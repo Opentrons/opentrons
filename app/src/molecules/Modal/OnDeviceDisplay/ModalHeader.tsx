@@ -8,6 +8,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   COLORS,
+  SIZE_2,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import type { ModalHeaderBaseProps } from './types'
@@ -19,11 +20,12 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
   const { title, hasExitIcon, iconName, iconColor, onClick, isError } = props
   return (
     <Flex
-      backgroundColor={isError ? COLORS.red_two : COLORS.white}
+      backgroundColor={isError ? COLORS.red2 : COLORS.white}
       color={isError ? COLORS.white : COLORS.black}
       height="6.25rem"
       width="100%"
-      padding={SPACING.spacing6}
+      paddingX={SPACING.spacing32}
+      paddingY={isError ? SPACING.spacing24 : SPACING.spacing32}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
@@ -34,13 +36,13 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
             aria-label={`icon_${iconName}`}
             name={iconName}
             color={isError ? COLORS.white : iconColor}
-            size={SPACING.spacing6}
+            size={SIZE_2}
             alignSelf={ALIGN_CENTER}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           />
         ) : null}
         <StyledText
-          fontWeight={TYPOGRAPHY.fontWeightLevel2_bold}
+          fontWeight={TYPOGRAPHY.fontWeightBold}
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
         >
@@ -48,7 +50,11 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
         </StyledText>
       </Flex>
       {hasExitIcon && onClick != null ? (
-        <Flex onClick={onClick} aria-label="closeIcon">
+        <Flex
+          onClick={onClick}
+          aria-label="closeIcon"
+          alignItems={ALIGN_CENTER}
+        >
           <Icon size="3.5rem" name="ot-close" />
         </Flex>
       ) : null}

@@ -264,7 +264,8 @@
         "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
         "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
         "opentrons/geb_96_tiprack_1000ul/1": 9.5
-      }
+      },
+      "defaultBlowoutVolume": 127.235
     }
   },
   "maxVolume": 1000,

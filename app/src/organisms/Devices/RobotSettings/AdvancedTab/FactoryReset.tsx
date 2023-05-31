@@ -39,7 +39,7 @@ export function FactoryReset({
       <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
-          marginBottom={SPACING.spacing2}
+          marginBottom={SPACING.spacing4}
           id="AdvancedSettings_factoryReset"
         >
           {t('factory_reset')}

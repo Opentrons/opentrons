@@ -6,9 +6,9 @@ import logging
 from datetime import datetime
 from textwrap import dedent
 from typing import Optional, Union
-from typing_extensions import Literal
+from typing_extensions import Literal, Final
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
 
 from robot_server.errors import ErrorDetails, ErrorBody
@@ -31,7 +31,7 @@ from robot_server.protocols import (
     get_protocol_store,
 )
 
-from ..run_store import RunNotFoundError
+from ..run_models import RunNotFoundError
 from ..run_auto_deleter import RunAutoDeleter
 from ..run_models import Run, RunCreate, RunUpdate
 from ..engine_store import EngineConflictError
@@ -41,6 +41,8 @@ from ..dependencies import get_run_data_manager, get_run_auto_deleter
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
+
+_DEFAULT_RUNS_LIST_LENGTH: Final = 20
 
 
 class RunNotFound(ErrorDetails):
@@ -185,14 +187,24 @@ async def create_run(
     },
 )
 async def get_runs(
+    pageLength: Optional[int] = Query(
+        None,
+        description=(
+            "The maximum number of runs to return."
+            " If this is less than the total number of runs,"
+            " the most-recently created runs will be returned."
+            " If this is omitted or `null`, all runs will be returned."
+        ),
+    ),
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
 ) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
-    """Get all runs.
+    """Get all runs, in order from least-recently to most-recently created.
 
     Args:
+        pageLength: Maximum number of items to return.
         run_data_manager: Current and historical run data management.
     """
-    data = run_data_manager.get_all()
+    data = run_data_manager.get_all(length=pageLength)
     current_run_id = run_data_manager.current_run_id
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     links = AllRunsLinks(

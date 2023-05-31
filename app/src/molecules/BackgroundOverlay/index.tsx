@@ -18,8 +18,8 @@ export function BackgroundOverlay(props: BackgroundOverlayProps): JSX.Element {
       right="0"
       top="0"
       bottom="0"
-      zIndex="1"
-      backgroundColor={COLORS.darkBlack_sixty}
+      zIndex="3"
+      backgroundColor={COLORS.darkBlack60}
       onClick={onClick}
       {...flexProps}
     />

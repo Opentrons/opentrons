@@ -74,7 +74,7 @@ export function MoveLabwareInterventionContent({
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.75rem" width="100%">
       <MoveLabwareHeader />
-      <Flex gridGap={SPACING.spacing6}>
+      <Flex gridGap={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.75rem" width="50%">
           <Flex
             flexDirection={DIRECTION_COLUMN}
@@ -90,7 +90,7 @@ export function MoveLabwareInterventionContent({
               {protocolSetupTranslator('labware_name')}
             </StyledText>
             <StyledText as="p">{labwareName}</StyledText>
-            <Divider marginY={SPACING.spacing3} />
+            <Divider marginY={SPACING.spacing8} />
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -156,7 +156,7 @@ function MoveLabwareHeader(): JSX.Element {
     <Flex alignItems={ALIGN_CENTER} gridGap="0.75rem">
       <Icon
         name="move-xy-circle"
-        size={SPACING.spacing6}
+        size={SPACING.spacing32}
         flex="0 0 auto"
         color={COLORS.successEnabled}
       />

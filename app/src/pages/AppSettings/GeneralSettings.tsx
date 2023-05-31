@@ -35,7 +35,10 @@ import {
   alertPermanentlyIgnored,
   alertUnignored,
 } from '../../redux/alerts'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED,
+} from '../../redux/analytics'
 import { UpdateAppModal } from '../../organisms/UpdateAppModal'
 import { PreviousVersionModal } from '../../organisms/AppSettings/PreviousVersionModal'
 import { ConnectRobotSlideout } from '../../organisms/AppSettings/ConnectRobotSlideout'
@@ -49,7 +52,6 @@ const GITHUB_LINK =
   'https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md'
 
 const ENABLE_APP_UPDATE_NOTIFICATIONS = 'Enable app update notifications'
-const EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLED = 'appUpdateNotificationsToggled'
 
 export function GeneralSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared'])
@@ -83,7 +85,7 @@ export function GeneralSettings(): JSX.Element {
       )
 
       trackEvent({
-        name: EVENT_APP_UPDATE_NOTIFICATIONS_TOGGLED,
+        name: ANALYTICS_APP_UPDATE_NOTIFICATIONS_TOGGLED,
         // this looks weird, but the control is a toggle, which makes the next
         // "enabled" setting `!enabled`. Therefore the next "ignored" setting is
         // `!!enabled`, or just `enabled`
@@ -99,12 +101,12 @@ export function GeneralSettings(): JSX.Element {
     <>
       <Box
         height="calc(100vh - 8.5rem)"
-        paddingX={SPACING.spacing4}
-        paddingY={SPACING.spacing5}
+        paddingX={SPACING.spacing16}
+        paddingY={SPACING.spacing24}
       >
         {showUpdateBanner && (
           <Box
-            marginBottom={SPACING.spacing4}
+            marginBottom={SPACING.spacing16}
             id="GeneralSettings_updatebanner"
           >
             <Banner
@@ -116,7 +118,7 @@ export function GeneralSettings(): JSX.Element {
                 textDecoration={TYPOGRAPHY.textDecorationUnderline}
                 role="button"
                 onClick={() => setShowUpdateModal(true)}
-                marginLeft={SPACING.spacing2}
+                marginLeft={SPACING.spacing4}
               >
                 {t('view_update')}
               </Link>
@@ -128,7 +130,7 @@ export function GeneralSettings(): JSX.Element {
             flexDirection={DIRECTION_ROW}
             alignItems={updateAvailable ? ALIGN_CENTER : ALIGN_START}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            gridGap={SPACING.spacing4}
+            gridGap={SPACING.spacing16}
           >
             {showConnectRobotSlideout && (
               <ConnectRobotSlideout
@@ -139,13 +141,13 @@ export function GeneralSettings(): JSX.Element {
             <Box width="65%">
               <StyledText
                 css={TYPOGRAPHY.h3SemiBold}
-                paddingBottom={SPACING.spacing3}
+                paddingBottom={SPACING.spacing8}
               >
                 {t('software_version')}
               </StyledText>
               <StyledText
                 as="p"
-                paddingBottom={SPACING.spacing3}
+                paddingBottom={SPACING.spacing8}
                 id="GeneralSettings_currentVersion"
               >
                 {CURRENT_VERSION}
@@ -174,14 +176,14 @@ export function GeneralSettings(): JSX.Element {
                 fontSize={TYPOGRAPHY.fontSizeLabel}
                 lineHeight={TYPOGRAPHY.lineHeight12}
                 color={COLORS.darkGreyEnabled}
-                paddingY={SPACING.spacing5}
+                paddingY={SPACING.spacing24}
               >
                 {t('up_to_date')}
               </StyledText>
             )}
           </Flex>
           <Box width="70%">
-            <StyledText as="p" paddingY={SPACING.spacing3}>
+            <StyledText as="p" paddingY={SPACING.spacing8}>
               {t('manage_versions')}
             </StyledText>
           </Box>
@@ -204,10 +206,10 @@ export function GeneralSettings(): JSX.Element {
             </Flex>
           </Box>
         </Box>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <StyledText
           css={TYPOGRAPHY.h3SemiBold}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing8}
         >
           {t('update_alerts')}
         </StyledText>
@@ -219,21 +221,21 @@ export function GeneralSettings(): JSX.Element {
           <StyledText as="p">{t('receive_alert')}</StyledText>
           <ToggleButton
             label={ENABLE_APP_UPDATE_NOTIFICATIONS}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
             disabled={updateAlertEnabled === null}
             toggledOn={updateAlertEnabled === true}
             onClick={handleToggle}
             id="GeneralSettings_softwareUpdateAlerts"
           />
         </Flex>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <StyledText
             css={TYPOGRAPHY.h3SemiBold}
-            paddingBottom={SPACING.spacing3}
+            paddingBottom={SPACING.spacing8}
           >
             {t('connect_ip')}
           </StyledText>

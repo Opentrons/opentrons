@@ -54,7 +54,7 @@ const MODAL_STYLE = {
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
   width: '47rem',
-  margin: SPACING.spacing5,
+  margin: SPACING.spacing24,
   border: `6px ${String(BORDERS.styleSolid)} ${String(COLORS.blueEnabled)}`,
   borderRadius: BORDERS.radiusSoftCorners,
   boxShadow: BORDERS.smallDropShadow,
@@ -65,7 +65,7 @@ const HEADER_STYLE = {
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
   justifyContent: JUSTIFY_CENTER,
-  padding: `0px ${String(SPACING.spacing6)}`,
+  padding: `0px ${SPACING.spacing32}`,
   color: COLORS.white,
   backgroundColor: COLORS.blueEnabled,
   position: POSITION_STICKY,
@@ -77,8 +77,8 @@ const CONTENT_STYLE = {
   display: DISPLAY_FLEX,
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
-  gridGap: SPACING.spacing5,
-  padding: `${String(SPACING.spacing6)}`,
+  gridGap: SPACING.spacing24,
+  padding: `${SPACING.spacing32}`,
   borderRadius: `0px 0px ${String(BORDERS.radiusSoftCorners)} ${String(
     BORDERS.radiusSoftCorners
   )}`,
@@ -126,7 +126,7 @@ export function InterventionModal({
     case 'waitForResume':
       modalContent = (
         <PauseInterventionContent
-          startedAt={command.params?.startedAt ?? null}
+          startedAt={command.startedAt ?? null}
           message={command.params?.message ?? null}
         />
       )
@@ -187,7 +187,7 @@ export function InterventionModal({
                   {t('protocol_info:manual_steps_learn_more')}
                   <Icon
                     name="open-in-new"
-                    marginLeft={SPACING.spacing2}
+                    marginLeft={SPACING.spacing4}
                     size="0.5rem"
                   />
                 </Link>

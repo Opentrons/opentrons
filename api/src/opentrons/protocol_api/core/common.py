@@ -9,6 +9,7 @@ from .module import (
     AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
+    AbstractMagneticBlockCore,
 )
 from .protocol import AbstractProtocol
 from .well import AbstractWellCore
@@ -22,4 +23,5 @@ TemperatureModuleCore = AbstractTemperatureModuleCore
 MagneticModuleCore = AbstractMagneticModuleCore
 ThermocyclerCore = AbstractThermocyclerCore
 HeaterShakerCore = AbstractHeaterShakerCore
+MagneticBlockCore = AbstractMagneticBlockCore
 ProtocolCore = AbstractProtocol[InstrumentCore, LabwareCore, ModuleCore]

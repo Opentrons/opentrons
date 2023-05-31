@@ -37,7 +37,7 @@ const render = (props: React.ComponentProps<typeof SetupModules>) => {
     <SetupModules
       robotName={MOCK_ROBOT_NAME}
       runId={MOCK_RUN_ID}
-      expandLabwareSetupStep={() => jest.fn()}
+      expandLabwarePositionCheckStep={() => jest.fn()}
     />,
     { i18nInstance: i18n }
   )[0]
@@ -65,7 +65,9 @@ describe('SetupModules', () => {
 
   it('should render Proceed to labware setup CTA that is enabled', () => {
     const { getByRole } = render(props)
-    const button = getByRole('button', { name: 'Proceed to labware setup' })
+    const button = getByRole('button', {
+      name: 'Proceed to labware position check',
+    })
     expect(button).toBeEnabled()
   })
 
@@ -77,7 +79,9 @@ describe('SetupModules', () => {
         remainingAttachedModules: [mockTemperatureModule],
       })
     const { getByRole } = render(props)
-    const button = getByRole('button', { name: 'Proceed to labware setup' })
+    const button = getByRole('button', {
+      name: 'Proceed to labware position check',
+    })
     expect(button).toBeDisabled()
   })
 

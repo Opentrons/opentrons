@@ -17,7 +17,7 @@ const PrimaryButtonTemplate: Story<
 > = args => {
   const { children } = args
   return (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
+    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
       <PrimaryButton>{children}</PrimaryButton>
     </Flex>
   )
@@ -33,7 +33,7 @@ const SecondaryButtonTemplate: Story<
 > = args => {
   const { children } = args
   return (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
+    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
       <SecondaryButton>{children}</SecondaryButton>
     </Flex>
   )

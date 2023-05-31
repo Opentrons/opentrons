@@ -111,7 +111,7 @@ export function ModuleRow(props: Props): JSX.Element {
           moduleType={type}
           size={SIZE_1}
           color={C_DARK_GRAY}
-          marginRight={SPACING.spacing2}
+          marginRight={SPACING.spacing4}
         />
         {i18n.t(`modules.module_display_names.${type}`)}
       </h4>

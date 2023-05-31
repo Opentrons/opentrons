@@ -32,6 +32,7 @@ from .ot3utils import (
     create_tip_action_group,
     PipetteAction,
     NODEID_SUBSYSTEM,
+    motor_nodes,
 )
 
 from opentrons_hardware.firmware_bindings.constants import (
@@ -214,10 +215,15 @@ class OT3Simulator:
     @ensure_yield
     async def update_motor_status(self) -> None:
         """Retreieve motor and encoder status and position from all present nodes"""
-        # Simulate condition at boot, status would not be ok
-        self._motor_status.update(
-            (node, MotorStatus(False, False)) for node in self._present_nodes
-        )
+        if not self._motor_status:
+            # Simulate condition at boot, status would not be ok
+            self._motor_status.update(
+                (node, MotorStatus(False, False)) for node in self._present_nodes
+            )
+        else:
+            self._motor_status.update(
+                (node, MotorStatus(True, True)) for node in self._present_nodes
+            )
 
     @ensure_yield
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
@@ -238,7 +244,7 @@ class OT3Simulator:
 
     def check_encoder_status(self, axes: Sequence[OT3Axis]) -> bool:
         """If any of the encoder statuses is ok, parking can proceed."""
-        return any(
+        return all(
             isinstance(status, MotorStatus) and status.encoder_ok
             for status in self._get_motor_status(axes)
         )
@@ -294,7 +300,9 @@ class OT3Simulator:
         self._encoder_position.update(final_positions)
 
     @ensure_yield
-    async def home(self, axes: Optional[List[OT3Axis]] = None) -> OT3AxisMap[float]:
+    async def home(
+        self, axes: Sequence[OT3Axis], gantry_load: GantryLoad
+    ) -> OT3AxisMap[float]:
         """Home axes.
 
         Args:
@@ -491,6 +499,15 @@ class OT3Simulator:
             NODEID_SUBSYSTEM[node.application_for()]: 0 for node in self._present_nodes
         }
 
+    def axis_is_present(self, axis: OT3Axis) -> bool:
+        try:
+            return axis_to_node(axis) in motor_nodes(
+                cast(Set[FirmwareTarget], self._present_nodes)
+            )
+        except KeyError:
+            # Currently unhandled axis
+            return False
+
     @property
     def update_required(self) -> bool:
         return self._update_required
@@ -554,11 +571,6 @@ class OT3Simulator:
 
     @ensure_yield
     async def halt(self) -> None:
-        """Halt the motors."""
-        return None
-
-    @ensure_yield
-    async def hard_halt(self) -> None:
         """Halt the motors."""
         return None
 

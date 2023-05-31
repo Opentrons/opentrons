@@ -39,7 +39,7 @@ export interface RunData {
   current: boolean
   status: RunStatus
   actions: RunAction[]
-  errors: Error[]
+  errors: RunError[]
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
   modules: LoadedModule[]
@@ -66,6 +66,10 @@ export interface Run {
 
 export interface RunsLinks {
   current?: ResourceLink
+}
+
+export interface GetRunsParams {
+  pageLength?: number // the number of items to include
 }
 
 export interface Runs {
@@ -106,7 +110,7 @@ export interface CommandData {
   data: RunCommandSummary
 }
 
-export interface Error {
+export interface RunError {
   id: string
   errorType: string
   createdAt: string

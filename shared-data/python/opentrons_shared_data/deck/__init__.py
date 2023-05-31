@@ -1,7 +1,7 @@
 """
 opentrons_shared_data.deck: types and bindings for deck definitions
 """
-from typing import Dict, NamedTuple, overload, TYPE_CHECKING
+from typing import Dict, NamedTuple, cast, overload, TYPE_CHECKING
 from typing_extensions import Final
 import json
 
@@ -46,12 +46,14 @@ def load(name: str, version: int) -> "DeckDefinition":
     ...
 
 
-def load(name, version=DEFAULT_DECK_DEFINITION_VERSION):
+def load(name: str, version: int = DEFAULT_DECK_DEFINITION_VERSION) -> object:
     return json.loads(load_shared_data(f"deck/definitions/{version}/{name}.json"))
 
 
 def load_schema(version: int) -> "DeckSchema":
-    return json.loads(load_shared_data(f"deck/schemas/{version}.json"))
+    return cast(
+        "DeckSchema", json.loads(load_shared_data(f"deck/schemas/{version}.json"))
+    )
 
 
 def get_calibration_square_position_in_slot(slot: int) -> Offset:
