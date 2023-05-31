@@ -2359,6 +2359,11 @@
           "title": "Blockmaxvolumeul",
           "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler.",
           "type": "number"
+        },
+        "holdTimeSeconds": {
+          "title": "Holdtimeseconds",
+          "description": "Amount of time, in seconds, to hold the temperature for. If specified, a waitForBlockTemperature command will block until the given hold time has elapsed.",
+          "type": "number"
         }
       },
       "required": ["moduleId", "celsius"]

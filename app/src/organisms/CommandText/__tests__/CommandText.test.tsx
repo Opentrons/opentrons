@@ -316,7 +316,9 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )[0]
-    getByText('Setting Thermocycler block temperature to 20°C')
+    getByText(
+      'Setting Thermocycler block temperature to 20°C with hold time of 0 seconds after target reached'
+    )
   })
   it('renders correct text for thermocycler/setTargetLidTemperature', () => {
     const mockTemp = 20
@@ -495,7 +497,7 @@ describe('CommandText', () => {
       'magneticModule/disengage': 'Disengaging Magnetic Module',
       'temperatureModule/deactivate': 'Deactivating Temperature Module',
       'thermocycler/waitForBlockTemperature':
-        'Waiting for Thermocycler block to reach target temperature',
+        'Waiting for Thermocycler block to reach target temperature and holding for specified time',
       'thermocycler/waitForLidTemperature':
         'Waiting for Thermocycler lid to reach target temperature',
       'thermocycler/openLid': 'Opening Thermocycler lid',

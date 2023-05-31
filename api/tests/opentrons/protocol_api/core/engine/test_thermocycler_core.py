@@ -94,6 +94,7 @@ def test_set_target_block_temperature(
             module_id="1234",
             celsius=42.0,
             block_max_volume=3.4,
+            hold_time_seconds=1.2,
         ),
         times=1,
     )
