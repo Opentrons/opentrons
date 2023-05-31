@@ -1,7 +1,14 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { COLORS, Flex, Icon, SPACING, SIZE_2 } from '@opentrons/components'
+import {
+  ALIGN_CENTER,
+  COLORS,
+  Flex,
+  Icon,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
 import { MenuList } from '../../../atoms/MenuList'
@@ -26,42 +33,54 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   return (
     <MenuList onClick={onClick} isOnDevice={true}>
       <MenuItem
-        key="home-gantry"
+        key="home-robot-arm"
         onClick={() => dispatch(home(robotName, ROBOT))}
       >
-        <Flex>
+        <Flex alignItems={ALIGN_CENTER}>
           <Icon
-            name="home-gantry"
-            aria-label="home-gantry_icon"
-            size={SIZE_2}
+            name="home-robot-arm"
+            aria-label="home-robot-arm_icon"
+            size="2.5rem"
           />
-          <StyledText marginLeft={SPACING.spacing24}>
-            {t('home_gantry')}
+          <StyledText
+            as="h4"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginLeft={SPACING.spacing12}
+          >
+            {t('home_robot_arm')}
           </StyledText>
         </Flex>
       </MenuItem>
       <MenuItem key="restart" onClick={() => dispatch(restartRobot(robotName))}>
-        <Flex>
+        <Flex alignItems={ALIGN_CENTER}>
           <Icon
             name="restart"
-            size={SIZE_2}
+            size="2.5rem"
             color={COLORS.black}
             aria-label="restart_icon"
           />
-          <StyledText marginLeft={SPACING.spacing24}>
+          <StyledText
+            as="h4"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginLeft={SPACING.spacing12}
+          >
             {t('robot_controls:restart_label')}
           </StyledText>
         </Flex>
       </MenuItem>
       <MenuItem key="light" onClick={toggleLights}>
-        <Flex>
+        <Flex alignItems={ALIGN_CENTER}>
           <Icon
             name="light"
-            size={SIZE_2}
+            size="2.5rem"
             color={COLORS.black}
             aria-label="light_icon"
           />
-          <StyledText marginLeft={SPACING.spacing24}>
+          <StyledText
+            as="h4"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            marginLeft={SPACING.spacing12}
+          >
             {i18n.format(
               t(lightsOn ? 'lights_off' : 'lights_on'),
               'capitalize'

@@ -59,6 +59,7 @@ interface ProtocolInstrumentMountItemProps {
     | GripperData['data']['calibratedOffset']
     | null
   speccedName: PipetteName | GripperModel
+  instrumentsRefetch?: () => void
 }
 export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
@@ -155,6 +156,7 @@ export function ProtocolInstrumentMountItem(
           selectedPipette={selectedPipette}
           mount={mount as Mount}
           pipetteInfo={mostRecentAnalysis?.pipettes}
+          onComplete={props.instrumentsRefetch}
         />
       ) : null}
     </>
