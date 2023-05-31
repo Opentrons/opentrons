@@ -15,5 +15,6 @@
   "start_setup": "Start setup",
   "this_protocol_will_be_trashed": "This protocol will be moved to this computer’s trash and may be unrecoverable.",
   "updated": "Updated",
-  "yes_delete_this_protocol": "Yes, delete protocol"
+  "yes_delete_this_protocol": "Yes, delete protocol",
+  "delete_protocol_message": " and its run history will be permanently deleted."
 }

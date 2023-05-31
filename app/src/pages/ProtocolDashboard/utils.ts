@@ -1,6 +1,6 @@
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
-import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
+import type { ProtocolsOnDeviceSortKey } from '../../redux/config/types'
 
 export function sortProtocols(
   sortBy: ProtocolsOnDeviceSortKey,
