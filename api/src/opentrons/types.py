@@ -1,7 +1,7 @@
 from __future__ import annotations
 import enum
 from math import sqrt, isclose
-from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union
+from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union, List
 
 from .protocols.api_support.labware_like import LabwareLike
 
@@ -154,39 +154,94 @@ class Location:
 class Mount(enum.Enum):
     LEFT = enum.auto()
     RIGHT = enum.auto()
+    EXTENSION = enum.auto()
 
     def __str__(self) -> str:
         return self.name
 
     @classmethod
+    def ot2_mounts(cls) -> List["Mount"]:
+        return [Mount.LEFT, Mount.RIGHT]
+
+    @classmethod
     def string_to_mount(cls, mount: str) -> "Mount":
         if mount == "right":
             return cls.RIGHT
-        else:
+        elif mount == "left":
             return cls.LEFT
+        else:
+            return cls.EXTENSION
 
 
 class MountType(str, enum.Enum):
     LEFT = "left"
     RIGHT = "right"
+    EXTENSION = "extension"
 
+    # TODO (spp, 2023-05-04): we should deprecate this and instead create an 'other_pipette_mount' method
     def other_mount(self) -> MountType:
         return MountType.LEFT if self is MountType.RIGHT else MountType.RIGHT
 
     def to_hw_mount(self) -> Mount:
-        return Mount.LEFT if self is MountType.LEFT else Mount.RIGHT
+        return {
+            MountType.LEFT: Mount.LEFT,
+            MountType.RIGHT: Mount.RIGHT,
+            MountType.EXTENSION: Mount.EXTENSION,
+        }[self]
+
+    @staticmethod
+    def from_hw_mount(mount: Mount) -> MountType:
+        """Convert from Mount to MountType."""
+        mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
+        return mount_map[mount]
 
 
+class PipetteMountType(enum.Enum):
+    LEFT = "left"
+    RIGHT = "right"
+    COMBINED = "combined"  # added for 96-channel. Remove if not required
+
+    def to_mount_type(self) -> MountType:
+        return {
+            PipetteMountType.LEFT: MountType.LEFT,
+            PipetteMountType.RIGHT: MountType.RIGHT,
+        }[self]
+
+
+# What is this used for? Can we consolidate this into MountType?
+# If not, can we change the 'GRIPPER' mount name to 'EXTENSION' so that it's
+# consistent with all user-facing mount names?
 class OT3MountType(str, enum.Enum):
     LEFT = "left"
     RIGHT = "right"
     GRIPPER = "gripper"
 
 
+DECK_COORDINATE_TO_SLOT_NAME = {
+    "D1": "1",
+    "D2": "2",
+    "D3": "3",
+    "C1": "4",
+    "C2": "5",
+    "C3": "6",
+    "B1": "7",
+    "B2": "8",
+    "B3": "9",
+    "A1": "10",
+    "A2": "11",
+    "A3": "12",
+}
+
+DECK_SLOT_NAME_TO_COORDINATE = {
+    slot_name: coordinate
+    for coordinate, slot_name in DECK_COORDINATE_TO_SLOT_NAME.items()
+}
+
+
 # TODO(mc, 2020-11-09): this makes sense in shared-data or other common
 # model library
 # https://github.com/Opentrons/opentrons/pull/6943#discussion_r519029833
-class DeckSlotName(str, enum.Enum):
+class DeckSlotName(enum.Enum):
     """Deck slot identifiers."""
 
     SLOT_1 = "1"
@@ -204,15 +259,33 @@ class DeckSlotName(str, enum.Enum):
 
     @classmethod
     def from_primitive(cls, value: DeckLocation) -> DeckSlotName:
-        str_val = str(value)
+        str_val = str(value).upper()
+        if str_val in DECK_COORDINATE_TO_SLOT_NAME:
+            str_val = DECK_COORDINATE_TO_SLOT_NAME[str_val]
         return cls(str_val)
 
     def as_int(self) -> int:
         return int(self.value)
 
+    def as_coordinate(self) -> str:
+        return DECK_SLOT_NAME_TO_COORDINATE[self.value]
+
+    @property
+    def id(self) -> str:
+        """This slot's unique ID, as it appears in the deck definition.
+
+        This can be used to look up slot details in the deck definition.
+
+        This is preferred over `.value` or `.__str__()` for explicitness.
+        """
+        return self.value
+
     def __str__(self) -> str:
-        """Stringify to a simple integer string."""
-        return str(self.value)
+        """Stringify to the unique ID.
+
+        For explicitness, prefer using `.id` instead.
+        """
+        return self.id
 
 
 class TransferTipPolicy(enum.Enum):

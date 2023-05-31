@@ -21,32 +21,32 @@ export const MOCK_MODULE_ID = 'f806ff9f-3b17-4692-aa63-f77c57fe18d1'
 
 export const mockPauseCommandWithStartTime = {
   commandType: 'waitForResume',
+  startedAt: new Date(),
   params: {
-    startedAt: new Date(),
     message: longCommandMessage,
   },
 } as any
 
 export const mockPauseCommandWithoutStartTime = {
   commandType: 'waitForResume',
+  startedAt: null,
   params: {
-    startedAt: null,
     message: longCommandMessage,
   },
 } as any
 
 export const mockPauseCommandWithShortMessage = {
   commandType: 'waitForResume',
+  startedAt: null,
   params: {
-    startedAt: null,
     message: shortCommandMessage,
   },
 } as any
 
 export const mockPauseCommandWithNoMessage = {
   commandType: 'waitForResume',
+  startedAt: null,
   params: {
-    startedAt: null,
     message: null,
   },
 } as any

@@ -273,7 +273,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
       ) : null}
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex gridGap={SPACING.spacing3}>
+          <Flex gridGap={SPACING.spacing8}>
             <StyledText
               as="h2"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}

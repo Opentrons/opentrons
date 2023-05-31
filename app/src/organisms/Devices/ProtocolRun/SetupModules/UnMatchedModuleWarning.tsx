@@ -16,12 +16,12 @@ export const UnMatchedModuleWarning = (): JSX.Element | null => {
   if (!showBanner) return null
 
   return (
-    <Box marginTop={SPACING.spacing3}>
+    <Box marginTop={SPACING.spacing8}>
       <Banner
-        iconMarginRight={SPACING.spacing4}
-        iconMarginLeft={SPACING.spacing3}
+        iconMarginRight={SPACING.spacing16}
+        iconMarginLeft={SPACING.spacing8}
         type="warning"
-        size={SPACING.spacingM}
+        size={SPACING.spacing20}
         onCloseClick={() => setShowBanner(false)}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
@@ -34,7 +34,7 @@ export const UnMatchedModuleWarning = (): JSX.Element | null => {
           </StyledText>
 
           <StyledText as="p" data-testid="UnMatchedModuleWarning_body">
-            {t('module_mismatch_body')}
+            {`${t('module_mismatch_body')}.`}
           </StyledText>
         </Flex>
       </Banner>

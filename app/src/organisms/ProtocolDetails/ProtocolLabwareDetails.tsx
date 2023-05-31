@@ -57,13 +57,13 @@ export const ProtocolLabwareDetails = (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
-      marginBottom={SPACING.spacing3}
+      marginBottom={SPACING.spacing8}
     >
       <Flex flexDirection={DIRECTION_ROW}>
         <StyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
           data-testid="ProtocolLabwareDetails_labware_name"
           width="66%"
         >
@@ -107,14 +107,14 @@ export const ProtocolLabwareDetailItem = (
       <Divider width="100%" />
       <Flex
         flexDirection={DIRECTION_ROW}
-        marginY={SPACING.spacing3}
+        marginY={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
       >
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
           width="66%"
-          marginRight={SPACING.spacingM}
+          marginRight={SPACING.spacing20}
         >
           {namespace === 'opentrons' ? (
             <Icon
@@ -123,12 +123,12 @@ export const ProtocolLabwareDetailItem = (
               height="0.75rem"
               minHeight="0.75rem"
               minWidth="0.75rem"
-              marginRight={SPACING.spacing3}
+              marginRight={SPACING.spacing8}
             />
           ) : (
-            <Flex marginLeft={SPACING.spacingM} />
+            <Flex marginLeft={SPACING.spacing20} />
           )}
-          <StyledText as="p" paddingRight={SPACING.spacing6}>
+          <StyledText as="p" paddingRight={SPACING.spacing32}>
             {displayName}
           </StyledText>
         </Flex>
@@ -168,7 +168,7 @@ export const LabwareDetailOverflowMenu = (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
-      marginRight={SPACING.spacing3}
+      marginRight={SPACING.spacing8}
       marginLeft={SPACING.spacingAuto}
     >
       <Flex>

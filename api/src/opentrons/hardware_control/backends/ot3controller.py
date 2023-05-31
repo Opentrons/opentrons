@@ -45,6 +45,8 @@ from .ot3utils import (
     sub_system_to_node_id,
     NODEID_SUBSYSTEM,
     USBTARGET_SUBSYSTEM,
+    filter_probed_core_nodes,
+    motor_nodes,
 )
 
 try:
@@ -88,7 +90,12 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteType,
     USBTarget,
     FirmwareTarget,
+    ErrorCode,
 )
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    StopRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
 from opentrons_hardware.hardware_control import status_bar
 
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
@@ -180,7 +187,9 @@ class OT3Controller:
     _tool_detector: detector.OneshotToolDetector
 
     @classmethod
-    async def build(cls, config: OT3Config, use_usb_bus: bool = False) -> OT3Controller:
+    async def build(
+        cls, config: OT3Config, use_usb_bus: bool = False, check_updates: bool = True
+    ) -> OT3Controller:
         """Create the OT3Controller instance.
 
         Args:
@@ -199,13 +208,16 @@ class OT3Controller:
                     "No rear panel device found, probably an EVT bot, disable rearPanelIntegration feature flag if it is"
                 )
                 raise e
-        return cls(config, driver=driver, usb_driver=usb_driver)
+        return cls(
+            config, driver=driver, usb_driver=usb_driver, check_updates=check_updates
+        )
 
     def __init__(
         self,
         config: OT3Config,
         driver: AbstractCanDriver,
         usb_driver: Optional[SerialUsbDriver] = None,
+        check_updates: bool = True,
     ) -> None:
         """Construct.
 
@@ -223,6 +235,7 @@ class OT3Controller:
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
+        self._check_updates = check_updates
         self._update_required = False
         self._initialized = False
         self._update_tracker: Optional[UpdateProgress] = None
@@ -262,7 +275,7 @@ class OT3Controller:
 
     @property
     def update_required(self) -> bool:
-        return self._update_required
+        return self._update_required and self._check_updates
 
     @update_required.setter
     def update_required(self, value: bool) -> None:
@@ -294,21 +307,7 @@ class OT3Controller:
         return pipette_nodes
 
     def _motor_nodes(self) -> Set[NodeId]:
-        # do the replacement of head and gripper devices
-        motor_nodes = self._replace_gripper_node(self._present_devices)
-        motor_nodes = self._replace_head_node(motor_nodes)
-        bootloader_nodes = {
-            NodeId.pipette_left_bootloader,
-            NodeId.pipette_right_bootloader,
-            NodeId.gantry_x_bootloader,
-            NodeId.gantry_y_bootloader,
-            NodeId.head_bootloader,
-            NodeId.gripper_bootloader,
-        }
-        # remove any bootloader nodes
-        motor_nodes -= bootloader_nodes
-        # filter out usb nodes
-        return {NodeId(target) for target in motor_nodes if target in NodeId}
+        return motor_nodes(self._present_devices)
 
     def get_instrument_update(
         self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
@@ -482,8 +481,7 @@ class OT3Controller:
         )
 
     def check_encoder_status(self, axes: Sequence[OT3Axis]) -> bool:
-        """If any of the encoder statuses is ok, parking can proceed."""
-        return any(
+        return all(
             isinstance(status, MotorStatus) and status.encoder_ok
             for status in self._get_motor_status(axes)
         )
@@ -539,11 +537,13 @@ class OT3Controller:
         self._handle_motor_status_response(positions)
 
     def _build_home_pipettes_runner(
-        self, axes: Sequence[OT3Axis]
+        self,
+        axes: Sequence[OT3Axis],
+        gantry_load: GantryLoad,
     ) -> Optional[MoveGroupRunner]:
-        speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
-        )
+        speed_settings = self._configuration.motion_settings.max_speed_discontinuity[
+            gantry_load
+        ]
 
         distances_pipette = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
@@ -568,11 +568,13 @@ class OT3Controller:
         return None
 
     def _build_home_gantry_z_runner(
-        self, axes: Sequence[OT3Axis]
+        self,
+        axes: Sequence[OT3Axis],
+        gantry_load: GantryLoad,
     ) -> Optional[MoveGroupRunner]:
-        speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
-        )
+        speed_settings = self._configuration.motion_settings.max_speed_discontinuity[
+            gantry_load
+        ]
 
         distances_gantry = {
             ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
@@ -616,7 +618,9 @@ class OT3Controller:
         return None
 
     @requires_update
-    async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
+    async def home(
+        self, axes: Sequence[OT3Axis], gantry_load: GantryLoad
+    ) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.
 
         Args:
@@ -625,7 +629,7 @@ class OT3Controller:
         Returns:
             A dictionary containing the new positions of each axis
         """
-        checked_axes = [axis for axis in axes if self._axis_is_present(axis)]
+        checked_axes = [axis for axis in axes if self.axis_is_present(axis)]
         assert (
             OT3Axis.G not in checked_axes
         ), "Please home G axis using gripper_home_jaw()"
@@ -633,8 +637,8 @@ class OT3Controller:
             return {}
 
         maybe_runners = (
-            self._build_home_gantry_z_runner(checked_axes),
-            self._build_home_pipettes_runner(checked_axes),
+            self._build_home_gantry_z_runner(checked_axes, gantry_load),
+            self._build_home_pipettes_runner(checked_axes, gantry_load),
         )
         coros = [
             runner.run(can_messenger=self._messenger)
@@ -646,7 +650,7 @@ class OT3Controller:
             await self.tip_action(
                 [OT3Axis.Q],
                 self.axis_bounds[OT3Axis.Q][1] - self.axis_bounds[OT3Axis.Q][0],
-                self._configuration.motion_settings.default_max_speed.high_throughput[
+                self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
                     OT3Axis.to_kind(OT3Axis.Q)
                 ],
             )
@@ -968,11 +972,11 @@ class OT3Controller:
 
     async def halt(self) -> None:
         """Halt the motors."""
-        return None
-
-    async def hard_halt(self) -> None:
-        """Halt the motors."""
-        return None
+        error = await self._messenger.ensure_send(
+            NodeId.broadcast, StopRequest(payload=EmptyPayload())
+        )
+        if error != ErrorCode.ok:
+            log.warning(f"Halt stop request failed: {error}")
 
     async def probe(self, axis: OT3Axis, distance: float) -> OT3AxisMap[float]:
         """Probe."""
@@ -1010,49 +1014,6 @@ class OT3Controller:
             node_to_axis(k): v for k, v in OT3Controller._get_home_position().items()
         }
 
-    @staticmethod
-    def _replace_head_node(targets: Set[FirmwareTarget]) -> Set[FirmwareTarget]:
-        """Replace the head core node with its two sides.
-
-        The node ID for the head central controller is what shows up in a network probe,
-        but what we actually send commands to an overwhelming majority of the time is
-        the head_l and head_r synthetic node IDs, and those are what we want in the
-        network map.
-        """
-        if NodeId.head in targets:
-            targets.remove(NodeId.head)
-            targets.add(NodeId.head_r)
-            targets.add(NodeId.head_l)
-        return targets
-
-    @staticmethod
-    def _replace_gripper_node(targets: Set[FirmwareTarget]) -> Set[FirmwareTarget]:
-        """Replace the gripper core node with its two axes.
-
-        The node ID for the gripper controller is what shows up in a network probe,
-        but what we actually send most commands to is the gripper_z and gripper_g
-        synthetic nodes, so we should have them in the network map instead.
-        """
-        if NodeId.gripper in targets:
-            targets.remove(NodeId.gripper)
-            targets.add(NodeId.gripper_z)
-            targets.add(NodeId.gripper_g)
-        return targets
-
-    @staticmethod
-    def _filter_probed_core_nodes(
-        current_set: Set[FirmwareTarget], probed_set: Set[FirmwareTarget]
-    ) -> Set[FirmwareTarget]:
-        core_replaced: Set[FirmwareTarget] = {
-            NodeId.gantry_x,
-            NodeId.gantry_y,
-            NodeId.head,
-            USBTarget.rear_panel,
-        }
-        current_set -= core_replaced
-        current_set |= probed_set
-        return current_set
-
     async def _probe_core(self, timeout: float = 5.0) -> None:
         """Update the list of core nodes present on the network.
 
@@ -1067,7 +1028,7 @@ class OT3Controller:
         if self._usb_messenger is not None:
             core_nodes.add(USBTarget.rear_panel)
         core_present = set(await self._network_info.probe(core_nodes, timeout))
-        self._present_devices = self._filter_probed_core_nodes(
+        self._present_devices = filter_probed_core_nodes(
             self._present_devices, core_present
         )
 
@@ -1101,7 +1062,7 @@ class OT3Controller:
         self._present_devices = core_present
         log.info(f"The present devices are now {self._present_devices}")
 
-    def _axis_is_present(self, axis: OT3Axis) -> bool:
+    def axis_is_present(self, axis: OT3Axis) -> bool:
         try:
             return axis_to_node(axis) in self._motor_nodes()
         except KeyError:
@@ -1163,7 +1124,6 @@ class OT3Controller:
             speed_mm_per_s,
             sensor_id_for_instrument(probe),
             relative_threshold_pf=sensor_threshold_pf,
-            log_sensor_values=True,
         )
 
         self._position[axis_to_node(moving)] = pos

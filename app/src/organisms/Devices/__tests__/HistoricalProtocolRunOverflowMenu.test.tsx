@@ -13,7 +13,10 @@ import runRecord from '../../../organisms/RunDetails/__fixtures__/runRecord.json
 import { useDownloadRunLog, useTrackProtocolRunEvent } from '../hooks'
 import { useRunControls } from '../../RunTimeControl/hooks'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../../redux/analytics'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 
 import type { CommandsData } from '@opentrons/api-client'
@@ -151,7 +154,7 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
     })
     fireEvent.click(rerunBtn)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'proceedToRun',
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'HistoricalProtocolRun' },
     })
     expect(mockUseRunControls).toHaveBeenCalled()

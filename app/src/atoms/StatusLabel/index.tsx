@@ -42,12 +42,12 @@ export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
       <Flex
         backgroundColor={backgroundColor}
         borderRadius={BORDERS.radiusSoftCorners}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
         paddingX="0.375rem"
-        paddingY={SPACING.spacing1}
+        paddingY={SPACING.spacing2}
         alignItems={ALIGN_CENTER}
-        marginTop={SPACING.spacing2}
-        marginBottom={SPACING.spacing2}
+        marginTop={SPACING.spacing4}
+        marginBottom={SPACING.spacing4}
         data-testid={
           id != null ? `status_label_${status}_${id}` : `status_label_${status}`
         }

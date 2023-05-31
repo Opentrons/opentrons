@@ -6,6 +6,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import { DeckSlot } from '../types'
 
@@ -34,6 +35,7 @@ export interface FormModulesByType {
   temperatureModuleType: FormModule
   thermocyclerModuleType: FormModule
   heaterShakerModuleType: FormModule
+  magneticBlockType: FormModule
 }
 export type ModuleEntities = Record<string, ModuleEntity>
 // NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'
@@ -60,6 +62,9 @@ export interface HeaterShakerModuleState {
   targetSpeed: number | null
   latchOpen: boolean | null
 }
+export interface MagneticBlockState {
+  type: typeof MAGNETIC_BLOCK_TYPE
+}
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState:
@@ -67,6 +72,7 @@ export interface ModuleTemporalProperties {
     | TemperatureModuleState
     | ThermocyclerModuleState
     | HeaterShakerModuleState
+    | MagneticBlockState
 }
 export type ModuleOnDeck = ModuleEntity & ModuleTemporalProperties
 export type ModulesForEditModulesCard = Partial<

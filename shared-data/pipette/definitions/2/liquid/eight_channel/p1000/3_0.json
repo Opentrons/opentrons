@@ -7,7 +7,7 @@
       "defaultBlowOutFlowRate": 80,
       "defaultTipLength": 57.9,
       "defaultTipOverlap": 10.5,
-      "defaultReturnTipHeight": 0.83,
+      "defaultReturnTipHeight": 0.5,
       "aspirate": {
         "default": [
           [0.4148, -1705.1015, 20.5455],
@@ -99,7 +99,8 @@
           [48.5297, 0.0084, 13.8668],
           [51.4512, 0.0064, 13.9651]
         ]
-      }
+      },
+      "defaultBlowoutVolume": 3.2
     },
     "t200": {
       "defaultAspirateFlowRate": 80,
@@ -197,7 +198,8 @@
           [198.5845, 0.0011, 15.0538],
           [214.0264, 0.0008, 15.123]
         ]
-      }
+      },
+      "defaultBlowoutVolume": 16
     },
     "t1000": {
       "defaultAspirateFlowRate": 160,
@@ -295,7 +297,8 @@
           [1004.87, 0.0001, 15.3912],
           [1051.4648, 0.0001, 15.391]
         ]
-      }
+      },
+      "defaultBlowoutVolume": 16
     }
   },
   "maxVolume": 1000,

@@ -1,44 +1,27 @@
-import { LEFT, RIGHT } from '@opentrons/shared-data'
+import { LEFT, RIGHT, LoadedPipette } from '@opentrons/shared-data'
 import {
-  mockAttachedGen3Pipette,
-  mockGen3P1000PipetteSpecs,
+  mock96ChannelAttachedPipetteInformation,
+  mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
 import { FLOWS, SECTIONS } from '../constants'
 import { getPipetteWizardStepsForProtocol } from '../getPipetteWizardStepsForProtocol'
 
-import type { AttachedPipette } from '../../../redux/pipettes/types'
-import type { PipetteInfo } from '../../Devices/hooks'
 import type { PipetteWizardStep } from '../types'
 
-const mockPipetteInfo = {
-  requestedPipetteMatch: 'incompatible',
-  pipetteCalDate: null,
-  pipetteSpecs: {
-    displayName: 'pipette 1',
-    name: 'p1000_96',
-  },
-} as PipetteInfo
+const mockPipetteInfo = [
+  { id: '123', pipetteName: 'p1000_96', mount: 'left' },
+] as LoadedPipette[]
 
-const mockPipettesInProtocolNotEmpty = {
-  left: { ...mockPipetteInfo, pipetteSpecs: { name: 'p1000_single_gen3' } },
+const mockPipettesInProtocolNotEmpty = [
+  { id: '123', pipetteName: 'p1000_single_gen3', mount: 'left' },
+]
+const mockPipettesInProtocolMulti = [
+  { id: '123', pipetteName: 'p1000_multi_gen3', mount: 'left' },
+]
+const mockSingleMountPipetteAttached = {
+  left: mockAttachedPipetteInformation,
   right: null,
 }
-const mockPipettesInProtocolMulti = {
-  left: { ...mockPipetteInfo, pipetteSpecs: { name: 'p1000_multi_gen3' } },
-  right: null,
-}
-const mockPipettesInProtocol96Channel = {
-  left: mockPipetteInfo,
-  right: null,
-}
-const mockPipette: AttachedPipette = {
-  ...mockAttachedGen3Pipette,
-  modelSpecs: {
-    ...mockGen3P1000PipetteSpecs,
-    displayName: 'mock pipette display name',
-  },
-}
-const mockSingleMountPipetteAttached = { left: mockPipette, right: null }
 
 describe('getPipetteWizardStepsForProtocol', () => {
   it('returns an empty array of info when the attached pipette matches required pipette', () => {
@@ -46,14 +29,13 @@ describe('getPipetteWizardStepsForProtocol', () => {
     expect(
       getPipetteWizardStepsForProtocol(
         mockSingleMountPipetteAttached,
-        {
-          left: {
-            pipetteCalDate: 'cal date',
-            requestedPipetteMatch: 'match',
-            pipetteSpecs: { name: 'p1000_single_gen3' },
+        [
+          {
+            id: '123',
+            pipetteName: 'p1000_single_gen3',
+            mount: 'left',
           },
-          right: null,
-        } as any,
+        ],
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)
@@ -61,14 +43,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
   it('returns an empty array when there is no pipette attached and no pipette is needed', () => {
     const mockFlowSteps = [] as PipetteWizardStep[]
     expect(
-      getPipetteWizardStepsForProtocol(
-        { left: null, right: null },
-        {
-          left: null,
-          right: null,
-        } as any,
-        LEFT
-      )
+      getPipetteWizardStepsForProtocol({ left: null, right: null }, [], LEFT)
     ).toStrictEqual(mockFlowSteps)
   })
   it('returns the calibration flow only when correct pipette is attached but there is no pip cal data', () => {
@@ -92,15 +67,14 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        { left: null, right: mockPipette },
         {
           left: null,
           right: {
-            pipetteCalDate: null,
-            requestedPipetteMatch: 'match',
-            pipetteSpecs: { name: 'p1000_single_gen3' },
-          },
-        } as any,
+            ...mockAttachedPipetteInformation,
+            data: { calibratedOffset: undefined as any },
+          } as any,
+        },
+        [{ id: '123', pipetteName: 'p1000_single_gen3', mount: 'right' }],
         RIGHT
       )
     ).toStrictEqual(mockFlowSteps)
@@ -205,7 +179,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        { left: { ...mockPipette, name: 'p1000_96' }, right: null },
+        { left: mock96ChannelAttachedPipetteInformation, right: null },
         mockPipettesInProtocolNotEmpty as any,
         LEFT
       )
@@ -263,8 +237,8 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        { left: mockPipette, right: null },
-        mockPipettesInProtocol96Channel as any,
+        { left: mockAttachedPipetteInformation, right: null },
+        mockPipetteInfo as any,
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)
@@ -321,8 +295,8 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        { left: null, right: mockPipette },
-        mockPipettesInProtocol96Channel as any,
+        { left: null, right: mockAttachedPipetteInformation },
+        mockPipetteInfo as any,
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)
@@ -390,8 +364,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
     ] as PipetteWizardStep[]
     expect(
       getPipetteWizardStepsForProtocol(
-        { left: mockPipette, right: mockPipette },
-        mockPipettesInProtocol96Channel as any,
+        {
+          left: mockAttachedPipetteInformation,
+          right: mockAttachedPipetteInformation,
+        },
+        mockPipetteInfo as any,
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)
@@ -475,7 +452,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
     expect(
       getPipetteWizardStepsForProtocol(
         { left: null, right: null },
-        mockPipettesInProtocol96Channel as any,
+        mockPipetteInfo as any,
         LEFT
       )
     ).toStrictEqual(mockFlowSteps)

@@ -19,7 +19,7 @@ describe('UnmountGripper', () => {
     render = props => {
       return renderWithProviders(
         <UnmountGripper
-          runId={mockRunId}
+          maintenanceRunId={mockRunId}
           flowType={GRIPPER_FLOW_TYPES.ATTACH}
           proceed={mockProceed}
           attachedGripper={props?.attachedGripper ?? null}

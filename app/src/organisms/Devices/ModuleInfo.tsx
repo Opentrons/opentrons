@@ -57,11 +57,11 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
       y={0}
       height={labwareInterfaceYDimension ?? yDimension}
       width={labwareInterfaceXDimension ?? xDimension}
-      flexProps={{ padding: SPACING.spacing4 }}
+      flexProps={{ padding: SPACING.spacing16 }}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing1}
+        gridGap={SPACING.spacing2}
         justifyContent={JUSTIFY_CENTER}
       >
         {!runHasStarted ? (
@@ -71,7 +71,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
               color={isAttached ? COLORS.successEnabled : COLORS.warningEnabled}
               key="icon"
               size="10px"
-              marginRight={SPACING.spacing2}
+              marginRight={SPACING.spacing4}
             />
             <StyledText
               color={COLORS.darkGreyEnabled}

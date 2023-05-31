@@ -117,28 +117,32 @@ export function Toast(props: ToastProps): JSX.Element {
     }
   } = {
     [ERROR_TOAST]: {
-      iconName: 'alert-circle',
-      color: `${showODDStyle ? COLORS.yellow_two : COLORS.errorEnabled}`,
+      iconName: 'ot-alert',
+      color: `${showODDStyle ? COLORS.red2 : COLORS.errorEnabled}`,
       backgroundColor: `${
-        showODDStyle ? COLORS.yellow_four : COLORS.errorBackgroundLight
+        showODDStyle ? COLORS.red4 : COLORS.errorBackgroundLight
       }`,
     },
     [INFO_TOAST]: {
       iconName: 'information',
-      color: COLORS.darkGreyEnabled,
-      backgroundColor: COLORS.darkGreyDisabled,
+      color: `${showODDStyle ? COLORS.grey2 : COLORS.darkGreyEnabled}`,
+      backgroundColor: `${
+        showODDStyle ? COLORS.grey4 : COLORS.darkGreyDisabled
+      }`,
     },
     [SUCCESS_TOAST]: {
-      iconName: 'check-circle',
-      color: `${showODDStyle ? COLORS.green_two : COLORS.successEnabled}`,
+      iconName: 'ot-check',
+      color: `${showODDStyle ? COLORS.green2 : COLORS.successEnabled}`,
       backgroundColor: `${
-        showODDStyle ? COLORS.green_four : COLORS.successBackgroundLight
+        showODDStyle ? COLORS.green4 : COLORS.successBackgroundLight
       }`,
     },
     [WARNING_TOAST]: {
-      iconName: 'alert-circle',
-      color: COLORS.warningEnabled,
-      backgroundColor: COLORS.warningBackgroundLight,
+      iconName: 'ot-alert',
+      color: `${showODDStyle ? COLORS.yellow2 : COLORS.warningEnabled}`,
+      backgroundColor: `${
+        showODDStyle ? COLORS.yellow4 : COLORS.warningBackgroundLight
+      }`,
     },
   }
 
@@ -178,20 +182,22 @@ export function Toast(props: ToastProps): JSX.Element {
       css={showODDStyle ? ODD_ANIMATION : DESKTOP_ANIMATION}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      borderRadius={
-        showODDStyle ? BORDERS.size_three : BORDERS.radiusSoftCorners
-      }
+      borderRadius={showODDStyle ? BORDERS.size3 : BORDERS.radiusSoftCorners}
       borderColor={toastStyleByType[type].color}
-      borderWidth={showODDStyle ? BORDERS.size_one : SPACING.spacingXXS}
+      borderWidth={showODDStyle ? BORDERS.size1 : '1px'}
       border={BORDERS.styleSolid}
+      boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}
+      onClick={closeText.length > 0 ? onClose : undefined}
       // adjust padding when heading is present and creates extra column
       padding={
         showODDStyle
-          ? `${String(SPACING.spacing4)} ${String(SPACING.spacing5)}`
-          : `${heading != null ? SPACING.spacing2 : SPACING.spacing3} ${
-              SPACING.spacing3
-            } ${heading != null ? SPACING.spacing2 : SPACING.spacing3} 0.75rem`
+          ? `${SPACING.spacing16} ${SPACING.spacing24}`
+          : `${heading != null ? SPACING.spacing4 : SPACING.spacing8} ${
+              SPACING.spacing8
+            } ${heading != null ? SPACING.spacing4 : SPACING.spacing8} ${
+              SPACING.spacing12
+            }`
       }
       data-testid={`Toast_${type}`}
       height={showODDStyle ? '5.76rem' : 'auto'}
@@ -202,15 +208,16 @@ export function Toast(props: ToastProps): JSX.Element {
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
         overflow="hidden"
         width="100%"
       >
         <Icon
           name={icon?.name ?? toastStyleByType[type].iconName}
           color={toastStyleByType[type].color}
-          width={showODDStyle ? SPACING.spacing6 : SPACING.spacing4}
-          marginRight={showODDStyle ? SPACING.spacing3 : SPACING.spacing3}
+          maxWidth={showODDStyle ? SPACING.spacing32 : SPACING.spacing16}
+          minWidth={showODDStyle ? SPACING.spacing32 : SPACING.spacing16}
+          marginRight={SPACING.spacing8}
           spin={icon?.spin != null ? icon.spin : false}
           aria-label={`icon_${type}`}
         />
@@ -227,12 +234,13 @@ export function Toast(props: ToastProps): JSX.Element {
               }
               fontWeight={
                 showODDStyle
-                  ? TYPOGRAPHY.fontWeightLevel2_bold
+                  ? TYPOGRAPHY.fontWeightBold
                   : TYPOGRAPHY.fontWeightRegular
               }
               lineHeight={
                 showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
               }
+              marginRight={showODDStyle ? SPACING.spacing4 : undefined}
               maxWidth={showODDStyle ? '30.375rem' : 'auto'}
               overflow="hidden"
               textOverflow="ellipsis"
@@ -242,9 +250,7 @@ export function Toast(props: ToastProps): JSX.Element {
             </StyledText>
           ) : null}
           <StyledText
-            color={
-              showODDStyle ? COLORS.darkBlack_hundred : COLORS.darkBlackEnabled
-            }
+            color={COLORS.darkBlackEnabled}
             fontSize={
               showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
             }
@@ -256,6 +262,8 @@ export function Toast(props: ToastProps): JSX.Element {
             lineHeight={
               showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
             }
+            overflow="hidden"
+            textOverflow="ellipsis"
             whiteSpace="nowrap"
           >
             {message}
@@ -263,12 +271,24 @@ export function Toast(props: ToastProps): JSX.Element {
         </Flex>
       </Flex>
       {closeText.length > 0 && (
-        <Link onClick={onClose} role="button" height={SPACING.spacing5}>
+        <Link role="button">
           <StyledText
-            color={COLORS.darkBlack_hundred}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            fontSize={TYPOGRAPHY.fontSize22}
-            lineHeight={TYPOGRAPHY.lineHeight28}
+            color={COLORS.darkBlackEnabled}
+            fontSize={
+              showODDStyle ? TYPOGRAPHY.fontSize22 : TYPOGRAPHY.fontSizeP
+            }
+            fontWeight={
+              showODDStyle
+                ? TYPOGRAPHY.fontWeightSemiBold
+                : TYPOGRAPHY.fontWeightRegular
+            }
+            lineHeight={
+              showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
+            }
+            textDecoration={
+              showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
+            }
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
             whiteSpace="nowrap"
           >
             {closeText}

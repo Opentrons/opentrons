@@ -10,7 +10,11 @@ import type {
   RobotApiResponseMeta,
 } from '../../robot-api/types'
 import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
-import type { PipetteInfo } from '../../../organisms/Devices/hooks'
+import type {
+  PipetteInfo,
+  PipetteInformation,
+} from '../../../organisms/Devices/hooks'
+import { PipetteData } from '@opentrons/api-client'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
@@ -52,6 +56,7 @@ export const mockGen3P1000PipetteSpecs: any = {
   displayName: 'Flex 1-Channel 1000 μL',
   name: 'p1000_single_gen3',
   backCompatNames: ['p1000_single'],
+  channels: 1,
 }
 
 export const mockGen3P1000Pipette8ChannelSpecs: any = {
@@ -326,4 +331,70 @@ export const mockRightPipetteCalibration: any = {
   offset: [1, 2, 3],
   tiprack: 'some-other-tiprack',
   lastModified: '2020-08-25T20:25',
+}
+
+export const mockPipetteData1Channel: PipetteData = {
+  data: {
+    channels: 1,
+    min_volume: 1,
+    max_volume: 50,
+    calibratedOffset: {
+      offset: { x: 0, y: 2, z: 1 },
+      source: 'default',
+      last_modified: '2020-08-25T20:25',
+    },
+  },
+  instrumentModel: 'p1000_single_v3.0',
+  instrumentName: 'p1000_single_gen3',
+  instrumentType: 'pipette',
+  mount: 'left',
+  serialNumber: 'abc',
+}
+export const mockAttachedPipetteInformation: PipetteInformation = {
+  ...mockPipetteData1Channel,
+  displayName: 'Flex 1-Channel 1000 μL',
+}
+
+export const mockPipetteData8Channel: PipetteData = {
+  data: {
+    channels: 8,
+    min_volume: 1,
+    max_volume: 50,
+    calibratedOffset: {
+      offset: { x: 0, y: 2, z: 1 },
+      source: 'default',
+      last_modified: '2020-08-25T20:25',
+    },
+  },
+  instrumentModel: 'p1000_multi_v3.0',
+  instrumentName: 'p1000_multi_gen3',
+  instrumentType: 'pipette',
+  mount: 'right',
+  serialNumber: 'cba',
+}
+export const mock8ChannelAttachedPipetteInformation: PipetteInformation = {
+  ...mockPipetteData8Channel,
+  displayName: 'Flex 8-Channel 1000 μL',
+}
+
+export const mockPipetteData96Channel: PipetteData = {
+  data: {
+    channels: 96,
+    min_volume: 1,
+    max_volume: 50,
+    calibratedOffset: {
+      offset: { x: 0, y: 2, z: 1 },
+      source: 'default',
+      last_modified: '2020-08-25T20:25',
+    },
+  },
+  instrumentModel: 'p1000_96_v1',
+  instrumentName: 'p1000_96',
+  instrumentType: 'pipette',
+  mount: 'right',
+  serialNumber: 'cba',
+}
+export const mock96ChannelAttachedPipetteInformation: PipetteInformation = {
+  ...mockPipetteData96Channel,
+  displayName: 'Flex 96-Channel 1000 μL',
 }

@@ -28,8 +28,8 @@ const closeIconStyles = css`
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
   border-radius: 0.875rem;
-  width: ${SPACING.spacingL};
-  height: ${SPACING.spacingL};
+  width: 1.625rem;
+  height: 1.625rem;
   &:hover {
     background-color: ${COLORS.lightGreyHover};
   }
@@ -46,8 +46,8 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        paddingX={SPACING.spacing5}
-        paddingY={SPACING.spacing4}
+        paddingX={SPACING.spacing24}
+        paddingY={SPACING.spacing16}
       >
         <Flex>
           {icon != null && <Icon {...icon} />}
@@ -67,8 +67,8 @@ export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
               >
                 <Icon
                   name="close"
-                  width={SPACING.spacing5}
-                  height={SPACING.spacing5}
+                  width={SPACING.spacing24}
+                  height={SPACING.spacing24}
                 />
               </Btn>
             )}

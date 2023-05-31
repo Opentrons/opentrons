@@ -28,7 +28,7 @@ export function PauseInterventionContent({
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.75rem">
       <PauseHeader startedAt={startedAt} />
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
         <InterventionCommandMessage commandMessage={message} />
       </Flex>
     </Flex>
@@ -51,7 +51,7 @@ function PauseHeader({ startedAt }: PauseHeaderProps): JSX.Element {
     <Flex alignItems={ALIGN_CENTER} gridGap="0.75rem">
       <Icon
         name="pause-circle"
-        size={SPACING.spacing6}
+        size={SPACING.spacing32}
         flex="0 0 auto"
         color={COLORS.darkGreyEnabled}
       />

@@ -29,15 +29,15 @@ const PLAY_PAUSE_BUTTON_STYLE = css`
     color: ${COLORS.white};
   }
   &:focus-visible {
-    box-shadow: 0 0 0 ${SPACING.spacing1} ${COLORS.fundamentalsFocus};
+    box-shadow: 0 0 0 ${SPACING.spacing2} ${COLORS.fundamentalsFocus};
     background-color: ${COLORS.blueEnabled};
   }
   &:active {
     background-color: ${COLORS.bluePressed};
   }
   &:disabled {
-    background-color: ${COLORS.darkBlack_twenty};
-    color: ${COLORS.darkBlack_sixty};
+    background-color: ${COLORS.darkBlack20};
+    color: ${COLORS.darkBlack60};
   }
 `
 
