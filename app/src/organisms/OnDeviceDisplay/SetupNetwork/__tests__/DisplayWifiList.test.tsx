@@ -52,7 +52,7 @@ describe('DisplayWifiList', () => {
   })
 
   it('should render a wifi list, button and spinner', () => {
-    const [{ getByText, getByRole, getByTestId }] = render(props)
+    const [{ getByText, getByRole }] = render(props)
     getByText('Connect via Wi-Fi')
     getByText('foo')
     getByText('bar')
