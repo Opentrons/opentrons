@@ -214,17 +214,17 @@ async def jog(api, position, cp,mount):
         )
         print("\r", end="")
 
-async def calibrate_tip_racks(api, mount, slot_loc, AXIS):
+async def calibrate_tip_racks(api, slot_loc):
     print("Calibrate tip rack positions\n")
     calibrated_slot_loc = {}
     calibrated_step = {}
     for key in slot_loc.keys():
         print(f"Testing: {key}\n")
         if key == "OT3Mount.LEFT":
-            mount == type.OT3Mount.LEFT
+            mount = types.OT3Mount.LEFT
             AXIS = OT3Axis.Z_L
         elif key == "OT3Mount.RIGHT":
-            mount == type.OT3Mount.RIGHT
+            mount = types.OT3Mount.RIGHT
             AXIS = OT3Axis.Z_R
 
         await api.move_to(mount, Point(slot_loc[key][0], slot_loc[key][1], slot_loc[key][2]))
@@ -287,7 +287,7 @@ def _connect_to_fixture(pipp: str=""):
     return hardware
     
 
-async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
+async def _main(is_simulating: bool) -> None:
     #path = '/data/testing_data/calibrated_slot_locations.json'
     mount_options = {
         "left": types.OT3Mount.LEFT,
@@ -306,18 +306,18 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     #     print("input err")
 
     slot_loc = {
-        "A1": (13.42, 394.92, 200),
-        "A2": (177.32, 394.92, 200),
-        "A3": (341.03, 394.92, 200),
-        "B1": (13.42, 288.42, 200),
-        "B2": (177.32, 288.92, 200),
-        "B3": (341.03, 288.92, 200),
-        "C1": (13.42, 181.92, 200),
-        "C2": (177.32, 181.92, 200),
-        "C3": (341.03, 181.92, 200),
-        "D1": (13.42, 75.5, 200),
-        "D2": (177.32, 75.5, 200),
-        "D3": (341.03, 75.5, 200),
+        "A1": (13.42, 394.92, 250),
+        "A2": (177.32, 394.92, 250),
+        "A3": (341.03, 394.92, 250),
+        "B1": (13.42, 288.42, 250),
+        "B2": (177.32, 288.92, 250),
+        "B3": (341.03, 288.92, 250),
+        "C1": (13.42, 181.92, 250),
+        "C2": (177.32, 181.92, 250),
+        "C3": (341.03, 181.92, 250),
+        "D1": (13.42, 75.5, 250),
+        "D2": (177.32, 75.5, 250),
+        "D3": (341.03, 75.5, 250),
     }
 
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
@@ -366,7 +366,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     }
 
     if(not args.load_cal):
-        calibrated_slot_loc,calibrated_step = await calibrate_tip_racks(api, mount, l_r_loc, AXIS)
+        calibrated_slot_loc,calibrated_step = await calibrate_tip_racks(api, l_r_loc)
     else:
         ### import calibrated json file
         # path = '/home/root/.opentrons/testing_data/calibrated_slot_locations.json'
@@ -377,11 +377,11 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                 calibrated_slot_loc = json.load(openfile)
         else:
             print("Slot locations calibration file not found.\n")
-            calibrated_slot_loc,calibrated_step = await calibrate_tip_racks(api, mount, l_r_loc, AXIS)
+            calibrated_slot_loc,calibrated_step = await calibrate_tip_racks(api, l_r_loc)
         print("Calibration data successfully loaded!\n")
 
 
-    test_pip = api.get_attached_instrument(mount)
+    #test_pip = api.get_attached_instrument(mount)
     test_name = "deck-test"
     file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_robot)
     header = ["------------------------------------"]
@@ -424,7 +424,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         for keyv in l_r_loc: 
             datalist = []
             if keyv == "OT3Mount.LEFT":
-                mount == mount_options[keyv]
+                mount = mount_options[keyv]
                 AXIS = OT3Axis.Z_L
                 await api.move_to(mount, Point(calibrated_slot_loc[keyv][0],
                                 calibrated_slot_loc[keyv][1]+3, calibrated_slot_loc[keyv][2]))
