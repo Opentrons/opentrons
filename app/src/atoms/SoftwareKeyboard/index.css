@@ -1,13 +1,25 @@
 /* stylelint-disable */
 
-.simple-keyboard.oddTheme1 .hg-theme-default {
+.simple-keyboard.oddTheme1.hg-theme-default {
   background-color: #d0d0d0;
   font-family: 'Public Sans', sans-serif;
   padding: 8px;
 }
 
-.simple-keyboard.oddTheme1 .hg-button {
+.simple-keyboard.oddTheme1.hg-button {
   min-width: 48px;
   min-height: 48px;
   font-size: 22px;
+}
+
+.hg-button.hg-functionBtn.hg-button-numbers {
+  flex-grow: 0.5;
+}
+
+.hg-button.hg-functionBtn.hg-button-ent {
+  flex-grow: 0.5;
+}
+
+.hg-button.hg-functionBtn.hg-button-space {
+  flex-grow: 4;
 }
