@@ -84,7 +84,11 @@ export function Modal(props: ModalProps): JSX.Element {
           paddingX={SPACING.spacing32}
           paddingBottom={SPACING.spacing32}
           paddingTop={header != null ? '0rem' : SPACING.spacing32}
-          borderRadius={`0px 0px ${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3}`}
+          borderRadius={
+            header != null
+              ? `0px 0px ${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3}`
+              : BORDERS.borderRadiusSize3
+          }
         >
           {children}
         </Flex>
