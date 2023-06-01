@@ -6,32 +6,21 @@ import {
 import { TakeoverModal } from './TakeoverModal'
 import { TakeoverModalContext } from './TakeoverModalContext'
 
-interface TakeoverModalProviderProps {
+interface MaintenanceRunTakeoverProps {
   children: React.ReactNode
 }
-export function TakeoverModalProvider(
-  props: TakeoverModalProviderProps
+export function MaintenanceRunTakeover(
+  props: MaintenanceRunTakeoverProps
 ): JSX.Element {
   const [
-    isDesktopAppMaintanenceInProgress,
-    setIsDesktopAppMaintenanceInProgress,
+    isODDMaintanenceInProgress,
+    setIsODDMaintanenceInProgress,
   ] = React.useState<boolean>(false)
-  const maintenanceRunIdFromHook = useCurrentMaintenanceRun({
+  const maintenanceRunId = useCurrentMaintenanceRun({
     refetchInterval: 5000,
   }).data?.data.id
 
-  const isMaintanenceRunCurrent = maintenanceRunIdFromHook != null
-  const [maintenanceRunId, setMaintenanceRunId] = React.useState<string | null>(
-    null
-  )
-
-  React.useEffect(() => {
-    if (maintenanceRunIdFromHook != null) {
-      setMaintenanceRunId(maintenanceRunIdFromHook)
-    } else {
-      setMaintenanceRunId(null)
-    }
-  }, [maintenanceRunIdFromHook])
+  const isMaintanenceRunCurrent = maintenanceRunId != null
 
   const [isConfirmTerminate, setConfirmTerminate] = React.useState<boolean>(
     false
@@ -43,8 +32,6 @@ export function TakeoverModalProvider(
     if (maintenanceRunId != null) {
       deleteMaintenanceRun(maintenanceRunId, {
         onSuccess: () => {
-          setMaintenanceRunId(null)
-          setIsDesktopAppMaintenanceInProgress(true)
           setConfirmTerminate(false)
         },
       })
@@ -54,13 +41,13 @@ export function TakeoverModalProvider(
   return (
     <TakeoverModalContext.Provider
       value={{
-        setMaintenanceInProgress: () =>
-          setIsDesktopAppMaintenanceInProgress(true),
+        setODDMaintenanceFlowInProgress: () =>
+          setIsODDMaintanenceInProgress(true),
       }}
     >
-      {!isDesktopAppMaintanenceInProgress && isMaintanenceRunCurrent && (
+      {!isODDMaintanenceInProgress && isMaintanenceRunCurrent && (
         <TakeoverModal
-          confirmTerminate={() => handleCloseAndTerminate()}
+          confirmTerminate={handleCloseAndTerminate}
           isConfirmTerminate={isConfirmTerminate}
           setConfirmTerminate={setConfirmTerminate}
         />

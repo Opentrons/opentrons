@@ -1,11 +1,11 @@
 import * as React from 'react'
 
 export interface TakeoverModalContextType {
-  setMaintenanceInProgress: () => void
+  setODDMaintenanceFlowInProgress: () => void
 }
 
 export const TakeoverModalContext = React.createContext<TakeoverModalContextType>(
   {
-    setMaintenanceInProgress: () => {},
+    setODDMaintenanceFlowInProgress: () => {},
   }
 )

@@ -16,7 +16,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { BackButton } from '../atoms/buttons'
 import { SleepScreen } from '../atoms/SleepScreen'
 import { ToasterOven } from '../organisms/ToasterOven'
-import { TakeoverModalProvider } from '../organisms/TakeoverModal'
+import { MaintenanceRunTakeover } from '../organisms/TakeoverModal'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
@@ -250,7 +250,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
         {Boolean(isIdle) ? (
           <SleepScreen />
         ) : (
-          <TakeoverModalProvider>
+          <MaintenanceRunTakeover>
             <ToasterOven>
               <ProtocolReceiptToasts />
               <Switch>
@@ -269,7 +269,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
                 <Redirect exact from="/" to={'/loading'} />
               </Switch>
             </ToasterOven>
-          </TakeoverModalProvider>
+          </MaintenanceRunTakeover>
         )}
       </Box>
       <TopLevelRedirects />

@@ -9,7 +9,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { MediumButton } from '../../atoms/buttons'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { useTakeoverModal } from '../TakeoverModal'
+import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { useLaunchLPC } from '../LabwarePositionCheck/useLaunchLPC'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
@@ -25,7 +25,7 @@ export function ProtocolSetupLabwarePositionCheck({
 }: ProtocolSetupLabwarePositionCheckProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
-  const { setMaintenanceInProgress } = useTakeoverModal()
+  const { setMaintenanceInProgress } = useMaintenanceRunTakeover()
 
   const handleLaunchLPCClick = (): void => {
     setMaintenanceInProgress()

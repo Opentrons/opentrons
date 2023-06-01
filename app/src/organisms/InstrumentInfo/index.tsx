@@ -20,7 +20,7 @@ import { GripperWizardFlows } from '../GripperWizardFlows'
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
-import { useTakeoverModal } from '../TakeoverModal'
+import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { formatTimestamp } from '../Devices/utils'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 
@@ -35,7 +35,7 @@ interface InstrumentInfoProps {
 }
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
   const { t, i18n } = useTranslation('instruments_dashboard')
-  const { setMaintenanceInProgress } = useTakeoverModal()
+  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
   const { instrument } = props
   const history = useHistory()
   const [wizardProps, setWizardProps] = React.useState<
@@ -53,7 +53,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     },
   }
   const handleDetach: React.MouseEventHandler = () => {
-    setMaintenanceInProgress()
+    setODDMaintenanceFlowInProgress()
     if (instrument != null) {
       setWizardProps(
         instrument.mount === 'extension'
@@ -76,7 +76,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     }
   }
   const handleRecalibrate: React.MouseEventHandler = () => {
-    setMaintenanceInProgress()
+    setODDMaintenanceFlowInProgress()
     if (instrument != null) {
       setWizardProps(
         instrument.mount === 'extension'

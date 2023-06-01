@@ -3,7 +3,7 @@ import { LEFT, renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
 import { i18n } from '../../../i18n'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
-import { useTakeoverModal } from '../../TakeoverModal'
+import { useMaintenanceRunTakeover } from '../../TakeoverModal'
 import { ProtocolInstrumentMountItem } from '..'
 
 jest.mock('../../PipetteWizardFlows')
@@ -12,8 +12,8 @@ jest.mock('../../TakeoverModal')
 const mockPipetteWizardFlows = PipetteWizardFlows as jest.MockedFunction<
   typeof PipetteWizardFlows
 >
-const mockUseTakeoverModal = useTakeoverModal as jest.MockedFunction<
-  typeof useTakeoverModal
+const mockUseMaintenanceRunTakeover = useMaintenanceRunTakeover as jest.MockedFunction<
+  typeof useMaintenanceRunTakeover
 >
 
 const mockGripperData = {
@@ -61,7 +61,7 @@ const render = (
 
 describe('ProtocolInstrumentMountItem', () => {
   let props: React.ComponentProps<typeof ProtocolInstrumentMountItem>
-  const mockMaintenanceInprogress = jest.fn()
+  const mockSetODDMaintenanceFlowInProgress = jest.fn()
   beforeEach(() => {
     props = {
       mount: LEFT,
@@ -70,8 +70,8 @@ describe('ProtocolInstrumentMountItem', () => {
       speccedName: 'p1000_multi_gen3',
     }
     mockPipetteWizardFlows.mockReturnValue(<div>pipette wizard flow</div>)
-    mockUseTakeoverModal.mockReturnValue({
-      setMaintenanceInProgress: mockMaintenanceInprogress,
+    mockUseMaintenanceRunTakeover.mockReturnValue({
+      setODDMaintenanceFlowInProgress: mockSetODDMaintenanceFlowInProgress,
     })
   })
 
@@ -122,7 +122,7 @@ describe('ProtocolInstrumentMountItem', () => {
     const button = getByText('Calibrate')
     fireEvent.click(button)
     getByText('pipette wizard flow')
-    expect(mockMaintenanceInprogress).toHaveBeenCalled()
+    expect(mockSetODDMaintenanceFlowInProgress).toHaveBeenCalled()
   })
   it('renders the attach button and clicking on it launches the correct flow ', () => {
     props = {
@@ -136,7 +136,7 @@ describe('ProtocolInstrumentMountItem', () => {
     const button = getByText('Attach')
     fireEvent.click(button)
     getByText('pipette wizard flow')
-    expect(mockMaintenanceInprogress).toHaveBeenCalled()
+    expect(mockSetODDMaintenanceFlowInProgress).toHaveBeenCalled()
   })
   it('renders the correct information when gripper needs to be atached', () => {
     props = {
