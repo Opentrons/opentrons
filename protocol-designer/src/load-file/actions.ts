@@ -109,14 +109,14 @@ export const saveProtocolFile: () => ThunkAction<SaveProtocolFileAction> = () =>
   saveFile(fileData, fileName)
 }
 
-export interface SetRobotNameAction {
-  type: 'SET_ROBOT_NAME'
+export interface SetRobotTypeAction {
+  type: 'SET_ROBOT_TYPE'
   payload: RobotDataFields
 }
 
-export const setRobotName = (
-  payload: SetRobotNameAction['payload']
-): SetRobotNameAction => ({
-  type: 'SET_ROBOT_NAME',
+export const setRobotType = (
+  payload: SetRobotTypeAction['payload']
+): SetRobotTypeAction => ({
+  type: 'SET_ROBOT_TYPE',
   payload,
 })

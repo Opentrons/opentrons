@@ -103,7 +103,7 @@ const robotDataDefaultFields: RobotDataFields = {
 }
 const robot = handleActions(
   {
-    SET_ROBOT_NAME: (
+    SET_ROBOT_TYPE: (
       state: RobotDataFields,
       action: {
         payload: RobotDataFields
