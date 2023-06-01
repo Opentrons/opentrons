@@ -56,26 +56,21 @@ export const PipetteWizardFlows = (
   const { t } = useTranslation('pipette_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+  const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
   const pipetteWizardSteps = React.useMemo(
     () =>
-      props.pipetteInfo == null
-        ? getPipetteWizardSteps(
-            flowType,
-            mount,
-            selectedPipette,
-            isGantryEmpty,
-            attachedPipettes
-          )
+      memoizedPipetteInfo == null
+        ? getPipetteWizardSteps(flowType, mount, selectedPipette, isGantryEmpty)
         : getPipetteWizardStepsForProtocol(
             attachedPipettes,
-            props.pipetteInfo,
+            memoizedPipetteInfo,
             mount
           ),
     []
   )
-  const requiredPipette = props.pipetteInfo?.find(
+  const requiredPipette = memoizedPipetteInfo?.find(
     pipette => pipette.mount === mount
   )
   const host = useHost()
@@ -88,15 +83,15 @@ export const PipetteWizardFlows = (
   )
   const hasCalData =
     attachedPipettes[mount]?.data.calibratedOffset?.last_modified != null
-
+  const memoizedAttachedPipettes = React.useMemo(() => attachedPipettes, [])
   const wizardTitle = usePipetteFlowWizardHeaderText({
     flowType,
     mount,
     selectedPipette,
     hasCalData,
     isGantryEmpty,
-    attachedPipettes,
-    pipetteInfo: props.pipetteInfo ?? null,
+    attachedPipettes: memoizedAttachedPipettes,
+    pipetteInfo: memoizedPipetteInfo,
   })
 
   const goBack = (): void => {
@@ -137,7 +132,7 @@ export const PipetteWizardFlows = (
   const handleClose = (): void => {
     setIsExiting(false)
     closeFlow()
-    if (currentStepIndex === totalStepCount && onComplete != null) onComplete()
+    if (onComplete != null) onComplete()
   }
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({
@@ -220,6 +215,7 @@ export const PipetteWizardFlows = (
         {...calibrateBaseProps}
         createMaintenanceRun={createMaintenanceRun}
         isCreateLoading={isCreateLoading}
+        requiredPipette={requiredPipette}
       />
     )
   } else if (currentStep.section === SECTIONS.ATTACH_PROBE) {

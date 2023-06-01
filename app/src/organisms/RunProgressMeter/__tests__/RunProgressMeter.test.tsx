@@ -4,10 +4,12 @@ import { renderWithProviders } from '@opentrons/components'
 import {
   useAllCommandsQuery,
   useCommandQuery,
+  useRunQuery,
 } from '@opentrons/react-api-client'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
 import { i18n } from '../../../i18n'
+import { InterventionModal } from '../../InterventionModal'
 import { ProgressBar } from '../../../atoms/ProgressBar'
 import { useRunStatus } from '../../RunTimeControl/hooks'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -19,6 +21,11 @@ import {
   NON_DETERMINISTIC_COMMAND_ID,
   NON_DETERMINISTIC_COMMAND_KEY,
 } from '../__fixtures__'
+import {
+  mockMoveLabwareCommand,
+  mockPauseCommandWithStartTime,
+  mockRunData,
+} from '../../InterventionModal/__fixtures__'
 import { RunProgressMeter } from '..'
 
 jest.mock('@opentrons/react-api-client')
@@ -27,10 +34,12 @@ jest.mock('../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 jest.mock('../../Devices/hooks/useLastRunCommandKey')
 jest.mock('../../Devices/hooks')
 jest.mock('../../../atoms/ProgressBar')
+jest.mock('../../InterventionModal')
 
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
 >
+const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
 >
@@ -47,6 +56,9 @@ const mockUseLastRunCommandKey = useLastRunCommandKey as jest.MockedFunction<
   typeof useLastRunCommandKey
 >
 const mockProgressBar = ProgressBar as jest.MockedFunction<typeof ProgressBar>
+const mockInterventionModal = InterventionModal as jest.MockedFunction<
+  typeof InterventionModal
+>
 
 const render = (props: React.ComponentProps<typeof RunProgressMeter>) => {
   return renderWithProviders(<RunProgressMeter {...props} />, {
@@ -61,6 +73,7 @@ describe('RunProgressMeter', () => {
   let props: React.ComponentProps<typeof RunProgressMeter>
   beforeEach(() => {
     mockProgressBar.mockReturnValue(<div>MOCK PROGRESS BAR</div>)
+    mockInterventionModal.mockReturnValue(<div>MOCK INTERVENTION MODAL</div>)
     mockUseRunStatus.mockReturnValue(RUN_STATUS_RUNNING)
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(NON_DETERMINISTIC_RUN_ID)
@@ -78,11 +91,13 @@ describe('RunProgressMeter', () => {
     when(mockUseLastRunCommandKey)
       .calledWith(NON_DETERMINISTIC_RUN_ID)
       .mockReturnValue(NON_DETERMINISTIC_COMMAND_KEY)
+    mockUseRunQuery.mockReturnValue({ data: null } as any)
 
     props = {
       runId: NON_DETERMINISTIC_RUN_ID,
       robotName: ROBOT_NAME,
       makeHandleJumpToStep: jest.fn(),
+      resumeRunHandler: jest.fn(),
     }
   })
 
@@ -102,5 +117,26 @@ describe('RunProgressMeter', () => {
     getByText('Current Step:')
     getByText('Not started yet')
     getByText('Download run log')
+  })
+  it('should render an intervention modal when lastRunCommand is a pause command', () => {
+    mockUseAllCommandsQuery.mockReturnValue({
+      data: { data: [mockPauseCommandWithStartTime], meta: { totalLength: 1 } },
+    } as any)
+    mockUseRunQuery.mockReturnValue({ data: { data: { labware: [] } } } as any)
+    mockUseCommandQuery.mockReturnValue({ data: null } as any)
+    mockUseMostRecentCompletedAnalysis.mockReturnValue({} as any)
+    const { getByText } = render(props)
+    expect(getByText('MOCK INTERVENTION MODAL')).toBeTruthy()
+  })
+
+  it('should render an intervention modal when lastRunCommand is a move labware command', () => {
+    mockUseAllCommandsQuery.mockReturnValue({
+      data: { data: [mockMoveLabwareCommand], meta: { totalLength: 1 } },
+    } as any)
+    mockUseRunQuery.mockReturnValue({ data: { data: mockRunData } } as any)
+    mockUseCommandQuery.mockReturnValue({ data: null } as any)
+    mockUseMostRecentCompletedAnalysis.mockReturnValue({} as any)
+    const { getByText } = render(props)
+    expect(getByText('MOCK INTERVENTION MODAL')).toBeTruthy()
   })
 })

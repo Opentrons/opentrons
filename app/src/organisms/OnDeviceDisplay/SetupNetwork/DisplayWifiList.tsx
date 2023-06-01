@@ -13,7 +13,7 @@ import {
   Btn,
   JUSTIFY_START,
   JUSTIFY_CENTER,
-  JUSTIFY_END,
+  Box,
   COLORS,
   BORDERS,
 } from '@opentrons/components'
@@ -47,7 +47,6 @@ const NETWORK_ROW_STYLE = css`
 
 interface DisplayWifiListProps {
   list: WifiNetwork[]
-  isSearching: boolean
   setShowSelectAuthenticationType: (
     isShowSelectAuthenticationType: boolean
   ) => void
@@ -57,7 +56,6 @@ interface DisplayWifiListProps {
 
 export function DisplayWifiList({
   list,
-  isSearching,
   setShowSelectAuthenticationType,
   setChangeState,
   setSelectedSsid,
@@ -71,7 +69,7 @@ export function DisplayWifiList({
 
   return (
     <>
-      <HeaderWithIPs isSearching={isSearching} />
+      <HeaderWithIPs />
       {list != null && list.length > 0 ? (
         list.map(nw => (
           <Btn
@@ -80,7 +78,7 @@ export function DisplayWifiList({
             key={nw.ssid}
             backgroundColor="#d6d6d6"
             marginBottom={SPACING.spacing8}
-            borderRadius={BORDERS.size3}
+            borderRadius={BORDERS.borderRadiusSize3}
             css={NETWORK_ROW_STYLE}
             onClick={() => handleClick(nw)}
           >
@@ -109,7 +107,7 @@ export function DisplayWifiList({
         marginTop={SPACING.spacing8}
         height="4rem"
         backgroundColor="#d6d6d6"
-        borderRadius={BORDERS.size3}
+        borderRadius={BORDERS.borderRadiusSize3}
         color={COLORS.black}
         css={NETWORK_ROW_STYLE}
       >
@@ -133,11 +131,7 @@ export function DisplayWifiList({
   )
 }
 
-interface HeadWithIPsProps {
-  isSearching: boolean
-}
-
-const HeaderWithIPs = ({ isSearching }: HeadWithIPsProps): JSX.Element => {
+const HeaderWithIPs = (): JSX.Element => {
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   return (
@@ -171,16 +165,7 @@ const HeaderWithIPs = ({ isSearching }: HeadWithIPsProps): JSX.Element => {
           {t('connect_via', { type: t('wifi') })}
         </StyledText>
       </Flex>
-      <Flex justifyContent={JUSTIFY_END} flex="1">
-        {isSearching ? (
-          <Icon
-            name="ot-spinner"
-            spin
-            size="3.3125rem"
-            data-testid="wifi_list_search_spinner"
-          />
-        ) : null}
-      </Flex>
+      <Box flex="1" />
     </Flex>
   )
 }

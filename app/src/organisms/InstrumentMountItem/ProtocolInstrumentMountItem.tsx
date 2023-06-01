@@ -40,7 +40,7 @@ export const MountItem = styled.div<{ isReady: boolean }>`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border-radius: ${BORDERS.size3};
+  border-radius: ${BORDERS.borderRadiusSize3};
   background-color: ${({ isReady }) =>
     isReady ? COLORS.green3 : COLORS.yellow3};
   &:hover,
@@ -59,6 +59,7 @@ interface ProtocolInstrumentMountItemProps {
     | GripperData['data']['calibratedOffset']
     | null
   speccedName: PipetteName | GripperModel
+  instrumentsRefetch?: () => void
 }
 export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
@@ -155,6 +156,7 @@ export function ProtocolInstrumentMountItem(
           selectedPipette={selectedPipette}
           mount={mount as Mount}
           pipetteInfo={mostRecentAnalysis?.pipettes}
+          onComplete={props.instrumentsRefetch}
         />
       ) : null}
     </>
