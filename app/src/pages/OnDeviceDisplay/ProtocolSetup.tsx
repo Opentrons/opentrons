@@ -401,14 +401,6 @@ function PrepareToRun({
           subDetail={modulesSubDetail}
           status={modulesStatus}
         />
-
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('labware')}
-          title={t('labware')}
-          detail={labwareDetail}
-          subDetail={labwareSubDetail}
-          status="general"
-        />
         <ProtocolSetupStep
           onClickSetupStep={handleLpcClick}
           title={t('labware_position_check')}
@@ -417,6 +409,13 @@ function PrepareToRun({
           )}
           status="general"
           isActionUnavailable={lpcDisabledReason != null}
+        />
+        <ProtocolSetupStep
+          onClickSetupStep={() => setSetupScreen('labware')}
+          title={t('labware')}
+          detail={labwareDetail}
+          subDetail={labwareSubDetail}
+          status="general"
         />
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('liquids')}

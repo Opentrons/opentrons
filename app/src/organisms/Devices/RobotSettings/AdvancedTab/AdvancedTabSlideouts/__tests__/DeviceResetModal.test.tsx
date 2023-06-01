@@ -6,7 +6,7 @@ import { i18n } from '../../../../../../i18n'
 import { resetConfig } from '../../../../../../redux/robot-admin'
 import { useDispatchApiRequest } from '../../../../../../redux/robot-api'
 
-import { FactoryResetModal } from '../FactoryResetModal'
+import { DeviceResetModal } from '../DeviceResetModal'
 
 import type { DispatchApiRequestType } from '../../../../../../redux/robot-api'
 
@@ -21,16 +21,16 @@ const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
 const mockResetOptions = {}
 const mockCloseModal = jest.fn()
 const ROBOT_NAME = 'otie'
-const render = (props: React.ComponentProps<typeof FactoryResetModal>) => {
+const render = (props: React.ComponentProps<typeof DeviceResetModal>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <FactoryResetModal {...props} />
+      <DeviceResetModal {...props} />
     </MemoryRouter>,
     { i18nInstance: i18n }
   )
 }
 
-describe('RobotSettings FactoryResetModal', () => {
+describe('RobotSettings DeviceResetModal', () => {
   let dispatchApiRequest: DispatchApiRequestType
   beforeEach(() => {
     dispatchApiRequest = jest.fn()

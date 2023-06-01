@@ -44,19 +44,19 @@ import {
 import type { State, Dispatch } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 
-interface FactoryResetSlideoutProps {
+interface DeviceResetSlideoutProps {
   isExpanded: boolean
   onCloseClick: () => void
   robotName: string
   updateResetStatus: (connected: boolean, rOptions?: ResetConfigRequest) => void
 }
 
-export function FactoryResetSlideout({
+export function DeviceResetSlideout({
   isExpanded,
   onCloseClick,
   robotName,
   updateResetStatus,
-}: FactoryResetSlideoutProps): JSX.Element {
+}: DeviceResetSlideoutProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const doTrackEvent = useTrackEvent()
   const robot = useRobot(robotName)
@@ -135,7 +135,7 @@ export function FactoryResetSlideout({
 
   return (
     <Slideout
-      title={t('factory_reset_slideout_title')}
+      title={t('device_reset')}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={

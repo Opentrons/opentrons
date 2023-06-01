@@ -28,19 +28,19 @@ import { resetConfig } from '../../../../../redux/robot-admin'
 import type { State } from '../../../../../redux/types'
 import type { ResetConfigRequest } from '../../../../../redux/robot-admin/types'
 
-interface FactoryResetModalProps {
+interface DeviceResetModalProps {
   closeModal: () => void
   isRobotReachable: boolean
   robotName: string
   resetOptions?: ResetConfigRequest
 }
 
-export function FactoryResetModal({
+export function DeviceResetModal({
   closeModal,
   isRobotReachable,
   robotName,
   resetOptions,
-}: FactoryResetModalProps): JSX.Element {
+}: DeviceResetModalProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()

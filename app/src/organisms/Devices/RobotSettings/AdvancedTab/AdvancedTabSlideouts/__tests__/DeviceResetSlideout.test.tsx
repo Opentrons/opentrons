@@ -5,7 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
 import { getResetConfigOptions } from '../../../../../../redux/robot-admin'
 import { useIsOT3 } from '../../../../hooks'
-import { FactoryResetSlideout } from '../FactoryResetSlideout'
+import { DeviceResetSlideout } from '../DeviceResetSlideout'
 
 jest.mock('../../../../../../redux/config')
 jest.mock('../../../../../../redux/discovery')
@@ -52,7 +52,7 @@ const mockResetConfigOptions = [
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <FactoryResetSlideout
+      <DeviceResetSlideout
         isExpanded={true}
         onCloseClick={mockOnCloseClick}
         robotName={ROBOT_NAME}
@@ -63,7 +63,7 @@ const render = () => {
   )
 }
 
-describe('RobotSettings FactoryResetSlideout', () => {
+describe('RobotSettings DeviceResetSlideout', () => {
   beforeEach(() => {
     mockGetResetConfigOptions.mockReturnValue(mockResetConfigOptions)
     mockUseIsOT3.mockReturnValue(false)
@@ -75,7 +75,7 @@ describe('RobotSettings FactoryResetSlideout', () => {
 
   it('should render title, description, checkboxes, links and button', () => {
     const [{ getByText, getByRole, getAllByText, getByTestId }] = render()
-    getByText('Factory Reset')
+    getByText('Device Reset')
     getByText('Select the robot data to clear.')
     getByText('Factory resets cannot be undone.')
     getByText('Robot Calibration Data')
@@ -98,7 +98,7 @@ describe('RobotSettings FactoryResetSlideout', () => {
     getByRole('checkbox', { name: 'Clear protocol run history' })
     getByRole('checkbox', { name: 'Clear custom boot scripts' })
     getByRole('button', { name: 'Clear data and restart robot' })
-    getByTestId('Slideout_icon_close_Factory Reset')
+    getByTestId('Slideout_icon_close_Device Reset')
   })
 
   it('should change some options and text for the OT-3', () => {
@@ -136,7 +136,7 @@ describe('RobotSettings FactoryResetSlideout', () => {
 
   it('should close the slideout when clicking close icon button', () => {
     const [{ getByTestId }] = render()
-    const closeButton = getByTestId('Slideout_icon_close_Factory Reset')
+    const closeButton = getByTestId('Slideout_icon_close_Device Reset')
     fireEvent.click(closeButton)
     expect(mockOnCloseClick).toHaveBeenCalled()
   })

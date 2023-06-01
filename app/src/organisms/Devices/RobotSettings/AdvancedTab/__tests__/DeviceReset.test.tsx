@@ -6,7 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
 
-import { FactoryReset } from '../FactoryReset'
+import { DeviceReset } from '../DeviceReset'
 
 const mockUpdateIsEXpanded = jest.fn()
 
@@ -15,7 +15,7 @@ jest.mock('../../../../ProtocolUpload/hooks')
 const render = (isRobotBusy = false) => {
   return renderWithProviders(
     <MemoryRouter>
-      <FactoryReset
+      <DeviceReset
         updateIsExpanded={mockUpdateIsEXpanded}
         isRobotBusy={isRobotBusy}
       />
@@ -24,14 +24,14 @@ const render = (isRobotBusy = false) => {
   )
 }
 
-describe('RobotSettings FactoryReset', () => {
+describe('RobotSettings DeviceReset', () => {
   afterEach(() => {
     jest.resetAllMocks()
   })
 
   it('should render title, description, and butoon', () => {
     const [{ getByText, getByRole }] = render()
-    getByText('Factory reset')
+    getByText('Device Reset')
     getByText(
       'Reset labware calibration, boot scripts, and/or robot calibration to factory settings.'
     )
