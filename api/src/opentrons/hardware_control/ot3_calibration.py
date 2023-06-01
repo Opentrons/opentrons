@@ -566,6 +566,7 @@ async def find_calibration_structure_position(
 ) -> Point:
     """Find the calibration square offset given an arbitry postition on the deck."""
     # Find the estimated structure plate height. This will be used to baseline the edge detection points.
+    nominal_center = nominal_center._replace(y=nominal_center.y - 2)
     z_height = await find_calibration_structure_height(hcapi, mount, nominal_center)
     initial_center = nominal_center._replace(z=z_height)
     LOG.info(f"Found structure plate at {z_height}mm")
@@ -574,6 +575,7 @@ async def find_calibration_structure_position(
     found_center = await find_calibration_structure_center(
         hcapi, mount, initial_center, method, raise_verify_error
     )
+    nominal_center = nominal_center._replace(y=nominal_center.y + 1)
     return nominal_center - found_center
 
 
@@ -693,7 +695,7 @@ async def calibrate_gripper_jaw(
         return offset
     finally:
         hcapi.remove_gripper_probe()
-        await hcapi.ungrip()
+        # await hcapi.ungrip()
 
 
 async def calibrate_gripper(
