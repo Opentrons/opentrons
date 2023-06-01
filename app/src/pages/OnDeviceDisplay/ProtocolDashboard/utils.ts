@@ -2,6 +2,8 @@ import type { ProtocolResource } from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
 import type { ProtocolsOnDeviceSortKey } from '../../../redux/config/types'
 
+const DUMMY_FOR_NO_DATE_CASE = -8640000000000000
+
 export function sortProtocols(
   sortBy: ProtocolsOnDeviceSortKey,
   protocols: ProtocolResource[],
@@ -11,10 +13,12 @@ export function sortProtocols(
     const aName = a.metadata.protocolName ?? a.files[0].name
     const bName = b.metadata.protocolName ?? b.files[0].name
     const aLastRun = new Date(
-      runs.find(run => run.protocolId === a.id)?.completedAt ?? 0
+      runs.find(run => run.protocolId === a.id)?.completedAt ??
+        new Date(DUMMY_FOR_NO_DATE_CASE)
     )
     const bLastRun = new Date(
-      runs.find(run => run.protocolId === b.id)?.completedAt ?? 0
+      runs.find(run => run.protocolId === b.id)?.completedAt ??
+        new Date(DUMMY_FOR_NO_DATE_CASE)
     )
     const aDate = new Date(a.createdAt)
     const bDate = new Date(b.createdAt)
