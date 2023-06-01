@@ -5,7 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../../../i18n'
 import { getResetConfigOptions } from '../../../../../../redux/robot-admin'
 import { useIsOT3 } from '../../../../hooks'
-import { FactoryResetSlideout } from '../FactoryResetSlideout'
+import { DeviceResetSlideout } from '../DeviceResetSlideout'
 
 jest.mock('../../../../../../redux/config')
 jest.mock('../../../../../../redux/discovery')
@@ -52,7 +52,7 @@ const mockResetConfigOptions = [
 const render = () => {
   return renderWithProviders(
     <MemoryRouter>
-      <FactoryResetSlideout
+      <DeviceResetSlideout
         isExpanded={true}
         onCloseClick={mockOnCloseClick}
         robotName={ROBOT_NAME}
@@ -63,7 +63,7 @@ const render = () => {
   )
 }
 
-describe('RobotSettings FactoryResetSlideout', () => {
+describe('RobotSettings DeviceResetSlideout', () => {
   beforeEach(() => {
     mockGetResetConfigOptions.mockReturnValue(mockResetConfigOptions)
     mockUseIsOT3.mockReturnValue(false)
@@ -75,7 +75,7 @@ describe('RobotSettings FactoryResetSlideout', () => {
 
   it('should render title, description, checkboxes, links and button', () => {
     const [{ getByText, getByRole, getAllByText, getByTestId }] = render()
-    getByText('Factory Reset')
+    getByText('Device Reset')
     getByText('Select the robot data to clear.')
     getByText('Factory resets cannot be undone.')
     getByText('Robot Calibration Data')
