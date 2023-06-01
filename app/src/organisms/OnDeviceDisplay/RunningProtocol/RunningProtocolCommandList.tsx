@@ -43,8 +43,9 @@ const TITLE_TEXT_STYLE = css`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  height: max-content;
 `
 
 const COMMAND_ROW_STYLE = css`
