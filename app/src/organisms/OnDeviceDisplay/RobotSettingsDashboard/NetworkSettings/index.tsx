@@ -130,16 +130,6 @@ export function NetworkSettings({
               chipText={handleChipText(isEthernetConnected)}
               displayDetailsTab={() => setShowDetailsTab('ethernet')}
             />
-            <NetworkSettingButton
-              buttonTitle={t('usb')}
-              buttonBackgroundColor={handleButtonBackgroundColor(
-                isUsbConnected
-              )}
-              iconName="usb"
-              chipType={handleChipType(isUsbConnected)}
-              chipText={handleChipText(isUsbConnected)}
-              displayDetailsTab={() => console.log('Not Implemented')}
-            />
           </Flex>
         )
     }

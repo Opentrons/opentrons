@@ -14,23 +14,23 @@ import {
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 
-interface FactoryResetProps {
+interface DeviceResetProps {
   updateIsExpanded: (
     isExpanded: boolean,
-    type: 'factoryReset' | 'renameRobot'
+    type: 'deviceReset' | 'renameRobot'
   ) => void
   isRobotBusy: boolean
 }
 
-export function FactoryReset({
+export function DeviceReset({
   updateIsExpanded,
   isRobotBusy,
-}: FactoryResetProps): JSX.Element {
+}: DeviceResetProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
     if (!isRobotBusy) {
-      updateIsExpanded(true, 'factoryReset')
+      updateIsExpanded(true, 'deviceReset')
     }
   }
 
@@ -40,16 +40,16 @@ export function FactoryReset({
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
           marginBottom={SPACING.spacing4}
-          id="AdvancedSettings_factoryReset"
+          id="AdvancedSettings_deviceReset"
         >
-          {t('factory_reset')}
+          {t('device_reset')}
         </StyledText>
-        <StyledText as="p">{t('factory_reset_description')}</StyledText>
+        <StyledText as="p">{t('device_reset_description')}</StyledText>
       </Box>
       <TertiaryButton
         marginLeft={SPACING_AUTO}
         onClick={handleClick}
-        id="RobotSettings_FactoryResetChooseButton"
+        id="RobotSettings_DeviceResetChooseButton"
         disabled={isRobotBusy}
       >
         {t('choose_reset_settings')}
