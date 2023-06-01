@@ -150,9 +150,7 @@ function getCheckLabwareSectionSteps(args: LPCArgs): CheckLabwareStep[] {
       ...acc,
       ...labwareLocationCombos.reduce<CheckLabwareStep[]>(
         (innerAcc, { location, labwareId, moduleId }) => {
-          if (
-            labwareId !== currentLabware.id
-          ) {
+          if (labwareId !== currentLabware.id) {
             return innerAcc
           }
 
