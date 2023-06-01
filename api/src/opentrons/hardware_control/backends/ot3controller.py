@@ -494,8 +494,22 @@ class OT3Controller:
         for axis, pos in response.items():
             self._position.update({axis: pos[0]})
             self._encoder_position.update({axis: pos[1]})
+            # TODO (FPS 6-01-2023): Remove this once the Feature Flag to ignore stall detection is removed.
+            # This check will latch the motor status for an axis at "true" if it was ever set to true.
+            # To account for the case where a motor axis has its power reset, we also depend on the
+            # "encoder_ok" flag staying set (it will only be False if the motor axis has not been
+            # homed since a power cycle)
+            motor_ok_latch = (
+                (not ff.stall_detection_enabled())
+                and self._motor_status[axis].motor_ok
+                and self._motor_status[axis].encoder_ok
+            )
             self._motor_status.update(
-                {axis: MotorStatus(motor_ok=pos[2], encoder_ok=pos[3])}
+                {
+                    axis: MotorStatus(
+                        motor_ok=(pos[2] or motor_ok_latch), encoder_ok=pos[3]
+                    )
+                }
             )
 
     @requires_update
