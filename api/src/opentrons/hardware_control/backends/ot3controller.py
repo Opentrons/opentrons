@@ -71,6 +71,8 @@ from opentrons_hardware.hardware_control.motion_planning import (
 from opentrons_hardware.hardware_control.motor_enable_disable import (
     set_enable_motor,
     set_disable_motor,
+    set_enable_gear_motor,
+    set_disable_gear_motor,
 )
 from opentrons_hardware.hardware_control.motor_position_status import (
     get_motor_position,
@@ -930,13 +932,17 @@ class OT3Controller:
 
     async def disengage_axes(self, axes: List[OT3Axis]) -> None:
         """Disengage axes."""
-        nodes = {axis_to_node(ax) for ax in axes}
+        nodes = {axis_to_node(ax) for ax in axes if ax is not OT3Axis.Q}
         await set_disable_motor(self._messenger, nodes)
+        if OT3Axis.Q in axes:
+            await set_disable_gear_motor(self._messenger, {axis_to_node(OT3Axis.Q)})
 
     async def engage_axes(self, axes: List[OT3Axis]) -> None:
         """Engage axes."""
-        nodes = {axis_to_node(ax) for ax in axes}
+        nodes = {axis_to_node(ax) for ax in axes if ax is not OT3Axis.Q}
         await set_enable_motor(self._messenger, nodes)
+        if OT3Axis.Q in axes:
+            await set_enable_gear_motor(self._messenger, {axis_to_node(OT3Axis.Q)})
 
     async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         """Set the light states."""

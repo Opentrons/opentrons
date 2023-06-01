@@ -1725,6 +1725,8 @@ class OT3API(
                 for axis, current in spec.ending_current.items()
             }
         )
+        if move.is_ht_tip_action:
+            self._backend.disengage_axes([OT3Axis.Q])
         _remove()
 
     async def clean_up(self) -> None:
