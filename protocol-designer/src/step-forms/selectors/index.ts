@@ -36,11 +36,7 @@ import {
 } from '../../labware-defs'
 import { i18n } from '../../localization'
 import { InstrumentGroup } from '@opentrons/components'
-import type {
-  DropdownOption,
-  Mount,
-  InstrumentInfoProps,
-} from '@opentrons/components'
+import type { DropdownOption, Mount } from '@opentrons/components'
 import type {
   InvariantContext,
   LabwareEntity,
@@ -67,6 +63,7 @@ import {
   ThermocyclerModuleState,
   HeaterShakerModuleState,
   MagneticBlockState,
+  InstrumentInfoProps,
 } from '../types'
 import {
   PresavedStepFormState,
@@ -364,7 +361,12 @@ export const getPipettesForInstrumentGroup: Selector<
         pipetteSpecs: pipetteSpec,
         description: _getPipetteDisplayName(pipetteOnDeck.name),
         isDisabled: false,
-        tiprackModel: getLabwareDisplayName(tiprackDef),
+        tiprackModel:
+          Object.keys(tiprackDef).length === undefined
+            ? getLabwareDisplayName(tiprackDef)
+            : Array.isArray(tiprackDef)
+            ? tiprackDef.map(i => getLabwareDisplayName(i))
+            : [],
       }
       acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
       return acc
