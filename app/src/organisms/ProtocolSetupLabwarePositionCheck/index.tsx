@@ -25,10 +25,10 @@ export function ProtocolSetupLabwarePositionCheck({
 }: ProtocolSetupLabwarePositionCheckProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
-  const { setMaintenanceInProgress } = useMaintenanceRunTakeover()
+  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
 
   const handleLaunchLPCClick = (): void => {
-    setMaintenanceInProgress()
+    setODDMaintenanceFlowInProgress()
     launchLPC()
   }
 
