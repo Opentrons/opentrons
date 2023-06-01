@@ -272,6 +272,11 @@ const SplashHeader = styled.h1`
   color: ${COLORS.white};
 `
 const SplashBody = styled.h4`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  overflow-wrap: break-word;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
@@ -294,8 +299,8 @@ const SplashFrame = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  border: ${BORDERS.size2} solid ${COLORS.white}${COLORS.opacity20HexCode};
-  border-radius: ${BORDERS.size3};
+  border: ${BORDERS.borderRadiusSize2} solid ${COLORS.white}${COLORS.opacity20HexCode};
+  border-radius: ${BORDERS.borderRadiusSize3};
   grid-gap: ${SPACING.spacing40};
 `
 

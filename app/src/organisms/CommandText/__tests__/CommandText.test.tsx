@@ -488,7 +488,7 @@ describe('CommandText', () => {
     const expectedCopyByCommandType: {
       [commandType in RunTimeCommand['commandType']]?: string
     } = {
-      home: 'Homing all gantry, pipette, and plunger axes',
+      home: 'Homing all robot arm, pipette, and plunger axes',
       savePosition: 'Saving position',
       touchTip: 'Touching tip',
       'magneticModule/engage': 'Engaging Magnetic Module',

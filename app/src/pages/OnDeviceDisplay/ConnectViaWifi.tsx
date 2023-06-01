@@ -29,7 +29,7 @@ import type { RequestState } from '../../redux/robot-api/types'
 import type { WifiNetwork } from '../../redux/networking/types'
 import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
 
-const FETCH_WIFI_LIST_MS = 5000
+const WIFI_LIST_POLL_MS = 5000
 
 export function ConnectViaWifi(): JSX.Element {
   const [selectedSsid, setSelectedSsid] = React.useState<string>('')
@@ -47,7 +47,7 @@ export function ConnectViaWifi(): JSX.Element {
   const [password, setPassword] = React.useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const list = useWifiList(robotName, FETCH_WIFI_LIST_MS)
+  const list = useWifiList(robotName, WIFI_LIST_POLL_MS)
   const [dispatchApiRequest, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
     const lastId = last(requestIds)

@@ -61,31 +61,20 @@ describe('DisplayWifiList', () => {
     jest.resetAllMocks()
   })
 
-  it('should render text and display search network mock when looking for wifi ssids', () => {
-    props.list = []
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('Select a network')
-    getByTestId('back-button')
-    expect(getByTestId('wifi_list_search_spinner')).toBeInTheDocument()
-    getByText('mock DisplaySearchNetwork')
-  })
-
-  it('should render wifi list and button', () => {
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('Select a network')
+  it('should render a wifi list, button and spinner', () => {
+    const [{ getByText, getByRole }] = render(props)
+    getByText('Connect via Wi-Fi')
     getByText('foo')
     getByText('bar')
     getByText('baz')
-    getByTestId('back-button')
-    // ToDo (kj:05/23/2023) the spinner part will be fixed when the designer is in the office
-    // expect(queryByTestId('wifi_list_search_spinner')).not.toBeInTheDocument()
+    getByRole('button', { name: 'Back' })
   })
 
-  // it('should not render a spinner', () => {
-  //   props = { ...props, isSearching: false }
-  //   const [{ queryByTestId }] = render(props)
-  //   expect(queryByTestId('wifi_list_search_spinner')).not.toBeInTheDocument()
-  // })
+  it('should not render a spinner', () => {
+    props = { ...props }
+    const [{ queryByTestId }] = render(props)
+    expect(queryByTestId('wifi_list_search_spinner')).not.toBeInTheDocument()
+  })
 
   it('should call mock functions when back', () => {
     const [{ getByTestId }] = render(props)

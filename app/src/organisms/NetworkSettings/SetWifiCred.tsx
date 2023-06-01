@@ -43,7 +43,7 @@ const SSID_INPUT_FIELD_STYLE = css`
   &:focus {
     border: 3px solid ${COLORS.blueEnabled};
     filter: drop-shadow(0px 0px 10px ${COLORS.blueEnabled});
-    border-radius: ${BORDERS.size1};
+    border-radius: ${BORDERS.borderRadiusSize1};
   }
 `
 

@@ -33,7 +33,7 @@ export function SetupInstrumentCalibration({
   const { t } = useTranslation('protocol_setup')
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
 
-  const { data: instrumentsQueryData } = useInstrumentsQuery()
+  const { data: instrumentsQueryData, refetch } = useInstrumentsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const usesGripper = isGripperInCommands(
@@ -62,6 +62,7 @@ export function SetupInstrumentCalibration({
             mount={mount}
             robotName={robotName}
             runId={runId}
+            instrumentsRefetch={refetch}
           />
         ) : null
       })}
