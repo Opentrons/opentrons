@@ -219,7 +219,6 @@
       "type": "object",
       "description": "Unordered object of well objects with position and dimensional information",
       "additionalProperties": false,
-      "minProperties": 1,
       "patternProperties": {
         "[A-Z]+[0-9]+": {
           "type": "object",
