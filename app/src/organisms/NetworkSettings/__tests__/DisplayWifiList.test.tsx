@@ -62,12 +62,12 @@ describe('DisplayWifiList', () => {
   })
 
   it('should render a wifi list, button and spinner', () => {
-    const [{ getByText, getByRole }] = render(props)
-    getByText('Connect via Wi-Fi')
+    const [{ getByText, getByTestId }] = render(props)
+    getByText('Select a network')
     getByText('foo')
     getByText('bar')
     getByText('baz')
-    getByRole('button', { name: 'Back' })
+    getByTestId('back-button')
   })
 
   it('should not render a spinner', () => {

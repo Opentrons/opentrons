@@ -4,20 +4,20 @@ import { useHistory } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
-  Flex,
-  SPACING,
-  DIRECTION_ROW,
   ALIGN_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  Icon,
-  Btn,
-  JUSTIFY_START,
-  JUSTIFY_CENTER,
-  JUSTIFY_END,
-  COLORS,
   BORDERS,
-  TYPOGRAPHY,
+  Box,
+  Btn,
+  COLORS,
+  DIRECTION_ROW,
   DISPLAY_FLEX,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_START,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -74,31 +74,16 @@ export function DisplayWifiList({
   isHeader = false,
 }: DisplayWifiListProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const [isSearching, setIsSearching] = React.useState<boolean>(false)
 
   const handleClick = (nw: WifiNetwork): void => {
     setShowSelectAuthenticationType(true)
     setSelectedSsid(nw.ssid)
     setChangeState({ type: CONNECT, ssid: nw.ssid, network: nw })
   }
-  const hasSsid = list != null && list.length > 0
-
-  // ToDo (kj:05/23/2023) This spinner part will be fixed later (talked with the designer)
-  React.useEffect(() => {
-    setIsSearching(true)
-    const checkUpdateTimer = setTimeout(() => {
-      setIsSearching(false)
-    }, 3000)
-    return () => {
-      clearTimeout(checkUpdateTimer)
-    }
-  }, [list])
 
   return (
     <>
-      {isHeader ? (
-        <HeaderWithIPs isSearching={isSearching} hasSsid={hasSsid} />
-      ) : null}
+      {isHeader ? <HeaderWithIPs /> : null}
       {list != null && list.length > 0
         ? list.map(nw => (
             <Btn
@@ -108,7 +93,7 @@ export function DisplayWifiList({
               key={nw.ssid}
               backgroundColor={COLORS.light1}
               marginBottom={SPACING.spacing8}
-              borderRadius={BORDERS.size3}
+              borderRadius={BORDERS.borderRadiusSize3}
               css={NETWORK_ROW_STYLE}
               flexDirection={DIRECTION_ROW}
               padding={`${SPACING.spacing20} ${SPACING.spacing32}`}
@@ -126,7 +111,7 @@ export function DisplayWifiList({
         onClick={() => setChangeState({ type: JOIN_OTHER, ssid: null })}
         height="5rem"
         backgroundColor={COLORS.light1}
-        borderRadius={BORDERS.size4}
+        borderRadius={BORDERS.borderRadiusSize4}
         color={COLORS.black}
         css={NETWORK_ROW_STYLE}
         padding={`${SPACING.spacing20} ${SPACING.spacing32}`}
@@ -142,15 +127,7 @@ export function DisplayWifiList({
   )
 }
 
-interface HeadWithIPsProps {
-  isSearching: boolean
-  hasSsid: boolean
-}
-
-const HeaderWithIPs = ({
-  isSearching,
-  hasSsid,
-}: HeadWithIPsProps): JSX.Element => {
+const HeaderWithIPs = (): JSX.Element => {
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
   return (
@@ -181,16 +158,7 @@ const HeaderWithIPs = ({
           {t('select_a_network')}
         </StyledText>
       </Flex>
-      <Flex justifyContent={JUSTIFY_END} flex="1">
-        {isSearching ? (
-          <Icon
-            name="ot-spinner"
-            spin
-            size="3rem"
-            data-testid="wifi_list_search_spinner"
-          />
-        ) : null}
-      </Flex>
+      <Box flex="1" />
     </Flex>
   )
 }
