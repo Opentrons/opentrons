@@ -245,11 +245,6 @@ function PrepareToRun({
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
-  // const protocolAnalysisLoading =
-  //   mostRecentAnalysis == null ||
-  //   attachedInstruments == null ||
-  //   (protocolHasModules && attachedModules == null) ||
-  //   allPipettesCalibrationData == null
   if (
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
@@ -400,6 +395,7 @@ function PrepareToRun({
           detail={modulesDetail}
           subDetail={modulesSubDetail}
           status={modulesStatus}
+          isActionUnavailable={!protocolHasModules}
         />
         <ProtocolSetupStep
           onClickSetupStep={handleLpcClick}
