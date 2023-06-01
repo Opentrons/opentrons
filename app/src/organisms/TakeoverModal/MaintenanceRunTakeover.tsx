@@ -19,7 +19,6 @@ export function MaintenanceRunTakeover(
   const maintenanceRunId = useCurrentMaintenanceRun({
     refetchInterval: 5000,
   }).data?.data.id
-
   const isMaintanenceRunCurrent = maintenanceRunId != null
 
   const [
@@ -27,13 +26,13 @@ export function MaintenanceRunTakeover(
     setShowConfirmTerminateModal,
   ] = React.useState<boolean>(false)
 
-  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
+  const { deleteMaintenanceRun, status } = useDeleteMaintenanceRunMutation()
 
   const handleCloseAndTerminate = (): void => {
     if (maintenanceRunId != null) {
       deleteMaintenanceRun(maintenanceRunId, {
         onSuccess: () => {
-          setShowConfirmTerminateModal(false)
+          if (status === 'success') setShowConfirmTerminateModal(false)
         },
       })
     }
@@ -51,6 +50,7 @@ export function MaintenanceRunTakeover(
           confirmTerminate={handleCloseAndTerminate}
           showConfirmTerminateModal={showConfirmTerminateModal}
           setShowConfirmTerminateModal={setShowConfirmTerminateModal}
+          terminateInProgress={status !== 'idle'}
         />
       )}
       {props.children}

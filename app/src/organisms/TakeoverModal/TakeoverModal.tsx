@@ -21,6 +21,7 @@ interface TakeoverModalProps {
   showConfirmTerminateModal: boolean
   setShowConfirmTerminateModal: React.Dispatch<React.SetStateAction<boolean>>
   confirmTerminate: () => void
+  terminateInProgress: boolean
 }
 
 export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
@@ -28,6 +29,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
     showConfirmTerminateModal,
     setShowConfirmTerminateModal,
     confirmTerminate,
+    terminateInProgress,
   } = props
   const { i18n, t } = useTranslation('shared')
 
@@ -54,10 +56,13 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
                 width="50%"
               />
               <SmallButton
+                iconName={terminateInProgress ? 'ot-spinner' : undefined}
+                iconPlacement="startIcon"
                 buttonType="alert"
                 onClick={confirmTerminate}
                 buttonText={t('terminate_activity')}
                 width="50%"
+                disabled={terminateInProgress}
               />
             </Flex>
           </Flex>
