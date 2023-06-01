@@ -141,8 +141,10 @@ async def get_thread_manager(
         ) from exc
 
     if postinit_task and postinit_task.done() and postinit_task.exception():
-        exc = postinit_task.exception()
-        log.error(f'Hardware failed to initialize: {format_exception_only(type(exc), exc)}')
+        exc = cast(Exception, postinit_task.exception())
+        log.error(
+            f"Hardware failed to initialize: {format_exception_only(type(exc), exc)}"
+        )
         raise HardwareFailedToInitialize(detail=str(exc)).as_error(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         ) from exc
@@ -231,19 +233,7 @@ async def _postinit_ot2_tasks(hardware: ThreadManagedHardware) -> None:
     blink_task = asyncio.create_task(_blink())
 
     try:
-
-        if not ff.disable_home_on_boot():
-            log.info("Homing Z axes")
-            try:
-                await hardware.home_z()
-            except Exception:
-                # If this is a flex, and the estop is asserted, we'll get an error
-                # here; make sure that it doesn't prevent things from actually
-                # starting.
-                log.error(
-                    "Exception homing z on startup, ignoring to allow server to start"
-                )
-
+        await _home_on_boot(hardware.wrapped())
         await hardware.set_lights(button=True)
     finally:
         blink_task.cancel()
@@ -253,16 +243,22 @@ async def _postinit_ot2_tasks(hardware: ThreadManagedHardware) -> None:
             pass
 
 
-async def _postinit_ot3_tasks(
-    hardware_tm: ThreadManagedHardware, app_state: AppState
+async def _home_on_boot(hardware: HardwareControlAPI) -> None:
+    if ff.disable_home_on_boot():
+        return
+    log.info("Homing Z axes")
+    try:
+        await hardware.home_z()
+    except Exception:
+        # If this is a flex, and the estop is asserted, we'll get an error
+        # here; make sure that it doesn't prevent things from actually
+        # starting.
+        log.error("Exception homing z on startup, ignoring to allow server to start")
+
+
+async def _do_updates(
+    hardware: "OT3API", update_manager: FirmwareUpdateManager
 ) -> None:
-    """Tasks to run on an initialized OT-3 before it is ready to use."""
-    hardware = cast("OT3API", hardware_tm)
-    update_manager = await get_firmware_update_manager(
-        app_state=app_state,
-        thread_manager=hardware_tm,
-        task_runner=get_task_runner(app_state),
-    )
 
     update_handles = [
         await update_manager.start_update_process(
@@ -280,27 +276,32 @@ async def _postinit_ot3_tasks(
                     f"Error updating {handle.process_details.subsystem}: {progress.error}"
                 )
                 return
-            elif progress.progress > 99:
+            elif progress.state == type(progress.state).done:  # noqa: E721
                 log.info(f"Update complete for {handle.process_details.subsystem}")
                 return
             else:
                 await asyncio.sleep(1)
 
+    await asyncio.gather(*(_until_update_finishes(handle) for handle in update_handles))
+
+
+async def _postinit_ot3_tasks(
+    hardware_tm: ThreadManagedHardware, app_state: AppState
+) -> None:
+    """Tasks to run on an initialized OT-3 before it is ready to use."""
+    update_manager = await get_firmware_update_manager(
+        app_state=app_state,
+        thread_manager=hardware_tm,
+        task_runner=get_task_runner(app_state),
+    )
+
+    hardware = cast("OT3API", hardware_tm)
+
     try:
-        await asyncio.gather(*(_until_update_finishes(handle) for handle in update_handles))
+        await _do_updates(hardware, update_manager)
         await hardware.cache_instruments()
-        if not ff.disable_home_on_boot():
-            log.info("Homing Z axes")
-            try:
-                await hardware.home_z()
-            except Exception:
-                # If this is a flex, and the estop is asserted, we'll get an error
-                # here; make sure that it doesn't prevent things from actually
-                # starting.
-                log.error(
-                    "Exception homing z on startup, ignoring to allow server to start"
-                )
-    except Exception as e:
+        await _home_on_boot(hardware)
+    except Exception:
         log.exception("Hardware initialization failure")
         raise
 
@@ -363,6 +364,24 @@ async def _initialize_simulated_hardware(
     return await load_simulator_thread_manager(path=simulator_config_path)
 
 
+def _postinit_done_handler(task: "asyncio.Task[None]") -> None:
+    if task.exception():
+        exc = cast(Exception, task.exception())
+        log.error(f"Postinit task failed: {format_exception_only(type(exc), exc)}")
+    else:
+        log.info("Postinit task complete")
+
+
+def _systemd_notify(systemd_available: bool) -> None:
+    if systemd_available:
+        try:
+            import systemd.daemon  # type: ignore
+
+            systemd.daemon.notify("READY=1")
+        except ImportError:
+            pass
+
+
 async def _initialize_hardware_api(app_state: AppState) -> None:
     """Initialize the HardwareAPI and attach it to global state."""
     app_settings = get_settings()
@@ -380,27 +399,16 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
         _initialize_event_watchers(app_state, hardware)
         _hw_api_accessor.set_on(app_state, hardware)
 
-        if systemd_available:
-            try:
-                import systemd.daemon  # type: ignore
-
-                systemd.daemon.notify("READY=1")
-            except ImportError:
-                pass
-
-        def _done_handler(task: "asyncio.Task[None]") -> None:
-            if task.exception():
-                exc = task.exception()
-                log.error(f'Postinit task failed: {format_exception_only(exc)}')
-            else:
-                log.info("Postinit task complete")
+        _systemd_notify(systemd_available)
 
         if should_use_ot3():
-            postinit_task = asyncio.create_task(_postinit_ot3_tasks(hardware, app_state))
+            postinit_task = asyncio.create_task(
+                _postinit_ot3_tasks(hardware, app_state)
+            )
         else:
             postinit_task = asyncio.create_task(_postinit_ot2_tasks(hardware))
 
-        postinit_task.add_done_callback(_done_handler)
+        postinit_task.add_done_callback(_postinit_done_handler)
         _postinit_task_accessor.set_on(app_state, postinit_task)
 
         log.info("Opentrons hardware API initialized")
