@@ -2,11 +2,11 @@
 test_name: Get pipettes
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Get all the attached pipettes
     request:
-      url: "{host:s}:{port:d}/pipettes"
+      url: "{ot2_server_base_url}/pipettes"
       method: GET
     response:
       status_code: 200

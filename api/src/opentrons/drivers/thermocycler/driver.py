@@ -317,6 +317,14 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
             "Gen1 Thermocyclers do not support the Plate Lift command."
         )
 
+    async def jog_lid(self, angle: float) -> None:
+        """Send the Jog Lid command.
+
+        NOT SUPPORTED on TC Gen1."""
+        raise NotImplementedError(
+            "Gen1 Thermocyclers do not support the Jog Lid command."
+        )
+
 
 class ThermocyclerDriverV2(ThermocyclerDriver):
     """
@@ -361,3 +369,13 @@ class ThermocyclerDriverV2(ThermocyclerDriver):
             gcode=GCODE.PLATE_LIFT
         )
         await self._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
+
+    async def jog_lid(self, angle: float) -> None:
+        """Send the Jog Lid command."""
+        c = (
+            CommandBuilder(terminator=TC_COMMAND_TERMINATOR)
+            .add_gcode(gcode="M240.D")
+            .add_float(prefix="", value=angle, precision=2)
+            .add_element("O")
+        )
+        await self._connection.send_command(command=c, retries=1)

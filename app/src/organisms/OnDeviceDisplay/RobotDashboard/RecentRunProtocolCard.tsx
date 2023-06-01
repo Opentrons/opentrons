@@ -87,7 +87,7 @@ export function RecentRunProtocolCard({
       gridGap={SPACING.spacing24}
       backgroundColor={isReadyToBeReRun ? COLORS.green3 : COLORS.yellow3}
       width="25.8125rem"
-      borderRadius={BORDERS.size4}
+      borderRadius={BORDERS.borderRadiusSize4}
       onClick={handleCardClick}
     >
       <Flex>

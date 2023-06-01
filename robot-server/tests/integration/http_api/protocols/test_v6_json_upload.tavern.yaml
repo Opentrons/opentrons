@@ -2,13 +2,12 @@ test_name: Upload and analyze a JSONv6 protocol
 
 marks:
   - usefixtures:
-      - run_server
-      - clean_server_state
+      - ot2_server_base_url
 
 stages:
   - name: Upload simple v6 protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: '../shared-data/protocol/fixtures/6/simpleV6.json'
@@ -31,7 +30,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: GET
     response:
       strict:
@@ -45,7 +44,7 @@ stages:
                 status: completed
   - name: Get protocol by ID
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
       method: GET
     response:
       status_code: 200
@@ -73,7 +72,7 @@ stages:
           referencingRuns: []
   - name: Get protocol analysis by ID
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       status_code: 200
@@ -567,13 +566,12 @@ test_name: Upload and analyze a JSONv6 protocol, with liquids
 
 marks:
   - usefixtures:
-      - run_server
-      - clean_server_state
+      - ot2_server_base_url
 
 stages:
   - name: Upload simple v6 protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: '../shared-data/protocol/fixtures/6/simpleV6.json'
@@ -596,7 +594,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: GET
     response:
       strict:
@@ -610,7 +608,7 @@ stages:
                 status: completed
   - name: Get protocol analysis by ID
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       strict:

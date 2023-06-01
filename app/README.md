@@ -132,7 +132,7 @@ ANALYZER=1 make -C app
 [electron]: https://www.electronjs.org/
 [electron-renderer]: https://electronjs.org/docs/tutorial/quick-start#renderer-process
 [hmr]: https://webpack.js.org/concepts/hot-module-replacement/
-[react]: https://reactjs.org/
+[react]: https://react.dev/
 [redux]: http://redux.js.org/
 [css-modules]: https://github.com/css-modules/css-modules
 [babel]: https://babeljs.io/
