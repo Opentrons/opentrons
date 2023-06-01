@@ -228,7 +228,9 @@ async def calibrate_tip_racks(api, slot_loc):
             mount = types.OT3Mount.RIGHT
             AXIS = OT3Axis.Z_R
         print(mount)
-        await api.move_to(mount, Point(slot_loc[key][0], slot_loc[key][1], 10.0))
+        xyz1 = (slot_loc[key])
+        print(xyz1)
+        await api.move_to(mount, Point(x=slot_loc[key][0], y=slot_loc[key][1], z=300.0))
         input("3333")
         await api.move_to(mount, Point(slot_loc[key][0], slot_loc[key][1], slot_loc[key][2]))
         input("2")
@@ -311,18 +313,18 @@ async def _main(is_simulating: bool) -> None:
     #     print("input err")
 
     slot_loc = {
-        "A1": (13.42, 394.92, 10.00),
-        "A2": (177.32, 394.92, 10.00),
-        "A3": (341.03, 394.92, 10.00),
-        "B1": (13.42, 288.42, 10.00),
-        "B2": (177.32, 288.92, 10.00),
-        "B3": (341.03, 288.92, 10.00),
-        "C1": (13.42, 181.92, 10.00),
-        "C2": (177.32, 181.92, 10.00),
-        "C3": (341.03, 181.92, 10.00),
-        "D1": (13.42, 75.5, 10.00),
-        "D2": (177.32, 75.5, 10.00),
-        "D3": (341.03, 75.5, 10.00),
+        "A1": (13.42, 394.92, 200.00),
+        "A2": (177.32, 394.92, 200.00),
+        "A3": (341.03, 394.92, 200.00),
+        "B1": (13.42, 288.42, 200.00),
+        "B2": (177.32, 288.92, 200.00),
+        "B3": (341.03, 288.92, 200.00),
+        "C1": (13.42, 181.92, 200.00),
+        "C2": (177.32, 181.92, 200.00),
+        "C3": (341.03, 181.92, 200.00),
+        "D1": (13.42, 75.5, 200.00),
+        "D2": (177.32, 75.5, 200.00),
+        "D3": (341.03, 75.5, 200.00),
     }
 
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
@@ -361,12 +363,14 @@ async def _main(is_simulating: bool) -> None:
                 aa = False
     except:
         print("Enter slot number err")
-
+    mount = mount_options["left"]
+    await api.move_to(mount, Point(x=slot_loc[slot][0], y=slot_loc[slot][1], z=slot_loc[slot][2]))
+    input("312312312312")
     #await api.move_to(mount, Point(slot_loc[slot][0], slot_loc[slot][1], slot_loc[slot][2]))
 
     l_r_loc = {
-        "OT3Mount.LEFT":(slot_loc[slot][0], slot_loc[slot][1], slot_loc[slot][2]),
-        "OT3Mount.RIGHT":(slot_loc[slot][0], slot_loc[slot][1], slot_loc[slot][2])
+        "OT3Mount.LEFT":slot_loc[slot],
+        "OT3Mount.RIGHT":slot_loc[slot]
 
     }
     print(l_r_loc)
