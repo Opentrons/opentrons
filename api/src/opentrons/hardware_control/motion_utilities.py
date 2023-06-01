@@ -51,7 +51,6 @@ def offset_for_mount(
     return offsets[primary_mount]
 
 
-# TODO (spp, 2023-05-22): I don't think these overloads are required anymore. Remove them.
 @overload
 def target_position_from_absolute(
     mount: Mount,
@@ -121,25 +120,25 @@ def target_position_from_absolute(  # type: ignore[no-untyped-def]
     return target_position
 
 
-@overload
+# @overload
+# def target_position_from_relative(
+#     mount: Mount, delta: Point, current_position: Dict[Axis, float]
+# ) -> "OrderedDict[Axis, float]":
+#     ...
+#
+#
+# @overload
+# def target_position_from_relative(
+#     mount: OT3Mount, delta: Point, current_position: Dict[Axis, float]
+# ) -> "OrderedDict[Axis, float]":
+#     ...
+
+
 def target_position_from_relative(
-    mount: Mount, delta: Point, current_position: Dict[Axis, float]
+    mount: Union[Mount, OT3Mount],
+    delta: Point,
+    current_position: Dict[Axis, float],
 ) -> "OrderedDict[Axis, float]":
-    ...
-
-
-@overload
-def target_position_from_relative(
-    mount: OT3Mount, delta: Point, current_position: Dict[Axis, float]
-) -> "OrderedDict[Axis, float]":
-    ...
-
-
-def target_position_from_relative(  # type: ignore[no-untyped-def]
-    mount,
-    delta,
-    current_position,
-):
     """Create a target position for all specified machine axes."""
     primary_z = Axis.by_mount(mount)
     x_ax = Axis.X
@@ -154,25 +153,25 @@ def target_position_from_relative(  # type: ignore[no-untyped-def]
     return target_position
 
 
-@overload
+# @overload
+# def target_position_from_plunger(
+#     mount: Mount, delta: float, current_position: Dict[Axis, float]
+# ) -> "OrderedDict[Axis, float]":
+#     ...
+#
+#
+# @overload
+# def target_position_from_plunger(
+#     mount: OT3Mount, delta: float, current_position: Dict[Axis, float]
+# ) -> "OrderedDict[Axis, float]":
+#     ...
+
+
 def target_position_from_plunger(
-    mount: Mount, delta: float, current_position: Dict[Axis, float]
+    mount: OT3Mount,
+    delta: float,
+    current_position: Dict[Axis, float],
 ) -> "OrderedDict[Axis, float]":
-    ...
-
-
-@overload
-def target_position_from_plunger(
-    mount: OT3Mount, delta: float, current_position: Dict[Axis, float]
-) -> "OrderedDict[Axis, float]":
-    ...
-
-
-def target_position_from_plunger(  # type: ignore[no-untyped-def]
-    mount,
-    delta,
-    current_position,
-):
     """Create a target position for machine axes including plungers.
 
     Axis positions other than the plunger are identical to current
@@ -212,6 +211,7 @@ def machine_point_from_deck_point(
     return Point(*linal.apply_transform(attitude, deck_point)) + offset
 
 
+# Do we really need this now?
 AxisType = TypeVar("AxisType", bound=Axis)
 
 
