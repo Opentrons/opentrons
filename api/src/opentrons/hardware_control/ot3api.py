@@ -822,21 +822,21 @@ class OT3API(
         if refresh:
             await self.refresh_positions()
 
-        axes_to_validate = [
-            key
-            for key, value in self._current_position.items()
-            if key not in [OT3Axis.G, OT3Axis.P_L, OT3Axis.P_R]
-        ]
-
-        if not self._backend.check_encoder_status(axes_to_validate):
-            await self.home()
-
-        valid = self._backend.check_motor_status(axes_to_validate)
-        mod_log.info(f"is this valid? {valid}")
-
-        valid_motor = self._current_position and valid
-        if not valid_motor:
-            raise MustHomeError("Current position is invalid; please home motors.")
+        mod_log.info(f"self._backend._motor_status {self._backend._motor_status}")
+        # axes_to_validate = [
+        #     key
+        #     for key, value in self._current_position.items()
+        #     if key not in [OT3Axis.G, OT3Axis.P_L, OT3Axis.P_R]
+        # ]
+        #
+        # if not self._backend.check_encoder_status(axes_to_validate):
+        #     await self.home()
+        #
+        # valid = self._backend.check_motor_status(axes_to_validate)
+        #
+        # valid_motor = self._current_position and valid
+        # if not valid_motor:
+        #     raise MustHomeError("Current position is invalid; please home motors.")
 
         return self._current_position
 
@@ -1020,6 +1020,15 @@ class OT3API(
                 # create a custom error
                 raise ValueError(f"{axis} is not present")
 
+        if not self._backend.check_encoder_status(list(position.keys())):
+            await self.home()
+
+        valid = self._backend.check_motor_status(list(position.keys()))
+
+        valid_motor = self._current_position and valid
+        if not valid_motor:
+            raise MustHomeError("Current position is invalid; please home motors.")
+
         absolute_positions: "OrderedDict[OT3Axis, float]" = OrderedDict()
         current_position = await self.current_axes_effector_positions()
         if OT3Axis.X in position:
@@ -1035,7 +1044,17 @@ class OT3API(
         for axis in [OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G]:
             if axis in position:
                 have_z = True
-                absolute_positions[axis] = position[axis]
+                if OT3Axis.Z_L:
+                    carrige_effectors_offset = self._robot_calibration.left_mount_offset
+                elif OT3Axis.Z_R:
+                    carrige_effectors_offset = (
+                        self._robot_calibration.right_mount_offset
+                    )
+                else:
+                    carrige_effectors_offset = (
+                        self._robot_calibration.gripper_mount_offset
+                    )
+                absolute_positions[axis] = position[axis] - carrige_effectors_offset.z
 
         if not have_z:
             absolute_positions[OT3Axis.Z_L] = current_position[OT3Axis.Z_L]

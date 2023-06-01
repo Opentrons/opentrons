@@ -25,10 +25,10 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-# These offsets are based on testing attach flows with 8/1 channel pipettes
-_ATTACH_OFFSET = Point(x=-13.775, y=84)
-_INSTRUMENT_ATTACH_Z_OFFSET = 400.0
-_PLATE_ATTACH_Z_OFFSET = 260.0
+# These offsets supplied from HW
+_ATTACH_POINT = Point(x=0, y=144)
+_INSTRUMENT_ATTACH_Z_POINT = 400.0
+_PLATE_ATTACH_Z_POINT = 270
 
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
@@ -81,24 +81,22 @@ class MoveToMaintenancePositionImplementation(
         ot3_api = ensure_ot3_hardware(
             self._hardware_api,
         )
-        logger.info(f"is instance OT3API: {isinstance(self._hardware_api, OT3API)}")
         if params.maintenancePosition == MaintenancePosition.AttachInstrument:
-
+            mount_to_axis = OT3Axis.by_mount(params.mount.to_hw_mount())
+            logger.info(f"mount_to_axis {mount_to_axis}")
             # NOTE(bc, 2023-05-10): this is a direct diagonal movement, an arc movement would be safer
             await ot3_api.move_axes(
                 {
-                    OT3Axis.X: _ATTACH_OFFSET.x,
                     OT3Axis.Y: _ATTACH_OFFSET.y,
-                    OT3Axis.by_mount(
-                        params.mount.to_hw_mount()
-                    ): _INSTRUMENT_ATTACH_Z_OFFSET,
+                    OT3Axis.X: _ATTACH_OFFSET.x,
+                    mount_to_axis: _INSTRUMENT_ATTACH_Z_OFFSET,
                 }
             )
         else:
             await ot3_api.move_axes(
                 {
-                    OT3Axis.X: _ATTACH_OFFSET.x,
                     OT3Axis.Y: _ATTACH_OFFSET.y,
+                    OT3Axis.X: _ATTACH_OFFSET.x,
                     OT3Axis.Z_L: _PLATE_ATTACH_Z_OFFSET,
                     OT3Axis.Z_R: _PLATE_ATTACH_Z_OFFSET,
                 }
