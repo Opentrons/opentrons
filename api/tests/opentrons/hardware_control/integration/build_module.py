@@ -35,7 +35,7 @@ async def build_module(
             port_number=1,
             port_group=PortGroup.UNKNOWN,
             device_path="",
-            hub=1,
+            hub=False,
             hub_port=None,
         ),
         hw_control_loop=asyncio.get_running_loop(),
