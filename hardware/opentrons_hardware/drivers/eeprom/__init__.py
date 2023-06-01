@@ -3,6 +3,7 @@
 from .eeprom import EEPROM
 
 from .types import (
+    PropId,
     PropType,
     Property,
     MachineType,
@@ -12,6 +13,7 @@ from .types import (
 
 
 __all__ = [
+    "PropId",
     "PropType",
     "Property",
     "MachineType",

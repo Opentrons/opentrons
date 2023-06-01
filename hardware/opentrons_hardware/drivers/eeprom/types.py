@@ -6,7 +6,6 @@ from enum import Enum
 from typing import Optional, Type, Dict, Any
 
 
-
 class PropId(Enum):
     """The unique property id for a property."""
 
