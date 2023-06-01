@@ -11,15 +11,3 @@
   min-height: 48px;
   font-size: 22px;
 }
-
-.hg-button.hg-functionBtn.hg-button-numbers {
-  flex-grow: 0.5;
-}
-
-.hg-button.hg-functionBtn.hg-button-ent {
-  flex-grow: 0.5;
-}
-
-.hg-button.hg-functionBtn.hg-button-space {
-  flex-grow: 4;
-}

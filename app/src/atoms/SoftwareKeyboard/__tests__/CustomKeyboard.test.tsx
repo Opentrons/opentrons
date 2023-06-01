@@ -52,8 +52,6 @@ describe('CustomKeyboard', () => {
       'm',
       'del',
       '123',
-      'space',
-      'enter',
     ]
     buttons.forEach((button, index) => {
       const expectedName = expectedButtonNames[index]
@@ -96,8 +94,6 @@ describe('CustomKeyboard', () => {
       'M',
       'del',
       '123',
-      'space',
-      'enter',
     ]
     buttons.forEach((button, index) => {
       const expectedName = expectedButtonNames[index]
