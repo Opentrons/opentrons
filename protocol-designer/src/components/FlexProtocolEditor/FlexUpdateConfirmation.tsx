@@ -1,6 +1,8 @@
 import React from 'react'
+import { css } from 'styled-components'
 import styles from './FlexComponents.css'
 import { StyledText } from './StyledText'
+import { Btn, COLORS, Icon } from '@opentrons/components'
 
 interface UpdateConfirmationProps {
   confirmationTitle: string
@@ -10,6 +12,17 @@ interface UpdateConfirmationProps {
   handleCancelClick: any
   handleConfirmClick: any
 }
+
+const CLOSE_ICON_STYLE = css`
+  border-radius: 50%;
+
+  &:hover {
+    background: ${COLORS.lightGreyHover};
+  }
+  &:active {
+    background: ${COLORS.lightGreyPressed};
+  }
+`
 
 export const UpdateConfirmation = ({
   confirmationTitle,
@@ -25,12 +38,9 @@ export const UpdateConfirmation = ({
         <div className={styles.confirmation_model}>
           <div className={styles.flex_title}>
             <StyledText as="h2">{confirmationTitle}</StyledText>
-            <button
-              className={styles.confirmation_model_x_button}
-              onClick={handleCancelClick}
-            >
-              <StyledText as="h4">X</StyledText>
-            </button>
+            <Btn size="1.5rem" onClick={handleCancelClick}>
+              <Icon name="close" css={CLOSE_ICON_STYLE} />
+            </Btn>
           </div>
           <div className={styles.line_separator} />
           <StyledText as="h4">{confirmationMessage}</StyledText>

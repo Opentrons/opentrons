@@ -214,13 +214,7 @@
   border-radius: 10px;
 }
 
-.confirmation_model_x_button {
-  margin: 0 !important;
-  padding: 0 !important;
-  color: #000 !important;
-}
-
-.confirmation_model button {
+.right_end button {
   margin: 0 10px;
   padding: 10px 20px;
   border-radius: 5px;
