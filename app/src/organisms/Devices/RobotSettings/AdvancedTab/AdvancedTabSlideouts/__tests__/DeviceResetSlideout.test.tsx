@@ -98,7 +98,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
     getByRole('checkbox', { name: 'Clear protocol run history' })
     getByRole('checkbox', { name: 'Clear custom boot scripts' })
     getByRole('button', { name: 'Clear data and restart robot' })
-    getByTestId('Slideout_icon_close_Factory Reset')
+    getByTestId('Slideout_icon_close_Device Reset')
   })
 
   it('should change some options and text for the OT-3', () => {
@@ -136,7 +136,7 @@ describe('RobotSettings DeviceResetSlideout', () => {
 
   it('should close the slideout when clicking close icon button', () => {
     const [{ getByTestId }] = render()
-    const closeButton = getByTestId('Slideout_icon_close_Factory Reset')
+    const closeButton = getByTestId('Slideout_icon_close_Device Reset')
     fireEvent.click(closeButton)
     expect(mockOnCloseClick).toHaveBeenCalled()
   })
