@@ -22,10 +22,10 @@ export function Welcome(): JSX.Element {
 
   return (
     <Flex
-      padding="4.71875rem 3.75rem"
       flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_CENTER}
       gridGap={SPACING.spacing12}
+      justifyContent={JUSTIFY_CENTER}
+      padding="4.71875rem 3.75rem"
     >
       <img alt={IMAGE_ALT} src={screenImage} width="904px" height="189px" />
       <Flex justifyContent={JUSTIFY_CENTER}>
@@ -35,20 +35,19 @@ export function Welcome(): JSX.Element {
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER}>
         <StyledText
-          width="39.875rem"
-          textAlign={TYPOGRAPHY.textAlignCenter}
           as="h4"
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={COLORS.darkBlack70}
+          textAlign={TYPOGRAPHY.textAlignCenter}
+          width="39.875rem"
         >
           {t('welcome_description')}
         </StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing28}>
         <MediumButton
-          buttonType="primary"
-          buttonText={t('shared:get_started')}
           buttonCategory="rounded"
+          buttonText={t('shared:get_started')}
+          buttonType="primary"
           onClick={() => history.push('/network-setup')}
         />
       </Flex>

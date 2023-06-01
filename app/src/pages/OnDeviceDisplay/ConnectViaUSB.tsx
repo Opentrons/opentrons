@@ -36,26 +36,27 @@ export function ConnectViaUSB(): JSX.Element {
     <>
       <StepMeter totalSteps={5} currentStep={2} />
       <Flex
-        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing32}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
       >
         <Flex
-          flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
+          flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_CENTER}
+          marginBottom={SPACING.spacing32}
           position={POSITION_RELATIVE}
-          marginBottom={SPACING.spacing64}
         >
           <Btn
-            position={POSITION_ABSOLUTE}
             left="0"
             onClick={() => history.push('/network-setup')}
+            position={POSITION_ABSOLUTE}
           >
             <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
               <Icon
+                aria-label="Connect_via_usb_back_button"
                 name="back"
                 size="3rem"
-                aria-label="Connect_via_usb_back_button"
               />
             </Flex>
           </Btn>
@@ -68,20 +69,20 @@ export function ConnectViaUSB(): JSX.Element {
         {isConnected ? (
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
             <Flex
-              flexDirection={DIRECTION_COLUMN}
+              alignItems={ALIGN_CENTER}
               backgroundColor={COLORS.green3}
               borderRadius={BORDERS.borderRadiusSize3}
               height="18.5rem"
-              alignItems={ALIGN_CENTER}
-              justifyContent={JUSTIFY_CENTER}
+              flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing32}
+              justifyContent={JUSTIFY_CENTER}
               padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
             >
               <Icon name="ot-check" size="3rem" color={COLORS.green2} />
               <Flex
+                alignItems={ALIGN_CENTER}
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing4}
-                alignItems={ALIGN_CENTER}
               >
                 <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                   {t('successfully_connected')}
@@ -102,29 +103,29 @@ export function ConnectViaUSB(): JSX.Element {
           </Flex>
         ) : (
           <Flex
-            justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
             backgroundColor={COLORS.darkBlack20}
+            borderRadius={BORDERS.borderRadiusSize3}
             flexDirection={DIRECTION_COLUMN}
-            padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
             gridGap={SPACING.spacing32}
             height="25.25rem"
-            borderRadius={BORDERS.borderRadiusSize3}
+            justifyContent={JUSTIFY_CENTER}
+            padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
           >
             <Icon name="ot-alert" size="3rem" />
             <Flex
+              alignItems={ALIGN_CENTER}
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing4}
               justifyContent={JUSTIFY_CENTER}
-              alignItems={ALIGN_CENTER}
             >
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
                 {t('no_connection_found')}
               </StyledText>
               <Flex
+                alignItems={ALIGN_CENTER}
                 flexDirection={DIRECTION_COLUMN}
                 gridGap={SPACING.spacing8}
-                alignItems={ALIGN_CENTER}
               >
                 <StyledText as="h4" color={COLORS.darkBlack70}>
                   {t('connect_via_usb_description_1')}
