@@ -65,7 +65,7 @@ export function SetupGripperCalibrationItem({
             setOpenWizardFlowType(GRIPPER_FLOW_TYPES.RECALIBRATE)
           }}
         >
-          {t('calibrate_now_cta')}
+          {t('calibrate_now')}
         </TertiaryButton>
       </Flex>
     )

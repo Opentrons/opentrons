@@ -177,7 +177,7 @@ export function CurrentRunningProtocolCommand({
       <Flex
         padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
         backgroundColor={COLORS.mediumBlueEnabled}
-        borderRadius={BORDERS.size2}
+        borderRadius={BORDERS.borderRadiusSize2}
         justifyContent={JUSTIFY_CENTER}
         css={COMMAND_ROW_STYLE}
       >

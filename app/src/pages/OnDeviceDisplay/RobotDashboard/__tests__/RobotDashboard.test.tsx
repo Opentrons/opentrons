@@ -74,6 +74,7 @@ const mockProtocol: ProtocolResource = {
   id: 'mockProtocol1',
   createdAt: '2022-05-03T21:36:12.494778+00:00',
   protocolType: 'json',
+  robotType: 'OT-3 Standard',
   metadata: {
     protocolName: 'yay mock protocol',
     author: 'engineering',

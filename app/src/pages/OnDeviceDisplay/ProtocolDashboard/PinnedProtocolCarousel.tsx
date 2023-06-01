@@ -65,12 +65,15 @@ export function PinnedProtocolCarousel(props: {
     return size
   }
 
+  // We set a negative right margin to give the illusion of the carousel spilling
+  // off the page, as per the designs.
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing8}
       ref={swipe.ref}
+      marginRight={pinnedProtocols.length < 3 ? '0' : `-${SPACING.spacing40}`}
       onMouseDown={handleMouseDown}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
