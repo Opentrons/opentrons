@@ -36,7 +36,7 @@ function getRootReducer(): Reducer<BaseState, Action> {
   return (state: any, action) => {
     if (
       action.type === 'LOAD_FILE' ||
-      // action.type === 'CREATE_NEW_PROTOCOL' ||
+      action.type === 'CREATE_NEW_PROTOCOL' ||
       action.type === 'UNDO_LOAD_FILE'
     ) {
       // reset entire state, rehydrate from localStorage

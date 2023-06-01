@@ -7,7 +7,7 @@ import { actions as loadFileActions } from '../load-file'
 import { MapDispatchToPropsParam, connect, useDispatch } from 'react-redux'
 import { ThunkDispatch } from '../types'
 import { actions as navActions } from '../navigation'
-import { setRobotName } from '../load-file/actions'
+import { setRobotType } from '../load-file/actions'
 import {
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
@@ -86,13 +86,13 @@ function mergeProps(
     ...passThruProps,
     goToOT3FilePage: () => {
       dispatch(
-        setRobotName({ model: OT3_STANDARD_MODEL, deckId: OT3_STANDARD_DECKID })
+        setRobotType({ model: OT3_STANDARD_MODEL, deckId: OT3_STANDARD_DECKID })
       )
       dispatch(navActions.navigateToPage('new-flex-file-form'))
     },
     goToOT2FilePage: () => {
       dispatch(
-        setRobotName({ model: OT2_STANDARD_MODEL, deckId: OT2_STANDARD_DECKID })
+        setRobotType({ model: OT2_STANDARD_MODEL, deckId: OT2_STANDARD_DECKID })
       )
       dispatch(navActions.navigateToPage('file-splash'))
     },
