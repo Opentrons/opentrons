@@ -1,10 +1,8 @@
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import { SECTIONS } from '../constants'
 import { getLabwareDefinitionsFromCommands } from './labware'
 import {
   getLabwareDefURI,
   getIsTiprack,
-  getSlotHasMatingSurfaceUnitVector,
   FIXED_TRASH_ID,
 } from '@opentrons/shared-data'
 import { getLabwareLocationCombos } from '../../ApplyHistoricOffsets/hooks/getLabwareLocationCombos'
@@ -29,8 +27,6 @@ interface LPCArgs {
   modules: ProtocolAnalysisOutput['modules']
   commands: RunTimeCommand[]
 }
-
-const OT2_STANDARD_DECK_DEF = standardDeckDef as any
 
 export const getCheckSteps = (args: LPCArgs): LabwarePositionCheckStep[] => {
   const checkTipRacksSectionSteps = getCheckTipRackSectionSteps(args)

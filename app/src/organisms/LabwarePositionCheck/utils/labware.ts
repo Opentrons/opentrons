@@ -4,11 +4,9 @@ import {
   getTiprackVolume,
   ProtocolFile,
   LabwareDefinition2,
-  getSlotHasMatingSurfaceUnitVector,
   getLabwareDefURI,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type {
   ProtocolAnalysisOutput,
@@ -17,8 +15,6 @@ import type {
 import type { LabwareToOrder } from '../types'
 import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-
-const OT2_STANDARD_DECK_DEF = standardDeckDef as any
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,
