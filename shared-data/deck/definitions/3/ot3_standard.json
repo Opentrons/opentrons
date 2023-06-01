@@ -211,7 +211,7 @@
       }
     ]
   },
-  "layers":[
+  "layers": [
     {
       "name": "style",
       "type": "element",
