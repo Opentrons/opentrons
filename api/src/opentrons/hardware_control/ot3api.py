@@ -72,7 +72,6 @@ from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
 from .util import DeckTransformState
 from .types import (
-    Axis,
     CriticalPoint,
     DoorState,
     DoorStateNotification,
@@ -657,7 +656,7 @@ class OT3API(
 
     @ExecutionManagerProvider.wait_for_running
     async def _update_position_estimation(
-        self, axes: Optional[Union[List[Axis], List[Axis]]] = None
+        self, axes: Optional[List[Axis]] = None
     ) -> None:
         """
         Function to update motor estimation for a set of axes
@@ -796,7 +795,7 @@ class OT3API(
     ) -> Dict[Axis, float]:
         realmount = OT3Mount.from_mount(mount)
         ot3_pos = await self.current_position_ot3(realmount, critical_point, refresh)
-        return self._axis_map_from_ot3axis_map(ot3_pos)
+        return ot3_pos
 
     async def current_position_ot3(
         self,
@@ -1231,7 +1230,7 @@ class OT3API(
 
     @ExecutionManagerProvider.wait_for_running
     async def home(
-        self, axes: Optional[Union[List[Axis], List[Axis]]] = None
+        self, axes: Optional[List[Axis]] = None
     ) -> None:
         """
         Worker function to home the robot by axis or list of
@@ -1258,7 +1257,7 @@ class OT3API(
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:
         """Which axes are engaged and holding."""
-        return self._axis_map_from_ot3axis_map(self._backend.engaged_axes())
+        return self._backend.engaged_axes()
 
     @property
     def engaged_axes(self) -> Dict[Axis, bool]:
@@ -2112,15 +2111,3 @@ class OT3API(
         return values
 
     AMKey = TypeVar("AMKey")
-
-    @staticmethod
-    def _axis_map_from_ot3axis_map(
-        inval: Dict[Axis, "OT3API.AMKey"]
-    ) -> Dict[Axis, "OT3API.AMKey"]:
-        ret: Dict[Axis, OT3API.AMKey] = {}
-        for ax in Axis:
-            try:
-                ret[ax] = inval[Axis.from_axis(ax)]
-            except KeyError:
-                pass
-        return ret
