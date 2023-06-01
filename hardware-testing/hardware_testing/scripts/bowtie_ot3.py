@@ -20,6 +20,7 @@ def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
         pos_min._replace(x=pos_max.x),  # front-right-down
         pos_max._replace(z=pos_min.z),  # back-right-down
     ]
+    print("pos_max",pos_max)
     return bowtie_points
 
 

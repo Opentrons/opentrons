@@ -220,15 +220,20 @@ async def calibrate_tip_racks(api, slot_loc):
     calibrated_step = {}
     for key in slot_loc.keys():
         print(f"Testing: {key}\n")
+
         if key == "OT3Mount.LEFT":
             mount = types.OT3Mount.LEFT
             AXIS = OT3Axis.Z_L
         elif key == "OT3Mount.RIGHT":
             mount = types.OT3Mount.RIGHT
             AXIS = OT3Axis.Z_R
-
+        print(mount)
+        await api.move_to(mount, Point(slot_loc[key][0], slot_loc[key][1], 10.0))
+        input("3333")
         await api.move_to(mount, Point(slot_loc[key][0], slot_loc[key][1], slot_loc[key][2]))
+        input("2")
         cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE)
+        input("2")
         tip_rack_position = await jog(api, cur_pos, CriticalPoint.NOZZLE,mount)
 
         cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE)
@@ -306,18 +311,18 @@ async def _main(is_simulating: bool) -> None:
     #     print("input err")
 
     slot_loc = {
-        "A1": (13.42, 394.92, 250),
-        "A2": (177.32, 394.92, 250),
-        "A3": (341.03, 394.92, 250),
-        "B1": (13.42, 288.42, 250),
-        "B2": (177.32, 288.92, 250),
-        "B3": (341.03, 288.92, 250),
-        "C1": (13.42, 181.92, 250),
-        "C2": (177.32, 181.92, 250),
-        "C3": (341.03, 181.92, 250),
-        "D1": (13.42, 75.5, 250),
-        "D2": (177.32, 75.5, 250),
-        "D3": (341.03, 75.5, 250),
+        "A1": (13.42, 394.92, 10.00),
+        "A2": (177.32, 394.92, 10.00),
+        "A3": (341.03, 394.92, 10.00),
+        "B1": (13.42, 288.42, 10.00),
+        "B2": (177.32, 288.92, 10.00),
+        "B3": (341.03, 288.92, 10.00),
+        "C1": (13.42, 181.92, 10.00),
+        "C2": (177.32, 181.92, 10.00),
+        "C3": (341.03, 181.92, 10.00),
+        "D1": (13.42, 75.5, 10.00),
+        "D2": (177.32, 75.5, 10.00),
+        "D3": (341.03, 75.5, 10.00),
     }
 
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
@@ -361,10 +366,11 @@ async def _main(is_simulating: bool) -> None:
 
     l_r_loc = {
         "OT3Mount.LEFT":(slot_loc[slot][0], slot_loc[slot][1], slot_loc[slot][2]),
-        "OT3Mount.LEFT":(slot_loc[slot][0], slot_loc[slot][1], slot_loc[slot][2])
+        "OT3Mount.RIGHT":(slot_loc[slot][0], slot_loc[slot][1], slot_loc[slot][2])
 
     }
-
+    print(l_r_loc)
+    input("1")
     if(not args.load_cal):
         calibrated_slot_loc,calibrated_step = await calibrate_tip_racks(api, l_r_loc)
     else:
