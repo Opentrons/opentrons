@@ -3,7 +3,6 @@ from opentrons.config.types import GantryLoad, PerPipetteAxisSettings
 from opentrons.hardware_control.types import (
     OT3Mount,
     Axis,
-    Axis,
     CriticalPoint,
     OT3AxisKind,
     GripperProbe,
@@ -16,7 +15,6 @@ __all__ = [
     "Axis",
     "Point",
     "PerPipetteAxisSettings",
-    "Axis",
     "Mount",
     "CriticalPoint",
     "OT3AxisKind",

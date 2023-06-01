@@ -187,7 +187,7 @@ def target_position_from_plunger(
     )
     plunger_pos = OrderedDict()
     z_ax = Axis.by_mount(mount)
-    plunger = Axis.of_main_tool_actuator(mount)
+    plunger = Axis.of_main_tool_actuator(mount)     # (spp): is it okay that we'll now use only the new plunger names?
     all_axes_pos[z_ax] = current_position[z_ax]
     plunger_pos[plunger] = delta
     all_axes_pos.update(plunger_pos)

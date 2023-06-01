@@ -24,7 +24,6 @@ from opentrons.hardware_control.robot_calibration import (
     RobotCalibration,
     DeckCalibration,
 )
-from opentrons.hardware_control.types import Axis
 
 
 async def test_controller_must_home(hardware_api):

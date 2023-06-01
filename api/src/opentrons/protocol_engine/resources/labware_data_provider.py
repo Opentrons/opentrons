@@ -44,7 +44,7 @@ class LabwareDataProvider:
     def _get_labware_definition_sync(
         load_name: str, namespace: str, version: int
     ) -> LabwareDefinition:
-        return LabwareDexfinition.parse_obj(
+        return LabwareDefinition.parse_obj(
             get_labware_definition(load_name, namespace, version)
         )
 
