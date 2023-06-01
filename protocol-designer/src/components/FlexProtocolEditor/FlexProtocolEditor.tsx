@@ -21,6 +21,8 @@ import {
   TEMPERATURE_MODULE_V2,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
+  OT3_STANDARD_MODEL,
+  OT3_STANDARD_DECKID,
 } from '@opentrons/shared-data'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -47,6 +49,7 @@ import {
   mapStateToProps as newModalFileMapStateToProps,
 } from '../modals/NewFileModal'
 import { FlexFileDetails } from './FlexFileDetails'
+import { setRobotType } from '../../load-file/actions'
 type Props = React.ComponentProps<typeof FlexProtocolEditor>
 export interface FormModule {
   onDeck: boolean
@@ -345,6 +348,9 @@ function FlexProtocolEditor({
     }, [])
 
     onSave({ modules, newProtocolFields, pipettes })
+    dispatch(
+      setRobotType({ model: OT3_STANDARD_MODEL, deckId: OT3_STANDARD_DECKID })
+    )
     dispatch(navActions.navigateToPage('liquids'))
   }
 
