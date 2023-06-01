@@ -5,13 +5,13 @@ import { StyledText } from '../StyledText'
 import styles from '../FlexComponents.css'
 import { useFormikContext } from 'formik'
 
-interface flexProtocolName {
+export interface flexProtocolName {
   fields: { name: string; author: string; description: string }
   handleChange: () => void
   handleBlur: () => void
 }
 
-function FlexProtocolNameComponent(): JSX.Element {
+export function FlexProtocolNameComponent(): JSX.Element {
   const {
     values,
     errors,
@@ -43,6 +43,7 @@ function FlexProtocolNameComponent(): JSX.Element {
           onBlur={handleBlur}
           value={values.fields.name}
           name="fields.name"
+          id="protocol-name-input"
         />
         {Boolean(errors?.fields?.name) && touched?.fields?.name && (
           <StyledText as="label" className={styles.error_text}>
@@ -68,6 +69,7 @@ function FlexProtocolNameComponent(): JSX.Element {
           onBlur={handleBlur}
           value={values.fields.author}
           name="fields.author"
+          id="organization-author-input"
         />
       </FormGroup>
 
@@ -83,6 +85,7 @@ function FlexProtocolNameComponent(): JSX.Element {
           onBlur={handleBlur}
           value={values.fields.description}
           name="fields.description"
+          data-testid="protocol-description-textarea"
         />
       </FormGroup>
     </>
