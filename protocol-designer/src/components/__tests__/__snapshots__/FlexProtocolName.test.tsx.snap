@@ -1,0 +1,990 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FlexProtocolNameComponent renders organization author input field 1`] = `
+.c0 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.c1 {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1rem;
+}
+
+.c2 {
+  font-size: 0.813rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+.c3 {
+  font-size: 0.625rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+<div>
+  <h2
+    class="c0 c1"
+  >
+    Protocol Name and Description
+  </h2>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Choose a name for your protocol.*
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Protocol Name
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="protocol-name-input"
+            id="protocol-name-input"
+            name="fields.name"
+            tabindex="1"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Add more information, if you like (you can change this later).
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Organization/Author
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="organization-author-input"
+            id="organization-author-input"
+            name="fields.author"
+            tabindex="2"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Description
+    </p>
+    <textarea
+      class="textarea_input"
+      data-testid="protocol-description-textarea"
+      name="fields.description"
+      rows="4"
+      tabindex="3"
+    />
+  </div>
+</div>
+`;
+
+exports[`FlexProtocolNameComponent renders protocol description textarea 1`] = `
+.c0 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.c1 {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1rem;
+}
+
+.c2 {
+  font-size: 0.813rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+.c3 {
+  font-size: 0.625rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+<div>
+  <h2
+    class="c0 c1"
+  >
+    Protocol Name and Description
+  </h2>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Choose a name for your protocol.*
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Protocol Name
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="protocol-name-input"
+            id="protocol-name-input"
+            name="fields.name"
+            tabindex="1"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Add more information, if you like (you can change this later).
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Organization/Author
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="organization-author-input"
+            id="organization-author-input"
+            name="fields.author"
+            tabindex="2"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Description
+    </p>
+    <textarea
+      class="textarea_input"
+      data-testid="protocol-description-textarea"
+      name="fields.description"
+      rows="4"
+      tabindex="3"
+    />
+  </div>
+</div>
+`;
+
+exports[`FlexProtocolNameComponent renders protocol name input field 1`] = `
+.c0 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.c1 {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1rem;
+}
+
+.c2 {
+  font-size: 0.813rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+.c3 {
+  font-size: 0.625rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+<div>
+  <h2
+    class="c0 c1"
+  >
+    Protocol Name and Description
+  </h2>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Choose a name for your protocol.*
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Protocol Name
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="protocol-name-input"
+            id="protocol-name-input"
+            name="fields.name"
+            tabindex="1"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Add more information, if you like (you can change this later).
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Organization/Author
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="organization-author-input"
+            id="organization-author-input"
+            name="fields.author"
+            tabindex="2"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Description
+    </p>
+    <textarea
+      class="textarea_input"
+      data-testid="protocol-description-textarea"
+      name="fields.description"
+      rows="4"
+      tabindex="3"
+    />
+  </div>
+</div>
+`;
+
+exports[`FlexProtocolNameComponent renders protocol name input field with initial focus 1`] = `
+.c0 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.c1 {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1rem;
+}
+
+.c2 {
+  font-size: 0.813rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+.c3 {
+  font-size: 0.625rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+<div>
+  <h2
+    class="c0 c1"
+  >
+    Protocol Name and Description
+  </h2>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Choose a name for your protocol.*
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Protocol Name
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="protocol-name-input"
+            id="protocol-name-input"
+            name="fields.name"
+            tabindex="1"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Add more information, if you like (you can change this later).
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Organization/Author
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="organization-author-input"
+            id="organization-author-input"
+            name="fields.author"
+            tabindex="2"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Description
+    </p>
+    <textarea
+      class="textarea_input"
+      data-testid="protocol-description-textarea"
+      name="fields.description"
+      rows="4"
+      tabindex="3"
+    />
+  </div>
+</div>
+`;
+
+exports[`FlexProtocolNameComponent updates organization author input field value 1`] = `
+.c0 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.c1 {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1rem;
+}
+
+.c2 {
+  font-size: 0.813rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+.c3 {
+  font-size: 0.625rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+<div>
+  <h2
+    class="c0 c1"
+  >
+    Protocol Name and Description
+  </h2>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Choose a name for your protocol.*
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Protocol Name
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="protocol-name-input"
+            id="protocol-name-input"
+            name="fields.name"
+            tabindex="1"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Add more information, if you like (you can change this later).
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Organization/Author
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="organization-author-input"
+            id="organization-author-input"
+            name="fields.author"
+            tabindex="2"
+            type="text"
+            value="New Organization Author"
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Description
+    </p>
+    <textarea
+      class="textarea_input"
+      data-testid="protocol-description-textarea"
+      name="fields.description"
+      rows="4"
+      tabindex="3"
+    />
+  </div>
+</div>
+`;
+
+exports[`FlexProtocolNameComponent updates protocol description textarea value 1`] = `
+.c0 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.c1 {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1rem;
+}
+
+.c2 {
+  font-size: 0.813rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+.c3 {
+  font-size: 0.625rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+<div>
+  <h2
+    class="c0 c1"
+  >
+    Protocol Name and Description
+  </h2>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Choose a name for your protocol.*
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Protocol Name
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="protocol-name-input"
+            id="protocol-name-input"
+            name="fields.name"
+            tabindex="1"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Add more information, if you like (you can change this later).
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Organization/Author
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="organization-author-input"
+            id="organization-author-input"
+            name="fields.author"
+            tabindex="2"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Description
+    </p>
+    <textarea
+      class="textarea_input"
+      data-testid="protocol-description-textarea"
+      name="fields.description"
+      rows="4"
+      tabindex="3"
+    >
+      New Protocol Description
+    </textarea>
+  </div>
+</div>
+`;
+
+exports[`FlexProtocolNameComponent updates protocol name input field value 1`] = `
+.c0 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.c1 {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1rem;
+}
+
+.c2 {
+  font-size: 0.813rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+.c3 {
+  font-size: 0.625rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+<div>
+  <h2
+    class="c0 c1"
+  >
+    Protocol Name and Description
+  </h2>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Choose a name for your protocol.*
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Protocol Name
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="protocol-name-input"
+            id="protocol-name-input"
+            name="fields.name"
+            tabindex="1"
+            type="text"
+            value="New Protocol Name"
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex_sub_heading"
+  >
+    <h5
+      class="c0 c2"
+    >
+      Add more information, if you like (you can change this later).
+    </h5>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Organization/Author
+    </p>
+    <div
+      class="form_field"
+    >
+      <div
+        class="input_field_container"
+      >
+        <div
+          class="input_field"
+        >
+          <input
+            data-testid="organization-author-input"
+            id="organization-author-input"
+            name="fields.author"
+            tabindex="2"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          class="input_caption"
+        >
+          <span />
+          <span
+            class="right"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="form_group"
+  >
+    <p
+      class="c0 c3"
+    >
+      Description
+    </p>
+    <textarea
+      class="textarea_input"
+      data-testid="protocol-description-textarea"
+      name="fields.description"
+      rows="4"
+      tabindex="3"
+    />
+  </div>
+</div>
+`;
