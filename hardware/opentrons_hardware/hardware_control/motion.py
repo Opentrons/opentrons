@@ -1,5 +1,5 @@
 """A collection of motions that define a single move."""
-from typing import List, Dict, Iterable, Union, Tuple
+from typing import List, Dict, Iterable, Union
 from dataclasses import dataclass
 import numpy as np
 from logging import getLogger
