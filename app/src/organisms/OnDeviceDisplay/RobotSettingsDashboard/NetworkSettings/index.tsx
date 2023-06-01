@@ -47,12 +47,7 @@ export function NetworkSettings({
   const [showInterfaceTitle, setShowInterfaceTitle] = React.useState<boolean>(
     true
   )
-  const {
-    isWifiConnected,
-    isEthernetConnected,
-    isUsbConnected,
-    activeSsid,
-  } = networkConnection
+  const { isWifiConnected, isEthernetConnected, activeSsid } = networkConnection
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const list = useWifiList(robotName)
