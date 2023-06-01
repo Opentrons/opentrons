@@ -48,7 +48,7 @@ class USBPort:
             board_revision: Board revision
 
         Returns:
-            Tuple of the port number, hub and name
+            Tuple of the port number, port group, hub, hub port, device path, and name
         """
         full_name, device_path = port_path.split(":")
         port_nodes = cls.get_unique_nodes(full_name)
@@ -76,21 +76,17 @@ class USBPort:
         board_revision: BoardRevision,
     ) -> Tuple[Optional[int], int, Optional[int], str]:
         """
-        Find Hub.
+        Find the hub, port, and hub_port data for a USB port from
+        the port nodes.
 
-        Here we need to determine if a port is a hub
-        or not. A hub path might look like:
-        `1-1.4/1-1.4/1-1.4.1/1-1.4.1`. When this function
-        is used, the nodes will look like: ['1-1.4', '1-1.4.1'].
-        This function will then be used to check if it is a
-        port hub based on the values given. In the case of the
-        example above, it will determine this device is
-        connected to a hub and return both the port and
-        the hub number. The hub would always be the first number,
-        in this case `4` and the port number of the hub would be `1`.
+        The last item of the port nodes list is parsed by splitting
+        the item at each period. It is parsed as follows:
+        'bus.hub.port.hub_port'. The USB bus data is unused. The
+        hub_port data is only populated if a USB hub is connected
+        to that port.
 
         :param port_nodes: A list of unique port id(s)
-        :returns: Tuple of the port number, hub and name
+        :returns: Tuple of the hub, port number, hub_port and name
         """
         if len(port_nodes) > 2:
             port_info = port_nodes[2].split(".")
@@ -120,15 +116,28 @@ class USBPort:
     @staticmethod
     def get_unique_nodes(full_name: str) -> List[str]:
         """
-        Get Unique Nodes.
+        Get unique port nodes for a USB port from the USB port path.
 
-        A path might look like: `1-1.3/1-1.3`. In this
-        instance we know that the device is on Bus 1 and
-        port 3 of the pi. We only need one unique id
-        here, so we will filter it out.
+        For a Flex or OT-2_R with a USB hub connected to a port,
+        the USB port path will look like:
+        `1-1.3/1-1.3.2/1-1.3.2.4/1-1.3.2.4`. This will become the
+        following 3 port nodes: ['1-1.3', '1-1.3.2', '1-1.3.2.4'].
 
-        :param full_name: Full path of the physical
-        USB Path.
+        For a Flex or OT-2_R without a USB hub connected to a port,
+        the USB port path will look like: `1-1.3/1-1.3.4/1-1.3.4`.
+        This will become the follwing 2 port nodes: ['1-1.3', '1-1.3.4'].
+
+        For a OT-2_OG with a USB hub connected to a port, the USB
+        port path will look like: `1-1.3/1-1.3/1-1.3.3/1-1.3.3`. This will
+        become the following 2 port nodes: ['1-1.3', '1-1.3.3'].
+
+        For a OT-2_OG without a USB hub connected to a port, the USB
+        port path will look like: `1-1.3/1-1.3`. This will become the
+        following 1 port node: ['1-1.3'].
+
+        We only need one unique id here, so we will filter out duplicates.
+
+        :param full_name: Full path of the physical USB Path
         :returns: List of separated USB port paths
         """
         port_nodes = []
@@ -142,6 +151,24 @@ class USBPort:
         board_revision: BoardRevision,
         port_info: Tuple[Optional[int], int, Optional[int]],
     ) -> Tuple[bool, PortGroup, int, Optional[int]]:
+        """
+        Synthesize the hub, port_group, and hub_port data for a USB port
+        from the hub and hub_port data.
+
+        If a USB hub is connected to a port, the hub data field is True
+        and the hub_port data field is populated. Otherwise, the hub
+        data field is False and the hub_port data field is None.
+
+        For the OT-2, there is only one bank of USB ports, so the
+        port_group is always MAIN. For the Flex, there are LEFT and
+        RIGHT USB port banks, which map to specific hub values.
+
+        For the Flex, the RIGHT port values are increased by 4 to match
+        the physical hardware labeling (USB5 - USB8).
+
+        :param port_info: Tuple of the hub, port number, and hub port
+        :returns: Tuple of the hub, port group, port number, and hub port
+        """
         hub, port, hub_port = port_info
         if board_revision == BoardRevision.OG:
             if hub:
