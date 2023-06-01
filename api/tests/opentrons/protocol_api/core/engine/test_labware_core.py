@@ -91,8 +91,8 @@ def test_get_definition(subject: LabwareCore) -> None:
             "parameters": {"loadName": "world"},
             "ordering": [],
             "allowedRoles": [],
-            "stackingOverlapWithLabware": {},
-            "stackingOverlapWithModule": {},
+            "stackingOffsetWithLabware": {},
+            "stackingOffsetWithModule": {},
         },
     )
     assert subject.get_parameters() == cast(LabwareParamsDict, {"loadName": "world"})

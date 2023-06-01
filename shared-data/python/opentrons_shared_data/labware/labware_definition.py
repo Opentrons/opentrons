@@ -283,13 +283,13 @@ class LabwareDefinition(BaseModel):
         default_factory=list,
         description="Allowed behaviors and usage of a labware in a protocol.",
     )
-    stackingOverlapWithLabware: Dict[str, OverlapOffset] = Field(
+    stackingOffsetWithLabware: Dict[str, OverlapOffset] = Field(
         default_factory=dict,
         description="Supported labware that can be stacked upon,"
-        " with overlap height between both labware.",
+        " with overlap vector offset between both labware.",
     )
-    stackingOverlapWithModule: Dict[str, OverlapOffset] = Field(
+    stackingOffsetWithModule: Dict[str, OverlapOffset] = Field(
         default_factory=dict,
         description="Supported module that can be stacked upon,"
-        " with overlap height between labware and module.",
+        " with overlap vector offset between labware and module.",
     )

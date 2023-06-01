@@ -1014,7 +1014,7 @@
     "y": 0,
     "z": 0
   },
-  "stackingOverlapWithLabware": {
+  "stackingOffsetWithLabware": {
     "opentrons_96_flat_bottom_adapter": {
       "x": 0,
       "y": 0,

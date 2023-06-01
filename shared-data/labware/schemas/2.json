@@ -329,14 +329,14 @@
         "enum": ["labware", "adapter", "fixture", "maintenance"]
       }
     },
-    "stackingOverlapWithLabware": {
+    "stackingOffsetWithLabware": {
       "type": "object",
       "description": "Supported labware that can be stacked upon, with overlap height between both labware.",
       "additionalProperties": {
         "$ref": "#/definitions/coordinates"
       }
     },
-    "stackingOverlapWithModule": {
+    "stackingOffsetWithModule": {
       "type": "object",
       "description": "Supported module that can be stacked upon, with overlap height between labware and module.",
       "additionalProperties": {
