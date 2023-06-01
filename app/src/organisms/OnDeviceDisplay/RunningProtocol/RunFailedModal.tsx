@@ -35,7 +35,7 @@ export function RunFailedModal({
   setShowRunFailedModal,
   errors,
 }: RunFailedModalProps): JSX.Element | null {
-  const { t, i18n } = useTranslation(['run_details', 'shared'])
+  const { i18n, t } = useTranslation(['run_details', 'shared'])
   const history = useHistory()
   const { stopRun } = useStopRunMutation()
   const [isCanceling, setIsCanceling] = React.useState(false)
@@ -73,7 +73,10 @@ export function RunFailedModal({
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('error_type', {
-              errorType: errors[0].errorType,
+              errorType:
+                errors[0].errorType != null
+                  ? errors[0].errorType
+                  : i18n.format(t('shared:unknown'), 'capitalize'),
             })}
           </StyledText>
           <Flex
