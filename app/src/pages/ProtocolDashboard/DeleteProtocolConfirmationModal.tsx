@@ -80,7 +80,7 @@ export function DeleteProtocolConfirmationModal({
     }
   }
   return (
-    <Modal header={modalHeader} onOutsideClick={handleCloseModal}>
+    <Modal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing40}
