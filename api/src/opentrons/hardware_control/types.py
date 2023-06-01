@@ -280,6 +280,13 @@ class Axis(enum.Enum):
         """Returns only OT2 axes."""
         return [axis for axis in Axis if axis not in [Axis.Z_G, Axis.Q, Axis.G]]
 
+    @classmethod
+    def of_plunger(cls, mount: top_types.Mount) -> "Axis":
+        """Get plunger axes.
+
+        Same as `of_main_tool_actuator` but for OT2 backwards compatibility.
+        """
+        return cls.of_main_tool_actuator(mount)
 
 class OT3SubSystem(enum.Enum):
     """An enumeration of ot3 components.
