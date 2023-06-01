@@ -20,8 +20,8 @@ async def _main(is_simulating: bool) -> None:
     encoder_end = await api.encoder_current_position(mount, refresh=True)
     print(
         f"Encoder tracked the Z moved "
-        f"from {encoder_start[z_ax.to_axis()]} "
-        f"to {encoder_end[z_ax.to_axis()]}"
+        f"from {encoder_start[z_ax]} "
+        f"to {encoder_end[z_ax]}"
     )
 
     # use the Endstops to quickly move back to the homing position

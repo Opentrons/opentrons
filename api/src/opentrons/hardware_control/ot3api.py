@@ -663,7 +663,8 @@ class OT3API(
         """
 
         if axes:
-            checked_axes = [Axis.from_axis(ax) for ax in axes]
+            # (spp): should this be a Set? 'axes' can technically be: [X, Y, Z, Z_L, A, Z_R]..
+            checked_axes = [ax for ax in axes if ax in Axis]
         else:
             checked_axes = [ax for ax in Axis]
         await self._backend.update_motor_estimation(checked_axes)
@@ -861,8 +862,7 @@ class OT3API(
         """
         Return the encoder position in absolute deck coords specified mount.
         """
-        ot3pos = await self.encoder_current_position_ot3(mount, critical_point, refresh)
-        return {ot3ax.to_axis(): value for ot3ax, value in ot3pos.items()}
+        return await self.encoder_current_position_ot3(mount, critical_point, refresh)
 
     async def encoder_current_position_ot3(
         self,
@@ -976,7 +976,7 @@ class OT3API(
         )
         if max_speeds:
             checked_max: Optional[OT3AxisMap[float]] = {
-                Axis.from_axis(k): v for k, v in max_speeds.items()
+                k: v for k, v in max_speeds.items()     # (spp): is this even needed?
             }
         else:
             checked_max = None
@@ -1022,7 +1022,7 @@ class OT3API(
         )
         if max_speeds:
             checked_max: Optional[OT3AxisMap[float]] = {
-                Axis.from_axis(k): v for k, v in max_speeds.items()
+                k: v for k, v in max_speeds.items()     # (spp): is this even needed?
             }
         else:
             checked_max = None
@@ -1240,7 +1240,7 @@ class OT3API(
         await self.refresh_positions()
 
         if axes:
-            checked_axes = [Axis.from_axis(ax) for ax in axes]
+            checked_axes = [ax for ax in axes if ax in Axis]    # (spp): is this even needed?
         else:
             checked_axes = [ax for ax in Axis if ax != Axis.Q]
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
@@ -1263,13 +1263,11 @@ class OT3API(
     def engaged_axes(self) -> Dict[Axis, bool]:
         return self.get_engaged_axes()
 
-    async def disengage_axes(self, which: Union[List[Axis], List[Axis]]) -> None:
-        axes = [Axis.from_axis(ax) for ax in which]
-        await self._backend.disengage_axes(axes)
+    async def disengage_axes(self, which: List[Axis]) -> None:
+        await self._backend.disengage_axes(which)
 
-    async def engage_axes(self, which: Union[List[Axis], List[Axis]]) -> None:
-        axes = [Axis.from_axis(ax) for ax in which]
-        await self._backend.engage_axes(axes)
+    async def engage_axes(self, which: List[Axis]) -> None:
+        await self._backend.engage_axes(which)
 
     async def get_limit_switches(self) -> Dict[Axis, bool]:
         res = await self._backend.get_limit_switches()
@@ -1433,7 +1431,7 @@ class OT3API(
 
         try:
             await self._backend.set_active_current(
-                {Axis.from_axis(aspirate_spec.axis): aspirate_spec.current}
+                {aspirate_spec.axis: aspirate_spec.current}
             )
 
             await self._move(
@@ -1470,7 +1468,7 @@ class OT3API(
 
         try:
             await self._backend.set_active_current(
-                {Axis.from_axis(dispense_spec.axis): dispense_spec.current}
+                {dispense_spec.axis: dispense_spec.current}
             )
             await self._move(
                 target_pos,
@@ -1639,12 +1637,7 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
         spec, _remove = self._pipette_handler.plan_check_drop_tip(realmount, home_after)
         for move in spec.drop_moves:
-            await self._backend.set_active_current(
-                {
-                    Axis.from_axis(axis): current
-                    for axis, current in move.current.items()
-                }
-            )
+            await self._backend.set_active_current(move.current)
 
             if move.is_ht_tip_action and move.speed:
                 # The speed check is needed because speed can sometimes be None.
@@ -1670,18 +1663,13 @@ class OT3API(
                     speed=move.speed,
                     home_flagged_axes=False,
                 )
-        if move.home_after:
-            await self._home([Axis.from_axis(ax) for ax in move.home_axes])
+            if move.home_after:  # (spp): this check was outside the loop previously; I think that was a bug?
+                await self._home(move.home_axes)
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
 
-        await self._backend.set_active_current(
-            {
-                Axis.from_axis(axis): current
-                for axis, current in spec.ending_current.items()
-            }
-        )
+        await self._backend.set_active_current(spec.ending_current)
         _remove()
 
     async def clean_up(self) -> None:

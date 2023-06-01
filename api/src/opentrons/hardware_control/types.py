@@ -168,44 +168,13 @@ class Axis(enum.Enum):
         }
         return bm[mount]
 
-    # TODO (spp, 2023-05-22): remove this
-    @classmethod
-    def from_axis(cls, axis: Union[Axis, "Axis"]) -> "Axis":
-        am = {
-            Axis.X: cls.X,
-            Axis.Y: cls.Y,
-            Axis.Z: cls.Z_L,
-            Axis.A: cls.Z_R,
-            Axis.B: cls.P_L,
-            Axis.C: cls.P_R,
-            Axis.Z_G: cls.Z_G,
-            Axis.G: cls.G,
-        }
-        try:
-            return am[axis]  # type: ignore
-        except KeyError:
-            return axis  # type: ignore
-
-    def to_axis(self) -> Axis:
-        am = {
-            Axis.X: Axis.X,
-            Axis.Y: Axis.Y,
-            Axis.Z_L: Axis.Z,
-            Axis.Z_R: Axis.A,
-            Axis.P_L: Axis.B,
-            Axis.P_R: Axis.C,
-            Axis.Z_G: Axis.Z_G,
-            Axis.G: Axis.G,
-        }
-        return am[self]
-
     @classmethod
     def pipette_axes(cls) -> Tuple["Axis", "Axis"]:
         """The axes which are used for moving plunger motors."""
         return cls.P_L, cls.P_R
 
     @classmethod
-    def mount_axes(cls, robot_type: Optional[RobotType]) -> Tuple["Axis", "Axis", "Axis"]:
+    def mount_axes(cls) -> Tuple["Axis", "Axis", "Axis"]:
         """The axes which are used for moving instruments up and down."""
         return cls.Z_L, cls.Z_R, cls.Z_G
 
