@@ -52,7 +52,7 @@ class USBPort:
         """
         full_name, device_path = port_path.split(":")
         port_nodes = cls.get_unique_nodes(full_name)
-        hub, port, hub_port, name = cls.find_hub(port_nodes)
+        hub, port, hub_port, name = cls.find_hub(port_nodes, board_revision)
         hub, port_group, port, hub_port = cls.map_to_revision(
             board_revision,
             (
@@ -73,6 +73,7 @@ class USBPort:
     @staticmethod
     def find_hub(
         port_nodes: List[str],
+        board_revision: BoardRevision,
     ) -> Tuple[Optional[int], int, Optional[int], str]:
         """
         Find Hub.
@@ -97,6 +98,12 @@ class USBPort:
             port = int(port_info[2])
             hub_port: Optional[int] = int(port_info[3])
             name = port_nodes[2]
+        elif (board_revision == BoardRevision.OG) and (len(port_nodes) > 1):
+            port_info = port_nodes[1].split(".")
+            hub = int(port_info[1])
+            port = int(port_info[1])
+            hub_port = int(port_info[2])
+            name = port_nodes[1]
         elif len(port_nodes) > 1:
             port_info = port_nodes[1].split(".")
             hub = int(port_info[1])
@@ -138,9 +145,14 @@ class USBPort:
         hub, port, hub_port = port_info
         if board_revision == BoardRevision.OG:
             if hub:
-                return REV_OG_USB_PORTS.get(str(hub), hub), PortGroup.MAIN, port, None # hub should be None, unless there's an actual hub/extender
+                return (
+                    REV_OG_USB_PORTS.get(str(hub), hub),
+                    PortGroup.MAIN,
+                    REV_OG_USB_PORTS.get(str(port), port),
+                    hub_port,
+                )
             else:
-                return hub, PortGroup.MAIN, REV_OG_USB_PORTS.get(str(port), port), None
+                return None, PortGroup.MAIN, REV_OG_USB_PORTS.get(str(port), port), None
         elif board_revision == BoardRevision.FLEX_B2:
             if hub == OT3_USB_PORT_GROUP_LEFT:
                 port_group = PortGroup.LEFT
