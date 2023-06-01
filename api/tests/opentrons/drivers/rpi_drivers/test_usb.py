@@ -95,7 +95,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
             port_number=1,
             port_group=PortGroup.MAIN,
             device_path="1.0/tty/ttyACM1/dev",
-            hub=None,
+            hub=False,
             hub_port=None,
         )
     elif revision == BoardRevision.A:
@@ -105,17 +105,17 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
             port_number=1,
             port_group=PortGroup.MAIN,
             device_path="1.0/tty/ttyACM1/dev",
-            hub=None,
+            hub=False,
             hub_port=None,
         )
     elif revision == BoardRevision.FLEX_B2:
         expected_name = "1-1.3.4"
         assert updated_list[0].usb_port == USBPort(
             name=expected_name,
-            port_number=4,
+            port_number=8,
             port_group=PortGroup.RIGHT,
             device_path="1.0/tty/ttyACM1/dev",
-            hub=None,
+            hub=False,
             hub_port=None,
         )
 
@@ -132,7 +132,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
             port_number=2,
             port_group=PortGroup.MAIN,
             device_path="1.0/tty/ttyACM2/dev",
-            hub=2,
+            hub=True,
             hub_port=3,
         )
     elif revision == BoardRevision.A:
@@ -142,7 +142,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
             port_number=2,
             port_group=PortGroup.MAIN,
             device_path="1.0/tty/ttyACM2/dev",
-            hub=3,
+            hub=True,
             hub_port=3,
         )
     elif revision == BoardRevision.FLEX_B2:
@@ -152,6 +152,6 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
             port_number=2,
             port_group=PortGroup.LEFT,
             device_path="1.0/tty/ttyACM2/dev",
-            hub=4,
+            hub=True,
             hub_port=3,
         )

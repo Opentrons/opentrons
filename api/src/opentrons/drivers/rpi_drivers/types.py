@@ -22,8 +22,8 @@ class PortGroup(enum.Enum):
 
 REV_OG_USB_PORTS = {"3": 1, "5": 2}
 REV_A_USB_HUB = 3
-OT3_USB_PORT_GROUP_LEFT = 4
-OT3_USB_PORT_GROUP_RIGHT = 3
+FLEX_B2_USB_PORT_GROUP_LEFT = 4
+FLEX_B2_USB_PORT_GROUP_RIGHT = 3
 
 
 @dataclass(frozen=True)
@@ -31,9 +31,9 @@ class USBPort:
     name: str
     port_number: int
     port_group: PortGroup = PortGroup.UNKNOWN
-    device_path: str = ""
-    hub: Optional[int] = None
+    hub: bool = False
     hub_port: Optional[int] = None
+    device_path: str = ""
 
     @classmethod
     def build(cls, port_path: str, board_revision: BoardRevision) -> "USBPort":
@@ -64,10 +64,10 @@ class USBPort:
         return cls(
             name=name,
             port_number=port,
-            device_path=device_path,
-            hub=hub,
             port_group=port_group,
+            hub=hub,
             hub_port=hub_port,
+            device_path=device_path,
         )
 
     @staticmethod
@@ -141,34 +141,40 @@ class USBPort:
     def map_to_revision(
         board_revision: BoardRevision,
         port_info: Tuple[Optional[int], int, Optional[int]],
-    ) -> Tuple[Optional[int], PortGroup, int, Optional[int]]:
+    ) -> Tuple[bool, PortGroup, int, Optional[int]]:
         hub, port, hub_port = port_info
         if board_revision == BoardRevision.OG:
             if hub:
                 return (
-                    REV_OG_USB_PORTS.get(str(hub), hub),
+                    True,
                     PortGroup.MAIN,
                     REV_OG_USB_PORTS.get(str(port), port),
                     hub_port,
                 )
             else:
-                return None, PortGroup.MAIN, REV_OG_USB_PORTS.get(str(port), port), None
+                return (
+                    False,
+                    PortGroup.MAIN,
+                    REV_OG_USB_PORTS.get(str(port), port),
+                    None,
+                )
         elif board_revision == BoardRevision.FLEX_B2:
-            if hub == OT3_USB_PORT_GROUP_LEFT:
+            if hub == FLEX_B2_USB_PORT_GROUP_LEFT:
                 port_group = PortGroup.LEFT
-            elif hub == OT3_USB_PORT_GROUP_RIGHT:
+            elif hub == FLEX_B2_USB_PORT_GROUP_RIGHT:
                 port_group = PortGroup.RIGHT
+                port = port + 4
             else:
                 port_group = PortGroup.UNKNOWN
             if hub_port:
-                return hub, port_group, port, hub_port
+                return True, port_group, port, hub_port
             else:
-                return None, port_group, port, None
+                return False, port_group, port, None
         else:  # any variant of OT2-Refresh
             if hub_port:
-                return hub, PortGroup.MAIN, port, hub_port
+                return True, PortGroup.MAIN, port, hub_port
             else:
-                return None, PortGroup.MAIN, port, None
+                return False, PortGroup.MAIN, port, None
 
     def __hash__(self) -> int:
         """
