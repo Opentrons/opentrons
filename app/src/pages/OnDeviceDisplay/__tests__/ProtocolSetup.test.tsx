@@ -18,6 +18,7 @@ import { i18n } from '../../../i18n'
 import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
 import {
   useAttachedModules,
+  useLPCDisabledReason,
   useRunCreatedAtTimestamp,
 } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -97,6 +98,9 @@ const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrations
 const mockUseLaunchLPC = useLaunchLPC as jest.MockedFunction<
   typeof useLaunchLPC
 >
+const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
+  typeof useLPCDisabledReason
+>
 const mockSnackbar = Snackbar as jest.MockedFunction<typeof Snackbar>
 
 const render = (path = '/') => {
@@ -147,6 +151,7 @@ describe('ProtocolSetup', () => {
   let mockLaunchLPC: jest.Mock
   beforeEach(() => {
     mockLaunchLPC = jest.fn()
+    mockUseLPCDisabledReason.mockReturnValue(null)
     mockSnackbar.mockReturnValue(<div>Mock Snackbar</div>)
     mockUseAttachedModules.mockReturnValue([])
     mockProtocolSetupModules.mockReturnValue(
@@ -276,8 +281,20 @@ describe('ProtocolSetup', () => {
   })
 
   it('should launch LPC when clicked', () => {
+    mockUseLPCDisabledReason.mockReturnValue(null)
     const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
+    getByText('Recommended')
     getByText('Labware Position Check').click()
     expect(mockLaunchLPC).toHaveBeenCalled()
+    getByText('mock LPC Wizard')
+  })
+
+  it('should launch a snackbar when user tries to launch LPC when setup is incomplete', () => {
+    mockUseLPCDisabledReason.mockReturnValue('mock disabled reason')
+    const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
+    getByText('Currently unavailable')
+    getByText('Labware Position Check').click()
+    expect(mockLaunchLPC).not.toHaveBeenCalled()
+    getByText('Mock Snackbar')
   })
 })

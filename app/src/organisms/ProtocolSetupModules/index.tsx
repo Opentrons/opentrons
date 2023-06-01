@@ -76,7 +76,7 @@ function RowModule({
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={isModuleReady ? COLORS.green3 : COLORS.yellow3}
-      borderRadius={BORDERS.size3}
+      borderRadius={BORDERS.borderRadiusSize3}
       cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
       gridGap={SPACING.spacing24}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}

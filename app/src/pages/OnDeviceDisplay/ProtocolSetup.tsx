@@ -34,7 +34,10 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
-import { useAttachedModules } from '../../organisms/Devices/hooks'
+import {
+  useAttachedModules,
+  useLPCDisabledReason,
+} from '../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
@@ -64,6 +67,8 @@ interface ProtocolSetupStepProps {
   detail?: string | null
   // second line of detail text
   subDetail?: string | null
+  // CTA unavailable
+  isActionUnavailable?: boolean
 }
 
 function ProtocolSetupStep({
@@ -72,6 +77,7 @@ function ProtocolSetupStep({
   title,
   detail,
   subDetail,
+  isActionUnavailable,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
     ready: COLORS.green3,
@@ -83,7 +89,7 @@ function ProtocolSetupStep({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
-        borderRadius={BORDERS.size4}
+        borderRadius={BORDERS.borderRadiusSize4}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       >
@@ -94,17 +100,29 @@ function ProtocolSetupStep({
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
         ) : null}
-        <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <StyledText
+          as="h4"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          color={isActionUnavailable ? COLORS.darkBlack60 : COLORS.darkBlack100}
+        >
           {title}
         </StyledText>
         <Flex flex="1" justifyContent={JUSTIFY_END}>
-          <StyledText as="p" textAlign={TEXT_ALIGN_RIGHT}>
+          <StyledText
+            as="p"
+            textAlign={TEXT_ALIGN_RIGHT}
+            color={
+              isActionUnavailable ? COLORS.darkBlack60 : COLORS.darkBlack100
+            }
+          >
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
             {subDetail}
           </StyledText>
         </Flex>
-        <Icon marginLeft={SPACING.spacing8} name="more" size="3rem" />
+        {isActionUnavailable ? null : (
+          <Icon marginLeft={SPACING.spacing8} name="more" size="3rem" />
+        )}
       </Flex>
     </Btn>
   )
@@ -188,7 +206,8 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
-  const [showSnackbar, setShowSnackbar] = React.useState<boolean>(false)
+  const [showPlaySnackbar, setShowPlaySnackbar] = React.useState<boolean>(false)
+  const [showLPCSnackbar, setShowLPCSnackbar] = React.useState<boolean>(false)
 
   const { play } = useRunControls(runId)
 
@@ -197,22 +216,40 @@ function PrepareToRun({
     history.goBack()
   }
 
-  const [
-    showConfirmCancelModal,
-    setShowConfirmCancelModal,
-  ] = React.useState<boolean>(false)
-
   const protocolHasModules =
     mostRecentAnalysis?.modules != null &&
     mostRecentAnalysis?.modules.length > 0
   const attachedModules = useAttachedModules()
+
+  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
+
+  const protocolModulesInfo =
+    mostRecentAnalysis != null
+      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+      : []
+
+  const {
+    missingModuleIds,
+    remainingAttachedModules,
+  } = getUnmatchedModulesForProtocol(attachedModules, protocolModulesInfo)
+
+  const isMissingModules = missingModuleIds.length > 0
+  const lpcDisabledReason = useLPCDisabledReason({
+    runId,
+    hasMissingModulesForOdd: isMissingModules,
+    hasMissingPipCalForOdd: allPipettesCalibrationData == null,
+  })
+
+  const [
+    showConfirmCancelModal,
+    setShowConfirmCancelModal,
+  ] = React.useState<boolean>(false)
 
   // const protocolAnalysisLoading =
   //   mostRecentAnalysis == null ||
   //   attachedInstruments == null ||
   //   (protocolHasModules && attachedModules == null) ||
   //   allPipettesCalibrationData == null
-
   if (
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
@@ -235,19 +272,6 @@ function PrepareToRun({
   })
   const instrumentsStatus = areInstrumentsReady ? 'ready' : 'not ready'
 
-  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
-
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
-
-  const {
-    missingModuleIds,
-    remainingAttachedModules,
-  } = getUnmatchedModulesForProtocol(attachedModules, protocolModulesInfo)
-
-  const isMissingModules = missingModuleIds.length > 0
   const isUnmatchedModules =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0
   const modulesStatus = isMissingModules ? 'not ready' : 'ready'
@@ -258,7 +282,7 @@ function PrepareToRun({
     if (isReadyToRun) {
       play()
     } else {
-      setShowSnackbar(true)
+      setShowPlaySnackbar(true)
     }
   }
 
@@ -305,6 +329,14 @@ function PrepareToRun({
 
   // Liquids information
   const liquidsInProtocol = mostRecentAnalysis?.liquids ?? []
+
+  const handleLpcClick = (): void => {
+    if (lpcDisabledReason != null) {
+      setShowLPCSnackbar(true)
+    } else {
+      launchLPC()
+    }
+  }
 
   return (
     <>
@@ -378,10 +410,13 @@ function PrepareToRun({
           status="general"
         />
         <ProtocolSetupStep
-          onClickSetupStep={launchLPC}
+          onClickSetupStep={handleLpcClick}
           title={t('labware_position_check')}
-          detail={t('recommended')}
+          detail={t(
+            lpcDisabledReason != null ? 'currently_unavailable' : 'recommended'
+          )}
           status="general"
+          isActionUnavailable={lpcDisabledReason != null}
         />
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('liquids')}
@@ -396,7 +431,7 @@ function PrepareToRun({
           }
         />
       </Flex>
-      {showSnackbar && (
+      {showPlaySnackbar && (
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
@@ -410,7 +445,22 @@ function PrepareToRun({
               t('complete_setup_before_proceeding'),
               'capitalize'
             )}
-            onClose={() => setShowSnackbar(false)}
+            onClose={() => setShowPlaySnackbar(false)}
+          />
+        </Flex>
+      )}
+      {showLPCSnackbar && lpcDisabledReason != null && (
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_CENTER}
+          width="100%"
+          position={POSITION_STICKY}
+          bottom={SPACING.spacing40}
+          zIndex={1000}
+        >
+          <Snackbar
+            message={lpcDisabledReason}
+            onClose={() => setShowLPCSnackbar(false)}
           />
         </Flex>
       )}

@@ -26,7 +26,7 @@ export function RobotIsBusyModal({
   const { t } = useTranslation(['device_details', 'shared'])
 
   return (
-    <Modal type="warning" title={t('robot_is_busy')}>
+    <Modal type="warning" title={t('shared:robot_is_busy')}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Trans
           t={t}

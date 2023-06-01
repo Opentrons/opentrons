@@ -1,15 +1,22 @@
 import * as React from 'react'
+import { resetAllWhenMocks, when } from 'jest-when'
 import type { MatcherFunction } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
+import { useProtocolMetadata } from '../../Devices/hooks'
 import { PickUpTip } from '../PickUpTip'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
-import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
-import { CommandData } from '@opentrons/api-client'
-import { resetAllWhenMocks, when } from 'jest-when'
+import type { CommandData } from '@opentrons/api-client'
+
+jest.mock('../../Devices/hooks')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
+
+const mockUseProtocolMetaData = useProtocolMetadata as jest.MockedFunction<
+  typeof useProtocolMetadata
+>
 
 const matchTextWithSpans: (text: string) => MatcherFunction = (
   text: string
@@ -49,6 +56,7 @@ describe('PickUpTip', () => {
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
     }
+    mockUseProtocolMetaData.mockReturnValue({ robotType: 'OT-3 Standard' })
   })
   afterEach(() => {
     jest.resetAllMocks()

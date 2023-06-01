@@ -2,13 +2,12 @@ test_name: Get the definitions of a run's loaded labware
 
 marks:
   - usefixtures:
-      - run_server
-      - clean_server_state
+      - ot2_server_base_url
 
 stages:
   - name: Upload simple JSONv6 protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/simple_v6.json'
@@ -20,7 +19,7 @@ stages:
 
   - name: Create run from protocol
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{ot2_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -33,7 +32,7 @@ stages:
 
   - name: Issue a play action
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
       json:
         data:
           actionType: play
@@ -45,7 +44,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}'
+      url: '{ot2_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -57,7 +56,7 @@ stages:
 
   - name: Fetch run labware definitions
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/loaded_labware_definitions'
+      url: '{ot2_server_base_url}/runs/{run_id}/loaded_labware_definitions'
       method: GET
     response:
       strict:

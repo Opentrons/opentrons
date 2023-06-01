@@ -129,6 +129,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       errorMessage={errorMessage}
       chainRunCommands={chainRunCommands}
       mount={mount}
+      setShowErrorMessage={setShowErrorMessage}
     />
   ) : (
     <GenericWizardTile

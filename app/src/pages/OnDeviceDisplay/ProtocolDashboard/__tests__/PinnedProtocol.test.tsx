@@ -21,6 +21,7 @@ jest.mock('react-router-dom', () => {
 const mockProtocol: ProtocolResource = {
   id: 'mockProtocol1',
   createdAt: '2022-05-03T21:36:12.494778+00:00',
+  robotType: 'OT-3 Standard',
   protocolType: 'json',
   metadata: {
     protocolName: 'yay mock protocol',

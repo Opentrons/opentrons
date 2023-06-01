@@ -174,7 +174,7 @@ const Summary = (props: {
       </StyledText>
       <Flex
         backgroundColor={COLORS.darkBlack20}
-        borderRadius={BORDERS.size1}
+        borderRadius={BORDERS.borderRadiusSize1}
         marginTop={SPACING.spacing24}
         maxWidth="22rem"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
