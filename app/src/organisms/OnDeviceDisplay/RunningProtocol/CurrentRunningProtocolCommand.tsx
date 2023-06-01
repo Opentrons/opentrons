@@ -13,6 +13,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
+  ALIGN_FLEX_START,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
@@ -148,6 +149,8 @@ export function CurrentRunningProtocolCommand({
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_FLEX_START}
+        height="6.75rem"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText
@@ -159,7 +162,9 @@ export function CurrentRunningProtocolCommand({
           </StyledText>
           <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
         </Flex>
-        <RunTimer {...runTimerInfo} style={RUN_TIMER_STYLE} />
+        <Flex height="100%" alignItems={ALIGN_CENTER}>
+          <RunTimer {...runTimerInfo} style={RUN_TIMER_STYLE} />
+        </Flex>
       </Flex>
 
       <Flex

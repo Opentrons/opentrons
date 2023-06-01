@@ -15,6 +15,7 @@ import {
   BORDERS,
   POSITION_RELATIVE,
   OVERFLOW_HIDDEN,
+  ALIGN_FLEX_START,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
@@ -120,19 +121,25 @@ export function RunningProtocolCommandList({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing40}
+      height="29.5rem"
+    >
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_FLEX_START}
         gridGap={SPACING.spacing40}
+        height="6.75rem"
       >
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
+        <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText fontSize="1.75rem" lineHeight="2.25rem" fontWeight="700">
             {currentRunStatus}
           </StyledText>
           <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
         </Flex>
-        <Flex gridGap="1.5rem">
+        <Flex height="100%" gridGap="1.5rem" alignItems={ALIGN_CENTER}>
           <StopButton onStop={onStop} buttonSize="6.26rem" iconSize="5rem" />
           <PlayPauseButton
             onTogglePlayPause={onTogglePlayPause}
@@ -156,6 +163,7 @@ export function RunningProtocolCommandList({
             ref={ref}
             items={robotSideAnalysis?.commands}
             initialIndex={currentRunCommandIndex}
+            margin={0}
           >
             {(command, index) => {
               const backgroundColor =
