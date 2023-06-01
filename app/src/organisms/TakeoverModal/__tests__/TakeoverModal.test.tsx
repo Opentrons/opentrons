@@ -16,6 +16,7 @@ describe('TakeoverModal', () => {
       showConfirmTerminateModal: false,
       setShowConfirmTerminateModal: jest.fn(),
       confirmTerminate: jest.fn(),
+      terminateInProgress: false,
     }
   })
 
