@@ -62,9 +62,9 @@
   justify-content: center;
 }
 
-.flex_round_tabs_button_100p {
-  width: 100%;
-  margin: 1rem;
+.flex_round_tabs_button_50p_right {
+  width: 50%;
+  margin: 1rem 1rem 1rem auto;
 }
 
 .flex_round_tabs_button_50p {
