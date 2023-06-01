@@ -1,17 +1,19 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
+import { OT2_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { InterventionModal } from '..'
 import {
-  mockPauseCommandWithNoMessage,
   mockPauseCommandWithoutStartTime,
-  mockPauseCommandWithShortMessage,
   mockPauseCommandWithStartTime,
-  shortCommandText,
+  mockMoveLabwareCommand,
   truncatedCommandMessage,
 } from '../__fixtures__'
 
 const ROBOT_NAME = 'Otie'
+const LABWARE_NAME = 'Mock 96 Well Plate'
+
+const mockOnResumeHandler = jest.fn()
 
 const render = (props: React.ComponentProps<typeof InterventionModal>) => {
   return renderWithProviders(<InterventionModal {...props} />, {
@@ -22,13 +24,17 @@ const render = (props: React.ComponentProps<typeof InterventionModal>) => {
 describe('InterventionModal', () => {
   let props: React.ComponentProps<typeof InterventionModal>
   beforeEach(() => {
-    props = { robotName: ROBOT_NAME, command: mockPauseCommandWithStartTime }
+    props = {
+      robotName: ROBOT_NAME,
+      command: mockPauseCommandWithStartTime,
+      onResume: mockOnResumeHandler,
+    }
   })
 
   it('renders an InterventionModal with the robot name in the header, learn more link, and confirm button', () => {
     const { getByText, getByRole } = render(props)
     expect(getByText('Perform manual step on Otie')).toBeTruthy()
-    expect(getByText('Learn more about user interventions')).toBeTruthy()
+    expect(getByText('Learn more about manual steps')).toBeTruthy()
     expect(getByRole('button', { name: 'Confirm and resume' })).toBeTruthy()
   })
 
@@ -44,15 +50,28 @@ describe('InterventionModal', () => {
     expect(getByText('Paused for --:--:--')).toBeTruthy()
   })
 
-  it('does not truncate command text when shorter than 220 characters', () => {
-    props = { ...props, command: mockPauseCommandWithShortMessage }
+  it('clicking "Confirm and resume" triggers the resume handler', () => {
     const { getByText } = render(props)
-    expect(getByText(shortCommandText)).toBeTruthy()
+    getByText('Confirm and resume').click()
+    expect(mockOnResumeHandler).toHaveBeenCalled()
   })
 
-  it('displays a default message if pause step does not have a message', () => {
-    props = { ...props, command: mockPauseCommandWithNoMessage }
+  it('renders a move labware intervention modal given a move labware command', () => {
+    props = {
+      ...props,
+      command: mockMoveLabwareCommand,
+      robotType: OT2_STANDARD_MODEL,
+      moduleRenderInfo: {},
+      labwareRenderInfo: {},
+      labwareName: LABWARE_NAME,
+      oldDisplayLocation: 'Slot 1',
+      newDisplayLocation: 'Slot 2',
+    }
     const { getByText } = render(props)
-    expect(getByText('Pausing protocol')).toBeTruthy()
+    getByText('Move Labware')
+    getByText('Labware Name')
+    getByText('Mock 96 Well Plate')
+    getByText('Labware Location')
+    getByText('Slot 1 → Slot 2')
   })
 })

@@ -30,8 +30,9 @@ import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/C
 
 export type AuthType = 'wpa-psk' | 'none'
 
+const WIFI_LIST_POLL_MS = 5000
+
 export function ConnectViaWifi(): JSX.Element {
-  const [isSearching, setIsSearching] = React.useState<boolean>(true)
   const [selectedSsid, setSelectedSsid] = React.useState<string>('')
   const [
     showSelectAuthenticationType,
@@ -46,7 +47,7 @@ export function ConnectViaWifi(): JSX.Element {
   const [password, setPassword] = React.useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const list = useWifiList(robotName)
+  const list = useWifiList(robotName, WIFI_LIST_POLL_MS)
   const [dispatchApiRequest, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
     const lastId = last(requestIds)
@@ -79,7 +80,6 @@ export function ConnectViaWifi(): JSX.Element {
       return (
         <DisplayWifiList
           list={list}
-          isSearching={isSearching}
           setShowSelectAuthenticationType={setShowSelectAuthenticationType}
           setChangeState={setChangeState}
           setSelectedSsid={setSelectedSsid}
@@ -152,12 +152,6 @@ export function ConnectViaWifi(): JSX.Element {
       return null
     }
   }
-
-  React.useEffect(() => {
-    if (list != null && list.length > 0) {
-      setIsSearching(false)
-    }
-  }, [list])
 
   React.useEffect(() => {
     setCurrentRequestState(requestState)

@@ -24,7 +24,7 @@ const STRETCH_LIST_STYLE = css`
   width: 100%;
   padding: ${SPACING.spacing16};
   background-color: ${COLORS.light1};
-  border-radius: ${BORDERS.size3};
+  border-radius: ${BORDERS.borderRadiusSize3};
 `
 
 export function EthernetConnectionDetails(): JSX.Element {

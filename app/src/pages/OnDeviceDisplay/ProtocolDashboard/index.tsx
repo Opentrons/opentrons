@@ -258,7 +258,7 @@ export function ProtocolDashboard(): JSX.Element {
               flexDirection={DIRECTION_COLUMN}
               height="27.25rem"
               justifyContent={JUSTIFY_CENTER}
-              borderRadius={BORDERS.size3}
+              borderRadius={BORDERS.borderRadiusSize3}
             >
               <img
                 alt={t('nothing_here_yet')}
@@ -315,7 +315,7 @@ export function ProtocolCard(props: {
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.light1}
-      borderRadius={BORDERS.size4}
+      borderRadius={BORDERS.borderRadiusSize4}
       marginBottom={SPACING.spacing8}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       padding={SPACING.spacing24}

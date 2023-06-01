@@ -17,12 +17,14 @@ export interface ModuleRenderInfoForProtocol extends ProtocolModuleInfo {
   attachedModuleMatch: AttachedModule | null
 }
 
+export interface ModuleRenderInfoById {
+  [moduleId: string]: ModuleRenderInfoForProtocol
+}
+
 export function useModuleRenderInfoForProtocolById(
   robotName: string,
   runId: string
-): {
-  [moduleId: string]: ModuleRenderInfoForProtocol
-} {
+): ModuleRenderInfoById {
   const { robotType } = useProtocolDetailsForRun(runId)
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
 
