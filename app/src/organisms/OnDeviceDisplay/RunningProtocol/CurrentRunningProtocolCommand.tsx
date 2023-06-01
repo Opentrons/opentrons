@@ -150,6 +150,7 @@ export function CurrentRunningProtocolCommand({
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_FLEX_START}
+        gridGap={SPACING.spacing40}
         height="6.75rem"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
