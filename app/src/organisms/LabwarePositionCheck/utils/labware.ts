@@ -145,8 +145,10 @@ export const getLabwareIdsInOrder = (
           `could not find labware definition within protocol with uri: ${currentLabware.definitionUri}`
         )
       }
+      // skip any labware that is a tip rack or trash
       const isTiprack = getIsTiprack(labwareDef)
-      if (isTiprack) return acc // skip any labware that is a tiprack
+      const isTrash = labwareDef.parameters.format === 'trash'
+      if (isTiprack || isTrash) return acc
 
       const labwareLocations = getAllUniqLocationsForLabware(
         currentLabware.id,
@@ -155,7 +157,6 @@ export const getLabwareIdsInOrder = (
       return [
         ...acc,
         ...labwareLocations.reduce<LabwareToOrder[]>((innerAcc, loc) => {
-          if (labwareDef.parameters.format === 'trash') return innerAcc
           let slot = ''
           if (loc === 'offDeck') {
             slot = 'offDeck'
