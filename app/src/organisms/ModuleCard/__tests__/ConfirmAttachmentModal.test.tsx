@@ -26,7 +26,7 @@ describe('ConfirmAttachmentBanner', () => {
 
   it('renders the correct modal info when accessed through set shake slideout', () => {
     const { getByText, getByRole } = render(props)
-    getByText('Confirm Heater-Shaker Module attachment to deck')
+    getByText('Confirm Heater-Shaker Module attachment')
     getByText(
       'Module should have both anchors fully extended for a firm attachment to the deck.'
     )
