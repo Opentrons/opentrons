@@ -412,13 +412,8 @@ function FlexProtocolEditor({
                     className={
                       notOnFirstPage
                         ? styles.flex_round_tabs_button_50p
-                        : styles.flex_round_tabs_button_100p
+                        : styles.flex_round_tabs_button_50p_right
                     }
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'center',
-                      width: '50%',
-                    }}
                   >
                     <StyledText as="h3">{nextButton}</StyledText>
                   </NewPrimaryBtn>
