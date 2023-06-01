@@ -118,7 +118,7 @@ def test_build_linear_home_step() -> None:
             duration_sec=float64(20.0),
             acceleration_mm_sec_sq=float64(0),
             stop_condition=MoveStopCondition.limit_switch,
-            move_type=MoveType.home
+            move_type=MoveType.home,
         ),
         NodeId.head_l: MoveGroupSingleAxisStep(
             distance_mm=float64(4),
@@ -126,7 +126,7 @@ def test_build_linear_home_step() -> None:
             duration_sec=float64(40),
             acceleration_mm_sec_sq=float64(0),
             stop_condition=MoveStopCondition.limit_switch,
-            move_type=MoveType.home
+            move_type=MoveType.home,
         ),
     }
     distance = {NodeId.head_l: float64(4), NodeId.pipette_right: float64(10)}
@@ -154,4 +154,3 @@ def test_build_limit_switch_backoff_step() -> None:
     }
     velocity = {NodeId.head_l: float64(-0.1), NodeId.pipette_right: float64(-0.5)}
     assert expected == create_backoff_step(velocity)
-

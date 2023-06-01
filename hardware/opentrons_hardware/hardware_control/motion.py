@@ -146,7 +146,7 @@ def create_backoff_step(velocity: Dict[NodeId, np.float64]) -> MoveGroupStep:
             distance_mm=np.float64(BACKOFF_MAX_MM),
             acceleration_mm_sec_sq=np.float64(0),
             velocity_mm_sec=abs(v),
-            duration_sec=np.float64(BACKOFF_MAX_MM)/abs(v),
+            duration_sec=np.float64(BACKOFF_MAX_MM) / abs(v),
             stop_condition=MoveStopCondition.limit_switch_backoff,
             move_type=MoveType.linear,
         )
