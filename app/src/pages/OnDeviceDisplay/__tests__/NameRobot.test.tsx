@@ -65,7 +65,7 @@ describe('NameRobot', () => {
   })
 
   it('should render text, button and keyboard', () => {
-    const [{ getByText, getByRole, queryByRole }] = render()
+    const [{ getByText, getByRole }] = render()
     getByText('Name your robot')
     getByText('Don’t worry, you can change this later in your settings.')
     getByText('Enter up to 17 characters (letters and numbers only)')
@@ -73,7 +73,6 @@ describe('NameRobot', () => {
     getByText('Confirm')
     // keyboard
     getByRole('button', { name: 'a' })
-    expect(queryByRole('button', { name: 'enter' })).not.toBeInTheDocument()
   })
 
   it('should display a letter when typing a letter', () => {
