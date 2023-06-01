@@ -4699,5 +4699,8 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "stackingOverlapWithLabware": {
+    "opentrons_universal_flat_adapter": 8.32
   }
 }

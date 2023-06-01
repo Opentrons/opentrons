@@ -1016,5 +1016,8 @@
     "x": 0,
     "y": 0,
     "z": 0
+  },
+  "stackingOverlapWithLabware": {
+    "opentrons_96_pcr_adapter": 10.2
   }
 }
