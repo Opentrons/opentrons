@@ -54,6 +54,16 @@ class CornerOffsetFromSlot(BaseModel):
     z: _Number
 
 
+class OverlapOffset(BaseModel):
+    """
+    Overlap dimensions of labware with another labware/module that it can be stacked on top of.
+    """
+
+    x: _Number
+    y: _Number
+    z: _Number
+
+
 class BrandData(BaseModel):
     brand: str = Field(..., description="Brand/manufacturer name")
     brandId: Optional[List[str]] = Field(
@@ -273,12 +283,12 @@ class LabwareDefinition(BaseModel):
         default_factory=list,
         description="Allowed behaviors and usage of a labware in a protocol.",
     )
-    stackingOverlapWithLabware: Dict[str, float] = Field(
+    stackingOverlapWithLabware: Dict[str, OverlapOffset] = Field(
         default_factory=dict,
         description="Supported labware that can be stacked upon,"
         " with overlap height between both labware.",
     )
-    stackingOverlapWithModule: Dict[str, float] = Field(
+    stackingOverlapWithModule: Dict[str, OverlapOffset] = Field(
         default_factory=dict,
         description="Supported module that can be stacked upon,"
         " with overlap height between labware and module.",

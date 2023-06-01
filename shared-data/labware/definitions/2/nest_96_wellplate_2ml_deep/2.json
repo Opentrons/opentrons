@@ -1119,9 +1119,17 @@
     "z": 0
   },
   "stackingOverlapWithLabware": {
-    "opentrons_96_deep_well_adapter": 16.3
+    "opentrons_96_deep_well_adapter": {
+      "x": 0,
+      "y": 0,
+      "z": 16.3
+    }
   },
   "stackingOverlapWithModule": {
-    "magneticBlockV1": 2.66
+    "magneticBlockV1": {
+      "x": 0,
+      "y": 0,
+      "z": 2.66
+    }
   }
 }

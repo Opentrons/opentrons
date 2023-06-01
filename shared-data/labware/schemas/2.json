@@ -48,6 +48,22 @@
       "description": "a string safe to use for loadName / namespace. Lowercase-only.",
       "type": "string",
       "pattern": "^[a-z0-9._]+$"
+    },
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      }
     }
   },
   "type": "object",
@@ -317,14 +333,14 @@
       "type": "object",
       "description": "Supported labware that can be stacked upon, with overlap height between both labware.",
       "additionalProperties": {
-        "type": "number"
+        "$ref": "#/definitions/coordinates"
       }
     },
     "stackingOverlapWithModule": {
       "type": "object",
       "description": "Supported module that can be stacked upon, with overlap height between labware and module.",
       "additionalProperties": {
-        "type": "number"
+        "$ref": "#/definitions/coordinates"
       }
     }
   }
