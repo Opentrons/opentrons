@@ -69,7 +69,7 @@ export function RecentRunProtocolCarousel({
     >
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
         {sortedProtocols.map((protocol: ProtocolResource) => {
-          const run = runs.data?.data.find(
+          const run = runs.data?.data.findLast(
             run => run.protocolId === protocol.id
           )
           const protocolId = protocol.id
