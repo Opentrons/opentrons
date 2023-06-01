@@ -3,7 +3,7 @@
 from datetime import datetime
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, Type, Dict, Any
+from typing import Dict, Any
 
 
 class PropId(Enum):
@@ -59,12 +59,6 @@ class MachineType(Enum):
     """Type of machine we are running on."""
 
     FLEX = "flex"
-
-
-class EEPROMSize(Enum):
-    """The size in kbyes the eeprom running on this device has."""
-
-    FLEXA1 = 16
 
 
 @dataclass(frozen=True)

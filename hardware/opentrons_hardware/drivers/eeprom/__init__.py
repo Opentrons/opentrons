@@ -1,13 +1,16 @@
 """The eeprom interface package."""
 
-from .eeprom import EEPROM
+from .eeprom import (
+    EEPROM,
+    DEFAULT_BUS,
+    DEFAULT_ADDRESS,
+)
 
 from .types import (
     PropId,
     PropType,
     Property,
     MachineType,
-    EEPROMSize,
     EEPROMData,
 )
 
@@ -17,7 +20,8 @@ __all__ = [
     "PropType",
     "Property",
     "MachineType",
-    "EEPROMSize",
     "EEPROMData",
     "EEPROM",
+    "DEFAULT_BUS",
+    "DEFAULT_ADDRESS",
 ]

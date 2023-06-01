@@ -2,19 +2,15 @@
 
 import os
 import logging
-from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
 from pathlib import Path
-from typing import Optional, Type, List, Tuple, Any
+from typing import Optional, Set, Type, List, Tuple, Any
 from types import TracebackType
 
 from .types import (
     PropId,
-    PropType,
     Property,
     MachineType,
-    EEPROMSize,
     EEPROMData,
 )
 from .utils import (
@@ -28,7 +24,20 @@ logger = logging.getLogger(__name__)
 # The default bus line and address of the i2c eeprom device
 DEFAULT_BUS = 3
 DEFAULT_ADDRESS = "0050"
-DEFAULT_PAGE_SIZE = 64
+DEFAULT_READ_SIZE = 64
+
+
+"""
+
+NOTES:
+
+1. serialized property data can have a maximum size of 254 bytes
+   start (1b) + len (1b) + prop_id (1b) + data (255b) + end (1b)
+   The maximum property packet can be 258bytes long (data (255b) + header (3b))
+   ex.
+      fe0201010d
+      feff04..254...0d
+"""
 
 
 class EEPROM:
@@ -50,7 +59,7 @@ class EEPROM:
         self._eeprom_filepath = Path(f"/sys/bus/i2c/devices/{bus}-{address}/eeprom")
         self._eeprom_fd = -1
         self._eeprom_data: Optional[EEPROMData] = None
-        self._properties: List[Property] = list()
+        self._properties: Set[Property] = set()
         self.open()
 
     @property
@@ -63,8 +72,8 @@ class EEPROM:
         """Object representing the serialized data stored in the eeprom."""
         return self._eeprom_data
 
-    def properties(self) -> List[Property]:
-        """List of properties that are on the eeprom."""
+    def properties(self) -> Set[Property]:
+        """Set of properties that are on the eeprom."""
         return self._properties
 
     def __enter__(self) -> "EEPROM":
@@ -105,10 +114,10 @@ class EEPROM:
             self._eeprom_fd = -1
         return True
 
-    def _read(self, size: int = 64, address: int = 0) -> bytes:
+    def _read(self, size: int = DEFAULT_READ_SIZE, address: int = 0) -> bytes:
         """Reads a number of bytes from the eeprom."""
         if self._eeprom_fd == -1:
-            raise RuntimeError(f"eeprom file descriptor is not opened.")
+            raise RuntimeError(f"eeprom file descriptor is not opened {self.name}.")
 
         logger.debug(
             f"Reading {size} bytes from address {hex(address)} for device {self.name}"
@@ -139,34 +148,31 @@ class EEPROM:
             return os.write(self._eeprom_fd, formatted_data)
         except TimeoutError:
             logging.error(
-                f"Could not write data to eeprom, make sure the write bit is low."
+                f"Could not write data to eeprom {self.name}, make sure the write bit is low."
             )
             return -1
 
-    def property_read(self, prop_ids: Optional[List[PropId]] = None) -> List[Property]:
-        """Returns a list of properties read from the eeprom."""
-        prop_ids = prop_ids or list(PropId.__members__.values())
+    def property_read(self, prop_ids: Optional[Set[PropId]] = None) -> Set[Property]:
+        """Returns a set of properties read from the eeprom."""
         # read intil we dont have any more data
-        # TODO (ba, 2023-06-01): maybe change properties to a Set for uniquenes
-        properties: List[Property] = list()
+        properties: Set[Property] = set()
         # keep track of data that might be an incomplete packet
         data_overflow = b""
         while True:
             # read data in 64 byte chunks
-            data = self._read(size=DEFAULT_PAGE_SIZE)
+            data = self._read(size=DEFAULT_READ_SIZE)
             print(f"read data from eeprom - {data.hex()}")
             # TODO (ba, 2023-06-01): We need to validate the packet
             # 1. This means we need to keep reading data until we either have a page of 0xff
             # 2. We also have to take care of packets crossing over more than one page
             # THIS IS CRITICAL!
-            props = parse_data(data)
+            props = parse_data(data, prop_ids=prop_ids)
             if not props:
                 # we dont have any more properties to read.
                 break
             # TODO (ba, 2023-06-01): compare the requested prop_ids to the parsed ones and break if equal.
-            properties += props
-            break;
-        print(properties)
+            properties.update(props)
+            break
         return properties
 
     def property_write(self, properties: Tuple[PropId, Any]) -> List[PropId]:

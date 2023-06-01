@@ -1,7 +1,7 @@
 """Utilities to parse and format bynary data into Property objects."""
 
 import struct
-from typing import Any, List, Optional, Tuple
+from typing import Any, Optional, Set, Tuple
 
 from .types import (
     PropId,
@@ -15,39 +15,39 @@ DATA_START_DELIM = 0xFE
 DATA_END_DELIM = 0x0D
 
 
-def parse_data(data: bytes) -> List[Property]:
+def parse_data(data: bytes, prop_ids: Optional[Set[PropId]] = None) -> Set[Property]:
     """This function will parse bytes and return a list of valid Property objects."""
-    properties: List[Property] = list()
+    prop_ids = prop_ids or set(PropId.__members__.values())
+    properties: Set[Property] = set()
     packet = b""
     start_idx = end_idx = 0
     for idx in range(len(data)):
         if data[idx] == DATA_START_DELIM:
-            print(f"Start byte: {idx}")
             start_idx = idx
         elif data[idx] == DATA_END_DELIM:
-            print(f"End byte: {idx}")
             end_idx = idx
         if end_idx != 0:
+            # Make sure this is a valid packet
             packet = data[start_idx : end_idx + 1]
-            print(f"Found potential packet - {packet.hex()}")
             valid_packet = _check_valid_data(packet)
             if valid_packet:
-                print(f"Found valid packet - {packet.hex()}")
-                print("Handle packet here!")
-                prop_len = packet[start_idx + 1]
-                prop_id = packet[start_idx + 2]
-                prop_data = packet[start_idx + 3 : end_idx]
-                print(
-                    f"prop_len: {prop_len} prop_id: {prop_id} prop_data: {prop_data.hex()}"
-                )
+                prop_len = packet[1] - 1  # the prop id is included in the len
+                prop_id = packet[2]
+
+                prop_data = packet[3:-1]
+                if prop_len != len(prop_data):
+                    start_idx = end_idx = 0
+                    continue
+
+                # decode the data for the given property
                 prop = _parse_prop(prop_id, prop_len, prop_data)
-                if prop:
-                    properties.append(prop)
+                if prop and prop.id in prop_ids:
+                    properties.add(prop)
             start_idx = end_idx = 0
     return properties
 
 
-def _parse_prop(prop_id: PropId, prop_len: int, data: bytes) -> Optional[Property]:
+def _parse_prop(prop_id: int, prop_len: int, data: bytes) -> Optional[Property]:
     try:
         prop = PropId(prop_id)
     except ValueError:
@@ -66,16 +66,11 @@ def _parse_prop(prop_id: PropId, prop_len: int, data: bytes) -> Optional[Propert
         decoded_data = data.decode("utf-8")
     else:
         decoded_data = data
-
-    print(
-        f"Found data_type: {data_type} data_size: {data_size} decoded: {decoded_data}"
-    )
-
     return Property(id=prop, type=data_type, size=data_size, value=decoded_data)
 
 
-def serialize_properties(properties: List[Property]) -> bytes:
-    """This function will turn a list of Property objects into a byte string."""
+def serialize_properties(properties: Set[Property]) -> bytes:
+    """This function will turn a set of Property objects into a byte string."""
     return b""
 
 

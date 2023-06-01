@@ -6,11 +6,9 @@ from opentrons_hardware.drivers.eeprom import (
     EEPROM,
     EEPROMData,
     PropId,
+    DEFAULT_BUS,
+    DEFAULT_ADDRESS,
 )
-
-
-DEFAULT_BUS = 3
-DEFAULT_ADDRESS = "0050"
 
 
 def _main(args: argparse.Namespace, eeprom_api: EEPROM) -> None:
@@ -32,16 +30,16 @@ def _main(args: argparse.Namespace, eeprom_api: EEPROM) -> None:
 
     print("read property test")
     # write a valid property
-    size = eeprom_api._write(b"\xfe\x02\x01\x01\x0d", 0)
+    size = eeprom_api._write(b"\xfe\x02\x01\x01\x0d\xfe\x07\x03STRING\x0d", 0)
     print(f"wrote bytes: {size}")
 
-    # print("read all properties test")
-    # data = eeprom_api.property_read()
-    # print(data)
-
-    print("read specific properties test")
-    data = eeprom_api.property_read([PropId.FORMAT_VERSION, PropId.MACHINE_TYPE])
+    print("read all properties test")
+    data = eeprom_api.property_read()
     print(data)
+
+    # print("read specific properties test")
+    # data = eeprom_api.property_read([PropId.FORMAT_VERSION, PropId.MACHINE_TYPE])
+    # print(data)
 
 
 if __name__ == "__main__":
