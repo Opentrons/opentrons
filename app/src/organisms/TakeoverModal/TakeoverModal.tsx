@@ -68,7 +68,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
             <Flex
               height="12.5rem"
               backgroundColor={COLORS.darkBlack20}
-              borderRadius={BORDERS.size3}
+              borderRadius={BORDERS.borderRadiusSize3}
               flexDirection={DIRECTION_COLUMN}
               color={COLORS.darkBlack90}
               padding={SPACING.spacing24}
