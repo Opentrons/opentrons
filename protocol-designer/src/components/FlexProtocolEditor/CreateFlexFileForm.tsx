@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { i18n } from '../../localization'
-import { FlexProtocolEditorComponent } from './FlexProtocolEditor'
 import { StyledText } from './StyledText'
 import styles from './FlexComponents.css'
 import { UpdateConfirmation } from './FlexUpdateConfirmation'
@@ -58,13 +57,6 @@ function FlexFormComponent(): JSX.Element {
         <StyledText as="h5" className={styles.right_end}>
           {i18n.t('flex.header.required_fields')}
         </StyledText>
-        <FlexProtocolEditorComponent
-          FlexFileDetails={{
-            isEditValue: false,
-            tabIdValue: undefined,
-            formProps: undefined,
-          }}
-        />
       </div>
     </>
   )

@@ -70,7 +70,7 @@
   },
   "cancel_create_protocol": {
     "confirmation_title": "Cancel Create Protocol?",
-    "confirmation_message": "Are you sure you want to cancel creating a protocol? Progress will be lost, You can't undo this change.",
+    "confirmation_message": "Are you sure you want to cancel creating a protocol? Progress will be lost. You can’t undo this change.",
     "cancel_button_name": "Go back",
     "continue_button_name": "Cancel New Protocol"
   }
