@@ -85,15 +85,3 @@ export const pipetteSlot: pipetteSlots = {
 }
 
 export const blockMount: string[] = ['p1000_96']
-
-interface selectPage {
-  newFlexFileForm: string
-  protocolEditor: string
-  defaultLandingPage: string
-}
-
-export const selectPageForms: selectPage = {
-  newFlexFileForm: 'new-flex-file-form',
-  protocolEditor: 'protocol-editor',
-  defaultLandingPage: 'default-landing-page',
-}
