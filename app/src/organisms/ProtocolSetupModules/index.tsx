@@ -266,7 +266,7 @@ export function ProtocolSetupModules({
               e.stopPropagation()
               setClearModuleMismatchBanner(true)
             }}
-            heading={t('module_mismatch_error')}
+            heading={t('extra_module_attached')}
             message={t('module_mismatch_body')}
           />
         ) : null}

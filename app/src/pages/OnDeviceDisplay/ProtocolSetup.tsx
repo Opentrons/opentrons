@@ -245,6 +245,11 @@ function PrepareToRun({
     setShowConfirmCancelModal,
   ] = React.useState<boolean>(false)
 
+  // const protocolAnalysisLoading =
+  //   mostRecentAnalysis == null ||
+  //   attachedInstruments == null ||
+  //   (protocolHasModules && attachedModules == null) ||
+  //   allPipettesCalibrationData == null
   if (
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
@@ -304,7 +309,7 @@ function PrepareToRun({
     ? missingModulesText
     : connectedModulesText
   const modulesSubDetail =
-    isMissingModules && isUnmatchedModules ? t('module_mismatch_error') : null
+    isMissingModules && isUnmatchedModules ? t('extra_module_attached') : null
 
   // Labware information
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
@@ -395,7 +400,6 @@ function PrepareToRun({
           detail={modulesDetail}
           subDetail={modulesSubDetail}
           status={modulesStatus}
-          isActionUnavailable={!protocolHasModules}
         />
         <ProtocolSetupStep
           onClickSetupStep={handleLpcClick}
