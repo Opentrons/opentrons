@@ -275,6 +275,11 @@ class Axis(enum.Enum):
         else:
             raise KeyError(self)
 
+    @classmethod
+    def ot2_axes(cls) -> List["Axis"]:
+        """Returns only OT2 axes."""
+        return [axis for axis in Axis if axis not in [Axis.Z_G, Axis.Q, Axis.G]]
+
 
 class OT3SubSystem(enum.Enum):
     """An enumeration of ot3 components.
