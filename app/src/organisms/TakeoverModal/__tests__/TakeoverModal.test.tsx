@@ -15,7 +15,7 @@ describe('TakeoverModal', () => {
     props = {
       isConfirmTerminate: false,
       setConfirmTerminate: jest.fn(),
-      onClose: jest.fn(),
+      confirmTerminate: jest.fn(),
     }
   })
 
@@ -44,6 +44,6 @@ describe('TakeoverModal', () => {
     getByLabelText('SmallButton_primary').click()
     expect(props.setConfirmTerminate).toHaveBeenCalled()
     getByLabelText('SmallButton_alert').click()
-    expect(props.onClose).toHaveBeenCalled()
+    expect(props.confirmTerminate).toHaveBeenCalled()
   })
 })

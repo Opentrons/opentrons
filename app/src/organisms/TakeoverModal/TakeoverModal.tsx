@@ -20,11 +20,11 @@ import type { ModalHeaderBaseProps } from '../../molecules/Modal/OnDeviceDisplay
 interface TakeoverModalProps {
   isConfirmTerminate: boolean
   setConfirmTerminate: React.Dispatch<React.SetStateAction<boolean>>
-  onClose: () => void
+  confirmTerminate: () => void
 }
 
 export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
-  const { isConfirmTerminate, setConfirmTerminate, onClose } = props
+  const { isConfirmTerminate, setConfirmTerminate, confirmTerminate } = props
   const { i18n, t } = useTranslation('shared')
 
   const terminateHeader: ModalHeaderBaseProps = {
@@ -50,7 +50,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
               />
               <SmallButton
                 buttonType="alert"
-                onClick={onClose}
+                onClick={confirmTerminate}
                 buttonText={t('terminate_activity')}
                 width="50%"
               />

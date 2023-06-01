@@ -60,7 +60,7 @@ export function TakeoverModalProvider(
     >
       {!isDesktopAppMaintanenceInProgress && isMaintanenceRunCurrent && (
         <TakeoverModal
-          onClose={() => handleCloseAndTerminate()}
+          confirmTerminate={() => handleCloseAndTerminate()}
           isConfirmTerminate={isConfirmTerminate}
           setConfirmTerminate={setConfirmTerminate}
         />
