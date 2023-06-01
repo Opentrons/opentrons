@@ -42,19 +42,16 @@ describe('SetWifiCred', () => {
   })
 
   it('should render text, button and software keyboard', () => {
-    const [{ getByText, getByRole, getAllByRole, getByLabelText }] = render(
-      props
-    )
+    const [{ getByText, getByRole, getByLabelText }] = render(props)
     getByText('Sign into Wi-Fi')
     getByText('Connect')
     getByText('Enter password')
     expect(getByLabelText('wifi_password')).toBeInTheDocument()
     getByRole('button', { name: 'Show' })
     // software keyboard
-    getByRole('button', { name: 'backspace' })
+    getByRole('button', { name: 'del' })
     getByRole('button', { name: 'a' })
-    const shiftButtons = getAllByRole('button', { name: 'shift' })
-    expect(shiftButtons.length).toBe(2)
+    getByRole('button', { name: 'shift' })
   })
 
   it('should display password', () => {
