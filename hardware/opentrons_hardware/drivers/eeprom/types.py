@@ -10,10 +10,11 @@ class PropId(Enum):
     """The unique property id for a property."""
 
     FORMAT_VERSION = 1
-    MACHINE_TYPE = 2
-    MACHINE_VERSION = 3
-    PROGRAMMED_DATE = 4
-    UNIT_NUMBER = 5
+    SERIAL_NUMBER = 2
+    MACHINE_TYPE = 3
+    MACHINE_VERSION = 4
+    PROGRAMMED_DATE = 5
+    UNIT_NUMBER = 6
 
 
 class PropType(Enum):
@@ -29,6 +30,7 @@ class PropType(Enum):
 
 PROP_ID_TYPES = {
     PropId.FORMAT_VERSION: PropType.BYTE,
+    PropId.SERIAL_NUMBER: PropType.STR,
     PropId.MACHINE_TYPE: PropType.BYTE,
     PropId.MACHINE_VERSION: PropType.STR,
     PropId.PROGRAMMED_DATE: PropType.STR,

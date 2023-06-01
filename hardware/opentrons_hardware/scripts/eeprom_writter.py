@@ -30,7 +30,10 @@ def _main(args: argparse.Namespace, eeprom_api: EEPROM) -> None:
 
     print("read property test")
     # write a valid property
-    size = eeprom_api._write(b"\xfe\x02\x01\x01\x0d\xfe\x07\x03STRING\x0d", 0)
+    #size = eeprom_api._write(b"\xfe\x02\x01\x01\x0d\xfe\x07\x03STRING\x0d", 0)
+    #print(f"wrote bytes: {size}")
+
+    size = eeprom_api._write(b"\xfe\x02\x01\x01\x0d\xfe\x07\x04STRING\x0d\xfe\x12\x02FLXA1020221007001\x0d", 0)
     print(f"wrote bytes: {size}")
 
     print("read all properties test")
