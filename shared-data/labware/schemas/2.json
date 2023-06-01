@@ -183,8 +183,7 @@
         "type": "array",
         "items": {
           "type": "string"
-        },
-        "minItems": 1
+        }
       }
     },
     "cornerOffsetFromSlot": {
@@ -289,8 +288,7 @@
             "description": "An array of wells that contain the same metadata",
             "items": {
               "type": "string"
-            },
-            "minItems": 1
+            }
           },
           "metadata": {
             "type": "object",
