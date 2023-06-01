@@ -110,6 +110,7 @@ function Input(props: InputFieldProps): JSX.Element {
           readOnly={props.readOnly}
           tabIndex={props.tabIndex}
           autoFocus={props.autoFocus}
+          data-testid={props.id}
         />
         {props.units && <div className={styles.suffix}>{props.units}</div>}
       </div>
