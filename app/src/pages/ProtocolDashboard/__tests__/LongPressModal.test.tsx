@@ -5,15 +5,10 @@ import { fireEvent } from '@testing-library/react'
 import { renderHook } from '@testing-library/react-hooks'
 
 import { renderWithProviders, useLongPress } from '@opentrons/components'
-import {
-  getProtocol,
-  deleteProtocol,
-  deleteRun,
-  HostConfig,
-} from '@opentrons/api-client'
+import { HostConfig } from '@opentrons/api-client'
 import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
 
-import { i18n } from '../../../../i18n'
+import { i18n } from '../../../i18n'
 import { LongPressModal } from '../LongPressModal'
 
 import type { UseLongPressResult } from '@opentrons/components'
@@ -24,12 +19,7 @@ const mockUseCreateRunMutation = useCreateRunMutation as jest.MockedFunction<
   typeof useCreateRunMutation
 >
 const mockuseHost = useHost as jest.MockedFunction<typeof useHost>
-const mockGetProtocol = getProtocol as jest.MockedFunction<typeof getProtocol>
-const mockDeleteProtocol = deleteProtocol as jest.MockedFunction<
-  typeof deleteProtocol
->
-const mockDeleteRun = deleteRun as jest.MockedFunction<typeof deleteRun>
-
+const mockFunc = jest.fn()
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {
@@ -42,7 +32,11 @@ jest.mock('@opentrons/react-api-client')
 const render = (longPress: UseLongPressResult) => {
   return renderWithProviders(
     <MemoryRouter>
-      <LongPressModal longpress={longPress} protocolId={'mockProtocol1'} />
+      <LongPressModal
+        longpress={longPress}
+        protocolId={'mockProtocol1'}
+        setShowDeleteConfirmationModal={mockFunc}
+      />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -66,26 +60,13 @@ describe('Long Press Modal', () => {
     getByText('Delete protocol')
   })
 
-  it('should delete delete the protocol and all referenced runs', async () => {
-    when(mockGetProtocol)
-      .calledWith(MOCK_HOST_CONFIG, 'mockProtocol1')
-      .mockResolvedValue({
-        data: { links: { referencingRuns: [{ id: '1' }, { id: '2' }] } },
-      } as any)
+  it('should call mock function when tapping delete protocol', () => {
     const { result } = renderHook(() => useLongPress())
     result.current.isLongPressed = true
     const [{ getByText }] = render(result.current)
-    getByText('Delete protocol')
-    const deleteButton = getByText('Delete protocol').closest('button')
-    deleteButton?.click()
-    // flush promises and then make assertions
-    await new Promise(setImmediate)
-    expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
-    expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '2')
-    expect(mockDeleteProtocol).toHaveBeenCalledWith(
-      MOCK_HOST_CONFIG,
-      'mockProtocol1'
-    )
+    const button = getByText('Delete protocol')
+    button.click()
+    expect(mockFunc).toHaveBeenCalled()
   })
 
   it('should launch protocol run when clicking run protocol button', () => {

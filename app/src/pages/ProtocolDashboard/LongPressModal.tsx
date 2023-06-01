@@ -1,31 +1,33 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useQueryClient } from 'react-query'
 import { useHistory } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Flex, Icon, SPACING } from '@opentrons/components'
-import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
-import { useCreateRunMutation, useHost } from '@opentrons/react-api-client'
+import { useCreateRunMutation } from '@opentrons/react-api-client'
 
-import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
-import { StyledText } from '../../../atoms/text'
-import { MenuList } from '../../../atoms/MenuList'
-import { MenuItem } from '../../../atoms/MenuList/MenuItem'
-import { SmallModalChildren } from '../../../molecules/Modal/OnDeviceDisplay'
-import { useToaster } from '../../../organisms/ToasterOven'
-import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
+import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
+import { StyledText } from '../../atoms/text'
+import { MenuList } from '../../atoms/MenuList'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { SmallModalChildren } from '../../molecules/Modal/OnDeviceDisplay'
+import { useToaster } from '../../organisms/ToasterOven'
+import { getPinnedProtocolIds, updateConfigValue } from '../../redux/config'
 
 import type { UseLongPressResult } from '@opentrons/components'
-import type { Dispatch } from '../../../redux/types'
+import type { Dispatch } from '../../redux/types'
 
-export function LongPressModal(props: {
+interface LongPressModalProps {
   longpress: UseLongPressResult
   protocolId: string
-}): JSX.Element {
-  const { longpress, protocolId } = props
+  setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
+}
+
+export function LongPressModal({
+  longpress,
+  protocolId,
+  setShowDeleteConfirmationModal,
+}: LongPressModalProps): JSX.Element {
   const history = useHistory()
-  const host = useHost()
-  const queryClient = useQueryClient()
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const { t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
@@ -57,36 +59,8 @@ export function LongPressModal(props: {
   }
 
   const handleDeleteClick = (): void => {
-    if (host != null) {
-      getProtocol(host, protocolId)
-        .then(
-          response =>
-            response.data.links?.referencingRuns.map(({ id }) => id) ?? []
-        )
-        .then(referencingRunIds => {
-          return Promise.all(
-            referencingRunIds?.map(runId => deleteRun(host, runId))
-          )
-        })
-        .then(() => deleteProtocol(host, protocolId))
-        .then(() =>
-          queryClient
-            .invalidateQueries([host, 'protocols'])
-            .catch((e: Error) =>
-              console.error(`error invalidating runs query: ${e.message}`)
-            )
-        )
-        .then(() => longpress.setIsLongPressed(false))
-        .catch((e: Error) => {
-          console.error(`error deleting resources: ${e.message}`)
-          longpress.setIsLongPressed(false)
-        })
-    } else {
-      console.error(
-        'could not delete resources because the robot host is unknown'
-      )
-      longpress.setIsLongPressed(false)
-    }
+    setShowDeleteConfirmationModal(true)
+    longpress.setIsLongPressed(false)
   }
 
   const handlePinClick = (): void => {
@@ -114,7 +88,6 @@ export function LongPressModal(props: {
     dispatch(
       updateConfigValue('protocols.pinnedProtocolIds', pinnedProtocolIds)
     )
-
     longpress.setIsLongPressed(false)
   }
 
