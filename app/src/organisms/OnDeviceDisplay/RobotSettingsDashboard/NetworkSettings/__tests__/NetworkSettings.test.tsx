@@ -69,11 +69,10 @@ describe('NetworkSettings', () => {
     jest.clearAllMocks()
   })
 
-  it('displays the wifi, ethernet, and usb network options', () => {
+  it('displays the wifi and ethernet options', () => {
     const [{ getByText }] = render(props)
     expect(getByText('Wi-Fi')).toBeTruthy()
     expect(getByText('Ethernet')).toBeTruthy()
-    expect(getByText('USB')).toBeTruthy()
   })
 
   it('selecting the Wi-Fi option displays the wifi details', () => {
@@ -103,10 +102,4 @@ describe('NetworkSettings', () => {
     expect(queryByText('ETHERNET DETAILS')).toBeFalsy()
     expect(getByText('Network Settings')).toBeTruthy()
   })
-
-  it.todo('selecting the USB option displays the usb details')
-
-  it.todo(
-    'clicking back on the usb details screen shows the network settings page again'
-  )
 })
