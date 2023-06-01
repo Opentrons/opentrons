@@ -13,8 +13,8 @@ describe('TakeoverModal', () => {
   let props: React.ComponentProps<typeof TakeoverModal>
   beforeEach(() => {
     props = {
-      isConfirmTerminate: false,
-      setConfirmTerminate: jest.fn(),
+      showConfirmTerminateModal: false,
+      setShowConfirmTerminateModal: jest.fn(),
       confirmTerminate: jest.fn(),
     }
   })
@@ -26,13 +26,13 @@ describe('TakeoverModal', () => {
       'A computer with the Opentrons App is currently controlling this robot.'
     )
     getByText('Terminate remote activity').click()
-    expect(props.setConfirmTerminate).toHaveBeenCalled()
+    expect(props.setShowConfirmTerminateModal).toHaveBeenCalled()
   })
 
   it('renders information for confirm terminate modal', () => {
     props = {
       ...props,
-      isConfirmTerminate: true,
+      showConfirmTerminateModal: true,
     }
     const { getByText, getByLabelText } = render(props)
     getByText('Terminate activity?')
@@ -42,7 +42,7 @@ describe('TakeoverModal', () => {
     getByText('Continue activity')
     getByText('Terminate activity')
     getByLabelText('SmallButton_primary').click()
-    expect(props.setConfirmTerminate).toHaveBeenCalled()
+    expect(props.setShowConfirmTerminateModal).toHaveBeenCalled()
     getByLabelText('SmallButton_alert').click()
     expect(props.confirmTerminate).toHaveBeenCalled()
   })

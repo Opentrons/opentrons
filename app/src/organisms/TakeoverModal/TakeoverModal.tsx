@@ -18,13 +18,17 @@ import { Modal } from '../../molecules/Modal/OnDeviceDisplay'
 import type { ModalHeaderBaseProps } from '../../molecules/Modal/OnDeviceDisplay/types'
 
 interface TakeoverModalProps {
-  isConfirmTerminate: boolean
-  setConfirmTerminate: React.Dispatch<React.SetStateAction<boolean>>
+  showConfirmTerminateModal: boolean
+  setShowConfirmTerminateModal: React.Dispatch<React.SetStateAction<boolean>>
   confirmTerminate: () => void
 }
 
 export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
-  const { isConfirmTerminate, setConfirmTerminate, confirmTerminate } = props
+  const {
+    showConfirmTerminateModal,
+    setShowConfirmTerminateModal,
+    confirmTerminate,
+  } = props
   const { i18n, t } = useTranslation('shared')
 
   const terminateHeader: ModalHeaderBaseProps = {
@@ -35,7 +39,8 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
 
   return (
     <Portal level="top">
-      {isConfirmTerminate ? (
+      {showConfirmTerminateModal ? (
+        //    confirm terminate modal
         <Modal header={terminateHeader}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             <StyledText as="p" marginBottom={SPACING.spacing40}>
@@ -44,7 +49,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
             <Flex flex="1" gridGap={SPACING.spacing8}>
               <SmallButton
                 buttonType="primary"
-                onClick={() => setConfirmTerminate(false)}
+                onClick={() => setShowConfirmTerminateModal(false)}
                 buttonText={t('continue_activity')}
                 width="50%"
               />
@@ -93,7 +98,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
             <StyledText
               as="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-              onClick={() => setConfirmTerminate(true)}
+              onClick={() => setShowConfirmTerminateModal(true)}
             >
               {t('terminate')}
             </StyledText>

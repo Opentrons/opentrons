@@ -22,9 +22,10 @@ export function MaintenanceRunTakeover(
 
   const isMaintanenceRunCurrent = maintenanceRunId != null
 
-  const [isConfirmTerminate, setConfirmTerminate] = React.useState<boolean>(
-    false
-  )
+  const [
+    showConfirmTerminateModal,
+    setShowConfirmTerminateModal,
+  ] = React.useState<boolean>(false)
 
   const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation()
 
@@ -32,7 +33,7 @@ export function MaintenanceRunTakeover(
     if (maintenanceRunId != null) {
       deleteMaintenanceRun(maintenanceRunId, {
         onSuccess: () => {
-          setConfirmTerminate(false)
+          setShowConfirmTerminateModal(false)
         },
       })
     }
@@ -48,8 +49,8 @@ export function MaintenanceRunTakeover(
       {!isODDMaintanenceInProgress && isMaintanenceRunCurrent && (
         <TakeoverModal
           confirmTerminate={handleCloseAndTerminate}
-          isConfirmTerminate={isConfirmTerminate}
-          setConfirmTerminate={setConfirmTerminate}
+          showConfirmTerminateModal={showConfirmTerminateModal}
+          setShowConfirmTerminateModal={setShowConfirmTerminateModal}
         />
       )}
       {props.children}
