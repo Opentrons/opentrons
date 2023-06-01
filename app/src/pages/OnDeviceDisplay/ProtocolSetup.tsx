@@ -308,8 +308,6 @@ function PrepareToRun({
   const modulesDetail = isMissingModules
     ? missingModulesText
     : connectedModulesText
-  const modulesSubDetail =
-    isMissingModules && isUnmatchedModules ? t('extra_module_attached') : null
 
   // Labware information
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
@@ -398,7 +396,6 @@ function PrepareToRun({
           onClickSetupStep={() => setSetupScreen('modules')}
           title={t('modules')}
           detail={modulesDetail}
-          subDetail={modulesSubDetail}
           status={modulesStatus}
         />
         <ProtocolSetupStep
