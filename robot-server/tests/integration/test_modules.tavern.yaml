@@ -103,6 +103,7 @@ stages:
             moduleModel: thermocyclerModuleV1
             usbPort:
               port: !anyint
+              hub: !anyint
               path: !anystr
             data:
               status: !anystr
@@ -122,6 +123,7 @@ stages:
             moduleModel: heaterShakerModuleV1
             usbPort:
               port: !anyint
+              hub: !anyint
               path: !anystr
             data:
               status: !anystr
@@ -139,6 +141,7 @@ stages:
             moduleModel: temperatureModuleV1
             usbPort:
               port: !anyint
+              hub: !anyint
               path: !anystr
             data:
               status: !anystr
@@ -153,6 +156,7 @@ stages:
             moduleModel: magneticModuleV1
             usbPort:
               port: !anyint
+              hub: !anyint
               path: !anystr
             data:
               status: !anystr
