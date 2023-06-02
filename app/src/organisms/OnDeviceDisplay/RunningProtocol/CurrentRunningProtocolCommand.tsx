@@ -71,6 +71,9 @@ const COMMAND_ROW_STYLE_ANIMATED = css`
   font-size: 1.375rem;
   line-height: 1.75rem;
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  text-align: center;
+  width: fit-content;
+  margin: auto;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -82,6 +85,9 @@ const COMMAND_ROW_STYLE = css`
   font-size: 1.375rem;
   line-height: 1.75rem;
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  text-align: center;
+  width: fit-content;
+  margin: auto;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
