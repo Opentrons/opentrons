@@ -17,6 +17,8 @@ from typing_extensions import TypeGuard
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Mount, DeckSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -30,6 +32,9 @@ from opentrons.hardware_control.modules.types import (
 
 if TYPE_CHECKING:
     from .labware import Well
+
+
+_COORDINATE_STYLE_DECK_LABELS_ADDED_IN = APIVersion(2, 15)
 
 
 class InvalidPipetteMountError(ValueError):
@@ -87,16 +92,28 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
         ) from e
 
 
-def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
+def ensure_deck_slot(
+    deck_slot: Union[int, str], api_version: APIVersion
+) -> DeckSlotName:
     """Ensure that a primitive value matches a named deck slot."""
     if not isinstance(deck_slot, (int, str)):
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
 
     try:
-        # TODO(jbl 2023-04-25) this should raise an error when below version 2.15 and using deck coordinates
-        return DeckSlotName.from_primitive(deck_slot)
+        parsed_slot = DeckSlotName.from_primitive(deck_slot)
     except ValueError as e:
         raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
+
+    is_ot2_style = parsed_slot.to_ot2_equivalent() == parsed_slot
+    if not is_ot2_style and api_version < _COORDINATE_STYLE_DECK_LABELS_ADDED_IN:
+        alternative = parsed_slot.to_ot2_equivalent().id
+        raise APIVersionError(
+            f'Specifying a deck slot like "{deck_slot}" requires apiLevel'
+            f" {_COORDINATE_STYLE_DECK_LABELS_ADDED_IN}."
+            f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
+        )
+
+    return parsed_slot
 
 
 def ensure_deck_slot_string(slot_name: DeckSlotName, robot_type: RobotType) -> str:
