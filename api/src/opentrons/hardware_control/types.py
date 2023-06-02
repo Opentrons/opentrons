@@ -224,6 +224,7 @@ class Axis(enum.Enum):
         }
         return kind_map[kind]
 
+    # (spp): Need to make this return Mount for OT2
     @classmethod
     def to_mount(cls, inst: "Axis") -> OT3Mount:
         return {

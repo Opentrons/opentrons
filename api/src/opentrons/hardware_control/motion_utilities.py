@@ -168,7 +168,7 @@ def target_position_from_relative(
 
 
 def target_position_from_plunger(
-    mount: OT3Mount,
+    mount: Union[Mount, OT3Mount],
     delta: float,
     current_position: Dict[Axis, float],
 ) -> "OrderedDict[Axis, float]":
