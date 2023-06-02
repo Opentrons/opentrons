@@ -349,9 +349,6 @@ def machine_from_deck(
         for axes, deck_point in point_for_z_axis.items()
     }
 
-    # This allows passing in multiple mounts at once.
-    # When moving both mounts at once the head firmware crashes.
-    # Make sure to pass only one mount at a time.
     to_check = {}
     for axis, point in transformed.items():
         to_check[axis] = point.z

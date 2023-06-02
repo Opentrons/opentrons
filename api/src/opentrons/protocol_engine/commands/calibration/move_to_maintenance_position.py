@@ -25,7 +25,9 @@ if TYPE_CHECKING:
 _ATTACH_POINT = Point(x=0, y=100)
 # These offsets are by eye measuring
 _INSTRUMENT_ATTACH_Z_POINT = 400.0
-_PLATE_ATTACH_Z_POINT = 300
+_PLATE_ATTACH_Z_LEFT_POINT = 300
+# Move the right mount a bit higher than the left so the user won't forget to unscrew
+_PLATE_ATTACH_Z_RIGHT_POINT = 320
 
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
@@ -88,20 +90,12 @@ class MoveToMaintenancePositionImplementation(
                 }
             )
         else:
-            # TODO (tz, 6-2-2023): Change this to one call to move_axes with both
-            #  Z_L and Z_R once head firmware allows moving both mounts the the same time
             await ot3_api.move_axes(
                 {
                     OT3Axis.Y: _ATTACH_POINT.y,
                     OT3Axis.X: _ATTACH_POINT.x,
-                    OT3Axis.Z_L: _PLATE_ATTACH_Z_POINT,
-                }
-            )
-            await ot3_api.move_axes(
-                {
-                    OT3Axis.Y: _ATTACH_POINT.y,
-                    OT3Axis.X: _ATTACH_POINT.x,
-                    OT3Axis.Z_R: _PLATE_ATTACH_Z_POINT,
+                    OT3Axis.Z_L: _PLATE_ATTACH_Z_LEFT_POINT,
+                    OT3Axis.Z_R: _PLATE_ATTACH_Z_RIGHT_POINT,
                 }
             )
 

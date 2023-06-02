@@ -1,6 +1,7 @@
 """Test for Calibration Set Up Position Implementation."""
 import pytest
 from decoy import Decoy
+from typing import Mapping
 
 from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position import (
     MoveToMaintenancePositionParams,
@@ -27,15 +28,30 @@ def subject(
 
 
 @pytest.mark.ot3_only
-async def test_calibration_move_to_location_implementation_attach_instrument(
+@pytest.mark.parametrize(
+    "maintenance_position, verify_axes",
+    [
+        (
+            MaintenancePosition.AttachInstrument,
+            {OT3Axis.Y: 100, OT3Axis.X: 0, OT3Axis.Z_L: 400},
+        ),
+        (
+            MaintenancePosition.AttachPlate,
+            {OT3Axis.Y: 100, OT3Axis.X: 0, OT3Axis.Z_L: 300, OT3Axis.Z_R: 320},
+        ),
+    ],
+)
+async def test_calibration_move_to_location_implementation(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
     state_view: StateView,
     ot3_hardware_api: OT3API,
+    maintenance_position: MaintenancePosition,
+    verify_axes: Mapping[OT3Axis, float],
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
-        mount=MountType.LEFT, maintenancePosition=MaintenancePosition.AttachInstrument
+        mount=MountType.LEFT, maintenancePosition=maintenance_position
     )
 
     result = await subject.execute(params=params)
@@ -43,35 +59,7 @@ async def test_calibration_move_to_location_implementation_attach_instrument(
 
     decoy.verify(
         await ot3_hardware_api.move_axes(
-            position={OT3Axis.Y: 100, OT3Axis.X: 0, OT3Axis.Z_L: 400},
-        ),
-        times=1,
-    )
-
-
-async def test_calibration_move_to_location_implementation_attach_plate(
-    decoy: Decoy,
-    subject: MoveToMaintenancePositionImplementation,
-    state_view: StateView,
-    ot3_hardware_api: OT3API,
-) -> None:
-    """Command should get a move to target location and critical point and should verify move_to call."""
-    params = MoveToMaintenancePositionParams(
-        mount=MountType.LEFT, maintenancePosition=MaintenancePosition.AttachPlate
-    )
-
-    result = await subject.execute(params=params)
-    assert result == MoveToMaintenancePositionResult()
-
-    decoy.verify(
-        await ot3_hardware_api.move_axes(
-            position={OT3Axis.Y: 100, OT3Axis.X: 0, OT3Axis.Z_L: 300},
-        ),
-        times=1,
-    )
-    decoy.verify(
-        await ot3_hardware_api.move_axes(
-            position={OT3Axis.Y: 100, OT3Axis.X: 0, OT3Axis.Z_R: 300},
+            position=verify_axes,
         ),
         times=1,
     )
