@@ -92,7 +92,7 @@ export function RobotSystemVersion({
           ) : null}
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
             <StyledText as="p">{`${t(
-              'shared:view_latest_release_notes'
+              'view_latest_release_notes_at'
             )} ${GITHUB_URL}`}</StyledText>
             <Flex
               backgroundColor={COLORS.light2}
