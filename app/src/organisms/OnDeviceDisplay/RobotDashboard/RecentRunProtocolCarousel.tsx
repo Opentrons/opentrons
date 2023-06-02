@@ -4,7 +4,6 @@ import {
   DIRECTION_ROW,
   Flex,
   SPACING,
-  Box
 } from '@opentrons/components'
 import { RecentRunProtocolCard } from './RecentRunProtocolCard'
 
@@ -31,8 +30,6 @@ const CarouselWrapper = styled.div`
 export function RecentRunProtocolCarousel({
   recentRunsOfUniqueProtocols,
 }: RecentRunProtocolCarouselProps): JSX.Element {
-  // We set a negative right margin to give the illusion of the carousel spilling
-  // off the page, as per the designs.
   return (
     <CarouselWrapper>
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8} marginX={SPACING.spacing40}>

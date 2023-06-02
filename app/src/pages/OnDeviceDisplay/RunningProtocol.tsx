@@ -5,15 +5,16 @@ import { useSelector } from 'react-redux'
 
 import {
   Flex,
+  Box,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   SPACING,
-  useSwipe,
   COLORS,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
   POSITION_RELATIVE,
   OVERFLOW_HIDDEN,
+  ALIGN_FLEX_START,
   ALIGN_FLEX_END,
 } from '@opentrons/components'
 import {
@@ -44,6 +45,9 @@ import { getLocalRobot } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
+
+const HALF_SCREEN_WIDTH_PX = 512
+const SCROLL_DEBOUNCE_MS = 250
 interface BulletProps {
   isActive: boolean
 }
@@ -64,14 +68,10 @@ export type ScreenOption =
 
 export function RunningProtocol(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
-  const [currentOption, setCurrentOption] = React.useState<ScreenOption>(
-    'CurrentRunningProtocolCommand'
-  )
   const [
     showConfirmCancelRunModal,
     setShowConfirmCancelRunModal,
   ] = React.useState<boolean>(false)
-  const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const currentRunCommandKey = useLastRunCommandKey(runId)
   const totalIndex = robotSideAnalysis?.commands.length
@@ -94,108 +94,134 @@ export function RunningProtocol(): JSX.Element {
   const robotName = localRobot != null ? localRobot.name : 'no name'
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
 
+  const horizontalScrollContainerRef = React.useRef<HTMLDivElement | null>(null)
+  const commandViewRef = React.useRef<HTMLDivElement | null>(null)
+  const listViewRef = React.useRef<HTMLDivElement | null>(null)
+  const [isScrolling, setIsScrolling] = React.useState(false)
+  const [scrollLeft, setScrollLeft] = React.useState(0)
+  const handleHorizontalScroll: React.UIEventHandler = (event) => {
+    setScrollLeft(event.currentTarget.scrollLeft)
+    setIsScrolling(true)
+  }
+  const isCommandViewVisible = scrollLeft <= HALF_SCREEN_WIDTH_PX
+  const isListViewVisible = scrollLeft > HALF_SCREEN_WIDTH_PX
+
   React.useEffect(() => {
-    if (
-      currentOption === 'CurrentRunningProtocolCommand' &&
-      swipe.swipeType === 'swipe-left'
-    ) {
-      setCurrentOption('RunningProtocolCommandList')
-      swipe.setSwipeType('')
+    if (isScrolling) {
+      const timer = setTimeout(() => {
+        setIsScrolling(false)
+      }, SCROLL_DEBOUNCE_MS)
+      return () => clearTimeout(timer)
+    } else {
+      if (listViewRef.current != null && scrollLeft > HALF_SCREEN_WIDTH_PX) {
+        listViewRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+      }
+      else if (commandViewRef.current != null && scrollLeft <= HALF_SCREEN_WIDTH_PX) {
+        commandViewRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+      }
     }
 
-    if (
-      currentOption === 'RunningProtocolCommandList' &&
-      swipe.swipeType === 'swipe-right'
-    ) {
-      setCurrentOption('CurrentRunningProtocolCommand')
-      swipe.setSwipeType('')
-    }
-  }, [currentOption, swipe, swipe.setSwipeType])
+  }, [isScrolling])
 
   return (
-    <>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      position={POSITION_RELATIVE}
+      overflow={OVERFLOW_HIDDEN}
+    >
+      {robotSideAnalysis != null ? (
+        <StepMeter
+          totalSteps={totalIndex != null ? totalIndex : 0}
+          currentStep={
+            currentRunCommandIndex != null
+              ? Number(currentRunCommandIndex) + 1
+              : 1
+          }
+        />
+      ) : null}
+      {showConfirmCancelRunModal ? (
+        <ConfirmCancelRunModal
+          runId={runId}
+          setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
+          isActiveRun={true}
+        />
+      ) : null}
       <Flex
+        padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
         flexDirection={DIRECTION_COLUMN}
-        position={POSITION_RELATIVE}
-        overflow={OVERFLOW_HIDDEN}
       >
-        {robotSideAnalysis != null ? (
-          <StepMeter
-            totalSteps={totalIndex != null ? totalIndex : 0}
-            currentStep={
-              currentRunCommandIndex != null
-                ? Number(currentRunCommandIndex) + 1
-                : 1
-            }
-          />
-        ) : null}
-        {showConfirmCancelRunModal ? (
-          <ConfirmCancelRunModal
-            runId={runId}
-            setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
-            isActiveRun={true}
-          />
-        ) : null}
-        <Flex
-          ref={swipe.ref}
-          padding={`1.75rem ${SPACING.spacing40} ${SPACING.spacing40}`}
-          flexDirection={DIRECTION_COLUMN}
+        <CarouselWrapper
+          ref={horizontalScrollContainerRef}
+          onScroll={handleHorizontalScroll}
         >
           {robotSideAnalysis != null ? (
-            currentOption === 'CurrentRunningProtocolCommand' ? (
-              <CurrentRunningProtocolCommand
-                playRun={playRun}
-                pauseRun={pauseRun}
-                setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
-                trackProtocolRunEvent={trackProtocolRunEvent}
-                robotAnalyticsData={robotAnalyticsData}
-                protocolName={protocolName}
-                runStatus={runStatus}
-                currentRunCommandIndex={currentRunCommandIndex}
-                robotSideAnalysis={robotSideAnalysis}
-                runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
-              />
-            ) : (
-              <RunningProtocolCommandList
-                protocolName={protocolName}
-                runStatus={runStatus}
-                playRun={playRun}
-                pauseRun={pauseRun}
-                setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
-                trackProtocolRunEvent={trackProtocolRunEvent}
-                robotAnalyticsData={robotAnalyticsData}
-                currentRunCommandIndex={currentRunCommandIndex}
-                robotSideAnalysis={robotSideAnalysis}
-              />
-            )
+            <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing80} marginX={SPACING.spacing40}>
+              <Box ref={listViewRef} width="944px" height="100%">
+                <CurrentRunningProtocolCommand
+                  playRun={playRun}
+                  pauseRun={pauseRun}
+                  setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
+                  trackProtocolRunEvent={trackProtocolRunEvent}
+                  robotAnalyticsData={robotAnalyticsData}
+                  protocolName={protocolName}
+                  runStatus={runStatus}
+                  currentRunCommandIndex={currentRunCommandIndex}
+                  robotSideAnalysis={robotSideAnalysis}
+                  runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
+                />
+              </Box>
+              <Box ref={commandViewRef} width="944px" height="100%">
+                <RunningProtocolCommandList
+                  protocolName={protocolName}
+                  runStatus={runStatus}
+                  playRun={playRun}
+                  pauseRun={pauseRun}
+                  setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
+                  trackProtocolRunEvent={trackProtocolRunEvent}
+                  robotAnalyticsData={robotAnalyticsData}
+                  currentRunCommandIndex={currentRunCommandIndex}
+                  robotSideAnalysis={robotSideAnalysis}
+                />
+              </Box>
+            </Flex>
           ) : (
-            <RunningProtocolSkeleton currentOption={currentOption} />
+            <RunningProtocolSkeleton />
           )}
-          <Flex
-            marginTop="2rem"
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing16}
-            justifyContent={JUSTIFY_CENTER}
-            alignItems={ALIGN_CENTER}
-          >
-            <Bullet
-              isActive={currentOption === 'CurrentRunningProtocolCommand'}
-            />
-            <Bullet isActive={currentOption === 'RunningProtocolCommandList'} />
-          </Flex>
+        </CarouselWrapper>
+        <Flex
+          marginTop="2rem"
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing16}
+          justifyContent={JUSTIFY_CENTER}
+          alignItems={ALIGN_CENTER}
+        >
+          <Bullet isActive={isCommandViewVisible} onClick={() => {
+            if (listViewRef.current != null) {
+              listViewRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+            }
+          }} />
+          <Bullet isActive={isListViewVisible}
+            onClick={() => {
+              if (commandViewRef.current != null) {
+                commandViewRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+              }
+            }}
+          />
         </Flex>
       </Flex>
-      {/* temporary */}
-      <Flex
-        alignSelf={ALIGN_FLEX_END}
-        marginTop={SPACING.spacing24}
-        width="fit-content"
-        paddingRight={SPACING.spacing32}
-      >
-        <Link to="/dashboard">
-          <TertiaryButton>back to RobotDashboard</TertiaryButton>
-        </Link>
-      </Flex>
-    </>
+    </Flex >
   )
 }
+
+const CarouselWrapper = styled.div`
+  display: flex;
+  flex-direction: ${DIRECTION_ROW};
+  align-items: ${ALIGN_FLEX_START};
+  margin-right: -${SPACING.spacing40};
+  margin-left: -${SPACING.spacing40};
+  overflow-x: scroll;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+`
