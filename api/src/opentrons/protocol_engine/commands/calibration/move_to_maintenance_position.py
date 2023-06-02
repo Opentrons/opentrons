@@ -9,14 +9,13 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from opentrons.types import MountType, Point
-from opentrons.hardware_control.types import CriticalPoint, OT3Axis
+from opentrons.hardware_control.types import OT3Axis
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
 )
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-from opentrons.hardware_control.ot3api import OT3API
 
 if TYPE_CHECKING:
     from opentrons.hardware_control import HardwareControlAPI
@@ -26,9 +25,9 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 # These offsets supplied from HW
-_ATTACH_POINT = Point(x=0, y=144)
+_ATTACH_POINT = Point(x=0, y=100)
 _INSTRUMENT_ATTACH_Z_POINT = 400.0
-_PLATE_ATTACH_Z_POINT = 270
+_PLATE_ATTACH_Z_POINT = 140
 
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
@@ -87,18 +86,24 @@ class MoveToMaintenancePositionImplementation(
             # NOTE(bc, 2023-05-10): this is a direct diagonal movement, an arc movement would be safer
             await ot3_api.move_axes(
                 {
-                    OT3Axis.Y: _ATTACH_OFFSET.y,
-                    OT3Axis.X: _ATTACH_OFFSET.x,
-                    mount_to_axis: _INSTRUMENT_ATTACH_Z_OFFSET,
+                    OT3Axis.Y: _ATTACH_POINT.y,
+                    OT3Axis.X: _ATTACH_POINT.x,
+                    mount_to_axis: _INSTRUMENT_ATTACH_Z_POINT,
                 }
             )
         else:
             await ot3_api.move_axes(
                 {
-                    OT3Axis.Y: _ATTACH_OFFSET.y,
-                    OT3Axis.X: _ATTACH_OFFSET.x,
-                    OT3Axis.Z_L: _PLATE_ATTACH_Z_OFFSET,
-                    OT3Axis.Z_R: _PLATE_ATTACH_Z_OFFSET,
+                    OT3Axis.Y: _ATTACH_POINT.y,
+                    OT3Axis.X: _ATTACH_POINT.x,
+                    OT3Axis.Z_L: _PLATE_ATTACH_Z_POINT,
+                }
+            )
+            await ot3_api.move_axes(
+                {
+                    OT3Axis.Y: _ATTACH_POINT.y,
+                    OT3Axis.X: _ATTACH_POINT.x,
+                    OT3Axis.Z_R: _PLATE_ATTACH_Z_POINT,
                 }
             )
 

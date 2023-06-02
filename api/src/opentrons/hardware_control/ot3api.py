@@ -822,22 +822,6 @@ class OT3API(
         if refresh:
             await self.refresh_positions()
 
-        mod_log.info(f"self._backend._motor_status {self._backend._motor_status}")
-        # axes_to_validate = [
-        #     key
-        #     for key, value in self._current_position.items()
-        #     if key not in [OT3Axis.G, OT3Axis.P_L, OT3Axis.P_R]
-        # ]
-        #
-        # if not self._backend.check_encoder_status(axes_to_validate):
-        #     await self.home()
-        #
-        # valid = self._backend.check_motor_status(axes_to_validate)
-        #
-        # valid_motor = self._current_position and valid
-        # if not valid_motor:
-        #     raise MustHomeError("Current position is invalid; please home motors.")
-
         return self._current_position
 
     async def refresh_positions(self) -> None:
