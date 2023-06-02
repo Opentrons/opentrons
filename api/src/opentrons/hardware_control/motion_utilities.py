@@ -330,7 +330,7 @@ def machine_from_deck(
         }
     except KeyError:
         raise ValueError(
-            "Moves must specify either exactly an " "x, y, and (z or a) or none of them"
+            "Moves must specify either exactly an x, y, and (z or a) or none of them"
         )
 
     # Pre-fill the dict we’ll send to the backend with the axes we don’t
