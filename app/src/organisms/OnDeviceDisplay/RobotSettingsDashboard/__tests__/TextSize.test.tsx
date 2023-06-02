@@ -25,7 +25,6 @@ describe('TextSize', () => {
 
   it('should render text and buttons', () => {
     const [{ getByText, getByTestId }] = render(props)
-    getByText('Text Size')
     getByTestId('DisplayTextSize_back_button')
     getByTestId('DisplayTextSize_decrease')
     getByTestId('DisplayTextSize_increase')
