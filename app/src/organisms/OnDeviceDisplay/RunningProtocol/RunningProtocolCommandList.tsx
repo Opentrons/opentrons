@@ -141,7 +141,7 @@ export function RunningProtocolCommandList({
           <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
         </Flex>
         <Flex height="100%" gridGap="1.5rem" alignItems={ALIGN_CENTER}>
-          <StopButton onStop={onStop} buttonSize="6.26rem" iconSize="5rem" />
+          <StopButton onStop={onStop} buttonSize="6.26rem" iconSize="2.5rem" />
           <PlayPauseButton
             onTogglePlayPause={onTogglePlayPause}
             buttonSize="6.25rem"
