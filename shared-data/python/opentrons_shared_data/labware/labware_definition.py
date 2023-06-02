@@ -223,7 +223,7 @@ class Metadata1(BaseModel):
 
 class Group(BaseModel):
     wells: List[str] = Field(
-        ..., description="An array of wells that contain the same metadata", min_items=1
+        ..., description="An array of wells that contain the same metadata"
     )
     metadata: Metadata1 = Field(
         ..., description="Metadata specific to a grid of wells in a labware"
