@@ -1156,7 +1156,7 @@ async def test_move_to_plunger_bottom(
     # tip attached, moving UP towards "bottom" position
     # NOTE: _move() is mocked, so we need to update the OT3API's
     #       cached coordinates in the test
-    pip_ax = OT3Axis.by_mount(mount)
+    pip_ax = OT3Axis.of_main_tool_actuator(mount)
     ot3_hardware._current_position[pip_ax] = target_pos[pip_ax] + 1
     mock_move.reset_mock()
     await ot3_hardware.prepare_for_aspirate(mount)
