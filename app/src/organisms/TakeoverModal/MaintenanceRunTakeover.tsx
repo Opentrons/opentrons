@@ -27,16 +27,21 @@ export function MaintenanceRunTakeover(
   ] = React.useState<boolean>(false)
 
   const { deleteMaintenanceRun, status } = useDeleteMaintenanceRunMutation()
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   const handleCloseAndTerminate = (): void => {
     if (maintenanceRunId != null) {
-      deleteMaintenanceRun(maintenanceRunId, {
-        onSuccess: () => {
-          if (status === 'success') setShowConfirmTerminateModal(false)
-        },
-      })
+      setIsLoading(true)
+      deleteMaintenanceRun(maintenanceRunId)
     }
   }
+
+  React.useEffect(() => {
+    if (maintenanceRunId == null && status === 'idle') {
+      setIsLoading(false)
+      setShowConfirmTerminateModal(false)
+    }
+  }, [maintenanceRunId, status])
 
   return (
     <TakeoverModalContext.Provider
@@ -50,7 +55,7 @@ export function MaintenanceRunTakeover(
           confirmTerminate={handleCloseAndTerminate}
           showConfirmTerminateModal={showConfirmTerminateModal}
           setShowConfirmTerminateModal={setShowConfirmTerminateModal}
-          terminateInProgress={status !== 'idle'}
+          terminateInProgress={isLoading}
         />
       )}
       {props.children}
