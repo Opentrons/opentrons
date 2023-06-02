@@ -14,6 +14,7 @@ from hardware_testing import data
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
 
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.drivers import mitutoyo_digimatic_indicator as dial
 
@@ -142,18 +143,43 @@ async def jog(api, position, cp):
 
 STALL_THRESHOLD = 0.25
 CYCLES = 25
+DEFAULT_CURRENT = 1.0
+DEFAULT_SPEED = 45
 
-async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
+async def _plunger_alignment(api: OT3API, mount: OT3Mount) -> bool:
+    print("Checking alignment...\n")
+    pipette_ax = types.OT3Axis.of_main_tool_actuator(mount)
+    current_pos = await api.current_position_ot3(mount, refresh=True)
+    est = current_pos[pipette_ax]
+    encoder_pos = await api.encoder_current_position_ot3(mount, refresh=True)
+    enc = encoder_pos[pipette_ax]
+    stalled_mm = est - enc
+    if abs(stalled_mm) < STALL_THRESHOLD:
+        print(f"=== ALIGNED: {round(stalled_mm, 2)} mm ===\n\t>> est: {est}\n\t>> enc: {enc}\n")
+        return True
+    else:
+        print(f"=== STALLED: {round(stalled_mm, 2)} mm ===\n\t>> est: {est}\n\t>> enc: {enc}\n")
+        return False
+
+async def _plunger_stall(api: OT3API, mount: OT3Mount) -> None:
+    # print(f"=== STALLED ===\n")
+    pipette_ax = types.OT3Axis.of_main_tool_actuator(mount)
+    await api._update_position_estimation([pipette_ax])
+    current_pos = await api.current_position_ot3(mount, refresh=True)
+    encoder_pos = await api.encoder_current_position_ot3(mount, refresh=True)
+    print(f"Updated position:\n\t>> Current Position: {current_pos[pipette_ax]}\n\t>> Encoder Position: {encoder_pos[pipette_ax]}\n")
+
+async def _main(is_simulating: bool, mount: types.OT3Mount, speed: int, current: float) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
 
     test_pip = api.get_attached_instrument(mount)
     test_tag = test_pip['name']
-    test_robot = input("Enter robot ID:\n\t>> ")
+    test_robot = input("Enter robot ID/pipette ID:\n\t>> ")
 
     test_name = "pipette-plunger-stall-test"
     file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
 
-    header = ['Cycle', 'Test Robot', 'Test Pipette', 'Init Position Read (mm)', 'Stall Position Read (mm)', 'Difference (mm)', 'Encoder Value Before', 'Encoder Value After']
+    header = ['Cycle', 'Test Robot/Test Pipette', 'Pipette Model', 'Current (A)', 'Speed (mm/s)', 'Init Position Read (mm)', 'Stall Position Read (mm)', 'Difference (mm)', 'Encoder Value Before', 'Encoder Value After', 'Encoder Difference (mm)']
     header_str = data.convert_list_to_csv_line(header)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
@@ -164,68 +190,81 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     fixture_position = await jog(api, cur_pos, CriticalPoint.NOZZLE)
     top_pos, bottom_pos, _, drop_pos = helpers_ot3.get_plunger_positions_ot3(api, mount)
     pipette_ax = types.OT3Axis.of_main_tool_actuator(mount)
-    # await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_pos)
-    # ### Record measurement from dial indicator ###
-    # time.sleep(1)
-    # await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
-    # await api.move_rel(mount, delta=Point(z=10))
 
-    ### loop # of trials -->
-    for cycle in range(CYCLES):
-        print("Move to drop tip position\n")
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_pos)
-        time.sleep(1)
+    for trials in range(4):
+        for cycle in range(CYCLES):
+            print(f"\n=========== Cycle {cycle + 1}/{CYCLES} ===========\n")
+            print("Move to drop tip position\n")
+            await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_pos)
+            time.sleep(1)
 
-        init_reading = gauge.read()
-        init_encoder_pos = await api.encoder_current_position_ot3(mount, refresh=True)
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
-        await api.move_rel(mount, delta=Point(z=10))
+            print("Take initial reading\n")
+            init_reading = gauge.read()
+            init_encoder_pos = await api.encoder_current_position_ot3(mount, refresh=True)
+            print(f"\t>> Gauge read: {init_reading} mm, Encoder read: {init_encoder_pos[pipette_ax]} mm\n")
+            await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+            await api.move_rel(mount, delta=Point(z=10))
 
-        while(1):
-            print("Move to top plunger position\n")
-            await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos, motor_current=0.15, speed=90)
-            print("Move to bottom plunger position\n")
-            await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos, motor_current=0.15, speed=90)
+            print("=== ATTEMPT TO STALL PLUNGER ===\n")
+            count = 0
+            while(1):
 
-            # pipette_ax = types.OT3Axis.of_main_tool_actuator(mount)
-            current_pos = await api.current_position_ot3(mount, refresh=True)
-            est = current_pos[pipette_ax]
-            encoder_pos = await api.encoder_current_position_ot3(mount, refresh=True)
-            enc = encoder_pos[pipette_ax]
-            stalled_mm = est - enc
+                count += 1
+                print(f"COUNT: {count}\n")
 
-            if abs(stalled_mm) > STALL_THRESHOLD:
-                print(f"STALLED: {stalled_mm} mm\n")
-                await api._update_position_estimation([pipette_ax])
-                current_pos = await api.current_position_ot3(mount, refresh=True) ###
-                encoder_pos = await api.encoder_current_position_ot3(mount, refresh=True) ###
-                print(f"Updated position:\nCurrent Position: {current_pos}\nEncoder Position: {encoder_pos}\n") ###
-                break
+                print("Move to top plunger position\n")
+                await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos, motor_current=current, speed=speed)
+                if not await _plunger_alignment(api, mount):
+                    await _plunger_stall(api, mount)
+                    break
 
-        print("Move to dial indicator fixture\n")
-        await api.move_rel(mount, delta=Point(z=-10))
-        print("Move to drop tip position\n")
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_pos)
-        time.sleep(1)
+                print("Move to bottom plunger position\n")
+                await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos, motor_current=current, speed=speed)
+                if not await _plunger_alignment(api, mount):
+                    await _plunger_stall(api, mount)
+                    break
 
-        stall_reading = gauge.read()
-        stall_encoder_pos = await api.encoder_current_position_ot3(mount, refresh=True)
+                if count > 9:
+                    print("=== Unable to cause stall. Canceling script. ===\n")
+                    await api.home()
+                    sys.exit()
 
-        reading_diff = init_reading - stall_reading
+            print("Move to dial indicator fixture\n")
+            await api.move_rel(mount, delta=Point(z=-10))
+            print("Move to drop tip position\n")
+            await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_pos, motor_current=DEFAULT_CURRENT, speed=DEFAULT_SPEED)
+            time.sleep(1)
 
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+            print("Take stalled reading\n")
+            stall_reading = gauge.read()
+            stall_encoder_pos = await api.encoder_current_position_ot3(mount, refresh=True)
+            print(f"\t>> Gauge read: {stall_reading} mm, Encoder read: {stall_encoder_pos[pipette_ax]} mm\n")
 
-        if cycle > 0:
-            test_robot = ""
-            test_tag = ""
+            reading_diff = stall_reading - init_reading
+            print(f"\t>> Gauge read difference: {round(reading_diff, 2)} mm, Encoder read difference: {round(stall_encoder_pos[pipette_ax] - init_encoder_pos[pipette_ax], 2)} mm\n")
 
-        cycle_data = [cycle+1, test_robot, test_tag, init_reading, stall_reading, reading_diff, init_encoder_pos[pipette_ax], stall_encoder_pos[pipette_ax]]
-        cycle_data_str = data.convert_list_to_csv_line(cycle_data)
-        data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
-        # await api.move_rel(mount, delta=Point(z=10))
+            await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos, motor_current=DEFAULT_CURRENT, speed=DEFAULT_SPEED)
+
+            if cycle > 0:
+                test_robot = ""
+                test_tag = ""
+
+            cycle_data = [cycle+1, test_robot, test_tag, current, speed, init_reading, stall_reading, reading_diff, init_encoder_pos[pipette_ax], stall_encoder_pos[pipette_ax], stall_encoder_pos[pipette_ax] - init_encoder_pos[pipette_ax]]
+            cycle_data_str = data.convert_list_to_csv_line(cycle_data)
+            data.append_data_to_file(test_name=test_name, file_name=file_name, data=cycle_data_str)
+            await api.home_plunger(mount)
+
+        await api.home()
         await api.home_plunger(mount)
-        ### <-- end of 1 cycle
-
+        print(f"Moving to fixture: {fixture_position}\n")
+        if mount == OT3Mount.LEFT:
+            AXIS = OT3Axis.Z_L
+        else:
+            AXIS = OT3Axis.Z_R
+        home_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE)
+        await api.move_to(mount, Point(fixture_position[OT3Axis.X], fixture_position[OT3Axis.Y], home_pos[AXIS]))
+        await api.move_to(mount, Point(fixture_position[OT3Axis.X], fixture_position[OT3Axis.Y], fixture_position[AXIS]))
+    await api.home()
 
 
 if __name__ == "__main__":
@@ -241,10 +280,14 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--mod_port", type=str, required=False, default = "/dev/ttyUSB0")
+    parser.add_argument(
+        "--speed", type=int, required=False, default = 45) # 50
+    parser.add_argument(
+        "--current", type=float, required=False, default = 0.175)
     args = parser.parse_args()
     mount = mount_options[args.mount]
 
     gauge = dial.Mitutoyo_Digimatic_Indicator(port=args.mod_port)
     gauge.connect()
 
-    asyncio.run(_main(args.simulate, mount))
+    asyncio.run(_main(args.simulate, mount, args.speed, args.current))
