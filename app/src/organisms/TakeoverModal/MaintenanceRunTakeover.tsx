@@ -26,7 +26,11 @@ export function MaintenanceRunTakeover(
     setShowConfirmTerminateModal,
   ] = React.useState<boolean>(false)
 
-  const { deleteMaintenanceRun, status } = useDeleteMaintenanceRunMutation()
+  const {
+    deleteMaintenanceRun,
+    status,
+    reset,
+  } = useDeleteMaintenanceRunMutation()
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   const handleCloseAndTerminate = (): void => {
@@ -40,6 +44,7 @@ export function MaintenanceRunTakeover(
     if (maintenanceRunId == null && status === 'success') {
       setIsLoading(false)
       setShowConfirmTerminateModal(false)
+      reset()
     }
   }, [maintenanceRunId, status])
 
