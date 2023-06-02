@@ -40,8 +40,8 @@ describe('RobotSystemVersionModal', () => {
   })
   it('should render text and buttons', () => {
     const [{ getByText, getByRole }] = render(props)
-    getByText('Robot System Version mockVersion Available')
-    getByText('Updating the Opentrons Flex requires a restart')
+    getByText('Robot System Version mockVersion available')
+    getByText('Updating the robot system requires a restart')
     getByText('mockReleaseNote')
     getByRole('button', { name: 'Remind me later' })
     getByRole('button', { name: 'Update' })

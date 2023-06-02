@@ -3,31 +3,25 @@ import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
 import {
-  Flex,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Icon,
-  TYPOGRAPHY,
-  PrimaryButton,
-  SecondaryButton,
-  ALIGN_CENTER,
-  COLORS,
+  Flex,
+  OVERFLOW_SCROLL,
   SPACING,
-  BORDERS,
 } from '@opentrons/components'
 
-import { Modal } from '../../../molecules/Modal'
+import { SmallButton } from '../../../atoms/buttons'
+import { InlineNotification } from '../../../atoms/InlineNotification'
 import { ReleaseNotes } from '../../../molecules/ReleaseNotes'
-import { StyledText } from '../../../atoms/text'
+import { Modal } from '../../../molecules/Modal/OnDeviceDisplay/Modal'
+
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
 
 interface RobotSystemVersionModalProps {
   version: string
   releaseNotes: string
   setShowModal: (showModal: boolean) => void
 }
-
-// ToDo (kj:02/24/2023) We will need to decide to create or extend the existing modal for the ODD
-// Current modal's design is different from the ODD's one.
 
 export function RobotSystemVersionModal({
   version,
@@ -37,68 +31,47 @@ export function RobotSystemVersionModal({
   const { t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
 
+  const modalHeader: ModalHeaderBaseProps = {
+    title: t('robot_system_version_available', {
+      releaseVersion: version,
+    }),
+  }
+
   return (
-    <Flex padding={SPACING.spacing40}>
-      <Modal
-        title={t('robot_system_version_available', {
-          releaseVersion: version,
-        })}
-        type="warning"
-        width="59rem"
-        height="32.5rem"
-        // Note (kj:02/24/2023) ModalShell uses marginLeft to centralize modal body because of the desktop nav
-        // If we utilize the existing modal for the ODD, we will need to pass a boolean for that adjustment
-        marginLeft="1.5rem"
+    <Modal header={modalHeader} modalSize="large">
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing32}
+        width="100%"
       >
-        <Flex flexDirection={DIRECTION_COLUMN}>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            alignItems={ALIGN_CENTER}
-            paddingX={SPACING.spacing16}
-            paddingY={SPACING.spacing24}
-            backgroundColor={COLORS.light2}
-            borderRadius={BORDERS.borderRadiusSize3}
-            marginY={SPACING.spacing24}
-          >
-            <Icon
-              size="1.5rem"
-              name="information"
-              color={COLORS.darkGreyEnabled}
-            />
-            <StyledText
-              fontSize="1.375rem"
-              lineHeight="2rem"
-              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >
-              {t('updating_ot3')}
-            </StyledText>
-          </Flex>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing24}
+          overflow={OVERFLOW_SCROLL}
+        >
+          <InlineNotification
+            type="neutral"
+            heading={t('updating_robot_system')}
+            hug
+          />
+          {/* </Flex> */}
           <ReleaseNotes source={releaseNotes} />
         </Flex>
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing12}>
-          <SecondaryButton
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
+          <SmallButton
             flex="1"
             onClick={() => setShowModal(false)}
-            fontSize="1.5rem"
-            lineHeight="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            height="4.375rem"
-          >
-            {t('remind_me_later')}
-          </SecondaryButton>
-
-          <PrimaryButton
+            buttonText={t('not_now')}
+            buttonType="secondary"
+          />
+          <SmallButton
             flex="1"
             onClick={() => history.push('/robot-settings/update-robot')}
-            fontSize="1.5rem"
-            lineHeight="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            height="4.375rem"
-          >
-            {t('shared:update')}
-          </PrimaryButton>
+            buttonText={t('shared:update')}
+            buttonType="primary"
+          />
         </Flex>
-      </Modal>
-    </Flex>
+      </Flex>
+    </Modal>
   )
 }
