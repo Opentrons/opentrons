@@ -51,12 +51,13 @@ async def run(args: argparse.Namespace) -> None:
     with open(args.dict) as fp:
         update_dict = json.load(fp)
     update_details: Dict[FirmwareTarget, str] = dict()
-    for name, filepath in update_dict.items():
+    for name, filepath in update_dict["subsystems"].items():
         try:
             name = name.replace("-", "_")
             target: FirmwareTarget = (
                 NodeId[name] if name in NodeId.__members__ else USBTarget[name]
             )
+            print(target)
             update_details[target] = filepath
         except KeyError:
             logger.warning(f"Invalid target {name}")
