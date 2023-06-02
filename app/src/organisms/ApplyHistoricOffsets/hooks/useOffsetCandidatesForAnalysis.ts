@@ -3,6 +3,7 @@ import {
   getLabwareDisplayName,
   IDENTITY_VECTOR,
   getLoadedLabwareDefinitionsByUri,
+  CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
 import { useAllHistoricOffsets } from './useAllHistoricOffsets'
 import { getLabwareLocationCombos } from './getLabwareLocationCombos'
@@ -14,8 +15,8 @@ export interface OffsetCandidate extends LabwareOffset {
   labwareDisplayName: string
 }
 export function useOffsetCandidatesForAnalysis(
-  analysisOutput: ProtocolAnalysisOutput | null,
-  robotIp: string | null
+  analysisOutput: ProtocolAnalysisOutput | CompletedProtocolAnalysis | null,
+  robotIp?: string | null
 ): OffsetCandidate[] {
   const allHistoricOffsets = useAllHistoricOffsets(
     robotIp != null ? { hostname: robotIp } : null
