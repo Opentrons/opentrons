@@ -110,6 +110,8 @@ interface CurrentRunningProtocolCommandProps {
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   trackProtocolRunEvent: TrackProtocolRunEvent
   robotAnalyticsData: RobotAnalyticsData | null
+  lastAnimatedCommand: string | null
+  updateLastAnimatedCommand: (newCommandKey: string) => void
   protocolName?: string
   currentRunCommandIndex?: number
 }
@@ -125,6 +127,8 @@ export function CurrentRunningProtocolCommand({
   robotAnalyticsData,
   protocolName,
   currentRunCommandIndex,
+  lastAnimatedCommand,
+  updateLastAnimatedCommand,
 }: CurrentRunningProtocolCommandProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const currentCommand = robotSideAnalysis?.commands.find(
@@ -132,16 +136,15 @@ export function CurrentRunningProtocolCommand({
   )
 
   let shouldAnimate = true
-  const lastAnimatedCommand = sessionStorage.getItem('lastAnimatedCommand')
   if (currentCommand?.key != null) {
     if (lastAnimatedCommand == null) {
-      sessionStorage.setItem('lastAnimatedCommand', currentCommand.key)
+      updateLastAnimatedCommand(currentCommand.key)
       shouldAnimate = true
     } else if (lastAnimatedCommand === currentCommand.key) {
       shouldAnimate = false
     } else {
       shouldAnimate = true
-      sessionStorage.setItem('lastAnimatedCommand', currentCommand.key)
+      updateLastAnimatedCommand(currentCommand.key)
     }
   }
   const currentRunStatus = t(`status_${runStatus}`)
