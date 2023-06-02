@@ -198,7 +198,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=10,
+                        leading_air_gap=5,
                         trailing_air_gap=5,
                     ),
                 ),
