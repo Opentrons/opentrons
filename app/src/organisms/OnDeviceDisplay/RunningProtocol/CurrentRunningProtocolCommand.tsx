@@ -67,7 +67,7 @@ const RUN_TIMER_STYLE = css`
   color: ${COLORS.darkBlackEnabled};
 `
 
-const COMMAND_ROW_STYLE = css`
+const COMMAND_ROW_STYLE_ANIMATED = css`
   font-size: 1.375rem;
   line-height: 1.75rem;
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
@@ -76,6 +76,16 @@ const COMMAND_ROW_STYLE = css`
   -webkit-line-clamp: 2;
   overflow: hidden;
   animation: ${fadeIn} 1.5s ease-in-out;
+`
+
+const COMMAND_ROW_STYLE = css`
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 `
 
 interface RunTimerInfo {
@@ -114,6 +124,20 @@ export function CurrentRunningProtocolCommand({
   const currentCommand = robotSideAnalysis?.commands.find(
     (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
   )
+
+  let shouldAnimate = true
+  const lastAnimatedCommand = sessionStorage.getItem('lastAnimatedCommand')
+  if (currentCommand?.key != null) {
+    if (lastAnimatedCommand == null) {
+      sessionStorage.setItem('lastAnimatedCommand', currentCommand.key)
+      shouldAnimate = true
+    } else if (lastAnimatedCommand === currentCommand.key) {
+      shouldAnimate = false
+    } else {
+      shouldAnimate = true
+      sessionStorage.setItem('lastAnimatedCommand', currentCommand.key)
+    }
+  }
   const currentRunStatus = t(`status_${runStatus}`)
 
   const onStop = (): void => {
@@ -185,7 +209,7 @@ export function CurrentRunningProtocolCommand({
         backgroundColor={COLORS.mediumBlueEnabled}
         borderRadius={BORDERS.borderRadiusSize2}
         justifyContent={JUSTIFY_CENTER}
-        css={COMMAND_ROW_STYLE}
+        css={shouldAnimate ? COMMAND_ROW_STYLE_ANIMATED : COMMAND_ROW_STYLE}
       >
         {robotSideAnalysis != null && currentCommand != null ? (
           <CommandText
