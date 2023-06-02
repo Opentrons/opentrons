@@ -21,14 +21,13 @@ import {
   SelectAuthenticationType,
   SetWifiCred,
   WifiConnectionDetails,
-} from '../../organisms/OnDeviceDisplay/SetupNetwork'
+} from '../../organisms/NetworkSettings'
 
+import type { WifiSecurityType } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
 import type { WifiNetwork } from '../../redux/networking/types'
 import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
-
-export type AuthType = 'wpa-psk' | 'none'
 
 const WIFI_LIST_POLL_MS = 5000
 
@@ -38,9 +37,10 @@ export function ConnectViaWifi(): JSX.Element {
     showSelectAuthenticationType,
     setShowSelectAuthenticationType,
   ] = React.useState<boolean>(false)
-  const [selectedAuthType, setSelectedAuthType] = React.useState<AuthType>(
-    'wpa-psk'
-  )
+  const [
+    selectedAuthType,
+    setSelectedAuthType,
+  ] = React.useState<WifiSecurityType>('wpa-psk')
   const [changeState, setChangeState] = React.useState<NetworkChangeState>({
     type: null,
   })
@@ -68,7 +68,6 @@ export function ConnectViaWifi(): JSX.Element {
       psk: password,
     }
     dispatchApiRequest(Networking.postWifiConfigure(robotName, options))
-    // Note: kj 1/18/2023 for join_other network , this will be required by a following PR
     if (changeState.type === JOIN_OTHER) {
       setChangeState({ type: changeState.type, ssid: options.ssid })
     }
@@ -83,6 +82,7 @@ export function ConnectViaWifi(): JSX.Element {
           setShowSelectAuthenticationType={setShowSelectAuthenticationType}
           setChangeState={setChangeState}
           setSelectedSsid={setSelectedSsid}
+          isHeader
         />
       )
     } else if (changeState.type === JOIN_OTHER && changeState.ssid === null) {
@@ -167,7 +167,7 @@ export function ConnectViaWifi(): JSX.Element {
         setChangeState({ type: CONNECT, ssid: selectedSsid, network })
       }
     }
-  }, [selectedSsid, selectedAuthType])
+  }, [selectedSsid, selectedAuthType, list])
 
   return (
     <>

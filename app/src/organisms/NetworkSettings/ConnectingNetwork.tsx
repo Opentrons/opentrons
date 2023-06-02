@@ -13,7 +13,7 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
+import { StyledText } from '../../atoms/text'
 
 interface ConnectingNetworkProps {
   ssid: string

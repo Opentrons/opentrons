@@ -198,6 +198,7 @@
   "searching_for_networks": "Searching for networks...",
   "searching": "Searching",
   "security_type": "Security Type",
+  "select_a_network": "Select a network",
   "select_a_security_type": "Select a security type",
   "select_authentication_method": "Select authentication method for your selected network.",
   "sending_software": "Sending software...",

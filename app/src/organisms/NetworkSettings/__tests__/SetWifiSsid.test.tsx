@@ -3,8 +3,8 @@ import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../../i18n'
-import { JOIN_OTHER } from '../../../Devices/RobotSettings/ConnectNetwork/constants'
+import { i18n } from '../../../i18n'
+import { JOIN_OTHER } from '../../Devices/RobotSettings/ConnectNetwork/constants'
 import { SetWifiSsid } from '../SetWifiSsid'
 
 const mockSetSelectedSsid = jest.fn()

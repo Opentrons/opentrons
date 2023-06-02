@@ -16,14 +16,14 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
-import { MediumButton } from '../../../atoms/buttons'
-import { getLocalRobot } from '../../../redux/discovery'
-import { getNetworkInterfaces } from '../../../redux/networking'
-import { NetworkDetailsModal } from '../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
+import { StyledText } from '../../atoms/text'
+import { MediumButton } from '../../atoms/buttons'
+import { getLocalRobot } from '../../redux/discovery'
+import { getNetworkInterfaces } from '../../redux/networking'
+import { NetworkDetailsModal } from '../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { State } from '../../../redux/types'
+import type { State } from '../../redux/types'
 
 interface WifiConnectionDetailsProps {
   ssid?: string
