@@ -113,21 +113,13 @@ class NetworkInfo:
         expected_can: Optional[Set[NodeId]] = None
         expected_usb: Optional[Set[USBTarget]] = None
         if expected is not None:
-            expected_can = {NodeId(target) for target in expected if target in NodeId}
-            expected_usb = {
-                USBTarget(target) for target in expected if target in USBTarget
-            }
+            expected_can, expected_usb = self._split_devices(expected)
+
         can_device_info, usb_device_info = await asyncio.gather(
             self._can_network_info.probe(expected_can, timeout),
             self._usb_network_info.probe(expected_usb, timeout),
         )
-        device_info: Dict[FirmwareTarget, DeviceInfoCache] = {
-            node: cache for (node, cache) in can_device_info.items()
-        }
-        device_info.update(
-            {target: cache for (target, cache) in usb_device_info.items()}
-        )
-        return device_info
+        return self._fuse_info(can_device_info, usb_device_info)
 
     async def probe_specific(
         self, devices: Set[FirmwareTarget], timeout: float = 1.0
@@ -138,23 +130,40 @@ class NetworkInfo:
         getting a general assessment of what's present. It will also update the internal cache
         of device state for what it finds, but only for the devices in the argument.
         """
-        can_devs: Set[NodeId] = {
-            NodeId(target) for target in devices if target in NodeId
-        }
-        usb_devs: Set[USBTarget] = {
-            USBTarget(target) for target in devices if target in USBTarget
-        }
+        can_devs, usb_devs = self._split_devices(devices)
         can_device_info, usb_device_info = await asyncio.gather(
             self._can_network_info.probe_specific(can_devs, timeout),
             self._usb_network_info.probe_specific(usb_devs, timeout),
         )
+        return self._fuse_info(can_device_info, usb_device_info)
+
+    def mark_absent(
+        self, devices: Set[FirmwareTarget]
+    ) -> Dict[FirmwareTarget, DeviceInfoCache]:
+        """Mark the specified devices as absent. Best used in combination with probe_specific."""
+        can_devices, usb_devices = self._split_devices(devices)
+        can_info = self._can_network_info.mark_absent(can_devices)
+        usb_info = self._usb_network_info.mark_absent(usb_devices)
+        return self._fuse_info(can_info, usb_info)
+
+    @staticmethod
+    def _fuse_info(
+        can_info: Dict[NodeId, DeviceInfoCache],
+        usb_info: Dict[USBTarget, DeviceInfoCache],
+    ) -> Dict[FirmwareTarget, DeviceInfoCache]:
         device_info: Dict[FirmwareTarget, DeviceInfoCache] = {
-            node: cache for (node, cache) in can_device_info.items()
+            node: cache for (node, cache) in can_info.items()
         }
-        device_info.update(
-            {target: cache for (target, cache) in usb_device_info.items()}
-        )
+        device_info.update({target: cache for (target, cache) in usb_info.items()})
         return device_info
+
+    @staticmethod
+    def _split_devices(
+        devices: Set[FirmwareTarget],
+    ) -> Tuple[Set[NodeId], Set[USBTarget]]:
+        return {NodeId(target) for target in devices if target in NodeId}, {
+            USBTarget(target) for target in devices if target in USBTarget
+        }
 
 
 class UsbNetworkInfo:
@@ -295,6 +304,12 @@ class UsbNetworkInfo:
             self._device_info_cache = targets
         return targets
 
+    def mark_absent(self, devices: Set[USBTarget]) -> Dict[USBTarget, DeviceInfoCache]:
+        """Mark the specified devices as absent. Best used in combination with probe_specific."""
+        for device in devices:
+            self._device_info_cache.pop(device, None)
+        return self._device_info_cache
+
 
 class CanNetworkInfo:
     """This class is responsible for keeping track of nodes on the can bus."""
@@ -349,9 +364,6 @@ class CanNetworkInfo:
             nodes[
                 NodeId(device_info_cache.target).application_for()
             ] = device_info_cache
-            log.info(
-                f"Info response from {NodeId(arbitration_id.parts.originating_node_id).name}: {device_info_cache}"
-            )
             if expected_nodes and expected_nodes.issubset(
                 {node.application_for() for node in nodes}
             ):
@@ -430,6 +442,12 @@ class CanNetworkInfo:
                 else:
                     self._device_info_cache.pop(target, None)
         return nodes
+
+    def mark_absent(self, devices: Set[NodeId]) -> Dict[NodeId, DeviceInfoCache]:
+        """Mark the specified devices as absent. Best used in combination with probe_specific."""
+        for device in devices:
+            self._device_info_cache.pop(device.application_for(), None)
+        return self._device_info_cache
 
 
 def _parse_usb_device_info_response(

@@ -176,6 +176,35 @@ class SubsystemManager:
                 raise state
             return self._tool_task_state is True
 
+    async def _check_devices_after_update(
+        self, devices: Set[SubSystem], timeout_sec: float = 10.0
+    ) -> None:
+        try:
+            await asyncio.wait_for(
+                self._do_check_devices_after_update(devices), timeout=timeout_sec
+            )
+        except asyncio.TimeoutError:
+            raise RuntimeError("Device failed to come back after firmware update")
+
+    async def _do_check_devices_after_update(self, devices: Set[SubSystem]) -> None:
+        # refresh the device_info cache and reset internal states
+        log.info(f"Checking {devices} after update")
+        attempts = 1
+        while True:
+            await self._probe_network_and_cache_fw_updates(
+                {subsystem_to_target(subsystem) for subsystem in devices},
+                False,
+            )
+            # make sure the update actually succeeded
+            device_info = self.device_info
+            if devices.issubset(device_info.keys()) and all(
+                info.ok for subsys, info in device_info.items() if subsys in devices
+            ):
+                log.info(f"Found all devices after {attempts} tries")
+                return
+            log.info(f"Failed to find all of {devices}: found {device_info}")
+            attempts += 1
+
     def get_update_progress(self) -> Dict[SubSystem, UpdateStatus]:
         """Returns a set of UpdateStatus of the updates."""
         return {k: v for k, v in self._updates_ongoing.items()}
@@ -250,17 +279,8 @@ class SubsystemManager:
                 )
                 status_callbacks[subsystem](upstream_status)
                 yield upstream_status
-        # refresh the device_info cache and reset internal states
-        await self._probe_network_and_cache_fw_updates(
-            {subsystem_to_target(subsystem) for subsystem in updating_subsystems}, False
-        )
-        # make sure the update actually succeeded
-        device_info = self.device_info
-        for subsystem in updating_subsystems:
-            if subsystem not in device_info or not device_info[subsystem].ok:
-                raise RuntimeError(
-                    f"Update failed: {str(subsystem)} not present and ok after update"
-                )
+
+        await self._check_devices_after_update(updating_subsystems)
 
     def _get_required_fw_updates(
         self, targets: Set[FirmwareTarget], force: bool
@@ -364,8 +384,13 @@ class SubsystemManager:
                 tool_nodes.add(NodeId.pipette_right)
             if update.gripper != ToolType.nothing_attached:
                 tool_nodes.add(NodeId.gripper)
-            log.debug(f"Tool detect: update from head {update}, probing {tool_nodes}")
+            base_nodes: Set[FirmwareTarget] = {
+                NodeId.pipette_left,
+                NodeId.pipette_right,
+                NodeId.gripper,
+            }
             try:
+                self._network_info.mark_absent(base_nodes - tool_nodes)
                 await self._probe_network_and_cache_fw_updates(
                     self._expected_core_targets.union(tool_nodes), False
                 )
