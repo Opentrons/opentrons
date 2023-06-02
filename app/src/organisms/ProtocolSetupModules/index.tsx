@@ -15,7 +15,6 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
-  SIZE_2,
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
