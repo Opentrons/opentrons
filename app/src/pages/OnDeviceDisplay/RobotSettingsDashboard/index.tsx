@@ -118,12 +118,6 @@ export function RobotSettingsDashboard(): JSX.Element {
             iconName="brightness"
           />
           <RobotSettingButton
-            settingName={t('text_size')}
-            currentOption="TextSize"
-            setCurrentOption={setCurrentOption}
-            iconName="text-size"
-          />
-          <RobotSettingButton
             settingName={t('device_reset')}
             currentOption="DeviceReset"
             setCurrentOption={setCurrentOption}
