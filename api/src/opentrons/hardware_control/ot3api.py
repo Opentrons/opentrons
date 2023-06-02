@@ -1713,8 +1713,8 @@ class OT3API(
                     speed=move.speed,
                     home_flagged_axes=False,
                 )
-        if move.home_after:
-            await self._home([OT3Axis.from_axis(ax) for ax in move.home_axes])
+            if move.home_after:
+                await self._home([OT3Axis.from_axis(ax) for ax in move.home_axes])
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
