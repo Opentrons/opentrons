@@ -82,6 +82,7 @@ class DisplayCategory(str, Enum):
     trash = "trash"
     wellPlate = "wellPlate"
     aluminumBlock = "aluminumBlock"
+    adapter = "adapter"
     other = "other"
 
 
