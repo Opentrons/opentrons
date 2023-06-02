@@ -60,12 +60,12 @@ DESCRIPTION = (
 PACKAGES = find_packages(where="src")
 INSTALL_REQUIRES = [
     f"opentrons-shared-data=={VERSION}",
-    "aionotify==0.2.0",
-    "anyio==3.3.0",
-    "jsonschema==3.0.2",
+    "aionotify>=0.2.0,<1",
+    "anyio>=3.3.0,<4",
+    "jsonschema>=3.0.2,<5",
     "numpy>=1.15.1,<2",
-    "pydantic==1.8.2",
-    "pyserial==3.5",
+    "pydantic>=1.8.2,<2",
+    "pyserial>=3.5,<4",
     "typing-extensions>=4.0.0,<5",
     "click>=8.0.0,<9",
     'importlib-metadata >= 1.0 ; python_version < "3.8"',
