@@ -16,7 +16,7 @@ import {
   useLongPress,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
+import { StyledText } from '../../atoms/text'
 import { LongPressModal } from './LongPressModal'
 
 import type { UseLongPressResult } from '@opentrons/components'
@@ -29,8 +29,9 @@ export function PinnedProtocol(props: {
   longPress: React.Dispatch<React.SetStateAction<boolean>>
   cardSize?: CardSizeType
   lastRun?: string
+  setShowDeleteConfirmationModal: (showDeleteConfirmationModal: boolean) => void
 }): JSX.Element {
-  const { lastRun, protocol, longPress } = props
+  const { lastRun, protocol, longPress, setShowDeleteConfirmationModal } = props
   const cardSize = props.cardSize ?? 'full'
   const history = useHistory()
   const longpress = useLongPress()
@@ -126,7 +127,11 @@ export function PinnedProtocol(props: {
         </StyledText>
       </Flex>
       {longpress.isLongPressed === true && (
-        <LongPressModal longpress={longpress} protocolId={protocol.id} />
+        <LongPressModal
+          longpress={longpress}
+          protocolId={protocol.id}
+          setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
+        />
       )}
     </Flex>
   )

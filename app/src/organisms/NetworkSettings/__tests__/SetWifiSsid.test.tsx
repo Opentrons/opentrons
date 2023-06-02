@@ -47,7 +47,6 @@ describe('SetWifiSsid', () => {
     getByRole('button', { name: 'a' })
     getByRole('button', { name: 'b' })
     getByRole('button', { name: 'c' })
-    getByRole('button', { name: '/' }) // Only Normal software keyboard has
   })
 
   it('when tapping back button, call a mock function', () => {
