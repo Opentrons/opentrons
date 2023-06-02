@@ -87,7 +87,9 @@ describe('CheckItem', () => {
     const { getByText, getByRole } = render(props)
     getByRole('heading', { name: 'Prepare labware in slot D2' })
     getByText('Clear all deck slots of labware, leaving modules in place')
-    getByText(matchTextWithSpans('Place a Mock Labware Definition into slot D2'))
+    getByText(
+      matchTextWithSpans('Place a Mock Labware Definition into slot D2')
+    )
     getByRole('link', { name: 'Need help?' })
     getByRole('button', { name: 'Confirm placement' })
   })
