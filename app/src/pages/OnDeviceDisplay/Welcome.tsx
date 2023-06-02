@@ -43,7 +43,7 @@ export function Welcome(): JSX.Element {
           {t('welcome_description')}
         </StyledText>
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing28}>
+      <Flex justifyContent={JUSTIFY_CENTER} marginTop="1.75rem">
         <MediumButton
           buttonCategory="rounded"
           buttonText={t('shared:get_started')}
