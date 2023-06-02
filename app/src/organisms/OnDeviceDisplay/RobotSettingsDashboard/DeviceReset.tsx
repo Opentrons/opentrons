@@ -100,13 +100,13 @@ export function DeviceReset({
   }, [dispatch, robotName])
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32}>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex flexDirection={DIRECTION_ROW}>
           <Btn onClick={() => setCurrentOption(null)}>
-            <Icon name="chevron-left" size="2.5rem" />
+            <Icon name="back" size="3rem" />
           </Btn>
-          <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
+          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('device_reset')}
           </StyledText>
         </Flex>
