@@ -75,6 +75,14 @@ describe('CurrentRunningProtocolCommand', () => {
     expect(mockShowModal).toHaveBeenCalled()
   })
 
+  it('updates sessionStorage when the last animated command is not the current command', () => {
+    const [{ rerender }] = render(props)
+    expect(sessionStorage.getItem('lastAnimatedCommand')).toEqual('-113949561') // value pulled from mockRobotSideAnalysis fixture
+    sessionStorage.setItem('lastAnimatedCommand', 'a non matching key')
+    rerender(<CurrentRunningProtocolCommand {...props} />)
+    expect(sessionStorage.getItem('lastAnimatedCommand')).toEqual('-113949561')
+  })
+
   // ToDo (kj:04/10/2023) once we fix the track event stuff, we can implement tests
   it.todo('when tapping play button, track event mock function is called')
 })
