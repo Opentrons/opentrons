@@ -282,7 +282,8 @@ class MoveGroupRunner:
                 acceleration_um=Int32Field(
                     int(
                         (
-                            step.acceleration_mm_sec_sq * 1000.0
+                            step.acceleration_mm_sec_sq
+                            * 1000.0
                             / interrupts_per_sec
                             / interrupts_per_sec
                         )
