@@ -60,6 +60,7 @@ export function ProtocolWithLastRun({
   const protocolName = protocolData.metadata.protocolName ?? protocolData.files[0].name
 
   const PROTOCOL_CARD_STYLE = css`
+    flex: 1 0 0;
     &:active {
       background-color: ${isReadyToBeReRun
       ? COLORS.green3Pressed
