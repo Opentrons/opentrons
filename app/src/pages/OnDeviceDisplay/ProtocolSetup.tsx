@@ -243,10 +243,10 @@ function PrepareToRun({
       ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
       : []
 
-  const {
-    missingModuleIds,
-    remainingAttachedModules,
-  } = getUnmatchedModulesForProtocol(attachedModules, protocolModulesInfo)
+  const { missingModuleIds } = getUnmatchedModulesForProtocol(
+    attachedModules,
+    protocolModulesInfo
+  )
 
   const isMissingModules = missingModuleIds.length > 0
   const lpcDisabledReason = useLPCDisabledReason({
