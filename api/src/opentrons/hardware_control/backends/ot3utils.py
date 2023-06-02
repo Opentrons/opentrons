@@ -335,7 +335,7 @@ def create_home_group(
         velocity=node_id_velocities,
     )
     # halve the homing speed for backoff
-    backoff_velocities = {k: v / 2 for k, v in node_id_velocities.items()}
+    backoff_velocities = {k: v for k, v in node_id_velocities.items()}
     backoff = create_backoff_step(backoff_velocities)
 
     move_group: MoveGroup = [home, backoff]
