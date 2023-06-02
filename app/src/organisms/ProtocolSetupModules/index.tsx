@@ -129,7 +129,7 @@ function RowModule({
             iconName="connection-status"
           />
           {isDuplicateModuleModel ? (
-            <Icon name="information" size={SIZE_2} />
+            <Icon name="information" size="2rem" />
           ) : null}
         </Flex>
       )}
