@@ -228,16 +228,10 @@ async def calibrate_tip_racks(api, slot_loc):
             mount = types.OT3Mount.RIGHT
             AXIS = OT3Axis.Z_R
         print(mount)
-        xyz1 = (slot_loc[key])
-        print(xyz1)
-        await api.move_to(mount, Point(x=slot_loc[key][0], y=slot_loc[key][1], z=300.0))
-        input("3333")
-        await api.move_to(mount, Point(slot_loc[key][0], slot_loc[key][1], slot_loc[key][2]))
-        input("2")
+        await api.move_to(mount, Point(x=slot_loc[key][0], y=slot_loc[key][1], z=420.0))
+        await api.move_to(mount, Point(x=slot_loc[key][0], y=slot_loc[key][1], z=slot_loc[key][2]))
         cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE)
-        input("2")
         tip_rack_position = await jog(api, cur_pos, CriticalPoint.NOZZLE,mount)
-
         cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE)
         steplist = await jogste(api, cur_pos, CriticalPoint.NOZZLE,mount)
         calibrated_step[key] = steplist
@@ -270,7 +264,7 @@ def _reading(hardware):
             #print(hardware_read)
             endlen = hardware_read.rfind("\r")
             #print(endlen)
-            results = hardware_read[endlen-8:endlen]
+            results = hardware_read[endlen-9:endlen]
             datalist.append(results)
         if len(datalist) >= 2:
             if datalist[-1] == datalist[-2]:
@@ -313,18 +307,18 @@ async def _main(is_simulating: bool) -> None:
     #     print("input err")
 
     slot_loc = {
-        "A1": (13.42, 394.92, 200.00),
-        "A2": (177.32, 394.92, 200.00),
-        "A3": (341.03, 394.92, 200.00),
-        "B1": (13.42, 288.42, 200.00),
-        "B2": (177.32, 288.92, 200.00),
-        "B3": (341.03, 288.92, 200.00),
-        "C1": (13.42, 181.92, 200.00),
-        "C2": (177.32, 181.92, 200.00),
-        "C3": (341.03, 181.92, 200.00),
-        "D1": (13.42, 75.5, 200.00),
-        "D2": (177.32, 75.5, 200.00),
-        "D3": (341.03, 75.5, 200.00),
+        "A1": (13.42, 394.92, 400.15),
+        "A2": (177.32, 394.92, 400.15),
+        "A3": (341.03, 394.92, 400.15),
+        "B1": (13.42, 288.42, 400.15),
+        "B2": (177.32, 288.92, 400.15),
+        "B3": (341.03, 288.92, 400.15),
+        "C1": (13.42, 181.92, 400.15),
+        "C2": (217.32, 91.92, 400.15),
+        "C3": (341.03, 181.92, 400.15),
+        "D1": (13.42, 75.5, 400.15),
+        "D2": (177.32, 75.5, 400.15),
+        "D3": (341.03, 75.5, 400.15),
     }
 
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
@@ -363,9 +357,9 @@ async def _main(is_simulating: bool) -> None:
                 aa = False
     except:
         print("Enter slot number err")
-    mount = mount_options["left"]
-    await api.move_to(mount, Point(x=slot_loc[slot][0], y=slot_loc[slot][1], z=slot_loc[slot][2]))
-    input("312312312312")
+    # mount = mount_options["left"]
+    # await api.move_to(mount, Point(x=slot_loc[slot][0], y=slot_loc[slot][1], z=slot_loc[slot][2]))
+    # input("312312312312")
     #await api.move_to(mount, Point(slot_loc[slot][0], slot_loc[slot][1], slot_loc[slot][2]))
 
     l_r_loc = {
@@ -374,23 +368,8 @@ async def _main(is_simulating: bool) -> None:
 
     }
     print(l_r_loc)
-    input("1")
-    if(not args.load_cal):
-        calibrated_slot_loc,calibrated_step = await calibrate_tip_racks(api, l_r_loc)
-    else:
-        ### import calibrated json file
-        # path = '/home/root/.opentrons/testing_data/calibrated_slot_locations.json'
-        print("Loading calibration data...\n")
-        path = '/data/testing_data/calibrated_slot_locations.json'
-        if(os.path.exists(path)):
-            with open('/data/testing_data/calibrated_slot_locations.json', 'r') as openfile:
-                calibrated_slot_loc = json.load(openfile)
-        else:
-            print("Slot locations calibration file not found.\n")
-            calibrated_slot_loc,calibrated_step = await calibrate_tip_racks(api, l_r_loc)
-        print("Calibration data successfully loaded!\n")
-
-
+    calibrated_slot_loc,calibrated_step = await calibrate_tip_racks(api, l_r_loc)
+    
     #test_pip = api.get_attached_instrument(mount)
     test_name = "deck-test"
     file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_robot)
@@ -410,7 +389,7 @@ async def _main(is_simulating: bool) -> None:
     header_str = data.convert_list_to_csv_line(txtval)
 
     balance_block_xy = [117,87]
-    balance_block_xz = [117,37]
+    balance_block_xz = [117,15]
 
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
@@ -428,38 +407,40 @@ async def _main(is_simulating: bool) -> None:
 
     deck_dic={"OT3Mount.RIGHT":"Z to XY",
             "OT3Mount.LEFT":"Y to XZ"}
+    datalist = []
 
     try:
         cycle = 3
-        for keyv in l_r_loc: 
-            datalist = []
-            if keyv == "OT3Mount.LEFT":
-                mount = mount_options[keyv]
+        for keyv in l_r_loc.keys(): 
+            print("keyv",keyv)
+            if str(keyv) == "OT3Mount.LEFT":
+                mount = types.OT3Mount.LEFT
                 AXIS = OT3Axis.Z_L
                 await api.move_to(mount, Point(calibrated_slot_loc[keyv][0],
-                                calibrated_slot_loc[keyv][1]+3, calibrated_slot_loc[keyv][2]))
+                                calibrated_slot_loc[keyv][1]-4, calibrated_slot_loc[keyv][2]))
                 await api.move_rel(
-                                mount, Point(y=3)
+                                mount, Point(y=4)
                             )
                 distance_xz = round(balance_block_xz[1] / cycle,1)
 
                 hardewar = hardewar_l
                 steplist = calibrated_step[keyv]
-            elif keyv == "OT3Mount.RIGHT":
-                mount == mount_options[keyv]
+            elif str(keyv) == "OT3Mount.RIGHT":
+                mount = types.OT3Mount.RIGHT
                 AXIS = OT3Axis.Z_R
                 await api.move_to(mount, Point(calibrated_slot_loc[keyv][0],
-                                calibrated_slot_loc[keyv][1], calibrated_slot_loc[keyv][2]-3))
+                                calibrated_slot_loc[keyv][1], calibrated_slot_loc[keyv][2]+5))
                 await api.move_rel(
-                                mount, Point(z=3)
+                                mount, Point(z=-5)
                             )
                 distance_xy = round(balance_block_xy[1] / cycle,1)
                 hardewar = hardewar_R
                 steplist = calibrated_step[keyv]
             
             txtval = ["OT3 robot deck",deck_dic[keyv]]
-            header_str = data.convert_list_to_csv_line(txtval)
-            data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+            datalist.append(txtval)
+            #header_str = data.convert_list_to_csv_line(txtval)
+            #data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
             input("Please set the micrometer to zero,Press enter to start the test")
 
@@ -477,14 +458,17 @@ async def _main(is_simulating: bool) -> None:
                                 mount, Point(x=move), speed=steplist[1]
                             )
                     readval = _reading(hardewar)
+                    cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE)
+                    posi = "{0},{1},{2}".format(round(cur_pos[OT3Axis.X], 2),round(cur_pos[OT3Axis.Y], 2),round(cur_pos[OT3Axis.by_mount(mount)], 2))
                     print("testig=:::::{}".format(readval))
-                    txtval = [time.time(),readval]
+                    txtval = [posi,readval]
                     datalist.append(txtval)
 
                     
                     Toollength = Toollength - steplist[0]
                 else:
-                    
+                    if i >= 2:
+                        break
                     if mount == OT3Mount.LEFT:
                         await api.move_rel(
                                     mount, Point(z=-distance_xz), speed=steplist[1]
@@ -496,10 +480,10 @@ async def _main(is_simulating: bool) -> None:
             await api.home([AXIS])
     except Exception as err:
         print("test err {}".format(err))
-    finally:
-        for ii in datalist:
-            savedata = data.convert_list_to_csv_line(ii)
-            data.append_data_to_file(test_name=test_name, file_name=file_name, data=savedata)
+    
+    for ii in datalist:
+        savedata = data.convert_list_to_csv_line(ii)
+        data.append_data_to_file(test_name=test_name, file_name=file_name, data=savedata)
     await api.home()
 
 if __name__ == "__main__":
@@ -515,7 +499,7 @@ if __name__ == "__main__":
     )
     # parser.add_argument("--pick_up_num", type=int, default=20)
     # parser.add_argument("--tip_rack_num", type=int, default=12)
-    parser.add_argument("--load_cal", action="store_true")
+    #parser.add_argument("--load_cal", action="store_true")
     parser.add_argument("--test_tag", action="store_true")
     parser.add_argument("--test_robot", action="store_true")
     #parser.add_argument("--restart_flag", action="store_true")
