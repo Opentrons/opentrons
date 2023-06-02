@@ -69,21 +69,36 @@ def _parse_prop(prop_id: int, prop_len: int, data: bytes) -> Optional[Property]:
     return Property(id=prop, type=data_type, size=data_size, value=decoded_data)
 
 
-def serialize_properties(properties: Set[Property]) -> bytes:
-    """This function will turn a set of Property objects into a byte string."""
-    return b""
+def generate_packet(prop_id: PropId, value: Any) -> Optional[bytes]:
+    """This function will turn prop_ids and their data into a bytes for writting to eeprom."""
+    data = _encode_data(prop_id, value)
+    if data:
+        # PropId is included in the data length
+        packet = struct.pack("!BBB", DATA_START_DELIM, len(data) + 1, prop_id.value)
+        packet += data + struct.pack("!B", DATA_END_DELIM)
+        return packet
+    return None
 
 
-def generate_packet(properties: Tuple[PropId, Any]) -> bytes:
-    """This function will turn concert prop_ids and their data into a bytestring."""
-    data = b""
-    # for property, data in properties:
-    #    if prop
-    return data
-
-
-def _validate_packet(data: bytes) -> bytes:
-    return b""
+def _encode_data(prop_id: PropId, value: Any) -> Optional[bytes]:
+    data_type = PROP_ID_TYPES[prop_id]
+    data_size = PROP_TYPE_SIZE[data_type]
+    try:
+        if data_type == PropType.BYTE:
+            return struct.pack("!B", value)
+        elif data_type == PropType.CHAR:
+            return struct.pack("!B", ord(value))
+        elif data_type == PropType.SHORT:
+            return struct.pack("!h", value)
+        elif data_type == PropType.INT:
+            return struct.pack("!i", value)
+        elif data_type == PropType.STR:
+            return f"{value}".encode("utf-8")
+        elif data_type == PropType.BIN:
+            return bytes(value)
+    except (ValueError, TypeError):
+        pass
+    return None
 
 
 def _format_data(data: bytes) -> bytes:

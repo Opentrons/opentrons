@@ -10,7 +10,6 @@ from .types import (
     PropId,
     PropType,
     Property,
-    MachineType,
     EEPROMData,
 )
 
@@ -19,7 +18,6 @@ __all__ = [
     "PropId",
     "PropType",
     "Property",
-    "MachineType",
     "EEPROMData",
     "EEPROM",
     "DEFAULT_BUS",

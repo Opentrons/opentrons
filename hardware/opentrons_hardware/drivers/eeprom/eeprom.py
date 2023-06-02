@@ -10,12 +10,10 @@ from types import TracebackType
 from .types import (
     PropId,
     Property,
-    MachineType,
     EEPROMData,
 )
 from .utils import (
     parse_data,
-    serialize_properties,
     generate_packet,
 )
 
@@ -37,6 +35,13 @@ NOTES:
    ex.
       fe0201010d
       feff04..254...0d
+
+2. Need to deal with property_read incomplete packet case
+3. Need to deal with property_write only able to write 1 page of data
+4. Do we want to clear the eeprom when we write???
+5. In property_write, return the PropIds of the properties that were written successfully.
+6. Need to Set the write bit (SODIMM_222) LOW before being able to write
+
 """
 
 
@@ -58,9 +63,8 @@ class EEPROM:
         self._address = address
         self._eeprom_filepath = Path(f"/sys/bus/i2c/devices/{bus}-{address}/eeprom")
         self._eeprom_fd = -1
-        self._eeprom_data: Optional[EEPROMData] = None
+        self._eeprom_data: EEPROMData = EEPROMData()
         self._properties: Set[Property] = set()
-        self.open()
 
     @property
     def name(self) -> str:
@@ -68,12 +72,13 @@ class EEPROM:
         return f"{self._bus}-{self._address}"
 
     @property
-    def data(self) -> Optional[EEPROMData]:
+    def data(self) -> EEPROMData:
         """Object representing the serialized data stored in the eeprom."""
         return self._eeprom_data
 
+    @property
     def properties(self) -> Set[Property]:
-        """Set of properties that are on the eeprom."""
+        """Returns a set of Property objects that are on the eeprom."""
         return self._properties
 
     def __enter__(self) -> "EEPROM":
@@ -93,12 +98,17 @@ class EEPROM:
         """Destructor to close the file descriptor."""
         self.close()
 
+    def setup(self) -> None:
+        """Setup the class and instantiate from memory."""
+        self._eeprom_fd = self.open()
+        self._properties = self.property_read()
+        self._eeprom_data = self._populate_data()
+
     def open(self) -> int:
         """Opens up the eeprom file and returns the file descriptor."""
         if self._eeprom_fd > 0:
             logger.warning("File descriptor already opened for eeprom")
             return self._eeprom_fd
-
         try:
             self._eeprom_fd = os.open(self._eeprom_filepath, os.O_RDWR)
         except OSError:
@@ -113,6 +123,39 @@ class EEPROM:
             os.close(self._eeprom_fd)
             self._eeprom_fd = -1
         return True
+
+    def property_read(self, prop_ids: Optional[Set[PropId]] = None) -> Set[Property]:
+        """Returns a set of properties read from the eeprom."""
+        properties: Set[Property] = set()
+        address = 0
+        while True:
+            # read data in n byte chunks
+            data = self._read(size=DEFAULT_READ_SIZE, address=address)
+            props = parse_data(data, prop_ids=prop_ids)
+            if not props:
+                # we dont have any more valid data to read so break out.
+                break
+            properties.update(props)
+            # read the next page
+            address += DEFAULT_READ_SIZE
+
+        # sort by PropId value to keep things in order
+        return set(sorted(properties, key=lambda prop: prop.id.value))
+
+    def property_write(
+        self, properties: Set[Tuple[PropId, Any]], force: bool = False
+    ) -> List[PropId]:
+        """Write the given properties to the eeprom, returning a list of the successful ones."""
+        # sort the properties so they are written in ascending order
+        properties = set(sorted(properties, key=lambda prop: prop[0].value))
+        data: bytes = b""
+        for prop_id, value in properties:
+            packet = generate_packet(prop_id, value)
+            if packet:
+                data += packet
+        if data:
+            size = self._write(data)
+        return list()
 
     def _read(self, size: int = DEFAULT_READ_SIZE, address: int = 0) -> bytes:
         """Reads a number of bytes from the eeprom."""
@@ -130,7 +173,7 @@ class EEPROM:
             logger.error(f"Could not read from eeprom {self.name} - {e}")
         return data
 
-    def _write(self, data: bytes, address: int) -> int:
+    def _write(self, data: bytes, address: int = 0) -> int:
         """Write data to the eeprom at the given address."""
         if self._eeprom_fd == -1:
             raise RuntimeError(
@@ -138,55 +181,31 @@ class EEPROM:
             )
 
         try:
-            # TODO: (ba, 2023-05-25): Need to format data here (START + Length + Type + Data)
-            formatted_data = data
             logger.debug(
                 f"Writting {len(data)} bytes to address {hex(address)} for device {self.name} - {data.hex()}"
             )
             os.lseek(self._eeprom_fd, address, os.SEEK_SET)
-            # TODO: (ba, 2023-05-25): Set the write bit (SODIMM_222) LOW before writting
-            return os.write(self._eeprom_fd, formatted_data)
+            return os.write(self._eeprom_fd, data)
         except TimeoutError:
             logging.error(
                 f"Could not write data to eeprom {self.name}, make sure the write bit is low."
             )
             return -1
 
-    def property_read(self, prop_ids: Optional[Set[PropId]] = None) -> Set[Property]:
-        """Returns a set of properties read from the eeprom."""
-        # read intil we dont have any more data
-        properties: Set[Property] = set()
-        # keep track of data that might be an incomplete packet
-        data_overflow = b""
-        while True:
-            # read data in 64 byte chunks
-            data = self._read(size=DEFAULT_READ_SIZE)
-            print(f"read data from eeprom - {data.hex()}")
-            # TODO (ba, 2023-06-01): We need to validate the packet
-            # 1. This means we need to keep reading data until we either have a page of 0xff
-            # 2. We also have to take care of packets crossing over more than one page
-            # THIS IS CRITICAL!
-            props = parse_data(data, prop_ids=prop_ids)
-            if not props:
-                # we dont have any more properties to read.
-                break
-            # TODO (ba, 2023-06-01): compare the requested prop_ids to the parsed ones and break if equal.
-            properties.update(props)
-            break
-        return properties
-
-    def property_write(self, properties: Tuple[PropId, Any]) -> List[PropId]:
-        """Write the given properties to the eeprom, returning a list of the successful ones."""
-        for prop_id, data in properties:
-            # prepare packet
-            pass
-        return list()
-
-    def serialize(self) -> EEPROMData:
-        """Returns the serialized data in the eeprom."""
-        return EEPROMData(
-            som_manufacturer_id="test",
-            opentrons_serial_id="opentrons_test",
-            programmed_date=datetime.now(),
-            device_type=MachineType.FLEX,
-        )
+    def _populate_data(self) -> EEPROMData:
+        """This will create and populate the EEPROMData object."""
+        for prop in self._properties:
+            if prop.id == PropId.FORMAT_VERSION:
+                self._eeprom_data.format_version = prop.value
+            elif prop.id == PropId.SERIAL_NUMBER and len(prop.value) >= 22:
+                self._eeprom_data.serial_number = prop.value
+                self._eeprom_data.machine_type = prop.value[:3]
+                self._eeprom_data.machine_version = prop.value[3:6]
+                date_string = prop.value[6:14]
+                self._eeprom_data.programmed_date = datetime.strptime(
+                    date_string, "%Y%m%d"
+                )
+                self._eeprom_data.manufacturing_facility = prop.value[14:15]
+                self._eeprom_data.unit_number = int(prop.value[15:18])
+                self._eeprom_data.unique_id = prop.value[18:22]
+        return self._eeprom_data

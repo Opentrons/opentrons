@@ -3,7 +3,7 @@
 from datetime import datetime
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 
 class PropId(Enum):
@@ -42,8 +42,8 @@ PROP_TYPE_SIZE = {
     PropType.CHAR: 1,
     PropType.SHORT: 2,
     PropType.INT: 4,
-    PropType.STR: -1,
-    PropType.BIN: -1,
+    PropType.STR: 254,
+    PropType.BIN: 254,
 }
 
 
@@ -57,21 +57,15 @@ class Property:
     value: Any
 
 
-class MachineType(Enum):
-    """Type of machine we are running on."""
-
-    FLEX = "flex"
-
-
-@dataclass(frozen=True)
+@dataclass
 class EEPROMData:
     """Dataclass that represents the serialized data from the eeprom."""
 
-    som_manufacturer_id: str
-    opentrons_serial_id: str
-    programmed_date: datetime
-    device_type: MachineType
-
-    def to_dict(self) -> Dict[str, Any]:
-        """Turn the properties into a dictionary."""
-        return dict()
+    format_version: int = 1
+    serial_number: Optional[str] = None
+    machine_type: Optional[str] = None
+    machine_version: Optional[str] = None
+    programmed_date: Optional[datetime] = None
+    manufacturing_facility: Optional[str] = None
+    unit_number: Optional[int] = None
+    unique_id: Optional[str] = None

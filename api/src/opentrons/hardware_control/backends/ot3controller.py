@@ -232,7 +232,8 @@ class OT3Controller:
         self._gpio_dev, self._usb_messenger = self._build_system_hardware(usb_driver)
         self._tool_detector = detector.OneshotToolDetector(self._messenger)
         self._network_info = NetworkInfo(self._messenger, self._usb_messenger)
-        self._eeprom = self._setup_eeprom()
+        self._eeprom = EEPROM()
+        self._eeprom.setup()
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
@@ -309,11 +310,6 @@ class OT3Controller:
 
     def _motor_nodes(self) -> Set[NodeId]:
         return motor_nodes(self._present_devices)
-
-    def _setup_eeprom(self) -> None:
-        eeprom = EEPROM()
-        eeprom.read()
-        return eeprom
 
     def get_instrument_update(
         self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
