@@ -814,16 +814,6 @@ class OT3API(
             OT3Mount.from_mount(mount), self._current_position, critical_point
         )
 
-    async def current_axes_effector_positions(
-        self,
-        refresh: bool = False,
-    ) -> Dict[OT3Axis, float]:
-        """Return the current axes effectors position (in deck coords)."""
-        if refresh:
-            await self.refresh_positions()
-
-        return self._current_position
-
     async def refresh_positions(self) -> None:
         """Request and update both the motor and encoder positions from backend."""
         async with self._motion_lock:
@@ -999,6 +989,9 @@ class OT3API(
         """
         assert position, "move_axes requires a none empty position"
 
+        if not self._current_position:
+            await self.refresh_positions()
+
         for axis in position.keys():
             if not self._backend.axis_is_present(axis):
                 # create a custom error
@@ -1007,14 +1000,14 @@ class OT3API(
         if not self._backend.check_encoder_status(list(position.keys())):
             await self.home()
 
-        valid = self._backend.check_motor_status(list(position.keys()))
-
-        valid_motor = self._current_position and valid
+        valid_motor = self._current_position and self._backend.check_motor_status(
+            list(position.keys())
+        )
         if not valid_motor:
             raise MustHomeError("Current position is invalid; please home motors.")
 
         absolute_positions: "OrderedDict[OT3Axis, float]" = OrderedDict()
-        current_position = await self.current_axes_effector_positions()
+        current_position = self._current_position
         if OT3Axis.X in position:
             absolute_positions[OT3Axis.X] = position[OT3Axis.X]
         else:

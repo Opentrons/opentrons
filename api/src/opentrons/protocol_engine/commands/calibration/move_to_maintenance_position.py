@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 # These offsets supplied from HW
 _ATTACH_POINT = Point(x=0, y=100)
+# These offsets are by eye
 _INSTRUMENT_ATTACH_Z_POINT = 400.0
 _PLATE_ATTACH_Z_POINT = 300
 
@@ -92,6 +93,8 @@ class MoveToMaintenancePositionImplementation(
                 }
             )
         else:
+            # TODO (tz, 6-2-2023): Change this to one call to move_axes with both
+            #  Z_L and Z_R once head firmware allows moving both mounts the the same time
             await ot3_api.move_axes(
                 {
                     OT3Axis.Y: _ATTACH_POINT.y,
