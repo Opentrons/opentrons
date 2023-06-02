@@ -95,7 +95,7 @@ _dispense_defaults = {
     96: {
         1000: {  # P1000
             50: DispenseSettings(  # T50
-                flow_rate=160,  # 160 ul/sec ==  10 mm/sec
+                flow_rate=80,  # 160 ul/sec ==  10 mm/sec
                 delay=0.5,
                 submerge=_default_submerge_mm_t50,
                 retract=_default_retract_mm,
