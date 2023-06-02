@@ -73,10 +73,7 @@ export function RunFailedModal({
         >
           <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('error_type', {
-              errorType:
-                errors[0].errorType != null
-                  ? errors[0].errorType
-                  : i18n.format(t('shared:unknown'), 'capitalize'),
+              errorType: errors[0].errorType,
             })}
           </StyledText>
           <Flex
