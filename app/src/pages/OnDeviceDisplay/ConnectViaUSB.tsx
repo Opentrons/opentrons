@@ -16,6 +16,7 @@ import {
   POSITION_ABSOLUTE,
   BORDERS,
 } from '@opentrons/components'
+import { useConnectionsQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
 import { MediumButton } from '../../atoms/buttons'
@@ -23,8 +24,13 @@ import { MediumButton } from '../../atoms/buttons'
 export function ConnectViaUSB(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
-  // ToDo (kj:05/16/2023) isConnected part will be implemented later
-  const isConnected = false
+  // TODO(bh, 2023-5-31): active connections from /system/connected isn't exactly the right way to monitor for a usb connection -
+  // the system-server tracks active connections by authorization token, which is valid for 2 hours
+  // another option is to report an active usb connection by monitoring usb port traffic (discovery-client polls health from the desktop app)
+  const activeConnections = useConnectionsQuery().data?.connections ?? []
+  const isConnected = activeConnections.some(
+    connection => connection.agent === 'com.opentrons.app.usb'
+  )
 
   return (
     <>
@@ -64,7 +70,7 @@ export function ConnectViaUSB(): JSX.Element {
             <Flex
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.green3}
-              borderRadius={BORDERS.size3}
+              borderRadius={BORDERS.borderRadiusSize3}
               height="18.5rem"
               alignItems={ALIGN_CENTER}
               justifyContent={JUSTIFY_CENTER}
@@ -90,7 +96,7 @@ export function ConnectViaUSB(): JSX.Element {
             </Flex>
             <MediumButton
               buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-              onClick={() => history.push('/robot-settings/update-robot')}
+              onClick={() => history.push('/robot-settings/rename-robot')}
             />
           </Flex>
         ) : (
@@ -102,7 +108,7 @@ export function ConnectViaUSB(): JSX.Element {
             padding={`${SPACING.spacing48} ${SPACING.spacing80}`}
             gridGap={SPACING.spacing32}
             height="25.25rem"
-            borderRadius={BORDERS.size3}
+            borderRadius={BORDERS.borderRadiusSize3}
           >
             <Icon name="ot-alert" size="3rem" />
             <Flex

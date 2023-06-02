@@ -28,17 +28,36 @@ import {
 import {
   useAllCommandsQuery,
   useCommandQuery,
+  useRunQuery,
 } from '@opentrons/react-api-client'
+import {
+  OT2_STANDARD_MODEL,
+  getRobotTypeFromLoadedLabware,
+} from '@opentrons/shared-data'
+
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { Tooltip } from '../../atoms/Tooltip'
 import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
+import { InterventionModal } from '../InterventionModal'
 import { ProgressBar } from '../../atoms/ProgressBar'
-import { useDownloadRunLog } from '../Devices/hooks'
+import { getLoadedLabware } from '../CommandText/utils/accessors'
+import {
+  useDownloadRunLog,
+  useLabwareRenderInfoForRunById,
+  useModuleRenderInfoForProtocolById,
+} from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
+import {
+  isInterventionCommand,
+  getLabwareDisplayLocationFromRunData,
+  getLabwareNameFromRunData,
+} from '../InterventionModal/utils'
 
 import type { RunStatus } from '@opentrons/api-client'
+import type { LabwareLocation } from '@opentrons/shared-data'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,
@@ -51,14 +70,22 @@ interface RunProgressMeterProps {
   runId: string
   robotName: string
   makeHandleJumpToStep: (index: number) => () => void
+  resumeRunHandler: () => void
 }
 export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
-  const { runId, robotName, makeHandleJumpToStep } = props
+  const { runId, robotName, makeHandleJumpToStep, resumeRunHandler } = props
+  const [
+    showInterventionModal,
+    setShowInterventionModal,
+  ] = React.useState<boolean>(false)
   const { t } = useTranslation('run_details')
+  const { t: commandTextTranslator } = useTranslation('protocol_command_text')
   const runStatus = useRunStatus(runId)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
+  const { data: runRecord } = useRunQuery(runId)
+  const runData = runRecord?.data ?? null
   const analysis = useMostRecentCompletedAnalysis(runId)
   const { data: allCommandsQueryData } = useAllCommandsQuery(runId, {
     cursor: null,
@@ -145,30 +172,106 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     )
   }
 
+  if (
+    lastRunCommand != null &&
+    isInterventionCommand(lastRunCommand) &&
+    !showInterventionModal
+  ) {
+    setShowInterventionModal(true)
+  }
+
   const onDownloadClick: React.MouseEventHandler<HTMLAnchorElement> = e => {
     if (downloadIsDisabled) return false
     e.preventDefault()
     e.stopPropagation()
     downloadRunLog()
   }
-  return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Flex gridGap={SPACING.spacing8}>
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>{`${t(
-            'current_step'
-          )}${
-            runStatus === RUN_STATUS_IDLE
-              ? ':'
-              : ` ${countOfTotalText}${currentStepContents != null ? ': ' : ''}`
-          }`}</StyledText>
 
-          {currentStepContents}
-        </Flex>
-        <Link
-          {...targetProps}
-          role="button"
-          css={css`
+  const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
+    robotName,
+    runId
+  )
+  const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
+
+  let oldLabwareLocation: LabwareLocation | null = null
+  if (lastRunCommand?.commandType === 'moveLabware' && runData != null) {
+    oldLabwareLocation =
+      getLoadedLabware(runData, lastRunCommand.params.labwareId)?.location ??
+      null
+  }
+  const robotType =
+    runData != null
+      ? getRobotTypeFromLoadedLabware(runData.labware)
+      : OT2_STANDARD_MODEL
+
+  return (
+    <>
+      {showInterventionModal &&
+      analysis != null &&
+      runStatus != null &&
+      runData != null &&
+      lastRunCommand != null &&
+      !TERMINAL_RUN_STATUSES.includes(runStatus) &&
+      isInterventionCommand(lastRunCommand) ? (
+        <Portal level="top">
+          <InterventionModal
+            robotName={robotName}
+            command={lastRunCommand}
+            moduleRenderInfo={moduleRenderInfoById}
+            labwareRenderInfo={labwareRenderInfoById}
+            labwareName={getLabwareNameFromRunData(
+              runData,
+              lastRunCommand.params.labwareId,
+              analysis.commands
+            )}
+            oldDisplayLocation={
+              oldLabwareLocation != null
+                ? getLabwareDisplayLocationFromRunData(
+                    runData,
+                    oldLabwareLocation,
+                    commandTextTranslator,
+                    robotType
+                  )
+                : ''
+            }
+            newDisplayLocation={
+              lastRunCommand?.commandType === 'moveLabware'
+                ? getLabwareDisplayLocationFromRunData(
+                    runData,
+                    lastRunCommand.params.newLocation,
+                    commandTextTranslator,
+                    robotType
+                  )
+                : ''
+            }
+            robotType={robotType}
+            onResume={() => {
+              setShowInterventionModal(false)
+              resumeRunHandler()
+            }}
+          />
+        </Portal>
+      ) : null}
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Flex gridGap={SPACING.spacing8}>
+            <StyledText
+              as="h2"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >{`${t('current_step')}${
+              runStatus === RUN_STATUS_IDLE
+                ? ':'
+                : ` ${countOfTotalText}${
+                    currentStepContents != null ? ': ' : ''
+                  }`
+            }`}</StyledText>
+
+            {currentStepContents}
+          </Flex>
+          <Link
+            {...targetProps}
+            role="button"
+            css={css`
             ${TYPOGRAPHY.darkLinkH4SemiBold}
             &:hover {
               color: ${
@@ -180,44 +283,48 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
           }
           `}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          onClick={onDownloadClick}
-        >
-          <Flex gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
-            <Icon name="download" size={SIZE_1} />
-            {t('download_run_log')}
-          </Flex>
-        </Link>
-        {downloadIsDisabled ? (
-          <Tooltip tooltipProps={tooltipProps}>
-            {t('complete_protocol_to_download')}
-          </Tooltip>
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            onClick={onDownloadClick}
+          >
+            <Flex gridGap={SPACING.spacing2} alignItems={ALIGN_CENTER}>
+              <Icon name="download" size={SIZE_1} />
+              {t('download_run_log')}
+            </Flex>
+          </Link>
+          {downloadIsDisabled ? (
+            <Tooltip tooltipProps={tooltipProps}>
+              {t('complete_protocol_to_download')}
+            </Tooltip>
+          ) : null}
+        </Flex>
+        {analysis != null && lastRunAnalysisCommandIndex >= 0 ? (
+          <ProgressBar
+            percentComplete={
+              runHasNotBeenStarted
+                ? 0
+                : ((lastRunAnalysisCommandIndex + 1) /
+                    analysisCommands.length) *
+                  100
+            }
+            outerStyles={css`
+              height: 0.375rem;
+              background-color: ${COLORS.medGreyEnabled};
+              border-radius: ${BORDERS.radiusSoftCorners};
+              position: relative;
+              overflow: initial;
+            `}
+            innerStyles={css`
+              height: 0.375rem;
+              background-color: ${COLORS.darkGreyEnabled};
+              border-radius: ${BORDERS.radiusSoftCorners};
+            `}
+          >
+            <InterventionTicks
+              {...{ makeHandleJumpToStep, analysisCommands }}
+            />
+          </ProgressBar>
         ) : null}
       </Flex>
-      {analysis != null && lastRunAnalysisCommandIndex >= 0 ? (
-        <ProgressBar
-          percentComplete={
-            runHasNotBeenStarted
-              ? 0
-              : ((lastRunAnalysisCommandIndex + 1) / analysisCommands.length) *
-                100
-          }
-          outerStyles={css`
-            height: 0.375rem;
-            background-color: ${COLORS.medGreyEnabled};
-            border-radius: ${BORDERS.radiusSoftCorners};
-            position: relative;
-            overflow: initial;
-          `}
-          innerStyles={css`
-            height: 0.375rem;
-            background-color: ${COLORS.darkGreyEnabled};
-            border-radius: ${BORDERS.radiusSoftCorners};
-          `}
-        >
-          <InterventionTicks {...{ makeHandleJumpToStep, analysisCommands }} />
-        </ProgressBar>
-      ) : null}
-    </Flex>
+    </>
   )
 }

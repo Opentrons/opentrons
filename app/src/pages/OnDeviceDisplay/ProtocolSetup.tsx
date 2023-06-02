@@ -89,7 +89,7 @@ function ProtocolSetupStep({
       <Flex
         alignItems={ALIGN_CENTER}
         backgroundColor={backgroundColorByStepStatus[status]}
-        borderRadius={BORDERS.size4}
+        borderRadius={BORDERS.borderRadiusSize4}
         gridGap={SPACING.spacing16}
         padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       >
@@ -401,14 +401,6 @@ function PrepareToRun({
           subDetail={modulesSubDetail}
           status={modulesStatus}
         />
-
-        <ProtocolSetupStep
-          onClickSetupStep={() => setSetupScreen('labware')}
-          title={t('labware')}
-          detail={labwareDetail}
-          subDetail={labwareSubDetail}
-          status="general"
-        />
         <ProtocolSetupStep
           onClickSetupStep={handleLpcClick}
           title={t('labware_position_check')}
@@ -417,6 +409,13 @@ function PrepareToRun({
           )}
           status="general"
           isActionUnavailable={lpcDisabledReason != null}
+        />
+        <ProtocolSetupStep
+          onClickSetupStep={() => setSetupScreen('labware')}
+          title={t('labware')}
+          detail={labwareDetail}
+          subDetail={labwareSubDetail}
+          status="general"
         />
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('liquids')}

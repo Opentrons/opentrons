@@ -40,31 +40,30 @@ const CHIP_PROPS_BY_TYPE: Record<
 > = {
   basic: {
     backgroundColor: COLORS.darkBlack20,
-    borderRadius: BORDERS.size1,
+    borderRadius: BORDERS.borderRadiusSize1,
     textColor: COLORS.darkBlack90,
   },
   neutral: {
     backgroundColor: COLORS.darkBlack20,
-    borderRadius: BORDERS.size6,
+    borderRadius: BORDERS.borderRadiusSize6,
     iconColor: COLORS.darkBlack90,
     textColor: COLORS.darkBlack70,
   },
   success: {
     backgroundColor: COLORS.green3,
-    borderRadius: BORDERS.size6,
+    borderRadius: BORDERS.borderRadiusSize6,
     iconColor: COLORS.green1,
     iconName: 'ot-check',
     textColor: COLORS.green1,
   },
   warning: {
     backgroundColor: COLORS.yellow3,
-    borderRadius: BORDERS.size6,
+    borderRadius: BORDERS.borderRadiusSize6,
     iconColor: COLORS.yellow1,
     textColor: COLORS.yellow1,
   },
 }
 
-// ToDo (kj:02/09/2023) replace hard-coded values when the DS is out
 export function Chip({
   background,
   iconName,
