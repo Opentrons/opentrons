@@ -59,7 +59,11 @@ export function TouchScreenSleep({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      paddingY={SPACING.spacing32}
+      gridGap={SPACING.spacing32}
+    >
       <Flex alignItems={ALIGN_CENTER}>
         <Btn onClick={() => setCurrentOption(null)}>
           <Icon name="back" size="3rem" color={COLORS.darkBlack100} />

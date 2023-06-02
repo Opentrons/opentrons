@@ -66,7 +66,7 @@ export function UpdateChannel({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32}>
       <Flex alignItems={ALIGN_CENTER}>
         <Btn
           onClick={() => setCurrentOption(null)}

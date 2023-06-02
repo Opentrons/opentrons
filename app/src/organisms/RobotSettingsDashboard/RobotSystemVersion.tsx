@@ -57,16 +57,12 @@ export function RobotSystemVersion({
           setShowModal={setShowModal}
         />
       )}
-      <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32}>
         <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_CENTER}>
           <Btn onClick={() => setCurrentOption(null)}>
             <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
           </Btn>
-          <StyledText
-            as="h2"
-            textAlign="center"
-            fontWeight={TYPOGRAPHY.fontWeightBold}
-          >
+          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('robot_system_version')}
           </StyledText>
         </Flex>
