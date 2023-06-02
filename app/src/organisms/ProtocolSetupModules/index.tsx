@@ -103,7 +103,6 @@ function RowModule({
                 : module.slotName,
           })}
         </StyledText>
-
       </Flex>
       {isNonConnectingModule ? (
         <Flex
@@ -119,17 +118,21 @@ function RowModule({
         <Flex
           flex="3 0 0"
           alignItems={ALIGN_CENTER}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        >
           <Chip
-            text={isModuleReady ? t('module_connected') : t('module_disconnected')}
+            text={
+              isModuleReady ? t('module_connected') : t('module_disconnected')
+            }
             type={isModuleReady ? 'success' : 'warning'}
             background={false}
             iconName="connection-status"
           />
-          {isDuplicateModuleModel ? <Icon name="information" size={SIZE_2} /> : null}
+          {isDuplicateModuleModel ? (
+            <Icon name="information" size={SIZE_2} />
+          ) : null}
         </Flex>
       )}
-
     </Flex>
   )
 }

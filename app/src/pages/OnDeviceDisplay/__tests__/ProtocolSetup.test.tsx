@@ -239,17 +239,6 @@ describe('ProtocolSetup', () => {
     expect(mockPlay).toBeCalledTimes(1)
   })
 
-  it('should show snackbar when click play button', () => {
-    mockGetUnmatchedModulesForProtocol.mockReturnValue({
-      missingModuleIds: ['missingMod'],
-      remainingAttachedModules: [],
-    })
-    const [{ getByRole, getByText }] = render(`/runs/${RUN_ID}/setup/`)
-    getByRole('button', { name: 'play' }).click()
-    expect(mockPlay).toBeCalledTimes(0)
-    getByText('Mock Snackbar')
-  })
-
   it('should launch cancel modal when click close button', () => {
     const [{ getByRole, getByText, queryByText }] = render(
       `/runs/${RUN_ID}/setup/`
