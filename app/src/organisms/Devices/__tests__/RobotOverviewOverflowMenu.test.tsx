@@ -114,7 +114,7 @@ describe('RobotOverviewOverflowMenu', () => {
       name: 'Run a protocol',
     })
     const restartBtn = getByRole('button', { name: 'Restart robot' })
-    const homeBtn = getByRole('button', { name: 'Home gantry' })
+    const homeBtn = getByRole('button', { name: 'Home robot arm' })
     const disconnectBtn = getByRole('button', {
       name: 'Disconnect from network',
     })
@@ -149,7 +149,7 @@ describe('RobotOverviewOverflowMenu', () => {
       name: 'Run a protocol',
     })
     const restartBtn = getByRole('button', { name: 'Restart robot' })
-    const homeBtn = getByRole('button', { name: 'Home gantry' })
+    const homeBtn = getByRole('button', { name: 'Home robot arm' })
     const settingsBtn = getByRole('button', { name: 'Robot settings' })
 
     expect(updateRobotSoftwareBtn).toBeEnabled()
@@ -161,7 +161,7 @@ describe('RobotOverviewOverflowMenu', () => {
     getByText('mock update buildroot')
   })
 
-  it('should render disabled run a protocol, restart, disconnect, and home gantry menu items when robot is busy', () => {
+  it('should render disabled run a protocol, restart, disconnect, and home robot arm menu items when robot is busy', () => {
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
 
     const { getByRole } = render(props)
@@ -171,7 +171,7 @@ describe('RobotOverviewOverflowMenu', () => {
 
     expect(getByRole('button', { name: 'Run a protocol' })).toBeDisabled()
     expect(getByRole('button', { name: 'Restart robot' })).toBeDisabled()
-    expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Home robot arm' })).toBeDisabled()
     expect(
       getByRole('button', { name: 'Disconnect from network' })
     ).toBeDisabled()
@@ -183,20 +183,20 @@ describe('RobotOverviewOverflowMenu', () => {
 
     getByRole('button').click()
     expect(getByRole('button', { name: 'Restart robot' })).toBeDisabled()
-    expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Home robot arm' })).toBeDisabled()
     expect(
       queryByRole('button', { name: 'Disconnect from network' })
     ).toBeNull()
     expect(getByRole('button', { name: 'Robot settings' })).toBeEnabled()
   })
 
-  it('clicking home gantry should home the gantry', () => {
+  it('clicking home robot arm should home the robot arm', () => {
     const { getByRole } = render(props)
 
     const btn = getByRole('button')
     fireEvent.click(btn)
 
-    const homeBtn = getByRole('button', { name: 'Home gantry' })
+    const homeBtn = getByRole('button', { name: 'Home robot arm' })
     fireEvent.click(homeBtn)
 
     expect(mockHome).toBeCalled()
@@ -216,7 +216,7 @@ describe('RobotOverviewOverflowMenu', () => {
       name: 'Run a protocol',
     })
     const restartBtn = getByRole('button', { name: 'Restart robot' })
-    const homeBtn = getByRole('button', { name: 'Home gantry' })
+    const homeBtn = getByRole('button', { name: 'Home robot arm' })
     const disconnectBtn = getByRole('button', {
       name: 'Disconnect from network',
     })
@@ -269,7 +269,7 @@ describe('RobotOverviewOverflowMenu', () => {
     expect(queryByRole('Update robot software')).toBeNull()
     getByRole('button', { name: 'Run a protocol' })
     getByRole('button', { name: 'Restart robot' })
-    getByRole('button', { name: 'Home gantry' })
+    getByRole('button', { name: 'Home robot arm' })
     getByRole('button', { name: 'Disconnect from network' })
     getByRole('button', { name: 'Robot settings' })
   })

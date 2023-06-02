@@ -37,7 +37,7 @@ const LIQUID_CARD_STYLE = css`
 const LIQUID_CARD_ODD_STYLE = css`
   border-color: ${COLORS.medGreyEnabled};
   border: ${SPACING.spacing4} solid ${COLORS.medGreyEnabled};
-  border-radius: ${BORDERS.size3};
+  border-radius: ${BORDERS.borderRadiusSize3};
 `
 interface LiquidDetailCardProps {
   liquidId: string
@@ -68,7 +68,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   const ACTIVE_STYLE = css`
     background-color: ${isOnDevice ? COLORS.medBlue : COLORS.lightBlue};
     border: ${isOnDevice ? SPACING.spacing4 : `1px`} solid ${COLORS.blueEnabled};
-    border-radius: ${isOnDevice ? BORDERS.size3 : 0};
+    border-radius: ${isOnDevice ? BORDERS.borderRadiusSize3 : 0};
   `
   const volumePerWellRange = getWellRangeForLiquidLabwarePair(
     volumeByWell,
