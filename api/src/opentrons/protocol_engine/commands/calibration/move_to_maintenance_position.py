@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # These offsets supplied from HW
 _ATTACH_POINT = Point(x=0, y=100)
 _INSTRUMENT_ATTACH_Z_POINT = 400.0
-_PLATE_ATTACH_Z_POINT = 140
+_PLATE_ATTACH_Z_POINT = 300
 
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 

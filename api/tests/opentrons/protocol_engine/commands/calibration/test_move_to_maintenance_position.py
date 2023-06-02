@@ -1,8 +1,6 @@
 """Test for Calibration Set Up Position Implementation."""
 import pytest
 from decoy import Decoy
-from typing import Mapping
-from typing_extensions import TYPE_CHECKING
 
 from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position import (
     MoveToMaintenancePositionParams,
@@ -19,7 +17,9 @@ from opentrons.hardware_control.ot3api import OT3API
 
 @pytest.mark.ot3_only
 @pytest.fixture
-def subject(ot3_hardware_api: OT3API, state_view: StateView):
+def subject(
+    ot3_hardware_api: OT3API, state_view: StateView
+) -> MoveToMaintenancePositionImplementation:
     """Returns the subject under test."""
     return MoveToMaintenancePositionImplementation(
         state_view=state_view, hardware_api=ot3_hardware_api
@@ -27,19 +27,6 @@ def subject(ot3_hardware_api: OT3API, state_view: StateView):
 
 
 @pytest.mark.ot3_only
-# @pytest.mark.parametrize(
-#     "maintenance_position, verify_axes",
-#     [
-#         (
-#             MaintenancePosition.AttachInstrument,
-#             {OT3Axis.Y: 120, OT3Axis.X: 0, OT3Axis.Z_L: 400},
-#         ),
-#         (
-#             MaintenancePosition.AttachPlate,
-#             {OT3Axis.Y: 120, OT3Axis.X: 0, OT3Axis.Z_L: 260},
-#         ),
-#     ],
-# )
 async def test_calibration_move_to_location_implementation_attach_instrument(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
@@ -78,13 +65,13 @@ async def test_calibration_move_to_location_implementation_attach_plate(
 
     decoy.verify(
         await ot3_hardware_api.move_axes(
-            position={OT3Axis.Y: 100, OT3Axis.X: 0, OT3Axis.Z_L: 140},
+            position={OT3Axis.Y: 100, OT3Axis.X: 0, OT3Axis.Z_L: 300},
         ),
         times=1,
     )
     decoy.verify(
         await ot3_hardware_api.move_axes(
-            position={OT3Axis.Y: 100, OT3Axis.X: 0, OT3Axis.Z_R: 140},
+            position={OT3Axis.Y: 100, OT3Axis.X: 0, OT3Axis.Z_R: 300},
         ),
         times=1,
     )

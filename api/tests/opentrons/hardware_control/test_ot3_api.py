@@ -1171,11 +1171,16 @@ async def test_move_to_plunger_bottom(
         ({OT3Axis.X: 13}, {OT3Axis.X: 13, OT3Axis.Y: 493.8, OT3Axis.Z_L: 253.475}),
         (
             {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: 15},
-            {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: 15},
+            {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: -240.675},
         ),
         (
             {OT3Axis.Z_R: 15, OT3Axis.Z_L: 16},
-            {OT3Axis.X: 477.2, OT3Axis.Y: 493.8, OT3Axis.Z_R: 15, OT3Axis.Z_L: 16},
+            {
+                OT3Axis.X: 477.2,
+                OT3Axis.Y: 493.8,
+                OT3Axis.Z_L: -239.675,
+                OT3Axis.Z_R: -240.675,
+            },
         ),
     ],
 )
