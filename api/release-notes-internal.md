@@ -10,8 +10,21 @@ This is internal release 0.11.0 for the Opentrons Flex robot software, involving
 
 Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
 
-## Smaller Fun Features
+## Update Notes
 
+- ⚠️ After upgrading your robot to 0.11.0, you'll need to factory-reset its run history before you can use it.
+
+  1. From the robot's 3-dot menu (⋮), go to **Robot settings.**
+  2. Under **Advanced > Factory reset**, select **Choose reset settings.**
+  3. Choose **Clear protocol run history,** and then select **Clear data and restart robot.**
+
+  Note that this will remove all of your saved labware offsets.
+
+  You will need to follow these steps if you subsequently downgrade back to a prior release, too.
+
+## New Stuff In This Release
+
+- When interacting with an OT-3, the app will use the newer names for the deck slots, like "C2", instead of the names from the OT-2, like "5".
 - The `requirements` dict in Python protocols can now have `"robotType": "Flex"` instead of `"robotType": "OT-3"`. `"OT-3"` will still work, but it's discouraged because it's not the customer-facing name.
 
 # Internal Release 0.9.0

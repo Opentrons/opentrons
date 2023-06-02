@@ -41,7 +41,7 @@ describe('ReturnTip', () => {
       section: SECTIONS.RETURN_TIP,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
       labwareId: mockCompletedAnalysis.labware[0].id,
-      location: { slotName: '1' },
+      location: { slotName: 'D1' },
       protocolData: mockCompletedAnalysis,
       proceed: jest.fn(),
       setFatalError: jest.fn(),
@@ -56,11 +56,11 @@ describe('ReturnTip', () => {
   })
   it('renders correct copy', () => {
     const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Return tip rack to slot 1' })
+    getByRole('heading', { name: 'Return tip rack to slot D1' })
     getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(
       matchTextWithSpans(
-        'Place the Mock TipRack Definition that you used before back into slot 1. The pipette will return tips to their original location in the rack.'
+        'Place the Mock TipRack Definition that you used before back into slot D1. The pipette will return tips to their original location in the rack.'
       )
     )
     getByRole('link', { name: 'Need help?' })
@@ -75,7 +75,7 @@ describe('ReturnTip', () => {
           commandType: 'moveLabware',
           params: {
             labwareId: 'labwareId1',
-            newLocation: { slotName: '1' },
+            newLocation: { slotName: 'D1' },
             strategy: 'manualMoveWithoutPause',
           },
         },
@@ -125,7 +125,7 @@ describe('ReturnTip', () => {
           commandType: 'moveLabware',
           params: {
             labwareId: 'labwareId1',
-            newLocation: { slotName: '1' },
+            newLocation: { slotName: 'D1' },
             strategy: 'manualMoveWithoutPause',
           },
         },
@@ -174,13 +174,13 @@ describe('ReturnTip', () => {
           {
             id: 'firstHSId',
             model: HEATERSHAKER_MODULE_V1,
-            location: { slotName: '3' },
+            location: { slotName: 'D3' },
             serialNumber: 'firstHSSerial',
           },
           {
             id: 'secondHSId',
             model: HEATERSHAKER_MODULE_V1,
-            location: { slotName: '10' },
+            location: { slotName: 'A1' },
             serialNumber: 'secondHSSerial',
           },
         ],
@@ -203,7 +203,7 @@ describe('ReturnTip', () => {
           commandType: 'moveLabware',
           params: {
             labwareId: 'labwareId1',
-            newLocation: { slotName: '1' },
+            newLocation: { slotName: 'D1' },
             strategy: 'manualMoveWithoutPause',
           },
         },
