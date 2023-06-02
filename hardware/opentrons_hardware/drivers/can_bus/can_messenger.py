@@ -2,7 +2,17 @@
 from __future__ import annotations
 import asyncio
 from inspect import Traceback
-from typing import Optional, Callable, Tuple, Dict, Union, List, cast, TypeVar, Type
+from typing import (
+    Optional,
+    Callable,
+    Tuple,
+    Dict,
+    Union,
+    List,
+    cast,
+    TypeVar,
+    Type,
+)
 
 import logging
 
@@ -72,6 +82,7 @@ class AcknowledgeListener:
         message: MessageDefinition,
         timeout: float,
         expected_nodes: List[NodeId],
+        exclusive: bool = False,
     ) -> None:
         """Build this listener class and ready the queue."""
         self._can_messenger = can_messenger
@@ -79,6 +90,7 @@ class AcknowledgeListener:
         self._message = message
         self._timeout = timeout
         self._event = asyncio.Event()
+        self._exclusive = exclusive
         # todo add ability to know how many nodes will ack to a broadcast
         # we can assume at least 3 for the gantry and head boards
         self._expected_nodes = expected_nodes
@@ -137,7 +149,10 @@ class AcknowledgeListener:
                 ),
             )
             self._event.clear()
-            await self._can_messenger.send(self._node_id, self._message)
+            if self._exclusive:
+                await self._can_messenger.send_exclusive(self._node_id, self._message)
+            else:
+                await self._can_messenger.send(self._node_id, self._message)
             await asyncio.wait_for(
                 self._event.wait(),
                 max(1.0, self._timeout),
@@ -164,6 +179,8 @@ E = TypeVar("E", bound=BaseException)
 class CanMessenger:
     """High level can messaging class wrapping a CanDriver.
 
+    Should only be used when it is the only thing talking on the bus.
+
     The background task can be controlled with start/stop methods.
 
     To receive message notifications add a listener using add_listener
@@ -181,9 +198,23 @@ class CanMessenger:
             Tuple[MessageListenerCallback, Optional[MessageListenerCallbackFilter]],
         ] = {}
         self._task: Optional[asyncio.Task[None]] = None
+        self._access_lock = asyncio.Lock()
+        self._exclusive_condvar = asyncio.Condition(self._access_lock)
+        self._nonexclusive_condvar = asyncio.Condition(self._access_lock)
+        self._held_exclusive = False
+        self._nonexclusive_access_count = 0
+        self._exclusive_lock = asyncio.Lock()
 
     async def send(self, node_id: NodeId, message: MessageDefinition) -> None:
         """Send a message."""
+        async with self._exclusive_lock:
+            return await self._send(node_id, message)
+
+    async def send_exclusive(self, node_id: NodeId, message: MessageDefinition) -> None:
+        """Send while the exclusive ock is held."""
+        return await self._send(node_id, message)
+
+    async def _send(self, node_id: NodeId, message: MessageDefinition) -> None:
         func = (
             FunctionCode.error
             if message.message_id == MessageId.error_message
@@ -213,6 +244,18 @@ class CanMessenger:
             log.exception("Exception in CAN send")
             raise CANCommunicationError(exc=exc) from exc
 
+    async def ensure_send_exclusive(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float = 3,
+        expected_nodes: List[NodeId] = [],
+    ) -> ErrorCode:
+        """Send a message and wait for the ack while holding the exclusive lock."""
+        return await self._ensure_send(
+            node_id, message, timeout, expected_nodes, exclusive=True
+        )
+
     async def ensure_send(
         self,
         node_id: NodeId,
@@ -221,6 +264,18 @@ class CanMessenger:
         expected_nodes: List[NodeId] = [],
     ) -> ErrorCode:
         """Send a message and wait for the ack."""
+        # Note: we don't take the lock in this method because the acknowledge listener
+        # does it
+        return await self._ensure_send(node_id, message, timeout, expected_nodes)
+
+    async def _ensure_send(
+        self,
+        node_id: NodeId,
+        message: MessageDefinition,
+        timeout: float = 3,
+        expected_nodes: List[NodeId] = [],
+        exclusive: bool = False,
+    ) -> ErrorCode:
         if len(expected_nodes) == 0:
             log.warning("Expected Nodes should have been specified")
             if node_id == NodeId.broadcast:
@@ -234,6 +289,7 @@ class CanMessenger:
             message=message,
             timeout=timeout,
             expected_nodes=expected_nodes,
+            exclusive=exclusive,
         )
         try:
             return await listener.send_and_verify_recieved()
@@ -243,7 +299,7 @@ class CanMessenger:
             log.exception("Exception in CAN ensure_send")
             raise CANCommunicationError(exc=exc) from exc
 
-    async def __aenter__(self) -> CanMessenger:
+    async def __aenter__(self: CanMessenger) -> CanMessenger:
         """Start messenger."""
         self.start()
         return self
@@ -264,7 +320,7 @@ class CanMessenger:
     def start(self) -> None:
         """Start the reader task."""
         if self._task:
-            log.warning("task already running.")
+            log.warning("can messenger task already running.")
             return
         self._task = asyncio.get_event_loop().create_task(self._read_task_shield())
 
@@ -275,7 +331,7 @@ class CanMessenger:
             try:
                 await self._task
             except asyncio.CancelledError:
-                log.info("Task cancelled.")
+                log.info("CAN messenger task cancelled.")
         else:
             log.warning("task not running.")
 
@@ -347,6 +403,23 @@ class CanMessenger:
                 ErrorCode(error_payload.error_code.value),
                 ErrorSeverity(error_payload.severity.value),
             )
+
+    @property
+    def exclusive_writer(self) -> asyncio.Lock:
+        """A caller may acquire this context manager to temporarily gain exclusive control of the bus.
+
+        When this context manager is acquired, only the acquirer may send data to the bus. This is
+        guaranteed by
+        - Waiting for any other bus callers, exclusive or non-exclusive, to finish their business before
+          yielding control back to the caller
+        - Preventing any other callers, exclusive or non-exclusive, from starting a send until the
+          context manager is released
+
+        The context manager resolves to an object that has a read and write interface to use only while
+        holding the lock.
+        """
+        log.info("probably about to do exclusive")
+        return self._exclusive_lock
 
 
 class WaitableCallback:
