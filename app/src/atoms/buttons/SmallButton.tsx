@@ -154,6 +154,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
               size="1.75rem"
               marginRight={SPACING.spacing8}
               name={iconName}
+              spin={iconName === 'ot-spinner'}
             />
           </Flex>
         ) : null}
@@ -171,6 +172,7 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
               size="1.75rem"
               marginLeft={SPACING.spacing8}
               name={iconName}
+              spin={iconName === 'ot-spinner'}
             />
           </Flex>
         ) : null}
