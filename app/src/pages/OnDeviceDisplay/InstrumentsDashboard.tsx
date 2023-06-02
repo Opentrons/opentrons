@@ -3,7 +3,7 @@ import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { PipetteWizardFlows } from '../../organisms/PipetteWizardFlows'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
-import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
+import { Navigation } from '../../organisms/Navigation'
 import { AttachedInstrumentMountItem } from '../../organisms/InstrumentMountItem'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 

@@ -11,7 +11,7 @@ import { ConnectViaWifi } from '../../pages/OnDeviceDisplay/ConnectViaWifi'
 import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { InstrumentsDashboard } from '../../pages/OnDeviceDisplay/InstrumentsDashboard'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
-import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import { RobotSettingsDashboard } from '../../pages/RobotSettingsDashboard'
 import { ProtocolDashboard } from '../../pages/ProtocolDashboard'
 import { ProtocolSetup } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import { ProtocolDetails } from '../../pages/OnDeviceDisplay/ProtocolDetails'
@@ -33,7 +33,7 @@ jest.mock('../../pages/OnDeviceDisplay/ConnectViaEthernet')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaWifi')
 jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
-jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
+jest.mock('../../pages/RobotSettingsDashboard')
 jest.mock('../../pages/ProtocolDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolDetails')
