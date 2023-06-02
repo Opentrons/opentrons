@@ -139,7 +139,7 @@ export function NetworkSettings({
           alignItems={ALIGN_START}
         >
           <Btn onClick={handleNavigate}>
-            <Icon name="back" size="3rem" />
+            <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
           </Btn>
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t(screenTitle)}
