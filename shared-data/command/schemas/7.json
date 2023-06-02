@@ -861,7 +861,32 @@
     "DeckSlotName": {
       "title": "DeckSlotName",
       "description": "Deck slot identifiers.",
-      "enum": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+      "enum": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "A1",
+        "A2",
+        "A3",
+        "B1",
+        "B2",
+        "B3",
+        "C1",
+        "C2",
+        "C3",
+        "D1",
+        "D2",
+        "D3"
+      ]
     },
     "DeckSlotLocation": {
       "title": "DeckSlotLocation",
@@ -869,7 +894,12 @@
       "type": "object",
       "properties": {
         "slotName": {
-          "$ref": "#/definitions/DeckSlotName"
+          "description": "A slot on the robot's deck.\n\nThe plain numbers like `\"5\"` are for the OT-2, and the letter-number pairs like `\"C2\"` are for the Flex.\n\nWhen you provide one of these values, you can use either style. It will automatically be converted to match the robot.\n\nWhen one of these values is returned, it will always match the robot.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/DeckSlotName"
+            }
+          ]
         }
       },
       "required": ["slotName"]

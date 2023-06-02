@@ -13,7 +13,7 @@
   "locations": {
     "orderedSlots": [
       {
-        "id": "1",
+        "id": "D1",
         "position": [0.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -21,7 +21,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot 1",
+        "displayName": "Slot D1",
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -29,7 +29,7 @@
         ]
       },
       {
-        "id": "2",
+        "id": "D2",
         "position": [164.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -37,7 +37,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot 2",
+        "displayName": "Slot D2",
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -45,7 +45,7 @@
         ]
       },
       {
-        "id": "3",
+        "id": "D3",
         "position": [328.0, 0.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -53,7 +53,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot 3",
+        "displayName": "Slot D3",
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -61,7 +61,7 @@
         ]
       },
       {
-        "id": "4",
+        "id": "C1",
         "position": [0.0, 107, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -69,7 +69,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot 4",
+        "displayName": "Slot C1",
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -77,7 +77,7 @@
         ]
       },
       {
-        "id": "5",
+        "id": "C2",
         "position": [164.0, 107, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -85,7 +85,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot 5",
+        "displayName": "Slot C2",
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -93,7 +93,7 @@
         ]
       },
       {
-        "id": "6",
+        "id": "C3",
         "position": [328.0, 107, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -101,7 +101,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot 6",
+        "displayName": "Slot C3",
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -109,7 +109,7 @@
         ]
       },
       {
-        "id": "7",
+        "id": "B1",
         "position": [0.0, 214.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -117,7 +117,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot 7",
+        "displayName": "Slot B1",
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -126,7 +126,7 @@
         ]
       },
       {
-        "id": "8",
+        "id": "B2",
         "position": [164.0, 214.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -134,7 +134,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot 8",
+        "displayName": "Slot B2",
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -142,7 +142,7 @@
         ]
       },
       {
-        "id": "9",
+        "id": "B3",
         "position": [328.0, 214.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -150,7 +150,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot 9",
+        "displayName": "Slot B3",
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -158,7 +158,7 @@
         ]
       },
       {
-        "id": "10",
+        "id": "A1",
         "position": [0.0, 321.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -166,7 +166,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot 10",
+        "displayName": "Slot A1",
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -174,7 +174,7 @@
         ]
       },
       {
-        "id": "11",
+        "id": "A2",
         "position": [164.0, 321.0, 0.0],
         "matingSurfaceUnitVector": [-1, 1, -1],
         "boundingBox": {
@@ -182,7 +182,7 @@
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot 11",
+        "displayName": "Slot A2",
         "compatibleModuleTypes": [
           "magneticModuleType",
           "temperatureModuleType",
@@ -190,14 +190,14 @@
         ]
       },
       {
-        "id": "12",
+        "id": "A3",
         "position": [328.0, 321.0, 0.0],
         "boundingBox": {
           "xDimension": 128.0,
           "yDimension": 86.0,
           "zDimension": 0
         },
-        "displayName": "Slot 12",
+        "displayName": "Slot A3",
         "compatibleModuleTypes": []
       }
     ],
@@ -205,7 +205,7 @@
     "fixtures": [
       {
         "id": "fixedTrash",
-        "slot": "12",
+        "slot": "A3",
         "labware": "opentrons_1_trash_3200ml_fixed",
         "displayName": "Fixed Trash"
       }

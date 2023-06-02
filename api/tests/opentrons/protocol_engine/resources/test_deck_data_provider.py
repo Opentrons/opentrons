@@ -126,7 +126,7 @@ async def test_get_deck_labware_fixtures_ot3_standard(
     assert result == [
         DeckFixedLabware(
             labware_id="fixedTrash",
-            location=DeckSlotLocation(slotName=DeckSlotName.FIXED_TRASH),
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
             definition=ot3_fixed_trash_def,
         )
     ]
