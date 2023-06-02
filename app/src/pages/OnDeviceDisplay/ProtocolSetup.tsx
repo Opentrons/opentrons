@@ -282,8 +282,6 @@ function PrepareToRun({
   })
   const instrumentsStatus = areInstrumentsReady ? 'ready' : 'not ready'
 
-  const isUnmatchedModules =
-    remainingAttachedModules.length > 0 && missingModuleIds.length > 0
   const modulesStatus = isMissingModules ? 'not ready' : 'ready'
 
   const isReadyToRun = areInstrumentsReady && !isMissingModules
