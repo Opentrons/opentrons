@@ -62,11 +62,16 @@ describe('useDeleteMaintenanceRunMutation hook', () => {
       .calledWith(HOST_CONFIG, MAINTENANCE_RUN_ID)
       .mockResolvedValue({ data: { data: null } } as Response<EmptyResponse>)
 
-    const { result } = renderHook(() => useDeleteMaintenanceRunMutation(), {
-      wrapper,
-    })
+    const { result, waitFor } = renderHook(
+      () => useDeleteMaintenanceRunMutation(),
+      {
+        wrapper,
+      }
+    )
     act(() => result.current.deleteMaintenanceRun(MAINTENANCE_RUN_ID))
 
-    expect(result.current.data).toEqual(undefined)
+    await waitFor(() => result.current.data != null)
+
+    expect(result.current.data).toEqual({ data: null })
   })
 })

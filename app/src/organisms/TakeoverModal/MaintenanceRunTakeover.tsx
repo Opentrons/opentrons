@@ -37,7 +37,7 @@ export function MaintenanceRunTakeover(
   }
 
   React.useEffect(() => {
-    if (maintenanceRunId == null && status === 'idle') {
+    if (maintenanceRunId == null && status === 'success') {
       setIsLoading(false)
       setShowConfirmTerminateModal(false)
     }

@@ -47,12 +47,7 @@ export function useDeleteMaintenanceRunMutation(
           return response.data
         }
       ),
-    {
-      ...options,
-      onSuccess: () => {
-        mutation.reset()
-      },
-    }
+    options
   )
 
   return {
