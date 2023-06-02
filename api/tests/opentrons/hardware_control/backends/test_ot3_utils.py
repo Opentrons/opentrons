@@ -13,9 +13,7 @@ def test_create_step():
         Axis.P_L: 0,
         Axis.P_R: 0,
     }
-    moves = [
-        Move.build_dummy([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R, Axis.P_L])
-    ]
+    moves = [Move.build_dummy([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R, Axis.P_L])]
     present_nodes = [NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l]
     move_group, final_pos = ot3utils.create_move_group(
         origin=origin,

@@ -469,9 +469,7 @@ class OT3Controller:
         """Set the module controls"""
         self._module_controls = module_controls
 
-    def _get_motor_status(
-        self, ax: Sequence[Axis]
-    ) -> Iterator[Optional[MotorStatus]]:
+    def _get_motor_status(self, ax: Sequence[Axis]) -> Iterator[Optional[MotorStatus]]:
         return (self._motor_status.get(axis_to_node(a)) for a in ax)
 
     def check_motor_status(self, axes: Sequence[Axis]) -> bool:
@@ -624,9 +622,7 @@ class OT3Controller:
             A dictionary containing the new positions of each axis
         """
         checked_axes = [axis for axis in axes if self.axis_is_present(axis)]
-        assert (
-                Axis.G not in checked_axes
-        ), "Please home G axis using gripper_home_jaw()"
+        assert Axis.G not in checked_axes, "Please home G axis using gripper_home_jaw()"
         if not checked_axes:
             return {}
 
@@ -806,9 +802,7 @@ class OT3Controller:
         )
         # add pipette_left, pipette_right and gripper if present
         for mount in current_tools.keys():
-            self._present_devices.add(
-                axis_to_node(Axis.of_main_tool_actuator(mount))
-            )
+            self._present_devices.add(axis_to_node(Axis.of_main_tool_actuator(mount)))
         return current_tools
 
     async def get_limit_switches(self) -> OT3AxisMap[bool]:

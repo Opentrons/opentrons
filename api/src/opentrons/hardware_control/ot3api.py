@@ -267,9 +267,7 @@ class OT3API(
     def _reset_last_mount(self) -> None:
         self._last_moved_mount = None
 
-    def _deck_from_machine(
-        self, machine_pos: Dict[Axis, float]
-    ) -> Dict[Axis, float]:
+    def _deck_from_machine(self, machine_pos: Dict[Axis, float]) -> Dict[Axis, float]:
         return deck_from_machine(
             machine_pos,
             self._transforms.deck_calibration.attitude,
@@ -848,9 +846,7 @@ class OT3API(
             await self._backend.update_encoder_position()
         )
         if self.has_gripper():
-            self._gripper_handler.set_jaw_displacement(
-                self._encoder_position[Axis.G]
-            )
+            self._gripper_handler.set_jaw_displacement(self._encoder_position[Axis.G])
         return self._encoder_position
 
     async def encoder_current_position(
@@ -976,7 +972,7 @@ class OT3API(
         )
         if max_speeds:
             checked_max: Optional[OT3AxisMap[float]] = {
-                k: v for k, v in max_speeds.items()     # (spp): is this even needed?
+                k: v for k, v in max_speeds.items()  # (spp): is this even needed?
             }
         else:
             checked_max = None
@@ -1022,7 +1018,7 @@ class OT3API(
         )
         if max_speeds:
             checked_max: Optional[OT3AxisMap[float]] = {
-                k: v for k, v in max_speeds.items()     # (spp): is this even needed?
+                k: v for k, v in max_speeds.items()  # (spp): is this even needed?
             }
         else:
             checked_max = None
@@ -1229,9 +1225,7 @@ class OT3API(
                     await self._cache_encoder_position()
 
     @ExecutionManagerProvider.wait_for_running
-    async def home(
-        self, axes: Optional[List[Axis]] = None
-    ) -> None:
+    async def home(self, axes: Optional[List[Axis]] = None) -> None:
         """
         Worker function to home the robot by axis or list of
         desired axes.
@@ -1240,7 +1234,9 @@ class OT3API(
         await self.refresh_positions()
 
         if axes:
-            checked_axes = [ax for ax in axes if ax in Axis]    # (spp): is this even needed?
+            checked_axes = [
+                ax for ax in axes if ax in Axis
+            ]  # (spp): is this even needed?
         else:
             checked_axes = [ax for ax in Axis if ax != Axis.Q]
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
@@ -1663,7 +1659,9 @@ class OT3API(
                     speed=move.speed,
                     home_flagged_axes=False,
                 )
-            if move.home_after:  # (spp): this check was outside the loop previously; I think that was a bug?
+            if (
+                move.home_after
+            ):  # (spp): this check was outside the loop previously; I think that was a bug?
                 await self._home(move.home_axes)
 
         for shake in spec.shake_moves:

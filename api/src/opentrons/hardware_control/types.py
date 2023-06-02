@@ -1,6 +1,7 @@
 import enum
 import logging
 from dataclasses import dataclass
+from types import DynamicClassAttribute
 from typing import (
     NamedTuple,
     Optional,
@@ -150,7 +151,7 @@ class Axis(enum.Enum):
     Q = 7  # hi-throughput pipette tiprack grab
     G = 8  # gripper grab
 
-    # Old axes' aliases:
+    # OT2 axes' aliases:
     Z = Z_L  # left pipette mount Z
     A = Z_R  # right pipette mount Z
     B = P_L  # left pipette plunger
@@ -188,9 +189,7 @@ class Axis(enum.Enum):
         return cls.X, cls.Y, cls.Z_L, cls.Z_R, cls.Z_G
 
     @classmethod
-    def of_main_tool_actuator(
-        cls, mount: Union[top_types.Mount, OT3Mount]
-    ) -> "Axis":
+    def of_main_tool_actuator(cls, mount: Union[top_types.Mount, OT3Mount]) -> "Axis":
         if isinstance(mount, top_types.Mount):
             checked_mount = OT3Mount.from_mount(mount)
         else:
@@ -239,17 +238,7 @@ class Axis(enum.Enum):
     @classmethod
     def home_order(
         cls,
-    ) -> Tuple[
-        "Axis",
-        "Axis",
-        "Axis",
-        "Axis",
-        "Axis",
-        "Axis",
-        "Axis",
-        "Axis",
-        "Axis",
-    ]:
+    ) -> Tuple["Axis", "Axis", "Axis", "Axis", "Axis", "Axis", "Axis", "Axis", "Axis",]:
         return (*cls.mount_axes(), cls.X, cls.Y, *cls.pipette_axes(), cls.G, cls.Q)
 
     def __str__(self) -> str:
@@ -287,6 +276,7 @@ class Axis(enum.Enum):
         Same as `of_main_tool_actuator` but for OT2 backwards compatibility.
         """
         return cls.of_main_tool_actuator(mount)
+
 
 class OT3SubSystem(enum.Enum):
     """An enumeration of ot3 components.
@@ -383,7 +373,7 @@ def subsystem_to_mount(subsystem: OT3SubSystem) -> OT3Mount:
     return mount_lookup[subsystem]
 
 
-BCAxes = Axis   # This doesn't seem to be used. Remove?
+BCAxes = Axis  # This doesn't seem to be used. Remove?
 AxisMapValue = TypeVar("AxisMapValue")
 OT3AxisMap = Dict[Axis, AxisMapValue]
 

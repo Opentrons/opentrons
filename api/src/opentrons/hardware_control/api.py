@@ -548,7 +548,7 @@ class API(
                 self._backend.set_active_current(
                     {checked_axis: instr.config.plunger_current}
                 )
-                await self._backend.home([checked_axis.name.upper()])
+                await self._backend.home([self._axis_to_string(checked_axis)])
                 # either we were passed False for our acquire_lock and we
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
@@ -584,7 +584,7 @@ class API(
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis.ot2_axes()]
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
-        smoothie_gantry = [ax.name.upper() for ax in gantry]
+        smoothie_gantry = [self._axis_to_string(ax) for ax in gantry]
         smoothie_pos = {}
         plungers = [ax for ax in checked_axes if ax not in Axis.gantry_axes()]
 
@@ -723,7 +723,7 @@ class API(
         )
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
         if fail_on_not_homed and not self._backend.is_homed(
-            [axis.name for axis in axes_moving if axis is not None]
+            [self._axis_to_string(axis) for axis in axes_moving if axis is not None]
         ):
             raise mhe
         await self._cache_and_maybe_retract_mount(mount)
@@ -777,14 +777,14 @@ class API(
 
         bounds = self._backend.axis_bounds
         to_check = {
-            ax: machine_pos[ax.name]
+            ax: machine_pos[self._axis_to_string(ax)]
             for idx, ax in enumerate(target_position.keys())
             if ax in Axis.gantry_axes()
         }
 
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
         checked_maxes = max_speeds or {}
-        str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
+        str_maxes = {self._axis_to_string(ax): val for ax, val in checked_maxes.items()}
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
@@ -811,7 +811,7 @@ class API(
         return self.get_engaged_axes()
 
     async def disengage_axes(self, which: List[Axis]) -> None:
-        await self._backend.disengage_axes([ax.name for ax in which])
+        await self._backend.disengage_axes([self._axis_to_string(ax) for ax in which])
 
     async def _fast_home(self, axes: Sequence[str], margin: float) -> Dict[str, float]:
         converted_axes = "".join(axes)
@@ -823,7 +823,7 @@ class API(
 
         Works regardless of critical point or home status.
         """
-        smoothie_ax = (Axis.by_mount(mount).name.upper(),)
+        smoothie_ax = (self._axis_to_string(Axis.by_mount(mount)),)
 
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
@@ -1062,7 +1062,7 @@ class API(
             )
             if move.home_after:
                 smoothie_pos = await self._backend.fast_home(
-                    [ax.name.upper() for ax in move.home_axes],
+                    [self._axis_to_string(ax) for ax in move.home_axes],
                     move.home_after_safety_margin,
                 )
                 self._current_position = deck_from_machine(
@@ -1112,8 +1112,20 @@ class API(
     ) -> Dict[Axis, "API.MapPayload"]:
         return {Axis[k]: v for k, v in input_map.items()}
 
-    @staticmethod
     def _string_map_from_axis_map(
-        input_map: Dict[Axis, "API.MapPayload"]
+        self, input_map: Dict[Axis, "API.MapPayload"]
     ) -> Dict[str, "API.MapPayload"]:
-        return {k.name: v for k, v in input_map.items()}
+        return {self._axis_to_string(k): v for k, v in input_map.items()}
+
+    def _axis_to_string(self, axis: Axis) -> str:
+        """Returns OT-2 specific string for the given axis."""
+        axis_str_map = {
+            Axis.Z_L: "Z",
+            Axis.Z_R: "A",
+            Axis.P_L: "B",
+            Axis.P_R: "C",
+        }
+        try:
+            return axis_str_map[axis]
+        except KeyError:
+            return axis.name

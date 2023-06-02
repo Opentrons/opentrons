@@ -737,9 +737,7 @@ async def test_probe_direction(
     probe_direction: Direction,
 ) -> None:
     mock_gantry_position.return_value = origin
-    await ot3_hardware.capacitive_probe(
-        OT3Mount.RIGHT, Axis.X, target, fake_settings
-    )
+    await ot3_hardware.capacitive_probe(OT3Mount.RIGHT, Axis.X, target, fake_settings)
     prep_move = mock_move_to.call_args_list[0]
     if prep_direction == 0.0:
         assert prep_move[0][1].x == origin.x

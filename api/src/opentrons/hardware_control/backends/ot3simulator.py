@@ -231,9 +231,7 @@ class OT3Simulator:
         # Simulate conditions as if there are no stalls, aka do nothing
         return None
 
-    def _get_motor_status(
-        self, ax: Sequence[Axis]
-    ) -> Iterator[Optional[MotorStatus]]:
+    def _get_motor_status(self, ax: Sequence[Axis]) -> Iterator[Optional[MotorStatus]]:
         return (self._motor_status.get(axis_to_node(a)) for a in ax)
 
     def check_motor_status(self, axes: Sequence[Axis]) -> bool:

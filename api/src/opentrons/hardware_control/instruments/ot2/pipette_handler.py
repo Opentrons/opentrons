@@ -768,9 +768,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                     presses=[
                         PickUpTipPressSpec(
                             current={
-                                Axis.by_mount(
-                                    mount
-                                ): instrument.config.pick_up_current
+                                Axis.by_mount(mount): instrument.config.pick_up_current
                             },
                             speed=pick_up_speed,
                             relative_down=top_types.Point(0, 0, press_dist),
@@ -897,16 +895,8 @@ class PipetteHandlerProvider(Generic[MountType]):
             seq_builder_ot3 = self._droptip_sequence_builder(
                 bottom,
                 droptip,
-                {
-                    Axis.of_main_tool_actuator(
-                        mount
-                    ): instrument.config.plunger_current
-                },
-                {
-                    Axis.of_main_tool_actuator(
-                        mount
-                    ): instrument.config.drop_tip_current
-                },
+                {Axis.of_main_tool_actuator(mount): instrument.config.plunger_current},
+                {Axis.of_main_tool_actuator(mount): instrument.config.drop_tip_current},
                 speed,
                 home_after,
                 (Axis.of_main_tool_actuator(mount),),

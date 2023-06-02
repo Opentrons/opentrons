@@ -65,9 +65,7 @@ async def test_transform_values(pipette_model):
         ]
         assert mock_move.call_args[1]["target_list"][0].position[Axis.X] == point[0]
         assert mock_move.call_args[1]["target_list"][0].position[Axis.Y] == point[1]
-        assert (
-                mock_move.call_args[1]["target_list"][0].position[Axis.Z_R] == point[2]
-        )
+        assert mock_move.call_args[1]["target_list"][0].position[Axis.Z_R] == point[2]
 
     with mock.patch.object(
         sim._move_manager,
@@ -87,6 +85,4 @@ async def test_transform_values(pipette_model):
         ]
         assert mock_move.call_args[1]["target_list"][0].position[Axis.X] == point[0]
         assert mock_move.call_args[1]["target_list"][0].position[Axis.Y] == point[1]
-        assert (
-                mock_move.call_args[1]["target_list"][0].position[Axis.Z_L] == point[2]
-        )
+        assert mock_move.call_args[1]["target_list"][0].position[Axis.Z_L] == point[2]

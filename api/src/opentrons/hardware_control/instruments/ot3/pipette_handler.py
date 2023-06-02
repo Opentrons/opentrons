@@ -808,11 +808,7 @@ class PipetteHandlerProvider:
         seq_builder_ot3 = self._droptip_sequence_builder(
             bottom,
             droptip,
-            {
-                Axis.of_main_tool_actuator(
-                    mount
-                ): instrument.plunger_motor_current.run
-            },
+            {Axis.of_main_tool_actuator(mount): instrument.plunger_motor_current.run},
             {drop_tip_current_axis: instrument.drop_configurations.current},
             speed,
             home_after,
