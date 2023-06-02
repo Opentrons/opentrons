@@ -1,7 +1,6 @@
 """Calibration Move To Maintenance Location command payload, result, and implementation models."""
 from __future__ import annotations
 
-import logging
 import enum
 from typing import TYPE_CHECKING, Type, Optional
 from typing_extensions import Literal
@@ -22,11 +21,9 @@ if TYPE_CHECKING:
     from ...state import StateView
 
 
-logger = logging.getLogger(__name__)
-
 # These offsets supplied from HW
 _ATTACH_POINT = Point(x=0, y=100)
-# These offsets are by eye
+# These offsets are by eye measuring
 _INSTRUMENT_ATTACH_Z_POINT = 400.0
 _PLATE_ATTACH_Z_POINT = 300
 
@@ -83,8 +80,6 @@ class MoveToMaintenancePositionImplementation(
         )
         if params.maintenancePosition == MaintenancePosition.AttachInstrument:
             mount_to_axis = OT3Axis.by_mount(params.mount.to_hw_mount())
-            logger.info(f"mount_to_axis {mount_to_axis}")
-            # NOTE(bc, 2023-05-10): this is a direct diagonal movement, an arc movement would be safer
             await ot3_api.move_axes(
                 {
                     OT3Axis.Y: _ATTACH_POINT.y,
