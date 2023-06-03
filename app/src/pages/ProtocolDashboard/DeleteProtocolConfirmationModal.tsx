@@ -17,9 +17,9 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal/OnDeviceDisplay'
+import { Modal } from '../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface DeleteProtocolConfirmationModalProps {
   protocolName?: string

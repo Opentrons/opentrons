@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { Modal } from '.'
+import { Modal } from '..'
 
 interface SmallModalChildrenProps {
   handleCloseMaxPinsAlert: () => void

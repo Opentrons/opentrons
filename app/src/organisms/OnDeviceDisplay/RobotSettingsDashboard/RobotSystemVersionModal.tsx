@@ -16,7 +16,7 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { Modal } from '../../../molecules/Modal'
+import { LegacyModal } from '../../../molecules/LegacyModal'
 import { ReleaseNotes } from '../../../molecules/ReleaseNotes'
 import { StyledText } from '../../../atoms/text'
 
@@ -39,7 +39,7 @@ export function RobotSystemVersionModal({
 
   return (
     <Flex padding={SPACING.spacing40}>
-      <Modal
+      <LegacyModal
         title={t('robot_system_version_available', {
           releaseVersion: version,
         })}
@@ -98,7 +98,7 @@ export function RobotSystemVersionModal({
             {t('shared:update')}
           </PrimaryButton>
         </Flex>
-      </Modal>
+      </LegacyModal>
     </Flex>
   )
 }

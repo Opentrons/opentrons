@@ -30,7 +30,7 @@ import { Portal } from '../../App/portal'
 import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
 import { InlineNotification } from '../../atoms/InlineNotification'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
@@ -196,15 +196,15 @@ export function ProtocolSetupModules({
           />
         ) : null}
         {showSetupInstructionsModal ? (
-          <Modal
+          <LegacyModal
             title={t('setup_instructions')}
             onClose={() => setShowSetupInstructionsModal(false)}
           >
             TODO: setup instructions modal
-          </Modal>
+          </LegacyModal>
         ) : null}
         {showDeckMapModal ? (
-          <Modal
+          <LegacyModal
             title={t('map_view')}
             onClose={() => setShowDeckMapModal(false)}
             fullPage
@@ -236,7 +236,7 @@ export function ProtocolSetupModules({
                 ))
               }
             </RobotWorkSpace>
-          </Modal>
+          </LegacyModal>
         ) : null}
       </Portal>
       <Flex

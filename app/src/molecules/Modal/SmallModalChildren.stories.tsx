@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { SmallModalChildren } from './SmallModalChildren'
+import { SmallModalChildren } from './__tests__/SmallModalChildren'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
