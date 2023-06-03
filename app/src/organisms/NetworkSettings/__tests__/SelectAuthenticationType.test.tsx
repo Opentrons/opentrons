@@ -19,7 +19,7 @@ jest.mock('../SetWifiCred')
 jest.mock('../../../redux/networking')
 jest.mock('../../../redux/discovery/selectors')
 jest.mock('../AlternativeSecurityTypeModal')
-jest.mock('../../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/hooks')
+jest.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
 jest.mock('react-router-dom', () => {
   const reactRouterDom = jest.requireActual('react-router-dom')
   return {

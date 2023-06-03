@@ -13,9 +13,7 @@ import { WifiConnectionDetails } from '../WifiConnectionDetails'
 jest.mock('../../../resources/networking/hooks')
 jest.mock('../../../redux/networking')
 jest.mock('../../../redux/discovery/selectors')
-jest.mock(
-  '../../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
-)
+jest.mock('../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal')
 
 const mockPush = jest.fn()
 jest.mock('react-router-dom', () => {

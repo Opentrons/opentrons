@@ -17,7 +17,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/GripperWizardFlows')
 jest.mock('../../../organisms/PipetteWizardFlows')
 jest.mock('../../../organisms/PipetteWizardFlows/ChoosePipette')
-jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock('../../../organisms/Navigation')
 
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
 const mockGripperWizardFlows = GripperWizardFlows as jest.MockedFunction<

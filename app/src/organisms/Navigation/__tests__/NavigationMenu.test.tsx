@@ -5,7 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { restartRobot } from '../../../redux/robot-admin'
 import { home } from '../../../redux/robot-controls'
 import { useLights } from '../../Devices/hooks'
-import { NavigationMenu } from '../../Navigation/NavigationMenu'
+import { NavigationMenu } from '../NavigationMenu'
 
 jest.mock('../../../redux/robot-admin')
 jest.mock('../../../redux/robot-controls')
