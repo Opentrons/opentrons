@@ -19,12 +19,13 @@ import {
   POSITION_STATIC,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
-import { useNetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
-import { getLocalRobot } from '../../../redux/discovery'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { useNetworkConnection } from '../../pages/OnDeviceDisplay/hooks'
+import { getLocalRobot } from '../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
+import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 
-import type { RouteProps } from '../../../App/types'
+import type { RouteProps } from '../../App/types'
 
 interface NavigationProps {
   routes: RouteProps[]
@@ -37,6 +38,10 @@ export function Navigation(props: NavigationProps): JSX.Element {
   const { routes, setNavMenuIsOpened, longPressModalIsOpened } = props
   const localRobot = useSelector(getLocalRobot)
   const [showNavMenu, setShowNavMenu] = React.useState<boolean>(false)
+  const [
+    showRestartRobotConfirmationModal,
+    setShowRestartRobotConfirmationModal,
+  ] = React.useState<boolean>(false)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
 
   // We need to display an icon for what type of network connection (if any)
@@ -114,8 +119,20 @@ export function Navigation(props: NavigationProps): JSX.Element {
         <NavigationMenu
           onClick={() => handleMenu(false)}
           robotName={robotName}
+          setShowNavMenu={setShowNavMenu}
+          setShowRestartRobotConfirmationModal={
+            setShowRestartRobotConfirmationModal
+          }
         />
       )}
+      {showRestartRobotConfirmationModal ? (
+        <RestartRobotConfirmationModal
+          robotName={robotName}
+          setShowRestartRobotConfirmationModal={
+            setShowRestartRobotConfirmationModal
+          }
+        />
+      ) : null}
     </>
   )
 }

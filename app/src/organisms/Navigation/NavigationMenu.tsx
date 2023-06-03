@@ -10,25 +10,38 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
-import { MenuList } from '../../../atoms/MenuList'
-import { MenuItem } from '../../../atoms/MenuList/MenuItem'
-import { home, ROBOT } from '../../../redux/robot-controls'
-import { restartRobot } from '../../../redux/robot-admin'
-import { useLights } from '../../Devices/hooks'
+import { StyledText } from '../../atoms/text'
+import { MenuList } from '../../atoms/MenuList'
+import { MenuItem } from '../../atoms/MenuList/MenuItem'
+import { home, ROBOT } from '../../redux/robot-controls'
+import { useLights } from '../Devices/hooks'
 
-import type { Dispatch } from '../../../redux/types'
+import type { Dispatch } from '../../redux/types'
 
 interface NavigationMenuProps {
   onClick: React.MouseEventHandler
   robotName: string
+  setShowNavMenu: (showNavMenu: boolean) => void
+  setShowRestartRobotConfirmationModal: (
+    showRestartRobotConfirmationModal: boolean
+  ) => void
 }
 
 export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
-  const { onClick, robotName } = props
+  const {
+    onClick,
+    robotName,
+    setShowNavMenu,
+    setShowRestartRobotConfirmationModal,
+  } = props
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
   const { lightsOn, toggleLights } = useLights()
   const dispatch = useDispatch<Dispatch>()
+
+  const handleRestart = (): void => {
+    setShowNavMenu(false)
+    setShowRestartRobotConfirmationModal(true)
+  }
 
   return (
     <MenuList onClick={onClick} isOnDevice={true}>
@@ -51,7 +64,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
           </StyledText>
         </Flex>
       </MenuItem>
-      <MenuItem key="restart" onClick={() => dispatch(restartRobot(robotName))}>
+      <MenuItem key="restart" onClick={handleRestart}>
         <Flex alignItems={ALIGN_CENTER}>
           <Icon
             name="restart"
