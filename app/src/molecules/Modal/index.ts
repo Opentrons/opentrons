@@ -1,2 +1,2 @@
 export * from './Modal'
-export * from './__tests__/SmallModalChildren'
+export * from './SmallModalChildren'
