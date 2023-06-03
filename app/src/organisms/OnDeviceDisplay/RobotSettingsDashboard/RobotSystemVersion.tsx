@@ -71,7 +71,10 @@ export function RobotSystemVersion({
             alignItems={ALIGN_CENTER}
             gridGap={SPACING.spacing16}
           >
-            <Btn onClick={() => setCurrentOption(null)}>
+            <Btn
+              onClick={() => setCurrentOption(null)}
+              data-testid="RobotSystemVersion_back_button"
+            >
               <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
             </Btn>
             <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
@@ -117,7 +120,7 @@ export function RobotSystemVersion({
             {isUpdateAvailable ? (
               <MediumButton
                 flex="1"
-                buttonText={t('app_settings:view_software_update')}
+                buttonText={t('view_update')}
                 onClick={() => setShowModal(true)}
               />
             ) : (

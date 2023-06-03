@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
@@ -39,25 +38,23 @@ describe('RobotSystemVersionModal', () => {
     jest.clearAllMocks()
   })
   it('should render text and buttons', () => {
-    const [{ getByText, getByRole }] = render(props)
+    const [{ getByText }] = render(props)
     getByText('Robot System Version mockVersion available')
     getByText('Updating the robot system requires a restart')
     getByText('mockReleaseNote')
-    getByRole('button', { name: 'Remind me later' })
-    getByRole('button', { name: 'Update' })
+    getByText('Not now')
+    getByText('Update')
   })
 
   it('should close the modal when tapping remind me later', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Update' })
-    fireEvent.click(button)
+    const [{ getByText }] = render(props)
+    getByText('Update').click()
     expect(mockPush).toHaveBeenCalledWith('/robot-settings/update-robot')
   })
 
   it('should call the mock function when tapping update', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Remind me later' })
-    fireEvent.click(button)
+    const [{ getByText }] = render(props)
+    getByText('Not now').click()
     expect(mockFn).toHaveBeenCalled()
   })
 })

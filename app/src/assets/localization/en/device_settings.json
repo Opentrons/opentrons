@@ -191,7 +191,7 @@
   "robot_settings": "Robot Settings",
   "robot_software_update_required": "A robot software update is required to run protocols with this version of the Opentrons App.",
   "robot_successfully_connected": "Robot successfully connected to {{networkName}}.",
-  "robot_system_version_available": "Robot System Version {{releaseVersion}} Available",
+  "robot_system_version_available": "Robot System Version {{releaseVersion}} available",
   "robot_system_version": "Robot System Version",
   "robot_update_available": "Robot Update Available",
   "search_again": "Search again",
