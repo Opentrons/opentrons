@@ -52,6 +52,11 @@ const INPUT_FIELD_ODD_STYLE = css`
   font-size: 2.5rem;
   line-height: 3.25rem;
   text-align: center;
+  outline: none;
+
+  &:focus {
+    border: none;
+  }
 `
 
 interface FormikErrors {

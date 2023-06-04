@@ -1,6 +1,8 @@
 'use strict'
 
 module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
   setupFilesAfterEnv: [
     '<rootDir>/scripts/setup-enzyme.js',
     '<rootDir>/scripts/setup-global-mocks.js',
@@ -11,9 +13,18 @@ module.exports = {
   },
   moduleNameMapper: {
     '\\.(css)$': 'identity-obj-proxy',
+    // '/^components/(.*)$/': '<rootDir>/components/src/$1',
+    // '@opentrons/components(.*)$': '<rootDir>/components/src/$1',
+    // '^@opentrons/components/(.*)$': '<rootDir>/$1',
+    '@opentrons/components(.*)$': '<rootDir>/components/src/$1',
+    // '@opentrons/api-client(.*)$': '<rootDir>/api-client/src/$1/',
+    // '@opentrons/react-api-client(.*)$': '<rootDir>/react-api-client/src/$1/',
+    // '@opentrons/shared-data(.*)$': '<rootDir>/shared-data/js/$1/',
+    '@opentrons/shared-data(.*)$': '<rootDir>/shared-data/js/$1',
   },
+  resolver: undefined,
   transform: {
-    '^.+\\.(js|ts|tsx)$': 'babel-jest',
+    '^.+\\.(js|ts|tsx)$': 'esbuild-jest',
     '\\.(jpg|png|gif|svg|woff|woff2|webm)$':
       '@opentrons/components/src/__mocks__/file.js',
   },
