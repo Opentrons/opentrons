@@ -1,9 +1,14 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
+import { useConnectionsQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../i18n'
 import { ConnectViaUSB } from '../ConnectViaUSB'
+
+import type { UseQueryResult } from 'react-query'
+import type { ActiveConnections } from '@opentrons/api-client'
 
 const mockPush = jest.fn()
 
@@ -14,6 +19,11 @@ jest.mock('react-router-dom', () => {
     useHistory: () => ({ push: mockPush } as any),
   }
 })
+jest.mock('@opentrons/react-api-client')
+
+const mockUseConnectionsQuery = useConnectionsQuery as jest.MockedFunction<
+  typeof useConnectionsQuery
+>
 
 const render = () => {
   return renderWithProviders(
@@ -27,7 +37,19 @@ const render = () => {
 }
 
 describe('ConnectViaUSB', () => {
-  it('should render text, button, and image', () => {
+  beforeEach(() => {
+    when(mockUseConnectionsQuery)
+      .calledWith()
+      .mockReturnValue(({
+        data: { connections: [] },
+      } as unknown) as UseQueryResult<ActiveConnections>)
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
+    resetAllWhenMocks()
+  })
+
+  it('should render no connection text, button, and image', () => {
     const [{ getByText, getByLabelText }] = render()
     getByText('USB')
     getByText('No connection found')
@@ -43,21 +65,30 @@ describe('ConnectViaUSB', () => {
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
 
-  // Note the following cases will be activated when the connection check functionality is ready
-  /*
-  it('should render text and button', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Connect via USB')
-    getByRole('button', { name: 'Back' })
+  it('should render successful connection text and button', () => {
+    when(mockUseConnectionsQuery)
+      .calledWith()
+      .mockReturnValue(({
+        data: { connections: [{ agent: 'com.opentrons.app.usb' }] },
+      } as unknown) as UseQueryResult<ActiveConnections>)
+    const [{ getByText }] = render()
+    getByText('USB')
     getByText('Successfully connected!')
-    getByRole('button', { name: 'Next step' })
+    getByText(
+      'Find your robot in the Opentrons App to install software updates.'
+    )
+    getByText('Continue')
   })
 
-  it('should call a mock function when tapping next step button', () => {
-    const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Next step' })
-    fireEvent.click(button)
-    expect(mockPush).toHaveBeenCalledWith('/path-to-name-screen')
+  it('should route to the rename robot page when tapping continue button', () => {
+    when(mockUseConnectionsQuery)
+      .calledWith()
+      .mockReturnValue(({
+        data: { connections: [{ agent: 'com.opentrons.app.usb' }] },
+      } as unknown) as UseQueryResult<ActiveConnections>)
+    const [{ getByText }] = render()
+    const button = getByText('Continue')
+    button.click()
+    expect(mockPush).toHaveBeenCalledWith('/robot-settings/rename-robot')
   })
-  */
 })

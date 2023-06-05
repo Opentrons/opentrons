@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {
   getModuleType,
+  MAGNETIC_BLOCK_TYPE,
   ModuleDefinition,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -122,6 +123,8 @@ export const Module = (props: Props): JSX.Element => {
     )
   }
 
+  const magneticBlockLayerBlockList = ['Module_Title', 'Well_Labels', 'Wells']
+
   return (
     <g transform={positionTransform} data-test={`Module_${moduleType}`}>
       <g transform={orientationTransform}>
@@ -132,6 +135,11 @@ export const Module = (props: Props): JSX.Element => {
             />
           ) : (
             <ModuleFromDef
+              layerBlocklist={
+                moduleType === MAGNETIC_BLOCK_TYPE
+                  ? magneticBlockLayerBlockList
+                  : undefined
+              }
               {...(innerProps as React.ComponentProps<typeof ModuleFromDef>)}
               def={def}
             />

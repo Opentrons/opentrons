@@ -15,7 +15,6 @@ import {
   TouchscreenBrightness,
   NetworkSettings,
   RobotSystemVersion,
-  TextSize,
   UpdateChannel,
 } from '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
 import { getBuildrootUpdateAvailable } from '../../../../redux/buildroot'
@@ -39,9 +38,6 @@ jest.mock(
 )
 jest.mock(
   '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/RobotSystemVersion'
-)
-jest.mock(
-  '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TextSize'
 )
 jest.mock(
   '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TouchscreenBrightness'
@@ -70,7 +66,6 @@ const mockDeviceReset = DeviceReset as jest.MockedFunction<typeof DeviceReset>
 const mockRobotSystemVersion = RobotSystemVersion as jest.MockedFunction<
   typeof RobotSystemVersion
 >
-const mockTextSize = TextSize as jest.MockedFunction<typeof TextSize>
 const mockTouchscreenBrightness = TouchscreenBrightness as jest.MockedFunction<
   typeof TouchscreenBrightness
 >
@@ -102,7 +97,6 @@ describe('RobotSettingsDashboard', () => {
     mockNetworkSettings.mockReturnValue(<div>Mock Network Settings</div>)
     mockDeviceReset.mockReturnValue(<div>Mock Device Reset</div>)
     mockRobotSystemVersion.mockReturnValue(<div>Mock Robot System Version</div>)
-    mockTextSize.mockReturnValue(<div>Mock Text Size</div>)
     mockTouchscreenBrightness.mockReturnValue(
       <div>Mock Touchscreen Brightness</div>
     )
@@ -130,7 +124,6 @@ describe('RobotSettingsDashboard', () => {
     )
     getByText('Touchscreen Sleep')
     getByText('Touchscreen Brightness')
-    getByText('Text Size')
     getByText('Device Reset')
     getByText('Update Channel')
     getByText('Enable Developer Tools')
@@ -188,13 +181,6 @@ describe('RobotSettingsDashboard', () => {
     const button = getByText('Touchscreen Brightness')
     fireEvent.click(button)
     getByText('Mock Touchscreen Brightness')
-  })
-
-  it('should render component when tapping text size', () => {
-    const [{ getByText }] = render()
-    const button = getByText('Text Size')
-    fireEvent.click(button)
-    getByText('Mock Text Size')
   })
 
   it('should render component when tapping device rest', () => {
