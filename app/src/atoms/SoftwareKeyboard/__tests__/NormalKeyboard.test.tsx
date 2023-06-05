@@ -23,7 +23,94 @@ describe('SoftwareKeyboard', () => {
     const buttons = getAllByRole('button')
 
     const expectedButtonNames = [
-      '`',
+      'q',
+      'w',
+      'e',
+      'r',
+      't',
+      'y',
+      'u',
+      'i',
+      'o',
+      'p',
+      'a',
+      's',
+      'd',
+      'f',
+      'g',
+      'h',
+      'j',
+      'k',
+      'l',
+      'shift',
+      '123',
+      'z',
+      'x',
+      'c',
+      'v',
+      'b',
+      'n',
+      'm',
+      'del',
+      'space',
+    ]
+
+    buttons.forEach((button, index) => {
+      const expectedName = expectedButtonNames[index]
+      expect(button).toHaveTextContent(expectedName)
+    })
+  })
+
+  it('should render the software keyboards when hitting shift key', () => {
+    const { getAllByRole, getByRole } = render(props)
+    const shiftKey = getByRole('button', { name: 'shift' })
+    fireEvent.click(shiftKey)
+    const buttons = getAllByRole('button')
+    const expectedButtonNames = [
+      'Q',
+      'W',
+      'E',
+      'R',
+      'T',
+      'Y',
+      'U',
+      'I',
+      'O',
+      'P',
+      'A',
+      'S',
+      'D',
+      'F',
+      'G',
+      'H',
+      'J',
+      'K',
+      'L',
+      'shift',
+      '123',
+      'Z',
+      'X',
+      'C',
+      'V',
+      'B',
+      'N',
+      'M',
+      'del',
+      'space',
+    ]
+
+    buttons.forEach((button, index) => {
+      const expectedName = expectedButtonNames[index]
+      expect(button).toHaveTextContent(expectedName)
+    })
+  })
+
+  it('should render the software keyboards when hitting 123 key', () => {
+    const { getAllByRole, getByRole } = render(props)
+    const numberKey = getByRole('button', { name: '123' })
+    fireEvent.click(numberKey)
+    const buttons = getAllByRole('button')
+    const expectedButtonNames = [
       '1',
       '2',
       '3',
@@ -35,50 +122,24 @@ describe('SoftwareKeyboard', () => {
       '9',
       '0',
       '-',
-      '=',
-      'backspace',
-      'tab',
-      'q',
-      'w',
-      'e',
-      'r',
-      't',
-      'y',
-      'u',
-      'i',
-      'o',
-      'p',
-      '[',
-      ']',
-      '\\',
-      'caps',
-      'a',
-      's',
-      'd',
-      'f',
-      'g',
-      'h',
-      'j',
-      'k',
-      'l',
-      ';',
-      "'",
-      '< enter',
-      'shift',
-      'z',
-      'x',
-      'c',
-      'v',
-      'b',
-      'n',
-      'm',
-      ',',
-      '.',
       '/',
-      'shift',
-      '.com',
+      ':',
+      ';',
+      '(',
+      ')',
+      '$',
+      '&',
       '@',
-      '', // space keyboard
+      '"',
+      'ABC',
+      '#+=',
+      '.',
+      ',',
+      '?',
+      '!',
+      "'",
+      'del',
+      'space',
     ]
 
     buttons.forEach((button, index) => {
@@ -87,68 +148,43 @@ describe('SoftwareKeyboard', () => {
     })
   })
 
-  it('should render the software keyboards when hitting shift key', () => {
-    const { getAllByRole } = render(props)
-    const shiftKey = getAllByRole('button', { name: 'shift' })[0]
-    fireEvent.click(shiftKey)
+  it('should render the software keyboards when hitting #+= key', () => {
+    const { getAllByRole, getByRole } = render(props)
+    const numberKey = getByRole('button', { name: '123' })
+    fireEvent.click(numberKey)
+    const symbolKey = getByRole('button', { name: '#+=' })
+    fireEvent.click(symbolKey)
     const buttons = getAllByRole('button')
     const expectedButtonNames = [
-      '~',
-      '!',
-      '@',
-      '#',
-      '$',
-      '%',
-      '^',
-      '&',
-      '*',
-      '(',
-      ')',
-      '_',
-      '+',
-      'backspace',
-      'tab',
-      'Q',
-      'W',
-      'E',
-      'R',
-      'T',
-      'Y',
-      'U',
-      'I',
-      'O',
-      'P',
+      '[',
+      ']',
       '{',
       '}',
+      '#',
+      '%',
+      '^',
+      '*',
+      '+',
+      '=',
+      '_',
+      '\\',
       '|',
-      'caps',
-      'A',
-      'S',
-      'D',
-      'F',
-      'G',
-      'H',
-      'J',
-      'K',
-      'L',
-      ':',
-      '"',
-      '< enter',
-      'shift',
-      'Z',
-      'X',
-      'C',
-      'V',
-      'B',
-      'N',
-      'M',
+      '~',
       '<',
       '>',
+      '€',
+      '£',
+      '¥',
+      '·',
+      'ABC',
+      '123',
+      '.',
+      ',',
       '?',
-      'shift',
-      '.com',
-      '@',
-      '', // space keyboard
+      '!',
+      "'",
+      'del',
+      'space',
     ]
 
     buttons.forEach((button, index) => {
@@ -159,8 +195,8 @@ describe('SoftwareKeyboard', () => {
 
   it('should call mock function when clicking a key', () => {
     const { getByRole } = render(props)
-    const numKey = getByRole('button', { name: 'a' })
-    fireEvent.click(numKey)
+    const aKey = getByRole('button', { name: 'a' })
+    fireEvent.click(aKey)
     expect(props.onChange).toHaveBeenCalled()
   })
 })

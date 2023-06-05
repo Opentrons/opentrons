@@ -5,18 +5,19 @@ import styled, { css } from 'styled-components'
 import clamp from 'lodash/clamp'
 
 import {
-  Flex,
-  Btn,
-  DIRECTION_COLUMN,
-  JUSTIFY_FLEX_START,
   ALIGN_CENTER,
-  Icon,
-  DIRECTION_ROW,
-  Box,
-  JUSTIFY_CENTER,
   BORDERS,
-  SPACING,
+  Box,
+  Btn,
   COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  JUSTIFY_CENTER,
+  JUSTIFY_FLEX_START,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -46,7 +47,7 @@ interface BrightnessTileProps {
 const BrightnessTile = styled(Box)`
   width: 100%;
   height: 8.75rem;
-  border-radius: ${BORDERS.size2};
+  border-radius: ${BORDERS.borderRadiusSize2};
   background: ${(props: BrightnessTileProps) =>
     props.isActive ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
 `
@@ -84,15 +85,15 @@ export function TouchscreenBrightness({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32}>
       <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_CENTER}>
         <Btn
           onClick={() => setCurrentOption(null)}
           data-testid="TouchscreenBrightness_back_button"
         >
-          <Icon name="chevron-left" size="2.5rem" />
+          <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
         </Btn>
-        <StyledText fontSize="2rem" textAlign="center">
+        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('touchscreen_brightness')}
         </StyledText>
       </Flex>

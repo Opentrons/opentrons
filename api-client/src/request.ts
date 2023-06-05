@@ -25,8 +25,11 @@ export function request<ResData, ReqData = null>(
   config: HostConfig,
   params?: AxiosRequestConfig['params']
 ): ResponsePromise<ResData> {
-  const { hostname, port, requestor = axios.request } = config
-  const headers = { ...DEFAULT_HEADERS }
+  const { hostname, port, requestor = axios.request, token } = config
+
+  const tokenHeader = token != null ? { authenticationBearer: token } : {}
+  const headers = { ...DEFAULT_HEADERS, ...tokenHeader }
+
   const baseURL = `http://${hostname}:${port ?? DEFAULT_PORT}`
 
   return requestor<ResData>({ headers, method, baseURL, url, data, params })

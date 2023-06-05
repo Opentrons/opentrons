@@ -17,12 +17,19 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useAuthorization } from '@opentrons/react-api-client'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import FLEX_PNG from '../../assets/images/FLEX.png'
 import { ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
+import { getConfig } from '../../redux/config'
+import {
+  CONNECTABLE,
+  getRobotAddressesByName,
+  getRobotModelByName,
+  OPENTRONS_USB,
+} from '../../redux/discovery'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
 import { RobotStatusHeader } from './RobotStatusHeader'
 import { ReachableBanner } from './ReachableBanner'
@@ -58,6 +65,23 @@ export function RobotOverview({
   )
   const isRobotViewable = useIsRobotViewable(robot?.name ?? '')
   const { lightsOn, toggleLights } = useLights()
+
+  const userId = useSelector(getConfig)?.support?.userId ?? 'Opentrons-user'
+
+  const addresses = useSelector((state: State) =>
+    getRobotAddressesByName(state, robot?.name ?? '')
+  )
+  const isUsbConnected = addresses.some(address => address.ip === OPENTRONS_USB)
+
+  // TODO(bh, 2023-05-31): remove registration/authorization here when AppApiHostProvider exists
+  useAuthorization({
+    subject: 'Opentrons',
+    agent:
+      // define the registration agent as usb if any usb hostname address exists
+      // may change when ODD no longer needs to rely on this
+      isUsbConnected ? 'com.opentrons.app.usb' : 'com.opentrons.app',
+    agentId: userId,
+  })
 
   return robot != null ? (
     <>
