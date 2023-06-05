@@ -3,6 +3,7 @@ describe('The Settings Page', () => {
 
   before(() => {
     cy.visit('/')
+    cy.get('button').contains('Create new OT-2 protocol').click()
   })
 
   it('displays the announcement modal and clicks "GOT IT!" to close it', () => {

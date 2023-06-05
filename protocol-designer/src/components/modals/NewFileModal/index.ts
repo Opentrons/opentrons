@@ -52,7 +52,7 @@ export const NewFileModal = connect(
   mergeProps
 )(FilePipettesModalComponent)
 
-function mapStateToProps(state: BaseState): SP {
+export function mapStateToProps(state: BaseState): SP {
   return {
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
     _customLabware: labwareDefSelectors.getCustomLabwareDefsByURI(state),
@@ -63,7 +63,7 @@ function mapStateToProps(state: BaseState): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
+export function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
   return {
     onCancel: () => dispatch(navigationActions.toggleNewProtocolModal(false)),
     _createNewProtocol: (args: CreateNewProtocolArgs) => {

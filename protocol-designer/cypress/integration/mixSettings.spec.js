@@ -42,6 +42,7 @@ function enterBatchEdit() {
 describe('Advanced Settings for Mix Form', () => {
   before(() => {
     cy.visit('/')
+    cy.get('button').contains('Create new OT-2 protocol').click()
     cy.closeAnnouncementModal()
     importProtocol()
     openDesignTab()
