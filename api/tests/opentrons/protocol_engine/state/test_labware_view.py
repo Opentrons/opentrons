@@ -513,9 +513,7 @@ def test_get_slot_definition_raises_with_bad_slot_name(
     subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
     with pytest.raises(errors.SlotDoesNotExistError):
-        # note: normally the typechecker should catch this, but clients may
-        # not be using typechecking or our enums
-        subject.get_slot_definition(42)  # type: ignore[arg-type]
+        subject.get_slot_definition(DeckSlotName.SLOT_A1)
 
 
 def test_get_slot_position(ot2_standard_deck_def: DeckDefinitionV3) -> None:
@@ -731,6 +729,7 @@ def test_get_display_name() -> None:
 
 def test_get_fixed_trash_id() -> None:
     """It should return the ID of the labware loaded into the fixed trash slot."""
+    # OT-2 fixed trash slot:
     subject = get_labware_view(
         labware_by_id={
             "abc123": LoadedLabware(
@@ -743,9 +742,24 @@ def test_get_fixed_trash_id() -> None:
             )
         },
     )
-
     assert subject.get_fixed_trash_id() == "abc123"
 
+    # OT-3 fixed trash slot:
+    subject = get_labware_view(
+        labware_by_id={
+            "abc123": LoadedLabware(
+                id="abc123",
+                loadName="trash-load-name",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+                definitionUri="trash-definition-uri",
+                offsetId=None,
+                displayName=None,
+            )
+        },
+    )
+    assert subject.get_fixed_trash_id() == "abc123"
+
+    # Nothing in the fixed trash slot:
     subject = get_labware_view(
         labware_by_id={
             "abc123": LoadedLabware(
@@ -758,7 +772,6 @@ def test_get_fixed_trash_id() -> None:
             )
         },
     )
-
     with pytest.raises(errors.LabwareNotLoadedError):
         subject.get_fixed_trash_id()
 
@@ -813,14 +826,14 @@ def test_get_calibration_coordinates() -> None:
         "locations": {
             "orderedSlots": [
                 {
-                    "id": "1",
+                    "id": "D1",
                     "position": [2, 2, 0.0],
                     "boundingBox": {
                         "xDimension": 4.0,
                         "yDimension": 6.0,
                         "zDimension": 0,
                     },
-                    "displayName": "Slot 1",
+                    "displayName": "Slot D1",
                 }
             ]
         }
@@ -890,11 +903,17 @@ def test_get_by_slot_filter_ids() -> None:
     ["well_name", "mount", "labware_slot", "next_to_module", "expected_result"],
     [
         ("abc", MountType.RIGHT, DeckSlotName.SLOT_3, False, EdgePathType.LEFT),
+        ("abc", MountType.RIGHT, DeckSlotName.SLOT_D3, False, EdgePathType.LEFT),
         ("abc", MountType.RIGHT, DeckSlotName.SLOT_1, True, EdgePathType.LEFT),
+        ("abc", MountType.RIGHT, DeckSlotName.SLOT_D1, True, EdgePathType.LEFT),
         ("pqr", MountType.LEFT, DeckSlotName.SLOT_3, True, EdgePathType.RIGHT),
+        ("pqr", MountType.LEFT, DeckSlotName.SLOT_D3, True, EdgePathType.RIGHT),
         ("pqr", MountType.LEFT, DeckSlotName.SLOT_3, False, EdgePathType.DEFAULT),
+        ("pqr", MountType.LEFT, DeckSlotName.SLOT_D3, False, EdgePathType.DEFAULT),
         ("pqr", MountType.RIGHT, DeckSlotName.SLOT_3, True, EdgePathType.DEFAULT),
+        ("pqr", MountType.RIGHT, DeckSlotName.SLOT_D3, True, EdgePathType.DEFAULT),
         ("def", MountType.LEFT, DeckSlotName.SLOT_3, True, EdgePathType.DEFAULT),
+        ("def", MountType.LEFT, DeckSlotName.SLOT_D3, True, EdgePathType.DEFAULT),
     ],
 )
 def test_get_edge_path_type(

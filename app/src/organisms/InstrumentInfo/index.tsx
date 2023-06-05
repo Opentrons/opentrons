@@ -20,13 +20,13 @@ import { GripperWizardFlows } from '../GripperWizardFlows'
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
+import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { formatTimestamp } from '../Devices/utils'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
-
 interface InstrumentInfoProps {
   // NOTE: instrument will only be null while
   // in the middle of detach wizard which occludes
@@ -35,6 +35,7 @@ interface InstrumentInfoProps {
 }
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
   const { t, i18n } = useTranslation('instruments_dashboard')
+  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
   const { instrument } = props
   const history = useHistory()
   const [wizardProps, setWizardProps] = React.useState<
@@ -52,6 +53,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     },
   }
   const handleDetach: React.MouseEventHandler = () => {
+    setODDMaintenanceFlowInProgress()
     if (instrument != null) {
       setWizardProps(
         instrument.mount === 'extension'
@@ -74,6 +76,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     }
   }
   const handleRecalibrate: React.MouseEventHandler = () => {
+    setODDMaintenanceFlowInProgress()
     if (instrument != null) {
       setWizardProps(
         instrument.mount === 'extension'
@@ -160,7 +163,7 @@ interface InfoItemProps extends StyleProps {
 function InfoItem(props: InfoItemProps): JSX.Element {
   return (
     <Flex
-      borderRadius={BORDERS.size3}
+      borderRadius={BORDERS.borderRadiusSize3}
       backgroundColor={COLORS.lightGreyPressed}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
