@@ -145,7 +145,7 @@ describe('RecentRunProtocolCard', () => {
     }).replace('about ', '')
     getByText('Ready to run')
     getByText('mockProtocol')
-    getByText(`Last run ${lastRunTime}`)
+    getByText(`Completed ${lastRunTime}`)
   })
 
   it('should render missing chip when missing a pipette', () => {

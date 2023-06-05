@@ -114,7 +114,7 @@ export function RecentRunProtocolCard({
         lineHeight={TYPOGRAPHY.lineHeight28}
         color={COLORS.darkBlack70}
       >
-        {i18n.format(t('last_run_time'), 'capitalize')}{' '}
+        {i18n.format(t('completed'), 'capitalize')}{' '}
         {lastRun != null
           ? formatDistance(new Date(lastRun), new Date(), {
               addSuffix: true,
