@@ -16,12 +16,11 @@ labware.
 import asyncio
 import textwrap
 from pathlib import Path
-from typing import Any, AsyncGenerator, Generator
+from typing import Any, AsyncGenerator
 
 import anyio
 import pytest
 
-from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
 
 
@@ -29,24 +28,17 @@ INTEGRATION_TEST_PROTOCOLS_DIR = Path(__file__).parent / "../../protocols"
 LABWARE_PATH = INTEGRATION_TEST_PROTOCOLS_DIR / "test_1_reservoir_5ul.json"
 EXPECTED_LABWARE_LOAD_NAME = "test_1_reservoir_5ul"
 
-PORT = "15555"
 ANALYSIS_POLL_INTERVAL = 0.1
 ANALYSIS_POLL_TIMEOUT = 10
 
 
-@pytest.fixture(scope="module")
-def dev_server() -> Generator[DevServer, None, None]:
-    """Return a running dev server."""
-    with DevServer(port=PORT) as dev_server:
-        dev_server.start()
-        yield dev_server
-
-
 @pytest.fixture
-async def robot_client(dev_server: DevServer) -> AsyncGenerator[RobotClient, None]:
+async def robot_client(
+    ot2_server_base_url: str,
+) -> AsyncGenerator[RobotClient, None]:
     """Return a client for a running dev server."""
     async with RobotClient.make(
-        host="http://localhost", port=dev_server.port, version="*"
+        base_url=ot2_server_base_url, version="*"
     ) as robot_client:
         assert (
             await robot_client.wait_until_alive()

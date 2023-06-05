@@ -7,12 +7,12 @@ import {
   TYPOGRAPHY,
   DIRECTION_ROW,
   SPACING,
+  PrimaryButton,
   ALIGN_FLEX_END,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
 import { StyledText } from '../../../../atoms/text'
-import { PrimaryButton } from '../../../../atoms/buttons'
 import { Modal } from '../../../../molecules/Modal'
 import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
 import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
@@ -55,7 +55,7 @@ export const SecureLabwareModal = (
                     block: (
                       <StyledText
                         as="p"
-                        marginBottom={SPACING.spacing2}
+                        marginBottom={SPACING.spacing4}
                         marginRight="3.625rem"
                       />
                     ),
@@ -66,7 +66,7 @@ export const SecureLabwareModal = (
                 width="288px"
                 height="100%"
                 src={secureMagModBracketImage}
-                style={{ marginBottom: SPACING.spacing5 }}
+                style={{ marginBottom: SPACING.spacing24 }}
               />
             </Flex>
           )}
@@ -82,7 +82,7 @@ export const SecureLabwareModal = (
                 src={secureTCLatchImage}
                 width="288px"
                 height="100%"
-                style={{ marginBottom: SPACING.spacing4 }}
+                style={{ marginBottom: SPACING.spacing16 }}
               />
             </Flex>
           )}

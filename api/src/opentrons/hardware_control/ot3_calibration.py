@@ -1,21 +1,42 @@
 """Functions and utilites for OT3 calibration."""
 from __future__ import annotations
+from functools import lru_cache
+from dataclasses import dataclass
 from typing_extensions import Final, Literal, TYPE_CHECKING
-from typing import Union, Tuple, List, Dict, Any, Optional
+from typing import Tuple, List, Dict, Any, Optional, Union
 import datetime
 import numpy as np
 from enum import Enum
-from math import floor, copysign
+from math import floor, copysign, isclose
 from logging import getLogger
 from opentrons.util.linal import solve_attitude
 
 from .types import OT3Mount, OT3Axis, GripperProbe
 from opentrons.types import Point
-from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings
+from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings, OT3Config
 import json
 
-from opentrons_shared_data.deck import load as load_deck
-from opentrons.calibration_storage.types import AttitudeMatrix
+from opentrons_shared_data.deck import (
+    get_calibration_square_position_in_slot,
+    Z_PREP_OFFSET,
+    CALIBRATION_PROBE_RADIUS,
+    CALIBRATION_SQUARE_EDGES as SQUARE_EDGES,
+)
+from .robot_calibration import (
+    RobotCalibration,
+    DeckCalibration,
+)
+from opentrons.calibration_storage import types
+from opentrons.calibration_storage.ot3.deck_attitude import (
+    save_robot_belt_attitude,
+    get_robot_belt_attitude,
+    delete_robot_belt_attitude,
+)
+from opentrons.config.robot_configs import (
+    default_ot3_deck_calibration,
+    defaults_ot3,
+)
+from .util import DeckTransformState
 
 if TYPE_CHECKING:
     from .ot3api import OT3API
@@ -28,22 +49,23 @@ SEARCH_TRANSIT_HEIGHT: Final[float] = 5
 GRIPPER_GRIP_FORCE: Final[float] = 20
 BELT_CAL_TRANSIT_HEIGHT: Final[float] = 50
 
-# FIXME: add these to shared-data
-Z_PREP_OFFSET = Point(x=13, y=13, z=0)
-CALIBRATION_SQUARE_DEPTH: Final[float] = -0.25
-CALIBRATION_SQUARE_SIZE: Final[float] = 20
-CALIBRATION_PROBE_RADIUS: Final[float] = 2
+PREP_OFFSET_DEPTH = Point(*Z_PREP_OFFSET)
 EDGES = {
-    "right": Point(x=CALIBRATION_SQUARE_SIZE * 0.5),
-    "left": Point(x=-CALIBRATION_SQUARE_SIZE * 0.5),
-    "top": Point(y=CALIBRATION_SQUARE_SIZE * 0.5),
-    "bottom": Point(y=-CALIBRATION_SQUARE_SIZE * 0.5),
+    "left": Point(*SQUARE_EDGES["left"]),
+    "right": Point(*SQUARE_EDGES["right"]),
+    "top": Point(*SQUARE_EDGES["top"]),
+    "bottom": Point(*SQUARE_EDGES["bottom"]),
 }
 
 
 class CalibrationMethod(Enum):
     BINARY_SEARCH = "binary search"
     NONCONTACT_PASS = "noncontact pass"
+
+
+class CalibrationTarget(Enum):
+    DECK_OBJECT = "deck_object"
+    GANTRY_INSTRUMENT = "gantry_instrument"
 
 
 class CalibrationStructureNotFoundError(RuntimeError):
@@ -81,7 +103,7 @@ def _deck_hit(
     to determine whether or not it had hit the deck.
     """
     if found_pos > expected_pos + settings.early_sense_tolerance_mm:
-        raise EarlyCapacitiveSenseTrigger(expected_pos, expected_pos)
+        raise EarlyCapacitiveSenseTrigger(found_pos, expected_pos)
     return (
         True if found_pos >= (expected_pos - settings.overrun_tolerance_mm) else False
     )
@@ -148,7 +170,7 @@ async def find_edge_binary(
     slot_edge_nominal: Point,
     search_axis: Union[Literal[OT3Axis.X, OT3Axis.Y]],
     direction_if_hit: Literal[1, -1],
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
     """
     Find the true position of one edge of the calibration slot in the deck.
@@ -180,6 +202,7 @@ async def find_edge_binary(
         search_axis, direction_if_hit
     )
     stride = edge_settings.search_initial_tolerance_mm * direction_if_hit
+    final_z_height_found = slot_edge_nominal.z
     for _ in range(edge_settings.search_iteration_limit):
         LOG.info(f"Checking position {checking_pos}")
         interaction_pos = await _probe_deck_at(
@@ -187,10 +210,11 @@ async def find_edge_binary(
         )
         hit_deck = _deck_hit(interaction_pos, checking_pos.z, edge_settings)
         if hit_deck:
-            LOG.info(f"hit at {interaction_pos}, stride size: {stride}")
             # In this block, we've hit the deck
-            # update the fonud deck value
-            checking_pos = checking_pos._replace(z=interaction_pos)
+            LOG.info(f"hit at {interaction_pos}, stride size: {stride}")
+            # store the final found Z height found
+            # because the height is most accurate next to the edge
+            final_z_height_found = interaction_pos
             if copysign(stride, direction_if_hit) == stride:
                 # If we're in direction_if_hit direction, the last probe was on the deck,
                 # so we want to continue
@@ -223,6 +247,8 @@ async def find_edge_binary(
             LOG.warning(e)
     # remove probe offset so we actually get position of the edge
     found_edge = checking_pos - critical_edge_offset(search_axis, direction_if_hit)
+    # use the last-found Z height as the edge's most true Z position
+    found_edge = found_edge._replace(z=final_z_height_found)
     return found_edge
 
 
@@ -230,7 +256,7 @@ async def find_slot_center_binary(
     hcapi: OT3API,
     mount: OT3Mount,
     estimated_center: Point,
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
     """Find the center of the calibration slot by binary-searching its edges.
     Returns the XY-center of the slot.
@@ -247,17 +273,17 @@ async def find_slot_center_binary(
     LOG.info(f"Found +x edge at {plus_x_edge.x}mm")
     estimated_center = estimated_center._replace(x=plus_x_edge.x - EDGES["right"].x)
 
-    minus_x_edge = await find_edge_binary(
-        hcapi, mount, estimated_center + EDGES["left"], OT3Axis.X, 1, raise_verify_error
-    )
-    LOG.info(f"Found -x edge at {minus_x_edge.x}mm")
-    estimated_center = estimated_center._replace(x=(plus_x_edge.x + minus_x_edge.x) / 2)
-
     plus_y_edge = await find_edge_binary(
         hcapi, mount, estimated_center + EDGES["top"], OT3Axis.Y, -1, raise_verify_error
     )
     LOG.info(f"Found +y edge at {plus_y_edge.y}mm")
     estimated_center = estimated_center._replace(y=plus_y_edge.y - EDGES["top"].y)
+
+    minus_x_edge = await find_edge_binary(
+        hcapi, mount, estimated_center + EDGES["left"], OT3Axis.X, 1, raise_verify_error
+    )
+    LOG.info(f"Found -x edge at {minus_x_edge.x}mm")
+    estimated_center = estimated_center._replace(x=(plus_x_edge.x + minus_x_edge.x) / 2)
 
     minus_y_edge = await find_edge_binary(
         hcapi,
@@ -276,20 +302,6 @@ async def find_slot_center_binary(
     )
 
 
-# FIXME: this should live in shared-data deck definition
-def _get_calibration_square_position_in_slot(slot: int) -> Point:
-    """Get slot top-left position."""
-    deck = load_deck("ot3_standard", version=3)
-    slots = deck["locations"]["orderedSlots"]
-    s = slots[slot - 1]
-    assert s["id"] == str(slot)
-    bottom_left = Point(*s["position"])
-    slot_size_x = s["boundingBox"]["xDimension"]
-    slot_size_y = s["boundingBox"]["yDimension"]
-    relative_center = Point(x=float(slot_size_x), y=float(slot_size_y)) * 0.5
-    return bottom_left + relative_center + Point(z=CALIBRATION_SQUARE_DEPTH)
-
-
 async def find_calibration_structure_height(
     hcapi: OT3API, mount: OT3Mount, nominal_center: Point
 ) -> float:
@@ -304,17 +316,21 @@ async def find_calibration_structure_height(
     will cause a collision is not 0. This routine finds that value.
     """
     z_pass_settings = hcapi.config.calibration.z_offset.pass_settings
-    z_prep_point = nominal_center + Z_PREP_OFFSET
+    z_prep_point = nominal_center + PREP_OFFSET_DEPTH
     structure_z = await _probe_deck_at(hcapi, mount, z_prep_point, z_pass_settings)
     z_limit = nominal_center.z - z_pass_settings.max_overrun_distance_mm
-    if structure_z < z_limit:
+    if (structure_z < z_limit) or isclose(z_limit, structure_z, abs_tol=0.001):
         raise CalibrationStructureNotFoundError(structure_z, z_limit)
     LOG.info(f"autocalibration: found structure at {structure_z}")
     return structure_z
 
 
 async def _probe_deck_at(
-    api: OT3API, mount: OT3Mount, target: Point, settings: CapacitivePassSettings
+    api: OT3API,
+    mount: OT3Mount,
+    target: Point,
+    settings: CapacitivePassSettings,
+    speed: float = 50,
 ) -> float:
     here = await api.gantry_position(mount)
     abs_transit_height = max(
@@ -322,7 +338,7 @@ async def _probe_deck_at(
     )
     safe_height = max(here.z, target.z, abs_transit_height)
     await api.move_to(mount, here._replace(z=safe_height))
-    await api.move_to(mount, target._replace(z=safe_height))
+    await api.move_to(mount, target._replace(z=safe_height), speed=speed)
     await api.move_to(mount, target._replace(z=abs_transit_height))
     _found_pos = await api.capacitive_probe(
         mount, OT3Axis.by_mount(mount), target.z, settings
@@ -338,7 +354,7 @@ async def find_axis_center(
     mount: OT3Mount,
     minus_edge_nominal: Point,
     plus_edge_nominal: Point,
-    axis: Union[Literal[OT3Axis.X, OT3Axis.Y]],
+    axis: Literal[OT3Axis.X, OT3Axis.Y],
 ) -> float:
     """Find the center of the calibration slot on the specified axis.
 
@@ -500,7 +516,7 @@ async def find_calibration_structure_center(
     mount: OT3Mount,
     nominal_center: Point,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
 
     # Perform xy offset search
@@ -521,7 +537,7 @@ async def _calibrate_mount(
     mount: OT3Mount,
     slot: int = 5,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
     """
     Run automatic calibration for the tool attached to the specified mount.
@@ -547,11 +563,15 @@ async def _calibrate_mount(
     the plane of the deck. This value is suitable for vector-subtracting
     from the current instrument offset to set a new instrument offset.
     """
-    nominal_center = _get_calibration_square_position_in_slot(slot)
+    nominal_center = Point(*get_calibration_square_position_in_slot(slot))
     try:
         # find the center of the calibration sqaure
         offset = await find_calibration_structure_position(
-            hcapi, mount, nominal_center, method, raise_verify_error
+            hcapi,
+            mount,
+            nominal_center,
+            method=method,
+            raise_verify_error=raise_verify_error,
         )
         # update center with values obtained during calibration
         LOG.info(f"Found calibration value {offset} for mount {mount.name}")
@@ -575,7 +595,8 @@ async def find_calibration_structure_position(
     mount: OT3Mount,
     nominal_center: Point,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
-    raise_verify_error: bool = False,
+    target: CalibrationTarget = CalibrationTarget.GANTRY_INSTRUMENT,
+    raise_verify_error: bool = True,
 ) -> Point:
     """Find the calibration square offset given an arbitry postition on the deck."""
     # Find the estimated structure plate height. This will be used to baseline the edge detection points.
@@ -587,23 +608,14 @@ async def find_calibration_structure_position(
     found_center = await find_calibration_structure_center(
         hcapi, mount, initial_center, method, raise_verify_error
     )
-    return nominal_center - found_center
 
-
-async def _calibrate_module(
-    hcapi: OT3API,
-    mount: OT3Mount,
-    slot: int,
-    method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
-) -> Point:
-    """This will find the position of the calibration square for a given module."""
-    # Find the module calibration offsets
-    # TODO (ba, 2023-03-14): the nominal_center will be passed in from protocol engine in the future,
-    # where it would have the module + module calibration geometric offsets applied.
-    nominal_center = _get_calibration_square_position_in_slot(slot)
-    offset = await find_calibration_structure_position(
-        hcapi, mount, nominal_center, method
-    )
+    offset = nominal_center - found_center
+    # NOTE: If the calibration target is a deck object the polarity of the calibrated
+    #  offset needs to be reversed. This is because we are using the gantry instrument
+    #  to calibrate a stationary object on the deck and need to find the offset of that
+    #  deck object relative to the deck and not the instrument which sits above the deck.
+    if target == CalibrationTarget.DECK_OBJECT:
+        return offset * -1
     return offset
 
 
@@ -625,17 +637,17 @@ async def find_slot_center_binary_from_nominal_center(
     -------
     The actual and nominal centers of the specified slot.
     """
-    nominal_center = _get_calibration_square_position_in_slot(slot)
+    nominal_center = Point(*get_calibration_square_position_in_slot(slot))
     offset = await find_calibration_structure_position(
         hcapi, mount, nominal_center, method=CalibrationMethod.BINARY_SEARCH
     )
-    return offset, nominal_center
+    return nominal_center - offset, nominal_center
 
 
 async def _determine_transform_matrix(
     hcapi: OT3API,
     mount: OT3Mount,
-) -> AttitudeMatrix:
+) -> types.AttitudeMatrix:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount. Returned linear transform matrix is determined via the
     actual and nominal center points of the back right (A), front right (B), and back left (C) slots.
@@ -649,7 +661,7 @@ async def _determine_transform_matrix(
     -------
     A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
     """
-    slot_a, slot_b, slot_c = 12, 3, 10
+    slot_a, slot_b, slot_c = 1, 10, 3
     point_a, nominal_point_a = await find_slot_center_binary_from_nominal_center(
         hcapi, mount, slot_a
     )
@@ -697,7 +709,7 @@ async def calibrate_gripper_jaw(
     probe: GripperProbe,
     slot: int = 5,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
     """
     Run automatic calibration for gripper jaw.
@@ -712,18 +724,19 @@ async def calibrate_gripper_jaw(
     the average of the pin offsets, which can be obtained by passing the
     two offsets into the `gripper_pin_offsets_mean` func.
     """
-    try:
-        await hcapi.reset_instrument_offset(OT3Mount.GRIPPER)
-        hcapi.add_gripper_probe(probe)
-        await hcapi.grip(GRIPPER_GRIP_FORCE)
-        offset = await _calibrate_mount(
-            hcapi, OT3Mount.GRIPPER, slot, method, raise_verify_error
-        )
-        LOG.info(f"Gripper {probe.name} probe offset: {offset}")
-        return offset
-    finally:
-        hcapi.remove_gripper_probe()
-        await hcapi.ungrip()
+    async with hcapi.instrument_cache_lock():
+        try:
+            await hcapi.reset_instrument_offset(OT3Mount.GRIPPER)
+            hcapi.add_gripper_probe(probe)
+            await hcapi.grip(GRIPPER_GRIP_FORCE)
+            offset = await _calibrate_mount(
+                hcapi, OT3Mount.GRIPPER, slot, method, raise_verify_error
+            )
+            LOG.info(f"Gripper {probe.name} probe offset: {offset}")
+            return offset
+        finally:
+            hcapi.remove_gripper_probe()
+            await hcapi.ungrip()
 
 
 async def calibrate_gripper(
@@ -741,7 +754,7 @@ async def calibrate_pipette(
     mount: Literal[OT3Mount.LEFT, OT3Mount.RIGHT],
     slot: int = 5,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
-    raise_verify_error: bool = False,
+    raise_verify_error: bool = True,
 ) -> Point:
     """
     Run automatic calibration for pipette.
@@ -751,14 +764,17 @@ async def calibrate_pipette(
     tip has been attached, or the conductive probe has been attached,
     or the probe has been lowered).
     """
-    try:
-        await hcapi.reset_instrument_offset(mount)
-        await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        offset = await _calibrate_mount(hcapi, mount, slot, method, raise_verify_error)
-        await hcapi.save_instrument_offset(mount, offset)
-        return offset
-    finally:
-        await hcapi.remove_tip(mount)
+    async with hcapi.instrument_cache_lock():
+        try:
+            await hcapi.reset_instrument_offset(mount)
+            await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
+            offset = await _calibrate_mount(
+                hcapi, mount, slot, method, raise_verify_error
+            )
+            await hcapi.save_instrument_offset(mount, offset)
+            return offset
+        finally:
+            await hcapi.remove_tip(mount)
 
 
 async def calibrate_module(
@@ -766,6 +782,7 @@ async def calibrate_module(
     mount: OT3Mount,
     slot: int,
     module_id: str,
+    nominal_position: Point,
 ) -> Point:
     """
     Run automatic calibration for a module.
@@ -781,30 +798,46 @@ async def calibrate_module(
     The robot should be homed before calling this function.
     """
 
-    try:
-        # add the probe depending on the mount
-        if mount == OT3Mount.GRIPPER:
-            hcapi.add_gripper_probe(GripperProbe.FRONT)
-        else:
-            await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
+    async with hcapi.instrument_cache_lock():
+        try:
+            # add the probe depending on the mount
+            if mount == OT3Mount.GRIPPER:
+                hcapi.add_gripper_probe(GripperProbe.FRONT)
+            else:
+                await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
 
-        # find the offset
-        offset = await _calibrate_module(hcapi, mount, slot)
-        await hcapi.save_module_offset(module_id, mount, slot, offset)
-        return offset
-    finally:
-        # remove probe
-        if mount == OT3Mount.GRIPPER:
-            hcapi.remove_gripper_probe()
-            await hcapi.ungrip()
-        else:
-            await hcapi.remove_tip(mount)
+            LOG.info(
+                f"Starting module calibration for {module_id} at {nominal_position} using {mount}"
+            )
+            # FIXME (ba, 2023-04-04): Well B1 of the module adapter definition includes the z prep offset
+            # of 13x13mm in the nominial position, but we are still using PREP_OFFSET_DEPTH in
+            # find_calibration_structure_height which effectively doubles the offset. We plan
+            # on removing PREP_OFFSET_DEPTH in the near future, but for now just subtract PREP_OFFSET_DEPTH
+            # from the nominal position so we dont have to alter any other part of the system.
+            nominal_position = nominal_position - PREP_OFFSET_DEPTH
+            offset = await find_calibration_structure_position(
+                hcapi,
+                mount,
+                nominal_position,
+                method=CalibrationMethod.BINARY_SEARCH,
+                target=CalibrationTarget.DECK_OBJECT,
+            )
+            await hcapi.save_module_offset(module_id, mount, slot, offset)
+            return offset
+        finally:
+            # remove probe
+            if mount == OT3Mount.GRIPPER:
+                hcapi.remove_gripper_probe()
+                await hcapi.ungrip()
+            else:
+                await hcapi.remove_tip(mount)
 
 
 async def calibrate_belts(
     hcapi: OT3API,
     mount: OT3Mount,
-) -> AttitudeMatrix:
+    pipette_id: str,
+) -> types.AttitudeMatrix:
     """
     Run automatic calibration for the gantry x and y belts attached to the specified mount.
 
@@ -817,10 +850,168 @@ async def calibrate_belts(
     -------
     A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
     """
-    if mount == OT3Mount.GRIPPER:
-        raise RuntimeError("Must use pipette mount, not gripper")
-    try:
-        await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        return await _determine_transform_matrix(hcapi, mount)
-    finally:
-        await hcapi.remove_tip(mount)
+    async with hcapi.instrument_cache_lock():
+        if mount == OT3Mount.GRIPPER:
+            raise RuntimeError("Must use pipette mount, not gripper")
+        try:
+            hcapi.reset_deck_calibration()
+            await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
+            belt_attitude = await _determine_transform_matrix(hcapi, mount)
+            save_robot_belt_attitude(belt_attitude, pipette_id)
+            return belt_attitude
+        finally:
+            hcapi.load_deck_calibration()
+            await hcapi.remove_tip(mount)
+
+
+def apply_machine_transform(
+    belt_attitude: types.AttitudeMatrix,
+) -> types.AttitudeMatrix:
+    """
+    This applies the machine attitude matrix (which happens to be a negative identity) to the belt attitude matrix to form the deck attitude matrix.
+
+    Param
+    -----
+    belt_attitude: attitude matrix with regards to belt coordinate system
+
+    Returns
+    -------
+    Attitude matrix with regards to machine coordinate system.
+    """
+    belt_attitude_arr = np.array(belt_attitude)
+    machine_transform_arr = np.array(defaults_ot3.DEFAULT_MACHINE_TRANSFORM)
+    deck_attitude_arr = np.dot(belt_attitude_arr, machine_transform_arr)  # type: ignore[no-untyped-call]
+    deck_attitude = deck_attitude_arr.round(4).tolist()
+    return deck_attitude  # type: ignore[no-any-return]
+
+
+def load_attitude_matrix(to_default: bool = True) -> DeckCalibration:
+    calibration_data = get_robot_belt_attitude()
+
+    if calibration_data and not to_default:
+        return DeckCalibration(
+            attitude=apply_machine_transform(calibration_data.attitude),
+            source=calibration_data.source,
+            status=types.CalibrationStatus(**calibration_data.status.dict()),
+            belt_attitude=calibration_data.attitude,
+            last_modified=calibration_data.lastModified,
+            pipette_calibrated_with=calibration_data.pipetteCalibratedWith,
+        )
+    else:
+        # load default if calibration data does not exist
+        return DeckCalibration(
+            attitude=apply_machine_transform(default_ot3_deck_calibration()),
+            source=types.SourceType.default,
+            status=types.CalibrationStatus(),
+            belt_attitude=default_ot3_deck_calibration(),
+        )
+
+
+def validate_attitude_deck_calibration(
+    deck_cal: DeckCalibration,
+) -> DeckTransformState:
+    """
+    This function determines whether the deck calibration is valid
+    or not based on the following use-cases:
+
+    TODO(pm, 5/9/2023): As with the OT2, expand on this method,
+    or create another method to diagnose bad instrument offset data
+    """
+    curr_cal = np.array(deck_cal.attitude)
+    row, _ = curr_cal.shape
+    rank: int = np.linalg.matrix_rank(curr_cal)  # type: ignore
+    if row != rank:
+        # Check that the matrix is non-singular
+        return DeckTransformState.SINGULARITY
+    elif not deck_cal.last_modified:
+        # Check that the matrix is not an identity
+        return DeckTransformState.IDENTITY
+    else:
+        # Transform as it stands is sufficient.
+        return DeckTransformState.OK
+
+
+def delete_belt_calibration_data(hcapi: OT3API) -> None:
+    delete_robot_belt_attitude()
+    hcapi.reset_deck_calibration()
+
+
+class OT3RobotCalibrationProvider:
+    """This class provides the following robot calibration data:
+    deck calibration: transform matrix to account for stretch of x and y belts
+    carriage offset: the vector from the deck origin to the bottom center of the gantry carriage when the gantry is homed
+    mount offset (per mount): the vector from the carriage origin (bottom center) to the mount origin (centered on the top peg of the mount flush with the mating face)
+    """
+
+    def __init__(self, config: OT3Config) -> None:
+        self._robot_calibration = OT3Transforms(
+            deck_calibration=load_attitude_matrix(to_default=False),
+            carriage_offset=Point(*config.carriage_offset),
+            left_mount_offset=Point(*config.left_mount_offset),
+            right_mount_offset=Point(*config.right_mount_offset),
+            gripper_mount_offset=Point(*config.gripper_mount_offset),
+        )
+
+    @lru_cache(1)
+    def _validate(self) -> DeckTransformState:
+        return validate_attitude_deck_calibration(
+            self._robot_calibration.deck_calibration
+        )
+
+    @property
+    def robot_calibration(self) -> OT3Transforms:
+        return self._robot_calibration
+
+    def reset_robot_calibration(self) -> None:
+        self._validate.cache_clear()
+        self._robot_calibration = OT3Transforms(
+            deck_calibration=load_attitude_matrix(to_default=True),
+            carriage_offset=Point(*defaults_ot3.DEFAULT_CARRIAGE_OFFSET),
+            left_mount_offset=Point(*defaults_ot3.DEFAULT_LEFT_MOUNT_OFFSET),
+            right_mount_offset=Point(*defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET),
+            gripper_mount_offset=Point(*defaults_ot3.DEFAULT_GRIPPER_MOUNT_OFFSET),
+        )
+
+    def reset_deck_calibration(self) -> None:
+        self._robot_calibration.deck_calibration = load_attitude_matrix(to_default=True)
+
+    def load_deck_calibration(self) -> None:
+        self._validate.cache_clear()
+        self._robot_calibration.deck_calibration = load_attitude_matrix(
+            to_default=False
+        )
+
+    def set_robot_calibration(self, robot_calibration: OT3Transforms) -> None:
+        self._validate.cache_clear()
+        self._robot_calibration = robot_calibration
+
+    def validate_calibration(self) -> DeckTransformState:
+        """
+        The lru cache decorator is currently not supported by the
+        ThreadManager. To work around this, we need to wrap the
+        actual function around a dummy outer function.
+
+        Once decorators are more fully supported, we can remove this.
+        """
+        return self._validate()
+
+    def build_temporary_identity_calibration(self) -> OT3Transforms:
+        """
+        Get temporary default calibration data suitable for use during
+        calibration
+        """
+        return OT3Transforms(
+            deck_calibration=load_attitude_matrix(to_default=True),
+            carriage_offset=Point(*defaults_ot3.DEFAULT_CARRIAGE_OFFSET),
+            left_mount_offset=Point(*defaults_ot3.DEFAULT_LEFT_MOUNT_OFFSET),
+            right_mount_offset=Point(*defaults_ot3.DEFAULT_RIGHT_MOUNT_OFFSET),
+            gripper_mount_offset=Point(*defaults_ot3.DEFAULT_GRIPPER_MOUNT_OFFSET),
+        )
+
+
+@dataclass
+class OT3Transforms(RobotCalibration):
+    carriage_offset: Point
+    left_mount_offset: Point
+    right_mount_offset: Point
+    gripper_mount_offset: Point

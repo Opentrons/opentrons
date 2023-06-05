@@ -10,6 +10,7 @@ import {
   DIRECTION_COLUMN,
   TYPOGRAPHY,
   SPACING,
+  PrimaryButton,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
@@ -17,7 +18,6 @@ import {
 import find from 'lodash/find'
 import { LEFT, RIGHT } from '../../../redux/pipettes'
 import { CHECK_STATUS_OUTSIDE_THRESHOLD } from '../../../redux/sessions'
-import { PrimaryButton } from '../../../atoms/buttons'
 import { CalibrationHealthCheckResults } from './CalibrationHealthCheckResults'
 import { RenderMountInformation } from './RenderMountInformation'
 import { CalibrationResult } from './CalibrationResult'
@@ -125,7 +125,7 @@ export function ResultsSummary(
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="25rem"
     >
       <Box marginBottom="1.5rem">
@@ -133,11 +133,11 @@ export function ResultsSummary(
           isCalibrationCompleted={isCalibrationCompleted()}
         />
       </Box>
-      <Box marginBottom={SPACING.spacing4}>
+      <Box marginBottom={SPACING.spacing16}>
         <CalibrationResult calType="deck" isBadCal={isDeckResultBad} />
       </Box>
       <RenderMountInformation mount={LEFT} pipette={leftPipette} />
-      <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing16}>
         {leftPipette != null && (
           <>
             <CalibrationResult

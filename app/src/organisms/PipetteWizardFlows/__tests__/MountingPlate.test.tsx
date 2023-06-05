@@ -1,32 +1,19 @@
 import * as React from 'react'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import {
-  LEFT,
-  NINETY_SIX_CHANNEL,
-  RIGHT,
-  SINGLE_MOUNT_PIPETTES,
-} from '@opentrons/shared-data'
+import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
-import {
-  mockAttachedPipette,
-  mockGen3P1000PipetteSpecs,
-} from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { MountingPlate } from '../MountingPlate'
-
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 const render = (props: React.ComponentProps<typeof MountingPlate>) => {
   return renderWithProviders(<MountingPlate {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-const mockPipette: AttachedPipette = {
-  ...mockAttachedPipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
-}
+
 describe('MountingPlate', () => {
   let props: React.ComponentProps<typeof MountingPlate>
   beforeEach(() => {
@@ -37,8 +24,8 @@ describe('MountingPlate', () => {
       chainRunCommands: jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
-      runId: RUN_ID_1,
-      attachedPipettes: { left: mockPipette, right: null },
+      maintenanceRunId: RUN_ID_1,
+      attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.ATTACH,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
@@ -92,22 +79,5 @@ describe('MountingPlate', () => {
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
-  })
-  it('renders null if a single mount pipette is attached', () => {
-    props = {
-      ...props,
-      selectedPipette: SINGLE_MOUNT_PIPETTES,
-    }
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
-  })
-
-  it('renders null if flow is calibrate is attached', () => {
-    props = {
-      ...props,
-      flowType: FLOWS.CALIBRATE,
-    }
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
   })
 })

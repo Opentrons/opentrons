@@ -19,7 +19,7 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 interface RectProps {
   isActive: boolean
@@ -28,9 +28,9 @@ interface RectProps {
 const TextSizeTile = styled(Box)`
   width: 10.5625rem;
   height: 6.25rem;
-  border-radius: ${BORDERS.size_two};
+  border-radius: ${BORDERS.borderRadiusSize2};
   background: ${(props: RectProps) =>
-    props.isActive ? COLORS.highlightPurple_one : COLORS.highlightPurple_two};
+    props.isActive ? COLORS.highlightPurple1 : COLORS.highlightPurple2};
 `
 
 interface TextSizeProps {
@@ -62,7 +62,7 @@ export function TextSize({ setCurrentOption }: TextSizeProps): JSX.Element {
           textSize="1.375rem"
           lineHeight="1.75rem"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkBlack_seventy}
+          color={COLORS.darkBlack70}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {t('text_size_description')}

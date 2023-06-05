@@ -1,22 +1,30 @@
 import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 import { useTranslation } from 'react-i18next'
-import { COLORS, SPACING, Flex, TYPOGRAPHY } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons/OnDeviceDisplay'
-import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
+import {
+  COLORS,
+  SPACING,
+  Flex,
+  TYPOGRAPHY,
+  SecondaryButton,
+  AlertPrimaryButton,
+} from '@opentrons/components'
+import { SmallButton } from '../../atoms/buttons'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { FLOWS } from './constants'
 import type { PipetteWizardFlow } from './types'
 
 interface ExitModalProps {
+  isRobotMoving?: boolean
   proceed: () => void
   goBack: () => void
   flowType: PipetteWizardFlow
-  isOnDevice: boolean | null
+  isOnDevice: boolean
 }
 
 export function ExitModal(props: ExitModalProps): JSX.Element {
-  const { goBack, proceed, flowType, isOnDevice } = props
+  const { goBack, proceed, flowType, isOnDevice, isRobotMoving } = props
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
 
   let flowTitle: string = t('pipette_calibration')
@@ -30,6 +38,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
       break
     }
   }
+  if (isRobotMoving) return <InProgressModal description={t('stand_back')} />
 
   return (
     <SimpleWizardBody
@@ -40,7 +49,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
     >
       {isOnDevice ? (
         <>
-          <Flex marginRight={SPACING.spacing3}>
+          <Flex marginRight={SPACING.spacing8}>
             <SmallButton
               onClick={proceed}
               buttonText={capitalize(t('shared:exit'))}
@@ -49,13 +58,13 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
           </Flex>
           <SmallButton
             buttonText={t('shared:go_back')}
-            buttonType="default"
+            buttonType="primary"
             onClick={goBack}
           />
         </>
       ) : (
         <>
-          <SecondaryButton onClick={goBack} marginRight={SPACING.spacing2}>
+          <SecondaryButton onClick={goBack} marginRight={SPACING.spacing4}>
             {t('shared:go_back')}
           </SecondaryButton>
           <AlertPrimaryButton

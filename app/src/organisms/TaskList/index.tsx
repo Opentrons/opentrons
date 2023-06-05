@@ -15,10 +15,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   TYPOGRAPHY,
+  useHoverTooltip,
 } from '@opentrons/components'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
+import { Tooltip } from '../../atoms/Tooltip'
 
 import type { SubTaskProps, TaskListProps, TaskProps } from './types'
 
@@ -56,12 +58,10 @@ function ProgressTrackerItem({
           ? COLORS.blueEnabled
           : ''
       }
-      marginTop="-0.75rem"
+      marginTop={`-${SPACING.spacing12}`}
       // shorten connector length when subtasks are present
       marginBottom={
-        hasSubTasks
-          ? `-${String(SPACING.spacing3)}`
-          : `-${String(SPACING.spacingM)}`
+        hasSubTasks ? `-${SPACING.spacing8}` : `-${SPACING.spacing20}`
       }
       height="100%"
     />
@@ -74,7 +74,7 @@ function ProgressTrackerItem({
       {isComplete || isTaskListComplete || isPastTask ? (
         <Icon
           size="1.25rem"
-          margin={SPACING.spacing4}
+          margin={SPACING.spacing16}
           name="ot-check"
           color={
             isTaskListComplete || isPastTask
@@ -91,7 +91,7 @@ function ProgressTrackerItem({
             isFutureTask ? COLORS.medGreyHover : COLORS.blueEnabled
           }
           color={COLORS.white}
-          margin={SPACING.spacing4}
+          margin={SPACING.spacing16}
           height="1.25rem"
           width="1.25rem"
           borderRadius="0.625rem"
@@ -153,9 +153,9 @@ function ProgressTrackerItem({
                   borderColor={
                     isFutureSubTask ? COLORS.medGreyHover : COLORS.blueEnabled
                   }
-                  borderWidth={SPACING.spacing1}
+                  borderWidth={SPACING.spacing2}
                   color={COLORS.white}
-                  margin={SPACING.spacing4}
+                  margin={SPACING.spacing16}
                   height="0.75rem"
                   width="0.75rem"
                   borderRadius="0.375rem"
@@ -172,12 +172,12 @@ function ProgressTrackerItem({
                       ? COLORS.blueEnabled
                       : COLORS.medGreyEnabled
                   }
-                  marginTop={`-${String(SPACING.spacing3)}`}
+                  marginTop={`-${SPACING.spacing8}`}
                   marginBottom={
                     // extend connector for last subtask
                     isLastSubTask
-                      ? `-${String(SPACING.spacingM)}`
-                      : `-${String(SPACING.spacing3)}`
+                      ? `-${SPACING.spacing20}`
+                      : `-${SPACING.spacing8}`
                   }
                   height="100%"
                 />
@@ -199,7 +199,11 @@ function SubTask({
   cta,
   footer,
   markedBad,
+  generalClickHandler,
+  generalTaskDisabledReason,
 }: SubTaskProps): JSX.Element {
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
   const [activeTaskIndex, activeSubTaskIndex] = activeIndex ?? []
 
   const isTaskListComplete = activeIndex == null
@@ -210,28 +214,29 @@ function SubTask({
     activeSubTaskIndex != null &&
     ((activeSubTaskIndex > subTaskIndex && activeTaskIndex === taskIndex) ||
       activeTaskIndex > taskIndex)
+  const isDisabled = generalTaskDisabledReason != null
 
   return (
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={isActiveSubTask ? COLORS.lightBlue : COLORS.white}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       border={isActiveSubTask ? BORDERS.activeLineBorder : BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
-      gridGap={SPACING.spacing5}
+      gridGap={SPACING.spacing24}
       width="100%"
     >
       <Flex
         alignItems={ALIGN_FLEX_START}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
       >
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           <Flex
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing3}
+            gridGap={SPACING.spacing8}
           >
             {title}
           </Flex>
@@ -242,7 +247,7 @@ function SubTask({
             <Flex
               alignItems={ALIGN_CENTER}
               flexDirection={DIRECTION_ROW}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
               {markedBad === true && (
                 <Icon
@@ -259,12 +264,53 @@ function SubTask({
         ) : null}
       </Flex>
       {(isTaskListComplete || isPastSubTask) && cta != null ? (
-        <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} onClick={cta.onClick}>
-          {cta.label}
-        </Link>
+        <>
+          <Link
+            {...targetProps}
+            css={
+              isDisabled
+                ? TYPOGRAPHY.darkLinkLabelSemiBoldDisabled
+                : TYPOGRAPHY.darkLinkLabelSemiBold
+            }
+            onClick={() => {
+              if (isDisabled) {
+                return
+              }
+              if (generalClickHandler != null) {
+                generalClickHandler()
+              }
+              cta.onClick()
+            }}
+          >
+            {cta.label}
+          </Link>
+          {isDisabled ? (
+            <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+              {generalTaskDisabledReason}
+            </Tooltip>
+          ) : null}
+        </>
       ) : null}
       {isActiveSubTask && cta != null ? (
-        <TertiaryButton onClick={cta.onClick}>{cta.label}</TertiaryButton>
+        <>
+          <TertiaryButton
+            {...targetProps}
+            disabled={isDisabled}
+            onClick={() => {
+              if (generalClickHandler != null) {
+                generalClickHandler()
+              }
+              cta.onClick()
+            }}
+          >
+            {cta.label}
+          </TertiaryButton>
+          {isDisabled ? (
+            <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+              {generalTaskDisabledReason}
+            </Tooltip>
+          ) : null}
+        </>
       ) : null}
     </Flex>
   )
@@ -281,7 +327,10 @@ function Task({
   taskListLength,
   isComplete,
   markedBad,
+  generalClickHandler,
+  generalTaskDisabledReason,
 }: TaskProps): JSX.Element {
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const [activeTaskIndex] = activeIndex ?? []
 
   // TODO(bh, 2022-10-18): pass booleans to children as props
@@ -289,6 +338,7 @@ function Task({
   const isPastTask = activeTaskIndex != null && taskIndex < activeTaskIndex
   const isActiveTask = activeTaskIndex === taskIndex
   const hasSubTasks = subTasks.length > 0
+  const isDisabled = generalTaskDisabledReason != null
 
   const [isTaskOpen, setIsTaskOpen] = React.useState<boolean>(
     hasSubTasks && isActiveTask
@@ -309,7 +359,7 @@ function Task({
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={SPACING.spacing4}
+        padding={SPACING.spacing16}
         backgroundColor={
           isActiveTask && !isTaskOpen ? COLORS.lightBlue : COLORS.white
         }
@@ -324,7 +374,7 @@ function Task({
         <Flex
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacing5}
+          gridGap={SPACING.spacing24}
           // click to open the subtask drawer if subtasks are present
           cursor={hasSubTasks ? 'pointer' : ''}
           onClick={() => (hasSubTasks ? setIsTaskOpen(!isTaskOpen) : null)}
@@ -332,13 +382,13 @@ function Task({
           <Flex
             alignItems={ALIGN_FLEX_START}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing2}
+            gridGap={SPACING.spacing4}
           >
             <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
               <Flex
                 alignItems={ALIGN_CENTER}
                 flexDirection={DIRECTION_ROW}
-                gridGap={SPACING.spacing3}
+                gridGap={SPACING.spacing8}
               >
                 {markedBad === true && (
                   <Icon
@@ -358,7 +408,7 @@ function Task({
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}
-                  gridGap={SPACING.spacing3}
+                  gridGap={SPACING.spacing8}
                 >
                   {footer}
                 </Flex>
@@ -372,19 +422,60 @@ function Task({
               height="15px"
             />
           ) : (isTaskListComplete || isPastTask) && cta != null ? (
-            <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} onClick={cta.onClick}>
-              {cta.label}
-            </Link>
+            <>
+              <Link
+                {...targetProps}
+                css={
+                  isDisabled
+                    ? TYPOGRAPHY.darkLinkLabelSemiBoldDisabled
+                    : TYPOGRAPHY.darkLinkLabelSemiBold
+                }
+                onClick={() => {
+                  if (isDisabled) {
+                    return
+                  }
+                  if (generalClickHandler != null) {
+                    generalClickHandler()
+                  }
+                  cta.onClick()
+                }}
+              >
+                {cta.label}
+              </Link>
+              {isDisabled ? (
+                <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+                  {generalTaskDisabledReason}
+                </Tooltip>
+              ) : null}
+            </>
           ) : null}
           {isActiveTask && cta != null ? (
-            <TertiaryButton onClick={cta.onClick}>{cta.label}</TertiaryButton>
+            <>
+              <TertiaryButton
+                {...targetProps}
+                disabled={isDisabled}
+                onClick={() => {
+                  if (generalClickHandler != null) {
+                    generalClickHandler()
+                  }
+                  cta.onClick()
+                }}
+              >
+                {cta.label}
+              </TertiaryButton>
+              {isDisabled ? (
+                <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
+                  {generalTaskDisabledReason}
+                </Tooltip>
+              ) : null}
+            </>
           ) : null}
         </Flex>
         {isTaskOpen ? (
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            marginTop={SPACING.spacing4}
-            gridGap={SPACING.spacing3}
+            marginTop={SPACING.spacing16}
+            gridGap={SPACING.spacing8}
           >
             {subTasks.map(
               (
@@ -401,6 +492,8 @@ function Task({
                   subTaskIndex={subTaskIndex}
                   taskIndex={taskIndex}
                   markedBad={markedBad}
+                  generalClickHandler={generalClickHandler}
+                  generalTaskDisabledReason={generalTaskDisabledReason}
                 />
               )
             )}
@@ -414,9 +507,11 @@ function Task({
 export function TaskList({
   activeIndex,
   taskList,
+  generalTaskClickHandler,
+  generalTaskDisabledReason,
 }: TaskListProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       {taskList.map(
         (
           { title, description, cta, footer, subTasks, isComplete, markedBad },
@@ -434,6 +529,8 @@ export function TaskList({
             taskListLength={taskList.length}
             isComplete={isComplete}
             markedBad={markedBad}
+            generalClickHandler={generalTaskClickHandler}
+            generalTaskDisabledReason={generalTaskDisabledReason}
           />
         )
       )}

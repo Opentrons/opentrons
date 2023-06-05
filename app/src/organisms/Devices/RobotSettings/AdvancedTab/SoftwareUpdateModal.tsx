@@ -7,6 +7,8 @@ import {
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
   SPACING,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 import { getShellUpdateState } from '../../../../redux/shell'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
@@ -14,7 +16,6 @@ import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 
 import { StyledText } from '../../../../atoms/text'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
-import { PrimaryButton, SecondaryButton } from '../../../../atoms/buttons'
 import { Banner } from '../../../../atoms/Banner'
 import { Modal } from '../../../../molecules/Modal'
 import { CONNECTABLE, REACHABLE } from '../../../../redux/discovery'
@@ -67,7 +68,7 @@ export function SoftwareUpdateModal({
   ) : (
     <Modal title={t('robot_update_available')} onClose={closeModal}>
       <Banner type="informing">{t('requires_restarting_the_robot')}</Banner>
-      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing16}>
         {/* <ReleaseNotes source={releaseNotes} /> ToDo: align with new design */}
         <StyledText css={TYPOGRAPHY.pSemiBold}>
           {t('app_change_in', { version })}
@@ -75,16 +76,16 @@ export function SoftwareUpdateModal({
         <StyledText as="p">
           {'None in the Opentrons (Here will be change logs)'}
         </StyledText>
-        <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing3}>
+        <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing8}>
           {t('new_features')}
         </StyledText>
         <StyledText as="p">
           {'None in the Opentrons (Here will be features info)'}
         </StyledText>
-        <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing3}>
+        <StyledText css={TYPOGRAPHY.pSemiBold} marginTop={SPACING.spacing8}>
           {t('bug_fixes')}
         </StyledText>
-        <StyledText as="p" marginBottom={SPACING.spacing4}>
+        <StyledText as="p" marginBottom={SPACING.spacing16}>
           {'None in the Opentrons (Here will be fixes info)'}
         </StyledText>
         <Divider />
@@ -92,8 +93,8 @@ export function SoftwareUpdateModal({
           href={TECHNICAL_CHANGE_LOG_URL}
           css={TYPOGRAPHY.pSemiBold}
           id="SoftwareUpdateTechnicalChangeLogLink"
-          marginTop={SPACING.spacing4}
-          marginBottom={SPACING.spacing3}
+          marginTop={SPACING.spacing16}
+          marginBottom={SPACING.spacing8}
         >
           {t('view_opentrons_technical_change_log')}
         </ExternalLink>
@@ -101,7 +102,7 @@ export function SoftwareUpdateModal({
           href={ISSUE_TRACKER_URL}
           css={TYPOGRAPHY.pSemiBold}
           id="SoftwareUpdateIssueTrackerLink"
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
         >
           {t('view_opentrons_issue_tracker')}
         </ExternalLink>
@@ -109,12 +110,12 @@ export function SoftwareUpdateModal({
           href={RELEASE_NOTES_URL}
           css={TYPOGRAPHY.pSemiBold}
           id="SoftwareUpdateReleaseNotesLink"
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
         >
           {t('view_opentrons_release_notes')}
         </ExternalLink>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
-          <SecondaryButton onClick={closeModal} marginRight={SPACING.spacing3}>
+          <SecondaryButton onClick={closeModal} marginRight={SPACING.spacing8}>
             {t('remind_me_later')}
           </SecondaryButton>
           <PrimaryButton

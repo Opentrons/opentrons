@@ -24,6 +24,7 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.actions import ActionDispatcher, AddPipetteConfigAction
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
+    DeckType,
     ModuleLocation,
     LoadedPipette,
     LabwareOffset,
@@ -57,7 +58,9 @@ from opentrons.protocol_engine.execution.equipment import (
 def _make_config(use_virtual_modules: bool) -> Config:
     return Config(
         use_virtual_modules=use_virtual_modules,
-        robot_type="OT-2 Standard",  # Arbitrary.
+        # Robot and deck type are arbitrary.
+        robot_type="OT-2 Standard",
+        deck_type=DeckType.OT2_STANDARD,
     )
 
 
@@ -74,12 +77,6 @@ def patch_mock_pipette_data_provider(
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mocked out StateStore instance."""
     return decoy.mock(cls=StateStore)
-
-
-@pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mocked out HardwareControlAPI instance."""
-    return decoy.mock(cls=HardwareControlAPI)
 
 
 @pytest.fixture
@@ -357,7 +354,7 @@ async def test_load_labware_on_module(
         state_store.labware.get_definition_by_uri(matchers.IsA(str))
     ).then_return(minimal_labware_def)
 
-    decoy.when(state_store.modules.get_model("module-id")).then_return(
+    decoy.when(state_store.modules.get_requested_model("module-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V1
     )
     decoy.when(state_store.modules.get_location("module-id")).then_return(
@@ -441,7 +438,7 @@ def test_find_offset_id_of_labware_on_module(
     subject: EquipmentHandler,
 ) -> None:
     """It should find a new offset by resolving the new location."""
-    decoy.when(state_store.modules.get_model("input-module-id")).then_return(
+    decoy.when(state_store.modules.get_requested_model("input-module-id")).then_return(
         ModuleModel.THERMOCYCLER_MODULE_V1
     )
     decoy.when(state_store.modules.get_location("input-module-id")).then_return(
@@ -786,6 +783,35 @@ async def test_load_module_using_virtual(
         module_id="module-id",
         serial_number="fake-serial-number-abc123",
         definition=tempdeck_v1_def,
+    )
+
+
+async def test_load_magnetic_block(
+    decoy: Decoy,
+    model_utils: ModelUtils,
+    state_store: StateStore,
+    module_data_provider: ModuleDataProvider,
+    hardware_api: HardwareControlAPI,
+    mag_block_v1_def: ModuleDefinition,
+    subject: EquipmentHandler,
+) -> None:
+    """It should load a mag block, returning its ID & definition in result."""
+    decoy.when(model_utils.ensure_id("input-module-id")).then_return("module-id")
+
+    decoy.when(
+        module_data_provider.get_definition(ModuleModel.MAGNETIC_BLOCK_V1)
+    ).then_return(mag_block_v1_def)
+
+    result = await subject.load_magnetic_block(
+        model=ModuleModel.MAGNETIC_BLOCK_V1,
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        module_id="input-module-id",
+    )
+
+    assert result == LoadedModuleData(
+        module_id="module-id",
+        serial_number=None,
+        definition=mag_block_v1_def,
     )
 
 

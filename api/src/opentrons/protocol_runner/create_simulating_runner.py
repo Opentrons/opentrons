@@ -1,20 +1,25 @@
-"""Simulating ProtocolRunner factory."""
+"""Simulating AbstractRunner factory."""
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import API as OT2API, HardwareControlAPI
+from opentrons.protocols.api_support import deck_type
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
+    DeckType,
     create_protocol_engine,
 )
+from opentrons.protocol_reader.protocol_source import ProtocolConfig
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from .legacy_wrappers import LegacySimulatingContextCreator
-from .protocol_runner import ProtocolRunner
+from .protocol_runner import create_protocol_runner, AbstractRunner
 
 
-async def create_simulating_runner(robot_type: RobotType) -> ProtocolRunner:
-    """Create a ProtocolRunner wired to a simulating HardwareControlAPI.
+async def create_simulating_runner(
+    robot_type: RobotType, protocol_config: ProtocolConfig
+) -> AbstractRunner:
+    """Create a AbstractRunner wired to a simulating HardwareControlAPI.
 
     Example:
         ```python
@@ -24,7 +29,7 @@ async def create_simulating_runner(robot_type: RobotType) -> ProtocolRunner:
         from opentrons.protocol_runner import (
             ProtocolType,
             ProtocolFile,
-            ProtocolRunner,
+            AbstractRunner,
             create_simulating_runner,
         )
 
@@ -32,7 +37,7 @@ async def create_simulating_runner(robot_type: RobotType) -> ProtocolRunner:
             protocol_type=ProtocolType.PYTHON,
             files=[Path("/path/to/protocol.py")],
         )
-        runner: ProtocolRunner = await create_simulating_runner()
+        runner: AbstractRunner = await create_simulating_runner()
         commands: List[Command] = await runner.run(protocol)
         ```
     """
@@ -47,13 +52,11 @@ async def create_simulating_runner(robot_type: RobotType) -> ProtocolRunner:
         hardware_api=simulating_hardware_api,
         config=ProtocolEngineConfig(
             robot_type=robot_type,
+            deck_type=DeckType(deck_type.for_simulation(robot_type)),
             ignore_pause=True,
             use_virtual_modules=True,
             use_virtual_gripper=True,
-            use_virtual_pipettes=(
-                robot_type != "OT-3 Standard"
-                and not feature_flags.disable_fast_protocol_upload()
-            ),
+            use_virtual_pipettes=(not feature_flags.disable_fast_protocol_upload()),
         ),
     )
 
@@ -62,7 +65,8 @@ async def create_simulating_runner(robot_type: RobotType) -> ProtocolRunner:
         protocol_engine=protocol_engine,
     )
 
-    return ProtocolRunner(
+    return create_protocol_runner(
+        protocol_config=protocol_config,
         protocol_engine=protocol_engine,
         hardware_api=simulating_hardware_api,
         legacy_context_creator=simulating_legacy_context_creator,

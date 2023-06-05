@@ -315,6 +315,13 @@ export const mockHeaterShaker: Types.HeaterShakerModule = {
   usbPort: { path: '/dev/ot_module_heatershaker0', port: 1, hub: null },
 }
 
+export const mockMagneticBlock = {
+  id: 'magneticBlock_id',
+  moduleModel: 'magneticBlockV1',
+  moduleType: 'magneticBlockType',
+  displayName: 'Magnetic Block GEN1',
+}
+
 // fetch modules fixtures
 
 export const mockFetchModulesSuccessMeta: RobotApiResponseMeta = {

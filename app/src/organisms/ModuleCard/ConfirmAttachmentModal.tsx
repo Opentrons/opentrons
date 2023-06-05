@@ -10,15 +10,15 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
   Link,
+  PrimaryButton,
+  CheckboxField,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
 import { Dispatch } from '../../redux/types'
 import { UpdateConfigValueAction } from '../../redux/config/types'
 import { updateConfigValue } from '../../redux/config'
-import { CheckboxField } from '../../atoms/CheckboxField'
 
 export function setHeaterShakerAttached(
   heaterShakerAttached: boolean
@@ -61,7 +61,7 @@ export const ConfirmAttachmentModal = (
         flexDirection={DIRECTION_COLUMN}
         fontSize={TYPOGRAPHY.fontSizeP}
       >
-        <StyledText paddingBottom={SPACING.spacing2}>
+        <StyledText paddingBottom={SPACING.spacing4}>
           {t(
             isProceedToRunModal
               ? 'module_anchors_extended'
@@ -73,7 +73,7 @@ export const ConfirmAttachmentModal = (
       <Flex
         flexDirection={DIRECTION_ROW}
         textAlign={TEXT_ALIGN_CENTER}
-        paddingTop={SPACING.spacing4}
+        paddingTop={SPACING.spacing16}
         data-testid={`ConfirmAttachmentModal_checkbox_field_${
           isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
         }`}
@@ -85,8 +85,8 @@ export const ConfirmAttachmentModal = (
           value={isDismissed}
         />
         <StyledText
-          paddingTop={SPACING.spacingXXS}
-          paddingLeft={SPACING.spacing3}
+          paddingTop="1px"
+          paddingLeft={SPACING.spacing8}
           fontSize={TYPOGRAPHY.fontSizeP}
         >
           {t('dont_show_me_again', { ns: 'shared' })}
@@ -94,12 +94,12 @@ export const ConfirmAttachmentModal = (
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
-        paddingTop={SPACING.spacingXL}
+        paddingTop={SPACING.spacing32}
         justifyContent={JUSTIFY_FLEX_END}
         alignItems={ALIGN_CENTER}
       >
         <Flex
-          paddingRight={SPACING.spacing2}
+          paddingRight={SPACING.spacing4}
           data-testid={`ConfirmAttachmentModal_secondary_btn_${
             isProceedToRunModal ? `on_start_protocol` : `on_set_shake`
           }`}
@@ -108,7 +108,7 @@ export const ConfirmAttachmentModal = (
             role="button"
             onClick={onCloseClick}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            marginRight={SPACING.spacing5}
+            marginRight={SPACING.spacing24}
             css={TYPOGRAPHY.linkPSemiBold}
           >
             {t('shared:cancel')}

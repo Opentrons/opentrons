@@ -13,21 +13,22 @@ import {
 } from '@opentrons/shared-data'
 import { getLabwareDef } from './utils/labware'
 import { UnorderedList } from '../../molecules/UnorderedList'
-
-import type { CreateRunCommand, ReturnTipStep } from './types'
-import { VectorOffset } from '@opentrons/api-client'
+import { useChainRunCommands } from '../../resources/runs/hooks'
 import { getDisplayLocation } from './utils/getDisplayLocation'
-import { chainRunCommands } from './utils/chainRunCommands'
+
+import type { VectorOffset } from '@opentrons/api-client'
+import type { ReturnTipStep } from './types'
 
 interface ReturnTipProps extends ReturnTipStep {
   protocolData: CompletedProtocolAnalysis
   proceed: () => void
-  createRunCommand: CreateRunCommand
+  chainRunCommands: ReturnType<typeof useChainRunCommands>['chainRunCommands']
+  setFatalError: (errorMessage: string) => void
   tipPickUpOffset: VectorOffset | null
   isRobotMoving: boolean
 }
 export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
-  const { t } = useTranslation('labware_position_check')
+  const { t } = useTranslation(['labware_position_check', 'shared'])
   const {
     pipetteId,
     labwareId,
@@ -36,7 +37,8 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
     proceed,
     tipPickUpOffset,
     isRobotMoving,
-    createRunCommand,
+    chainRunCommands,
+    setFatalError,
   } = props
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
@@ -121,20 +123,25 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
         },
         { commandType: 'home' as const, params: {} },
       ],
-      createRunCommand,
-      proceed
+      false
     )
+      .then(() => {
+        proceed()
+      })
+      .catch((e: Error) => {
+        setFatalError(`ReturnTip failed with message: ${e.message}`)
+      })
   }
 
-  if (isRobotMoving) return <RobotMotionLoader />
+  if (isRobotMoving)
+    return (
+      <RobotMotionLoader header={t('shared:stand_back_robot_is_in_motion')} />
+    )
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <PrepareSpace
         {...props}
-        header={t('prepare_item_in_location', {
-          item: t('tip_rack'),
-          location: displayLocation,
-        })}
+        header={t('return_tip_rack_to_location', { location: displayLocation })}
         body={<UnorderedList items={instructions} />}
         labwareDef={labwareDef}
         confirmPlacement={handleConfirmPlacement}

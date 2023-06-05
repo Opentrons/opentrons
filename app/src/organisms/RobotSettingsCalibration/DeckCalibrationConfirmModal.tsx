@@ -7,12 +7,12 @@ import {
   ALIGN_CENTER,
   COLORS,
   TYPOGRAPHY,
+  PrimaryButton,
   SPACING,
   Link,
 } from '@opentrons/components'
 import { Modal } from '../../molecules/Modal'
 import { StyledText } from '../../atoms/text'
-import { PrimaryButton } from '../../atoms/buttons'
 
 interface DeckCalibrationConfirmModalProps {
   confirm: () => unknown
@@ -32,13 +32,13 @@ export function DeckCalibrationConfirmModal({
       onClose={cancel}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing4}>
+        <StyledText as="p" marginBottom={SPACING.spacing16}>
           {t('deck_calibration_modal_description')}
         </StyledText>
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing5}
+          marginBottom={SPACING.spacing24}
         >
           {t('deck_calibration_modal_pipette_description')}
         </StyledText>
@@ -47,7 +47,7 @@ export function DeckCalibrationConfirmModal({
             role="button"
             onClick={cancel}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            marginRight={SPACING.spacing5}
+            marginRight={SPACING.spacing24}
             color={COLORS.blueEnabled}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}

@@ -1,21 +1,20 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
 
 import {
-  Flex,
-  Btn,
-  DIRECTION_COLUMN,
-  Icon,
   ALIGN_CENTER,
-  SPACING,
+  Btn,
   COLORS,
-  TYPOGRAPHY,
-  BORDERS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
+  SPACING,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
+import { RadioButton } from '../../../atoms/buttons'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
@@ -23,25 +22,7 @@ import {
 import { SLEEP_NEVER_MS } from '../../../App/constants'
 
 import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
-
-interface LabelProps {
-  isSelected?: boolean
-}
-
-const SettingButton = styled.input`
-  display: none;
-`
-
-const SettingButtonLabel = styled.label<LabelProps>`
-  padding: ${SPACING.spacing5};
-  border-radius: ${BORDERS.size_four};
-  height: 5.25rem;
-  cursor: pointer;
-  background: ${({ isSelected }) =>
-    isSelected === true ? COLORS.blueEnabled : COLORS.foundationalBlue};
-  color: ${({ isSelected }) => isSelected === true && COLORS.white};
-`
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 const SLEEP_TIME_MS = 60 * 1000 // 1 min
 
@@ -78,45 +59,32 @@ export function TouchScreenSleep({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      <Flex alignItems={ALIGN_CENTER}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      paddingY={SPACING.spacing32}
+      gridGap={SPACING.spacing32}
+    >
+      <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_ROW}>
         <Btn onClick={() => setCurrentOption(null)}>
-          <Icon name="chevron-left" size="2.5rem" />
+          <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
         </Btn>
         <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
           {t('touchscreen_sleep')}
         </StyledText>
       </Flex>
-      <Flex marginTop={SPACING.spacingXXL}>
-        <StyledText>{t('sleep_settings_description')}</StyledText>
-      </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
-        marginTop={SPACING.spacing5}
+        gridGap={SPACING.spacing8}
+        // marginTop={SPACING.spacing24}
       >
         {settingsButtons.map(radio => (
-          <React.Fragment key={`sleep_setting_${radio.label}`}>
-            <SettingButton
-              id={radio.label}
-              type="radio"
-              value={radio.value}
-              checked={radio.value === sleepMs}
-              onChange={handleChange}
-            />
-            <SettingButtonLabel
-              htmlFor={radio.label}
-              isSelected={radio.value === sleepMs}
-            >
-              <StyledText
-                fontSize="1.75rem"
-                lineHeight="1.875rem"
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-              >
-                {radio.label}
-              </StyledText>
-            </SettingButtonLabel>
-          </React.Fragment>
+          <RadioButton
+            key={`sleep_setting_${radio.label}`}
+            buttonLabel={radio.label}
+            buttonValue={radio.value}
+            onChange={handleChange}
+            isSelected={radio.value === sleepMs}
+          />
         ))}
       </Flex>
     </Flex>

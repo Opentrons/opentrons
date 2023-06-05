@@ -10,6 +10,7 @@ import {
   Icon,
   ALIGN_CENTER,
   TYPOGRAPHY,
+  AlertPrimaryButton,
   DIRECTION_ROW,
   COLORS,
   SPACING,
@@ -18,7 +19,6 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { AlertPrimaryButton } from '../../../atoms/buttons'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,
@@ -28,7 +28,7 @@ import { useDispatchApiRequest } from '../../../redux/robot-api'
 
 import type { Dispatch, State } from '../../../redux/types'
 import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 interface LabelProps {
   isSelected?: boolean
@@ -39,11 +39,11 @@ const OptionButton = styled.input`
 `
 
 const OptionLabel = styled.label<LabelProps>`
-  padding: ${SPACING.spacing4} ${SPACING.spacing5};
+  padding: ${SPACING.spacing16} ${SPACING.spacing24};
   border: 2px solid
     ${({ isSelected }) =>
-      isSelected === true ? COLORS.blueEnabled : COLORS.light_two};
-  border-radius: ${BORDERS.size_four};
+      isSelected === true ? COLORS.blueEnabled : COLORS.light2};
+  border-radius: ${BORDERS.borderRadiusSize4};
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.medBlue : COLORS.white};
 `
@@ -100,13 +100,13 @@ export function DeviceReset({
   }, [dispatch, robotName])
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32}>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex flexDirection={DIRECTION_ROW}>
           <Btn onClick={() => setCurrentOption(null)}>
-            <Icon name="chevron-left" size="2.5rem" />
+            <Icon name="back" size="3rem" />
           </Btn>
-          <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
+          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('device_reset')}
           </StyledText>
         </Flex>
@@ -114,9 +114,9 @@ export function DeviceReset({
           flexDirection={DIRECTION_ROW}
           backgroundColor={COLORS.warningBackgroundMed}
           alignItems={ALIGN_CENTER}
-          gridGap="0.75rem"
-          padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
-          borderRadius={BORDERS.size_three}
+          gridGap={SPACING.spacing12}
+          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+          borderRadius={BORDERS.borderRadiusSize3}
         >
           <Icon name="ot-alert" size="1.5rem" color={COLORS.warningEnabled} />
           <StyledText
@@ -129,8 +129,8 @@ export function DeviceReset({
         </Flex>
       </Flex>
       <Flex
-        marginTop={SPACING.spacing5}
-        gridGap={SPACING.spacing3}
+        marginTop={SPACING.spacing24}
+        gridGap={SPACING.spacing8}
         flexDirection={DIRECTION_COLUMN}
       >
         {availableOptions.map(option => (
@@ -162,7 +162,7 @@ export function DeviceReset({
         ))}
       </Flex>
       <AlertPrimaryButton
-        paddingY={SPACING.spacing5}
+        paddingY={SPACING.spacing24}
         marginTop="3.5rem"
         disabled={
           Object.keys(resetOptions).length === 0 ||

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { ODD_MEDIA_QUERY_SPECS } from '@opentrons/shared-data'
 import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -14,8 +13,8 @@ import {
   BORDERS,
   Btn,
   SIZE_1,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-
 import type { StyleProps } from '@opentrons/components'
 
 export type BannerType =
@@ -93,23 +92,22 @@ export function Banner(props: BannerProps): JSX.Element {
   const iconProps = {
     ...(icon ?? bannerProps.icon),
     size: size ?? SIZE_1,
-    marginRight: iconMarginRight ?? SPACING.spacing3,
+    marginRight: iconMarginRight ?? SPACING.spacing8,
     marginLeft: iconMarginLeft ?? '0rem',
     color: BANNER_PROPS_BY_TYPE[type].color,
   }
   const BANNER_STYLE = css`
-    border: ${String(SPACING.spacingXXS)} ${String(BORDERS.styleSolid)}
-      ${BANNER_PROPS_BY_TYPE[type].color};
+    border: 1px ${BORDERS.styleSolid} ${BANNER_PROPS_BY_TYPE[type].color};
     font-size: ${TYPOGRAPHY.fontSizeP};
     font-weight: ${TYPOGRAPHY.fontWeightRegular};
-    border-radius: ${SPACING.spacing2};
+    border-radius: ${SPACING.spacing4};
 
-    @media ${ODD_MEDIA_QUERY_SPECS} {
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
       font-size: 1.25rem;
       font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
       border: none;
-      background-color: ${COLORS.yellow_three};
-      border-radius: ${BORDERS.size_three};
+      background-color: ${COLORS.yellow3};
+      border-radius: ${BORDERS.borderRadiusSize3};
       line-height: 1.5rem;
     }
   `
@@ -120,7 +118,7 @@ export function Banner(props: BannerProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      padding={padding ?? SPACING.spacing3}
+      padding={padding ?? SPACING.spacing8}
       onClick={e => e.stopPropagation()}
       data-testid={`Banner_${type}`}
       {...styleProps}
@@ -137,8 +135,8 @@ export function Banner(props: BannerProps): JSX.Element {
         <Btn data-testid="Banner_close-button" onClick={props.onCloseClick}>
           {closeButton ?? (
             <Icon
-              width={SPACING.spacing5}
-              height={SPACING.spacing5}
+              width={SPACING.spacing24}
+              height={SPACING.spacing24}
               marginTop="0.375rem"
               name="close"
               aria-label="close_icon"

@@ -14,15 +14,15 @@ import {
   TYPOGRAPHY,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
   BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { PrimaryButton } from '../../../atoms/buttons'
 import { RobotSystemVersionModal } from './RobotSystemVersionModal'
 import { getShellUpdateState } from '../../../redux/shell'
 
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 const GITHUB_URL = 'https://github.com/Opentrons/opentrons'
 
@@ -37,7 +37,7 @@ export function RobotSystemVersion({
   isUpdateAvailable,
   setCurrentOption,
 }: RobotSystemVersionProps): JSX.Element {
-  const { t } = useTranslation([
+  const { t, i18n } = useTranslation([
     'device_settings',
     'shared',
     'device_details',
@@ -57,26 +57,26 @@ export function RobotSystemVersion({
           setShowModal={setShowModal}
         />
       )}
-      <Flex flexDirection={DIRECTION_COLUMN}>
+      <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32}>
         <Flex justifyContent={JUSTIFY_FLEX_START} alignItems={ALIGN_CENTER}>
           <Btn onClick={() => setCurrentOption(null)}>
-            <Icon name="chevron-left" size="2.5rem" />
+            <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
           </Btn>
-          <StyledText fontSize="2rem" textAlign="center">
+          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('robot_system_version')}
           </StyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           marginTop="3rem"
-          gridGap={SPACING.spacing5}
+          gridGap={SPACING.spacing24}
         >
           {isUpdateAvailable ? (
             <Flex
               flexDirection={DIRECTION_ROW}
-              padding={`${SPACING.spacing5} ${SPACING.spacing4}`}
-              gridGap={SPACING.spacing4}
-              borderRadius={BORDERS.size_three}
+              padding={`${SPACING.spacing24} ${SPACING.spacing16}`}
+              gridGap={SPACING.spacing16}
+              borderRadius={BORDERS.borderRadiusSize3}
               alignItems={ALIGN_CENTER}
               backgroundColor={COLORS.warningBackgroundMed}
             >
@@ -86,11 +86,11 @@ export function RobotSystemVersion({
                 lineHeight="1.875rem"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
-                {t('app_settings:update_available')}
+                {i18n.format(t('app_settings:update_available'), 'capitalize')}
               </StyledText>
             </Flex>
           ) : null}
-          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing5}>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
             <StyledText
               fontSize="1.5rem"
               lineHeight="2.0625rem"
@@ -99,11 +99,11 @@ export function RobotSystemVersion({
               'shared:view_latest_release_notes'
             )} ${GITHUB_URL}`}</StyledText>
             <Flex
-              backgroundColor={COLORS.light_two}
+              backgroundColor={COLORS.light2}
               flexDirection={DIRECTION_ROW}
-              padding={SPACING.spacing5}
+              padding={SPACING.spacing24}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
-              borderRadius={BORDERS.size_three}
+              borderRadius={BORDERS.borderRadiusSize3}
             >
               <StyledText
                 fontSize="1.5rem"
@@ -122,7 +122,7 @@ export function RobotSystemVersion({
         </Flex>
         {isUpdateAvailable ? (
           <PrimaryButton
-            paddingY={SPACING.spacing5}
+            paddingY={SPACING.spacing24}
             marginTop="7.8125rem"
             onClick={() => console.log('open update modal')}
           >

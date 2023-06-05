@@ -89,9 +89,13 @@ def _get_approach_submerge_retract_heights(
     aspirate: Optional[float],
     dispense: Optional[float],
     blank: bool,
+    channel_count: int,
 ) -> Tuple[float, float, float]:
     liquid_before, liquid_after = liquid_tracker.get_before_and_after_heights(
-        pipette, well, aspirate=aspirate, dispense=dispense
+        well,
+        aspirate=aspirate,
+        dispense=dispense,
+        channels=channel_count,
     )
     if blank:
         # force the pipette to move above the well
@@ -110,22 +114,34 @@ def _get_approach_submerge_retract_heights(
 
 
 def _submerge(
-    pipette: InstrumentContext, well: Well, height: float, channel_offset: Point
+    pipette: InstrumentContext,
+    well: Well,
+    height: float,
+    channel_offset: Point,
+    speed: float,
 ) -> None:
     pipette.move_to(
         well.bottom(height).move(channel_offset),
         force_direct=True,
-        speed=config.TIP_SPEED_WHILE_SUBMERGING,
+        speed=speed,
     )
 
 
 def _retract(
-    pipette: InstrumentContext, well: Well, height: float, channel_offset: Point
+    pipette: InstrumentContext,
+    well: Well,
+    height: float,
+    channel_offset: Point,
+    speed: float,
 ) -> None:
     pipette.move_to(
         well.bottom(height).move(channel_offset),
         force_direct=True,
-        speed=config.TIP_SPEED_WHILE_RETRACTING,
+        speed=speed,
+    )
+    pipette.move_to(
+        well.top().move(channel_offset),
+        force_direct=True,
     )
 
 
@@ -135,6 +151,7 @@ def _pipette_with_liquid_settings(
     liquid_class: LiquidClassSettings,
     well: Well,
     channel_offset: Point,
+    channel_count: int,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     aspirate: Optional[float] = None,
@@ -176,8 +193,23 @@ def _pipette_with_liquid_settings(
 
     # CALCULATE TIP HEIGHTS FOR EACH PHASE
     approach_mm, submerge_mm, retract_mm = _get_approach_submerge_retract_heights(
-        pipette, well, liquid_tracker, liquid_class, aspirate, dispense, blank
+        pipette,
+        well,
+        liquid_tracker,
+        liquid_class,
+        aspirate,
+        dispense,
+        blank,
+        channel_count,
     )
+
+    # SET Z SPEEDS DURING SUBMERGE/RETRACT
+    if aspirate:
+        submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_ASPIRATE
+        retract_speed = config.TIP_SPEED_WHILE_RETRACTING_ASPIRATE
+    else:
+        submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_DISPENSE
+        retract_speed = config.TIP_SPEED_WHILE_RETRACTING_DISPENSE
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
@@ -199,15 +231,17 @@ def _pipette_with_liquid_settings(
                 pipette.aspirate(aspirate)
                 pipette.dispense(aspirate)
                 _retract(
-                    pipette, well, approach_mm, channel_offset
+                    pipette, well, approach_mm, channel_offset, retract_speed
                 )  # retract to the approach height
                 pipette.blow_out().aspirate(pipette.min_volume).dispense()
-                _submerge(pipette, well, submerge_mm, channel_offset)
+                _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
         # aspirate specified volume
         callbacks.on_aspirating()
         pipette.aspirate(aspirate)
         # update liquid-height tracker
-        liquid_tracker.update_affected_wells(pipette, well, aspirate=aspirate)
+        liquid_tracker.update_affected_wells(
+            well, aspirate=aspirate, channels=channel_count
+        )
         # delay
         ctx.delay(liquid_class.aspirate.delay)
 
@@ -224,7 +258,9 @@ def _pipette_with_liquid_settings(
         callbacks.on_dispensing()
         _dispense_with_added_blow_out()
         # update liquid-height tracker
-        liquid_tracker.update_affected_wells(pipette, well, dispense=dispense)
+        liquid_tracker.update_affected_wells(
+            well, dispense=dispense, channels=channel_count
+        )
         # delay
         ctx.delay(liquid_class.dispense.delay)
         _do_user_pause(ctx, inspect, "about to retract")
@@ -241,12 +277,12 @@ def _pipette_with_liquid_settings(
 
     # PHASE 2: SUBMERGE
     callbacks.on_submerging()
-    _submerge(pipette, well, submerge_mm, channel_offset)
+    _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
     _aspirate_on_submerge() if aspirate else _dispense_on_submerge()
 
     # PHASE 3: RETRACT
     callbacks.on_retracting()
-    _retract(pipette, well, retract_mm, channel_offset)
+    _retract(pipette, well, retract_mm, channel_offset, retract_speed)
     _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
     # EXIT
@@ -261,6 +297,7 @@ def aspirate_with_liquid_class(
     aspirate_volume: float,
     well: Well,
     channel_offset: Point,
+    channel_count: int,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = False,
@@ -269,11 +306,7 @@ def aspirate_with_liquid_class(
 ) -> None:
     """Aspirate with liquid class."""
     liquid_class = get_liquid_class(
-        int(pipette.max_volume), tip_volume, int(aspirate_volume)
-    )
-    # FIXME: change API to allow going beyond tip max volume
-    aspirate_volume = min(
-        tip_volume - liquid_class.aspirate.air_gap.trailing_air_gap, aspirate_volume
+        int(pipette.max_volume), pipette.channels, tip_volume, int(aspirate_volume)
     )
     _pipette_with_liquid_settings(
         ctx,
@@ -281,6 +314,7 @@ def aspirate_with_liquid_class(
         liquid_class,
         well,
         channel_offset,
+        channel_count,
         liquid_tracker,
         callbacks,
         aspirate=aspirate_volume,
@@ -297,6 +331,7 @@ def dispense_with_liquid_class(
     dispense_volume: float,
     well: Well,
     channel_offset: Point,
+    channel_count: int,
     liquid_tracker: LiquidTracker,
     callbacks: PipettingCallbacks,
     blank: bool = False,
@@ -305,11 +340,7 @@ def dispense_with_liquid_class(
 ) -> None:
     """Dispense with liquid class."""
     liquid_class = get_liquid_class(
-        int(pipette.max_volume), tip_volume, int(dispense_volume)
-    )
-    # FIXME: change API to allow going beyond tip max volume
-    dispense_volume = min(
-        tip_volume - liquid_class.aspirate.air_gap.trailing_air_gap, dispense_volume
+        int(pipette.max_volume), pipette.channels, tip_volume, int(dispense_volume)
     )
     _pipette_with_liquid_settings(
         ctx,
@@ -317,6 +348,7 @@ def dispense_with_liquid_class(
         liquid_class,
         well,
         channel_offset,
+        channel_count,
         liquid_tracker,
         callbacks,
         dispense=dispense_volume,

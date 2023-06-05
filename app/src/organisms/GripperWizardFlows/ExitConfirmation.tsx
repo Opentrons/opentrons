@@ -4,8 +4,9 @@ import {
   COLORS,
   SPACING,
   TEXT_TRANSFORM_CAPITALIZE,
+  AlertPrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
-import { AlertPrimaryButton, SecondaryButton } from '../../atoms/buttons'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GRIPPER_FLOW_TYPES } from './constants'
 import type { GripperWizardFlowType } from './types'
@@ -34,7 +35,7 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
       subHeader={t('are_you_sure_exit', { flow: flowTitle })}
       isSuccess={false}
     >
-      <SecondaryButton onClick={handleGoBack} marginRight={SPACING.spacing2}>
+      <SecondaryButton onClick={handleGoBack} marginRight={SPACING.spacing4}>
         {t('shared:go_back')}
       </SecondaryButton>
       <AlertPrimaryButton

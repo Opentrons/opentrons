@@ -16,7 +16,11 @@ import { Portal } from '../../App/portal'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_DELETE_PROTOCOL_FROM_APP,
+} from '../../redux/analytics'
 import { getSendAllProtocolsToOT3 } from '../../redux/config'
 import {
   analyzeProtocol,
@@ -60,7 +64,7 @@ export function ProtocolOverflowMenu(
     cancel: cancelDeleteProtocol,
   } = useConditionalConfirm(() => {
     dispatch(removeProtocol(protocolKey))
-    trackEvent({ name: 'deleteProtocolFromApp', properties: {} })
+    trackEvent({ name: ANALYTICS_DELETE_PROTOCOL_FROM_APP, properties: {} })
   }, true)
   const sendAllProtocolsToOT3 = useSelector(getSendAllProtocolsToOT3)
 
@@ -76,7 +80,7 @@ export function ProtocolOverflowMenu(
     e.preventDefault()
     e.stopPropagation()
     trackEvent({
-      name: 'proceedToRun',
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
       properties: { sourceLocation: 'ProtocolsLanding' },
     })
     handleRunProtocol(storedProtocolData)
@@ -127,7 +131,7 @@ export function ProtocolOverflowMenu(
             onClick={handleClickRun}
             data-testid="ProtocolOverflowMenu_run"
           >
-            {t('run_now')}
+            {t('start_setup')}
           </MenuItem>
           <MenuItem
             onClick={handleClickReanalyze}

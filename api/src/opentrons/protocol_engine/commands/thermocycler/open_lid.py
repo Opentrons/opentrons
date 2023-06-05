@@ -51,14 +51,11 @@ class OpenLidImpl(AbstractCommandImpl[OpenLidParams, OpenLidResult]):
 
         # move the pipettes and gantry over the trash
         # do not home plunger axes because pipettes may be holding liquid
-        await self._movement.home(
-            [
-                MotorAxis.X,
-                MotorAxis.Y,
-                MotorAxis.RIGHT_Z,
-                MotorAxis.LEFT_Z,
-            ]
-        )
+        axes_to_home = [
+            MotorAxis.X,
+            MotorAxis.Y,
+        ] + self._state_view.motion.get_robot_mount_axes()
+        await self._movement.home(axes=axes_to_home)
 
         if thermocycler_hardware is not None:
             await thermocycler_hardware.open()

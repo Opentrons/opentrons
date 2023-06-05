@@ -1,8 +1,13 @@
 import * as React from 'react'
 
-import { Flex, DIRECTION_COLUMN, SPACING, COLORS } from '@opentrons/components'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  SPACING,
+  COLORS,
+  SecondaryButton,
+} from '@opentrons/components'
 
-import { SecondaryButton } from '../buttons'
 import { StyledText } from '../text'
 import { ProgressBar } from './index'
 
@@ -27,9 +32,9 @@ const Template: Story<React.ComponentProps<typeof ProgressBar>> = args => {
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacingXXL}
+      gridGap={SPACING.spacing40}
       backgroundColor={COLORS.darkGreyDisabled}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
     >
       <StyledText>{'Add 5% to the current progress every 0.2 sec'}</StyledText>
       <ProgressBar percentComplete={progress} />

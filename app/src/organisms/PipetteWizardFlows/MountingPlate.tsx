@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { RIGHT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
-import capitalize from 'lodash/capitalize'
+import { RIGHT } from '@opentrons/shared-data'
 import { SPACING } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -16,15 +15,10 @@ export const MountingPlate = (
     goBack,
     proceed,
     flowType,
-    selectedPipette,
     chainRunCommands,
     setShowErrorMessage,
   } = props
-  const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
-
-  //  this should never happen but to be safe
-  if (selectedPipette === SINGLE_MOUNT_PIPETTES || flowType === FLOWS.CALIBRATE)
-    return null
+  const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
 
   const handleDetachMountingPlate = (): void => {
     chainRunCommands(
@@ -77,7 +71,7 @@ export const MountingPlate = (
             i18nKey="attach_mounting_plate_instructions"
             components={{
               block: (
-                <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing4} />
+                <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing16} />
               ),
             }}
           />
@@ -87,7 +81,7 @@ export const MountingPlate = (
           </StyledText>
         )
       }
-      proceedButtonText={capitalize(t('shared:continue'))}
+      proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
       proceed={flowType === FLOWS.ATTACH ? proceed : handleDetachMountingPlate}
       back={goBack}
     />

@@ -22,8 +22,10 @@ import {
   useRobot,
   useTipLengthCalibrations,
 } from '../../organisms/Devices/hooks'
-import { useTrackEvent } from '../../redux/analytics'
-import { EVENT_CALIBRATION_DOWNLOADED } from '../../redux/calibration'
+import {
+  useTrackEvent,
+  ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
+} from '../../redux/analytics'
 
 // TODO(bc, 2022-02-08): replace with support article when available
 const FLEX_CALIBRATION_SUPPORT_URL = 'https://support.opentrons.com'
@@ -50,8 +52,8 @@ export function CalibrationDataDownload({
   const isOT3 = useIsOT3(robotName)
   // wait for robot request to resolve instead of using name directly from params
   const deckCalibrationData = useDeckCalibrationData(robot?.name)
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
-  const tipLengthCalibrations = useTipLengthCalibrations(robot?.name)
+  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
+  const tipLengthCalibrations = useTipLengthCalibrations()
 
   const downloadIsPossible =
     deckCalibrationData.isDeckCalibrated &&
@@ -68,7 +70,7 @@ export function CalibrationDataDownload({
   const onClickSaveAs: React.MouseEventHandler = e => {
     e.preventDefault()
     doTrackEvent({
-      name: EVENT_CALIBRATION_DOWNLOADED,
+      name: ANALYTICS_CALIBRATION_DATA_DOWNLOADED,
       properties: {},
     })
     saveAs(
@@ -91,9 +93,9 @@ export function CalibrationDataDownload({
     <Flex
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      paddingTop={SPACING.spacing5}
+      paddingTop={SPACING.spacing24}
     >
-      <Flex gridGap={SPACING.spacing3} flexDirection={DIRECTION_COLUMN}>
+      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {isOT3
             ? t('about_calibration_title')
@@ -131,7 +133,7 @@ export function CalibrationDataDownload({
         disabled={isOT3 ? !ot3DownloadIsPossible : !downloadIsPossible}
       >
         <Flex alignItems={ALIGN_CENTER}>
-          <Icon name="download" size="0.75rem" marginRight={SPACING.spacing3} />
+          <Icon name="download" size="0.75rem" marginRight={SPACING.spacing8} />
           {t('download_calibration_data')}
         </Flex>
       </TertiaryButton>

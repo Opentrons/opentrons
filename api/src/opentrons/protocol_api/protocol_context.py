@@ -15,9 +15,10 @@ from typing import (
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-from opentrons.types import Mount, Location, DeckLocation
+from opentrons.types import Mount, Location, DeckLocation, DeckSlotName
 from opentrons.broker import Broker
 from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support import instrument as instrument_support
@@ -28,13 +29,16 @@ from opentrons.protocols.api_support.util import (
     APIVersionError,
 )
 
+from ._types import OffDeckType
 from .core.common import ModuleCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
+from .core.engine.module_core import NonConnectedModuleCore
 from .core.module import (
     AbstractTemperatureModuleCore,
     AbstractMagneticModuleCore,
     AbstractThermocyclerCore,
     AbstractHeaterShakerCore,
+    AbstractMagneticBlockCore,
 )
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
@@ -50,6 +54,7 @@ from .module_contexts import (
     TemperatureModuleContext,
     ThermocyclerContext,
     HeaterShakerContext,
+    MagneticBlockContext,
     ModuleContext,
 )
 
@@ -62,6 +67,7 @@ ModuleTypes = Union[
     MagneticModuleContext,
     ThermocyclerContext,
     HeaterShakerContext,
+    MagneticBlockContext,
 ]
 
 
@@ -118,6 +124,11 @@ class ProtocolContext(CommandPublisher):
         self._core = core
         self._core_map = core_map or LoadedCoreMap()
         self._deck = deck or Deck(protocol_core=core, core_map=self._core_map)
+
+        # With the introduction of Extension mount type, this dict initializes to include
+        # the extension mount, for both ot2 & 3. While it doesn't seem like it would
+        # create an issue in the current PAPI context, it would be much safer to
+        # only use mounts available on the robot.
         self._instruments: Dict[Mount, Optional[InstrumentContext]] = {
             mount: None for mount in Mount
         }
@@ -298,18 +309,32 @@ class ProtocolContext(CommandPublisher):
         This function returns the created and initialized labware for use
         later in the protocol.
 
-        :param load_name: A string to use for looking up a labware definition
-        :param location: The slot into which to load the labware such as
-                         1 or '1'
+        :param str load_name: A string to use for looking up a labware definition.
+            You can find the ``load_name`` for any standard labware on the Opentrons
+            `Labware Library <https://labware.opentrons.com>`_.
+
+        :param location: The slot into which to load the labware,
+            such as ``1`` or ``"1"``.
+
         :type location: int or str
-        :param str label: An optional special name to give the labware. If
-                          specified, this is the name the labware will appear
-                          as in the run log and the calibration view in the
-                          Opentrons app.
-        :param str namespace: The namespace the labware definition belongs to.
-            If unspecified, will search 'opentrons' then 'custom_beta'
-        :param int version: The version of the labware definition. If
-            unspecified, will use version 1.
+
+        :param str label: An optional special name to give the labware. If specified, this
+            is the name the labware will appear as in the run log and the calibration
+            view in the Opentrons app.
+
+        :param str namespace: The namespace that the labware definition belongs to.
+            If unspecified, will search both:
+
+              * ``"opentrons"``, to load standard Opentrons labware definitions.
+              * ``"custom_beta"``, to load custom labware definitions created with the
+                `Custom Labware Creator <https://labware.opentrons.com/create>`_.
+
+            You might need to specify an explicit ``namespace`` if you have a custom
+            definition whose ``load_name`` is the same as an Opentrons standard
+            definition, and you want to explicitly choose one or the other.
+
+        :param version: The version of the labware definition. You should normally
+            leave this unspecified to let the implementation choose a good default.
         """
         load_name = validation.ensure_lowercase_name(load_name)
         deck_slot = validation.ensure_deck_slot(location)
@@ -379,11 +404,11 @@ class ProtocolContext(CommandPublisher):
         }
 
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
-    # TODO: gate move_labware behind API version
+    @requires_version(2, 15)
     def move_labware(
         self,
         labware: Labware,
-        new_location: Union[DeckLocation, ModuleTypes],
+        new_location: Union[DeckLocation, ModuleTypes, OffDeckType],
         use_gripper: bool = False,
         use_pick_up_location_lpc_offset: bool = False,
         use_drop_location_lpc_offset: bool = False,
@@ -399,7 +424,8 @@ class ProtocolContext(CommandPublisher):
                         using :py:meth:`load_labware`
 
         :param new_location: Deck slot location or a hardware module that is already
-                             loaded on the deck using :py:meth:`load_module`.
+                             loaded on the deck using :py:meth:`load_module`
+                             or off deck using :py:obj:`OFF_DECK`.
         :param use_gripper: Whether to use gripper to perform this move.
                             If True, will use the gripper to perform the move (OT3 only).
                             If False, will pause protocol execution to allow the user
@@ -427,11 +453,13 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        location = (
-            new_location._core
-            if isinstance(new_location, ModuleContext)
-            else validation.ensure_deck_slot(new_location)
-        )
+        location: Union[ModuleCore, OffDeckType, DeckSlotName]
+        if isinstance(new_location, ModuleContext):
+            location = new_location._core
+        elif isinstance(new_location, OffDeckType):
+            location = new_location
+        else:
+            location = validation.ensure_deck_slot(new_location)
 
         _pick_up_offset = (
             validation.ensure_valid_labware_offset_vector(pick_up_offset)
@@ -493,6 +521,9 @@ class ProtocolContext(CommandPublisher):
                   :py:class:`ThermocyclerContext`, or
                   :py:class:`HeaterShakerContext`,
                   depending on what you requested with ``module_name``.
+
+                  .. versionchanged:: 2.15
+                    Added :py:class:`MagneticBlockContext` return value.
         """
         if configuration:
             if self._api_version < APIVersion(2, 4):
@@ -506,6 +537,13 @@ class ProtocolContext(CommandPublisher):
                 )
 
         requested_model = validation.ensure_module_model(module_name)
+        if isinstance(
+            requested_model, MagneticBlockModel
+        ) and self._api_version < APIVersion(2, 15):
+            raise APIVersionError(
+                f"Module of type {module_name} is only available in versions 2.15 and above."
+            )
+
         deck_slot = None if location is None else validation.ensure_deck_slot(location)
 
         module_core = self._core.load_module(
@@ -795,6 +833,8 @@ class ProtocolContext(CommandPublisher):
         :param str name: A human-readable name for the liquid.
         :param str description: An optional description of the liquid.
         :param str display_color: An optional hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.
+
+        :return: A :py:class:`~opentrons.protocol_api.Liquid` object representing the specified liquid.
         """
         return self._core.define_liquid(
             name=name,
@@ -816,7 +856,7 @@ class ProtocolContext(CommandPublisher):
 
 
 def _create_module_context(
-    module_core: ModuleCore,
+    module_core: Union[ModuleCore, NonConnectedModuleCore],
     protocol_core: ProtocolCore,
     core_map: LoadedCoreMap,
     api_version: APIVersion,
@@ -831,6 +871,8 @@ def _create_module_context(
         module_cls = ThermocyclerContext
     elif isinstance(module_core, AbstractHeaterShakerCore):
         module_cls = HeaterShakerContext
+    elif isinstance(module_core, AbstractMagneticBlockCore):
+        module_cls = MagneticBlockContext
     else:
         assert False, "Unsupported module type"
 

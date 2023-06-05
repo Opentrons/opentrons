@@ -32,7 +32,7 @@ export function ChosenTipRackRender(
     <Flex
       flexDirection={DIRECTION_ROW}
       alignItems={ALIGN_CENTER}
-      marginLeft={SPACING.spacing3}
+      marginLeft={SPACING.spacing8}
     >
       <img
         css={css`
@@ -43,7 +43,7 @@ export function ChosenTipRackRender(
         alt={`${String(displayName)} image`}
       />
       <Box>
-        <StyledText as="p" marginLeft={SPACING.spacing4}>
+        <StyledText as="p" marginLeft={SPACING.spacing16}>
           {displayName}
         </StyledText>
       </Box>

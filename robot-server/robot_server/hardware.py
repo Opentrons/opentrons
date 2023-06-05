@@ -14,13 +14,21 @@ from opentrons.util.helpers import utc_now
 from opentrons.hardware_control import ThreadManagedHardware, HardwareControlAPI
 from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
 from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
+from opentrons.protocol_engine import DeckType
 
 from notify_server.clients import publisher
 from notify_server.settings import Settings as NotifyServerSettings
 from notify_server.models import event, topics
 from notify_server.models.hardware_event import DoorStatePayload
 
-from .app_state import AppState, AppStateAccessor, get_app_state
+from server_utils.fastapi_utils.app_state import (
+    AppState,
+    AppStateAccessor,
+    get_app_state,
+)
 from .errors import ErrorDetails
 from .settings import get_settings
 
@@ -144,6 +152,11 @@ async def get_hardware(
 async def get_robot_type() -> RobotType:
     """Return what kind of robot this server is running on."""
     return "OT-3 Standard" if should_use_ot3() else "OT-2 Standard"
+
+
+async def get_deck_type() -> DeckType:
+    """Return what kind of deck the robot that this server is running on has."""
+    return DeckType(guess_deck_type_from_global_config())
 
 
 async def _initialize_hardware_api(app_state: AppState) -> None:

@@ -94,9 +94,16 @@ class PipetteNotLoadedError(ProtocolEngineError):
 class ModuleNotLoadedError(ProtocolEngineError):
     """Raised when referencing a module that has not been loaded."""
 
+    def __init__(self, *, module_id: str) -> None:
+        super().__init__(f"Module {module_id} not found.")
+
 
 class ModuleNotOnDeckError(ProtocolEngineError):
     """Raised when trying to use a module that is loaded off the deck."""
+
+
+class ModuleNotConnectedError(ProtocolEngineError):
+    """Raised when trying to use a module that is not connected to the robot electrically."""
 
 
 class SlotDoesNotExistError(ProtocolEngineError):
@@ -153,6 +160,10 @@ class HeaterShakerLabwareLatchNotOpenError(ProtocolEngineError):
     """Raised when Heater-Shaker latch is not open when it is expected to be so."""
 
 
+class HeaterShakerLabwareLatchStatusUnknown(ProtocolEngineError):
+    """Raised when Heater-Shaker latch has not been set before moving to it."""
+
+
 class EngageHeightOutOfRangeError(ProtocolEngineError):
     """Raised when a Magnetic Module engage height is out of bounds."""
 
@@ -207,3 +218,11 @@ class FirmwareUpdateRequired(ProtocolEngineError):
 
 class PipetteNotReadyToAspirateError(ProtocolEngineError):
     """Raised when the pipette is not ready to aspirate."""
+
+
+class InvalidPipettingVolumeError(ProtocolEngineError):
+    """Raised when pipetting a volume larger than the pipette volume."""
+
+
+class InvalidAxisForRobotType(ProtocolEngineError):
+    """Raised when attempting to use an axis that is not present on the given type of robot."""

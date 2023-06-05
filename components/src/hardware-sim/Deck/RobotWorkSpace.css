@@ -1,4 +1,0 @@
-.robot_work_space {
-  /* reflect horizontally about the center of the DOM elem */
-  transform: scale(1, -1);
-}

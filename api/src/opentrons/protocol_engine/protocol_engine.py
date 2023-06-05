@@ -6,7 +6,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
-from . import commands
+from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
 from .types import (
     LabwareOffset,
@@ -148,6 +148,10 @@ class ProtocolEngine:
             RunStoppedError: the run has been stopped, so no new commands
                 may be added.
         """
+        request = slot_standardization.standardize_command(
+            request, self.state_view.config.robot_type
+        )
+
         command_id = self._model_utils.generate_id()
         request_hash = commands.hash_command_params(
             create=request,
@@ -166,9 +170,12 @@ class ProtocolEngine:
         return self._state_store.commands.get(command_id)
 
     async def wait_for_command(self, command_id: str) -> None:
-        """Wait for a command to be completed."""
+        """Wait for a command to be completed.
+
+        Will also return if the engine was stopped before it reached the command.
+        """
         await self._state_store.wait_for(
-            self._state_store.commands.get_is_complete,
+            self._state_store.commands.get_command_is_final,
             command_id=command_id,
         )
 
@@ -185,7 +192,9 @@ class ProtocolEngine:
                 the command in state.
 
         Returns:
-            The completed command, whether it succeeded or failed.
+            The command. If the command completed, it will be succeeded or failed.
+            If the engine was stopped before it reached the command,
+            the command will be queued.
         """
         command = self.add_command(request)
         await self.wait_for_command(command.id)
@@ -211,7 +220,7 @@ class ProtocolEngine:
             CommandExecutionFailedError: if any protocol command failed.
         """
         await self._state_store.wait_for(
-            condition=self._state_store.commands.get_all_complete
+            condition=self._state_store.commands.get_all_commands_final
         )
 
     async def finish(
@@ -276,6 +285,10 @@ class ProtocolEngine:
 
         To retrieve offsets later, see `.state_view.labware`.
         """
+        request = slot_standardization.standardize_labware_offset(
+            request, self.state_view.config.robot_type
+        )
+
         labware_offset_id = self._model_utils.generate_id()
         created_at = self._model_utils.get_timestamp()
         self._action_dispatcher.dispatch(
@@ -319,6 +332,8 @@ class ProtocolEngine:
 
     def reset_tips(self, labware_id: str) -> None:
         """Reset the tip state of a given labware."""
+        # TODO(mm, 2023-03-10): Safely raise an error if the given labware isn't a
+        # tip rack?
         self._action_dispatcher.dispatch(ResetTipsAction(labware_id=labware_id))
 
     # TODO(mm, 2022-11-10): This is a method on ProtocolEngine instead of a command

@@ -252,6 +252,7 @@ async def _pick_up_tip(
         tip_volume = pip.working_volume
     tip_length = helpers_ot3.get_default_tip_length(int(tip_volume))
     await api.pick_up_tip(mount, tip_length=tip_length)
+    await api.move_rel(mount, Point(z=tip_length))
     return actual
 
 
@@ -785,7 +786,7 @@ async def _test_diagnostics_pressure(
         print(f"FAIL: sealed pressure ({pressure_compress}) is not correct")
     write_cb(
         [
-            "pressure-sealed",
+            "pressure-compressed",
             pressure_compress,
             _bool_to_pass_fail(pressure_compress_pass),
         ]
@@ -1080,6 +1081,8 @@ async def _main(test_config: TestConfig) -> None:
         print(f"CSV: {csv_props.name}")
         print("homing")
         await api.home()
+        # disengage x,y for replace the new pipette
+        await api.disengage_axes([OT3Axis.X, OT3Axis.Y])
     print("done")
 
 

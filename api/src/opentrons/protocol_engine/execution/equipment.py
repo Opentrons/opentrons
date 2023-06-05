@@ -39,6 +39,7 @@ from ..types import (
     LabwareLocation,
     DeckSlotLocation,
     ModuleLocation,
+    LabwareOffset,
     LabwareOffsetLocation,
     ModuleModel,
     ModuleDefinition,
@@ -66,7 +67,7 @@ class LoadedModuleData:
     """The result of a load module procedure."""
 
     module_id: str
-    serial_number: str
+    serial_number: Optional[str]
     definition: ModuleDefinition
 
 
@@ -168,6 +169,9 @@ class EquipmentHandler:
         Returns:
             A LoadedPipetteData object.
         """
+        # TODO (spp, 2023-05-10): either raise error if using MountType.EXTENSION in
+        #  load pipettes command, or change the mount type used to be a restricted
+        #  PipetteMountType which has only pipette mounts and not the extension mount.
         use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
 
         pipette_name_value = (
@@ -232,6 +236,41 @@ class EquipmentHandler:
         )
 
         return LoadedPipetteData(pipette_id=pipette_id)
+
+    async def load_magnetic_block(
+        self,
+        model: ModuleModel,
+        location: DeckSlotLocation,
+        module_id: Optional[str],
+    ) -> LoadedModuleData:
+        """Ensure the required magnetic block is attached.
+
+        Args:
+            model: The model name of the module.
+            location: The deck location of the module
+            module_id: Optional ID assigned to the module.
+                       If None, an ID will be generated.
+
+        Returns:
+            A LoadedModuleData object.
+
+        Raises:
+            ModuleAlreadyPresentError: A module of a different type is already
+                assigned to the requested location.
+        """
+        assert ModuleModel.is_magnetic_block(
+            model
+        ), f"Expected Magnetic block and got {model.name}"
+        definition = self._module_data_provider.get_definition(model)
+        # when loading a hardware module select_hardware_module_to_load
+        # will ensure a module of a different type is not loaded at the same slot.
+        # this is for non-connected modules.
+        self._state_store.modules.raise_if_module_in_location(location=location)
+        return LoadedModuleData(
+            module_id=self._model_utils.ensure_id(module_id),
+            serial_number=None,
+            definition=definition,
+        )
 
     async def load_module(
         self,
@@ -349,16 +388,57 @@ class EquipmentHandler:
             or None if no labware offset will apply.
         """
         if isinstance(labware_location, DeckSlotLocation):
-            slot_name = labware_location.slotName
-            module_model = None
+            offset = self._state_store.labware.find_applicable_labware_offset(
+                definition_uri=labware_definition_uri,
+                location=LabwareOffsetLocation(
+                    slotName=labware_location.slotName,
+                    moduleModel=None,
+                ),
+            )
+            return self._get_id_from_offset(offset)
+
         elif isinstance(labware_location, ModuleLocation):
             module_id = labware_location.moduleId
             # Allow ModuleNotLoadedError to propagate.
-            module_model = self._state_store.modules.get_model(module_id=module_id)
+            # Note also that we match based on the module's requested model, not its
+            # actual model, to implement robot-server's documented HTTP API semantics.
+            module_model = self._state_store.modules.get_requested_model(
+                module_id=module_id
+            )
+
+            # If `module_model is None`, it probably means that this module was added by
+            # `ProtocolEngine.use_attached_modules()`, instead of an explicit
+            # `loadModule` command.
+            #
+            # This assert should never raise in practice because:
+            #   1. `ProtocolEngine.use_attached_modules()` is only used by
+            #      robot-server's "stateless command" endpoints, under `/commands`.
+            #   2. Those endpoints don't support loading labware, so this code will
+            #      never run.
+            #
+            # Nevertheless, if it does happen somehow, we do NOT want to pass the
+            # `None` value along to `LabwareView.find_applicable_labware_offset()`.
+            # `None` means something different there, which will cause us to return
+            # wrong results.
+            assert module_model is not None, (
+                "Can't find offsets for labware"
+                " that are loaded on modules"
+                " that were loaded with ProtocolEngine.use_attached_modules()."
+            )
+
             module_location = self._state_store.modules.get_location(
                 module_id=module_id
             )
             slot_name = module_location.slotName
+            offset = self._state_store.labware.find_applicable_labware_offset(
+                definition_uri=labware_definition_uri,
+                location=LabwareOffsetLocation(
+                    slotName=slot_name,
+                    moduleModel=module_model,
+                ),
+            )
+            return self._get_id_from_offset(offset)
+
         else:
             # No offset for off-deck location.
             # Returning None instead of raising an exception allows loading a labware
@@ -366,12 +446,6 @@ class EquipmentHandler:
             # Also allows using `moveLabware` with 'offDeck' location.
             return None
 
-        offset = self._state_store.labware.find_applicable_labware_offset(
-            definition_uri=labware_definition_uri,
-            location=LabwareOffsetLocation(
-                slotName=slot_name,
-                moduleModel=module_model,
-            ),
-        )
-
-        return None if offset is None else offset.id
+    @staticmethod
+    def _get_id_from_offset(labware_offset: Optional[LabwareOffset]) -> Optional[str]:
+        return None if labware_offset is None else labware_offset.id

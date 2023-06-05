@@ -1,8 +1,6 @@
 """Tests for the InstrumentContext public interface."""
 import inspect
 
-from typing import Optional, Union
-
 import pytest
 from decoy import Decoy
 
@@ -19,7 +17,7 @@ from opentrons.protocol_api.core.common import (
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api import TemperatureModuleContext
 
-from opentrons.types import DeckSlotName, Point
+from opentrons.types import Point
 
 
 @pytest.fixture(autouse=True)
@@ -155,24 +153,18 @@ def test_reset_tips(
     decoy.verify(mock_labware_core.reset_tips(), times=1)
 
 
-@pytest.mark.parametrize(
-    "labware_location, expected_result",
-    [(DeckSlotName.SLOT_1, "1"), (None, None)],
-)
 def test_parent_slot(
     decoy: Decoy,
     subject: Labware,
     mock_labware_core: LabwareCore,
     mock_protocol_core: ProtocolCore,
-    labware_location: Union[None, DeckSlotName],
-    expected_result: Optional[str],
 ) -> None:
     """Should get the labware's parent slot name or None."""
     decoy.when(mock_protocol_core.get_labware_location(mock_labware_core)).then_return(
-        labware_location
+        "bloop"
     )
 
-    subject.parent == expected_result
+    assert subject.parent == "bloop"
 
 
 def test_parent_module_context(
@@ -194,7 +186,7 @@ def test_parent_module_context(
         mock_temp_module_context
     )
 
-    subject.parent == mock_temp_module_context
+    assert subject.parent == mock_temp_module_context
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
@@ -217,3 +209,14 @@ def test_set_offset_raises_on_high_api_version(
     """It should raise an error, on high API versions."""
     with pytest.raises(APIVersionError):
         subject.set_offset(1, 2, 3)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_separate_calibration_raises_on_high_api_version(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+) -> None:
+    """It should raise an error, on high API versions."""
+    with pytest.raises(APIVersionError):
+        subject.separate_calibration

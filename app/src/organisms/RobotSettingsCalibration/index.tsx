@@ -2,6 +2,11 @@ import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { SpinnerModalPage, AlertModal } from '@opentrons/components'
+import {
+  useAllPipetteOffsetCalibrationsQuery,
+  useAllTipLengthCalibrationsQuery,
+  useCalibrationStatusQuery,
+} from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
 import { Line } from '../../atoms/structure'
@@ -10,11 +15,11 @@ import { CalibrateDeck } from '../../organisms/CalibrateDeck'
 import { CalibrationStatusCard } from '../../organisms/CalibrationStatusCard'
 import { CheckCalibration } from '../../organisms/CheckCalibration'
 import {
-  usePipetteOffsetCalibrations,
   useRobot,
   useAttachedPipettes,
   useRunStatuses,
   useIsOT3,
+  useAttachedPipettesFromInstrumentsQuery,
 } from '../../organisms/Devices/hooks'
 import { HowCalibrationWorksModal } from '../../organisms/HowCalibrationWorksModal'
 import { CONNECTABLE } from '../../redux/discovery'
@@ -35,11 +40,6 @@ import type {
   DeckCalibrationSession,
 } from '../../redux/sessions/types'
 import type { State, Dispatch } from '../../redux/types'
-import {
-  useAllPipetteOffsetCalibrationsQuery,
-  useAllTipLengthCalibrationsQuery,
-  useCalibrationStatusQuery,
-} from '@opentrons/react-api-client'
 
 const CALS_FETCH_MS = 5000
 
@@ -118,13 +118,17 @@ export function RobotSettingsCalibration({
     }
   )
 
-  // wait for robot request to resolve instead of using name directly from params
-  const pipetteOffsetCalibrations = usePipetteOffsetCalibrations(robot?.name)
+  const pipetteOffsetCalibrations = useAllPipetteOffsetCalibrationsQuery().data
+    ?.data
+  const attachedPipettesFromInstrumentQuery = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipettes = useAttachedPipettes()
   const { isRunRunning: isRunning } = useRunStatuses()
-
-  const pipettePresent =
+  const pipettePresentOt2 =
     !(attachedPipettes.left == null) || !(attachedPipettes.right == null)
+  const pipettePresentOt3 =
+    !(attachedPipettesFromInstrumentQuery.left == null) ||
+    !(attachedPipettesFromInstrumentQuery.right == null)
+  const pipettePresent = isOT3 ? pipettePresentOt3 : pipettePresentOt2
 
   const isPending =
     useSelector<State, RequestState | null>(state =>
@@ -180,7 +184,7 @@ export function RobotSettingsCalibration({
 
   const formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] = []
 
-  if (attachedPipettes != null) {
+  if (!isOT3 && attachedPipettes != null) {
     formattedPipetteOffsetCalibrations.push({
       modelName: attachedPipettes.left?.modelSpecs?.displayName,
       serialNumber: attachedPipettes.left?.id,
@@ -208,6 +212,23 @@ export function RobotSettingsCalibration({
       markedBad: pipetteOffsetCalibrations?.find(
         p => p.pipette === attachedPipettes.right?.id
       )?.status.markedBad,
+    })
+  } else {
+    formattedPipetteOffsetCalibrations.push({
+      modelName: attachedPipettesFromInstrumentQuery.left?.displayName,
+      serialNumber: attachedPipettesFromInstrumentQuery.left?.serialNumber,
+      mount: 'left' as Mount,
+      lastCalibrated:
+        attachedPipettesFromInstrumentQuery.left?.data.calibratedOffset
+          ?.last_modified,
+    })
+    formattedPipetteOffsetCalibrations.push({
+      modelName: attachedPipettesFromInstrumentQuery.right?.displayName,
+      serialNumber: attachedPipettesFromInstrumentQuery.right?.serialNumber,
+      mount: 'right' as Mount,
+      lastCalibrated:
+        attachedPipettesFromInstrumentQuery.right?.data.calibratedOffset
+          ?.last_modified,
     })
   }
 

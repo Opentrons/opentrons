@@ -34,11 +34,11 @@ export function CalibrationStatusCard({
   setShowHowCalibrationWorksModal,
 }: CalibrationStatusCardProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
-  const { taskListStatus } = useCalibrationTaskList(robotName)
+  const { taskListStatus } = useCalibrationTaskList()
 
   // start off assuming we are missing calibrations
-  let statusLabelBackgroundColor = COLORS.errorEnabled
-  let statusLabelIconColor = COLORS.errorEnabled
+  let statusLabelBackgroundColor: string = COLORS.errorEnabled
+  let statusLabelIconColor: string = COLORS.errorEnabled
   let statusLabelText = t('missing_calibration_data')
 
   // if the tasklist is empty, though, all calibrations are good
@@ -60,16 +60,16 @@ export function CalibrationStatusCard({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_FLEX_START}
         justifyContent={JUSTIFY_CENTER}
-        gridGap={SPACING.spacing3}
-        marginRight={SPACING.spacingXXL}
+        gridGap={SPACING.spacing8}
+        marginRight={SPACING.spacing40}
       >
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <StyledText css={TYPOGRAPHY.h2SemiBold}>
             {t('calibration_status')}
           </StyledText>

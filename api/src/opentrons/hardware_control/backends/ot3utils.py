@@ -22,6 +22,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     PipetteType,
     SensorId,
     PipetteTipActionType,
+    USBTarget,
 )
 from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
 from opentrons_hardware.hardware_control.motion_planning import (
@@ -66,6 +67,25 @@ SUBSYSTEM_NODEID: Dict[OT3SubSystem, NodeId] = {
     OT3SubSystem.pipette_left: NodeId.pipette_left,
     OT3SubSystem.pipette_right: NodeId.pipette_right,
     OT3SubSystem.gripper: NodeId.gripper,
+}
+
+NODEID_SUBSYSTEM: Dict[NodeId, OT3SubSystem] = {
+    NodeId.gantry_x: OT3SubSystem.gantry_x,
+    NodeId.gantry_x_bootloader: OT3SubSystem.gantry_x,
+    NodeId.gantry_y: OT3SubSystem.gantry_y,
+    NodeId.gantry_y_bootloader: OT3SubSystem.gantry_y,
+    NodeId.head: OT3SubSystem.head,
+    NodeId.head_bootloader: OT3SubSystem.head,
+    NodeId.pipette_left: OT3SubSystem.pipette_left,
+    NodeId.pipette_left_bootloader: OT3SubSystem.pipette_left,
+    NodeId.pipette_right: OT3SubSystem.pipette_right,
+    NodeId.pipette_right_bootloader: OT3SubSystem.pipette_right,
+    NodeId.gripper: OT3SubSystem.gripper,
+    NodeId.gripper_bootloader: OT3SubSystem.gripper,
+}
+
+USBTARGET_SUBSYSTEM: Dict[USBTarget, OT3SubSystem] = {
+    USBTarget.rear_panel: OT3SubSystem.rear_panel
 }
 
 
@@ -163,7 +183,7 @@ def node_id_to_subsystem(node_id: NodeId) -> "OT3SubSystem":
     node_to_subsystem = {
         node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()
     }
-    return node_to_subsystem[node_id]
+    return node_to_subsystem[node_id.application_for()]
 
 
 def get_current_settings(
@@ -212,6 +232,67 @@ def _convert_to_node_id_dict(
         if axis_is_node(axis):
             target[axis_to_node(axis)] = np.float64(pos)
     return target
+
+
+def replace_head_node(targets: Set[FirmwareTarget]) -> Set[FirmwareTarget]:
+    """Replace the head core node with its two sides.
+
+    The node ID for the head central controller is what shows up in a network probe,
+    but what we actually send commands to an overwhelming majority of the time is
+    the head_l and head_r synthetic node IDs, and those are what we want in the
+    network map.
+    """
+    if NodeId.head in targets:
+        targets.remove(NodeId.head)
+        targets.add(NodeId.head_r)
+        targets.add(NodeId.head_l)
+    return targets
+
+
+def replace_gripper_node(targets: Set[FirmwareTarget]) -> Set[FirmwareTarget]:
+    """Replace the gripper core node with its two axes.
+
+    The node ID for the gripper controller is what shows up in a network probe,
+    but what we actually send most commands to is the gripper_z and gripper_g
+    synthetic nodes, so we should have them in the network map instead.
+    """
+    if NodeId.gripper in targets:
+        targets.remove(NodeId.gripper)
+        targets.add(NodeId.gripper_z)
+        targets.add(NodeId.gripper_g)
+    return targets
+
+
+def filter_probed_core_nodes(
+    current_set: Set[FirmwareTarget], probed_set: Set[FirmwareTarget]
+) -> Set[FirmwareTarget]:
+    core_replaced: Set[FirmwareTarget] = {
+        NodeId.gantry_x,
+        NodeId.gantry_y,
+        NodeId.head,
+        USBTarget.rear_panel,
+    }
+    current_set -= core_replaced
+    current_set |= probed_set
+    return current_set
+
+
+def motor_nodes(devices: Set[FirmwareTarget]) -> Set[NodeId]:
+    # do the replacement of head and gripper devices
+    motor_nodes = replace_gripper_node(devices)
+    motor_nodes = replace_head_node(motor_nodes)
+    bootloader_nodes = {
+        NodeId.pipette_left_bootloader,
+        NodeId.pipette_right_bootloader,
+        NodeId.gantry_x_bootloader,
+        NodeId.gantry_y_bootloader,
+        NodeId.head_bootloader,
+        NodeId.gripper_bootloader,
+    }
+    # remove any bootloader nodes
+    motor_nodes -= bootloader_nodes
+    # filter out usb nodes
+    return {NodeId(target) for target in motor_nodes if target in NodeId}
 
 
 def create_move_group(
@@ -275,7 +356,7 @@ def create_gripper_jaw_grip_group(
 ) -> MoveGroup:
     step = create_gripper_jaw_step(
         duration=np.float64(GRIPPER_JAW_GRIP_TIME),
-        duty_cycle=np.float32(duty_cycle),
+        duty_cycle=np.float32(round(duty_cycle)),
         stop_condition=stop_condition,
         move_type=MoveType.grip,
     )

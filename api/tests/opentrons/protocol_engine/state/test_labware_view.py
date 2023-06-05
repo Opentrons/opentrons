@@ -372,8 +372,8 @@ def test_get_tip_length_gets_length_from_definition(
         definitions_by_uri={"some-tip-rack-uri": tip_rack_def},
     )
 
-    length = subject.get_tip_length("tip-rack-id")
-    assert length == tip_rack_def.parameters.tipLength
+    length = subject.get_tip_length("tip-rack-id", 12.3)
+    assert length == tip_rack_def.parameters.tipLength - 12.3  # type: ignore[operator]
 
 
 def test_get_tip_drop_z_offset() -> None:
@@ -489,48 +489,46 @@ def test_get_default_magnet_height(
     assert subject.get_default_magnet_height(module_id="module-id", offset=2) == 12.0
 
 
-def test_get_deck_definition(standard_deck_def: DeckDefinitionV3) -> None:
+def test_get_deck_definition(ot2_standard_deck_def: DeckDefinitionV3) -> None:
     """It should get the deck definition from the state."""
-    subject = get_labware_view(deck_definition=standard_deck_def)
+    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
-    assert subject.get_deck_definition() == standard_deck_def
+    assert subject.get_deck_definition() == ot2_standard_deck_def
 
 
-def test_get_slot_definition(standard_deck_def: DeckDefinitionV3) -> None:
+def test_get_slot_definition(ot2_standard_deck_def: DeckDefinitionV3) -> None:
     """It should return a deck slot's definition."""
-    subject = get_labware_view(deck_definition=standard_deck_def)
+    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
     result = subject.get_slot_definition(DeckSlotName.SLOT_6)
 
     assert result["id"] == "6"
-    assert result == standard_deck_def["locations"]["orderedSlots"][5]
+    assert result == ot2_standard_deck_def["locations"]["orderedSlots"][5]
 
 
 def test_get_slot_definition_raises_with_bad_slot_name(
-    standard_deck_def: DeckDefinitionV3,
+    ot2_standard_deck_def: DeckDefinitionV3,
 ) -> None:
     """It should raise a SlotDoesNotExistError if a bad slot name is given."""
-    subject = get_labware_view(deck_definition=standard_deck_def)
+    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
     with pytest.raises(errors.SlotDoesNotExistError):
-        # note: normally the typechecker should catch this, but clients may
-        # not be using typechecking or our enums
-        subject.get_slot_definition(42)  # type: ignore[arg-type]
+        subject.get_slot_definition(DeckSlotName.SLOT_A1)
 
 
-def test_get_slot_position(standard_deck_def: DeckDefinitionV3) -> None:
+def test_get_slot_position(ot2_standard_deck_def: DeckDefinitionV3) -> None:
     """It should get the absolute location of a deck slot's origin."""
-    subject = get_labware_view(deck_definition=standard_deck_def)
+    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
-    slot_pos = standard_deck_def["locations"]["orderedSlots"][2]["position"]
+    slot_pos = ot2_standard_deck_def["locations"]["orderedSlots"][2]["position"]
     result = subject.get_slot_position(DeckSlotName.SLOT_3)
 
     assert result == Point(x=slot_pos[0], y=slot_pos[1], z=slot_pos[2])
 
 
-def test_get_slot_center_position(standard_deck_def: DeckDefinitionV3) -> None:
+def test_get_slot_center_position(ot2_standard_deck_def: DeckDefinitionV3) -> None:
     """It should get the absolute location of a deck slot's center."""
-    subject = get_labware_view(deck_definition=standard_deck_def)
+    subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
     expected_center = Point(x=196.5, y=43.0, z=0.0)
     result = subject.get_slot_center_position(DeckSlotName.SLOT_2)
@@ -731,6 +729,7 @@ def test_get_display_name() -> None:
 
 def test_get_fixed_trash_id() -> None:
     """It should return the ID of the labware loaded into the fixed trash slot."""
+    # OT-2 fixed trash slot:
     subject = get_labware_view(
         labware_by_id={
             "abc123": LoadedLabware(
@@ -743,9 +742,24 @@ def test_get_fixed_trash_id() -> None:
             )
         },
     )
-
     assert subject.get_fixed_trash_id() == "abc123"
 
+    # OT-3 fixed trash slot:
+    subject = get_labware_view(
+        labware_by_id={
+            "abc123": LoadedLabware(
+                id="abc123",
+                loadName="trash-load-name",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+                definitionUri="trash-definition-uri",
+                offsetId=None,
+                displayName=None,
+            )
+        },
+    )
+    assert subject.get_fixed_trash_id() == "abc123"
+
+    # Nothing in the fixed trash slot:
     subject = get_labware_view(
         labware_by_id={
             "abc123": LoadedLabware(
@@ -758,7 +772,6 @@ def test_get_fixed_trash_id() -> None:
             )
         },
     )
-
     with pytest.raises(errors.LabwareNotLoadedError):
         subject.get_fixed_trash_id()
 
@@ -813,14 +826,14 @@ def test_get_calibration_coordinates() -> None:
         "locations": {
             "orderedSlots": [
                 {
-                    "id": "1",
+                    "id": "D1",
                     "position": [2, 2, 0.0],
                     "boundingBox": {
                         "xDimension": 4.0,
                         "yDimension": 6.0,
                         "zDimension": 0,
                     },
-                    "displayName": "Slot 1",
+                    "displayName": "Slot D1",
                 }
             ]
         }
@@ -890,11 +903,17 @@ def test_get_by_slot_filter_ids() -> None:
     ["well_name", "mount", "labware_slot", "next_to_module", "expected_result"],
     [
         ("abc", MountType.RIGHT, DeckSlotName.SLOT_3, False, EdgePathType.LEFT),
+        ("abc", MountType.RIGHT, DeckSlotName.SLOT_D3, False, EdgePathType.LEFT),
         ("abc", MountType.RIGHT, DeckSlotName.SLOT_1, True, EdgePathType.LEFT),
+        ("abc", MountType.RIGHT, DeckSlotName.SLOT_D1, True, EdgePathType.LEFT),
         ("pqr", MountType.LEFT, DeckSlotName.SLOT_3, True, EdgePathType.RIGHT),
+        ("pqr", MountType.LEFT, DeckSlotName.SLOT_D3, True, EdgePathType.RIGHT),
         ("pqr", MountType.LEFT, DeckSlotName.SLOT_3, False, EdgePathType.DEFAULT),
+        ("pqr", MountType.LEFT, DeckSlotName.SLOT_D3, False, EdgePathType.DEFAULT),
         ("pqr", MountType.RIGHT, DeckSlotName.SLOT_3, True, EdgePathType.DEFAULT),
+        ("pqr", MountType.RIGHT, DeckSlotName.SLOT_D3, True, EdgePathType.DEFAULT),
         ("def", MountType.LEFT, DeckSlotName.SLOT_3, True, EdgePathType.DEFAULT),
+        ("def", MountType.LEFT, DeckSlotName.SLOT_D3, True, EdgePathType.DEFAULT),
     ],
 )
 def test_get_edge_path_type(
@@ -929,3 +948,38 @@ def test_get_edge_path_type(
     )
 
     assert result == expected_result
+
+
+def test_get_all_labware_definition(
+    tip_rack_def: LabwareDefinition, falcon_tuberack_def: LabwareDefinition
+) -> None:
+    """It should return the loaded labware definition list."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="opentrons_96_tiprack_300ul",
+                location=ModuleLocation(moduleId="module-id"),
+            )
+        },
+        definitions_by_uri={
+            "opentrons_96_tiprack_300ul": tip_rack_def,
+            "falcon-definition": falcon_tuberack_def,
+        },
+    )
+
+    result = subject.get_loaded_labware_definitions()
+
+    assert result == [tip_rack_def]
+
+
+def test_get_all_labware_definition_empty() -> None:
+    """It should return an empty list."""
+    subject = get_labware_view(
+        labware_by_id={},
+    )
+
+    result = subject.get_loaded_labware_definitions()
+
+    assert result == []

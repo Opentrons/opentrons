@@ -24,9 +24,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
     onClose,
     closeOnOutsideClick,
     title,
-    childrenPadding = `${String(SPACING.spacing4)} ${String(
-      SPACING.spacing5
-    )} ${String(SPACING.spacing5)}`,
+    childrenPadding = `${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24}`,
     children,
     ...styleProps
   } = props
@@ -41,8 +39,8 @@ export const Modal = (props: ModalProps): JSX.Element => {
               name: 'ot-alert',
               color:
                 type === 'error' ? COLORS.errorEnabled : COLORS.warningEnabled,
-              size: SPACING.spacingM,
-              marginRight: SPACING.spacing3,
+              size: SPACING.spacing20,
+              marginRight: SPACING.spacing8,
             }
           : undefined
       }

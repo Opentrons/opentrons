@@ -11,9 +11,13 @@ import {
   GRIPPER_LOADNAME,
   CAL_PIN_LOADNAME,
 } from './constants'
-import type { Run, CreateRunData } from '@opentrons/api-client'
+import type {
+  CreateMaintenanceRunData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
+import { CreateCommand, LEFT } from '@opentrons/shared-data'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string
@@ -41,7 +45,12 @@ const INFO_BY_FLOW_TYPE: {
   },
 }
 interface BeforeBeginningProps extends GripperWizardStepProps {
-  createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
+  createMaintenanceRun: UseMutateFunction<
+    MaintenanceRun,
+    AxiosError<any>,
+    CreateMaintenanceRunData,
+    unknown
+  >
   isCreateLoading: boolean
 }
 
@@ -50,32 +59,37 @@ export const BeforeBeginning = (
 ): JSX.Element | null => {
   const {
     proceed,
-    createRun,
+    createMaintenanceRun,
     flowType,
-    attachedGripper,
     isCreateLoading,
     isRobotMoving,
-    // chainRunCommands,
-    // setIsBetweenCommands,
+    chainRunCommands,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
-    createRun({})
+    createMaintenanceRun({})
   }, [])
 
-  if (attachedGripper == null) return null
+  const commandsOnProceed: CreateCommand[] = [
+    // TODO: this needs to go once we're properly handling the axes for the commands
+    // below instead of using the left pipette axis as a proxy, but until then we need
+    // to make sure that proxy axis is homed.
+    { commandType: 'home' as const, params: {} },
+    {
+      // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
+      commandType: 'calibration/moveToMaintenancePosition' as const,
+      params: {
+        mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+      },
+    },
+  ]
+
   const handleOnClick = (): void => {
-    // setIsBetweenCommands(true)
-    // chainRunCommands([
-    //   {
-    //     commandType: 'home' as const,
-    //     params: {},
-    //   },
-    // ]).then(() => {
-    //   setIsBetweenCommands(false)
-    //   proceed()
-    // })
-    proceed()
+    chainRunCommands(commandsOnProceed, true)
+      .then(() => {
+        proceed()
+      })
+      .catch(() => {})
   }
 
   const equipmentInfoByLoadName: {
@@ -86,7 +100,7 @@ export const BeforeBeginning = (
       displayName: t('t10_torx_screwdriver'),
       subtitle: t('provided_with_robot_use_right_size'),
     },
-    opentrons_gripper: { displayName: t('gripper') },
+    [GRIPPER_LOADNAME]: { displayName: t('gripper') },
   }
 
   const { bodyI18nKey, equipmentLoadNames } = INFO_BY_FLOW_TYPE[flowType]

@@ -60,17 +60,16 @@ describe('Hardware', () => {
 
   it('should render column headers that indicate where the hardware is, what is called, and whether it is connected', () => {
     const { getByRole } = render(props)[0]
-    getByRole('columnheader', { name: 'location' })
-    getByRole('columnheader', { name: 'hardware' })
-    getByRole('columnheader', { name: 'connection status' })
+    getByRole('columnheader', { name: 'Location' })
+    getByRole('columnheader', { name: 'Hardware' })
   })
   it('should render the correct location, name, and connected status in each table row', () => {
     const { getByRole } = render(props)[0]
-    getByRole('row', { name: 'left mount P10 Single-Channel GEN1 connected' })
+    getByRole('row', { name: 'Left mount P10 Single-Channel GEN1' })
     getByRole('row', {
-      name: 'right mount P1000 Single-Channel GEN1 not connected',
+      name: 'Right mount P1000 Single-Channel GEN1',
     })
-    getByRole('row', { name: 'Slot 1 Heater-Shaker Module GEN1 connected' })
-    getByRole('row', { name: 'Slot 3 Temperature Module GEN2 not connected' })
+    getByRole('row', { name: 'Slot 1 Heater-Shaker Module GEN1' })
+    getByRole('row', { name: 'Slot 3 Temperature Module GEN2' })
   })
 })

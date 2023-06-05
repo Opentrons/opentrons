@@ -1,5 +1,6 @@
 import type {
   LoadedLabware,
+  LoadedModule,
   LoadedPipette,
   ModuleModel,
 } from '@opentrons/shared-data'
@@ -38,9 +39,10 @@ export interface RunData {
   current: boolean
   status: RunStatus
   actions: RunAction[]
-  errors: Error[]
+  errors: RunError[]
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
+  modules: LoadedModule[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
 }
@@ -64,6 +66,10 @@ export interface Run {
 
 export interface RunsLinks {
   current?: ResourceLink
+}
+
+export interface GetRunsParams {
+  pageLength?: number // the number of items to include
 }
 
 export interface Runs {
@@ -104,7 +110,7 @@ export interface CommandData {
   data: RunCommandSummary
 }
 
-export interface Error {
+export interface RunError {
   id: string
   errorType: string
   createdAt: string

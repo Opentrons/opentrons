@@ -29,15 +29,15 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
-      marginY={SPACING.spacing6}
-      paddingBottom={SPACING.spacing3}
+      marginY={SPACING.spacing32}
+      paddingBottom={SPACING.spacing8}
       width="96.5%"
     >
       <StyledText
         role="complementary"
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        marginBottom={SPACING.spacing3}
+        marginBottom={SPACING.spacing8}
       >
         {props.title}
       </StyledText>
@@ -51,13 +51,13 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
             href={PROTOCOL_LIBRARY_URL}
             id="EmptyStateLinks_protocolLibraryButton"
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
             external
           >
             {t('browse_protocol_library')}
             <Icon
               name="open-in-new"
-              marginLeft={SPACING.spacing2}
+              marginLeft={SPACING.spacing4}
               size="0.5rem"
             />
           </Link>
@@ -67,14 +67,14 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
             href={PROTOCOL_DESIGNER_URL}
             id="EmptyStateLinks_protocolDesignerButton"
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
             external
           >
             {t('launch_protocol_designer')}
 
             <Icon
               name="open-in-new"
-              marginLeft={SPACING.spacing2}
+              marginLeft={SPACING.spacing4}
               size="0.5rem"
             />
           </Link>
@@ -84,13 +84,13 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
             css={TYPOGRAPHY.darkLinkLabelSemiBold}
             href={API_DOCS_URL}
             id="EmptyStateLinks_apiDocsButton"
-            marginRight={SPACING.spacing2}
+            marginRight={SPACING.spacing4}
             external
           >
             {t('open_api_docs')}
             <Icon
               name="open-in-new"
-              marginLeft={SPACING.spacing2}
+              marginLeft={SPACING.spacing4}
               size="0.5rem"
             />
           </Link>

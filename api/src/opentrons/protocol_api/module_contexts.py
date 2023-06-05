@@ -20,6 +20,7 @@ from .core.common import (
     MagneticModuleCore,
     ThermocyclerCore,
     HeaterShakerCore,
+    MagneticBlockCore,
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -78,12 +79,6 @@ class ModuleContext(CommandPublisher):
         """Get the module's general type identifier."""
         return cast(ModuleType, self._core.MODULE_TYPE.value)
 
-    @property  # type: ignore[misc]
-    @requires_version(2, 14)
-    def serial_number(self) -> str:
-        """Get the module's unique hardware serial number."""
-        return self._core.get_serial_number()
-
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
         """Specify the presence of a piece of labware on the module.
@@ -124,14 +119,10 @@ class ModuleContext(CommandPublisher):
     ) -> Labware:
         """Load a labware onto the module using its load parameters.
 
-        :param name: The name of the labware object.
-        :param str label: An optional display name to give the labware.
-                          If specified, this is the name the labware will use
-                          in the run log and the calibration view in the Opentrons App.
-        :param str namespace: The namespace the labware definition belongs to.
-                              If unspecified, will search 'opentrons' then 'custom_beta'
-        :param int version: The version of the labware definition.
-                            If unspecified, will use version 1.
+        The parameters of this function behave like those of
+        :py:obj:`ProtocolContext.load_labware` (which loads labware directly
+        onto the deck). Note that the parameter ``name`` here corresponds to
+        ``load_name`` on the ``ProtocolContext`` function.
 
         :returns: The initialized and loaded labware object.
 
@@ -218,7 +209,7 @@ class ModuleContext(CommandPublisher):
     @requires_version(2, 14)
     def parent(self) -> str:
         """The name of the slot the module is on."""
-        return self._core.get_deck_slot().value
+        return self._core.get_deck_slot_id()
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
@@ -241,7 +232,7 @@ class ModuleContext(CommandPublisher):
 
         class_name = self.__class__.__name__
         display_name = self._core.get_display_name()
-        location = self._core.get_deck_slot().value
+        location = self._core.get_deck_slot().id
 
         return f"{class_name} at {display_name} on {location} lw {self.labware}"
 
@@ -257,6 +248,12 @@ class TemperatureModuleContext(ModuleContext):
     """
 
     _core: TemperatureModuleCore
+
+    @property  # type: ignore[misc]
+    @requires_version(2, 14)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
 
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 0)
@@ -337,6 +334,12 @@ class MagneticModuleContext(ModuleContext):
 
     _core: MagneticModuleCore
 
+    @property  # type: ignore[misc]
+    @requires_version(2, 14)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
+
     @publish(command=cmds.magdeck_calibrate)
     @requires_version(2, 0)
     def calibrate(self) -> None:
@@ -345,12 +348,14 @@ class MagneticModuleContext(ModuleContext):
         .. deprecated:: 2.14
             This method is unnecessary; remove any usage.
         """
-        _log.warning(
-            "`MagneticModuleContext.calibrate` doesn't do anything useful"
-            " and will no-op in Protocol API version 2.14 and higher."
-        )
         if self._api_version < ENGINE_CORE_API_VERSION:
+            _log.warning(
+                "`MagneticModuleContext.calibrate` doesn't do anything useful"
+                " and will be removed in Protocol API version 2.14 and higher."
+            )
             self._core._sync_module_hardware.calibrate()  # type: ignore[attr-defined]
+        else:
+            raise APIVersionError("`MagneticModuleContext.calibrate` has been removed.")
 
     @publish(command=cmds.magdeck_engage)
     @requires_version(2, 0)
@@ -435,6 +440,12 @@ class ThermocyclerContext(ModuleContext):
     """
 
     _core: ThermocyclerCore
+
+    @property  # type: ignore[misc]
+    @requires_version(2, 14)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
 
     @publish(command=cmds.thermocycler_open)
     @requires_version(2, 0)
@@ -677,6 +688,12 @@ class HeaterShakerContext(ModuleContext):
     _core: HeaterShakerCore
 
     @property  # type: ignore[misc]
+    @requires_version(2, 14)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
+
+    @property  # type: ignore[misc]
     @requires_version(2, 13)
     def target_temperature(self) -> Optional[float]:
         """The target temperature of the Heater-Shaker's plate in °C.
@@ -856,3 +873,15 @@ class HeaterShakerContext(ModuleContext):
         The Heater-Shaker does not have active cooling.
         """
         self._core.deactivate_heater()
+
+
+class MagneticBlockContext(ModuleContext):
+    """An object representing a Magnetic Block.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+
+    .. versionadded:: 2.15
+    """
+
+    _core: MagneticBlockCore

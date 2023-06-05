@@ -1,7 +1,7 @@
 // jog controls component
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   Box,
@@ -19,8 +19,13 @@ import {
   DIRECTION_ROW,
   ALIGN_FLEX_START,
   ALIGN_FLEX_END,
+  PrimaryButton,
+  TEXT_ALIGN_LEFT,
+  JUSTIFY_FLEX_START,
+  ALIGN_STRETCH,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
+import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
@@ -67,7 +72,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
       },
     ],
     title: 'Z-axis',
-    subtitle: 'Shift + Arrow keys',
+    subtitle: 'Shift + Arrow Keys',
   },
   [HORIZONTAL_PLANE]: {
     controls: [
@@ -114,9 +119,11 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
 }
 
 const DIRECTION_CONTROL_LAYOUT = css`
+  flex: 1;
   flex-direction: ${DIRECTION_ROW};
   justify-content: ${JUSTIFY_SPACE_BETWEEN};
-  grid-gap: ${SPACING.spacing4};
+  grid-gap: ${SPACING.spacing16};
+  min-width: 313px;
 
   @media (max-width: 750px) {
     flex-direction: ${DIRECTION_COLUMN};
@@ -126,8 +133,8 @@ const DIRECTION_CONTROL_LAYOUT = css`
 const PLANE_BUTTONS_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
-  grid-gap: ${SPACING.spacing3};
-  width: 9.75rem;
+  grid-gap: ${SPACING.spacing8};
+  min-width: 9.8125rem;
 
   @media (max-width: 750px) {
     flex-direction: ${DIRECTION_ROW};
@@ -137,10 +144,17 @@ const PLANE_BUTTONS_STYLE = css`
 
 const DEFAULT_BUTTON_STYLE = css`
   display: flex;
-  justify-content: ${JUSTIFY_CENTER};
+  border: 1px ${COLORS.white} solid;
+  justify-content: ${JUSTIFY_FLEX_START};
   align-items: ${ALIGN_CENTER};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
+  grid-gap: ${SPACING.spacing8};
+  padding: ${SPACING.spacing8};
+
+  &:focus {
+    background-color: ${COLORS.white};
+  }
 
   &:hover {
     background-color: ${COLORS.white};
@@ -156,7 +170,7 @@ const DEFAULT_BUTTON_STYLE = css`
   }
 
   &:disabled {
-    background-color: inherit;
+    background-color: ${COLORS.white};
     color: ${COLORS.errorDisabled};
   }
 `
@@ -165,6 +179,11 @@ const ACTIVE_BUTTON_STYLE = css`
   ${DEFAULT_BUTTON_STYLE}
   color: ${COLORS.blueEnabled};
   border: 1px ${COLORS.blueEnabled} solid;
+
+  &:hover {
+    color: ${COLORS.bluePressed};
+    border: 1px ${COLORS.bluePressed} solid;
+  }
 `
 
 interface DirectionControlProps {
@@ -209,12 +228,18 @@ export function DirectionControl(props: DirectionControlProps): JSX.Element {
                   name={
                     plane === 'vertical' ? 'vertical-plane' : 'horizontal-plane'
                   }
-                  width="1.2rem"
-                  marginRight={SPACING.spacing3}
+                  height="1.375rem"
+                  flex="1 0 auto"
                 />
-                <Flex flexDirection={DIRECTION_COLUMN}>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  alignItems={ALIGN_FLEX_START}
+                  flex="1 1 auto"
+                >
                   {title}
                   <StyledText
+                    textAlign={TEXT_ALIGN_LEFT}
+                    alignSelf={ALIGN_STRETCH}
                     color={COLORS.darkGreyEnabled}
                     css={TYPOGRAPHY.labelRegular}
                   >
@@ -260,11 +285,20 @@ const ARROW_GRID_STYLES = css`
     '.         .         ArrowDown ArrowDown .          .         '
     '.         .         .         .         .          .         ';
 
-  grid-gap: ${SPACING.spacing2};
+  grid-gap: ${SPACING.spacing4};
   align-items: ${ALIGN_CENTER};
 
   @media (max-width: 750px) {
     max-width: 12.5rem;
+  }
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    max-width: 415px;
+    grid-gap: ${SPACING.spacing20};
+    grid-template-areas:
+      '.         .         ArrowUp   ArrowUp   .          .         '
+      'ArrowLeft ArrowLeft ArrowUp   ArrowUp   ArrowRight ArrowRight'
+      'ArrowLeft ArrowLeft ArrowDown ArrowDown ArrowRight ArrowRight'
+      '.         .         ArrowDown ArrowDown .          .         ';
   }
 `
 const ARROW_BUTTON_STYLES = css`
@@ -296,13 +330,17 @@ const ARROW_BUTTON_STYLES = css`
   }
 
   &:disabled {
-    background-color: inherit;
+    background-color: ${COLORS.white};
     color: ${COLORS.darkGreyDisabled};
   }
 
   @media (max-width: 750px) {
     width: 4rem;
     height: 4rem;
+  }
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 125px;
+    height: 125px;
   }
 `
 
@@ -343,3 +381,51 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
     </Box>
   )
 }
+
+export function TouchDirectionControl(
+  props: DirectionControlProps
+): JSX.Element {
+  const { planes, jog, stepSize, initialPlane } = props
+  const [currentPlane, setCurrentPlane] = React.useState<Plane>(
+    initialPlane ?? planes[0]
+  )
+  const { t } = useTranslation(['robot_calibration'])
+
+  return (
+    <Flex
+      flex="1"
+      flexDirection={DIRECTION_COLUMN}
+      border={`1px solid ${COLORS.darkBlack40}`}
+      borderRadius={BORDERS.radiusSoftCorners}
+      padding={SPACING.spacing16}
+      gridGap={SPACING.spacing8}
+    >
+      <TouchControlLabel>{t('jog_controls')}</TouchControlLabel>
+      <Flex css={DIRECTION_CONTROL_LAYOUT}>
+        <Flex css={PLANE_BUTTONS_STYLE}>
+          {planes.map((plane: Plane) => {
+            return (
+              <SmallButton
+                key={plane}
+                buttonType={currentPlane === plane ? 'primary' : 'secondary'}
+                onClick={() => {
+                  setCurrentPlane(plane)
+                }}
+                buttonText={CONTROLS_CONTENTS_BY_PLANE[plane].title}
+              />
+            )
+          })}
+        </Flex>
+        <Flex justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
+          <ArrowKeys plane={currentPlane} jog={jog} stepSize={stepSize} />
+        </Flex>
+      </Flex>
+    </Flex>
+  )
+}
+
+const TouchControlLabel = styled.p`
+  font-size: ${TYPOGRAPHY.fontSize20};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  line-height: ${TYPOGRAPHY.lineHeight24};
+`

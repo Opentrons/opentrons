@@ -7,7 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { Welcome } from '../Welcome'
 
-const PNG_FILE_NAME = 'odd_abstract@x2.png'
+const PNG_FILE_NAME = 'welcome_background.png'
 
 const mockPush = jest.fn()
 jest.mock('react-router-dom', () => {
@@ -31,19 +31,20 @@ const render = () => {
 
 describe('Welcome', () => {
   it('should render text, image, and button', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('Welcome to your OT-3!')
+    const [{ getByText, getByLabelText, getByRole }] = render()
+    getByText('Welcome to your Opentrons Flex!')
     getByText(
       "Quickly run protocols and check on your robot's status right on your lab bench."
     )
-    getByRole('button', { name: 'Get started' })
+    getByText('Get started')
+    getByLabelText('MediumButton_primary')
     const image = getByRole('img')
     expect(image.getAttribute('src')).toEqual(PNG_FILE_NAME)
   })
 
   it('should call mockPush when tapping Get started', () => {
-    const [{ getByRole }] = render()
-    const button = getByRole('button', { name: 'Get started' })
+    const [{ getByLabelText }] = render()
+    const button = getByLabelText('MediumButton_primary')
     fireEvent.click(button)
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })

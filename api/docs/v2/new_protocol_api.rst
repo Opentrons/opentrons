@@ -1,3 +1,5 @@
+:og:description: A comprehensive reference of classes and methods that make up the Opentrons Python Protocol API.
+
 .. _protocol-api-reference:
 
 API Version 2 Reference
@@ -61,8 +63,13 @@ Modules
 
 Useful Types and Definitions
 ----------------------------
+
+..
+   The opentrons.types module contains a mixture of public Protocol API things and private internal things.
+   Explicitly name the things that we expect to be public, excluding everything else.
+
 .. automodule:: opentrons.types
-   :members:
+   :members: PipetteNotAttachedError, Point, Location, Mount
 
 
 Executing and Simulating Protocols

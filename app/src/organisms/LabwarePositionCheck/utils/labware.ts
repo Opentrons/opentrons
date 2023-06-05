@@ -4,11 +4,9 @@ import {
   getTiprackVolume,
   ProtocolFile,
   LabwareDefinition2,
-  getSlotHasMatingSurfaceUnitVector,
   getLabwareDefURI,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type {
   ProtocolAnalysisOutput,
@@ -17,8 +15,6 @@ import type {
 import type { LabwareToOrder } from '../types'
 import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-
-const OT2_STANDARD_DECK_DEF = standardDeckDef as any
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,
@@ -149,8 +145,10 @@ export const getLabwareIdsInOrder = (
           `could not find labware definition within protocol with uri: ${currentLabware.definitionUri}`
         )
       }
+      // skip any labware that is a tip rack or trash
       const isTiprack = getIsTiprack(labwareDef)
-      if (isTiprack) return acc // skip any labware that is a tiprack
+      const isTrash = labwareDef.parameters.format === 'trash'
+      if (isTiprack || isTrash) return acc
 
       const labwareLocations = getAllUniqLocationsForLabware(
         currentLabware.id,
@@ -159,14 +157,6 @@ export const getLabwareIdsInOrder = (
       return [
         ...acc,
         ...labwareLocations.reduce<LabwareToOrder[]>((innerAcc, loc) => {
-          if (
-            !getSlotHasMatingSurfaceUnitVector(
-              OT2_STANDARD_DECK_DEF,
-              loc !== 'offDeck' && 'slotName' in loc ? loc.slotName : ''
-            )
-          ) {
-            return innerAcc
-          }
           let slot = ''
           if (loc === 'offDeck') {
             slot = 'offDeck'
@@ -222,6 +212,7 @@ export const getAllUniqLocationsForLabware = (
   const labwareLocation = commands.reduce<LabwareLocation[]>(
     (acc, command: RunTimeCommand) =>
       command.commandType === 'loadLabware' &&
+      command.result?.definition.parameters.format !== 'trash' &&
       command.result?.labwareId === labwareId
         ? [...acc, command.params.location]
         : acc,

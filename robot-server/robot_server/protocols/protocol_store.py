@@ -199,6 +199,14 @@ class ProtocolStore:
             for r in all_sql_resources
         ]
 
+    @lru_cache(maxsize=_CACHE_ENTRIES)
+    def get_all_ids(self) -> List[str]:
+        """Get all protocol ids currently saved in this store."""
+        select_ids = sqlalchemy.select(protocol_table.c.id).order_by(sqlite_rowid)
+        with self._sql_engine.begin() as transaction:
+            protocol_ids = transaction.execute(select_ids).scalars().all()
+        return protocol_ids
+
     def get_id_by_hash(self, hash: str) -> Optional[str]:
         """Get all protocol hashes keyed by protocol id."""
         for p in self.get_all():
@@ -283,23 +291,22 @@ class ProtocolStore:
 
         return usage_info
 
-    def get_referenced_run_ids(self, protocol_id: str) -> List[str]:
+    def get_referencing_run_ids(self, protocol_id: str) -> List[str]:
         """Return a list of run ids that reference a particular protocol.
 
         See the `runs` module for information about runs.
 
         Results are ordered with the oldest-added (NOT created) run first.
         """
-        select_referenced_run_ids = sqlalchemy.select(run_table.c.id).where(
+        select_referencing_run_ids = sqlalchemy.select(run_table.c.id).where(
             run_table.c.protocol_id == protocol_id
         )
-        referenced_run_ids = []
 
         with self._sql_engine.begin() as transaction:
-            referenced_run_ids = (
-                transaction.execute(select_referenced_run_ids).scalars().all()
+            referencing_run_ids = (
+                transaction.execute(select_referencing_run_ids).scalars().all()
             )
-        return referenced_run_ids
+        return referencing_run_ids
 
     def _sql_insert(self, resource: _DBProtocolResource) -> None:
         statement = sqlalchemy.insert(protocol_table).values(
@@ -360,6 +367,7 @@ class ProtocolStore:
 
     def _clear_caches(self) -> None:
         self.get.cache_clear()
+        self.get_all_ids.cache_clear()
         self.get_all.cache_clear()
         self.has.cache_clear()
 
