@@ -34,7 +34,8 @@ if TYPE_CHECKING:
     from .labware import Well
 
 
-_COORDINATE_STYLE_DECK_LABELS_ADDED_IN = APIVersion(2, 15)
+# The first APIVersion where Python protocols can specify deck labels like "D1" instead of "1".
+_COORDINATE_DECK_LABEL_VERSION_GATE = APIVersion(2, 15)
 
 
 class InvalidPipetteMountError(ValueError):
