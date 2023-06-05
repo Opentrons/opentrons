@@ -195,7 +195,7 @@ export function ProtocolDashboard(): JSX.Element {
               zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 3}
               width="100%"
             >
-              <Flex width="30.75rem">
+              <Flex width="32.3125rem">
                 <SmallButton
                   buttonText={t('protocol_name_title')}
                   buttonType={
@@ -233,7 +233,7 @@ export function ProtocolDashboard(): JSX.Element {
                   onClick={handleSortByLastRun}
                 />
               </Flex>
-              <Flex justifyContent={JUSTIFY_CENTER} width="17rem">
+              <Flex justifyContent={JUSTIFY_CENTER} width="14.625rem">
                 <SmallButton
                   buttonText={t('date_added')}
                   buttonType={
