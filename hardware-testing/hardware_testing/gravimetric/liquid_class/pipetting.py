@@ -1,9 +1,6 @@
 """Pipette motions."""
 from dataclasses import dataclass
-from math import pi
 from typing import Optional, Callable, Tuple
-
-from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_api.labware import Well

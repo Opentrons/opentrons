@@ -57,7 +57,7 @@ def _get_dye_type(volume: float) -> str:
     return dye_type
 
 
-def _setup_dye(volume: float, cfg: config.PhotometricConfig):
+def _setup_dye(volume: float, cfg: config.PhotometricConfig) -> None:
     if volume == 250:
         # this is actually the 1000ul test
         dye_required = (volume * 4 * 96) + _MIN_END_VOLUME_UL
@@ -66,7 +66,8 @@ def _setup_dye(volume: float, cfg: config.PhotometricConfig):
             _MIN_START_VOLUME_UL, volume * 96 * cfg.trials + _MIN_END_VOLUME_UL
         )
     ui.get_user_ready(
-        f"Place the {_get_dye_type(volume)} reservoir in slot {cfg.reservoir_slot} and fill to {dye_required}ul of {_get_dye_type(volume)} dye"
+        f"Place the {_get_dye_type(volume)} reservoir in slot {cfg.reservoir_slot}"
+        f" and fill to {dye_required}ul of {_get_dye_type(volume)} dye"
     )
 
 
@@ -497,7 +498,8 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     (trial + 1) == cfg.trials and volume == test_volumes[-1]
                 ):
                     ui.get_user_ready(
-                        f"Replace the tipracks in slots {cfg.slots_tiprack} with new {cfg.tip_volume}uL tipracks"
+                        f"Replace the tipracks in slots {cfg.slots_tiprack} with new"
+                        f" {cfg.tip_volume}uL tipracks"
                     )
                     tip_iter = 0
                 if volume < 250:
