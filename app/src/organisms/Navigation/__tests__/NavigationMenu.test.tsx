@@ -11,7 +11,7 @@ import { NavigationMenu } from '../NavigationMenu'
 jest.mock('../../../redux/robot-admin')
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../Devices/hooks')
-jest.mock('./RestartRobotConfirmationModal')
+jest.mock('../RestartRobotConfirmationModal')
 
 const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockHome = home as jest.MockedFunction<typeof home>
