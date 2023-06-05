@@ -1,8 +1,27 @@
 diff --git a/api/src/opentrons/config/defaults_ot3.py b/api/src/opentrons/config/defaults_ot3.py
-index beae5cc110..b9c706a5e0 100644
+index 89696c5b2a..63fdb32bdc 100644
 --- a/api/src/opentrons/config/defaults_ot3.py
 +++ b/api/src/opentrons/config/defaults_ot3.py
-@@ -101,10 +101,10 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
+@@ -83,7 +83,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
+         OT3AxisKind.X: 500,
+         OT3AxisKind.Y: 375,
+         OT3AxisKind.Z: 35,
+-        OT3AxisKind.P: 5,
++        OT3AxisKind.P: 13,
+         OT3AxisKind.Z_G: 50,
+         OT3AxisKind.Q: 5.5,
+     },
+@@ -98,18 +98,18 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
+ 
+ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
+     high_throughput={
+-        OT3AxisKind.X: 1000,
+-        OT3AxisKind.Y: 1000,
++        OT3AxisKind.X: 500,
++        OT3AxisKind.Y: 500,
+         OT3AxisKind.Z: 120,
+         OT3AxisKind.P: 30,
+         OT3AxisKind.Z_G: 150,
          OT3AxisKind.Q: 10,
      },
      low_throughput={
@@ -16,6 +35,15 @@ index beae5cc110..b9c706a5e0 100644
          OT3AxisKind.Z_G: 150,
      },
  )
+@@ -120,7 +120,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
+     high_throughput={
+         OT3AxisKind.X: 10,
+         OT3AxisKind.Y: 10,
+-        OT3AxisKind.Z: 5,
++        OT3AxisKind.Z: 20,
+         OT3AxisKind.P: 5,
+         OT3AxisKind.Z_G: 10,
+         OT3AxisKind.Q: 5,
 diff --git a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
 index 5f96add2a4..047dc58add 100644
 --- a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
