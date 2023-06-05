@@ -21,10 +21,8 @@ from hardware_testing.opentrons_api import helpers_ot3
 async def _calibrate_pipette(api: OT3API, mount: types.OT3Mount) -> None:
     ui.print_header("CALIBRATE PIPETTE")
     await api.home()
-    # if not api.is_simulator:
-    #     ui.get_user_ready("calibrating pipette to slot #5")
     try:
-        await calibrate_pipette(api, mount, slot=5)
+        await calibrate_pipette(api, mount, slot=5)  # type: ignore[arg-type]
     except CalibrationStructureNotFoundError as e:
         if not api.is_simulator:
             raise e
@@ -41,7 +39,9 @@ async def _check_belt_accuracy(api: OT3API, mount: types.OT3Mount) -> None:
         await api.add_tip(mount, api.config.calibration.probe_length)
         nominal_pos = types.Point(*get_calibration_square_position_in_slot(slot))
         try:
-            slot_offset = await find_calibration_structure_position(api, mount, nominal_pos)
+            slot_offset = await find_calibration_structure_position(
+                api, mount, nominal_pos
+            )
         except CalibrationStructureNotFoundError as e:
             if not api.is_simulator:
                 raise e
@@ -60,7 +60,7 @@ async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> None:
     # if not api.is_simulator:
     #     ui.get_user_ready("about to probe deck slots #3, #10, and #12")
     try:
-        attitude = await calibrate_belts(api, mount, pip.pipette_id)
+        attitude = await calibrate_belts(api, mount, pip.pipette_id)  # type: ignore[arg-type]
     except CalibrationStructureNotFoundError as e:
         if not api.is_simulator:
             raise e
