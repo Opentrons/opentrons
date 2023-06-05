@@ -78,6 +78,8 @@ function newProtocolMetadata(
     protocolName: action.payload.name || '',
     created: Date.now(),
     lastModified: null,
+    author: action.payload.author || '',
+    description: action.payload.description || '',
   }
 }
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type

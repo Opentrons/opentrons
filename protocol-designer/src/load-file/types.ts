@@ -14,6 +14,8 @@ export type FileUploadMessage =
     }
 export interface NewProtocolFields {
   name: string | null | undefined
+  author?: string | null | undefined
+  description?: string | null | undefined
 }
 export interface LoadFileAction {
   type: 'LOAD_FILE'
