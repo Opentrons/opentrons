@@ -832,7 +832,6 @@ def test_command_store_saves_unknown_finish_error() -> None:
 
 def test_command_store_saves_correct_error_code() -> None:
     """If an error is derived from ProtocolEngineError, its ErrorCode should be used."""
-
     TEST_CODE = 1234
 
     class MyCustomError(errors.ProtocolEngineError):
