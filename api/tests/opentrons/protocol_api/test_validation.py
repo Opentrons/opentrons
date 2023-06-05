@@ -118,7 +118,7 @@ def test_ensure_deck_slot_invalid(
     expected_error_type: Type[Exception],
     expected_error_match: str,
 ) -> None:
-    """It should raise a ValueError if given an invalid name."""
+    """It should raise an exception if given an invalid name."""
     with pytest.raises(expected_error_type, match=expected_error_match):
         subject.ensure_deck_slot(input_value, input_api_version)  # type: ignore[arg-type]
 
