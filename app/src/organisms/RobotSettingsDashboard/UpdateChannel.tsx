@@ -66,13 +66,17 @@ export function UpdateChannel({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      paddingTop={SPACING.spacing32}
+      paddingBottom={SPACING.spacing40}
+    >
       <Flex alignItems={ALIGN_CENTER}>
         <Btn
           onClick={() => setCurrentOption(null)}
           data-testid="UpdateChannel_back_button"
         >
-          <Icon name="back" size="3rem" />
+          <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
         </Btn>
         <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('app_settings:update_channel')}
