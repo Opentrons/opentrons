@@ -179,6 +179,8 @@
   "rename_robot": "Rename robot",
   "requires_restarting_the_robot": "Updating the robot’s software requires restarting the robot",
   "reset_to_factory_settings": "Reset to factory settings?",
+  "restart_now": "Restart now?",
+  "restart_robot_confirmation_description": "<span>It will take a few minutes for <bold>{{robotName}}</bold> to restart.</span>",
   "restarting_robot": "Restarting robot...",
   "returns_your_device_to_new_state": "This returns your device to a new state.",
   "robot_calibration_data": "Robot Calibration Data",
