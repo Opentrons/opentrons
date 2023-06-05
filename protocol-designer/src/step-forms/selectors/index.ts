@@ -120,6 +120,17 @@ export const getLabwareEntities: Selector<
       _hydrateLabwareEntity(l, id, labwareDefs)
     )
 )
+export const getLabwareEntitiesForOT3: Selector<
+  BaseState,
+  LabwareEntities
+> = createSelector(
+  _getNormalizedLabwareById,
+  labwareDefSelectors.getOt3LabwareDefsByURI,
+  (normalizedLabwareById, labwareDefs) =>
+    mapValues(normalizedLabwareById, (l: NormalizedLabware, id: string) =>
+      _hydrateLabwareEntity(l, id, labwareDefs)
+    )
+)
 // Special version of `getLabwareEntities` selector for use in step-forms reducers
 export const _getLabwareEntitiesRootState: (
   arg0: RootState

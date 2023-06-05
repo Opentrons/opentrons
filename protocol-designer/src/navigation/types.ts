@@ -5,3 +5,5 @@ export type Page =
   | 'steplist'
   | 'settings-app'
   | 'settings-features'
+  | 'landing-page'
+  | 'new-flex-file-form'

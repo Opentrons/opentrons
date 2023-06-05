@@ -11,7 +11,7 @@ const page: Reducer<Page, any> = handleActions(
     // TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
     NAVIGATE_TO_PAGE: (state, action: NavigateToPageAction) => action.payload,
   },
-  'file-splash'
+  'landing-page'
 )
 // @ts-expect-error(sa, 2021-6-21): TS thinks this will only return false, even though TOGGLE_NEW_PROTOCOL_MODAL might yield true
 const newProtocolModal: Reducer<boolean, any> = handleActions(

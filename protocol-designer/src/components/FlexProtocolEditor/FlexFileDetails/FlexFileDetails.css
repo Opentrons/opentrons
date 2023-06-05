@@ -1,0 +1,84 @@
+@import '@opentrons/components';
+
+.pd_fd_header {
+  position: relative;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  line-height: 1rem;
+}
+
+.pd_fd_sub_header {
+  font-size: 0.813rem;
+  font-weight: 400;
+  line-height: 1rem;
+}
+
+.container {
+  margin: 1.5rem 3rem 1.5rem;
+}
+
+.bold_text {
+  font-weight: bold !important;
+}
+
+.heading_container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.left_button {
+  order: 1;
+}
+
+.right_buttons {
+  order: 2;
+}
+
+.close_protocol_button {
+  margin-left: 5px;
+  color: red !important;
+}
+
+.line_separator {
+  border-bottom: 1px solid var(--c-light-gray);
+  margin: 30px 0 30px;
+  width: 100%;
+}
+
+.margin_bottom {
+  margin-bottom: 10px !important;
+}
+
+.margin_right {
+  margin-right: 5px;
+}
+
+.name_margin {
+  margin-left: 64px;
+}
+
+.desc_margin {
+  margin-left: 26px;
+}
+
+.other_margin {
+  margin-left: 11px;
+}
+
+.created_margin {
+  margin-left: 15px;
+}
+
+.author_margin {
+  margin-left: 57px;
+}
+
+.card_width {
+  width: 21rem;
+}
+
+.card_content {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}

@@ -1,6 +1,7 @@
 describe('Desktop Navigation', () => {
   before(() => {
     cy.visit('/')
+    cy.get('button').contains('Create new OT-2 protocol').click()
     cy.closeAnnouncementModal()
   })
 
