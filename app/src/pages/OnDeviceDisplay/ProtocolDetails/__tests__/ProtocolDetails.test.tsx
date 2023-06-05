@@ -15,6 +15,7 @@ import {
   useCreateRunMutation,
   useHost,
   useProtocolQuery,
+  useProtocolAnalysesQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import { useMissingHardwareText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
@@ -23,6 +24,7 @@ import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
@@ -33,7 +35,7 @@ jest.mock('../Hardware')
 jest.mock('../Labware')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
-const mockCreateRun = jest.fn((id: string) => {})
+const mockCreateRun = jest.fn((id: string) => { })
 const mockHardware = Hardware as jest.MockedFunction<typeof Hardware>
 const mockLabware = Labware as jest.MockedFunction<typeof Labware>
 const mockDeck = Deck as jest.MockedFunction<typeof Deck>
@@ -48,6 +50,9 @@ const mockDeleteProtocol = deleteProtocol as jest.MockedFunction<
 const mockDeleteRun = deleteRun as jest.MockedFunction<typeof deleteRun>
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
+>
+const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
+  typeof useProtocolAnalysesQuery
 >
 const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
   typeof useMissingProtocolHardware
@@ -98,6 +103,14 @@ describe('ODDProtocolDetails', () => {
           key: '26ed5a82-502f-4074-8981-57cdda1d066d',
         },
       },
+    } as any)
+    mockUseProtocolAnalysesQuery.mockReturnValue({
+      data: {
+        data: [{
+          id: 'mockAnalysisId',
+          status: 'completed'
+        }]
+      }
     } as any)
     when(mockuseHost).calledWith().mockReturnValue(MOCK_HOST_CONFIG)
   })

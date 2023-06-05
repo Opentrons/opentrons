@@ -32,8 +32,12 @@ export function RecentRunProtocolCarousel({
 }: RecentRunProtocolCarouselProps): JSX.Element {
   return (
     <CarouselWrapper>
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8} marginX={SPACING.spacing40}>
-        {recentRunsOfUniqueProtocols.map((runData) => (
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        gridGap={SPACING.spacing8}
+        marginX={SPACING.spacing40}
+      >
+        {recentRunsOfUniqueProtocols.map(runData => (
           <RecentRunProtocolCard key={runData.id} runData={runData} />
         ))}
       </Flex>

@@ -34,11 +34,13 @@ export function RobotDashboard(): JSX.Element {
   const [showWelcomeModal, setShowWelcomeModal] = React.useState<boolean>(
     unfinishedUnboxingFlowRoute === '/robot-settings/rename-robot'
   )
-  
+
   const recentRunsOfUniqueProtocols = allRuns
     .reverse() // newest runs first
     .reduce<RunData[]>((acc, run) => {
-      if (acc.some(collectedRun => collectedRun.protocolId === run.protocolId)) {
+      if (
+        acc.some(collectedRun => collectedRun.protocolId === run.protocolId)
+      ) {
         return acc
       } else {
         return [...acc, run]
@@ -64,7 +66,9 @@ export function RobotDashboard(): JSX.Element {
             >
               {t('run_again')}
             </StyledText>
-            <RecentRunProtocolCarousel recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols} />
+            <RecentRunProtocolCarousel
+              recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}
+            />
           </>
         )}
       </Flex>

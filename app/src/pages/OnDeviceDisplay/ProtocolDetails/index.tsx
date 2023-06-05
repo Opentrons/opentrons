@@ -26,7 +26,10 @@ import {
   useProtocolAnalysesQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { CompletedProtocolAnalysis, ProtocolResource } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  ProtocolResource,
+} from '@opentrons/shared-data'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../../atoms/buttons'
 import { Chip } from '../../../atoms/Chip'
@@ -183,10 +186,11 @@ const Summary = (props: {
         maxWidth="22rem"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <StyledText as="p">{`${t('protocol_info:date_added')}: ${date != null
+        <StyledText as="p">{`${t('protocol_info:date_added')}: ${
+          date != null
             ? format(new Date(date), 'MM/dd/yyyy k:mm')
             : t('shared:no_data')
-          }`}</StyledText>
+        }`}</StyledText>
       </Flex>
     </Flex>
   )
@@ -254,13 +258,16 @@ export function ProtocolDetails(): JSX.Element | null {
   const pinned = pinnedProtocolIds.includes(protocolId)
 
   const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId)
-  const mostRecentAnalysis = (protocolAnalyses?.data ?? [])
-    .reverse()
-    .find(
-      (analysis): analysis is CompletedProtocolAnalysis =>
-        analysis.status === 'completed'
-    ) ?? null
-  const scrapedLabwareOffsets = useOffsetCandidatesForAnalysis(mostRecentAnalysis).map(({ vector, location, definitionUri }) => ({
+  const mostRecentAnalysis =
+    (protocolAnalyses?.data ?? [])
+      .reverse()
+      .find(
+        (analysis): analysis is CompletedProtocolAnalysis =>
+          analysis.status === 'completed'
+      ) ?? null
+  const scrapedLabwareOffsets = useOffsetCandidatesForAnalysis(
+    mostRecentAnalysis
+  ).map(({ vector, location, definitionUri }) => ({
     vector,
     location,
     definitionUri,
@@ -294,7 +301,7 @@ export function ProtocolDetails(): JSX.Element | null {
   }
 
   const handleRunProtocol = (): void => {
-    createRun({ protocolId, labwareOffsets: scrapedLabwareOffsets})
+    createRun({ protocolId, labwareOffsets: scrapedLabwareOffsets })
   }
   const [
     showConfirmDeleteProtocol,

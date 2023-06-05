@@ -22,7 +22,14 @@ import { useMissingProtocolHardware } from '../../../pages/Protocols/hooks'
 import { useCloneRun } from '../../ProtocolUpload/hooks'
 import { useTrackProtocolRunEvent } from '../../Devices/hooks'
 import { useMissingHardwareText } from './hooks'
-import { RUN_STATUS_FAILED, RUN_STATUS_STOPPED, RUN_STATUS_SUCCEEDED, Run, RunData, RunStatus } from '@opentrons/api-client'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+  Run,
+  RunData,
+  RunStatus,
+} from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 interface RecentRunProtocolCardProps {
@@ -30,11 +37,14 @@ interface RecentRunProtocolCardProps {
 }
 
 export function RecentRunProtocolCard({
-  runData
+  runData,
 }: RecentRunProtocolCardProps): JSX.Element | null {
-  const protocolData = useProtocolQuery(runData.protocolId ?? null).data?.data ?? null
+  const protocolData =
+    useProtocolQuery(runData.protocolId ?? null).data?.data ?? null
 
-  return protocolData == null ? null : <ProtocolWithLastRun protocolData={protocolData} runData={runData} />
+  return protocolData == null ? null : (
+    <ProtocolWithLastRun protocolData={protocolData} runData={runData} />
+  )
 }
 
 interface ProtocolWithLastRunProps {
@@ -44,7 +54,7 @@ interface ProtocolWithLastRunProps {
 
 export function ProtocolWithLastRun({
   runData,
-  protocolData
+  protocolData,
 }: ProtocolWithLastRunProps): JSX.Element {
   const { t, i18n } = useTranslation('device_details')
   const missingProtocolHardware = useMissingProtocolHardware(protocolData.id)
@@ -57,14 +67,15 @@ export function ProtocolWithLastRun({
     history.push(`protocols/${createRunResponse.data.id}/setup`)
   const { cloneRun } = useCloneRun(runData.id, onResetSuccess)
 
-  const protocolName = protocolData.metadata.protocolName ?? protocolData.files[0].name
+  const protocolName =
+    protocolData.metadata.protocolName ?? protocolData.files[0].name
 
   const PROTOCOL_CARD_STYLE = css`
     flex: 1 0 0;
     &:active {
       background-color: ${isReadyToBeReRun
-      ? COLORS.green3Pressed
-      : COLORS.yellow3Pressed};
+        ? COLORS.green3Pressed
+        : COLORS.yellow3Pressed};
     }
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -94,9 +105,13 @@ export function ProtocolWithLastRun({
     [RUN_STATUS_SUCCEEDED]: t('completed'),
     [RUN_STATUS_FAILED]: t('failed'),
   }
-  const formattedLastRunTime = formatDistance(new Date(runData.createdAt), new Date(), {
-    addSuffix: true,
-  }).replace('about ', '')
+  const formattedLastRunTime = formatDistance(
+    new Date(runData.createdAt),
+    new Date(),
+    {
+      addSuffix: true,
+    }
+  ).replace('about ', '')
 
   return (
     <Flex
@@ -134,7 +149,10 @@ export function ProtocolWithLastRun({
         lineHeight={TYPOGRAPHY.lineHeight28}
         color={COLORS.darkBlack70}
       >
-        {i18n.format(`${terminationTypeMap[runData.status] ?? ''} ${formattedLastRunTime}`, 'capitalize')}
+        {i18n.format(
+          `${terminationTypeMap[runData.status] ?? ''} ${formattedLastRunTime}`,
+          'capitalize'
+        )}
       </StyledText>
     </Flex>
   )

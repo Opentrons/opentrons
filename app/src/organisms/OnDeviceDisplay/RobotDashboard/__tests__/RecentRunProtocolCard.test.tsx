@@ -25,8 +25,6 @@ jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../hooks')
 
-const mockProtocolName = 'mockProtocol'
-const mockProtocolId = 'mockProtocolId'
 const mockLastRun = '2023-04-12T21:30:49.124108+00:00'
 const RUN_ID = 'mockRunId'
 
@@ -109,10 +107,7 @@ describe('RecentRunProtocolCard', () => {
 
   beforeEach(() => {
     props = {
-      protocolName: mockProtocolName,
-      protocolId: mockProtocolId,
-      lastRun: mockLastRun,
-      runId: RUN_ID,
+      runData: mockRunData,
     }
     mockTrackEvent = jest.fn()
     mockTrackProtocolRunEvent = jest.fn(

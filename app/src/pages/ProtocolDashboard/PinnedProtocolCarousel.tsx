@@ -29,7 +29,11 @@ export function PinnedProtocolCarousel(props: {
 
   return (
     <CarouselWrapper>
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8} marginX={SPACING.spacing40}>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        gridGap={SPACING.spacing8}
+        marginX={SPACING.spacing40}
+      >
         {pinnedProtocols.map(protocol => {
           const lastRun = runs.data?.data.find(
             run => run.protocolId === protocol.id
