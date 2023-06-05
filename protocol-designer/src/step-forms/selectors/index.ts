@@ -361,12 +361,9 @@ export const getPipettesForInstrumentGroup: Selector<
         pipetteSpecs: pipetteSpec,
         description: _getPipetteDisplayName(pipetteOnDeck.name),
         isDisabled: false,
-        tiprackModel:
-          Object.keys(tiprackDef).length === undefined
-            ? getLabwareDisplayName(tiprackDef)
-            : Array.isArray(tiprackDef)
-            ? tiprackDef.map(i => getLabwareDisplayName(i))
-            : [],
+        tiprackModel: Array.isArray(tiprackDef)
+          ? tiprackDef.map(i => getLabwareDisplayName(i))
+          : getLabwareDisplayName(tiprackDef),
       }
       acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
       return acc
