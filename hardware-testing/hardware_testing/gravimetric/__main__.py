@@ -102,6 +102,7 @@ def run_pm(
     inspect: bool,
     user_volumes: bool,
     gantry_speed: int,
+    touch_tip: bool,
 ) -> None:
     """Run."""
     protocol_cfg = PROTOCOL_CFG[pipette_volume][96][tip_volume]
@@ -124,6 +125,7 @@ def run_pm(
             inspect=inspect,
             user_volumes=user_volumes,
             gantry_speed=gantry_speed,
+            touch_tip=touch_tip,
         ),
     )
 
@@ -145,6 +147,7 @@ if __name__ == "__main__":
     parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
     parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
     parser.add_argument("--photometric", action="store_true")
+    parser.add_argument("--touch-tip", action="store_true")
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context
@@ -175,6 +178,7 @@ if __name__ == "__main__":
             args.inspect,
             args.user_volumes,
             args.gantry_speed,
+            args.touch_tip,
         )
     else:
         run(
