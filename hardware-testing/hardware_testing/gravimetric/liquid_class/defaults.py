@@ -95,7 +95,7 @@ _dispense_defaults = {
     96: {
         1000: {  # P1000
             50: DispenseSettings(  # T50
-                flow_rate=160,
+                flow_rate=80,  # 160 ul/sec ==  10 mm/sec
                 delay=0.5,
                 submerge=_default_submerge_mm_t50,
                 retract=_default_retract_mm,
@@ -103,7 +103,7 @@ _dispense_defaults = {
                 deceleration=20000,  # this is a fake number
             ),
             200: DispenseSettings(  # T200
-                flow_rate=160,
+                flow_rate=80,
                 delay=0.5,
                 submerge=_default_submerge_mm,
                 retract=_default_retract_mm,
@@ -111,7 +111,7 @@ _dispense_defaults = {
                 deceleration=20000,  # this is a fake number
             ),
             1000: DispenseSettings(  # T1000
-                flow_rate=160,
+                flow_rate=80,
                 delay=0.5,
                 submerge=_default_submerge_mm,
                 retract=_default_retract_mm,
@@ -400,7 +400,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm_t50,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=3.2,
+                        leading_air_gap=5,
                         trailing_air_gap=0.1,
                     ),
                 ),
@@ -432,8 +432,8 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=16,
-                        trailing_air_gap=5,
+                        leading_air_gap=3.2,
+                        trailing_air_gap=2,
                     ),
                 ),
                 50: AspirateSettings(  # 50uL
@@ -442,7 +442,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=16,
+                        leading_air_gap=3.2,
                         trailing_air_gap=3.5,
                     ),
                 ),
@@ -452,7 +452,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=16,
+                        leading_air_gap=2,
                         trailing_air_gap=2,
                     ),
                 ),
@@ -464,7 +464,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=16,
+                        leading_air_gap=12,
                         trailing_air_gap=10,
                     ),
                 ),
