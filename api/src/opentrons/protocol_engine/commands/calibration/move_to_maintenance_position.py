@@ -32,11 +32,11 @@ _PLATE_ATTACH_Z_RIGHT_POINT = 320
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
 
-class MaintenancePosition(str, enum.Enum):
+class MaintenancePosition(enum.Enum):
     """Maintenance position options."""
 
-    AttachPlate = "attachPlate"
-    AttachInstrument = "attachInstrument"
+    ATTACH_PLATE = "attachPlate"
+    ATTACH_INSTRUMENT = "attachInstrument"
 
 
 class MoveToMaintenancePositionParams(BaseModel):
@@ -48,7 +48,7 @@ class MoveToMaintenancePositionParams(BaseModel):
     )
 
     maintenancePosition: MaintenancePosition = Field(
-        MaintenancePosition.AttachInstrument,
+        MaintenancePosition.ATTACH_INSTRUMENT,
         description="The position the gantry mount needs to move to.",
     )
 
@@ -99,7 +99,7 @@ class MoveToMaintenancePositionImplementation(
                 critical_point=CriticalPoint.MOUNT,
             )
 
-        if params.maintenancePosition == MaintenancePosition.AttachInstrument:
+        if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
             mount_to_axis = OT3Axis.by_mount(params.mount.to_hw_mount())
             await ot3_api.move_axes(
                 {

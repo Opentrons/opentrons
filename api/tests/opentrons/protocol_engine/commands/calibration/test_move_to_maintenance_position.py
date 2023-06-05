@@ -37,11 +37,11 @@ def subject(
     "maintenance_position, verify_axes",
     [
         (
-            MaintenancePosition.AttachInstrument,
+            MaintenancePosition.ATTACH_INSTRUMENT,
             {OT3Axis.Z_L: 400},
         ),
         (
-            MaintenancePosition.AttachPlate,
+            MaintenancePosition.ATTACH_PLATE,
             {OT3Axis.Z_L: 295, OT3Axis.Z_R: 320},
         ),
     ],
