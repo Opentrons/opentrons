@@ -9,7 +9,6 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
-  GRIPPER_MODELS,
   GRIPPER_V1,
   getGripperDisplayName,
   getModuleDisplayName,

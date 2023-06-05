@@ -5,7 +5,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
+import { useAllRunsQuery, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
 import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
@@ -77,6 +77,9 @@ const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.Mocked
 const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
   typeof useAllRunsQuery
 >
+const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
+  typeof useProtocolQuery
+>
 const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
   typeof useTrackProtocolRunEvent
 >
@@ -118,6 +121,9 @@ describe('RecentRunProtocolCard', () => {
     mockUseMissingProtocolHardware.mockReturnValue([])
     mockUseAllRunsQuery.mockReturnValue({
       data: { data: [mockRunData] },
+    } as any)
+    mockUseProtocolQuery.mockReturnValue({
+      data: { data: {} },
     } as any)
     when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,

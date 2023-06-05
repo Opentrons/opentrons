@@ -19,23 +19,26 @@ import {
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import { useMissingHardwareText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../../../Protocols/hooks'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
-import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
+jest.mock(
+  '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+)
 jest.mock('../../../Protocols/hooks')
 jest.mock('../Deck')
 jest.mock('../Hardware')
 jest.mock('../Labware')
 
 const MOCK_HOST_CONFIG = {} as HostConfig
-const mockCreateRun = jest.fn((id: string) => { })
+const mockCreateRun = jest.fn((id: string) => {})
 const mockHardware = Hardware as jest.MockedFunction<typeof Hardware>
 const mockLabware = Labware as jest.MockedFunction<typeof Labware>
 const mockDeck = Deck as jest.MockedFunction<typeof Deck>
@@ -56,6 +59,9 @@ const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunc
 >
 const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
   typeof useMissingProtocolHardware
+>
+const mockUseOffsetCandidatesForAnalysis = useOffsetCandidatesForAnalysis as jest.MockedFunction<
+  typeof useOffsetCandidatesForAnalysis
 >
 
 const mockUseMissingHardwareText = useMissingHardwareText as jest.MockedFunction<
@@ -83,6 +89,7 @@ describe('ODDProtocolDetails', () => {
     mockUseMissingHardwareText.mockReturnValue(
       'mock missing hardware chip text'
     )
+    mockUseOffsetCandidatesForAnalysis.mockReturnValue([])
     mockUseMissingProtocolHardware.mockReturnValue([])
     mockUseProtocolQuery.mockReturnValue({
       data: {
@@ -106,11 +113,13 @@ describe('ODDProtocolDetails', () => {
     } as any)
     mockUseProtocolAnalysesQuery.mockReturnValue({
       data: {
-        data: [{
-          id: 'mockAnalysisId',
-          status: 'completed'
-        }]
-      }
+        data: [
+          {
+            id: 'mockAnalysisId',
+            status: 'completed',
+          },
+        ],
+      },
     } as any)
     when(mockuseHost).calledWith().mockReturnValue(MOCK_HOST_CONFIG)
   })

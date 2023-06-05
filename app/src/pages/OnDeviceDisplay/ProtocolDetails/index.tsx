@@ -51,7 +51,6 @@ import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisp
 import type { Dispatch } from '../../../redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 const ProtocolHeader = (props: {
   title: string

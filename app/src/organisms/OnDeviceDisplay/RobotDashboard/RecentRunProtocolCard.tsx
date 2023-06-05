@@ -105,6 +105,7 @@ export function ProtocolWithLastRun({
     [RUN_STATUS_SUCCEEDED]: t('completed'),
     [RUN_STATUS_FAILED]: t('failed'),
   }
+  // TODO(BC, 2023-06-05): see if addSuffix false allow can remove usage of .replace here
   const formattedLastRunTime = formatDistance(
     new Date(runData.createdAt),
     new Date(),
