@@ -23,9 +23,13 @@ import {
 import {
   useCreateRunMutation,
   useHost,
+  useProtocolAnalysesQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { ProtocolResource } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  ProtocolResource,
+} from '@opentrons/shared-data'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../../atoms/buttons'
 import { Chip } from '../../../atoms/Chip'
@@ -46,6 +50,7 @@ import { Liquids } from './Liquids'
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
 import type { Dispatch } from '../../../redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
+import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
 const ProtocolHeader = (props: {
   title: string
@@ -252,6 +257,22 @@ export function ProtocolDetails(): JSX.Element | null {
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinned = pinnedProtocolIds.includes(protocolId)
 
+  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId)
+  const mostRecentAnalysis =
+    (protocolAnalyses?.data ?? [])
+      .reverse()
+      .find(
+        (analysis): analysis is CompletedProtocolAnalysis =>
+          analysis.status === 'completed'
+      ) ?? null
+  const scrapedLabwareOffsets = useOffsetCandidatesForAnalysis(
+    mostRecentAnalysis
+  ).map(({ vector, location, definitionUri }) => ({
+    vector,
+    location,
+    definitionUri,
+  }))
+
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
       queryClient
@@ -280,7 +301,7 @@ export function ProtocolDetails(): JSX.Element | null {
   }
 
   const handleRunProtocol = (): void => {
-    createRun({ protocolId })
+    createRun({ protocolId, labwareOffsets: scrapedLabwareOffsets })
   }
   const [
     showConfirmDeleteProtocol,
