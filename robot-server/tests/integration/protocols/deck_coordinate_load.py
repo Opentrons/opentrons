@@ -2,7 +2,7 @@ metadata = {
     "protocolName": "Deck Coordinate PAPIv2 Test",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.14"}
+requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 
 def run(context):
