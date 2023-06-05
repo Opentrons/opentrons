@@ -123,7 +123,9 @@ class ProtocolContext(CommandPublisher):
         self._api_version = api_version
         self._core = core
         self._core_map = core_map or LoadedCoreMap()
-        self._deck = deck or Deck(protocol_core=core, core_map=self._core_map)
+        self._deck = deck or Deck(
+            protocol_core=core, core_map=self._core_map, api_version=api_version
+        )
 
         # With the introduction of Extension mount type, this dict initializes to include
         # the extension mount, for both ot2 & 3. While it doesn't seem like it would
