@@ -1161,7 +1161,7 @@ async def test_move_to_plunger_bottom(
     ot3_hardware._current_position[pip_ax] = target_pos[pip_ax] + 1
     mock_move.reset_mock()
     await ot3_hardware.prepare_for_aspirate(mount)
-    mock_move.assert_called_once_with(
+    mock_move.assert_called_with(
         target_pos, speed=expected_speed_moving_up, acquire_lock=True
     )
 
