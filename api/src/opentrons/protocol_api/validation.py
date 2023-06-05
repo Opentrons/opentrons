@@ -95,7 +95,18 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
 def ensure_deck_slot(
     deck_slot: Union[int, str], api_version: APIVersion
 ) -> DeckSlotName:
-    """Ensure that a primitive value matches a named deck slot."""
+    """Ensure that a primitive value matches a named deck slot.
+
+    Params:
+        deck_slot: The primitive value to validate. Valid values are like `5`, `"5"`, or `"C2"`.
+        api_version: The Python Protocol API version whose rules to use to validate the value.
+            Values like `"C2"` are only supported in newer versions.
+
+    Raises:
+        TypeError: If you provide something that's not an `int` or `str`.
+        ValueError: If the value does not match a known deck slot.
+        APIVersionError: If you provide a value like `"C2"`, but `api_version` is too old.
+    """
     if not isinstance(deck_slot, (int, str)):
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
 
