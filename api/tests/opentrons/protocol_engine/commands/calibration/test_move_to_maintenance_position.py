@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Mapping
 import pytest
 from decoy import Decoy
 
+from opentrons.motion_planning import Waypoint
 from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position import (
     MoveToMaintenancePositionParams,
     MoveToMaintenancePositionImplementation,
@@ -13,8 +14,8 @@ from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position
 )
 
 from opentrons.protocol_engine.state import StateView
-from opentrons.types import MountType
-from opentrons.hardware_control.types import OT3Axis
+from opentrons.types import MountType, Mount, Point
+from opentrons.hardware_control.types import OT3Axis, CriticalPoint
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -36,12 +37,12 @@ def subject(
     "maintenance_position, verify_axes",
     [
         (
-            MaintenancePosition.AttachInstrument,
-            {OT3Axis.Y: 100, OT3Axis.X: 0, OT3Axis.Z_L: 400},
+            MaintenancePosition.ATTACH_INSTRUMENT,
+            {OT3Axis.Z_L: 400},
         ),
         (
-            MaintenancePosition.AttachPlate,
-            {OT3Axis.Y: 100, OT3Axis.X: 0, OT3Axis.Z_L: 300, OT3Axis.Z_R: 320},
+            MaintenancePosition.ATTACH_PLATE,
+            {OT3Axis.Z_L: 295, OT3Axis.Z_R: 320},
         ),
     ],
 )
@@ -56,6 +57,31 @@ async def test_calibration_move_to_location_implementation(
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
         mount=MountType.LEFT, maintenancePosition=maintenance_position
+    )
+
+    decoy.when(await ot3_hardware_api.gantry_position(Mount.LEFT)).then_return(
+        Point(x=1, y=2, z=3)
+    )
+
+    decoy.when(ot3_hardware_api.get_instrument_max_height(Mount.LEFT)).then_return(12)
+
+    decoy.when(
+        state_view.motion.get_movement_waypoints_to_coords(
+            origin=Point(x=1, y=2, z=3),
+            dest=Point(x=0, y=100, z=0),
+            max_travel_z=12,
+            direct=False,
+            additional_min_travel_z=None,
+        )
+    ).then_return(
+        [
+            Waypoint(position=Point(3, 1, 4), critical_point=None),
+            Waypoint(position=Point(1, 5, 9), critical_point=CriticalPoint.XY_CENTER),
+        ]
+    )
+
+    decoy.when(await ot3_hardware_api.gantry_position(Mount.RIGHT)).then_return(
+        Point(x=6, y=6, z=6)
     )
 
     result = await subject.execute(params=params)

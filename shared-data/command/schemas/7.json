@@ -3049,6 +3049,11 @@
       },
       "required": ["params"]
     },
+    "MaintenancePosition": {
+      "title": "MaintenancePosition",
+      "description": "Maintenance position options.",
+      "enum": ["attachPlate", "attachInstrument"]
+    },
     "MoveToMaintenancePositionParams": {
       "title": "MoveToMaintenancePositionParams",
       "description": "Calibration set up position command parameters.",
@@ -3059,6 +3064,15 @@
           "allOf": [
             {
               "$ref": "#/definitions/MountType"
+            }
+          ]
+        },
+        "maintenancePosition": {
+          "description": "The position the gantry mount needs to move to.",
+          "default": "attachInstrument",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MaintenancePosition"
             }
           ]
         }

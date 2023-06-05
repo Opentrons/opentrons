@@ -7,8 +7,8 @@ from typing_extensions import Literal
 
 from pydantic import BaseModel, Field
 
-from opentrons.types import MountType, Point
-from opentrons.hardware_control.types import OT3Axis
+from opentrons.types import MountType, Point, Mount
+from opentrons.hardware_control.types import OT3Axis, CriticalPoint
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -25,18 +25,18 @@ if TYPE_CHECKING:
 _ATTACH_POINT = Point(x=0, y=100)
 # These offsets are by eye measuring
 _INSTRUMENT_ATTACH_Z_POINT = 400.0
-_PLATE_ATTACH_Z_LEFT_POINT = 300
+_PLATE_ATTACH_Z_LEFT_POINT = 295
 # Move the right mount a bit higher than the left so the user won't forget to unscrew
 _PLATE_ATTACH_Z_RIGHT_POINT = 320
 
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
 
-class MaintenancePosition(str, enum.Enum):
+class MaintenancePosition(enum.Enum):
     """Maintenance position options."""
 
-    AttachPlate = "attachPlate"
-    AttachInstrument = "attachInstrument"
+    ATTACH_PLATE = "attachPlate"
+    ATTACH_INSTRUMENT = "attachInstrument"
 
 
 class MoveToMaintenancePositionParams(BaseModel):
@@ -48,7 +48,7 @@ class MoveToMaintenancePositionParams(BaseModel):
     )
 
     maintenancePosition: MaintenancePosition = Field(
-        MaintenancePosition.AttachInstrument,
+        MaintenancePosition.ATTACH_INSTRUMENT,
         description="The position the gantry mount needs to move to.",
     )
 
@@ -80,20 +80,35 @@ class MoveToMaintenancePositionImplementation(
         ot3_api = ensure_ot3_hardware(
             self._hardware_api,
         )
-        if params.maintenancePosition == MaintenancePosition.AttachInstrument:
+        current_position = await ot3_api.gantry_position(Mount.LEFT)
+        max_travel_z = ot3_api.get_instrument_max_height(Mount.LEFT)
+        way_points = self._state_view.motion.get_movement_waypoints_to_coords(
+            origin=current_position,
+            dest=_ATTACH_POINT,
+            max_travel_z=max_travel_z,
+            direct=False,
+            additional_min_travel_z=None,
+        )
+
+        for waypoint in way_points:
+            await ot3_api.move_to(
+                mount=Mount.LEFT,
+                abs_position=Point(
+                    x=waypoint.position.x, y=waypoint.position.y, z=current_position.z
+                ),
+                critical_point=CriticalPoint.MOUNT,
+            )
+
+        if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
             mount_to_axis = OT3Axis.by_mount(params.mount.to_hw_mount())
             await ot3_api.move_axes(
                 {
-                    OT3Axis.Y: _ATTACH_POINT.y,
-                    OT3Axis.X: _ATTACH_POINT.x,
                     mount_to_axis: _INSTRUMENT_ATTACH_Z_POINT,
                 }
             )
         else:
             await ot3_api.move_axes(
                 {
-                    OT3Axis.Y: _ATTACH_POINT.y,
-                    OT3Axis.X: _ATTACH_POINT.x,
                     OT3Axis.Z_L: _PLATE_ATTACH_Z_LEFT_POINT,
                     OT3Axis.Z_R: _PLATE_ATTACH_Z_RIGHT_POINT,
                 }

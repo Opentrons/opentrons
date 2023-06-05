@@ -339,11 +339,6 @@ def machine_from_deck(
         ax: pos for ax, pos in deck_pos.items() if ax not in ax.gantry_axes()
     }
 
-    # Type ignored below because linal.apply_transform (rightly) specifies
-    # Tuple[float, float, float] and the implied type from
-    # target_position.items() is (rightly) Tuple[float, ...] with unbounded
-    # size; unfortunately, mypy can’t quite figure out the length check
-    # above that makes this OK
     transformed = {
         axes: machine_point_from_deck_point(deck_point, attitude, offset)
         for axes, deck_point in point_for_z_axis.items()
