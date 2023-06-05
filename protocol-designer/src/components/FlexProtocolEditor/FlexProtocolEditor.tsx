@@ -44,12 +44,12 @@ import {
 } from '../modals/FilePipettesModal'
 import { LabwareDefByDefURI } from '../../labware-defs'
 import { NewProtocolFields } from '../../load-file'
-import {
-  mapDispatchToProps,
-  mapStateToProps as newModalFileMapStateToProps,
-} from '../modals/NewFileModal'
 import { FlexFileDetails } from './FlexFileDetails'
 import { setRobotType } from '../../load-file/actions'
+import {
+  mapDispatchToProps,
+  mapStateToProps,
+} from './FlexPillForm/FlexProtocolEditorProps'
 type Props = React.ComponentProps<typeof FlexProtocolEditor>
 export interface FormModule {
   onDeck: boolean
@@ -468,7 +468,7 @@ function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: any): Props {
 }
 
 export const FlexProtocolEditorComponent = connect(
-  newModalFileMapStateToProps,
+  mapStateToProps,
   mapDispatchToProps,
   mergeProps
 )(FlexProtocolEditor)

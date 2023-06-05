@@ -77,6 +77,7 @@ export interface Props {
     modules: ModuleCreationArgs[]
   }) => unknown
   moduleRestrictionsDisabled?: boolean | null
+  setRobotType: () => unknown
 }
 const initialFormState: FormState = {
   fields: { name: '' },
@@ -245,6 +246,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
       modules[magModIndex].slot = '9'
     }
     this.props.onSave({ modules, newProtocolFields, pipettes })
+    this.props.setRobotType()
   }
 
   showEditPipetteConfirmationModal: () => void = () => {

@@ -34,8 +34,8 @@ export interface ProtocolFile<DesignerApplicationData = {}> {
     data?: DesignerApplicationData
   }
   robot: {
-    model: 'OT-2 Standard' | 'OT-3 Standard'
-    deckId: 'ot2_standard' | 'ot2_short_trash' | 'ot3_standard'
+    model: string | null
+    deckId: string | null
   }
   pipettes: {
     [pipetteId: string]: { name: PipetteName }
