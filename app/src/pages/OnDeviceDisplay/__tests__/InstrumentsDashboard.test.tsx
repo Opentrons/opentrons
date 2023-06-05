@@ -63,8 +63,8 @@ const mockGripperData = {
   },
 }
 const mockRightPipetteData = {
-  instrumentModel: 'p300_single_v2',
-  instrumentType: 'p300',
+  instrumentModel: 'p50_single_v3.0',
+  instrumentType: 'p50',
   mount: 'right',
   serialNumber: 'abc123',
   data: {
@@ -76,7 +76,7 @@ const mockRightPipetteData = {
   },
 }
 const mockLeftPipetteData = {
-  instrumentModel: 'p1000_single_v2',
+  instrumentModel: 'p1000_single_v3.0',
   instrumentType: 'p1000',
   mount: 'left',
   serialNumber: 'def456',
@@ -106,11 +106,11 @@ describe('InstrumentsDashboard', () => {
   it('should render mount info for all attached mounts', () => {
     const [{ getByText }] = render()
     getByText('left Mount')
-    getByText(mockLeftPipetteData.instrumentModel)
+    getByText('Flex 1-Channel 1000 μL')
     getByText('right Mount')
-    getByText(mockRightPipetteData.instrumentModel)
+    getByText('Flex 1-Channel 50 μL')
     getByText('extension Mount')
-    getByText(mockGripperData.instrumentModel)
+    getByText('Flex Gripper')
   })
   it('should route to left mount detail when instrument attached and clicked', async () => {
     const [{ getByText }] = render()

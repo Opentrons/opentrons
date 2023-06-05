@@ -100,10 +100,7 @@ def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
 
 
 def ensure_deck_slot_string(slot_name: DeckSlotName, robot_type: RobotType) -> str:
-    if robot_type == "OT-2 Standard":
-        return str(slot_name)
-    else:
-        return slot_name.as_coordinate()
+    return slot_name.to_equivalent_for_robot_type(robot_type).id
 
 
 def ensure_lowercase_name(name: str) -> str:

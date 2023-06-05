@@ -3,11 +3,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  Btn,
-  DIRECTION_COLUMN,
-  Icon,
   ALIGN_CENTER,
+  Btn,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
   SPACING,
 } from '@opentrons/components'
 
@@ -57,22 +59,23 @@ export function TouchScreenSleep({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      <Flex alignItems={ALIGN_CENTER}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      paddingY={SPACING.spacing32}
+      gridGap={SPACING.spacing32}
+    >
+      <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_ROW}>
         <Btn onClick={() => setCurrentOption(null)}>
-          <Icon name="chevron-left" size="2.5rem" />
+          <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
         </Btn>
         <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
           {t('touchscreen_sleep')}
         </StyledText>
       </Flex>
-      <Flex marginTop={SPACING.spacing40}>
-        <StyledText>{t('sleep_settings_description')}</StyledText>
-      </Flex>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
-        marginTop={SPACING.spacing24}
+        // marginTop={SPACING.spacing24}
       >
         {settingsButtons.map(radio => (
           <RadioButton

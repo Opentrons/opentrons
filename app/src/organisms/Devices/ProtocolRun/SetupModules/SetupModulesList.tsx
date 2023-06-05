@@ -20,6 +20,7 @@ import {
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_V1,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
 } from '@opentrons/shared-data'
@@ -52,7 +53,6 @@ export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
     robotName,
     runId
   )
-
   const {
     missingModuleIds,
     remainingAttachedModules,
@@ -210,6 +210,48 @@ export const ModulesListItem = ({
       ? attachedModuleMatch
       : null
 
+  let subText: JSX.Element | null = null
+  if (moduleModel === HEATERSHAKER_MODULE_V1) {
+    subText = (
+      <Btn
+        marginLeft={SPACING.spacing20}
+        css={css`
+          color: ${COLORS.darkGreyEnabled};
+
+          &:hover {
+            color: ${COLORS.darkBlackEnabled};
+          }
+        `}
+        marginTop={SPACING.spacing4}
+        onClick={() => setShowHeaterShakerFlow(true)}
+      >
+        <Flex flexDirection={DIRECTION_ROW}>
+          <Icon
+            name="information"
+            size="0.75rem"
+            marginTop={SPACING.spacing4}
+          />
+          <StyledText
+            marginLeft={SPACING.spacing4}
+            textDecoration={TYPOGRAPHY.textDecorationUnderline}
+            as="p"
+          >
+            {t('view_module_setup_instructions')}
+          </StyledText>
+        </Flex>
+      </Btn>
+    )
+  } else if (moduleModel === MAGNETIC_BLOCK_V1) {
+    subText = (
+      <StyledText
+        as="p"
+        marginLeft={SPACING.spacing20}
+        color={COLORS.darkGreyEnabled}
+      >
+        {t('no_usb_connection_required')}
+      </StyledText>
+    )
+  }
   return (
     <Box
       border={BORDERS.styleSolid}
@@ -241,35 +283,7 @@ export const ModulesListItem = ({
             >
               {displayName}
             </StyledText>
-            {moduleModel === HEATERSHAKER_MODULE_V1 ? (
-              <Btn
-                marginLeft={SPACING.spacing20}
-                css={css`
-                  color: ${COLORS.darkGreyEnabled};
-
-                  &:hover {
-                    color: ${COLORS.darkBlackEnabled};
-                  }
-                `}
-                marginTop={SPACING.spacing4}
-                onClick={() => setShowHeaterShakerFlow(true)}
-              >
-                <Flex flexDirection={DIRECTION_ROW}>
-                  <Icon
-                    name="information"
-                    size="0.75rem"
-                    marginTop={SPACING.spacing4}
-                  />
-                  <StyledText
-                    marginLeft={SPACING.spacing4}
-                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                    as="p"
-                  >
-                    {t('view_module_setup_instructions')}
-                  </StyledText>
-                </Flex>
-              </Btn>
-            ) : null}
+            {subText}
           </Flex>
         </Flex>
         <StyledText as="p" width="15%">
@@ -283,25 +297,29 @@ export const ModulesListItem = ({
           })}
         </StyledText>
         <Flex width="15%">
-          <StatusLabel
-            id={location}
-            status={moduleConnectionStatus}
-            backgroundColor={
-              attachedModuleMatch != null
-                ? COLORS.successBackgroundLight
-                : COLORS.warningBackgroundLight
-            }
-            iconColor={
-              attachedModuleMatch != null
-                ? COLORS.successEnabled
-                : COLORS.warningEnabled
-            }
-            textColor={
-              attachedModuleMatch != null
-                ? COLORS.successText
-                : COLORS.warningText
-            }
-          />
+          {moduleModel === MAGNETIC_BLOCK_V1 ? (
+            <StyledText as="p"> {t('n_a')}</StyledText>
+          ) : (
+            <StatusLabel
+              id={location}
+              status={moduleConnectionStatus}
+              backgroundColor={
+                attachedModuleMatch != null
+                  ? COLORS.successBackgroundLight
+                  : COLORS.warningBackgroundLight
+              }
+              iconColor={
+                attachedModuleMatch != null
+                  ? COLORS.successEnabled
+                  : COLORS.warningEnabled
+              }
+              textColor={
+                attachedModuleMatch != null
+                  ? COLORS.successText
+                  : COLORS.warningText
+              }
+            />
+          )}
         </Flex>
       </Flex>
     </Box>

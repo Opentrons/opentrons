@@ -4,15 +4,25 @@ from typing import Union
 
 from fastapi import APIRouter, Depends, status
 
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition as SD_LabwareDefinition,
+)
+
 from opentrons.protocol_engine import LabwareOffsetCreate, LabwareOffset
 from opentrons.protocols.models import LabwareDefinition
 
 from robot_server.errors import ErrorBody
-from robot_server.service.json_api import RequestModel, SimpleBody, PydanticResponse
+from robot_server.service.json_api import (
+    RequestModel,
+    SimpleBody,
+    PydanticResponse,
+    ResponseList,
+)
 
 from ..run_models import Run, LabwareDefinitionSummary
+from ..run_data_manager import RunDataManager, RunNotCurrentError
 from ..engine_store import EngineStore
-from ..dependencies import get_engine_store
+from ..dependencies import get_engine_store, get_run_data_manager
 from .base_router import RunNotFound, RunStopped, RunNotIdle, get_run_data_from_url
 
 log = logging.getLogger(__name__)
@@ -102,4 +112,44 @@ async def add_labware_definition(
             data=LabwareDefinitionSummary.construct(definitionUri=uri)
         ),
         status_code=status.HTTP_201_CREATED,
+    )
+
+
+@labware_router.get(
+    path="/runs/{runId}/loaded_labware_definitions",
+    summary="Get the definitions of a run's loaded labware",
+    description=(
+        "Get the definitions of all the labware that the given run has loaded so far."
+        "\n\n"
+        "When the run is first created, this list will be empty."
+        " As it executes and goes through `loadLabware` commands, those commands'"
+        " `result.definition`s will be added to this list."
+        " Repeated definitions will be deduplicated."
+    ),
+    responses={
+        status.HTTP_200_OK: {"model": SimpleBody[Run]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[RunStopped]},
+    },
+)
+async def get_run_loaded_labware_definitions(
+    runId: str,
+    run_data_manager: RunDataManager = Depends(get_run_data_manager),
+) -> PydanticResponse[SimpleBody[ResponseList[SD_LabwareDefinition]]]:
+    """Get a run's loaded labware definition by the run ID.
+
+    Args:
+        runId: Run ID pulled from URL.
+        run_data_manager: Current and historical run data management.
+    """
+    try:
+        labware_definitions = run_data_manager.get_run_loaded_labware_definitions(
+            run_id=runId
+        )
+    except RunNotCurrentError as e:
+        raise RunStopped(detail=str(e)).as_error(status.HTTP_409_CONFLICT) from e
+
+    labware_definitions_result = ResponseList.construct(__root__=labware_definitions)
+    return await PydanticResponse.create(
+        content=SimpleBody.construct(data=labware_definitions_result),
+        status_code=status.HTTP_200_OK,
     )

@@ -372,6 +372,41 @@ describe('discovery selectors', () => {
       ],
     },
     {
+      name: 'handles opentrons-usb robots by setting as local',
+      selector: discovery.getDiscoveredRobots,
+      state: {
+        discovery: {
+          robotsByName: {
+            'opentrons-foo': {
+              name: 'opentrons-foo',
+              health: mockLegacyHealthResponse,
+              serverHealth: mockLegacyServerHealthResponse,
+              addresses: [
+                {
+                  ip: 'opentrons-usb',
+                  port: 31950,
+                  seen: true,
+                  healthStatus: HEALTH_STATUS_OK,
+                  serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
+                  healthError: null,
+                  serverHealthError: mockHealthFetchErrorResponse,
+                  advertisedModel: null,
+                },
+              ],
+            },
+          },
+        },
+        robot: { connection: { connectedTo: '' } },
+      },
+      expected: [
+        expect.objectContaining({
+          name: 'opentrons-foo',
+          ip: 'opentrons-usb',
+          local: true,
+        }),
+      ],
+    },
+    {
       name: 'getViewableRobots returns connectable and reachable robots',
       selector: discovery.getViewableRobots,
       state: MOCK_STATE,

@@ -35,7 +35,7 @@ const SettingButton = styled.input`
 
 const SettingButtonLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing24};
-  border-radius: ${BORDERS.size4};
+  border-radius: ${BORDERS.borderRadiusSize4};
   cursor: pointer;
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
@@ -66,15 +66,15 @@ export function UpdateChannel({
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32}>
       <Flex alignItems={ALIGN_CENTER}>
         <Btn
           onClick={() => setCurrentOption(null)}
           data-testid="UpdateChannel_back_button"
         >
-          <Icon name="chevron-left" size="2.5rem" />
+          <Icon name="back" size="3rem" />
         </Btn>
-        <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
+        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('app_settings:update_channel')}
         </StyledText>
       </Flex>

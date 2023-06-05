@@ -158,7 +158,7 @@ export function ProtocolRunHeader({
       `/devices/${robotName}/protocol-runs/${createRunResponse.data.id}/run-preview`
     )
 
-  const { pause } = useRunControls(runId, onResetSuccess)
+  const { pause, play } = useRunControls(runId, onResetSuccess)
 
   const [showAnalysisErrorModal, setShowAnalysisErrorModal] = React.useState(
     false
@@ -294,7 +294,9 @@ export function ProtocolRunHeader({
           </Flex>
         </Box>
       ) : null}
-      <RunProgressMeter {...{ makeHandleJumpToStep, runId, robotName }} />
+      <RunProgressMeter
+        {...{ makeHandleJumpToStep, runId, robotName, resumeRunHandler: play }}
+      />
       {showConfirmCancelModal ? (
         <ConfirmCancelModal
           onClose={() => setShowConfirmCancelModal(false)}
@@ -382,7 +384,7 @@ interface ActionButtonProps {
 function ActionButton(props: ActionButtonProps): JSX.Element {
   const { runId, robotName, runStatus, isProtocolAnalyzing } = props
   const history = useHistory()
-  const { t } = useTranslation('run_details')
+  const { t } = useTranslation(['run_details', 'shared'])
   const attachedModules =
     useModulesQuery({
       refetchInterval: EQUIPMENT_POLL_MS,
@@ -469,7 +471,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   if (currentRunId === runId && !isSetupComplete) {
     disableReason = t('setup_incomplete')
   } else if (isOtherRunCurrent) {
-    disableReason = t('robot_is_busy')
+    disableReason = t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     disableReason = t('shared:a_software_update_is_available')
   }

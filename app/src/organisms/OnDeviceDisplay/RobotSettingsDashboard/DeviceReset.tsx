@@ -43,7 +43,7 @@ const OptionLabel = styled.label<LabelProps>`
   border: 2px solid
     ${({ isSelected }) =>
       isSelected === true ? COLORS.blueEnabled : COLORS.light2};
-  border-radius: ${BORDERS.size4};
+  border-radius: ${BORDERS.borderRadiusSize4};
   background: ${({ isSelected }) =>
     isSelected === true ? COLORS.medBlue : COLORS.white};
 `
@@ -100,13 +100,13 @@ export function DeviceReset({
   }, [dispatch, robotName])
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} paddingY={SPACING.spacing32}>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex flexDirection={DIRECTION_ROW}>
           <Btn onClick={() => setCurrentOption(null)}>
-            <Icon name="chevron-left" size="2.5rem" />
+            <Icon name="back" size="3rem" />
           </Btn>
-          <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
+          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('device_reset')}
           </StyledText>
         </Flex>
@@ -116,7 +116,7 @@ export function DeviceReset({
           alignItems={ALIGN_CENTER}
           gridGap={SPACING.spacing12}
           padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-          borderRadius={BORDERS.size3}
+          borderRadius={BORDERS.borderRadiusSize3}
         >
           <Icon name="ot-alert" size="1.5rem" color={COLORS.warningEnabled} />
           <StyledText

@@ -1,7 +1,10 @@
 import pytest
 
 from opentrons.types import Location, Point
-from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
+from opentrons.protocols.api_support.deck_type import (
+    SHORT_TRASH_DECK,
+    STANDARD_OT2_DECK,
+)
 from opentrons.protocols.geometry.planning import (
     plan_moves,
     safe_height,
@@ -23,9 +26,24 @@ trough_name = "usascientific_12_reservoir_22ml"
 P300M_GEN2_MAX_HEIGHT = 155.75
 
 
-@pytest.fixture
-def deck(deck_definition_name) -> Deck:
-    return Deck(deck_type=deck_definition_name)
+@pytest.fixture(
+    # Limit the tests in this file to just test with OT-2 deck definitions.
+    #
+    # We need to do this because the tests in this file use the `Deck` class from
+    # the older, non-Protocol-Engine versions of the Python Protocol API (apiLevel<=2.13),
+    # and those versions do not support OT-3s.
+    #
+    # TODO(mm, 2023-05-18) We should either:
+    #
+    # * Decide that the functions tested here are only for PAPIv<=2.13.
+    #   Then, we should move them to `opentrons.protocol_api.core.legacy` to indicate that.
+    #
+    # * Or, decide that the functions tested here are for all versions of PAPI.
+    #   Then, we should rewrite these tests to not depend on the OT-2-only `Deck` class.
+    params=[STANDARD_OT2_DECK, SHORT_TRASH_DECK]
+)
+def deck(request) -> Deck:
+    return Deck(deck_type=request.param)
 
 
 def check_arc_basic(arc, from_loc, to_loc):
@@ -312,10 +330,6 @@ def test_gen2_module_transforms(deck):
     assert mmod2.labware_offset == Point(1.425, -0.125, 82.25)
 
 
-# todo(mm, 2023-05-11): This test is limited to just the OT-2 deck definition
-# because it depends on the details of the OT-2 trash height relative to troughs.
-# See if it can be rewritten to avoid that.
-@pytest.mark.parametrize("deck_definition_name", [STANDARD_OT2_DECK])
 def test_instr_max_height(deck):
     fixed_trash = deck.get_fixed_trash()
     trough = labware.load(trough_name, deck.position_for(1))
