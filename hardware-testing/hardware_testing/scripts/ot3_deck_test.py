@@ -57,7 +57,7 @@ async def jogste(api, position, cp,mount):
         Click  >> Enter << to save position
         Click  >> q << to quit the test script
         #########################################            
-        Set operating parameters 
+        Set operating parameters(设置移动的步进) 
                     """
     print(information_str)
     while True:
@@ -104,7 +104,7 @@ async def jogste(api, position, cp,mount):
             round(position[OT3Axis.by_mount(mount)], 2),
             " Motor Step: ",
             step_size[step_length_index],
-            end="",
+            end="          ",
         )
         print("\r", end="")
 
@@ -210,7 +210,7 @@ async def jog(api, position, cp,mount):
             round(position[OT3Axis.by_mount(mount)], 2),
             " Motor Step: ",
             step_size[step_length_index],
-            end="",
+            end="          ",
         )
         print("\r", end="")
 
@@ -218,6 +218,7 @@ async def calibrate_tip_racks(api, slot_loc):
     print("Calibrate tip rack positions\n")
     calibrated_slot_loc = {}
     calibrated_step = {}
+    ht = 0
     for key in slot_loc.keys():
         print(f"Testing: {key}\n")
 
@@ -227,9 +228,11 @@ async def calibrate_tip_racks(api, slot_loc):
         elif key == "OT3Mount.RIGHT":
             mount = types.OT3Mount.RIGHT
             AXIS = OT3Axis.Z_R
+            ht = 87
+
         print(mount)
-        await api.move_to(mount, Point(x=slot_loc[key][0], y=slot_loc[key][1], z=420.0))
-        await api.move_to(mount, Point(x=slot_loc[key][0], y=slot_loc[key][1], z=slot_loc[key][2]))
+        await api.move_to(mount, Point(x=slot_loc[key][0], y=slot_loc[key][1] + ht, z=508.15))
+        await api.move_to(mount, Point(x=slot_loc[key][0], y=slot_loc[key][1] + ht, z=slot_loc[key][2]))
         cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE)
         tip_rack_position = await jog(api, cur_pos, CriticalPoint.NOZZLE,mount)
         cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE)
@@ -307,30 +310,24 @@ async def _main(is_simulating: bool) -> None:
     #     print("input err")
 
     slot_loc = {
-        "A1": (13.42, 394.92, 400.15),
-        "A2": (177.32, 394.92, 400.15),
-        "A3": (341.03, 394.92, 400.15),
         "B1": (13.42, 288.42, 400.15),
         "B2": (177.32, 288.92, 400.15),
         "B3": (341.03, 288.92, 400.15),
         "C1": (13.42, 181.92, 400.15),
         "C2": (217.32, 91.92, 400.15),
         "C3": (341.03, 181.92, 400.15),
-        "D1": (13.42, 75.5, 400.15),
-        "D2": (177.32, 75.5, 400.15),
-        "D3": (341.03, 75.5, 400.15),
     }
 
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
     #await api.home_plunger(mount)
 
-    test_tag = "MD"
-    test_robot = "OT3"
-    if args.test_tag:
-        test_tag = input("Enter test tag:\n\t>> ")
-    if args.test_robot:
-        test_robot = input("Enter robot ID:\n\t>> ")
+    # test_tag = "MD"
+    # test_robot = "OT3"
+    
+    test_tag = input("Enter test tag(请输入测试的设备名称):\n\t>> ")
+    
+    test_robot = input("Enter robot ID(请输入OT3设备名称):\n\t>> ")
 
     # whereval = "OT3Mount.LEFT"
     # if(mount == OT3Mount.LEFT):
@@ -352,7 +349,7 @@ async def _main(is_simulating: bool) -> None:
     aa =True
     try:
         while aa:
-            slot = input("Enter slot number:\n\t>> ")
+            slot = input("Enter slot number(请输入要移到的slot位置编号):\n\t>> ")
             if slot in slot_loc.keys():
                 aa = False
     except:
@@ -381,7 +378,11 @@ async def _main(is_simulating: bool) -> None:
     header_str = data.convert_list_to_csv_line(txtval)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
-    txtval = ["device:",test_robot]
+    txtval = ["robot number:",test_robot]
+    header_str = data.convert_list_to_csv_line(txtval)
+    data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
+
+    txtval = ["test device:",test_tag]
     header_str = data.convert_list_to_csv_line(txtval)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
@@ -416,8 +417,12 @@ async def _main(is_simulating: bool) -> None:
             if str(keyv) == "OT3Mount.LEFT":
                 mount = types.OT3Mount.LEFT
                 AXIS = OT3Axis.Z_L
-                await api.move_to(mount, Point(calibrated_slot_loc[keyv][0],
-                                calibrated_slot_loc[keyv][1]-4, calibrated_slot_loc[keyv][2]))
+
+                await api.move_to(mount, Point(x=calibrated_slot_loc[keyv][0],
+                                y=calibrated_slot_loc[keyv][1]-4, z=508.15))
+
+                await api.move_to(mount, Point(x=calibrated_slot_loc[keyv][0],
+                                y=calibrated_slot_loc[keyv][1]-4, z=calibrated_slot_loc[keyv][2]))
                 await api.move_rel(
                                 mount, Point(y=4)
                             )
@@ -428,6 +433,10 @@ async def _main(is_simulating: bool) -> None:
             elif str(keyv) == "OT3Mount.RIGHT":
                 mount = types.OT3Mount.RIGHT
                 AXIS = OT3Axis.Z_R
+                
+                await api.move_to(mount, Point(calibrated_slot_loc[keyv][0],
+                                calibrated_slot_loc[keyv][1], calibrated_slot_loc[keyv][2]+5))
+                                
                 await api.move_to(mount, Point(calibrated_slot_loc[keyv][0],
                                 calibrated_slot_loc[keyv][1], calibrated_slot_loc[keyv][2]+5))
                 await api.move_rel(
@@ -442,7 +451,7 @@ async def _main(is_simulating: bool) -> None:
             #header_str = data.convert_list_to_csv_line(txtval)
             #data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
-            input("Please set the micrometer to zero,Press enter to start the test")
+            input("Please set the micrometer to zero,Press enter to start the test(请把千分尺置零)")
 
             for i in range(cycle):
                 Toollength = zijulis[keyv] - steplist[0]
@@ -459,7 +468,7 @@ async def _main(is_simulating: bool) -> None:
                             )
                     readval = _reading(hardewar)
                     cur_pos = await api.current_position_ot3(mount, critical_point=CriticalPoint.NOZZLE)
-                    posi = "{0},{1},{2}".format(round(cur_pos[OT3Axis.X], 2),round(cur_pos[OT3Axis.Y], 2),round(cur_pos[OT3Axis.by_mount(mount)], 2))
+                    posi = "{0}-{1}-{2}".format(round(cur_pos[OT3Axis.X], 2),round(cur_pos[OT3Axis.Y], 2),round(cur_pos[OT3Axis.by_mount(mount)], 2))
                     print("testig=:::::{}".format(readval))
                     txtval = [posi,readval]
                     datalist.append(txtval)
@@ -494,14 +503,14 @@ if __name__ == "__main__":
     }
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument(
-        "--mount", type=str, choices=list(mount_options.keys()), default="left"
-    )
+    # parser.add_argument(
+    #     "--mount", type=str, choices=list(mount_options.keys()), default="left"
+    # )
     # parser.add_argument("--pick_up_num", type=int, default=20)
     # parser.add_argument("--tip_rack_num", type=int, default=12)
     #parser.add_argument("--load_cal", action="store_true")
-    parser.add_argument("--test_tag", action="store_true")
-    parser.add_argument("--test_robot", action="store_true")
+    # parser.add_argument("--test_tag", action="store_true")
+    # parser.add_argument("--test_robot", action="store_true")
     #parser.add_argument("--restart_flag", action="store_true")
     # parser.add_argument("--start_slot_row_col_totalTips_totalFailure", type=str, default="1:1:1:1:0")
     # parser.add_argument("--check_tip", action="store_true")
