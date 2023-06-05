@@ -15,6 +15,7 @@ from hardware_testing.opentrons_api.types import OT3Mount, Point
 from .definition import LiquidClassSettings
 from .defaults import get_liquid_class
 
+backlash_distance_as_volume = 4.7712
 
 @dataclass
 class LiquidSurfaceHeights:
@@ -209,6 +210,7 @@ def _pipette_with_liquid_settings(
         #       method to accept a microliter amount as an optional argument.
         # Advantage: guarantee all aspirations begin at same position, helping low-volume accuracy.
         # Disadvantage: limit our max leading-air-gap volume, potentially leaving droplets behind.
+        pipette.aspirate(backlash_distance_as_volume)
 
     def _aspirate_on_submerge() -> None:
         # mix 5x times
@@ -234,8 +236,7 @@ def _pipette_with_liquid_settings(
 
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
-        # pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
-        # FIXME: don't leave this commented out!!!
+        pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
         pass
 
     def _dispense_on_approach() -> None:

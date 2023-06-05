@@ -33,7 +33,7 @@ _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
 TARGET_END_PHOTOPLATE_VOLUME = 200
 
-_DYE_MAP: Dict[str,Dict[str,float]] = {
+_DYE_MAP: Dict[str, Dict[str, float]] = {
     "HV": {"min": 200.1, "max": 350},
     "A": {"min": 50, "max": 200},
     "B": {"min": 10, "max": 49.99},
@@ -385,7 +385,7 @@ def _drop_tip(
 def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     """Run."""
     run_id, start_time = create_run_id_and_start_time()
-    dye_types_req : Dict[str,float] = {dye: 0 for dye in _DYE_MAP.keys()}
+    dye_types_req: Dict[str, float] = {dye: 0 for dye in _DYE_MAP.keys()}
     test_volumes = _get_volumes(ctx, cfg)
     total_photoplates = 0
     for vol in test_volumes:

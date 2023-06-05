@@ -103,7 +103,7 @@ _dispense_defaults = {
                 deceleration=20000,  # this is a fake number
             ),
             200: DispenseSettings(  # T200
-                flow_rate=160,
+                flow_rate=80,
                 delay=0.5,
                 submerge=_default_submerge_mm,
                 retract=_default_retract_mm,
@@ -111,7 +111,7 @@ _dispense_defaults = {
                 deceleration=20000,  # this is a fake number
             ),
             1000: DispenseSettings(  # T1000
-                flow_rate=160,
+                flow_rate=80,
                 delay=0.5,
                 submerge=_default_submerge_mm,
                 retract=_default_retract_mm,
@@ -401,7 +401,7 @@ _aspirate_defaults = {
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
                         leading_air_gap=5,
-                        trailing_air_gap=4.2,
+                        trailing_air_gap=0.1,
                     ),
                 ),
                 10: AspirateSettings(  # 10uL
@@ -464,7 +464,7 @@ _aspirate_defaults = {
                     submerge=_default_submerge_mm,
                     retract=_default_retract_mm,
                     air_gap=AirGapSettings(
-                        leading_air_gap=16,
+                        leading_air_gap=12,
                         trailing_air_gap=10,
                     ),
                 ),
