@@ -94,7 +94,7 @@ test-gravimetric-multi:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1
 
 .PHONY: test-gravimetric
-test-gravimetric: patch-for-gravimetric test-gravimetric-single test-gravimetric-multi
+test-gravimetric: apply-patches-gravimetric test-gravimetric-single test-gravimetric-multi
 
 .PHONY: test-production-qc
 test-production-qc:
@@ -230,7 +230,7 @@ sync-ot3: sync-sw-ot3 sync-fw-ot3
 
 .PHONY: push-ot3-gravimetric
 push-ot3-gravimetric:
-	-$(MAKE) patch-for-gravimetric
+	-$(MAKE) apply-patches-gravimetric
 	$(MAKE) sync-sw-ot3
 
 .PHONY: apply-patches-gravimetric
