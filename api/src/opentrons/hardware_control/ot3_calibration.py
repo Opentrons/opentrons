@@ -661,7 +661,7 @@ async def _determine_transform_matrix(
     -------
     A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
     """
-    slot_a, slot_b, slot_c = 12, 3, 10
+    slot_a, slot_b, slot_c = 1, 10, 3
     point_a, nominal_point_a = await find_slot_center_binary_from_nominal_center(
         hcapi, mount, slot_a
     )

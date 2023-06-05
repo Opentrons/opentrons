@@ -22,7 +22,7 @@ import {
   RecentRunProtocolCarousel,
 } from '../../../organisms/OnDeviceDisplay/RobotDashboard'
 import { getOnDeviceDisplaySettings } from '../../../redux/config'
-import { sortProtocols } from '../ProtocolDashboard/utils'
+import { sortProtocols } from '../../ProtocolDashboard/utils'
 import { WelcomedModal } from './WelcomeModal'
 
 export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8 // This might be changed

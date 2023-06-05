@@ -12,10 +12,15 @@ from opentrons.protocols.models import LabwareDefinition
 from robot_server.errors import ApiError
 from robot_server.service.json_api import RequestModel, SimpleBody
 from robot_server.runs.run_models import Run, LabwareDefinitionSummary
+from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.engine_store import EngineStore
 from robot_server.runs.router.labware_router import (
     add_labware_offset,
     add_labware_definition,
+    get_run_loaded_labware_definitions,
+)
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition as SD_LabwareDefinition,
 )
 
 
@@ -144,3 +149,27 @@ async def test_add_labware_definition_not_current(
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "RunStopped"
+
+
+async def test_get_run_labware_definition(
+    mock_run_data_manager: RunDataManager, decoy: Decoy
+) -> None:
+    """It should wrap the run's labware defintion in a response."""
+    decoy.when(
+        mock_run_data_manager.get_run_loaded_labware_definitions(run_id="run-id")
+    ).then_return(
+        [
+            SD_LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
+            SD_LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
+        ]
+    )
+
+    result = await get_run_loaded_labware_definitions(
+        runId="run-id", run_data_manager=mock_run_data_manager
+    )
+
+    assert result.content.data.__root__ == [
+        SD_LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
+        SD_LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
+    ]
+    assert result.status_code == 200

@@ -38,7 +38,7 @@
   "quirks": [],
   "slotTransforms": {
     "ot3_standard": {
-      "7": {
+      "B1": {
         "labwareOffset": [
           [1, 0, 0, -20.005],
           [0, 1, 0, -0.1],

@@ -10,7 +10,7 @@ import { useIsOT3 } from '../../hooks'
 import {
   DisableHoming,
   DisplayRobotName,
-  FactoryReset,
+  DeviceReset,
   LegacySettings,
   OpenJupyterControl,
   RobotInformation,
@@ -35,7 +35,7 @@ jest.mock('../../../../redux/shell/update', () => ({
 jest.mock('../../hooks/useIsOT3')
 jest.mock('../AdvancedTab/DisplayRobotName')
 jest.mock('../AdvancedTab/DisableHoming')
-jest.mock('../AdvancedTab/FactoryReset')
+jest.mock('../AdvancedTab/DeviceReset')
 jest.mock('../AdvancedTab/LegacySettings')
 jest.mock('../AdvancedTab/OpenJupyterControl')
 jest.mock('../AdvancedTab/RobotInformation')
@@ -57,9 +57,7 @@ const mockAboutRobotName = DisplayRobotName as jest.MockedFunction<
 const mockDisableHoming = DisableHoming as jest.MockedFunction<
   typeof DisableHoming
 >
-const mockFactoryReset = FactoryReset as jest.MockedFunction<
-  typeof FactoryReset
->
+const mockDeviceReset = DeviceReset as jest.MockedFunction<typeof DeviceReset>
 const mockLegacySettings = LegacySettings as jest.MockedFunction<
   typeof LegacySettings
 >
@@ -115,7 +113,7 @@ describe('RobotSettings Advanced tab', () => {
     } as ShellUpdateState)
     mockAboutRobotName.mockReturnValue(<div>Mock AboutRobotName Section</div>)
     mockDisableHoming.mockReturnValue(<div>Mock DisableHoming Section</div>)
-    mockFactoryReset.mockReturnValue(<div>Mock FactoryReset Section</div>)
+    mockDeviceReset.mockReturnValue(<div>Mock DeviceReset Section</div>)
     mockLegacySettings.mockReturnValue(<div>Mock LegacySettings Section</div>)
     mockOpenJupyterControl.mockReturnValue(
       <div>Mock OpenJupyterControl Section</div>
@@ -156,9 +154,9 @@ describe('RobotSettings Advanced tab', () => {
     getByText('Mock DisableHoming Section')
   })
 
-  it('should render FactoryReset section', () => {
+  it('should render DeviceReset section', () => {
     const [{ getByText }] = render()
-    getByText('Mock FactoryReset Section')
+    getByText('Mock DeviceReset Section')
   })
 
   it('should render LegacySettings section for OT-2', () => {

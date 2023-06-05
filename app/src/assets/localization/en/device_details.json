@@ -93,7 +93,6 @@
   "reset_all": "Reset all",
   "right": "right",
   "robot_control_not_available": "Some robot controls are not available when run is in progress",
-  "robot_is_busy": "Robot is busy",
   "run_a_protocol": "Run a protocol",
   "run_again": "Run again",
   "run_duration": "Run duration",
