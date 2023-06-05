@@ -9,7 +9,7 @@ try:
 except ImportError as e:
     print(e)
     # FIXME: delete this once there is no risk of machines running <=0.7.0
-    from opentrons.config.defaults_ot3 import (
+    from opentrons.config.defaults_ot3 import (  # type: ignore[attr-defined, no-redef]
         DEFAULT_DECK_TRANSFORM as DEFAULT_TRANSFORM,
     )
 from opentrons.hardware_control.ot3api import OT3API
