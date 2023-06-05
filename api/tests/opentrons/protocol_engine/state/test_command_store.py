@@ -466,6 +466,7 @@ def test_command_failure_clears_queues() -> None:
             errorType="ProtocolEngineError",
             detail="oh no",
             createdAt=datetime(year=2023, month=3, day=3),
+            errorCode=errors.ProtocolEngineError.ERROR_CODE,
         ),
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
@@ -566,6 +567,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
             errorType="ProtocolEngineError",
             detail="oh no",
             createdAt=datetime(year=2023, month=3, day=3),
+            errorCode=errors.ProtocolEngineError.ERROR_CODE,
         ),
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
@@ -819,6 +821,8 @@ def test_command_store_saves_unknown_finish_error() -> None:
                 createdAt=datetime(year=2021, month=1, day=1),
                 errorType="RuntimeError",
                 detail="oh no",
+                # Unknown errors use the default error code
+                errorCode=errors.ProtocolEngineError.ERROR_CODE,
             )
         },
         run_started_at=None,
@@ -883,6 +887,7 @@ def test_command_store_handles_command_failed() -> None:
         errorType="ProtocolEngineError",
         createdAt=datetime(year=2022, month=2, day=2),
         detail="oh no",
+        errorCode=errors.ProtocolEngineError.ERROR_CODE,
     )
 
     expected_failed_command = create_failed_command(
