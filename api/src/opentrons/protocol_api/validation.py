@@ -117,11 +117,11 @@ def ensure_deck_slot(
         raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
 
     is_ot2_style = parsed_slot.to_ot2_equivalent() == parsed_slot
-    if not is_ot2_style and api_version < _COORDINATE_STYLE_DECK_LABELS_ADDED_IN:
+    if not is_ot2_style and api_version < _COORDINATE_DECK_LABEL_VERSION_GATE:
         alternative = parsed_slot.to_ot2_equivalent().id
         raise APIVersionError(
             f'Specifying a deck slot like "{deck_slot}" requires apiLevel'
-            f" {_COORDINATE_STYLE_DECK_LABELS_ADDED_IN}."
+            f" {_COORDINATE_DECK_LABEL_VERSION_GATE}."
             f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
         )
 
