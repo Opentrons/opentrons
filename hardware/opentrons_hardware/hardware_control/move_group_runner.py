@@ -395,7 +395,7 @@ class MoveScheduler:
         log.error(f"Error during move group: {message}")
         if severity == ErrorSeverity.unrecoverable:
             self._should_stop = True
-        self._event.set()
+            self._event.set()
 
     def _handle_move_completed(
         self, message: _AcceptableMoves, arbitration_id: ArbitrationId
