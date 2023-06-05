@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 _ATTACH_POINT = Point(x=0, y=100)
 # These offsets are by eye measuring
 _INSTRUMENT_ATTACH_Z_POINT = 400.0
-_PLATE_ATTACH_Z_LEFT_POINT = 290
+_PLATE_ATTACH_Z_LEFT_POINT = 295
 # Move the right mount a bit higher than the left so the user won't forget to unscrew
 _PLATE_ATTACH_Z_RIGHT_POINT = 320
 

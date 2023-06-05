@@ -42,7 +42,7 @@ def subject(
         ),
         (
             MaintenancePosition.AttachPlate,
-            {OT3Axis.Z_L: 290, OT3Axis.Z_R: 320},
+            {OT3Axis.Z_L: 295, OT3Axis.Z_R: 320},
         ),
     ],
 )
