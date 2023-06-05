@@ -59,7 +59,20 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
 
-_INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_1
+_OT3_INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_D1
+
+_RIGHT_SIDE_SLOTS = {
+    # OT-2:
+    DeckSlotName.FIXED_TRASH,
+    DeckSlotName.SLOT_9,
+    DeckSlotName.SLOT_6,
+    DeckSlotName.SLOT_3,
+    # OT-3:
+    DeckSlotName.SLOT_A3,
+    DeckSlotName.SLOT_B3,
+    DeckSlotName.SLOT_C3,
+    DeckSlotName.SLOT_D3,
+}
 
 
 class LabwareLoadParams(NamedTuple):
@@ -269,11 +282,11 @@ class LabwareView(HasState[LabwareState]):
         deck_def = self.get_deck_definition()
 
         for slot_def in deck_def["locations"]["orderedSlots"]:
-            if slot_def["id"] == str(slot):
+            if slot_def["id"] == slot.id:
                 return slot_def
 
         raise errors.SlotDoesNotExistError(
-            f"Slot ID {slot} does not exist in deck {deck_def['otId']}"
+            f"Slot ID {slot.id} does not exist in deck {deck_def['otId']}"
         )
 
     def get_slot_position(self, slot: DeckSlotName) -> Point:
@@ -408,12 +421,7 @@ class LabwareView(HasState[LabwareState]):
 
         left_path_criteria = mount is MountType.RIGHT and well_name in left_column
         right_path_criteria = mount is MountType.LEFT and well_name in right_column
-        labware_right_side = labware_slot in [
-            DeckSlotName.SLOT_3,
-            DeckSlotName.SLOT_6,
-            DeckSlotName.SLOT_9,
-            DeckSlotName.FIXED_TRASH,
-        ]
+        labware_right_side = labware_slot in _RIGHT_SIDE_SLOTS
 
         if left_path_criteria and (next_to_module or labware_right_side):
             return EdgePathType.LEFT
@@ -580,10 +588,12 @@ class LabwareView(HasState[LabwareState]):
                 that is currently in use for the protocol run.
         """
         for labware in self._state.labware_by_id.values():
-            if (
-                isinstance(labware.location, DeckSlotLocation)
-                and labware.location.slotName == DeckSlotName.FIXED_TRASH
-            ):
+            if isinstance(
+                labware.location, DeckSlotLocation
+            ) and labware.location.slotName in {
+                DeckSlotName.FIXED_TRASH,
+                DeckSlotName.SLOT_A3,
+            }:
                 return labware.id
 
         raise errors.LabwareNotLoadedError(
@@ -606,7 +616,7 @@ class LabwareView(HasState[LabwareState]):
 
     def get_calibration_coordinates(self, offset: Point) -> Point:
         """Get calibration critical point and target position."""
-        target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
+        target_center = self.get_slot_center_position(_OT3_INSTRUMENT_ATTACH_SLOT)
         # TODO (tz, 11-30-22): These coordinates wont work for OT-2. We will need to apply offsets after
         # https://opentrons.atlassian.net/browse/RCORE-382
 

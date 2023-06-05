@@ -34,6 +34,7 @@ export function NoUpdateFound(): JSX.Element {
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadiusSize3}
+        padding={`${SPACING.spacing40} ${SPACING.spacing80}`}
       >
         <Icon
           name="ot-check"

@@ -333,27 +333,27 @@ def test_get_module_offset_for_ot2_standard(
     argvalues=[
         (
             lazy_fixture("tempdeck_v2_def"),
-            DeckSlotName.SLOT_1,
+            DeckSlotName.SLOT_1.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=9),
         ),
         (
             lazy_fixture("tempdeck_v2_def"),
-            DeckSlotName.SLOT_3,
+            DeckSlotName.SLOT_3.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=9),
         ),
         (
             lazy_fixture("thermocycler_v2_def"),
-            DeckSlotName.SLOT_7,
+            DeckSlotName.SLOT_7.to_ot3_equivalent(),
             LabwareOffsetVector(x=-20.005, y=67.96, z=0.26),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
-            DeckSlotName.SLOT_1,
+            DeckSlotName.SLOT_1.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=18.95),
         ),
         (
             lazy_fixture("heater_shaker_v1_def"),
-            DeckSlotName.SLOT_3,
+            DeckSlotName.SLOT_3.to_ot3_equivalent(),
             LabwareOffsetVector(x=0, y=0, z=18.95),
         ),
         (
@@ -715,6 +715,13 @@ def test_thermocycler_dodging_by_slots(
 
 
 @pytest.mark.parametrize(
+    argnames=["from_slot", "to_slot"],
+    argvalues=[
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_1),
+        (DeckSlotName.SLOT_B2, DeckSlotName.SLOT_D1),
+    ],
+)
+@pytest.mark.parametrize(
     argnames=["module_definition", "should_dodge"],
     argvalues=[
         (lazy_fixture("tempdeck_v1_def"), False),
@@ -727,6 +734,8 @@ def test_thermocycler_dodging_by_slots(
     ],
 )
 def test_thermocycler_dodging_by_modules(
+    from_slot: DeckSlotName,
+    to_slot: DeckSlotName,
     module_definition: ModuleDefinition,
     should_dodge: bool,
 ) -> None:
@@ -741,9 +750,7 @@ def test_thermocycler_dodging_by_modules(
         },
     )
     assert (
-        subject.should_dodge_thermocycler(
-            from_slot=DeckSlotName.SLOT_8, to_slot=DeckSlotName.SLOT_1
-        )
+        subject.should_dodge_thermocycler(from_slot=from_slot, to_slot=to_slot)
         is should_dodge
     )
 

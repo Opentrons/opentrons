@@ -24,8 +24,20 @@ const customLayout = {
 
 const customDisplay = {
   '{numbers}': '123',
+  '{ent}': 'enter',
+  '{escape}': 'esc ⎋',
+  '{tab}': 'tab ⇥',
   '{backspace}': 'del',
+  '{capslock}': 'caps lock ⇪',
+  '{shift}': 'shift',
+  '{controlleft}': 'ctrl ⌃',
+  '{controlright}': 'ctrl ⌃',
+  '{altleft}': 'alt ⌥',
+  '{altright}': 'alt ⌥',
+  '{metaleft}': 'cmd ⌘',
+  '{metaright}': 'cmd ⌘',
   '{abc}': 'ABC',
+  '{space}': 'space',
 }
 
 export function CustomKeyboard({
@@ -49,6 +61,7 @@ export function CustomKeyboard({
   return (
     <Keyboard
       keyboardRef={r => (keyboardRef.current = r)}
+      theme={'hg-theme-default oddTheme1'}
       onChange={onChange}
       onKeyPress={onKeyPress}
       layoutName={layoutName}

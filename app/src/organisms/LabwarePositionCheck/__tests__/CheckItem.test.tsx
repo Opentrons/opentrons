@@ -50,7 +50,7 @@ describe('CheckItem', () => {
       section: SECTIONS.CHECK_LABWARE,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
       labwareId: mockCompletedAnalysis.labware[0].id,
-      location: { slotName: '1' },
+      location: { slotName: 'D1' },
       protocolData: mockCompletedAnalysis,
       proceed: jest.fn(),
       chainRunCommands: mockChainRunCommands,
@@ -69,10 +69,10 @@ describe('CheckItem', () => {
   })
   it('renders correct copy when preparing space with tip rack', () => {
     const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Prepare tip rack in slot 1' })
+    getByRole('heading', { name: 'Prepare tip rack in slot D1' })
     getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(
-      matchTextWithSpans('Place a full Mock TipRack Definition into slot 1')
+      matchTextWithSpans('Place a full Mock TipRack Definition into slot D1')
     )
     getByRole('link', { name: 'Need help?' })
     getByRole('button', { name: 'Confirm placement' })
@@ -81,13 +81,15 @@ describe('CheckItem', () => {
     props = {
       ...props,
       labwareId: mockCompletedAnalysis.labware[1].id,
-      location: { slotName: '2' },
+      location: { slotName: 'D2' },
     }
 
     const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Prepare labware in slot 2' })
+    getByRole('heading', { name: 'Prepare labware in slot D2' })
     getByText('Clear all deck slots of labware, leaving modules in place')
-    getByText(matchTextWithSpans('Place a Mock Labware Definition into slot 2'))
+    getByText(
+      matchTextWithSpans('Place a Mock Labware Definition into slot D2')
+    )
     getByRole('link', { name: 'Need help?' })
     getByRole('button', { name: 'Confirm placement' })
   })
@@ -99,7 +101,7 @@ describe('CheckItem', () => {
             commandType: 'moveLabware',
             params: {
               labwareId: 'labwareId1',
-              newLocation: { slotName: '1' },
+              newLocation: { slotName: 'D1' },
               strategy: 'manualMoveWithoutPause',
             },
           },
@@ -137,7 +139,7 @@ describe('CheckItem', () => {
           commandType: 'moveLabware',
           params: {
             labwareId: 'labwareId1',
-            newLocation: { slotName: '1' },
+            newLocation: { slotName: 'D1' },
             strategy: 'manualMoveWithoutPause',
           },
         },
@@ -160,7 +162,7 @@ describe('CheckItem', () => {
     await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'initialPosition',
       labwareId: 'labwareId1',
-      location: { slotName: '1' },
+      location: { slotName: 'D1' },
       position: mockStartPosition,
     })
   })
@@ -169,7 +171,7 @@ describe('CheckItem', () => {
       ...props,
       workingOffsets: [
         {
-          location: { slotName: '1' },
+          location: { slotName: 'D1' },
           labwareId: 'labwareId1',
           initialPosition: { x: 1, y: 2, z: 3 },
           finalPosition: null,
@@ -197,7 +199,7 @@ describe('CheckItem', () => {
     await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'initialPosition',
       labwareId: 'labwareId1',
-      location: { slotName: '1' },
+      location: { slotName: 'D1' },
       position: null,
     })
   })
@@ -245,7 +247,7 @@ describe('CheckItem', () => {
       ...props,
       workingOffsets: [
         {
-          location: { slotName: '1' },
+          location: { slotName: 'D1' },
           labwareId: 'labwareId1',
           initialPosition: { x: 1, y: 2, z: 3 },
           finalPosition: null,
@@ -285,7 +287,7 @@ describe('CheckItem', () => {
     await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'finalPosition',
       labwareId: 'labwareId1',
-      location: { slotName: '1' },
+      location: { slotName: 'D1' },
       position: mockEndPosition,
     })
   })
@@ -293,7 +295,7 @@ describe('CheckItem', () => {
   it('executes heater shaker open latch command on component mount if step is on HS', async () => {
     props = {
       ...props,
-      location: { slotName: '1', moduleModel: HEATERSHAKER_MODULE_V1 },
+      location: { slotName: 'D1', moduleModel: HEATERSHAKER_MODULE_V1 },
       moduleId: 'firstHSId',
       protocolData: {
         ...props.protocolData,
@@ -301,13 +303,13 @@ describe('CheckItem', () => {
           {
             id: 'firstHSId',
             model: HEATERSHAKER_MODULE_V1,
-            location: { slotName: '3' },
+            location: { slotName: 'D3' },
             serialNumber: 'firstHSSerial',
           },
           {
             id: 'secondHSId',
             model: HEATERSHAKER_MODULE_V1,
-            location: { slotName: '10' },
+            location: { slotName: 'A1' },
             serialNumber: 'secondHSSerial',
           },
         ],
@@ -374,7 +376,7 @@ describe('CheckItem', () => {
   it('executes thermocycler open lid command on mount if checking labware on thermocycler', () => {
     props = {
       ...props,
-      location: { slotName: '7', moduleModel: THERMOCYCLER_MODULE_V2 },
+      location: { slotName: 'B1', moduleModel: THERMOCYCLER_MODULE_V2 },
       moduleId: 'tcId',
       protocolData: {
         ...props.protocolData,
@@ -382,7 +384,7 @@ describe('CheckItem', () => {
           {
             id: 'tcId',
             model: THERMOCYCLER_MODULE_V2,
-            location: { slotName: '7' },
+            location: { slotName: 'B1' },
             serialNumber: 'tcSerial',
           },
         ],

@@ -64,7 +64,6 @@ const CHIP_PROPS_BY_TYPE: Record<
   },
 }
 
-// ToDo (kj:02/09/2023) replace hard-coded values when the DS is out
 export function Chip({
   background,
   iconName,
@@ -83,7 +82,9 @@ export function Chip({
       backgroundColor={backgroundColor}
       borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
       flexDirection={DIRECTION_ROW}
-      padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+      padding={`${SPACING.spacing8} ${
+        background === false ? 0 : SPACING.spacing16
+      }`}
       gridGap={SPACING.spacing8}
       data-testid={`Chip_${type}`}
       {...styleProps}

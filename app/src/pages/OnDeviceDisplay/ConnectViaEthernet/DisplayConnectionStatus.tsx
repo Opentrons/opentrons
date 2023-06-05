@@ -42,7 +42,7 @@ export function DisplayConnectionStatus({
         padding={
           isConnected
             ? '4.4375rem 3.75rem'
-            : `${SPACING.spacing48} ${SPACING.spacing80}`
+            : `${SPACING.spacing40} ${SPACING.spacing80}`
         }
       >
         <Icon
@@ -69,8 +69,9 @@ export function DisplayConnectionStatus({
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignCenter}
               color={COLORS.darkBlack70}
+              margin="0 2rem"
             >
-              {t('no_network_found_description')}
+              {t('ethernet_connection_description')}
             </StyledText>
           )}
         </Flex>

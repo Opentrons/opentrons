@@ -82,6 +82,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
         """Get the number of slots on the deck."""
         return len(self._slot_definitions_by_name)
 
+    # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def right_of(self, slot: DeckLocation) -> Optional[DeckItem]:
         """Get the item directly to the right of the given slot, if any."""
         slot_name = _get_slot_name(slot)
@@ -89,6 +90,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
 
         return self[east_slot] if east_slot is not None else None
 
+    # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def left_of(self, slot: DeckLocation) -> Optional[DeckItem]:
         """Get the item directly to the left of the given slot, if any."""
         slot_name = _get_slot_name(slot)
@@ -96,6 +98,9 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
 
         return self[west_slot] if west_slot is not None else None
 
+    # todo(mm, 2023-05-08): This is undocumented in the public PAPI, but is used in some protocols
+    # written by Applications Engineering. Either officially document this, or decide it's internal
+    # and remove it from this class. Jira RSS-236.
     def position_for(self, slot: DeckLocation) -> Location:
         """Get the absolute location of a deck slot's front-left corner."""
         slot_definition = self.get_slot_definition(slot)
@@ -103,26 +108,33 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
 
         return Location(point=Point(x, y, z), labware=slot_definition["id"])
 
+    # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def get_slot_definition(self, slot: DeckLocation) -> SlotDefV3:
         """Get the geometric definition data of a slot."""
-        slot_name = _get_slot_name(slot)
-        return self._slot_definitions_by_name[slot_name.id]
+        slot_name = validation.ensure_deck_slot_string(
+            _get_slot_name(slot), self._protocol_core.robot_type
+        )
+        return self._slot_definitions_by_name[slot_name]
 
+    # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def get_slot_center(self, slot: DeckLocation) -> Point:
         """Get the absolute coordinates of a slot's center."""
         slot_name = _get_slot_name(slot)
         return self._protocol_core.get_slot_center(slot_name)
 
+    # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     @property
     def highest_z(self) -> float:
         """Get the height of the tallest known point on the deck."""
         return self._protocol_core.get_highest_z()
 
+    # todo(mm, 2023-05-08): This appears internal. Remove it from this public class. Jira RSS-236.
     @property
     def slots(self) -> List[SlotDefV3]:
         """Get a list of all slot definitions."""
         return list(self._slot_definitions_by_name.values())
 
+    # todo(mm, 2023-05-08): This appears internal. Remove it from this public class. Jira RSS-236.
     @property
     def calibration_positions(self) -> List[CalibrationPosition]:
         """Get a list of all calibration positions on the deck."""

@@ -15,7 +15,7 @@ import type { ModalHeaderBaseProps, ModalSize } from './types'
 
 interface ModalProps {
   /** clicking anywhere outside of the modal closes it  */
-  onOutsideClick: React.MouseEventHandler
+  onOutsideClick?: React.MouseEventHandler
   /** modal content */
   children: React.ReactNode
   /** for small, medium, or large modal sizes, medium by default */
@@ -49,7 +49,7 @@ export function Modal(props: ModalProps): JSX.Element {
     <BackgroundOverlay
       onClick={e => {
         e.stopPropagation()
-        onOutsideClick(e)
+        onOutsideClick?.(e)
       }}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
@@ -85,9 +85,9 @@ export function Modal(props: ModalProps): JSX.Element {
           paddingBottom={SPACING.spacing32}
           paddingTop={header != null ? '0rem' : SPACING.spacing32}
           borderRadius={
-            isError
+            header != null
               ? `0px 0px ${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3}`
-              : 0
+              : BORDERS.borderRadiusSize3
           }
         >
           {children}
