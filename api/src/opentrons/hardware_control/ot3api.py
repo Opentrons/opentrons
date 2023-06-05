@@ -1677,7 +1677,7 @@ class OT3API(
         instrument.working_volume = tip_volume
 
     async def drop_tip(
-        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
+        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = True
     ) -> None:
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
@@ -1714,8 +1714,8 @@ class OT3API(
                     speed=move.speed,
                     home_flagged_axes=False,
                 )
-        if move.home_after:
-            await self._home([OT3Axis.from_axis(ax) for ax in move.home_axes])
+            if move.home_after:
+                await self._home([OT3Axis.from_axis(ax) for ax in move.home_axes])
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
@@ -1726,6 +1726,10 @@ class OT3API(
                 for axis, current in spec.ending_current.items()
             }
         )
+        # home mount axis
+        if home_after:
+            await self._home([OT3Axis.by_mount(mount)])
+
         _remove()
 
     async def clean_up(self) -> None:
