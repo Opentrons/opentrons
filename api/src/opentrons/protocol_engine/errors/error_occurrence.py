@@ -1,6 +1,7 @@
 """Models for concrete occurrences of specific errors."""
 from datetime import datetime
 from pydantic import BaseModel, Field
+from .exceptions import ProtocolEngineError
 
 
 # TODO(mc, 2021-11-12): flesh this model out with structured error data
@@ -13,5 +14,6 @@ class ErrorOccurrence(BaseModel):
     createdAt: datetime = Field(..., description="When the error occurred.")
     detail: str = Field(..., description="A human-readable message about the error.")
     errorCode: int = Field(
-        ..., description="An enumerated error code for the error type."
+        default=ProtocolEngineError.ERROR_CODE,
+        description="An enumerated error code for the error type.",
     )
