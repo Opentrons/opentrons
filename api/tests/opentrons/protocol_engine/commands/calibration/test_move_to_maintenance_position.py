@@ -1,7 +1,9 @@
 """Test for Calibration Set Up Position Implementation."""
+from __future__ import annotations
+from typing import TYPE_CHECKING, Mapping
+
 import pytest
 from decoy import Decoy
-from typing import Mapping
 
 from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position import (
     MoveToMaintenancePositionParams,
@@ -13,7 +15,9 @@ from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position
 from opentrons.protocol_engine.state import StateView
 from opentrons.types import MountType
 from opentrons.hardware_control.types import OT3Axis
-from opentrons.hardware_control.ot3api import OT3API
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API
 
 
 @pytest.mark.ot3_only
