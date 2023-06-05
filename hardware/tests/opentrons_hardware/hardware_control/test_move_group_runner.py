@@ -83,6 +83,7 @@ def calc_acceleration(step: MoveGroupSingleAxisStep) -> int:
     """Calculate acceleration."""
     return int(
         step.acceleration_mm_sec_sq
+        * 1000
         / interrupts_per_sec
         / interrupts_per_sec
         * (2**31)
