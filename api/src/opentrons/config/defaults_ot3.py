@@ -174,16 +174,16 @@ DEFAULT_HOLD_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLo
 
 DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 1.5,
-        OT3AxisKind.Y: 1.5,
+        OT3AxisKind.X: 1.4,
+        OT3AxisKind.Y: 1.4,
         OT3AxisKind.Z: 1.4,
         OT3AxisKind.P: 2.2,
         OT3AxisKind.Z_G: 0.67,
         OT3AxisKind.Q: 1.5,
     },
     low_throughput={
-        OT3AxisKind.X: 1.5,
-        OT3AxisKind.Y: 1.5,
+        OT3AxisKind.X: 1.4,
+        OT3AxisKind.Y: 1.4,
         OT3AxisKind.Z: 1.4,
         # TODO: verify this value
         OT3AxisKind.P: 1.0,
