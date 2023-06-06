@@ -24,6 +24,8 @@ REV_OG_USB_PORTS = {"3": 1, "5": 2}
 REV_A_USB_HUB = 3
 FLEX_B2_USB_PORT_GROUP_LEFT = 4
 FLEX_B2_USB_PORT_GROUP_RIGHT = 3
+FLEX_B2_USB_PORT_GROUP_FRONT = 7
+FLEX_B2_USB_PORTS = {"4": 1, "3": 2, "2": 3, "1": 4}
 
 
 @dataclass(frozen=True)
@@ -83,7 +85,8 @@ class USBPort:
         the item at each period. It is parsed as follows:
         'bus.hub.port.hub_port'. The USB bus data is unused. The
         hub_port data is only populated if a USB hub is connected
-        to that port.
+        to that port. The Flex FRONT USB port is parsed as:
+        'bus.hub.hub_port'.
 
         :param port_nodes: A list of unique port id(s)
         :returns: Tuple of the hub, port number, hub_port and name
@@ -94,23 +97,37 @@ class USBPort:
             port = int(port_info[2])
             hub_port: Optional[int] = int(port_info[3])
             name = port_nodes[2]
-        elif (board_revision == BoardRevision.OG) and (len(port_nodes) > 1):
-            port_info = port_nodes[1].split(".")
-            hub = int(port_info[1])
-            port = int(port_info[1])
-            hub_port = int(port_info[2])
-            name = port_nodes[1]
         elif len(port_nodes) > 1:
-            port_info = port_nodes[1].split(".")
-            hub = int(port_info[1])
-            port = int(port_info[2])
-            hub_port = None
-            name = port_nodes[1]
+            if board_revision == BoardRevision.OG:
+                port_info = port_nodes[1].split(".")
+                hub = int(port_info[1])
+                port = int(port_info[1])
+                hub_port = int(port_info[2])
+                name = port_nodes[1]
+            else:
+                port_info = port_nodes[1].split(".")
+                hub = int(port_info[1])
+                name = port_nodes[1]
+                if (board_revision == BoardRevision.FLEX_B2) and (
+                    hub == FLEX_B2_USB_PORT_GROUP_FRONT
+                ):
+                    port = 1
+                    hub_port = int(port_info[2])
+                else:
+                    port = int(port_info[2])
+                    hub_port = None
         else:
-            port = int(port_nodes[0].split(".")[1])
-            hub = None
-            hub_port = None
-            name = port_nodes[0]
+            if board_revision == BoardRevision.FLEX_B2:
+                port_info = port_nodes[0].split(".")
+                hub = int(port_info[1])
+                port = 1
+                hub_port = None
+                name = port_nodes[0]
+            else:
+                port = int(port_nodes[0].split(".")[1])
+                hub = None
+                hub_port = None
+                name = port_nodes[0]
         return hub, port, hub_port, name
 
     @staticmethod
@@ -122,10 +139,14 @@ class USBPort:
         the USB port path will look like:
         `1-1.3/1-1.3.2/1-1.3.2.4/1-1.3.2.4`. This will become the
         following 3 port nodes: ['1-1.3', '1-1.3.2', '1-1.3.2.4'].
+        The Flex FRONT USB port with a hub connected will look like:
+        `1-1.7/1-1.7.4/1-1.7.4` and become ['1-1.7', '1-1.7.4'].
 
         For a Flex or OT-2_R without a USB hub connected to a port,
         the USB port path will look like: `1-1.3/1-1.3.4/1-1.3.4`.
         This will become the follwing 2 port nodes: ['1-1.3', '1-1.3.4'].
+        The Flex FRONT USB port without a hub connected will look like:
+        `1-1.7/1-1.7` and become ['1-1.7'].
 
         For a OT-2_OG with a USB hub connected to a port, the USB
         port path will look like: `1-1.3/1-1.3/1-1.3.3/1-1.3.3`. This will
@@ -160,8 +181,8 @@ class USBPort:
         data field is False and the hub_port data field is None.
 
         For the OT-2, there is only one bank of USB ports, so the
-        port_group is always MAIN. For the Flex, there are LEFT and
-        RIGHT USB port banks, which map to specific hub values.
+        port_group is always MAIN. For the Flex, there are LEFT, RIGHT,
+        and FRONT USB port banks, which map to specific hub values.
 
         For the Flex, the RIGHT port values are increased by 4 to match
         the physical hardware labeling (USB5 - USB8).
@@ -188,9 +209,13 @@ class USBPort:
         elif board_revision == BoardRevision.FLEX_B2:
             if hub == FLEX_B2_USB_PORT_GROUP_LEFT:
                 port_group = PortGroup.LEFT
+                port = FLEX_B2_USB_PORTS.get(str(port), port)
             elif hub == FLEX_B2_USB_PORT_GROUP_RIGHT:
                 port_group = PortGroup.RIGHT
+                port = FLEX_B2_USB_PORTS.get(str(port), port)
                 port = port + 4
+            elif hub == FLEX_B2_USB_PORT_GROUP_FRONT:
+                port_group = PortGroup.FRONT
             else:
                 port_group = PortGroup.UNKNOWN
             if hub_port:

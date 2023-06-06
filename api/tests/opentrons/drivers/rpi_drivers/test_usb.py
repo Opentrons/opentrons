@@ -50,6 +50,10 @@ fake_bus_flex = [
     "/sys/bus/usb/devices/usb1/1-1/1-1.4/1-1.4.2/1-1.4.2.3/1-1.4.2.3:1.0/tty/ttyACM2/dev",
     "/sys/bus/usb/devices/usb1/1-1/1-1.4/1-1.4.2/1-1.4.2.3/dev",
     "/sys/bus/usb/devices/usb1/1-1/1-1.4/dev",
+    "/sys/bus/usb/devices/usb1/1-1/1-1.7/dev",
+    "/sys/bus/usb/devices/usb1/1-1/1-1.7/1-1.7:1.0/tty/ttyACM4/dev",
+    "/sys/bus/usb/devices/usb1/1-1/1-1.7/1-1.7.4/dev",
+    "/sys/bus/usb/devices/usb1/1-1/1-1.7/1-1.7.4/1-1.7.4:1.0/tty/ttyACM5/dev",
 ]
 
 
@@ -112,7 +116,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
         expected_name = "1-1.3.4"
         assert updated_list[0].usb_port == USBPort(
             name=expected_name,
-            port_number=8,
+            port_number=5,
             port_group=PortGroup.RIGHT,
             device_path="1.0/tty/ttyACM1/dev",
             hub=False,
@@ -149,9 +153,44 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
         expected_name = "1-1.4.2.3"
         assert updated_list[0].usb_port == USBPort(
             name=expected_name,
-            port_number=2,
+            port_number=3,
             port_group=PortGroup.LEFT,
             device_path="1.0/tty/ttyACM2/dev",
             hub=True,
             hub_port=3,
+        )
+
+    if revision == BoardRevision.FLEX_B2:
+        usb_bus._read_symlink = MagicMock(return_value="ttyACM4")  # type: ignore[assignment]
+        mod_at_port_list = [
+            ModuleAtPort(
+                name="heater-shaker module", port="dev/ot_module_heater_shaker_module"
+            ),
+        ]
+        updated_list = usb_bus.match_virtual_ports(mod_at_port_list)
+        expected_name = "1-1.7"
+        assert updated_list[0].usb_port == USBPort(
+            name=expected_name,
+            port_number=1,
+            port_group=PortGroup.FRONT,
+            device_path="1.0/tty/ttyACM4/dev",
+            hub=False,
+            hub_port=None,
+        )
+
+        usb_bus._read_symlink = MagicMock(return_value="ttyACM5")  # type: ignore[assignment]
+        mod_at_port_list = [
+            ModuleAtPort(
+                name="thermocycler module", port="dev/ot_module_thermocycler_module"
+            ),
+        ]
+        updated_list = usb_bus.match_virtual_ports(mod_at_port_list)
+        expected_name = "1-1.7.4"
+        assert updated_list[0].usb_port == USBPort(
+            name=expected_name,
+            port_number=1,
+            port_group=PortGroup.FRONT,
+            device_path="1.0/tty/ttyACM5/dev",
+            hub=True,
+            hub_port=4,
         )
