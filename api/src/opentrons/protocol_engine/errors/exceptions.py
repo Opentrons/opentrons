@@ -1,11 +1,20 @@
 """Protocol engine exceptions."""
 
+from enum import IntEnum, unique
+
+
+@unique
+class ErrorCode(IntEnum):
+    """Enumerated error codes."""
+
+    UNKNOWN = 4000  # Catch-all code for any unclassified error
+
 
 class ProtocolEngineError(RuntimeError):
     """Base Protocol Engine error class."""
 
     # This default error code should be overridden in every child class.
-    ERROR_CODE = 4000
+    ERROR_CODE: int = ErrorCode.UNKNOWN
 
 
 class UnexpectedProtocolError(ProtocolEngineError):
@@ -16,8 +25,7 @@ class UnexpectedProtocolError(ProtocolEngineError):
     and wrapped.
     """
 
-    # Any "unclassified" error gets error code 4000
-    ERROR_CODE = 4000
+    ERROR_CODE: int = ErrorCode.UNKNOWN
 
     def __init__(self, original_error: Exception) -> None:
         """Initialize an UnexpectedProtocolError with an original error."""
