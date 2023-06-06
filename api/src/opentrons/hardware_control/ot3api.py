@@ -1027,7 +1027,7 @@ class OT3API(
                 if OT3Axis.Z_L:
                     carriage_effectors_offset = self._robot_calibration.left_mount_offset
                 elif OT3Axis.Z_R:
-                    carrige_effectors_offset = (
+                    carriage_effectors_offset = (
                         self._robot_calibration.right_mount_offset
                     )
                 else:
