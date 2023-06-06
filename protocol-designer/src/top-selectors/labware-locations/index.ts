@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect'
-import { THERMOCYCLER_MODULE_TYPE, getDeckDefFromRobotType } from '@opentrons/shared-data'
+import { THERMOCYCLER_MODULE_TYPE, getDeckDefFromRobotType, getModuleDisplayName } from '@opentrons/shared-data'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
@@ -10,9 +10,14 @@ import { getActiveItem } from '../../ui/steps'
 import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { Selector } from '../../types'
-import {  getModuleEntities } from '../../step-forms/selectors'
+import { getModuleEntities } from '../../step-forms/selectors'
 
-export const getUnocuppiedLabwareLocations: Selector<string[] | null> = createSelector(
+interface Option {
+  name: string
+  value: string
+}
+
+export const getUnocuppiedLabwareLocationOptions: Selector<Option[] | null> = createSelector(
   stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
   getActiveItem,
@@ -52,13 +57,17 @@ export const getUnocuppiedLabwareLocations: Selector<string[] | null> = createSe
         ? orderedStepIds.findIndex(id => id === stepId)
         : null
 
+
       if (timelineIdx == null) {
         console.error(`Expected non-null timelineIdx for step ${stepId}`)
         return null
       }
-
-      const prevFrame = timeline[timelineIdx - 1]
-      if (prevFrame) robotState = prevFrame.robotState
+      if (timelineIdx === 0) {
+        robotState = initialRobotState
+      } else {
+        const prevFrame = timeline[timelineIdx - 1]
+        if (prevFrame) robotState = prevFrame.robotState
+      }
     }
 
     if (robotState == null) return null
@@ -69,25 +78,27 @@ export const getUnocuppiedLabwareLocations: Selector<string[] | null> = createSe
     const deckDef = getDeckDefFromRobotType(robotType)
     const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
 
-    const {modules, labware} = robotState 
+    const { modules, labware } = robotState
     const slotIdsOccupiedByModules = Object.entries(modules).reduce<string[]>((acc, [modId, modOnDeck]) => {
       if (moduleEntities[modId]?.type === THERMOCYCLER_MODULE_TYPE) {
-        return robotType === 'OT-2 Standard' ? [...acc, '7', '8', '10', '11'] : [...acc, 'A1', 'B1'] 
+        return robotType === 'OT-2 Standard' ? [...acc, '7', '8', '10', '11'] : [...acc, 'A1', 'B1']
       } else {
         return [...acc, modOnDeck.slot]
       }
     }, [])
-    
-    const unoccupiedModuleIds = Object.entries(modules).reduce<string[]>((acc, [modId, modOnDeck]) => { 
+
+    const unoccupiedModuleOptions = Object.keys(modules).reduce<Option[]>((acc, modId) => {
       const moduleHasLabware = Object.entries(labware).some(([lwId, lwOnDeck]) => lwOnDeck.slot === modId)
-      return moduleHasLabware ? acc : [...acc, modId]
+      return moduleHasLabware ? acc : [
+        ...acc, 
+        {name: getModuleDisplayName(moduleEntities[modId].model), value: modId}
+      ]
     }, [])
 
-    const unoccupiedSlotIds = allSlotIds.filter(slotId => (
+    const unoccupiedSlotOptions = allSlotIds.filter(slotId => (
       !slotIdsOccupiedByModules.includes(slotId) && !Object.values(labware).map(lw => lw.slot).includes(slotId)
-    ))
+    )).map(slotId => ({name: slotId, value: slotId}))
 
-    console.log('GOT TO BOTTOM')
-    return [...unoccupiedModuleIds, ...unoccupiedSlotIds]
+    return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions]
   }
 )
