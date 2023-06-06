@@ -265,7 +265,7 @@ class MoveGroupRunner:
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
                 duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
-                velocity=self._convert_velocity(
+                velocity_mm=self._convert_velocity(
                     step.velocity_mm_sec, interrupts_per_sec
                 ),
             )
@@ -279,17 +279,18 @@ class MoveGroupRunner:
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
                 duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
-                acceleration=Int32Field(
+                acceleration_um=Int32Field(
                     int(
                         (
                             step.acceleration_mm_sec_sq
+                            * 1000.0
                             / interrupts_per_sec
                             / interrupts_per_sec
                         )
                         * (2**31)
                     )
                 ),
-                velocity=Int32Field(
+                velocity_mm=Int32Field(
                     int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
                 ),
             )

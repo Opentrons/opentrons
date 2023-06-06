@@ -5,7 +5,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
 import { renderWithProviders } from '@opentrons/components'
-import { useAllRunsQuery } from '@opentrons/react-api-client'
+import { useAllRunsQuery, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
 import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
@@ -25,8 +25,6 @@ jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../hooks')
 
-const mockProtocolName = 'mockProtocol'
-const mockProtocolId = 'mockProtocolId'
 const mockLastRun = '2023-04-12T21:30:49.124108+00:00'
 const RUN_ID = 'mockRunId'
 
@@ -79,6 +77,9 @@ const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.Mocked
 const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
   typeof useAllRunsQuery
 >
+const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
+  typeof useProtocolQuery
+>
 const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
   typeof useTrackProtocolRunEvent
 >
@@ -109,10 +110,7 @@ describe('RecentRunProtocolCard', () => {
 
   beforeEach(() => {
     props = {
-      protocolName: mockProtocolName,
-      protocolId: mockProtocolId,
-      lastRun: mockLastRun,
-      runId: RUN_ID,
+      runData: mockRunData,
     }
     mockTrackEvent = jest.fn()
     mockTrackProtocolRunEvent = jest.fn(
@@ -123,6 +121,9 @@ describe('RecentRunProtocolCard', () => {
     mockUseMissingProtocolHardware.mockReturnValue([])
     mockUseAllRunsQuery.mockReturnValue({
       data: { data: [mockRunData] },
+    } as any)
+    mockUseProtocolQuery.mockReturnValue({
+      data: { data: {} },
     } as any)
     when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
