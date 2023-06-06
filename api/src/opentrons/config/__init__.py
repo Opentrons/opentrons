@@ -59,9 +59,6 @@ class SystemArchitecture(Enum):
     YOCTO = auto()
 
 
-ROBOT_FIRMWARE_DIR: Optional[Path] = None
-#: The path to firmware files for modules
-
 ARCHITECTURE: SystemArchitecture = SystemArchitecture.HOST
 #: The system architecture running
 
@@ -79,7 +76,6 @@ if IS_ROBOT:
     if "OT_SYSTEM_VERSION" in os.environ:
         OT_SYSTEM_VERSION = os.environ["OT_SYSTEM_VERSION"]
         ARCHITECTURE = SystemArchitecture.YOCTO
-        ROBOT_FIRMWARE_DIR = Path("/lib/firmware/")
     else:
         try:
             with open("/etc/VERSION.json") as vj:
@@ -88,7 +84,6 @@ if IS_ROBOT:
             ARCHITECTURE = SystemArchitecture.BUILDROOT
         except Exception:
             log.exception("Could not find version file in /etc/VERSION.json")
-        ROBOT_FIRMWARE_DIR = Path("/usr/lib/firmware/")
     JUPYTER_NOTEBOOK_ROOT_DIR = Path("/var/lib/jupyter/notebooks/")
     JUPYTER_NOTEBOOK_LABWARE_DIR = JUPYTER_NOTEBOOK_ROOT_DIR / "labware"
 
@@ -284,6 +279,13 @@ CONFIG_ELEMENTS = (
         Path("robot") / "modules",
         ConfigElementType.DIR,
         "The dir where module calibration is stored",
+    ),
+    ConfigElement(
+        "firmware_binaries_dir",
+        "Firmware Binaries Directory",
+        Path("/usr/lib/firmware"),
+        ConfigElementType.DIR,
+        "The dir where the firmware binaries for subsystems and modules are stored.",
     ),
 )
 #: The available configuration file elements to modify. All of these can be
