@@ -435,7 +435,7 @@ async def _main(is_simulating: bool) -> None:
                 AXIS = OT3Axis.Z_R
                 
                 await api.move_to(mount, Point(calibrated_slot_loc[keyv][0],
-                                calibrated_slot_loc[keyv][1], calibrated_slot_loc[keyv][2]+5))
+                                calibrated_slot_loc[keyv][1], 508.15))
                                 
                 await api.move_to(mount, Point(calibrated_slot_loc[keyv][0],
                                 calibrated_slot_loc[keyv][1], calibrated_slot_loc[keyv][2]+5))
