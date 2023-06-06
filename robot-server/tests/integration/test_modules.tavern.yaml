@@ -104,6 +104,7 @@ stages:
             usbPort:
               port: !anyint
               hub: !anybool
+              port_group: !anyint
               path: !anystr
             data:
               status: !anystr
@@ -124,6 +125,7 @@ stages:
             usbPort:
               port: !anyint
               hub: !anybool
+              port_group: !anyint
               path: !anystr
             data:
               status: !anystr
@@ -142,6 +144,7 @@ stages:
             usbPort:
               port: !anyint
               hub: !anybool
+              port_group: !anyint
               path: !anystr
             data:
               status: !anystr
@@ -157,6 +160,7 @@ stages:
             usbPort:
               port: !anyint
               hub: !anybool
+              port_group: !anyint
               path: !anystr
             data:
               status: !anystr

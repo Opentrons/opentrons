@@ -4,7 +4,7 @@ from decoy import Decoy
 from typing_extensions import Final
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
+from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort, PortGroup
 from opentrons.hardware_control.modules import MagDeck, ModuleType, MagneticStatus
 
 from opentrons.protocol_engine import ModuleModel
@@ -72,7 +72,13 @@ async def test_get_modules_maps_data_and_id(
         hasAvailableUpdate=True,
         moduleType=ModuleType.MAGNETIC,
         moduleModel=ModuleModel.MAGNETIC_MODULE_V1,
-        usbPort=UsbPort(port=42, hub=None, path="/dev/null"),
+        usbPort=UsbPort(
+            port=42,
+            hub=False,
+            port_group=PortGroup.UNKNOWN,
+            hub_port=None,
+            path="/dev/null",
+        ),
         data=MagneticModuleData(
             status=MagneticStatus.ENGAGED,
             engaged=True,
@@ -96,7 +102,13 @@ async def test_get_modules_maps_data_and_id(
         }
     )
     decoy.when(magnetic_module.usb_port).then_return(
-        HardwareUSBPort(name="abc", port_number=101)
+        HardwareUSBPort(
+            name="abc",
+            port_number=101,
+            hub=False,
+            port_group=PortGroup.UNKNOWN,
+            hub_port=None,
+        )
     )
 
     module_identity = ModuleIdentity(
@@ -116,7 +128,13 @@ async def test_get_modules_maps_data_and_id(
             module_identity=module_identity,
             has_available_update=True,
             live_data={"status": "engaged", "data": {"engaged": True, "height": 42}},
-            usb_port=HardwareUSBPort(name="abc", port_number=101),
+            usb_port=HardwareUSBPort(
+                name="abc",
+                port_number=101,
+                hub=False,
+                port_group=PortGroup.UNKNOWN,
+                hub_port=None,
+            ),
         )
     ).then_return(expected_response)
 
