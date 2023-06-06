@@ -502,7 +502,7 @@ class OT3Controller:
             motor_ok_latch = (
                 (not ff.stall_detection_enabled())
                 and ((axis in self._motor_status) and self._motor_status[axis].motor_ok)
-                and self._motor_status[axis].encoder_okq
+                and self._motor_status[axis].encoder_ok
             )
             self._motor_status.update(
                 {
