@@ -249,7 +249,7 @@ class Modules(BaseModel):
                                 "model": "heater-shaker_v10",
                                 "moduleModel": "heaterShakerModuleV1",
                                 "port": "/dev/ot_module_heatershaker1",
-                                "usbPort": {"hub": None, "port": None},
+                                "usbPort": {"hub": None, "port": None, "port_group": None, "hub_port": None},
                                 "revision": "heater-shaker_v10",
                                 "serial": "HSnnnnnn",
                                 "status": "running",

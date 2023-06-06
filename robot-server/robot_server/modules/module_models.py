@@ -15,6 +15,7 @@ from opentrons.drivers.types import (
     ThermocyclerLidStatus,
     HeaterShakerLabwareLatchStatus,
 )
+from opentrons.drivers.rpi_drivers.types import PortGroup
 from opentrons.protocol_engine import ModuleModel
 
 ModuleT = TypeVar("ModuleT", bound=ModuleType)
@@ -28,16 +29,30 @@ class UsbPort(BaseModel):
     port: int = Field(
         ...,
         description=(
-            "The USB port the module is connected to."
-            " If connected via a hub, ``port`` represents a port on the hub."
+            "The USB port the module is plugged into."
+            " If connected via a hub, ``port`` represents the port the hub is plugged into."
         ),
     )
 
-    hub: Optional[int] = Field(
+    port_group: PortGroup = Field(
+        ...,
+        description=(
+            "The physical USB port bank the module is pplugged into."
+        ),
+    )
+
+    hub: bool = Field(
+        ...,
+        description=(
+            "If the module is connected via a USB hub."
+        ),
+    )
+
+    hub_port: Optional[int] = Field(
         ...,
         description=(
             "If the module is connected via a USB hub,"
-            " the USB port the hub is plugged into."
+            " the port on the hub the module is plugged into."
         ),
     )
 
