@@ -939,12 +939,23 @@ class OT3Controller:
         self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
     ) -> AsyncIterator[None]:
         tool = sensor_node_for_mount(OT3Mount(mount.value))
-        # TODO we should switch the sensor type based on the channel
+        # FIXME we should switch the sensor type based on the channel
         # used when partial tip pick up is implemented.
-        # TODO we should also monitor pressure in all available channels
+        # FIXME we should also monitor pressure in all available channels
         provided_context_manager = check_overpressure(self._messenger, tool, sensor_id)
-        async with provided_context_manager():
+        async with provided_context_manager() as handle_overpressure:
             yield
+
+        def _pop_queue() -> Optional[ErrorCode]:
+            try:
+                return handle_overpressure.get_nowait()
+            except asyncio.QueueEmpty:
+                return None
+
+        if _pop_queue():
+            raise RuntimeError(
+                f"The pressure sensor on the {mount} mount has exceeded operational limits."
+            )
 
     async def liquid_probe(
         self,

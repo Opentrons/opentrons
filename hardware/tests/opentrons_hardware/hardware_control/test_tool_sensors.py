@@ -35,6 +35,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
     liquid_probe,
+    check_overpressure,
     InstrumentProbeTarget,
     PipetteProbeTarget,
 )
@@ -366,3 +367,29 @@ async def test_capacitive_sweep(
         mock_messenger, target_node, motor_node, distance, speed
     )
     assert result == list(range(10))
+
+
+@pytest.mark.parametrize(
+    "target_node,sensor_id, threshold_pascals",
+    [
+        (NodeId.pipette_left, SensorId.S0, 14),
+        (NodeId.pipette_right, SensorId.S1, 16),
+    ],
+)
+async def test_overpressure(
+    mock_messenger: AsyncMock, message_send_loopback: CanLoopback, target_node, sensor_id
+) -> None:
+    partial_context_manager = check_overpressure(mock_messenger, target_node, sensor_id)
+
+    def responder(
+        node_id: NodeId, message: MessageDefinition
+    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
+        message.payload.serialize()
+        return []
+
+    message_send_loopback.add_responder(responder)
+    try:
+        # Execute the actual partial context manager
+        partial_context_manager()
+    finally:
+        assert None

@@ -34,6 +34,9 @@ LOG = getLogger(__name__)
 PipetteProbeTarget = Literal[NodeId.pipette_left, NodeId.pipette_right]
 InstrumentProbeTarget = Union[PipetteProbeTarget, Literal[NodeId.gripper]]
 
+# FIXME we should organize all of these functions to use the sensor drivers.
+# FIXME we should restrict some of these functions by instrument type.
+
 
 def _build_pass_step(
     movers: List[NodeId],
@@ -126,10 +129,15 @@ async def liquid_probe(
     return positions
 
 
-async def check_overpressure(messenger: CanMessenger, tool: PipetteProbeTarget, sensor_id: SensorId = SensorId.S0):
+async def check_overpressure(
+    messenger: CanMessenger, tool: PipetteProbeTarget, sensor_id: SensorId = SensorId.S0
+):
     sensor_scheduler = SensorScheduler()
     sensor_info = SensorInformation(SensorType.pressure, sensor_id, tool)
-    return partial(sensor_scheduler.monitor_exceed_max_threshold, sensor_info, messenger)
+    return partial(
+        sensor_scheduler.monitor_exceed_max_threshold, sensor_info, messenger
+    )
+
 
 async def capacitive_probe(
     messenger: CanMessenger,
@@ -202,5 +210,3 @@ async def capacitive_pass(
                 break
 
     return list(_drain())
-
-

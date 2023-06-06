@@ -470,35 +470,41 @@ class SensorScheduler:
                     f"recieved error {str(error)} trying to write unbind sensor output on {str(target_sensor.node_id)}"
                 )
 
-
     @asynccontextmanager
     async def monitor_exceed_max_threshold(
         self,
         target_sensor: SensorInformation,
         can_messenger: CanMessenger,
     ) -> AsyncIterator[None]:
-        response_queue: "asyncio.Queue[float]" = asyncio.Queue()
-        log.info("Made it to this damn function")
-        def _error_listener(
+
+        error_response_queue: "asyncio.Queue[float]" = asyncio.Queue()
+
+        def _async_error_listener(
             message: MessageDefinition, arb_id: ArbitrationId
         ) -> None:
-            if isinstance(message, ErrorMessage):
-                raise
+            if (
+                isinstance(message, ErrorMessage)
+                and message.payload.error_code == ErrorCode.over_pressure
+            ):
+                error_response_queue.put_nowait(message.payload)
 
         def _filter(arbitration_id: ArbitrationId) -> bool:
             return (
                 NodeId(arbitration_id.parts.originating_node_id)
                 == target_sensor.node_id
-            ) and (MessageId(arbitration_id.parts.message_id) == MessageId.error_message)
+            ) and (
+                MessageId(arbitration_id.parts.message_id) == MessageId.error_message
+            )
 
-        can_messenger.add_listener(_error_listener, _filter)
         error = await can_messenger.ensure_send(
             node_id=target_sensor.node_id,
             message=BindSensorOutputRequest(
                 payload=BindSensorOutputRequestPayload(
                     sensor=SensorTypeField(target_sensor.sensor_type),
                     sensor_id=SensorIdField(target_sensor.sensor_id),
-                    binding=SensorOutputBindingField(SensorOutputBinding.max_threshold_sync.value),
+                    binding=SensorOutputBindingField(
+                        SensorOutputBinding.max_threshold_sync.value
+                    ),
                 )
             ),
             expected_nodes=[target_sensor.node_id],
@@ -509,9 +515,10 @@ class SensorScheduler:
             )
 
         try:
-            yield response_queue
+            can_messenger.add_listener(_async_error_listener, _filter)
+            yield error_response_queue
         finally:
-            can_messenger.remove_listener(_error_listener)
+            can_messenger.remove_listener(_async_error_listener)
             error = await can_messenger.ensure_send(
                 node_id=target_sensor.node_id,
                 message=BindSensorOutputRequest(

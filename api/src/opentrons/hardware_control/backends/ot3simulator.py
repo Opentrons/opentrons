@@ -268,7 +268,9 @@ class OT3Simulator:
         return axis_convert(self._encoder_position, 0.0)
 
     @asynccontextmanager
-    async def monitor_overpressure(self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0) -> AsyncIterator[None]:
+    async def monitor_overpressure(
+        self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
+    ) -> AsyncIterator[None]:
         yield
 
     @ensure_yield
