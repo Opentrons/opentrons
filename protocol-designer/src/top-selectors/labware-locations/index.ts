@@ -5,32 +5,32 @@ import {
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
 } from '../../steplist'
-import { selectors as stepFormSelectors } from '../../step-forms'
+import { LabwareOnDeck, ModuleOnDeck, PipetteOnDeck, selectors as stepFormSelectors } from '../../step-forms'
 import { getActiveItem } from '../../ui/steps'
 import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { Selector } from '../../types'
-import { getModuleEntities } from '../../step-forms/selectors'
+import { getLabwareEntities, getModuleEntities, getPipetteEntities } from '../../step-forms/selectors'
+import type { RobotState } from '@opentrons/step-generation'
+
 
 interface Option {
   name: string
   value: string
 }
 
-export const getUnocuppiedLabwareLocationOptions: Selector<Option[] | null> = createSelector(
+export const getRobotStateAtActiveItem: Selector<RobotState | null> = createSelector(
   stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
   getActiveItem,
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.lastValidRobotState,
-  getModuleEntities,
   (
     orderedStepIds,
     robotStateTimeline,
     activeItem,
     initialRobotState,
     lastValidRobotState,
-    moduleEntities,
   ) => {
     let robotState = null
     if (activeItem == null) return null
@@ -47,7 +47,7 @@ export const getUnocuppiedLabwareLocationOptions: Selector<Option[] | null> = cr
         robotState = lastValidRobotState
       } else {
         console.error(
-          `Invalid terminalId ${terminalId}, could not getUnoccupiedLabwareLocations`
+          `Invalid terminalId ${terminalId}, could not robotState of active item`
         )
       }
     } else {
@@ -70,13 +70,20 @@ export const getUnocuppiedLabwareLocationOptions: Selector<Option[] | null> = cr
       }
     }
 
-    if (robotState == null) return null
+    return robotState
+  }
+)
 
 
+export const getUnocuppiedLabwareLocationOptions: Selector<Option[] | null> = createSelector(
+  getRobotStateAtActiveItem,
+  getModuleEntities,
+  (robotState, moduleEntities) => {
     // TODO IMMEDIATElY: get robot type from global state
     const robotType = 'OT-2 Standard'
     const deckDef = getDeckDefFromRobotType(robotType)
     const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
+    if (robotState == null) return null
 
     const { modules, labware } = robotState
     const slotIdsOccupiedByModules = Object.entries(modules).reduce<string[]>((acc, [modId, modOnDeck]) => {
@@ -90,15 +97,60 @@ export const getUnocuppiedLabwareLocationOptions: Selector<Option[] | null> = cr
     const unoccupiedModuleOptions = Object.keys(modules).reduce<Option[]>((acc, modId) => {
       const moduleHasLabware = Object.entries(labware).some(([lwId, lwOnDeck]) => lwOnDeck.slot === modId)
       return moduleHasLabware ? acc : [
-        ...acc, 
-        {name: getModuleDisplayName(moduleEntities[modId].model), value: modId}
+        ...acc,
+        { name: getModuleDisplayName(moduleEntities[modId].model), value: modId }
       ]
     }, [])
 
     const unoccupiedSlotOptions = allSlotIds.filter(slotId => (
       !slotIdsOccupiedByModules.includes(slotId) && !Object.values(labware).map(lw => lw.slot).includes(slotId)
-    )).map(slotId => ({name: slotId, value: slotId}))
+    )).map(slotId => ({ name: slotId, value: slotId }))
 
     return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions]
+  }
+)
+
+export const getLabwareOnDeckForActiveItem: Selector<LabwareOnDeck[] | null> = createSelector(
+  getRobotStateAtActiveItem,
+  getLabwareEntities,
+  (
+    robotState,
+    labwareEntities,
+  ) => {
+    if (robotState == null) return null
+    return Object.entries(labwareEntities).map(([lwId, lwEntity]) => ({
+      ...lwEntity,
+      ...robotState.labware[lwId]
+    }))
+  }
+)
+
+export const getModulesOnDeckForActiveItem: Selector<ModuleOnDeck[] | null> = createSelector(
+  getRobotStateAtActiveItem,
+  getModuleEntities,
+  (
+    robotState,
+    moduleEntities,
+  ) => {
+    if (robotState == null) return null
+    return Object.entries(moduleEntities).map(([modId, modEntity]) => ({
+      ...modEntity,
+      ...robotState.modules[modId]
+    }))
+  }
+)
+
+export const getPipettesForActiveItem: Selector<PipetteOnDeck[] | null> = createSelector(
+  getRobotStateAtActiveItem,
+  getPipetteEntities,
+  (
+    robotState,
+    pipetteEntities,
+  ) => {
+    if (robotState == null) return null
+    return Object.entries(pipetteEntities).map(([pipId, pipEntity]) => ({
+      ...pipEntity,
+      ...robotState.pipettes[pipId]
+    }))
   }
 )
