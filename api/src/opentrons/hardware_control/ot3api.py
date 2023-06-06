@@ -1031,7 +1031,7 @@ class OT3API(
                         self._robot_calibration.right_mount_offset
                     )
                 else:
-                    carrige_effectors_offset = (
+                    carriage_effectors_offset = (
                         self._robot_calibration.gripper_mount_offset
                     )
                 absolute_positions[axis] = position[axis] - carrige_effectors_offset.z
