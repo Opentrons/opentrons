@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from functools import wraps
 import logging
 from copy import deepcopy
+from math import isclose
 from typing import (
     Any,
     Awaitable,
@@ -47,6 +48,7 @@ from .ot3utils import (
     USBTARGET_SUBSYSTEM,
     filter_probed_core_nodes,
     motor_nodes,
+    LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
 )
 
 try:
@@ -524,6 +526,14 @@ class OT3Controller:
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
+    def _get_axis_home_distance(self, axis: OT3Axis) -> float:
+        if self.check_motor_status([axis]):
+            return -1 * (
+                self._position[axis_to_node(axis)] + LIMIT_SWITCH_OVERTRAVEL_DISTANCE
+            )
+        else:
+            return -1 * self.axis_bounds[axis][1] - self.axis_bounds[axis][0]
+
     def _build_home_pipettes_runner(
         self,
         axes: Sequence[OT3Axis],
@@ -534,7 +544,7 @@ class OT3Controller:
         ]
 
         distances_pipette = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            ax: self._get_axis_home_distance(ax)
             for ax in axes
             if ax in OT3Axis.pipette_axes()
         }
@@ -565,7 +575,7 @@ class OT3Controller:
         ]
 
         distances_gantry = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            ax: self._get_axis_home_distance(ax)
             for ax in axes
             if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
         }
@@ -575,7 +585,7 @@ class OT3Controller:
             if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
         }
         distances_z = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
+            ax: self._get_axis_home_distance(ax)
             for ax in axes
             if ax in OT3Axis.mount_axes()
         }

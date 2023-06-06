@@ -51,6 +51,8 @@ from opentrons_hardware.hardware_control.motion import (
 GRIPPER_JAW_HOME_TIME: float = 10
 GRIPPER_JAW_GRIP_TIME: float = 10
 
+LIMIT_SWITCH_OVERTRAVEL_DISTANCE: float = 1
+
 PipetteAction = Literal["clamp", "home"]
 
 # TODO: These methods exist to defer uses of NodeId to inside
@@ -335,7 +337,7 @@ def create_home_group(
         velocity=node_id_velocities,
     )
     # halve the homing speed for backoff
-    backoff_velocities = {k: v for k, v in node_id_velocities.items()}
+    backoff_velocities = {k: v / 2 for k, v in node_id_velocities.items()}
     backoff = create_backoff_step(backoff_velocities)
 
     move_group: MoveGroup = [home, backoff]
