@@ -43,6 +43,12 @@ class GripperNotAttachedError(Exception):
     pass
 
 
+class AxisNotPresentError(Exception):
+    """An error raised if an axis that is not present."""
+
+    pass
+
+
 class FirmwareUpdateRequired(RuntimeError):
     """An error raised when the firmware of the submodules needs to be updated."""
 

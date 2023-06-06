@@ -97,7 +97,7 @@ from .types import (
     UpdateStatus,
     StatusBarState,
 )
-from .errors import MustHomeError, GripperNotAttachedError
+from .errors import MustHomeError, GripperNotAttachedError, AxisNotPresentError
 from . import modules
 from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
 
@@ -990,15 +990,12 @@ class OT3API(
         The effector of the x,y axis is the center of the carriage.
         The effector of the pipette mount axis are the mount critical points but only in z.
         """
-        assert position, "move_axes requires a none empty position"
-
         if not self._current_position:
             await self.refresh_positions()
 
         for axis in position.keys():
             if not self._backend.axis_is_present(axis):
-                # create a custom error
-                raise ValueError(f"{axis} is not present")
+                raise AxisNotPresentError(f"{axis} is not present")
 
         if not self._backend.check_encoder_status(list(position.keys())):
             await self.home()
