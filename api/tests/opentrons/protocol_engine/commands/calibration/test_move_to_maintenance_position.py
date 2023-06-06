@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Mapping
 import pytest
 from decoy import Decoy
 
-from opentrons.motion_planning import Waypoint
 from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position import (
     MoveToMaintenancePositionParams,
     MoveToMaintenancePositionImplementation,
@@ -65,27 +64,26 @@ async def test_calibration_move_to_location_implementation(
 
     decoy.when(ot3_hardware_api.get_instrument_max_height(Mount.LEFT)).then_return(12)
 
-    decoy.when(
-        state_view.motion.get_movement_waypoints_to_coords(
-            origin=Point(x=1, y=2, z=3),
-            dest=Point(x=0, y=100, z=0),
-            max_travel_z=12,
-            direct=False,
-            additional_min_travel_z=None,
-        )
-    ).then_return(
-        [
-            Waypoint(position=Point(3, 1, 4), critical_point=None),
-            Waypoint(position=Point(1, 5, 9), critical_point=CriticalPoint.XY_CENTER),
-        ]
-    )
-
-    decoy.when(await ot3_hardware_api.gantry_position(Mount.RIGHT)).then_return(
-        Point(x=6, y=6, z=6)
-    )
-
     result = await subject.execute(params=params)
     assert result == MoveToMaintenancePositionResult()
+
+    decoy.verify(
+        await ot3_hardware_api.move_to(
+            mount=Mount.LEFT,
+            abs_position=Point(x=1, y=2, z=12),
+            critical_point=CriticalPoint.MOUNT,
+        ),
+        times=1,
+    )
+
+    decoy.verify(
+        await ot3_hardware_api.move_to(
+            mount=Mount.LEFT,
+            abs_position=Point(x=0, y=110, z=12),
+            critical_point=CriticalPoint.MOUNT,
+        ),
+        times=1,
+    )
 
     decoy.verify(
         await ot3_hardware_api.move_axes(

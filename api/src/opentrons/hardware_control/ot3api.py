@@ -1025,16 +1025,18 @@ class OT3API(
             if axis in position:
                 have_z = True
                 if OT3Axis.Z_L:
-                    carrige_effectors_offset = self._robot_calibration.left_mount_offset
+                    carriage_effectors_offset = (
+                        self._robot_calibration.left_mount_offset
+                    )
                 elif OT3Axis.Z_R:
-                    carrige_effectors_offset = (
+                    carriage_effectors_offset = (
                         self._robot_calibration.right_mount_offset
                     )
                 else:
-                    carrige_effectors_offset = (
+                    carriage_effectors_offset = (
                         self._robot_calibration.gripper_mount_offset
                     )
-                absolute_positions[axis] = position[axis] - carrige_effectors_offset.z
+                absolute_positions[axis] = position[axis] - carriage_effectors_offset.z
 
         if not have_z:
             absolute_positions[OT3Axis.Z_L] = current_position[OT3Axis.Z_L]

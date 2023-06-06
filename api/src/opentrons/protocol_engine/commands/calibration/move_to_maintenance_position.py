@@ -4,6 +4,7 @@ from __future__ import annotations
 import enum
 from typing import TYPE_CHECKING, Type, Optional
 from typing_extensions import Literal
+import logging
 
 from pydantic import BaseModel, Field
 
@@ -20,12 +21,14 @@ if TYPE_CHECKING:
     from opentrons.hardware_control import HardwareControlAPI
     from ...state import StateView
 
+logger = logging.getLogger(__name__)
 
 # These offsets supplied from HW
-_ATTACH_POINT = Point(x=0, y=100)
+_ATTACH_POINT = Point(x=0, y=110)
 # These offsets are by eye measuring
 _INSTRUMENT_ATTACH_Z_POINT = 400.0
-_PLATE_ATTACH_Z_LEFT_POINT = 295
+# given from HW
+_MAX_AXIS_MOTION_RANGE = 215
 # Move the right mount a bit higher than the left so the user won't forget to unscrew
 _PLATE_ATTACH_Z_RIGHT_POINT = 320
 
@@ -82,20 +85,17 @@ class MoveToMaintenancePositionImplementation(
         )
         current_position = await ot3_api.gantry_position(Mount.LEFT)
         max_travel_z = ot3_api.get_instrument_max_height(Mount.LEFT)
-        way_points = self._state_view.motion.get_movement_waypoints_to_coords(
-            origin=current_position,
-            dest=_ATTACH_POINT,
-            max_travel_z=max_travel_z,
-            direct=False,
-            additional_min_travel_z=None,
-        )
+        movement_points = [
+            # move the z to the highest position
+            Point(x=current_position.x, y=current_position.y, z=max_travel_z),
+            # move in x,y without going down the z
+            Point(x=_ATTACH_POINT.x, y=_ATTACH_POINT.y, z=max_travel_z),
+        ]
 
-        for waypoint in way_points:
+        for movement in movement_points:
             await ot3_api.move_to(
                 mount=Mount.LEFT,
-                abs_position=Point(
-                    x=waypoint.position.x, y=waypoint.position.y, z=current_position.z
-                ),
+                abs_position=movement,
                 critical_point=CriticalPoint.MOUNT,
             )
 
@@ -109,7 +109,7 @@ class MoveToMaintenancePositionImplementation(
         else:
             await ot3_api.move_axes(
                 {
-                    OT3Axis.Z_L: _PLATE_ATTACH_Z_LEFT_POINT,
+                    OT3Axis.Z_L: max_travel_z - _MAX_AXIS_MOTION_RANGE,
                     OT3Axis.Z_R: _PLATE_ATTACH_Z_RIGHT_POINT,
                 }
             )
