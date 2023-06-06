@@ -7,12 +7,12 @@ import { i18n } from '../../../i18n'
 import { useNetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
 import { getLocalRobot } from '../../../redux/discovery'
 import { mockConnectedRobot } from '../../../redux/discovery/__fixtures__'
-import { NavigationMenu } from '../Navigation/NavigationMenu'
-import { Navigation } from '../Navigation'
+import { NavigationMenu } from '../NavigationMenu'
+import { Navigation } from '..'
 
 jest.mock('../../../pages/OnDeviceDisplay/hooks/useNetworkConnection')
 jest.mock('../../../redux/discovery')
-jest.mock('../Navigation/NavigationMenu')
+jest.mock('../NavigationMenu')
 
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot

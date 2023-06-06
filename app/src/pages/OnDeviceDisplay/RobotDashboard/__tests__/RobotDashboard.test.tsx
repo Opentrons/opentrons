@@ -10,7 +10,7 @@ import {
 import { i18n } from '../../../../i18n'
 import { EmptyRecentRun } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun'
 import { RecentRunProtocolCarousel } from '../../../../organisms/OnDeviceDisplay/RobotDashboard'
-import { Navigation } from '../../../../organisms/OnDeviceDisplay/Navigation'
+import { Navigation } from '../../../../organisms/Navigation'
 import { useMissingProtocolHardware } from '../../../Protocols/hooks'
 import { getOnDeviceDisplaySettings } from '../../../../redux/config'
 import { WelcomedModal } from '../WelcomeModal'
@@ -32,7 +32,7 @@ jest.mock('../../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun')
 jest.mock(
   '../../../../organisms/OnDeviceDisplay/RobotDashboard/RecentRunProtocolCarousel'
 )
-jest.mock('../../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock('../../../../organisms/Navigation')
 jest.mock('../../../Protocols/hooks')
 jest.mock('../../../../redux/config')
 jest.mock('../WelcomeModal')

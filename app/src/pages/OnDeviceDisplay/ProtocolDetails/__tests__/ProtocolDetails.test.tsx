@@ -15,9 +15,11 @@ import {
   useCreateRunMutation,
   useHost,
   useProtocolQuery,
+  useProtocolAnalysesQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
 import { useMissingHardwareText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 import { useMissingProtocolHardware } from '../../../Protocols/hooks'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
@@ -27,6 +29,9 @@ import { Labware } from '../Labware'
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
+jest.mock(
+  '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+)
 jest.mock('../../../Protocols/hooks')
 jest.mock('../Deck')
 jest.mock('../Hardware')
@@ -49,8 +54,14 @@ const mockDeleteRun = deleteRun as jest.MockedFunction<typeof deleteRun>
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
+const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
+  typeof useProtocolAnalysesQuery
+>
 const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
   typeof useMissingProtocolHardware
+>
+const mockUseOffsetCandidatesForAnalysis = useOffsetCandidatesForAnalysis as jest.MockedFunction<
+  typeof useOffsetCandidatesForAnalysis
 >
 
 const mockUseMissingHardwareText = useMissingHardwareText as jest.MockedFunction<
@@ -78,6 +89,7 @@ describe('ODDProtocolDetails', () => {
     mockUseMissingHardwareText.mockReturnValue(
       'mock missing hardware chip text'
     )
+    mockUseOffsetCandidatesForAnalysis.mockReturnValue([])
     mockUseMissingProtocolHardware.mockReturnValue([])
     mockUseProtocolQuery.mockReturnValue({
       data: {
@@ -97,6 +109,16 @@ describe('ODDProtocolDetails', () => {
           files: [],
           key: '26ed5a82-502f-4074-8981-57cdda1d066d',
         },
+      },
+    } as any)
+    mockUseProtocolAnalysesQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            id: 'mockAnalysisId',
+            status: 'completed',
+          },
+        ],
       },
     } as any)
     when(mockuseHost).calledWith().mockReturnValue(MOCK_HOST_CONFIG)
