@@ -41,6 +41,7 @@ import {
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
 } from '../../step-forms'
+import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { BrowseLabwareModal } from '../labware'
 import { ModuleTag } from './ModuleTag'
 import { SlotWarning } from './SlotWarning'
@@ -65,12 +66,11 @@ export interface DeckSetupProps {
   selectedTerminalItemId?: TerminalItemId | null
   handleClickOutside?: () => unknown
   drilledDown: boolean
-  initialDeckSetup: InitialDeckSetup
 }
 
 type ContentsProps = RobotWorkSpaceRenderProps & {
+  activeDeckSetup: InitialDeckSetup
   selectedTerminalItemId?: TerminalItemId | null
-  initialDeckSetup: InitialDeckSetup
   showGen1MultichannelCollisionWarnings: boolean
 }
 
@@ -164,11 +164,12 @@ export const getSwapBlocked = (args: SwapBlockedArgs): boolean => {
 // don't use initialDeckSetup here. Use some version of timelineFrameForActiveItem
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
-    initialDeckSetup,
+    activeDeckSetup,
     deckSlotsById,
     getRobotCoordsFromDOMCoords,
     showGen1MultichannelCollisionWarnings,
   } = props
+
 
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
@@ -190,7 +191,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const swapBlocked = getSwapBlocked({
     hoveredLabware,
     draggedLabware,
-    modulesById: initialDeckSetup.modules,
+    modulesById: activeDeckSetup.modules,
     customLabwareDefs,
   })
 
@@ -200,10 +201,10 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   )
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(
-    props.initialDeckSetup
+    activeDeckSetup
   )
   const deckSlots: DeckDefSlot[] = values(deckSlotsById)
-  const moduleSlots = getModuleSlotDefs(initialDeckSetup, deckSlotsById)
+  const moduleSlots = getModuleSlotDefs(activeDeckSetup, deckSlotsById)
   // NOTE: in these arrays of slots, order affects SVG render layering
   // labware can be in a module or on the deck
   const labwareParentSlots: DeckDefSlot[] = [...deckSlots, ...moduleSlots]
@@ -211,15 +212,15 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
 
   const allLabware: LabwareOnDeckType[] = Object.keys(
-    initialDeckSetup.labware
+    activeDeckSetup.labware
   ).reduce<LabwareOnDeckType[]>((acc, labwareId) => {
-    const labware = initialDeckSetup.labware[labwareId]
+    const labware = activeDeckSetup.labware[labwareId]
     return getLabwareHasQuirk(labware.def, 'fixedTrash')
       ? acc
       : [...acc, labware]
   }, [])
 
-  const allModules: ModuleOnDeck[] = values(initialDeckSetup.modules)
+  const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
 
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   const multichannelWarningSlots: DeckDefSlot[] = showGen1MultichannelCollisionWarnings
@@ -296,7 +297,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         .filter(
           slot =>
             !slotsBlockedBySpanning.includes(slot.id) &&
-            getSlotIsEmpty(props.initialDeckSetup, slot.id)
+            getSlotIsEmpty(activeDeckSetup, slot.id)
         )
         .map(slot => {
           return (
@@ -306,7 +307,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               slot={slot}
               selectedTerminalItemId={props.selectedTerminalItemId}
               // Module slots' ids reference their parent module
-              moduleType={initialDeckSetup.modules[slot.id]?.type || null}
+              moduleType={activeDeckSetup.modules[slot.id]?.type || null}
               handleDragHover={handleHoverEmptySlot}
             />
           )
@@ -359,12 +360,14 @@ const getHasGen1MultiChannelPipette = (
 }
 
 export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
+  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+
   const _hasGen1MultichannelPipette = React.useMemo(
-    () => getHasGen1MultiChannelPipette(props.initialDeckSetup.pipettes),
-    [props.initialDeckSetup.pipettes]
+    () => getHasGen1MultiChannelPipette(activeDeckSetup.pipettes),
+    [activeDeckSetup.pipettes]
   )
   const showGen1MultichannelCollisionWarnings =
     !_disableCollisionWarnings && _hasGen1MultichannelPipette
@@ -389,7 +392,7 @@ export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
             {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
               <>
                 <DeckSetupContents
-                  initialDeckSetup={props.initialDeckSetup}
+                  activeDeckSetup={activeDeckSetup}
                   selectedTerminalItemId={props.selectedTerminalItemId}
                   {...{
                     deckSlotsById,

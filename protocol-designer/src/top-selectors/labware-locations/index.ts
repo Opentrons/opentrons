@@ -1,11 +1,12 @@
 import { createSelector } from 'reselect'
+import map from 'lodash/map'
 import { THERMOCYCLER_MODULE_TYPE, getDeckDefFromRobotType, getModuleDisplayName } from '@opentrons/shared-data'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
 } from '../../steplist'
-import { LabwareOnDeck, ModuleOnDeck, PipetteOnDeck, selectors as stepFormSelectors } from '../../step-forms'
+import { InitialDeckSetup, LabwareOnDeck, ModuleOnDeck, PipetteOnDeck, selectors as stepFormSelectors } from '../../step-forms'
 import { getActiveItem } from '../../ui/steps'
 import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { selectors as fileDataSelectors } from '../../file-data'
@@ -118,14 +119,14 @@ export const getLabwareOnDeckForActiveItem: Selector<LabwareOnDeck[] | null> = c
     labwareEntities,
   ) => {
     if (robotState == null) return null
-    return Object.entries(labwareEntities).map(([lwId, lwEntity]) => ({
+    return map(labwareEntities, (lwEntity, lwId) => ({
       ...lwEntity,
       ...robotState.labware[lwId]
     }))
   }
 )
 
-export const getModulesOnDeckForActiveItem: Selector<ModuleOnDeck[] | null> = createSelector(
+export const getModuleEntitiesForActiveItem: Selector<ModuleOnDeck[] | null> = createSelector(
   getRobotStateAtActiveItem,
   getModuleEntities,
   (
@@ -133,14 +134,14 @@ export const getModulesOnDeckForActiveItem: Selector<ModuleOnDeck[] | null> = cr
     moduleEntities,
   ) => {
     if (robotState == null) return null
-    return Object.entries(moduleEntities).map(([modId, modEntity]) => ({
+    return map(moduleEntities, (modEntity, modId) => ({
       ...modEntity,
       ...robotState.modules[modId]
     }))
   }
 )
 
-export const getPipettesForActiveItem: Selector<PipetteOnDeck[] | null> = createSelector(
+export const getPipettesOnDeckForActiveItem: Selector<PipetteOnDeck[] | null> = createSelector(
   getRobotStateAtActiveItem,
   getPipetteEntities,
   (
@@ -148,9 +149,33 @@ export const getPipettesForActiveItem: Selector<PipetteOnDeck[] | null> = create
     pipetteEntities,
   ) => {
     if (robotState == null) return null
-    return Object.entries(pipetteEntities).map(([pipId, pipEntity]) => ({
+    return map(pipetteEntities, (pipEntity, pipId) => ({
       ...pipEntity,
       ...robotState.pipettes[pipId]
     }))
+  }
+)
+
+export const getDeckSetupForActiveItem: Selector<InitialDeckSetup> = createSelector(
+  getRobotStateAtActiveItem,
+  getPipetteEntities,
+  getModuleEntities,
+  getLabwareEntities,
+  (robotState, pipetteEntities, moduleEntities, labwareEntities) => {
+    if (robotState == null) return {pipettes: {}, labware: {}, modules: {}}
+    return {
+      pipettes: map(pipetteEntities, (pipEntity, pipId) => ({
+        ...pipEntity,
+        ...robotState.pipettes[pipId]
+      })),
+      labware: map(labwareEntities, (lwEntity, lwId) => ({
+        ...lwEntity,
+        ...robotState.labware[lwId]
+      })),
+      modules: map(moduleEntities, (modEntity, modId) => ({
+        ...modEntity,
+        ...robotState.modules[modId]
+      }))
+    }
   }
 )

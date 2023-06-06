@@ -8,8 +8,9 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   _invariantContext,
   prevRobotState
 ) => {
+  console.log('MOVE LABWARE COMMAND CREATOR', args, prevRobotState)
   const { labware, useGripper, newLocation } = args
-  const actionName = 'moveToWell'
+  const actionName = 'moveToLabware'
   const errors: CommandCreatorError[] = []
 
   if (!labware || !prevRobotState.labware[labware]) {
