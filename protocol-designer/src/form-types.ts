@@ -46,6 +46,7 @@ export type StepFieldName = string
 // | 'labwareLocationUpdate'
 // | 'mix_mmFromBottom'
 // | 'mix_touchTip_mmFromBottom'
+// | 'newLocation'
 // | 'path'
 // | 'pauseAction'
 // | 'pauseHour'
@@ -58,6 +59,7 @@ export type StepFieldName = string
 // | 'stepName'
 // | 'times'
 // | 'touchTip'
+// | 'useGripper'
 // | 'volume'
 // | 'wells'
 // // deck setup form fields
@@ -73,6 +75,7 @@ export type StepFieldName = string
 // | 'aspirate_disposalVol_volume'
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
 export type StepType =
+  | 'moveLabware'
   | 'moveLiquid'
   | 'mix'
   | 'pause'
@@ -82,6 +85,7 @@ export type StepType =
   | 'thermocycler'
   | 'heaterShaker'
 export const stepIconsByType: Record<StepType, IconName> = {
+  moveLabware: 'move-xy',
   moveLiquid: 'ot-transfer',
   mix: 'ot-mix',
   pause: 'pause',
