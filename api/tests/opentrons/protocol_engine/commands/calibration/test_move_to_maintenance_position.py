@@ -41,7 +41,7 @@ def subject(
         ),
         (
             MaintenancePosition.ATTACH_PLATE,
-            {OT3Axis.Z_L: 295, OT3Axis.Z_R: 320},
+            {OT3Axis.Z_L: 85, OT3Axis.Z_R: 105},
         ),
     ],
 )
@@ -62,7 +62,7 @@ async def test_calibration_move_to_location_implementation(
         Point(x=1, y=2, z=3)
     )
 
-    decoy.when(ot3_hardware_api.get_instrument_max_height(Mount.LEFT)).then_return(12)
+    decoy.when(ot3_hardware_api.get_instrument_max_height(Mount.LEFT)).then_return(300)
 
     result = await subject.execute(params=params)
     assert result == MoveToMaintenancePositionResult()
@@ -70,7 +70,7 @@ async def test_calibration_move_to_location_implementation(
     decoy.verify(
         await ot3_hardware_api.move_to(
             mount=Mount.LEFT,
-            abs_position=Point(x=1, y=2, z=12),
+            abs_position=Point(x=1, y=2, z=300),
             critical_point=CriticalPoint.MOUNT,
         ),
         times=1,
@@ -79,7 +79,7 @@ async def test_calibration_move_to_location_implementation(
     decoy.verify(
         await ot3_hardware_api.move_to(
             mount=Mount.LEFT,
-            abs_position=Point(x=0, y=110, z=12),
+            abs_position=Point(x=0, y=110, z=300),
             critical_point=CriticalPoint.MOUNT,
         ),
         times=1,

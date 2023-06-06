@@ -25,12 +25,11 @@ logger = logging.getLogger(__name__)
 
 # These offsets supplied from HW
 _ATTACH_POINT = Point(x=0, y=110)
+_MAX_Z_AXIS_MOTION_RANGE = 215
 # These offsets are by eye measuring
 _INSTRUMENT_ATTACH_Z_POINT = 400.0
-# given from HW
-_MAX_AXIS_MOTION_RANGE = 215
 # Move the right mount a bit higher than the left so the user won't forget to unscrew
-_PLATE_ATTACH_Z_RIGHT_POINT = 320
+_RIGHT_MOUNT_Z_MARGIN = 20
 
 MoveToMaintenancePositionCommandType = Literal["calibration/moveToMaintenancePosition"]
 
@@ -108,10 +107,11 @@ class MoveToMaintenancePositionImplementation(
                 }
             )
         else:
+            max_motion_range = max_height_z - _MAX_Z_AXIS_MOTION_RANGE
             await ot3_api.move_axes(
                 {
-                    OT3Axis.Z_L: max_height_z - _MAX_AXIS_MOTION_RANGE,
-                    OT3Axis.Z_R: _PLATE_ATTACH_Z_RIGHT_POINT,
+                    OT3Axis.Z_L: max_motion_range,
+                    OT3Axis.Z_R: max_motion_range + _RIGHT_MOUNT_Z_MARGIN,
                 }
             )
 
