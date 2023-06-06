@@ -15,7 +15,10 @@ import {
   OutlineButton,
 } from '@opentrons/components'
 import { i18n } from '../../../localization'
-import { createCustomTiprackDef } from '../../../labware-defs/actions'
+import {
+  createCustomTiprackDef,
+  removeCustomTiprackFile,
+} from '../../../labware-defs/actions'
 import { StyledText } from '../StyledText'
 import cx from 'classnames'
 
@@ -42,7 +45,6 @@ export const TipRackOptions = ({
   const allLabware = useSelector(getLabwareDefsByURI)
   const tiprackOptions = getFlexTiprackOptions(allLabware)
   const [selected, setSelected] = useState<string[]>([])
-  const [customTipRack, setCustomTipRack] = useState(false)
   const {
     values,
     errors,
@@ -54,12 +56,8 @@ export const TipRackOptions = ({
       i.namespace !== 'opentrons' && i.namespace !== customTiprackOption.value
   )
 
-  const opentronsFlexTiprackData = [...tiprackOptions].filter(
-    (i: any) => i.namespace === 'opentrons'
-  )
-  opentronsFlexTiprackData.push(customTiprackOption)
   const handleNameChange = (selected: string[]): any => {
-    setFieldValue(`pipettesByMount.${pipetteName}.tiprackDefURI`, selected[0])
+    setFieldValue(`pipettesByMount.${pipetteName}.tiprackDefURI`, selected)
   }
   const latestTipRackList = values.pipettesByMount[pipetteName].tiprackDefURI
   useEffect(() => {
@@ -77,7 +75,7 @@ export const TipRackOptions = ({
             : styles.disable_mount_option
         }
       >
-        {opentronsFlexTiprackData.map(({ name, value }: any, index: number) => {
+        {tiprackOptions.map(({ name, value }: any, index: number) => {
           const isChecked = selected.includes(value)
           return (
             <CheckboxField
@@ -86,22 +84,16 @@ export const TipRackOptions = ({
               name={name}
               value={isChecked}
               onChange={(e: any) => {
-                const { name, checked } = e.currentTarget
+                const { checked } = e.currentTarget
                 if (checked) {
                   const tiprackCheckedData = [...selected, ...[value]]
                   setSelected(tiprackCheckedData)
                   handleNameChange(tiprackCheckedData)
-                  if (name === customTiprackOption.name) setCustomTipRack(true)
                 } else {
-                  const indexToRemove = selected.indexOf(name)
-                  if (indexToRemove !== -1) {
-                    selected.splice(indexToRemove, 1)
-                  }
+                  const indexToRemove = selected.indexOf(value)
+                  indexToRemove !== -1 && selected.splice(indexToRemove, 1)
                   setSelected(selected)
                   handleNameChange(selected)
-                  if (name === customTiprackOption.name) {
-                    setCustomTipRack(false)
-                  }
                 }
               }}
             ></CheckboxField>
@@ -110,11 +102,14 @@ export const TipRackOptions = ({
       </section>
 
       {customTiprackFilteredData.length > 0 && (
-        <ShowCustomTiprackList customTipRackProps={customTiprackFilteredData} />
+        <ShowCustomTiprackList
+          customTipRackProps={customTiprackFilteredData}
+          dispatchProps={dispatch}
+        />
       )}
       <Flex>
-        {customTipRack &&
-          customFileUpload(customTipRack, customTiprackFilteredData, dispatch)}
+        {pipetteName !== pipetteSlot.right &&
+          customFileUpload(customTiprackFilteredData, dispatch)}
       </Flex>
       {pipetteName === pipetteSlot.left && (
         <StyledText as="label" className={styles.error_text}>
@@ -126,7 +121,6 @@ export const TipRackOptions = ({
 }
 
 function customFileUpload(
-  customTipRack: boolean,
   customTiprackFilteredData: any[],
   dispatch: any
 ): JSX.Element {
@@ -135,7 +129,7 @@ function customFileUpload(
       Component="label"
       className={styles.custom_tiprack_upload_file}
     >
-      {customTipRack && customTiprackFilteredData.length === 0
+      {customTiprackFilteredData.length === 0
         ? i18n.t('button.upload_custom_tip_rack')
         : i18n.t('button.add_another_custom_tiprack')}
       <input
@@ -148,23 +142,16 @@ function customFileUpload(
   )
 }
 
-function ShowCustomTiprackList({ customTipRackProps }: any): any {
-  // const [customTipRackPropsUpdated, setCustomTipRackProps] = useState(
-  //   customTipRackProps
-  // )
-  // useEffect(() => {
-  //   setCustomTipRackProps(customTipRackProps)
-  // }, [customTipRackProps])
-
-  const removeCustomTipRackFile = (fileName: string): void => {
-    // const updatedCustomTipRackProps = customTipRackPropsUpdated.filter(
-    //   (obj: { name: string }) => obj.name !== fileName
-    // )
-    // setCustomTipRackProps([...updatedCustomTipRackProps])
+function ShowCustomTiprackList({
+  customTipRackProps,
+  dispatchProps,
+}: any): JSX.Element {
+  const removeCustomTipRackFile = (customFile: string): void => {
+    dispatchProps(removeCustomTiprackFile(customFile))
   }
   return (
     <Flex className={styles.filter_data}>
-      {customTipRackProps.map(({ name }: any, index: number) => {
+      {customTipRackProps.map(({ name, value }: any, index: number) => {
         return (
           <Flex className={styles.custom_tiprack} key={index}>
             <StyledText as="p" className={fontSize14}>
@@ -174,7 +161,7 @@ function ShowCustomTiprackList({ customTipRackProps }: any): any {
             <StyledText
               as="p"
               className={cx(styles.remove_button, fontSize14)}
-              onClick={() => removeCustomTipRackFile(name)}
+              onClick={() => removeCustomTipRackFile(value)}
             >
               {i18n.t('button.remove_custom_tiprack')}
             </StyledText>

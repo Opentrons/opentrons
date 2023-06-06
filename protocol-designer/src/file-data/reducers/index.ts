@@ -98,8 +98,8 @@ const fileMetadata = handleActions(
   defaultFields
 )
 const robotDataDefaultFields: RobotDataFields = {
-  model: OT2_STANDARD_MODEL,
-  deckId: OT2_STANDARD_DECKID,
+  model: null,
+  deckId: null,
 }
 const robot = handleActions(
   {

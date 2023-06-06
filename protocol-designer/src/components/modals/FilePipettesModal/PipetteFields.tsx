@@ -27,6 +27,7 @@ import { FormPipettesByMount } from '../../../step-forms'
 import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
 
 import type { PipetteName } from '@opentrons/shared-data'
+import { blockedTipRackListForOt2 } from '../../FlexProtocolEditor/constant'
 
 export interface Props {
   initialTabIndex?: number
@@ -84,7 +85,7 @@ export function PipetteFields(props: Props): JSX.Element {
 
   type Values<T> = T[keyof T]
 
-  const tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
+  let tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
     allLabware,
     (acc, def: Values<typeof allLabware>) => {
       if (def.metadata.displayCategory !== 'tipRack') return acc
@@ -97,6 +98,10 @@ export function PipetteFields(props: Props): JSX.Element {
       ]
     },
     []
+  )
+
+  tiprackOptions = tiprackOptions.filter(
+    ({ name }): any => !blockedTipRackListForOt2.includes(name)
   )
 
   const initialTabIndex = props.initialTabIndex || 1

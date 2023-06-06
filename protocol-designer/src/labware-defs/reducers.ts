@@ -11,6 +11,7 @@ import { LabwareUploadMessage, LabwareDefByDefURI } from './types'
 import {
   CreateCustomLabwareDef,
   LabwareUploadMessageAction,
+  RemoveCustomTiprackFile,
   ReplaceCustomLabwareDef,
 } from './actions'
 import { LoadFileAction } from '../load-file'
@@ -38,6 +39,12 @@ const customDefs: Reducer<LabwareDefByDefURI, Action> = handleActions(
         def => !getLabwareDefIsStandard(def) // assume if it's not standard, it's custom
       )
       return { ...state, ...customDefsFromFile }
+    },
+    REMOVE_CUSTOM_TIPRACK_FILE: (
+      state: LabwareDefByDefURI,
+      action: RemoveCustomTiprackFile
+    ) => {
+      return omit(state, action.payload)
     },
   },
   {}

@@ -41,6 +41,14 @@ export const blockedTipRackListForFlex: string[] = [
   'Opentrons 96 Filter Tip Rack 200 µL',
 ]
 
+export const blockedTipRackListForOt2: string[] = [
+  'Opentrons Flex 96 Tip Rack 1000 µL',
+  'Opentrons Flex 96 Tip Rack 200 µL',
+  'Opentrons Flex 96 Tip Rack 50 µL',
+  'Opentrons Flex 96 Filter Tip Rack 1000 µL',
+  'Opentrons Flex 96 Filter Tip Rack 200 µL',
+  'Opentrons Flex 96 Filter Tip Rack 50 µL',
+]
 // Custom tiprack option object
 export const customTiprackOption: {
   name: string
@@ -85,15 +93,3 @@ export const pipetteSlot: pipetteSlots = {
 }
 
 export const blockMount: string[] = ['p1000_96']
-
-interface selectPage {
-  newFlexFileForm: string
-  protocolEditor: string
-  defaultLandingPage: string
-}
-
-export const selectPageForms: selectPage = {
-  newFlexFileForm: 'new-flex-file-form',
-  protocolEditor: 'protocol-editor',
-  defaultLandingPage: 'default-landing-page',
-}

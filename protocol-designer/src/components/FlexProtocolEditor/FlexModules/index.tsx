@@ -14,10 +14,15 @@ import {
   ModuleType,
   ModuleModel,
   OT3_STANDARD_MODEL,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
-  MODELS_FOR_FLEX_MODULE_TYPE,
+  MODELS_FOR_MODULE_TYPE,
 } from '../../../constants'
 import { MiniCard } from './MiniCard'
 import { ConnectedSlotMap } from '../../modals/EditModulesModal/ConnectedSlotMap'
@@ -47,6 +52,10 @@ interface FormValues {
   selectedSlot: string
 }
 
+interface SupportedSlots {
+  [key: string]: string
+}
+
 function FlexModulesComponent(): JSX.Element {
   const {
     values: { modulesByType },
@@ -57,6 +66,15 @@ function FlexModulesComponent(): JSX.Element {
   } = useFormikContext<FormValues>()
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
   const modules: ModuleType[] = Object.keys(modulesByType)
+
+  const supportedSlots: SupportedSlots = {
+    [MAGNETIC_MODULE_TYPE]: 'GEN1',
+    [TEMPERATURE_MODULE_TYPE]: 'GEN2',
+    [THERMOCYCLER_MODULE_TYPE]: 'GEN2',
+    [HEATERSHAKER_MODULE_TYPE]: 'GEN1',
+    [MAGNETIC_BLOCK_TYPE]: 'GEN1',
+  }
+
   const [selectedModules, setSelectedModules] = useState<string[]>([])
   useEffect(() => {
     setSelectedModules(
@@ -139,27 +157,31 @@ function FlexModulesComponent(): JSX.Element {
                       <DropdownField
                         tabIndex={i}
                         name={`${moduleTypeAccessor}.model`}
-                        options={MODELS_FOR_FLEX_MODULE_TYPE[moduleType]}
+                        options={MODELS_FOR_MODULE_TYPE[moduleType].filter(
+                          ({ name }) => name === supportedSlots[moduleType]
+                        )}
                         value={selectedModel}
                         onChange={handleChange}
                         onBlur={handleBlur}
                       />
                     </FormGroup>
 
-                    <FormGroup
-                      label="Position"
-                      {...targetProps}
-                      className={styles.model_options}
-                    >
-                      <DropdownField
-                        tabIndex={1}
-                        name={`modulesByType.${moduleType}.slot`}
-                        options={getAllFlexModuleSlotsByType(moduleType)}
-                        value={modulesByType[moduleType].slot}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
-                    </FormGroup>
+                    <div {...targetProps}>
+                      <FormGroup
+                        label="Position"
+                        className={styles.model_options}
+                      >
+                        <DropdownField
+                          tabIndex={1}
+                          name={`modulesByType.${moduleType}.slot`}
+                          options={getAllFlexModuleSlotsByType(moduleType)}
+                          value={modulesByType[moduleType].slot}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                        />
+                      </FormGroup>
+                    </div>
+
                     <ConnectedSlotMap
                       fieldName={`modulesByType.${moduleType}.slot`}
                       robotType={OT3_STANDARD_MODEL}

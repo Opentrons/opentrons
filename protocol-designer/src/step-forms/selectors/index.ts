@@ -36,11 +36,7 @@ import {
 } from '../../labware-defs'
 import { i18n } from '../../localization'
 import { InstrumentGroup } from '@opentrons/components'
-import type {
-  DropdownOption,
-  Mount,
-  InstrumentInfoProps,
-} from '@opentrons/components'
+import type { DropdownOption, Mount } from '@opentrons/components'
 import type {
   InvariantContext,
   LabwareEntity,
@@ -67,6 +63,7 @@ import {
   ThermocyclerModuleState,
   HeaterShakerModuleState,
   MagneticBlockState,
+  InstrumentInfoProps,
 } from '../types'
 import {
   PresavedStepFormState,
@@ -120,17 +117,7 @@ export const getLabwareEntities: Selector<
       _hydrateLabwareEntity(l, id, labwareDefs)
     )
 )
-export const getLabwareEntitiesForOT3: Selector<
-  BaseState,
-  LabwareEntities
-> = createSelector(
-  _getNormalizedLabwareById,
-  labwareDefSelectors.getOt3LabwareDefsByURI,
-  (normalizedLabwareById, labwareDefs) =>
-    mapValues(normalizedLabwareById, (l: NormalizedLabware, id: string) =>
-      _hydrateLabwareEntity(l, id, labwareDefs)
-    )
-)
+
 // Special version of `getLabwareEntities` selector for use in step-forms reducers
 export const _getLabwareEntitiesRootState: (
   arg0: RootState
@@ -374,7 +361,9 @@ export const getPipettesForInstrumentGroup: Selector<
         pipetteSpecs: pipetteSpec,
         description: _getPipetteDisplayName(pipetteOnDeck.name),
         isDisabled: false,
-        tiprackModel: getLabwareDisplayName(tiprackDef),
+        tiprackModel: Array.isArray(tiprackDef)
+          ? tiprackDef.map(i => getLabwareDisplayName(i))
+          : getLabwareDisplayName(tiprackDef),
       }
       acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
       return acc

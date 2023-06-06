@@ -115,7 +115,7 @@ export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteByI
 // when they are de-normalized, the definitions they reference are baked in
 // =========== PIPETTES ========
 export type PipetteEntity = NormalizedPipette & {
-  tiprackLabwareDef: LabwareDefinition2
+  tiprackLabwareDef: LabwareDefinition2 | any
   spec: PipetteNameSpecs
 }
 

@@ -41,6 +41,7 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
       changeIs96Selected(is96ChannelSelected)
     }
   }, [pipetteSlot.left, pipetteName, changeIs96Selected, is96ChannelSelected])
+
   const className = cx({ disable_mount_option: is96ChannelSelected })
 
   const pipetteHeaderText =

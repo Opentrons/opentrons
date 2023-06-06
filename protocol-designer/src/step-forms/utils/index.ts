@@ -69,7 +69,7 @@ export function denormalizePipetteEntities(
     (acc: PipetteEntities, pipette: NormalizedPipette): PipetteEntities => {
       const pipetteId = pipette.id
       const spec = getPipetteNameSpecs(pipette.name)
-
+      const tiprackDef = [...pipette.tiprackDefURI]
       if (!spec) {
         throw new Error(
           `no pipette spec for pipette id "${pipetteId}", name "${pipette.name}"`
@@ -78,7 +78,10 @@ export function denormalizePipetteEntities(
       const pipetteEntity: PipetteEntity = {
         ...pipette,
         spec,
-        tiprackLabwareDef: labwareDefs[pipette.tiprackDefURI],
+        tiprackLabwareDef:
+          typeof pipette.tiprackDefURI === 'string'
+            ? labwareDefs[pipette.tiprackDefURI]
+            : tiprackDef.map((i: string) => labwareDefs[i]),
       }
       return { ...acc, [pipetteId]: pipetteEntity }
     },

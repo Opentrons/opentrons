@@ -2,7 +2,7 @@ import groupBy from 'lodash/groupBy'
 import {
   getLabwareDefURI,
   LabwareDefinition2,
-  PD_DO_NOT_LIST_OT3,
+  PD_DO_NOT_LIST,
 } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from './types'
 
@@ -24,7 +24,7 @@ export function getAllDefinitions(): LabwareDefByDefURI {
       const def: LabwareDefinition2 = definitionsContext(filename)
       const labwareDefURI = getLabwareDefURI(def)
       // Need to handle Ot2 and OT3 supported labware here
-      return PD_DO_NOT_LIST_OT3.includes(def.parameters.loadName)
+      return PD_DO_NOT_LIST.includes(def.parameters.loadName)
         ? acc
         : { ...acc, [labwareDefURI]: def }
     }, {})
@@ -33,18 +33,6 @@ export function getAllDefinitions(): LabwareDefByDefURI {
   return _definitions
 }
 
-// Please be aware that only labware supported by OT3 should be loaded.
-// separate list to only allow the ot3 tipracks
-export function getOt3AllDefinitions(): LabwareDefByDefURI {
-  _definitions = definitionsContext.keys().reduce((acc, filename) => {
-    const def: LabwareDefinition2 = definitionsContext(filename)
-    const labwareDefURI = getLabwareDefURI(def)
-    return PD_DO_NOT_LIST_OT3.includes(def.parameters.loadName)
-      ? acc
-      : { ...acc, [labwareDefURI]: def }
-  }, {})
-  return _definitions
-}
 // filter out all but the latest version of each labware
 // NOTE: this is similar to labware-library's getOnlyLatestDefs, but this one
 // has the {labwareDefURI: def} shape, instead of an array of labware defs

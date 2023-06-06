@@ -1,4 +1,4 @@
-import { Mount } from '@opentrons/components'
+import { InstrumentDiagramProps, Mount } from '@opentrons/components'
 import {
   ModuleType,
   ModuleModel,
@@ -110,4 +110,25 @@ export interface InitialDeckSetup {
   modules: {
     [moduleId: string]: ModuleOnDeck
   }
+}
+
+export interface InstrumentInfoProps {
+  /** 'left' or 'right' */
+  mount: Mount
+  /** if true, show labels 'LEFT PIPETTE' / 'RIGHT PIPETTE' */
+  showMountLabel?: boolean | null
+  /** human-readable description, eg 'p300 Single-channel' */
+  description: string
+  /** paired tiprack model */
+  tiprackModel?: string | any
+  /** if disabled, pipette & its info are grayed out */
+  isDisabled: boolean
+  /** specs of mounted pipette */
+  pipetteSpecs?: InstrumentDiagramProps['pipetteSpecs'] | null
+  /** classes to apply */
+  className?: string
+  /** classes to apply to the info group child */
+  infoClassName?: string
+  /** children to display under the info */
+  children?: React.ReactNode
 }
