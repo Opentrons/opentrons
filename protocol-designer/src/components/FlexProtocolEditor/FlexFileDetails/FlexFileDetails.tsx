@@ -24,7 +24,6 @@ import {
 } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
 import { BaseState, ThunkDispatch } from '../../../types'
-import { ModuleDiagram } from '../../modules'
 import { StyledText } from '../StyledText'
 
 import flexStyles from '../FlexComponents.css'
@@ -33,6 +32,7 @@ import { InstrumentGroup } from '../FlexInstrument/InstrumentGroup'
 import { actions as navActions } from '../../../navigation'
 import { UpdateConfirmation } from '../FlexUpdateConfirmation'
 import { FlexProtocolEditorComponent } from '../FlexProtocolEditor'
+import { FlexSupportedModuleDiagram } from '../FlexModules/FlexModuleDiagram'
 export interface Props {
   formValues: FileMetadataFields
   instruments: React.ComponentProps<typeof InstrumentGroup>
@@ -55,6 +55,7 @@ const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 export function FlexFileDetailsComponent(props: any): JSX.Element {
   const [isEdit, setEdit] = useState(false)
   const [selectedTabId, setTabId] = useState<number>(0)
+  const existingModulesLength = getModuleData(props.modules).length
 
   if (isEdit) {
     return (
@@ -147,12 +148,14 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                         </Flex>
                       </div>
                       <SelectedModules propsData={props} />
-                      <EditButton
-                        editProps={setEdit}
-                        setTab={2}
-                        setTabId={setTabId}
-                        addItems={true}
-                      />
+                      {existingModulesLength < 4 && (
+                        <EditButton
+                          editProps={setEdit}
+                          setTab={2}
+                          setTabId={setTabId}
+                          addItems={true}
+                        />
+                      )}
                     </div>
                   </form>
                 )}
@@ -349,7 +352,7 @@ const SelectedModules = (props: { propsData: any }): JSX.Element => {
             <Card>
               <div className={styles.card_content}>
                 <Flex>
-                  <ModuleDiagram
+                  <FlexSupportedModuleDiagram
                     type={moduleType.type}
                     model={moduleType.model}
                   />

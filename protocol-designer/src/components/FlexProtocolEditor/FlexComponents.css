@@ -72,6 +72,12 @@
   margin: 1rem;
 }
 
+.flex_round_tabs_button {
+  display: flex;
+  justify-content: center;
+  width: 50%;
+}
+
 .flex_sub_heading {
   margin-top: 27px;
 }

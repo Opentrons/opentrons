@@ -257,11 +257,10 @@ function FlexProtocolEditor({
   formProps,
   onSave,
 }: FlexProtocolEditorComponentProps): JSX.Element {
+  const dispatch = useDispatch()
   const [selectedTab, setTab] = useState<number>(0)
   const [redirectToDetails, setRedirectToDetails] = useState(false)
-  const dispatch = useDispatch()
   const [isEdit, setEdit] = useState(false)
-  // On Redirction if page tab edit set to true
   useEffect(() => {
     if (isEditValue) {
       setEdit(isEditValue)
@@ -341,6 +340,9 @@ function FlexProtocolEditor({
         : acc
     }, [])
     onSave({ modules, newProtocolFields, pipettes: [] })
+    dispatch(
+      setRobotType({ model: OT3_STANDARD_MODEL, deckId: OT3_STANDARD_DECKID })
+    )
     if (isEdit) {
       setRedirectToDetails(true)
     } else {
@@ -405,16 +407,11 @@ function FlexProtocolEditor({
                       disabled={notOnFirstPage && !props.isValid}
                       tabIndex={4}
                       type="submit"
-                      className={`${styles.common_button} ${
+                      className={`${styles.flex_round_tabs_button} ${
                         notOnFirstPage
                           ? styles.flex_round_tabs_button_50p
                           : styles.flex_round_tabs_button_100p
                       }`}
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        width: '50%',
-                      }}
                     >
                       <StyledText as="h3">{nextButton}</StyledText>
                     </NewPrimaryBtn>

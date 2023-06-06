@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import cx from 'classnames'
 import { Flex, RadioGroup } from '@opentrons/components'
 import { blockMount, pipetteSlot } from '../constant'
@@ -36,9 +36,11 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
     pipettesByMount[pipetteName].pipetteName
   )
 
-  if (pipetteSlot.left === pipetteName) {
-    changeIs96Selected(is96ChannelSelected)
-  }
+  useEffect(() => {
+    if (pipetteSlot.left === pipetteName) {
+      changeIs96Selected(is96ChannelSelected)
+    }
+  }, [pipetteSlot.left, pipetteName, changeIs96Selected, is96ChannelSelected])
   const className = cx({ disable_mount_option: is96ChannelSelected })
 
   const pipetteHeaderText =
