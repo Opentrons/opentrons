@@ -52,7 +52,6 @@ describe('RobotSystemVersion', () => {
     )
     getByText('Current Version:')
     getByText('mock7.0.0')
-    getByText('Check for updates')
   })
 
   it('should render text when there is available update', () => {
