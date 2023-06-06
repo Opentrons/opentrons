@@ -26,7 +26,6 @@ jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../hooks')
 
-const mockLastRun = '2023-04-12T21:30:49.124108+00:00'
 const RUN_ID = 'mockRunId'
 
 const mockMissingPipette = [
@@ -68,7 +67,7 @@ const mockRunData = {
   completedAt: 'thistime',
   startedAt: 'thistime',
   protocolId: 'mockProtocolId',
-  status: RUN_STATUS_FAILED
+  status: RUN_STATUS_FAILED,
 } as any
 
 let mockCloneRun: jest.Mock
@@ -143,9 +142,13 @@ describe('RecentRunProtocolCard', () => {
 
   it('should render text', () => {
     const [{ getByText }] = render(props)
-    const lastRunTime = formatDistance(new Date(mockRunData.createdAt), new Date(), {
-      addSuffix: true,
-    }).replace('about ', '')
+    const lastRunTime = formatDistance(
+      new Date(mockRunData.createdAt),
+      new Date(),
+      {
+        addSuffix: true,
+      }
+    ).replace('about ', '')
     getByText('Ready to run')
     getByText('mockProtocol')
     getByText(`Failed ${lastRunTime}`)
