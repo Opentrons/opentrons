@@ -862,7 +862,6 @@ def test_command_store_saves_correct_error_code() -> None:
                 createdAt=datetime(year=2021, month=1, day=1),
                 errorType="MyCustomError",
                 detail="oh no",
-                # Unknown errors use the default error code
                 errorCode=TEST_CODE,
             )
         },
