@@ -123,13 +123,7 @@ export function RobotSystemVersion({
                 buttonText={t('view_update')}
                 onClick={() => setShowModal(true)}
               />
-            ) : (
-              <MediumButton
-                flex="1"
-                buttonText={t('check_for_updates')}
-                onClick={() => console.log('check for updates')}
-              />
-            )}
+            ) : null}
           </Flex>
         </Flex>
       </Flex>
