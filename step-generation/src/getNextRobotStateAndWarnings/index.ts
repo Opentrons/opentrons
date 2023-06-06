@@ -38,6 +38,7 @@ import type {
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
+import { forMoveLabware } from './forMoveLabware'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(
@@ -81,6 +82,14 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'magneticModule/disengage':
       forDisengageMagnet(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+
+    case 'moveLabware':
+      forMoveLabware(
         command.params,
         invariantContext,
         robotStateAndWarnings

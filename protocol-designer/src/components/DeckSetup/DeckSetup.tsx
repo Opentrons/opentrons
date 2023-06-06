@@ -159,6 +159,7 @@ export const getSwapBlocked = (args: SwapBlockedArgs): boolean => {
   return labwareSourceToDestBlocked || labwareDestToSourceBlocked
 }
 
+// TODO IMMEDIATELY BC -> address this todo
 // TODO IL 2020-01-12: to support dynamic labware/module movement during a protocol,
 // don't use initialDeckSetup here. Use some version of timelineFrameForActiveItem
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {

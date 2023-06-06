@@ -384,6 +384,13 @@ export interface ThermocyclerStateStepArgs {
   message?: string
 }
 
+export interface MoveLabwareArgs extends CommonArgs {
+  commandCreatorFnName: 'moveLabware',
+  labware: string,
+  useGripper: boolean,
+  newLocation: string
+}
+
 export type CommandCreatorArgs =
   | ConsolidateArgs
   | DistributeArgs
@@ -398,6 +405,7 @@ export type CommandCreatorArgs =
   | ThermocyclerProfileStepArgs
   | ThermocyclerStateStepArgs
   | HeaterShakerArgs
+  | MoveLabwareArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }

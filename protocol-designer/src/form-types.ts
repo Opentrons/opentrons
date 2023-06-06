@@ -216,6 +216,18 @@ export interface HydratedMoveLiquidFormData {
     blowout_location: string | null | undefined // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
   }
 }
+
+export interface HydratedMoveLabwareFormData {
+  id: string
+  stepType: 'moveLabware'
+  stepName: string
+  description: string | null | undefined
+  fields: {
+    labware: LabwareEntity,
+    newLocation: string,
+    useGripper: boolean,
+  }
+}
 export interface HydratedMixFormDataLegacy {
   id: string
   stepType: 'mix'
