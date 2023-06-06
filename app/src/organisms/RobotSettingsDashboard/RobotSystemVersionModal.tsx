@@ -54,7 +54,6 @@ export function RobotSystemVersionModal({
             heading={t('updating_robot_system')}
             hug
           />
-          {/* </Flex> */}
           <ReleaseNotes source={releaseNotes} />
         </Flex>
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
