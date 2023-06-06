@@ -28,6 +28,7 @@ _ATTACH_POINT = Point(x=0, y=110)
 _MAX_Z_AXIS_MOTION_RANGE = 215
 # These offsets are by eye measuring
 _INSTRUMENT_ATTACH_Z_POINT = 400.0
+_LEFT_MOUNT_Z_MARGIN = 5
 # Move the right mount a bit higher than the left so the user won't forget to unscrew
 _RIGHT_MOUNT_Z_MARGIN = 20
 
@@ -110,7 +111,7 @@ class MoveToMaintenancePositionImplementation(
             max_motion_range = max_height_z - _MAX_Z_AXIS_MOTION_RANGE
             await ot3_api.move_axes(
                 {
-                    OT3Axis.Z_L: max_motion_range,
+                    OT3Axis.Z_L: max_motion_range + _LEFT_MOUNT_Z_MARGIN,
                     OT3Axis.Z_R: max_motion_range + _RIGHT_MOUNT_Z_MARGIN,
                 }
             )

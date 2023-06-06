@@ -41,7 +41,7 @@ def subject(
         ),
         (
             MaintenancePosition.ATTACH_PLATE,
-            {OT3Axis.Z_L: 85, OT3Axis.Z_R: 105},
+            {OT3Axis.Z_L: 90, OT3Axis.Z_R: 105},
         ),
     ],
 )
