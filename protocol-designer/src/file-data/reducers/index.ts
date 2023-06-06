@@ -2,10 +2,16 @@ import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { Timeline } from '@opentrons/step-generation'
 import { Action } from '../../types'
-import { FileMetadataFields, SaveFileMetadataAction } from '../types'
+import {
+  FileMetadataFields,
+  RobotDataFields,
+  SaveFileMetadataAction,
+} from '../types'
 import { LoadFileAction, NewProtocolFields } from '../../load-file'
 import { ComputeRobotStateTimelineSuccessAction } from '../actions'
 import { Substeps } from '../../steplist/types'
+import { OT2_STANDARD_DECKID, OT2_STANDARD_MODEL } from '@opentrons/shared-data'
+
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   {
     COMPUTE_ROBOT_STATE_TIMELINE_REQUEST: () => true,
@@ -91,12 +97,39 @@ const fileMetadata = handleActions(
   },
   defaultFields
 )
+const robotDataDefaultFields: RobotDataFields = {
+  model: OT2_STANDARD_MODEL,
+  deckId: OT2_STANDARD_DECKID,
+}
+const robot = handleActions(
+  {
+    SET_ROBOT_TYPE: (
+      state: RobotDataFields,
+      action: {
+        payload: RobotDataFields
+      }
+    ): RobotDataFields => {
+      return { ...state, ...action.payload }
+    },
+    LOAD_FILE: (
+      state: RobotDataFields,
+      action: {
+        payload: any
+      }
+    ): RobotDataFields => {
+      const { file } = action.payload
+      return { ...state, ...file.robot }
+    },
+  },
+  robotDataDefaultFields
+)
 export interface RootState {
   computedRobotStateTimeline: Timeline
   computedSubsteps: Substeps
   currentProtocolExists: boolean
   fileMetadata: FileMetadataFields
   timelineIsBeingComputed: boolean
+  robot: RobotDataFields
 }
 const _allReducers = {
   computedRobotStateTimeline,
@@ -104,6 +137,7 @@ const _allReducers = {
   currentProtocolExists,
   fileMetadata,
   timelineIsBeingComputed,
+  robot,
 }
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers

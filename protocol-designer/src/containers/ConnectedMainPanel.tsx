@@ -17,24 +17,50 @@ import { getSelectedTerminalItemId } from '../ui/steps'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors, Page } from '../navigation'
 import { BaseState } from '../types'
+import { FlexFileDetails } from '../components/FlexProtocolEditor/FlexFileDetails'
+import { LandingPageComponent } from '../components/LandingPage'
+import { OT2_STANDARD_DECKID } from '@opentrons/shared-data'
+import { selectors as fileSelectors, RobotDataFields } from '../file-data'
+import { FlexProtocolEditorComponent } from '../components/FlexProtocolEditor/FlexProtocolEditor'
 
 interface Props {
   page: Page
   selectedTerminalItemId: TerminalItemId | null | undefined
   ingredSelectionMode: boolean
+  robot: RobotDataFields
 }
 
 function MainPanelComponent(props: Props): JSX.Element {
-  const { page, selectedTerminalItemId, ingredSelectionMode } = props
+  const { page, selectedTerminalItemId, ingredSelectionMode, robot } = props
+  // in OT3 case : undefined while import file
+  // in OT2 case: ot2_standard while import file
+  const fileComponent =
+    !robot || robot.deckId === OT2_STANDARD_DECKID ? (
+      <ConnectedFilePage />
+    ) : (
+      <FlexFileDetails />
+    )
   switch (page) {
     case 'file-splash':
       return <Splash />
     case 'file-detail':
-      return <ConnectedFilePage />
+      return fileComponent
     case 'liquids':
       return <LiquidsPage />
+    case 'landing-page':
+      return <LandingPageComponent />
     case 'settings-app':
       return <SettingsPage />
+    case 'new-flex-file-form':
+      return (
+        <FlexProtocolEditorComponent
+          FlexFileDetails={{
+            isEditValue: false,
+            tabIdValue: undefined,
+            formProps: undefined,
+          }}
+        />
+      )
     default: {
       const startTerminalItemSelected =
         selectedTerminalItemId === START_TERMINAL_ITEM_ID
@@ -62,6 +88,7 @@ function mapStateToProps(state: BaseState): Props {
     selectedTerminalItemId: getSelectedTerminalItemId(state),
     ingredSelectionMode:
       labwareIngredSelectors.getSelectedLabwareId(state) != null,
+    robot: fileSelectors.protocolRobotModelName(state),
   }
 }
 

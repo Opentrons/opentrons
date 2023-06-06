@@ -11,6 +11,9 @@ import { selectors as fileSelectors } from '../file-data'
 interface SP {
   currentPage: Page
   currentProtocolExists: boolean
+  robot: {
+    deckId: string
+  }
 }
 
 interface DP {
@@ -31,10 +34,15 @@ function Nav(props: Props): JSX.Element {
             title={i18n.t('nav.tab_name.file')}
             selected={
               props.currentPage === 'file-splash' ||
-              props.currentPage === 'file-detail'
+              props.currentPage === 'file-detail' ||
+              props.currentPage === 'new-flex-file-form'
             }
             onClick={props.handleClick(
-              noCurrentProtocol ? 'file-splash' : 'file-detail'
+              noCurrentProtocol
+                ? 'new-flex-file-form'
+                : props.robot.deckId === 'ot3_standard'
+                ? 'file-detail'
+                : 'file-splash'
             )}
           />
           <NavTab
@@ -78,6 +86,7 @@ function mapStateToProps(state: BaseState): SP {
   return {
     currentPage: selectors.getCurrentPage(state),
     currentProtocolExists: fileSelectors.getCurrentProtocolExists(state),
+    robot: fileSelectors.protocolRobotModelName(state),
   }
 }
 

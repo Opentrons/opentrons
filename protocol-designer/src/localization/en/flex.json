@@ -1,0 +1,77 @@
+{
+  "landing_page": {
+    "welcome": "Welcome to Protocol Designer",
+    "create_flex_protocol": "Create New Opentrons Flex Protocol",
+    "create_ot2_protocol": "Create new OT-2 protocol",
+    "import_protocol": "Import a protocol"
+  },
+  "header": {
+    "title": "Create New Opentrons Flex Protocol",
+    "cancel_button": "Cancel",
+    "required_fields": "*required fields"
+  },
+  "round_tabs": {
+    "next": "Next",
+    "update": "Update",
+    "previous": "Previous",
+    "go_to_liquids_page": "Create protocol, on to liquids"
+  },
+  "name_and_description": {
+    "name": "Protocol Name and Description",
+    "heading": "Protocol Name and Description",
+    "choose_name": "Choose a name for your protocol.*",
+    "protocol_name": "Protocol Name",
+    "supporting_error_text": "supporting text about any error handling goes here.",
+    "add_more_information": "Add more information, if you like (you can change this later).",
+    "organization_author": "Organization/Author",
+    "protocol_description": "Description"
+  },
+  "instrument_selection": {
+    "name": "Instrument Selection",
+    "heading": "Pipettes"
+  },
+  "modules_selection": {
+    "name": "Module Selection",
+    "heading": "Modules"
+  },
+  "pipette_selection": {
+    "pipette_96_selection_note": "Note: 96-channel take up both mounts and requires a tiprack adapter",
+    "pippette_ocuupies_both_mount": "Note: 96 Channel occupies both the mount.",
+    "choose_first_pipette": "Choose First Pipette",
+    "choose_second_pipette": "Choose Second Pipette",
+    "left_pipette_display": "Left Mount",
+    "right_pipette_display": "Right Mount"
+  },
+  "errors": {
+    "first_pipette_not_selected": "You must select a pipette before proceeding.",
+    "tiprack_not_selected": "You must select a tip rack before proceeding."
+  },
+  "file_tab": {
+    "heading": "Protocol Information",
+    "subheading": "Opentrons Flex Protocol",
+    "export": "Export Protocol",
+    "close_export": "Close Protocol",
+    "invalid_json": "Please select valid JSON file to display",
+    "name_desc_title": "Name and Description",
+    "name": "Name : ",
+    "author": "Author : ",
+    "description": "Description : ",
+    "date_created": "Date Created : ",
+    "last_exported": "Last Exported : ",
+    "pipette": "Pipettes",
+    "swap_pipette": "Swap Pipette",
+    "modules": "Modules",
+    "add_items": "Add Items",
+    "edit": "Edit",
+    "left": "Left mount -",
+    "right": "Right mount -",
+    "add_pipette": "Add Pipette",
+    "no_modules_found": "No modules found."
+  },
+  "cancel_create_protocol": {
+    "confirmation_title": "Cancel Create Protocol?",
+    "confirmation_message": "Are you sure you want to cancel creating a protocol? Progress will be lost. You can’t undo this change.",
+    "cancel_button_name": "Go back",
+    "continue_button_name": "Cancel New Protocol"
+  }
+}

@@ -13,7 +13,6 @@ const slotThree = 'foreignObject[x="265"][y="0"]'
 describe('Custom Tip Racks', () => {
   before(() => {
     cy.visit('/')
-    cy.closeAnnouncementModal()
   })
 
   const testCases = [
@@ -46,6 +45,8 @@ describe('Custom Tip Racks', () => {
 
   describe('build a new protocol with a custom tip rack', () => {
     it('sets up pipettes', () => {
+      cy.get('button').contains('Create new OT-2 protocol').click()
+      cy.closeAnnouncementModal()
       cy.get('button').contains('Create New').click()
       cy.get("input[placeholder='Untitled']").type(protocolTitle)
       cy.choosePipettes(pipette, pipette)

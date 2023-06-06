@@ -20,6 +20,7 @@ const magenticDeckWellWithExtraSpace = 'Mag Deck Well '
 describe('Protocols with Modules', () => {
   before(() => {
     cy.visit('/')
+    cy.get('button').contains('Create new OT-2 protocol').click()
     cy.closeAnnouncementModal()
   })
 

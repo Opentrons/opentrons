@@ -68,6 +68,12 @@ function mapStateToProps(state: BaseState): SP {
   const fileName = fileDataSelectors.protocolName(state)
   const selectedStepInfo = getSelectedStepTitleInfo(state)
   const selectedTerminalId = getSelectedTerminalItemId(state)
+  // const robotModelName = fileDataSelectors.protocolRobotModelName(state)
+  // const labwareNames =
+  //   robotModelName === 'ot3_standard'
+  //     ? uiLabwareSelectors.getLabwareNicknamesByIdForOT3(state)
+  //     : uiLabwareSelectors.getLabwareNicknamesById(state)
+
   const labwareNames = uiLabwareSelectors.getLabwareNicknamesById(state)
   const drilledDownLabwareId = labwareIngredSelectors.getDrillDownLabwareId(
     state
@@ -91,6 +97,12 @@ function mapStateToProps(state: BaseState): SP {
       return {
         _page,
         title: i18n.t([`nav.title.${_page}`, fileName]),
+        subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
+      }
+    case 'new-flex-file-form':
+      return {
+        _page,
+        title: i18n.t('flex.header.title'),
         subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
       }
     case 'file-splash':

@@ -1,8 +1,8 @@
 import groupBy from 'lodash/groupBy'
 import {
   getLabwareDefURI,
-  PD_DO_NOT_LIST,
   LabwareDefinition2,
+  PD_DO_NOT_LIST_OT3,
 } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from './types'
 
@@ -15,7 +15,6 @@ const definitionsContext = require.context(
   /\.json$/, // import filter
   'sync' // load every definition into one synchronous chunk
 )
-
 let _definitions: LabwareDefByDefURI | null = null
 export function getAllDefinitions(): LabwareDefByDefURI {
   // NOTE: unlike labware-library, no filtering out trashes here (we need 'em)
@@ -24,12 +23,26 @@ export function getAllDefinitions(): LabwareDefByDefURI {
     _definitions = definitionsContext.keys().reduce((acc, filename) => {
       const def: LabwareDefinition2 = definitionsContext(filename)
       const labwareDefURI = getLabwareDefURI(def)
-      return PD_DO_NOT_LIST.includes(def.parameters.loadName)
+      // Need to handle Ot2 and OT3 supported labware here
+      return PD_DO_NOT_LIST_OT3.includes(def.parameters.loadName)
         ? acc
         : { ...acc, [labwareDefURI]: def }
     }, {})
   }
 
+  return _definitions
+}
+
+// Please be aware that only labware supported by OT3 should be loaded.
+// separate list to only allow the ot3 tipracks
+export function getOt3AllDefinitions(): LabwareDefByDefURI {
+  _definitions = definitionsContext.keys().reduce((acc, filename) => {
+    const def: LabwareDefinition2 = definitionsContext(filename)
+    const labwareDefURI = getLabwareDefURI(def)
+    return PD_DO_NOT_LIST_OT3.includes(def.parameters.loadName)
+      ? acc
+      : { ...acc, [labwareDefURI]: def }
+  }, {})
   return _definitions
 }
 // filter out all but the latest version of each labware
