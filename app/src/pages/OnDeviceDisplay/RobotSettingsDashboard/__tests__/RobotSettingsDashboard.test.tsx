@@ -8,7 +8,7 @@ import { i18n } from '../../../../i18n'
 import { getLocalRobot } from '../../../../redux/discovery'
 import { toggleDevtools } from '../../../../redux/config'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
-import { Navigation } from '../../../../organisms/OnDeviceDisplay/Navigation'
+import { Navigation } from '../../../../organisms/Navigation'
 import {
   DeviceReset,
   TouchScreenSleep,
@@ -26,7 +26,7 @@ jest.mock('../../../../redux/discovery')
 jest.mock('../../../../redux/buildroot')
 jest.mock('../../../../redux/config')
 jest.mock('../../hooks/useNetworkConnection')
-jest.mock('../../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock('../../../../organisms/Navigation')
 jest.mock(
   '../../../../organisms/OnDeviceDisplay/RobotSettingsDashboard/TouchScreenSleep'
 )

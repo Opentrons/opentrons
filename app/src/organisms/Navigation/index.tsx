@@ -19,12 +19,12 @@ import {
   POSITION_STATIC,
 } from '@opentrons/components'
 
-import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
-import { useNetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
-import { getLocalRobot } from '../../../redux/discovery'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { useNetworkConnection } from '../../pages/OnDeviceDisplay/hooks'
+import { getLocalRobot } from '../../redux/discovery'
 import { NavigationMenu } from './NavigationMenu'
 
-import type { RouteProps } from '../../../App/types'
+import type { RouteProps } from '../../App/types'
 
 interface NavigationProps {
   routes: RouteProps[]
