@@ -70,6 +70,7 @@ def get_api_context(
         hardware_api=ThreadManager(_thread_manager_build_hw_api),  # type: ignore[arg-type]
         deck_type=guess_deck_type_from_global_config(),
         extra_labware=extra_labware,
+        deck_version=2,
     )
 
 
