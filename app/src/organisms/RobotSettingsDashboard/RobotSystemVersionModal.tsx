@@ -6,7 +6,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  OVERFLOW_SCROLL,
+  OVERFLOW_AUTO,
   SPACING,
 } from '@opentrons/components'
 
@@ -47,7 +47,7 @@ export function RobotSystemVersionModal({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing24}
-          overflow={OVERFLOW_SCROLL}
+          overflow={OVERFLOW_AUTO}
         >
           <InlineNotification
             type="neutral"

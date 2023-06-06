@@ -88,7 +88,7 @@ export function RobotSystemVersion({
               gridGap={SPACING.spacing16}
               borderRadius={BORDERS.borderRadiusSize3}
               alignItems={ALIGN_CENTER}
-              backgroundColor={COLORS.warningBackgroundMed}
+              backgroundColor={COLORS.yellow3}
             >
               <Icon name="ot-alert" size="1.75rem" color={COLORS.yellow2} />
               <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -103,7 +103,7 @@ export function RobotSystemVersion({
               'view_latest_release_notes_at'
             )} ${GITHUB_URL}`}</StyledText>
             <Flex
-              backgroundColor={COLORS.light2}
+              backgroundColor={COLORS.light1}
               flexDirection={DIRECTION_ROW}
               padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
