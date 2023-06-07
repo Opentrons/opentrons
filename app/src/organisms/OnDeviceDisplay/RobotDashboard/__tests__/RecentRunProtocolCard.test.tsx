@@ -16,6 +16,7 @@ import { useMissingHardwareText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../pages/Protocols/hooks')
@@ -25,7 +26,6 @@ jest.mock('../../../../organisms/ProtocolUpload/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../hooks')
 
-const mockLastRun = '2023-04-12T21:30:49.124108+00:00'
 const RUN_ID = 'mockRunId'
 
 const mockMissingPipette = [
@@ -67,6 +67,7 @@ const mockRunData = {
   completedAt: 'thistime',
   startedAt: 'thistime',
   protocolId: 'mockProtocolId',
+  status: RUN_STATUS_FAILED,
 } as any
 
 let mockCloneRun: jest.Mock
@@ -123,7 +124,7 @@ describe('RecentRunProtocolCard', () => {
       data: { data: [mockRunData] },
     } as any)
     mockUseProtocolQuery.mockReturnValue({
-      data: { data: {} },
+      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
     } as any)
     when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
@@ -141,12 +142,16 @@ describe('RecentRunProtocolCard', () => {
 
   it('should render text', () => {
     const [{ getByText }] = render(props)
-    const lastRunTime = formatDistance(new Date(mockLastRun), new Date(), {
-      addSuffix: true,
-    }).replace('about ', '')
+    const lastRunTime = formatDistance(
+      new Date(mockRunData.createdAt),
+      new Date(),
+      {
+        addSuffix: true,
+      }
+    ).replace('about ', '')
     getByText('Ready to run')
     getByText('mockProtocol')
-    getByText(`Last run ${lastRunTime}`)
+    getByText(`Failed ${lastRunTime}`)
   })
 
   it('should render missing chip when missing a pipette', () => {
