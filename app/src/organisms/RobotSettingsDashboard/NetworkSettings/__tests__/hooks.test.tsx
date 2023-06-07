@@ -3,13 +3,13 @@ import { renderHook } from '@testing-library/react-hooks'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
-import { getOnDeviceDisplaySettings } from '../../../../../redux/config'
+import { getOnDeviceDisplaySettings } from '../../../../redux/config'
 import { useIsFinishedUnboxing } from '../hooks'
 
 import type { Store } from 'redux'
-import type { State } from '../../../../../redux/types'
+import type { State } from '../../../../redux/types'
 
-jest.mock('../../../../../redux/config')
+jest.mock('../../../../redux/config')
 
 const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
   typeof getOnDeviceDisplaySettings

@@ -13,10 +13,10 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
-import { Modal } from '../../../../molecules/Modal/OnDeviceDisplay/Modal'
+import { StyledText } from '../../../atoms/text'
+import { Modal } from '../../../molecules/Modal/OnDeviceDisplay/Modal'
 
-import type { ModalHeaderBaseProps } from '../../../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
 
 interface NetworkDetailsModalProps {
   setShowNetworkDetailModal: (showNetworkDetailModal: boolean) => void

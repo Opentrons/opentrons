@@ -2,11 +2,11 @@ import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
 
 import { renderWithProviders } from '@opentrons/components'
-import { i18n } from '../../../../i18n'
-import { updateConfigValue } from '../../../../redux/config'
+import { i18n } from '../../../i18n'
+import { updateConfigValue } from '../../../redux/config'
 import { TouchScreenSleep } from '../TouchScreenSleep'
 
-jest.mock('../../../../redux/config')
+jest.mock('../../../redux/config')
 
 const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
   typeof updateConfigValue

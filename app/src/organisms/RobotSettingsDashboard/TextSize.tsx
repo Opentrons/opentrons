@@ -17,9 +17,9 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
+import { StyledText } from '../../atoms/text'
 
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
+import type { SettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 interface RectProps {
   isActive: boolean

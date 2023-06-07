@@ -17,7 +17,7 @@ import {
   DISPLAY_FLEX,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
+import { StyledText } from '../../../atoms/text'
 import { NetworkDetailsModal } from './NetworkDetailsModal'
 import {
   ConnectingNetwork,
@@ -26,22 +26,22 @@ import {
   SetWifiSsid,
   SelectAuthenticationType,
   SetWifiCred,
-} from '../../../NetworkSettings'
-import * as Networking from '../../../../redux/networking'
-import * as RobotApi from '../../../../redux/robot-api'
-import { getLocalRobot } from '../../../../redux/discovery'
-import { fetchStatus, getNetworkInterfaces } from '../../../../redux/networking'
-import { useWifiList } from '../../../../resources/networking/hooks'
+} from '../../NetworkSettings'
+import * as Networking from '../../../redux/networking'
+import * as RobotApi from '../../../redux/robot-api'
+import { getLocalRobot } from '../../../redux/discovery'
+import { fetchStatus, getNetworkInterfaces } from '../../../redux/networking'
+import { useWifiList } from '../../../resources/networking/hooks'
 import {
   CONNECT,
   JOIN_OTHER,
-} from '../../../Devices/RobotSettings/ConnectNetwork/constants'
+} from '../../Devices/RobotSettings/ConnectNetwork/constants'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { Dispatch, State } from '../../../../redux/types'
-import type { RequestState } from '../../../../redux/robot-api/types'
-import type { WifiNetwork } from '../../../../redux/networking/types'
-import type { NetworkChangeState } from '../../../Devices/RobotSettings/ConnectNetwork/types'
+import type { Dispatch, State } from '../../../redux/types'
+import type { RequestState } from '../../../redux/robot-api/types'
+import type { WifiNetwork } from '../../../redux/networking/types'
+import type { NetworkChangeState } from '../../Devices/RobotSettings/ConnectNetwork/types'
 
 const FETCH_WIFI_LIST_MS = 5000
 interface WifiConnectionDetailsProps {

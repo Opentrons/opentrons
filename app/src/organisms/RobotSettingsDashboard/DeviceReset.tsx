@@ -18,17 +18,17 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
+import { StyledText } from '../../atoms/text'
 import {
   getResetConfigOptions,
   fetchResetConfigOptions,
   resetConfig,
-} from '../../../redux/robot-admin'
-import { useDispatchApiRequest } from '../../../redux/robot-api'
+} from '../../redux/robot-admin'
+import { useDispatchApiRequest } from '../../redux/robot-api'
 
-import type { Dispatch, State } from '../../../redux/types'
-import type { ResetConfigRequest } from '../../../redux/robot-admin/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
+import type { Dispatch, State } from '../../redux/types'
+import type { ResetConfigRequest } from '../../redux/robot-admin/types'
+import type { SettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 interface LabelProps {
   isSelected?: boolean

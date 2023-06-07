@@ -3,17 +3,17 @@ import { when } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../../../i18n'
-import * as Networking from '../../../../../redux/networking'
-import { getLocalRobot } from '../../../../../redux/discovery'
-import { mockConnectedRobot } from '../../../../../redux/discovery/__fixtures__'
+import { i18n } from '../../../../i18n'
+import * as Networking from '../../../../redux/networking'
+import { getLocalRobot } from '../../../../redux/discovery'
+import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { EthernetConnectionDetails } from '../EthernetConnectionDetails'
 
-import type { State } from '../../../../../redux/types'
+import type { State } from '../../../../redux/types'
 
-jest.mock('../../../../../redux/networking')
-jest.mock('../../../../../redux/discovery')
-jest.mock('../../../../../redux/discovery/selectors')
+jest.mock('../../../../redux/networking')
+jest.mock('../../../../redux/discovery')
+jest.mock('../../../../redux/discovery/selectors')
 
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces

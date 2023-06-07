@@ -13,16 +13,16 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
-import { RadioButton } from '../../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { RadioButton } from '../../atoms/buttons'
 import {
   getOnDeviceDisplaySettings,
   updateConfigValue,
-} from '../../../redux/config'
-import { SLEEP_NEVER_MS } from '../../../App/constants'
+} from '../../redux/config'
+import { SLEEP_NEVER_MS } from '../../App/constants'
 
-import type { Dispatch } from '../../../redux/types'
-import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
+import type { Dispatch } from '../../redux/types'
+import type { SettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 const SLEEP_TIME_MS = 60 * 1000 // 1 min
 

@@ -3,16 +3,16 @@ import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
 
-import { i18n } from '../../../../../i18n'
-import { getLocalRobot } from '../../../../../redux/discovery'
-import * as Networking from '../../../../../redux/networking'
+import { i18n } from '../../../../i18n'
+import { getLocalRobot } from '../../../../redux/discovery'
+import * as Networking from '../../../../redux/networking'
 import { NetworkDetailsModal } from '../NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
-import type { State } from '../../../../../redux/types'
+import type { State } from '../../../../redux/types'
 
-jest.mock('../../../../../redux/discovery')
-jest.mock('../../../../../redux/networking')
+jest.mock('../../../../redux/discovery')
+jest.mock('../../../../redux/networking')
 jest.mock('../NetworkDetailsModal')
 
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<

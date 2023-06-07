@@ -16,17 +16,17 @@ import {
   BORDERS,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../../atoms/text'
-import { Chip } from '../../../../atoms/Chip'
-import { useWifiList } from '../../../../resources/networking/hooks'
-import { getLocalRobot } from '../../../../redux/discovery'
+import { StyledText } from '../../../atoms/text'
+import { Chip } from '../../../atoms/Chip'
+import { useWifiList } from '../../../resources/networking/hooks'
+import { getLocalRobot } from '../../../redux/discovery'
 import { EthernetConnectionDetails } from './EthernetConnectionDetails'
 import { WifiConnectionDetails } from './WifiConnectionDetails'
 
 import type { IconName } from '@opentrons/components'
-import type { NetworkConnection } from '../../../../pages/OnDeviceDisplay/hooks'
-import type { ChipType } from '../../../../atoms/Chip'
-import type { SettingOption } from '../../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
+import type { NetworkConnection } from '../../../pages/OnDeviceDisplay/hooks'
+import type { ChipType } from '../../../atoms/Chip'
+import type { SettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
 
 export type ConnectionType = 'wifi' | 'ethernet' | 'usb'
 
