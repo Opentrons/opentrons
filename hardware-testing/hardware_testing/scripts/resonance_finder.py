@@ -461,10 +461,10 @@ async def _main(is_simulating: bool) -> None:
                     move_output_tuple = await _single_axis_move(test_axis,
                                                                 api,
                                                                 cycles=CYCLES)
-                    if(test_axis == 'L'):
-                        move_output_tuple = await _single_axis_move('R',
-                                                                    api,
-                                                                    cycles=CYCLES)
+                    # if(test_axis == 'L'):
+                    #     move_output_tuple = await _single_axis_move('R',
+                    #                                                 api,
+                    #                                                 cycles=CYCLES)
                     run_avg_error = move_output_tuple[0]
                     cycles_completed = move_output_tuple[1]
 
