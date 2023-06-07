@@ -34,6 +34,7 @@ from .ot3utils import (
     create_home_group,
     node_to_axis,
     sensor_node_for_mount,
+    sensor_node_for_pipette,
     sensor_id_for_instrument,
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
@@ -938,17 +939,21 @@ class OT3Controller:
     async def monitor_overpressure(
         self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
     ) -> AsyncIterator[None]:
-        tool = sensor_node_for_mount(OT3Mount(mount.value))
+        tool = sensor_node_for_pipette(OT3Mount(mount.value))
         # FIXME we should switch the sensor type based on the channel
         # used when partial tip pick up is implemented.
         # FIXME we should also monitor pressure in all available channels
-        provided_context_manager = check_overpressure(self._messenger, tool, sensor_id)
-        async with provided_context_manager() as handle_overpressure:
+        provided_context_manager = await check_overpressure(
+            self._messenger, tool, sensor_id
+        )
+        errors: asyncio.Queue[ErrorCode] = asyncio.Queue()
+
+        async with provided_context_manager() as errors:
             yield
 
         def _pop_queue() -> Optional[ErrorCode]:
             try:
-                return handle_overpressure.get_nowait()
+                return errors.get_nowait()
             except asyncio.QueueEmpty:
                 return None
 
@@ -970,7 +975,7 @@ class OT3Controller:
         sensor_id: SensorId = SensorId.S0,
     ) -> Dict[NodeId, float]:
         head_node = axis_to_node(OT3Axis.by_mount(mount))
-        tool = sensor_node_for_mount(OT3Mount(mount.value))
+        tool = sensor_node_for_pipette(OT3Mount(mount.value))
         positions = await liquid_probe(
             self._messenger,
             tool,

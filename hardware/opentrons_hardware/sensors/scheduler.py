@@ -475,18 +475,22 @@ class SensorScheduler:
         self,
         target_sensor: SensorInformation,
         can_messenger: CanMessenger,
-    ) -> AsyncIterator[None]:
-
-        error_response_queue: "asyncio.Queue[float]" = asyncio.Queue()
+    ) -> AsyncIterator["asyncio.Queue[ErrorCode]"]:
+        """While acquired, monitor that a sensor does not exceed its rated."""
+        error_response_queue: "asyncio.Queue[ErrorCode]" = asyncio.Queue()
 
         def _async_error_listener(
             message: MessageDefinition, arb_id: ArbitrationId
         ) -> None:
+            # FIXME could possibly make this error more generalized for other
+            # sensors in the future
             if (
                 isinstance(message, ErrorMessage)
-                and message.payload.error_code == ErrorCode.over_pressure
+                and message.payload.error_code.value == ErrorCode.over_pressure.value
             ):
-                error_response_queue.put_nowait(message.payload)
+                error_response_queue.put_nowait(
+                    ErrorCode(message.payload.error_code.value)
+                )
 
         def _filter(arbitration_id: ArbitrationId) -> bool:
             return (

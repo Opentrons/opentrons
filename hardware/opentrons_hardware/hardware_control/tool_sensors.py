@@ -1,7 +1,7 @@
 """Functions for commanding motion limited by tool sensors."""
 import asyncio
 from functools import partial
-from typing import Union, List, Iterator, Tuple, Dict
+from typing import Union, List, Iterator, Tuple, Dict, Callable, AsyncContextManager
 from logging import getLogger
 from numpy import float64
 from math import copysign
@@ -13,6 +13,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorType,
     SensorThresholdMode,
     SensorOutputBinding,
+    ErrorCode,
 )
 from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
 from opentrons_hardware.sensors.types import (
@@ -131,7 +132,12 @@ async def liquid_probe(
 
 async def check_overpressure(
     messenger: CanMessenger, tool: PipetteProbeTarget, sensor_id: SensorId = SensorId.S0
-):
+) -> Callable[..., AsyncContextManager["asyncio.Queue[ErrorCode]"]]:
+    """Montior for overpressure in the system.
+
+    Returns a partial context manager to be used in the hardware controller so
+    we can wrap moves.
+    """
     sensor_scheduler = SensorScheduler()
     sensor_info = SensorInformation(SensorType.pressure, sensor_id, tool)
     return partial(

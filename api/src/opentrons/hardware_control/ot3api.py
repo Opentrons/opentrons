@@ -695,7 +695,8 @@ class OT3API(
         """
 
         checked_mount = OT3Mount.from_mount(mount)
-        await self.home([OT3Axis.of_main_tool_actuator(checked_mount)])
+        async with self._backend.monitor_overpressure(mount):
+            await self.home([OT3Axis.of_main_tool_actuator(checked_mount)])
         instr = self._pipette_handler.hardware_instruments[checked_mount]
         if instr:
             self._log.info("Attempting to move the plunger to bottom.")
@@ -1567,11 +1568,12 @@ class OT3API(
         )
 
         try:
-            await self._move(
-                target_pos,
-                speed=blowout_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self._backend.monitor_overpressure(realmount):
+                await self._move(
+                    target_pos,
+                    speed=blowout_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Blow out failed")
             raise

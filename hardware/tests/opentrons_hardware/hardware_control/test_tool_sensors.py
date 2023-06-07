@@ -9,12 +9,14 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MoveCompleted,
     ReadFromSensorResponse,
     Acknowledgement,
+    BindSensorOutputRequest,
 )
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     EmptyPayload,
     MoveCompletedPayload,
     ReadFromSensorResponsePayload,
+    BindSensorOutputRequestPayload,
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
@@ -26,6 +28,7 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorIdField,
     SensorTypeField,
     MotorPositionFlagsField,
+    SensorOutputBindingField,
 )
 
 
@@ -370,26 +373,44 @@ async def test_capacitive_sweep(
 
 
 @pytest.mark.parametrize(
-    "target_node,sensor_id, threshold_pascals",
+    "target_node,sensor_id",
     [
-        (NodeId.pipette_left, SensorId.S0, 14),
-        (NodeId.pipette_right, SensorId.S1, 16),
+        (NodeId.pipette_left, SensorId.S0),
+        (NodeId.pipette_right, SensorId.S1),
     ],
 )
-async def test_overpressure(
-    mock_messenger: AsyncMock, message_send_loopback: CanLoopback, target_node, sensor_id
+async def test_overpressure_closure(
+    mock_messenger: AsyncMock, target_node: PipetteProbeTarget, sensor_id: SensorId
 ) -> None:
-    partial_context_manager = check_overpressure(mock_messenger, target_node, sensor_id)
+    """Test that we can use partial context manager."""
+    partial_context_manager = await check_overpressure(
+        mock_messenger, target_node, sensor_id
+    )
 
-    def responder(
-        node_id: NodeId, message: MessageDefinition
-    ) -> List[Tuple[NodeId, MessageDefinition, NodeId]]:
-        message.payload.serialize()
-        return []
-
-    message_send_loopback.add_responder(responder)
-    try:
-        # Execute the actual partial context manager
-        partial_context_manager()
-    finally:
-        assert None
+    # Execute the actual partial context manager and see that the correct
+    # messages are sent.
+    async with partial_context_manager():
+        mock_messenger.ensure_send.assert_called_with(
+            node_id=target_node,
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(SensorType.pressure),
+                    sensor_id=SensorIdField(sensor_id),
+                    binding=SensorOutputBindingField(
+                        SensorOutputBinding.max_threshold_sync
+                    ),
+                )
+            ),
+            expected_nodes=[target_node],
+        )
+    mock_messenger.ensure_send.assert_called_with(
+        node_id=target_node,
+        message=BindSensorOutputRequest(
+            payload=BindSensorOutputRequestPayload(
+                sensor=SensorTypeField(SensorType.pressure),
+                sensor_id=SensorIdField(sensor_id),
+                binding=SensorOutputBindingField(SensorOutputBinding.none),
+            )
+        ),
+        expected_nodes=[target_node],
+    )
