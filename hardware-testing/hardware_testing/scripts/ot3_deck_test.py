@@ -322,8 +322,8 @@ async def _main(is_simulating: bool) -> None:
     await api.home()
     #await api.home_plunger(mount)
 
-    # test_tag = "MD"
-    # test_robot = "OT3"
+    test_tag = "MD"
+    test_robot = "OT3"
     
     test_tag = input("Enter test tag(请输入测试的设备名称):\n\t>> ")
     
@@ -369,7 +369,7 @@ async def _main(is_simulating: bool) -> None:
     
     #test_pip = api.get_attached_instrument(mount)
     test_name = "deck-test"
-    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_robot)
+    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
     header = ["------------------------------------"]
     header_str = data.convert_list_to_csv_line(header)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
