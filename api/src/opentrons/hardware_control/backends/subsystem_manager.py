@@ -195,6 +195,7 @@ class SubsystemManager:
                 {subsystem_to_target(subsystem) for subsystem in devices},
                 False,
             )
+            await asyncio.sleep(0.1)
             # make sure the update actually succeeded
             device_info = self.device_info
             if devices.issubset(device_info.keys()) and all(
