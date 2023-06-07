@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
 import {
@@ -41,7 +41,9 @@ import {
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
 } from '../../step-forms'
+import * as labwareIngredActions from '../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { BrowseLabwareModal } from '../labware'
 import { ModuleTag } from './ModuleTag'
 import { SlotWarning } from './SlotWarning'
@@ -51,6 +53,7 @@ import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 import { TerminalItemId } from '../../steplist'
 
 import styles from './DeckSetup.css'
+import { getSelectedTerminalItemId } from '../../ui/steps'
 
 export const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -61,12 +64,6 @@ export const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
-
-export interface DeckSetupProps {
-  selectedTerminalItemId?: TerminalItemId | null
-  handleClickOutside?: () => unknown
-  drilledDown: boolean
-}
 
 type ContentsProps = RobotWorkSpaceRenderProps & {
   activeDeckSetup: InitialDeckSetup
@@ -149,11 +146,11 @@ export const getSwapBlocked = (args: SwapBlockedArgs): boolean => {
   // dragging custom labware to module gives not compat error
   const labwareSourceToDestBlocked = sourceModuleType
     ? !getLabwareIsCompatible(hoveredLabware.def, sourceModuleType) &&
-      !hoveredLabwareIsCustom
+    !hoveredLabwareIsCustom
     : false
   const labwareDestToSourceBlocked = destModuleType
     ? !getLabwareIsCompatible(draggedLabware.def, destModuleType) &&
-      !draggedLabwareIsCustom
+    !draggedLabwareIsCustom
     : false
 
   return labwareSourceToDestBlocked || labwareDestToSourceBlocked
@@ -225,23 +222,23 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   const multichannelWarningSlots: DeckDefSlot[] = showGen1MultichannelCollisionWarnings
     ? compact([
-        (allModules.some(
-          moduleOnDeck =>
-            moduleOnDeck.slot === '1' &&
-            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
-            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-        ) &&
-          deckSlotsById?.['4']) ||
-          null,
-        (allModules.some(
-          moduleOnDeck =>
-            moduleOnDeck.slot === '3' &&
-            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
-            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-        ) &&
-          deckSlotsById?.['6']) ||
-          null,
-      ])
+      (allModules.some(
+        moduleOnDeck =>
+          moduleOnDeck.slot === '1' &&
+          // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
+          MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+      ) &&
+        deckSlotsById?.['4']) ||
+      null,
+      (allModules.some(
+        moduleOnDeck =>
+          moduleOnDeck.slot === '3' &&
+          // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
+          MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+      ) &&
+        deckSlotsById?.['6']) ||
+      null,
+    ])
     : []
 
   return (
@@ -359,11 +356,14 @@ const getHasGen1MultiChannelPipette = (
   )
 }
 
-export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
+export const DeckSetup = (): JSX.Element => {
+  const drilledDown = useSelector(labwareIngredSelectors.getDrillDownLabwareId) != null
+  const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+  const dispatch = useDispatch()
 
   const _hasGen1MultichannelPipette = React.useMemo(
     () => getHasGen1MultiChannelPipette(activeDeckSetup.pipettes),
@@ -374,13 +374,15 @@ export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
 
   const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
   const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
-    onClickOutside: props.handleClickOutside,
+    onClickOutside: () => {
+      if (drilledDown) dispatch(labwareIngredActions.drillUpFromLabware())
+    },
   })
 
   return (
     <React.Fragment>
       <div className={styles.deck_row}>
-        {props.drilledDown && <BrowseLabwareModal />}
+        {drilledDown && <BrowseLabwareModal />}
         <div ref={wrapperRef} className={styles.deck_wrapper}>
           <RobotWorkSpace
             deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
@@ -393,7 +395,7 @@ export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
               <>
                 <DeckSetupContents
                   activeDeckSetup={activeDeckSetup}
-                  selectedTerminalItemId={props.selectedTerminalItemId}
+                  selectedTerminalItemId={selectedTerminalItemId}
                   {...{
                     deckSlotsById,
                     getRobotCoordsFromDOMCoords,
