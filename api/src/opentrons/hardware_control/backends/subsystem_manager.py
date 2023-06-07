@@ -244,7 +244,7 @@ class SubsystemManager:
             log.info("No firmware updates required for specified subsystems.")
             return
 
-        log.info("Updating firmware on {updating_subsystems}")
+        log.info(f"Updating firmware on {updating_subsystems}")
 
         update_details = {
             target: firmware_updates[target].filepath
