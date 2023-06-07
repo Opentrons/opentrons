@@ -4,6 +4,7 @@ from collections import defaultdict
 import logging
 from typing import List, Set, Tuple, Iterator, Union, Optional
 import numpy as np
+import time
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -486,6 +487,14 @@ class MoveScheduler:
             if error != ErrorCode.ok:
                 log.error(f"recieved error trying to execute move group {str(error)}")
 
+            expected_time = max(
+                1.0, self._durations[group_id - self._start_at_index] * 1.1
+            )
+            full_timeout = max(
+                1.0, self._durations[group_id - self._start_at_index] * 2
+            )
+            start_time = time.time()
+
             try:
                 # TODO: The max here can be removed once can_driver.send() no longer
                 # returns before the message actually hits the bus. Right now it
@@ -494,12 +503,18 @@ class MoveScheduler:
                 # the execute even gets sent.
                 await asyncio.wait_for(
                     self._event.wait(),
-                    max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
+                    full_timeout,
                 )
+                duration = time.time() - start_time
                 await self._send_stop_if_necessary(can_messenger, group_id)
+
+                if duration >= expected_time:
+                    log.warning(
+                        f"Move set {str(group_id)} took longer ({duration} seconds) than expected ({expected_time} seconds)."
+                    )
             except asyncio.TimeoutError:
                 log.warning(
-                    f"Move set {str(group_id)} timed out, expected duration {str(max(1.0, self._durations[group_id - self._start_at_index] * 1.1))}"
+                    f"Move set {str(group_id)} timed out of max duration {full_timeout}. Expected time: {expected_time}"
                 )
                 log.warning(
                     f"Expected nodes in group {str(group_id)}: {str(self._get_nodes_in_move_group(group_id))}"
