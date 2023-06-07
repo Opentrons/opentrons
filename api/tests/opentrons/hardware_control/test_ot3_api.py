@@ -1,6 +1,6 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import Iterator, Union, Dict, Tuple, List, Any
+from typing import Iterator, Union, Dict, Tuple, List, Any, OrderedDict
 from typing_extensions import Literal
 from math import copysign
 import pytest
@@ -1163,6 +1163,39 @@ async def test_move_to_plunger_bottom(
     mock_move.assert_called_once_with(
         target_pos, speed=expected_speed_moving_up, acquire_lock=True
     )
+
+
+@pytest.mark.parametrize(
+    "input_position, expected_move_pos",
+    [
+        ({OT3Axis.X: 13}, {OT3Axis.X: 13, OT3Axis.Y: 493.8, OT3Axis.Z_L: 253.475}),
+        (
+            {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: 15},
+            {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: -240.675},
+        ),
+        (
+            {OT3Axis.Z_R: 15, OT3Axis.Z_L: 16},
+            {
+                OT3Axis.X: 477.2,
+                OT3Axis.Y: 493.8,
+                OT3Axis.Z_L: -239.675,
+                OT3Axis.Z_R: -240.675,
+            },
+        ),
+    ],
+)
+async def test_move_axes(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move: AsyncMock,
+    mock_check_motor: Mock,
+    input_position: Dict[OT3Axis, float],
+    expected_move_pos: OrderedDict[OT3Axis, float],
+):
+
+    await ot3_hardware.move_axes(position=input_position)
+    mock_check_motor.return_value = True
+
+    mock_move.assert_called_once_with(target_position=expected_move_pos, speed=None)
 
 
 async def test_move_gripper_mount_without_gripper_attached(

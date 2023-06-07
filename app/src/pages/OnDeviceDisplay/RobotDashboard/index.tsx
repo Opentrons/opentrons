@@ -9,31 +9,25 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import {
-  useAllProtocolsQuery,
-  useAllRunsQuery,
-} from '@opentrons/react-api-client'
+import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../../atoms/text'
-import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import { Navigation } from '../../../organisms/Navigation'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
 import {
   EmptyRecentRun,
   RecentRunProtocolCarousel,
 } from '../../../organisms/OnDeviceDisplay/RobotDashboard'
 import { getOnDeviceDisplaySettings } from '../../../redux/config'
-import { sortProtocols } from '../../ProtocolDashboard/utils'
 import { WelcomedModal } from './WelcomeModal'
+import { RunData } from '@opentrons/api-client'
 
-export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8 // This might be changed
-const SORT_KEY = 'recentRun'
+export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 
 export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
-  const protocols = useAllProtocolsQuery()
-  const runs = useAllRunsQuery()
-  const protocolsData = protocols.data?.data ?? []
-  const runData = runs.data?.data ?? []
+  const allRuns = useAllRunsQuery().data?.data ?? []
+
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
   )
@@ -41,18 +35,18 @@ export function RobotDashboard(): JSX.Element {
     unfinishedUnboxingFlowRoute === '/robot-settings/rename-robot'
   )
 
-  const recentlyRunProtocols = protocolsData.filter(protocol =>
-    runData.some(run => run.protocolId === protocol.id)
-  )
-
-  /** Currently the max number of displaying recent run protocol is 8 */
-  const sortedProtocols =
-    recentlyRunProtocols.length > 0
-      ? sortProtocols(SORT_KEY, recentlyRunProtocols, runData).slice(
-          0,
-          MAXIMUM_RECENT_RUN_PROTOCOLS
-        )
-      : []
+  const recentRunsOfUniqueProtocols = allRuns
+    .reverse() // newest runs first
+    .reduce<RunData[]>((acc, run) => {
+      if (
+        acc.some(collectedRun => collectedRun.protocolId === run.protocolId)
+      ) {
+        return acc
+      } else {
+        return [...acc, run]
+      }
+    }, [])
+    .slice(0, MAXIMUM_RECENT_RUN_PROTOCOLS)
 
   return (
     <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
@@ -61,7 +55,7 @@ export function RobotDashboard(): JSX.Element {
         {showWelcomeModal ? (
           <WelcomedModal setShowWelcomeModal={setShowWelcomeModal} />
         ) : null}
-        {sortedProtocols.length === 0 ? (
+        {recentRunsOfUniqueProtocols.length === 0 ? (
           <EmptyRecentRun />
         ) : (
           <>
@@ -72,7 +66,9 @@ export function RobotDashboard(): JSX.Element {
             >
               {t('run_again')}
             </StyledText>
-            <RecentRunProtocolCarousel sortedProtocols={sortedProtocols} />
+            <RecentRunProtocolCarousel
+              recentRunsOfUniqueProtocols={recentRunsOfUniqueProtocols}
+            />
           </>
         )}
       </Flex>
