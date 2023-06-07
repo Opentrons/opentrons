@@ -4,6 +4,12 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
+# Internal Release 0.12.0
+
+## New Stuff In This Release
+
+- If your Python protocol specifies a Flex-style slot name like `"C2"`, its `apiLevel` must now be `2.15`.
+
 # Internal Release 0.11.0
 
 This is internal release 0.11.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
@@ -26,7 +32,6 @@ Some things are known not to work, and are listed below. Specific compatibility 
 
 - When interacting with an OT-3, the app will use the newer names for the deck slots, like "C2", instead of the names from the OT-2, like "5".
 - The `requirements` dict in Python protocols can now have `"robotType": "Flex"` instead of `"robotType": "OT-3"`. `"OT-3"` will still work, but it's discouraged because it's not the customer-facing name.
-- If your Python protocol specifies a Flex-style slot name like `"C2"`, its `apiLevel` must now be `2.15`.
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
