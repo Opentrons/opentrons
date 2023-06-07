@@ -275,7 +275,7 @@ class SubsystemManager:
                 upstream_status = UpdateStatus(
                     subsystem=subsystem,
                     state=UpdateState[status_element[0].name],
-                    progress=int(status_element[1]),
+                    progress=int(status_element[1] * 100),
                 )
                 status_callbacks[subsystem](upstream_status)
                 yield upstream_status

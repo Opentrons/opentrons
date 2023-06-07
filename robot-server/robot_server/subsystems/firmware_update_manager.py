@@ -183,8 +183,7 @@ class _UpdateProcess:
         last_progress = 0
         try:
             async for update in self._hw_handle.update_firmware({self.subsystem}):
-                # update progress comes out of hardware as a float in [0, 1]
-                last_progress = update.progress * 100
+                last_progress = update.progress
                 await self._status_queue.put(
                     UpdateProgress(
                         UpdateState.from_hw(update.state), last_progress, None
