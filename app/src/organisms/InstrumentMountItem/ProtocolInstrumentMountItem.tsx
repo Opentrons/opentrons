@@ -120,11 +120,7 @@ export function ProtocolInstrumentMountItem(
             <Icon
               size="1.5rem"
               name={isAttachedWithCal ? 'ot-check' : 'ot-alert'}
-              color={
-                isAttachedWithCal
-                  ? COLORS.successEnabled
-                  : COLORS.warningEnabled
-              }
+              color={isAttachedWithCal ? COLORS.green1 : COLORS.yellow1}
             />
             <CalibrationStatus
               color={isAttachedWithCal ? COLORS.green1 : COLORS.yellow1}
