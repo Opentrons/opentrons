@@ -165,6 +165,19 @@ async def _error_update(
     raise RuntimeError("oh no!")
 
 
+async def _baseexception_update(
+    subsystems: Optional[Set[HWSubSystem]], force: bool = False
+) -> AsyncIterator[HWUpdateStatus]:
+    assert subsystems
+    subsystem = next(iter(subsystems))
+    yield HWUpdateStatus(subsystem, HWUpdateState.queued, 0)
+    await asyncio.sleep(0)
+    for value in range(0, 30, 10):
+        yield HWUpdateStatus(subsystem, HWUpdateState.updating, value)
+        await asyncio.sleep(0)
+    raise BaseException()
+
+
 async def test_updates_of_non_present_subsystems_fail(
     subject: FirmwareUpdateManager, ot3_hardware_api: OT3API, decoy: Decoy
 ) -> None:
@@ -240,7 +253,14 @@ async def test_ongoing_updates_accessible(
 
 
 @pytest.mark.parametrize(
-    "updater", (_instant_update, _quick_update, _conflicting_update, _error_update)
+    "updater",
+    (
+        _instant_update,
+        _quick_update,
+        _conflicting_update,
+        _error_update,
+        _baseexception_update,
+    ),
 )
 async def test_complete_updates_leave_ongoing(
     updater: MockUpdater,

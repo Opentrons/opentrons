@@ -58,7 +58,7 @@ def update_route_for(subsystem: SubSystem) -> str:
     return f"/subsystems/updates/{subsystem.value}"
 
 
-def _error_str(maybe_err: Optional[Exception]) -> Optional[str]:
+def _error_str(maybe_err: Optional[BaseException]) -> Optional[str]:
     if maybe_err:
         return str(maybe_err)
     return None

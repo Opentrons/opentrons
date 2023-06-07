@@ -43,7 +43,7 @@ class UpdateProgress:
 
     state: UpdateState
     progress: int
-    error: Optional[Exception]
+    error: Optional[BaseException]
 
 
 @dataclass
@@ -200,14 +200,15 @@ class _UpdateProcess:
                     UncontrolledUpdateInProgress(SubSystem.from_hw(self.subsystem)),
                 )
             )
-        except Exception as e:
+        except BaseException as be:
             log.exception("Failed to update firmware")
             await self._status_queue.put(
-                UpdateProgress(UpdateState.failed, last_progress, e)
+                UpdateProgress(UpdateState.failed, last_progress, be)
             )
-        # mypy continues to think this is a method but it is a function stored in an
-        # attribute and therefore does not need a self argument
-        await self._complete_callback()  # type: ignore[misc]
+        finally:
+            # mypy continues to think this is a method but it is a function stored in an
+            # attribute and therefore does not need a self argument
+            await self._complete_callback()  # type: ignore[misc]
 
     def get_handle(self) -> "UpdateProcessHandle":
         """Get a public handle for the task that is usable elsewhere.
