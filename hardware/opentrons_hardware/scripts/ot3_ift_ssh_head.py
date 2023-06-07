@@ -219,7 +219,7 @@ async def home(messenger, node,args):
         await set_pipette_current(messenger,current,node)
         await home_runner.run(can_messenger = messenger)
         print("MOVEHOME=Pass")
-    except asyncio.TimeoutError:
+    except:
         print("MOVEHOME=Failed")
 
 async def move_to(messenger: CanMessenger, node, distance, velocity):
