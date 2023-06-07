@@ -342,11 +342,16 @@ class Labware:
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def parent(self) -> Union[str, ModuleTypes, None]:
-        """The parent of this labware.
+        """The parent of this labware---where this labware is loaded.
 
-        If the labware is on the deck, a `str` deck slot name will be returned.
-        If on a module, the parent :py:class:`ModuleContext` will be returned.
-        If off deck, `None` will be returned.
+        Returns:
+            If the labware is directly on the robot's deck, the `str` name of the deck slot.
+            On a Flex, this will be like ``"D1"``, and on an OT-2, this will be like ``"1"``.
+            See :ref:`deck-slots`.
+
+            If the labware is on a module, a :py:class:`ModuleContext`.
+
+            If the labware is off-deck, ``None``.
 
         .. versionchanged:: 2.14
             Return type for module parent changed to :py:class:`ModuleContext`.
@@ -907,7 +912,6 @@ def split_tipracks(tip_racks: List[Labware]) -> Tuple[Labware, List[Labware]]:
 def select_tiprack_from_list(
     tip_racks: List[Labware], num_channels: int, starting_point: Optional[Well] = None
 ) -> Tuple[Labware, Well]:
-
     try:
         first, rest = split_tipracks(tip_racks)
     except IndexError:
