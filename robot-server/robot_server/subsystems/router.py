@@ -239,7 +239,7 @@ async def get_subsystem_update(
 @subsystems_router.get(
     "/subsystems/updates/all",
     summary="Get a list of all updates by id.",
-    description="Get a list of all updates, including both current and concluded ones, by their update id. This is a list of all previous updates since the machine booted, including their final status and whether they succeeded or failed. While an update might complete while you're not polling and therefore disappear from /subsystems/updates/running, you can always pull a previous update by id from here.",
+    description="Get a list of all updates, including both current updates and updates that started since the last boot but are now complete. Response includes each update's final status and whether it succeeded or failed. While an update might complete and therefore disappear from /subsystems/updates/current, you can always find that update in the response to this endpoint by its update id.",
     responses={status.HTTP_200_OK: {"model": SimpleMultiBody[UpdateProgressData]}},
 )
 async def get_update_processes(
@@ -263,8 +263,8 @@ async def get_update_processes(
 
 @subsystems_router.get(
     "/subsystems/updates/all/{id}",
-    summary="Get the details of a specific update id.",
-    description="As /subsystems/updates/all but filtered by the route parameter.",
+    summary="Get the details of a specific update by its id.",
+    description="As /subsystems/updates/all but returning only one resource: the one with the id matching the route parameter (if it exists).",
     responses={status.HTTP_200_OK: {"model": SimpleBody[UpdateProgressData]}},
 )
 async def get_update_process(

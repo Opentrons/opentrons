@@ -37,7 +37,7 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
     serialNumber: str = Field(..., description="Instrument hardware serial number.")
     subsystem: Optional[SubSystem] = Field(
         None,
-        description="The subsystem corresponding to this pipette.",
+        description="The subsystem corresponding to this instrument.",
     )
     ok: Literal[True] = Field(
         ..., description="Whether this instrument is OK and ready to go"
