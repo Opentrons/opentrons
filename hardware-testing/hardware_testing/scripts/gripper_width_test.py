@@ -56,7 +56,7 @@ class Gripper_Width_Test:
         self.jaw_length = 94.55 # mm
         self.step_error = 0.5 # mm
         self.step_height = 10 # mm
-        self.steps = [88, 80, 72, 64]
+        self.steps = [88, 80, 72, 64] # bottom-up
         self.axes = self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
         self.test_data = {
             "Time":"None",
@@ -116,6 +116,10 @@ class Gripper_Width_Test:
         jaw_displacement = self.api._gripper_handler.gripper.current_jaw_displacement
         return jaw_displacement
 
+    def _get_jaw_width(self):
+        jaw_width = self.api._gripper_handler.get_gripper().jaw_width
+        return jaw_width
+
     async def _record_data(self, cycle):
         elapsed_time = (time.time() - self.start_time)/60
         self.test_data["Time"] = str(round(elapsed_time, 3))
@@ -137,12 +141,13 @@ class Gripper_Width_Test:
         time.sleep(self.hold_time)
         # Get gripper jaw displacement
         jaw_displacement = self._get_jaw_displacement()
-        gripper_width = round((self.jaw_length - jaw_displacement*2), 3)
-        abs_error = round((step_width - self.step_error) - gripper_width, 3)
-        self.test_data["Gripper Width"] = str(gripper_width)
+        jaw_width = self._get_jaw_width()
+        abs_error = round((step_width - self.step_error) - jaw_width, 3)
+        self.test_data["Gripper Width"] = str(jaw_width)
         self.test_data["Absolute Error"] = str(abs_error)
-        print(f"-->> Step {step} ({step_width}mm): Displacement = {jaw_displacement}, Width = {gripper_width}, Error = {abs_error}")
-        await api.ungrip()
+        print(f"-->> Step {step} ({step_width}mm): Displacement = {jaw_displacement}, Width = {jaw_width}, Error = {abs_error}")
+        # Hold gripper jaw width (do not home or ungrip jaw!)
+        await api.hold_jaw_width(90)
         time.sleep(1)
 
     async def _move_gripper(self, api, mount):
