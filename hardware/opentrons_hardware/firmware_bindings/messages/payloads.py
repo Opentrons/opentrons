@@ -184,8 +184,8 @@ class AddToMoveGroupRequestPayload(MoveGroupRequestPayload):
 class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
     """Add a linear move request to a message group."""
 
-    acceleration: utils.Int32Field
-    velocity: utils.Int32Field
+    acceleration_um: utils.Int32Field
+    velocity_mm: utils.Int32Field
     request_stop_condition: MoveStopConditionField
 
 
@@ -193,7 +193,7 @@ class AddLinearMoveRequestPayload(AddToMoveGroupRequestPayload):
 class HomeRequestPayload(AddToMoveGroupRequestPayload):
     """Request to home."""
 
-    velocity: utils.Int32Field
+    velocity_mm: utils.Int32Field
 
 
 @dataclass(eq=False)

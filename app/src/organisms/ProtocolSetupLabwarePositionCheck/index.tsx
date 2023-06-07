@@ -9,6 +9,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { MediumButton } from '../../atoms/buttons'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
+import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { useLaunchLPC } from '../LabwarePositionCheck/useLaunchLPC'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
@@ -24,6 +25,12 @@ export function ProtocolSetupLabwarePositionCheck({
 }: ProtocolSetupLabwarePositionCheckProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
+  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
+
+  const handleLaunchLPCClick = (): void => {
+    setODDMaintenanceFlowInProgress()
+    launchLPC()
+  }
 
   return LPCWizard != null ? (
     LPCWizard
@@ -44,7 +51,7 @@ export function ProtocolSetupLabwarePositionCheck({
         justifyContent={JUSTIFY_CENTER}
       >
         <MediumButton
-          onClick={() => launchLPC()}
+          onClick={handleLaunchLPCClick}
           buttonType="secondary"
           buttonText="Start Labware Position Check"
         />

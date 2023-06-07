@@ -28,33 +28,6 @@ Some things are known not to work, and are listed below. Specific compatibility 
 - The `requirements` dict in Python protocols can now have `"robotType": "Flex"` instead of `"robotType": "OT-3"`. `"OT-3"` will still work, but it's discouraged because it's not the customer-facing name.
 - If your Python protocol specifies a Flex-style slot name like `"C2"`, its `apiLevel` must now be `2.15`.
 
-# Internal Release 0.9.0
-
-This is internal release 0.9.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
-
-Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
-
-## Big New Things
-### Robot Control
-- Stall detection is enabled for most moves. You might now get stall detection failures if you stall the robot.
-- Motor driver configuration changes should improve performance and prevent step loss on the gantry.
-- More USB connectivity fixes; updating should now work
-- Many 96-channel behavior fixes, especially around tip pickup.
-
-### Python Protocol API
-- ``move_labware`` now requires api level 2.15; as a bonus feature to sweeten the deal, however, you can now `move_labware` to a special `OFF_DECK` location
-- The Mount type has an `EXTENSION` entry for the gripper now
-
-### ODD
-- You now get lovely little popups on the ODD when you send a protocol to an OT-3. 
-- Design passes on the following screens should improve little usability issues: protocols dashboard, connect to network, protocol details
-- The unboxing flow should handle USB connections better now
-
-For more details about this release, please see the full [technical change log][]. 
-
-## Smaller Known Issues In This Release
-- Gripper calibration occasionally seems like it "skipped a step", going straight from front to rear calibration. If this happens, exit and rerun. This is because of a server error that isn't getting properly reported. We're working on both fixing the error and its reporting, but in the meantime exiting and rerunning the process should fix it. This is RQA-844.
-
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
 ### ODD
@@ -88,7 +61,5 @@ For more details about this release, please see the full [technical change log][
 - Chrome remote devtools - if you enable them and then use Chrome to go to robotip:9223 you'll get devtools
 - After a while, the ODD should go into idle; if you touch it, it will come back online
 
-## Smaller Known Issues
 
-## Smaller fun features
-- The lights work (don't do anything yet though)
+
