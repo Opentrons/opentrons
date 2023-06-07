@@ -73,27 +73,31 @@ async def set_pipette_current(run_current,args) -> None:
             pass
 async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
     step_size = [0.1, 0.5, 1, 15, 20, 50]
+    current_size = [0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0]
+    step_current_index = 4
     step_length_index = 3
     step = step_size[step_length_index]
     pos = 0
     speed = 10
-    current = 0.4
+    current = current_size[step_current_index]
+    await set_pipette_current(current, args)
     print('Speed = {}, current = {}'.format(speed,current))
     res = {node: (0,0,0)}
-
-    await set_pipette_current(current, args)
     information_str = """
         Click  >>   w  << to move up
         Click  >>   s  << to move downward
         Click  >>   h  << to move home
         Click  >>   +   << to Increase the length of each step
         Click  >>   -   << to decrease the length of each step
+        Click  >>   >   << to Increase the current
+        Click  >>   <   << to decrease the current
         Click  >> Enter << to save position
         Click  >> q << to quit the test script
                     """
     # print(information_str)
     while True:
         input = getch()
+
         if input == 'w':
             #plus pipette direction
             sys.stdout.flush()
@@ -132,6 +136,20 @@ async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
             if step_length_index <= 0:
                 step_length_index = 0
             step = step_size[step_length_index]
+        elif input == ">":
+            sys.stdout.flush()
+            step_current_index = step_current_index + 1
+            if step_current_index >= 21:
+                step_current_index = 21
+            current = current_size[step_current_index]
+            await set_pipette_current(current, args)
+        elif input == "<":
+            sys.stdout.flush()
+            step_current_index = step_current_index - 1
+            if step_current_index >= 0:
+                step_current_index = 0
+            current = current_size[step_current_index]
+            await set_pipette_current(current, args)
 
         elif input == '\r' or input == '\n' or input == '\r\n':
             sys.stdout.flush()
@@ -141,6 +159,7 @@ async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
                                 'encoder position: ', res[node][1], ', '
                                 ' Motor Step: ',
                                 step_size[step_length_index],
+                                "current",current_size[step_current_index],
                                 end = '')
         print('\r', end='')
 
