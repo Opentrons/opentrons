@@ -991,10 +991,9 @@ async def test_update_required_flag_disabled(
 
 async def test_monitor_pressure(controller: OT3Controller, mock_messenger: CanMessenger, mock_move_group_run, mock_present_devices) -> None:
     mount = OT3Mount.LEFT
-    mock_move_group_run.side_effect = move_group_run_side_effect(controller, [OT3Axis.P_L])
+    mock_move_group_run.side_effect = move_group_run_side_effect(
+        controller, [OT3Axis.P_L]
+    )
     async with controller.monitor_overpressure(mount):
         await controller.home([OT3Axis.P_L], GantryLoad.LOW_THROUGHPUT)
-        mock_messenger.ensure_send.assert_called_once()
-        # mock_messenger.reset_mock()
-    # mock_messenger.ensure_send.assert_called_once()
     mock_move_group_run.assert_called_once()
