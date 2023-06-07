@@ -80,7 +80,7 @@ export const getUnocuppiedLabwareLocationOptions: Selector<Option[] | null> = cr
   getModuleEntities,
   (robotState, moduleEntities) => {
     // TODO IMMEDIATElY: get robot type from global state
-    const robotType = 'OT-2 Standard'
+    const robotType = 'OT-3 Standard'
     const deckDef = getDeckDefFromRobotType(robotType)
     const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
     if (robotState == null) return null

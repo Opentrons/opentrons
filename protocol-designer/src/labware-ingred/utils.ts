@@ -1,11 +1,14 @@
-import { sortedSlotnames } from '@opentrons/components'
+import { getDeckDefinitions } from '@opentrons/components'
 import { getSlotIsEmpty } from '../step-forms/utils'
 import { InitialDeckSetup } from '../step-forms/types'
 import { DeckSlot } from '../types'
+
 export function getNextAvailableDeckSlot(
   initialDeckSetup: InitialDeckSetup
 ): DeckSlot | null | undefined {
-  return sortedSlotnames.find(slot => getSlotIsEmpty(initialDeckSetup, slot))
+  const deckDef = getDeckDefinitions().ot3_standard
+  // TODO immediately branch on robotType 
+  return deckDef.locations.orderedSlots.find(slot => getSlotIsEmpty(initialDeckSetup, slot.id))?.id 
 }
 
 const getMatchOrNull = (

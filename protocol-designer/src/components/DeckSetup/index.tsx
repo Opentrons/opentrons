@@ -372,7 +372,7 @@ export const DeckSetup = (): JSX.Element => {
   const showGen1MultichannelCollisionWarnings =
     !_disableCollisionWarnings && _hasGen1MultichannelPipette
 
-  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
+  const deckDef = React.useMemo(() => getDeckDefinitions().ot3_standard, [])
   const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
     onClickOutside: () => {
       if (drilledDown) dispatch(labwareIngredActions.drillUpFromLabware())
