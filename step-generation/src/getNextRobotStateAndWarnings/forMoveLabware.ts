@@ -9,5 +9,14 @@ export function forMoveLabware(
   const { labwareId, newLocation } = params
   const { robotState } = robotStateAndWarnings
 
-  robotState.labware[labwareId].slot = String(newLocation)
+  let newLocationString = ''
+  if (newLocation === 'offDeck') {
+    newLocationString = newLocation
+  } else if ('moduleId' in newLocation) {
+    newLocationString = newLocation.moduleId
+  } else if ('slotName' in newLocation) { 
+    newLocationString = newLocation.slotName
+  }
+
+  robotState.labware[labwareId].slot = newLocationString
 }
