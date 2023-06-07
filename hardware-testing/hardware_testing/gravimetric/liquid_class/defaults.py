@@ -137,7 +137,7 @@ _dispense_defaults = {
                     acceleration=40000,  # this is a fake number
                     deceleration=40000,  # this is a fake number
                 ),
-                5: DispenseSettings(  # 5uL
+                10: DispenseSettings(  # 5uL
                     flow_rate=57,
                     delay=0.5,
                     submerge=_default_submerge_mm_t50,
