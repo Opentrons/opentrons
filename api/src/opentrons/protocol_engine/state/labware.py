@@ -1,6 +1,7 @@
 """Basic labware data state and store."""
 from __future__ import annotations
 
+import random
 from dataclasses import dataclass
 from typing import (
     Any,
@@ -40,6 +41,9 @@ from ..types import (
     LabwareLocation,
     LoadedLabware,
     ModuleLocation,
+    DropTipWellLocation,
+    DropTipWellOrigin,
+    WellOffset,
 )
 from ..actions import (
     Action,
@@ -59,7 +63,20 @@ _MAGDECK_HALF_MM_LABWARE = {
     "opentrons/usascientific_96_wellplate_2.4ml_deep/1",
 }
 
-_INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_1
+_OT3_INSTRUMENT_ATTACH_SLOT = DeckSlotName.SLOT_D1
+
+_RIGHT_SIDE_SLOTS = {
+    # OT-2:
+    DeckSlotName.FIXED_TRASH,
+    DeckSlotName.SLOT_9,
+    DeckSlotName.SLOT_6,
+    DeckSlotName.SLOT_3,
+    # OT-3:
+    DeckSlotName.SLOT_A3,
+    DeckSlotName.SLOT_B3,
+    DeckSlotName.SLOT_C3,
+    DeckSlotName.SLOT_D3,
+}
 
 
 class LabwareLoadParams(NamedTuple):
@@ -269,11 +286,11 @@ class LabwareView(HasState[LabwareState]):
         deck_def = self.get_deck_definition()
 
         for slot_def in deck_def["locations"]["orderedSlots"]:
-            if slot_def["id"] == str(slot):
+            if slot_def["id"] == slot.id:
                 return slot_def
 
         raise errors.SlotDoesNotExistError(
-            f"Slot ID {slot} does not exist in deck {deck_def['otId']}"
+            f"Slot ID {slot.id} does not exist in deck {deck_def['otId']}"
         )
 
     def get_slot_position(self, slot: DeckSlotName) -> Point:
@@ -302,6 +319,14 @@ class LabwareView(HasState[LabwareState]):
             raise errors.LabwareDefinitionDoesNotExistError(
                 f"Labware definition for matching {uri} not found."
             ) from e
+
+    def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
+        """Get all loaded labware definitions."""
+        loaded_labware = self._state.labware_by_id.values()
+        return [
+            self.get_definition_by_uri(LabwareUri(labware.definitionUri))
+            for labware in loaded_labware
+        ]
 
     def find_custom_labware_load_params(self) -> List[LabwareLoadParams]:
         """Find all load labware parameters for custom labware definitions in state."""
@@ -400,12 +425,7 @@ class LabwareView(HasState[LabwareState]):
 
         left_path_criteria = mount is MountType.RIGHT and well_name in left_column
         right_path_criteria = mount is MountType.LEFT and well_name in right_column
-        labware_right_side = labware_slot in [
-            DeckSlotName.SLOT_3,
-            DeckSlotName.SLOT_6,
-            DeckSlotName.SLOT_9,
-            DeckSlotName.FIXED_TRASH,
-        ]
+        labware_right_side = labware_slot in _RIGHT_SIDE_SLOTS
 
         if left_path_criteria and (next_to_module or labware_right_side):
             return EdgePathType.LEFT
@@ -572,10 +592,12 @@ class LabwareView(HasState[LabwareState]):
                 that is currently in use for the protocol run.
         """
         for labware in self._state.labware_by_id.values():
-            if (
-                isinstance(labware.location, DeckSlotLocation)
-                and labware.location.slotName == DeckSlotName.FIXED_TRASH
-            ):
+            if isinstance(
+                labware.location, DeckSlotLocation
+            ) and labware.location.slotName in {
+                DeckSlotName.FIXED_TRASH,
+                DeckSlotName.SLOT_A3,
+            }:
                 return labware.id
 
         raise errors.LabwareNotLoadedError(
@@ -596,16 +618,20 @@ class LabwareView(HasState[LabwareState]):
                     f"Labware {labware.loadName} is already present at {location}."
                 )
 
-    def get_calibration_coordinates(self, offset: Point) -> Point:
-        """Get calibration critical point and target position."""
-        target_center = self.get_slot_center_position(_INSTRUMENT_ATTACH_SLOT)
-        # TODO (tz, 11-30-22): These coordinates wont work for OT-2. We will need to apply offsets after
-        # https://opentrons.atlassian.net/browse/RCORE-382
-
-        return Point(
-            x=target_center.x,
-            y=target_center.y + offset.y,
-            z=offset.z,
+    def get_random_drop_tip_location(
+        self, labware_id: str, well_name: str
+    ) -> DropTipWellLocation:
+        """Get a random location along the x-axis within 3/4th length of the well top plane."""
+        well_dims = self.get_well_size(labware_id=labware_id, well_name=well_name)
+        random_offset_in_well = WellOffset(
+            x=random.randrange(
+                start=int(well_dims[0] * -3 / 8), stop=int(well_dims[0] * 3 / 8), step=1
+            ),
+            y=0,
+            z=0,
+        )
+        return DropTipWellLocation(
+            origin=DropTipWellOrigin.DEFAULT, offset=random_offset_in_well
         )
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:

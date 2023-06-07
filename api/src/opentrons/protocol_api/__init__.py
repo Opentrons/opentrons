@@ -13,12 +13,14 @@ from .protocol_context import ProtocolContext
 from .deck import Deck
 from .instrument_context import InstrumentContext
 from .labware import Labware, Well
+from ._types import OFF_DECK
 from .module_contexts import (
     ModuleContext,
     ThermocyclerContext,
     MagneticModuleContext,
     TemperatureModuleContext,
     HeaterShakerContext,
+    MagneticBlockContext,
 )
 from ._liquid import Liquid
 
@@ -38,9 +40,11 @@ __all__ = [
     "MagneticModuleContext",
     "ThermocyclerContext",
     "HeaterShakerContext",
+    "MagneticBlockContext",
     "Labware",
     "Well",
     "Liquid",
+    "OFF_DECK",
     # For internal Opentrons use only:
     "create_protocol_context",
     "ProtocolEngineCoreRequiredError",

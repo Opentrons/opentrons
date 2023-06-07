@@ -12,6 +12,7 @@ class DevServer:
     def __init__(
         self,
         port: str = "31950",
+        is_ot3: bool = False,
         ot_api_config_dir: Optional[Path] = None,
         persistence_directory: Optional[Path] = None,
         maximum_runs: Optional[int] = None,
@@ -19,6 +20,7 @@ class DevServer:
     ) -> None:
         """Initialize a dev server."""
         self.port: str = port
+        self.is_ot3 = is_ot3
 
         self.ot_api_config_dir: Path = (
             ot_api_config_dir
@@ -50,7 +52,9 @@ class DevServer:
         # This environment is only for the subprocess so it should
         # not have any side effects.
         env = {
-            "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev.env",
+            "OT_ROBOT_SERVER_DOT_ENV_PATH": "dev-flex.env"
+            if self.is_ot3
+            else "dev.env",
             "OT_API_CONFIG_DIR": str(self.ot_api_config_dir),
             "OT_ROBOT_SERVER_persistence_directory": str(self.persistence_directory),
         }

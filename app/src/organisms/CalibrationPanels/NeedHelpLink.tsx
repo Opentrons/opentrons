@@ -25,7 +25,7 @@ export function NeedHelpLink(props: NeedHelpLinkProps): JSX.Element {
       <Icon
         color={COLORS.darkGreyEnabled}
         size={SIZE_1}
-        marginRight={SPACING.spacing2}
+        marginRight={SPACING.spacing4}
         name="question-mark-circle"
       />
       <Link

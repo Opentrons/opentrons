@@ -33,8 +33,18 @@ class InvalidMoveError(ValueError):
     pass
 
 
+class NotSupportedByHardware(ValueError):
+    """Error raised when attempting to use arguments and values not supported by the specific hardware."""
+
+
 class GripperNotAttachedError(Exception):
     """An error raised if a gripper is accessed that is not attached."""
+
+    pass
+
+
+class AxisNotPresentError(Exception):
+    """An error raised if an axis that is not present."""
 
     pass
 

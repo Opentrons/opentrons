@@ -3,25 +3,34 @@ For more details about this release, please see the full [technical changelog][]
 
 ---
 
-# Internal Release 0.2.0
+# Internal Release 0.11.0
 
-This is 0.2.0, an internal release for the app supporting the Opentrons Flex.
+This is 0.11.0, an internal release for the app supporting the Opentrons Flex.
 
 This is still pretty early in the process, so some things are known not to work, and are listed below. Some things that may surprise you do work, and are also listed below. There may also be some littler things of note, and those are at the bottom.
 
+## Update Notes
+
+- ⚠️ After upgrading your robot to 0.11.0, you'll need to factory-reset its run history before you can use it.
+
+  1. From the robot's 3-dot menu (⋮), go to **Robot settings.**
+  2. Under **Advanced > Factory reset**, select **Choose reset settings.**
+  3. Choose **Clear protocol run history,** and then select **Clear data and restart robot.**
+
+  Note that this will remove all of your saved labware offsets.
+
+  You will need to follow these steps if you subsequently downgrade back to a prior release, too.
+
 ## New Stuff In This Release
-- Gripper attach and calibration flows
-- Tipracks say flex now
+
+- The HTTP API will now accept both styles of deck slot name: coordinates like "C2", and integers like "5". Flexes will now return the "C2" style, and OT-2s will continue to return the "5" style.
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 - Attach, detach, and calibration flows for anything from the protocol setup page
-- USB connectivity
 - Pipette/gripper firmware update on attach: if you need to attach a new instrument, attach it and then power-cycle the robot
-- If you leave the app on the device page it will very frequently ask what instrument is connected, which causes problems; don't leave the app on the device page of the robot for a really long time
-- The app always says instrument calibration is out of date
 
 ## Big Things That Do Work Please Do Report Bugs About Them
-- Connecting to a Flex
+- Connecting to a Flex, including via USB
 - Running protocols on those Flexs including simulate, play/pause, labware position check
   - Except for gripper; no LPC for gripper
 - Attach, detach, and calibration flows for pipettes and gripper  when started from the device page

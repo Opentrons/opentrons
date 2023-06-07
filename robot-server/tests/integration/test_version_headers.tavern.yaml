@@ -3,12 +3,12 @@ test_name: Version headers
 
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 
 stages:
   - name: Successful request contains version headers
     request:
-      url: '{host:s}:{port:d}/health'
+      url: '{ot2_server_base_url}/health'
       method: GET
     response:
       status_code: 200
@@ -18,7 +18,7 @@ stages:
 
   - name: Successful request within range returns version headers
     request:
-      url: '{host:s}:{port:d}/health'
+      url: '{ot2_server_base_url}/health'
       method: GET
       headers:
         Opentrons-Version: '2'
@@ -30,7 +30,7 @@ stages:
 
   - name: Version too high request contains version headers
     request:
-      url: '{host:s}:{port:d}/health'
+      url: '{ot2_server_base_url}/health'
       method: GET
       headers:
         Opentrons-Version: '1337'
@@ -42,7 +42,7 @@ stages:
 
   - name: Latest version request contains version headers
     request:
-      url: '{host:s}:{port:d}/health'
+      url: '{ot2_server_base_url}/health'
       method: GET
       headers:
         Opentrons-Version: '*'
@@ -54,7 +54,7 @@ stages:
 
   - name: Version too low request contains version headers
     request:
-      url: '{host:s}:{port:d}/health'
+      url: '{ot2_server_base_url}/health'
       method: GET
       headers:
         Opentrons-Version: '1'
@@ -71,7 +71,7 @@ stages:
 
   - name: Version missing request contains version headers
     request:
-      url: '{host:s}:{port:d}/health'
+      url: '{ot2_server_base_url}/health'
       method: GET
       headers:
         Opentrons-Version: ''

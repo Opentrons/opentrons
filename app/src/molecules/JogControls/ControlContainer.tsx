@@ -19,7 +19,7 @@ interface ControlContainerProps extends StyleProps {
 const CONTROL_CHILDREN_STYLES = css`
   background-color: ${COLORS.fundamentalsBackground};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing4};
+  padding: ${SPACING.spacing16};
   width: 100%;
   height: 9.75rem;
 
@@ -33,7 +33,7 @@ export const ControlContainer = (props: ControlContainerProps): JSX.Element => {
   const { title, children } = props
   return (
     <Flex width="100%" flexDirection={DIRECTION_COLUMN}>
-      <StyledText as="h6" marginY={SPACING.spacing3}>
+      <StyledText as="h6" marginY={SPACING.spacing8}>
         {title}
       </StyledText>
       <Flex css={CONTROL_CHILDREN_STYLES}>{children}</Flex>

@@ -18,7 +18,14 @@ export interface ProtocolMetadata {
 }
 
 export interface Protocol {
-  links?: ResourceLinks
+  links?: {
+    referencingRuns: [
+      {
+        id: string
+        href: string
+      }
+    ]
+  }
   data: ProtocolResource
 }
 
@@ -30,4 +37,9 @@ export interface ProtocolAnalyses {
 export interface Protocols {
   links?: ResourceLinks
   data: ProtocolResource[]
+}
+
+export interface ProtocolsIds {
+  links?: ResourceLinks
+  data: string[]
 }

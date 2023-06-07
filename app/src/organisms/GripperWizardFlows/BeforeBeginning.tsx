@@ -11,7 +11,10 @@ import {
   GRIPPER_LOADNAME,
   CAL_PIN_LOADNAME,
 } from './constants'
-import type { Run, CreateRunData } from '@opentrons/api-client'
+import type {
+  CreateMaintenanceRunData,
+  MaintenanceRun,
+} from '@opentrons/api-client'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
 import { CreateCommand, LEFT } from '@opentrons/shared-data'
@@ -42,7 +45,12 @@ const INFO_BY_FLOW_TYPE: {
   },
 }
 interface BeforeBeginningProps extends GripperWizardStepProps {
-  createRun: UseMutateFunction<Run, AxiosError<any>, CreateRunData, unknown>
+  createMaintenanceRun: UseMutateFunction<
+    MaintenanceRun,
+    AxiosError<any>,
+    CreateMaintenanceRunData,
+    unknown
+  >
   isCreateLoading: boolean
 }
 
@@ -51,7 +59,7 @@ export const BeforeBeginning = (
 ): JSX.Element | null => {
   const {
     proceed,
-    createRun,
+    createMaintenanceRun,
     flowType,
     isCreateLoading,
     isRobotMoving,
@@ -59,10 +67,14 @@ export const BeforeBeginning = (
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
-    createRun({})
+    createMaintenanceRun({})
   }, [])
 
-  let commandsOnProceed: CreateCommand[] = [
+  const commandsOnProceed: CreateCommand[] = [
+    // TODO: this needs to go once we're properly handling the axes for the commands
+    // below instead of using the left pipette axis as a proxy, but until then we need
+    // to make sure that proxy axis is homed.
+    { commandType: 'home' as const, params: {} },
     {
       // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
       commandType: 'calibration/moveToMaintenancePosition' as const,
@@ -71,15 +83,6 @@ export const BeforeBeginning = (
       },
     },
   ]
-  if (
-    flowType === GRIPPER_FLOW_TYPES.ATTACH ||
-    flowType === GRIPPER_FLOW_TYPES.RECALIBRATE
-  ) {
-    commandsOnProceed = [
-      { commandType: 'home' as const, params: {} },
-      ...commandsOnProceed,
-    ]
-  }
 
   const handleOnClick = (): void => {
     chainRunCommands(commandsOnProceed, true)

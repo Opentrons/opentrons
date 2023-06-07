@@ -53,6 +53,7 @@ describe('ChooseProtocolSlideout', () => {
     mockDeckThumbnail.mockReturnValue(<div>mock Deck Thumbnail</div>)
     mockUseCreateRunFromProtocol.mockReturnValue({
       createRunFromProtocolSource: mockCreateRunFromProtocol,
+      reset: jest.fn(),
     } as any)
     mockUseTrackCreateProtocolRunEvent.mockReturnValue({
       trackCreateProtocolRunEvent: mockTrackCreateProtocolRunEvent,

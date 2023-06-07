@@ -22,8 +22,8 @@ export function ClearDeckModal(props: ClearDeckModalProps): JSX.Element {
     <>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        paddingX={SPACING.spacing6}
-        paddingTop={SPACING.spacing6}
+        paddingX={SPACING.spacing32}
+        paddingTop={SPACING.spacing32}
         marginBottom="13.375rem"
       >
         <Trans
@@ -33,15 +33,15 @@ export function ClearDeckModal(props: ClearDeckModalProps): JSX.Element {
             h1: (
               <StyledText
                 css={TYPOGRAPHY.h1Default}
-                marginBottom={SPACING.spacing4}
+                marginBottom={SPACING.spacing16}
               />
             ),
             block: <StyledText as="p" />,
           }}
         />
       </Flex>
-      <Flex justifyContent={JUSTIFY_FLEX_END} marginBottom={SPACING.spacing6}>
-        <PrimaryButton marginX={SPACING.spacing6} onClick={onContinueClick}>
+      <Flex justifyContent={JUSTIFY_FLEX_END} marginBottom={SPACING.spacing32}>
+        <PrimaryButton marginX={SPACING.spacing32} onClick={onContinueClick}>
           {t('get_started')}
         </PrimaryButton>
       </Flex>

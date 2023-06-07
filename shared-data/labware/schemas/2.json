@@ -40,6 +40,7 @@
         "trash",
         "wellPlate",
         "aluminumBlock",
+        "adapter",
         "other"
       ]
     },
@@ -47,6 +48,22 @@
       "description": "a string safe to use for loadName / namespace. Lowercase-only.",
       "type": "string",
       "pattern": "^[a-z0-9._]+$"
+    },
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      }
     }
   },
   "type": "object",
@@ -166,8 +183,7 @@
         "type": "array",
         "items": {
           "type": "string"
-        },
-        "minItems": 1
+        }
       }
     },
     "cornerOffsetFromSlot": {
@@ -202,7 +218,6 @@
       "type": "object",
       "description": "Unordered object of well objects with position and dimensional information",
       "additionalProperties": false,
-      "minProperties": 1,
       "patternProperties": {
         "[A-Z]+[0-9]+": {
           "type": "object",
@@ -273,8 +288,7 @@
             "description": "An array of wells that contain the same metadata",
             "items": {
               "type": "string"
-            },
-            "minItems": 1
+            }
           },
           "metadata": {
             "type": "object",
@@ -302,6 +316,28 @@
             "description": "Brand data for the well group (e.g. for tubes)"
           }
         }
+      }
+    },
+    "allowedRoles": {
+      "type": "array",
+      "description": "Allowed behaviors and usage of a labware in a protocol.",
+      "items": {
+        "type": "string",
+        "enum": ["labware", "adapter", "fixture", "maintenance"]
+      }
+    },
+    "stackingOffsetWithLabware": {
+      "type": "object",
+      "description": "Supported labware that can be stacked upon, with overlap height between both labware.",
+      "additionalProperties": {
+        "$ref": "#/definitions/coordinates"
+      }
+    },
+    "stackingOffsetWithModule": {
+      "type": "object",
+      "description": "Supported module that can be stacked upon, with overlap height between labware and module.",
+      "additionalProperties": {
+        "$ref": "#/definitions/coordinates"
       }
     }
   }

@@ -1,10 +1,12 @@
-"""OT-3 Module Calibration Script."""
+"""OT-3 Module Calibration test script."""
 import argparse
-from traceback import print_exc
-import requests
 
+from hardware_testing.opentrons_api.types import Point
+from hardware_testing.opentrons_api.http_api import (
+    OpentronsHTTPAPI,
+)
 
-MOUNTS = ["left", "right", "extension"]
+PROBE_OFFSET = Point(x=0, y=0, z=44.5)
 
 
 MODELS = [
@@ -18,98 +20,95 @@ MODELS = [
 ]
 
 
-CALIBRATION_ADAPTER = {
-    "temperatureModuleV1": "opentrons_calibration_adapter_temperature_module",
-    "temperatureModuleV2": "opentrons_calibration_adapter_temperature_module",
-    "magneticModuleV1": "opentrons_calibration_adapter_magnetic_module",
-    "magneticModuleV2": "opentrons_calibration_adapter_magnetic_module",
-    "thermocyclerModuleV1": "opentrons_calibration_adapter_thermocycler_module",
-    "thermocyclerModuleV2": "opentrons_calibration_adapter_thermocycler_module",
-    "heaterShakerModuleV1": "opentrons_calibration_adapter_heatershaker_module",
-}
+def _handle_module_case(opentrons_api: OpentronsHTTPAPI, model: str) -> bool:
+    if "heaterShaker" in model:
+        # make sure the clamp is closed
+        opentrons_api.heater_shaker_latch_open(False)
+    elif "thermocycler" in model:
+        # make sure the lid is open
+        opentrons_api.thermocycler_lid_open(True)
+    return True
 
 
-HEADERS = {"opentrons-version": "4"}
-BASE_URL = "http://{}:31950"
-PARAMS = {"waitUntilComplete": "true"}
+def _main(args: argparse.Namespace, opentrons_api: OpentronsHTTPAPI) -> None:
+    # Create a new run
+    run_id = opentrons_api.create_run()
+    if not run_id:
+        raise RuntimeError("Could not create run.")
 
+    # Home all axes so we are at a known state
+    opentrons_api.home()
 
-def _home_z(ip_addr: str) -> None:
-    """Home the z axis for the instrument."""
-    # Home the instrument axis so we are at a known state
-    print("Homing z axis")
-    home_z = {"data": {"commandType": "home", "params": {"axes": ["leftZ", "rightZ"]}}}
-    url = f"{BASE_URL.format(ip_addr)}/commands"
-    requests.post(headers=HEADERS, url=url, json=home_z, params=PARAMS)
+    # Load in the instrument
+    pipette_id = opentrons_api.load_pipette(args.mount)
+    if not pipette_id:
+        raise RuntimeError(f"Could not load mount {args.mount}")
 
+    # Load the module
+    module_id = opentrons_api.load_module(args.model, args.slot)
+    if not module_id:
+        raise RuntimeError(f"Could not load module {args.model}")
 
-def _main(args: argparse.Namespace) -> None:
-    base_url = f"{BASE_URL.format(args.host)}"
+    # Load the calibration labware for the specific module
+    labware_id = opentrons_api.load_labware(module_id, args.model)
+    if not labware_id:
+        raise RuntimeError(f"Could not load labware for {args.model}")
 
-    # create an empty run
-    res = requests.post(headers=HEADERS, url=f"{base_url}/runs")
-    run_id = res.json()["data"]["id"]
-    url = f"{base_url}/runs/{run_id}/commands"
-    print(f"Created run {run_id}")
+    # Calibrate the module
+    print(
+        f"Calibrating module {args.model} at slot {args.slot} with mount {args.mount}"
+    )
+    offset = opentrons_api.calibrate_module(args.mount, module_id, labware_id)
+    if not offset:
+        raise RuntimeError(f"Could not calibrate {args.model}")
 
-    # Home the instrument axis so we are at a known state
-    _home_z(args.host)
+    # set module pre-conditions (closed lid/latch)
+    _handle_module_case(opentrons_api, args.model)
+    print("Moving to calibrated well center")
+    calibrated_position = opentrons_api.move_to_well(
+        args.mount, "A1", offset=PROBE_OFFSET
+    )
 
-    # load the module based on the model
-    print(f"Loading the module {args.model} at slot {args.slot}")
-    load_module = {
-        "data": {
-            "commandType": "loadModule",
-            "params": {"model": args.model, "location": {"slotName": args.slot}},
-        }
-    }
-    res = requests.post(headers=HEADERS, url=url, json=load_module, params=PARAMS)
-    module_id = res.json()["data"]["result"]["moduleId"]
+    # Finish and print result
+    print(f"Calibration offset {offset}")
+    print(f"Calibrated center {calibrated_position}")
 
-    # load the calibration labware for the specific module
-    print(f"Loading the calibration adapter at slot {args.slot}")
-    load_labware = {
-        "data": {
-            "commandType": "loadLabware",
-            "params": {
-                "location": {"moduleId": module_id},
-                "loadName": CALIBRATION_ADAPTER[args.model],
-                "namespace": "opentrons",
-                "version": 1,
-            },
-        }
-    }
-    res = requests.post(headers=HEADERS, url=url, json=load_labware, params=PARAMS)
-    labware_id = res.json()["data"]["result"]["labwareId"]
-
-    # calibrate the module
-    print(f"Calibrating {args.model} at slot {args.slot} with mount {args.mount}")
-    calibrate_module = {
-        "data": {
-            "commandType": "calibration/calibrateModule",
-            "params": {
-                "moduleId": module_id,
-                "labwareId": labware_id,
-                "mount": args.mount,
-            },
-        }
-    }
-
-    res = requests.post(headers=HEADERS, url=url, json=calibrate_module, params=PARAMS)
-    if res.status_code != 201 or not res.json()["data"].get("result"):
-        error = res.json()["data"]["error"]
-        error_type = error.get("errorType")
-        error_details = error.get("detail")
-        print(f"Failed to calibrate module {args.model} {error_type} - {error_details}")
+    # Verify the offset
+    confirm = input("Verify the calibrated offset? y/n\n")
+    if "n" in confirm:
         return
 
-    calibration_offset = res.json()["data"]["result"]["moduleOffset"]
-    print(f"Calibration result {calibration_offset}")
+    # Setup the run
+    opentrons_api.cancel_run(run_id)
+    opentrons_api.create_run()
+    opentrons_api.home()
+    module_id = opentrons_api.load_module(args.model, args.slot)
+    opentrons_api.load_labware(module_id, args.model)
+    opentrons_api.load_pipette(args.mount)
+
+    # set module pre-conditions (closed lid/latch)
+    _handle_module_case(opentrons_api, args.model)
+
+    print("Moving to the uncalibrated well position")
+    # we need to add the probe z offset so we dont crash into the deck
+    inverse_offset = (offset * -1) + PROBE_OFFSET
+    uncalibrated_position = opentrons_api.move_to_well(
+        args.mount, "A1", offset=inverse_offset
+    )
+    print(f"Uncalibrated center position: {uncalibrated_position}")
+
+    input("Press Enter to to move to calibrated position.")
+    calibrated_position = opentrons_api.move_to_well(
+        args.mount, "A1", offset=PROBE_OFFSET
+    )
+    print(f"Calibrated center position: {calibrated_position}")
+
+    input("Press Enter to continue...")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Script to test module calibration over HTTP"
+        description="Script to test and verify module calibration over HTTP"
     )
     parser.add_argument(
         "--host", help="The ip address of the robot", default="localhost"
@@ -129,14 +128,17 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mount",
         help="The mount to use for the calibration",
-        choices=MOUNTS,
+        choices=["left", "right"],
         required=True,
     )
     args = parser.parse_args()
+
     try:
-        _main(args)
-    except Exception:
-        print("Unhandled exception")
-        print_exc()
+        opentrons_api = OpentronsHTTPAPI(args.host)
+        _main(args, opentrons_api)
+    except Exception as e:
+        print(e)
     finally:
-        _home_z(args.host)
+        # home the gantry and cancel run
+        opentrons_api.home(["leftZ", "rightZ"])
+        opentrons_api.cancel_run()

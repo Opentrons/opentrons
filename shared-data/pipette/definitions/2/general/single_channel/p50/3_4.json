@@ -1,16 +1,16 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "P50 One Channel GEN3",
+  "displayName": "Flex 1-Channel 50 μL",
   "model": "p50",
   "displayCategory": "GEN3",
   "pickUpTipConfigurations": {
-    "current": 0.15,
+    "current": 0.2,
     "presses": 1,
-    "speed": 5,
+    "speed": 10,
     "increment": 0.0,
     "distance": 13.0
   },
-  "dropTipConfigurations": { "current": 1.0, "speed": 10 },
+  "dropTipConfigurations": { "current": 1.0, "speed": 15 },
   "plungerMotorConfigurations": { "idle": 0.3, "run": 1.0 },
   "plungerPositionsConfigurations": {
     "top": 0.0,
@@ -25,6 +25,7 @@
     "environment": { "count": 1 }
   },
   "partialTipConfigurations": { "partialTipSupported": false },
+  "backCompatNames": [],
   "channels": 1,
   "shaftDiameter": 1.0,
   "shaftULperMM": 0.785

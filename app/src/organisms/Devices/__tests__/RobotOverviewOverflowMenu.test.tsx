@@ -14,7 +14,7 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { fetchWifiList, getCanDisconnect } from '../../../redux/networking'
+import { useCanDisconnect } from '../../../resources/networking/hooks'
 import { DisconnectModal } from '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
 import { useCurrentRunId } from '../../ProtocolUpload/hooks'
@@ -28,7 +28,7 @@ jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/robot-admin')
 jest.mock('../hooks')
 jest.mock('../../../redux/buildroot')
-jest.mock('../../../redux/networking')
+jest.mock('../../../resources/networking/hooks')
 jest.mock(
   '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
 )
@@ -58,11 +58,8 @@ const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction
 const mockDisconnectModal = DisconnectModal as jest.MockedFunction<
   typeof DisconnectModal
 >
-const mockGetCanDisconnect = getCanDisconnect as jest.MockedFunction<
-  typeof getCanDisconnect
->
-const mockFetchWifiList = fetchWifiList as jest.MockedFunction<
-  typeof fetchWifiList
+const mockUseCanDisconnect = useCanDisconnect as jest.MockedFunction<
+  typeof useCanDisconnect
 >
 
 const render = (
@@ -98,8 +95,8 @@ describe('RobotOverviewOverflowMenu', () => {
       <div>choose protocol slideout</div>
     )
     when(mockDisconnectModal).mockReturnValue(<div>mock disconnect modal</div>)
-    when(mockGetCanDisconnect)
-      .calledWith({} as State, mockConnectableRobot.name)
+    when(mockUseCanDisconnect)
+      .calledWith(mockConnectableRobot.name)
       .mockReturnValue(true)
   })
   afterEach(() => {
@@ -117,7 +114,7 @@ describe('RobotOverviewOverflowMenu', () => {
       name: 'Run a protocol',
     })
     const restartBtn = getByRole('button', { name: 'Restart robot' })
-    const homeBtn = getByRole('button', { name: 'Home gantry' })
+    const homeBtn = getByRole('button', { name: 'Home robot arm' })
     const disconnectBtn = getByRole('button', {
       name: 'Disconnect from network',
     })
@@ -152,7 +149,7 @@ describe('RobotOverviewOverflowMenu', () => {
       name: 'Run a protocol',
     })
     const restartBtn = getByRole('button', { name: 'Restart robot' })
-    const homeBtn = getByRole('button', { name: 'Home gantry' })
+    const homeBtn = getByRole('button', { name: 'Home robot arm' })
     const settingsBtn = getByRole('button', { name: 'Robot settings' })
 
     expect(updateRobotSoftwareBtn).toBeEnabled()
@@ -164,7 +161,7 @@ describe('RobotOverviewOverflowMenu', () => {
     getByText('mock update buildroot')
   })
 
-  it('should render disabled run a protocol, restart, disconnect, and home gantry menu items when robot is busy', () => {
+  it('should render disabled run a protocol, restart, disconnect, and home robot arm menu items when robot is busy', () => {
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
 
     const { getByRole } = render(props)
@@ -174,7 +171,7 @@ describe('RobotOverviewOverflowMenu', () => {
 
     expect(getByRole('button', { name: 'Run a protocol' })).toBeDisabled()
     expect(getByRole('button', { name: 'Restart robot' })).toBeDisabled()
-    expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Home robot arm' })).toBeDisabled()
     expect(
       getByRole('button', { name: 'Disconnect from network' })
     ).toBeDisabled()
@@ -186,28 +183,28 @@ describe('RobotOverviewOverflowMenu', () => {
 
     getByRole('button').click()
     expect(getByRole('button', { name: 'Restart robot' })).toBeDisabled()
-    expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Home robot arm' })).toBeDisabled()
     expect(
       queryByRole('button', { name: 'Disconnect from network' })
     ).toBeNull()
     expect(getByRole('button', { name: 'Robot settings' })).toBeEnabled()
   })
 
-  it('clicking home gantry should home the gantry', () => {
+  it('clicking home robot arm should home the robot arm', () => {
     const { getByRole } = render(props)
 
     const btn = getByRole('button')
     fireEvent.click(btn)
 
-    const homeBtn = getByRole('button', { name: 'Home gantry' })
+    const homeBtn = getByRole('button', { name: 'Home robot arm' })
     fireEvent.click(homeBtn)
 
     expect(mockHome).toBeCalled()
   })
 
   it('should render disabled disconnect button in the menu when the robot cannot disconnect', () => {
-    when(mockGetCanDisconnect)
-      .calledWith({} as State, mockConnectableRobot.name)
+    when(mockUseCanDisconnect)
+      .calledWith(mockConnectableRobot.name)
       .mockReturnValue(false)
 
     const { getByRole, queryByText } = render(props)
@@ -219,7 +216,7 @@ describe('RobotOverviewOverflowMenu', () => {
       name: 'Run a protocol',
     })
     const restartBtn = getByRole('button', { name: 'Restart robot' })
-    const homeBtn = getByRole('button', { name: 'Home gantry' })
+    const homeBtn = getByRole('button', { name: 'Home robot arm' })
     const disconnectBtn = getByRole('button', {
       name: 'Disconnect from network',
     })
@@ -272,7 +269,7 @@ describe('RobotOverviewOverflowMenu', () => {
     expect(queryByRole('Update robot software')).toBeNull()
     getByRole('button', { name: 'Run a protocol' })
     getByRole('button', { name: 'Restart robot' })
-    getByRole('button', { name: 'Home gantry' })
+    getByRole('button', { name: 'Home robot arm' })
     getByRole('button', { name: 'Disconnect from network' })
     getByRole('button', { name: 'Robot settings' })
   })
@@ -281,24 +278,5 @@ describe('RobotOverviewOverflowMenu', () => {
     const btn = getByRole('button')
     fireEvent.click(btn)
     expect(getByRole('button', { name: 'Robot settings' })).toBeDisabled()
-  })
-
-  it('dispatches fetchWifiList on mount and on an interval', () => {
-    render({ robot: mockUnreachableRobot })
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(
-      1,
-      mockUnreachableRobot.name
-    )
-    expect(mockFetchWifiList).toHaveBeenCalledTimes(1)
-    jest.advanceTimersByTime(20000)
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(
-      2,
-      mockUnreachableRobot.name
-    )
-    expect(mockFetchWifiList).toHaveBeenNthCalledWith(
-      3,
-      mockUnreachableRobot.name
-    )
-    expect(mockFetchWifiList).toHaveBeenCalledTimes(3)
   })
 })

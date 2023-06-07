@@ -12,7 +12,10 @@ import {
 import { StyledText } from '../../atoms/text'
 import { UploadInput as FileImporter } from '../../molecules/UploadInput'
 import { addProtocol } from '../../redux/protocol-storage'
-import { useTrackEvent } from '../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_IMPORT_PROTOCOL_TO_APP,
+} from '../../redux/analytics'
 import { useLogger } from '../../logger'
 
 import type { Dispatch } from '../../redux/types'
@@ -34,7 +37,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     }
     dispatch(addProtocol(file.path))
     trackEvent({
-      name: 'importProtocolToApp',
+      name: ANALYTICS_IMPORT_PROTOCOL_TO_APP,
       properties: { protocolFileName: file.name },
     })
     props.onUpload?.()
@@ -44,7 +47,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       alignItems={ALIGN_CENTER}
-      marginY={SPACING.spacingM}
+      marginY={SPACING.spacing20}
     >
       <FileImporter
         onUpload={(file: File) => handleUpload(file)}

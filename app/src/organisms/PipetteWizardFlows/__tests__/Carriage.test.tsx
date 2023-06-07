@@ -1,31 +1,19 @@
 import * as React from 'react'
-import { fireEvent, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import {
-  LEFT,
-  NINETY_SIX_CHANNEL,
-  SINGLE_MOUNT_PIPETTES,
-} from '@opentrons/shared-data'
+import { LEFT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
-import {
-  mockAttachedPipette,
-  mockGen3P1000PipetteSpecs,
-} from '../../../redux/pipettes/__fixtures__'
+import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
 import { FLOWS } from '../constants'
 import { Carriage } from '../Carriage'
-
-import type { AttachedPipette } from '../../../redux/pipettes/types'
 
 const render = (props: React.ComponentProps<typeof Carriage>) => {
   return renderWithProviders(<Carriage {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
-const mockPipette: AttachedPipette = {
-  ...mockAttachedPipette,
-  modelSpecs: mockGen3P1000PipetteSpecs,
-}
+
 describe('Carriage', () => {
   let props: React.ComponentProps<typeof Carriage>
   beforeEach(() => {
@@ -36,8 +24,8 @@ describe('Carriage', () => {
       chainRunCommands: jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
-      runId: RUN_ID_1,
-      attachedPipettes: { left: mockPipette, right: null },
+      maintenanceRunId: RUN_ID_1,
+      attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
       flowType: FLOWS.ATTACH,
       errorMessage: null,
       setShowErrorMessage: jest.fn(),
@@ -47,12 +35,11 @@ describe('Carriage', () => {
     }
   })
   it('returns the correct information, buttons work as expected when flow is attach', () => {
-    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    const { getByText, getByAltText, getByRole } = render(props)
     getByText('Unscrew z-axis carriage')
     getByAltText('Unscrew gantry')
     getByRole('button', { name: 'Continue' })
-    getByLabelText('back').click()
-    expect(props.goBack).toHaveBeenCalled()
+    expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
   })
   it('renders the correct button when is the on device display', () => {
     props = {
@@ -60,7 +47,7 @@ describe('Carriage', () => {
       isOnDevice: true,
     }
     const { getByLabelText } = render(props)
-    getByLabelText('SmallButton_default')
+    getByLabelText('SmallButton_primary')
   })
   it('returns the correct information, buttons work as expected when flow is detach', () => {
     props = {
@@ -80,22 +67,6 @@ describe('Carriage', () => {
     getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
   })
-  it('renders null if a single mount pipette is attached', () => {
-    props = {
-      ...props,
-      selectedPipette: SINGLE_MOUNT_PIPETTES,
-    }
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
-  })
-  it('renders null if flow is calibrate is attached', () => {
-    props = {
-      ...props,
-      flowType: FLOWS.CALIBRATE,
-    }
-    const { container } = render(props)
-    expect(container.firstChild).toBeNull()
-  })
   it('clicking on continue button executes the commands correctly', async () => {
     const { getByRole } = render(props)
     const contBtn = getByRole('button', { name: 'Continue' })
@@ -105,8 +76,12 @@ describe('Carriage', () => {
         {
           commandType: 'home',
           params: {
-            axes: 'rightZ',
+            axes: ['rightZ'],
           },
+        },
+        {
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: { mount: LEFT },
         },
       ],
       false

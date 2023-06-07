@@ -1,3 +1,6 @@
+import * as React from 'react'
+import styled from 'styled-components'
+import { useTranslation } from 'react-i18next'
 import {
   COLORS,
   ALIGN_CENTER,
@@ -7,21 +10,18 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import * as React from 'react'
-import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import {
   useAllPipetteOffsetCalibrationsQuery,
   useInstrumentsQuery,
 } from '@opentrons/react-api-client'
-import { BackButton } from '../../atoms/buttons'
-import { ContinueButton } from '../ProtocolSetupModules'
+import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
+import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { isGripperInCommands } from '../../resources/protocols/utils'
 
 export interface ProtocolSetupInstrumentsProps {
   runId: string
@@ -32,44 +32,42 @@ export function ProtocolSetupInstruments({
   runId,
   setSetupScreen,
 }: ProtocolSetupInstrumentsProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
-  const { data: attachedInstruments } = useInstrumentsQuery()
+  const { t, i18n } = useTranslation('protocol_setup')
+  const { data: attachedInstruments, refetch } = useInstrumentsQuery()
   const {
     data: allPipettesCalibrationData,
   } = useAllPipetteOffsetCalibrationsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const usesGripper =
-    mostRecentAnalysis?.commands.some(
-      c =>
-        c.commandType === 'moveLabware' && c.params.strategy === 'usingGripper'
-    ) ?? false
+    mostRecentAnalysis != null
+      ? isGripperInCommands(mostRecentAnalysis?.commands ?? [])
+      : false
   const attachedGripperMatch = usesGripper
     ? (attachedInstruments?.data ?? []).find(
         (i): i is GripperData => i.instrumentType === 'gripper'
       ) ?? null
     : null
+
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
     >
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_CENTER}>
-        <BackButton onClick={() => setSetupScreen('prepare to run')}>
-          {t('instruments')}
-        </BackButton>
-        <Flex gridGap={SPACING.spacingXXL}>
-          <ContinueButton onClick={() => setSetupScreen('modules')} />
-        </Flex>
-      </Flex>
+      <ODDBackButton
+        label={t('instruments')}
+        onClick={() => setSetupScreen('prepare to run')}
+      />
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        paddingX={SPACING.spacing5}
+        paddingX={SPACING.spacing24}
       >
         <ColumnLabel>{t('location')}</ColumnLabel>
-        <ColumnLabel>{t('calibration_status')}</ColumnLabel>
+        <ColumnLabel>
+          {i18n.format(t('calibration_status'), 'sentenceCase')}
+        </ColumnLabel>
       </Flex>
       {(mostRecentAnalysis?.pipettes ?? []).map(loadedPipette => {
         const attachedPipetteMatch =
@@ -85,6 +83,7 @@ export function ProtocolSetupInstruments({
             mount={loadedPipette.mount}
             speccedName={loadedPipette.pipetteName}
             attachedInstrument={attachedPipetteMatch}
+            mostRecentAnalysis={mostRecentAnalysis}
             attachedCalibrationData={
               attachedPipetteMatch != null
                 ? allPipettesCalibrationData?.data.find(
@@ -94,6 +93,7 @@ export function ProtocolSetupInstruments({
                   ) ?? null
                 : null
             }
+            instrumentsRefetch={refetch}
           />
         )
       })}
@@ -101,7 +101,7 @@ export function ProtocolSetupInstruments({
         <ProtocolInstrumentMountItem
           key="extension"
           mount="extension"
-          speccedName={attachedGripperMatch?.instrumentModel as GripperModel}
+          speccedName={'gripperV1' as GripperModel}
           attachedInstrument={attachedGripperMatch}
           attachedCalibrationData={
             attachedGripperMatch?.data.calibratedOffset ?? null
@@ -117,5 +117,5 @@ const ColumnLabel = styled.p`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontWeightSemiBold};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  color: ${COLORS.darkBlack_seventy};
+  color: ${COLORS.darkBlack70};
 `

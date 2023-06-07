@@ -42,7 +42,6 @@ export function InstrumentsAndModules({
   robotName,
 }: InstrumentsAndModulesProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
-
   const attachedPipettes = usePipettesQuery(
     {},
     {
@@ -82,6 +81,7 @@ export function InstrumentsAndModules({
   const pipetteOffsetCalibrations =
     useAllPipetteOffsetCalibrationsQuery({
       refetchInterval: FETCH_PIPETTE_CAL_POLL,
+      enabled: !isOT3,
     })?.data?.data ?? []
   const leftMountOffsetCalibration = getOffsetCalibrationForMount(
     pipetteOffsetCalibrations,
@@ -103,7 +103,7 @@ export function InstrumentsAndModules({
       <StyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        marginBottom={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
         id="InstrumentsAndModules_title"
       >
         {t('instruments_and_modules')}
@@ -112,26 +112,26 @@ export function InstrumentsAndModules({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         minHeight={SIZE_3}
-        paddingBottom={SPACING.spacing3}
+        paddingBottom={SPACING.spacing8}
         width="100%"
         flexDirection={DIRECTION_COLUMN}
       >
         {currentRunId != null && !isRunTerminal && (
           <Flex
-            paddingBottom={SPACING.spacing4}
+            paddingBottom={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
-            paddingX={SPACING.spacing2}
+            paddingX={SPACING.spacing4}
             width="100%"
           >
             <Banner type="warning">{t('robot_control_not_available')}</Banner>
           </Flex>
         )}
         {isRobotViewable ? (
-          <Flex gridGap={SPACING.spacing3} width="100%">
+          <Flex gridGap={SPACING.spacing8} width="100%">
             <Flex
               flex="50%"
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
               <PipetteCard
                 pipetteId={attachedPipettes.left?.id}
@@ -140,13 +140,25 @@ export function InstrumentsAndModules({
                     ? getPipetteModelSpecs(attachedPipettes.left?.model) ?? null
                     : null
                 }
-                pipetteOffsetCalibration={leftMountOffsetCalibration}
+                isPipetteCalibrated={
+                  isOT3
+                    ? attachedInstruments?.data?.find(i => i.mount === 'left')
+                        ?.data?.calibratedOffset != null
+                    : leftMountOffsetCalibration != null
+                }
                 mount={LEFT}
                 robotName={robotName}
                 is96ChannelAttached={is96ChannelAttached}
               />
               {isOT3 ? (
-                <GripperCard attachedGripper={extensionInstrument} />
+                <GripperCard
+                  attachedGripper={extensionInstrument}
+                  isCalibrated={
+                    attachedInstruments?.data?.find(
+                      i => i.mount === 'extension'
+                    )?.data?.calibratedOffset != null
+                  }
+                />
               ) : null}
               {leftColumnModules.map((module, index) => (
                 <ModuleCard
@@ -162,7 +174,7 @@ export function InstrumentsAndModules({
             <Flex
               flex="50%"
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
               {!Boolean(is96ChannelAttached) ? (
                 <PipetteCard
@@ -173,7 +185,13 @@ export function InstrumentsAndModules({
                         null
                       : null
                   }
-                  pipetteOffsetCalibration={rightMountOffsetCalibration}
+                  isPipetteCalibrated={
+                    isOT3
+                      ? attachedInstruments?.data?.find(
+                          i => i.mount === 'right'
+                        )?.data?.calibratedOffset != null
+                      : rightMountOffsetCalibration != null
+                  }
                   mount={RIGHT}
                   robotName={robotName}
                   is96ChannelAttached={false}
@@ -195,10 +213,10 @@ export function InstrumentsAndModules({
           <Flex
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacingSM}
+            gridGap={SPACING.spacing12}
             justifyContent={JUSTIFY_CENTER}
             minHeight={SIZE_3}
-            padding={SPACING.spacingSM}
+            padding={SPACING.spacing12}
           >
             {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
             <StyledText

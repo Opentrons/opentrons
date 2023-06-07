@@ -12,11 +12,11 @@ from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import StateSummary, CommandSlice
 from opentrons.protocol_engine.commands import Command
 
-from robot_server.persistence import run_table, action_table
+from robot_server.persistence import run_table, action_table, sqlite_rowid
 from robot_server.protocols import ProtocolNotFoundError
 
 from .action_models import RunAction, RunActionType
-
+from .run_models import RunNotFoundError
 
 _CACHE_ENTRIES = 32
 
@@ -33,14 +33,6 @@ class RunResource:
     protocol_id: Optional[str]
     created_at: datetime
     actions: List[RunAction]
-
-
-class RunNotFoundError(ValueError):
-    """Error raised when a given Run ID is not found in the store."""
-
-    def __init__(self, run_id: str) -> None:
-        """Initialize the error message from the missing ID."""
-        super().__init__(f"Run {run_id} was not found.")
 
 
 class CommandNotFoundError(ValueError):
@@ -212,18 +204,30 @@ class RunStore:
         return _convert_row_to_run(run_row, action_rows)
 
     @lru_cache(maxsize=_CACHE_ENTRIES)
-    def get_all(self) -> List[RunResource]:
+    def get_all(self, length: Optional[int] = None) -> List[RunResource]:
         """Get all known run resources.
 
         Returns:
             All stored run entries.
         """
         select_runs = sqlalchemy.select(_run_columns)
-        select_actions = sqlalchemy.select(action_table)
+        select_actions = sqlalchemy.select(action_table).order_by(sqlite_rowid.asc())
         actions_by_run_id = defaultdict(list)
 
         with self._sql_engine.begin() as transaction:
-            runs = transaction.execute(select_runs).all()
+            if length is not None:
+                select_runs = (
+                    select_runs.limit(length)
+                    .order_by(sqlite_rowid.desc())
+                    .limit(length)
+                )
+                # need to select the last inserted runs and return by asc order
+                runs = list(reversed(transaction.execute(select_runs).all()))
+            else:
+                runs = transaction.execute(
+                    select_runs.order_by(sqlite_rowid.asc())
+                ).all()
+
             actions = transaction.execute(select_actions).all()
 
         for action_row in actions:

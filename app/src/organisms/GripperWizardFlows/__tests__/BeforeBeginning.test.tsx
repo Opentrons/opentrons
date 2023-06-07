@@ -31,10 +31,10 @@ describe('BeforeBeginning', () => {
       chainRunCommands: jest
         .fn()
         .mockImplementationOnce(() => Promise.resolve()),
-      runId: RUN_ID_1,
+      maintenanceRunId: RUN_ID_1,
       attachedGripper: {},
       flowType: GRIPPER_FLOW_TYPES.ATTACH,
-      createRun: jest.fn(),
+      createMaintenanceRun: jest.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
     }
@@ -94,6 +94,7 @@ describe('BeforeBeginning', () => {
     getByRole('button', { name: 'Move gantry to front' }).click()
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
+        { commandType: 'home', params: {} },
         {
           commandType: 'calibration/moveToMaintenancePosition',
           params: { mount: 'left' },

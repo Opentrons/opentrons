@@ -15,7 +15,7 @@ import type { StyleProps } from '@opentrons/components'
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
   [commandType in RunTimeCommand['commandType']]?: string
 } = {
-  home: 'home_gantry',
+  home: 'home_robot_arm',
   savePosition: 'save_position',
   touchTip: 'touch_tip',
   'magneticModule/engage': 'engaging_magnetic_module',
@@ -85,12 +85,12 @@ export function CommandText(props: Props): JSX.Element | null {
       )
       return (
         <Flex flexDirection={DIRECTION_COLUMN} {...styleProps}>
-          <StyledText marginBottom={SPACING.spacing2} {...styleProps}>
+          <StyledText marginBottom={SPACING.spacing4} {...styleProps}>
             {t('tc_starting_profile', {
               repetitions: Object.keys(steps).length,
             })}
           </StyledText>
-          <Flex marginLeft={SPACING.spacing4}>
+          <Flex marginLeft={SPACING.spacing16}>
             <ul>
               {steps.map((step: string, index: number) => (
                 <li key={index}> {step}</li>

@@ -1,9 +1,11 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { Provider } from 'react-redux'
 
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 
+import { useWifiList } from '../../../../resources/networking/hooks'
 import * as Networking from '../../../../redux/networking'
 import * as RobotApi from '../../../../redux/robot-api'
 import * as Fixtures from '../../../../redux/networking/__fixtures__'
@@ -19,6 +21,7 @@ import { SelectNetwork } from '../SelectNetwork'
 import type { ReactWrapper } from 'enzyme'
 import { RequestState } from '../../../../redux/robot-api/types'
 
+jest.mock('../../../../resources/networking/hooks')
 jest.mock('../../../../redux/networking/selectors')
 jest.mock('../../../../redux/robot-api/selectors')
 
@@ -50,9 +53,7 @@ const mockWifiKeys = [
 
 const mockEapOptions = [Fixtures.mockEapOption]
 
-const mockGetWifiList = Networking.getWifiList as jest.MockedFunction<
-  typeof Networking.getWifiList
->
+const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
 
 const mockGetWifiKeys = Networking.getWifiKeys as jest.MockedFunction<
   typeof Networking.getWifiKeys
@@ -82,11 +83,9 @@ describe('<TemporarySelectNetwork />', () => {
 
     jest.useFakeTimers()
 
-    mockGetWifiList.mockImplementation((state, robotName) => {
-      expect(state).toEqual(mockState)
-      expect(robotName).toEqual(mockRobotName)
-      return mockWifiList
-    })
+    when(mockUseWifiList)
+      .calledWith(mockRobotName)
+      .mockReturnValue(mockWifiList)
 
     mockGetWifiKeys.mockImplementation((state, robotName) => {
       expect(state).toEqual(mockState)
@@ -115,6 +114,7 @@ describe('<TemporarySelectNetwork />', () => {
     jest.clearAllMocks()
     jest.clearAllTimers()
     jest.useRealTimers()
+    resetAllWhenMocks()
   })
 
   it('renders an <SelectSsid /> child with props from state', () => {
@@ -125,7 +125,9 @@ describe('<TemporarySelectNetwork />', () => {
   })
 
   it('renders an <SelectSsid /> child with no active ssid', () => {
-    mockGetWifiList.mockReturnValue(mockWifiList.slice(1))
+    when(mockUseWifiList)
+      .calledWith(mockRobotName)
+      .mockReturnValue(mockWifiList.slice(1))
 
     const wrapper = render()
     const selectSsid = wrapper.find(SelectSsid)

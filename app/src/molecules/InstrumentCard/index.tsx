@@ -32,6 +32,7 @@ interface InstrumentCardProps extends StyleProps {
   instrumentDiagramProps?: InstrumentDiagramProps
   // special casing the gripper at least for now
   isGripperAttached?: boolean
+  banner?: React.ReactNode
 }
 
 /**
@@ -46,6 +47,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
     isGripperAttached = false,
     label,
     menuOverlayItems,
+    banner,
     ...styleProps
   } = props
 
@@ -61,8 +63,8 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.fundamentalsBackground}
       borderRadius={BORDERS.radiusSoftCorners}
-      gridGap={SPACING.spacing3}
-      padding={SPACING.spacing4}
+      gridGap={SPACING.spacing8}
+      padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
       {...styleProps}
     >
@@ -88,9 +90,10 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
       <Flex
         alignItems={ALIGN_FLEX_START}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing1}
-        paddingRight={SPACING.spacing5}
+        gridGap={SPACING.spacing2}
+        paddingRight={SPACING.spacing24}
       >
+        {banner}
         <StyledText
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.darkGreyEnabled}
@@ -105,8 +108,8 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
       </Flex>
       <Box
         position={POSITION_ABSOLUTE}
-        top={SPACING.spacing2}
-        right={SPACING.spacing2}
+        top={SPACING.spacing4}
+        right={SPACING.spacing4}
       >
         <OverflowBtn onClick={handleOverflowClick} />
         {menuOverlay}

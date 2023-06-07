@@ -1,18 +1,14 @@
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 
-import {
-  Flex,
-  DIRECTION_COLUMN,
-  // useInterval,
-  SPACING,
-} from '@opentrons/components'
+import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
 import { StepMeter } from '../../atoms/StepMeter'
 import * as Networking from '../../redux/networking'
 import { getLocalRobot } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
+import { useWifiList } from '../../resources/networking/hooks'
 import {
   CONNECT,
   JOIN_OTHER,
@@ -25,35 +21,33 @@ import {
   SelectAuthenticationType,
   SetWifiCred,
   WifiConnectionDetails,
-} from '../../organisms/OnDeviceDisplay/SetupNetwork'
+} from '../../organisms/NetworkSettings'
 
-import type { State, Dispatch } from '../../redux/types'
+import type { WifiSecurityType } from '@opentrons/api-client'
+import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
 import type { WifiNetwork } from '../../redux/networking/types'
 import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
 
-export type AuthType = 'wpa-psk' | 'none'
+const WIFI_LIST_POLL_MS = 5000
 
 export function ConnectViaWifi(): JSX.Element {
-  const [isSearching, setIsSearching] = React.useState<boolean>(true)
   const [selectedSsid, setSelectedSsid] = React.useState<string>('')
   const [
     showSelectAuthenticationType,
     setShowSelectAuthenticationType,
   ] = React.useState<boolean>(false)
-  const [selectedAuthType, setSelectedAuthType] = React.useState<AuthType>(
-    'wpa-psk'
-  )
+  const [
+    selectedAuthType,
+    setSelectedAuthType,
+  ] = React.useState<WifiSecurityType>('wpa-psk')
   const [changeState, setChangeState] = React.useState<NetworkChangeState>({
     type: null,
   })
   const [password, setPassword] = React.useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const dispatch = useDispatch<Dispatch>()
-  const list = useSelector((state: State) =>
-    Networking.getWifiList(state, robotName)
-  )
+  const list = useWifiList(robotName, WIFI_LIST_POLL_MS)
   const [dispatchApiRequest, requestIds] = RobotApi.useDispatchApiRequest()
   const requestState = useSelector((state: State) => {
     const lastId = last(requestIds)
@@ -74,7 +68,6 @@ export function ConnectViaWifi(): JSX.Element {
       psk: password,
     }
     dispatchApiRequest(Networking.postWifiConfigure(robotName, options))
-    // Note: kj 1/18/2023 for join_other network , this will be required by a following PR
     if (changeState.type === JOIN_OTHER) {
       setChangeState({ type: changeState.type, ssid: options.ssid })
     }
@@ -86,10 +79,10 @@ export function ConnectViaWifi(): JSX.Element {
       return (
         <DisplayWifiList
           list={list}
-          isSearching={isSearching}
           setShowSelectAuthenticationType={setShowSelectAuthenticationType}
           setChangeState={setChangeState}
           setSelectedSsid={setSelectedSsid}
+          isHeader
         />
       )
     } else if (changeState.type === JOIN_OTHER && changeState.ssid === null) {
@@ -128,7 +121,7 @@ export function ConnectViaWifi(): JSX.Element {
       currentRequestState !== null &&
       currentRequestState.status === RobotApi.PENDING
     ) {
-      return <ConnectingNetwork />
+      return <ConnectingNetwork ssid={changeState.ssid} />
     } else if (
       changeState.ssid != null &&
       currentRequestState !== null &&
@@ -161,16 +154,6 @@ export function ConnectViaWifi(): JSX.Element {
   }
 
   React.useEffect(() => {
-    dispatch(Networking.fetchWifiList(robotName))
-  }, [dispatch, robotName])
-
-  React.useEffect(() => {
-    if (list != null && list.length > 0) {
-      setIsSearching(false)
-    }
-  }, [list])
-
-  React.useEffect(() => {
     setCurrentRequestState(requestState)
   }, [requestState])
 
@@ -184,16 +167,14 @@ export function ConnectViaWifi(): JSX.Element {
         setChangeState({ type: CONNECT, ssid: selectedSsid, network })
       }
     }
-  }, [selectedSsid, selectedAuthType])
+  }, [selectedSsid, selectedAuthType, list])
 
   return (
     <>
-      <StepMeter totalSteps={5} currentStep={2} OnDevice />
+      <StepMeter totalSteps={5} currentStep={2} />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={`${String(SPACING.spacing6)} ${String(
-          SPACING.spacingXXL
-        )} ${String(SPACING.spacingXXL)}`}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
       >
         {renderScreen()}
       </Flex>

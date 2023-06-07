@@ -20,100 +20,110 @@ describe('CustomKeyboard', () => {
   })
 
   it('should render the custom keyboards lower case', () => {
-    const { getByRole } = render(props)
-    // first row
-    getByRole('button', { name: 'q' })
-    getByRole('button', { name: 'w' })
-    getByRole('button', { name: 'e' })
-    getByRole('button', { name: 'r' })
-    getByRole('button', { name: 't' })
-    getByRole('button', { name: 'y' })
-    getByRole('button', { name: 'u' })
-    getByRole('button', { name: 'i' })
-    getByRole('button', { name: 'o' })
-    getByRole('button', { name: 'p' })
-
-    // second row
-    getByRole('button', { name: 'a' })
-    getByRole('button', { name: 's' })
-    getByRole('button', { name: 'd' })
-    getByRole('button', { name: 'f' })
-    getByRole('button', { name: 'g' })
-    getByRole('button', { name: 'h' })
-    getByRole('button', { name: 'j' })
-    getByRole('button', { name: 'k' })
-    getByRole('button', { name: 'l' })
-
-    // third row
-    getByRole('button', { name: 'shift' })
-    getByRole('button', { name: 'z' })
-    getByRole('button', { name: 'x' })
-    getByRole('button', { name: 'c' })
-    getByRole('button', { name: 'v' })
-    getByRole('button', { name: 'b' })
-    getByRole('button', { name: 'n' })
-    getByRole('button', { name: 'm' })
-    getByRole('button', { name: 'del' })
-
-    // fourth row
-    getByRole('button', { name: '123' }) // numbers
+    const { getAllByRole } = render(props)
+    const buttons = getAllByRole('button')
+    const expectedButtonNames = [
+      'q',
+      'w',
+      'e',
+      'r',
+      't',
+      'y',
+      'u',
+      'i',
+      'o',
+      'p',
+      'a',
+      's',
+      'd',
+      'f',
+      'g',
+      'h',
+      'j',
+      'k',
+      'l',
+      'shift',
+      'z',
+      'x',
+      'c',
+      'v',
+      'b',
+      'n',
+      'm',
+      'del',
+      '123',
+    ]
+    buttons.forEach((button, index) => {
+      const expectedName = expectedButtonNames[index]
+      expect(button).toHaveTextContent(expectedName)
+    })
   })
   it('should render the custom keyboards upper case, when clicking shift key', () => {
-    const { getByRole } = render(props)
+    const { getByRole, getAllByRole } = render(props)
     const shiftKey = getByRole('button', { name: 'shift' })
     fireEvent.click(shiftKey)
 
-    // first row
-    getByRole('button', { name: 'Q' })
-    getByRole('button', { name: 'W' })
-    getByRole('button', { name: 'E' })
-    getByRole('button', { name: 'R' })
-    getByRole('button', { name: 'T' })
-    getByRole('button', { name: 'Y' })
-    getByRole('button', { name: 'U' })
-    getByRole('button', { name: 'I' })
-    getByRole('button', { name: 'O' })
-
-    // second row
-    getByRole('button', { name: 'A' })
-    getByRole('button', { name: 'S' })
-    getByRole('button', { name: 'D' })
-    getByRole('button', { name: 'F' })
-    getByRole('button', { name: 'G' })
-    getByRole('button', { name: 'H' })
-    getByRole('button', { name: 'J' })
-    getByRole('button', { name: 'K' })
-    getByRole('button', { name: 'L' })
-
-    // third row
-    getByRole('button', { name: 'shift' })
-    getByRole('button', { name: 'Z' })
-    getByRole('button', { name: 'X' })
-    getByRole('button', { name: 'C' })
-    getByRole('button', { name: 'V' })
-    getByRole('button', { name: 'B' })
-    getByRole('button', { name: 'N' })
-    getByRole('button', { name: 'M' })
-    // fourth row
-    getByRole('button', { name: '123' }) // numbers
+    const buttons = getAllByRole('button')
+    const expectedButtonNames = [
+      'Q',
+      'W',
+      'E',
+      'R',
+      'T',
+      'Y',
+      'U',
+      'I',
+      'O',
+      'P',
+      'A',
+      'S',
+      'D',
+      'F',
+      'G',
+      'H',
+      'J',
+      'K',
+      'L',
+      'shift',
+      'Z',
+      'X',
+      'C',
+      'V',
+      'B',
+      'N',
+      'M',
+      'del',
+      '123',
+    ]
+    buttons.forEach((button, index) => {
+      const expectedName = expectedButtonNames[index]
+      expect(button).toHaveTextContent(expectedName)
+    })
   })
 
   it('should render the custom keyboards numbers, when clicking number key', () => {
-    const { getByRole } = render(props)
+    const { getByRole, getAllByRole } = render(props)
     const numberKey = getByRole('button', { name: '123' })
     fireEvent.click(numberKey)
-    getByRole('button', { name: '1' })
-    getByRole('button', { name: '2' })
-    getByRole('button', { name: '3' })
-    getByRole('button', { name: '4' })
-    getByRole('button', { name: '5' })
-    getByRole('button', { name: '6' })
-    getByRole('button', { name: '7' })
-    getByRole('button', { name: '8' })
-    getByRole('button', { name: '9' })
-    getByRole('button', { name: '0' })
-    getByRole('button', { name: 'ABC' })
-    getByRole('button', { name: 'del' })
+    const buttons = getAllByRole('button')
+    const expectedButtonNames = [
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      'ABC',
+      '0',
+      'del',
+    ]
+    buttons.forEach((button, index) => {
+      const expectedName = expectedButtonNames[index]
+      expect(button).toHaveTextContent(expectedName)
+    })
   })
 
   it('should render the custom keyboards lower case, when clicking number key then abc key', () => {

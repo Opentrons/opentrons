@@ -69,6 +69,8 @@ def test_pipette_name_validity(scannedval: str) -> None:
         "P1KSVVV",
         "P1KSV0A",
         "P1KSV0102022022123123123",
+        "P,KSV01abc123",
+        "P1KSV01,abc123",
     ],
 )
 def test_pipette_serial_validity(scannedval: str) -> None:
@@ -127,14 +129,7 @@ def test_scan_valid_gripper_serials(
 
 @pytest.mark.parametrize(
     "scannedval",
-    [
-        "",
-        "G",
-        "GR",
-        "GRVVV",
-        "GRV0A",
-        "GRVV0102022022123123123",
-    ],
+    ["", "G", "GR", "GRVVV", "GRV0A", "GRVV0102022022123123123", "GRPV01,abc123"],
 )
 def test_gripper_serial_validity(scannedval: str) -> None:
     """Various regex failures for gripper."""

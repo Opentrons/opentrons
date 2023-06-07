@@ -34,7 +34,7 @@ const Children = (
     </Box>
     <StyledText
       as="p"
-      marginLeft={SPACING.spacing3}
+      marginLeft={SPACING.spacing8}
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
     >
       MiniCard stories protocol
