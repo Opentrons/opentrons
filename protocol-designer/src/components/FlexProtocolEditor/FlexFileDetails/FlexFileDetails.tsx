@@ -1,4 +1,5 @@
 import {
+  ALIGN_CENTER,
   Card,
   DIRECTION_COLUMN,
   Flex,
@@ -33,6 +34,7 @@ import { InstrumentGroup } from '../FlexInstrument/InstrumentGroup'
 import { FlexProtocolEditorComponent } from '../FlexProtocolEditor'
 import { actions as navActions } from '../../../navigation'
 import { UpdateConfirmation } from '../FlexUpdateConfirmation'
+import { MiniCard } from '../FlexModules/MiniCard'
 export interface Props {
   formValues: FileMetadataFields
   instruments: React.ComponentProps<typeof InstrumentGroup>
@@ -261,55 +263,73 @@ const FileProtocolNameAndDescription = (props: {
 }): JSX.Element => {
   const { nameDescriptionData } = props
   return (
-    <div>
-      <Flex className={cx(styles.heading_container, styles.margin_bottom)}>
-        <StyledText as="h3" className={styles.margin_bottom}>
-          {i18n.t('flex.file_tab.name_desc_title')}
-        </StyledText>
-      </Flex>
-      <Flex className={styles.margin_bottom}>
-        <StyledText as="h4" className={styles.bold_text}>
-          {i18n.t('flex.file_tab.name')}
-        </StyledText>
-        <StyledText as="h5" className={styles.name_margin}>
-          {nameDescriptionData.protocolName}
-        </StyledText>
-      </Flex>
-      <Flex className={styles.margin_bottom}>
-        <StyledText as="h4" className={styles.bold_text}>
-          {i18n.t('flex.file_tab.author')}
-        </StyledText>
-        <StyledText as="h5" className={styles.author_margin}>
-          {nameDescriptionData.author}
-        </StyledText>
-      </Flex>
-      <Flex className={styles.margin_bottom}>
-        <StyledText as="h4" className={styles.bold_text}>
-          {i18n.t('flex.file_tab.description')}
-        </StyledText>
-        <StyledText as="h5" className={styles.desc_margin}>
-          {nameDescriptionData.description}
-        </StyledText>
-      </Flex>
-      <Flex className={styles.margin_bottom}>
-        <StyledText as="h4" className={styles.bold_text}>
-          {i18n.t('flex.file_tab.date_created')}
-        </StyledText>
-        <StyledText as="h5" className={styles.created_margin}>
-          {nameDescriptionData.created &&
-            format(nameDescriptionData.created, DATE_ONLY_FORMAT)}
-        </StyledText>
-      </Flex>
-      <Flex className={styles.margin_bottom}>
-        <StyledText as="h4" className={styles.bold_text}>
-          {i18n.t('flex.file_tab.last_exported')}
-        </StyledText>
-        <StyledText as="h5" className={styles.other_margin}>
-          {nameDescriptionData.lastModified &&
-            format(nameDescriptionData.lastModified, DATETIME_FORMAT)}
-        </StyledText>
-      </Flex>
-    </div>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      className={cx(styles.heading_container, styles.margin_bottom)}
+    >
+      <StyledText as="h3" className={styles.margin_bottom}>
+        {i18n.t('flex.file_tab.name_desc_title')}
+      </StyledText>
+
+      <ShowProtocolBasicData
+        data={nameDescriptionData.protocolName}
+        title={i18n.t('flex.file_tab.name')}
+        style={styles.name_margin}
+      />
+
+      <ShowProtocolBasicData
+        data={nameDescriptionData.author}
+        title={i18n.t('flex.file_tab.author')}
+        style={styles.author_margin}
+      />
+
+      <ShowProtocolBasicData
+        data={nameDescriptionData.description}
+        title={i18n.t('flex.file_tab.description')}
+        style={styles.desc_margin}
+      />
+
+      <ShowProtocolBasicData
+        data={
+          nameDescriptionData.created &&
+          format(nameDescriptionData.created, DATE_ONLY_FORMAT)
+        }
+        title={i18n.t('flex.file_tab.date_created')}
+        style={styles.created_margin}
+      />
+
+      <ShowProtocolBasicData
+        data={
+          nameDescriptionData.lastModified &&
+          format(nameDescriptionData.lastModified, DATETIME_FORMAT)
+        }
+        title={i18n.t('flex.file_tab.last_exported')}
+        style={styles.other_margin}
+      />
+    </Flex>
+  )
+}
+
+interface ShowProtocolBasicDataProps {
+  title: string
+  data: string
+  style?: string
+}
+
+const ShowProtocolBasicData: React.FC<ShowProtocolBasicDataProps> = ({
+  title,
+  data,
+  style,
+}): JSX.Element => {
+  return (
+    <Flex className={styles.margin_bottom}>
+      <StyledText as="h4" className={styles.bold_text}>
+        {title}
+      </StyledText>
+      <StyledText as="h5" className={style}>
+        {data}
+      </StyledText>
+    </Flex>
   )
 }
 
@@ -346,7 +366,7 @@ const SelectedModules = (props: { propsData: any }): JSX.Element => {
             className={` ${styles.card_width} ${styles.margin_bottom}`}
             key={i}
           >
-            <Card>
+            <MiniCard isSelected={moduleType.type}>
               <div className={styles.card_content}>
                 <Flex>
                   <ModuleDiagram
@@ -355,6 +375,7 @@ const SelectedModules = (props: { propsData: any }): JSX.Element => {
                   />
                   <Flex
                     flexDirection={DIRECTION_COLUMN}
+                    justifyContent={ALIGN_CENTER}
                     marginLeft={SPACING.spacing4}
                     marginTop={SPACING.spacing4}
                     marginBottom={SPACING.spacing4}
@@ -368,7 +389,7 @@ const SelectedModules = (props: { propsData: any }): JSX.Element => {
                   </Flex>
                 </Flex>
               </div>
-            </Card>
+            </MiniCard>
           </div>
         ))
       ) : (

@@ -1,37 +1,45 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
-  Flex,
   DIRECTION_COLUMN,
-  SPACING,
-  FormGroup,
   DropdownField,
+  Flex,
+  FormGroup,
+  SPACING,
+  Tooltip,
   useHoverTooltip,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
-import { StyledText } from '../StyledText'
-import styles from '../FlexComponents.css'
 import {
-  ModuleType,
-  ModuleModel,
-  OT3_STANDARD_MODEL,
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  ModuleModel,
+  ModuleType,
+  OT3_STANDARD_MODEL,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
+import { useFormikContext } from 'formik'
+import { useEffect, useState } from 'react'
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
   MODELS_FOR_MODULE_TYPE,
 } from '../../../constants'
-import { MiniCard } from './MiniCard'
-import { ConnectedSlotMap } from '../../modals/EditModulesModal/ConnectedSlotMap'
-import { getAllFlexModuleSlotsByType } from './FlexModuleData'
-import { PDAlert } from '../../alerts/PDAlert'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
+import { i18n } from '../../../localization'
 import { ModuleOnDeck } from '../../../step-forms'
 import { ModelModuleInfo } from '../../EditModules'
-import { useFormikContext } from 'formik'
+import { PDAlert } from '../../alerts/PDAlert'
+import { ConnectedSlotMap } from '../../modals/EditModulesModal/ConnectedSlotMap'
+import styles from '../FlexComponents.css'
+import { StyledText } from '../StyledText'
+import { getAllFlexModuleSlotsByType } from './FlexModuleData'
 import { FlexSupportedModuleDiagram } from './FlexModuleDiagram'
+import { MiniCard } from './MiniCard'
+import { validator } from './validator'
+
+import { useSelector } from 'react-redux'
+import { selectors as stepFormSelectors } from '../../../step-forms'
+import { isModuleWithCollisionIssue } from '../../modules'
 
 export interface EditModulesModalProps {
   moduleType: ModuleType
@@ -62,11 +70,10 @@ function FlexModulesComponent(): JSX.Element {
     handleChange,
     handleBlur,
     setFieldValue,
-    errors,
   } = useFormikContext<FormValues>()
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
   const modules: ModuleType[] = Object.keys(modulesByType)
-
+  const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const supportedSlots: SupportedSlots = {
     [MAGNETIC_MODULE_TYPE]: 'GEN1',
     [TEMPERATURE_MODULE_TYPE]: 'GEN2',
@@ -75,8 +82,19 @@ function FlexModulesComponent(): JSX.Element {
     [MAGNETIC_BLOCK_TYPE]: 'GEN1',
   }
 
-  const [selectedModules, setSelectedModules] = useState<string[]>([])
+  const [selectedModules, setSelectedModules] = useState<string[]>(
+    Object.keys(modulesByType).filter(j => modulesByType[j].onDeck)
+  )
+  const [errors, setError] = useState<Record<string, any>>({})
+
+  const disabledModuleRestriction = useSelector(
+    featureFlagSelectors.getDisableModuleRestrictions
+  )
+
+  let enableSlotSelection = false
   const toggleModuleSelection = (moduleType: string): void => {
+    const noCollisionIssue = !isModuleWithCollisionIssue(moduleType)
+    enableSlotSelection = disabledModuleRestriction || noCollisionIssue
     setSelectedModules([...selectedModules, moduleType])
     if (selectedModules.includes(moduleType)) {
       setSelectedModules(
@@ -89,12 +107,31 @@ function FlexModulesComponent(): JSX.Element {
     }
   }
 
-  const slotIssue =
-    errors?.selectedSlot && errors.selectedSlot.includes('occupied')
-
-  const [targetProps] = useHoverTooltip({
+  const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'top',
   })
+
+  const slotOptionTooltip = (
+    <div className={styles.slot_tooltip}>
+      {i18n.t('tooltip.edit_module_modal.slot_selection')}
+    </div>
+  )
+
+  useEffect(() => {
+    for (let key in modulesByType) {
+      if (modulesByType.hasOwnProperty(key) && modulesByType[key].onDeck) {
+        const error = validator({
+          selectedModel: modulesByType[key],
+          selectedType: key,
+          initialDeckSetup,
+        })
+        error && setError(error)
+      }
+    }
+  }, modulesByType)
+
+  const slotIssue =
+    errors?.selectedSlot && errors?.selectedSlot.includes('occupied')
 
   return (
     <>
@@ -106,13 +143,14 @@ function FlexModulesComponent(): JSX.Element {
         <PDAlert
           alertType="warning"
           title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
-          description={''}
+          description={errors.selectedSlot}
         />
       )}
 
       <div className={styles.flex_sub_heading}>
         <>
           {modules.map((moduleType, i) => {
+            const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
             const label = i18n.t(`modules.module_display_names.${moduleType}`)
             const defaultModel = DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType]
             const selectedModel = modulesByType[moduleType].model
@@ -120,27 +158,25 @@ function FlexModulesComponent(): JSX.Element {
             return (
               <div className={styles.module_section} key={i}>
                 <div className={styles.mini_card}>
-                  <div>
-                    <MiniCard
-                      isSelected={selectedModules.includes(moduleType)}
-                      isError={false}
-                      value={moduleType}
-                      onClick={() => toggleModuleSelection(moduleType)}
+                  <MiniCard
+                    isSelected={selectedModules.includes(moduleType)}
+                    isError={false}
+                    value={moduleType}
+                    onClick={() => toggleModuleSelection(moduleType)}
+                  >
+                    <FlexSupportedModuleDiagram
+                      type={moduleType}
+                      model={selectedModel ?? defaultModel}
+                    />
+                    <Flex
+                      flexDirection={DIRECTION_COLUMN}
+                      marginLeft={SPACING.spacing4}
+                      marginTop={SPACING.spacing4}
+                      marginBottom={SPACING.spacing4}
                     >
-                      <FlexSupportedModuleDiagram
-                        type={moduleType}
-                        model={selectedModel ?? defaultModel}
-                      />
-                      <Flex
-                        flexDirection={DIRECTION_COLUMN}
-                        marginLeft={SPACING.spacing4}
-                        marginTop={SPACING.spacing4}
-                        marginBottom={SPACING.spacing4}
-                      >
-                        <StyledText as="h4">{label}</StyledText>
-                      </Flex>
-                    </MiniCard>
-                  </div>
+                      <StyledText as="h4">{label}</StyledText>
+                    </Flex>
+                  </MiniCard>
                 </div>
 
                 {/* Deck Map Selecetion */}
@@ -159,24 +195,34 @@ function FlexModulesComponent(): JSX.Element {
                       />
                     </FormGroup>
 
-                    <FormGroup
-                      label="Position"
-                      {...targetProps}
-                      className={styles.model_options}
-                    >
-                      <DropdownField
-                        tabIndex={1}
-                        name={`modulesByType.${moduleType}.slot`}
-                        options={getAllFlexModuleSlotsByType(moduleType)}
-                        value={modulesByType[moduleType].slot}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                      />
-                    </FormGroup>
-                    <ConnectedSlotMap
-                      fieldName={`modulesByType.${moduleType}.slot`}
-                      robotType={OT3_STANDARD_MODEL}
-                    />
+                    {showSlotOption && (
+                      <>
+                        {!enableSlotSelection && (
+                          <Tooltip {...tooltipProps}>
+                            {slotOptionTooltip}
+                          </Tooltip>
+                        )}
+                        <div {...targetProps}>
+                          <FormGroup
+                            label="Position"
+                            className={styles.model_options}
+                          >
+                            <DropdownField
+                              tabIndex={1}
+                              name={`modulesByType.${moduleType}.slot`}
+                              options={getAllFlexModuleSlotsByType(moduleType)}
+                              value={modulesByType[moduleType].slot}
+                              onChange={handleChange}
+                              onBlur={handleBlur}
+                            />
+                          </FormGroup>
+                        </div>
+                        <ConnectedSlotMap
+                          fieldName={`modulesByType.${moduleType}.slot`}
+                          robotType={OT3_STANDARD_MODEL}
+                        />
+                      </>
+                    )}
                   </>
                 )}
               </div>

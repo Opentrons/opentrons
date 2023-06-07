@@ -185,12 +185,12 @@ const getInitialValues = (values: any): InitialValues => {
         modules.heaterShakerModuleType.slot
     }
 
-    if (values.modules.magneticModuleType) {
+    if (modules.magneticBlockType) {
       initialFormValues.modulesByType[MAGNETIC_BLOCK_TYPE].onDeck = true
       initialFormValues.modulesByType[MAGNETIC_BLOCK_TYPE].model =
-        values.modules.magneticModuleType.model
+        modules.magneticBlockType.model
       initialFormValues.modulesByType[MAGNETIC_BLOCK_TYPE].slot =
-        values.modules.magneticModuleType.slot
+        modules.magneticBlockType.slot
     }
 
     if (modules.temperatureModuleType) {
