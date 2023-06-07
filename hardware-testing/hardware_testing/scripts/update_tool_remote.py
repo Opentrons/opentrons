@@ -1,3 +1,4 @@
+"""Script for updating a tool connected to a Flex."""
 import argparse
 import requests
 import sys
@@ -40,15 +41,14 @@ def _do_update_tool(api: OpentronsHTTPAPI, mounts: List[str]) -> None:
     updates: List[str] = []
     for mount in mounts:
         try:
-            instr = next(instr for instr in instrs if instr['mount'] == mount)
+            instr = next(instr for instr in instrs if instr["mount"] == mount)
         except StopIteration:
-            assert False, f'No instrument present on {mount}'
+            assert False, f"No instrument present on {mount}"
 
-        if instr['ok']:
-            print(f'Instrument on {mount} does not need an update')
+        if instr["ok"]:
+            print(f"Instrument on {mount} does not need an update")
             continue
-        updates.append(api.update_subsystem(instr['subsystem']))
-
+        updates.append(api.update_subsystem(instr["subsystem"]))
 
     done: Set[str] = set()
     updating = set(updates)
@@ -60,7 +60,7 @@ def _do_update_tool(api: OpentronsHTTPAPI, mounts: List[str]) -> None:
             continue
         status = api.get_update_status(update)
         print(
-            f'{subsystem}: {status["updateStatus"]} {status["updateProgress"]}%'
+            f'{status["subsystem"]}: {status["updateStatus"]} {status["updateProgress"]}%'
         )
         if status["updateStatus"] in ("complete", "error"):
             done.add(update)
@@ -77,6 +77,7 @@ def _do_update_tool(api: OpentronsHTTPAPI, mounts: List[str]) -> None:
 
 
 def update_tool(host: str, mount: str) -> None:
+    """Update a tool on the specified mount of the robot at the specified host."""
     api = OpentronsHTTPAPI(host)
     assert api.get_health(), f"Could not reach {host}"
     _do_update_tool(api, _mounts_from_arg(mount))
@@ -94,10 +95,8 @@ def __main__() -> None:
         default="all",
         help="which mount",
     )
-    parser.add_argument("-v", "--verbose", action="store_true", help="Print more stuff")
     args = parser.parse_args()
 
-    DEBUG = args.verbose
     try:
         update_tool(args.host, args.mount)
         sys.exit(0)

@@ -56,7 +56,8 @@ class OpentronsHTTPAPI:
         return self._run_id
 
     def get_health(self) -> Dict[str, Any]:
-        return requests.get(headers=HEADERS, url=f'{self._base_url}/health').json()
+        """Get and return robot health."""
+        return requests.get(headers=HEADERS, url=f"{self._base_url}/health").json()
 
     def create_run(self) -> Optional[str]:
         """Create a run and return the run_id."""
@@ -342,13 +343,25 @@ class OpentronsHTTPAPI:
         return True
 
     def get_instruments(self) -> List[Dict[str, Any]]:
-        return requests.get(f'{self._base_url}/instruments', headers=HEADERS).json()['data']
+        """Get and return attached instruments."""
+        return requests.get(f"{self._base_url}/instruments", headers=HEADERS).json()[
+            "data"
+        ]
 
     def get_subsystems(self) -> List[Dict[str, Any]]:
-        return requests.get(f'{self._base_url}/subsystems/status', headers=HEADERS).json()['data']
+        """Get and return attached subsystems."""
+        return requests.get(
+            f"{self._base_url}/subsystems/status", headers=HEADERS
+        ).json()["data"]
 
     def update_subsystem(self, subsystem: str) -> str:
-        return requests.post(f'{self._base_url}/subsystems/updates/{subsystem}', headers=HEADERS).json()['data']['id']
+        """Begin an update for a subsystem."""
+        return requests.post(
+            f"{self._base_url}/subsystems/updates/{subsystem}", headers=HEADERS
+        ).json()["data"]["id"]
 
     def get_update_status(self, update_id: str) -> Dict[str, Any]:
-        return requests.get(f'{self._base_url}/subsystems/updates/all/{update_id}', headers=HEADERS).json()['data']
+        """Get and return the status of an update."""
+        return requests.get(
+            f"{self._base_url}/subsystems/updates/all/{update_id}", headers=HEADERS
+        ).json()["data"]
