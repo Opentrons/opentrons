@@ -1,19 +1,18 @@
 import { createSelector } from 'reselect'
-import map from 'lodash/map'
+import mapValues from 'lodash/mapValues'
 import { THERMOCYCLER_MODULE_TYPE, getDeckDefFromRobotType, getModuleDisplayName } from '@opentrons/shared-data'
 import {
   START_TERMINAL_ITEM_ID,
   END_TERMINAL_ITEM_ID,
   PRESAVED_STEP_ID,
 } from '../../steplist'
-import { InitialDeckSetup, LabwareOnDeck, ModuleOnDeck, PipetteOnDeck, selectors as stepFormSelectors } from '../../step-forms'
+import { AllTemporalPropertiesForTimelineFrame, selectors as stepFormSelectors } from '../../step-forms'
 import { getActiveItem } from '../../ui/steps'
 import { TERMINAL_ITEM_SELECTION_TYPE } from '../../ui/steps/reducers'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { Selector } from '../../types'
 import { getLabwareEntities, getModuleEntities, getPipetteEntities } from '../../step-forms/selectors'
 import type { RobotState } from '@opentrons/step-generation'
-
 
 interface Option {
   name: string
@@ -95,11 +94,11 @@ export const getUnocuppiedLabwareLocationOptions: Selector<Option[] | null> = cr
       }
     }, [])
 
-    const unoccupiedModuleOptions = Object.keys(modules).reduce<Option[]>((acc, modId) => {
+    const unoccupiedModuleOptions = Object.entries(modules).reduce<Option[]>((acc, [modId, modOnDeck]) => {
       const moduleHasLabware = Object.entries(labware).some(([lwId, lwOnDeck]) => lwOnDeck.slot === modId)
       return moduleHasLabware ? acc : [
         ...acc,
-        { name: getModuleDisplayName(moduleEntities[modId].model), value: modId }
+        { name: `${getModuleDisplayName(moduleEntities[modId].model)} in slot ${modOnDeck.slot}`, value: modId } 
       ]
     }, [])
 
@@ -111,52 +110,7 @@ export const getUnocuppiedLabwareLocationOptions: Selector<Option[] | null> = cr
   }
 )
 
-export const getLabwareOnDeckForActiveItem: Selector<LabwareOnDeck[] | null> = createSelector(
-  getRobotStateAtActiveItem,
-  getLabwareEntities,
-  (
-    robotState,
-    labwareEntities,
-  ) => {
-    if (robotState == null) return null
-    return map(labwareEntities, (lwEntity, lwId) => ({
-      ...lwEntity,
-      ...robotState.labware[lwId]
-    }))
-  }
-)
-
-export const getModuleEntitiesForActiveItem: Selector<ModuleOnDeck[] | null> = createSelector(
-  getRobotStateAtActiveItem,
-  getModuleEntities,
-  (
-    robotState,
-    moduleEntities,
-  ) => {
-    if (robotState == null) return null
-    return map(moduleEntities, (modEntity, modId) => ({
-      ...modEntity,
-      ...robotState.modules[modId]
-    }))
-  }
-)
-
-export const getPipettesOnDeckForActiveItem: Selector<PipetteOnDeck[] | null> = createSelector(
-  getRobotStateAtActiveItem,
-  getPipetteEntities,
-  (
-    robotState,
-    pipetteEntities,
-  ) => {
-    if (robotState == null) return null
-    return map(pipetteEntities, (pipEntity, pipId) => ({
-      ...pipEntity,
-      ...robotState.pipettes[pipId]
-    }))
-  }
-)
-
-export const getDeckSetupForActiveItem: Selector<InitialDeckSetup> = createSelector(
+export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelineFrame> = createSelector(
   getRobotStateAtActiveItem,
   getPipetteEntities,
   getModuleEntities,
@@ -164,15 +118,15 @@ export const getDeckSetupForActiveItem: Selector<InitialDeckSetup> = createSelec
   (robotState, pipetteEntities, moduleEntities, labwareEntities) => {
     if (robotState == null) return {pipettes: {}, labware: {}, modules: {}}
     return {
-      pipettes: map(pipetteEntities, (pipEntity, pipId) => ({
+      pipettes: mapValues(pipetteEntities, (pipEntity, pipId) => ({
         ...pipEntity,
         ...robotState.pipettes[pipId]
       })),
-      labware: map(labwareEntities, (lwEntity, lwId) => ({
+      labware: mapValues(labwareEntities, (lwEntity, lwId) => ({
         ...lwEntity,
         ...robotState.labware[lwId]
       })),
-      modules: map(moduleEntities, (modEntity, modId) => ({
+      modules: mapValues(moduleEntities, (modEntity, modId) => ({
         ...modEntity,
         ...robotState.modules[modId]
       }))

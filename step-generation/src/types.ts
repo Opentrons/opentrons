@@ -5,6 +5,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
+  LabwareLocation,
 } from '@opentrons/shared-data'
 import type {
   CreateCommand,
@@ -388,7 +389,7 @@ export interface MoveLabwareArgs extends CommonArgs {
   commandCreatorFnName: 'moveLabware',
   labware: string,
   useGripper: boolean,
-  newLocation: string
+  newLocation: LabwareLocation 
 }
 
 export type CommandCreatorArgs =

@@ -116,7 +116,7 @@ export const modulePipetteCollisionDanger = (): CommandCreatorError => {
 export const thermocyclerLidClosed = (): CommandCreatorError => {
   return {
     type: 'THERMOCYCLER_LID_CLOSED',
-    message: 'Attempted to pipette into a thermocycler with the lid closed.',
+    message: 'Attempted to interact with contents of thermocycler with the lid closed.',
   }
 }
 

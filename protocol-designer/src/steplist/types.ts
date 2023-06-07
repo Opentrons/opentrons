@@ -113,7 +113,7 @@ export interface PauseSubstepItem {
 }
 export interface MoveLabwareSubstepItem {
   substepType: 'moveLabware'
-  moveLabwarArgs: MoveLabwareArgs // Move labware substeps use same data as processed form
+  moveLabwareArgs: MoveLabwareArgs // Move labware substeps use same data as processed form
 }
 export interface WaitForTemperatureSubstepItem {
   substepType: 'waitForTemperature'

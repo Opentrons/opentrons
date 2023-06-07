@@ -100,7 +100,10 @@ export interface PipetteTemporalProperties {
 export type LabwareOnDeck = LabwareEntity & LabwareTemporalProperties
 export type PipetteOnDeck = PipetteEntity & PipetteTemporalProperties
 // TODO: Ian 2019-11-08 make all values Maybe typed
-export interface InitialDeckSetup {
+
+export type InitialDeckSetup = AllTemporalPropertiesForTimelineFrame
+
+export interface AllTemporalPropertiesForTimelineFrame {
   labware: {
     [labwareId: string]: LabwareOnDeck
   }

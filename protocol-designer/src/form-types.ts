@@ -4,6 +4,7 @@ import {
   PAUSE_UNTIL_TEMP,
 } from './constants'
 import { IconName } from '@opentrons/components'
+import { LabwareLocation } from '@opentrons/shared-data'
 import {
   ChangeTipOptions,
   LabwareEntity,
@@ -224,7 +225,7 @@ export interface HydratedMoveLabwareFormData {
   description: string | null | undefined
   fields: {
     labware: LabwareEntity,
-    newLocation: string,
+    newLocation: LabwareLocation,
     useGripper: boolean,
   }
 }
