@@ -73,6 +73,7 @@ def test_initial_state(
                 offsetId=None,
             )
         },
+        adapters_by_id={},
         labware_offsets_by_id={},
         definitions_by_uri={expected_trash_uri: ot2_fixed_trash_def},
     )

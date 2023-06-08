@@ -67,6 +67,14 @@ class LabwareDefinitionDoesNotExistError(ProtocolEngineError):
     """Raised when referencing a labware definition that does not exist."""
 
 
+class LabwareDefinitionIsNotLabware(ProtocolEngineError):
+    """Raised when trying to load a labware via loadLabware that is not a labware."""
+
+
+class LabwareDefinitionIsNotAdapter(ProtocolEngineError):
+    """Raised when trying to load an adapter via loadAdapter that is not an adapter."""
+
+
 class LabwareOffsetDoesNotExistError(ProtocolEngineError):
     """Raised when referencing a labware offset that does not exist."""
 

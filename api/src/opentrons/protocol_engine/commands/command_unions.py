@@ -97,6 +97,14 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
+from .load_adapter import (
+    LoadAdapter,
+    LoadAdapterParams,
+    LoadAdapterCreate,
+    LoadAdapterResult,
+    LoadAdapterCommandType,
+)
+
 from .load_liquid import (
     LoadLiquid,
     LoadLiquidParams,
@@ -222,6 +230,7 @@ Command = Union[
     DropTipInPlace,
     Home,
     LoadLabware,
+    LoadAdapter,
     LoadLiquid,
     LoadModule,
     LoadPipette,
@@ -275,6 +284,7 @@ CommandParams = Union[
     DropTipInPlaceParams,
     HomeParams,
     LoadLabwareParams,
+    LoadAdapterParams,
     LoadLiquidParams,
     LoadModuleParams,
     LoadPipetteParams,
@@ -329,6 +339,7 @@ CommandType = Union[
     DropTipInPlaceCommandType,
     HomeCommandType,
     LoadLabwareCommandType,
+    LoadAdapterCommandType,
     LoadLiquidCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
@@ -382,6 +393,7 @@ CommandCreate = Union[
     DropTipInPlaceCreate,
     HomeCreate,
     LoadLabwareCreate,
+    LoadAdapterCreate,
     LoadLiquidCreate,
     LoadModuleCreate,
     LoadPipetteCreate,
@@ -435,6 +447,7 @@ CommandResult = Union[
     DropTipInPlaceResult,
     HomeResult,
     LoadLabwareResult,
+    LoadAdapterResult,
     LoadLiquidResult,
     LoadModuleResult,
     LoadPipetteResult,

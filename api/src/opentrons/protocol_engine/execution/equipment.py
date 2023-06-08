@@ -4,6 +4,7 @@ from typing import Optional, overload, Union
 from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.labware.labware_definition import LabwareRole
 
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
@@ -151,6 +152,14 @@ class EquipmentHandler:
         return LoadedLabwareData(
             labware_id=labware_id, definition=definition, offsetId=offset_id
         )
+
+    @staticmethod
+    def validate_definition_is_labware(definition: LabwareDefinition):
+        return not definition.allowedRoles or LabwareRole.labware in definition.allowedRoles
+
+    @staticmethod
+    def validate_definition_is_adapter(definition: LabwareDefinition):
+        return LabwareRole.adapter in definition.allowedRoles
 
     async def load_pipette(
         self,

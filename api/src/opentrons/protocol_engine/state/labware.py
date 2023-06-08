@@ -30,6 +30,7 @@ from ..resources import DeckFixedLabware
 from ..commands import (
     Command,
     LoadLabwareResult,
+    LoadAdapterResult,
     MoveLabwareResult,
 )
 from ..types import (
@@ -95,6 +96,7 @@ class LabwareState:
     # If a LoadedLabware here has a non-None offsetId,
     # it must point to an existing element of labware_offsets_by_id.
     labware_by_id: Dict[str, LoadedLabware]
+    adapters_by_id: Dict[str, LoadedLabware]
 
     # Indexed by LabwareOffset.id.
     # We rely on Python 3.7+ preservation of dict insertion order.
@@ -142,6 +144,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
             definitions_by_uri=definitions_by_uri,
             labware_offsets_by_id={},
             labware_by_id=labware_by_id,
+            adapters_by_id={},
             deck_definition=deck_definition,
         )
 
@@ -170,28 +173,39 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
     def _handle_command(self, command: Command) -> None:
         """Modify state in reaction to a command."""
-        if isinstance(command.result, LoadLabwareResult):
+        if isinstance(command.result, (LoadLabwareResult, LoadAdapterResult)):
             # If the labware load refers to an offset, that offset must actually exist.
             if command.result.offsetId is not None:
                 assert command.result.offsetId in self._state.labware_offsets_by_id
 
-            labware_id = command.result.labwareId
             definition_uri = uri_from_details(
                 namespace=command.result.definition.namespace,
                 load_name=command.result.definition.parameters.loadName,
                 version=command.result.definition.version,
             )
 
-            self._state.labware_by_id[labware_id] = LoadedLabware.construct(
-                id=labware_id,
-                location=command.params.location,
-                loadName=command.result.definition.parameters.loadName,
-                definitionUri=definition_uri,
-                offsetId=command.result.offsetId,
-                displayName=command.params.displayName,
-            )
-
             self._state.definitions_by_uri[definition_uri] = command.result.definition
+
+            if isinstance(command.result, LoadLabwareResult):
+                labware_id = command.result.labwareId
+                self._state.labware_by_id[labware_id] = LoadedLabware.construct(
+                    id=labware_id,
+                    location=command.params.location,
+                    loadName=command.result.definition.parameters.loadName,
+                    definitionUri=definition_uri,
+                    offsetId=command.result.offsetId,
+                    displayName=command.params.displayName,
+                )
+            elif isinstance(command.result, LoadAdapterResult):
+                adapter_id = command.result.adapterId
+                self._state.adapters_by_id[adapter_id] = LoadedLabware.construct(
+                    id=adapter_id,
+                    location=command.params.location,
+                    loadName=command.result.definition.parameters.loadName,
+                    definitionUri=definition_uri,
+                    offsetId=command.result.offsetId,
+                    displayName=command.params.displayName,
+                )
 
         elif isinstance(command.result, MoveLabwareResult):
             labware_id = command.params.labwareId
