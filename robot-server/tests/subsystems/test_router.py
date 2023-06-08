@@ -1,6 +1,6 @@
 """Tests for /subsystems routes."""
 from datetime import datetime
-from typing import Set, Dict
+from typing import Set, Dict, TYPE_CHECKING
 from fastapi import Response, Request
 from starlette.datastructures import URL, MutableHeaders
 
@@ -43,8 +43,10 @@ from opentrons.hardware_control.types import (
     SubSystemState,
     UpdateState as HWUpdateState,
 )
-from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control import ThreadManagedHardware
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API
 
 
 @pytest.fixture
@@ -54,14 +56,22 @@ def update_manager(decoy: Decoy) -> FirmwareUpdateManager:
 
 
 @pytest.fixture()
-def ot3_hardware_api(decoy: Decoy) -> OT3API:
+def ot3_hardware_api(decoy: Decoy) -> "OT3API":
     """Build a hardware controller decoy dependency."""
+    try:
+        from opentrons.hardware_control.ot3api import OT3API
+    except ImportError:
+        pytest.skip("Cannot run on OT-2 (for now)")
     return decoy.mock(cls=OT3API)
 
 
 @pytest.fixture()
-def thread_manager(decoy: Decoy, ot3_hardware_api: OT3API) -> ThreadManagedHardware:
+def thread_manager(decoy: Decoy, ot3_hardware_api: "OT3API") -> ThreadManagedHardware:
     """Mock thread manager."""
+    try:
+        from opentrons.hardware_control.ot3api import OT3API
+    except ImportError:
+        pytest.skip("Cannot run on OT-2 (for now)")
     manager = decoy.mock(cls=ThreadManagedHardware)
     decoy.when(manager.wrapped()).then_return(ot3_hardware_api)
     decoy.when(manager.wraps_instance(OT3API)).then_return(True)
@@ -113,7 +123,7 @@ def _build_subsystem_data(
     ],
 )
 async def test_get_attached_subsystems(
-    ot3_hardware_api: OT3API,
+    ot3_hardware_api: "OT3API",
     thread_manager: ThreadManagedHardware,
     subsystems: Set[HWSubSystem],
     decoy: Decoy,
@@ -140,7 +150,7 @@ async def test_get_attached_subsystems(
     ],
 )
 async def test_get_attached_subsystem(
-    ot3_hardware_api: OT3API,
+    ot3_hardware_api: "OT3API",
     thread_manager: ThreadManagedHardware,
     subsystem: SubSystem,
     decoy: Decoy,
@@ -162,7 +172,7 @@ async def test_get_attached_subsystem(
 
 
 async def test_get_attached_subsystem_handles_not_present_subsystem(
-    ot3_hardware_api: OT3API, thread_manager: ThreadManagedHardware, decoy: Decoy
+    ot3_hardware_api: "OT3API", thread_manager: ThreadManagedHardware, decoy: Decoy
 ) -> None:
     """It should return an error for a non-present subsystem."""
     decoy.when(ot3_hardware_api.attached_subsystems).then_return({})
