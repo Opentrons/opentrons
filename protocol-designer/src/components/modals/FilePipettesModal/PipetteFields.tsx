@@ -11,7 +11,10 @@ import {
   getIncompatiblePipetteNames,
   getLabwareDefURI,
   getLabwareDisplayName,
+  OT2_PIPETTES,
+  OT2_ROBOT_TYPE,
   OT3_PIPETTES,
+  RobotType,
 } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
@@ -33,31 +36,32 @@ export interface Props {
   values: FormPipettesByMount
   // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
   errors:
-    | null
-    | string
-    | {
-        left?: {
-          tiprackDefURI: string
-        }
-        right?: {
-          tiprackDefURI: string
-        }
-      }
+  | null
+  | string
+  | {
+    left?: {
+      tiprackDefURI: string
+    }
+    right?: {
+      tiprackDefURI: string
+    }
+  }
   touched:
-    | null
-    | boolean
-    | {
-        left?: {
-          tiprackDefURI: boolean
-        }
-        right?: {
-          tiprackDefURI: boolean
-        }
-      }
+  | null
+  | boolean
+  | {
+    left?: {
+      tiprackDefURI: boolean
+    }
+    right?: {
+      tiprackDefURI: boolean
+    }
+  }
   onFieldChange: (event: React.ChangeEvent<HTMLSelectElement>) => unknown
   onSetFieldValue: (field: string, value: string | null) => void
   onSetFieldTouched: (field: string, touched: boolean) => void
   onBlur: (event: React.FocusEvent<HTMLSelectElement>) => unknown
+  robotType: RobotType
 }
 
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
@@ -76,6 +80,7 @@ export function PipetteFields(props: Props): JSX.Element {
     onBlur,
     errors,
     touched,
+    robotType
   } = props
 
   const dispatch = useDispatch()
@@ -106,7 +111,7 @@ export function PipetteFields(props: Props): JSX.Element {
     const pipetteName = values[mount].pipetteName
     return (
       <PipetteSelect
-        nameBlocklist={OT3_PIPETTES}
+        nameBlocklist={robotType === OT2_ROBOT_TYPE ? OT3_PIPETTES : OT2_PIPETTES}
         enableNoneOption
         tabIndex={tabIndex}
         pipetteName={pipetteName != null ? pipetteName : null}
@@ -152,12 +157,12 @@ export function PipetteFields(props: Props): JSX.Element {
                 // TODO JF 2020-3-19 allow dropdowns to take error
                 // components from formik so we avoid manually doing this
                 touched &&
-                typeof touched !== 'boolean' &&
-                touched.left &&
-                touched.left.tiprackDefURI &&
-                errors !== null &&
-                typeof errors !== 'string' &&
-                errors.left
+                  typeof touched !== 'boolean' &&
+                  touched.left &&
+                  touched.left.tiprackDefURI &&
+                  errors !== null &&
+                  typeof errors !== 'string' &&
+                  errors.left
                   ? errors.left.tiprackDefURI
                   : null
               }
@@ -200,12 +205,12 @@ export function PipetteFields(props: Props): JSX.Element {
                 // TODO JF 2020-3-19 allow dropdowns to take error
                 // components from formik so we avoid manually doing this
                 touched &&
-                typeof touched !== 'boolean' &&
-                touched.right &&
-                touched.right.tiprackDefURI &&
-                errors !== null &&
-                typeof errors !== 'string' &&
-                errors.right
+                  typeof touched !== 'boolean' &&
+                  touched.right &&
+                  touched.right.tiprackDefURI &&
+                  errors !== null &&
+                  typeof errors !== 'string' &&
+                  errors.right
                   ? errors.right.tiprackDefURI
                   : null
               }

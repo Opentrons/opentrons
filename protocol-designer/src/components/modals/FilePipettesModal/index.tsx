@@ -37,6 +37,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   OT2_ROBOT_TYPE,
   FLEX_ROBOT_TYPE,
+  RobotType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -406,6 +407,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                           // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
                           touched={touched.pipettesByMount ?? null}
                           onSetFieldTouched={setFieldTouched}
+                          robotType={values.fields.robotType}
                         />
 
                         {this.props.showModulesFields && (

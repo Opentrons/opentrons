@@ -6,6 +6,7 @@ import {
   getPipetteNameSpecs,
   GEN1,
   GEN2,
+  GEN3,
 } from '@opentrons/shared-data'
 import { Select, CONTEXT_VALUE } from '../forms'
 import styles from './PipetteSelect.css'
@@ -68,13 +69,17 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
   const allowlist = ({ value }: SelectOption): boolean => {
     return !nameBlocklist.some(n => n === value)
   }
+  const gen3Options = specsByCategory[GEN3].map(specToOption).filter(allowlist)
   const gen2Options = specsByCategory[GEN2].map(specToOption).filter(allowlist)
   const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
   const groupedOptions = [
     ...(enableNoneOption ? [OPTION_NONE] : []),
+    ...(gen3Options.length > 0 ? [{ options: gen3Options }] : []),
     ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),
     ...(gen1Options.length > 0 ? [{ options: gen1Options }] : []),
   ]
+  console.log('groupedOptions', groupedOptions)
+  console.log('gen3Options', gen3Options)
 
   const defaultValue = enableNoneOption ? OPTION_NONE : null
   const value =
@@ -103,6 +108,10 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       }}
       formatOptionLabel={(option, { context }) => {
         const { value } = option
+        console.log(
+          'option',
+          option
+        )
         const label = option.label || value
         const specs = allPipetteNameSpecs.find(s => s.name === value)
 
@@ -137,9 +146,9 @@ const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
         displayCategory
       )}
     >
-      <div className={styles.pipette_volume_class}>{volumeClass}</div>
-      <div className={styles.pipette_channels}>{displayChannels}</div>
-      <div className={styles.pipette_category}>{displayCategory}</div>
+      <div className={styles.pipette_volume_class}>{displayName}</div>
+      {/* <div className={styles.pipette_channels}>{displayChannels}</div>
+      <div className={styles.pipette_category}>{displayCategory}</div> */}
     </Flex>
   )
 }

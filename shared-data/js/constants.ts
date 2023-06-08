@@ -120,6 +120,21 @@ export const OT3_PIPETTES = [
   'p1000_multi_gen3',
   'p1000_96',
 ]
+export const OT2_PIPETTES = [
+  'p300_single',
+  'p300_multi',
+  'p300_single_gen2',
+  'p300_multi_gen2',
+  'p1000_96',
+  'p1000_single',
+  'p1000_single_gen2',
+  'p20_single_gen2',
+  'p20_multi_gen2',
+  'p50_single',
+  'p50_multi',
+  'p10_single',
+  'p10_multi',
+]
 
 //  magnetic module info
 export const MM: 'mm' = 'mm'
