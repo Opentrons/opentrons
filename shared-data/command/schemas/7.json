@@ -926,6 +926,19 @@
       },
       "required": ["moduleId"]
     },
+    "OnLabwareLocation": {
+      "title": "OnLabwareLocation",
+      "description": "The location of something placed atop another labware.",
+      "type": "object",
+      "properties": {
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "The ID of a loaded Labware from a prior `loadLabware` command.",
+          "type": "string"
+        }
+      },
+      "required": ["labwareId"]
+    },
     "LoadLabwareParams": {
       "title": "LoadLabwareParams",
       "description": "Payload required to load a labware into a slot.",
@@ -940,6 +953,9 @@
             },
             {
               "$ref": "#/definitions/ModuleLocation"
+            },
+            {
+              "$ref": "#/definitions/OnLabwareLocation"
             },
             {
               "enum": ["offDeck"],
@@ -1019,6 +1035,9 @@
             },
             {
               "$ref": "#/definitions/ModuleLocation"
+            },
+            {
+              "$ref": "#/definitions/OnLabwareLocation"
             },
             {
               "enum": ["offDeck"],
@@ -1354,6 +1373,9 @@
             },
             {
               "$ref": "#/definitions/ModuleLocation"
+            },
+            {
+              "$ref": "#/definitions/OnLabwareLocation"
             },
             {
               "enum": ["offDeck"],
