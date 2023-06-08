@@ -108,7 +108,7 @@ async def test_run_update(
     )
     if should_erase:
         mock_eraser_run.assert_called_once_with(
-            node_id=target.bootloader_node, timeout_sec=11
+            node_id=target.bootloader_node, timeout_sec=60
         )
     else:
         mock_eraser_run.assert_not_called()
@@ -165,8 +165,8 @@ async def test_run_updates(
     if should_erase:
         mock_eraser_run.assert_has_calls(
             [
-                mock.call(node_id=target_1.bootloader_node, timeout_sec=11),
-                mock.call(node_id=target_2.bootloader_node, timeout_sec=11),
+                mock.call(node_id=target_1.bootloader_node, timeout_sec=60),
+                mock.call(node_id=target_2.bootloader_node, timeout_sec=60),
             ]
         )
     else:
