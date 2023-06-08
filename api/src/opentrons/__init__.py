@@ -18,7 +18,7 @@ from opentrons.config import (
     name,
     robot_configs,
     IS_ROBOT,
-    ROBOT_FIRMWARE_DIR,
+    get_opentrons_path,
 )
 from opentrons.util import logging_config
 from opentrons.protocols.types import ApiDeprecationError
@@ -62,7 +62,8 @@ def _find_smoothie_file() -> Tuple[Path, str]:
     # Search for smoothie files in /usr/lib/firmware first then fall back to
     # value packed in wheel
     if IS_ROBOT:
-        resources.extend(ROBOT_FIRMWARE_DIR.iterdir())  # type: ignore
+        firmware_binaries_dir = get_opentrons_path("firmware_binaries_dir")
+        resources.extend(firmware_binaries_dir.iterdir())
 
     resources_path = Path(HERE) / "resources"
     resources.extend(resources_path.iterdir())
