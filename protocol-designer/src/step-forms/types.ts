@@ -30,13 +30,7 @@ export interface FormModule {
   model: ModuleModel | null
   slot: DeckSlot
 }
-export interface FormModulesByType {
-  magneticModuleType: FormModule
-  temperatureModuleType: FormModule
-  thermocyclerModuleType: FormModule
-  heaterShakerModuleType: FormModule
-  magneticBlockType: FormModule
-}
+export type FormModulesByType = Record<ModuleType, FormModule>
 export type ModuleEntities = Record<string, ModuleEntity>
 // NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'
 export interface MagneticModuleState {

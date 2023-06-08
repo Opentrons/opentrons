@@ -17,6 +17,7 @@ import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal'
 import { GateModal } from './modals/GateModal'
 import { AnnouncementModal } from './modals/AnnouncementModal'
 import styles from './ProtocolEditor.css'
+import { CreateFileWizard } from './modals/CreateFileWizard'
 
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
@@ -42,7 +43,8 @@ function ProtocolEditorComponent(): JSX.Element {
             )}
           >
             <AnnouncementModal />
-            <NewFileModal showProtocolFields />
+            {/* <NewFileModal showProtocolFields /> */}
+            <CreateFileWizard />
             <FileUploadMessageModal />
 
             <MainPageModalPortalRoot />
