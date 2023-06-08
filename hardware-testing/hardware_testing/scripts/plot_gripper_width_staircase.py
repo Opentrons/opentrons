@@ -188,7 +188,6 @@ class Plot:
         x_axis = "Step Width"
         y_axis = "Absolute Error"
         y_std = "Standard Deviation"
-        df["Input Force"] = df["Input Force"].astype(str) + " N"
         x_start = df[x_axis].iloc[0]
         x_end = df[x_axis].iloc[-1]
         y_start = df[y_axis].iloc[0]
