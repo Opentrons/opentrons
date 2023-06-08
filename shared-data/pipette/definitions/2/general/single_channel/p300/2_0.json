@@ -33,5 +33,5 @@
   "shaftDiameter": 3.5,
   "shaftULperMM": 9.621,
   "backCompatNames": ["p300_single"],
-  "backlashDistance": 0.1
+  "backlashDistance": 0.0
 }

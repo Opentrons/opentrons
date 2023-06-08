@@ -33,5 +33,5 @@
   "shaftDiameter": 1.0,
   "shaftULperMM": 0.785,
   "backCompatNames": ["p10_multi"],
-  "backlashDistance": 0.1
+  "backlashDistance": 0.0
 }
