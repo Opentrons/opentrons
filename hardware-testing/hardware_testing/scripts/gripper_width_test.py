@@ -71,6 +71,7 @@ class Gripper_Width_Test:
             "Step Width":"None",
             "Gripper Width":"None",
             "Absolute Error":"None",
+            "Jaw Error":"None",
         }
         self.class_name = self.__class__.__name__
 
@@ -142,9 +143,10 @@ class Gripper_Width_Test:
         # Grip staircase step
         await api.grip(self.grip_force)
         time.sleep(self.hold_time)
+        await api.grip(self.grip_force)
         # Get gripper jaw displacement
-        jaw_displacement = self._get_jaw_displacement()
-        jaw_width = self._get_jaw_width()
+        jaw_displacement = round(self._get_jaw_displacement(), 3)
+        jaw_width = round(self._get_jaw_width(), 3)
         total_error = self.step_error + self.jaw_error
         abs_error = round((step_width - jaw_width) - total_error, 3)
         self.test_data["Gripper Width"] = str(jaw_width)
@@ -163,6 +165,7 @@ class Gripper_Width_Test:
         # Measure closed gripper jaw width
         jaw_width = self._get_jaw_width()
         self.jaw_error = round(self.jaw_min - jaw_width, 3)
+        self.test_data["Jaw Error"] = str(self.jaw_error)
         print(f"\nClosed Jaw Error = {self.jaw_error}mm (Expected = 60mm / Actual = {jaw_width}mm)\n")
         # Hold gripper jaw width (do not home or ungrip jaw!)
         await api.hold_jaw_width(self.jaw_length)
