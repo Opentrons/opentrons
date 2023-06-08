@@ -72,6 +72,15 @@ export function ConfirmCancelRunModal({
     })
   }
 
+  const handleTouchStart = (e: React.TouchEvent): void => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleTouchEnd = (): void => {
+    setShowConfirmCancelRunModal(false)
+  }
+
   return (
     <Modal
       modalSize="medium"
@@ -98,7 +107,9 @@ export function ConfirmCancelRunModal({
             flex="1"
             buttonType="primary"
             buttonText={t('shared:go_back')}
-            onClick={() => setShowConfirmCancelRunModal(false)}
+            // onClick={() => setShowConfirmCancelRunModal(false)}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
           />
           <SmallButton
             flex="1"

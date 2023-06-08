@@ -27,13 +27,15 @@ export type ButtonCategory = 'default' | 'rounded'
 
 type IconPlacement = 'startIcon' | 'endIcon'
 interface SmallButtonProps extends StyleProps {
-  onClick: React.MouseEventHandler
+  onClick?: React.MouseEventHandler
   buttonType: SmallButtonTypes
   buttonText: React.ReactNode
   iconPlacement?: IconPlacement
   iconName?: IconName
   buttonCategory?: ButtonCategory // if not specified, it will be 'default'
   disabled?: boolean
+  onTouchStart?: React.TouchEventHandler
+  onTouchEnd?: React.TouchEventHandler
 }
 
 export function SmallButton(props: SmallButtonProps): JSX.Element {
