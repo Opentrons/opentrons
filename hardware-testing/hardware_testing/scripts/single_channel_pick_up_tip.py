@@ -439,6 +439,8 @@ async def _main() -> None:
         expected_liquid_height=args.expected_liquid_height,
         log_pressure=args.log_pressure,
         aspirate_while_sensing=False,
+        auto_zero_sensor = False,
+        num_baseline_reads = 10,
         data_file=lp_file_name,
     )
     tip_count = 0
@@ -839,9 +841,9 @@ if __name__ == "__main__":
     parser.add_argument("--tiprack_slot", type=str, choices=slot_locs, default="B2")
     parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C1")
     parser.add_argument("--trough_slot", type=str, choices=slot_locs, default="B3")
-    parser.add_argument("--fg", action="store_true", default=True)
+    parser.add_argument("--fg", action="store_true", default=False)
     parser.add_argument("--dial_indicator", action="store_true")
-    parser.add_argument("--tip_size", type=str, default="T50", help="Tip Size")
+    parser.add_argument("--tip_size", type=str, default="T1K", help="Tip Size")
     parser.add_argument("--max_z_distance", type=float, default=40)
     parser.add_argument("--min_z_distance", type=float, default=5)
     parser.add_argument("--mount_speed", type=float, default=11)
