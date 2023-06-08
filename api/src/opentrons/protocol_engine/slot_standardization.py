@@ -26,6 +26,7 @@ from .types import (
     LabwareLocation,
     LabwareOffsetCreate,
     ModuleLocation,
+    OnLabwareLocation,
 )
 
 
@@ -121,7 +122,10 @@ def _standardize_labware_location(
 ) -> LabwareLocation:
     if isinstance(original, DeckSlotLocation):
         return _standardize_deck_slot_location(original, robot_type)
-    elif isinstance(original, ModuleLocation) or original == OFF_DECK_LOCATION:
+    elif (
+        isinstance(original, (ModuleLocation, OnLabwareLocation))
+        or original == OFF_DECK_LOCATION
+    ):
         return original
 
 

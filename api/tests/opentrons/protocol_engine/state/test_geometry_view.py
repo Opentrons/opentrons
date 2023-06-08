@@ -17,15 +17,18 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     ModuleOffsetVector,
     LoadedLabware,
     LoadedModule,
+    ModuleModel,
     WellLocation,
     WellOrigin,
     DropTipWellLocation,
     DropTipWellOrigin,
     WellOffset,
     Dimensions,
+    OverlapOffset,
     DeckType,
     CurrentWell,
 )
@@ -148,13 +151,60 @@ def test_get_labware_parent_position_on_module(
             module_id="module-id", deck_type=DeckType.OT2_STANDARD
         )
     ).then_return(LabwareOffsetVector(x=4, y=5, z=6))
+    decoy.when(module_view.get_connected_model("module-id")).then_return(
+        ModuleModel.THERMOCYCLER_MODULE_V2
+    )
+    decoy.when(
+        labware_view.get_module_overlap_offsets(
+            "labware-id", ModuleModel.THERMOCYCLER_MODULE_V2
+        )
+    ).then_return(OverlapOffset(x=1, y=2, z=3))
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
-        ModuleOffsetVector(x=0, y=0, z=0)
+        ModuleOffsetVector(x=2, y=3, z=4)
     )
 
     result = subject.get_labware_parent_position("labware-id")
 
-    assert result == Point(5, 7, 9)
+    assert result == Point(6, 8, 10)
+
+
+def test_get_labware_parent_position_on_labware(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    ot2_standard_deck_def: DeckDefinitionV3,
+    subject: GeometryView,
+) -> None:
+    """It should return a labware position for labware on a labware."""
+    labware_data = LoadedLabware(
+        id="labware-id",
+        loadName="bcd",
+        definitionUri=uri_from_details(namespace="a", load_name="bcd", version=1),
+        location=OnLabwareLocation(labwareId="adapter-id"),
+        offsetId=None,
+    )
+    adapter_data = LoadedLabware(
+        id="adapter-id",
+        loadName="xyz",
+        definitionUri=uri_from_details(namespace="w", load_name="xyz", version=1),
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        offsetId=None,
+    )
+    decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        Point(1, 2, 3)
+    )
+    decoy.when(labware_view.get("adapter-id")).then_return(adapter_data)
+    decoy.when(labware_view.get_dimensions("adapter-id")).then_return(
+        Dimensions(x=3, y=1, z=5)
+    )
+    decoy.when(
+        labware_view.get_labware_overlap_offsets("labware-id", "xyz")
+    ).then_return(OverlapOffset(x=2, y=-1, z=2))
+
+    result = subject.get_labware_parent_position("labware-id")
+
+    assert result == Point(2, 4, 6)
 
 
 def test_get_labware_origin_position(
@@ -262,6 +312,14 @@ def test_get_module_labware_highest_z(
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
         ModuleOffsetVector(x=0, y=0, z=0)
     )
+    decoy.when(module_view.get_connected_model("module-id")).then_return(
+        ModuleModel.MAGNETIC_MODULE_V2
+    )
+    decoy.when(
+        labware_view.get_module_overlap_offsets(
+            "labware-id", ModuleModel.MAGNETIC_MODULE_V2
+        )
+    ).then_return(OverlapOffset(x=0, y=0, z=0))
 
     highest_z = subject.get_labware_highest_z("labware-id")
 
@@ -558,6 +616,14 @@ def test_get_module_labware_well_position(
     decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
         ModuleOffsetVector(x=0, y=0, z=0)
     )
+    decoy.when(module_view.get_connected_model("module-id")).then_return(
+        ModuleModel.MAGNETIC_MODULE_V2
+    )
+    decoy.when(
+        labware_view.get_module_overlap_offsets(
+            "labware-id", ModuleModel.MAGNETIC_MODULE_V2
+        )
+    ).then_return(OverlapOffset(x=0, y=0, z=0))
 
     result = subject.get_well_position("labware-id", "B2")
     assert result == Point(

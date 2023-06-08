@@ -63,10 +63,21 @@ class ModuleLocation(BaseModel):
     )
 
 
+class OnLabwareLocation(BaseModel):
+    """The location of something placed atop another labware."""
+
+    labwareId: str = Field(
+        ...,
+        description="The ID of a loaded Labware from a prior `loadLabware` command.",
+    )
+
+
 _OffDeckLocationType = Literal["offDeck"]
 OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
 
-LabwareLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
+LabwareLocation = Union[
+    DeckSlotLocation, ModuleLocation, OnLabwareLocation, _OffDeckLocationType
+]
 """Union of all locations where it's legal to keep a labware."""
 
 
@@ -348,6 +359,22 @@ class LabwareOffsetVector(BaseModel):
     y: float
     z: float
 
+    def __add__(self, other: Any) -> LabwareOffsetVector:
+        """Adds two vectors together."""
+        if not isinstance(other, LabwareOffsetVector):
+            return NotImplemented
+        return LabwareOffsetVector(
+            x=self.x + other.x, y=self.y + other.y, z=self.z + other.z
+        )
+
+    def __sub__(self, other: Any) -> LabwareOffsetVector:
+        """Subtracts two vectors."""
+        if not isinstance(other, LabwareOffsetVector):
+            return NotImplemented
+        return LabwareOffsetVector(
+            x=self.x - other.x, y=self.y - other.y, z=self.z - other.z
+        )
+
 
 # TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class InstrumentOffsetVector(BaseModel):
@@ -365,6 +392,10 @@ class ModuleOffsetVector(BaseModel):
     x: float
     y: float
     z: float
+
+
+class OverlapOffset(Vec3f):
+    """Offset representing overlap space of one labware on top of another labware or module."""
 
 
 # TODO(mm, 2023-04-13): Move to shared-data, so this binding can be maintained alongside the JSON

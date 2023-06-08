@@ -15,6 +15,7 @@ from ..types import (
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     ModuleOffsetVector,
     LabwareLocation,
     LabwareOffsetVector,
@@ -95,33 +96,70 @@ class GeometryView:
         return min_travel_z
 
     def get_labware_parent_nominal_position(self, labware_id: str) -> Point:
-        """Get the position of the labware's uncalibrated parent slot (deck or module)."""
+        """Get the position of the labware's uncalibrated parent slot (deck, module, or another labware)."""
         labware_data = self._labware.get(labware_id)
-        module_id: Optional[str] = None
-        if isinstance(labware_data.location, DeckSlotLocation):
-            slot_name = labware_data.location.slotName
-        elif isinstance(labware_data.location, ModuleLocation):
-            module_id = labware_data.location.moduleId
-            slot_name = self._modules.get_location(module_id).slotName
-        elif labware_data.location == OFF_DECK_LOCATION:
-            # Labware is off-deck
+        slot_name = self._get_labware_slot_name(labware_data)
+        slot_pos = self._labware.get_slot_position(slot_name)
+        offset = self._get_labware_position_offset(labware_data)
+
+        return Point(
+            slot_pos.x + offset.x,
+            slot_pos.y + offset.y,
+            slot_pos.z + offset.z,
+        )
+
+    def _get_labware_slot_name(self, labware: LoadedLabware) -> DeckSlotName:
+        labware_location = labware.location
+        if isinstance(labware_location, DeckSlotLocation):
+            return labware_location.slotName
+        elif isinstance(labware_location, ModuleLocation):
+            return self._modules.get_location(labware_location.moduleId).slotName
+        elif isinstance(labware_location, OnLabwareLocation):
+            on_labware_data = self._labware.get(labware_location.labwareId)
+            return self._get_labware_slot_name(on_labware_data)
+        else:
             raise errors.LabwareNotOnDeckError(
-                f"Labware {labware_id} does not have a parent associated with it"
+                f"Labware {labware.id} does not have a parent associated with it"
                 f" since it is no longer on the deck."
             )
 
-        slot_pos = self._labware.get_slot_position(slot_name)
-        if module_id is None:
-            return slot_pos
-        else:
+    def _get_labware_position_offset(
+        self, labware: LoadedLabware
+    ) -> LabwareOffsetVector:
+        labware_location = labware.location
+        if isinstance(labware_location, DeckSlotLocation):
+            return LabwareOffsetVector(x=0, y=0, z=0)
+        elif isinstance(labware_location, ModuleLocation):
+            module_id = labware_location.moduleId
             deck_type = DeckType(self._labware.get_deck_definition()["otId"])
             module_offset = self._modules.get_nominal_module_offset(
                 module_id=module_id, deck_type=deck_type
             )
-            return Point(
-                slot_pos.x + module_offset.x,
-                slot_pos.y + module_offset.y,
-                slot_pos.z + module_offset.z,
+            module_model = self._modules.get_connected_model(module_id)
+            stacking_overlap = self._labware.get_module_overlap_offsets(
+                labware.id, module_model
+            )
+            return LabwareOffsetVector(
+                x=module_offset.x - stacking_overlap.x,
+                y=module_offset.y - stacking_overlap.y,
+                z=module_offset.z - stacking_overlap.z,
+            )
+        elif isinstance(labware_location, OnLabwareLocation):
+            on_labware = self._labware.get(labware_location.labwareId)
+            on_labware_dimensions = self._labware.get_dimensions(on_labware.id)
+            stacking_overlap = self._labware.get_labware_overlap_offsets(
+                labware_id=labware.id, below_labware_name=on_labware.loadName
+            )
+            labware_offset = LabwareOffsetVector(
+                x=on_labware_dimensions.x - stacking_overlap.x,
+                y=on_labware_dimensions.y - stacking_overlap.y,
+                z=on_labware_dimensions.z - stacking_overlap.z,
+            )
+            return labware_offset + self._get_labware_position_offset(on_labware)
+        else:
+            raise errors.LabwareNotOnDeckError(
+                f"Labware {labware.id} does not have a parent associated with it"
+                f" since it is no longer on the deck."
             )
 
     def get_labware_parent_position(self, labware_id: str) -> Point:

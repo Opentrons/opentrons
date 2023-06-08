@@ -42,9 +42,11 @@ from ..types import (
     LabwareLocation,
     LoadedLabware,
     ModuleLocation,
+    ModuleModel,
     DropTipWellLocation,
     DropTipWellOrigin,
     WellOffset,
+    OverlapOffset,
 )
 from ..actions import (
     Action,
@@ -516,6 +518,30 @@ class LabwareView(HasState[LabwareState]):
             x=dims.xDimension,
             y=dims.yDimension,
             z=dims.zDimension,
+        )
+
+    def get_labware_overlap_offsets(
+        self, labware_id: str, below_labware_name: str
+    ) -> OverlapOffset:
+        """Get the labware's overlap with requested labware's load name."""
+        definition = self.get_definition(labware_id)
+        stacking_overlap = definition.stackingOffsetWithLabware.get(
+            below_labware_name, OverlapOffset(x=0, y=0, z=0)
+        )
+        return OverlapOffset(
+            x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
+        )
+
+    def get_module_overlap_offsets(
+        self, labware_id: str, module_model: ModuleModel
+    ) -> OverlapOffset:
+        """Get the labware's overlap with requested module model."""
+        definition = self.get_definition(labware_id)
+        stacking_overlap = definition.stackingOffsetWithModule.get(
+            str(module_model.value), OverlapOffset(x=0, y=0, z=0)
+        )
+        return OverlapOffset(
+            x=stacking_overlap.x, y=stacking_overlap.y, z=stacking_overlap.z
         )
 
     def get_default_magnet_height(self, module_id: str, offset: float) -> float:
