@@ -69,6 +69,17 @@
       "PROTOCOL_MODULES": "Add Modules"
     }
   },
+  "create_file_wizard": {
+    "additional_items": "Additional items",
+    "add_optional_info": "Add more information, if you like (you can change this later).",
+    "choose_robot_type_and_protocol_name": "Choose robot type and name your protocol.*",
+    "description": "Description",
+    "organization_or_author": "Organization/Author",
+    "pipettes": "Pipettes",
+    "protocol_name": "Protocol Name",
+    "protocol_name_and_description": "Protocol Name and Description",
+    "robot_type": "Robot Type"
+  },
   "well_order": {
     "title": "Well Order",
     "body": "Change the order in which the robot aspirates from the selected wells",

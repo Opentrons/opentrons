@@ -6,7 +6,7 @@ import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
 import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
-import { ALIGN_STRETCH, DIRECTION_COLUMN, DropdownField, Flex, FormGroup, InputField, ModalShell, OutlineButton, SPACING, WizardHeader } from '@opentrons/components'
+import { ALIGN_CENTER, ALIGN_STRETCH, DIRECTION_COLUMN, DropdownField, Flex, FormGroup, InputField, JUSTIFY_SPACE_BETWEEN, ModalShell, OutlineButton, PrimaryButton, SPACING, SecondaryButton, WizardHeader } from '@opentrons/components'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
 import { i18n } from '../../../localization'
@@ -24,7 +24,6 @@ import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
 
 import styles from '../FilePipettesModal/FilePipettesModal.css'
-import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
 
 import {
@@ -41,11 +40,9 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
   SPAN7_8_10_11_SLOT,
-  FLEX_ROBOT_TYPE,
   getPipetteNameSpecs
 } from '@opentrons/shared-data'
 import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
-import { PipetteFields } from '../FilePipettesModal/PipetteFields'
 import { ModuleFields } from '../FilePipettesModal/ModuleFields'
 
 import {
@@ -58,12 +55,19 @@ import {
 } from '../../../step-forms'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
+import type { FormState } from './types'
+import { RobotTypeAndMetadataTile } from './RobotTypeAndMetadataTile'
+import { PipettesTile } from './PipettesTile'
+import { ModulesAndOtherTile } from './ModulesAndOtherTile'
 
 interface CreateFileFields {
   newProtocolFields: NewProtocolFields
   pipettes: PipetteFieldsData[]
   modules: ModuleCreationArgs[]
 }
+
+type WizardStep = 'robotTypeAndMetadata' | 'pipettes' | 'modulesAndOther'
+const WIZARD_STEPS: WizardStep[] = ['robotTypeAndMetadata', 'pipettes', 'modulesAndOther']
 
 export function CreateFileWizard(): JSX.Element | null {
   const showWizard = useSelector(getNewProtocolModal)
@@ -139,18 +143,41 @@ export function CreateFileWizard(): JSX.Element | null {
     <WizardHeader
       title={"Create New Protocol"}
       currentStep={currentStepIndex}
-      totalSteps={3}
+      totalSteps={WIZARD_STEPS.length}
       onExit={handleCancel}
     />
   )
+  const currentWizardStep = WIZARD_STEPS[currentStepIndex]
   return showWizard ? (
     <ModalShell width="48rem" header={wizardHeader}>
-      <Flex padding={SPACING.spacing16}>
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
         <CreateFileForm
-          onSave={handleSubmit}
-          onCancel={handleCancel}
           moduleRestrictionsDisabled={moduleRestrictionsDisabled}
+          currentWizardStep={currentWizardStep}
         />
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+          {currentWizardStep !== 'robotTypeAndMetadata' ? (
+            <SecondaryButton onClick={() => {
+              if (currentStepIndex > 0) {
+                setCurrentStepIndex(currentStepIndex - 1)
+              }
+            }}>
+              Go Back
+            </SecondaryButton>
+          ) : <Flex />
+          }
+          {currentWizardStep === 'modulesAndOther' ?
+            (
+              <PrimaryButton onClick={handleSubmit}>
+                Create protocol, on to liquids
+              </PrimaryButton>
+            ) : (
+              <PrimaryButton onClick={() => { setCurrentStepIndex(currentStepIndex + 1) }}>
+                Next
+              </PrimaryButton>
+            )
+          }
+        </Flex>
       </Flex>
     </ModalShell>
   ) : null
@@ -167,24 +194,13 @@ interface ModuleCreationArgs {
   slot: string
 }
 
-interface FormState {
-  fields: NewProtocolFields
-  pipettesByMount: FormPipettesByMount
-  modulesByType: FormModulesByType
-}
-
-interface CreateFileFormProps {
-  onCancel: () => unknown
-  onSave: (args: {
-    newProtocolFields: NewProtocolFields
-    pipettes: PipetteFieldsData[]
-    modules: ModuleCreationArgs[]
-  }) => unknown
-  moduleRestrictionsDisabled?: boolean | null
-}
-
 const initialFormState: FormState = {
-  fields: { name: '', robotType: OT2_ROBOT_TYPE },
+  fields: {
+    name: '',
+    description: '',
+    organizationOrAuthor: '',
+    robotType: OT2_ROBOT_TYPE
+  },
   pipettesByMount: {
     left: { pipetteName: '', tiprackDefURI: null },
     right: { pipetteName: '', tiprackDefURI: null },
@@ -261,20 +277,20 @@ const validationSchema = Yup.object().shape({
   }),
 })
 
-const ROBOT_TYPE_OPTIONS = [{ value: OT2_ROBOT_TYPE, name: 'OT2' }, { value: FLEX_ROBOT_TYPE, name: 'Opentrons Flex' }]
 
 interface CreateFileFormProps {
-  onCancel: () => unknown
-  onSave: (args: {
-    newProtocolFields: NewProtocolFields
-    pipettes: PipetteFieldsData[]
-    modules: ModuleCreationArgs[]
-  }) => unknown
   moduleRestrictionsDisabled?: boolean | null
+  currentWizardStep: WizardStep
 }
 
+
 function CreateFileForm(props: CreateFileFormProps): JSX.Element {
-  const { onSave, onCancel, moduleRestrictionsDisabled } = props
+  const { moduleRestrictionsDisabled, currentWizardStep } = props
+  const contentsByWizardStep: { [wizardStep in WizardStep]: (formikProps: FormikProps<FormState>) => JSX.Element } = {
+    robotTypeAndMetadata: (formikProps: FormikProps<FormState>) => <RobotTypeAndMetadataTile {...formikProps} />,
+    pipettes: (formikProps: FormikProps<FormState>) => <PipettesTile {...formikProps} />,
+    modulesAndOther: (formikProps: FormikProps<FormState>) => <ModulesAndOtherTile {...formikProps} />,
+  }
 
   const handleSubmit = (values: FormState): void => {
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
@@ -334,7 +350,6 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
 
 
   return (
-
     <Formik
       enableReinitialize
       initialValues={initialFormState}
@@ -342,21 +357,14 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
       validationSchema={validationSchema}
       validateOnChange={false}
     >
-      {({
-        handleChange,
-        handleSubmit,
-        errors,
-        setFieldValue,
-        touched,
-        values,
-        handleBlur,
-        setFieldTouched,
-      }: FormikProps<FormState>) => {
+      {(formikProps: FormikProps<FormState>) => {
+        const { handleSubmit, values } = formikProps
         const { left, right } = values.pipettesByMount
 
-        const pipetteSelectionIsValid =
-          // at least one must not be none (empty string)
-          left.pipetteName || right.pipetteName
+        // TODO: validation
+        // const pipetteSelectionIsValid =
+        //   // at least one must not be none (empty string)
+        //   left.pipetteName || right.pipetteName
 
         const hasCrashableMagnetModuleSelected = getCrashableModuleSelected(
           values.modulesByType,
@@ -380,124 +388,34 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
               pipetteSpecs && pipetteSpecs.channels !== 1
           )
 
-        const crashablePipetteSelected = getIsCrashablePipetteSelected(
-          values.pipettesByMount
+        const crashablePipetteSelected = getIsCrashablePipetteSelected(values.pipettesByMount)
+        const modCrashWarning = (
+          <CrashInfoBox
+            showDiagram
+            showMagPipetteCollisons={crashablePipetteSelected && hasCrashableMagnetModuleSelected}
+            showTempPipetteCollisons={crashablePipetteSelected && hasCrashableTemperatureModuleSelected}
+            showHeaterShakerLabwareCollisions={hasHeaterShakerSelected}
+            showHeaterShakerModuleCollisions={hasHeaterShakerSelected}
+            showHeaterShakerPipetteCollisions={showHeaterShakerPipetteCollisions}
+          />
         )
 
-        const showTempPipetteCollisons =
-          crashablePipetteSelected &&
-          hasCrashableTemperatureModuleSelected
-        const showMagPipetteCollisons =
-          crashablePipetteSelected && hasCrashableMagnetModuleSelected
         return (
           <form onSubmit={handleSubmit}>
-            <div className={styles.protocol_file_group}>
-              <Flex gridGap={SPACING.spacing16}>
-                <h2 className={styles.new_file_modal_title}>
-                  {i18n.t('modal.new_protocol.title.PROTOCOL_FILE')}
-                </h2>
-                <Flex flexDirection={DIRECTION_COLUMN} width="10rem" alignItems={ALIGN_STRETCH}>
-                  <DropdownField
-                    options={ROBOT_TYPE_OPTIONS}
-                    onChange={handleChange}
-                    value={values.fields.robotType}
-                    name="fields.robotType"
-                  />
-                </Flex>
-              </Flex>
-              <FormGroup
-                className={formStyles.stacked_row}
-                label="Name"
-              >
-                <InputField
-                  autoFocus
-                  tabIndex={1}
-                  placeholder={i18n.t(
-                    'form.generic.default_protocol_name'
-                  )}
-                  name="fields.name"
-                  value={values.fields.name}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                />
+            {contentsByWizardStep[currentWizardStep](formikProps)}
+            {
+              !moduleRestrictionsDisabled &&
+                currentWizardStep === 'modulesAndOther'
+                ? modCrashWarning
+                : null
+            }
 
-              </FormGroup>
-            </div>
-
-            <h2 className={styles.new_file_modal_title}>
-              {i18n.t('modal.new_protocol.title.PROTOCOL_PIPETTES')}
-            </h2>
-
-            <PipetteFields
-              initialTabIndex={1}
-              values={values.pipettesByMount}
-              onFieldChange={handleChange}
-              onSetFieldValue={setFieldValue}
-              onBlur={handleBlur}
-              errors={errors.pipettesByMount ?? null}
-              touched={touched.pipettesByMount ?? null}
-              onSetFieldTouched={setFieldTouched}
-              robotType={values.fields.robotType}
-            />
-            <div className={styles.protocol_modules_group}>
-              <h2 className={styles.new_file_modal_title}>
-                {i18n.t(
-                  'modal.new_protocol.title.PROTOCOL_MODULES'
-                )}
-              </h2>
-              <ModuleFields
-                errors={errors.modulesByType ?? null}
-                values={values.modulesByType}
-                onFieldChange={handleChange}
-                onSetFieldValue={setFieldValue}
-                onBlur={handleBlur}
-                touched={touched.modulesByType ?? null}
-                onSetFieldTouched={setFieldTouched}
-              />
-            </div>
-            {!moduleRestrictionsDisabled && (
-              <CrashInfoBox
-                showDiagram
-                showMagPipetteCollisons={showMagPipetteCollisons}
-                showTempPipetteCollisons={showTempPipetteCollisons}
-                showHeaterShakerLabwareCollisions={
-                  hasHeaterShakerSelected
-                }
-                showHeaterShakerModuleCollisions={
-                  hasHeaterShakerSelected
-                }
-                showHeaterShakerPipetteCollisions={
-                  showHeaterShakerPipetteCollisions
-                }
-              />
-            )}
-            <div className={modalStyles.button_row}>
-              <OutlineButton
-                onClick={onCancel}
-                tabIndex={7}
-                className={styles.button}
-              >
-                {i18n.t('button.cancel')}
-              </OutlineButton>
-              <OutlineButton
-                disabled={!pipetteSelectionIsValid}
-                // @ts-expect-error(sa, 2021-6-21): Formik handleSubmit type not cooporating with OutlineButton onClick type
-                onClick={handleSubmit}
-                tabIndex={6}
-                className={styles.button}
-              >
-                {i18n.t('button.save')}
-              </OutlineButton>
-            </div>
           </form>
         )
       }}
+
     </Formik>
-
   )
-
-
-
 }
 
 

@@ -16,6 +16,8 @@ export type FileUploadMessage =
     }
 export interface NewProtocolFields {
   name: string | null | undefined
+  description: string | null | undefined
+  organizationOrAuthor: string | null | undefined
   robotType: RobotType
 }
 export interface LoadFileAction {
