@@ -65,7 +65,7 @@ interface ProtocolInstrumentMountItemProps {
 export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
 ): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { i18n, t } = useTranslation('protocol_setup')
   const { mount, attachedInstrument, speccedName, mostRecentAnalysis } = props
   const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
   const [
@@ -94,14 +94,14 @@ export function ProtocolInstrumentMountItem(
       <MountItem isReady={isAttachedWithCal}>
         <Flex width="100%" alignItems={ALIGN_CENTER}>
           <Flex
-            flex="2"
+            flex={isAttachedWithCal ? 1 : 2}
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing4}
           >
             <MountLabel>
               {i18n.format(
                 is96ChannelPipette ? t('96_mount') : t('mount', { mount }),
-                'capitalize'
+                'titleCase'
               )}
             </MountLabel>
             <SpeccedInstrumentName>
