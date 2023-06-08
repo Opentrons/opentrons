@@ -121,9 +121,11 @@ test-integration: test-production-qc test-examples test-scripts test-gravimetric
 
 .PHONY: lint
 lint:
+	$(MAKE) apply-patches-gravimetric
 	$(python) -m mypy hardware_testing tests
 	$(python) -m black --check hardware_testing tests setup.py
 	$(python) -m flake8 hardware_testing tests setup.py
+	$(MAKE) remove-patches-gravimetric
 
 .PHONY: format
 format:

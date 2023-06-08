@@ -259,7 +259,6 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         alias="backlashDistance",
     )
 
-
     @validator("pipette_type", pre=True)
     def convert_pipette_model_string(cls, v: str) -> PipetteModelType:
         return PipetteModelType(v)

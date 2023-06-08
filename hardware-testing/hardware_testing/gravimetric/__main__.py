@@ -170,7 +170,7 @@ if __name__ == "__main__":
         _ctx = helpers.get_api_context(
             _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
             is_simulating=args.simulate,
-            deck_version = 2,
+            deck_version="2",
         )
         run_pm(
             _ctx,
