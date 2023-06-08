@@ -124,7 +124,7 @@ export function PinnedProtocol(props: {
             : t('no_history')}
         </StyledText>
         <StyledText as="p">
-          {format(new Date(protocol.createdAt), 'M/d/yyyy HH:mm')}
+          {format(new Date(protocol.createdAt), 'M/d/yy HH:mm')}
         </StyledText>
       </Flex>
       {longpress.isLongPressed === true && (
