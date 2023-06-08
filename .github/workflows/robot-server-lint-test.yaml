@@ -17,7 +17,7 @@ on:
       - 'notify-server/**/*'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
-      - '.github/workflows/robot-server-test-lint.yaml'
+      - '.github/workflows/robot-server-lint-test.yaml'
       - '.github/actions/python/**'
     branches:
       - 'edge'
@@ -37,7 +37,7 @@ on:
       - 'notify-server/**/*'
       - 'scripts/**/*.mk'
       - 'scripts/**/*.py'
-      - '.github/workflows/robot-server-test-lint.yaml'
+      - '.github/workflows/robot-server-lint-test.yaml'
       - '.github/actions/python/**'
   workflow_dispatch:
 
