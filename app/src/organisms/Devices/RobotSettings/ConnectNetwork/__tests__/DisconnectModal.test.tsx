@@ -5,14 +5,12 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../../i18n'
 import { useRobot } from '../../../../../organisms/Devices/hooks'
+import { useWifiList } from '../../../../../resources/networking/hooks'
 import {
   mockConnectableRobot,
   mockReachableRobot,
 } from '../../../../../redux/discovery/__fixtures__'
-import {
-  getWifiList,
-  postWifiDisconnect,
-} from '../../../../../redux/networking'
+import { postWifiDisconnect } from '../../../../../redux/networking'
 import { mockWifiNetwork } from '../../../../../redux/networking/__fixtures__'
 import {
   dismissRequest,
@@ -28,11 +26,12 @@ import type { DispatchApiRequestType } from '../../../../../redux/robot-api'
 import type { RequestState } from '../../../../../redux/robot-api/types'
 import type { State } from '../../../../../redux/types'
 
+jest.mock('../../../../../resources/networking/hooks')
 jest.mock('../../../../../organisms/Devices/hooks')
 jest.mock('../../../../../redux/networking')
 jest.mock('../../../../../redux/robot-api')
 
-const mockGetWifiList = getWifiList as jest.MockedFunction<typeof getWifiList>
+const mockUseWifiList = useWifiList as jest.MockedFunction<typeof useWifiList>
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
 >
@@ -65,8 +64,8 @@ describe('DisconnectModal', () => {
 
   beforeEach(() => {
     dispatchApiRequest = jest.fn()
-    when(mockGetWifiList)
-      .calledWith({} as State, ROBOT_NAME)
+    when(mockUseWifiList)
+      .calledWith(ROBOT_NAME)
       .mockReturnValue([{ ...mockWifiNetwork, ssid: 'foo', active: true }])
     when(mockUseDispatchApiRequest)
       .calledWith()

@@ -6,7 +6,7 @@ from opentrons.protocol_engine.errors import HardwareNotSupportedError
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
-    from opentrons.hardware_control.protocols import HardwareControlAPI
+    from opentrons.hardware_control import HardwareControlAPI
 
 
 def ensure_ot3_hardware(

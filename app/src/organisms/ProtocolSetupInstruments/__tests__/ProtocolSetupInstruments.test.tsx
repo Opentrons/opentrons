@@ -10,8 +10,8 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ProtocolSetupInstruments } from '..'
 import { mockRecentAnalysis } from '../__fixtures__'
+import { ProtocolSetupInstruments } from '..'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock(
@@ -86,17 +86,14 @@ describe('ProtocolSetupInstruments', () => {
   })
 
   it('renders the Instruments Setup page', () => {
-    const [{ getByText, getByRole }] = render()
+    const [{ getByText }] = render()
     getByText('Instruments')
     getByText('Location')
-    getByText('calibration status')
-    getByRole('button', { name: 'continue' })
+    getByText('Calibration Status')
   })
 
   it('correctly navigates with the nav buttons', () => {
-    const [{ getByRole, getAllByRole }] = render()
-    getByRole('button', { name: 'continue' }).click()
-    expect(mockSetSetupScreen).toHaveBeenCalledWith('modules')
+    const [{ getAllByRole }] = render()
     getAllByRole('button')[0].click()
     expect(mockSetSetupScreen).toHaveBeenCalledWith('prepare to run')
   })

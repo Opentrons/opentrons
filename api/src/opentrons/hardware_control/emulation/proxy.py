@@ -2,8 +2,8 @@
 from __future__ import annotations
 import asyncio
 import logging
-import socket
 import uuid
+import socket
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List
@@ -116,10 +116,17 @@ class Proxy:
         connection = Connection(
             identifier=str(uuid.uuid1()), reader=reader, writer=writer
         )
+
+        log.info(f"Using Local Host: {self._settings.use_local_host}")
+
+        client_host = (
+            "127.0.0.1" if self._settings.use_local_host else socket.gethostname()
+        )
+
         self._cons.append(connection)
         self._event_listener.on_server_connected(
             server_type=self._name,
-            client_uri=f"socket://{socket.gethostname()}:{self._settings.driver_port}",
+            client_uri=f"socket://{client_host}:{self._settings.driver_port}",
             identifier=connection.identifier,
         )
 

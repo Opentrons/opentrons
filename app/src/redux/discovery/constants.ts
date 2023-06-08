@@ -27,5 +27,8 @@ export const RE_HOSTNAME_IPV4_LL: RegExp = /^169\.254\.\d+\.\d+$/
 export const RE_HOSTNAME_LOCALHOST: RegExp = /^localhost$/
 export const RE_HOSTNAME_LOOPBACK: RegExp = /^127\.0\.0\.1$/
 
-export const RE_ROBOT_MODEL_OT3: RegExp = /^OT-3.*/
+export const RE_ROBOT_MODEL_OT3: RegExp = /^(OT-3)|(Opentrons Flex).*/
 export const RE_ROBOT_MODEL_OT2: RegExp = /^OT-2.*/
+
+// opentrons-usb hostname assigned to device detected by USB
+export const OPENTRONS_USB: 'opentrons-usb' = 'opentrons-usb'

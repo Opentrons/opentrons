@@ -241,7 +241,7 @@ async def test_deck_not_found(
     override_cal_config: None,
 ) -> None:
     await ot3_hardware.home()
-    mock_capacitive_probe.side_effect = (-3,)
+    mock_capacitive_probe.side_effect = (-25,)
     with pytest.raises(CalibrationStructureNotFoundError):
         await find_calibration_structure_height(
             ot3_hardware,
@@ -346,7 +346,11 @@ async def test_calibrate_mount_errors(
         ot3_hardware.managed_obj, "reset_instrument_offset", AsyncMock()
     ) as reset_instrument_offset, patch.object(
         ot3_hardware.managed_obj, "save_instrument_offset", AsyncMock()
-    ) as save_instrument_offset:
+    ) as save_instrument_offset, patch(
+        "opentrons.hardware_control.ot3_calibration.find_calibration_structure_height",
+        AsyncMock(spec=find_calibration_structure_height),
+    ) as find_deck:
+        find_deck.return_value = 10
         mock_data_analysis.return_value = (-1000, 1000)
 
         await ot3_hardware.home()

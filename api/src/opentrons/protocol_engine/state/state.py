@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Callable, List, Optional, Sequence, TypeVar
+from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
+from opentrons.protocol_engine.types import ModuleOffsetVector
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 
@@ -127,6 +128,7 @@ class StateStore(StateView, ActionHandler):
         deck_fixed_labware: Sequence[DeckFixedLabware],
         is_door_open: bool,
         change_notifier: Optional[ChangeNotifier] = None,
+        module_calibration_offsets: Optional[Dict[str, ModuleOffsetVector]] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -138,6 +140,7 @@ class StateStore(StateView, ActionHandler):
                 definition to preload into labware state.
             is_door_open: Whether the robot's door is currently open.
             change_notifier: Internal state change notifier.
+            module_calibration_offsets: Module offsets to preload.
         """
         self._command_store = CommandStore(config=config, is_door_open=is_door_open)
         self._pipette_store = PipetteStore()
@@ -145,7 +148,9 @@ class StateStore(StateView, ActionHandler):
             deck_fixed_labware=deck_fixed_labware,
             deck_definition=deck_definition,
         )
-        self._module_store = ModuleStore()
+        self._module_store = ModuleStore(
+            module_calibration_offsets=module_calibration_offsets
+        )
         self._liquid_store = LiquidStore()
         self._tip_store = TipStore()
 
@@ -258,11 +263,13 @@ class StateStore(StateView, ActionHandler):
 
         # Derived states
         self._geometry = GeometryView(
+            config=self._config,
             labware_view=self._labware,
             module_view=self._modules,
             pipette_view=self._pipettes,
         )
         self._motion = MotionView(
+            config=self._config,
             labware_view=self._labware,
             pipette_view=self._pipettes,
             geometry_view=self._geometry,

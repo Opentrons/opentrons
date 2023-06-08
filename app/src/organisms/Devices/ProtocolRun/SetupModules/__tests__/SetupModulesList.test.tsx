@@ -6,6 +6,7 @@ import { i18n } from '../../../../../i18n'
 import {
   mockMagneticModule as mockMagneticModuleFixture,
   mockHeaterShaker,
+  mockMagneticBlock,
 } from '../../../../../redux/modules/__fixtures__/index'
 import {
   mockMagneticModuleGen2,
@@ -326,5 +327,30 @@ describe('SetupModulesList', () => {
     const moduleSetup = getByText('View module setup instructions')
     fireEvent.click(moduleSetup)
     getByText('mockHeaterShakerWizard')
+  })
+  it('shoulde render a magnetic block', () => {
+    mockUseModuleRenderInfoForProtocolById.mockReturnValue({
+      [mockMagneticBlock.id]: {
+        moduleId: mockMagneticBlock.id,
+        x: MOCK_MAGNETIC_MODULE_COORDS[0],
+        y: MOCK_MAGNETIC_MODULE_COORDS[1],
+        z: MOCK_MAGNETIC_MODULE_COORDS[2],
+        moduleDef: {
+          id: 'magneticBlock_id',
+          model: mockMagneticBlock.moduleModel,
+          moduleType: mockMagneticBlock.moduleType,
+          displayName: mockMagneticBlock.displayName,
+        },
+        nestedLabwareDef: null,
+        nestedLabwareId: null,
+        protocolLoadOrder: 0,
+        slotName: '1',
+        attachedModuleMatch: null,
+      },
+    } as any)
+    const { getByText } = render(props)
+    getByText('No USB connection required')
+    getByText('N/A')
+    getByText('Magnetic Block GEN1')
   })
 })

@@ -372,6 +372,41 @@ describe('discovery selectors', () => {
       ],
     },
     {
+      name: 'handles opentrons-usb robots by setting as local',
+      selector: discovery.getDiscoveredRobots,
+      state: {
+        discovery: {
+          robotsByName: {
+            'opentrons-foo': {
+              name: 'opentrons-foo',
+              health: mockLegacyHealthResponse,
+              serverHealth: mockLegacyServerHealthResponse,
+              addresses: [
+                {
+                  ip: 'opentrons-usb',
+                  port: 31950,
+                  seen: true,
+                  healthStatus: HEALTH_STATUS_OK,
+                  serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
+                  healthError: null,
+                  serverHealthError: mockHealthFetchErrorResponse,
+                  advertisedModel: null,
+                },
+              ],
+            },
+          },
+        },
+        robot: { connection: { connectedTo: '' } },
+      },
+      expected: [
+        expect.objectContaining({
+          name: 'opentrons-foo',
+          ip: 'opentrons-usb',
+          local: true,
+        }),
+      ],
+    },
+    {
       name: 'getViewableRobots returns connectable and reachable robots',
       selector: discovery.getViewableRobots,
       state: MOCK_STATE,
@@ -560,7 +595,7 @@ describe('discovery selectors', () => {
       selector: discovery.getRobotModelByName,
       state: MOCK_STATE,
       args: ['fizzbuzz'],
-      expected: 'OT-3',
+      expected: 'Opentrons Flex',
     },
     {
       name: 'getRobotType returns type of a connectable OT-2',
@@ -581,7 +616,25 @@ describe('discovery selectors', () => {
       selector: discovery.getRobotModelByName,
       state: MOCK_STATE,
       args: ['qux'],
-      expected: 'OT-3',
+      expected: 'Opentrons Flex',
+    },
+    {
+      name: 'getRobotAddressesByName returns addresses by name',
+      selector: discovery.getRobotAddressesByName,
+      state: MOCK_STATE,
+      args: ['qux'],
+      expected: [
+        {
+          ip: '10.0.0.4',
+          port: 31950,
+          seen: true,
+          healthStatus: HEALTH_STATUS_UNREACHABLE,
+          serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
+          healthError: mockHealthFetchErrorResponse,
+          serverHealthError: mockHealthFetchErrorResponse,
+          advertisedModel: ROBOT_MODEL_OT3,
+        },
+      ],
     },
   ]
 

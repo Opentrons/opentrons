@@ -49,3 +49,9 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
         and will implicitly revert back to the previous state after a short
         action, while others"""
         ...
+
+    def get_status_bar_state(self) -> StatusBarState:
+        """Get the current status bar state.
+
+        :returns: The current status bar state enumeration."""
+        ...

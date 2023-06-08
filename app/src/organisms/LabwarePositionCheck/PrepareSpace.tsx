@@ -1,19 +1,7 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import {
-  LabwareRender,
-  Module,
-  RobotWorkSpace,
-  Flex,
-  Box,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  SPACING,
-  PrimaryButton,
-  RESPONSIVENESS,
-} from '@opentrons/components'
+import { useSelector } from 'react-redux'
+import { LabwareRender, Module, RobotWorkSpace } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
   CompletedProtocolAnalysis,
@@ -22,11 +10,14 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   getModuleType,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import ot2DeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+import ot3DeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
-import { StyledText } from '../../atoms/text'
-import { CheckLabwareStep } from './types'
-import { NeedHelpLink } from '../CalibrationPanels'
+import { getIsOnDevice } from '../../redux/config'
+import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { useProtocolMetadata } from '../Devices/hooks'
+
+import type { CheckLabwareStep } from './types'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -53,109 +44,85 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   const { location, moduleId, labwareDef, protocolData, header, body } = props
 
-  if (protocolData == null) return null
-  return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
-      minHeight="25rem"
-    >
-      <Flex gridGap={SPACING.spacingL}>
-        <Flex
-          flex="1"
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
-        >
-          <StyledText as="h1">{header}</StyledText>
-          {body}
-        </Flex>
-        <Box flex="1">
-          <RobotWorkSpace
-            deckDef={standardDeckDef as any}
-            viewBox={DECK_MAP_VIEWBOX}
-            deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-            id="LabwarePositionCheck_deckMap"
-          >
-            {({ deckSlotsById }) => {
-              const deckSlot = deckSlotsById[location.slotName]
-              const [x, y] = deckSlot.position
-              let labwareToPrepare = null
-              if ('moduleModel' in location && location.moduleModel != null) {
-                labwareToPrepare = (
-                  <Module
-                    x={x}
-                    y={y}
-                    orientation={inferModuleOrientationFromXCoordinate(
-                      deckSlot.position[x]
-                    )}
-                    def={getModuleDef2(location.moduleModel)}
-                    innerProps={
-                      getModuleType(location.moduleModel) ===
-                      THERMOCYCLER_MODULE_TYPE
-                        ? { lidMotorState: 'open' }
-                        : {}
-                    }
-                  >
-                    <LabwareRender definition={labwareDef} />
-                  </Module>
-                )
-              } else {
-                labwareToPrepare = (
-                  <g transform={`translate(${String(x)},${String(y)})`}>
-                    <LabwareRender definition={labwareDef} />
-                  </g>
-                )
-              }
-              return (
-                <>
-                  {protocolData.modules.map(module => {
-                    const [modX, modY] = deckSlotsById[
-                      module.location.slotName
-                    ].position
+  const { robotType } = useProtocolMetadata()
+  const isOnDevice = useSelector(getIsOnDevice)
 
-                    // skip the focused module as it will be rendered above with the labware
-                    return module.id === moduleId ? null : (
-                      <Module
-                        key={module.id}
-                        x={modX}
-                        y={modY}
-                        orientation={inferModuleOrientationFromXCoordinate(
-                          modX
-                        )}
-                        def={getModuleDef2(module.model)}
-                        innerProps={
-                          getModuleType(module.model) ===
-                          THERMOCYCLER_MODULE_TYPE
-                            ? { lidMotorState: 'open' }
-                            : {}
-                        }
-                      />
-                    )
-                  })}
-                  {labwareToPrepare}
-                </>
+  if (protocolData == null || robotType == null) return null
+  const deckDef = robotType === 'OT-3 Standard' ? ot3DeckDef : ot2DeckDef
+  return (
+    <GenericWizardTile
+      header={header}
+      bodyText={body}
+      rightHandBody={
+        <RobotWorkSpace
+          height={isOnDevice ? '80%' : '100%'}
+          deckDef={deckDef as any}
+          viewBox={DECK_MAP_VIEWBOX}
+          deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+          id="LabwarePositionCheck_deckMap"
+        >
+          {({ deckSlotsById }) => {
+            const deckSlot = deckSlotsById[location.slotName]
+            const [x, y] = deckSlot.position
+            let labwareToPrepare = null
+            if ('moduleModel' in location && location.moduleModel != null) {
+              labwareToPrepare = (
+                <Module
+                  x={x}
+                  y={y}
+                  orientation={inferModuleOrientationFromXCoordinate(
+                    deckSlot.position[x]
+                  )}
+                  def={getModuleDef2(location.moduleModel)}
+                  innerProps={
+                    getModuleType(location.moduleModel) ===
+                    THERMOCYCLER_MODULE_TYPE
+                      ? { lidMotorState: 'open' }
+                      : {}
+                  }
+                >
+                  <LabwareRender definition={labwareDef} />
+                </Module>
               )
-            }}
-          </RobotWorkSpace>
-        </Box>
-      </Flex>
-      <Flex
-        width="100%"
-        marginTop={SPACING.spacing6}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
-        css={css`
-          @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-            margin-top: 0;
-          }
-        `}
-      >
-        <NeedHelpLink href={LPC_HELP_LINK_URL} />
-        <PrimaryButton onClick={props.confirmPlacement}>
-          {t('shared:confirm_placement')}
-        </PrimaryButton>
-      </Flex>
-    </Flex>
+            } else {
+              labwareToPrepare = (
+                <g transform={`translate(${String(x)},${String(y)})`}>
+                  <LabwareRender definition={labwareDef} />
+                </g>
+              )
+            }
+            return (
+              <>
+                {protocolData.modules.map(module => {
+                  const [modX, modY] = deckSlotsById[
+                    module.location.slotName
+                  ].position
+
+                  // skip the focused module as it will be rendered above with the labware
+                  return module.id === moduleId ? null : (
+                    <Module
+                      key={module.id}
+                      x={modX}
+                      y={modY}
+                      orientation={inferModuleOrientationFromXCoordinate(modX)}
+                      def={getModuleDef2(module.model)}
+                      innerProps={
+                        getModuleType(module.model) === THERMOCYCLER_MODULE_TYPE
+                          ? { lidMotorState: 'open' }
+                          : {}
+                      }
+                    />
+                  )
+                })}
+                {labwareToPrepare}
+              </>
+            )
+          }}
+        </RobotWorkSpace>
+      }
+      proceed={props.confirmPlacement}
+      proceedButtonText={t('shared:confirm_placement')}
+      getHelp={isOnDevice ? undefined : LPC_HELP_LINK_URL}
+    />
   )
 }

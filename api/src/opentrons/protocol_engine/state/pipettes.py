@@ -28,6 +28,7 @@ from ..commands import (
     MoveRelativeResult,
     PickUpTipResult,
     DropTipResult,
+    DropTipInPlaceResult,
     HomeResult,
     BlowOutResult,
     TouchTipResult,
@@ -167,7 +168,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.attached_tip_by_id[pipette_id] = attached_tip
             self._state.aspirated_volume_by_id[pipette_id] = 0
 
-        elif isinstance(command.result, DropTipResult):
+        elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None

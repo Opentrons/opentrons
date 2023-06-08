@@ -16,7 +16,7 @@ const BASE_STYLE = {
   left: 0,
   width: '100%',
   height: '100%',
-  padding: `${SPACING.spacing4}, ${SPACING.spacing5}`,
+  padding: `${SPACING.spacing16}, ${SPACING.spacing24}`,
 } as const
 
 const MODAL_STYLE = {
@@ -30,21 +30,21 @@ const MODAL_STYLE = {
 const HEADER_STYLE = {
   backgroundColor: Styles.C_LIGHT_GRAY,
   position: Styles.POSITION_STICKY,
-  padding: SPACING.spacing4,
+  padding: SPACING.spacing16,
   top: 0,
 } as const
 
 const FOOTER_STYLE = {
   backgroundColor: Styles.C_WHITE,
   position: Styles.POSITION_STICKY,
-  padding: SPACING.spacing4,
+  padding: SPACING.spacing16,
   bottom: 0,
 } as const
 
 const CONTENT_STYLE = {
-  paddingTop: SPACING.spacing4,
-  paddingX: SPACING.spacing5,
-  paddingBottom: SPACING.spacing5,
+  paddingTop: SPACING.spacing16,
+  paddingX: SPACING.spacing24,
+  paddingBottom: SPACING.spacing24,
 } as const
 
 export interface BaseModalProps extends StyleProps {

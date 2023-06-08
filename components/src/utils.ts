@@ -34,19 +34,23 @@ export const wellNameSplit = (wellName: string): [string, string] => {
  *
  * @param {string} text - A string param
  * @param {number} maxLength - A maximum length of display
- * @param {string} breakPoint - A point to insert three dots
+ * @param {number} breakPoint - Optional A point to insert three dots
  *
  * @returns {string} Returns the truncated string
  */
 export function truncateString(
   text: string,
   maxLength: number,
-  breakPoint: number
+  breakPoint?: number
 ): string {
   const dots = '...'
   if (text.length > maxLength)
-    return `${text.substring(0, breakPoint)}${dots}${text.slice(
-      breakPoint - maxLength + dots.length
-    )}`
+    if (breakPoint != null) {
+      return `${text.substring(0, breakPoint)}${dots}${text.slice(
+        breakPoint - maxLength + dots.length
+      )}`
+    } else {
+      return `${text.slice(0, maxLength - dots.length)}${dots}`
+    }
   else return text
 }

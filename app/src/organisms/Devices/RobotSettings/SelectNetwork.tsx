@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
 
+import { useWifiList } from '../../../resources/networking/hooks'
 import * as RobotApi from '../../../redux/robot-api'
 import * as Networking from '../../../redux/networking'
 import { Portal } from '../../../App/portal'
@@ -26,9 +27,7 @@ export const SelectNetwork = ({
   robotName,
   isRobotBusy,
 }: TempSelectNetworkProps): JSX.Element => {
-  const list = useSelector((state: State) =>
-    Networking.getWifiList(state, robotName)
-  )
+  const list = useWifiList(robotName)
   const keys = useSelector((state: State) =>
     Networking.getWifiKeys(state, robotName)
   )

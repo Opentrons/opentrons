@@ -141,7 +141,7 @@ export function SetupTipLengthCalibrationButton({
               disabled={disabled || !isDeckCalibrated}
               {...targetProps}
             >
-              {t('calibrate_now_cta')}
+              {t('calibrate_now')}
             </TertiaryButton>
             {!isDeckCalibrated ? (
               <Tooltip {...tooltipProps}>

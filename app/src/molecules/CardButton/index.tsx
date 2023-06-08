@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
+import { css } from 'styled-components'
 import {
   Flex,
   DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
   ALIGN_CENTER,
   SPACING,
   COLORS,
@@ -11,70 +11,107 @@ import {
   Icon,
   Btn,
   BORDERS,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 
 import type { IconName } from '@opentrons/components'
 
-// ToDo kj 11/18/2022 props will be updated when the hi-fi is done
+const CARD_BUTTON_STYLE = css`
+  display: flex;
+  flex-direction: ${DIRECTION_COLUMN};
+  align-items: ${ALIGN_CENTER};
+  border-radius: ${BORDERS.borderRadiusSize5};
+  padding: ${SPACING.spacing32};
+  box-shadow: none;
+
+  &:focus {
+    background-color: ${COLORS.mediumBluePressed};
+    box-shadow: none;
+  }
+
+  &:hover {
+    border: none;
+    box-shadow: none;
+    background-color: ${COLORS.mediumBlueEnabled};
+    color: ${COLORS.darkBlackEnabled};
+  }
+
+  &:focus-visible {
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.mediumBlueEnabled};
+  }
+
+  &:active {
+    background-color: ${COLORS.mediumBluePressed};
+  }
+
+  &:disabled {
+    background-color: ${COLORS.darkBlack20};
+    color: ${COLORS.darkBlack70};
+  }
+`
+
+const CARD_BUTTON_TEXT_STYLE = css`
+  word-wrap: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+`
+
 interface CardButtonProps {
-  cardWidth: string
-  cardHeight: string
+  /**  Header text should be less than 2 words.  */
   title: string
+  /**  set an Icon */
   iconName: IconName
+  /**  Subtext should be less than 3 lines.  */
   description: string
+  /**  The path when clicking a card button */
   destinationPath: string
+  /**  make button enabled/disabled */
+  disabled?: boolean
 }
 
 export function CardButton(props: CardButtonProps): JSX.Element {
-  const {
-    cardWidth,
-    cardHeight,
-    title,
-    iconName,
-    description,
-    destinationPath,
-  } = props
+  const { title, iconName, description, destinationPath, disabled } = props
   const history = useHistory()
 
   return (
     <Btn
-      display="flex"
-      padding={SPACING.spacing5}
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing5}
-      justifyContent={JUSTIFY_CENTER}
-      alignItems={ALIGN_CENTER}
       onClick={() => history.push(destinationPath)}
-      width={cardWidth}
-      height={cardHeight}
-      backgroundColor={COLORS.medBlue}
-      borderRadius={BORDERS.size_four}
+      width="100%"
+      css={CARD_BUTTON_STYLE}
+      backgroundColor={disabled ? COLORS.darkBlack20 : COLORS.mediumBlueEnabled}
+      disabled={disabled}
     >
       <Icon
         name={iconName}
-        size="5rem"
-        color={COLORS.blueEnabled}
+        size="3.75rem"
         data-testid={`cardButton_icon_${String(iconName)}`}
+        color={disabled ? COLORS.darkBlack60 : COLORS.blueEnabled}
       />
-      <Flex>
+      <Flex marginTop={SPACING.spacing16}>
         <StyledText
-          fontSize="2rem"
-          lineHeight="2.75rem"
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          color={COLORS.darkBlackEnabled}
+          as="h4"
+          fontWeight={TYPOGRAPHY.fontWeightBold}
+          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
           textAlign={TYPOGRAPHY.textAlignCenter}
         >
           {title}
         </StyledText>
       </Flex>
-      <Flex marginTop="0.75rem">
+      <Flex
+        marginTop={SPACING.spacing4}
+        width="100%"
+        justifyContent={JUSTIFY_CENTER}
+      >
         <StyledText
-          fontSize="1.375rem"
-          lineHeight="1.875rem"
+          as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
-          color={COLORS.darkBlackEnabled}
-          textAlign={TYPOGRAPHY.textAlignCenter}
+          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
+          css={CARD_BUTTON_TEXT_STYLE}
         >
           {description}
         </StyledText>

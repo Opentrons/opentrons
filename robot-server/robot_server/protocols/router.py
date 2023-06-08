@@ -16,7 +16,6 @@ from opentrons.protocol_reader import (
     FileHasher,
 )
 from opentrons_shared_data.robot.dev_types import RobotType
-
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.hardware import get_robot_type
 from robot_server.service.task_runner import TaskRunner, get_task_runner
@@ -104,7 +103,7 @@ class RunLink(BaseModel):
 class ProtocolLinks(BaseModel):
     """Links returned along with a protocol resource."""
 
-    referencingRunIds: List[RunLink] = Field(
+    referencingRuns: List[RunLink] = Field(
         ...,
         description="Links to runs that reference the protocol.",
     )
@@ -307,6 +306,28 @@ async def get_protocols(
 
 
 @protocols_router.get(
+    path="/protocols/ids",
+    summary="Get uploaded protocol ids",
+    responses={status.HTTP_200_OK: {"model": SimpleMultiBody[str]}},
+)
+async def get_protocol_ids(
+    protocol_store: ProtocolStore = Depends(get_protocol_store),
+) -> PydanticResponse[SimpleMultiBody[str]]:
+    """Get a list of all protocol ids stored on the server.
+
+    Args:
+        protocol_store: In-memory database of protocol resources.
+    """
+    protocol_ids = protocol_store.get_all_ids()
+
+    meta = MultiBodyMeta(cursor=0, totalLength=len(protocol_ids))
+
+    return await PydanticResponse.create(
+        content=SimpleMultiBody.construct(data=protocol_ids, meta=meta)
+    )
+
+
+@protocols_router.get(
     path="/protocols/{protocolId}",
     summary="Get an uploaded protocol",
     responses={
@@ -332,7 +353,7 @@ async def get_protocol_by_id(
         raise ProtocolNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND)
 
     analyses = analysis_store.get_summaries_by_protocol(protocol_id=protocolId)
-    referencingRunIds = protocol_store.get_referencing_run_ids(protocolId)
+    referencing_run_ids = protocol_store.get_referencing_run_ids(protocolId)
 
     data = Protocol.construct(
         id=protocolId,
@@ -348,9 +369,9 @@ async def get_protocol_by_id(
     )
 
     links = ProtocolLinks.construct(
-        referencingRunIds=[
-            RunLink.construct(id=runId, href=f"/runs/{runId}")
-            for runId in referencingRunIds
+        referencingRuns=[
+            RunLink.construct(id=run_id, href=f"/runs/{run_id}")
+            for run_id in referencing_run_ids
         ]
     )
 

@@ -152,11 +152,15 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # GRIP AND MEASURE FORCE
         print(f"gripping at {duty_cycle}% duty cycle")
         found_forces = list()
-        for i in range(NUM_DUTY_CYCLE_TRIALS):
+        # take 2x extra samples, because we'll remove min/max later
+        for i in range(NUM_DUTY_CYCLE_TRIALS + 2):
             actual_force = await _grip_and_read_force(api, gauge, duty=duty_cycle)
             print(f" - trial {i + 1}/{NUM_DUTY_CYCLE_TRIALS} = {actual_force} N")
             found_forces.append(actual_force)
-        actual_force = sum(found_forces) / float(NUM_DUTY_CYCLE_TRIALS)
+        # remove min/max forces
+        forces_without_outliers = sorted(found_forces)[1:-1]
+        # calculate average
+        actual_force = sum(forces_without_outliers) / float(NUM_DUTY_CYCLE_TRIALS)
         print(f"average = {actual_force} N")
         tag = _get_test_tag(duty_cycle=duty_cycle)
         report(section, tag, [duty_cycle, actual_force, CSVResult.PASS])

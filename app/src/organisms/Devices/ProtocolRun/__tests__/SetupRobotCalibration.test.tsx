@@ -5,18 +5,21 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
+} from '../../../../redux/analytics'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { useDeckCalibrationData, useIsOT3, useRunHasStarted } from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
-import { SetupPipetteCalibration } from '../SetupPipetteCalibration'
+import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
 jest.mock('../../../../redux/analytics')
 jest.mock('../../hooks')
 jest.mock('../SetupDeckCalibration')
-jest.mock('../SetupPipetteCalibration')
+jest.mock('../SetupInstrumentCalibration')
 jest.mock('../SetupTipLengthCalibration')
 
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
@@ -25,8 +28,8 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 const mockSetupDeckCalibration = SetupDeckCalibration as jest.MockedFunction<
   typeof SetupDeckCalibration
 >
-const mockSetupPipetteCalibration = SetupPipetteCalibration as jest.MockedFunction<
-  typeof SetupPipetteCalibration
+const mockSetupInstrumentCalibration = SetupInstrumentCalibration as jest.MockedFunction<
+  typeof SetupInstrumentCalibration
 >
 const mockSetupTipLengthCalibration = SetupTipLengthCalibration as jest.MockedFunction<
   typeof SetupTipLengthCalibration
@@ -72,8 +75,8 @@ describe('SetupRobotCalibration', () => {
     when(mockSetupDeckCalibration).mockReturnValue(
       <div>Mock SetupDeckCalibration</div>
     )
-    when(mockSetupPipetteCalibration).mockReturnValue(
-      <div>Mock SetupPipetteCalibration</div>
+    when(mockSetupInstrumentCalibration).mockReturnValue(
+      <div>Mock SetupInstrumentCalibration</div>
     )
     when(mockSetupTipLengthCalibration).mockReturnValue(
       <div>Mock SetupTipLengthCalibration</div>
@@ -94,7 +97,7 @@ describe('SetupRobotCalibration', () => {
     const { getByText } = render()[0]
 
     getByText('Mock SetupDeckCalibration')
-    getByText('Mock SetupPipetteCalibration')
+    getByText('Mock SetupInstrumentCalibration')
     getByText('Mock SetupTipLengthCalibration')
   })
 
@@ -103,7 +106,7 @@ describe('SetupRobotCalibration', () => {
     const { getByText, queryByText } = render()[0]
 
     expect(queryByText('Mock SetupDeckCalibration')).toBeNull()
-    getByText('Mock SetupPipetteCalibration')
+    getByText('Mock SetupInstrumentCalibration')
     expect(queryByText('Mock SetupTipLengthCalibration')).toBeNull()
   })
 
@@ -119,7 +122,7 @@ describe('SetupRobotCalibration', () => {
     fireEvent.click(getByRole('button', { name: 'Proceed to module setup' }))
     expect(mockExpandStep).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'proceed_to_module_setup_step',
+      name: ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
       properties: {},
     })
   })

@@ -15,7 +15,10 @@ from typing import (
 from typing_extensions import TypeGuard
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import Mount, DeckSlotName, Location
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
@@ -23,6 +26,7 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel,
     ThermocyclerModuleModel,
     HeaterShakerModuleModel,
+    MagneticBlockModel,
     ThermocyclerStep,
 )
 
@@ -30,8 +34,35 @@ if TYPE_CHECKING:
     from .labware import Well
 
 
+# The first APIVersion where Python protocols can specify deck labels like "D1" instead of "1".
+_COORDINATE_DECK_LABEL_VERSION_GATE = APIVersion(2, 15)
+
+
+class InvalidPipetteMountError(ValueError):
+    """An error raised when attempting to load pipettes on an invalid mount."""
+
+
+class PipetteMountTypeError(TypeError):
+    """An error raised when an invalid mount type is used for loading pipettes."""
+
+
 def ensure_mount(mount: Union[str, Mount]) -> Mount:
     """Ensure that an input value represents a valid Mount."""
+    if mount in [Mount.EXTENSION, "extension"]:
+        # This would cause existing protocols that might be iterating over mount types
+        # for loading pipettes to raise an error because Mount now includes Extension mount.
+        # For example, this would raise error-
+        # ```
+        #   for i, mount in enumerate(Mount):
+        #       pipette[i] = ctx.load_instrument("p300_single", mount)
+        # ```
+        # But this is a very rare use case and none of the protocols in protocol library
+        # or protocols seen/ built by support/ science/ apps engg do this so it might be
+        # safe to raise this error now?
+        raise InvalidPipetteMountError(
+            f"Loading pipettes on {mount} is not allowed."
+            f"Use the left or right mounts instead."
+        )
     if isinstance(mount, Mount):
         return mount
 
@@ -39,14 +70,12 @@ def ensure_mount(mount: Union[str, Mount]) -> Mount:
         try:
             return Mount[mount.upper()]
         except KeyError as e:
-            # TODO(mc, 2022-08-25): create specific exception type
-            raise ValueError(
+            raise InvalidPipetteMountError(
                 "If mount is specified as a string, it must be 'left' or 'right';"
                 f" instead, {mount} was given."
             ) from e
 
-    # TODO(mc, 2022-08-25): create specific exception type
-    raise TypeError(
+    raise PipetteMountTypeError(
         "Instrument mount should be 'left', 'right', or an opentrons.types.Mount;"
         f" instead, {mount} was given."
     )
@@ -64,15 +93,43 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
         ) from e
 
 
-def ensure_deck_slot(deck_slot: Union[int, str]) -> DeckSlotName:
-    """Ensure that a primitive value matches a named deck slot."""
+def ensure_deck_slot(
+    deck_slot: Union[int, str], api_version: APIVersion
+) -> DeckSlotName:
+    """Ensure that a primitive value matches a named deck slot.
+
+    Params:
+        deck_slot: The primitive value to validate. Valid values are like `5`, `"5"`, or `"C2"`.
+        api_version: The Python Protocol API version whose rules to use to validate the value.
+            Values like `"C2"` are only supported in newer versions.
+
+    Raises:
+        TypeError: If you provide something that's not an `int` or `str`.
+        ValueError: If the value does not match a known deck slot.
+        APIVersionError: If you provide a value like `"C2"`, but `api_version` is too old.
+    """
     if not isinstance(deck_slot, (int, str)):
         raise TypeError(f"Deck slot must be a string or integer, but got {deck_slot}")
 
     try:
-        return DeckSlotName(str(deck_slot))
+        parsed_slot = DeckSlotName.from_primitive(deck_slot)
     except ValueError as e:
         raise ValueError(f"'{deck_slot}' is not a valid deck slot") from e
+
+    is_ot2_style = parsed_slot.to_ot2_equivalent() == parsed_slot
+    if not is_ot2_style and api_version < _COORDINATE_DECK_LABEL_VERSION_GATE:
+        alternative = parsed_slot.to_ot2_equivalent().id
+        raise APIVersionError(
+            f'Specifying a deck slot like "{deck_slot}" requires apiLevel'
+            f" {_COORDINATE_DECK_LABEL_VERSION_GATE}."
+            f' Increase your protocol\'s apiLevel, or use slot "{alternative}" instead.'
+        )
+
+    return parsed_slot
+
+
+def ensure_deck_slot_string(slot_name: DeckSlotName, robot_type: RobotType) -> str:
+    return slot_name.to_equivalent_for_robot_type(robot_type).id
 
 
 def ensure_lowercase_name(name: str) -> str:
@@ -104,6 +161,7 @@ _MODULE_MODELS: Dict[str, ModuleModel] = {
     "thermocyclerModuleV1": ThermocyclerModuleModel.THERMOCYCLER_V1,
     "thermocyclerModuleV2": ThermocyclerModuleModel.THERMOCYCLER_V2,
     "heaterShakerModuleV1": HeaterShakerModuleModel.HEATER_SHAKER_V1,
+    "magneticBlockV1": MagneticBlockModel.MAGNETIC_BLOCK_V1,
 }
 
 

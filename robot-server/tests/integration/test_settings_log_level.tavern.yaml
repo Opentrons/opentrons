@@ -2,7 +2,7 @@
 test_name: POST Acceptable Log Level
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
   - parametrize:
       key: log_level
       vals:
@@ -14,7 +14,7 @@ stages:
   - name: Set log_level to acceptable values 
     request:
       method: POST
-      url: "{host:s}:{port:d}/settings/log_level/local"
+      url: "{ot2_server_base_url}/settings/log_level/local"
       json: 
         log_level: "{log_level}"
     response:
@@ -26,12 +26,12 @@ stages:
 test_name: POST Set log level to invalid value
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Set log_level to error 
     request:
       method: POST
-      url: "{host:s}:{port:d}/settings/log_level/local"
+      url: "{ot2_server_base_url}/settings/log_level/local"
       json: 
         log_level: bad_level
     response:
@@ -42,12 +42,12 @@ stages:
 test_name: POST Set log level to nothing
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Set log_level to nothing 
     request:
       method: POST
-      url: "{host:s}:{port:d}/settings/log_level/local"
+      url: "{ot2_server_base_url}/settings/log_level/local"
       json: 
         log_level: Null
     response:
