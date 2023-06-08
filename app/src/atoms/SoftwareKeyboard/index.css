@@ -10,10 +10,15 @@
   margin-right: 8px;
 }
 
+.simple-keyboard.oddTheme1 .hg-row {
+  margin-bottom: 8px;
+}
+
 .simple-keyboard.oddTheme1.hg-button {
   min-width: 48px;
   height: 48px;
   font-size: 28px;
+  margin-bottom: 8px;
 }
 
 .simple-keyboard.oddTheme1.hg-button :focus {
