@@ -26,6 +26,7 @@ import {
 import { NormalizedPipette } from '@opentrons/step-generation'
 import { BaseState, ThunkDispatch } from '../../../types'
 import { LabwareDefByDefURI } from '../../../labware-defs/types'
+import { RobotType } from '@opentrons/shared-data'
 type Props = React.ComponentProps<typeof FilePipettesModalComponent>
 interface OP {
   showProtocolFields: Props['showProtocolFields']
@@ -41,6 +42,7 @@ interface CreateNewProtocolArgs {
   newProtocolFields: NewProtocolFields
   pipettes: PipetteFieldsData[]
   modules: ModuleCreationArgs[]
+  robotType: RobotType
 }
 interface DP {
   onCancel: () => unknown

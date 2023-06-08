@@ -20,6 +20,8 @@ import {
   GEN_ONE_MULTI_PIPETTES,
   DeckSlot as DeckDefSlot,
   ModuleType,
+  getDeckDefFromRobotType,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'
@@ -54,6 +56,7 @@ import { TerminalItemId } from '../../steplist'
 
 import styles from './DeckSetup.css'
 import { getSelectedTerminalItemId } from '../../ui/steps'
+import { getRobotType } from '../../file-data/selectors'
 
 export const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -75,6 +78,9 @@ export const VIEWBOX_MIN_X = -64
 export const VIEWBOX_MIN_Y = -10
 export const VIEWBOX_WIDTH = 520
 export const VIEWBOX_HEIGHT = 414
+
+const OT2_VIEWBOX = `${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`
+const FLEX_VIEWBOX = '-144.31 -76.59 750 580'
 
 const getSlotDefForModuleSlot = (
   moduleOnDeck: ModuleOnDeck,
@@ -156,9 +162,6 @@ export const getSwapBlocked = (args: SwapBlockedArgs): boolean => {
   return labwareSourceToDestBlocked || labwareDestToSourceBlocked
 }
 
-// TODO IMMEDIATELY BC -> address this todo
-// TODO IL 2020-01-12: to support dynamic labware/module movement during a protocol,
-// don't use initialDeckSetup here. Use some version of timelineFrameForActiveItem
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
     activeDeckSetup,
@@ -363,6 +366,7 @@ export const DeckSetup = (): JSX.Element => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+  const robotType = useSelector(getRobotType)
   const dispatch = useDispatch()
 
   const _hasGen1MultichannelPipette = React.useMemo(
@@ -372,7 +376,7 @@ export const DeckSetup = (): JSX.Element => {
   const showGen1MultichannelCollisionWarnings =
     !_disableCollisionWarnings && _hasGen1MultichannelPipette
 
-  const deckDef = React.useMemo(() => getDeckDefinitions().ot3_standard, [])
+  const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [])
   const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
     onClickOutside: () => {
       if (drilledDown) dispatch(labwareIngredActions.drillUpFromLabware())
@@ -387,7 +391,7 @@ export const DeckSetup = (): JSX.Element => {
           <RobotWorkSpace
             deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             deckDef={deckDef}
-            viewBox={`${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
+            viewBox={robotType === OT2_ROBOT_TYPE ? OT2_VIEWBOX: FLEX_VIEWBOX}
             width="100%"
             height="100%"
           >

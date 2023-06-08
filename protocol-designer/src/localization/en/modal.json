@@ -64,7 +64,7 @@
   },
   "new_protocol": {
     "title": {
-      "PROTOCOL_FILE": "Create New Protocol",
+      "PROTOCOL_FILE": "Create New Protocol for",
       "PROTOCOL_PIPETTES": "Pipette & Tip Setup",
       "PROTOCOL_MODULES": "Add Modules"
     }

@@ -7,6 +7,7 @@ import { LoadFileAction, NewProtocolFields } from '../../load-file'
 import { ComputeRobotStateTimelineSuccessAction } from '../actions'
 import { Substeps } from '../../steplist/types'
 import { OT2_ROBOT_TYPE, RobotType } from '@opentrons/shared-data'
+
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   {
     COMPUTE_ROBOT_STATE_TIMELINE_REQUEST: () => true,
@@ -93,13 +94,16 @@ const fileMetadata = handleActions(
   defaultFields
 )
 
-// track if a protocol has been created or loaded
-const robotTypeReducer = handleActions<RobotType>(
-  {
-    SET_ROBOT_TYPE: (robotType: RobotType) => robotType,
-  },
-  OT2_ROBOT_TYPE 
-)
+// on which robot type the current protocol file is meant to execute
+const robotTypeReducer = (
+  state: RobotType = OT2_ROBOT_TYPE,
+  action: any
+): RobotType => {
+  if (action.type === 'CREATE_NEW_PROTOCOL') {
+    return action.payload.robotType
+  }
+  return state
+}
 export interface RootState {
   computedRobotStateTimeline: Timeline
   computedSubsteps: Substeps
@@ -114,7 +118,7 @@ const _allReducers = {
   currentProtocolExists,
   fileMetadata,
   timelineIsBeingComputed,
-  robotTypeReducer,
+  robotType: robotTypeReducer,
 }
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers
