@@ -415,6 +415,8 @@ async def match_z_settings(axis, speed, accel, current):
     return True
 
 async def _main(is_simulating: bool) -> None:
+    # api = await build_async_ot3_hardware_api(is_simulating=is_simulating,
+    #                                          stall_detection_enable = False)
     api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
     print("HOMING")
     await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
@@ -503,7 +505,7 @@ def speed_range_from_freq(test_axis):
     #                    750*AXIS_MICROSTEP[test_axis],
     #                    1*AXIS_MICROSTEP[test_axis])
     freq_range = np.arange(START_FREQ*AXIS_MICROSTEP[test_axis],
-                       10000*AXIS_MICROSTEP[test_axis],
+                       50000*AXIS_MICROSTEP[test_axis],
                        FREQ_INC*AXIS_MICROSTEP[test_axis])
 
     #ustep/s * mm/ustep
