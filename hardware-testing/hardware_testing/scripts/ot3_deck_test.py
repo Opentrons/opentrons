@@ -411,7 +411,7 @@ async def _main(is_simulating: bool) -> None:
     datalist = []
 
     try:
-        cycle = 3
+        cycle = 1
         for keyv in l_r_loc.keys(): 
             print("keyv",keyv)
             if str(keyv) == "OT3Mount.LEFT":
@@ -476,7 +476,7 @@ async def _main(is_simulating: bool) -> None:
                     
                     Toollength = Toollength - steplist[0]
                 else:
-                    if i >= 2:
+                    if i >= len(range(cycle)):
                         break
                     if mount == OT3Mount.LEFT:
                         await api.move_rel(
