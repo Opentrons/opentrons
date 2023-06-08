@@ -1,4 +1,4 @@
-import * as React from 'react'
++import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
@@ -40,7 +40,7 @@ export function RestartRobotConfirmationModal({
     <Modal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing40}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
         <Trans
