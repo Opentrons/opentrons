@@ -1,9 +1,11 @@
 """Response models for protocol analysis."""
 # TODO(mc, 2021-08-25): add modules to simulation result
 from enum import Enum
-from pydantic import BaseModel, Field
-from typing import List, Union
+from pydantic import BaseModel, Field, validator
+from typing import Any, Dict, List, Union
 from typing_extensions import Literal
+
+from opentrons.protocol_engine.commands.parse import parse_command
 
 from opentrons.protocol_engine import (
     Command,
@@ -102,10 +104,17 @@ class CompletedAnalysis(BaseModel):
         default_factory=list,
         description="Modules that have been loaded into the run.",
     )
+
     commands: List[Command] = Field(
         ...,
         description="The protocol commands the run is expected to produce",
     )
+
+    @validator("commands", each_item=True, pre=True)
+    @classmethod
+    def parse_command(cls, command: Dict[str, Any]) -> Command:
+        return parse_command(command)
+
     errors: List[ErrorOccurrence] = Field(
         ...,
         description="Any errors the protocol run produced",
