@@ -5,7 +5,6 @@ from .definition import (
     LiquidClassSettings,
     AspirateSettings,
     DispenseSettings,
-    AirGapSettings,
     interpolate,
 )
 
@@ -20,28 +19,13 @@ _dispense_defaults = {
         50: {  # P50
             50: {  # T50
                 1: DispenseSettings(  # 1uL
-                    flow_rate=57,
+                    z_depth=_default_submerge_mm_t50,
+                    plunger_acceleration=40000,
+                    plunger_flow_rate=57,
                     delay=0.5,
-                    submerge=_default_submerge_mm_t50,
-                    retract=_default_retract_mm,
-                    acceleration=40000,  # this is a fake number
-                    deceleration=40000,  # this is a fake number
-                ),
-                10: DispenseSettings(  # 10uL
-                    flow_rate=57,
-                    delay=0.5,
-                    submerge=_default_submerge_mm_t50,
-                    retract=_default_retract_mm,
-                    acceleration=40000,  # this is a fake number
-                    deceleration=40000,  # this is a fake number
-                ),
-                50: DispenseSettings(  # 50uL
-                    flow_rate=57,
-                    delay=0.5,
-                    submerge=_default_submerge_mm_t50,
-                    retract=_default_retract_mm,
-                    acceleration=40000,  # this is a fake number
-                    deceleration=40000,  # this is a fake number
+                    z_retract_discontinuity=20,
+                    z_retract_height=_default_retract_mm,
+                    leading_air_gap=2,
                 ),
             },
         },

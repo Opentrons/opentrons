@@ -6,12 +6,12 @@ from dataclasses import dataclass
 class LiquidSettings:
     """Liquid Settings for both aspirate and dispense."""
 
-    submerge_depth: float  # millimeters below meniscus
-    acceleration: float  # ul/sec^2
-    flow_rate: float  # ul/sec
+    z_depth: float  # millimeters below meniscus
+    plunger_acceleration: float  # ul/sec^2
+    plunger_flow_rate: float  # ul/sec
     delay: float  # seconds
-    retract_acceleration: float  # mm/sec/sec
-    retract_height: float  # millimeters above meniscus
+    z_retract_discontinuity: float  # mm/sec/sec
+    z_retract_height: float  # millimeters above meniscus
 
 
 @dataclass
@@ -46,21 +46,21 @@ def interpolate(
 
     return LiquidClassSettings(
         aspirate=AspirateSettings(
-            submerge_depth=_interp(a.aspirate.submerge_depth, b.aspirate.submerge_depth),
-            acceleration=_interp(a.aspirate.acceleration, b.aspirate.acceleration),
-            flow_rate=_interp(a.aspirate.flow_rate, b.aspirate.flow_rate),
+            z_depth=_interp(a.aspirate.z_depth, b.aspirate.z_depth),
+            plunger_acceleration=_interp(a.aspirate.plunger_acceleration, b.aspirate.plunger_acceleration),
+            plunger_flow_rate=_interp(a.aspirate.plunger_flow_rate, b.aspirate.plunger_flow_rate),
             delay=_interp(a.aspirate.delay, b.aspirate.delay),
-            retract_acceleration=_interp(a.aspirate.retract_acceleration, b.aspirate.retract_acceleration),
-            retract_height=_interp(a.aspirate.retract_height, b.aspirate.retract_height),
+            z_retract_discontinuity=_interp(a.aspirate.z_retract_discontinuity, b.aspirate.z_retract_discontinuity),
+            z_retract_height=_interp(a.aspirate.z_retract_height, b.aspirate.z_retract_height),
             trailing_air_gap=_interp(a.aspirate.trailing_air_gap, b.aspirate.trailing_air_gap),
         ),
         dispense=DispenseSettings(
-            submerge_depth=_interp(a.dispense.submerge_depth, b.dispense.submerge_depth),
-            acceleration=_interp(a.dispense.acceleration, b.dispense.acceleration),
-            flow_rate=_interp(a.dispense.flow_rate, b.dispense.flow_rate),
+            z_depth=_interp(a.dispense.z_depth, b.dispense.z_depth),
+            plunger_acceleration=_interp(a.dispense.plunger_acceleration, b.dispense.plunger_acceleration),
+            plunger_flow_rate=_interp(a.dispense.plunger_flow_rate, b.dispense.plunger_flow_rate),
             delay=_interp(a.dispense.delay, b.dispense.delay),
-            retract_acceleration=_interp(a.dispense.retract_acceleration, b.dispense.retract_acceleration),
-            retract_height=_interp(a.dispense.retract_height, b.dispense.retract_height),
+            z_retract_discontinuity=_interp(a.dispense.z_retract_discontinuity, b.dispense.z_retract_discontinuity),
+            z_retract_height=_interp(a.dispense.z_retract_height, b.dispense.z_retract_height),
             leading_air_gap=_interp(a.dispense.leading_air_gap, b.dispense.leading_air_gap),
         ),
     )
