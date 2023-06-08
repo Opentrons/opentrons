@@ -40,15 +40,17 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     attachedPipettes[mount]?.instrumentName === 'p1000_96'
   const handle96ChannelProceed = (): void => {
     chainRunCommands(
-      {
-        // @ts-expect-error calibration type not yet supported
-        commandType: 'calibration/moveToMaintenancePosition' as const,
-        params: {
-          mount: RIGHT,
-          maintenancePosition: 'attachPlate',
+      [
+        {
+          // @ts-expect-error calibration type not yet supported
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: RIGHT,
+            maintenancePosition: 'attachPlate',
+          },
         },
-      },
-      true
+      ],
+      false
     )
       .then(() => {
         proceed()
