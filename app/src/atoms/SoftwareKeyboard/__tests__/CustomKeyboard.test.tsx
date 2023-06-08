@@ -42,7 +42,7 @@ describe('CustomKeyboard', () => {
       'j',
       'k',
       'l',
-      'shift',
+      'SHIFT',
       'z',
       'x',
       'c',
@@ -60,7 +60,7 @@ describe('CustomKeyboard', () => {
   })
   it('should render the custom keyboards upper case, when clicking shift key', () => {
     const { getByRole, getAllByRole } = render(props)
-    const shiftKey = getByRole('button', { name: 'shift' })
+    const shiftKey = getByRole('button', { name: 'SHIFT' })
     fireEvent.click(shiftKey)
 
     const buttons = getAllByRole('button')
@@ -84,7 +84,7 @@ describe('CustomKeyboard', () => {
       'J',
       'K',
       'L',
-      'shift',
+      'SHIFT',
       'Z',
       'X',
       'C',
@@ -116,7 +116,7 @@ describe('CustomKeyboard', () => {
       '7',
       '8',
       '9',
-      'ABC',
+      'abc',
       '0',
       'del',
     ]
@@ -132,7 +132,7 @@ describe('CustomKeyboard', () => {
     getByRole('button', { name: 'a' })
     fireEvent.click(numberKey)
     getByRole('button', { name: '1' })
-    const abcKey = getByRole('button', { name: 'ABC' })
+    const abcKey = getByRole('button', { name: 'abc' })
     fireEvent.click(abcKey)
     getByRole('button', { name: 'a' })
   })
