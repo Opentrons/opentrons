@@ -51,6 +51,7 @@ def get_api_context(
     pipette_right: Optional[str] = None,
     gripper: Optional[str] = None,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
+    deck_version: int = guess_deck_type_from_global_config()
 ) -> protocol_api.ProtocolContext:
     """Get api context."""
 

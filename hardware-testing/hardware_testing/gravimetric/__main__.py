@@ -167,6 +167,11 @@ if __name__ == "__main__":
         is_simulating=args.simulate,
     )
     if args.photometric:
+        _ctx = helpers.get_api_context(
+            _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
+            is_simulating=args.simulate,
+            deck_version = 2,
+        )
         run_pm(
             _ctx,
             args.pipette,
@@ -181,6 +186,10 @@ if __name__ == "__main__":
             args.touch_tip,
         )
     else:
+        _ctx = helpers.get_api_context(
+            _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
+            is_simulating=args.simulate,
+        )
         run(
             _ctx,
             args.pipette,
