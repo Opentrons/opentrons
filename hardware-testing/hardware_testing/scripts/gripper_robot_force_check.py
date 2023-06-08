@@ -74,7 +74,7 @@ class Gripper_Robot_Force_Check:
 
     async def test_setup(self):
         self.file_setup()
-        # self.gauge_setup()
+        self.gauge_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         await set_error_tolerance(self.api._backend._messenger, 15, 15)
         self.mount = OT3Mount.GRIPPER
@@ -156,7 +156,7 @@ class Gripper_Robot_Force_Check:
         self.test_data["Cycle"] = str(self.cycle)
         test_data = self.dict_values_to_line(self.test_data)
         data.append_data_to_file(self.test_name, self.test_file, test_data)
-        # self._get_average()
+        self._get_average()
 
     async def _read_gripper(
         self, api: OT3API, input: int
@@ -172,8 +172,8 @@ class Gripper_Robot_Force_Check:
         time.sleep(self.hold_time)
         self.jaw_displacement = round(self._get_jaw_displacement(), 3)
         self.test_data["Jaw Displacement"] = str(self.jaw_displacement)
-        # self.force = self._get_stable_force()
-        # self.test_data["Output Force"] = str(self.force)
+        self.force = self._get_stable_force()
+        self.test_data["Output Force"] = str(self.force)
         await api.ungrip()
         print(f"Cycle #{self.cycle}: Output Force = {self.force} N")
         print(f"Cycle #{self.cycle}: Jaw Displacement = {self.jaw_displacement} mm")
