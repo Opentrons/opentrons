@@ -53,7 +53,10 @@ class Gripper_Width_Test:
         self.gripper_id = None
         self.cycle = None
         self.nominal_center = None
-        self.jaw_length = 94.55 # mm
+        self.jaw_error = None
+        self.jaw_max = 94.55 # mm
+        self.jaw_min = 60 # mm
+        self.jaw_length = 90 # mm
         self.step_error = 0.5 # mm
         self.step_height = 10 # mm
         self.steps = [88, 80, 72, 64] # bottom-up
@@ -104,7 +107,7 @@ class Gripper_Width_Test:
             self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
         self.test_data["Gripper"] = str(self.gripper_id)
         self.test_data["Input Force"] = str(self.grip_force)
-        await set_error_tolerance(self.api._backend._messenger, 15, 15)
+        await set_error_tolerance(self.api._backend._messenger, 1, 1)
 
     def dict_keys_to_line(self, dict):
         return str.join(",", list(dict.keys()))+"\n"
@@ -142,13 +145,27 @@ class Gripper_Width_Test:
         # Get gripper jaw displacement
         jaw_displacement = self._get_jaw_displacement()
         jaw_width = self._get_jaw_width()
-        abs_error = round((step_width - self.step_error) - jaw_width, 3)
+        total_error = self.step_error + self.jaw_error
+        abs_error = round((step_width - jaw_width) - total_error, 3)
         self.test_data["Gripper Width"] = str(jaw_width)
         self.test_data["Absolute Error"] = str(abs_error)
         print(f"-->> Step {step} ({step_width}mm): Displacement = {jaw_displacement}, Width = {jaw_width}, Error = {abs_error}")
         # Hold gripper jaw width (do not home or ungrip jaw!)
-        await api.hold_jaw_width(90)
+        await api.hold_jaw_width(self.jaw_length)
         time.sleep(1)
+
+    async def _actual_gripper(self, api, mount):
+        # Home gripper jaw only once
+        await api.home_gripper_jaw()
+        # Close gripper jaw
+        await api.grip(self.grip_force)
+        time.sleep(1)
+        # Measure closed gripper jaw width
+        jaw_width = self._get_jaw_width()
+        self.jaw_error = round(self.jaw_min - jaw_width, 3)
+        print(f"\nClosed Jaw Error = {self.jaw_error}mm (Expected = 60mm / Actual = {jaw_width}mm)\n")
+        # Hold gripper jaw width (do not home or ungrip jaw!)
+        await api.hold_jaw_width(self.jaw_length)
 
     async def _move_gripper(self, api, mount):
         # Move gripper above staircase
@@ -211,6 +228,7 @@ class Gripper_Width_Test:
                 if self.calibrate:
                     await self._calibrate_slot(self.api, self.mount, 6)
                 await self._move_gripper(self.api, self.mount)
+                await self._actual_gripper(self.api, self.mount)
                 for i in range(self.cycles):
                     cycle = i + 1
                     print(f"\n-> Running Test Cycle {cycle}/{self.cycles}")
