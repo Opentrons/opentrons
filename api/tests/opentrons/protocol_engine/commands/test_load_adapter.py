@@ -26,7 +26,7 @@ async def test_load_adapter_implementation(
         namespace="opentrons-test",
         version=1,
         displayName="My custom display name",
-        adapterId="abc-123"
+        adapterId="abc-123",
     )
 
     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
@@ -47,7 +47,9 @@ async def test_load_adapter_implementation(
         )
     )
 
-    decoy.when(equipment.validate_definition_is_adapter(labware_definition)).then_return(True)
+    decoy.when(
+        equipment.validate_definition_is_adapter(labware_definition)
+    ).then_return(True)
 
     result = await subject.execute(data)
 

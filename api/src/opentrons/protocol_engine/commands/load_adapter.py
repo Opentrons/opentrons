@@ -92,8 +92,12 @@ class LoadAdapterImplementation(
             labware_id=params.adapterId,
         )
 
-        if not self._equipment.validate_definition_is_adapter(loaded_labware.definition):
-            raise LabwareDefinitionIsNotAdapter(f'{params.loadName} is not defined as an adapter')
+        if not self._equipment.validate_definition_is_adapter(
+            loaded_labware.definition
+        ):
+            raise LabwareDefinitionIsNotAdapter(
+                f"{params.loadName} is not defined as an adapter"
+            )
 
         return LoadAdapterResult(
             adapterId=loaded_labware.labware_id,
