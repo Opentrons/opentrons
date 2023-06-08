@@ -8,9 +8,19 @@ from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.types import Location
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 
+
+from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.opentrons_api.types import Point, OT3Axis
-
+from .measurement import (
+    MeasurementData,
+    MeasurementType,
+    create_measurement_tag,
+    EnvironmentData,
+)
+from .measurement.environment import (
+    read_environment_data
+)
 from . import report
 from . import config
 from .helpers import get_pipette_unique_name
@@ -29,7 +39,7 @@ from .measurement.environment import get_min_reading, get_max_reading
 from .tips import get_tips
 
 
-_MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
+_MEASUREMENTS: List[Tuple[str, EnvironmentData]] = list()
 
 TARGET_END_PHOTOPLATE_VOLUME = 200
 
@@ -69,21 +79,6 @@ def _setup_dye(volume: float, cfg: config.PhotometricConfig) -> None:
         f"Place the {_get_dye_type(volume)} reservoir in slot {cfg.reservoir_slot}"
         f" and fill to {dye_required}ul of {_get_dye_type(volume)} dye"
     )
-
-
-def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
-    # update this regularly, because the script may exit early
-    env_data_list = [m.environment for tag, m in _MEASUREMENTS]
-    first_data = env_data_list[0]
-    last_data = env_data_list[-1]
-    min_data = get_min_reading(env_data_list)
-    max_data = get_max_reading(env_data_list)
-    report.store_environment(
-        test_report, report.EnvironmentReportState.FIRST, first_data
-    )
-    report.store_environment(test_report, report.EnvironmentReportState.LAST, last_data)
-    report.store_environment(test_report, report.EnvironmentReportState.MIN, min_data)
-    report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
 
 
 def _check_if_software_supports_high_volumes() -> bool:
@@ -248,8 +243,10 @@ def _dispense_volumes(volume: float) -> Tuple[float, float, int]:
     return target_volume, volume_to_dispense, num_dispenses
 
 
+
 def _run_trial(
     ctx: ProtocolContext,
+    test_report: CSVReport,
     pipette: InstrumentContext,
     source: Well,
     dest: Labware,
@@ -271,6 +268,21 @@ def _run_trial(
         """Do Nothing."""
         return
 
+    def _tag(m_type: MeasurementType) -> str:
+        return create_measurement_tag(m_type, volume, 0, trial)
+
+    def _record_measurement_and_store(m_type: MeasurementType) -> MeasurementData:
+        m_tag = _tag(m_type)
+        m_data = read_environment_data(cfg.pipette_mount, ctx.is_simulating())
+        report.store_measurements_pm(test_report, m_tag, m_data)
+        _MEASUREMENTS.append(
+            (
+                m_tag,
+                m_data,
+            )
+        )
+        return m_data
+
     pipetting_callbacks = PipettingCallbacks(
         on_submerging=_no_op,
         on_mixing=_no_op,
@@ -287,6 +299,9 @@ def _run_trial(
     photoplate_preped_vol = max(target_volume - volume_to_dispense, 0)
 
     _setup_dye(volume_to_dispense, cfg)
+
+    print(test_report)
+    _record_measurement_and_store(MeasurementType.INIT)
     pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
     if do_jog:
         _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
@@ -299,7 +314,6 @@ def _run_trial(
         print(
             f"software thinks there is {reservoir_volume} uL of liquid in the reservoir"
         )
-
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         ctx,
@@ -316,6 +330,7 @@ def _run_trial(
         mix=mix,
     )
 
+    _record_measurement_and_store(MeasurementType.ASPIRATE)
     for i in range(num_dispenses):
 
         for w in dest.wells():
@@ -341,6 +356,7 @@ def _run_trial(
         if cfg.touch_tip:
             ui.get_user_ready("ready")
             pipette.touch_tip(speed=30)
+        _record_measurement_and_store(MeasurementType.DISPENSE)
         pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
         if ((i+1) == num_dispenses):
             _drop_tip(ctx, pipette, cfg)
@@ -481,6 +497,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
 
                 _run_trial(
                     ctx=ctx,
+                    test_report=test_report,
                     pipette=pipette,
                     source=reservoir["A1"],
                     dest=photoplate,
@@ -513,3 +530,4 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         hw_api = ctx._core.get_hardware()
         hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])  # disengage xy axis
     ui.print_title("RESULTS")
+    print(test_report)
