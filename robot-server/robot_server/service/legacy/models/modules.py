@@ -1,5 +1,6 @@
 import typing
 from pydantic import BaseModel, Field
+from opentrons.drivers.rpi_drivers.types import PortGroup
 
 
 class TemperatureModuleLiveData(BaseModel):
@@ -94,13 +95,24 @@ ModuleLiveData = typing.Union[
 
 
 class PhysicalPort(BaseModel):
-    hub: typing.Optional[int] = Field(
+    hub: bool = Field(
         ...,
-        description="A physical USB external hub that is"
-        "connected to the raspberry pi",
+        description="If a physical USB external hub is"
+        " connected to the raspberry pi",
     )
-    port: typing.Optional[int] = Field(
-        ..., description="The physical port that a module is" "connected to."
+    port: int = Field(
+        ...,
+        description="The USB port the module is plugged into."
+        " If connected via a hub, ``port`` represents the port the hub is plugged into.",
+    )
+    port_group: PortGroup = Field(
+        ...,
+        description="The physical USB port bank the module is plugged into.",
+    )
+    hub_port: typing.Optional[int] = Field(
+        ...,
+        description="If the module is connected via a USB hub,"
+        " the port on the hub the module is plugged into.",
     )
 
 
