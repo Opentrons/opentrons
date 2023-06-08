@@ -286,9 +286,9 @@ def _run_trial(
     target_volume, volume_to_dispense, num_dispenses = _dispense_volumes(volume)
     photoplate_preped_vol = max(target_volume - volume_to_dispense, 0)
 
+    _setup_dye(volume_to_dispense, cfg)
     pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
     if do_jog:
-        _setup_dye(volume_to_dispense, cfg)
         _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
         height_below_top = source.depth - _liquid_height
         print(f"liquid is {height_below_top} mm below top of reservoir")
@@ -342,9 +342,11 @@ def _run_trial(
             ui.get_user_ready("ready")
             pipette.touch_tip(speed=30)
         pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
-        pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))
+        if ((i+1) == num_dispenses):
+            _drop_tip(ctx, pipette, cfg)
+        else:
+            pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))
         ui.get_user_ready("Cover and replace the photoplate in slot 3")
-    _drop_tip(ctx, pipette, cfg)
     return
 
 
