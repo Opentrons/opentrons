@@ -40,10 +40,19 @@ index 89696c5b2a..63fdb32bdc 100644
          OT3AxisKind.X: 10,
          OT3AxisKind.Y: 10,
 -        OT3AxisKind.Z: 5,
-+        OT3AxisKind.Z: 20,
++        OT3AxisKind.Z: 15,
          OT3AxisKind.P: 5,
          OT3AxisKind.Z_G: 10,
          OT3AxisKind.Q: 5,
+@@ -176,7 +176,7 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
+     high_throughput={
+         OT3AxisKind.X: 1.4,
+         OT3AxisKind.Y: 1.4,
+-        OT3AxisKind.Z: 1.4,
++        OT3AxisKind.Z: 1.5,
+         OT3AxisKind.P: 2.2,
+         OT3AxisKind.Z_G: 0.67,
+         OT3AxisKind.Q: 1.5,
 diff --git a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
 index 5f96add2a4..047dc58add 100644
 --- a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
