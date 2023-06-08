@@ -42,13 +42,13 @@ interface StopButtonProps {
   onStop?: () => void
   /** default size 12.5rem */
   buttonSize?: string
-  /** default size 10rem */
+  /** default size 5rem */
   iconSize?: string
 }
 export function StopButton({
   onStop,
   buttonSize = '12.5rem',
-  iconSize = '10rem',
+  iconSize = '5rem',
 }: StopButtonProps): JSX.Element {
   return (
     <Btn
@@ -60,7 +60,7 @@ export function StopButton({
       onClick={onStop}
       aria-label="stop"
     >
-      <Icon name="close" color={COLORS.white} size={iconSize} />
+      <Icon name="ot-close-thick" color={COLORS.white} size={iconSize} />
     </Btn>
   )
 }

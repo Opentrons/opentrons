@@ -5,7 +5,7 @@ import re
 from pkg_resources import parse_version
 from typing import ClassVar, Mapping, Optional, cast, TypeVar
 
-from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
+from opentrons.config import IS_ROBOT, get_opentrons_path
 from opentrons.drivers.rpi_drivers.types import USBPort
 
 from ..execution_manager import ExecutionManager
@@ -76,7 +76,8 @@ class AbstractModule(abc.ABC):
         file_prefix = self.firmware_prefix()
 
         MODULE_FW_RE = re.compile(f"^{file_prefix}@v(.*)[.](hex|bin)$")
-        for fw_resource in ROBOT_FIRMWARE_DIR.iterdir():  # type: ignore
+        firmware_binaries_dir = get_opentrons_path("firmware_binaries_dir")
+        for fw_resource in firmware_binaries_dir.iterdir():
             matches = MODULE_FW_RE.search(fw_resource.name)
             if matches:
                 return BundledFirmware(version=matches.group(1), path=fw_resource)
