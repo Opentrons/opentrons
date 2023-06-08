@@ -14,7 +14,7 @@ from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position
 
 from opentrons.protocol_engine.state import StateView
 from opentrons.types import MountType, Mount, Point
-from opentrons.hardware_control.types import OT3Axis, CriticalPoint
+from opentrons.hardware_control.types import OT3Axis
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -71,7 +71,6 @@ async def test_calibration_move_to_location_implementation(
         await ot3_hardware_api.move_to(
             mount=Mount.LEFT,
             abs_position=Point(x=1, y=2, z=300),
-            critical_point=CriticalPoint.MOUNT,
         ),
         times=1,
     )
@@ -80,7 +79,6 @@ async def test_calibration_move_to_location_implementation(
         await ot3_hardware_api.move_to(
             mount=Mount.LEFT,
             abs_position=Point(x=0, y=110, z=300),
-            critical_point=CriticalPoint.MOUNT,
         ),
         times=1,
     )

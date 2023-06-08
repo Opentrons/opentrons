@@ -9,7 +9,7 @@ import logging
 from pydantic import BaseModel, Field
 
 from opentrons.types import MountType, Point, Mount
-from opentrons.hardware_control.types import OT3Axis, CriticalPoint
+from opentrons.hardware_control.types import OT3Axis
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -97,7 +97,6 @@ class MoveToMaintenancePositionImplementation(
             await ot3_api.move_to(
                 mount=Mount.LEFT,
                 abs_position=movement,
-                critical_point=CriticalPoint.MOUNT,
             )
 
         if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
