@@ -156,7 +156,7 @@ export function DeviceResetSlideout({
           borderRadius={BORDERS.borderRadiusSize1}
           padding={SPACING.spacing8}
           border={`1px solid ${COLORS.warningEnabled}`}
-          marginBottom={SPACING.spacing16}
+          marginBottom={SPACING.spacing24}
         >
           <Icon
             name="alert-circle"
