@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import reduce from 'lodash/reduce'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
@@ -18,15 +19,10 @@ import {
 } from '@opentrons/components'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
-import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { actions as navigationActions } from '../../../navigation'
 import { getNewProtocolModal } from '../../../navigation/selectors'
-import {
-  actions as fileActions,
-  selectors as loadFileSelectors,
-  NewProtocolFields,
-} from '../../../load-file'
+import { actions as fileActions, selectors as loadFileSelectors } from '../../../load-file'
 import * as labwareDefSelectors from '../../../labware-defs/selectors'
 import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
@@ -67,16 +63,10 @@ import { PipettesTile } from './PipettesTile'
 import { ModulesAndOtherTile } from './ModulesAndOtherTile'
 import { WizardHeader } from './WizardHeader'
 
-interface CreateFileFields {
-  newProtocolFields: NewProtocolFields
-  pipettes: PipetteFieldsData[]
-  modules: ModuleCreationArgs[]
-}
-
 type WizardStep = 'robotType' | 'metadata' | 'pipettes' | 'modulesAndOther'
 const WIZARD_STEPS: WizardStep[] = ['robotType', 'metadata', 'pipettes', 'modulesAndOther']
-
 export function CreateFileWizard(): JSX.Element | null {
+  const { i18n, t } = useTranslation()
   const showWizard = useSelector(getNewProtocolModal)
   const moduleRestrictionsDisabled = useSelector(featureFlagSelectors.getDisableModuleRestrictions)
   const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
@@ -129,7 +119,7 @@ export function CreateFileWizard(): JSX.Element | null {
     }
     const newProtocolFields = values.fields
 
-    if (!hasUnsavedChanges || window.confirm(i18n.t('alert.window.confirm_create_new'))) {
+    if (!hasUnsavedChanges || window.confirm(t('alert.window.confirm_create_new'))) {
       dispatch(fileActions.createNewProtocol(newProtocolFields))
       const pipettesById: Record<string, PipetteOnDeck> = pipettes.reduce(
         (acc, pipette) => ({ ...acc, [uuid()]: pipette }),
@@ -187,7 +177,7 @@ export function CreateFileWizard(): JSX.Element | null {
   }
   const wizardHeader = (
     <WizardHeader
-      title={"Create New Protocol"}
+      title={t('modal.create_file_wizard.create_new_protocol')}
       currentStep={currentStepIndex}
       totalSteps={WIZARD_STEPS.length}
       onExit={handleCancel}
@@ -209,18 +199,16 @@ export function CreateFileWizard(): JSX.Element | null {
                 setCurrentStepIndex(currentStepIndex - 1)
               }
             }}>
-              Go Back
+              {i18n.format(t('shared.go_back'), 'capitalize')}
             </SecondaryButton>
           ) : <Flex />
           }
           {currentWizardStep === 'modulesAndOther' ?
             (
-              <PrimaryButton onClick={handleSubmit}>
-                Create protocol, on to liquids
-              </PrimaryButton>
+              <PrimaryButton onClick={handleSubmit}>{t('modal.create_file_wizard.create_protocol_on_to_liquids')}</PrimaryButton>
             ) : (
               <PrimaryButton onClick={() => { setCurrentStepIndex(currentStepIndex + 1) }}>
-                Next
+                {i18n.format(t('shared.next'), 'capitalize')}
               </PrimaryButton>
             )
           }

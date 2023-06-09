@@ -72,6 +72,8 @@
   "create_file_wizard": {
     "additional_items": "Additional items",
     "add_optional_info": "Add more information, if you like (you can change this later).",
+    "create_new_protocol": "Create New Protocol",
+    "create_protocol_on_to_liquids": "Create Protocol, on to Liquids",
     "choose_robot_type": "Choose robot type",
     "name_your_protocol": "Name your protocol.*",
     "description": "Description",
