@@ -105,11 +105,11 @@ class PhysicalPort(BaseModel):
         description="The USB port the module is plugged into."
         " If connected via a hub, ``port`` represents the port the hub is plugged into.",
     )
-    port_group: PortGroup = Field(
+    portGroup: PortGroup = Field(
         ...,
         description="The physical USB port bank the module is plugged into.",
     )
-    hub_port: typing.Optional[int] = Field(
+    hubPort: typing.Optional[int] = Field(
         ...,
         description="If the module is connected via a USB hub,"
         " the port on the hub the module is plugged into.",
@@ -262,10 +262,10 @@ class Modules(BaseModel):
                                 "moduleModel": "heaterShakerModuleV1",
                                 "port": "/dev/ot_module_heatershaker1",
                                 "usbPort": {
-                                    "hub": None,
-                                    "port": None,
-                                    "port_group": None,
-                                    "hub_port": None,
+                                    "hub": False,
+                                    "port": 1,
+                                    "portGroup": 5,
+                                    "hubPort": None,
                                 },
                                 "revision": "heater-shaker_v10",
                                 "serial": "HSnnnnnn",

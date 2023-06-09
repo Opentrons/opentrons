@@ -75,8 +75,8 @@ async def test_get_modules_maps_data_and_id(
         usbPort=UsbPort(
             port=42,
             hub=False,
-            port_group=PortGroup.UNKNOWN,
-            hub_port=None,
+            portGroup=PortGroup.UNKNOWN,
+            hubPort=None,
             path="/dev/null",
         ),
         data=MagneticModuleData(

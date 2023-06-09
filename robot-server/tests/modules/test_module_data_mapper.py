@@ -110,9 +110,9 @@ def test_maps_magnetic_module_data(
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
         usbPort=UsbPort(
             port=101,
-            port_group=PortGroup.UNKNOWN,
+            portGroup=PortGroup.UNKNOWN,
             hub=False,
-            hub_port=None,
+            hubPort=None,
             path="/dev/null",
         ),
         data=expected_output_data,
@@ -170,9 +170,9 @@ def test_maps_temperature_module_data(input_model: str, input_data: LiveData) ->
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
         usbPort=UsbPort(
             port=101,
-            port_group=PortGroup.UNKNOWN,
+            portGroup=PortGroup.UNKNOWN,
             hub=False,
-            hub_port=None,
+            hubPort=None,
             path="/dev/null",
         ),
         data=TemperatureModuleData(
@@ -263,9 +263,9 @@ def test_maps_thermocycler_module_data(input_model: str, input_data: LiveData) -
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
         usbPort=UsbPort(
             port=101,
-            port_group=PortGroup.UNKNOWN,
+            portGroup=PortGroup.UNKNOWN,
             hub=False,
-            hub_port=None,
+            hubPort=None,
             path="/dev/null",
         ),
         data=ThermocyclerModuleData(
@@ -358,9 +358,9 @@ def test_maps_heater_shaker_module_data(input_model: str, input_data: LiveData) 
         moduleModel=ModuleModel(input_model),  # type: ignore[arg-type]
         usbPort=UsbPort(
             port=101,
-            port_group=PortGroup.UNKNOWN,
+            portGroup=PortGroup.UNKNOWN,
             hub=False,
-            hub_port=None,
+            hubPort=None,
             path="/dev/null",
         ),
         data=HeaterShakerModuleData(

@@ -34,7 +34,7 @@ class UsbPort(BaseModel):
         ),
     )
 
-    port_group: PortGroup = Field(
+    portGroup: PortGroup = Field(
         ...,
         description=("The physical USB port bank the module is plugged into."),
     )
@@ -44,7 +44,7 @@ class UsbPort(BaseModel):
         description=("If the module is connected via a USB hub."),
     )
 
-    hub_port: Optional[int] = Field(
+    hubPort: Optional[int] = Field(
         ...,
         description=(
             "If the module is connected via a USB hub,"

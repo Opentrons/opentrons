@@ -36,8 +36,8 @@ async def get_modules(
             usbPort=PhysicalPort(
                 hub=mod.usb_port.hub,
                 port=mod.usb_port.port_number,
-                port_group=mod.usb_port.port_group,
-                hub_port=mod.usb_port.hub_port,
+                portGroup=mod.usb_port.port_group,
+                hubPort=mod.usb_port.hub_port,
             ),
             serial=mod.device_info.get("serial"),  # type: ignore
             revision=mod.device_info.get("model"),  # type: ignore
