@@ -33,6 +33,7 @@ from .ot3utils import (
     PipetteAction,
     NODEID_SUBSYSTEM,
     motor_nodes,
+    target_to_subsystem,
 )
 
 from opentrons_hardware.firmware_bindings.constants import (
@@ -49,16 +50,16 @@ from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import (
     BoardRevision,
-    InstrumentFWInfo,
     OT3Axis,
     OT3Mount,
     OT3AxisMap,
     CurrentConfig,
     InstrumentProbeType,
     MotorStatus,
-    PipetteSubType,
     UpdateStatus,
-    OT3SubSystem,
+    UpdateState,
+    SubSystem,
+    SubSystemState,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control import status_bar
@@ -170,7 +171,16 @@ class OT3Simulator:
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
-        self._present_nodes: Set[NodeId] = set()
+        nodes = set((NodeId.head_l, NodeId.head_r, NodeId.gantry_x, NodeId.gantry_y))
+        if self._attached_instruments[OT3Mount.LEFT].get("model", None):
+            nodes.add(NodeId.pipette_left)
+        if self._attached_instruments[OT3Mount.RIGHT].get("model", None):
+            nodes.add(NodeId.pipette_right)
+        if self._attached_instruments.get(
+            OT3Mount.GRIPPER
+        ) and self._attached_instruments[OT3Mount.GRIPPER].get("model", None):
+            nodes.add(NodeId.gripper)
+        self._present_nodes = nodes
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
     @property
@@ -493,7 +503,7 @@ class OT3Simulator:
         }
 
     @property
-    def fw_version(self) -> Dict[OT3SubSystem, int]:
+    def fw_version(self) -> Dict[SubSystem, int]:
         """Get the firmware version."""
         return {
             NODEID_SUBSYSTEM[node.application_for()]: 0 for node in self._present_nodes
@@ -518,22 +528,16 @@ class OT3Simulator:
             log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
             self._update_required = value
 
-    def get_instrument_update(
-        self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
-    ) -> InstrumentFWInfo:
-        return InstrumentFWInfo(mount, False, 0, 0)
-
-    def get_update_progress(self) -> Set[UpdateStatus]:
-        return set()
-
     async def update_firmware(
         self,
-        attached_pipettes: Dict[OT3Mount, PipetteSubType],
-        nodes: Optional[Set[FirmwareTarget]] = None,
+        subsystems: Set[SubSystem],
         force: bool = False,
-    ) -> AsyncIterator[Set[UpdateStatus]]:
+    ) -> AsyncIterator[UpdateStatus]:
         """Updates the firmware on the OT3."""
-        yield set()
+        for subsystem in subsystems:
+            yield UpdateStatus(
+                subsystem=subsystem, state=UpdateState.done, progress=100
+            )
 
     def engaged_axes(self) -> OT3AxisMap[bool]:
         """Get engaged axes."""
@@ -611,19 +615,6 @@ class OT3Simulator:
         }
 
     @ensure_yield
-    async def probe_network(self) -> None:
-        nodes = set((NodeId.head_l, NodeId.head_r, NodeId.gantry_x, NodeId.gantry_y))
-        if self._attached_instruments[OT3Mount.LEFT].get("model", None):
-            nodes.add(NodeId.pipette_left)
-        if self._attached_instruments[OT3Mount.RIGHT].get("model", None):
-            nodes.add(NodeId.pipette_right)
-        if self._attached_instruments.get(
-            OT3Mount.GRIPPER
-        ) and self._attached_instruments[OT3Mount.GRIPPER].get("model", None):
-            nodes.add(NodeId.gripper)
-        self._present_nodes = nodes
-
-    @ensure_yield
     async def capacitive_probe(
         self,
         mount: OT3Mount,
@@ -654,3 +645,18 @@ class OT3Simulator:
 
     def status_bar_interface(self) -> status_bar.StatusBar:
         return status_bar.StatusBar(None)
+
+    @property
+    def subsystems(self) -> Dict[SubSystem, SubSystemState]:
+        return {
+            target_to_subsystem(target): SubSystemState(
+                ok=True,
+                current_fw_version=1,
+                next_fw_version=1,
+                fw_update_needed=False,
+                current_fw_sha="simulated",
+                pcba_revision="A1",
+                update_state=None,
+            )
+            for target in self._present_nodes
+        }

@@ -1821,6 +1821,30 @@ exports[`icons ot-close renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons ot-close-thick renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 80 80"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M80 14.2937L65.7503 0L39.718 26.141L14.2397 0.566085L0 14.8699L25.4683 40.4347L0.866062 65.1403L15.1057 79.4339L39.718 54.7283L64.8943 80L79.1339 65.7063L53.9577 40.4347L80 14.2937Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons ot-connect renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
