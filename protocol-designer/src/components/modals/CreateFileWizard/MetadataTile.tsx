@@ -1,16 +1,13 @@
 import * as React from 'react'
-import styled, {css} from 'styled-components'
+import styled from 'styled-components'
 import {  DIRECTION_COLUMN, Flex, Text, SPACING, BORDERS, TYPOGRAPHY, RadioGroup } from '@opentrons/components'
 import { i18n } from '../../../localization'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { FormikProps } from 'formik'
 import { InputField } from './InputField'
 
 import type { FormState } from './types'
 
-const ROBOT_TYPE_OPTIONS = [{ value: OT2_ROBOT_TYPE, name: 'OT2' }, { value: FLEX_ROBOT_TYPE, name: 'Opentrons Flex' }]
-
-export function RobotTypeAndMetadataTile(props: FormikProps<FormState>): JSX.Element {
+export function MetadataTile(props: FormikProps<FormState>): JSX.Element {
   const { handleChange, handleBlur, values } = props
   return (
     <Flex flexDirection={DIRECTION_COLUMN} height='32rem' gridGap={SPACING.spacing32}>
@@ -20,24 +17,8 @@ export function RobotTypeAndMetadataTile(props: FormikProps<FormState>): JSX.Ele
 
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <Text as='h4'>
-          {i18n.t('modal.create_file_wizard.choose_robot_type_and_protocol_name')}
+          {i18n.t('modal.create_file_wizard.name_your_protocol')}
         </Text>
-        <Flex flexDirection={DIRECTION_COLUMN} width="10rem" gridGap={SPACING.spacing4}>
-          <Text as="p">
-            {i18n.t('modal.create_file_wizard.robot_type')}
-          </Text>
-          <RadioGroup 
-            useBlueChecked
-            name="fields.robotType"
-            css={css`
-              ${TYPOGRAPHY.pRegular}
-              line-height: ${TYPOGRAPHY.lineHeight20};
-            `}
-            value={values.fields.robotType}
-            onChange={handleChange}
-            options={ROBOT_TYPE_OPTIONS}
-          />
-        </Flex>
         <Flex flexDirection={DIRECTION_COLUMN} width="20rem" gridGap={SPACING.spacing4}>
           <Text as="p">
             {i18n.t('modal.create_file_wizard.protocol_name')}

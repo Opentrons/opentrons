@@ -23,9 +23,6 @@ import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
 
-import styles from '../FilePipettesModal/FilePipettesModal.css'
-import modalStyles from '../modal.css'
-
 import {
   ModuleType,
   ModuleModel,
@@ -43,7 +40,6 @@ import {
   getPipetteNameSpecs
 } from '@opentrons/shared-data'
 import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
-import { ModuleFields } from '../FilePipettesModal/ModuleFields'
 
 import {
   actions as stepFormActions,
@@ -56,7 +52,8 @@ import {
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
-import { RobotTypeAndMetadataTile } from './RobotTypeAndMetadataTile'
+import { RobotTypeTile } from './RobotTypeTile'
+import { MetadataTile } from './MetadataTile'
 import { PipettesTile } from './PipettesTile'
 import { ModulesAndOtherTile } from './ModulesAndOtherTile'
 
@@ -66,8 +63,8 @@ interface CreateFileFields {
   modules: ModuleCreationArgs[]
 }
 
-type WizardStep = 'robotTypeAndMetadata' | 'pipettes' | 'modulesAndOther'
-const WIZARD_STEPS: WizardStep[] = ['robotTypeAndMetadata', 'pipettes', 'modulesAndOther']
+type WizardStep = 'robotType' | 'metadata' | 'pipettes' | 'modulesAndOther'
+const WIZARD_STEPS: WizardStep[] = ['robotType', 'metadata', 'pipettes', 'modulesAndOther']
 
 export function CreateFileWizard(): JSX.Element | null {
   const showWizard = useSelector(getNewProtocolModal)
@@ -80,10 +77,49 @@ export function CreateFileWizard(): JSX.Element | null {
   const dispatch = useDispatch()
 
   const handleCancel = (): void => { dispatch(navigationActions.toggleNewProtocolModal(false)) }
-  const handleSubmit = (fields: CreateFileFields): void => {
-    if (!hasUnsavedChanges || window.confirm(i18n.t('alert.window.confirm_create_new'))) {
+  const handleSubmit = (values: FormState): void => {
+    const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
+      values.pipettesByMount,
+      (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
+        return formPipette?.pipetteName != null &&
+          formPipette.tiprackDefURI != null &&
+          (mount === 'left' || mount === 'right')
+          ? [
+            ...acc,
+            {
+              mount,
+              name: formPipette.pipetteName as PipetteName,
+              tiprackDefURI: formPipette.tiprackDefURI,
+            },
+          ]
+          : acc
+      },
+      []
+    )
 
-      const { modules, newProtocolFields, pipettes } = fields
+    const modules: ModuleCreationArgs[] = Object.entries(values.modulesByType).reduce<
+      ModuleCreationArgs[]
+    >((acc, [moduleType, formModule]) => {
+      return formModule?.onDeck
+        ? [
+          ...acc,
+          {
+            type: moduleType as ModuleType,
+            model: formModule.model || ('' as ModuleModel),
+            slot: formModule.slot,
+          },
+        ]
+        : acc
+    }, [])
+    const heaterShakerIndex = modules.findIndex(mod => mod.type === HEATERSHAKER_MODULE_TYPE)
+    const magModIndex = modules.findIndex(mod => mod.type === MAGNETIC_MODULE_TYPE)
+    if (heaterShakerIndex > -1 && magModIndex > -1) {
+      // if both are present, move the Mag mod to slot 9, since both can't be in slot 1
+      modules[magModIndex].slot = '9'
+    }
+    const newProtocolFields = values.fields
+
+    if (!hasUnsavedChanges || window.confirm(i18n.t('alert.window.confirm_create_new'))) {
       dispatch(fileActions.createNewProtocol(newProtocolFields))
       const pipettesById: Record<string, PipetteOnDeck> = pipettes.reduce(
         (acc, pipette) => ({ ...acc, [uuid()]: pipette }),
@@ -154,9 +190,10 @@ export function CreateFileWizard(): JSX.Element | null {
         <CreateFileForm
           moduleRestrictionsDisabled={moduleRestrictionsDisabled}
           currentWizardStep={currentWizardStep}
+          handleSubmit={handleSubmit}
         />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-          {currentWizardStep !== 'robotTypeAndMetadata' ? (
+          {currentWizardStep !== 'robotType' ? (
             <SecondaryButton onClick={() => {
               if (currentStepIndex > 0) {
                 setCurrentStepIndex(currentStepIndex - 1)
@@ -281,58 +318,16 @@ const validationSchema = Yup.object().shape({
 interface CreateFileFormProps {
   moduleRestrictionsDisabled?: boolean | null
   currentWizardStep: WizardStep
+  handleSubmit: (values: FormState) => void
 }
 
-
 function CreateFileForm(props: CreateFileFormProps): JSX.Element {
-  const { moduleRestrictionsDisabled, currentWizardStep } = props
+  const { moduleRestrictionsDisabled, currentWizardStep, handleSubmit } = props
   const contentsByWizardStep: { [wizardStep in WizardStep]: (formikProps: FormikProps<FormState>) => JSX.Element } = {
-    robotTypeAndMetadata: (formikProps: FormikProps<FormState>) => <RobotTypeAndMetadataTile {...formikProps} />,
+    robotType: (formikProps: FormikProps<FormState>) => <RobotTypeTile {...formikProps} />,
+    metadata: (formikProps: FormikProps<FormState>) => <MetadataTile {...formikProps} />,
     pipettes: (formikProps: FormikProps<FormState>) => <PipettesTile {...formikProps} />,
     modulesAndOther: (formikProps: FormikProps<FormState>) => <ModulesAndOtherTile {...formikProps} />,
-  }
-
-  const handleSubmit = (values: FormState): void => {
-    const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
-      values.pipettesByMount,
-      (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
-        return formPipette?.pipetteName != null &&
-          formPipette.tiprackDefURI != null &&
-          (mount === 'left' || mount === 'right')
-          ? [
-            ...acc,
-            {
-              mount,
-              name: formPipette.pipetteName as PipetteName,
-              tiprackDefURI: formPipette.tiprackDefURI,
-            },
-          ]
-          : acc
-      },
-      []
-    )
-
-    const modules: ModuleCreationArgs[] = Object.entries(values.modulesByType).reduce<
-      ModuleCreationArgs[]
-    >((acc, [moduleType, formModule]) => {
-      return formModule?.onDeck
-        ? [
-          ...acc,
-          {
-            type: moduleType as ModuleType,
-            model: formModule.model || ('' as ModuleModel),
-            slot: formModule.slot,
-          },
-        ]
-        : acc
-    }, [])
-    const heaterShakerIndex = modules.findIndex(mod => mod.type === HEATERSHAKER_MODULE_TYPE)
-    const magModIndex = modules.findIndex(mod => mod.type === MAGNETIC_MODULE_TYPE)
-    if (heaterShakerIndex > -1 && magModIndex > -1) {
-      // if both are present, move the Mag mod to slot 9, since both can't be in slot 1
-      modules[magModIndex].slot = '9'
-    }
-    onSave({ modules, newProtocolFields: values.fields, pipettes })
   }
 
   const getCrashableModuleSelected = (
@@ -347,7 +342,6 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
 
     return crashableModuleOnDeck
   }
-
 
   return (
     <Formik
@@ -409,11 +403,9 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
                 ? modCrashWarning
                 : null
             }
-
           </form>
         )
       }}
-
     </Formik>
   )
 }

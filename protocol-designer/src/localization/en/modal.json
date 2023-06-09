@@ -72,7 +72,8 @@
   "create_file_wizard": {
     "additional_items": "Additional items",
     "add_optional_info": "Add more information, if you like (you can change this later).",
-    "choose_robot_type_and_protocol_name": "Choose robot type and name your protocol.*",
+    "choose_robot_type": "Choose robot type",
+    "name_your_protocol": "Name your protocol.*",
     "description": "Description",
     "organization_or_author": "Organization/Author",
     "pipettes": "Pipettes",
