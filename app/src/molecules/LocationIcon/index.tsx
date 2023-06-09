@@ -13,7 +13,6 @@ import {
 import { StyledText } from '../../atoms/text'
 
 import type { IconName } from '@opentrons/components'
-import { fontWeightBold } from '@opentrons/components/src/ui-style-constants/typography'
 
 interface LocationIconProps {
   /** name constant of the slot to display */
@@ -22,7 +21,10 @@ interface LocationIconProps {
   iconName?: IconName
 }
 
-export function LocationIcon({ slotName, iconName }: LocationIconProps) {
+export function LocationIcon({
+  slotName,
+  iconName,
+}: LocationIconProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -34,7 +36,7 @@ export function LocationIcon({ slotName, iconName }: LocationIconProps) {
       data-testid={
         slotName != null
           ? `LocationIcon_${slotName}`
-          : `LocationIcon_${iconName}`
+          : `LocationIcon_${String(iconName)}`
       }
     >
       {iconName != null ? (
