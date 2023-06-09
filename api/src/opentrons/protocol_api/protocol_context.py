@@ -338,6 +338,10 @@ class ProtocolContext(CommandPublisher):
         :param version: The version of the labware definition. You should normally
             leave this unspecified to let the implementation choose a good default.
         """
+        if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
+            raise APIVersionError(
+                "Loading a labware off deck is supported at apiLevel 2.15 and higher."
+            )
         load_name = validation.ensure_lowercase_name(load_name)
         load_location: Union[OffDeckType, DeckSlotName]
         if isinstance(location, OffDeckType):

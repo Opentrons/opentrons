@@ -508,7 +508,7 @@ class ProtocolCore(
 
     def get_labware_location(
         self, labware_core: LabwareCore
-    ) -> Union[str, ModuleCore, NonConnectedModuleCore, None]:
+    ) -> Union[str, ModuleCore, NonConnectedModuleCore, OffDeckType]:
         """Get labware parent location."""
         labware_location = self._engine_client.state.labware.get_location(
             labware_core.labware_id
@@ -519,4 +519,5 @@ class ProtocolCore(
             )
         elif isinstance(labware_location, ModuleLocation):
             return self._module_cores_by_id.get(labware_location.moduleId)
-        return None
+
+        return OffDeckType.OFF_DECK

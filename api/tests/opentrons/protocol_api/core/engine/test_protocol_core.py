@@ -345,18 +345,6 @@ def test_load_labware_off_deck(
         )
     )
 
-    decoy.when(
-        mock_engine_client.state.geometry.get_slot_item(
-            slot_name=DeckSlotName.SLOT_5,
-            allowed_labware_ids={"fixed-trash-123", "abc123"},
-            allowed_module_ids=set(),
-        )
-    ).then_return(
-        LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
-    )
-
-    assert subject.get_slot_item(DeckSlotName.SLOT_5) is result
-
 
 @pytest.mark.parametrize(
     argnames=["use_gripper", "expected_strategy"],
@@ -1142,4 +1130,4 @@ def test_get_labware_location_off_deck(
         engine_client=mock_engine_client,
     )
 
-    assert subject.get_labware_location(labware) is None
+    assert subject.get_labware_location(labware) is OFF_DECK

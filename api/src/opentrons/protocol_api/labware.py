@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple, cast
 from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
 
 from opentrons.types import Location, Point
+from ._types import OffDeckType
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version, APIVersionError
 
@@ -341,12 +342,12 @@ class Labware:
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def parent(self) -> Union[str, ModuleTypes, None]:
+    def parent(self) -> Union[str, ModuleTypes, OffDeckType]:
         """The parent of this labware.
 
         If the labware is on the deck, a `str` deck slot name will be returned.
         If on a module, the parent :py:class:`ModuleContext` will be returned.
-        If off deck, `None` will be returned.
+        If off deck, `off-deck` will be returned.
 
         .. versionchanged:: 2.14
             Return type for module parent changed to :py:class:`ModuleContext`.

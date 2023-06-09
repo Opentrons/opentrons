@@ -292,6 +292,24 @@ def test_load_labware_off_deck(
     decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_load_labware_off_deck_raises(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: ProtocolContext,
+) -> None:
+    """It should raise and api error."""
+    with pytest.raises(APIVersionError):
+        subject.load_labware(
+            load_name="UPPERCASE_LABWARE",
+            label="some_display_name",
+            namespace="some_namespace",
+            version=1337,
+            location=OFF_DECK,
+        )
+
+
 def test_load_labware_from_definition(
     decoy: Decoy,
     mock_core: ProtocolCore,
