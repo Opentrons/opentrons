@@ -467,12 +467,19 @@ class SyncClient:
         return cast(commands.thermocycler.SetTargetLidTemperatureResult, result)
 
     def thermocycler_set_target_block_temperature(
-        self, module_id: str, celsius: float, block_max_volume: Optional[float]
+        self,
+        module_id: str,
+        celsius: float,
+        block_max_volume: Optional[float],
+        hold_time_seconds: Optional[float],
     ) -> commands.thermocycler.SetTargetBlockTemperatureResult:
         """Execute a `thermocycler/setTargetLidTemperature` command and return the result."""
         request = commands.thermocycler.SetTargetBlockTemperatureCreate(
             params=commands.thermocycler.SetTargetBlockTemperatureParams(
-                moduleId=module_id, celsius=celsius, blockMaxVolumeUl=block_max_volume
+                moduleId=module_id,
+                celsius=celsius,
+                blockMaxVolumeUl=block_max_volume,
+                holdTimeSeconds=hold_time_seconds,
             )
         )
         result = self._transport.execute_command(request=request)

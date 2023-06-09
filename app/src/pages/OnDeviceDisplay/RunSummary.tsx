@@ -255,6 +255,10 @@ export function RunSummary(): JSX.Element {
                   onClick={handleViewErrorDetails}
                   buttonText={t('view_error_details')}
                   height="17rem"
+                  disabled={
+                    runRecord?.data.errors == null ||
+                    runRecord?.data.errors.length === 0
+                  }
                 />
               ) : null}
             </Flex>

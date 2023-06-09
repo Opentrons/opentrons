@@ -4,6 +4,12 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
+# Internal Release 0.12.0
+
+## New Stuff In This Release
+
+- If your Python protocol specifies a Flex-style slot name like `"C2"`, its `apiLevel` must now be `2.15`.
+
 # Internal Release 0.11.0
 
 This is internal release 0.11.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.

@@ -19,3 +19,10 @@ comment:
 flag_management:
   default_rules:
     carryforward: true
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 10

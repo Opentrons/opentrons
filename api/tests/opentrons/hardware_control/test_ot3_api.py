@@ -43,8 +43,9 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     LiquidNotFound,
     EarlyLiquidSenseTrigger,
-    OT3SubSystem,
+    SubSystem,
     GripperJawState,
+    StatusBarState,
 )
 from opentrons.hardware_control.errors import (
     GripperNotAttachedError,
@@ -1590,21 +1591,21 @@ async def test_light_settings(
     "versions,version_str",
     [
         ({}, "unknown"),
-        ({OT3SubSystem.pipette_right: 2}, "2"),
+        ({SubSystem.pipette_right: 2}, "2"),
         (
             {
-                OT3SubSystem.pipette_left: 2,
-                OT3SubSystem.gantry_x: 2,
-                OT3SubSystem.gantry_y: 2,
+                SubSystem.pipette_left: 2,
+                SubSystem.gantry_x: 2,
+                SubSystem.gantry_y: 2,
             },
             "2",
         ),
-        ({OT3SubSystem.gripper: 3, OT3SubSystem.head: 1}, "1, 3"),
+        ({SubSystem.gripper: 3, SubSystem.head: 1}, "1, 3"),
     ],
 )
 def test_fw_version(
     ot3_hardware: ThreadManager[OT3API],
-    versions: Dict[OT3SubSystem, int],
+    versions: Dict[SubSystem, int],
     version_str: str,
 ) -> None:
     with patch(
@@ -1613,3 +1614,30 @@ def test_fw_version(
     ) as mock_fw_version:
         mock_fw_version.return_value = versions
         assert ot3_hardware.get_fw_version() == version_str
+
+
+@pytest.mark.parametrize(argnames=["enabled"], argvalues=[[True], [False]])
+async def test_status_bar_interface(
+    ot3_hardware: ThreadManager[OT3API],
+    enabled: bool,
+) -> None:
+    """Test setting status bar statuses and make sure the cached status is correct."""
+    await ot3_hardware.set_status_bar_enabled(enabled)
+
+    settings = {
+        StatusBarState.IDLE: StatusBarState.IDLE,
+        StatusBarState.RUNNING: StatusBarState.RUNNING,
+        StatusBarState.PAUSED: StatusBarState.PAUSED,
+        StatusBarState.HARDWARE_ERROR: StatusBarState.HARDWARE_ERROR,
+        StatusBarState.SOFTWARE_ERROR: StatusBarState.SOFTWARE_ERROR,
+        StatusBarState.CONFIRMATION: StatusBarState.IDLE,
+        StatusBarState.RUN_COMPLETED: StatusBarState.RUN_COMPLETED,
+        StatusBarState.UPDATING: StatusBarState.UPDATING,
+        StatusBarState.ACTIVATION: StatusBarState.IDLE,
+        StatusBarState.DISCO: StatusBarState.IDLE,
+        StatusBarState.OFF: StatusBarState.OFF,
+    }
+
+    for setting, response in settings.items():
+        await ot3_hardware.set_status_bar_state(state=setting)
+        assert ot3_hardware.get_status_bar_state() == response

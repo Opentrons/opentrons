@@ -3,7 +3,9 @@ from dataclasses import dataclass
 from typing import Iterator, List, Mapping, Optional, Tuple, Union
 
 from opentrons_shared_data.deck.dev_types import SlotDefV3
+
 from opentrons.motion_planning import adjacent_slots_getters
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckLocation, DeckSlotName, Location, Point
 
 from .core.common import ProtocolCore
@@ -31,9 +33,9 @@ class CalibrationPosition:
     displayName: str
 
 
-def _get_slot_name(slot_key: DeckLocation) -> DeckSlotName:
+def _get_slot_name(slot_key: DeckLocation, api_version: APIVersion) -> DeckSlotName:
     try:
-        return validation.ensure_deck_slot(slot_key)
+        return validation.ensure_deck_slot(slot_key, api_version)
     except (TypeError, ValueError) as error:
         raise KeyError(str(error)) from error
 
@@ -44,9 +46,15 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     Accessible via :py:meth:`ProtocolContext.deck`.
     """
 
-    def __init__(self, protocol_core: ProtocolCore, core_map: LoadedCoreMap) -> None:
+    def __init__(
+        self,
+        protocol_core: ProtocolCore,
+        core_map: LoadedCoreMap,
+        api_version: APIVersion,
+    ) -> None:
         self._protocol_core = protocol_core
         self._core_map = core_map
+        self._api_version = api_version
 
         deck_locations = protocol_core.get_deck_definition()["locations"]
 
@@ -68,7 +76,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
 
     def __getitem__(self, key: DeckLocation) -> Optional[DeckItem]:
         """Get the item, if any, located in a given slot."""
-        slot_name = _get_slot_name(key)
+        slot_name = _get_slot_name(key, self._api_version)
         item_core = self._protocol_core.get_slot_item(slot_name)
         item = self._core_map.get(item_core)
 
@@ -85,7 +93,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def right_of(self, slot: DeckLocation) -> Optional[DeckItem]:
         """Get the item directly to the right of the given slot, if any."""
-        slot_name = _get_slot_name(slot)
+        slot_name = _get_slot_name(slot, self._api_version)
         east_slot = adjacent_slots_getters.get_east_slot(slot_name.as_int())
 
         return self[east_slot] if east_slot is not None else None
@@ -93,7 +101,7 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def left_of(self, slot: DeckLocation) -> Optional[DeckItem]:
         """Get the item directly to the left of the given slot, if any."""
-        slot_name = _get_slot_name(slot)
+        slot_name = _get_slot_name(slot, self._api_version)
         west_slot = adjacent_slots_getters.get_west_slot(slot_name.as_int())
 
         return self[west_slot] if west_slot is not None else None
@@ -112,14 +120,14 @@ class Deck(Mapping[DeckLocation, Optional[DeckItem]]):
     def get_slot_definition(self, slot: DeckLocation) -> SlotDefV3:
         """Get the geometric definition data of a slot."""
         slot_name = validation.ensure_deck_slot_string(
-            _get_slot_name(slot), self._protocol_core.robot_type
+            _get_slot_name(slot, self._api_version), self._protocol_core.robot_type
         )
         return self._slot_definitions_by_name[slot_name]
 
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
     def get_slot_center(self, slot: DeckLocation) -> Point:
         """Get the absolute coordinates of a slot's center."""
-        slot_name = _get_slot_name(slot)
+        slot_name = _get_slot_name(slot, self._api_version)
         return self._protocol_core.get_slot_center(slot_name)
 
     # todo(mm, 2023-05-08): This may be internal and removable from this public class. Jira RSS-236.
