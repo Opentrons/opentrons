@@ -4,10 +4,7 @@ import pytest
 from decoy import Decoy
 from typing_extensions import Final
 
-from opentrons.calibration_storage.ot3.models.v1 import (
-    CalibrationStatus,
-    ModuleOffsetModel,
-)
+from opentrons.calibration_storage.ot3.models.v1 import CalibrationStatus
 from opentrons.calibration_storage.types import SourceType
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
