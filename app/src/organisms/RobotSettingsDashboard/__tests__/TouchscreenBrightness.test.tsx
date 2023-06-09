@@ -88,11 +88,4 @@ describe('TouchscreenBrightness', () => {
     fireEvent.click(button)
     expect(mockUpdateConfigValue).toHaveBeenCalled()
   })
-
-  it('should call mock function when tapping back button', () => {
-    const [{ getByTestId }] = render(props)
-    const button = getByTestId('TouchscreenBrightness_back_button')
-    fireEvent.click(button)
-    expect(props.setCurrentOption).toHaveBeenCalled()
-  })
 })

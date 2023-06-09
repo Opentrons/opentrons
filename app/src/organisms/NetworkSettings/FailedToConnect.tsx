@@ -15,41 +15,34 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
-import { DISCONNECT } from '../Devices/RobotSettings/ConnectNetwork/constants'
 
+import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import type { RequestState } from '../../redux/robot-api/types'
-import type {
-  NetworkChangeType,
-  NetworkChangeState,
-} from '../Devices/RobotSettings/ConnectNetwork/types'
 
 interface FailedToConnectProps {
-  ssid: string
-  requestState?: RequestState
-  type: NetworkChangeType | null
-  onConnect: () => void
-  setChangeState: (changeState: NetworkChangeState) => void
-  setCurrentRequestState: (currentState: RequestState | null) => void
+  selectedSsid: string
+  requestState: RequestState | null
+  handleConnect: () => void
+  setCurrentOption: SetSettingOption
 }
 
 export function FailedToConnect({
-  ssid,
+  selectedSsid,
   requestState,
-  type,
-  onConnect,
-  setChangeState,
-  setCurrentRequestState,
+  setCurrentOption,
+  handleConnect,
 }: FailedToConnectProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  const isInvalidPassword = !(type === DISCONNECT)
+  // TODO(bh, 2023-6-9): parse the error/failed request
+  // const isInvalidPassword = !(type === DISCONNECT)
+  const isInvalidPassword = true
 
   const handleClickTryAgain = (): void => {
     if (isInvalidPassword) {
-      // Display SetWifiCred screen
-      setCurrentRequestState(null)
+      setCurrentOption('RobotSettingsSetWifiCred')
     } else {
       // Try to reconnect
-      onConnect()
+      handleConnect()
     }
   }
 
@@ -97,8 +90,8 @@ export function FailedToConnect({
                 marginTop={SPACING.spacing40}
               >
                 {isInvalidPassword
-                  ? t('incorrect_password_for_ssid', { ssid: ssid })
-                  : t('failed_to_connect_to_ssid', { ssid: ssid })}
+                  ? t('incorrect_password_for_ssid', { ssid: selectedSsid })
+                  : t('failed_to_connect_to_ssid', { ssid: selectedSsid })}
               </StyledText>
               {!isInvalidPassword &&
                 requestState != null &&
@@ -118,7 +111,7 @@ export function FailedToConnect({
             flex="1"
             buttonType="secondary"
             buttonText={t('change_network')}
-            onClick={() => setChangeState({ type: null })}
+            onClick={() => setCurrentOption('RobotSettingsWifi')}
           />
           <MediumButton
             flex="1"

@@ -23,13 +23,9 @@ import {
 import { StyledText } from '../../atoms/text'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { DisplaySearchNetwork } from './DisplaySearchNetwork'
-import {
-  CONNECT,
-  JOIN_OTHER,
-} from '../Devices/RobotSettings/ConnectNetwork/constants'
 
+import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import type { WifiNetwork } from '../../redux/networking/types'
-import type { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
 
 const NETWORK_ROW_STYLE = css`
   &:hover {
@@ -58,27 +54,24 @@ const NETWORK_ROW_STYLE = css`
 
 interface DisplayWifiListProps {
   list: WifiNetwork[]
-  setShowSelectAuthenticationType: (
-    isShowSelectAuthenticationType: boolean
-  ) => void
-  setChangeState: (changeState: NetworkChangeState) => void
+  onClickSsid: () => void
+  setCurrentOption: SetSettingOption
   setSelectedSsid: (selectedSsid: string) => void
   isHeader?: boolean
 }
 
 export function DisplayWifiList({
   list,
-  setShowSelectAuthenticationType,
-  setChangeState,
+  onClickSsid,
+  setCurrentOption,
   setSelectedSsid,
   isHeader = false,
 }: DisplayWifiListProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   const handleClick = (nw: WifiNetwork): void => {
-    setShowSelectAuthenticationType(true)
     setSelectedSsid(nw.ssid)
-    setChangeState({ type: CONNECT, ssid: nw.ssid, network: nw })
+    onClickSsid()
   }
 
   return (
@@ -108,7 +101,9 @@ export function DisplayWifiList({
         : null}
       <Btn
         display="flex"
-        onClick={() => setChangeState({ type: JOIN_OTHER, ssid: null })}
+        onClick={() => {
+          setCurrentOption('RobotSettingsJoinOtherNetwork')
+        }}
         height="5rem"
         backgroundColor={COLORS.light1}
         borderRadius={BORDERS.borderRadiusSize4}
