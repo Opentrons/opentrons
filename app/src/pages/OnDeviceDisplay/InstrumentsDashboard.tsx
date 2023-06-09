@@ -6,7 +6,6 @@ import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import { Navigation } from '../../organisms/Navigation'
 import { AttachedInstrumentMountItem } from '../../organisms/InstrumentMountItem'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
-import { get96ChannelFromModel } from '../../organisms/InstrumentInfo/utils'
 
 export const InstrumentsDashboard = (): JSX.Element => {
   const { data: attachedInstruments } = useInstrumentsQuery()
@@ -16,9 +15,10 @@ export const InstrumentsDashboard = (): JSX.Element => {
     | null
   >(null)
 
-  const instrument =
-    (attachedInstruments?.data ?? []).find(i => i.instrumentModel) ?? null
-  const isNinetySixChannel = get96ChannelFromModel(instrument?.instrumentModel)
+  const leftInstrument =
+    (attachedInstruments?.data ?? []).find(i => i.mount === 'left') ?? null
+  // @ts-expect-error mount is a type narrower that ensures channels will exist
+  const isNinetySixChannel = leftInstrument?.data?.channels === 96
 
   return (
     <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>

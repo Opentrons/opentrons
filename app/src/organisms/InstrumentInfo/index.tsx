@@ -23,7 +23,6 @@ import { FLOWS } from '../PipetteWizardFlows/constants'
 import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { formatTimestamp } from '../Devices/utils'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
-import { get96ChannelFromModel } from './utils'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
@@ -54,7 +53,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       setWizardProps(null)
     },
   }
-  const is96Channel = get96ChannelFromModel(instrument?.instrumentModel)
+  const is96Channel =
+    // @ts-expect-error the mount acts as a type narrower here
+    instrument.mount !== 'extension' && instrument.data?.channels === 96
 
   const handleDetach: React.MouseEventHandler = () => {
     setODDMaintenanceFlowInProgress()
@@ -92,10 +93,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
                 setWizardProps(null)
               },
               mount: instrument.mount as PipetteMount,
-              selectedPipette:
-                instrument.instrumentModel === 'p1000_96'
-                  ? NINETY_SIX_CHANNEL
-                  : SINGLE_MOUNT_PIPETTES,
+              selectedPipette: is96Channel
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
               flowType: FLOWS.CALIBRATE,
             }
       )
