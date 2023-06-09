@@ -150,7 +150,7 @@ class OpentronsHTTPAPI:
         self._pipette_id = res.json()["data"]["result"]["pipetteId"]
         return self._pipette_id  # type: ignore
 
-    def load_module(self, model: str, slot: int) -> str:
+    def load_module(self, model: str, slot: str) -> str:
         """Load a module for the current run, returns the module_id."""
         if self._run_id is None:
             raise RuntimeError("Need an active run to load module.")

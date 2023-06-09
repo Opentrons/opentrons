@@ -29,7 +29,7 @@ class ModuleCalibrationData(BaseModel):
     """A module's calibration data."""
 
     offset: Vec3f
-    slot: Optional[int] = None
+    slot: Optional[str] = None
     source: Optional[SourceType] = None
     last_modified: Optional[datetime] = None
 

@@ -102,7 +102,7 @@ async def test_get_modules_maps_data_and_id(
     )
 
     calibration_offset = module_calibration.ModuleCalibrationOffset(
-        slot=1,
+        slot="D3",
         offset=Point(x=0, y=0, z=0),
         module=ModuleType.MAGNETIC,
         module_id="serial-number",
