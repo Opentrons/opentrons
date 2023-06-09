@@ -16,7 +16,7 @@ from opentrons_shared_data.pipette.dev_types import (
     ChannelCount,
 )
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
-
+from robot_server.subsystems.models import SubSystem
 
 InstrumentModelT = TypeVar(
     "InstrumentModelT", bound=Union[GripperModelStr, PipetteModel]
@@ -34,8 +34,14 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
         ..., description="Type of instrument- either a pipette or a gripper."
     )
     instrumentModel: InstrumentModelT = Field(..., description="Instrument model.")
-    # TODO (spp, 2023-01-06): add firmware version field
     serialNumber: str = Field(..., description="Instrument hardware serial number.")
+    subsystem: Optional[SubSystem] = Field(
+        None,
+        description="The subsystem corresponding to this instrument.",
+    )
+    ok: Literal[True] = Field(
+        ..., description="Whether this instrument is OK and ready to go"
+    )
     data: InstrumentDataT
 
 
@@ -89,4 +95,35 @@ class Gripper(_GenericInstrument[GripperModelStr, GripperData]):
     data: GripperData
 
 
-AttachedInstrument = Union[Pipette, Gripper]
+class _BadInstrument(BaseModel):
+    """Represents something that is physically connected but broken in some way. Must be updated."""
+
+    subsystem: SubSystem = Field(
+        ..., description="The hardware subsystem for this instrument"
+    )
+    status: str = Field(
+        ...,
+        description="A route on this server to more information about the status of the hardware",
+    )
+    update: str = Field(
+        ..., description="A route on this server to begin an update of the instrument"
+    )
+    ok: Literal[False] = Field(
+        ...,
+        description="If the instrument is not OK, a previous update was interrupted. It must be updated again.",
+    )
+
+
+class BadGripper(_BadInstrument):
+    """Represents a gripper that is physically connected but not ready to operate."""
+
+    instrumentType: Literal["gripper"] = "gripper"
+
+
+class BadPipette(_BadInstrument):
+    """Represents a pipette that is physically connected but not ready to operate."""
+
+    instrumentType: Literal["pipette"] = "pipette"
+
+
+AttachedItem = Union[Pipette, Gripper, BadPipette, BadGripper]
