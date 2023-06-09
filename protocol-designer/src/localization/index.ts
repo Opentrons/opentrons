@@ -1,4 +1,5 @@
 import i18next from 'i18next'
+import { initReactI18next } from 'react-i18next'
 import { en } from './en'
 // TODO(IL, 2020-06-08): use a proper type def for i18next module -- but flow-types seems wrong
 interface I18n {
@@ -8,7 +9,7 @@ interface I18n {
   ) => string
 }
 // @ts-expect-error missing property t
-export const i18n: I18n = i18next.init(
+export const i18n: I18n = i18next.use(initReactI18next).init(
   {
     lng: 'en',
     resources: {

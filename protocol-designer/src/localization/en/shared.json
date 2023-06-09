@@ -1,4 +1,4 @@
 {
   "exit": "exit",
-  "step": "step"
+  "step": "Step {{current}} / {{max}}"
 }

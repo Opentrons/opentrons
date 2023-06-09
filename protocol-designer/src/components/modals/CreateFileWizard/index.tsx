@@ -6,7 +6,16 @@ import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
 import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
-import { ALIGN_CENTER, ALIGN_STRETCH, DIRECTION_COLUMN, DropdownField, Flex, FormGroup, InputField, JUSTIFY_SPACE_BETWEEN, ModalShell, OutlineButton, PrimaryButton, SPACING, SecondaryButton, WizardHeader } from '@opentrons/components'
+import {
+  ALIGN_CENTER,
+  DIRECTION_COLUMN,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  ModalShell,
+  PrimaryButton,
+  SPACING,
+  SecondaryButton,
+} from '@opentrons/components'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
 import { i18n } from '../../../localization'
@@ -56,6 +65,7 @@ import { RobotTypeTile } from './RobotTypeTile'
 import { MetadataTile } from './MetadataTile'
 import { PipettesTile } from './PipettesTile'
 import { ModulesAndOtherTile } from './ModulesAndOtherTile'
+import { WizardHeader } from './WizardHeader'
 
 interface CreateFileFields {
   newProtocolFields: NewProtocolFields
