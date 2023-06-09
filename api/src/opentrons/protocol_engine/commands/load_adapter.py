@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from ..errors import LabwareDefinitionIsNotAdapter
+from ..errors import LabwareDefinitionIsNotAdapterError
 from ..resources import labware_validation
 from ..types import AdapterLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
@@ -96,7 +96,7 @@ class LoadAdapterImplementation(
         if not labware_validation.validate_definition_is_adapter(
             loaded_labware.definition
         ):
-            raise LabwareDefinitionIsNotAdapter(
+            raise LabwareDefinitionIsNotAdapterError(
                 f"{params.loadName} is not defined as an adapter"
             )
 

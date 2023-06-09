@@ -67,11 +67,11 @@ class LabwareDefinitionDoesNotExistError(ProtocolEngineError):
     """Raised when referencing a labware definition that does not exist."""
 
 
-class LabwareDefinitionIsNotLabware(ProtocolEngineError):
+class LabwareDefinitionIsNotLabwareError(ProtocolEngineError):
     """Raised when trying to load a labware via loadLabware that is not a labware."""
 
 
-class LabwareDefinitionIsNotAdapter(ProtocolEngineError):
+class LabwareDefinitionIsNotAdapterError(ProtocolEngineError):
     """Raised when trying to load an adapter via loadAdapter that is not an adapter."""
 
 
