@@ -9,11 +9,11 @@ from urllib.request import Request, urlopen
 
 from opentrons import protocol_api, execute, simulate
 
-from photometric_ot2 import config
-from photometric_ot2.pipetting import liquid_level, motions
-from photometric_ot2.pipetting.lookup_table_12_row_trough_next import \
+from . import config
+from .pipetting import liquid_level, motions
+from .pipetting.lookup_table_12_row_trough_next import \
     LIQUID_LEVEL_LOOKUP_NEXT_TROUGH_12_ROW as TROUGH_LOOKUP_TABLE
-from photometric_ot2.protocol import load_labware_and_pipettes
+from .protocol import load_labware_and_pipettes
 
 metadata = {'apiLevel': '2.12'}
 
