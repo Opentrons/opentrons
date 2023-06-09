@@ -1,7 +1,8 @@
 """Response models for protocol analysis."""
 # TODO(mc, 2021-08-25): add modules to simulation result
+from dataclasses import dataclass
 from enum import Enum
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, parse_obj_as, validator
 from typing import Any, Dict, List, Union
 from typing_extensions import Literal
 
@@ -15,6 +16,46 @@ from opentrons.protocol_engine import (
     LoadedPipette,
     Liquid,
 )
+
+
+# ~9s baseline
+
+# Dataclass:
+# ~9s -> ~11s by doing List[FastParseCommand] and discriminating each command linearly
+# ~11s -> ~7s by switching that to a key lookup discriminator
+# No noticeable benefit to __slots__
+# Ugh but this breaks serialization (encoding) because Pydantic doesn't give us a way to customize serialization without it being a BaseModel.
+
+
+# # We're making this a dataclass so == and repr() work.
+# @dataclass
+# class FastParseCommand:
+#     # def __init__(self, command: Command) -> None:
+#     #     self.command = command
+
+#     # Lists of commands can be tens of thousands of elements long.
+#     __slots__ = ("command",)
+
+#     command: Command
+#     """The parsed command."""
+
+#     @classmethod
+#     def __get_validators__(cls):
+#         def parse_into_cls(v: Dict[str, Any]) -> FastParseCommand:
+#             return cls(parse_command(v))
+
+#         yield parse_into_cls
+
+
+class FastParseCommand(BaseModel):
+    __root__: Command
+
+    @classmethod
+    def __get_validators__(cls):
+        def parse_into_cls(v: Dict[str, Any]) -> FastParseCommand:
+            return cls.construct(__root__=parse_command(v))
+
+        yield parse_into_cls
 
 
 class AnalysisStatus(str, Enum):
@@ -105,15 +146,17 @@ class CompletedAnalysis(BaseModel):
         description="Modules that have been loaded into the run.",
     )
 
-    commands: List[Command] = Field(
+    commands: List[FastParseCommand] = Field(
         ...,
         description="The protocol commands the run is expected to produce",
     )
 
-    @validator("commands", each_item=True, pre=True)
-    @classmethod
-    def parse_command(cls, command: Dict[str, Any]) -> Command:
-        return parse_command(command)
+    # # TODO: This does not seem sufficient: it applies in addition to the default validator, not instead of it.
+    # @validator("commands", each_item=True, pre=True)
+    # @classmethod
+    # def parse_command(cls, command: Dict[str, Any]) -> Command:
+    #     # return None
+    #     return parse_command(command)
 
     errors: List[ErrorOccurrence] = Field(
         ...,
@@ -126,3 +169,37 @@ class CompletedAnalysis(BaseModel):
 
 
 ProtocolAnalysis = Union[PendingAnalysis, CompletedAnalysis]
+
+
+# class FastParseCommand:
+#     @classmethod
+#     def validate(cls, v: str):
+#         m = post_code_regex.fullmatch(v.upper())
+#         if m:
+#             return f"{m.group(1)} {m.group(2)}"
+#         else:
+#             raise PydanticCustomError("postcode", "invalid postcode format")
+
+#     # I have no fucking clue what these are doing.
+
+#     @classmethod
+#     def __get_pydantic_core_schema__(
+#         cls, _source_type: Any, _handler: GetCoreSchemaHandler
+#     ) -> core_schema.CoreSchema:
+#         return core_schema.no_info_after_validator_function(
+#             cls.validate,
+#             core_schema.str_schema(),
+#         )
+
+#     @classmethod
+#     def __get_pydantic_json_schema__(
+#         cls, schema: core_schema.CoreSchema, handler: GetJsonSchemaHandler
+#     ) -> JsonSchemaValue:
+#         json_schema = handler(schema)
+#         json_schema.update(
+#             # simplified regex here for brevity, see the wikipedia link above
+#             pattern="^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$",
+#             # some example postcodes
+#             examples=["SP11 9DG", "W1J 7BU"],
+#         )
+#         return json_schema

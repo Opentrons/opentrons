@@ -22,6 +22,7 @@ from robot_server.persistence import legacy_pickle
 
 from .analysis_models import (
     AnalysisSummary,
+    FastParseCommand,
     ProtocolAnalysis,
     PendingAnalysis,
     CompletedAnalysis,
@@ -143,7 +144,7 @@ class AnalysisStore:
         completed_analysis = CompletedAnalysis.construct(
             id=analysis_id,
             result=result,
-            commands=commands,
+            commands=[FastParseCommand.construct(__root__=c) for c in commands],
             labware=labware,
             modules=modules,
             pipettes=pipettes,
