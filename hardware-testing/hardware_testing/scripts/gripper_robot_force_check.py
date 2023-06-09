@@ -33,16 +33,18 @@ def build_arg_parser():
     arg_parser.add_argument('-t', '--hold_time', type=int, required=False, help='Sets the gripper hold time in seconds', default=10)
     arg_parser.add_argument('-u', '--open_time', type=int, required=False, help='Sets the gripper open time in seconds', default=1)
     arg_parser.add_argument('-n', '--part_number', type=str, required=False, help='Sets the gripper part number', default="DVT-00")
-    arg_parser.add_argument('-i', '--continuous', action="store_true", required=False, help='Continuous grip mode')
+    arg_parser.add_argument('-i', '--continuous', action="store_true", required=False, help='Continuous grip')
+    arg_parser.add_argument('-b', '--backlash', action="store_true", required=False, help='Backlash test')
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Gripper_Robot_Force_Check:
     def __init__(
-        self, simulate: bool, continuous: bool, mode: str, cycles: int, force: int, pwm: int, hold_time: float, open_time: float, part_number: str
+        self, simulate: bool, continuous: bool, backlash: bool, mode: str, cycles: int, force: int, pwm: int, hold_time: float, open_time: float, part_number: str
     ) -> None:
         self.simulate = simulate
         self.continuous = continuous
+        self.backlash = backlash
         self.mode = mode
         self.cycles = cycles
         self.grip_force = force
@@ -167,11 +169,12 @@ class Gripper_Robot_Force_Check:
             print(f"Cycle #{self.cycle}: Input = {input} N")
             self.test_data["Input Force"] = str(input)
             await api.grip(input)
+            time.sleep(self.hold_time)
         else:
             print(f"Cycle #{self.cycle}: Input = {input} %")
             self.test_data["Input PWM"] = str(input)
             await api._grip(input)
-        time.sleep(self.hold_time)
+            time.sleep(self.hold_time)
         self.jaw_displacement = round(self._get_jaw_displacement(), 3)
         self.test_data["Jaw Displacement"] = str(self.jaw_displacement)
         self.force = self._get_stable_force()
@@ -213,13 +216,25 @@ class Gripper_Robot_Force_Check:
                     input_list = self.grip_force
                 else:
                     input_list = self.grip_pwm
-                for input in input_list:
+                if self.backlash:
+                    self.continuous = True
                     for i in range(self.cycles):
-                        self.cycle = i + 1
-                        print(f"\n-> Starting Test Cycle {self.cycle}/{self.cycles}")
-                        await self._read_gripper(self.api, input)
-                        await self._record_data()
-                        time.sleep(1.0)
+                        for input in input_list:
+                            self.cycle = i + 1
+                            print(f"\n-> Starting Test Cycle {self.cycle}/{self.cycles}")
+                            await self._read_gripper(self.api, input)
+                            await self._record_data()
+                            time.sleep(1.0)
+                        await self.api.ungrip()
+                        time.sleep(self.open_time)
+                else:
+                    for input in input_list:
+                        for i in range(self.cycles):
+                            self.cycle = i + 1
+                            print(f"\n-> Starting Test Cycle {self.cycle}/{self.cycles}")
+                            await self._read_gripper(self.api, input)
+                            await self._record_data()
+                            time.sleep(1.0)
         except Exception as e:
             await self.exit()
             raise e
@@ -234,5 +249,5 @@ if __name__ == '__main__':
     print("\nOT-3 Gripper-on-Robot Force Check\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Gripper_Robot_Force_Check(args.simulate, args.continuous, args.mode, args.cycles, args.force, args.pwm, args.hold_time, args.open_time, args.part_number)
+    test = Gripper_Robot_Force_Check(args.simulate, args.continuous, args.backlash, args.mode, args.cycles, args.force, args.pwm, args.hold_time, args.open_time, args.part_number)
     asyncio.run(test.run())
