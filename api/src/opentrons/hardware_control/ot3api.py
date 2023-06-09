@@ -273,6 +273,7 @@ class OT3API(
         strict_attached_instruments: bool = True,
         use_usb_bus: bool = False,
         update_firmware: bool = True,
+        status_bar_enabled: bool = True,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
@@ -286,6 +287,9 @@ class OT3API(
 
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
 
+        await api_instance.set_status_bar_enabled(status_bar_enabled)
+        # TODO: Remove this line once the robot server runs the startup
+        # animation after initialization!
         await api_instance.set_status_bar_state(StatusBarState.IDLE)
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
@@ -426,6 +430,9 @@ class OT3API(
 
     async def set_status_bar_state(self, state: StatusBarState) -> None:
         await self._status_bar_controller.set_status_bar_state(state)
+
+    async def set_status_bar_enabled(self, enabled: bool) -> None:
+        await self._status_bar_controller.set_enabled(enabled)
 
     def get_status_bar_state(self) -> StatusBarState:
         return self._status_bar_controller.get_current_state()

@@ -117,6 +117,7 @@ async def _create_thread_manager() -> ThreadManagedHardware:
             OT3API.build_hardware_controller,
             use_usb_bus=ff.rear_panel_integration(),
             threadmanager_nonblocking=True,
+            status_bar_enabled=ff.status_bar_enabled(),
         )
     else:
         thread_manager = ThreadManager(
