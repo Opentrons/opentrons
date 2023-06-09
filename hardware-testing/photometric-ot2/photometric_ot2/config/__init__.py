@@ -51,7 +51,7 @@ class ConfigTest:
 def default_config() -> ConfigTest:
     return ConfigTest(
         pipette=PipetteConfigTest(
-            change_tip=True,
+            change_tip=False,
             use_trash=True
         ),
         scale=ScaleConfigTest(
@@ -66,7 +66,7 @@ def default_config() -> ConfigTest:
         photo=True,
         grav=True,
         start_tip='A1',
-        baseline=False,
+        baseline=True,
         plate_on_scale=False,
         use_multi=False,
         volume=200,

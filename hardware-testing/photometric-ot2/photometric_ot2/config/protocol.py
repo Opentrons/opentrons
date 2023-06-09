@@ -49,12 +49,13 @@ def load_labware_and_pipettes(protocol: protocol_api.ProtocolContext,
                                   location=DEFAULT_LABWARE_SLOTS.plate)
     trough = protocol.load_labware('nest_12_reservoir_15ml',
                                    location=DEFAULT_LABWARE_SLOTS.trough)
-    if vial_def:
-        vial = protocol.load_labware_from_definition(vial_def,
-                                                     location=DEFAULT_LABWARE_SLOTS.vial)
-    else:
-        vial = protocol.load_labware('radwag_pipette_calibration_vial',
-                                     location=DEFAULT_LABWARE_SLOTS.vial)
+    vial = None
+    # if vial_def:
+    #     vial = protocol.load_labware_from_definition(vial_def,
+    #                                                  location=DEFAULT_LABWARE_SLOTS.vial)
+    # else:
+    #     vial = protocol.load_labware('radwag_pipette_calibration_vial',
+    #                                  location=DEFAULT_LABWARE_SLOTS.vial)
     pipette = None
     if pip_mount:
         pipette = protocol.load_instrument(f'p{pip_size}_single_gen2', pip_mount,

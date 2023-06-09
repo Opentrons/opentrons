@@ -9,16 +9,17 @@ from urllib.request import Request, urlopen
 
 from opentrons import protocol_api, execute, simulate
 
-from . import config
-from .pipetting import liquid_level, motions
-from .pipetting.lookup_table_12_row_trough_next import \
+from pipetting import liquid_level, motions
+from pipetting.lookup_table_12_row_trough_next import \
     LIQUID_LEVEL_LOOKUP_NEXT_TROUGH_12_ROW as TROUGH_LOOKUP_TABLE
-from .protocol import load_labware_and_pipettes
+from config.protocol import load_labware_and_pipettes
+from config import default_config
 
 metadata = {'apiLevel': '2.12'}
 
-CFG = config.default_config()
+CFG = default_config()
 REFILL_VOL = 0
+TROUGH_DEAD_VOL = 3000
 
 
 def http_get_all_labware_offsets(ctx):
@@ -76,46 +77,25 @@ def get_latest_offset_for_labware(labware_offsets, labware):
     return round(v["x"], 2), round(v["y"], 2), round(v["z"], 2)
 
 
-def init_liquid_tracking(plate, trough, vial):
+def init_liquid_tracking(plate, trough):
     # LIQUID TRACKING
-    for c in [plate, vial]:
-        for w in c.wells():
-            # NOTE: For Corning 3631, assuming a perfect cylinder creates
-            #       an error of -0.78mm when Corning 3631 plate is full (~360uL)
-            #       This means the software will think the liquid is
-            #       0.78mm lower than it is in reality. To make it more
-            #       accurate, give .init_liquid_height() a lookup table
-            liquid_level.init_liquid_height(w)
+    for w in plate.wells():
+        # NOTE: For Corning 3631, assuming a perfect cylinder creates
+        #       an error of -0.78mm when Corning 3631 plate is full (~360uL)
+        #       This means the software will think the liquid is
+        #       0.78mm lower than it is in reality. To make it more
+        #       accurate, give .init_liquid_height() a lookup table
+        liquid_level.init_liquid_height(w)
     for w in trough.wells():
         liquid_level.init_liquid_height(w, lookup_table=TROUGH_LOOKUP_TABLE)
-    if CFG.photo or (CFG.plate_on_scale and not CFG.use_multi):
-        for col in CFG.trough_cols:
-            dye_well = trough[f'A{col}']
-            if not liquid_level.get_volume(dye_well):
-                liquid_level.add_start_volume(dye_well, 3000)
-            if CFG.hv_divide:
-                liquid_level.add_start_volume(
-                    dye_well, CFG.volume * (12 / CFG.hv_divide), name='Dye')
-            else:
-                liquid_level.add_start_volume(
-                    dye_well, CFG.volume * CFG.num_samples, name='Dye')
-        if CFG.has_diluent:
-            # assume the diluent volume = 200 - CFG.volume
-            diluent_vol = 200 - CFG.volume
-            print('diluent_vol =', diluent_vol)
-            assert 0 <= diluent_vol <= 200
-            for well in plate.wells():
-                liquid_level.set_start_volume(well, diluent_vol)
     # always assume baseline is in the final x2 troughs
-    if CFG.baseline or (CFG.plate_on_scale and CFG.use_multi):
-        vol_per_transfer = CFG.volume * 8
-        dead_vol = 3000
-        vol_needed = vol_per_transfer * 6  # 6 columns (half the plate)
-        for col in ['11', '12']:
-            baseline_well = trough[f'A{col}']
-            if not liquid_level.get_volume(baseline_well):
-                liquid_level.add_start_volume(baseline_well, dead_vol)
-            liquid_level.add_start_volume(baseline_well, vol_needed, name='Baseline')
+    vol_per_transfer = CFG.volume * 8  # because multi channel
+    vol_needed = vol_per_transfer * 6  # 6 columns (half the plate)
+    for col in ['11', '12']:
+        baseline_well = trough[f'A{col}']
+        if not liquid_level.get_volume(baseline_well):
+            liquid_level.add_start_volume(baseline_well, TROUGH_DEAD_VOL)
+        liquid_level.add_start_volume(baseline_well, vol_needed, name='Baseline')
 
 
 def test_drop_tip(pipette):
@@ -213,19 +193,14 @@ def run(protocol: protocol_api.ProtocolContext):
             delta = get_latest_offset_for_labware(offsets_list, labware)
             labware.set_offset(x=delta[0], y=delta[1], z=delta[2])
 
-        if items.tiprack:
-            _load_and_set_offset(items.tiprack)
         if items.tiprack_multi:
             _load_and_set_offset(items.tiprack_multi)
         if items.trough:
             _load_and_set_offset(items.trough)
         if items.plate:
             _load_and_set_offset(items.plate)
-    # must be after updating labware offsets (b/c all Well objects are re-instantiated)
-    motions.apply_additional_offset_to_labware(
-        items.vial, z=CFG.scale.safe_z_offset)
     # must be after all offsets/addition_offsets are applied (b/c all Well objects are re-instantiated)
-    init_liquid_tracking(plate=items.plate, trough=items.trough, vial=items.vial)
+    init_liquid_tracking(plate=items.plate, trough=items.trough)
 
     # PIPETTE
     if items.multi:
@@ -234,9 +209,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # RUN
     liquid_level.print_setup_instructions(
         user_confirm=not protocol.is_simulating(), refill_vol=REFILL_VOL)
-    if CFG.baseline:
-        fill_plate_with_baseline(
-            protocol, items.multi, items.trough, items.plate)
+    fill_plate_with_baseline(
+        protocol, items.multi, items.trough, items.plate)
     print(f'Time: {datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}')
     print(f'Duration: {round((time.time() - start_timestamp) / 60, 1)} minutes')
     print('\ndone')
@@ -288,8 +262,8 @@ if __name__ == '__main__':
                         help='If set, user can visually inspect each pipetting movement')
     parser.add_argument("--trash", action='store_true',
                         help='If set, pipette will discard used tips to the trash')
-    parser.add_argument("--same-tip", action='store_true',
-                        help='If set, pipette will use the same tip(s) between each transfer')
+    parser.add_argument("--change-tip", action='store_true',
+                        help='If set, pipette will use change tip(s) between each transfer')
     parser.add_argument("--simulate", action='store_true',
                         help='If set, the protocol will be simulated')
     parser.add_argument("--grav", action='store_true',
@@ -331,8 +305,8 @@ if __name__ == '__main__':
     CFG.volume = args.volume
     CFG.inspect = args.inspect
     CFG.scale.use_lid = args.lid
-    if args.same_tip:
-        CFG.pipette.change_tip = False
+    if args.change_tip:
+        CFG.pipette.change_tip = True
     CFG.grav = args.grav
     CFG.photo = args.photo
     CFG.baseline = args.baseline
@@ -346,7 +320,7 @@ if __name__ == '__main__':
     CFG.scale_baud = args.scale_baud
 
     if args.refill:
-        REFILL_VOL = 3000
+        REFILL_VOL = TROUGH_DEAD_VOL
 
     if args.simulate:
         p = simulate.get_protocol_api(metadata['apiLevel'])
