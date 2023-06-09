@@ -7,7 +7,7 @@ from typing_extensions import Literal
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..errors import LabwareDefinitionIsNotAdapter
-from ..types import LabwareLocation
+from ..types import AdapterLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -20,7 +20,7 @@ LoadAdapterCommandType = Literal["loadAdapter"]
 class LoadAdapterParams(BaseModel):
     """Payload required to load an adapter into a slot."""
 
-    location: LabwareLocation = Field(
+    location: AdapterLocation = Field(
         ...,
         description="Location the adapter should be loaded into.",
     )
