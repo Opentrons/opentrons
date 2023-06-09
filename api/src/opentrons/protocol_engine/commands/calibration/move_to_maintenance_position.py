@@ -83,13 +83,21 @@ class MoveToMaintenancePositionImplementation(
         ot3_api = ensure_ot3_hardware(
             self._hardware_api,
         )
-        current_position_mount = await ot3_api.gantry_position(Mount.LEFT, critical_point=CriticalPoint.MOUNT)
-        max_height_z_mount = ot3_api.get_instrument_max_height(Mount.LEFT, critical_point=CriticalPoint.MOUNT)
+        current_position_mount = await ot3_api.gantry_position(
+            Mount.LEFT, critical_point=CriticalPoint.MOUNT
+        )
+        max_height_z_mount = ot3_api.get_instrument_max_height(
+            Mount.LEFT, critical_point=CriticalPoint.MOUNT
+        )
         max_height_z_tip = ot3_api.get_instrument_max_height(Mount.LEFT)
         # avoid using motion planning waypoints because we do not need to move the z at this moment
         movement_points = [
             # move the z to the highest position
-            Point(x=current_position_mount.x, y=current_position_mount.y, z=max_height_z_mount),
+            Point(
+                x=current_position_mount.x,
+                y=current_position_mount.y,
+                z=max_height_z_mount,
+            ),
             # move in x,y without going down the z
             Point(x=_ATTACH_POINT.x, y=_ATTACH_POINT.y, z=max_height_z_mount),
         ]
