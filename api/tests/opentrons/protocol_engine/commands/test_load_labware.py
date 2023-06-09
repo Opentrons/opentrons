@@ -1,10 +1,15 @@
 """Test load labware commands."""
+import inspect
+import pytest
+
 from decoy import Decoy
 
 from opentrons.types import DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.execution import LoadedLabwareData, EquipmentHandler
+from opentrons.protocol_engine.resources import labware_validation
+from opentrons.protocol_engine.state import StateView
 
 from opentrons.protocol_engine.commands.load_labware import (
     LoadLabwareParams,
@@ -13,13 +18,23 @@ from opentrons.protocol_engine.commands.load_labware import (
 )
 
 
+@pytest.fixture(autouse=True)
+def patch_mock_labware_validation(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock out move_types.py functions."""
+    for name, func in inspect.getmembers(labware_validation, inspect.isfunction):
+        monkeypatch.setattr(labware_validation, name, decoy.mock(func=func))
+
+
 async def test_load_labware_implementation(
     decoy: Decoy,
     well_plate_def: LabwareDefinition,
     equipment: EquipmentHandler,
+    state_view: StateView,
 ) -> None:
     """A LoadLabware command should have an execution implementation."""
-    subject = LoadLabwareImplementation(equipment=equipment)
+    subject = LoadLabwareImplementation(equipment=equipment, state_view=state_view)
 
     data = LoadLabwareParams(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
@@ -44,6 +59,10 @@ async def test_load_labware_implementation(
             offsetId="labware-offset-id",
         )
     )
+
+    decoy.when(
+        labware_validation.validate_definition_is_labware(well_plate_def)
+    ).then_return(True)
 
     result = await subject.execute(data)
 

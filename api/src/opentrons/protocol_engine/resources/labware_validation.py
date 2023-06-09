@@ -15,3 +15,10 @@ def validate_definition_is_labware(definition: LabwareDefinition) -> bool:
 def validate_definition_is_adapter(definition: LabwareDefinition) -> bool:
     """Validate that one of the definition's allowed roles is `adapter`."""
     return LabwareRole.adapter in definition.allowedRoles
+
+
+def validate_labware_can_be_stacked(
+    top_labware_definition: LabwareDefinition, below_labware_load_name: str
+) -> bool:
+    """Validate that the labware being loaded onto is in the above labware's stackingOffsetWithLabware definition."""
+    return below_labware_load_name in top_labware_definition.stackingOffsetWithLabware

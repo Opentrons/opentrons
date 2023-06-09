@@ -6,10 +6,13 @@ from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from ..types import LabwareLocation
+from ..errors import LabwareDefinitionIsNotLabwareError, LabwareCannotBeStackedError
+from ..resources import labware_validation
+from ..types import LabwareLocation, OnLabwareLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
+    from ..state import StateView
     from ..execution import EquipmentHandler
 
 
@@ -81,8 +84,11 @@ class LoadLabwareImplementation(
 ):
     """Load labware command implementation."""
 
-    def __init__(self, equipment: EquipmentHandler, **kwargs: object) -> None:
+    def __init__(
+        self, equipment: EquipmentHandler, state_view: StateView, **kwargs: object
+    ) -> None:
         self._equipment = equipment
+        self._state_view = state_view
 
     async def execute(self, params: LoadLabwareParams) -> LoadLabwareResult:
         """Load definition and calibration data necessary for a labware."""
@@ -93,6 +99,23 @@ class LoadLabwareImplementation(
             location=params.location,
             labware_id=params.labwareId,
         )
+
+        if not labware_validation.validate_definition_is_labware(
+            loaded_labware.definition
+        ):
+            raise LabwareDefinitionIsNotLabwareError(
+                f"{params.loadName} is not defined as a labware."
+            )
+
+        if isinstance(params.location, OnLabwareLocation):
+            below_labware = self._state_view.labware.get(params.location.labwareId)
+            if not labware_validation.validate_labware_can_be_stacked(
+                top_labware_definition=loaded_labware.definition,
+                below_labware_load_name=below_labware.loadName,
+            ):
+                raise LabwareCannotBeStackedError(
+                    f"Labware {params.loadName} cannot be loaded onto labware {below_labware.loadName}"
+                )
 
         return LoadLabwareResult(
             labwareId=loaded_labware.labware_id,

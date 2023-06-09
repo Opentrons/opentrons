@@ -75,6 +75,10 @@ class LabwareDefinitionIsNotAdapterError(ProtocolEngineError):
     """Raised when trying to load an adapter via loadAdapter that is not an adapter."""
 
 
+class LabwareCannotBeStackedError(ProtocolEngineError):
+    """Raised when trying to load labware onto another labware it is not defined to be loaded onto."""
+
+
 class LabwareOffsetDoesNotExistError(ProtocolEngineError):
     """Raised when referencing a labware offset that does not exist."""
 
