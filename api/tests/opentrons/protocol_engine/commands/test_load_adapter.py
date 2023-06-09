@@ -1,16 +1,29 @@
 """Test load adapter commands."""
+import inspect
+import pytest
+
 from decoy import Decoy
 
 from opentrons.types import DeckSlotName
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.protocol_engine.types import DeckSlotLocation
 from opentrons.protocol_engine.execution import LoadedLabwareData, EquipmentHandler
+from opentrons.protocol_engine.resources import labware_validation
 
 from opentrons.protocol_engine.commands.load_adapter import (
     LoadAdapterParams,
     LoadAdapterResult,
     LoadAdapterImplementation,
 )
+
+
+@pytest.fixture(autouse=True)
+def patch_mock_labware_validation(
+    decoy: Decoy, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Mock out move_types.py functions."""
+    for name, func in inspect.getmembers(labware_validation, inspect.isfunction):
+        monkeypatch.setattr(labware_validation, name, decoy.mock(func=func))
 
 
 async def test_load_adapter_implementation(
@@ -48,7 +61,7 @@ async def test_load_adapter_implementation(
     )
 
     decoy.when(
-        equipment.validate_definition_is_adapter(labware_definition)
+        labware_validation.validate_definition_is_adapter(labware_definition)
     ).then_return(True)
 
     result = await subject.execute(data)
