@@ -95,6 +95,8 @@ from .types import (
     UpdateStatus,
     StatusBarState,
     SubSystemState,
+    TipStateType,
+
 )
 from .errors import (
     MustHomeError,
@@ -1658,6 +1660,9 @@ class OT3API(
         for rel_point, speed in spec.shake_off_list:
             await self.move_rel(realmount, rel_point, speed=speed)
 
+        # TODO change to enum
+        await self._backend.get_tip_present(realmount, TipStateType.PICK_UP)
+
         _add_tip_to_instrs()
 
         if prep_after:
@@ -1735,6 +1740,9 @@ class OT3API(
                 for axis, current in spec.ending_current.items()
             }
         )
+
+        # TODO change to enum
+        await self._backend.get_tip_present(realmount, TipStateType.DROP)
         _remove()
 
     async def clean_up(self) -> None:

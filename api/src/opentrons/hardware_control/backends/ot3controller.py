@@ -73,6 +73,8 @@ from opentrons_hardware.hardware_control.motor_position_status import (
     update_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
+from opentrons_hardware.hardware_control.tip_presence import get_tip_ejector_state
+from opentrons_hardware.hardware_control.network import NetworkInfo
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
     set_hold_current,
@@ -112,6 +114,8 @@ from opentrons.hardware_control.types import (
     DoorState,
     SubSystemState,
     SubSystem,
+    TipStateType,
+    FailedTipStateCheck,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
@@ -729,6 +733,17 @@ class OT3Controller:
         assert motor_nodes, "No nodes available to read limit switch status from"
         res = await get_limit_switches(self._messenger, motor_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
+
+    async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+        """Get the state of the gantry's limit switches on each axis."""
+        # TODO (lc 06/09/2023) We should create a separate type for
+        # pipette specific sensors. This work is done in the overpressure
+        # PR.
+        res = await get_tip_ejector_state(
+            self._messenger, sensor_node_for_mount(OT3Mount(mount.value))  # type: ignore
+        )
+        if res != tip_state.value:
+            raise FailedTipStateCheck(tip_state, res)
 
     @staticmethod
     def _tip_motor_nodes(axis_current_keys: KeysView[OT3Axis]) -> List[NodeId]:

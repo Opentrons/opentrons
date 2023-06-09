@@ -60,6 +60,7 @@ from opentrons.hardware_control.types import (
     UpdateState,
     SubSystem,
     SubSystemState,
+    TipStateType,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control import status_bar
@@ -362,6 +363,12 @@ class OT3Simulator:
     ) -> None:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
         self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
+
+    async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> bool:
+        if tip_state == TipStateType.PICK_UP:
+            return True
+        else:
+            return False
 
     @ensure_yield
     async def tip_action(

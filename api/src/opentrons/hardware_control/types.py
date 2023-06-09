@@ -618,6 +618,14 @@ class GripperProbe(enum.Enum):
             return InstrumentProbeType.PRIMARY
 
 
+class TipStateType(enum.Enum):
+    DROP = False
+    PICK_UP = True
+
+    def __str__(self) -> str:
+        return self.name
+
+
 class EarlyLiquidSenseTrigger(RuntimeError):
     """Error raised if sensor threshold reached before minimum probing distance."""
 
@@ -641,4 +649,15 @@ class LiquidNotFound(RuntimeError):
         super().__init__(
             f"Liquid threshold not found, current_position = {position}"
             f"position at max travel allowed = {max_z_pos}"
+        )
+
+
+class FailedTipStateCheck(RuntimeError):
+    """Error raised if the tip ejector state does not match the expected value."""
+
+    def __init__(self, tip_state_type: TipStateType, actual_state: bool) -> None:
+        """Iniitialize FailedTipStateCheck error."""
+        super().__init__(
+            f"Failed to correctly determine tip state for {str(tip_state_type)}"
+            f"received {actual_state} but expected {tip_state_type.value}"
         )
