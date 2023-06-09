@@ -43,7 +43,7 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     LiquidNotFound,
     EarlyLiquidSenseTrigger,
-    OT3SubSystem,
+    SubSystem,
     GripperJawState,
 )
 from opentrons.hardware_control.errors import (
@@ -1590,21 +1590,21 @@ async def test_light_settings(
     "versions,version_str",
     [
         ({}, "unknown"),
-        ({OT3SubSystem.pipette_right: 2}, "2"),
+        ({SubSystem.pipette_right: 2}, "2"),
         (
             {
-                OT3SubSystem.pipette_left: 2,
-                OT3SubSystem.gantry_x: 2,
-                OT3SubSystem.gantry_y: 2,
+                SubSystem.pipette_left: 2,
+                SubSystem.gantry_x: 2,
+                SubSystem.gantry_y: 2,
             },
             "2",
         ),
-        ({OT3SubSystem.gripper: 3, OT3SubSystem.head: 1}, "1, 3"),
+        ({SubSystem.gripper: 3, SubSystem.head: 1}, "1, 3"),
     ],
 )
 def test_fw_version(
     ot3_hardware: ThreadManager[OT3API],
-    versions: Dict[OT3SubSystem, int],
+    versions: Dict[SubSystem, int],
     version_str: str,
 ) -> None:
     with patch(
