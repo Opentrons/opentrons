@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 TRAVERSAL_SPEED = 200  # speed during movements between labware
-SUBMERGED_SPEED = 5  # speed while submerged within a liquid
+SUBMERGED_SPEED = 60  # speed while submerged within a liquid
 
 SAFE_HOVER_MM = 3  # distance above liquid-level that is considered safe
 SUBMERGED_MM = 1.5  # distance below liquid-level to aspirate/dispense
@@ -36,7 +36,7 @@ PLUNGER_FLOW_RATE_CFG = {
         'blow_out': 500
     },
     300: {
-        'aspirate': 47, 'dispense': 47,
+        'aspirate': 80, 'dispense': 200,
         'blow_out': 200
     },
     20: {
