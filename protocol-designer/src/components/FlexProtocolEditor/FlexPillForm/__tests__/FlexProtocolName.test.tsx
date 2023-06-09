@@ -4,7 +4,7 @@ import { useFormikContext } from 'formik'
 import {
   FlexProtocolNameComponent,
   flexProtocolName,
-} from '../FlexProtocolEditor/FlexPillForm/FlexProtocolName'
+} from '../FlexProtocolName'
 
 jest.mock('formik', () => ({
   useFormikContext: jest.fn(),
