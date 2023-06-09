@@ -33,14 +33,16 @@ def build_arg_parser():
     arg_parser.add_argument('-t', '--hold_time', type=int, required=False, help='Sets the gripper hold time in seconds', default=10)
     arg_parser.add_argument('-u', '--open_time', type=int, required=False, help='Sets the gripper open time in seconds', default=1)
     arg_parser.add_argument('-n', '--part_number', type=str, required=False, help='Sets the gripper part number', default="DVT-00")
+    arg_parser.add_argument('-i', '--continuous', action="store_true", required=False, help='Continuous grip mode')
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Gripper_Robot_Force_Check:
     def __init__(
-        self, simulate: bool, mode: str, cycles: int, force: int, pwm: int, hold_time: float, open_time: float, part_number: str
+        self, simulate: bool, continuous: bool, mode: str, cycles: int, force: int, pwm: int, hold_time: float, open_time: float, part_number: str
     ) -> None:
         self.simulate = simulate
+        self.continuous = continuous
         self.mode = mode
         self.cycles = cycles
         self.grip_force = force
@@ -174,10 +176,11 @@ class Gripper_Robot_Force_Check:
         self.test_data["Jaw Displacement"] = str(self.jaw_displacement)
         self.force = self._get_stable_force()
         self.test_data["Output Force"] = str(self.force)
-        await api.ungrip()
         print(f"Cycle #{self.cycle}: Output Force = {self.force} N")
         print(f"Cycle #{self.cycle}: Jaw Displacement = {self.jaw_displacement} mm")
-        time.sleep(self.open_time)
+        if not self.continuous:
+            await api.ungrip()
+            time.sleep(self.open_time)
 
     async def _move_gripper(
         self, api: OT3API, mount: OT3Mount
@@ -231,5 +234,5 @@ if __name__ == '__main__':
     print("\nOT-3 Gripper-on-Robot Force Check\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Gripper_Robot_Force_Check(args.simulate, args.mode, args.cycles, args.force, args.pwm, args.hold_time, args.open_time, args.part_number)
+    test = Gripper_Robot_Force_Check(args.simulate, args.continuous, args.mode, args.cycles, args.force, args.pwm, args.hold_time, args.open_time, args.part_number)
     asyncio.run(test.run())
