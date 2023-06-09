@@ -97,9 +97,9 @@ class GeometryView:
 
     def get_labware_parent_nominal_position(self, labware_id: str) -> Point:
         """Get the position of the labware's uncalibrated parent slot (deck, module, or another labware)."""
-        labware_data = self._labware.get(labware_id)
-        slot_name = self._get_labware_slot_name(labware_data)
+        slot_name = self.get_ancestor_slot_name(labware_id)
         slot_pos = self._labware.get_slot_position(slot_name)
+        labware_data = self._labware.get(labware_id)
         offset = self._get_labware_position_offset(labware_data)
 
         return Point(
@@ -107,21 +107,6 @@ class GeometryView:
             slot_pos.y + offset.y,
             slot_pos.z + offset.z,
         )
-
-    def _get_labware_slot_name(self, labware: LoadedLabware) -> DeckSlotName:
-        labware_location = labware.location
-        if isinstance(labware_location, DeckSlotLocation):
-            return labware_location.slotName
-        elif isinstance(labware_location, ModuleLocation):
-            return self._modules.get_location(labware_location.moduleId).slotName
-        elif isinstance(labware_location, OnLabwareLocation):
-            on_labware_data = self._labware.get(labware_location.labwareId)
-            return self._get_labware_slot_name(on_labware_data)
-        else:
-            raise errors.LabwareNotOnDeckError(
-                f"Labware {labware.id} does not have a parent associated with it"
-                f" since it is no longer on the deck."
-            )
 
     def _get_labware_position_offset(
         self, labware: LoadedLabware
@@ -364,6 +349,9 @@ class GeometryView:
         elif isinstance(labware.location, ModuleLocation):
             module_id = labware.location.moduleId
             slot_name = self._modules.get_location(module_id).slotName
+        elif isinstance(labware.location, OnLabwareLocation):
+            below_labware_id = labware.location.labwareId
+            slot_name = self.get_ancestor_slot_name(below_labware_id)
         elif labware.location == OFF_DECK_LOCATION:
             raise errors.LabwareNotOnDeckError(
                 f"Labware {labware_id} does not have a slot associated with it"
