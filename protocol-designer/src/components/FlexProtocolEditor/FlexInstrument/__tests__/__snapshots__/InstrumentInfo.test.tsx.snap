@@ -1,0 +1,101 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InstrumentInfoComponent renders correctly with all props provided 1`] = `
+<div
+  style={
+    Object {
+      "marginBottom": 10,
+    }
+  }
+>
+  <Card>
+    <div
+      className="pipette left test-class"
+    >
+      <InstrumentDiagram
+        className="pipette_icon"
+        mount="left"
+        pipetteSpecs={
+          Object {
+            "channels": 1,
+            "displayCategory": "GEN2",
+          }
+        }
+      />
+      <div
+        className="pipette_info test-info-class"
+      >
+        <InfoItem
+          title="left pipette"
+          value="This is a pipette"
+        />
+        <InfoItem
+          title="tip rack"
+          value="opentrons_96_tiprack_300ul"
+        />
+        <div>
+          Test Child Component
+        </div>
+      </div>
+    </div>
+  </Card>
+</div>
+`;
+
+exports[`InstrumentInfoComponent renders correctly with long description 1`] = `
+<div
+  style={
+    Object {
+      "marginBottom": 10,
+    }
+  }
+>
+  <Card>
+    <div
+      className="pipette left"
+    >
+      <InstrumentDiagram
+        className="pipette_icon"
+        mount="left"
+      />
+      <div
+        className="pipette_info"
+      >
+        <InfoItem
+          title="pipette"
+          value="This is a very long description that should still render correctly even though it takes up multiple lines and is quite verbose."
+        />
+      </div>
+    </div>
+  </Card>
+</div>
+`;
+
+exports[`InstrumentInfoComponent renders correctly with minimum required props provided 1`] = `
+<div
+  style={
+    Object {
+      "marginBottom": 10,
+    }
+  }
+>
+  <Card>
+    <div
+      className="pipette left"
+    >
+      <InstrumentDiagram
+        className="pipette_icon"
+        mount="left"
+      />
+      <div
+        className="pipette_info"
+      >
+        <InfoItem
+          title="pipette"
+          value="This is a pipette"
+        />
+      </div>
+    </div>
+  </Card>
+</div>
+`;

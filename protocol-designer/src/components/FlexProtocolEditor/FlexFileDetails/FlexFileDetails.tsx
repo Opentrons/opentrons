@@ -165,7 +165,7 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
   }
 }
 
-const FileProtocolInformation = (): JSX.Element => {
+export const FileProtocolInformation = (): JSX.Element => {
   const dispatch = useDispatch()
   const [showConfirmation, setShowConfirmation] = useState(false)
 
@@ -256,7 +256,7 @@ const NoFileSelection = (): JSX.Element => {
 }
 
 // File related information name and description etc.
-const FileProtocolNameAndDescription = (props: {
+export const FileProtocolNameAndDescription = (props: {
   nameDescriptionData: any
 }): JSX.Element => {
   const { nameDescriptionData } = props
@@ -313,7 +313,7 @@ const FileProtocolNameAndDescription = (props: {
   )
 }
 
-const EditButton = ({
+export const EditButton = ({
   editProps,
   setTab,
   setTabId,
@@ -335,7 +335,7 @@ const EditButton = ({
   )
 }
 
-const SelectedModules = (props: { propsData: any }): JSX.Element => {
+export const SelectedModules = (props: { propsData: any }): JSX.Element => {
   const { propsData } = props
   const existingModules = getModuleData(propsData.modules)
   return (

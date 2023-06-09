@@ -102,7 +102,7 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
   )
 }
 
-const checkSelectedPipette = (pipetteName: string): boolean => {
+export const checkSelectedPipette = (pipetteName: string): boolean => {
   return blockMount.includes(pipetteName)
 }
 

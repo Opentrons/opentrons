@@ -28,6 +28,10 @@ export interface InstrumentInfoProps {
   infoClassName?: string
   /** children to display under the info */
   children?: React.ReactNode
+  /** name of the instrument */
+  name?: string
+  /** URI of the tiprack definition */
+  tiprackDefURI?: string
 }
 
 export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
