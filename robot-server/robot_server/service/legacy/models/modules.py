@@ -1,6 +1,5 @@
 import typing
 from pydantic import BaseModel, Field
-from opentrons.drivers.rpi_drivers.types import PortGroup
 
 
 class TemperatureModuleLiveData(BaseModel):
@@ -105,7 +104,7 @@ class PhysicalPort(BaseModel):
         description="The USB port the module is plugged into."
         " If connected via a hub, ``port`` represents the port the hub is plugged into.",
     )
-    portGroup: PortGroup = Field(
+    portGroup: str = Field(
         ...,
         description="The physical USB port bank the module is plugged into.",
     )
@@ -264,7 +263,7 @@ class Modules(BaseModel):
                                 "usbPort": {
                                     "hub": False,
                                     "port": 1,
-                                    "portGroup": 5,
+                                    "portGroup": "unknown",
                                     "hubPort": None,
                                 },
                                 "revision": "heater-shaker_v10",

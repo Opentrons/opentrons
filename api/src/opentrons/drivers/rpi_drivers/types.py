@@ -12,12 +12,12 @@ class PinDir(enum.Enum):
     output = enum.auto()
 
 
-class PortGroup(enum.Enum):
-    MAIN = enum.auto()
-    LEFT = enum.auto()
-    RIGHT = enum.auto()
-    FRONT = enum.auto()
-    UNKNOWN = enum.auto()
+class PortGroup:
+    MAIN = "main"
+    LEFT = "left"
+    RIGHT = "right"
+    FRONT = "front"
+    UNKNOWN = "unknown"
 
 
 REV_OG_USB_PORTS = {"3": 1, "5": 2}
@@ -32,7 +32,7 @@ FLEX_B2_USB_PORTS = {"4": 1, "3": 2, "2": 3, "1": 4}
 class USBPort:
     name: str
     port_number: int
-    port_group: PortGroup = PortGroup.UNKNOWN
+    port_group: str = PortGroup.UNKNOWN
     hub: bool = False
     hub_port: Optional[int] = None
     device_path: str = ""
@@ -171,7 +171,7 @@ class USBPort:
     def map_to_revision(
         board_revision: BoardRevision,
         port_info: Tuple[Optional[int], int, Optional[int]],
-    ) -> Tuple[bool, PortGroup, int, Optional[int]]:
+    ) -> Tuple[bool, str, int, Optional[int]]:
         """
         Synthesize the hub, port_group, and hub_port data for a USB port
         from the hub and hub_port data.

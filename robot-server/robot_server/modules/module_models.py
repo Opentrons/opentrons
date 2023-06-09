@@ -15,7 +15,6 @@ from opentrons.drivers.types import (
     ThermocyclerLidStatus,
     HeaterShakerLabwareLatchStatus,
 )
-from opentrons.drivers.rpi_drivers.types import PortGroup
 from opentrons.protocol_engine import ModuleModel
 
 ModuleT = TypeVar("ModuleT", bound=ModuleType)
@@ -34,7 +33,7 @@ class UsbPort(BaseModel):
         ),
     )
 
-    portGroup: PortGroup = Field(
+    portGroup: str = Field(
         ...,
         description=("The physical USB port bank the module is plugged into."),
     )
