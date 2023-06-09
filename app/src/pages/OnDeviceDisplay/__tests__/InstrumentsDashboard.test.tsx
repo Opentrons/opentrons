@@ -6,7 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipette'
-import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import { Navigation } from '../../../organisms/Navigation'
 import { formatTimestamp } from '../../../organisms/Devices/utils'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
@@ -17,7 +17,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/GripperWizardFlows')
 jest.mock('../../../organisms/PipetteWizardFlows')
 jest.mock('../../../organisms/PipetteWizardFlows/ChoosePipette')
-jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock('../../../organisms/Navigation')
 
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
 const mockGripperWizardFlows = GripperWizardFlows as jest.MockedFunction<

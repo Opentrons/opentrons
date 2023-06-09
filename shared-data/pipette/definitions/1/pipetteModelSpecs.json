@@ -7355,7 +7355,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.82,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.1": {
@@ -7550,7 +7550,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.82,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.3": {
@@ -7745,7 +7745,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.82,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.4": {
@@ -7940,7 +7940,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.82,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p50_multi_v3.0": {

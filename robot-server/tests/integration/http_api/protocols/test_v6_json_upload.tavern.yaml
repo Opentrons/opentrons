@@ -443,6 +443,7 @@ stages:
                       x: 0
                       y: 0
                       z: 0
+                  randomizeDropLocation: false
                 result:
                   position: { 'x': 347.84000000000003, 'y': 325.06, 'z': 82.0 }
                 startedAt: !anystr

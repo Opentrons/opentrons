@@ -10,6 +10,7 @@
   "delete_protocol": "Delete Protocol",
   "delete_protocol_perm": "{{name}} and its run history will be permanently deleted.",
   "description": "description",
+  "extension_mount": "extension mount",
   "go_to_labware_definition": "Go to labware definition",
   "hardware": "hardware",
   "labware_name": "Labware Name",
