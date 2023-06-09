@@ -9,6 +9,8 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
+  GRIPPER_V1,
+  getGripperDisplayName,
   getModuleDisplayName,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
@@ -55,7 +57,9 @@ const getHardwareLocation = (
   protocolHardware: ProtocolHardware,
   translator: TFunction<'protocol_details'>
 ): string => {
-  if (protocolHardware.hardwareType === 'pipette') {
+  if (protocolHardware.hardwareType === 'gripper') {
+    return translator(`extension_mount`)
+  } else if (protocolHardware.hardwareType === 'pipette') {
     return translator(`${protocolHardware.mount}_mount`)
   } else {
     return translator('slot', { slotName: protocolHardware.slot })
@@ -63,7 +67,9 @@ const getHardwareLocation = (
 }
 
 const getHardwareName = (protocolHardware: ProtocolHardware): string => {
-  if (protocolHardware.hardwareType === 'pipette') {
+  if (protocolHardware.hardwareType === 'gripper') {
+    return getGripperDisplayName(GRIPPER_V1)
+  } else if (protocolHardware.hardwareType === 'pipette') {
     return getPipetteNameSpecs(protocolHardware.pipetteName)?.displayName ?? ''
   } else {
     return getModuleDisplayName(protocolHardware.moduleModel)

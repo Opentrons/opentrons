@@ -45,6 +45,8 @@ _PREP_AFTER_ADDED_IN = APIVersion(2, 13)
 """The version after which the pick-up tip procedure should also prepare the plunger."""
 _PRESSES_INCREMENT_REMOVED_IN = APIVersion(2, 14)
 """The version after which the pick-up tip procedure deprecates presses and increment arguments."""
+_DROP_TIP_LOCATION_RANDOMIZED_IN = APIVersion(2, 15)
+"""The version after which a drop-tip-into-trash procedure drops tips in a random location within the trash well."""
 
 
 class InstrumentContext(publisher.CommandPublisher):
@@ -835,7 +837,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         If no location is passed, the Pipette will drop the tip into its
         :py:attr:`trash_container`, which if not specified defaults to
-        the fixed trash in slot 12.
+        the fixed trash in slot 12.  From API version 2.15 on, the exact position
+        where the pipette drops the tip(s) within the trash will be randomized
+        in order to prevent tips from piling up in a single location in the trash.
 
         The location in which to drop the tip can be manually specified with
         the `location` argument. The `location` argument can be specified in
@@ -898,8 +902,11 @@ class InstrumentContext(publisher.CommandPublisher):
 
         :returns: This instance
         """
+        randomize_drop_location: bool = False
         if location is None:
             well = self.trash_container.wells()[0]
+            if self.api_version >= _DROP_TIP_LOCATION_RANDOMIZED_IN:
+                randomize_drop_location = True
 
         elif isinstance(location, labware.Well):
             well = location
@@ -932,7 +939,10 @@ class InstrumentContext(publisher.CommandPublisher):
             command=cmds.drop_tip(instrument=self, location=well),
         ):
             self._core.drop_tip(
-                location=location, well_core=well._core, home_after=home_after
+                location=location,
+                well_core=well._core,
+                home_after=home_after,
+                randomize_drop_location=randomize_drop_location,
             )
 
         self._last_tip_picked_up_from = None

@@ -13,20 +13,18 @@ const render = () => {
 describe('UnMatchedModuleWarning', () => {
   it('should render the correct title', () => {
     const { getByText } = render()
-    getByText(
-      'This robot has connected modules that are not specified in this protocol'
-    )
+    getByText('Extra module attached')
   })
   it('should render the correct body, clicking on exit button closes banner', () => {
     const { getByText, getByTestId } = render()
     getByText(
-      'Make sure the modules connected to this robot are of the right type and generation.'
+      'Check that the modules connected to this robot are of the right type and generation.'
     )
     const exit = getByTestId('Banner_close-button')
     fireEvent.click(exit)
     expect(
       screen.queryByText(
-        'Make sure the modules connected to this robot are of the right type and generation.'
+        'Check that the modules connected to this robot are of the right type and generation.'
       )
     ).not.toBeInTheDocument()
   })
