@@ -77,7 +77,9 @@ class _GenericModule(GenericModel, Generic[ModuleT, ModuleModelT, ModuleDataT]):
     )
     moduleType: ModuleT = Field(..., description="General type of the module.")
     moduleModel: ModuleModelT = Field(..., description="Specific model of the module.")
-    moduleOffset: Optional[ModuleCalibrationData] = Field(None, description="The calibrated module offset.")
+    moduleOffset: Optional[ModuleCalibrationData] = Field(
+        None, description="The calibrated module offset."
+    )
     data: ModuleDataT
     usbPort: UsbPort
 

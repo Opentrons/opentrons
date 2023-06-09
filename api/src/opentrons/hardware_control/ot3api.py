@@ -1898,14 +1898,20 @@ class OT3API(
             module_type, module_id, mount, slot, offset, instrument_id
         )
 
-    def get_module_calibration_offset(self, serial_number: str) -> Optional[ModuleCalibrationOffset]:
+    def get_module_calibration_offset(
+        self, serial_number: str
+    ) -> Optional[ModuleCalibrationOffset]:
         """Get the module calibration offset of a module."""
         module = self._backend.module_controls.get_module_by_module_id(serial_number)
         if not module:
-            self._log.warning(f"Could not load calibration: unknown module {serial_number}")
+            self._log.warning(
+                f"Could not load calibration: unknown module {serial_number}"
+            )
             return None
         module_type = module.MODULE_TYPE
-        return self._backend.module_controls.load_module_offset(module_type, serial_number)
+        return self._backend.module_controls.load_module_offset(
+            module_type, serial_number
+        )
 
     def get_attached_pipette(
         self, mount: Union[top_types.Mount, OT3Mount]

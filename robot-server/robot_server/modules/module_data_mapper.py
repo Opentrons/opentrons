@@ -1,5 +1,5 @@
 """Module identification and response data mapping."""
-from typing import Type, cast
+from typing import Type, cast, Optional
 
 from opentrons.hardware_control.modules import (
     LiveData,
@@ -45,7 +45,7 @@ class ModuleDataMapper:
         has_available_update: bool,
         live_data: LiveData,
         usb_port: HardwareUSBPort,
-        module_offset: ModuleCalibrationData,
+        module_offset: Optional[ModuleCalibrationData],
     ) -> AttachedModule:
         """Map hardware control data to an attached module response."""
         module_model = ModuleModel(model)

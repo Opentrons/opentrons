@@ -1,13 +1,9 @@
 """Modules routes."""
 from fastapi import APIRouter, Depends, status
-from typing import List, Dict, Optional
+from typing import List, Dict
 
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules.module_calibration import (
-    ModuleCalibrationOffset,
-    load_all_module_calibrations,
-    load_module_calibration_offset,
-)
+from opentrons.hardware_control.modules import module_calibration
 from opentrons.protocol_engine.types import Vec3f
 
 from robot_server.hardware import get_hardware
@@ -49,7 +45,9 @@ async def get_attached_modules(
         )
 
     # Load any the module calibrations
-    module_calibrations: Dict[str, ModuleCalibrationOffset] = {mod.module_id: mod for mod in load_all_module_calibrations()}
+    module_calibrations: Dict[str, module_calibration.ModuleCalibrationOffset] = {
+        mod.module_id: mod for mod in module_calibration.load_all_module_calibrations()
+    }
 
     response_data: List[AttachedModule] = []
     for mod in hardware.attached_modules:
@@ -73,7 +71,9 @@ async def get_attached_modules(
                     slot=calibrated.slot,
                     source=calibrated.status.source,
                     last_modified=calibrated.last_modified,
-                ) if calibrated else None,
+                )
+                if calibrated
+                else None,
             )
         )
 
