@@ -1063,6 +1063,7 @@ class OT3API(
         _, moves = self._move_manager.plan_motion(
             origin=origin, target_list=[move_target]
         )
+        self._log.info(f"built move: {moves[0].to_dict()}")
         return moves
 
     @ExecutionManagerProvider.wait_for_running
@@ -1091,15 +1092,15 @@ class OT3API(
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
 
         origin = await self._backend.update_position()
+        self._log.info(
+            f"move target (machine): {machine_pos} (deck): {target_position}\n"
+            f"move origin (machine): {origin}")
         try:
             moves = self._build_moves(origin, machine_pos, speed)
         except ZeroLengthMoveError as zero_length_error:
-            self._log.info(f"{str(zero_length_error)}, ignoring")
+            self._log.debug(f"{str(zero_length_error)}, ignoring")
             return
-        self._log.info(
-            f"move: deck {target_position} becomes machine {machine_pos} from {origin} "
-            f"requiring {moves}"
-        )
+
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
