@@ -93,7 +93,9 @@ class LoadAdapterImplementation(
             labware_id=params.adapterId,
         )
 
-        if not labware_validation.validate_definition_is_adapter(loaded_labware.definition):
+        if not labware_validation.validate_definition_is_adapter(
+            loaded_labware.definition
+        ):
             raise LabwareDefinitionIsNotAdapter(
                 f"{params.loadName} is not defined as an adapter"
             )

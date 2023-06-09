@@ -76,7 +76,9 @@ _OffDeckLocationType = Literal["offDeck"]
 OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
 
 AdapterLocation = Union[
-    DeckSlotLocation, ModuleLocation, _OffDeckLocationType  # TODO should this be allowed?
+    DeckSlotLocation,
+    ModuleLocation,
+    _OffDeckLocationType,  # TODO should this be allowed?
 ]
 LabwareLocation = Union[
     DeckSlotLocation, ModuleLocation, OnLabwareLocation, _OffDeckLocationType
