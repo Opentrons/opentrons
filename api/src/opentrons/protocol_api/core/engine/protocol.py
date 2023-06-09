@@ -133,17 +133,23 @@ class ProtocolCore(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore],
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
-        module_location: Union[ModuleLocation, DeckSlotLocation]
+        load_location: Union[ModuleLocation, DeckSlotLocation, str]
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
-            module_location = ModuleLocation(moduleId=location.module_id)
+            load_location = ModuleLocation(moduleId=location.module_id)
+        elif location == OffDeckType.OFF_DECK:
+            load_location = OFF_DECK_LOCATION
+        elif isinstance(location, DeckSlotName):
+            load_location = DeckSlotLocation(slotName=location)
         else:
-            module_location = DeckSlotLocation(slotName=location)
+            raise UnknownLocationError(
+                f"load_labware is not supported with the given location: {location}."
+            )
 
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
@@ -154,7 +160,7 @@ class ProtocolCore(
 
         load_result = self._engine_client.load_labware(
             load_name=load_name,
-            location=module_location,
+            location=load_location,
             namespace=namespace,
             version=version,
             display_name=label,
