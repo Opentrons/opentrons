@@ -186,6 +186,11 @@ settings = [
         title="Disable stall detection on the Flex.",
         description="This is an Opentrons-internal setting for hardware-testing.",
     ),
+    SettingDefinition(
+        _id="disableStatusBar",
+        title="Disable the LED status bar on the Flex.",
+        description="This setting disables the LED status bar on the Flex.",
+    ),
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
@@ -562,6 +567,16 @@ def _migrate24to25(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate25to26(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 26 of the feature flags file.
+
+    - Adds the disableStatusBar config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableStatusBar"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -588,6 +603,7 @@ _MIGRATIONS = [
     _migrate22to23,
     _migrate23to24,
     _migrate24to25,
+    _migrate25to26,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

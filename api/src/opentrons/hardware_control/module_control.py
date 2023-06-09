@@ -230,7 +230,7 @@ class AttachedModulesControl:
         return found_module
 
     def load_module_offset(
-        self, module_type: ModuleType, module_id: str, slot: int
+        self, module_type: ModuleType, module_id: str, slot: Optional[int] = None
     ) -> ModuleCalibrationOffset:
         log.info(f"Loading module offset for {module_type} {module_id}")
         return load_module_calibration_offset(module_type, module_id, slot)
