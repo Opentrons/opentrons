@@ -29,7 +29,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Width Test')
-    arg_parser.add_argument('-a', '--calibrate', action="store_true", required=False, help='Calibrates gripper')
+    arg_parser.add_argument('-a', '--calibrate', action="store_true", required=False, help='Calibrate gripper')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Sets the number of testing cycles', default=10)
     arg_parser.add_argument('-f', '--force', type=int, required=False, help='Sets the gripper force in Newtons', default=10)
     arg_parser.add_argument('-t', '--time', type=int, required=False, help='Sets the gripper hold time in seconds', default=10)
@@ -202,9 +202,10 @@ class Gripper_Width_Test:
     async def _home(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
-        # Home grantry
+        # Home gripper
         await api.home_gripper_jaw()
         await api.home_z()
+        # Home grantry
         await api.home()
         self.home = await api.gantry_position(mount)
 
