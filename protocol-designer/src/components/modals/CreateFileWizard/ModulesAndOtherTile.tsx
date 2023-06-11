@@ -17,7 +17,7 @@ export function ModulesAndOtherTile(props: FormikProps<FormState>): JSX.Element 
     setFieldTouched,
   } = props
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} height='32rem' gridGap={SPACING.spacing32}>
+    <Flex flexDirection={DIRECTION_COLUMN} height='26rem' gridGap={SPACING.spacing32}>
 
       <Text as='h2'>
         {i18n.t('modal.create_file_wizard.additional_items')}

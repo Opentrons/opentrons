@@ -77,7 +77,7 @@ export function CreateFileWizard(): JSX.Element | null {
   const dispatch = useDispatch()
 
   const handleCancel = (): void => { dispatch(navigationActions.toggleNewProtocolModal(false)) }
-  const handleSubmit = (values: FormState): void => {
+  const handleSubmit = ({values}: FormState): void => {
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
@@ -97,6 +97,7 @@ export function CreateFileWizard(): JSX.Element | null {
       []
     )
 
+    console.log('values', values)
     const modules: ModuleCreationArgs[] = Object.entries(values.modulesByType).reduce<
       ModuleCreationArgs[]
     >((acc, [moduleType, formModule]) => {
