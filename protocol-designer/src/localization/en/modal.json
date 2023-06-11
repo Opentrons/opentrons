@@ -72,13 +72,16 @@
   "create_file_wizard": {
     "additional_items": "Additional items",
     "add_optional_info": "Add more information, if you like (you can change this later).",
+    "choose_at_least_one_tip_rack": "Choose at least one tiprack for this pipette",
+    "choose_first_pipette": "Choose first pipette",
+    "choose_second_pipette": "Choose second pipette",
+    "choose_robot_type": "Choose robot type",
     "create_new_protocol": "Create New Protocol",
     "create_protocol_on_to_liquids": "Create Protocol, on to Liquids",
-    "choose_robot_type": "Choose robot type",
     "name_your_protocol": "Name your protocol.*",
     "description": "Description",
     "organization_or_author": "Organization/Author",
-    "pipettes": "Pipettes",
+    "pipette_type": "Pipette Type",
     "protocol_name": "Protocol Name",
     "protocol_name_and_description": "Protocol Name and Description",
     "robot_type": "Robot Type"

@@ -15,7 +15,7 @@ const ROBOT_TYPES: RobotType[] = [OT2_ROBOT_TYPE, FLEX_ROBOT_TYPE]
 export function RobotTypeTile(props: FormikProps<FormState>): JSX.Element {
   const { values, setFieldValue } = props
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} height='32rem' gridGap={SPACING.spacing32}>
+    <Flex flexDirection={DIRECTION_COLUMN} height='26rem' gridGap={SPACING.spacing32}>
       <Text as='h2'>
         {i18n.t('modal.create_file_wizard.choose_robot_type')}
       </Text>

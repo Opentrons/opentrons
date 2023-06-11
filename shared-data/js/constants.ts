@@ -125,7 +125,6 @@ export const OT2_PIPETTES = [
   'p300_multi',
   'p300_single_gen2',
   'p300_multi_gen2',
-  'p1000_96',
   'p1000_single',
   'p1000_single_gen2',
   'p20_single_gen2',

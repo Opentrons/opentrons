@@ -10,7 +10,7 @@ import type { FormState } from './types'
 export function MetadataTile(props: FormikProps<FormState>): JSX.Element {
   const { handleChange, handleBlur, values } = props
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} height='32rem' gridGap={SPACING.spacing32}>
+    <Flex flexDirection={DIRECTION_COLUMN} height='26rem' gridGap={SPACING.spacing32}>
       <Text as='h2'>
         {i18n.t('modal.create_file_wizard.protocol_name_and_description')}
       </Text>

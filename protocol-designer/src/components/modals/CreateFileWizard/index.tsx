@@ -59,12 +59,12 @@ import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
 import { RobotTypeTile } from './RobotTypeTile'
 import { MetadataTile } from './MetadataTile'
-import { PipettesTile } from './PipettesTile'
+import { FirstPipetteTile, SecondPipetteTile } from './PipetteTile'
 import { ModulesAndOtherTile } from './ModulesAndOtherTile'
 import { WizardHeader } from './WizardHeader'
 
-type WizardStep = 'robotType' | 'metadata' | 'pipettes' | 'modulesAndOther'
-const WIZARD_STEPS: WizardStep[] = ['robotType', 'metadata', 'pipettes', 'modulesAndOther']
+type WizardStep = 'robotType' | 'metadata' | 'first_pipette' |'second_pipette' | 'modulesAndOther'
+const WIZARD_STEPS: WizardStep[] = ['robotType', 'metadata', 'first_pipette', 'second_pipette', 'modulesAndOther']
 export function CreateFileWizard(): JSX.Element | null {
   const { i18n, t } = useTranslation()
   const showWizard = useSelector(getNewProtocolModal)
@@ -324,7 +324,8 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
   const contentsByWizardStep: { [wizardStep in WizardStep]: (formikProps: FormikProps<FormState>) => JSX.Element } = {
     robotType: (formikProps: FormikProps<FormState>) => <RobotTypeTile {...formikProps} />,
     metadata: (formikProps: FormikProps<FormState>) => <MetadataTile {...formikProps} />,
-    pipettes: (formikProps: FormikProps<FormState>) => <PipettesTile {...formikProps} />,
+    first_pipette: (formikProps: FormikProps<FormState>) => <FirstPipetteTile {...formikProps} />,
+    second_pipette: (formikProps: FormikProps<FormState>) => <SecondPipetteTile {...formikProps} />,
     modulesAndOther: (formikProps: FormikProps<FormState>) => <ModulesAndOtherTile {...formikProps} />,
   }
 

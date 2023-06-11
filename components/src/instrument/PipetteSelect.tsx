@@ -78,8 +78,6 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),
     ...(gen1Options.length > 0 ? [{ options: gen1Options }] : []),
   ]
-  console.log('groupedOptions', groupedOptions)
-  console.log('gen3Options', gen3Options)
 
   const defaultValue = enableNoneOption ? OPTION_NONE : null
   const value =
