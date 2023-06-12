@@ -48,7 +48,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
           justifyContent={JUSTIFY_CENTER}
         >
           <StyledText as="h1" fontWeight={TYPOGRAPHY.fontWeightBold}>
-            Something went wrong
+            {'Something went wrong'}
           </StyledText>
           <MediumButton
             flex="1"
