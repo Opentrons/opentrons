@@ -121,7 +121,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--slot",
-        help="The slot on the deck the module is located in",
+        help="The slot on the deck the module is located in. eg D3",
         type=str,
         required=True,
     )

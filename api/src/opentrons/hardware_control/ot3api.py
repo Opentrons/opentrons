@@ -1828,7 +1828,7 @@ class OT3API(
             return self._pipette_handler.save_instrument_offset(checked_mount, delta)
 
     async def save_module_offset(
-        self, module_id: str, mount: OT3Mount, slot: int, offset: top_types.Point
+        self, module_id: str, mount: OT3Mount, slot: str, offset: top_types.Point
     ) -> Optional[ModuleCalibrationOffset]:
         """Save a new offset for a given module."""
         module = self._backend.module_controls.get_module_by_module_id(module_id)
