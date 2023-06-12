@@ -20,6 +20,8 @@ class ErrorOccurrence(BaseModel):
     )
 
     class Config:
+        """Customize configuration for this model."""
+
         @staticmethod
         def schema_extra(schema: Dict[str, Any], model: object) -> None:
             """Append the schema to make the errorCode appear required.
@@ -31,5 +33,6 @@ class ErrorOccurrence(BaseModel):
             mark this as a non-required field, which is misleading as this is
             a response from the server to the client and it will always have an
             errorCode defined. This hack is required because it informs the client
-            that it does not, in fact, have to account for a missing errorCode."""
+            that it does not, in fact, have to account for a missing errorCode.
+            """
             schema["required"].append("errorCode")
