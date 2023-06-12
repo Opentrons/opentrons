@@ -74,7 +74,6 @@ tip_rack = LoadedLabware(
 
 def get_labware_view(
     labware_by_id: Optional[Dict[str, LoadedLabware]] = None,
-    adapters_by_id: Optional[Dict[str, LoadedLabware]] = None,
     labware_offsets_by_id: Optional[Dict[str, LabwareOffset]] = None,
     definitions_by_uri: Optional[Dict[str, LabwareDefinition]] = None,
     deck_definition: Optional[DeckDefinitionV3] = None,
@@ -82,7 +81,6 @@ def get_labware_view(
     """Get a labware view test subject."""
     state = LabwareState(
         labware_by_id=labware_by_id or {},
-        adapters_by_id=adapters_by_id or {},
         labware_offsets_by_id=labware_offsets_by_id or {},
         definitions_by_uri=definitions_by_uri or {},
         deck_definition=deck_definition or cast(DeckDefinitionV3, {"fake": True}),
