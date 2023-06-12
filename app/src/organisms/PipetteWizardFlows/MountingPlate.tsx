@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import { RIGHT } from '@opentrons/shared-data'
+import { LEFT } from '@opentrons/shared-data'
 import { SPACING } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -20,14 +20,14 @@ export const MountingPlate = (
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
 
-  const handleDetachMountingPlate = (): void => {
+  const handleAttachMountingPlate = (): void => {
     chainRunCommands(
       [
         {
           // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
-            mount: RIGHT,
+            mount: LEFT,
           },
         },
       ],
@@ -70,7 +70,7 @@ export const MountingPlate = (
         )
       }
       proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
-      proceed={flowType === FLOWS.ATTACH ? proceed : handleDetachMountingPlate}
+      proceed={flowType === FLOWS.DETACH ? proceed : handleAttachMountingPlate}
       back={goBack}
     />
   )

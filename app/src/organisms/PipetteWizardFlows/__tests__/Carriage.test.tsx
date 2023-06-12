@@ -79,10 +79,6 @@ describe('Carriage', () => {
             axes: ['rightZ'],
           },
         },
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: { mount: LEFT },
-        },
       ],
       false
     )

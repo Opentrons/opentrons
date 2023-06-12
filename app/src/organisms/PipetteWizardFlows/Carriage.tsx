@@ -8,7 +8,6 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -30,11 +29,6 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         {
           commandType: 'home' as const,
           params: { axes: ['rightZ'] },
-        },
-        {
-          // @ts-expect-error calibration command types not yet supported
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: { mount: LEFT },
         },
       ],
       false

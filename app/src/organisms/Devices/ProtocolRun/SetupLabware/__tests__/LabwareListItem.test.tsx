@@ -127,7 +127,7 @@ describe('LabwareListItem', () => {
       isOt3: true,
     })
     getByText('Mock Labware Definition')
-    getByText('Slot 7+10, Thermocycler Module GEN1')
+    getByText('Slot A1+B1, Thermocycler Module GEN1')
   })
 
   it('renders the correct info for a labware on top of a magnetic module', () => {
