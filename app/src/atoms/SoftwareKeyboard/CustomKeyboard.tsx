@@ -1,5 +1,6 @@
 import * as React from 'react'
 import Keyboard from 'react-simple-keyboard'
+import { customDisplay } from './constants'
 
 interface CustomKeyboardProps {
   onChange: (input: string) => void
@@ -20,12 +21,6 @@ const customLayout = {
     '{numbers}',
   ],
   numbers: ['1 2 3', '4 5 6', '7 8 9', '{abc} 0 {backspace}'],
-}
-
-const customDisplay = {
-  '{numbers}': '123',
-  '{backspace}': 'del',
-  '{abc}': 'ABC',
 }
 
 export function CustomKeyboard({
@@ -49,6 +44,7 @@ export function CustomKeyboard({
   return (
     <Keyboard
       keyboardRef={r => (keyboardRef.current = r)}
+      theme={'hg-theme-default oddTheme1'}
       onChange={onChange}
       onKeyPress={onKeyPress}
       layoutName={layoutName}

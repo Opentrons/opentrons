@@ -107,8 +107,8 @@ export function MediumButton(props: MediumButtonProps): JSX.Element {
     background-color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType]
       .defaultBackgroundColor};
     border-radius: ${buttonCategory === 'rounded'
-      ? BORDERS.size5
-      : BORDERS.size4};
+      ? BORDERS.borderRadiusSize5
+      : BORDERS.borderRadiusSize4};
     box-shadow: none;
     color: ${MEDIUM_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
     cursor: default;

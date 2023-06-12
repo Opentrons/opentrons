@@ -35,5 +35,9 @@ export const TemperatureCommandText = ({
 
   return t(T_KEYS_BY_COMMAND_TYPE[command.commandType], {
     temp: command.params.celsius,
+    hold_time_seconds:
+      'holdTimeSeconds' in command.params
+        ? command.params.holdTimeSeconds ?? '0'
+        : '0',
   })
 }

@@ -41,7 +41,7 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
       >
-        <Icon name="ot-check" size={SIZE_3} color={COLORS.warningEnabled} />
+        <Icon name="ot-alert" size={SIZE_3} color={COLORS.warningEnabled} />
         <ConfirmationHeader>{t('exit_screen_title')}</ConfirmationHeader>
         <StyledText as="p" marginTop={SPACING.spacing8}>
           {t('exit_screen_subtitle')}

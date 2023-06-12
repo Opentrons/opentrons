@@ -10,7 +10,7 @@ import {
 import { i18n } from '../../../../i18n'
 import { EmptyRecentRun } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun'
 import { RecentRunProtocolCarousel } from '../../../../organisms/OnDeviceDisplay/RobotDashboard'
-import { Navigation } from '../../../../organisms/OnDeviceDisplay/Navigation'
+import { Navigation } from '../../../../organisms/Navigation'
 import { useMissingProtocolHardware } from '../../../Protocols/hooks'
 import { getOnDeviceDisplaySettings } from '../../../../redux/config'
 import { WelcomedModal } from '../WelcomeModal'
@@ -32,7 +32,7 @@ jest.mock('../../../../organisms/OnDeviceDisplay/RobotDashboard/EmptyRecentRun')
 jest.mock(
   '../../../../organisms/OnDeviceDisplay/RobotDashboard/RecentRunProtocolCarousel'
 )
-jest.mock('../../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock('../../../../organisms/Navigation')
 jest.mock('../../../Protocols/hooks')
 jest.mock('../../../../redux/config')
 jest.mock('../WelcomeModal')
@@ -74,6 +74,7 @@ const mockProtocol: ProtocolResource = {
   id: 'mockProtocol1',
   createdAt: '2022-05-03T21:36:12.494778+00:00',
   protocolType: 'json',
+  robotType: 'OT-3 Standard',
   metadata: {
     protocolName: 'yay mock protocol',
     author: 'engineering',

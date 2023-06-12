@@ -40,9 +40,9 @@ export type SettingOption =
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
   margin-bottom: ${SPACING.spacing8};
-  background-color: ${COLORS.medGreyEnabled};
+  background-color: ${COLORS.light1};
   padding: ${SPACING.spacing20} ${SPACING.spacing24};
-  border-radius: ${BORDERS.size4};
+  border-radius: ${BORDERS.borderRadiusSize4};
 `
 
 interface RobotSettingButtonProps {
@@ -101,7 +101,7 @@ export function RobotSettingButton({
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
       >
-        <Icon name={iconName} size="3rem" />
+        <Icon name={iconName} size="3rem" color={COLORS.darkBlack100} />
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing2}
@@ -130,7 +130,7 @@ export function RobotSettingButton({
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
           padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
-          borderRadius={BORDERS.size4}
+          borderRadius={BORDERS.borderRadiusSize4}
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {Boolean(devToolsOn) ? t('shared:on') : t('shared:off')}
@@ -145,7 +145,7 @@ export function RobotSettingButton({
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.transparent}
           padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
-          borderRadius={BORDERS.size4}
+          borderRadius={BORDERS.borderRadiusSize4}
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {Boolean(lightsOn) ? t('shared:on') : t('shared:off')}
@@ -161,7 +161,7 @@ export function RobotSettingButton({
           />
         ) : null}
         {enabledDevTools == null && ledLights == null ? (
-          <Icon name="more" size="3rem" />
+          <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
         ) : null}
       </Flex>
     </Btn>

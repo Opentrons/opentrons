@@ -67,7 +67,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
     justify-content: ${JUSTIFY_FLEX_START};
     background-color: ${COLORS.mediumBlueEnabled};
     border-width: 0; 
-    border-radius: ${BORDERS.size4};
+    border-radius: ${BORDERS.borderRadiusSize4};
     padding: ${SPACING.spacing24};
     height: 5.25rem;
     width: 57.8125rem;

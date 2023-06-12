@@ -47,7 +47,7 @@ from opentrons.types import DeckSlotName
             DeckType.OT3_STANDARD,
             lazy_fixture("ot3_standard_deck_def"),
             lazy_fixture("ot3_fixed_trash_def"),
-            DeckSlotName.FIXED_TRASH,  # TODO: Update when OT-3 deck slots get renamed.
+            DeckSlotName.SLOT_A3,
         ),
     ],
 )

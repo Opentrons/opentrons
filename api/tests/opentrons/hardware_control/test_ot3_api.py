@@ -1,6 +1,6 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import Iterator, Union, Dict, Tuple, List, Any
+from typing import Iterator, Union, Dict, Tuple, List, Any, OrderedDict
 from typing_extensions import Literal
 from math import copysign
 import pytest
@@ -43,8 +43,9 @@ from opentrons.hardware_control.types import (
     InstrumentProbeType,
     LiquidNotFound,
     EarlyLiquidSenseTrigger,
-    OT3SubSystem,
+    SubSystem,
     GripperJawState,
+    StatusBarState,
 )
 from opentrons.hardware_control.errors import (
     GripperNotAttachedError,
@@ -1165,6 +1166,39 @@ async def test_move_to_plunger_bottom(
     )
 
 
+@pytest.mark.parametrize(
+    "input_position, expected_move_pos",
+    [
+        ({OT3Axis.X: 13}, {OT3Axis.X: 13, OT3Axis.Y: 493.8, OT3Axis.Z_L: 253.475}),
+        (
+            {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: 15},
+            {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: -240.675},
+        ),
+        (
+            {OT3Axis.Z_R: 15, OT3Axis.Z_L: 16},
+            {
+                OT3Axis.X: 477.2,
+                OT3Axis.Y: 493.8,
+                OT3Axis.Z_L: -239.675,
+                OT3Axis.Z_R: -240.675,
+            },
+        ),
+    ],
+)
+async def test_move_axes(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move: AsyncMock,
+    mock_check_motor: Mock,
+    input_position: Dict[OT3Axis, float],
+    expected_move_pos: OrderedDict[OT3Axis, float],
+):
+
+    await ot3_hardware.move_axes(position=input_position)
+    mock_check_motor.return_value = True
+
+    mock_move.assert_called_once_with(target_position=expected_move_pos, speed=None)
+
+
 async def test_move_gripper_mount_without_gripper_attached(
     ot3_hardware: ThreadManager[OT3API], mock_backend_move: AsyncMock
 ) -> None:
@@ -1557,21 +1591,21 @@ async def test_light_settings(
     "versions,version_str",
     [
         ({}, "unknown"),
-        ({OT3SubSystem.pipette_right: 2}, "2"),
+        ({SubSystem.pipette_right: 2}, "2"),
         (
             {
-                OT3SubSystem.pipette_left: 2,
-                OT3SubSystem.gantry_x: 2,
-                OT3SubSystem.gantry_y: 2,
+                SubSystem.pipette_left: 2,
+                SubSystem.gantry_x: 2,
+                SubSystem.gantry_y: 2,
             },
             "2",
         ),
-        ({OT3SubSystem.gripper: 3, OT3SubSystem.head: 1}, "1, 3"),
+        ({SubSystem.gripper: 3, SubSystem.head: 1}, "1, 3"),
     ],
 )
 def test_fw_version(
     ot3_hardware: ThreadManager[OT3API],
-    versions: Dict[OT3SubSystem, int],
+    versions: Dict[SubSystem, int],
     version_str: str,
 ) -> None:
     with patch(
@@ -1580,3 +1614,30 @@ def test_fw_version(
     ) as mock_fw_version:
         mock_fw_version.return_value = versions
         assert ot3_hardware.get_fw_version() == version_str
+
+
+@pytest.mark.parametrize(argnames=["enabled"], argvalues=[[True], [False]])
+async def test_status_bar_interface(
+    ot3_hardware: ThreadManager[OT3API],
+    enabled: bool,
+) -> None:
+    """Test setting status bar statuses and make sure the cached status is correct."""
+    await ot3_hardware.set_status_bar_enabled(enabled)
+
+    settings = {
+        StatusBarState.IDLE: StatusBarState.IDLE,
+        StatusBarState.RUNNING: StatusBarState.RUNNING,
+        StatusBarState.PAUSED: StatusBarState.PAUSED,
+        StatusBarState.HARDWARE_ERROR: StatusBarState.HARDWARE_ERROR,
+        StatusBarState.SOFTWARE_ERROR: StatusBarState.SOFTWARE_ERROR,
+        StatusBarState.CONFIRMATION: StatusBarState.IDLE,
+        StatusBarState.RUN_COMPLETED: StatusBarState.RUN_COMPLETED,
+        StatusBarState.UPDATING: StatusBarState.UPDATING,
+        StatusBarState.ACTIVATION: StatusBarState.IDLE,
+        StatusBarState.DISCO: StatusBarState.IDLE,
+        StatusBarState.OFF: StatusBarState.OFF,
+    }
+
+    for setting, response in settings.items():
+        await ot3_hardware.set_status_bar_state(state=setting)
+        assert ot3_hardware.get_status_bar_state() == response
