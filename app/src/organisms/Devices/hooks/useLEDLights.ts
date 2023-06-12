@@ -1,31 +1,41 @@
 import * as React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { State } from '../../../redux/types'
+import { RobotSettings } from '../../../redux/robot-settings/types'
 import {
-  useLightsQuery,
-  useSetLightsMutation,
-} from '@opentrons/react-api-client'
+  fetchSettings,
+  getRobotSettings,
+  updateSetting,
+} from '../../../redux/robot-settings'
 
-const LIGHTS_POLL_MS = 5000
-export function useLights(): {
+export function useLights(
+  robotName: string
+): {
   lightsOn: boolean | null
   toggleLights: () => void
 } {
   const [lightsOnCache, setLightsOnCache] = React.useState(false)
-  const { setLights, data: setLightsData } = useSetLightsMutation()
-  const { data: lightsData } = useLightsQuery({
-    refetchInterval: LIGHTS_POLL_MS,
-  })
+
+  const dispatch = useDispatch()
+
+  const settings = useSelector<State, RobotSettings>((state: State) =>
+    getRobotSettings(state, robotName)
+  )
+
+  const isStatusBarDisabled =
+    settings.find(setting => setting.id === 'disableStatusBar')?.value === true
 
   React.useEffect(() => {
-    if (setLightsData != null) {
-      setLightsOnCache(setLightsData.on)
-    } else if (lightsData != null) {
-      setLightsOnCache(lightsData.on)
-    }
-  }, [lightsData, setLightsData])
+    setLightsOnCache(isStatusBarDisabled)
+  }, [isStatusBarDisabled])
+
+  React.useEffect(() => {
+    dispatch(fetchSettings(robotName))
+  }, [dispatch, robotName])
 
   const toggleLights = (): void => {
-    setLightsOnCache(!Boolean(lightsOnCache))
-    setLights({ on: !Boolean(lightsOnCache) })
+    setLightsOnCache(!lightsOnCache)
+    dispatch(updateSetting(robotName, 'disableStatusBar', !lightsOnCache))
   }
 
   return { lightsOn: lightsOnCache, toggleLights }
