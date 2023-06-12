@@ -389,8 +389,8 @@ async def _main(is_simulating: bool) -> None:
     txtval = ["------------------------------------"]
     header_str = data.convert_list_to_csv_line(txtval)
 
-    balance_block_xy = [117,87]
-    balance_block_xz = [117,15]
+    balance_block_xy = [128,80]
+    balance_block_xz = [120,15]
 
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
