@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
@@ -12,11 +12,17 @@ import { UNREACHABLE } from '../../../redux/discovery/constants'
 import { Navigation } from '../../../organisms/Navigation'
 import { useLights } from '../../../organisms/Devices/hooks'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
+import {
+  fetchSettings,
+  getRobotSettings,
+  updateSetting,
+} from '../../../redux/robot-settings'
 import { useNetworkConnection } from '../hooks'
 import { RobotSettingButton } from './RobotSettingButton'
 import { RobotSettingsContent } from './RobotSettingsContent'
 
 import type { State } from '../../../redux/types'
+import type { RobotSettings } from '../../../redux/robot-settings/types'
 import type { SettingOption } from './RobotSettingButton'
 
 export function RobotSettingsDashboard(): JSX.Element {
@@ -26,6 +32,7 @@ export function RobotSettingsDashboard(): JSX.Element {
     'shared',
   ])
   const localRobot = useSelector(getLocalRobot)
+  const dispatch = useDispatch()
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
   const networkConnection = useNetworkConnection(robotName)
   const [
@@ -42,7 +49,21 @@ export function RobotSettingsDashboard(): JSX.Element {
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
   const devToolsOn = useSelector(getDevtoolsEnabled)
-  const { lightsOn, toggleLights } = useLights()
+
+  const settings = useSelector<State, RobotSettings>((state: State) =>
+    getRobotSettings(state, robotName)
+  )
+
+  const isStatusBarDisabled =
+    settings.find(setting => setting.id === 'disableStatusBar')?.value === true
+
+  const toggleLights = dispatch(
+    updateSetting(robotName, 'disableStatusBar', !isStatusBarDisabled)
+  )
+
+  React.useEffect(() => {
+    dispatch(fetchSettings(robotName))
+  }, [dispatch, robotName])
 
   return (
     <Flex
@@ -102,7 +123,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             setCurrentOption={setCurrentOption}
             iconName="light"
             ledLights
-            lightsOn={Boolean(lightsOn)}
+            lightsOn={!isStatusBarDisabled}
             toggleLights={toggleLights}
           />
           <RobotSettingButton
