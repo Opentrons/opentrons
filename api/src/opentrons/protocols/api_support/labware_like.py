@@ -5,10 +5,18 @@ if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware, Well
     from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
     from opentrons.protocol_api.module_contexts import ModuleContext
+    from opentrons.protocol_api._types import OffDeckType
 
 
 WrappableLabwareLike = Union[
-    "Labware", "Well", str, "ModuleGeometry", "LabwareLike", None, "ModuleContext"
+    "Labware",
+    "Well",
+    str,
+    "ModuleGeometry",
+    "LabwareLike",
+    None,
+    "OffDeckType",
+    "ModuleContext",
 ]
 
 

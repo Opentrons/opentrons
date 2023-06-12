@@ -11,6 +11,7 @@ if TYPE_CHECKING:
     from .protocol_api.labware import Labware, Well
     from .protocol_api.core.legacy.module_geometry import ModuleGeometry
     from .protocol_api.module_contexts import ModuleContext
+    from .protocol_api._types import OffDeckType
 
 
 class PipetteNotAttachedError(KeyError):
@@ -66,7 +67,14 @@ class Point(NamedTuple):
 
 
 LocationLabware = Union[
-    "Labware", "Well", str, "ModuleGeometry", LabwareLike, None, "ModuleContext"
+    "Labware",
+    "Well",
+    str,
+    "ModuleGeometry",
+    LabwareLike,
+    None,
+    "OffDeckType",
+    "ModuleContext",
 ]
 
 
