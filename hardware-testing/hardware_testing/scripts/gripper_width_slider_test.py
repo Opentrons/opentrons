@@ -30,17 +30,21 @@ def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Gripper Width Slider Test')
     arg_parser.add_argument('-a', '--calibrate', action="store_true", required=False, help='Calibrate gripper')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
+    arg_parser.add_argument('-f', '--force', type=int, required=False, help='Sets the gripper force in Newtons', default=10)
+    arg_parser.add_argument('-w', '--width', type=int, required=False, help='Sets the gripper jaw width', default=72)
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Sets the slider slot number', default=5)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Gripper_Width_Slider_Test:
     def __init__(
-        self, simulate: bool, calibrate: bool, cycles: int, slot: int
+        self, simulate: bool, calibrate: bool, cycles: int, force: int, width: int, slot: int
     ) -> None:
         self.simulate = simulate
         self.calibrate = calibrate
         self.cycles = cycles
+        self.grip_force = force
+        self.jaw_width = width
         self.slot = slot
         self.api = None
         self.mount = None
@@ -48,9 +52,16 @@ class Gripper_Width_Slider_Test:
         self.gripper_id = None
         self.deck_definition = None
         self.y_offset = None
+        self.jaw_error = None
+        self.jaw_length = None # 94.55 mm
+        self.jaw_max = 92 # mm
+        self.jaw_min = 60 # mm
+        self.jaw_home = 90 # mm
+        self.jaw_displacement = (self.jaw_max - self.jaw_width) / 2
+        self.slider_thick = 5 # mm
         self.slider_height = 48 # mm
         self.slider_length = 85 # mm
-        self.jaw_length = 72 # mm
+        self.slider_length_half = self.slider_length / 2
         self.CUTOUT_SIZE = 20 # mm
         self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
         self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
@@ -60,23 +71,23 @@ class Gripper_Width_Slider_Test:
             "Cycle":"None",
             "Slot":"None",
             "Gripper":"None",
-            "X Gauge":"None",
-            "Y Gauge":"None",
-            "Z Gauge":"None",
-            "X Center":"None",
-            "Y Center":"None",
-            "Deck Height":"None",
+            "Y Offset":"None",
+            "Slider":"None",
+            "Gripper Displacement":"None",
+            "Encoder Displacement":"None",
+            "Measured Displacement":"None",
+            "Gripper Width":"None",
+            "Encoder Width":"None",
+            "Measured Width":"None",
+            "Encoder Error":"None",
+            "Measured Error":"None",
+            "Jaw Error":"None",
         }
         self.gauges = {}
         self.gauge_ports = {
             # "X":"/dev/ttyUSB0",
             "Y":"/dev/ttyUSB1",
             # "Z":"/dev/ttyUSB2",
-        }
-        self.gauge_offsets = {
-            "X":Point(x=0, y=0, z=6),
-            "Y":Point(x=0, y=0, z=-50),
-            "Z":Point(x=0, y=0, z=6),
         }
         self.gripper_probes = {
             "Front":GripperProbe.FRONT,
@@ -100,7 +111,7 @@ class Gripper_Width_Slider_Test:
     def file_setup(self):
         class_name = self.__class__.__name__
         self.test_name = class_name.lower()
-        self.test_tag = f"slot{self.slot}"
+        self.test_tag = f"slot{self.slot}_w{self.jaw_width}"
         self.test_header = self.dict_keys_to_line(self.test_data)
         self.test_id = data.create_run_id()
         self.test_path = data.create_folder_for_test_data(self.test_name)
@@ -120,7 +131,9 @@ class Gripper_Width_Slider_Test:
         else:
             self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
         self.test_data["Gripper"] = str(self.gripper_id)
-        await set_error_tolerance(self.api._backend._messenger, 1, 1)
+        self.test_data[f"Gripper Width"] = str(self.jaw_width)
+        self.test_data[f"Gripper Displacement"] = str(self.jaw_displacement)
+        await set_error_tolerance(self.api._backend._messenger, 0.01, 2)
 
     async def deck_setup(self):
         self.deck_definition = load("ot3_standard", version=3)
@@ -133,42 +146,22 @@ class Gripper_Width_Slider_Test:
     def dict_values_to_line(self, dict):
         return str.join(",", list(dict.values()))+"\n"
 
+    def _get_jaw_displacement(self):
+        jaw_displacement = self.api._gripper_handler.gripper.current_jaw_displacement
+        return jaw_displacement
+
+    def _get_jaw_width(self):
+        jaw_width = self.api._gripper_handler.get_gripper().jaw_width
+        return jaw_width
+
     def _read_gauge(self, axis):
         # Read gauge
         gauge_read = self.gauges[axis].read_stable(timeout=20)
         return gauge_read
 
-    def _zero_gauges(self):
-        print(f"\nPlace Gauge Block on Deck Slot #{self.slot}")
-        for axis in self.gauges:
-            gauge_zero = "{} Zero".format(axis)
-            input(f"\nPush block against {axis}-axis Gauge and Press ENTER\n")
-            _reading = True
-            while _reading:
-                zeros = []
-                for i in range(5):
-                    gauge = self.gauges[axis].read_stable(timeout=20)
-                    zeros.append(gauge)
-                _variance = abs(max(zeros) - min(zeros))
-                print(f"Variance = {_variance}")
-                if _variance < 0.1:
-                    _reading = False
-            zero = sum(zeros) / len(zeros)
-            self.test_data[gauge_zero] = str(zero)
-            print(f"{axis} Gauge Zero = {zero}mm")
-        input(f"\nRemove Gauge Block from Deck Slot #{self.slot} and Press ENTER\n")
-
     async def _center_slider(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
-        # Home gripper
-        await api.home_z()
-        await api.home_gripper_jaw()
-        # Move above slot center
-        current_position = await api.gantry_position(mount)
-        above_slot_center = self.nominal_center._replace(z=current_position.z)
-        await api.move_to(mount, above_slot_center)
-        time.sleep(1.0)
         # Move to gripper slider height
         gripper_slider = self.nominal_center._replace(z=self.slider_height)
         await api.move_to(mount, gripper_slider)
@@ -177,49 +170,108 @@ class Gripper_Width_Slider_Test:
         await api.grip(10)
         time.sleep(2.0)
         self.y_offset = self._read_gauge("Y")
-        print(f"--> Y Offset = {self.y_offset} mm")
-        self.test_data[f"Y Gauge"] = str(self.y_offset)
+        print(f"-->> Y Offset = {self.y_offset} mm")
+        self.test_data[f"Y Offset"] = str(self.y_offset)
         # Ungrip slider
-        await api.ungrip()
+        # await api.ungrip()
+        await api.hold_jaw_width(self.jaw_home)
         time.sleep(1.0)
 
     async def _push_slider(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
-        # Move up
+        # Move upwards
         current_position = await api.gantry_position(mount)
         slider_position = current_position._replace(z=56)
         await api.move_to(mount, slider_position)
-        await api.hold_jaw_width(self.jaw_length)
+        # Hold gripper jaw width
+        await api.hold_jaw_width(self.jaw_width)
         time.sleep(2.0)
-        input("ENTER!")
-        await api.ungrip()
+        # Measure displacement
+        slider = self._read_gauge("Y")
+        print(f"-->> Slider = {slider} mm")
+        self.test_data[f"Slider"] = str(slider)
+        encoder_displacement = round(self._get_jaw_displacement(), 3)
+        encoder_width = round(self._get_jaw_width(), 3)
+        measured_displacement = round(abs(slider - self.y_offset) + self.slider_gap_half, 3)
+        measured_width = round(self.jaw_max - measured_displacement*2, 3)
+        encoder_error = round(self.jaw_width - abs(encoder_width), 3)
+        measured_error = round(self.jaw_width - abs(measured_width), 3)
+        # Show measurements
+        print("")
+        print(f"--->>> Desired Displacement = {self.jaw_displacement} mm")
+        print(f"--->>> Desired Width = {self.jaw_width} mm")
+        print(f"--->>> Encoder Displacement = {encoder_displacement} mm")
+        print(f"--->>> Encoder Width = {encoder_width} mm")
+        print(f"--->>> Measured Displacement = {measured_displacement} mm")
+        print(f"--->>> Measured Width = {measured_width} mm")
+        print(f"--->>> Encoder Error = {encoder_error} mm")
+        print(f"--->>> Measured Error = {measured_error} mm")
+        # Save measurements
+        self.test_data[f"Encoder Displacement"] = str(encoder_displacement)
+        self.test_data[f"Measured Displacement"] = str(measured_displacement)
+        self.test_data[f"Encoder Width"] = str(encoder_width)
+        self.test_data[f"Measured Width"] = str(measured_width)
+        self.test_data[f"Encoder Error"] = str(encoder_error)
+        self.test_data[f"Measured Error"] = str(measured_error)
+        # Ungrip slider
+        # await api.ungrip()
+        await api.hold_jaw_width(self.jaw_home)
         time.sleep(1.0)
 
     async def _reset_slider(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         slider = self._read_gauge("Y")
-        print(f"Slider = {slider} mm")
-        i = abs(slider + self.y_offset)
+        print(f"\n(Slider = {slider} mm)")
+        print("Resetting Slider...")
         if slider > 0:
-            print("Pushing Forward!")
+            distance = abs(slider + self.y_offset)
+            i = round(distance, 3)
+            print(f"Pushing Forward! ({i}mm)")
             while slider > 0:
                 await api.move_rel(mount, Point(0, -i, 0))
                 slider = self._read_gauge("Y")
                 i =+ 1
         else:
-            i += (self.slider_length - (i + 0.5))
-            print("Pushing Backwards!")
+            distance = self.jaw_length_half + (self.jaw_length_half - (self.slider_thick + (self.jaw_length - self.jaw_width)/2))
+            i = round(distance, 3)
+            print(f"Pushing Backwards! ({i}mm)")
             while slider < 0:
                 await api.move_rel(mount, Point(0, i, 0))
                 slider = self._read_gauge("Y")
                 i =+ 1
 
+    async def _gripper_error(
+        self, api: OT3API, mount: OT3Mount
+    ) -> None:
+        # Move gripper above slider
+        current_position = await api.gantry_position(mount)
+        above_staircase = self.nominal_center._replace(z=current_position.z)
+        await api.move_to(mount, above_staircase)
+        # Home gripper jaw only once
+        await api.home_gripper_jaw()
+        # Close gripper jaw
+        await api.grip(self.grip_force)
+        time.sleep(1)
+        # Measure closed gripper jaw width
+        jaw_width = self._get_jaw_width()
+        self.jaw_error = round(self.jaw_min - jaw_width, 3)
+        self.test_data["Jaw Error"] = str(self.jaw_error)
+        print(f"\nClosed Jaw Error = {self.jaw_error} mm (Expected = 60mm / Actual = {jaw_width}mm)\n")
+        # Update jaw length
+        self.jaw_length = self.jaw_max + self.jaw_error
+        self.jaw_length_half = self.jaw_length / 2
+        # Update slider gap
+        self.slider_gap = self.jaw_length - self.slider_length
+        self.slider_gap_half = self.slider_gap / 2
+        # Hold gripper jaw width (do not home or ungrip jaw!)
+        await api.hold_jaw_width(self.jaw_home)
 
     async def _measure_gripper_width(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
+        await self._gripper_error(api, mount)
         await self._center_slider(api, mount)
         await self._push_slider(api, mount)
         await self._reset_slider(api, mount)
@@ -306,5 +358,5 @@ if __name__ == '__main__':
     print("\nOT-3 Gripper Width Slider Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Gripper_Width_Slider_Test(args.simulate, args.calibrate, args.cycles, args.slot)
+    test = Gripper_Width_Slider_Test(args.simulate, args.calibrate, args.cycles, args.force, args.width, args.slot)
     asyncio.run(test.run())
