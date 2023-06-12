@@ -31,51 +31,17 @@ TEST_PARAMETERS = {
     GantryLoad.LOW_THROUGHPUT: {
         'X': {
             'SPEED': {
-                'MIN': 400,
-                'MAX': 600,
-                'INC': 50},
-            'ACCEL': {
-                'MIN': 900,
-                'MAX': 1100,
-                'INC': 100}},
-        'Y': {
-            'SPEED': {
-                'MIN': 300,
-                'MAX': 600,
-                'INC': 50},
-            'ACCEL': {
-                'MIN': 900,
-                'MAX': 1100,
-                'INC': 100}},
-        'L': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 30},
-            'ACCEL': {
-                'MIN': 100,
-                'MAX': 300,
-                'INC': 100}},
-        'R': {
-            'SPEED': {
-                'MIN': 40,
-                'MAX': 140,
-                'INC': 30},
-            'ACCEL': {
-                'MIN': 100,
-                'MAX': 300,
-                'INC': 100}}
-    },
-    GantryLoad.HIGH_THROUGHPUT: {
-        'X': {
-            'SPEED': {
                 'MIN': 300,
                 'MAX': 500,
                 'INC': 100},
             'ACCEL': {
                 'MIN': 700,
                 'MAX': 900,
-                'INC': 100}},
+                'INC': 100},
+            'CURRENT': {
+                'MIN': 1,
+                'MAX': 1.5,
+                'INC': 0.25}},
         'Y': {
             'SPEED': {
                 'MIN': 275,
@@ -84,25 +50,91 @@ TEST_PARAMETERS = {
             'ACCEL': {
                 'MIN': 500,
                 'MAX': 700,
-                'INC': 100}},
+                'INC': 100},
+            'CURRENT': {
+                'MIN': 1,
+                'MAX': 1.5,
+                'INC': 0.25}},
         'L': {
             'SPEED': {
                 'MIN': 40,
                 'MAX': 140,
-                'INC': 10},
+                'INC': 30},
             'ACCEL': {
                 'MIN': 100,
                 'MAX': 300,
-                'INC': 100}},
+                'INC': 100},
+            'CURRENT': {
+                'MIN': 1,
+                'MAX': 1.5,
+                'INC': 0.25}},
         'R': {
             'SPEED': {
                 'MIN': 40,
                 'MAX': 140,
-                'INC': 10},
+                'INC': 30},
             'ACCEL': {
                 'MIN': 100,
                 'MAX': 300,
-                'INC': 100}},
+                'INC': 100},
+            'CURRENT': {
+                'MIN': 1,
+                'MAX': 1.5,
+                'INC': 0.25}}
+    },
+    GantryLoad.HIGH_THROUGHPUT: {
+        'X': {
+            'SPEED': {
+                'MIN': 275,
+                'MAX': 375,
+                'INC': 50},
+            'ACCEL': {
+                'MIN': 700,
+                'MAX': 900,
+                'INC': 100},
+            'CURRENT': {
+                'MIN': 1.0,
+                'MAX': 1.4,
+                'INC': 0.2}},
+        'Y': {
+            'SPEED': {
+                'MIN': 275,
+                'MAX': 375,
+                'INC': 50},
+            'ACCEL': {
+                'MIN': 400,
+                'MAX': 600,
+                'INC': 100},
+            'CURRENT': {
+                'MIN': 1.3,
+                'MAX': 1.5,
+                'INC': 0.1}},
+        'L': {
+            'SPEED': {
+                'MIN': 40,
+                'MAX': 140,
+                'INC': 30},
+            'ACCEL': {
+                'MIN': 100,
+                'MAX': 300,
+                'INC': 100},
+            'CURRENT': {
+                'MIN': 1,
+                'MAX': 1.5,
+                'INC': 0.25}},
+        'R': {
+            'SPEED': {
+                'MIN': 40,
+                'MAX': 140,
+                'INC': 30},
+            'ACCEL': {
+                'MIN': 100,
+                'MAX': 300,
+                'INC': 100},
+            'CURRENT': {
+                'MIN': 1,
+                'MAX': 1.5,
+                'INC': 0.25}}
     }
 }
 
@@ -227,6 +259,7 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
 
         print('Executing Move: ' + str(c))
+        print(' Current - ' + str(SETTINGS[AXIS_MAP[axis]].run_current))
         print(' Speed - ' + str(cur_speed))
         print(' Acceleration - ' + str(SETTINGS[AXIS_MAP[axis]].acceleration))
 
@@ -262,11 +295,11 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
                                        speed=35)
             except:
                  await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
-                
+
             if(DELAY > 0):
                 time.sleep(DELAY)
             await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
-            return (move_error, c+1)
+            return (move_error, c)
 
         #record the current position
         inital_pos = await api.encoder_current_position_ot3(mount=MOUNT)
@@ -288,7 +321,7 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
             if(DELAY > 0):
                 time.sleep(DELAY)
             await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
-            return (move_error, c+1);
+            return (move_error, c);
         else:
             avg_error.append(move_error)
 
@@ -322,7 +355,7 @@ async def _main(is_simulating: bool) -> None:
     print("HOMING")
     await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     try:
-        #run the test while recording raw results
+        # #run the test while recording raw results
         table_results = {}
 
         #check if directory exists, make if doesn't
@@ -330,13 +363,17 @@ async def _main(is_simulating: bool) -> None:
             os.makedirs(BASE_DIRECTORY)
 
         with open(BASE_DIRECTORY + SAVE_NAME + AXIS + '.csv', mode='w') as csv_file:
-            fieldnames = ['axis','speed', 'acceleration', 'error', 'cycles']
+            fieldnames = ['axis', 'current', 'speed',
+                          'acceleration', 'error', 'cycles']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
 
             test_axis_list = list(AXIS)
             for test_axis in test_axis_list:
-                table_results[test_axis] = {}
+                c_len = len(parameter_range(LOAD, test_axis, 'CURRENT'))
+                s_len = len(parameter_range(LOAD, test_axis, 'SPEED'))
+                a_len = len(parameter_range(LOAD, test_axis, 'ACCEL'))
+                table_results[test_axis] = np.zeros((c_len,s_len,a_len))
 
                 axis_parameters = TEST_LIST[test_axis]
                 print('Testing Axis: ' + test_axis)
@@ -345,7 +382,7 @@ async def _main(is_simulating: bool) -> None:
                     print(p)
                     SETTINGS[AXIS_MAP[test_axis]].acceleration = p['ACCEL']
                     SETTINGS[AXIS_MAP[test_axis]].max_speed = p['SPEED']
-                    SETTINGS[AXIS_MAP[test_axis]].run_current = START_CURRENT
+                    SETTINGS[AXIS_MAP[test_axis]].run_current = p['CURRENT']
 
                     #update the robot settings to use test speed/accel
                     await match_z_settings(test_axis,
@@ -367,19 +404,25 @@ async def _main(is_simulating: bool) -> None:
                     run_avg_error = move_output_tuple[0]
                     cycles_completed = move_output_tuple[1]
 
-                    #record results to dictionary for neat formatting later
-                    if p['SPEED'] in table_results[test_axis].keys():
-                        table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
-                    else:
-                        table_results[test_axis][p['SPEED']] = {}
-                        table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
+                    # #record results to dictionary for neat formatting later
+                    # if p['SPEED'] in table_results[test_axis].keys():
+                    #     table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
+                    # else:
+                    #     table_results[test_axis][p['SPEED']] = {}
+                    #     table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
+                    c_i = table_results_key[test_axis][p['CURRENT']]
+                    s_i = table_results_key[test_axis][p['SPEED']]
+                    a_i = table_results_key[test_axis][p['ACCEL']]
+                    table_results[test_axis][c_i][s_i][a_i] = cycles_completed
 
                     #record results of cycles to raw csv
                     print("Cycles complete")
+                    print("Current: " + str(p['CURRENT']))
                     print("Speed: " + str(p['SPEED']))
                     print("Acceleration: " + str(p['ACCEL']))
                     print("Error: " + str(run_avg_error))
                     writer.writerow({'axis': test_axis,
+                                     'current': p['CURRENT'],
                                      'speed': p['SPEED'],
                                      'acceleration': p['ACCEL'],
                                      'error': run_avg_error,
@@ -390,20 +433,27 @@ async def _main(is_simulating: bool) -> None:
         test_axis_list = list(AXIS)
         for test_axis in test_axis_list:
             with open(BASE_DIRECTORY + SAVE_NAME + test_axis + '_table.csv', mode='w') as csv_file:
-                fieldnames = ['Speed'] + [*parameter_range(LOAD, test_axis, 'ACCEL')]
+                fieldnames = ['Current', 'Speed'] + [*parameter_range(LOAD, test_axis, 'ACCEL')]
                 # print(fieldnames)
                 writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-                td = {'Speed': LOAD}
+                td = {'Current': LOAD}
                 writer.writerow(td)
-                td = {'Speed': test_axis}
+                td = {'Current': test_axis}
                 writer.writerow(td)
                 td = {'Speed': 'Acceleration'}
                 writer.writerow(td)
                 writer.writeheader()
-                for i in parameter_range(LOAD, test_axis, 'SPEED'):
-                    td = {'Speed': i}
-                    td.update(table_results[test_axis][i])
-                    writer.writerow(td)
+                for c in parameter_range(LOAD, test_axis, 'CURRENT'):
+                    for s in parameter_range(LOAD, test_axis, 'SPEED'):
+                        td = {'Current': c, 'Speed': s}
+                        c_i = table_results_key[test_axis][c]
+                        s_i = table_results_key[test_axis][s]
+                        for a in parameter_range(LOAD, test_axis, 'ACCEL'):
+                            a_i = table_results_key[test_axis][a]
+                            val = table_results[test_axis][c_i][s_i][a_i]
+                            td.update({a: val})
+
+                        writer.writerow(td)
                 # print(table_results[test_axis])
 
     except KeyboardInterrupt:
@@ -417,18 +467,34 @@ def parameter_range(test_load, test_axis, p_type):
     step = TEST_PARAMETERS[test_load][test_axis][p_type]['INC']
     #add step to stop to make range inclusive
     stop = TEST_PARAMETERS[test_load][test_axis][p_type]['MAX'] + step
-    return range(start, stop, step)
+    return np.arange(start, stop, step)
 
-#dictionary containing lists of all speed/accel combinations to for each axis
+table_results_key = {}
+
+#dictionary containing lists of all speed/accel/current combinations to for each axis
 def make_test_list(test_axis, test_load):
     test_axis = list(test_axis)
     complete_test_list = {}
     for axis_t in test_axis:
         axis_test_list = []
-        for speed_t in parameter_range(test_load, axis_t, 'SPEED'):
-            for accel_t in parameter_range(test_load, axis_t, 'ACCEL'):
-                axis_test_list.append({'SPEED': speed_t,
-                                       'ACCEL': accel_t})
+        table_results_key[axis_t] = {}
+        c_i = 0
+        s_i = 0
+        a_i = 0
+        for current_t in parameter_range(test_load, axis_t, 'CURRENT'):
+            table_results_key[axis_t][current_t] = c_i
+            c_i = c_i + 1
+            s_i = 0
+            for speed_t in parameter_range(test_load, axis_t, 'SPEED'):
+                table_results_key[axis_t][speed_t] = s_i
+                s_i = s_i + 1
+                a_i = 0
+                for accel_t in parameter_range(test_load, axis_t, 'ACCEL'):
+                    table_results_key[axis_t][accel_t] = a_i
+                    a_i = a_i + 1
+                    axis_test_list.append({'CURRENT': current_t,
+                                           'SPEED': speed_t,
+                                           'ACCEL': accel_t})
 
         complete_test_list[axis_t] = axis_test_list
 
