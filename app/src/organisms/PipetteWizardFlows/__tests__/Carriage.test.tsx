@@ -35,9 +35,9 @@ describe('Carriage', () => {
     }
   })
   it('returns the correct information, buttons work as expected when flow is attach', () => {
-    const { getByText, getByAltText, getByRole } = render(props)
+    const { getByText, getByTestId, getByRole } = render(props)
     getByText('Unscrew z-axis carriage')
-    getByAltText('Unscrew gantry')
+    getByTestId('Pipette_Zaxis_Attach_96.webm')
     getByRole('button', { name: 'Continue' })
     expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
   })
@@ -54,7 +54,7 @@ describe('Carriage', () => {
       ...props,
       flowType: FLOWS.DETACH,
     }
-    const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
+    const { getByTestId, getByText, getByRole, getByLabelText } = render(props)
     getByText('Reattach z-axis carriage')
     getByText(
       'Push the right pipette mount up to the top of the z-axis. Then tighten the captive screw at the top right of the gantry carriage.'
@@ -62,7 +62,7 @@ describe('Carriage', () => {
     getByText(
       'When reattached, the right mount should no longer freely move up and down.'
     )
-    getByAltText('Reattach carriage')
+    getByTestId('Pipette_Zaxis_Detach_96.webm')
     getByRole('button', { name: 'Continue' })
     getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
@@ -78,10 +78,6 @@ describe('Carriage', () => {
           params: {
             axes: ['rightZ'],
           },
-        },
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: { mount: LEFT },
         },
       ],
       false

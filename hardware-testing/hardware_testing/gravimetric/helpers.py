@@ -51,6 +51,7 @@ def get_api_context(
     pipette_right: Optional[str] = None,
     gripper: Optional[str] = None,
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
+    deck_version: str = guess_deck_type_from_global_config(),
 ) -> protocol_api.ProtocolContext:
     """Get api context."""
 
@@ -68,8 +69,9 @@ def get_api_context(
     return protocol_api.create_protocol_context(
         api_version=APIVersion.from_string(api_level),
         hardware_api=ThreadManager(_thread_manager_build_hw_api),  # type: ignore[arg-type]
-        deck_type=guess_deck_type_from_global_config(),
+        deck_type="ot3_standard",
         extra_labware=extra_labware,
+        deck_version=2,
     )
 
 

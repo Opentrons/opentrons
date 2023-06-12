@@ -339,7 +339,8 @@ def _run_trial(
             added_blow_out=(i + 1) == num_dispenses,
         )
         if cfg.touch_tip:
-            pipette.touch_tip(v_offset=-2.0)
+            ui.get_user_ready("ready")
+            pipette.touch_tip(speed=30)
         pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
         pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))
         ui.get_user_ready("Cover and replace the photoplate in slot 3")
