@@ -65,10 +65,12 @@ wheel: $(wheel_file)
 
 .PHONY: test
 test:
+	$(MAKE) apply-patches-gravimetric
 	$(pytest) $(tests) $(test_opts)
 
 .PHONY: test-cov
 test-cov:
+	$(MAKE) apply-patches-gravimetric
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-photometric
