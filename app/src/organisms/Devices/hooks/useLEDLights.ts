@@ -8,25 +8,28 @@ import {
   updateSetting,
 } from '../../../redux/robot-settings'
 
-export function useLights(
+// not releveant to the OT-2, this controls the front LED lights on the Flex
+export function useLEDLights(
   robotName: string
 ): {
-  lightsOn: boolean | null
+  lightsDisabled: boolean
   toggleLights: () => void
 } {
-  const [lightsOnCache, setLightsOnCache] = React.useState(false)
+  const [lightsDisabledCache, setLightsDisabledCache] = React.useState<boolean>(
+    false
+  )
+
+  console.log({ lightsDisabledCache })
 
   const dispatch = useDispatch()
 
-  const settings = useSelector<State, RobotSettings>((state: State) =>
-    getRobotSettings(state, robotName)
-  )
-
   const isStatusBarDisabled =
-    settings.find(setting => setting.id === 'disableStatusBar')?.value === true
+    useSelector<State, RobotSettings>((state: State) =>
+      getRobotSettings(state, robotName)
+    ).find(setting => setting.id === 'disableStatusBar')?.value === true
 
   React.useEffect(() => {
-    setLightsOnCache(isStatusBarDisabled)
+    setLightsDisabledCache(isStatusBarDisabled)
   }, [isStatusBarDisabled])
 
   React.useEffect(() => {
@@ -34,9 +37,9 @@ export function useLights(
   }, [dispatch, robotName])
 
   const toggleLights = (): void => {
-    setLightsOnCache(!lightsOnCache)
-    dispatch(updateSetting(robotName, 'disableStatusBar', !lightsOnCache))
+    dispatch(updateSetting(robotName, 'disableStatusBar', !lightsDisabledCache))
+    setLightsDisabledCache(!lightsDisabledCache)
   }
 
-  return { lightsOn: lightsOnCache, toggleLights }
+  return { lightsDisabled: lightsDisabledCache, toggleLights }
 }
