@@ -518,6 +518,8 @@ class ProtocolCore(
                 labware_location.slotName, self._engine_client.state.config.robot_type
             )
         elif isinstance(labware_location, ModuleLocation):
-            return self._module_cores_by_id.get(labware_location.moduleId)
+            # TODO (tz. 06-12-23) this will raise a key exception if module not found instead of returning None.
+            # This does not need to return OFF_DECK.
+            return self._module_cores_by_id[labware_location.moduleId]
 
         return OffDeckType.OFF_DECK
