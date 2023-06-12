@@ -13,14 +13,11 @@ from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.opentrons_api.types import Point, OT3Axis
 from .measurement import (
-    MeasurementData,
     MeasurementType,
     create_measurement_tag,
     EnvironmentData,
 )
-from .measurement.environment import (
-    read_environment_data
-)
+from .measurement.environment import read_environment_data
 from . import report
 from . import config
 from .helpers import get_pipette_unique_name
@@ -32,10 +29,7 @@ from .liquid_class.pipetting import (
     PipettingCallbacks,
 )
 from .liquid_height.height import LiquidTracker, initialize_liquid_from_deck
-from .measurement import (
-    MeasurementData,
-)
-from .measurement.environment import get_min_reading, get_max_reading
+
 from .tips import get_tips
 
 
@@ -243,7 +237,6 @@ def _dispense_volumes(volume: float) -> Tuple[float, float, int]:
     return target_volume, volume_to_dispense, num_dispenses
 
 
-
 def _run_trial(
     ctx: ProtocolContext,
     test_report: CSVReport,
@@ -271,7 +264,7 @@ def _run_trial(
     def _tag(m_type: MeasurementType) -> str:
         return create_measurement_tag(m_type, volume, 0, trial)
 
-    def _record_measurement_and_store(m_type: MeasurementType) -> MeasurementData:
+    def _record_measurement_and_store(m_type: MeasurementType) -> EnvironmentData:
         m_tag = _tag(m_type)
         m_data = read_environment_data(cfg.pipette_mount, ctx.is_simulating())
         report.store_measurements_pm(test_report, m_tag, m_data)
@@ -358,7 +351,7 @@ def _run_trial(
             pipette.touch_tip(speed=30)
         _record_measurement_and_store(MeasurementType.DISPENSE)
         pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
-        if ((i+1) == num_dispenses):
+        if (i + 1) == num_dispenses:
             _drop_tip(ctx, pipette, cfg)
         else:
             pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))

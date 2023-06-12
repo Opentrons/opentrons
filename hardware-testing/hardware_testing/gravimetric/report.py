@@ -83,10 +83,7 @@ def create_csv_test_report_photometric(
 ) -> CSVReport:
     """Create CSV test report."""
     env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
-    volume_stat_type = (
-            ["channel_all"]
-    )
-    meas_vols: List[Tuple[int,int,int]] = []
+    meas_vols: List[Tuple[int, int, int]] = []
 
     for vol in volumes:
         meas_vols += [
