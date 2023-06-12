@@ -3,9 +3,10 @@ import asyncio
 import logging
 from pathlib import Path
 from fastapi import Depends, status
-from typing import Callable, Union, TYPE_CHECKING, cast
+from typing import Callable, Union, TYPE_CHECKING, cast, Awaitable, Iterator
 from uuid import uuid4  # direct to avoid import cycles in service.dependencies
-from traceback import format_exception_only
+from traceback import format_exception_only, TracebackException
+from contextlib import contextmanager
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons import initialize as initialize_api, should_use_ot3
@@ -64,6 +65,11 @@ _event_unsubscribe_accessor = AppStateAccessor[Callable[[], None]](
 _firmware_update_manager_accessor = AppStateAccessor[FirmwareUpdateManager](
     "firmware_update_manager"
 )
+
+
+class _ExcPassthrough(BaseException):
+    def __init__(self, payload: TracebackException) -> None:
+        self.payload = payload
 
 
 def start_initializing_hardware(app_state: AppState) -> None:
@@ -141,10 +147,9 @@ async def get_thread_manager(
         ) from exc
 
     if postinit_task and postinit_task.done() and postinit_task.exception():
+        with _format_exc_only("Hardware failed to initialize"):
+            postinit_task.result()
         exc = cast(Exception, postinit_task.exception())
-        log.error(
-            f"Hardware failed to initialize: {format_exception_only(type(exc), exc)}"
-        )
         raise HardwareFailedToInitialize(detail=str(exc)).as_error(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
         ) from exc
@@ -366,8 +371,8 @@ async def _initialize_simulated_hardware(
 
 def _postinit_done_handler(task: "asyncio.Task[None]") -> None:
     if task.exception():
-        exc = cast(Exception, task.exception())
-        log.error(f"Postinit task failed: {format_exception_only(type(exc), exc)}")
+        with _format_exc("Postinit task failed"):
+            task.result()
     else:
         log.info("Postinit task complete")
 
@@ -380,6 +385,33 @@ def _systemd_notify(systemd_available: bool) -> None:
             systemd.daemon.notify("READY=1")
         except ImportError:
             pass
+
+
+async def _wrap_postinit(postinit: Awaitable[None]) -> None:
+    try:
+        return await postinit
+    except BaseException as be:
+        raise _ExcPassthrough(TracebackException.from_exception(be))
+
+
+@contextmanager
+def _format_exc_only(log_prefix: str) -> Iterator[None]:
+    try:
+        yield
+    except _ExcPassthrough as passthrough:
+        log.error(f"{log_prefix}: {passthrough.payload.format_exception_only()}")
+    except BaseException as be:
+        log.error(f"{log_prefix}: {format_exception_only(type(be), be)}")
+
+
+@contextmanager
+def _format_exc(log_prefix: str) -> Iterator[None]:
+    try:
+        yield
+    except _ExcPassthrough as passthrough:
+        log.error(f"{log_prefix}: {passthrough.payload.format(chain=True)}")
+    except BaseException as be:
+        log.error(f"{log_prefix}: {format_exception_only(type(be), be)}")
 
 
 async def _initialize_hardware_api(app_state: AppState) -> None:
@@ -403,10 +435,12 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
 
         if should_use_ot3():
             postinit_task = asyncio.create_task(
-                _postinit_ot3_tasks(hardware, app_state)
+                _wrap_postinit(_postinit_ot3_tasks(hardware, app_state))
             )
         else:
-            postinit_task = asyncio.create_task(_postinit_ot2_tasks(hardware))
+            postinit_task = asyncio.create_task(
+                _wrap_postinit(_postinit_ot2_tasks(hardware))
+            )
 
         postinit_task.add_done_callback(_postinit_done_handler)
         _postinit_task_accessor.set_on(app_state, postinit_task)
