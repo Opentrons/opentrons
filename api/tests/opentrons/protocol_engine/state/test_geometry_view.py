@@ -196,11 +196,11 @@ def test_get_labware_parent_position_on_labware(
     )
     decoy.when(labware_view.get("adapter-id")).then_return(adapter_data)
     decoy.when(labware_view.get_dimensions("adapter-id")).then_return(
-        Dimensions(x=3, y=1, z=5)
+        Dimensions(x=123, y=456, z=5)
     )
     decoy.when(
         labware_view.get_labware_overlap_offsets("labware-id", "xyz")
-    ).then_return(OverlapOffset(x=2, y=-1, z=2))
+    ).then_return(OverlapOffset(x=1, y=2, z=2))
 
     result = subject.get_labware_parent_position("labware-id")
 

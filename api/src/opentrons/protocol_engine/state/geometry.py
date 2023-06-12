@@ -136,8 +136,8 @@ class GeometryView:
                 labware_id=labware.id, below_labware_name=on_labware.loadName
             )
             labware_offset = LabwareOffsetVector(
-                x=on_labware_dimensions.x - stacking_overlap.x,
-                y=on_labware_dimensions.y - stacking_overlap.y,
+                x=stacking_overlap.x,
+                y=stacking_overlap.y,
                 z=on_labware_dimensions.z - stacking_overlap.z,
             )
             return labware_offset + self._get_labware_position_offset(on_labware)
