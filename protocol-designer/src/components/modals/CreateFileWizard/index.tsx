@@ -7,16 +7,7 @@ import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
 import { Formik, FormikProps } from 'formik'
 import * as Yup from 'yup'
-import {
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  ModalShell,
-  PrimaryButton,
-  SPACING,
-  SecondaryButton,
-} from '@opentrons/components'
+import { ModalShell } from '@opentrons/components'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -63,10 +54,10 @@ import { FirstPipetteTile, SecondPipetteTile } from './PipetteTile'
 import { ModulesAndOtherTile } from './ModulesAndOtherTile'
 import { WizardHeader } from './WizardHeader'
 
-type WizardStep = 'robotType' | 'metadata' | 'first_pipette' |'second_pipette' | 'modulesAndOther'
+type WizardStep = 'robotType' | 'metadata' | 'first_pipette' | 'second_pipette' | 'modulesAndOther'
 const WIZARD_STEPS: WizardStep[] = ['robotType', 'metadata', 'first_pipette', 'second_pipette', 'modulesAndOther']
 export function CreateFileWizard(): JSX.Element | null {
-  const { i18n, t } = useTranslation()
+  const { t } = useTranslation()
   const showWizard = useSelector(getNewProtocolModal)
   const moduleRestrictionsDisabled = useSelector(featureFlagSelectors.getDisableModuleRestrictions)
   const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
@@ -77,7 +68,7 @@ export function CreateFileWizard(): JSX.Element | null {
   const dispatch = useDispatch()
 
   const handleCancel = (): void => { dispatch(navigationActions.toggleNewProtocolModal(false)) }
-  const handleSubmit = ({values}: FormState): void => {
+  const createProtocolFile = (values: FormState): void => {
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
@@ -97,7 +88,6 @@ export function CreateFileWizard(): JSX.Element | null {
       []
     )
 
-    console.log('values', values)
     const modules: ModuleCreationArgs[] = Object.entries(values.modulesByType).reduce<
       ModuleCreationArgs[]
     >((acc, [moduleType, formModule]) => {
@@ -185,36 +175,24 @@ export function CreateFileWizard(): JSX.Element | null {
     />
   )
   const currentWizardStep = WIZARD_STEPS[currentStepIndex]
+  const goBack = (): void => {
+    if (currentStepIndex > 0) {
+      setCurrentStepIndex(currentStepIndex - 1)
+    }
+  }
+  const proceed = (): void => {
+    setCurrentStepIndex(currentStepIndex + 1)
+  }
+
   return showWizard ? (
     <ModalShell width="48rem" header={wizardHeader}>
-      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
-        <CreateFileForm
-          moduleRestrictionsDisabled={moduleRestrictionsDisabled}
-          currentWizardStep={currentWizardStep}
-          handleSubmit={handleSubmit}
-        />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-          {currentWizardStep !== 'robotType' ? (
-            <SecondaryButton onClick={() => {
-              if (currentStepIndex > 0) {
-                setCurrentStepIndex(currentStepIndex - 1)
-              }
-            }}>
-              {i18n.format(t('shared.go_back'), 'capitalize')}
-            </SecondaryButton>
-          ) : <Flex />
-          }
-          {currentWizardStep === 'modulesAndOther' ?
-            (
-              <PrimaryButton onClick={handleSubmit}>{t('modal.create_file_wizard.create_protocol_on_to_liquids')}</PrimaryButton>
-            ) : (
-              <PrimaryButton onClick={() => { setCurrentStepIndex(currentStepIndex + 1) }}>
-                {i18n.format(t('shared.next'), 'capitalize')}
-              </PrimaryButton>
-            )
-          }
-        </Flex>
-      </Flex>
+      <CreateFileForm
+        moduleRestrictionsDisabled={moduleRestrictionsDisabled}
+        currentWizardStep={currentWizardStep}
+        createProtocolFile={createProtocolFile}
+        proceed={proceed}
+        goBack={goBack}
+      />
     </ModalShell>
   ) : null
 }
@@ -317,17 +295,20 @@ const validationSchema = Yup.object().shape({
 interface CreateFileFormProps {
   moduleRestrictionsDisabled?: boolean | null
   currentWizardStep: WizardStep
-  handleSubmit: (values: FormState) => void
+  createProtocolFile: (values: FormState) => void
+  goBack: () => void
+  proceed: () => void
 }
 
 function CreateFileForm(props: CreateFileFormProps): JSX.Element {
-  const { moduleRestrictionsDisabled, currentWizardStep, handleSubmit } = props
+  const { moduleRestrictionsDisabled, currentWizardStep, createProtocolFile, proceed, goBack } = props
+
   const contentsByWizardStep: { [wizardStep in WizardStep]: (formikProps: FormikProps<FormState>) => JSX.Element } = {
-    robotType: (formikProps: FormikProps<FormState>) => <RobotTypeTile {...formikProps} />,
-    metadata: (formikProps: FormikProps<FormState>) => <MetadataTile {...formikProps} />,
-    first_pipette: (formikProps: FormikProps<FormState>) => <FirstPipetteTile {...formikProps} />,
-    second_pipette: (formikProps: FormikProps<FormState>) => <SecondPipetteTile {...formikProps} />,
-    modulesAndOther: (formikProps: FormikProps<FormState>) => <ModulesAndOtherTile {...formikProps} />,
+    robotType: (formikProps: FormikProps<FormState>) => <RobotTypeTile {...{ ...formikProps, proceed, goBack }} />,
+    metadata: (formikProps: FormikProps<FormState>) => <MetadataTile {...{ ...formikProps, proceed, goBack }} />,
+    first_pipette: (formikProps: FormikProps<FormState>) => <FirstPipetteTile {...{ ...formikProps, proceed, goBack }} />,
+    second_pipette: (formikProps: FormikProps<FormState>) => <SecondPipetteTile {...{ ...formikProps, proceed, goBack }} />,
+    modulesAndOther: (formikProps: FormikProps<FormState>) => <ModulesAndOtherTile {...{ ...formikProps, proceed: () => createProtocolFile(formikProps.values), goBack }} />,
   }
 
   const getCrashableModuleSelected = (
@@ -347,12 +328,12 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     <Formik
       enableReinitialize
       initialValues={initialFormState}
-      onSubmit={handleSubmit}
+      onSubmit={() => { }}
       validationSchema={validationSchema}
       validateOnChange={false}
     >
       {(formikProps: FormikProps<FormState>) => {
-        const { handleSubmit, values } = formikProps
+        const { values } = formikProps
         const { left, right } = values.pipettesByMount
 
         // TODO: validation
@@ -395,7 +376,7 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
         )
 
         return (
-          <form onSubmit={handleSubmit}>
+          <form>
             {contentsByWizardStep[currentWizardStep](formikProps)}
             {
               !moduleRestrictionsDisabled &&

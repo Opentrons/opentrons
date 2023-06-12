@@ -1,18 +1,19 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import reduce from 'lodash/reduce'
-import { DIRECTION_COLUMN, Flex, Text, SPACING, RadioGroup, Mount, RadioOption } from '@opentrons/components'
+import { DIRECTION_COLUMN, Flex, Text, SPACING, RadioGroup, Mount, RadioOption, ALIGN_CENTER, PrimaryButton, SecondaryButton, JUSTIFY_SPACE_BETWEEN } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { FormikProps } from 'formik'
 
-import type { FormState } from './types'
+import type { FormState, WizardTileProps } from './types'
 import { GEN1, GEN2, OT2_PIPETTES, OT2_ROBOT_TYPE, OT3_PIPETTES, getAllPipetteNames, getLabwareDefURI, getLabwareDisplayName, getPipetteNameSpecs } from '@opentrons/shared-data'
 import { useSelector } from 'react-redux'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import type { PipetteName } from '@opentrons/shared-data'
 import { linkPSemiBold } from '@opentrons/components/src/ui-style-constants/typography'
 
-export function FirstPipetteTile(props: FormikProps<FormState>): JSX.Element {
+export function FirstPipetteTile(props: WizardTileProps): JSX.Element {
   return (
     <PipetteTile
       {...props}
@@ -21,7 +22,7 @@ export function FirstPipetteTile(props: FormikProps<FormState>): JSX.Element {
       tileHeader={i18n.t('modal.create_file_wizard.choose_first_pipette')} />
   )
 }
-export function SecondPipetteTile(props: FormikProps<FormState>): JSX.Element {
+export function SecondPipetteTile(props: WizardTileProps): JSX.Element {
   return (
     <PipetteTile
       {...props}
@@ -30,27 +31,34 @@ export function SecondPipetteTile(props: FormikProps<FormState>): JSX.Element {
       tileHeader={i18n.t('modal.create_file_wizard.choose_second_pipette')} />
   )
 }
-interface PipetteTileProps extends FormikProps<FormState> {
+interface PipetteTileProps extends WizardTileProps {
   mount: Mount
   allowNoPipette: boolean
   tileHeader: string
 }
 export function PipetteTile(props: PipetteTileProps): JSX.Element {
-  const { allowNoPipette, tileHeader } = props
+  const { i18n, t } = useTranslation()
+  const { allowNoPipette, tileHeader, proceed, goBack } = props
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} height='26rem' gridGap={SPACING.spacing32}>
-      <Text as='h2'>{tileHeader}</Text>
-      <Flex>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16} flex="1">
-          <Text as='p'>{i18n.t('modal.create_file_wizard.pipette_type')}</Text>
-          <PipetteField {...props} allowNoPipette={allowNoPipette} />
+    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+      <Flex flexDirection={DIRECTION_COLUMN} height='26rem' gridGap={SPACING.spacing32}>
+        <Text as='h2'>{tileHeader}</Text>
+        <Flex>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16} flex="1">
+            <Text as='p'>{i18n.t('modal.create_file_wizard.pipette_type')}</Text>
+            <PipetteField {...props} allowNoPipette={allowNoPipette} />
+          </Flex>
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16} flex="1">
+            <Text as='p'>
+              {i18n.t('modal.create_file_wizard.choose_at_least_one_tip_rack')}
+            </Text>
+            <OT2TipRackField {...props} />
+          </Flex>
         </Flex>
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16} flex="1">
-          <Text as='p'>
-            {i18n.t('modal.create_file_wizard.choose_at_least_one_tip_rack')}
-          </Text>
-          <OT2TipRackField {...props} />
-        </Flex>
+      </Flex>
+      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+        <SecondaryButton onClick={goBack}>{i18n.format(t('shared.go_back'), 'capitalize')}</SecondaryButton>
+        <PrimaryButton onClick={proceed}>{i18n.format(t('shared.next'), 'capitalize')}</PrimaryButton>
       </Flex>
     </Flex>
   )

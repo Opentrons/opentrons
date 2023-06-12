@@ -1,33 +1,38 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { DIRECTION_COLUMN, Flex, SPACING, TYPOGRAPHY, Text, COLORS, BORDERS, JUSTIFY_CENTER, ALIGN_CENTER, RESPONSIVENESS, DIRECTION_ROW, JUSTIFY_FLEX_START, JUSTIFY_SPACE_BETWEEN, ALIGN_STRETCH } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import { DIRECTION_COLUMN, Flex, SPACING, TYPOGRAPHY, Text, COLORS, BORDERS, JUSTIFY_CENTER, ALIGN_CENTER, RESPONSIVENESS, DIRECTION_ROW, JUSTIFY_FLEX_START, JUSTIFY_SPACE_BETWEEN, ALIGN_STRETCH, PrimaryButton, JUSTIFY_FLEX_END } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
-import { FormikProps } from 'formik'
 import opentronsFlexImage from '../../../images/OpentronsFlex.png'
 import OT2Image from '../../../images/OT2.png'
 
 import type { RobotType } from '@opentrons/shared-data'
-import type { FormState } from './types'
+import type { WizardTileProps } from './types'
 
 const ROBOT_TYPES: RobotType[] = [OT2_ROBOT_TYPE, FLEX_ROBOT_TYPE]
 
-export function RobotTypeTile(props: FormikProps<FormState>): JSX.Element {
-  const { values, setFieldValue } = props
+export function RobotTypeTile(props: WizardTileProps): JSX.Element {
+  const { i18n, t } = useTranslation()
+  const { values, setFieldValue, proceed } = props
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} height='26rem' gridGap={SPACING.spacing32}>
-      <Text as='h2'>
-        {i18n.t('modal.create_file_wizard.choose_robot_type')}
-      </Text>
+    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+      <Flex flexDirection={DIRECTION_COLUMN} height='26rem' gridGap={SPACING.spacing32}>
+        <Text as='h2'>
+          {i18n.t('modal.create_file_wizard.choose_robot_type')}
+        </Text>
 
-      <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing8}>
-        {ROBOT_TYPES.map(robotType => (
-          <RobotTypeOption
-            key={robotType}
-            isSelected={values.fields.robotType === robotType}
-            onClick={() => { setFieldValue('fields.robotType', robotType) }}
-            robotType={robotType} />
-        ))}
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing8}>
+          {ROBOT_TYPES.map(robotType => (
+            <RobotTypeOption
+              key={robotType}
+              isSelected={values.fields.robotType === robotType}
+              onClick={() => { setFieldValue('fields.robotType', robotType) }}
+              robotType={robotType} />
+          ))}
+        </Flex>
+      </Flex>
+      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END} width="100%">
+        <PrimaryButton onClick={proceed}>{i18n.format(t('shared.next'), 'capitalize')}</PrimaryButton>
       </Flex>
     </Flex>
   )
