@@ -26,6 +26,7 @@ class GravimetricConfig:
     user_volumes: bool
     gantry_speed: int
     scale_delay: int
+    air_sensor: bool
 
 
 @dataclass

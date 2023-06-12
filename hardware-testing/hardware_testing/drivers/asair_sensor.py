@@ -155,3 +155,10 @@ class SimAsairSensor(AsairSensorBase):
         temp = random.uniform(24.5, 25)
         relative_hum = random.uniform(45, 40)
         return Reading(temperature=temp, relative_humidity=relative_hum)
+
+if __name__ == '__main__':
+    from hardware_testing.drivers import list_ports_and_select
+    _port = list_ports_and_select("asair_sensor")
+    con = AsairSensor.connect(_port)
+    res = con.get_reading()
+    print(f"temperature:{res.relative_humidity}, humidity:{res.temperature}") # fix me: get_reading function leave a bug, return temperature and humidity reverse.
