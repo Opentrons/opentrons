@@ -577,12 +577,12 @@ class OT3API(
         """
         Function to update motor estimation for a set of axes
         """
-
         if axes:
             checked_axes = [OT3Axis.from_axis(ax) for ax in axes]
         else:
             checked_axes = [ax for ax in OT3Axis]
         await self._backend.update_motor_estimation(checked_axes)
+        self._log.info(f"Updated position estimation for {checked_axes}")
 
     # Global actions API
     def pause(self, pause_type: PauseType) -> None:
@@ -1222,14 +1222,14 @@ class OT3API(
             checked_axes = [ax for ax in OT3Axis if ax != OT3Axis.Q]
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
             checked_axes.append(OT3Axis.Q)
-        self._log.info(f"Homing {axes}")
 
         home_seq = [
             ax
             for ax in OT3Axis.home_order()
             if (ax in checked_axes and self._backend.axis_is_present(ax))
         ]
-        self._log.info(f"home was called with {axes} generating sequence {home_seq}")
+        self._log.info(f"Homing {home_seq}")
+        self._log.debug(f"home was called with {axes} generating sequence {home_seq}")
         await self._home(home_seq)
 
     def get_engaged_axes(self) -> Dict[Axis, bool]:

@@ -74,7 +74,7 @@ def limit_max_speed(
         axis_speed = constraints[axis].max_speed
         axis_ratio = axis_speed / abs_speed
         if axis_ratio < scale:
-            log.info(
+            log.debug(
                 f"speed {max_linear_speed} decreased by {axis_ratio} because {axis} speed limit is {axis_speed}"
             )
             scale = axis_ratio

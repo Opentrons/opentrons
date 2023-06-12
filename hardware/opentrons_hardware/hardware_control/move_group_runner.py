@@ -394,7 +394,7 @@ class MoveScheduler:
     ) -> None:
         self._error = message
         severity = message.payload.severity.value
-        log.error(f"Error during move group: {message}")
+        log.error(f"Error from node {arbitration_id.parts.originating_node_id} during move group: {message}")
         if severity == ErrorSeverity.unrecoverable:
             self._should_stop = True
             self._event.set()
