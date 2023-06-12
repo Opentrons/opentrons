@@ -133,7 +133,7 @@ class MoveGroupRunner:
             raise RuntimeError("A group must be prepped before it can be executed.")
         try:
             move_completion_data = await self._move(can_messenger, self._start_at_index)
-        except Exception:
+        except (RuntimeError, asyncio.TimeoutError):
             log.error("raising error from Move group runner")
             raise
         return self._accumulate_move_completions(move_completion_data)
