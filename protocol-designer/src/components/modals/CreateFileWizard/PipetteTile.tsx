@@ -15,22 +15,28 @@ import { linkPSemiBold } from '@opentrons/components/src/ui-style-constants/typo
 import { GoBackLink } from './GoBackLink'
 
 export function FirstPipetteTile(props: WizardTileProps): JSX.Element {
+  const mount = "left"
   return (
     <PipetteTile
       {...props}
-      mount="left"
+      mount={mount}
       allowNoPipette={false}
       tileHeader={i18n.t('modal.create_file_wizard.choose_first_pipette')} />
   )
 }
-export function SecondPipetteTile(props: WizardTileProps): JSX.Element {
-  return (
-    <PipetteTile
-      {...props}
-      mount="right"
-      allowNoPipette
-      tileHeader={i18n.t('modal.create_file_wizard.choose_second_pipette')} />
-  )
+export function SecondPipetteTile(props: WizardTileProps): JSX.Element | null {
+  if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
+    props.proceed()
+    return null
+  } else {
+    return (
+      <PipetteTile
+        {...props}
+        mount="right"
+        allowNoPipette
+        tileHeader={i18n.t('modal.create_file_wizard.choose_second_pipette')} />
+    )
+  }
 }
 interface PipetteTileProps extends WizardTileProps {
   mount: Mount
@@ -58,7 +64,7 @@ export function PipetteTile(props: PipetteTileProps): JSX.Element {
         </Flex>
       </Flex>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-        <GoBackLink onClick={goBack}/>
+        <GoBackLink onClick={() => goBack()} />
         <PrimaryButton onClick={proceed}>{i18n.format(t('shared.next'), 'capitalize')}</PrimaryButton>
       </Flex>
     </Flex>
@@ -122,7 +128,7 @@ const FLEX_TIP_VOLS_FOR_PIP_VOL: { [maxVol: number]: number[] } = {
 }
 
 function OT2TipRackField(props: OT2FieldProps): JSX.Element {
-  const { mount, setFieldValue, values, handleChange } = props
+  const { mount, values, handleChange } = props
   const allLabware = useSelector(getLabwareDefsByURI)
   const [showAll, setShowAll] = React.useState(false)
 

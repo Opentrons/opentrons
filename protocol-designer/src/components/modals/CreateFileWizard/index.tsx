@@ -156,9 +156,9 @@ export function CreateFileWizard(): JSX.Element | null {
     />
   )
   const currentWizardStep = WIZARD_STEPS[currentStepIndex]
-  const goBack = (): void => {
-    if (currentStepIndex > 0) {
-      setCurrentStepIndex(currentStepIndex - 1)
+  const goBack = (stepsBack: number = 1): void => {
+    if (currentStepIndex >= (0 + stepsBack)) {
+      setCurrentStepIndex(currentStepIndex - stepsBack)
     }
   }
   const proceed = (): void => {
@@ -226,6 +226,7 @@ const initialFormState: FormState = {
       slot: SPAN7_8_10_11_SLOT,
     },
   },
+  additionalEquipment: []
 }
 
 const pipetteValidationShape = Yup.object().shape({
@@ -301,7 +302,6 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
       initialValues={initialFormState}
       onSubmit={() => { }}
       validationSchema={validationSchema}
-      // validateOnChange={false}
     >
       {(formikProps: FormikProps<FormState>) => (
         contentsByWizardStep[currentWizardStep](formikProps)

@@ -80,7 +80,7 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
         </Flex>
       </Flex>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-        <GoBackLink onClick={goBack} />
+        <GoBackLink onClick={() => goBack()} />
         <PrimaryButton onClick={proceed} disabled={disableProceed}>
           {i18n.format(t('shared.next'), 'capitalize')}
         </PrimaryButton>
