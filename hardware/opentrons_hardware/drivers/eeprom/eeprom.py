@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Optional, Set, Type, List, Tuple, Any
 from types import TracebackType
 
+from ..gpio import OT3GPIO
 from .types import (
     PropId,
     Property,
@@ -40,8 +41,6 @@ NOTES:
 3. Need to deal with property_write only able to write 1 page of data
 4. Do we want to clear the eeprom when we write???
 5. In property_write, return the PropIds of the properties that were written successfully.
-6. Need to Set the write bit (SODIMM_222) LOW before being able to write
-
 """
 
 
@@ -52,15 +51,18 @@ class EEPROM:
         self,
         bus: Optional[int] = DEFAULT_BUS,
         address: Optional[str] = DEFAULT_ADDRESS,
+        gpio: Optional[OT3GPIO] = None,
     ) -> None:
         """Contructor
 
         Args:
+            gpio: The gpio device so we can set the eeprom wp
             bus: The i2c bus this device is on
             address: The unique address for this device
         """
         self._bus = bus
         self._address = address
+        self._gpio = gpio
         self._eeprom_filepath = Path(f"/sys/bus/i2c/devices/{bus}-{address}/eeprom")
         self._eeprom_fd = -1
         self._eeprom_data: EEPROMData = EEPROMData()
@@ -92,6 +94,7 @@ class EEPROM:
         traceback: Optional[TracebackType],
     ) -> bool:
         """Exit runtime context and close the file descriptor."""
+        self._gpio.deactivate_eeprom_wp()
         return self.close()
 
     def __del__(self) -> None:
@@ -154,7 +157,13 @@ class EEPROM:
             if packet:
                 data += packet
         if data:
-            size = self._write(data)
+            try:
+                if self._gpio:
+                    self._gpio.activate_eeprom_wp()
+                size = self._write(data)
+            finally:
+                if self._gpio:
+                    self._gpio.deactivate_eeprom_wp()
         return list()
 
     def _read(self, size: int = DEFAULT_READ_SIZE, address: int = 0) -> bytes:

@@ -224,8 +224,9 @@ class OT3Controller:
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
         self._gpio_dev, self._usb_messenger = self._build_system_hardware(usb_driver)
-        self._eeprom = EEPROM()
+        self._eeprom = EEPROM(gpio=self._gpio_dev)
         self._eeprom.setup()
+        print(self.eeprom_data)
         self._subsystem_manager = SubsystemManager(
             self._messenger,
             self._usb_messenger,
@@ -268,6 +269,11 @@ class OT3Controller:
             subsystem: info.current_fw_version
             for subsystem, info in self.subsystems.items()
         }
+
+    @property
+    def eeprom_data(self) -> EEPROMData:
+        """Get the data on the eeprom."""
+        return self._eeprom.data
 
     @property
     def update_required(self) -> bool:
