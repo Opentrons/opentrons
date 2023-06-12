@@ -57,6 +57,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
           />
         </Flex>
       )
+    } else {
+      return this.props.children
     }
   }
 }
