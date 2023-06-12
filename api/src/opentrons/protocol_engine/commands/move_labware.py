@@ -97,7 +97,7 @@ class MoveLabwareImplementation(
         definition_uri = current_labware.definitionUri
 
         empty_new_location = self._state_view.geometry.ensure_location_not_occupied(
-            location=params.newLocation
+            labware_id=params.labwareId, location=params.newLocation
         )
 
         # Allow propagation of ModuleNotLoadedError.

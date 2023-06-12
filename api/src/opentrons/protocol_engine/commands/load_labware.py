@@ -6,7 +6,7 @@ from typing_extensions import Literal
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from ..errors import LabwareDefinitionIsNotLabwareError, LabwareCannotBeStackedError
+from ..errors import LabwareDefinitionIsNotLabwareError
 from ..resources import labware_validation
 from ..types import LabwareLocation, OnLabwareLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
@@ -108,14 +108,10 @@ class LoadLabwareImplementation(
             )
 
         if isinstance(params.location, OnLabwareLocation):
-            below_labware = self._state_view.labware.get(params.location.labwareId)
-            if not labware_validation.validate_labware_can_be_stacked(
+            self._state_view.labware.raise_if_labware_cannot_be_stacked(
                 top_labware_definition=loaded_labware.definition,
-                below_labware_load_name=below_labware.loadName,
-            ):
-                raise LabwareCannotBeStackedError(
-                    f"Labware {params.loadName} cannot be loaded onto labware {below_labware.loadName}"
-                )
+                bottom_labware_id=params.location.labwareId,
+            )
 
         return LoadLabwareResult(
             labwareId=loaded_labware.labware_id,

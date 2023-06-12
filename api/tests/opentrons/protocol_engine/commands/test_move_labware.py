@@ -66,7 +66,8 @@ async def test_manual_move_labware_implementation(
     )
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+            labware_id="my-cool-labware-id",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         )
     ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
     decoy.when(
@@ -119,7 +120,8 @@ async def test_gripper_move_labware_implementation(
     )
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
+            labware_id="my-cool-labware-id",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         )
     ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_5))
     decoy.when(
@@ -200,7 +202,8 @@ async def test_move_labware_raises_for_labware_or_module_not_found(
     )
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            location=ModuleLocation(moduleId="imaginary-module-id-1")
+            labware_id="real-labware-id",
+            location=ModuleLocation(moduleId="imaginary-module-id-1"),
         )
     ).then_return(ModuleLocation(moduleId="imaginary-module-id-2"))
 
@@ -246,7 +249,8 @@ async def test_move_labware_raises_if_movement_obstructed(
     )
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
+            labware_id="my-cool-labware-id",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
         )
     ).then_return(DeckSlotLocation(slotName=DeckSlotName.SLOT_6))
     decoy.when(
@@ -297,7 +301,8 @@ async def test_move_labware_raises_when_location_occupied(
     )
     decoy.when(
         state_view.geometry.ensure_location_not_occupied(
-            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
+            labware_id="my-cool-labware-id",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
         )
     ).then_raise(errors.LocationIsOccupiedError("Woops!"))
 

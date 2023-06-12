@@ -361,12 +361,17 @@ class GeometryView:
         return slot_name
 
     def ensure_location_not_occupied(
-        self, location: LabwareLocation
+        self, labware_id: str, location: LabwareLocation
     ) -> LabwareLocation:
         """Ensure that the location does not already have equipment in it."""
         if isinstance(location, (DeckSlotLocation, ModuleLocation)):
             self._labware.raise_if_labware_in_location(location)
             self._modules.raise_if_module_in_location(location)
+        elif isinstance(location, OnLabwareLocation):
+            labware_definition = self._labware.get_definition(labware_id)
+            self._labware.raise_if_labware_cannot_be_stacked(
+                labware_definition, location.labwareId
+            )
         return location
 
     def get_labware_center(

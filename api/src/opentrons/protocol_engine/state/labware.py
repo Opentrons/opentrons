@@ -26,7 +26,7 @@ from opentrons.protocols.models import LabwareDefinition, WellDefinition
 from opentrons.calibration_storage.helpers import uri_from_details
 
 from .. import errors
-from ..resources import DeckFixedLabware
+from ..resources import DeckFixedLabware, labware_validation
 from ..commands import (
     Command,
     LoadLabwareResult,
@@ -649,6 +649,19 @@ class LabwareView(HasState[LabwareState]):
                 raise errors.LocationIsOccupiedError(
                     f"Labware {labware.loadName} is already present at {location}."
                 )
+
+    def raise_if_labware_cannot_be_stacked(
+        self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
+    ) -> None:
+        """Raise if the specified labware definition cannot be placed on top of the bottom labware."""
+        below_labware = self.get(bottom_labware_id)
+        if not labware_validation.validate_labware_can_be_stacked(
+            top_labware_definition=top_labware_definition,
+            below_labware_load_name=below_labware.loadName,
+        ):
+            raise errors.LabwareCannotBeStackedError(
+                f"Labware {top_labware_definition.parameters.loadName} cannot be loaded onto labware {below_labware.loadName}"
+            )
 
     def get_random_drop_tip_location(
         self, labware_id: str, well_name: str
