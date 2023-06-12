@@ -249,3 +249,7 @@ update-patches-gravimetric:
 	cd ../ && git diff origin/edge ./shared-data/** > ./hardware-testing/hardware_testing/gravimetric/overrides/shared-data.patch
 	cd ../ && git diff origin/edge ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/robot-server.patch
 	$(MAKE) remove-patches-gravimetric
+
+.PHONY: push-photometric-ot2
+push-photometric-ot2:
+	scp -r -O photometric-ot2/photometric_ot2 root@$(host):/data/user_storage
