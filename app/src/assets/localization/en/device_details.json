@@ -42,6 +42,8 @@
   "input_out_of_range": "Input out of range",
   "instruments_and_modules": "Instruments and Modules",
   "labware_bottom": "Labware Bottom",
+  "last_run_time": "last run {{number}}",
+  "left_right": "Left+Right Mounts",
   "left": "left",
   "lights": "Lights",
   "link_firmware_update": "View Firmware Update",

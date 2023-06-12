@@ -4,8 +4,8 @@ import { LEFT } from '@opentrons/shared-data'
 import { SPACING } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import attachMountingPlate from '../../assets/images/change-pip/attach-mounting-plate.png'
-import { BODY_STYLE, FLOWS } from './constants'
+import { getPipetteAnimations96 } from './utils'
+import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
 import type { PipetteWizardStepProps } from './types'
 
 export const MountingPlate = (
@@ -48,22 +48,10 @@ export const MountingPlate = (
           ? 'attach_mounting_plate'
           : 'unscrew_and_detach'
       )}
-      rightHandBody={
-        <img
-          //  TODO(jr 12/2/22): update image
-          src={
-            flowType === FLOWS.ATTACH
-              ? attachMountingPlate
-              : attachMountingPlate
-          }
-          style={{ marginTop: '-3rem' }}
-          alt={
-            flowType === FLOWS.ATTACH
-              ? 'Attach mounting plate'
-              : 'Detach mounting plate'
-          }
-        />
-      }
+      rightHandBody={getPipetteAnimations96({
+        section: SECTIONS.MOUNTING_PLATE,
+        flowType: flowType,
+      })}
       bodyText={
         flowType === FLOWS.ATTACH ? (
           <Trans
