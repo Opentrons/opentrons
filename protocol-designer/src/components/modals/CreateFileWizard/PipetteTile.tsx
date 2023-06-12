@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import type { PipetteName } from '@opentrons/shared-data'
 import { linkPSemiBold } from '@opentrons/components/src/ui-style-constants/typography'
+import { GoBackLink } from './GoBackLink'
 
 export function FirstPipetteTile(props: WizardTileProps): JSX.Element {
   return (
@@ -40,7 +41,7 @@ export function PipetteTile(props: PipetteTileProps): JSX.Element {
   const { i18n, t } = useTranslation()
   const { allowNoPipette, tileHeader, proceed, goBack } = props
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing16}>
+    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
       <Flex flexDirection={DIRECTION_COLUMN} height='26rem' gridGap={SPACING.spacing32}>
         <Text as='h2'>{tileHeader}</Text>
         <Flex>
@@ -57,7 +58,7 @@ export function PipetteTile(props: PipetteTileProps): JSX.Element {
         </Flex>
       </Flex>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-        <SecondaryButton onClick={goBack}>{i18n.format(t('shared.go_back'), 'capitalize')}</SecondaryButton>
+        <GoBackLink onClick={goBack}/>
         <PrimaryButton onClick={proceed}>{i18n.format(t('shared.next'), 'capitalize')}</PrimaryButton>
       </Flex>
     </Flex>
@@ -70,7 +71,7 @@ interface OT2FieldProps extends FormikProps<FormState> {
 }
 
 function PipetteField(props: OT2FieldProps): JSX.Element {
-  const { mount, values, setFieldValue, allowNoPipette } = props
+  const { mount, values, setFieldValue, allowNoPipette, handleChange } = props
   const robotType = values.fields.robotType
   const pipetteOptions = React.useMemo(() => {
     const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
@@ -88,13 +89,19 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
   }, [robotType])
 
   const nameAccessor = `pipettesByMount.${mount}.pipetteName`
-
+  // const selectedPipetteName = values.pipettesByMount[mount].pipetteName
+  // React.useEffect(() => {
+  //   if (selectedPipetteName === undefined) {
+  //     setFieldValue(nameAccessor, pipetteOptions[0].value)
+  //   }
+  // }, [selectedPipetteName])
   return (
     <RadioGroup
       options={pipetteOptions}
       value={values.pipettesByMount[mount].pipetteName ?? ''}
-      onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-        setFieldValue(nameAccessor, e.currentTarget.value)
+      onChange={(e) => {
+        handleChange(e)
+        setFieldValue(`pipettesByMount.${mount}.tiprackDefURI`, undefined)
       }}
       name={nameAccessor}
     />
@@ -115,7 +122,7 @@ const FLEX_TIP_VOLS_FOR_PIP_VOL: { [maxVol: number]: number[] } = {
 }
 
 function OT2TipRackField(props: OT2FieldProps): JSX.Element {
-  const { mount, setFieldValue, values } = props
+  const { mount, setFieldValue, values, handleChange } = props
   const allLabware = useSelector(getLabwareDefsByURI)
   const [showAll, setShowAll] = React.useState(false)
 
@@ -149,16 +156,21 @@ function OT2TipRackField(props: OT2FieldProps): JSX.Element {
     }
   }
 
+  const selectedTipRack = values.pipettesByMount[mount].tiprackDefURI
   const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
 
-  return (
+  // React.useEffect(() => {
+  //   if (selectedTipRack === undefined) {
+  //     setFieldValue(nameAccessor, tipRackOptions[0].value)
+  //   }
+  // }, [selectedTipRack, selectedPipetteName])
+
+  return selectedPipetteName !== '' ? (
     <>
       <RadioGroup
         options={tipRackOptions}
-        value={values.pipettesByMount[mount].tiprackDefURI ?? ''}
-        onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-          setFieldValue(nameAccessor, e.currentTarget.value)
-        }}
+        value={selectedTipRack ?? ''}
+        onChange={handleChange}
         name={nameAccessor}
       />
       <Text
@@ -171,6 +183,6 @@ function OT2TipRackField(props: OT2FieldProps): JSX.Element {
         {showAll ? 'Show Less' : 'Show More'}
       </Text>
     </>
-  )
+  ) : <Text as="p">N/A</Text>
 
 }

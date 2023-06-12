@@ -78,7 +78,7 @@
     "choose_robot_type": "Choose robot type",
     "create_new_protocol": "Create New Protocol",
     "create_protocol_on_to_liquids": "Create Protocol, on to Liquids",
-    "name_your_protocol": "Name your protocol.*",
+    "name_your_protocol": "Name your protocol.",
     "description": "Description",
     "organization_or_author": "Organization/Author",
     "pipette_type": "Pipette Type",

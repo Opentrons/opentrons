@@ -10,7 +10,6 @@ import * as Yup from 'yup'
 import { ModalShell } from '@opentrons/components'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
-import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { actions as navigationActions } from '../../../navigation'
 import { getNewProtocolModal } from '../../../navigation/selectors'
 import { actions as fileActions, selectors as loadFileSelectors } from '../../../load-file'
@@ -19,32 +18,8 @@ import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
 
-import {
-  ModuleType,
-  ModuleModel,
-  PipetteName,
-  OT2_ROBOT_TYPE,
-  MAGNETIC_BLOCK_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  MAGNETIC_BLOCK_V1,
-  HEATERSHAKER_MODULE_TYPE,
-  HEATERSHAKER_MODULE_V1,
-  MAGNETIC_MODULE_TYPE,
-  THERMOCYCLER_MODULE_V1,
-  THERMOCYCLER_MODULE_TYPE,
-  SPAN7_8_10_11_SLOT,
-  getPipetteNameSpecs
-} from '@opentrons/shared-data'
-import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
-
-import {
-  actions as stepFormActions,
-  FormPipettesByMount,
-  FormModulesByType,
-  FormPipette,
-  getIsCrashablePipetteSelected,
-  PipetteOnDeck,
-} from '../../../step-forms'
+import { ModuleType, ModuleModel, PipetteName, OT2_ROBOT_TYPE, MAGNETIC_BLOCK_TYPE, TEMPERATURE_MODULE_TYPE, MAGNETIC_BLOCK_V1, HEATERSHAKER_MODULE_TYPE, HEATERSHAKER_MODULE_V1, MAGNETIC_MODULE_TYPE, THERMOCYCLER_MODULE_V1, THERMOCYCLER_MODULE_TYPE, SPAN7_8_10_11_SLOT } from '@opentrons/shared-data'
+import { actions as stepFormActions, FormPipettesByMount, FormPipette, PipetteOnDeck } from '../../../step-forms'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
@@ -59,11 +34,17 @@ const WIZARD_STEPS: WizardStep[] = ['robotType', 'metadata', 'first_pipette', 's
 export function CreateFileWizard(): JSX.Element | null {
   const { t } = useTranslation()
   const showWizard = useSelector(getNewProtocolModal)
-  const moduleRestrictionsDisabled = useSelector(featureFlagSelectors.getDisableModuleRestrictions)
   const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
   const customLabware = useSelector(labwareDefSelectors.getCustomLabwareDefsByURI)
 
   const [currentStepIndex, setCurrentStepIndex] = React.useState(0)
+
+  React.useEffect(() => {
+    // re-initialize wizard step count when modal is closed
+    if (!showWizard && currentStepIndex > 0) {
+      setCurrentStepIndex(0)
+    }
+  }, [showWizard])
 
   const dispatch = useDispatch()
 
@@ -187,7 +168,6 @@ export function CreateFileWizard(): JSX.Element | null {
   return showWizard ? (
     <ModalShell width="48rem" header={wizardHeader}>
       <CreateFileForm
-        moduleRestrictionsDisabled={moduleRestrictionsDisabled}
         currentWizardStep={currentWizardStep}
         createProtocolFile={createProtocolFile}
         proceed={proceed}
@@ -210,14 +190,14 @@ interface ModuleCreationArgs {
 
 const initialFormState: FormState = {
   fields: {
-    name: '',
-    description: '',
-    organizationOrAuthor: '',
+    name: undefined,
+    description: undefined,
+    organizationOrAuthor: undefined,
     robotType: OT2_ROBOT_TYPE
   },
   pipettesByMount: {
-    left: { pipetteName: '', tiprackDefURI: null },
-    right: { pipetteName: '', tiprackDefURI: null },
+    left: { pipetteName: undefined, tiprackDefURI: undefined },
+    right: { pipetteName: undefined, tiprackDefURI: undefined },
   },
   modulesByType: {
     [MAGNETIC_BLOCK_TYPE]: {
@@ -273,7 +253,7 @@ const moduleValidationShape: any = Yup.object().shape({
 
 const validationSchema = Yup.object().shape({
   fields: Yup.object().shape({
-    name: Yup.string(),
+    name: Yup.string().required('Required'),
   }),
   pipettesByMount: Yup.object()
     .shape({
@@ -293,7 +273,6 @@ const validationSchema = Yup.object().shape({
 
 
 interface CreateFileFormProps {
-  moduleRestrictionsDisabled?: boolean | null
   currentWizardStep: WizardStep
   createProtocolFile: (values: FormState) => void
   goBack: () => void
@@ -301,27 +280,19 @@ interface CreateFileFormProps {
 }
 
 function CreateFileForm(props: CreateFileFormProps): JSX.Element {
-  const { moduleRestrictionsDisabled, currentWizardStep, createProtocolFile, proceed, goBack } = props
+  const { currentWizardStep, createProtocolFile, proceed, goBack } = props
 
   const contentsByWizardStep: { [wizardStep in WizardStep]: (formikProps: FormikProps<FormState>) => JSX.Element } = {
     robotType: (formikProps: FormikProps<FormState>) => <RobotTypeTile {...{ ...formikProps, proceed, goBack }} />,
     metadata: (formikProps: FormikProps<FormState>) => <MetadataTile {...{ ...formikProps, proceed, goBack }} />,
     first_pipette: (formikProps: FormikProps<FormState>) => <FirstPipetteTile {...{ ...formikProps, proceed, goBack }} />,
     second_pipette: (formikProps: FormikProps<FormState>) => <SecondPipetteTile {...{ ...formikProps, proceed, goBack }} />,
-    modulesAndOther: (formikProps: FormikProps<FormState>) => <ModulesAndOtherTile {...{ ...formikProps, proceed: () => createProtocolFile(formikProps.values), goBack }} />,
-  }
-
-  const getCrashableModuleSelected = (
-    modules: FormModulesByType,
-    moduleType: ModuleType
-  ): boolean => {
-    const formModule = modules[moduleType]
-    const crashableModuleOnDeck =
-      formModule?.onDeck && formModule?.model
-        ? isModuleWithCollisionIssue(formModule.model)
-        : false
-
-    return crashableModuleOnDeck
+    modulesAndOther: (formikProps: FormikProps<FormState>) => (
+      <ModulesAndOtherTile
+        {...formikProps}
+        proceed={() => createProtocolFile(formikProps.values)}
+        goBack={goBack} />
+    ),
   }
 
   return (
@@ -330,63 +301,11 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
       initialValues={initialFormState}
       onSubmit={() => { }}
       validationSchema={validationSchema}
-      validateOnChange={false}
+      // validateOnChange={false}
     >
-      {(formikProps: FormikProps<FormState>) => {
-        const { values } = formikProps
-        const { left, right } = values.pipettesByMount
-
-        // TODO: validation
-        // const pipetteSelectionIsValid =
-        //   // at least one must not be none (empty string)
-        //   left.pipetteName || right.pipetteName
-
-        const hasCrashableMagnetModuleSelected = getCrashableModuleSelected(
-          values.modulesByType,
-          MAGNETIC_MODULE_TYPE
-        )
-        const hasCrashableTemperatureModuleSelected = getCrashableModuleSelected(
-          values.modulesByType,
-          TEMPERATURE_MODULE_TYPE
-        )
-        const hasHeaterShakerSelected = Boolean(
-          values.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
-        )
-
-        const showHeaterShakerPipetteCollisions =
-          hasHeaterShakerSelected &&
-          [
-            getPipetteNameSpecs(left.pipetteName as PipetteName),
-            getPipetteNameSpecs(right.pipetteName as PipetteName),
-          ].some(
-            pipetteSpecs =>
-              pipetteSpecs && pipetteSpecs.channels !== 1
-          )
-
-        const crashablePipetteSelected = getIsCrashablePipetteSelected(values.pipettesByMount)
-        const modCrashWarning = (
-          <CrashInfoBox
-            showDiagram
-            showMagPipetteCollisons={crashablePipetteSelected && hasCrashableMagnetModuleSelected}
-            showTempPipetteCollisons={crashablePipetteSelected && hasCrashableTemperatureModuleSelected}
-            showHeaterShakerLabwareCollisions={hasHeaterShakerSelected}
-            showHeaterShakerModuleCollisions={hasHeaterShakerSelected}
-            showHeaterShakerPipetteCollisions={showHeaterShakerPipetteCollisions}
-          />
-        )
-
-        return (
-          <form>
-            {contentsByWizardStep[currentWizardStep](formikProps)}
-            {
-              !moduleRestrictionsDisabled &&
-                currentWizardStep === 'modulesAndOther'
-                ? modCrashWarning
-                : null
-            }
-          </form>
-        )
-      }}
+      {(formikProps: FormikProps<FormState>) => (
+        contentsByWizardStep[currentWizardStep](formikProps)
+      )}
     </Formik>
   )
 }
