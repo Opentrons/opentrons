@@ -94,7 +94,7 @@ async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
         Click  >> Enter << to save position
         Click  >> q << to quit the test script
                     """
-    # print(information_str)
+    print(information_str)
     while True:
         input = getch()
 
@@ -160,7 +160,7 @@ async def _jog_axis(messenger: CanMessenger, node, position,args) -> None:
                                 ' Motor Step: ',
                                 step_size[step_length_index],
                                 "current",current_size[step_current_index],
-                                end = '')
+                                end = '                                      ')
         print('\r', end='')
 
 def calc_time(distance, speed):
