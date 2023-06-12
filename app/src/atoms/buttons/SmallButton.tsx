@@ -110,6 +110,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
         .activeBackgroundColor};
       box-shadow: none;
+      -webkit-tap-highlight-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
+        .activeBackgroundColor};
     }
     &:hover {
       border: none;
@@ -117,6 +119,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
         .defaultBackgroundColor};
       color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType].defaultColor};
+      -webkit-tap-highlight-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
+        .defaultBackgroundColor};
     }
     &:focus-visible {
       box-shadow: ${ODD_FOCUS_VISIBLE};
@@ -126,6 +130,8 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
 
     &:active {
       background-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
+        .activeBackgroundColor};
+      -webkit-tap-highlight-color: ${SMALL_BUTTON_PROPS_BY_TYPE[buttonType]
         .activeBackgroundColor};
     }
 
