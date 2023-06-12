@@ -1150,6 +1150,8 @@ async def test_move_to_plunger_bottom(
     await ot3_hardware.add_tip(mount, 100)
     mock_move.reset_mock()
     await ot3_hardware.prepare_for_aspirate(mount)
+    # make sure when plunger is going down that only one move is called,
+    # and there's no backlash move queued
     mock_move.assert_called_once_with(
         target_pos, speed=expected_speed_moving_down, acquire_lock=True
     )
@@ -1161,7 +1163,14 @@ async def test_move_to_plunger_bottom(
     ot3_hardware._current_position[pip_ax] = target_pos[pip_ax] + 1
     mock_move.reset_mock()
     await ot3_hardware.prepare_for_aspirate(mount)
-    mock_move.assert_called_once_with(
+    # make sure we've done the backlash compensation
+    backlash_pos = target_pos.copy()
+    backlash_pos[pip_ax] -= pipette.backlash_distance
+    mock_move.assert_any_call(
+        backlash_pos, speed=expected_speed_moving_up, acquire_lock=True
+    )
+    # make sure the final move is to our target position
+    mock_move.assert_called_with(
         target_pos, speed=expected_speed_moving_up, acquire_lock=True
     )
 
