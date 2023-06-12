@@ -212,6 +212,15 @@ CONFIG_ELEMENTS = (
         "relative path it will be relative to log_dir"
         "The location of the file to save serial logs to",
     ),
+    ConfigElement(
+        "server_log_file",
+        "Server Log File",
+        Path("logs") / "server.log",
+        ConfigElementType.FILE,
+        "The location of the file to save robot server logs to. If this is"
+        " an absolute path, it will be used directly. If it is a "
+        "relative path it will be relative to log_dir",
+    ),
     # Unlike other config elements, the wifi keys dir is still in
     # /data/user_storage/opentrons_data because these paths are fed directly to
     # NetworkManager and stored in connections files there. To change this
