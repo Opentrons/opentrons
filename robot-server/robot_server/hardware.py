@@ -399,7 +399,9 @@ def _format_exc_only(log_prefix: str) -> Iterator[None]:
     try:
         yield
     except _ExcPassthrough as passthrough:
-        log.error(f"{log_prefix}: {''.join(list(passthrough.payload.format_exception_only()))}")
+        log.error(
+            f"{log_prefix}: {''.join(list(passthrough.payload.format_exception_only()))}"
+        )
     except BaseException as be:
         log.error(f"{log_prefix}: {format_exception_only(type(be), be)}")
 
@@ -409,7 +411,9 @@ def _format_exc(log_prefix: str) -> Iterator[None]:
     try:
         yield
     except _ExcPassthrough as passthrough:
-        log.error(f"{log_prefix}: {''.join(list(passthrough.payload.format(chain=True)))}")
+        log.error(
+            f"{log_prefix}: {''.join(list(passthrough.payload.format(chain=True)))}"
+        )
     except BaseException as be:
         log.error(f"{log_prefix}: {format_exception_only(type(be), be)}")
 
