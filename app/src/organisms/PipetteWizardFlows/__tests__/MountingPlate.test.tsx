@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { fireEvent, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
-import { LEFT, NINETY_SIX_CHANNEL, RIGHT } from '@opentrons/shared-data'
+import { LEFT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import { mockAttachedPipetteInformation } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
@@ -34,7 +34,7 @@ describe('MountingPlate', () => {
       isOnDevice: false,
     }
   })
-  it('returns the correct information, buttons work as expected for attach flow', () => {
+  it('returns the correct information, buttons work as expected for attach flow', async () => {
     const { getByText, getByAltText, getByRole, getByLabelText } = render(props)
     getByText('Attach Mounting Plate')
     getByText(
@@ -43,6 +43,17 @@ describe('MountingPlate', () => {
     getByAltText('Attach mounting plate')
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
+    await waitFor(() => {
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+    })
     expect(props.proceed).toHaveBeenCalled()
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
@@ -62,20 +73,7 @@ describe('MountingPlate', () => {
     getByAltText('Detach mounting plate')
     const proceedBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(proceedBtn)
-    expect(props.chainRunCommands).toHaveBeenCalledWith(
-      [
-        {
-          commandType: 'calibration/moveToMaintenancePosition',
-          params: {
-            mount: RIGHT,
-          },
-        },
-      ],
-      false
-    )
-    await waitFor(() => {
-      expect(props.proceed).toHaveBeenCalled()
-    })
+    expect(props.proceed).toHaveBeenCalled()
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)
     expect(props.goBack).toHaveBeenCalled()
