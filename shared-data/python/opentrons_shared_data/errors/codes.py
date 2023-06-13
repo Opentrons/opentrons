@@ -56,6 +56,7 @@ class ErrorCodes(Enum):
     E_STOP_NOT_PRESENT = _code_from_dict_entry("3009")
     PIPETTE_NOT_PRESENT = _code_from_dict_entry("3010")
     GRIPPER_NOT_PRESENT = _code_from_dict_entry("3011")
+    GENERAL_ERROR = _code_from_dict_entry("4000")
 
     @classmethod
     @lru_cache(25)
