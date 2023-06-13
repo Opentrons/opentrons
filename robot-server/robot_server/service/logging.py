@@ -1,7 +1,7 @@
 import logging
 from logging.config import dictConfig
 from typing import Any, Dict
-from opentrons.config import IS_ROBOT, CONFIG, robot_configs
+from opentrons.config import IS_ROBOT, robot_configs
 
 
 def initialize_logging() -> None:
@@ -39,20 +39,21 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
                 "class": "systemd.journal.JournalHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
+                "SYSLOG_IDENTIFER": "opentrons-robot-server",
             },
             "syslog_plus_unit": {
                 "class": "systemd.journal.JournalHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFIER": "opentrons-api",
-                "filename": CONFIG["server_log_file"],
+                "SYSLOG_IDENTIFIER": "opentrons-robot-server",
+                "backupCount": 3,
+                "maxBytes": 5000000,
             },
             "syslog_plus_unit_above_warn": {
                 "class": "systemd.journal.JournalHandler",
                 "level": logging.WARN,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFER": "opentrons-api",
-                "filename": CONFIG["server_log_file"],
+                "SYSLOG_IDENTIFER": "opentrons-robot-server",
             },
             "unit_only_below_warn": {
                 "class": "systemd.journal.JournalHandler",
@@ -68,6 +69,11 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
                 "propagate": False,
             },
             "uvicorn.error": {
+                "handlers": ["syslog_plus_unit"],
+                "level": log_level,
+                "propagate": False,
+            },
+            "uvicorn": {
                 "handlers": ["syslog_plus_unit"],
                 "level": log_level,
                 "propagate": False,
@@ -111,8 +117,8 @@ def _dev_log_config(log_level: int) -> Dict[str, Any]:
                 "class": "logging.StreamHandler",
                 "level": logging.DEBUG,
                 "formatter": "basic",
-                "filename": CONFIG["server_log_file"],
                 "maxBytes": 5000000,
+                "SYSLOG_IDENTIFIER": "opentrons-robot-server",
             }
         },
         "loggers": {
