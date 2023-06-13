@@ -88,7 +88,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
       <Flex flexDirection={DIRECTION_COLUMN} minHeight='26rem' gridGap={SPACING.spacing32}>
         <Text as='h2'>
-          {t('modal.create_file_wizard.additional_items')}
+          {t('modal.create_file_wizard.choose_additional_items')}
         </Text>
         {robotType === OT2_ROBOT_TYPE ? (
           <ModuleFields
@@ -133,7 +133,7 @@ const FLEX_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
 function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const { values } = props
   return (
-    <Flex flexWrap='wrap' gridGap={SPACING.spacing4}>
+    <Flex flexWrap='wrap' gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
       <FlexAddOnField
         {...props}
         onClick={() => {
@@ -192,7 +192,7 @@ function FlexAddOnField(props: FlexAddOnFieldProps): JSX.Element {
 const AdditionalItemCard = styled.div<{ isSelected: boolean }>`
   display: flex;
   align-items: ${ALIGN_CENTER};
-  min-width: 8rem;
+  width: 21.75rem;
   grid-gap: ${SPACING.spacing8};
   padding: ${SPACING.spacing16};
   border: ${BORDERS.lineBorder};

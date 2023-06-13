@@ -70,7 +70,7 @@
     }
   },
   "create_file_wizard": {
-    "additional_items": "Additional items",
+    "choose_additional_items": "Choose additional items",
     "add_optional_info": "Add more information, if you like (you can change this later).",
     "choose_at_least_one_tip_rack": "Choose at least one tiprack for this pipette",
     "choose_first_pipette": "Choose first pipette",
