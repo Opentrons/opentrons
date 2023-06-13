@@ -59,7 +59,10 @@ async def jogste(api, position, cp,mount):
         #########################################            
         Set operating parameters(设置移动的步进) 
                     """
+
     print(information_str)
+    print("Motor Step: ",
+            step_size[step_length_index])
     while True:
         input = getch()
         
@@ -96,12 +99,6 @@ async def jogste(api, position, cp,mount):
 
 
         print(
-            "Coordinates: ",
-            round(position[OT3Axis.X], 2),
-            ",",
-            round(position[OT3Axis.Y], 2),
-            ",",
-            round(position[OT3Axis.by_mount(mount)], 2),
             " Motor Step: ",
             step_size[step_length_index],
             end="          ",
@@ -117,6 +114,7 @@ async def jog(api, position, cp,mount):
     xy_speed = 60
     za_speed = 65
     information_str = """
+        <<调整千分尺到测试位置>>
         Click  >>   i   << to move up
         Click  >>   k   << to move down
         Click  >>   a  << to move left
@@ -325,9 +323,9 @@ async def _main(is_simulating: bool) -> None:
     test_tag = "MD"
     test_robot = "OT3"
     
-    test_tag = input("Enter test tag(请输入测试的设备名称):\n\t>> ")
+    test_tag = input("Enter test ID(请输入测试的设备编号):\n\t>> ")
     
-    test_robot = input("Enter robot ID(请输入OT3设备名称):\n\t>> ")
+    test_robot = input("Enter robot ID(请输入OT3设备编号):\n\t>> ")
 
     # whereval = "OT3Mount.LEFT"
     # if(mount == OT3Mount.LEFT):
@@ -369,7 +367,7 @@ async def _main(is_simulating: bool) -> None:
     
     #test_pip = api.get_attached_instrument(mount)
     test_name = "deck-test"
-    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag)
+    file_name = data.create_file_name(test_name=test_name, run_id=data.create_run_id(), tag=test_tag,pipid=test_robot)
     header = ["------------------------------------"]
     header_str = data.convert_list_to_csv_line(header)
     data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
@@ -413,11 +411,11 @@ async def _main(is_simulating: bool) -> None:
     try:
         cycle = 1
         for keyv in l_r_loc.keys(): 
-            print("keyv",keyv)
+            #print("keyv",keyv)
             if str(keyv) == "OT3Mount.LEFT":
                 mount = types.OT3Mount.LEFT
                 AXIS = OT3Axis.Z_L
-
+                loct = ["LEFT","左边"]
                 await api.move_to(mount, Point(x=calibrated_slot_loc[keyv][0],
                                 y=calibrated_slot_loc[keyv][1]-4, z=508.15))
 
@@ -433,7 +431,7 @@ async def _main(is_simulating: bool) -> None:
             elif str(keyv) == "OT3Mount.RIGHT":
                 mount = types.OT3Mount.RIGHT
                 AXIS = OT3Axis.Z_R
-                
+                loct = ["RIGHT","右边"]
                 await api.move_to(mount, Point(calibrated_slot_loc[keyv][0],
                                 calibrated_slot_loc[keyv][1], 508.15))
                                 
@@ -451,7 +449,7 @@ async def _main(is_simulating: bool) -> None:
             #header_str = data.convert_list_to_csv_line(txtval)
             #data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
-            input("Please set the micrometer to zero,Press enter to start the test(请把千分尺置零)")
+            input("Please set the {} micrometer to zero,Press enter to start the test(请把{}千分尺置零后回车开始测试)".format(loct[0],loct[1]))
 
             for i in range(cycle):
                 Toollength = zijulis[keyv] - steplist[0]
@@ -476,7 +474,7 @@ async def _main(is_simulating: bool) -> None:
                     
                     Toollength = Toollength - steplist[0]
                 else:
-                    if i >= len(range(cycle)):
+                    if i+1 >= len(range(cycle)):
                         break
                     if mount == OT3Mount.LEFT:
                         await api.move_rel(
