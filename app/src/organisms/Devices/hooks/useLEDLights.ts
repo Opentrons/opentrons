@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { State } from '../../../redux/types'
-import { RobotSettings } from '../../../redux/robot-settings/types'
 import {
   fetchSettings,
   getRobotSettings,
   updateSetting,
 } from '../../../redux/robot-settings'
+import type { RobotSettings } from '../../../redux/robot-settings/types'
+import type { Dispatch, State } from '../../../redux/types'
 
 // not releveant to the OT-2, this controls the front LED lights on the Flex
 export function useLEDLights(
@@ -19,7 +19,7 @@ export function useLEDLights(
     true
   )
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<Dispatch>()
 
   const isStatusBarEnabled =
     useSelector<State, RobotSettings>((state: State) =>
