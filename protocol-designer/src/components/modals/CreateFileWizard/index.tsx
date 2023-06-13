@@ -203,7 +203,7 @@ const initialFormState: FormState = {
     [MAGNETIC_BLOCK_TYPE]: {
       onDeck: false,
       model: MAGNETIC_BLOCK_V1,
-      slot: '1',
+      slot: '2',
     },
     [HEATERSHAKER_MODULE_TYPE]: {
       onDeck: false,

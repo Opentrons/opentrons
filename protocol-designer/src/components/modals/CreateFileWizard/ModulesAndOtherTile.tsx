@@ -157,7 +157,13 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
             image={<ModuleDiagram type={moduleType} model={moduleModel} />}
             text={getModuleDisplayName(moduleModel)}
             onClick={() => {
-              props.setFieldValue(`modulesByType.${moduleType}.onDeck`, !values.modulesByType[moduleType].onDeck)
+              if (values.modulesByType[moduleType].onDeck){
+                props.setFieldValue(`modulesByType.${moduleType}.onDeck`, false)
+                props.setFieldValue(`modulesByType.${moduleType}.model`, null)
+              } else {
+                props.setFieldValue(`modulesByType.${moduleType}.onDeck`, true)
+                props.setFieldValue(`modulesByType.${moduleType}.model`, moduleModel)
+              }
             }}
           />
         )
