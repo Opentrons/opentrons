@@ -12,8 +12,7 @@ High level overview of the script:
 import os
 import json
 from dataclasses import dataclass
-from typing import Optional
-from typing_extensions import Literal
+from typing import Dict, Optional, Set, Union
 from opentrons_hardware.firmware_bindings.constants import PipetteName
 from opentrons_hardware.instruments.pipettes.serials import serial_val_from_parts
 
@@ -31,35 +30,18 @@ class OT3PipetteEnvVar:
     pipette_name: PipetteName
     pipette_model: int
     pipette_serial_code: bytes
-    eeprom_file_name: str
-    mount: Literal["left", "right"]
+    eeprom_file_path: str
 
     @classmethod
-    def from_json_string(
-        cls, env_var_string: str, mount: Literal["left", "right"]
-    ) -> "OT3PipetteEnvVar":
+    def from_json_string(cls, env_var_string: str) -> "OT3PipetteEnvVar":
         """Create OT3PipetteEnvVar from json string."""
         env_var = json.loads(env_var_string)
         return cls(
             pipette_name=PipetteName[env_var["pipette_name"]],
             pipette_model=env_var["pipette_model"],
             pipette_serial_code=env_var["pipette_serial_code"].encode("utf-8"),
-            eeprom_file_name=env_var["eeprom_file_name"],
-            mount=mount,
+            eeprom_file_path=env_var["eeprom_file_path"],
         )
-
-    def _eeprom_dir_path(self) -> str:
-        """Get eeprom directory path."""
-        return (
-            LEFT_PIPETTE_EEPROM_DIR_PATH
-            if self.mount == "left"
-            else RIGHT_PIPETTE_EEPROM_DIR_PATH
-        )
-
-    @property
-    def eeprom_file_path(self) -> str:
-        """Get eeprom file path."""
-        return "/".join([self._eeprom_dir_path(), self.eeprom_file_name])
 
     def _generate_serial_code(self) -> bytes:
         """Generate serial code."""
@@ -75,8 +57,8 @@ class OT3PipetteEnvVar:
 
 def _get_env_var(env_var_name: str) -> str:
     """Check that environment variable is set."""
-    env_var_value: Optional[str] = os.environ.get(LEFT_PIPETTE_ENV_VAR_NAME)
-    if env_var_value is None or len(env_var_value) == 0:
+    env_var_value: Optional[str] = os.environ.get(env_var_name)
+    if env_var_value is None:
         raise ValueError(
             f"Environment variable {env_var_name} is not set. "
             "Please set this environment variable and try again."
@@ -86,13 +68,11 @@ def _get_env_var(env_var_name: str) -> str:
 
 def main() -> None:
     """Main function."""
-    left_pipette_json = _get_env_var(LEFT_PIPETTE_ENV_VAR_NAME)
-    right_pipette_json = _get_env_var(RIGHT_PIPETTE_ENV_VAR_NAME)
+    left_pipette_json_string = _get_env_var(LEFT_PIPETTE_ENV_VAR_NAME)
+    right_pipette_json_string = _get_env_var(RIGHT_PIPETTE_ENV_VAR_NAME)
 
-    OT3PipetteEnvVar.from_json_string(left_pipette_json, "left").generate_eeprom_file()
-    OT3PipetteEnvVar.from_json_string(
-        right_pipette_json, "right"
-    ).generate_eeprom_file()
+    OT3PipetteEnvVar.from_json_string(left_pipette_json_string).generate_eeprom_file()
+    OT3PipetteEnvVar.from_json_string(right_pipette_json_string).generate_eeprom_file()
 
 
 if __name__ == "__main__":
