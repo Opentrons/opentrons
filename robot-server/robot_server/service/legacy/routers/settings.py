@@ -12,6 +12,7 @@ from opentrons.config import (
     reset as reset_util,
     robot_configs,
     advanced_settings,
+    feature_flags as ff,
 )
 
 from robot_server.errors import LegacyErrorResponse
@@ -50,10 +51,13 @@ router = APIRouter()
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": LegacyErrorResponse},
     },
 )
-async def post_settings(update: AdvancedSettingRequest) -> AdvancedSettingsResponse:
+async def post_settings(
+    update: AdvancedSettingRequest, hardware: HardwareControlAPI = Depends(get_hardware)
+) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
     try:
         await advanced_settings.set_adv_setting(update.id, update.value)
+        await hardware.set_status_bar_enabled(ff.status_bar_enabled())
     except ValueError as e:
         raise LegacyErrorResponse(message=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
     except advanced_settings.SettingException as e:

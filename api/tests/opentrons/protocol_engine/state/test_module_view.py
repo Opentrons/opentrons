@@ -1450,6 +1450,38 @@ def test_thermocycler_validate_target_block_temperature(
     assert result == input_temperature
 
 
+@pytest.mark.parametrize(
+    argnames=["input_time", "validated_time"],
+    argvalues=[(0.0, 0.0), (0.123, 0.123), (123.456, 123.456), (1234567, 1234567)],
+)
+def test_thermocycler_validate_hold_time(
+    module_view_with_thermocycler: ModuleView,
+    input_time: float,
+    validated_time: float,
+) -> None:
+    """It should return a valid hold time."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+    result = subject.validate_hold_time(input_time)
+
+    assert result == validated_time
+
+
+@pytest.mark.parametrize("input_time", [-0.1, -123])
+def test_thermocycler_validate_hold_time_raises(
+    module_view_with_thermocycler: ModuleView,
+    input_time: float,
+) -> None:
+    """It should raise on invalid hold time."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+
+    with pytest.raises(errors.InvalidHoldTimeError):
+        subject.validate_hold_time(input_time)
+
+
 @pytest.mark.parametrize("input_temperature", [-0.001, 99.001])
 def test_thermocycler_validate_target_block_temperature_raises(
     module_view_with_thermocycler: ModuleView,

@@ -618,18 +618,6 @@ class LabwareView(HasState[LabwareState]):
                     f"Labware {labware.loadName} is already present at {location}."
                 )
 
-    def get_calibration_coordinates(self, offset: Point) -> Point:
-        """Get calibration critical point and target position."""
-        target_center = self.get_slot_center_position(_OT3_INSTRUMENT_ATTACH_SLOT)
-        # TODO (tz, 11-30-22): These coordinates wont work for OT-2. We will need to apply offsets after
-        # https://opentrons.atlassian.net/browse/RCORE-382
-
-        return Point(
-            x=target_center.x,
-            y=target_center.y + offset.y,
-            z=offset.z,
-        )
-
     def get_random_drop_tip_location(
         self, labware_id: str, well_name: str
     ) -> DropTipWellLocation:

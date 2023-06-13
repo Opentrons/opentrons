@@ -24,7 +24,7 @@ import { RadioButton, SmallButton } from '../../atoms/buttons'
 import { getLocalRobot } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
-import { useIsFinishedUnboxing } from '../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/hooks'
+import { useIsFinishedUnboxing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { Dispatch, State } from '../../redux/types'

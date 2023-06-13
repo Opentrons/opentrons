@@ -7,16 +7,18 @@ import {
   ALIGN_CENTER,
   COLORS,
   JUSTIFY_CENTER,
-  SPACING,
 } from '@opentrons/components'
 
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
+
 const STOP_BUTTON_STYLE = css`
+  -webkit-tap-highlight-color: transparent;
   display: flex;
   background-color: ${COLORS.red2};
   border-radius: 50%;
 
   &:focus {
-    background-color: #c41e20;
+    background-color: ${COLORS.red2Pressed};
     box-shadow: none;
   }
   &:hover {
@@ -26,7 +28,7 @@ const STOP_BUTTON_STYLE = css`
     color: ${COLORS.white};
   }
   &:focus-visible {
-    box-shadow: 0 0 0 ${SPACING.spacing2} ${COLORS.fundamentalsFocus};
+    box-shadow: ${ODD_FOCUS_VISIBLE};
     background-color: ${COLORS.red2};
   }
   &:active {
@@ -42,13 +44,13 @@ interface StopButtonProps {
   onStop?: () => void
   /** default size 12.5rem */
   buttonSize?: string
-  /** default size 10rem */
+  /** default size 5rem */
   iconSize?: string
 }
 export function StopButton({
   onStop,
   buttonSize = '12.5rem',
-  iconSize = '10rem',
+  iconSize = '5rem',
 }: StopButtonProps): JSX.Element {
   return (
     <Btn
@@ -60,7 +62,7 @@ export function StopButton({
       onClick={onStop}
       aria-label="stop"
     >
-      <Icon name="close" color={COLORS.white} size={iconSize} />
+      <Icon name="ot-close-thick" color={COLORS.white} size={iconSize} />
     </Btn>
   )
 }

@@ -60,4 +60,5 @@ interface CalibrateGripperResult {
 }
 interface MoveToMaintenancePositionParams {
   mount: PipetteMount
+  maintenancePosition?: 'attachPlate' | 'attachInstrument'
 }

@@ -115,7 +115,7 @@ export function ProtocolSetupInstruments({
 const ColumnLabel = styled.p`
   flex: 1;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  font-size: ${TYPOGRAPHY.fontWeightSemiBold};
+  font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   color: ${COLORS.darkBlack70};
 `

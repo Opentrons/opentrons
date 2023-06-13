@@ -6,8 +6,25 @@
   padding: 8px;
 }
 
+.simple-keyboard.oddTheme1 .hg-row .hg-button:not(:last-child) {
+  margin-right: 8px;
+}
+
+.simple-keyboard.oddTheme1 .hg-row {
+  margin-bottom: 8px;
+}
+
 .simple-keyboard.oddTheme1.hg-button {
   min-width: 48px;
-  min-height: 48px;
-  font-size: 22px;
+  height: 48px;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.simple-keyboard.oddTheme1.hg-button :focus {
+  -webkit-tap-highlight-color: #e3e3e3;
+}
+
+.simple-keyboard.oddTheme1.hg-button :active {
+  -webkit-tap-highlight-color: #e3e3e3;
 }

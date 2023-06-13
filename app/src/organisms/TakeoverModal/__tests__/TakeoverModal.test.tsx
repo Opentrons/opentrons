@@ -36,7 +36,7 @@ describe('TakeoverModal', () => {
       showConfirmTerminateModal: true,
     }
     const { getByText, getByLabelText } = render(props)
-    getByText('Terminate activity?')
+    getByText('Terminate remote activity?')
     getByText(
       'This will immediately stop the activity begun on a computer. You, or another user, may lose progress or see an error in the Opentrons App.'
     )

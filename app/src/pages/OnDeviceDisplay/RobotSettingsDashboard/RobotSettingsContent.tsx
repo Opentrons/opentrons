@@ -9,7 +9,7 @@ import {
   RobotName,
   RobotSystemVersion,
   UpdateChannel,
-} from '../../../organisms/OnDeviceDisplay/RobotSettingsDashboard'
+} from '../../../organisms/RobotSettingsDashboard'
 
 import type { NetworkConnection } from '../hooks'
 import type { SettingOption } from './RobotSettingButton'
