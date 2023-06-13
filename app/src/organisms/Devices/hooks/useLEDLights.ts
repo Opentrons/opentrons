@@ -12,34 +12,32 @@ import {
 export function useLEDLights(
   robotName: string
 ): {
-  lightsDisabled: boolean
+  lightsEnabled: boolean
   toggleLights: () => void
 } {
-  const [lightsDisabledCache, setLightsDisabledCache] = React.useState<boolean>(
-    false
+  const [lightsEnabledCache, setLightsEnabledCache] = React.useState<boolean>(
+    true
   )
-
-  console.log({ lightsDisabledCache })
 
   const dispatch = useDispatch()
 
-  const isStatusBarDisabled =
+  const isStatusBarEnabled =
     useSelector<State, RobotSettings>((state: State) =>
       getRobotSettings(state, robotName)
-    ).find(setting => setting.id === 'disableStatusBar')?.value === true
+    ).find(setting => setting.id === 'disableStatusBar')?.value !== true
 
   React.useEffect(() => {
-    setLightsDisabledCache(isStatusBarDisabled)
-  }, [isStatusBarDisabled])
+    setLightsEnabledCache(isStatusBarEnabled)
+  }, [isStatusBarEnabled])
 
   React.useEffect(() => {
     dispatch(fetchSettings(robotName))
   }, [dispatch, robotName])
 
   const toggleLights = (): void => {
-    dispatch(updateSetting(robotName, 'disableStatusBar', !lightsDisabledCache))
-    setLightsDisabledCache(!lightsDisabledCache)
+    dispatch(updateSetting(robotName, 'disableStatusBar', lightsEnabledCache))
+    setLightsEnabledCache(!lightsEnabledCache)
   }
 
-  return { lightsDisabled: lightsDisabledCache, toggleLights }
+  return { lightsEnabled: lightsEnabledCache, toggleLights }
 }

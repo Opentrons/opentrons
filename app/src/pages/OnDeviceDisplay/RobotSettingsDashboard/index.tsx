@@ -10,7 +10,7 @@ import { getBuildrootUpdateAvailable } from '../../../redux/buildroot'
 import { getDevtoolsEnabled } from '../../../redux/config'
 import { UNREACHABLE } from '../../../redux/discovery/constants'
 import { Navigation } from '../../../organisms/Navigation'
-import { useLEDLights } from '../../../organisms/Devices/hooks/useLEDLights'
+import { useLEDLights } from '../../../organisms/Devices/hooks'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
 import { useNetworkConnection } from '../hooks'
 import { RobotSettingButton } from './RobotSettingButton'
@@ -27,7 +27,7 @@ export function RobotSettingsDashboard(): JSX.Element {
   ])
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-  const { lightsDisabled, toggleLights } = useLEDLights(robotName)
+  const { lightsEnabled, toggleLights } = useLEDLights(robotName)
   const networkConnection = useNetworkConnection(robotName)
   const [
     currentOption,
@@ -102,7 +102,7 @@ export function RobotSettingsDashboard(): JSX.Element {
             setCurrentOption={setCurrentOption}
             iconName="light"
             ledLights
-            lightsOn={!lightsDisabled}
+            lightsOn={lightsEnabled}
             toggleLights={toggleLights}
           />
           <RobotSettingButton
