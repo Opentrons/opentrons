@@ -62,15 +62,17 @@ def build_arg_parser():
     arg_parser.add_argument('-f', '--force', type=int, required=False, help='Set the gripper force in Newtons', default=20)
     arg_parser.add_argument('-t', '--time', type=int, required=False, help='Set the gripper hold time in seconds', default=10)
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Sets the deck slot number', default=6)
+    arg_parser.add_argument('-z', '--fast', action="store_true", required=False, help='Fast mode')
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Gripper_Lifetime_Test:
     def __init__(
-        self, simulate: bool, calibrate: bool, mode: str, cycles: int, force: float, time: float, slot: int
+        self, simulate: bool, calibrate: bool, fast: bool, mode: str, cycles: int, force: float, time: float, slot: int
     ) -> None:
         self.simulate = simulate
         self.calibrate = calibrate
+        self.fast = fast
         self.mode = mode
         self.cycles = cycles
         self.grip_force = force
@@ -82,7 +84,7 @@ class Gripper_Lifetime_Test:
         self.gripper_id = None
         self.cycle = None
         self.current_state = None
-        self.GRIP_HEIGHT = Point(0, 0, -100) # mm
+        self.grip_height = None
         self.axes = [OT3Axis.G, OT3Axis.Z_G]
         self.test_data = {
             "Time":"None",
@@ -185,9 +187,10 @@ class Gripper_Lifetime_Test:
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         self.current_state = self.states["PICK"]
-        target_position = target_position_from_relative(mount, self.GRIP_HEIGHT, api._current_position)
+        target_position = target_position_from_relative(mount, self.grip_height, api._current_position)
         await api._move(target_position)
-        time.sleep(1.0)
+        if not self.fast:
+            time.sleep(1.0)
         await api.grip(self.grip_force)
         await self._record_data()
 
@@ -196,16 +199,18 @@ class Gripper_Lifetime_Test:
     ) -> None:
         self.current_state = self.states["HOLD"]
         await api.home_z(mount)
-        time.sleep(self.hold_time)
+        if not self.fast:
+            time.sleep(self.hold_time)
         await self._record_data()
 
     async def _drop(
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         self.current_state = self.states["DROP"]
-        target_position = target_position_from_relative(mount, self.GRIP_HEIGHT, api._current_position)
+        target_position = target_position_from_relative(mount, self.grip_height, api._current_position)
         await api._move(target_position)
-        time.sleep(1.0)
+        if not self.fast:
+            time.sleep(1.0)
         await api.ungrip()
         await self._record_data()
 
@@ -244,7 +249,9 @@ class Gripper_Lifetime_Test:
                     if self.calibrate:
                         await self._calibrate_slot(self.api, self.mount, self.slot)
                     await self._move_gripper(self.api, self.mount)
-                    self.GRIP_HEIGHT = Point(0, 0, -125)
+                    self.grip_height = Point(0, 0, -125)
+                else:
+                    self.grip_height = Point(0, 0, -100)
                 for i in range(self.cycles):
                     self.cycle = i + 1
                     print(f"\n-> Starting Test Cycle {self.cycle}/{self.cycles}")
@@ -267,5 +274,5 @@ if __name__ == '__main__':
     dictConfig(LOG_CONFIG)
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Gripper_Lifetime_Test(args.simulate, args.calibrate, args.mode, args.cycles, args.force, args.time, args.slot)
+    test = Gripper_Lifetime_Test(args.simulate, args.calibrate, args.fast, args.mode, args.cycles, args.force, args.time, args.slot)
     asyncio.run(test.run())
