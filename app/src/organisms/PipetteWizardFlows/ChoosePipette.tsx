@@ -245,7 +245,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                       textAlign={TYPOGRAPHY.textAlignCenter}
                     >
-                      {singleMount}s
+                      {singleMount}
                     </StyledText>
                   </PipetteMountOption>
                   <PipetteMountOption
