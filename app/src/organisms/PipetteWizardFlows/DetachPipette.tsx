@@ -1,13 +1,13 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { RIGHT } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { Skeleton } from '../../atoms/Skeleton'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import detach96Pipette from '../../assets/images/change-pip/detach-96-pipette.png'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { BODY_STYLE, SECTIONS } from './constants'
-import { getPipetteAnimations } from './utils'
+import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface DetachPipetteProps extends PipetteWizardStepProps {
@@ -25,6 +25,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     mount,
     isFetching,
     setFetching,
+    chainRunCommands,
     isOnDevice,
     flowType,
   } = props
@@ -36,6 +37,27 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
   }
   const is96ChannelPipette =
     attachedPipettes[mount]?.instrumentName === 'p1000_96'
+  const handle96ChannelProceed = (): void => {
+    chainRunCommands(
+      [
+        {
+          // @ts-expect-error calibration type not yet supported
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: RIGHT,
+            maintenancePosition: 'attachPlate',
+          },
+        },
+      ],
+      false
+    )
+      .then(() => {
+        proceed()
+      })
+      .catch(() => {
+        proceed()
+      })
+  }
   const channel = attachedPipettes[mount]?.data.channels
   let bodyText: React.ReactNode = <div></div>
   if (isFetching) {
@@ -73,7 +95,6 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
           }`
         )
       }
-      //  TODO(Jr, 11/8/22): replace image with correct one!
       rightHandBody={
         isFetching ? (
           <Skeleton
@@ -82,11 +103,10 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
             backgroundSize={BACKGROUND_SIZE}
           />
         ) : is96ChannelPipette ? (
-          <img
-            src={detach96Pipette}
-            width="100%"
-            alt={'Unscrew 96 channel pipette'}
-          />
+          getPipetteAnimations96({
+            section: pipetteWizardStep.section,
+            flowType: flowType,
+          })
         ) : (
           getPipetteAnimations({ pipetteWizardStep, channel })
         )
@@ -98,7 +118,7 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
         <CheckPipetteButton
           isOnDevice={isOnDevice}
           proceedButtonText={i18n.format(t('shared:continue'), 'capitalize')}
-          proceed={proceed}
+          proceed={is96ChannelPipette ? handle96ChannelProceed : proceed}
           setFetching={setFetching}
           isFetching={isFetching}
         />

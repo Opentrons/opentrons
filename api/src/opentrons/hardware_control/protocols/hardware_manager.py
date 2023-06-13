@@ -1,4 +1,7 @@
+from typing import Dict
 from typing_extensions import Protocol
+
+from ..types import SubSystem, SubSystemState
 
 
 class HardwareManager(Protocol):
@@ -24,5 +27,17 @@ class HardwareManager(Protocol):
     def board_revision(self) -> str:
         """
         Return the revision of the central hardware.
+        """
+        ...
+
+    @property
+    def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
+        """
+        Get a view of the hardware subsystems currently attached to the machine.
+
+        These subsystems are the programmable parts that underly and provide things like motion
+        control and instruments. Depending on the machine, different subsystems may be available.
+        In general, callers should not use the presence or absence of a specific subsystem to decide
+        whether or not the hardware is operating properly.
         """
         ...

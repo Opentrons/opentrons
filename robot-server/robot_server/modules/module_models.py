@@ -1,9 +1,11 @@
 """Request and response models for /modules endpoints."""
+from datetime import datetime
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 from typing import Generic, Optional, TypeVar, Union
 from typing_extensions import Literal
 
+from opentrons.calibration_storage.types import SourceType
 from opentrons.hardware_control.modules import (
     ModuleType,
     TemperatureStatus,
@@ -16,10 +18,20 @@ from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
 )
 from opentrons.protocol_engine import ModuleModel
+from opentrons.protocol_engine.types import Vec3f
 
 ModuleT = TypeVar("ModuleT", bound=ModuleType)
 ModuleModelT = TypeVar("ModuleModelT", bound=ModuleModel)
 ModuleDataT = TypeVar("ModuleDataT", bound=BaseModel)
+
+
+class ModuleCalibrationData(BaseModel):
+    """A module's calibration data."""
+
+    offset: Vec3f
+    slot: Optional[str] = None
+    source: Optional[SourceType] = None
+    last_modified: Optional[datetime] = None
 
 
 class UsbPort(BaseModel):
@@ -65,6 +77,9 @@ class _GenericModule(GenericModel, Generic[ModuleT, ModuleModelT, ModuleDataT]):
     )
     moduleType: ModuleT = Field(..., description="General type of the module.")
     moduleModel: ModuleModelT = Field(..., description="Specific model of the module.")
+    moduleOffset: Optional[ModuleCalibrationData] = Field(
+        None, description="The calibrated module offset."
+    )
     data: ModuleDataT
     usbPort: UsbPort
 

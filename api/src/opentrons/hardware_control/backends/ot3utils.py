@@ -7,7 +7,7 @@ from opentrons.hardware_control.types import (
     OT3AxisKind,
     OT3AxisMap,
     CurrentConfig,
-    OT3SubSystem,
+    SubSystem,
     OT3Mount,
     InstrumentProbeType,
     PipetteSubType,
@@ -40,6 +40,7 @@ from opentrons_hardware.hardware_control.motion import (
     create_step,
     NodeIdMotionValues,
     create_home_step,
+    create_backoff_step,
     MoveGroup,
     MoveType,
     MoveStopCondition,
@@ -49,6 +50,8 @@ from opentrons_hardware.hardware_control.motion import (
 
 GRIPPER_JAW_HOME_TIME: float = 10
 GRIPPER_JAW_GRIP_TIME: float = 10
+
+LIMIT_SWITCH_OVERTRAVEL_DISTANCE: float = 1
 
 PipetteAction = Literal["clamp", "home"]
 
@@ -60,33 +63,20 @@ PipetteAction = Literal["clamp", "home"]
 # server tests fail when importing hardware controller. This is obviously
 # terrible and needs to be fixed.
 
-SUBSYSTEM_NODEID: Dict[OT3SubSystem, NodeId] = {
-    OT3SubSystem.gantry_x: NodeId.gantry_x,
-    OT3SubSystem.gantry_y: NodeId.gantry_y,
-    OT3SubSystem.head: NodeId.head,
-    OT3SubSystem.pipette_left: NodeId.pipette_left,
-    OT3SubSystem.pipette_right: NodeId.pipette_right,
-    OT3SubSystem.gripper: NodeId.gripper,
+SUBSYSTEM_NODEID: Dict[SubSystem, NodeId] = {
+    SubSystem.gantry_x: NodeId.gantry_x,
+    SubSystem.gantry_y: NodeId.gantry_y,
+    SubSystem.head: NodeId.head,
+    SubSystem.pipette_left: NodeId.pipette_left,
+    SubSystem.pipette_right: NodeId.pipette_right,
+    SubSystem.gripper: NodeId.gripper,
 }
 
-NODEID_SUBSYSTEM: Dict[NodeId, OT3SubSystem] = {
-    NodeId.gantry_x: OT3SubSystem.gantry_x,
-    NodeId.gantry_x_bootloader: OT3SubSystem.gantry_x,
-    NodeId.gantry_y: OT3SubSystem.gantry_y,
-    NodeId.gantry_y_bootloader: OT3SubSystem.gantry_y,
-    NodeId.head: OT3SubSystem.head,
-    NodeId.head_bootloader: OT3SubSystem.head,
-    NodeId.pipette_left: OT3SubSystem.pipette_left,
-    NodeId.pipette_left_bootloader: OT3SubSystem.pipette_left,
-    NodeId.pipette_right: OT3SubSystem.pipette_right,
-    NodeId.pipette_right_bootloader: OT3SubSystem.pipette_right,
-    NodeId.gripper: OT3SubSystem.gripper,
-    NodeId.gripper_bootloader: OT3SubSystem.gripper,
-}
+NODEID_SUBSYSTEM = {node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()}
 
-USBTARGET_SUBSYSTEM: Dict[USBTarget, OT3SubSystem] = {
-    USBTarget.rear_panel: OT3SubSystem.rear_panel
-}
+SUBSYSTEM_USB: Dict[SubSystem, USBTarget] = {SubSystem.rear_panel: USBTarget.rear_panel}
+
+USB_SUBSYSTEM = {target: subsystem for subsystem, target in SUBSYSTEM_USB.items()}
 
 
 def axis_nodes() -> List["NodeId"]:
@@ -173,17 +163,38 @@ def axis_is_node(axis: OT3Axis) -> bool:
         return False
 
 
-def sub_system_to_node_id(sub_sys: OT3SubSystem) -> "NodeId":
+def sub_system_to_nodeid(sub_sys: SubSystem) -> "NodeId":
     """Convert a sub system to a NodeId."""
     return SUBSYSTEM_NODEID[sub_sys]
 
 
-def node_id_to_subsystem(node_id: NodeId) -> "OT3SubSystem":
+def node_id_to_subsystem(node_id: NodeId) -> "SubSystem":
     """Convert a NodeId to a Subsystem"""
-    node_to_subsystem = {
-        node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()
-    }
-    return node_to_subsystem[node_id.application_for()]
+    return NODEID_SUBSYSTEM[node_id.application_for()]
+
+
+def usb_to_subsystem(target: USBTarget) -> SubSystem:
+    return USB_SUBSYSTEM[target]
+
+
+def subsystem_to_usb(subsystem: SubSystem) -> USBTarget:
+    return SUBSYSTEM_USB[subsystem]
+
+
+def target_to_subsystem(target: FirmwareTarget) -> SubSystem:
+    if isinstance(target, USBTarget):
+        return usb_to_subsystem(target)
+    elif isinstance(target, NodeId):
+        return node_id_to_subsystem(target)
+    else:
+        raise KeyError(target)
+
+
+def subsystem_to_target(subsystem: SubSystem) -> FirmwareTarget:
+    try:
+        return sub_system_to_nodeid(subsystem)
+    except KeyError:
+        return subsystem_to_usb(subsystem)
 
 
 def get_current_settings(
@@ -263,20 +274,6 @@ def replace_gripper_node(targets: Set[FirmwareTarget]) -> Set[FirmwareTarget]:
     return targets
 
 
-def filter_probed_core_nodes(
-    current_set: Set[FirmwareTarget], probed_set: Set[FirmwareTarget]
-) -> Set[FirmwareTarget]:
-    core_replaced: Set[FirmwareTarget] = {
-        NodeId.gantry_x,
-        NodeId.gantry_y,
-        NodeId.head,
-        USBTarget.rear_panel,
-    }
-    current_set -= core_replaced
-    current_set |= probed_set
-    return current_set
-
-
 def motor_nodes(devices: Set[FirmwareTarget]) -> Set[NodeId]:
     # do the replacement of head and gripper devices
     motor_nodes = replace_gripper_node(devices)
@@ -329,11 +326,15 @@ def create_home_group(
 ) -> MoveGroup:
     node_id_distances = _convert_to_node_id_dict(distance)
     node_id_velocities = _convert_to_node_id_dict(velocity)
-    step = create_home_step(
+    home = create_home_step(
         distance=node_id_distances,
         velocity=node_id_velocities,
     )
-    move_group: MoveGroup = [step]
+    # halve the homing speed for backoff
+    backoff_velocities = {k: v / 2 for k, v in node_id_velocities.items()}
+    backoff = create_backoff_step(backoff_velocities)
+
+    move_group: MoveGroup = [home, backoff]
     return move_group
 
 
@@ -443,24 +444,6 @@ def fw_update_state_from_status(state: FirmwareUpdateStatus) -> UpdateState:
     return _update_state_lookup[state]
 
 
-subsystem_to_mount = {
-    OT3SubSystem.pipette_left: OT3Mount.LEFT,
-    OT3SubSystem.pipette_right: OT3Mount.RIGHT,
-    OT3SubSystem.gripper: OT3Mount.GRIPPER,
-}
-
-
-def mount_from_subsystem(subsystem: OT3SubSystem) -> OT3Mount:
-    return subsystem_to_mount[subsystem]
-
-
-def subsystem_from_mount(mount: OT3Mount) -> OT3SubSystem:
-    mount_to_subsystem = {
-        ot3mount: subsystem for subsystem, ot3mount in subsystem_to_mount.items()
-    }
-    return mount_to_subsystem[mount]
-
-
 class UpdateProgress:
     """Class to keep track of Update progress."""
 
@@ -471,7 +454,7 @@ class UpdateProgress:
             subsystem = (
                 node_id_to_subsystem(NodeId(target))
                 if isinstance(target, NodeId)
-                else OT3SubSystem.rear_panel
+                else SubSystem.rear_panel
             )
             self._tracker[target] = UpdateStatus(subsystem, UpdateState.queued, 0)
 
@@ -492,7 +475,7 @@ class UpdateProgress:
         subsystem = (
             node_id_to_subsystem(NodeId(target))
             if isinstance(target, NodeId)
-            else OT3SubSystem.rear_panel
+            else SubSystem.rear_panel
         )
         state = fw_update_state_from_status(fw_update_status)
         progress = int(progress * 100)

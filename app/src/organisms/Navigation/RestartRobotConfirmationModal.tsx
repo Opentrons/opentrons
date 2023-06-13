@@ -40,7 +40,7 @@ export function RestartRobotConfirmationModal({
     <Modal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing40}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
         <Trans

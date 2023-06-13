@@ -32,5 +32,6 @@
   "channels": 1,
   "shaftDiameter": 5.0,
   "shaftULperMM": 19.635,
-  "backCompatNames": []
+  "backCompatNames": [],
+  "backlashDistance": 0.0
 }

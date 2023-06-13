@@ -16,6 +16,7 @@ from typing import (
     Set,
     Any,
     TypeVar,
+    Mapping,
 )
 
 from opentrons_shared_data.pipette import name_config
@@ -79,7 +80,7 @@ class API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlInterface[RobotCalibration],
+    HardwareControlInterface[RobotCalibration, Axis],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -348,6 +349,10 @@ class API(
         await self.set_lights(button=True)
 
     async def set_status_bar_state(self, state: StatusBarState) -> None:
+        """The status bar does not exist on OT-2!"""
+        return None
+
+    async def set_status_bar_enabled(self, enabled: bool) -> None:
         """The status bar does not exist on OT-2!"""
         return None
 
@@ -696,6 +701,18 @@ class API(
 
         await self._cache_and_maybe_retract_mount(mount)
         await self._move(target_position, speed=speed, max_speeds=max_speeds)
+
+    async def move_axes(
+        self,
+        position: Mapping[Axis, float],
+        speed: Optional[float] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
+    ) -> None:
+        """Moves the effectors of the specified axis to the specified position.
+        The effector of the x,y axis is the center of the carriage.
+        The effector of the pipette mount axis are the mount critical points but only in z.
+        """
+        raise NotSupportedByHardware("move_axes is not supported on the OT-2.")
 
     async def move_rel(
         self,

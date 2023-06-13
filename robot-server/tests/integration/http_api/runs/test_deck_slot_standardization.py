@@ -23,8 +23,22 @@ async def robot_client(base_url: str) -> AsyncGenerator[RobotClient, None]:
     [
         (lazy_fixture("ot2_server_base_url"), "1", "2", "1", "2"),
         (lazy_fixture("ot2_server_base_url"), "D1", "D2", "1", "2"),
-        (lazy_fixture("ot3_server_base_url"), "1", "2", "D1", "D2"),
-        (lazy_fixture("ot3_server_base_url"), "D1", "D2", "D1", "D2"),
+        pytest.param(
+            lazy_fixture("ot3_server_base_url"),
+            "1",
+            "2",
+            "D1",
+            "D2",
+            marks=pytest.mark.ot3_only,
+        ),
+        pytest.param(
+            lazy_fixture("ot3_server_base_url"),
+            "D1",
+            "D2",
+            "D1",
+            "D2",
+            marks=pytest.mark.ot3_only,
+        ),
     ],
 )
 async def test_deck_slot_standardization(
