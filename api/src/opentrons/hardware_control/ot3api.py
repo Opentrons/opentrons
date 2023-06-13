@@ -1262,6 +1262,11 @@ class OT3API(
         res = await self._backend.get_limit_switches()
         return {ax: val for ax, val in res.items()}
 
+    async def get_tip_status(self, mount: Union[top_types.Mount, OT3Mount]) -> Dict[OT3Axis, bool]:
+        checked_mount = OT3Mount.from_mount(mount)
+        res = await self._backend.get_tip_status(checked_mount)
+        return {ax: val for ax, val in res.items()}
+
     @ExecutionManagerProvider.wait_for_running
     async def retract(
         self, mount: Union[top_types.Mount, OT3Mount], margin: float = 10
@@ -1566,6 +1571,7 @@ class OT3API(
         self, mount: OT3Mount, pipette_spec: PickUpTipSpec
     ) -> None:
         for press in pipette_spec.presses:
+            start_pos = await self.gantry_position(mount)
             async with self._backend.restore_current():
                 await self._backend.set_active_current(
                     {axis: current for axis, current in press.current.items()}
@@ -1580,7 +1586,8 @@ class OT3API(
             target_up = target_position_from_relative(
                 mount, press.relative_up, self._current_position
             )
-            await self._move(target_up)
+            await self._update_position_estimation(axes=[OT3Axis.by_mount(mount)])
+            await self.move_to(mount, start_pos) # self._move(target_up)
 
     async def _motor_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
