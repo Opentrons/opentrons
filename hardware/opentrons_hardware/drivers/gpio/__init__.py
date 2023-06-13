@@ -56,7 +56,7 @@ class OT3GPIO:
         )
         self._eeprom_wp_out_line = self._gpiod.find_line(EEPROM_WP_OUT_GPIO_NAME)
         self._eeprom_wp_out_line.request(
-                self._consumer_name, type=self._gpiod.LINE_REQ_OUT
+                self._consumer_name, type=self._gpiod.LINE_REQ_DIR_OUT
         )
         self.deactivate_estop()
         self.deactivate_nsync_out()

@@ -224,9 +224,8 @@ class OT3Controller:
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
         self._gpio_dev, self._usb_messenger = self._build_system_hardware(usb_driver)
-        self._eeprom = EEPROM(gpio=self._gpio_dev)
+        self._eeprom = EEPROM()
         self._eeprom.setup()
-        print(self.eeprom_data)
         self._subsystem_manager = SubsystemManager(
             self._messenger,
             self._usb_messenger,

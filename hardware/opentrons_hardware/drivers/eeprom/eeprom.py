@@ -30,17 +30,9 @@ DEFAULT_READ_SIZE = 64
 
 NOTES:
 
-1. serialized property data can have a maximum size of 254 bytes
-   start (1b) + len (1b) + prop_id (1b) + data (255b) + end (1b)
-   The maximum property packet can be 258bytes long (data (255b) + header (3b))
-   ex.
-      fe0201010d
-      feff04..254...0d
-
-2. Need to deal with property_read incomplete packet case
-3. Need to deal with property_write only able to write 1 page of data
-4. Do we want to clear the eeprom when we write???
-5. In property_write, return the PropIds of the properties that were written successfully.
+1. Need to deal with property_write only able to write 1 page of data
+2. Do we want to clear the eeprom when we write???
+3. In property_write, return the PropIds of the properties that were written successfully.
 """
 
 
@@ -51,20 +43,19 @@ class EEPROM:
         self,
         bus: Optional[int] = DEFAULT_BUS,
         address: Optional[str] = DEFAULT_ADDRESS,
-        gpio: Optional[OT3GPIO] = None,
     ) -> None:
         """Contructor
 
         Args:
-            gpio: The gpio device so we can set the eeprom wp
             bus: The i2c bus this device is on
             address: The unique address for this device
         """
         self._bus = bus
         self._address = address
-        self._gpio = gpio
-        self._eeprom_filepath = Path(f"/sys/bus/i2c/devices/{bus}-{address}/eeprom")
+        #self._eeprom_filepath = Path(f"/sys/bus/i2c/devices/{bus}-{address}/eeprom")
+        self._eeprom_filepath = Path(f"/data/eeprom")
         self._eeprom_fd = -1
+        self._gpio = OT3GPIO("hardware_control")
         self._eeprom_data: EEPROMData = EEPROMData()
         self._properties: Set[Property] = set()
 
@@ -131,14 +122,21 @@ class EEPROM:
         """Returns a set of properties read from the eeprom."""
         properties: Set[Property] = set()
         address = 0
+        overflow = b""
         while True:
             # read data in n byte chunks
             data = self._read(size=DEFAULT_READ_SIZE, address=address)
-            props = parse_data(data, prop_ids=prop_ids)
-            if not props:
+            if not data:
+                break
+            # prepend any leftover data from previous read
+            data = overflow + data
+            props, overflow = parse_data(data, prop_ids=prop_ids)
+            if props:
+                properties.update(props)
+            elif not props and not overflow:
                 # we dont have any more valid data to read so break out.
                 break
-            properties.update(props)
+
             # read the next page
             address += DEFAULT_READ_SIZE
 
@@ -158,12 +156,10 @@ class EEPROM:
                 data += packet
         if data:
             try:
-                if self._gpio:
-                    self._gpio.activate_eeprom_wp()
+                self._gpio.activate_eeprom_wp()
                 size = self._write(data)
             finally:
-                if self._gpio:
-                    self._gpio.deactivate_eeprom_wp()
+                self._gpio.deactivate_eeprom_wp()
         return list()
 
     def _read(self, size: int = DEFAULT_READ_SIZE, address: int = 0) -> bytes:

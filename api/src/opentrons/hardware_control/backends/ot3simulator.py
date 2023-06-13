@@ -45,7 +45,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
 )
-
+from opentrons_hardware.drivers.eeprom import EEPROM
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import (
@@ -182,6 +182,8 @@ class OT3Simulator:
             nodes.add(NodeId.gripper)
         self._present_nodes = nodes
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
+        self._eeprom = EEPROM()
+        self._eeprom.setup()
 
     @property
     def initialized(self) -> bool:

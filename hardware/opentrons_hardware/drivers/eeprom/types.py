@@ -3,12 +3,15 @@
 from datetime import datetime
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple, Set
+
+
 
 
 class PropId(Enum):
     """The unique property id for a property."""
 
+    INVALID = 0xFF
     FORMAT_VERSION = 1
     SERIAL_NUMBER = 2
     MACHINE_TYPE = 3
@@ -69,3 +72,4 @@ class EEPROMData:
     manufacturing_facility: Optional[str] = None
     unit_number: Optional[int] = None
     unique_id: Optional[str] = None
+
