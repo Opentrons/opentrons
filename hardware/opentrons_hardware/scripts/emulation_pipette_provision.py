@@ -19,9 +19,6 @@ from opentrons_hardware.instruments.pipettes.serials import serial_val_from_part
 LEFT_PIPETTE_ENV_VAR_NAME = "LEFT_OT3_PIPETTE_DEFINITION"
 RIGHT_PIPETTE_ENV_VAR_NAME = "RIGHT_OT3_PIPETTE_DEFINITION"
 
-LEFT_PIPETTE_EEPROM_DIR_PATH = "/volumes/left-pipette-eeprom"
-RIGHT_PIPETTE_EEPROM_DIR_PATH = "/volumes/right-pipette-eeprom"
-
 
 @dataclass
 class OT3PipetteEnvVar:
