@@ -5,7 +5,6 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
-  // BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
