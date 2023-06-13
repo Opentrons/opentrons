@@ -296,11 +296,11 @@ class CanMessenger:
                             log.debug("message ignored by filter")
                             continue
                         listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]
-                    if (
-                        message.arbitration_id.parts.message_id
-                        == MessageId.error_message
-                    ):
-                        await self._handle_error(build)
+                    #if (
+                    #    message.arbitration_id.parts.message_id
+                    #    == MessageId.error_message
+                    #):
+                    #    await self._handle_error(build)
                 except BinarySerializableException:
                     log.exception(f"Failed to build from {message}")
             else:
