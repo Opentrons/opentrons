@@ -45,7 +45,7 @@ export function WelcomedModal({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
-        gridGap={SPACING.spacing40}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>

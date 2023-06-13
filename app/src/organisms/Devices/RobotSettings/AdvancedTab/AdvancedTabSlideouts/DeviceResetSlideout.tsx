@@ -4,20 +4,20 @@ import { useTranslation } from 'react-i18next'
 import snakeCase from 'lodash/snakeCase'
 
 import {
-  Flex,
+  ALIGN_CENTER,
+  BORDERS,
+  Box,
+  CheckboxField,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  Link,
+  PrimaryButton,
   SPACING,
   TYPOGRAPHY,
-  PrimaryButton,
-  Link,
-  Box,
-  Icon,
-  COLORS,
-  SIZE_1,
-  ALIGN_CENTER,
-  CheckboxField,
 } from '@opentrons/components'
 import { useAllRunsQuery } from '@opentrons/react-api-client'
 
@@ -149,135 +149,173 @@ export function DeviceResetSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing16}>
-          {t('factory_reset_slideout_description')}
-        </StyledText>
-        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          backgroundColor={COLORS.warningBackgroundLight}
+          borderRadius={BORDERS.borderRadiusSize1}
+          padding={SPACING.spacing8}
+          border={`1px solid ${COLORS.warningEnabled}`}
+          marginBottom={SPACING.spacing24}
+        >
           <Icon
             name="alert-circle"
-            size={SIZE_1}
+            size="1rem"
             marginRight={SPACING.spacing8}
             color={COLORS.warningEnabled}
           />
-          <StyledText as="p" color={COLORS.warningText}>
-            {t('factory_resets_cannot_be_undone')}
-          </StyledText>
+          <StyledText as="p">{t('resets_cannot_be_undone')}</StyledText>
         </Flex>
-        <Divider marginY={SPACING.spacing16} />
-        <Box>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            marginBottom={SPACING.spacing8}
-          >
-            <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
-              {t('robot_calibration_data')}
-            </StyledText>
-            <Link
-              role="button"
-              css={TYPOGRAPHY.linkPSemiBold}
-              onClick={downloadCalibrationLogs}
-            >
-              {t('download')}
-            </Link>
-          </Flex>
-          {isOT3 ? null : (
-            <StyledText as="p" marginBottom={SPACING.spacing8}>
-              {t('calibration_description')}
-            </StyledText>
-          )}
-          {calibrationOptions.map(opt => {
-            const calibrationName =
-              isOT3 && opt.id === 'pipetteOffsetCalibrations'
-                ? t('clear_option_pipette_calibrations')
-                : t(`clear_option_${snakeCase(opt.id)}`)
-            return (
-              <CheckboxField
-                key={opt.id}
-                onChange={() =>
-                  setResetOptions({
-                    ...resetOptions,
-                    [opt.id]: !(resetOptions[opt.id] ?? false),
-                  })
-                }
-                value={resetOptions[opt.id]}
-                label={calibrationName}
-              />
-            )
-          })}
-          {/* TODO(bh, 2022-11-02): placeholder, remove when gripper calibration reset config option available */}
-          {isOT3 ? (
-            <CheckboxField
-              key="gripperCalibration"
-              onChange={() =>
-                setResetOptions({
-                  ...resetOptions,
-                  gripperCalibration: !(
-                    resetOptions.gripperCalibration ?? false
-                  ),
-                })
-              }
-              value={resetOptions.gripperCalibration}
-              label={t('clear_option_gripper_calibration')}
-            />
-          ) : null}
-        </Box>
-        <Box marginTop={SPACING.spacing24}>
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            marginBottom={SPACING.spacing8}
-          >
-            <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
-              {t('protocol_run_history')}
-            </StyledText>
-            <Link
-              role="button"
-              css={TYPOGRAPHY.linkPSemiBold}
-              onClick={downloadRunHistoryLogs}
-            >
-              {t('download')}
-            </Link>
-          </Flex>
-          <StyledText as="p" marginBottom={SPACING.spacing8}>
-            {t('protocol_run_history_description')}
+        {/* Note: (kj:06/07/2023) this part will be updated when be is ready */}
+        {isOT3 ? (
+          <>
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing20}>
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                  {t('factory_reset')}
+                </StyledText>
+                <StyledText as="p" marginTop={SPACING.spacing8}>
+                  {t('factory_reset_description')}
+                </StyledText>
+              </Flex>
+              <Flex flexDirection={DIRECTION_COLUMN}>
+                <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                  {t('clear_all_stored_data')}
+                </StyledText>
+                <StyledText as="p" marginTop={SPACING.spacing8}>
+                  {t('clear_all_stored_data_description')}
+                </StyledText>
+              </Flex>
+            </Flex>
+            <Divider marginY={SPACING.spacing16} />
+          </>
+        ) : null}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('clear_individual_data')}
           </StyledText>
-          {runHistoryOption.map(opt => (
-            <CheckboxField
-              key={opt.id}
-              onChange={() =>
-                setResetOptions({
-                  ...resetOptions,
-                  [opt.id]: !(resetOptions[opt.id] ?? false),
-                })
-              }
-              value={resetOptions[opt.id]}
-              label={t(`clear_option_${snakeCase(opt.id)}`)}
-            />
-          ))}
-        </Box>
-        <Box marginTop={SPACING.spacing24}>
-          <StyledText
-            as="p"
-            css={TYPOGRAPHY.pSemiBold}
-            marginBottom={SPACING.spacing8}
-          >
-            {t('boot_scripts')}
+          <StyledText as="p">
+            {t('device_reset_slideout_description')}
           </StyledText>
-          {bootScriptOption.map(opt => (
-            <CheckboxField
-              key={opt.id}
-              onChange={() =>
-                setResetOptions({
-                  ...resetOptions,
-                  [opt.id]: !(resetOptions[opt.id] ?? false),
-                })
-              }
-              value={resetOptions[opt.id]}
-              label={t(`clear_option_${snakeCase(opt.id)}`)}
-            />
-          ))}
-        </Box>
+          <Flex
+            marginTop={SPACING.spacing20}
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing20}
+            paddingX={SPACING.spacing16}
+          >
+            <Box>
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                marginBottom="0.625rem"
+              >
+                <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+                  {t('robot_calibration_data')}
+                </StyledText>
+                <Link
+                  role="button"
+                  css={TYPOGRAPHY.linkPSemiBold}
+                  onClick={downloadCalibrationLogs}
+                >
+                  {t('download')}
+                </Link>
+              </Flex>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={-SPACING.spacing4}
+              >
+                {calibrationOptions.map(opt => {
+                  const calibrationName =
+                    isOT3 && opt.id === 'pipetteOffsetCalibrations'
+                      ? t('clear_option_pipette_calibrations')
+                      : t(`clear_option_${snakeCase(opt.id)}`)
+                  return (
+                    <CheckboxField
+                      key={opt.id}
+                      onChange={() =>
+                        setResetOptions({
+                          ...resetOptions,
+                          [opt.id]: !(resetOptions[opt.id] ?? false),
+                        })
+                      }
+                      value={resetOptions[opt.id]}
+                      label={calibrationName}
+                    />
+                  )
+                })}
+                {/* TODO(bh, 2022-11-02): placeholder, remove when gripper calibration reset config option available */}
+                {isOT3 ? (
+                  <CheckboxField
+                    key="gripperCalibration"
+                    onChange={() =>
+                      setResetOptions({
+                        ...resetOptions,
+                        gripperCalibration: !(
+                          resetOptions.gripperCalibration ?? false
+                        ),
+                      })
+                    }
+                    value={resetOptions.gripperCalibration}
+                    label={t('clear_option_gripper_calibration')}
+                  />
+                ) : null}
+              </Flex>
+            </Box>
+            <Box>
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                marginBottom={SPACING.spacing8}
+              >
+                <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+                  {t('protocol_run_history')}
+                </StyledText>
+                <Link
+                  role="button"
+                  css={TYPOGRAPHY.linkPSemiBold}
+                  onClick={downloadRunHistoryLogs}
+                >
+                  {t('download')}
+                </Link>
+              </Flex>
+              {runHistoryOption.map(opt => (
+                <CheckboxField
+                  key={opt.id}
+                  onChange={() =>
+                    setResetOptions({
+                      ...resetOptions,
+                      [opt.id]: !(resetOptions[opt.id] ?? false),
+                    })
+                  }
+                  value={resetOptions[opt.id]}
+                  label={t(`clear_option_${snakeCase(opt.id)}`)}
+                />
+              ))}
+            </Box>
+            <Box>
+              <StyledText
+                as="p"
+                css={TYPOGRAPHY.pSemiBold}
+                marginBottom={SPACING.spacing8}
+              >
+                {t('boot_scripts')}
+              </StyledText>
+              {bootScriptOption.map(opt => (
+                <CheckboxField
+                  key={opt.id}
+                  onChange={() =>
+                    setResetOptions({
+                      ...resetOptions,
+                      [opt.id]: !(resetOptions[opt.id] ?? false),
+                    })
+                  }
+                  value={resetOptions[opt.id]}
+                  label={t(`clear_option_${snakeCase(opt.id)}`)}
+                />
+              ))}
+            </Box>
+          </Flex>
+        </Flex>
       </Flex>
     </Slideout>
   )

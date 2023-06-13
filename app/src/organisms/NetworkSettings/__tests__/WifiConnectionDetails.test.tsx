@@ -7,15 +7,13 @@ import { i18n } from '../../../i18n'
 import { useWifiList } from '../../../resources/networking/hooks'
 import * as Networking from '../../../redux/networking'
 import * as Fixtures from '../../../redux/networking/__fixtures__'
-import { NetworkDetailsModal } from '../../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
+import { NetworkDetailsModal } from '../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 import { WifiConnectionDetails } from '../WifiConnectionDetails'
 
 jest.mock('../../../resources/networking/hooks')
 jest.mock('../../../redux/networking')
 jest.mock('../../../redux/discovery/selectors')
-jest.mock(
-  '../../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
-)
+jest.mock('../../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal')
 
 const mockPush = jest.fn()
 jest.mock('react-router-dom', () => {

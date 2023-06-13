@@ -33,7 +33,7 @@
   "set_and_await_hs_shake": "Setting Heater-Shaker to shake at {{rpm}} rpm and waiting until reached",
   "setting_hs_temp": "Setting Target Temperature of Heater-Shaker to {{temp}}°C",
   "setting_temperature_module_temp": "Setting Temperature Module to {{temp}}°C (rounded to nearest integer)",
-  "setting_thermocycler_block_temp": "Setting Thermocycler block temperature to {{temp}}°C",
+  "setting_thermocycler_block_temp": "Setting Thermocycler block temperature to {{temp}}°C with hold time of {{hold_time_seconds}} seconds after target reached",
   "setting_thermocycler_lid_temp": "Setting Thermocycler lid temperature to {{temp}}°C",
   "slot": "Slot {{slot_name}}",
   "tc_awaiting_for_duration": "Waiting for Thermocycler profile to complete",
@@ -44,7 +44,7 @@
   "wait_for_duration": "Pausing for {{seconds}} seconds. {{message}}",
   "wait_for_resume": "Pausing protocol",
   "waiting_for_hs_to_reach": "Waiting for Heater-Shaker to reach target temperature",
-  "waiting_for_tc_block_to_reach": "Waiting for Thermocycler block to reach target temperature",
+  "waiting_for_tc_block_to_reach": "Waiting for Thermocycler block to reach target temperature and holding for specified time",
   "waiting_for_tc_lid_to_reach": "Waiting for Thermocycler lid to reach target temperature",
   "waiting_to_reach_temp_module": "Waiting for Temperature Module to reach {{temp}}°C (rounded to nearest integer)"
 }

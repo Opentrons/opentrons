@@ -59,8 +59,8 @@ async def test_add_moves(
                 seq_id=UInt8Field(i),
                 duration=UInt32Field(duration),
                 request_stop_condition=MoveStopConditionField(0),
-                acceleration=Int32Field(0),
-                velocity=Int32Field(0),
+                acceleration_um=Int32Field(0),
+                velocity_mm=Int32Field(0),
             )
         )
         for i, duration in enumerate(durations)

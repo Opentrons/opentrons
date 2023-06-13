@@ -29,7 +29,7 @@ export function LongPressModal({
 }: LongPressModalProps): JSX.Element {
   const history = useHistory()
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
-  const { t } = useTranslation(['protocol_info', 'shared'])
+  const { i18n, t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const { makeSnackbar } = useToaster()
 
@@ -97,7 +97,7 @@ export function LongPressModal({
         <SmallModalChildren
           header={t('too_many_pins_header')}
           subText={t('too_many_pins_body')}
-          buttonText={t('shared:close')}
+          buttonText={i18n.format(t('shared:close'), 'capitalize')}
           handleCloseMaxPinsAlert={() => longpress?.setIsLongPressed(false)}
         />
       ) : (

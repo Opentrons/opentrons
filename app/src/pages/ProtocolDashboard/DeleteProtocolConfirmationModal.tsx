@@ -83,7 +83,7 @@ export function DeleteProtocolConfirmationModal({
     <Modal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing40}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
         <Box width="100%">
@@ -116,6 +116,7 @@ export function DeleteProtocolConfirmationModal({
 }
 
 const ProtocolNameText = styled.span`
+  display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;

@@ -1,7 +1,7 @@
 """Labware state store tests."""
 import pytest
 from datetime import datetime
-from typing import Dict, Optional, cast, ContextManager, Any, Union
+from typing import Dict, Optional, cast, ContextManager, Any, Union, List
 from contextlib import nullcontext as does_not_raise
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
@@ -20,6 +20,7 @@ from opentrons.protocol_engine.types import (
     LoadedLabware,
     ModuleModel,
     ModuleLocation,
+    DropTipWellLocation,
 )
 from opentrons.protocol_engine.state.move_types import EdgePathType
 from opentrons.protocol_engine.state.labware import (
@@ -43,6 +44,14 @@ reservoir = LoadedLabware(
     loadName="reservoir-load-name",
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
     definitionUri="some-reservoir-uri",
+    offsetId=None,
+)
+
+trash = LoadedLabware(
+    id="trash-id",
+    loadName="trash-load-name",
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+    definitionUri="some-trash-uri",
     offsetId=None,
 )
 
@@ -820,32 +829,6 @@ def test_raise_if_labware_in_location(
         subject.raise_if_labware_in_location(location=location)
 
 
-def test_get_calibration_coordinates() -> None:
-    """Should return critical point and coordinates."""
-    slot_definitions = {
-        "locations": {
-            "orderedSlots": [
-                {
-                    "id": "D1",
-                    "position": [2, 2, 0.0],
-                    "boundingBox": {
-                        "xDimension": 4.0,
-                        "yDimension": 6.0,
-                        "zDimension": 0,
-                    },
-                    "displayName": "Slot D1",
-                }
-            ]
-        }
-    }
-
-    subject = get_labware_view(deck_definition=cast(DeckDefinitionV3, slot_definitions))
-
-    result = subject.get_calibration_coordinates(offset=Point(y=1, z=2))
-
-    assert result == Point(x=4, y=6, z=2)
-
-
 def test_get_by_slot() -> None:
     """It should get the labware in a given slot."""
     labware_1 = LoadedLabware.construct(  # type: ignore[call-arg]
@@ -983,3 +966,31 @@ def test_get_all_labware_definition_empty() -> None:
     result = subject.get_loaded_labware_definitions()
 
     assert result == []
+
+
+def test_get_random_drop_tip_location(
+    ot3_fixed_trash_def: LabwareDefinition,
+) -> None:
+    """It should provide a random location within 3/4th of well top center every time."""
+    subject = get_labware_view(
+        labware_by_id={
+            "trash-id": trash,
+        },
+        definitions_by_uri={
+            "some-trash-uri": ot3_fixed_trash_def,
+        },
+    )
+    drop_location: List[DropTipWellLocation] = []
+    for i in range(50):
+        drop_location.append(
+            subject.get_random_drop_tip_location(labware_id="trash-id", well_name="A1")
+        )
+
+    for i in range(50):
+        print(drop_location[i])
+        assert not all(drop_location[i] == another_loc for another_loc in drop_location)
+        # trash's well A1 dimensions:
+        # "xDimension": 225
+        assert -84 <= drop_location[i].offset.x < 84
+        assert drop_location[i].offset.y == 0
+        assert drop_location[i].offset.z == 0

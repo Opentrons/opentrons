@@ -20,7 +20,7 @@ import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { getLocalRobot } from '../../redux/discovery'
 import { getNetworkInterfaces } from '../../redux/networking'
-import { NetworkDetailsModal } from '../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
+import { NetworkDetailsModal } from '../RobotSettingsDashboard/NetworkSettings/NetworkDetailsModal'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { State } from '../../redux/types'

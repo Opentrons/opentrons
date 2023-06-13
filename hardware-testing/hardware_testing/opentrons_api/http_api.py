@@ -1,6 +1,6 @@
 """Module to handle Opentrons Protocol Engine HTTP API."""
 from time import sleep
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 import requests
 
 from hardware_testing.opentrons_api.types import Point
@@ -54,6 +54,10 @@ class OpentronsHTTPAPI:
     def run_id(self) -> Optional[str]:
         """The current run id."""
         return self._run_id
+
+    def get_health(self) -> Dict[str, Any]:
+        """Get and return robot health."""
+        return requests.get(headers=HEADERS, url=f"{self._base_url}/health").json()
 
     def create_run(self) -> Optional[str]:
         """Create a run and return the run_id."""
@@ -150,7 +154,7 @@ class OpentronsHTTPAPI:
         self._pipette_id = res.json()["data"]["result"]["pipetteId"]
         return self._pipette_id  # type: ignore
 
-    def load_module(self, model: str, slot: int) -> str:
+    def load_module(self, model: str, slot: str) -> str:
         """Load a module for the current run, returns the module_id."""
         if self._run_id is None:
             raise RuntimeError("Need an active run to load module.")
@@ -337,3 +341,27 @@ class OpentronsHTTPAPI:
             msg = f"Failed to {lid_state} lid: {error_type} - {error_details}"
             raise RuntimeError(msg)
         return True
+
+    def get_instruments(self) -> List[Dict[str, Any]]:
+        """Get and return attached instruments."""
+        return requests.get(f"{self._base_url}/instruments", headers=HEADERS).json()[
+            "data"
+        ]
+
+    def get_subsystems(self) -> List[Dict[str, Any]]:
+        """Get and return attached subsystems."""
+        return requests.get(
+            f"{self._base_url}/subsystems/status", headers=HEADERS
+        ).json()["data"]
+
+    def update_subsystem(self, subsystem: str) -> str:
+        """Begin an update for a subsystem."""
+        return requests.post(
+            f"{self._base_url}/subsystems/updates/{subsystem}", headers=HEADERS
+        ).json()["data"]["id"]
+
+    def get_update_status(self, update_id: str) -> Dict[str, Any]:
+        """Get and return the status of an update."""
+        return requests.get(
+            f"{self._base_url}/subsystems/updates/all/{update_id}", headers=HEADERS
+        ).json()["data"]
