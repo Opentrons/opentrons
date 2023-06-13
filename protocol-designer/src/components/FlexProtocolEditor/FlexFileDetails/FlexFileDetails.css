@@ -75,10 +75,25 @@
 }
 
 .card_width {
-  width: 21rem;
+  width: 56rem !important;
 }
 
 .card_content {
   padding-top: 10px;
   padding-bottom: 10px;
+}
+
+.model_options {
+  width: 8rem;
+}
+
+.module_card {
+  width: 17rem;
+  margin-bottom: 3rem;
+}
+
+.module_outer_border {
+  border: 1px solid black;
+  margin: 1rem;
+  padding: 1rem;
 }

@@ -1,17 +1,22 @@
+import React, { useEffect, useState } from 'react'
 import {
   ALIGN_CENTER,
-  Card,
   DIRECTION_COLUMN,
+  DropdownField,
   Flex,
+  FormGroup,
+  JUSTIFY_CENTER,
+  JUSTIFY_END,
+  JUSTIFY_SPACE_BETWEEN,
+  OutlineButton,
   SPACING,
   SecondaryButton,
 } from '@opentrons/components'
 import cx from 'classnames'
 import { format } from 'date-fns'
-import { Formik, FormikProps } from 'formik'
+import { Formik, FormikProps, useFormikContext } from 'formik'
 import { mapValues } from 'lodash'
-import React, { useState } from 'react'
-import { connect, useDispatch } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import {
   FileMetadataFields,
@@ -35,6 +40,20 @@ import { FlexProtocolEditorComponent } from '../FlexProtocolEditor'
 import { actions as navActions } from '../../../navigation'
 import { UpdateConfirmation } from '../FlexUpdateConfirmation'
 import { MiniCard } from '../FlexModules/MiniCard'
+import {
+  HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  OT3_STANDARD_MODEL,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import { getAllFlexModuleSlotsByType } from '../FlexModules/FlexModuleData'
+import { ConnectedSlotMap } from '../../modals/EditModulesModal/ConnectedSlotMap'
+import { validator } from '../FlexModules/validator'
+import { PDAlert } from '../../alerts/PDAlert'
+import { moveDeckItem } from '../../../labware-ingred/actions'
+
 export interface Props {
   formValues: FileMetadataFields
   instruments: React.ComponentProps<typeof InstrumentGroup>
@@ -53,6 +72,18 @@ interface SP {
 // TODO(mc, 2020-02-28): explore l10n for these dates
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
 const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
+
+interface SupportedSlots {
+  [key: string]: string
+}
+
+const supportedSlots: SupportedSlots = {
+  [MAGNETIC_MODULE_TYPE]: 'GEN1',
+  [TEMPERATURE_MODULE_TYPE]: 'GEN2',
+  [THERMOCYCLER_MODULE_TYPE]: 'GEN2',
+  [HEATERSHAKER_MODULE_TYPE]: 'GEN1',
+  [MAGNETIC_BLOCK_TYPE]: 'GEN1',
+}
 
 export function FlexFileDetailsComponent(props: any): JSX.Element {
   const [isEdit, setEdit] = useState(false)
@@ -78,7 +109,7 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
             <div className={flexStyles.main_page_wrapper}>
               <Formik
                 enableReinitialize
-                initialValues={props.formValues}
+                initialValues={props}
                 onSubmit={props.handleSubmit}
               >
                 {({
@@ -148,7 +179,11 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                           />
                         </Flex>
                       </div>
-                      <SelectedModules propsData={props} />
+                      {!props?.modules?.length ? (
+                        <SelectedModules {...props} />
+                      ) : (
+                        <NoSelectedModule />
+                      )}
                       <EditButton
                         editProps={setEdit}
                         setTab={2}
@@ -355,50 +390,118 @@ const EditButton = ({
   )
 }
 
-const SelectedModules = (props: { propsData: any }): JSX.Element => {
-  const { propsData } = props
-  const existingModules = getModuleData(propsData.modules)
+const NoSelectedModule = () => (
+  <StyledText as="h4">{i18n.t('flex.file_tab.no_modules_found')}</StyledText>
+)
+
+const SelectedModules = (props: any): JSX.Element => {
   return (
     <>
-      {existingModules?.length > 0 ? (
-        existingModules.map((moduleType: any, i: number) => (
-          <div
-            className={` ${styles.card_width} ${styles.margin_bottom}`}
-            key={i}
-          >
-            <MiniCard isSelected={moduleType.type}>
-              <div className={styles.card_content}>
-                <Flex>
-                  <ModuleDiagram
-                    type={moduleType.type}
-                    model={moduleType.model}
-                  />
-                  <Flex
-                    flexDirection={DIRECTION_COLUMN}
-                    justifyContent={ALIGN_CENTER}
-                    marginLeft={SPACING.spacing4}
-                    marginTop={SPACING.spacing4}
-                    marginBottom={SPACING.spacing4}
-                  >
-                    <StyledText as="h4">
-                      {i18n.t(
-                        `modules.module_display_names.${moduleType.type}`
-                      )}
-                      - Slot {moduleType.slot}
-                    </StyledText>
-                  </Flex>
-                </Flex>
-              </div>
-            </MiniCard>
-          </div>
-        ))
-      ) : (
-        <StyledText as="h4">
-          {i18n.t('flex.file_tab.no_modules_found')}
-        </StyledText>
-      )}
+      {getModuleData(props.modules).map((moduleType: any, i: number) => (
+        <div key={i} className={styles.module_outer_border}>
+          <SingleModuleRender {...moduleType} />
+        </div>
+      ))}
     </>
   )
+
+  function SingleModuleRender(moduleOnDeck: any): JSX.Element {
+    const { values, handleChange, handleBlur } = useFormikContext<any>()
+    const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
+    const dispatch = useDispatch()
+    const type = moduleOnDeck?.type
+    const model = moduleOnDeck?.model
+    const [slotIssue, setSlotIssue] = useState<string | null>(null)
+
+    useEffect(() => {
+      if (values.modules[type].slot !== moduleOnDeck.slot) {
+        const error = validator({
+          selectedModel: values.modules[type],
+          selectedType: moduleOnDeck?.type,
+          initialDeckSetup,
+        })
+        error?.selectedSlot &&
+          error?.selectedSlot.includes('occupied') &&
+          setSlotIssue(error.selectedSlot)
+      }
+    }, [moduleOnDeck])
+
+    const moveDeckSlot = (selectedSlot: string) => {
+      if (selectedSlot && moduleOnDeck && moduleOnDeck.slot !== selectedSlot) {
+        dispatch(moveDeckItem(moduleOnDeck.slot, selectedSlot))
+      }
+    }
+
+    return (
+      <>
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Flex className={styles.module_card}>
+            <MiniCard isSelected={type}>
+              <Flex>
+                <ModuleDiagram type={type} model={model} />
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  justifyContent={ALIGN_CENTER}
+                  marginLeft={SPACING.spacing4}
+                  marginTop={SPACING.spacing4}
+                  marginBottom={SPACING.spacing4}
+                >
+                  <StyledText as="h4">
+                    {i18n.t(`modules.module_display_names.${type}`)}- Slot{' '}
+                    {values.modules[type].slot}
+                  </StyledText>
+                </Flex>
+              </Flex>
+            </MiniCard>
+          </Flex>
+
+          <Flex flexDirection={DIRECTION_COLUMN}>
+            <StyledText as="p">Model:</StyledText>
+            <StyledText as="p">{supportedSlots[type]}</StyledText>
+          </Flex>
+
+          <Flex>
+            <FormGroup label="Position" className={styles.model_options}>
+              <DropdownField
+                tabIndex={1}
+                name={`modules.${type}.slot`}
+                options={getAllFlexModuleSlotsByType(type)}
+                value={values.modules[type].slot}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+            </FormGroup>
+          </Flex>
+
+          <ConnectedSlotMap
+            fieldName={`modules.${type}.slot`}
+            robotType={OT3_STANDARD_MODEL}
+          />
+        </Flex>
+        <Flex>
+          {slotIssue && (
+            <PDAlert
+              alertType="warning"
+              title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
+              description={slotIssue}
+            />
+          )}
+          {values.modules[type].slot !== moduleOnDeck.slot && (
+            <Flex flexDirection={DIRECTION_COLUMN} alignItems={JUSTIFY_END}>
+              <OutlineButton
+                disabled={Boolean(slotIssue)}
+                onClick={() => moveDeckSlot(values.modules[type].slot)}
+                className={styles.button_margin}
+                type="submit"
+              >
+                SAVE
+              </OutlineButton>
+            </Flex>
+          )}
+        </Flex>
+      </>
+    )
+  }
 }
 
 export function getModuleData(modules: any): any {

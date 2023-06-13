@@ -4,6 +4,7 @@ import {
   DropdownField,
   Flex,
   FormGroup,
+  JUSTIFY_CENTER,
   SPACING,
   Tooltip,
   useHoverTooltip,
@@ -169,6 +170,7 @@ function FlexModulesComponent(): JSX.Element {
                       model={selectedModel ?? defaultModel}
                     />
                     <Flex
+                      justifyContent={JUSTIFY_CENTER}
                       flexDirection={DIRECTION_COLUMN}
                       marginLeft={SPACING.spacing4}
                       marginTop={SPACING.spacing4}
