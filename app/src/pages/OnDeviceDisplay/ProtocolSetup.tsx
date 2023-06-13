@@ -36,6 +36,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { useMaintenanceRunTakeover } from '../../organisms/TakeoverModal'
 import {
   useAttachedModules,
   useLPCDisabledReason,
@@ -47,7 +48,6 @@ import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
 import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
 import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
-import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
@@ -281,6 +281,7 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
+  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
 
   const { play } = useRunControls(runId)
 
@@ -463,7 +464,10 @@ function PrepareToRun({
           disabled={protocolModulesInfo.length === 0}
         />
         <ProtocolSetupStep
-          onClickSetupStep={launchLPC}
+          onClickSetupStep={() => {
+            setODDMaintenanceFlowInProgress()
+            launchLPC()
+          }}
           title={t('labware_position_check')}
           detail={t(
             lpcDisabledReason != null ? 'currently_unavailable' : 'recommended'
@@ -531,12 +535,6 @@ export function ProtocolSetup(): JSX.Element {
     ),
     labware: (
       <ProtocolSetupLabware runId={runId} setSetupScreen={setSetupScreen} />
-    ),
-    lpc: (
-      <ProtocolSetupLabwarePositionCheck
-        runId={runId}
-        setSetupScreen={setSetupScreen}
-      />
     ),
     liquids: (
       <ProtocolSetupLiquids runId={runId} setSetupScreen={setSetupScreen} />
