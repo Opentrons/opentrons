@@ -71,3 +71,9 @@ async def test_module_cache_remove_entry():
     future.result()
     mods_after = thread_manager.attached_modules
     assert len(mods_after) == 1
+
+
+async def test_wraps_instance():
+    """It should expose the underlying type."""
+    thread_manager = ThreadManager(API.build_hardware_simulator)
+    assert thread_manager.wraps_instance(API)

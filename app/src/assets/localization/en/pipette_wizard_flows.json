@@ -25,6 +25,7 @@
   "detach_96_attach_mount": "Detach 96-Channel Pipette and Attach {{mount}} Pipette",
   "detach_96_channel": "Detach 96-Channel Pipette",
   "detach_and_reattach": "Detach and reattach pipette",
+  "detach_and_retry": "detach and retry",
   "detach_mount_attach_96": "Detach {{mount}} Pipette and Attach 96-Channel Pipette",
   "detach_mounting_plate_instructions": "Hold onto the plate so it does not fall. Then remove the pins on the plate from the slots on the gantry carriage.",
   "detach_pipette_to_attach_96": "Detach {{pipetteName}} and attach 96-Channel pipette",
@@ -60,6 +61,7 @@
   "pipette_failed_to_attach": "unable to detect pipette",
   "pipette_failed_to_detach": "{{pipetteName}} still attached",
   "pipette_heavy": "The 96-Channel Pipette is heavy ({{weight}}). Ask a labmate for help, if needed.",
+  "please_install_correct_pip": "Install {{pipetteName}} instead",
   "progress_will_be_lost": "{{flow}} progress will be lost",
   "reattach_carriage": "reattach z-axis carriage",
   "recalibrate_pipette": "recalibrate {{mount}} pipette",
@@ -76,5 +78,6 @@
   "unscrew_and_detach": "Loosen Screws and Detach Mounting Plate",
   "unscrew_at_top": "<block>Loosen the captive screw on the top right of the  carriage. This releases the right pipette mount, which should then freely move up and down.</block>",
   "unscrew_carriage": "unscrew z-axis carriage",
+  "wrong_pip": "wrong instrument installed",
   "z_axis_still_attached": "z-axis screw still secure"
 }

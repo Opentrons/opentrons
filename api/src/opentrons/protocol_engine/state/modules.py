@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from numpy import array, dot, add
+from numpy import array, dot
 
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -80,7 +80,7 @@ class SlotTransit(NamedTuple):
     end: DeckSlotName
 
 
-_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
+_OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.FIXED_TRASH),
     SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_1),
     SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.FIXED_TRASH),
@@ -95,7 +95,16 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
     SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_4),
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.SLOT_11),
     SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_1),
-]
+}
+
+_OT3_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
+    SlotTransit(start=t.start.to_ot3_equivalent(), end=t.end.to_ot3_equivalent())
+    for t in _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE
+}
+
+_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = (
+    _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE | _OT3_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE
+)
 
 
 @dataclass(frozen=True)
@@ -669,16 +678,6 @@ class ModuleView(HasState[ModuleState]):
         # Apply the slot transform, if any
         xform = array(xforms_ser_offset)
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
-
-        # add the calibrated module offset if there is one
-        module = self.get(module_id)
-        offset: Optional[ModuleOffsetVector] = None
-        if module.serialNumber is not None:
-            offset = self._state.module_offset_by_serial.get(module.serialNumber)
-
-        if offset is not None:
-            module_offset = array((offset.x, offset.y, offset.z, 1))
-            xformed = add(xformed, module_offset)
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],

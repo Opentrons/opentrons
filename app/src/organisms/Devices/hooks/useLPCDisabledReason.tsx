@@ -10,30 +10,41 @@ import {
   useUnmatchedModulesForProtocol,
 } from '.'
 
-export function useLPCDisabledReason(
-  robotName: string,
+interface LPCDisabledReasonProps {
   runId: string
+  robotName?: string
+  hasMissingModulesForOdd?: boolean
+  hasMissingPipCalForOdd?: boolean
+}
+export function useLPCDisabledReason(
+  props: LPCDisabledReasonProps
 ): string | null {
-  const { t } = useTranslation('protocol_setup')
+  const {
+    runId,
+    robotName,
+    hasMissingModulesForOdd,
+    hasMissingPipCalForOdd,
+  } = props
+  const { t } = useTranslation(['protocol_setup', 'shared'])
   const runHasStarted = useRunHasStarted(runId)
-  const { complete: isCalibrationComplete } = useRunCalibrationStatus(
-    robotName,
-    runId
-  )
+  const { complete } = useRunCalibrationStatus(robotName ?? '', runId)
   const unmatchedModuleResults = useUnmatchedModulesForProtocol(
-    robotName,
+    robotName ?? '',
     runId
   )
+
+  const isCalibrationComplete =
+    robotName != null ? complete : !hasMissingPipCalForOdd
+  const { missingModuleIds } = unmatchedModuleResults
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
-  const { missingModuleIds } = unmatchedModuleResults
-  const calibrationIncomplete =
-    missingModuleIds.length === 0 && !isCalibrationComplete
-  const moduleSetupIncomplete =
-    missingModuleIds.length > 0 && isCalibrationComplete
+  const hasMissingModules =
+    hasMissingModulesForOdd ?? missingModuleIds.length > 0
+  const calibrationIncomplete = !hasMissingModules && !isCalibrationComplete
+  const moduleSetupIncomplete = hasMissingModules && isCalibrationComplete
   const moduleAndCalibrationIncomplete =
-    missingModuleIds.length > 0 && !isCalibrationComplete
+    hasMissingModules && !isCalibrationComplete
   const labwareDefinitions =
     protocolData?.commands != null
       ? getLoadedLabwareDefinitionsByUri(protocolData.commands)
@@ -50,26 +61,54 @@ export function useLPCDisabledReason(
   let lpcDisabledReason: string | null = null
 
   if (moduleAndCalibrationIncomplete) {
-    lpcDisabledReason = t('lpc_disabled_modules_and_calibration_not_complete')
+    lpcDisabledReason = t(
+      robotName != null
+        ? 'lpc_disabled_modules_and_calibration_not_complete'
+        : 'connect_all_hardware'
+    )
   } else if (calibrationIncomplete) {
-    lpcDisabledReason = t('lpc_disabled_calibration_not_complete')
+    lpcDisabledReason = t(
+      robotName != null
+        ? 'lpc_disabled_calibration_not_complete'
+        : 'cal_all_pip'
+    )
   } else if (moduleSetupIncomplete) {
-    lpcDisabledReason = t('lpc_disabled_modules_not_connected')
+    lpcDisabledReason = t(
+      robotName != null
+        ? 'lpc_disabled_modules_not_connected'
+        : 'connect_all_mod'
+    )
   } else if (runHasStarted) {
-    lpcDisabledReason = t('labware_position_check_not_available')
+    lpcDisabledReason = t(
+      robotName != null
+        ? 'labware_position_check_not_available'
+        : 'shared:robot_is_busy'
+    )
   } else if (robotProtocolAnalysis == null) {
     lpcDisabledReason = t(
-      'labware_position_check_not_available_analyzing_on_robot'
+      robotName != null
+        ? 'labware_position_check_not_available_analyzing_on_robot'
+        : 'shared:robot_is_analyzing'
     )
   } else if (
     isEmpty(protocolData?.pipettes) ||
     isEmpty(protocolData?.labware)
   ) {
-    lpcDisabledReason = t('labware_position_check_not_available_empty_protocol')
+    lpcDisabledReason = t(
+      robotName != null
+        ? 'labware_position_check_not_available_empty_protocol'
+        : 'must_have_labware_and_pip'
+    )
   } else if (!tipRackLoadedInProtocol) {
-    lpcDisabledReason = t('lpc_disabled_no_tipracks_loaded')
+    lpcDisabledReason = t(
+      robotName != null
+        ? 'lpc_disabled_no_tipracks_loaded'
+        : 'no_tiprack_loaded'
+    )
   } else if (!tipsArePickedUp) {
-    lpcDisabledReason = t('lpc_disabled_no_tipracks_used')
+    lpcDisabledReason = t(
+      robotName != null ? 'lpc_disabled_no_tipracks_used' : 'no_tiprack_used'
+    )
   }
 
   return lpcDisabledReason

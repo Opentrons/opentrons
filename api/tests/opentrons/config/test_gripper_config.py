@@ -5,7 +5,7 @@ from opentrons_shared_data.gripper.gripper_definition import GripperModel
 
 def test_load_gripper_config() -> None:
     loaded_config = gc.load(GripperModel.v1)
-    assert loaded_config.display_name == "Gripper V1"
+    assert loaded_config.display_name == "Flex Gripper"
 
 
 def test_gripper_force_conversion() -> None:

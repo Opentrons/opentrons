@@ -44,8 +44,7 @@ describe('WelcomeModal', () => {
 
   it('should call a mock function when tapping got it button', () => {
     const [{ getByText }] = render(props)
-    const button = getByText('Got it')
-    button.click()
+    getByText('Got it').click()
     expect(mockUpdateConfigValue).toHaveBeenCalled()
     expect(props.setShowWelcomeModal).toHaveBeenCalled()
   })

@@ -25,7 +25,11 @@ import {
   SIZE_2,
   Btn,
 } from '@opentrons/components'
-import { RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
+import {
+  RUN_STATUS_FAILED,
+  RUN_STATUS_STOPPED,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { LargeButton, TertiaryButton } from '../../atoms/buttons'
@@ -48,6 +52,7 @@ import {
   ANALYTICS_PROTOCOL_RUN_AGAIN,
   ANALYTICS_PROTOCOL_RUN_FINISH,
 } from '../../redux/analytics'
+import { RunFailedModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 
 import type { Run } from '@opentrons/api-client'
 import type { OnDeviceRouteParams } from '../../App/types'
@@ -59,7 +64,7 @@ export function RunSummary(): JSX.Element {
   const history = useHistory()
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const runStatus = runRecord?.data.status ?? null
-  const isRunSucceeded = runStatus === RUN_STATUS_SUCCEEDED
+  const didRunSucceed = runStatus === RUN_STATUS_SUCCEEDED
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
@@ -79,7 +84,9 @@ export function RunSummary(): JSX.Element {
       ? onDeviceDisplayFormatTimestamp(completedAt)
       : EMPTY_TIMESTAMP
 
-  const [showSplash, setShowSplash] = React.useState(runRecord?.data.current)
+  const [showSplash, setShowSplash] = React.useState(
+    runStatus === RUN_STATUS_FAILED || runStatus === RUN_STATUS_SUCCEEDED
+  )
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const onResetSuccess = (_createRunResponse: Run): void =>
     history.push(`/runs/${runId}/setup`)
@@ -89,10 +96,16 @@ export function RunSummary(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
+  const [showRunFailedModal, setShowRunFailedModal] = React.useState<boolean>(
+    false
+  )
 
-  const runStatusText = isRunSucceeded
-    ? t('run_complete')
-    : t('run_failed_modal_title')
+  let headerText = t('run_complete_splash')
+  if (runStatus === RUN_STATUS_FAILED) {
+    headerText = t('run_failed_splash')
+  } else if (runStatus === RUN_STATUS_STOPPED) {
+    headerText = t('run_canceled_splash')
+  }
 
   const handleReturnToDash = (): void => {
     closeCurrentRun()
@@ -109,8 +122,7 @@ export function RunSummary(): JSX.Element {
   }
 
   const handleViewErrorDetails = (): void => {
-    // Note (kj:04/28/2023) the current RunFailedModal is needed to refactor before hooking up
-    console.log('will be added')
+    setShowRunFailedModal(true)
   }
 
   const handleClickSplash = (): void => {
@@ -143,16 +155,20 @@ export function RunSummary(): JSX.Element {
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing40}
             padding={SPACING.spacing40}
-            backgroundColor={isRunSucceeded ? COLORS.green2 : COLORS.red2}
+            backgroundColor={didRunSucceed ? COLORS.green2 : COLORS.red2}
           >
             <SplashFrame>
               <Flex gridGap={SPACING.spacing32} alignItems={ALIGN_CENTER}>
                 <Icon
-                  name={isRunSucceeded ? 'ot-check' : 'ot-alert'}
+                  name={didRunSucceed ? 'ot-check' : 'ot-alert'}
                   size="4.5rem"
                   color={COLORS.white}
                 />
-                <SplashHeader> {runStatusText} </SplashHeader>
+                <SplashHeader>
+                  {didRunSucceed
+                    ? t('run_complete_splash')
+                    : t('run_failed_splash')}
+                </SplashHeader>
               </Flex>
               <Flex width="49rem" justifyContent={JUSTIFY_CENTER}>
                 <SplashBody>{protocolName}</SplashBody>
@@ -167,6 +183,13 @@ export function RunSummary(): JSX.Element {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             padding={SPACING.spacing40}
           >
+            {showRunFailedModal ? (
+              <RunFailedModal
+                runId={runId}
+                setShowRunFailedModal={setShowRunFailedModal}
+                errors={runRecord?.data.errors}
+              />
+            ) : null}
             <Flex
               flexDirection={DIRECTION_COLUMN}
               alignItems={ALIGN_FLEX_START}
@@ -174,13 +197,13 @@ export function RunSummary(): JSX.Element {
             >
               <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
                 <Icon
-                  name={isRunSucceeded ? 'ot-check' : 'ot-alert'}
+                  name={didRunSucceed ? 'ot-check' : 'ot-alert'}
                   size={SIZE_2}
                   color={
-                    isRunSucceeded ? COLORS.successEnabled : COLORS.errorEnabled
+                    didRunSucceed ? COLORS.successEnabled : COLORS.errorEnabled
                   }
                 />
-                <SummaryHeader>{runStatusText}</SummaryHeader>
+                <SummaryHeader>{headerText}</SummaryHeader>
               </Flex>
               <ProtocolName>{protocolName}</ProtocolName>
               <Flex gridGap={SPACING.spacing8}>
@@ -224,7 +247,7 @@ export function RunSummary(): JSX.Element {
                 buttonText={t('run_again')}
                 height="17rem"
               />
-              {!isRunSucceeded ? (
+              {!didRunSucceed ? (
                 <LargeButton
                   flex="1"
                   iconName="info"
@@ -232,6 +255,10 @@ export function RunSummary(): JSX.Element {
                   onClick={handleViewErrorDetails}
                   buttonText={t('view_error_details')}
                   height="17rem"
+                  disabled={
+                    runRecord?.data.errors == null ||
+                    runRecord?.data.errors.length === 0
+                  }
                 />
               ) : null}
             </Flex>
@@ -262,6 +289,11 @@ const SplashHeader = styled.h1`
   color: ${COLORS.white};
 `
 const SplashBody = styled.h4`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+  overflow-wrap: break-word;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   text-align: ${TYPOGRAPHY.textAlignLeft};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
@@ -284,8 +316,8 @@ const SplashFrame = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  border: ${BORDERS.size2} solid ${COLORS.white}${COLORS.opacity20HexCode};
-  border-radius: ${BORDERS.size3};
+  border: ${BORDERS.borderRadiusSize2} solid ${COLORS.white}${COLORS.opacity20HexCode};
+  border-radius: ${BORDERS.borderRadiusSize3};
   grid-gap: ${SPACING.spacing40};
 `
 

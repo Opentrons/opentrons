@@ -4,3 +4,4 @@ export { useCreateMaintenanceCommandMutation } from './useCreateMaintenanceComma
 export { useCreateMaintenanceRunLabwareDefinitionMutation } from './useCreateMaintenanceRunLabwareDefinitionMutation'
 export { useDeleteMaintenanceRunMutation } from './useDeleteMaintenanceRunMutation'
 export { usePlayMaintenanceRunMutation } from './usePlayMaintenanceRunMutation'
+export { useCurrentMaintenanceRun } from './useCurrentMaintenanceRun'

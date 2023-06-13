@@ -89,6 +89,7 @@ def test_plan_check_pick_up_tip_with_presses_argument(
                 pick_up_distance=0,
                 speed=10,
                 currents={Axis.Q: 1},
+                home_buffer=10,
             ),
         ),
         (None, 3, 8, None),

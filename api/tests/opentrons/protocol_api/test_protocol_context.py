@@ -9,6 +9,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
 from opentrons.types import Mount, DeckSlotName
+from opentrons.protocol_api import OFF_DECK
 from opentrons.broker import Broker
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols.api_support import instrument as mock_instrument_support
@@ -209,6 +210,7 @@ def test_load_labware(
     decoy: Decoy,
     mock_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should create a labware using its execution core."""
@@ -217,7 +219,9 @@ def test_load_labware(
     decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
         "lowercase_labware"
     )
-    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_5)
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_5
+    )
 
     decoy.when(
         mock_core.load_labware(
@@ -250,6 +254,7 @@ def test_load_labware(
 def test_load_labware_from_definition(
     decoy: Decoy,
     mock_core: ProtocolCore,
+    api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should be able to load a labware from a definition dictionary."""
@@ -259,7 +264,9 @@ def test_load_labware_from_definition(
     labware_load_params = LabwareLoadParams("you", "are", 1337)
 
     decoy.when(mock_validation.ensure_lowercase_name("are")).then_return("are")
-    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_1
+    )
     decoy.when(mock_core.add_labware_definition(labware_definition_dict)).then_return(
         labware_load_params
     )
@@ -316,13 +323,16 @@ def test_move_labware_to_slot(
     decoy: Decoy,
     mock_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should move labware to new slot location."""
     drop_offset = {"x": 4, "y": 5, "z": 6}
     mock_labware_core = decoy.mock(cls=LabwareCore)
 
-    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_1
+    )
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
     movable_labware = Labware(
@@ -395,10 +405,66 @@ def test_move_labware_to_module(
     )
 
 
+def test_move_labware_off_deck(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: ProtocolContext,
+) -> None:
+    """It should move labware off-deck."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    movable_labware = Labware(
+        core=mock_labware_core,
+        api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=mock_core,
+        core_map=mock_core_map,
+    )
+
+    subject.move_labware(labware=movable_labware, new_location=OFF_DECK)
+    decoy.verify(
+        mock_core.move_labware(
+            labware_core=mock_labware_core,
+            new_location=OFF_DECK,
+            use_gripper=False,
+            use_pick_up_location_lpc_offset=False,
+            use_drop_location_lpc_offset=False,
+            pick_up_offset=None,
+            drop_offset=None,
+        )
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_move_labware_off_deck_raises(
+    subject: ProtocolContext,
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+) -> None:
+    """It should raise an APIVersionError if using move_labware in an unsupported version."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    movable_labware = Labware(
+        core=mock_labware_core,
+        api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=mock_core,
+        core_map=mock_core_map,
+    )
+
+    with pytest.raises(APIVersionError):
+        subject.move_labware(labware=movable_labware, new_location=OFF_DECK)
+
+
 def test_load_module(
     decoy: Decoy,
     mock_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should load a module."""
@@ -407,7 +473,9 @@ def test_load_module(
     decoy.when(mock_validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
     )
-    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_3)
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_3
+    )
 
     decoy.when(
         mock_core.load_module(

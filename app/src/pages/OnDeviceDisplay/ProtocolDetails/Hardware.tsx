@@ -9,6 +9,8 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
+  GRIPPER_V1,
+  getGripperDisplayName,
   getModuleDisplayName,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
@@ -42,12 +44,12 @@ const TableDatum = styled('td')`
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
-    border-top-left-radius: ${BORDERS.size4};
-    border-bottom-left-radius: ${BORDERS.size4};
+    border-top-left-radius: ${BORDERS.borderRadiusSize4};
+    border-bottom-left-radius: ${BORDERS.borderRadiusSize4};
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.size4};
-    border-bottom-right-radius: ${BORDERS.size4};
+    border-top-right-radius: ${BORDERS.borderRadiusSize4};
+    border-bottom-right-radius: ${BORDERS.borderRadiusSize4};
   }
 `
 
@@ -55,7 +57,9 @@ const getHardwareLocation = (
   protocolHardware: ProtocolHardware,
   translator: TFunction<'protocol_details'>
 ): string => {
-  if (protocolHardware.hardwareType === 'pipette') {
+  if (protocolHardware.hardwareType === 'gripper') {
+    return translator(`extension_mount`)
+  } else if (protocolHardware.hardwareType === 'pipette') {
     return translator(`${protocolHardware.mount}_mount`)
   } else {
     return translator('slot', { slotName: protocolHardware.slot })
@@ -63,7 +67,9 @@ const getHardwareLocation = (
 }
 
 const getHardwareName = (protocolHardware: ProtocolHardware): string => {
-  if (protocolHardware.hardwareType === 'pipette') {
+  if (protocolHardware.hardwareType === 'gripper') {
+    return getGripperDisplayName(GRIPPER_V1)
+  } else if (protocolHardware.hardwareType === 'pipette') {
     return getPipetteNameSpecs(protocolHardware.pipetteName)?.displayName ?? ''
   } else {
     return getModuleDisplayName(protocolHardware.moduleModel)

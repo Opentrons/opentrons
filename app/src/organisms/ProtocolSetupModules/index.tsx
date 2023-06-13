@@ -21,6 +21,7 @@ import {
   getModuleDisplayName,
   getModuleType,
   inferModuleOrientationFromXCoordinate,
+  NON_CONNECTING_MODULE_TYPES,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -66,16 +67,16 @@ function RowModule({
   setShowMultipleModulesModal,
 }: RowModuleProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const attachedModuleMatch = !!module.attachedModuleMatch
+  const isNonConnectingModule = NON_CONNECTING_MODULE_TYPES.includes(
+    module.moduleDef.moduleType
+  )
+  const isModuleReady =
+    isNonConnectingModule || module.attachedModuleMatch != null
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={
-        attachedModuleMatch
-          ? `${COLORS.successEnabled}${COLORS.opacity20HexCode}`
-          : COLORS.warningBackgroundMed
-      }
-      borderRadius={BORDERS.size3}
+      backgroundColor={isModuleReady ? COLORS.green3 : COLORS.yellow3}
+      borderRadius={BORDERS.borderRadiusSize3}
       cursor={isDuplicateModuleModel ? 'pointer' : 'inherit'}
       gridGap={SPACING.spacing24}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
@@ -84,14 +85,14 @@ function RowModule({
       }
     >
       <Flex
-        width="22.25rem"
+        flex="4 0 0"
         fontSize={TYPOGRAPHY.fontSize22}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         lineHeight={TYPOGRAPHY.lineHeight28}
       >
         <StyledText>{getModuleDisplayName(module.moduleDef.model)}</StyledText>
       </Flex>
-      <Flex alignItems={ALIGN_CENTER} width="11.625rem">
+      <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
         <StyledText>
           {/* TODO(bh, 2023-02-07): adjust slot location when hi-fi designs finalized */}
           {t('slot_location', {
@@ -101,22 +102,36 @@ function RowModule({
                 : module.slotName,
           })}
         </StyledText>
-        {isDuplicateModuleModel ? (
-          <Icon
-            name="information"
-            paddingLeft={SPACING.spacing8}
-            size="1.5rem"
-          />
-        ) : null}
       </Flex>
-      <Chip
-        text={
-          attachedModuleMatch ? t('module_connected') : t('module_disconnected')
-        }
-        type={attachedModuleMatch ? 'success' : 'warning'}
-        background={false}
-        iconName="connection-status"
-      />
+      {isNonConnectingModule ? (
+        <Flex
+          flex="3 0 0"
+          alignItems={ALIGN_CENTER}
+          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+        >
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            {t('n_a')}
+          </StyledText>
+        </Flex>
+      ) : (
+        <Flex
+          flex="3 0 0"
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+        >
+          <Chip
+            text={
+              isModuleReady ? t('module_connected') : t('module_disconnected')
+            }
+            type={isModuleReady ? 'success' : 'warning'}
+            background={false}
+            iconName="connection-status"
+          />
+          {isDuplicateModuleModel ? (
+            <Icon name="information" size="2rem" />
+          ) : null}
+        </Flex>
+      )}
     </Flex>
   )
 }
@@ -254,7 +269,7 @@ export function ProtocolSetupModules({
               e.stopPropagation()
               setClearModuleMismatchBanner(true)
             }}
-            heading={t('module_mismatch_error')}
+            heading={t('extra_module_attached')}
             message={t('module_mismatch_body')}
           />
         ) : null}
@@ -265,16 +280,11 @@ export function ProtocolSetupModules({
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             gridGap={SPACING.spacing24}
             lineHeight={TYPOGRAPHY.lineHeight28}
+            paddingX={SPACING.spacing24}
           >
-            <Flex paddingLeft={SPACING.spacing24} width="22.75rem">
-              <StyledText>{'Module Name'}</StyledText>
-            </Flex>
-            <Flex width="13.8125rem" paddingLeft="0.9375rem">
-              <StyledText>{'Location'}</StyledText>
-            </Flex>
-            <Flex width="17.9375rem">
-              <StyledText>{'Status'}</StyledText>
-            </Flex>
+            <StyledText flex="4 0 0">{'Module Name'}</StyledText>
+            <StyledText flex="2 0 0">{'Location'}</StyledText>
+            <StyledText flex="3 0 0"> {'Status'}</StyledText>
           </Flex>
           {attachedProtocolModuleMatches.map(module => {
             // check for duplicate module model in list of modules for protocol
