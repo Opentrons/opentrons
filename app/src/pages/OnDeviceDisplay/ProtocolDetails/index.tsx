@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from 'react-query'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory, useParams } from 'react-router-dom'
@@ -22,9 +23,13 @@ import {
 import {
   useCreateRunMutation,
   useHost,
+  useProtocolAnalysesQuery,
   useProtocolQuery,
 } from '@opentrons/react-api-client'
-import { ProtocolResource } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  ProtocolResource,
+} from '@opentrons/shared-data'
 import { MAXIMUM_PINNED_PROTOCOLS } from '../../../App/constants'
 import { MediumButton, SmallButton, TabbedButton } from '../../../atoms/buttons'
 import { Chip } from '../../../atoms/Chip'
@@ -45,6 +50,7 @@ import { Liquids } from './Liquids'
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
 import type { Dispatch } from '../../../redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
+import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
 
 const ProtocolHeader = (props: {
   title: string
@@ -71,6 +77,7 @@ const ProtocolHeader = (props: {
       position={POSITION_STICKY}
       top="0"
       backgroundColor={COLORS.white}
+      zIndex={10} // the header is always visble when things scroll beneath
     >
       <Flex
         alignItems={ALIGN_CENTER}
@@ -174,7 +181,7 @@ const Summary = (props: {
       </StyledText>
       <Flex
         backgroundColor={COLORS.darkBlack20}
-        borderRadius={BORDERS.size1}
+        borderRadius={BORDERS.borderRadiusSize1}
         marginTop={SPACING.spacing24}
         maxWidth="22rem"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
@@ -238,6 +245,7 @@ export function ProtocolDetails(): JSX.Element | null {
   const history = useHistory()
   const host = useHost()
   const { makeSnackbar } = useToaster()
+  const queryClient = useQueryClient()
   const [currentOption, setCurrentOption] = React.useState<TabOption>(
     protocolSectionTabOptions[0]
   )
@@ -249,10 +257,29 @@ export function ProtocolDetails(): JSX.Element | null {
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
   const pinned = pinnedProtocolIds.includes(protocolId)
 
+  const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId)
+  const mostRecentAnalysis =
+    (protocolAnalyses?.data ?? [])
+      .reverse()
+      .find(
+        (analysis): analysis is CompletedProtocolAnalysis =>
+          analysis.status === 'completed'
+      ) ?? null
+  const scrapedLabwareOffsets = useOffsetCandidatesForAnalysis(
+    mostRecentAnalysis
+  ).map(({ vector, location, definitionUri }) => ({
+    vector,
+    location,
+    definitionUri,
+  }))
+
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
-      const runId: string = data.data.id
-      history.push(`/runs/${runId}/setup`)
+      queryClient
+        .invalidateQueries([host, 'runs'])
+        .catch((e: Error) =>
+          console.error(`could not invalidate runs cache: ${e.message}`)
+        )
     },
   })
 
@@ -274,7 +301,7 @@ export function ProtocolDetails(): JSX.Element | null {
   }
 
   const handleRunProtocol = (): void => {
-    createRun({ protocolId })
+    createRun({ protocolId, labwareOffsets: scrapedLabwareOffsets })
   }
   const [
     showConfirmDeleteProtocol,
@@ -359,7 +386,7 @@ export function ProtocolDetails(): JSX.Element | null {
           <SmallModalChildren
             header={t('too_many_pins_header')}
             subText={t('too_many_pins_body')}
-            buttonText={t('shared:close')}
+            buttonText={i18n.format(t('shared:close'), 'capitalize')}
             handleCloseMaxPinsAlert={() => setShowMaxPinsAlert(false)}
           />
         )}

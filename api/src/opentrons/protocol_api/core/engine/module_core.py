@@ -278,7 +278,10 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore):
     ) -> None:
         """Set the target temperature for the well block, in °C."""
         self._engine_client.thermocycler_set_target_block_temperature(
-            module_id=self.module_id, celsius=celsius, block_max_volume=block_max_volume
+            module_id=self.module_id,
+            celsius=celsius,
+            block_max_volume=block_max_volume,
+            hold_time_seconds=hold_time_seconds,
         )
 
     def wait_for_block_temperature(self) -> None:
