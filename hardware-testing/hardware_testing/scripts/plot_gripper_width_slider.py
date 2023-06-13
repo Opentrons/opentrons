@@ -38,6 +38,7 @@ class Plot:
         self.df_data = self.import_files(self.path)
         self.df_avg = self.average_df(self.df_data, self.dict_tables["Avg"])
         self.df_avg_err = self.average_width_df(self.df_avg, self.dict_tables["Avg Error"])
+        self.get_min_max(self.df_data)
 
     def import_files(self, path):
         df = pd.DataFrame()
@@ -57,6 +58,34 @@ class Plot:
         if not os.path.exists(path):
             os.makedirs(path)
 
+    def get_min_max(self, df):
+        df_err = pd.DataFrame()
+        df_err["Gripper Width"] = df["Gripper Width"]
+        df_err["Encoder Error"] = abs(df["Encoder Error"])
+        df_err["Measured Error"] = abs(df["Measured Error"])
+        min_id_enc = df_err["Encoder Error"].idxmin()
+        max_id_enc = df_err["Encoder Error"].idxmax()
+        min_id_mes = df_err["Measured Error"].idxmin()
+        max_id_mes = df_err["Measured Error"].idxmax()
+
+        df_mm = pd.DataFrame()
+        df_mm = df_mm.append(df_err.iloc[min_id_enc], ignore_index=True)
+        df_mm = df_mm.append(df_err.iloc[max_id_enc], ignore_index=True)
+        df_mm = df_mm.append(df_err.iloc[min_id_mes], ignore_index=True)
+        df_mm = df_mm.append(df_err.iloc[max_id_mes], ignore_index=True)
+        df_mm.rename(
+            index={
+                0: "Min Encoder Error",
+                1: "Max Encoder Error",
+                2: "Min Measured Error",
+                3: "Max Measured Error",
+            },
+            inplace=True
+        )
+        print("\n-> Min/Max Data:\n")
+        print(df_mm)
+        print("")
+
     def average_df(self, df, filename):
         df_avg = pd.DataFrame()
         df_avg["Encoder StdDev"] = df.groupby(["Gripper Width"])["Encoder Error"].std()
@@ -68,7 +97,7 @@ class Plot:
         df_avg.reset_index(inplace=True)
         df_avg = df_avg.round(4)
         df_avg.to_csv(self.PLOT_PATH + filename)
-        print("\nAverage Data:\n")
+        print("\n-> Average Data:\n")
         print(df_avg)
         return df_avg
 
@@ -82,7 +111,7 @@ class Plot:
         df_avg_err["Avg Accuracy"] = 100 - df_avg_err["Avg Percent Error"]
         df_avg_err = df_avg_err.round(4)
         df_avg_err.to_csv(self.PLOT_PATH + filename)
-        print("\nAverage Error:\n")
+        print("\n-> Average Error:\n")
         print(df_avg_err)
         return df_avg_err
 
