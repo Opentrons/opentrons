@@ -39,7 +39,7 @@ const cardStyleBySize: {
     height: '8.875rem',
     lineHeight: TYPOGRAPHY.lineHeight42,
     fontWeight: TYPOGRAPHY.fontWeightBold,
-    width: '100%',
+    width: '59rem',
   },
   half: {
     fontSize: TYPOGRAPHY.fontSize28,
