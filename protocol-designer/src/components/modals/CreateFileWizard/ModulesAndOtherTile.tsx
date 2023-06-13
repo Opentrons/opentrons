@@ -129,6 +129,12 @@ const FLEX_SUPPORTED_MODULE_MODELS: ModuleModel[] = [
   MAGNETIC_BLOCK_V1,
   TEMPERATURE_MODULE_V2,
 ]
+const DEFAULT_SLOT_MAP: {[moduleModel in ModuleModel]?: string} = {
+  [THERMOCYCLER_MODULE_V2]: 'B1',
+  [HEATERSHAKER_MODULE_V1]: 'D1',
+  [MAGNETIC_BLOCK_V1]: 'D2',
+  [TEMPERATURE_MODULE_V2]: 'D3',
+}
 
 function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const { values } = props
@@ -160,9 +166,11 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
               if (values.modulesByType[moduleType].onDeck){
                 props.setFieldValue(`modulesByType.${moduleType}.onDeck`, false)
                 props.setFieldValue(`modulesByType.${moduleType}.model`, null)
+                props.setFieldValue(`modulesByType.${moduleType}.slot`, null)
               } else {
                 props.setFieldValue(`modulesByType.${moduleType}.onDeck`, true)
                 props.setFieldValue(`modulesByType.${moduleType}.model`, moduleModel)
+                props.setFieldValue(`modulesByType.${moduleType}.slot`, DEFAULT_SLOT_MAP[moduleModel])
               }
             }}
           />
