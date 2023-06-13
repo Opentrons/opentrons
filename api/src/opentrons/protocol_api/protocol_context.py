@@ -316,7 +316,7 @@ class ProtocolContext(CommandPublisher):
             `Labware Library <https://labware.opentrons.com>`_.
 
         :param location: The slot into which to load the labware,
-            such as ``1`` or ``"1"`` or off deck using :py:obj:`OFF_DECK`.
+            such as ``1`` or ``"1"`` or off-deck using :py:obj:`OFF_DECK`.
 
         :type location: int or str or :py:obj:`OFF_DECK
 
