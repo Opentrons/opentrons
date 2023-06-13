@@ -104,7 +104,19 @@ class Location:
        of each item.
     """
 
-    def __init__(self, point: Point, labware: LocationLabware):
+    def __init__(
+        self,
+        point: Point,
+        labware: Union[
+            "Labware",
+            "Well",
+            str,
+            "ModuleGeometry",
+            LabwareLike,
+            None,
+            "ModuleContext",
+        ],
+    ):
         self._point = point
         self._labware = LabwareLike(labware)
 
@@ -154,7 +166,14 @@ class Location:
             >>> assert loc.point == Point(1, 1, 1)  # True
 
         """
-        return Location(point=self.point + point, labware=self._labware.object)
+        from opentrons.protocol_api._types import OffDeckType
+
+        return Location(
+            point=self.point + point,
+            labware=self._labware.object
+            if not isinstance(self._labware.object, OffDeckType)
+            else None,
+        )
 
     def __repr__(self) -> str:
         return f"Location(point={repr(self._point)}, labware={self._labware})"
@@ -326,17 +345,17 @@ class DeckSlotName(enum.Enum):
 
 # fmt: off
 _slot_equivalencies = [
-    (DeckSlotName.SLOT_1,      DeckSlotName.SLOT_D1),
-    (DeckSlotName.SLOT_2,      DeckSlotName.SLOT_D2),
-    (DeckSlotName.SLOT_3,      DeckSlotName.SLOT_D3),
-    (DeckSlotName.SLOT_4,      DeckSlotName.SLOT_C1),
-    (DeckSlotName.SLOT_5,      DeckSlotName.SLOT_C2),
-    (DeckSlotName.SLOT_6,      DeckSlotName.SLOT_C3),
-    (DeckSlotName.SLOT_7,      DeckSlotName.SLOT_B1),
-    (DeckSlotName.SLOT_8,      DeckSlotName.SLOT_B2),
-    (DeckSlotName.SLOT_9,      DeckSlotName.SLOT_B3),
-    (DeckSlotName.SLOT_10,     DeckSlotName.SLOT_A1),
-    (DeckSlotName.SLOT_11,     DeckSlotName.SLOT_A2),
+    (DeckSlotName.SLOT_1, DeckSlotName.SLOT_D1),
+    (DeckSlotName.SLOT_2, DeckSlotName.SLOT_D2),
+    (DeckSlotName.SLOT_3, DeckSlotName.SLOT_D3),
+    (DeckSlotName.SLOT_4, DeckSlotName.SLOT_C1),
+    (DeckSlotName.SLOT_5, DeckSlotName.SLOT_C2),
+    (DeckSlotName.SLOT_6, DeckSlotName.SLOT_C3),
+    (DeckSlotName.SLOT_7, DeckSlotName.SLOT_B1),
+    (DeckSlotName.SLOT_8, DeckSlotName.SLOT_B2),
+    (DeckSlotName.SLOT_9, DeckSlotName.SLOT_B3),
+    (DeckSlotName.SLOT_10, DeckSlotName.SLOT_A1),
+    (DeckSlotName.SLOT_11, DeckSlotName.SLOT_A2),
     (DeckSlotName.FIXED_TRASH, DeckSlotName.SLOT_A3),
 ]
 # fmt: on
