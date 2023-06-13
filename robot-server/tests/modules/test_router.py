@@ -1,13 +1,19 @@
 """Tests for /modules routes."""
+import inspect
 import pytest
 from decoy import Decoy
 from typing_extensions import Final
 
+from opentrons.calibration_storage.ot3.models.v1 import CalibrationStatus
+from opentrons.calibration_storage.types import SourceType
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
 from opentrons.hardware_control.modules import MagDeck, ModuleType, MagneticStatus
+from opentrons.hardware_control.modules import module_calibration
 
+from opentrons.types import Point
 from opentrons.protocol_engine import ModuleModel
+from opentrons.protocol_engine.types import Vec3f
 
 from robot_server.modules.router import get_attached_modules
 from robot_server.modules.module_identifier import ModuleIdentifier, ModuleIdentity
@@ -15,11 +21,19 @@ from robot_server.modules.module_data_mapper import ModuleDataMapper
 from robot_server.modules.module_models import (
     MagneticModule,
     MagneticModuleData,
+    ModuleCalibrationData,
     UsbPort,
 )
 
 
 _HTTP_API_VERSION: Final = 3
+
+
+@pytest.fixture(autouse=True)
+def _use_mock_module_calibration(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out the opentrons.module_calibration module."""
+    for name, func in inspect.getmembers(module_calibration, inspect.isfunction):
+        monkeypatch.setattr(module_calibration, name, decoy.mock(func=func))
 
 
 @pytest.fixture()
@@ -46,6 +60,7 @@ async def test_get_modules_empty(
 ) -> None:
     """It should get an empty modules list from the hardware API."""
     decoy.when(hardware_api.attached_modules).then_return([])
+    decoy.when(module_calibration.load_all_module_calibrations()).then_return([])
 
     result = await get_attached_modules(
         requested_version=_HTTP_API_VERSION,
@@ -73,6 +88,9 @@ async def test_get_modules_maps_data_and_id(
         moduleType=ModuleType.MAGNETIC,
         moduleModel=ModuleModel.MAGNETIC_MODULE_V1,
         usbPort=UsbPort(port=42, hub=None, path="/dev/null"),
+        moduleOffset=ModuleCalibrationData.construct(
+            offset=Vec3f(x=0, y=0, z=0),
+        ),
         data=MagneticModuleData(
             status=MagneticStatus.ENGAGED,
             engaged=True,
@@ -80,12 +98,25 @@ async def test_get_modules_maps_data_and_id(
         ),
     )
 
+    calibration_offset = module_calibration.ModuleCalibrationOffset(
+        slot="D3",
+        offset=Point(x=0, y=0, z=0),
+        module=ModuleType.MAGNETIC,
+        module_id="serial-number",
+        source=SourceType.default,
+        status=CalibrationStatus(),
+    )
     decoy.when(hardware_api.attached_modules).then_return([magnetic_module])
+    decoy.when(module_calibration.load_all_module_calibrations()).then_return(
+        [
+            calibration_offset,
+        ]
+    )
     decoy.when(magnetic_module.has_available_update()).then_return(True)
     decoy.when(magnetic_module.model()).then_return("magneticModuleV1")
     decoy.when(magnetic_module.device_info).then_return(
         {
-            "serial": "abc",
+            "serial": "serial-number",
             "version": "1.2.3",
         }
     )
@@ -107,7 +138,7 @@ async def test_get_modules_maps_data_and_id(
     )
 
     decoy.when(
-        module_identifier.identify({"serial": "abc", "version": "1.2.3"})
+        module_identifier.identify({"serial": "serial-number", "version": "1.2.3"})
     ).then_return(module_identity)
 
     decoy.when(
@@ -117,6 +148,16 @@ async def test_get_modules_maps_data_and_id(
             has_available_update=True,
             live_data={"status": "engaged", "data": {"engaged": True, "height": 42}},
             usb_port=HardwareUSBPort(name="abc", port_number=101),
+            module_offset=ModuleCalibrationData.construct(
+                offset=Vec3f(
+                    x=calibration_offset.offset.x,
+                    y=calibration_offset.offset.y,
+                    z=calibration_offset.offset.z,
+                ),
+                slot=calibration_offset.slot,
+                source=None,
+                last_modified=None,
+            ),
         )
     ).then_return(expected_response)
 

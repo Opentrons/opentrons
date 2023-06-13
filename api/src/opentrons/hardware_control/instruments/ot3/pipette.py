@@ -90,6 +90,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._pipette_type = self._config.pipette_type
         self._pipette_version = self._config.version
         self._max_channels = self._config.channels
+        self._backlash_distance = config.backlash_distance
 
         # TODO (lc 12-05-2022) figure out how we can safely deprecate "name" and "model"
         self._pipette_name = ot3_pipette_config.PipetteNameType(
@@ -142,6 +143,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def channels(self) -> PipetteChannelType:
         return self._max_channels
+
+    @property
+    def backlash_distance(self) -> float:
+        return self._backlash_distance
 
     @property
     def tip_overlap(self) -> Dict[str, float]:

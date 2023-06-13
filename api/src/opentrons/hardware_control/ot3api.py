@@ -273,6 +273,7 @@ class OT3API(
         strict_attached_instruments: bool = True,
         use_usb_bus: bool = False,
         update_firmware: bool = True,
+        status_bar_enabled: bool = True,
     ) -> "OT3API":
         """Build an ot3 hardware controller."""
         checked_loop = use_or_initialize_loop(loop)
@@ -286,6 +287,9 @@ class OT3API(
 
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
 
+        await api_instance.set_status_bar_enabled(status_bar_enabled)
+        # TODO: Remove this line once the robot server runs the startup
+        # animation after initialization!
         await api_instance.set_status_bar_state(StatusBarState.IDLE)
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
@@ -426,6 +430,9 @@ class OT3API(
 
     async def set_status_bar_state(self, state: StatusBarState) -> None:
         await self._status_bar_controller.set_status_bar_state(state)
+
+    async def set_status_bar_enabled(self, enabled: bool) -> None:
+        await self._status_bar_controller.set_enabled(enabled)
 
     def get_status_bar_state(self) -> StatusBarState:
         return self._status_bar_controller.get_current_state()
@@ -1410,6 +1417,14 @@ class OT3API(
             # save time by using max speed
             max_speeds = self.config.motion_settings.default_max_speed
             speed = max_speeds[self.gantry_load][OT3AxisKind.P]
+        if current_pos > target_pos[pip_ax]:
+            backlash_pos = target_pos.copy()
+            backlash_pos[pip_ax] -= instrument.backlash_distance
+            await self._move(
+                backlash_pos,
+                speed=(speed * rate),
+                acquire_lock=acquire_lock,
+            )
         await self._move(
             target_pos,
             speed=(speed * rate),
@@ -1444,6 +1459,11 @@ class OT3API(
         )
         if not aspirate_spec:
             return
+
+        checked_mount = OT3Mount.from_mount(mount)
+        instrument = self._pipette_handler.get_pipette(checked_mount)
+        pip_ax = OT3Axis.of_main_tool_actuator(mount)
+
         target_pos = target_position_from_plunger(
             realmount,
             aspirate_spec.plunger_distance,
@@ -1454,7 +1474,13 @@ class OT3API(
             await self._backend.set_active_current(
                 {OT3Axis.from_axis(aspirate_spec.axis): aspirate_spec.current}
             )
-
+            backlash_pos = target_pos.copy()
+            backlash_pos[pip_ax] -= instrument.backlash_distance
+            await self._move(
+                backlash_pos,
+                speed=aspirate_spec.speed,
+                home_flagged_axes=False,
+            )
             await self._move(
                 target_pos,
                 speed=aspirate_spec.speed,
@@ -1802,7 +1828,7 @@ class OT3API(
             return self._pipette_handler.save_instrument_offset(checked_mount, delta)
 
     async def save_module_offset(
-        self, module_id: str, mount: OT3Mount, slot: int, offset: top_types.Point
+        self, module_id: str, mount: OT3Mount, slot: str, offset: top_types.Point
     ) -> Optional[ModuleCalibrationOffset]:
         """Save a new offset for a given module."""
         module = self._backend.module_controls.get_module_by_module_id(module_id)
@@ -1821,6 +1847,21 @@ class OT3API(
         )
         return self._backend.module_controls.save_module_offset(
             module_type, module_id, mount, slot, offset, instrument_id
+        )
+
+    def get_module_calibration_offset(
+        self, serial_number: str
+    ) -> Optional[ModuleCalibrationOffset]:
+        """Get the module calibration offset of a module."""
+        module = self._backend.module_controls.get_module_by_module_id(serial_number)
+        if not module:
+            self._log.warning(
+                f"Could not load calibration: unknown module {serial_number}"
+            )
+            return None
+        module_type = module.MODULE_TYPE
+        return self._backend.module_controls.load_module_offset(
+            module_type, serial_number
         )
 
     def get_attached_pipette(

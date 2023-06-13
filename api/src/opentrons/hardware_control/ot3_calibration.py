@@ -780,7 +780,7 @@ async def calibrate_pipette(
 async def calibrate_module(
     hcapi: OT3API,
     mount: OT3Mount,
-    slot: int,
+    slot: str,
     module_id: str,
     nominal_position: Point,
 ) -> Point:

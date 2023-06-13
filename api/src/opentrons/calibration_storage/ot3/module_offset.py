@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from functools import lru_cache
 from pathlib import Path
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.hardware_control.types import OT3Mount
@@ -30,6 +31,9 @@ def delete_module_offset_file(module_id: str) -> None:
     offset_dir = config.get_opentrons_path("module_calibration_dir")
     offset_path = offset_dir / f"{module_id}.json"
     io.delete_file(offset_path)
+    # something changed, clear lru cache
+    get_module_offset.cache_clear()
+    load_all_module_offsets.cache_clear()
 
 
 def clear_module_offset_calibrations() -> None:
@@ -39,6 +43,9 @@ def clear_module_offset_calibrations() -> None:
 
     offset_dir = config.get_opentrons_path("module_calibration_dir")
     io._remove_json_files_in_directories(offset_dir)
+    # something changed, clear lru cache
+    get_module_offset.cache_clear()
+    load_all_module_offsets.cache_clear()
 
 
 # Save Module Offset Calibrations
@@ -48,7 +55,7 @@ def clear_module_offset_calibrations() -> None:
 def save_module_calibration(
     offset: types.Point,
     mount: OT3Mount,
-    slot: int,
+    slot: str,
     module: ModuleType,
     module_id: str,
     instrument_id: Optional[str] = None,
@@ -76,14 +83,18 @@ def save_module_calibration(
         status=cal_status_model,
     )
     io.save_to_file(module_dir, module_id, module_calibration)
+    # something changed, clear lru cache
+    get_module_offset.cache_clear()
+    load_all_module_offsets.cache_clear()
 
 
 # Get Module Offset Calibrations
 
 
 @no_type_check
+@lru_cache(maxsize=10)
 def get_module_offset(
-    module: ModuleType, module_id: str, slot: Optional[int] = None
+    module: ModuleType, module_id: str, slot: Optional[str] = None
 ) -> Optional[v1.ModuleOffsetModel]:
     try:
         module_calibration_filepath = (
@@ -102,6 +113,7 @@ def get_module_offset(
         return None
 
 
+@lru_cache(maxsize=10)
 def load_all_module_offsets() -> List[v1.ModuleOffsetModel]:
     """Load all module offsets from the disk."""
 
