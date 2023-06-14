@@ -1,0 +1,81 @@
+"""Error codes."""
+
+from enum import Enum
+from dataclasses import dataclass
+import json
+from typing import Tuple, Dict
+from functools import lru_cache
+
+from ..load import load_shared_data
+from .categories import ErrorCategories
+
+CODES: Dict[str, Dict[str, str]] = json.loads(
+    load_shared_data("errors/definitions/1/errors.json")
+)["codes"]
+
+
+@dataclass(frozen=True)
+class ErrorCode:
+    """Individual error code data."""
+
+    code: str
+    detail: str
+    category: ErrorCategories
+
+
+def _code_from_dict_entry(entry_code: str) -> ErrorCode:
+    return ErrorCode(
+        code=entry_code,
+        detail=CODES[entry_code]["detail"],
+        category=ErrorCategories.by_category_name(CODES[entry_code]["category"]),
+    )
+
+
+class ErrorCodes(Enum):
+    """All enumerated error codes."""
+
+    COMMUNICATION_ERROR = _code_from_dict_entry("1000")
+    CANBUS_COMMUNICATION_ERROR = _code_from_dict_entry("1001")
+    INTERNAL_USB_COMMUNICATION_ERROR = _code_from_dict_entry("1002")
+    MODULE_COMMUNICATION_ERROR = _code_from_dict_entry("1003")
+    COMMAND_TIMED_OUT = _code_from_dict_entry("1004")
+    FIRMWARE_UPDATE_FAILED = _code_from_dict_entry("1005")
+    ROBOTICS_CONTROL_ERROR = _code_from_dict_entry("2000")
+    MOTION_FAILED = _code_from_dict_entry("2001")
+    HOMING_FAILED = _code_from_dict_entry("2002")
+    STALL_OR_COLLISION_DETECTED = _code_from_dict_entry("2003")
+    MOTION_PLANNING_FAILURE = _code_from_dict_entry("2004")
+    ROBOTICS_INTERACTION_ERROR = _code_from_dict_entry("3000")
+    LABWARE_DROPPED = _code_from_dict_entry("3001")
+    LABWARE_NOT_PICKED_UP = _code_from_dict_entry("3002")
+    TIP_PICKUP_FAILED = _code_from_dict_entry("3003")
+    TIP_DROP_FAILED = _code_from_dict_entry("3004")
+    UNEXPECTED_TIP_REMOVAL = _code_from_dict_entry("3005")
+    PIPETTE_OVERPRESSURE = _code_from_dict_entry("3006")
+    E_STOP_ACTIVATED = _code_from_dict_entry("3008")
+    E_STOP_NOT_PRESENT = _code_from_dict_entry("3009")
+    PIPETTE_NOT_PRESENT = _code_from_dict_entry("3010")
+    GRIPPER_NOT_PRESENT = _code_from_dict_entry("3011")
+    GENERAL_ERROR = _code_from_dict_entry("4000")
+
+    @classmethod
+    @lru_cache(25)
+    def by_error_code(cls, error_code: str) -> "ErrorCodes":
+        """Get an error by its code.
+
+        Note: this is a linear search because it makes life easier and also this is rare in python.
+        """
+        for error in cls:
+            if error.value.code == error_code:
+                return error
+        raise KeyError(error_code)
+
+    @classmethod
+    @lru_cache(len(ErrorCategories))
+    def of_category(cls, category: ErrorCategories) -> Tuple["ErrorCodes", ...]:
+        """Get all error codes by their category."""
+        return tuple(
+            error
+            for error in cls
+            if error.value.code.startswith(category.value.code_prefix)
+        )

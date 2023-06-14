@@ -5,10 +5,10 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
-  BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
+import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '.'
 
 interface SmallModalChildrenProps {
@@ -48,24 +48,13 @@ export function SmallModalChildren(
           {subText}
         </StyledText>
 
-        <Flex
-          backgroundColor={COLORS.blueEnabled}
-          borderRadius={BORDERS.borderRadiusSize3}
-          flexDirection={DIRECTION_COLUMN}
-          marginTop={SPACING.spacing32}
-          onClick={handleCloseMaxPinsAlert}
-          padding={SPACING.spacing16}
-        >
-          <StyledText
-            color={COLORS.white}
-            fontSize={TYPOGRAPHY.fontSize22}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            lineHeight={TYPOGRAPHY.lineHeight28}
-            textAlign={TYPOGRAPHY.textAlignCenter}
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-          >
-            {buttonText}
-          </StyledText>
+        <Flex marginTop={SPACING.spacing32}>
+          <SmallButton
+            flex="1"
+            buttonText={buttonText}
+            buttonType="primary"
+            onClick={handleCloseMaxPinsAlert}
+          />
         </Flex>
       </Flex>
     </Modal>
