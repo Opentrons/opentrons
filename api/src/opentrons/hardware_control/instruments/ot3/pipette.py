@@ -6,7 +6,6 @@ from typing_extensions import Final
 
 from opentrons.types import Point
 
-from opentrons.config import ot3_pipette_config
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
     PipetteTipType,
@@ -27,6 +26,10 @@ from opentrons_shared_data.pipette.dev_types import (
     UlPerMmAction,
     PipetteName,
     PipetteModel,
+)
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+    load_data as load_pipette_data,
 )
 from opentrons.hardware_control.types import CriticalPoint, OT3Mount
 from opentrons.hardware_control.errors import InvalidMoveError
@@ -93,13 +96,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._backlash_distance = config.backlash_distance
 
         # TODO (lc 12-05-2022) figure out how we can safely deprecate "name" and "model"
-        self._pipette_name = ot3_pipette_config.PipetteNameType(
+        self._pipette_name = pipette_load_name.PipetteNameType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
             pipette_generation=config.display_category,
         )
         self._acting_as = self._pipette_name
-        self._pipette_model = ot3_pipette_config.PipetteModelVersionType(
+        self._pipette_model = pipette_load_name.PipetteModelVersionType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
             pipette_version=config.version,
@@ -203,7 +206,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return cast(PipetteName, f"{self._acting_as}")
 
     def reload_configurations(self) -> None:
-        self._config = ot3_pipette_config.load_ot3_pipette(self._pipette_model)
+        self._config = load_pipette_data.load_definition(
+            self._pipette_model.pipette_type,
+            self._pipette_model.pipette_channels,
+            self._pipette_model.pipette_version,
+        )
         self._config_as_dict = self._config.dict()
 
     def reset_state(self) -> None:

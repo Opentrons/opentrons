@@ -1,14 +1,12 @@
 import re
 from typing import List, Optional, Union, cast
 from dataclasses import dataclass
-from opentrons_shared_data.pipette import load_data
-from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
-from opentrons_shared_data.pipette.pipette_definition import (
+from .dev_types import PipetteModel, PipetteName
+from .pipette_definition import (
     PipetteChannelType,
     PipetteModelType,
     PipetteVersionType,
     PipetteGenerationType,
-    PipetteConfigurations,
     PIPETTE_AVAILABLE_TYPES,
     PIPETTE_CHANNELS_INTS,
     PipetteModelMajorVersionType,
@@ -50,6 +48,26 @@ class PipetteModelVersionType:
 
         return f"{base_name}_v{self.pipette_version}"
 
+
+def supported_pipette(model_or_name: Union[PipetteName, PipetteModel, None]) -> bool:
+    """Determine if a pipette type is supported.
+
+    Args:
+        model_or_name (Union[PipetteName, PipetteModel, None]): The pipette we want to check.
+
+    Returns:
+        bool: Whether or not the given pipette name or model is supported.
+    """
+    if not model_or_name:
+        return False
+    split_model_or_name = model_or_name.split("_")
+    channels_as_int = channels_from_string(split_model_or_name[1]).as_int
+    if (
+        split_model_or_name[0] in PIPETTE_AVAILABLE_TYPES
+        or channels_as_int in PIPETTE_CHANNELS_INTS
+    ):
+        return True
+    return False
 
 def channels_from_string(channels: str) -> PipetteChannelType:
     """Convert channels from a string.
@@ -178,29 +196,3 @@ def convert_pipette_model(
         version = DEFAULT_MODEL_VERSION
     return PipetteModelVersionType(PipetteModelType[pipette_type], channels, version)
 
-
-def supported_pipette(model_or_name: Union[PipetteName, PipetteModel, None]) -> bool:
-    """Determine if a pipette type is supported.
-
-    Args:
-        model_or_name (Union[PipetteName, PipetteModel, None]): The pipette we want to check.
-
-    Returns:
-        bool: Whether or not the given pipette name or model is supported.
-    """
-    if not model_or_name:
-        return False
-    split_model_or_name = model_or_name.split("_")
-    channels_as_int = channels_from_string(split_model_or_name[1]).as_int
-    if (
-        split_model_or_name[0] in PIPETTE_AVAILABLE_TYPES
-        or channels_as_int in PIPETTE_CHANNELS_INTS
-    ):
-        return True
-    return False
-
-
-def load_ot3_pipette(model_type: PipetteModelVersionType) -> PipetteConfigurations:
-    return load_data.load_definition(
-        model_type.pipette_type, model_type.pipette_channels, model_type.pipette_version
-    )
