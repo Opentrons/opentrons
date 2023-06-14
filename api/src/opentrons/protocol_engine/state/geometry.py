@@ -375,7 +375,9 @@ class GeometryView:
         return location
 
     def get_labware_center(
-        self, labware_id: str, location: Union[DeckSlotLocation, ModuleLocation]
+        self,
+        labware_id: str,
+        location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     ) -> Point:
         """Get the center point of the labware as placed on the given location.
 
@@ -383,21 +385,28 @@ class GeometryView:
         specified location. Labware offset not included.
         """
         labware_dimensions = self._labware.get_dimensions(labware_id)
-        module_offset = LabwareOffsetVector(x=0, y=0, z=0)
+        offset = LabwareOffsetVector(x=0, y=0, z=0)
         location_slot: DeckSlotName
+
         if isinstance(location, ModuleLocation):
             deck_type = DeckType(self._labware.get_deck_definition()["otId"])
-            module_offset = self._modules.get_module_offset(
+            offset = self._modules.get_module_offset(
                 module_id=location.moduleId, deck_type=deck_type
             )
             location_slot = self._modules.get_location(location.moduleId).slotName
+        elif isinstance(location, OnLabwareLocation):
+            location_slot = self.get_ancestor_slot_name(location.labwareId)
+            labware_data = self._labware.get(labware_id)
+            offset = self._get_labware_position_offset(
+                labware_data
+            )  # TODO get actual offset with calib
         else:
             location_slot = location.slotName
         slot_center = self._labware.get_slot_center_position(location_slot)
         return Point(
-            slot_center.x + module_offset.x,
-            slot_center.y + module_offset.y,
-            slot_center.z + module_offset.z + labware_dimensions.z / 2,
+            slot_center.x + offset.x,
+            slot_center.y + offset.y,
+            slot_center.z + offset.z + labware_dimensions.z / 2,
         )
 
     def get_extra_waypoints(
