@@ -91,36 +91,6 @@ export const getLabwareDefinitionsInUse = (
   )
 }
 
-interface RobotModel {
-  [pipetteId: string]: { name: PipetteName }
-}
-
-export const getRobotModelFromPipettes = (
-  pipettes: RobotModel
-): {
-  model: typeof OT2_STANDARD_MODEL | typeof OT3_STANDARD_MODEL
-  deckId: typeof OT2_STANDARD_DECKID | typeof OT3_STANDARD_DECKID
-} => {
-  const loadedPipettes = Object.values(pipettes)
-  const pipetteGEN = loadedPipettes.some(
-    pipette => getPipetteNameSpecs(pipette.name)?.displayCategory === GEN3
-  )
-    ? GEN3
-    : GEN2
-  switch (pipetteGEN) {
-    case GEN3:
-      return {
-        model: OT3_STANDARD_MODEL,
-        deckId: OT3_STANDARD_DECKID,
-      }
-    default:
-      return {
-        model: OT2_STANDARD_MODEL,
-        deckId: OT2_STANDARD_DECKID,
-      }
-  }
-}
-
 export const createFile: Selector<ProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
@@ -290,9 +260,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           commandType: 'loadModule' as const,
           params: {
             moduleId: moduleId,
-            location: {
-              slotName: module.slot === SPAN7_8_10_11_SLOT ? '7' : module.slot,
-            },
+            location: { slotName: module.slot === SPAN7_8_10_11_SLOT ? '7' : module.slot},
           },
         }
         return loadModuleCommand
@@ -317,6 +285,36 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     )
 
     const commands = [...loadCommands, ...nonLoadCommands]
+
+    interface RobotModel {
+      [pipetteId: string]: { name: PipetteName }
+    }
+
+    const getRobotModelFromPipettes = (
+      pipettes: RobotModel
+    ): {
+      model: typeof OT2_STANDARD_MODEL | typeof OT3_STANDARD_MODEL
+      deckId: typeof OT2_STANDARD_DECKID | typeof OT3_STANDARD_DECKID
+    } => {
+      const loadedPipettes = Object.values(pipettes)
+      const pipetteGEN = loadedPipettes.some(
+        pipette => getPipetteNameSpecs(pipette.name)?.displayCategory === GEN3
+      )
+        ? GEN3
+        : GEN2
+      switch (pipetteGEN) {
+        case GEN3:
+          return {
+            model: OT3_STANDARD_MODEL,
+            deckId: OT3_STANDARD_DECKID,
+          }
+        default:
+          return {
+            model: OT2_STANDARD_MODEL,
+            deckId: OT2_STANDARD_DECKID,
+          }
+      }
+    }
 
     const protocolFile = {
       metadata: {
