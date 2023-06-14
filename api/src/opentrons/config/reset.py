@@ -118,7 +118,7 @@ def reset(options: Set[ResetOptionId]) -> None:
         reset_tip_length_calibrations()
 
     if ResetOptionId.gripper_offset in options:
-        ot3_gripper_offset.clear_gripper_calibration_offsets()
+        reset_gripper_offset()
 
 
 def reset_boot_scripts() -> None:
