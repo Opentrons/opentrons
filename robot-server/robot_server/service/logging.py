@@ -44,8 +44,6 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
                 "class": "systemd.journal.JournalHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "backupCount": 3,
-                "maxBytes": 5000000,
                 "SYSLOG_IDENTIFIER": "uvicorn",
             },
             "syslog_plus_unit_above_warn": {
@@ -112,7 +110,6 @@ def _dev_log_config(log_level: int) -> Dict[str, Any]:
                 "class": "logging.StreamHandler",
                 "level": logging.DEBUG,
                 "formatter": "basic",
-                "maxBytes": 5000000,
             }
         },
         "loggers": {
