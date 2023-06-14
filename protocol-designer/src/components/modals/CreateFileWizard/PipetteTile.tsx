@@ -174,8 +174,8 @@ const OT2_TIP_VOLS_FOR_PIP_VOL: { [maxVol: number]: number[] } = {
 }
 
 const FLEX_TIP_VOLS_FOR_PIP_VOL: { [maxVol: number]: number[] } = {
-  50: [50, 200],
-  1000: [1000, 200, 50],
+  50: [20, 200],
+  1000: [1000, 200, 20],
 }
 
 function OT2TipRackField(props: OT2FieldProps): JSX.Element {
