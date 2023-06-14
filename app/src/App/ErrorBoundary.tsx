@@ -41,6 +41,8 @@ export class ErrorBoundary extends React.Component<Props, State> {
     if (this.state.hasError) {
       return (
         <Flex
+          width="100%"
+          height="max-content"
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing16}
           padding={SPACING.spacing40}
