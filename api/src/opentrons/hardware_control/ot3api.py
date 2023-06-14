@@ -1677,7 +1677,7 @@ class OT3API(
         instrument.working_volume = tip_volume
 
     async def drop_tip(
-        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = True
+        self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
     ) -> None:
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
