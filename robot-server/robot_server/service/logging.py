@@ -39,27 +39,27 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
                 "class": "systemd.journal.JournalHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFER": "opentrons-robot-server",
             },
             "syslog_plus_unit": {
                 "class": "systemd.journal.JournalHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFIER": "opentrons-robot-server",
                 "backupCount": 3,
                 "maxBytes": 5000000,
+                "SYSLOG_IDENTIFIER": "uvicorn",
             },
             "syslog_plus_unit_above_warn": {
                 "class": "systemd.journal.JournalHandler",
                 "level": logging.WARN,
                 "formatter": "message_only",
-                "SYSLOG_IDENTIFER": "opentrons-robot-server",
+                "SYSLOG_IDENTIFIER": "uvicorn",
             },
             "unit_only_below_warn": {
                 "class": "systemd.journal.JournalHandler",
                 "level": logging.DEBUG,
                 "formatter": "message_only",
                 "filters": ["records_below_warning"],
+                "SYSLOG_IDENTIFIER": "uvicorn",
             },
         },
         "loggers": {
@@ -69,11 +69,6 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
                 "propagate": False,
             },
             "uvicorn.error": {
-                "handlers": ["syslog_plus_unit"],
-                "level": log_level,
-                "propagate": False,
-            },
-            "uvicorn": {
                 "handlers": ["syslog_plus_unit"],
                 "level": log_level,
                 "propagate": False,
@@ -118,7 +113,6 @@ def _dev_log_config(log_level: int) -> Dict[str, Any]:
                 "level": logging.DEBUG,
                 "formatter": "basic",
                 "maxBytes": 5000000,
-                "SYSLOG_IDENTIFIER": "opentrons-robot-server",
             }
         },
         "loggers": {
