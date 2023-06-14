@@ -18,11 +18,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteChannelType,
 )
 from ..instrument_abc import AbstractInstrument
-from .instrument_calibration import (
-    save_pipette_offset_calibration,
-    load_pipette_offset,
-    PipetteOffsetByPipetteMount,
-)
+from opentrons.calibration_storage.instrument_calibration_provider import InstrumentCalibrationHandlerProvider
 from opentrons_shared_data.pipette.dev_types import (
     UlPerMmAction,
     PipetteName,
@@ -64,7 +60,7 @@ def piecewise_volume_conversion(
     raise IndexError()
 
 
-class Pipette(AbstractInstrument[PipetteConfigurations]):
+class Pipette(AbstractInstrument[PipetteConfigurations], InstrumentCalibrationHandlerProvider[RobotType]):
     """A class to gather and track pipette state and configs.
 
     This class should not touch hardware or call back out to the hardware

@@ -14,11 +14,7 @@ from opentrons.hardware_control.types import (
     InstrumentFWInfo,
 )
 from opentrons.hardware_control.errors import InvalidMoveError
-from .instrument_calibration import (
-    GripperCalibrationOffset,
-    load_gripper_calibration_offset,
-    save_gripper_calibration_offset,
-)
+from opentrons.calibration_storage.instrument_calibration_provider import InstrumentCalibrationHandlerProvider
 from ..instrument_abc import AbstractInstrument
 from opentrons.hardware_control.dev_types import AttachedGripper, GripperDict
 
@@ -34,7 +30,7 @@ RECONFIG_KEYS = {"quirks"}
 mod_log = logging.getLogger(__name__)
 
 
-class Gripper(AbstractInstrument[GripperDefinition]):
+class Gripper(AbstractInstrument[GripperDefinition], InstrumentCalibrationHandlerProvider[RobotType]):
     """A class to gather and track gripper state and configs.
 
     This class should not touch hardware or call back out to the hardware
