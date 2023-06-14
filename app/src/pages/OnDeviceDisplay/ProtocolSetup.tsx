@@ -225,12 +225,16 @@ const PLAY_BUTTON_STYLE = css`
   }
 `
 interface PlayButtonProps {
-  disabled: boolean
   ready: boolean
   onPlay: () => void
+  disabled?: boolean
 }
 
-function PlayButton({ disabled, onPlay, ready }: PlayButtonProps): JSX.Element {
+function PlayButton({
+  disabled = false,
+  onPlay,
+  ready,
+}: PlayButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
@@ -422,13 +426,12 @@ function PrepareToRun({
         boxShadow={isScrolled ? BORDERS.shadowBig : undefined}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
-        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40} ${SPACING.spacing40}`}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         position={POSITION_STICKY}
         top={0}
         backgroundColor={COLORS.white}
         overflowY="hidden"
-        marginLeft={`-${SPACING.spacing32}`}
-        marginRight={`-${SPACING.spacing32}`}
+        marginX={`-${SPACING.spacing32}`}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
@@ -467,8 +470,7 @@ function PrepareToRun({
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
-        paddingLeft={SPACING.spacing8}
-        paddingRight={SPACING.spacing8}
+        paddingX={SPACING.spacing8}
       >
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('instruments')}
@@ -595,7 +597,7 @@ function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
         </Flex>
         <Flex gridGap={SPACING.spacing24}>
           <CloseButton onClose={() => props.cancelAndClose()} />
-          <PlayButton disabled onPlay={() => {}} ready={false} />
+          <PlayButton onPlay={() => {}} ready={false} />
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
