@@ -35,6 +35,7 @@ from ..commands import (
 )
 from ..types import (
     DeckSlotLocation,
+    OnLabwareLocation,
     Dimensions,
     LabwareOffset,
     LabwareOffsetVector,
@@ -255,6 +256,17 @@ class LabwareView(HasState[LabwareState]):
         raise errors.exceptions.LabwareNotLoadedOnModuleError(
             "There is no labware loaded on this Module"
         )
+
+    def raise_if_labware_is_not_on_top(self, labware_id: str) -> None:
+        """Raise if labware has another labware on top."""
+        for labware in self._state.labware_by_id.values():
+            if (
+                isinstance(labware.location, OnLabwareLocation)
+                and labware.location.labwareId == labware_id
+            ):
+                raise errors.LabwareIsInStackError(
+                    f"Cannot move to labware {labware_id}, labware has other labware stacked on top."
+                )
 
     # TODO(mc, 2022-12-09): enforce data integrity (e.g. one labware per slot)
     # rather than shunting this work to callers via `allowed_ids`.

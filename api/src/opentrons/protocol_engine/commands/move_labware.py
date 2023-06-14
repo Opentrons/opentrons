@@ -7,6 +7,7 @@ from typing_extensions import Literal
 
 from ..types import (
     LabwareLocation,
+    OnLabwareLocation,
     LabwareMovementStrategy,
     LabwareOffsetVector,
     ExperimentalOffsetData,
@@ -99,6 +100,15 @@ class MoveLabwareImplementation(
         empty_new_location = self._state_view.geometry.ensure_location_not_occupied(
             labware_id=params.labwareId, location=params.newLocation
         )
+
+        # Check that labware and destination do not have labware on top
+        self._state_view.labware.raise_if_labware_is_not_on_top(
+            labware_id=params.labwareId
+        )
+        if isinstance(params.newLocation, OnLabwareLocation):
+            self._state_view.labware.raise_if_labware_is_not_on_top(
+                params.newLocation.labwareId
+            )
 
         # Allow propagation of ModuleNotLoadedError.
         new_offset_id = self._equipment.find_applicable_labware_offset_id(

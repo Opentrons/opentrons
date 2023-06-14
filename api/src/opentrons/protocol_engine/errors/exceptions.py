@@ -79,6 +79,10 @@ class LabwareCannotBeStackedError(ProtocolEngineError):
     """Raised when trying to load labware onto another labware it is not defined to be loaded onto."""
 
 
+class LabwareIsInStackError(ProtocolEngineError):
+    """Raised when trying to move to or physically interact with a labware that has another labware on top."""
+
+
 class LabwareOffsetDoesNotExistError(ProtocolEngineError):
     """Raised when referencing a labware offset that does not exist."""
 
