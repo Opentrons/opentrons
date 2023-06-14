@@ -58,9 +58,9 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
             "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
         },
         "Y": {
-            "SPEED": {"MIN": 325, "MAX": 325, "INC": 1},
-            "ACCEL": {"MIN": 500, "MAX": 500, "INC": 1},
-            "CURRENT": {"MIN": 1.4, "MAX": 1.4, "INC": 0.1},
+            "SPEED": {"MIN": 325, "MAX": 425, "INC": 100},
+            "ACCEL": {"MIN": 500, "MAX": 600, "INC": 100},
+            "CURRENT": {"MIN": 1.4, "MAX": 1.4, "INC": 0},
         },
         "L": {
             "SPEED": {"MIN": 40, "MAX": 140, "INC": 30},
@@ -432,9 +432,13 @@ def parameter_range(test_load: GantryLoad, test_axis: str, p_type: str) -> np.nd
     """Makes a range of a parameter based on start, stop, step."""
     start = TEST_PARAMETERS[test_load][test_axis][p_type]["MIN"]
     step = TEST_PARAMETERS[test_load][test_axis][p_type]["INC"]
-    # add step to stop to make range inclusive
-    stop = TEST_PARAMETERS[test_load][test_axis][p_type]["MAX"] + step
-    return np.arange(start, stop, step)
+
+    if step == 0:
+        return np.array([start])
+    else:
+        # add step to stop to make range inclusive
+        stop = TEST_PARAMETERS[test_load][test_axis][p_type]["MAX"] + step
+        return np.arange(start, stop, step)
 
 
 table_results_key: Dict[str, Dict[float, int]] = {}
