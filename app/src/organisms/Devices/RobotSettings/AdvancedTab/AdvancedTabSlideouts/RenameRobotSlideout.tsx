@@ -26,6 +26,7 @@ import { Slideout } from '../../../../../atoms/Slideout'
 import { StyledText } from '../../../../../atoms/text'
 import { InputField } from '../../../../../atoms/InputField'
 import { Banner } from '../../../../../atoms/Banner'
+import { useIsOT3 } from '../../../hooks'
 
 import type { UpdatedRobotName } from '@opentrons/api-client'
 import type { State, Dispatch } from '../../../../../redux/types'
@@ -55,6 +56,7 @@ export function RenameRobotSlideout({
   const [previousRobotName, setPreviousRobotName] = React.useState<string>(
     robotName
   )
+  const isOt3 = useIsOT3(robotName)
   const trackEvent = useTrackEvent()
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
@@ -144,9 +146,11 @@ export function RenameRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <Banner type="informing" marginBottom={SPACING.spacing16}>
-          {t('rename_robot_prefer_usb_connection')}
-        </Banner>
+        {isOt3 ? null : (
+          <Banner type="informing" marginBottom={SPACING.spacing16}>
+            {t('rename_robot_prefer_usb_connection')}
+          </Banner>
+        )}
         <StyledText as="p" marginBottom={SPACING.spacing16}>
           {t('rename_robot_input_limitation_detail')}
         </StyledText>
@@ -170,7 +174,11 @@ export function RenameRobotSlideout({
           {t('characters_max')}
         </StyledText>
         {formik.errors.newRobotName && (
-          <StyledText as="label" color={COLORS.errorEnabled}>
+          <StyledText
+            as="label"
+            color={COLORS.errorEnabled}
+            marginTop={SPACING.spacing4}
+          >
             {formik.errors.newRobotName}
           </StyledText>
         )}
