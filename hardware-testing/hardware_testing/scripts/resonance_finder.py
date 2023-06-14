@@ -158,7 +158,7 @@ SETTINGS = {
         acceleration=ACCEL,
         max_start_stop_speed=10,
         max_change_dir_speed=5,
-        hold_current=0.7,
+        hold_current=0.3,
         run_current=1.5
     ),
     OT3Axis.Y: GantryLoadSettings(
@@ -166,7 +166,7 @@ SETTINGS = {
         acceleration=ACCEL,
         max_start_stop_speed=10,
         max_change_dir_speed=5,
-        hold_current=0.7,
+        hold_current=0.3,
         run_current=1.5
     ),
     OT3Axis.Z_L: GantryLoadSettings(
@@ -301,7 +301,8 @@ async def _single_axis_move(axis, api: OT3API, cycles: int = 1) -> None:
 
 
     #move away from the limit switch before cycling
-    #await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
+    # await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
+    # await api.move_rel(mount=MOUNT, delta={'Y': Point(y=-100)}, speed=80)
 
     for c in range(cycles):
         #move away from homed position

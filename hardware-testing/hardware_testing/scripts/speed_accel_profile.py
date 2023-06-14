@@ -89,12 +89,12 @@ TEST_PARAMETERS = {
                 'MAX': 375,
                 'INC': 50},
             'ACCEL': {
-                'MIN': 700,
+                'MIN': 500,
                 'MAX': 900,
                 'INC': 100},
             'CURRENT': {
-                'MIN': 1.0,
-                'MAX': 1.4,
+                'MIN': 0.7,
+                'MAX': 1.5,
                 'INC': 0.2}},
         'Y': {
             'SPEED': {
@@ -146,7 +146,7 @@ SETTINGS = {
         acceleration=1000,
         max_start_stop_speed=10,
         max_change_dir_speed=5,
-        hold_current=0.7,
+        hold_current=0.3,
         run_current=START_CURRENT
     ),
     OT3Axis.Y: GantryLoadSettings(
@@ -154,7 +154,7 @@ SETTINGS = {
         acceleration=1000,
         max_start_stop_speed=10,
         max_change_dir_speed=5,
-        hold_current=0.7,
+        hold_current=0.3,
         run_current=START_CURRENT
     ),
     OT3Axis.Z_L: GantryLoadSettings(
