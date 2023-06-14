@@ -31,7 +31,7 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
 
   const disableProceed =
     values.fields.name == null ||
-    values.fields.name == '' ||
+    values.fields.name === '' ||
     !Boolean(touched?.fields?.name) ||
     errors?.fields?.name != null
 
@@ -114,7 +114,7 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
         width="100%"
       >
         <GoBackLink onClick={() => goBack()} />
-        <PrimaryButton onClick={proceed} disabled={disableProceed}>
+        <PrimaryButton onClick={() => proceed()} disabled={disableProceed}>
           {i18n.format(t('shared.next'), 'capitalize')}
         </PrimaryButton>
       </Flex>

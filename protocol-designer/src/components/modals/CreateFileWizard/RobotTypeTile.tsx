@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { DIRECTION_COLUMN, Flex, SPACING, TYPOGRAPHY, Text, COLORS, BORDERS, JUSTIFY_CENTER, ALIGN_CENTER, RESPONSIVENESS, DIRECTION_ROW, JUSTIFY_FLEX_START, JUSTIFY_SPACE_BETWEEN, ALIGN_STRETCH, PrimaryButton, JUSTIFY_FLEX_END } from '@opentrons/components'
+import { DIRECTION_COLUMN, Flex, SPACING, TYPOGRAPHY, Text, COLORS, BORDERS, JUSTIFY_CENTER, ALIGN_CENTER, RESPONSIVENESS, DIRECTION_ROW, JUSTIFY_FLEX_START, JUSTIFY_SPACE_BETWEEN, PrimaryButton, JUSTIFY_FLEX_END } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import opentronsFlexImage from '../../../images/OpentronsFlex.png'
 import OT2Image from '../../../images/OT2.png'
@@ -32,7 +32,7 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
         </Flex>
       </Flex>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END} width="100%">
-        <PrimaryButton onClick={proceed}>{i18n.format(t('shared.next'), 'capitalize')}</PrimaryButton>
+        <PrimaryButton onClick={() => proceed()}>{i18n.format(t('shared.next'), 'capitalize')}</PrimaryButton>
       </Flex>
     </Flex>
   )

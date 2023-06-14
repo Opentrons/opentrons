@@ -111,13 +111,15 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
         <GoBackLink
           onClick={() => {
             if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
+              goBack(3)
+            } else if (props.values.pipettesByMount.right.pipetteName == null) {
               goBack(2)
             } else {
               goBack()
             }
           }}
         />
-        <PrimaryButton onClick={proceed}>{t('modal.create_file_wizard.create_protocol_on_to_liquids')}</PrimaryButton>
+        <PrimaryButton onClick={() => proceed()}>{t('modal.create_file_wizard.create_protocol_on_to_liquids')}</PrimaryButton>
       </Flex>
     </Flex>
   )

@@ -76,6 +76,7 @@
     "choose_first_pipette": "Choose first pipette",
     "choose_second_pipette": "Choose second pipette",
     "choose_robot_type": "Choose robot type",
+    "choose_tips_for_pipette": "Choose tips for {{pipetteName}} on {{mount}} mount",
     "create_new_protocol": "Create New Protocol",
     "create_protocol_on_to_liquids": "Create Protocol, on to Liquids",
     "name_your_protocol": "Name your protocol.",

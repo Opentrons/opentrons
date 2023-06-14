@@ -16,6 +16,6 @@ export interface FormState {
 }
 
 export interface WizardTileProps extends FormikProps<FormState> {
-  proceed: () => void
+  proceed: (stepsForward?: number) => void
   goBack: (stepsBack?: number) => void
 }

@@ -43,26 +43,33 @@ import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
 import { RobotTypeTile } from './RobotTypeTile'
 import { MetadataTile } from './MetadataTile'
-import { FirstPipetteTile, SecondPipetteTile } from './PipetteTile'
+import { FirstPipetteTypeTile, SecondPipetteTypeTile } from './PipetteTypeTile'
+import { FirstPipetteTipsTile, SecondPipetteTipsTile } from './PipetteTipsTile'
 import { ModulesAndOtherTile } from './ModulesAndOtherTile'
 import { WizardHeader } from './WizardHeader'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
 
+
 type WizardStep =
   | 'robotType'
   | 'metadata'
-  | 'first_pipette'
-  | 'second_pipette'
+  | 'first_pipette_type'
+  | 'first_pipette_tips'
+  | 'second_pipette_type'
+  | 'second_pipette_tips'
   | 'modulesAndOther'
 const WIZARD_STEPS: WizardStep[] = [
   'robotType',
   'metadata',
-  'first_pipette',
-  'second_pipette',
-  'modulesAndOther',
+  'first_pipette_type',
+  'first_pipette_tips',
+  'second_pipette_type',
+  'second_pipette_tips',
+  'modulesAndOther'
 ]
+
 export function CreateFileWizard(): JSX.Element | null {
   const { t } = useTranslation()
   const showWizard = useSelector(getNewProtocolModal)
@@ -93,13 +100,13 @@ export function CreateFileWizard(): JSX.Element | null {
           formPipette.tiprackDefURI != null &&
           (mount === 'left' || mount === 'right')
           ? [
-              ...acc,
-              {
-                mount,
-                name: formPipette.pipetteName as PipetteName,
-                tiprackDefURI: formPipette.tiprackDefURI,
-              },
-            ]
+            ...acc,
+            {
+              mount,
+              name: formPipette.pipetteName as PipetteName,
+              tiprackDefURI: formPipette.tiprackDefURI,
+            },
+          ]
           : acc
       },
       []
@@ -110,13 +117,13 @@ export function CreateFileWizard(): JSX.Element | null {
     ).reduce<ModuleCreationArgs[]>((acc, [moduleType, formModule]) => {
       return formModule?.onDeck
         ? [
-            ...acc,
-            {
-              type: moduleType as ModuleType,
-              model: formModule.model || ('' as ModuleModel),
-              slot: formModule.slot,
-            },
-          ]
+          ...acc,
+          {
+            type: moduleType as ModuleType,
+            model: formModule.model || ('' as ModuleModel),
+            slot: formModule.slot,
+          },
+        ]
         : acc
     }, [])
     const heaterShakerIndex = modules.findIndex(
@@ -204,8 +211,10 @@ export function CreateFileWizard(): JSX.Element | null {
       setCurrentStepIndex(currentStepIndex - stepsBack)
     }
   }
-  const proceed = (): void => {
-    setCurrentStepIndex(currentStepIndex + 1)
+  const proceed = (stepsForward: number = 1): void => {
+    if ((currentStepIndex + stepsForward) < WIZARD_STEPS.length) {
+      setCurrentStepIndex(currentStepIndex + stepsForward)
+    }
   }
 
   return showWizard ? (
@@ -336,11 +345,17 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     metadata: (formikProps: FormikProps<FormState>) => (
       <MetadataTile {...{ ...formikProps, proceed, goBack }} />
     ),
-    first_pipette: (formikProps: FormikProps<FormState>) => (
-      <FirstPipetteTile {...{ ...formikProps, proceed, goBack }} />
+    first_pipette_type: (formikProps: FormikProps<FormState>) => (
+      <FirstPipetteTypeTile {...{ ...formikProps, proceed, goBack }} />
     ),
-    second_pipette: (formikProps: FormikProps<FormState>) => (
-      <SecondPipetteTile {...{ ...formikProps, proceed, goBack }} />
+    first_pipette_tips: (formikProps: FormikProps<FormState>) => (
+      <FirstPipetteTipsTile {...{ ...formikProps, proceed, goBack }} />
+    ),
+    second_pipette_type: (formikProps: FormikProps<FormState>) => (
+      <SecondPipetteTypeTile {...{ ...formikProps, proceed, goBack }} />
+    ),
+    second_pipette_tips: (formikProps: FormikProps<FormState>) => (
+      <SecondPipetteTipsTile {...{ ...formikProps, proceed, goBack }} />
     ),
     modulesAndOther: (formikProps: FormikProps<FormState>) => (
       <ModulesAndOtherTile
@@ -355,11 +370,11 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     <Formik
       enableReinitialize
       initialValues={initialFormState}
-      onSubmit={() => {}}
+      onSubmit={() => { }}
       validationSchema={validationSchema}
     >
       {(formikProps: FormikProps<FormState>) => {
-        const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
           const { name, value } = e.target
           formikProps.setFieldValue(name, value)
           formikProps.setFieldTouched(name, true)
