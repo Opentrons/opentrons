@@ -21,12 +21,13 @@ import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
 } from '../step-forms'
+import { getRobotModelFromPipettes } from '../file-data/selectors'
+import { stepIconsByType, StepType } from '../form-types'
 import {
   ConfirmDeleteModal,
   CLOSE_UNSAVED_STEP_FORM,
 } from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
-import { stepIconsByType, StepType } from '../form-types'
 import styles from './listButtons.css'
 
 interface StepButtonComponentProps {
@@ -124,6 +125,9 @@ export const StepCreationButton = (): JSX.Element => {
   )
   const isStepCreationDisabled = useSelector(getIsMultiSelectMode)
   const modules = useSelector(stepFormSelectors.getInitialDeckSetup).modules
+  const pipettes = useSelector(stepFormSelectors.getInitialDeckSetup).pipettes
+  const isOt3 = getRobotModelFromPipettes(pipettes).model === 'OT-3 Standard'
+
   const isStepTypeEnabled: Record<
     Exclude<StepType, 'manualIntervention'>,
     boolean
@@ -150,22 +154,29 @@ export const StepCreationButton = (): JSX.Element => {
   ): ReturnType<typeof stepsActions.addAndSelectStepWithHints> =>
     dispatch(stepsActions.addAndSelectStepWithHints({ stepType }))
 
-  const items = getSupportedSteps().map(stepType => (
-    <StepButtonItem
-      key={stepType}
-      stepType={stepType}
-      disabled={!isStepTypeEnabled[stepType]}
-      onClick={() => {
-        setExpanded(false)
+  const items = getSupportedSteps()
+    .filter(stepType => {
+      if (!isOt3 && stepType === 'moveLabware') {
+        return false
+      }
+      return true
+    })
+    .map(stepType => (
+      <StepButtonItem
+        key={stepType}
+        stepType={stepType}
+        disabled={!isStepTypeEnabled[stepType]}
+        onClick={() => {
+          setExpanded(false)
 
-        if (currentFormIsPresaved || formHasChanges) {
-          setEnqueuedStepType(stepType)
-        } else {
-          addStep(stepType)
-        }
-      }}
-    />
-  ))
+          if (currentFormIsPresaved || formHasChanges) {
+            setEnqueuedStepType(stepType)
+          } else {
+            addStep(stepType)
+          }
+        }}
+      />
+    ))
 
   return (
     <>
