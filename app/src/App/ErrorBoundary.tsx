@@ -33,7 +33,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInformation: React.ErrorInfo): void {
-    console.log(`error: ${error}`) // ToDo send the error to robot logs
+    console.log(error) // ToDo send the error to robot logs
     this.setState({ errorInformation })
   }
 

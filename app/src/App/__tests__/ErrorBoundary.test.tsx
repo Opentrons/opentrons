@@ -12,7 +12,7 @@ const ChildWithoutError = () => {
 }
 
 describe('ErrorBoundary', () => {
-  it('should render text', () => {
+  it('should render text when an error happens', () => {
     render(
       <ErrorBoundary>
         <ErrorChild />
@@ -22,7 +22,7 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('Reload the app')).toBeInTheDocument()
   })
 
-  it('should render text', () => {
+  it('should render text when an error does not happen', () => {
     render(
       <ErrorBoundary>
         <ChildWithoutError />
