@@ -1,16 +1,16 @@
 from fastapi import APIRouter, Query, Response
-from typing import Dict, List
+from typing import Dict
 
 from opentrons.system import log_control
 from robot_server.service.legacy.models.logs import LogIdentifier, LogFormat
 
 router = APIRouter()
 
-IDENTIFIER_TO_SYSLOG_ID: Dict[LogIdentifier, List[str]] = {
-    LogIdentifier.api: ["opentrons-api"],
-    LogIdentifier.serial: ["opentrons-api-serial"],
-    LogIdentifier.server: ["uvicorn"],
-    LogIdentifier.api_server: ["uvicorn", "opentrons-api"],
+IDENTIFIER_TO_SYSLOG_ID: Dict[LogIdentifier, str] = {
+    LogIdentifier.api: "opentrons-api",
+    LogIdentifier.serial: "opentrons-api-serial",
+    LogIdentifier.server: "uvicorn",
+    LogIdentifier.api_server: "opentrons-robot-server",
 }
 
 
