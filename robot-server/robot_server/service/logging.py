@@ -71,13 +71,18 @@ def _robot_log_config(log_level: int) -> Dict[str, Any]:
                 "level": log_level,
                 "propagate": False,
             },
+            "uvicorn": {
+                "handlers": ["syslog_plus_unit"],
+                "level": log_level,
+                "propagate": False,
+            },
             "fastapi": {
-                "handlers": ["unit_only"],
+                "handlers": ["syslog_plus_unit"],
                 "level": log_level,
                 "propagate": False,
             },
             "starlette": {
-                "handlers": ["unit_only"],
+                "handlers": ["syslog_plus_unit"],
                 "level": log_level,
                 "propagate": False,
             },
