@@ -19,8 +19,6 @@ interface JSONErrorBody {
   category: ErrorCategories
 }
 
-export type ErrorDefinitions = Map<ErrorCodes, ErrorBody>
-
 export function getError(code: ErrorCodes): ErrorBody | null {
   return errorDefinitions.codes[code]
     ? {
