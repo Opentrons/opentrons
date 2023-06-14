@@ -1,34 +1,61 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { DIRECTION_COLUMN, Flex, Text, SPACING, BORDERS, TYPOGRAPHY, JUSTIFY_SPACE_BETWEEN, ALIGN_CENTER, SecondaryButton, PrimaryButton } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  Text,
+  SPACING,
+  BORDERS,
+  TYPOGRAPHY,
+  JUSTIFY_SPACE_BETWEEN,
+  ALIGN_CENTER,
+  PrimaryButton,
+} from '@opentrons/components'
 import { InputField } from './InputField'
+import { GoBackLink } from './GoBackLink'
 
 import type { WizardTileProps } from './types'
-import { GoBackLink } from './GoBackLink'
 
 export function MetadataTile(props: WizardTileProps): JSX.Element {
   const { i18n, t } = useTranslation()
-  const { handleChange, handleBlur, values, goBack, proceed, errors, touched } = props
+  const {
+    handleChange,
+    handleBlur,
+    values,
+    goBack,
+    proceed,
+    errors,
+    touched,
+  } = props
 
-  const disableProceed = values.fields.name == null || !Boolean(touched?.fields?.name) || errors?.fields?.name != null
+  const disableProceed =
+    values.fields.name == null ||
+    values.fields.name == '' ||
+    !Boolean(touched?.fields?.name) ||
+    errors?.fields?.name != null
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
-      <Flex flexDirection={DIRECTION_COLUMN} height='26rem' gridGap={SPACING.spacing24}>
-        <Text as='h2'>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        height="26rem"
+        gridGap={SPACING.spacing24}
+      >
+        <Text as="h2">
           {t('modal.create_file_wizard.protocol_name_and_description')}
         </Text>
 
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-          <Text as='h4'>
+          <Text as="h4">
             {t('modal.create_file_wizard.name_your_protocol')}
           </Text>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             width="20rem"
             minHeight="74px" // leave room for error if present
-            gridGap={SPACING.spacing4}>
+            gridGap={SPACING.spacing4}
+          >
             <Text as="p">
               {`${t('modal.create_file_wizard.protocol_name')} *`}
             </Text>
@@ -38,23 +65,25 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               value={values.fields.name}
               onChange={handleChange}
               onBlur={handleBlur}
-              error={touched?.fields?.name != null ? errors?.fields?.name ?? null : null}
+              error={
+                touched?.fields?.name &&
+                values.fields.name &&
+                values.fields.name.length > 1
+                  ? errors?.fields?.name ?? null
+                  : null
+              }
             />
           </Flex>
         </Flex>
 
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-          <Text as='h4'>
-            {t('modal.create_file_wizard.add_optional_info')}
-          </Text>
+          <Text as="h4">{t('modal.create_file_wizard.add_optional_info')}</Text>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             width="30rem"
             gridGap={SPACING.spacing4}
           >
-            <Text as="p">
-              {t('modal.create_file_wizard.description')}
-            </Text>
+            <Text as="p">{t('modal.create_file_wizard.description')}</Text>
             <DescriptionField
               name="fields.description"
               value={values.fields.description ?? ''}
@@ -79,7 +108,11 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
           </Flex>
         </Flex>
       </Flex>
-      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+      <Flex
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        width="100%"
+      >
         <GoBackLink onClick={() => goBack()} />
         <PrimaryButton onClick={proceed} disabled={disableProceed}>
           {i18n.format(t('shared.next'), 'capitalize')}
@@ -92,7 +125,6 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
 const DescriptionField = styled.textarea`
   min-height: 5rem;
   width: 100%;
-  background-color: #f8f8f8;
   border: ${BORDERS.lineBorder};
   border-radius: ${BORDERS.radiusSoftCorners};
   padding: ${SPACING.spacing8};

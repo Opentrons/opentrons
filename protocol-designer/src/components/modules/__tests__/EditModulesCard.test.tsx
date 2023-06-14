@@ -196,11 +196,13 @@ describe('EditModulesCard', () => {
     })
   })
 
-  it('displays module row with module to add when no moduleData', () => {
+  it('displays module row with module to add when no moduleData for OT-2', () => {
     const wrapper = render(props)
-
+    const SUPPORTED_MODULE_TYPES_FILTERED = SUPPORTED_MODULE_TYPES.filter(
+      moduleType => moduleType !== 'magneticBlockType'
+    )
     expect(wrapper.find(ModuleRow)).toHaveLength(4)
-    SUPPORTED_MODULE_TYPES.forEach(moduleType => {
+    SUPPORTED_MODULE_TYPES_FILTERED.forEach(moduleType => {
       expect(
         wrapper.find(ModuleRow).filter({ type: moduleType }).props()
       ).toEqual({
