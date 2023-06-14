@@ -103,7 +103,6 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       ? BORDERS.borderRadiusSize5
       : BORDERS.borderRadiusSize4};
     box-shadow: none;
-    padding: ${SPACING.spacing16} ${SPACING.spacing24};
     ${TYPOGRAPHY.pSemiBold}
 
     &:focus {
@@ -141,6 +140,11 @@ export function SmallButton(props: SmallButtonProps): JSX.Element {
       css={SMALL_BUTTON_STYLE}
       aria-label={`SmallButton_${buttonType}`}
       disabled={disabled}
+      padding={
+        iconPlacement != null
+          ? SPACING.spacing16
+          : `${SPACING.spacing16} ${SPACING.spacing24}`
+      }
       {...buttonProps}
     >
       <Flex

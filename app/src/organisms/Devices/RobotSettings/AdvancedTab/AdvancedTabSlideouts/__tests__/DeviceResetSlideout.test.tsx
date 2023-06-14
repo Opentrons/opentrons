@@ -73,22 +73,19 @@ describe('RobotSettings DeviceResetSlideout', () => {
     jest.resetAllMocks()
   })
 
-  it('should render title, description, checkboxes, links and button', () => {
+  it('should render title, description, checkboxes, links and button: OT-2', () => {
     const [{ getByText, getByRole, getAllByText, getByTestId }] = render()
     getByText('Device Reset')
-    getByText('Select the robot data to clear.')
-    getByText('Factory resets cannot be undone.')
+    getByText('Resets cannot be undone')
+    getByText('Clear individual data')
+    getByText('Select individual settings to only clear specific data types.')
     getByText('Robot Calibration Data')
-    getByText(
-      'Resetting Deck and/or Tip Length Calibration data will also clear Pipette Offset Calibration data.'
-    )
     getByText('Clear deck calibration')
     getByText('Clear pipette offset calibrations')
     getByText('Clear tip length calibrations')
-    getByText('Protocol Run History')
-    getByText('Resetting run history will also clear Labware Offset data.')
+    getByText('Protocol run History')
     getByText('Clear protocol run history')
-    getByText('Boot Scripts')
+    getByText('Boot scripts')
     getByText('Clear custom boot scripts')
     const downloads = getAllByText('Download')
     expect(downloads.length).toBe(2)
@@ -101,9 +98,17 @@ describe('RobotSettings DeviceResetSlideout', () => {
     getByTestId('Slideout_icon_close_Device Reset')
   })
 
-  it('should change some options and text for the OT-3', () => {
+  it('should change some options and text for Flex', () => {
     mockUseIsOT3.mockReturnValue(true)
     const [{ getByText, getByRole, queryByRole, queryByText }] = render()
+    getByText('Factory Reset')
+    getByText(
+      'Resets all settings. You’ll have to redo initial setup before using the robot again.'
+    )
+    getByText('Clear all stored data')
+    getByText(
+      'Clears instrument calibrations and protocols. Keeps robot name and network settings.'
+    )
 
     expect(
       queryByText(
