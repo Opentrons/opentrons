@@ -310,6 +310,7 @@ export function makeInitialRobotState(args: {
     moduleLocations = {},
     pipetteLocations,
   } = args
+  console.log('make initial', {invariantContext, labwareLocations, moduleLocations, pipetteLocations})
   return {
     labware: labwareLocations,
     modules: moduleLocations,

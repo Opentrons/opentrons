@@ -11,6 +11,7 @@ import {
   FONT_WEIGHT_BOLD,
   TEXT_TRANSFORM_UPPERCASE,
   RobotWorkSpaceRenderProps,
+  Module,
 } from '@opentrons/components'
 import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
 import {
@@ -22,6 +23,10 @@ import {
   ModuleType,
   getDeckDefFromRobotType,
   OT2_ROBOT_TYPE,
+  getModuleDef2,
+  inferModuleOrientationFromXCoordinate,
+  getModuleType,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'
@@ -263,11 +268,16 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
 
         return (
           <React.Fragment key={slot.id}>
-            <ModuleViz
+            <Module 
               x={moduleX}
               y={moduleY}
-              orientation={orientation}
-              moduleType={moduleOnDeck.type}
+              def={getModuleDef2(moduleOnDeck.model)}
+              orientation={inferModuleOrientationFromXCoordinate(slot.position[0])}
+              innerProps={
+                getModuleType(moduleOnDeck.model) === THERMOCYCLER_MODULE_TYPE
+                  ? { lidMotorState: 'open' }
+                  : {}
+              }
             />
             <ModuleTag
               x={moduleX}
