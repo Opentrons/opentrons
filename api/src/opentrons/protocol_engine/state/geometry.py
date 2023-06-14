@@ -147,14 +147,30 @@ class GeometryView:
                 f" since it is no longer on the deck."
             )
 
+    def _get_calibrated_module_offset(
+        self, location: LabwareLocation
+    ) -> ModuleOffsetVector:
+        """Get a labware location's underlying calibrated module offset, if it is on a module."""
+        if isinstance(location, ModuleLocation):
+            module_id = location.moduleId
+            return self._modules.get_module_calibration_offset(module_id)
+        elif isinstance(location, DeckSlotLocation):
+            return ModuleOffsetVector(x=0, y=0, z=0)
+        elif isinstance(location, OnLabwareLocation):
+            labware_data = self._labware.get(location.labwareId)
+            return self._get_calibrated_module_offset(labware_data.location)
+        elif location == OFF_DECK_LOCATION:
+            raise errors.LabwareNotOnDeckError(
+                "Labware does not have a slot or module associated with it"
+                " since it is no longer on the deck."
+            )
+
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the calibrated position of the labware's parent slot (deck or module)."""
         parent_pos = self.get_labware_parent_nominal_position(labware_id)
-        cal_offset = ModuleOffsetVector(x=0, y=0, z=0)
         labware_data = self._labware.get(labware_id)
-        if isinstance(labware_data.location, ModuleLocation):
-            module_id = labware_data.location.moduleId
-            cal_offset = self._modules.get_module_calibration_offset(module_id)
+        cal_offset = self._get_calibrated_module_offset(labware_data.location)
+
         return Point(
             x=parent_pos.x + cal_offset.x,
             y=parent_pos.y + cal_offset.y,
@@ -397,9 +413,14 @@ class GeometryView:
         elif isinstance(location, OnLabwareLocation):
             location_slot = self.get_ancestor_slot_name(location.labwareId)
             labware_data = self._labware.get(labware_id)
-            offset = self._get_labware_position_offset(
-                labware_data
-            )  # TODO get actual offset with calib
+            labware_offset = self._get_labware_position_offset(labware_data)
+            # Get the calibrated offset if the on labware location is on top of a module, otherwise return empty one
+            cal_offset = self._get_calibrated_module_offset(labware_data.location)
+            offset = LabwareOffsetVector(
+                x=labware_offset.x + cal_offset.x,
+                y=labware_offset.y + cal_offset.y,
+                z=labware_offset.z + cal_offset.z,
+            )
         else:
             location_slot = location.slotName
         slot_center = self._labware.get_slot_center_position(location_slot)
