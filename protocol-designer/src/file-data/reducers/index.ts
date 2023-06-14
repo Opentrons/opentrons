@@ -72,6 +72,8 @@ function newProtocolMetadata(
   return {
     ...defaultFields,
     protocolName: action.payload.name || '',
+    description: action.payload.description || '',
+    author: action.payload.organizationOrAuthor|| '',
     created: Date.now(),
     lastModified: null,
   }
