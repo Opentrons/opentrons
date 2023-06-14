@@ -5,8 +5,8 @@ from typing import Optional
 import serial
 
 DURATION_SECONDS = 60
-LOW_VOLUME_RPM = 1400
-HIGH_VOLUME_RPM = 1000
+LOW_VOLUME_RPM = 1500
+HIGH_VOLUME_RPM = 1100
 
 ACK = "\r\n"
 TIMEOUT = 0.1
@@ -82,22 +82,23 @@ if __name__ == "__main__":
 
     shaker = HeaterShakerSerial(port=args.port)
     shaker.connect()
+    assert 0.1 < args.volume <= 250, f"unexpected volume: {args.volume} uL"
+    rpm = HIGH_VOLUME_RPM if args.volume > 200 else LOW_VOLUME_RPM
     try:
         shaker.open_plate_lock()
         print("\n\n")
-        print(f"VOLUME: {args.volume}\n\n")
-        print("check that volume is correct ^^^\n")
-        input("Insert plate, press ENTER when ready: ")
+        print(f"\tVOLUME: {args.volume}")
+        print(f"\tRPM: {rpm}")
+        print("\n\n")
+        input("insert plate, press ENTER when ready: ")
         shaker.close_plate_lock()
         time.sleep(1)
-        if args.volume > 200:
-            shaker.set_rpm(HIGH_VOLUME_RPM)
-        else:
-            shaker.set_rpm(LOW_VOLUME_RPM)
+        print("starting...")
+        shaker.set_rpm(rpm)
         for i in range(DURATION_SECONDS):
-            print(f"Seconds {i + 1}/{DURATION_SECONDS}")
+            print(f"seconds: {i + 1}/{DURATION_SECONDS}")
             time.sleep(1)
     finally:
         shaker.home_plate()
         shaker.open_plate_lock()
-    print("Done")
+    print("done")
