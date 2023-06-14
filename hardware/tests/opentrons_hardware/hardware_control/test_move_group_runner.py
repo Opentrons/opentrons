@@ -1,6 +1,5 @@
 """Tests for the move scheduler."""
 import pytest
-import logging
 from typing import List, Any, Tuple
 from numpy import float64, float32, int32
 from mock import AsyncMock, call, MagicMock, patch
