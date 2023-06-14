@@ -481,6 +481,12 @@ export function ProtocolSetup(): JSX.Element {
     configBypassHeaterShakerAttachmentConfirmation
   )
 
+  console.log(
+    'configBypassHeaterShakerAttachmentConfirmation',
+    configBypassHeaterShakerAttachmentConfirmation
+  )
+  console.log('showConfirmationModal', showConfirmationModal)
+
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
     'prepare to run'
