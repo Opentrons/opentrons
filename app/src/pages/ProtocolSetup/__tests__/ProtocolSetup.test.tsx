@@ -33,7 +33,7 @@ import {
   useRunControls,
   useRunStatus,
 } from '../../../organisms/RunTimeControl/hooks'
-import { ProtocolSetup } from '../ProtocolSetup'
+import { ProtocolSetup } from '..'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 

@@ -1,25 +1,27 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useHistory, useParams } from 'react-router-dom'
 import first from 'lodash/first'
 
 import {
-  Btn,
-  Flex,
-  Icon,
   ALIGN_CENTER,
+  BORDERS,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
+  POSITION_STICKY,
+  SPACING,
   TEXT_ALIGN_RIGHT,
   truncateString,
   TYPOGRAPHY,
-  BORDERS,
-  SPACING,
-  POSITION_STICKY,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import {
   useProtocolQuery,
@@ -54,8 +56,14 @@ import {
 } from '../../organisms/ProtocolSetupInstruments/utils'
 import { useRunControls } from '../../organisms/RunTimeControl/hooks'
 import { useToaster } from '../../organisms/ToasterOven'
-import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
+import { getLabwareSetupItemGroups } from '../Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../redux/analytics'
+import { getIsHeaterShakerAttached } from '../../redux/config'
+import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
@@ -456,6 +464,22 @@ export type SetupScreens =
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
+  const trackEvent = useTrackEvent()
+  const { play } = useRunControls(runId)
+  const handleProceedToRunClick = (): void => {
+    trackEvent({ name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN, properties: {} })
+    play()
+  }
+  const configBypassHeaterShakerAttachmentConfirmation = useSelector(
+    getIsHeaterShakerAttached
+  )
+  const {
+    showConfirmation: showConfirmationModal,
+    cancel: cancelExit,
+  } = useConditionalConfirm(
+    handleProceedToRunClick,
+    configBypassHeaterShakerAttachmentConfirmation
+  )
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
@@ -486,16 +510,25 @@ export function ProtocolSetup(): JSX.Element {
   }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      padding={
-        setupScreen === 'prepare to run'
-          ? `0 ${SPACING.spacing32} ${SPACING.spacing40}`
-          : `${SPACING.spacing32} ${SPACING.spacing40}`
-      }
-    >
-      {setupComponentByScreen[setupScreen]}
-    </Flex>
+    <>
+      {showConfirmationModal ? (
+        <ConfirmAttachedModal
+          onCloseClick={cancelExit}
+          isProceedToRunModal={true}
+          onConfirmClick={handleProceedToRunClick}
+        />
+      ) : null}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        padding={
+          setupScreen === 'prepare to run'
+            ? `0 ${SPACING.spacing32} ${SPACING.spacing40}`
+            : `${SPACING.spacing32} ${SPACING.spacing40}`
+        }
+      >
+        {setupComponentByScreen[setupScreen]}
+      </Flex>
+    </>
   )
 }
 

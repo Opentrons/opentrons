@@ -52,7 +52,7 @@ import type {
   LabwareLocation,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
-import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import type { SetupScreens } from '../../pages/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
 import type { LatchStatus } from '../../redux/modules/api-types'
 
