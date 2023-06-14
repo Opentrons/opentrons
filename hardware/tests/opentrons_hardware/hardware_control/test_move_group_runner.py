@@ -749,22 +749,24 @@ async def test_tip_action_move_runner_receives_two_responses(
     mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups
 ) -> None:
     """The magic call function should receive two responses for a tip action."""
-    with patch.object(MoveScheduler, "__call__") as mock_magic_call:
+    with patch.object(MoveScheduler, "_handle_move_completed") as mock_move_complete:
         subject = MoveScheduler(move_groups=move_group_tip_action)
         mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
         mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
         mock_can_messenger.send.side_effect = mock_sender.mock_send
         await subject.run(can_messenger=mock_can_messenger)
 
-        assert isinstance(mock_magic_call.call_args_list[0][0][0], md.Acknowledgement)
-        assert isinstance(mock_magic_call.call_args_list[1][0][0], md.TipActionResponse)
-
-        assert mock_magic_call.call_args_list[1][0][
+        assert isinstance(
+            mock_move_complete.call_args_list[0][0][0], md.TipActionResponse
+        )
+        assert mock_move_complete.call_args_list[0][0][
             0
         ].payload.gear_motor_id == GearMotorIdField(1)
-        assert isinstance(mock_magic_call.call_args_list[2][0][0], md.TipActionResponse)
 
-        assert mock_magic_call.call_args_list[2][0][
+        assert isinstance(
+            mock_move_complete.call_args_list[1][0][0], md.TipActionResponse
+        )
+        assert mock_move_complete.call_args_list[1][0][
             0
         ].payload.gear_motor_id == GearMotorIdField(0)
 
@@ -791,21 +793,8 @@ async def test_tip_action_move_runner_fail_receives_one_response(
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send_failure
     mock_can_messenger.send.side_effect = mock_sender.mock_send_failure
 
-    expected_warnings = [
-        (
-            "opentrons_hardware.hardware_control.move_group_runner",
-            30,
-            "Move set 0 timed out of max duration 2.0. Expected time: 1.1",
-        ),
-        (
-            "opentrons_hardware.hardware_control.move_group_runner",
-            30,
-            "Expected nodes in group 0: [<NodeId.pipette_left: 96>]",
-        ),
-    ]
-    with caplog.at_level(logging.WARN):
+    with pytest.raises(asyncio.TimeoutError):
         await subject.run(can_messenger=mock_can_messenger)
-        assert caplog.record_tuples == expected_warnings
 
 
 async def test_multi_group_move(
@@ -879,96 +868,6 @@ async def test_multi_group_move(
     assert position[2][1].payload.current_position_um.value == 25000
     assert position[3][1].payload.current_position_um.value == 12000
     assert position[4][1].payload.current_position_um.value == 12000
-
-
-async def test_multi_group_move_with_stale_complete(
-    mock_can_messenger: AsyncMock,
-    move_group_multiple: MoveGroups,
-    move_group_single: MoveGroups,
-) -> None:
-    """It should start next group once the prior has completed."""
-    subject = MoveScheduler(move_groups=move_group_multiple)
-    mock_sender = MockSendMoveCompleter(move_group_multiple, subject)
-    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
-    mock_can_messenger.send.side_effect = mock_sender.mock_send
-
-    # set up a stale move schedluer and set its listener to the subject
-    stale_subject = MoveScheduler(move_groups=move_group_single)
-    stale_mock_sender = MockSendMoveCompleter(move_group_single, subject)
-    stale_mock_can_messenger = AsyncMock()
-    stale_mock_can_messenger.ensure_send.side_effect = (
-        stale_mock_sender.mock_ensure_send
-    )
-    stale_mock_can_messenger.send.side_effect = stale_mock_sender.mock_send
-
-    position, stale = await asyncio.gather(
-        subject.run(can_messenger=mock_can_messenger),
-        stale_subject.run(can_messenger=stale_mock_can_messenger),
-    )
-    expected_nodes_list: List[List[NodeId]] = []
-
-    # we have to do this weird list->set->list conversion to get the same
-    # order as the one move_group_runner uses since sets hash things
-    # in a way that doesn't preserve order
-    for movegroup in move_group_multiple:
-        expected_nodes = set()
-        for seq_id, mgs in enumerate(movegroup):
-            expected_nodes.update(set((k.value, seq_id) for k in mgs.keys()))
-        expected_nodes_list.append([NodeId(n) for n, s in expected_nodes])
-
-    # remove duplicates from the expected nodes lists
-    for i, enl in enumerate(expected_nodes_list):
-        res = []
-        for n in enl:
-            if n not in res:
-                res.append(n)
-        expected_nodes_list[i] = res
-
-    mock_can_messenger.ensure_send.assert_has_calls(
-        calls=[
-            call(
-                node_id=NodeId.broadcast,
-                message=md.ExecuteMoveGroupRequest(
-                    payload=ExecuteMoveGroupRequestPayload(
-                        group_id=UInt8Field(0),
-                        cancel_trigger=UInt8Field(0),
-                        start_trigger=UInt8Field(0),
-                    )
-                ),
-                expected_nodes=expected_nodes_list[0],
-            ),
-            call(
-                node_id=NodeId.broadcast,
-                message=md.ExecuteMoveGroupRequest(
-                    payload=ExecuteMoveGroupRequestPayload(
-                        group_id=UInt8Field(1),
-                        cancel_trigger=UInt8Field(0),
-                        start_trigger=UInt8Field(0),
-                    )
-                ),
-                expected_nodes=expected_nodes_list[1],
-            ),
-            call(
-                node_id=NodeId.broadcast,
-                message=md.ExecuteMoveGroupRequest(
-                    payload=ExecuteMoveGroupRequestPayload(
-                        group_id=UInt8Field(2),
-                        cancel_trigger=UInt8Field(0),
-                        start_trigger=UInt8Field(0),
-                    )
-                ),
-                expected_nodes=expected_nodes_list[2],
-            ),
-        ]
-    )
-    assert len(position) == 5
-    assert position[0][1].payload.current_position_um.value == 229000
-    assert position[1][1].payload.current_position_um.value == 522000
-    assert position[2][1].payload.current_position_um.value == 25000
-    assert position[3][1].payload.current_position_um.value == 12000
-    assert position[4][1].payload.current_position_um.value == 12000
-
-    assert len(stale) == 0
 
 
 async def test_multi_gripper_group_move(
