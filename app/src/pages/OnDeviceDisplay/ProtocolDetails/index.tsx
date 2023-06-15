@@ -75,12 +75,11 @@ const ProtocolHeader = (props: {
       boxShadow={isScrolled ? BORDERS.shadowBig : undefined}
       gridGap={SPACING.spacing40}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing32} ${SPACING.spacing40}`}
+      padding={`${SPACING.spacing32} ${SPACING.spacing40}`}
       position={POSITION_STICKY}
       top="0"
       backgroundColor={COLORS.white}
-      marginLeft={`-${SPACING.spacing32}`}
-      marginRight={`-${SPACING.spacing32}`}
+      marginX={`-${SPACING.spacing32}`}
       zIndex={1} // the header is always visble when things scroll beneath
     >
       <Flex
@@ -94,7 +93,7 @@ const ProtocolHeader = (props: {
           onClick={() => history.goBack()}
           width="3rem"
         >
-          <Icon name="back" width="3rem" color={COLORS.darkBlack100} />
+          <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
         </Btn>
         <Flex
           flexDirection={DIRECTION_COLUMN}
