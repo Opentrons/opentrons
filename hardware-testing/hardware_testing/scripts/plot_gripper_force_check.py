@@ -128,7 +128,7 @@ class Plot:
         subfig.add_traces(fig1.data + fig2.data)
         self.plot_param["figure"] = subfig
         self.plot_param["filename"] = "plot_force_check"
-        self.plot_param["title"] = "Gripper Force Check (Period = 1/2 Lifetime)"
+        self.plot_param["title"] = "Gripper Force Check (Period = 1 Lifetime)"
         self.plot_param["x_title"] = "Cycle Number"
         self.plot_param["y_title"] = "Output Force (N)"
         self.plot_param["x_range"] = [1, 10]

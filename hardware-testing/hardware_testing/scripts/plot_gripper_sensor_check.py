@@ -126,7 +126,7 @@ class Plot:
                 subfig.add_traces(fig.data)
         self.plot_param["figure"] = subfig
         self.plot_param["filename"] = "plot_sensor_check"
-        self.plot_param["title"] = "Gripper Sensor Check (Period = 1/8 Lifetime)"
+        self.plot_param["title"] = "Gripper Sensor Check (Period = 1 Lifetime)"
         self.plot_param["x_title"] = "Cycle Number"
         self.plot_param["y_title"] = "Capacitance (PF)"
         self.plot_param["x_range"] = [1, 10]

@@ -126,7 +126,7 @@ class Plot:
         fig = px.line(df, x=x_axis, y=[y_axis], markers=True)
         self.plot_param["figure"] = fig
         self.plot_param["filename"] = "plot_jaw_displacement"
-        self.plot_param["title"] = f"Gripper Jaw Encoder (State = {state}, Period = 1/2 Lifetime)"
+        self.plot_param["title"] = f"Gripper Jaw Encoder (State = {state}, Period = 1 Lifetime)"
         self.plot_param["x_title"] = "Cycle Number"
         self.plot_param["y_title"] = "Gripper Jaw Displacement (mm)"
         self.plot_param["x_range"] = [x_start, x_end]
