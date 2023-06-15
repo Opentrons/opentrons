@@ -35,7 +35,7 @@ const SSID_INPUT_FIELD_STYLE = css`
 `
 
 interface SetWifiSsidProps {
-  errorMessage: string | null
+  errorMessage?: string | null
   inputSsid: string
   setInputSsid: React.Dispatch<React.SetStateAction<string>>
 }

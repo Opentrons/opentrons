@@ -150,7 +150,9 @@ export function WifiConnectionDetails({
           onClickSsid={() =>
             setCurrentOption('RobotSettingsSelectAuthenticationType')
           }
-          setCurrentOption={setCurrentOption}
+          handleJoinAnotherNetwork={() =>
+            setCurrentOption('RobotSettingsJoinOtherNetwork')
+          }
           setSelectedSsid={setSelectedSsid}
         />
       </Flex>

@@ -55,7 +55,7 @@ const NETWORK_ROW_STYLE = css`
 interface DisplayWifiListProps {
   list: WifiNetwork[]
   onClickSsid: () => void
-  setCurrentOption: SetSettingOption
+  handleJoinAnotherNetwork: () => void
   setSelectedSsid: (selectedSsid: string) => void
   isHeader?: boolean
 }
@@ -63,7 +63,7 @@ interface DisplayWifiListProps {
 export function DisplayWifiList({
   list,
   onClickSsid,
-  setCurrentOption,
+  handleJoinAnotherNetwork,
   setSelectedSsid,
   isHeader = false,
 }: DisplayWifiListProps): JSX.Element {
@@ -101,9 +101,7 @@ export function DisplayWifiList({
         : null}
       <Btn
         display="flex"
-        onClick={() => {
-          setCurrentOption('RobotSettingsJoinOtherNetwork')
-        }}
+        onClick={handleJoinAnotherNetwork}
         height="5rem"
         backgroundColor={COLORS.light1}
         borderRadius={BORDERS.borderRadiusSize4}

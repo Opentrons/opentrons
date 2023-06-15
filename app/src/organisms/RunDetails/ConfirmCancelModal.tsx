@@ -65,7 +65,7 @@ export function ConfirmCancelModal(
   return (
     <Portal>
       <Modal
-        type="warning"
+        type="error"
         onClose={isCanceling ? undefined : onClose}
         title={t('cancel_run_modal_heading')}
       >

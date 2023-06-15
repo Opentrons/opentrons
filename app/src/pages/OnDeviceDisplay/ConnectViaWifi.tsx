@@ -18,7 +18,7 @@ import {
   DisplayWifiList,
   FailedToConnect,
   SetWifiSsid,
-  SelectAuthenticationType,
+  SelectAuthenticationType as SelectAuthenticationTypeComponent,
   SetWifiCred,
   WifiConnectionDetails,
 } from '../../organisms/NetworkSettings'
@@ -28,8 +28,11 @@ import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
 import type { WifiNetwork } from '../../redux/networking/types'
 import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
+import { useTranslation } from 'react-i18next'
+import { ChildNavigation } from '../../organisms/ChildNavigation'
 
 const WIFI_LIST_POLL_MS = 5000
+type WifiScreenOption = 'WifiList' | 'JoinOtherNetwork' | 'SelectAuthType'
 
 export function ConnectViaWifi(): JSX.Element {
   const [selectedSsid, setSelectedSsid] = React.useState<string>('')
@@ -44,6 +47,10 @@ export function ConnectViaWifi(): JSX.Element {
   const [changeState, setChangeState] = React.useState<NetworkChangeState>({
     type: null,
   })
+
+  const [currentOption, setCurrentOption] = React.useState<WifiScreenOption>(
+    'WifiList'
+  )
   const [password, setPassword] = React.useState<string>('')
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -75,33 +82,28 @@ export function ConnectViaWifi(): JSX.Element {
   }
 
   const renderScreen = (): JSX.Element | null => {
-    if (changeState.type == null) {
+    if (currentOption === 'WifiList') {
       return (
         <DisplayWifiList
           list={list}
-          setShowSelectAuthenticationType={setShowSelectAuthenticationType}
-          setChangeState={setChangeState}
+          handleJoinAnotherNetwork={() => setCurrentOption('JoinOtherNetwork')}
           setSelectedSsid={setSelectedSsid}
+          onClickSsid={() => setCurrentOption('JoinOtherNetwork')}
           isHeader
         />
       )
-    } else if (changeState.type === JOIN_OTHER && changeState.ssid === null) {
+    } else if (currentOption === 'JoinOtherNetwork') {
       return (
-        <SetWifiSsid
+        <JoinOtherNetwork
+          setCurrentOption={setCurrentOption}
           setSelectedSsid={setSelectedSsid}
-          setShowSelectAuthenticationType={setShowSelectAuthenticationType}
-          setChangeState={setChangeState}
         />
       )
-    } else if (showSelectAuthenticationType) {
+    } else if (currentOption === 'SelectAuthType') {
       return (
         <SelectAuthenticationType
-          ssid={selectedSsid}
-          fromWifiList={true}
           selectedAuthType={selectedAuthType}
-          setShowSelectAuthenticationType={setShowSelectAuthenticationType}
           setSelectedAuthType={setSelectedAuthType}
-          setChangeState={setChangeState}
         />
       )
       // This condition might be changed for manual connect
@@ -164,7 +166,6 @@ export function ConnectViaWifi(): JSX.Element {
       const network = list.find((nw: WifiNetwork) => nw.ssid === selectedSsid)
       if (network != null) {
         handleConnect()
-        setChangeState({ type: CONNECT, ssid: selectedSsid, network })
       }
     }
   }, [selectedSsid, selectedAuthType, list])
@@ -179,5 +180,79 @@ export function ConnectViaWifi(): JSX.Element {
         {renderScreen()}
       </Flex>
     </>
+  )
+}
+
+interface JoinOtherNetworkProps {
+  setCurrentOption: (option: WifiScreenOption) => void
+  setSelectedSsid: React.Dispatch<React.SetStateAction<string>>
+}
+
+function JoinOtherNetwork({
+  setCurrentOption,
+  setSelectedSsid,
+}: JoinOtherNetworkProps): JSX.Element {
+  const { i18n, t } = useTranslation('device_settings')
+
+  const [inputSsid, setInputSsid] = React.useState<string>('')
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
+
+  const handleContinue = (): void => {
+    if (inputSsid.length >= 2 && inputSsid.length <= 32) {
+      setSelectedSsid(inputSsid)
+      setCurrentOption('SelectAuthType')
+    } else {
+      setErrorMessage(t('join_other_network_error_message'))
+    }
+  }
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <ChildNavigation
+        buttonText={i18n.format(t('continue'), 'capitalize')}
+        header={t('join_other_network')}
+        onClickBack={() => setCurrentOption('WifiList')}
+        onClickButton={handleContinue}
+      />
+      <SetWifiSsid
+        errorMessage={errorMessage}
+        inputSsid={inputSsid}
+        setInputSsid={setInputSsid}
+      />
+    </Flex>
+  )
+}
+
+interface SelectAuthenticationTypeProps {
+  handleWifiConnect: () => void
+  selectedAuthType: WifiSecurityType
+  setCurrentOption: (option: WifiScreenOption) => void
+  setSelectedAuthType: (authType: WifiSecurityType) => void
+}
+function SelectAuthenticationType({
+  handleWifiConnect,
+  selectedAuthType,
+  setCurrentOption,
+  setSelectedAuthType,
+}: SelectAuthenticationTypeProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <ChildNavigation
+        buttonText={t('connect')}
+        header={t('select_a_security_type')}
+        onClickBack={() => setCurrentOption('Wifi')}
+        onClickButton={() => {
+          selectedAuthType !== 'none'
+            ? setCurrentOption('SetWifiCred')
+            : handleWifiConnect()
+        }}
+      />
+      <SelectAuthenticationTypeComponent
+        selectedAuthType={selectedAuthType}
+        setSelectedAuthType={setSelectedAuthType}
+      />
+    </Flex>
   )
 }
