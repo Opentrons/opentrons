@@ -2,10 +2,10 @@ from typing import Dict, List, Optional, Mapping, TypeVar
 from typing_extensions import Protocol
 
 from opentrons.types import Mount, Point
-from ..types import Axis, CriticalPoint, MotionChecks, OT3Axis
+from ..types import Axis, CriticalPoint, MotionChecks
 
 
-AxisType = TypeVar("AxisType", Axis, OT3Axis)
+AxisType = TypeVar("AxisType", bound=Axis)
 
 
 class MotionController(Protocol[AxisType]):

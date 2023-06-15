@@ -16,6 +16,7 @@ from .stoppable import Stoppable
 from .simulatable import Simulatable
 
 
+
 class HardwareControlInterface(
     ModuleProvider,
     ExecutionControllable,
@@ -49,6 +50,7 @@ __all__ = [
     "Simulatable",
     "Stoppable",
     "AsyncioConfigurable",
+    "AxisType",
     "ExecutionControllable",
     "InstrumentConfigurer",
     "MotionController",

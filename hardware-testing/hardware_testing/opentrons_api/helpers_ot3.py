@@ -5,7 +5,7 @@ from datetime import datetime
 from math import pi
 from subprocess import run
 from time import time
-from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union
+from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union, cast
 
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
@@ -25,6 +25,7 @@ from opentrons.hardware_control.instruments.ot2.pipette import Pipette as Pipett
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
 from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons_shared_data.robot import RobotType
 
 from .types import (
     GantryLoad,
@@ -488,9 +489,10 @@ def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[Axis, float]:
     transforms = api._robot_calibration
     machine_pos_per_axis = api._backend.home_position()
     deck_pos_per_axis = deck_from_machine(
-        machine_pos_per_axis,
-        transforms.deck_calibration.attitude,
-        transforms.carriage_offset,
+        machine_pos=machine_pos_per_axis,
+        attitude=transforms.deck_calibration.attitude,
+        offset=transforms.carriage_offset,
+        robot_type=cast(RobotType,"OT-3 Standard"),
     )
     mount_pos_per_axis = api._effector_pos_from_carriage_pos(
         mount, deck_pos_per_axis, None

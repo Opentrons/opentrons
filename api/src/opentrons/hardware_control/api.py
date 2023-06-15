@@ -17,10 +17,12 @@ from typing import (
     Any,
     TypeVar,
     Mapping,
+    cast,
 )
 
 from opentrons_shared_data.pipette import name_config
 from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
@@ -543,7 +545,7 @@ class API(
         assert (axis is not None) ^ (mount is not None), "specify either axis or mount"
         if axis:
             checked_axis = axis
-            checked_mount = Axis.to_mount(checked_axis)
+            checked_mount = Axis.to_ot2_mount(checked_axis)
         if mount:
             checked_mount = mount
             checked_axis = Axis.of_plunger(checked_mount)
@@ -601,9 +603,10 @@ class API(
             if smoothie_gantry:
                 smoothie_pos.update(await self._backend.home(smoothie_gantry))
                 self._current_position = deck_from_machine(
-                    self._axis_map_from_string_map(smoothie_pos),
-                    self._robot_calibration.deck_calibration.attitude,
-                    top_types.Point(0, 0, 0),
+                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
+                    attitude=self._robot_calibration.deck_calibration.attitude,
+                    offset=top_types.Point(0, 0, 0),
+                    robot_type=cast(RobotType, "OT-2 Standard"),
                 )
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
@@ -638,9 +641,10 @@ class API(
             if refresh:
                 smoothie_pos = await self._backend.update_position()
                 self._current_position = deck_from_machine(
-                    self._axis_map_from_string_map(smoothie_pos),
-                    self._robot_calibration.deck_calibration.attitude,
-                    top_types.Point(0, 0, 0),
+                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
+                    attitude=self._robot_calibration.deck_calibration.attitude,
+                    offset=top_types.Point(0, 0, 0),
+                    robot_type=cast(RobotType,"OT-2 Standard"),
                 )
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
@@ -849,9 +853,10 @@ class API(
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
             self._current_position = deck_from_machine(
-                self._axis_map_from_string_map(smoothie_pos),
-                self._robot_calibration.deck_calibration.attitude,
-                top_types.Point(0, 0, 0),
+                machine_pos=self._axis_map_from_string_map(smoothie_pos),
+                attitude=self._robot_calibration.deck_calibration.attitude,
+                offset=top_types.Point(0, 0, 0),
+                robot_type=cast(RobotType,"OT-2 Standard"),
             )
 
     # Gantry/frame (i.e. not pipette) config API
@@ -1087,9 +1092,10 @@ class API(
                     move.home_after_safety_margin,
                 )
                 self._current_position = deck_from_machine(
-                    self._axis_map_from_string_map(smoothie_pos),
-                    self._robot_calibration.deck_calibration.attitude,
-                    top_types.Point(0, 0, 0),
+                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
+                    attitude=self._robot_calibration.deck_calibration.attitude,
+                    offset=top_types.Point(0, 0, 0),
+                    robot_type=cast(RobotType, "OT-2 Standard"),
                 )
 
         for shake in spec.shake_moves:

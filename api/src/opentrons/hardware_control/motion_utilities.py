@@ -1,12 +1,15 @@
 """Utilities for calculating motion correctly."""
-
-from typing import Callable, Dict, Union, overload, TypeVar, Optional, cast
+from functools import lru_cache
+from typing import Callable, Dict, Union, overload, Optional, cast
 from collections import OrderedDict
+
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from opentrons.types import Mount, Point
 from opentrons.calibration_storage.types import AttitudeMatrix
 from opentrons.util import linal
+
 from .types import Axis, OT3Mount
-from functools import lru_cache
 
 
 # TODO: The offset_for_mount function should be defined with an overload
@@ -120,20 +123,6 @@ def target_position_from_absolute(  # type: ignore[no-untyped-def]
     return target_position
 
 
-# @overload
-# def target_position_from_relative(
-#     mount: Mount, delta: Point, current_position: Dict[Axis, float]
-# ) -> "OrderedDict[Axis, float]":
-#     ...
-#
-#
-# @overload
-# def target_position_from_relative(
-#     mount: OT3Mount, delta: Point, current_position: Dict[Axis, float]
-# ) -> "OrderedDict[Axis, float]":
-#     ...
-
-
 def target_position_from_relative(
     mount: Union[Mount, OT3Mount],
     delta: Point,
@@ -151,20 +140,6 @@ def target_position_from_relative(
         )
     )
     return target_position
-
-
-# @overload
-# def target_position_from_plunger(
-#     mount: Mount, delta: float, current_position: Dict[Axis, float]
-# ) -> "OrderedDict[Axis, float]":
-#     ...
-#
-#
-# @overload
-# def target_position_from_plunger(
-#     mount: OT3Mount, delta: float, current_position: Dict[Axis, float]
-# ) -> "OrderedDict[Axis, float]":
-#     ...
 
 
 def target_position_from_plunger(
@@ -189,7 +164,7 @@ def target_position_from_plunger(
     z_ax = Axis.by_mount(mount)
     plunger = Axis.of_main_tool_actuator(
         mount
-    )  # (spp): is it okay that we'll now use only the new plunger names?
+    )
     all_axes_pos[z_ax] = current_position[z_ax]
     plunger_pos[plunger] = delta
     all_axes_pos.update(plunger_pos)
@@ -213,15 +188,11 @@ def machine_point_from_deck_point(
     return Point(*linal.apply_transform(attitude, deck_point)) + offset
 
 
-# Do we really need this now?
-AxisType = TypeVar("AxisType", bound=Axis)
-
-
 def machine_from_deck(
-    deck_pos: Dict[AxisType, float],
+    deck_pos: Dict[Axis, float],
     attitude: AttitudeMatrix,
     offset: Point,
-) -> Dict[AxisType, float]:
+) -> Dict[Axis, float]:
     """Build a machine-axis position from a deck position"""
     try:
         point_for_z_axis = {
@@ -256,17 +227,22 @@ def machine_from_deck(
 
 
 def deck_from_machine(
-    machine_pos: Dict[AxisType, float],
+    machine_pos: Dict[Axis, float],
     attitude: AttitudeMatrix,
     offset: Point,
-) -> Dict[AxisType, float]:
+    robot_type: RobotType,
+) -> Dict[Axis, float]:
     """Build a deck-abs position store from the machine's position"""
-    axis_enum = type(next(iter(machine_pos.keys())))
-    plunger_axes = {k: v for k, v in machine_pos.items() if k not in k.gantry_axes()}
-    mount_axes = {k: v for k, v in machine_pos.items() if k in k.mount_axes()}
+    plunger_axes: Dict[Axis, float] = {k: v for k, v in machine_pos.items() if k not in k.gantry_axes()}
+    mount_axes: Dict[Axis, float] = {k: v for k, v in machine_pos.items() if k in k.mount_axes()}
+    to_mount: Callable[[Axis], Union[Mount, OT3Mount]]
+    if robot_type == "OT-2 Standard":
+        to_mount = Axis.to_ot2_mount
+    else:
+        to_mount = Axis.to_ot3_mount
     deck_positions_by_mount = {
-        axis_enum.to_mount(axis): deck_point_from_machine_point(
-            Point(machine_pos[axis_enum.X], machine_pos[axis_enum.Y], value),
+        to_mount(axis): deck_point_from_machine_point(
+            Point(machine_pos[Axis.X], machine_pos[Axis.Y], value),
             attitude,
             offset,
         )
@@ -274,11 +250,11 @@ def deck_from_machine(
     }
     position_for_gantry = next(iter(deck_positions_by_mount.values()))
     deck_pos = {
-        axis_enum.X: position_for_gantry[0],
-        axis_enum.Y: position_for_gantry[1],
+        Axis.X: position_for_gantry[0],
+        Axis.Y: position_for_gantry[1],
     }
     for mount, pos in deck_positions_by_mount.items():
-        deck_pos[axis_enum.by_mount(mount)] = pos[2]
+        deck_pos[Axis.by_mount(mount)] = pos[2]
 
     deck_pos.update(plunger_axes)
     return deck_pos

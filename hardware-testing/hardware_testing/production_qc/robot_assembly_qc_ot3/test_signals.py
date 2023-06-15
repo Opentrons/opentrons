@@ -22,9 +22,9 @@ from hardware_testing.data.csv_report import (
     CSVLine,
     CSVLineRepeating,
 )
-from hardware_testing.opentrons_api.types import OT3Axis, Point
+from hardware_testing.opentrons_api.types import Axis, Point
 
-MOVING_Z_AXIS = OT3Axis.Z_L
+MOVING_Z_AXIS = Axis.Z_L
 MOVING_DISTANCE = 100
 MOVE_SECONDS = 5
 ROUND_ERR_MARGIN = 0.05
@@ -37,8 +37,8 @@ def _build_move_group(
     distance: float, speed: float, stop: MoveStopCondition
 ) -> MoveGroupStep:
     movers = [
-        axis_to_node(OT3Axis.X),
-        axis_to_node(OT3Axis.Y),
+        axis_to_node(Axis.X),
+        axis_to_node(Axis.Y),
         axis_to_node(MOVING_Z_AXIS),
     ]
     dist_64 = float64(abs(distance))
@@ -116,7 +116,7 @@ async def _move_and_interrupt_with_signal(api: OT3API, sig_name: str) -> None:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    mount = OT3Axis.to_mount(MOVING_Z_AXIS)
+    mount = Axis.to_ot3_mount(MOVING_Z_AXIS)
 
     async def _home() -> None:
         try:

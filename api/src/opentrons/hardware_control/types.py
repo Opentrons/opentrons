@@ -214,9 +214,17 @@ class Axis(enum.Enum):
         }
         return kind_map[kind]
 
-    # (spp): Need to make this return Mount for OT2
     @classmethod
-    def to_mount(cls, inst: "Axis") -> OT3Mount:
+    def to_ot2_mount(cls, inst: "Axis") -> top_types.Mount:
+        return {
+            cls.Z: top_types.Mount.LEFT,
+            cls.A: top_types.Mount.RIGHT,
+            cls.B: top_types.Mount.LEFT,
+            cls.C: top_types.Mount.RIGHT,
+        }[inst]
+
+    @classmethod
+    def to_ot3_mount(cls, inst: "Axis") -> OT3Mount:
         return {
             cls.Z_R: OT3Mount.RIGHT,
             cls.Z_L: OT3Mount.LEFT,
@@ -225,12 +233,6 @@ class Axis(enum.Enum):
             cls.Z_G: OT3Mount.GRIPPER,
             cls.G: OT3Mount.GRIPPER,
         }[inst]
-
-    @classmethod
-    def home_order(
-        cls,
-    ) -> Tuple["Axis", "Axis", "Axis", "Axis", "Axis", "Axis", "Axis", "Axis", "Axis",]:
-        return (*cls.mount_axes(), cls.X, cls.Y, *cls.pipette_axes(), cls.G, cls.Q)
 
     def __str__(self) -> str:
         return self.name

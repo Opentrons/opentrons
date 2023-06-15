@@ -29,6 +29,7 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
 from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons import types as top_types
 from opentrons.config import robot_configs, ot3_pipette_config
@@ -102,7 +103,7 @@ from .errors import (
 from . import modules
 from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
 
-from .protocols import HardwareControlInterface
+from .protocols import HardwareControlInterface, AxisType
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
@@ -143,6 +144,9 @@ from .status_bar_state import StatusBarStateController
 
 mod_log = logging.getLogger(__name__)
 
+AXES_IN_HOMING_ORDER: Tuple[Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis] = (
+    *Axis.mount_axes(), Axis.X, Axis.Y, *Axis.pipette_axes(), Axis.G, Axis.Q)
+
 
 class OT3API(
     ExecutionManagerProvider,
@@ -152,7 +156,7 @@ class OT3API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlInterface[OT3Transforms, Axis],
+    HardwareControlInterface[OT3Transforms, AxisType],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -253,9 +257,10 @@ class OT3API(
 
     def _deck_from_machine(self, machine_pos: Dict[Axis, float]) -> Dict[Axis, float]:
         return deck_from_machine(
-            machine_pos,
-            self._robot_calibration.deck_calibration.attitude,
-            self._robot_calibration.carriage_offset,
+            machine_pos=machine_pos,
+            attitude=self._robot_calibration.deck_calibration.attitude,
+            offset=self._robot_calibration.carriage_offset,
+            robot_type=cast(RobotType,"OT-3 Standard"),
         )
 
     @classmethod
@@ -1227,7 +1232,7 @@ class OT3API(
 
         home_seq = [
             ax
-            for ax in Axis.home_order()
+            for ax in AXES_IN_HOMING_ORDER
             if (ax in checked_axes and self._backend.axis_is_present(ax))
         ]
         self._log.info(f"home was called with {axes} generating sequence {home_seq}")
@@ -1746,7 +1751,7 @@ class OT3API(
         return self._gripper_handler.get_gripper()
 
     @property
-    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
+    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:
         # see comment in `protocols.instrument_configurer`
         # override required for type matching
         # Warning: don't use this in new code, used `hardware_pipettes` instead
