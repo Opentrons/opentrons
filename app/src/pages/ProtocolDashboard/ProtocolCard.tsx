@@ -10,6 +10,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   SPACING,
+  TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
 
@@ -60,14 +61,17 @@ export function ProtocolCard(props: {
       backgroundColor={COLORS.light1}
       borderRadius={BORDERS.borderRadiusSize4}
       marginBottom={SPACING.spacing8}
+      gridGap={SPACING.spacing48}
       onClick={() => handleProtocolClick(longpress, protocol.id)}
       padding={SPACING.spacing24}
       ref={longpress.ref}
     >
       <Flex width="30.75rem" overflowWrap="anywhere">
-        <StyledText as="p">{protocolName}</StyledText>
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {protocolName}
+        </StyledText>
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} width="12rem">
+      <Flex width="9.25rem" justifyContent={JUSTIFY_CENTER}>
         <StyledText as="p" color={COLORS.darkBlack70}>
           {lastRun != null
             ? formatDistance(new Date(lastRun), new Date(), {
@@ -76,9 +80,9 @@ export function ProtocolCard(props: {
             : t('no_history')}
         </StyledText>
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} width="17rem">
+      <Flex width="10rem">
         <StyledText as="p" color={COLORS.darkBlack70}>
-          {format(new Date(protocol.createdAt), 'M/d/yyyy HH:mm')}
+          {format(new Date(protocol.createdAt), 'M/d/yy HH:mm')}
         </StyledText>
         {longpress.isLongPressed && (
           <LongPressModal

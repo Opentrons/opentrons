@@ -2,7 +2,7 @@
 import asyncio
 from typing import Optional, Type, TypeVar, cast
 
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import AbstractModule
 
@@ -30,7 +30,14 @@ async def build_module(
     module = await module_cls.build(
         port=f"socket://127.0.0.1:{port}",
         execution_manager=execution_manager,
-        usb_port=USBPort(name="", port_number=1, device_path="", hub=1),
+        usb_port=USBPort(
+            name="",
+            port_number=1,
+            port_group=PortGroup.UNKNOWN,
+            device_path="",
+            hub=False,
+            hub_port=None,
+        ),
         hw_control_loop=asyncio.get_running_loop(),
         poll_interval_seconds=poll_interval_seconds,
     )

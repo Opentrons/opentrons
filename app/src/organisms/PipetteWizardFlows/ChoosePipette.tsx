@@ -37,6 +37,7 @@ import { SmallButton } from '../../atoms/buttons'
 import { ModalShell } from '../../molecules/Modal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import singleChannelAndEightChannel from '../../assets/images/change-pip/1_and_8_channel.png'
+import ninetySixChannel from '../../assets/images/change-pip/ninety-six-channel.png'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { ExitModal } from './ExitModal'
 import { FLOWS } from './constants'
@@ -252,8 +253,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}
                   >
                     <img
-                      //  TODO(jr, 11/2/22): change this image to the correct 96 channel pipette image
-                      src={singleChannelAndEightChannel}
+                      src={ninetySixChannel}
                       width="138.78px"
                       height="160px"
                       alt={bothMounts}

@@ -1,5 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`InstrumentDiagram 96-channel GEN1 renders correctly 1`] = `
+.c0 {
+  min-width: 0;
+}
+
+<div
+  className="c0"
+>
+  <img
+    className=""
+    src="ninety-six-channel-gen1.png"
+  />
+</div>
+`;
+
 exports[`InstrumentDiagram Multi-channel GEN2 renders correctly 1`] = `
 .c0 {
   min-width: 0;
@@ -56,6 +71,36 @@ exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
   <img
     className=""
     src="single_channel_GEN1_800px.png"
+  />
+</div>
+`;
+
+exports[`InstrumentDiagram eight-channel GEN3 renders correctly 1`] = `
+.c0 {
+  min-width: 0;
+}
+
+<div
+  className="c0"
+>
+  <img
+    className="flipped_image"
+    src="eight-channel-gen3.png"
+  />
+</div>
+`;
+
+exports[`InstrumentDiagram single-channel GEN3 renders correctly 1`] = `
+.c0 {
+  min-width: 0;
+}
+
+<div
+  className="c0"
+>
+  <img
+    className="flipped_image"
+    src="single-channel-gen3.png"
   />
 </div>
 `;

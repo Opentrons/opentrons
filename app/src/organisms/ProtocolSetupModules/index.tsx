@@ -2,17 +2,17 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  Icon,
-  Module,
-  RobotWorkSpace,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  Module,
+  RobotWorkSpace,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -84,17 +84,14 @@ function RowModule({
         isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
       }
     >
-      <Flex
-        flex="4 0 0"
-        fontSize={TYPOGRAPHY.fontSize22}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        lineHeight={TYPOGRAPHY.lineHeight28}
-      >
-        <StyledText>{getModuleDisplayName(module.moduleDef.model)}</StyledText>
+      <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {getModuleDisplayName(module.moduleDef.model)}
+        </StyledText>
       </Flex>
       <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
         <StyledText>
-          {/* TODO(bh, 2023-02-07): adjust slot location when hi-fi designs finalized */}
+          {/* todo (kj:06/09/2023) need to use LocationIcon */}
           {t('slot_location', {
             slotName:
               getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
