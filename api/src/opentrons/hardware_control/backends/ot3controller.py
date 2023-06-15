@@ -345,7 +345,7 @@ class OT3Controller:
     @property
     def board_revision(self) -> BoardRevision:
         """Get the board revision"""
-        return BoardRevision.UNKNOWN
+        return BoardRevision.FLEX_B2
 
     @property
     def module_controls(self) -> AttachedModulesControl:

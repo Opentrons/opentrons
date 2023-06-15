@@ -466,6 +466,7 @@ def test_command_failure_clears_queues() -> None:
             errorType="ProtocolEngineError",
             detail="oh no",
             createdAt=datetime(year=2023, month=3, day=3),
+            errorCode=errors.ProtocolEngineError.ERROR_CODE,
         ),
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
@@ -566,6 +567,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
             errorType="ProtocolEngineError",
             detail="oh no",
             createdAt=datetime(year=2023, month=3, day=3),
+            errorCode=errors.ProtocolEngineError.ERROR_CODE,
         ),
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
@@ -819,6 +821,48 @@ def test_command_store_saves_unknown_finish_error() -> None:
                 createdAt=datetime(year=2021, month=1, day=1),
                 errorType="RuntimeError",
                 detail="oh no",
+                # Unknown errors use the default error code
+                errorCode=errors.ProtocolEngineError.ERROR_CODE,
+            )
+        },
+        run_started_at=None,
+        latest_command_hash=None,
+    )
+
+
+def test_command_store_saves_correct_error_code() -> None:
+    """If an error is derived from ProtocolEngineError, its ErrorCode should be used."""
+    TEST_CODE = "1234"
+
+    class MyCustomError(errors.ProtocolEngineError):
+        ERROR_CODE = TEST_CODE
+
+    subject = CommandStore(is_door_open=False, config=_make_config())
+
+    error_details = FinishErrorDetails(
+        error=MyCustomError("oh no"),
+        error_id="error-id",
+        created_at=datetime(year=2021, month=1, day=1),
+    )
+    subject.handle_action(FinishAction(error_details=error_details))
+
+    assert subject.state == CommandState(
+        queue_status=QueueStatus.PAUSED,
+        run_result=RunResult.FAILED,
+        run_completed_at=None,
+        is_door_blocking=False,
+        running_command_id=None,
+        all_command_ids=[],
+        queued_command_ids=OrderedSet(),
+        queued_setup_command_ids=OrderedSet(),
+        commands_by_id=OrderedDict(),
+        errors_by_id={
+            "error-id": errors.ErrorOccurrence(
+                id="error-id",
+                createdAt=datetime(year=2021, month=1, day=1),
+                errorType="MyCustomError",
+                detail="oh no",
+                errorCode=TEST_CODE,
             )
         },
         run_started_at=None,
@@ -883,6 +927,7 @@ def test_command_store_handles_command_failed() -> None:
         errorType="ProtocolEngineError",
         createdAt=datetime(year=2022, month=2, day=2),
         detail="oh no",
+        errorCode=errors.ProtocolEngineError.ERROR_CODE,
     )
 
     expected_failed_command = create_failed_command(

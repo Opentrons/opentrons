@@ -32,6 +32,7 @@ from ..errors import (
     SetupCommandNotAllowedError,
     PauseNotAllowedError,
     ProtocolCommandFailedError,
+    ProtocolEngineError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
@@ -255,6 +256,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 createdAt=action.failed_at,
                 errorType=type(action.error).__name__,
                 detail=str(action.error),
+                errorCode=action.error.ERROR_CODE,
             )
 
             prev_entry = self._state.commands_by_id[action.command_id]
@@ -335,11 +337,18 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     created_at = action.error_details.created_at
                     error = action.error_details.error
 
+                    error_code = (
+                        error.ERROR_CODE
+                        if isinstance(error, ProtocolEngineError)
+                        else ProtocolEngineError.ERROR_CODE
+                    )
+
                     self._state.errors_by_id[error_id] = ErrorOccurrence.construct(
                         id=error_id,
                         createdAt=created_at,
                         errorType=type(error).__name__,
                         detail=str(error),
+                        errorCode=error_code,
                     )
 
         elif isinstance(action, HardwareStoppedAction):

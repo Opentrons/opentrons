@@ -7,16 +7,18 @@ import {
   ALIGN_CENTER,
   COLORS,
   JUSTIFY_CENTER,
-  SPACING,
 } from '@opentrons/components'
 
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
+
 const STOP_BUTTON_STYLE = css`
+  -webkit-tap-highlight-color: transparent;
   display: flex;
   background-color: ${COLORS.red2};
   border-radius: 50%;
 
   &:focus {
-    background-color: #c41e20;
+    background-color: ${COLORS.red2Pressed};
     box-shadow: none;
   }
   &:hover {
@@ -26,7 +28,7 @@ const STOP_BUTTON_STYLE = css`
     color: ${COLORS.white};
   }
   &:focus-visible {
-    box-shadow: 0 0 0 ${SPACING.spacing2} ${COLORS.fundamentalsFocus};
+    box-shadow: ${ODD_FOCUS_VISIBLE};
     background-color: ${COLORS.red2};
   }
   &:active {

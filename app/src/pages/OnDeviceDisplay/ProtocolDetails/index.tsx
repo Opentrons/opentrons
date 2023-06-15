@@ -386,7 +386,7 @@ export function ProtocolDetails(): JSX.Element | null {
           <SmallModalChildren
             header={t('too_many_pins_header')}
             subText={t('too_many_pins_body')}
-            buttonText={t('shared:close')}
+            buttonText={i18n.format(t('shared:close'), 'capitalize')}
             handleCloseMaxPinsAlert={() => setShowMaxPinsAlert(false)}
           />
         )}
