@@ -222,6 +222,7 @@ async def _main() -> None:
     today = datetime.date.today()
     hw_api = await build_async_ot3_hardware_api(is_simulating=args.simulate,
                                     use_defaults=True)
+    await hw_api.cache_instruments()
     pipette_model = hw_api._pipette_handler.hardware_instruments[mount].name
     if args.dial_indicator:
         test_data ={
@@ -506,11 +507,11 @@ if __name__ == "__main__":
     parser.add_argument("--tips", type=int, default = 40)
     parser.add_argument("--max_z_distance", type=float, default = 40)
     parser.add_argument("--min_z_distance", type=float, default = 5)
-    parser.add_argument("--mount_speed", type=float, default =11.3)
-    parser.add_argument("--plunger_speed", type=float, default = 21.3)
-    parser.add_argument("--sensor_threshold", type=int, default = 50, help = "Threshold in Pascals")
+    parser.add_argument("--mount_speed", type=float, default = 5)
+    parser.add_argument("--plunger_speed", type=float, default = 10)
+    parser.add_argument("--sensor_threshold", type=int, default = 52, help = "Threshold in Pascals")
     parser.add_argument("--expected_liquid_height", type=int, default = 0)
-    parser.add_argument("--tip_size", type=str, default="T50", help="Tip Size")
+    parser.add_argument("--tip_size", type=str, default="T200", help="Tip Size")
     parser.add_argument("--log_pressure", action="store_true")
     parser.add_argument(
         "--test",
