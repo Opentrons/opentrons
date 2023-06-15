@@ -61,20 +61,6 @@ def _get_dye_type(volume: float) -> str:
     return dye_type
 
 
-def _setup_dye(volume: float, cfg: config.PhotometricConfig) -> None:
-    if volume == 250:
-        # this is actually the 1000ul test
-        dye_required = (volume * 4 * 96) + _MIN_END_VOLUME_UL
-    else:
-        dye_required = max(
-            _MIN_START_VOLUME_UL, volume * 96 * cfg.trials + _MIN_END_VOLUME_UL
-        )
-    ui.get_user_ready(
-        f"Place the {_get_dye_type(volume)} reservoir in slot {cfg.reservoir_slot}"
-        f" and fill to {dye_required}ul of {_get_dye_type(volume)} dye"
-    )
-
-
 def _check_if_software_supports_high_volumes() -> bool:
     src_a = getsource(Pipette.set_current_volume)
     src_b = getsource(Pipette.ok_to_add_volume)
@@ -291,7 +277,11 @@ def _run_trial(
     target_volume, volume_to_dispense, num_dispenses = _dispense_volumes(volume)
     photoplate_preped_vol = max(target_volume - volume_to_dispense, 0)
 
-    _setup_dye(volume_to_dispense, cfg)
+    if num_dispenses > 1 and not ctx.is_simulating():
+        # TODO: Likely will not test 1000 uL in the near-term,
+        #       but eventually we'll want to be more helpful here in prompting
+        #       what volumes need to be added between trials.
+        ui.get_user_ready("check DYE is enough")
 
     print(test_report)
     _record_measurement_and_store(MeasurementType.INIT)
@@ -347,7 +337,6 @@ def _run_trial(
             added_blow_out=(i + 1) == num_dispenses,
         )
         if cfg.touch_tip:
-            ui.get_user_ready("ready")
             pipette.touch_tip(speed=30)
         _record_measurement_and_store(MeasurementType.DISPENSE)
         pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
@@ -355,7 +344,8 @@ def _run_trial(
             _drop_tip(ctx, pipette, cfg)
         else:
             pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))
-        ui.get_user_ready("Cover and replace the photoplate in slot 3")
+        if not ctx.is_simulating():
+            ui.get_user_ready("add SEAL to plate")
     return
 
 
@@ -408,21 +398,9 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         dye_types_req[_get_dye_type(volume_to_dispense)] += dye_required
 
     trial_total = len(test_volumes) * cfg.trials
+    # 1000uL tests only do 3x trials, to save time/money
     if cfg.trials > 3 and 1000 in test_volumes:
-        trial_total = trial_total - cfg.trials + 3
-
-    ui.print_header("PREPARE")
-    ui.get_user_ready(
-        f"Is there 1 {cfg.photoplate} on the deck and {total_photoplates-1} ready?"
-    )
-    ui.get_user_ready(f"Is there {total_photoplates} {cfg.photoplate} covers ready?")
-    ui.get_user_ready(
-        f"Is there {trial_total-cfg.trials}  extra full {cfg.tip_volume}ul tipracks?"
-    )
-    for dye in dye_types_req.keys():
-        if dye_types_req[dye] > 0:
-            dye_req = max(_MIN_START_VOLUME_UL, dye_types_req[dye] + _MIN_END_VOLUME_UL)
-            ui.get_user_ready(f"Is there {dye_req}ul of dye type {dye}?")
+        trial_total = (trial_total - cfg.trials) + 3
 
     ui.print_header("LOAD LABWARE")
     photoplate, reservoir, tipracks = _load_labware(ctx, cfg)
@@ -465,6 +443,21 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         environment="None",
         liquid="None",
     )
+
+    ui.print_header("PREPARE")
+    for dye in dye_types_req.keys():
+        if dye_types_req[dye] > 0:
+            dye_req = max(_MIN_START_VOLUME_UL, dye_types_req[dye] + _MIN_END_VOLUME_UL)
+            if cfg.refill:
+                dye_req -= _MIN_END_VOLUME_UL
+                print(f" * {_MIN_END_VOLUME_UL / 1000} mL is already in RESERVOIR")
+                if not ctx.is_simulating():
+                    dye_ml = round(dye_req / 1000.0, 1)
+                    ui.get_user_ready(f'[REFILL] add {dye_ml} mL more DYE type "{dye}"')
+            else:
+                if not ctx.is_simulating():
+                    dye_ml = round(dye_req / 1000.0, 1)
+                    ui.get_user_ready(f'add {dye_ml} mL of DYE type "{dye}"')
 
     print("homing...")
     ctx.home()
@@ -510,10 +503,10 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                 if tip_iter >= len(tips[0]) and not (
                     (trial + 1) == cfg.trials and volume == test_volumes[-1]
                 ):
-                    ui.get_user_ready(
-                        f"Replace the tipracks in slots {cfg.slots_tiprack} with new"
-                        f" {cfg.tip_volume}uL tipracks"
-                    )
+                    if not ctx.is_simulating():
+                        ui.get_user_ready(
+                            f"replace TIPRACKS in slots {cfg.slots_tiprack}"
+                        )
                     tip_iter = 0
                 if volume < 250:
                     do_jog = False
