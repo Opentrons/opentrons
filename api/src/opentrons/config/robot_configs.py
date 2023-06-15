@@ -67,7 +67,11 @@ def _load_file() -> Dict[str, Any]:
 
 def load() -> Union[RobotConfig, OT3Config]:
     """Load the appropriate config, if it exists, or build defaults."""
-    return build_config(_load_file())
+    contents = _load_file()
+    config = build_config(contents)
+    if not contents:
+        save_robot_settings(config)
+    return config
 
 
 def load_ot2() -> RobotConfig:
