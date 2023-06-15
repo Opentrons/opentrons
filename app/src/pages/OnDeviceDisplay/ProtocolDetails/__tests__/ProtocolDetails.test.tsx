@@ -15,8 +15,12 @@ import {
   useCreateRunMutation,
   useHost,
   useProtocolQuery,
+  useProtocolAnalysesQuery,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../../i18n'
+import { useMissingHardwareText } from '../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
+import { useOffsetCandidatesForAnalysis } from '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+import { useMissingProtocolHardware } from '../../../Protocols/hooks'
 import { ProtocolDetails } from '..'
 import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
@@ -24,6 +28,11 @@ import { Labware } from '../Labware'
 
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
+jest.mock(
+  '../../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'
+)
+jest.mock('../../../Protocols/hooks')
 jest.mock('../Deck')
 jest.mock('../Hardware')
 jest.mock('../Labware')
@@ -45,6 +54,19 @@ const mockDeleteRun = deleteRun as jest.MockedFunction<typeof deleteRun>
 const mockUseProtocolQuery = useProtocolQuery as jest.MockedFunction<
   typeof useProtocolQuery
 >
+const mockUseProtocolAnalysesQuery = useProtocolAnalysesQuery as jest.MockedFunction<
+  typeof useProtocolAnalysesQuery
+>
+const mockUseMissingProtocolHardware = useMissingProtocolHardware as jest.MockedFunction<
+  typeof useMissingProtocolHardware
+>
+const mockUseOffsetCandidatesForAnalysis = useOffsetCandidatesForAnalysis as jest.MockedFunction<
+  typeof useOffsetCandidatesForAnalysis
+>
+
+const mockUseMissingHardwareText = useMissingHardwareText as jest.MockedFunction<
+  typeof useMissingHardwareText
+>
 
 const render = (path = '/protocols/fakeProtocolId') => {
   return renderWithProviders(
@@ -64,7 +86,11 @@ describe('ODDProtocolDetails', () => {
     mockUseCreateRunMutation.mockReturnValue({
       createRun: mockCreateRun,
     } as any)
-
+    mockUseMissingHardwareText.mockReturnValue(
+      'mock missing hardware chip text'
+    )
+    mockUseOffsetCandidatesForAnalysis.mockReturnValue([])
+    mockUseMissingProtocolHardware.mockReturnValue([])
     mockUseProtocolQuery.mockReturnValue({
       data: {
         data: {
@@ -85,6 +111,16 @@ describe('ODDProtocolDetails', () => {
         },
       },
     } as any)
+    mockUseProtocolAnalysesQuery.mockReturnValue({
+      data: {
+        data: [
+          {
+            id: 'mockAnalysisId',
+            status: 'completed',
+          },
+        ],
+      },
+    } as any)
     when(mockuseHost).calledWith().mockReturnValue(MOCK_HOST_CONFIG)
   })
   afterEach(() => {
@@ -102,8 +138,8 @@ describe('ODDProtocolDetails', () => {
     )
   })
   it('renders the start setup button', () => {
-    const [{ getByRole }] = render()
-    getByRole('button', { name: 'Start setup' })
+    const [{ getByText }] = render()
+    getByText('Start setup')
   })
   it('renders the protocol author', () => {
     const [{ getByText }] = render()
@@ -135,6 +171,8 @@ describe('ODDProtocolDetails', () => {
     const [{ getByText }] = render()
     const deleteButton = getByText('Delete protocol').closest('button')
     deleteButton?.click()
+    const confirmDeleteButton = getByText('Delete')
+    confirmDeleteButton.click()
     // flush promises and then make assertions
     await new Promise(setImmediate)
     expect(mockDeleteRun).toHaveBeenCalledWith(MOCK_HOST_CONFIG, '1')
@@ -157,7 +195,7 @@ describe('ODDProtocolDetails', () => {
     getByText('Mock Labware')
     // Can't test this until liquids section exists
     getByRole('button', { name: 'Liquids' })
-    const deckButton = getByRole('button', { name: 'Initial Deck Layout' })
+    const deckButton = getByRole('button', { name: 'Deck' })
     deckButton.click()
     getByText('Mock Initial Deck Layout')
     const summaryButton = getByRole('button', { name: 'Summary' })

@@ -26,9 +26,9 @@ const Template: Story<React.ComponentProps<typeof Toast>> = args => {
 
   return (
     <>
-      <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_ROW} marginY={SPACING.spacing16}>
         <PrimaryButton onClick={handleClick}>Click me</PrimaryButton>
-        <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_COLUMN} marginLeft={SPACING.spacing8}>
           <StyledText as="p">
             When clicking the button, the Toast shows up in the bottom.
           </StyledText>
@@ -43,7 +43,7 @@ const Template: Story<React.ComponentProps<typeof Toast>> = args => {
         <Flex
           justifyContent={JUSTIFY_CENTER}
           position={POSITION_FIXED}
-          bottom={SPACING.spacing4}
+          bottom={SPACING.spacing16}
           zIndex={1000}
         >
           <Toast {...args} onClose={() => setIsShowToast(false)} />

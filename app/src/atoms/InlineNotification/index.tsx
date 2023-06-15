@@ -72,12 +72,12 @@ export function InlineNotification(
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={INLINE_NOTIFICATION_PROPS_BY_TYPE[type].backgroundColor}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.borderRadiusSize3}
       data-testid={`InlineNotification_${type}`}
       flexDirection={DIRECTION_ROW}
-      gridGap="0.75rem"
+      gridGap={SPACING.spacing12}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={`0.75rem ${SPACING.spacing4}`}
+      padding={`${SPACING.spacing12} ${SPACING.spacing16}`}
       width={hug ? 'max-content' : '100%'}
     >
       <Icon {...iconProps} aria-label={`icon_${type}`} />

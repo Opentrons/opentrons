@@ -39,6 +39,9 @@
     },
     {
       "path": "./react-api-client"
+    },
+    {
+      "path": "./usb-bridge/node-client"
     }
   ]
 }

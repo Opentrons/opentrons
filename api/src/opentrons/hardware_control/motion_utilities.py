@@ -322,30 +322,34 @@ def machine_from_deck(
     offset: Point,
 ) -> Dict[AxisType, float]:
     """Build a machine-axis position from a deck position"""
-    to_transform = Point(*(tp for ax, tp in deck_pos.items() if ax in ax.gantry_axes()))
+    try:
+        point_for_z_axis = {
+            axe: Point(x=deck_pos[type(axe).X], y=deck_pos[type(axe).Y], z=pos)
+            for axe, pos in deck_pos.items()
+            if axe in axe.mount_axes()
+        }
+    except KeyError:
+        raise ValueError(
+            "Moves must specify either exactly an x, y, and (z or a) or none of them"
+        )
 
     # Pre-fill the dict we’ll send to the backend with the axes we don’t
     # need to transform
     machine_pos = {
         ax: pos for ax, pos in deck_pos.items() if ax not in ax.gantry_axes()
     }
-    if len(to_transform) != 3:
-        raise ValueError(
-            "Moves must specify either exactly an " "x, y, and (z or a) or none of them"
-        )
 
-    # Type ignored below because linal.apply_transform (rightly) specifies
-    # Tuple[float, float, float] and the implied type from
-    # target_position.items() is (rightly) Tuple[float, ...] with unbounded
-    # size; unfortunately, mypy can’t quite figure out the length check
-    # above that makes this OK
-    transformed = machine_point_from_deck_point(to_transform, attitude, offset)
-
-    to_check = {
-        ax: transformed[idx]
-        for idx, ax in enumerate(deck_pos.keys())
-        if ax in ax.gantry_axes()
+    transformed = {
+        axes: machine_point_from_deck_point(deck_point, attitude, offset)
+        for axes, deck_point in point_for_z_axis.items()
     }
+
+    to_check = {}
+    for axis, point in transformed.items():
+        to_check[axis] = point.z
+        to_check[type(axis).X] = point.x
+        to_check[type(axis).Y] = point.y
+
     machine_pos.update({ax: pos for ax, pos in to_check.items()})
     return machine_pos
 

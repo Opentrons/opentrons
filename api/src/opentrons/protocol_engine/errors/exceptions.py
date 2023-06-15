@@ -1,8 +1,20 @@
 """Protocol engine exceptions."""
 
+from enum import Enum, unique
+
+
+@unique
+class ErrorCode(Enum):
+    """Enumerated error codes."""
+
+    UNKNOWN = "4000"  # Catch-all code for any unclassified error
+
 
 class ProtocolEngineError(RuntimeError):
     """Base Protocol Engine error class."""
+
+    # This default error code should be overridden in every child class.
+    ERROR_CODE: str = ErrorCode.UNKNOWN.value
 
 
 class UnexpectedProtocolError(ProtocolEngineError):
@@ -12,6 +24,8 @@ class UnexpectedProtocolError(ProtocolEngineError):
     exception was raised somewhere in the stack and it was not properly caught
     and wrapped.
     """
+
+    ERROR_CODE: str = ErrorCode.UNKNOWN.value
 
     def __init__(self, original_error: Exception) -> None:
         """Initialize an UnexpectedProtocolError with an original error."""
@@ -184,6 +198,10 @@ class InvalidBlockVolumeError(ProtocolEngineError):
     """Raised when attempting to set an invalid block max volume."""
 
 
+class InvalidHoldTimeError(ProtocolEngineError):
+    """An error raised when attempting to set an invalid temperature hold time."""
+
+
 class InvalidTargetSpeedError(ProtocolEngineError):
     """Raised when attempting to set an invalid target speed."""
 
@@ -222,3 +240,7 @@ class PipetteNotReadyToAspirateError(ProtocolEngineError):
 
 class InvalidPipettingVolumeError(ProtocolEngineError):
     """Raised when pipetting a volume larger than the pipette volume."""
+
+
+class InvalidAxisForRobotType(ProtocolEngineError):
+    """Raised when attempting to use an axis that is not present on the given type of robot."""

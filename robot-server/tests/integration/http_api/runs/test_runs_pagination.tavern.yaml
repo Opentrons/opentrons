@@ -1,0 +1,149 @@
+test_name: Create runs and get all runs with and without pageLength.
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Create Empty Run 1
+    request:
+      url: '{ot2_server_base_url}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          first_run_id: data.id
+  - name: Patch the Run
+    request:
+      url: '{ot2_server_base_url}/runs/{first_run_id}'
+      json:
+        data: { 'current': false }
+      method: PATCH
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          id: !anystr
+          status: stopped
+          current: false
+  - name: Create Empty Run 2
+    request:
+      url: '{ot2_server_base_url}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          second_run_id: data.id
+  - name: Create Empty Run 3
+    request:
+      url: '{ot2_server_base_url}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          third_run_id: data.id
+  - name: Get runs default pagination
+    request:
+      url: '{ot2_server_base_url}/runs'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{first_run_id}'
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            status: stopped
+            current: False
+            actions: [ ]
+            errors: [ ]
+            pipettes: [ ]
+            modules: [ ]
+            labware:
+              - id: !anystr
+                loadName: !anystr
+                definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+                location: !anydict
+            labwareOffsets: [ ]
+            liquids: [ ]
+          - id: '{second_run_id}'
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            status: stopped
+            current: False
+            actions: [ ]
+            errors: [ ]
+            pipettes: [ ]
+            modules: [ ]
+            labware:
+              - id: !anystr
+                loadName: !anystr
+                definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+                location: !anydict
+            labwareOffsets: [ ]
+            liquids: [ ]
+          - id: '{third_run_id}'
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            status: idle
+            current: True
+            actions: [ ]
+            errors: [ ]
+            pipettes: [ ]
+            modules: [ ]
+            labware:
+              - id: !anystr
+                loadName: !anystr
+                definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+                location: !anydict
+            labwareOffsets: [ ]
+            liquids: [ ]
+        links:
+          current:
+            href: '/runs/{third_run_id}'
+  - name: Get runs pagination 0
+    request:
+      url: '{ot2_server_base_url}/runs?pageLength=0'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          []
+        links:
+          current:
+            href: '/runs/{third_run_id}'
+

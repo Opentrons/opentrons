@@ -49,7 +49,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         onClick={toggleSetShowDropdownMenu}
         border={BORDERS.lineBorder}
         borderRadius={BORDERS.radiusRoundEdge}
-        padding={SPACING.spacing3}
+        padding={SPACING.spacing8}
         backgroundColor={COLORS.white}
         css={css`
           cursor: pointer;
@@ -70,7 +70,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
           top="8.5rem"
-          left={SPACING.spacing4}
+          left={SPACING.spacing16}
           flexDirection={DIRECTION_COLUMN}
         >
           {filterOptions.map((option, index) => (

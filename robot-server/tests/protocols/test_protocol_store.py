@@ -371,3 +371,52 @@ def test_get_referencing_run_ids(
     run_store.remove(run_id="run-id-2")
 
     assert subject.get_referencing_run_ids("protocol-id-1") == []
+
+
+def test_get_protocol_ids(
+    subject: ProtocolStore,
+) -> None:
+    """It should return a list of protocol ids."""
+    protocol_resource_1 = ProtocolResource(
+        protocol_id="protocol-id-1",
+        created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+        source=ProtocolSource(
+            directory=None,
+            main_file=Path("/dev/null"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            robot_type="OT-2 Standard",
+            content_hash="abc1",
+        ),
+        protocol_key=None,
+    )
+
+    protocol_resource_2 = ProtocolResource(
+        protocol_id="protocol-id-2",
+        created_at=datetime(year=2021, month=1, day=2, tzinfo=timezone.utc),
+        source=ProtocolSource(
+            directory=None,
+            main_file=Path("/dev/null"),
+            config=JsonProtocolConfig(schema_version=123),
+            files=[],
+            metadata={},
+            robot_type="OT-2 Standard",
+            content_hash="abc2",
+        ),
+        protocol_key=None,
+    )
+
+    assert subject.get_all_ids() == []
+
+    subject.insert(protocol_resource_1)
+
+    assert subject.get_all_ids() == ["protocol-id-1"]
+
+    subject.insert(protocol_resource_2)
+    assert subject.get_all_ids() == ["protocol-id-1", "protocol-id-2"]
+
+    subject.remove(protocol_id="protocol-id-1")
+    subject.remove(protocol_id="protocol-id-2")
+
+    assert subject.get_all_ids() == []

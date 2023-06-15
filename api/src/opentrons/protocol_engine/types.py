@@ -37,7 +37,21 @@ class EngineStatus(str, Enum):
 class DeckSlotLocation(BaseModel):
     """The location of something placed in a single deck slot."""
 
-    slotName: DeckSlotName
+    slotName: DeckSlotName = Field(
+        ...,
+        description=(
+            # This description should be kept in sync with LabwareOffsetLocation.slotName.
+            "A slot on the robot's deck."
+            "\n\n"
+            'The plain numbers like `"5"` are for the OT-2,'
+            ' and the letter-number pairs like `"C2"` are for the Flex.'
+            "\n\n"
+            "When you provide one of these values, you can use either style."
+            " It will automatically be converted to match the robot."
+            "\n\n"
+            "When one of these values is returned, it will always match the robot."
+        ),
+    )
 
 
 class ModuleLocation(BaseModel):
@@ -151,6 +165,9 @@ class DeckPoint(BaseModel):
     z: float
 
 
+# TODO(mm, 2023-05-10): Deduplicate with constants in
+# opentrons.protocols.api_support.deck_type
+# and consider moving to shared-data.
 class DeckType(str, Enum):
     """Types of deck available."""
 
@@ -219,6 +236,8 @@ class MotorAxis(str, Enum):
     RIGHT_Z = "rightZ"
     LEFT_PLUNGER = "leftPlunger"
     RIGHT_PLUNGER = "rightPlunger"
+    EXTENSION_Z = "extensionZ"
+    EXTENSION_JAW = "extensionJaw"
 
 
 # TODO(mc, 2022-01-18): use opentrons_shared_data.module.dev_types.ModuleModel
@@ -426,6 +445,15 @@ class LabwareOffsetLocation(BaseModel):
             "The deck slot where the protocol will load the labware."
             " Or, if the protocol will load the labware on a module,"
             " the deck slot where the protocol will load that module."
+            "\n\n"
+            # This description should be kept in sync with DeckSlotLocation.slotName.
+            'The plain numbers like `"5"` are for the OT-2,'
+            ' and the letter-number pairs like `"C2"` are for the Flex.'
+            "\n\n"
+            "When you provide one of these values, you can use either style."
+            " It will automatically be converted to match the robot."
+            "\n\n"
+            "When one of these values is returned, it will always match the robot."
         ),
     )
     moduleModel: Optional[ModuleModel] = Field(

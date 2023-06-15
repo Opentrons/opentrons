@@ -37,7 +37,7 @@ export const ProtocolLiquidsDetails = (
       {liquidsInLoadOrder?.map((liquid, index) => {
         return (
           <React.Fragment key={liquid.id}>
-            <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing4}>
+            <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing16}>
               <LiquidsListItemDetails
                 liquidId={liquid.id}
                 displayColor={liquid.displayColor}

@@ -183,8 +183,8 @@ export function ProtocolRunSetup({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing4}
-      margin={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
+      margin={SPACING.spacing16}
     >
       {protocolData != null ? (
         <>
@@ -217,7 +217,7 @@ export function ProtocolRunSetup({
                   {StepDetailMap[stepKey].stepInternals}
                 </SetupStep>
                 {index !== stepsKeysInOrder.length - 1 ? (
-                  <Line marginTop={SPACING.spacing5} />
+                  <Line marginTop={SPACING.spacing24} />
                 ) : null}
               </Flex>
             ))

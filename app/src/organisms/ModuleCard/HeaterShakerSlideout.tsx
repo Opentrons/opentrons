@@ -97,13 +97,13 @@ export const HeaterShakerSlideout = (
       <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING.spacing2}
+        paddingTop={SPACING.spacing4}
         data-testid={`HeaterShakerSlideout_title_${module.serialNumber}`}
       >
         {t('set_target_temp_of_hs')}
       </StyledText>
       <Flex
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`HeaterShakerSlideout_input_field_${module.serialNumber}`}
       >
@@ -111,7 +111,7 @@ export const HeaterShakerSlideout = (
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.darkGrey}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
         >
           {t('set_block_temp')}
         </StyledText>

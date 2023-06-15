@@ -6,7 +6,7 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
-from . import commands
+from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
 from .types import (
     LabwareOffset,
@@ -148,6 +148,10 @@ class ProtocolEngine:
             RunStoppedError: the run has been stopped, so no new commands
                 may be added.
         """
+        request = slot_standardization.standardize_command(
+            request, self.state_view.config.robot_type
+        )
+
         command_id = self._model_utils.generate_id()
         request_hash = commands.hash_command_params(
             create=request,
@@ -281,6 +285,10 @@ class ProtocolEngine:
 
         To retrieve offsets later, see `.state_view.labware`.
         """
+        request = slot_standardization.standardize_labware_offset(
+            request, self.state_view.config.robot_type
+        )
+
         labware_offset_id = self._model_utils.generate_id()
         created_at = self._model_utils.get_timestamp()
         self._action_dispatcher.dispatch(

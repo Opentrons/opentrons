@@ -340,6 +340,8 @@ class MoveStopCondition(int, Enum):
     encoder_position = 0x4
     gripper_force = 0x8
     stall = 0x10
+    ignore_stalls = 0x20
+    limit_switch_backoff = 0x40
 
 
 @unique
@@ -351,3 +353,12 @@ class MotorUsageValueType(int, Enum):
     right_gear_motor_distance = 0x2
     force_application_time = 0x3
     total_error_count = 0x4
+
+
+class MoveAckId(int, Enum):
+    """Move Ack IDs."""
+
+    complete_without_condition = 0x1
+    stopped_by_condition = 0x2
+    timeout = 0x3
+    position_error = 0x4
