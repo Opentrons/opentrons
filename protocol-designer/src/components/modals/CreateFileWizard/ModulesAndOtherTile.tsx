@@ -11,9 +11,6 @@ import {
   PrimaryButton,
   ALIGN_CENTER,
   JUSTIFY_SPACE_BETWEEN,
-  BORDERS,
-  JUSTIFY_CENTER,
-  COLORS,
 } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_TYPE,
@@ -46,6 +43,7 @@ import { ModuleFields } from '../FilePipettesModal/ModuleFields'
 import { GoBackLink } from './GoBackLink'
 
 import type { WizardTileProps } from './types'
+import { EquipmentOption } from './EquipmentOption'
 
 const getCrashableModuleSelected = (
   modules: FormModulesByType,
@@ -155,7 +153,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           onClick={() => {
             if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
               goBack(3)
-            } else if (props.values.pipettesByMount.right.pipetteName == '') {
+            } else if (props.values.pipettesByMount.right.pipetteName === '') {
               goBack(2)
             } else {
               goBack()
@@ -187,7 +185,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
   const { values } = props
   return (
     <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
-      <FlexAddOnField
+      <EquipmentOption
         {...props}
         onClick={() => {
           if (values.additionalEquipment.includes('gripper')) {
@@ -214,8 +212,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
       {FLEX_SUPPORTED_MODULE_MODELS.map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
         return (
-          <FlexAddOnField
-            {...props}
+          <EquipmentOption
             key={moduleModel}
             isSelected={values.modulesByType[moduleType].onDeck}
             image={<ModuleDiagram type={moduleType} model={moduleModel} />}
@@ -243,42 +240,6 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
     </Flex>
   )
 }
-
-interface FlexAddOnFieldProps extends WizardTileProps {
-  onClick: React.MouseEventHandler
-  isSelected: boolean
-  image: React.ReactNode
-  text: React.ReactNode
-}
-function FlexAddOnField(props: FlexAddOnFieldProps): JSX.Element {
-  const { text, image, onClick, isSelected } = props
-  return (
-    <AdditionalItemCard onClick={onClick} isSelected={isSelected}>
-      <Flex
-        height="3.5rem"
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-        marginRight={SPACING.spacing16}
-      >
-        {image}
-      </Flex>
-      <Text as="p">{text}</Text>
-    </AdditionalItemCard>
-  )
-}
-
-const AdditionalItemCard = styled.div<{ isSelected: boolean }>`
-  display: flex;
-  align-items: ${ALIGN_CENTER};
-  width: 21.75rem;
-  grid-gap: ${SPACING.spacing8};
-  padding: ${SPACING.spacing16};
-  border: ${BORDERS.lineBorder};
-  border-radius: ${BORDERS.borderRadiusSize2};
-  cursor: pointer;
-  border-color: ${({ isSelected }) =>
-    isSelected ? COLORS.blueEnabled : COLORS.medGreyEnabled};
-`
 
 const AdditionalItemImage = styled.img`
   max-width: 100%;

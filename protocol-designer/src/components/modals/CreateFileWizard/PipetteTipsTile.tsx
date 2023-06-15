@@ -14,6 +14,7 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
+  InstrumentDiagram,
 } from '@opentrons/components'
 import {
   getLabwareDefURI,
@@ -25,6 +26,7 @@ import { GoBackLink } from './GoBackLink'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { FormState, WizardTileProps } from './types'
+import { EquipmentOption } from './EquipmentOption'
 
 export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
   return <PipetteTipsTile {...props} mount="left" />
@@ -56,7 +58,7 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
       pipetteName:
         firstPipetteName != null
           ? getPipetteNameSpecs(firstPipetteName as PipetteName)?.displayName ??
-            ''
+          ''
           : '',
       mount,
     }
@@ -96,7 +98,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const selectedPipetteDefaultTipRacks =
     selectedPipetteName != null
       ? getPipetteNameSpecs(selectedPipetteName as PipetteName)
-          ?.defaultTipracks ?? []
+        ?.defaultTipracks ?? []
       : []
 
   const tipRackOptions = reduce<typeof allLabware, RadioOption[]>(
@@ -123,12 +125,20 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
     setFieldValue(nameAccessor, tipRackOptions[0]?.value ?? null)
   }
 
-  return selectedPipetteName !== '' ? (
-    <RadioGroup
-      options={tipRackOptions}
-      value={currentValue ?? ''}
-      onChange={handleChange}
-      name={nameAccessor}
-    />
-  ) : null
+  return (
+    <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
+      {tipRackOptions.map(o => (
+        <EquipmentOption
+          key={o.name}
+          isSelected={currentValue === o.value}
+          image={<img/>}
+          text={o.name}
+          onClick={() => { setFieldValue(nameAccessor, o.value) }}
+          width="21.75rem"
+          minHeight="111px"
+        />
+      ))
+      }
+    </Flex>
+  )
 }

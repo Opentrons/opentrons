@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { FormikProps } from 'formik'
 import {
@@ -6,15 +7,16 @@ import {
   Flex,
   Text,
   SPACING,
-  RadioGroup,
   Mount,
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
   LEFT,
   RIGHT,
+  InstrumentDiagram,
 } from '@opentrons/components'
 import {
+  PipetteName,
   GEN1,
   GEN2,
   OT2_PIPETTES,
@@ -27,6 +29,7 @@ import { i18n } from '../../../localization'
 import { GoBackLink } from './GoBackLink'
 
 import type { FormState, WizardTileProps } from './types'
+import { EquipmentOption } from './EquipmentOption'
 
 export function FirstPipetteTypeTile(props: WizardTileProps): JSX.Element {
   const mount = LEFT
@@ -94,7 +97,7 @@ interface OT2FieldProps extends FormikProps<FormState> {
 }
 
 function PipetteField(props: OT2FieldProps): JSX.Element {
-  const { mount, values, setFieldValue, allowNoPipette, handleChange } = props
+  const { mount, values, setFieldValue, allowNoPipette } = props
   const robotType = values.fields.robotType
   const pipetteOptions = React.useMemo(() => {
     const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
@@ -108,13 +111,13 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
         name: getPipetteNameSpecs(name)?.displayName ?? '',
       }))
     return [
-      ...(allowNoPipette ? [{ name: 'None', value: '' }] : []),
       ...allPipetteOptions.filter(
         //  filter out 96-channel for now
         o => o.name.includes('Flex') && o.value !== 'p1000_96'
       ),
       ...allPipetteOptions.filter(o => o.name.includes(GEN2)),
       ...allPipetteOptions.filter(o => o.name.includes(GEN1)),
+      ...(allowNoPipette ? [{ name: 'None', value: '' }] : []),
     ]
   }, [robotType])
   const nameAccessor = `pipettesByMount.${mount}.pipetteName`
@@ -124,14 +127,25 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
   }
 
   return (
-    <RadioGroup
-      options={pipetteOptions}
-      value={currentValue ?? ''}
-      onChange={e => {
-        handleChange(e)
-        setFieldValue(`pipettesByMount.${mount}.tiprackDefURI`, undefined)
-      }}
-      name={nameAccessor}
-    />
+    <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
+      {pipetteOptions.map(o => (
+        <EquipmentOption
+          key={o.name}
+          isSelected={currentValue === o.value}
+          image={(
+            o.value === '' ? null :
+              <InstrumentDiagram
+                imageStyle={css`height: 75px; width: 60px;`}
+                mount="left"
+                pipetteSpecs={getPipetteNameSpecs(o.value as PipetteName)} />
+          )}
+          text={o.name}
+          onClick={() => { setFieldValue(nameAccessor, o.value) }}
+          width="21.75rem"
+          minHeight="111px"
+        />
+      ))
+      }
+    </Flex>
   )
 }
