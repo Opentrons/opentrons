@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom'
 import { css } from 'styled-components'
+import { ErrorBoundary } from 'react-error-boundary'
 
 import {
   Box,
@@ -39,7 +40,7 @@ import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { SLEEP_NEVER_MS } from './constants'
 import { useCurrentRunRoute, useProtocolReceiptToast } from './hooks'
-import { ErrorBoundary } from './ErrorBoundary'
+import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
 import type { Dispatch } from '../redux/types'
 import type { RouteProps } from './types'
@@ -247,7 +248,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   return (
     <ApiHostProvider hostname="localhost">
-      <ErrorBoundary>
+      <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
         <Box width="100%" css="user-select: none;">
           {isIdle ? (
             <SleepScreen />
