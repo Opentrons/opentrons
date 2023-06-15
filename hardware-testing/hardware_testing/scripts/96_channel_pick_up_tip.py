@@ -24,10 +24,11 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
     home_ot3,
     move_plunger_absolute_ot3,
-    move_plunger_relative_ot3,
     get_plunger_positions_ot3,
     update_pick_up_current,
+    update_pick_up_speed,
     update_pick_up_distance,
+    update_drop_tip_current,
     _get_pipette_from_mount,
 )
 
@@ -258,7 +259,7 @@ async def calibrate_tiprack(api, home_position, mount):
     drop_tip_loc = Point(drop_tip_loc[OT3Axis.X],
                         drop_tip_loc[OT3Axis.Y],
                         drop_tip_loc[OT3Axis.by_mount(mount)])
-    await api.drop_tip(mount)
+    #await api.drop_tip(mount)
     return tiprack_loc, drop_tip_loc
 
 async def _main() -> None:
@@ -268,31 +269,10 @@ async def _main() -> None:
         is_simulating=args.simulate, use_defaults=True
     )
     pipette_model = hw_api.get_all_attached_instr()[OT3Mount.LEFT]["pipette_id"]
-    # dial_data = {
-    #     "Ch1": None, "Ch2": None, "Ch3": None, "Ch4": None, "Ch5": None, "Ch6": None,
-    #     "Ch7": None, "Ch8": None, "Ch9": None, "Ch10": None, "Ch11": None, "Ch12": None,
-    #     "Ch13": None, "Ch14": None, "Ch15": None, "Ch16": None, "Ch17": None, "Ch18": None,
-    #     "Ch19": None, "Ch20": None, "Ch21": None, "Ch22": None, "Ch23": None, "Ch24": None,
-    #     "Ch25": None, "Ch26": None, "Ch27": None, "Ch28": None, "Ch29": None, "Ch30": None,
-    #     "Ch31": None, "Ch32": None, "Ch33": None, "Ch34": None, "Ch35": None, "Ch36": None,
-    #     "Ch37": None, "Ch38": None, "Ch39": None, "Ch40": None, "Ch41": None, "Ch42": None,
-    #     "Ch43": None, "Ch44": None, "Ch45": None, "Ch46": None, "Ch47": None, "Ch48": None,
-    #     "Ch49": None, "Ch50": None, "Ch51": None, "Ch52": None, "Ch53": None, "Ch54": None,
-    #     "Ch55": None, "Ch56": None, "Ch57": None, "Ch58": None, "Ch59": None, "Ch60": None,
-    #     "Ch61": None, "Ch62": None, "Ch63": None, "Ch64": None, "Ch65": None, "Ch66": None,
-    #     "Ch67": None, "Ch68": None, "Ch69": None, "Ch70": None, "Ch71": None, "Ch72": None,
-    #     "Ch73": None, "Ch74": None, "Ch75": None, "Ch76": None, "Ch77": None, "Ch78": None,
-    #     "Ch79": None, "Ch80": None, "Ch81": None, "Ch82": None, "Ch83": None, "Ch84": None,
-    #     "Ch85": None, "Ch86": None, "Ch87": None, "Ch88": None, "Ch89": None, "Ch90": None,
-    #     "Ch91": None, "Ch92": None, "Ch93": None, "Ch94": None, "Ch95": None, "Ch96": None,
-    #     "Motor Current": None,
-    #     "Trial": None,
-    #     "pipette_model": None,
-    # }
 
     dial_data = {"Column_1": None, "Column_2": None, "Column_3": None, "Column_4": None, "Column_5": None, "Column_6": None,
                 "Column_7": None, "Column_8": None, "Column_9": None, "Column_10": None, "Column_11": None, "Column_12": None}
-    # m_current = float(input("motor_current in amps: "))
+    m_current = float(input("motor_current in amps: "))
     # pick_up_speed = float(input("pick up tip speed in mm/s: "))
     details = [pipette_model, m_current]
     test_n, test_f = file_setup(dial_data, details)
@@ -313,22 +293,17 @@ async def _main() -> None:
     start_time = time.perf_counter()
     m_current = float(input("motor_current in amps: "))
     pick_up_speed = float(input("pick up tip speed in mm/s: "))
+    await update_pick_up_current(hw_api, mount, m_current)
+    await update_pick_up_speed(hw_api, mount, pick_up_speed)
+    await update_pick_up_distance(hw_api, mount, 16.5)
     # Calibrate to tiprack
     if args.tiprack:
         pickup_loc, droptip_loc = await calibrate_tiprack(hw_api, home_position, mount)
-    # Let's pick up the same tips and move to up.
-    cp = CriticalPoint.NOZZLE
-    await move_to_point(hw_api, mount, pickup_loc, cp)
-    await hw_api.pick_up_tip(
-        mount, tip_length=tip_length[args.tip_size])
     await hw_api.home_z(mount)
     cp = CriticalPoint.TIP
     home_w_tip = await hw_api.current_position_ot3(mount, cp)
     # Calibrate Dial Indicator with single tip
     if args.dial_indicator:
-        tip_count = 0
-        x_offset = 0
-        y_offset = 0
         cp = CriticalPoint.TIP
         dial_loc = Point(
                         slot_loc["C2"][0],
@@ -343,42 +318,51 @@ async def _main() -> None:
                             dial_loc[OT3Axis.by_mount(mount)])
 
     try:
+        tip_count = 0
+        x_offset = 0
+        y_offset = 0
         while True:
             measurements = []
-            for tip in range(1, tips_to_use + 1):
-                tip_count += 1
-                x_offset += 9
-                if tip_count % 8 == 0:
-                    y_offset = 0
-                if tip_count % 8 == 0:
-                    x_offset -= 9
-                await asyncio.sleep(1)
-                tip_measurement = gauge.read()
-                print(f"Tip_attachment(mm): {tip_measurement}")
-                tip_position = Point(dial_loc[0] + x_offset,
-                                        dial_loc[1] + y_offset,
-                                        dial_loc[2])
-                measurements.append(tip_measurement)
-                if tip_count % 12 == 0:
-                    d_str = ''
-                    for m in measurements:
-                        d_str += str(m) + ','
-                    d_str = d_str[:-1]
-                    data.append_data_to_file(test_n, test_f, d_str)
-                    # Reset Measurements list
-                    measurements = []
-                await move_to_point(hw_api, mount, tip_position, cp)
-
+            tip_count = 0
             cp = CriticalPoint.TIP
+            # for tip in range(1, tips_to_use + 1):
+            #     cp = CriticalPoint.TIP
+            #     tip_count += 1
+            #     x_offset -= 9
+            #     if tip_count % 12 == 0:
+            #         y_offset += 9
+            #     if tip_count % 12 == 0:
+            #         x_offset = 0
+            #     await asyncio.sleep(1)
+            #     tip_measurement = gauge.read()
+            #     print("tip-",tip_count, "(mm): " ,tip_measurement, end="")
+            #     print("\r", end="")
+            #     tip_position = Point(dial_loc[0] + x_offset,
+            #                             dial_loc[1] + y_offset,
+            #                             dial_loc[2])
+            #     measurements.append(tip_measurement)
+            #     if tip_count % 12 == 0:
+            #         d_str = ''
+            #         for m in measurements:
+            #             d_str += str(m) + ','
+            #         d_str = d_str[:-1] + '\n'
+            #         print(f"{d_str}")
+            #         data.append_data_to_file(test_n, test_f, d_str)
+            #         # Reset Measurements list
+            #         measurements = []
+            #         print("\r\n")
+            #     await move_to_point(hw_api, mount, tip_position, cp)
             await move_to_point(hw_api, mount, droptip_loc, cp)
             await hw_api.drop_tip(mount)
             await hw_api.home_z(mount)
-            # m_current = float(input("motor_current in amps: "))
-            # pick_up_speed = float(input("pick up tip speed in mm/s: "))
+            m_current = float(input("motor_current in amps: "))
+            pick_up_speed = float(input("pick up tip speed in mm/s: "))
+            await update_pick_up_current(hw_api, mount, m_current)
+            await update_pick_up_speed(hw_api, mount, pick_up_speed)
+            await update_pick_up_distance(hw_api, mount, 16.5)
             cp = CriticalPoint.NOZZLE
             await move_to_point(hw_api, mount, pickup_loc, cp)
             await hw_api.pick_up_tip(mount, tip_length=tip_length[args.tip_size])
-            # await hw_api.home_z(mount)
 
     except KeyboardInterrupt:
         await hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])
