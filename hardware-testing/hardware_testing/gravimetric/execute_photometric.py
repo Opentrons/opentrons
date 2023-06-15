@@ -283,7 +283,6 @@ def _run_trial(
         #       what volumes need to be added between trials.
         ui.get_user_ready("check DYE is enough")
 
-    print(test_report)
     _record_measurement_and_store(MeasurementType.INIT)
     pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
     if do_jog:
@@ -293,10 +292,10 @@ def _run_trial(
         liquid_tracker.set_start_volume_from_liquid_height(
             source, _liquid_height, name="Dye"
         )
-        reservoir_volume = liquid_tracker.get_volume(source)
-        print(
-            f"software thinks there is {reservoir_volume} uL of liquid in the reservoir"
-        )
+    reservoir_ml = round(liquid_tracker.get_volume(source) / 1000, 1)
+    print(
+        f"software thinks there is {reservoir_ml} mL of liquid in the reservoir"
+    )
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         ctx,

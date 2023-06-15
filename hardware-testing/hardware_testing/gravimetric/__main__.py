@@ -175,6 +175,7 @@ if __name__ == "__main__":
         _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
         is_simulating=args.simulate,
         deck_version="2",
+        stall_detection_enable=False,  # FIXME: enable stall-detection
     )
     if args.photometric:
         run_photometric(
