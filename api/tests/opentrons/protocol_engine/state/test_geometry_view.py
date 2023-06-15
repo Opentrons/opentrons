@@ -175,7 +175,7 @@ def test_get_labware_parent_position_on_labware(
     ot2_standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
 ) -> None:
-    """It should return a labware position for labware on a labware."""
+    """It should return a labware position for labware on a labware on a module."""
     labware_data = LoadedLabware(
         id="labware-id",
         loadName="bcd",
@@ -187,10 +187,16 @@ def test_get_labware_parent_position_on_labware(
         id="adapter-id",
         loadName="xyz",
         definitionUri=uri_from_details(namespace="w", load_name="xyz", version=1),
-        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+        location=ModuleLocation(moduleId="module-id"),
         offsetId=None,
     )
     decoy.when(labware_view.get("labware-id")).then_return(labware_data)
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    )
+    decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
+        Point(1, 2, 3)
+    )
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
         Point(1, 2, 3)
     )
@@ -202,9 +208,29 @@ def test_get_labware_parent_position_on_labware(
         labware_view.get_labware_overlap_offsets("labware-id", "xyz")
     ).then_return(OverlapOffset(x=1, y=2, z=2))
 
+    decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
+    decoy.when(
+        module_view.get_nominal_module_offset(
+            module_id="module-id", deck_type=DeckType.OT2_STANDARD
+        )
+    ).then_return(LabwareOffsetVector(x=1, y=2, z=3))
+
+    decoy.when(module_view.get_connected_model("module-id")).then_return(
+        ModuleModel.MAGNETIC_MODULE_V2
+    )
+    decoy.when(
+        labware_view.get_module_overlap_offsets(
+            "adapter-id", ModuleModel.MAGNETIC_MODULE_V2
+        )
+    ).then_return(OverlapOffset(x=-3, y=-2, z=-1))
+
+    decoy.when(module_view.get_module_calibration_offset("module-id")).then_return(
+        ModuleOffsetVector(x=3, y=4, z=5)
+    )
+
     result = subject.get_labware_parent_position("labware-id")
 
-    assert result == Point(2, 4, 6)
+    assert result == Point(9, 12, 15)
 
 
 def test_get_labware_origin_position(
@@ -1097,6 +1123,52 @@ def test_get_labware_center(
     )
 
     assert labware_center == expected_center_point
+
+
+def test_get_labware_center_on_labware(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    ot2_standard_deck_def: DeckDefinitionV3,
+    subject: GeometryView,
+) -> None:
+    """It should get the center point of a labware on another labware."""
+    decoy.when(labware_view.get(labware_id="labware-id")).then_return(
+        LoadedLabware(
+            id="labware-id",
+            loadName="above-name",
+            definitionUri="1234",
+            location=OnLabwareLocation(labwareId="below-id"),
+        )
+    )
+    decoy.when(labware_view.get(labware_id="below-id")).then_return(
+        LoadedLabware(
+            id="below-id",
+            loadName="below-name",
+            definitionUri="1234",
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        )
+    )
+
+    decoy.when(labware_view.get_dimensions("labware-id")).then_return(
+        Dimensions(x=500, y=5001, z=10)
+    )
+    decoy.when(labware_view.get_dimensions("below-id")).then_return(
+        Dimensions(x=1000, y=1001, z=11)
+    )
+    decoy.when(
+        labware_view.get_labware_overlap_offsets("labware-id", "below-name")
+    ).then_return(OverlapOffset(x=0, y=1, z=6))
+
+    decoy.when(labware_view.get_slot_center_position(DeckSlotName.SLOT_4)).then_return(
+        Point(x=5, y=9, z=10)
+    )
+
+    labware_center = subject.get_labware_center(
+        labware_id="labware-id", location=OnLabwareLocation(labwareId="below-id")
+    )
+
+    assert labware_center == Point(5, 10, 20)
 
 
 @pytest.mark.parametrize(
