@@ -39,10 +39,6 @@ export function ProtocolCard(props: {
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
   const longpress = useLongPress()
 
-  setTimeout(() => {
-    throw new Error()
-  }, 5000)
-
   const handleProtocolClick = (
     longpress: UseLongPressResult,
     protocolId: string
