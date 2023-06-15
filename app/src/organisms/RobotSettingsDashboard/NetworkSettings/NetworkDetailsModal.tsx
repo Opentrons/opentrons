@@ -14,9 +14,9 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
-import { Modal } from '../../../molecules/Modal/OnDeviceDisplay/Modal'
+import { Modal } from '../../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 
 interface NetworkDetailsModalProps {
   setShowNetworkDetailModal: (showNetworkDetailModal: boolean) => void

@@ -7,8 +7,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { StyledText } from '../../../atoms/text'
-import { SmallButton } from '../../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
+import { SmallButton } from '../../atoms/buttons'
 import { Modal } from '.'
 
 interface SmallModalChildrenProps {
