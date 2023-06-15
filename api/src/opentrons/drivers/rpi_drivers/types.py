@@ -111,7 +111,7 @@ class USBPort:
                 if (board_revision == BoardRevision.FLEX_B2) and (
                     hub == FLEX_B2_USB_PORT_GROUP_FRONT
                 ):
-                    port = 1
+                    port = 9
                     hub_port = int(port_info[2])
                 else:
                     port = int(port_info[2])
@@ -120,7 +120,7 @@ class USBPort:
             if board_revision == BoardRevision.FLEX_B2:
                 port_info = port_nodes[0].split(".")
                 hub = int(port_info[1])
-                port = 1
+                port = 9
                 hub_port = None
                 name = port_nodes[0]
             else:
