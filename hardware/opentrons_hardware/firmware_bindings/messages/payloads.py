@@ -226,6 +226,13 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 
 
 @dataclass(eq=False)
+class GearMotorPositionResponse(EmptyPayload):
+
+    current_position: utils.UInt32Field
+
+
+
+@dataclass(eq=False)
 class MotorPositionResponse(EmptyPayload):
     """Read Encoder Position."""
 
@@ -548,6 +555,7 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     """A request to perform a tip action."""
 
     velocity: utils.Int32Field
+    acceleration: utils.Int32Field
     action: PipetteTipActionTypeField
     request_stop_condition: MoveStopConditionField
 

@@ -206,7 +206,9 @@ def get_current_settings(
     config: OT3CurrentSettings,
     gantry_load: GantryLoad,
 ) -> OT3AxisMap[CurrentConfig]:
+    print(f"CONFIG = {config}")
     conf_by_pip = config.by_gantry_load(gantry_load)
+    print(f"conf_by_pip = {conf_by_pip}")
     currents = {}
     for axis_kind in conf_by_pip["hold_current"].keys():
         for axis in Axis.of_kind(axis_kind):
@@ -223,20 +225,25 @@ def get_system_constraints(
 ) -> "SystemConstraints[Axis]":
     conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
-    for axis_kind in [
+    axis_kind = [
         OT3AxisKind.P,
         OT3AxisKind.X,
         OT3AxisKind.Y,
         OT3AxisKind.Z,
         OT3AxisKind.Z_G,
-    ]:
-        for axis in Axis.of_kind(axis_kind):
+    ]
+    if gantry_load == GantryLoad.HIGH_THROUGHPUT:
+        axis_kind.append(OT3AxisKind.Q)
+    for axis_kind in axis_kind:
+        for axis in OT3Axis.of_kind(axis_kind):
             constraints[axis] = AxisConstraints.build(
                 conf_by_pip["acceleration"][axis_kind],
                 conf_by_pip["max_speed_discontinuity"][axis_kind],
                 conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
                 conf_by_pip["default_max_speed"][axis_kind],
             )
+
+
     return constraints
 
 
@@ -367,12 +374,17 @@ def create_home_group(
 
 
 def create_tip_action_group(
-    axes: Sequence[Axis], distance: float, velocity: float, action: PipetteAction
+    axes: Sequence[OT3Axis],
+    distance: float,
+    velocity: float,
+    acceleration: float,
+    action: PipetteAction,
 ) -> MoveGroup:
     current_nodes = [axis_to_node(ax) for ax in axes]
     step = create_tip_action_step(
         velocity={node_id: np.float64(velocity) for node_id in current_nodes},
         distance={node_id: np.float64(distance) for node_id in current_nodes},
+        acceleration={node_id: np.float64(acceleration) for node_id in current_nodes},
         present_nodes=current_nodes,
         action=PipetteTipActionType[action],
     )
