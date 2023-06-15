@@ -69,7 +69,6 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteVersionType,
 )
 from opentrons_shared_data.pipette import (
-    pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
 )
 
