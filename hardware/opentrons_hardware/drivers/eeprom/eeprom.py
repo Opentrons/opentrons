@@ -4,7 +4,7 @@ import os
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Set, Type, List, Tuple, Any
+from typing import Optional, Set, Type, Tuple, Any
 from types import TracebackType
 
 from ..gpio import OT3GPIO
@@ -26,16 +26,6 @@ DEFAULT_ADDRESS = "0050"
 DEFAULT_READ_SIZE = 64
 
 
-"""
-
-NOTES:
-
-1. Need to deal with property_write only able to write 1 page of data
-2. Do we want to clear the eeprom when we write???
-3. In property_write, return the PropIds of the properties that were written successfully.
-"""
-
-
 class EEPROM:
     """This class lets you read/write to the eeprom using a sysfs file."""
 
@@ -43,19 +33,22 @@ class EEPROM:
         self,
         bus: Optional[int] = DEFAULT_BUS,
         address: Optional[str] = DEFAULT_ADDRESS,
+        filepath: Optional[str] = None,
     ) -> None:
         """Contructor
 
         Args:
             bus: The i2c bus this device is on
             address: The unique address for this device
+            filepath: The filepath of the eeprom, for testing.
         """
         self._bus = bus
         self._address = address
-        #self._eeprom_filepath = Path(f"/sys/bus/i2c/devices/{bus}-{address}/eeprom")
-        self._eeprom_filepath = Path(f"/data/eeprom")
+        self._eeprom_filepath = filepath or Path(
+            f"/sys/bus/i2c/devices/{bus}-{address}/eeprom"
+        )
         self._eeprom_fd = -1
-        self._gpio = OT3GPIO("hardware_control")
+        self._gpio = OT3GPIO("eeprom_hw_control")
         self._eeprom_data: EEPROMData = EEPROMData()
         self._properties: Set[Property] = set()
 
@@ -123,13 +116,10 @@ class EEPROM:
         properties: Set[Property] = set()
         address = 0
         overflow = b""
-        while True:
-            # read data in n byte chunks
-            data = self._read(size=DEFAULT_READ_SIZE, address=address)
-            if not data:
-                break
-            # prepend any leftover data from previous read
-            data = overflow + data
+        for idx in range(len(PropId)):
+            logger.debug(f"Reading eeprom page {idx}.")
+            # read data in n byte chunks andprepend any leftover data from previous read
+            data = overflow + self._read(size=DEFAULT_READ_SIZE, address=address)
             props, overflow = parse_data(data, prop_ids=prop_ids)
             if props:
                 properties.update(props)
@@ -143,24 +133,27 @@ class EEPROM:
         # sort by PropId value to keep things in order
         return set(sorted(properties, key=lambda prop: prop.id.value))
 
-    def property_write(
-        self, properties: Set[Tuple[PropId, Any]], force: bool = False
-    ) -> List[PropId]:
-        """Write the given properties to the eeprom, returning a list of the successful ones."""
+    def property_write(self, properties: Set[Tuple[PropId, Any]]) -> Set[PropId]:
+        """Write the given properties to the eeprom, returning a set of the successful ones."""
+        written_props: Set[PropId] = set()
         # sort the properties so they are written in ascending order
         properties = set(sorted(properties, key=lambda prop: prop[0].value))
         data: bytes = b""
         for prop_id, value in properties:
             packet = generate_packet(prop_id, value)
             if packet:
+                written_props.add(prop_id)
                 data += packet
         if data:
             try:
                 self._gpio.activate_eeprom_wp()
-                size = self._write(data)
+                self._write(data)
+            except RuntimeError:
+                # something went wrong, clear written props
+                written_props = set()
             finally:
                 self._gpio.deactivate_eeprom_wp()
-        return list()
+        return written_props
 
     def _read(self, size: int = DEFAULT_READ_SIZE, address: int = 0) -> bytes:
         """Reads a number of bytes from the eeprom."""
@@ -195,14 +188,14 @@ class EEPROM:
             logging.error(
                 f"Could not write data to eeprom {self.name}, make sure the write bit is low."
             )
-            return -1
+            raise
 
     def _populate_data(self) -> EEPROMData:
         """This will create and populate the EEPROMData object."""
         for prop in self._properties:
             if prop.id == PropId.FORMAT_VERSION:
                 self._eeprom_data.format_version = prop.value
-            elif prop.id == PropId.SERIAL_NUMBER and len(prop.value) >= 22:
+            elif prop.id == PropId.SERIAL_NUMBER and len(prop.value) >= 17:
                 self._eeprom_data.serial_number = prop.value
                 self._eeprom_data.machine_type = prop.value[:3]
                 self._eeprom_data.machine_version = prop.value[3:6]
@@ -210,7 +203,5 @@ class EEPROM:
                 self._eeprom_data.programmed_date = datetime.strptime(
                     date_string, "%Y%m%d"
                 )
-                self._eeprom_data.manufacturing_facility = prop.value[14:15]
-                self._eeprom_data.unit_number = int(prop.value[15:18])
-                self._eeprom_data.unique_id = prop.value[18:22]
+                self._eeprom_data.unit_number = int(prop.value[14:17])
         return self._eeprom_data

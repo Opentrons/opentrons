@@ -3,9 +3,12 @@
 from datetime import datetime
 from dataclasses import dataclass
 from enum import Enum
-from typing import Dict, Any, Optional, Tuple, Set
+from typing import Any, Optional
 
 
+# NOTE: a serialized property can be up-to 255 (0xff) bytes long,
+# this includes the property id (1b) + data length (1b) + data (1-253b)
+MAX_DATA_LEN = 253
 
 
 class PropId(Enum):
@@ -14,10 +17,6 @@ class PropId(Enum):
     INVALID = 0xFF
     FORMAT_VERSION = 1
     SERIAL_NUMBER = 2
-    MACHINE_TYPE = 3
-    MACHINE_VERSION = 4
-    PROGRAMMED_DATE = 5
-    UNIT_NUMBER = 6
 
 
 class PropType(Enum):
@@ -34,10 +33,6 @@ class PropType(Enum):
 PROP_ID_TYPES = {
     PropId.FORMAT_VERSION: PropType.BYTE,
     PropId.SERIAL_NUMBER: PropType.STR,
-    PropId.MACHINE_TYPE: PropType.BYTE,
-    PropId.MACHINE_VERSION: PropType.STR,
-    PropId.PROGRAMMED_DATE: PropType.STR,
-    PropId.UNIT_NUMBER: PropType.INT,
 }
 
 PROP_TYPE_SIZE = {
@@ -45,8 +40,8 @@ PROP_TYPE_SIZE = {
     PropType.CHAR: 1,
     PropType.SHORT: 2,
     PropType.INT: 4,
-    PropType.STR: 254,
-    PropType.BIN: 254,
+    PropType.STR: MAX_DATA_LEN,
+    PropType.BIN: MAX_DATA_LEN,
 }
 
 
@@ -56,7 +51,7 @@ class Property:
 
     id: PropId
     type: PropType
-    size: int
+    max_size: int
     value: Any
 
 
@@ -69,7 +64,4 @@ class EEPROMData:
     machine_type: Optional[str] = None
     machine_version: Optional[str] = None
     programmed_date: Optional[datetime] = None
-    manufacturing_facility: Optional[str] = None
     unit_number: Optional[int] = None
-    unique_id: Optional[str] = None
-

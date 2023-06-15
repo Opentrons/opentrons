@@ -224,8 +224,6 @@ class OT3Controller:
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
         self._gpio_dev, self._usb_messenger = self._build_system_hardware(usb_driver)
-        self._eeprom = EEPROM()
-        self._eeprom.setup()
         self._subsystem_manager = SubsystemManager(
             self._messenger,
             self._usb_messenger,
@@ -233,6 +231,8 @@ class OT3Controller:
             network.NetworkInfo(self._messenger, self._usb_messenger),
             FirmwareUpdate(),
         )
+        self._eeprom = EEPROM()
+        self._eeprom.setup()
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}

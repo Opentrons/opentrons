@@ -9,14 +9,15 @@ from .types import (
     PropType,
     PROP_ID_TYPES,
     PROP_TYPE_SIZE,
+    MAX_DATA_LEN,
 )
+
 
 ParsedData = Tuple[Set[Property], bytes]
 
 
 def parse_data(data: bytes, prop_ids: Optional[Set[PropId]] = None) -> ParsedData:
-    """
-    This function will parse bytes and return a list of valid Property objects.
+    """This function will parse bytes and return a list of valid Property objects.
 
     Any data that is unparsed or incomplete will be returned to the caller,
     this way it can be combined with new data and reparsed.
@@ -26,7 +27,7 @@ def parse_data(data: bytes, prop_ids: Optional[Set[PropId]] = None) -> ParsedDat
     packet = b""
     start_idx = end_idx = 0
     data_len = len(data)
-    while(start_idx <= data_len):
+    while start_idx < data_len:
         prop_id = data[start_idx]
         # break out if we have an invalid prop id (0xff)
         if prop_id == PropId.INVALID.value:
@@ -37,6 +38,8 @@ def parse_data(data: bytes, prop_ids: Optional[Set[PropId]] = None) -> ParsedDat
             packet = data[start_idx:]
             break
         prop_len = data[start_idx + 1]
+        if prop_len > MAX_DATA_LEN:
+            break
         end_idx = start_idx + 2 + prop_len
         if end_idx > data_len:
             packet = data[start_idx:]
@@ -66,21 +69,23 @@ def _parse_prop(prop_id: int, prop_len: int, data: bytes) -> Optional[Property]:
             decoded_data = int.from_bytes(data, "big")
         elif data_type == PropType.STR:
             decoded_data = data.decode("utf-8")
-        return Property(id=prop, type=data_type, size=data_size, value=decoded_data)
+        return Property(id=prop, type=data_type, max_size=data_size, value=decoded_data)
     except ValueError:
         return None
+
 
 def generate_packet(prop_id: PropId, value: Any) -> Optional[bytes]:
     """This function will turn prop_ids and their data into a bytes for writting to eeprom."""
     data = _encode_data(prop_id, value)
-    if data:
-        return struct.pack("!BB", len(data), prop_id.value) + data
+    if data and len(data) <= MAX_DATA_LEN:
+        return struct.pack("!BB", prop_id.value, len(data)) + data
     return None
 
 
-def _encode_data(prop_id: PropId, value: Any) -> Optional[bytes]:
+def _encode_data(prop_id: PropId, value: Any) -> Optional[bytes]:  # noqa: C901
+    if prop_id == PropId.INVALID:
+        return None
     data_type = PROP_ID_TYPES[prop_id]
-    data_size = PROP_TYPE_SIZE[data_type]
     encoded_data: bytes = b""
     try:
         if data_type == PropType.BYTE:
@@ -98,4 +103,3 @@ def _encode_data(prop_id: PropId, value: Any) -> Optional[bytes]:
         return encoded_data
     except (ValueError, TypeError):
         return None
-
