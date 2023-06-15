@@ -52,7 +52,11 @@ def hardware_pipette_ot3() -> Callable:
         id: str = "testID",
     ):
         return ot3_pipette.Pipette(
-            load_pipette_data.load_definition(model.pipette_type, model.pipette_channels, model.pipette_version), calibration, id
+            load_pipette_data.load_definition(
+                model.pipette_type, model.pipette_channels, model.pipette_version
+            ),
+            calibration,
+            id,
         )
 
     return _create_pipette

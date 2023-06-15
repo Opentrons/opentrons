@@ -69,6 +69,7 @@ def supported_pipette(model_or_name: Union[PipetteName, PipetteModel, None]) -> 
         return True
     return False
 
+
 def channels_from_string(channels: str) -> PipetteChannelType:
     """Convert channels from a string.
 
@@ -195,4 +196,3 @@ def convert_pipette_model(
         channels = DEFAULT_CHANNELS
         version = DEFAULT_MODEL_VERSION
     return PipetteModelVersionType(PipetteModelType[pipette_type], channels, version)
-
