@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import {
   BORDERS,
   COLORS,
+  Flex,
   SPACING,
   TYPOGRAPHY,
   WRAP,
@@ -12,12 +13,15 @@ import {
   GRIPPER_V1,
   getGripperDisplayName,
   getModuleDisplayName,
+  getModuleDisplayIcon,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
+import { LocationIcon } from '../../../molecules/LocationIcon'
 import { useRequiredProtocolHardware } from '../../Protocols/hooks'
 import { EmptySection } from './EmptySection'
 
+import type { IconName } from '@opentrons/components'
 import type { ProtocolHardware } from '../../Protocols/hooks'
 import type { TFunction } from 'react-i18next'
 
@@ -25,7 +29,7 @@ const Table = styled('table')`
   ${TYPOGRAPHY.labelRegular}
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing4};
+  border-spacing: 0 ${SPACING.spacing8};
   margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
@@ -72,7 +76,18 @@ const getHardwareName = (protocolHardware: ProtocolHardware): string => {
   } else if (protocolHardware.hardwareType === 'pipette') {
     return getPipetteNameSpecs(protocolHardware.pipetteName)?.displayName ?? ''
   } else {
+    console.log(protocolHardware)
     return getModuleDisplayName(protocolHardware.moduleModel)
+  }
+}
+
+const getModuleIcon = (
+  protocolHardware: ProtocolHardware
+): IconName | undefined => {
+  if (protocolHardware.hardwareType === 'module') {
+    return getModuleDisplayIcon(protocolHardware.moduleModel) as IconName
+  } else {
+    return undefined
   }
 }
 
@@ -113,22 +128,36 @@ export const Hardware = (props: { protocolId: string }): JSX.Element => {
           return (
             <TableRow key={id}>
               <TableDatum>
-                <StyledText
-                  as="p"
-                  color={COLORS.darkBlack100}
-                  paddingLeft={SPACING.spacing24}
-                >
-                  {i18n.format(getHardwareLocation(hardware, t), 'capitalize')}
-                </StyledText>
+                <Flex paddingLeft={SPACING.spacing24}>
+                  {hardware.hardwareType === 'module' ? (
+                    <LocationIcon slotName={hardware.slot} />
+                  ) : (
+                    <StyledText
+                      as="p"
+                      color={COLORS.darkBlack100}
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    >
+                      {i18n.format(
+                        getHardwareLocation(hardware, t),
+                        'titleCase'
+                      )}
+                    </StyledText>
+                  )}
+                </Flex>
               </TableDatum>
               <TableDatum>
-                <StyledText
-                  as="p"
-                  color={COLORS.darkBlack100}
-                  paddingLeft={SPACING.spacing24}
-                >
-                  {getHardwareName(hardware)}
-                </StyledText>
+                <Flex paddingLeft={SPACING.spacing24}>
+                  {hardware.hardwareType === 'module' &&
+                    getModuleIcon(hardware) !== null && (
+                      <LocationIcon
+                        iconName={getModuleIcon(hardware)}
+                        border={false}
+                      />
+                    )}
+                  <StyledText as="p" color={COLORS.darkBlack100}>
+                    {getHardwareName(hardware)}
+                  </StyledText>
+                </Flex>
               </TableDatum>
             </TableRow>
           )
