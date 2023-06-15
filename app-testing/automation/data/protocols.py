@@ -116,8 +116,8 @@ class Protocols:
         description="""
             This protocol gives an error in PD.
             8-Channel pipette cannot access labware
-            8-Channel pipettes cannot access labware or tip racks to the left or right of 
-            a Heater-Shaker GEN1 module. Move labware to a different slot to access it 
+            8-Channel pipettes cannot access labware or tip racks to the left or right of
+            a Heater-Shaker GEN1 module. Move labware to a different slot to access it
             with an 8-Channel pipette.
             If you export it anyway there are NOT analysis errors in the app side analysis.
             TODO on if there are robot side analysis errors but do not expect them?

@@ -14,14 +14,15 @@ Slices of the tests will be selected as candidates for automation and then perfo
    1. Install python 3.11
 2. Install the Opentrons application on your machine.
    1. <https://opentrons.com/ot-app/>
-   2. This could also be done by building the installer on a branch and installing the App.
+   2. [Internal release for Flex like](https://github.com/Opentrons/opentrons/releases/tag/ot3%400.11.0)
+   3. This could also be done by building the installer on a branch and installing the App.
       1. for Mac
          1. `make -C app-shell dist-osx`
 3. Install Chromedriver
    1. in the app-testing directory
       1. `sudo ./ci-tools/mac_get_chromedriver.sh 21.3.1` per the version of electron in the root package.json for electron
          1. Windows `sudo .\ci-tools\windows_get_chromedriver.ps1 -version 21.3.1`
-         1. if you experience `wget: command not found`
+         2. if you experience `wget: command not found`
             1. brew install wget and try again
    2. when you run `chromedriver --version`
       1. It should work
@@ -35,10 +36,8 @@ Slices of the tests will be selected as candidates for automation and then perfo
 6. In the app-testing directory (make, python, pipenv required on your path)
    1. `make teardown`
    2. `make setup`
-7. Run all tests
-   1. `make test`
-8. Run specific test(s)
-   1. `pipenv run python -m pytest -k test_labware_landing`
+7. Run specific test(s)
+   1. `pipenv run python -m pytest -k test_analyses`
       1. [See docs on pytest -k flag](https://docs.pytest.org/en/6.2.x/usage.html#specifying-tests-selecting-tests)
 
 ## Tools

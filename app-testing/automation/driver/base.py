@@ -66,7 +66,7 @@ class Base:
         if screenshot:
             self.take_screenshot(message=screenshot_message)
         time.sleep(effect_time_sec)
-        apply_style(original_style)
+        apply_style(str(original_style))
 
     def apply_border_to_element(
         self,
@@ -90,7 +90,7 @@ class Base:
         if screenshot:
             self.take_screenshot(message=screenshot_message)
         time.sleep(effect_time_sec)
-        apply_style(original_style)
+        apply_style(str(original_style))
 
     def highlight_element(self, finder: Callable[..., WebElement]) -> None:
         """Highlight an element."""

@@ -164,7 +164,7 @@ class DeviceLanding:
         if not button:  # None check but the finder throws so should never be hit
             return False
         # get the status of the toggle
-        return button.get_attribute("aria-checked").lower() == "true"
+        return button.get_attribute("aria-checked").lower() == "true"  # type: ignore
 
     def set_lights(self, on: bool) -> bool:
         """Set the lights toggle.  Return a bool of the condition: final light state == the desired state."""
