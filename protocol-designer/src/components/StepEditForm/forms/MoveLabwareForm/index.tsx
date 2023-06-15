@@ -7,7 +7,7 @@ import {
   LabwareLocationField,
 } from '../../fields'
 import styles from '../../StepEditForm.css'
-import { StepFormProps } from '../../types'
+import type { StepFormProps } from '../../types'
 
 export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
   const { propsForFields } = props
@@ -20,7 +20,6 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
         </span>
       </div>
       <div className={styles.form_row}>
-
         <FormGroup
           label={i18n.t('form.step_edit_form.labwareLabel.movedLabware')}
           className={styles.large_field}
@@ -30,16 +29,11 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
         <FormGroup
           className={styles.small_field}
           label={i18n.t('form.step_edit_form.field.useGripper.label')}
-
         >
           <ToggleRowField
             {...propsForFields.useGripper}
-            offLabel={i18n.t(
-              'form.step_edit_form.field.useGripper.toggleOff'
-            )}
-            onLabel={i18n.t(
-              'form.step_edit_form.field.useGripper.toggleOn'
-            )}
+            offLabel={i18n.t('form.step_edit_form.field.useGripper.toggleOff')}
+            onLabel={i18n.t('form.step_edit_form.field.useGripper.toggleOn')}
           />
         </FormGroup>
       </div>
@@ -52,9 +46,7 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
         </FormGroup>
       </div>
 
-      <div className={styles.section_wrapper}>
-      </div>
-
+      <div className={styles.section_wrapper}></div>
     </div>
   )
 }

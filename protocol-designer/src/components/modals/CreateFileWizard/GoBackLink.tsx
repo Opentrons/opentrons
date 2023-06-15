@@ -13,12 +13,13 @@ export function GoBackLink(props: GoBackLinkProps): JSX.Element {
 
   return (
     <Link
-    role="button"
-    css={css`
-      ${TYPOGRAPHY.darkLinkH4SemiBold}
-      margin: 0 ${SPACING.spacing32};
-    `}
-    onClick={onClick}>
+      role="button"
+      css={css`
+        ${TYPOGRAPHY.darkLinkH4SemiBold}
+        margin: 0 ${SPACING.spacing32};
+      `}
+      onClick={onClick}
+    >
       {i18n.format(t('shared.go_back'), 'capitalize')}
     </Link>
   )

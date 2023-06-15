@@ -1,10 +1,10 @@
+import { FormikProps } from 'formik'
 import type {
   FormPipettesByMount,
   FormModulesByType,
 } from '../../../step-forms'
 
 import type { NewProtocolFields } from '../../../load-file'
-import { FormikProps } from 'formik'
 
 type AdditionalEquipment = 'gripper'
 

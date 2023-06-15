@@ -1,8 +1,24 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { css } from 'styled-components'
-import { DIRECTION_COLUMN, Flex, SPACING, TYPOGRAPHY, Text, COLORS, BORDERS, JUSTIFY_CENTER, ALIGN_CENTER, RESPONSIVENESS, DIRECTION_ROW, JUSTIFY_FLEX_START, JUSTIFY_SPACE_BETWEEN, PrimaryButton, JUSTIFY_FLEX_END } from '@opentrons/components'
+import {
+  DIRECTION_COLUMN,
+  Flex,
+  SPACING,
+  TYPOGRAPHY,
+  Text,
+  COLORS,
+  BORDERS,
+  JUSTIFY_CENTER,
+  ALIGN_CENTER,
+  RESPONSIVENESS,
+  DIRECTION_ROW,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
+  PrimaryButton,
+  JUSTIFY_FLEX_END,
+} from '@opentrons/components'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { css } from 'styled-components'
 import opentronsFlexImage from '../../../images/OpentronsFlex.png'
 import OT2Image from '../../../images/OT2.png'
 
@@ -16,8 +32,12 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
   const { values, setFieldValue, proceed } = props
   return (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
-      <Flex flexDirection={DIRECTION_COLUMN} height='26rem' gridGap={SPACING.spacing32}>
-        <Text as='h2'>
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        height="26rem"
+        gridGap={SPACING.spacing32}
+      >
+        <Text as="h2">
           {i18n.t('modal.create_file_wizard.choose_robot_type')}
         </Text>
 
@@ -26,26 +46,37 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
             <RobotTypeOption
               key={robotType}
               isSelected={values.fields.robotType === robotType}
-              onClick={() => { setFieldValue('fields.robotType', robotType) }}
-              robotType={robotType} />
+              onClick={() => {
+                setFieldValue('fields.robotType', robotType)
+              }}
+              robotType={robotType}
+            />
           ))}
         </Flex>
       </Flex>
-      <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END} width="100%">
-        <PrimaryButton onClick={() => proceed()}>{i18n.format(t('shared.next'), 'capitalize')}</PrimaryButton>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_FLEX_END}
+        width="100%"
+      >
+        <PrimaryButton onClick={() => proceed()}>
+          {i18n.format(t('shared.next'), 'capitalize')}
+        </PrimaryButton>
       </Flex>
     </Flex>
   )
 }
 
-const CONTENTS_BY_ROBOT_TYPE: { [robotType in RobotType]: { displayName: string, imageSrc: string } } = {
+const CONTENTS_BY_ROBOT_TYPE: {
+  [robotType in RobotType]: { displayName: string; imageSrc: string }
+} = {
   [OT2_ROBOT_TYPE]: {
     displayName: 'OT2',
-    imageSrc: OT2Image
+    imageSrc: OT2Image,
   },
   [FLEX_ROBOT_TYPE]: {
     displayName: 'Opentrons Flex',
-    imageSrc: opentronsFlexImage
+    imageSrc: opentronsFlexImage,
   },
 }
 
@@ -63,7 +94,12 @@ function RobotTypeOption(props: RobotTypeOptionProps): JSX.Element {
       onClick={onClick}
       css={isSelected ? SELECTED_OPTIONS_STYLE : UNSELECTED_OPTIONS_STYLE}
     >
-      <img src={imageSrc} css={css`max-width: 11rem;`} />
+      <img
+        src={imageSrc}
+        css={css`
+          max-width: 11rem;
+        `}
+      />
       <Text
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

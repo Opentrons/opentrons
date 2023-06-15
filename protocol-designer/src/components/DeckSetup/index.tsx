@@ -53,16 +53,14 @@ import {
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import { TerminalItemId } from '../../steplist'
+import { getSelectedTerminalItemId } from '../../ui/steps'
+import { getRobotType } from '../../file-data/selectors'
 import { BrowseLabwareModal } from '../labware'
 import { SlotWarning } from './SlotWarning'
 import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
-
-import { TerminalItemId } from '../../steplist'
-
 import styles from './DeckSetup.css'
-import { getSelectedTerminalItemId } from '../../ui/steps'
-import { getRobotType } from '../../file-data/selectors'
 
 export const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
@@ -123,11 +121,11 @@ export const getSwapBlocked = (args: SwapBlockedArgs): boolean => {
   // dragging custom labware to module gives not compat error
   const labwareSourceToDestBlocked = sourceModuleType
     ? !getLabwareIsCompatible(hoveredLabware.def, sourceModuleType) &&
-    !hoveredLabwareIsCustom
+      !hoveredLabwareIsCustom
     : false
   const labwareDestToSourceBlocked = destModuleType
     ? !getLabwareIsCompatible(draggedLabware.def, destModuleType) &&
-    !draggedLabwareIsCustom
+      !draggedLabwareIsCustom
     : false
 
   return labwareSourceToDestBlocked || labwareDestToSourceBlocked
@@ -140,7 +138,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     getRobotCoordsFromDOMCoords,
     showGen1MultichannelCollisionWarnings,
   } = props
-
 
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
@@ -192,23 +189,23 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   const multichannelWarningSlots: DeckDefSlot[] = showGen1MultichannelCollisionWarnings
     ? compact([
-      (allModules.some(
-        moduleOnDeck =>
-          moduleOnDeck.slot === '1' &&
-          // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
-          MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-      ) &&
-        deckSlotsById?.['4']) ||
-      null,
-      (allModules.some(
-        moduleOnDeck =>
-          moduleOnDeck.slot === '3' &&
-          // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
-          MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-      ) &&
-        deckSlotsById?.['6']) ||
-      null,
-    ])
+        (allModules.some(
+          moduleOnDeck =>
+            moduleOnDeck.slot === '1' &&
+            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
+            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+        ) &&
+          deckSlotsById?.['4']) ||
+          null,
+        (allModules.some(
+          moduleOnDeck =>
+            moduleOnDeck.slot === '3' &&
+            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
+            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+        ) &&
+          deckSlotsById?.['6']) ||
+          null,
+      ])
     : []
 
   return (
@@ -391,7 +388,8 @@ const getHasGen1MultiChannelPipette = (
 }
 
 export const DeckSetup = (): JSX.Element => {
-  const drilledDown = useSelector(labwareIngredSelectors.getDrillDownLabwareId) != null
+  const drilledDown =
+    useSelector(labwareIngredSelectors.getDrillDownLabwareId) != null
   const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const _disableCollisionWarnings = useSelector(

@@ -108,8 +108,10 @@ export const commandCreatorFromStepArgs = (
       return StepGeneration.curryCommandCreator(StepGeneration.mix, args)
 
     case 'moveLabware': {
-      console.log('IN MOVE LABWARE SWITCH')
-      return StepGeneration.curryCommandCreator(StepGeneration.moveLabware, args)
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.moveLabware,
+        args
+      )
     }
 
     case 'engageMagnet':

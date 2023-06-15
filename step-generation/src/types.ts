@@ -386,10 +386,10 @@ export interface ThermocyclerStateStepArgs {
 }
 
 export interface MoveLabwareArgs extends CommonArgs {
-  commandCreatorFnName: 'moveLabware',
-  labware: string,
-  useGripper: boolean,
-  newLocation: LabwareLocation 
+  commandCreatorFnName: 'moveLabware'
+  labware: string
+  useGripper: boolean
+  newLocation: LabwareLocation
 }
 
 export type CommandCreatorArgs =

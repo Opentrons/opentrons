@@ -87,7 +87,7 @@ export function getDefaultsForStepType(
       return {
         labware: null,
         useGripper: false,
-        newLocation: null
+        newLocation: null,
       }
 
     case 'pause':

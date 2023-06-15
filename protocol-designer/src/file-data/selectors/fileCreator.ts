@@ -15,7 +15,6 @@ import {
   OT3_STANDARD_DECKID,
   OT3_STANDARD_MODEL,
   SPAN7_8_10_11_SLOT,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
@@ -260,7 +259,9 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           commandType: 'loadModule' as const,
           params: {
             moduleId: moduleId,
-            location: { slotName: module.slot === SPAN7_8_10_11_SLOT ? '7' : module.slot},
+            location: {
+              slotName: module.slot === SPAN7_8_10_11_SLOT ? '7' : module.slot,
+            },
           },
         }
         return loadModuleCommand

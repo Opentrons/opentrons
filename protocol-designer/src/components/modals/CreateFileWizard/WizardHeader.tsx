@@ -12,7 +12,7 @@ import {
   SPACING,
   RESPONSIVENESS,
   Text,
-  StepMeter
+  StepMeter,
 } from '@opentrons/components'
 
 interface WizardHeaderProps {

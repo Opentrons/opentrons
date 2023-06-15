@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { FormikProps } from 'formik'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -10,16 +11,25 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
+  LEFT,
+  RIGHT,
 } from '@opentrons/components'
+import {
+  GEN1,
+  GEN2,
+  OT2_PIPETTES,
+  OT2_ROBOT_TYPE,
+  OT3_PIPETTES,
+  getAllPipetteNames,
+  getPipetteNameSpecs,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
-import { FormikProps } from 'formik'
-
-import type { FormState, WizardTileProps } from './types'
-import { GEN1, GEN2, OT2_PIPETTES, OT2_ROBOT_TYPE, OT3_PIPETTES, getAllPipetteNames, getPipetteNameSpecs } from '@opentrons/shared-data'
 import { GoBackLink } from './GoBackLink'
 
+import type { FormState, WizardTileProps } from './types'
+
 export function FirstPipetteTypeTile(props: WizardTileProps): JSX.Element {
-  const mount = 'left'
+  const mount = LEFT
   return (
     <PipetteTypeTile
       {...props}
@@ -29,7 +39,9 @@ export function FirstPipetteTypeTile(props: WizardTileProps): JSX.Element {
     />
   )
 }
-export function SecondPipetteTypeTile(props: WizardTileProps): JSX.Element | null {
+export function SecondPipetteTypeTile(
+  props: WizardTileProps
+): JSX.Element | null {
   if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
     props.proceed(2)
     return null
@@ -37,7 +49,7 @@ export function SecondPipetteTypeTile(props: WizardTileProps): JSX.Element | nul
     return (
       <PipetteTypeTile
         {...props}
-        mount="right"
+        mount={RIGHT}
         allowNoPipette
         tileHeader={i18n.t('modal.create_file_wizard.choose_second_pipette')}
       />
@@ -87,14 +99,16 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
   const pipetteOptions = React.useMemo(() => {
     const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
       .filter(name =>
-        (robotType === OT2_ROBOT_TYPE ? OT2_PIPETTES : OT3_PIPETTES).includes(name)
+        (robotType === OT2_ROBOT_TYPE ? OT2_PIPETTES : OT3_PIPETTES).includes(
+          name
+        )
       )
       .map(name => ({
         value: name,
         name: getPipetteNameSpecs(name)?.displayName ?? '',
       }))
     return [
-      ...(allowNoPipette ? [{ name: 'None', value: ''}] : []),
+      ...(allowNoPipette ? [{ name: 'None', value: '' }] : []),
       ...allPipetteOptions.filter(
         //  filter out 96-channel for now
         o => o.name.includes('Flex') && o.value !== 'p1000_96'
@@ -105,7 +119,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
   }, [robotType])
   const nameAccessor = `pipettesByMount.${mount}.pipetteName`
   const currentValue = values.pipettesByMount[mount].pipetteName
-  if (currentValue === undefined) { 
+  if (currentValue === undefined) {
     setFieldValue(nameAccessor, pipetteOptions[0]?.value ?? '')
   }
 
