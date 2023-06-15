@@ -23,7 +23,7 @@ const Table = styled('table')`
   border-collapse: separate
   table-layout: auto;
   width: 100%;
-  border-spacing: 0 ${SPACING.spacing4};
+  border-spacing: 0 ${SPACING.spacing8};
   margin: ${SPACING.spacing16} 0;
   text-align: ${TYPOGRAPHY.textAlignLeft};
 `
@@ -87,10 +87,11 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
           </TableHeader>
           <TableHeader>
             <StyledText
-              fontSize={TYPOGRAPHY.fontSize20}
               color={COLORS.darkBlack70}
+              fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingRight={SPACING.spacing12}
+              textAlign={TYPOGRAPHY.textAlignCenter}
             >
               {i18n.format(t('quantity'), 'sentenceCase')}
             </StyledText>
