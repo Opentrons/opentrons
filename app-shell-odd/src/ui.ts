@@ -69,7 +69,8 @@ export function createUi(dispatch: Dispatch): BrowserWindow {
   return mainWindow
 }
 
-function waitForRobotServerAndShowMainWIndow(dispatch: Dispatch): void {
+export function waitForRobotServerAndShowMainWIndow(dispatch: Dispatch): void {
+  console.log('waitForRobotServerAndShowMainWIndow')
   setTimeout(function () {
     systemd
       .getisRobotServerReady()
