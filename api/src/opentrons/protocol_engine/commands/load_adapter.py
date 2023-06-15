@@ -8,7 +8,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..errors import LabwareDefinitionIsNotAdapterError
 from ..resources import labware_validation
-from ..types import AdapterLocation
+from ..types import NonStackedLocation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -21,7 +21,7 @@ LoadAdapterCommandType = Literal["loadAdapter"]
 class LoadAdapterParams(BaseModel):
     """Payload required to load an adapter into a slot."""
 
-    location: AdapterLocation = Field(
+    location: NonStackedLocation = Field(
         ...,
         description="Location the adapter should be loaded into.",
     )

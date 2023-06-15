@@ -75,15 +75,13 @@ class OnLabwareLocation(BaseModel):
 _OffDeckLocationType = Literal["offDeck"]
 OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
 
-AdapterLocation = Union[
-    DeckSlotLocation,
-    ModuleLocation,
-    _OffDeckLocationType,  # TODO should this be allowed?
-]
 LabwareLocation = Union[
     DeckSlotLocation, ModuleLocation, OnLabwareLocation, _OffDeckLocationType
 ]
 """Union of all locations where it's legal to keep a labware."""
+
+NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
+"""Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
 
 
 class LabwareMovementStrategy(str, Enum):
