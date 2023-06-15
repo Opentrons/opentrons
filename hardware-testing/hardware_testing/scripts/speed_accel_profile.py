@@ -50,12 +50,17 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
             "ACCEL": {"MIN": 100, "MAX": 300, "INC": 100},
             "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
         },
+        "G": {
+            "SPEED": {"MIN": 10, "MAX": 50, "INC": 10},
+            "ACCEL": {"MIN": 50, "MAX": 200, "INC": 50},
+            "CURRENT": {"MIN": 0.3, "MAX": 1, "INC": 0.1},
+        }
     },
     GantryLoad.HIGH_THROUGHPUT: {
         "X": {
-            "SPEED": {"MIN": 275, "MAX": 475, "INC": 100},
-            "ACCEL": {"MIN": 700, "MAX": 900, "INC": 100},
-            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
+            "SPEED": {"MIN": 275, "MAX": 425, "INC": 75},
+            "ACCEL": {"MIN": 600, "MAX": 800, "INC": 100},
+            "CURRENT": {"MIN": 1, "MAX": 1.4, "INC": 0.2},
         },
         "Y": {
             "SPEED": {"MIN": 325, "MAX": 425, "INC": 100},
@@ -72,6 +77,11 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
             "ACCEL": {"MIN": 100, "MAX": 300, "INC": 100},
             "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
         },
+        "G": {
+            "SPEED": {"MIN": 10, "MAX": 50, "INC": 10},
+            "ACCEL": {"MIN": 50, "MAX": 200, "INC": 50},
+            "CURRENT": {"MIN": 0.3, "MAX": 1, "INC": 0.1},
+        }
     },
 }
 
@@ -83,7 +93,7 @@ SETTINGS = {
         acceleration=1000,
         max_start_stop_speed=10,
         max_change_dir_speed=5,
-        hold_current=0.3,
+        hold_current=0.5,
         run_current=START_CURRENT,
     ),
     OT3Axis.Y: GantryLoadSettings(
@@ -91,7 +101,7 @@ SETTINGS = {
         acceleration=1000,
         max_start_stop_speed=10,
         max_change_dir_speed=5,
-        hold_current=0.3,
+        hold_current=0.5,
         run_current=START_CURRENT,
     ),
     OT3Axis.Z_L: GantryLoadSettings(
@@ -99,7 +109,7 @@ SETTINGS = {
         acceleration=100,
         max_start_stop_speed=10,
         max_change_dir_speed=1,
-        hold_current=1.5,
+        hold_current=0.8,
         run_current=START_CURRENT,
     ),
     OT3Axis.Z_R: GantryLoadSettings(
@@ -107,9 +117,17 @@ SETTINGS = {
         acceleration=100,
         max_start_stop_speed=10,
         max_change_dir_speed=1,
-        hold_current=1.5,
+        hold_current=0.8,
         run_current=START_CURRENT,
     ),
+    OT3Axis.Z_G: GantryLoadSettings(
+        max_speed=50,
+        acceleration=150,
+        max_start_stop_speed=10,
+        max_change_dir_speed=1,
+        hold_current=0.2,
+        run_current=0.67,
+    )
 }
 
 MOUNT = OT3Mount.LEFT
@@ -119,13 +137,24 @@ AXIS_MAP = {
     "X": OT3Axis.X,
     "L": OT3Axis.Z_L,
     "R": OT3Axis.Z_R,
+    "G": OT3Axis.Z_G,
     "P": OT3Axis.P_L,
-    "O": OT3Axis.P_R,
+    "O": OT3Axis.P_R
 }
 
 LOAD = GantryLoad.LOW_THROUGHPUT
 
 GANTRY_LOAD_MAP = {"LOW": GantryLoad.LOW_THROUGHPUT, "HIGH": GantryLoad.HIGH_THROUGHPUT}
+
+MOUNT_MAP = {
+    "Y": OT3Mount.LEFT,
+    "X": OT3Mount.LEFT,
+    "L": OT3Mount.LEFT,
+    "R": OT3Mount.RIGHT,
+    "G": OT3Mount.GRIPPER,
+    "P": OT3Mount.LEFT,
+    "O": OT3Mount.RIGHT
+}
 
 DELAY = 0
 
@@ -133,11 +162,13 @@ step_x = 500
 step_y = 300
 xy_home_offset = 5
 step_z = 200
+step_g = 150
 HOME_POINT_MAP = {
     "Y": Point(y=-xy_home_offset),
     "X": Point(x=-xy_home_offset),
     "L": Point(z=0),
     "R": Point(z=0),
+    "G": Point(z=0)
 }
 
 POINT_MAP = {
@@ -145,6 +176,7 @@ POINT_MAP = {
     "X": Point(x=step_x),
     "L": Point(z=step_z),
     "R": Point(z=step_z),
+    "G": Point(z=step_g)
 }
 
 NEG_POINT_MAP = {
@@ -152,6 +184,7 @@ NEG_POINT_MAP = {
     "X": Point(x=-step_x),
     "L": Point(z=-step_z),
     "R": Point(z=-step_z),
+    "G": Point(z=-step_g)
 }
 
 
@@ -201,10 +234,7 @@ async def _single_axis_move(
 ) -> Tuple[float, int]:
     """Move and check error of single axis."""
     avg_error = []
-    if axis == "L":
-        MOUNT = OT3Mount.LEFT
-    else:
-        MOUNT = OT3Mount.RIGHT
+    MOUNT = MOUNT_MAP[axis]
 
     # move away from the limit switch before cycling
     await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
@@ -248,10 +278,14 @@ async def _single_axis_move(
                         mount=MOUNT, delta=move_error_correction, speed=35
                     )
             except MustHomeError:
+                if axis == "G":
+                    await api.home([OT3Axis.Z_G])
                 await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
 
             if DELAY > 0:
                 time.sleep(DELAY)
+            if axis == "G":
+                await api.home([OT3Axis.Z_G])
             await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
             return (move_error, c)
 
@@ -274,6 +308,8 @@ async def _single_axis_move(
             print()
             if DELAY > 0:
                 time.sleep(DELAY)
+            if axis == "G":
+                await api.home([OT3Axis.Z_G])
             await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
             return (move_error, c)
         else:
@@ -281,6 +317,8 @@ async def _single_axis_move(
 
         # home every 50 cycles in case we have drifted
         if (c + 1) % 50 == 0:
+            if axis == "G":
+                await api.home([OT3Axis.Z_G])
             await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
             # move away from the limit switch before cycling
             await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
@@ -365,11 +403,6 @@ async def _main(is_simulating: bool) -> None:
                     cycles_completed = move_output_tuple[1]
 
                     # #record results to dictionary for neat formatting later
-                    # if p['SPEED'] in table_results[test_axis].keys():
-                    #     table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
-                    # else:
-                    #     table_results[test_axis][p['SPEED']] = {}
-                    #     table_results[test_axis][p['SPEED']][p['ACCEL']] = cycles_completed
                     c_i = table_results_key[test_axis][p["CURRENT"]]
                     s_i = table_results_key[test_axis][p["SPEED"]]
                     a_i = table_results_key[test_axis][p["ACCEL"]]
@@ -422,7 +455,8 @@ async def _main(is_simulating: bool) -> None:
                 # print(table_results[test_axis])
 
     except KeyboardInterrupt:
-        await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+        disengage_list = [AXIS_MAP[x] for x in list(AXIS)]
+        await api.disengage_axes(disengage_list)
     finally:
         # await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
         await api.clean_up()
