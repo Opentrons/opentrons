@@ -610,21 +610,15 @@ class OT3Controller:
         axes: Sequence[Axis],
         distance: float,
         speed: float,
+        acceleration: float = 0,
         tip_action: str = "home",
     ) -> None:
         if tip_action == "home":
             speed = speed * -1
-            runner = MoveGroupRunner(
-                move_groups=create_tip_action_home_group(axes, distance, speed)
-            )
-        else:
-            runner = MoveGroupRunner(
-                move_groups=[
-                    create_tip_action_group(
-                        axes, distance, speed, cast(PipetteAction, tip_action)
-                    )
-                ]
-            )
+        move_group = create_tip_action_group(
+            axes, distance, speed, acceleration, cast(PipetteAction, tip_action)
+        )
+        runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
         for axis, point in positions.items():
             self._position.update({axis: point[0]})

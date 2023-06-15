@@ -1678,17 +1678,27 @@ class OT3API(
             )
             await self._move(target_down)
             # perform pick up tip
-            await self._backend.tip_action(
-                [Axis.of_main_tool_actuator(mount)],
-                pipette_spec.pick_up_distance,
-                pipette_spec.speed,
-                "clamp",
-            )
+
+            gear_origin_dict = {OT3Axis.Q: 0}
+            gear_motor_target = pipette_spec.pick_up_distance + pipette_spec.home_buffer
+            gear_target_dict = {OT3Axis.Q: gear_motor_target}
+            moves = self._build_moves(gear_origin_dict, gear_target_dict)
+            blocks = moves[0][0].blocks
+
+            for block in blocks:
+                await self._backend.tip_action(
+                        [OT3Axis.of_main_tool_actuator(mount)],
+                        block.distance,
+                        block.final_speed,
+                        block.acceleration,
+                        "clamp",
+                )
             # back clamps off the adapter posts
             await self._backend.tip_action(
                 [Axis.of_main_tool_actuator(mount)],
                 pipette_spec.pick_up_distance + pipette_spec.home_buffer,
                 pipette_spec.speed,
+                0,
                 "home",
             )
 
