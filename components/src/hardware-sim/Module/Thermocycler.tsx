@@ -9,7 +9,7 @@ import { RobotCoordsForeignDiv } from '../Deck'
 import { ModuleFromDef } from './ModuleFromDef'
 
 import { C_MED_LIGHT_GRAY } from '../../styles'
-import { COLORS } from '../../ui-style-constants'
+import { COLORS, BORDERS } from '../../ui-style-constants'
 
 const ROOM_TEMPERATURE_C = 23 // value taken from TC firmware
 export interface ThermocyclerVizProps {
@@ -29,6 +29,7 @@ export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
         innerDivProps={{
           borderRadius: '6px',
           backgroundColor: C_MED_LIGHT_GRAY,
+          border: BORDERS.lineBorder,
           width: '100%',
           height: '100%',
         }}
@@ -58,7 +59,7 @@ export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
         y="22"
         innerDivProps={{
           borderRadius: '6px',
-          backgroundColor: blockTargetTemp <= ROOM_TEMPERATURE_C ? COLORS.blueEnabled : COLORS.red2,
+          backgroundColor: blockTargetTemp <= ROOM_TEMPERATURE_C ? COLORS.mediumBlueEnabled : COLORS.red4,
           width: '100%',
           height: '100%',
         }}
@@ -73,14 +74,3 @@ export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
     </>
   )
 }
-
-// Order is WRGB
-// // Brights are being toned down
-// #define COLOR_TABLE \
-//   COLOR_DEF(soft_white, 0xee000000), \
-//   COLOR_DEF(white, 0x00eeeeee),      \
-//   COLOR_DEF(red, 0x00500000),        \
-//   COLOR_DEF(green, 0x0000ee00),      \
-//   COLOR_DEF(blue, 0x000000ff),       \
-//   COLOR_DEF(orange, 0x00ff5300),     \
-//   COLOR_DEF(none, 0x00000000)
