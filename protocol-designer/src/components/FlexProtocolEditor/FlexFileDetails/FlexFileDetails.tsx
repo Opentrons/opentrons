@@ -171,13 +171,13 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                         <StyledText as="h3" className={styles.margin_bottom}>
                           {i18n.t('flex.file_tab.modules')}
                         </StyledText>
-                        <Flex>
+                        {/* <Flex>
                           <EditButton
                             editProps={setEdit}
                             setTab={2}
                             setTabId={setTabId}
                           />
-                        </Flex>
+                        </Flex> */}
                       </div>
                       {!props?.modules?.length ? (
                         <SelectedModules {...props} />
@@ -456,7 +456,7 @@ const SelectedModules = (props: any): JSX.Element => {
           </Flex>
 
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p">Model:</StyledText>
+            <StyledText as="h5">Model:</StyledText>
             <StyledText as="p">{supportedSlots[type]}</StyledText>
           </Flex>
 
@@ -478,7 +478,7 @@ const SelectedModules = (props: any): JSX.Element => {
             robotType={OT3_STANDARD_MODEL}
           />
         </Flex>
-        <Flex>
+        <Flex className={styles.slot_issue_warning}>
           {slotIssue && (
             <PDAlert
               alertType="warning"
@@ -486,8 +486,13 @@ const SelectedModules = (props: any): JSX.Element => {
               description={slotIssue}
             />
           )}
+        </Flex>
+        <Flex
+          justifyContent={JUSTIFY_END}
+          className={styles.slot_issue_warning}
+        >
           {values.modules[type].slot !== moduleOnDeck.slot && (
-            <Flex flexDirection={DIRECTION_COLUMN} alignItems={JUSTIFY_END}>
+            <Flex>
               <OutlineButton
                 disabled={Boolean(slotIssue)}
                 onClick={() => moveDeckSlot(values.modules[type].slot)}
