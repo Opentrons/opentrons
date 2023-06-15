@@ -440,19 +440,20 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
 
     ui.print_header("PREPARE")
     for dye in dye_types_req.keys():
+        transfered_ul = dye_types_req[dye]
+        reservoir_ul = max(_MIN_START_VOLUME_UL, transfered_ul + _MIN_END_VOLUME_UL)
+        leftover_ul = reservoir_ul - transfered_ul
+        _ul_to_ml = lambda x: round(x / 1000, 1)
         if dye_types_req[dye] > 0:
             if cfg.refill:
                 # only add the minimum required volume
-                print(f" * dye is already in RESERVOIR")
+                print(f' * {_ul_to_ml(leftover_ul)} mL "{dye}" LEFTOVER in reservoir')
                 if not ctx.is_simulating():
-                    dye_ml = round(dye_types_req[dye] / 1000.0, 1)
-                    ui.get_user_ready(f'[REFILL] add {dye_ml} mL more DYE type "{dye}"')
+                    ui.get_user_ready(f'[refill] ADD {_ul_to_ml(transfered_ul)} mL more DYE type "{dye}"')
             else:
                 # add minimum required volume PLUS labware's dead-volume
-                dye_ul = max(_MIN_START_VOLUME_UL, dye_types_req[dye] + _MIN_END_VOLUME_UL)
-                dye_ml = round(dye_ul / 1000.0, 1)
                 if not ctx.is_simulating():
-                    ui.get_user_ready(f'add {dye_ml} mL of DYE type "{dye}"')
+                    ui.get_user_ready(f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye}"')
 
     print("homing...")
     ctx.home()
