@@ -280,7 +280,7 @@ async def _main() -> None:
                                                 )
     try:
         # Home
-        await home_ot3(hw_api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+        await hw_api.home()
         home_pos = await hw_api.current_position_ot3(mount, refresh=True)
         await hw_api.cache_instruments()
         await hw_api.home_plunger(mount)
