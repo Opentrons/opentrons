@@ -171,7 +171,8 @@ class Gripper_Lifetime_Test:
         self.test_data["Jaw State"] = str(self._get_jaw_state()).split('.')[1]
         self.test_data["Jaw Displacement"] = str(self._get_jaw_displacement())
         if self.mode == "robot":
-            self.test_data["Encoder Position"] = str(await self._get_encoder())
+            # self.test_data["Encoder Position"] = str(await self._get_encoder())
+            self.test_data["Encoder Position"] = "(0.0;0.0;0.0)"
         else:
             self.test_data["Encoder Position"] = "(0.0;0.0;0.0)"
         test_data = self.dict_values_to_line(self.test_data)
