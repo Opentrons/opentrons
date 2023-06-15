@@ -224,9 +224,9 @@ export interface HydratedMoveLabwareFormData {
   stepName: string
   description: string | null | undefined
   fields: {
-    labware: LabwareEntity,
-    newLocation: LabwareLocation,
-    useGripper: boolean,
+    labware: LabwareEntity
+    newLocation: LabwareLocation
+    useGripper: boolean
   }
 }
 export interface HydratedMixFormDataLegacy {

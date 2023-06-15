@@ -11,7 +11,6 @@ import { PortalRoot as MainPageModalPortalRoot } from '../components/portals/Mai
 import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../ui/steps/utils'
 import { PrereleaseModeIndicator } from './PrereleaseModeIndicator'
 import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
-import { NewFileModal } from './modals/NewFileModal'
 import { FileUploadMessageModal } from './modals/FileUploadMessageModal'
 import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal'
 import { GateModal } from './modals/GateModal'

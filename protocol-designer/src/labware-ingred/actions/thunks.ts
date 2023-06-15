@@ -54,7 +54,8 @@ export const createContainer: (
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
-  const slot = args.slot || getNextAvailableDeckSlot(initialDeckSetup, robotType)
+  const slot =
+    args.slot || getNextAvailableDeckSlot(initialDeckSetup, robotType)
   const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
     args.labwareDefURI
   ]

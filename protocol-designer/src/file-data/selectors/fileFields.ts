@@ -1,8 +1,9 @@
 import { createSelector } from 'reselect'
-import { BaseState, Selector } from '../../types'
-import { RootState } from '../reducers'
-import { FileMetadataFields } from '../types'
+import type { BaseState, Selector } from '../../types'
+import type { RootState } from '../reducers'
+import type { FileMetadataFields } from '../types'
 import type { RobotType } from '@opentrons/shared-data'
+
 export const rootSelector = (state: BaseState): RootState => state.fileData
 export const getCurrentProtocolExists: Selector<boolean> = createSelector(
   rootSelector,
@@ -16,6 +17,7 @@ export const getFileMetadata: Selector<FileMetadataFields> = createSelector(
   state => state.fileMetadata
 )
 
-export const getRobotType: Selector<RobotType> = createSelector(rootSelector, state => state.robotType)
-
-
+export const getRobotType: Selector<RobotType> = createSelector(
+  rootSelector,
+  state => state.robotType
+)

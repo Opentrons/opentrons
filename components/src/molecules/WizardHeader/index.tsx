@@ -3,7 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
 import { Box, Btn, Flex, Text } from '../../primitives'
 import { DIRECTION_ROW, JUSTIFY_SPACE_BETWEEN } from '../../styles'
-import { COLORS, RESPONSIVENESS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
+import {
+  COLORS,
+  RESPONSIVENESS,
+  SPACING,
+  TYPOGRAPHY,
+} from '../../ui-style-constants'
 import { StepMeter } from '../../atoms/StepMeter'
 
 interface WizardHeaderProps {

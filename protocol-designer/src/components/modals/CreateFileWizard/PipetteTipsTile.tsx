@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+import { FormikProps } from 'formik'
 import reduce from 'lodash/reduce'
 import {
   DIRECTION_COLUMN,
@@ -13,19 +15,23 @@ import {
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
-import { FormikProps } from 'formik'
-
-import type { FormState, WizardTileProps } from './types'
-import { getLabwareDefURI, getLabwareDisplayName, getPipetteNameSpecs } from '@opentrons/shared-data'
-import { useSelector } from 'react-redux'
+import {
+  getLabwareDefURI,
+  getLabwareDisplayName,
+  getPipetteNameSpecs,
+} from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
-import type { PipetteName } from '@opentrons/shared-data'
 import { GoBackLink } from './GoBackLink'
+
+import type { PipetteName } from '@opentrons/shared-data'
+import type { FormState, WizardTileProps } from './types'
 
 export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
   return <PipetteTipsTile {...props} mount="left" />
 }
-export function SecondPipetteTipsTile(props: WizardTileProps): JSX.Element | null {
+export function SecondPipetteTipsTile(
+  props: WizardTileProps
+): JSX.Element | null {
   if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
     props.proceed()
     return null
@@ -44,10 +50,17 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
   const { proceed, goBack, mount, values } = props
 
   const firstPipetteName = values.pipettesByMount[mount].pipetteName
-  const tileHeader = i18n.t('modal.create_file_wizard.choose_tips_for_pipette', {
-    pipetteName: firstPipetteName != null ? getPipetteNameSpecs(firstPipetteName as PipetteName)?.displayName ?? '' : '',
-    mount
-  })
+  const tileHeader = i18n.t(
+    'modal.create_file_wizard.choose_tips_for_pipette',
+    {
+      pipetteName:
+        firstPipetteName != null
+          ? getPipetteNameSpecs(firstPipetteName as PipetteName)?.displayName ??
+            ''
+          : '',
+      mount,
+    }
+  )
   return (
     <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
       <Flex
@@ -82,16 +95,18 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const selectedPipetteName = values.pipettesByMount[mount].pipetteName
   const selectedPipetteDefaultTipRacks =
     selectedPipetteName != null
-      ? getPipetteNameSpecs(selectedPipetteName as PipetteName)?.defaultTipracks ?? []
+      ? getPipetteNameSpecs(selectedPipetteName as PipetteName)
+          ?.defaultTipracks ?? []
       : []
 
   const tipRackOptions = reduce<typeof allLabware, RadioOption[]>(
     allLabware,
     (acc, def: typeof allLabware[string]) => {
       if (
-        def.metadata.displayCategory !== 'tipRack'
-        || !selectedPipetteDefaultTipRacks.includes(getLabwareDefURI(def))
-      ) return acc
+        def.metadata.displayCategory !== 'tipRack' ||
+        !selectedPipetteDefaultTipRacks.includes(getLabwareDefURI(def))
+      )
+        return acc
       return [
         ...acc,
         {
@@ -104,7 +119,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   ).sort(a => (a.name.includes('(Retired)') ? 1 : -1))
   const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
   const currentValue = values.pipettesByMount[mount].tiprackDefURI
-  if (currentValue === undefined) { 
+  if (currentValue === undefined) {
     setFieldValue(nameAccessor, tipRackOptions[0]?.value ?? null)
   }
 

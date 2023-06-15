@@ -60,9 +60,10 @@ const getLabwareLocation = (
   if (newLocationString === 'offDeck') {
     return 'offDeck'
   } else if (newLocationString in state.moduleEntities) {
-    return {moduleId: newLocationString}
-  } else { // assume it is a slot
-    return {slotName: newLocationString}
+    return { moduleId: newLocationString }
+  } else {
+    // assume it is a slot
+    return { slotName: newLocationString }
   }
 }
 
@@ -302,7 +303,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   newLocation: {
     hydrate: getLabwareLocation,
-  }
+  },
 }
 const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
   // profile step fields

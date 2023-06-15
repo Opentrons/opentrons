@@ -1,7 +1,7 @@
 import takeWhile from 'lodash/takeWhile'
-import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
 import * as StepGeneration from '@opentrons/step-generation'
-import { StepArgsAndErrorsById } from '../steplist/types'
+import { commandCreatorFromStepArgs } from '../file-data/selectors/commands'
+import type { StepArgsAndErrorsById } from '../steplist/types'
 export interface GenerateRobotStateTimelineArgs {
   allStepArgsAndErrors: StepArgsAndErrorsById
   orderedStepIds: string[]
@@ -31,9 +31,6 @@ export const generateRobotStateTimeline = (
     allStepArgs,
     stepArgs => stepArgs
   )
-  console.table({
-    continuousStepArgs
-  })
   const curriedCommandCreators = continuousStepArgs.reduce(
     (
       acc: StepGeneration.CurriedCommandCreator[],
@@ -43,7 +40,7 @@ export const generateRobotStateTimeline = (
       const curriedCommandCreator = commandCreatorFromStepArgs(args)
 
       console.table({
-       curriedCommandCreator 
+        curriedCommandCreator,
       })
       if (curriedCommandCreator === null) {
         // unsupported command creator in args.commandCreatorFnName

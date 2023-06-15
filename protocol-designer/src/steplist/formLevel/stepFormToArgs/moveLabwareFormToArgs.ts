@@ -13,6 +13,6 @@ export const moveLabwareFormToArgs = (
     description,
     labware: labware.id,
     useGripper,
-    newLocation
+    newLocation,
   }
 }

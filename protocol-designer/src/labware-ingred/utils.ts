@@ -1,15 +1,20 @@
+import {
+  OT2_ROBOT_TYPE,
+  RobotType,
+  getDeckDefFromRobotType,
+} from '@opentrons/shared-data'
 import { getSlotIsEmpty } from '../step-forms/utils'
 import { InitialDeckSetup } from '../step-forms/types'
 import { DeckSlot } from '../types'
-import { OT2_ROBOT_TYPE, RobotType, getDeckDefFromRobotType } from '@opentrons/shared-data'
-
 
 export function getNextAvailableDeckSlot(
   initialDeckSetup: InitialDeckSetup,
   robotType: RobotType = OT2_ROBOT_TYPE
 ): DeckSlot | null | undefined {
   const deckDef = getDeckDefFromRobotType(robotType)
-  return deckDef.locations.orderedSlots.find(slot => getSlotIsEmpty(initialDeckSetup, slot.id))?.id
+  return deckDef.locations.orderedSlots.find(slot =>
+    getSlotIsEmpty(initialDeckSetup, slot.id)
+  )?.id
 }
 
 const getMatchOrNull = (

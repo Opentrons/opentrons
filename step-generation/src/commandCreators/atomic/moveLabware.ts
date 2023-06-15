@@ -1,7 +1,16 @@
+import {
+  CreateCommand,
+  HEATERSHAKER_MODULE_TYPE,
+  LabwareMovementStrategy,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 import { uuid } from '../../utils'
-import { CreateCommand, HEATERSHAKER_MODULE_TYPE, LabwareMovementStrategy, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
-import type { CommandCreator, CommandCreatorError, MoveLabwareArgs } from '../../types'
+import type {
+  CommandCreator,
+  CommandCreatorError,
+  MoveLabwareArgs,
+} from '../../types'
 /** Move to specified well of labware, with optional offset and pathing options. */
 export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   args,
@@ -21,10 +30,16 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     )
   }
 
-  const destModuleId = newLocation !== 'offDeck' && 'moduleId' in newLocation ? newLocation.moduleId : null
+  const destModuleId =
+    newLocation !== 'offDeck' && 'moduleId' in newLocation
+      ? newLocation.moduleId
+      : null
   if (destModuleId != null) {
     const destModuleState = prevRobotState.modules[destModuleId].moduleState
-    if (destModuleState.type === THERMOCYCLER_MODULE_TYPE && destModuleState.lidOpen !== true) {
+    if (
+      destModuleState.type === THERMOCYCLER_MODULE_TYPE &&
+      destModuleState.lidOpen !== true
+    ) {
       errors.push(errorCreators.thermocyclerLidClosed())
     } else if (destModuleState.type === HEATERSHAKER_MODULE_TYPE) {
       if (destModuleState.latchOpen === true) {
@@ -40,10 +55,11 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
     return { errors }
   }
 
-
   const params = {
     labwareId: labware,
-    strategy: useGripper ? 'usingGripper' : 'manualMoveWithPause' as LabwareMovementStrategy,
+    strategy: useGripper
+      ? 'usingGripper'
+      : ('manualMoveWithPause' as LabwareMovementStrategy),
     newLocation,
   }
 

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import groupBy from 'lodash/groupBy'
-import { Flex } from '../primitives'
 import {
   getAllPipetteNames,
   getPipetteNameSpecs,
@@ -8,13 +7,13 @@ import {
   GEN2,
   GEN3,
 } from '@opentrons/shared-data'
+import { Flex } from '../primitives'
 import { Select, CONTEXT_VALUE } from '../forms'
 import styles from './PipetteSelect.css'
 
-import type { SelectOption } from '../forms'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
-
+import type { SelectOption } from '../forms'
 export interface PipetteSelectProps {
   /** currently selected value, optional in case selecting triggers immediate action */
   pipetteName?: string | null
@@ -106,10 +105,6 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       }}
       formatOptionLabel={(option, { context }) => {
         const { value } = option
-        console.log(
-          'option',
-          option
-        )
         const label = option.label || value
         const specs = allPipetteNameSpecs.find(s => s.name === value)
 
@@ -128,13 +123,6 @@ const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
   const volumeClassMaybeMatch = displayName && displayName.match(/P\d+/)
   const volumeClass = volumeClassMaybeMatch ? volumeClassMaybeMatch[0] : ''
 
-  let displayChannels = ''
-  if (channels === 1) {
-    displayChannels = 'Single-Channel'
-  } else if (channels === 8) {
-    displayChannels = '8-Channel'
-  }
-
   return (
     <Flex
       data-test={dataIdFormat(
@@ -145,8 +133,6 @@ const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
       )}
     >
       <div className={styles.pipette_volume_class}>{displayName}</div>
-      {/* <div className={styles.pipette_channels}>{displayChannels}</div>
-      <div className={styles.pipette_category}>{displayCategory}</div> */}
     </Flex>
   )
 }

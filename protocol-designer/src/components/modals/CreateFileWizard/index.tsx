@@ -51,7 +51,6 @@ import { WizardHeader } from './WizardHeader'
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
 
-
 type WizardStep =
   | 'robotType'
   | 'metadata'
@@ -67,7 +66,7 @@ const WIZARD_STEPS: WizardStep[] = [
   'first_pipette_tips',
   'second_pipette_type',
   'second_pipette_tips',
-  'modulesAndOther'
+  'modulesAndOther',
 ]
 
 export function CreateFileWizard(): JSX.Element | null {
@@ -100,13 +99,13 @@ export function CreateFileWizard(): JSX.Element | null {
           formPipette.tiprackDefURI != null &&
           (mount === 'left' || mount === 'right')
           ? [
-            ...acc,
-            {
-              mount,
-              name: formPipette.pipetteName as PipetteName,
-              tiprackDefURI: formPipette.tiprackDefURI,
-            },
-          ]
+              ...acc,
+              {
+                mount,
+                name: formPipette.pipetteName as PipetteName,
+                tiprackDefURI: formPipette.tiprackDefURI,
+              },
+            ]
           : acc
       },
       []
@@ -117,13 +116,13 @@ export function CreateFileWizard(): JSX.Element | null {
     ).reduce<ModuleCreationArgs[]>((acc, [moduleType, formModule]) => {
       return formModule?.onDeck
         ? [
-          ...acc,
-          {
-            type: moduleType as ModuleType,
-            model: formModule.model || ('' as ModuleModel),
-            slot: formModule.slot,
-          },
-        ]
+            ...acc,
+            {
+              type: moduleType as ModuleType,
+              model: formModule.model || ('' as ModuleModel),
+              slot: formModule.slot,
+            },
+          ]
         : acc
     }, [])
     const heaterShakerIndex = modules.findIndex(
@@ -212,7 +211,7 @@ export function CreateFileWizard(): JSX.Element | null {
     }
   }
   const proceed = (stepsForward: number = 1): void => {
-    if ((currentStepIndex + stepsForward) < WIZARD_STEPS.length) {
+    if (currentStepIndex + stepsForward < WIZARD_STEPS.length) {
       setCurrentStepIndex(currentStepIndex + stepsForward)
     }
   }
@@ -370,7 +369,7 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
     <Formik
       enableReinitialize
       initialValues={initialFormState}
-      onSubmit={() => { }}
+      onSubmit={() => {}}
       validationSchema={validationSchema}
     >
       {(formikProps: FormikProps<FormState>) => {

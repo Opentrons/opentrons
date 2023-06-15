@@ -1,12 +1,12 @@
 import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { Timeline } from '@opentrons/step-generation'
-import { Action } from '../../types'
-import { FileMetadataFields, SaveFileMetadataAction } from '../types'
-import { LoadFileAction, NewProtocolFields } from '../../load-file'
-import { ComputeRobotStateTimelineSuccessAction } from '../actions'
-import { Substeps } from '../../steplist/types'
 import { OT2_ROBOT_TYPE, RobotType } from '@opentrons/shared-data'
+import { Action } from '../../types'
+import { LoadFileAction, NewProtocolFields } from '../../load-file'
+import { Substeps } from '../../steplist/types'
+import { ComputeRobotStateTimelineSuccessAction } from '../actions'
+import { FileMetadataFields, SaveFileMetadataAction } from '../types'
 
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   {
@@ -73,7 +73,7 @@ function newProtocolMetadata(
     ...defaultFields,
     protocolName: action.payload.name || '',
     description: action.payload.description || '',
-    author: action.payload.organizationOrAuthor|| '',
+    author: action.payload.organizationOrAuthor || '',
     created: Date.now(),
     lastModified: null,
   }

@@ -1,4 +1,5 @@
 import mapValues from 'lodash/mapValues'
+import { CommandCreatorArgs } from '@opentrons/step-generation'
 import { castField } from '../../../steplist/fieldLevel'
 import { mixFormToArgs } from './mixFormToArgs'
 import { pauseFormToArgs } from './pauseFormToArgs'
@@ -7,9 +8,8 @@ import { temperatureFormToArgs } from './temperatureFormToArgs'
 import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
 import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
 import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
-import { FormData } from '../../../form-types'
-import { CommandCreatorArgs } from '@opentrons/step-generation'
 import { moveLabwareFormToArgs } from './moveLabwareFormToArgs'
+import type { FormData } from '../../../form-types'
 // NOTE: this acts as an adapter for the PD defined data shape of the step forms
 // to create arguments that the step generation service is expecting
 // in order to generate command creators
@@ -44,7 +44,7 @@ export const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
       return heaterShakerFormToArgs(castForm)
 
     case 'moveLabware':
-      return moveLabwareFormToArgs({...castForm, fields: castForm})
+      return moveLabwareFormToArgs({ ...castForm, fields: castForm })
 
     default:
       console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)

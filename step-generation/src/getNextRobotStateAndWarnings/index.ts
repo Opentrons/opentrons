@@ -32,13 +32,13 @@ import {
   forHeaterShakerSetTargetTemperature,
   forHeaterShakerStopShake,
 } from './heaterShakerUpdates'
+import { forMoveLabware } from './forMoveLabware'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
-import { forMoveLabware } from './forMoveLabware'
 
 // WARNING this will mutate the prevRobotState
 function _getNextRobotStateAndWarningsSingleCommand(
@@ -89,11 +89,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
 
     case 'moveLabware':
-      forMoveLabware(
-        command.params,
-        invariantContext,
-        robotStateAndWarnings
-      )
+      forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
       break
 
     case 'touchTip':

@@ -37,7 +37,6 @@ import {
   MAGNETIC_BLOCK_TYPE,
   OT2_ROBOT_TYPE,
   FLEX_ROBOT_TYPE,
-  RobotType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -87,7 +86,12 @@ export interface Props {
   moduleRestrictionsDisabled?: boolean | null
 }
 const initialFormState: FormState = {
-  fields: { name: '', robotType: OT2_ROBOT_TYPE },
+  fields: {
+    name: '',
+    robotType: OT2_ROBOT_TYPE,
+    description: '',
+    organizationOrAuthor: '',
+  },
   pipettesByMount: {
     left: { pipetteName: '', tiprackDefURI: null },
     right: { pipetteName: '', tiprackDefURI: null },
@@ -164,7 +168,10 @@ const validationSchema = Yup.object().shape({
   }),
 })
 
-const ROBOT_TYPE_OPTIONS = [{ value: OT2_ROBOT_TYPE, name: 'OT2' }, { value: FLEX_ROBOT_TYPE, name: 'Opentrons Flex' }]
+const ROBOT_TYPE_OPTIONS = [
+  { value: OT2_ROBOT_TYPE, name: 'OT2' },
+  { value: FLEX_ROBOT_TYPE, name: 'Opentrons Flex' },
+]
 
 // TODO: Ian 2019-03-15 use i18n for labels
 export class FilePipettesModal extends React.Component<Props, State> {
@@ -213,13 +220,13 @@ export class FilePipettesModal extends React.Component<Props, State> {
           formPipette.tiprackDefURI &&
           (mount === 'left' || mount === 'right')
           ? [
-            ...acc,
-            {
-              mount,
-              name: formPipette.pipetteName,
-              tiprackDefURI: formPipette.tiprackDefURI,
-            },
-          ]
+              ...acc,
+              {
+                mount,
+                name: formPipette.pipetteName,
+                tiprackDefURI: formPipette.tiprackDefURI,
+              },
+            ]
           : acc
       },
       []
@@ -235,13 +242,13 @@ export class FilePipettesModal extends React.Component<Props, State> {
       const formModule = values.modulesByType[moduleType]
       return formModule?.onDeck
         ? [
-          ...acc,
-          {
-            type: moduleType,
-            model: formModule.model || ('' as ModuleModel), // TODO: we need to validate that module models are of type ModuleModel
-            slot: formModule.slot,
-          },
-        ]
+            ...acc,
+            {
+              type: moduleType,
+              model: formModule.model || ('' as ModuleModel), // TODO: we need to validate that module models are of type ModuleModel
+              slot: formModule.slot,
+            },
+          ]
         : acc
     }, [])
     const heaterShakerIndex = modules.findIndex(
@@ -357,9 +364,15 @@ export class FilePipettesModal extends React.Component<Props, State> {
                           <div className={styles.protocol_file_group}>
                             <Flex gridGap={SPACING.spacing16}>
                               <h2 className={styles.new_file_modal_title}>
-                                {i18n.t('modal.new_protocol.title.PROTOCOL_FILE')}
+                                {i18n.t(
+                                  'modal.new_protocol.title.PROTOCOL_FILE'
+                                )}
                               </h2>
-                              <Flex flexDirection={DIRECTION_COLUMN} width="10rem" alignItems={ALIGN_STRETCH}>
+                              <Flex
+                                flexDirection={DIRECTION_COLUMN}
+                                width="10rem"
+                                alignItems={ALIGN_STRETCH}
+                              >
                                 <DropdownField
                                   options={ROBOT_TYPE_OPTIONS}
                                   onChange={handleChange}
@@ -383,7 +396,6 @@ export class FilePipettesModal extends React.Component<Props, State> {
                                 onChange={handleChange}
                                 onBlur={handleBlur}
                               />
-
                             </FormGroup>
                           </div>
                         )}
@@ -391,8 +403,8 @@ export class FilePipettesModal extends React.Component<Props, State> {
                         <h2 className={styles.new_file_modal_title}>
                           {showProtocolFields
                             ? i18n.t(
-                              'modal.new_protocol.title.PROTOCOL_PIPETTES'
-                            )
+                                'modal.new_protocol.title.PROTOCOL_PIPETTES'
+                              )
                             : i18n.t('modal.edit_pipettes.title')}
                         </h2>
 

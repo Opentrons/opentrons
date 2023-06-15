@@ -14,7 +14,7 @@ export function forMoveLabware(
     newLocationString = newLocation
   } else if ('moduleId' in newLocation) {
     newLocationString = newLocation.moduleId
-  } else if ('slotName' in newLocation) { 
+  } else if ('slotName' in newLocation) {
     newLocationString = newLocation.slotName
   }
 

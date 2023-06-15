@@ -8,7 +8,6 @@ import {
   ModuleType,
   PipetteName,
   getPipetteNameSpecs,
-  OT3_PIPETTES,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
@@ -17,6 +16,7 @@ import {
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
+import { getRobotType } from '../../file-data/selectors'
 import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
 import { isModuleWithCollisionIssue } from './utils'
@@ -33,13 +33,7 @@ export function EditModulesCard(props: Props): JSX.Element {
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
-
-  const getIsFlexPipette = (pipetteName?: string | null): boolean =>
-    pipetteName != null && OT3_PIPETTES.includes(pipetteName)
-
-  const isFlexPipette =
-    getIsFlexPipette(pipettesByMount?.left.pipetteName) ||
-    getIsFlexPipette(pipettesByMount?.right.pipetteName)
+  const robotType = useSelector(getRobotType)
 
   const magneticModuleOnDeck = modules[MAGNETIC_MODULE_TYPE]
   const temperatureModuleOnDeck = modules[TEMPERATURE_MODULE_TYPE]
@@ -76,7 +70,7 @@ export function EditModulesCard(props: Props): JSX.Element {
 
   const SUPPORTED_MODULE_TYPES_FILTERED = SUPPORTED_MODULE_TYPES.filter(
     moduleType =>
-      isFlexPipette
+      robotType === 'OT-3 Standard'
         ? moduleType !== 'magneticModuleType'
         : moduleType !== 'magneticBlockType'
   )
