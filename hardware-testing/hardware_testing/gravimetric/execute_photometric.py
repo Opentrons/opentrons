@@ -35,8 +35,6 @@ from .tips import get_tips
 
 _MEASUREMENTS: List[Tuple[str, EnvironmentData]] = list()
 
-TARGET_END_PHOTOPLATE_VOLUME = 200
-
 _DYE_MAP: Dict[str, Dict[str, float]] = {
     "HV": {"min": 200.1, "max": 350},
     "A": {"min": 50, "max": 200},
@@ -217,9 +215,9 @@ def _print_stats(mode: str, average: float, cv: float, d: float) -> None:
 
 
 def _dispense_volumes(volume: float) -> Tuple[float, float, int]:
-    target_volume = 250 if volume > 800 else TARGET_END_PHOTOPLATE_VOLUME
-    num_dispenses = ceil(volume / target_volume)
+    num_dispenses = ceil(volume / 250)
     volume_to_dispense = volume / num_dispenses
+    target_volume = min(max(volume_to_dispense, 200), 250)
     return target_volume, volume_to_dispense, num_dispenses
 
 
@@ -391,15 +389,12 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     test_volumes = _get_volumes(ctx, cfg)
     total_photoplates = 0
     for vol in test_volumes:
-        target_volume, volume_to_dispense, _ = _dispense_volumes(vol)
-        total_photoplates = total_photoplates + (ceil(vol / target_volume) * cfg.trials)
-        dye_required = vol * 96 * (cfg.trials if vol < 1000 else 3)
-        dye_types_req[_get_dye_type(volume_to_dispense)] += dye_required
+        target_volume, volume_to_dispense, num_dispenses = _dispense_volumes(vol)
+        total_photoplates += num_dispenses * cfg.trials
+        dye_per_vol = vol * 96 * cfg.trials
+        dye_types_req[_get_dye_type(volume_to_dispense)] += dye_per_vol
 
     trial_total = len(test_volumes) * cfg.trials
-    # 1000uL tests only do 3x trials, to save time/money
-    if cfg.trials > 3 and 1000 in test_volumes:
-        trial_total = (trial_total - cfg.trials) + 3
 
     ui.print_header("LOAD LABWARE")
     photoplate, reservoir, tipracks = _load_labware(ctx, cfg)
@@ -446,16 +441,17 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     ui.print_header("PREPARE")
     for dye in dye_types_req.keys():
         if dye_types_req[dye] > 0:
-            dye_req = max(_MIN_START_VOLUME_UL, dye_types_req[dye] + _MIN_END_VOLUME_UL)
             if cfg.refill:
-                dye_req -= _MIN_END_VOLUME_UL
-                print(f" * {_MIN_END_VOLUME_UL / 1000} mL is already in RESERVOIR")
+                # only add the minimum required volume
+                print(f" * dye is already in RESERVOIR")
                 if not ctx.is_simulating():
-                    dye_ml = round(dye_req / 1000.0, 1)
+                    dye_ml = round(dye_types_req[dye] / 1000.0, 1)
                     ui.get_user_ready(f'[REFILL] add {dye_ml} mL more DYE type "{dye}"')
             else:
+                # add minimum required volume PLUS labware's dead-volume
+                dye_ul = max(_MIN_START_VOLUME_UL, dye_types_req[dye] + _MIN_END_VOLUME_UL)
+                dye_ml = round(dye_ul / 1000.0, 1)
                 if not ctx.is_simulating():
-                    dye_ml = round(dye_req / 1000.0, 1)
                     ui.get_user_ready(f'add {dye_ml} mL of DYE type "{dye}"')
 
     print("homing...")
@@ -471,9 +467,6 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
             do_jog = True
             for trial in range(cfg.trials):
                 trial_count += 1
-                if trial >= 3 and volume == 1000:
-                    # we only do 3 1000ul tests
-                    break
                 ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
                 print(f"trial total {trial_count}/{trial_total}")
                 next_tip: Well = tips[0][tip_iter]
