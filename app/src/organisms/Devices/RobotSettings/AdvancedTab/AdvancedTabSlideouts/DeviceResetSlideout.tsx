@@ -74,15 +74,13 @@ export function DeviceResetSlideout({
   )
 
   const ot2CalibrationOptions =
-    // TODO(bh, 2022-11-07): update OT-2 filter when gripper calibration reset config option available
     options != null ? options.filter(opt => opt.id.includes('Calibration')) : []
   const ot3CalibrationOptions =
     options != null
       ? options.filter(
           opt =>
             opt.id === 'pipetteOffsetCalibrations' ||
-            // TODO(bh, 2022-11-07): confirm or update when gripper calibration reset config option available
-            opt.id === 'gripperCalibration'
+            opt.id === 'gripperOffsetCalibrations'
         )
       : []
 
@@ -225,40 +223,33 @@ export function DeviceResetSlideout({
                 gridGap={-SPACING.spacing4}
               >
                 {calibrationOptions.map(opt => {
-                  const calibrationName =
-                    isOT3 && opt.id === 'pipetteOffsetCalibrations'
+                  let calibrationName = ''
+                  if (opt.id === 'pipetteOffsetCalibrations') {
+                    calibrationName = isOT3
                       ? t('clear_option_pipette_calibrations')
                       : t(`clear_option_${snakeCase(opt.id)}`)
+                  } else if(opt.id === 'gripperOffsetCalibrations') {
+                    calibrationName = t('clear_option_gripper_calibration')
+                  }
+                  else {
+                    calibrationName = t(`clear_option_${snakeCase(opt.id)}`)
+                  }
                   return (
-                    <CheckboxField
-                      key={opt.id}
-                      onChange={() =>
-                        setResetOptions({
-                          ...resetOptions,
-                          [opt.id]: !(resetOptions[opt.id] ?? false),
-                        })
-                      }
-                      value={resetOptions[opt.id]}
-                      label={calibrationName}
-                    />
+                    calibrationName !== '' && (
+                      <CheckboxField
+                        key={opt.id}
+                        onChange={() =>
+                          setResetOptions({
+                            ...resetOptions,
+                            [opt.id]: !(resetOptions[opt.id] ?? false),
+                          })
+                        }
+                        value={resetOptions[opt.id]}
+                        label={calibrationName}
+                      />
+                    )
                   )
                 })}
-                {/* TODO(bh, 2022-11-02): placeholder, remove when gripper calibration reset config option available */}
-                {isOT3 ? (
-                  <CheckboxField
-                    key="gripperCalibration"
-                    onChange={() =>
-                      setResetOptions({
-                        ...resetOptions,
-                        gripperCalibration: !(
-                          resetOptions.gripperCalibration ?? false
-                        ),
-                      })
-                    }
-                    value={resetOptions.gripperCalibration}
-                    label={t('clear_option_gripper_calibration')}
-                  />
-                ) : null}
               </Flex>
             </Box>
             <Box>
