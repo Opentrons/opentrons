@@ -178,6 +178,7 @@ class Gripper_Robot_Sensor_Check:
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         # Move above slot estimated center
+        self.nominal_center = self.nominal_center._replace(y=self.nominal_center.y - 3)
         above_slot_center = self.nominal_center._replace(z=self.home.z)
         await api.move_to(mount, above_slot_center)
         await api.grip(self.grip_force)
