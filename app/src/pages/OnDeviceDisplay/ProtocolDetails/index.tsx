@@ -81,7 +81,7 @@ const ProtocolHeader = (props: {
       backgroundColor={COLORS.white}
       marginLeft={`-${SPACING.spacing32}`}
       marginRight={`-${SPACING.spacing32}`}
-      zIndex={10} // the header is always visble when things scroll beneath
+      zIndex={1} // the header is always visble when things scroll beneath
     >
       <Flex
         alignItems={ALIGN_CENTER}
