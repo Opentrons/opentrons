@@ -74,7 +74,6 @@ from opentrons_hardware.hardware_control.motor_position_status import (
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.tip_presence import get_tip_ejector_state
-from opentrons_hardware.hardware_control.network import NetworkInfo
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
     set_hold_current,

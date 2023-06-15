@@ -4,7 +4,17 @@ from decoy import Decoy
 from itertools import chain
 
 from contextlib import nullcontext as does_not_raise
-from typing import Dict, List, Optional, Set, Tuple, Any, Iterator, AsyncIterator, ContextManager
+from typing import (
+    Dict,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Any,
+    Iterator,
+    AsyncIterator,
+    ContextManager,
+)
 
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
@@ -1009,20 +1019,20 @@ async def test_monitor_pressure(
 @pytest.mark.parametrize(
     "tip_state_type, mocked_ejector_response, expectation",
     [
-        [TipStateType.PICK_UP, True, does_not_raise()],
-        [TipStateType.DROP, False, does_not_raise()],
-        [TipStateType.PICK_UP, False, pytest.raises(FailedTipStateCheck)],
-        [TipStateType.DROP, True, pytest.raises(FailedTipStateCheck)],
+        [TipStateType.PRESENT, True, does_not_raise()],
+        [TipStateType.ABSENT, False, does_not_raise()],
+        [TipStateType.PRESENT, False, pytest.raises(FailedTipStateCheck)],
+        [TipStateType.ABSENT, True, pytest.raises(FailedTipStateCheck)],
     ],
 )
 async def test_get_tip_present(
     controller: OT3Controller,
     tip_state_type: TipStateType,
     mocked_ejector_response: bool,
-    expectation: ContextManager,
-):
+    expectation: ContextManager[None],
+) -> None:
     mount = OT3Mount.LEFT
-    with patch(
+    with mock.patch(
         "opentrons.hardware_control.backends.ot3controller.get_tip_ejector_state",
         return_value=mocked_ejector_response,
     ):

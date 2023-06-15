@@ -619,8 +619,8 @@ class GripperProbe(enum.Enum):
 
 
 class TipStateType(enum.Enum):
-    DROP = False
-    PICK_UP = True
+    ABSENT = False
+    PRESENT = True
 
     def __str__(self) -> str:
         return self.name

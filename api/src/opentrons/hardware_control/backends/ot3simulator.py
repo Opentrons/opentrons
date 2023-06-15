@@ -365,7 +365,7 @@ class OT3Simulator:
         self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
 
     async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> bool:
-        if tip_state == TipStateType.PICK_UP:
+        if tip_state == TipStateType.PRESENT:
             return True
         else:
             return False

@@ -96,7 +96,6 @@ from .types import (
     StatusBarState,
     SubSystemState,
     TipStateType,
-
 )
 from .errors import (
     MustHomeError,
@@ -1661,7 +1660,7 @@ class OT3API(
             await self.move_rel(realmount, rel_point, speed=speed)
 
         # TODO change to enum
-        await self._backend.get_tip_present(realmount, TipStateType.PICK_UP)
+        await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
 
         _add_tip_to_instrs()
 
@@ -1742,7 +1741,7 @@ class OT3API(
         )
 
         # TODO change to enum
-        await self._backend.get_tip_present(realmount, TipStateType.DROP)
+        await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
         _remove()
 
     async def clean_up(self) -> None:
