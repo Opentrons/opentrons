@@ -71,7 +71,7 @@ def get_api_context(
         hardware_api=ThreadManager(_thread_manager_build_hw_api),  # type: ignore[arg-type]
         deck_type="ot3_standard",
         extra_labware=extra_labware,
-        deck_version=2,
+        deck_version=int(deck_version),
     )
 
 
