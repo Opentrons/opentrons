@@ -77,8 +77,8 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
         <tr>
           <TableHeader>
             <StyledText
-              as="label"
               color={COLORS.darkBlack70}
+              fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingLeft={SPACING.spacing24}
             >
@@ -88,8 +88,8 @@ export const Labware = (props: { protocolId: string }): JSX.Element => {
           <TableHeader>
             <StyledText
               alignItems={ALIGN_CENTER}
-              as="label"
               color={COLORS.darkBlack70}
+              fontSize={TYPOGRAPHY.fontSize20}
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               paddingRight={SPACING.spacing12}
               textAlign={TYPOGRAPHY.textAlignCenter}
