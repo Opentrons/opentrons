@@ -26,6 +26,19 @@ import { Deck } from '../Deck'
 import { Hardware } from '../Hardware'
 import { Labware } from '../Labware'
 
+// Mock IntersectionObserver
+class IntersectionObserver {
+  observe = jest.fn()
+  disconnect = jest.fn()
+  unobserve = jest.fn()
+}
+
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: IntersectionObserver,
+})
+
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/OnDeviceDisplay/RobotDashboard/hooks')
@@ -130,7 +143,7 @@ describe('ODDProtocolDetails', () => {
   it('renders protocol truncated name that expands when clicked', () => {
     const [{ getByText }] = render()
     const name = getByText(
-      'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic ...nd Amplify Libraries'
+      'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genom...'
     )
     name.click()
     getByText(
