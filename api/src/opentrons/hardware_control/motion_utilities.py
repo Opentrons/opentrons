@@ -162,9 +162,7 @@ def target_position_from_plunger(
     )
     plunger_pos = OrderedDict()
     z_ax = Axis.by_mount(mount)
-    plunger = Axis.of_main_tool_actuator(
-        mount
-    )
+    plunger = Axis.of_main_tool_actuator(mount)
     all_axes_pos[z_ax] = current_position[z_ax]
     plunger_pos[plunger] = delta
     all_axes_pos.update(plunger_pos)
@@ -233,8 +231,12 @@ def deck_from_machine(
     robot_type: RobotType,
 ) -> Dict[Axis, float]:
     """Build a deck-abs position store from the machine's position"""
-    plunger_axes: Dict[Axis, float] = {k: v for k, v in machine_pos.items() if k not in k.gantry_axes()}
-    mount_axes: Dict[Axis, float] = {k: v for k, v in machine_pos.items() if k in k.mount_axes()}
+    plunger_axes: Dict[Axis, float] = {
+        k: v for k, v in machine_pos.items() if k not in k.gantry_axes()
+    }
+    mount_axes: Dict[Axis, float] = {
+        k: v for k, v in machine_pos.items() if k in k.mount_axes()
+    }
     to_mount: Callable[[Axis], Union[Mount, OT3Mount]]
     if robot_type == "OT-2 Standard":
         to_mount = Axis.to_ot2_mount

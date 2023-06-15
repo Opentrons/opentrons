@@ -103,7 +103,7 @@ from .errors import (
 from . import modules
 from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
 
-from .protocols import HardwareControlInterface, AxisType
+from .protocols import HardwareControlInterface
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
@@ -145,7 +145,13 @@ from .status_bar_state import StatusBarStateController
 mod_log = logging.getLogger(__name__)
 
 AXES_IN_HOMING_ORDER: Tuple[Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis] = (
-    *Axis.mount_axes(), Axis.X, Axis.Y, *Axis.pipette_axes(), Axis.G, Axis.Q)
+    *Axis.mount_axes(),
+    Axis.X,
+    Axis.Y,
+    *Axis.pipette_axes(),
+    Axis.G,
+    Axis.Q,
+)
 
 
 class OT3API(
@@ -156,7 +162,7 @@ class OT3API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlInterface[OT3Transforms, AxisType],
+    HardwareControlInterface[OT3Transforms, Axis],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -260,7 +266,7 @@ class OT3API(
             machine_pos=machine_pos,
             attitude=self._robot_calibration.deck_calibration.attitude,
             offset=self._robot_calibration.carriage_offset,
-            robot_type=cast(RobotType,"OT-3 Standard"),
+            robot_type=cast(RobotType, "OT-3 Standard"),
         )
 
     @classmethod
@@ -1751,7 +1757,7 @@ class OT3API(
         return self._gripper_handler.get_gripper()
 
     @property
-    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:
+    def hardware_instruments(self) -> InstrumentsByMount[top_types.Mount]:  # type: ignore
         # see comment in `protocols.instrument_configurer`
         # override required for type matching
         # Warning: don't use this in new code, used `hardware_pipettes` instead

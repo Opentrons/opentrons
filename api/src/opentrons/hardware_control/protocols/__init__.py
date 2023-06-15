@@ -16,7 +16,6 @@ from .stoppable import Stoppable
 from .simulatable import Simulatable
 
 
-
 class HardwareControlInterface(
     ModuleProvider,
     ExecutionControllable,

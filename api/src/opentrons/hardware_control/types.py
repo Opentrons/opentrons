@@ -1,12 +1,10 @@
 import enum
 import logging
 from dataclasses import dataclass
-from types import DynamicClassAttribute
 from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar, Type
 from typing_extensions import Literal
 from opentrons import types as top_types
 from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
-from opentrons_shared_data.robot.dev_types import RobotType
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -18,65 +16,6 @@ class MotionChecks(enum.Enum):
     LOW = 1
     HIGH = 2
     BOTH = 3
-
-
-# # TODO (spp, 2023-05-11): merge Axis into this and make Axis the only type.
-# #  Use Z_L, Z_R, etc as the axes with aliases for Z, A, B, C
-# class Axis(enum.Enum):
-#     X = 0  # Gantry X
-#     Y = 1  # Gantry Y
-#     Z = 2  # left pipette mount Z
-#     A = 3  # right pipette mount Z
-#     B = 4  # left pipette plunger
-#     C = 5  # right pipette plunger
-#     Z_G = 6  # Gripper Z
-#     G = 7  # Gripper Jaws
-#
-#     @classmethod
-#     def by_mount(cls, mount: top_types.Mount) -> "Axis":
-#         bm = {top_types.Mount.LEFT: cls.Z, top_types.Mount.RIGHT: cls.A}
-#         return bm[mount]
-#
-#     # TODO (spp, 2023-5-4): deprecate this method & create a replacement called 'pipette_mount_axes'
-#     @classmethod
-#     def mount_axes(cls) -> Tuple["Axis", "Axis"]:
-#         """The axes which are used for moving pipettes up and down."""
-#         return cls.Z, cls.A
-#
-#     @classmethod
-#     def gantry_axes(cls) -> Tuple["Axis", "Axis", "Axis", "Axis"]:
-#         """The axes which are tied to the gantry and require the deck
-#         calibration transform
-#         """
-#         return cls.X, cls.Y, cls.Z, cls.A
-#
-#     @classmethod
-#     def of_plunger(cls, mount: top_types.Mount) -> "Axis":
-#         pm = {top_types.Mount.LEFT: cls.B, top_types.Mount.RIGHT: cls.C}
-#         return pm[mount]
-#
-#     @classmethod
-#     def to_mount(cls, inst: "Axis") -> top_types.Mount:
-#         return {
-#             cls.Z: top_types.Mount.LEFT,
-#             cls.A: top_types.Mount.RIGHT,
-#             cls.B: top_types.Mount.LEFT,
-#             cls.C: top_types.Mount.RIGHT,
-#             cls.Z_G: top_types.Mount.EXTENSION,
-#             cls.G: top_types.Mount.EXTENSION,
-#         }[inst]
-#
-#     @classmethod
-#     def pipette_axes(cls) -> Tuple["Axis", "Axis"]:
-#         return cls.B, cls.C
-#
-#     @classmethod
-#     def ot2_axes(cls) -> List["Axis"]:
-#         """Returns only OT2 axes."""
-#         return [axis for axis in Axis if axis not in [Axis.Z_G, Axis.G]]
-#
-#     def __str__(self) -> str:
-#         return self.name
 
 
 class OT3Mount(enum.Enum):

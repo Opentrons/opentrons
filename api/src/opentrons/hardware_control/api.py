@@ -644,7 +644,7 @@ class API(
                     machine_pos=self._axis_map_from_string_map(smoothie_pos),
                     attitude=self._robot_calibration.deck_calibration.attitude,
                     offset=top_types.Point(0, 0, 0),
-                    robot_type=cast(RobotType,"OT-2 Standard"),
+                    robot_type=cast(RobotType, "OT-2 Standard"),
                 )
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
@@ -856,7 +856,7 @@ class API(
                 machine_pos=self._axis_map_from_string_map(smoothie_pos),
                 attitude=self._robot_calibration.deck_calibration.attitude,
                 offset=top_types.Point(0, 0, 0),
-                robot_type=cast(RobotType,"OT-2 Standard"),
+                robot_type=cast(RobotType, "OT-2 Standard"),
             )
 
     # Gantry/frame (i.e. not pipette) config API

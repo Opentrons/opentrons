@@ -100,7 +100,6 @@ from opentrons_hardware.hardware_control import network, tools
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
     BoardRevision,
-    InstrumentFWInfo,
     Axis,
     AionotifyEvent,
     OT3Mount,
