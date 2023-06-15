@@ -18,8 +18,7 @@ type Props = OP & SP
 const NameOverlay = (props: Props): JSX.Element => {
   const { labwareOnDeck, nickname } = props
   const title = nickname || getLabwareDisplayName(labwareOnDeck.def)
-  // TODO(mc, 2019-06-27): µL to uL replacement needed to handle CSS capitalization
-  return <LabwareNameOverlay title={title.replace('µL', 'uL')} />
+  return <LabwareNameOverlay title={title} />
 }
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {

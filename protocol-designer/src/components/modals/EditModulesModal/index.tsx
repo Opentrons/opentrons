@@ -21,7 +21,7 @@ import {
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
-  getSlotsBlockedBySpanning,
+  getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
   getLabwareOnSlot,
 } from '../../../step-forms/utils'
@@ -82,7 +82,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
   const hasSlotIssue = (selectedSlot: string): boolean => {
     const previousModuleSlot = moduleOnDeck?.slot
     const hasModuleMoved = previousModuleSlot !== selectedSlot
-    const isSlotBlocked = getSlotsBlockedBySpanning(initialDeckSetup).includes(
+    const isSlotBlocked = getSlotIdsBlockedBySpanning(initialDeckSetup).includes(
       selectedSlot
     )
     const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, selectedSlot)

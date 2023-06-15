@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
 import {
-  ModuleViz,
   RobotCoordsText,
   RobotWorkSpace,
   useOnClickOutside,
@@ -12,11 +11,14 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   RobotWorkSpaceRenderProps,
   Module,
+  RobotCoordsForeignDiv,
+  Text,
+  COLORS,
+  SPACING,
 } from '@opentrons/components'
-import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
+import { MODULES_WITH_COLLISION_ISSUES, ModuleTemporalProperties } from '@opentrons/step-generation'
 import {
   getLabwareHasQuirk,
-  getModuleVizDims,
   inferModuleOrientationFromSlot,
   GEN_ONE_MULTI_PIPETTES,
   DeckSlot as DeckDefSlot,
@@ -25,8 +27,8 @@ import {
   OT2_ROBOT_TYPE,
   getModuleDef2,
   inferModuleOrientationFromXCoordinate,
-  getModuleType,
   THERMOCYCLER_MODULE_TYPE,
+  getModuleDisplayName,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'
@@ -42,7 +44,7 @@ import {
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import {
-  getSlotsBlockedBySpanning,
+  getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
@@ -52,7 +54,6 @@ import * as labwareIngredActions from '../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { BrowseLabwareModal } from '../labware'
-import { ModuleTag } from './ModuleTag'
 import { SlotWarning } from './SlotWarning'
 import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
@@ -86,41 +87,6 @@ export const VIEWBOX_HEIGHT = 414
 
 const OT2_VIEWBOX = `${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`
 const FLEX_VIEWBOX = '-144.31 -76.59 750 580'
-
-const getSlotDefForModuleSlot = (
-  moduleOnDeck: ModuleOnDeck,
-  deckSlots: { [slotId: string]: DeckDefSlot }
-): DeckDefSlot => {
-  const parentSlotDef =
-    deckSlots[moduleOnDeck.slot] || PSEUDO_DECK_SLOTS[moduleOnDeck.slot]
-  const moduleOrientation = inferModuleOrientationFromSlot(moduleOnDeck.slot)
-  const moduleData = getModuleVizDims(moduleOrientation, moduleOnDeck.type)
-
-  return {
-    ...parentSlotDef,
-    id: moduleOnDeck.id,
-    position: [
-      parentSlotDef.position[0] + moduleData.childXOffset,
-      parentSlotDef.position[1] + moduleData.childYOffset,
-      0,
-    ],
-    boundingBox: {
-      xDimension: moduleData.childXDimension,
-      yDimension: moduleData.childYDimension,
-      zDimension: 0,
-    },
-    displayName: `Slot of ${moduleOnDeck.type} in slot ${moduleOnDeck.slot}`,
-  }
-}
-
-const getModuleSlotDefs = (
-  initialDeckSetup: InitialDeckSetup,
-  deckSlots: { [slotId: string]: DeckDefSlot }
-): DeckDefSlot[] => {
-  return values(initialDeckSetup.modules).map((moduleOnDeck: ModuleOnDeck) =>
-    getSlotDefForModuleSlot(moduleOnDeck, deckSlots)
-  )
-}
 
 export interface SwapBlockedArgs {
   hoveredLabware?: LabwareOnDeckType | null
@@ -205,14 +171,10 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     []
   )
 
-  const slotsBlockedBySpanning = getSlotsBlockedBySpanning(
+  const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanning(
     activeDeckSetup
   )
   const deckSlots: DeckDefSlot[] = values(deckSlotsById)
-  const moduleSlots = getModuleSlotDefs(activeDeckSetup, deckSlotsById)
-  // NOTE: in these arrays of slots, order affects SVG render layering
-  // labware can be in a module or on the deck
-  const labwareParentSlots: DeckDefSlot[] = [...deckSlots, ...moduleSlots]
   // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
   const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
 
@@ -256,36 +218,94 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         const slot = moduleParentSlots.find(
           slot => slot.id === moduleOnDeck.slot
         )
-        if (!slot) {
-          console.warn(
-            `no slot ${moduleOnDeck.slot} for module ${moduleOnDeck.id}`
-          )
+        if (slot == null) {
+          console.warn(`no slot ${moduleOnDeck.slot} for module ${moduleOnDeck.id}`)
           return null
         }
+        const moduleDef = getModuleDef2(moduleOnDeck.model)
 
-        const [moduleX, moduleY] = slot.position
-        const orientation = inferModuleOrientationFromSlot(slot.id)
+        const getModuleInnerProps = (
+          moduleState: ModuleTemporalProperties['moduleState']
+        ): React.ComponentProps<typeof Module>['innerProps'] => {
+          if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
+            let lidMotorState = "unknown"
+            if (moduleState.lidOpen === true) {
+              lidMotorState = "open"
+            } else if (moduleState.lidOpen === false) {
+              lidMotorState = "closed"
+            }
+            return {
+              lidMotorState,
+              blockTargetTemp: moduleState.blockTargetTemp
+            }
+          }
+        }
+        const labwareLoadedOnModule = allLabware.find(lw => lw.slot === moduleOnDeck.id)
+        const shouldHideChildren = moduleOnDeck.moduleState.type === THERMOCYCLER_MODULE_TYPE && moduleOnDeck.moduleState.lidOpen === false
+        const labwareInterfaceSlotDef: DeckDefSlot = {
+          displayName: `Labware interface on ${moduleOnDeck.model}`,
+          id: moduleOnDeck.id,
+          position: [0,0,0], // Module Component already handles nested positioning
+          matingSurfaceUnitVector: [-1, 1, -1],
+          boundingBox: {
+            xDimension: moduleDef.dimensions.labwareInterfaceXDimension ?? 0,
+            yDimension: moduleDef.dimensions.labwareInterfaceYDimension ?? 0,
+            zDimension: 0,
+          },
+          compatibleModules: [THERMOCYCLER_MODULE_TYPE],
+        }
 
         return (
-          <React.Fragment key={slot.id}>
-            <Module 
-              x={moduleX}
-              y={moduleY}
-              def={getModuleDef2(moduleOnDeck.model)}
-              orientation={inferModuleOrientationFromXCoordinate(slot.position[0])}
-              innerProps={
-                getModuleType(moduleOnDeck.model) === THERMOCYCLER_MODULE_TYPE
-                  ? { lidMotorState: 'open' }
-                  : {}
-              }
-            />
-            <ModuleTag
-              x={moduleX}
-              y={moduleY}
-              orientation={orientation}
-              id={moduleOnDeck.id}
-            />
-          </React.Fragment>
+          <Module
+            key={slot.id}
+            x={slot.position[0]}
+            y={slot.position[1]}
+            def={moduleDef}
+            orientation={inferModuleOrientationFromXCoordinate(slot.position[0])}
+            innerProps={getModuleInnerProps(moduleOnDeck.moduleState)}
+          >
+            {(labwareLoadedOnModule != null && !shouldHideChildren) ? (
+              <>
+                <LabwareOnDeck x={0} y={0} labwareOnDeck={labwareLoadedOnModule} />
+                <LabwareControls
+                  slot={labwareInterfaceSlotDef}
+                  setHoveredLabware={setHoveredLabware}
+                  setDraggedLabware={setDraggedLabware}
+                  swapBlocked={
+                    swapBlocked &&
+                    (labwareLoadedOnModule.id === hoveredLabware?.id ||
+                      labwareLoadedOnModule.id === draggedLabware?.id)
+                  }
+                  labwareOnDeck={labwareLoadedOnModule}
+                  selectedTerminalItemId={props.selectedTerminalItemId}
+                />
+              </>
+            ) : null}
+            {(labwareLoadedOnModule == null && !shouldHideChildren) ? (
+              // @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
+              <SlotControls
+                key={slot.id}
+                slot={labwareInterfaceSlotDef}
+                selectedTerminalItemId={props.selectedTerminalItemId}
+                moduleType={moduleOnDeck.type}
+                handleDragHover={handleHoverEmptySlot}
+              />
+            ) : null}
+            <RobotCoordsForeignDiv
+              width={moduleDef.dimensions.labwareInterfaceXDimension}
+              height={16}
+              y={-22}
+              innerDivProps={{
+                backgroundColor: COLORS.darkGreyEnabled,
+                padding: SPACING.spacing4,
+                height: '100%',
+                color: COLORS.white
+              }}>
+              <Text as="p" fontSize="0.5rem">
+                {getModuleDisplayName(moduleOnDeck.model)}
+              </Text>
+            </RobotCoordsForeignDiv>
+          </Module>
         )
       })}
 
@@ -303,10 +323,10 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
       ))}
 
       {/* SlotControls for all empty deck + module slots */}
-      {labwareParentSlots
+      {deckSlots
         .filter(
           slot =>
-            !slotsBlockedBySpanning.includes(slot.id) &&
+            !slotIdsBlockedBySpanning.includes(slot.id) &&
             getSlotIsEmpty(activeDeckSetup, slot.id)
         )
         .map(slot => {
@@ -323,10 +343,11 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           )
         })}
 
-      {/* all labware on deck and in modules */}
+      {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
-        const slot = labwareParentSlots.find(slot => slot.id === labware.slot)
-        if (!slot) {
+        if (allModules.some(m => m.id === labware.slot)) return null
+        const slot = deckSlots.find(slot => slot.id === labware.slot)
+        if (slot == null) {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
@@ -401,7 +422,7 @@ export const DeckSetup = (): JSX.Element => {
           <RobotWorkSpace
             deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             deckDef={deckDef}
-            viewBox={robotType === OT2_ROBOT_TYPE ? OT2_VIEWBOX: FLEX_VIEWBOX}
+            viewBox={robotType === OT2_ROBOT_TYPE ? OT2_VIEWBOX : FLEX_VIEWBOX}
             width="100%"
             height="100%"
           >

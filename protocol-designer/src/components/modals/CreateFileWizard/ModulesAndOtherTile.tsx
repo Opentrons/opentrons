@@ -112,7 +112,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           onClick={() => {
             if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
               goBack(3)
-            } else if (props.values.pipettesByMount.right.pipetteName == null) {
+            } else if (props.values.pipettesByMount.right.pipetteName == '') {
               goBack(2)
             } else {
               goBack()
