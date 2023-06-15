@@ -1,5 +1,4 @@
-export type InstrumentData = PipetteData | GripperData
-
+export type InstrumentData = PipetteData | GripperData | BadPipette | BadGripper
 export interface GripperData {
   data: {
     jawState: string
@@ -46,4 +45,20 @@ export interface Instruments {
 
 export interface GetInstrumentsRequestParams {
   refresh?: boolean
+}
+
+export interface BadPipette {
+  subsystem: 'pipette_left' | 'pipette_right'
+  status: string
+  update: string
+  ok: boolean
+  instrumentType: 'pipette'
+}
+
+export interface BadGripper {
+  subsystem: 'gripper'
+  status: string
+  update: string
+  ok: boolean
+  instrumentType: 'gripper'
 }

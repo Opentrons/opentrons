@@ -14,7 +14,10 @@ export function useAttachedPipettesFromInstrumentsQuery(): AttachedPipettesFromI
   const { data: attachedInstruments } = useInstrumentsQuery()
   return (attachedInstruments?.data ?? []).reduce(
     (acc, instrumentData) => {
-      if (instrumentData.instrumentType !== 'pipette') {
+      if (
+        instrumentData.instrumentType !== 'pipette' ||
+        'subsystem' in instrumentData
+      ) {
         return acc
       }
       const { mount, instrumentModel } = instrumentData

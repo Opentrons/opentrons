@@ -94,6 +94,7 @@ const mock96ChannelData = {
   mount: 'left',
   serialNumber: 'def456',
   data: {
+    channels: 96,
     calibratedOffset: {
       offset: { x: 0, y: 0, z: 0 },
       source: 'default',

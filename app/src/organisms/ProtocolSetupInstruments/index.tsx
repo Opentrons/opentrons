@@ -74,6 +74,7 @@ export function ProtocolSetupInstruments({
           (attachedInstruments?.data ?? []).find(
             (i): i is PipetteData =>
               i.instrumentType === 'pipette' &&
+              !('subsystem' in i) &&
               i.mount === loadedPipette.mount &&
               i.instrumentName === loadedPipette.pipetteName
           ) ?? null
