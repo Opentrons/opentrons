@@ -369,7 +369,7 @@ async def test_ensure_movement_obstructed_by_thermocycler_raises(
     to_loc: LabwareLocation,
 ) -> None:
     """It should raise error when labware movement is obstructed by thermocycler."""
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+    decoy.when(state_store.labware.get_parent_location(labware_id="labware-id")).then_return(
         from_loc
     )
     decoy.when(
@@ -390,7 +390,7 @@ async def test_ensure_movement_not_obstructed_by_modules(
     state_store: StateStore,
 ) -> None:
     """It should not raise error when labware movement is not obstructed by thermocycler."""
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+    decoy.when(state_store.labware.get_parent_location(labware_id="labware-id")).then_return(
         ModuleLocation(moduleId="a-rando-module-id")
     )
     await subject.ensure_movement_not_obstructed_by_module(
@@ -421,7 +421,7 @@ async def test_ensure_movement_obstructed_by_heater_shaker_raises(
     to_loc: LabwareLocation,
 ) -> None:
     """It should raise error when labware movement is obstructed by thermocycler."""
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+    decoy.when(state_store.labware.get_parent_location(labware_id="labware-id")).then_return(
         from_loc
     )
     decoy.when(
@@ -442,7 +442,7 @@ async def test_ensure_movement_not_obstructed_does_not_raise_for_slot_locations(
     state_store: StateStore,
 ) -> None:
     """It should not raise error when moving from slot to slot."""
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+    decoy.when(state_store.labware.get_parent_location(labware_id="labware-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     )
     await subject.ensure_movement_not_obstructed_by_module(

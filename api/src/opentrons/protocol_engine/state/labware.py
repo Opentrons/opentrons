@@ -36,6 +36,7 @@ from ..commands import (
 from ..types import (
     DeckSlotLocation,
     OnLabwareLocation,
+    AdapterLocation,
     Dimensions,
     LabwareOffset,
     LabwareOffsetVector,
@@ -363,6 +364,13 @@ class LabwareView(HasState[LabwareState]):
     def get_location(self, labware_id: str) -> LabwareLocation:
         """Get labware location by the labware's unique identifier."""
         return self.get(labware_id).location
+
+    def get_parent_location(self, labware_id: str) -> AdapterLocation:
+        """Get labware's non-labware parent location."""
+        parent = self.get_location(labware_id)
+        if isinstance(parent, OnLabwareLocation):
+            return self.get_parent_location(parent.labwareId)
+        return parent
 
     def get_all(self) -> List[LoadedLabware]:
         """Get a list of all labware entries in state."""

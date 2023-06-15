@@ -269,7 +269,9 @@ class LabwareMovementHandler:
         new location is a module that is in a state that prevents the labware from
         being moved (either manually or using gripper).
         """
-        current_parent = self._state_store.labware.get_location(labware_id=labware_id)
+        current_parent = self._state_store.labware.get_parent_location(
+            labware_id=labware_id
+        )
         for parent in (current_parent, new_location):
             try:
                 await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
