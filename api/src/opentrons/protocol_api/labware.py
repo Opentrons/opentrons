@@ -347,7 +347,7 @@ class Labware:
 
         If the labware is on the deck, a `str` deck slot name will be returned.
         If on a module, the parent :py:class:`ModuleContext` will be returned.
-        If off deck, `off-deck` will be returned.
+        If off deck, :py:obj:`OFF_DECK` will be returned.
 
         .. versionchanged:: 2.14
             Return type for module parent changed to :py:class:`ModuleContext`.
