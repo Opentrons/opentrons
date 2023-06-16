@@ -15,6 +15,9 @@ from opentrons.hardware_control.ot3_calibration import (
 from opentrons_shared_data.deck import (
     get_calibration_square_position_in_slot,
 )
+from opentrons_hardware.hardware_control.gripper_settings import (
+    set_error_tolerance,
+)
 from hardware_testing import data
 from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point, GripperProbe
 from hardware_testing.opentrons_api.helpers_ot3 import (
@@ -70,11 +73,6 @@ class Gripper_Center_Test:
             # "X":"/dev/ttyUSB0",
             "Y":"/dev/ttyUSB1",
             # "Z":"/dev/ttyUSB2",
-        }
-        self.gauge_offsets = {
-            "X":Point(x=0, y=0, z=6),
-            "Y":Point(x=0, y=0, z=-50),
-            "Z":Point(x=0, y=0, z=6),
         }
         self.gripper_probes = {
             "Front":GripperProbe.FRONT,
