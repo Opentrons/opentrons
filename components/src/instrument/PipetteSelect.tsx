@@ -123,6 +123,12 @@ const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
   const volumeClassMaybeMatch = displayName && displayName.match(/P\d+/)
   const volumeClass = volumeClassMaybeMatch ? volumeClassMaybeMatch[0] : ''
 
+  let displayChannels = ''
+  if (channels === 1) {
+    displayChannels = 'Single-Channel'
+  } else if (channels === 8) {
+    displayChannels = '8-Channel'
+  }
   return (
     <Flex
       data-test={dataIdFormat(
@@ -132,7 +138,9 @@ const PipetteNameItem = (props: PipetteNameSpecs): JSX.Element => {
         displayCategory
       )}
     >
-      <div className={styles.pipette_volume_class}>{displayName}</div>
+      <div className={styles.pipette_volume_class}>{volumeClass}</div>
+      <div className={styles.pipette_channels}>{displayChannels}</div>
+      <div className={styles.pipette_category}>{displayCategory}</div>
     </Flex>
   )
 }
