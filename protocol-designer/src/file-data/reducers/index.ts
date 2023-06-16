@@ -103,6 +103,8 @@ const robotTypeReducer = (
 ): RobotType => {
   if (action.type === 'CREATE_NEW_PROTOCOL') {
     return action.payload.robotType
+  } else if (action.type === 'LOAD_FILE') {
+    return action.payload.file.robot.model
   }
   return state
 }
