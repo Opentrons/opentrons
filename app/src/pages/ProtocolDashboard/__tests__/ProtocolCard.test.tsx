@@ -81,9 +81,10 @@ describe('ProtocolCard', () => {
       data: { data: [{ result: 'error' }] } as any,
     } as UseQueryResult<ProtocolAnalyses>)
     const [{ getByText, getByLabelText }] = render()
+    getByLabelText('failedAnalysis_icon')
+    getByText('Failed analysis')
     getByText('yay mock protocol').click()
     getByText('Protocol analysis failed')
-    getByText('An error occurred while attempting to analyze')
     getByText(
       'Delete the protocol, make changes to address the error, and resend the protocol to this robot from the Opentrons App.'
     )

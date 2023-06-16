@@ -1,16 +1,19 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { format, formatDistance } from 'date-fns'
 import last from 'lodash/last'
 
 import {
   ALIGN_CENTER,
+  ALIGN_END,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
+  Icon,
   JUSTIFY_CENTER,
   SPACING,
   TYPOGRAPHY,
@@ -134,8 +137,8 @@ export function ProtocolCard(props: {
 
   return (
     <Flex
-      alignItems={ALIGN_CENTER}
-      backgroundColor={COLORS.light1}
+      alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
+      backgroundColor={isFailedAnalysis ? COLORS.red3 : COLORS.light1}
       borderRadius={BORDERS.borderRadiusSize4}
       marginBottom={SPACING.spacing8}
       gridGap={SPACING.spacing48}
@@ -143,7 +146,28 @@ export function ProtocolCard(props: {
       padding={SPACING.spacing24}
       ref={longpress.ref}
     >
-      <Flex width="30.75rem" overflowWrap="anywhere">
+      <Flex
+        width="30.75rem"
+        overflowWrap="anywhere"
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing8}
+      >
+        {isFailedAnalysis ? (
+          <Flex
+            color={COLORS.red1}
+            flexDirection={DIRECTION_ROW}
+            gridGap={SPACING.spacing8}
+          >
+            <Icon
+              name="ot-alert"
+              size="1.5rem"
+              aria-label="failedAnalysis_icon"
+            />
+            <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+              {i18n.format(t('failed_analysis'), 'capitalize')}
+            </StyledText>
+          </Flex>
+        ) : null}
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {protocolName}
         </StyledText>
@@ -181,12 +205,15 @@ export function ProtocolCard(props: {
               width="100%"
             >
               <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-                <Flex>
-                  <StyledText as="p">{t('error_analyzing')}</StyledText>
-                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                    {' ' + protocolName + '.'}
-                  </StyledText>
-                </Flex>
+                <Trans
+                  t={t}
+                  i18nKey={t('error_analyzing', { protocolName })}
+                  components={{
+                    block: <StyledText as="p" />,
+                    bold: <strong />,
+                  }}
+                />
+
                 <StyledText as="p">{t('delete_protocol_from_app')}</StyledText>
               </Flex>
               <SmallButton
