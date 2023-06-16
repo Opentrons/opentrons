@@ -291,9 +291,7 @@ def _run_trial(
             source, _liquid_height, name="Dye"
         )
     reservoir_ml = round(liquid_tracker.get_volume(source) / 1000, 1)
-    print(
-        f"software thinks there is {reservoir_ml} mL of liquid in the reservoir"
-    )
+    print(f"software thinks there is {reservoir_ml} mL of liquid in the reservoir")
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         ctx,
@@ -382,6 +380,33 @@ def _drop_tip(
         pipette.drop_tip(home_after=False)
 
 
+def _display_dye_information(
+    ctx: ProtocolContext, dye_types_req: Dict[str, float], refill: bool
+) -> None:
+    for dye in dye_types_req.keys():
+        transfered_ul = dye_types_req[dye]
+        reservoir_ul = max(_MIN_START_VOLUME_UL, transfered_ul + _MIN_END_VOLUME_UL)
+        leftover_ul = reservoir_ul - transfered_ul
+
+        def _ul_to_ml(x: float) -> float:
+            return round(x / 1000.0, 1)
+
+        if dye_types_req[dye] > 0:
+            if refill:
+                # only add the minimum required volume
+                print(f' * {_ul_to_ml(leftover_ul)} mL "{dye}" LEFTOVER in reservoir')
+                if not ctx.is_simulating():
+                    ui.get_user_ready(
+                        f'[refill] ADD {_ul_to_ml(transfered_ul)} mL more DYE type "{dye}"'
+                    )
+            else:
+                # add minimum required volume PLUS labware's dead-volume
+                if not ctx.is_simulating():
+                    ui.get_user_ready(
+                        f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye}"'
+                    )
+
+
 def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     """Run."""
     run_id, start_time = create_run_id_and_start_time()
@@ -404,7 +429,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     ui.print_header("LOAD PIPETTE")
     pipette = _load_pipette(ctx, cfg)
     pipette_tag = get_pipette_unique_name(pipette)
-    print(f'found pipette: {pipette_tag}')
+    print(f"found pipette: {pipette_tag}")
     if not ctx.is_simulating():
         ui.get_user_ready("create pipette QR code")
     if cfg.user_volumes:
@@ -441,21 +466,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     )
 
     ui.print_header("PREPARE")
-    for dye in dye_types_req.keys():
-        transfered_ul = dye_types_req[dye]
-        reservoir_ul = max(_MIN_START_VOLUME_UL, transfered_ul + _MIN_END_VOLUME_UL)
-        leftover_ul = reservoir_ul - transfered_ul
-        _ul_to_ml = lambda x: round(x / 1000, 1)
-        if dye_types_req[dye] > 0:
-            if cfg.refill:
-                # only add the minimum required volume
-                print(f' * {_ul_to_ml(leftover_ul)} mL "{dye}" LEFTOVER in reservoir')
-                if not ctx.is_simulating():
-                    ui.get_user_ready(f'[refill] ADD {_ul_to_ml(transfered_ul)} mL more DYE type "{dye}"')
-            else:
-                # add minimum required volume PLUS labware's dead-volume
-                if not ctx.is_simulating():
-                    ui.get_user_ready(f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye}"')
+    _display_dye_information(ctx, dye_types_req, cfg.refill)
 
     print("homing...")
     ctx.home()
