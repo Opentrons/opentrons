@@ -37,7 +37,7 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
     errors?.fields?.name != null
 
   return (
-    <HandleEnter onEnter={proceed} >
+    <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -69,8 +69,8 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
                 onBlur={handleBlur}
                 error={
                   touched?.fields?.name &&
-                    values.fields.name &&
-                    values.fields.name.length > 1
+                  values.fields.name &&
+                  values.fields.name.length > 1
                     ? errors?.fields?.name ?? null
                     : null
                 }
@@ -79,7 +79,9 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
           </Flex>
 
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-            <Text as="h4">{t('modal.create_file_wizard.add_optional_info')}</Text>
+            <Text as="h4">
+              {t('modal.create_file_wizard.add_optional_info')}
+            </Text>
             <Flex
               flexDirection={DIRECTION_COLUMN}
               width="30rem"

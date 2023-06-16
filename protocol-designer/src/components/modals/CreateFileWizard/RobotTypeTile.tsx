@@ -32,7 +32,7 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
   const { i18n, t } = useTranslation()
   const { values, setFieldValue, proceed } = props
   return (
-    <HandleEnter onEnter={proceed} >
+    <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -43,7 +43,10 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
             {i18n.t('modal.create_file_wizard.choose_robot_type')}
           </Text>
 
-          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing8}>
+          <Flex
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+            gridGap={SPACING.spacing8}
+          >
             {ROBOT_TYPES.map(robotType => (
               <RobotTypeOption
                 key={robotType}

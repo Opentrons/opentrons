@@ -63,7 +63,7 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
     }
   )
   return (
-    <HandleEnter onEnter={proceed} >
+    <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
         <Flex
           flexDirection={DIRECTION_COLUMN}

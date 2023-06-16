@@ -16,7 +16,7 @@ export function HandleEnter(props: HandleEnterProps): JSX.Element {
         {
           key: 'Enter',
           shiftKey: false,
-          onPress: onEnter
+          onPress: onEnter,
         },
       ]}
     >

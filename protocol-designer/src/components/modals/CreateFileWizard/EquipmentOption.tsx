@@ -9,7 +9,7 @@ import {
   JUSTIFY_CENTER,
   COLORS,
   StyleProps,
-  TYPOGRAPHY
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 interface EquipmentOptionProps extends StyleProps {
@@ -20,7 +20,14 @@ interface EquipmentOptionProps extends StyleProps {
   showCheckbox?: boolean
 }
 export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
-  const { text, onClick, isSelected, image = null, showCheckbox = false, ...styleProps } = props
+  const {
+    text,
+    onClick,
+    isSelected,
+    image = null,
+    showCheckbox = false,
+    ...styleProps
+  } = props
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -33,7 +40,12 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
       borderColor={isSelected ? COLORS.blueEnabled : COLORS.medGreyEnabled}
       {...styleProps}
     >
-      {showCheckbox ? <Icon size="2rem" name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'} /> : null}
+      {showCheckbox ? (
+        <Icon
+          size="2rem"
+          name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
+        />
+      ) : null}
       <Flex
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
@@ -41,7 +53,9 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
       >
         {image}
       </Flex>
-      <Text as="p" fontSize={TYPOGRAPHY.fontSizeP}>{text}</Text>
+      <Text as="p" fontSize={TYPOGRAPHY.fontSizeP}>
+        {text}
+      </Text>
     </Flex>
   )
 }

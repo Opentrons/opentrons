@@ -116,7 +116,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
 
   const robotType = values.fields.robotType
   return (
-    <HandleEnter onEnter={proceed} >
+    <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -153,9 +153,13 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
         >
           <GoBackLink
             onClick={() => {
-              if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
+              if (
+                props.values.pipettesByMount.left.pipetteName === 'p1000_96'
+              ) {
                 goBack(3)
-              } else if (props.values.pipettesByMount.right.pipetteName === '') {
+              } else if (
+                props.values.pipettesByMount.right.pipetteName === ''
+              ) {
                 goBack(2)
               } else {
                 goBack()

@@ -16,7 +16,10 @@ import {
   COLORS,
   SPACING,
 } from '@opentrons/components'
-import { MODULES_WITH_COLLISION_ISSUES, ModuleTemporalProperties } from '@opentrons/step-generation'
+import {
+  MODULES_WITH_COLLISION_ISSUES,
+  ModuleTemporalProperties,
+} from '@opentrons/step-generation'
 import {
   getLabwareHasQuirk,
   inferModuleOrientationFromSlot,
@@ -77,7 +80,7 @@ type ContentsProps = RobotWorkSpaceRenderProps & {
   activeDeckSetup: InitialDeckSetup
   selectedTerminalItemId?: TerminalItemId | null
   showGen1MultichannelCollisionWarnings: boolean
-  deckDef: DeckDefinition,
+  deckDef: DeckDefinition
 }
 
 export const VIEWBOX_MIN_X = -64
@@ -123,11 +126,11 @@ export const getSwapBlocked = (args: SwapBlockedArgs): boolean => {
   // dragging custom labware to module gives not compat error
   const labwareSourceToDestBlocked = sourceModuleType
     ? !getLabwareIsCompatible(hoveredLabware.def, sourceModuleType) &&
-    !hoveredLabwareIsCustom
+      !hoveredLabwareIsCustom
     : false
   const labwareDestToSourceBlocked = destModuleType
     ? !getLabwareIsCompatible(draggedLabware.def, destModuleType) &&
-    !draggedLabwareIsCustom
+      !draggedLabwareIsCustom
     : false
 
   return labwareSourceToDestBlocked || labwareDestToSourceBlocked
@@ -171,9 +174,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     []
   )
 
-  const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanning(
-    activeDeckSetup
-  )
+  const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanning(activeDeckSetup)
   const deckSlots: DeckDefSlot[] = values(deckSlotsById)
   // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
   const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
@@ -192,23 +193,23 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   const multichannelWarningSlots: DeckDefSlot[] = showGen1MultichannelCollisionWarnings
     ? compact([
-      (allModules.some(
-        moduleOnDeck =>
-          moduleOnDeck.slot === '1' &&
-          // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
-          MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-      ) &&
-        deckSlotsById?.['4']) ||
-      null,
-      (allModules.some(
-        moduleOnDeck =>
-          moduleOnDeck.slot === '3' &&
-          // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
-          MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-      ) &&
-        deckSlotsById?.['6']) ||
-      null,
-    ])
+        (allModules.some(
+          moduleOnDeck =>
+            moduleOnDeck.slot === '1' &&
+            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
+            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+        ) &&
+          deckSlotsById?.['4']) ||
+          null,
+        (allModules.some(
+          moduleOnDeck =>
+            moduleOnDeck.slot === '3' &&
+            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
+            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+        ) &&
+          deckSlotsById?.['6']) ||
+          null,
+      ])
     : []
 
   return (
@@ -219,7 +220,9 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           slot => slot.id === moduleOnDeck.slot
         )
         if (slot == null) {
-          console.warn(`no slot ${moduleOnDeck.slot} for module ${moduleOnDeck.id}`)
+          console.warn(
+            `no slot ${moduleOnDeck.slot} for module ${moduleOnDeck.id}`
+          )
           return null
         }
         const moduleDef = getModuleDef2(moduleOnDeck.model)
@@ -228,20 +231,24 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           moduleState: ModuleTemporalProperties['moduleState']
         ): React.ComponentProps<typeof Module>['innerProps'] => {
           if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
-            let lidMotorState = "unknown"
+            let lidMotorState = 'unknown'
             if (moduleState.lidOpen === true) {
-              lidMotorState = "open"
+              lidMotorState = 'open'
             } else if (moduleState.lidOpen === false) {
-              lidMotorState = "closed"
+              lidMotorState = 'closed'
             }
             return {
               lidMotorState,
-              blockTargetTemp: moduleState.blockTargetTemp
+              blockTargetTemp: moduleState.blockTargetTemp,
             }
           }
         }
-        const labwareLoadedOnModule = allLabware.find(lw => lw.slot === moduleOnDeck.id)
-        const shouldHideChildren = moduleOnDeck.moduleState.type === THERMOCYCLER_MODULE_TYPE && moduleOnDeck.moduleState.lidOpen === false
+        const labwareLoadedOnModule = allLabware.find(
+          lw => lw.slot === moduleOnDeck.id
+        )
+        const shouldHideChildren =
+          moduleOnDeck.moduleState.type === THERMOCYCLER_MODULE_TYPE &&
+          moduleOnDeck.moduleState.lidOpen === false
         const labwareInterfaceSlotDef: DeckDefSlot = {
           displayName: `Labware interface on ${moduleOnDeck.model}`,
           id: moduleOnDeck.id,
@@ -261,14 +268,20 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             x={slot.position[0]}
             y={slot.position[1]}
             def={moduleDef}
-            orientation={inferModuleOrientationFromXCoordinate(slot.position[0])}
+            orientation={inferModuleOrientationFromXCoordinate(
+              slot.position[0]
+            )}
             innerProps={getModuleInnerProps(moduleOnDeck.moduleState)}
             targetSlotId={slot.id}
             targetDeckId={deckDef.otId}
           >
-            {(labwareLoadedOnModule != null && !shouldHideChildren) ? (
+            {labwareLoadedOnModule != null && !shouldHideChildren ? (
               <>
-                <LabwareOnDeck x={0} y={0} labwareOnDeck={labwareLoadedOnModule} />
+                <LabwareOnDeck
+                  x={0}
+                  y={0}
+                  labwareOnDeck={labwareLoadedOnModule}
+                />
                 <LabwareControls
                   slot={labwareInterfaceSlotDef}
                   setHoveredLabware={setHoveredLabware}
@@ -283,7 +296,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 />
               </>
             ) : null}
-            {(labwareLoadedOnModule == null && !shouldHideChildren) ? (
+            {labwareLoadedOnModule == null && !shouldHideChildren ? (
               // @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
               <SlotControls
                 key={slot.id}
@@ -301,8 +314,9 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 backgroundColor: COLORS.darkGreyEnabled,
                 padding: SPACING.spacing4,
                 height: '100%',
-                color: COLORS.white
-              }}>
+                color: COLORS.white,
+              }}
+            >
               <Text as="p" fontSize="0.5rem">
                 {getModuleDisplayName(moduleOnDeck.model)}
               </Text>

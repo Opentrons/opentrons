@@ -69,7 +69,7 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
   const { i18n, t } = useTranslation()
   const { allowNoPipette, tileHeader, proceed, goBack } = props
   return (
-    <HandleEnter onEnter={proceed} >
+    <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -126,29 +126,42 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
   const nameAccessor = `pipettesByMount.${mount}.pipetteName`
   const currentValue = values.pipettesByMount[mount].pipetteName
   if (currentValue === undefined) {
-    setFieldValue(nameAccessor, allowNoPipette ? '' : pipetteOptions[0]?.value ?? '')
+    setFieldValue(
+      nameAccessor,
+      allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
+    )
   }
 
   return (
-    <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER} overflowY="scroll">
+    <Flex
+      flexWrap="wrap"
+      gridGap={SPACING.spacing4}
+      alignSelf={ALIGN_CENTER}
+      overflowY="scroll"
+    >
       {pipetteOptions.map(o => (
         <EquipmentOption
           key={o.name}
           isSelected={currentValue === o.value}
-          image={(
-            o.value === '' ? null :
+          image={
+            o.value === '' ? null : (
               <InstrumentDiagram
                 mount="left"
-                imageStyle={css`max-height: 3rem;`}
-                pipetteSpecs={getPipetteNameSpecs(o.value as PipetteName)} />
-          )}
+                imageStyle={css`
+                  max-height: 3rem;
+                `}
+                pipetteSpecs={getPipetteNameSpecs(o.value as PipetteName)}
+              />
+            )
+          }
           text={o.name}
-          onClick={() => { setFieldValue(nameAccessor, o.value) }}
-          width={pipetteOptions.length > 5 ? "14.5rem" : "21.75rem"}
+          onClick={() => {
+            setFieldValue(nameAccessor, o.value)
+          }}
+          width={pipetteOptions.length > 5 ? '14.5rem' : '21.75rem'}
           minHeight="4rem"
         />
-      ))
-      }
+      ))}
     </Flex>
   )
 }

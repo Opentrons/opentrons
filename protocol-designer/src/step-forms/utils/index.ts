@@ -88,10 +88,13 @@ export function denormalizePipetteEntities(
 export const getSlotIdsBlockedBySpanning = (
   initialDeckSetup: InitialDeckSetup
 ): DeckSlot[] => {
-
-  const loadedThermocycler = values(initialDeckSetup.modules).find(({type}: ModuleOnDeck) => type === THERMOCYCLER_MODULE_TYPE)
+  const loadedThermocycler = values(initialDeckSetup.modules).find(
+    ({ type }: ModuleOnDeck) => type === THERMOCYCLER_MODULE_TYPE
+  )
   if (loadedThermocycler != null) {
-    return loadedThermocycler.slot === SPAN7_8_10_11_SLOT ? ['7', '8', '10', '11'] : ['A1', 'B1']
+    return loadedThermocycler.slot === SPAN7_8_10_11_SLOT
+      ? ['7', '8', '10', '11']
+      : ['A1', 'B1']
   }
 
   return []

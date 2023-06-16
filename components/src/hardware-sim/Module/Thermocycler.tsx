@@ -59,7 +59,10 @@ export function Thermocycler(props: ThermocyclerVizProps): JSX.Element {
         y="22"
         innerDivProps={{
           borderRadius: '6px',
-          backgroundColor: blockTargetTemp <= ROOM_TEMPERATURE_C ? COLORS.mediumBlueEnabled : COLORS.red4,
+          backgroundColor:
+            blockTargetTemp <= ROOM_TEMPERATURE_C
+              ? COLORS.mediumBlueEnabled
+              : COLORS.red4,
           width: '100%',
           height: '100%',
         }}

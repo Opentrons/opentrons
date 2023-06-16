@@ -106,17 +106,22 @@ export const Module = (props: Props): JSX.Element => {
 
   // additional transforms to apply to vectors in certain deck/slot combinations
   const transformsForDeckBySlot = def.slotTransforms[targetDeckId]
-  const slotTransformsForDeckSlot = targetSlotId != null && transformsForDeckBySlot != null && targetSlotId in transformsForDeckBySlot ? transformsForDeckBySlot[targetSlotId] : null
+  const slotTransformsForDeckSlot =
+    targetSlotId != null &&
+    transformsForDeckBySlot != null &&
+    targetSlotId in transformsForDeckBySlot
+      ? transformsForDeckBySlot[targetSlotId]
+      : null
   const deckSpecificTransforms = slotTransformsForDeckSlot ?? {}
   if (deckSpecificTransforms?.cornerOffsetFromSlot != null) {
     const [
       [slotTranslateX],
-      [slotTranslateY]
+      [slotTranslateY],
     ] = multiplyMatrices(deckSpecificTransforms.cornerOffsetFromSlot, [
       [translateX],
       [translateY],
       [translateZ],
-      [1]
+      [1],
     ])
     offsetTransform = `translate(${slotTranslateX}, ${slotTranslateY})`
   }
