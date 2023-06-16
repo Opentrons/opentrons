@@ -44,6 +44,7 @@ import { GoBackLink } from './GoBackLink'
 
 import type { WizardTileProps } from './types'
 import { EquipmentOption } from './EquipmentOption'
+import { HandleEnter } from './HandleEnter'
 
 const getCrashableModuleSelected = (
   modules: FormModulesByType,
@@ -115,56 +116,58 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
 
   const robotType = values.fields.robotType
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        minHeight="26rem"
-        gridGap={SPACING.spacing32}
-      >
-        <Text as="h2">
-          {t('modal.create_file_wizard.choose_additional_items')}
-        </Text>
-        {robotType === OT2_ROBOT_TYPE ? (
-          <ModuleFields
-            //  @ts-expect-error
-            errors={errors.modulesByType ?? null}
-            values={values.modulesByType}
-            onFieldChange={handleChange}
-            onSetFieldValue={setFieldValue}
-            onBlur={handleBlur}
-            //  @ts-expect-error
-            touched={touched.modulesByType ?? null}
-            onSetFieldTouched={setFieldTouched}
-          />
-        ) : (
-          <FlexModuleFields {...props} />
-        )}
-        {robotType === OT2_ROBOT_TYPE && moduleRestrictionsDisabled !== true
-          ? modCrashWarning
-          : null}
-      </Flex>
+    <HandleEnter onEnter={proceed} >
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          minHeight="26rem"
+          gridGap={SPACING.spacing32}
+        >
+          <Text as="h2">
+            {t('modal.create_file_wizard.choose_additional_items')}
+          </Text>
+          {robotType === OT2_ROBOT_TYPE ? (
+            <ModuleFields
+              //  @ts-expect-error
+              errors={errors.modulesByType ?? null}
+              values={values.modulesByType}
+              onFieldChange={handleChange}
+              onSetFieldValue={setFieldValue}
+              onBlur={handleBlur}
+              //  @ts-expect-error
+              touched={touched.modulesByType ?? null}
+              onSetFieldTouched={setFieldTouched}
+            />
+          ) : (
+            <FlexModuleFields {...props} />
+          )}
+          {robotType === OT2_ROBOT_TYPE && moduleRestrictionsDisabled !== true
+            ? modCrashWarning
+            : null}
+        </Flex>
 
-      <Flex
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        width="100%"
-      >
-        <GoBackLink
-          onClick={() => {
-            if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
-              goBack(3)
-            } else if (props.values.pipettesByMount.right.pipetteName === '') {
-              goBack(2)
-            } else {
-              goBack()
-            }
-          }}
-        />
-        <PrimaryButton onClick={() => proceed()}>
-          {t('modal.create_file_wizard.create_protocol_on_to_liquids')}
-        </PrimaryButton>
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          width="100%"
+        >
+          <GoBackLink
+            onClick={() => {
+              if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
+                goBack(3)
+              } else if (props.values.pipettesByMount.right.pipetteName === '') {
+                goBack(2)
+              } else {
+                goBack()
+              }
+            }}
+          />
+          <PrimaryButton onClick={() => proceed()}>
+            {t('modal.create_file_wizard.create_protocol_on_to_liquids')}
+          </PrimaryButton>
+        </Flex>
       </Flex>
-    </Flex>
+    </HandleEnter>
   )
 }
 

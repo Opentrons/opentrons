@@ -30,6 +30,7 @@ import { GoBackLink } from './GoBackLink'
 
 import type { FormState, WizardTileProps } from './types'
 import { EquipmentOption } from './EquipmentOption'
+import { HandleEnter } from './HandleEnter'
 
 export function FirstPipetteTypeTile(props: WizardTileProps): JSX.Element {
   const mount = LEFT
@@ -68,26 +69,28 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
   const { i18n, t } = useTranslation()
   const { allowNoPipette, tileHeader, proceed, goBack } = props
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        height="26rem"
-        gridGap={SPACING.spacing32}
-      >
-        <Text as="h2">{tileHeader}</Text>
-        <PipetteField {...props} allowNoPipette={allowNoPipette} />
+    <HandleEnter onEnter={proceed} >
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          height="26rem"
+          gridGap={SPACING.spacing32}
+        >
+          <Text as="h2">{tileHeader}</Text>
+          <PipetteField {...props} allowNoPipette={allowNoPipette} />
+        </Flex>
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          width="100%"
+        >
+          <GoBackLink onClick={() => goBack()} />
+          <PrimaryButton onClick={() => proceed()}>
+            {i18n.format(t('shared.next'), 'capitalize')}
+          </PrimaryButton>
+        </Flex>
       </Flex>
-      <Flex
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        width="100%"
-      >
-        <GoBackLink onClick={() => goBack()} />
-        <PrimaryButton onClick={() => proceed()}>
-          {i18n.format(t('shared.next'), 'capitalize')}
-        </PrimaryButton>
-      </Flex>
-    </Flex>
+    </HandleEnter>
   )
 }
 
@@ -123,7 +126,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
   const nameAccessor = `pipettesByMount.${mount}.pipetteName`
   const currentValue = values.pipettesByMount[mount].pipetteName
   if (currentValue === undefined) {
-    setFieldValue(nameAccessor, pipetteOptions[0]?.value ?? '')
+    setFieldValue(nameAccessor, allowNoPipette ? '' : pipetteOptions[0]?.value ?? '')
   }
 
   return (

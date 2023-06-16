@@ -8,7 +8,6 @@ import {
   Flex,
   Text,
   SPACING,
-  Icon,
   Mount,
   RadioOption,
   ALIGN_CENTER,
@@ -26,6 +25,7 @@ import { GoBackLink } from './GoBackLink'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { FormState, WizardTileProps } from './types'
 import { EquipmentOption } from './EquipmentOption'
+import { HandleEnter } from './HandleEnter'
 
 export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
   return <PipetteTipsTile {...props} mount="left" />
@@ -63,26 +63,28 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
     }
   )
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        height="26rem"
-        gridGap={SPACING.spacing32}
-      >
-        <Text as="h2">{tileHeader}</Text>
-        <PipetteTipsField {...props} />
+    <HandleEnter onEnter={proceed} >
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          height="26rem"
+          gridGap={SPACING.spacing32}
+        >
+          <Text as="h2">{tileHeader}</Text>
+          <PipetteTipsField {...props} />
+        </Flex>
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          width="100%"
+        >
+          <GoBackLink onClick={() => goBack()} />
+          <PrimaryButton onClick={() => proceed()}>
+            {i18n.format(t('shared.next'), 'capitalize')}
+          </PrimaryButton>
+        </Flex>
       </Flex>
-      <Flex
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        width="100%"
-      >
-        <GoBackLink onClick={() => goBack()} />
-        <PrimaryButton onClick={() => proceed()}>
-          {i18n.format(t('shared.next'), 'capitalize')}
-        </PrimaryButton>
-      </Flex>
-    </Flex>
+    </HandleEnter>
   )
 }
 
@@ -91,7 +93,7 @@ interface PipetteTipsFieldProps extends FormikProps<FormState> {
 }
 
 function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
-  const { mount, values, handleChange, setFieldValue } = props
+  const { mount, values, setFieldValue } = props
   const allLabware = useSelector(getLabwareDefsByURI)
   const selectedPipetteName = values.pipettesByMount[mount].pipetteName
   const selectedPipetteDefaultTipRacks =
@@ -121,7 +123,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
   const currentValue = values.pipettesByMount[mount].tiprackDefURI
   if (currentValue === undefined) {
-    setFieldValue(nameAccessor, tipRackOptions[-1]?.value ?? null)
+    setFieldValue(nameAccessor, tipRackOptions[0]?.value ?? '')
   }
 
   return (

@@ -24,6 +24,7 @@ import OT2Image from '../../../images/OT2.png'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { WizardTileProps } from './types'
+import { HandleEnter } from './HandleEnter'
 
 const ROBOT_TYPES: RobotType[] = [OT2_ROBOT_TYPE, FLEX_ROBOT_TYPE]
 
@@ -31,39 +32,41 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
   const { i18n, t } = useTranslation()
   const { values, setFieldValue, proceed } = props
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        height="26rem"
-        gridGap={SPACING.spacing32}
-      >
-        <Text as="h2">
-          {i18n.t('modal.create_file_wizard.choose_robot_type')}
-        </Text>
+    <HandleEnter onEnter={proceed} >
+      <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          height="26rem"
+          gridGap={SPACING.spacing32}
+        >
+          <Text as="h2">
+            {i18n.t('modal.create_file_wizard.choose_robot_type')}
+          </Text>
 
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing8}>
-          {ROBOT_TYPES.map(robotType => (
-            <RobotTypeOption
-              key={robotType}
-              isSelected={values.fields.robotType === robotType}
-              onClick={() => {
-                setFieldValue('fields.robotType', robotType)
-              }}
-              robotType={robotType}
-            />
-          ))}
+          <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} gridGap={SPACING.spacing8}>
+            {ROBOT_TYPES.map(robotType => (
+              <RobotTypeOption
+                key={robotType}
+                isSelected={values.fields.robotType === robotType}
+                onClick={() => {
+                  setFieldValue('fields.robotType', robotType)
+                }}
+                robotType={robotType}
+              />
+            ))}
+          </Flex>
+        </Flex>
+        <Flex
+          alignItems={ALIGN_CENTER}
+          justifyContent={JUSTIFY_FLEX_END}
+          width="100%"
+        >
+          <PrimaryButton onClick={() => proceed()}>
+            {i18n.format(t('shared.next'), 'capitalize')}
+          </PrimaryButton>
         </Flex>
       </Flex>
-      <Flex
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_FLEX_END}
-        width="100%"
-      >
-        <PrimaryButton onClick={() => proceed()}>
-          {i18n.format(t('shared.next'), 'capitalize')}
-        </PrimaryButton>
-      </Flex>
-    </Flex>
+    </HandleEnter>
   )
 }
 
