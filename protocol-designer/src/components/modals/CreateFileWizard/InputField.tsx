@@ -79,6 +79,7 @@ export function InputField(props: InputFieldProps): JSX.Element {
   )
 }
 
+// TODO(BC, 2023-06-16): reconcile this with the components library component that it was copied from
 function Input(props: InputFieldProps): JSX.Element {
   const error = props.error != null
   const value = props.isIndeterminate ?? false ? '' : props.value ?? ''

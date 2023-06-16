@@ -11,7 +11,7 @@ import type {
   CommandCreatorError,
   MoveLabwareArgs,
 } from '../../types'
-/** Move to specified well of labware, with optional offset and pathing options. */
+/** Move labware from one location to another, manually or via a gripper. */
 export const moveLabware: CommandCreator<MoveLabwareArgs> = (
   args,
   invariantContext,
