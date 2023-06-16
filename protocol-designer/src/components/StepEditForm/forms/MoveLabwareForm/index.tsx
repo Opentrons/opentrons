@@ -12,6 +12,7 @@ import type { StepFormProps } from '../../types'
 export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
   const { propsForFields } = props
 
+  console.log('labwarelocaiton props for fields', propsForFields)
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>

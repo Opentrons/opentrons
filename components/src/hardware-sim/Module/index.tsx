@@ -104,10 +104,12 @@ export const Module = (props: Props): JSX.Element => {
   let nestedLabwareOffsetY = labwareOffsetY
 
   // additional transforms to apply to vectors in certain deck/slot combinations
-  const deckSpecificTransforms = targetSlotId != null ? def.slotTransforms[targetDeckId][targetSlotId] : null
+  const transformsForDeckBySlot = def.slotTransforms[targetDeckId]
+  const slotTransformsForDeckSlot = targetSlotId != null && transformsForDeckBySlot != null && targetSlotId in transformsForDeckBySlot ? transformsForDeckBySlot[targetSlotId] : null
+  const deckSpecificTransforms = slotTransformsForDeckSlot ?? {}
   if (deckSpecificTransforms?.cornerOffsetFromSlot != null) {
     const [[slotTranslateX], [slotTranslateY]] = multiplyMatrices(deckSpecificTransforms.cornerOffsetFromSlot, [[translateX], [translateY], [translateZ], [1]])
-      offsetTransform = `translate(${slotTranslateX}, ${slotTranslateY})`
+    offsetTransform = `translate(${slotTranslateX}, ${slotTranslateY})`
   }
   if (deckSpecificTransforms?.labwareOffset != null) {
     const [[slotLabwareOffsetX], [slotLabwareOffsetY]] = multiplyMatrices(deckSpecificTransforms.labwareOffset, [[labwareOffsetX], [labwareOffsetY], [1], [1]])
