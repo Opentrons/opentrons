@@ -188,11 +188,12 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
 
             self._state.definitions_by_uri[definition_uri] = command.result.definition
 
-            deck_item_id = (
-                command.result.labwareId
-                if isinstance(command.result, LoadLabwareResult)
-                else command.result.adapterId
-            )
+            if isinstance(command.result, LoadLabwareResult):
+                deck_item_id = command.result.labwareId
+                display_name = command.params.displayName
+            else:
+                deck_item_id = command.result.adapterId
+                display_name = None
 
             self._state.labware_by_id[deck_item_id] = LoadedLabware.construct(
                 id=deck_item_id,
@@ -200,7 +201,7 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 loadName=command.result.definition.parameters.loadName,
                 definitionUri=definition_uri,
                 offsetId=command.result.offsetId,
-                displayName=command.params.displayName,
+                displayName=display_name,
             )
 
         elif isinstance(command.result, MoveLabwareResult):

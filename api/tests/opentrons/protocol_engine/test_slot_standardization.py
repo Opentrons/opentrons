@@ -186,7 +186,6 @@ def test_standardize_load_adapter_command(
             namespace="namespace",
             version=123,
             adapterId="labwareId",
-            displayName="displayName",
         ),
     )
     expected = commands.LoadAdapterCreate(
@@ -198,7 +197,6 @@ def test_standardize_load_adapter_command(
             namespace="namespace",
             version=123,
             adapterId="labwareId",
-            displayName="displayName",
         ),
     )
     assert subject.standardize_command(original, robot_type) == expected

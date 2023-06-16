@@ -39,7 +39,6 @@ async def test_load_adapter_implementation(
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1,
-        displayName="My custom display name",
         adapterId="abc-123",
     )
 
@@ -86,7 +85,6 @@ async def test_load_adapter_raises_not_adapter(
         loadName="some-load-name",
         namespace="opentrons-test",
         version=1,
-        displayName="My custom display name",
         adapterId="abc-123",
     )
 
