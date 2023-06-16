@@ -42,7 +42,6 @@ function ProtocolEditorComponent(): JSX.Element {
             )}
           >
             <AnnouncementModal />
-            {/* <NewFileModal showProtocolFields /> */}
             <CreateFileWizard />
             <FileUploadMessageModal />
 
