@@ -10,7 +10,6 @@ from opentrons.util.async_helpers import async_context_manager_in_thread
 from .protocol_engine import ProtocolEngine
 from .resources import DeckDataProvider, ModuleDataProvider
 from .state import Config, StateStore
-from .types import DeckType
 
 
 # TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to
@@ -44,6 +43,7 @@ async def create_protocol_engine(
 @contextlib.contextmanager
 def create_protocol_engine_in_thread(
     hardware_api: HardwareControlAPI,
+    config: Config,
 ) -> typing.Generator[
     typing.Tuple[ProtocolEngine, asyncio.AbstractEventLoop], None, None
 ]:
@@ -64,7 +64,7 @@ def create_protocol_engine_in_thread(
     2. Stops and cleans up the event loop.
     3. Joins the thread.
     """
-    with async_context_manager_in_thread(_protocol_engine(hardware_api)) as (
+    with async_context_manager_in_thread(_protocol_engine(hardware_api, config)) as (
         protocol_engine,
         loop,
     ):
@@ -73,19 +73,11 @@ def create_protocol_engine_in_thread(
 
 @contextlib.asynccontextmanager
 async def _protocol_engine(
-    hardware_api: HardwareControlAPI,
+    hardware_api: HardwareControlAPI, config: Config
 ) -> typing.AsyncGenerator[ProtocolEngine, None]:
     protocol_engine = await create_protocol_engine(
         hardware_api=hardware_api,
-        config=Config(
-            robot_type="OT-3 Standard",
-            deck_type=DeckType.OT3_STANDARD,
-            ignore_pause=True,
-            use_virtual_pipettes=True,
-            use_virtual_modules=True,
-            use_virtual_gripper=True,
-            block_on_door_open=False,
-        ),
+        config=config,
     )
     try:
         protocol_engine.play()
