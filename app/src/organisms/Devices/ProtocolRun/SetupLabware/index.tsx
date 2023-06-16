@@ -16,7 +16,7 @@ import {
   useModuleRenderInfoForProtocolById,
   useStoredProtocolAnalysis,
 } from '../../hooks'
-import { ProceedToRunButton } from '../ProceedToRunButton'
+import { BackToTopButton } from '../BackToTopButton'
 import { SetupLabwareMap } from './SetupLabwareMap'
 import { SetupLabwareList } from './SetupLabwareList'
 
@@ -79,7 +79,7 @@ export function SetupLabware(props: SetupLabwareProps): JSX.Element {
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing16}>
         {nextStep == null ? (
-          <ProceedToRunButton
+          <BackToTopButton
             protocolRunHeaderRef={protocolRunHeaderRef}
             robotName={robotName}
             runId={runId}

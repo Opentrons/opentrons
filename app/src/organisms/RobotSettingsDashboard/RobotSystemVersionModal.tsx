@@ -13,9 +13,9 @@ import {
 import { SmallButton } from '../../atoms/buttons'
 import { InlineNotification } from '../../atoms/InlineNotification'
 import { ReleaseNotes } from '../../molecules/ReleaseNotes'
-import { Modal } from '../../molecules/Modal/OnDeviceDisplay/Modal'
+import { Modal } from '../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface RobotSystemVersionModalProps {
   version: string

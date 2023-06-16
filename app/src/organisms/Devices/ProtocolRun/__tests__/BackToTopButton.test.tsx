@@ -14,7 +14,7 @@ import {
   useRunHasStarted,
   useUnmatchedModulesForProtocol,
 } from '../../hooks'
-import { ProceedToRunButton } from '../ProceedToRunButton'
+import { BackToTopButton } from '../BackToTopButton'
 
 jest.mock('@opentrons/components', () => {
   const actualComponents = jest.requireActual('@opentrons/components')
@@ -45,7 +45,7 @@ const RUN_ID = '1'
 const render = () => {
   return renderWithProviders(
     <StaticRouter>
-      <ProceedToRunButton
+      <BackToTopButton
         protocolRunHeaderRef={null}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
@@ -60,7 +60,7 @@ const render = () => {
 
 let mockTrackEvent: jest.Mock
 
-describe('ProceedToRunButton', () => {
+describe('BackToTopButton', () => {
   beforeEach(() => {
     when(mockUseUnmatchedModulesForProtocol)
       .calledWith(ROBOT_NAME, RUN_ID)
@@ -85,7 +85,7 @@ describe('ProceedToRunButton', () => {
 
   it('should be enabled with no tooltip if there are no missing Ids', () => {
     const { getByRole } = render()
-    const button = getByRole('link', { name: 'Proceed to run' })
+    const button = getByRole('link', { name: 'Back to top' })
     expect(button).not.toBeDisabled()
     expect(button.getAttribute('href')).toEqual(
       '/devices/otie/protocol-runs/1/run-preview'
@@ -94,7 +94,7 @@ describe('ProceedToRunButton', () => {
 
   it('should track a mixpanel event when clicked', () => {
     const { getByRole } = render()
-    const button = getByRole('link', { name: 'Proceed to run' })
+    const button = getByRole('link', { name: 'Back to top' })
     button.click()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -110,7 +110,7 @@ describe('ProceedToRunButton', () => {
         remainingAttachedModules: [],
       })
     const { getByRole, getByText } = render()
-    const button = getByRole('button', { name: 'Proceed to run' })
+    const button = getByRole('button', { name: 'Back to top' })
     expect(button).toBeDisabled()
     getByText('Make sure all modules are connected before proceeding to run')
   })
@@ -127,7 +127,7 @@ describe('ProceedToRunButton', () => {
         complete: false,
       })
     const { getByRole, getByText } = render()
-    const button = getByRole('button', { name: 'Proceed to run' })
+    const button = getByRole('button', { name: 'Back to top' })
     expect(button).toBeDisabled()
     getByText(
       'Make sure robot calibration is complete and all modules are connected before proceeding to run'
@@ -140,7 +140,7 @@ describe('ProceedToRunButton', () => {
         complete: false,
       })
     const { getByRole, getByText } = render()
-    const button = getByRole('button', { name: 'Proceed to run' })
+    const button = getByRole('button', { name: 'Back to top' })
     expect(button).toBeDisabled()
     getByText(
       'Make sure robot calibration is complete before proceeding to run'
@@ -150,7 +150,7 @@ describe('ProceedToRunButton', () => {
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(true)
 
     const { getByRole, getByText } = render()
-    const button = getByRole('button', { name: 'Proceed to run' })
+    const button = getByRole('button', { name: 'Back to top' })
     expect(button).toBeDisabled()
     getByText('Protocol run started.')
   })

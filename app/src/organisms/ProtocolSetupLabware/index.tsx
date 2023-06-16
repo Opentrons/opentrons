@@ -34,7 +34,7 @@ import { FloatingActionButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { Portal } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareDisplayLocation } from '../CommandText/utils'
@@ -130,7 +130,7 @@ export function ProtocolSetupLabware({
     <>
       <Portal level="top">
         {showDeckMapModal ? (
-          <Modal
+          <LegacyModal
             title={t('map_view')}
             onClose={() => setShowDeckMapModal(false)}
             fullPage
@@ -206,10 +206,10 @@ export function ProtocolSetupLabware({
                 </>
               )}
             </RobotWorkSpace>
-          </Modal>
+          </LegacyModal>
         ) : null}
         {showLabwareDetailsModal && selectedLabware != null ? (
-          <Modal
+          <LegacyModal
             onClose={() => {
               setShowLabwareDetailsModal(false)
               setSelectedLabware(null)
@@ -247,7 +247,7 @@ export function ProtocolSetupLabware({
                 </StyledText>
               </Flex>
             </Flex>
-          </Modal>
+          </LegacyModal>
         ) : null}
       </Portal>
       <ODDBackButton

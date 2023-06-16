@@ -225,15 +225,22 @@ const PLAY_BUTTON_STYLE = css`
   }
 `
 interface PlayButtonProps {
-  disabled: boolean
+  ready: boolean
   onPlay: () => void
+  disabled?: boolean
 }
 
-function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
+function PlayButton({
+  disabled = false,
+  onPlay,
+  ready,
+}: PlayButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={disabled ? COLORS.darkBlack20 : COLORS.blueEnabled}
+      backgroundColor={
+        disabled || !ready ? COLORS.darkBlack20 : COLORS.blueEnabled
+      }
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
       height="6.25rem"
@@ -245,7 +252,7 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
       css={PLAY_BUTTON_STYLE}
     >
       <Icon
-        color={disabled ? COLORS.darkBlack60 : COLORS.white}
+        color={disabled || !ready ? COLORS.darkBlack60 : COLORS.white}
         name="play-icon"
         size="2.5rem"
       />
@@ -265,6 +272,16 @@ function PrepareToRun({
   const { t, i18n } = useTranslation('protocol_setup')
   const history = useHistory()
   const { makeSnackbar } = useToaster()
+
+  // Watch for scrolling to toggle dropshadow
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
+  const observer = new IntersectionObserver(([entry]) => {
+    setIsScrolled(!entry.isIntersecting)
+  })
+  if (scrollRef.current) {
+    observer.observe(scrollRef.current)
+  }
 
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
@@ -402,16 +419,19 @@ function PrepareToRun({
 
   return (
     <>
+      {/* Empty box to detect scrolling */}
+      <Flex ref={scrollRef} />
       {/* Protocol Setup Header */}
       <Flex
+        boxShadow={isScrolled ? BORDERS.shadowBig : undefined}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
-        paddingBottom={SPACING.spacing40}
-        paddingTop={SPACING.spacing32}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         position={POSITION_STICKY}
         top={0}
         backgroundColor={COLORS.white}
         overflowY="hidden"
+        marginX={`-${SPACING.spacing32}`}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
@@ -441,6 +461,7 @@ function PrepareToRun({
                 allPipettesCalibrationData == null
               }
               onPlay={onPlay}
+              ready={isReadyToRun}
             />
           </Flex>
         </Flex>
@@ -449,12 +470,14 @@ function PrepareToRun({
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
+        paddingX={SPACING.spacing8}
       >
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('instruments')}
           title={t('instruments')}
           detail={instrumentsDetail}
           status={instrumentsStatus}
+          disabled={speccedInstrumentCount === 0}
         />
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('modules')}
@@ -482,6 +505,7 @@ function PrepareToRun({
           detail={labwareDetail}
           subDetail={labwareSubDetail}
           status="general"
+          disabled={labwareDetail === null}
         />
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('liquids')}
@@ -494,6 +518,7 @@ function PrepareToRun({
                 })
               : t('liquids_not_in_setup')
           }
+          disabled={liquidsInProtocol.length === 0}
         />
       </Flex>
       {LPCWizard}
@@ -572,7 +597,7 @@ function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
         </Flex>
         <Flex gridGap={SPACING.spacing24}>
           <CloseButton onClose={() => props.cancelAndClose()} />
-          <PlayButton disabled onPlay={() => {}} />
+          <PlayButton onPlay={() => {}} ready={false} />
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>

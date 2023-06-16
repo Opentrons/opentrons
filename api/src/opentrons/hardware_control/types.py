@@ -439,6 +439,7 @@ class BoardRevision(enum.Enum):
     A = enum.auto()
     B = enum.auto()
     C = enum.auto()
+    FLEX_B2 = enum.auto()
 
     @classmethod
     def by_bits(cls, rev_bits: Tuple[bool, bool]) -> "BoardRevision":

@@ -133,7 +133,9 @@ class ModuleDataMapper:
             hasAvailableUpdate=has_available_update,
             usbPort=UsbPort(
                 port=usb_port.port_number,
+                portGroup=usb_port.port_group,
                 hub=usb_port.hub,
+                hubPort=usb_port.hub_port,
                 path=usb_port.device_path,
             ),
             # types of below fields are already checked at runtime
