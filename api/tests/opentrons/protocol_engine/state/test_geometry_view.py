@@ -1048,17 +1048,14 @@ def test_ensure_location_not_occupied_raises(
     """It should raise error when labware is present in given location."""
     slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
     # Shouldn't raise if neither labware nor module in location
-    assert (
-        subject.ensure_location_not_occupied(labware_id="foo", location=slot_location)
-        == slot_location
-    )
+    assert subject.ensure_location_not_occupied(location=slot_location) == slot_location
 
     # Raise if labware in location
     decoy.when(labware_view.raise_if_labware_in_location(slot_location)).then_raise(
         errors.LocationIsOccupiedError("Woops!")
     )
     with pytest.raises(errors.LocationIsOccupiedError):
-        subject.ensure_location_not_occupied(labware_id="foo", location=slot_location)
+        subject.ensure_location_not_occupied(location=slot_location)
 
     # Raise if module in location
     module_location = ModuleLocation(moduleId="module-id")
@@ -1069,13 +1066,11 @@ def test_ensure_location_not_occupied_raises(
         errors.LocationIsOccupiedError("Woops again!")
     )
     with pytest.raises(errors.LocationIsOccupiedError):
-        subject.ensure_location_not_occupied(labware_id="foo", location=module_location)
+        subject.ensure_location_not_occupied(location=module_location)
 
     # Shouldn't raise for off-deck labware
     assert (
-        subject.ensure_location_not_occupied(
-            labware_id="foo", location=OFF_DECK_LOCATION
-        )
+        subject.ensure_location_not_occupied(location=OFF_DECK_LOCATION)
         == OFF_DECK_LOCATION
     )
 

@@ -109,8 +109,9 @@ class GeometryView:
         )
 
     def _get_labware_position_offset(
-        self, labware_id, labware_location: LabwareLocation
+        self, labware_id: str, labware_location: LabwareLocation
     ) -> LabwareOffsetVector:
+        """Gets the offset vector of a labware on the given location."""
         if isinstance(labware_location, DeckSlotLocation):
             return LabwareOffsetVector(x=0, y=0, z=0)
         elif isinstance(labware_location, ModuleLocation):
@@ -378,17 +379,12 @@ class GeometryView:
         return slot_name
 
     def ensure_location_not_occupied(
-        self, labware_id: str, location: LabwareLocation
+        self, location: LabwareLocation
     ) -> LabwareLocation:
-        """Ensure that the location does not already have equipment in it and labware can be placed there."""
+        """Ensure that the location does not already have equipment in it."""
         if isinstance(location, (DeckSlotLocation, ModuleLocation)):
             self._labware.raise_if_labware_in_location(location)
             self._modules.raise_if_module_in_location(location)
-        elif isinstance(location, OnLabwareLocation):
-            labware_definition = self._labware.get_definition(labware_id)
-            self._labware.raise_if_labware_cannot_be_stacked(
-                labware_definition, location.labwareId
-            )
         return location
 
     def get_labware_center(

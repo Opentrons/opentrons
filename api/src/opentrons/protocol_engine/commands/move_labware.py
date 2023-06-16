@@ -95,10 +95,13 @@ class MoveLabwareImplementation(
         """Move a loaded labware to a new location."""
         # Allow propagation of LabwareNotLoadedError.
         current_labware = self._state_view.labware.get(labware_id=params.labwareId)
+        current_labware_definition = self._state_view.labware.get_definition(
+            params.labwareId
+        )
         definition_uri = current_labware.definitionUri
 
         empty_new_location = self._state_view.geometry.ensure_location_not_occupied(
-            labware_id=params.labwareId, location=params.newLocation
+            location=params.newLocation
         )
 
         # Check that labware and destination do not have labware on top
@@ -108,6 +111,11 @@ class MoveLabwareImplementation(
         if isinstance(params.newLocation, OnLabwareLocation):
             self._state_view.labware.raise_if_labware_is_not_on_top(
                 params.newLocation.labwareId
+            )
+            # Ensure that labware can be placed on requested labware
+            self._state_view.labware.raise_if_labware_cannot_be_stacked(
+                top_labware_definition=current_labware_definition,
+                bottom_labware_id=params.newLocation.labwareId,
             )
 
         # Allow propagation of ModuleNotLoadedError.
