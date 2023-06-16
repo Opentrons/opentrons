@@ -42,11 +42,6 @@ class LoadAdapterParams(BaseModel):
         description="An optional ID to assign to this adapter. If None, an ID "
         "will be generated.",
     )
-    displayName: Optional[str] = Field(
-        None,
-        description="An optional user-specified display name "
-        "or label for this adapter.",
-    )
 
 
 class LoadAdapterResult(BaseModel):

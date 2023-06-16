@@ -1061,11 +1061,6 @@
           "title": "Adapterid",
           "description": "An optional ID to assign to this adapter. If None, an ID will be generated.",
           "type": "string"
-        },
-        "displayName": {
-          "title": "Displayname",
-          "description": "An optional user-specified display name or label for this adapter.",
-          "type": "string"
         }
       },
       "required": ["location", "loadName", "namespace", "version"]
