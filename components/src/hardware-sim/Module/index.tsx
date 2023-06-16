@@ -29,15 +29,12 @@ const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
 // multiply two matrices together (dot product)
 function multiplyMatrices(a: number[][], b: number[][]): number[][] {
   const transposedB = b[0].map((_val, index) => b.map(row => row[index]))
-  return a.map((rowA) => (
-    transposedB.map((rowB) => (
-      rowA.reduce((acc, valA, colIndexA) => (
-        acc + (valA * rowB[colIndexA])
-      ), 0)
-    ))
-  ))
+  return a.map(rowA =>
+    transposedB.map(rowB =>
+      rowA.reduce((acc, valA, colIndexA) => acc + valA * rowB[colIndexA], 0)
+    )
+  )
 }
-
 
 interface Props {
   x: number
@@ -45,9 +42,9 @@ interface Props {
   def: ModuleDefinition
   orientation?: 'left' | 'right'
   innerProps?:
-  | React.ComponentProps<typeof Thermocycler>
-  | React.ComponentProps<typeof ModuleFromDef>
-  | {}
+    | React.ComponentProps<typeof Thermocycler>
+    | React.ComponentProps<typeof ModuleFromDef>
+    | {}
   statusInfo?: React.ReactNode // contents of small status rectangle, not displayed if absent
   children?: React.ReactNode // contents to be rendered on top of the labware mating surface of the module
   targetSlotId?: string
@@ -83,7 +80,11 @@ export const Module = (props: Props): JSX.Element => {
   const moduleType = getModuleType(def.model)
 
   const { x: labwareOffsetX, y: labwareOffsetY } = def.labwareOffset
-  const { x: translateX, y: translateY, z: translateZ } = def.cornerOffsetFromSlot
+  const {
+    x: translateX,
+    y: translateY,
+    z: translateZ,
+  } = def.cornerOffsetFromSlot
   const {
     xDimension,
     yDimension,
@@ -108,11 +109,27 @@ export const Module = (props: Props): JSX.Element => {
   const slotTransformsForDeckSlot = targetSlotId != null && transformsForDeckBySlot != null && targetSlotId in transformsForDeckBySlot ? transformsForDeckBySlot[targetSlotId] : null
   const deckSpecificTransforms = slotTransformsForDeckSlot ?? {}
   if (deckSpecificTransforms?.cornerOffsetFromSlot != null) {
-    const [[slotTranslateX], [slotTranslateY]] = multiplyMatrices(deckSpecificTransforms.cornerOffsetFromSlot, [[translateX], [translateY], [translateZ], [1]])
+    const [
+      [slotTranslateX],
+      [slotTranslateY]
+    ] = multiplyMatrices(deckSpecificTransforms.cornerOffsetFromSlot, [
+      [translateX],
+      [translateY],
+      [translateZ],
+      [1]
+    ])
     offsetTransform = `translate(${slotTranslateX}, ${slotTranslateY})`
   }
   if (deckSpecificTransforms?.labwareOffset != null) {
-    const [[slotLabwareOffsetX], [slotLabwareOffsetY]] = multiplyMatrices(deckSpecificTransforms.labwareOffset, [[labwareOffsetX], [labwareOffsetY], [1], [1]])
+    const [
+      [slotLabwareOffsetX],
+      [slotLabwareOffsetY],
+    ] = multiplyMatrices(deckSpecificTransforms.labwareOffset, [
+      [labwareOffsetX],
+      [labwareOffsetY],
+      [1],
+      [1],
+    ])
     nestedLabwareOffsetX = slotLabwareOffsetX
     nestedLabwareOffsetY = slotLabwareOffsetY
   }

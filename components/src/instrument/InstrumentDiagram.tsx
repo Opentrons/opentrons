@@ -14,14 +14,14 @@ import type { Mount } from '../robot-types'
 import type { StyleProps } from '..'
 
 export interface InstrumentDiagramProps extends StyleProps {
+  mount: Mount
   pipetteSpecs?: Pick<PipetteNameSpecs, 'displayCategory' | 'channels'> | null
   className?: string
-  mount: Mount
-  imageStyle: FlattenSimpleInterpolation
+  imageStyle?: FlattenSimpleInterpolation
 }
 
 export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
-  const { pipetteSpecs, mount, className, imageStyle, ...styleProps } = props
+  const { mount, pipetteSpecs, className, imageStyle, ...styleProps } = props
   const { displayCategory, channels } = pipetteSpecs || {}
 
   let imgSrc
@@ -41,15 +41,13 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
   }
 
   return (
-    <Box 
+    <Box
       className={className}
       transform={mount === 'right' ? 'scaleX(-1)' : ''}
       filter={mount === 'right' ? 'FlipH' : ''}
-      {...styleProps}>
-      <img
-        src={channels === 96 ? ninetySixSrc : imgSrc}
-        css={imageStyle}
-      />
+      {...styleProps}
+    >
+      <img src={channels === 96 ? ninetySixSrc : imgSrc} css={imageStyle} />
     </Box>
   )
 }
