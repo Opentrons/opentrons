@@ -60,14 +60,14 @@ def _run_loop_in_thread() -> typing.Generator[asyncio.AbstractEventLoop, None, N
 
     Exiting this context manager stops and cleans up the event loop, and then joins the thread.
     """
-    loop_queue: "queue.SimpleQueue[asyncio.AbstractEventLoop]" = queue.SimpleQueue()
+    loop_mailbox: "queue.SimpleQueue[asyncio.AbstractEventLoop]" = queue.SimpleQueue()
 
     def _in_thread() -> None:
         loop = asyncio.new_event_loop()
 
         # We assume that the lines above this will never fail,
         # so we will always reach this point to unblock the parent thread.
-        loop_queue.put(loop)
+        loop_mailbox.put(loop)
 
         loop.run_forever()
 
@@ -90,7 +90,7 @@ def _run_loop_in_thread() -> typing.Generator[asyncio.AbstractEventLoop, None, N
     with ThreadPoolExecutor(max_workers=1) as executor:
         executor.submit(_in_thread)
 
-        loop_in_thread = loop_queue.get()
+        loop_in_thread = loop_mailbox.get()
 
         try:
             yield loop_in_thread

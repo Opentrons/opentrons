@@ -72,8 +72,14 @@ def test_loop_lifetime() -> None:
             pass
 
     with async_context_manager_in_thread(NoOp()) as (_, loop_in_thread):
-        asyncio.run_coroutine_threadsafe(asyncio.sleep(0.000001), loop_in_thread)
+        # As a smoke test to see if the event loop is running and usable,
+        # run an arbitrary coroutine and wait for it to finish.
+        (
+            asyncio.run_coroutine_threadsafe(asyncio.sleep(0.000001), loop_in_thread)
+        ).result()
 
+    # The loop should be closed and unusable now that the context manager has exited.
+    assert loop_in_thread.is_closed
     with pytest.raises(RuntimeError, match="Event loop is closed"):
         loop_in_thread.call_soon_threadsafe(lambda: None)
 
@@ -111,4 +117,4 @@ def test_propagates_exception_from_exit() -> None:
     context_manager = RaiseExceptionOnExit()
     with pytest.raises(RuntimeError, match="Oh the humanity"):
         with async_context_manager_in_thread(context_manager):
-            assert False, "We should not reach here."
+            pass
