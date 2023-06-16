@@ -318,7 +318,7 @@ class ProtocolContext(CommandPublisher):
         :param location: The slot into which to load the labware,
             such as ``1`` or ``"1"`` or off-deck using :py:obj:`OFF_DECK`.
 
-        :type location: int or str or :py:obj:`OFF_DECK
+        :type location: int or str or :py:obj:`OFF_DECK`
 
         :param str label: An optional special name to give the labware. If specified, this
             is the name the labware will appear as in the run log and the calibration
