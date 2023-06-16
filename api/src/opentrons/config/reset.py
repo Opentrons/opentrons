@@ -48,10 +48,8 @@ _OT_2_RESET_OPTIONS = [
 ]
 _OT_3_RESET_OPTIONS = [
     ResetOptionId.boot_scripts,
-    ResetOptionId.deck_calibration,
     ResetOptionId.pipette_offset,
     ResetOptionId.gripper_offset,
-    ResetOptionId.tip_length_calibrations,
     ResetOptionId.runs_history,
 ]
 
