@@ -992,6 +992,7 @@ async def test_update_required_flag_disabled(
 async def test_monitor_pressure(
     controller: OT3Controller,
     mock_move_group_run: mock.AsyncMock,
+    mock_present_devices: None,
 ) -> None:
     mount = OT3Mount.LEFT
     mock_move_group_run.side_effect = move_group_run_side_effect(

@@ -117,6 +117,7 @@ from opentrons.hardware_control.errors import (
     InvalidPipetteName,
     InvalidPipetteModel,
     FirmwareUpdateRequired,
+    OverPressureDetected,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -939,28 +940,37 @@ class OT3Controller:
     async def monitor_overpressure(
         self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
     ) -> AsyncIterator[None]:
-        tool = sensor_node_for_pipette(OT3Mount(mount.value))
-        # FIXME we should switch the sensor type based on the channel
-        # used when partial tip pick up is implemented.
-        # FIXME we should also monitor pressure in all available channels
-        provided_context_manager = await check_overpressure(
-            self._messenger, tool, sensor_id
-        )
-        errors: asyncio.Queue[ErrorCode] = asyncio.Queue()
-
-        async with provided_context_manager() as errors:
-            yield
-
-        def _pop_queue() -> Optional[ErrorCode]:
-            try:
-                return errors.get_nowait()
-            except asyncio.QueueEmpty:
-                return None
-
-        if _pop_queue():
-            raise RuntimeError(
-                f"The pressure sensor on the {mount} mount has exceeded operational limits."
+        if ff.overpressure_detection_enabled():
+            tool = sensor_node_for_pipette(OT3Mount(mount.value))
+            # FIXME we should switch the sensor type based on the channel
+            # used when partial tip pick up is implemented.
+            # FIXME we should also monitor pressure in all available channels
+            provided_context_manager = await check_overpressure(
+                self._messenger, tool, sensor_id
             )
+            errors: asyncio.Queue[ErrorCode] = asyncio.Queue()
+
+            async with provided_context_manager() as errors:
+                try:
+                    yield
+                finally:
+                    pass
+
+            def _pop_queue() -> Optional[ErrorCode]:
+                try:
+                    return errors.get_nowait()
+                except asyncio.QueueEmpty:
+                    return None
+
+            if _pop_queue():
+                raise OverPressureDetected(
+                    f"The pressure sensor on the {mount} mount has exceeded operational limits."
+                )
+        else:
+            try:
+                yield
+            finally:
+                pass
 
     async def liquid_probe(
         self,
