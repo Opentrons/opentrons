@@ -12,6 +12,8 @@ from ..types import (
     LabwareOffsetVector,
     ExperimentalOffsetData,
 )
+from ..errors import LabwareMovementNotAllowedError
+from ..resources import labware_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -96,7 +98,7 @@ class MoveLabwareImplementation(
         # Allow propagation of LabwareNotLoadedError.
         current_labware = self._state_view.labware.get(labware_id=params.labwareId)
         current_labware_definition = self._state_view.labware.get_definition(
-            params.labwareId
+            labware_id=params.labwareId
         )
         definition_uri = current_labware.definitionUri
 
@@ -108,14 +110,14 @@ class MoveLabwareImplementation(
         self._state_view.labware.raise_if_labware_is_not_on_top(
             labware_id=params.labwareId
         )
-        if isinstance(params.newLocation, OnLabwareLocation):
+        if isinstance(empty_new_location, OnLabwareLocation):
             self._state_view.labware.raise_if_labware_is_not_on_top(
-                params.newLocation.labwareId
+                empty_new_location.labwareId
             )
             # Ensure that labware can be placed on requested labware
             self._state_view.labware.raise_if_labware_cannot_be_stacked(
                 top_labware_definition=current_labware_definition,
-                bottom_labware_id=params.newLocation.labwareId,
+                bottom_labware_id=empty_new_location.labwareId,
             )
 
         # Allow propagation of ModuleNotLoadedError.
@@ -127,6 +129,13 @@ class MoveLabwareImplementation(
         )
 
         if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
+            if labware_validation.validate_definition_is_adapter(
+                current_labware_definition
+            ):
+                raise LabwareMovementNotAllowedError(
+                    f"Cannot move adapter {params.labwareId} with gripper."
+                )
+
             validated_current_loc = (
                 self._labware_movement.ensure_valid_gripper_location(
                     current_labware.location
