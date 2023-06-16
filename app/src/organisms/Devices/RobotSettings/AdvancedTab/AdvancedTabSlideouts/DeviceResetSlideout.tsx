@@ -80,7 +80,7 @@ export function DeviceResetSlideout({
       ? options.filter(
           opt =>
             opt.id === 'pipetteOffsetCalibrations' ||
-            opt.id === 'gripperCalibration'
+            opt.id === 'gripperOffsetCalibrations'
         )
       : []
 
