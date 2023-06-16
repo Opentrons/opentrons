@@ -273,7 +273,7 @@ def test_get_parent_location_on_labware(location: LabwareLocation) -> None:
                 loadName="load-name",
                 location=location,
                 definitionUri="some-uri",
-            )
+            ),
         }
     )
 
