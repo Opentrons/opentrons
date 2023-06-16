@@ -22,14 +22,14 @@ import {
 import { useHost, useProtocolAnalysesQuery } from '@opentrons/react-api-client'
 import { deleteProtocol, deleteRun, getProtocol } from '@opentrons/api-client'
 
-import { Modal } from '../../molecules/Modal/OnDeviceDisplay'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
+import { Modal } from '../../molecules/Modal'
 import { LongPressModal } from './LongPressModal'
 
 import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 export function ProtocolCard(props: {
   protocol: ProtocolResource
