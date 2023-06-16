@@ -49,35 +49,78 @@ The design goal of this API is to make code readable and easy to understand. A p
 
 For example, if we wanted to have the OT-2 transfer liquid from well A1 to well B1 on a plate, our protocol would look like:
 	
-.. code-block:: python
-    :substitutions:
+.. tabs::
+    
+    .. tab:: Flex
+        ::
+            
+            from opentrons import protocol_api
+            
+            # metadata
+            metadata = {
+                'protocolName': 'My Protocol',
+                'author': 'Name <opentrons@example.com>',
+                'description': 'Simple protocol to get started using the Flex'
+            }
+            
+            # requirements
+            requirements = {
+                “robotType”: “Flex”,
+                “apiLevel”: “x.xx”
+            }
+            
+            # protocol run function
+            def run(protocol: protocol_api.ProtocolContext):
+            
+            # labware
+            plate = protocol.load_labware('corning_96_wellplate_360ul_flat', location='TK FLEX LOCATION')
+            tiprack = protocol.load_labware('TK API LOADNAME HERE', location='TK FLEX LOCATION')
+            
+            # pipettes
+            left_pipette = protocol.load_instrument(
+                'TK FLEX PIPETTE LOADNAME HERE',
+                mount='left', tip_racks=[tiprack]
+            )
+            
+            # commands
+            left_pipette.pick_up_tip()
+            left_pipette.aspirate(TK CHECK AMOUNT MATCH PIPETTE, plate['A1'])
+            left_pipette.dispense(TK CHECK AMOUNT MATCH PIPETTE, plate['B2'])
+            left_pipette.drop_tip()
+        
+        And then explanation here.
 
-    from opentrons import protocol_api
+    .. tab:: OT-2
+        ::
 
-    # metadata
-    metadata = {
-        'protocolName': 'My Protocol',
-        'author': 'Name <opentrons@example.com>',
-        'description': 'Simple protocol to get started using the OT-2',
-        'apiLevel': '|apiLevel|'
-    }
+            from opentrons import protocol_api
 
-    # protocol run function
-    def run(protocol: protocol_api.ProtocolContext):
+            # metadata
+            metadata = {
+                'protocolName': 'My Protocol',
+                'author': 'Name <opentrons@example.com>',
+                'description': 'Simple protocol to get started using the OT-2',
+                'apiLevel': '2.14'
+            }
 
-        # labware
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', location='1')
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', location='2')
+            # protocol run function
+            def run(protocol: protocol_api.ProtocolContext):
 
-        # pipettes
-        left_pipette = protocol.load_instrument(
-             'p300_single', mount='left', tip_racks=[tiprack])
+            # labware
+            plate = protocol.load_labware('corning_96_wellplate_360ul_flat', location='1')
+            tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', location='2')
 
-        # commands
-        left_pipette.pick_up_tip()
-        left_pipette.aspirate(100, plate['A1'])
-        left_pipette.dispense(100, plate['B2'])
-        left_pipette.drop_tip()
+            # pipettes
+            left_pipette = protocol.load_instrument(
+            'p300_single', mount='left', tip_racks=[tiprack])
+
+            # commands
+            left_pipette.pick_up_tip()
+            left_pipette.aspirate(100, plate['A1'])
+            left_pipette.dispense(100, plate['B2'])
+            left_pipette.drop_tip()
+
+        And then explanation here.
 
 This example proceeds completely linearly. Following it line-by-line, you can see that it has the following effects:
 
