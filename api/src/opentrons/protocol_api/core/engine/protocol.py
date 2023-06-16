@@ -29,6 +29,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.types import (
     ModuleModel as ProtocolEngineModuleModel,
     OFF_DECK_LOCATION,
+    LabwareLocation,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import (
@@ -139,17 +140,7 @@ class ProtocolCore(
         version: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
-        load_location: Union[ModuleLocation, DeckSlotLocation, str]
-        if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
-            load_location = ModuleLocation(moduleId=location.module_id)
-        elif location == OffDeckType.OFF_DECK:
-            load_location = OFF_DECK_LOCATION
-        elif isinstance(location, DeckSlotName):
-            load_location = DeckSlotLocation(slotName=location)
-        else:
-            raise UnknownLocationError(
-                f"load_labware is not supported with the given location: {location}."
-            )
+        load_location = self._convert_labware_location(location=location)
 
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
@@ -212,17 +203,7 @@ class ProtocolCore(
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move the given labware to a new location."""
-        to_location: Union[ModuleLocation, DeckSlotLocation, str]
-        if isinstance(new_location, (ModuleCore, NonConnectedModuleCore)):
-            to_location = ModuleLocation(moduleId=new_location.module_id)
-        elif new_location == OffDeckType.OFF_DECK:
-            to_location = OFF_DECK_LOCATION
-        elif isinstance(new_location, DeckSlotName):
-            to_location = DeckSlotLocation(slotName=new_location)
-        else:
-            raise UnknownLocationError(
-                f"move_labware is not supported with the given location: {new_location}."
-            )
+        to_location = self._convert_labware_location(location=new_location)
 
         strategy = (
             LabwareMovementStrategy.USING_GRIPPER
@@ -518,8 +499,17 @@ class ProtocolCore(
                 labware_location.slotName, self._engine_client.state.config.robot_type
             )
         elif isinstance(labware_location, ModuleLocation):
-            # TODO (tz. 06-12-23) this will raise a key exception if module not found instead of returning None.
-            # This does not need to return OFF_DECK.
             return self._module_cores_by_id[labware_location.moduleId]
 
         return OffDeckType.OFF_DECK
+
+    @staticmethod
+    def _convert_labware_location(
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
+    ) -> LabwareLocation:
+        if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
+            return ModuleLocation(moduleId=location.module_id)
+        elif location is OffDeckType.OFF_DECK:
+            return OFF_DECK_LOCATION
+        elif isinstance(location, DeckSlotName):
+            return DeckSlotLocation(slotName=location)

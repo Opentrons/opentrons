@@ -118,6 +118,7 @@ class Location:
         ],
     ):
         self._point = point
+        self._given_labware = labware
         self._labware = LabwareLike(labware)
 
     # todo(mm, 2021-10-01): Figure out how to get .point and .labware to show up
@@ -166,14 +167,8 @@ class Location:
             >>> assert loc.point == Point(1, 1, 1)  # True
 
         """
-        from opentrons.protocol_api._types import OffDeckType
 
-        return Location(
-            point=self.point + point,
-            labware=self._labware.object
-            if not isinstance(self._labware.object, OffDeckType)
-            else None,
-        )
+        return Location(point=self.point + point, labware=self._given_labware)
 
     def __repr__(self) -> str:
         return f"Location(point={repr(self._point)}, labware={self._labware})"
