@@ -155,7 +155,7 @@ class LegacyProtocolCore(
         """Load a labware using its identifying parameters."""
         if isinstance(location, OffDeckType):
             raise APIVersionError(
-                "Loading a labware off deck is not supported in this API version"
+                "Loading a labware off deck is only supported with apiLevel 2.15 and newer."
             )
 
         deck_slot = (
