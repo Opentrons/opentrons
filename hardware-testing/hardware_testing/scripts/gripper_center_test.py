@@ -90,8 +90,8 @@ class Gripper_Center_Test:
         self.gauge_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         self.mount = OT3Mount.GRIPPER
-        self.deck_setup()
-        self.gripper_setup()
+        await self.deck_setup()
+        await self.gripper_setup()
         print(f"\nStarting Gripper Center Test!\n")
         self.start_time = time.time()
 
@@ -112,15 +112,15 @@ class Gripper_Center_Test:
             self.gauges[key] = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(port=value)
             self.gauges[key].connect()
 
-    def gripper_setup(self):
+    async def gripper_setup(self):
         if self.simulate:
             self.gripper_id = "SIMULATION"
         else:
             self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
         self.test_data["Gripper"] = str(self.gripper_id)
-        await set_error_tolerance(self.api._backend._messenger, 15, 15)
+        await set_error_tolerance(self.api._backend._messenger, 0.01, 15)
 
-    def deck_setup(self):
+    async def deck_setup(self):
         self.deck_definition = load("ot3_standard", version=3)
         self.nominal_center = Point(*get_calibration_square_position_in_slot(self.slot))
         self.test_data["Slot"] = str(self.slot)
