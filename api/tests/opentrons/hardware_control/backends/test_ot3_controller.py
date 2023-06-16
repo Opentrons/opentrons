@@ -989,7 +989,10 @@ async def test_update_required_flag_disabled(
         await controller.set_active_current({OT3Axis.X: 2})
 
 
-async def test_monitor_pressure(controller: OT3Controller, mock_messenger: CanMessenger, mock_move_group_run, mock_present_devices) -> None:
+async def test_monitor_pressure(
+    controller: OT3Controller,
+    mock_move_group_run: mock.AsyncMock,
+) -> None:
     mount = OT3Mount.LEFT
     mock_move_group_run.side_effect = move_group_run_side_effect(
         controller, [OT3Axis.P_L]
