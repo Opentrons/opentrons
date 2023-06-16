@@ -273,7 +273,9 @@ class LabwareMovementHandler:
             labware_id=labware_id
         )
         if isinstance(new_location, OnLabwareLocation):
-            new_location = self._state_store.labware.get_parent_location(labware_id=new_location.labwareId)
+            new_location = self._state_store.labware.get_parent_location(
+                labware_id=new_location.labwareId
+            )
         for parent in (current_parent, new_location):
             try:
                 await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(

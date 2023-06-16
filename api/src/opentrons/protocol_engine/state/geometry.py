@@ -139,7 +139,9 @@ class GeometryView:
                 y=stacking_overlap.y,
                 z=on_labware_dimensions.z - stacking_overlap.z,
             )
-            return labware_offset + self._get_labware_position_offset(on_labware.id, on_labware.location)
+            return labware_offset + self._get_labware_position_offset(
+                on_labware.id, on_labware.location
+            )
         else:
             raise errors.LabwareNotOnDeckError(
                 f"Labware {labware_id} does not have a parent associated with it"

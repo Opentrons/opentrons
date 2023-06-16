@@ -690,8 +690,12 @@ class LabwareView(HasState[LabwareState]):
                     f" onto a labware on top of a module"
                 )
         elif isinstance(below_labware.location, OnLabwareLocation):
-            further_below_definition = self.get_definition(labware_id=below_labware.location.labwareId)
-            if labware_validation.validate_definition_is_adapter(further_below_definition):
+            further_below_definition = self.get_definition(
+                labware_id=below_labware.location.labwareId
+            )
+            if labware_validation.validate_definition_is_adapter(
+                further_below_definition
+            ):
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {top_labware_definition.parameters.loadName} cannot be loaded"
                     f" onto labware on top of adapter"
