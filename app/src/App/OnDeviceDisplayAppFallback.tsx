@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
+import { FallbackProps } from 'react-error-boundary'
 
 import {
   ALIGN_CENTER,
@@ -19,7 +20,9 @@ import { appRestart } from '../redux/shell'
 import type { Dispatch } from '../redux/types'
 import type { ModalHeaderBaseProps } from '../molecules/Modal/OnDeviceDisplay/types'
 
-export function OnDeviceDisplayAppFallback(): JSX.Element {
+export function OnDeviceDisplayAppFallback({
+  error,
+}: FallbackProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const handleRestartClick = (): void => {
     dispatch(appRestart())
@@ -43,6 +46,7 @@ export function OnDeviceDisplayAppFallback(): JSX.Element {
         <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {'Something went wrong'}
         </StyledText>
+        <StyledText as="p">{error.message}</StyledText>
         <MediumButton
           buttonType="alert"
           buttonText="Restart app"
