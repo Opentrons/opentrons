@@ -104,7 +104,7 @@ class CommandExecutor:
             if isinstance(error, asyncio.CancelledError):
                 error = RunStoppedError("Run was cancelled")
             elif not isinstance(error, ProtocolEngineError):
-                error = UnexpectedProtocolError(error)
+                error = UnexpectedProtocolError(message=str(error), wrapping=[error])
 
             self._action_dispatcher.dispatch(
                 FailCommandAction(

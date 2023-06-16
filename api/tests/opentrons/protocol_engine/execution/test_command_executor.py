@@ -264,7 +264,7 @@ async def test_execute(
     ["command_error", "expected_error"],
     [
         (
-            errors.ProtocolEngineError("oh no"),
+            errors.ProtocolEngineError(message="oh no"),
             matchers.ErrorMatching(errors.ProtocolEngineError, match="oh no"),
         ),
         (

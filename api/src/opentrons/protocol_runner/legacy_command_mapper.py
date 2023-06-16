@@ -3,6 +3,7 @@
 from collections import defaultdict
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
+from traceback import format_exception, format_exception_only
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, Location
@@ -19,6 +20,7 @@ from opentrons.protocol_engine.resources import (
     pipette_data_provider,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.errors import ErrorCodes, EnumeratedError
 from opentrons.protocol_api.core.legacy.deck import FIXED_TRASH_ID
 
 from .legacy_wrappers import (
@@ -44,6 +46,27 @@ class LegacyCommandParams(pe_commands.CustomParams):
 
 class LegacyContextCommandError(ProtocolEngineError):
     """An error returned when a PAPIv2 ProtocolContext command fails."""
+
+    def __init__(self, wrapping_exc: BaseException) -> None:
+
+        if isinstance(wrapping_exc, EnumeratedError):
+            super().__init__(
+                wrapping_exc.code,
+                wrapping_exc.message,
+                wrapping_exc.detail,
+                wrapping_exc.wrapping,
+            )
+        else:
+            super().__init__(
+                ErrorCodes.GENERAL_ERROR,
+                "\n".join(format_exception_only(type(wrapping_exc), wrapping_exc)),
+                {
+                    "wrapping_exception": "\n".join(
+                        format_exception(type(wrapping_exc), wrapping_exc, None)
+                    )
+                },
+                None,
+            )
 
 
 _LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModel] = {
@@ -224,7 +247,7 @@ class LegacyCommandMapper:
                         command_id=running_command.id,
                         error_id=ModelUtils.generate_id(),
                         failed_at=now,
-                        error=LegacyContextCommandError(str(command_error)),
+                        error=LegacyContextCommandError(command_error),
                     )
                 )
 

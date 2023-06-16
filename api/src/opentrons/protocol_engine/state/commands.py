@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Mapping, Optional, Union
 
+from opentrons_shared_data.errors.exceptions import EnumeratedError
+
 from opentrons.ordered_set import OrderedSet
 
 from opentrons.hardware_control.types import DoorState
@@ -32,7 +34,7 @@ from ..errors import (
     SetupCommandNotAllowedError,
     PauseNotAllowedError,
     ProtocolCommandFailedError,
-    ProtocolEngineError,
+    UnexpectedProtocolError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
@@ -251,12 +253,8 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._state.running_command_id = None
 
         elif isinstance(action, FailCommandAction):
-            error_occurrence = ErrorOccurrence.construct(
-                id=action.error_id,
-                createdAt=action.failed_at,
-                errorType=type(action.error).__name__,
-                detail=str(action.error),
-                errorCode=action.error.ERROR_CODE,
+            error_occurrence = ErrorOccurrence.from_failed(
+                id=action.error_id, createdAt=action.failed_at, error=action.error
             )
 
             prev_entry = self._state.commands_by_id[action.command_id]
@@ -335,20 +333,20 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 if action.error_details:
                     error_id = action.error_details.error_id
                     created_at = action.error_details.created_at
-                    error = action.error_details.error
 
-                    error_code = (
-                        error.ERROR_CODE
-                        if isinstance(error, ProtocolEngineError)
-                        else ProtocolEngineError.ERROR_CODE
-                    )
+                    if not isinstance(
+                        action.error_details.error,
+                        EnumeratedError,
+                    ):
+                        error: EnumeratedError = UnexpectedProtocolError(
+                            message=str(action.error_details.error),
+                            wrapping=[action.error_details.error],
+                        )
+                    else:
+                        error = action.error_details.error
 
-                    self._state.errors_by_id[error_id] = ErrorOccurrence.construct(
-                        id=error_id,
-                        createdAt=created_at,
-                        errorType=type(error).__name__,
-                        detail=str(error),
-                        errorCode=error_code,
+                    self._state.errors_by_id[error_id] = ErrorOccurrence.from_failed(
+                        id=error_id, createdAt=created_at, error=error
                     )
 
         elif isinstance(action, HardwareStoppedAction):
