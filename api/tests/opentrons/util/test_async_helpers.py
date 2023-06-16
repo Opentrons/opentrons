@@ -1,11 +1,8 @@
-"""Tests for the `async_context_manager_in_thread` helper."""
-
-
 import asyncio
 
 import pytest
 
-from .async_context_manager_in_thread import async_context_manager_in_thread
+from opentrons.util import async_helpers as subject
 
 
 def test_enters_and_exits() -> None:
@@ -30,7 +27,7 @@ def test_enters_and_exits() -> None:
     assert not context_manager.entered
     assert not context_manager.exited
 
-    with async_context_manager_in_thread(context_manager) as (result, _):
+    with subject.async_context_manager_in_thread(context_manager) as (result, _):
         assert context_manager.entered
         assert not context_manager.exited
         assert result == "Yay!"
@@ -51,7 +48,10 @@ def test_returns_matching_loop() -> None:
             pass
 
     context_manager = ContextManager()
-    with async_context_manager_in_thread(context_manager) as (result, loop_in_thread):
+    with subject.async_context_manager_in_thread(context_manager) as (
+        result,
+        loop_in_thread,
+    ):
         assert result is loop_in_thread
 
 
@@ -71,7 +71,7 @@ def test_loop_lifetime() -> None:
         ) -> None:
             pass
 
-    with async_context_manager_in_thread(NoOp()) as (_, loop_in_thread):
+    with subject.async_context_manager_in_thread(NoOp()) as (_, loop_in_thread):
         # As a smoke test to see if the event loop is running and usable,
         # run an arbitrary coroutine and wait for it to finish.
         (
@@ -98,7 +98,7 @@ def test_propagates_exception_from_enter() -> None:
 
     context_manager = RaiseExceptionOnEnter()
     with pytest.raises(RuntimeError, match="Oh the humanity"):
-        with async_context_manager_in_thread(context_manager):
+        with subject.async_context_manager_in_thread(context_manager):
             assert False, "We should not reach here."
 
 
@@ -116,5 +116,5 @@ def test_propagates_exception_from_exit() -> None:
 
     context_manager = RaiseExceptionOnExit()
     with pytest.raises(RuntimeError, match="Oh the humanity"):
-        with async_context_manager_in_thread(context_manager):
+        with subject.async_context_manager_in_thread(context_manager):
             pass

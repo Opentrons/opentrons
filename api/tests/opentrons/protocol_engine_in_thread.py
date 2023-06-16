@@ -11,8 +11,7 @@ from opentrons.protocol_engine import (
     Config,
     DeckType,
 )
-
-from .async_context_manager_in_thread import async_context_manager_in_thread
+from opentrons.util.async_helpers import async_context_manager_in_thread
 
 
 @contextlib.contextmanager
