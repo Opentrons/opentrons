@@ -50,11 +50,10 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import ProtocolContext, Labware, create_protocol_context
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_engine import create_protocol_engine_in_thread
 from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import Location, Point
-
-from .protocol_engine_in_thread import protocol_engine_in_thread
 
 
 if TYPE_CHECKING:
@@ -281,7 +280,7 @@ def _make_ot3_pe_ctx(
     deck_type: str,
 ) -> Generator[ProtocolContext, None, None]:
     """Return a ProtocolContext configured for an OT-3 and backed by Protocol Engine."""
-    with protocol_engine_in_thread(hardware=hardware) as (engine, loop):
+    with create_protocol_engine_in_thread(hardware=hardware) as (engine, loop):
         yield create_protocol_context(
             api_version=APIVersion(2, 14),
             hardware_api=hardware,

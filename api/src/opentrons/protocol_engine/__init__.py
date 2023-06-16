@@ -5,7 +5,10 @@ protocol commands, issued by some arbitrary protocol runner, and turn it into
 protocol state and side-effects like robot movements.
 """
 
-from .create_protocol_engine import create_protocol_engine
+from .create_protocol_engine import (
+    create_protocol_engine,
+    create_protocol_engine_in_thread,
+)
 from .protocol_engine import ProtocolEngine
 from .errors import ProtocolEngineError, ErrorOccurrence
 from .commands import (
@@ -53,6 +56,7 @@ from .types import (
 __all__ = [
     # main factory and interface exports
     "create_protocol_engine",
+    "create_protocol_engine_in_thread",
     "ProtocolEngine",
     "StateSummary",
     "Config",
