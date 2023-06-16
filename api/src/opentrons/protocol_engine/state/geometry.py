@@ -106,7 +106,7 @@ class GeometryView:
         elif labware_data.location == OFF_DECK_LOCATION:
             # Labware is off-deck
             raise errors.LabwareNotOnDeckError(
-                f"Cannot access labware {labware_id} since it is no longer on the deck. "
+                f"Cannot access labware {labware_id} since it is not on the deck. "
                 f"Either it has been loaded off-deck or its been moved off-deck."
             )
 
