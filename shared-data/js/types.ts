@@ -324,11 +324,7 @@ export interface ModuleDefinition {
   twoDimensionalRendering: INode
 }
 
-export type AffineTransformMatrix = [
-  [number, number, number],
-  [number, number, number],
-  [number, number, number]
-]
+export type AffineTransformMatrix = number[][]
 
 export interface SlotTransforms {
   [deckOtId: string]: {

@@ -43,6 +43,7 @@ import {
   InvariantContext,
 } from '@opentrons/step-generation'
 import { StepFieldName } from '../../form-types'
+import { LabwareLocation } from '@opentrons/shared-data'
 export type { StepFieldName }
 
 const getLabwareEntity = (
@@ -50,6 +51,20 @@ const getLabwareEntity = (
   id: string
 ): LabwareEntity | null => {
   return state.labwareEntities[id] || null
+}
+
+const getLabwareLocation = (
+  state: InvariantContext,
+  newLocationString: string
+): LabwareLocation | null => {
+  if (newLocationString === 'offDeck') {
+    return 'offDeck'
+  } else if (newLocationString in state.moduleEntities) {
+    return { moduleId: newLocationString }
+  } else {
+    // assume it is a slot
+    return { slotName: newLocationString }
+  }
 }
 
 const getPipetteEntity = (
@@ -285,6 +300,9 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   mix_mmFromBottom: {
     castValue: Number,
+  },
+  newLocation: {
+    hydrate: getLabwareLocation,
   },
 }
 const profileFieldHelperMap: Record<string, StepFieldHelpers> = {
