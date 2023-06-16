@@ -1,0 +1,114 @@
+{
+  "categories": {
+    "hardwareCommunicationError": {
+      "detail": "Hardware communications failed",
+      "codePrefix": "1"
+    },
+    "roboticsControlError": {
+      "detail": "A robot action failed",
+      "codePrefix": "2"
+    },
+    "roboticsInteractionError": {
+      "detail": "A robot interaction failed",
+      "codePrefix": "3"
+    },
+    "generalError": {
+      "detail": "A software error occurred",
+      "codePrefix": "4"
+    }
+  },
+  "codes": {
+    "1000": {
+      "detail": "Communication Error",
+      "category": "hardwareCommunicationError"
+    },
+    "1001": {
+      "detail": "CANBus Communication Error",
+      "category": "hardwareCommunicationError"
+    },
+    "1002": {
+      "detail": "Internal USB Communication Error",
+      "category": "hardwareCommunicationError"
+    },
+    "1003": {
+      "detail": "Module Communication Error",
+      "category": "hardwareCommunicationError"
+    },
+    "1004": {
+      "detail": "Command Timed Out",
+      "category": "hardwareCommunicationError"
+    },
+    "1005": {
+      "detail": "Firmware Update Failed",
+      "category": "hardwareCommunicationError"
+    },
+    "2000": {
+      "detail": "Robotics Control Error",
+      "category": "roboticsControlError"
+    },
+    "2001": {
+      "detail": "Motion Failed",
+      "category": "roboticsControlError"
+    },
+    "2002": {
+      "detail": "Homing Failed",
+      "category": "roboticsControlError"
+    },
+    "2003": {
+      "detail": "Stall or Collision Detected",
+      "category": "roboticsControlError"
+    },
+    "2004": {
+      "detail": "Motion Planning Failure",
+      "category": "roboticsControlError"
+    },
+    "3000": {
+      "detail": "A robotics interaction error occurred.",
+      "category": "roboticsInteractionError"
+    },
+    "3001": {
+      "detail": "Labware Dropped",
+      "category": "roboticsInteractionError"
+    },
+    "3002": {
+      "detail": "Labware Not Picked Up",
+      "category": "roboticsInteractionError"
+    },
+    "3003": {
+      "detail": "Tip Pickup Failed",
+      "category": "roboticsInteractionError"
+    },
+    "3004": {
+      "detail": "Tip Drop Failed",
+      "category": "roboticsInteractionError"
+    },
+    "3005": {
+      "detail": "Unexpected Tip Removal",
+      "category": "roboticsInteractionError"
+    },
+    "3006": {
+      "detail": "Pipette Overpressure",
+      "category": "roboticsInteractionError"
+    },
+    "3008": {
+      "detail": "E-Stop Activated",
+      "category": "roboticsInteractionError"
+    },
+    "3009": {
+      "detail": "E-Stop Not Present",
+      "category": "roboticsInteractionError"
+    },
+    "3010": {
+      "detail": "Pipette Not Present",
+      "category": "roboticsInteractionError"
+    },
+    "3011": {
+      "detail": "Gripper Not Present",
+      "category": "roboticsInteractionError"
+    },
+    "4000": {
+      "detail": "Unknown or Uncategorized Error",
+      "category": "generalError"
+    }
+  }
+}

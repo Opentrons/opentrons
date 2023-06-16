@@ -94,7 +94,7 @@ test-gravimetric-multi:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1
 
 .PHONY: test-gravimetric
-test-gravimetric: apply-patches-gravimetric test-gravimetric-single test-gravimetric-multi
+test-gravimetric: test-gravimetric-single test-gravimetric-multi
 
 .PHONY: test-production-qc
 test-production-qc:
@@ -124,6 +124,7 @@ lint:
 	$(python) -m mypy hardware_testing tests
 	$(python) -m black --check hardware_testing tests setup.py
 	$(python) -m flake8 hardware_testing tests setup.py
+	$(MAKE) remove-patches-gravimetric
 
 .PHONY: format
 format:
@@ -230,7 +231,6 @@ sync-ot3: sync-sw-ot3 sync-fw-ot3
 
 .PHONY: push-ot3-gravimetric
 push-ot3-gravimetric:
-	-$(MAKE) apply-patches-gravimetric
 	$(MAKE) sync-sw-ot3
 
 .PHONY: apply-patches-gravimetric
@@ -249,3 +249,7 @@ update-patches-gravimetric:
 	cd ../ && git diff origin/edge ./shared-data/** > ./hardware-testing/hardware_testing/gravimetric/overrides/shared-data.patch
 	cd ../ && git diff origin/edge ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/robot-server.patch
 	$(MAKE) remove-patches-gravimetric
+
+.PHONY: push-photometric-ot2
+push-photometric-ot2:
+	scp -r -O photometric-ot2/photometric_ot2 root@$(host):/data/user_storage

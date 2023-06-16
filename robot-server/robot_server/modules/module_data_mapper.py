@@ -1,5 +1,5 @@
 """Module identification and response data mapping."""
-from typing import Type, cast
+from typing import Type, cast, Optional
 
 from opentrons.hardware_control.modules import (
     LiveData,
@@ -24,6 +24,7 @@ from .module_models import (
     AttachedModuleData,
     MagneticModule,
     MagneticModuleData,
+    ModuleCalibrationData,
     TemperatureModule,
     TemperatureModuleData,
     ThermocyclerModule,
@@ -44,6 +45,7 @@ class ModuleDataMapper:
         has_available_update: bool,
         live_data: LiveData,
         usb_port: HardwareUSBPort,
+        module_offset: Optional[ModuleCalibrationData],
     ) -> AttachedModule:
         """Map hardware control data to an attached module response."""
         module_model = ModuleModel(model)
@@ -131,11 +133,14 @@ class ModuleDataMapper:
             hasAvailableUpdate=has_available_update,
             usbPort=UsbPort(
                 port=usb_port.port_number,
+                portGroup=usb_port.port_group,
                 hub=usb_port.hub,
+                hubPort=usb_port.hub_port,
                 path=usb_port.device_path,
             ),
             # types of below fields are already checked at runtime
             moduleType=module_type,  # type: ignore[arg-type]
             moduleModel=module_model,  # type: ignore[arg-type]
             data=module_data,  # type: ignore[arg-type]
+            moduleOffset=module_offset,
         )

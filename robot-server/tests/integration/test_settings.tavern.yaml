@@ -66,6 +66,12 @@ stages:
             description: !re_search 'This is an Opentrons-internal setting for hardware-testing.'
             restart_required: false
             value: !anything
+          - id: disableStatusBar
+            old_id: Null
+            title: 'Disable the LED status bar on the Flex.'
+            description: !re_search 'This setting disables the LED status bar on the Flex.'
+            restart_required: false
+            value: !anything
         links: !anydict
 
 ---

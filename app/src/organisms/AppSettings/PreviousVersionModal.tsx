@@ -8,7 +8,7 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { StyledText } from '../../atoms/text'
 
@@ -27,7 +27,7 @@ export function PreviousVersionModal(
   const { t } = useTranslation('app_settings')
 
   return (
-    <Modal onClose={props.closeModal} title={t('how_to_restore')}>
+    <LegacyModal onClose={props.closeModal} title={t('how_to_restore')}>
       <Box>
         <StyledText as="p" paddingBottom={SPACING.spacing8}>
           {t('restore_description')}
@@ -55,6 +55,6 @@ export function PreviousVersionModal(
           {t('close')}
         </PrimaryButton>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

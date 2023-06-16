@@ -59,6 +59,7 @@ stages:
               errorType: ExceptionInProtocolError
               createdAt: !anystr
               detail: 'NoTipAttachedError [line 9]: Cannot perform DROPTIP without a tip attached'
+              errorCode: '4000'
 
   - name: Verify commands contain the expected results
     request:
@@ -108,6 +109,7 @@ stages:
               errorType: LegacyContextCommandError
               createdAt: !anystr
               detail: 'Cannot perform DROPTIP without a tip attached'
+              errorCode: '4000'
             params:
               pipetteId: !anystr
               labwareId: !anystr

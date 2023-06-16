@@ -795,7 +795,7 @@ async def test_tip_action_move_runner_fail_receives_one_response(
         (
             "opentrons_hardware.hardware_control.move_group_runner",
             30,
-            "Move set 0 timed out, expected duration 1.1",
+            "Move set 0 timed out of max duration 2.0. Expected time: 1.1",
         ),
         (
             "opentrons_hardware.hardware_control.move_group_runner",
