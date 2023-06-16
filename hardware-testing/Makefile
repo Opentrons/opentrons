@@ -67,11 +67,13 @@ wheel: $(wheel_file)
 test:
 	$(MAKE) apply-patches-gravimetric
 	$(pytest) $(tests) $(test_opts)
+	$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-cov
 test-cov:
 	$(MAKE) apply-patches-gravimetric
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
+	$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-photometric
 test-photometric:
@@ -95,7 +97,7 @@ test-gravimetric-multi:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1
 
 .PHONY: test-gravimetric
-test-gravimetric: apply-patches-gravimetric test-gravimetric-single test-gravimetric-multi
+test-gravimetric: apply-patches-gravimetric test-gravimetric-single test-gravimetric-multi remove-patches-gravimetric
 
 .PHONY: test-production-qc
 test-production-qc:
@@ -233,8 +235,9 @@ sync-ot3: sync-sw-ot3 sync-fw-ot3
 
 .PHONY: push-ot3-gravimetric
 push-ot3-gravimetric:
-	-$(MAKE) apply-patches-gravimetric
+	$(MAKE) apply-patches-gravimetric
 	$(MAKE) sync-sw-ot3
+	$(MAKE) remove-patches-gravimetric
 
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:
