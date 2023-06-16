@@ -3,7 +3,7 @@ import asyncio
 import contextlib
 import typing
 
-from opentrons.hardware_control import HardwareControlAPI, ThreadManagedHardware
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import DoorState
 from opentrons.util.async_helpers import async_context_manager_in_thread
 
@@ -43,7 +43,7 @@ async def create_protocol_engine(
 
 @contextlib.contextmanager
 def create_protocol_engine_in_thread(
-    hardware: ThreadManagedHardware,
+    hardware_api: HardwareControlAPI,
 ) -> typing.Generator[
     typing.Tuple[ProtocolEngine, asyncio.AbstractEventLoop], None, None
 ]:
@@ -64,7 +64,7 @@ def create_protocol_engine_in_thread(
     2. Stops and cleans up the event loop.
     3. Joins the thread.
     """
-    with async_context_manager_in_thread(_protocol_engine(hardware)) as (
+    with async_context_manager_in_thread(_protocol_engine(hardware_api)) as (
         protocol_engine,
         loop,
     ):
@@ -73,10 +73,10 @@ def create_protocol_engine_in_thread(
 
 @contextlib.asynccontextmanager
 async def _protocol_engine(
-    hardware: ThreadManagedHardware,
+    hardware_api: HardwareControlAPI,
 ) -> typing.AsyncGenerator[ProtocolEngine, None]:
     protocol_engine = await create_protocol_engine(
-        hardware_api=hardware.wrapped(),
+        hardware_api=hardware_api,
         config=Config(
             robot_type="OT-3 Standard",
             deck_type=DeckType.OT3_STANDARD,
