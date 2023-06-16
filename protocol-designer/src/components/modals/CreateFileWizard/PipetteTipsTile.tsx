@@ -8,13 +8,12 @@ import {
   Flex,
   Text,
   SPACING,
-  RadioGroup,
+  Icon,
   Mount,
   RadioOption,
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
-  InstrumentDiagram,
 } from '@opentrons/components'
 import {
   getLabwareDefURI,
@@ -122,7 +121,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
   const currentValue = values.pipettesByMount[mount].tiprackDefURI
   if (currentValue === undefined) {
-    setFieldValue(nameAccessor, tipRackOptions[0]?.value ?? null)
+    setFieldValue(nameAccessor, tipRackOptions[-1]?.value ?? null)
   }
 
   return (
@@ -131,11 +130,10 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
         <EquipmentOption
           key={o.name}
           isSelected={currentValue === o.value}
-          image={<img/>}
           text={o.name}
           onClick={() => { setFieldValue(nameAccessor, o.value) }}
           width="21.75rem"
-          minHeight="111px"
+          minHeight="4rem"
         />
       ))
       }

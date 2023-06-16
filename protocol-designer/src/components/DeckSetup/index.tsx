@@ -29,6 +29,7 @@ import {
   inferModuleOrientationFromXCoordinate,
   THERMOCYCLER_MODULE_TYPE,
   getModuleDisplayName,
+  DeckDefinition,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'
@@ -76,6 +77,7 @@ type ContentsProps = RobotWorkSpaceRenderProps & {
   activeDeckSetup: InitialDeckSetup
   selectedTerminalItemId?: TerminalItemId | null
   showGen1MultichannelCollisionWarnings: boolean
+  deckDef: DeckDefinition,
 }
 
 export const VIEWBOX_MIN_X = -64
@@ -121,11 +123,11 @@ export const getSwapBlocked = (args: SwapBlockedArgs): boolean => {
   // dragging custom labware to module gives not compat error
   const labwareSourceToDestBlocked = sourceModuleType
     ? !getLabwareIsCompatible(hoveredLabware.def, sourceModuleType) &&
-      !hoveredLabwareIsCustom
+    !hoveredLabwareIsCustom
     : false
   const labwareDestToSourceBlocked = destModuleType
     ? !getLabwareIsCompatible(draggedLabware.def, destModuleType) &&
-      !draggedLabwareIsCustom
+    !draggedLabwareIsCustom
     : false
 
   return labwareSourceToDestBlocked || labwareDestToSourceBlocked
@@ -137,6 +139,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     deckSlotsById,
     getRobotCoordsFromDOMCoords,
     showGen1MultichannelCollisionWarnings,
+    deckDef,
   } = props
 
   // NOTE: handling module<>labware compat when moving labware to empty module
@@ -189,23 +192,23 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   const multichannelWarningSlots: DeckDefSlot[] = showGen1MultichannelCollisionWarnings
     ? compact([
-        (allModules.some(
-          moduleOnDeck =>
-            moduleOnDeck.slot === '1' &&
-            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
-            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-        ) &&
-          deckSlotsById?.['4']) ||
-          null,
-        (allModules.some(
-          moduleOnDeck =>
-            moduleOnDeck.slot === '3' &&
-            // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
-            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
-        ) &&
-          deckSlotsById?.['6']) ||
-          null,
-      ])
+      (allModules.some(
+        moduleOnDeck =>
+          moduleOnDeck.slot === '1' &&
+          // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
+          MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+      ) &&
+        deckSlotsById?.['4']) ||
+      null,
+      (allModules.some(
+        moduleOnDeck =>
+          moduleOnDeck.slot === '3' &&
+          // @ts-expect-error(sa, 2021-6-21): ModuleModel is a super type of the elements in MODULES_WITH_COLLISION_ISSUES
+          MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+      ) &&
+        deckSlotsById?.['6']) ||
+      null,
+    ])
     : []
 
   return (
@@ -242,7 +245,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         const labwareInterfaceSlotDef: DeckDefSlot = {
           displayName: `Labware interface on ${moduleOnDeck.model}`,
           id: moduleOnDeck.id,
-          position: [0,0,0], // Module Component already handles nested positioning
+          position: [0, 0, 0], // Module Component already handles nested positioning
           matingSurfaceUnitVector: [-1, 1, -1],
           boundingBox: {
             xDimension: moduleDef.dimensions.labwareInterfaceXDimension ?? 0,
@@ -260,6 +263,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             def={moduleDef}
             orientation={inferModuleOrientationFromXCoordinate(slot.position[0])}
             innerProps={getModuleInnerProps(moduleOnDeck.moduleState)}
+            targetSlotId={slot.id}
+            targetDeckId={deckDef.otId}
           >
             {(labwareLoadedOnModule != null && !shouldHideChildren) ? (
               <>
@@ -425,17 +430,16 @@ export const DeckSetup = (): JSX.Element => {
             height="100%"
           >
             {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
-              <>
-                <DeckSetupContents
-                  activeDeckSetup={activeDeckSetup}
-                  selectedTerminalItemId={selectedTerminalItemId}
-                  {...{
-                    deckSlotsById,
-                    getRobotCoordsFromDOMCoords,
-                    showGen1MultichannelCollisionWarnings,
-                  }}
-                />
-              </>
+              <DeckSetupContents
+                activeDeckSetup={activeDeckSetup}
+                selectedTerminalItemId={selectedTerminalItemId}
+                {...{
+                  deckDef,
+                  deckSlotsById,
+                  getRobotCoordsFromDOMCoords,
+                  showGen1MultichannelCollisionWarnings,
+                }}
+              />
             )}
           </RobotWorkSpace>
         </div>

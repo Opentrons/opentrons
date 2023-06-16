@@ -208,6 +208,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
           />
         }
         text="Gripper"
+        showCheckbox
       />
       {FLEX_SUPPORTED_MODULE_MODELS.map(moduleModel => {
         const moduleType = getModuleType(moduleModel)
@@ -234,6 +235,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
                 )
               }
             }}
+            showCheckbox
           />
         )
       })}
@@ -242,7 +244,7 @@ function FlexModuleFields(props: WizardTileProps): JSX.Element {
 }
 
 const AdditionalItemImage = styled.img`
-  max-width: 100%;
-  max-height: 100%;
+  width: 6rem;
+  max-height: 4rem;
   display: block;
 `

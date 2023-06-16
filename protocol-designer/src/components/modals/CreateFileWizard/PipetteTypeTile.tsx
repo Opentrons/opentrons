@@ -127,7 +127,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
   }
 
   return (
-    <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
+    <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER} overflowY="scroll">
       {pipetteOptions.map(o => (
         <EquipmentOption
           key={o.name}
@@ -135,14 +135,14 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
           image={(
             o.value === '' ? null :
               <InstrumentDiagram
-                imageStyle={css`height: 75px; width: 60px;`}
                 mount="left"
+                imageStyle={css`max-height: 3rem;`}
                 pipetteSpecs={getPipetteNameSpecs(o.value as PipetteName)} />
           )}
           text={o.name}
           onClick={() => { setFieldValue(nameAccessor, o.value) }}
-          width="21.75rem"
-          minHeight="111px"
+          width={pipetteOptions.length > 5 ? "14.5rem" : "21.75rem"}
+          minHeight="4rem"
         />
       ))
       }
