@@ -8,10 +8,12 @@ export type Subsystem =
   | 'rear_panel'
 
 export interface SubsystemUpdateProgressData {
-  id: string
-  createdAt: string
-  subsystem: Subsystem
-  status: 'queued' | 'updating' | 'done'
-  updateProgress: number
-  updateError: string
+  data: {
+    id: string
+    createdAt: string
+    subsystem: Subsystem
+    updateStatus: 'queued' | 'updating' | 'done'
+    updateProgress: number
+    updateError: string
+  }
 }

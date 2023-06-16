@@ -9,7 +9,9 @@ export const getPipetteWizardStepsForProtocol = (
   pipetteInfo: LoadedPipette[],
   mount: Mount
 ): PipetteWizardStep[] => {
+  console.log('attachedPipettes', attachedPipettes)
   const requiredPipette = pipetteInfo.find(pipette => pipette.mount === mount)
+  console.log(requiredPipette)
   const nintySixChannelAttached =
     attachedPipettes[LEFT]?.instrumentName === 'p1000_96'
 

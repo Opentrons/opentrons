@@ -19,7 +19,7 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import mountGripper from '../../assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
-import type { GripperData } from '@opentrons/api-client'
+import type { BadGripper, GripperData } from '@opentrons/api-client'
 
 const CAPITALIZE_FIRST_LETTER_STYLE = css`
   &:first-letter {
@@ -38,10 +38,8 @@ export const MountGripper = (
     refetchInterval: 3000,
   })
   const isGripperAttached = (instrumentsQueryData?.data ?? []).some(
-    (i): i is GripperData =>
-      i.instrumentType === 'gripper' && !('subsystem' in i)
+    (i): i is GripperData | BadGripper => i.instrumentType === 'gripper'
   )
-
   const handleOnClick = (): void => {
     refetch()
       .then(() => {

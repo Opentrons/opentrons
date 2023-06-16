@@ -23,6 +23,7 @@ import { GRIPPER_FLOW_TYPES, SECTIONS } from './constants'
 import { BeforeBeginning } from './BeforeBeginning'
 import { MovePin } from './MovePin'
 import { MountGripper } from './MountGripper'
+import { FirmwareUpdate } from './FirmwareUpdate'
 import { UnmountGripper } from './UnmountGripper'
 import { Success } from './Success'
 import { ExitConfirmation } from './ExitConfirmation'
@@ -199,6 +200,11 @@ export const GripperWizard = (
     onExit = confirmExit
     modalContent = modalContent = (
       <MountGripper {...currentStep} {...sharedProps} />
+    )
+  } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
+    onExit = confirmExit
+    modalContent = modalContent = (
+      <FirmwareUpdate {...currentStep} {...sharedProps} />
     )
   } else if (currentStep.section === SECTIONS.UNMOUNT_GRIPPER) {
     onExit = confirmExit

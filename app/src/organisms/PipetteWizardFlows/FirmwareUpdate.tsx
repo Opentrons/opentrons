@@ -17,11 +17,18 @@ interface FirmwareUpdateProps extends PipetteWizardStepProps {
 export const FirmwareUpdate = (props: FirmwareUpdateProps): JSX.Element => {
   const { proceed, mount } = props
   const { t } = useTranslation('pipette_wizard_flows')
+  const [updateId, setUpdateId] = React.useState<string>('')
   const {
     data: attachedInstruments,
     refetch: refetchInstruments,
   } = useInstrumentsQuery()
-  const { updateSubsystem } = useUpdateSubsystemMutation()
+  const { updateSubsystem } = useUpdateSubsystemMutation({
+    onSuccess: data => {
+      console.log('success')
+      setUpdateId(data.data.id)
+      console.log('data id', data.data.id)
+    },
+  })
 
   const subsystem = mount === LEFT ? 'pipette_left' : 'pipette_right'
 
@@ -29,16 +36,18 @@ export const FirmwareUpdate = (props: FirmwareUpdateProps): JSX.Element => {
     attachedInstruments?.data?.some(
       (i): i is BadPipette => 'subsystem' in i && i.subsystem === subsystem
     ) ?? false
-  console.log('attached instruments', attachedInstruments?.data)
-  if (!updateNeeded) {
-    console.log('no update needed')
-    proceed()
-  } else {
-    updateSubsystem(subsystem)
-    console.log('updating subsystem')
-  }
-  const { data: updateData } = useSubsystemUpdateQuery(subsystem)
-  const status = updateData?.status
+  React.useEffect(() => {
+    if (!updateNeeded) {
+      console.log('no update needed')
+      proceed()
+    } else {
+      updateSubsystem(subsystem)
+      console.log('updating subsystem')
+    }
+  }, [])
+  const { data: updateData } = useSubsystemUpdateQuery(updateId)
+  console.log('update data', updateData)
+  const status = updateData?.data.updateStatus
   console.log('status', status)
   React.useEffect(() => {
     if (status === 'done') {

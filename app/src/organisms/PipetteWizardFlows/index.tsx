@@ -35,6 +35,7 @@ import { DetachPipette } from './DetachPipette'
 import { Carriage } from './Carriage'
 import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
+import { FirmwareUpdate } from './FirmwareUpdate'
 
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
@@ -56,6 +57,7 @@ export const PipetteWizardFlows = (
   const { t } = useTranslation('pipette_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
+
   const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
@@ -269,6 +271,8 @@ export const PipetteWizardFlows = (
         setFetching={setIsFetchingPipettes}
       />
     )
+  } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
+    modalContent = <FirmwareUpdate {...currentStep} {...calibrateBaseProps} />
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
     onExit = confirmExit
     modalContent = (

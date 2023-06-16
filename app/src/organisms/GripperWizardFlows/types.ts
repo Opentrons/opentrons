@@ -16,6 +16,7 @@ export type GripperWizardStep =
   | BeforeBeginningStep
   | MovePinStep
   | MountGripperStep
+  | FirmwareUpdateStep
   | UnmountGripperStep
   | SuccessStep
 
@@ -39,6 +40,9 @@ export interface MountGripperStep {
 }
 export interface UnmountGripperStep {
   section: typeof SECTIONS.UNMOUNT_GRIPPER
+}
+export interface FirmwareUpdateStep {
+  section: typeof SECTIONS.FIRMWARE_UPDATE
 }
 export interface SuccessStep {
   section: typeof SECTIONS.SUCCESS
