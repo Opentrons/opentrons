@@ -73,7 +73,8 @@ export function DeviceResetSlideout({
     getResetConfigOptions(state, robotName)
   )
 
-  const calibrationOptions = options != null ? options.filter(opt => opt.id.includes('Calibration')) : []
+  const calibrationOptions =
+    options != null ? options.filter(opt => opt.id.includes('Calibration')) : []
 
   const bootScriptOption =
     options != null ? options.filter(opt => opt.id.includes('bootScript')) : []
