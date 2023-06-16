@@ -377,6 +377,18 @@ class UnexpectedTipRemovalError(RoboticsInteractionError):
         super().__init__(ErrorCodes.UNEXPECTED_TIP_REMOVAL, message, detail, wrapping)
 
 
+class UnexpectedTipAttachError(RoboticsInteractionError):
+    """An error indicating that a pipette had a tip when it shouldn't."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an UnexpectedTipAttachError."""
+        super().__init__(ErrorCodes.UNEXPECTED_TIP_ATTACH, message, detail, wrapping)
+
 
 class PipetteOverpressureError(RoboticsInteractionError):
     """An error indicating that a pipette experienced an overpressure event, likely because of a clog."""
