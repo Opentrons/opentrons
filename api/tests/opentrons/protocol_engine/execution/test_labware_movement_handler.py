@@ -19,6 +19,7 @@ from opentrons.hardware_control.types import OT3Mount, OT3Axis
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     OFF_DECK_LOCATION,
     LabwareOffset,
     LabwareOffsetLocation,
@@ -140,6 +141,11 @@ def subject(
             0,
         ),
         (
+            OnLabwareLocation(labwareId="a-labware-id"),
+            OnLabwareLocation(labwareId="another-labware-id"),
+            0,
+        ),
+        (
             ModuleLocation(moduleId="tc2-id"),
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             # This test picks up from a TC2, so it should pick up 3.5mm higher.
@@ -154,8 +160,8 @@ async def test_move_labware_with_gripper(
     thermocycler_plate_lifter: ThermocyclerPlateLifter,
     ot3_hardware_api: OT3API,
     subject: LabwareMovementHandler,
-    from_location: Union[DeckSlotLocation, ModuleLocation],
-    to_location: Union[DeckSlotLocation, ModuleLocation],
+    from_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
+    to_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     extra_pickup_offset: float,
 ) -> None:
     """It should perform a labware movement with gripper by delegating to OT3API."""
