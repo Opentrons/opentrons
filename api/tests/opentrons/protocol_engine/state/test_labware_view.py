@@ -6,7 +6,10 @@ from contextlib import nullcontext as does_not_raise
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import Parameters
+from opentrons_shared_data.labware.labware_definition import (
+    Parameters,
+    OverlapOffset as SharedDataOverlapOffset,
+)
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, Point, MountType
 
@@ -20,7 +23,11 @@ from opentrons.protocol_engine.types import (
     LoadedLabware,
     ModuleModel,
     ModuleLocation,
+    OnLabwareLocation,
+    LabwareLocation,
+    OFF_DECK_LOCATION,
     DropTipWellLocation,
+    OverlapOffset,
 )
 from opentrons.protocol_engine.state.move_types import EdgePathType
 from opentrons.protocol_engine.state.labware import (
@@ -210,6 +217,69 @@ def test_get_labware_location() -> None:
     result = subject.get_location("plate-id")
 
     assert result == DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+
+
+@pytest.mark.parametrize(
+    argnames="location",
+    argvalues=[
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
+        ModuleLocation(moduleId="module-id"),
+        OFF_DECK_LOCATION,
+    ],
+)
+def test_get_parent_location(location: LabwareLocation) -> None:
+    """It should return the non-OnLabware location of a labware."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="plate-id",
+                loadName="load-name",
+                location=location,
+                definitionUri="some-uri",
+            )
+        }
+    )
+
+    result = subject.get_parent_location(labware_id="labware-id")
+
+    assert result == location
+
+
+@pytest.mark.parametrize(
+    argnames="location",
+    argvalues=[
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
+        ModuleLocation(moduleId="module-id"),
+    ],
+)
+def test_get_parent_location_on_labware(location: LabwareLocation) -> None:
+    """It should return the non-OnLabware location of a labware."""
+    subject = get_labware_view(
+        labware_by_id={
+            "top-id": LoadedLabware(
+                id="top-id",
+                loadName="load-name",
+                location=OnLabwareLocation(labwareId="middle-id"),
+                definitionUri="some-uri",
+            ),
+            "middle-id": LoadedLabware(
+                id="middle-id",
+                loadName="load-name",
+                location=OnLabwareLocation(labwareId="bottom-id"),
+                definitionUri="some-uri",
+            ),
+            "bottom-id": LoadedLabware(
+                id="bottom-id",
+                loadName="load-name",
+                location=location,
+                definitionUri="some-uri",
+            )
+        }
+    )
+
+    result = subject.get_parent_location(labware_id="top-id")
+
+    assert result == location
 
 
 def test_get_has_quirk(
@@ -476,6 +546,48 @@ def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
         y=well_plate_def.dimensions.yDimension,
         z=well_plate_def.dimensions.zDimension,
     )
+
+
+def test_get_labware_overlap_offsets() -> None:
+    """It should get the labware overlap offsets."""
+    subject = get_labware_view(
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={
+            "some-plate-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={
+                    "bottom-labware-name": SharedDataOverlapOffset(x=1, y=2, z=3)
+                }
+            )
+        },
+    )
+
+    result = subject.get_labware_overlap_offsets(
+        labware_id="plate-id", below_labware_name="bottom-labware-name"
+    )
+
+    assert result == OverlapOffset(x=1, y=2, z=3)
+
+
+def test_get_module_overlap_offsets() -> None:
+    """It should get the labware overlap offsets."""
+    subject = get_labware_view(
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={
+            "some-plate-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+                stackingOffsetWithModule={
+                    str(
+                        ModuleModel.TEMPERATURE_MODULE_V2.value
+                    ): SharedDataOverlapOffset(x=1, y=2, z=3)
+                }
+            )
+        },
+    )
+
+    result = subject.get_module_overlap_offsets(
+        labware_id="plate-id", module_model=ModuleModel.TEMPERATURE_MODULE_V2
+    )
+
+    assert result == OverlapOffset(x=1, y=2, z=3)
 
 
 def test_get_default_magnet_height(
