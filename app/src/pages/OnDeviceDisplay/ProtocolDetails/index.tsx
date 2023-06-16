@@ -35,10 +35,7 @@ import { MediumButton, SmallButton, TabbedButton } from '../../../atoms/buttons'
 import { Chip } from '../../../atoms/Chip'
 import { StyledText } from '../../../atoms/text'
 import { useMissingHardwareText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
-import {
-  Modal,
-  SmallModalChildren,
-} from '../../../molecules/Modal/OnDeviceDisplay'
+import { Modal, SmallModalChildren } from '../../../molecules/Modal'
 import { useToaster } from '../../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
 import { useMissingProtocolHardware } from '../../Protocols/hooks'
@@ -47,7 +44,7 @@ import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 import { Liquids } from './Liquids'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 import type { Dispatch } from '../../../redux/types'
 import type { OnDeviceRouteParams } from '../../../App/types'
 import { useOffsetCandidatesForAnalysis } from '../../../organisms/ApplyHistoricOffsets/hooks/useOffsetCandidatesForAnalysis'

@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { SPACING, COLORS, Box } from '@opentrons/components'
-import { ModalHeader } from './ModalHeader'
-import { ModalShell } from './ModalShell'
+import { LegacyModalHeader } from './LegacyModalHeader'
+import { LegacyModalShell } from './LegacyModalShell'
 import type { StyleProps } from '@opentrons/components'
 
 type ModalType = 'info' | 'warning' | 'error'
-export * from './ModalShell'
-export * from './ModalHeader'
+export * from './LegacyModalShell'
+export * from './LegacyModalHeader'
 
-export interface ModalProps extends StyleProps {
+export interface LegacyModalProps extends StyleProps {
   type?: ModalType
   onClose?: React.MouseEventHandler
   closeOnOutsideClick?: boolean
@@ -18,7 +18,7 @@ export interface ModalProps extends StyleProps {
   children?: React.ReactNode
 }
 
-export const Modal = (props: ModalProps): JSX.Element => {
+export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
   const {
     type = 'info',
     onClose,
@@ -30,7 +30,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
   } = props
 
   const modalHeader = (
-    <ModalHeader
+    <LegacyModalHeader
       onClose={onClose}
       title={title}
       icon={
@@ -48,7 +48,7 @@ export const Modal = (props: ModalProps): JSX.Element => {
   )
 
   return (
-    <ModalShell
+    <LegacyModalShell
       width={styleProps.width ?? '31.25rem'}
       header={modalHeader}
       onOutsideClick={closeOnOutsideClick ?? false ? onClose : undefined}
@@ -57,6 +57,6 @@ export const Modal = (props: ModalProps): JSX.Element => {
       {...props}
     >
       <Box padding={childrenPadding}>{children}</Box>
-    </ModalShell>
+    </LegacyModalShell>
   )
 }

@@ -4,7 +4,7 @@ import { ModalHeader } from './ModalHeader'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'ODD/Molecules/Modals/ModalHeader',
+  title: 'ODD/Molecules/Modal/ModalHeader',
   argTypes: {
     iconName: {
       options: ['information', 'ot-check', 'ot-alert', undefined],

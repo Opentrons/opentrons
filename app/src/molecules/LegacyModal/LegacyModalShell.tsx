@@ -15,7 +15,7 @@ import {
   styleProps,
   SPACING,
 } from '@opentrons/components'
-export interface ModalShellProps extends StyleProps {
+export interface LegacyModalShellProps extends StyleProps {
   /** Modal content */
   children: React.ReactNode
   /** Optional close on outside click **/
@@ -38,7 +38,7 @@ export interface ModalShellProps extends StyleProps {
  * - An optional sticky footer
  * - An optional onOutsideClick function
  */
-export function ModalShell(props: ModalShellProps): JSX.Element {
+export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
   const {
     onOutsideClick,
     zIndex = 10,

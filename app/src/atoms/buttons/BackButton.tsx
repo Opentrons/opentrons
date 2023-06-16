@@ -2,7 +2,14 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 
-import { ALIGN_CENTER, Box, Btn, Flex, Icon } from '@opentrons/components'
+import {
+  ALIGN_CENTER,
+  Box,
+  Btn,
+  Flex,
+  Icon,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 
 // TODO(bh, 2022-12-7): finish styling when designs finalized
 export function BackButton({
@@ -21,7 +28,7 @@ export function BackButton({
     >
       <Flex alignItems={ALIGN_CENTER}>
         <Icon name="back" height="3rem" />
-        <Box fontSize="2rem" fontWeight="700">
+        <Box fontSize="2rem" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {/* render "Back" if no children given */}
           {children != null ? children : t('back')}
         </Box>
