@@ -52,7 +52,7 @@ from .module_core import (
     NonConnectedModuleCore,
     MagneticBlockCore,
 )
-from .exceptions import InvalidModuleLocationError, UnknownLocationError
+from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
 from . import deck_conflict
 

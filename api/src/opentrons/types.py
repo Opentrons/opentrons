@@ -338,7 +338,6 @@ class DeckSlotName(enum.Enum):
         return self.id
 
 
-# fmt: off
 _slot_equivalencies = [
     (DeckSlotName.SLOT_1, DeckSlotName.SLOT_D1),
     (DeckSlotName.SLOT_2, DeckSlotName.SLOT_D2),
@@ -353,7 +352,6 @@ _slot_equivalencies = [
     (DeckSlotName.SLOT_11, DeckSlotName.SLOT_A2),
     (DeckSlotName.FIXED_TRASH, DeckSlotName.SLOT_A3),
 ]
-# fmt: on
 
 _ot2_to_ot3 = {ot2: ot3 for ot2, ot3 in _slot_equivalencies}
 _ot3_to_ot2 = {ot3: ot2 for ot2, ot3 in _slot_equivalencies}
