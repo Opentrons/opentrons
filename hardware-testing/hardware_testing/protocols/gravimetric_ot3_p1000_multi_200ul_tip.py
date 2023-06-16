@@ -2,8 +2,7 @@
 from opentrons.protocol_api import ProtocolContext
 
 metadata = {"protocolName": "gravimetric-ot3-p1000-multi-200ul-tip"}
-# FIXME: bump to v2.14 to utilize protocol engine
-requirements = {"robotType": "Flex", "apiLevel": "2.13"}
+requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOT_SCALE = 4
 SLOTS_TIPRACK = {

@@ -2,8 +2,7 @@
 from opentrons.protocol_api import ProtocolContext
 
 metadata = {"protocolName": "photometric-ot3-p1000-96-1000ul-tip"}
-# FIXME: bump to v2.14 to utilize protocol engine
-requirements = {"robotType": "OT-3", "apiLevel": "2.13"}
+requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOTS_TIPRACK = {
     1000: [5, 6, 8, 9, 11],

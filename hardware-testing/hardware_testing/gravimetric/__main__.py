@@ -21,6 +21,9 @@ from . import execute, helpers, workarounds, execute_photometric
 from .config import GravimetricConfig, GANTRY_MAX_SPEED, PhotometricConfig
 from .measurement import DELAY_FOR_MEASUREMENT
 
+# FIXME: bump to v2.15 to utilize protocol engine
+API_LEVEL = "2.13"
+
 LABWARE_OFFSETS: List[dict] = []
 
 # Keyed by pipette volume, channel count, and tip volume in that order
@@ -163,15 +166,11 @@ if __name__ == "__main__":
             LABWARE_OFFSETS.append(offset)
     _protocol = PROTOCOL_CFG[args.pipette][args.channels][args.tip]
     _ctx = helpers.get_api_context(
-        _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
+        API_LEVEL,  # type: ignore[attr-defined]
         is_simulating=args.simulate,
+        deck_version="2",
     )
     if args.photometric:
-        _ctx = helpers.get_api_context(
-            _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
-            is_simulating=args.simulate,
-            deck_version="2",
-        )
         run_pm(
             _ctx,
             args.pipette,
@@ -186,10 +185,6 @@ if __name__ == "__main__":
             args.touch_tip,
         )
     else:
-        _ctx = helpers.get_api_context(
-            _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
-            is_simulating=args.simulate,
-        )
         run(
             _ctx,
             args.pipette,
