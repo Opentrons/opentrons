@@ -404,7 +404,9 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     ui.print_header("LOAD PIPETTE")
     pipette = _load_pipette(ctx, cfg)
     pipette_tag = get_pipette_unique_name(pipette)
-    print(f'found pipette "{pipette_tag}"')
+    print(f'found pipette: {pipette_tag}')
+    if not ctx.is_simulating():
+        ui.get_user_ready("create pipette QR code")
     if cfg.user_volumes:
         pipette_tag += "-user-volume"
     else:
