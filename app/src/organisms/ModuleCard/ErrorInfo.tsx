@@ -19,7 +19,7 @@ import {
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { Portal } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { AttachedModule } from '../../redux/modules/types'
 
@@ -79,7 +79,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
       </Flex>
       {showErrorDetails ? (
         <Portal level="top">
-          <Modal
+          <LegacyModal
             type="error"
             title={t('module_name_error', {
               moduleName: getModuleDisplayName(attachedModule.moduleModel),
@@ -103,7 +103,7 @@ export function ErrorInfo(props: ErrorInfoProps): JSX.Element | null {
                 {t('shared:close')}
               </PrimaryButton>
             </Flex>
-          </Modal>
+          </LegacyModal>
         </Portal>
       ) : null}
     </Banner>

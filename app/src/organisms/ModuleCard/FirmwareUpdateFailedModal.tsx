@@ -13,7 +13,7 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { AttachedModule } from '../../redux/modules/types'
 
@@ -43,7 +43,7 @@ export const FirmwareUpdateFailedModal = (
   )
 
   return (
-    <Modal title={title} onClose={onCloseClick}>
+    <LegacyModal title={title} onClose={onCloseClick}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid={`FirmwareUpdateFailedModal_body_text_${module.serialNumber}`}
@@ -68,6 +68,6 @@ export const FirmwareUpdateFailedModal = (
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 
 import { Portal } from '../../../../App/portal'
 import { WizardHeader } from '../../../../molecules/WizardHeader'
-import { ModalShell } from '../../../../molecules/Modal'
+import { LegacyModalShell } from '../../../../molecules/LegacyModal'
 import { CalibrateTipLength } from '../../../../organisms/CalibrateTipLength'
 import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { LoadingState } from '../../../../organisms/CalibrationPanels'
@@ -166,12 +166,12 @@ export function useDashboardCalibrateTipLength(
         />
       ) : null}
       {startingSession ? (
-        <ModalShell
+        <LegacyModalShell
           width="47rem"
           header={<WizardHeader title={t('tip_length_calibration')} />}
         >
           <LoadingState />
-        </ModalShell>
+        </LegacyModalShell>
       ) : null}
       <CalibrateTipLength
         session={tipLengthCalibrationSession}
