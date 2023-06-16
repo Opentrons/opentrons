@@ -8,7 +8,6 @@ import {
   Flex,
   Text,
   SPACING,
-  Icon,
   Mount,
   RadioOption,
   ALIGN_CENTER,
@@ -22,10 +21,10 @@ import {
 } from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { GoBackLink } from './GoBackLink'
+import { EquipmentOption } from './EquipmentOption'
 
 import type { PipetteName } from '@opentrons/shared-data'
 import type { FormState, WizardTileProps } from './types'
-import { EquipmentOption } from './EquipmentOption'
 
 export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
   return <PipetteTipsTile {...props} mount="left" />
@@ -57,7 +56,7 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
       pipetteName:
         firstPipetteName != null
           ? getPipetteNameSpecs(firstPipetteName as PipetteName)?.displayName ??
-          ''
+            ''
           : '',
       mount,
     }
@@ -91,13 +90,13 @@ interface PipetteTipsFieldProps extends FormikProps<FormState> {
 }
 
 function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
-  const { mount, values, handleChange, setFieldValue } = props
+  const { mount, values, setFieldValue } = props
   const allLabware = useSelector(getLabwareDefsByURI)
   const selectedPipetteName = values.pipettesByMount[mount].pipetteName
   const selectedPipetteDefaultTipRacks =
     selectedPipetteName != null
       ? getPipetteNameSpecs(selectedPipetteName as PipetteName)
-        ?.defaultTipracks ?? []
+          ?.defaultTipracks ?? []
       : []
 
   const tipRackOptions = reduce<typeof allLabware, RadioOption[]>(
@@ -131,12 +130,13 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
           key={o.name}
           isSelected={currentValue === o.value}
           text={o.name}
-          onClick={() => { setFieldValue(nameAccessor, o.value) }}
+          onClick={() => {
+            setFieldValue(nameAccessor, o.value)
+          }}
           width="21.75rem"
           minHeight="4rem"
         />
-      ))
-      }
+      ))}
     </Flex>
   )
 }
