@@ -353,7 +353,9 @@ class Labware:
             Return type for module parent changed to :py:class:`ModuleContext`.
             Prior to this version, an internal geometry interface is returned.
         .. versionchanged:: 2.15
-            Return type for off-deck changed from None to off-deck.
+            Will now return :py:obj:`OFF_DECK` if the labware is off-deck.
+            Formerly, if the labware was removed by using ``del`` on :py:obj:`.deck`,
+            this would return where it was before its removal.
         """
         if isinstance(self._core, LegacyLabwareCore):
             # Type ignoring to preserve backwards compatibility
