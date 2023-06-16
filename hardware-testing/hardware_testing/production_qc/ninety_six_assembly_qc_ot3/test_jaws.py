@@ -11,7 +11,7 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount
+from hardware_testing.opentrons_api.types import Axis, OT3Mount
 
 RETRACT_MM = 0.25
 MAX_TRAVEL = 29.8 - RETRACT_MM  # FIXME: what is the max travel?
@@ -62,7 +62,7 @@ async def _check_if_jaw_is_aligned_with_endstop(api: OT3API) -> Tuple[bool, bool
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    ax = OT3Axis.Q
+    ax = Axis.Q
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
     default_current = settings.run_current
     default_speed = settings.max_speed

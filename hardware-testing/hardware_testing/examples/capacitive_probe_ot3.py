@@ -56,7 +56,7 @@ PROBE_SETTINGS_XY_AXIS = CapacitivePassSettings(
 async def _probe_sequence(
     api: OT3API, mount: types.OT3Mount, stable: bool
 ) -> types.Point:
-    z_ax = types.OT3Axis.by_mount(mount)
+    z_ax = types.Axis.by_mount(mount)
 
     print("Align the XY axes above Z probe location...")
     home_pos_z = helpers_ot3.get_endstop_position_ot3(api, mount)[z_ax]
@@ -87,7 +87,7 @@ async def _probe_sequence(
         )
     found_x_left = await api.capacitive_probe(
         mount,
-        types.OT3Axis.X,
+        types.Axis.X,
         ASSUMED_XY_LOCATION.x - half_cutout,
         PROBE_SETTINGS_XY_AXIS,
     )
@@ -97,7 +97,7 @@ async def _probe_sequence(
         )
     found_x_right = await api.capacitive_probe(
         mount,
-        types.OT3Axis.X,
+        types.Axis.X,
         ASSUMED_XY_LOCATION.x + half_cutout,
         PROBE_SETTINGS_XY_AXIS,
     )
@@ -108,7 +108,7 @@ async def _probe_sequence(
         )
     found_y_front = await api.capacitive_probe(
         mount,
-        types.OT3Axis.Y,
+        types.Axis.Y,
         ASSUMED_XY_LOCATION.y - half_cutout,
         PROBE_SETTINGS_XY_AXIS,
     )
@@ -118,7 +118,7 @@ async def _probe_sequence(
         )
     found_y_back = await api.capacitive_probe(
         mount,
-        types.OT3Axis.Y,
+        types.Axis.Y,
         ASSUMED_XY_LOCATION.y + half_cutout,
         PROBE_SETTINGS_XY_AXIS,
     )
@@ -149,11 +149,11 @@ async def _main(is_simulating: bool, cycles: int, stable: bool) -> None:
         await _probe_sequence(api, mount, stable)
 
     # move up, "remove" the probe, then disengage the XY motors when done
-    z_ax = types.OT3Axis.by_mount(mount)
+    z_ax = types.Axis.by_mount(mount)
     top_z = helpers_ot3.get_endstop_position_ot3(api, mount)[z_ax]
     await api.move_to(mount, ASSUMED_XY_LOCATION._replace(z=top_z))
     await api.remove_tip(mount)
-    await api.disengage_axes([types.OT3Axis.X, types.OT3Axis.Y])
+    await api.disengage_axes([types.Axis.X, types.Axis.Y])
 
 
 if __name__ == "__main__":

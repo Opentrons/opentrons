@@ -445,7 +445,7 @@ async def move_tip_motor_relative_ot3(
     else:
         action = "clamp"
     _move_coro = api._backend.tip_action(
-        axes=[OT3Axis.Q],
+        axes=[Axis.Q],
         distance=distance,
         speed=speed if speed else 5,
         tip_action=action,
@@ -455,7 +455,7 @@ async def move_tip_motor_relative_ot3(
     else:
         async with api._backend.restore_current():
             await api._backend.set_active_current(
-                {OT3Axis.Q: motor_current}  # type: ignore[dict-item]
+                {Axis.Q: motor_current}  # type: ignore[dict-item]
             )
             await _move_coro
 
@@ -492,7 +492,7 @@ def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[Axis, float]:
         machine_pos=machine_pos_per_axis,
         attitude=transforms.deck_calibration.attitude,
         offset=transforms.carriage_offset,
-        robot_type=cast(RobotType,"OT-3 Standard"),
+        robot_type=cast(RobotType, "OT-3 Standard"),
     )
     mount_pos_per_axis = api._effector_pos_from_carriage_pos(
         mount, deck_pos_per_axis, None

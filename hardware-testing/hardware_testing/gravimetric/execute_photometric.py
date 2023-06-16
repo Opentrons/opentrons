@@ -9,7 +9,7 @@ from opentrons.types import Location
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
-from hardware_testing.opentrons_api.types import Point, OT3Axis
+from hardware_testing.opentrons_api.types import Point, Axis
 
 from . import report
 from . import config
@@ -509,5 +509,5 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     finally:
         # FIXME: instead keep motors engaged, and move to an ATTACH position
         hw_api = ctx._core.get_hardware()
-        hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])  # disengage xy axis
+        hw_api.disengage_axes([Axis.X, Axis.Y])  # disengage xy axis
     ui.print_title("RESULTS")

@@ -6,7 +6,7 @@ from pathlib import Path
 from hardware_testing.data import ui, get_git_description
 from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis
+from hardware_testing.opentrons_api.types import OT3Mount, Axis
 
 from .config import TestSection, TestConfig, build_report, TESTS
 
@@ -37,7 +37,7 @@ async def _main(cfg: TestConfig) -> None:
     pipette_id = str(pipette.pipette_id)
 
     # FIXME: remove this once the "'L' format requires 0 <= number <= 4294967295" bug is gone
-    await api._backend.home([OT3Axis.P_L], api.gantry_load)
+    await api._backend.home([Axis.P_L], api.gantry_load)
     await api.refresh_positions()
 
     # BUILD REPORT

@@ -9,7 +9,7 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Lab
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.data.csv_report import CSVReport
-from hardware_testing.opentrons_api.types import OT3Mount, Point, OT3Axis
+from hardware_testing.opentrons_api.types import OT3Mount, Point, Axis
 from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 from . import report
@@ -818,7 +818,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         recorder.deactivate()
         # FIXME: instead keep motors engaged, and move to an ATTACH position
         hw_api = ctx._core.get_hardware()
-        hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])  # disengage xy axis
+        hw_api.disengage_axes([Axis.X, Axis.Y])  # disengage xy axis
     ui.print_title("RESULTS")
     _print_final_results(
         volumes=test_volumes,

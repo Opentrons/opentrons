@@ -19,7 +19,7 @@ from hardware_testing.data.csv_report import (
 )
 
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
+from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point
 
 
 TEST_SLOT = 8
@@ -105,9 +105,9 @@ def _get_hover_and_probe_pos(
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    z_ax = OT3Axis.Z_L
-    p_ax = OT3Axis.P_L
-    t_ax = OT3Axis.Q
+    z_ax = Axis.Z_L
+    p_ax = Axis.P_L
+    t_ax = Axis.Q
 
     default_probe_cfg = api.config.calibration.z_offset.pass_settings
     await api.reset_instrument_offset(OT3Mount.LEFT)
@@ -185,7 +185,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         current_pos = await api.gantry_position(OT3Mount.LEFT)
         await api.move_to(OT3Mount.LEFT, probe_pos._replace(z=current_pos.z))
         await api.move_to(OT3Mount.LEFT, probe_pos._replace(z=PROBE_PREP_HEIGHT_MM))
-        z_ax = OT3Axis.by_mount(OT3Mount.LEFT)
+        z_ax = Axis.by_mount(OT3Mount.LEFT)
         # NOTE: currently there's an issue where the 1st time an instrument
         #       probes, it won't trigger when contacting the deck. However all
         #       following probes work fine. So, here we do a "fake" probe

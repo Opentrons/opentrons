@@ -11,7 +11,7 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point, GripperProbe
+from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, GripperProbe
 from hardware_testing.data import ui
 
 PLUNGER_TOLERANCE_MM = 0.2
@@ -79,7 +79,7 @@ async def _has_gripper(api: OT3API) -> bool:
 
 
 async def _get_plunger_positions(api: OT3API, mount: OT3Mount) -> Tuple[float, float]:
-    axis = OT3Axis.of_main_tool_actuator(mount)
+    axis = Axis.of_main_tool_actuator(mount)
     estimates = await api.current_position_ot3(mount)
     encoders = await api.encoder_current_position_ot3(mount)
     return estimates[axis], encoders[axis]
@@ -102,7 +102,7 @@ async def _probe_mount_and_record_result(
     probe: Optional[GripperProbe] = None,
 ) -> None:
     # home
-    z_ax = OT3Axis.by_mount(mount)
+    z_ax = Axis.by_mount(mount)
     await api.home([z_ax])
 
     # attach probe
@@ -158,7 +158,7 @@ async def _test_pipette(
         ui.print_error(f"no pipette found on {mount.value} mount")
         return
     pip_id = helpers_ot3.get_pipette_serial_ot3(pip)
-    pip_ax = OT3Axis.of_main_tool_actuator(mount)
+    pip_ax = Axis.of_main_tool_actuator(mount)
     top, _, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
 
     # PIPETTE-ID
@@ -198,8 +198,8 @@ async def _test_pipette(
 async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     await api.cache_instruments()
     mount = OT3Mount.GRIPPER
-    z_ax = OT3Axis.by_mount(mount)
-    jaw_ax = OT3Axis.of_main_tool_actuator(mount)
+    z_ax = Axis.by_mount(mount)
+    jaw_ax = Axis.of_main_tool_actuator(mount)
     gripper = api._gripper_handler.gripper
     if not gripper:
         ui.print_error("no gripper found")
@@ -311,7 +311,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     #     ui.get_user_ready("remove the gripper")
 
     print("moving back near home position")
-    await api.home([OT3Axis.Z_L, OT3Axis.Z_R])
+    await api.home([Axis.Z_L, Axis.Z_R])
     await api.move_rel(
         OT3Mount.LEFT,
         RELATIVE_MOVE_FROM_HOME_DELTA * -0.9,

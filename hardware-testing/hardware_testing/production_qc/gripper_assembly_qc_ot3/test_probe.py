@@ -20,7 +20,7 @@ from hardware_testing.data.csv_report import (
 )
 
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point, GripperProbe
+from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, GripperProbe
 
 
 TEST_SLOT = 5
@@ -83,8 +83,8 @@ def _get_hover_and_probe_pos(api: OT3API) -> Tuple[Point, Point]:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    z_ax = OT3Axis.Z_G
-    g_ax = OT3Axis.G
+    z_ax = Axis.Z_G
+    g_ax = Axis.G
     mount = OT3Mount.GRIPPER
 
     s_driver = sensor_driver.SensorDriver()
@@ -138,7 +138,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
         # move to 5 mm above the deck
         await api.move_to(mount, probe_pos._replace(z=PROBE_PREP_HEIGHT_MM))
-        z_ax = OT3Axis.by_mount(mount)
+        z_ax = Axis.by_mount(mount)
         # NOTE: currently there's an issue where the 1st time an instrument
         #       probes, it won't trigger when contacting the deck. However all
         #       following probes work fine. So, here we do a "fake" probe

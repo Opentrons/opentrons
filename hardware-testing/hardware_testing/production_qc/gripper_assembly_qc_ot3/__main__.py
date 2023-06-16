@@ -6,7 +6,7 @@ from pathlib import Path
 from hardware_testing.data import ui, get_git_description
 from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis
+from hardware_testing.opentrons_api.types import OT3Mount, Axis
 
 from .config import TestSection, TestConfig, build_report, TESTS
 
@@ -50,7 +50,7 @@ async def _main(cfg: TestConfig) -> None:
         await test_run(api, report, section.value)
 
     # DISENGAGE XY FOR OPERATOR TO RELOAD GRIPPER
-    await api.disengage_axes([OT3Axis.X, OT3Axis.Y])
+    await api.disengage_axes([Axis.X, Axis.Y])
     ui.print_title("DONE")
 
     # SAVE REPORT
