@@ -1,6 +1,8 @@
+"""Tests for reading the current status of the tip presence photointerrupter."""
 from mock import AsyncMock
 
-from typing import List, Tuple
+from typing import List, Tuple, cast
+from typing_extensions import Literal
 
 from opentrons_hardware.hardware_control.tip_presence import get_tip_ejector_state
 from opentrons_hardware.firmware_bindings.messages import (
@@ -11,7 +13,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     PushTipPresenceNotificationPayload,
 )
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
-from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from tests.conftest import CanLoopback
 
 
@@ -41,7 +43,9 @@ async def test_get_tip_ejector_state(
 
     message_send_loopback.add_responder(responder)
 
-    res = await get_tip_ejector_state(mock_messenger, node)
+    res = await get_tip_ejector_state(
+        mock_messenger, cast(Literal[NodeId.pipette_left, NodeId.pipette_right], node)
+    )
 
     # We should have sent a request
     mock_messenger.ensure_send.assert_called_once_with(
@@ -50,12 +54,14 @@ async def test_get_tip_ejector_state(
         expected_nodes=[node],
     )
 
-    assert res == True
+    assert res
 
 
 async def test_tip_ejector_state_times_out(mock_messenger: AsyncMock) -> None:
     """Test that a timeout is handled."""
     node = NodeId.pipette_left
 
-    res = await get_tip_ejector_state(mock_messenger, node)
-    assert res == False
+    res = await get_tip_ejector_state(
+        mock_messenger, cast(Literal[NodeId.pipette_left, NodeId.pipette_right], node)
+    )
+    assert not res

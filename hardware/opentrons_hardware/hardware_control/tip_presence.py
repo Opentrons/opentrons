@@ -1,3 +1,4 @@
+"""Utilities for reading the current status of the tip presence photointerrupter."""
 import asyncio
 import logging
 
@@ -22,13 +23,15 @@ async def get_tip_ejector_state(
     node: Literal[NodeId.pipette_left, NodeId.pipette_right],
 ) -> bool:
     """Get the state of the tip presence interrupter.
+
     When the tip ejector flag is occuluded, then we
-    know that there is a tip on the pipette."""
+    know that there is a tip on the pipette.
+    """
     tip_ejector_state = False
 
     event = asyncio.Event()
 
-    def _listener(message: MessageDefinition, arb_id: ArbitrationId):
+    def _listener(message: MessageDefinition, arb_id: ArbitrationId) -> None:
         nonlocal tip_ejector_state
         if isinstance(message, PushTipPresenceNotification):
             event.set()
