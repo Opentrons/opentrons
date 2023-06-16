@@ -100,7 +100,7 @@ class GeometryView:
         slot_name = self.get_ancestor_slot_name(labware_id)
         slot_pos = self._labware.get_slot_position(slot_name)
         labware_data = self._labware.get(labware_id)
-        offset = self._get_labware_position_offset(labware_data)
+        offset = self._get_labware_position_offset(labware_id, labware_data.location)
 
         return Point(
             slot_pos.x + offset.x,
@@ -109,9 +109,8 @@ class GeometryView:
         )
 
     def _get_labware_position_offset(
-        self, labware: LoadedLabware
+        self, labware_id, labware_location: LabwareLocation
     ) -> LabwareOffsetVector:
-        labware_location = labware.location
         if isinstance(labware_location, DeckSlotLocation):
             return LabwareOffsetVector(x=0, y=0, z=0)
         elif isinstance(labware_location, ModuleLocation):
@@ -122,7 +121,7 @@ class GeometryView:
             )
             module_model = self._modules.get_connected_model(module_id)
             stacking_overlap = self._labware.get_module_overlap_offsets(
-                labware.id, module_model
+                labware_id, module_model
             )
             return LabwareOffsetVector(
                 x=module_offset.x - stacking_overlap.x,
@@ -133,17 +132,17 @@ class GeometryView:
             on_labware = self._labware.get(labware_location.labwareId)
             on_labware_dimensions = self._labware.get_dimensions(on_labware.id)
             stacking_overlap = self._labware.get_labware_overlap_offsets(
-                labware_id=labware.id, below_labware_name=on_labware.loadName
+                labware_id=labware_id, below_labware_name=on_labware.loadName
             )
             labware_offset = LabwareOffsetVector(
                 x=stacking_overlap.x,
                 y=stacking_overlap.y,
                 z=on_labware_dimensions.z - stacking_overlap.z,
             )
-            return labware_offset + self._get_labware_position_offset(on_labware)
+            return labware_offset + self._get_labware_position_offset(on_labware.id, on_labware.location)
         else:
             raise errors.LabwareNotOnDeckError(
-                f"Labware {labware.id} does not have a parent associated with it"
+                f"Labware {labware_id} does not have a parent associated with it"
                 f" since it is no longer on the deck."
             )
 
@@ -412,10 +411,9 @@ class GeometryView:
             location_slot = self._modules.get_location(location.moduleId).slotName
         elif isinstance(location, OnLabwareLocation):
             location_slot = self.get_ancestor_slot_name(location.labwareId)
-            labware_data = self._labware.get(labware_id)
-            labware_offset = self._get_labware_position_offset(labware_data)
+            labware_offset = self._get_labware_position_offset(labware_id, location)
             # Get the calibrated offset if the on labware location is on top of a module, otherwise return empty one
-            cal_offset = self._get_calibrated_module_offset(labware_data.location)
+            cal_offset = self._get_calibrated_module_offset(location)
             offset = LabwareOffsetVector(
                 x=labware_offset.x + cal_offset.x,
                 y=labware_offset.y + cal_offset.y,
