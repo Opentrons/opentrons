@@ -11,7 +11,7 @@ import {
   Btn,
   PrimaryButton,
 } from '@opentrons/components'
-import { Modal } from '../../../../molecules/Modal'
+import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
 
 interface RobotIsBusyModalProps {
@@ -26,7 +26,7 @@ export function RobotIsBusyModal({
   const { t } = useTranslation(['device_details', 'shared'])
 
   return (
-    <Modal type="warning" title={t('shared:robot_is_busy')}>
+    <LegacyModal type="warning" title={t('shared:robot_is_busy')}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Trans
           t={t}
@@ -51,6 +51,6 @@ export function RobotIsBusyModal({
           <PrimaryButton onClick={proceed}>{t('yes_update_now')}</PrimaryButton>
         </Flex>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

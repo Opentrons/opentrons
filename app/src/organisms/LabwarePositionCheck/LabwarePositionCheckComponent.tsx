@@ -8,7 +8,7 @@ import { Portal } from '../../App/portal'
 import { IntroScreen } from './IntroScreen'
 import { ExitConfirmation } from './ExitConfirmation'
 import { CheckItem } from './CheckItem'
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getIsOnDevice } from '../../redux/config'
 import { PickUpTip } from './PickUpTip'
@@ -296,14 +296,14 @@ export const LabwarePositionCheckComponent = (
   return (
     <Portal level="top">
       {isOnDevice ? (
-        <ModalShell fullPage>
+        <LegacyModalShell fullPage>
           {wizardHeader}
           {modalContent}
-        </ModalShell>
+        </LegacyModalShell>
       ) : (
-        <ModalShell width="47rem" header={wizardHeader}>
+        <LegacyModalShell width="47rem" header={wizardHeader}>
           {modalContent}
-        </ModalShell>
+        </LegacyModalShell>
       )}
     </Portal>
   )

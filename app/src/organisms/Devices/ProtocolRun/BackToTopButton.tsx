@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-import { useHoverTooltip, PrimaryButton } from '@opentrons/components'
+import { useHoverTooltip, SecondaryButton } from '@opentrons/components'
 
 import { Tooltip } from '../../../atoms/Tooltip'
 import {
@@ -15,19 +15,19 @@ import {
   useRunHasStarted,
 } from '../hooks'
 
-interface ProceedToRunButtonProps {
+interface BackToTopButtonProps {
   protocolRunHeaderRef: React.RefObject<HTMLDivElement> | null
   robotName: string
   runId: string
   sourceLocation: string
 }
 
-export function ProceedToRunButton({
+export function BackToTopButton({
   protocolRunHeaderRef,
   robotName,
   runId,
   sourceLocation,
-}: ProceedToRunButtonProps): JSX.Element | null {
+}: BackToTopButtonProps): JSX.Element | null {
   const { t } = useTranslation('protocol_setup')
   const [targetProps, tooltipProps] = useHoverTooltip()
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
@@ -71,13 +71,13 @@ export function ProceedToRunButton({
         })
       }}
     >
-      <PrimaryButton
+      <SecondaryButton
         disabled={proceedToRunDisabledReason != null}
         id="LabwareSetup_proceedToRunButton"
         {...targetProps}
       >
-        {t('proceed_to_run')}
-      </PrimaryButton>
+        {t('back_to_top')}
+      </SecondaryButton>
       {proceedToRunDisabledReason != null && (
         <Tooltip tooltipProps={tooltipProps}>
           {proceedToRunDisabledReason}

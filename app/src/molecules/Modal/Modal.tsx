@@ -8,10 +8,10 @@ import {
   DIRECTION_COLUMN,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
-import { BackgroundOverlay } from '../../BackgroundOverlay'
+import { BackgroundOverlay } from '../BackgroundOverlay'
 import { ModalHeader } from './ModalHeader'
 
-import type { ModalHeaderBaseProps, ModalSize } from './types'
+import type { ModalHeaderBaseProps, ModalSize } from '../Modal/types'
 
 interface ModalProps {
   /** clicking anywhere outside of the modal closes it  */
