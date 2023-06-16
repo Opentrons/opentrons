@@ -954,23 +954,19 @@ class OT3Controller:
                 try:
                     yield
                 finally:
-                    pass
 
-            def _pop_queue() -> Optional[ErrorCode]:
-                try:
-                    return errors.get_nowait()
-                except asyncio.QueueEmpty:
-                    return None
+                    def _pop_queue() -> Optional[ErrorCode]:
+                        try:
+                            return errors.get_nowait()
+                        except asyncio.QueueEmpty:
+                            return None
 
-            if _pop_queue():
-                raise OverPressureDetected(
-                    f"The pressure sensor on the {mount} mount has exceeded operational limits."
-                )
+                    if _pop_queue():
+                        raise OverPressureDetected(
+                            f"The pressure sensor on the {mount} mount has exceeded operational limits."
+                        )
         else:
-            try:
-                yield
-            finally:
-                pass
+            yield
 
     async def liquid_probe(
         self,
