@@ -65,15 +65,15 @@ wheel: $(wheel_file)
 
 .PHONY: test
 test:
-	$(MAKE) apply-patches-gravimetric
+	-$(MAKE) apply-patches-gravimetric
 	$(pytest) $(tests) $(test_opts)
-	$(MAKE) remove-patches-gravimetric
+	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-cov
 test-cov:
-	$(MAKE) apply-patches-gravimetric
+	-$(MAKE) apply-patches-gravimetric
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
-	$(MAKE) remove-patches-gravimetric
+	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-photometric
 test-photometric:
@@ -97,7 +97,11 @@ test-gravimetric-multi:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1
 
 .PHONY: test-gravimetric
-test-gravimetric: apply-patches-gravimetric test-gravimetric-single test-gravimetric-multi remove-patches-gravimetric
+test-gravimetric:
+	-$(MAKE) apply-patches-gravimetric
+	$(MAKE) test-gravimetric-single
+	$(MAKE) test-gravimetric-multi
+	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-production-qc
 test-production-qc:
@@ -124,11 +128,11 @@ test-integration: test-production-qc test-examples test-scripts test-gravimetric
 
 .PHONY: lint
 lint:
-	$(MAKE) apply-patches-gravimetric
+	-$(MAKE) apply-patches-gravimetric
 	$(python) -m mypy hardware_testing tests
 	$(python) -m black --check hardware_testing tests setup.py
 	$(python) -m flake8 hardware_testing tests setup.py
-	$(MAKE) remove-patches-gravimetric
+	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: format
 format:

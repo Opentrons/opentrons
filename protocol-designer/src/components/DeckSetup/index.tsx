@@ -1,9 +1,8 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
 import {
-  ModuleViz,
   RobotCoordsText,
   RobotWorkSpace,
   useOnClickOutside,
@@ -11,15 +10,29 @@ import {
   FONT_WEIGHT_BOLD,
   TEXT_TRANSFORM_UPPERCASE,
   RobotWorkSpaceRenderProps,
+  Module,
+  RobotCoordsForeignDiv,
+  Text,
+  COLORS,
+  SPACING,
 } from '@opentrons/components'
-import { MODULES_WITH_COLLISION_ISSUES } from '@opentrons/step-generation'
+import {
+  MODULES_WITH_COLLISION_ISSUES,
+  ModuleTemporalProperties,
+} from '@opentrons/step-generation'
 import {
   getLabwareHasQuirk,
-  getModuleVizDims,
   inferModuleOrientationFromSlot,
   GEN_ONE_MULTI_PIPETTES,
   DeckSlot as DeckDefSlot,
   ModuleType,
+  getDeckDefFromRobotType,
+  OT2_ROBOT_TYPE,
+  getModuleDef2,
+  inferModuleOrientationFromXCoordinate,
+  THERMOCYCLER_MODULE_TYPE,
+  getModuleDisplayName,
+  DeckDefinition,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'
@@ -35,20 +48,22 @@ import {
 
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import {
-  getSlotsBlockedBySpanning,
+  getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
 } from '../../step-forms'
+import * as labwareIngredActions from '../../labware-ingred/actions'
+import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
+import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
+import { TerminalItemId } from '../../steplist'
+import { getSelectedTerminalItemId } from '../../ui/steps'
+import { getRobotType } from '../../file-data/selectors'
 import { BrowseLabwareModal } from '../labware'
-import { ModuleTag } from './ModuleTag'
 import { SlotWarning } from './SlotWarning'
 import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
-
-import { TerminalItemId } from '../../steplist'
-
 import styles from './DeckSetup.css'
 
 export const DECK_LAYER_BLOCKLIST = [
@@ -61,17 +76,11 @@ export const DECK_LAYER_BLOCKLIST = [
   'screwHoles',
 ]
 
-export interface DeckSetupProps {
-  selectedTerminalItemId?: TerminalItemId | null
-  handleClickOutside?: () => unknown
-  drilledDown: boolean
-  initialDeckSetup: InitialDeckSetup
-}
-
 type ContentsProps = RobotWorkSpaceRenderProps & {
+  activeDeckSetup: InitialDeckSetup
   selectedTerminalItemId?: TerminalItemId | null
-  initialDeckSetup: InitialDeckSetup
   showGen1MultichannelCollisionWarnings: boolean
+  deckDef: DeckDefinition
 }
 
 export const VIEWBOX_MIN_X = -64
@@ -79,40 +88,8 @@ export const VIEWBOX_MIN_Y = -10
 export const VIEWBOX_WIDTH = 520
 export const VIEWBOX_HEIGHT = 414
 
-const getSlotDefForModuleSlot = (
-  moduleOnDeck: ModuleOnDeck,
-  deckSlots: { [slotId: string]: DeckDefSlot }
-): DeckDefSlot => {
-  const parentSlotDef =
-    deckSlots[moduleOnDeck.slot] || PSEUDO_DECK_SLOTS[moduleOnDeck.slot]
-  const moduleOrientation = inferModuleOrientationFromSlot(moduleOnDeck.slot)
-  const moduleData = getModuleVizDims(moduleOrientation, moduleOnDeck.type)
-
-  return {
-    ...parentSlotDef,
-    id: moduleOnDeck.id,
-    position: [
-      parentSlotDef.position[0] + moduleData.childXOffset,
-      parentSlotDef.position[1] + moduleData.childYOffset,
-      0,
-    ],
-    boundingBox: {
-      xDimension: moduleData.childXDimension,
-      yDimension: moduleData.childYDimension,
-      zDimension: 0,
-    },
-    displayName: `Slot of ${moduleOnDeck.type} in slot ${moduleOnDeck.slot}`,
-  }
-}
-
-const getModuleSlotDefs = (
-  initialDeckSetup: InitialDeckSetup,
-  deckSlots: { [slotId: string]: DeckDefSlot }
-): DeckDefSlot[] => {
-  return values(initialDeckSetup.modules).map((moduleOnDeck: ModuleOnDeck) =>
-    getSlotDefForModuleSlot(moduleOnDeck, deckSlots)
-  )
-}
+const OT2_VIEWBOX = `${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`
+const FLEX_VIEWBOX = '-144.31 -76.59 750 580'
 
 export interface SwapBlockedArgs {
   hoveredLabware?: LabwareOnDeckType | null
@@ -159,14 +136,13 @@ export const getSwapBlocked = (args: SwapBlockedArgs): boolean => {
   return labwareSourceToDestBlocked || labwareDestToSourceBlocked
 }
 
-// TODO IL 2020-01-12: to support dynamic labware/module movement during a protocol,
-// don't use initialDeckSetup here. Use some version of timelineFrameForActiveItem
 export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const {
-    initialDeckSetup,
+    activeDeckSetup,
     deckSlotsById,
     getRobotCoordsFromDOMCoords,
     showGen1MultichannelCollisionWarnings,
+    deckDef,
   } = props
 
   // NOTE: handling module<>labware compat when moving labware to empty module
@@ -189,7 +165,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
   const swapBlocked = getSwapBlocked({
     hoveredLabware,
     draggedLabware,
-    modulesById: initialDeckSetup.modules,
+    modulesById: activeDeckSetup.modules,
     customLabwareDefs,
   })
 
@@ -198,27 +174,21 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     []
   )
 
-  const slotsBlockedBySpanning = getSlotsBlockedBySpanning(
-    props.initialDeckSetup
-  )
+  const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanning(activeDeckSetup)
   const deckSlots: DeckDefSlot[] = values(deckSlotsById)
-  const moduleSlots = getModuleSlotDefs(initialDeckSetup, deckSlotsById)
-  // NOTE: in these arrays of slots, order affects SVG render layering
-  // labware can be in a module or on the deck
-  const labwareParentSlots: DeckDefSlot[] = [...deckSlots, ...moduleSlots]
   // modules can be on the deck, including pseudo-slots (eg special 'spanning' slot for thermocycler position)
   const moduleParentSlots = [...deckSlots, ...values(PSEUDO_DECK_SLOTS)]
 
   const allLabware: LabwareOnDeckType[] = Object.keys(
-    initialDeckSetup.labware
+    activeDeckSetup.labware
   ).reduce<LabwareOnDeckType[]>((acc, labwareId) => {
-    const labware = initialDeckSetup.labware[labwareId]
+    const labware = activeDeckSetup.labware[labwareId]
     return getLabwareHasQuirk(labware.def, 'fixedTrash')
       ? acc
       : [...acc, labware]
   }, [])
 
-  const allModules: ModuleOnDeck[] = values(initialDeckSetup.modules)
+  const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
 
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   const multichannelWarningSlots: DeckDefSlot[] = showGen1MultichannelCollisionWarnings
@@ -249,31 +219,109 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         const slot = moduleParentSlots.find(
           slot => slot.id === moduleOnDeck.slot
         )
-        if (!slot) {
+        if (slot == null) {
           console.warn(
             `no slot ${moduleOnDeck.slot} for module ${moduleOnDeck.id}`
           )
           return null
         }
+        const moduleDef = getModuleDef2(moduleOnDeck.model)
 
-        const [moduleX, moduleY] = slot.position
-        const orientation = inferModuleOrientationFromSlot(slot.id)
+        const getModuleInnerProps = (
+          moduleState: ModuleTemporalProperties['moduleState']
+        ): React.ComponentProps<typeof Module>['innerProps'] => {
+          if (moduleState.type === THERMOCYCLER_MODULE_TYPE) {
+            let lidMotorState = 'unknown'
+            if (moduleState.lidOpen === true) {
+              lidMotorState = 'open'
+            } else if (moduleState.lidOpen === false) {
+              lidMotorState = 'closed'
+            }
+            return {
+              lidMotorState,
+              blockTargetTemp: moduleState.blockTargetTemp,
+            }
+          }
+        }
+        const labwareLoadedOnModule = allLabware.find(
+          lw => lw.slot === moduleOnDeck.id
+        )
+        const shouldHideChildren =
+          moduleOnDeck.moduleState.type === THERMOCYCLER_MODULE_TYPE &&
+          moduleOnDeck.moduleState.lidOpen === false
+        const labwareInterfaceSlotDef: DeckDefSlot = {
+          displayName: `Labware interface on ${moduleOnDeck.model}`,
+          id: moduleOnDeck.id,
+          position: [0, 0, 0], // Module Component already handles nested positioning
+          matingSurfaceUnitVector: [-1, 1, -1],
+          boundingBox: {
+            xDimension: moduleDef.dimensions.labwareInterfaceXDimension ?? 0,
+            yDimension: moduleDef.dimensions.labwareInterfaceYDimension ?? 0,
+            zDimension: 0,
+          },
+          compatibleModules: [THERMOCYCLER_MODULE_TYPE],
+        }
 
         return (
-          <React.Fragment key={slot.id}>
-            <ModuleViz
-              x={moduleX}
-              y={moduleY}
-              orientation={orientation}
-              moduleType={moduleOnDeck.type}
-            />
-            <ModuleTag
-              x={moduleX}
-              y={moduleY}
-              orientation={orientation}
-              id={moduleOnDeck.id}
-            />
-          </React.Fragment>
+          <Module
+            key={slot.id}
+            x={slot.position[0]}
+            y={slot.position[1]}
+            def={moduleDef}
+            orientation={inferModuleOrientationFromXCoordinate(
+              slot.position[0]
+            )}
+            innerProps={getModuleInnerProps(moduleOnDeck.moduleState)}
+            targetSlotId={slot.id}
+            targetDeckId={deckDef.otId}
+          >
+            {labwareLoadedOnModule != null && !shouldHideChildren ? (
+              <>
+                <LabwareOnDeck
+                  x={0}
+                  y={0}
+                  labwareOnDeck={labwareLoadedOnModule}
+                />
+                <LabwareControls
+                  slot={labwareInterfaceSlotDef}
+                  setHoveredLabware={setHoveredLabware}
+                  setDraggedLabware={setDraggedLabware}
+                  swapBlocked={
+                    swapBlocked &&
+                    (labwareLoadedOnModule.id === hoveredLabware?.id ||
+                      labwareLoadedOnModule.id === draggedLabware?.id)
+                  }
+                  labwareOnDeck={labwareLoadedOnModule}
+                  selectedTerminalItemId={props.selectedTerminalItemId}
+                />
+              </>
+            ) : null}
+            {labwareLoadedOnModule == null && !shouldHideChildren ? (
+              // @ts-expect-error (ce, 2021-06-21) once we upgrade to the react-dnd hooks api, and use react-redux hooks, typing this will be easier
+              <SlotControls
+                key={slot.id}
+                slot={labwareInterfaceSlotDef}
+                selectedTerminalItemId={props.selectedTerminalItemId}
+                moduleType={moduleOnDeck.type}
+                handleDragHover={handleHoverEmptySlot}
+              />
+            ) : null}
+            <RobotCoordsForeignDiv
+              width={moduleDef.dimensions.labwareInterfaceXDimension}
+              height={16}
+              y={-22}
+              innerDivProps={{
+                backgroundColor: COLORS.darkGreyEnabled,
+                padding: SPACING.spacing4,
+                height: '100%',
+                color: COLORS.white,
+              }}
+            >
+              <Text as="p" fontSize="0.5rem">
+                {getModuleDisplayName(moduleOnDeck.model)}
+              </Text>
+            </RobotCoordsForeignDiv>
+          </Module>
         )
       })}
 
@@ -291,11 +339,11 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
       ))}
 
       {/* SlotControls for all empty deck + module slots */}
-      {labwareParentSlots
+      {deckSlots
         .filter(
           slot =>
-            !slotsBlockedBySpanning.includes(slot.id) &&
-            getSlotIsEmpty(props.initialDeckSetup, slot.id)
+            !slotIdsBlockedBySpanning.includes(slot.id) &&
+            getSlotIsEmpty(activeDeckSetup, slot.id)
         )
         .map(slot => {
           return (
@@ -305,16 +353,17 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               slot={slot}
               selectedTerminalItemId={props.selectedTerminalItemId}
               // Module slots' ids reference their parent module
-              moduleType={initialDeckSetup.modules[slot.id]?.type || null}
+              moduleType={activeDeckSetup.modules[slot.id]?.type || null}
               handleDragHover={handleHoverEmptySlot}
             />
           )
         })}
 
-      {/* all labware on deck and in modules */}
+      {/* all labware on deck NOT those in modules */}
       {allLabware.map(labware => {
-        const slot = labwareParentSlots.find(slot => slot.id === labware.slot)
-        if (!slot) {
+        if (allModules.some(m => m.id === labware.slot)) return null
+        const slot = deckSlots.find(slot => slot.id === labware.slot)
+        if (slot == null) {
           console.warn(`no slot ${labware.slot} for labware ${labware.id}!`)
           return null
         }
@@ -357,46 +406,54 @@ const getHasGen1MultiChannelPipette = (
   )
 }
 
-export const DeckSetup = (props: DeckSetupProps): JSX.Element => {
+export const DeckSetup = (): JSX.Element => {
+  const drilledDown =
+    useSelector(labwareIngredSelectors.getDrillDownLabwareId) != null
+  const selectedTerminalItemId = useSelector(getSelectedTerminalItemId)
+  const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+  const robotType = useSelector(getRobotType)
+  const dispatch = useDispatch()
+
   const _hasGen1MultichannelPipette = React.useMemo(
-    () => getHasGen1MultiChannelPipette(props.initialDeckSetup.pipettes),
-    [props.initialDeckSetup.pipettes]
+    () => getHasGen1MultiChannelPipette(activeDeckSetup.pipettes),
+    [activeDeckSetup.pipettes]
   )
   const showGen1MultichannelCollisionWarnings =
     !_disableCollisionWarnings && _hasGen1MultichannelPipette
 
-  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
+  const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [])
   const wrapperRef: React.RefObject<HTMLDivElement> = useOnClickOutside({
-    onClickOutside: props.handleClickOutside,
+    onClickOutside: () => {
+      if (drilledDown) dispatch(labwareIngredActions.drillUpFromLabware())
+    },
   })
 
   return (
     <React.Fragment>
       <div className={styles.deck_row}>
-        {props.drilledDown && <BrowseLabwareModal />}
+        {drilledDown && <BrowseLabwareModal />}
         <div ref={wrapperRef} className={styles.deck_wrapper}>
           <RobotWorkSpace
             deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             deckDef={deckDef}
-            viewBox={`${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
+            viewBox={robotType === OT2_ROBOT_TYPE ? OT2_VIEWBOX : FLEX_VIEWBOX}
             width="100%"
             height="100%"
           >
             {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
-              <>
-                <DeckSetupContents
-                  initialDeckSetup={props.initialDeckSetup}
-                  selectedTerminalItemId={props.selectedTerminalItemId}
-                  {...{
-                    deckSlotsById,
-                    getRobotCoordsFromDOMCoords,
-                    showGen1MultichannelCollisionWarnings,
-                  }}
-                />
-              </>
+              <DeckSetupContents
+                activeDeckSetup={activeDeckSetup}
+                selectedTerminalItemId={selectedTerminalItemId}
+                {...{
+                  deckDef,
+                  deckSlotsById,
+                  getRobotCoordsFromDOMCoords,
+                  showGen1MultichannelCollisionWarnings,
+                }}
+              />
             )}
           </RobotWorkSpace>
         </div>

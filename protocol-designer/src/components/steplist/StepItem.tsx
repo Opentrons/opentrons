@@ -512,6 +512,7 @@ export const StepItemContents = (
   // non-header substeps
   if (
     substeps &&
+    'commandCreatorFnName' in substeps &&
     (substeps.commandCreatorFnName === 'transfer' ||
       substeps.commandCreatorFnName === 'consolidate' ||
       substeps.commandCreatorFnName === 'distribute' ||

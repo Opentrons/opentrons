@@ -26,6 +26,6 @@ def run(ctx: ProtocolContext) -> None:
     pipette = ctx.load_instrument("p1000_96", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])
-        pipette.aspirate(pipette.min_volume, reservoir["A1"].top())
-        pipette.dispense(pipette.min_volume, plate["A1"].top())
+        pipette.aspirate(10, reservoir["A1"].top())
+        pipette.dispense(10, plate["A1"].top())
         pipette.drop_tip(home_after=False)

@@ -6,9 +6,9 @@ from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.data import ui
 from hardware_testing.protocols import (
-    gravimetric_ot3_p50,
+    gravimetric_ot3_p50_single,
     gravimetric_ot3_p50_multi_50ul_tip,
-    gravimetric_ot3_p1000,
+    gravimetric_ot3_p1000_single,
     gravimetric_ot3_p1000_multi_50ul_tip,
     gravimetric_ot3_p1000_multi_200ul_tip,
     gravimetric_ot3_p1000_multi_1000ul_tip,
@@ -23,19 +23,22 @@ from . import execute, helpers, workarounds, execute_photometric
 from .config import GravimetricConfig, GANTRY_MAX_SPEED, PhotometricConfig
 from .measurement import DELAY_FOR_MEASUREMENT
 
+# FIXME: bump to v2.15 to utilize protocol engine
+API_LEVEL = "2.13"
+
 LABWARE_OFFSETS: List[dict] = []
 
 # Keyed by pipette volume, channel count, and tip volume in that order
 GRAVIMETRIC_CFG = {
     50: {
-        1: {50: gravimetric_ot3_p50},
+        1: {50: gravimetric_ot3_p50_single},
         8: {50: gravimetric_ot3_p50_multi_50ul_tip},
     },
     1000: {
         1: {
-            50: gravimetric_ot3_p1000,
-            200: gravimetric_ot3_p1000,
-            1000: gravimetric_ot3_p1000,
+            50: gravimetric_ot3_p1000_single,
+            200: gravimetric_ot3_p1000_single,
+            1000: gravimetric_ot3_p1000_single,
         },
         8: {
             50: gravimetric_ot3_p1000_multi_50ul_tip,
@@ -172,10 +175,9 @@ if __name__ == "__main__":
             LABWARE_OFFSETS.append(offset)
     _protocol = GRAVIMETRIC_CFG[args.pipette][args.channels][args.tip]
     _ctx = helpers.get_api_context(
-        _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
+        API_LEVEL,  # type: ignore[attr-defined]
         is_simulating=args.simulate,
         deck_version="2",
-        stall_detection_enable=False,  # FIXME: enable stall-detection
     )
     if args.photometric:
         run_photometric(
