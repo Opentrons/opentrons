@@ -44,18 +44,12 @@ stages:
           - id: bootScripts
             name: Boot Scripts
             description: Clear custom boot scripts
-          - id: deckCalibration
-            name: Deck Calibration
-            description: !re_search 'Clear deck calibration'
           - id: pipetteOffsetCalibrations
             name: Pipette Offset Calibrations
             description: !re_search 'Clear pipette offset calibrations'
           - id: gripperOffsetCalibrations
             name: Gripper Offset Calibrations
             description: !re_search 'Clear gripper offset calibrations'
-          - id: tipLengthCalibrations
-            name: Tip Length Calibrations
-            description: !re_search 'Clear tip length calibrations'
           - id: runsHistory
             name: Clear Runs History
             description: !re_search 'Erase this device''s stored history of protocols and runs.'
