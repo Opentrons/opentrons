@@ -45,7 +45,7 @@ export const SUPPORTED_MODULE_SLOTS: SupportedSlotMap = {
   [MAGNETIC_MODULE_TYPE]: [],
 }
 
-const ALL_MODULE_SLOTS: DropdownOption[] = [
+export const ALL_MODULE_SLOTS: DropdownOption[] = [
   {
     name: 'Slot A1',
     value: '10',
@@ -92,7 +92,7 @@ const ALL_MODULE_SLOTS: DropdownOption[] = [
   },
 ]
 
-const HEATER_SHAKER_SLOTS: DropdownOption[] = [
+export const HEATER_SHAKER_SLOTS: DropdownOption[] = [
   {
     name: 'Slot A1',
     value: '10',
@@ -119,7 +119,7 @@ const HEATER_SHAKER_SLOTS: DropdownOption[] = [
   },
 ]
 
-const TEMPERATURE_MODULE_SLOTS: DropdownOption[] = [
+export const TEMPERATURE_MODULE_SLOTS: DropdownOption[] = [
   {
     name: 'Slot A1',
     value: '10',
@@ -160,21 +160,21 @@ export function getAllFlexModuleSlotsByType(
   }
 
   if (moduleType === HEATERSHAKER_MODULE_TYPE) {
-    return supportedSlotOption.concat(
+    return supportedSlotOption?.concat(
       HEATER_SHAKER_SLOTS.filter(s => s.value !== supportedSlotOption[0].value)
     )
   }
 
   if (moduleType === TEMPERATURE_MODULE_TYPE) {
-    return supportedSlotOption.concat(
+    return supportedSlotOption?.concat(
       TEMPERATURE_MODULE_SLOTS.filter(
         s => s.value !== supportedSlotOption[0].value
       )
     )
   }
 
-  const allOtherSlots = ALL_MODULE_SLOTS.filter(
-    s => s.value !== supportedSlotOption[0].value
-  )
-  return supportedSlotOption.concat(allOtherSlots)
+  const allOtherSlots =
+    supportedSlotOption !== undefined &&
+    ALL_MODULE_SLOTS.filter(s => s.value !== supportedSlotOption[0].value)
+  return supportedSlotOption?.concat(allOtherSlots)
 }

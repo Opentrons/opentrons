@@ -29,7 +29,7 @@ type ModuleImg = {
   }
 }
 
-const MODULE_IMG_BY_TYPE: ModuleImg = {
+export const MODULE_IMG_BY_TYPE: ModuleImg = {
   [MAGNETIC_MODULE_TYPE]: {
     [MAGNETIC_MODULE_V1]: require('../../../images/modules/magdeck_gen1.png'),
     [MAGNETIC_MODULE_V2]: require('../../../images/modules/magdeck_gen2.png'),

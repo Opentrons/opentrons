@@ -4,7 +4,7 @@ import { SPACING, Flex, COLORS, BORDERS } from '@opentrons/components'
 
 import type { StyleProps } from '@opentrons/components'
 
-interface MiniCardProps extends StyleProps {
+export interface MiniCardProps extends StyleProps {
   onClick: (event: React.MouseEvent<HTMLDivElement>) => void
   isSelected: boolean
   children: React.ReactNode
