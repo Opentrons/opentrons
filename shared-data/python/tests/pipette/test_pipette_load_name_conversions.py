@@ -1,59 +1,13 @@
 import pytest
 
-from typing import Tuple, cast
-from opentrons_shared_data.pipette.pipette_definition import (
-    SupportedTipsDefinition,
-    PipetteTipType,
-)
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteChannelType,
     PipetteModelType,
     PipetteVersionType,
     PipetteGenerationType,
-    PipetteModelMajorVersionType,
-    PipetteModelMinorVersionType,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
-from opentrons.config import ot3_pipette_config as pc
-
-
-def test_multiple_tip_configurations() -> None:
-    model_version = pc.PipetteModelVersionType(
-        PipetteModelType.p1000,
-        PipetteChannelType.EIGHT_CHANNEL,
-        PipetteVersionType(3, 3),
-    )
-    loaded_configuration = pc.load_ot3_pipette(model_version)
-    assert list(loaded_configuration.supported_tips.keys()) == [
-        PipetteTipType.t50,
-        PipetteTipType.t200,
-        PipetteTipType.t1000,
-    ]
-    assert isinstance(
-        loaded_configuration.supported_tips[PipetteTipType.t50],
-        SupportedTipsDefinition,
-    )
-
-
-@pytest.mark.parametrize(
-    argnames=["model", "channels", "version"],
-    argvalues=[["p50", 8, (3, 3)], ["p1000", 96, (3, 3)], ["p50", 1, (1, 0)]],
-)
-def test_load_full_pipette_configurations(
-    model: str, channels: int, version: Tuple[int, int]
-) -> None:
-    model_version = pc.PipetteModelVersionType(
-        PipetteModelType(model),
-        PipetteChannelType(channels),
-        PipetteVersionType(
-            cast(PipetteModelMajorVersionType, version[0]),
-            cast(PipetteModelMinorVersionType, version[1]),
-        ),
-    )
-    loaded_configuration = pc.load_ot3_pipette(model_version)
-    assert loaded_configuration.pipette_type.value == model
-    assert loaded_configuration.channels.as_int == channels
-    assert loaded_configuration.version.as_tuple == version
+from opentrons_shared_data.pipette import pipette_load_name_conversions as pc
 
 
 @pytest.mark.parametrize(
