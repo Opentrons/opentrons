@@ -12,6 +12,8 @@ import systemd from './systemd'
 import type { BrowserWindow } from 'electron'
 import type { Dispatch, Logger } from './types'
 
+app.commandLine.appendSwitch('touch-events', 'enabled')
+
 systemd.sendStatus('starting app')
 const config = getConfig()
 const log = createLogger('main')

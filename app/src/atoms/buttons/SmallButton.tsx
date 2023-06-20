@@ -35,6 +35,7 @@ interface SmallButtonProps extends StyleProps {
   buttonCategory?: ButtonCategory // if not specified, it will be 'default'
   disabled?: boolean
   onTouchStart?: React.TouchEventHandler
+  onTouchMove?: React.TouchEventHandler
   onTouchEnd?: React.TouchEventHandler
 }
 
