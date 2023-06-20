@@ -29,6 +29,7 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.types import (
     ModuleModel as ProtocolEngineModuleModel,
     OFF_DECK_LOCATION,
+    LabwareLocation,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import (
@@ -51,7 +52,7 @@ from .module_core import (
     NonConnectedModuleCore,
     MagneticBlockCore,
 )
-from .exceptions import InvalidModuleLocationError, UnknownLocationError
+from .exceptions import InvalidModuleLocationError
 from . import load_labware_params
 from . import deck_conflict
 
@@ -133,17 +134,13 @@ class ProtocolCore(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore],
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
-        module_location: Union[ModuleLocation, DeckSlotLocation]
-        if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
-            module_location = ModuleLocation(moduleId=location.module_id)
-        else:
-            module_location = DeckSlotLocation(slotName=location)
+        load_location = self._convert_labware_location(location=location)
 
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
@@ -154,7 +151,7 @@ class ProtocolCore(
 
         load_result = self._engine_client.load_labware(
             load_name=load_name,
-            location=module_location,
+            location=load_location,
             namespace=namespace,
             version=version,
             display_name=label,
@@ -206,17 +203,7 @@ class ProtocolCore(
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move the given labware to a new location."""
-        to_location: Union[ModuleLocation, DeckSlotLocation, str]
-        if isinstance(new_location, (ModuleCore, NonConnectedModuleCore)):
-            to_location = ModuleLocation(moduleId=new_location.module_id)
-        elif new_location == OffDeckType.OFF_DECK:
-            to_location = OFF_DECK_LOCATION
-        elif isinstance(new_location, DeckSlotName):
-            to_location = DeckSlotLocation(slotName=new_location)
-        else:
-            raise UnknownLocationError(
-                f"move_labware is not supported with the given location: {new_location}."
-            )
+        to_location = self._convert_labware_location(location=new_location)
 
         strategy = (
             LabwareMovementStrategy.USING_GRIPPER
@@ -502,7 +489,7 @@ class ProtocolCore(
 
     def get_labware_location(
         self, labware_core: LabwareCore
-    ) -> Union[str, ModuleCore, NonConnectedModuleCore, None]:
+    ) -> Union[str, ModuleCore, NonConnectedModuleCore, OffDeckType]:
         """Get labware parent location."""
         labware_location = self._engine_client.state.labware.get_location(
             labware_core.labware_id
@@ -512,5 +499,17 @@ class ProtocolCore(
                 labware_location.slotName, self._engine_client.state.config.robot_type
             )
         elif isinstance(labware_location, ModuleLocation):
-            return self._module_cores_by_id.get(labware_location.moduleId)
-        return None
+            return self._module_cores_by_id[labware_location.moduleId]
+
+        return OffDeckType.OFF_DECK
+
+    @staticmethod
+    def _convert_labware_location(
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
+    ) -> LabwareLocation:
+        if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
+            return ModuleLocation(moduleId=location.module_id)
+        elif location is OffDeckType.OFF_DECK:
+            return OFF_DECK_LOCATION
+        elif isinstance(location, DeckSlotName):
+            return DeckSlotLocation(slotName=location)
