@@ -8,6 +8,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import (
     Parameters,
+    LabwareRole,
     OverlapOffset as SharedDataOverlapOffset,
 )
 from opentrons.protocols.models import LabwareDefinition
@@ -1078,6 +1079,101 @@ def test_get_all_labware_definition_empty() -> None:
     result = subject.get_loaded_labware_definitions()
 
     assert result == []
+
+
+def test_raise_if_labware_cannot_be_stacked_not_validated() -> None:
+    """It should raise if the labware name is not in the definition stacking overlap."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            )
+        },
+    )
+
+    with pytest.raises(errors.LabwareCannotBeStackedError):
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
+                parameters=Parameters.construct(  # type: ignore[call-arg]
+                    loadName="name"
+                ),
+                stackingOffsetWithLabware={},
+            ),
+            bottom_labware_id="labware-id",
+        )
+
+
+def test_raise_if_labware_cannot_be_stacked_on_module_not_adapter() -> None:
+    """It should raise if the below labware on a module is not an adapter."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=ModuleLocation(moduleId="module-id"),
+            )
+        },
+        definitions_by_uri={
+            "def-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.labware]
+            )
+        },
+    )
+
+    with pytest.raises(errors.LabwareCannotBeStackedError, match="module"):
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
+                parameters=Parameters.construct(  # type: ignore[call-arg]
+                    loadName="name"
+                ),
+                stackingOffsetWithLabware={
+                    "test": SharedDataOverlapOffset(x=0, y=0, z=0)
+                },
+            ),
+            bottom_labware_id="labware-id",
+        )
+
+
+def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
+    """It should raise if the OnLabware location is on an adapter."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri-1",
+                location=OnLabwareLocation(labwareId="below-id"),
+            ),
+            "below-id": LoadedLabware(
+                id="below-id",
+                loadName="adapter-name",
+                definitionUri="def-uri-2",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            ),
+        },
+        definitions_by_uri={
+            "def-uri-2": LabwareDefinition.construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.adapter]
+            )
+        },
+    )
+
+    with pytest.raises(errors.LabwareCannotBeStackedError, match="adapter"):
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
+                parameters=Parameters.construct(  # type: ignore[call-arg]
+                    loadName="name"
+                ),
+                stackingOffsetWithLabware={
+                    "test": SharedDataOverlapOffset(x=0, y=0, z=0)
+                },
+            ),
+            bottom_labware_id="labware-id",
+        )
 
 
 def test_get_random_drop_tip_location(
