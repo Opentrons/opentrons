@@ -830,29 +830,17 @@ def test_command_store_saves_unknown_finish_error() -> None:
                 # and they wrap
                 wrappedErrors=[
                     errors.ErrorOccurrence(
-                        # the wrapped error(s) have the same id and creation time
                         id="error-id",
                         createdAt=datetime(year=2021, month=1, day=1),
-                        # but the details of the wrapped exception
-                        errorType="GeneralError",
-                        detail="Error 4000 GENERAL_ERROR (GeneralError)",
+                        errorType="PythonException",
+                        detail="RuntimeError: oh no\n",
                         errorCode="4000",
-                        # including further wrapped errors
-                        wrappedErrors=[
-                            errors.ErrorOccurrence(
-                                id="error-id",
-                                createdAt=datetime(year=2021, month=1, day=1),
-                                errorType="PythonException",
-                                detail="RuntimeError: oh no\n",
-                                errorCode="4000",
-                                # and we get some fun extra info if this wraps a normal exception
-                                errorInfo={
-                                    "class": "RuntimeError",
-                                    "args": "('oh no',)",
-                                },
-                                wrappedErrors=[],
-                            )
-                        ],
+                        # and we get some fun extra info if this wraps a normal exception
+                        errorInfo={
+                            "class": "RuntimeError",
+                            "args": "('oh no',)",
+                        },
+                        wrappedErrors=[],
                     )
                 ],
             )

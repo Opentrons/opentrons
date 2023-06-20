@@ -41,7 +41,7 @@ def test_exception_wrapping_multi_level() -> None:
 
 
 def test_exception_wrapping_rethrow() -> None:
-    """We can even wrap exceptions inside an except."""
+    """We can wrap raise-froms."""
     try:
         try:
             raise RuntimeError("oh no!")
@@ -53,3 +53,22 @@ def test_exception_wrapping_rethrow() -> None:
     assert wrapped.detail["class"] == "RuntimeError"
     assert wrapped.detail["traceback"]
     assert wrapped.detail["args"] == "('oh no!',)"
+
+
+def test_exception_wrapping_error_in_except() -> None:
+    """We can even wrap exceptions in exception handlers."""
+    try:
+        try:
+            raise RuntimeError("oh no!")
+        except RuntimeError:
+            raise KeyError("uh oh")
+    except BaseException as e:
+        wrapped = PythonException(e)
+
+    # when we have an exception-during-handler, the originally-handled
+    # exception is what's bubbled up:
+    assert wrapped.detail["class"] == "KeyError"
+    assert len(wrapped.wrapping) == 1
+    assert wrapped.wrapping[0].detail["class"] == "RuntimeError"
+    assert wrapped.wrapping[0].detail["traceback"]
+    assert wrapped.wrapping[0].detail["args"] == "('oh no!',)"

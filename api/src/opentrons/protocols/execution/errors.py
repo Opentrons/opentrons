@@ -1,4 +1,5 @@
-from opentrons_shared_data.errors.exceptions import GeneralError, PythonException
+from opentrons_shared_data.errors.exceptions import GeneralError
+
 
 class ExceptionInProtocolError(GeneralError):
     """This exception wraps an exception that was raised from a protocol
@@ -17,7 +18,8 @@ class ExceptionInProtocolError(GeneralError):
                 self.original_exc.__class__.__name__,
                 " [line {}]".format(self.line) if self.line else "",
                 self.message,
-            ))
+            ),
+        )
 
     def __str__(self):
         return self.message

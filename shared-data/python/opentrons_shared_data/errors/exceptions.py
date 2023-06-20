@@ -174,10 +174,12 @@ class PythonException(GeneralError):
         """Build a PythonException."""
 
         def _descend_exc_ctx(exc: BaseException) -> List[PythonException]:
+            descendants: List[PythonException] = []
+            if exc.__context__:
+                descendants.append(PythonException(exc.__context__))
             if exc.__cause__:
-                return [PythonException(exc.__cause__)]
-            else:
-                return []
+                descendants.append(PythonException(exc.__cause__))
+            return descendants
 
         base_details = {
             k: str(v)

@@ -3,7 +3,6 @@
 from collections import defaultdict
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple, Union
-from traceback import format_exception, format_exception_only
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName, Location
@@ -60,7 +59,7 @@ class LegacyContextCommandError(ProtocolEngineError):
             super().__init__(
                 code=ErrorCodes.GENERAL_ERROR,
                 message=str(wrapping_exc),
-                wrapping=[PythonException(wrapping_exc)]
+                wrapping=[PythonException(wrapping_exc)],
             )
 
 
