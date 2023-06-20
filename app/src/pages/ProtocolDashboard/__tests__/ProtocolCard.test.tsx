@@ -80,7 +80,7 @@ describe('ProtocolCard', () => {
     mockUseProtocolAnalysesQuery.mockReturnValue({
       data: { data: [{ result: 'error' }] } as any,
     } as UseQueryResult<ProtocolAnalyses>)
-    const [{ getByText, getByLabelText }] = render()
+    const [{ getByText, getByLabelText, queryByText }] = render()
     getByLabelText('failedAnalysis_icon')
     getByText('Failed analysis')
     getByText('yay mock protocol').click()
@@ -90,7 +90,7 @@ describe('ProtocolCard', () => {
     )
     getByText('Delete protocol')
     getByLabelText('closeIcon').click()
-    expect(mockPush).toHaveBeenCalledWith('/protocols/mockProtocol1')
+    expect(queryByText('Protocol analysis failed')).not.toBeInTheDocument()
   })
 
   it('should display modal after long click', async () => {

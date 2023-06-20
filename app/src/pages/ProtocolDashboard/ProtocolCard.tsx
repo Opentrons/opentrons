@@ -4,6 +4,7 @@ import { Trans, useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { format, formatDistance } from 'date-fns'
 import last from 'lodash/last'
+import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
@@ -78,16 +79,6 @@ export function ProtocolCard(props: {
     }
   }
 
-  const handleExitFailedAnalysisModalClick = (
-    longpress: UseLongPressResult,
-    protocolId: string
-  ): void => {
-    setShowFailedAnalysisModal(false)
-    if (longpress.isLongPressed !== true) {
-      history.push(`/protocols/${protocolId}`)
-    }
-  }
-
   React.useEffect(() => {
     if (longpress.isLongPressed) {
       longPress(true)
@@ -98,7 +89,7 @@ export function ProtocolCard(props: {
   const failedAnalysisHeader: ModalHeaderBaseProps = {
     title: i18n.format(t('protocol_analysis_failed'), 'capitalize'),
     hasExitIcon: true,
-    onClick: () => handleExitFailedAnalysisModalClick(longpress, protocol.id),
+    onClick: () => setShowFailedAnalysisModal(false),
   }
 
   const handleDeleteProtocol = (): void => {
@@ -134,7 +125,6 @@ export function ProtocolCard(props: {
       )
     }
   }
-
   return (
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
@@ -195,21 +185,35 @@ export function ProtocolCard(props: {
         {showFailedAnalysisModal && (
           <Modal
             header={failedAnalysisHeader}
-            onOutsideClick={() =>
-              handleExitFailedAnalysisModalClick(longpress, protocol.id)
-            }
+            onOutsideClick={() => setShowFailedAnalysisModal(false)}
           >
             <Flex
               flexDirection={DIRECTION_COLUMN}
               gridGap={SPACING.spacing32}
               width="100%"
             >
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+              <Flex
+                flexDirection={DIRECTION_COLUMN}
+                gridGap={SPACING.spacing8}
+                maxWidth="100%"
+              >
                 <Trans
                   t={t}
                   i18nKey={t('error_analyzing', { protocolName })}
                   components={{
-                    block: <StyledText as="p" />,
+                    block: (
+                      <StyledText
+                        as="p"
+                        css={css`
+                          display: -webkit-box;
+                          -webkit-box-orient: vertical;
+                          -webkit-line-clamp: 3;
+                          overflow: hidden;
+                          overflow-wrap: break-word;
+                          height: max-content;
+                        `}
+                      />
+                    ),
                     bold: <strong />,
                   }}
                 />
