@@ -7,7 +7,7 @@ index 89696c5b2a..4c2d6184b8 100644
          OT3AxisKind.Y: 375,
          OT3AxisKind.Z: 35,
 -        OT3AxisKind.P: 5,
-+        OT3AxisKind.P: 20,
++        OT3AxisKind.P: 15,
          OT3AxisKind.Z_G: 50,
          OT3AxisKind.Q: 5.5,
      },
