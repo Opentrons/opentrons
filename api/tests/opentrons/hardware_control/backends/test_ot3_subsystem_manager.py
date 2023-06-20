@@ -268,7 +268,7 @@ class ToolDetectionController:
             else ToolType.nothing_attached,
         )
 
-        self._decoy.when(await self._tool_detector.resolve(arg, 5.0)).then_return(
+        self._decoy.when(await self._tool_detector.resolve(arg, 10.0)).then_return(
             summary
         )
         return summary
