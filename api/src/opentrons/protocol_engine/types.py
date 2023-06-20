@@ -505,6 +505,13 @@ class LabwareOffsetLocation(BaseModel):
             " in the protocol's analysis."
         ),
     )
+    definitionUri: Optional[str] = Field(
+        None,
+        description=(
+            "The definition URI of a labware that a labware can be loaded onto,"
+            " if applicable."
+        ),
+    )
 
 
 class LabwareOffset(BaseModel):
