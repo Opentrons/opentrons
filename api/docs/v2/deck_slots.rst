@@ -15,7 +15,7 @@ When you load an item onto the robot's deck, like with :py:obj:`ProtocolContext.
 
 Specify a slot in one of two formats:
 
-* A letter-number pair like ``"A1"``. This matches how the deck is physically labeled on an Opentrons Flex.
+* A coordinate like ``"A1"``. This matches how the deck is physically labeled on an Opentrons Flex.
 * A number like ``"10"`` or ``10``. This matches how the deck is physically labeled on an Opentrons OT-2.
 
 

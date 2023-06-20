@@ -527,7 +527,7 @@ class ProtocolContext(CommandPublisher):
             be in Slot 7.
 
             .. versionchanged:: 2.15
-                You can now specify a deck slot as a letter-number pair, like ``"D1"``.
+                You can now specify a deck slot as a coordinate, like ``"D1"``.
 
         :param configuration: Configure a thermocycler to be in the ``semi`` position.
             This parameter does not work. Do not use it.
