@@ -237,11 +237,15 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             command={lastRunCommand}
             moduleRenderInfo={moduleRunRenderInfo}
             labwareRenderInfo={labwareRunRenderInfo}
-            labwareName={getLabwareNameFromRunData(
-              runData,
-              lastRunCommand.params.labwareId,
-              analysisCommands
-            )}
+            labwareName={
+              'labwareId' in lastRunCommand.params
+                ? getLabwareNameFromRunData(
+                    runData,
+                    lastRunCommand.params.labwareId,
+                    analysisCommands
+                  )
+                : ''
+            }
             oldDisplayLocation={
               oldLabwareLocation != null
                 ? getLabwareDisplayLocationFromRunData(

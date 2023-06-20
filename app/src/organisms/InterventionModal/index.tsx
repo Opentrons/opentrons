@@ -115,37 +115,35 @@ export function InterventionModal({
 
   let modalContent: JSX.Element | null = null
 
-  switch (command.commandType) {
-    case 'pause': // legacy pause command
-    case 'waitForResume':
-      modalContent = (
-        <PauseInterventionContent
-          startedAt={command.startedAt ?? null}
-          message={command.params?.message ?? null}
+  if (
+    command.commandType === 'waitForResume' ||
+    command.commandType === 'pause' // legacy pause command
+  ) {
+    modalContent = (
+      <PauseInterventionContent
+        startedAt={command.startedAt ?? null}
+        message={command.params.message ?? null}
+      />
+    )
+  } else if (command.commandType === 'moveLabware') {
+    modalContent =
+      robotType != null &&
+      moduleRenderInfo != null &&
+      oldDisplayLocation != null &&
+      newDisplayLocation != null &&
+      labwareRenderInfo != null &&
+      deckDef != null ? (
+        <MoveLabwareInterventionContent
+          robotType={robotType}
+          moduleRenderInfo={moduleRenderInfo}
+          labwareRenderInfo={labwareRenderInfo}
+          labwareName={labwareName ?? ''}
+          movedLabwareId={command.params.labwareId}
+          oldDisplayLocation={oldDisplayLocation}
+          newDisplayLocation={newDisplayLocation}
+          deckDef={deckDef}
         />
-      )
-      break
-    case 'moveLabware':
-      modalContent =
-        robotType != null &&
-        moduleRenderInfo != null &&
-        oldDisplayLocation != null &&
-        newDisplayLocation != null &&
-        labwareRenderInfo != null &&
-        command.params?.labwareId != null &&
-        deckDef != null ? (
-          <MoveLabwareInterventionContent
-            robotType={robotType}
-            moduleRenderInfo={moduleRenderInfo}
-            labwareRenderInfo={labwareRenderInfo}
-            labwareName={labwareName ?? ''}
-            movedLabwareId={command.params.labwareId}
-            oldDisplayLocation={oldDisplayLocation}
-            newDisplayLocation={newDisplayLocation}
-            deckDef={deckDef}
-          />
-        ) : null
-      break
+      ) : null
   }
 
   return (
