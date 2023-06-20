@@ -275,8 +275,8 @@ class ProtocolContext(CommandPublisher):
         to the location specified by `location`.
 
         :param labware_def: The labware definition to load
-        :param location: The slot into which to load the labware such as
-                         1 or '1'
+        :param location: The slot into which to load the labware,
+                         such as ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
         :type location: int or str
         :param str label: An optional special name to give the labware. If
                           specified, this is the name the labware will appear
@@ -315,8 +315,11 @@ class ProtocolContext(CommandPublisher):
             You can find the ``load_name`` for any standard labware on the Opentrons
             `Labware Library <https://labware.opentrons.com>`_.
 
-        :param location: The slot into which to load the labware,
-            such as ``1`` or ``"1"`` or off-deck using :py:obj:`OFF_DECK`.
+        :param location: Either a :ref:`deck slot <deck-slots>`,
+            like ``1``, ``"1"``, or ``"D1"``, or the special value :py:obj:`OFF_DECK`.
+
+            .. versionchanged:: 2.15
+                You can now specify a deck slot as a coordinate, like ``"D1"``.
 
         :type location: int or str or :py:obj:`OFF_DECK`
 
@@ -383,6 +386,8 @@ class ProtocolContext(CommandPublisher):
         logger.warning("load_labware_by_name is deprecated. Use load_labware instead.")
         return self.load_labware(load_name, location, label, namespace, version)
 
+    # TODO(mm, 2023-06-07): Figure out what to do with this, now that the Flex has non-integer
+    # slot names and labware can be stacked. https://opentrons.atlassian.net/browse/RLAB-354
     @property  # type: ignore
     @requires_version(2, 0)
     def loaded_labwares(self) -> Dict[int, Labware]:
@@ -433,9 +438,13 @@ class ProtocolContext(CommandPublisher):
         :param labware: Labware to move. Should be a labware already loaded
                         using :py:meth:`load_labware`
 
-        :param new_location: Deck slot location or a hardware module that is already
-                             loaded on the deck using :py:meth:`load_module`
-                             or off deck using :py:obj:`OFF_DECK`.
+        :param new_location: Where to move the labware to. This is either:
+
+                * A deck slot like ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
+                * A hardware module that's already been loaded on the deck
+                  with :py:meth:`load_module`.
+                * The special constant :py:obj:`OFF_DECK`.
+
         :param use_gripper: Whether to use gripper to perform this move.
                             If True, will use the gripper to perform the move (OT3 only).
                             If False, will pause protocol execution to allow the user
@@ -510,15 +519,22 @@ class ProtocolContext(CommandPublisher):
         by using :py:attr:`loaded_modules`.
 
         :param str module_name: The name or model of the module.
-        :param location: The location of the module. This is usually the
-                         name or number of the slot on the deck where you
-                         will be placing the module. Some modules, like
-                         the Thermocycler, are only valid in one deck
-                         location. You do not have to specify a location
-                         when loading a Thermocycler---it will always be
-                         in Slot 7.
+            See :ref:`available_modules` for possible values.
+
+        :param location: The location of the module.
+
+            This is usually the name or number of the slot on the deck where you
+            will be placing the module, like ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
+
+            The Thermocycler is only valid in one deck location.
+            You don't have to specify a location when loading it, but if you do,
+            it must be ``7``, ``"7"``, or ``"B1"``. See :ref:`thermocycler-module`.
+
+            .. versionchanged:: 2.15
+                You can now specify a deck slot as a coordinate, like ``"D1"``.
+
         :param configuration: Configure a thermocycler to be in the ``semi`` position.
-                              This parameter does not work. Do not use it.
+            This parameter does not work. Do not use it.
 
             .. versionchanged:: 2.14
                 This parameter dangerously modified the protocol's geometry system,
@@ -578,6 +594,8 @@ class ProtocolContext(CommandPublisher):
 
         return module_context
 
+    # TODO(mm, 2023-06-07): Figure out what to do with this, now that the Flex has non-integer
+    # slot names and labware can be stacked. https://opentrons.atlassian.net/browse/RLAB-354
     @property  # type: ignore
     @requires_version(2, 0)
     def loaded_modules(self) -> Dict[int, ModuleTypes]:
@@ -791,19 +809,23 @@ class ProtocolContext(CommandPublisher):
     @property  # type: ignore
     @requires_version(2, 0)
     def deck(self) -> Deck:
-        """An interface to provide information about the current deck layout.
+        """An interface to provide information about what's currently loaded on the deck.
 
-        This object behaves like a dictionary with keys for both numeric
-        and string slot numbers - for instance, ``protocol.deck[1]`` and
-        ``protocol.deck['1']`` will both return the object in slot 1. If
-        nothing is loaded into a slot, ``None`` will be present.
+        This object behaves like a dictionary whose keys are the deck slot names.
+        For instance, ``protocol.deck[1]``, ``protocol.deck["1"]``, and ``protocol.deck["D1"]``
+        will all return the object loaded in the front-left slot. (See :ref:`deck-slots`.)
+
+        The value will be a :py:obj:`~opentrons.protocol_api.Labware` if the slot contains a
+        labware, a :py:obj:`~opentrons.protocol_api.ModuleContext` if the slot contains a hardware
+        module, or ``None`` if the slot doesn't contain anything.
 
         This object is useful for determining if a slot in the deck is free.
+
         Rather than filtering the objects in the deck map yourself,
         you can also use :py:attr:`loaded_labwares` to see a dict of labwares
         and :py:attr:`loaded_modules` to see a dict of modules.
 
-        For advanced control you can delete an item of labware from the deck
+        For advanced control, you can delete an item of labware from the deck
         with e.g. ``del protocol.deck['1']`` to free a slot for new labware.
         """
         return self._deck
