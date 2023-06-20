@@ -318,6 +318,9 @@ class ProtocolContext(CommandPublisher):
         :param location: Either a :ref:`deck slot <deck-slots>`,
             like ``1``, ``"1"``, or ``"D1"``, or the special value :py:obj:`OFF_DECK`.
 
+            .. versionchanged:: 2.15
+                You can now specify a deck slot as a coordinate, like ``"D1"``.
+
         :type location: int or str or :py:obj:`OFF_DECK`
 
         :param str label: An optional special name to give the labware. If specified, this
