@@ -75,7 +75,7 @@ export function DeviceResetSlideout({
 
   const ot2CalibrationOptions =
     options != null ? options.filter(opt => opt.id.includes('Calibration')) : []
-  const ot3CalibrationOptions =
+  const flexCalibrationOptions =
     options != null
       ? options.filter(
           opt =>
@@ -85,7 +85,7 @@ export function DeviceResetSlideout({
       : []
 
   const calibrationOptions = isOT3
-    ? ot3CalibrationOptions
+    ? flexCalibrationOptions
     : ot2CalibrationOptions
 
   const bootScriptOption =
