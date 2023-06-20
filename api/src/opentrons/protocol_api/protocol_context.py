@@ -297,12 +297,12 @@ class ProtocolContext(CommandPublisher):
     def load_labware(
         self,
         load_name: str,
-        location: DeckLocation,
+        location: Union[DeckLocation, OffDeckType],
         label: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
     ) -> Labware:
-        """Load a labware onto the deck given its name.
+        """Load a labware onto a location.
 
         For labware already defined by Opentrons, this is a convenient way
         to collapse the two stages of labware initialization (creating
@@ -316,9 +316,9 @@ class ProtocolContext(CommandPublisher):
             `Labware Library <https://labware.opentrons.com>`_.
 
         :param location: The slot into which to load the labware,
-            such as ``1`` or ``"1"``.
+            such as ``1`` or ``"1"`` or off-deck using :py:obj:`OFF_DECK`.
 
-        :type location: int or str
+        :type location: int or str or :py:obj:`OFF_DECK`
 
         :param str label: An optional special name to give the labware. If specified, this
             is the name the labware will appear as in the run log and the calibration
@@ -338,12 +338,20 @@ class ProtocolContext(CommandPublisher):
         :param version: The version of the labware definition. You should normally
             leave this unspecified to let the implementation choose a good default.
         """
+        if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
+            raise APIVersionError(
+                "Loading a labware off-deck requires apiLevel 2.15 or higher."
+            )
         load_name = validation.ensure_lowercase_name(load_name)
-        deck_slot = validation.ensure_deck_slot(location, self._api_version)
+        load_location: Union[OffDeckType, DeckSlotName]
+        if isinstance(location, OffDeckType):
+            load_location = location
+        else:
+            load_location = validation.ensure_deck_slot(location, self._api_version)
 
         labware_core = self._core.load_labware(
             load_name=load_name,
-            location=deck_slot,
+            location=load_location,
             label=label,
             namespace=namespace,
             version=version,

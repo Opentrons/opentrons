@@ -25,7 +25,7 @@ from typing import (
     Union,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import ot3_pipette_config, gripper_config, feature_flags as ff
+from opentrons.config import gripper_config, feature_flags as ff
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -137,6 +137,10 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+    load_data as load_pipette_data,
+)
 from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
 
 from .subsystem_manager import SubsystemManager
@@ -345,7 +349,7 @@ class OT3Controller:
     @property
     def board_revision(self) -> BoardRevision:
         """Get the board revision"""
-        return BoardRevision.UNKNOWN
+        return BoardRevision.FLEX_B2
 
     @property
     def module_controls(self) -> AttachedModulesControl:
@@ -638,7 +642,7 @@ class OT3Controller:
     @staticmethod
     def _combine_serial_number(pipette_info: ohc_tool_types.PipetteInformation) -> str:
         serialized_name = OT3Controller._lookup_serial_key(pipette_info.name)
-        version = ot3_pipette_config.version_from_string(pipette_info.model)
+        version = pipette_load_name.version_from_string(pipette_info.model)
         return f"{serialized_name}V{version.major}{version.minor}{pipette_info.serial}"
 
     @staticmethod
@@ -654,11 +658,14 @@ class OT3Controller:
             # for PipetteInformation.serial so we don't have to use
             # helper methods to convert the serial back to what was flashed
             # on the eeprom.
+            converted_name = pipette_load_name.convert_pipette_name(
+                cast(PipetteName, attached.name.name), attached.model
+            )
             return {
-                "config": ot3_pipette_config.load_ot3_pipette(
-                    ot3_pipette_config.convert_pipette_name(
-                        cast(PipetteName, attached.name.name), attached.model
-                    )
+                "config": load_pipette_data.load_definition(
+                    converted_name.pipette_type,
+                    converted_name.pipette_channels,
+                    converted_name.pipette_version,
                 ),
                 "id": OT3Controller._combine_serial_number(attached),
             }

@@ -8,9 +8,16 @@ from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.types import Location
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 
+
+from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.opentrons_api.types import Point, OT3Axis
-
+from .measurement import (
+    MeasurementType,
+    create_measurement_tag,
+    EnvironmentData,
+)
+from .measurement.environment import read_environment_data
 from . import report
 from . import config
 from .helpers import get_pipette_unique_name
@@ -22,16 +29,11 @@ from .liquid_class.pipetting import (
     PipettingCallbacks,
 )
 from .liquid_height.height import LiquidTracker, initialize_liquid_from_deck
-from .measurement import (
-    MeasurementData,
-)
-from .measurement.environment import get_min_reading, get_max_reading
+
 from .tips import get_tips
 
 
-_MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
-
-TARGET_END_PHOTOPLATE_VOLUME = 200
+_MEASUREMENTS: List[Tuple[str, EnvironmentData]] = list()
 
 _DYE_MAP: Dict[str, Dict[str, float]] = {
     "HV": {"min": 200.1, "max": 350},
@@ -55,35 +57,6 @@ def _get_dye_type(volume: float) -> str:
         dye_type is not None
     ), f"volume {volume} is outside of the available dye range"
     return dye_type
-
-
-def _setup_dye(volume: float, cfg: config.PhotometricConfig) -> None:
-    if volume == 250:
-        # this is actually the 1000ul test
-        dye_required = (volume * 4 * 96) + _MIN_END_VOLUME_UL
-    else:
-        dye_required = max(
-            _MIN_START_VOLUME_UL, volume * 96 * cfg.trials + _MIN_END_VOLUME_UL
-        )
-    ui.get_user_ready(
-        f"Place the {_get_dye_type(volume)} reservoir in slot {cfg.reservoir_slot}"
-        f" and fill to {dye_required}ul of {_get_dye_type(volume)} dye"
-    )
-
-
-def _update_environment_first_last_min_max(test_report: report.CSVReport) -> None:
-    # update this regularly, because the script may exit early
-    env_data_list = [m.environment for tag, m in _MEASUREMENTS]
-    first_data = env_data_list[0]
-    last_data = env_data_list[-1]
-    min_data = get_min_reading(env_data_list)
-    max_data = get_max_reading(env_data_list)
-    report.store_environment(
-        test_report, report.EnvironmentReportState.FIRST, first_data
-    )
-    report.store_environment(test_report, report.EnvironmentReportState.LAST, last_data)
-    report.store_environment(test_report, report.EnvironmentReportState.MIN, min_data)
-    report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
 
 
 def _check_if_software_supports_high_volumes() -> bool:
@@ -242,14 +215,15 @@ def _print_stats(mode: str, average: float, cv: float, d: float) -> None:
 
 
 def _dispense_volumes(volume: float) -> Tuple[float, float, int]:
-    target_volume = 250 if volume > 800 else TARGET_END_PHOTOPLATE_VOLUME
-    num_dispenses = ceil(volume / target_volume)
+    num_dispenses = ceil(volume / 250)
     volume_to_dispense = volume / num_dispenses
+    target_volume = min(max(volume_to_dispense, 200), 250)
     return target_volume, volume_to_dispense, num_dispenses
 
 
 def _run_trial(
     ctx: ProtocolContext,
+    test_report: CSVReport,
     pipette: InstrumentContext,
     source: Well,
     dest: Labware,
@@ -271,6 +245,21 @@ def _run_trial(
         """Do Nothing."""
         return
 
+    def _tag(m_type: MeasurementType) -> str:
+        return create_measurement_tag(m_type, volume, 0, trial)
+
+    def _record_measurement_and_store(m_type: MeasurementType) -> EnvironmentData:
+        m_tag = _tag(m_type)
+        m_data = read_environment_data(cfg.pipette_mount, ctx.is_simulating())
+        report.store_measurements_pm(test_report, m_tag, m_data)
+        _MEASUREMENTS.append(
+            (
+                m_tag,
+                m_data,
+            )
+        )
+        return m_data
+
     pipetting_callbacks = PipettingCallbacks(
         on_submerging=_no_op,
         on_mixing=_no_op,
@@ -286,20 +275,23 @@ def _run_trial(
     target_volume, volume_to_dispense, num_dispenses = _dispense_volumes(volume)
     photoplate_preped_vol = max(target_volume - volume_to_dispense, 0)
 
+    if num_dispenses > 1 and not ctx.is_simulating():
+        # TODO: Likely will not test 1000 uL in the near-term,
+        #       but eventually we'll want to be more helpful here in prompting
+        #       what volumes need to be added between trials.
+        ui.get_user_ready("check DYE is enough")
+
+    _record_measurement_and_store(MeasurementType.INIT)
     pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
     if do_jog:
-        _setup_dye(volume_to_dispense, cfg)
         _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
         height_below_top = source.depth - _liquid_height
         print(f"liquid is {height_below_top} mm below top of reservoir")
         liquid_tracker.set_start_volume_from_liquid_height(
             source, _liquid_height, name="Dye"
         )
-        reservoir_volume = liquid_tracker.get_volume(source)
-        print(
-            f"software thinks there is {reservoir_volume} uL of liquid in the reservoir"
-        )
-
+    reservoir_ml = round(liquid_tracker.get_volume(source) / 1000, 1)
+    print(f"software thinks there is {reservoir_ml} mL of liquid in the reservoir")
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         ctx,
@@ -316,6 +308,7 @@ def _run_trial(
         mix=mix,
     )
 
+    _record_measurement_and_store(MeasurementType.ASPIRATE)
     for i in range(num_dispenses):
 
         for w in dest.wells():
@@ -339,12 +332,15 @@ def _run_trial(
             added_blow_out=(i + 1) == num_dispenses,
         )
         if cfg.touch_tip:
-            ui.get_user_ready("ready")
             pipette.touch_tip(speed=30)
+        _record_measurement_and_store(MeasurementType.DISPENSE)
         pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
-        pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))
-        ui.get_user_ready("Cover and replace the photoplate in slot 3")
-    _drop_tip(ctx, pipette, cfg)
+        if (i + 1) == num_dispenses:
+            _drop_tip(ctx, pipette, cfg)
+        else:
+            pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))
+        if not ctx.is_simulating():
+            ui.get_user_ready("add SEAL to plate")
     return
 
 
@@ -384,6 +380,33 @@ def _drop_tip(
         pipette.drop_tip(home_after=False)
 
 
+def _display_dye_information(
+    ctx: ProtocolContext, dye_types_req: Dict[str, float], refill: bool
+) -> None:
+    for dye in dye_types_req.keys():
+        transfered_ul = dye_types_req[dye]
+        reservoir_ul = max(_MIN_START_VOLUME_UL, transfered_ul + _MIN_END_VOLUME_UL)
+        leftover_ul = reservoir_ul - transfered_ul
+
+        def _ul_to_ml(x: float) -> float:
+            return round(x / 1000.0, 1)
+
+        if dye_types_req[dye] > 0:
+            if refill:
+                # only add the minimum required volume
+                print(f' * {_ul_to_ml(leftover_ul)} mL "{dye}" LEFTOVER in reservoir')
+                if not ctx.is_simulating():
+                    ui.get_user_ready(
+                        f'[refill] ADD {_ul_to_ml(transfered_ul)} mL more DYE type "{dye}"'
+                    )
+            else:
+                # add minimum required volume PLUS labware's dead-volume
+                if not ctx.is_simulating():
+                    ui.get_user_ready(
+                        f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye}"'
+                    )
+
+
 def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     """Run."""
     run_id, start_time = create_run_id_and_start_time()
@@ -391,27 +414,12 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     test_volumes = _get_volumes(ctx, cfg)
     total_photoplates = 0
     for vol in test_volumes:
-        target_volume, volume_to_dispense, _ = _dispense_volumes(vol)
-        total_photoplates = total_photoplates + (ceil(vol / target_volume) * cfg.trials)
-        dye_required = vol * 96 * (cfg.trials if vol < 1000 else 3)
-        dye_types_req[_get_dye_type(volume_to_dispense)] += dye_required
+        target_volume, volume_to_dispense, num_dispenses = _dispense_volumes(vol)
+        total_photoplates += num_dispenses * cfg.trials
+        dye_per_vol = vol * 96 * cfg.trials
+        dye_types_req[_get_dye_type(volume_to_dispense)] += dye_per_vol
 
     trial_total = len(test_volumes) * cfg.trials
-    if cfg.trials > 3 and 1000 in test_volumes:
-        trial_total = trial_total - cfg.trials + 3
-
-    ui.print_header("PREPARE")
-    ui.get_user_ready(
-        f"Is there 1 {cfg.photoplate} on the deck and {total_photoplates-1} ready?"
-    )
-    ui.get_user_ready(f"Is there {total_photoplates} {cfg.photoplate} covers ready?")
-    ui.get_user_ready(
-        f"Is there {trial_total-cfg.trials}  extra full {cfg.tip_volume}ul tipracks?"
-    )
-    for dye in dye_types_req.keys():
-        if dye_types_req[dye] > 0:
-            dye_req = max(_MIN_START_VOLUME_UL, dye_types_req[dye] + _MIN_END_VOLUME_UL)
-            ui.get_user_ready(f"Is there {dye_req}ul of dye type {dye}?")
 
     ui.print_header("LOAD LABWARE")
     photoplate, reservoir, tipracks = _load_labware(ctx, cfg)
@@ -421,7 +429,9 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     ui.print_header("LOAD PIPETTE")
     pipette = _load_pipette(ctx, cfg)
     pipette_tag = get_pipette_unique_name(pipette)
-    print(f'found pipette "{pipette_tag}"')
+    print(f"found pipette: {pipette_tag}")
+    if not ctx.is_simulating():
+        ui.get_user_ready("create pipette QR code")
     if cfg.user_volumes:
         pipette_tag += "-user-volume"
     else:
@@ -455,6 +465,9 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         liquid="None",
     )
 
+    ui.print_header("PREPARE")
+    _display_dye_information(ctx, dye_types_req, cfg.refill)
+
     print("homing...")
     ctx.home()
     # get the first channel's first-used tip
@@ -468,9 +481,6 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
             do_jog = True
             for trial in range(cfg.trials):
                 trial_count += 1
-                if trial >= 3 and volume == 1000:
-                    # we only do 3 1000ul tests
-                    break
                 ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
                 print(f"trial total {trial_count}/{trial_total}")
                 next_tip: Well = tips[0][tip_iter]
@@ -479,6 +489,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
 
                 _run_trial(
                     ctx=ctx,
+                    test_report=test_report,
                     pipette=pipette,
                     source=reservoir["A1"],
                     dest=photoplate,
@@ -498,10 +509,10 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                 if tip_iter >= len(tips[0]) and not (
                     (trial + 1) == cfg.trials and volume == test_volumes[-1]
                 ):
-                    ui.get_user_ready(
-                        f"Replace the tipracks in slots {cfg.slots_tiprack} with new"
-                        f" {cfg.tip_volume}uL tipracks"
-                    )
+                    if not ctx.is_simulating():
+                        ui.get_user_ready(
+                            f"replace TIPRACKS in slots {cfg.slots_tiprack}"
+                        )
                     tip_iter = 0
                 if volume < 250:
                     do_jog = False
@@ -511,3 +522,4 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         hw_api = ctx._core.get_hardware()
         hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])  # disengage xy axis
     ui.print_title("RESULTS")
+    print(test_report)

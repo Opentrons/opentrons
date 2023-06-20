@@ -20,7 +20,7 @@ import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { useTrackProtocolRunEvent } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../redux/analytics'
@@ -64,7 +64,7 @@ export function ConfirmCancelModal(
 
   return (
     <Portal>
-      <Modal
+      <LegacyModal
         type="warning"
         onClose={isCanceling ? undefined : onClose}
         title={t('cancel_run_modal_heading')}
@@ -101,7 +101,7 @@ export function ConfirmCancelModal(
             </AlertPrimaryButton>
           </Flex>
         </Flex>
-      </Modal>
+      </LegacyModal>
     </Portal>
   )
 }
