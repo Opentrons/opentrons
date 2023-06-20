@@ -67,7 +67,7 @@ def test_get_options() -> None:
     assert list(options.keys()) == reset._OT_2_RESET_OPTIONS
 
     options = reset.reset_options("OT-3 Standard")
-    assert list(options.keys()) == reset._OT_3_RESET_OPTIONS
+    assert list(options.keys()) == reset._FLEX_RESET_OPTIONS
 
 
 def test_reset_empty_set(

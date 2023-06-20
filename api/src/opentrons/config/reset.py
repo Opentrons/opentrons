@@ -46,7 +46,7 @@ _OT_2_RESET_OPTIONS = [
     ResetOptionId.tip_length_calibrations,
     ResetOptionId.runs_history,
 ]
-_OT_3_RESET_OPTIONS = [
+_FLEX_RESET_OPTIONS = [
     ResetOptionId.boot_scripts,
     ResetOptionId.pipette_offset,
     ResetOptionId.gripper_offset,
@@ -86,7 +86,7 @@ _settings_reset_options = {
 
 def reset_options(robot_type: str) -> Dict[ResetOptionId, CommonResetOption]:
     reset_options_for_robot_type = (
-        _OT_2_RESET_OPTIONS if robot_type == "OT-2 Standard" else _OT_3_RESET_OPTIONS
+        _OT_2_RESET_OPTIONS if robot_type == "OT-2 Standard" else _FLEX_RESET_OPTIONS
     )
     return {
         key: _settings_reset_options[key]

@@ -228,8 +228,6 @@ export function DeviceResetSlideout({
                     calibrationName = isOT3
                       ? t('clear_option_pipette_calibrations')
                       : t(`clear_option_${snakeCase(opt.id)}`)
-                  } else if (opt.id === 'gripperOffsetCalibrations') {
-                    calibrationName = t('clear_option_gripper_calibration')
                   } else {
                     calibrationName = t(`clear_option_${snakeCase(opt.id)}`)
                   }

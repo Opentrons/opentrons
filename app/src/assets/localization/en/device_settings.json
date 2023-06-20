@@ -33,7 +33,7 @@
   "clear_individual_data": "Clear individual data",
   "clear_option_boot_scripts": "Clear custom boot scripts",
   "clear_option_deck_calibration": "Clear deck calibration",
-  "clear_option_gripper_calibration": "Clear gripper calibration",
+  "clear_option_gripper_offset_calibrations": "Clear gripper calibration",
   "clear_option_pipette_calibrations": "Clear pipette calibration(s)",
   "clear_option_pipette_offset_calibrations": "Clear pipette offset calibrations",
   "clear_option_runs_history": "Clear protocol run history",

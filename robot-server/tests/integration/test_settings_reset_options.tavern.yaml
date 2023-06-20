@@ -30,6 +30,7 @@ stages:
 ---
 test_name: GET Settings Reset Options for OT-3
 marks:
+  - ot3_only
   - usefixtures:
       - ot3_server_base_url
 stages:
@@ -136,7 +137,6 @@ test_name: POST Reset gripper offset calibrations option for OT-2 raises
 marks:
   - usefixtures:
     - ot2_server_base_url
-    - ot3_server_base_url
 stages:
   - name: POST Reset gripperOffsetCalibrations true fails on OT-2
     request:
@@ -148,6 +148,13 @@ stages:
       status_code: 403
       json:
         message: "gripperOffsetCalibrations is not a valid reset option."
+---
+test_name: POST Reset gripper offset calibrations option for OT-3 raises
+marks:
+  - ot3_only
+  - usefixtures:
+    - ot3_server_base_url
+stages:
   - name: POST Reset gripperOffsetCalibrations true on OT-3
     request:
       url: '{ot3_server_base_url}/settings/reset'
