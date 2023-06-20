@@ -4,7 +4,7 @@ from logging import getLogger
 from typing import Any, Dict, Optional, Union, Iterator, Sequence
 
 from opentrons_shared_data.errors import ErrorCodes
-from opentrons_shared_data.errors.exceptions import EnumeratedError, GeneralError
+from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException
 
 log = getLogger(__name__)
 
@@ -50,7 +50,7 @@ class UnexpectedProtocolError(ProtocolEngineError):
                 if isinstance(exc, EnumeratedError):
                     yield exc
                 else:
-                    yield GeneralError(wrapping=[exc])
+                    yield PythonException(exc)
 
         super().__init__(
             code=ErrorCodes.GENERAL_ERROR,

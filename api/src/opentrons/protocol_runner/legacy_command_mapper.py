@@ -20,7 +20,7 @@ from opentrons.protocol_engine.resources import (
     pipette_data_provider,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.errors import ErrorCodes, EnumeratedError
+from opentrons_shared_data.errors import ErrorCodes, EnumeratedError, PythonException
 from opentrons.protocol_api.core.legacy.deck import FIXED_TRASH_ID
 
 from .legacy_wrappers import (
@@ -58,14 +58,9 @@ class LegacyContextCommandError(ProtocolEngineError):
             )
         else:
             super().__init__(
-                ErrorCodes.GENERAL_ERROR,
-                "\n".join(format_exception_only(type(wrapping_exc), wrapping_exc)),
-                {
-                    "wrapping_exception": "\n".join(
-                        format_exception(type(wrapping_exc), wrapping_exc, None)
-                    )
-                },
-                None,
+                code=ErrorCodes.GENERAL_ERROR,
+                message=str(wrapping_exc),
+                wrapping=[PythonException(wrapping_exc)]
             )
 
 
