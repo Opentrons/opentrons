@@ -21,23 +21,12 @@ This is still pretty early in the process, so some things are known not to work,
 
   You will need to follow these steps if you subsequently downgrade back to a prior release, too.
 
-## New Stuff In This Release
-
-- The HTTP API will now accept both styles of deck slot name: coordinates like "C2", and integers like "5". Flexes will now return the "C2" style, and OT-2s will continue to return the "5" style.
-
-# Internal Release 0.9.0
-
-This is 0.9.0, an internal release for the app supporting the Opentrons Flex.
-
-This is still pretty early in the process, so some things are known not to work, and are listed below. Some things that may surprise you do work, and are also listed below. There may also be some littler things of note, and those are at the bottom.
-
-## Smaller Known Issues In This Release
-- Gripper calibration occasionally seems like it "skipped a step", going straight from front to rear calibration. If this happens, exit and rerun. This is because of a server error that isn't getting properly reported. We're working on both fixing the error and its reporting, but in the meantime exiting and rerunning the process should fix it. This is RQA-844.
+- After upgrading your app, the protocols that you already had imported to the app will display blank deck maps. To fix this, select **Reanalyze** from the protocol's 3-dot menu (⋮).
 
 ## New Stuff In This Release
-- USB connectivity improvements: the app will display a nice big icon in the network settings page for a USB robot, USB robots will disappear properly when disconnected, things of this nature.
-- 96-channel detach improvements
-- Visual fixes and improvements
+
+- When interacting with an OT-3, the app will use the newer names for the deck slots, like "C2", instead of the names from the OT-2, like "5".
+- The `requirements` dict in Python protocols can now have `"robotType": "Flex"` instead of `"robotType": "OT-3"`. `"OT-3"` will still work, but it's discouraged because it's not the customer-facing name.
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 - Attach, detach, and calibration flows for anything from the protocol setup page

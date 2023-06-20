@@ -49,6 +49,39 @@ describe('InstrumentDiagram', () => {
 
     expect(tree).toMatchSnapshot()
   })
+
+  it('single-channel GEN3 renders correctly', () => {
+    const tree = Renderer.create(
+      <InstrumentDiagram
+        mount="right"
+        pipetteSpecs={{ channels: 1, displayCategory: 'GEN3' }}
+      />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  it('eight-channel GEN3 renders correctly', () => {
+    const tree = Renderer.create(
+      <InstrumentDiagram
+        mount="right"
+        pipetteSpecs={{ channels: 8, displayCategory: 'GEN3' }}
+      />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+
+  it('96-channel GEN1 renders correctly', () => {
+    const tree = Renderer.create(
+      <InstrumentDiagram
+        mount="left"
+        pipetteSpecs={{ channels: 96, displayCategory: 'GEN1' }}
+      />
+    ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
 })
 
 describe('InstrumentGroup', () => {

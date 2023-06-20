@@ -37,6 +37,25 @@ import { ProtocolSetup } from '../ProtocolSetup'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
+// Mock IntersectionObserver
+class IntersectionObserver {
+  observe = jest.fn()
+  disconnect = jest.fn()
+  unobserve = jest.fn()
+}
+
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: IntersectionObserver,
+})
+
+Object.defineProperty(global, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: IntersectionObserver,
+})
+
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
@@ -142,6 +161,13 @@ const mockEmptyAnalysis = ({
   pipettes: [],
   commands: [],
 } as unknown) as CompletedProtocolAnalysis
+const mockLiquids = [
+  {
+    id: 'm',
+    displayName: 'mock',
+    description: 'Mock liquid',
+  },
+]
 
 const mockPlay = jest.fn()
 
@@ -262,9 +288,21 @@ describe('ProtocolSetup', () => {
   })
 
   it('should launch protocol setup liquids screen when click liquids', () => {
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith(RUN_ID)
+      .mockReturnValue({ ...mockRobotSideAnalysis, liquids: mockLiquids })
+    when(mockGetProtocolModulesInfo)
+      .calledWith(
+        { ...mockRobotSideAnalysis, liquids: mockLiquids },
+        ot3StandardDeckDef as any
+      )
+      .mockReturnValue(mockProtocolModuleInfo)
+    when(mockGetUnmatchedModulesForProtocol)
+      .calledWith([], mockProtocolModuleInfo)
+      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
     expect(queryByText('Mock ProtocolSetupLiquids')).toBeNull()
-    getByText('Liquids not in setup')
+    getByText('1 initial liquid')
     getByText('Liquids').click()
     getByText('Mock ProtocolSetupLiquids')
   })

@@ -4,6 +4,7 @@ from collections import defaultdict
 import logging
 from typing import List, Set, Tuple, Iterator, Union, Optional
 import numpy as np
+import time
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -265,7 +266,7 @@ class MoveGroupRunner:
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
                 duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
-                velocity=self._convert_velocity(
+                velocity_mm=self._convert_velocity(
                     step.velocity_mm_sec, interrupts_per_sec
                 ),
             )
@@ -279,17 +280,18 @@ class MoveGroupRunner:
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
                 duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
-                acceleration=Int32Field(
+                acceleration_um=Int32Field(
                     int(
                         (
                             step.acceleration_mm_sec_sq
+                            * 1000.0
                             / interrupts_per_sec
                             / interrupts_per_sec
                         )
                         * (2**31)
                     )
                 ),
-                velocity=Int32Field(
+                velocity_mm=Int32Field(
                     int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
                 ),
             )
@@ -331,13 +333,14 @@ class MoveScheduler:
         # For each move group create a set identifying the node and seq id.
         self._moves: List[Set[Tuple[int, int]]] = []
         self._durations: List[float] = []
-        self._stop_condition: List[MoveStopCondition] = []
+        self._stop_condition: List[List[MoveStopCondition]] = []
         self._start_at_index = start_at_index
         self._expected_tip_action_motors = []
 
         for move_group in move_groups:
             move_set = set()
             duration = 0.0
+            stop_cond = []
             for seq_id, move in enumerate(move_group):
                 movesteps = list(move.values())
                 move_set.update(set((k.value, seq_id) for k in move.keys()))
@@ -348,9 +351,10 @@ class MoveScheduler:
                         GearMotorId.right,
                     ]
                 for step in move_group[seq_id]:
-                    self._stop_condition.append(move_group[seq_id][step].stop_condition)
+                    stop_cond.append(move_group[seq_id][step].stop_condition)
 
             self._moves.append(move_set)
+            self._stop_condition.append(stop_cond)
             self._durations.append(duration)
         log.debug(f"Move scheduler running for groups {move_groups}")
         self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
@@ -394,21 +398,28 @@ class MoveScheduler:
         log.error(f"Error during move group: {message}")
         if severity == ErrorSeverity.unrecoverable:
             self._should_stop = True
-        self._event.set()
+            self._event.set()
 
     def _handle_move_completed(
         self, message: _AcceptableMoves, arbitration_id: ArbitrationId
     ) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
+        seq_id = message.payload.seq_id.value
         ack_id = message.payload.ack_id.value
         node_id = arbitration_id.parts.originating_node_id
         try:
-            stop_cond = self._stop_condition[group_id]
+            stop_cond = self._stop_condition[group_id][seq_id]
             if (
-                stop_cond == MoveStopCondition.limit_switch
+                stop_cond
+                in [
+                    MoveStopCondition.limit_switch,
+                    MoveStopCondition.limit_switch_backoff,
+                ]
                 and ack_id != MoveAckId.stopped_by_condition
             ):
-                log.warning(f"Homing time out for {node_id}")
+                log.error(
+                    f"Homing move from node {node_id} completed without meeting condition {stop_cond}"
+                )
                 self._should_stop = True
                 self._event.set()
         except IndexError:
@@ -485,6 +496,14 @@ class MoveScheduler:
             if error != ErrorCode.ok:
                 log.error(f"recieved error trying to execute move group {str(error)}")
 
+            expected_time = max(
+                1.0, self._durations[group_id - self._start_at_index] * 1.1
+            )
+            full_timeout = max(
+                1.0, self._durations[group_id - self._start_at_index] * 2
+            )
+            start_time = time.time()
+
             try:
                 # TODO: The max here can be removed once can_driver.send() no longer
                 # returns before the message actually hits the bus. Right now it
@@ -493,12 +512,18 @@ class MoveScheduler:
                 # the execute even gets sent.
                 await asyncio.wait_for(
                     self._event.wait(),
-                    max(1.0, self._durations[group_id - self._start_at_index] * 1.1),
+                    full_timeout,
                 )
+                duration = time.time() - start_time
                 await self._send_stop_if_necessary(can_messenger, group_id)
+
+                if duration >= expected_time:
+                    log.warning(
+                        f"Move set {str(group_id)} took longer ({duration} seconds) than expected ({expected_time} seconds)."
+                    )
             except asyncio.TimeoutError:
                 log.warning(
-                    f"Move set {str(group_id)} timed out, expected duration {str(max(1.0, self._durations[group_id - self._start_at_index] * 1.1))}"
+                    f"Move set {str(group_id)} timed out of max duration {full_timeout}. Expected time: {expected_time}"
                 )
                 log.warning(
                     f"Expected nodes in group {str(group_id)}: {str(self._get_nodes_in_move_group(group_id))}"

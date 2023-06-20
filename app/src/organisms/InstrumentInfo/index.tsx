@@ -43,6 +43,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     | React.ComponentProps<typeof PipetteWizardFlows>
     | null
   >(null)
+
   const sharedGripperWizardProps: Pick<
     React.ComponentProps<typeof GripperWizardFlows>,
     'attachedGripper' | 'closeFlow'
@@ -52,6 +53,10 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       setWizardProps(null)
     },
   }
+  const is96Channel =
+    // @ts-expect-error the mount acts as a type narrower here
+    instrument.mount !== 'extension' && instrument.data?.channels === 96
+
   const handleDetach: React.MouseEventHandler = () => {
     setODDMaintenanceFlowInProgress()
     if (instrument != null) {
@@ -66,10 +71,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
                 history.goBack()
               },
               mount: instrument.mount as PipetteMount,
-              selectedPipette:
-                instrument.instrumentModel === 'p1000_96'
-                  ? NINETY_SIX_CHANNEL
-                  : SINGLE_MOUNT_PIPETTES,
+              selectedPipette: is96Channel
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
               flowType: FLOWS.DETACH,
             }
       )
@@ -89,10 +93,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
                 setWizardProps(null)
               },
               mount: instrument.mount as PipetteMount,
-              selectedPipette:
-                instrument.instrumentModel === 'p1000_96'
-                  ? NINETY_SIX_CHANNEL
-                  : SINGLE_MOUNT_PIPETTES,
+              selectedPipette: is96Channel
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
               flowType: FLOWS.CALIBRATE,
             }
       )

@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
   ALIGN_CENTER,
-  BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -11,7 +10,6 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  TYPOGRAPHY,
   POSITION_STICKY,
   POSITION_STATIC,
 } from '@opentrons/components'
@@ -21,7 +19,7 @@ import {
 } from '@opentrons/react-api-client'
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { Navigation } from '../../organisms/OnDeviceDisplay/Navigation'
+import { Navigation } from '../../organisms/Navigation'
 import { onDeviceDisplayRoutes } from '../../App/OnDeviceDisplayApp'
 import {
   getPinnedProtocolIds,
@@ -31,9 +29,8 @@ import {
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
 import { sortProtocols } from './utils'
 import { ProtocolCard } from './ProtocolCard'
+import { NoProtocols } from './NoProtocols'
 import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
-
-import imgSrc from '../../assets/images/on-device-display/empty_protocol_dashboard.png'
 
 import type { Dispatch } from '../../redux/types'
 import type { ProtocolsOnDeviceSortKey } from '../../redux/config/types'
@@ -195,7 +192,7 @@ export function ProtocolDashboard(): JSX.Element {
               zIndex={navMenuIsOpened || longPressModalIsOpened ? 0 : 3}
               width="100%"
             >
-              <Flex width="30.75rem">
+              <Flex width="32.3125rem">
                 <SmallButton
                   buttonText={t('protocol_name_title')}
                   buttonType={
@@ -233,7 +230,7 @@ export function ProtocolDashboard(): JSX.Element {
                   onClick={handleSortByLastRun}
                 />
               </Flex>
-              <Flex justifyContent={JUSTIFY_CENTER} width="17rem">
+              <Flex justifyContent={JUSTIFY_CENTER} width="14.625rem">
                 <SmallButton
                   buttonText={t('date_added')}
                   buttonType={
@@ -275,36 +272,7 @@ export function ProtocolDashboard(): JSX.Element {
             </Flex>
           </>
         ) : (
-          <>
-            {pinnedProtocols.length === 0 && (
-              <Flex
-                alignItems={ALIGN_CENTER}
-                backgroundColor={COLORS.darkBlack20}
-                flexDirection={DIRECTION_COLUMN}
-                height="27.25rem"
-                justifyContent={JUSTIFY_CENTER}
-                borderRadius={BORDERS.borderRadiusSize3}
-              >
-                <img
-                  alt={t('nothing_here_yet')}
-                  src={imgSrc}
-                  width="284px"
-                  height="166px"
-                />
-                <StyledText
-                  as="h3"
-                  fontWeight={TYPOGRAPHY.fontWeightBold}
-                  marginTop={SPACING.spacing16}
-                  marginBottom={SPACING.spacing8}
-                >
-                  {t('nothing_here_yet')}
-                </StyledText>
-                <StyledText as="h4" color={COLORS.darkBlack70}>
-                  {t('send_a_protocol_to_store')}
-                </StyledText>
-              </Flex>
-            )}
-          </>
+          <>{pinnedProtocols.length === 0 && <NoProtocols />}</>
         )}
       </Flex>
     </>

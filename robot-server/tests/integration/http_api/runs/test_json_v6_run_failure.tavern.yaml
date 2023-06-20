@@ -110,6 +110,7 @@ stages:
               errorType: UnexpectedProtocolError
               createdAt: !anystr
               detail: 'Cannot perform DROPTIP without a tip attached'
+              errorCode: '4000'
             params:
               pipetteId: pipetteId
               labwareId: tipRackId
@@ -120,6 +121,7 @@ stages:
                   x: 0
                   y: 0
                   z: 0
+              randomizeDropLocation: false
           - id: !anystr
             key: !anystr
             commandType: pickUpTip

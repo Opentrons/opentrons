@@ -13,15 +13,17 @@ from opentrons.hardware_control.modules import (
     HeaterShaker,
 )
 from opentrons.hardware_control.modules import utils, UpdateError, BundledFirmware
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 
 
 @pytest.fixture
 async def magdeck():
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=0,
+        port_group=PortGroup.UNKNOWN,
+        hub_port=None,
         device_path="/dev/ot_module_magdeck1",
     )
     m = await utils.build(
@@ -43,8 +45,10 @@ async def magdeck():
 async def tempdeck():
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=1,
+        port_group=PortGroup.UNKNOWN,
+        hub_port=None,
         device_path="/dev/ot_module_tempdeck1",
     )
     t = await utils.build(
@@ -67,8 +71,10 @@ async def tempdeck():
 async def thermocycler():
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=2,
+        port_group=PortGroup.UNKNOWN,
+        hub_port=None,
         device_path="/dev/ot_module_thermocycler1",
     )
     t = await utils.build(
@@ -101,8 +107,10 @@ async def heater_shaker():
     """Get a mocked out heater-shaker hardware control object."""
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=3,
+        port_group=PortGroup.UNKNOWN,
+        hub_port=None,
         device_path="/dev/ot_module_heatershaker1",
     )
     heatershaker = await utils.build(

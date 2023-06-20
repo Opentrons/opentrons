@@ -717,6 +717,12 @@
           "title": "Homeafter",
           "description": "Whether to home this pipette's plunger after dropping the tip. You should normally leave this unspecified to let the robot choose a safe default depending on its hardware.",
           "type": "boolean"
+        },
+        "randomizeDropLocation": {
+          "title": "Randomizedroplocation",
+          "description": "Whether to randomize the location where tip is dropped within the labware. If True, this command will ignore the wellLocation provided and drop tip at a random location within a set area of the specified labware well. If False, the tip will be dropped at the top center of the well.",
+          "default": false,
+          "type": "boolean"
         }
       },
       "required": ["pipetteId", "labwareId", "wellName"]
@@ -2453,6 +2459,11 @@
           "title": "Blockmaxvolumeul",
           "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler.",
           "type": "number"
+        },
+        "holdTimeSeconds": {
+          "title": "Holdtimeseconds",
+          "description": "Amount of time, in seconds, to hold the temperature for. If specified, a waitForBlockTemperature command will block until the given hold time has elapsed.",
+          "type": "number"
         }
       },
       "required": ["moduleId", "celsius"]
@@ -3049,6 +3060,11 @@
       },
       "required": ["params"]
     },
+    "MaintenancePosition": {
+      "title": "MaintenancePosition",
+      "description": "Maintenance position options.",
+      "enum": ["attachPlate", "attachInstrument"]
+    },
     "MoveToMaintenancePositionParams": {
       "title": "MoveToMaintenancePositionParams",
       "description": "Calibration set up position command parameters.",
@@ -3059,6 +3075,15 @@
           "allOf": [
             {
               "$ref": "#/definitions/MountType"
+            }
+          ]
+        },
+        "maintenancePosition": {
+          "description": "The position the gantry mount needs to move to.",
+          "default": "attachInstrument",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MaintenancePosition"
             }
           ]
         }

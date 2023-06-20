@@ -20,9 +20,15 @@ async def _exercise_pipette(api: OT3API, mount: types.OT3Mount) -> None:
         except ValueError:
             _value = None  # type: ignore[assignment]
         if _inp[0] == "a":
+            try:
+                await api.prepare_for_aspirate(mount)
+            except Exception as e:
+                print(e)
             await api.aspirate(mount, _value)
         elif _inp[0] == "d":
             await api.dispense(mount, _value)
+        elif _inp[0] == "b":
+            await api.blow_out(mount, _value)
         elif _inp[0] == "t":
             pipette = api.hardware_pipettes[mount.to_mount()]
             assert pipette is not None
@@ -57,9 +63,6 @@ async def _exercise_gripper(api: OT3API) -> None:
 async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
-    if mount != types.OT3Mount.GRIPPER:
-        _, bottom, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
-        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom)
     while True:
         await helpers_ot3.jog_mount_ot3(api, mount)
         if mount == types.OT3Mount.GRIPPER:

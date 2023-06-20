@@ -65,10 +65,12 @@ wheel: $(wheel_file)
 
 .PHONY: test
 test:
+	$(MAKE) apply-patches-gravimetric
 	$(pytest) $(tests) $(test_opts)
 
 .PHONY: test-cov
 test-cov:
+	$(MAKE) apply-patches-gravimetric
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
 .PHONY: test-photometric
@@ -121,9 +123,11 @@ test-integration: test-production-qc test-examples test-scripts test-gravimetric
 
 .PHONY: lint
 lint:
+	$(MAKE) apply-patches-gravimetric
 	$(python) -m mypy hardware_testing tests
 	$(python) -m black --check hardware_testing tests setup.py
 	$(python) -m flake8 hardware_testing tests setup.py
+	$(MAKE) remove-patches-gravimetric
 
 .PHONY: format
 format:
@@ -249,3 +253,7 @@ update-patches-gravimetric:
 	cd ../ && git diff origin/edge ./shared-data/** > ./hardware-testing/hardware_testing/gravimetric/overrides/shared-data.patch
 	cd ../ && git diff origin/edge ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/robot-server.patch
 	$(MAKE) remove-patches-gravimetric
+
+.PHONY: push-photometric-ot2
+push-photometric-ot2:
+	scp -r -O photometric-ot2/photometric_ot2 root@$(host):/data/user_storage

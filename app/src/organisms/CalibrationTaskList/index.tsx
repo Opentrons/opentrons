@@ -16,7 +16,7 @@ import {
 
 import { StatusLabel } from '../../atoms/StatusLabel'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { TaskList } from '../TaskList'
 
 import {
@@ -105,7 +105,7 @@ export function CalibrationTaskList({
   }
 
   return (
-    <Modal
+    <LegacyModal
       title={`${robotName} ${t('calibration_dashboard')}`}
       onClose={() =>
         history.push(`/devices/${robotName}/robot-settings/calibration`)
@@ -170,6 +170,6 @@ export function CalibrationTaskList({
           />
         </>
       )}
-    </Modal>
+    </LegacyModal>
   )
 }
