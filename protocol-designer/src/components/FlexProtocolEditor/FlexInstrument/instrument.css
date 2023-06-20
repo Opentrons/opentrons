@@ -15,7 +15,7 @@
   grid-area: left;
   grid-template-columns: 80% 20%;
   grid-template-areas: 'info img';
-  margin-right: 3rem;
+  margin-right: 1rem;
 }
 
 .right {
@@ -32,6 +32,7 @@
 .pipette_info {
   grid-area: info;
   min-height: 8rem;
+  width: max-content;
 }
 
 .flipped_image {
@@ -49,9 +50,11 @@
   font-weight: var(--fw-semibold);
   color: var(--c-font-dark);
   text-transform: capitalize;
-  margin: 2rem 0 0.25rem;
+  margin: 1rem 0 0.25rem;
 }
 
 .value {
   @apply --font-body-2-dark;
+  display: block;
+  margin-bottom: 5px;
 }

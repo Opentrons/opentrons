@@ -34,7 +34,7 @@ import { FlexRoundTab } from './FlexRoundTab'
 import { DeckSlot } from '../../types'
 import { FlexProtocolName, SelectPipetteOption } from './FlexPillForm'
 import { FlexModules } from './FlexModules'
-import { connect, useDispatch } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 import { actions as navActions } from '../../navigation'
 import { reduce } from 'lodash'
 import assert from 'assert'
@@ -51,6 +51,8 @@ import {
   mapDispatchToProps,
   mapStateToProps,
 } from './FlexPillForm/FlexProtocolEditorProps'
+import { getLabwareDefsByURI } from '../../labware-defs/selectors'
+import { getFlexTiprackOptions } from './FlexPillForm/TipRackList'
 type Props = React.ComponentProps<typeof FlexProtocolEditor>
 export interface FormModule {
   onDeck: boolean
@@ -107,113 +109,98 @@ const validationSchema = Yup.object().shape({
   }),
 })
 
-const initialFormValues: InitialValues = {
-  fields: {
-    name: '',
-    author: '',
-    description: '',
-  },
-  mountSide,
-  pipettesByMount: {
-    left: {
-      pipetteName: '',
-      mount: 'left',
-      tiprackDefURI: [],
-      isSelected: false,
+const getInitialValues = (
+  values: any,
+  matchingTiprackRight: any,
+  matchingTiprackLeft: any
+): InitialValues => {
+  const initialFormValues: InitialValues = {
+    fields: {
+      name: '',
+      author: '',
+      description: '',
     },
-    right: {
-      pipetteName: '',
-      mount: 'right',
-      tiprackDefURI: [],
-      isSelected: false,
+    mountSide,
+    pipettesByMount: {
+      left: {
+        pipetteName: '',
+        mount: 'left',
+        tiprackDefURI: [],
+        isSelected: false,
+      },
+      right: {
+        pipetteName: '',
+        mount: 'right',
+        tiprackDefURI: [],
+        isSelected: false,
+      },
     },
-  },
-  modulesByType: {
-    [HEATERSHAKER_MODULE_TYPE]: {
-      onDeck: false,
-      model: HEATERSHAKER_MODULE_V1,
-      slot: '1',
+    modulesByType: {
+      [HEATERSHAKER_MODULE_TYPE]: {
+        onDeck: false,
+        model: HEATERSHAKER_MODULE_V1,
+        slot: '1',
+      },
+      [MAGNETIC_BLOCK_TYPE]: {
+        onDeck: false,
+        model: MAGNETIC_BLOCK_V1,
+        slot: '4',
+      },
+      [TEMPERATURE_MODULE_TYPE]: {
+        onDeck: false,
+        model: TEMPERATURE_MODULE_V2,
+        slot: '3',
+      },
+      [THERMOCYCLER_MODULE_TYPE]: {
+        onDeck: false,
+        model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
+        slot: SPAN7_8_10_11_SLOT,
+      },
     },
-    [MAGNETIC_BLOCK_TYPE]: {
-      onDeck: false,
-      model: MAGNETIC_BLOCK_V1,
-      slot: '4',
-    },
-    [TEMPERATURE_MODULE_TYPE]: {
-      onDeck: false,
-      model: TEMPERATURE_MODULE_V2,
-      slot: '3',
-    },
-    [THERMOCYCLER_MODULE_TYPE]: {
-      onDeck: false,
-      model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
-      slot: SPAN7_8_10_11_SLOT,
-    },
-  },
-}
+  }
 
-const getInitialValues = (values: any): InitialValues => {
   if (Boolean(values)) {
     const { formValues, instruments, modules } = values
     // Matching the form values
     initialFormValues.fields = {
+      ...initialFormValues.fields,
       name: formValues.protocolName,
       ...formValues,
     }
 
     // Matching the pipette values
-    initialFormValues.pipettesByMount.right.pipetteName =
-      instruments.right?.pipetteSpecs.name
     initialFormValues.pipettesByMount.left.pipetteName =
-      instruments.left?.pipetteSpecs.name
+      instruments.left?.pipetteSpecs?.name || ''
+    initialFormValues.pipettesByMount.right.pipetteName =
+      instruments.right?.pipetteSpecs?.name || ''
 
     // Matching the tip rack
-    initialFormValues.pipettesByMount.right.tiprackDefURI = instruments.right
-      ?.tiprackModel
-      ? [instruments.right.tiprackModel]
-      : []
-    initialFormValues.pipettesByMount.left.tiprackDefURI = instruments.left
-      ?.tiprackModel
-      ? [instruments.left.tiprackModel]
-      : []
+    initialFormValues.pipettesByMount.left.tiprackDefURI =
+      matchingTiprackLeft || []
+    initialFormValues.pipettesByMount.right.tiprackDefURI =
+      matchingTiprackRight || []
 
     // Matching the module values
-    if (modules.heaterShakerModuleType) {
-      initialFormValues.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck = true
-      initialFormValues.modulesByType[HEATERSHAKER_MODULE_TYPE].model =
-        modules.heaterShakerModuleType.model
-      initialFormValues.modulesByType[HEATERSHAKER_MODULE_TYPE].slot =
-        modules.heaterShakerModuleType.slot
+    const moduleMappings = {
+      heaterShakerModuleType: HEATERSHAKER_MODULE_TYPE,
+      magneticModuleType: MAGNETIC_BLOCK_TYPE,
+      temperatureModuleType: TEMPERATURE_MODULE_TYPE,
+      thermocyclerModuleType: THERMOCYCLER_MODULE_TYPE,
     }
 
-    if (values.modules.magneticModuleType) {
-      initialFormValues.modulesByType[MAGNETIC_BLOCK_TYPE].onDeck = true
-      initialFormValues.modulesByType[MAGNETIC_BLOCK_TYPE].model =
-        values.modules.magneticModuleType.model
-      initialFormValues.modulesByType[MAGNETIC_BLOCK_TYPE].slot =
-        values.modules.magneticModuleType.slot
-    }
+    Object.entries(moduleMappings).forEach(([moduleKey, moduleType]) => {
+      if (modules[moduleKey]) {
+        const module = modules[moduleKey]
+        initialFormValues.modulesByType[moduleType].onDeck = true
+        initialFormValues.modulesByType[moduleType].model = module.model
+        initialFormValues.modulesByType[moduleType].slot = module.slot
+      }
+    })
 
-    if (modules.temperatureModuleType) {
-      initialFormValues.modulesByType[TEMPERATURE_MODULE_TYPE].onDeck = true
-      initialFormValues.modulesByType[TEMPERATURE_MODULE_TYPE].model =
-        modules.temperatureModuleType.model
-      initialFormValues.modulesByType[TEMPERATURE_MODULE_TYPE].slot =
-        modules.temperatureModuleType.slot
-    }
-
-    if (modules.thermocyclerModuleType) {
-      initialFormValues.modulesByType[THERMOCYCLER_MODULE_TYPE].onDeck = true
-      initialFormValues.modulesByType[THERMOCYCLER_MODULE_TYPE].model =
-        modules.thermocyclerModuleType.model
-      initialFormValues.modulesByType[THERMOCYCLER_MODULE_TYPE].slot =
-        modules.thermocyclerModuleType.slot
-    }
-
-    return initialFormValues
-  } else {
     return initialFormValues
   }
+
+  return initialFormValues
 }
 
 interface selectedTabProps {
@@ -251,6 +238,10 @@ const SelectComponent = (selectedTab: number): JSX.Element | null => {
   }
 }
 
+const getTiprackValue = (tiprackName: string, tiprackOptions: any[]): any[] =>
+  tiprackOptions
+    .filter(tiprack => tiprackName?.includes(tiprack.name))
+    .map(tiprack => tiprack.value)
 function FlexProtocolEditor({
   isEditValue,
   tabIdValue,
@@ -261,6 +252,22 @@ function FlexProtocolEditor({
   const [selectedTab, setTab] = useState<number>(0)
   const [redirectToDetails, setRedirectToDetails] = useState(false)
   const [isEdit, setEdit] = useState(false)
+  const [matchingTiprackLeft, setMatchingTiprackLeft] = useState<string[]>([])
+  const [matchingTiprackRight, setMatchingTiprackRight] = useState<string[]>([])
+
+  const allLabware = useSelector(getLabwareDefsByURI)
+
+  const rightTiprackNames = formProps?.instruments?.right?.tiprackModel
+  const leftTiprackNames = formProps?.instruments?.left?.tiprackModel
+
+  useEffect(() => {
+    const newTiprackOptions = getFlexTiprackOptions(allLabware)
+    setMatchingTiprackLeft(getTiprackValue(leftTiprackNames, newTiprackOptions))
+    setMatchingTiprackRight(
+      getTiprackValue(rightTiprackNames, newTiprackOptions)
+    )
+  }, [allLabware, leftTiprackNames, rightTiprackNames])
+
   useEffect(() => {
     if (isEditValue) {
       setEdit(isEditValue)
@@ -270,11 +277,15 @@ function FlexProtocolEditor({
 
   // Next button click
   const handleNext = ({ selectedTab }: selectedTabProps): any => {
-    const setTabNumber =
-      selectedTab >= 0 && selectedTab <= navPillTabListLength
-        ? selectedTab + 1
-        : selectedTab
-    setTab(setTabNumber)
+    if (isEdit) {
+      return <FlexFileDetails />
+    } else {
+      const setTabNumber =
+        selectedTab >= 0 && selectedTab <= navPillTabListLength
+          ? selectedTab + 1
+          : selectedTab
+      setTab(setTabNumber)
+    }
   }
 
   // Previous button click
@@ -298,7 +309,7 @@ function FlexProtocolEditor({
 
   const handleSubmit = ({ values }: any): void => {
     const newProtocolFields = values.fields
-    const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
+    let pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount: string): PipetteFieldsData[] => {
         assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
@@ -339,7 +350,11 @@ function FlexProtocolEditor({
           ]
         : acc
     }, [])
-    onSave({ modules, newProtocolFields, pipettes: [] })
+    pipettes = pipettes.filter(
+      item => item.name !== ('LEAVE_SECOND_EMPTY' as any)
+    )
+
+    onSave({ modules, newProtocolFields, pipettes })
     dispatch(
       setRobotType({ model: OT3_STANDARD_MODEL, deckId: OT3_STANDARD_DECKID })
     )
@@ -373,7 +388,11 @@ function FlexProtocolEditor({
           {
             <Formik
               enableReinitialize
-              initialValues={getInitialValues(formProps)}
+              initialValues={getInitialValues(
+                formProps,
+                matchingTiprackRight,
+                matchingTiprackLeft
+              )}
               validateOnChange={true}
               validationSchema={notOnFirstPage && validationSchema}
               onSubmit={values => {

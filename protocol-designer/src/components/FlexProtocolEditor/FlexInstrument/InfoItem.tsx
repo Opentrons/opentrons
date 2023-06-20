@@ -14,11 +14,15 @@ export interface InfoItemProps {
  */
 export function InfoItem(props: InfoItemProps): JSX.Element {
   const { title, value, className } = props
-
+  const values = Array.isArray(value) ? value : [value]
   return (
     <div className={className}>
       <h2 className={styles.title}>{title}</h2>
-      <span className={styles.value}>{value}</span>
+      {values.map((val, index) => (
+        <span key={index} className={styles.value}>
+          {val}
+        </span>
+      ))}
     </div>
   )
 }

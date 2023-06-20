@@ -23,6 +23,15 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
   const { displayCategory, channels } = pipetteSpecs || {}
   let imgSrc
   switch (displayCategory) {
+    case 'GEN3': {
+      imgSrc =
+        channels === 1
+          ? singleGEN2Src
+          : channels === 8
+          ? multiGEN2Src
+          : multiSrc
+      break
+    }
     case 'GEN2': {
       imgSrc = channels === 1 ? singleGEN2Src : multiGEN2Src
       break

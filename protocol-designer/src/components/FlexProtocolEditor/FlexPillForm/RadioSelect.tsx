@@ -83,7 +83,7 @@ export const RadioSelect = ({ pipetteName, pipetteType }: any): JSX.Element => {
   return (
     <RadioGroup
       name={pipetteName}
-      value={pipetteType}
+      value={pipetteType || 'LEAVE_SECOND_EMPTY'}
       options={newGroupedOptions}
       onChange={handleChange}
       onBlur={handleBlur}

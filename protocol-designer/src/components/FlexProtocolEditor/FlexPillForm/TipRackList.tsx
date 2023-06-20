@@ -40,17 +40,22 @@ interface formikContextProps {
 export const TipRackOptions = ({
   pipetteName,
   isLeft96ChannelSelected,
+  isLeaveMountEmpty,
 }: any): JSX.Element => {
   const dispatch = useDispatch()
   const allLabware = useSelector(getLabwareDefsByURI)
   const tiprackOptions = getFlexTiprackOptions(allLabware)
   const [selected, setSelected] = useState<string[]>([])
+  const [isLeaveMountEmptyStatus, setIsLeaveMountEmpty] = useState(true)
+  useEffect(() => {
+    setIsLeaveMountEmpty(isLeaveMountEmpty)
+  }, [isLeaveMountEmpty])
+
   const {
     values,
     errors,
     setFieldValue,
   } = useFormikContext<formikContextProps>()
-
   const customTiprackFilteredData = [...tiprackOptions].filter(
     (i: any) =>
       i.namespace !== 'opentrons' && i.namespace !== customTiprackOption.value
@@ -68,10 +73,12 @@ export const TipRackOptions = ({
     <>
       <section
         className={
-          pipetteName === pipetteSlot.left
-            ? styles.pb_10
-            : !isLeft96ChannelSelected
-            ? styles.pb_10
+          pipetteName === pipetteSlot.left ||
+          (!isLeaveMountEmptyStatus && pipetteName === pipetteSlot.left) ||
+          (!isLeft96ChannelSelected &&
+            !isLeaveMountEmptyStatus &&
+            !isLeaveMountEmptyStatus)
+            ? styles.margin_10
             : styles.disable_mount_option
         }
       >
@@ -172,7 +179,7 @@ function ShowCustomTiprackList({
   )
 }
 
-const getFlexTiprackOptions = (allLabware: any): any => {
+export const getFlexTiprackOptions = (allLabware: any): any => {
   type Values<T> = T[keyof T]
   const tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
     allLabware,

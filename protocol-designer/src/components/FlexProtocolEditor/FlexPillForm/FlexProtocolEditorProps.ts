@@ -102,7 +102,6 @@ export function mapDispatchToProps(dispatch: ThunkDispatch<any>): DP {
         pipettes.map(pipette => pipette.tiprackDefURI)
       )
       newTiprackModels.forEach(tiprackDefURI => {
-        console.log('typeof tiprackDefURI', tiprackDefURI)
         const tiprackDefURIData = [...tiprackDefURI]
         tiprackDefURIData.forEach((item: any) => {
           dispatch(

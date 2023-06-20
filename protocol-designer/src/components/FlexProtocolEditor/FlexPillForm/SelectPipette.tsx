@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import cx from 'classnames'
 import { Flex, RadioGroup } from '@opentrons/components'
 import { blockMount, pipetteSlot } from '../constant'
@@ -18,7 +18,9 @@ interface SelectPipetteOptionProps {
 interface formikContextProps {
   pipettesByMount: {
     [key: string]: {
+      tiprackDefURI: []
       pipetteName: string
+      isSelected: boolean
     }
   }
   pipette: any
@@ -36,11 +38,29 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
     pipettesByMount[pipetteName].pipetteName
   )
 
+  if (isLeft96ChannelSelected) {
+    values.pipettesByMount.right.pipetteName = ''
+    values.pipettesByMount.right.tiprackDefURI = []
+  } else if (
+    values.pipettesByMount?.right?.pipetteName === 'LEAVE_SECOND_EMPTY'
+  ) {
+    values.pipettesByMount.right.tiprackDefURI = []
+  }
+
+  const [isLeaveMountEmpty, setIsLeaveMountEmpty] = useState(true)
   useEffect(() => {
     if (pipetteSlot.left === pipetteName) {
       changeIs96Selected(is96ChannelSelected)
     }
   }, [pipetteSlot.left, pipetteName, changeIs96Selected, is96ChannelSelected])
+
+  useEffect(() => {
+    if (values.pipettesByMount?.right?.pipetteName === 'LEAVE_SECOND_EMPTY') {
+      setIsLeaveMountEmpty(true)
+    } else {
+      setIsLeaveMountEmpty(false)
+    }
+  }, [values.pipettesByMount, isLeaveMountEmpty])
 
   const className = cx({ disable_mount_option: is96ChannelSelected })
 
@@ -50,21 +70,21 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
       : i18n.t('flex.pipette_selection.choose_second_pipette')
   return (
     <div>
-      <Flex className={styles.pb_10}>
+      <Flex className={styles.margin_10}>
         <StyledText as={'h2'}>{pipetteHeaderText}</StyledText>
       </Flex>
       {
         <>
-          <StyledText as={'p'} className={styles.pb_10}>
+          <StyledText as={'p'} className={styles.margin_10}>
             {i18n.t('flex.pipette_selection.pipette_96_selection_note')}
           </StyledText>
           {/* Pipette Selection here */}
           <Flex
             className={
               pipetteName === pipetteSlot.left
-                ? styles.pb_10
+                ? styles.margin_10
                 : !isLeft96ChannelSelected
-                ? styles.pb_10
+                ? styles.margin_10
                 : styles.disable_mount_option
             }
           >
@@ -95,10 +115,11 @@ export const SelectPipetteOption: React.FC<SelectPipetteOptionProps> = ({
           )}
 
           <hr />
-          <div className={styles.pb_10}>
+          <div className={styles.margin_10}>
             <TipRackOptions
               pipetteName={pipetteName}
               isLeft96ChannelSelected={isLeft96ChannelSelected}
+              isLeaveMountEmpty={isLeaveMountEmpty}
             />
           </div>
         </>

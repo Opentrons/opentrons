@@ -56,7 +56,10 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
   const [isEdit, setEdit] = useState(false)
   const [selectedTabId, setTabId] = useState<number>(0)
   const existingModulesLength = getModuleData(props.modules).length
-
+  const HideAddButton =
+    !props.instruments?.left?.description.includes('Flex 96-Channel 1000 μL') &&
+    (props.instruments?.right === undefined ||
+      props.instruments?.right === null)
   if (isEdit) {
     return (
       <FlexProtocolEditorComponent
@@ -107,7 +110,7 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                         className={`${styles.heading_container} ${styles.margin_bottom}`}
                       >
                         <StyledText as="h3">
-                          {i18n.t('flex.file_tab.pipette')}
+                          {i18n.t('flex.instrument_selection.name')}
                         </StyledText>
                         <Flex>
                           {Object.keys(props.instruments).length !== 1 && (
@@ -130,6 +133,14 @@ export function FlexFileDetailsComponent(props: any): JSX.Element {
                       </div>
                       <div>
                         <InstrumentGroup {...props.instruments} />
+                        {HideAddButton && (
+                          <EditButton
+                            editProps={setEdit}
+                            setTab={1}
+                            setTabId={setTabId}
+                            addItems={true}
+                          />
+                        )}
                       </div>
                       <div className={styles.line_separator} />
 
