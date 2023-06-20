@@ -77,9 +77,6 @@ def test_get_pipette_static_config() -> None:
         "default_blow_out_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_dispense_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_aspirate_speeds": {"2.0": 5.021202, "2.6": 10.042404},
-        "fw_update_required": False,
-        "fw_current_version": 1,
-        "fw_next_version": None,
         "default_blow_out_volume": 10,
     }
 

@@ -11,6 +11,7 @@ import { CurrentRunningProtocolCommand } from '../CurrentRunningProtocolCommand'
 const mockPlayRun = jest.fn()
 const mockPauseRun = jest.fn()
 const mockShowModal = jest.fn()
+const mockUpdateLastAnimatedCommand = jest.fn()
 
 const mockRunTimer = {
   runStatus: RUN_STATUS_RUNNING,
@@ -42,6 +43,8 @@ describe('CurrentRunningProtocolCommand', () => {
       robotAnalyticsData: {} as any,
       protocolName: 'mockRunningProtocolName',
       currentRunCommandIndex: 0,
+      lastAnimatedCommand: null,
+      updateLastAnimatedCommand: mockUpdateLastAnimatedCommand,
     }
   })
 
@@ -73,6 +76,21 @@ describe('CurrentRunningProtocolCommand', () => {
     const button = getByLabelText('stop')
     fireEvent.click(button)
     expect(mockShowModal).toHaveBeenCalled()
+  })
+
+  it('updates the last animated command when it is not the current command', () => {
+    const [{ rerender }] = render(props)
+    expect(mockUpdateLastAnimatedCommand).toHaveBeenLastCalledWith('-113949561')
+    rerender(
+      <CurrentRunningProtocolCommand
+        {...props}
+        lastAnimatedCommand="-113949561"
+      />
+    ) // won't trigger an update because the key matches
+    const newProps = { ...props, lastAnimatedCommand: 'aNewCommandKey' }
+    rerender(<CurrentRunningProtocolCommand {...newProps} />)
+    expect(mockUpdateLastAnimatedCommand).toHaveBeenLastCalledWith('-113949561')
+    expect(mockUpdateLastAnimatedCommand).toHaveBeenCalledTimes(2)
   })
 
   // ToDo (kj:04/10/2023) once we fix the track event stuff, we can implement tests

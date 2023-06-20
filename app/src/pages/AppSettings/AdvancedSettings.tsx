@@ -32,7 +32,7 @@ import {
   getReachableRobots,
   getUnreachableRobots,
 } from '../../redux/discovery'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { SelectOption } from '../../atoms/SelectField/Select'
 import { SelectField } from '../../atoms/SelectField'
@@ -204,7 +204,7 @@ export function AdvancedSettings(): JSX.Element {
         >
           {showConfirmDeleteUnavailRobots ? (
             <Portal level="top">
-              <Modal
+              <LegacyModal
                 type="warning"
                 title={t('clear_unavailable_robots')}
                 onClose={cancelExit}
@@ -235,7 +235,7 @@ export function AdvancedSettings(): JSX.Element {
                     </AlertPrimaryButton>
                   </Flex>
                 </Flex>
-              </Modal>
+              </LegacyModal>
             </Portal>
           ) : null}
           <Flex flexDirection={DIRECTION_COLUMN}>

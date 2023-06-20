@@ -7,7 +7,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     WriteMotorCurrentRequest,
     GearWriteMotorCurrentRequest,
 )
-from opentrons_hardware.firmware_bindings.constants import ErrorCode
+from opentrons_hardware.firmware_bindings.constants import ErrorCode, NodeId
 from opentrons_hardware.firmware_bindings.utils import UInt32Field
 from .types import NodeMap, NodeList
 
@@ -34,6 +34,8 @@ async def set_currents(
 ) -> None:
     """Set hold current and run current for each node."""
     for node, currents in current_settings.items():
+        if node == NodeId.gripper_g:
+            continue
         motor_message = _motor_current_message_for(node in use_tip_motor_message_for)
         error = await can_messenger.ensure_send(
             node_id=node,

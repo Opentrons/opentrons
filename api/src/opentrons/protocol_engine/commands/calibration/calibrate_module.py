@@ -67,7 +67,7 @@ class CalibrateModuleImplementation(
             self._hardware_api,
         )
         ot3_mount = OT3Mount.from_mount(params.mount)
-        slot = self._state_view.modules.get_location(params.moduleId).slotName.as_int()
+        slot = self._state_view.modules.get_location(params.moduleId).slotName.id
         module_serial = self._state_view.modules.get_serial_number(params.moduleId)
         # NOTE (ba, 2023-03-31): There are two wells for calibration labware definitions
         # well A1 represents the location calibration square center relative to the adapters bottom-left corner

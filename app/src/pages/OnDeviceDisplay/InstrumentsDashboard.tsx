@@ -15,26 +15,46 @@ export const InstrumentsDashboard = (): JSX.Element => {
     | null
   >(null)
 
+  const leftInstrument =
+    (attachedInstruments?.data ?? []).find(i => i.mount === 'left') ?? null
+  // @ts-expect-error mount is a type narrower that ensures channels will exist
+  const isNinetySixChannel = leftInstrument?.data?.channels === 96
+
   return (
     <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <AttachedInstrumentMountItem
-          mount="left"
-          attachedInstrument={
-            (attachedInstruments?.data ?? []).find(i => i.mount === 'left') ??
-            null
-          }
-          setWizardProps={setWizardProps}
-        />
-        <AttachedInstrumentMountItem
-          mount="right"
-          attachedInstrument={
-            (attachedInstruments?.data ?? []).find(i => i.mount === 'right') ??
-            null
-          }
-          setWizardProps={setWizardProps}
-        />
+        {isNinetySixChannel ? (
+          <AttachedInstrumentMountItem
+            mount="left"
+            attachedInstrument={
+              (attachedInstruments?.data ?? []).find(i => i.mount === 'left') ??
+              null
+            }
+            setWizardProps={setWizardProps}
+          />
+        ) : (
+          <>
+            <AttachedInstrumentMountItem
+              mount="left"
+              attachedInstrument={
+                (attachedInstruments?.data ?? []).find(
+                  i => i.mount === 'left'
+                ) ?? null
+              }
+              setWizardProps={setWizardProps}
+            />
+            <AttachedInstrumentMountItem
+              mount="right"
+              attachedInstrument={
+                (attachedInstruments?.data ?? []).find(
+                  i => i.mount === 'right'
+                ) ?? null
+              }
+              setWizardProps={setWizardProps}
+            />
+          </>
+        )}
         <AttachedInstrumentMountItem
           mount="extension"
           attachedInstrument={
