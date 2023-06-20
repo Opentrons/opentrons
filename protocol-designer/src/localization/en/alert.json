@@ -112,15 +112,15 @@
       },
       "THERMOCYCLER_LID_CLOSED": {
         "title": "Thermocycler lid is closed",
-        "body": "Before a pipette can interact with labware in the Thermocycler, the lid must be open. To resolve this error, please add a thermocycler step ahead of the current step, and set the lid status to \"open\"."
+        "body": "Before the robot can interact with labware in the Thermocycler, the lid must be open. To resolve this error, please add a thermocycler step ahead of the current step, and set the lid status to \"open\"."
       },
       "HEATER_SHAKER_LATCH_OPEN": {
         "title": "Heater-Shaker labware latch is open",
-        "body": "Before a pipette can interact with labware on the Heater-Shaker module, the labware latch must be closed. To resolve this error, please add a Heater-Shaker step ahead of the current step, and set the labware latch status to \"closed\"."
+        "body": "Before the robot can interact with labware on the Heater-Shaker module, the labware latch must be closed. To resolve this error, please add a Heater-Shaker step ahead of the current step, and set the labware latch status to \"closed\"."
       },
       "HEATER_SHAKER_IS_SHAKING": {
         "title": "Heater-Shaker is shaking",
-        "body": "A pipette cannot interact with labware on the Heater-Shaker Module while it is shaking."
+        "body": "the robot cannot interact with labware on the Heater-Shaker Module while it is shaking."
       },
       "TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER": {
         "body": "The Heater-Shaker labware latch will collide with labware over 53 mm. Move labware to a different slot."

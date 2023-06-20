@@ -1,7 +1,7 @@
 """Gravimetric OT3."""
 from opentrons.protocol_api import ProtocolContext
 
-metadata = {"protocolName": "gravimetric-ot3-p50"}
+metadata = {"protocolName": "gravimetric-ot3-p50-single"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOT_SCALE = 4
