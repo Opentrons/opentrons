@@ -519,15 +519,16 @@ class ProtocolContext(CommandPublisher):
         by using :py:attr:`loaded_modules`.
 
         :param str module_name: The name or model of the module.
+            See :ref:`available_modules` for possible values.
 
         :param location: The location of the module.
 
             This is usually the name or number of the slot on the deck where you
             will be placing the module, like ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
 
-            Some modules, like the Thermocycler, are only valid in one deck location.
-            You do not have to specify a location when loading a Thermocycler---it will always
-            be in Slot 7.
+            The Thermocycler is only valid in one deck location.
+            You don't have to specify a location when loading it, but if you do,
+            it must be ``7``, ``"7"``, or ``"B1"``. See :ref:`thermocycler-module`.
 
             .. versionchanged:: 2.15
                 You can now specify a deck slot as a coordinate, like ``"D1"``.
