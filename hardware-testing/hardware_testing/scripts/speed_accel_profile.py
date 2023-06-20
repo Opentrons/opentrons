@@ -25,6 +25,7 @@ BASE_DIRECTORY = "/userfs/data/testing_data/speed_accel_profile/"
 SAVE_NAME = "speed_test_output_"
 
 CYCLES = 1
+ENCODER_DELAY = 100 #milliseconds
 
 TEST_LIST: Dict[str, list] = {}
 
@@ -238,10 +239,12 @@ async def _single_axis_move(
 
     # move away from the limit switch before cycling
     await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
+    time.sleep(ENCODER_DELAY) #let postition settle
 
     for c in range(cycles):
         # move away from homed position
-        inital_pos = await api.encoder_current_position_ot3(mount=MOUNT)
+        inital_pos = await api.encoder_current_position_ot3(mount=MOUNT,
+                                                            refresh=True)
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
 
         print("Executing Move: " + str(c))
@@ -252,7 +255,9 @@ async def _single_axis_move(
         await api.move_rel(mount=MOUNT, delta=NEG_POINT_MAP[axis], speed=cur_speed)
 
         # check if we moved to correct position with encoder
-        move_pos = await api.encoder_current_position_ot3(mount=MOUNT)
+        time.sleep(ENCODER_DELAY) #let postition settle
+        move_pos = await api.encoder_current_position_ot3(mount=MOUNT,
+                                                            refresh=True)
         print("inital_pos: " + str(inital_pos))
         print("mov_pos: " + str(move_pos))
         delta_move_pos = get_pos_delta(move_pos, inital_pos)
@@ -290,12 +295,15 @@ async def _single_axis_move(
             return (move_error, c)
 
         # record the current position
-        inital_pos = await api.encoder_current_position_ot3(mount=MOUNT)
+        inital_pos = await api.encoder_current_position_ot3(mount=MOUNT,
+                                                            refresh=True)
 
         # move back to near homed position
         await api.move_rel(mount=MOUNT, delta=POINT_MAP[axis], speed=cur_speed)
 
-        final_pos = await api.encoder_current_position_ot3(mount=MOUNT)
+        time.sleep(ENCODER_DELAY) #let postition settle
+        final_pos = await api.encoder_current_position_ot3(mount=MOUNT,
+                                                            refresh=True)
         delta_pos = get_pos_delta(final_pos, inital_pos)
         delta_pos_axis = delta_pos[AXIS_MAP[axis]]
         move_error = check_move_error(delta_pos_axis, POINT_MAP[axis], axis)
@@ -322,6 +330,7 @@ async def _single_axis_move(
             await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
             # move away from the limit switch before cycling
             await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
+            time.sleep(ENCODER_DELAY) #let postition settle
 
     if DELAY > 0:
         time.sleep(DELAY)
