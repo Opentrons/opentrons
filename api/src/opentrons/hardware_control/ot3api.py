@@ -28,10 +28,13 @@ from opentrons.hardware_control.modules.module_calibration import (
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
 from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs, ot3_pipette_config
+from opentrons.config import robot_configs
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -546,7 +549,7 @@ class OT3API(
             # TODO (lc 12-5-2022) cache instruments should be receiving
             # a pipette type / channels rather than the named config.
             # We should also check version here once we're comfortable.
-            if not ot3_pipette_config.supported_pipette(name):
+            if not pipette_load_name.supported_pipette(name):
                 raise RuntimeError(f"{name} is not a valid pipette name")
         async with self._motion_lock:
             # we're not actually checking the required instrument except in the context

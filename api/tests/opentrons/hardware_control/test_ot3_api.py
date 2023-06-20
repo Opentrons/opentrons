@@ -61,12 +61,15 @@ from opentrons.types import Point, Mount
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
-from opentrons.config import gripper_config as gc, ot3_pipette_config
+from opentrons.config import gripper_config as gc
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteModelType,
     PipetteChannelType,
     PipetteVersionType,
+)
+from opentrons_shared_data.pipette import (
+    load_data as load_pipette_data,
 )
 
 
@@ -346,12 +349,10 @@ async def test_gantry_load_transform(
             instr_data = AttachedGripper(config=gripper_config, id="2345")
             await ot3_hardware.cache_gripper(instr_data)
         else:
-            pipette_config = ot3_pipette_config.load_ot3_pipette(
-                ot3_pipette_config.PipetteModelVersionType(
-                    PipetteModelType(configs["model"]),
-                    PipetteChannelType(configs["channels"]),
-                    PipetteVersionType(*configs["version"]),
-                )
+            pipette_config = load_pipette_data.load_definition(
+                PipetteModelType(configs["model"]),
+                PipetteChannelType(configs["channels"]),
+                PipetteVersionType(*configs["version"]),
             )
             instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
             await ot3_hardware.cache_pipette(mount, instr_data, None)
@@ -439,12 +440,10 @@ async def prepare_for_mock_blowout(
     mount: OT3Mount,
     configs: Any,
 ) -> Tuple[Any, ThreadManager[OT3API]]:
-    pipette_config = ot3_pipette_config.load_ot3_pipette(
-        ot3_pipette_config.PipetteModelVersionType(
-            PipetteModelType(configs["model"]),
-            PipetteChannelType(configs["channels"]),
-            PipetteVersionType(*configs["version"]),
-        )
+    pipette_config = load_pipette_data.load_definition(
+        PipetteModelType(configs["model"]),
+        PipetteChannelType(configs["channels"]),
+        PipetteVersionType(*configs["version"]),
     )
     instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
     await ot3_hardware.cache_pipette(mount, instr_data, None)
@@ -1059,12 +1058,8 @@ async def test_home_plunger(
 ):
     mount = OT3Mount.LEFT
     instr_data = OT3AttachedPipette(
-        config=ot3_pipette_config.load_ot3_pipette(
-            ot3_pipette_config.PipetteModelVersionType(
-                PipetteModelType("p1000"),
-                PipetteChannelType(1),
-                PipetteVersionType(3, 4),
-            )
+        config=load_pipette_data.load_definition(
+            PipetteModelType("p1000"), PipetteChannelType(1), PipetteVersionType(3, 4)
         ),
         id="fakepip",
     )
@@ -1082,12 +1077,10 @@ async def test_prepare_for_aspirate(
 ):
     mount = OT3Mount.LEFT
     instr_data = OT3AttachedPipette(
-        config=ot3_pipette_config.load_ot3_pipette(
-            ot3_pipette_config.PipetteModelVersionType(
-                PipetteModelType("p1000"),
-                PipetteChannelType(1),
-                PipetteVersionType(3, 4),
-            )
+        config=load_pipette_data.load_definition(
+            PipetteModelType("p1000"),
+            PipetteChannelType(1),
+            PipetteVersionType(3, 4),
         ),
         id="fakepip",
     )
@@ -1105,12 +1098,8 @@ async def test_move_to_plunger_bottom(
 ):
     mount = OT3Mount.LEFT
     instr_data = OT3AttachedPipette(
-        config=ot3_pipette_config.load_ot3_pipette(
-            ot3_pipette_config.PipetteModelVersionType(
-                PipetteModelType("p1000"),
-                PipetteChannelType(1),
-                PipetteVersionType(3, 4),
-            )
+        config=load_pipette_data.load_definition(
+            PipetteModelType("p1000"), PipetteChannelType(1), PipetteVersionType(3, 4)
         ),
         id="fakepip",
     )
