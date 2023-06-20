@@ -12,6 +12,7 @@
   "cancel_run_module_info": "Additionally, any hardware modules used within the protocol will remain active and maintain their current states until deactivated.",
   "cancel_run": "Cancel run",
   "canceling_run": "Canceling Run",
+  "canceling_run_dot": "canceling run...",
   "clear_protocol_to_make_available": "Clear protocol from robot to make it available.",
   "clear_protocol": "Clear protocol",
   "close_door_to_resume": "Close robot door to resume run",

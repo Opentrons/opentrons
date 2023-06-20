@@ -39,6 +39,7 @@ import {
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
 } from '../../organisms/Devices/hooks'
+import { CancelingRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '../../redux/discovery'
 
@@ -130,6 +131,7 @@ export function RunningProtocol(): JSX.Element {
             }
           />
         ) : null}
+        {runStatus === 'stop-requested' ? <CancelingRunModal /> : null}
         {showConfirmCancelRunModal ? (
           <ConfirmCancelRunModal
             runId={runId}
