@@ -25,7 +25,9 @@ BASE_DIRECTORY = "/userfs/data/testing_data/speed_accel_profile/"
 SAVE_NAME = "speed_test_output_"
 
 CYCLES = 1
-ENCODER_DELAY = 100 #milliseconds
+ENCODER_DELAY = 0.1 #seconds
+ENCODER_REFRESH = True
+ERROR_THRESHOLD = 0.1 #mm
 
 TEST_LIST: Dict[str, list] = {}
 
@@ -37,9 +39,9 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
             "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
         },
         "Y": {
-            "SPEED": {"MIN": 275, "MAX": 375, "INC": 75},
-            "ACCEL": {"MIN": 500, "MAX": 700, "INC": 100},
-            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
+            "SPEED": {"MIN": 225, "MAX": 375, "INC": 75},
+            "ACCEL": {"MIN": 500, "MAX": 800, "INC": 100},
+            "CURRENT": {"MIN": 0.5, "MAX": 1.5, "INC": 0.25},
         },
         "L": {
             "SPEED": {"MIN": 40, "MAX": 140, "INC": 30},
@@ -232,19 +234,19 @@ def get_move_correction(actual_move: float, axis: str, direction: int) -> Point:
 
 async def _single_axis_move(
     axis: str, api: OT3API, cycles: int = 1
-) -> Tuple[float, int]:
+) -> list:
     """Move and check error of single axis."""
     avg_error = []
     MOUNT = MOUNT_MAP[axis]
 
     # move away from the limit switch before cycling
     await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
-    time.sleep(ENCODER_DELAY) #let postition settle
+    time.sleep(ENCODER_DELAY*2) #let postition settle
 
     for c in range(cycles):
         # move away from homed position
         inital_pos = await api.encoder_current_position_ot3(mount=MOUNT,
-                                                            refresh=True)
+                                                            refresh=ENCODER_REFRESH)
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
 
         print("Executing Move: " + str(c))
@@ -257,7 +259,7 @@ async def _single_axis_move(
         # check if we moved to correct position with encoder
         time.sleep(ENCODER_DELAY) #let postition settle
         move_pos = await api.encoder_current_position_ot3(mount=MOUNT,
-                                                            refresh=True)
+                                                            refresh=ENCODER_REFRESH)
         print("inital_pos: " + str(inital_pos))
         print("mov_pos: " + str(move_pos))
         delta_move_pos = get_pos_delta(move_pos, inital_pos)
@@ -265,7 +267,10 @@ async def _single_axis_move(
         move_error = check_move_error(delta_move_axis, NEG_POINT_MAP[axis], axis)
         # if we had error in the move stop move
         print(axis + " Error: " + str(move_error))
-        if move_error >= 0.1:
+
+        avg_error.append(abs(move_error))
+        output_list = [sum(avg_error) / len(avg_error), c, max(avg_error)]
+        if move_error >= ERROR_THRESHOLD:
             # attempt to move closer to the home position quickly
             move_error_correction = get_move_correction(delta_move_axis, axis, -1)
             print()
@@ -292,23 +297,26 @@ async def _single_axis_move(
             if axis == "G":
                 await api.home([OT3Axis.Z_G])
             await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
-            return (move_error, c)
+            return output_list
 
         # record the current position
         inital_pos = await api.encoder_current_position_ot3(mount=MOUNT,
-                                                            refresh=True)
+                                                            refresh=ENCODER_REFRESH)
 
         # move back to near homed position
         await api.move_rel(mount=MOUNT, delta=POINT_MAP[axis], speed=cur_speed)
 
         time.sleep(ENCODER_DELAY) #let postition settle
         final_pos = await api.encoder_current_position_ot3(mount=MOUNT,
-                                                            refresh=True)
+                                                            refresh=ENCODER_REFRESH)
         delta_pos = get_pos_delta(final_pos, inital_pos)
         delta_pos_axis = delta_pos[AXIS_MAP[axis]]
         move_error = check_move_error(delta_pos_axis, POINT_MAP[axis], axis)
         print(axis + " Error: " + str(move_error))
-        if abs(move_error) >= 0.1:
+
+        avg_error.append(abs(move_error))
+        output_list = [sum(avg_error) / len(avg_error), c, max(avg_error)]
+        if abs(move_error) >= ERROR_THRESHOLD:
             print()
             print("**************************************")
             print("ERROR IN POS MOVE")
@@ -319,9 +327,7 @@ async def _single_axis_move(
             if axis == "G":
                 await api.home([OT3Axis.Z_G])
             await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
-            return (move_error, c)
-        else:
-            avg_error.append(move_error)
+            return output_list
 
         # home every 50 cycles in case we have drifted
         if (c + 1) % 50 == 0:
@@ -330,12 +336,13 @@ async def _single_axis_move(
             await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
             # move away from the limit switch before cycling
             await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
-            time.sleep(ENCODER_DELAY) #let postition settle
+            time.sleep(ENCODER_DELAY*2) #let postition settle
 
     if DELAY > 0:
         time.sleep(DELAY)
 
-    return (sum(avg_error) / len(avg_error), c + 1)
+    output_list = [sum(avg_error) / len(avg_error), c + 1, max(avg_error)]
+    return output_list
 
 
 async def match_z_settings(
@@ -352,6 +359,31 @@ async def match_z_settings(
 
     return True
 
+def save_table(test_axis_list: list, file_suffix: str, results: np.ndarray, data_round: int) -> None:
+    """Saves output to a table format."""
+    for test_axis in test_axis_list:
+        with open(
+            BASE_DIRECTORY + SAVE_NAME + test_axis + "_" + file_suffix + ".csv", mode="w"
+        ) as csv_file:
+            fieldnames = ["Current", "Speed"] + [
+                *parameter_range(LOAD, test_axis, "ACCEL")
+            ]
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            writer.writerow({"Current": LOAD})
+            writer.writerow({"Current": test_axis})
+            writer.writerow({"Speed": "Acceleration"})
+            writer.writeheader()
+            for c in parameter_range(LOAD, test_axis, "CURRENT"):
+                for s in parameter_range(LOAD, test_axis, "SPEED"):
+                    td = {"Current": c, "Speed": s}
+                    c_i = round(TABLE_RESULTS_KEY[test_axis][c], 3)
+                    s_i = TABLE_RESULTS_KEY[test_axis][s]
+                    for a in parameter_range(LOAD, test_axis, "ACCEL"):
+                        a_i = TABLE_RESULTS_KEY[test_axis][a]
+                        val = round(results[test_axis][c_i][s_i][a_i], data_round)
+                        td.update({a: val})
+
+                    writer.writerow(td)
 
 async def _main(is_simulating: bool) -> None:
     """Main run function."""
@@ -362,23 +394,27 @@ async def _main(is_simulating: bool) -> None:
     await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     try:
         # #run the test while recording raw results
-        table_results = {}
+        results_cycles = {}
+        results_error = {}
+        results_max_error = {}
 
         # check if directory exists, make if doesn't
         if not os.path.exists(BASE_DIRECTORY):
             os.makedirs(BASE_DIRECTORY)
 
+        test_axis_list = list(AXIS)
         with open(BASE_DIRECTORY + SAVE_NAME + AXIS + ".csv", mode="w") as csv_file:
             fieldnames = ["axis", "current", "speed", "acceleration", "error", "cycles"]
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             writer.writeheader()
 
-            test_axis_list = list(AXIS)
             for test_axis in test_axis_list:
                 c_len = len(parameter_range(LOAD, test_axis, "CURRENT"))
                 s_len = len(parameter_range(LOAD, test_axis, "SPEED"))
                 a_len = len(parameter_range(LOAD, test_axis, "ACCEL"))
-                table_results[test_axis] = np.zeros((c_len, s_len, a_len))
+                results_cycles[test_axis] = np.zeros((c_len, s_len, a_len))
+                results_error[test_axis] = np.zeros((c_len, s_len, a_len))
+                results_max_error[test_axis] = np.zeros((c_len, s_len, a_len))
 
                 axis_parameters = TEST_LIST[test_axis]
                 print("Testing Axis: " + test_axis)
@@ -405,17 +441,20 @@ async def _main(is_simulating: bool) -> None:
                     # await api.home([AXIS_MAP[test_axis]])
                     print("HOMING")
                     await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
-                    move_output_tuple = await _single_axis_move(
+                    move_output_list = await _single_axis_move(
                         test_axis, api, cycles=CYCLES
                     )
-                    run_avg_error = move_output_tuple[0]
-                    cycles_completed = move_output_tuple[1]
+                    run_avg_error = move_output_list[0]
+                    cycles_completed = move_output_list[1]
+                    max_error = move_output_list[2]
 
                     # #record results to dictionary for neat formatting later
-                    c_i = table_results_key[test_axis][p["CURRENT"]]
-                    s_i = table_results_key[test_axis][p["SPEED"]]
-                    a_i = table_results_key[test_axis][p["ACCEL"]]
-                    table_results[test_axis][c_i][s_i][a_i] = cycles_completed
+                    c_i = TABLE_RESULTS_KEY[test_axis][p["CURRENT"]]
+                    s_i = TABLE_RESULTS_KEY[test_axis][p["SPEED"]]
+                    a_i = TABLE_RESULTS_KEY[test_axis][p["ACCEL"]]
+                    results_cycles[test_axis][c_i][s_i][a_i] = cycles_completed
+                    results_error[test_axis][c_i][s_i][a_i] = run_avg_error
+                    results_max_error[test_axis][c_i][s_i][a_i] = max_error
 
                     # record results of cycles to raw csv
                     print("Cycles complete")
@@ -435,33 +474,15 @@ async def _main(is_simulating: bool) -> None:
                     )
 
         # create tableized output csv for neat presentation
-        # print(table_results)
-        test_axis_list = list(AXIS)
-        for test_axis in test_axis_list:
-            with open(
-                BASE_DIRECTORY + SAVE_NAME + test_axis + "_table.csv", mode="w"
-            ) as csv_file:
-                fieldnames = ["Current", "Speed"] + [
-                    *parameter_range(LOAD, test_axis, "ACCEL")
-                ]
-                # print(fieldnames)
-                writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-                writer.writerow({"Current": LOAD})
-                writer.writerow({"Current": test_axis})
-                writer.writerow({"Speed": "Acceleration"})
-                writer.writeheader()
-                for c in parameter_range(LOAD, test_axis, "CURRENT"):
-                    for s in parameter_range(LOAD, test_axis, "SPEED"):
-                        td = {"Current": c, "Speed": s}
-                        c_i = table_results_key[test_axis][c]
-                        s_i = table_results_key[test_axis][s]
-                        for a in parameter_range(LOAD, test_axis, "ACCEL"):
-                            a_i = table_results_key[test_axis][a]
-                            val = table_results[test_axis][c_i][s_i][a_i]
-                            td.update({a: val})
+        # output for cycles completed
+        save_table(test_axis_list, "cycles", results_cycles, 0)
 
-                        writer.writerow(td)
-                # print(table_results[test_axis])
+        # #output for average error
+        save_table(test_axis_list, "error", results_error, 3)
+
+        # #output for average error
+        save_table(test_axis_list, "max_error", results_max_error, 3)
+
 
     except KeyboardInterrupt:
         disengage_list = [AXIS_MAP[x] for x in list(AXIS)]
@@ -484,7 +505,7 @@ def parameter_range(test_load: GantryLoad, test_axis: str, p_type: str) -> np.nd
         return np.arange(start, stop, step)
 
 
-table_results_key: Dict[str, Dict[float, int]] = {}
+TABLE_RESULTS_KEY: Dict[str, Dict[float, int]] = {}
 
 
 # dictionary containing lists of all speed/accel/current combinations to for each axis
@@ -494,20 +515,20 @@ def make_test_list(test_axis: list, test_load: GantryLoad) -> Dict[str, list]:
     complete_test_list: Dict[str, list] = {}
     for axis_t in test_axis:
         axis_test_list = []
-        table_results_key[axis_t] = {}
+        TABLE_RESULTS_KEY[axis_t] = {}
         c_i = 0
         s_i = 0
         a_i = 0
         for current_t in parameter_range(test_load, axis_t, "CURRENT"):
-            table_results_key[axis_t][current_t] = c_i
+            TABLE_RESULTS_KEY[axis_t][current_t] = c_i
             c_i = c_i + 1
             s_i = 0
             for speed_t in parameter_range(test_load, axis_t, "SPEED"):
-                table_results_key[axis_t][speed_t] = s_i
+                TABLE_RESULTS_KEY[axis_t][speed_t] = s_i
                 s_i = s_i + 1
                 a_i = 0
                 for accel_t in parameter_range(test_load, axis_t, "ACCEL"):
-                    table_results_key[axis_t][accel_t] = a_i
+                    TABLE_RESULTS_KEY[axis_t][accel_t] = a_i
                     a_i = a_i + 1
                     axis_test_list.append(
                         {"CURRENT": current_t, "SPEED": speed_t, "ACCEL": accel_t}
