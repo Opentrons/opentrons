@@ -28,7 +28,7 @@ export function TitleHeader({ title }: TitleHeaderProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
-      marginBottom={SPACING.spacing32}
+      marginBottom={SPACING.spacing40}
       position={POSITION_RELATIVE}
     >
       <Btn

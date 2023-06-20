@@ -7,6 +7,7 @@
   "step_description": {
     "mix": "Mix contents of wells/tubes.",
     "pause": "Enable pause within protocol.",
+    "moveLabware": "Move labware to and from deck slot and module locations.",
     "moveLiquid": "Move liquid to and from wells/tubes.",
     "magnet": "Engage or disengage the Magnetic module.",
     "temperature": "Set temperature command for Temperature module.",

@@ -22,6 +22,7 @@ from ..types import (
     CurrentWell,
     TipGeometry,
 )
+from .config import Config
 from .labware import LabwareView
 from .modules import ModuleView
 from .pipettes import PipetteView
@@ -34,11 +35,13 @@ class GeometryView:
 
     def __init__(
         self,
+        config: Config,
         labware_view: LabwareView,
         module_view: ModuleView,
         pipette_view: PipetteView,
     ) -> None:
         """Initialize a GeometryView instance."""
+        self._config = config
         self._labware = labware_view
         self._modules = module_view
         self._pipettes = pipette_view
@@ -103,8 +106,8 @@ class GeometryView:
         elif labware_data.location == OFF_DECK_LOCATION:
             # Labware is off-deck
             raise errors.LabwareNotOnDeckError(
-                f"Labware {labware_id} does not have a parent associated with it"
-                f" since it is no longer on the deck."
+                f"Cannot access labware {labware_id} since it is not on the deck. "
+                f"Either it has been loaded off-deck or its been moved off-deck."
             )
 
         slot_pos = self._labware.get_slot_position(slot_name)
@@ -374,10 +377,13 @@ class GeometryView:
             from_slot=self.get_ancestor_slot_name(location.labware_id),
             to_slot=self.get_ancestor_slot_name(labware_id),
         ):
-            slot_5_center = self._labware.get_slot_center_position(
-                slot=DeckSlotName.SLOT_5
+            middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
+                self._config.robot_type
             )
-            return [(slot_5_center.x, slot_5_center.y)]
+            middle_slot_center = self._labware.get_slot_center_position(
+                slot=middle_slot,
+            )
+            return [(middle_slot_center.x, middle_slot_center.y)]
         return []
 
     # TODO(mc, 2022-12-09): enforce data integrity (e.g. one module per slot)

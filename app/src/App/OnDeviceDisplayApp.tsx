@@ -16,6 +16,7 @@ import { ApiHostProvider } from '@opentrons/react-api-client'
 import { BackButton } from '../atoms/buttons'
 import { SleepScreen } from '../atoms/SleepScreen'
 import { ToasterOven } from '../organisms/ToasterOven'
+import { MaintenanceRunTakeover } from '../organisms/TakeoverModal'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
@@ -25,7 +26,7 @@ import { ProtocolSetup } from '../pages/OnDeviceDisplay/ProtocolSetup'
 import { TempODDMenu } from '../pages/OnDeviceDisplay/TempODDMenu'
 import { RobotDashboard } from '../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../pages/OnDeviceDisplay/RobotSettingsDashboard'
-import { ProtocolDashboard } from '../pages/OnDeviceDisplay/ProtocolDashboard'
+import { ProtocolDashboard } from '../pages/ProtocolDashboard'
 import { ProtocolDetails } from '../pages/OnDeviceDisplay/ProtocolDetails'
 import { RunningProtocol } from '../pages/OnDeviceDisplay/RunningProtocol'
 import { RunSummary } from '../pages/OnDeviceDisplay/RunSummary'
@@ -37,7 +38,7 @@ import { InitialLoadingScreen } from '../pages/OnDeviceDisplay/InitialLoadingScr
 import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { SLEEP_NEVER_MS } from './constants'
-import { useCurrentRunRoute } from './hooks'
+import { useCurrentRunRoute, useProtocolReceiptToast } from './hooks'
 
 import type { Dispatch } from '../redux/types'
 import type { RouteProps } from './types'
@@ -246,26 +247,29 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   return (
     <ApiHostProvider hostname="localhost">
       <Box width="100%" css="user-select: none;">
-        {Boolean(isIdle) ? (
+        {isIdle ? (
           <SleepScreen />
         ) : (
-          <ToasterOven>
-            <Switch>
-              {onDeviceDisplayRoutes.map(
-                ({ Component, exact, path }: RouteProps) => {
-                  return (
-                    <Route key={path} exact={exact} path={path}>
-                      <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
-                        <ModalPortalRoot />
-                        <Component />
-                      </Box>
-                    </Route>
-                  )
-                }
-              )}
-              <Redirect exact from="/" to={'/loading'} />
-            </Switch>
-          </ToasterOven>
+          <MaintenanceRunTakeover>
+            <ToasterOven>
+              <ProtocolReceiptToasts />
+              <Switch>
+                {onDeviceDisplayRoutes.map(
+                  ({ Component, exact, path }: RouteProps) => {
+                    return (
+                      <Route key={path} exact={exact} path={path}>
+                        <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
+                          <ModalPortalRoot />
+                          <Component />
+                        </Box>
+                      </Route>
+                    )
+                  }
+                )}
+                <Redirect exact from="/" to={'/loading'} />
+              </Switch>
+            </ToasterOven>
+          </MaintenanceRunTakeover>
         )}
       </Box>
       <TopLevelRedirects />
@@ -276,7 +280,13 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 function TopLevelRedirects(): JSX.Element | null {
   const runRouteMatch = useRouteMatch({ path: '/runs/:runId' })
   const currentRunRoute = useCurrentRunRoute()
+
   if (runRouteMatch != null && currentRunRoute == null)
     return <Redirect to="/dashboard" />
   return currentRunRoute != null ? <Redirect to={currentRunRoute} /> : null
+}
+
+function ProtocolReceiptToasts(): null {
+  useProtocolReceiptToast()
+  return null
 }

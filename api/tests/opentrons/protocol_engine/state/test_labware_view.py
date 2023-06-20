@@ -1,7 +1,7 @@
 """Labware state store tests."""
 import pytest
 from datetime import datetime
-from typing import Dict, Optional, cast, ContextManager, Any, Union
+from typing import Dict, Optional, cast, ContextManager, Any, Union, List
 from contextlib import nullcontext as does_not_raise
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
@@ -20,6 +20,7 @@ from opentrons.protocol_engine.types import (
     LoadedLabware,
     ModuleModel,
     ModuleLocation,
+    DropTipWellLocation,
 )
 from opentrons.protocol_engine.state.move_types import EdgePathType
 from opentrons.protocol_engine.state.labware import (
@@ -43,6 +44,14 @@ reservoir = LoadedLabware(
     loadName="reservoir-load-name",
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
     definitionUri="some-reservoir-uri",
+    offsetId=None,
+)
+
+trash = LoadedLabware(
+    id="trash-id",
+    loadName="trash-load-name",
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+    definitionUri="some-trash-uri",
     offsetId=None,
 )
 
@@ -513,9 +522,7 @@ def test_get_slot_definition_raises_with_bad_slot_name(
     subject = get_labware_view(deck_definition=ot2_standard_deck_def)
 
     with pytest.raises(errors.SlotDoesNotExistError):
-        # note: normally the typechecker should catch this, but clients may
-        # not be using typechecking or our enums
-        subject.get_slot_definition(42)  # type: ignore[arg-type]
+        subject.get_slot_definition(DeckSlotName.SLOT_A1)
 
 
 def test_get_slot_position(ot2_standard_deck_def: DeckDefinitionV3) -> None:
@@ -731,6 +738,7 @@ def test_get_display_name() -> None:
 
 def test_get_fixed_trash_id() -> None:
     """It should return the ID of the labware loaded into the fixed trash slot."""
+    # OT-2 fixed trash slot:
     subject = get_labware_view(
         labware_by_id={
             "abc123": LoadedLabware(
@@ -743,9 +751,24 @@ def test_get_fixed_trash_id() -> None:
             )
         },
     )
-
     assert subject.get_fixed_trash_id() == "abc123"
 
+    # OT-3 fixed trash slot:
+    subject = get_labware_view(
+        labware_by_id={
+            "abc123": LoadedLabware(
+                id="abc123",
+                loadName="trash-load-name",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A3),
+                definitionUri="trash-definition-uri",
+                offsetId=None,
+                displayName=None,
+            )
+        },
+    )
+    assert subject.get_fixed_trash_id() == "abc123"
+
+    # Nothing in the fixed trash slot:
     subject = get_labware_view(
         labware_by_id={
             "abc123": LoadedLabware(
@@ -758,7 +781,6 @@ def test_get_fixed_trash_id() -> None:
             )
         },
     )
-
     with pytest.raises(errors.LabwareNotLoadedError):
         subject.get_fixed_trash_id()
 
@@ -805,32 +827,6 @@ def test_raise_if_labware_in_location(
     )
     with expected_raise:
         subject.raise_if_labware_in_location(location=location)
-
-
-def test_get_calibration_coordinates() -> None:
-    """Should return critical point and coordinates."""
-    slot_definitions = {
-        "locations": {
-            "orderedSlots": [
-                {
-                    "id": "1",
-                    "position": [2, 2, 0.0],
-                    "boundingBox": {
-                        "xDimension": 4.0,
-                        "yDimension": 6.0,
-                        "zDimension": 0,
-                    },
-                    "displayName": "Slot 1",
-                }
-            ]
-        }
-    }
-
-    subject = get_labware_view(deck_definition=cast(DeckDefinitionV3, slot_definitions))
-
-    result = subject.get_calibration_coordinates(offset=Point(y=1, z=2))
-
-    assert result == Point(x=4, y=6, z=2)
 
 
 def test_get_by_slot() -> None:
@@ -890,11 +886,17 @@ def test_get_by_slot_filter_ids() -> None:
     ["well_name", "mount", "labware_slot", "next_to_module", "expected_result"],
     [
         ("abc", MountType.RIGHT, DeckSlotName.SLOT_3, False, EdgePathType.LEFT),
+        ("abc", MountType.RIGHT, DeckSlotName.SLOT_D3, False, EdgePathType.LEFT),
         ("abc", MountType.RIGHT, DeckSlotName.SLOT_1, True, EdgePathType.LEFT),
+        ("abc", MountType.RIGHT, DeckSlotName.SLOT_D1, True, EdgePathType.LEFT),
         ("pqr", MountType.LEFT, DeckSlotName.SLOT_3, True, EdgePathType.RIGHT),
+        ("pqr", MountType.LEFT, DeckSlotName.SLOT_D3, True, EdgePathType.RIGHT),
         ("pqr", MountType.LEFT, DeckSlotName.SLOT_3, False, EdgePathType.DEFAULT),
+        ("pqr", MountType.LEFT, DeckSlotName.SLOT_D3, False, EdgePathType.DEFAULT),
         ("pqr", MountType.RIGHT, DeckSlotName.SLOT_3, True, EdgePathType.DEFAULT),
+        ("pqr", MountType.RIGHT, DeckSlotName.SLOT_D3, True, EdgePathType.DEFAULT),
         ("def", MountType.LEFT, DeckSlotName.SLOT_3, True, EdgePathType.DEFAULT),
+        ("def", MountType.LEFT, DeckSlotName.SLOT_D3, True, EdgePathType.DEFAULT),
     ],
 )
 def test_get_edge_path_type(
@@ -929,3 +931,66 @@ def test_get_edge_path_type(
     )
 
     assert result == expected_result
+
+
+def test_get_all_labware_definition(
+    tip_rack_def: LabwareDefinition, falcon_tuberack_def: LabwareDefinition
+) -> None:
+    """It should return the loaded labware definition list."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="opentrons_96_tiprack_300ul",
+                location=ModuleLocation(moduleId="module-id"),
+            )
+        },
+        definitions_by_uri={
+            "opentrons_96_tiprack_300ul": tip_rack_def,
+            "falcon-definition": falcon_tuberack_def,
+        },
+    )
+
+    result = subject.get_loaded_labware_definitions()
+
+    assert result == [tip_rack_def]
+
+
+def test_get_all_labware_definition_empty() -> None:
+    """It should return an empty list."""
+    subject = get_labware_view(
+        labware_by_id={},
+    )
+
+    result = subject.get_loaded_labware_definitions()
+
+    assert result == []
+
+
+def test_get_random_drop_tip_location(
+    ot3_fixed_trash_def: LabwareDefinition,
+) -> None:
+    """It should provide a random location within 3/4th of well top center every time."""
+    subject = get_labware_view(
+        labware_by_id={
+            "trash-id": trash,
+        },
+        definitions_by_uri={
+            "some-trash-uri": ot3_fixed_trash_def,
+        },
+    )
+    drop_location: List[DropTipWellLocation] = []
+    for i in range(50):
+        drop_location.append(
+            subject.get_random_drop_tip_location(labware_id="trash-id", well_name="A1")
+        )
+
+    for i in range(50):
+        print(drop_location[i])
+        assert not all(drop_location[i] == another_loc for another_loc in drop_location)
+        # trash's well A1 dimensions:
+        # "xDimension": 225
+        assert -84 <= drop_location[i].offset.x < 84
+        assert drop_location[i].offset.y == 0
+        assert drop_location[i].offset.z == 0

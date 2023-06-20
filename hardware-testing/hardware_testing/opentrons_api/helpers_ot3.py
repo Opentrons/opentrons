@@ -5,7 +5,7 @@ from datetime import datetime
 from math import pi
 from subprocess import run
 from time import time
-from typing import List, Optional, Dict, Tuple, Union
+from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union
 
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
@@ -16,6 +16,7 @@ from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
+from opentrons.config.advanced_settings import set_adv_setting
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
@@ -128,12 +129,24 @@ async def build_async_ot3_hardware_api(
     pipette_right: Optional[str] = None,
     gripper: Optional[str] = None,
     loop: Optional[asyncio.AbstractEventLoop] = None,
+    stall_detection_enable: Optional[bool] = None,
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
+    if stall_detection_enable is not None:
+        try:
+            await set_adv_setting(
+                "disableStallDetection", False if stall_detection_enable else True
+            )
+        except ValueError as e:
+            print(e)
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
     kwargs = {"config": config}
     if is_simulating:
-        builder = OT3API.build_hardware_simulator
+        # This Callable type annotation works around mypy complaining about slight mismatches
+        # between the signatures of build_hardware_simulator() and build_hardware_controller().
+        builder: Callable[
+            ..., Coroutine[None, None, OT3API]
+        ] = OT3API.build_hardware_simulator
         sim_pips = _create_attached_instruments_dict(
             pipette_left, pipette_right, gripper
         )
@@ -473,7 +486,7 @@ async def move_gripper_jaw_relative_ot3(api: OT3API, delta: float) -> None:
 
 def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[OT3Axis, float]:
     """Get the endstop's position per mount."""
-    transforms = api._transforms
+    transforms = api._robot_calibration
     machine_pos_per_axis = api._backend.home_position()
     deck_pos_per_axis = deck_from_machine(
         machine_pos_per_axis,
@@ -838,23 +851,43 @@ def get_default_tip_length(volume: int) -> float:
 
 
 def get_slot_bottom_left_position_ot3(slot: int) -> Point:
-    """Get slot bottom-left position."""
+    """Get slot bottom-left position.
+
+    Params:
+        slot: The OT-3 slot, specified as an OT-2-style slot number.
+            For example, specify 5 to get slot C2.
+    """
     deck = load_deck("ot3_standard", version=3)
     slots = deck["locations"]["orderedSlots"]
+
+    # Assume that the OT-3 deck definition has the same number of slots, and in the same order,
+    # as the OT-2.
+    # TODO(mm, 2023-05-22): This assumption will break down when the OT-3 has staging area slots.
+    # https://opentrons.atlassian.net/browse/RLAB-345
     s = slots[slot - 1]
-    assert s["id"] == str(slot)
+
     return Point(*s["position"])
 
 
 def get_slot_top_left_position_ot3(slot: int) -> Point:
-    """Get slot top-left position."""
+    """Get slot top-left position.
+
+    Params:
+        slot: The OT-3 slot, specified as an OT-2-style slot number.
+            For example, specify 5 to get slot C2.
+    """
     bottom_left = get_slot_bottom_left_position_ot3(slot)
     slot_size = get_slot_size()
     return bottom_left + Point(y=slot_size.y)
 
 
 def get_theoretical_a1_position(slot: int, labware: str) -> Point:
-    """Get the theoretical A1 position of a labware in a slot."""
+    """Get the theoretical A1 position of a labware in a slot.
+
+    Params:
+        slot: The OT-3 slot, specified as an OT-2-style slot number.
+            For example, specify 5 to get slot C2.
+    """
     labware_def = load_labware(loadname=labware, version=1)
     dims = labware_def["dimensions"]
     well_a1 = labware_def["wells"]["A1"]
@@ -865,7 +898,12 @@ def get_theoretical_a1_position(slot: int, labware: str) -> Point:
 
 
 def get_slot_calibration_square_position_ot3(slot: int) -> Point:
-    """Get slot calibration block position."""
+    """Get slot calibration block position.
+
+    Params:
+        slot: The OT-3 slot, specified as an OT-2-style slot number.
+            For example, specify 5 to get slot C2.
+    """
     slot_top_left = get_slot_top_left_position_ot3(slot)
     calib_sq_offset = CALIBRATION_SQUARE_EVT.top_left_offset
     return slot_top_left + calib_sq_offset

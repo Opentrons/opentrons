@@ -28,7 +28,7 @@ export function ODDBackButton(
           color={COLORS.darkBlack100}
           data-testid="back_icon"
           name="back"
-          width="2.5rem"
+          width="3rem"
         />
       </Btn>
       {label}

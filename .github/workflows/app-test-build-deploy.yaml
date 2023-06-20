@@ -98,6 +98,7 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
+
     name: 'opentrons app backend unit tests and build'
     runs-on: ${{ matrix.os }}
     steps:
@@ -154,7 +155,7 @@ jobs:
           flags: app
 
       # build the desktop app and deploy it
-      - if: github.event_name != 'pull_request'
+      - if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
         name: 'build app for ${{ matrix.os }}'
         timeout-minutes: 60
         env:
@@ -175,7 +176,7 @@ jobs:
         run: |
           make -C app-shell dist-${{ matrix.os }}
 
-      - if: github.event_name != 'pull_request'
+      - if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
         name: 'upload github artifact'
         uses: actions/upload-artifact@v3
         with:
@@ -193,6 +194,10 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
+        exclude:
+          - os: format('macos-latest{0}', startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build') || null)
+          - os: format('windows-2022{0}', startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build') || null)
+
     name: 'opentrons app backend unit tests and build for OT3'
     runs-on: ${{ matrix.os }}
     steps:
@@ -239,7 +244,7 @@ jobs:
           make setup-js
 
       # build the app and deploy it
-      - if: github.event_name != 'pull_request'
+      - if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
         name: 'build app for ${{ matrix.os }}'
         timeout-minutes: 60
         env:
@@ -260,7 +265,7 @@ jobs:
         run: |
           make -C app-shell dist-${{ matrix.os }}
 
-      - if: github.event_name != 'pull_request'
+      - if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
         name: 'upload github artifact'
         uses: actions/upload-artifact@v3
         with:
@@ -272,7 +277,7 @@ jobs:
     name: 'Deploy built app artifacts to S3'
     runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'build-app-test-backend']
-    if: github.event_name != 'pull_request'
+    if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
     steps:
       - name: 'download run app builds'
         uses: 'actions/download-artifact@v3'
@@ -293,7 +298,7 @@ jobs:
     name: 'Deploy built OT3 app artifacts to S3'
     runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'build-app-ot3']
-    if: github.event_name != 'pull_request'
+    if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
     steps:
       - name: 'download run app builds'
         uses: 'actions/download-artifact@v3'

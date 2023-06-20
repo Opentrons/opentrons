@@ -384,7 +384,7 @@ interface ActionButtonProps {
 function ActionButton(props: ActionButtonProps): JSX.Element {
   const { runId, robotName, runStatus, isProtocolAnalyzing } = props
   const history = useHistory()
-  const { t } = useTranslation('run_details')
+  const { t } = useTranslation(['run_details', 'shared'])
   const attachedModules =
     useModulesQuery({
       refetchInterval: EQUIPMENT_POLL_MS,
@@ -471,7 +471,7 @@ function ActionButton(props: ActionButtonProps): JSX.Element {
   if (currentRunId === runId && !isSetupComplete) {
     disableReason = t('setup_incomplete')
   } else if (isOtherRunCurrent) {
-    disableReason = t('robot_is_busy')
+    disableReason = t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
     disableReason = t('shared:a_software_update_is_available')
   }

@@ -66,9 +66,9 @@ export function fetchRobotApi(
           path,
           method,
           body: response?.data,
-          ok: response?.data != null,
-          // TODO(bh, 2023-04-25): until all response info forwarded (including unsuccessful requests), presume success here to quiet TS
-          status: 200,
+          status: response?.status,
+          // appShellRequestor eventually calls axios.request, which doesn't provide an ok boolean in the response
+          ok: response?.statusText === 'OK',
         }))
       )
     : from(fetch(url, options)).pipe(

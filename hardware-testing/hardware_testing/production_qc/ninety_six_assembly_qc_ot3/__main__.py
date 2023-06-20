@@ -37,7 +37,7 @@ async def _main(cfg: TestConfig) -> None:
     pipette_id = str(pipette.pipette_id)
 
     # FIXME: remove this once the "'L' format requires 0 <= number <= 4294967295" bug is gone
-    await api._backend.home([OT3Axis.P_L])
+    await api._backend.home([OT3Axis.P_L], api.gantry_load)
     await api.refresh_positions()
 
     # BUILD REPORT

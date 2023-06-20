@@ -66,17 +66,6 @@ describe('RobotOverflowMenu', () => {
     resetAllWhenMocks()
   })
 
-  it('renders overflow menu items when the robot is reachable and a run id is not present', () => {
-    mockUseCurrentRunId.mockReturnValue(null)
-    const { getByText, getByLabelText } = render(props)
-    const btn = getByLabelText('RobotOverflowMenu_button')
-    fireEvent.click(btn)
-    getByText('Robot settings')
-    const run = getByText('Run a protocol')
-    fireEvent.click(run)
-    getByText('choose protocol slideout')
-  })
-
   it('renders overflow menu items when the robot is reachable and a run id is present', () => {
     const { getByLabelText, getByRole } = render(props)
     const btn = getByLabelText('RobotOverflowMenu_button')

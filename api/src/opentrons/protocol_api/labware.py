@@ -31,6 +31,7 @@ from opentrons.protocols.labware import (  # noqa: F401
 
 from . import validation
 from ._liquid import Liquid
+from ._types import OffDeckType
 from .core import well_grid
 from .core.engine import ENGINE_CORE_API_VERSION
 from .core.labware import AbstractLabware
@@ -341,16 +342,20 @@ class Labware:
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def parent(self) -> Union[str, ModuleTypes, None]:
+    def parent(self) -> Union[str, ModuleTypes, OffDeckType]:
         """The parent of this labware.
 
         If the labware is on the deck, a `str` deck slot name will be returned.
         If on a module, the parent :py:class:`ModuleContext` will be returned.
-        If off deck, `None` will be returned.
+        If off deck, :py:obj:`OFF_DECK` will be returned.
 
         .. versionchanged:: 2.14
             Return type for module parent changed to :py:class:`ModuleContext`.
             Prior to this version, an internal geometry interface is returned.
+        .. versionchanged:: 2.15
+            Will now return :py:obj:`OFF_DECK` if the labware is off-deck.
+            Formerly, if the labware was removed by using ``del`` on :py:obj:`.deck`,
+            this would return where it was before its removal.
         """
         if isinstance(self._core, LegacyLabwareCore):
             # Type ignoring to preserve backwards compatibility

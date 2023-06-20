@@ -11,12 +11,12 @@ import { PortalRoot as MainPageModalPortalRoot } from '../components/portals/Mai
 import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../ui/steps/utils'
 import { PrereleaseModeIndicator } from './PrereleaseModeIndicator'
 import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
-import { NewFileModal } from './modals/NewFileModal'
 import { FileUploadMessageModal } from './modals/FileUploadMessageModal'
 import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal'
 import { GateModal } from './modals/GateModal'
 import { AnnouncementModal } from './modals/AnnouncementModal'
 import styles from './ProtocolEditor.css'
+import { CreateFileWizard } from './modals/CreateFileWizard'
 
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
@@ -42,7 +42,7 @@ function ProtocolEditorComponent(): JSX.Element {
             )}
           >
             <AnnouncementModal />
-            <NewFileModal showProtocolFields />
+            <CreateFileWizard />
             <FileUploadMessageModal />
 
             <MainPageModalPortalRoot />
