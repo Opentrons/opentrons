@@ -10,6 +10,7 @@ from opentrons.calibration_storage import (
     delete_robot_deck_attitude,
     clear_tip_length_calibration,
     clear_pipette_offset_calibrations,
+    ot3_gripper_offset,
 )
 
 
@@ -33,9 +34,24 @@ class ResetOptionId(str, Enum):
     boot_scripts = "bootScripts"
     deck_calibration = "deckCalibration"
     pipette_offset = "pipetteOffsetCalibrations"
+    gripper_offset = "gripperOffsetCalibrations"
     tip_length_calibrations = "tipLengthCalibrations"
     runs_history = "runsHistory"
 
+
+_OT_2_RESET_OPTIONS = [
+    ResetOptionId.boot_scripts,
+    ResetOptionId.deck_calibration,
+    ResetOptionId.pipette_offset,
+    ResetOptionId.tip_length_calibrations,
+    ResetOptionId.runs_history,
+]
+_FLEX_RESET_OPTIONS = [
+    ResetOptionId.boot_scripts,
+    ResetOptionId.pipette_offset,
+    ResetOptionId.gripper_offset,
+    ResetOptionId.runs_history,
+]
 
 _settings_reset_options = {
     ResetOptionId.boot_scripts: CommonResetOption(
@@ -48,6 +64,10 @@ _settings_reset_options = {
     ResetOptionId.pipette_offset: CommonResetOption(
         name="Pipette Offset Calibrations",
         description="Clear pipette offset calibrations",
+    ),
+    ResetOptionId.gripper_offset: CommonResetOption(
+        name="Gripper Offset Calibrations",
+        description="Clear gripper offset calibrations",
     ),
     ResetOptionId.tip_length_calibrations: CommonResetOption(
         name="Tip Length Calibrations",
@@ -64,8 +84,15 @@ _settings_reset_options = {
 }
 
 
-def reset_options() -> Dict[ResetOptionId, CommonResetOption]:
-    return _settings_reset_options
+def reset_options(robot_type: str) -> Dict[ResetOptionId, CommonResetOption]:
+    reset_options_for_robot_type = (
+        _OT_2_RESET_OPTIONS if robot_type == "OT-2 Standard" else _FLEX_RESET_OPTIONS
+    )
+    return {
+        key: _settings_reset_options[key]
+        for key in _settings_reset_options
+        if key in reset_options_for_robot_type
+    }
 
 
 def reset(options: Set[ResetOptionId]) -> None:
@@ -88,6 +115,9 @@ def reset(options: Set[ResetOptionId]) -> None:
     if ResetOptionId.tip_length_calibrations in options:
         reset_tip_length_calibrations()
 
+    if ResetOptionId.gripper_offset in options:
+        reset_gripper_offset()
+
 
 def reset_boot_scripts() -> None:
     if IS_ROBOT:
@@ -106,6 +136,10 @@ def reset_deck_calibration() -> None:
 
 def reset_pipette_offset() -> None:
     clear_pipette_offset_calibrations()
+
+
+def reset_gripper_offset() -> None:
+    ot3_gripper_offset.clear_gripper_calibration_offsets()
 
 
 def reset_tip_length_calibrations() -> None:
