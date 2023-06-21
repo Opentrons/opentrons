@@ -3,6 +3,7 @@ import contextlib
 from functools import partial, lru_cache
 from dataclasses import replace
 import logging
+from copy import deepcopy
 from collections import OrderedDict
 from typing import (
     AsyncIterator,
@@ -63,6 +64,7 @@ from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import (
     get_system_constraints,
+    get_system_constraints_for_calibration,
     axis_convert,
 )
 from .backends.errors import SubsystemUpdating
@@ -238,6 +240,27 @@ class OT3API(
             get_system_constraints(self._config.motion_settings, gantry_load)
         )
         await self._backend.update_to_default_current_settings(gantry_load)
+
+    async def set_system_constraints_for_calibration(self) -> None:
+        self._move_manager.update_constraints(
+            get_system_constraints_for_calibration(
+                self._config.motion_settings, self._gantry_load
+            )
+        )
+        mod_log.debug(
+            f"Set system constraints for calibration: {self._move_manager.get_constraints()}"
+        )
+
+    @contextlib.asynccontextmanager
+    async def restore_system_constrants(self) -> AsyncIterator[None]:
+        old_system_constraints = deepcopy(self._move_manager.get_constraints())
+        try:
+            yield
+        finally:
+            self._move_manager.update_constraints(old_system_constraints)
+            mod_log.debug(
+                f"Restore previous system constraints: {old_system_constraints}"
+            )
 
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")
