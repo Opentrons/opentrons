@@ -32,7 +32,10 @@ from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     CoordinateValue,
 )
-from opentrons_hardware.hardware_control.tool_sensors import ProbeTarget
+from opentrons_hardware.hardware_control.tool_sensors import (
+    InstrumentProbeTarget,
+    PipetteProbeTarget,
+)
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     unit_vector_multiplication,
 )
@@ -401,15 +404,24 @@ def axis_convert(
     return ret
 
 
-_sensor_node_lookup: Dict[OT3Mount, ProbeTarget] = {
+_sensor_node_lookup: Dict[OT3Mount, InstrumentProbeTarget] = {
     OT3Mount.LEFT: NodeId.pipette_left,
     OT3Mount.RIGHT: NodeId.pipette_right,
     OT3Mount.GRIPPER: NodeId.gripper,
 }
 
+_sensor_node_lookup_pipettes_only: Dict[OT3Mount, PipetteProbeTarget] = {
+    OT3Mount.LEFT: NodeId.pipette_left,
+    OT3Mount.RIGHT: NodeId.pipette_right,
+}
 
-def sensor_node_for_mount(mount: OT3Mount) -> ProbeTarget:
+
+def sensor_node_for_mount(mount: OT3Mount) -> InstrumentProbeTarget:
     return _sensor_node_lookup[mount]
+
+
+def sensor_node_for_pipette(mount: OT3Mount) -> PipetteProbeTarget:
+    return _sensor_node_lookup_pipettes_only[mount]
 
 
 _instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {

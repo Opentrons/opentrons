@@ -34,6 +34,7 @@ from .ot3utils import (
     create_home_group,
     node_to_axis,
     sensor_node_for_mount,
+    sensor_node_for_pipette,
     sensor_id_for_instrument,
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
@@ -116,6 +117,7 @@ from opentrons.hardware_control.errors import (
     InvalidPipetteName,
     InvalidPipetteModel,
     FirmwareUpdateRequired,
+    OverPressureDetected,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -128,6 +130,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
     liquid_probe,
+    check_overpressure,
 )
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
@@ -940,6 +943,38 @@ class OT3Controller:
         by_node = {axis_to_node(k): v for k, v in to_xform.items()}
         return {k: v for k, v in by_node.items() if k in self._motor_nodes()}
 
+    @asynccontextmanager
+    async def monitor_overpressure(
+        self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
+    ) -> AsyncIterator[None]:
+        if ff.overpressure_detection_enabled():
+            tool = sensor_node_for_pipette(OT3Mount(mount.value))
+            # FIXME we should switch the sensor type based on the channel
+            # used when partial tip pick up is implemented.
+            # FIXME we should also monitor pressure in all available channels
+            provided_context_manager = await check_overpressure(
+                self._messenger, tool, sensor_id
+            )
+            errors: asyncio.Queue[ErrorCode] = asyncio.Queue()
+
+            async with provided_context_manager() as errors:
+                try:
+                    yield
+                finally:
+
+                    def _pop_queue() -> Optional[ErrorCode]:
+                        try:
+                            return errors.get_nowait()
+                        except asyncio.QueueEmpty:
+                            return None
+
+                    if _pop_queue():
+                        raise OverPressureDetected(
+                            f"The pressure sensor on the {mount} mount has exceeded operational limits."
+                        )
+        else:
+            yield
+
     async def liquid_probe(
         self,
         mount: OT3Mount,
@@ -953,7 +988,7 @@ class OT3Controller:
         sensor_id: SensorId = SensorId.S0,
     ) -> Dict[NodeId, float]:
         head_node = axis_to_node(OT3Axis.by_mount(mount))
-        tool = sensor_node_for_mount(OT3Mount(mount.value))
+        tool = sensor_node_for_pipette(OT3Mount(mount.value))
         positions = await liquid_probe(
             self._messenger,
             tool,

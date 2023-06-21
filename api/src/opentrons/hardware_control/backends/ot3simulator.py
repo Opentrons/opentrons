@@ -271,6 +271,12 @@ class OT3Simulator:
         """Get the encoder current position."""
         return axis_convert(self._encoder_position, 0.0)
 
+    @asynccontextmanager
+    async def monitor_overpressure(
+        self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
+    ) -> AsyncIterator[None]:
+        yield
+
     @ensure_yield
     async def liquid_probe(
         self,
