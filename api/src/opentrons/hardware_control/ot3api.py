@@ -248,7 +248,9 @@ class OT3API(
                 self._config.motion_settings, self._gantry_load
             )
         )
-        mod_log.debug(f"Set system constraints for calibration: {self._move_manager.get_constraints()}")
+        mod_log.debug(
+            f"Set system constraints for calibration: {self._move_manager.get_constraints()}"
+        )
 
     @contextlib.asynccontextmanager
     async def restore_system_constrants(self) -> AsyncIterator[None]:
@@ -257,7 +259,9 @@ class OT3API(
             yield
         finally:
             self._move_manager.update_constraints(old_system_constraints)
-            mod_log.debug(f"Restore previous system constraints: {old_system_constraints}")
+            mod_log.debug(
+                f"Restore previous system constraints: {old_system_constraints}"
+            )
 
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")

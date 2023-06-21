@@ -29,7 +29,7 @@ class MoveManager(Generic[AxisKey]):
     def update_constraints(self, constraints: SystemConstraints[AxisKey]) -> None:
         """Update system constraints when instruments are changed."""
         self._constraints = constraints
-    
+
     def get_constraints(self) -> SystemConstraints[AxisKey]:
         return self._constraints
 
