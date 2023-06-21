@@ -14,7 +14,7 @@ import {
   CheckboxField,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { StyledText } from '../../atoms/text'
 import { Dispatch } from '../../redux/types'
 import { UpdateConfigValueAction } from '../../redux/config/types'
@@ -50,7 +50,7 @@ export const ConfirmAttachmentModal = (
   }
 
   return (
-    <Modal
+    <LegacyModal
       title={t('confirm_heater_shaker_modal_attachment')}
       onClose={onCloseClick}
     >
@@ -127,6 +127,6 @@ export const ConfirmAttachmentModal = (
           </PrimaryButton>
         </Flex>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

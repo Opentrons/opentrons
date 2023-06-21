@@ -13,7 +13,7 @@ export const SUPPORTED_MODULE_TYPES: ModuleType[] = [
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  // MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_BLOCK_TYPE,
 ]
 type SupportedSlotMap = Record<ModuleType, DropdownOption[]>
 export const SUPPORTED_MODULE_SLOTS: SupportedSlotMap = {

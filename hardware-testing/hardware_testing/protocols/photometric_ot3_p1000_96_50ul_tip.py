@@ -2,8 +2,7 @@
 from opentrons.protocol_api import ProtocolContext
 
 metadata = {"protocolName": "photometric-ot3-p1000-96-50ul-tip"}
-# FIXME: bump to v2.14 to utilize protocol engine
-requirements = {"robotType": "OT-3", "apiLevel": "2.13"}
+requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOTS_TIPRACK = {
     50: [5, 6, 8, 9, 11],
@@ -27,6 +26,6 @@ def run(ctx: ProtocolContext) -> None:
     pipette = ctx.load_instrument("p1000_96", "left")
     for rack in tipracks:
         pipette.pick_up_tip(rack["A1"])
-        pipette.aspirate(pipette.min_volume, reservoir["A1"].top())
-        pipette.dispense(pipette.min_volume, plate["A1"].top())
+        pipette.aspirate(10, reservoir["A1"].top())
+        pipette.dispense(10, plate["A1"].top())
         pipette.drop_tip(home_after=False)

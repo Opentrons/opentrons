@@ -129,15 +129,16 @@ async def build_async_ot3_hardware_api(
     pipette_right: Optional[str] = None,
     gripper: Optional[str] = None,
     loop: Optional[asyncio.AbstractEventLoop] = None,
-    stall_detection_enable: bool = True,
+    stall_detection_enable: Optional[bool] = None,
 ) -> OT3API:
     """Built an OT3 Hardware API instance."""
-    try:
-        await set_adv_setting(
-            "disableStallDetection", False if stall_detection_enable else True
-        )
-    except ValueError as e:
-        print(e)
+    if stall_detection_enable is not None:
+        try:
+            await set_adv_setting(
+                "disableStallDetection", False if stall_detection_enable else True
+            )
+        except ValueError as e:
+            print(e)
     config = build_config_ot3({}) if use_defaults else load_ot3_config()
     kwargs = {"config": config}
     if is_simulating:

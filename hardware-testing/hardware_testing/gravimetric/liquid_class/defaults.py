@@ -728,6 +728,15 @@ def get_liquid_class(
 
 def get_test_volumes(pipette: int, channels: int, tip: int) -> List[float]:
     """Get test volumes."""
-    aspirate_cls_per_volume = _aspirate_defaults[channels][pipette][tip]
-    defined_volumes = list(aspirate_cls_per_volume.keys())
-    return [float(v) for v in defined_volumes]
+    if channels == 96:
+        if tip == 50:
+            return [5.0]
+        elif tip == 200:
+            return [200.0]
+        else:
+            raise ValueError(f"no volumes to test for tip size: {tip} uL")
+    else:
+        # FIXME: also reduce total number of volumes we test for 1ch & 8ch pipettes
+        aspirate_cls_per_volume = _aspirate_defaults[channels][pipette][tip]
+        defined_volumes = list(aspirate_cls_per_volume.keys())
+        return [float(v) for v in defined_volumes]
