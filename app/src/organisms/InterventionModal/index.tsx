@@ -98,7 +98,7 @@ export interface InterventionModalProps {
   moduleRenderInfo?: RunModuleInfo[] | null
   labwareRenderInfo?: RunLabwareInfo[] | null
   labwareAnimationParams?: LabwareAnimationParams | null
-  labwareName?: string
+  labwareName?: string | null
   oldDisplayLocation?: string
   newDisplayLocation?: string
   deckDef?: DeckDefinition

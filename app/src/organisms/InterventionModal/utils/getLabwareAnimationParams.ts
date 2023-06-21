@@ -12,12 +12,14 @@ import {
   SPLASH_OUT_DURATION_MS,
 } from './animationConstants'
 
-import type { RunCommandSummary } from '@opentrons/api-client'
 import type {
   MoveLabwareAnimationParams,
   SplashAnimationParams,
 } from '@opentrons/components'
-import type { DeckDefinition } from '@opentrons/shared-data'
+import type {
+  DeckDefinition,
+  MoveLabwareRunTimeCommand,
+} from '@opentrons/shared-data'
 import type { RunLabwareInfo } from './getCurrentRunLabwareRenderInfo'
 import type { RunModuleInfo } from './getCurrentRunModulesRenderInfo'
 
@@ -29,7 +31,7 @@ export interface LabwareAnimationParams {
 export function getLabwareAnimationParams(
   runLabwareInfo: RunLabwareInfo[],
   runModuleInfo: RunModuleInfo[],
-  command: RunCommandSummary,
+  command: Omit<MoveLabwareRunTimeCommand, 'result'>,
   deckDef: DeckDefinition
 ): {
   movementParams: MoveLabwareAnimationParams
@@ -58,13 +60,13 @@ export function getLabwareAnimationParams(
         : OT2_STANDARD_SLOT_HEIGHT * -1,
     ]
   } else if ('moduleId' in command.params?.newLocation) {
-    const matchedModule = runModuleInfo.find(
-      m => m.moduleId === command.params.newLocation.moduleId
-    )
+    const destModuleId = command.params.newLocation.moduleId
+    const matchedModule = runModuleInfo.find(m => m.moduleId === destModuleId)
     newPos = matchedModule != null ? [matchedModule.x, matchedModule.y] : null
   } else {
+    const destSlotName = command.params.newLocation.slotName
     const slotPosition = deckDef.locations.orderedSlots.find(
-      slot => slot.id === command.params.newLocation.slotName
+      slot => slot.id === destSlotName
     )?.position
     if (slotPosition == null) {
       return null

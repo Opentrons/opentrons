@@ -241,6 +241,8 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
         : null
   }
 
+  console.log({ lastRunCommand })
+
   return (
     <>
       {showInterventionModal &&
@@ -257,11 +259,15 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             moduleRenderInfo={moduleRunRenderInfo}
             labwareRenderInfo={labwareRunRenderInfo}
             labwareAnimationParams={labwareAnimationParams}
-            labwareName={getLabwareNameFromRunData(
-              runData,
-              lastRunCommand.params.labwareId,
-              analysisCommands
-            )}
+            labwareName={
+              lastRunCommand.commandType === 'moveLabware'
+                ? getLabwareNameFromRunData(
+                    runData,
+                    lastRunCommand.params.labwareId,
+                    analysisCommands
+                  )
+                : null
+            }
             oldDisplayLocation={
               oldLabwareLocation != null
                 ? getLabwareDisplayLocationFromRunData(
