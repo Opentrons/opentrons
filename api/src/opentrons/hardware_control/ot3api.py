@@ -8,7 +8,6 @@ from collections import OrderedDict
 from typing import (
     AsyncIterator,
     AsyncGenerator,
-    Iterator,
     cast,
     Callable,
     Dict,

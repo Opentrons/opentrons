@@ -31,6 +31,7 @@ class MoveManager(Generic[AxisKey]):
         self._constraints = constraints
 
     def get_constraints(self) -> SystemConstraints[AxisKey]:
+        """Retrieve current system constraints."""
         return self._constraints
 
     def _clear_blend_log(self) -> None:
