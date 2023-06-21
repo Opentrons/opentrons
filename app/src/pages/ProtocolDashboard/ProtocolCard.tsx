@@ -207,7 +207,7 @@ export function ProtocolCard(props: {
                         css={css`
                           display: -webkit-box;
                           -webkit-box-orient: vertical;
-                          -webkit-line-clamp: 4;
+                          -webkit-line-clamp: 3;
                           overflow: hidden;
                           overflow-wrap: break-word;
                           height: max-content;
