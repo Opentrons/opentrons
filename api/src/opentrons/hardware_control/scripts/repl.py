@@ -91,7 +91,7 @@ if ff.enable_ot3_hardware_controller():
 
     def build_thread_manager() -> ThreadManager[Union["API", OT3API]]:
         return ThreadManager(
-            OT3API.build_hardware_controller,
+            HCApi.build_hardware_controller,
             use_usb_bus=ff.rear_panel_integration(),
             update_firmware=update_firmware,
         )
@@ -112,7 +112,7 @@ else:
 
     def build_thread_manager() -> ThreadManager[Union[API, OT3API]]:
         return ThreadManager(
-            API.build_hardware_controller,
+            HCApi.build_hardware_controller,
             use_usb_bus=ff.rear_panel_integration(),
             update_firmware=update_firmware,
         )
