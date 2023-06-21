@@ -35,7 +35,7 @@ async def get_tip_ejector_state(
         nonlocal tip_ejector_state
         if isinstance(message, PushTipPresenceNotification):
             event.set()
-            tip_ejector_state = bool(message.payload.ejector_flag_status)
+            tip_ejector_state = message.payload.ejector_flag_status.value != 0
 
     def _filter(arbitration_id: ArbitrationId) -> bool:
         return (NodeId(arbitration_id.parts.originating_node_id) == node) and (
@@ -44,14 +44,8 @@ async def get_tip_ejector_state(
         )
 
     can_messenger.add_listener(_listener, _filter)
-    error = await can_messenger.ensure_send(
-        node_id=node, message=TipStatusQueryRequest(), expected_nodes=[node]
-    )
+    await can_messenger.send(node_id=node, message=TipStatusQueryRequest())
 
-    if error != ErrorCode.ok:
-        log.error(
-            f"recieved error {str(error)} trying to get tip ejector status {str(node)}"
-        )
     try:
         await asyncio.wait_for(event.wait(), 1.0)
     except asyncio.TimeoutError:
