@@ -19,6 +19,7 @@ import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { getRobotType } from '../../file-data/selectors'
 import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
+import { GripperRow } from './GripperRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
@@ -29,12 +30,12 @@ export interface Props {
 
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
-
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
   const robotType = useSelector(getRobotType)
-
+  // const savedStepForms = useSelector(getSavedStepForms)
+  // const additionalEquipment = savedStepForms.additionalEquipment
   const magneticModuleOnDeck = modules[MAGNETIC_MODULE_TYPE]
   const temperatureModuleOnDeck = modules[TEMPERATURE_MODULE_TYPE]
   const heaterShakerOnDeck = modules[HEATERSHAKER_MODULE_TYPE]
@@ -67,18 +68,19 @@ export function EditModulesCard(props: Props): JSX.Element {
     ].some(pipetteSpecs => pipetteSpecs?.channels !== 1)
 
   const warningsEnabled = !moduleRestrictionsDisabled
+  const isOt3 = robotType === 'OT-3 Standard'
 
   const SUPPORTED_MODULE_TYPES_FILTERED = SUPPORTED_MODULE_TYPES.filter(
     moduleType =>
-      robotType === 'OT-3 Standard'
+      isOt3
         ? moduleType !== 'magneticModuleType'
         : moduleType !== 'magneticBlockType'
   )
 
   return (
-    <Card title="Modules">
+    <Card title={isOt3 ? 'Additional Items' : 'Modules'}>
       <div className={styles.modules_card_content}>
-        {warningsEnabled && (
+        {warningsEnabled && !isOt3 && (
           <CrashInfoBox
             showMagPipetteCollisons={showMagPipetteCollisons}
             showTempPipetteCollisons={showTempPipetteCollisons}
@@ -99,6 +101,7 @@ export function EditModulesCard(props: Props): JSX.Element {
                 showCollisionWarnings={warningsEnabled}
                 key={i}
                 openEditModuleModal={openEditModuleModal}
+                isOt3={isOt3}
               />
             )
           } else {
@@ -111,6 +114,12 @@ export function EditModulesCard(props: Props): JSX.Element {
             )
           }
         })}
+        {isOt3 ? (
+          <GripperRow
+            handleAddGripper={() => console.log('wire this up')}
+            isGripperAdded={true}
+          />
+        ) : null}
       </div>
     </Card>
   )

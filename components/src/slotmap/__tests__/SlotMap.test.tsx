@@ -5,13 +5,13 @@ import { SlotMap } from '../SlotMap'
 import { Icon } from '../../icons'
 
 describe('SlotMap', () => {
-  it('component renders 11 slots', () => {
+  it('component renders 11 slots for ot-2', () => {
     const wrapper = shallow(<SlotMap occupiedSlots={['1']} />)
 
     expect(wrapper.find('rect')).toHaveLength(11)
   })
 
-  it('component renders crash info icon when collision slots present', () => {
+  it('component renders crash info icon when collision slots present for ot-2', () => {
     const wrapper = shallow(
       <SlotMap occupiedSlots={['1']} collisionSlots={['4']} />
     )
@@ -28,5 +28,17 @@ describe('SlotMap', () => {
     expect(wrapperDefault.find('.slot_occupied')).toHaveLength(1)
     expect(wrapperWithError.find('.slot_occupied')).toHaveLength(1)
     expect(wrapperWithError.find('.slot_occupied.slot_error')).toHaveLength(1)
+  })
+
+  it('should render 12 slots for flex', () => {
+    const wrapper = shallow(<SlotMap occupiedSlots={['D1']} isOt3={true} />)
+    expect(wrapper.find('rect')).toHaveLength(12)
+  })
+
+  it('component renders crash info icon when collision slots present for flex', () => {
+    const wrapper = shallow(
+      <SlotMap occupiedSlots={['D1']} collisionSlots={['D2']} isOt3={true} />
+    )
+    expect(wrapper.find(Icon)).toHaveLength(1)
   })
 })
