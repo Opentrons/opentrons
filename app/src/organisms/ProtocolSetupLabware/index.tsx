@@ -35,6 +35,7 @@ import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { Portal } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
+import { LocationIcon } from '../../molecules/LocationIcon'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareDisplayLocation } from '../CommandText/utils'
@@ -267,10 +268,10 @@ export function ProtocolSetupLabware({
           lineHeight={TYPOGRAPHY.lineHeight28}
         >
           <Flex paddingLeft={SPACING.spacing24} width="17.9%">
-            <StyledText>{'Location'}</StyledText>
+            <StyledText>{t('location')}</StyledText>
           </Flex>
           <Flex width="82.1%">
-            <StyledText>{'Labware Name'}</StyledText>
+            <StyledText>{t('labware_name')}</StyledText>
           </Flex>
         </Flex>
         {[...onDeckItems, ...offDeckItems].map((labware, i) => {
@@ -441,6 +442,15 @@ function RowLabware({
     matchedModule != null &&
     matchedModule.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE
 
+  console.log(
+    'slot',
+    getLabwareDisplayLocation(
+      robotSideAnalysis,
+      initialLocation,
+      commandTextTranslator
+    )
+  )
+
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -451,13 +461,15 @@ function RowLabware({
       gridGap={SPACING.spacing24}
     >
       <Flex width="7.6875rem">
-        <StyledText>
-          {getLabwareDisplayLocation(
+        {/* <StyledText> */}
+        <LocationIcon
+          slotName={getLabwareDisplayLocation(
             robotSideAnalysis,
             initialLocation,
             commandTextTranslator
           )}
-        </StyledText>
+        />
+        {/* </StyledText> */}
       </Flex>
       <Flex
         alignSelf={ALIGN_FLEX_START}
@@ -465,19 +477,10 @@ function RowLabware({
         gridGap={SPACING.spacing4}
         width="86%"
       >
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-        >
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {getLabwareDisplayName(definition)}
         </StyledText>
-        <StyledText
-          color={COLORS.darkBlack70}
-          fontSize={TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-        >
+        <StyledText as="p" color={COLORS.darkBlack70}>
           {nickName}
         </StyledText>
         {isOnHeaterShaker ? moduleInstructions : null}
