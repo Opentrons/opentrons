@@ -8,13 +8,13 @@ import {
   LabwareLocation,
 } from '@opentrons/shared-data'
 import type {
-  CreateCommand,
   LabwareDefinition2,
   ModuleType,
   ModuleModel,
   PipetteNameSpecs,
   PipetteName,
 } from '@opentrons/shared-data'
+import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command'
 import type {
   AtomicProfileStep,
   EngageMagnetParams,
