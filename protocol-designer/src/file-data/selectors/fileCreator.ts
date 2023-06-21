@@ -299,7 +299,9 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     } => {
       const loadedPipettes = Object.values(pipettes)
       const pipetteGEN = loadedPipettes.some(
-        pipette => getPipetteNameSpecs(pipette.name)?.displayCategory === GEN3
+        pipette =>
+          getPipetteNameSpecs(pipette.name)?.displayCategory === GEN3 ||
+          getPipetteNameSpecs(pipette.name)?.channels === 96
       )
         ? GEN3
         : GEN2
