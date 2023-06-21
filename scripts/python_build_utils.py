@@ -89,6 +89,9 @@ def _latest_version_for_project(project, git_dir):
     return prefix.join(tag.split(prefix)[1:])
 
 def _ref_from_sha(sha):
+    branch_name = subprocess.check_output(
+        ['git', 'branch', '--show-current'],
+        cwd=CWD).strip().decode().split('\n')
     # codebuild leaves us in detached HEAD, so we need to pull some
     # gymnastics to get a nice branch name. First, get all the tag and head
     # refs
@@ -107,6 +110,10 @@ def _ref_from_sha(sha):
     # tags are the best
     for match in matching:
         if 'tags' in match:
+            return match.split('/')[-1]
+    # if we have a local branch name just use that
+    for match in matching:
+        if branch_name and branch_name[0] in match:
             return match.split('/')[-1]
     # local branches are next best
     for match in matching:
