@@ -9,6 +9,8 @@ from functools import wraps
 import asyncio
 import logging
 from logging.config import dictConfig
+from opentrons.hardware_control.api import API
+from opentrons.hardware_control.ot3api import OT3API
 
 update_firmware = True
 has_robot_server = True
@@ -54,7 +56,6 @@ from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     find_axis_center,
     gripper_pin_offsets_mean,
 )
-from opentrons.hardware_control import HardwareControlAPI  # noqa: E402
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
 
 
@@ -83,9 +84,6 @@ LOG_CONFIG = {
         },
     },
 }
-
-from opentrons.hardware_control.api import API
-from opentrons.hardware_control.ot3api import OT3API
 
 if ff.enable_ot3_hardware_controller():
 
@@ -147,7 +145,7 @@ def build_api() -> ThreadManager[Union[API, OT3API]]:
     return tm
 
 
-def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
+def do_interact(api: ThreadManager[Union[API, OT3API]]) -> None:
     interact(
         banner=(
             "Hardware Control API REPL\nCall methods on api like "
