@@ -84,12 +84,14 @@ LOG_CONFIG = {
     },
 }
 
+from opentrons.hardware_control.api import API
+from opentrons.hardware_control.ot3api import OT3API
+
 if ff.enable_ot3_hardware_controller():
-    from opentrons.hardware_control.ot3api import OT3API
 
-    HCApi: Union[Type[OT3API], Type["API"]] = OT3API
+    HCApi: Union[Type[OT3API], Type[API]] = OT3API
 
-    def build_thread_manager() -> ThreadManager[Union["API", OT3API]]:
+    def build_thread_manager() -> ThreadManager[Union[API, OT3API]]:
         return ThreadManager(
             OT3API.build_hardware_controller,
             use_usb_bus=ff.rear_panel_integration(),
@@ -106,7 +108,6 @@ if ff.enable_ot3_hardware_controller():
         return synchronizer
 
 else:
-    from opentrons.hardware_control.api import API
 
     HCApi = API
 
@@ -125,7 +126,7 @@ def stop_server() -> None:
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
-def build_api() -> ThreadManager[HardwareControlAPI]:
+def build_api() -> ThreadManager[Union[API, OT3API]]:
     # NOTE: We are using StreamHandler so when the hw controller is
     # being built we can log firmware update progress to stdout.
     stream_handler = logging.StreamHandler()
