@@ -41,10 +41,10 @@ def test_engage_invalid_axes(api_client, hardware):
 def test_disengage_axes(api_client, hardware):
     postres = api_client.post("/motors/disengage", json={"axes": ["x", "b"]})
 
-    hardware.disengage_axes.assert_called_once_with([Axis.X, Axis.B])
+    hardware.disengage_axes.assert_called_once_with([Axis.X, Axis.P_L])
 
     assert postres.status_code == 200
-    assert postres.json() == {"message": "Disengaged axes: x, b"}
+    assert postres.json() == {"message": "Disengaged axes: x, p_l"}
 
 
 def test_disengage_axes_case_insensitive(api_client, hardware):
@@ -54,7 +54,7 @@ def test_disengage_axes_case_insensitive(api_client, hardware):
     hardware.disengage_axes.assert_called_once_with([Axis.Y, Axis.A])
 
     assert postres.status_code == 200
-    assert postres.json() == {"message": "Disengaged axes: y, a"}
+    assert postres.json() == {"message": "Disengaged axes: y, z_r"}
 
 
 def test_disengage_invalid_axes(api_client, hardware):

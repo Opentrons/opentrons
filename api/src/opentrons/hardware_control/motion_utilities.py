@@ -190,13 +190,19 @@ def machine_from_deck(
     deck_pos: Dict[Axis, float],
     attitude: AttitudeMatrix,
     offset: Point,
+    robot_type: RobotType,
 ) -> Dict[Axis, float]:
     """Build a machine-axis position from a deck position"""
     try:
+        mount_axes = (
+            Axis.ot2_mount_axes()
+            if robot_type == "OT-2 Standard"
+            else Axis.ot3_mount_axes()
+        )
         point_for_z_axis = {
             axe: Point(x=deck_pos[type(axe).X], y=deck_pos[type(axe).Y], z=pos)
             for axe, pos in deck_pos.items()
-            if axe in axe.mount_axes()
+            if axe in mount_axes
         }
     except KeyError:
         raise ValueError(
@@ -234,13 +240,13 @@ def deck_from_machine(
     plunger_axes: Dict[Axis, float] = {
         k: v for k, v in machine_pos.items() if k not in k.gantry_axes()
     }
-    mount_axes: Dict[Axis, float] = {
-        k: v for k, v in machine_pos.items() if k in k.mount_axes()
-    }
+    mount_axes: Dict[Axis, float]
     to_mount: Callable[[Axis], Union[Mount, OT3Mount]]
     if robot_type == "OT-2 Standard":
+        mount_axes = {k: v for k, v in machine_pos.items() if k in k.ot2_mount_axes()}
         to_mount = Axis.to_ot2_mount
     else:
+        mount_axes = {k: v for k, v in machine_pos.items() if k in k.ot3_mount_axes()}
         to_mount = Axis.to_ot3_mount
     deck_positions_by_mount = {
         to_mount(axis): deck_point_from_machine_point(

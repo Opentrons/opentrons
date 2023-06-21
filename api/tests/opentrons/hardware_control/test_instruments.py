@@ -260,7 +260,7 @@ async def test_cache_instruments_sim(sim_and_instr):
     current_calls = [mock.call({"B": 0.05}), mock.call({"C": 0.05})]
     sim._backend._smoothie_driver.update_steps_per_mm.assert_has_calls(
         steps_mm_calls, any_order=True
-    )
+    )  # <-- this line
     sim._backend._smoothie_driver.update_pipette_config.assert_has_calls(
         pip_config_calls, any_order=True
     )

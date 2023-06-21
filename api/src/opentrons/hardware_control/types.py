@@ -104,8 +104,21 @@ class Axis(enum.Enum):
         return cls.P_L, cls.P_R
 
     @classmethod
-    def mount_axes(cls) -> Tuple["Axis", "Axis", "Axis"]:
+    def mount_axes(cls) -> None:
         """The axes which are used for moving instruments up and down."""
+        raise NotImplementedError(
+            "`Axis.mount_axes` has been removed. Use `Axis.ot2_mount_axes` or "
+            "`Axis.ot3_mount_axes` instead."
+        )
+
+    @classmethod
+    def ot2_mount_axes(cls) -> Tuple["Axis", "Axis"]:
+        """The OT2 axes which are used for moving instruments up and down."""
+        return cls.Z_L, cls.Z_R
+
+    @classmethod
+    def ot3_mount_axes(cls) -> Tuple["Axis", "Axis", "Axis"]:
+        """The OT3 axes which are used for moving instruments up and down."""
         return cls.Z_L, cls.Z_R, cls.Z_G
 
     @classmethod

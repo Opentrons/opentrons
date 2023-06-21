@@ -4,7 +4,7 @@ import logging
 from enum import Enum
 from typing import Dict, Any, Optional, List, Mapping, Tuple, TypeVar
 
-from .types import CriticalPoint, MotionChecks
+from .types import CriticalPoint, MotionChecks, Axis
 from .errors import OutOfBoundsMove
 from opentrons.types import Point
 
@@ -99,3 +99,17 @@ def check_motion_bounds(
             mod_log.warning(bounds_message)
             if checks.value & MotionChecks.HIGH.value:
                 raise OutOfBoundsMove(bounds_message)
+
+
+def ot2_axis_to_string(axis: Axis) -> str:
+    """Returns OT-2 specific string for the given axis."""
+    axis_str_map = {
+        Axis.Z_L: "Z",
+        Axis.Z_R: "A",
+        Axis.P_L: "B",
+        Axis.P_R: "C",
+    }
+    try:
+        return axis_str_map[axis]
+    except KeyError:
+        return axis.name

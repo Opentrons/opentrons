@@ -541,7 +541,7 @@ class LegacyHeaterShakerCore(LegacyModuleCore, AbstractHeaterShakerCore):
             pipette_location=protocol_core.get_last_location()
         ):
             hardware = protocol_core.get_hardware()
-            hardware.home(axes=[axis for axis in Axis.mount_axes()])
+            hardware.home(axes=[axis for axis in Axis.ot2_mount_axes()])
             protocol_core.set_last_location(None)
 
     def _prepare_for_latch_open(self) -> None:
@@ -554,7 +554,7 @@ class LegacyHeaterShakerCore(LegacyModuleCore, AbstractHeaterShakerCore):
             pipette_location=protocol_core.get_last_location()
         ):
             hardware = protocol_core.get_hardware()
-            hardware.home(axes=[axis for axis in Axis.mount_axes()])
+            hardware.home(axes=[axis for axis in Axis.ot2_mount_axes()])
             protocol_core.set_last_location(None)
 
 

@@ -145,7 +145,7 @@ from .status_bar_state import StatusBarStateController
 mod_log = logging.getLogger(__name__)
 
 AXES_IN_HOMING_ORDER: Tuple[Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis, Axis] = (
-    *Axis.mount_axes(),
+    *Axis.ot3_mount_axes(),
     Axis.X,
     Axis.Y,
     *Axis.pipette_axes(),
@@ -1091,9 +1091,10 @@ class OT3API(
     ) -> None:
         """Worker function to apply robot motion."""
         machine_pos = machine_from_deck(
-            target_position,
-            self._robot_calibration.deck_calibration.attitude,
-            self._robot_calibration.carriage_offset,
+            deck_pos=target_position,
+            attitude=self._robot_calibration.deck_calibration.attitude,
+            offset=self._robot_calibration.carriage_offset,
+            robot_type=cast(RobotType, "OT-3 Standard"),
         )
         bounds = self._backend.axis_bounds
         to_check = {

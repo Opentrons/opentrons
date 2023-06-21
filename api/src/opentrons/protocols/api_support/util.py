@@ -20,7 +20,8 @@ from typing import (
 from opentrons import types as top_types
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.types import Axis
-
+from opentrons.hardware_control.util import ot2_axis_to_string
+from opentrons_shared_data.robot.dev_types import RobotType
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Well, Labware
@@ -266,6 +267,11 @@ class AxisMaxSpeeds(UserDict):
     user access by string
     """
 
+    def __init__(self, robot_type: RobotType) -> None:
+        """"""
+        super().__init__()
+        self._robot_type = robot_type
+
     def __getitem__(self, key: Union[str, Axis]):
         checked_key = AxisMaxSpeeds._verify_key(key)
         return self.data[checked_key]
@@ -300,13 +306,29 @@ class AxisMaxSpeeds(UserDict):
 
     def __iter__(self):
         """keys() and dict iteration return string keys"""
-        return (k.name for k in self.data.keys())
+        string_keys = (
+            k.name if self._robot_type == "OT-3 Standard" else ot2_axis_to_string(k)
+            for k in self.data.keys()
+        )
+        return string_keys
 
     def keys(self):
-        return (k.name for k in self.data.keys())
+        string_keys = (
+            k.name if self._robot_type == "OT-3 Standard" else ot2_axis_to_string(k)
+            for k in self.data.keys()
+        )
+        return string_keys
 
     def items(self):
-        return ((k.name, v) for k, v in self.data.items())
+        return (
+            (
+                k.name
+                if self._robot_type == "OT-3 Standard"
+                else ot2_axis_to_string(k),
+                v,
+            )
+            for k, v in self.data.items()
+        )
 
 
 def clamp_value(

@@ -484,22 +484,22 @@ class OT3Controller:
         distances_gantry = {
             ax: self._get_axis_home_distance(ax)
             for ax in axes
-            if ax in Axis.gantry_axes() and ax not in Axis.mount_axes()
+            if ax in Axis.gantry_axes() and ax not in Axis.ot3_mount_axes()
         }
         velocities_gantry = {
             ax: -1 * speed_settings[Axis.to_kind(ax)]
             for ax in axes
-            if ax in Axis.gantry_axes() and ax not in Axis.mount_axes()
+            if ax in Axis.gantry_axes() and ax not in Axis.ot3_mount_axes()
         }
         distances_z = {
             ax: self._get_axis_home_distance(ax)
             for ax in axes
-            if ax in Axis.mount_axes()
+            if ax in Axis.ot3_mount_axes()
         }
         velocities_z = {
             ax: -1 * speed_settings[Axis.to_kind(ax)]
             for ax in axes
-            if ax in Axis.mount_axes()
+            if ax in Axis.ot3_mount_axes()
         }
         move_group_gantry_z = []
         if distances_z and velocities_z:

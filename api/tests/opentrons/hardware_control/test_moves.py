@@ -91,9 +91,10 @@ async def test_home(ot3_hardware, mock_home):
         mock_home.assert_called_once_with([Axis.X], GantryLoad.LOW_THROUGHPUT)
         assert dfm_mock.call_count == 2
         dfm_mock.assert_called_with(
-            mock_home.return_value,
-            ot3_hardware._robot_calibration.deck_calibration.attitude,
-            ot3_hardware._robot_calibration.carriage_offset,
+            machine_pos=mock_home.return_value,
+            attitude=ot3_hardware._robot_calibration.deck_calibration.attitude,
+            offset=ot3_hardware._robot_calibration.carriage_offset,
+            robot_type="OT-3 Standard",
         )
     assert ot3_hardware._current_position[Axis.X] == 20
 

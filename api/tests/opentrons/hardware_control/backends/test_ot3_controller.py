@@ -326,12 +326,12 @@ async def test_home_prioritize_mount(
 
     await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
     has_xy = len({Axis.X, Axis.Y} & set(axes)) > 0
-    has_mount = len(set(Axis.mount_axes()) & set(axes)) > 0
+    has_mount = len(set(Axis.ot3_mount_axes()) & set(axes)) > 0
     run = mock_move_group_run.call_args_list[0][0][0]._move_groups
     if has_xy and has_mount:
         assert len(run) > 1
         for node in run[0][0]:
-            assert node_to_axis(node) in Axis.mount_axes()
+            assert node_to_axis(node) in Axis.ot3_mount_axes()
         for node in run[1][0]:
             assert node in [NodeId.gantry_x, NodeId.gantry_y]
     else:

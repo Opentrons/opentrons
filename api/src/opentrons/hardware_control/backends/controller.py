@@ -30,6 +30,7 @@ from opentrons.types import Mount
 
 from ..module_control import AttachedModulesControl
 from ..types import AionotifyEvent, BoardRevision, Axis, DoorState
+from ..util import ot2_axis_to_string
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
@@ -231,7 +232,7 @@ class Controller:
         pipette axis to a low current (dwelling current) after each move
         """
         self._smoothie_driver.set_active_current(
-            {axis.name: amp for axis, amp in axis_currents.items()}
+            {ot2_axis_to_string(axis): amp for axis, amp in axis_currents.items()}
         )
 
     @contextmanager
@@ -347,17 +348,19 @@ class Controller:
         plunger_axis = Axis.of_plunger(mount)
 
         await self._smoothie_driver.update_steps_per_mm(
-            {plunger_axis.name: config["steps_per_mm"]}
+            {ot2_axis_to_string(plunger_axis): config["steps_per_mm"]}
         )
         await self._smoothie_driver.update_pipette_config(
-            mount_axis.name, {"home": config["home_pos"]}
+            ot2_axis_to_string(mount_axis), {"home": config["home_pos"]}
         )
         await self._smoothie_driver.update_pipette_config(
-            plunger_axis.name, {"max_travel": config["max_travel"]}
+            ot2_axis_to_string(plunger_axis), {"max_travel": config["max_travel"]}
         )
         self._smoothie_driver.set_dwelling_current(
-            {plunger_axis.name: config["idle_current"]}
+            {ot2_axis_to_string(plunger_axis): config["idle_current"]}
         )
         ms = config["splits"]
         if ms:
-            self._smoothie_driver.configure_splits_for({plunger_axis.name: ms})
+            self._smoothie_driver.configure_splits_for(
+                {ot2_axis_to_string(plunger_axis): ms}
+            )
