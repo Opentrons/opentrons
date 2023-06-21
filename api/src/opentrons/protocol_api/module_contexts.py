@@ -208,7 +208,11 @@ class ModuleContext(CommandPublisher):
     @property  # type: ignore[misc]
     @requires_version(2, 14)
     def parent(self) -> str:
-        """The name of the slot the module is on."""
+        """The name of the slot the module is on.
+
+        On a Flex, this will be like ``"D1"``. On an OT-2, this will be like ``"1"``.
+        See :ref:`deck-slots`.
+        """
         return self._core.get_deck_slot_id()
 
     @property  # type: ignore[misc]
@@ -229,7 +233,6 @@ class ModuleContext(CommandPublisher):
         )
 
     def __repr__(self) -> str:
-
         class_name = self.__class__.__name__
         display_name = self._core.get_display_name()
         location = self._core.get_deck_slot().id
