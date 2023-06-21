@@ -10,6 +10,7 @@ from opentrons.broker import Broker
 from opentrons.hardware_control.modules import ThermocyclerStep
 from opentrons.commands import module_commands as cmds
 from opentrons.commands.publisher import CommandPublisher, publish
+from opentrons.protocols.api_support.constants import ENGINE_CORE_API_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError, requires_version
 
@@ -23,7 +24,6 @@ from .core.common import (
     MagneticBlockCore,
 )
 from .core.core_map import LoadedCoreMap
-from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_module_core import LegacyModuleCore
 from .core.legacy.module_geometry import ModuleGeometry as LegacyModuleGeometry
 from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore

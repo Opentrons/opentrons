@@ -23,6 +23,7 @@ from opentrons.hardware_control.modules.types import (
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_reader import ProtocolSource, ProtocolFileRole
 
+from opentrons.protocols.api_support.constants import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api import (
     ProtocolContext as LegacyProtocolContext,
     InstrumentContext as LegacyPipetteContext,
@@ -31,7 +32,6 @@ from opentrons.protocol_api import (
     Well as LegacyWell,
     create_protocol_context,
 )
-from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.core.legacy.load_info import (
     LoadInfo as LegacyLoadInfo,
     InstrumentLoadInfo as LegacyInstrumentLoadInfo,

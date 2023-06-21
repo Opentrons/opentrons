@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING, Any, List, Dict, Optional, Union, Tuple, cast
 from opentrons_shared_data.labware.dev_types import LabwareDefinition, LabwareParameters
 
 from opentrons.types import Location, Point
+from opentrons.protocols.api_support.constants import ENGINE_CORE_API_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import requires_version, APIVersionError
 
@@ -33,7 +34,6 @@ from . import validation
 from ._liquid import Liquid
 from ._types import OffDeckType
 from .core import well_grid
-from .core.engine import ENGINE_CORE_API_VERSION
 from .core.labware import AbstractLabware
 from .core.module import AbstractModuleCore
 from .core.core_map import LoadedCoreMap

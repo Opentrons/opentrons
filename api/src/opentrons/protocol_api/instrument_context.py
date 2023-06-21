@@ -12,8 +12,8 @@ from opentrons.commands import publisher
 from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.advanced_control import transfers
 
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support import instrument
+from opentrons.protocols.api_support.constants import ENGINE_CORE_API_VERSION
 from opentrons.protocols.api_support.util import (
     FlowRates,
     PlungerSpeeds,
@@ -21,9 +21,9 @@ from opentrons.protocols.api_support.util import (
     requires_version,
     APIVersionError,
 )
+from opentrons.protocols.api_support.types import APIVersion
 
 from .core.common import InstrumentCore, ProtocolCore
-from .core.engine import ENGINE_CORE_API_VERSION
 from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
 from .config import Clearances
 from . import labware, validation
@@ -77,7 +77,6 @@ class InstrumentContext(publisher.CommandPublisher):
         trash: labware.Labware,
         requested_as: str,
     ) -> None:
-
         super().__init__(broker)
         self._api_version = api_version
         self._core = core
