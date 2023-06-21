@@ -11,10 +11,12 @@ from typing import (
     Callable,
     Awaitable,
     List,
+    Set,
 )
 
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
+    StatusBarState,
 )
 from opentrons.hardware_control.errors import UpdateOngoingError
 
@@ -243,6 +245,59 @@ class _UpdateProcess:
             except QueueEmpty:
                 return packet
 
+class _AnimationHandler:
+    """Internal interface to manage animations to represent firmware updates.
+    
+    The status bar should be set to the \"updating\" animation whenever an update
+    is in progress, but this is complicated by a couple of factors:
+    - When the rear panel firmware is being updated, the status bar will be stuck
+      off because it is controlled by that MCU
+    - When all updates are finished, the next state depends on whether the updates
+      are automatic updates on startup (which should lead into the off status) or
+      the updates are manually requested by a client (in which case we should 
+      transition back to the Idle status).
+    """
+
+    def __init__(self, hw_handle: "OT3API") -> None:
+        self._hardware_handle = hw_handle
+        self._initialized = False
+        self._in_progress: Set[SubSystem] = []
+        self._lock = Lock()
+    
+    def mark_initialized(self) -> None:
+        self._initialized = True
+
+    async def start_update(self, subsystem: SubSystem) -> None:
+        async with self._lock:
+            if subsystem in self._in_progress:
+                return 
+            self._in_progress.add(subsystem)
+
+            if SubSystem.rear_panel in self._in_progress:
+                # We can't control the status bar
+                return
+            if len(self._in_progress) == 1:
+                # This is the only update running, update the status bar
+                await self._hardware_handle.set_status_bar_state(StatusBarState.UPDATING)
+
+    async def update_complete(self, subsystem: SubSystem) -> None:
+        async with self._lock:
+            if subsystem not in self._in_progress:
+                return
+            self._in_progress.remove(subsystem)
+
+            if SubSystem.rear_panel in self._in_progress:
+                # We can't control the status bar
+                return 
+            if len(self._in_progress) > 0 and subsystem == SubSystem.rear_panel:
+                # The rear panel just finished AND we're still updating, so we
+                # have to set the rear panel to go back to blinking
+                await self._hardware_handle.set_status_bar_state(StatusBarState.UPDATING)
+            elif len(self._in_progress) == 0:
+                # There are no more updates.
+                state = StatusBarState.IDLE if self._initialized else StatusBarState.OFF
+                await self._hardware_handle.set_status_bar_state(state)
+
 
 class UpdateProcessHandle:
     """The external interface to get status notifications from the update process."""
@@ -307,12 +362,15 @@ class FirmwareUpdateManager:
     _task_runner: TaskRunner
     _hardware_handle: "OT3API"
 
+    _animation_handler: _AnimationHandler
+
     def __init__(self, task_runner: TaskRunner, hw_handle: "OT3API") -> None:
         self._all_updates_by_id = {}
         self._running_updates_by_subsystem = {}
         self._task_runner = task_runner
         self._management_lock = Lock()
         self._hardware_handle = hw_handle
+        self._animation_handler = _AnimationHandler(hw_handle=hw_handle)
 
     async def _get_by_id(self, update_id: str) -> _UpdateProcess:
         async with self._management_lock:
@@ -342,6 +400,7 @@ class FirmwareUpdateManager:
                     # make sure this process gets its progress updated since nothing may
                     # update it from the route handler after this
                     await process.provide_latest_progress()
+                    await self._animation_handler.update_complete(subsystem)
                 except KeyError:
                     log.exception(f"Double pop for update on {subsystem}")
 
@@ -351,6 +410,7 @@ class FirmwareUpdateManager:
         self._running_updates_by_subsystem[hw_subsystem] = self._all_updates_by_id[
             update_id
         ]
+        await self._animation_handler.start_update(subsystem=subsystem)
         self._task_runner.run(self._all_updates_by_id[update_id]._update_task)
         return self._all_updates_by_id[update_id]
 
@@ -415,3 +475,6 @@ class FirmwareUpdateManager:
             process = await self._emplace(update_id, subsystem, created_at)
             await process.provide_latest_progress()
         return process.get_handle()
+
+    def mark_initialized(self) -> None:
+        self._animation_handler.mark_initialized()
