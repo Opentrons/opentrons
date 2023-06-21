@@ -42,6 +42,7 @@ interface Control {
   iconName: IconName
   axis: Axis
   sign: Sign
+  disabled: boolean
 }
 interface ControlsContents {
   controls: Control[]
@@ -53,6 +54,26 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
   [VERTICAL_PLANE]: {
     controls: [
       {
+        keyName: 'ArrowLeft',
+        shiftKey: false,
+        bearing: 'left',
+        iconName: 'ot-arrow-left',
+        axis: 'x',
+        sign: -1,
+        gridColumn: 0,
+        disabled: true,
+      },
+      {
+        keyName: 'ArrowRight',
+        shiftKey: false,
+        bearing: 'right',
+        iconName: 'ot-arrow-right',
+        axis: 'x',
+        sign: 1,
+        gridColumn: 2,
+        disabled: true,
+      },
+      {
         keyName: 'ArrowUp',
         shiftKey: true,
         bearing: 'up',
@@ -60,6 +81,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         axis: 'z',
         sign: 1,
         gridColumn: 1,
+        disabled: false,
       },
       {
         keyName: 'ArrowDown',
@@ -69,6 +91,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         axis: 'z',
         sign: -1,
         gridColumn: 1,
+        disabled: false,
       },
     ],
     title: 'Z-axis',
@@ -84,6 +107,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         axis: 'x',
         sign: -1,
         gridColumn: 0,
+        disabled: false,
       },
       {
         keyName: 'ArrowRight',
@@ -93,6 +117,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         axis: 'x',
         sign: 1,
         gridColumn: 2,
+        disabled: false,
       },
       {
         keyName: 'ArrowUp',
@@ -102,6 +127,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         axis: 'y',
         sign: 1,
         gridColumn: 1,
+        disabled: false,
       },
       {
         keyName: 'ArrowDown',
@@ -111,6 +137,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         axis: 'y',
         sign: -1,
         gridColumn: 1,
+        disabled: false,
       },
     ],
     title: 'X- and Y-axis',
@@ -347,7 +374,7 @@ const ARROW_BUTTON_STYLES = css`
     &:hover {
       background-color: ${COLORS.light1Pressed};
       color: ${COLORS.darkBlackHover};
-      box-shadow: 0 0 0;
+      border: 1px ${COLORS.transparent} solid;
     }
 
     &:active {
@@ -362,6 +389,7 @@ const ARROW_BUTTON_STYLES = css`
     &:disabled {
       background-color: ${COLORS.darkBlack20};
       color: ${COLORS.darkBlack40};
+      border: 1px ${COLORS.transparent} solid;
     }
   }
 `
@@ -396,7 +424,7 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
   return (
     <Box css={ARROW_GRID_STYLES}>
       {controls.map(
-        ({ bearing, iconName, axis, sign, gridColumn, keyName }) => (
+        ({ bearing, iconName, axis, sign, gridColumn, keyName, disabled }) => (
           <PrimaryButton
             key={bearing}
             onClick={() => jog(axis, sign, stepSize)}
@@ -404,6 +432,7 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
             title={bearing}
             gridArea={keyName}
             alignSelf={BUTTON_ALIGN_BY_KEY_NAME[keyName] ?? 'center'}
+            disabled={disabled}
           >
             <Icon css={ARROW_ICON_STYLES} name={iconName} />
           </PrimaryButton>
