@@ -439,7 +439,14 @@ class OT3Controller:
             move_groups=[move_group],
             ignore_stalls=True if not ff.stall_detection_enabled() else False,
         )
-        positions = await runner.run(can_messenger=self._messenger)
+        mounts_moving = [
+            OT3Axis.to_mount(node_to_axis(k))
+            for g in move_group
+            for k in g.keys()
+            if k in [NodeId.pipette_left, NodeId.pipette_right]
+        ]
+        async with self.monitor_overpressure(mounts_moving):
+            positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
     def _get_axis_home_distance(self, axis: OT3Axis) -> float:
@@ -559,7 +566,11 @@ class OT3Controller:
             for runner in maybe_runners
             if runner
         ]
-        positions = await asyncio.gather(*coros)
+        moving_pipettes = [
+            OT3Axis.to_mount(ax) for ax in checked_axes if ax in OT3Axis.pipette_axes()
+        ]
+        async with self.monitor_overpressure(moving_pipettes):
+            positions = await asyncio.gather(*coros)
         if OT3Axis.Q in checked_axes:
             await self.tip_action(
                 [OT3Axis.Q],
@@ -945,30 +956,32 @@ class OT3Controller:
 
     @asynccontextmanager
     async def monitor_overpressure(
-        self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
+        self, mounts: List[OT3Mount], sensor_id: SensorId = SensorId.S0
     ) -> AsyncIterator[None]:
-        if ff.overpressure_detection_enabled():
-            tool = sensor_node_for_pipette(OT3Mount(mount.value))
+        if ff.overpressure_detection_enabled() and mounts:
+            tools = [sensor_node_for_pipette(OT3Mount(m.value)) for m in mounts]
             # FIXME we should switch the sensor type based on the channel
             # used when partial tip pick up is implemented.
             # FIXME we should also monitor pressure in all available channels
             provided_context_manager = await check_overpressure(
-                self._messenger, tool, sensor_id
+                self._messenger, tools, sensor_id
             )
-            errors: asyncio.Queue[ErrorCode] = asyncio.Queue()
+            errors: asyncio.Queue[Tuple[NodeId, ErrorCode]] = asyncio.Queue()
 
             async with provided_context_manager() as errors:
                 try:
                     yield
                 finally:
 
-                    def _pop_queue() -> Optional[ErrorCode]:
+                    def _pop_queue() -> Optional[Tuple[NodeId, ErrorCode]]:
                         try:
                             return errors.get_nowait()
                         except asyncio.QueueEmpty:
                             return None
 
-                    if _pop_queue():
+                    q_msg = _pop_queue()
+                    if q_msg:
+                        mount = OT3Axis.to_mount(node_to_axis(q_msg[0]))
                         raise OverPressureDetected(
                             f"The pressure sensor on the {mount} mount has exceeded operational limits."
                         )

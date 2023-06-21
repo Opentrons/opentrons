@@ -131,15 +131,19 @@ async def liquid_probe(
 
 
 async def check_overpressure(
-    messenger: CanMessenger, tool: PipetteProbeTarget, sensor_id: SensorId = SensorId.S0
-) -> Callable[..., AsyncContextManager["asyncio.Queue[ErrorCode]"]]:
+    messenger: CanMessenger,
+    tools: List[PipetteProbeTarget],
+    sensor_id: SensorId = SensorId.S0,
+) -> Callable[..., AsyncContextManager["asyncio.Queue[Tuple[NodeId, ErrorCode]]"]]:
     """Montior for overpressure in the system.
 
     Returns a partial context manager to be used in the hardware controller so
     we can wrap moves.
     """
     sensor_scheduler = SensorScheduler()
-    sensor_info = SensorInformation(SensorType.pressure, sensor_id, tool)
+    sensor_info = []
+    for tool in tools:
+        sensor_info.append(SensorInformation(SensorType.pressure, sensor_id, tool))
     return partial(
         sensor_scheduler.monitor_exceed_max_threshold, sensor_info, messenger
     )

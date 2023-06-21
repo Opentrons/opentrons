@@ -1,6 +1,6 @@
 """Test the tool-sensor coordination code."""
 import logging
-from mock import patch, ANY, AsyncMock
+from mock import patch, ANY, AsyncMock, call
 import pytest
 from contextlib import asynccontextmanager
 from typing import Iterator, List, Tuple, AsyncIterator, Any
@@ -375,12 +375,15 @@ async def test_capacitive_sweep(
 @pytest.mark.parametrize(
     "target_node,sensor_id",
     [
-        (NodeId.pipette_left, SensorId.S0),
-        (NodeId.pipette_right, SensorId.S1),
+        ([NodeId.pipette_left], SensorId.S0),
+        ([NodeId.pipette_right], SensorId.S1),
+        ([NodeId.pipette_left, NodeId.pipette_right], SensorId.S1),
     ],
 )
 async def test_overpressure_closure(
-    mock_messenger: AsyncMock, target_node: PipetteProbeTarget, sensor_id: SensorId
+    mock_messenger: AsyncMock,
+    target_node: List[PipetteProbeTarget],
+    sensor_id: SensorId,
 ) -> None:
     """Test that we can use partial context manager."""
     partial_context_manager = await check_overpressure(
@@ -390,27 +393,39 @@ async def test_overpressure_closure(
     # Execute the actual partial context manager and see that the correct
     # messages are sent.
     async with partial_context_manager():
-        mock_messenger.ensure_send.assert_called_with(
-            node_id=target_node,
-            message=BindSensorOutputRequest(
-                payload=BindSensorOutputRequestPayload(
-                    sensor=SensorTypeField(SensorType.pressure),
-                    sensor_id=SensorIdField(sensor_id),
-                    binding=SensorOutputBindingField(
-                        SensorOutputBinding.max_threshold_sync
+        mock_messenger.ensure_send.assert_has_calls(
+            [
+                call(
+                    node_id=n,
+                    message=BindSensorOutputRequest(
+                        payload=BindSensorOutputRequestPayload(
+                            sensor=SensorTypeField(SensorType.pressure),
+                            sensor_id=SensorIdField(sensor_id),
+                            binding=SensorOutputBindingField(
+                                SensorOutputBinding.max_threshold_sync
+                            ),
+                        )
                     ),
+                    expected_nodes=[n],
                 )
-            ),
-            expected_nodes=[target_node],
+                for n in target_node
+            ],
+            any_order=True,
         )
-    mock_messenger.ensure_send.assert_called_with(
-        node_id=target_node,
-        message=BindSensorOutputRequest(
-            payload=BindSensorOutputRequestPayload(
-                sensor=SensorTypeField(SensorType.pressure),
-                sensor_id=SensorIdField(sensor_id),
-                binding=SensorOutputBindingField(SensorOutputBinding.none),
+    mock_messenger.ensure_send.assert_has_calls(
+        [
+            call(
+                node_id=n,
+                message=BindSensorOutputRequest(
+                    payload=BindSensorOutputRequestPayload(
+                        sensor=SensorTypeField(SensorType.pressure),
+                        sensor_id=SensorIdField(sensor_id),
+                        binding=SensorOutputBindingField(SensorOutputBinding.none),
+                    )
+                ),
+                expected_nodes=[n],
             )
-        ),
-        expected_nodes=[target_node],
+            for n in target_node
+        ],
+        any_order=True,
     )
