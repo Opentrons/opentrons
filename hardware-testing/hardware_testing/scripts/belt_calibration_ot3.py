@@ -30,7 +30,7 @@ async def _calibrate_pipette(api: OT3API, mount: types.OT3Mount) -> None:
         await api.home_z(mount)
 
 
-async def _check_belt_accuracy(api: OT3API, mount: types.OT3Mount) -> None:
+async def _check_belt_accuracy_probe(api: OT3API, mount: types.OT3Mount) -> None:
     ui.print_header("CHECK BELT ACCURACY")
     for slot in [1, 3, 10, 12]:
         await api.home()
@@ -79,26 +79,51 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     )
     print("homing")
     await api.home()
+    await api.cache_instruments()
     print("resetting robot calibration")
     await api.reset_instrument_offset(mount)
     api.reset_robot_calibration()
 
-    # SKIP calibrating the belts, then check accuracy
-    await _calibrate_pipette(api, mount)
-    await _check_belt_accuracy(api, mount)
+    if args.mode == "all":
+        # SKIP calibrating the belts, then check accuracy
+        await _calibrate_pipette(api, mount)
+        await _check_belt_accuracy_probe(api, mount)
+        # await _check_belt_accuracy_dial(api, mount)
 
-    # DO calibrate the belts, then check accuracy
-    await _calibrate_belts(api, mount)  # <-- !!!
-    await _calibrate_pipette(api, mount)
-    await _check_belt_accuracy(api, mount)
+        # DO calibrate the belts, then check accuracy
+        await _calibrate_belts(api, mount)  # <-- !!!
+        await _calibrate_pipette(api, mount)
+        await _check_belt_accuracy_probe(api, mount)
+        # await _check_belt_accuracy_dial(api, mount)
+    elif args.mode == "belt":
+        await _calibrate_belts(api, mount)
+    elif args.mode == "probe":
+        # SKIP calibrating the belts, then check accuracy
+        await _calibrate_pipette(api, mount)
+        await _check_belt_accuracy_probe(api, mount)
+
+        # DO calibrate the belts, then check accuracy
+        await _calibrate_belts(api, mount)  # <-- !!!
+        await _calibrate_pipette(api, mount)
+        await _check_belt_accuracy_probe(api, mount)
+    elif args.mode == "dial":
+        # SKIP calibrating the belts, then check accuracy
+        await _calibrate_pipette(api, mount)
+        await _check_belt_accuracy_dial(api, mount)
+
+        # DO calibrate the belts, then check accuracy
+        await _calibrate_belts(api, mount)  # <-- !!!
+        await _calibrate_pipette(api, mount)
+        await _check_belt_accuracy_dial(api, mount)
 
     print("done")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--mount", type=str, choices=["left", "right"], required=True)
+    parser.add_argument("-s", "--simulate", action="store_true")
+    parser.add_argument("-m", "--mount", type=str, choices=["left", "right"], required=True)
+    parser.add_argument("-d", "--mode", type=str, choices=["belt", "probe", "dial", "all"], required=True, default="all")
     args = parser.parse_args()
     if args.mount == "left":
         mnt = types.OT3Mount.LEFT
