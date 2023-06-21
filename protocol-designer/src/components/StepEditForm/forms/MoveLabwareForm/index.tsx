@@ -45,8 +45,6 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
           <LabwareLocationField {...propsForFields.newLocation} />
         </FormGroup>
       </div>
-
-      <div className={styles.section_wrapper}></div>
     </div>
   )
 }
