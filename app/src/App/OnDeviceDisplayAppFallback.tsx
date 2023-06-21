@@ -14,11 +14,11 @@ import {
 
 import { StyledText } from '../atoms/text'
 import { MediumButton } from '../atoms/buttons'
-import { Modal } from '../molecules/Modal/OnDeviceDisplay/Modal'
+import { Modal } from '../molecules/Modal'
 import { appRestart } from '../redux/shell'
 
 import type { Dispatch } from '../redux/types'
-import type { ModalHeaderBaseProps } from '../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../molecules/Modal/types'
 
 export function OnDeviceDisplayAppFallback({
   error,
