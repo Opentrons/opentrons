@@ -167,7 +167,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const rightPipetteModel = pipettesData?.right?.model ?? null
   const extensionMountDisplayName =
     extensionInstrument != null &&
-      extensionInstrument.instrumentModel === 'gripperV1'
+    extensionInstrument.instrumentModel === 'gripperV1'
       ? getGripperDisplayName(extensionInstrument.instrumentModel)
       : null
 
@@ -186,34 +186,32 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
         {t('shared:instruments')}
       </StyledText>
 
-      {isPipetteQueryLoading || isInstrumentsQueryLoading ?
-        null
-        : (
-          <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
-            {leftAndRightMountsPipetteDisplayName != null ? (
-              <InstrumentContainer
-                displayName={leftAndRightMountsPipetteDisplayName}
-              />
-            ) : null}
-            {leftPipetteModel != null ? (
-              <InstrumentContainer
-                displayName={
-                  getPipetteModelSpecs(leftPipetteModel)?.displayName ?? ''
-                }
-              />
-            ) : null}
-            {rightPipetteModel != null ? (
-              <InstrumentContainer
-                displayName={
-                  getPipetteModelSpecs(rightPipetteModel)?.displayName ?? ''
-                }
-              />
-            ) : null}
-            {extensionMountDisplayName != null ? (
-              <InstrumentContainer displayName={extensionMountDisplayName} />
-            ) : null}
-          </Flex>
-        )}
+      {isPipetteQueryLoading || isInstrumentsQueryLoading ? null : (
+        <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
+          {leftAndRightMountsPipetteDisplayName != null ? (
+            <InstrumentContainer
+              displayName={leftAndRightMountsPipetteDisplayName}
+            />
+          ) : null}
+          {leftPipetteModel != null ? (
+            <InstrumentContainer
+              displayName={
+                getPipetteModelSpecs(leftPipetteModel)?.displayName ?? ''
+              }
+            />
+          ) : null}
+          {rightPipetteModel != null ? (
+            <InstrumentContainer
+              displayName={
+                getPipetteModelSpecs(rightPipetteModel)?.displayName ?? ''
+              }
+            />
+          ) : null}
+          {extensionMountDisplayName != null ? (
+            <InstrumentContainer displayName={extensionMountDisplayName} />
+          ) : null}
+        </Flex>
+      )}
     </Flex>
   )
 }
