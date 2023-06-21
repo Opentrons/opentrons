@@ -1663,9 +1663,6 @@ class OT3API(
             )
             await self._move(target_up)
 
-    async def get_gear_position(self):
-        return await self._backend.gear_motor_position_estimation()
-
     async def _motor_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
     ) -> None:
@@ -1682,33 +1679,27 @@ class OT3API(
             await self._move(target_down)
             # perform pick up tip
 
-            # gear_origin_dict = {OT3Axis.Q: 0}
             gear_motor_origin = await self._backend.gear_motor_position_estimation()
-            gear_origin_dict = {
-                OT3Axis.Q: gear_motor_origin[0]
-            }
+            gear_origin_dict = {OT3Axis.Q: gear_motor_origin[0]}
             gear_motor_target = pipette_spec.pick_up_distance + pipette_spec.home_buffer
             gear_target_dict = {OT3Axis.Q: gear_motor_target}
             moves = self._build_moves(gear_origin_dict, gear_target_dict)
             blocks = moves[0][0].blocks
 
             for block in blocks:
-                print(f"block speed = {block.initial_speed}")
-                print(f"block acceleration = {block.acceleration}")
                 await self._backend.tip_action(
-                        [OT3Axis.of_main_tool_actuator(mount)],
-                        block.distance,
-                        block.initial_speed,
-                        block.acceleration,
-                        "clamp",
+                    [OT3Axis.of_main_tool_actuator(mount)],
+                    float(block.distance),
+                    float(block.initial_speed),
+                    float(block.acceleration),
+                    "clamp",
                 )
             # back clamps off the adapter posts
-            print(f"pipette spec speed = {pipette_spec.speed}")
             await self._backend.tip_action(
-                [Axis.of_main_tool_actuator(mount)],
-                pipette_spec.pick_up_distance + pipette_spec.home_buffer,
-                (pipette_spec.speed - 1),
-                0,
+                [OT3Axis.of_main_tool_actuator(mount)],
+                float(pipette_spec.pick_up_distance + pipette_spec.home_buffer),
+                float(pipette_spec.speed),
+                float(0),
                 "home",
             )
 

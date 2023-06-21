@@ -99,8 +99,7 @@ class MoveGroupRunner:
         """
         self._move_groups = move_groups
         self._start_at_index = start_at_index
-        # self._ignore_stalls = ignore_stalls
-        self._ignore_stalls = True
+        self._ignore_stalls = ignore_stalls
         self._is_prepped: bool = False
 
     @staticmethod
@@ -328,12 +327,12 @@ class MoveGroupRunner:
             acceleration=Int32Field(
                 int(
                     (
-                            step.acceleration_mm_sec_sq
-                            * 1000.0
-                            / interrupts_per_sec
-                            / interrupts_per_sec
+                        step.acceleration_mm_sec_sq
+                        * 1000.0
+                        / interrupts_per_sec
+                        / interrupts_per_sec
                     )
-                    * (2 ** 31)
+                    * (2**31)
                 )
             ),
             action=PipetteTipActionTypeField(step.action),

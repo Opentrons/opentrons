@@ -228,7 +228,7 @@ def get_system_constraints(
 ) -> "SystemConstraints[OT3Axis]":
     conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
-    axis_kind = [
+    axis_kind_list = [
         OT3AxisKind.P,
         OT3AxisKind.X,
         OT3AxisKind.Y,
@@ -236,8 +236,8 @@ def get_system_constraints(
         OT3AxisKind.Z_G,
     ]
     if gantry_load == GantryLoad.HIGH_THROUGHPUT:
-        axis_kind.append(OT3AxisKind.Q)
-    for axis_kind in axis_kind:
+        axis_kind_list.append(OT3AxisKind.Q)
+    for axis_kind in axis_kind_list:
         for axis in OT3Axis.of_kind(axis_kind):
             constraints[axis] = AxisConstraints.build(
                 conf_by_pip["acceleration"][axis_kind],
@@ -245,7 +245,6 @@ def get_system_constraints(
                 conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
                 conf_by_pip["default_max_speed"][axis_kind],
             )
-
 
     return constraints
 
