@@ -1626,10 +1626,15 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@fontsource/public-sans@4.5.11":
-  version "4.5.11"
-  resolved "https://registry.yarnpkg.com/@fontsource/public-sans/-/public-sans-4.5.11.tgz#a95f6129c8bf092da7ae956eebf688b35b389e2c"
-  integrity sha512-waejL3VQnifnLVwQGcW2bULD2vUaevjE9OKmOSAmBACAebZnnYznHL+NL4NgW6B+b1wyltmIr6jBF5XMZVWgYA==
+"@fontsource/dejavu-sans@5.0.3":
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/@fontsource/dejavu-sans/-/dejavu-sans-5.0.3.tgz#32fad6738b228a2e6f490f1fa6983393997f9d4b"
+  integrity sha512-VW88zyjoaxAqypEL6TqX2fcPIsCyxj+TPO6Usrine+i5tmJxnSBkh5NJ1dhczy+2ieC2tCHpKygZggw3k6qgUA==
+
+"@fontsource/public-sans@5.0.3":
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/@fontsource/public-sans/-/public-sans-5.0.3.tgz#483c13f0ba320ec570d4161495a28c7f1bfaba6a"
+  integrity sha512-qoP6K/rmKIe6TP31kV9ImR73u/R1opPA3sx+4NLH4wQWbxTOQNLbH9nDzKF2PN7IQ9xLpu5e6XnQLgwlPpjeTQ==
 
 "@gar/promisify@^1.1.3":
   version "1.1.3"
@@ -2173,7 +2178,8 @@
 "@opentrons/app@link:app":
   version "0.0.0-dev"
   dependencies:
-    "@fontsource/public-sans" "4.5.11"
+    "@fontsource/dejavu-sans" "5.0.3"
+    "@fontsource/public-sans" "5.0.3"
     "@hot-loader/react-dom" "17.0.1"
     "@opentrons/api-client" "link:api-client"
     "@opentrons/components" "link:components"

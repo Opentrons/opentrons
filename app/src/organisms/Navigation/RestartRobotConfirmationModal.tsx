@@ -12,11 +12,11 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal/OnDeviceDisplay'
+import { Modal } from '../../molecules/Modal'
 import { restartRobot } from '../../redux/robot-admin'
 
 import { Dispatch } from '../../redux/types'
-import { ModalHeaderBaseProps } from '../../molecules/Modal/OnDeviceDisplay/types'
+import { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface RestartRobotConfirmationModalProps {
   robotName: string

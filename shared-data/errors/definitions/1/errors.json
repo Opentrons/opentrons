@@ -106,6 +106,10 @@
       "detail": "Gripper Not Present",
       "category": "roboticsInteractionError"
     },
+    "3012": {
+      "detail": "Unexpected Tip Presence",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"

@@ -28,10 +28,13 @@ from opentrons.hardware_control.modules.module_calibration import (
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
 from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs, ot3_pipette_config
+from opentrons.config import robot_configs
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -92,6 +95,7 @@ from .types import (
     UpdateStatus,
     StatusBarState,
     SubSystemState,
+    TipStateType,
 )
 from .errors import (
     MustHomeError,
@@ -546,7 +550,7 @@ class OT3API(
             # TODO (lc 12-5-2022) cache instruments should be receiving
             # a pipette type / channels rather than the named config.
             # We should also check version here once we're comfortable.
-            if not ot3_pipette_config.supported_pipette(name):
+            if not pipette_load_name.supported_pipette(name):
                 raise RuntimeError(f"{name} is not a valid pipette name")
         async with self._motion_lock:
             # we're not actually checking the required instrument except in the context
@@ -695,7 +699,8 @@ class OT3API(
         """
 
         checked_mount = OT3Mount.from_mount(mount)
-        await self.home([OT3Axis.of_main_tool_actuator(checked_mount)])
+        async with self._backend.monitor_overpressure(mount):
+            await self.home([OT3Axis.of_main_tool_actuator(checked_mount)])
         instr = self._pipette_handler.hardware_instruments[checked_mount]
         if instr:
             self._log.info("Attempting to move the plunger to bottom.")
@@ -1476,16 +1481,17 @@ class OT3API(
             )
             backlash_pos = target_pos.copy()
             backlash_pos[pip_ax] -= instrument.backlash_distance
-            await self._move(
-                backlash_pos,
-                speed=aspirate_spec.speed,
-                home_flagged_axes=False,
-            )
-            await self._move(
-                target_pos,
-                speed=aspirate_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self._backend.monitor_overpressure(mount):
+                await self._move(
+                    backlash_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
+                await self._move(
+                    target_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Aspirate failed")
             aspirate_spec.instr.set_current_volume(0)
@@ -1517,11 +1523,12 @@ class OT3API(
             await self._backend.set_active_current(
                 {OT3Axis.from_axis(dispense_spec.axis): dispense_spec.current}
             )
-            await self._move(
-                target_pos,
-                speed=dispense_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self._backend.monitor_overpressure(mount):
+                await self._move(
+                    target_pos,
+                    speed=dispense_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Dispense failed")
             dispense_spec.instr.set_current_volume(0)
@@ -1565,11 +1572,12 @@ class OT3API(
         )
 
         try:
-            await self._move(
-                target_pos,
-                speed=blowout_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self._backend.monitor_overpressure(realmount):
+                await self._move(
+                    target_pos,
+                    speed=blowout_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Blow out failed")
             raise
@@ -1651,6 +1659,8 @@ class OT3API(
         for rel_point, speed in spec.shake_off_list:
             await self.move_rel(realmount, rel_point, speed=speed)
 
+        await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
+
         _add_tip_to_instrs()
 
         if prep_after:
@@ -1682,6 +1692,7 @@ class OT3API(
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
         spec, _remove = self._pipette_handler.plan_check_drop_tip(realmount, home_after)
+
         for move in spec.drop_moves:
             await self._backend.set_active_current(
                 {
@@ -1709,11 +1720,12 @@ class OT3API(
                 target_pos = target_position_from_plunger(
                     realmount, move.target_position, self._current_position
                 )
-                await self._move(
-                    target_pos,
-                    speed=move.speed,
-                    home_flagged_axes=False,
-                )
+                async with self._backend.monitor_overpressure(mount):
+                    await self._move(
+                        target_pos,
+                        speed=move.speed,
+                        home_flagged_axes=False,
+                    )
         if move.home_after:
             await self._home([OT3Axis.from_axis(ax) for ax in move.home_axes])
 
@@ -1726,6 +1738,8 @@ class OT3API(
                 for axis, current in spec.ending_current.items()
             }
         )
+
+        await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
         _remove()
 
     async def clean_up(self) -> None:

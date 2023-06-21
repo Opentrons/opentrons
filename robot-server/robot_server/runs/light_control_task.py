@@ -21,9 +21,9 @@ def _engine_status_to_status_bar(status: Optional[EngineStatus]) -> StatusBarSta
         EngineStatus.RUNNING: StatusBarState.RUNNING,
         EngineStatus.PAUSED: StatusBarState.PAUSED,
         EngineStatus.BLOCKED_BY_OPEN_DOOR: StatusBarState.PAUSED,
-        EngineStatus.STOP_REQUESTED: StatusBarState.RUNNING,
-        EngineStatus.STOPPED: StatusBarState.RUNNING,
-        EngineStatus.FINISHING: StatusBarState.RUNNING,
+        EngineStatus.STOP_REQUESTED: StatusBarState.UPDATING,
+        EngineStatus.STOPPED: StatusBarState.IDLE,
+        EngineStatus.FINISHING: StatusBarState.UPDATING,
         EngineStatus.FAILED: StatusBarState.HARDWARE_ERROR,
         EngineStatus.SUCCEEDED: StatusBarState.RUN_COMPLETED,
     }[status]

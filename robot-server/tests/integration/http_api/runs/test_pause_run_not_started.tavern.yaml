@@ -36,4 +36,4 @@ stages:
         errors:
           - id: 'RunActionNotAllowed'
             title: 'Run Action Not Allowed'
-            detail: 'Cannot pause a run that is not running.'
+            detail: 'Error 4000 GENERAL_ERROR (PauseNotAllowedError): Cannot pause a run that is not running.'

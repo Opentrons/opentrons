@@ -18,13 +18,18 @@ exports[`InstrumentDiagram 96-channel GEN1 renders correctly 1`] = `
 exports[`InstrumentDiagram Multi-channel GEN2 renders correctly 1`] = `
 .c0 {
   min-width: 0;
+  -webkit-transform: scaleX(-1);
+  -ms-transform: scaleX(-1);
+  transform: scaleX(-1);
+  -webkit-filter: FlipH;
+  filter: FlipH;
 }
 
 <div
   className="c0"
 >
   <img
-    className="flipped_image"
+    className=""
     src="multi-channel_GEN2_800px.png"
   />
 </div>
@@ -48,13 +53,18 @@ exports[`InstrumentDiagram Multi-channel renders correctly 1`] = `
 exports[`InstrumentDiagram Single-channel GEN2 renders correctly 1`] = `
 .c0 {
   min-width: 0;
+  -webkit-transform: scaleX(-1);
+  -ms-transform: scaleX(-1);
+  transform: scaleX(-1);
+  -webkit-filter: FlipH;
+  filter: FlipH;
 }
 
 <div
   className="c0"
 >
   <img
-    className="flipped_image"
+    className=""
     src="single-channel_GEN2_800px.png"
   />
 </div>
@@ -78,13 +88,18 @@ exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
 exports[`InstrumentDiagram eight-channel GEN3 renders correctly 1`] = `
 .c0 {
   min-width: 0;
+  -webkit-transform: scaleX(-1);
+  -ms-transform: scaleX(-1);
+  transform: scaleX(-1);
+  -webkit-filter: FlipH;
+  filter: FlipH;
 }
 
 <div
   className="c0"
 >
   <img
-    className="flipped_image"
+    className=""
     src="eight-channel-gen3.png"
   />
 </div>
@@ -93,13 +108,18 @@ exports[`InstrumentDiagram eight-channel GEN3 renders correctly 1`] = `
 exports[`InstrumentDiagram single-channel GEN3 renders correctly 1`] = `
 .c0 {
   min-width: 0;
+  -webkit-transform: scaleX(-1);
+  -ms-transform: scaleX(-1);
+  transform: scaleX(-1);
+  -webkit-filter: FlipH;
+  filter: FlipH;
 }
 
 <div
   className="c0"
 >
   <img
-    className="flipped_image"
+    className=""
     src="single-channel-gen3.png"
   />
 </div>
@@ -108,6 +128,15 @@ exports[`InstrumentDiagram single-channel GEN3 renders correctly 1`] = `
 exports[`InstrumentGroup Renders correctly 1`] = `
 .c0 {
   min-width: 0;
+}
+
+.c1 {
+  min-width: 0;
+  -webkit-transform: scaleX(-1);
+  -ms-transform: scaleX(-1);
+  transform: scaleX(-1);
+  -webkit-filter: FlipH;
+  filter: FlipH;
 }
 
 <section
@@ -161,10 +190,10 @@ exports[`InstrumentGroup Renders correctly 1`] = `
       </div>
     </div>
     <div
-      className="c0 pipette_icon"
+      className="c1 pipette_icon"
     >
       <img
-        className="flipped_image"
+        className=""
         src="single_channel_GEN1_800px.png"
       />
     </div>
