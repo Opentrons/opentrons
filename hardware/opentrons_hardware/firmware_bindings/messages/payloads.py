@@ -227,9 +227,9 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 
 @dataclass(eq=False)
 class GearMotorPositionResponse(EmptyPayload):
+    """Read Gear Motor Position Estimation."""
 
     current_position: utils.UInt32Field
-
 
 
 @dataclass(eq=False)

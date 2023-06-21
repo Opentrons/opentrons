@@ -273,16 +273,18 @@ class UpdateMotorPositionEstimationResponse(BaseMessage):  # noqa: D101
 
 
 @dataclass
-class UpdateGearMotorPositionEstimationRequest(EmptyPayloadMessage): # noqa D101
+class UpdateGearMotorPositionEstimationRequest(EmptyPayloadMessage):  # noqa: D101
     message_id: Literal[
         MessageId.update_gear_motor_position_estimation_request
     ] = MessageId.update_gear_motor_position_estimation_request
 
 
 @dataclass
-class UpdateGearMotorPositionEstimationResponse(BaseMessage): # noqa D101
+class UpdateGearMotorPositionEstimationResponse(BaseMessage):  # noqa: D101
     payload: payloads.GearMotorPositionResponse
-    payload_type: Type[payloads.GearMotorPositionResponse] = payloads.GearMotorPositionResponse
+    payload_type: Type[
+        payloads.GearMotorPositionResponse
+    ] = payloads.GearMotorPositionResponse
     message_id: Literal[
         MessageId.update_gear_motor_position_estimation_response
     ] = MessageId.update_gear_motor_position_estimation_response

@@ -173,20 +173,20 @@ async def update_gear_motor_position_estimation(
     """
 
     def _listener_filter(arbitration_id: ArbitrationId) -> bool:
-        return (NodeId(arbitration_id.parts.originating_node_id) in {NodeId.pipette_left}) and (
+        return (
+            NodeId(arbitration_id.parts.originating_node_id) in {NodeId.pipette_left}
+        ) and (
             MessageId(arbitration_id.parts.message_id)
             == UpdateGearMotorPositionEstimationResponse.message_id
         )
 
     data = []
 
-    # for node in nodes:
     with WaitableCallback(can_messenger, _listener_filter) as reader:
         await can_messenger.send(
             node_id=NodeId.pipette_left,
             message=UpdateGearMotorPositionEstimationRequest(),
         )
-        print(f"SENT GEAR MOTOR ESTIMATION REQUEST")
         try:
             for i in range(2):
                 response = await asyncio.wait_for(
@@ -215,7 +215,6 @@ async def _parser_update_gear_motor_position_response(
     reader: WaitableCallback, expected: NodeId
 ) -> Tuple[float, bool]:
     async for response, arb_id in reader:
-        print(f"\nGOT RESPONSE {response}\n")
         assert isinstance(response, UpdateGearMotorPositionEstimationResponse)
         node = NodeId(arb_id.parts.originating_node_id)
         if node == expected:

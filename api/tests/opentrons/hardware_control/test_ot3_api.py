@@ -1337,7 +1337,6 @@ async def test_save_instrument_offset(
         )
 
 
-
 async def test_pick_up_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
     mock_instrument_handlers: Tuple[Mock],

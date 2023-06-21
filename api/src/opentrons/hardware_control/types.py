@@ -57,7 +57,7 @@ class OT3AxisKind(enum.Enum):
     #: Plunger axis (of the left and right pipettes)
     Z_G = 4
     #: Gripper Z axis
-    Q = 5
+    Q = 6
     #: High-throughput tip grabbing axis
     OTHER = 5
     #: The internal axes of high throughput pipettes, for instance
@@ -152,7 +152,7 @@ class Axis(enum.Enum):
             cls.Z_L: OT3AxisKind.Z,
             cls.Z_R: OT3AxisKind.Z,
             cls.Z_G: OT3AxisKind.Z_G,
-            cls.Q: OT3AxisKind.OTHER,
+            cls.Q: OT3AxisKind.Q,
             cls.G: OT3AxisKind.OTHER,
         }
         return kind_map[axis]
@@ -166,8 +166,7 @@ class Axis(enum.Enum):
             OT3AxisKind.Z: [cls.Z_L, cls.Z_R],
             OT3AxisKind.Z_G: [cls.Z_G],
             OT3AxisKind.Q: [cls.Q],
-            OT3AxisKind.OTHER: [cls.Q],
-            # OT3AxisKind.OTHER: [cls.G],
+            OT3AxisKind.OTHER: [cls.Q, cls.G],
         }
         return kind_map[kind]
 
