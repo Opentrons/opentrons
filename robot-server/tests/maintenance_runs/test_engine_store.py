@@ -7,8 +7,12 @@ from decoy import Decoy, matchers
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
+from opentrons.hardware_control import API
+from opentrons.protocol_engine import (
+    ProtocolEngine,
+    StateSummary,
+    types as pe_types,
+)
 from opentrons.protocol_runner import LiveRunner, RunResult
 
 from robot_server.maintenance_runs.maintenance_engine_store import (
@@ -22,12 +26,13 @@ def subject(decoy: Decoy) -> MaintenanceEngineStore:
     """Get a MaintenanceEngineStore test subject."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=HardwareControlAPI)
+    hardware_api = decoy.mock(cls=API)
     return MaintenanceEngineStore(
         hardware_api=hardware_api,
-        # Arbitrary choice of robot_type. Tests where robot_type matters should
+        # Arbitrary choice of robot and deck type. Tests where these matter should
         # construct their own MaintenanceEngineStore.
         robot_type="OT-2 Standard",
+        deck_type=pe_types.DeckType.OT2_SHORT_TRASH,
     )
 
 
@@ -44,20 +49,26 @@ async def test_create_engine(subject: MaintenanceEngineStore) -> None:
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
-async def test_create_engine_uses_robot_type(
-    decoy: Decoy, robot_type: RobotType
+@pytest.mark.parametrize("deck_type", pe_types.DeckType)
+async def test_create_engine_uses_robot_and_deck_type(
+    decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
 ) -> None:
-    """It should create ProtocolEngines with the given robot type."""
+    """It should create ProtocolEngines with the given robot and deck type."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=HardwareControlAPI)
-    subject = MaintenanceEngineStore(hardware_api=hardware_api, robot_type=robot_type)
+    hardware_api = decoy.mock(cls=API)
+    subject = MaintenanceEngineStore(
+        hardware_api=hardware_api,
+        robot_type=robot_type,
+        deck_type=deck_type,
+    )
 
     await subject.create(
         run_id="run-id", labware_offsets=[], created_at=datetime(2023, 4, 1)
     )
 
     assert subject.engine.state_view.config.robot_type == robot_type
+    assert subject.engine.state_view.config.deck_type == deck_type
 
 
 async def test_create_engine_with_labware_offsets(

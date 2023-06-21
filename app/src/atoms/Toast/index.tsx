@@ -182,9 +182,11 @@ export function Toast(props: ToastProps): JSX.Element {
       css={showODDStyle ? ODD_ANIMATION : DESKTOP_ANIMATION}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      borderRadius={showODDStyle ? BORDERS.size3 : BORDERS.radiusSoftCorners}
+      borderRadius={
+        showODDStyle ? BORDERS.borderRadiusSize3 : BORDERS.radiusSoftCorners
+      }
       borderColor={toastStyleByType[type].color}
-      borderWidth={showODDStyle ? BORDERS.size1 : '1px'}
+      borderWidth={showODDStyle ? BORDERS.borderRadiusSize1 : '1px'}
       border={BORDERS.styleSolid}
       boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}
@@ -215,7 +217,8 @@ export function Toast(props: ToastProps): JSX.Element {
         <Icon
           name={icon?.name ?? toastStyleByType[type].iconName}
           color={toastStyleByType[type].color}
-          width={showODDStyle ? SPACING.spacing32 : SPACING.spacing16}
+          maxWidth={showODDStyle ? SPACING.spacing32 : SPACING.spacing16}
+          minWidth={showODDStyle ? SPACING.spacing32 : SPACING.spacing16}
           marginRight={SPACING.spacing8}
           spin={icon?.spin != null ? icon.spin : false}
           aria-label={`icon_${type}`}
@@ -261,6 +264,8 @@ export function Toast(props: ToastProps): JSX.Element {
             lineHeight={
               showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
             }
+            overflow="hidden"
+            textOverflow="ellipsis"
             whiteSpace="nowrap"
           >
             {message}
@@ -268,7 +273,7 @@ export function Toast(props: ToastProps): JSX.Element {
         </Flex>
       </Flex>
       {closeText.length > 0 && (
-        <Link role="button" height={SPACING.spacing24}>
+        <Link role="button">
           <StyledText
             color={COLORS.darkBlackEnabled}
             fontSize={
@@ -281,6 +286,9 @@ export function Toast(props: ToastProps): JSX.Element {
             }
             lineHeight={
               showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
+            }
+            textDecoration={
+              showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
             }
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             whiteSpace="nowrap"

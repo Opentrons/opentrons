@@ -5,6 +5,7 @@ import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
 import {
   mock8ChannelAttachedPipetteInformation,
+  mock96ChannelAttachedPipetteInformation,
   mockAttachedPipetteInformation,
 } from '../../../redux/pipettes/__fixtures__'
 import { RUN_ID_1 } from '../../RunTimeControl/__fixtures__'
@@ -95,7 +96,7 @@ describe('AttachProbe', () => {
     )
   })
 
-  it('returns the correct information when robot is in motion', () => {
+  it('returns the correct information when robot is in motion for single channel', () => {
     props = {
       ...props,
       isRobotMoving: true,
@@ -106,6 +107,23 @@ describe('AttachProbe', () => {
       'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
     )
     getByTestId('Pipette_Probing_1.webm')
+  })
+
+  it('returns the correct information when robot is in motion for 96 channel', () => {
+    props = {
+      ...props,
+      attachedPipettes: {
+        left: mock96ChannelAttachedPipetteInformation,
+        right: null,
+      },
+      isRobotMoving: true,
+    }
+    const { getByText, getByTestId } = render(props)
+    getByText('Stand back, Flex 96-Channel 1000 μL is calibrating')
+    getByText(
+      'The calibration probe will touch the sides of the calibration square in slot C2 to determine its exact position'
+    )
+    getByTestId('Pipette_Probing_96.webm')
   })
 
   it('returns the correct information when robot is in motion during exiting', () => {

@@ -1173,7 +1173,7 @@ exports[`icons help-circle renders correctly 1`] = `
 </svg>
 `;
 
-exports[`icons home-gantry renders correctly 1`] = `
+exports[`icons home-robot-arm renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
   animation: GLFYz 0.8s steps(8) infinite;
@@ -1533,6 +1533,30 @@ exports[`icons move-xy renders correctly 1`] = `
 </svg>
 `;
 
+exports[`icons move-xy-circle renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 32 32"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M32 16C32 24.8366 24.8366 32 16 32C7.16344 32 0 24.8366 0 16C0 7.16344 7.16344 0 16 0C24.8366 0 32 7.16344 32 16ZM15.1247 7.44167V12.925H16.8747V7.44167L18.7414 9.16667L20.0247 7.88333L15.9997 4L12.0039 7.88333L13.2872 9.16667L15.1247 7.44167ZM16.9046 18.9998V24.4831L18.7421 22.7581L20.0254 24.0415L16.0296 27.9248L12.0046 24.0415L13.2879 22.7581L15.1546 24.4831V18.9998H16.9046ZM7.4944 16.8518H12.9777V15.1018H7.4944L9.2194 13.2352L7.93607 11.9518L4.05273 15.9768L7.93607 19.9727L9.2194 18.6893L7.4944 16.8518ZM19.0525 15.073H24.5359L22.8109 13.2355L24.0942 11.9521L27.9775 15.948L24.0942 19.973L22.8109 18.6896L24.5359 16.823H19.0525V15.073Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
 exports[`icons open-in-new renders correctly 1`] = `
 .c0.spin {
   -webkit-animation: GLFYz 0.8s steps(8) infinite;
@@ -1792,6 +1816,30 @@ exports[`icons ot-close renders correctly 1`] = `
 >
   <path
     d="M18.95 7.94954L14.3412 12.5584L14.0004 12.8992L13.6711 12.57L9.05069 7.94956L7.63647 9.36377L12.2569 13.9842L12.5861 14.3134L12.2568 14.6428L7.63632 19.2632L9.05054 20.6775L13.671 16.057L14.0004 15.7276L14.3413 16.0686L18.9502 20.6775L20.3644 19.2633L15.7555 14.6544L15.4146 14.3134L15.7554 13.9726L20.3642 9.36376L18.95 7.94954Z"
+    fillRule="evenodd"
+  />
+</svg>
+`;
+
+exports[`icons ot-close-thick renders correctly 1`] = `
+.c0.spin {
+  -webkit-animation: GLFYz 0.8s steps(8) infinite;
+  animation: GLFYz 0.8s steps(8) infinite;
+  -webkit-transform-origin: center;
+  -ms-transform-origin: center;
+  transform-origin: center;
+}
+
+<svg
+  aria-hidden="true"
+  className=" c0 foo"
+  fill="currentColor"
+  version="1.1"
+  viewBox="0 0 80 80"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M80 14.2937L65.7503 0L39.718 26.141L14.2397 0.566085L0 14.8699L25.4683 40.4347L0.866062 65.1403L15.1057 79.4339L39.718 54.7283L64.8943 80L79.1339 65.7063L53.9577 40.4347L80 14.2937Z"
     fillRule="evenodd"
   />
 </svg>

@@ -33,7 +33,12 @@ async def get_modules(
             model=mod.device_info.get("model"),  # type: ignore
             moduleModel=mod.model(),
             port=mod.port,  # /dev/ttyS0
-            usbPort=PhysicalPort(hub=mod.usb_port.hub, port=mod.usb_port.port_number),
+            usbPort=PhysicalPort(
+                hub=mod.usb_port.hub,
+                port=mod.usb_port.port_number,
+                portGroup=mod.usb_port.port_group,
+                hubPort=mod.usb_port.hub_port,
+            ),
             serial=mod.device_info.get("serial"),  # type: ignore
             revision=mod.device_info.get("model"),  # type: ignore
             fwVersion=mod.device_info.get("version"),  # type: ignore

@@ -9,15 +9,13 @@ from opentrons import config
 
 from opentrons.config.robot_configs import (
     get_legacy_gantry_calibration,
-    default_deck_calibration,
+    default_ot2_deck_calibration,
 )
-from opentrons.config.types import OT3Config
 from opentrons.calibration_storage import (
     types,
     save_robot_deck_attitude,
     get_robot_deck_attitude,
 )
-from opentrons.types import Point
 from opentrons.util import linal
 
 from .util import DeckTransformState
@@ -30,6 +28,7 @@ class DeckCalibration:
     attitude: types.AttitudeMatrix
     source: types.SourceType
     status: types.CalibrationStatus
+    belt_attitude: Optional[types.AttitudeMatrix] = None
     last_modified: Optional[datetime] = None
     pipette_calibrated_with: Optional[str] = None
     tiprack: Optional[str] = None
@@ -40,42 +39,6 @@ class RobotCalibration:
     deck_calibration: DeckCalibration
 
 
-@dataclass
-class OT3Transforms(RobotCalibration):
-    carriage_offset: Point
-    left_mount_offset: Point
-    right_mount_offset: Point
-    gripper_mount_offset: Point
-
-
-def build_ot3_transforms(config: OT3Config) -> OT3Transforms:
-    return OT3Transforms(
-        deck_calibration=DeckCalibration(
-            attitude=config.deck_transform,
-            source=types.SourceType.default,
-            status=types.CalibrationStatus(),
-        ),
-        carriage_offset=Point(*config.carriage_offset),
-        left_mount_offset=Point(*config.left_mount_offset),
-        right_mount_offset=Point(*config.right_mount_offset),
-        gripper_mount_offset=Point(*config.gripper_mount_offset),
-    )
-
-
-def build_temporary_identity_calibration() -> RobotCalibration:
-    """
-    Get a temporary identity deck cal suitable for use during
-    calibration
-    """
-    return RobotCalibration(
-        deck_calibration=DeckCalibration(
-            attitude=default_deck_calibration(),
-            source=types.SourceType.default,
-            status=types.CalibrationStatus(),
-        )
-    )
-
-
 def validate_attitude_deck_calibration(
     deck_cal: DeckCalibration,
 ) -> DeckTransformState:
@@ -83,7 +46,7 @@ def validate_attitude_deck_calibration(
     This function determines whether the deck calibration is valid
     or not based on the following use-cases:
 
-    TODO(lc, 8/10/2020): Expand on this method, or create
+    TODO(lc, 8/10/2020): As with the OT2, expand on this method, or create
     another method to diagnose bad instrument offset data
     """
     curr_cal = np.array(deck_cal.attitude)
@@ -198,7 +161,7 @@ def load_attitude_matrix() -> DeckCalibration:
     else:
         # load default if deck calibration data do not exist
         return DeckCalibration(
-            attitude=default_deck_calibration(),
+            attitude=default_ot2_deck_calibration(),
             source=types.SourceType.default,
             status=types.CalibrationStatus(),
         )
@@ -226,6 +189,12 @@ class RobotCalibrationProvider:
         self._validate.cache_clear()
         self._robot_calibration = load()
 
+    def reset_deck_calibration(self) -> None:
+        self._robot_calibration = load()
+
+    def load_deck_calibration(self) -> None:
+        self._robot_calibration = load()
+
     def set_robot_calibration(self, robot_calibration: RobotCalibration) -> None:
         self._validate.cache_clear()
         self._robot_calibration = robot_calibration
@@ -239,3 +208,16 @@ class RobotCalibrationProvider:
         Once decorators are more fully supported, we can remove this.
         """
         return self._validate()
+
+    def build_temporary_identity_calibration(self) -> RobotCalibration:
+        """
+        Get a temporary identity deck cal suitable for use during
+        calibration
+        """
+        return RobotCalibration(
+            deck_calibration=DeckCalibration(
+                attitude=default_ot2_deck_calibration(),
+                source=types.SourceType.default,
+                status=types.CalibrationStatus(),
+            )
+        )

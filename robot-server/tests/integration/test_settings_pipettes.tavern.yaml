@@ -2,12 +2,12 @@
 test_name: GET Pipettes
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
       - attach_pipettes
 stages:
   - name: GET Pipette Settings request returns correct info
     request:
-      url: "{host:s}:{port:d}/settings/pipettes"
+      url: "{ot2_server_base_url}/settings/pipettes"
       method: GET
     response:
       status_code: 200
@@ -36,12 +36,12 @@ stages:
 test_name: GET Pipette {pipette_id}
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
       - attach_pipettes
 stages:
   - name: GET Pipette Settings of specific pipette request returns correct info
     request:
-      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
       method: GET
     response:
       status_code: 200
@@ -69,12 +69,12 @@ stages:
 test_name: PATCH Pipette {pipette_id} single value
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
       - attach_pipettes
 stages:
   - name: PATCH Pipette Settings of a single value
     request:
-      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
       method: PATCH
       json:
         fields:
@@ -112,12 +112,12 @@ stages:
 test_name: PATCH Pipette {pipette_id} multiple values
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
       - attach_pipettes
 stages:
   - name: PATCH Pipette Settings of multiple values
     request:
-      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
       method: PATCH
       json:
         fields:
@@ -171,12 +171,12 @@ stages:
 test_name: PATCH Pipette {pipette_id} value too low
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
       - attach_pipettes
 stages:
   - name: PATCH Pipette Settings with too low of a value
     request:
-      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
       method: PATCH
       json:
         fields:
@@ -191,12 +191,12 @@ stages:
 test_name: PATCH Pipette {pipette_id} value too high
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
       - attach_pipettes
 stages:
   - name: PATCH Pipette Settings with too high of a value
     request:
-      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
       method: PATCH
       json:
         fields:
@@ -211,12 +211,12 @@ stages:
 test_name: PATCH Pipette {pipette_id} no value
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
       - attach_pipettes
 stages:
   - name: PATCH Pipette Settings with no value at all (should reset to default)
     request:
-      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
       method: PATCH
       json:
         fields:

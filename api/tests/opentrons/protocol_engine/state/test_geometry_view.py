@@ -30,6 +30,7 @@ from opentrons.protocol_engine.types import (
     CurrentWell,
 )
 from opentrons.protocol_engine.state import move_types
+from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.pipettes import PipetteView
@@ -67,6 +68,10 @@ def subject(
 ) -> GeometryView:
     """Get a GeometryView with its store dependencies mocked out."""
     return GeometryView(
+        config=Config(
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
+        ),
         labware_view=labware_view,
         module_view=module_view,
         pipette_view=mock_pipette_view,
@@ -118,7 +123,7 @@ def test_get_labware_parent_position_on_module(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
-    standard_deck_def: DeckDefinitionV3,
+    ot2_standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
 ) -> None:
     """It should return a module position for labware on a module."""
@@ -137,7 +142,7 @@ def test_get_labware_parent_position_on_module(
     decoy.when(labware_view.get_slot_position(DeckSlotName.SLOT_3)).then_return(
         Point(1, 2, 3)
     )
-    decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
+    decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
         module_view.get_nominal_module_offset(
             module_id="module-id", deck_type=DeckType.OT2_STANDARD
@@ -222,7 +227,7 @@ def test_get_module_labware_highest_z(
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
-    standard_deck_def: DeckDefinitionV3,
+    ot2_standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
 ) -> None:
     """It should get the absolute location of a labware's highest Z point."""
@@ -247,7 +252,7 @@ def test_get_module_labware_highest_z(
     decoy.when(module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
     )
-    decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
+    decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
         module_view.get_nominal_module_offset(
             module_id="module-id", deck_type=DeckType.OT2_STANDARD
@@ -515,7 +520,7 @@ def test_get_module_labware_well_position(
     well_plate_def: LabwareDefinition,
     labware_view: LabwareView,
     module_view: ModuleView,
-    standard_deck_def: DeckDefinitionV3,
+    ot2_standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
 ) -> None:
     """It should be able to get the position of a well top in a labware on module."""
@@ -544,7 +549,7 @@ def test_get_module_labware_well_position(
     decoy.when(module_view.get_location("module-id")).then_return(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
     )
-    decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
+    decoy.when(labware_view.get_deck_definition()).then_return(ot2_standard_deck_def)
     decoy.when(
         module_view.get_nominal_module_offset(
             module_id="module-id", deck_type=DeckType.OT2_STANDARD
@@ -989,7 +994,7 @@ def test_get_labware_center(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
-    standard_deck_def: DeckDefinitionV3,
+    ot2_standard_deck_def: DeckDefinitionV3,
     subject: GeometryView,
     location: Union[DeckSlotLocation, ModuleLocation],
     expected_center_point: Point,
@@ -1000,7 +1005,9 @@ def test_get_labware_center(
     )
 
     if isinstance(location, ModuleLocation):
-        decoy.when(labware_view.get_deck_definition()).then_return(standard_deck_def)
+        decoy.when(labware_view.get_deck_definition()).then_return(
+            ot2_standard_deck_def
+        )
         decoy.when(
             module_view.get_module_offset(
                 module_id="module-id", deck_type=DeckType.OT2_STANDARD
@@ -1062,7 +1069,8 @@ def test_get_extra_waypoints(
         )
     ).then_return(should_dodge)
     decoy.when(
-        labware_view.get_slot_center_position(slot=DeckSlotName.SLOT_5)
+        # Assume the subject's Config is for an OT-3, so use an OT-3 slot name.
+        labware_view.get_slot_center_position(slot=DeckSlotName.SLOT_C2)
     ).then_return(Point(x=11, y=22, z=33))
 
     extra_waypoints = subject.get_extra_waypoints("to-labware-id", location)

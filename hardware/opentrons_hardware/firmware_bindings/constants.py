@@ -226,6 +226,7 @@ class ErrorCode(int, Enum):
     estop_released = 0x0A
     motor_busy = 0x0B
     stop_requested = 0x0C
+    over_pressure = 0x0D
 
 
 @unique
@@ -292,6 +293,7 @@ class SensorOutputBinding(int, Enum):
     none = 0x0
     sync = 0x01
     report = 0x02
+    max_threshold_sync = 0x04
 
 
 @unique
@@ -340,6 +342,8 @@ class MoveStopCondition(int, Enum):
     encoder_position = 0x4
     gripper_force = 0x8
     stall = 0x10
+    ignore_stalls = 0x20
+    limit_switch_backoff = 0x40
 
 
 @unique
@@ -351,3 +355,12 @@ class MotorUsageValueType(int, Enum):
     right_gear_motor_distance = 0x2
     force_application_time = 0x3
     total_error_count = 0x4
+
+
+class MoveAckId(int, Enum):
+    """Move Ack IDs."""
+
+    complete_without_condition = 0x1
+    stopped_by_condition = 0x2
+    timeout = 0x3
+    position_error = 0x4

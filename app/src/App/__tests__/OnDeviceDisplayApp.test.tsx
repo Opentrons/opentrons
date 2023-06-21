@@ -12,7 +12,7 @@ import { NetworkSetupMenu } from '../../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { InstrumentsDashboard } from '../../pages/OnDeviceDisplay/InstrumentsDashboard'
 import { RobotDashboard } from '../../pages/OnDeviceDisplay/RobotDashboard'
 import { RobotSettingsDashboard } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
-import { ProtocolDashboard } from '../../pages/OnDeviceDisplay/ProtocolDashboard'
+import { ProtocolDashboard } from '../../pages/ProtocolDashboard'
 import { ProtocolSetup } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import { ProtocolDetails } from '../../pages/OnDeviceDisplay/ProtocolDetails'
 import { OnDeviceDisplayApp } from '../OnDeviceDisplayApp'
@@ -23,7 +23,7 @@ import { NameRobot } from '../../pages/OnDeviceDisplay/NameRobot'
 import { InitialLoadingScreen } from '../../pages/OnDeviceDisplay/InitialLoadingScreen'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
 import { getIsShellReady } from '../../redux/shell'
-import { useCurrentRunRoute } from '../hooks'
+import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
 
 import type { OnDeviceDisplaySettings } from '../../redux/config/types'
 
@@ -34,7 +34,7 @@ jest.mock('../../pages/OnDeviceDisplay/ConnectViaUSB')
 jest.mock('../../pages/OnDeviceDisplay/ConnectViaWifi')
 jest.mock('../../pages/OnDeviceDisplay/RobotDashboard')
 jest.mock('../../pages/OnDeviceDisplay/RobotSettingsDashboard')
-jest.mock('../../pages/OnDeviceDisplay/ProtocolDashboard')
+jest.mock('../../pages/ProtocolDashboard')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolSetup')
 jest.mock('../../pages/OnDeviceDisplay/ProtocolDetails')
 jest.mock('../../pages/OnDeviceDisplay/InstrumentsDashboard')
@@ -100,6 +100,9 @@ const mockgetIsShellReady = getIsShellReady as jest.MockedFunction<
 >
 const mockUseCurrentRunRoute = useCurrentRunRoute as jest.MockedFunction<
   typeof useCurrentRunRoute
+>
+const mockUseProtocolReceiptToasts = useProtocolReceiptToast as jest.MockedFunction<
+  typeof useProtocolReceiptToast
 >
 
 const render = (path = '/') => {
@@ -210,5 +213,9 @@ describe('OnDeviceDisplayApp', () => {
     const [{ getByText }] = render('/')
     mockgetIsShellReady.mockReturnValue(true)
     getByText('Mock Loading')
+  })
+  it('renders protocol receipt toasts', () => {
+    render('/')
+    expect(mockUseProtocolReceiptToasts).toHaveBeenCalled()
   })
 })

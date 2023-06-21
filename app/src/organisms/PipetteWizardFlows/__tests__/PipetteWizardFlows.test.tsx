@@ -392,12 +392,8 @@ describe('PipetteWizardFlows', () => {
         [
           { commandType: 'home' as const, params: {} },
           {
-            commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT },
-          },
-          {
             commandType: 'calibration/moveToMaintenancePosition' as const,
-            params: { mount: RIGHT },
+            params: { maintenancePosition: 'attachPlate', mount: RIGHT },
           },
         ],
         false

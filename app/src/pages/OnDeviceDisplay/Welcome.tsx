@@ -9,8 +9,8 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { MediumButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { SmallButton } from '../../atoms/buttons'
 
 import screenImage from '../../assets/images/on-device-display/welcome_background.png'
 
@@ -22,38 +22,31 @@ export function Welcome(): JSX.Element {
 
   return (
     <Flex
-      padding="4.71875rem 3.75rem"
       flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_CENTER}
       gridGap={SPACING.spacing12}
+      justifyContent={JUSTIFY_CENTER}
+      padding="4.71875rem 3.75rem"
     >
       <img alt={IMAGE_ALT} src={screenImage} width="904px" height="189px" />
       <Flex justifyContent={JUSTIFY_CENTER}>
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize38}
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-          lineHeight={TYPOGRAPHY.lineHeight48}
-        >
+        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('welcome_title')}
         </StyledText>
       </Flex>
       <Flex justifyContent={JUSTIFY_CENTER}>
         <StyledText
-          width="39.875rem"
-          textAlign={TYPOGRAPHY.textAlignCenter}
-          fontSize={TYPOGRAPHY.fontSize28}
-          lineHeight={TYPOGRAPHY.lineHeight36}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          as="h4"
           color={COLORS.darkBlack70}
+          textAlign={TYPOGRAPHY.textAlignCenter}
+          width="39.875rem"
         >
           {t('welcome_description')}
         </StyledText>
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} marginTop={SPACING.spacing40}>
-        <SmallButton
-          buttonType="primary"
-          buttonText={t('shared:get_started')}
+      <Flex justifyContent={JUSTIFY_CENTER} marginTop="1.75rem">
+        <MediumButton
           buttonCategory="rounded"
+          buttonText={t('shared:get_started')}
           onClick={() => history.push('/network-setup')}
         />
       </Flex>

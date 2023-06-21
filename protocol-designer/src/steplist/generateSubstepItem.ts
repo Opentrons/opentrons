@@ -354,6 +354,13 @@ export function generateSubstepItem(
     }
   }
 
+  if (stepArgs.commandCreatorFnName === 'moveLabware') {
+    return {
+      substepType: 'moveLabware',
+      moveLabwareArgs: stepArgs,
+    }
+  }
+
   if (
     stepArgs.commandCreatorFnName === 'consolidate' ||
     stepArgs.commandCreatorFnName === 'distribute' ||

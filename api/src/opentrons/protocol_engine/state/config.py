@@ -3,6 +3,8 @@ from dataclasses import dataclass
 
 from opentrons_shared_data.robot.dev_types import RobotType
 
+from opentrons.protocol_engine.types import DeckType
+
 
 @dataclass(frozen=True)
 class Config:
@@ -10,6 +12,8 @@ class Config:
 
     Params:
         robot_type: What kind of robot the engine is controlling,
+            or pretending to control.
+        deck_type: The type of deck on the robot that the engine is controlling,
             or pretending to control.
         ignore_pause: The engine should no-op instead of waiting
             for pauses and delays to complete.
@@ -22,6 +26,7 @@ class Config:
     """
 
     robot_type: RobotType
+    deck_type: DeckType
     ignore_pause: bool = False
     use_virtual_pipettes: bool = False
     use_virtual_modules: bool = False

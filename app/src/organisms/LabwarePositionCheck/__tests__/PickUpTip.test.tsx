@@ -1,15 +1,22 @@
 import * as React from 'react'
+import { resetAllWhenMocks, when } from 'jest-when'
 import type { MatcherFunction } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
+import { useProtocolMetadata } from '../../Devices/hooks'
 import { PickUpTip } from '../PickUpTip'
 import { SECTIONS } from '../constants'
 import { mockCompletedAnalysis, mockExistingOffsets } from '../__fixtures__'
-import { HEATERSHAKER_MODULE_V1 } from '@opentrons/shared-data'
-import { CommandData } from '@opentrons/api-client'
-import { resetAllWhenMocks, when } from 'jest-when'
+import type { CommandData } from '@opentrons/api-client'
+
+jest.mock('../../Devices/hooks')
 
 const mockStartPosition = { x: 10, y: 20, z: 30 }
+
+const mockUseProtocolMetaData = useProtocolMetadata as jest.MockedFunction<
+  typeof useProtocolMetadata
+>
 
 const matchTextWithSpans: (text: string) => MatcherFunction = (
   text: string
@@ -38,7 +45,7 @@ describe('PickUpTip', () => {
       section: SECTIONS.PICK_UP_TIP,
       pipetteId: mockCompletedAnalysis.pipettes[0].id,
       labwareId: mockCompletedAnalysis.labware[0].id,
-      location: { slotName: '1' },
+      location: { slotName: 'D1' },
       protocolData: mockCompletedAnalysis,
       proceed: jest.fn(),
       chainRunCommands: mockChainRunCommands,
@@ -49,6 +56,7 @@ describe('PickUpTip', () => {
       existingOffsets: mockExistingOffsets,
       isRobotMoving: false,
     }
+    mockUseProtocolMetaData.mockReturnValue({ robotType: 'OT-3 Standard' })
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -56,10 +64,10 @@ describe('PickUpTip', () => {
   })
   it('renders correct copy when preparing space', () => {
     const { getByText, getByRole } = render(props)
-    getByRole('heading', { name: 'Prepare tip rack in slot 1' })
+    getByRole('heading', { name: 'Prepare tip rack in slot D1' })
     getByText('Clear all deck slots of labware, leaving modules in place')
     getByText(
-      matchTextWithSpans('Place a full Mock TipRack Definition into slot 1')
+      matchTextWithSpans('Place a full Mock TipRack Definition into slot D1')
     )
     getByRole('link', { name: 'Need help?' })
     getByRole('button', { name: 'Confirm placement' })
@@ -69,14 +77,14 @@ describe('PickUpTip', () => {
       ...props,
       workingOffsets: [
         {
-          location: { slotName: '1' },
+          location: { slotName: 'D1' },
           labwareId: 'labwareId1',
           initialPosition: { x: 1, y: 2, z: 3 },
           finalPosition: null,
         },
       ],
     })
-    getByRole('heading', { name: 'Pick up tip from tip rack in slot 1' })
+    getByRole('heading', { name: 'Pick up tip from tip rack in slot D1' })
     getByText(
       "Ensure that the pipette nozzle furthest from you is centered above and level with the top of the tip in the A1 position. If it isn't, use the controls below or your keyboard to jog the pipette until it is properly aligned."
     )
@@ -98,7 +106,7 @@ describe('PickUpTip', () => {
           commandType: 'moveLabware',
           params: {
             labwareId: 'labwareId1',
-            newLocation: { slotName: '1' },
+            newLocation: { slotName: 'D1' },
             strategy: 'manualMoveWithoutPause',
           },
         },
@@ -186,7 +194,7 @@ describe('PickUpTip', () => {
       ...props,
       workingOffsets: [
         {
-          location: { slotName: '1' },
+          location: { slotName: 'D1' },
           labwareId: 'labwareId1',
           initialPosition: { x: 1, y: 2, z: 3 },
           finalPosition: null,
@@ -210,7 +218,7 @@ describe('PickUpTip', () => {
     await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'finalPosition',
       labwareId: 'labwareId1',
-      location: { slotName: '1' },
+      location: { slotName: 'D1' },
       position: { x: 10, y: 20, z: 30 },
     })
     await expect(props.registerPosition).toHaveBeenNthCalledWith(2, {
@@ -324,7 +332,7 @@ describe('PickUpTip', () => {
       ...props,
       workingOffsets: [
         {
-          location: { slotName: '1' },
+          location: { slotName: 'D1' },
           labwareId: 'labwareId1',
           initialPosition: { x: 1, y: 2, z: 3 },
           finalPosition: null,
@@ -346,7 +354,7 @@ describe('PickUpTip', () => {
     await expect(props.registerPosition).toHaveBeenNthCalledWith(1, {
       type: 'finalPosition',
       labwareId: 'labwareId1',
-      location: { slotName: '1' },
+      location: { slotName: 'D1' },
       position: { x: 10, y: 20, z: 30 },
     })
     await expect(props.registerPosition).toHaveBeenNthCalledWith(2, {
@@ -405,13 +413,13 @@ describe('PickUpTip', () => {
           {
             id: 'firstHSId',
             model: HEATERSHAKER_MODULE_V1,
-            location: { slotName: '3' },
+            location: { slotName: 'D3' },
             serialNumber: 'firstHSSerial',
           },
           {
             id: 'secondHSId',
             model: HEATERSHAKER_MODULE_V1,
-            location: { slotName: '10' },
+            location: { slotName: 'A1' },
             serialNumber: 'secondHSSerial',
           },
         ],
@@ -434,7 +442,7 @@ describe('PickUpTip', () => {
           commandType: 'moveLabware',
           params: {
             labwareId: 'labwareId1',
-            newLocation: { slotName: '1' },
+            newLocation: { slotName: 'D1' },
             strategy: 'manualMoveWithoutPause',
           },
         },

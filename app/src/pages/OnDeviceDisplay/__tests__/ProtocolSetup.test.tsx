@@ -18,16 +18,17 @@ import { i18n } from '../../../i18n'
 import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
 import {
   useAttachedModules,
+  useLPCDisabledReason,
   useRunCreatedAtTimestamp,
 } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
 import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
-import { Snackbar } from '../../../atoms/Snackbar'
 import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
 import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
+import { mockProtocolModuleInfo } from '../../../organisms/ProtocolSetupInstruments/__fixtures__'
 import {
   useRunControls,
   useRunStatus,
@@ -35,6 +36,25 @@ import {
 import { ProtocolSetup } from '../ProtocolSetup'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
+
+// Mock IntersectionObserver
+class IntersectionObserver {
+  observe = jest.fn()
+  disconnect = jest.fn()
+  unobserve = jest.fn()
+}
+
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: IntersectionObserver,
+})
+
+Object.defineProperty(global, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: IntersectionObserver,
+})
 
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('@opentrons/react-api-client')
@@ -49,7 +69,6 @@ jest.mock('../../../organisms/ProtocolSetupModules/utils')
 jest.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../organisms/ProtocolSetupLiquids')
-jest.mock('../../../atoms/Snackbar')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -97,7 +116,9 @@ const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrations
 const mockUseLaunchLPC = useLaunchLPC as jest.MockedFunction<
   typeof useLaunchLPC
 >
-const mockSnackbar = Snackbar as jest.MockedFunction<typeof Snackbar>
+const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
+  typeof useLPCDisabledReason
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -140,6 +161,13 @@ const mockEmptyAnalysis = ({
   pipettes: [],
   commands: [],
 } as unknown) as CompletedProtocolAnalysis
+const mockLiquids = [
+  {
+    id: 'm',
+    displayName: 'mock',
+    description: 'Mock liquid',
+  },
+]
 
 const mockPlay = jest.fn()
 
@@ -147,7 +175,7 @@ describe('ProtocolSetup', () => {
   let mockLaunchLPC: jest.Mock
   beforeEach(() => {
     mockLaunchLPC = jest.fn()
-    mockSnackbar.mockReturnValue(<div>Mock Snackbar</div>)
+    mockUseLPCDisabledReason.mockReturnValue(null)
     mockUseAttachedModules.mockReturnValue([])
     mockProtocolSetupModules.mockReturnValue(
       <div>Mock ProtocolSetupModules</div>
@@ -234,17 +262,6 @@ describe('ProtocolSetup', () => {
     expect(mockPlay).toBeCalledTimes(1)
   })
 
-  it('should show snackbar when click play button', () => {
-    mockGetUnmatchedModulesForProtocol.mockReturnValue({
-      missingModuleIds: ['missingMod'],
-      remainingAttachedModules: [],
-    })
-    const [{ getByRole, getByText }] = render(`/protocols/${RUN_ID}/setup/`)
-    getByRole('button', { name: 'play' }).click()
-    expect(mockPlay).toBeCalledTimes(0)
-    getByText('Mock Snackbar')
-  })
-
   it('should launch cancel modal when click close button', () => {
     const [{ getByRole, getByText, queryByText }] = render(
       `/runs/${RUN_ID}/setup/`
@@ -260,7 +277,10 @@ describe('ProtocolSetup', () => {
       .mockReturnValue(mockRobotSideAnalysis)
     when(mockGetProtocolModulesInfo)
       .calledWith(mockRobotSideAnalysis, ot3StandardDeckDef as any)
-      .mockReturnValue([])
+      .mockReturnValue(mockProtocolModuleInfo)
+    when(mockGetUnmatchedModulesForProtocol)
+      .calledWith([], mockProtocolModuleInfo)
+      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
     expect(queryByText('Mock ProtocolSetupModules')).toBeNull()
     queryByText('Modules')?.click()
@@ -268,16 +288,31 @@ describe('ProtocolSetup', () => {
   })
 
   it('should launch protocol setup liquids screen when click liquids', () => {
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith(RUN_ID)
+      .mockReturnValue({ ...mockRobotSideAnalysis, liquids: mockLiquids })
+    when(mockGetProtocolModulesInfo)
+      .calledWith(
+        { ...mockRobotSideAnalysis, liquids: mockLiquids },
+        ot3StandardDeckDef as any
+      )
+      .mockReturnValue(mockProtocolModuleInfo)
+    when(mockGetUnmatchedModulesForProtocol)
+      .calledWith([], mockProtocolModuleInfo)
+      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
     const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
     expect(queryByText('Mock ProtocolSetupLiquids')).toBeNull()
-    getByText('Liquids not in setup')
+    getByText('1 initial liquid')
     getByText('Liquids').click()
     getByText('Mock ProtocolSetupLiquids')
   })
 
   it('should launch LPC when clicked', () => {
+    mockUseLPCDisabledReason.mockReturnValue(null)
     const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
+    getByText('Recommended')
     getByText('Labware Position Check').click()
     expect(mockLaunchLPC).toHaveBeenCalled()
+    getByText('mock LPC Wizard')
   })
 })

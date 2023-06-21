@@ -35,7 +35,6 @@ const RUN_ID = '1'
 describe('SetupPipetteCalibrationItem', () => {
   const render = ({
     pipetteInfo = mockPipetteInfo,
-    index = 1,
     mount = 'left',
     robotName = ROBOT_NAME,
     runId = RUN_ID,
@@ -47,7 +46,6 @@ describe('SetupPipetteCalibrationItem', () => {
         <SetupPipetteCalibrationItem
           {...{
             pipetteInfo,
-            index,
             mount,
             robotName,
             runId,

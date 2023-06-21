@@ -71,6 +71,7 @@ export function RunningProtocol(): JSX.Element {
     showConfirmCancelRunModal,
     setShowConfirmCancelRunModal,
   ] = React.useState<boolean>(false)
+  const lastAnimatedCommand = React.useRef<string | null>(null)
   const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
   const currentRunCommandKey = useLastRunCommandKey(runId)
@@ -127,7 +128,6 @@ export function RunningProtocol(): JSX.Element {
                 ? Number(currentRunCommandIndex) + 1
                 : 1
             }
-            OnDevice
           />
         ) : null}
         {showConfirmCancelRunModal ? (
@@ -155,6 +155,10 @@ export function RunningProtocol(): JSX.Element {
                 currentRunCommandIndex={currentRunCommandIndex}
                 robotSideAnalysis={robotSideAnalysis}
                 runTimerInfo={{ runStatus, startedAt, stoppedAt, completedAt }}
+                lastAnimatedCommand={lastAnimatedCommand.current}
+                updateLastAnimatedCommand={(newCommandKey: string) =>
+                  (lastAnimatedCommand.current = newCommandKey)
+                }
               />
             ) : (
               <RunningProtocolCommandList

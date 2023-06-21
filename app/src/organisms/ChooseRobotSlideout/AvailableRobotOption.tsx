@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { css } from 'styled-components'
 import { Trans, useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
@@ -19,13 +19,15 @@ import { useAllRunsQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../atoms/text'
 import { MiniCard } from '../../molecules/MiniCard'
 import { getRobotModelByName, OPENTRONS_USB } from '../../redux/discovery'
+import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import { appShellRequestor } from '../../redux/shell/remote'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import OT3_PNG from '../../assets/images/OT3.png'
+import FLEX_PNG from '../../assets/images/FLEX.png'
 import { RobotBusyStatusAction } from '.'
 
+import type { IconName } from '@opentrons/components'
 import type { Robot } from '../../redux/discovery/types'
-import type { State } from '../../redux/types'
+import type { Dispatch, State } from '../../redux/types'
 
 interface AvailableRobotOptionProps {
   robot: Robot
@@ -51,12 +53,13 @@ export function AvailableRobotOption(
   } = props
   const { ip, local, name: robotName } = robot ?? {}
   const { t } = useTranslation('protocol_list')
+  const dispatch = useDispatch<Dispatch>()
   const robotModel = useSelector((state: State) =>
     getRobotModelByName(state, robotName)
   )
 
   const { data: runsData } = useAllRunsQuery(
-    {},
+    { pageLength: 0 },
     {
       onSuccess: data => {
         if (data?.links?.current != null)
@@ -73,6 +76,24 @@ export function AvailableRobotOption(
   )
   const robotHasCurrentRun = runsData?.links?.current != null
 
+  const { ethernet, wifi } = useSelector((state: State) =>
+    getNetworkInterfaces(state, robotName)
+  )
+
+  let iconName: IconName | null = null
+  if (wifi?.ipAddress != null) {
+    iconName = 'wifi'
+  } else if (ethernet?.ipAddress != null) {
+    iconName = 'ethernet'
+  } else if (local != null && local) {
+    iconName = 'usb'
+  }
+
+  React.useEffect(() => {
+    dispatch(fetchStatus(robotName))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return showIdleOnly && robotHasCurrentRun ? null : (
     <>
       <MiniCard
@@ -81,7 +102,7 @@ export function AvailableRobotOption(
         isError={(isError || isOnDifferentSoftwareVersion) && isSelected}
       >
         <img
-          src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
+          src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
           css={css`
             width: 4rem;
             height: 3.5625rem;
@@ -104,11 +125,10 @@ export function AvailableRobotOption(
             >
               {robotName}
               <Icon
-                // local boolean corresponds to a wired usb connection
-                aria-label={local ?? false ? 'usb' : 'wifi'}
+                aria-label={iconName}
                 marginBottom={`-${SPACING.spacing4}`}
                 marginLeft={SPACING.spacing8}
-                name={local ?? false ? 'usb' : 'wifi'}
+                name={iconName ?? 'wifi'}
                 size={SIZE_1}
               />
             </StyledText>
