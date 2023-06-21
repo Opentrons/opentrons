@@ -48,10 +48,8 @@ async def test_get_tip_ejector_state(
     )
 
     # We should have sent a request
-    mock_messenger.ensure_send.assert_called_once_with(
-        node_id=node,
-        message=message_definitions.TipStatusQueryRequest(),
-        expected_nodes=[node],
+    mock_messenger.send.assert_called_once_with(
+        node_id=node, message=message_definitions.TipStatusQueryRequest()
     )
 
     assert res

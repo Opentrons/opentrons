@@ -13,7 +13,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     PushTipPresenceNotification,
 )
 
-from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId, ErrorCode
+from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
 
 log = logging.getLogger(__name__)
 
