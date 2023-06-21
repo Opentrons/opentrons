@@ -143,7 +143,7 @@ describe('ODDProtocolDetails', () => {
   it('renders protocol truncated name that expands when clicked', () => {
     const [{ getByText }] = render()
     const name = getByText(
-      'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genom...'
+      'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment...Amplify Libraries'
     )
     name.click()
     getByText(
@@ -167,7 +167,7 @@ describe('ODDProtocolDetails', () => {
     getByText(
       `Date Added: ${format(
         new Date('2022-05-03T21:36:12.494778+00:00'),
-        'MM/dd/yyyy k:mm'
+        'MM/dd/yy k:mm'
       )}`
     )
   })

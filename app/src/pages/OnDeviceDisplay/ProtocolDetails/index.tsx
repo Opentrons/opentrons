@@ -66,7 +66,7 @@ const ProtocolHeader = (props: {
 
   let displayedTitle = title
   if (title.length > 92 && truncate) {
-    displayedTitle = truncateString(title, 69)
+    displayedTitle = truncateString(title, 80, 60)
   }
 
   return (
@@ -195,7 +195,7 @@ const Summary = (props: {
       >
         <StyledText as="p">{`${t('protocol_info:date_added')}: ${
           date != null
-            ? format(new Date(date), 'MM/dd/yyyy k:mm')
+            ? format(new Date(date), 'MM/dd/yy k:mm')
             : t('shared:no_data')
         }`}</StyledText>
       </Flex>
