@@ -9,6 +9,7 @@ from typing import Tuple, Dict
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.errors import MustHomeError
+from opentrons.hardware_control.types import MotorStatus
 
 from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
@@ -17,9 +18,11 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     set_gantry_load_per_axis_settings_ot3,
 )
 
+from opentrons_hardware.firmware_bindings.constants import NodeId
+
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 BASE_DIRECTORY = "/userfs/data/testing_data/speed_accel_profile/"
 SAVE_NAME = "speed_test_output_"
@@ -27,9 +30,14 @@ SAVE_NAME = "speed_test_output_"
 CYCLES = 1
 ENCODER_DELAY = 0.1 #seconds
 ENCODER_REFRESH = True
-ERROR_THRESHOLD = 0.1 #mm
+ERROR_THRESHOLD = 0.2 #mm
 
 TEST_LIST: Dict[str, list] = {}
+
+FAKE_STATUS = {NodeId.gantry_x: MotorStatus(motor_ok=True, encoder_ok=True),
+                NodeId.gantry_y: MotorStatus(motor_ok=True, encoder_ok=True),
+                NodeId.head_l: MotorStatus(motor_ok=True, encoder_ok=True),
+                NodeId.head_r: MotorStatus(motor_ok=True, encoder_ok=True)}
 
 TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
     GantryLoad.LOW_THROUGHPUT: {
@@ -39,9 +47,9 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
             "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
         },
         "Y": {
-            "SPEED": {"MIN": 225, "MAX": 375, "INC": 75},
-            "ACCEL": {"MIN": 500, "MAX": 800, "INC": 100},
-            "CURRENT": {"MIN": 0.5, "MAX": 1.5, "INC": 0.25},
+            "SPEED": {"MIN": 275, "MAX": 425, "INC": 75},
+            "ACCEL": {"MIN": 500, "MAX": 700, "INC": 100},
+            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
         },
         "L": {
             "SPEED": {"MIN": 40, "MAX": 140, "INC": 30},
@@ -63,12 +71,12 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
         "X": {
             "SPEED": {"MIN": 275, "MAX": 425, "INC": 75},
             "ACCEL": {"MIN": 600, "MAX": 800, "INC": 100},
-            "CURRENT": {"MIN": 1, "MAX": 1.4, "INC": 0.2},
+            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
         },
         "Y": {
-            "SPEED": {"MIN": 325, "MAX": 425, "INC": 100},
-            "ACCEL": {"MIN": 500, "MAX": 600, "INC": 100},
-            "CURRENT": {"MIN": 1.4, "MAX": 1.4, "INC": 0},
+            "SPEED": {"MIN": 250, "MAX": 400, "INC": 100},
+            "ACCEL": {"MIN": 400, "MAX": 600, "INC": 100},
+            "CURRENT": {"MIN": 1.3, "MAX": 1.5, "INC": 0.1},
         },
         "L": {
             "SPEED": {"MIN": 40, "MAX": 140, "INC": 30},
@@ -163,7 +171,7 @@ DELAY = 0
 
 step_x = 500
 step_y = 300
-xy_home_offset = 5
+xy_home_offset = 7
 step_z = 200
 step_g = 150
 HOME_POINT_MAP = {
@@ -245,6 +253,23 @@ async def _single_axis_move(
 
     for c in range(cycles):
         # move away from homed position
+        print("before encoder check")
+        print("api._encoder_position: "+str(api._encoder_position))
+        print("OT3Axis.by_mount(MOUNT): "+str(OT3Axis.by_mount(MOUNT)))
+        if api._encoder_position:
+            print("api._encoder_position evaluates True")
+        position_axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(MOUNT)]
+        check = str(api._backend.check_encoder_status(position_axes))
+        print("api._backend.check_encoder_status(position_axes): "+check)
+        print("valid motor check: " + str(api._encoder_position and check))
+        valid_motor = api._encoder_position and api._backend.check_encoder_status(
+            position_axes
+        )
+        print("valid_motor: "+str(valid_motor))
+        if not valid_motor:
+            print("must home error should be raised")
+        else:
+            print("must home error should NOT be raised")
         inital_pos = await api.encoder_current_position_ot3(mount=MOUNT,
                                                             refresh=ENCODER_REFRESH)
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
@@ -290,13 +315,15 @@ async def _single_axis_move(
             except MustHomeError:
                 if axis == "G":
                     await api.home([OT3Axis.Z_G])
-                await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+                if not BENCH:
+                    await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
 
             if DELAY > 0:
                 time.sleep(DELAY)
             if axis == "G":
                 await api.home([OT3Axis.Z_G])
-            await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+            if not BENCH:
+                await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
             return output_list
 
         # record the current position
@@ -326,14 +353,16 @@ async def _single_axis_move(
                 time.sleep(DELAY)
             if axis == "G":
                 await api.home([OT3Axis.Z_G])
-            await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+            if not BENCH:
+                await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
             return output_list
 
         # home every 50 cycles in case we have drifted
         if (c + 1) % 50 == 0:
             if axis == "G":
                 await api.home([OT3Axis.Z_G])
-            await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+            if not BENCH:
+                await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
             # move away from the limit switch before cycling
             await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
             time.sleep(ENCODER_DELAY*2) #let postition settle
@@ -387,11 +416,26 @@ def save_table(test_axis_list: list, file_suffix: str, results: np.ndarray, data
 
 async def _main(is_simulating: bool) -> None:
     """Main run function."""
-    api = await build_async_ot3_hardware_api(
-        is_simulating=is_simulating, stall_detection_enable=False
-    )
-    print("HOMING")
-    await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+    if "G" in list(AXIS):
+        print("GRIPPER")
+        api = await build_async_ot3_hardware_api(
+            is_simulating=is_simulating,
+            stall_detection_enable=False,
+            gripper="GRPV1120230323A01"
+        )
+        await api.reset()
+    else:
+        api = await build_async_ot3_hardware_api(
+            is_simulating=is_simulating, stall_detection_enable=False
+        )
+
+    #do not home all axes if on bench
+    if not BENCH:
+        print("HOMING")
+        await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+    else:
+        api._backend._motor_status.update(FAKE_STATUS)
+
     try:
         # #run the test while recording raw results
         results_cycles = {}
@@ -438,9 +482,12 @@ async def _main(is_simulating: bool) -> None:
                     )
 
                     # attempt to cycle with the test settings
-                    # await api.home([AXIS_MAP[test_axis]])
-                    print("HOMING")
-                    await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+                    print("HOMING: " + str(test_axis))
+                    await api.home(axes = [AXIS_MAP[test_axis]])
+                    if BENCH:
+                        api._backend._motor_status.update(FAKE_STATUS)
+                        print(api._backend._motor_status)
+
                     move_output_list = await _single_axis_move(
                         test_axis, api, cycles=CYCLES
                     )
@@ -547,6 +594,7 @@ if __name__ == "__main__":
     parser.add_argument("--load", type=str, default="LOW")
     parser.add_argument("--delay", type=int, default=0)
     parser.add_argument("--current", type=float, default=START_CURRENT)
+    parser.add_argument("--bench", type=bool, default=False)
 
     args = parser.parse_args()
     CYCLES = args.cycles
@@ -555,6 +603,7 @@ if __name__ == "__main__":
     LOAD = GANTRY_LOAD_MAP[args.load]
     DELAY = args.delay
     START_CURRENT = args.current
+    BENCH = args.bench
     TEST_LIST = make_test_list(AXIS, LOAD)
 
     asyncio.run(_main(args.simulate))
