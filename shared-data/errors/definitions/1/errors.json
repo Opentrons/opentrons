@@ -110,6 +110,10 @@
       "detail": "Unexpected Tip Presence",
       "category": "roboticsInteractionError"
     },
+    "3013": {
+      "detail": "Firmware Update Required",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"

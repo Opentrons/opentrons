@@ -392,6 +392,19 @@ class UnexpectedTipAttachError(RoboticsInteractionError):
         super().__init__(ErrorCodes.UNEXPECTED_TIP_ATTACH, message, detail, wrapping)
 
 
+class FirmwareUpdateRequiredError(RoboticsInteractionError):
+    """An error indicating that a firmware update is required."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FirmwareUpdateRequiredError."""
+        super().__init__(ErrorCodes.FIRMWARE_UPDATE_REQUIRED, message, detail, wrapping)
+
+
 class PipetteOverpressureError(RoboticsInteractionError):
     """An error indicating that a pipette experienced an overpressure event, likely because of a clog."""
 
