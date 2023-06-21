@@ -167,6 +167,7 @@ class Axis(enum.Enum):
             OT3AxisKind.Z_G: [cls.Z_G],
             OT3AxisKind.Q: [cls.Q],
             OT3AxisKind.OTHER: [cls.Q],
+            # OT3AxisKind.OTHER: [cls.G],
         }
         return kind_map[kind]
 

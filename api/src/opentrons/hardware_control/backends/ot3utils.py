@@ -211,12 +211,10 @@ def get_current_settings(
     config: OT3CurrentSettings,
     gantry_load: GantryLoad,
 ) -> OT3AxisMap[CurrentConfig]:
-    print(f"CONFIG = {config}")
     conf_by_pip = config.by_gantry_load(gantry_load)
-    print(f"conf_by_pip = {conf_by_pip}")
     currents = {}
     for axis_kind in conf_by_pip["hold_current"].keys():
-        for axis in Axis.of_kind(axis_kind):
+        for axis in OT3Axis.of_kind(axis_kind):
             currents[axis] = CurrentConfig(
                 conf_by_pip["hold_current"][axis_kind],
                 conf_by_pip["run_current"][axis_kind],
@@ -227,7 +225,7 @@ def get_current_settings(
 def get_system_constraints(
     config: OT3MotionSettings,
     gantry_load: GantryLoad,
-) -> "SystemConstraints[Axis]":
+) -> "SystemConstraints[OT3Axis]":
     conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
     axis_kind = [

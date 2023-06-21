@@ -81,6 +81,7 @@ from opentrons_hardware.hardware_control.motor_enable_disable import (
 from opentrons_hardware.hardware_control.motor_position_status import (
     get_motor_position,
     update_motor_position_estimation,
+    update_gear_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.tip_presence import get_tip_ejector_state
