@@ -135,7 +135,7 @@ async def _main(is_simulating: bool, volume: float) -> None:
         SLOT_FIXTURE
     ) + fixture.position_in_slot("left")
     tip_rack_nominal = helpers_ot3.get_theoretical_a1_position(
-        SLOT_TIP_RACK, f"opentrons_ot3_96_tiprack_{fixture.tip_volume}ul"
+        SLOT_TIP_RACK, f"opentrons_flex_96_tiprack_{fixture.tip_volume}ul"
     )
     tip_length = helpers_ot3.get_default_tip_length(fixture.tip_volume)
 
