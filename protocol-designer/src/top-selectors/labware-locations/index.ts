@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect'
-import { useSelector } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 import {
   THERMOCYCLER_MODULE_TYPE,
