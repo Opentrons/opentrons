@@ -619,8 +619,8 @@ class GripperProbe(enum.Enum):
 
 
 class TipStateType(enum.Enum):
-    ABSENT = False
-    PRESENT = True
+    ABSENT = 0
+    PRESENT = 1
 
     def __str__(self) -> str:
         return self.name
@@ -655,9 +655,9 @@ class LiquidNotFound(RuntimeError):
 class FailedTipStateCheck(RuntimeError):
     """Error raised if the tip ejector state does not match the expected value."""
 
-    def __init__(self, tip_state_type: TipStateType, actual_state: bool) -> None:
+    def __init__(self, tip_state_type: TipStateType, actual_state: int) -> None:
         """Iniitialize FailedTipStateCheck error."""
         super().__init__(
-            f"Failed to correctly determine tip state for {str(tip_state_type)}"
-            f"received {actual_state} but expected {tip_state_type.value}"
+            f"Failed to correctly determine tip state for tip {str(tip_state_type)} "
+            f"received {bool(actual_state)} but expected {bool(tip_state_type.value)}"
         )

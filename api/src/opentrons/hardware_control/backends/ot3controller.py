@@ -734,7 +734,7 @@ class OT3Controller:
         return {node_to_axis(node): bool(val) for node, val in res.items()}
 
     async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
-        """Get the state of the gantry's limit switches on each axis."""
+        """Get the state of the tip ejector flag for a given mount."""
         # TODO (lc 06/09/2023) We should create a separate type for
         # pipette specific sensors. This work is done in the overpressure
         # PR.

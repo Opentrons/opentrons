@@ -1659,7 +1659,6 @@ class OT3API(
         for rel_point, speed in spec.shake_off_list:
             await self.move_rel(realmount, rel_point, speed=speed)
 
-        # TODO change to enum
         await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
 
         _add_tip_to_instrs()
@@ -1740,7 +1739,6 @@ class OT3API(
             }
         )
 
-        # TODO change to enum
         await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
         _remove()
 

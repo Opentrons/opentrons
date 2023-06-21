@@ -21,13 +21,13 @@ log = logging.getLogger(__name__)
 async def get_tip_ejector_state(
     can_messenger: CanMessenger,
     node: Literal[NodeId.pipette_left, NodeId.pipette_right],
-) -> bool:
+) -> int:
     """Get the state of the tip presence interrupter.
 
     When the tip ejector flag is occuluded, then we
     know that there is a tip on the pipette.
     """
-    tip_ejector_state = False
+    tip_ejector_state = 0
 
     event = asyncio.Event()
 
@@ -35,7 +35,7 @@ async def get_tip_ejector_state(
         nonlocal tip_ejector_state
         if isinstance(message, PushTipPresenceNotification):
             event.set()
-            tip_ejector_state = message.payload.ejector_flag_status.value != 0
+            tip_ejector_state = message.payload.ejector_flag_status.value
 
     def _filter(arbitration_id: ArbitrationId) -> bool:
         return (NodeId(arbitration_id.parts.originating_node_id) == node) and (
