@@ -53,9 +53,7 @@ export type SettingOption =
   | 'RobotSettingsWifi'
   | 'RobotSettingsWifiConnect'
 
-export type SetSettingOption = React.Dispatch<
-  React.SetStateAction<SettingOption | null>
->
+export type SetSettingOption = (option: SettingOption | null) => void
 
 export function RobotSettingsDashboard(): JSX.Element {
   const { i18n, t } = useTranslation('shared')
@@ -154,7 +152,7 @@ export function RobotSettingsDashboard(): JSX.Element {
         />
       )
     case 'UpdateChannel':
-      return <UpdateChannel setCurrentOption={setCurrentOption} />
+      return <UpdateChannel handleBackPress={() => setCurrentOption(null)} />
 
     case 'RobotSettingsWifi':
       return (
@@ -197,11 +195,16 @@ export function RobotSettingsDashboard(): JSX.Element {
           requestState={requestState}
           selectedSsid={selectedSsid}
           setCurrentOption={setCurrentOption}
+          selectedAuthType={selectedAuthType}
         />
       )
 
     case 'EthernetConnectionDetails':
-      return <EthernetConnectionDetails setCurrentOption={setCurrentOption} />
+      return (
+        <EthernetConnectionDetails
+          handleGoBack={() => setCurrentOption('NetworkSettings')}
+        />
+      )
 
     // fallthrough option: render the robot settings list of buttons
     default:

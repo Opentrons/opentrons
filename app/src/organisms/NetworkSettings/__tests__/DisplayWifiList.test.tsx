@@ -9,9 +9,6 @@ import { DisplaySearchNetwork } from '../DisplaySearchNetwork'
 import { DisplayWifiList } from '../DisplayWifiList'
 
 const mockPush = jest.fn()
-const mockSetShowSelectAuthenticationType = jest.fn()
-const mockSetChangeState = jest.fn()
-const mockSetSelectedSsid = jest.fn()
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
   { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
@@ -47,9 +44,8 @@ describe('DisplayWifiList', () => {
   beforeEach(() => {
     props = {
       list: mockWifiList,
-      setShowSelectAuthenticationType: mockSetShowSelectAuthenticationType,
-      setChangeState: mockSetChangeState,
-      setSelectedSsid: mockSetSelectedSsid,
+      handleJoinAnotherNetwork: jest.fn(),
+      handleNetworkPress: jest.fn(),
       isHeader: true,
     }
     mockDisplaySearchNetwork.mockReturnValue(
@@ -87,8 +83,6 @@ describe('DisplayWifiList', () => {
     const [{ getByText }] = render(props)
     const button = getByText('foo')
     fireEvent.click(button)
-    expect(props.setShowSelectAuthenticationType).toHaveBeenCalled()
-    expect(props.setChangeState).toHaveBeenCalled()
-    expect(props.setSelectedSsid).toHaveBeenCalled()
+    expect(props.handleNetworkPress).toHaveBeenCalledWith('foo')
   })
 })

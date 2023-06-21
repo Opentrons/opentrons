@@ -19,6 +19,7 @@ import {
 } from '../../../../organisms/RobotSettingsDashboard'
 import { getBuildrootUpdateAvailable } from '../../../../redux/buildroot'
 import { useLights } from '../../../../organisms/Devices/hooks'
+import { useNetworkConnection } from '../../hooks'
 
 import { RobotSettingsDashboard } from '..'
 
@@ -64,6 +65,9 @@ const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
 const mockGetBuildrootUpdateAvailable = getBuildrootUpdateAvailable as jest.MockedFunction<
   typeof getBuildrootUpdateAvailable
 >
+const mockUseNetworkConnection = useNetworkConnection as jest.MockedFunction<
+  typeof useNetworkConnection
+>
 
 const render = () => {
   return renderWithProviders(
@@ -93,6 +97,7 @@ describe('RobotSettingsDashboard', () => {
       lightsOn: false,
       toggleLights: mockToggleLights,
     })
+    mockUseNetworkConnection.mockReturnValue({} as any)
   })
 
   it('should render Navigation', () => {

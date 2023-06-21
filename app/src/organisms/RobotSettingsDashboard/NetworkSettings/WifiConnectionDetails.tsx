@@ -24,22 +24,21 @@ import { getNetworkInterfaces } from '../../../redux/networking'
 import { useWifiList } from '../../../resources/networking/hooks'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
-import type { SetSettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import type { State } from '../../../redux/types'
 
 const FETCH_WIFI_LIST_MS = 5000
 
 interface WifiConnectionDetailsProps {
-  setCurrentOption: SetSettingOption
-  setSelectedSsid: React.Dispatch<React.SetStateAction<string>>
+  handleJoinAnotherNetwork: () => void
+  handleNetworkPress: (ssid: string) => void
   activeSsid?: string
   connectedWifiAuthType?: WifiSecurityType
 }
 export function WifiConnectionDetails({
   activeSsid,
   connectedWifiAuthType,
-  setCurrentOption,
-  setSelectedSsid,
+  handleNetworkPress,
+  handleJoinAnotherNetwork,
 }: WifiConnectionDetailsProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const [
@@ -147,13 +146,10 @@ export function WifiConnectionDetails({
         ) : null}
         <DisplayWifiList
           list={list}
-          onClickSsid={() =>
-            setCurrentOption('RobotSettingsSelectAuthenticationType')
-          }
-          handleJoinAnotherNetwork={() =>
-            setCurrentOption('RobotSettingsJoinOtherNetwork')
-          }
-          setSelectedSsid={setSelectedSsid}
+          handleJoinAnotherNetwork={handleJoinAnotherNetwork}
+          handleNetworkPress={(ssid: string) => {
+            handleNetworkPress(ssid)
+          }}
         />
       </Flex>
     </>

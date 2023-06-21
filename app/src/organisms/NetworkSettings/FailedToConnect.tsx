@@ -16,35 +16,24 @@ import {
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import type { RequestState } from '../../redux/robot-api/types'
 
 interface FailedToConnectProps {
   selectedSsid: string
   requestState: RequestState | null
-  handleConnect: () => void
-  setCurrentOption: SetSettingOption
+  handleChangeNetwork: () => void
+  handleTryAgain: () => void
+  isInvalidPassword: boolean
 }
 
 export function FailedToConnect({
   selectedSsid,
   requestState,
-  setCurrentOption,
-  handleConnect,
+  handleTryAgain,
+  handleChangeNetwork,
+  isInvalidPassword,
 }: FailedToConnectProps): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
-  // TODO(bh, 2023-6-9): parse the error/failed request
-  // const isInvalidPassword = !(type === DISCONNECT)
-  const isInvalidPassword = true
-
-  const handleClickTryAgain = (): void => {
-    if (isInvalidPassword) {
-      setCurrentOption('RobotSettingsSetWifiCred')
-    } else {
-      // Try to reconnect
-      handleConnect()
-    }
-  }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
@@ -72,11 +61,7 @@ export function FailedToConnect({
               name="ot-alert"
               size="3rem"
               color={COLORS.red2}
-              aria-label={
-                isInvalidPassword
-                  ? 'failed_to_connect_invalidPassword'
-                  : 'failed_to_connect'
-              }
+              aria-label={'failed_to_connect_invalidPassword'}
             />
             <Flex
               flexDirection={DIRECTION_COLUMN}
@@ -111,12 +96,12 @@ export function FailedToConnect({
             flex="1"
             buttonType="secondary"
             buttonText={t('change_network')}
-            onClick={() => setCurrentOption('RobotSettingsWifi')}
+            onClick={handleChangeNetwork}
           />
           <MediumButton
             flex="1"
             buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
-            onClick={handleClickTryAgain}
+            onClick={handleTryAgain}
           />
         </Flex>
       </Flex>

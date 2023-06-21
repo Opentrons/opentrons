@@ -20,7 +20,6 @@ import { getNetworkInterfaces } from '../../../redux/networking'
 import { getLocalRobot } from '../../../redux/discovery'
 
 import type { State } from '../../../redux/types'
-import type { SetSettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 const STRETCH_LIST_STYLE = css`
   width: 100%;
@@ -30,13 +29,13 @@ const STRETCH_LIST_STYLE = css`
 `
 
 interface EthernetConnectionDetailsProps {
-  setCurrentOption: SetSettingOption
+  handleGoBack: () => void
 }
 
 export function EthernetConnectionDetails(
   props: EthernetConnectionDetailsProps
 ): JSX.Element {
-  const { setCurrentOption } = props
+  const { handleGoBack } = props
   const { t, i18n } = useTranslation(['device_settings', 'shared'])
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
@@ -48,7 +47,7 @@ export function EthernetConnectionDetails(
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
         header={t('ethernet')}
-        onClickBack={() => setCurrentOption('NetworkSettings')}
+        onClickBack={handleGoBack}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}

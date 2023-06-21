@@ -6,10 +6,7 @@ import styled from 'styled-components'
 import {
   Flex,
   SPACING,
-  Btn,
   DIRECTION_COLUMN,
-  ALIGN_CENTER,
-  Icon,
   TYPOGRAPHY,
   COLORS,
   BORDERS,
@@ -25,7 +22,6 @@ import {
 } from '../../redux/config'
 
 import type { Dispatch } from '../../redux/types'
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 interface LabelProps {
   isSelected?: boolean
@@ -45,11 +41,11 @@ const SettingButtonLabel = styled.label<LabelProps>`
 `
 
 interface UpdateChannelProps {
-  setCurrentOption: SetSettingOption
+  handleBackPress: () => void
 }
 
 export function UpdateChannel({
-  setCurrentOption,
+  handleBackPress,
 }: UpdateChannelProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'app_settings'])
   const dispatch = useDispatch<Dispatch>()
@@ -70,7 +66,7 @@ export function UpdateChannel({
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
         header={t('app_settings:update_channel')}
-        onClickBack={() => setCurrentOption(null)}
+        onClickBack={handleBackPress}
       />
       <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING.spacing40}>
         <StyledText

@@ -48,7 +48,6 @@ describe('TouchscreenBrightness', () => {
   it('should render text and buttons', () => {
     const [{ getByText, getByTestId }] = render(props)
     getByText('Touchscreen Brightness')
-    getByTestId('TouchscreenBrightness_back_button')
     getByTestId('TouchscreenBrightness_decrease')
     getByTestId('TouchscreenBrightness_increase')
   })

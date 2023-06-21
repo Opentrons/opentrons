@@ -19,7 +19,7 @@ import {
   FailedToConnect,
   SetWifiSsid,
   SelectAuthenticationType as SelectAuthenticationTypeComponent,
-  SetWifiCred,
+  SetWifiCred as SetWifiCredComponent,
   WifiConnectionDetails,
 } from '../../organisms/NetworkSettings'
 
@@ -32,21 +32,19 @@ import { useTranslation } from 'react-i18next'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 
 const WIFI_LIST_POLL_MS = 5000
-type WifiScreenOption = 'WifiList' | 'JoinOtherNetwork' | 'SelectAuthType'
+type WifiScreenOption =
+  | 'WifiList'
+  | 'JoinOtherNetwork'
+  | 'SelectAuthType'
+  | 'SetWifiCred'
+  | 'WifiConnectStatus'
 
 export function ConnectViaWifi(): JSX.Element {
   const [selectedSsid, setSelectedSsid] = React.useState<string>('')
   const [
-    showSelectAuthenticationType,
-    setShowSelectAuthenticationType,
-  ] = React.useState<boolean>(false)
-  const [
     selectedAuthType,
     setSelectedAuthType,
   ] = React.useState<WifiSecurityType>('wpa-psk')
-  const [changeState, setChangeState] = React.useState<NetworkChangeState>({
-    type: null,
-  })
 
   const [currentOption, setCurrentOption] = React.useState<WifiScreenOption>(
     'WifiList'
@@ -60,35 +58,42 @@ export function ConnectViaWifi(): JSX.Element {
     const lastId = last(requestIds)
     return lastId != null ? RobotApi.getRequestById(state, lastId) : null
   })
-  const [
-    currentRequestState,
-    setCurrentRequestState,
-  ] = React.useState<RequestState | null>(requestState)
+
+  console.log({ requestState })
+  console.log({ currentOption })
 
   const handleConnect = (): void => {
     const options = {
       ssid: selectedSsid,
       securityType: selectedAuthType,
-      hidden:
-        selectedAuthType === 'none' ||
-        (changeState.type === JOIN_OTHER && false),
+      hidden: false,
       psk: password,
     }
     dispatchApiRequest(Networking.postWifiConfigure(robotName, options))
-    if (changeState.type === JOIN_OTHER) {
-      setChangeState({ type: changeState.type, ssid: options.ssid })
-    }
+    setCurrentOption('WifiConnectStatus')
     setPassword('')
   }
 
   const renderScreen = (): JSX.Element | null => {
-    if (currentOption === 'WifiList') {
+    if (currentOption === 'WifiConnectStatus') {
+      return (
+        <WifiConnectStatus
+          handleConnect={handleConnect}
+          requestState={requestState}
+          setCurrentOption={setCurrentOption}
+          selectedSsid={selectedSsid}
+          selectedAuthType={selectedAuthType}
+        />
+      )
+    } else if (currentOption === 'WifiList') {
       return (
         <DisplayWifiList
           list={list}
           handleJoinAnotherNetwork={() => setCurrentOption('JoinOtherNetwork')}
-          setSelectedSsid={setSelectedSsid}
-          onClickSsid={() => setCurrentOption('JoinOtherNetwork')}
+          handleNetworkPress={(ssid: string) => {
+            setSelectedSsid(ssid)
+            setCurrentOption('SelectAuthType')
+          }}
           isHeader
         />
       )
@@ -104,71 +109,23 @@ export function ConnectViaWifi(): JSX.Element {
         <SelectAuthenticationType
           selectedAuthType={selectedAuthType}
           setSelectedAuthType={setSelectedAuthType}
+          handleWifiConnect={handleConnect}
+          setCurrentOption={setCurrentOption}
         />
       )
-      // This condition might be changed for manual connect
-    } else if (changeState.ssid != null && currentRequestState === null) {
+    } else if (currentOption === 'SetWifiCred') {
       return (
         <SetWifiCred
-          ssid={changeState.ssid}
-          setShowSelectAuthenticationType={setShowSelectAuthenticationType}
-          authType={selectedAuthType}
           password={password}
           setPassword={setPassword}
+          setCurrentOption={setCurrentOption}
           handleConnect={handleConnect}
-        />
-      )
-    } else if (
-      changeState.ssid != null &&
-      currentRequestState !== null &&
-      currentRequestState.status === RobotApi.PENDING
-    ) {
-      return <ConnectingNetwork ssid={changeState.ssid} />
-    } else if (
-      changeState.ssid != null &&
-      currentRequestState !== null &&
-      currentRequestState.status === RobotApi.SUCCESS
-    ) {
-      return (
-        <WifiConnectionDetails
-          ssid={changeState.ssid}
-          authType={selectedAuthType}
-        />
-      )
-    } else if (
-      changeState.ssid != null &&
-      currentRequestState !== null &&
-      currentRequestState.status === RobotApi.FAILURE
-    ) {
-      return (
-        <FailedToConnect
-          ssid={changeState.ssid}
-          requestState={currentRequestState}
-          type={changeState.type}
-          onConnect={handleConnect}
-          setChangeState={setChangeState}
-          setCurrentRequestState={setCurrentRequestState}
         />
       )
     } else {
       return null
     }
   }
-
-  React.useEffect(() => {
-    setCurrentRequestState(requestState)
-  }, [requestState])
-
-  React.useEffect(() => {
-    // TODO kj 01/30/2023 This authType None will be fixed in a following PR
-    // a user selects none as authType
-    if (selectedSsid !== '' && selectedAuthType === 'none') {
-      const network = list.find((nw: WifiNetwork) => nw.ssid === selectedSsid)
-      if (network != null) {
-        handleConnect()
-      }
-    }
-  }, [selectedSsid, selectedAuthType, list])
 
   return (
     <>
@@ -235,14 +192,14 @@ function SelectAuthenticationType({
   setCurrentOption,
   setSelectedAuthType,
 }: SelectAuthenticationTypeProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
+  const { i18n, t } = useTranslation('device_settings')
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
-        buttonText={t('connect')}
+        buttonText={i18n.format(t('continue'), 'capitalize')}
         header={t('select_a_security_type')}
-        onClickBack={() => setCurrentOption('Wifi')}
+        onClickBack={() => setCurrentOption('WifiList')}
         onClickButton={() => {
           selectedAuthType !== 'none'
             ? setCurrentOption('SetWifiCred')
@@ -255,4 +212,76 @@ function SelectAuthenticationType({
       />
     </Flex>
   )
+}
+
+interface SetWifiCredProps {
+  handleConnect: () => void
+  password: string
+  setCurrentOption: (option: WifiScreenOption) => void
+  setPassword: React.Dispatch<React.SetStateAction<string>>
+}
+
+export function SetWifiCred({
+  handleConnect,
+  password,
+  setCurrentOption,
+  setPassword,
+}: SetWifiCredProps): JSX.Element {
+  const { t } = useTranslation('device_settings')
+
+  return (
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <ChildNavigation
+        buttonText={t('connect')}
+        header={t('sign_into_wifi')}
+        onClickBack={() => setCurrentOption('SelectAuthType')}
+        onClickButton={handleConnect}
+      />
+      <SetWifiCredComponent password={password} setPassword={setPassword} />
+    </Flex>
+  )
+}
+
+interface WifiConnectStatusProps {
+  handleConnect: () => void
+  requestState: RequestState | null
+  selectedSsid: string
+  setCurrentOption: (option: WifiScreenOption) => void
+  selectedAuthType: WifiSecurityType
+}
+
+/**
+ * Robot settings page managing wifi connect status
+ */
+export function WifiConnectStatus({
+  handleConnect,
+  requestState,
+  setCurrentOption,
+  selectedSsid,
+  selectedAuthType,
+}: WifiConnectStatusProps): JSX.Element | null {
+  if (requestState == null) {
+    return null
+  } else if (requestState.status === RobotApi.PENDING) {
+    return <ConnectingNetwork ssid={selectedSsid} />
+  } else if (requestState.status === RobotApi.FAILURE) {
+    const isInvalidPassword = requestState.response.status === 401
+    return (
+      <FailedToConnect
+        requestState={requestState}
+        selectedSsid={selectedSsid}
+        handleTryAgain={() =>
+          isInvalidPassword ? setCurrentOption('SetWifiCred') : handleConnect()
+        }
+        isInvalidPassword={isInvalidPassword}
+        handleChangeNetwork={() => setCurrentOption('WifiList')}
+      />
+    )
+  } else if (requestState.status === RobotApi.SUCCESS) {
+    return (
+      <WifiConnectionDetails ssid={selectedSsid} authType={selectedAuthType} />
+    )
+  } else {
+    return null
+  }
 }

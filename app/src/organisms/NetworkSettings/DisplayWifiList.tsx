@@ -24,7 +24,6 @@ import { StyledText } from '../../atoms/text'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
 import { DisplaySearchNetwork } from './DisplaySearchNetwork'
 
-import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import type { WifiNetwork } from '../../redux/networking/types'
 
 const NETWORK_ROW_STYLE = css`
@@ -54,25 +53,18 @@ const NETWORK_ROW_STYLE = css`
 
 interface DisplayWifiListProps {
   list: WifiNetwork[]
-  onClickSsid: () => void
   handleJoinAnotherNetwork: () => void
-  setSelectedSsid: (selectedSsid: string) => void
+  handleNetworkPress: (ssid: string) => void
   isHeader?: boolean
 }
 
 export function DisplayWifiList({
   list,
-  onClickSsid,
   handleJoinAnotherNetwork,
-  setSelectedSsid,
+  handleNetworkPress,
   isHeader = false,
 }: DisplayWifiListProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-
-  const handleClick = (nw: WifiNetwork): void => {
-    setSelectedSsid(nw.ssid)
-    onClickSsid()
-  }
 
   return (
     <>
@@ -92,7 +84,7 @@ export function DisplayWifiList({
               padding={`${SPACING.spacing20} ${SPACING.spacing32}`}
               alignItems={ALIGN_CENTER}
               gridGap={SPACING.spacing4}
-              onClick={() => handleClick(nw)}
+              onClick={() => handleNetworkPress(nw.ssid)}
             >
               <Icon name="wifi" size="2.5rem" />
               <StyledText as="h4">{nw.ssid}</StyledText>

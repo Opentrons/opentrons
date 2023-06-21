@@ -36,8 +36,13 @@ export function RobotSettingsWifi({
       <WifiConnectionDetails
         activeSsid={activeSsid}
         connectedWifiAuthType={connectedWifiAuthType}
-        setSelectedSsid={setSelectedSsid}
-        setCurrentOption={setCurrentOption}
+        handleJoinAnotherNetwork={() =>
+          setCurrentOption('RobotSettingsJoinOtherNetwork')
+        }
+        handleNetworkPress={(ssid: string) => {
+          setSelectedSsid(ssid)
+          setCurrentOption('RobotSettingsSelectAuthenticationType')
+        }}
       />
     </Flex>
   )
