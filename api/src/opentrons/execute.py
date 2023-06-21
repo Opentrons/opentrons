@@ -10,7 +10,7 @@ import argparse
 import logging
 import os
 import sys
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional, TextIO, Union, cast
+from typing import TYPE_CHECKING, Callable, Dict, List, Optional, TextIO, Union
 
 from opentrons import protocol_api, __version__, should_use_ot3
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
@@ -25,7 +25,7 @@ from opentrons.protocols.api_support.deck_type import (
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import API as OT2API, ThreadManager, HardwareControlAPI
-from opentrons.hardware_control.types import MachineType
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
@@ -61,7 +61,6 @@ def get_protocol_api(
     bundled_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
     extra_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
-    machine: Optional[MachineType] = None,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a ``protocol_api.ProtocolContext``
@@ -104,11 +103,8 @@ def get_protocol_api(
                           on a robot, it will look in the 'labware'
                           subdirectory of the Jupyter data directory for
                           custom labware.
-    :param machine: Either `"ot2"` or `"ot3"`. If `None`, machine will be
-                    determined from persistent settings.
     :return: The protocol context.
     """
-    _create_hardware_controller(machine)
     if isinstance(version, str):
         checked_version = parse.version_from_string(version)
     elif not isinstance(version, APIVersion):
@@ -123,13 +119,15 @@ def get_protocol_api(
     ):
         extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
+    robot_type = _get_robot_type()
+    deck_type = guess_deck_type_from_global_config()
+
+    _create_hardware_controller(robot_type)
+
     try:
         context = protocol_api.create_protocol_context(
             api_version=checked_version,
-            # FIXME(2022-12-02): Instead of guessing,
-            # match this to the robot type declared by the protocol.
-            # https://opentrons.atlassian.net/browse/RSS-156
-            deck_type=guess_deck_type_from_global_config(),
+            deck_type=deck_type,
             hardware_api=_THREAD_MANAGED_HW,  # type: ignore[arg-type]
             bundled_labware=bundled_labware,
             bundled_data=bundled_data,
@@ -228,11 +226,6 @@ def execute(
     emit_runlog: Optional[Callable[[command_types.CommandMessage], None]] = None,
     custom_labware_paths: Optional[List[str]] = None,
     custom_data_paths: Optional[List[str]] = None,
-    # TODO(mm, 2022-12-14): The `machine` param should probably be removed.
-    #  * Protocols now declare their target robot types intrinsically.
-    #  * I don't think it would ever make sense to call this function with anything
-    #    other than the host robot's type, anyway?
-    machine: Optional[MachineType] = None,
 ) -> None:
     """
     Run the protocol itself.
@@ -280,8 +273,6 @@ def execute(
                               non-recursive contents of specified directories
                               are presented by the protocol context in
                               ``ProtocolContext.bundled_data``.
-    :param machine: Either `"ot2"` or `"ot3"`. If `None`, machine will be
-                    determined from persistent settings.
 
     The format of the runlog entries is as follows:
 
@@ -336,7 +327,6 @@ def execute(
             bundled_labware=getattr(protocol, "bundled_labware", None),
             bundled_data=bundled_data,
             extra_labware=gpa_extras,
-            machine=machine,
         )
         if emit_runlog:
             broker = context.broker
@@ -390,7 +380,6 @@ def main() -> int:
         action="store_true",
         help="Do not print the commands as they are executed",
     )
-    parser.add_argument("-m", "--machine", choices=["ot2", "ot3"])
     args = parser.parse_args()
     printer = None if args.no_print_runlog else make_runlog_cb()
     if args.log_level != "none":
@@ -399,19 +388,22 @@ def main() -> int:
         log_level = args.log_level
     else:
         log_level = "warning"
-    machine = cast(Optional[MachineType], args.machine)
     # Try to migrate containers from database to v2 format
     execute(
         args.protocol,
         args.protocol.name,
         log_level=log_level,
         emit_runlog=printer,
-        machine=machine,
     )
     return 0
 
 
-def _create_hardware_controller(machine: Optional[MachineType]) -> None:
+def _get_robot_type() -> RobotType:
+    """Return what kind of robot we're currently running on."""
+    return "OT-3 Standard" if should_use_ot3() else "OT-2 Standard"
+
+
+def _create_hardware_controller(robot_type: RobotType) -> None:
     # Build a hardware controller in a worker thread, which is necessary
     # because ipython runs its notebook in asyncio but the notebook
     # is at script/repl scope not function scope and is synchronous so
@@ -419,7 +411,8 @@ def _create_hardware_controller(machine: Optional[MachineType]) -> None:
     # IPython 7 we can avoid this, but for now we can't
     global _THREAD_MANAGED_HW
     if not _THREAD_MANAGED_HW:
-        if machine == "ot3" or should_use_ot3():
+        if robot_type == "OT-3 Standard":
+            # Conditional import because this isn't installed on OT-2s.
             from opentrons.hardware_control.ot3api import OT3API
 
             _THREAD_MANAGED_HW = ThreadManager(OT3API.build_hardware_controller)
