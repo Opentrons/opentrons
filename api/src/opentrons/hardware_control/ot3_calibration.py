@@ -736,7 +736,7 @@ async def calibrate_gripper_jaw(
             return offset
         finally:
             hcapi.remove_gripper_probe()
-            await hcapi.ungrip()
+            # await hcapi.ungrip()
 
 
 async def calibrate_gripper(
@@ -745,7 +745,7 @@ async def calibrate_gripper(
     """Calibrate gripper."""
     offset = gripper_pin_offsets_mean(front=offset_front, rear=offset_rear)
     LOG.info(f"Gripper calibration offset: {offset}")
-    await hcapi.save_instrument_offset(OT3Mount.GRIPPER, offset)
+    # await hcapi.save_instrument_offset(OT3Mount.GRIPPER, offset)
     return offset
 
 
@@ -771,7 +771,7 @@ async def calibrate_pipette(
             offset = await _calibrate_mount(
                 hcapi, mount, slot, method, raise_verify_error
             )
-            await hcapi.save_instrument_offset(mount, offset)
+            # await hcapi.save_instrument_offset(mount, offset)
             return offset
         finally:
             await hcapi.remove_tip(mount)
