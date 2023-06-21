@@ -14,7 +14,6 @@ import { UpdateChannel } from '../UpdateChannel'
 
 jest.mock('../../../redux/config')
 
-
 const mockChannelOptions = [
   {
     label: 'Stable',

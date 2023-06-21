@@ -10,8 +10,6 @@ import type { WifiSecurityType } from '@opentrons/api-client'
 import type { SetSettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import type { RequestState } from '../../../redux/robot-api/types'
 
-const STATUS_CODE_UNAUTHORIZED = 401
-
 interface RobotSettingsWifiConnectProps {
   handleConnect: () => void
   requestState: RequestState | null

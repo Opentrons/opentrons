@@ -45,10 +45,7 @@ export function EthernetConnectionDetails(
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <ChildNavigation
-        header={t('ethernet')}
-        onClickBack={handleGoBack}
-      />
+      <ChildNavigation header={t('ethernet')} onClickBack={handleGoBack} />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}

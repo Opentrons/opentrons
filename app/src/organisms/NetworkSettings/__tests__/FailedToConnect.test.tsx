@@ -40,7 +40,7 @@ describe('ConnectedResult', () => {
       selectedSsid: 'mockSsid',
       handleChangeNetwork: jest.fn(),
       handleTryAgain: jest.fn(),
-      isInvalidPassword: true
+      isInvalidPassword: true,
     }
   })
 
@@ -76,5 +76,4 @@ describe('ConnectedResult', () => {
     button.click()
     expect(props.handleTryAgain).toHaveBeenCalled()
   })
-
 })

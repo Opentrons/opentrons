@@ -10,10 +10,6 @@ import { getLocalRobot } from '../../redux/discovery'
 import * as RobotApi from '../../redux/robot-api'
 import { useWifiList } from '../../resources/networking/hooks'
 import {
-  CONNECT,
-  JOIN_OTHER,
-} from '../../organisms/Devices/RobotSettings/ConnectNetwork/constants'
-import {
   ConnectingNetwork,
   DisplayWifiList,
   FailedToConnect,
@@ -26,8 +22,6 @@ import {
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import type { WifiNetwork } from '../../redux/networking/types'
-import type { NetworkChangeState } from '../../organisms/Devices/RobotSettings/ConnectNetwork/types'
 import { useTranslation } from 'react-i18next'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 

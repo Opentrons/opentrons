@@ -11,9 +11,7 @@ import { useIsFinishedUnboxing } from '../../RobotSettingsDashboard/NetworkSetti
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
 
 const mockPush = jest.fn()
-const mockSetShowSelectAuthenticationType = jest.fn()
 const mockSetSelectedAuthType = jest.fn()
-const mockSetChangeState = jest.fn()
 
 jest.mock('../SetWifiCred')
 jest.mock('../../../redux/networking')

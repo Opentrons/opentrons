@@ -47,7 +47,7 @@ describe('WifiConnectionDetails', () => {
       activeSsid: 'mock wifi ssid',
       connectedWifiAuthType: 'none',
       handleNetworkPress: jest.fn(),
-      handleJoinAnotherNetwork: jest.fn()
+      handleJoinAnotherNetwork: jest.fn(),
     }
     mockGetLocalRobot.mockReturnValue({
       name: ROBOT_NAME,

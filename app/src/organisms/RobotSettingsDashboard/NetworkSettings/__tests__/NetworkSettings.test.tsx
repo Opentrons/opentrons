@@ -92,7 +92,9 @@ describe('NetworkSettings', () => {
   it('selecting the Ethernet option displays the ethernet details', () => {
     const [{ getByText }] = render(props)
     getByText('Ethernet').click()
-    expect(mockSetCurrentOption).toHaveBeenCalledWith('EthernetConnectionDetails')
+    expect(mockSetCurrentOption).toHaveBeenCalledWith(
+      'EthernetConnectionDetails'
+    )
   })
 
   it('clicking back on the ethernet details screen shows the network settings page again', () => {
