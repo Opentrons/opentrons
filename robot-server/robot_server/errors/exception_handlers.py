@@ -38,6 +38,13 @@ from .error_responses import (
 log = getLogger(__name__)
 
 
+def _code_or_default(exc: BaseException) -> str:
+    if isinstance(exc, EnumeratedError):
+        return exc.error_code
+    else:
+        return ErrorCodes.GENERAL_ERROR.value.code
+
+
 def _route_is_legacy(request: Request) -> bool:
     """Check if router handling the request is a legacy v1 endpoint."""
     router = request.scope.get("router")
@@ -140,7 +147,9 @@ async def handle_unexpected_error(request: Request, error: Exception) -> JSONRes
     ).strip()
 
     if _route_is_legacy(request):
-        response: BaseErrorBody = LegacyErrorResponse(message=detail)
+        response: BaseErrorBody = LegacyErrorResponse(
+            message=detail, errorCode=_code_or_default(error)
+        )
     else:
         response = UnexpectedError(detail=detail, meta={"stacktrace": stacktrace})
 
