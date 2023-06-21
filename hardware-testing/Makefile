@@ -96,11 +96,22 @@ test-gravimetric-multi:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 200 --trials 1
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1
 
+.PHONY: test-gravimetric-96
+test-gravimetric-96:
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --tip 1000 --trials 1 --increment
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --tip 200 --trials 1 --increment
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --tip 50 --trials 1 --increment
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --tip 1000 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --tip 200 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --tip 50 --trials 1
+
+
 .PHONY: test-gravimetric
 test-gravimetric:
 	-$(MAKE) apply-patches-gravimetric
 	$(MAKE) test-gravimetric-single
 	$(MAKE) test-gravimetric-multi
+	$(MAKE) test-gravimetric-96
 	-$(MAKE) remove-patches-gravimetric
 
 .PHONY: test-production-qc

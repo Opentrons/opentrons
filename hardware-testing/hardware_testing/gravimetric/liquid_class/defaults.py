@@ -734,7 +734,7 @@ def get_test_volumes(pipette: int, channels: int, tip: int) -> List[float]:
         elif tip == 200:
             return [200.0]
         else:
-            raise ValueError(f"no volumes to test for tip size: {tip} uL")
+            return [1000.0]
     else:
         # FIXME: also reduce total number of volumes we test for 1ch & 8ch pipettes
         aspirate_cls_per_volume = _aspirate_defaults[channels][pipette][tip]

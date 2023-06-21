@@ -117,6 +117,8 @@ def _reduce_volumes_to_not_exceed_software_limit(
 def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[float]:
     if cfg.increment:
         test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
+        if cfg.pipette_channels == 96:
+            test_volumes = [test_volumes[i] for i in range(len(test_volumes)) if (i % 2 == 0)]
     elif cfg.user_volumes and not ctx.is_simulating():
         _inp = input('Enter desired volumes, comma separated (eg: "10,100,1000") :')
         test_volumes = [
@@ -160,7 +162,8 @@ def _load_pipette(
     if cfg.pipette_channels not in load_str_channels:
         raise ValueError(f"unexpected number of channels: {cfg.pipette_channels}")
     chnl_str = load_str_channels[cfg.pipette_channels]
-    pip_name = f"p{cfg.pipette_volume}_{chnl_str}_gen3"
+    gen_str = "_gen3" if cfg.pipette_channels != 96 else ""
+    pip_name = f"p{cfg.pipette_volume}_{chnl_str}{gen_str}"
     print(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
     pipette = ctx.load_instrument(pip_name, cfg.pipette_mount)
     assert pipette.channels == cfg.pipette_channels, (
@@ -483,7 +486,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     test_volumes = _get_volumes(ctx, cfg)
     for v in test_volumes:
         print(f"\t{v} uL")
-    tips = get_tips(ctx, pipette, all_channels=cfg.increment)
+    tips = get_tips(ctx, pipette, all_channels=(cfg.increment or (cfg.pipette_channels == 96)))
     total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips])
     channels_to_test = _get_test_channels(cfg)
     if len(channels_to_test) > 1:
@@ -491,10 +494,14 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     else:
         num_channels_per_transfer = cfg.pipette_channels
     trial_total = len(test_volumes) * cfg.trials * len(channels_to_test)
-    assert (
-        trial_total <= total_tips
-    ), f"more trials ({trial_total}) than tips ({total_tips})"
-
+    if cfg.pipette_channels != 96:
+        assert (
+            trial_total <= total_tips
+        ), f"more trials ({trial_total}) than tips ({total_tips})"
+    else:
+        print(f"trial total {trial_total} tips {total_tips}")
+        if trial_total > total_tips:
+            ui.get_user_ready(f"Do you have {trial_total-total_tips} extra tipracks")
     ui.print_header("LOAD SCALE")
     print(
         "Some Radwag settings cannot be controlled remotely.\n"
@@ -617,6 +624,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 average_dispense_evaporation_ul,
             )
         trial_count = 0
+        tip_iter = 0
+        used_tips = 0
         for volume in test_volumes:
             actual_asp_list_all = []
             actual_disp_list_all = []
@@ -641,7 +650,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     )
                     print(f"trial total {trial_count}/{trial_total}")
                     # remove it so it's not used again
-                    next_tip: Well = tips[channel].pop(0)
+                    next_tip: Well = tips[channel][tip_iter]
                     next_tip_location = next_tip.top().move(channel_offset)
                     _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
                     (
@@ -703,6 +712,14 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     )
                     print("dropping tip")
                     _drop_tip(ctx, pipette, cfg)
+                    tip_iter += 1
+                    used_tips += 1
+                    if tip_iter >= len(tips[0]) and not (used_tips == trial_total):
+                        if not ctx.is_simulating():
+                            ui.get_user_ready(
+                            f"replace TIPRACKS in slots {cfg.slots_tiprack}"
+                            )
+                        tip_iter = 0
 
                 ui.print_header(f"{volume} uL channel {channel + 1} CALCULATIONS")
                 aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(
