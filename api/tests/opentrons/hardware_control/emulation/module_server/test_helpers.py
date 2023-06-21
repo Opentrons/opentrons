@@ -47,9 +47,7 @@ def modules_at_port() -> List[ModuleAtPort]:
         ModuleAtPort(
             port=f"url{i}",
             name=f"module_type{i}",
-            usb_port=USBPort(
-                name=f"identifier{i}", port_number=0, hub=True, hub_port=i + 1
-            ),
+            usb_port=USBPort(name=f"identifier{i}", port_number=i + 1),
         )
         for i in range(5)
     ]
