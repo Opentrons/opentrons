@@ -9,7 +9,13 @@ our static analysis and dev setup.
 
 from .categories import ErrorCategories, ErrorCategory
 from .codes import ErrorCodes, ErrorCode
-from .exceptions import EnumeratedError
+from .exceptions import (
+    EnumeratedError,
+    PythonException,
+    GeneralError,
+    RoboticsControlError,
+    RoboticsInteractionError,
+)
 
 __all__ = [
     "ErrorCategory",
@@ -17,4 +23,8 @@ __all__ = [
     "ErrorCode",
     "ErrorCodes",
     "EnumeratedError",
+    "PythonException",
+    "GeneralError",
+    "RoboticsControlError",
+    "RoboticsInteractionError",
 ]
