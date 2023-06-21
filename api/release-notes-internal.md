@@ -1,4 +1,3 @@
-
 For more details about this release, please see the full [technical change log][]. 
 
 [technical change log]: https://github.com/Opentrons/opentrons/releases
@@ -51,5 +50,6 @@ For more details about this release, please see the full [technical change log][
 - Automatic updates of robot software when new internal releases are created
 - Chrome remote devtools - if you enable them and then use Chrome to go to robotip:9223 you'll get devtools
 - After a while, the ODD should go into idle; if you touch it, it will come back online
+
 
 

@@ -99,7 +99,8 @@ class MoveGroupRunner:
         """
         self._move_groups = move_groups
         self._start_at_index = start_at_index
-        self._ignore_stalls = ignore_stalls
+        # self._ignore_stalls = ignore_stalls
+        self._ignore_stalls = True
         self._is_prepped: bool = False
 
     @staticmethod
