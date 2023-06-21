@@ -68,8 +68,6 @@ const ProtocolHeader = (props: {
     displayedTitle = truncateString(title, 92, 69)
   }
 
-  fdfd
-
   return (
     <Flex
       alignItems={ALIGN_CENTER}
