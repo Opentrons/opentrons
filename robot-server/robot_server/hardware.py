@@ -19,7 +19,11 @@ from opentrons.config import (
 from opentrons.util.helpers import utc_now
 from opentrons.hardware_control import ThreadManagedHardware, HardwareControlAPI
 from opentrons.hardware_control.simulator_setup import load_simulator_thread_manager
-from opentrons.hardware_control.types import HardwareEvent, DoorStateNotification, StatusBarState
+from opentrons.hardware_control.types import (
+    HardwareEvent,
+    DoorStateNotification,
+    StatusBarState,
+)
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )

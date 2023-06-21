@@ -291,9 +291,6 @@ class OT3API(
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
 
         await api_instance.set_status_bar_enabled(status_bar_enabled)
-        # TODO: Remove this line once the robot server runs the startup
-        # animation after initialization!
-        await api_instance.set_status_bar_state(StatusBarState.IDLE)
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
         )
