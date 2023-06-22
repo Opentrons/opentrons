@@ -1659,7 +1659,11 @@ class OT3API(
         for rel_point, speed in spec.shake_off_list:
             await self.move_rel(realmount, rel_point, speed=speed)
 
-        await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
+        # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
+        #       but not with DVT pipettes because those can only detect drops
+
+        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+            await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
 
         _add_tip_to_instrs()
 
@@ -1739,7 +1743,9 @@ class OT3API(
             }
         )
 
-        await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
+        # TODO: implement tip-detection sequence during drop-tip for 96ch
+        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+            await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
         _remove()
 
     async def clean_up(self) -> None:
