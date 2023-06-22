@@ -41,6 +41,7 @@ import * as labwareDefSelectors from '../../../labware-defs/selectors'
 import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
+import { toggleIsGripperRequired } from '../../../step-forms/actions/additionalItems'
 import { RobotTypeTile } from './RobotTypeTile'
 import { MetadataTile } from './MetadataTile'
 import { FirstPipetteTypeTile, SecondPipetteTypeTile } from './PipetteTypeTile'
@@ -50,7 +51,6 @@ import { WizardHeader } from './WizardHeader'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
-import { toggleIsGripperRequired } from '../../../step-forms/actions/additionalItems'
 
 type WizardStep =
   | 'robotType'
@@ -187,7 +187,6 @@ export function CreateFileWizard(): JSX.Element | null {
       // add gripper
       if (values.additionalEquipment.includes('gripper')) {
         dispatch(toggleIsGripperRequired())
-        console.log(values.additionalEquipment)
       }
       // auto-generate tipracks for pipettes
       const newTiprackModels: string[] = uniq(

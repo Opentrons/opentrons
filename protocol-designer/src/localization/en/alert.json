@@ -205,7 +205,7 @@
     "unused_gripper": {
       "heading": "Unused gripper",
       "body1": "The Flex Gripper is specified in your protocol is not currently used in any step. In order to run this protocol you will need to connect it to your robot.",
-      "bodh2": "If you don't intend to use the Flex Gripper, please consider removing it from your protocol."
+      "body2": "If you don't intend to use the Flex Gripper, please consider removing it from your protocol."
     }
   },
   "crash": {

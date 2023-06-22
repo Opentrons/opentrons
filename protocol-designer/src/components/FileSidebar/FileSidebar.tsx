@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import {
   DeprecatedPrimaryButton,
@@ -9,8 +8,6 @@ import {
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { resetScrollElements } from '../../ui/steps/utils'
-import { getRobotType } from '../../file-data/selectors'
-import { getAdditionalEquipment } from '../../step-forms/selectors'
 import { Portal } from '../portals/MainPageModalPortal'
 import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
@@ -25,7 +22,11 @@ import type {
   ModuleOnDeck,
   PipetteOnDeck,
 } from '../../step-forms'
-import type { CreateCommand, ProtocolFile } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  ProtocolFile,
+  RobotType,
+} from '@opentrons/shared-data'
 
 export interface Props {
   loadFile: (event: React.ChangeEvent<HTMLInputElement>) => unknown
@@ -36,6 +37,15 @@ export interface Props {
   pipettesOnDeck: InitialDeckSetup['pipettes']
   modulesOnDeck: InitialDeckSetup['modules']
   savedStepForms: SavedStepFormState
+  robotType: RobotType
+  additionalEquipment: AdditionalEquipment
+}
+
+export interface AdditionalEquipment {
+  [additionalEquipmentId: string]: {
+    name: 'gripper'
+    id: string
+  }
 }
 
 interface WarningContent {
@@ -176,13 +186,13 @@ export function FileSidebar(props: Props): JSX.Element {
     modulesOnDeck,
     pipettesOnDeck,
     savedStepForms,
+    robotType,
+    additionalEquipment,
   } = props
   const [
     showExportWarningModal,
     setShowExportWarningModal,
   ] = React.useState<boolean>(false)
-  const robotType = useSelector(getRobotType)
-  const additionalEquipment = useSelector(getAdditionalEquipment)
   const isGripperAttached = Object.values(additionalEquipment).some(
     equipment => equipment?.name === 'gripper'
   )
@@ -214,6 +224,7 @@ export function FileSidebar(props: Props): JSX.Element {
     robotType
   )
 
+  //  TODO(jr, 6/22/23): need to refactor when the gripper toggle is wired up
   const gripperWithoutStep = isGripperAttached && !hasMoveLabware
 
   const hasWarning =
