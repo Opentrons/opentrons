@@ -22,7 +22,7 @@ from opentrons_hardware.firmware_bindings.constants import NodeId
 
 import logging
 
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.INFO)
 
 BASE_DIRECTORY = "/userfs/data/testing_data/speed_accel_profile/"
 SAVE_NAME = "speed_test_output_"
@@ -39,64 +39,67 @@ FAKE_STATUS = {NodeId.gantry_x: MotorStatus(motor_ok=True, encoder_ok=True),
                 NodeId.head_l: MotorStatus(motor_ok=True, encoder_ok=True),
                 NodeId.head_r: MotorStatus(motor_ok=True, encoder_ok=True)}
 
+FAKE_GRIPPER = {NodeId.gripper_g: MotorStatus(motor_ok=True, encoder_ok=True)}
+
 TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
     GantryLoad.LOW_THROUGHPUT: {
         "X": {
-            "SPEED": {"MIN": 300, "MAX": 500, "INC": 100},
+            "SPEED": {"MIN": 250, "MAX": 450, "INC": 100},
             "ACCEL": {"MIN": 700, "MAX": 900, "INC": 100},
-            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
+            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25}
         },
         "Y": {
-            "SPEED": {"MIN": 275, "MAX": 425, "INC": 75},
-            "ACCEL": {"MIN": 500, "MAX": 700, "INC": 100},
-            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
+            "SPEED": {"MIN": 250, "MAX": 400, "INC": 75},
+            "ACCEL": {"MIN": 550, "MAX": 750, "INC": 100},
+            "CURRENT": {"MIN": 0.9, "MAX": 1.4, "INC": 0.25}
         },
         "L": {
-            "SPEED": {"MIN": 40, "MAX": 140, "INC": 30},
-            "ACCEL": {"MIN": 100, "MAX": 300, "INC": 100},
-            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
+            "SPEED": {"MIN": 80, "MAX": 120, "INC": 10},
+            "ACCEL": {"MIN": 100, "MAX": 200, "INC": 50},
+            "CURRENT": {"MIN": 0.75, "MAX": 1.25, "INC": 0.25}
         },
         "R": {
-            "SPEED": {"MIN": 40, "MAX": 140, "INC": 30},
-            "ACCEL": {"MIN": 100, "MAX": 300, "INC": 100},
-            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
+            "SPEED": {"MIN": 80, "MAX": 120, "INC": 10},
+            "ACCEL": {"MIN": 100, "MAX": 200, "INC": 50},
+            "CURRENT": {"MIN": 0.75, "MAX": 1.25, "INC": 0.25}
         },
         "G": {
-            "SPEED": {"MIN": 10, "MAX": 50, "INC": 10},
-            "ACCEL": {"MIN": 50, "MAX": 200, "INC": 50},
-            "CURRENT": {"MIN": 0.3, "MAX": 1, "INC": 0.1},
+            "SPEED": {"MIN": 50, "MAX": 100, "INC": 10},
+            "ACCEL": {"MIN": 150, "MAX": 200, "INC": 0},
+            "CURRENT": {"MIN": 0.6, "MAX": 1, "INC": 0}
         }
     },
     GantryLoad.HIGH_THROUGHPUT: {
         "X": {
             "SPEED": {"MIN": 275, "MAX": 425, "INC": 75},
             "ACCEL": {"MIN": 600, "MAX": 800, "INC": 100},
-            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
+            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25}
         },
         "Y": {
             "SPEED": {"MIN": 250, "MAX": 400, "INC": 100},
             "ACCEL": {"MIN": 400, "MAX": 600, "INC": 100},
-            "CURRENT": {"MIN": 1.3, "MAX": 1.5, "INC": 0.1},
+            "CURRENT": {"MIN": 1.3, "MAX": 1.5, "INC": 0.1}
         },
         "L": {
-            "SPEED": {"MIN": 40, "MAX": 140, "INC": 30},
-            "ACCEL": {"MIN": 100, "MAX": 300, "INC": 100},
-            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
+            "SPEED": {"MIN": 25, "MAX": 45, "INC": 10},
+            "ACCEL": {"MIN": 120, "MAX": 180, "INC": 30},
+            "CURRENT": {"MIN": 1.3, "MAX": 1.5, "INC": 0.1}
         },
         "R": {
-            "SPEED": {"MIN": 40, "MAX": 140, "INC": 30},
-            "ACCEL": {"MIN": 100, "MAX": 300, "INC": 100},
-            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25},
+            "SPEED": {"MIN": 25, "MAX": 45, "INC": 10},
+            "ACCEL": {"MIN": 120, "MAX": 180, "INC": 30},
+            "CURRENT": {"MIN": 1.3, "MAX": 1.5, "INC": 0.1}
         },
         "G": {
             "SPEED": {"MIN": 10, "MAX": 50, "INC": 10},
             "ACCEL": {"MIN": 50, "MAX": 200, "INC": 50},
-            "CURRENT": {"MIN": 0.3, "MAX": 1, "INC": 0.1},
+            "CURRENT": {"MIN": 0.3, "MAX": 1, "INC": 0.1}
         }
     },
 }
 
 START_CURRENT = 1.0
+HIGH_CURRENT = 1.5
 
 SETTINGS = {
     OT3Axis.X: GantryLoadSettings(
@@ -250,26 +253,28 @@ async def _single_axis_move(
     # move away from the limit switch before cycling
     await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
     time.sleep(ENCODER_DELAY*2) #let postition settle
-
+    # if axis == "G":
+    #     await api.home_gripper_jaw()
+    #     api._backend._motor_status.update(FAKE_GRIPPER)
     for c in range(cycles):
-        # move away from homed position
-        print("before encoder check")
-        print("api._encoder_position: "+str(api._encoder_position))
-        print("OT3Axis.by_mount(MOUNT): "+str(OT3Axis.by_mount(MOUNT)))
-        if api._encoder_position:
-            print("api._encoder_position evaluates True")
-        position_axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(MOUNT)]
-        check = str(api._backend.check_encoder_status(position_axes))
-        print("api._backend.check_encoder_status(position_axes): "+check)
-        print("valid motor check: " + str(api._encoder_position and check))
-        valid_motor = api._encoder_position and api._backend.check_encoder_status(
-            position_axes
-        )
-        print("valid_motor: "+str(valid_motor))
-        if not valid_motor:
-            print("must home error should be raised")
-        else:
-            print("must home error should NOT be raised")
+        # print("before encoder check")
+        # print("api._encoder_position: "+str(api._encoder_position))
+        # print("OT3Axis.by_mount(MOUNT): "+str(OT3Axis.by_mount(MOUNT)))
+        # if api._encoder_position:
+        #     print("api._encoder_position evaluates True")
+        # position_axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(MOUNT)]
+        # check = str(api._backend.check_encoder_status(position_axes))
+        # print("api._backend.check_encoder_status(position_axes): "+check)
+        # print(api._backend.check_encoder_status([OT3Axis.X, OT3Axis.Y, OT3Axis.G]))
+        # print("valid motor check: " + str(api._encoder_position and check))
+        # valid_motor = api._encoder_position and api._backend.check_encoder_status(
+        #     position_axes
+        # )
+        # print("valid_motor: "+str(valid_motor))
+        # if not valid_motor:
+        #     print("must home error should be raised")
+        # else:
+        #     print("must home error should NOT be raised")
         inital_pos = await api.encoder_current_position_ot3(mount=MOUNT,
                                                             refresh=ENCODER_REFRESH)
         cur_speed = SETTINGS[AXIS_MAP[axis]].max_speed
@@ -417,7 +422,7 @@ def save_table(test_axis_list: list, file_suffix: str, results: np.ndarray, data
 async def _main(is_simulating: bool) -> None:
     """Main run function."""
     if "G" in list(AXIS):
-        print("GRIPPER")
+        print("Building API with GRIPPER")
         api = await build_async_ot3_hardware_api(
             is_simulating=is_simulating,
             stall_detection_enable=False,
@@ -425,6 +430,7 @@ async def _main(is_simulating: bool) -> None:
         )
         await api.reset()
     else:
+        print("Building API")
         api = await build_async_ot3_hardware_api(
             is_simulating=is_simulating, stall_detection_enable=False
         )
@@ -605,5 +611,10 @@ if __name__ == "__main__":
     START_CURRENT = args.current
     BENCH = args.bench
     TEST_LIST = make_test_list(AXIS, LOAD)
+
+    if args.load == "HIGH":
+        print("Setting high hold current")
+        SETTINGS[AXIS_MAP["L"]].hold_current = HIGH_CURRENT
+        SETTINGS[AXIS_MAP["R"]].hold_current = HIGH_CURRENT
 
     asyncio.run(_main(args.simulate))
