@@ -44,7 +44,7 @@ class DeckSlotLocation(BaseModel):
             "A slot on the robot's deck."
             "\n\n"
             'The plain numbers like `"5"` are for the OT-2,'
-            ' and the letter-number pairs like `"C2"` are for the Flex.'
+            ' and the coordinates like `"C2"` are for the Flex.'
             "\n\n"
             "When you provide one of these values, you can use either style."
             " It will automatically be converted to match the robot."
@@ -482,7 +482,7 @@ class LabwareOffsetLocation(BaseModel):
             "\n\n"
             # This description should be kept in sync with DeckSlotLocation.slotName.
             'The plain numbers like `"5"` are for the OT-2,'
-            ' and the letter-number pairs like `"C2"` are for the Flex.'
+            ' and the coordinates like `"C2"` are for the Flex.'
             "\n\n"
             "When you provide one of these values, you can use either style."
             " It will automatically be converted to match the robot."

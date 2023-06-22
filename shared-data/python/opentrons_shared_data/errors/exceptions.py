@@ -1,6 +1,9 @@
 """Exception hierarchy for error codes."""
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List, Iterator, Union, Sequence
 from logging import getLogger
+from traceback import format_exception_only, format_tb
+import inspect
+import sys
 
 from .codes import ErrorCodes
 from .categories import ErrorCategories
@@ -17,15 +20,21 @@ class EnumeratedError(Exception):
         code: ErrorCodes,
         message: Optional[str] = None,
         detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence["EnumeratedError"]] = None,
     ) -> None:
         """Build an EnumeratedError."""
         self.code = code
         self.message = message or ""
         self.detail = detail or {}
+        self.wrapping = wrapping or []
 
     def __repr__(self) -> str:
         """Get a representative string for the exception."""
         return f"<{self.__class__.__name__}: code=<{self.code.value.code} {self.code.name}> message={self.message} detail={str(self.detail)}"
+
+    def __str__(self) -> str:
+        """Get a human-readable string."""
+        return f'Error {self.code.value.code} {self.code.name} ({self.__class__.__name__}){f": {self.message}" if self.message else ""}'
 
 
 class CommunicationError(EnumeratedError):
@@ -41,6 +50,7 @@ class CommunicationError(EnumeratedError):
         code: Optional[ErrorCodes] = None,
         message: Optional[str] = None,
         detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a CommunicationError."""
         if code and code not in code.of_category(
@@ -49,7 +59,9 @@ class CommunicationError(EnumeratedError):
             log.error(
                 f"Error {code.name} is inappropriate for a CommunicationError exception"
             )
-        super().__init__(code or ErrorCodes.COMMUNICATION_ERROR, message, detail)
+        super().__init__(
+            code or ErrorCodes.COMMUNICATION_ERROR, message, detail, wrapping
+        )
 
 
 class RoboticsControlError(EnumeratedError):
@@ -65,6 +77,7 @@ class RoboticsControlError(EnumeratedError):
         code: Optional[ErrorCodes] = None,
         message: Optional[str] = None,
         detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a RoboticsControlError."""
         if code and code not in code.of_category(
@@ -74,7 +87,9 @@ class RoboticsControlError(EnumeratedError):
                 f"Error {code.name} is inappropriate for a RoboticsControlError exception"
             )
 
-        super().__init__(code or ErrorCodes.ROBOTICS_CONTROL_ERROR, message, detail)
+        super().__init__(
+            code or ErrorCodes.ROBOTICS_CONTROL_ERROR, message, detail, wrapping
+        )
 
 
 class RoboticsInteractionError(EnumeratedError):
@@ -90,6 +105,7 @@ class RoboticsInteractionError(EnumeratedError):
         code: Optional[ErrorCodes] = None,
         message: Optional[str] = None,
         detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a RoboticsInteractionError."""
         if code and code not in code.of_category(
@@ -99,7 +115,9 @@ class RoboticsInteractionError(EnumeratedError):
                 f"Error {code.name} is inappropriate for a RoboticsInteractionError exception"
             )
 
-        super().__init__(code or ErrorCodes.ROBOTICS_INTERACTION_ERROR, message, detail)
+        super().__init__(
+            code or ErrorCodes.ROBOTICS_INTERACTION_ERROR, message, detail, wrapping
+        )
 
 
 class GeneralError(EnumeratedError):
@@ -115,190 +133,325 @@ class GeneralError(EnumeratedError):
         code: Optional[ErrorCodes] = None,
         message: Optional[str] = None,
         detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[Union[EnumeratedError, BaseException]]] = None,
     ) -> None:
         """Build a GeneralError."""
         if code and code not in code.of_category(ErrorCategories.GENERAL_ERROR):
             log.error(
                 f"Error {code.name} is inappropriate for a GeneralError exception"
             )
-        super().__init__(code or ErrorCodes.GENERAL_ERROR, message, detail)
+
+        def _wrapped_excs() -> Iterator[EnumeratedError]:
+            if not wrapping:
+                return
+            for exc in wrapping:
+                if isinstance(exc, EnumeratedError):
+                    yield exc
+                else:
+                    yield PythonException(exc)
+
+        super().__init__(
+            code or ErrorCodes.GENERAL_ERROR, message, detail, list(_wrapped_excs())
+        )
+
+
+def _exc_harvest_predicate(v: Any) -> bool:
+    if inspect.isroutine(v):
+        return False
+    if inspect.ismethoddescriptor(v):
+        return False
+    # on python 3.11 and up we can check if things are method wrappers, which basic builtin
+    # dunders like __add__ are, but until then we can't and also don't know this is real
+    if sys.version_info.minor >= 11 and inspect.ismethodwrapper(v):  # type: ignore[attr-defined]
+        return False
+    return True
+
+
+class PythonException(GeneralError):
+    """An exception wrapping a base exception but with a GeneralError code and storing details."""
+
+    def __init__(self, exc: BaseException) -> None:
+        """Build a PythonException."""
+
+        def _descend_exc_ctx(exc: BaseException) -> List[PythonException]:
+            descendants: List[PythonException] = []
+            if exc.__context__:
+                descendants.append(PythonException(exc.__context__))
+            if exc.__cause__:
+                descendants.append(PythonException(exc.__cause__))
+            return descendants
+
+        base_details = {
+            k: str(v)
+            for k, v in inspect.getmembers(exc, _exc_harvest_predicate)
+            if not k.startswith("_")
+        }
+        try:
+            tb = exc.__traceback__
+        except AttributeError:
+            tb = None
+
+        if tb:
+            base_details["traceback"] = "\n".join(format_tb(tb))
+        base_details["class"] = type(exc).__name__
+
+        super().__init__(
+            message="\n".join(format_exception_only(type(exc), exc)),
+            detail=base_details,
+            wrapping=_descend_exc_ctx(exc),
+        )
 
 
 class CanbusCommunicationError(CommunicationError):
     """An error indicating a problem with canbus communication."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a CanbusCommunicationError."""
-        super().__init__(ErrorCodes.CANBUS_COMMUNICATION_ERROR, message, detail)
+        super().__init__(
+            ErrorCodes.CANBUS_COMMUNICATION_ERROR, message, detail, wrapping
+        )
 
 
 class InternalUSBCommunicationError(CommunicationError):
     """An error indicating a problem with internal USB communication - e.g. with the rear panel."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an InternalUSBCommunicationError."""
-        super().__init__(ErrorCodes.INTERNAL_USB_COMMUNICATION_ERROR, message, detail)
+        super().__init__(
+            ErrorCodes.INTERNAL_USB_COMMUNICATION_ERROR, message, detail, wrapping
+        )
 
 
 class ModuleCommunicationError(CommunicationError):
     """An error indicating a problem with module communication."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build an ModuleCommunicationError."""
-        super().__init__(ErrorCodes.MODULE_COMMUNICATION_ERROR, message, detail)
+        """Build a CanbusCommunicationError."""
+        super().__init__(
+            ErrorCodes.CANBUS_COMMUNICATION_ERROR, message, detail, wrapping
+        )
 
 
 class CommandTimedOutError(CommunicationError):
     """An error indicating that a command timed out."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a CommandTimedOutError."""
-        super().__init__(ErrorCodes.COMMAND_TIMED_OUT, message, detail)
+        super().__init__(ErrorCodes.COMMAND_TIMED_OUT, message, detail, wrapping)
 
 
 class FirmwareUpdateFailedError(CommunicationError):
     """An error indicating that a firmware update failed."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a FirmwareUpdateFailedError."""
-        super().__init__(ErrorCodes.FIRMWARE_UPDATE_FAILED, message, detail)
+        super().__init__(ErrorCodes.FIRMWARE_UPDATE_FAILED, message, detail, wrapping)
 
 
 class MotionFailedError(RoboticsControlError):
     """An error indicating that a motion failed."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a FirmwareUpdateFailedError."""
-        super().__init__(ErrorCodes.MOTION_FAILED, message, detail)
+        super().__init__(ErrorCodes.MOTION_FAILED, message, detail, wrapping)
 
 
 class HomingFailedError(RoboticsControlError):
     """An error indicating that a homing failed."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a FirmwareUpdateFailedError."""
-        super().__init__(ErrorCodes.HOMING_FAILED, message, detail)
+        super().__init__(ErrorCodes.HOMING_FAILED, message, detail, wrapping)
 
 
 class StallOrCollisionDetectedError(RoboticsControlError):
     """An error indicating that a stall or collision occurred."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a StallOrCollisionDetectedError."""
-        super().__init__(ErrorCodes.STALL_OR_COLLISION_DETECTED, message, detail)
+        super().__init__(
+            ErrorCodes.STALL_OR_COLLISION_DETECTED, message, detail, wrapping
+        )
 
 
 class MotionPlanningFailureError(RoboticsControlError):
     """An error indicating that motion planning failed."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a MotionPlanningFailureError."""
-        super().__init__(ErrorCodes.MOTION_PLANNING_FAILURE, message, detail)
+        super().__init__(ErrorCodes.MOTION_PLANNING_FAILURE, message, detail, wrapping)
 
 
 class LabwareDroppedError(RoboticsInteractionError):
     """An error indicating that the gripper dropped labware it was holding."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LabwareDroppedError."""
-        super().__init__(ErrorCodes.LABWARE_DROPPED, message, detail)
+        super().__init__(ErrorCodes.LABWARE_DROPPED, message, detail, wrapping)
 
 
 class TipPickupFailedError(RoboticsInteractionError):
     """An error indicating that a pipette failed to pick up a tip."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a TipPickupFailedError."""
-        super().__init__(ErrorCodes.TIP_PICKUP_FAILED, message, detail)
+        super().__init__(ErrorCodes.TIP_PICKUP_FAILED, message, detail, wrapping)
 
 
 class TipDropFailedError(RoboticsInteractionError):
     """An error indicating that a pipette failed to drop a tip."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a TipPickupFailedError."""
-        super().__init__(ErrorCodes.TIP_DROP_FAILED, message, detail)
+        super().__init__(ErrorCodes.TIP_DROP_FAILED, message, detail, wrapping)
 
 
 class UnexpectedTipRemovalError(RoboticsInteractionError):
     """An error indicating that a pipette did not have a tip when it should (aka it fell off)."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an UnexpectedTipRemovalError."""
-        super().__init__(ErrorCodes.UNEXPECTED_TIP_REMOVAL, message, detail)
+        super().__init__(ErrorCodes.UNEXPECTED_TIP_REMOVAL, message, detail, wrapping)
+
+
+class UnexpectedTipAttachError(RoboticsInteractionError):
+    """An error indicating that a pipette had a tip when it shouldn't."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an UnexpectedTipAttachError."""
+        super().__init__(ErrorCodes.UNEXPECTED_TIP_ATTACH, message, detail, wrapping)
 
 
 class PipetteOverpressureError(RoboticsInteractionError):
     """An error indicating that a pipette experienced an overpressure event, likely because of a clog."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an PipetteOverpressureError."""
-        super().__init__(ErrorCodes.PIPETTE_OVERPRESSURE, message, detail)
+        super().__init__(ErrorCodes.PIPETTE_OVERPRESSURE, message, detail, wrapping)
 
 
 class EStopActivatedError(RoboticsInteractionError):
     """An error indicating that the E-stop was activated."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an EStopActivatedError."""
-        super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, detail)
+        super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, detail, wrapping)
 
 
 class EStopNotPresentError(RoboticsInteractionError):
     """An error indicating that the E-stop is not present."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an EStopNotPresentError."""
-        super().__init__(ErrorCodes.E_STOP_NOT_PRESENT, message, detail)
+        super().__init__(ErrorCodes.E_STOP_NOT_PRESENT, message, detail, wrapping)
 
 
 class PipetteNotPresentError(RoboticsInteractionError):
     """An error indicating that the specified pipette is not present."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an PipetteNotPresentError."""
-        super().__init__(ErrorCodes.PIPETTE_NOT_PRESENT, message, detail)
+        super().__init__(ErrorCodes.PIPETTE_NOT_PRESENT, message, detail, wrapping)
 
 
 class GripperNotPresentError(RoboticsInteractionError):
     """An error indicating that the specified gripper is not present."""
 
     def __init__(
-        self, message: Optional[str] = None, detail: Optional[Dict[str, Any]] = None
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an GripperNotPresentError."""
-        super().__init__(ErrorCodes.GRIPPER_NOT_PRESENT, message, detail)
+        super().__init__(ErrorCodes.GRIPPER_NOT_PRESENT, message, detail, wrapping)

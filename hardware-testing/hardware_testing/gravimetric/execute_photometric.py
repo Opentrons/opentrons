@@ -11,7 +11,7 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Lab
 
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
-from hardware_testing.opentrons_api.types import Point, OT3Axis
+from hardware_testing.opentrons_api.types import Point
 from .measurement import (
     MeasurementType,
     create_measurement_tag,
@@ -306,6 +306,7 @@ def _run_trial(
         blank=blank,
         inspect=inspect,
         mix=mix,
+        touch_tip=False,
     )
 
     _record_measurement_and_store(MeasurementType.ASPIRATE)
@@ -330,9 +331,8 @@ def _run_trial(
             inspect=inspect,
             mix=mix,
             added_blow_out=(i + 1) == num_dispenses,
+            touch_tip=cfg.touch_tip,
         )
-        if cfg.touch_tip:
-            pipette.touch_tip(speed=30)
         _record_measurement_and_store(MeasurementType.DISPENSE)
         pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
         if (i + 1) == num_dispenses:
@@ -340,7 +340,7 @@ def _run_trial(
         else:
             pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))
         if not ctx.is_simulating():
-            ui.get_user_ready("add SEAL to plate")
+            ui.get_user_ready("add SEAL to plate and remove from DECK")
     return
 
 
@@ -381,7 +381,10 @@ def _drop_tip(
 
 
 def _display_dye_information(
-    ctx: ProtocolContext, dye_types_req: Dict[str, float], refill: bool
+    ctx: ProtocolContext,
+    dye_types_req: Dict[str, float],
+    refill: bool,
+    include_hv: bool,
 ) -> None:
     for dye in dye_types_req.keys():
         transfered_ul = dye_types_req[dye]
@@ -402,8 +405,9 @@ def _display_dye_information(
             else:
                 # add minimum required volume PLUS labware's dead-volume
                 if not ctx.is_simulating():
+                    dye_msg = 'A" or "HV' if include_hv and dye == "A" else dye
                     ui.get_user_ready(
-                        f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye}"'
+                        f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye_msg}"'
                     )
 
 
@@ -466,7 +470,10 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     )
 
     ui.print_header("PREPARE")
-    _display_dye_information(ctx, dye_types_req, cfg.refill)
+    can_swap_a_for_hv = not [
+        v for v in test_volumes if _DYE_MAP["A"]["min"] <= v < _DYE_MAP["A"]["max"]
+    ]
+    _display_dye_information(ctx, dye_types_req, cfg.refill, can_swap_a_for_hv)
 
     print("homing...")
     ctx.home()
@@ -483,6 +490,8 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                 trial_count += 1
                 ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
                 print(f"trial total {trial_count}/{trial_total}")
+                if not ctx.is_simulating():
+                    ui.get_user_ready(f"put PLATE #{trial + 1} and remove SEAL")
                 next_tip: Well = tips[0][tip_iter]
                 next_tip_location = next_tip.top()
                 _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
@@ -518,8 +527,16 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     do_jog = False
 
     finally:
-        # FIXME: instead keep motors engaged, and move to an ATTACH position
-        hw_api = ctx._core.get_hardware()
-        hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])  # disengage xy axis
-    ui.print_title("RESULTS")
-    print(test_report)
+        ui.print_title("CHANGE PIPETTES")
+        if pipette.has_tip:
+            if pipette.current_volume > 0:
+                trash = pipette.trash_container.wells()[0]
+                # FIXME: this should be a blow_out() at max volume,
+                #        but that is not available through PyAPI yet
+                #        so instead just dispensing.
+                pipette.dispense(pipette.current_volume, trash.top())
+                pipette.aspirate(10)  # to pull any droplets back up
+            _drop_tip(ctx, pipette, cfg)
+        ctx.home()
+        # move to attach point
+        pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))

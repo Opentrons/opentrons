@@ -217,6 +217,14 @@ from .blow_out_in_place import (
     BlowOutInPlaceResult,
 )
 
+from .set_status_bar import (
+    SetStatusBar,
+    SetStatusBarParams,
+    SetStatusBarCreate,
+    SetStatusBarResult,
+    SetStatusBarCommandType,
+)
+
 Command = Union[
     Aspirate,
     AspirateInPlace,
@@ -244,6 +252,7 @@ Command = Union[
     SavePosition,
     SetRailLights,
     TouchTip,
+    SetStatusBar,
     heater_shaker.WaitForTemperature,
     heater_shaker.SetTargetTemperature,
     heater_shaker.DeactivateHeater,
@@ -298,6 +307,7 @@ CommandParams = Union[
     SavePositionParams,
     SetRailLightsParams,
     TouchTipParams,
+    SetStatusBarParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -353,6 +363,7 @@ CommandType = Union[
     SavePositionCommandType,
     SetRailLightsCommandType,
     TouchTipCommandType,
+    SetStatusBarCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -407,6 +418,7 @@ CommandCreate = Union[
     SavePositionCreate,
     SetRailLightsCreate,
     TouchTipCreate,
+    SetStatusBarCreate,
     heater_shaker.WaitForTemperatureCreate,
     heater_shaker.SetTargetTemperatureCreate,
     heater_shaker.DeactivateHeaterCreate,
@@ -461,6 +473,7 @@ CommandResult = Union[
     SavePositionResult,
     SetRailLightsResult,
     TouchTipResult,
+    SetStatusBarResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,

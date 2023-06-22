@@ -11,6 +11,7 @@ from opentrons.protocol_engine.execution import (
     RunControlHandler,
     RailLightsHandler,
     LabwareMovementHandler,
+    StatusBarHandler,
 )
 from opentrons.protocol_engine.state import StateView
 
@@ -55,3 +56,9 @@ def run_control(decoy: Decoy) -> RunControlHandler:
 def rail_lights(decoy: Decoy) -> RailLightsHandler:
     """Get a mocked out RailLightsHandler."""
     return decoy.mock(cls=RailLightsHandler)
+
+
+@pytest.fixture
+def status_bar(decoy: Decoy) -> StatusBarHandler:
+    """Get a mocked out StatusBarHandler."""
+    return decoy.mock(cls=StatusBarHandler)
