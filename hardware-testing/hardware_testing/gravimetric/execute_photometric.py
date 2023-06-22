@@ -381,7 +381,10 @@ def _drop_tip(
 
 
 def _display_dye_information(
-    ctx: ProtocolContext, dye_types_req: Dict[str, float], refill: bool
+    ctx: ProtocolContext,
+    dye_types_req: Dict[str, float],
+    refill: bool,
+    include_hv: bool,
 ) -> None:
     for dye in dye_types_req.keys():
         transfered_ul = dye_types_req[dye]
@@ -402,8 +405,9 @@ def _display_dye_information(
             else:
                 # add minimum required volume PLUS labware's dead-volume
                 if not ctx.is_simulating():
+                    dye_msg = 'A" or "HV' if include_hv and dye == "A" else dye
                     ui.get_user_ready(
-                        f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye}"'
+                        f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye_msg}"'
                     )
 
 
@@ -466,7 +470,12 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     )
 
     ui.print_header("PREPARE")
-    _display_dye_information(ctx, dye_types_req, cfg.refill)
+    can_swap_a_for_hv = not [
+        v
+        for v in test_volumes
+        if _DYE_MAP["A"]["min"] <= v < _DYE_MAP["A"]["max"]
+    ]
+    _display_dye_information(ctx, dye_types_req, cfg.refill, can_swap_a_for_hv)
 
     print("homing...")
     ctx.home()
