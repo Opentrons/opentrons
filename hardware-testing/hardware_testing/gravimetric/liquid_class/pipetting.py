@@ -157,6 +157,7 @@ def _pipette_with_liquid_settings(
     inspect: bool = False,
     mix: bool = False,
     added_blow_out: bool = True,
+    touch_tip: bool = False,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     _check_aspirate_dispense_args(aspirate, dispense)
@@ -253,9 +254,9 @@ def _pipette_with_liquid_settings(
         _do_user_pause(ctx, inspect, "about to retract")
 
     def _dispense_on_retract() -> None:
-        # blow-out any remaining air in pipette (any reason why not?)
-        callbacks.on_blowing_out()
         if added_blow_out:
+            # blow-out any remaining air in pipette (any reason why not?)
+            callbacks.on_blowing_out()
             _do_user_pause(ctx, inspect, "about to blow-out")
             # FIXME: using the HW-API to specify that we want to blow-out the full
             #        available blow-out volume
@@ -264,8 +265,15 @@ def _pipette_with_liquid_settings(
             # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
             max_blow_out_volume = 79.5 if pipette.max_volume >= 1000 else 3.9
             hw_api.blow_out(hw_mount, max_blow_out_volume)
-        else:
-            pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
+        if touch_tip:
+            print("touching tip: start")
+            pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
+            print("touching tip: end")
+        # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
+        #       to avoid droplets from forming and falling off the tip
+        print("trailing-air-gap: start")
+        pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
+        print("trailing-air-gap: end")
 
     # PHASE 1: APPROACH
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
@@ -299,6 +307,7 @@ def aspirate_with_liquid_class(
     blank: bool = False,
     inspect: bool = False,
     mix: bool = False,
+    touch_tip: bool = False,
 ) -> None:
     """Aspirate with liquid class."""
     liquid_class = get_liquid_class(
@@ -317,6 +326,7 @@ def aspirate_with_liquid_class(
         blank=blank,
         inspect=inspect,
         mix=mix,
+        touch_tip=touch_tip,
     )
 
 
@@ -334,6 +344,7 @@ def dispense_with_liquid_class(
     inspect: bool = False,
     mix: bool = False,
     added_blow_out: bool = True,
+    touch_tip: bool = False,
 ) -> None:
     """Dispense with liquid class."""
     liquid_class = get_liquid_class(
@@ -353,4 +364,5 @@ def dispense_with_liquid_class(
         inspect=inspect,
         mix=mix,
         added_blow_out=added_blow_out,
+        touch_tip=touch_tip,
     )

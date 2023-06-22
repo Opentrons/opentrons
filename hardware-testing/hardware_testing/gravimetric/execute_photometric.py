@@ -11,7 +11,7 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Lab
 
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
-from hardware_testing.opentrons_api.types import Point, OT3Axis
+from hardware_testing.opentrons_api.types import Point
 from .measurement import (
     MeasurementType,
     create_measurement_tag,
@@ -306,6 +306,7 @@ def _run_trial(
         blank=blank,
         inspect=inspect,
         mix=mix,
+        touch_tip=False,
     )
 
     _record_measurement_and_store(MeasurementType.ASPIRATE)
@@ -330,9 +331,8 @@ def _run_trial(
             inspect=inspect,
             mix=mix,
             added_blow_out=(i + 1) == num_dispenses,
+            touch_tip=cfg.touch_tip,
         )
-        if cfg.touch_tip:
-            pipette.touch_tip(speed=30)
         _record_measurement_and_store(MeasurementType.DISPENSE)
         pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
         if (i + 1) == num_dispenses:
@@ -471,9 +471,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
 
     ui.print_header("PREPARE")
     can_swap_a_for_hv = not [
-        v
-        for v in test_volumes
-        if _DYE_MAP["A"]["min"] <= v < _DYE_MAP["A"]["max"]
+        v for v in test_volumes if _DYE_MAP["A"]["min"] <= v < _DYE_MAP["A"]["max"]
     ]
     _display_dye_information(ctx, dye_types_req, cfg.refill, can_swap_a_for_hv)
 
@@ -529,8 +527,16 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     do_jog = False
 
     finally:
-        # FIXME: instead keep motors engaged, and move to an ATTACH position
-        hw_api = ctx._core.get_hardware()
-        hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])  # disengage xy axis
-    ui.print_title("RESULTS")
-    print(test_report)
+        ui.print_title("CHANGE PIPETTES")
+        if pipette.has_tip:
+            if pipette.current_volume > 0:
+                trash = pipette.trash_container.wells()[0]
+                # FIXME: this should be a blow_out() at max volume,
+                #        but that is not available through PyAPI yet
+                #        so instead just dispensing.
+                pipette.dispense(pipette.current_volume, trash.top())
+                pipette.aspirate(10)  # to pull any droplets back up
+            _drop_tip(ctx, pipette, cfg)
+        ctx.home()
+        # move to attach point
+        pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))
