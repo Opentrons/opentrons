@@ -5,6 +5,7 @@ from opentrons.protocol_engine import commands
 StatelessCommandCreate = Union[
     commands.HomeCreate,
     commands.SetRailLightsCreate,
+    commands.SetStatusBarCreate,
     commands.magnetic_module.EngageCreate,
     commands.magnetic_module.DisengageCreate,
     commands.temperature_module.SetTargetTemperatureCreate,
@@ -26,6 +27,7 @@ StatelessCommandCreate = Union[
 StatelessCommand = Union[
     commands.Home,
     commands.SetRailLights,
+    commands.SetStatusBar,
     commands.magnetic_module.Engage,
     commands.magnetic_module.Disengage,
     commands.temperature_module.SetTargetTemperature,

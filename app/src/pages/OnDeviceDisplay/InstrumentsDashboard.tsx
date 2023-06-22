@@ -7,8 +7,12 @@ import { Navigation } from '../../organisms/Navigation'
 import { AttachedInstrumentMountItem } from '../../organisms/InstrumentMountItem'
 import { GripperWizardFlows } from '../../organisms/GripperWizardFlows'
 
+const FETCH_PIPETTE_CAL_POLL = 10000
+
 export const InstrumentsDashboard = (): JSX.Element => {
-  const { data: attachedInstruments } = useInstrumentsQuery()
+  const { data: attachedInstruments } = useInstrumentsQuery({
+    refetchInterval: FETCH_PIPETTE_CAL_POLL,
+  })
   const [wizardProps, setWizardProps] = React.useState<
     | React.ComponentProps<typeof GripperWizardFlows>
     | React.ComponentProps<typeof PipetteWizardFlows>

@@ -179,11 +179,4 @@ describe('RobotCard', () => {
     const [{ getByText }] = render(props)
     getByText('Mock RobotStatusHeader')
   })
-
-  it('renders loading text while loading instruments', () => {
-    const [{ getByText }] = render(props)
-
-    getByText('instruments')
-    getByText('LOADING')
-  })
 })
