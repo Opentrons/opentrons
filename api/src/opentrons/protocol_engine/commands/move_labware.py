@@ -107,11 +107,11 @@ class MoveLabwareImplementation(
         )
 
         # Check that labware and destination do not have labware on top
-        self._state_view.labware.raise_if_labware_is_not_on_top(
+        self._state_view.labware.raise_if_labware_has_labware_on_top(
             labware_id=params.labwareId
         )
         if isinstance(empty_new_location, OnLabwareLocation):
-            self._state_view.labware.raise_if_labware_is_not_on_top(
+            self._state_view.labware.raise_if_labware_has_labware_on_top(
                 empty_new_location.labwareId
             )
             # Ensure that labware can be placed on requested labware

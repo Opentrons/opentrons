@@ -92,7 +92,7 @@ async def test_manual_move_labware_implementation(
     result = await subject.execute(data)
     decoy.verify(await run_control.wait_for_resume(), times=times_pause_called)
     decoy.verify(
-        state_view.labware.raise_if_labware_is_not_on_top("my-cool-labware-id")
+        state_view.labware.raise_if_labware_has_labware_on_top("my-cool-labware-id")
     )
     assert result == MoveLabwareResult(
         offsetId="wowzers-a-new-offset-id",
@@ -148,8 +148,10 @@ async def test_move_labware_implementation_on_labware(
 
     result = await subject.execute(data)
     decoy.verify(
-        state_view.labware.raise_if_labware_is_not_on_top("my-cool-labware-id"),
-        state_view.labware.raise_if_labware_is_not_on_top("my-even-cooler-labware-id"),
+        state_view.labware.raise_if_labware_has_labware_on_top("my-cool-labware-id"),
+        state_view.labware.raise_if_labware_has_labware_on_top(
+            "my-even-cooler-labware-id"
+        ),
         state_view.labware.raise_if_labware_cannot_be_stacked(
             LabwareDefinition.construct(namespace="spacename"),  # type: ignore[call-arg]
             "my-even-cooler-labware-id",
@@ -217,7 +219,7 @@ async def test_gripper_move_labware_implementation(
 
     result = await subject.execute(data)
     decoy.verify(
-        state_view.labware.raise_if_labware_is_not_on_top("my-cool-labware-id"),
+        state_view.labware.raise_if_labware_has_labware_on_top("my-cool-labware-id"),
         await labware_movement.move_labware_with_gripper(
             labware_id="my-cool-labware-id",
             current_location=validated_from_location,

@@ -259,7 +259,7 @@ class LabwareView(HasState[LabwareState]):
             "There is no labware loaded on this Module"
         )
 
-    def raise_if_labware_is_not_on_top(self, labware_id: str) -> None:
+    def raise_if_labware_has_labware_on_top(self, labware_id: str) -> None:
         """Raise if labware has another labware on top."""
         for labware in self._state.labware_by_id.values():
             if (
