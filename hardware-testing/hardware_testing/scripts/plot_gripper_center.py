@@ -43,7 +43,6 @@ class Plot:
 
     def import_file(self, file):
         df = pd.read_csv(file)
-        # df = df[df["Cycle"] <= 40]
         self.total_cycles = df["Cycle"].max()
         self.slot = df["Slot"].iloc[0]
         self.force = df["Input Force"].iloc[0]
@@ -172,7 +171,7 @@ class Plot:
         y_avg_xpos = 0
         y_avg_text = f"Avg = {y_avg}mm ± {y_range}mm"
 
-        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=-100, ay_pos=100)
+        annotation_ymin = self.set_annotation(y_min_xpos, y_min, y_min_text, ax_pos=100, ay_pos=100)
         annotation_ymax = self.set_annotation(y_max_xpos, y_max, y_max_text, ax_pos=-100, ay_pos=-100)
         annotation_yavg = self.set_annotation(y_avg_xpos, y_avg, y_avg_text, ax_pos=100, ay_pos=-100)
         annotation_yacc = self.set_annotation(y_acc_xpos, y_acc, y_acc_text, ax_pos=100, ay_pos=-100)
