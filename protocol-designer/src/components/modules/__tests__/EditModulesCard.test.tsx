@@ -16,10 +16,12 @@ import {
 } from '../../../step-forms'
 import { getRobotType } from '../../../file-data/selectors'
 import { FormPipette } from '../../../step-forms/types'
+import { getAdditionalEquipment } from '../../../step-forms/selectors'
 import { SUPPORTED_MODULE_TYPES } from '../../../modules'
 import { EditModulesCard } from '../EditModulesCard'
 import { CrashInfoBox } from '../CrashInfoBox'
 import { ModuleRow } from '../ModuleRow'
+import { GripperRow } from '../GripperRow'
 
 jest.mock('../../../feature-flags')
 jest.mock('../../../step-forms/selectors')
@@ -34,7 +36,9 @@ const getPipettesForEditPipetteFormMock = stepFormSelectors.getPipettesForEditPi
 const mockGetRobotType = getRobotType as jest.MockedFunction<
   typeof getRobotType
 >
-
+const mockGetAdditionalEquipment = getAdditionalEquipment as jest.MockedFunction<
+  typeof getAdditionalEquipment
+>
 describe('EditModulesCard', () => {
   let store: any
   let crashableMagneticModule: ModuleOnDeck | undefined
@@ -72,7 +76,7 @@ describe('EditModulesCard', () => {
       pipetteName: 'p300_multi_test',
       tiprackDefURI: 'tiprack300',
     }
-
+    mockGetAdditionalEquipment.mockReturnValue({})
     mockGetRobotType.mockReturnValue('OT-2 Standard')
     getDisableModuleRestrictionsMock.mockReturnValue(false)
     getPipettesForEditPipetteFormMock.mockReturnValue({
@@ -195,6 +199,7 @@ describe('EditModulesCard', () => {
     expect(
       wrapper.find(ModuleRow).filter({ type: MAGNETIC_MODULE_TYPE }).props()
     ).toEqual({
+      isOt3: false,
       type: MAGNETIC_MODULE_TYPE,
       moduleOnDeck: crashableMagneticModule,
       showCollisionWarnings: true,
@@ -232,5 +237,21 @@ describe('EditModulesCard', () => {
         openEditModuleModal: props.openEditModuleModal,
       })
     })
+  })
+  it('displays gripper row with no gripper', () => {
+    mockGetRobotType.mockReturnValue('OT-3 Standard')
+    const wrapper = render(props)
+    expect(wrapper.find(GripperRow)).toHaveLength(1)
+    expect(wrapper.find(GripperRow).props().isGripperAdded).toEqual(false)
+  })
+  it('displays gripper row with gripper attached', () => {
+    const mockGripperId = 'gripeprId'
+    mockGetRobotType.mockReturnValue('OT-3 Standard')
+    mockGetAdditionalEquipment.mockReturnValue({
+      [mockGripperId]: { name: 'gripper', id: mockGripperId },
+    })
+    const wrapper = render(props)
+    expect(wrapper.find(GripperRow)).toHaveLength(1)
+    expect(wrapper.find(GripperRow).props().isGripperAdded).toEqual(true)
   })
 })
