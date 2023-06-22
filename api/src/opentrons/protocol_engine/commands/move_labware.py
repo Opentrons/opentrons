@@ -102,7 +102,7 @@ class MoveLabwareImplementation(
         )
         definition_uri = current_labware.definitionUri
 
-        empty_new_location = self._state_view.geometry.ensure_location_not_occupied(
+        available_new_location = self._state_view.geometry.ensure_location_not_occupied(
             location=params.newLocation
         )
 
@@ -110,22 +110,23 @@ class MoveLabwareImplementation(
         self._state_view.labware.raise_if_labware_has_labware_on_top(
             labware_id=params.labwareId
         )
-        if isinstance(empty_new_location, OnLabwareLocation):
+        if isinstance(available_new_location, OnLabwareLocation):
             self._state_view.labware.raise_if_labware_has_labware_on_top(
-                empty_new_location.labwareId
+                available_new_location.labwareId
             )
             # Ensure that labware can be placed on requested labware
             self._state_view.labware.raise_if_labware_cannot_be_stacked(
                 top_labware_definition=current_labware_definition,
-                bottom_labware_id=empty_new_location.labwareId,
+                bottom_labware_id=available_new_location.labwareId,
             )
 
         # Allow propagation of ModuleNotLoadedError.
         new_offset_id = self._equipment.find_applicable_labware_offset_id(
-            labware_definition_uri=definition_uri, labware_location=empty_new_location
+            labware_definition_uri=definition_uri,
+            labware_location=available_new_location,
         )
         await self._labware_movement.ensure_movement_not_obstructed_by_module(
-            labware_id=params.labwareId, new_location=empty_new_location
+            labware_id=params.labwareId, new_location=available_new_location
         )
 
         if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
@@ -142,7 +143,7 @@ class MoveLabwareImplementation(
                 )
             )
             validated_new_loc = self._labware_movement.ensure_valid_gripper_location(
-                empty_new_location,
+                available_new_location,
             )
             experimental_offset_data = ExperimentalOffsetData(
                 usePickUpLocationLpcOffset=params.usePickUpLocationLpcOffset,
