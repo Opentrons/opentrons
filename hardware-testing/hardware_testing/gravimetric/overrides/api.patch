@@ -7,11 +7,19 @@ index 5b21328a92..1bb9a6ceb8 100644
          OT3AxisKind.Y: 375,
          OT3AxisKind.Z: 35,
 -        OT3AxisKind.P: 5,
-+        OT3AxisKind.P: 20,
++        OT3AxisKind.P: 15,
          OT3AxisKind.Z_G: 50,
          OT3AxisKind.Q: 5.5,
      },
-@@ -98,18 +98,18 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
+@@ -91,25 +91,25 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
+         OT3AxisKind.X: 375,
+         OT3AxisKind.Y: 375,
+         OT3AxisKind.Z: 100,
+-        OT3AxisKind.P: 45,
++        OT3AxisKind.P: 70,
+         OT3AxisKind.Z_G: 50,
+     },
+ )
  
  DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
      high_throughput={
