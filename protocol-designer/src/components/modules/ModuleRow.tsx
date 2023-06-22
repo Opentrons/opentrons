@@ -22,10 +22,14 @@ import { ModuleDiagram } from './ModuleDiagram'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
-import { ModuleType, THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  ModuleType,
+  RobotType,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 interface Props {
-  isOt3?: boolean
+  robotType?: RobotType
   moduleOnDeck?: ModuleOnDeck
   showCollisionWarnings?: boolean
   type: ModuleType
@@ -37,9 +41,10 @@ export function ModuleRow(props: Props): JSX.Element {
     moduleOnDeck,
     openEditModuleModal,
     showCollisionWarnings,
-    isOt3,
+    robotType,
   } = props
   const type: ModuleType = moduleOnDeck?.type || props.type
+  const isFlex = robotType === 'OT-3 Standard'
 
   const model = moduleOnDeck?.model
   const slot = moduleOnDeck?.slot
@@ -72,7 +77,7 @@ export function ModuleRow(props: Props): JSX.Element {
     slotDisplayName = 'Slot 7'
     occupiedSlotsForMap = ['7', '8', '10', '11']
     //  TC on Flex
-  } else if (isOt3 && type === THERMOCYCLER_MODULE_TYPE && slot === 'B1') {
+  } else if (isFlex && type === THERMOCYCLER_MODULE_TYPE && slot === 'B1') {
     occupiedSlotsForMap = ['A1', 'B1']
   }
   // If collisionSlots are populated, check which slot is occupied
@@ -149,7 +154,7 @@ export function ModuleRow(props: Props): JSX.Element {
               <SlotMap
                 occupiedSlots={occupiedSlotsForMap}
                 collisionSlots={collisionSlots}
-                isOt3={isOt3}
+                robotType={robotType}
               />
             </div>
           )}

@@ -110,7 +110,7 @@ export interface NormalizedPipetteById {
   }
 }
 
-export interface NoramlizedAdditionalEquipmentById {
+export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
     name: 'gripper'
     id: string

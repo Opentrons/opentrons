@@ -31,13 +31,19 @@ describe('SlotMap', () => {
   })
 
   it('should render 12 slots for flex', () => {
-    const wrapper = shallow(<SlotMap occupiedSlots={['D1']} isOt3={true} />)
+    const wrapper = shallow(
+      <SlotMap occupiedSlots={['D1']} robotType="OT-3 Standard" />
+    )
     expect(wrapper.find('rect')).toHaveLength(12)
   })
 
   it('component renders crash info icon when collision slots present for flex', () => {
     const wrapper = shallow(
-      <SlotMap occupiedSlots={['D1']} collisionSlots={['D2']} isOt3={true} />
+      <SlotMap
+        occupiedSlots={['D1']}
+        collisionSlots={['D2']}
+        robotType="OT-3 Standard"
+      />
     )
     expect(wrapper.find(Icon)).toHaveLength(1)
   })

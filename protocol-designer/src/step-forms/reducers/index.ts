@@ -48,7 +48,7 @@ import { nestedCombineReducers } from './nestedCombineReducers'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 import { Reducer } from 'redux'
 import {
-  NoramlizedAdditionalEquipmentById,
+  NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
 } from '@opentrons/step-generation'
 import { LoadFileAction } from '../../load-file'
@@ -114,7 +114,7 @@ import {
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
 } from '../actions'
-import { SetGripperAction } from '../actions/additionalItems'
+import { ToggleIsGripperRequiredAction } from '../actions/additionalItems'
 type FormState = FormData | null
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
@@ -138,7 +138,7 @@ export type UnsavedFormActions =
   | EditProfileCycleAction
   | EditProfileStepAction
   | SelectMultipleStepsAction
-  | SetGripperAction
+  | ToggleIsGripperRequiredAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -198,7 +198,7 @@ export const unsavedForm = (
     case 'CANCEL_STEP_FORM':
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
-    case 'IS_GRIPPER_REQUIRED':
+    case 'TOGGLE_IS_GRIPPER_REQUIRED':
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
@@ -487,7 +487,7 @@ export type SavedStepFormsActions =
   | SwapSlotContentsAction
   | ReplaceCustomLabwareDef
   | EditModuleAction
-  | SetGripperAction
+  | ToggleIsGripperRequiredAction
 export const _editModuleFormUpdate = ({
   savedForm,
   moduleId,
@@ -1268,19 +1268,21 @@ export const pipetteInvariantProperties: Reducer<
 
 const initialAdditionalEquipmentState = {}
 
-export const additionalEquipmentInvariantProperties = handleActions<NoramlizedAdditionalEquipmentById>(
+export const additionalEquipmentInvariantProperties = handleActions<NormalizedAdditionalEquipmentById>(
   {
-    //  TODO(jr, 6/22/23): wire this up when schemav7 migration is complete
-    //  Additionally, wire up the the gripper logic using the toggle in moveLabware step
     //  @ts-expect-error
     LOAD_FILE: (
       state,
       action: LoadFileAction
-    ): NoramlizedAdditionalEquipmentById => {
+    ): NormalizedAdditionalEquipmentById => {
       const { file } = action.payload
-      const gripper =
-        // @ts-expect-error (jr, 6/22/23): moveLabware doesn't exist in schemav6
-        file.commands.filter(command => command.commandType === 'moveLabware')
+      const gripper = file.commands.filter(
+        command =>
+          // @ts-expect-error (jr, 6/22/23): moveLabware doesn't exist in schemav6
+          command.commandType === 'moveLabware' &&
+          // @ts-expect-error (jr, 6/22/23): moveLabware doesn't exist in schemav6
+          command.params.strategy === 'usingGripper'
+      )
       const hasGripper = gripper.length > 0
       // @ts-expect-error  (jr, 6/22/23): OT-3 Standard doesn't exist on schemav6
       const isOt3 = file.robot.model === 'OT-3 Standard'
@@ -1297,9 +1299,9 @@ export const additionalEquipmentInvariantProperties = handleActions<NoramlizedAd
         return { ...state }
       }
     },
-    IS_GRIPPER_REQUIRED: (
-      state: NoramlizedAdditionalEquipmentById
-    ): NoramlizedAdditionalEquipmentById => {
+    TOGGLE_IS_GRIPPER_REQUIRED: (
+      state: NormalizedAdditionalEquipmentById
+    ): NormalizedAdditionalEquipmentById => {
       const additionalEquipmentId = Object.keys(state)[0]
       const existingEquipment = state[additionalEquipmentId]
 
@@ -1319,7 +1321,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NoramlizedAd
 
       return updatedEquipment
     },
-    DEFAULT: (): NoramlizedAdditionalEquipmentById => ({}),
+    DEFAULT: (): NormalizedAdditionalEquipmentById => ({}),
   },
   initialAdditionalEquipmentState
 )
@@ -1444,7 +1446,7 @@ export interface RootState {
   labwareInvariantProperties: NormalizedLabwareById
   pipetteInvariantProperties: NormalizedPipetteById
   moduleInvariantProperties: ModuleEntities
-  additionalEquipmentInvariantProperties: NoramlizedAdditionalEquipmentById
+  additionalEquipmentInvariantProperties: NormalizedAdditionalEquipmentById
   presavedStepForm: PresavedStepFormState
   savedStepForms: SavedStepFormState
   unsavedForm: FormState

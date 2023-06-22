@@ -1647,7 +1647,7 @@ describe('unsavedForm reducer', () => {
     'SAVE_STEP_FORM',
     'SELECT_TERMINAL_ITEM',
     'SELECT_MULTIPLE_STEPS',
-    'IS_GRIPPER_REQUIRED',
+    'TOGGLE_IS_GRIPPER_REQUIRED',
   ]
   actionTypes.forEach(actionType => {
     it(`should clear the unsaved form when any ${actionType} action is dispatched`, () => {

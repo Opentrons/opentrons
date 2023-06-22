@@ -291,6 +291,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       [pipetteId: string]: { name: PipetteName }
     }
 
+    //  TODO(jr 6/22/23):  entire method should be replaced with the contents of robotType key
+    //  on the protocol file instead of inferring it from pipette types.
     const getRobotModelFromPipettes = (
       pipettes: RobotModel
     ): {

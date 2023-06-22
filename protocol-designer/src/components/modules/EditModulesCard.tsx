@@ -8,6 +8,7 @@ import {
   ModuleType,
   PipetteName,
   getPipetteNameSpecs,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
@@ -75,11 +76,11 @@ export function EditModulesCard(props: Props): JSX.Element {
     ].some(pipetteSpecs => pipetteSpecs?.channels !== 1)
 
   const warningsEnabled = !moduleRestrictionsDisabled
-  const isOt3 = robotType === 'OT-3 Standard'
+  const isFlex = robotType === FLEX_ROBOT_TYPE
 
   const SUPPORTED_MODULE_TYPES_FILTERED = SUPPORTED_MODULE_TYPES.filter(
     moduleType =>
-      isOt3
+      isFlex
         ? moduleType !== 'magneticModuleType'
         : moduleType !== 'magneticBlockType'
   )
@@ -88,9 +89,9 @@ export function EditModulesCard(props: Props): JSX.Element {
     dispatch(toggleIsGripperRequired())
   }
   return (
-    <Card title={isOt3 ? 'Additional Items' : 'Modules'}>
+    <Card title={isFlex ? 'Additional Items' : 'Modules'}>
       <div className={styles.modules_card_content}>
-        {warningsEnabled && !isOt3 && (
+        {warningsEnabled && !isFlex && (
           <CrashInfoBox
             showMagPipetteCollisons={showMagPipetteCollisons}
             showTempPipetteCollisons={showTempPipetteCollisons}
@@ -111,7 +112,7 @@ export function EditModulesCard(props: Props): JSX.Element {
                 showCollisionWarnings={warningsEnabled}
                 key={i}
                 openEditModuleModal={openEditModuleModal}
-                isOt3={isOt3}
+                robotType={robotType}
               />
             )
           } else {
@@ -124,7 +125,7 @@ export function EditModulesCard(props: Props): JSX.Element {
             )
           }
         })}
-        {isOt3 ? (
+        {isFlex ? (
           <GripperRow
             handleGripper={handleGripperClick}
             isGripperAdded={isGripperAttached}

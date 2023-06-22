@@ -206,9 +206,12 @@ export function FileSidebar(props: Props): JSX.Element {
       command => !LOAD_COMMANDS.includes(command.commandType)
     ) ?? []
 
-  const hasMoveLabware =
-    fileData?.commands.find(command => command.commandType === 'moveLabware') !=
-    null
+  const gripperInUse =
+    fileData?.commands.find(
+      command =>
+        command.commandType === 'moveLabware' &&
+        command.params.strategy === 'usingGripper'
+    ) != null
 
   const noCommands = fileData ? nonLoadCommands.length === 0 : true
   const pipettesWithoutStep = getUnusedEntities(
@@ -224,8 +227,7 @@ export function FileSidebar(props: Props): JSX.Element {
     robotType
   )
 
-  //  TODO(jr, 6/22/23): need to refactor when the gripper toggle is wired up
-  const gripperWithoutStep = isGripperAttached && !hasMoveLabware
+  const gripperWithoutStep = isGripperAttached && !gripperInUse
 
   const hasWarning =
     noCommands ||

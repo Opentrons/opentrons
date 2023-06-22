@@ -18,6 +18,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   ModuleType,
   ModuleModel,
+  OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
@@ -79,7 +80,7 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
   } = props
   const robotType = useSelector(getRobotType)
   const supportedModuleSlot =
-    robotType === 'OT-2 Standard'
+    robotType === OT2_STANDARD_MODEL
       ? SUPPORTED_MODULE_SLOTS_OT2[moduleType][0].value
       : SUPPORTED_MODULE_SLOTS_FLEX[moduleType][0].value
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
@@ -295,7 +296,7 @@ const EditModulesModalComponent = (
 
                 <ConnectedSlotMap
                   fieldName="selectedSlot"
-                  isOt3={robotType === 'OT-3 Standard'}
+                  robotType={robotType}
                 />
               </>
             )}

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { RobotType } from '@opentrons/shared-data'
 import { Icon } from '../icons'
 import styles from './styles.css'
 
@@ -13,7 +14,7 @@ export interface SlotMapProps {
   collisionSlots?: string[]
   /** Optional error styling */
   isError?: boolean
-  isOt3?: boolean
+  robotType?: RobotType
 }
 
 const OT2_SLOT_MAP_SLOTS = [
@@ -37,8 +38,9 @@ const numRows = 4
 const numCols = 3
 
 export function SlotMap(props: SlotMapProps): JSX.Element {
-  const { collisionSlots, occupiedSlots, isError, isOt3 } = props
-  const slots = isOt3 ? FLEX_SLOT_MAP_SLOTS : OT2_SLOT_MAP_SLOTS
+  const { collisionSlots, occupiedSlots, isError, robotType } = props
+  const slots =
+    robotType === 'OT-3 Standard' ? FLEX_SLOT_MAP_SLOTS : OT2_SLOT_MAP_SLOTS
 
   return (
     <svg

@@ -16,7 +16,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import {
-  NoramlizedAdditionalEquipmentById,
+  NormalizedAdditionalEquipmentById,
   TEMPERATURE_DEACTIVATED,
 } from '@opentrons/step-generation'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
@@ -158,12 +158,12 @@ export const getPipetteEntities: Selector<
 
 export const _getAdditionalEquipmentRootState: (
   arg: RootState
-) => NoramlizedAdditionalEquipmentById = rs =>
+) => NormalizedAdditionalEquipmentById = rs =>
   rs.additionalEquipmentInvariantProperties
 
 export const getAdditionalEquipment: Selector<
   BaseState,
-  NoramlizedAdditionalEquipmentById
+  NormalizedAdditionalEquipmentById
 > = createSelector(rootSelector, _getAdditionalEquipmentRootState)
 
 const _getInitialDeckSetupStepFormRootState: (
