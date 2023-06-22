@@ -14,7 +14,6 @@ from typing import TYPE_CHECKING, Callable, Dict, List, Optional, TextIO, Union
 
 from opentrons import protocol_api, __version__, should_use_ot3
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution import execute as execute_apiv2
 
 from opentrons.commands import types as command_types
@@ -316,14 +315,14 @@ def execute(
         else:
             raise
 
-    if getattr(protocol, "api_level", APIVersion(2, 0)) < APIVersion(2, 0):
-        raise ApiDeprecationError(getattr(protocol, "api_level"))
+    if protocol.api_level < APIVersion(2, 0):
+        raise ApiDeprecationError(version=protocol.api_level)
     else:
         bundled_data = getattr(protocol, "bundled_data", {})
         bundled_data.update(extra_data)
         gpa_extras = getattr(protocol, "extra_labware", None) or None
         context = get_protocol_api(
-            getattr(protocol, "api_level", MAX_SUPPORTED_VERSION),
+            protocol.api_level,
             bundled_labware=getattr(protocol, "bundled_labware", None),
             bundled_data=bundled_data,
             extra_labware=gpa_extras,
