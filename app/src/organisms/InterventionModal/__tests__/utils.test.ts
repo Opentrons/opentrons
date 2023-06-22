@@ -18,8 +18,6 @@ import {
   mockThermocyclerModule,
 } from '../__fixtures__'
 import {
-  OT2_STANDARD_SLOT_HEIGHT,
-  OT3_STANDARD_SLOT_HEIGHT,
   getCurrentRunLabwareRenderInfo,
   getCurrentRunModulesRenderInfo,
   getLabwareAnimationParams,
@@ -241,7 +239,10 @@ describe('getCurrentRunLabwareRenderInfo', () => {
     )
     expect(labwareInfo).toBeTruthy()
     expect(labwareInfo?.x).toEqual(0)
-    expect(labwareInfo?.y).toEqual(-90.5)
+    expect(labwareInfo?.y).toEqual(
+      deckDefFixture.cornerOffsetFromOrigin[1] -
+        mockLabwareDefinition.dimensions.yDimension
+    )
   })
 
   it('defaults labware x, y coordinates to 0,0 if slot position not found in deck definition', () => {
@@ -444,7 +445,10 @@ describe('getLabwareAnimationParams', () => {
 
     expect(res).toBeTruthy()
     expect(res?.movementParams.xMovement).toEqual(0)
-    expect(res?.movementParams.yMovement).toEqual(0 - OT2_STANDARD_SLOT_HEIGHT)
+    expect(res?.movementParams.yMovement).toEqual(
+      deckDefFixture.cornerOffsetFromOrigin[1] -
+        mockLabwareDefinition.dimensions.yDimension
+    )
     expect(res?.movementParams.begin).toEqual('splash-out.end+500ms')
     expect(res?.movementParams.duration).toEqual('800ms')
     expect(res?.splashParams.inParams.begin).toEqual('800ms;deck-in.end+800ms')
@@ -470,6 +474,9 @@ describe('getLabwareAnimationParams', () => {
 
     expect(res).toBeTruthy()
     expect(res?.movementParams.xMovement).toEqual(0)
-    expect(res?.movementParams.yMovement).toEqual(0 - OT3_STANDARD_SLOT_HEIGHT)
+    expect(res?.movementParams.yMovement).toEqual(
+      deckDefFixtureFlex.cornerOffsetFromOrigin[1] -
+        mockLabwareDefinition.dimensions.yDimension
+    )
   })
 })
