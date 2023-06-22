@@ -7,7 +7,7 @@ import {
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
-import { FirmwareUpdate } from '../FirmwareUpdate'
+import { FirmwareUpdateModal } from '../'
 import {
   BadPipette,
   PipetteData,
@@ -26,21 +26,22 @@ const mockUseUpdateSubsystemMutation = useUpdateSubsystemMutation as jest.Mocked
   typeof useUpdateSubsystemMutation
 >
 
-const render = (props: React.ComponentProps<typeof FirmwareUpdate>) => {
-  return renderWithProviders(<FirmwareUpdate {...props} />, {
+const render = (props: React.ComponentProps<typeof FirmwareUpdateModal>) => {
+  return renderWithProviders(<FirmwareUpdateModal {...props} />, {
     i18nInstance: i18n,
   })[0]
 }
 
-describe('FirmwareUpdate', () => {
-  let props: React.ComponentProps<typeof FirmwareUpdate>
+describe('FirmwareUpdateModal', () => {
+  let props: React.ComponentProps<typeof FirmwareUpdateModal>
   const refetch = jest.fn(() => Promise.resolve())
   const updateSubsystem = jest.fn(() => Promise.resolve())
   beforeEach(() => {
     props = {
       proceed: jest.fn(),
-      mount: 'left',
-    } as any
+      description: 'A firmware update is required, instrument is updating',
+      subsystem: 'pipette_left',
+    }
     mockUseInstrumentQuery.mockReturnValue({
       data: {
         data: [
@@ -64,7 +65,8 @@ describe('FirmwareUpdate', () => {
       data: {
         data: {
           id: 'update id',
-          updateStatus: 'done',
+          updateStatus: 'in progress',
+          updateProgress: 20,
         } as any,
       } as SubsystemUpdateProgressData,
       updateSubsystem,

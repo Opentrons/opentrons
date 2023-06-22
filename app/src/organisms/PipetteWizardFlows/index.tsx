@@ -18,6 +18,7 @@ import { ModalShell } from '../../molecules/Modal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { FirmwareUpdateModal } from '../../molecules/FirmwareUpdateModal'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
@@ -35,7 +36,6 @@ import { DetachPipette } from './DetachPipette'
 import { Carriage } from './Carriage'
 import { MountingPlate } from './MountingPlate'
 import { UnskippableModal } from './UnskippableModal'
-import { FirmwareUpdate } from './FirmwareUpdate'
 
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
@@ -57,7 +57,6 @@ export const PipetteWizardFlows = (
   const { t } = useTranslation('pipette_wizard_flows')
 
   const attachedPipettes = useAttachedPipettesFromInstrumentsQuery()
-
   const memoizedPipetteInfo = React.useMemo(() => props.pipetteInfo ?? null, [])
   const isGantryEmpty =
     attachedPipettes[LEFT] == null && attachedPipettes[RIGHT] == null
@@ -272,7 +271,13 @@ export const PipetteWizardFlows = (
       />
     )
   } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
-    modalContent = <FirmwareUpdate {...currentStep} {...calibrateBaseProps} />
+    modalContent = (
+      <FirmwareUpdateModal
+        proceed={proceed}
+        subsystem={mount === LEFT ? 'pipette_left' : 'pipette_right'}
+        description={t('firmware_updating')}
+      />
+    )
   } else if (currentStep.section === SECTIONS.DETACH_PIPETTE) {
     onExit = confirmExit
     modalContent = (

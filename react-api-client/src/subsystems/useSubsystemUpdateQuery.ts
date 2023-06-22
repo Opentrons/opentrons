@@ -22,7 +22,7 @@ export function useSubsystemUpdateQuery<TError = Error>(
     {
       ...options,
       enabled: updateId != null,
-      refetchInterval: 5000,
+      refetchInterval: 2000,
     }
   )
 
