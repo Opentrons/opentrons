@@ -8,6 +8,3 @@ export const SPLASH_IN_DURATION_MS = 300
 export const SPLASH_OUT_DELAY_MS = 300
 export const SPLASH_OUT_DURATION_MS = 300
 export const SPLASH_IN_OFFDECK_DELAY_MS = 800
-
-export const OT2_STANDARD_SLOT_HEIGHT = 90.5
-export const OT3_STANDARD_SLOT_HEIGHT = 107

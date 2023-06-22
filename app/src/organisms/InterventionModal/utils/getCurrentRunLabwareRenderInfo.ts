@@ -1,10 +1,5 @@
 import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
 
-import {
-  OT2_STANDARD_SLOT_HEIGHT,
-  OT3_STANDARD_SLOT_HEIGHT,
-} from './animationConstants'
-
 import type { RunData } from '@opentrons/api-client'
 import type {
   DeckDefinition,
@@ -65,9 +60,8 @@ export function getCurrentRunLabwareRenderInfo(
           {
             x: 0,
             y:
-              deckDef.otId === 'ot3_standard'
-                ? OT3_STANDARD_SLOT_HEIGHT * -1
-                : OT2_STANDARD_SLOT_HEIGHT * -1,
+              deckDef.cornerOffsetFromOrigin[1] -
+              labwareDef.dimensions.yDimension,
             labwareId: labware.id,
             labwareDef,
           },

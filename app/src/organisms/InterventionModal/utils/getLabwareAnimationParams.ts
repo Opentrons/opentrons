@@ -3,8 +3,6 @@ import {
   LABWARE_MOVE_DURATION_MS,
   LABWARE_MOVE_TO_OFFDECK_DELAY_MS,
   LABWARE_MOVE_TO_OFFDECK_DURATION_MS,
-  OT2_STANDARD_SLOT_HEIGHT,
-  OT3_STANDARD_SLOT_HEIGHT,
   SPLASH_IN_DELAY_MS,
   SPLASH_IN_DURATION_MS,
   SPLASH_IN_OFFDECK_DELAY_MS,
@@ -52,12 +50,14 @@ export function getLabwareAnimationParams(
   let newPos: [number, number] | null = null
   if (command.params?.newLocation === 'offDeck') {
     // we want the labware to slide straight down off the deck
-    // so we maintain the x position and set the y to the negative height of the slot for the deck type so the labware completely leaves the deck map
+    // so we maintain the x position and set the y to the cornerOffsetFromOrigin y axis value and subtract the labware yDimension to be safe
+    const labwareYDimension =
+      'labwareDef' in labwareFromRun
+        ? labwareFromRun.labwareDef.dimensions.yDimension
+        : labwareFromRun.nestedLabwareDef?.dimensions.yDimension ?? 0
     newPos = [
       labwareFromRun.x,
-      deckDef.otId === 'ot3_standard'
-        ? OT3_STANDARD_SLOT_HEIGHT * -1
-        : OT2_STANDARD_SLOT_HEIGHT * -1,
+      deckDef.cornerOffsetFromOrigin[1] - labwareYDimension,
     ]
   } else if ('moduleId' in command.params?.newLocation) {
     const destModuleId = command.params.newLocation.moduleId

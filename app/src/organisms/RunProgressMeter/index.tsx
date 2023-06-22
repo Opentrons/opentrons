@@ -241,8 +241,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
         : null
   }
 
-  console.log({ lastRunCommand })
-
   return (
     <>
       {showInterventionModal &&

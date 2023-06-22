@@ -138,7 +138,6 @@ export function InterventionModal({
       oldDisplayLocation != null &&
       newDisplayLocation != null &&
       labwareRenderInfo != null &&
-      command.params?.labwareId != null &&
       deckDef != null &&
       labwareAnimationParams != null ? (
         <MoveLabwareInterventionContent

@@ -32,11 +32,7 @@ export function getModuleRenderComponents(
         }
       >
         {nestedLabwareDef != null && nestedLabwareId != null ? (
-          <React.Fragment
-            key={`InterventionModal_Labware_${String(
-              nestedLabwareDef.metadata.displayName
-            )}_${x}${y}`}
-          >
+          <>
             <LabwareRender
               definition={nestedLabwareDef}
               highlightLabware={movedLabwareId === nestedLabwareId}
@@ -49,7 +45,7 @@ export function getModuleRenderComponents(
             {movedLabwareId !== nestedLabwareId ? (
               <LabwareDisabledOverlay definition={nestedLabwareDef} />
             ) : null}
-          </React.Fragment>
+          </>
         ) : null}
       </Module>
     )
@@ -62,23 +58,22 @@ export function getLabwareRenderComponents(
   labwareAnimationParams: LabwareAnimationParams
 ): JSX.Element[] {
   return map(labwareRenderInfo, ({ x, y, labwareDef, labwareId }) => (
-    <React.Fragment
+    <g
       key={`InterventionModal_Labware_${String(
         labwareDef.metadata.displayName
       )}_${x}${y}`}
+      transform={`translate(${x},${y})`}
     >
-      <g transform={`translate(${x},${y})`}>
-        <LabwareRender
-          definition={labwareDef}
-          highlightLabware={movedLabwareId === labwareId}
-          labwareAnimationParams={
-            movedLabwareId === labwareId ? labwareAnimationParams : null
-          }
-        />
-        {movedLabwareId !== labwareId ? (
-          <LabwareDisabledOverlay definition={labwareDef} />
-        ) : null}
-      </g>
-    </React.Fragment>
+      <LabwareRender
+        definition={labwareDef}
+        highlightLabware={movedLabwareId === labwareId}
+        labwareAnimationParams={
+          movedLabwareId === labwareId ? labwareAnimationParams : null
+        }
+      />
+      {movedLabwareId !== labwareId ? (
+        <LabwareDisabledOverlay definition={labwareDef} />
+      ) : null}
+    </g>
   ))
 }
