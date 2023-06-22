@@ -25,12 +25,8 @@ import type { Dispatch, State } from '../../redux/types'
 // import type { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
 
 interface SelectAuthenticationTypeProps {
-  // TODO: determine approach here
-  // for now, just go back to wifi list screen
-  // fromWifiList?: boolean
   selectedAuthType: WifiSecurityType
   setSelectedAuthType: (authType: WifiSecurityType) => void
-  // setChangeState: (changeState: NetworkChangeState) => void
 }
 
 export function SelectAuthenticationType({
@@ -49,19 +45,6 @@ export function SelectAuthenticationType({
     showAlternativeSecurityTypeModal,
     setShowAlternativeSecurityTypeModal,
   ] = React.useState<boolean>(false)
-
-  // const handleClickBack = (): void => {
-  //   if (fromWifiList != null) {
-  //     // back to wifi list
-  //     setChangeState({ type: null })
-  //     if (!isInitialSetup && setShowInterfaceTitle != null)
-  //       setShowInterfaceTitle(true)
-  //   } else {
-  //     // back to set wifi ssid
-  //     // Note: This will be updated by PR-#11917
-  //     console.log('go back to SetWifiSsid screen')
-  //   }
-  // }
 
   const securityButtons = [
     {

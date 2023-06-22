@@ -6,7 +6,6 @@ import {
 } from '../../../organisms/NetworkSettings'
 import { FAILURE, PENDING, SUCCESS } from '../../../redux/robot-api'
 
-import type { WifiSecurityType } from '@opentrons/api-client'
 import type { SetSettingOption } from '../../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 import type { RequestState } from '../../../redux/robot-api/types'
 

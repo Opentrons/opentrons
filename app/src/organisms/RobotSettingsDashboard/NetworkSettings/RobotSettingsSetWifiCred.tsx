@@ -30,7 +30,7 @@ export function RobotSettingsSetWifiCred({
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
         buttonText={t('connect')}
-        header={t('sign_into_wifi')}
+        header={t('wifi')}
         onClickBack={() => setCurrentOption('RobotSettingsWifi')}
         onClickButton={handleConnect}
       />

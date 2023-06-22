@@ -23,7 +23,7 @@ import type { WifiSecurityType } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
 import { useTranslation } from 'react-i18next'
-import { ChildNavigation } from '../../organisms/ChildNavigation'
+import { RobotSetupHeader } from '../../organisms/RobotSetupHeader'
 
 const WIFI_LIST_POLL_MS = 5000
 type WifiScreenOption =
@@ -159,7 +159,7 @@ function JoinOtherNetwork({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <ChildNavigation
+      <RobotSetupHeader
         buttonText={i18n.format(t('continue'), 'capitalize')}
         header={t('join_other_network')}
         onClickBack={() => setCurrentOption('WifiList')}
@@ -190,7 +190,7 @@ function SelectAuthenticationType({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <ChildNavigation
+      <RobotSetupHeader
         buttonText={i18n.format(t('continue'), 'capitalize')}
         header={t('select_a_security_type')}
         onClickBack={() => setCurrentOption('WifiList')}
@@ -225,7 +225,7 @@ export function SetWifiCred({
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
-      <ChildNavigation
+      <RobotSetupHeader
         buttonText={t('connect')}
         header={t('sign_into_wifi')}
         onClickBack={() => setCurrentOption('SelectAuthType')}

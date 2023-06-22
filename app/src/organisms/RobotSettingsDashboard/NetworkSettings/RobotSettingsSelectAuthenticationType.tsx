@@ -30,7 +30,7 @@ export function RobotSettingsSelectAuthenticationType({
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>
       <ChildNavigation
-        buttonText={t('connect')}
+        buttonText={t('continue')}
         header={t('select_a_security_type')}
         onClickBack={() => setCurrentOption('RobotSettingsWifi')}
         onClickButton={() => {
