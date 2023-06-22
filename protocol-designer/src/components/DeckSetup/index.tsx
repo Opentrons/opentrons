@@ -432,7 +432,7 @@ export const DeckSetup = (): JSX.Element => {
   })
 
   return (
-    <React.Fragment>
+    <>
       <div className={styles.deck_row}>
         {drilledDown && <BrowseLabwareModal />}
         <div ref={wrapperRef} className={styles.deck_wrapper}>
@@ -458,7 +458,7 @@ export const DeckSetup = (): JSX.Element => {
           </RobotWorkSpace>
         </div>
       </div>
-    </React.Fragment>
+    </>
   )
 }
 
