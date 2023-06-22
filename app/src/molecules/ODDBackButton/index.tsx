@@ -10,6 +10,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { StyledText } from '../../atoms/text'
+
 export function ODDBackButton(
   props: React.HTMLProps<HTMLButtonElement>
 ): JSX.Element {
@@ -18,10 +20,8 @@ export function ODDBackButton(
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      fontSize={TYPOGRAPHY.fontSize38}
-      fontWeight={TYPOGRAPHY.fontWeightBold}
       gridGap={SPACING.spacing16}
-      lineHeight={TYPOGRAPHY.lineHeight48}
+      paddingBottom={SPACING.spacing32}
     >
       <Btn onClick={onClick}>
         <Icon
@@ -31,7 +31,9 @@ export function ODDBackButton(
           width="3rem"
         />
       </Btn>
-      {label}
+      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        {label}
+      </StyledText>
     </Flex>
   )
 }
