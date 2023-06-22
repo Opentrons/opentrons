@@ -12,6 +12,7 @@ export {
   dropTip,
   engageMagnet,
   mix,
+  moveLabware,
   replaceTip,
   setTemperature,
   thermocyclerProfileStep,

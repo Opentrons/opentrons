@@ -5,6 +5,7 @@ import { fireEvent } from '@testing-library/dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
+import { getRobotSettings } from '../../../../redux/robot-settings'
 import { getLocalRobot } from '../../../../redux/discovery'
 import { toggleDevtools } from '../../../../redux/config'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
@@ -18,14 +19,15 @@ import {
   UpdateChannel,
 } from '../../../../organisms/RobotSettingsDashboard'
 import { getBuildrootUpdateAvailable } from '../../../../redux/buildroot'
-import { useLights } from '../../../../organisms/Devices/hooks'
 import { useNetworkConnection } from '../../hooks'
+import { useLEDLights } from '../../../../organisms/Devices/hooks'
 
 import { RobotSettingsDashboard } from '..'
 
 jest.mock('../../../../redux/discovery')
 jest.mock('../../../../redux/buildroot')
 jest.mock('../../../../redux/config')
+jest.mock('../../../../redux/robot-settings')
 jest.mock('../../hooks/useNetworkConnection')
 jest.mock('../../../../organisms/Navigation')
 jest.mock('../../../../organisms/RobotSettingsDashboard/TouchScreenSleep')
@@ -40,6 +42,9 @@ const mockToggleLights = jest.fn()
 
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot
+>
+const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
+  typeof getRobotSettings
 >
 const mockToggleDevtools = toggleDevtools as jest.MockedFunction<
   typeof toggleDevtools
@@ -61,7 +66,9 @@ const mockTouchscreenBrightness = TouchscreenBrightness as jest.MockedFunction<
 const mockUpdateChannel = UpdateChannel as jest.MockedFunction<
   typeof UpdateChannel
 >
-const mockUseLights = useLights as jest.MockedFunction<typeof useLights>
+const mockuseLEDLights = useLEDLights as jest.MockedFunction<
+  typeof useLEDLights
+>
 const mockGetBuildrootUpdateAvailable = getBuildrootUpdateAvailable as jest.MockedFunction<
   typeof getBuildrootUpdateAvailable
 >
@@ -89,12 +96,13 @@ describe('RobotSettingsDashboard', () => {
     mockNetworkSettings.mockReturnValue(<div>Mock Network Settings</div>)
     mockDeviceReset.mockReturnValue(<div>Mock Device Reset</div>)
     mockRobotSystemVersion.mockReturnValue(<div>Mock Robot System Version</div>)
+    mockGetRobotSettings.mockReturnValue([])
     mockTouchscreenBrightness.mockReturnValue(
       <div>Mock Touchscreen Brightness</div>
     )
     mockUpdateChannel.mockReturnValue(<div>Mock Update Channel</div>)
-    mockUseLights.mockReturnValue({
-      lightsOn: false,
+    mockuseLEDLights.mockReturnValue({
+      lightsEnabled: false,
       toggleLights: mockToggleLights,
     })
     mockUseNetworkConnection.mockReturnValue({} as any)
@@ -111,10 +119,8 @@ describe('RobotSettingsDashboard', () => {
     getByText('opentrons-robot-name')
     getByText('Robot System Version')
     getByText('Network Settings')
-    getByText('Display LED Lights')
-    getByText(
-      'Turn on or off the strip of color lights on the front of the robot.'
-    )
+    getByText('Status LEDs')
+    getByText('Control the strip of color lights on the front of the robot.')
     getByText('Touchscreen Sleep')
     getByText('Touchscreen Brightness')
     getByText('Device Reset')
@@ -139,16 +145,16 @@ describe('RobotSettingsDashboard', () => {
     getByText('Mock Robot System Version')
   })
 
-  it('should render text with lights off and clicking it, calls useLights', () => {
+  it('should render text with lights off and clicking it, calls useLEDLights', () => {
     const [{ getByText }] = render()
-    const lights = getByText('Display LED Lights')
+    const lights = getByText('Status LEDs')
     fireEvent.click(lights)
     expect(mockToggleLights).toHaveBeenCalled()
   })
 
   it('should render text with lights on', () => {
-    mockUseLights.mockReturnValue({
-      lightsOn: true,
+    mockuseLEDLights.mockReturnValue({
+      lightsEnabled: true,
       toggleLights: mockToggleLights,
     })
     const [{ getByText }] = render()

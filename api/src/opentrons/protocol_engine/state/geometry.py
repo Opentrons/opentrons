@@ -106,8 +106,8 @@ class GeometryView:
         elif labware_data.location == OFF_DECK_LOCATION:
             # Labware is off-deck
             raise errors.LabwareNotOnDeckError(
-                f"Labware {labware_id} does not have a parent associated with it"
-                f" since it is no longer on the deck."
+                f"Cannot access labware {labware_id} since it is not on the deck. "
+                f"Either it has been loaded off-deck or its been moved off-deck."
             )
 
         slot_pos = self._labware.get_slot_position(slot_name)

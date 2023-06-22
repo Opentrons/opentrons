@@ -16,6 +16,7 @@ import {
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
+import { getRobotType } from '../../file-data/selectors'
 import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
 import { isModuleWithCollisionIssue } from './utils'
@@ -32,6 +33,7 @@ export function EditModulesCard(props: Props): JSX.Element {
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
+  const robotType = useSelector(getRobotType)
 
   const magneticModuleOnDeck = modules[MAGNETIC_MODULE_TYPE]
   const temperatureModuleOnDeck = modules[TEMPERATURE_MODULE_TYPE]
@@ -66,7 +68,12 @@ export function EditModulesCard(props: Props): JSX.Element {
 
   const warningsEnabled = !moduleRestrictionsDisabled
 
-  const SUPPORTED_MODULE_TYPES_FILTERED = SUPPORTED_MODULE_TYPES
+  const SUPPORTED_MODULE_TYPES_FILTERED = SUPPORTED_MODULE_TYPES.filter(
+    moduleType =>
+      robotType === 'OT-3 Standard'
+        ? moduleType !== 'magneticModuleType'
+        : moduleType !== 'magneticBlockType'
+  )
 
   return (
     <Card title="Modules">

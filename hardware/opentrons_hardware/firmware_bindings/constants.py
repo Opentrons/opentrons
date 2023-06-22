@@ -226,6 +226,7 @@ class ErrorCode(int, Enum):
     estop_released = 0x0A
     motor_busy = 0x0B
     stop_requested = 0x0C
+    over_pressure = 0x0D
 
 
 @unique
@@ -292,6 +293,7 @@ class SensorOutputBinding(int, Enum):
     none = 0x0
     sync = 0x01
     report = 0x02
+    max_threshold_sync = 0x04
 
 
 @unique
@@ -341,6 +343,7 @@ class MoveStopCondition(int, Enum):
     gripper_force = 0x8
     stall = 0x10
     ignore_stalls = 0x20
+    limit_switch_backoff = 0x40
 
 
 @unique

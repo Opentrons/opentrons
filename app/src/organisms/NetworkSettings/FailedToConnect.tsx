@@ -93,13 +93,11 @@ export function FailedToConnect({
         </Flex>
         <Flex gridGap={SPACING.spacing8}>
           <MediumButton
-            flex="1"
             buttonType="secondary"
             buttonText={t('change_network')}
             onClick={handleChangeNetwork}
           />
           <MediumButton
-            flex="1"
             buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
             onClick={handleTryAgain}
           />

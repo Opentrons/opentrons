@@ -10,7 +10,7 @@ import { getBuildrootUpdateAvailable } from '../../../redux/buildroot'
 import { getDevtoolsEnabled } from '../../../redux/config'
 import { UNREACHABLE } from '../../../redux/discovery/constants'
 import { Navigation } from '../../../organisms/Navigation'
-import { useLights } from '../../../organisms/Devices/hooks'
+import { useLEDLights } from '../../../organisms/Devices/hooks'
 import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
 import { useNetworkConnection } from '../hooks'
 import { RobotSettingButton } from './RobotSettingButton'
@@ -39,7 +39,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
   const devToolsOn = useSelector(getDevtoolsEnabled)
-  const { lightsOn, toggleLights } = useLights()
+  const { lightsEnabled, toggleLights } = useLEDLights(robotName)
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING.spacing40}>
@@ -78,7 +78,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
         setCurrentOption={setCurrentOption}
         iconName="light"
         ledLights
-        lightsOn={Boolean(lightsOn)}
+        lightsOn={lightsEnabled}
         toggleLights={toggleLights}
       />
       <RobotSettingButton

@@ -8,7 +8,6 @@ import {
   DeviceReset,
   TouchscreenBrightness,
   TouchScreenSleep,
-  // TextSize,
   NetworkSettings,
   RobotName,
   RobotSettingsJoinOtherNetwork,
@@ -61,7 +60,6 @@ export function RobotSettingsDashboard(): JSX.Element {
   // GENERAL ROBOT INFORMATION
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name != null ? localRobot.name : 'no name'
-
   const robotServerVersion =
     localRobot?.status != null ? getRobotApiVersion(localRobot) : null
 
