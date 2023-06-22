@@ -8,6 +8,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
   OT2_ROBOT_TYPE,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -78,7 +79,7 @@ describe('EditModulesCard', () => {
       tiprackDefURI: 'tiprack300',
     }
     mockGetAdditionalEquipment.mockReturnValue({})
-    mockGetRobotType.mockReturnValue('OT-2 Standard')
+    mockGetRobotType.mockReturnValue(OT2_ROBOT_TYPE)
     getDisableModuleRestrictionsMock.mockReturnValue(false)
     getPipettesForEditPipetteFormMock.mockReturnValue({
       left: crashablePipette,
@@ -224,7 +225,7 @@ describe('EditModulesCard', () => {
     })
   })
   it('displays module row with module to add when no moduleData for Flex', () => {
-    mockGetRobotType.mockReturnValue('OT-3 Standard')
+    mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
     const wrapper = render(props)
     const SUPPORTED_MODULE_TYPES_FILTERED = SUPPORTED_MODULE_TYPES.filter(
       moduleType => moduleType !== 'magneticModuleType'
@@ -240,14 +241,14 @@ describe('EditModulesCard', () => {
     })
   })
   it('displays gripper row with no gripper', () => {
-    mockGetRobotType.mockReturnValue('OT-3 Standard')
+    mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
     const wrapper = render(props)
     expect(wrapper.find(GripperRow)).toHaveLength(1)
     expect(wrapper.find(GripperRow).props().isGripperAdded).toEqual(false)
   })
   it('displays gripper row with gripper attached', () => {
     const mockGripperId = 'gripeprId'
-    mockGetRobotType.mockReturnValue('OT-3 Standard')
+    mockGetRobotType.mockReturnValue(FLEX_ROBOT_TYPE)
     mockGetAdditionalEquipment.mockReturnValue({
       [mockGripperId]: { name: 'gripper', id: mockGripperId },
     })
