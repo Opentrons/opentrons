@@ -1649,7 +1649,7 @@ class OT3API(
 
             gear_motor_origin = await self._backend.gear_motor_position_estimation()
             gear_origin_dict = {OT3Axis.Q: gear_motor_origin[0]}
-            gear_motor_target = pipette_spec.pick_up_distance + pipette_spec.home_buffer
+            gear_motor_target = pipette_spec.pick_up_distance
             gear_target_dict = {OT3Axis.Q: gear_motor_target}
             moves = self._build_moves(gear_origin_dict, gear_target_dict)
             blocks = moves[0][0].blocks

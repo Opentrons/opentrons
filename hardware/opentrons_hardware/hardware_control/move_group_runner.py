@@ -324,6 +324,8 @@ class MoveGroupRunner:
             velocity=self._convert_velocity(
                 step.velocity_mm_sec, tip_interrupts_per_sec
             ),
+            action=PipetteTipActionTypeField(step.action),
+            request_stop_condition=MoveStopConditionField(step.stop_condition),
             acceleration=Int32Field(
                 int(
                     (
@@ -335,8 +337,6 @@ class MoveGroupRunner:
                     * (2**31)
                 )
             ),
-            action=PipetteTipActionTypeField(step.action),
-            request_stop_condition=MoveStopConditionField(step.stop_condition),
         )
         return TipActionRequest(payload=tip_action_payload)
 
