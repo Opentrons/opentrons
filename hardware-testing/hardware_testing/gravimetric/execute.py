@@ -118,7 +118,9 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[fl
     if cfg.increment:
         test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
         if cfg.pipette_channels == 96:
-            test_volumes = [test_volumes[i] for i in range(len(test_volumes)) if (i % 2 == 0)]
+            test_volumes = [
+                test_volumes[i] for i in range(len(test_volumes)) if (i % 2 == 0)
+            ]
     elif cfg.user_volumes and not ctx.is_simulating():
         _inp = input('Enter desired volumes, comma separated (eg: "10,100,1000") :')
         test_volumes = [
@@ -462,7 +464,7 @@ def _get_channel_divider(cfg: config.GravimetricConfig) -> float:
         return float(cfg.pipette_channels)
 
 
-def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
+def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:  # noqa: C901
     """Run."""
     run_id, start_time = create_run_id_and_start_time()
 
@@ -486,7 +488,9 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     test_volumes = _get_volumes(ctx, cfg)
     for v in test_volumes:
         print(f"\t{v} uL")
-    tips = get_tips(ctx, pipette, all_channels=(cfg.increment or (cfg.pipette_channels == 96)))
+    tips = get_tips(
+        ctx, pipette, all_channels=(cfg.increment or (cfg.pipette_channels == 96))
+    )
     total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips])
     channels_to_test = _get_test_channels(cfg)
     if len(channels_to_test) > 1:
@@ -717,7 +721,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     if tip_iter >= len(tips[0]) and not (used_tips == trial_total):
                         if not ctx.is_simulating():
                             ui.get_user_ready(
-                            f"replace TIPRACKS in slots {cfg.slots_tiprack}"
+                                f"replace TIPRACKS in slots {cfg.slots_tiprack}"
                             )
                         tip_iter = 0
 
