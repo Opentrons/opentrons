@@ -1270,18 +1270,6 @@ const initialAdditionalEquipmentState = {}
 
 export const additionalEquipmentInvariantProperties = handleActions(
   {
-    LOAD_FILE: (
-      state: NoramlizedAdditionalEquipmentById
-    ): NoramlizedAdditionalEquipmentById => {
-      const additionalEquipmentId = uuid()
-      const updatedEquipment = {
-        [additionalEquipmentId]: {
-          name: 'gripper' as const,
-          id: additionalEquipmentId,
-        },
-      }
-      return { ...state, ...updatedEquipment }
-    },
     IS_GRIPPER_REQUIRED: (
       state: NoramlizedAdditionalEquipmentById
     ): NoramlizedAdditionalEquipmentById => {
