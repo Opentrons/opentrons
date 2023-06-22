@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -16,6 +16,8 @@ import {
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
+import { getAdditionalEquipment } from '../../step-forms/selectors'
+import { toggleIsGripperRequired } from '../../step-forms/actions/additionalItems'
 import { getRobotType } from '../../file-data/selectors'
 import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
@@ -33,9 +35,14 @@ export function EditModulesCard(props: Props): JSX.Element {
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
+  const additionalEquipment = useSelector(getAdditionalEquipment)
+  const isGripperAttached = Object.values(additionalEquipment).some(
+    equipment => equipment?.name === 'gripper'
+  )
+
+  const dispatch = useDispatch()
   const robotType = useSelector(getRobotType)
-  // const savedStepForms = useSelector(getSavedStepForms)
-  // const additionalEquipment = savedStepForms.additionalEquipment
+
   const magneticModuleOnDeck = modules[MAGNETIC_MODULE_TYPE]
   const temperatureModuleOnDeck = modules[TEMPERATURE_MODULE_TYPE]
   const heaterShakerOnDeck = modules[HEATERSHAKER_MODULE_TYPE]
@@ -77,6 +84,9 @@ export function EditModulesCard(props: Props): JSX.Element {
         : moduleType !== 'magneticBlockType'
   )
 
+  const handleGripperClick = (): void => {
+    dispatch(toggleIsGripperRequired())
+  }
   return (
     <Card title={isOt3 ? 'Additional Items' : 'Modules'}>
       <div className={styles.modules_card_content}>
@@ -116,8 +126,8 @@ export function EditModulesCard(props: Props): JSX.Element {
         })}
         {isOt3 ? (
           <GripperRow
-            handleAddGripper={() => console.log('wire this up')}
-            isGripperAdded={true}
+            handleGripper={handleGripperClick}
+            isGripperAdded={isGripperAttached}
           />
         ) : null}
       </div>

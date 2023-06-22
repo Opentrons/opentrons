@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import {
   DeprecatedPrimaryButton,
@@ -7,10 +8,12 @@ import {
   SidePanel,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
+import { resetScrollElements } from '../../ui/steps/utils'
+import { getRobotType } from '../../file-data/selectors'
+import { getAdditionalEquipment } from '../../step-forms/selectors'
+import { Portal } from '../portals/MainPageModalPortal'
 import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
-import { resetScrollElements } from '../../ui/steps/utils'
-import { Portal } from '../portals/MainPageModalPortal'
 import { getUnusedEntities } from './utils'
 import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
@@ -44,6 +47,7 @@ interface MissingContent {
   noCommands: boolean
   pipettesWithoutStep: PipetteOnDeck[]
   modulesWithoutStep: ModuleOnDeck[]
+  gripperWithoutStep: boolean
 }
 
 const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
@@ -57,6 +61,7 @@ function getWarningContent({
   noCommands,
   pipettesWithoutStep,
   modulesWithoutStep,
+  gripperWithoutStep,
 }: MissingContent): WarningContent | null {
   if (noCommands) {
     return {
@@ -70,6 +75,18 @@ function getWarningContent({
         </>
       ),
       heading: i18n.t('alert.export_warnings.no_commands.heading'),
+    }
+  }
+
+  if (gripperWithoutStep) {
+    return {
+      content: (
+        <>
+          <p>{i18n.t('alert.export_warnings.unused_gripper.body1')}</p>
+          <p>{i18n.t('alert.export_warnings.unused_gripper.body2')}</p>
+        </>
+      ),
+      heading: i18n.t('alert.export_warnings.unused_gripper.heading'),
     }
   }
 
@@ -164,6 +181,11 @@ export function FileSidebar(props: Props): JSX.Element {
     showExportWarningModal,
     setShowExportWarningModal,
   ] = React.useState<boolean>(false)
+  const robotType = useSelector(getRobotType)
+  const additionalEquipment = useSelector(getAdditionalEquipment)
+  const isGripperAttached = Object.values(additionalEquipment).some(
+    equipment => equipment?.name === 'gripper'
+  )
 
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
 
@@ -174,20 +196,31 @@ export function FileSidebar(props: Props): JSX.Element {
       command => !LOAD_COMMANDS.includes(command.commandType)
     ) ?? []
 
+  const hasMoveLabware =
+    fileData?.commands.find(command => command.commandType === 'moveLabware') !=
+    null
+
   const noCommands = fileData ? nonLoadCommands.length === 0 : true
   const pipettesWithoutStep = getUnusedEntities(
     pipettesOnDeck,
     savedStepForms,
-    'pipette'
+    'pipette',
+    robotType
   )
   const modulesWithoutStep = getUnusedEntities(
     modulesOnDeck,
     savedStepForms,
-    'moduleId'
+    'moduleId',
+    robotType
   )
 
+  const gripperWithoutStep = isGripperAttached && !hasMoveLabware
+
   const hasWarning =
-    noCommands || modulesWithoutStep.length || pipettesWithoutStep.length
+    noCommands ||
+    modulesWithoutStep.length ||
+    pipettesWithoutStep.length ||
+    gripperWithoutStep
 
   const warning =
     hasWarning &&
@@ -195,6 +228,7 @@ export function FileSidebar(props: Props): JSX.Element {
       noCommands,
       pipettesWithoutStep,
       modulesWithoutStep,
+      gripperWithoutStep,
     })
 
   const getExportHintContent = (): {

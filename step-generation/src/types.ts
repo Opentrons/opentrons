@@ -8,13 +8,13 @@ import {
   LabwareLocation,
 } from '@opentrons/shared-data'
 import type {
+  CreateCommand,
   LabwareDefinition2,
   ModuleType,
   ModuleModel,
   PipetteNameSpecs,
   PipetteName,
 } from '@opentrons/shared-data'
-import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command'
 import type {
   AtomicProfileStep,
   EngageMagnetParams,
@@ -110,6 +110,13 @@ export interface NormalizedPipetteById {
   }
 }
 
+export interface NoramlizedAdditionalEquipmentById {
+  [additionalEquipmentId: string]: {
+    name: 'gripper'
+    id: string
+  }
+}
+
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
 
 // "entities" have only properties that are time-invariant
@@ -123,7 +130,6 @@ export type PipetteEntity = NormalizedPipette & {
 export interface PipetteEntities {
   [pipetteId: string]: PipetteEntity
 }
-
 // ===== MIX-IN TYPES =====
 export type ChangeTipOptions =
   | 'always'

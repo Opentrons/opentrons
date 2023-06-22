@@ -10,12 +10,12 @@ import gripperImage from '../../images/flex_gripper.svg'
 import styles from './styles.css'
 
 interface GripperRowProps {
-  handleAddGripper: () => void
+  handleGripper: () => void
   isGripperAdded: boolean
 }
 
 export function GripperRow(props: GripperRowProps): JSX.Element {
-  const { handleAddGripper, isGripperAdded } = props
+  const { handleGripper, isGripperAdded } = props
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -27,10 +27,7 @@ export function GripperRow(props: GripperRowProps): JSX.Element {
         className={styles.modules_button_group}
         style={{ alignSelf: ALIGN_CENTER }}
       >
-        <OutlineButton
-          className={styles.module_button}
-          onClick={handleAddGripper}
-        >
+        <OutlineButton className={styles.module_button} onClick={handleGripper}>
           {isGripperAdded ? 'Remove' : 'Add'}
         </OutlineButton>
       </div>

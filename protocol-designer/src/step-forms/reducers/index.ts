@@ -47,7 +47,10 @@ import { getLabwareOnModule } from '../../ui/modules/utils'
 import { nestedCombineReducers } from './nestedCombineReducers'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 import { Reducer } from 'redux'
-import { NormalizedPipetteById } from '@opentrons/step-generation'
+import {
+  NoramlizedAdditionalEquipmentById,
+  NormalizedPipetteById,
+} from '@opentrons/step-generation'
 import { LoadFileAction } from '../../load-file'
 import {
   CreateContainerAction,
@@ -111,6 +114,7 @@ import {
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
 } from '../actions'
+import { SetGripperAction } from '../actions/additionalItems'
 type FormState = FormData | null
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
@@ -134,6 +138,7 @@ export type UnsavedFormActions =
   | EditProfileCycleAction
   | EditProfileStepAction
   | SelectMultipleStepsAction
+  | SetGripperAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -193,6 +198,7 @@ export const unsavedForm = (
     case 'CANCEL_STEP_FORM':
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
+    case 'IS_GRIPPER_REQUIRED':
     case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
@@ -481,6 +487,7 @@ export type SavedStepFormsActions =
   | SwapSlotContentsAction
   | ReplaceCustomLabwareDef
   | EditModuleAction
+  | SetGripperAction
 export const _editModuleFormUpdate = ({
   savedForm,
   moduleId,
@@ -983,7 +990,6 @@ export const savedStepForms = (
         { ...savedStepForms }
       )
     }
-
     case 'REPLACE_CUSTOM_LABWARE_DEF': {
       // no mismatch, it's safe to keep all steps as they are
       if (!action.payload.isOverwriteMismatched) return savedStepForms
@@ -1259,6 +1265,50 @@ export const pipetteInvariantProperties: Reducer<
   },
   initialPipetteState
 )
+
+const initialAdditionalEquipmentState = {}
+
+export const additionalEquipmentInvariantProperties = handleActions(
+  {
+    LOAD_FILE: (
+      state: NoramlizedAdditionalEquipmentById
+    ): NoramlizedAdditionalEquipmentById => {
+      const additionalEquipmentId = uuid()
+      const updatedEquipment = {
+        [additionalEquipmentId]: {
+          name: 'gripper' as const,
+          id: additionalEquipmentId,
+        },
+      }
+      return { ...state, ...updatedEquipment }
+    },
+    IS_GRIPPER_REQUIRED: (
+      state: NoramlizedAdditionalEquipmentById
+    ): NoramlizedAdditionalEquipmentById => {
+      const additionalEquipmentId = Object.keys(state)[0]
+      const existingEquipment = state[additionalEquipmentId]
+
+      let updatedEquipment
+
+      if (existingEquipment && existingEquipment.name === 'gripper') {
+        updatedEquipment = {}
+      } else {
+        const newAdditionalEquipmentId = uuid()
+        updatedEquipment = {
+          [newAdditionalEquipmentId]: {
+            name: 'gripper' as const,
+            id: newAdditionalEquipmentId,
+          },
+        }
+      }
+
+      return updatedEquipment
+    },
+    DEFAULT: (): NoramlizedAdditionalEquipmentById => ({}),
+  },
+  initialAdditionalEquipmentState
+)
+
 export type OrderedStepIdsState = StepIdType[]
 const initialOrderedStepIdsState: string[] = []
 // @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
@@ -1379,6 +1429,7 @@ export interface RootState {
   labwareInvariantProperties: NormalizedLabwareById
   pipetteInvariantProperties: NormalizedPipetteById
   moduleInvariantProperties: ModuleEntities
+  additionalEquipmentInvariantProperties: NoramlizedAdditionalEquipmentById
   presavedStepForm: PresavedStepFormState
   savedStepForms: SavedStepFormState
   unsavedForm: FormState
@@ -1400,6 +1451,10 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     ),
     moduleInvariantProperties: moduleInvariantProperties(
       prevStateFallback.moduleInvariantProperties,
+      action
+    ),
+    additionalEquipmentInvariantProperties: additionalEquipmentInvariantProperties(
+      prevStateFallback.additionalEquipmentInvariantProperties,
       action
     ),
     labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),

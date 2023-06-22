@@ -50,6 +50,7 @@ import { WizardHeader } from './WizardHeader'
 
 import type { NormalizedPipette } from '@opentrons/step-generation'
 import type { FormState } from './types'
+import { toggleIsGripperRequired } from '../../../step-forms/actions/additionalItems'
 
 type WizardStep =
   | 'robotType'
@@ -183,6 +184,11 @@ export function CreateFileWizard(): JSX.Element | null {
       modules.forEach(moduleArgs =>
         dispatch(stepFormActions.createModule(moduleArgs))
       )
+      // add gripper
+      if (values.additionalEquipment.includes('gripper')) {
+        dispatch(toggleIsGripperRequired())
+        console.log(values.additionalEquipment)
+      }
       // auto-generate tipracks for pipettes
       const newTiprackModels: string[] = uniq(
         pipettes.map(pipette => pipette.tiprackDefURI)
