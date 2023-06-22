@@ -504,7 +504,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:  # noqa: C
         ), f"more trials ({trial_total}) than tips ({total_tips})"
     else:
         print(f"trial total {trial_total} tips {total_tips}")
-        if trial_total > total_tips:
+        if trial_total > total_tips and not ctx.is_simulating():
             ui.get_user_ready(f"Do you have {trial_total-total_tips} extra tipracks")
     ui.print_header("LOAD SCALE")
     print(
