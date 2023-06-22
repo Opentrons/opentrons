@@ -340,7 +340,7 @@ def _run_trial(
         else:
             pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))
         if not ctx.is_simulating():
-            ui.get_user_ready("add SEAL to plate")
+            ui.get_user_ready("add SEAL to plate and remove from DECK")
     return
 
 
@@ -492,6 +492,8 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                 trial_count += 1
                 ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
                 print(f"trial total {trial_count}/{trial_total}")
+                if not ctx.is_simulating():
+                    ui.get_user_ready(f"put PLATE #{trial + 1} and remove SEAL")
                 next_tip: Well = tips[0][tip_iter]
                 next_tip_location = next_tip.top()
                 _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
