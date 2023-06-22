@@ -60,7 +60,7 @@ function getFlexRunCalibrationStatus(
     const pipetteOnThisMount = instrumentsQueryData?.data.find(
       (i): i is PipetteData =>
         i.instrumentType === 'pipette' &&
-        !('subsystem' in i) &&
+        i.ok &&
         i.mount === speccedPipette.mount
     )
     return pipetteOnThisMount?.instrumentName !== speccedPipette.pipetteName
@@ -72,7 +72,7 @@ function getFlexRunCalibrationStatus(
     const pipetteMatch = instrumentsQueryData?.data.find(
       (i): i is PipetteData =>
         i.instrumentType === 'pipette' &&
-        !('subsystem' in i) &&
+        i.ok &&
         i.mount === speccedPipette.mount &&
         i?.instrumentName === speccedPipette.pipetteName
     )
@@ -86,8 +86,7 @@ function getFlexRunCalibrationStatus(
   )
   if (protocolRequiresGripper) {
     const attachedGripper = attachedInstruments.find(
-      (i): i is GripperData =>
-        i.instrumentType === 'gripper' && !('subsystem' in i)
+      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
     )
     if (attachedGripper == null) {
       return { complete: false, reason: 'attach_gripper_failure_reason' }

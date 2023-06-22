@@ -62,7 +62,7 @@ export function AttachedInstrumentMountItem(
     }
   }
   let displayName
-  if (attachedInstrument != null && !('subsystem' in attachedInstrument)) {
+  if (attachedInstrument != null && attachedInstrument.ok) {
     displayName =
       attachedInstrument?.mount !== 'extension'
         ? getPipetteModelSpecs(

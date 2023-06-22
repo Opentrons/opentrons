@@ -30,8 +30,7 @@ export const UnmountGripper = (
     refetchInterval: 3000,
   })
   const isGripperStillAttached = (instrumentsQueryData?.data ?? []).some(
-    (i): i is GripperData =>
-      i.instrumentType === 'gripper' && !('subsystem' in i)
+    (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
   )
 
   const [

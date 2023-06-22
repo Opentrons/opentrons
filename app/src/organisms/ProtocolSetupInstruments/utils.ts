@@ -28,7 +28,7 @@ export function getAttachedGripper(
     (attachedInstruments?.data ?? []).find(
       (i): i is GripperData =>
         i.instrumentType === 'gripper' &&
-        !('subsystem' in i) &&
+        i.ok &&
         i.data.calibratedOffset != null
     ) ?? null
   )
@@ -42,7 +42,7 @@ export function getPipetteMatch(
     (attachedInstruments?.data ?? []).find(
       (i): i is PipetteData =>
         i.instrumentType === 'pipette' &&
-        !('subsystem' in i) &&
+        i.ok &&
         i.mount === loadedPipette.mount &&
         i.instrumentName === loadedPipette.pipetteName
     ) ?? null

@@ -20,13 +20,12 @@ export const CheckPipetteButton = (
     isFetching,
     isOnDevice,
   } = props
-  const { refetch, data } = useInstrumentsQuery({
+  const { refetch } = useInstrumentsQuery({
     enabled: false,
     onSettled: () => {
       setFetching(false)
     },
   })
-  console.log(data?.data)
 
   return isOnDevice ? (
     <SmallButton

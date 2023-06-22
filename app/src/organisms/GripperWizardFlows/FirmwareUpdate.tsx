@@ -6,18 +6,17 @@ import {
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
-import type { PipetteWizardStepProps } from './types'
-import { BadPipette } from '@opentrons/api-client'
-import { LEFT } from '@opentrons/shared-data'
+import type { GripperWizardStepProps } from './types'
+import { BadGripper } from '@opentrons/api-client'
 
-interface FirmwareUpdateProps extends PipetteWizardStepProps {
+interface FirmwareUpdateProps extends GripperWizardStepProps {
   proceed: () => void
 }
 
 export const FirmwareUpdate = (props: FirmwareUpdateProps): JSX.Element => {
-  const { proceed, mount } = props
+  const { proceed } = props
   const { t } = useTranslation('pipette_wizard_flows')
-  const [updateId, setUpdateId] = React.useState<string>('')
+  const [updateId, setUpdateId] = React.useState('')
   const {
     data: attachedInstruments,
     refetch: refetchInstruments,
@@ -27,31 +26,27 @@ export const FirmwareUpdate = (props: FirmwareUpdateProps): JSX.Element => {
       setUpdateId(data.data.id)
     },
   })
-
-  const subsystem = mount === LEFT ? 'pipette_left' : 'pipette_right'
-
+  console.log(updateId)
   const updateNeeded =
     attachedInstruments?.data?.some(
-      (i): i is BadPipette => !i.ok && i.subsystem === subsystem
+      (i): i is BadGripper => !i.ok && i.subsystem === 'gripper'
     ) ?? false
   React.useEffect(() => {
     if (!updateNeeded) {
       proceed()
     } else {
-      updateSubsystem(subsystem)
+      updateSubsystem('gripper')
     }
   }, [])
   const { data: updateData } = useSubsystemUpdateQuery(updateId)
   const status = updateData?.data.updateStatus
-
   React.useEffect(() => {
     if (status === 'done') {
       refetchInstruments()
         .then(() => {
           proceed()
         })
-        .catch(e => {
-          console.error(e.message)
+        .catch(() => {
           proceed()
         })
     }

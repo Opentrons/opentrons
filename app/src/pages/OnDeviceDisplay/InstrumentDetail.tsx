@@ -18,8 +18,7 @@ export const InstrumentDetail = (): JSX.Element => {
   const { data: attachedInstruments } = useInstrumentsQuery()
   const instrument =
     (attachedInstruments?.data ?? []).find(
-      (i): i is PipetteData | GripperData =>
-        !('subsystem' in i) && i.mount === mount
+      (i): i is PipetteData | GripperData => i.ok && i.mount === mount
     ) ?? null
 
   const displayName =

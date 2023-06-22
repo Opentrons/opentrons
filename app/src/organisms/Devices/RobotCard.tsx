@@ -164,8 +164,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
   } = useInstrumentsQuery({ enabled: isOT3 })
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
-      (i): i is GripperData =>
-        i.instrumentType === 'gripper' && !('subsystem' in i)
+      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
     ) ?? null
   const leftPipetteModel = pipettesData?.left?.model ?? null
   const rightPipetteModel = pipettesData?.right?.model ?? null

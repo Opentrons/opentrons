@@ -59,8 +59,7 @@ export function InstrumentsAndModules({
   // { refetchInterval: EQUIPMENT_POLL_MS, },
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
-      (i): i is GripperData =>
-        i.instrumentType === 'gripper' && !('subsystem' in i)
+      (i): i is GripperData => i.instrumentType === 'gripper' && !i.ok
     ) ?? null
 
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
@@ -149,7 +148,7 @@ export function InstrumentsAndModules({
                     ? attachedInstruments?.data?.find(
                         (i): i is PipetteData =>
                           i.instrumentType === 'pipette' &&
-                          !('subsystem' in i) &&
+                          i.ok &&
                           i.mount === 'left'
                       )?.data?.calibratedOffset != null
                     : leftMountOffsetCalibration != null
@@ -194,7 +193,7 @@ export function InstrumentsAndModules({
                       ? attachedInstruments?.data?.find(
                           (i): i is PipetteData =>
                             i.instrumentType === 'pipette' &&
-                            !('subsystem' in i) &&
+                            i.ok &&
                             i.mount === 'right'
                         )?.data?.calibratedOffset != null
                       : rightMountOffsetCalibration != null
