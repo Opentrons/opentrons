@@ -232,7 +232,10 @@ def _pipette_with_liquid_settings(
 
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
+        # NOTE: temporarily set aspirate flow-rate to be the faster dispense flow-rate
+        pipette.flow_rate.aspirate = liquid_class.dispense.flow_rate
         pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
+        pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
 
     def _dispense_on_approach() -> None:
         _do_user_pause(ctx, inspect, "about to dispense")
@@ -266,14 +269,13 @@ def _pipette_with_liquid_settings(
             max_blow_out_volume = 79.5 if pipette.max_volume >= 1000 else 3.9
             hw_api.blow_out(hw_mount, max_blow_out_volume)
         if touch_tip:
-            print("touching tip: start")
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
-            print("touching tip: end")
         # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
         #       to avoid droplets from forming and falling off the tip
-        print("trailing-air-gap: start")
+        # NOTE: temporarily set aspirate flow-rate to be the faster dispense flow-rate
+        pipette.flow_rate.aspirate = liquid_class.dispense.flow_rate
         pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
-        print("trailing-air-gap: end")
+        pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
 
     # PHASE 1: APPROACH
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
