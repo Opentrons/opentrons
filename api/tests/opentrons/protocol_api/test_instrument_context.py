@@ -599,7 +599,7 @@ def test_drop_tip_to_well(
             location=None,
             well_core=mock_well._core,
             home_after=False,
-            randomize_drop_location=False,
+            alternate_drop_location=False,
         ),
         times=1,
     )
@@ -624,7 +624,7 @@ def test_drop_tip_to_trash(
             location=None,
             well_core=mock_well._core,
             home_after=None,
-            randomize_drop_location=False,
+            alternate_drop_location=False,
         ),
         times=1,
     )
@@ -649,7 +649,7 @@ def test_drop_tip_to_randomized_trash_location(
             location=None,
             well_core=mock_well._core,
             home_after=None,
-            randomize_drop_location=True,
+            alternate_drop_location=True,
         ),
         times=1,
     )
@@ -678,7 +678,7 @@ def test_return_tip(
             location=None,
             well_core=mock_well._core,
             home_after=None,
-            randomize_drop_location=False,
+            alternate_drop_location=False,
         ),
     )
 
