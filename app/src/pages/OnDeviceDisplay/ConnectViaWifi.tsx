@@ -53,9 +53,6 @@ export function ConnectViaWifi(): JSX.Element {
     return lastId != null ? RobotApi.getRequestById(state, lastId) : null
   })
 
-  console.log({ requestState })
-  console.log({ currentOption })
-
   const handleConnect = (): void => {
     const options = {
       ssid: selectedSsid,
@@ -244,9 +241,6 @@ interface WifiConnectStatusProps {
   selectedAuthType: WifiSecurityType
 }
 
-/**
- * Robot settings page managing wifi connect status
- */
 export function WifiConnectStatus({
   handleConnect,
   requestState,
@@ -257,7 +251,7 @@ export function WifiConnectStatus({
   if (requestState == null) {
     return null
   } else if (requestState.status === RobotApi.PENDING) {
-    return <ConnectingNetwork height={"33rem"} ssid={selectedSsid} />
+    return <ConnectingNetwork height={'33rem'} ssid={selectedSsid} />
   } else if (requestState.status === RobotApi.FAILURE) {
     const isInvalidPassword = requestState.response.status === 401
     return (

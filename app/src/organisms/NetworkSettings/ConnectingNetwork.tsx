@@ -21,7 +21,7 @@ interface ConnectingNetworkProps {
 }
 export function ConnectingNetwork({
   ssid,
-  height = "37.5rem"
+  height = '37.5rem',
 }: ConnectingNetworkProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   return (
