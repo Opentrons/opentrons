@@ -1659,7 +1659,7 @@ class OT3API(
         for rel_point, speed in spec.shake_off_list:
             await self.move_rel(realmount, rel_point, speed=speed)
 
-        # TODO: implement tip-detection sequence during drop-tip for 96ch,
+        # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
         #       but not with DVT pipettes because those can only detect drops
         if self._pipette_handler.get_pipette(realmount).channels.value != 96:
             await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
