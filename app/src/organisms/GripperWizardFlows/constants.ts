@@ -27,5 +27,5 @@ export const SUCCESSFULLY_CALIBRATED = 'successfullyCalibrated' as const
 
 //  required equipment list
 export const CAL_PIN_LOADNAME = 'calibration_pin' as const
-export const SCREWDRIVER_LOADNAME = 't10_torx_screwdriver' as const
+export const SCREWDRIVER_LOADNAME = 'hex_screwdriver' as const
 export const GRIPPER_LOADNAME = 'flex_gripper' as const
