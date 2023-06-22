@@ -18,6 +18,7 @@ from .rail_lights import RailLightsHandler
 from .run_control import RunControlHandler
 from .hardware_stopper import HardwareStopper
 from .door_watcher import DoorWatcher
+from .status_bar import StatusBarHandler
 
 # .thermocycler_movement_flagger omitted from package's public interface.
 
@@ -39,4 +40,5 @@ __all__ = [
     "HardwareStopper",
     "DoorWatcher",
     "RailLightsHandler",
+    "StatusBarHandler",
 ]
