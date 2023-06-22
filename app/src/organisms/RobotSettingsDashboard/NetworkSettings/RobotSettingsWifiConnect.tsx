@@ -15,7 +15,6 @@ interface RobotSettingsWifiConnectProps {
   requestState: RequestState | null
   selectedSsid: string
   setCurrentOption: SetSettingOption
-  selectedAuthType: WifiSecurityType
 }
 
 /**
@@ -26,7 +25,6 @@ export function RobotSettingsWifiConnect({
   requestState,
   setCurrentOption,
   selectedSsid,
-  selectedAuthType,
 }: RobotSettingsWifiConnectProps): JSX.Element | null {
   console.log({ requestState })
   if (requestState == null) {

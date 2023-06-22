@@ -257,7 +257,7 @@ export function WifiConnectStatus({
   if (requestState == null) {
     return null
   } else if (requestState.status === RobotApi.PENDING) {
-    return <ConnectingNetwork ssid={selectedSsid} />
+    return <ConnectingNetwork height={"33rem"} ssid={selectedSsid} />
   } else if (requestState.status === RobotApi.FAILURE) {
     const isInvalidPassword = requestState.response.status === 401
     return (

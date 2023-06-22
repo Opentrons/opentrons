@@ -195,7 +195,6 @@ export function RobotSettingsDashboard(): JSX.Element {
           requestState={requestState}
           selectedSsid={selectedSsid}
           setCurrentOption={setCurrentOption}
-          selectedAuthType={selectedAuthType}
         />
       )
 
