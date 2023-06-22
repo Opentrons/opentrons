@@ -66,6 +66,7 @@ ssh $(call id-file-arg,$(2)) $(3) root@$(1) \
  mv /var/$(notdir $(4))-unzip/$(basename $(basename $(notdir $(4))))/$(if $(7),$(7)/)$(6)*.$(if $(8),$(8),egg)-info $(5)/$(basename $(basename $(notdir $(4)))).$(if $(8),$(8),egg)-info ; \
  cleanup \
  "
+
 $(if $(9),$(call sync-version-file,$(1),$(2),$(3),$(9)),)
 endef
 
