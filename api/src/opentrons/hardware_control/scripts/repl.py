@@ -99,7 +99,7 @@ if ff.enable_ot3_hardware_controller():
     def wrap_async_util_fn(fn: Any, *bind_args: Any, **bind_kwargs: Any) -> Any:
         @wraps(fn)
         def synchronizer(*args: Any, **kwargs: Any) -> Any:
-            return asyncio.get_event_loop().run_until_complete(
+            return asyncio.new_event_loop().run_until_complete(
                 fn(*bind_args, *args, **bind_kwargs, **kwargs)
             )
 
