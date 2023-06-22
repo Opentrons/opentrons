@@ -1268,8 +1268,35 @@ export const pipetteInvariantProperties: Reducer<
 
 const initialAdditionalEquipmentState = {}
 
-export const additionalEquipmentInvariantProperties = handleActions(
+export const additionalEquipmentInvariantProperties = handleActions<NoramlizedAdditionalEquipmentById>(
   {
+    //  TODO(jr, 6/22/23): wire this up when schemav7 migration is complete
+    //  Additionally, wire up the the gripper logic using the toggle in moveLabware step
+    //  @ts-expect-error
+    LOAD_FILE: (
+      state,
+      action: LoadFileAction
+    ): NoramlizedAdditionalEquipmentById => {
+      const { file } = action.payload
+      const gripper =
+        // @ts-expect-error (jr, 6/22/23): moveLabware doesn't exist in schemav6
+        file.commands.filter(command => command.commandType === 'moveLabware')
+      const hasGripper = gripper.length > 0
+      // @ts-expect-error  (jr, 6/22/23): OT-3 Standard doesn't exist on schemav6
+      const isOt3 = file.robot.model === 'OT-3 Standard'
+      const additionalEquipmentId = uuid()
+      const updatedEquipment = {
+        [additionalEquipmentId]: {
+          name: 'gripper' as const,
+          id: additionalEquipmentId,
+        },
+      }
+      if (hasGripper && isOt3) {
+        return { ...state, ...updatedEquipment }
+      } else {
+        return { ...state }
+      }
+    },
     IS_GRIPPER_REQUIRED: (
       state: NoramlizedAdditionalEquipmentById
     ): NoramlizedAdditionalEquipmentById => {
