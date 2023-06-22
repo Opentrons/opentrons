@@ -1,5 +1,6 @@
 """Global error types."""
 from typing_extensions import Literal
+from typing import Type, Any
 
 from .error_responses import ErrorDetails
 from opentrons_shared_data.errors import ErrorCodes
@@ -43,3 +44,22 @@ class FirmwareUpdateRequired(ErrorDetails):
     id: Literal["FirmwareUpdateRequired"] = "FirmwareUpdateRequired"
     title: str = "Firmware Update Required"
     errorCode: str = ErrorCodes.FIRMWARE_UPDATE_REQUIRED.value.code
+
+    @classmethod
+    def from_exc(
+        cls: Type["FirmwareUpdateRequired"],
+        exc: BaseException,
+        *,
+        override_defaults: bool = False,
+        **supplemental_kwargs: Any
+    ) -> "FirmwareUpdateRequired":
+        """Build a FirmwareUpdateRequired from a specific exception. Preserves metadata."""
+        parent_inst = ErrorDetails.from_exc(
+            exc, override_defaults=override_defaults, **supplemental_kwargs
+        )
+        inst = FirmwareUpdateRequired(**parent_inst.dict())
+        if not inst.meta:
+            inst.meta = {"update_url": "/subsystems/update"}
+        else:
+            inst.meta["update_url"] = "/subsystems/update"
+        return inst
