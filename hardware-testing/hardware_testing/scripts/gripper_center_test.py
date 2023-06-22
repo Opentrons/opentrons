@@ -32,7 +32,7 @@ def build_arg_parser():
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
     arg_parser.add_argument('-f', '--force', type=int, required=False, help='Sets the gripper force in Newtons', default=10)
     arg_parser.add_argument('-t', '--time', type=float, required=False, help='Sets the gripper hold time in seconds', default=2)
-    arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Sets the deck slot number for calibration', default=6)
+    arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Sets the slider slot number', default=5)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
@@ -246,8 +246,8 @@ class Gripper_Center_Test:
                     print(f"\n-> Starting Test Cycle {cycle}/{self.cycles}")
                     self.slot_center = self.nominal_center
                     await self._home(self.api, self.mount)
-                    await self._calibrate_slot(self.api, self.mount, self.slot)
-                    await self._measure_center(self.api, self.mount, 5)
+                    await self._calibrate_slot(self.api, self.mount, 6)
+                    await self._measure_center(self.api, self.mount, self.slot)
                     await self._record_data(cycle)
                     await self._reset(self.api, self.mount)
         except Exception as e:
