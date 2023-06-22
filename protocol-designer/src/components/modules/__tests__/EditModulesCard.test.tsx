@@ -7,6 +7,7 @@ import {
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -199,7 +200,7 @@ describe('EditModulesCard', () => {
     expect(
       wrapper.find(ModuleRow).filter({ type: MAGNETIC_MODULE_TYPE }).props()
     ).toEqual({
-      isOt3: false,
+      robotType: OT2_ROBOT_TYPE,
       type: MAGNETIC_MODULE_TYPE,
       moduleOnDeck: crashableMagneticModule,
       showCollisionWarnings: true,
