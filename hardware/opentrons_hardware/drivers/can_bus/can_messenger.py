@@ -357,9 +357,10 @@ class CanMessenger:
             except (CANCommunicationError, AsyncHardwareError, CanError) as e:
                 log.exception(f"Nonfatal error in CAN read task: {e}")
                 continue
-            except Exception as exc:
-                log.exception("Exception in read")
-                raise CANCommunicationError(exc=exc)
+            except Exception as e:
+                # Log this separately if it's some unknown error
+                log.exception(f"Unexpected error in CAN read task: {e}")
+                continue
 
     async def _read_task(self) -> None:
         """Read task."""
