@@ -555,9 +555,9 @@ class TipActionRequestPayload(AddToMoveGroupRequestPayload):
     """A request to perform a tip action."""
 
     velocity: utils.Int32Field
-    acceleration: utils.Int32Field
     action: PipetteTipActionTypeField
     request_stop_condition: MoveStopConditionField
+    acceleration: utils.Int32Field
 
 
 @dataclass(eq=False)
