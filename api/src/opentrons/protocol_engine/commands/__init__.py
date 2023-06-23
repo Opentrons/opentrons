@@ -118,6 +118,14 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
+from .load_adapter import (
+    LoadAdapter,
+    LoadAdapterParams,
+    LoadAdapterCreate,
+    LoadAdapterResult,
+    LoadAdapterCommandType,
+)
+
 from .load_liquid import (
     LoadLiquid,
     LoadLiquidParams,
@@ -325,6 +333,12 @@ __all__ = [
     "LoadLabwareParams",
     "LoadLabwareResult",
     "LoadLabwareCommandType",
+    # load adapter command models
+    "LoadAdapter",
+    "LoadAdapterCreate",
+    "LoadAdapterParams",
+    "LoadAdapterResult",
+    "LoadAdapterCommandType",
     # load module command models
     "LoadModule",
     "LoadModuleCreate",
