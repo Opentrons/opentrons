@@ -140,7 +140,37 @@ def test_get_id_by_module_raises_error() -> None:
         }
     )
     with pytest.raises(errors.exceptions.LabwareNotLoadedOnModuleError):
-        assert subject.get_id_by_module(module_id="no-module-id")
+        subject.get_id_by_module(module_id="no-module-id")
+
+
+def test_raise_if_labware_has_labware_on_top() -> None:
+    """It should raise if labware has another labware on top."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id-1": LoadedLabware(
+                id="labware-id-1",
+                loadName="test",
+                definitionUri="test-uri",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            ),
+            "labware-id-2": LoadedLabware(
+                id="labware-id-2",
+                loadName="test",
+                definitionUri="test-uri",
+                location=ModuleLocation(moduleId="module-id"),
+            ),
+            "labware-id-3": LoadedLabware(
+                id="labware-id-3",
+                loadName="test",
+                definitionUri="test-uri",
+                location=OnLabwareLocation(labwareId="labware-id-1"),
+            ),
+        }
+    )
+    subject.raise_if_labware_has_labware_on_top("labware-id-2")
+    subject.raise_if_labware_has_labware_on_top("labware-id-3")
+    with pytest.raises(errors.exceptions.LabwareIsInStackError):
+        subject.raise_if_labware_has_labware_on_top("labware-id-1")
 
 
 def test_get_labware_definition(well_plate_def: LabwareDefinition) -> None:
