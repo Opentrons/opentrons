@@ -116,8 +116,7 @@ endef
 # argument 3 is any further ssh options, quoted
 # argument 4 is the package version dict to update the VERSION.json file with
 define sync-version-file
-	echo THIS: $(4)
-	echo THAT: $(version_dict)
+	@echo package-version: $(4)
 	$(shell python -c '$(VERSION_HELPER)')
 	$(eval filepath=$(shell find . -type f -name new_version_file.json))
 	scp $(call id-file-arg,$(2)) $(scp-legacy-option-flag) $(3) ${filepath} root@$(1):/data/VERSION.json
