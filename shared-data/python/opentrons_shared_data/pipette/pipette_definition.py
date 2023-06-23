@@ -86,15 +86,6 @@ class PipetteVersionType:
         self,
     ) -> Tuple[PipetteModelMajorVersionType, PipetteModelMinorVersionType]:
         return (self.major, self.minor)
-    
-    @property
-    def to_generation(self) -> PipetteGenerationType:
-        if self.major == 3:
-            return PipetteGenerationType.FLEX
-        elif self.major == 2:
-            return PipetteGenerationType.GEN2
-        else:
-            return PipetteGenerationType.GEN1
 
 
 class SupportedTipsDefinition(BaseModel):
