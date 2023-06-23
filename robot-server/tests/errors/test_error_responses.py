@@ -26,6 +26,7 @@ def test_error_details() -> None:
                 "id": "SomeErrorId",
                 "title": "Some Error Title",
                 "detail": "Some error detail",
+                "errorCode": "4000",
             },
         )
     }
@@ -50,6 +51,7 @@ def test_error_details_with_meta() -> None:
                 "title": "Some Error Title",
                 "detail": "Some error detail",
                 "source": {"pointer": "/foo/bar/baz"},
+                "errorCode": "4000",
                 "meta": {"some": "meta information"},
             },
         )
@@ -75,6 +77,7 @@ def test_error_response() -> None:
                 id="SomeErrorId",
                 title="Some Error Title",
                 detail="Some error detail",
+                errorCode="4006",
                 meta={"some": "meta information"},
             ),
         )
@@ -88,6 +91,7 @@ def test_error_response() -> None:
                 "id": "SomeErrorId",
                 "title": "Some Error Title",
                 "detail": "Some error detail",
+                "errorCode": "4006",
                 "meta": {"some": "meta information"},
             },
         )
@@ -102,6 +106,7 @@ def test_multi_error_response() -> None:
                 id="SomeErrorId",
                 title="Some Error Title",
                 detail="Some error detail",
+                errorCode="51231",
                 meta={"some": "meta information"},
             ),
             ErrorDetails(
@@ -121,12 +126,14 @@ def test_multi_error_response() -> None:
                 "id": "SomeErrorId",
                 "title": "Some Error Title",
                 "detail": "Some error detail",
+                "errorCode": "51231",
                 "meta": {"some": "meta information"},
             },
             {
                 "id": "SomeOtherErrorId",
                 "title": "Some Other Error Title",
                 "detail": "Some other error detail",
+                "errorCode": "4000",
                 "meta": {"some": "other meta information"},
             },
         ]

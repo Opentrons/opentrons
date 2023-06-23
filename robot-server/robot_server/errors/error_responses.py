@@ -113,11 +113,7 @@ class ErrorDetails(BaseErrorBody):
 
     @classmethod
     def from_exc(
-        cls: Type["ErrorDetailsT"],
-        exc: BaseException,
-        *,
-        override_defaults: bool = False,
-        **supplemental_kwargs: Any
+        cls: Type["ErrorDetailsT"], exc: BaseException, **supplemental_kwargs: Any
     ) -> "ErrorDetailsT":
         """Build an ErrorDetails model from an exception.
 
@@ -143,10 +139,6 @@ class ErrorDetails(BaseErrorBody):
             }
 
         values["meta"] = _exc_to_meta(checked_exc)
-        if not override_defaults:
-            for fieldname, fieldval in cls.__fields__.items():
-                if not fieldval.required and fieldval.default is not None:
-                    values.pop(fieldname, None)
         return cls(**values)
 
     def as_error(self, status_code: int) -> ApiError:

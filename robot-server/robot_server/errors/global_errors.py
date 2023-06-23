@@ -49,14 +49,10 @@ class FirmwareUpdateRequired(ErrorDetails):
     def from_exc(
         cls: Type["FirmwareUpdateRequired"],
         exc: BaseException,
-        *,
-        override_defaults: bool = False,
         **supplemental_kwargs: Any
     ) -> "FirmwareUpdateRequired":
         """Build a FirmwareUpdateRequired from a specific exception. Preserves metadata."""
-        parent_inst = ErrorDetails.from_exc(
-            exc, override_defaults=override_defaults, **supplemental_kwargs
-        )
+        parent_inst = ErrorDetails.from_exc(exc, **supplemental_kwargs)
         inst = FirmwareUpdateRequired(**parent_inst.dict())
         if not inst.meta:
             inst.meta = {"update_url": "/subsystems/update"}
