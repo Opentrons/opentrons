@@ -59,7 +59,6 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
           ? getPipetteNameSpecs(firstPipetteName as PipetteName)?.displayName ??
             ''
           : '',
-      mount,
     }
   )
   return (

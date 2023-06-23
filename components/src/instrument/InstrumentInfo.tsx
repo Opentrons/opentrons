@@ -1,6 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
+import { FLEX_ROBOT_TYPE, LEFT, RobotType } from '@opentrons/shared-data'
 import { InfoItem } from './InfoItem'
 import { InstrumentDiagram } from './InstrumentDiagram'
 import styles from './instrument.css'
@@ -11,6 +12,8 @@ import type { InstrumentDiagramProps } from './InstrumentDiagram'
 export interface InstrumentInfoProps {
   /** 'left' or 'right' */
   mount: Mount
+  /** robotType */
+  robotType: RobotType
   /** if true, show labels 'LEFT PIPETTE' / 'RIGHT PIPETTE' */
   showMountLabel?: boolean | null
   /** human-readable description, eg 'p300 Single-channel' */
@@ -30,12 +33,19 @@ export interface InstrumentInfoProps {
 }
 
 export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
-  const className = cx(
+  const baseClassname = cx(
     styles.pipette,
-    styles[props.mount],
     { [styles.disabled]: props.isDisabled },
     props.className
   )
+
+  const mountStyle = props.mount === LEFT ? styles.flex_left : styles.right
+  const flexClassname = cx(mountStyle, baseClassname)
+
+  const className =
+    props.robotType === FLEX_ROBOT_TYPE
+      ? flexClassname
+      : cx(styles[props.mount], baseClassname)
 
   return (
     <div className={className}>
@@ -45,7 +55,7 @@ export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
           value={props.description}
         />
         {props.tiprackModel && (
-          <InfoItem title={'tip rack'} value={props.tiprackModel} />
+          <InfoItem title="tip rack" value={props.tiprackModel} />
         )}
         {props.children}
       </div>

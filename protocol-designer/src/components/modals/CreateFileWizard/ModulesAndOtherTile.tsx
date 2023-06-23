@@ -167,7 +167,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
             }}
           />
           <PrimaryButton onClick={() => proceed()}>
-            {t('modal.create_file_wizard.create_protocol_on_to_liquids')}
+            {t('modal.create_file_wizard.review_file_details')}
           </PrimaryButton>
         </Flex>
       </Flex>

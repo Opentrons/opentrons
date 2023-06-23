@@ -21,6 +21,13 @@
   margin-right: 3rem;
 }
 
+.flex_left {
+  grid-area: left;
+  grid-template-columns: 80% 20%;
+  grid-template-areas: 'info img';
+  margin-right: 7rem;
+}
+
 .right {
   grid-area: right;
   grid-template-columns: 40% 80%;

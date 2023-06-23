@@ -27,10 +27,10 @@ import {
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { GoBackLink } from './GoBackLink'
-
-import type { FormState, WizardTileProps } from './types'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
+
+import type { FormState, WizardTileProps } from './types'
 
 export function FirstPipetteTypeTile(props: WizardTileProps): JSX.Element {
   const mount = LEFT

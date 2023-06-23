@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import * as React from 'react'
 import mapValues from 'lodash/mapValues'
-import { BaseState, ThunkDispatch } from '../types'
+import { RobotType } from '@opentrons/shared-data'
 import { FilePage } from '../components/FilePage'
 import {
   actions,
@@ -13,16 +13,21 @@ import { actions as steplistActions } from '../steplist'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
 import { actions as navActions } from '../navigation'
 
+import type { BaseState, ThunkDispatch } from '../types'
+import { getRobotType } from '../file-data/selectors'
+
 type Props = React.ComponentProps<typeof FilePage>
 interface SP {
   instruments: Props['instruments']
   formValues: Props['formValues']
   _initialDeckSetup: InitialDeckSetup
   modules: Props['modules']
+  robotType: RobotType
 }
 
 const mapStateToProps = (state: BaseState): SP => {
   return {
+    robotType: getRobotType(state),
     formValues: fileSelectors.getFileMetadata(state),
     instruments: stepFormSelectors.getPipettesForInstrumentGroup(state),
     modules: stepFormSelectors.getModulesForEditModulesCard(state),

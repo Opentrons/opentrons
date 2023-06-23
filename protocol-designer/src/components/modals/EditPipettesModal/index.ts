@@ -4,7 +4,7 @@ import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
 import filter from 'lodash/filter'
 import mapValues from 'lodash/mapValues'
-import { PipetteName } from '@opentrons/shared-data'
+import { PipetteName, RobotType } from '@opentrons/shared-data'
 import { uuid } from '../../../utils'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { actions as steplistActions } from '../../../steplist'
@@ -19,6 +19,7 @@ import { FilePipettesModal, PipetteFieldsData } from '../FilePipettesModal'
 import { NormalizedPipette } from '@opentrons/step-generation'
 import { BaseState, ThunkDispatch } from '../../../types'
 import { StepIdType } from '../../../form-types'
+import { getRobotType } from '../../../file-data/selectors'
 
 type Props = React.ComponentProps<typeof FilePipettesModal>
 
@@ -27,6 +28,7 @@ interface SP {
   _prevPipettes: { [pipetteId: string]: PipetteOnDeck }
   _orderedStepIds: StepIdType[]
   moduleRestrictionsDisabled?: boolean | null
+  robotType: RobotType
 }
 
 interface OP {
@@ -37,6 +39,7 @@ const mapSTP = (state: BaseState): SP => {
   const initialPipettes = stepFormSelectors.getPipettesForEditPipetteForm(state)
 
   return {
+    robotType: getRobotType(state),
     initialPipetteValues: initialPipettes,
     _prevPipettes: stepFormSelectors.getInitialDeckSetup(state).pipettes, // TODO: Ian 2019-01-02 when multi-step editing is supported, don't use initial deck state. Instead, show the pipettes available for the selected step range
     _orderedStepIds: stepFormSelectors.getOrderedStepIds(state),
