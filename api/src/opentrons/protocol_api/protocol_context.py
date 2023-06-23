@@ -386,6 +386,64 @@ class ProtocolContext(CommandPublisher):
         logger.warning("load_labware_by_name is deprecated. Use load_labware instead.")
         return self.load_labware(load_name, location, label, namespace, version)
 
+    @requires_version(2, 15)
+    def load_adapter_from_definition(
+        self,
+        adapter_def: "LabwareDefinition",
+        location: DeckLocation,
+    ) -> Labware:
+        """Specify the presence of an adapter on the deck.
+
+        This function loads the adapter definition specified by `adapter_def`
+        to the location specified by `location`.
+
+        :param adapter_def: The adapter's labware definition to load
+        :param location: The slot into which to load the labware,
+                         such as ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
+        :type location: int or str
+        """
+        load_params = self._core.add_labware_definition(adapter_def)
+
+        return self.load_adapter(
+            load_name=load_params.load_name,
+            namespace=load_params.namespace,
+            version=load_params.version,
+            location=location,
+        )
+
+    @requires_version(2, 15)
+    def load_adapter(
+        self,
+        load_name: str,
+        location: Union[DeckLocation, OffDeckType],
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        """add doc string here"""
+        load_name = validation.ensure_lowercase_name(load_name)
+        load_location: Union[OffDeckType, DeckSlotName]
+        if isinstance(location, OffDeckType):
+            load_location = location
+        else:
+            load_location = validation.ensure_deck_slot(location, self._api_version)
+
+        labware_core = self._core.load_adapter(
+            load_name=load_name,
+            location=load_location,
+            namespace=namespace,
+            version=version,
+        )
+
+        adapter = Labware(
+            core=labware_core,
+            api_version=self._api_version,
+            protocol_core=self._core,
+            core_map=self._core_map,
+        )
+        self._core_map.add(labware_core, adapter)
+
+        return adapter
+
     # TODO(mm, 2023-06-07): Figure out what to do with this, now that the Flex has non-integer
     # slot names and labware can be stacked. https://opentrons.atlassian.net/browse/RLAB-354
     @property  # type: ignore

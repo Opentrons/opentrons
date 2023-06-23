@@ -224,6 +224,16 @@ class LegacyProtocolCore(
 
         return labware_core
 
+    def load_adapter(
+        self,
+        load_name: str,
+        location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore, OffDeckType],
+        namespace: Optional[str],
+        version: Optional[int],
+    ) -> LegacyLabwareCore:
+        """Load an adapter using its identifying parameters"""
+        raise APIVersionError("Loading adapter is not supported in this API version.")
+
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,

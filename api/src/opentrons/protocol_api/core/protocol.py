@@ -68,6 +68,17 @@ class AbstractProtocol(
         """Load a labware using its identifying parameters."""
         ...
 
+    @abstractmethod
+    def load_adapter(
+        self,
+        load_name: str,
+        location: Union[DeckSlotName, ModuleCoreType, OffDeckType],
+        namespace: Optional[str],
+        version: Optional[int],
+    ) -> LabwareCoreType:
+        """Load an adapter using its identifying parameters"""
+        ...
+
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     @abstractmethod
     def move_labware(
