@@ -186,11 +186,7 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
         {t('shared:instruments')}
       </StyledText>
 
-      {isInstrumentsQueryLoading ? 'INSTRUMENTS' : null}
-      {isPipetteQueryLoading ? 'PIPETTES' : null}
-      {isPipetteQueryLoading || isInstrumentsQueryLoading ? (
-        <StyledText as="h5">{t('loading').toUpperCase()}</StyledText>
-      ) : (
+      {isPipetteQueryLoading || isInstrumentsQueryLoading ? null : (
         <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
           {leftAndRightMountsPipetteDisplayName != null ? (
             <InstrumentContainer

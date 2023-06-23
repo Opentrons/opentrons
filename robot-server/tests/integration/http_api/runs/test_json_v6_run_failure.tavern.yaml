@@ -111,6 +111,8 @@ stages:
               createdAt: !anystr
               detail: 'Cannot perform DROPTIP without a tip attached'
               errorCode: '4000'
+              errorInfo: !anydict
+              wrappedErrors: !anylist
             params:
               pipetteId: pipetteId
               labwareId: tipRackId

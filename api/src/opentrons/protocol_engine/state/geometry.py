@@ -15,6 +15,7 @@ from ..types import (
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     ModuleOffsetVector,
     LabwareLocation,
     LabwareOffsetVector,
@@ -95,43 +96,83 @@ class GeometryView:
         return min_travel_z
 
     def get_labware_parent_nominal_position(self, labware_id: str) -> Point:
-        """Get the position of the labware's uncalibrated parent slot (deck or module)."""
+        """Get the position of the labware's uncalibrated parent slot (deck, module, or another labware)."""
+        slot_name = self.get_ancestor_slot_name(labware_id)
+        slot_pos = self._labware.get_slot_position(slot_name)
         labware_data = self._labware.get(labware_id)
-        module_id: Optional[str] = None
-        if isinstance(labware_data.location, DeckSlotLocation):
-            slot_name = labware_data.location.slotName
-        elif isinstance(labware_data.location, ModuleLocation):
-            module_id = labware_data.location.moduleId
-            slot_name = self._modules.get_location(module_id).slotName
-        elif labware_data.location == OFF_DECK_LOCATION:
-            # Labware is off-deck
+        offset = self._get_labware_position_offset(labware_id, labware_data.location)
+
+        return Point(
+            slot_pos.x + offset.x,
+            slot_pos.y + offset.y,
+            slot_pos.z + offset.z,
+        )
+
+    def _get_labware_position_offset(
+        self, labware_id: str, labware_location: LabwareLocation
+    ) -> LabwareOffsetVector:
+        """Gets the offset vector of a labware on the given location."""
+        if isinstance(labware_location, DeckSlotLocation):
+            return LabwareOffsetVector(x=0, y=0, z=0)
+        elif isinstance(labware_location, ModuleLocation):
+            module_id = labware_location.moduleId
+            deck_type = DeckType(self._labware.get_deck_definition()["otId"])
+            module_offset = self._modules.get_nominal_module_offset(
+                module_id=module_id, deck_type=deck_type
+            )
+            module_model = self._modules.get_connected_model(module_id)
+            stacking_overlap = self._labware.get_module_overlap_offsets(
+                labware_id, module_model
+            )
+            return LabwareOffsetVector(
+                x=module_offset.x - stacking_overlap.x,
+                y=module_offset.y - stacking_overlap.y,
+                z=module_offset.z - stacking_overlap.z,
+            )
+        elif isinstance(labware_location, OnLabwareLocation):
+            on_labware = self._labware.get(labware_location.labwareId)
+            on_labware_dimensions = self._labware.get_dimensions(on_labware.id)
+            stacking_overlap = self._labware.get_labware_overlap_offsets(
+                labware_id=labware_id, below_labware_name=on_labware.loadName
+            )
+            labware_offset = LabwareOffsetVector(
+                x=stacking_overlap.x,
+                y=stacking_overlap.y,
+                z=on_labware_dimensions.z - stacking_overlap.z,
+            )
+            return labware_offset + self._get_labware_position_offset(
+                on_labware.id, on_labware.location
+            )
+        else:
             raise errors.LabwareNotOnDeckError(
                 f"Cannot access labware {labware_id} since it is not on the deck. "
                 f"Either it has been loaded off-deck or its been moved off-deck."
             )
 
-        slot_pos = self._labware.get_slot_position(slot_name)
-        if module_id is None:
-            return slot_pos
-        else:
-            deck_type = DeckType(self._labware.get_deck_definition()["otId"])
-            module_offset = self._modules.get_nominal_module_offset(
-                module_id=module_id, deck_type=deck_type
-            )
-            return Point(
-                slot_pos.x + module_offset.x,
-                slot_pos.y + module_offset.y,
-                slot_pos.z + module_offset.z,
+    def _get_calibrated_module_offset(
+        self, location: LabwareLocation
+    ) -> ModuleOffsetVector:
+        """Get a labware location's underlying calibrated module offset, if it is on a module."""
+        if isinstance(location, ModuleLocation):
+            module_id = location.moduleId
+            return self._modules.get_module_calibration_offset(module_id)
+        elif isinstance(location, DeckSlotLocation):
+            return ModuleOffsetVector(x=0, y=0, z=0)
+        elif isinstance(location, OnLabwareLocation):
+            labware_data = self._labware.get(location.labwareId)
+            return self._get_calibrated_module_offset(labware_data.location)
+        elif location == OFF_DECK_LOCATION:
+            raise errors.LabwareNotOnDeckError(
+                "Labware does not have a slot or module associated with it"
+                " since it is no longer on the deck."
             )
 
     def get_labware_parent_position(self, labware_id: str) -> Point:
         """Get the calibrated position of the labware's parent slot (deck or module)."""
         parent_pos = self.get_labware_parent_nominal_position(labware_id)
-        cal_offset = ModuleOffsetVector(x=0, y=0, z=0)
         labware_data = self._labware.get(labware_id)
-        if isinstance(labware_data.location, ModuleLocation):
-            module_id = labware_data.location.moduleId
-            cal_offset = self._modules.get_module_calibration_offset(module_id)
+        cal_offset = self._get_calibrated_module_offset(labware_data.location)
+
         return Point(
             x=parent_pos.x + cal_offset.x,
             y=parent_pos.y + cal_offset.y,
@@ -326,6 +367,9 @@ class GeometryView:
         elif isinstance(labware.location, ModuleLocation):
             module_id = labware.location.moduleId
             slot_name = self._modules.get_location(module_id).slotName
+        elif isinstance(labware.location, OnLabwareLocation):
+            below_labware_id = labware.location.labwareId
+            slot_name = self.get_ancestor_slot_name(below_labware_id)
         elif labware.location == OFF_DECK_LOCATION:
             raise errors.LabwareNotOnDeckError(
                 f"Labware {labware_id} does not have a slot associated with it"
@@ -344,7 +388,9 @@ class GeometryView:
         return location
 
     def get_labware_center(
-        self, labware_id: str, location: Union[DeckSlotLocation, ModuleLocation]
+        self,
+        labware_id: str,
+        location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     ) -> Point:
         """Get the center point of the labware as placed on the given location.
 
@@ -352,21 +398,32 @@ class GeometryView:
         specified location. Labware offset not included.
         """
         labware_dimensions = self._labware.get_dimensions(labware_id)
-        module_offset = LabwareOffsetVector(x=0, y=0, z=0)
+        offset = LabwareOffsetVector(x=0, y=0, z=0)
         location_slot: DeckSlotName
+
         if isinstance(location, ModuleLocation):
             deck_type = DeckType(self._labware.get_deck_definition()["otId"])
-            module_offset = self._modules.get_module_offset(
+            offset = self._modules.get_module_offset(
                 module_id=location.moduleId, deck_type=deck_type
             )
             location_slot = self._modules.get_location(location.moduleId).slotName
+        elif isinstance(location, OnLabwareLocation):
+            location_slot = self.get_ancestor_slot_name(location.labwareId)
+            labware_offset = self._get_labware_position_offset(labware_id, location)
+            # Get the calibrated offset if the on labware location is on top of a module, otherwise return empty one
+            cal_offset = self._get_calibrated_module_offset(location)
+            offset = LabwareOffsetVector(
+                x=labware_offset.x + cal_offset.x,
+                y=labware_offset.y + cal_offset.y,
+                z=labware_offset.z + cal_offset.z,
+            )
         else:
             location_slot = location.slotName
         slot_center = self._labware.get_slot_center_position(location_slot)
         return Point(
-            slot_center.x + module_offset.x,
-            slot_center.y + module_offset.y,
-            slot_center.z + module_offset.z + labware_dimensions.z / 2,
+            slot_center.x + offset.x,
+            slot_center.y + offset.y,
+            slot_center.z + offset.z + labware_dimensions.z / 2,
         )
 
     def get_extra_waypoints(

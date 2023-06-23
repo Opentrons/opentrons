@@ -2,5 +2,7 @@
   "exit": "exit",
   "go_back": "go back",
   "next": "next",
-  "step": "Step {{current}} / {{max}}"
+  "step": "Step {{current}} / {{max}}",
+  "remove": "remove",
+  "add": "add"
 }

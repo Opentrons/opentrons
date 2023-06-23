@@ -8,6 +8,8 @@ import {
   TYPOGRAPHY,
   DIRECTION_COLUMN,
   ALIGN_FLEX_START,
+  COLORS,
+  BORDERS,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
@@ -81,6 +83,8 @@ export function RunFailedModal({
             gridGap={SPACING.spacing8}
             overflowY="scroll"
             maxHeight="5.375rem"
+            backgroundColor={COLORS.light1}
+            borderRadius={BORDERS.borderRadiusSize3}
           >
             {errors?.map(error => (
               <StyledText

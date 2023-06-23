@@ -110,6 +110,13 @@ export interface NormalizedPipetteById {
   }
 }
 
+export interface NormalizedAdditionalEquipmentById {
+  [additionalEquipmentId: string]: {
+    name: 'gripper'
+    id: string
+  }
+}
+
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
 
 // "entities" have only properties that are time-invariant
@@ -123,7 +130,6 @@ export type PipetteEntity = NormalizedPipette & {
 export interface PipetteEntities {
   [pipetteId: string]: PipetteEntity
 }
-
 // ===== MIX-IN TYPES =====
 export type ChangeTipOptions =
   | 'always'

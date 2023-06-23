@@ -60,6 +60,7 @@ from opentrons.hardware_control.types import (
     UpdateState,
     SubSystem,
     SubSystemState,
+    TipStateType,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control import status_bar
@@ -271,6 +272,12 @@ class OT3Simulator:
         """Get the encoder current position."""
         return axis_convert(self._encoder_position, 0.0)
 
+    @asynccontextmanager
+    async def monitor_overpressure(
+        self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
+    ) -> AsyncIterator[None]:
+        yield
+
     @ensure_yield
     async def liquid_probe(
         self,
@@ -356,6 +363,10 @@ class OT3Simulator:
     ) -> None:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
         self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
+
+    async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+        """Get the state of the tip ejector flag for a given mount."""
+        pass
 
     @ensure_yield
     async def tip_action(

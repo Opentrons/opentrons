@@ -14,9 +14,9 @@ import {
 } from '@opentrons/components'
 import { InputField } from './InputField'
 import { GoBackLink } from './GoBackLink'
+import { HandleEnter } from './HandleEnter'
 
 import type { WizardTileProps } from './types'
-import { HandleEnter } from './HandleEnter'
 
 export function MetadataTile(props: WizardTileProps): JSX.Element {
   const { i18n, t } = useTranslation()
