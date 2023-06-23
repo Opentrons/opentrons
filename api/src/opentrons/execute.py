@@ -23,7 +23,11 @@ from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.hardware_control import API as OT2API, ThreadManager, HardwareControlAPI
+from opentrons.hardware_control import (
+    API as OT2API,
+    ThreadManagedHardware,
+    ThreadManager,
+)
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
@@ -31,7 +35,7 @@ from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-_THREAD_MANAGED_HW: Optional[ThreadManager[HardwareControlAPI]] = None
+_THREAD_MANAGED_HW: Optional[ThreadManagedHardware] = None
 #: The background global cache that all protocol contexts created by
 #: :py:meth:`get_protocol_api` will share
 
@@ -121,13 +125,13 @@ def get_protocol_api(
     robot_type = _get_robot_type()
     deck_type = guess_deck_type_from_global_config()
 
-    _create_hardware_controller(robot_type)
+    hardware_controller = _get_global_hardware_controller(robot_type)
 
     try:
         context = protocol_api.create_protocol_context(
             api_version=checked_version,
             deck_type=deck_type,
-            hardware_api=_THREAD_MANAGED_HW,  # type: ignore[arg-type]
+            hardware_api=hardware_controller,
             bundled_labware=bundled_labware,
             bundled_data=bundled_data,
             extra_labware=extra_labware,
@@ -135,7 +139,7 @@ def get_protocol_api(
     except protocol_api.ProtocolEngineCoreRequiredError as e:
         raise NotImplementedError(_PYTHON_TOO_NEW_MESSAGE) from e  # See Jira RCORE-535.
 
-    _THREAD_MANAGED_HW.sync.cache_instruments()  # type: ignore[union-attr]
+    hardware_controller.sync.cache_instruments()
     return context
 
 
@@ -402,7 +406,7 @@ def _get_robot_type() -> RobotType:
     return "OT-3 Standard" if should_use_ot3() else "OT-2 Standard"
 
 
-def _create_hardware_controller(robot_type: RobotType) -> None:
+def _get_global_hardware_controller(robot_type: RobotType) -> ThreadManagedHardware:
     # Build a hardware controller in a worker thread, which is necessary
     # because ipython runs its notebook in asyncio but the notebook
     # is at script/repl scope not function scope and is synchronous so
@@ -417,6 +421,8 @@ def _create_hardware_controller(robot_type: RobotType) -> None:
             _THREAD_MANAGED_HW = ThreadManager(OT3API.build_hardware_controller)
         else:
             _THREAD_MANAGED_HW = ThreadManager(OT2API.build_hardware_controller)
+
+    return _THREAD_MANAGED_HW
 
 
 @atexit.register
