@@ -266,6 +266,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
                   )
                 : null
             }
+            oldLocation={oldLabwareLocation ?? 'offDeck'}
             oldDisplayLocation={
               oldLabwareLocation != null
                 ? getLabwareDisplayLocationFromRunData(
@@ -276,6 +277,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
                   )
                 : ''
             }
+            newLocation={lastRunCommand.params?.newLocation ?? 'offDeck'}
             newDisplayLocation={
               lastRunCommand?.commandType === 'moveLabware'
                 ? getLabwareDisplayLocationFromRunData(

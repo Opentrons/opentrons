@@ -28,7 +28,7 @@ import { StyledText } from '../../atoms/text'
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 
-import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
+import type { DeckDefinition, LabwareLocation, RobotType } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
 import type {
   LabwareAnimationParams,
@@ -100,7 +100,9 @@ export interface InterventionModalProps {
   labwareAnimationParams?: LabwareAnimationParams | null
   labwareName?: string | null
   oldDisplayLocation?: string
+  oldLocation: LabwareLocation
   newDisplayLocation?: string
+  newLocation: LabwareLocation
   deckDef?: DeckDefinition
 }
 
@@ -114,7 +116,9 @@ export function InterventionModal({
   labwareAnimationParams,
   labwareName,
   oldDisplayLocation,
+  oldLocation,
   newDisplayLocation,
+  newLocation,
   deckDef,
 }: InterventionModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
@@ -147,6 +151,8 @@ export function InterventionModal({
           movedLabwareId={command.params.labwareId}
           oldDisplayLocation={oldDisplayLocation}
           newDisplayLocation={newDisplayLocation}
+          oldLocation={oldLocation}
+          newLocation={newLocation}
           deckDef={deckDef}
         />
       ) : null

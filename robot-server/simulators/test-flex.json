@@ -1,5 +1,6 @@
 {
   "machine": "OT-3 Standard",
+  "strict_attached_instruments": false,
   "attached_instruments": {
     "right": {
       "model": "p1000_single_v3.4",

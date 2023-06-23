@@ -12,6 +12,7 @@ import {
   BORDERS,
   Box,
   RobotWorkSpace,
+  MoveLabwareOnDeck,
 } from '@opentrons/components'
 
 import { getLabwareRenderComponents, getModuleRenderComponents } from './utils'
@@ -19,7 +20,7 @@ import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 
-import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
+import type { DeckDefinition, LabwareLocation, RobotType } from '@opentrons/shared-data'
 import type {
   LabwareAnimationParams,
   RunLabwareInfo,
@@ -34,7 +35,9 @@ export interface MoveLabwareInterventionProps {
   labwareName: string
   movedLabwareId: string
   oldDisplayLocation: string
+  oldLocation: LabwareLocation
   newDisplayLocation: string
+  newLocation: LabwareLocation
   deckDef: DeckDefinition
 }
 
@@ -47,8 +50,10 @@ export function MoveLabwareInterventionContent({
   labwareRenderInfo,
   oldDisplayLocation,
   newDisplayLocation,
+  oldLocation,
+  newLocation,
   deckDef,
-}: MoveLabwareInterventionProps): JSX.Element {
+}: MoveLabwareInterventionProps): JSX.Element | null {
   const { t: protocolSetupTranslator } = useTranslation('protocol_setup')
 
   // the module/labware render info needs to be 'sorted' so that the labware that is being moved comes last in the list.
@@ -70,7 +75,8 @@ export function MoveLabwareInterventionContent({
       )
     }
   }
-
+  const movedLabwareDef = labwareRenderInfo.find(l => l.labwareId === movedLabwareId)?.labwareDef
+if (movedLabwareDef == null) return null
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.75rem" width="100%">
       <MoveLabwareHeader />
@@ -105,7 +111,14 @@ export function MoveLabwareInterventionContent({
         </Flex>
         <Flex width="50%">
           <Box margin="0 auto" width="100%">
-            <RobotWorkSpace
+            <MoveLabwareOnDeck 
+              robotType={robotType}
+              initialLabwareLocation={oldLocation}
+              finalLabwareLocation={newLocation}
+              movedLabwareDef={movedLabwareDef}
+              moduleInfoById={{}}
+            />
+            {/* <RobotWorkSpace
               deckDef={deckDef}
               deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
               id="InterventionModal_deckMap"
@@ -142,7 +155,7 @@ export function MoveLabwareInterventionContent({
                       ]}
                 </>
               )}
-            </RobotWorkSpace>
+            </RobotWorkSpace> */}
           </Box>
         </Flex>
       </Flex>
