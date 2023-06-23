@@ -4,7 +4,7 @@ from pydantic.generics import GenericModel
 from typing import Any, Dict, Generic, Optional, Sequence, TypeVar, Type
 
 from robot_server.service.json_api import BaseResponseBody, ResourceLinks
-from opentrons_shared_data.errors import EnumeratedError, PythonException
+from opentrons_shared_data.errors import EnumeratedError, PythonException, ErrorCodes
 
 
 class ApiError(Exception):
@@ -107,7 +107,7 @@ class ErrorDetails(BaseErrorBody):
         ),
     )
     errorCode: str = Field(
-        None,
+        ErrorCodes.GENERAL_ERROR.value.code,
         description=("The Opentrons error code associated with the error"),
     )
 
