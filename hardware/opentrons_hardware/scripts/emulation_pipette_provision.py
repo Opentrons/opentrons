@@ -9,6 +9,7 @@ High level overview of the script:
 - Profit
 """
 
+from dataclasses import dataclass
 import os
 import json
 from typing import Optional
@@ -18,33 +19,26 @@ from opentrons_hardware.instruments.pipettes.serials import serial_val_from_part
 LEFT_PIPETTE_ENV_VAR_NAME = "LEFT_OT3_PIPETTE_DEFINITION"
 RIGHT_PIPETTE_ENV_VAR_NAME = "RIGHT_OT3_PIPETTE_DEFINITION"
 
+NO_PIPETTE_NAME = "EMPTY"
+NO_PIPETTE_MODEL = -1
+NO_PIPETTE_SERIAL_CODE = ""
+ 
 
+@dataclass
 class OT3PipetteEnvVar:
     """OT3 Pipette Environment Variable."""
 
-    NO_PIPETTE_NAME = "EMPTY"
-    NO_PIPETTE_MODEL = -1
-    NO_PIPETTE_SERIAL_CODE = ""
-
-    def __init__(
-        self,
-        pipette_name: str,
-        pipette_model: int,
-        pipette_serial_code: str,
-        eeprom_file_path: str,
-    ) -> None:
-        """Initialize."""
-        self.pipette_name = pipette_name
-        self.pipette_model = pipette_model
-        self.pipette_serial_code = pipette_serial_code
-        self.eeprom_file_path = eeprom_file_path
+    pipette_name: str
+    pipette_model: int
+    pipette_serial_code: str
+    eeprom_file_path: str
 
     def is_no_pipette(self) -> bool:
         """Check if pipette is no pipette."""
         no_pipette = (
-            self.pipette_name == self.NO_PIPETTE_NAME,
-            self.pipette_model == self.NO_PIPETTE_MODEL,
-            self.pipette_serial_code == self.NO_PIPETTE_SERIAL_CODE,
+            self.pipette_name == NO_PIPETTE_NAME,
+            self.pipette_model == NO_PIPETTE_MODEL,
+            self.pipette_serial_code == NO_PIPETTE_SERIAL_CODE,
         )
         any_no_pipette_fields_have_been_set = any(no_pipette)
         all_no_pipette_fields_are_not_set = not all(no_pipette)
@@ -54,9 +48,9 @@ class OT3PipetteEnvVar:
                 "\n".join(
                     (
                         "Invalid empty pipette definition. Expecting the following:",
-                        f"pipette_name: {self.NO_PIPETTE_NAME}",
-                        f"pipette_model: {self.NO_PIPETTE_MODEL}",
-                        f"pipette_serial_code: {self.NO_PIPETTE_SERIAL_CODE}",
+                        f"pipette_name: {NO_PIPETTE_NAME}",
+                        f"pipette_model: {NO_PIPETTE_MODEL}",
+                        f"pipette_serial_code: {NO_PIPETTE_SERIAL_CODE}",
                         "",
                         "You passed the following:",
                         f"pipette_name: {self.pipette_name}",
