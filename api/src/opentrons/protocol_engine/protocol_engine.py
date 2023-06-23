@@ -1,4 +1,5 @@
 """ProtocolEngine class definition."""
+from logging import getLogger
 from typing import Dict, Optional
 
 from opentrons.protocols.models import LabwareDefinition
@@ -41,6 +42,8 @@ from .actions import (
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
 )
+
+log = getLogger(__name__)
 
 
 class ProtocolEngine:
@@ -246,6 +249,8 @@ class ProtocolEngine:
                 If `False`, will set status to `stopped`.
         """
         if error:
+            log.info(f"did we get a estop error? {error}")
+            log.info(f"wrapping: {error.wrapping}")
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
                 created_at=self._model_utils.get_timestamp(),
