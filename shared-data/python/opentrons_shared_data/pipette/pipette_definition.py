@@ -86,6 +86,15 @@ class PipetteVersionType:
         self,
     ) -> Tuple[PipetteModelMajorVersionType, PipetteModelMinorVersionType]:
         return (self.major, self.minor)
+    
+    @property
+    def to_generation(self) -> PipetteGenerationType:
+        if self.major == 3:
+            return PipetteGenerationType.FLEX
+        elif self.major == 2:
+            return PipetteGenerationType.GEN2
+        else:
+            return PipetteGenerationType.GEN1
 
 
 class SupportedTipsDefinition(BaseModel):
@@ -346,3 +355,4 @@ class PipetteConfigurations(
     mount_configurations: pip_types.RobotMountConfigs = Field(
         ...,
     )
+    quirks: List[pip_types.Quirks] = Field(..., description="The list of quirks available for the loaded configuration")
