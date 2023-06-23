@@ -74,8 +74,9 @@ export function DisplayWifiList({
       ) : null}
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={SPACING.spacing60}
-        paddingTop={SPACING.spacing32}
+        // padding for robot setup
+        padding={isHeader ? SPACING.spacing60 : SPACING.spacing40}
+        paddingTop={isHeader ? SPACING.spacing32 : '0'}
       >
         {list != null && list.length > 0
           ? list.map(nw => (
