@@ -6,7 +6,10 @@ import {
   COLORS,
   Flex,
   Icon,
-  JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_CENTER,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -18,9 +21,9 @@ import type { InlineNotificationProps } from '../../atoms/InlineNotification'
 
 interface RobotSetupHeaderProps {
   header: string
-  onClickBack: React.MouseEventHandler
   buttonText?: React.ReactNode
   inlineNotification?: InlineNotificationProps
+  onClickBack?: React.MouseEventHandler
   onClickButton?: React.MouseEventHandler
 }
 
@@ -32,28 +35,39 @@ export function RobotSetupHeader({
   onClickButton,
 }: RobotSetupHeaderProps): JSX.Element {
   return (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-      <Btn onClick={onClickBack}>
-        <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
-      </Btn>
-      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
-        {header}
-      </StyledText>
-      {onClickButton != null && buttonText != null ? (
-        <SmallButton
-          buttonType="primary"
-          buttonCategory="rounded"
-          buttonText={buttonText}
-          onClick={onClickButton}
-        />
-      ) : null}
-      {inlineNotification != null ? (
-        <InlineNotification
-          heading={inlineNotification.heading}
-          hug={true}
-          type={inlineNotification.type}
-        />
-      ) : null}
+    <Flex paddingX={SPACING.spacing40} paddingY={SPACING.spacing32}>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
+        position={POSITION_RELATIVE}
+        width="100%"
+      >
+        {onClickBack != null ? (
+          <Btn onClick={onClickBack} position={POSITION_ABSOLUTE} left="0">
+            <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
+          </Btn>
+        ) : null}
+        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          {header}
+        </StyledText>
+        {onClickButton != null && buttonText != null ? (
+          <SmallButton
+            buttonType="primary"
+            buttonCategory="rounded"
+            buttonText={buttonText}
+            onClick={onClickButton}
+            position={POSITION_ABSOLUTE}
+            right="0"
+          />
+        ) : null}
+        {inlineNotification != null ? (
+          <InlineNotification
+            heading={inlineNotification.heading}
+            hug={true}
+            type={inlineNotification.type}
+          />
+        ) : null}
+      </Flex>
     </Flex>
   )
 }
