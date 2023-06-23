@@ -1,3 +1,4 @@
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import React from 'react'
 import Renderer from 'react-test-renderer'
 
@@ -88,12 +89,14 @@ describe('InstrumentGroup', () => {
   it('Renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentGroup
+        robotType={OT2_ROBOT_TYPE}
         left={{
           mount: 'left',
           description: 'p300 8-Channel',
           pipetteSpecs: { channels: 8, displayCategory: 'GEN1' },
           isDisabled: false,
           className: 'foo',
+          robotType: OT2_ROBOT_TYPE,
         }}
         right={{
           mount: 'right',
@@ -101,6 +104,7 @@ describe('InstrumentGroup', () => {
           pipetteSpecs: { channels: 1, displayCategory: 'GEN1' },
           isDisabled: true,
           className: 'blah',
+          robotType: OT2_ROBOT_TYPE,
         }}
       />
     ).toJSON()

@@ -12,8 +12,8 @@ import type { InstrumentDiagramProps } from './InstrumentDiagram'
 export interface InstrumentInfoProps {
   /** 'left' or 'right' */
   mount: Mount
-  /** robotType */
-  robotType: RobotType
+  /** optional robotType standardized to OT-2 Standard */
+  robotType?: RobotType
   /** if true, show labels 'LEFT PIPETTE' / 'RIGHT PIPETTE' */
   showMountLabel?: boolean | null
   /** human-readable description, eg 'p300 Single-channel' */
@@ -33,6 +33,7 @@ export interface InstrumentInfoProps {
 }
 
 export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
+  const { robotType = 'OT-2 Standard' } = props
   const baseClassname = cx(
     styles.pipette,
     { [styles.disabled]: props.isDisabled },
@@ -43,7 +44,7 @@ export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
   const flexClassname = cx(mountStyle, baseClassname)
 
   const className =
-    props.robotType === FLEX_ROBOT_TYPE
+    robotType === FLEX_ROBOT_TYPE
       ? flexClassname
       : cx(styles[props.mount], baseClassname)
 

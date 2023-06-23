@@ -7,7 +7,7 @@ import type { RobotType } from '@opentrons/shared-data'
 import type { InstrumentInfoProps } from './InstrumentInfo'
 
 export interface InstrumentGroupProps {
-  robotType: RobotType
+  robotType?: RobotType
   showMountLabel?: boolean | null | undefined
   left?: InstrumentInfoProps | null | undefined
   right?: InstrumentInfoProps | null | undefined

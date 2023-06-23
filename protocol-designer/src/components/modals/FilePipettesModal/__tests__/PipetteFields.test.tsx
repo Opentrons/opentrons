@@ -6,6 +6,7 @@ import {
   DropdownField,
   OutlineButton,
 } from '@opentrons/components'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 import { actions as labwareDefActions } from '../../../../labware-defs'
@@ -20,6 +21,7 @@ import type { SelectOption } from '@opentrons/components'
 
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/selectors')
+jest.mock('../../../../file-data/selectors')
 jest.mock('../../../../labware-defs/utils')
 jest.mock('../../../../labware-defs/actions')
 
@@ -73,7 +75,7 @@ describe('PipetteFields', () => {
       },
       errors: null,
       touched: null,
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     }
 
     getOnlyLatestDefsMock.mockReturnValue({
