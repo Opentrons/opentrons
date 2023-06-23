@@ -3,11 +3,11 @@ from opentrons.protocol_api import ProtocolContext
 metadata = {"protocolName": "belt-calibration-p1000"}
 requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 ​
-​
 def run(ctx: ProtocolContext) -> None:
     tipracks = [
         ctx.load_labware(f"opentrons_ot3_96_tiprack_1000uL", "D1"),
         ctx.load_labware(f"opentrons_ot3_96_tiprack_1000uL", "D3"),
+        ctx.load_labware(f"opentrons_ot3_96_tiprack_1000uL", "C2"),
         ctx.load_labware(f"opentrons_ot3_96_tiprack_1000uL", "A1"),
         ctx.load_labware(f"opentrons_ot3_96_tiprack_1000uL", "B3"),
     ]
