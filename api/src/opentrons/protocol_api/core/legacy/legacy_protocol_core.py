@@ -229,7 +229,10 @@ class LegacyProtocolCore(
         self,
         labware_core: LegacyLabwareCore,
         new_location: Union[
-            DeckSlotName, legacy_module_core.LegacyModuleCore, OffDeckType
+            DeckSlotName,
+            LegacyLabwareCore,
+            legacy_module_core.LegacyModuleCore,
+            OffDeckType,
         ],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,

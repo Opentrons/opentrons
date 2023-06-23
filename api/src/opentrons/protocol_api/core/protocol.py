@@ -73,7 +73,7 @@ class AbstractProtocol(
     def move_labware(
         self,
         labware_core: LabwareCoreType,
-        new_location: Union[DeckSlotName, ModuleCoreType, OffDeckType],
+        new_location: Union[DeckSlotName, LabwareCoreType, ModuleCoreType, OffDeckType],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
         use_drop_location_lpc_offset: bool,

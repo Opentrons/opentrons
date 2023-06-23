@@ -30,7 +30,7 @@ from opentrons.protocols.api_support.util import (
 )
 
 from ._types import OffDeckType
-from .core.common import ModuleCore, ProtocolCore
+from .core.common import ModuleCore, LabwareCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine.module_core import NonConnectedModuleCore
 from .core.module import (
@@ -423,7 +423,7 @@ class ProtocolContext(CommandPublisher):
     def move_labware(
         self,
         labware: Labware,
-        new_location: Union[DeckLocation, ModuleTypes, OffDeckType],
+        new_location: Union[DeckLocation, Labware, ModuleTypes, OffDeckType],
         use_gripper: bool = False,
         use_pick_up_location_lpc_offset: bool = False,
         use_drop_location_lpc_offset: bool = False,
@@ -472,8 +472,10 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        location: Union[ModuleCore, OffDeckType, DeckSlotName]
-        if isinstance(new_location, ModuleContext):
+        location: Union[ModuleCore, LabwareCore, OffDeckType, DeckSlotName]
+        if isinstance(new_location, Labware):
+            location = new_location._core
+        elif isinstance(new_location, ModuleContext):
             location = new_location._core
         elif isinstance(new_location, OffDeckType):
             location = new_location

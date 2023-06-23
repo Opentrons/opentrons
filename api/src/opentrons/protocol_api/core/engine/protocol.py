@@ -20,6 +20,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     ModuleModel as EngineModuleModel,
     LabwareMovementStrategy,
     LabwareOffsetVector,
@@ -30,6 +31,7 @@ from opentrons.protocol_engine.types import (
     ModuleModel as ProtocolEngineModuleModel,
     OFF_DECK_LOCATION,
     LabwareLocation,
+    NonStackedLocation,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import (
@@ -194,7 +196,7 @@ class ProtocolCore(
         self,
         labware_core: LabwareCore,
         new_location: Union[
-            DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType
+            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
         ],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
@@ -505,8 +507,23 @@ class ProtocolCore(
 
     @staticmethod
     def _convert_labware_location(
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
+        location: Union[
+            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+        ]
     ) -> LabwareLocation:
+        if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
+            return ModuleLocation(moduleId=location.module_id)
+        elif location is OffDeckType.OFF_DECK:
+            return OFF_DECK_LOCATION
+        elif isinstance(location, DeckSlotName):
+            return DeckSlotLocation(slotName=location)
+        elif isinstance(location, LabwareCore):
+            return OnLabwareLocation(labwareId=location.labware_id)
+
+    @staticmethod
+    def _convert_non_stacked_location(
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
+    ) -> NonStackedLocation:
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
             return ModuleLocation(moduleId=location.module_id)
         elif location is OffDeckType.OFF_DECK:
