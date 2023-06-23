@@ -12,6 +12,10 @@ import {
   SIZE_1,
   SPACING,
 } from '@opentrons/components'
+import {
+  FLEX_ROBOT_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { actions as stepFormActions, ModuleOnDeck } from '../../step-forms'
 import {
@@ -22,11 +26,7 @@ import { ModuleDiagram } from './ModuleDiagram'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
-import {
-  ModuleType,
-  RobotType,
-  THERMOCYCLER_MODULE_TYPE,
-} from '@opentrons/shared-data'
+import type { ModuleType, RobotType } from '@opentrons/shared-data'
 
 interface Props {
   robotType?: RobotType
@@ -44,7 +44,7 @@ export function ModuleRow(props: Props): JSX.Element {
     robotType,
   } = props
   const type: ModuleType = moduleOnDeck?.type || props.type
-  const isFlex = robotType === 'OT-3 Standard'
+  const isFlex = robotType === FLEX_ROBOT_TYPE
 
   const model = moduleOnDeck?.model
   const slot = moduleOnDeck?.slot

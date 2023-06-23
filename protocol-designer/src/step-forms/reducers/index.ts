@@ -7,6 +7,7 @@ import omit from 'lodash/omit'
 import omitBy from 'lodash/omitBy'
 import reduce from 'lodash/reduce'
 import {
+  FLEX_ROBOT_TYPE,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -1285,7 +1286,7 @@ export const additionalEquipmentInvariantProperties = handleActions<NormalizedAd
       )
       const hasGripper = gripper.length > 0
       // @ts-expect-error  (jr, 6/22/23): OT-3 Standard doesn't exist on schemav6
-      const isOt3 = file.robot.model === 'OT-3 Standard'
+      const isOt3 = file.robot.model === FLEX_ROBOT_TYPE
       const additionalEquipmentId = uuid()
       const updatedEquipment = {
         [additionalEquipmentId]: {

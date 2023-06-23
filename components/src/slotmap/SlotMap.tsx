@@ -1,6 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { RobotType } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, RobotType } from '@opentrons/shared-data'
 import { Icon } from '../icons'
 import styles from './styles.css'
 
@@ -40,7 +40,7 @@ const numCols = 3
 export function SlotMap(props: SlotMapProps): JSX.Element {
   const { collisionSlots, occupiedSlots, isError, robotType } = props
   const slots =
-    robotType === 'OT-3 Standard' ? FLEX_SLOT_MAP_SLOTS : OT2_SLOT_MAP_SLOTS
+    robotType === FLEX_ROBOT_TYPE ? FLEX_SLOT_MAP_SLOTS : OT2_SLOT_MAP_SLOTS
 
   return (
     <svg

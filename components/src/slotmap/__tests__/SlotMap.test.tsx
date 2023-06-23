@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { SlotMap } from '../SlotMap'
 import { Icon } from '../../icons'
 
@@ -32,7 +33,7 @@ describe('SlotMap', () => {
 
   it('should render 12 slots for flex', () => {
     const wrapper = shallow(
-      <SlotMap occupiedSlots={['D1']} robotType="OT-3 Standard" />
+      <SlotMap occupiedSlots={['D1']} robotType={FLEX_ROBOT_TYPE} />
     )
     expect(wrapper.find('rect')).toHaveLength(12)
   })
@@ -42,7 +43,7 @@ describe('SlotMap', () => {
       <SlotMap
         occupiedSlots={['D1']}
         collisionSlots={['D2']}
-        robotType="OT-3 Standard"
+        robotType={FLEX_ROBOT_TYPE}
       />
     )
     expect(wrapper.find(Icon)).toHaveLength(1)
