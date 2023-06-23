@@ -35,7 +35,14 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
       marginY={SPACING.spacing8}
       gridGap={SPACING.spacing4}
     >
-      <StyledText as="label" fontWeight={isOnDevice ? TYPOGRAPHY.fontWeightRegular : TYPOGRAPHY.fontWeightSemiBold}>
+      <StyledText
+        as="label"
+        fontWeight={
+          isOnDevice
+            ? TYPOGRAPHY.fontWeightRegular
+            : TYPOGRAPHY.fontWeightSemiBold
+        }
+      >
         {i18n.format(t('labware_offset_data'), 'capitalize')}
       </StyledText>
       <Flex
@@ -45,7 +52,7 @@ export function LiveOffsetValue(props: OffsetVectorProps): JSX.Element {
         padding={SPACING.spacing8}
         {...styleProps}
       >
-        <Icon name="reticle" size={isOnDevice ? "1.5rem" : SIZE_1} />
+        <Icon name="reticle" size={isOnDevice ? '1.5rem' : SIZE_1} />
         {[x, y, z].map((axis, index) => (
           <React.Fragment key={index}>
             <StyledText

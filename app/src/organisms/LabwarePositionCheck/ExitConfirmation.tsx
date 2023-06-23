@@ -57,7 +57,8 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
           width="100%"
           justifyContent={JUSTIFY_FLEX_END}
           alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing8}>
+          gridGap={SPACING.spacing8}
+        >
           <SmallButton
             onClick={onGoBack}
             buttonText={i18n.format(t('shared:go_back'), 'capitalize')}
@@ -89,9 +90,8 @@ export const ExitConfirmation = (props: ExitConfirmationProps): JSX.Element => {
             </AlertPrimaryButton>
           </Flex>
         </Flex>
-      )
-      }
-    </Flex >
+      )}
+    </Flex>
   )
 }
 

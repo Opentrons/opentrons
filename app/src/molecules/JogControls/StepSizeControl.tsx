@@ -178,15 +178,23 @@ export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
       padding={SPACING.spacing16}
       gridGap={SPACING.spacing16}
     >
-      <TouchControlLabel>{i18n.format(t('jump_size'), 'capitalize')}</TouchControlLabel>
+      <TouchControlLabel>
+        {i18n.format(t('jump_size'), 'capitalize')}
+      </TouchControlLabel>
       {stepSizes.map((stepSize: StepSize, index) => {
         const selected = currentStepSize === stepSize
         return (
           <TouchControlButton
             key={index}
             selected={selected}
-            onClick={() => { setCurrentStepSize(stepSize) }}>
-            <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_START}>
+            onClick={() => {
+              setCurrentStepSize(stepSize)
+            }}
+          >
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              alignItems={ALIGN_FLEX_START}
+            >
               <StyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}

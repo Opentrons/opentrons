@@ -15,7 +15,7 @@ import {
   JUSTIFY_CENTER,
   TYPOGRAPHY,
   JUSTIFY_FLEX_END,
-  PrimaryButton
+  PrimaryButton,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -117,7 +117,7 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
                     def={getModuleDef2(location.moduleModel)}
                     innerProps={
                       getModuleType(location.moduleModel) ===
-                        THERMOCYCLER_MODULE_TYPE
+                      THERMOCYCLER_MODULE_TYPE
                         ? { lidMotorState: 'open' }
                         : {}
                     }
@@ -145,10 +145,13 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
                         key={module.id}
                         x={modX}
                         y={modY}
-                        orientation={inferModuleOrientationFromXCoordinate(modX)}
+                        orientation={inferModuleOrientationFromXCoordinate(
+                          modX
+                        )}
                         def={getModuleDef2(module.model)}
                         innerProps={
-                          getModuleType(module.model) === THERMOCYCLER_MODULE_TYPE
+                          getModuleType(module.model) ===
+                          THERMOCYCLER_MODULE_TYPE
                             ? { lidMotorState: 'open' }
                             : {}
                         }
@@ -165,20 +168,22 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
       {isOnDevice ? (
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <SmallButton
-            buttonText={i18n.format(t('shared:confirm_placement'),'capitalize')}
+            buttonText={i18n.format(
+              t('shared:confirm_placement'),
+              'capitalize'
+            )}
             buttonType="primary"
             onClick={props.confirmPlacement}
           />
         </Flex>
       ) : (
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-            <NeedHelpLink href={LPC_HELP_LINK_URL} />
-            <PrimaryButton onClick={props.confirmPlacement}>
+          <NeedHelpLink href={LPC_HELP_LINK_URL} />
+          <PrimaryButton onClick={props.confirmPlacement}>
             {i18n.format(t('shared:confirm_placement'), 'capitalize')}
-            </PrimaryButton>
+          </PrimaryButton>
         </Flex>
       )}
     </Flex>
   )
 }
-

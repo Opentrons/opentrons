@@ -462,20 +462,25 @@ export function TouchDirectionControl(
     >
       <Flex css={DIRECTION_CONTROL_LAYOUT}>
         <Flex css={PLANE_BUTTONS_STYLE}>
-        <TouchControlLabel>{i18n.format(t('jog_controls'), 'capitalize')}</TouchControlLabel>
+          <TouchControlLabel>
+            {i18n.format(t('jog_controls'), 'capitalize')}
+          </TouchControlLabel>
           {planes.map((plane: Plane) => {
             const selected = currentPlane === plane
             return (
               <TouchControlButton
                 key={plane}
                 selected={selected}
-                onClick={() => { setCurrentPlane(plane) }}
+                onClick={() => {
+                  setCurrentPlane(plane)
+                }}
               >
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_FLEX_START}
                   justifyContent={JUSTIFY_CENTER}
-                  height="74px">
+                  height="74px"
+                >
                   <StyledText
                     as="p"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}

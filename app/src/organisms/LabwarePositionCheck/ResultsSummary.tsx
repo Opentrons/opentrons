@@ -32,7 +32,10 @@ import {
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
-import { getIsLabwareOffsetCodeSnippetsOn, getIsOnDevice } from '../../redux/config'
+import {
+  getIsLabwareOffsetCodeSnippetsOn,
+  getIsOnDevice,
+} from '../../redux/config'
 
 import type { ResultsSummaryStep, WorkingOffset } from './types'
 import type {
@@ -143,10 +146,10 @@ export const ResultsSummary = (
       padding={SPACING.spacing32}
       minHeight="29.5rem"
     >
-      <Flex 
+      <Flex
         flexDirection={DIRECTION_COLUMN}
         maxHeight="20rem"
-        overflowY='scroll'
+        overflowY="scroll"
       >
         <Header>{t('new_labware_offset_data')}</Header>
         {isLabwareOffsetCodeSnippetsOn ? (
@@ -156,8 +159,9 @@ export const ResultsSummary = (
             CommandLineComponent={CommandLineSnippet}
             marginTop={SPACING.spacing16}
           />
-        ) : TableComponent
-        }
+        ) : (
+          TableComponent
+        )}
       </Flex>
       {isOnDevice ? (
         <SmallButton
@@ -292,7 +296,9 @@ const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
     <TerseTable>
       <thead>
         <tr>
-          <TerseHeader>{i18n.format(t('slot_location'), 'capitalize')}</TerseHeader>
+          <TerseHeader>
+            {i18n.format(t('slot_location'), 'capitalize')}
+          </TerseHeader>
           <TerseHeader>{i18n.format(t('labware'), 'capitalize')}</TerseHeader>
           <TerseHeader>{i18n.format(t('offsets'), 'capitalize')}</TerseHeader>
         </tr>
@@ -309,7 +315,15 @@ const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
             <TerseTableRow key={index}>
               <TerseTableDatum>
                 <LocationIcon slotName={location.slotName} />
-                {location.moduleModel != null ? <LocationIcon iconName={MODULE_ICON_NAME_BY_TYPE[getModuleType(location.moduleModel)]} /> : null}
+                {location.moduleModel != null ? (
+                  <LocationIcon
+                    iconName={
+                      MODULE_ICON_NAME_BY_TYPE[
+                        getModuleType(location.moduleModel)
+                      ]
+                    }
+                  />
+                ) : null}
               </TerseTableDatum>
               <TerseTableDatum>
                 <StyledText as="p">{labwareDisplayName}</StyledText>
@@ -349,7 +363,7 @@ const TerseTable = styled('table')`
   border-spacing: 0 ${SPACING.spacing4};
   margin: ${SPACING.spacing16} 0;
   text-align: left;
-  tr td:first-child { 
+  tr td:first-child {
     border-top-left-radius: ${BORDERS.borderRadiusSize3};
     border-bottom-left-radius: ${BORDERS.borderRadiusSize3};
     padding-left: ${SPACING.spacing12};
