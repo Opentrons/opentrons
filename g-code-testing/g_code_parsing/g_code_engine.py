@@ -7,8 +7,7 @@ from collections import namedtuple
 
 from opentrons import APIVersion
 from opentrons.hardware_control.emulation.settings import Settings
-from opentrons.protocol_engine.create_protocol_engine import create_protocol_engine
-from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine import create_protocol_engine, Config, DeckType
 from opentrons.protocol_reader.protocol_source import (
     JsonProtocolConfig,
     ProtocolConfig,
@@ -18,6 +17,7 @@ from opentrons.protocol_reader.protocol_source import (
 from opentrons.protocol_runner.protocol_runner import create_protocol_runner
 from opentrons.protocols.parse import parse
 from opentrons.protocols.execution import execute
+from opentrons.protocols.api_support import deck_type
 from contextlib import asynccontextmanager, contextmanager
 from opentrons.protocol_api import create_protocol_context
 from opentrons.config.robot_configs import build_config
@@ -119,7 +119,10 @@ class GCodeEngine:
 
     @asynccontextmanager
     async def run_protocol(
-        self, path: str, version: Union[APIVersion, int]
+        self,
+        path: str,
+        # TODO(mm, 2023-05-16): version should be automatically derived from the protocol file.
+        version: Union[APIVersion, int],
     ) -> AsyncGenerator:
         """
         Runs passed protocol file and collects all G-Code I/O from it.
@@ -129,6 +132,8 @@ class GCodeEngine:
         :return: GCodeProgram with all the parsed data
         """
         file_path = Path(get_configuration_dir(), path)
+
+        # TODO(mm, 2023-05-16): robot_type should be automatically derived from the protocol file.
         robot_type: RobotType = "OT-2 Standard"
 
         with self._emulate() as hardware:
@@ -160,7 +165,12 @@ class GCodeEngine:
                     protocol_config=config,
                     protocol_engine=await create_protocol_engine(
                         hardware_api=hardware,  # type: ignore
-                        config=Config(robot_type=robot_type),
+                        config=Config(
+                            robot_type=robot_type,
+                            deck_type=DeckType(
+                                deck_type.for_simulation(robot_type=robot_type)
+                            ),
+                        ),
                     ),
                     hardware_api=hardware,  # type: ignore
                 )
@@ -172,6 +182,7 @@ class GCodeEngine:
                 context = create_protocol_context(
                     api_version=version,
                     hardware_api=hardware,
+                    deck_type=deck_type.for_simulation(robot_type=robot_type),
                 )
                 parsed_protocol = parse(protocol.text, protocol.filename)
                 with GCodeWatcher(emulator_settings=self._config) as watcher:

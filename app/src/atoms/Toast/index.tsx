@@ -183,10 +183,10 @@ export function Toast(props: ToastProps): JSX.Element {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
       borderRadius={
-        showODDStyle ? BORDERS.size_three : BORDERS.radiusSoftCorners
+        showODDStyle ? BORDERS.borderRadiusSize3 : BORDERS.radiusSoftCorners
       }
       borderColor={toastStyleByType[type].color}
-      borderWidth={showODDStyle ? BORDERS.size_one : SPACING.spacingXXS}
+      borderWidth={showODDStyle ? BORDERS.borderRadiusSize1 : '1px'}
       border={BORDERS.styleSolid}
       boxShadow={BORDERS.shadowBig}
       backgroundColor={toastStyleByType[type].backgroundColor}
@@ -194,10 +194,12 @@ export function Toast(props: ToastProps): JSX.Element {
       // adjust padding when heading is present and creates extra column
       padding={
         showODDStyle
-          ? `${String(SPACING.spacing4)} ${String(SPACING.spacing5)}`
-          : `${heading != null ? SPACING.spacing2 : SPACING.spacing3} ${
-              SPACING.spacing3
-            } ${heading != null ? SPACING.spacing2 : SPACING.spacing3} 0.75rem`
+          ? `${SPACING.spacing16} ${SPACING.spacing24}`
+          : `${heading != null ? SPACING.spacing4 : SPACING.spacing8} ${
+              SPACING.spacing8
+            } ${heading != null ? SPACING.spacing4 : SPACING.spacing8} ${
+              SPACING.spacing12
+            }`
       }
       data-testid={`Toast_${type}`}
       height={showODDStyle ? '5.76rem' : 'auto'}
@@ -208,15 +210,16 @@ export function Toast(props: ToastProps): JSX.Element {
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
         overflow="hidden"
         width="100%"
       >
         <Icon
           name={icon?.name ?? toastStyleByType[type].iconName}
           color={toastStyleByType[type].color}
-          width={showODDStyle ? SPACING.spacing6 : SPACING.spacing4}
-          marginRight={SPACING.spacing3}
+          maxWidth={showODDStyle ? SPACING.spacing32 : SPACING.spacing16}
+          minWidth={showODDStyle ? SPACING.spacing32 : SPACING.spacing16}
+          marginRight={SPACING.spacing8}
           spin={icon?.spin != null ? icon.spin : false}
           aria-label={`icon_${type}`}
         />
@@ -239,7 +242,7 @@ export function Toast(props: ToastProps): JSX.Element {
               lineHeight={
                 showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
               }
-              marginRight={showODDStyle ? SPACING.spacing2 : undefined}
+              marginRight={showODDStyle ? SPACING.spacing4 : undefined}
               maxWidth={showODDStyle ? '30.375rem' : 'auto'}
               overflow="hidden"
               textOverflow="ellipsis"
@@ -261,6 +264,8 @@ export function Toast(props: ToastProps): JSX.Element {
             lineHeight={
               showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
             }
+            overflow="hidden"
+            textOverflow="ellipsis"
             whiteSpace="nowrap"
           >
             {message}
@@ -268,7 +273,7 @@ export function Toast(props: ToastProps): JSX.Element {
         </Flex>
       </Flex>
       {closeText.length > 0 && (
-        <Link role="button" height={SPACING.spacing5}>
+        <Link role="button">
           <StyledText
             color={COLORS.darkBlackEnabled}
             fontSize={
@@ -281,6 +286,9 @@ export function Toast(props: ToastProps): JSX.Element {
             }
             lineHeight={
               showODDStyle ? TYPOGRAPHY.lineHeight28 : TYPOGRAPHY.lineHeight20
+            }
+            textDecoration={
+              showODDStyle ? 'none' : TYPOGRAPHY.textDecorationUnderline
             }
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             whiteSpace="nowrap"

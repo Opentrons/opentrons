@@ -27,24 +27,18 @@ class RobotClient:
         self,
         httpx_client: httpx.AsyncClient,
         worker_executor: concurrent.futures.ThreadPoolExecutor,
-        host: str,
-        port: str,
-        system_server_port: str,
+        base_url: str,
+        system_server_base_url: str,
     ) -> None:
         """Initialize the client."""
-        self.base_url: str = f"{host}:{port}"
-        self.system_server_base_url: str = f"{host}:{system_server_port}"
-        self.httpx_client: httpx.AsyncClient = httpx_client
-        self.worker_executor: concurrent.futures.ThreadPoolExecutor = worker_executor
+        self.httpx_client = httpx_client
+        self.worker_executor = worker_executor
+        self.base_url = base_url
+        self.system_server_base_url = system_server_base_url
 
     @staticmethod
     @contextlib.asynccontextmanager
-    async def make(
-        host: str,
-        port: str,
-        version: str,
-        system_server_port: str,
-    ) -> AsyncGenerator[RobotClient, None]:
+    async def make(base_url: str, version: str, system_server_base_url: str) -> AsyncGenerator[RobotClient, None]:
         with concurrent.futures.ThreadPoolExecutor() as worker_executor:
             async with httpx.AsyncClient(
                 headers={"opentrons-version": version},
@@ -57,9 +51,8 @@ class RobotClient:
                 yield RobotClient(
                     httpx_client=httpx_client,
                     worker_executor=worker_executor,
-                    host=host,
-                    port=port,
-                    system_server_port=system_server_port,
+                    base_url=base_url,
+                    system_server_base_url=system_server_base_url
                 )
 
     async def alive(self) -> bool:
@@ -186,9 +179,13 @@ class RobotClient:
                 "token"
             ]
 
-    async def get_runs(self) -> Response:
+    async def get_runs(self, length: Optional[int] = None) -> Response:
         """GET /runs."""
-        response = await self.httpx_client.get(url=f"{self.base_url}/runs")
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/runs"
+            if length is None
+            else f"{self.base_url}/runs?pageLength={length}"
+        )
         response.raise_for_status()
         return response
 

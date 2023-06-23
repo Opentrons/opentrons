@@ -11,7 +11,7 @@ import {
   SPACING,
   Link,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { StyledText } from '../../atoms/text'
 
 interface DeckCalibrationConfirmModalProps {
@@ -26,19 +26,19 @@ export function DeckCalibrationConfirmModal({
   const { t } = useTranslation(['device_settings', 'shared'])
 
   return (
-    <Modal
+    <LegacyModal
       type="warning"
       title={t('deck_calibration_modal_title')}
       onClose={cancel}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing4}>
+        <StyledText as="p" marginBottom={SPACING.spacing16}>
           {t('deck_calibration_modal_description')}
         </StyledText>
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing5}
+          marginBottom={SPACING.spacing24}
         >
           {t('deck_calibration_modal_pipette_description')}
         </StyledText>
@@ -47,7 +47,7 @@ export function DeckCalibrationConfirmModal({
             role="button"
             onClick={cancel}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            marginRight={SPACING.spacing5}
+            marginRight={SPACING.spacing24}
             color={COLORS.blueEnabled}
             css={TYPOGRAPHY.fontSizeP}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
@@ -65,6 +65,6 @@ export function DeckCalibrationConfirmModal({
           </PrimaryButton>
         </Flex>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

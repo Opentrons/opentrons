@@ -97,6 +97,7 @@ const POSITION_PROPS = [
   'left',
   'transform',
   'transformOrigin',
+  'filter',
 ] as const
 
 const TRANSITION_PROPS = ['transition'] as const

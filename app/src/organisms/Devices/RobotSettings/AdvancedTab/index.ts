@@ -1,6 +1,6 @@
 export * from './DisableHoming'
 export * from './DisplayRobotName'
-export * from './FactoryReset'
+export * from './DeviceReset'
 export * from './LegacySettings'
 export * from './OpenJupyterControl'
 export * from './RobotInformation'

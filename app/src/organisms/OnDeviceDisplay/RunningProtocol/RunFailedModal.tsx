@@ -5,19 +5,19 @@ import { useHistory } from 'react-router-dom'
 import {
   Flex,
   SPACING,
-  COLORS,
   TYPOGRAPHY,
   DIRECTION_COLUMN,
+  ALIGN_FLEX_START,
+  COLORS,
   BORDERS,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
-import { RunTimeCommand } from '@opentrons/shared-data'
 
 import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
-import { Modal } from '../../../molecules/Modal/OnDeviceDisplay'
+import { Modal } from '../../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 
 interface RunError {
   id: string
@@ -29,17 +29,12 @@ interface RunError {
 interface RunFailedModalProps {
   runId: string
   setShowRunFailedModal: (showRunFailedModal: boolean) => void
-  failedStep?: number
-  failedCommand?: RunTimeCommand
   errors?: RunError[]
 }
 
-// ToDo (kj:05/03/2023) This component is needed to refactor to handle error messages
 export function RunFailedModal({
   runId,
   setShowRunFailedModal,
-  failedStep,
-  failedCommand,
   errors,
 }: RunFailedModalProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['run_details', 'shared'])
@@ -50,15 +45,7 @@ export function RunFailedModal({
   if (errors == null) return null
   const modalHeader: ModalHeaderBaseProps = {
     title: t('run_failed_modal_title'),
-    iconName: 'ot-alert',
-    iconColor: COLORS.white,
   }
-
-  // Note (kj:04/12/2023) Error code hasn't been defined yet
-  // for now we use run's errors data
-  const errorName = errors[0].errorType
-  const errorCode = 'error-1000'
-  const errorMessages = errors.map((error: RunError) => error.detail)
 
   const handleClose = (): void => {
     setIsCanceling(true)
@@ -78,76 +65,48 @@ export function RunFailedModal({
   return (
     <Modal
       header={modalHeader}
-      modalSize="large"
-      isError
       onOutsideClick={() => setShowRunFailedModal(false)}
     >
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing4}
-        marginTop={SPACING.spacing6}
-      >
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-          fontWeight={TYPOGRAPHY.fontWeightBold}
-        >
-          {t('run_failed_modal_header', {
-            errorName: errorName,
-            errorCode: errorCode,
-            count: failedStep,
-          })}
-        </StyledText>
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-        >
-          {/* This will be added when we get a new error system */}
-          {'Error message'}
-        </StyledText>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          backgroundColor={COLORS.light1}
-          borderRadius={BORDERS.size_three}
-          gridGap={SPACING.spacing3}
-          padding={SPACING.spacing4}
-          overflowY="scroll"
-          maxHeight="7.75rem"
+          gridGap={SPACING.spacing16}
+          alignItems={ALIGN_FLEX_START}
         >
-          <StyledText
-            fontSize={TYPOGRAPHY.fontSize20}
-            lineHeight={TYPOGRAPHY.lineHeight24}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          >
-            {t('run_failed_modal_body', {
-              command: failedCommand,
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
+            {t('error_type', {
+              errorType: errors[0].errorType,
             })}
           </StyledText>
-          <StyledText
-            fontSize={TYPOGRAPHY.fontSize20}
-            lineHeight={TYPOGRAPHY.lineHeight24}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            overflowY="scroll"
+            maxHeight="5.375rem"
+            backgroundColor={COLORS.light1}
+            borderRadius={BORDERS.borderRadiusSize3}
           >
-            {errorMessages}
+            {errors?.map(error => (
+              <StyledText
+                as="p"
+                key={error.id}
+                textAlign={TYPOGRAPHY.textAlignLeft}
+              >
+                {error.detail}
+              </StyledText>
+            ))}
+          </Flex>
+          <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
+            {t('contact_information')}
           </StyledText>
         </Flex>
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-        >
-          {t('run_failed_modal_description')}
-        </StyledText>
-        <Flex marginTop="1.75rem">
-          <SmallButton
-            width="100%"
-            buttonType="alert"
-            buttonText={i18n.format(t('shared:close'), 'titleCase')}
-            onClick={handleClose}
-            disabled={isCanceling}
-          />
-        </Flex>
+        <SmallButton
+          width="100%"
+          buttonType="alert"
+          buttonText={i18n.format(t('shared:close'), 'capitalize')}
+          onClick={handleClose}
+          disabled={isCanceling}
+        />
       </Flex>
     </Modal>
   )

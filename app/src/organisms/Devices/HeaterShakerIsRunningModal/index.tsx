@@ -14,7 +14,7 @@ import {
   SecondaryButton,
 } from '@opentrons/components'
 import { useAttachedModules } from '../hooks'
-import { Modal } from '../../../molecules/Modal'
+import { LegacyModal } from '../../../molecules/LegacyModal'
 import { StyledText } from '../../../atoms/text'
 import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
@@ -48,8 +48,8 @@ export const HeaterShakerIsRunningModal = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Icon
         name="alert-circle"
-        marginX={SPACING.spacing3}
-        size={SPACING.spacingM}
+        marginX={SPACING.spacing8}
+        size={SPACING.spacing20}
         color={COLORS.warningEnabled}
         data-testid="HeaterShakerIsRunning_warning_icon"
       />
@@ -83,7 +83,7 @@ export const HeaterShakerIsRunningModal = (
   }
 
   return (
-    <Modal onClose={closeModal} title={title}>
+    <LegacyModal onClose={closeModal} title={title}>
       <Box>
         <HeaterShakerModuleCard module={module} />
       </Box>
@@ -93,23 +93,23 @@ export const HeaterShakerIsRunningModal = (
 
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <SecondaryButton
-          marginTop={SPACING.spacing5}
-          marginRight={SPACING.spacing3}
-          padding={SPACING.spacingSM}
+          marginTop={SPACING.spacing24}
+          marginRight={SPACING.spacing8}
+          padding={SPACING.spacing12}
           onClick={handleStopShake}
           id="HeaterShakerIsRunningModal_stop_shaking"
         >
           {t('stop_shaking_start_run')}
         </SecondaryButton>
         <PrimaryButton
-          marginTop={SPACING.spacing5}
-          padding={SPACING.spacingSM}
+          marginTop={SPACING.spacing24}
+          padding={SPACING.spacing12}
           onClick={handleContinueShaking}
           id="HeaterShakerIsRunningModal_keep_shaking"
         >
           {t('keep_shaking_start_run')}
         </PrimaryButton>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

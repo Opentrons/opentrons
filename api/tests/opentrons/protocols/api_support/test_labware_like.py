@@ -2,8 +2,9 @@ from unittest.mock import MagicMock
 
 import pytest
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
-from opentrons.protocol_api import labware
+from opentrons.protocol_api import labware, OFF_DECK
 from opentrons.protocols.api_support.labware_like import LabwareLike, LabwareLikeType
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocol_api.core.legacy import module_geometry
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location
@@ -18,13 +19,13 @@ def trough_definition() -> LabwareDefinition:
 
 @pytest.fixture(scope="session")
 def trough(trough_definition):
-    deck = Deck()
+    deck = Deck(deck_type=STANDARD_OT2_DECK)
     return labware.load_from_definition(trough_definition, deck.position_for(1))
 
 
 @pytest.fixture(scope="session")
 def module(trough):
-    deck = Deck()
+    deck = Deck(deck_type=STANDARD_OT2_DECK)
     mod = module_geometry.create_geometry(
         definition=module_geometry.load_definition(
             TemperatureModuleModel.TEMPERATURE_V2
@@ -84,6 +85,14 @@ def test_empty():
     assert ll.parent.object is None
     assert ll.object is None
     assert ll.object_type == LabwareLikeType.NONE
+
+
+def test_off_deck():
+    ll = LabwareLike(OFF_DECK)
+    assert ll.has_parent is False
+    assert ll.parent.object is None
+    assert ll.object is OFF_DECK
+    assert ll.object_type == LabwareLikeType.OFF_DECK
 
 
 def test_module_parent(trough, module, mod_trough):

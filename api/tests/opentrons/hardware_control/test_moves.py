@@ -10,6 +10,7 @@ from opentrons.calibration_storage.types import (
     SourceType,
     CalibrationStatus,
 )
+from opentrons.config.types import GantryLoad
 from opentrons.hardware_control.types import (
     Axis,
     CriticalPoint,
@@ -87,13 +88,13 @@ async def test_home(ot3_hardware, mock_home):
     with mock.patch("opentrons.hardware_control.ot3api.deck_from_machine") as dfm_mock:
         dfm_mock.return_value = {OT3Axis.X: 20}
         await ot3_hardware._home([OT3Axis.X])
-
-        mock_home.assert_called_once_with([OT3Axis.X])
+        assert ot3_hardware.gantry_load == GantryLoad.LOW_THROUGHPUT
+        mock_home.assert_called_once_with([OT3Axis.X], GantryLoad.LOW_THROUGHPUT)
         assert dfm_mock.call_count == 2
         dfm_mock.assert_called_with(
             mock_home.return_value,
-            ot3_hardware._transforms.deck_calibration.attitude,
-            ot3_hardware._transforms.carriage_offset,
+            ot3_hardware._robot_calibration.deck_calibration.attitude,
+            ot3_hardware._robot_calibration.carriage_offset,
         )
     assert ot3_hardware._current_position[OT3Axis.X] == 20
 
@@ -106,7 +107,8 @@ async def test_home_unmet(ot3_hardware, mock_home):
     mock_home.side_effect = MoveConditionNotMet()
     with pytest.raises(MoveConditionNotMet):
         await ot3_hardware.home([OT3Axis.X])
-    mock_home.assert_called_once_with([OT3Axis.X])
+    assert ot3_hardware.gantry_load == GantryLoad.LOW_THROUGHPUT
+    mock_home.assert_called_once_with([OT3Axis.X], GantryLoad.LOW_THROUGHPUT)
     assert ot3_hardware._current_position == {}
 
 

@@ -21,6 +21,9 @@ module.exports = {
     },
   },
   plugins: [
+    // ensure TS files are transpiled prior to running additional class-related plugins
+    // allows use of declare keyword
+    ['@babel/plugin-transform-typescript', { allowDeclareFields: true }],
     '@babel/plugin-proposal-class-properties',
     // ensure opentrons packages written in TS resolve to source code in
     // unit tests and bundling by rewriting import statements with babel
@@ -34,6 +37,7 @@ module.exports = {
           '^@opentrons/step-generation$': `@opentrons/step-generation/src/index.ts`,
           '^@opentrons/api-client$': `@opentrons/api-client/src/index.ts`,
           '^@opentrons/react-api-client$': `@opentrons/react-api-client/src/index.ts`,
+          '^@opentrons/usb-bridge/node-client$': `@opentrons/usb-bridge/node-client/src/index.ts`,
         },
       },
     ],

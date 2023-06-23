@@ -5,7 +5,7 @@ import math
 from typing import List, Optional, Tuple
 
 from opentrons.protocol_api.labware import Well
-from opentrons.protocol_api import ProtocolContext, InstrumentContext
+from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.gravimetric.helpers import (
     well_is_reservoir,
@@ -193,13 +193,15 @@ class LiquidContent:
 
 
 def _get_actual_volume_change_in_well(
-    pipette: InstrumentContext, well: Well, volume: Optional[float]
+    well: Well,
+    volume: Optional[float],
+    channels: int = 1,
 ) -> Optional[float]:
     """Get the actual volume change in well, depending on if the pipette is single or multi."""
     if volume is None:
         return None
     if well_is_reservoir(well):
-        volume *= pipette.channels
+        volume *= float(channels)
     return volume
 
 
@@ -302,17 +304,21 @@ class LiquidTracker:
 
     def get_before_and_after_heights(
         self,
-        pipette: InstrumentContext,
         well: Well,
         aspirate: Optional[float] = None,
         dispense: Optional[float] = None,
+        channels: int = 1,
     ) -> Tuple[float, float]:
         """Get before and after heights."""
         actual_aspirate_amount = _get_actual_volume_change_in_well(
-            pipette, well, volume=aspirate
+            well,
+            volume=aspirate,
+            channels=channels,
         )
         actual_dispense_amount = _get_actual_volume_change_in_well(
-            pipette, well, volume=dispense
+            well,
+            volume=dispense,
+            channels=channels,
         )
         before = self.get_liquid_height(well)
         after = self.get_liquid_height(
@@ -324,19 +330,23 @@ class LiquidTracker:
 
     def update_affected_wells(
         self,
-        pipette: InstrumentContext,
         well: Well,
         aspirate: Optional[float] = None,
         dispense: Optional[float] = None,
+        channels: int = 1,
     ) -> None:
         """Update affected wells."""
         actual_aspirate_amount = _get_actual_volume_change_in_well(
-            pipette, well, volume=aspirate
+            well,
+            volume=aspirate,
+            channels=channels,
         )
         actual_dispense_amount = _get_actual_volume_change_in_well(
-            pipette, well, volume=dispense
+            well,
+            volume=dispense,
+            channels=channels,
         )
-        for w in get_list_of_wells_affected(pipette, well):
+        for w in get_list_of_wells_affected(well, channels):
             self.update_well_volume(
                 w,
                 after_aspirate=actual_aspirate_amount,

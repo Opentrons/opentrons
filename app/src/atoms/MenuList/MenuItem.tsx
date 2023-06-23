@@ -17,7 +17,8 @@ export const MenuItem = styled.button<ButtonProps>`
   font-size: ${TYPOGRAPHY.fontSizeP};
   background-color: ${COLORS.transparent};
   color: ${COLORS.darkBlackEnabled};
-  padding: ${SPACING.spacing3} 0.75rem ${SPACING.spacing3} 0.75rem;
+  padding: ${SPACING.spacing8} ${SPACING.spacing12} ${SPACING.spacing8}
+    ${SPACING.spacing12};
 
   &:hover,
   &:active {
@@ -37,8 +38,8 @@ export const MenuItem = styled.button<ButtonProps>`
       isAlert ? COLORS.errorEnabled : COLORS.transparent};
     color: ${({ isAlert }) =>
       isAlert ? COLORS.white : COLORS.darkBlackEnabled};
-    padding: 1.625rem 1.5rem;
-    height: 4.875rem;
+    padding: ${SPACING.spacing24};
+    height: 5.5rem;
     line-height: ${TYPOGRAPHY.lineHeight36};
     &:hover,
     &:active {

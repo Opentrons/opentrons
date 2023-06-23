@@ -19,6 +19,7 @@ from .service.labware.router import router as labware_router
 from .service.tip_length.router import router as tl_router
 from .service.notifications.router import router as notifications_router
 from .authentication import check_auth_token_header, AuthenticationFailed
+from .subsystems.router import subsystems_router
 
 router = APIRouter()
 
@@ -148,4 +149,10 @@ router.include_router(
     responses={
         status.HTTP_403_FORBIDDEN: {"model": ErrorBody[AuthenticationFailed]},
     },
+)
+
+router.include_router(
+    router=subsystems_router,
+    tags=["Subsystem Management"],
+    dependencies=[Depends(check_version_header)],
 )

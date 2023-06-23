@@ -20,7 +20,7 @@ export function ODDBackButton(
       alignItems={ALIGN_CENTER}
       fontSize={TYPOGRAPHY.fontSize38}
       fontWeight={TYPOGRAPHY.fontWeightBold}
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
       lineHeight={TYPOGRAPHY.lineHeight48}
     >
       <Btn onClick={onClick}>
@@ -28,7 +28,7 @@ export function ODDBackButton(
           color={COLORS.darkBlack100}
           data-testid="back_icon"
           name="back"
-          width="2.5rem"
+          width="3rem"
         />
       </Btn>
       {label}

@@ -1,11 +1,13 @@
 import { Reducer, combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { Timeline } from '@opentrons/step-generation'
+import { OT2_ROBOT_TYPE, RobotType } from '@opentrons/shared-data'
 import { Action } from '../../types'
-import { FileMetadataFields, SaveFileMetadataAction } from '../types'
 import { LoadFileAction, NewProtocolFields } from '../../load-file'
-import { ComputeRobotStateTimelineSuccessAction } from '../actions'
 import { Substeps } from '../../steplist/types'
+import { ComputeRobotStateTimelineSuccessAction } from '../actions'
+import { FileMetadataFields, SaveFileMetadataAction } from '../types'
+
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   {
     COMPUTE_ROBOT_STATE_TIMELINE_REQUEST: () => true,
@@ -70,6 +72,8 @@ function newProtocolMetadata(
   return {
     ...defaultFields,
     protocolName: action.payload.name || '',
+    description: action.payload.description || '',
+    author: action.payload.organizationOrAuthor || '',
     created: Date.now(),
     lastModified: null,
   }
@@ -91,12 +95,26 @@ const fileMetadata = handleActions(
   },
   defaultFields
 )
+
+// on which robot type the current protocol file is meant to execute
+const robotTypeReducer = (
+  state: RobotType = OT2_ROBOT_TYPE,
+  action: any
+): RobotType => {
+  if (action.type === 'CREATE_NEW_PROTOCOL') {
+    return action.payload.robotType
+  } else if (action.type === 'LOAD_FILE') {
+    return action.payload.file.robot.model
+  }
+  return state
+}
 export interface RootState {
   computedRobotStateTimeline: Timeline
   computedSubsteps: Substeps
   currentProtocolExists: boolean
   fileMetadata: FileMetadataFields
   timelineIsBeingComputed: boolean
+  robotType: RobotType
 }
 const _allReducers = {
   computedRobotStateTimeline,
@@ -104,6 +122,7 @@ const _allReducers = {
   currentProtocolExists,
   fileMetadata,
   timelineIsBeingComputed,
+  robotType: robotTypeReducer,
 }
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers

@@ -13,16 +13,12 @@ from tests.integration.protocol_files import get_py_protocol, get_bundled_data
 
 
 async def test_upload_protocols_with_bundled_data(
-    session_server_host: str,
-    session_server_port: str,
+    ot2_server_base_url: str,
     session_system_server_port: str,
 ) -> None:
     """Test uploading data files with protocol."""
     async with RobotClient.make(
-        host=session_server_host,
-        port=session_server_port,
-        version="*",
-        system_server_port=session_system_server_port,
+        base_url=ot2_server_base_url, version="*", system_server_base_url=f"http://localhost:{session_system_server_port}"
     ) as robot_client:
         await robot_client.get_auth_token()
         with get_py_protocol(secrets.token_urlsafe(16)) as protocol:

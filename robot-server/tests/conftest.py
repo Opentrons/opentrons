@@ -8,6 +8,7 @@ from mock import MagicMock
 from pathlib import Path
 from typing import Callable, Generator, Iterator, cast
 from typing_extensions import NoReturn
+from decoy import Decoy
 
 from sqlalchemy.engine import Engine as SQLEngine
 
@@ -34,7 +35,6 @@ from robot_server.hardware import get_hardware
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 from robot_server.service.session.manager import SessionManager
 from robot_server.persistence import get_sql_engine, create_sql_engine
-from .integration.robot_client import RobotClient
 from robot_server.health.router import ComponentVersions, get_versions
 from robot_server.authentication import check_auth_token_header
 
@@ -47,6 +47,14 @@ async def always_raise() -> NoReturn:
 
 
 app.include_router(test_router)
+
+
+@pytest.fixture()
+def hardware_api(decoy: Decoy) -> HardwareControlAPI:
+    """Return a mock in the shape of a HardwareControlAPI."""
+    # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
+    # should pass in some sort of actual, valid HardwareAPI instead of a mock
+    return decoy.mock(cls=API)
 
 
 @pytest.fixture(autouse=True)
@@ -175,67 +183,6 @@ def server_temp_directory() -> Iterator[str]:
     os.environ["OT_API_CONFIG_DIR"] = new_dir
     config.reload()
     yield new_dir
-
-
-@pytest.fixture()
-def clean_server_state() -> Iterator[None]:
-    # async fn that does the things below
-    # make a robot client
-    # delete protocols
-    async def _clean_server_state() -> None:
-        port = "31950"
-        system_server_port = "32950"
-        async with RobotClient.make(
-            host="http://localhost",
-            port=port,
-            version="*",
-            system_server_port=system_server_port,
-        ) as robot_client:
-            await robot_client.get_auth_token()
-            await _delete_all_runs(robot_client)
-            await _delete_all_protocols(robot_client)
-
-    yield
-    asyncio.run(_clean_server_state())
-
-
-# TODO(jbl 2023-05-01) merge this with ot3_run_server, along with clean_server_state and run_server
-@pytest.fixture()
-def ot3_clean_server_state() -> Iterator[None]:
-    # async fn that does the things below
-    # make a robot client
-    # delete protocols
-    async def _clean_server_state() -> None:
-        port = "31960"
-        system_server_port = "32950"
-        async with RobotClient.make(
-            host="http://localhost",
-            port=port,
-            version="*",
-            system_server_port=system_server_port,
-        ) as robot_client:
-            await robot_client.get_auth_token()
-            await _delete_all_runs(robot_client)
-            await _delete_all_protocols(robot_client)
-
-    yield
-    asyncio.run(_clean_server_state())
-
-
-async def _delete_all_runs(robot_client: RobotClient) -> None:
-    """Delete all runs on the robot server."""
-    response = await robot_client.get_runs()
-    run_ids = [r["id"] for r in response.json()["data"]]
-    for run_id in run_ids:
-        await robot_client.delete_run(run_id)
-
-
-async def _delete_all_protocols(robot_client: RobotClient) -> None:
-    """Delete all protocols on the robot server"""
-    response = await robot_client.get_protocols()
-    protocol_ids = [p["id"] for p in response.json()["data"]]
-    for protocol_id in protocol_ids:
-        await robot_client.delete_protocol(protocol_id)
 
 
 @pytest.fixture

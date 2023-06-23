@@ -16,10 +16,10 @@ import {
   TYPOGRAPHY,
   LabwareRender,
 } from '@opentrons/components'
-import { Modal as OddModal } from '../../../../molecules/Modal/OnDeviceDisplay/Modal'
+import { Modal } from '../../../../molecules/Modal'
 import { getIsOnDevice } from '../../../../redux/config'
 import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { Modal } from '../../../../molecules/Modal'
+import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
 import { getSlotLabwareName } from '../utils/getSlotLabwareName'
 import { getSlotLabwareDefinition } from '../utils/getSlotLabwareDefinition'
@@ -124,7 +124,7 @@ export const LiquidsLabwareDetailsModal = (
   })
 
   return isOnDevice ? (
-    <OddModal
+    <Modal
       modalSize="large"
       onOutsideClick={closeModal}
       header={{
@@ -139,12 +139,12 @@ export const LiquidsLabwareDetailsModal = (
         css={HIDE_SCROLLBAR}
         minWidth="10.313rem"
         overflowY="scroll"
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
       >
         {liquidCard}
       </Flex>
       <Flex width="38.75rem">
-        <Flex marginLeft={SPACING.spacing6}>
+        <Flex marginLeft={SPACING.spacing32}>
           <svg
             viewBox="0.5 2.2 127 78"
             height="100%"
@@ -155,9 +155,9 @@ export const LiquidsLabwareDetailsModal = (
           </svg>
         </Flex>
       </Flex>
-    </OddModal>
+    </Modal>
   ) : (
-    <Modal
+    <LegacyModal
       onClose={closeModal}
       closeOnOutsideClick
       title={labwareName}
@@ -165,19 +165,19 @@ export const LiquidsLabwareDetailsModal = (
       width="45rem"
     >
       <Box
-        paddingX={SPACING.spacing4}
-        paddingTop={SPACING.spacing4}
+        paddingX={SPACING.spacing16}
+        paddingTop={SPACING.spacing16}
         backgroundColor={COLORS.fundamentalsBackground}
         height="28.125rem"
       >
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             maxHeight="27.125rem"
             overflowY="auto"
             css={HIDE_SCROLLBAR}
             minWidth="10.313rem"
-            gridGap={SPACING.spacing3}
+            gridGap={SPACING.spacing8}
           >
             {liquidCard}
           </Flex>
@@ -185,8 +185,8 @@ export const LiquidsLabwareDetailsModal = (
             flexDirection={DIRECTION_COLUMN}
             width="100%"
             maxHeight="25rem"
-            marginLeft={SPACING.spacing4}
-            marginTop={SPACING.spacing3}
+            marginLeft={SPACING.spacing16}
+            marginTop={SPACING.spacing8}
           >
             <Flex flexDirection={DIRECTION_ROW}>
               <Flex flexDirection={DIRECTION_COLUMN}>
@@ -207,7 +207,7 @@ export const LiquidsLabwareDetailsModal = (
               </Flex>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
-                marginLeft={SPACING.spacing5}
+                marginLeft={SPACING.spacing24}
               >
                 <StyledText
                   as="h6"
@@ -233,6 +233,6 @@ export const LiquidsLabwareDetailsModal = (
           </Flex>
         </Flex>
       </Box>
-    </Modal>
+    </LegacyModal>
   )
 }

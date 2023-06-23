@@ -13,7 +13,7 @@ import {
   useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { getIsOnDevice } from '../../redux/config'
@@ -246,9 +246,9 @@ export const GripperWizard = (
           {modalContent}
         </Flex>
       ) : (
-        <ModalShell width="48rem" header={wizardHeader}>
+        <LegacyModalShell width="48rem" header={wizardHeader}>
           {modalContent}
-        </ModalShell>
+        </LegacyModalShell>
       )}
     </Portal>
   )

@@ -5,7 +5,20 @@ import struct
 from opentrons_hardware.firmware_bindings.constants import PipetteName
 from opentrons_hardware.instruments.serial_utils import ensure_serial_length
 
-SERIAL_RE = re.compile("^(?P<name>P.{3,3})V(?P<model>[0-9]{2,2})(?P<code>.{,12})$")
+# Separate string into 3 named groups:
+#   - name P any
+#   - model
+#   - code
+
+RAW_SERIAL_STRING = (
+    "^"  # start of string
+    r"(?P<name>P[\w\d]{3})"  # "name" group starts with P and contains exactly 3 alphanumeric characters
+    "V"  # The character V
+    r"(?P<model>\d{2})"  # "model" group contains exactly 2 digits
+    r"(?P<code>[\w\d]{0,12})"  # "code" group contains 0 to 12 inclusive alphanumeric characters
+    "$"  # end of string
+)
+SERIAL_RE = re.compile(RAW_SERIAL_STRING)
 
 NAME_LOOKUP: Dict[str, PipetteName] = {
     "P1KS": PipetteName.p1000_single,

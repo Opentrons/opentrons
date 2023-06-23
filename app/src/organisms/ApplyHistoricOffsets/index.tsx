@@ -15,7 +15,10 @@ import {
   CheckboxField,
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
-import { ModalHeader, ModalShell } from '../../molecules/Modal'
+import {
+  LegacyModalHeader,
+  LegacyModalShell,
+} from '../../molecules/LegacyModal'
 import { PythonLabwareOffsetSnippet } from '../../molecules/PythonLabwareOffsetSnippet'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
 import { StyledText } from '../../atoms/text'
@@ -89,7 +92,7 @@ export function ApplyHistoricOffsets(
         disabled={noOffsetData}
         isIndeterminate={noOffsetData}
         label={
-          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing2}>
+          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
             <Icon size={SIZE_1} name="reticle" />
             <StyledText as="p">
               {t(noOffsetData ? 'no_offset_data' : 'apply_offset_data')}
@@ -105,10 +108,10 @@ export function ApplyHistoricOffsets(
       </Link>
       {showOffsetDataModal ? (
         <Portal level="top">
-          <ModalShell
+          <LegacyModalShell
             maxWidth="40rem"
             header={
-              <ModalHeader
+              <LegacyModalHeader
                 title={t(
                   noOffsetData
                     ? 'what_is_labware_offset_data'
@@ -122,8 +125,8 @@ export function ApplyHistoricOffsets(
               flexDirection={DIRECTION_COLUMN}
               padding={
                 noOffsetData
-                  ? `${SPACING.spacing4} ${SPACING.spacing6} ${SPACING.spacing6}`
-                  : SPACING.spacing6
+                  ? `${SPACING.spacing16} ${SPACING.spacing32} ${SPACING.spacing32}`
+                  : SPACING.spacing32
               }
             >
               {noOffsetData ? (
@@ -132,7 +135,7 @@ export function ApplyHistoricOffsets(
                   i18nKey={'robot_has_no_offsets_from_previous_runs'}
                   components={{
                     block: (
-                      <StyledText as="p" marginBottom={SPACING.spacing3} />
+                      <StyledText as="p" marginBottom={SPACING.spacing8} />
                     ),
                   }}
                 />
@@ -142,7 +145,7 @@ export function ApplyHistoricOffsets(
                 </StyledText>
               )}
               <ExternalLink
-                marginTop={noOffsetData ? '0px' : SPACING.spacing3}
+                marginTop={noOffsetData ? '0px' : SPACING.spacing8}
                 href={HOW_OFFSETS_WORK_SUPPORT_URL}
               >
                 {t('see_how_offsets_work')}
@@ -161,7 +164,7 @@ export function ApplyHistoricOffsets(
                 )
               ) : null}
             </Flex>
-          </ModalShell>
+          </LegacyModalShell>
         </Portal>
       ) : null}
     </Flex>

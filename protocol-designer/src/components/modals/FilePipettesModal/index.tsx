@@ -16,6 +16,11 @@ import {
   FormGroup,
   InputField,
   OutlineButton,
+  DropdownField,
+  Flex,
+  SPACING,
+  DIRECTION_COLUMN,
+  ALIGN_STRETCH,
 } from '@opentrons/components'
 import {
   HEATERSHAKER_MODULE_V1,
@@ -28,6 +33,10 @@ import {
   ModuleModel,
   getPipetteNameSpecs,
   PipetteName,
+  MAGNETIC_BLOCK_V1,
+  MAGNETIC_BLOCK_TYPE,
+  OT2_ROBOT_TYPE,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -76,14 +85,23 @@ export interface Props {
   }) => unknown
   moduleRestrictionsDisabled?: boolean | null
 }
-
 const initialFormState: FormState = {
-  fields: { name: '' },
+  fields: {
+    name: '',
+    robotType: OT2_ROBOT_TYPE,
+    description: '',
+    organizationOrAuthor: '',
+  },
   pipettesByMount: {
     left: { pipetteName: '', tiprackDefURI: null },
     right: { pipetteName: '', tiprackDefURI: null },
   },
   modulesByType: {
+    [MAGNETIC_BLOCK_TYPE]: {
+      onDeck: false,
+      model: MAGNETIC_BLOCK_V1,
+      slot: '1',
+    },
     [HEATERSHAKER_MODULE_TYPE]: {
       onDeck: false,
       model: HEATERSHAKER_MODULE_V1,
@@ -150,6 +168,11 @@ const validationSchema = Yup.object().shape({
   }),
 })
 
+const ROBOT_TYPE_OPTIONS = [
+  { value: OT2_ROBOT_TYPE, name: 'OT2' },
+  { value: FLEX_ROBOT_TYPE, name: 'Opentrons Flex' },
+]
+
 // TODO: Ian 2019-03-15 use i18n for labels
 export class FilePipettesModal extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -171,7 +194,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
   ) => boolean = (modules, moduleType) => {
     const formModule = modules[moduleType]
     const crashableModuleOnDeck =
-      formModule.onDeck && formModule.model
+      formModule?.onDeck && formModule?.model
         ? isModuleWithCollisionIssue(formModule.model)
         : false
 
@@ -339,9 +362,25 @@ export class FilePipettesModal extends React.Component<Props, State> {
                       <form onSubmit={handleSubmit}>
                         {showProtocolFields && (
                           <div className={styles.protocol_file_group}>
-                            <h2 className={styles.new_file_modal_title}>
-                              {i18n.t('modal.new_protocol.title.PROTOCOL_FILE')}
-                            </h2>
+                            <Flex gridGap={SPACING.spacing16}>
+                              <h2 className={styles.new_file_modal_title}>
+                                {i18n.t(
+                                  'modal.new_protocol.title.PROTOCOL_FILE'
+                                )}
+                              </h2>
+                              <Flex
+                                flexDirection={DIRECTION_COLUMN}
+                                width="10rem"
+                                alignItems={ALIGN_STRETCH}
+                              >
+                                <DropdownField
+                                  options={ROBOT_TYPE_OPTIONS}
+                                  onChange={handleChange}
+                                  value={values.fields.robotType}
+                                  name="fields.robotType"
+                                />
+                              </Flex>
+                            </Flex>
                             <FormGroup
                               className={formStyles.stacked_row}
                               label="Name"
@@ -380,6 +419,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                           // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
                           touched={touched.pipettesByMount ?? null}
                           onSetFieldTouched={setFieldTouched}
+                          robotType={values.fields.robotType}
                         />
 
                         {this.props.showModulesFields && (

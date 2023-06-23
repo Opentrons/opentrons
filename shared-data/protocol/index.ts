@@ -16,4 +16,5 @@ export type JsonProtocolFile =
   | Readonly<ProtocolFileV4<{}>>
   | Readonly<ProtocolFileV5<{}>>
 
+//  TODO(jr, 6/21/23): update to schemaV7
 export * from './types/schemaV6'

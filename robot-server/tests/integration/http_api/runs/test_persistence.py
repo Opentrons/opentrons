@@ -32,8 +32,7 @@ async def client_and_server(
 ) -> AsyncGenerator[ClientServerFixture, None]:
     """Get a dev server and a client to that server."""
     async with RobotClient.make(
-        host="http://localhost",
-        port=port,
+        base_url=f"http://localhost:{port}",
         version="*",
         system_server_port=session_system_server_port,
     ) as client:

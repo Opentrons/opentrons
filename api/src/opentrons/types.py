@@ -1,7 +1,9 @@
 from __future__ import annotations
 import enum
 from math import sqrt, isclose
-from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union
+from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union, List
+
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from .protocols.api_support.labware_like import LabwareLike
 
@@ -9,6 +11,7 @@ if TYPE_CHECKING:
     from .protocol_api.labware import Labware, Well
     from .protocol_api.core.legacy.module_geometry import ModuleGeometry
     from .protocol_api.module_contexts import ModuleContext
+    from .protocol_api._types import OffDeckType
 
 
 class PipetteNotAttachedError(KeyError):
@@ -64,7 +67,14 @@ class Point(NamedTuple):
 
 
 LocationLabware = Union[
-    "Labware", "Well", str, "ModuleGeometry", LabwareLike, None, "ModuleContext"
+    "Labware",
+    "Well",
+    str,
+    "ModuleGeometry",
+    LabwareLike,
+    None,
+    "OffDeckType",
+    "ModuleContext",
 ]
 
 
@@ -94,8 +104,21 @@ class Location:
        of each item.
     """
 
-    def __init__(self, point: Point, labware: LocationLabware):
+    def __init__(
+        self,
+        point: Point,
+        labware: Union[
+            "Labware",
+            "Well",
+            str,
+            "ModuleGeometry",
+            LabwareLike,
+            None,
+            "ModuleContext",
+        ],
+    ):
         self._point = point
+        self._given_labware = labware
         self._labware = LabwareLike(labware)
 
     # todo(mm, 2021-10-01): Figure out how to get .point and .labware to show up
@@ -144,7 +167,8 @@ class Location:
             >>> assert loc.point == Point(1, 1, 1)  # True
 
         """
-        return Location(point=self.point + point, labware=self._labware.object)
+
+        return Location(point=self.point + point, labware=self._given_labware)
 
     def __repr__(self) -> str:
         return f"Location(point={repr(self._point)}, labware={self._labware})"
@@ -154,54 +178,67 @@ class Location:
 class Mount(enum.Enum):
     LEFT = enum.auto()
     RIGHT = enum.auto()
+    EXTENSION = enum.auto()
 
     def __str__(self) -> str:
         return self.name
 
     @classmethod
+    def ot2_mounts(cls) -> List["Mount"]:
+        return [Mount.LEFT, Mount.RIGHT]
+
+    @classmethod
     def string_to_mount(cls, mount: str) -> "Mount":
         if mount == "right":
             return cls.RIGHT
-        else:
+        elif mount == "left":
             return cls.LEFT
+        else:
+            return cls.EXTENSION
 
 
 class MountType(str, enum.Enum):
     LEFT = "left"
     RIGHT = "right"
+    EXTENSION = "extension"
 
+    # TODO (spp, 2023-05-04): we should deprecate this and instead create an 'other_pipette_mount' method
     def other_mount(self) -> MountType:
         return MountType.LEFT if self is MountType.RIGHT else MountType.RIGHT
 
     def to_hw_mount(self) -> Mount:
-        return Mount.LEFT if self is MountType.LEFT else Mount.RIGHT
+        return {
+            MountType.LEFT: Mount.LEFT,
+            MountType.RIGHT: Mount.RIGHT,
+            MountType.EXTENSION: Mount.EXTENSION,
+        }[self]
+
+    @staticmethod
+    def from_hw_mount(mount: Mount) -> MountType:
+        """Convert from Mount to MountType."""
+        mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
+        return mount_map[mount]
 
 
+class PipetteMountType(enum.Enum):
+    LEFT = "left"
+    RIGHT = "right"
+    COMBINED = "combined"  # added for 96-channel. Remove if not required
+
+    def to_mount_type(self) -> MountType:
+        return {
+            PipetteMountType.LEFT: MountType.LEFT,
+            PipetteMountType.RIGHT: MountType.RIGHT,
+        }[self]
+
+
+# What is this used for? Can we consolidate this into MountType?
+# If not, can we change the 'GRIPPER' mount name to 'EXTENSION' so that it's
+# consistent with all user-facing mount names?
 class OT3MountType(str, enum.Enum):
     LEFT = "left"
     RIGHT = "right"
     GRIPPER = "gripper"
-
-
-DECK_COORDINATE_TO_SLOT_NAME = {
-    "D1": "1",
-    "D2": "2",
-    "D3": "3",
-    "C1": "4",
-    "C2": "5",
-    "C3": "6",
-    "B1": "7",
-    "B2": "8",
-    "B3": "9",
-    "A1": "10",
-    "A2": "11",
-    "A3": "12",
-}
-
-DECK_SLOT_NAME_TO_COORDINATE = {
-    slot_name: coordinate
-    for coordinate, slot_name in DECK_COORDINATE_TO_SLOT_NAME.items()
-}
 
 
 # TODO(mc, 2020-11-09): this makes sense in shared-data or other common
@@ -210,6 +247,7 @@ DECK_SLOT_NAME_TO_COORDINATE = {
 class DeckSlotName(enum.Enum):
     """Deck slot identifiers."""
 
+    # OT-2:
     SLOT_1 = "1"
     SLOT_2 = "2"
     SLOT_3 = "3"
@@ -223,18 +261,64 @@ class DeckSlotName(enum.Enum):
     SLOT_11 = "11"
     FIXED_TRASH = "12"
 
+    # OT-3:
+    SLOT_A1 = "A1"
+    SLOT_A2 = "A2"
+    SLOT_A3 = "A3"
+    SLOT_B1 = "B1"
+    SLOT_B2 = "B2"
+    SLOT_B3 = "B3"
+    SLOT_C1 = "C1"
+    SLOT_C2 = "C2"
+    SLOT_C3 = "C3"
+    SLOT_D1 = "D1"
+    SLOT_D2 = "D2"
+    SLOT_D3 = "D3"
+
     @classmethod
     def from_primitive(cls, value: DeckLocation) -> DeckSlotName:
         str_val = str(value).upper()
-        if str_val in DECK_COORDINATE_TO_SLOT_NAME:
-            str_val = DECK_COORDINATE_TO_SLOT_NAME[str_val]
         return cls(str_val)
 
+    # TODO(mm, 2023-05-08):
+    # Migrate callers off of this method. https://opentrons.atlassian.net/browse/RLAB-345
     def as_int(self) -> int:
-        return int(self.value)
+        """Return this deck slot as an OT-2-style integer.
 
-    def as_coordinate(self) -> str:
-        return DECK_SLOT_NAME_TO_COORDINATE[self.value]
+        For example, `SLOT_5.as_int()` and `SLOT_C2.as_int()` are both `5`.
+
+        Deprecated:
+            This will not make sense when the OT-3 has staging area slots.
+        """
+        return int(self.to_ot2_equivalent().value)
+
+    def to_ot2_equivalent(self) -> DeckSlotName:
+        """Return the OT-2 deck slot that's in the same place as this one.
+
+        For example, `SLOT_C2.to_ot3_equivalent()` is `SLOT_5`.
+
+        If this is already an OT-2 deck slot, returns itself.
+        """
+        return _ot3_to_ot2.get(self, self)
+
+    def to_ot3_equivalent(self) -> DeckSlotName:
+        """Return the OT-3 deck slot that's in the same place as this one.
+
+        For example, `SLOT_5.to_ot3_equivalent()` is `SLOT_C2`.
+
+        If this is already an OT-3 deck slot, returns itself.
+        """
+        return _ot2_to_ot3.get(self, self)
+
+    def to_equivalent_for_robot_type(self, robot_type: RobotType) -> DeckSlotName:
+        """Return the deck slot, for the given robot type, that's in the same place as this one.
+
+        See `to_ot2_equivalent()` and `to_ot3_equivalent()`.
+        """
+        if robot_type == "OT-2 Standard":
+            return self.to_ot2_equivalent()
+        elif robot_type == "OT-3 Standard":
+            return self.to_ot3_equivalent()
 
     @property
     def id(self) -> str:
@@ -252,6 +336,25 @@ class DeckSlotName(enum.Enum):
         For explicitness, prefer using `.id` instead.
         """
         return self.id
+
+
+_slot_equivalencies = [
+    (DeckSlotName.SLOT_1, DeckSlotName.SLOT_D1),
+    (DeckSlotName.SLOT_2, DeckSlotName.SLOT_D2),
+    (DeckSlotName.SLOT_3, DeckSlotName.SLOT_D3),
+    (DeckSlotName.SLOT_4, DeckSlotName.SLOT_C1),
+    (DeckSlotName.SLOT_5, DeckSlotName.SLOT_C2),
+    (DeckSlotName.SLOT_6, DeckSlotName.SLOT_C3),
+    (DeckSlotName.SLOT_7, DeckSlotName.SLOT_B1),
+    (DeckSlotName.SLOT_8, DeckSlotName.SLOT_B2),
+    (DeckSlotName.SLOT_9, DeckSlotName.SLOT_B3),
+    (DeckSlotName.SLOT_10, DeckSlotName.SLOT_A1),
+    (DeckSlotName.SLOT_11, DeckSlotName.SLOT_A2),
+    (DeckSlotName.FIXED_TRASH, DeckSlotName.SLOT_A3),
+]
+
+_ot2_to_ot3 = {ot2: ot3 for ot2, ot3 in _slot_equivalencies}
+_ot3_to_ot2 = {ot3: ot2 for ot2, ot3 in _slot_equivalencies}
 
 
 class TransferTipPolicy(enum.Enum):

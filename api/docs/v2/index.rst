@@ -11,6 +11,7 @@ Welcome
     versioning
     new_labware
     new_modules
+    deck_slots
     new_pipette
     new_atomic_commands
     new_complex_commands

@@ -57,16 +57,16 @@ const BUTTON_GROUP_STYLES = css`
 `
 
 const ACTIVE_STYLE = css`
-  padding-left: ${SPACING.spacing3};
-  padding-right: ${SPACING.spacing3};
+  padding-left: ${SPACING.spacing8};
+  padding-right: ${SPACING.spacing8};
   background-color: ${COLORS.blueEnabled};
   color: ${COLORS.white};
   pointer-events: none;
 `
 
 const DEFAULT_STYLE = css`
-  padding-left: ${SPACING.spacing3};
-  padding-right: ${SPACING.spacing3};
+  padding-left: ${SPACING.spacing8};
+  padding-right: ${SPACING.spacing8};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
   border: 1px ${COLORS.medGreyEnabled} solid;

@@ -54,7 +54,6 @@ describe('RunFailedModal', () => {
     props = {
       runId: RUN_ID,
       setShowRunFailedModal: mockFn,
-      failedStep: 1,
       errors: mockErrors,
     }
     mockStopRun = jest.fn((_runId, opts) => opts.onSuccess())
@@ -64,9 +63,11 @@ describe('RunFailedModal', () => {
   it('should render text and button', () => {
     const [{ getByText }] = render(props)
     getByText('Run failed')
-    getByText('ExceptionInProtocolError: error-1000 at protocol step 1')
     getByText(
       'ProtocolEngineError [line 16]: ModuleNotAttachedError: No available'
+    )
+    getByText(
+      'Download the run logs from the Opentrons App and send it to support@opentrons.com for assistance.'
     )
     getByText('Close')
   })

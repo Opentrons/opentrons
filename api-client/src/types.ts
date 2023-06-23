@@ -1,7 +1,12 @@
+import type { AxiosRequestConfig } from 'axios'
+import type { ResponsePromise } from './request'
+
 export interface HostConfig {
   hostname: string
+  requestor?: <ResData>(config: AxiosRequestConfig) => ResponsePromise<ResData>
   port?: number | null
   robotName?: string | null
+  token?: string
 }
 
 export interface ResourceLink {

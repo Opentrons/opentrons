@@ -9,6 +9,7 @@ import {
   TYPOGRAPHY,
   COLORS,
   BORDERS,
+  SPACING,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
@@ -41,7 +42,7 @@ export function CalibrationResult({
   }
   return (
     <Flex
-      padding="0.75rem"
+      padding={SPACING.spacing12}
       flexDirection={DIRECTION_ROW}
       css={RESULT_SUMMARY_STYLE}
       justifyContent={JUSTIFY_SPACE_BETWEEN}

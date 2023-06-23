@@ -34,7 +34,7 @@ import { FloatingActionButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { Portal } from '../../App/portal'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareDisplayLocation } from '../CommandText/utils'
@@ -130,7 +130,7 @@ export function ProtocolSetupLabware({
     <>
       <Portal level="top">
         {showDeckMapModal ? (
-          <Modal
+          <LegacyModal
             title={t('map_view')}
             onClose={() => setShowDeckMapModal(false)}
             fullPage
@@ -206,10 +206,10 @@ export function ProtocolSetupLabware({
                 </>
               )}
             </RobotWorkSpace>
-          </Modal>
+          </LegacyModal>
         ) : null}
         {showLabwareDetailsModal && selectedLabware != null ? (
-          <Modal
+          <LegacyModal
             onClose={() => {
               setShowLabwareDetailsModal(false)
               setSelectedLabware(null)
@@ -217,7 +217,7 @@ export function ProtocolSetupLabware({
             minHeight="14.375rem"
             minWidth="43.1875rem"
           >
-            <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing7}>
+            <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing48}>
               <LabwareThumbnail
                 viewBox={` 0 0 ${String(
                   selectedLabware.dimensions.xDimension
@@ -228,7 +228,7 @@ export function ProtocolSetupLabware({
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 alignItems={ALIGN_FLEX_START}
-                gridGap={SPACING.spacing4}
+                gridGap={SPACING.spacing16}
               >
                 <StyledText>
                   {mostRecentAnalysis != null
@@ -247,7 +247,7 @@ export function ProtocolSetupLabware({
                 </StyledText>
               </Flex>
             </Flex>
-          </Modal>
+          </LegacyModal>
         ) : null}
       </Portal>
       <ODDBackButton
@@ -256,8 +256,8 @@ export function ProtocolSetupLabware({
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
-        marginTop={SPACING.spacing6}
+        gridGap={SPACING.spacing8}
+        marginTop={SPACING.spacing32}
       >
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -266,7 +266,7 @@ export function ProtocolSetupLabware({
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight28}
         >
-          <Flex paddingLeft={SPACING.spacing5} width="17.9%">
+          <Flex paddingLeft={SPACING.spacing24} width="17.9%">
             <StyledText>{'Location'}</StyledText>
           </Flex>
           <Flex width="82.1%">
@@ -329,7 +329,7 @@ function LabwareLatch({
     <Flex
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.mediumBlueEnabled}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.borderRadiusSize3}
       color={
         latchStatus === 'opening' || latchStatus === 'closing'
           ? `${COLORS.darkBlack100}${COLORS.opacity60HexCode}`
@@ -337,12 +337,12 @@ function LabwareLatch({
       }
       flexDirection={DIRECTION_COLUMN}
       fontSize={TYPOGRAPHY.fontSize22}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       lineHeight={TYPOGRAPHY.lineHeight28}
       minWidth="11.0625rem"
       onClick={toggleLatch}
-      padding="0.75rem"
+      padding={SPACING.spacing12}
     >
       <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('labware_latch')}
@@ -445,10 +445,10 @@ function RowLabware({
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.light1}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.borderRadiusSize3}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={`${SPACING.spacing4} ${SPACING.spacing5}`}
-      gridGap={SPACING.spacing5}
+      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+      gridGap={SPACING.spacing24}
     >
       <Flex width="7.6875rem">
         <StyledText>
@@ -462,7 +462,7 @@ function RowLabware({
       <Flex
         alignSelf={ALIGN_FLEX_START}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing2}
+        gridGap={SPACING.spacing4}
         width="86%"
       >
         <StyledText

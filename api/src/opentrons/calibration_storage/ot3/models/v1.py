@@ -45,9 +45,9 @@ class TipLengthModel(BaseModel):
         json_decoders = {datetime: lambda obj: datetime.fromisoformat(obj)}
 
 
-class DeckCalibrationModel(BaseModel):
+class BeltCalibrationModel(BaseModel):
     attitude: types.AttitudeMatrix = Field(
-        ..., description="Attitude matrix found from calibration."
+        ..., description="Attitude matrix for belts found from calibration."
     )
     lastModified: datetime = Field(
         ..., description="The last time this deck was calibrated."
@@ -89,7 +89,10 @@ class InstrumentOffsetModel(BaseModel):
 class ModuleOffsetModel(BaseModel):
     offset: Point = Field(..., description="Module offset found from calibration.")
     mount: OT3Mount = Field(..., description="The mount used to calibrate this module.")
-    slot: int = Field(..., description="The slot this module was calibrated in.")
+    slot: str = Field(
+        ...,
+        description=("The slot this module was calibrated in."),
+    )
     module: ModuleType = Field(..., description="The module type of this module.")
     module_id: str = Field(..., description="The unique id of this module.")
     instrument_id: str = Field(

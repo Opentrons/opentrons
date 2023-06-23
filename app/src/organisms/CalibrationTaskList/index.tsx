@@ -16,7 +16,7 @@ import {
 
 import { StatusLabel } from '../../atoms/StatusLabel'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { TaskList } from '../TaskList'
 
 import {
@@ -105,14 +105,14 @@ export function CalibrationTaskList({
   }
 
   return (
-    <Modal
+    <LegacyModal
       title={`${robotName} ${t('calibration_dashboard')}`}
       onClose={() =>
         history.push(`/devices/${robotName}/robot-settings/calibration`)
       }
       fullPage
       backgroundColor={COLORS.fundamentalsBackground}
-      childrenPadding={`${SPACING.spacing4} ${SPACING.spacing5} ${SPACING.spacing5} ${SPACING.spacing2}`}
+      childrenPadding={`${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24} ${SPACING.spacing4}`}
     >
       {showCompletionScreen ? (
         <Flex
@@ -126,11 +126,11 @@ export function CalibrationTaskList({
             alignItems={ALIGN_CENTER}
           >
             <Icon name="ot-check" size="3rem" color={COLORS.successEnabled} />
-            <StyledText as="h1" marginTop={SPACING.spacing5}>
+            <StyledText as="h1" marginTop={SPACING.spacing24}>
               {t('calibrations_complete')}
             </StyledText>
             <PrimaryButton
-              marginTop={SPACING.spacing5}
+              marginTop={SPACING.spacing24}
               onClick={() =>
                 history.push(`/devices/${robotName}/robot-settings/calibration`)
               }
@@ -143,9 +143,9 @@ export function CalibrationTaskList({
         <>
           <Flex
             alignItems={ALIGN_CENTER}
-            gridGap={SPACING.spacing3}
-            padding={SPACING.spacing4}
-            paddingBottom={SPACING.spacing6}
+            gridGap={SPACING.spacing8}
+            padding={SPACING.spacing16}
+            paddingBottom={SPACING.spacing32}
           >
             <StyledText css={TYPOGRAPHY.h2SemiBold}>
               {t('calibration_status')}
@@ -170,6 +170,6 @@ export function CalibrationTaskList({
           />
         </>
       )}
-    </Modal>
+    </LegacyModal>
   )
 }

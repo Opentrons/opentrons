@@ -1,4 +1,5 @@
 import { createSelector } from 'reselect'
+import isIp from 'is-ip'
 import unionBy from 'lodash/unionBy'
 import {
   HEALTH_STATUS_OK,
@@ -33,8 +34,17 @@ export const getAddresses: (state: State) => Address[] = createSelector(
   state => state.manualAddresses,
   getHostStates,
   (manualAddresses, hosts) => {
-    const trackedAddresses = hosts.map(({ ip, port }) => ({ ip, port }))
-    return unionBy(trackedAddresses, manualAddresses, 'ip')
+    const trackedAddresses = hosts.map(({ ip, port, agent }) =>
+      agent != null
+        ? {
+            ip,
+            port,
+            agent,
+          }
+        : { ip, port }
+    )
+    // prefer reference from manualAddresses
+    return unionBy(manualAddresses, trackedAddresses, 'ip')
   }
 )
 
@@ -96,5 +106,10 @@ export function compareHostsByConnectability(
   const bIpPriority = IP_PRIORITY_MATCH.findIndex(re => re.test(b.ip))
   const ipSort = bIpPriority - aIpPriority
 
-  return ipSort
+  if (ipSort !== 0) return ipSort
+
+  // prefer ip hostname
+  const isIpSort = isIp(b.ip) ? 1 : -1
+
+  return isIpSort
 }

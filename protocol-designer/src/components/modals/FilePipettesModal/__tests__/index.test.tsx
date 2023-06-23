@@ -9,6 +9,8 @@ import {
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 import { Modal, InputField, OutlineButton } from '@opentrons/components'
 import { i18n } from '../../../../localization'
@@ -57,6 +59,11 @@ describe('FilePipettesModal', () => {
         onDeck: false,
         slot: '',
         model: HEATERSHAKER_MODULE_V1,
+      },
+      [MAGNETIC_BLOCK_TYPE]: {
+        onDeck: false,
+        slot: '',
+        model: MAGNETIC_BLOCK_V1,
       },
     }
 
@@ -170,7 +177,12 @@ describe('FilePipettesModal', () => {
             slot: initialModuleValues[MAGNETIC_MODULE_TYPE].slot,
           },
         ],
-        newProtocolFields: { name: '' },
+        newProtocolFields: {
+          name: '',
+          robotType: 'OT-2 Standard',
+          description: '',
+          organizationOrAuthor: '',
+        },
         pipettes: [
           {
             mount: 'left',
@@ -215,7 +227,12 @@ describe('FilePipettesModal', () => {
             slot: '9',
           },
         ],
-        newProtocolFields: { name: '' },
+        newProtocolFields: {
+          name: '',
+          robotType: 'OT-2 Standard',
+          description: '',
+          organizationOrAuthor: '',
+        },
         pipettes: [
           {
             mount: 'left',

@@ -2,12 +2,11 @@ test_name: Upload and run a protocol.
 
 marks:
   - usefixtures:
-      - run_server
-      - clean_server_state
+      - ot2_server_base_url
 stages:
   - name: Upload a protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/load_one_labware.py'
@@ -19,7 +18,7 @@ stages:
 
   - name: Create run from protocol
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{ot2_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -51,7 +50,7 @@ stages:
 
   - name: Get the specific run we just created, by its ID, and make sure it's the same
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}'
+      url: '{ot2_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -61,11 +60,11 @@ stages:
 
   - name: Get all runs and make sure our new run is included
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{ot2_server_base_url}/runs'
       method: GET
     response:
       strict:
-        # The run_server fixture has session scope and is is reused across tests.
+        # The ot2_server_base_url fixture has session scope and is is reused across tests.
         # So, other tests may create their own runs that will show up here.
         # Ignore them.
         - json:off
@@ -81,7 +80,7 @@ stages:
 
   - name: Add a labware offset to the run
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/labware_offsets'
+      url: '{ot2_server_base_url}/runs/{run_id}/labware_offsets'
       method: POST
       json:
         data:
@@ -111,7 +110,7 @@ stages:
 
   - name: Play the run
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -134,7 +133,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}'
+      url: '{ot2_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -146,7 +145,7 @@ stages:
 
   - name: Verify commands succeeded with the expected results
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       method: GET
     response:
       status_code: 200
@@ -176,7 +175,7 @@ stages:
 
   - name: Get full details of the load labware command and make sure the offset applied
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands/{load_labware_command_id}'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands/{load_labware_command_id}'
       method: GET
     response:
       status_code: 200
@@ -204,7 +203,7 @@ stages:
 
   - name: Mark the run as not-current and check its final data
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}'
+      url: '{ot2_server_base_url}/runs/{run_id}'
       method: PATCH
       json:
         data:
@@ -261,7 +260,7 @@ stages:
 
   - name: Get the run by its ID one last time and make sure its data is the same
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}'
+      url: '{ot2_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -271,7 +270,7 @@ stages:
 
   - name: Verify underlying protocol cannot be deleted
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
       method: DELETE
     response:
       status_code: 409

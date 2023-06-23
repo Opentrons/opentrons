@@ -48,11 +48,11 @@ export function Snackbar(props: SnackbarProps): JSX.Element {
     <Flex
       css={OPEN_STYLE}
       alignItems={ALIGN_CENTER}
-      borderRadius={BORDERS.size_three}
+      borderRadius={BORDERS.borderRadiusSize3}
       boxShadow={BORDERS.shadowSmall}
       backgroundColor={COLORS.darkBlack100}
-      maxWidth="29.25rem"
-      padding={`${SPACING.spacingM} ${SPACING.spacing5}`}
+      maxWidth="max-content"
+      padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       data-testid="Snackbar"
       {...styleProps}
     >

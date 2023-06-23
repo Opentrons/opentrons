@@ -6,9 +6,9 @@ from .hardware_manager import HardwareManager
 from .chassis_accessory_manager import ChassisAccessoryManager
 from .event_sourcer import EventSourcer
 from .liquid_handler import LiquidHandler
-from .calibratable import Calibratable
+from .calibratable import Calibratable, CalibrationType
 from .configurable import Configurable
-from .motion_controller import MotionController
+from .motion_controller import MotionController, AxisType
 from .instrument_configurer import InstrumentConfigurer
 from .execution_controllable import ExecutionControllable
 from .asyncio_configurable import AsyncioConfigurable
@@ -16,16 +16,16 @@ from .stoppable import Stoppable
 from .simulatable import Simulatable
 
 
-class HardwareControlAPI(
+class HardwareControlInterface(
     ModuleProvider,
     ExecutionControllable,
-    LiquidHandler,
+    LiquidHandler[CalibrationType, AxisType],
     ChassisAccessoryManager,
     HardwareManager,
     AsyncioConfigurable,
     Stoppable,
     Simulatable,
-    Protocol,
+    Protocol[CalibrationType, AxisType],
 ):
     """A mypy protocol for a hardware controller.
 

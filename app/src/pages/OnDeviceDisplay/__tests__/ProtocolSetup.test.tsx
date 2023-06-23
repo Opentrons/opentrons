@@ -18,6 +18,7 @@ import { i18n } from '../../../i18n'
 import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
 import {
   useAttachedModules,
+  useLPCDisabledReason,
   useRunCreatedAtTimestamp,
 } from '../../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -27,14 +28,30 @@ import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
 import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
 import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
+import { mockProtocolModuleInfo } from '../../../organisms/ProtocolSetupInstruments/__fixtures__'
 import {
   useRunControls,
   useRunStatus,
 } from '../../../organisms/RunTimeControl/hooks'
 import { ProtocolSetup } from '../ProtocolSetup'
+
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
+// Mock IntersectionObserver
+class IntersectionObserver {
+  observe = jest.fn()
+  disconnect = jest.fn()
+  unobserve = jest.fn()
+}
+
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: IntersectionObserver,
+})
+
 jest.mock('@opentrons/shared-data/js/helpers')
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
 jest.mock('../../../organisms/Devices/hooks')
 jest.mock(
@@ -46,7 +63,6 @@ jest.mock('../../../organisms/ProtocolSetupModules/utils')
 jest.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../organisms/ProtocolSetupLiquids')
-jest.mock('@opentrons/react-api-client')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -94,10 +110,14 @@ const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrations
 const mockUseLaunchLPC = useLaunchLPC as jest.MockedFunction<
   typeof useLaunchLPC
 >
+const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
+  typeof useLPCDisabledReason
+>
+
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/protocols/:runId/setup/">
+      <Route path="/runs/:runId/setup/">
         <ProtocolSetup />
       </Route>
     </MemoryRouter>,
@@ -135,6 +155,13 @@ const mockEmptyAnalysis = ({
   pipettes: [],
   commands: [],
 } as unknown) as CompletedProtocolAnalysis
+const mockLiquids = [
+  {
+    id: 'm',
+    displayName: 'mock',
+    description: 'Mock liquid',
+  },
+]
 
 const mockPlay = jest.fn()
 
@@ -142,6 +169,7 @@ describe('ProtocolSetup', () => {
   let mockLaunchLPC: jest.Mock
   beforeEach(() => {
     mockLaunchLPC = jest.fn()
+    mockUseLPCDisabledReason.mockReturnValue(null)
     mockUseAttachedModules.mockReturnValue([])
     mockProtocolSetupModules.mockReturnValue(
       <div>Mock ProtocolSetupModules</div>
@@ -212,7 +240,7 @@ describe('ProtocolSetup', () => {
   })
 
   it('should render text, image, and buttons', () => {
-    const [{ getByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
     getByText('Prepare to run')
     getByText('Instruments')
     getByText('Modules')
@@ -222,7 +250,7 @@ describe('ProtocolSetup', () => {
   })
 
   it('should play protocol when click play button', () => {
-    const [{ getByRole }] = render(`/protocols/${RUN_ID}/setup/`)
+    const [{ getByRole }] = render(`/runs/${RUN_ID}/setup/`)
     expect(mockPlay).toBeCalledTimes(0)
     getByRole('button', { name: 'play' }).click()
     expect(mockPlay).toBeCalledTimes(1)
@@ -230,7 +258,7 @@ describe('ProtocolSetup', () => {
 
   it('should launch cancel modal when click close button', () => {
     const [{ getByRole, getByText, queryByText }] = render(
-      `/protocols/${RUN_ID}/setup/`
+      `/runs/${RUN_ID}/setup/`
     )
     expect(queryByText('Mock ConfirmCancelRunModal')).toBeNull()
     getByRole('button', { name: 'close' }).click()
@@ -243,23 +271,42 @@ describe('ProtocolSetup', () => {
       .mockReturnValue(mockRobotSideAnalysis)
     when(mockGetProtocolModulesInfo)
       .calledWith(mockRobotSideAnalysis, ot3StandardDeckDef as any)
-      .mockReturnValue([])
-    const [{ getByText, queryByText }] = render(`/protocols/${RUN_ID}/setup/`)
+      .mockReturnValue(mockProtocolModuleInfo)
+    when(mockGetUnmatchedModulesForProtocol)
+      .calledWith([], mockProtocolModuleInfo)
+      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
+    const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
     expect(queryByText('Mock ProtocolSetupModules')).toBeNull()
     queryByText('Modules')?.click()
     getByText('Mock ProtocolSetupModules')
   })
 
   it('should launch protocol setup liquids screen when click liquids', () => {
-    const [{ getByText, queryByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith(RUN_ID)
+      .mockReturnValue({ ...mockRobotSideAnalysis, liquids: mockLiquids })
+    when(mockGetProtocolModulesInfo)
+      .calledWith(
+        { ...mockRobotSideAnalysis, liquids: mockLiquids },
+        ot3StandardDeckDef as any
+      )
+      .mockReturnValue(mockProtocolModuleInfo)
+    when(mockGetUnmatchedModulesForProtocol)
+      .calledWith([], mockProtocolModuleInfo)
+      .mockReturnValue({ missingModuleIds: [], remainingAttachedModules: [] })
+    const [{ getByText, queryByText }] = render(`/runs/${RUN_ID}/setup/`)
     expect(queryByText('Mock ProtocolSetupLiquids')).toBeNull()
+    getByText('1 initial liquid')
     getByText('Liquids').click()
     getByText('Mock ProtocolSetupLiquids')
   })
 
   it('should launch LPC when clicked', () => {
-    const [{ getByText }] = render(`/protocols/${RUN_ID}/setup/`)
+    mockUseLPCDisabledReason.mockReturnValue(null)
+    const [{ getByText }] = render(`/runs/${RUN_ID}/setup/`)
+    getByText('Recommended')
     getByText('Labware Position Check').click()
     expect(mockLaunchLPC).toHaveBeenCalled()
+    getByText('mock LPC Wizard')
   })
 })

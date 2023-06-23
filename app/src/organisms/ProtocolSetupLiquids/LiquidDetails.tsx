@@ -22,7 +22,7 @@ import type { LabwareByLiquidId, ParsedLiquid } from '@opentrons/api-client'
 const Table = styled('table')`
   table-layout: ${SPACING.spacingAuto};
   width: 100%;
-  border-spacing: 0 ${BORDERS.size_two};
+  border-spacing: 0 ${BORDERS.borderRadiusSize2};
   text-align: ${TYPOGRAPHY.textAlignLeft};
   color: ${COLORS.darkBlack90};
 `
@@ -31,7 +31,7 @@ const TableHeader = styled('th')`
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
-  padding: 0 ${SPACING.spacing5} ${SPACING.spacing3};
+  padding: 0 ${SPACING.spacing24} ${SPACING.spacing8};
 `
 const TableRow = styled('tr')`
   height: 5.75rem;
@@ -39,19 +39,19 @@ const TableRow = styled('tr')`
 `
 const TableDatum = styled('td')`
   z-index: 2;
-  padding: ${SPACING.spacing3} ${SPACING.spacingM};
+  padding: ${SPACING.spacing8} ${SPACING.spacing20};
   background-color: ${COLORS.light2};
   font-size: ${TYPOGRAPHY.fontSize22};
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
-    border-top-left-radius: ${BORDERS.size_three};
-    border-bottom-left-radius: ${BORDERS.size_three};
+    border-top-left-radius: ${BORDERS.borderRadiusSize3};
+    border-bottom-left-radius: ${BORDERS.borderRadiusSize3};
     width: 20%;
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.size_three};
-    border-bottom-right-radius: ${BORDERS.size_three};
+    border-top-right-radius: ${BORDERS.borderRadiusSize3};
+    border-bottom-right-radius: ${BORDERS.borderRadiusSize3};
   }
 `
 
@@ -69,7 +69,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
     null
   )
   return (
-    <Flex marginTop={SPACING.spacing5}>
+    <Flex marginTop={SPACING.spacing24}>
       {labwareIdModal != null && (
         <LiquidsLabwareDetailsModal
           labwareId={labwareIdModal}
@@ -103,10 +103,10 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                     <Flex
                       padding="0.375rem"
                       textAlign={TYPOGRAPHY.textAlignLeft}
-                      borderRadius={BORDERS.size_three}
+                      borderRadius={BORDERS.borderRadiusSize3}
                       border={`3px solid ${COLORS.darkBlackEnabled}`}
                       fontSize={TYPOGRAPHY.fontSize20}
-                      fontWeight="700"
+                      fontWeight={TYPOGRAPHY.fontWeightBold}
                     >
                       {slotName}
                     </Flex>
@@ -126,7 +126,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
                   <Flex flexDirection={DIRECTION_ROW}>
                     <Flex
                       height="2.75rem"
-                      padding={`${SPACING.spacing3} 0.75rem`}
+                      padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
                       width="max-content"
                       alignItems={TYPOGRAPHY.textAlignCenter}
                       marginRight={SPACING.spacingAuto}

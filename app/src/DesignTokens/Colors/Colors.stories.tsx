@@ -62,9 +62,9 @@ const Template: Story<ColorsStorybookProps> = args => {
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
       flexWrap="wrap"
-      padding={SPACING.spacing5}
+      padding={SPACING.spacing24}
     >
       {targetColors.map((color, index) => (
         <Flex
@@ -73,11 +73,11 @@ const Template: Story<ColorsStorybookProps> = args => {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
           backgroundColor={color[1]}
-          padding={SPACING.spacing4}
-          gridGap={SPACING.spacing2}
+          padding={SPACING.spacing16}
+          gridGap={SPACING.spacing4}
           width="20rem"
           height="6rem"
-          borderRadius={BORDERS.size_two}
+          borderRadius={BORDERS.borderRadiusSize2}
           onClick={() => handleClick(color[0])}
           style={{ cursor: 'pointer' }}
           border={`2px solid ${COLORS.darkBlackEnabled}`}

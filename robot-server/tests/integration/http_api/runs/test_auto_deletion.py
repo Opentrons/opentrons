@@ -22,10 +22,7 @@ async def test_runs_auto_delete(
     port = "15555"
     system_server_port = session_system_server_port
     async with RobotClient.make(
-        host="http://localhost",
-        port=port,
-        version="*",
-        system_server_port=system_server_port,
+        base_url=f"http://localhost:{port}", version="*", system_server_base_url=f"http://localhost:{system_server_port}"
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()
@@ -47,11 +44,10 @@ async def test_runs_auto_delete(
             )
 
             fetched_run_ids = await _get_run_ids(robot_client=robot_client)
-
             # Last n elements of created_run_ids.
             run_ids_to_expect = created_run_ids[-num_to_expect:]
 
-            assert fetched_run_ids == run_ids_to_expect
+            assert set(fetched_run_ids) == set(run_ids_to_expect)
 
 
 async def _create_runs(robot_client: RobotClient, num_runs: int) -> List[str]:
@@ -65,5 +61,5 @@ async def _create_runs(robot_client: RobotClient, num_runs: int) -> List[str]:
 
 async def _get_run_ids(robot_client: RobotClient) -> List[str]:
     """Return the IDs of all runs on the server."""
-    response = await robot_client.get_runs()
+    response = await robot_client.get_runs(length=None)
     return [p["id"] for p in response.json()["data"]]

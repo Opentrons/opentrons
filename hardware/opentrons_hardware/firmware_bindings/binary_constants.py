@@ -32,6 +32,10 @@ class BinaryMessageId(int, Enum):
     aux_id_response = 0x12
     estop_button_present_request = 0x13
 
+    write_eeprom_request = 0x100
+    read_eeprom_request = 0x101
+    read_eeprom_response = 0x102
+
     # Light messages prefixed by 0x400
     # 0x40x = light strip
     add_light_action = 0x400
