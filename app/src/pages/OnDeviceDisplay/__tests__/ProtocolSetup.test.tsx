@@ -50,12 +50,6 @@ Object.defineProperty(window, 'IntersectionObserver', {
   value: IntersectionObserver,
 })
 
-Object.defineProperty(global, 'IntersectionObserver', {
-  writable: true,
-  configurable: true,
-  value: IntersectionObserver,
-})
-
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')

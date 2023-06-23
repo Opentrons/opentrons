@@ -1639,3 +1639,26 @@ async def test_status_bar_interface(
     for setting, response in settings.items():
         await ot3_hardware.set_status_bar_state(state=setting)
         assert ot3_hardware.get_status_bar_state() == response
+
+
+async def test_tip_presence_disabled_ninety_six_channel(
+    ot3_hardware: ThreadManager[OT3API],
+) -> None:
+    """Test 96 channel tip presence is disabled."""
+    # TODO remove this check once we enable tip presence for 96 chan.
+    with patch.object(
+        ot3_hardware.managed_obj._backend,
+        "get_tip_present",
+        AsyncMock(spec=ot3_hardware.managed_obj._backend.get_tip_present),
+    ) as tip_present:
+        pipette_config = load_pipette_data.load_definition(
+            PipetteModelType("p1000"),
+            PipetteChannelType(96),
+            PipetteVersionType(3, 3),
+        )
+        instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
+        await ot3_hardware.cache_pipette(OT3Mount.LEFT, instr_data, None)
+        await ot3_hardware._configure_instruments()
+        await ot3_hardware.pick_up_tip(OT3Mount.LEFT, 60)
+
+        tip_present.assert_not_called()
