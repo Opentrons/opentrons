@@ -346,6 +346,77 @@ def test_load_labware_off_deck(
     )
 
 
+def test_load_adapter(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ProtocolCore,
+) -> None:
+    """It should issue a LoadAdapter command."""
+    decoy.when(
+        mock_engine_client.state.labware.find_custom_labware_load_params()
+    ).then_return([EngineLabwareLoadParams("hello", "world", 654)])
+
+    decoy.when(
+        load_labware_params.resolve(
+            "some_adapter",
+            "a_namespace",
+            456,
+            [EngineLabwareLoadParams("hello", "world", 654)],
+        )
+    ).then_return(("some_namespace", 9001))
+
+    decoy.when(
+        mock_engine_client.load_adapter(
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+            load_name="some_adapter",
+            namespace="some_namespace",
+            version=9001,
+        )
+    ).then_return(
+        commands.LoadAdapterResult(
+            adapterId="abc123",
+            definition=LabwareDefinition.construct(),  # type: ignore[call-arg]
+            offsetId=None,
+        )
+    )
+
+    decoy.when(mock_engine_client.state.labware.get_definition("abc123")).then_return(
+        LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
+    )
+
+    result = subject.load_adapter(
+        load_name="some_adapter",
+        location=DeckSlotName.SLOT_5,
+        namespace="a_namespace",
+        version=456,
+    )
+
+    assert isinstance(result, LabwareCore)
+    assert result.labware_id == "abc123"
+    assert subject.get_labware_cores() == [subject.fixed_trash, result]
+
+    decoy.verify(
+        deck_conflict.check(
+            engine_state=mock_engine_client.state,
+            existing_labware_ids=["fixed-trash-123"],
+            existing_module_ids=[],
+            new_labware_id="abc123",
+        )
+    )
+
+    decoy.when(
+        mock_engine_client.state.geometry.get_slot_item(
+            slot_name=DeckSlotName.SLOT_5,
+            allowed_labware_ids={"fixed-trash-123", "abc123"},
+            allowed_module_ids=set(),
+        )
+    ).then_return(
+        LoadedLabware.construct(id="abc123")  # type: ignore[call-arg]
+    )
+
+    assert subject.get_slot_item(DeckSlotName.SLOT_5) is result
+
+
 @pytest.mark.parametrize(
     argnames=["use_gripper", "expected_strategy"],
     argvalues=[

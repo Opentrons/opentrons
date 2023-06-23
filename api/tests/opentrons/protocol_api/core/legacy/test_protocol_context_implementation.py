@@ -166,10 +166,6 @@ def test_load_instrument(
 
 
 def test_load_labware_off_deck_raises(
-    decoy: Decoy,
-    mock_deck: Deck,
-    mock_labware_offset_provider: AbstractLabwareOffsetProvider,
-    mock_equipment_broker: EquipmentBroker[LoadInfo],
     subject: LegacyProtocolCore,
 ) -> None:
     """It should raise an api error."""
@@ -264,6 +260,19 @@ def test_load_labware(
         ),
         times=1,
     )
+
+
+def test_load_adapter_raises(
+    subject: LegacyProtocolCore,
+) -> None:
+    """It should raise an API version error when trying to load an adapter."""
+    with pytest.raises(APIVersionError):
+        subject.load_adapter(
+            load_name="cool load name",
+            location=DeckSlotName.SLOT_5,
+            namespace="cool namespace",
+            version=1337,
+        )
 
 
 def test_load_labware_on_module(
