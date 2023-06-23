@@ -18,6 +18,7 @@ import {
 } from '../../styles'
 import { RobotCoordsForeignObject } from '../Deck'
 
+import { multiplyMatrices } from '../utils'
 import { Thermocycler } from './Thermocycler'
 import { ModuleFromDef } from './ModuleFromDef'
 
@@ -25,16 +26,6 @@ export * from './Thermocycler'
 export * from './ModuleFromDef'
 
 const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
-
-// multiply two matrices together (dot product)
-function multiplyMatrices(a: number[][], b: number[][]): number[][] {
-  const transposedB = b[0].map((_val, index) => b.map(row => row[index]))
-  return a.map(rowA =>
-    transposedB.map(rowB =>
-      rowA.reduce((acc, valA, colIndexA) => acc + valA * rowB[colIndexA], 0)
-    )
-  )
-}
 
 interface Props {
   x: number

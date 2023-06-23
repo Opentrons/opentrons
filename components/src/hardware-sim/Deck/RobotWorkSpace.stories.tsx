@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { animated, useSpring, useSpringValue } from '@react-spring/web'
+import { animated, useSpring } from '@react-spring/web'
 import { RobotWorkSpace } from './RobotWorkSpace'
 import { RobotCoordsForeignDiv, Module } from '@opentrons/components'
 import { getModuleDef2 } from '@opentrons/shared-data'
