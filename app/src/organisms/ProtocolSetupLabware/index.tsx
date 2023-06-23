@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import map from 'lodash/map'
 import {
   ALIGN_CENTER,
@@ -294,6 +294,12 @@ export function ProtocolSetupLabware({
   )
 }
 
+const labwareLatchStyles = css`
+  &:active {
+    background-color: ${COLORS.mediumBluePressed};
+  }
+`
+
 interface LabwareLatchProps {
   toggleLatch: () => void
   latchStatus: LatchStatus
@@ -334,6 +340,7 @@ function LabwareLatch({
       alignItems={ALIGN_FLEX_START}
       backgroundColor={COLORS.mediumBlueEnabled}
       borderRadius={BORDERS.borderRadiusSize3}
+      css={labwareLatchStyles}
       color={
         latchStatus === 'opening' || latchStatus === 'closing'
           ? `${COLORS.darkBlack100}${COLORS.opacity60HexCode}`
