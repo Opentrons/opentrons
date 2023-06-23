@@ -41,10 +41,10 @@ import {
 } from '../../modules'
 import { ModuleFields } from '../FilePipettesModal/ModuleFields'
 import { GoBackLink } from './GoBackLink'
-
-import type { WizardTileProps } from './types'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
+
+import type { WizardTileProps } from './types'
 
 const getCrashableModuleSelected = (
   modules: FormModulesByType,

@@ -10,7 +10,6 @@ import {
 import { Flex } from '../primitives'
 import { Select, CONTEXT_VALUE } from '../forms'
 import styles from './PipetteSelect.css'
-// import { RadioGroup, RadioOption } from '..'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 import type { ActionMeta, SingleValue, MultiValue } from 'react-select'
 import type { SelectOption } from '../forms'
@@ -77,12 +76,6 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),
     ...(gen1Options.length > 0 ? [{ options: gen1Options }] : []),
   ]
-
-  // const transformedArray = gen3Options.map(item => ({
-  //   name: item.label,
-  //   value: item.value,
-  // }))
-
   const defaultValue = enableNoneOption ? OPTION_NONE : null
   const value =
     allPipetteNameSpecs
@@ -90,11 +83,6 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
       .map(specToOption)[0] || defaultValue
 
   return (
-    // <RadioGroup
-    //   options={transformedArray}
-    //   value={value.value}
-    //   onChange={props.onPipetteChange}
-    // />
     <Select
       isSearchable={false}
       menuPosition="fixed"

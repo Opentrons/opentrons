@@ -9,12 +9,12 @@ import {
   FileMetadataFields,
 } from '../file-data'
 import { selectors as stepFormSelectors, InitialDeckSetup } from '../step-forms'
+import { getRobotType } from '../file-data/selectors'
 import { actions as steplistActions } from '../steplist'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
 import { actions as navActions } from '../navigation'
 
 import type { BaseState, ThunkDispatch } from '../types'
-import { getRobotType } from '../file-data/selectors'
 
 type Props = React.ComponentProps<typeof FilePage>
 interface SP {

@@ -205,7 +205,7 @@ export function CreateFileWizard(): JSX.Element | null {
     <WizardHeader
       title={t('modal.create_file_wizard.create_new_protocol')}
       currentStep={currentStepIndex}
-      totalSteps={WIZARD_STEPS.length}
+      totalSteps={WIZARD_STEPS.length - 1}
       onExit={handleCancel}
     />
   )
