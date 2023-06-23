@@ -4,6 +4,8 @@ from pydantic import BaseModel, Field, validator
 from enum import Enum
 from dataclasses import dataclass
 
+from . import model_constants
+
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
 
@@ -57,7 +59,7 @@ class PipetteModelType(Enum):
 class PipetteGenerationType(Enum):
     GEN1 = "GEN1"
     GEN2 = "GEN2"
-    GEN3 = "GEN3"
+    FLEX = "FLEX"
 
 
 PIPETTE_AVAILABLE_TYPES = [m.name for m in PipetteModelType]
@@ -84,6 +86,15 @@ class PipetteVersionType:
         self,
     ) -> Tuple[PipetteModelMajorVersionType, PipetteModelMinorVersionType]:
         return (self.major, self.minor)
+    
+    @property
+    def to_generation(self) -> PipetteGenerationType:
+        if self.major == 3:
+            return PipetteGenerationType.FLEX
+        elif self.major == 2:
+            return PipetteGenerationType.GEN2
+        else:
+            return PipetteGenerationType.GEN1
 
 
 class SupportedTipsDefinition(BaseModel):
@@ -332,3 +343,5 @@ class PipetteConfigurations(
     version: PipetteVersionType = Field(
         ..., description="The version of the configuration loaded."
     )
+    mount_configurations: model_constants.SmoothieConfigs = Field(..., )
+    quirks: List[model_constants.Quirks] = Field(..., description="The list of quirks available for the loaded configuration")

@@ -2,7 +2,7 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
   "displayName": "Flex 1-Channel 1000 μL",
   "model": "p1000",
-  "displayCategory": "GEN3",
+  "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
     "current": 0.15,
     "presses": 1,
