@@ -36,6 +36,7 @@ export function ChildNavigation({
   return (
     <Flex
       alignItems={ALIGN_CENTER}
+      height="7.75rem"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       paddingX={SPACING.spacing40}
       paddingY={SPACING.spacing32}
