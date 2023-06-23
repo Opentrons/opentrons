@@ -9,11 +9,14 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  JUSTIFY_SPACE_EVENLY,
   LabwareRender,
   Module,
+  MODULE_ICON_NAME_BY_TYPE,
   RobotWorkSpace,
   SPACING,
   TYPOGRAPHY,
@@ -35,6 +38,7 @@ import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { Portal } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
+import { LocationIcon } from '../../molecules/LocationIcon'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareDisplayLocation } from '../CommandText/utils'
@@ -260,16 +264,16 @@ export function ProtocolSetupLabware({
         marginTop={SPACING.spacing32}
       >
         <Flex
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
+          gridGap={SPACING.spacing8}
           color={COLORS.darkBlack70}
           fontSize={TYPOGRAPHY.fontSize22}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight28}
         >
-          <Flex paddingLeft={SPACING.spacing24} width="17.9%">
+          <Flex paddingLeft={SPACING.spacing16} width="10.5625rem">
             <StyledText>{'Location'}</StyledText>
           </Flex>
-          <Flex width="82.1%">
+          <Flex>
             <StyledText>{'Labware Name'}</StyledText>
           </Flex>
         </Flex>
@@ -397,7 +401,7 @@ function RowLabware({
   const moduleInstructions = (
     <StyledText
       color={COLORS.darkBlack70}
-      fontSize={TYPOGRAPHY.fontSize20}
+      fontSize={TYPOGRAPHY.fontSize22}
       fontWeight={TYPOGRAPHY.fontWeightRegular}
       lineHeight={TYPOGRAPHY.lineHeight24}
     >
@@ -437,54 +441,67 @@ function RowLabware({
       })
   }
 
-  const isOnHeaterShaker =
-    matchedModule != null &&
-    matchedModule.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE
+  const matchedModuleType = matchedModule?.attachedModuleMatch?.moduleType
+
+  const isOnHeaterShaker = matchedModuleType === HEATERSHAKER_MODULE_TYPE
+
+  let location: JSX.Element | string | null = null
+  if (initialLocation === 'offDeck') {
+    location = commandTextTranslator('off_deck')
+  } else if ('slotName' in initialLocation) {
+    location = <LocationIcon slotName={initialLocation.slotName} />
+  } else if (matchedModuleType != null) {
+    location = (
+      <>
+        <LocationIcon slotName={matchedModule?.slotName} />{' '}
+        <LocationIcon iconName={MODULE_ICON_NAME_BY_TYPE[matchedModuleType]} />
+      </>
+    )
+  }
 
   return (
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={COLORS.light1}
       borderRadius={BORDERS.borderRadiusSize3}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      gridGap={SPACING.spacing24}
+      gridGap={SPACING.spacing32}
     >
-      <Flex width="7.6875rem">
-        <StyledText>
-          {getLabwareDisplayLocation(
-            robotSideAnalysis,
-            initialLocation,
-            commandTextTranslator
-          )}
-        </StyledText>
+      <Flex gridGap={SPACING.spacing4} width="7.6875rem">
+        {location}
       </Flex>
       <Flex
         alignSelf={ALIGN_FLEX_START}
-        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing4}
         width="86%"
       >
-        <StyledText
-          fontSize={TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          lineHeight={TYPOGRAPHY.lineHeight28}
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          justifyContent={JUSTIFY_SPACE_EVENLY}
         >
-          {getLabwareDisplayName(definition)}
-        </StyledText>
-        <StyledText
-          color={COLORS.darkBlack70}
-          fontSize={TYPOGRAPHY.fontSize22}
-          fontWeight={TYPOGRAPHY.fontWeightRegular}
-          lineHeight={TYPOGRAPHY.lineHeight28}
-        >
-          {nickName}
-        </StyledText>
-        {isOnHeaterShaker ? moduleInstructions : null}
+          <StyledText
+            fontSize={TYPOGRAPHY.fontSize22}
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            lineHeight={TYPOGRAPHY.lineHeight28}
+          >
+            {getLabwareDisplayName(definition)}
+          </StyledText>
+          <StyledText
+            color={COLORS.darkBlack70}
+            fontSize={TYPOGRAPHY.fontSize22}
+            fontWeight={TYPOGRAPHY.fontWeightRegular}
+            lineHeight={TYPOGRAPHY.lineHeight28}
+          >
+            {nickName}
+          </StyledText>
+          {isOnHeaterShaker ? moduleInstructions : null}
+        </Flex>
+        {isOnHeaterShaker ? (
+          <LabwareLatch toggleLatch={toggleLatch} latchStatus={latchStatus} />
+        ) : null}
       </Flex>
-      {isOnHeaterShaker ? (
-        <LabwareLatch toggleLatch={toggleLatch} latchStatus={latchStatus} />
-      ) : null}
     </Flex>
   )
 }
