@@ -88,6 +88,9 @@ class LoadAdapterImplementation(
             labware_id=params.adapterId,
         )
 
+        # TODO(jbl 2023-06-23) this validation check happen after the adapter is loaded, because it relies on
+        #   on the definition. In practice this will not cause any issues since it will raise a protocol ending
+        #   exception, but for correctness should be refactored to do this check beforehand.
         if not labware_validation.validate_definition_is_adapter(
             loaded_labware.definition
         ):

@@ -100,6 +100,9 @@ class LoadLabwareImplementation(
             labware_id=params.labwareId,
         )
 
+        # TODO(jbl 2023-06-23) these validation checks happen after the labware is loaded, because they rely on
+        #   on the definition. In practice this will not cause any issues since they will raise protocol ending
+        #   exception, but for correctness should be refactored to do this check beforehand.
         if not labware_validation.validate_definition_is_labware(
             loaded_labware.definition
         ):
