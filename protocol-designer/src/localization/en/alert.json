@@ -201,6 +201,11 @@
       "heading": "Unused modules",
       "body1": "The {{modulesDetails}} specified in your protocol are not currently used in any step. In order to run this protocol you will need to power up and connect the modules to your robot.",
       "body2": "If you don't intend to use these modules, please consider removing them from your protocol."
+    },
+    "unused_gripper": {
+      "heading": "Unused gripper",
+      "body1": "The Flex Gripper is specified in your protocol is not currently used in any step. In order to run this protocol you will need to connect it to your robot.",
+      "body2": "If you don't intend to use the Flex Gripper, please consider removing it from your protocol."
     }
   },
   "crash": {
