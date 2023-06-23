@@ -8,8 +8,8 @@ from fastapi import APIRouter, Depends
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.system import log_control
+from opentrons_shared_data.pipette import mutable_configurations
 from opentrons.config import (
-    pipette_config,
     reset as reset_util,
     robot_configs,
     advanced_settings,
@@ -261,10 +261,10 @@ async def get_robot_settings(
 )
 async def get_pipette_settings() -> MultiPipetteSettings:
     res = {}
-    for pipette_id in pipette_config.known_pipettes():
+    for pipette_id in mutable_configurations.known_pipettes():
         # Have to convert to dict using by_alias due to bug in fastapi
         res[pipette_id] = _pipette_settings_from_config(
-            pipette_config,
+            mutable_configurations,
             pipette_id,
         )
     return res
@@ -281,7 +281,7 @@ async def get_pipette_settings() -> MultiPipetteSettings:
     },
 )
 async def get_pipette_setting(pipette_id: str) -> PipetteSettings:
-    if pipette_id not in pipette_config.known_pipettes():
+    if pipette_id not in mutable_configurations.known_pipettes():
         raise LegacyErrorResponse(
             message=f"{pipette_id} is not a valid pipette id",
             errorCode=ErrorCodes.PIPETTE_NOT_PRESENT.value.code,
@@ -309,7 +309,7 @@ async def patch_pipette_setting(
     field_values = {k: None if v is None else v.value for k, v in fields.items()}
     if field_values:
         try:
-            pipette_config.override(fields=field_values, pipette_id=pipette_id)
+            mutable_configurations.save_overrides(fields=field_values, pipette_id=pipette_id)
         except ValueError as e:
             raise LegacyErrorResponse(
                 message=str(e), errorCode=ErrorCodes.GENERAL_ERROR.value.code
@@ -328,9 +328,9 @@ def _pipette_settings_from_config(pc, pipette_id: str) -> PipetteSettings:
     """
     mutuble_configs = pc.list_mutable_configs(pipette_id=pipette_id)
     fields = PipetteSettingsFields(**{k: v for k, v in mutuble_configs.items()})
-    c, m = pc.load_config_dict(pipette_id)
 
     # TODO(mc, 2020-09-17): s/fields/setting_fields (?)
+    # need model and name?
     return PipetteSettings(  # type: ignore[call-arg]
         info=PipetteSettingsInfo(name=c.get("name"), model=m), fields=fields
     )
