@@ -119,27 +119,25 @@ export function InterventionModal({
 }: InterventionModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
 
-  let modalContent: JSX.Element | null = null
-
-  if (
-    command.commandType === 'waitForResume' ||
-    command.commandType === 'pause' // legacy pause command
-  ) {
-    modalContent = (
-      <PauseInterventionContent
-        startedAt={command.startedAt ?? null}
-        message={command.params.message ?? null}
-      />
-    )
-  } else if (command.commandType === 'moveLabware') {
-    modalContent =
-      robotType != null &&
-      moduleRenderInfo != null &&
-      oldDisplayLocation != null &&
-      newDisplayLocation != null &&
-      labwareRenderInfo != null &&
-      deckDef != null &&
-      labwareAnimationParams != null ? (
+  const childContent = React.useMemo(() => {
+    if (
+      command.commandType === 'waitForResume' ||
+      command.commandType === 'pause' // legacy pause command
+    ) {
+      return (
+        <PauseInterventionContent
+          startedAt={command.startedAt ?? null}
+          message={command.params.message ?? null}
+        />
+      )
+    } else if (command.commandType === 'moveLabware') {
+      return robotType != null &&
+        moduleRenderInfo != null &&
+        oldDisplayLocation != null &&
+        newDisplayLocation != null &&
+        labwareRenderInfo != null &&
+        deckDef != null &&
+        labwareAnimationParams != null ? (
         <MoveLabwareInterventionContent
           robotType={robotType}
           moduleRenderInfo={moduleRenderInfo}
@@ -152,7 +150,15 @@ export function InterventionModal({
           deckDef={deckDef}
         />
       ) : null
-  }
+    } else {
+      return null
+    }
+  }, [
+    command.id,
+    Boolean(labwareRenderInfo),
+    Boolean(moduleRenderInfo),
+    Boolean(labwareAnimationParams),
+  ])
 
   return (
     <Flex
@@ -178,7 +184,7 @@ export function InterventionModal({
             </StyledText>
           </Box>
           <Box {...CONTENT_STYLE}>
-            {modalContent}
+            {childContent}
             <Box {...FOOTER_STYLE}>
               <StyledText>
                 <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} href="" external>
