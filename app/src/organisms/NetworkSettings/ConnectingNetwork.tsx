@@ -17,18 +17,16 @@ import { StyledText } from '../../atoms/text'
 
 interface ConnectingNetworkProps {
   ssid: string
-  height?: string
 }
 export function ConnectingNetwork({
   ssid,
-  height = '37.5rem',
 }: ConnectingNetworkProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} flex="1" height="100%">
       <Flex
-        height={height}
         backgroundColor={COLORS.darkBlack20}
+        flex="1"
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadiusSize3}
       >

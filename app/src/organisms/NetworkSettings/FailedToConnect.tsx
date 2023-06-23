@@ -36,74 +36,70 @@ export function FailedToConnect({
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      <StyledText
-        as="h2"
-        fontWeight={TYPOGRAPHY.fontWeightBold}
-        marginBottom="4rem"
-        textAlign={TYPOGRAPHY.textAlignCenter}
+    <Flex
+      flex="1"
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing32}
+      padding={SPACING.spacing40}
+      paddingTop={SPACING.spacing32}
+    >
+      <Flex
+        flex="1"
+        backgroundColor={COLORS.red3}
+        justifyContent={JUSTIFY_CENTER}
+        borderRadius={BORDERS.borderRadiusSize3}
       >
-        {t('wifi')}
-      </StyledText>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <Flex
-          height="18.5rem"
-          backgroundColor={COLORS.red3}
           justifyContent={JUSTIFY_CENTER}
-          borderRadius={BORDERS.borderRadiusSize3}
+          alignItems={ALIGN_CENTER}
+          flexDirection={DIRECTION_COLUMN}
         >
+          <Icon
+            name="ot-alert"
+            size="3rem"
+            color={COLORS.red2}
+            aria-label={'failed_to_connect_invalidPassword'}
+          />
           <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing4}
             justifyContent={JUSTIFY_CENTER}
             alignItems={ALIGN_CENTER}
-            flexDirection={DIRECTION_COLUMN}
           >
-            <Icon
-              name="ot-alert"
-              size="3rem"
-              color={COLORS.red2}
-              aria-label={'failed_to_connect_invalidPassword'}
-            />
-            <Flex
-              flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing4}
-              justifyContent={JUSTIFY_CENTER}
-              alignItems={ALIGN_CENTER}
+            <StyledText
+              as="h3"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              marginTop={SPACING.spacing40}
             >
-              <StyledText
-                as="h3"
-                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                marginTop={SPACING.spacing40}
-              >
-                {isInvalidPassword
-                  ? t('incorrect_password_for_ssid', { ssid: selectedSsid })
-                  : t('failed_to_connect_to_ssid', { ssid: selectedSsid })}
-              </StyledText>
-              {!isInvalidPassword &&
-                requestState != null &&
-                'error' in requestState &&
-                requestState.error != null &&
-                'message' in requestState.error &&
-                requestState.error.message != null && (
-                  <StyledText marginTop={SPACING.spacing16}>
-                    {requestState.error.message}
-                  </StyledText>
-                )}
-            </Flex>
+              {isInvalidPassword
+                ? t('incorrect_password_for_ssid', { ssid: selectedSsid })
+                : t('failed_to_connect_to_ssid', { ssid: selectedSsid })}
+            </StyledText>
+            {!isInvalidPassword &&
+              requestState != null &&
+              'error' in requestState &&
+              requestState.error != null &&
+              'message' in requestState.error &&
+              requestState.error.message != null && (
+                <StyledText marginTop={SPACING.spacing16}>
+                  {requestState.error.message}
+                </StyledText>
+              )}
           </Flex>
         </Flex>
-        <Flex gridGap={SPACING.spacing8}>
-          <MediumButton
-            flex={'1'}
-            buttonType="secondary"
-            buttonText={t('change_network')}
-            onClick={handleChangeNetwork}
-          />
-          <MediumButton
-            flex={'1'}
-            buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
-            onClick={handleTryAgain}
-          />
-        </Flex>
+      </Flex>
+      <Flex gridGap={SPACING.spacing8}>
+        <MediumButton
+          flex={'1'}
+          buttonType="secondary"
+          buttonText={t('change_network')}
+          onClick={handleChangeNetwork}
+        />
+        <MediumButton
+          flex={'1'}
+          buttonText={i18n.format(t('shared:try_again'), 'capitalize')}
+          onClick={handleTryAgain}
+        />
       </Flex>
     </Flex>
   )

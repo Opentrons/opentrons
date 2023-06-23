@@ -1,4 +1,9 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+
+import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
+
+import { ChildNavigation } from '../../../organisms/ChildNavigation'
 import {
   ConnectingNetwork,
   FailedToConnect,
@@ -24,25 +29,41 @@ export function RobotSettingsWifiConnect({
   setCurrentOption,
   selectedSsid,
 }: RobotSettingsWifiConnectProps): JSX.Element | null {
+  const { t } = useTranslation('device_settings')
+
   if (requestState == null) {
-    // TODO: do we ever get here?
+    // should only get here briefly if at all
     return null
   } else if (requestState.status === PENDING) {
-    return <ConnectingNetwork ssid={selectedSsid} />
+    return (
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        height="100%"
+        padding={SPACING.spacing40}
+      >
+        <ConnectingNetwork ssid={selectedSsid} />
+      </Flex>
+    )
   } else if (requestState.status === FAILURE) {
     const isInvalidPassword = requestState.response.status === 401
     return (
-      <FailedToConnect
-        requestState={requestState}
-        selectedSsid={selectedSsid}
-        isInvalidPassword={isInvalidPassword}
-        handleTryAgain={() =>
-          isInvalidPassword
-            ? setCurrentOption('RobotSettingsSetWifiCred')
-            : handleConnect()
-        }
-        handleChangeNetwork={() => setCurrentOption('RobotSettingsWifi')}
-      />
+      <Flex flexDirection={DIRECTION_COLUMN} height="100%">
+        <ChildNavigation
+          header={t('wifi')}
+          onClickBack={() => setCurrentOption('RobotSettingsWifi')}
+        />
+        <FailedToConnect
+          requestState={requestState}
+          selectedSsid={selectedSsid}
+          isInvalidPassword={isInvalidPassword}
+          handleTryAgain={() =>
+            isInvalidPassword
+              ? setCurrentOption('RobotSettingsSetWifiCred')
+              : handleConnect()
+          }
+          handleChangeNetwork={() => setCurrentOption('RobotSettingsWifi')}
+        />
+      </Flex>
     )
   } else if (requestState.status === SUCCESS) {
     setCurrentOption('RobotSettingsWifi')
