@@ -6,22 +6,19 @@ import { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   BORDERS,
-  Box,
   Btn,
   COLORS,
+  DIRECTION_COLUMN,
   DIRECTION_ROW,
   DISPLAY_FLEX,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_START,
   SPACING,
-  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { RobotSetupHeader } from '../../organisms/RobotSetupHeader'
 import { DisplaySearchNetwork } from './DisplaySearchNetwork'
 
 import type { WifiNetwork } from '../../redux/networking/types'
@@ -65,85 +62,61 @@ export function DisplayWifiList({
   isHeader = false,
 }: DisplayWifiListProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const history = useHistory()
 
   return (
     <>
-      {isHeader ? <HeaderWithIPs /> : null}
-      {list != null && list.length > 0
-        ? list.map(nw => (
-            <Btn
-              display={DISPLAY_FLEX}
-              width="100%"
-              height="5rem"
-              key={nw.ssid}
-              backgroundColor={COLORS.light1}
-              marginBottom={SPACING.spacing8}
-              borderRadius={BORDERS.borderRadiusSize3}
-              css={NETWORK_ROW_STYLE}
-              flexDirection={DIRECTION_ROW}
-              padding={`${SPACING.spacing20} ${SPACING.spacing32}`}
-              alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing4}
-              onClick={() => handleNetworkPress(nw.ssid)}
-            >
-              <Icon name="wifi" size="2.5rem" />
-              <StyledText as="h4">{nw.ssid}</StyledText>
-            </Btn>
-          ))
-        : null}
-      <Btn
-        display="flex"
-        onClick={handleJoinAnotherNetwork}
-        height="5rem"
-        backgroundColor={COLORS.light1}
-        borderRadius={BORDERS.borderRadiusSize4}
-        color={COLORS.black}
-        css={NETWORK_ROW_STYLE}
-        padding={`${SPACING.spacing20} ${SPACING.spacing32}`}
-        flexDirection={DIRECTION_ROW}
-        alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing4}
+      {isHeader ? (
+        <RobotSetupHeader
+          header={t('select_a_network')}
+          onClickBack={() => history.push('/network-setup')}
+        />
+      ) : null}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        padding={SPACING.spacing60}
+        paddingTop={SPACING.spacing32}
       >
-        <Icon name="plus" size="2.5rem" color={COLORS.darkBlack100} />
-        <StyledText as="h4">{t('join_other_network')}</StyledText>
-      </Btn>
-      {list != null && list.length > 0 ? null : <DisplaySearchNetwork />}
-    </>
-  )
-}
-
-const HeaderWithIPs = (): JSX.Element => {
-  const { t } = useTranslation(['device_settings', 'shared'])
-  const history = useHistory()
-  return (
-    <Flex
-      flexDirection={DIRECTION_ROW}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      alignItems={ALIGN_CENTER}
-      marginBottom="3.0625rem"
-      flex="1"
-    >
-      <Flex justifyContent={JUSTIFY_START} flex="1">
+        {list != null && list.length > 0
+          ? list.map(nw => (
+              <Btn
+                display={DISPLAY_FLEX}
+                width="100%"
+                height="5rem"
+                key={nw.ssid}
+                backgroundColor={COLORS.light1}
+                marginBottom={SPACING.spacing8}
+                borderRadius={BORDERS.borderRadiusSize3}
+                css={NETWORK_ROW_STYLE}
+                flexDirection={DIRECTION_ROW}
+                padding={`${SPACING.spacing20} ${SPACING.spacing32}`}
+                alignItems={ALIGN_CENTER}
+                gridGap={SPACING.spacing4}
+                onClick={() => handleNetworkPress(nw.ssid)}
+              >
+                <Icon name="wifi" size="2.5rem" />
+                <StyledText as="h4">{nw.ssid}</StyledText>
+              </Btn>
+            ))
+          : null}
         <Btn
-          onClick={() => history.push('/network-setup')}
-          data-testid="back-button"
+          display="flex"
+          onClick={handleJoinAnotherNetwork}
+          height="5rem"
+          backgroundColor={COLORS.light1}
+          borderRadius={BORDERS.borderRadiusSize4}
+          color={COLORS.black}
+          css={NETWORK_ROW_STYLE}
+          padding={`${SPACING.spacing20} ${SPACING.spacing32}`}
+          flexDirection={DIRECTION_ROW}
+          alignItems={ALIGN_CENTER}
+          gridGap={SPACING.spacing4}
         >
-          <Flex flexDirection={DIRECTION_ROW}>
-            <Icon
-              name="back"
-              marginRight={SPACING.spacing2}
-              size="3rem"
-              color={COLORS.darkBlack100}
-            />
-          </Flex>
+          <Icon name="plus" size="2.5rem" color={COLORS.darkBlack100} />
+          <StyledText as="h4">{t('join_other_network')}</StyledText>
         </Btn>
+        {list != null && list.length > 0 ? null : <DisplaySearchNetwork />}
       </Flex>
-      <Flex justifyContent={JUSTIFY_CENTER} flex="2">
-        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
-          {t('select_a_network')}
-        </StyledText>
-      </Flex>
-      <Box flex="1" />
-    </Flex>
+    </>
   )
 }

@@ -15,6 +15,15 @@ jest.mock('../../../../redux/discovery')
 jest.mock('../../../../redux/networking')
 jest.mock('../NetworkDetailsModal')
 
+const mockPush = jest.fn()
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
+
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces
 >

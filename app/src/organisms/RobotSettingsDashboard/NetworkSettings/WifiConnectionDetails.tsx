@@ -68,11 +68,7 @@ export function WifiConnectionDetails({
           securityType={connectedWifiAuthType}
         />
       ) : null}
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        paddingX={SPACING.spacing40}
-        paddingBottom={SPACING.spacing40}
-      >
+      <Flex flexDirection={DIRECTION_COLUMN}>
         {activeSsid != null ? (
           <Flex
             flexDirection={DIRECTION_COLUMN}

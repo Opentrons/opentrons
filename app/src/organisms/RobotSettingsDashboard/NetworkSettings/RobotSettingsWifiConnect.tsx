@@ -52,17 +52,24 @@ export function RobotSettingsWifiConnect({
           header={t('wifi')}
           onClickBack={() => setCurrentOption('RobotSettingsWifi')}
         />
-        <FailedToConnect
-          requestState={requestState}
-          selectedSsid={selectedSsid}
-          isInvalidPassword={isInvalidPassword}
-          handleTryAgain={() =>
-            isInvalidPassword
-              ? setCurrentOption('RobotSettingsSetWifiCred')
-              : handleConnect()
-          }
-          handleChangeNetwork={() => setCurrentOption('RobotSettingsWifi')}
-        />
+        <Flex
+          flex="1"
+          flexDirection={DIRECTION_COLUMN}
+          padding={SPACING.spacing40}
+          paddingTop={SPACING.spacing32}
+        >
+          <FailedToConnect
+            requestState={requestState}
+            selectedSsid={selectedSsid}
+            isInvalidPassword={isInvalidPassword}
+            handleTryAgain={() =>
+              isInvalidPassword
+                ? setCurrentOption('RobotSettingsSetWifiCred')
+                : handleConnect()
+            }
+            handleChangeNetwork={() => setCurrentOption('RobotSettingsWifi')}
+          />
+        </Flex>
       </Flex>
     )
   } else if (requestState.status === SUCCESS) {

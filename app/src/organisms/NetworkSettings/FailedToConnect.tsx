@@ -36,13 +36,7 @@ export function FailedToConnect({
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
 
   return (
-    <Flex
-      flex="1"
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing32}
-      padding={SPACING.spacing40}
-      paddingTop={SPACING.spacing32}
-    >
+    <Flex flex="1" flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
       <Flex
         flex="1"
         backgroundColor={COLORS.red3}

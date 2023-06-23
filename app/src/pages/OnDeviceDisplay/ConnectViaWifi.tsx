@@ -1,14 +1,11 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
 import { StepMeter } from '../../atoms/StepMeter'
-import * as Networking from '../../redux/networking'
-import { getLocalRobot } from '../../redux/discovery'
-import * as RobotApi from '../../redux/robot-api'
-import { useWifiList } from '../../resources/networking/hooks'
 import {
   ConnectingNetwork,
   DisplayWifiList,
@@ -18,12 +15,15 @@ import {
   SetWifiCred as SetWifiCredComponent,
   WifiConnectionDetails,
 } from '../../organisms/NetworkSettings'
+import { RobotSetupHeader } from '../../organisms/RobotSetupHeader'
+import * as Networking from '../../redux/networking'
+import { getLocalRobot } from '../../redux/discovery'
+import * as RobotApi from '../../redux/robot-api'
+import { useWifiList } from '../../resources/networking/hooks'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { State } from '../../redux/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import { useTranslation } from 'react-i18next'
-import { RobotSetupHeader } from '../../organisms/RobotSetupHeader'
 
 const WIFI_LIST_POLL_MS = 5000
 type WifiScreenOption =
@@ -123,7 +123,8 @@ export function ConnectViaWifi(): JSX.Element {
       <StepMeter totalSteps={5} currentStep={2} />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
+        // subtract height of StepMeter
+        height={`calc(100% - ${SPACING.spacing12})`}
       >
         {renderScreen()}
       </Flex>
@@ -248,22 +249,40 @@ export function WifiConnectStatus({
   selectedSsid,
   selectedAuthType,
 }: WifiConnectStatusProps): JSX.Element | null {
+  const { t } = useTranslation('device_settings')
+
   if (requestState == null) {
     return null
   } else if (requestState.status === RobotApi.PENDING) {
-    return <ConnectingNetwork ssid={selectedSsid} />
+    return (
+      <Flex padding={SPACING.spacing40} flex="1">
+        <ConnectingNetwork ssid={selectedSsid} />
+      </Flex>
+    )
   } else if (requestState.status === RobotApi.FAILURE) {
     const isInvalidPassword = requestState.response.status === 401
     return (
-      <FailedToConnect
-        requestState={requestState}
-        selectedSsid={selectedSsid}
-        handleTryAgain={() =>
-          isInvalidPassword ? setCurrentOption('SetWifiCred') : handleConnect()
-        }
-        isInvalidPassword={isInvalidPassword}
-        handleChangeNetwork={() => setCurrentOption('WifiList')}
-      />
+      <>
+        <RobotSetupHeader header={t('wifi')} />
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          flex="1"
+          padding={SPACING.spacing40}
+          paddingTop={SPACING.spacing32}
+        >
+          <FailedToConnect
+            requestState={requestState}
+            selectedSsid={selectedSsid}
+            handleTryAgain={() =>
+              isInvalidPassword
+                ? setCurrentOption('SetWifiCred')
+                : handleConnect()
+            }
+            isInvalidPassword={isInvalidPassword}
+            handleChangeNetwork={() => setCurrentOption('WifiList')}
+          />
+        </Flex>
+      </>
     )
   } else if (requestState.status === RobotApi.SUCCESS) {
     return (

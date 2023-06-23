@@ -43,7 +43,12 @@ export function RobotSetupHeader({
         width="100%"
       >
         {onClickBack != null ? (
-          <Btn onClick={onClickBack} position={POSITION_ABSOLUTE} left="0">
+          <Btn
+            aria-label="back-button"
+            onClick={onClickBack}
+            position={POSITION_ABSOLUTE}
+            left="0"
+          >
             <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
           </Btn>
         ) : null}

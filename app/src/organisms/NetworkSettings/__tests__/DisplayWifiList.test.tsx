@@ -58,12 +58,12 @@ describe('DisplayWifiList', () => {
   })
 
   it('should render a wifi list, button and spinner', () => {
-    const [{ getByText, getByTestId }] = render(props)
+    const [{ getByText, getByLabelText }] = render(props)
     getByText('Select a network')
     getByText('foo')
     getByText('bar')
     getByText('baz')
-    getByTestId('back-button')
+    getByLabelText('back-button')
   })
 
   it('should not render a spinner', () => {
@@ -73,8 +73,8 @@ describe('DisplayWifiList', () => {
   })
 
   it('should call mock functions when back', () => {
-    const [{ getByTestId }] = render(props)
-    const button = getByTestId('back-button')
+    const [{ getByLabelText }] = render(props)
+    const button = getByLabelText('back-button')
     fireEvent.click(button)
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
