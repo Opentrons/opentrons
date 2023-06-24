@@ -7,7 +7,7 @@ import { i18n } from '../../../i18n'
 import * as Networking from '../../../redux/networking'
 import { SetWifiCred } from '../SetWifiCred'
 import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
-import { useIsFinishedUnboxing } from '../../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/hooks'
+import { useUnboxingFlowUncompleted } from '../../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/hooks'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
 
 const mockPush = jest.fn()
@@ -42,8 +42,8 @@ const mockSetWifiCred = SetWifiCred as jest.MockedFunction<typeof SetWifiCred>
 const mockAlternativeSecurityTypeModal = AlternativeSecurityTypeModal as jest.MockedFunction<
   typeof AlternativeSecurityTypeModal
 >
-const mockUseIsFinishedUnboxing = useIsFinishedUnboxing as jest.MockedFunction<
-  typeof useIsFinishedUnboxing
+const mockuUeUnboxingFlowUncompleted = useUnboxingFlowUncompleted as jest.MockedFunction<
+  typeof useUnboxingFlowUncompleted
 >
 
 const render = (
@@ -78,7 +78,7 @@ describe('SelectAuthenticationType', () => {
     mockAlternativeSecurityTypeModal.mockReturnValue(
       <div>mock AlternativeSecurityTypeModal</div>
     )
-    mockUseIsFinishedUnboxing.mockReturnValue(true)
+    mockuUeUnboxingFlowUncompleted.mockReturnValue(true)
   })
 
   afterEach(() => {

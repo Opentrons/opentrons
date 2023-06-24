@@ -25,7 +25,7 @@ import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
 import { SmallButton } from '../../atoms/buttons'
-import { useIsFinishedUnboxing } from '../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/hooks'
+import { useUnboxingFlowUncompleted } from '../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/hooks'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 
@@ -67,7 +67,7 @@ export function SetWifiCred({
   const { t } = useTranslation(['device_settings', 'shared'])
   const keyboardRef = React.useRef(null)
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
-  const isInitialSetup = useIsFinishedUnboxing()
+  const isUnboxingFlowUncompleted = useUnboxingFlowUncompleted()
 
   return (
     <>
@@ -75,7 +75,9 @@ export function SetWifiCred({
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
         marginBottom={SPACING.spacing48}
-        justifyContent={isInitialSetup ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN}
+        justifyContent={
+          isUnboxingFlowUncompleted ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN
+        }
         position={POSITION_RELATIVE}
       >
         <Flex position={POSITION_ABSOLUTE} left="0">
@@ -88,7 +90,7 @@ export function SetWifiCred({
             </Flex>
           </Btn>
         </Flex>
-        <Flex marginLeft={isInitialSetup ? '0' : '4rem'}>
+        <Flex marginLeft={isUnboxingFlowUncompleted ? '0' : '4rem'}>
           <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {t('sign_into_wifi')}
           </StyledText>

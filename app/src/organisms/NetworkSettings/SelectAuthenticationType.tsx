@@ -24,7 +24,7 @@ import { RadioButton, SmallButton } from '../../atoms/buttons'
 import { getLocalRobot } from '../../redux/discovery'
 import { getNetworkInterfaces, fetchStatus } from '../../redux/networking'
 import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
-import { useIsFinishedUnboxing } from '../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/hooks'
+import { useUnboxingFlowUncompleted } from '../OnDeviceDisplay/RobotSettingsDashboard/NetworkSettings/hooks'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { Dispatch, State } from '../../redux/types'
@@ -62,13 +62,13 @@ export function SelectAuthenticationType({
     showAlternativeSecurityTypeModal,
     setShowAlternativeSecurityTypeModal,
   ] = React.useState<boolean>(false)
-  const isInitialSetup = useIsFinishedUnboxing()
+  const isUnboxingFlowUncompleted = useUnboxingFlowUncompleted()
 
   const handleClickBack = (): void => {
     if (fromWifiList != null) {
       // back to wifi list
       setChangeState({ type: null })
-      if (!isInitialSetup && setShowInterfaceTitle != null)
+      if (!isUnboxingFlowUncompleted && setShowInterfaceTitle != null)
         setShowInterfaceTitle(true)
     } else {
       // back to set wifi ssid
@@ -114,7 +114,7 @@ export function SelectAuthenticationType({
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={
-            isInitialSetup ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN
+            isUnboxingFlowUncompleted ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN
           }
           position={POSITION_RELATIVE}
           alignItems={ALIGN_CENTER}
@@ -127,7 +127,7 @@ export function SelectAuthenticationType({
               </Flex>
             </Btn>
           </Flex>
-          <Flex marginLeft={isInitialSetup ? '0' : '4rem'}>
+          <Flex marginLeft={isUnboxingFlowUncompleted ? '0' : '4rem'}>
             <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
               {t('select_a_security_type')}
             </StyledText>

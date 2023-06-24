@@ -53,7 +53,6 @@ export function UpdateChannel({
 }: UpdateChannelProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'app_settings'])
   const dispatch = useDispatch<Dispatch>()
-
   const channel = useSelector(getUpdateChannel)
   const channelOptions = useSelector(getUpdateChannelOptions)
 
