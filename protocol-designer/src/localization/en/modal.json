@@ -78,6 +78,7 @@
     "choose_robot_type": "Choose robot type",
     "choose_tips_for_pipette": "Choose tips for {{pipetteName}}",
     "create_new_protocol": "Create New Protocol",
+    "custom_tiprack": "Custom tips",
     "name_your_protocol": "Name your protocol.",
     "description": "Description",
     "organization_or_author": "Organization/Author",
@@ -85,7 +86,9 @@
     "protocol_name": "Protocol Name",
     "protocol_name_and_description": "Protocol name and description",
     "review_file_details": "Review file details",
-    "robot_type": "Robot Type"
+    "robot_type": "Robot Type",
+    "upload_tiprack": "Upload a custom tiprack to select its definition",
+    "upload": "Upload"
   },
   "well_order": {
     "title": "Well Order",

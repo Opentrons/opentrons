@@ -87,7 +87,9 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               width="30rem"
               gridGap={SPACING.spacing4}
             >
-              <Text as="p" fontSize={TYPOGRAPHY.fontSizeP}>{t('modal.create_file_wizard.description')}</Text>
+              <Text as="p" fontSize={TYPOGRAPHY.fontSizeP}>
+                {t('modal.create_file_wizard.description')}
+              </Text>
               <DescriptionField
                 name="fields.description"
                 value={values.fields.description ?? ''}

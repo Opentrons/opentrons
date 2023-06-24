@@ -136,7 +136,8 @@ export function PipetteFields(props: Props): JSX.Element {
       (acc, def: typeof allLabware[string]) => {
         if (
           def.metadata.displayCategory !== 'tipRack' ||
-          !selectedPipetteDefaultTipRacks.includes(getLabwareDefURI(def))
+          (!selectedPipetteDefaultTipRacks.includes(getLabwareDefURI(def)) &&
+            def.namespace !== 'custom_beta')
         )
           return acc
         return [

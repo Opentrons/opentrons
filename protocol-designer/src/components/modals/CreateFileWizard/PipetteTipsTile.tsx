@@ -1,6 +1,7 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { FormikProps } from 'formik'
 import reduce from 'lodash/reduce'
 import {
@@ -13,6 +14,16 @@ import {
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
+  TYPOGRAPHY,
+  ALIGN_START,
+  BORDERS,
+  DIRECTION_ROW,
+  COLORS,
+  OutlineButton,
+  Icon,
+  JUSTIFY_CENTER,
+  WRAP,
+  Btn,
 } from '@opentrons/components'
 import {
   getLabwareDefURI,
@@ -20,6 +31,7 @@ import {
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { GoBackLink } from './GoBackLink'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
@@ -66,7 +78,7 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          height="26rem"
+          height="25.5rem"
           gridGap={SPACING.spacing32}
         >
           <Text as="h2">{tileHeader}</Text>
@@ -76,6 +88,7 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           width="100%"
+          paddingTop={SPACING.spacing8}
         >
           <GoBackLink onClick={() => goBack()} />
           <PrimaryButton onClick={() => proceed()}>
@@ -87,12 +100,56 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
   )
 }
 
+const INPUT_STYLE = css`
+  background-color: ${COLORS.blueEnabled};
+  border-radius: ${BORDERS.radiusRoundEdge};
+  box-shadow: none;
+  color: ${COLORS.fundamentalsBackground};
+  overflow: no-wrap;
+  padding-left: ${SPACING.spacing16};
+  padding-right: ${SPACING.spacing16};
+  text-transform: ${TYPOGRAPHY.textTransformNone};
+  white-space: nowrap;
+  border: none;
+  padding-top: 8px;
+  ${TYPOGRAPHY.labelSemiBold}
+  height: max-content;
+  width: auto;
+  font-size: ${TYPOGRAPHY.fontSizeP};
+  input {
+    display: none;
+  }
+
+  &:hover {
+    background-color: ${COLORS.blueHover};
+    box-shadow: none;
+  }
+
+  &:active {
+    background-color: ${COLORS.bluePressed};
+  }
+`
+
+const ACCORDION_STYLE = css`
+  border-radius: 50%;
+  &:hover {
+    background: ${COLORS.lightGreyHover};
+  }
+  &:active {
+    background: ${COLORS.lightGreyPressed};
+  }
+`
 interface PipetteTipsFieldProps extends FormikProps<FormState> {
   mount: Mount
 }
 
 function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const { mount, values, setFieldValue } = props
+  const { t } = useTranslation()
+  const dispatch = useDispatch()
+  const [showCustomTipracks, setShowCustomTipracks] = React.useState<boolean>(
+    false
+  )
   const allLabware = useSelector(getLabwareDefsByURI)
   const selectedPipetteName = values.pipettesByMount[mount].pipetteName
   const selectedPipetteDefaultTipRacks =
@@ -101,44 +158,144 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
           ?.defaultTipracks ?? []
       : []
 
-  const tipRackOptions = reduce<typeof allLabware, RadioOption[]>(
+  const tiprackOptions = reduce<typeof allLabware, RadioOption[]>(
     allLabware,
     (acc, def: typeof allLabware[string]) => {
-      if (
-        def.metadata.displayCategory !== 'tipRack' ||
-        !selectedPipetteDefaultTipRacks.includes(getLabwareDefURI(def))
+      if (def.metadata.displayCategory !== 'tipRack') return acc
+
+      const isDefaultTiprack = selectedPipetteDefaultTipRacks.includes(
+        getLabwareDefURI(def)
       )
-        return acc
-      return [
-        ...acc,
-        {
-          name: getLabwareDisplayName(def),
-          value: getLabwareDefURI(def),
-        },
-      ]
+
+      const isCustomTiprack = def.namespace === 'custom_beta'
+
+      if (isDefaultTiprack || isCustomTiprack) {
+        return [
+          ...acc,
+          {
+            name: getLabwareDisplayName(def),
+            value: getLabwareDefURI(def),
+          },
+        ]
+      }
+
+      return acc
     },
     []
   ).sort(a => (a.name.includes('(Retired)') ? 1 : -1))
+
+  const defaultTiprackOptions = tiprackOptions.filter(option =>
+    selectedPipetteDefaultTipRacks.includes(option.value)
+  )
+
+  const customTiprackOptions = tiprackOptions.filter(
+    option =>
+      !selectedPipetteDefaultTipRacks.includes(option.value) &&
+      option.value.includes('custom_beta')
+  )
+
   const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
   const currentValue = values.pipettesByMount[mount].tiprackDefURI
   if (currentValue === undefined) {
-    setFieldValue(nameAccessor, tipRackOptions[0]?.value ?? '')
+    setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
   }
 
   return (
-    <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
-      {tipRackOptions.map(o => (
-        <EquipmentOption
-          key={o.name}
-          isSelected={currentValue === o.value}
-          text={o.name}
-          onClick={() => {
-            setFieldValue(nameAccessor, o.value)
-          }}
-          width="21.75rem"
-          minHeight="4rem"
-        />
-      ))}
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      overflowY="scroll"
+      gridGap={SPACING.spacing8}
+    >
+      <Flex flexWrap="wrap" gridGap={SPACING.spacing4} alignSelf={ALIGN_CENTER}>
+        {defaultTiprackOptions.map(o => (
+          <EquipmentOption
+            key={o.name}
+            isSelected={currentValue === o.value}
+            text={o.name}
+            onClick={() => {
+              setFieldValue(nameAccessor, o.value)
+            }}
+            width="21.75rem"
+            minHeight="4rem"
+          />
+        ))}
+      </Flex>
+      <Flex justifyContent="end" alignItems="center">
+        <Btn onClick={() => setShowCustomTipracks(!showCustomTipracks)}>
+          <Icon
+            css={ACCORDION_STYLE}
+            size="1.5rem"
+            name={showCustomTipracks ? 'minus' : 'plus'}
+          />
+        </Btn>
+      </Flex>
+      {showCustomTipracks ? (
+        <>
+          <Flex
+            flexDirection={DIRECTION_ROW}
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_SPACE_BETWEEN}
+          >
+            <Text as="h4">{t('modal.create_file_wizard.custom_tiprack')}</Text>
+
+            <OutlineButton Component="label" css={INPUT_STYLE}>
+              <Flex
+                flexDirection={DIRECTION_ROW}
+                alignItems={ALIGN_CENTER}
+                gridGap={SPACING.spacing2}
+              >
+                <Icon name="plus" size="1rem" />
+                {t('modal.create_file_wizard.upload')}
+              </Flex>
+              <input
+                type="file"
+                onChange={e => dispatch(createCustomTiprackDef(e))}
+              />
+            </OutlineButton>
+          </Flex>
+          {customTiprackOptions.length > 0 ? (
+            <Flex
+              flexWrap={WRAP}
+              gridGap={SPACING.spacing4}
+              alignSelf={
+                customTiprackOptions.length > 1 ? ALIGN_CENTER : ALIGN_START
+              }
+            >
+              {customTiprackOptions.map(o => (
+                <EquipmentOption
+                  key={o.name}
+                  isSelected={currentValue === o.value}
+                  text={o.name}
+                  onClick={() => {
+                    setFieldValue(nameAccessor, o.value)
+                  }}
+                  width="21.75rem"
+                  minHeight="4rem"
+                />
+              ))}
+            </Flex>
+          ) : (
+            <Flex
+              justifyContent={JUSTIFY_CENTER}
+              alignItems={ALIGN_CENTER}
+              width="100%"
+              height="8.5rem"
+              backgroundColor={COLORS.darkBlack20}
+              padding={SPACING.spacing8}
+              border={BORDERS.lineBorder}
+              borderRadius={BORDERS.borderRadiusSize2}
+            >
+              <Text
+                as="h4"
+                fontWeight={TYPOGRAPHY.fontWeightRegular}
+                color={COLORS.darkBlack70}
+              >
+                {t('modal.create_file_wizard.upload_tiprack')}
+              </Text>
+            </Flex>
+          )}
+        </>
+      ) : null}
     </Flex>
   )
 }
