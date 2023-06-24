@@ -66,6 +66,7 @@ const unsavedChanges = (
     case 'CREATE_MODULE':
     case 'DELETE_MODULE':
     case 'EDIT_MODULE':
+    case 'IS_GRIPPER_REQUIRED':
       return true
 
     default:

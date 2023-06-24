@@ -26,6 +26,9 @@ wheel_file = dist/$(call python_get_wheelname,system-server,$(project_rs_default
 # used to create the sdist.
 sdist_file = $(call python_get_sdistname,system-server,$(project_ot3_default),system_server)
 
+# Find the branch, sha, version that will be used to update the VERSION.json file
+version_file = $(call python_get_git_version,system-server,$(project_ot3_default),system_server)
+
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
 # make test tests=tests/system_server/abcd.py would run only the
@@ -94,7 +97,7 @@ push: wheel
 
 .PHONY: push-ot3
 push-ot3: sdist
-	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/opentrons-system-server,system_server)
+	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/opentrons-system-server,system_server,,,$(version_file))
 	$(call restart-service,$(host),,$(br_ssh_opts),opentrons-system-server)
 
 .PHONY: dev

@@ -40,7 +40,7 @@ export type SettingOption =
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
   margin-bottom: ${SPACING.spacing8};
-  background-color: ${COLORS.medGreyEnabled};
+  background-color: ${COLORS.light1};
   padding: ${SPACING.spacing20} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize4};
 `
@@ -101,7 +101,7 @@ export function RobotSettingButton({
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
       >
-        <Icon name={iconName} size="3rem" />
+        <Icon name={iconName} size="3rem" color={COLORS.darkBlack100} />
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing2}
@@ -161,7 +161,7 @@ export function RobotSettingButton({
           />
         ) : null}
         {enabledDevTools == null && ledLights == null ? (
-          <Icon name="more" size="3rem" />
+          <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
         ) : null}
       </Flex>
     </Btn>

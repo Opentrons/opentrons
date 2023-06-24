@@ -7,10 +7,13 @@ from typing_extensions import Literal
 
 from ..types import (
     LabwareLocation,
+    OnLabwareLocation,
     LabwareMovementStrategy,
     LabwareOffsetVector,
     ExperimentalOffsetData,
 )
+from ..errors import LabwareMovementNotAllowedError
+from ..resources import labware_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -94,28 +97,53 @@ class MoveLabwareImplementation(
         """Move a loaded labware to a new location."""
         # Allow propagation of LabwareNotLoadedError.
         current_labware = self._state_view.labware.get(labware_id=params.labwareId)
+        current_labware_definition = self._state_view.labware.get_definition(
+            labware_id=params.labwareId
+        )
         definition_uri = current_labware.definitionUri
 
-        empty_new_location = self._state_view.geometry.ensure_location_not_occupied(
+        available_new_location = self._state_view.geometry.ensure_location_not_occupied(
             location=params.newLocation
         )
 
+        # Check that labware and destination do not have labware on top
+        self._state_view.labware.raise_if_labware_has_labware_on_top(
+            labware_id=params.labwareId
+        )
+        if isinstance(available_new_location, OnLabwareLocation):
+            self._state_view.labware.raise_if_labware_has_labware_on_top(
+                available_new_location.labwareId
+            )
+            # Ensure that labware can be placed on requested labware
+            self._state_view.labware.raise_if_labware_cannot_be_stacked(
+                top_labware_definition=current_labware_definition,
+                bottom_labware_id=available_new_location.labwareId,
+            )
+
         # Allow propagation of ModuleNotLoadedError.
         new_offset_id = self._equipment.find_applicable_labware_offset_id(
-            labware_definition_uri=definition_uri, labware_location=empty_new_location
+            labware_definition_uri=definition_uri,
+            labware_location=available_new_location,
         )
         await self._labware_movement.ensure_movement_not_obstructed_by_module(
-            labware_id=params.labwareId, new_location=empty_new_location
+            labware_id=params.labwareId, new_location=available_new_location
         )
 
         if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
+            if labware_validation.validate_definition_is_adapter(
+                current_labware_definition
+            ):
+                raise LabwareMovementNotAllowedError(
+                    f"Cannot move adapter {params.labwareId} with gripper."
+                )
+
             validated_current_loc = (
                 self._labware_movement.ensure_valid_gripper_location(
                     current_labware.location
                 )
             )
             validated_new_loc = self._labware_movement.ensure_valid_gripper_location(
-                empty_new_location,
+                available_new_location,
             )
             experimental_offset_data = ExperimentalOffsetData(
                 usePickUpLocationLpcOffset=params.usePickUpLocationLpcOffset,

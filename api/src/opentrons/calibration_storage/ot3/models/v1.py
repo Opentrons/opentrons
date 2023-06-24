@@ -89,13 +89,9 @@ class InstrumentOffsetModel(BaseModel):
 class ModuleOffsetModel(BaseModel):
     offset: Point = Field(..., description="Module offset found from calibration.")
     mount: OT3Mount = Field(..., description="The mount used to calibrate this module.")
-    slot: int = Field(
+    slot: str = Field(
         ...,
-        description=(
-            "The slot this module was calibrated in."
-            " For historical reasons, this is specified as an OT-2-style integer like `5`,"
-            " not an OT-3-style string like `'C2'`."
-        ),
+        description=("The slot this module was calibrated in."),
     )
     module: ModuleType = Field(..., description="The module type of this module.")
     module_id: str = Field(..., description="The unique id of this module.")

@@ -77,7 +77,7 @@ describe('ProtocolInstrumentMountItem', () => {
 
   it('renders the correct information when there is no pipette attached', () => {
     const { getByText } = render(props)
-    getByText('Left mount')
+    getByText('Left Mount')
     getByText('No data')
     getByText('Flex 8-Channel 1000 μL')
     getByText('Attach')
@@ -88,7 +88,7 @@ describe('ProtocolInstrumentMountItem', () => {
       speccedName: 'p1000_96',
     }
     const { getByText } = render(props)
-    getByText('Left + right mount')
+    getByText('Left + Right Mount')
     getByText('No data')
     getByText('Flex 96-Channel 1000 μL')
     getByText('Attach')
@@ -100,7 +100,7 @@ describe('ProtocolInstrumentMountItem', () => {
       attachedInstrument: mockLeftPipetteData as any,
     }
     const { getByText } = render(props)
-    getByText('Left mount')
+    getByText('Left Mount')
     getByText('Calibrated')
     getByText('Flex 8-Channel 1000 μL')
   })
@@ -116,7 +116,7 @@ describe('ProtocolInstrumentMountItem', () => {
       } as any,
     }
     const { getByText } = render(props)
-    getByText('Left mount')
+    getByText('Left Mount')
     getByText('No data')
     getByText('Flex 8-Channel 1000 μL')
     const button = getByText('Calibrate')
@@ -130,7 +130,7 @@ describe('ProtocolInstrumentMountItem', () => {
       mount: LEFT,
     }
     const { getByText } = render(props)
-    getByText('Left mount')
+    getByText('Left Mount')
     getByText('No data')
     getByText('Flex 8-Channel 1000 μL')
     const button = getByText('Attach')
@@ -145,7 +145,7 @@ describe('ProtocolInstrumentMountItem', () => {
       speccedName: 'gripperV1',
     }
     const { getByText } = render(props)
-    getByText('Extension mount')
+    getByText('Extension Mount')
     getByText('No data')
     getByText('Flex Gripper')
     getByText('Attach')
@@ -158,7 +158,7 @@ describe('ProtocolInstrumentMountItem', () => {
       attachedInstrument: mockGripperData as any,
     }
     const { getByText } = render(props)
-    getByText('Extension mount')
+    getByText('Extension Mount')
     getByText('Calibrated')
     getByText('Flex Gripper')
   })

@@ -9,7 +9,7 @@ import { MAXIMUM_PINNED_PROTOCOLS } from '../../App/constants'
 import { StyledText } from '../../atoms/text'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { SmallModalChildren } from '../../molecules/Modal/OnDeviceDisplay'
+import { SmallModalChildren } from '../../molecules/Modal'
 import { useToaster } from '../../organisms/ToasterOven'
 import { getPinnedProtocolIds, updateConfigValue } from '../../redux/config'
 
@@ -29,7 +29,7 @@ export function LongPressModal({
 }: LongPressModalProps): JSX.Element {
   const history = useHistory()
   let pinnedProtocolIds = useSelector(getPinnedProtocolIds) ?? []
-  const { t } = useTranslation(['protocol_info', 'shared'])
+  const { i18n, t } = useTranslation(['protocol_info', 'shared'])
   const dispatch = useDispatch<Dispatch>()
   const { makeSnackbar } = useToaster()
 
@@ -97,7 +97,7 @@ export function LongPressModal({
         <SmallModalChildren
           header={t('too_many_pins_header')}
           subText={t('too_many_pins_body')}
-          buttonText={t('shared:close')}
+          buttonText={i18n.format(t('shared:close'), 'capitalize')}
           handleCloseMaxPinsAlert={() => longpress?.setIsLongPressed(false)}
         />
       ) : (
@@ -112,7 +112,7 @@ export function LongPressModal({
           </MenuItem>
           <MenuItem onClick={handlePinClick} key="pin">
             <Flex>
-              <Icon name="pin" size="1.875rem" />
+              <Icon name="pin" size="2.5rem" />
               <StyledText marginLeft={SPACING.spacing24}>
                 {pinned ? t('unpin_protocol') : t('pin_protocol')}
               </StyledText>
@@ -120,7 +120,7 @@ export function LongPressModal({
           </MenuItem>
           <MenuItem onClick={handleDeleteClick} key="trash" isAlert={true}>
             <Flex>
-              <Icon name="trash" size="1.875rem" />
+              <Icon name="trash" size="2.5rem" />
               <StyledText marginLeft={SPACING.spacing24}>
                 {t('delete_protocol')}
               </StyledText>

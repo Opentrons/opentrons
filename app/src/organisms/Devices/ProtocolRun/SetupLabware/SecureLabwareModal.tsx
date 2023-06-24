@@ -13,7 +13,7 @@ import {
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
 import { StyledText } from '../../../../atoms/text'
-import { Modal } from '../../../../molecules/Modal'
+import { LegacyModal } from '../../../../molecules/LegacyModal'
 import secureMagModBracketImage from '../../../../assets/images/secure_mag_mod_bracket.png'
 import secureTCLatchImage from '../../../../assets/images/secure_tc_latch.png'
 import { getModuleName } from '../utils/getModuleName'
@@ -32,7 +32,7 @@ export const SecureLabwareModal = (
   const moduleName = getModuleName(props.type)
   return (
     <Portal level="top">
-      <Modal
+      <LegacyModal
         title={t(`secure_labware_modal`, {
           name: moduleName,
         })}
@@ -94,7 +94,7 @@ export const SecureLabwareModal = (
             {t('shared:close')}
           </PrimaryButton>
         </Flex>
-      </Modal>
+      </LegacyModal>
     </Portal>
   )
 }

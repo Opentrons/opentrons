@@ -1,7 +1,7 @@
 import { when } from 'jest-when'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { aspirate } from '../commandCreators/atomic/aspirate'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, getPipetteNameSpecs } from '@opentrons/shared-data'
 import _fixtureTiprack10ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import _fixtureTiprack1000ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
 import {
@@ -28,6 +28,8 @@ import type { InvariantContext, RobotState } from '../'
 
 const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
 const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
+const FLEX_PIPETTE = 'p1000_single_gen3'
+const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
 
 jest.mock('../utils/thermocyclerPipetteCollision')
 jest.mock('../utils/heaterShakerCollision')
@@ -253,7 +255,77 @@ describe('aspirate', () => {
       type: 'HEATER_SHAKER_LATCH_OPEN',
     })
   })
+  it('should return an error when aspirating from heaterShaker with latch opened for Flex', () => {
+    if (FlexPipetteNameSpecs != null) {
+      invariantContext.pipetteEntities[
+        DEFAULT_PIPETTE
+      ].spec = FlexPipetteNameSpecs
+    }
+
+    mockPipetteIntoHeaterShakerLatchOpen.mockImplementationOnce(
+      (
+        modules: RobotState['modules'],
+        labware: RobotState['labware'],
+        labwareId: string
+      ) => {
+        expect(modules).toBe(robotStateWithTip.modules)
+        expect(labware).toBe(robotStateWithTip.labware)
+        expect(labwareId).toBe(SOURCE_LABWARE)
+        return true
+      }
+    )
+    const result = aspirate(
+      {
+        ...flowRateAndOffsets,
+        pipette: DEFAULT_PIPETTE,
+        volume: 50,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      } as AspDispAirgapParams,
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HEATER_SHAKER_LATCH_OPEN',
+    })
+  })
   it('should return an error when aspirating from heaterShaker when it is shaking', () => {
+    mockPipetteIntoHeaterShakerWhileShaking.mockImplementationOnce(
+      (
+        modules: RobotState['modules'],
+        labware: RobotState['labware'],
+        labwareId: string
+      ) => {
+        expect(modules).toBe(robotStateWithTip.modules)
+        expect(labware).toBe(robotStateWithTip.labware)
+        expect(labwareId).toBe(SOURCE_LABWARE)
+        return true
+      }
+    )
+    const result = aspirate(
+      {
+        ...flowRateAndOffsets,
+        pipette: DEFAULT_PIPETTE,
+        volume: 50,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      } as AspDispAirgapParams,
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HEATER_SHAKER_IS_SHAKING',
+    })
+  })
+  it('should return an error when aspirating from heaterShaker when it is shaking for flex', () => {
+    if (FlexPipetteNameSpecs != null) {
+      invariantContext.pipetteEntities[
+        DEFAULT_PIPETTE
+      ].spec = FlexPipetteNameSpecs
+    }
+
     mockPipetteIntoHeaterShakerWhileShaking.mockImplementationOnce(
       (
         modules: RobotState['modules'],

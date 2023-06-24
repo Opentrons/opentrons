@@ -1,5 +1,6 @@
 import * as React from 'react'
 import Keyboard from 'react-simple-keyboard'
+import { customDisplay } from './constants'
 
 interface CustomKeyboardProps {
   onChange: (input: string) => void
@@ -20,24 +21,6 @@ const customLayout = {
     '{numbers}',
   ],
   numbers: ['1 2 3', '4 5 6', '7 8 9', '{abc} 0 {backspace}'],
-}
-
-const customDisplay = {
-  '{numbers}': '123',
-  '{ent}': 'enter',
-  '{escape}': 'esc ⎋',
-  '{tab}': 'tab ⇥',
-  '{backspace}': 'del',
-  '{capslock}': 'caps lock ⇪',
-  '{shift}': 'shift',
-  '{controlleft}': 'ctrl ⌃',
-  '{controlright}': 'ctrl ⌃',
-  '{altleft}': 'alt ⌥',
-  '{altright}': 'alt ⌥',
-  '{metaleft}': 'cmd ⌘',
-  '{metaright}': 'cmd ⌘',
-  '{abc}': 'ABC',
-  '{space}': 'space',
 }
 
 export function CustomKeyboard({

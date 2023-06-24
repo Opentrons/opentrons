@@ -85,18 +85,16 @@ export function denormalizePipetteEntities(
     {}
   )
 }
-export const getSlotsBlockedBySpanning = (
+export const getSlotIdsBlockedBySpanning = (
   initialDeckSetup: InitialDeckSetup
 ): DeckSlot[] => {
-  // NOTE: Ian 2019-10-25 dumb heuristic since there's only one case this can happen now
-  if (
-    values(initialDeckSetup.modules).some(
-      (moduleOnDeck: ModuleOnDeck) =>
-        moduleOnDeck.type === THERMOCYCLER_MODULE_TYPE &&
-        moduleOnDeck.slot === SPAN7_8_10_11_SLOT
-    )
-  ) {
-    return ['7', '8', '10', '11']
+  const loadedThermocycler = values(initialDeckSetup.modules).find(
+    ({ type }: ModuleOnDeck) => type === THERMOCYCLER_MODULE_TYPE
+  )
+  if (loadedThermocycler != null) {
+    return loadedThermocycler.slot === SPAN7_8_10_11_SLOT
+      ? ['7', '8', '10', '11']
+      : ['A1', 'B1']
   }
 
   return []
@@ -112,7 +110,7 @@ export const getSlotIsEmpty = (
     // special "spanning slot" is not empty if there's anything in the slots that it spans,
     // even when there's no spanning labware/module (eg thermocycler) on the deck
     return false
-  } else if (getSlotsBlockedBySpanning(initialDeckSetup).includes(slot)) {
+  } else if (getSlotIdsBlockedBySpanning(initialDeckSetup).includes(slot)) {
     // if a slot is being blocked by a spanning labware/module (eg thermocycler), it's not empty
     return false
   }

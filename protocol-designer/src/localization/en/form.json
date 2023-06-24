@@ -34,7 +34,8 @@
     "labwareLabel": {
       "aspirate": "source",
       "dispense": "destination",
-      "mixLabware": "labware"
+      "mixLabware": "labware",
+      "movedLabware": "labware"
     },
     "mixVolumeLabel": "mix volume",
     "mixRepetitions": "repetitions",
@@ -183,6 +184,14 @@
         "timer": {
           "heaterShakerSetTimer": "Set timer"
         }
+      },
+      "useGripper": {
+        "label": "use gripper",
+        "toggleOff": "Move labware manually (protocol will pause and prompt)",
+        "toggleOn": "Use gripper to move labware"
+      },
+      "newLocation": {
+        "label": "new location"
       }
     }
   },
