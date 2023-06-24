@@ -25,7 +25,7 @@ import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
 import { SmallButton } from '../../atoms/buttons'
-import { useIsFinishedUnboxing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
+import { useUnboxingFlowUncompleted } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 

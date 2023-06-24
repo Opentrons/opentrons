@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
 import { getOnDeviceDisplaySettings } from '../../../../redux/config'
-import { useIsFinishedUnboxing } from '../hooks'
+import { useUnboxingFlowUncompleted } from '../hooks'
 
 import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'

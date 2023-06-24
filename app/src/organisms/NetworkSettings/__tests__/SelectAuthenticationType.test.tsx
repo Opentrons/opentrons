@@ -7,7 +7,7 @@ import { i18n } from '../../../i18n'
 import * as Networking from '../../../redux/networking'
 import { SetWifiCred } from '../SetWifiCred'
 import { AlternativeSecurityTypeModal } from '../AlternativeSecurityTypeModal'
-import { useIsFinishedUnboxing } from '../../RobotSettingsDashboard/NetworkSettings/hooks'
+import { useUnboxingFlowUncompleted } from '../../RobotSettingsDashboard/NetworkSettings/hooks'
 import { SelectAuthenticationType } from '../SelectAuthenticationType'
 
 const mockPush = jest.fn()
