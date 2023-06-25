@@ -422,3 +422,7 @@ ogp_site_name = "Opentrons Python Protocol API"
 ogp_image = "_static/PythonAPI.png"
 ogp_description_length = 170
 ogp_enable_meta_description = False
+
+# -- Options for tabs -----------------------------------------------------
+
+sphinx_tabs_disable_tab_closing = True
