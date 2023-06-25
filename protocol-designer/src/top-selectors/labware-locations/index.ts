@@ -122,7 +122,11 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
               {
                 name: `${getModuleDisplayName(
                   moduleEntities[modId].model
-                )} in slot ${modOnDeck.slot}`,
+                )} in slot ${
+                  modOnDeck.slot === 'span7_8_10_11'
+                    ? '7, 8, 10, 11'
+                    : modOnDeck.slot
+                }`,
                 value: modId,
               },
             ]

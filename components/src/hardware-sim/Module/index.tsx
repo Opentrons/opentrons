@@ -164,6 +164,9 @@ export const Module = (props: Props): JSX.Element => {
       ? nestedLabwareOffsetY
       : 0
   // transform to be applied to children which render within the labware interfacing surface of the module
+  //  TODO(jr, 6/26/23): labware looks off in Flex PD when on top of the thermocycler: maybe need
+  //  {moduleType == 'thermocyclerModuleType' && robotType === FLEX_ROBOT_TYPE ? clampedLabwareOffsetY + 17
+  //  : clampedLabwareOffsetY}
   const childrenTransform = `translate(${clampedLabwareOffsetX}, ${clampedLabwareOffsetY})`
 
   const renderStatusInfo = (): JSX.Element | null => {
