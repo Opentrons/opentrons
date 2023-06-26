@@ -61,7 +61,16 @@ export function InstrumentsAndModules({
     (attachedInstruments?.data ?? []).find(
       (i): i is GripperData => i.instrumentType === 'gripper' && !i.ok
     ) ?? null
-
+  const attachedLeftPipette =
+    attachedInstruments?.data?.find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'left'
+    ) ?? null
+  const attachedRightPipette =
+    attachedInstruments?.data?.find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'right'
+    ) ?? null
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes?.left ?? null
   )
@@ -145,12 +154,7 @@ export function InstrumentsAndModules({
                 }
                 isPipetteCalibrated={
                   isOT3
-                    ? attachedInstruments?.data?.find(
-                        (i): i is PipetteData =>
-                          i.instrumentType === 'pipette' &&
-                          i.ok &&
-                          i.mount === 'left'
-                      )?.data?.calibratedOffset != null
+                    ? attachedLeftPipette?.data?.calibratedOffset != null
                     : leftMountOffsetCalibration != null
                 }
                 mount={LEFT}
@@ -190,12 +194,7 @@ export function InstrumentsAndModules({
                   }
                   isPipetteCalibrated={
                     isOT3
-                      ? attachedInstruments?.data?.find(
-                          (i): i is PipetteData =>
-                            i.instrumentType === 'pipette' &&
-                            i.ok &&
-                            i.mount === 'right'
-                        )?.data?.calibratedOffset != null
+                      ? attachedRightPipette?.data?.calibratedOffset != null
                       : rightMountOffsetCalibration != null
                   }
                   mount={RIGHT}
