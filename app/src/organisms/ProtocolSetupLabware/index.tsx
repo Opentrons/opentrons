@@ -20,6 +20,7 @@ import {
   RobotWorkSpace,
   SPACING,
   TYPOGRAPHY,
+  useInterval,
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
@@ -49,7 +50,6 @@ import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRen
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type {
-  CompletedProtocolAnalysis,
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
   LabwareDefinition2,
@@ -58,7 +58,7 @@ import type {
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
-import type { LatchStatus } from '../../redux/modules/api-types'
+import { HeaterShakerModule } from '@opentrons/api-client'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
@@ -282,7 +282,6 @@ export function ProtocolSetupLabware({
             <RowLabware
               key={i}
               labware={labware}
-              robotSideAnalysis={mostRecentAnalysis}
               attachedProtocolModules={attachedProtocolModuleMatches}
               refetchModules={moduleQuery.refetch}
             />
@@ -301,38 +300,90 @@ const labwareLatchStyles = css`
 `
 
 interface LabwareLatchProps {
-  toggleLatch: () => void
-  latchStatus: LatchStatus
+  matchedHeaterShaker: HeaterShakerModule
+  refetchModules: () => void
 }
 
 function LabwareLatch({
-  toggleLatch,
-  latchStatus,
+  matchedHeaterShaker,
+  refetchModules,
 }: LabwareLatchProps): JSX.Element {
-  const { t } = useTranslation(['protocol_setup', 'heater_shaker'])
+  const [isLatchLoading, setIsLatchLoading] = React.useState<boolean>(false)
+  const [isLatchClosed, setIsLatchClosed] = React.useState<boolean>(false)
+  const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
+  const { createLiveCommand } = useCreateLiveCommandMutation()
+
+  useInterval(
+    () => {
+      refetchModules()
+    },
+    2000,
+    true
+  )
+
   let icon: 'latch-open' | 'latch-closed' | null = null
-  let statusText: string | null = null
-  switch (latchStatus) {
-    case 'idle_open':
-      icon = 'latch-open'
-      statusText = 'heater_shaker:open'
-      break
-    case 'idle_closed':
-      icon = 'latch-closed'
-      statusText = 'heater_shaker:closed'
-      break
-    case 'opening':
-      icon = 'latch-closed'
-      statusText = 'heater_shaker:opening'
-      break
-    case 'closing':
-      icon = 'latch-open'
-      statusText = 'heater_shaker:closing'
-      break
-    default:
-      icon = 'latch-open'
-      statusText = 'heater_shaker:open'
-      break
+
+  if (
+    (!isLatchClosed &&
+      (matchedHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
+        matchedHeaterShaker.data.labwareLatchStatus === 'closing')) ||
+    (isLatchClosed &&
+      (matchedHeaterShaker.data.labwareLatchStatus === 'idle_open' ||
+        matchedHeaterShaker.data.labwareLatchStatus === 'opening'))
+  ) {
+    setIsLatchClosed(
+      matchedHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
+        matchedHeaterShaker.data.labwareLatchStatus === 'opening'
+    )
+    setIsLatchLoading(
+      matchedHeaterShaker.data.labwareLatchStatus === 'opening' ||
+        matchedHeaterShaker.data.labwareLatchStatus === 'closing'
+    )
+  }
+  const latchCommand:
+    | HeaterShakerOpenLatchCreateCommand
+    | HeaterShakerCloseLatchCreateCommand = {
+    commandType: isLatchClosed
+      ? 'heaterShaker/openLabwareLatch'
+      : 'heaterShaker/closeLabwareLatch',
+    params: { moduleId: matchedHeaterShaker.id },
+  }
+
+  const toggleLatch = (): void => {
+    setIsLatchLoading(true)
+    createLiveCommand({
+      command: latchCommand,
+    }).catch((e: Error) => {
+      console.error(
+        `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+      )
+    })
+  }
+  const commandType = isLatchClosed
+    ? 'heaterShaker/openLabwareLatch'
+    : 'heaterShaker/closeLabwareLatch'
+  let hsLatchText: string | null = t('open')
+  if (commandType === 'heaterShaker/closeLabwareLatch' && isLatchLoading) {
+    hsLatchText = t('closing')
+    icon = 'latch-open'
+  } else if (
+    commandType === 'heaterShaker/openLabwareLatch' &&
+    isLatchLoading
+  ) {
+    hsLatchText = t('opening')
+    icon = 'latch-closed'
+  } else if (
+    commandType === 'heaterShaker/closeLabwareLatch' &&
+    !isLatchLoading
+  ) {
+    hsLatchText = t('open')
+    icon = 'latch-open'
+  } else if (
+    commandType === 'heaterShaker/openLabwareLatch' &&
+    !isLatchLoading
+  ) {
+    hsLatchText = t('closed')
+    icon = 'latch-closed'
   }
 
   return (
@@ -342,7 +393,7 @@ function LabwareLatch({
       borderRadius={BORDERS.borderRadiusSize3}
       css={labwareLatchStyles}
       color={
-        latchStatus === 'opening' || latchStatus === 'closing'
+        isLatchLoading
           ? `${COLORS.darkBlack100}${COLORS.opacity60HexCode}`
           : COLORS.darkBlackEnabled
       }
@@ -356,22 +407,26 @@ function LabwareLatch({
       padding={SPACING.spacing12}
     >
       <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-        {t('labware_latch')}
+        {t('protocol_setup:labware_latch')}
       </StyledText>
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >
-        {statusText != null && icon != null ? (
+        {hsLatchText != null && icon != null ? (
           <>
             <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
-              {t(statusText)}
+              {t(hsLatchText)}
             </StyledText>
             <Icon
               name={icon}
               size="2.5rem"
-              color={latchStatus === 'idle_open' ? COLORS.blueEnabled : ''}
+              color={
+                commandType === 'heaterShaker/closeLabwareLatch'
+                  ? COLORS.blueEnabled
+                  : ''
+              }
             />
           </>
         ) : null}
@@ -382,21 +437,19 @@ function LabwareLatch({
 
 interface RowLabwareProps {
   labware: LabwareSetupItem
-  robotSideAnalysis: CompletedProtocolAnalysis
   attachedProtocolModules: AttachedProtocolModuleMatch[]
   refetchModules: () => void
 }
 
 function RowLabware({
   labware,
-  robotSideAnalysis,
   attachedProtocolModules,
   refetchModules,
 }: RowLabwareProps): JSX.Element | null {
   const { definition, initialLocation, nickName } = labware
-  const { createLiveCommand } = useCreateLiveCommandMutation()
   const { t: commandTextTranslator } = useTranslation('protocol_command_text')
   const { t: setupTextTranslator } = useTranslation('protocol_setup')
+
   const matchedModule =
     initialLocation !== 'offDeck' &&
     'moduleId' in initialLocation &&
@@ -405,6 +458,12 @@ function RowLabware({
           mod => mod.moduleId === initialLocation.moduleId
         )
       : null
+  const matchingHeaterShaker =
+    matchedModule?.attachedModuleMatch != null &&
+    matchedModule.attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
+      ? matchedModule.attachedModuleMatch
+      : null
+
   const moduleInstructions = (
     <StyledText
       color={COLORS.darkBlack70}
@@ -416,41 +475,9 @@ function RowLabware({
     </StyledText>
   )
 
-  let latchCommand:
-    | HeaterShakerCloseLatchCreateCommand
-    | HeaterShakerOpenLatchCreateCommand
-  let latchStatus: LatchStatus = 'unknown'
-  if (
-    matchedModule?.attachedModuleMatch != null &&
-    matchedModule.attachedModuleMatch.moduleType === HEATERSHAKER_MODULE_TYPE
-  ) {
-    latchStatus = matchedModule.attachedModuleMatch.data.labwareLatchStatus
-    latchCommand = {
-      commandType:
-        latchStatus === 'idle_closed' || latchStatus === 'closing'
-          ? 'heaterShaker/openLabwareLatch'
-          : 'heaterShaker/closeLabwareLatch',
-      params: { moduleId: matchedModule.attachedModuleMatch.id },
-    }
-  }
-
-  const toggleLatch = (): void => {
-    createLiveCommand({
-      command: latchCommand,
-    })
-      .then(() => {
-        refetchModules()
-      })
-      .catch((e: Error) => {
-        console.error(
-          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
-        )
-      })
-  }
-
   const matchedModuleType = matchedModule?.attachedModuleMatch?.moduleType
 
-  const isOnHeaterShaker = matchedModuleType === HEATERSHAKER_MODULE_TYPE
+  const isOnHeaterShaker = matchingHeaterShaker != null
 
   let location: JSX.Element | string | null = null
   if (initialLocation === 'offDeck') {
@@ -506,7 +533,10 @@ function RowLabware({
           {isOnHeaterShaker ? moduleInstructions : null}
         </Flex>
         {isOnHeaterShaker ? (
-          <LabwareLatch toggleLatch={toggleLatch} latchStatus={latchStatus} />
+          <LabwareLatch
+            matchedHeaterShaker={matchingHeaterShaker}
+            refetchModules={refetchModules}
+          />
         ) : null}
       </Flex>
     </Flex>
