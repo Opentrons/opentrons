@@ -54,12 +54,12 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
             "CURRENT": {"MIN": 0.9, "MAX": 1.4, "INC": 0.25}
         },
         "L": {
-            "SPEED": {"MIN": 80, "MAX": 120, "INC": 10},
+            "SPEED": {"MIN": 80, "MAX": 120, "INC": 20},
             "ACCEL": {"MIN": 100, "MAX": 200, "INC": 50},
             "CURRENT": {"MIN": 0.75, "MAX": 1.25, "INC": 0.25}
         },
         "R": {
-            "SPEED": {"MIN": 80, "MAX": 120, "INC": 10},
+            "SPEED": {"MIN": 80, "MAX": 120, "INC": 20},
             "ACCEL": {"MIN": 100, "MAX": 200, "INC": 50},
             "CURRENT": {"MIN": 0.75, "MAX": 1.25, "INC": 0.25}
         },
@@ -76,7 +76,7 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
             "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25}
         },
         "Y": {
-            "SPEED": {"MIN": 250, "MAX": 400, "INC": 100},
+            "SPEED": {"MIN": 250, "MAX": 400, "INC": 75},
             "ACCEL": {"MIN": 400, "MAX": 600, "INC": 100},
             "CURRENT": {"MIN": 1.3, "MAX": 1.5, "INC": 0.1}
         },
@@ -100,6 +100,7 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
 
 START_CURRENT = 1.0
 HIGH_CURRENT = 1.5
+MAX_CURRENT = 1.5
 
 SETTINGS = {
     OT3Axis.X: GantryLoadSettings(
@@ -403,6 +404,7 @@ def save_table(test_axis_list: list, file_suffix: str, results: np.ndarray, data
                 *parameter_range(LOAD, test_axis, "ACCEL")
             ]
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            writer.writerow({"Current": TEST_NAME})
             writer.writerow({"Current": LOAD})
             writer.writerow({"Current": test_axis})
             writer.writerow({"Speed": "Acceleration"})
@@ -526,15 +528,25 @@ async def _main(is_simulating: bool) -> None:
                         }
                     )
 
+                    # create tableized output csv for neat presentation
+                    # output for cycles completed
+                    save_table([test_axis], "cycles", results_cycles, 0)
+
+                    # #output for average error
+                    save_table([test_axis], "error", results_error, 3)
+
+                    # #output for average error
+                    save_table([test_axis], "max_error", results_max_error, 3)
+
         # create tableized output csv for neat presentation
         # output for cycles completed
-        save_table(test_axis_list, "cycles", results_cycles, 0)
+        #save_table(test_axis_list, "cycles", results_cycles, 0)
 
         # #output for average error
-        save_table(test_axis_list, "error", results_error, 3)
+        #save_table(test_axis_list, "error", results_error, 3)
 
         # #output for average error
-        save_table(test_axis_list, "max_error", results_max_error, 3)
+        #save_table(test_axis_list, "max_error", results_max_error, 3)
 
 
     except KeyboardInterrupt:
@@ -554,7 +566,8 @@ def parameter_range(test_load: GantryLoad, test_axis: str, p_type: str) -> np.nd
         return np.array([start])
     else:
         # add step to stop to make range inclusive
-        stop = TEST_PARAMETERS[test_load][test_axis][p_type]["MAX"] + step
+        stop = TEST_PARAMETERS[test_load][test_axis][p_type]["MAX"] + step*0.5
+
         return np.arange(start, stop, step)
 
 
@@ -601,6 +614,7 @@ if __name__ == "__main__":
     parser.add_argument("--delay", type=int, default=0)
     parser.add_argument("--current", type=float, default=START_CURRENT)
     parser.add_argument("--bench", type=bool, default=False)
+    parser.add_argument("--name", type=str, default="ot3")
 
     args = parser.parse_args()
     CYCLES = args.cycles
@@ -610,6 +624,7 @@ if __name__ == "__main__":
     DELAY = args.delay
     START_CURRENT = args.current
     BENCH = args.bench
+    TEST_NAME = args.name
     TEST_LIST = make_test_list(AXIS, LOAD)
 
     if args.load == "HIGH":
