@@ -6,19 +6,11 @@ For more details about this release, please see the full [technical change log][
 
 # Internal Release 0.12.0
 
-## New Stuff In This Release
+## Update Notes
 
 - If your Python protocol specifies a Flex-style slot name like `"C2"`, its `apiLevel` must now be `2.15`.
 
-# Internal Release 0.11.0
-
-This is internal release 0.11.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
-
-Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
-
-## Update Notes
-
-- ⚠️ After upgrading your robot to 0.11.0, you'll need to factory-reset its run history before you can use it.
+- ⚠️ After upgrading your robot to 0.12.0 from 0.10.0 or previous, you'll need to factory-reset its run history before you can use it.
 
   1. From the robot's 3-dot menu (⋮), go to **Robot settings.**
   2. Under **Advanced > Factory reset**, select **Choose reset settings.**
@@ -30,7 +22,12 @@ Some things are known not to work, and are listed below. Specific compatibility 
 
 ## New Stuff In This Release
 
-- The HTTP API will now accept both styles of deck slot name: coordinates like "C2", and integers like "5". Flexes will now return the "C2" style, and OT-2s will continue to return the "5" style.
+- Many (many) visual and workflow fixes and improvements from design QA for the ODD
+- Pipette plunger backlash compensation should improve pipetting performance on the 96 channel
+- More slot name fixes to make them D1 instead of 1
+- 96 channel attach flow fixes
+- Firmware updates now use an HTTP API; there's no frontend, so continue to follow the rules abotu restarting with an instrument attached after an update.
+- Several ODD white screen fixes
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 

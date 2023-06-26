@@ -49,7 +49,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import ErrorMessageP
 
 from opentrons_hardware.firmware_bindings.utils import BinarySerializableException
 
-from .errors import AsyncHardwareError
+from .errors import AsyncHardwareError, CanError
 
 log = logging.getLogger(__name__)
 
@@ -349,17 +349,18 @@ class CanMessenger:
             self._listeners.pop(listener)
 
     async def _read_task_shield(self) -> None:
-        try:
-            await self._read_task()
-        except asyncio.CancelledError:
-            pass
-        except CANCommunicationError:
-            raise
-        except AsyncHardwareError:
-            raise
-        except Exception as exc:
-            log.exception("Exception in read")
-            raise CANCommunicationError(exc=exc)
+        while True:
+            try:
+                await self._read_task()
+            except asyncio.CancelledError:
+                return
+            except (CANCommunicationError, AsyncHardwareError, CanError) as e:
+                log.exception(f"Nonfatal error in CAN read task: {e}")
+                continue
+            except Exception as e:
+                # Log this separately if it's some unknown error
+                log.exception(f"Unexpected error in CAN read task: {e}")
+                continue
 
     async def _read_task(self) -> None:
         """Read task."""
