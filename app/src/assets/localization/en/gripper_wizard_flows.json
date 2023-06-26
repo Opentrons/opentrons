@@ -13,8 +13,8 @@
   "get_started": "Get started",
   "gripper_calibration": "Gripper Calibration",
   "gripper_recalibration": "Gripper Recalibration",
-  "gripper_still_attached": "Gripper Still Attached",
-  "gripper_successfully_attached_and_calibrated": "Gripper Successfully Attached and Calibrated",
+  "gripper_still_attached": "Flex Gripper Still Attached",
+  "gripper_successfully_attached_and_calibrated": "Flex Gripper Successfully Attached and Calibrated",
   "gripper_successfully_attached": "Flex Gripper Successfully Attached",
   "gripper_successfully_calibrated": "Flex Gripper Successfully Calibrated",
   "gripper_successfully_detached": "Flex Gripper Successfully Detached",
@@ -38,5 +38,5 @@
   "remove_probe": "Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.",
   "stand_back_gripper_is_calibrating": "Stand Back, Flex Gripper is Calibrating",
   "try_again": "Try again",
-  "unable_to_detect_gripper": "Unable to detect Flex Gripper"
+  "unable_to_detect_gripper": "Unable to detect Gripper"
 }
