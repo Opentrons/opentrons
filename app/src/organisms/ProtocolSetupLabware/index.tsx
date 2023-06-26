@@ -9,7 +9,6 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
-  DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -18,7 +17,6 @@ import {
   RobotWorkSpace,
   SPACING,
   TYPOGRAPHY,
-  MODULE_ICON_NAME_BY_TYPE,
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
@@ -37,7 +35,6 @@ import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { Portal } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { LocationIcon } from '../../molecules/LocationIcon'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareDisplayLocation } from '../CommandText/utils'
@@ -53,7 +50,6 @@ import type {
   HeaterShakerOpenLatchCreateCommand,
   LabwareDefinition2,
   LabwareLocation,
-  ModuleType,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
@@ -271,10 +267,10 @@ export function ProtocolSetupLabware({
           lineHeight={TYPOGRAPHY.lineHeight28}
         >
           <Flex paddingLeft={SPACING.spacing24} width="17.9%">
-            <StyledText>{t('location')}</StyledText>
+            <StyledText>{'Location'}</StyledText>
           </Flex>
-          <Flex width="81%">
-            <StyledText>{t('labware_name')}</StyledText>
+          <Flex width="82.1%">
+            <StyledText>{'Labware Name'}</StyledText>
           </Flex>
         </Flex>
         {[...onDeckItems, ...offDeckItems].map((labware, i) => {
@@ -340,13 +336,15 @@ function LabwareLatch({
           : COLORS.darkBlackEnabled
       }
       flexDirection={DIRECTION_COLUMN}
+      fontSize={TYPOGRAPHY.fontSize22}
       gridGap={SPACING.spacing8}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      minWidth="11rem"
+      lineHeight={TYPOGRAPHY.lineHeight28}
+      minWidth="11.0625rem"
       onClick={toggleLatch}
       padding={SPACING.spacing12}
     >
-      <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <StyledText fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
         {t('labware_latch')}
       </StyledText>
       <Flex
@@ -356,7 +354,9 @@ function LabwareLatch({
       >
         {statusText != null && icon != null ? (
           <>
-            <StyledText as="p">{t(statusText)}</StyledText>
+            <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
+              {t(statusText)}
+            </StyledText>
             <Icon
               name={icon}
               size="2.5rem"
@@ -441,37 +441,6 @@ function RowLabware({
     matchedModule != null &&
     matchedModule.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE
 
-  const getModuleType = (moduleInfo: string): ModuleType => {
-    const moduleType = moduleInfo.split(':')[1]
-    return moduleType as ModuleType
-  }
-  const displayLocationIcon = (): JSX.Element => {
-    const slotInfo = getLabwareDisplayLocation(
-      robotSideAnalysis,
-      initialLocation,
-      commandTextTranslator,
-      true
-    ).split(',')
-
-    if (slotInfo.length === 1 && slotInfo[0].length === 2) {
-      if (slotInfo[0].length === 2) {
-        return <LocationIcon slotName={slotInfo[0]} />
-      } else {
-        const iconName = MODULE_ICON_NAME_BY_TYPE[getModuleType(slotInfo[0])]
-        return <LocationIcon iconName={iconName} />
-      }
-    } else {
-      const iconName = MODULE_ICON_NAME_BY_TYPE[getModuleType(slotInfo[0])]
-      const slotName = slotInfo[1]
-      return (
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-          <LocationIcon slotName={slotName} />
-          <LocationIcon iconName={iconName} />
-        </Flex>
-      )
-    }
-  }
-
   return (
     <Flex
       alignItems={ALIGN_CENTER}
@@ -479,19 +448,36 @@ function RowLabware({
       borderRadius={BORDERS.borderRadiusSize3}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-      gridGap={SPACING.spacing32}
+      gridGap={SPACING.spacing24}
     >
-      <Flex minWidth="7.6875rem">{displayLocationIcon()}</Flex>
+      <Flex width="7.6875rem">
+        <StyledText>
+          {getLabwareDisplayLocation(
+            robotSideAnalysis,
+            initialLocation,
+            commandTextTranslator
+          )}
+        </StyledText>
+      </Flex>
       <Flex
         alignSelf={ALIGN_FLEX_START}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
         width="86%"
       >
-        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <StyledText
+          fontSize={TYPOGRAPHY.fontSize22}
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          lineHeight={TYPOGRAPHY.lineHeight28}
+        >
           {getLabwareDisplayName(definition)}
         </StyledText>
-        <StyledText as="p" color={COLORS.darkBlack70}>
+        <StyledText
+          color={COLORS.darkBlack70}
+          fontSize={TYPOGRAPHY.fontSize22}
+          fontWeight={TYPOGRAPHY.fontWeightRegular}
+          lineHeight={TYPOGRAPHY.lineHeight28}
+        >
           {nickName}
         </StyledText>
         {isOnHeaterShaker ? moduleInstructions : null}
