@@ -73,7 +73,7 @@ export function WifiConnectionDetails({
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing8}
-            marginBottom={SPACING.spacing40}
+            padding={`0 ${SPACING.spacing40} ${SPACING.spacing40}`}
           >
             <StyledText
               as="p"
@@ -136,6 +136,7 @@ export function WifiConnectionDetails({
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={COLORS.darkBlack70}
+            paddingX={SPACING.spacing40}
           >
             {t('other_networks')}
           </StyledText>
