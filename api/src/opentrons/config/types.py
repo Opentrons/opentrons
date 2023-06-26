@@ -1,4 +1,3 @@
-from enum import Enum
 from dataclasses import dataclass, asdict, fields
 from typing import Dict, Tuple, TypeVar, Generic, List, cast
 from typing_extensions import TypedDict, Literal
