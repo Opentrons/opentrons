@@ -6,7 +6,7 @@ from dataclasses import dataclass
 class LiquidSettings:
     """Liquid Settings for both aspirate and dispense."""
 
-    z_depth: float  # millimeters below meniscus
+    z_submerge_depth: float  # millimeters below meniscus
     plunger_acceleration: float  # ul/sec^2
     plunger_flow_rate: float  # ul/sec
     delay: float  # seconds
@@ -46,7 +46,7 @@ def interpolate(
 
     return LiquidClassSettings(
         aspirate=AspirateSettings(
-            z_depth=_interp(a.aspirate.z_depth, b.aspirate.z_depth),
+            z_submerge_depth=_interp(a.aspirate.z_submerge_depth, b.aspirate.z_submerge_depth),
             plunger_acceleration=_interp(a.aspirate.plunger_acceleration, b.aspirate.plunger_acceleration),
             plunger_flow_rate=_interp(a.aspirate.plunger_flow_rate, b.aspirate.plunger_flow_rate),
             delay=_interp(a.aspirate.delay, b.aspirate.delay),
@@ -55,7 +55,7 @@ def interpolate(
             trailing_air_gap=_interp(a.aspirate.trailing_air_gap, b.aspirate.trailing_air_gap),
         ),
         dispense=DispenseSettings(
-            z_depth=_interp(a.dispense.z_depth, b.dispense.z_depth),
+            z_submerge_depth=_interp(a.dispense.z_submerge_depth, b.dispense.z_submerge_depth),
             plunger_acceleration=_interp(a.dispense.plunger_acceleration, b.dispense.plunger_acceleration),
             plunger_flow_rate=_interp(a.dispense.plunger_flow_rate, b.dispense.plunger_flow_rate),
             delay=_interp(a.dispense.delay, b.dispense.delay),
