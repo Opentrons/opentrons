@@ -477,8 +477,6 @@ function RowLabware({
 
   const matchedModuleType = matchedModule?.attachedModuleMatch?.moduleType
 
-  const isOnHeaterShaker = matchingHeaterShaker != null
-
   let location: JSX.Element | string | null = null
   if (initialLocation === 'offDeck') {
     location = commandTextTranslator('off_deck')
@@ -530,9 +528,9 @@ function RowLabware({
           >
             {nickName}
           </StyledText>
-          {isOnHeaterShaker ? moduleInstructions : null}
+          {matchingHeaterShaker != null ? moduleInstructions : null}
         </Flex>
-        {isOnHeaterShaker ? (
+        {matchingHeaterShaker != null ? (
           <LabwareLatch
             matchedHeaterShaker={matchingHeaterShaker}
             refetchModules={refetchModules}
