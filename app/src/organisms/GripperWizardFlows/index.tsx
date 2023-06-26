@@ -8,6 +8,7 @@ import {
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   COLORS,
+  BORDERS,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
@@ -238,7 +239,13 @@ export const GripperWizard = (
       {isOnDevice ? (
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          width="100%"
+          width="992px"
+          height="568px"
+          left="14.5px"
+          top="16px"
+          border={BORDERS.lineBorder}
+          boxShadow={BORDERS.shadowSmall}
+          borderRadius={BORDERS.borderRadiusSize4}
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
         >
