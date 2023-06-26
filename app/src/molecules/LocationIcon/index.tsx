@@ -12,9 +12,9 @@ import {
 
 import { StyledText } from '../../atoms/text'
 
-import type { IconName } from '@opentrons/components'
+import type { IconName, StyleProps } from '@opentrons/components'
 
-interface LocationIconProps {
+interface LocationIconProps extends StyleProps {
   /** name constant of the slot to display */
   slotName?: string
   /** name constant of the slot to display */
@@ -24,6 +24,7 @@ interface LocationIconProps {
 export function LocationIcon({
   slotName,
   iconName,
+  ...styleProps
 }: LocationIconProps): JSX.Element {
   return (
     <Flex
@@ -38,6 +39,7 @@ export function LocationIcon({
           ? `LocationIcon_${slotName}`
           : `LocationIcon_${String(iconName)}`
       }
+      {...styleProps}
     >
       {iconName != null ? (
         <Icon
