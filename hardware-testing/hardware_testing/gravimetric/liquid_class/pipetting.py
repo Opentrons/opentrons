@@ -99,11 +99,11 @@ def _get_approach_submerge_retract_heights(
         liquid_before = well.depth + (well.depth - liquid_before)
         liquid_after = well.depth + (well.depth - liquid_after)
     if aspirate:
-        liq_submerge = liquid_class.aspirate.submerge
-        liq_retract = liquid_class.aspirate.retract
+        liq_submerge = liquid_class.aspirate.z_submerge_depth
+        liq_retract = liquid_class.aspirate.z_retract_height
     else:
-        liq_submerge = liquid_class.dispense.submerge
-        liq_retract = liquid_class.dispense.retract
+        liq_submerge = liquid_class.dispense.z_submerge_depth
+        liq_retract = liquid_class.dispense.z_retract_height
     approach_mm, submerge_mm, retract_mm = _get_heights_in_well(
         liquid_before, liquid_after, liq_submerge, liq_retract
     )
@@ -165,10 +165,10 @@ def _pipette_with_liquid_settings(
     def _dispense_with_added_blow_out() -> None:
         # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
         # FIXME: this is a hack, until there's an equivalent `pipette.blow_out(location, volume)`
-        pipette.flow_rate.blow_out = liquid_class.dispense.flow_rate
+        pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        hw_api.blow_out(hw_mount, liquid_class.aspirate.air_gap.leading_air_gap)
+        hw_api.blow_out(hw_mount, liquid_class.dispense.leading_air_gap)
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
@@ -198,9 +198,9 @@ def _pipette_with_liquid_settings(
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
         # set plunger speeds
-        pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
-        pipette.flow_rate.dispense = liquid_class.dispense.flow_rate
-        pipette.flow_rate.blow_out = liquid_class.dispense.flow_rate
+        pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
+        pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
+        pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
         # Note: Here, we previously would aspirate some air, to account for the leading-air-gap.
         #       However, we can instead use the already-present air between the pipette's
         #       "bottom" and "blow-out" plunger positions. This would require the `pipette.blow_out`
@@ -233,14 +233,14 @@ def _pipette_with_liquid_settings(
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
         # NOTE: temporarily set aspirate flow-rate to be the faster dispense flow-rate
-        pipette.flow_rate.aspirate = liquid_class.dispense.flow_rate
-        pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
-        pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
+        pipette.flow_rate.aspirate = liquid_class.dispense.plunger_flow_rate
+        pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
+        pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
 
     def _dispense_on_approach() -> None:
         _do_user_pause(ctx, inspect, "about to dispense")
         # remove trailing-air-gap
-        pipette.dispense(liquid_class.aspirate.air_gap.trailing_air_gap)
+        pipette.dispense(liquid_class.aspirate.trailing_air_gap)
 
     def _dispense_on_submerge() -> None:
         callbacks.on_dispensing()
@@ -273,9 +273,9 @@ def _pipette_with_liquid_settings(
         # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
         #       to avoid droplets from forming and falling off the tip
         # NOTE: temporarily set aspirate flow-rate to be the faster dispense flow-rate
-        pipette.flow_rate.aspirate = liquid_class.dispense.flow_rate
-        pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
-        pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
+        pipette.flow_rate.aspirate = liquid_class.dispense.plunger_flow_rate
+        pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
+        pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
 
     # PHASE 1: APPROACH
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))

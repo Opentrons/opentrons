@@ -46,21 +46,45 @@ def interpolate(
 
     return LiquidClassSettings(
         aspirate=AspirateSettings(
-            z_submerge_depth=_interp(a.aspirate.z_submerge_depth, b.aspirate.z_submerge_depth),
-            plunger_acceleration=_interp(a.aspirate.plunger_acceleration, b.aspirate.plunger_acceleration),
-            plunger_flow_rate=_interp(a.aspirate.plunger_flow_rate, b.aspirate.plunger_flow_rate),
+            z_submerge_depth=_interp(
+                a.aspirate.z_submerge_depth, b.aspirate.z_submerge_depth
+            ),
+            plunger_acceleration=_interp(
+                a.aspirate.plunger_acceleration, b.aspirate.plunger_acceleration
+            ),
+            plunger_flow_rate=_interp(
+                a.aspirate.plunger_flow_rate, b.aspirate.plunger_flow_rate
+            ),
             delay=_interp(a.aspirate.delay, b.aspirate.delay),
-            z_retract_discontinuity=_interp(a.aspirate.z_retract_discontinuity, b.aspirate.z_retract_discontinuity),
-            z_retract_height=_interp(a.aspirate.z_retract_height, b.aspirate.z_retract_height),
-            trailing_air_gap=_interp(a.aspirate.trailing_air_gap, b.aspirate.trailing_air_gap),
+            z_retract_discontinuity=_interp(
+                a.aspirate.z_retract_discontinuity, b.aspirate.z_retract_discontinuity
+            ),
+            z_retract_height=_interp(
+                a.aspirate.z_retract_height, b.aspirate.z_retract_height
+            ),
+            trailing_air_gap=_interp(
+                a.aspirate.trailing_air_gap, b.aspirate.trailing_air_gap
+            ),
         ),
         dispense=DispenseSettings(
-            z_submerge_depth=_interp(a.dispense.z_submerge_depth, b.dispense.z_submerge_depth),
-            plunger_acceleration=_interp(a.dispense.plunger_acceleration, b.dispense.plunger_acceleration),
-            plunger_flow_rate=_interp(a.dispense.plunger_flow_rate, b.dispense.plunger_flow_rate),
+            z_submerge_depth=_interp(
+                a.dispense.z_submerge_depth, b.dispense.z_submerge_depth
+            ),
+            plunger_acceleration=_interp(
+                a.dispense.plunger_acceleration, b.dispense.plunger_acceleration
+            ),
+            plunger_flow_rate=_interp(
+                a.dispense.plunger_flow_rate, b.dispense.plunger_flow_rate
+            ),
             delay=_interp(a.dispense.delay, b.dispense.delay),
-            z_retract_discontinuity=_interp(a.dispense.z_retract_discontinuity, b.dispense.z_retract_discontinuity),
-            z_retract_height=_interp(a.dispense.z_retract_height, b.dispense.z_retract_height),
-            leading_air_gap=_interp(a.dispense.leading_air_gap, b.dispense.leading_air_gap),
+            z_retract_discontinuity=_interp(
+                a.dispense.z_retract_discontinuity, b.dispense.z_retract_discontinuity
+            ),
+            z_retract_height=_interp(
+                a.dispense.z_retract_height, b.dispense.z_retract_height
+            ),
+            leading_air_gap=_interp(
+                a.dispense.leading_air_gap, b.dispense.leading_air_gap
+            ),
         ),
     )
