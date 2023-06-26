@@ -359,6 +359,20 @@ def test_load_labware_on_module(
     )
 
 
+def test_load_labware_on_labware_raises(
+    decoy: Decoy, subject: LegacyProtocolCore
+) -> None:
+    """It should raise an API version error when trying to load a labware onto a labware."""
+    with pytest.raises(APIVersionError):
+        subject.load_labware(
+            load_name="cool load name",
+            location=decoy.mock(cls=LegacyLabwareCore),
+            label="cool label",
+            namespace="cool namespace",
+            version=1337,
+        )
+
+
 def test_load_module(
     decoy: Decoy,
     mock_deck: Deck,
