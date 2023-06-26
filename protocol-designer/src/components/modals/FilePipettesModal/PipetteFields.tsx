@@ -24,6 +24,7 @@ import { i18n } from '../../../localization'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { FormPipettesByMount } from '../../../step-forms'
+import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { PipetteDiagram } from './PipetteDiagram'
 
 import styles from './FilePipettesModal.css'
@@ -88,6 +89,7 @@ export function PipetteFields(props: Props): JSX.Element {
     robotType,
   } = props
 
+  const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch()
   const allLabware = useSelector(getLabwareDefsByURI)
 
@@ -137,7 +139,8 @@ export function PipetteFields(props: Props): JSX.Element {
         if (
           def.metadata.displayCategory !== 'tipRack' ||
           (!selectedPipetteDefaultTipRacks.includes(getLabwareDefURI(def)) &&
-            def.namespace !== 'custom_beta')
+            def.namespace !== 'custom_beta' &&
+            !allowAllTipracks)
         )
           return acc
         return [

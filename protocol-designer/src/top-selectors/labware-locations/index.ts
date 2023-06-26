@@ -144,7 +144,9 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
       )
       .map(slotId => ({ name: slotId, value: slotId }))
 
-    return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions]
+    const offDeck = { name: 'Off Deck', value: 'offDeck' }
+
+    return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions, offDeck]
   }
 )
 

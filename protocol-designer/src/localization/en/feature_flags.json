@@ -19,5 +19,9 @@
   "OT_PD_ENABLE_OT_3": {
     "title": "Enable OT-3 support",
     "description": "Allow users to enable OT-3 support in protocol designer"
+  },
+  "ALLOW_ALL_TIPRACKS": {
+    "title": "Allow all tiprack options",
+    "description": "Enable selection of all tipracks for each pipette."
   }
 }

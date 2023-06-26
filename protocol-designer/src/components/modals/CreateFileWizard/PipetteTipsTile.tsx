@@ -32,6 +32,7 @@ import {
 } from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
+import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { GoBackLink } from './GoBackLink'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
@@ -146,13 +147,14 @@ interface PipetteTipsFieldProps extends FormikProps<FormState> {
 function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const { mount, values, setFieldValue } = props
   const { t } = useTranslation()
+  const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch()
   const [showCustomTipracks, setShowCustomTipracks] = React.useState<boolean>(
     false
   )
   const allLabware = useSelector(getLabwareDefsByURI)
   const selectedPipetteName = values.pipettesByMount[mount].pipetteName
-  const selectedPipetteDefaultTipRacks =
+  const selectedPipetteDefaultTipracks =
     selectedPipetteName != null
       ? getPipetteNameSpecs(selectedPipetteName as PipetteName)
           ?.defaultTipracks ?? []
@@ -163,13 +165,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
     (acc, def: typeof allLabware[string]) => {
       if (def.metadata.displayCategory !== 'tipRack') return acc
 
-      const isDefaultTiprack = selectedPipetteDefaultTipRacks.includes(
-        getLabwareDefURI(def)
-      )
-
-      const isCustomTiprack = def.namespace === 'custom_beta'
-
-      if (isDefaultTiprack || isCustomTiprack) {
+      if (allowAllTipracks) {
         return [
           ...acc,
           {
@@ -177,25 +173,41 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
             value: getLabwareDefURI(def),
           },
         ]
-      }
+      } else {
+        const isDefaultTiprack = selectedPipetteDefaultTipracks.includes(
+          getLabwareDefURI(def)
+        )
+        const isCustomTiprack = def.namespace === 'custom_beta'
 
-      return acc
+        if (isDefaultTiprack || isCustomTiprack) {
+          return [
+            ...acc,
+            {
+              name: getLabwareDisplayName(def),
+              value: getLabwareDefURI(def),
+            },
+          ]
+        }
+
+        return acc
+      }
     },
     []
   ).sort(a => (a.name.includes('(Retired)') ? 1 : -1))
 
   const defaultTiprackOptions = tiprackOptions.filter(option =>
-    selectedPipetteDefaultTipRacks.includes(option.value)
+    allowAllTipracks
+      ? !option.value.includes('custom_beta')
+      : selectedPipetteDefaultTipracks.includes(option.value)
   )
 
-  const customTiprackOptions = tiprackOptions.filter(
-    option =>
-      !selectedPipetteDefaultTipRacks.includes(option.value) &&
-      option.value.includes('custom_beta')
+  const customTiprackOptions = tiprackOptions.filter(option =>
+    option.value.includes('custom_beta')
   )
 
   const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
   const currentValue = values.pipettesByMount[mount].tiprackDefURI
+
   if (currentValue === undefined) {
     setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
   }
