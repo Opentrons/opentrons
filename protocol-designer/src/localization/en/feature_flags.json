@@ -21,7 +21,7 @@
     "description": "Allow users to enable OT-3 support in protocol designer"
   },
   "ALLOW_ALL_TIPRACKS": {
-    "title": "Allow all tiprack options",
-    "description": "Enable selection of all tipracks for each pipette."
+    "title": "Allow all tip rack options",
+    "description": "Enable selection of all tip racks for each pipette."
   }
 }

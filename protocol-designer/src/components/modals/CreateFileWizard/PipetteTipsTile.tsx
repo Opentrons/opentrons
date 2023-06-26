@@ -3,14 +3,12 @@ import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { FormikProps } from 'formik'
-import reduce from 'lodash/reduce'
 import {
   DIRECTION_COLUMN,
   Flex,
   Text,
   SPACING,
   Mount,
-  RadioOption,
   ALIGN_CENTER,
   PrimaryButton,
   JUSTIFY_SPACE_BETWEEN,
@@ -25,14 +23,11 @@ import {
   WRAP,
   Btn,
 } from '@opentrons/components'
-import {
-  getLabwareDefURI,
-  getLabwareDisplayName,
-  getPipetteNameSpecs,
-} from '@opentrons/shared-data'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
+import { getTiprackOptions } from '../utils'
 import { GoBackLink } from './GoBackLink'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
@@ -165,41 +160,11 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
       ? getPipetteNameSpecs(selectedPipetteName as PipetteName)
           ?.defaultTipracks ?? []
       : []
-
-  const tiprackOptions = reduce<typeof allLabware, RadioOption[]>(
-    allLabware,
-    (acc, def: typeof allLabware[string]) => {
-      if (def.metadata.displayCategory !== 'tipRack') return acc
-
-      if (allowAllTipracks) {
-        return [
-          ...acc,
-          {
-            name: getLabwareDisplayName(def),
-            value: getLabwareDefURI(def),
-          },
-        ]
-      } else {
-        const isDefaultTiprack = selectedPipetteDefaultTipracks.includes(
-          getLabwareDefURI(def)
-        )
-        const isCustomTiprack = def.namespace === 'custom_beta'
-
-        if (isDefaultTiprack || isCustomTiprack) {
-          return [
-            ...acc,
-            {
-              name: getLabwareDisplayName(def),
-              value: getLabwareDefURI(def),
-            },
-          ]
-        }
-
-        return acc
-      }
-    },
-    []
-  ).sort(a => (a.name.includes('(Retired)') ? 1 : -1))
+  const tiprackOptions = getTiprackOptions({
+    allLabware: allLabware,
+    allowAllTipracks: allowAllTipracks,
+    selectedPipetteName: selectedPipetteName,
+  })
 
   const defaultTiprackOptions = tiprackOptions.filter(option =>
     allowAllTipracks

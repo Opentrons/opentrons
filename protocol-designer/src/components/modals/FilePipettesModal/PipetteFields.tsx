@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
-import reduce from 'lodash/reduce'
 import {
   DropdownField,
   FormGroup,
@@ -11,20 +10,17 @@ import {
 } from '@opentrons/components'
 import {
   getIncompatiblePipetteNames,
-  getLabwareDefURI,
-  getLabwareDisplayName,
-  getPipetteNameSpecs,
   OT2_PIPETTES,
   OT2_ROBOT_TYPE,
   OT3_PIPETTES,
   RobotType,
 } from '@opentrons/shared-data'
-import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
 import { i18n } from '../../../localization'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { FormPipettesByMount } from '../../../step-forms'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
+import { getTiprackOptions } from '../utils'
 import { PipetteDiagram } from './PipetteDiagram'
 
 import styles from './FilePipettesModal.css'
@@ -127,32 +123,11 @@ export function PipetteFields(props: Props): JSX.Element {
   const renderTiprackSelect = (props: TiprackSelectProps): JSX.Element => {
     const { mount } = props
     const selectedPipetteName = values[mount].pipetteName
-    const selectedPipetteDefaultTipRacks =
-      selectedPipetteName != null
-        ? getPipetteNameSpecs(selectedPipetteName as PipetteName)
-            ?.defaultTipracks ?? []
-        : []
-
-    const tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
-      allLabware,
-      (acc, def: typeof allLabware[string]) => {
-        if (
-          def.metadata.displayCategory !== 'tipRack' ||
-          (!selectedPipetteDefaultTipRacks.includes(getLabwareDefURI(def)) &&
-            def.namespace !== 'custom_beta' &&
-            !allowAllTipracks)
-        )
-          return acc
-        return [
-          ...acc,
-          {
-            name: getLabwareDisplayName(def),
-            value: getLabwareDefURI(def),
-          },
-        ]
-      },
-      []
-    ).sort(a => (a.name.includes('(Retired)') ? 1 : -1))
+    const tiprackOptions = getTiprackOptions({
+      allLabware: allLabware,
+      allowAllTipracks: allowAllTipracks,
+      selectedPipetteName: selectedPipetteName,
+    })
 
     return (
       <DropdownField
