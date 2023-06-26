@@ -53,13 +53,15 @@ export function SecondPipetteTipsTile(
   const shouldProceed =
     leftPipetteName === 'p1000_96' || rightPipetteName === ''
 
-  if (shouldProceed) {
-    proceed()
-    return null
-  }
+  React.useEffect(() => {
+    if (shouldProceed) {
+      proceed()
+    }
+  }, [shouldProceed, proceed])
 
   return <PipetteTipsTile {...props} mount="right" />
 }
+
 interface PipetteTipsTileProps extends WizardTileProps {
   mount: Mount
 }
