@@ -1,5 +1,5 @@
 diff --git a/api/src/opentrons/config/defaults_ot3.py b/api/src/opentrons/config/defaults_ot3.py
-index 5b21328a92..1bb9a6ceb8 100644
+index 5b21328a92..12818d4267 100644
 --- a/api/src/opentrons/config/defaults_ot3.py
 +++ b/api/src/opentrons/config/defaults_ot3.py
 @@ -83,7 +83,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
@@ -93,7 +93,7 @@ index 815dada3b9..30121fc4c8 100644
      def add_tip(self, tip_length: float) -> None:
          """
 diff --git a/api/src/opentrons/hardware_control/ot3api.py b/api/src/opentrons/hardware_control/ot3api.py
-index 58a768a775..b1dc2d7e5b 100644
+index b847298df7..b6060f24b9 100644
 --- a/api/src/opentrons/hardware_control/ot3api.py
 +++ b/api/src/opentrons/hardware_control/ot3api.py
 @@ -1662,8 +1662,8 @@ class OT3API(

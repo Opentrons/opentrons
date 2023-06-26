@@ -2918,7 +2918,7 @@ index 0000000000..7f0470f3bb
 +}
 diff --git a/shared-data/labware/definitions/2/opentrons_ot3_96_tiprack_50ul_adp/1.json b/shared-data/labware/definitions/2/opentrons_ot3_96_tiprack_50ul_adp/1.json
 new file mode 100644
-index 0000000000..d443279540
+index 0000000000..e7d2cd59eb
 --- /dev/null
 +++ b/shared-data/labware/definitions/2/opentrons_ot3_96_tiprack_50ul_adp/1.json
 @@ -0,0 +1,1017 @@
