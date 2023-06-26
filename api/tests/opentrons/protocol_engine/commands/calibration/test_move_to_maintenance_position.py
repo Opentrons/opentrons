@@ -109,6 +109,7 @@ async def test_calibration_move_to_location_implementation(
         )
 
 
+@pytest.mark.ot3_only
 async def test_calibration_move_to_location_implementation_for_gripper(
     decoy: Decoy,
     subject: MoveToMaintenancePositionImplementation,
