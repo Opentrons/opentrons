@@ -674,7 +674,7 @@ class OT3API(
         if isinstance(mount, (top_types.Mount, OT3Mount)):
             axes = [OT3Axis.by_mount(mount)]
         else:
-            axes = list(OT3Axis.mount_axes())
+            axes = list(OT3Axis.mount_axes(self.gantry_load))
         await self.home(axes)
 
     async def home_gripper_jaw(self) -> None:
@@ -1237,7 +1237,7 @@ class OT3API(
 
         home_seq = [
             ax
-            for ax in OT3Axis.home_order()
+            for ax in OT3Axis.home_order(self.gantry_load)
             if (ax in checked_axes and self._backend.axis_is_present(ax))
         ]
         self._log.info(f"home was called with {axes} generating sequence {home_seq}")
