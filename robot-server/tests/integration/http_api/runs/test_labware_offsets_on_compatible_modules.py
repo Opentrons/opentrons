@@ -56,7 +56,9 @@ async def robot_client(
 ) -> AsyncGenerator[RobotClient, None]:
     """Return a client for a running dev server."""
     async with RobotClient.make(
-        base_url=ot2_server_base_url, version="*", system_server_base_url=f"http://localhost:{session_system_server_port}"
+        base_url=ot2_server_base_url,
+        version="*",
+        system_server_base_url=f"http://localhost:{session_system_server_port}",
     ) as robot_client:
         assert (
             await robot_client.wait_until_alive()

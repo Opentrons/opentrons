@@ -18,7 +18,9 @@ async def test_upload_protocols_with_bundled_data(
 ) -> None:
     """Test uploading data files with protocol."""
     async with RobotClient.make(
-        base_url=ot2_server_base_url, version="*", system_server_base_url=f"http://localhost:{session_system_server_port}"
+        base_url=ot2_server_base_url,
+        version="*",
+        system_server_base_url=f"http://localhost:{session_system_server_port}",
     ) as robot_client:
         await robot_client.get_auth_token()
         with get_py_protocol(secrets.token_urlsafe(16)) as protocol:

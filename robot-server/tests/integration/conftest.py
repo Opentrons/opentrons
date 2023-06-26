@@ -26,7 +26,7 @@ _SESSION_SYSTEM_SERVER_PORT = "32950"
 def get_auth_token() -> str:
     """Obtains an auth token from the system server on startup."""
     session = requests.Session()
-    base_url = f"{_SESSION_SERVER_HOST}:{_SESSION_SYSTEM_SERVER_PORT}"
+    base_url = f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_SESSION_SYSTEM_SERVER_PORT}"
 
     registration: str = session.post(
         url=f"{base_url}/system/register",
@@ -101,37 +101,44 @@ def ot3_server_base_url(_ot3_session_server: str) -> Generator[str, None, None]:
     _clean_server_state(_ot3_session_server)
 
 
+@pytest.fixture
+def session_system_server_port(_system_server_session_server: str) -> str:
+    """Return the port of the running session-scoped dev server."""
+    return _SESSION_SYSTEM_SERVER_PORT
+
+
 @pytest.fixture(scope="session")
-def run_system_server(
-    request_session: requests.Session,
-) -> Iterator[None]:
+def _system_server_session_server() -> Generator[str, None, None]:
     """Run the system server as a background process."""
+    base_url = (
+        f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_SESSION_SYSTEM_SERVER_PORT}"
+    )
     with DevSystemServer(port=_SESSION_SYSTEM_SERVER_PORT) as dev_server:
         dev_server.start()
 
-        # Wait for a bit to get started by polling /hcpealth
-        from requests.exceptions import ConnectionError
+        with _requests_session() as requests_session:
+            # Wait for a bit to get started by polling for a connection error
+            from requests.exceptions import ConnectionError
 
-        while True:
-            try:
-                request_session.get(
-                    f"{_SESSION_SERVER_HOST}:{_SESSION_SYSTEM_SERVER_PORT}/"
-                )
-            except ConnectionError:
-                # The server isn't up yet to accept requests. Keep polling.
-                pass
-            else:
-                # The server's replied with something other than a busy indicator. Stop polling.
-                break
+            while True:
+                try:
+                    requests_session.get(
+                        base_url
+                    )
+                except ConnectionError:
+                    # The server isn't up yet to accept requests. Keep polling.
+                    pass
+                else:
+                    # The server's replied with something other than a busy indicator. Stop polling.
+                    break
 
-            time.sleep(0.1)
+                time.sleep(0.1)
 
-        # For all future uses of request_session, a token will be included automatically
-        request_session.headers.update({"authenticationBearer": get_auth_token()})
-        yield
+        yield base_url
 
 
-def _ot2_session_server(server_temp_directory: str) -> Generator[str, None, None]:
+@pytest.fixture(scope="session")
+def _ot2_session_server(server_temp_directory: str, _system_server_session_server: str) -> Generator[str, None, None]:
     base_url = (
         f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_OT2_SESSION_SERVER_PORT}"
     )
@@ -146,7 +153,7 @@ def _ot2_session_server(server_temp_directory: str) -> Generator[str, None, None
 
 
 @pytest.fixture(scope="session")
-def _ot3_session_server(server_temp_directory: str) -> Generator[str, None, None]:
+def _ot3_session_server(server_temp_directory: str, _system_server_session_server: str) -> Generator[str, None, None]:
     base_url = (
         f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_OT3_SESSION_SERVER_PORT}"
     )
@@ -187,10 +194,11 @@ def _wait_until_ready(base_url: str) -> None:
             time.sleep(0.1)
 
 
-def _clean_server_state(base_url: str) -> None:
+def _clean_server_state(base_url: str, _system_server_session_server: str) -> None:
     async def _clean_server_state_async() -> None:
-        async with RobotClient.make(base_url=base_url, version="*") as robot_client:
+        async with RobotClient.make(base_url=base_url, version="*", system_server_base_url=_system_server_session_server) as robot_client:
             # Delete runs first because protocols can't be deleted if a run refers to them.
+            await robot_client.get_auth_token()
             await _delete_all_runs(robot_client)
             await _delete_all_protocols(robot_client)
 
@@ -203,13 +211,6 @@ async def _delete_all_runs(robot_client: RobotClient) -> None:
     run_ids = [r["id"] for r in response.json()["data"]]
     for run_id in run_ids:
         await robot_client.delete_run(run_id)
-
-
-
-@pytest.fixture(scope="session")
-def session_system_server_port(run_system_server: object) -> str:
-    """Return the port of the running session-scoped dev server."""
-    return _SESSION_SYSTEM_SERVER_PORT
 
 
 async def _delete_all_protocols(robot_client: RobotClient) -> None:

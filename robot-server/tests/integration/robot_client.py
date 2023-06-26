@@ -38,7 +38,9 @@ class RobotClient:
 
     @staticmethod
     @contextlib.asynccontextmanager
-    async def make(base_url: str, version: str, system_server_base_url: str) -> AsyncGenerator[RobotClient, None]:
+    async def make(
+        base_url: str, version: str, system_server_base_url: str
+    ) -> AsyncGenerator[RobotClient, None]:
         with concurrent.futures.ThreadPoolExecutor() as worker_executor:
             async with httpx.AsyncClient(
                 headers={"opentrons-version": version},
@@ -52,7 +54,7 @@ class RobotClient:
                     httpx_client=httpx_client,
                     worker_executor=worker_executor,
                     base_url=base_url,
-                    system_server_base_url=system_server_base_url
+                    system_server_base_url=system_server_base_url,
                 )
 
     async def alive(self) -> bool:
