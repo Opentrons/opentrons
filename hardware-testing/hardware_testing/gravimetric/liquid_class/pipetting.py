@@ -1,10 +1,13 @@
 """Pipette motions."""
+from math import pi
 from dataclasses import dataclass
 from typing import Optional, Callable, Tuple
 
+from opentrons.config.defaults_ot3 import DEFAULT_ACCELERATIONS
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_api.labware import Well
 
+from hardware_testing.opentrons_api.types import OT3AxisKind
 from hardware_testing.gravimetric import config
 from hardware_testing.gravimetric.liquid_height.height import LiquidTracker
 from hardware_testing.opentrons_api.types import OT3Mount, Point
@@ -142,6 +145,45 @@ def _retract(
     )
 
 
+def _change_plunger_acceleration(
+    ctx: ProtocolContext, pipette: InstrumentContext, ul_per_sec_per_sec: float
+) -> None:
+    hw_api = ctx._core.get_hardware()
+    # NOTE: set plunger accelerations by converting ul/sec/sec to mm/sec/sec,
+    #       making sure to use the nominal ul/mm to convert so that the
+    #       mm/sec/sec we move is constant regardless of changes to the function
+    if "p50" in pipette.name:
+        shaft_diameter_mm = 1.0
+    else:
+        shaft_diameter_mm = 4.5
+    nominal_ul_per_mm = pi * pow(shaft_diameter_mm * 0.5, 2)
+    p_accel = ul_per_sec_per_sec / nominal_ul_per_mm
+    if pipette.channels == 96:
+        hw_api.config.motion_settings.acceleration.high_throughput[
+            OT3AxisKind.P
+        ] = p_accel
+    else:
+        hw_api.config.motion_settings.acceleration.low_throughput[
+            OT3AxisKind.P
+        ] = p_accel
+
+
+def _reset_plunger_acceleration(
+    ctx: ProtocolContext, pipette: InstrumentContext
+) -> None:
+    hw_api = ctx._core.get_hardware()
+    if pipette.channels == 96:
+        p_accel = DEFAULT_ACCELERATIONS.high_throughput[OT3AxisKind.P]
+        hw_api.config.motion_settings.acceleration.high_throughput[
+            OT3AxisKind.P
+        ] = p_accel
+    else:
+        p_accel = DEFAULT_ACCELERATIONS.low_throughput[OT3AxisKind.P]
+        hw_api.config.motion_settings.acceleration.low_throughput[
+            OT3AxisKind.P
+        ] = p_accel
+
+
 def _pipette_with_liquid_settings(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -201,10 +243,10 @@ def _pipette_with_liquid_settings(
         pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
         pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
         pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
-        # set plunger accelerations
-        # TODO: set plunger accelerations by convering ul/sec/sec to mm/sec/sec,
-        #       making sure to use the nominal ul/mm to convert so that the
-        #       mm/sec/sec we move is constant regardless of changes to the function
+        # set accelerations
+        _change_plunger_acceleration(
+            ctx, pipette, liquid_class.aspirate.plunger_acceleration
+        )
 
     def _aspirate_on_submerge() -> None:
         # mix 5x times
@@ -234,9 +276,15 @@ def _pipette_with_liquid_settings(
         pipette.flow_rate.aspirate = liquid_class.dispense.plunger_flow_rate
         pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
         pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
+        # reset plunger accelerations
+        _reset_plunger_acceleration(ctx, pipette)
 
     def _dispense_on_approach() -> None:
         _do_user_pause(ctx, inspect, "about to dispense")
+        # set accelerations
+        _change_plunger_acceleration(
+            ctx, pipette, liquid_class.dispense.plunger_acceleration
+        )
         # remove trailing-air-gap
         pipette.dispense(liquid_class.aspirate.trailing_air_gap)
 
@@ -275,7 +323,7 @@ def _pipette_with_liquid_settings(
         pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
         pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
         # reset plunger accelerations back to defaults
-        # TODO: reset accelerations
+        _reset_plunger_acceleration(ctx, pipette)
 
     # PHASE 1: APPROACH
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
