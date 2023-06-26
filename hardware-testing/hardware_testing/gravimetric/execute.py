@@ -414,6 +414,13 @@ def _get_robot_serial(is_simulating: bool) -> str:
         return "simulation-serial-number"
 
 
+def _get_tip_batch(is_simulating: bool) -> str:
+    if not is_simulating:
+        return input("TIP BATCH:").strip()
+    else:
+        return "simulation-tip-batch"
+
+
 def _pick_up_tip(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -526,11 +533,13 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     test_report.set_tag(pipette_tag)
     test_report.set_operator(_get_operator_name(ctx.is_simulating()))
     serial_number = _get_robot_serial(ctx.is_simulating())
+    tip_batch = _get_tip_batch(ctx.is_simulating())
     test_report.set_version(get_git_description())
     report.store_serial_numbers(
         test_report,
         robot=serial_number,
         pipette=pipette_tag,
+        tips=tip_batch,
         scale=recorder.serial_number,
         environment="None",
         liquid="None",
