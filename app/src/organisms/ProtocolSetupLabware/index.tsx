@@ -20,7 +20,6 @@ import {
   RobotWorkSpace,
   SPACING,
   TYPOGRAPHY,
-  useInterval,
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
@@ -68,6 +67,8 @@ const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'CALIBRATION_CUTOUTS',
 ]
 
+const MODULE_REFETCH_INTERVAL = 5000
+
 const LabwareThumbnail = styled.svg`
   transform: scale(1, -1);
   width: 12rem;
@@ -103,7 +104,9 @@ export function ProtocolSetupLabware({
     mostRecentAnalysis != null
       ? getLabwareRenderInfo(mostRecentAnalysis, deckDef)
       : {}
-  const moduleQuery = useModulesQuery()
+  const moduleQuery = useModulesQuery({
+    refetchInterval: MODULE_REFETCH_INTERVAL,
+  })
   const attachedModules = moduleQuery?.data?.data ?? []
   const protocolModulesInfo =
     mostRecentAnalysis != null
@@ -308,38 +311,18 @@ function LabwareLatch({
   matchedHeaterShaker,
   refetchModules,
 }: LabwareLatchProps): JSX.Element {
-  const [isLatchLoading, setIsLatchLoading] = React.useState<boolean>(false)
-  const [isLatchClosed, setIsLatchClosed] = React.useState<boolean>(false)
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
   const { createLiveCommand } = useCreateLiveCommandMutation()
-
-  useInterval(
-    () => {
-      refetchModules()
-    },
-    2000,
-    true
-  )
+  console.log({ status: matchedHeaterShaker.data.labwareLatchStatus })
+  const isLatchLoading =
+    matchedHeaterShaker.data.labwareLatchStatus === 'opening' ||
+    matchedHeaterShaker.data.labwareLatchStatus === 'closing'
+  const isLatchClosed =
+    matchedHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
+    matchedHeaterShaker.data.labwareLatchStatus === 'opening'
 
   let icon: 'latch-open' | 'latch-closed' | null = null
 
-  if (
-    (!isLatchClosed &&
-      (matchedHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
-        matchedHeaterShaker.data.labwareLatchStatus === 'closing')) ||
-    (isLatchClosed &&
-      (matchedHeaterShaker.data.labwareLatchStatus === 'idle_open' ||
-        matchedHeaterShaker.data.labwareLatchStatus === 'opening'))
-  ) {
-    setIsLatchClosed(
-      matchedHeaterShaker.data.labwareLatchStatus === 'idle_closed' ||
-        matchedHeaterShaker.data.labwareLatchStatus === 'opening'
-    )
-    setIsLatchLoading(
-      matchedHeaterShaker.data.labwareLatchStatus === 'opening' ||
-        matchedHeaterShaker.data.labwareLatchStatus === 'closing'
-    )
-  }
   const latchCommand:
     | HeaterShakerOpenLatchCreateCommand
     | HeaterShakerCloseLatchCreateCommand = {
@@ -350,14 +333,15 @@ function LabwareLatch({
   }
 
   const toggleLatch = (): void => {
-    setIsLatchLoading(true)
     createLiveCommand({
       command: latchCommand,
-    }).catch((e: Error) => {
-      console.error(
-        `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
-      )
     })
+      .then(() => refetchModules())
+      .catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
+        )
+      })
   }
   const commandType = isLatchClosed
     ? 'heaterShaker/openLabwareLatch'
@@ -417,7 +401,7 @@ function LabwareLatch({
         {hsLatchText != null && icon != null ? (
           <>
             <StyledText fontWeight={TYPOGRAPHY.fontWeightRegular}>
-              {t(hsLatchText)}
+              {hsLatchText}
             </StyledText>
             <Icon
               name={icon}
