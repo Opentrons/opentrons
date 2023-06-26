@@ -92,13 +92,16 @@ export function MoveLabwareOnDeck(props: MoveLabwareOnDeckProps): JSX.Element | 
     config: { duration: 1000, easing: easings.easeInOutSine },
     from: {
       ...initialPosition,
-      splashOpacity: 1,
-      deckOpacity: 1,
+      splashOpacity: 0,
+      deckOpacity: 0,
     },
     to: [
+      { deckOpacity: 1 },
+      { splashOpacity: 1 },
       { splashOpacity: 0 },
       { ...finalPosition },
       { splashOpacity: 1 },
+      { splashOpacity: 0 },
       { deckOpacity: 0 },
     ],
     loop: true,
