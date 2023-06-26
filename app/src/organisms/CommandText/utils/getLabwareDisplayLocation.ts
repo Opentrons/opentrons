@@ -33,7 +33,7 @@ export function getLabwareDisplayLocation(
         location.moduleId
       )
       return isOnDevice
-        ? `${moduleModel}, ${slotName}`
+        ? `${location.moduleId}, ${slotName}`
         : t('module_in_slot', {
             count: getOccludedSlotCountForModule(
               getModuleType(moduleModel),
