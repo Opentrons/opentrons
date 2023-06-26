@@ -125,12 +125,20 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
   }, [robotType])
   const nameAccessor = `pipettesByMount.${mount}.pipetteName`
   const currentValue = values.pipettesByMount[mount].pipetteName
-  if (currentValue === undefined) {
-    setFieldValue(
-      nameAccessor,
-      allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
-    )
-  }
+  React.useEffect(() => {
+    if (currentValue === undefined) {
+      setFieldValue(
+        nameAccessor,
+        allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
+      )
+    }
+  }, [
+    currentValue,
+    setFieldValue,
+    nameAccessor,
+    allowNoPipette,
+    pipetteOptions,
+  ])
 
   return (
     <Flex

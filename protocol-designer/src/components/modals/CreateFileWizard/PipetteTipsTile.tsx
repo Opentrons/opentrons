@@ -46,15 +46,19 @@ export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
 export function SecondPipetteTipsTile(
   props: WizardTileProps
 ): JSX.Element | null {
-  if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
-    props.proceed()
+  const { values, proceed } = props
+  const leftPipetteName = values.pipettesByMount.left.pipetteName
+  const rightPipetteName = values.pipettesByMount.right.pipetteName
+
+  const shouldProceed =
+    leftPipetteName === 'p1000_96' || rightPipetteName === ''
+
+  if (shouldProceed) {
+    proceed()
     return null
-  } else if (props.values.pipettesByMount.right.pipetteName === '') {
-    props.proceed()
-    return null
-  } else {
-    return <PipetteTipsTile {...props} mount="right" />
   }
+
+  return <PipetteTipsTile {...props} mount="right" />
 }
 interface PipetteTipsTileProps extends WizardTileProps {
   mount: Mount
@@ -208,9 +212,11 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
   const currentValue = values.pipettesByMount[mount].tiprackDefURI
 
-  if (currentValue === undefined) {
-    setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
-  }
+  React.useEffect(() => {
+    if (currentValue === undefined) {
+      setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
+    }
+  }, [currentValue, setFieldValue, nameAccessor, tiprackOptions])
 
   return (
     <Flex
