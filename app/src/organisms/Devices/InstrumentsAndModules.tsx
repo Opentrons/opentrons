@@ -31,6 +31,7 @@ import {
 } from './utils'
 import { PipetteCard } from './PipetteCard'
 import { GripperCard } from '../GripperCard'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 const EQUIPMENT_POLL_MS = 5000
 const FETCH_PIPETTE_CAL_POLL = 30000
@@ -56,9 +57,20 @@ export function InstrumentsAndModules({
   const { data: attachedInstruments } = useInstrumentsQuery()
   // TODO(bc, 2023-03-20): reintroduce this poll, once it is safe to call cache_instruments during sensor reads on CAN bus
   // { refetchInterval: EQUIPMENT_POLL_MS, },
-  const extensionInstrument =
-    (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
-
+  const attachedGripper =
+    (attachedInstruments?.data ?? []).find(
+      (i): i is GripperData => i.instrumentType === 'gripper' && !i.ok
+    ) ?? null
+  const attachedLeftPipette =
+    attachedInstruments?.data?.find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'left'
+    ) ?? null
+  const attachedRightPipette =
+    attachedInstruments?.data?.find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'right'
+    ) ?? null
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes?.left ?? null
   )
@@ -142,8 +154,7 @@ export function InstrumentsAndModules({
                 }
                 isPipetteCalibrated={
                   isOT3
-                    ? attachedInstruments?.data?.find(i => i.mount === 'left')
-                        ?.data?.calibratedOffset != null
+                    ? attachedLeftPipette?.data?.calibratedOffset != null
                     : leftMountOffsetCalibration != null
                 }
                 mount={LEFT}
@@ -152,12 +163,8 @@ export function InstrumentsAndModules({
               />
               {isOT3 ? (
                 <GripperCard
-                  attachedGripper={extensionInstrument}
-                  isCalibrated={
-                    attachedInstruments?.data?.find(
-                      i => i.mount === 'extension'
-                    )?.data?.calibratedOffset != null
-                  }
+                  attachedGripper={attachedGripper}
+                  isCalibrated={attachedGripper?.data?.calibratedOffset != null}
                 />
               ) : null}
               {leftColumnModules.map((module, index) => (
@@ -187,9 +194,7 @@ export function InstrumentsAndModules({
                   }
                   isPipetteCalibrated={
                     isOT3
-                      ? attachedInstruments?.data?.find(
-                          i => i.mount === 'right'
-                        )?.data?.calibratedOffset != null
+                      ? attachedRightPipette?.data?.calibratedOffset != null
                       : rightMountOffsetCalibration != null
                   }
                   mount={RIGHT}

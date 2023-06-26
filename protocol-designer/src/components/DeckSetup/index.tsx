@@ -432,33 +432,31 @@ export const DeckSetup = (): JSX.Element => {
   })
 
   return (
-    <React.Fragment>
-      <div className={styles.deck_row}>
-        {drilledDown && <BrowseLabwareModal />}
-        <div ref={wrapperRef} className={styles.deck_wrapper}>
-          <RobotWorkSpace
-            deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-            deckDef={deckDef}
-            viewBox={robotType === OT2_ROBOT_TYPE ? OT2_VIEWBOX : FLEX_VIEWBOX}
-            width="100%"
-            height="100%"
-          >
-            {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
-              <DeckSetupContents
-                activeDeckSetup={activeDeckSetup}
-                selectedTerminalItemId={selectedTerminalItemId}
-                {...{
-                  deckDef,
-                  deckSlotsById,
-                  getRobotCoordsFromDOMCoords,
-                  showGen1MultichannelCollisionWarnings,
-                }}
-              />
-            )}
-          </RobotWorkSpace>
-        </div>
+    <div className={styles.deck_row}>
+      {drilledDown && <BrowseLabwareModal />}
+      <div ref={wrapperRef} className={styles.deck_wrapper}>
+        <RobotWorkSpace
+          deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
+          deckDef={deckDef}
+          viewBox={robotType === OT2_ROBOT_TYPE ? OT2_VIEWBOX : FLEX_VIEWBOX}
+          width="100%"
+          height="100%"
+        >
+          {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
+            <DeckSetupContents
+              activeDeckSetup={activeDeckSetup}
+              selectedTerminalItemId={selectedTerminalItemId}
+              {...{
+                deckDef,
+                deckSlotsById,
+                getRobotCoordsFromDOMCoords,
+                showGen1MultichannelCollisionWarnings,
+              }}
+            />
+          )}
+        </RobotWorkSpace>
       </div>
-    </React.Fragment>
+    </div>
   )
 }
 

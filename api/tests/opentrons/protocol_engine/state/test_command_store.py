@@ -4,6 +4,7 @@ from collections import OrderedDict
 from datetime import datetime
 from typing import NamedTuple, Type
 
+from opentrons_shared_data.errors import ErrorCodes
 from opentrons.ordered_set import OrderedSet
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName
@@ -455,7 +456,7 @@ def test_command_failure_clears_queues() -> None:
         command_id="command-id-1",
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
-        error=errors.ProtocolEngineError("oh no"),
+        error=errors.ProtocolEngineError(message="oh no"),
     )
 
     expected_failed_1 = commands.WaitForResume(
@@ -466,7 +467,7 @@ def test_command_failure_clears_queues() -> None:
             errorType="ProtocolEngineError",
             detail="oh no",
             createdAt=datetime(year=2023, month=3, day=3),
-            errorCode=errors.ProtocolEngineError.ERROR_CODE,
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
         ),
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
@@ -557,7 +558,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         command_id="command-id-2",
         error_id="error-id",
         failed_at=datetime(year=2023, month=3, day=3),
-        error=errors.ProtocolEngineError("oh no"),
+        error=errors.ProtocolEngineError(message="oh no"),
     )
     expected_failed_cmd_2 = commands.WaitForResume(
         id="command-id-2",
@@ -567,7 +568,7 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
             errorType="ProtocolEngineError",
             detail="oh no",
             createdAt=datetime(year=2023, month=3, day=3),
-            errorCode=errors.ProtocolEngineError.ERROR_CODE,
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
         ),
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
@@ -819,10 +820,29 @@ def test_command_store_saves_unknown_finish_error() -> None:
             "error-id": errors.ErrorOccurrence(
                 id="error-id",
                 createdAt=datetime(year=2021, month=1, day=1),
-                errorType="RuntimeError",
+                # this is wrapped into an UnexpectedProtocolError because it's not
+                # enumerated
+                errorType="UnexpectedProtocolError",
+                # but it has the information about what created it
                 detail="oh no",
                 # Unknown errors use the default error code
-                errorCode=errors.ProtocolEngineError.ERROR_CODE,
+                errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+                # and they wrap
+                wrappedErrors=[
+                    errors.ErrorOccurrence(
+                        id="error-id",
+                        createdAt=datetime(year=2021, month=1, day=1),
+                        errorType="PythonException",
+                        detail="RuntimeError: oh no\n",
+                        errorCode="4000",
+                        # and we get some fun extra info if this wraps a normal exception
+                        errorInfo={
+                            "class": "RuntimeError",
+                            "args": "('oh no',)",
+                        },
+                        wrappedErrors=[],
+                    )
+                ],
             )
         },
         run_started_at=None,
@@ -832,15 +852,15 @@ def test_command_store_saves_unknown_finish_error() -> None:
 
 def test_command_store_saves_correct_error_code() -> None:
     """If an error is derived from ProtocolEngineError, its ErrorCode should be used."""
-    TEST_CODE = "1234"
 
     class MyCustomError(errors.ProtocolEngineError):
-        ERROR_CODE = TEST_CODE
+        def __init__(self, message: str) -> None:
+            super().__init__(ErrorCodes.PIPETTE_NOT_PRESENT, message)
 
     subject = CommandStore(is_door_open=False, config=_make_config())
 
     error_details = FinishErrorDetails(
-        error=MyCustomError("oh no"),
+        error=MyCustomError(message="oh no"),
         error_id="error-id",
         created_at=datetime(year=2021, month=1, day=1),
     )
@@ -862,7 +882,7 @@ def test_command_store_saves_correct_error_code() -> None:
                 createdAt=datetime(year=2021, month=1, day=1),
                 errorType="MyCustomError",
                 detail="oh no",
-                errorCode=TEST_CODE,
+                errorCode=ErrorCodes.PIPETTE_NOT_PRESENT.value.code,
             )
         },
         run_started_at=None,
@@ -927,7 +947,7 @@ def test_command_store_handles_command_failed() -> None:
         errorType="ProtocolEngineError",
         createdAt=datetime(year=2022, month=2, day=2),
         detail="oh no",
-        errorCode=errors.ProtocolEngineError.ERROR_CODE,
+        errorCode=ErrorCodes.GENERAL_ERROR.value.code,
     )
 
     expected_failed_command = create_failed_command(
@@ -943,7 +963,7 @@ def test_command_store_handles_command_failed() -> None:
             command_id="command-id",
             error_id="error-id",
             failed_at=datetime(year=2022, month=2, day=2),
-            error=errors.ProtocolEngineError("oh no"),
+            error=errors.ProtocolEngineError(message="oh no"),
         )
     )
 

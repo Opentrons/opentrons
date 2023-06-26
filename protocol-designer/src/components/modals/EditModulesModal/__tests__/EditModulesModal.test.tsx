@@ -30,6 +30,7 @@ import {
 import * as moduleData from '../../../../modules/moduleData'
 import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
 import { selectors as featureSelectors } from '../../../../feature-flags'
+import { getRobotType } from '../../../../file-data/selectors'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
 import { isModuleWithCollisionIssue } from '../../../modules/utils'
 import { PDAlert } from '../../../alerts/PDAlert'
@@ -51,6 +52,7 @@ jest.mock('../../../../step-forms/selectors')
 jest.mock('../../../modules/utils')
 jest.mock('../../../../step-forms/utils')
 jest.mock('../form-state')
+jest.mock('../../../../file-data/selectors')
 
 const MODEL_FIELD = 'selectedModel'
 const SLOT_FIELD = 'selectedSlot'
@@ -73,10 +75,13 @@ const getLabwareOnSlotMock: jest.MockedFunction<any> = getLabwareOnSlot
 
 const getIsLabwareAboveHeightMock: jest.MockedFunction<any> = getIsLabwareAboveHeight
 
+const getRobotTypeMock: jest.MockedFunction<any> = getRobotType
+
 describe('Edit Modules Modal', () => {
   let mockStore: any
   let props: EditModulesModalProps
   beforeEach(() => {
+    getRobotTypeMock.mockReturnValue('OT-2 Standard')
     getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
     getSlotIdsBlockedBySpanningMock.mockReturnValue([])
     getLabwareOnSlotMock.mockReturnValue({})

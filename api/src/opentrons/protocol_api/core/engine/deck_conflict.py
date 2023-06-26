@@ -9,6 +9,7 @@ from opentrons.protocol_engine import (
     StateView,
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     OFF_DECK_LOCATION,
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
@@ -137,6 +138,10 @@ def _map_labware(
     elif isinstance(location_from_engine, ModuleLocation):
         # This labware is loaded atop a module. Don't map it to anything here;
         # let _map_module() pick it up.
+        return None
+
+    elif isinstance(location_from_engine, OnLabwareLocation):
+        # TODO(jbl 2023-06-08) check if we need to do any logic here or if this is correct
         return None
 
     elif location_from_engine == OFF_DECK_LOCATION:

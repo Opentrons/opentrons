@@ -11,8 +11,9 @@ def test_error_occurrence_schema() -> None:
     This is explicitly tested because we are overriding the schema
     due to a default value for errorCode.
     """
-    required_items: List[str] = ErrorOccurrence.schema()["required"]
-
+    required_items: List[str] = ErrorOccurrence.schema()["definitions"][
+        "ErrorOccurrence"
+    ]["required"]
     assert "errorCode" in required_items
 
 

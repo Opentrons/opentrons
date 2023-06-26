@@ -20,6 +20,8 @@ wheel_file = dist/$(call python_get_wheelname,hardware,$(project_rs_default),ope
 # used to create the sdist.
 sdist_file = dist/$(call python_get_sdistname,hardware,$(project_ot3_default),opentrons_hardware)
 
+# Find the branch, sha, version that will be used to update the VERSION.json file
+version_file = $(call python_get_git_version,hardware,$(project_ot3_default),opentrons_hardware)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -127,7 +129,7 @@ push: push-no-restart
 
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: sdist Pipfile.lock
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"opentrons_hardware")
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"opentrons_hardware",,,$(version_file))
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3

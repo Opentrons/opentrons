@@ -1,5 +1,5 @@
 diff --git a/api/src/opentrons/config/defaults_ot3.py b/api/src/opentrons/config/defaults_ot3.py
-index 89696c5b2a..4c2d6184b8 100644
+index 5b21328a92..1bb9a6ceb8 100644
 --- a/api/src/opentrons/config/defaults_ot3.py
 +++ b/api/src/opentrons/config/defaults_ot3.py
 @@ -83,7 +83,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
@@ -7,11 +7,19 @@ index 89696c5b2a..4c2d6184b8 100644
          OT3AxisKind.Y: 375,
          OT3AxisKind.Z: 35,
 -        OT3AxisKind.P: 5,
-+        OT3AxisKind.P: 20,
++        OT3AxisKind.P: 15,
          OT3AxisKind.Z_G: 50,
          OT3AxisKind.Q: 5.5,
      },
-@@ -98,18 +98,18 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
+@@ -91,25 +91,25 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
+         OT3AxisKind.X: 375,
+         OT3AxisKind.Y: 375,
+         OT3AxisKind.Z: 100,
+-        OT3AxisKind.P: 45,
++        OT3AxisKind.P: 70,
+         OT3AxisKind.Z_G: 50,
+     },
+ )
  
  DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
      high_throughput={
@@ -57,10 +65,10 @@ index 89696c5b2a..4c2d6184b8 100644
          OT3AxisKind.Q: 1.5,
      },
 diff --git a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
-index 3610fc8857..6b4db5dfe5 100644
+index 815dada3b9..30121fc4c8 100644
 --- a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
 +++ b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
-@@ -427,11 +427,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
+@@ -422,11 +422,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
  
      def set_current_volume(self, new_volume: float) -> None:
          assert new_volume >= 0
@@ -74,7 +82,7 @@ index 3610fc8857..6b4db5dfe5 100644
          self._current_volume += volume_incr
  
      def remove_current_volume(self, volume_incr: float) -> None:
-@@ -439,7 +439,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
+@@ -434,7 +434,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
          self._current_volume -= volume_incr
  
      def ok_to_add_volume(self, volume_incr: float) -> bool:
@@ -84,6 +92,32 @@ index 3610fc8857..6b4db5dfe5 100644
  
      def add_tip(self, tip_length: float) -> None:
          """
+diff --git a/api/src/opentrons/hardware_control/ot3api.py b/api/src/opentrons/hardware_control/ot3api.py
+index 58a768a775..b1dc2d7e5b 100644
+--- a/api/src/opentrons/hardware_control/ot3api.py
++++ b/api/src/opentrons/hardware_control/ot3api.py
+@@ -1662,8 +1662,8 @@ class OT3API(
+         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
+         #       but not with DVT pipettes because those can only detect drops
+ 
+-        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+-            await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
++        # if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
++        #     await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
+ 
+         _add_tip_to_instrs()
+ 
+@@ -1744,8 +1744,8 @@ class OT3API(
+         )
+ 
+         # TODO: implement tip-detection sequence during drop-tip for 96ch
+-        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+-            await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
++        # if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
++        #     await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
+         _remove()
+ 
+     async def clean_up(self) -> None:
 diff --git a/api/src/opentrons/protocol_api/core/legacy/deck.py b/api/src/opentrons/protocol_api/core/legacy/deck.py
 index 54bca33742..e6b49e47fe 100644
 --- a/api/src/opentrons/protocol_api/core/legacy/deck.py

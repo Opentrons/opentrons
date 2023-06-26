@@ -15,6 +15,7 @@ import { StyledText } from '../../atoms/text'
 import { EMPTY_TIMESTAMP } from '../Devices/constants'
 import { formatInterval } from '../RunTimeControl/utils'
 import { InterventionCommandMessage } from './InterventionCommandMessage'
+
 export interface PauseContentProps {
   startedAt: string | null
   message: string | null

@@ -18,6 +18,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   ModuleType,
   ModuleModel,
+  OT2_STANDARD_MODEL,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
@@ -31,7 +32,8 @@ import {
   actions as stepFormActions,
 } from '../../../step-forms'
 import {
-  SUPPORTED_MODULE_SLOTS,
+  SUPPORTED_MODULE_SLOTS_OT2,
+  SUPPORTED_MODULE_SLOTS_FLEX,
   getAllModuleSlotsByType,
 } from '../../../modules/moduleData'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -47,6 +49,7 @@ import { useResetSlotOnModelChange } from './form-state'
 
 import { ModuleOnDeck } from '../../../step-forms/types'
 import { ModelModuleInfo } from '../../EditModules'
+import { getRobotType } from '../../../file-data/selectors'
 
 export interface EditModulesModalProps {
   moduleType: ModuleType
@@ -75,7 +78,11 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     onCloseClick,
     moduleOnDeck,
   } = props
-  const supportedModuleSlot = SUPPORTED_MODULE_SLOTS[moduleType][0].value
+  const robotType = useSelector(getRobotType)
+  const supportedModuleSlot =
+    robotType === OT2_STANDARD_MODEL
+      ? SUPPORTED_MODULE_SLOTS_OT2[moduleType][0].value
+      : SUPPORTED_MODULE_SLOTS_FLEX[moduleType][0].value
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const dispatch = useDispatch()
 
@@ -222,6 +229,7 @@ const EditModulesModalComponent = (
   const disabledModuleRestriction = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+  const robotType = useSelector(getRobotType)
 
   const noCollisionIssue =
     selectedModel && !isModuleWithCollisionIssue(selectedModel)
@@ -278,15 +286,18 @@ const EditModulesModalComponent = (
                 <div {...targetProps} className={styles.option_slot}>
                   <FormGroup label="Position">
                     <SlotDropdown
-                      fieldName={'selectedSlot'}
-                      options={getAllModuleSlotsByType(moduleType)}
+                      fieldName="selectedSlot"
+                      options={getAllModuleSlotsByType(moduleType, robotType)}
                       disabled={!enableSlotSelection}
                       tabIndex={1}
                     />
                   </FormGroup>
                 </div>
 
-                <ConnectedSlotMap fieldName={'selectedSlot'} />
+                <ConnectedSlotMap
+                  fieldName="selectedSlot"
+                  robotType={robotType}
+                />
               </>
             )}
           </div>

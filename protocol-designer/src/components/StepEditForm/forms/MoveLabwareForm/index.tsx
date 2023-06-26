@@ -1,5 +1,12 @@
 import * as React from 'react'
-import { FormGroup } from '@opentrons/components'
+import { useSelector } from 'react-redux'
+import {
+  FormGroup,
+  Tooltip,
+  TOOLTIP_BOTTOM,
+  TOOLTIP_FIXED,
+  useHoverTooltip,
+} from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import {
   LabwareField,
@@ -7,10 +14,22 @@ import {
   LabwareLocationField,
 } from '../../fields'
 import styles from '../../StepEditForm.css'
-import type { StepFormProps } from '../../types'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { getRobotType } from '../../../../file-data/selectors'
+import { getAdditionalEquipment } from '../../../../step-forms/selectors'
+import { StepFormProps } from '../../types'
 
 export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
   const { propsForFields } = props
+  const robotType = useSelector(getRobotType)
+  const additionalEquipment = useSelector(getAdditionalEquipment)
+  const isGripperAttached = Object.values(additionalEquipment).some(
+    equipment => equipment?.name === 'gripper'
+  )
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_BOTTOM,
+    strategy: TOOLTIP_FIXED,
+  })
 
   return (
     <div className={styles.form_wrapper}>
@@ -26,16 +45,34 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
         >
           <LabwareField {...propsForFields.labware} />
         </FormGroup>
-        <FormGroup
-          className={styles.small_field}
-          label={i18n.t('form.step_edit_form.field.useGripper.label')}
-        >
-          <ToggleRowField
-            {...propsForFields.useGripper}
-            offLabel={i18n.t('form.step_edit_form.field.useGripper.toggleOff')}
-            onLabel={i18n.t('form.step_edit_form.field.useGripper.toggleOn')}
-          />
-        </FormGroup>
+        {robotType === FLEX_ROBOT_TYPE ? (
+          <>
+            {!isGripperAttached ? (
+              <Tooltip {...tooltipProps}>
+                {i18n.t(
+                  'tooltip.step_fields.moveLabware.disabled.gripper_not_used'
+                )}
+              </Tooltip>
+            ) : null}
+            <div {...targetProps}>
+              <FormGroup
+                className={styles.small_field}
+                label={i18n.t('form.step_edit_form.field.useGripper.label')}
+              >
+                <ToggleRowField
+                  {...propsForFields.useGripper}
+                  disabled={!isGripperAttached}
+                  offLabel={i18n.t(
+                    'form.step_edit_form.field.useGripper.toggleOff'
+                  )}
+                  onLabel={i18n.t(
+                    'form.step_edit_form.field.useGripper.toggleOn'
+                  )}
+                />
+              </FormGroup>
+            </div>
+          </>
+        ) : null}
       </div>
       <div className={styles.form_row}>
         <FormGroup
@@ -45,8 +82,6 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
           <LabwareLocationField {...propsForFields.newLocation} />
         </FormGroup>
       </div>
-
-      <div className={styles.section_wrapper}></div>
     </div>
   )
 }
