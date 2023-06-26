@@ -193,7 +193,9 @@ class OT3Axis(enum.Enum):
         return cls.P_L, cls.P_R
 
     @classmethod
-    def mount_axes(cls, gl: GantryLoad = GantryLoad.LOW_THROUGHPUT) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis"]:
+    def mount_axes(
+        cls, gl: GantryLoad = GantryLoad.LOW_THROUGHPUT
+    ) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis"]:
         """The axes which are used for moving instruments up and down."""
         if gl == GantryLoad.LOW_THROUGHPUT:
             return cls.Z_L, cls.Z_R, cls.Z_G
