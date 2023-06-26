@@ -313,9 +313,11 @@ function LabwareLatch({
   refetchModules,
 }: LabwareLatchProps): JSX.Element {
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
-  const { createLiveCommand, isLoading: isLiveCommandLoading } = useCreateLiveCommandMutation()
+  const {
+    createLiveCommand,
+    isLoading: isLiveCommandLoading,
+  } = useCreateLiveCommandMutation()
   const [isRefetchingModules, setIsRefetchingModules] = React.useState(false)
-  console.log({ status: matchedHeaterShaker.data.labwareLatchStatus })
   const isLatchLoading =
     isLiveCommandLoading ||
     isRefetchingModules ||
@@ -339,16 +341,20 @@ function LabwareLatch({
   const toggleLatch = (): void => {
     createLiveCommand({
       command: latchCommand,
-      waitUntilComplete: true
+      waitUntilComplete: true,
     })
       .then(() => {
         setIsRefetchingModules(true)
-        refetchModules().then(() => {
-          setIsRefetchingModules(false)
-        }).catch((e: Error) => {
-          console.error(`error refetching modules after toggle latch: ${e.message}`)
-          setIsRefetchingModules(false)
-        })
+        refetchModules()
+          .then(() => {
+            setIsRefetchingModules(false)
+          })
+          .catch((e: Error) => {
+            console.error(
+              `error refetching modules after toggle latch: ${e.message}`
+            )
+            setIsRefetchingModules(false)
+          })
       })
       .catch((e: Error) => {
         console.error(
@@ -435,7 +441,7 @@ function LabwareLatch({
 interface RowLabwareProps {
   labware: LabwareSetupItem
   attachedProtocolModules: AttachedProtocolModuleMatch[]
-  refetchModules: () => void
+  refetchModules: UseQueryResult<Modules>['refetch']
 }
 
 function RowLabware({
