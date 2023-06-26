@@ -100,6 +100,11 @@ class OT3Mount(enum.Enum):
         return top_types.Mount[self.name]
 
 
+class GantryLoad(enum.Enum):
+    HIGH_THROUGHPUT = "high_throughput"
+    LOW_THROUGHPUT = "low_throughput"
+
+
 class OT3AxisKind(enum.Enum):
     """An enum of the different kinds of axis we have.
 
@@ -188,9 +193,12 @@ class OT3Axis(enum.Enum):
         return cls.P_L, cls.P_R
 
     @classmethod
-    def mount_axes(cls) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis"]:
+    def mount_axes(cls, gl: GantryLoad = GantryLoad.LOW_THROUGHPUT) -> Tuple["OT3Axis", "OT3Axis", "OT3Axis"]:
         """The axes which are used for moving instruments up and down."""
-        return cls.Z_L, cls.Z_R, cls.Z_G
+        if gl == GantryLoad.LOW_THROUGHPUT:
+            return cls.Z_L, cls.Z_R, cls.Z_G
+        else:
+            return cls.Z_R, cls.Z_L, cls.Z_G
 
     @classmethod
     def gantry_axes(
@@ -252,7 +260,7 @@ class OT3Axis(enum.Enum):
 
     @classmethod
     def home_order(
-        cls,
+        cls, gl: GantryLoad
     ) -> Tuple[
         "OT3Axis",
         "OT3Axis",
@@ -264,7 +272,7 @@ class OT3Axis(enum.Enum):
         "OT3Axis",
         "OT3Axis",
     ]:
-        return (*cls.mount_axes(), cls.X, cls.Y, *cls.pipette_axes(), cls.G, cls.Q)
+        return (*cls.mount_axes(gl), cls.X, cls.Y, *cls.pipette_axes(), cls.G, cls.Q)
 
     def __str__(self) -> str:
         return self.name

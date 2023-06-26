@@ -2,7 +2,7 @@ from enum import Enum
 from dataclasses import dataclass, asdict, fields
 from typing import Dict, Tuple, TypeVar, Generic, List, cast
 from typing_extensions import TypedDict, Literal
-from opentrons.hardware_control.types import OT3AxisKind
+from opentrons.hardware_control.types import OT3AxisKind, GantryLoad
 
 
 class AxisDict(TypedDict):
@@ -15,11 +15,6 @@ class AxisDict(TypedDict):
 
 
 Vt = TypeVar("Vt")
-
-
-class GantryLoad(Enum):
-    HIGH_THROUGHPUT = "high_throughput"
-    LOW_THROUGHPUT = "low_throughput"
 
 
 @dataclass
