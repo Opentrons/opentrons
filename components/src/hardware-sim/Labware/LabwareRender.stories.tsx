@@ -71,6 +71,7 @@ Basic.args = {
   wellLabelOption: 'SHOW_LABEL_INSIDE',
   highlightedWells: { A1: null, A2: null },
   wellFill: { A1: 'maroon', A2: 'lavender' },
+  highlightLabware: false,
 }
 
 export const TipRack = Template.bind({})
@@ -89,4 +90,5 @@ TipRack.args = {
   wellLabelOption: 'SHOW_LABEL_INSIDE',
   highlightedWells: { A1: null, A2: null },
   missingTips: { C3: null, D4: null },
+  highlightLabware: false,
 }

@@ -11,6 +11,7 @@ import {
   Flex,
   Icon,
   SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
@@ -68,7 +69,7 @@ export function TouchScreenSleep({
         <Btn onClick={() => setCurrentOption(null)}>
           <Icon name="back" size="3rem" color={COLORS.darkBlack100} />
         </Btn>
-        <StyledText fontSize="2rem" lineHeight="2.75rem" fontWeight="700">
+        <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('touchscreen_sleep')}
         </StyledText>
       </Flex>

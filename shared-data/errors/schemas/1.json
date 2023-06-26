@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {},
+  "description": "Error codes for ingestion into JS",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "categories": {
+      "description": "A map of error categories to specific information",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z]+$": {
+          "description": "A category and information about it",
+          "properties": {
+            "detail": {
+              "type": "string",
+              "description": "a short human-readable text description of the category"
+            },
+            "codePrefix": {
+              "type": "string",
+              "description": "All errors in this category start with this prefix",
+              "regex": "^[0-9]+$"
+            }
+          }
+        }
+      }
+    },
+    "codes": {
+      "type": "object",
+      "patternProperties": {
+        "^[0-9]+$": {
+          "type": "object",
+          "properties": {
+            "detail": {
+              "type": "string",
+              "description": "A short human-readable text description of the error"
+            },
+            "category": {
+              "type": "string",
+              "description": "json pointer to the error category"
+            }
+          }
+        }
+      },
+
+      "description": "A map of error codes to detail information",
+      "additionalProperties": false
+    }
+  }
+}

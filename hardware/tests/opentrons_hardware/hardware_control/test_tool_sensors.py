@@ -9,12 +9,14 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MoveCompleted,
     ReadFromSensorResponse,
     Acknowledgement,
+    BindSensorOutputRequest,
 )
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     EmptyPayload,
     MoveCompletedPayload,
     ReadFromSensorResponsePayload,
+    BindSensorOutputRequestPayload,
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
@@ -26,6 +28,7 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorIdField,
     SensorTypeField,
     MotorPositionFlagsField,
+    SensorOutputBindingField,
 )
 
 
@@ -35,7 +38,9 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
     liquid_probe,
-    ProbeTarget,
+    check_overpressure,
+    InstrumentProbeTarget,
+    PipetteProbeTarget,
 )
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -116,7 +121,7 @@ async def test_liquid_probe(
     mock_bind_output: AsyncMock,
     message_send_loopback: CanLoopback,
     mock_sensor_threshold: AsyncMock,
-    target_node: ProbeTarget,
+    target_node: PipetteProbeTarget,
     motor_node: NodeId,
     threshold_pascals: float,
 ) -> None:
@@ -222,7 +227,7 @@ async def test_capacitive_probe(
     message_send_loopback: CanLoopback,
     mock_sensor_threshold: AsyncMock,
     mock_bind_sync: AsyncMock,
-    target_node: ProbeTarget,
+    target_node: InstrumentProbeTarget,
     motor_node: NodeId,
     caplog: Any,
     distance: float,
@@ -302,7 +307,7 @@ async def test_capacitive_sweep(
     message_send_loopback: CanLoopback,
     mock_sensor_threshold: AsyncMock,
     mock_bind_sync: AsyncMock,
-    target_node: ProbeTarget,
+    target_node: InstrumentProbeTarget,
     motor_node: NodeId,
     distance: float,
     speed: float,
@@ -365,3 +370,47 @@ async def test_capacitive_sweep(
         mock_messenger, target_node, motor_node, distance, speed
     )
     assert result == list(range(10))
+
+
+@pytest.mark.parametrize(
+    "target_node,sensor_id",
+    [
+        (NodeId.pipette_left, SensorId.S0),
+        (NodeId.pipette_right, SensorId.S1),
+    ],
+)
+async def test_overpressure_closure(
+    mock_messenger: AsyncMock, target_node: PipetteProbeTarget, sensor_id: SensorId
+) -> None:
+    """Test that we can use partial context manager."""
+    partial_context_manager = await check_overpressure(
+        mock_messenger, target_node, sensor_id
+    )
+
+    # Execute the actual partial context manager and see that the correct
+    # messages are sent.
+    async with partial_context_manager():
+        mock_messenger.ensure_send.assert_called_with(
+            node_id=target_node,
+            message=BindSensorOutputRequest(
+                payload=BindSensorOutputRequestPayload(
+                    sensor=SensorTypeField(SensorType.pressure),
+                    sensor_id=SensorIdField(sensor_id),
+                    binding=SensorOutputBindingField(
+                        SensorOutputBinding.max_threshold_sync
+                    ),
+                )
+            ),
+            expected_nodes=[target_node],
+        )
+    mock_messenger.ensure_send.assert_called_with(
+        node_id=target_node,
+        message=BindSensorOutputRequest(
+            payload=BindSensorOutputRequestPayload(
+                sensor=SensorTypeField(SensorType.pressure),
+                sensor_id=SensorIdField(sensor_id),
+                binding=SensorOutputBindingField(SensorOutputBinding.none),
+            )
+        ),
+        expected_nodes=[target_node],
+    )

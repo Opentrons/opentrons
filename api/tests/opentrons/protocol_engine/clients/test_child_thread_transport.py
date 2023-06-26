@@ -78,6 +78,7 @@ async def test_execute_command_failure(
         errorType="PrettyBadError",
         createdAt=datetime(year=2021, month=1, day=1),
         detail="Things are not looking good.",
+        errorCode="1234",
     )
 
     decoy.when(await engine.add_and_execute_command(request=cmd_request)).then_return(

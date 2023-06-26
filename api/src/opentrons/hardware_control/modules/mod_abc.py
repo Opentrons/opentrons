@@ -56,11 +56,11 @@ class AbstractModule(abc.ABC):
     def sort_key(inst: "AbstractModule") -> int:
         usb_port = inst.usb_port
 
-        if usb_port.hub is not None:
-            primary_port = usb_port.hub
-            secondary_port = usb_port.port_number
+        primary_port = usb_port.port_number
+
+        if usb_port.hub_port is not None:
+            secondary_port = usb_port.hub_port
         else:
-            primary_port = usb_port.port_number
             secondary_port = 0
 
         return primary_port * 1000 + secondary_port

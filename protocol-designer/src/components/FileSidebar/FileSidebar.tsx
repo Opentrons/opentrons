@@ -7,10 +7,10 @@ import {
   SidePanel,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-import { useBlockingHint } from '../Hints/useBlockingHint'
-import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { resetScrollElements } from '../../ui/steps/utils'
 import { Portal } from '../portals/MainPageModalPortal'
+import { useBlockingHint } from '../Hints/useBlockingHint'
+import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { getUnusedEntities } from './utils'
 import modalStyles from '../modals/modal.css'
 import styles from './FileSidebar.css'
@@ -22,7 +22,11 @@ import type {
   ModuleOnDeck,
   PipetteOnDeck,
 } from '../../step-forms'
-import type { CreateCommand, ProtocolFile } from '@opentrons/shared-data'
+import type {
+  CreateCommand,
+  ProtocolFile,
+  RobotType,
+} from '@opentrons/shared-data'
 
 export interface Props {
   loadFile: (event: React.ChangeEvent<HTMLInputElement>) => unknown
@@ -33,6 +37,15 @@ export interface Props {
   pipettesOnDeck: InitialDeckSetup['pipettes']
   modulesOnDeck: InitialDeckSetup['modules']
   savedStepForms: SavedStepFormState
+  robotType: RobotType
+  additionalEquipment: AdditionalEquipment
+}
+
+export interface AdditionalEquipment {
+  [additionalEquipmentId: string]: {
+    name: 'gripper'
+    id: string
+  }
 }
 
 interface WarningContent {
@@ -44,6 +57,7 @@ interface MissingContent {
   noCommands: boolean
   pipettesWithoutStep: PipetteOnDeck[]
   modulesWithoutStep: ModuleOnDeck[]
+  gripperWithoutStep: boolean
 }
 
 const LOAD_COMMANDS: Array<CreateCommand['commandType']> = [
@@ -57,6 +71,7 @@ function getWarningContent({
   noCommands,
   pipettesWithoutStep,
   modulesWithoutStep,
+  gripperWithoutStep,
 }: MissingContent): WarningContent | null {
   if (noCommands) {
     return {
@@ -70,6 +85,18 @@ function getWarningContent({
         </>
       ),
       heading: i18n.t('alert.export_warnings.no_commands.heading'),
+    }
+  }
+
+  if (gripperWithoutStep) {
+    return {
+      content: (
+        <>
+          <p>{i18n.t('alert.export_warnings.unused_gripper.body1')}</p>
+          <p>{i18n.t('alert.export_warnings.unused_gripper.body2')}</p>
+        </>
+      ),
+      heading: i18n.t('alert.export_warnings.unused_gripper.heading'),
     }
   }
 
@@ -159,11 +186,16 @@ export function FileSidebar(props: Props): JSX.Element {
     modulesOnDeck,
     pipettesOnDeck,
     savedStepForms,
+    robotType,
+    additionalEquipment,
   } = props
   const [
     showExportWarningModal,
     setShowExportWarningModal,
   ] = React.useState<boolean>(false)
+  const isGripperAttached = Object.values(additionalEquipment).some(
+    equipment => equipment?.name === 'gripper'
+  )
 
   const [showBlockingHint, setShowBlockingHint] = React.useState<boolean>(false)
 
@@ -174,20 +206,34 @@ export function FileSidebar(props: Props): JSX.Element {
       command => !LOAD_COMMANDS.includes(command.commandType)
     ) ?? []
 
+  const gripperInUse =
+    fileData?.commands.find(
+      command =>
+        command.commandType === 'moveLabware' &&
+        command.params.strategy === 'usingGripper'
+    ) != null
+
   const noCommands = fileData ? nonLoadCommands.length === 0 : true
   const pipettesWithoutStep = getUnusedEntities(
     pipettesOnDeck,
     savedStepForms,
-    'pipette'
+    'pipette',
+    robotType
   )
   const modulesWithoutStep = getUnusedEntities(
     modulesOnDeck,
     savedStepForms,
-    'moduleId'
+    'moduleId',
+    robotType
   )
 
+  const gripperWithoutStep = isGripperAttached && !gripperInUse
+
   const hasWarning =
-    noCommands || modulesWithoutStep.length || pipettesWithoutStep.length
+    noCommands ||
+    modulesWithoutStep.length ||
+    pipettesWithoutStep.length ||
+    gripperWithoutStep
 
   const warning =
     hasWarning &&
@@ -195,6 +241,7 @@ export function FileSidebar(props: Props): JSX.Element {
       noCommands,
       pipettesWithoutStep,
       modulesWithoutStep,
+      gripperWithoutStep,
     })
 
   const getExportHintContent = (): {
