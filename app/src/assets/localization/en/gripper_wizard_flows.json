@@ -10,6 +10,7 @@
   "connect_and_screw_in_gripper": "Connect and Screw In Gripper",
   "continue": "Continue",
   "detach_gripper": "Detach Gripper",
+  "firmware_updating": "A firmware update is required, instrument is updating...",
   "get_started": "Get started",
   "gripper_calibration": "Gripper Calibration",
   "gripper_recalibration": "Gripper Recalibration",

@@ -24,6 +24,7 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import mountGripper from '../../assets/videos/gripper-wizards/MOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
+import type { BadGripper, GripperData } from '@opentrons/api-client'
 
 const GO_BACK_BUTTON_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
@@ -56,9 +57,8 @@ export const MountGripper = (
     refetchInterval: 3000,
   })
   const isGripperAttached = (instrumentsQueryData?.data ?? []).some(
-    i => i.mount === 'extension'
+    (i): i is GripperData | BadGripper => i.instrumentType === 'gripper'
   )
-
   const handleOnClick = (): void => {
     refetch()
       .then(() => {

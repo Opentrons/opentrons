@@ -17,6 +17,7 @@ import {
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { FirmwareUpdateModal } from '../../molecules/FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
@@ -200,6 +201,15 @@ export const GripperWizard = (
     onExit = confirmExit
     modalContent = modalContent = (
       <MountGripper {...currentStep} {...sharedProps} />
+    )
+  } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
+    onExit = confirmExit
+    modalContent = modalContent = (
+      <FirmwareUpdateModal
+        proceed={handleProceed}
+        subsystem="gripper"
+        description={t('firmware_updating')}
+      />
     )
   } else if (currentStep.section === SECTIONS.UNMOUNT_GRIPPER) {
     onExit = confirmExit
