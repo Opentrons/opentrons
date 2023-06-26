@@ -7,10 +7,10 @@ class LiquidSettings:
     """Liquid Settings for both aspirate and dispense."""
 
     z_submerge_depth: float  # millimeters below meniscus
-    plunger_acceleration: float  # ul/sec^2
+    plunger_acceleration: float  # ul/sec/sec  # FIXME: not used yet
     plunger_flow_rate: float  # ul/sec
     delay: float  # seconds
-    z_retract_discontinuity: float  # mm/sec/sec
+    z_retract_discontinuity: float  # mm/sec  # FIXME: not used yet
     z_retract_height: float  # millimeters above meniscus
 
 

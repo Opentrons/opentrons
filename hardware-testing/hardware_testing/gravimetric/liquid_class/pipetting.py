@@ -201,12 +201,10 @@ def _pipette_with_liquid_settings(
         pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
         pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
         pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
-        # Note: Here, we previously would aspirate some air, to account for the leading-air-gap.
-        #       However, we can instead use the already-present air between the pipette's
-        #       "bottom" and "blow-out" plunger positions. This would require the `pipette.blow_out`
-        #       method to accept a microliter amount as an optional argument.
-        # Advantage: guarantee all aspirations begin at same position, helping low-volume accuracy.
-        # Disadvantage: limit our max leading-air-gap volume, potentially leaving droplets behind.
+        # set plunger accelerations
+        # TODO: set plunger accelerations by convering ul/sec/sec to mm/sec/sec,
+        #       making sure to use the nominal ul/mm to convert so that the
+        #       mm/sec/sec we move is constant regardless of changes to the function
 
     def _aspirate_on_submerge() -> None:
         # mix 5x times
@@ -276,6 +274,8 @@ def _pipette_with_liquid_settings(
         pipette.flow_rate.aspirate = liquid_class.dispense.plunger_flow_rate
         pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
         pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
+        # reset plunger accelerations back to defaults
+        # TODO: reset accelerations
 
     # PHASE 1: APPROACH
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
