@@ -57,7 +57,8 @@ import type {
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
-import { HeaterShakerModule } from '@opentrons/api-client'
+import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
+import type { UseQueryResult } from 'react-query'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
@@ -304,7 +305,7 @@ const labwareLatchStyles = css`
 
 interface LabwareLatchProps {
   matchedHeaterShaker: HeaterShakerModule
-  refetchModules: () => void
+  refetchModules: UseQueryResult<Modules>['refetch']
 }
 
 function LabwareLatch({
@@ -312,9 +313,12 @@ function LabwareLatch({
   refetchModules,
 }: LabwareLatchProps): JSX.Element {
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
-  const { createLiveCommand } = useCreateLiveCommandMutation()
+  const { createLiveCommand, isLoading: isLiveCommandLoading } = useCreateLiveCommandMutation()
+  const [isRefetchingModules, setIsRefetchingModules] = React.useState(false)
   console.log({ status: matchedHeaterShaker.data.labwareLatchStatus })
   const isLatchLoading =
+    isLiveCommandLoading ||
+    isRefetchingModules ||
     matchedHeaterShaker.data.labwareLatchStatus === 'opening' ||
     matchedHeaterShaker.data.labwareLatchStatus === 'closing'
   const isLatchClosed =
@@ -335,8 +339,17 @@ function LabwareLatch({
   const toggleLatch = (): void => {
     createLiveCommand({
       command: latchCommand,
+      waitUntilComplete: true
     })
-      .then(() => refetchModules())
+      .then(() => {
+        setIsRefetchingModules(true)
+        refetchModules().then(() => {
+          setIsRefetchingModules(false)
+        }).catch((e: Error) => {
+          console.error(`error refetching modules after toggle latch: ${e.message}`)
+          setIsRefetchingModules(false)
+        })
+      })
       .catch((e: Error) => {
         console.error(
           `error setting module status with command type ${latchCommand.commandType}: ${e.message}`
