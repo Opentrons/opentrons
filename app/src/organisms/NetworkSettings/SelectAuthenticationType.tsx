@@ -22,7 +22,6 @@ import { AlternativeSecurityTypeModal } from './AlternativeSecurityTypeModal'
 
 import type { WifiSecurityType } from '@opentrons/api-client'
 import type { Dispatch, State } from '../../redux/types'
-// import type { NetworkChangeState } from '../Devices/RobotSettings/ConnectNetwork/types'
 
 interface SelectAuthenticationTypeProps {
   selectedAuthType: WifiSecurityType
@@ -30,7 +29,6 @@ interface SelectAuthenticationTypeProps {
 }
 
 export function SelectAuthenticationType({
-  // fromWifiList,
   selectedAuthType,
   setSelectedAuthType,
 }: SelectAuthenticationTypeProps): JSX.Element {
