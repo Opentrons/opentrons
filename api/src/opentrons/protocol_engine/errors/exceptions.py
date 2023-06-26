@@ -711,3 +711,16 @@ class InvalidAxisForRobotType(ProtocolEngineError):
     ) -> None:
         """Build a InvalidAxisForRobotType."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class EStopActivatedError(ProtocolEngineError):
+    """Raised when an operation's required pipette tip is not attached."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PIpetteNotAttachedError."""
+        super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, details, wrapping)

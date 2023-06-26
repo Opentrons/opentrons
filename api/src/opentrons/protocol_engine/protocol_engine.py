@@ -250,7 +250,6 @@ class ProtocolEngine:
         """
         if error:
             log.info(f"did we get a estop error? {error}")
-            log.info(f"wrapping: {error.wrapping}")
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
                 created_at=self._model_utils.get_timestamp(),
