@@ -22,7 +22,6 @@ from .deck import Deck
 
 from .core.common import ProtocolCore as AbstractProtocolCore
 from .core.legacy.deck import Deck as LegacyDeck
-from opentrons_shared_data.deck import DEFAULT_DECK_DEFINITION_VERSION
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 from .core.legacy.labware_offset_provider import (
     AbstractLabwareOffsetProvider,
@@ -53,7 +52,6 @@ def create_protocol_context(
     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
     bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
-    deck_version: int = DEFAULT_DECK_DEFINITION_VERSION,
 ) -> ProtocolContext:
     """Create a ProtocolContext for use in a Python protocol.
 
@@ -123,7 +121,7 @@ def create_protocol_context(
 
     # TODO(mc, 2022-8-22): remove `disable_fast_protocol_upload`
     elif use_simulating_core and not feature_flags.disable_fast_protocol_upload():
-        legacy_deck = LegacyDeck(deck_type=deck_type, version=deck_version)
+        legacy_deck = LegacyDeck(deck_type=deck_type)
         core = LegacyProtocolCoreSimulator(
             sync_hardware=sync_hardware,
             labware_offset_provider=labware_offset_provider,
@@ -135,7 +133,7 @@ def create_protocol_context(
         )
 
     else:
-        legacy_deck = LegacyDeck(deck_type=deck_type, version=deck_version)
+        legacy_deck = LegacyDeck(deck_type=deck_type)
         core = LegacyProtocolCore(
             sync_hardware=sync_hardware,
             labware_offset_provider=labware_offset_provider,
