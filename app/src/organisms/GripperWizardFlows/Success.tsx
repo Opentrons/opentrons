@@ -1,11 +1,7 @@
 import { useSelector } from 'react-redux'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  COLORS,
-  TEXT_TRANSFORM_CAPITALIZE,
-  PrimaryButton,
-} from '@opentrons/components'
+import { COLORS, PrimaryButton } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
