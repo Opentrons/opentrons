@@ -23,10 +23,10 @@ export function ConnectingNetwork({
 }: ConnectingNetworkProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} flex="1" height="100%">
       <Flex
-        height="33rem"
         backgroundColor={COLORS.darkBlack20}
+        flex="1"
         justifyContent={JUSTIFY_CENTER}
         borderRadius={BORDERS.borderRadiusSize3}
       >

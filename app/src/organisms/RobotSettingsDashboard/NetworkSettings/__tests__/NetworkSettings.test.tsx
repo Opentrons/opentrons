@@ -78,7 +78,7 @@ describe('NetworkSettings', () => {
   it('selecting the Wi-Fi option displays the wifi details', () => {
     const [{ getByText }] = render(props)
     getByText('Wi-Fi').click()
-    expect(getByText('mock WifiConnectionDetails')).toBeTruthy()
+    expect(mockSetCurrentOption).toHaveBeenCalledWith('RobotSettingsWifi')
   })
 
   it('clicking back on the wifi details screen shows the network settings page again', () => {
@@ -92,7 +92,9 @@ describe('NetworkSettings', () => {
   it('selecting the Ethernet option displays the ethernet details', () => {
     const [{ getByText }] = render(props)
     getByText('Ethernet').click()
-    expect(getByText('mock EthernetConnectionDetails')).toBeTruthy()
+    expect(mockSetCurrentOption).toHaveBeenCalledWith(
+      'EthernetConnectionDetails'
+    )
   })
 
   it('clicking back on the ethernet details screen shows the network settings page again', () => {
