@@ -4,7 +4,7 @@
     "t50": {
       "defaultAspirateFlowRate": 478,
       "defaultDispenseFlowRate": 160,
-      "defaultBlowOutFlowRate": 80,
+      "defaultBlowOutFlowRate": 160,
       "defaultTipLength": 57.9,
       "defaultTipOverlap": 10.5,
       "defaultReturnTipHeight": 0.71,
