@@ -30,7 +30,7 @@ from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallbackFilter,
     CanMessenger,
 )
-from opentrons.config.types import OT3Config, GantryLoad, LiquidProbeSettings
+from opentrons.config.types import OT3Config, LiquidProbeSettings
 from opentrons.config.robot_configs import build_config_ot3
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -51,6 +51,7 @@ from opentrons.hardware_control.types import (
     UpdateState,
     TipStateType,
     FailedTipStateCheck,
+    GantryLoad,
 )
 from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,

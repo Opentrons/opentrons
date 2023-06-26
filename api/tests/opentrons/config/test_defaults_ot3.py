@@ -1,8 +1,8 @@
 import copy
 
 from opentrons.config import robot_configs, defaults_ot3
-from opentrons.config.types import GantryLoad, OT3Config
-from opentrons.hardware_control.types import OT3AxisKind
+from opentrons.config.types import OT3Config
+from opentrons.hardware_control.types import OT3AxisKind, GantryLoad
 from .ot3_settings import ot3_dummy_settings
 
 

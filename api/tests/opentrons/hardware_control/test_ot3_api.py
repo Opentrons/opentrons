@@ -9,7 +9,6 @@ from hypothesis import given, strategies, settings, HealthCheck, assume, example
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.config.types import (
-    GantryLoad,
     CapacitivePassSettings,
     LiquidProbeSettings,
 )
@@ -46,6 +45,7 @@ from opentrons.hardware_control.types import (
     SubSystem,
     GripperJawState,
     StatusBarState,
+    GantryLoad,
 )
 from opentrons.hardware_control.errors import (
     GripperNotAttachedError,

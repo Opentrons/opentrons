@@ -38,7 +38,6 @@ from opentrons.config import robot_configs
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
-    GantryLoad,
     CapacitivePassSettings,
     LiquidProbeSettings,
 )
@@ -96,6 +95,7 @@ from .types import (
     StatusBarState,
     SubSystemState,
     TipStateType,
+    GantryLoad,
 )
 from .errors import (
     MustHomeError,

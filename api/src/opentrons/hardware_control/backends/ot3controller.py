@@ -24,7 +24,7 @@ from typing import (
     KeysView,
     Union,
 )
-from opentrons.config.types import OT3Config, GantryLoad
+from opentrons.config.types import OT3Config
 from opentrons.config import gripper_config, feature_flags as ff
 from .ot3utils import (
     axis_convert,
@@ -115,6 +115,7 @@ from opentrons.hardware_control.types import (
     SubSystem,
     TipStateType,
     FailedTipStateCheck,
+    GantryLoad,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,

@@ -18,7 +18,7 @@ from typing import (
     Iterator,
 )
 
-from opentrons.config.types import OT3Config, GantryLoad
+from opentrons.config.types import OT3Config
 from opentrons.config import gripper_config
 from .ot3utils import (
     axis_convert,
@@ -61,6 +61,7 @@ from opentrons.hardware_control.types import (
     SubSystem,
     SubSystemState,
     TipStateType,
+    GantryLoad,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control import status_bar

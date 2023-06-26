@@ -10,7 +10,6 @@ from opentrons.calibration_storage.types import (
     SourceType,
     CalibrationStatus,
 )
-from opentrons.config.types import GantryLoad
 from opentrons.hardware_control.types import (
     Axis,
     CriticalPoint,
@@ -25,7 +24,7 @@ from opentrons.hardware_control.robot_calibration import (
     RobotCalibration,
     DeckCalibration,
 )
-from opentrons.hardware_control.types import OT3Axis
+from opentrons.hardware_control.types import OT3Axis, GantryLoad
 
 
 async def test_controller_must_home(hardware_api):

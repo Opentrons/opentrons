@@ -1,7 +1,7 @@
 """Shared utilities for ot3 hardware control."""
 from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence
 from typing_extensions import Literal
-from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
+from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings
 from opentrons.hardware_control.types import (
     OT3Axis,
     OT3AxisKind,
@@ -13,6 +13,7 @@ from opentrons.hardware_control.types import (
     PipetteSubType,
     UpdateState,
     UpdateStatus,
+    GantryLoad,
 )
 import numpy as np
 
