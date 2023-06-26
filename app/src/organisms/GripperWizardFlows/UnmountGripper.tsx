@@ -77,12 +77,7 @@ export const UnmountGripper = (
         >
           {t('shared:go_back')}
         </Link>
-        <PrimaryButton
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          onClick={handleContinue}
-        >
-          {t('try_again')}
-        </PrimaryButton>
+        <PrimaryButton onClick={handleContinue}>{t('try_again')}</PrimaryButton>
       </Flex>
     </SimpleWizardBody>
   ) : (
