@@ -17,7 +17,8 @@ import type {
 } from '@opentrons/api-client'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
-import { CreateCommand, EXTENSION } from '@opentrons/shared-data'
+import { EXTENSION } from '@opentrons/shared-data'
+import type { CreateCommand } from '@opentrons/shared-data'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string
