@@ -48,12 +48,11 @@ export function SecondPipetteTipsTile(
   const shouldProceed =
     leftPipetteName === 'p1000_96' || rightPipetteName === ''
 
-  React.useEffect(() => {
-    if (shouldProceed) {
-      proceed()
-    }
-  }, [shouldProceed, proceed])
-
+  if (shouldProceed) {
+    proceed()
+    return null
+  }
+  
   return <PipetteTipsTile {...props} mount="right" />
 }
 
