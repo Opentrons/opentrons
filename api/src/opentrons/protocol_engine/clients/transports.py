@@ -106,8 +106,10 @@ class ChildThreadTransport(AbstractSyncTransport):
         # TODO: this needs to have an actual code
         if command.error is not None:
             error = command.error
+            module = __import__(error.errorType)
+            error_type = getattr(module, error.errorType)
             if isinstance(error.errorType, ProtocolEngineError):
-                raise error.errorType()
+                raise error_type(wrapping=error)
             else:
                 raise UnexpectedProtocolError(
                     message=f"{error.errorType}: {error.detail}"
