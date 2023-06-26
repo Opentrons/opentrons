@@ -60,7 +60,7 @@ class AbstractProtocol(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCoreType, OffDeckType],
+        location: Union[DeckSlotName, LabwareCoreType, ModuleCoreType, OffDeckType],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],

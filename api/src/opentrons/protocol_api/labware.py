@@ -442,6 +442,64 @@ class Labware:
         else:
             return p["magneticModuleEngageHeight"]
 
+    @requires_version(2, 15)
+    def load_labware(
+        self,
+        name: str,
+        label: Optional[str] = None,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        """Load a compatible labware onto the labware or adapter using its load parameters.
+
+        The parameters of this function behave like those of
+        :py:obj:`ProtocolContext.load_labware` (which loads labware directly
+        onto the deck). Note that the parameter ``name`` here corresponds to
+        ``load_name`` on the ``ProtocolContext`` function.
+
+        :returns: The initialized and loaded labware object.
+        """
+        labware_core = self._protocol_core.load_labware(
+            load_name=name,
+            label=label,
+            namespace=namespace,
+            version=version,
+            location=self._core,
+        )
+
+        labware = Labware(
+            core=labware_core,
+            api_version=self._api_version,
+            protocol_core=self._protocol_core,
+            core_map=self._core_map,
+        )
+
+        self._core_map.add(labware_core, labware)
+
+        return labware
+
+    @requires_version(2, 15)
+    def load_labware_from_definition(
+        self, definition: LabwareDefinition, label: Optional[str] = None
+    ) -> Labware:
+        """Load a labware onto the module using an inline definition.
+
+        :param definition: The labware definition.
+        :param str label: An optional special name to give the labware. If
+                          specified, this is the name the labware will appear
+                          as in the run log and the calibration view in the
+                          Opentrons app.
+        :returns: The initialized and loaded labware object.
+        """
+        load_params = self._protocol_core.add_labware_definition(definition)
+
+        return self.load_labware(
+            name=load_params.load_name,
+            namespace=load_params.namespace,
+            version=load_params.version,
+            label=label,
+        )
+
     def set_calibration(self, delta: Point) -> None:
         """
         An internal, deprecated method used for updating the offset on the object.

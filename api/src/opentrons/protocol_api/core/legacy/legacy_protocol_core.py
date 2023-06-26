@@ -147,7 +147,12 @@ class LegacyProtocolCore(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore, OffDeckType],
+        location: Union[
+            DeckSlotName,
+            LegacyLabwareCore,
+            legacy_module_core.LegacyModuleCore,
+            OffDeckType,
+        ],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
@@ -156,6 +161,10 @@ class LegacyProtocolCore(
         if isinstance(location, OffDeckType):
             raise APIVersionError(
                 "Loading a labware off deck is only supported with apiLevel 2.15 and newer."
+            )
+        elif isinstance(location, LegacyLabwareCore):
+            raise APIVersionError(
+                "Loading a labware onto another labware or adapter is only supported with api version 2.15 and above"
             )
 
         deck_slot = (

@@ -1,8 +1,11 @@
 """Tests for the InstrumentContext public interface."""
 import inspect
+from typing import cast
 
 import pytest
 from decoy import Decoy
+
+from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
@@ -14,6 +17,8 @@ from opentrons.protocol_api.core.common import (
     ProtocolCore,
     ModuleCore,
 )
+
+from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api import TemperatureModuleContext
 
@@ -93,6 +98,79 @@ def test_is_tiprack(
 
     decoy.when(mock_labware_core.is_tip_rack()).then_return(False)
     assert subject.is_tiprack is False
+
+
+def test_load_labware(
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: Labware,
+) -> None:
+    """It should load a labware by the load parameters."""
+    new_mock_core = decoy.mock(cls=LabwareCore)
+    decoy.when(
+        mock_protocol_core.load_labware(
+            load_name="labware-name",
+            label="a label",
+            namespace="a-namespace",
+            version=123,
+            location=mock_labware_core,
+        )
+    ).then_return(new_mock_core)
+    decoy.when(new_mock_core.get_well_columns()).then_return([])
+
+    result = subject.load_labware(
+        name="labware-name",
+        label="a label",
+        namespace="a-namespace",
+        version=123,
+    )
+
+    assert isinstance(result, Labware)
+    assert result.api_version == api_version
+    decoy.verify(mock_map_core.add(new_mock_core, result), times=1)
+
+
+def test_load_labware_from_definition(
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: Labware,
+) -> None:
+    """It should be able to load a labware from a definition dictionary."""
+    new_mock_core = decoy.mock(cls=LabwareCore)
+
+    labware_definition_dict = cast(LabwareDefDict, {"labwareDef": True})
+    labware_load_params = LabwareLoadParams("you", "are", 1337)
+
+    decoy.when(
+        mock_protocol_core.add_labware_definition(labware_definition_dict)
+    ).then_return(labware_load_params)
+
+    decoy.when(new_mock_core.get_well_columns()).then_return([])
+
+    decoy.when(
+        mock_protocol_core.load_labware(
+            namespace="you",
+            load_name="are",
+            version=1337,
+            label="a label",
+            location=mock_labware_core,
+        )
+    ).then_return(new_mock_core)
+
+    result = subject.load_labware_from_definition(
+        definition=labware_definition_dict,
+        label="a label",
+    )
+
+    assert isinstance(result, Labware)
+    assert result.api_version == api_version
+    decoy.verify(mock_map_core.add(new_mock_core, result), times=1)
 
 
 def test_wells(

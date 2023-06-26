@@ -136,7 +136,9 @@ class ProtocolCore(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType],
+        location: Union[
+            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+        ],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
