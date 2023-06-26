@@ -7,9 +7,10 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   COLORS,
-  SPACING,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
+
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -17,6 +18,7 @@ const PLAY_PAUSE_BUTTON_STYLE = css`
   display: flex;
   border-radius: 50%;
   background-color: ${COLORS.blueEnabled};
+  -webkit-tap-highlight-color: transparent;
 
   &:focus {
     background-color: ${COLORS.bluePressed};
@@ -29,7 +31,7 @@ const PLAY_PAUSE_BUTTON_STYLE = css`
     color: ${COLORS.white};
   }
   &:focus-visible {
-    box-shadow: 0 0 0 ${SPACING.spacing2} ${COLORS.fundamentalsFocus};
+    box-shadow: ${ODD_FOCUS_VISIBLE};
     background-color: ${COLORS.blueEnabled};
   }
   &:active {

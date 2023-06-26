@@ -330,6 +330,16 @@ def test_set_log_level_invalid(
     mock_robot_configs.save_robot_settings.assert_not_called()
 
 
+@pytest.mark.parametrize(argnames=["disabled"], argvalues=[[True], [False]])
+def test_set_status_bar_disabled(api_client, hardware, disabled):
+    """Tests that the endpoint correctly updates the setting of the status bar in the API."""
+    resp = api_client.post(
+        "/settings", json={"id": "disableStatusBar", "value": disabled}
+    )
+    assert resp.status_code == 200
+    hardware.set_status_bar_enabled.assert_called_once_with(not disabled)
+
+
 @pytest.mark.parametrize(
     argnames=["body", "expected_log_level", "expected_log_level_name"],
     argvalues=[

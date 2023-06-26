@@ -6,7 +6,11 @@ from contextlib import nullcontext as does_not_raise
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.pipette.dev_types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import Parameters
+from opentrons_shared_data.labware.labware_definition import (
+    Parameters,
+    LabwareRole,
+    OverlapOffset as SharedDataOverlapOffset,
+)
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import DeckSlotName, Point, MountType
 
@@ -20,7 +24,11 @@ from opentrons.protocol_engine.types import (
     LoadedLabware,
     ModuleModel,
     ModuleLocation,
+    OnLabwareLocation,
+    LabwareLocation,
+    OFF_DECK_LOCATION,
     DropTipWellLocation,
+    OverlapOffset,
 )
 from opentrons.protocol_engine.state.move_types import EdgePathType
 from opentrons.protocol_engine.state.labware import (
@@ -132,7 +140,37 @@ def test_get_id_by_module_raises_error() -> None:
         }
     )
     with pytest.raises(errors.exceptions.LabwareNotLoadedOnModuleError):
-        assert subject.get_id_by_module(module_id="no-module-id")
+        subject.get_id_by_module(module_id="no-module-id")
+
+
+def test_raise_if_labware_has_labware_on_top() -> None:
+    """It should raise if labware has another labware on top."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id-1": LoadedLabware(
+                id="labware-id-1",
+                loadName="test",
+                definitionUri="test-uri",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            ),
+            "labware-id-2": LoadedLabware(
+                id="labware-id-2",
+                loadName="test",
+                definitionUri="test-uri",
+                location=ModuleLocation(moduleId="module-id"),
+            ),
+            "labware-id-3": LoadedLabware(
+                id="labware-id-3",
+                loadName="test",
+                definitionUri="test-uri",
+                location=OnLabwareLocation(labwareId="labware-id-1"),
+            ),
+        }
+    )
+    subject.raise_if_labware_has_labware_on_top("labware-id-2")
+    subject.raise_if_labware_has_labware_on_top("labware-id-3")
+    with pytest.raises(errors.exceptions.LabwareIsInStackError):
+        subject.raise_if_labware_has_labware_on_top("labware-id-1")
 
 
 def test_get_labware_definition(well_plate_def: LabwareDefinition) -> None:
@@ -210,6 +248,69 @@ def test_get_labware_location() -> None:
     result = subject.get_location("plate-id")
 
     assert result == DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
+
+
+@pytest.mark.parametrize(
+    argnames="location",
+    argvalues=[
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
+        ModuleLocation(moduleId="module-id"),
+        OFF_DECK_LOCATION,
+    ],
+)
+def test_get_parent_location(location: LabwareLocation) -> None:
+    """It should return the non-OnLabware location of a labware."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="plate-id",
+                loadName="load-name",
+                location=location,
+                definitionUri="some-uri",
+            )
+        }
+    )
+
+    result = subject.get_parent_location(labware_id="labware-id")
+
+    assert result == location
+
+
+@pytest.mark.parametrize(
+    argnames="location",
+    argvalues=[
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_D1),
+        ModuleLocation(moduleId="module-id"),
+    ],
+)
+def test_get_parent_location_on_labware(location: LabwareLocation) -> None:
+    """It should return the non-OnLabware location of a labware."""
+    subject = get_labware_view(
+        labware_by_id={
+            "top-id": LoadedLabware(
+                id="top-id",
+                loadName="load-name",
+                location=OnLabwareLocation(labwareId="middle-id"),
+                definitionUri="some-uri",
+            ),
+            "middle-id": LoadedLabware(
+                id="middle-id",
+                loadName="load-name",
+                location=OnLabwareLocation(labwareId="bottom-id"),
+                definitionUri="some-uri",
+            ),
+            "bottom-id": LoadedLabware(
+                id="bottom-id",
+                loadName="load-name",
+                location=location,
+                definitionUri="some-uri",
+            ),
+        }
+    )
+
+    result = subject.get_parent_location(labware_id="top-id")
+
+    assert result == location
 
 
 def test_get_has_quirk(
@@ -476,6 +577,48 @@ def test_get_dimensions(well_plate_def: LabwareDefinition) -> None:
         y=well_plate_def.dimensions.yDimension,
         z=well_plate_def.dimensions.zDimension,
     )
+
+
+def test_get_labware_overlap_offsets() -> None:
+    """It should get the labware overlap offsets."""
+    subject = get_labware_view(
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={
+            "some-plate-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+                stackingOffsetWithLabware={
+                    "bottom-labware-name": SharedDataOverlapOffset(x=1, y=2, z=3)
+                }
+            )
+        },
+    )
+
+    result = subject.get_labware_overlap_offsets(
+        labware_id="plate-id", below_labware_name="bottom-labware-name"
+    )
+
+    assert result == OverlapOffset(x=1, y=2, z=3)
+
+
+def test_get_module_overlap_offsets() -> None:
+    """It should get the labware overlap offsets."""
+    subject = get_labware_view(
+        labware_by_id={"plate-id": plate},
+        definitions_by_uri={
+            "some-plate-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+                stackingOffsetWithModule={
+                    str(
+                        ModuleModel.TEMPERATURE_MODULE_V2.value
+                    ): SharedDataOverlapOffset(x=1, y=2, z=3)
+                }
+            )
+        },
+    )
+
+    result = subject.get_module_overlap_offsets(
+        labware_id="plate-id", module_model=ModuleModel.TEMPERATURE_MODULE_V2
+    )
+
+    assert result == OverlapOffset(x=1, y=2, z=3)
 
 
 def test_get_default_magnet_height(
@@ -966,6 +1109,101 @@ def test_get_all_labware_definition_empty() -> None:
     result = subject.get_loaded_labware_definitions()
 
     assert result == []
+
+
+def test_raise_if_labware_cannot_be_stacked_not_validated() -> None:
+    """It should raise if the labware name is not in the definition stacking overlap."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            )
+        },
+    )
+
+    with pytest.raises(errors.LabwareCannotBeStackedError):
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
+                parameters=Parameters.construct(  # type: ignore[call-arg]
+                    loadName="name"
+                ),
+                stackingOffsetWithLabware={},
+            ),
+            bottom_labware_id="labware-id",
+        )
+
+
+def test_raise_if_labware_cannot_be_stacked_on_module_not_adapter() -> None:
+    """It should raise if the below labware on a module is not an adapter."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri",
+                location=ModuleLocation(moduleId="module-id"),
+            )
+        },
+        definitions_by_uri={
+            "def-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.labware]
+            )
+        },
+    )
+
+    with pytest.raises(errors.LabwareCannotBeStackedError, match="module"):
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
+                parameters=Parameters.construct(  # type: ignore[call-arg]
+                    loadName="name"
+                ),
+                stackingOffsetWithLabware={
+                    "test": SharedDataOverlapOffset(x=0, y=0, z=0)
+                },
+            ),
+            bottom_labware_id="labware-id",
+        )
+
+
+def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
+    """It should raise if the OnLabware location is on an adapter."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="def-uri-1",
+                location=OnLabwareLocation(labwareId="below-id"),
+            ),
+            "below-id": LoadedLabware(
+                id="below-id",
+                loadName="adapter-name",
+                definitionUri="def-uri-2",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            ),
+        },
+        definitions_by_uri={
+            "def-uri-2": LabwareDefinition.construct(  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.adapter]
+            )
+        },
+    )
+
+    with pytest.raises(errors.LabwareCannotBeStackedError, match="adapter"):
+        subject.raise_if_labware_cannot_be_stacked(
+            top_labware_definition=LabwareDefinition.construct(  # type: ignore[call-arg]
+                parameters=Parameters.construct(  # type: ignore[call-arg]
+                    loadName="name"
+                ),
+                stackingOffsetWithLabware={
+                    "test": SharedDataOverlapOffset(x=0, y=0, z=0)
+                },
+            ),
+            bottom_labware_id="labware-id",
+        )
 
 
 def test_get_random_drop_tip_location(

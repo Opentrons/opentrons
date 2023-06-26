@@ -4,10 +4,12 @@ import { formatDistance } from 'date-fns'
 import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 
+import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { useAllRunsQuery, useProtocolQuery } from '@opentrons/react-api-client'
 
 import { i18n } from '../../../../i18n'
+import { Skeleton } from '../../../../atoms/Skeleton'
 import { useMissingProtocolHardware } from '../../../../pages/Protocols/hooks'
 import { useTrackProtocolRunEvent } from '../../../Devices/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
@@ -16,9 +18,9 @@ import { useMissingHardwareText } from '../hooks'
 import { RecentRunProtocolCard } from '../'
 
 import type { ProtocolHardware } from '../../../../pages/Protocols/hooks'
-import { RUN_STATUS_FAILED } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
+jest.mock('../../../../atoms/Skeleton')
 jest.mock('../../../../pages/Protocols/hooks')
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
@@ -91,6 +93,7 @@ const mockUseCloneRun = useCloneRun as jest.MockedFunction<typeof useCloneRun>
 const mockUseMissingHardwareText = useMissingHardwareText as jest.MockedFunction<
   typeof useMissingHardwareText
 >
+const mockSkeleton = Skeleton as jest.MockedFunction<typeof Skeleton>
 
 const render = (props: React.ComponentProps<typeof RecentRunProtocolCard>) => {
   return renderWithProviders(
@@ -117,6 +120,7 @@ describe('RecentRunProtocolCard', () => {
     mockTrackProtocolRunEvent = jest.fn(
       () => new Promise(resolve => resolve({}))
     )
+    mockSkeleton.mockReturnValue(<div>mock Skeleton</div>)
     mockUseMissingHardwareText.mockReturnValue('Ready to run')
     mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockUseMissingProtocolHardware.mockReturnValue([])
@@ -184,5 +188,23 @@ describe('RecentRunProtocolCard', () => {
       properties: { sourceLocation: 'RecentRunProtocolCard' },
     })
     expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
+  })
+
+  it('should render the skeleton when react query is fetching', () => {
+    mockUseProtocolQuery.mockReturnValue({
+      isFetching: true,
+      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
+    } as any)
+    const [{ getByText }] = render(props)
+    getByText('mock Skeleton')
+  })
+
+  it('should render the skeleton when react query is loading', () => {
+    mockUseProtocolQuery.mockReturnValue({
+      isLoading: true,
+      data: { data: { metadata: { protocolName: 'mockProtocol' } } },
+    } as any)
+    const [{ getByText }] = render(props)
+    getByText('mock Skeleton')
   })
 })

@@ -27,6 +27,22 @@ _dispense_defaults = {
                     z_retract_height=_default_retract_mm,
                     leading_air_gap=2,
                 ),
+                10: DispenseSettings(  # 10uL
+                    flow_rate=57,
+                    delay=0.5,
+                    submerge=_default_submerge_mm_t50,
+                    retract=_default_retract_mm,
+                    acceleration=40000,  # this is a fake number
+                    deceleration=40000,  # this is a fake number
+                ),
+                50: DispenseSettings(  # 50uL
+                    flow_rate=57,
+                    delay=0.5,
+                    submerge=_default_submerge_mm_t50,
+                    retract=_default_retract_mm,
+                    acceleration=40000,  # this is a fake number
+                    deceleration=40000,  # this is a fake number
+                ),
             },
         },
         1000: {  # P1000
@@ -712,6 +728,15 @@ def get_liquid_class(
 
 def get_test_volumes(pipette: int, channels: int, tip: int) -> List[float]:
     """Get test volumes."""
-    aspirate_cls_per_volume = _aspirate_defaults[channels][pipette][tip]
-    defined_volumes = list(aspirate_cls_per_volume.keys())
-    return [float(v) for v in defined_volumes]
+    if channels == 96:
+        if tip == 50:
+            return [5.0]
+        elif tip == 200:
+            return [200.0]
+        else:
+            raise ValueError(f"no volumes to test for tip size: {tip} uL")
+    else:
+        # FIXME: also reduce total number of volumes we test for 1ch & 8ch pipettes
+        aspirate_cls_per_volume = _aspirate_defaults[channels][pipette][tip]
+        defined_volumes = list(aspirate_cls_per_volume.keys())
+        return [float(v) for v in defined_volumes]

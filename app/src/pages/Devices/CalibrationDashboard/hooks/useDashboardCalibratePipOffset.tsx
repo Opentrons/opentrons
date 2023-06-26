@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
 import { Portal } from '../../../../App/portal'
-import { ModalShell } from '../../../../molecules/Modal'
+import { LegacyModalShell } from '../../../../molecules/LegacyModal'
 import { WizardHeader } from '../../../../molecules/WizardHeader'
 import { CalibratePipetteOffset } from '../../../../organisms/CalibratePipetteOffset'
 import { LoadingState } from '../../../../organisms/CalibrationPanels'
@@ -163,12 +163,12 @@ export function useDashboardCalibratePipOffset(
   let Wizard: JSX.Element | null = (
     <Portal level="top">
       {startingSession ? (
-        <ModalShell
+        <LegacyModalShell
           width="47rem"
           header={<WizardHeader title={t('pipette_offset_calibration')} />}
         >
           <LoadingState />
-        </ModalShell>
+        </LegacyModalShell>
       ) : (
         <CalibratePipetteOffset
           session={pipOffsetCalSession}

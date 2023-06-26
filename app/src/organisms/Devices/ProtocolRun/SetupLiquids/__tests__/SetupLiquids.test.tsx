@@ -4,12 +4,12 @@ import { renderWithProviders } from '@opentrons/components'
 import { SetupLiquids } from '../index'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
-import { ProceedToRunButton } from '../../ProceedToRunButton'
+import { BackToTopButton } from '../../BackToTopButton'
 import { fireEvent } from '@testing-library/react'
 
 jest.mock('../SetupLiquidsList')
 jest.mock('../SetupLiquidsMap')
-jest.mock('../../ProceedToRunButton')
+jest.mock('../../BackToTopButton')
 
 const mockSetupLiquidsList = SetupLiquidsList as jest.MockedFunction<
   typeof SetupLiquidsList
@@ -17,8 +17,8 @@ const mockSetupLiquidsList = SetupLiquidsList as jest.MockedFunction<
 const mockSetupLiquidsMap = SetupLiquidsMap as jest.MockedFunction<
   typeof SetupLiquidsMap
 >
-const mockProceedToRunButton = ProceedToRunButton as jest.MockedFunction<
-  typeof ProceedToRunButton
+const mockBackToTopButton = BackToTopButton as jest.MockedFunction<
+  typeof BackToTopButton
 >
 
 const render = (props: React.ComponentProps<typeof SetupLiquids>) => {
@@ -35,16 +35,14 @@ describe('SetupLiquids', () => {
   beforeEach(() => {
     mockSetupLiquidsList.mockReturnValue(<div>Mock setup liquids list</div>)
     mockSetupLiquidsMap.mockReturnValue(<div>Mock setup liquids map</div>)
-    mockProceedToRunButton.mockReturnValue(
-      <button>Mock ProceedToRunButton</button>
-    )
+    mockBackToTopButton.mockReturnValue(<button>Mock BackToTopButton</button>)
   })
 
   it('renders the list and map view buttons and proceed button', () => {
     const [{ getByRole }] = render(props)
     getByRole('button', { name: 'List View' })
     getByRole('button', { name: 'Map View' })
-    getByRole('button', { name: 'Mock ProceedToRunButton' })
+    getByRole('button', { name: 'Mock BackToTopButton' })
   })
   it('renders the map view when you press that toggle button', () => {
     const [{ getByRole, getByText }] = render(props)

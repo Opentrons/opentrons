@@ -4,8 +4,7 @@ import {
   getBatchEditSelectedStepTypes,
   getHoveredItem,
 } from '../ui/steps/selectors'
-import { DeckSetup } from './DeckSetup'
-import { NullDeckState } from './DeckSetup/DeckSetup'
+import { DeckSetup, NullDeckState } from './DeckSetup'
 
 export const DeckSetupManager = (): JSX.Element => {
   const batchEditSelectedStepTypes = useSelector(getBatchEditSelectedStepTypes)

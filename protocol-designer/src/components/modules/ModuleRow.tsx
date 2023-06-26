@@ -12,6 +12,10 @@ import {
   SIZE_1,
   SPACING,
 } from '@opentrons/components'
+import {
+  FLEX_ROBOT_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { actions as stepFormActions, ModuleOnDeck } from '../../step-forms'
 import {
@@ -22,9 +26,10 @@ import { ModuleDiagram } from './ModuleDiagram'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
-import { ModuleType } from '@opentrons/shared-data'
+import type { ModuleType, RobotType } from '@opentrons/shared-data'
 
 interface Props {
+  robotType?: RobotType
   moduleOnDeck?: ModuleOnDeck
   showCollisionWarnings?: boolean
   type: ModuleType
@@ -32,12 +37,17 @@ interface Props {
 }
 
 export function ModuleRow(props: Props): JSX.Element {
-  const { moduleOnDeck, openEditModuleModal, showCollisionWarnings } = props
+  const {
+    moduleOnDeck,
+    openEditModuleModal,
+    showCollisionWarnings,
+    robotType,
+  } = props
   const type: ModuleType = moduleOnDeck?.type || props.type
+  const isFlex = robotType === FLEX_ROBOT_TYPE
 
   const model = moduleOnDeck?.model
   const slot = moduleOnDeck?.slot
-
   /*
   TODO (ka 2020-2-3): This logic is very specific to this individual implementation
   of SlotMap. Kept it here (for now?) because it spells out the different cases.
@@ -66,8 +76,10 @@ export function ModuleRow(props: Props): JSX.Element {
   if (slot === SPAN7_8_10_11_SLOT) {
     slotDisplayName = 'Slot 7'
     occupiedSlotsForMap = ['7', '8', '10', '11']
+    //  TC on Flex
+  } else if (isFlex && type === THERMOCYCLER_MODULE_TYPE && slot === 'B1') {
+    occupiedSlotsForMap = ['A1', 'B1']
   }
-
   // If collisionSlots are populated, check which slot is occupied
   // and render module specific crash warning. This logic assumes
   // default module slot placement magnet = Slot1 temperature = Slot3
@@ -142,6 +154,7 @@ export function ModuleRow(props: Props): JSX.Element {
               <SlotMap
                 occupiedSlots={occupiedSlotsForMap}
                 collisionSlots={collisionSlots}
+                robotType={robotType}
               />
             </div>
           )}
