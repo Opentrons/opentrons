@@ -472,6 +472,8 @@ class LegacyProtocolCore(
 
     def get_labware_location(
         self, labware_core: LegacyLabwareCore
-    ) -> Union[str, legacy_module_core.LegacyModuleCore, OffDeckType]:
+    ) -> Union[
+        str, LegacyLabwareCore, legacy_module_core.LegacyModuleCore, OffDeckType
+    ]:
         """Get labware parent location."""
         assert False, "get_labware_location only supported on engine core"

@@ -342,7 +342,7 @@ class Labware:
 
     @property  # type: ignore[misc]
     @requires_version(2, 0)
-    def parent(self) -> Union[str, ModuleTypes, OffDeckType]:
+    def parent(self) -> Union[str, Labware, ModuleTypes, OffDeckType]:
         """The parent of this labware---where this labware is loaded.
 
         Returns:
@@ -369,7 +369,7 @@ class Labware:
 
         labware_location = self._protocol_core.get_labware_location(self._core)
 
-        if isinstance(labware_location, AbstractModuleCore):
+        if isinstance(labware_location, (AbstractLabware, AbstractModuleCore)):
             return self._core_map.get(labware_location)
 
         return labware_location

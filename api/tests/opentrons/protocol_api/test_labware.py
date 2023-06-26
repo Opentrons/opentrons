@@ -267,6 +267,26 @@ def test_parent_module_context(
     assert subject.parent == mock_temp_module_context
 
 
+def test_parent_labware(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+) -> None:
+    """Should get labware's parent labware"""
+    mock_parent_labware_core = decoy.mock(cls=LabwareCore)
+    mock_labware = decoy.mock(cls=Labware)
+
+    decoy.when(mock_protocol_core.get_labware_location(mock_labware_core)).then_return(
+        mock_parent_labware_core
+    )
+
+    decoy.when(mock_map_core.get(mock_parent_labware_core)).then_return(mock_labware)
+
+    assert subject.parent == mock_labware
+
+
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
 def test_set_offset_succeeds_on_low_api_version(
     decoy: Decoy,

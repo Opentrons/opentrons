@@ -103,9 +103,8 @@ class ModuleContext(CommandPublisher):
 
         _log.warning(deprecation_message)
 
-        # Type ignoring to preserve backwards compatibility
         assert (
-            labware.parent == self._core.geometry  # type: ignore[comparison-overlap]
+            labware.parent == self._core.geometry
         ), "Labware is not configured with this module as its parent"
 
         return self._core.geometry.add_labware(labware)

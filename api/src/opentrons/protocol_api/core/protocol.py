@@ -192,5 +192,5 @@ class AbstractProtocol(
     @abstractmethod
     def get_labware_location(
         self, labware_core: LabwareCoreType
-    ) -> Union[str, ModuleCoreType, OffDeckType]:
+    ) -> Union[str, LabwareCoreType, ModuleCoreType, OffDeckType]:
         """Get labware parent location."""
