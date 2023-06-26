@@ -22,7 +22,7 @@ import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
 
-import type { ModuleType, RobotType } from '@opentrons/shared-data'
+import type { ModuleType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
 import type { ModulesForEditModulesCard } from '../step-forms'
 
@@ -33,7 +33,6 @@ export interface Props {
   saveFileMetadata: (fileMetaDataFields: FileMetadataFields) => void
   swapPipettes: () => unknown
   modules: ModulesForEditModulesCard
-  robotType: RobotType
 }
 
 interface State {
@@ -87,7 +86,6 @@ export class FilePage extends React.Component<Props, State> {
       saveFileMetadata,
       swapPipettes,
       modules,
-      robotType,
     } = this.props
 
     return (
@@ -181,11 +179,7 @@ export class FilePage extends React.Component<Props, State> {
 
         <Card title="Pipettes">
           <div className={styles.card_content}>
-            <InstrumentGroup
-              {...instruments}
-              showMountLabel
-              robotType={robotType}
-            />
+            <InstrumentGroup {...instruments} showMountLabel />
             <div className={styles.pipette_button_row}>
               <DeprecatedPrimaryButton
                 onClick={this.openEditPipetteModal}

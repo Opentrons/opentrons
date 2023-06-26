@@ -241,6 +241,17 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               lidMotorState,
               blockTargetTemp: moduleState.blockTargetTemp,
             }
+          } else if (
+            'targetTemperature' in moduleState &&
+            moduleState.type === 'temperatureModuleType'
+          ) {
+            return {
+              targetTemperature: moduleState.targetTemperature,
+            }
+          } else if ('targetTemp' in moduleState) {
+            return {
+              targetTemp: moduleState.targetTemp,
+            }
           }
         }
         const labwareLoadedOnModule = allLabware.find(
@@ -261,15 +272,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           },
           compatibleModules: [THERMOCYCLER_MODULE_TYPE],
         }
-        let targetTemp: number | null = null
-        if (
-          'targetTemperature' in moduleOnDeck.moduleState &&
-          moduleOnDeck.type === 'temperatureModuleType'
-        ) {
-          targetTemp = moduleOnDeck.moduleState.targetTemperature
-        } else if ('targetTemp' in moduleOnDeck.moduleState) {
-          targetTemp = moduleOnDeck.moduleState.targetTemp
-        }
 
         return (
           <Module
@@ -283,7 +285,6 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
             innerProps={getModuleInnerProps(moduleOnDeck.moduleState)}
             targetSlotId={slot.id}
             targetDeckId={deckDef.otId}
-            targetTemp={targetTemp}
           >
             {labwareLoadedOnModule != null && !shouldHideChildren ? (
               <>

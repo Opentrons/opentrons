@@ -1,7 +1,6 @@
 import { connect } from 'react-redux'
 import * as React from 'react'
 import mapValues from 'lodash/mapValues'
-import { RobotType } from '@opentrons/shared-data'
 import { FilePage } from '../components/FilePage'
 import {
   actions,
@@ -9,7 +8,6 @@ import {
   FileMetadataFields,
 } from '../file-data'
 import { selectors as stepFormSelectors, InitialDeckSetup } from '../step-forms'
-import { getRobotType } from '../file-data/selectors'
 import { actions as steplistActions } from '../steplist'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../constants'
 import { actions as navActions } from '../navigation'
@@ -22,12 +20,10 @@ interface SP {
   formValues: Props['formValues']
   _initialDeckSetup: InitialDeckSetup
   modules: Props['modules']
-  robotType: RobotType
 }
 
 const mapStateToProps = (state: BaseState): SP => {
   return {
-    robotType: getRobotType(state),
     formValues: fileSelectors.getFileMetadata(state),
     instruments: stepFormSelectors.getPipettesForInstrumentGroup(state),
     modules: stepFormSelectors.getModulesForEditModulesCard(state),

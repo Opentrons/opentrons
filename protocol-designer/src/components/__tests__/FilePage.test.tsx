@@ -1,7 +1,7 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { ModuleType, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { ModuleType } from '@opentrons/shared-data'
 import { FilePage, Props } from '../FilePage'
 import { EditModules } from '../EditModules'
 import { EditModulesCard } from '../modules'
@@ -28,7 +28,6 @@ describe('File Page', () => {
       saveFileMetadata: () => null,
       swapPipettes: () => null,
       modules: {} as ModulesForEditModulesCard,
-      robotType: OT2_ROBOT_TYPE,
     }
     mockStore = {
       dispatch: jest.fn(),

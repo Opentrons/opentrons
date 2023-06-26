@@ -1,11 +1,9 @@
 import * as React from 'react'
 import {
   getModuleType,
-  HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   ModuleDefinition,
   OT2_STANDARD_DECKID,
-  TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
@@ -18,9 +16,7 @@ import {
   DIRECTION_COLUMN,
   ALIGN_CENTER,
 } from '../../styles'
-import { COLORS } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck'
-import { RobotCoordsForeignDiv } from '..'
 import { Thermocycler } from './Thermocycler'
 import { ModuleFromDef } from './ModuleFromDef'
 
@@ -28,7 +24,6 @@ export * from './Thermocycler'
 export * from './ModuleFromDef'
 
 const LABWARE_OFFSET_DISPLAY_THRESHOLD = 2
-const ROOM_TEMPERATURE_C = 23
 
 // multiply two matrices together (dot product)
 function multiplyMatrices(a: number[][], b: number[][]): number[][] {
@@ -53,7 +48,6 @@ interface Props {
   children?: React.ReactNode // contents to be rendered on top of the labware mating surface of the module
   targetSlotId?: string
   targetDeckId?: string
-  targetTemp?: number | null
 }
 
 const statusInfoWrapperProps = {
@@ -81,7 +75,6 @@ export const Module = (props: Props): JSX.Element => {
     children,
     targetSlotId,
     targetDeckId = OT2_STANDARD_DECKID,
-    targetTemp,
   } = props
   const moduleType = getModuleType(def.model)
 
@@ -164,9 +157,6 @@ export const Module = (props: Props): JSX.Element => {
       ? nestedLabwareOffsetY
       : 0
   // transform to be applied to children which render within the labware interfacing surface of the module
-  //  TODO(jr, 6/26/23): labware looks off in Flex PD when on top of the thermocycler: maybe need
-  //  {moduleType == 'thermocyclerModuleType' && robotType === FLEX_ROBOT_TYPE ? clampedLabwareOffsetY + 17
-  //  : clampedLabwareOffsetY}
   const childrenTransform = `translate(${clampedLabwareOffsetX}, ${clampedLabwareOffsetY})`
 
   const renderStatusInfo = (): JSX.Element | null => {
@@ -191,46 +181,6 @@ export const Module = (props: Props): JSX.Element => {
   }
 
   const magneticBlockLayerBlockList = ['Module_Title', 'Well_Labels', 'Wells']
-  let ledLightOverlay: JSX.Element | null = null
-
-  if (def.moduleType === TEMPERATURE_MODULE_TYPE) {
-    if (targetTemp != null) {
-      ledLightOverlay = (
-        <RobotCoordsForeignDiv
-          width="5.5"
-          height="16"
-          x="23"
-          y="36.5"
-          innerDivProps={{
-            borderRadius: '6px',
-            backgroundColor:
-              targetTemp <= ROOM_TEMPERATURE_C
-                ? COLORS.mediumBlueEnabled
-                : COLORS.red4,
-            width: '100%',
-            height: '100%',
-          }}
-        />
-      )
-    }
-  } else if (def.moduleType === HEATERSHAKER_MODULE_TYPE) {
-    if (targetTemp != null) {
-      ledLightOverlay = (
-        <RobotCoordsForeignDiv
-          width="3.5"
-          height="16"
-          x="5"
-          y="38"
-          innerDivProps={{
-            borderRadius: '6px',
-            backgroundColor: COLORS.red4,
-            width: '100%',
-            height: '100%',
-          }}
-        />
-      )
-    }
-  }
 
   return (
     <g transform={positionTransform} data-test={`Module_${moduleType}`}>
@@ -251,7 +201,6 @@ export const Module = (props: Props): JSX.Element => {
                 {...(innerProps as React.ComponentProps<typeof ModuleFromDef>)}
                 def={def}
               />
-              {ledLightOverlay}
             </>
           )}
         </g>

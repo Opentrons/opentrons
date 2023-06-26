@@ -123,11 +123,13 @@ function DropdownIndicator(
         right={SPACING.spacing8}
         width={SPACING.spacing20}
       >
-        {Boolean(props.selectProps.menuIsOpen) ? (
-          <Icon transform="rotate(180deg)" name="menu-down" height="1.25rem" />
-        ) : (
-          <Icon name="menu-down" height="1.25rem" />
-        )}
+        <Icon
+          name="menu-down"
+          transform={`rotate(${
+            props.selectProps.menuIsOpen === true ? '180' : '0'
+          })`}
+          height="1.25rem"
+        />
       </Box>
     </reactSelectComponents.DropdownIndicator>
   )
