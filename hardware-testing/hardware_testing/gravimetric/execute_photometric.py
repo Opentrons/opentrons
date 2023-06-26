@@ -292,9 +292,6 @@ def _run_trial(
         )
     reservoir_ml = round(liquid_tracker.get_volume(source) / 1000, 1)
     print(f"software thinks there is {reservoir_ml} mL of liquid in the reservoir")
-    assert (
-        reservoir_ml - _MIN_END_VOLUME_UL > volume * channel_count
-    ), f"not enough volume in reservoir to aspirate {volume} uL across {channel_count} channels"
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         ctx,
@@ -359,13 +356,6 @@ def _get_robot_serial(is_simulating: bool) -> str:
         return input("ROBOT SERIAL NUMBER:").strip()
     else:
         return "simulation-serial-number"
-
-
-def _get_tip_batch(is_simulating: bool) -> str:
-    if not is_simulating:
-        return input("TIP BATCH:").strip()
-    else:
-        return "simulation-tip-batch"
 
 
 def _pick_up_tip(
@@ -470,13 +460,11 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     test_report.set_tag(pipette_tag)
     test_report.set_operator(_get_operator_name(ctx.is_simulating()))
     serial_number = _get_robot_serial(ctx.is_simulating())
-    tip_batch = _get_tip_batch(ctx.is_simulating())
     test_report.set_version(get_git_description())
     report.store_serial_numbers_pm(
         test_report,
         robot=serial_number,
         pipette=pipette_tag,
-        tips=tip_batch,
         environment="None",
         liquid="None",
     )
