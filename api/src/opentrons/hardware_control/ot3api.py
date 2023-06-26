@@ -2028,6 +2028,7 @@ class OT3API(
 
         return final_position, encoder_pos
 
+
     async def capacitive_probe(
         self,
         mount: OT3Mount,

@@ -221,7 +221,8 @@ async def _jog_axis(api, position) -> Dict[OT3Axis, float]:
 async def _main() -> None:
     today = datetime.date.today()
     hw_api = await build_async_ot3_hardware_api(is_simulating=args.simulate,
-                                    use_defaults=True)
+                                    use_defaults=True,
+                                    stall_detection_enable = False)
     await hw_api.cache_instruments()
     pipette_model = hw_api._pipette_handler.hardware_instruments[mount].name
     if args.dial_indicator:
