@@ -81,7 +81,7 @@ export const UnmountGripper = (
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           onClick={handleContinue}
         >
-          {t('shared:try_again')}
+          {t('try_again')}
         </PrimaryButton>
       </Flex>
     </SimpleWizardBody>
