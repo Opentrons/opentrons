@@ -113,6 +113,7 @@ class MoveToMaintenancePositionImplementation(
                     mount_to_axis: _INSTRUMENT_ATTACH_Z_POINT,
                 }
             )
+            await ot3_api.disengage_axes([mount_to_axis])
         else:
             max_motion_range = max_height_z_tip - _MAX_Z_AXIS_MOTION_RANGE
             await ot3_api.move_axes(

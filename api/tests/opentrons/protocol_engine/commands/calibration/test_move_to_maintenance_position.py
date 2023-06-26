@@ -99,3 +99,11 @@ async def test_calibration_move_to_location_implementation(
         ),
         times=1,
     )
+
+    if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
+        decoy.verify(
+            await ot3_hardware_api.disengage_axes(
+                list(verify_axes.keys()),
+            ),
+            times=1,
+        )
