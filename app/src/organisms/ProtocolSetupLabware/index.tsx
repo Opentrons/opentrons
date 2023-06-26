@@ -9,6 +9,7 @@ import {
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
+  DIRECTION_ROW,
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
@@ -45,12 +46,14 @@ import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModules/utils'
 import { getLabwareRenderInfo } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
+import type { IconName } from '@opentrons/components'
 import type {
   CompletedProtocolAnalysis,
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
   LabwareDefinition2,
   LabwareLocation,
+  ModuleType,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../../pages/Protocols/utils'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
@@ -70,6 +73,13 @@ const LabwareThumbnail = styled.svg`
   width: 12rem;
   flex-shrink: 0;
 `
+
+const MODULE_ICON_NAME_BY_TYPE: { [type in string]: IconName } = {
+  magneticModuleV2: 'ot-magnet-v2',
+  heaterShakerModuleV1: 'ot-heater-shaker',
+  temperatureModuleV2: 'ot-temperature-v2',
+  thermocyclerModuleV1: 'ot-thermocycler',
+}
 
 export interface ProtocolSetupLabwareProps {
   runId: string
@@ -442,14 +452,32 @@ function RowLabware({
     matchedModule != null &&
     matchedModule.attachedModuleMatch?.moduleType === HEATERSHAKER_MODULE_TYPE
 
-  console.log(
-    'slot',
-    getLabwareDisplayLocation(
+  const displayLocationIcon = (): JSX.Element => {
+    const slotInfo = getLabwareDisplayLocation(
       robotSideAnalysis,
       initialLocation,
-      commandTextTranslator
-    )
-  )
+      commandTextTranslator,
+      true
+    ).split(',')
+
+    if (slotInfo.length === 1 && slotInfo[0].length === 2) {
+      if (slotInfo[0].length === 2) {
+        return <LocationIcon slotName={slotInfo[0]} />
+      } else {
+        const iconName = MODULE_ICON_NAME_BY_TYPE[slotInfo[0] as ModuleType]
+        return <LocationIcon iconName={iconName} />
+      }
+    } else {
+      const iconName = MODULE_ICON_NAME_BY_TYPE[slotInfo[0] as ModuleType]
+      const slotName = slotInfo[1]
+      return (
+        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
+          <LocationIcon iconName={iconName} />
+          <LocationIcon slotName={slotName} />
+        </Flex>
+      )
+    }
+  }
 
   return (
     <Flex
@@ -460,17 +488,7 @@ function RowLabware({
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       gridGap={SPACING.spacing24}
     >
-      <Flex width="7.6875rem">
-        {/* <StyledText> */}
-        <LocationIcon
-          slotName={getLabwareDisplayLocation(
-            robotSideAnalysis,
-            initialLocation,
-            commandTextTranslator
-          )}
-        />
-        {/* </StyledText> */}
-      </Flex>
+      <Flex width="7.6875rem">{displayLocationIcon()}</Flex>
       <Flex
         alignSelf={ALIGN_FLEX_START}
         flexDirection={DIRECTION_COLUMN}
