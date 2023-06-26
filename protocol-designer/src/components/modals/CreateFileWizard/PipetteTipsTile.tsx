@@ -52,7 +52,7 @@ export function SecondPipetteTipsTile(
     proceed()
     return null
   }
-  
+
   return <PipetteTipsTile {...props} mount="right" />
 }
 
