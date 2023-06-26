@@ -1,18 +1,23 @@
+import { useSelector } from 'react-redux'
 import {
   Flex,
+  Btn,
   TYPOGRAPHY,
   COLOR_ERROR,
   JUSTIFY_SPACE_BETWEEN,
-  Link,
-  ALIGN_CENTER,
   SPACING,
+  COLORS,
+  RESPONSIVENESS,
   PrimaryButton,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
+import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -20,16 +25,30 @@ import mountGripper from '../../assets/videos/gripper-wizards/MOUNT_GRIPPER.webm
 
 import type { GripperWizardStepProps } from './types'
 
-const CAPITALIZE_FIRST_LETTER_STYLE = css`
-  &:first-letter {
-    text-transform: uppercase;
+const GO_BACK_BUTTON_STYLE = css`
+  ${TYPOGRAPHY.pSemiBold};
+  color: ${COLORS.darkGreyEnabled};
+
+  &:hover {
+    opacity: 70%;
+  }
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+    font-size: ${TYPOGRAPHY.fontSize22};
+
+    &:hover {
+      opacity: 100%;
+    }
   }
 `
+
 export const MountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
   const { proceed, isRobotMoving, goBack } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const isOnDevice = useSelector(getIsOnDevice)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
 
   // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
@@ -65,22 +84,25 @@ export const MountGripper = (
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_CENTER}
+        alignItems={ALIGN_FLEX_END}
         gridGap={SPACING.spacing8}
       >
-        <Link
-          role="button"
-          css={TYPOGRAPHY.darkLinkH4SemiBold}
-          onClick={goBack}
-        >
-          {t('shared:go_back')}
-        </Link>
-        <PrimaryButton
-          css={CAPITALIZE_FIRST_LETTER_STYLE}
-          onClick={() => setShowUnableToDetect(false)}
-        >
-          {t('shared:try_again')}
-        </PrimaryButton>
+        <Btn onClick={goBack}>
+          <StyledText css={GO_BACK_BUTTON_STYLE}>
+            {t('shared:go_back')}
+          </StyledText>
+        </Btn>
+        {isOnDevice ? (
+          <SmallButton
+            buttonText={t('try_again')}
+            buttonType="primary"
+            onClick={proceed}
+          />
+        ) : (
+          <PrimaryButton onClick={() => setShowUnableToDetect(false)}>
+            {t('try_again')}
+          </PrimaryButton>
+        )}
       </Flex>
     </SimpleWizardBody>
   ) : (
@@ -103,7 +125,7 @@ export const MountGripper = (
       bodyText={
         <StyledText as="p">{t('attached_gripper_and_screw_in')}</StyledText>
       }
-      proceedButtonText={t('shared:continue')}
+      proceedButtonText={t('continue')}
       proceed={handleOnClick}
       back={goBack}
     />
