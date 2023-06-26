@@ -120,7 +120,12 @@ def get_protocol_api(
         and IS_ROBOT
         and JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir()  # type: ignore[union-attr]
     ):
-        extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
+        extra_labware = {
+            uri: details.definition
+            for uri, details in labware_from_paths(
+                [str(JUPYTER_NOTEBOOK_LABWARE_DIR)]
+            ).items()
+        }
 
     robot_type = _get_robot_type()
     deck_type = guess_deck_type_from_global_config()
@@ -300,7 +305,10 @@ def execute(
     stack_logger.setLevel(getattr(logging, log_level.upper(), logging.WARNING))
     contents = protocol_file.read()
     if custom_labware_paths:
-        extra_labware = labware_from_paths(custom_labware_paths)
+        extra_labware = {
+            uri: details.definition
+            for uri, details in labware_from_paths(custom_labware_paths).items()
+        }
     else:
         extra_labware = {}
     if custom_data_paths:

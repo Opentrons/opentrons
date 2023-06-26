@@ -220,7 +220,12 @@ def get_protocol_api(
         and IS_ROBOT
         and JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir()  # type: ignore[union-attr]
     ):
-        extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
+        extra_labware = {
+            uri: details.definition
+            for uri, details in labware_from_paths(
+                [str(JUPYTER_NOTEBOOK_LABWARE_DIR)]
+            ).items()
+        }
 
     checked_hardware = _check_hardware_simulator(hardware_simulator, machine)
     return _build_protocol_context(
@@ -387,7 +392,10 @@ def simulate(  # noqa: C901
 
     contents = protocol_file.read()
     if custom_labware_paths:
-        extra_labware = labware_from_paths(custom_labware_paths)
+        extra_labware = {
+            uri: details.definition
+            for uri, details in labware_from_paths(custom_labware_paths).items()
+        }
     else:
         extra_labware = {}
 
