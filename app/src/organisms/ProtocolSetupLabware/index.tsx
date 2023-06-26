@@ -472,8 +472,8 @@ function RowLabware({
       const slotName = slotInfo[1]
       return (
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-          <LocationIcon iconName={iconName} />
           <LocationIcon slotName={slotName} />
+          <LocationIcon iconName={iconName} />
         </Flex>
       )
     }
