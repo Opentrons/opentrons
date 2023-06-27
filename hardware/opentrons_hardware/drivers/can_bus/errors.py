@@ -3,20 +3,6 @@
 from opentrons_hardware.firmware_bindings.constants import ErrorCode, ErrorSeverity
 
 
-class CanError(Exception):
-    """Can bus error."""
-
-    def __init__(self, message: str) -> None:
-        """Constructor."""
-        super().__init__(message)
-
-
-class ErrorFrameCanError(CanError):
-    """An error frame was received on the can bus."""
-
-    pass
-
-
 class AsyncHardwareError(RuntimeError):
     """An error generated from firmware that was not caused by a command sent from hardware controller."""
 
