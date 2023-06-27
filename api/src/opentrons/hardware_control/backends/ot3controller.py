@@ -50,6 +50,8 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
+
+from opentrons_hardware.drivers import SystemDrivers
 from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
@@ -58,7 +60,7 @@ from opentrons_hardware.drivers.binary_usb import (
     SerialUsbDriver,
     build_rear_panel_driver,
 )
-from opentrons_hardware.drivers.eeprom import EEPROM, EEPROMData
+from opentrons_hardware.drivers.eeprom import EEPROMDriver, EEPROMData
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
@@ -233,7 +235,9 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
-        self._gpio_dev, self._usb_messenger = self._build_system_hardware(usb_driver)
+        self._drivers = self._build_system_hardware(self._messenger, usb_driver)
+        self._usb_messenger = self._drivers.usb_messenger
+        self._gpio_dev = self._drivers.gpio_dev
         self._subsystem_manager = SubsystemManager(
             self._messenger,
             self._usb_messenger,
@@ -241,8 +245,6 @@ class OT3Controller:
             network.NetworkInfo(self._messenger, self._usb_messenger),
             FirmwareUpdate(),
         )
-        self._eeprom = EEPROM()
-        self._eeprom.setup()
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
@@ -282,7 +284,7 @@ class OT3Controller:
     @property
     def eeprom_data(self) -> EEPROMData:
         """Get the data on the eeprom."""
-        return self._eeprom.data
+        return self._drivers.eeprom.data
 
     @property
     def update_required(self) -> bool:
@@ -290,14 +292,24 @@ class OT3Controller:
 
     @staticmethod
     def _build_system_hardware(
+        can_messenger: CanMessenger,
         usb_driver: Optional[SerialUsbDriver],
-    ) -> Tuple[Union[OT3GPIO, RemoteOT3GPIO], Optional[BinaryMessenger]]:
-        if usb_driver is None:
-            return OT3GPIO("hardware_control"), None
-        else:
+    ) -> SystemDrivers:
+        gpio = OT3GPIO("hardware_control")
+        eeprom_driver = EEPROMDriver(gpio)
+        eeprom_driver.setup()
+        gpio_dev: Union[OT3GPIO, RemoteOT3GPIO] = gpio
+        usb_messenger: Optional[BinaryMessenger] = None
+        if usb_driver:
             usb_messenger = BinaryMessenger(usb_driver)
             usb_messenger.start()
-            return RemoteOT3GPIO(usb_messenger), usb_messenger
+            gpio_dev = RemoteOT3GPIO(usb_messenger)
+        return SystemDrivers(
+            can_messenger,
+            gpio_dev,
+            eeprom_driver,
+            usb_messenger=usb_messenger,
+        )
 
     def _motor_nodes(self) -> Set[NodeId]:
         """Get a list of the motor controller nodes of all attached and ok devices."""

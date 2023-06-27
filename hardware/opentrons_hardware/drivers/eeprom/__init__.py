@@ -1,7 +1,7 @@
 """The eeprom interface package."""
 
 from .eeprom import (
-    EEPROM,
+    EEPROMDriver,
     DEFAULT_BUS,
     DEFAULT_ADDRESS,
 )
@@ -19,7 +19,7 @@ __all__ = [
     "PropType",
     "Property",
     "EEPROMData",
-    "EEPROM",
+    "EEPROMDriver",
     "DEFAULT_BUS",
     "DEFAULT_ADDRESS",
 ]

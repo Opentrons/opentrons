@@ -26,11 +26,12 @@ DEFAULT_ADDRESS = "0050"
 DEFAULT_READ_SIZE = 64
 
 
-class EEPROM:
+class EEPROMDriver:
     """This class lets you read/write to the eeprom using a sysfs file."""
 
     def __init__(
         self,
+        gpio: OT3GPIO,
         bus: Optional[int] = DEFAULT_BUS,
         address: Optional[str] = DEFAULT_ADDRESS,
         filepath: Optional[str] = None,
@@ -38,17 +39,18 @@ class EEPROM:
         """Contructor
 
         Args:
+            gpio: An instance of the gpio class so we can toggle lines on the SOM
             bus: The i2c bus this device is on
             address: The unique address for this device
             filepath: The filepath of the eeprom, for testing.
         """
+        self._gpio = gpio
         self._bus = bus
         self._address = address
         self._eeprom_filepath = filepath or Path(
             f"/sys/bus/i2c/devices/{bus}-{address}/eeprom"
         )
         self._eeprom_fd = -1
-        self._gpio = OT3GPIO("eeprom_hw_control")
         self._eeprom_data: EEPROMData = EEPROMData()
         self._properties: Set[Property] = set()
 
