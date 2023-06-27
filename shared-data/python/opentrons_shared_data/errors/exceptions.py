@@ -298,6 +298,17 @@ class InternalMessageFormatError(CommunicationError):
         """Build an InternalMesasgeFormatError."""
         super().__init__(ErrorCodes.INTERNAL_MESSAGE_FORMAT_ERROR, message, detail, wrapping)
 
+class CANBusConfigurationError(CommunicationError):
+    """An error indicating a misconfiguration of the CANbus."""
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CANBus Configuration Error."""
+        super().__init__(ErrorCodes.CANBUS_CONFIGURATION_ERROR, message, detail, wrapping)
+
 
 class MotionFailedError(RoboticsControlError):
     """An error indicating that a motion failed."""

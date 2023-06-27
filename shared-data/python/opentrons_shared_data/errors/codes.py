@@ -41,6 +41,7 @@ class ErrorCodes(Enum):
     COMMAND_TIMED_OUT = _code_from_dict_entry("1004")
     FIRMWARE_UPDATE_FAILED = _code_from_dict_entry("1005")
     INTERNAL_MESSAGE_FORMAT_ERROR = _code_from_dict_entry('1006')
+    CANBUS_CONFIGURATION_ERROR = _code_from_dict_entry('1007')
     ROBOTICS_CONTROL_ERROR = _code_from_dict_entry("2000")
     MOTION_FAILED = _code_from_dict_entry("2001")
     HOMING_FAILED = _code_from_dict_entry("2002")

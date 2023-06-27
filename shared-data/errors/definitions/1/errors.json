@@ -46,6 +46,10 @@
       "detail": "Internal Message Format Error",
       "category": "hardwareCommunicationError"
     },
+    "1007": {
+      "detail": "CANBus Configuration Error",
+      "category": "hardwareCommunicationError"
+    },
     "2000": {
       "detail": "Robotics Control Error",
       "category": "roboticsControlError"
