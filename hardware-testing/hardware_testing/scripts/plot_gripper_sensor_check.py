@@ -52,8 +52,8 @@ class Plot:
 
     def average_df(self, df):
         df_avg = pd.DataFrame()
-        df_avg["Capacitance Air"] = df.groupby(["Gripper Probe"])["Capacitance Air"].mean()
-        df_avg["Capacitance Deck"] = df.groupby(["Gripper Probe"])["Capacitance Deck"].mean()
+        df_avg["Capacitance Air"] = df.groupby(["Gripper Probe"])["Capacitance Air"].max()#mean()
+        df_avg["Capacitance Deck"] = df.groupby(["Gripper Probe"])["Capacitance Deck"].max()#mean()
         df_avg.reset_index(inplace=True)
         df_avg = df_avg.round(2)
         print(df_avg)
