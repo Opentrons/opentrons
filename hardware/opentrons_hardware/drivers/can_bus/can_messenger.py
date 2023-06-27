@@ -352,7 +352,7 @@ class CanMessenger:
         while True:
             try:
                 await self._read_task()
-            except asyncio.CancelledError:
+            except (asyncio.CancelledError, StopAsyncIteration):
                 return
             except (CANCommunicationError, AsyncHardwareError, CanError) as e:
                 log.exception(f"Nonfatal error in CAN read task: {e}")
@@ -389,6 +389,7 @@ class CanMessenger:
                     log.exception(f"Failed to build from {message}")
             else:
                 log.error(f"Message {message} is not recognized.")
+        raise StopAsyncIteration
 
     async def _handle_error(self, build: BinarySerializable) -> None:
         err_msg = ErrorMessage(payload=build)  # type: ignore[arg-type]
