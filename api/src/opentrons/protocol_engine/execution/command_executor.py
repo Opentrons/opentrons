@@ -110,7 +110,7 @@ class CommandExecutor:
             # https://opentrons.atlassian.net/browse/RCORE-390
             if isinstance(error, asyncio.CancelledError):
                 error = RunStoppedError("Run was cancelled")
-            elif not isinstance(error, EStopActivatedError):
+            elif isinstance(error, EStopActivatedError):
                 error = PE_EStopActivatedError(message=str(error), wrapping=[error])
             elif not isinstance(error, ProtocolEngineError):
                 error = UnexpectedProtocolError(message=str(error), wrapping=[error])

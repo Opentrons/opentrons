@@ -68,3 +68,10 @@ class ErrorOccurrence(BaseModel):
 
 
 ErrorOccurrence.update_forward_refs()
+
+
+class ErrorOccurrenceWrapper(Exception):
+    """Do not use this with public. only use this to transport data from thread"""
+
+    def __init__(self, error: ErrorOccurrence):
+        self.error_details = error

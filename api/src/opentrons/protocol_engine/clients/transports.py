@@ -8,7 +8,7 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..protocol_engine import ProtocolEngine
-from ..errors import UnexpectedProtocolError
+from ..errors.error_occurrence import ErrorOccurrenceWrapper
 from ..state import StateView
 from ..commands import CommandCreate, CommandResult
 
@@ -106,7 +106,7 @@ class ChildThreadTransport(AbstractSyncTransport):
         # TODO: this needs to have an actual code
         if command.error is not None:
             error = command.error
-            raise UnexpectedProtocolError(message=f"{error.errorType}: {error.detail}")
+            raise ErrorOccurrenceWrapper(error=error)
 
         # FIXME(mm, 2023-04-10): This assert can easily trigger from this sequence:
         #

@@ -74,4 +74,5 @@ class TaskQueue:
             log.exception("Exception raised by protocol")
             error = e
 
+        log.info(f"error sending to finish {error}")
         await self._cleanup_func(error=error)

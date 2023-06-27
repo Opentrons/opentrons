@@ -12,6 +12,7 @@ from opentrons.hardware_control.modules.types import ThermocyclerStep
 
 from .. import commands
 from ..state import StateView
+from ..errors import ErrorOccurrence
 from ..types import (
     DeckPoint,
     DeckSlotLocation,

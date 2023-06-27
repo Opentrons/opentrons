@@ -36,6 +36,7 @@ from ..errors import (
     ProtocolCommandFailedError,
     UnexpectedProtocolError,
 )
+from ..errors.error_occurrence import ErrorOccurrenceWrapper
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
 from .config import Config
@@ -333,21 +334,26 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 if action.error_details:
                     error_id = action.error_details.error_id
                     created_at = action.error_details.created_at
-
-                    if not isinstance(
-                        action.error_details.error,
-                        EnumeratedError,
-                    ):
-                        error: EnumeratedError = UnexpectedProtocolError(
-                            message=str(action.error_details.error),
-                            wrapping=[action.error_details.error],
-                        )
+                    if isinstance(action.error_details.error, ErrorOccurrenceWrapper):
+                        error_occurrence = action.error_details.error.error_details
+                        self._state.errors_by_id[error_id] = error_occurrence
                     else:
-                        error = action.error_details.error
+                        if not isinstance(
+                            action.error_details.error,
+                            EnumeratedError,
+                        ):
+                            error: EnumeratedError = UnexpectedProtocolError(
+                                message=str(action.error_details.error),
+                                wrapping=[action.error_details.error],
+                            )
+                        else:
+                            error = action.error_details.error
 
-                    self._state.errors_by_id[error_id] = ErrorOccurrence.from_failed(
-                        id=error_id, createdAt=created_at, error=error
-                    )
+                        self._state.errors_by_id[
+                            error_id
+                        ] = ErrorOccurrence.from_failed(
+                            id=error_id, createdAt=created_at, error=error
+                        )
 
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.PAUSED
