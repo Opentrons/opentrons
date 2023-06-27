@@ -479,7 +479,7 @@ class GripperNotPresentError(RoboticsInteractionError):
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build an GripperNotPresentError."""
+        """Build a GripperNotPresentError."""
         super().__init__(ErrorCodes.GRIPPER_NOT_PRESENT, message, detail, wrapping)
 
 
