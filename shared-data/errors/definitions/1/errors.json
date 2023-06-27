@@ -50,6 +50,10 @@
       "detail": "CANBus Configuration Error",
       "category": "hardwareCommunicationError"
     },
+    "1008": {
+      "detail": "CANBus Bus Error",
+      "category": "hardwareCommunicationError"
+    },
     "2000": {
       "detail": "Robotics Control Error",
       "category": "roboticsControlError"
