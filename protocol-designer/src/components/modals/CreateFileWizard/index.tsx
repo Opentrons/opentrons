@@ -205,7 +205,7 @@ export function CreateFileWizard(): JSX.Element | null {
     <WizardHeader
       title={t('modal.create_file_wizard.create_new_protocol')}
       currentStep={currentStepIndex}
-      totalSteps={WIZARD_STEPS.length}
+      totalSteps={WIZARD_STEPS.length - 1}
       onExit={handleCancel}
     />
   )
@@ -347,7 +347,7 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
       <RobotTypeTile {...{ ...formikProps, proceed, goBack }} />
     ),
     metadata: (formikProps: FormikProps<FormState>) => (
-      <MetadataTile {...{ ...formikProps, proceed, goBack }} />
+      <MetadataTile {...formikProps} proceed={proceed} goBack={goBack} />
     ),
     first_pipette_type: (formikProps: FormikProps<FormState>) => (
       <FirstPipetteTypeTile {...{ ...formikProps, proceed, goBack }} />
@@ -384,10 +384,14 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
           formikProps.setFieldTouched(name, true)
         }
 
-        return contentsByWizardStep[currentWizardStep]({
-          ...formikProps,
-          handleChange,
-        })
+        return currentWizardStep === 'metadata'
+          ? contentsByWizardStep.metadata({
+              ...formikProps,
+              handleChange,
+            })
+          : contentsByWizardStep[currentWizardStep]({
+              ...formikProps,
+            })
       }}
     </Formik>
   )

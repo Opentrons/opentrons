@@ -33,16 +33,16 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
       alignItems={ALIGN_CENTER}
       width="21.75rem"
       padding={SPACING.spacing8}
-      border={BORDERS.lineBorder}
+      border={isSelected ? BORDERS.activeLineBorder : BORDERS.lineBorder}
       borderRadius={BORDERS.borderRadiusSize2}
       cursor="pointer"
       onClick={onClick}
-      borderColor={isSelected ? COLORS.blueEnabled : COLORS.medGreyEnabled}
       {...styleProps}
     >
       {showCheckbox ? (
         <Icon
-          size="2rem"
+          color={isSelected ? COLORS.blueEnabled : COLORS.darkGreyEnabled}
+          size="1.5rem"
           name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
         />
       ) : null}
