@@ -307,9 +307,9 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               />
             ) : null}
             <RobotCoordsForeignDiv
-              width={moduleDef.dimensions.labwareInterfaceXDimension}
-              height={16}
-              y={-22}
+              width={moduleDef.dimensions.labwareInterfaceXDimension/2}
+              height={24}
+              x={moduleDef.dimensions.labwareInterfaceXDimension}
               innerDivProps={{
                 backgroundColor: COLORS.darkGreyEnabled,
                 padding: SPACING.spacing4,
