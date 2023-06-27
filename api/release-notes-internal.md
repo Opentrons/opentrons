@@ -15,6 +15,7 @@ For more details about this release, please see the full [technical change log][
 - Many (many) visual and workflow fixes and improvements from design QA for the ODD
 - ODD should now display an error screen instead of a white screen
 - You can load labware to an OFF_DECK location
+- You can now use calibrate gripper in the reset settings options
 - There are consistent error codes in protocol status inforation now
 - The ODD should prompt you to update your pipettes when you attach one that needs it (!)
 - The 96 shouldn't fall down when you attach it now (!)
