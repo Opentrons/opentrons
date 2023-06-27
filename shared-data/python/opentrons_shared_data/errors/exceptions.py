@@ -309,6 +309,17 @@ class CANBusConfigurationError(CommunicationError):
         """Build a CANBus Configuration Error."""
         super().__init__(ErrorCodes.CANBUS_CONFIGURATION_ERROR, message, detail, wrapping)
 
+class CANBusBusError(CommunicationError):
+    """An error indicating a low-level bus error on the CANbus like an error frame."""
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CANBus Bus Error."""
+        super().__init__(ErrorCodes.CANBUS_BUS_ERROR, message, detail, wrapping)
+
 
 class MotionFailedError(RoboticsControlError):
     """An error indicating that a motion failed."""
