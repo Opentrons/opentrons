@@ -3,6 +3,7 @@ import contextlib
 from functools import partial, lru_cache
 from dataclasses import replace
 import logging
+from copy import deepcopy
 from collections import OrderedDict
 from typing import (
     AsyncIterator,
@@ -66,6 +67,7 @@ from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import (
     get_system_constraints,
+    get_system_constraints_for_calibration,
     axis_convert,
 )
 from .backends.errors import SubsystemUpdating
@@ -243,6 +245,27 @@ class OT3API(
         )
         await self._backend.update_to_default_current_settings(gantry_load)
 
+    async def set_system_constraints_for_calibration(self) -> None:
+        self._move_manager.update_constraints(
+            get_system_constraints_for_calibration(
+                self._config.motion_settings, self._gantry_load
+            )
+        )
+        mod_log.debug(
+            f"Set system constraints for calibration: {self._move_manager.get_constraints()}"
+        )
+
+    @contextlib.asynccontextmanager
+    async def restore_system_constrants(self) -> AsyncIterator[None]:
+        old_system_constraints = deepcopy(self._move_manager.get_constraints())
+        try:
+            yield
+        finally:
+            self._move_manager.update_constraints(old_system_constraints)
+            mod_log.debug(
+                f"Restore previous system constraints: {old_system_constraints}"
+            )
+
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")
         self.door_state = door_state
@@ -292,9 +315,6 @@ class OT3API(
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
 
         await api_instance.set_status_bar_enabled(status_bar_enabled)
-        # TODO: Remove this line once the robot server runs the startup
-        # animation after initialization!
-        await api_instance.set_status_bar_state(StatusBarState.IDLE)
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
         )
@@ -1730,8 +1750,8 @@ class OT3API(
                         speed=move.speed,
                         home_flagged_axes=False,
                     )
-        if move.home_after:
-            await self._home([OT3Axis.from_axis(ax) for ax in move.home_axes])
+            if move.home_after:
+                await self._home([OT3Axis.from_axis(ax) for ax in move.home_axes])
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
@@ -1746,6 +1766,11 @@ class OT3API(
         # TODO: implement tip-detection sequence during drop-tip for 96ch
         if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
             await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
+
+        # home mount axis
+        if home_after:
+            await self._home([OT3Axis.by_mount(mount)])
+
         _remove()
 
     async def clean_up(self) -> None:

@@ -68,7 +68,7 @@
   "device_reset_description": "Reset labware calibration, boot scripts, and/or robot calibration to factory settings.",
   "device_reset_slideout_description": "Select individual settings to only clear specific data types.",
   "device_reset": "Device Reset",
-  "device_resets_cannot_be_undone": "Device resets cannot be undone.",
+  "device_resets_cannot_be_undone": "Resets cannot be undone",
   "directly_connected_to_this_computer": "Directly connected to this computer.",
   "disable_homing_description": "Prevent robot from homing motors when the robot restarts.",
   "disable_homing": "Disable homing the gantry when restarting robot",
