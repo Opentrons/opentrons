@@ -6,7 +6,7 @@ import {
 } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from '../../labware-defs'
 
-interface tiprackOption {
+interface TiprackOption {
   name: string
   value: string
 }
@@ -16,7 +16,7 @@ interface TiprackOptionsProps {
   allowAllTipracks: boolean
   selectedPipetteName?: string | null
 }
-export function getTiprackOptions(props: TiprackOptionsProps): tiprackOption[] {
+export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
   const { allLabware, allowAllTipracks, selectedPipetteName } = props
   const selectedPipetteDefaultTipracks =
     selectedPipetteName != null

@@ -585,7 +585,7 @@ export const getInvariantContext: Selector<
     moduleEntities,
     pipetteEntities,
     config: {
-      ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
+      OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
       OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
     },
   })

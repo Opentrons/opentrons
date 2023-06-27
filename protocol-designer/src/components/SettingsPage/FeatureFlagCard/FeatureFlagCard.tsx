@@ -33,7 +33,7 @@ export const FeatureFlagCard = (props: Props): JSX.Element => {
 
   const getDescription = (flag: FlagTypes): JSX.Element => {
     const RICH_DESCRIPTIONS: Partial<Record<FlagTypes, JSX.Element>> = {
-      ALLOW_ALL_TIPRACKS: (
+      OT_PD_ALLOW_ALL_TIPRACKS: (
         <>
           <p>{i18n.t(`feature_flags.${flag}.description`)} </p>
         </>

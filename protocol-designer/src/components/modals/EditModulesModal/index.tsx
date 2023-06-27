@@ -259,7 +259,7 @@ const EditModulesModalComponent = (
   })
 
   //  TODO(jr, 6/26/23): should probably move this into a util component
-  function getFlexModuleOptions(
+  function getModuleOptionsForRobotType(
     options: Array<{ name: string; value: ModuleModel }>,
     robotType: RobotType
   ): Array<{ name: string; value: ModuleModel }> {
@@ -295,7 +295,7 @@ const EditModulesModalComponent = (
               <ModelDropdown
                 fieldName="selectedModel"
                 tabIndex={0}
-                options={getFlexModuleOptions(
+                options={getModuleOptionsForRobotType(
                   MODELS_FOR_MODULE_TYPE[moduleType],
                   robotType
                 )}

@@ -21,5 +21,5 @@ export const getEnabledOT3: Selector<boolean> = createSelector(
 )
 export const getAllowAllTipracks: Selector<boolean> = createSelector(
   getFeatureFlagData,
-  flags => flags.ALLOW_ALL_TIPRACKS ?? false
+  flags => flags.OT_PD_ALLOW_ALL_TIPRACKS ?? false
 )
