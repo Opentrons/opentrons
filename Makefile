@@ -133,9 +133,6 @@ push:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
 	$(MAKE) -C $(SHARED_DATA_DIR) push-no-restart
 	sleep 1
-# TODO (amit, 2021-09-28): re-enable when opentrons-hardware is worth deploying.
-# $(MAKE) -C $(HARDWARE_DIR) push-no-restart
-# sleep 1
 	$(MAKE) -C $(API_DIR) push-no-restart
 	sleep 1
 	$(MAKE) -C $(SERVER_UTILS_DIR) push
