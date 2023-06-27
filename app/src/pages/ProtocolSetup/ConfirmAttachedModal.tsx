@@ -5,9 +5,9 @@ import { Flex, SPACING, DIRECTION_COLUMN } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal//OnDeviceDisplay/Modal'
+import { Modal } from '../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface ConfirmAttachedModalProps {
   onCloseClick: () => void
