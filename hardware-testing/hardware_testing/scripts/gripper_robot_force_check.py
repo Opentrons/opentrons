@@ -80,15 +80,9 @@ class Gripper_Robot_Force_Check:
         self.file_setup()
         self.gauge_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
-        await set_error_tolerance(self.api._backend._messenger, 15, 15)
         self.mount = OT3Mount.GRIPPER
-        if self.simulate:
-            self.gripper_id = "SIMULATION"
-        else:
-            self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
-        self.test_data["Part Number"] = str(self.part_number)
-        self.test_data["Serial Number"] = str(self.gripper_id)
-        self.deck_definition = load("ot3_standard", version=3)
+        await self.deck_setup()
+        await self.gripper_setup()
         print(f"\nStarting Gripper-on-Robot Force Check!\n")
         self.start_time = time.time()
 
@@ -118,6 +112,20 @@ class Gripper_Robot_Force_Check:
     def gauge_setup(self):
         self.force_gauge = mark10.Mark10.create(port=self.force_gauge_port)
         self.force_gauge.connect()
+
+    async def gripper_setup(self):
+        if self.simulate:
+            self.gripper_id = "SIMULATION"
+        else:
+            self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
+        self.test_data["Part Number"] = str(self.part_number)
+        self.test_data["Serial Number"] = str(self.gripper_id)
+        await set_error_tolerance(self.api._backend._messenger, 0.01, 15)
+
+    async def deck_setup(self):
+        self.deck_definition = load("ot3_standard", version=3)
+        self.nominal_center = Point(*get_calibration_square_position_in_slot(self.slot))
+        self.test_data["Slot"] = str(self.slot)
 
     def dict_keys_to_line(self, dict):
         return str.join(",", list(dict.keys()))+"\n"
