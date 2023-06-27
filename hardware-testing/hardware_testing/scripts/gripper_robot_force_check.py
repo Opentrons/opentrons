@@ -9,6 +9,9 @@ from logging.config import dictConfig
 
 from opentrons_shared_data.deck import load
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons_shared_data.deck import (
+    get_calibration_square_position_in_slot,
+)
 from opentrons_hardware.hardware_control.gripper_settings import (
     set_error_tolerance,
 )
@@ -35,12 +38,13 @@ def build_arg_parser():
     arg_parser.add_argument('-n', '--part_number', type=str, required=False, help='Sets the gripper part number', default="DVT-00")
     arg_parser.add_argument('-i', '--continuous', action="store_true", required=False, help='Continuous grip')
     arg_parser.add_argument('-b', '--backlash', action="store_true", required=False, help='Backlash test')
+    arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Sets the slider slot number', default=5)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Gripper_Robot_Force_Check:
     def __init__(
-        self, simulate: bool, continuous: bool, backlash: bool, mode: str, cycles: int, force: int, pwm: int, hold_time: float, open_time: float, part_number: str
+        self, simulate: bool, continuous: bool, backlash: bool, mode: str, cycles: int, force: int, pwm: int, hold_time: float, open_time: float, part_number: str, slot: int
     ) -> None:
         self.simulate = simulate
         self.continuous = continuous
@@ -52,6 +56,7 @@ class Gripper_Robot_Force_Check:
         self.hold_time = hold_time
         self.open_time = open_time
         self.part_number = part_number
+        self.slot = slot
         self.api = None
         self.mount = None
         self.home = None
@@ -114,13 +119,14 @@ class Gripper_Robot_Force_Check:
         self.force_gauge.connect()
 
     async def gripper_setup(self):
+        self.api.cache_instruments()
         if self.simulate:
             self.gripper_id = "SIMULATION"
         else:
             self.gripper_id = self.api._gripper_handler.get_gripper().gripper_id
         self.test_data["Part Number"] = str(self.part_number)
         self.test_data["Serial Number"] = str(self.gripper_id)
-        await set_error_tolerance(self.api._backend._messenger, 0.01, 15)
+        await set_error_tolerance(self.api._backend._messenger, 15, 15)
 
     async def deck_setup(self):
         self.deck_definition = load("ot3_standard", version=3)
@@ -257,5 +263,5 @@ if __name__ == '__main__':
     print("\nOT-3 Gripper-on-Robot Force Check\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Gripper_Robot_Force_Check(args.simulate, args.continuous, args.backlash, args.mode, args.cycles, args.force, args.pwm, args.hold_time, args.open_time, args.part_number)
+    test = Gripper_Robot_Force_Check(args.simulate, args.continuous, args.backlash, args.mode, args.cycles, args.force, args.pwm, args.hold_time, args.open_time, args.part_number, args.slot)
     asyncio.run(test.run())
