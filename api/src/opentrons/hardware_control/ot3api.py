@@ -727,7 +727,6 @@ class OT3API(
             await self._move_to_plunger_bottom(
                 checked_mount, rate=1.0, acquire_lock=False
             )
-            await self.current_position_ot3(mount=checked_mount, refresh=True)
 
     @lru_cache(1)
     def _carriage_offset(self) -> top_types.Point:
