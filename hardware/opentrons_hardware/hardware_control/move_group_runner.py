@@ -206,10 +206,12 @@ class MoveGroupRunner:
         Args:
             can_messenger: a can messenger
         """
-        await can_messenger.send(
+        error = await can_messenger.ensure_send(
             node_id=NodeId.broadcast,
             message=ClearAllMoveGroupsRequest(payload=EmptyPayload()),
         )
+        if error != ErrorCode.ok:
+            log.warning("Clear move group failed")
 
     async def _send_groups(self, can_messenger: CanMessenger) -> None:
         """Send commands to set up the message groups."""
