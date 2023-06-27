@@ -1,4 +1,5 @@
 import { when } from 'jest-when'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import { expectTimelineError } from '../__utils__/testMatchers'
 import { moveToWell } from '../commandCreators/atomic/moveToWell'
 import {
@@ -44,6 +45,9 @@ const mockPipetteAdjacentHeaterShakerWhileShaking = pipetteAdjacentHeaterShakerW
 const mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette as jest.MockedFunction<
   typeof getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette
 >
+
+const FLEX_PIPETTE = 'p1000_single_gen3'
+const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
 
 describe('moveToWell', () => {
   let robotStateWithTip: RobotState
@@ -193,6 +197,40 @@ describe('moveToWell', () => {
     })
   })
 
+  it('should return an error when moving to well in a heater-shaker with latch opened for flex', () => {
+    if (FlexPipetteNameSpecs != null) {
+      invariantContext.pipetteEntities[
+        DEFAULT_PIPETTE
+      ].spec = FlexPipetteNameSpecs
+    }
+
+    mockPipetteIntoHeaterShakerLatchOpen.mockImplementationOnce(
+      (
+        modules: RobotState['modules'],
+        labware: RobotState['labware'],
+        labwareId: string
+      ) => {
+        expect(modules).toBe(robotStateWithTip.modules)
+        expect(labware).toBe(robotStateWithTip.labware)
+        expect(labwareId).toBe(SOURCE_LABWARE)
+        return true
+      }
+    )
+    const result = moveToWell(
+      {
+        pipette: DEFAULT_PIPETTE,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HEATER_SHAKER_LATCH_OPEN',
+    })
+  })
+
   it('should return an error when moving to well in a heater-shaker latch is opened but is not shaking', () => {
     mockPipetteIntoHeaterShakerLatchOpen.mockImplementationOnce(
       (
@@ -235,6 +273,53 @@ describe('moveToWell', () => {
   })
 
   it('should return an error when moving to well in a heater-shaker is shaking but latch is closed', () => {
+    mockPipetteIntoHeaterShakerLatchOpen.mockImplementationOnce(
+      (
+        modules: RobotState['modules'],
+        labware: RobotState['labware'],
+        labwareId: string
+      ) => {
+        expect(modules).toBe(robotStateWithTip.modules)
+        expect(labware).toBe(robotStateWithTip.labware)
+        expect(labwareId).toBe(SOURCE_LABWARE)
+        return false
+      }
+    )
+    mockPipetteIntoHeaterShakerWhileShaking.mockImplementationOnce(
+      (
+        modules: RobotState['modules'],
+        labware: RobotState['labware'],
+        labwareId: string
+      ) => {
+        expect(modules).toBe(robotStateWithTip.modules)
+        expect(labware).toBe(robotStateWithTip.labware)
+        expect(labwareId).toBe(SOURCE_LABWARE)
+        return true
+      }
+    )
+
+    const result = moveToWell(
+      {
+        pipette: DEFAULT_PIPETTE,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HEATER_SHAKER_IS_SHAKING',
+    })
+  })
+
+  it('should return an error when moving to well in a heater-shaker is shaking but latch is closed for flex', () => {
+    if (FlexPipetteNameSpecs != null) {
+      invariantContext.pipetteEntities[
+        DEFAULT_PIPETTE
+      ].spec = FlexPipetteNameSpecs
+    }
+
     mockPipetteIntoHeaterShakerLatchOpen.mockImplementationOnce(
       (
         modules: RobotState['modules'],

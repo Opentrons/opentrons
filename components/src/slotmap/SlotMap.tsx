@@ -1,5 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
+import { FLEX_ROBOT_TYPE, RobotType } from '@opentrons/shared-data'
 import { Icon } from '../icons'
 import styles from './styles.css'
 
@@ -13,13 +14,21 @@ export interface SlotMapProps {
   collisionSlots?: string[]
   /** Optional error styling */
   isError?: boolean
+  robotType?: RobotType
 }
 
-const SLOT_MAP_SLOTS = [
+const OT2_SLOT_MAP_SLOTS = [
   ['10', '11'],
   ['7', '8', '9'],
   ['4', '5', '6'],
   ['1', '2', '3'],
+]
+
+const FLEX_SLOT_MAP_SLOTS = [
+  ['A1', 'A2', 'A3'],
+  ['B1', 'B2', 'B3'],
+  ['C1', 'C2', 'C3'],
+  ['D1', 'D2', 'D3'],
 ]
 
 const slotWidth = 33
@@ -29,12 +38,15 @@ const numRows = 4
 const numCols = 3
 
 export function SlotMap(props: SlotMapProps): JSX.Element {
-  const { collisionSlots, occupiedSlots, isError } = props
+  const { collisionSlots, occupiedSlots, isError, robotType } = props
+  const slots =
+    robotType === FLEX_ROBOT_TYPE ? FLEX_SLOT_MAP_SLOTS : OT2_SLOT_MAP_SLOTS
+
   return (
     <svg
       viewBox={`-1,-1,${slotWidth * numCols + 2}, ${slotHeight * numRows + 2}`}
     >
-      {SLOT_MAP_SLOTS.flatMap((row, rowIndex) =>
+      {slots.flatMap((row, rowIndex) =>
         row.map((slot, colIndex) => {
           const isCollisionSlot =
             collisionSlots && collisionSlots.includes(slot)

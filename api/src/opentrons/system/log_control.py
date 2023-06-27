@@ -21,12 +21,13 @@ async def get_records_dumb(selector: str, records: int, mode: str) -> bytes:
 
     :param selector: The syslog selector to limit responses to
     :param records: The maximum number of records to print
-    :param mode: A journalctl dump mode. Should be either "short" or "json".
+    :param mode: A journalctl dump mode. Should be either "short-precise" or "json".
     """
+    selector_flag = "-u" if selector == "opentrons-robot-server" else "-t"
     proc = await asyncio.create_subprocess_exec(
         "journalctl",
         "--no-pager",
-        "-t",
+        selector_flag,
         selector,
         "-n",
         str(records),

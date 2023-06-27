@@ -65,6 +65,9 @@ async def test_get_current_status(
         ],
         [EngineStatus.RUNNING, EngineStatus.FAILED, StatusBarState.HARDWARE_ERROR],
         [EngineStatus.RUNNING, EngineStatus.SUCCEEDED, StatusBarState.RUN_COMPLETED],
+        [EngineStatus.RUNNING, EngineStatus.STOP_REQUESTED, StatusBarState.UPDATING],
+        [EngineStatus.STOP_REQUESTED, EngineStatus.STOPPED, StatusBarState.IDLE],
+        [EngineStatus.RUNNING, EngineStatus.FINISHING, StatusBarState.UPDATING],
     ],
 )
 async def test_light_controller_update(

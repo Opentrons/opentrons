@@ -19,7 +19,7 @@ import {
 
 import { StyledText } from '../../atoms/text'
 
-import type { SettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
+import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 interface RectProps {
   isActive: boolean
@@ -34,7 +34,7 @@ const TextSizeTile = styled(Box)`
 `
 
 interface TextSizeProps {
-  setCurrentOption: (currentOption: SettingOption | null) => void
+  setCurrentOption: SetSettingOption
 }
 
 // ToDo (kj:03/03/2023) We need to define the max text size and min text size also decided to the default text size position in the rectangles

@@ -84,12 +84,12 @@ describe('DetachPipette', () => {
         right: null,
       },
     }
-    const { getByText, getByAltText, getByLabelText } = render(props)
+    const { getByText, getByTestId, getByLabelText } = render(props)
     getByText('Loosen screws and detach Flex 96-Channel 1000 μL')
     getByText(
       'Hold the pipette in place and loosen the pipette screws. (The screws are captive and will not come apart from the pipette.) Then carefully remove the pipette.'
     )
-    getByAltText('Unscrew 96 channel pipette')
+    getByTestId('Pipette_Detach_96.webm')
     getByText('mock check pipette button')
     const backBtn = getByLabelText('back')
     fireEvent.click(backBtn)

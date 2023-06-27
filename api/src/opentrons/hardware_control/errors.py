@@ -61,6 +61,12 @@ class FirmwareUpdateFailed(RuntimeError):
     pass
 
 
+class OverPressureDetected(RuntimeError):
+    """An error raised when the pressure sensor max value is exceeded."""
+
+    pass
+
+
 class InvalidPipetteName(KeyError):
     """Raised for an invalid pipette."""
 

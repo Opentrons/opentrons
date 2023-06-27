@@ -1,6 +1,7 @@
 """Functions for commanding motion limited by tool sensors."""
 import asyncio
-from typing import Union, List, Iterator, Tuple, Dict
+from functools import partial
+from typing import Union, List, Iterator, Tuple, Dict, Callable, AsyncContextManager
 from logging import getLogger
 from numpy import float64
 from math import copysign
@@ -12,6 +13,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorType,
     SensorThresholdMode,
     SensorOutputBinding,
+    ErrorCode,
 )
 from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
 from opentrons_hardware.sensors.types import (
@@ -30,7 +32,11 @@ from opentrons_hardware.hardware_control.motion import (
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 
 LOG = getLogger(__name__)
-ProbeTarget = Union[Literal[NodeId.pipette_left, NodeId.pipette_right, NodeId.gripper]]
+PipetteProbeTarget = Literal[NodeId.pipette_left, NodeId.pipette_right]
+InstrumentProbeTarget = Union[PipetteProbeTarget, Literal[NodeId.gripper]]
+
+# FIXME we should organize all of these functions to use the sensor drivers.
+# FIXME we should restrict some of these functions by instrument type.
 
 
 def _build_pass_step(
@@ -55,7 +61,7 @@ def _build_pass_step(
 
 async def liquid_probe(
     messenger: CanMessenger,
-    tool: ProbeTarget,
+    tool: PipetteProbeTarget,
     head_node: NodeId,
     max_z_distance: float,
     plunger_speed: float,
@@ -124,9 +130,24 @@ async def liquid_probe(
     return positions
 
 
+async def check_overpressure(
+    messenger: CanMessenger, tool: PipetteProbeTarget, sensor_id: SensorId = SensorId.S0
+) -> Callable[..., AsyncContextManager["asyncio.Queue[ErrorCode]"]]:
+    """Montior for overpressure in the system.
+
+    Returns a partial context manager to be used in the hardware controller so
+    we can wrap moves.
+    """
+    sensor_scheduler = SensorScheduler()
+    sensor_info = SensorInformation(SensorType.pressure, sensor_id, tool)
+    return partial(
+        sensor_scheduler.monitor_exceed_max_threshold, sensor_info, messenger
+    )
+
+
 async def capacitive_probe(
     messenger: CanMessenger,
-    tool: ProbeTarget,
+    tool: InstrumentProbeTarget,
     mover: NodeId,
     distance: float,
     speed: float,
@@ -168,7 +189,7 @@ async def capacitive_probe(
 
 async def capacitive_pass(
     messenger: CanMessenger,
-    tool: ProbeTarget,
+    tool: InstrumentProbeTarget,
     mover: NodeId,
     distance: float,
     speed: float,

@@ -19,6 +19,7 @@ from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
     UpdateStatus as HWUpdateStatus,
     SubSystemState,
+    StatusBarState,
 )
 from opentrons.hardware_control.errors import UpdateOngoingError as HWUpdateOngoingError
 
@@ -30,6 +31,7 @@ from robot_server.subsystems.firmware_update_manager import (
     UpdateInProgress,
     SubsystemNotFound,
     NoOngoingUpdate,
+    AnimationHandler,
 )
 
 from robot_server.subsystems.models import UpdateState, SubSystem
@@ -42,6 +44,12 @@ if TYPE_CHECKING:
 def decoy_task_runner(decoy: Decoy) -> TaskRunner:
     """Get a mocked out TaskRunner."""
     return decoy.mock(cls=TaskRunner)
+
+
+@pytest.fixture
+def decoy_animation_handler(decoy: Decoy) -> AnimationHandler:
+    """Get a mocked out AnimationHandler."""
+    return decoy.mock(cls=AnimationHandler)
 
 
 @pytest.fixture
@@ -66,9 +74,13 @@ def ot3_hardware_api(decoy: Decoy) -> OT3API:
 
 
 @pytest.fixture
-def subject(task_runner: TaskRunner, ot3_hardware_api: OT3API) -> FirmwareUpdateManager:
+def subject(
+    task_runner: TaskRunner,
+    ot3_hardware_api: OT3API,
+    decoy_animation_handler: AnimationHandler,
+) -> FirmwareUpdateManager:
     """Get a FirmwareUpdateManager to test."""
-    return FirmwareUpdateManager(task_runner, ot3_hardware_api)
+    return FirmwareUpdateManager(task_runner, ot3_hardware_api, decoy_animation_handler)
 
 
 def _build_attached_subsystem(
@@ -270,6 +282,7 @@ async def test_complete_updates_leave_ongoing(
     updater: MockUpdater,
     subject: FirmwareUpdateManager,
     ot3_hardware_api: OT3API,
+    decoy_animation_handler: AnimationHandler,
     decoy: Decoy,
 ) -> None:
     """It should move completed updates out of ongoing whether they succeed or fail."""
@@ -291,6 +304,13 @@ async def test_complete_updates_leave_ongoing(
     with pytest.raises(NoOngoingUpdate):
         await subject.get_ongoing_update_process_handle_by_subsystem(SubSystem.gantry_x)
     assert subject.get_update_process_handle_by_id("some-id") == proc
+    decoy.verify(
+        [
+            await decoy_animation_handler.update_started(subsystem=SubSystem.gantry_x),
+            await decoy_animation_handler.update_complete(subsystem=SubSystem.gantry_x),
+        ],
+        times=1,
+    )
 
 
 @pytest.mark.ot3_only
@@ -298,3 +318,38 @@ async def test_correct_exception_for_wrong_id(subject: FirmwareUpdateManager) ->
     """It uses a custom exception for incorrect ids."""
     with pytest.raises(UpdateIdNotFound):
         subject.get_update_process_handle_by_id("blahblah")
+
+
+@pytest.mark.ot3_only
+async def test_animation_handler(ot3_hardware_api: OT3API, decoy: Decoy) -> None:
+    """It sets the lights accordingly."""
+    subject = AnimationHandler(hw_handle=ot3_hardware_api)
+
+    # First group of updates:
+    #   - UPDATING
+    #   - UPDATING again (once rear panel finishes)
+    #   - OFF (once finished)
+    await subject.update_started(SubSystem.gantry_x)
+    await subject.update_started(SubSystem.rear_panel)
+    await subject.update_started(SubSystem.gantry_y)
+
+    await subject.update_complete(SubSystem.gantry_x)
+    await subject.update_complete(SubSystem.rear_panel)
+    await subject.update_complete(SubSystem.gantry_y)
+
+    # Second group of updates - UPDATING and then IDLE
+    subject.mark_initialized()
+    await subject.update_started(SubSystem.head)
+    await subject.update_complete(SubSystem.head)
+
+    decoy.verify(
+        [
+            # First group
+            await ot3_hardware_api.set_status_bar_state(StatusBarState.UPDATING),
+            await ot3_hardware_api.set_status_bar_state(StatusBarState.UPDATING),
+            await ot3_hardware_api.set_status_bar_state(StatusBarState.OFF),
+            await ot3_hardware_api.set_status_bar_state(StatusBarState.UPDATING),
+            await ot3_hardware_api.set_status_bar_state(StatusBarState.IDLE),
+        ],
+        times=1,
+    )

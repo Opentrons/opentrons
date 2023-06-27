@@ -26,7 +26,7 @@ class ModuleCalibrationOffset:
     module: ModuleType
     source: SourceType
     status: CalibrationStatus
-    slot: Optional[int] = None
+    slot: Optional[str] = None
     mount: Optional[OT3Mount] = None
     instrument_id: Optional[str] = None
     last_modified: Optional[datetime] = None
@@ -35,7 +35,7 @@ class ModuleCalibrationOffset:
 def load_module_calibration_offset(
     module_type: ModuleType,
     module_id: str,
-    slot: Optional[int] = None,
+    slot: Optional[str] = None,
 ) -> ModuleCalibrationOffset:
     """Loads the calibration offset for a module."""
     # load default if module offset data do not exist
@@ -71,7 +71,7 @@ def load_module_calibration_offset(
 def save_module_calibration_offset(
     offset: Point,
     mount: OT3Mount,
-    slot: int,
+    slot: str,
     module: ModuleType,
     module_id: str,
     instrument_id: Optional[str] = None,

@@ -65,11 +65,11 @@ describe('Hardware', () => {
   })
   it('should render the correct location, name, and connected status in each table row', () => {
     const { getByRole } = render(props)[0]
-    getByRole('row', { name: 'Left mount P10 Single-Channel GEN1' })
+    getByRole('row', { name: 'Left Mount P10 Single-Channel GEN1' })
     getByRole('row', {
-      name: 'Right mount P1000 Single-Channel GEN1',
+      name: 'Right Mount P1000 Single-Channel GEN1',
     })
-    getByRole('row', { name: 'Slot 1 Heater-Shaker Module GEN1' })
-    getByRole('row', { name: 'Slot 3 Temperature Module GEN2' })
+    getByRole('row', { name: '1 Heater-Shaker Module GEN1' })
+    getByRole('row', { name: '3 Temperature Module GEN2' })
   })
 })
