@@ -27,6 +27,10 @@ export function Ot2ModuleTag(props: Ot2ModuleTagProps): JSX.Element {
   const isThermocyclerModel =
     model === THERMOCYCLER_MODULE_V1 || model === THERMOCYCLER_MODULE_V2
   const xDimension = dimensions.labwareInterfaceXDimension ?? 0
+  const xCoordinateForOtherMods =
+    orientation === 'left'
+      ? -(xDimension / 2)
+      : dimensions.labwareInterfaceXDimension
 
   return (
     <RobotCoordsForeignDiv
@@ -37,13 +41,7 @@ export function Ot2ModuleTag(props: Ot2ModuleTagProps): JSX.Element {
       }
       height={isThermocyclerModel ? 16 : 24}
       y={isThermocyclerModel ? -22 : 0}
-      x={
-        isThermocyclerModel
-          ? 0
-          : orientation === 'left'
-          ? -(xDimension / 2)
-          : dimensions.labwareInterfaceXDimension
-      }
+      x={isThermocyclerModel ? 0 : xCoordinateForOtherMods}
       innerDivProps={{
         backgroundColor: COLORS.darkGreyEnabled,
         padding: SPACING.spacing4,
