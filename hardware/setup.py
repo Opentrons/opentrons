@@ -46,7 +46,11 @@ CLASSIFIERS = [
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "Hardware control for Opentrons Robots."
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
-INSTALL_REQUIRES = ["python-can==3.3.4", "pyserial==3.5"]
+INSTALL_REQUIRES = [
+    "python-can==3.3.4",
+    "pyserial==3.5",
+    f"opentrons_shared_data=={VERSION}",
+]
 
 
 def read(*parts: str) -> str:
