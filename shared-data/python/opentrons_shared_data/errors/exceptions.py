@@ -296,7 +296,8 @@ class InternalMessageFormatError(CommunicationError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an InternalMesasgeFormatError."""
-        super().__init__(ErrorCodes.FIRMWARE_UPDATE_FAILED, message, detail, wrapping)
+        super().__init__(ErrorCodes.INTERNAL_MESSAGE_FORMAT_ERROR, message, detail, wrapping)
+
 
 class MotionFailedError(RoboticsControlError):
     """An error indicating that a motion failed."""
