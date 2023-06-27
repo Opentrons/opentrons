@@ -100,7 +100,7 @@ describe('Results', () => {
         {
           commandType: 'home' as const,
           params: {
-            axes: ['leftPlunger'],
+            axes: ['leftPlunger', 'leftZ'],
           },
         },
         {
@@ -138,7 +138,7 @@ describe('Results', () => {
         {
           commandType: 'home' as const,
           params: {
-            axes: ['leftPlunger'],
+            axes: ['leftPlunger', 'leftZ'],
           },
         },
         {

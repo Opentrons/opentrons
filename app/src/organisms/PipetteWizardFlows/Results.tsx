@@ -133,11 +133,8 @@ export const Results = (props: ResultsProps): JSX.Element => {
       flowType === FLOWS.ATTACH &&
       currentStepIndex !== totalStepCount
     ) {
-      let axes: MotorAxis = mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
-      // TODO: (sb)5/25/23 Stop homing leftZ for 96 once motor is disabled
-      if (attachedPipettes[mount]?.instrumentName === 'p1000_96') {
-        axes = ['leftPlunger', 'leftZ']
-      }
+      const axes: MotorAxis =
+        mount === LEFT ? ['leftPlunger', 'leftZ'] : ['rightPlunger', 'rightZ']
       chainRunCommands(
         [
           {
