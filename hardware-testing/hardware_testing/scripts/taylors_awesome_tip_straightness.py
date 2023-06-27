@@ -164,7 +164,8 @@ async def _main() -> None:
     )
     # await set_default_current_settings(hw_api, load=None)
     await hw_api.cache_instruments()
-    await home_ot3(hw_api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+    await hw_api.home()
+    # await home_ot3(hw_api, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     await hw_api.home_plunger(mount)
     home_pos = await hw_api.current_position_ot3(mount)
     tip_length = {"T1K": 85.7, "T200": 48.35, "T50": 47.9}
