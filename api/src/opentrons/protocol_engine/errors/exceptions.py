@@ -158,6 +158,19 @@ class LabwareNotLoadedOnModuleError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class LabwareNotLoadedOnLabwareError(ProtocolEngineError):
+    """Raised when referencing a labware on a labware that has not been loaded."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareNotLoadedOnLabwareError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class LabwareNotOnDeckError(ProtocolEngineError):
     """Raised when a labware can't be used because it's off-deck."""
 

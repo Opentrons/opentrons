@@ -46,7 +46,10 @@ from opentrons.protocol_engine.types import (
     FlowRates,
     OFF_DECK_LOCATION,
 )
-from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
+from opentrons.protocol_engine.errors import (
+    LabwareNotLoadedOnModuleError,
+    LabwareNotLoadedOnLabwareError,
+)
 from opentrons.protocol_engine.state.labware import (
     LabwareLoadParams as EngineLabwareLoadParams,
 )
@@ -1133,6 +1136,68 @@ def test_get_deck_definition(
     result = subject.get_deck_definition()
 
     assert result == deck_definition
+
+
+def test_get_labware_on_module(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+) -> None:
+    """It should get the item on top of a given module."""
+    mock_module_core = decoy.mock(cls=ModuleCore)
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_module_core.module_id).then_return("abc")
+    decoy.when(mock_engine_client.state.labware.get_id_by_module("abc")).then_return(
+        "123"
+    )
+
+    subject._labware_cores_by_id["123"] = mock_labware_core
+
+    assert subject.get_labware_on_module(mock_module_core) == mock_labware_core
+
+
+def test_get_labware_on_module_returns_none(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+) -> None:
+    """It should return none if there is no item on top of the module."""
+    mock_module_core = decoy.mock(cls=ModuleCore)
+
+    decoy.when(mock_module_core.module_id).then_return("abc")
+    decoy.when(mock_engine_client.state.labware.get_id_by_module("abc")).then_raise(
+        LabwareNotLoadedOnModuleError("whoops")
+    )
+
+    assert subject.get_labware_on_module(mock_module_core) is None
+
+
+def test_get_labware_on_labware(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+) -> None:
+    """It should get the item on top of a given labware."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+    mock_other_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_labware_core.labware_id).then_return("abc")
+    decoy.when(mock_engine_client.state.labware.get_id_by_labware("abc")).then_return(
+        "123"
+    )
+
+    subject._labware_cores_by_id["123"] = mock_other_labware_core
+
+    assert subject.get_labware_on_labware(mock_labware_core) == mock_other_labware_core
+
+
+def test_get_labware_on_labware_returns_none(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ProtocolCore
+) -> None:
+    """It should return none if there is no item on top of the labware."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_labware_core.labware_id).then_return("abc")
+    decoy.when(mock_engine_client.state.labware.get_id_by_labware("abc")).then_raise(
+        LabwareNotLoadedOnLabwareError("oops")
+    )
+
+    assert subject.get_labware_on_labware(mock_labware_core) is None
 
 
 def test_get_slot_center(

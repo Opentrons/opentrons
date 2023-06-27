@@ -168,6 +168,12 @@ class AbstractProtocol(
         """Get the labware on a given module, if any."""
 
     @abstractmethod
+    def get_labware_on_labware(
+        self, labware_core: LabwareCoreType
+    ) -> Optional[LabwareCoreType]:
+        """Get the labware on a given labware, if any."""
+
+    @abstractmethod
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""
 

@@ -442,6 +442,13 @@ class Labware:
         else:
             return p["magneticModuleEngageHeight"]
 
+    @property  # type: ignore[misc]
+    @requires_version(2, 15)
+    def labware(self) -> Optional[Labware]:
+        """The labware (if any) present on this labware."""
+        labware_core = self._protocol_core.get_labware_on_labware(self._core)
+        return self._core_map.get(labware_core)
+
     @requires_version(2, 15)
     def load_labware(
         self,

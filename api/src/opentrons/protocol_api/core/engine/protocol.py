@@ -36,6 +36,7 @@ from opentrons.protocol_engine.types import (
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import (
     LabwareNotLoadedOnModuleError,
+    LabwareNotLoadedOnLabwareError,
 )
 
 from ... import validation
@@ -500,6 +501,18 @@ class ProtocolCore(
             )
             return self._labware_cores_by_id[labware_id]
         except LabwareNotLoadedOnModuleError:
+            return None
+
+    def get_labware_on_labware(
+        self, labware_core: LabwareCore
+    ) -> Optional[LabwareCore]:
+        """Get the item on top of a given labware, if any."""
+        try:
+            labware_id = self._engine_client.state.labware.get_id_by_labware(
+                labware_core.labware_id
+            )
+            return self._labware_cores_by_id[labware_id]
+        except LabwareNotLoadedOnLabwareError:
             return None
 
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:

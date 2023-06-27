@@ -143,6 +143,37 @@ def test_get_id_by_module_raises_error() -> None:
         subject.get_id_by_module(module_id="no-module-id")
 
 
+def test_get_id_by_labware() -> None:
+    """Should return the labware id associated to the labware."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="test-uri",
+                location=OnLabwareLocation(labwareId="other-labware-id"),
+            )
+        }
+    )
+    assert subject.get_id_by_labware(labware_id="other-labware-id") == "labware-id"
+
+
+def test_get_id_by_labware_raises_error() -> None:
+    """Should raise error that labware not found."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="test-uri",
+                location=OnLabwareLocation(labwareId="other-labware-id"),
+            )
+        }
+    )
+    with pytest.raises(errors.exceptions.LabwareNotLoadedOnLabwareError):
+        subject.get_id_by_labware(labware_id="no-labware-id")
+
+
 def test_raise_if_labware_has_labware_on_top() -> None:
     """It should raise if labware has another labware on top."""
     subject = get_labware_view(

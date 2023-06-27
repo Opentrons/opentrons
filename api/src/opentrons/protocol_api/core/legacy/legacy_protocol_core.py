@@ -446,6 +446,11 @@ class LegacyProtocolCore(
         labware = module_core.geometry.labware
         return cast(LegacyLabwareCore, labware._core) if labware is not None else None
 
+    def get_labware_on_labware(
+        self, labware_core: LegacyLabwareCore
+    ) -> Optional[LegacyLabwareCore]:
+        assert False, "get_labware_on_labware only supported on engine core"
+
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the geometry definition of the robot's deck."""
         assert False, "get_deck_definition only supported on engine core"
