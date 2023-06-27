@@ -100,6 +100,17 @@ def test_is_tiprack(
     assert subject.is_tiprack is False
 
 
+def test_is_adapter(
+    decoy: Decoy, mock_labware_core: LabwareCore, subject: Labware
+) -> None:
+    """It should report if it's an adapter."""
+    decoy.when(mock_labware_core.is_adapter()).then_return(True)
+    assert subject.is_adapter is True
+
+    decoy.when(mock_labware_core.is_adapter()).then_return(False)
+    assert subject.is_adapter is False
+
+
 def test_load_labware(
     decoy: Decoy,
     mock_labware_core: LabwareCore,

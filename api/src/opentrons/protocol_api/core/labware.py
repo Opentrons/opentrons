@@ -90,11 +90,15 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
 
     @abstractmethod
     def is_tip_rack(self) -> bool:
-        "Whether the labware is a tip rack."
+        """Whether the labware is a tip rack."""
+
+    @abstractmethod
+    def is_adapter(self) -> bool:
+        """Whether the labware is an adapter."""
 
     @abstractmethod
     def is_fixed_trash(self) -> bool:
-        "Whether the labware is a fixed trash."
+        """Whether the labware is a fixed trash."""
 
     @abstractmethod
     def get_tip_length(self) -> float:

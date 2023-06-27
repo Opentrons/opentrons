@@ -784,6 +784,11 @@ class Labware:
         return self._is_tiprack
 
     @property  # type: ignore[misc]
+    @requires_version(2, 15)
+    def is_adapter(self) -> bool:
+        return self._core.is_adapter()
+
+    @property  # type: ignore[misc]
     @requires_version(2, 0)
     def tip_length(self) -> float:
         return self._core.get_tip_length()
