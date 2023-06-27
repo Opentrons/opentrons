@@ -294,7 +294,7 @@ const SplashBody = styled.h4`
   overflow: hidden;
   overflow-wrap: break-word;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  text-align: ${TYPOGRAPHY.textAlignLeft};
+  text-align: ${TYPOGRAPHY.textAlignCenter};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize32};
   line-height: ${TYPOGRAPHY.lineHeight42};
