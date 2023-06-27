@@ -47,6 +47,10 @@ export const blowout: CommandCreator<BlowoutParams> = (
     )
   }
 
+  if (prevRobotState.labware[labware].slot === 'offDeck') {
+    errors.push(errorCreators.labwareOffDeck())
+  }
+
   if (errors.length > 0) {
     return {
       errors,

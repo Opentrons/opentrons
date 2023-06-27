@@ -82,6 +82,10 @@ export const dispense: CommandCreator<DispenseParams> = (
     )
   }
 
+  if (prevRobotState.labware[labware].slot === 'offDeck') {
+    errors.push(errorCreators.labwareOffDeck())
+  }
+
   if (
     thermocyclerPipetteCollision(
       prevRobotState.modules,

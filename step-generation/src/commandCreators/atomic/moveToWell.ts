@@ -56,6 +56,10 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
     )
   }
 
+  if (prevRobotState.labware[labware].slot === 'offDeck') {
+    errors.push(errorCreators.labwareOffDeck())
+  }
+
   if (
     modulePipetteCollision({
       pipette,
