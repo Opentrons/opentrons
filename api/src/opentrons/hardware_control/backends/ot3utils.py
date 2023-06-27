@@ -1,6 +1,7 @@
 """Shared utilities for ot3 hardware control."""
 from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence
 from typing_extensions import Literal
+from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
     OT3Axis,
@@ -32,7 +33,10 @@ from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     CoordinateValue,
 )
-from opentrons_hardware.hardware_control.tool_sensors import ProbeTarget
+from opentrons_hardware.hardware_control.tool_sensors import (
+    InstrumentProbeTarget,
+    PipetteProbeTarget,
+)
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     unit_vector_multiplication,
 )
@@ -235,6 +239,29 @@ def get_system_constraints(
     return constraints
 
 
+def get_system_constraints_for_calibration(
+    config: OT3MotionSettings,
+    gantry_load: GantryLoad,
+) -> "SystemConstraints[OT3Axis]":
+    conf_by_pip = config.by_gantry_load(gantry_load)
+    constraints = {}
+    for axis_kind in [
+        OT3AxisKind.P,
+        OT3AxisKind.X,
+        OT3AxisKind.Y,
+        OT3AxisKind.Z,
+        OT3AxisKind.Z_G,
+    ]:
+        for axis in OT3Axis.of_kind(axis_kind):
+            constraints[axis] = AxisConstraints.build(
+                conf_by_pip["acceleration"][axis_kind],
+                conf_by_pip["max_speed_discontinuity"][axis_kind],
+                conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
+                DEFAULT_CALIBRATION_AXIS_MAX_SPEED,
+            )
+    return constraints
+
+
 def _convert_to_node_id_dict(
     axis_pos: Coordinates[OT3Axis, CoordinateValue],
 ) -> NodeIdMotionValues:
@@ -401,15 +428,24 @@ def axis_convert(
     return ret
 
 
-_sensor_node_lookup: Dict[OT3Mount, ProbeTarget] = {
+_sensor_node_lookup: Dict[OT3Mount, InstrumentProbeTarget] = {
     OT3Mount.LEFT: NodeId.pipette_left,
     OT3Mount.RIGHT: NodeId.pipette_right,
     OT3Mount.GRIPPER: NodeId.gripper,
 }
 
+_sensor_node_lookup_pipettes_only: Dict[OT3Mount, PipetteProbeTarget] = {
+    OT3Mount.LEFT: NodeId.pipette_left,
+    OT3Mount.RIGHT: NodeId.pipette_right,
+}
 
-def sensor_node_for_mount(mount: OT3Mount) -> ProbeTarget:
+
+def sensor_node_for_mount(mount: OT3Mount) -> InstrumentProbeTarget:
     return _sensor_node_lookup[mount]
+
+
+def sensor_node_for_pipette(mount: OT3Mount) -> PipetteProbeTarget:
+    return _sensor_node_lookup_pipettes_only[mount]
 
 
 _instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {

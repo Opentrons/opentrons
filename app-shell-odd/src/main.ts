@@ -6,6 +6,7 @@ import { registerDiscovery } from './discovery'
 import { registerRobotLogs } from './robot-logs'
 import { registerUpdate, updateLatestVersion } from './update'
 import { registerRobotSystemUpdate } from './system-update'
+import { registerAppRestart } from './restart'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import systemd from './systemd'
 
@@ -71,6 +72,7 @@ function startUp(): void {
     registerRobotLogs(dispatch, mainWindow),
     registerUpdate(dispatch),
     registerRobotSystemUpdate(dispatch),
+    registerAppRestart(),
   ]
 
   ipcMain.on('dispatch', (_, action) => {

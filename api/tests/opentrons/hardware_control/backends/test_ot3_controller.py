@@ -1,9 +1,20 @@
-from typing import Dict, List, Optional, Set, Tuple, Any, Iterator, AsyncIterator
-from itertools import chain
-
 import mock
 import pytest
 from decoy import Decoy
+from itertools import chain
+
+from contextlib import nullcontext as does_not_raise
+from typing import (
+    Dict,
+    List,
+    Optional,
+    Set,
+    Tuple,
+    Any,
+    Iterator,
+    AsyncIterator,
+    ContextManager,
+)
 
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
@@ -38,6 +49,8 @@ from opentrons.hardware_control.types import (
     SubSystemState,
     UpdateStatus,
     UpdateState,
+    TipStateType,
+    FailedTipStateCheck,
 )
 from opentrons.hardware_control.errors import (
     FirmwareUpdateRequired,
@@ -987,3 +1000,41 @@ async def test_update_required_flag_disabled(
         fake_src,
     ):
         await controller.set_active_current({OT3Axis.X: 2})
+
+
+async def test_monitor_pressure(
+    controller: OT3Controller,
+    mock_move_group_run: mock.AsyncMock,
+    mock_present_devices: None,
+) -> None:
+    mount = OT3Mount.LEFT
+    mock_move_group_run.side_effect = move_group_run_side_effect(
+        controller, [OT3Axis.P_L]
+    )
+    async with controller.monitor_overpressure(mount):
+        await controller.home([OT3Axis.P_L], GantryLoad.LOW_THROUGHPUT)
+    mock_move_group_run.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "tip_state_type, mocked_ejector_response, expectation",
+    [
+        [TipStateType.PRESENT, 1, does_not_raise()],
+        [TipStateType.ABSENT, 0, does_not_raise()],
+        [TipStateType.PRESENT, 0, pytest.raises(FailedTipStateCheck)],
+        [TipStateType.ABSENT, 1, pytest.raises(FailedTipStateCheck)],
+    ],
+)
+async def test_get_tip_present(
+    controller: OT3Controller,
+    tip_state_type: TipStateType,
+    mocked_ejector_response: int,
+    expectation: ContextManager[None],
+) -> None:
+    mount = OT3Mount.LEFT
+    with mock.patch(
+        "opentrons.hardware_control.backends.ot3controller.get_tip_ejector_state",
+        return_value=mocked_ejector_response,
+    ):
+        with expectation:
+            await controller.get_tip_present(mount, tip_state_type)

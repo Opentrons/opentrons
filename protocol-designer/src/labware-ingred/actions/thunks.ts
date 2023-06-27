@@ -11,6 +11,7 @@ import {
   DuplicateLabwareAction,
 } from './actions'
 import { ThunkAction } from '../../types'
+import { getRobotType } from '../../file-data/selectors'
 export interface RenameLabwareAction {
   type: 'RENAME_LABWARE'
   payload: {
@@ -52,7 +53,9 @@ export const createContainer: (
 ) => {
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
-  const slot = args.slot || getNextAvailableDeckSlot(initialDeckSetup)
+  const robotType = getRobotType(state)
+  const slot =
+    args.slot || getNextAvailableDeckSlot(initialDeckSetup, robotType)
   const labwareDef = labwareDefSelectors.getLabwareDefsByURI(state)[
     args.labwareDefURI
   ]

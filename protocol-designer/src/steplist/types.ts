@@ -1,6 +1,7 @@
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
 import {
   CommandCreatorArgs,
+  MoveLabwareArgs,
   PauseArgs,
   ThermocyclerProfileStepArgs,
 } from '@opentrons/step-generation'
@@ -110,6 +111,10 @@ export interface PauseSubstepItem {
   substepType: 'pause'
   pauseStepArgs: PauseArgs // Pause substeps use same data as processed form
 }
+export interface MoveLabwareSubstepItem {
+  substepType: 'moveLabware'
+  moveLabwareArgs: MoveLabwareArgs // Move labware substeps use same data as processed form
+}
 export interface WaitForTemperatureSubstepItem {
   substepType: 'waitForTemperature'
   temperature: number
@@ -157,6 +162,7 @@ export type SubstepItemData =
   | ThermocyclerProfileSubstepItem
   | ThermocyclerStateSubstepItem
   | HeaterShakerSubstepItem
+  | MoveLabwareSubstepItem
 export type Substeps = Record<StepIdType, SubstepItemData | null | undefined>
 export type StepFormErrors = FormError[]
 export interface StepArgsAndErrors {

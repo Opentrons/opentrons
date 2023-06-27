@@ -11,10 +11,10 @@ import {
 
 import { StyledText } from '../../atoms/text'
 
-import type { SettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard/RobotSettingButton'
+import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 interface RobotNameProps {
-  setCurrentOption: (currentOption: SettingOption | null) => void
+  setCurrentOption: SetSettingOption
 }
 
 export function RobotName({ setCurrentOption }: RobotNameProps): JSX.Element {

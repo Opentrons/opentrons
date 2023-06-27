@@ -1,11 +1,10 @@
+import { useSelector } from 'react-redux'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  COLORS,
-  TEXT_TRANSFORM_CAPITALIZE,
-  PrimaryButton,
-} from '@opentrons/components'
+import { COLORS, PrimaryButton } from '@opentrons/components'
+import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { SmallButton } from '../../atoms/buttons'
 import {
   SUCCESSFULLY_ATTACHED,
   SUCCESSFULLY_ATTACHED_AND_CALIBRATED,
@@ -19,6 +18,7 @@ export const Success = (
 ): JSX.Element => {
   const { proceed, successfulAction } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const isOnDevice = useSelector(getIsOnDevice)
 
   const infoByAction: {
     [action in SuccessStep['successfulAction']]: {
@@ -51,12 +51,15 @@ export const Success = (
       header={header}
       isSuccess
     >
-      <PrimaryButton
-        textTransform={TEXT_TRANSFORM_CAPITALIZE}
-        onClick={proceed}
-      >
-        {buttonText}
-      </PrimaryButton>
+      {isOnDevice ? (
+        <SmallButton
+          buttonText={buttonText}
+          buttonType="primary"
+          onClick={proceed}
+        />
+      ) : (
+        <PrimaryButton onClick={proceed}>{buttonText}</PrimaryButton>
+      )}
     </SimpleWizardBody>
   )
 }

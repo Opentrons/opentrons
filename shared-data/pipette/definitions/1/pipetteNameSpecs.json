@@ -492,8 +492,10 @@
       "travelDistance": 80
     },
     "defaultTipracks": [
-      "opentrons/opentrons_96_tiprack_300ul/1",
-      "opentrons/opentrons_96_filtertiprack_200ul/1"
+      "opentrons/opentrons_flex_96_tiprack_200ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
     ]
   },
   "p1000_single_gen3": {
@@ -535,9 +537,12 @@
       "travelDistance": 80
     },
     "defaultTipracks": [
-      "opentrons/opentrons_96_tiprack_1000ul/1",
-      "opentrons/opentrons_96_filtertiprack_1000ul/1",
-      "opentrons/geb_96_tiprack_1000ul/1"
+      "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+      "opentrons/opentrons_flex_96_tiprack_200ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
     ]
   },
   "p1000_multi_gen3": {
@@ -577,9 +582,12 @@
       "travelDistance": 80
     },
     "defaultTipracks": [
-      "opentrons/opentrons_96_tiprack_1000ul/1",
-      "opentrons/opentrons_96_filtertiprack_1000ul/1",
-      "opentrons/geb_96_tiprack_1000ul/1"
+      "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+      "opentrons/opentrons_flex_96_tiprack_200ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
     ]
   },
   "p50_multi_gen3": {
@@ -618,8 +626,10 @@
       "travelDistance": 80
     },
     "defaultTipracks": [
-      "opentrons/opentrons_96_tiprack_300ul/1",
-      "opentrons/opentrons_96_filtertiprack_200ul/1"
+      "opentrons/opentrons_flex_96_tiprack_200ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
     ]
   },
   "p1000_96": {
@@ -658,8 +668,12 @@
       "travelDistance": 80
     },
     "defaultTipracks": [
-      "opentrons/opentrons_96_tiprack_300ul/1",
-      "opentrons/opentrons_96_filtertiprack_200ul/1"
+      "opentrons/opentrons_flex_96_tiprack_1000ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_1000ul/1",
+      "opentrons/opentrons_flex_96_tiprack_200ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_200ul/1",
+      "opentrons/opentrons_flex_96_tiprack_50ul/1",
+      "opentrons/opentrons_flex_96_filtertiprack_50ul/1"
     ]
   }
 }

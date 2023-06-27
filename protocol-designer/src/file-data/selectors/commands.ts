@@ -107,6 +107,13 @@ export const commandCreatorFromStepArgs = (
     case 'mix':
       return StepGeneration.curryCommandCreator(StepGeneration.mix, args)
 
+    case 'moveLabware': {
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.moveLabware,
+        args
+      )
+    }
+
     case 'engageMagnet':
       return StepGeneration.curryCommandCreator(
         StepGeneration.engageMagnet,

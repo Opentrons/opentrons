@@ -7,12 +7,14 @@ import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import { getInitialDeckSetup } from '../../step-forms/selectors'
 import { getLabwareNicknamesById } from '../../ui/labware/selectors'
 import { uuid } from '../../utils'
+import { getRobotType } from '../../file-data/selectors'
 import { renameLabware, createContainer } from '../actions'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 
 jest.mock('../../labware-defs/selectors')
 jest.mock('../../step-forms/selectors')
 jest.mock('../../ui/labware/selectors')
+jest.mock('../../file-data/selectors')
 jest.mock('../../utils')
 jest.mock('../utils')
 
@@ -36,6 +38,10 @@ const mockGetNextAvailableDeckSlot = getNextAvailableDeckSlot as jest.MockedFunc
 
 const mockGetNextNickname = getNextNickname as jest.MockedFunction<
   typeof getNextNickname
+>
+
+const mockGetRobotType = getRobotType as jest.MockedFunction<
+  typeof getRobotType
 >
 
 const middlewares = [thunk]
@@ -106,7 +112,7 @@ describe('renameLabware thunk', () => {
 describe('createContainer', () => {
   it('should dispatch CREATE_CONTAINER with the specified slot', () => {
     const store: any = mockStore({})
-
+    mockGetRobotType.mockReturnValue('OT-2 Standard')
     mockGetInitialDeckSetup.mockImplementation(state => {
       expect(state).toBe(store.getState())
       return { labware: {}, pipettes: {}, modules: {} }
@@ -138,7 +144,7 @@ describe('createContainer', () => {
 
   it('should dispatch CREATE_CONTAINER with slot from getNextAvailableDeckSlot if no slot is specified', () => {
     const store: any = mockStore({})
-
+    mockGetRobotType.mockReturnValue('OT-2 Standard')
     const initialDeckSetup = { labware: {}, pipettes: {}, modules: {} }
     mockGetInitialDeckSetup.mockImplementation(state => {
       expect(state).toBe(store.getState())
@@ -174,7 +180,7 @@ describe('createContainer', () => {
 
   it('should do nothing if no slot is specified and getNextAvailableDeckSlot returns falsey', () => {
     const store: any = mockStore({})
-
+    mockGetRobotType.mockReturnValue('OT-3 Standard')
     const initialDeckSetup = { labware: {}, pipettes: {}, modules: {} }
     mockGetInitialDeckSetup.mockImplementation(state => {
       expect(state).toBe(store.getState())
@@ -203,7 +209,7 @@ describe('createContainer', () => {
     // so for the auto-incrementing My Tiprack (1), My Tiprack (2) mechanism to work
     // we must dispatch RENAME_LABWARE here instead of having that overlay dispatch it.
     const store: any = mockStore({})
-
+    mockGetRobotType.mockReturnValue('OT-2 Standard')
     mockGetLabwareNicknamesById.mockImplementation(state => {
       expect(state).toBe(store.getState())
       return {

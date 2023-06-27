@@ -4,18 +4,18 @@ import { css } from 'styled-components'
 import { ViewportList, ViewportListRef } from 'react-viewport-list'
 
 import {
-  Flex,
-  DIRECTION_ROW,
-  COLORS,
-  SPACING,
-  DIRECTION_COLUMN,
-  TYPOGRAPHY,
-  JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
-  BORDERS,
-  POSITION_RELATIVE,
-  OVERFLOW_HIDDEN,
   ALIGN_FLEX_START,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  DIRECTION_ROW,
+  Flex,
+  JUSTIFY_SPACE_BETWEEN,
+  OVERFLOW_HIDDEN,
+  POSITION_RELATIVE,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
@@ -37,9 +37,9 @@ import type { RobotAnalyticsData } from '../../../redux/analytics/types'
 
 const TITLE_TEXT_STYLE = css`
   color: ${COLORS.darkBlack70};
-  font-size: 1.75rem;
+  font-size: ${TYPOGRAPHY.fontSize28};
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  line-height: 2.25rem;
+  line-height: ${TYPOGRAPHY.lineHeight36};
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -49,8 +49,8 @@ const TITLE_TEXT_STYLE = css`
 `
 
 const COMMAND_ROW_STYLE = css`
-  font-size: 1.375rem;
-  line-height: 1.75rem;
+  font-size: ${TYPOGRAPHY.fontSize22};
+  line-height: ${TYPOGRAPHY.lineHeight28};
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -135,7 +135,7 @@ export function RunningProtocolCommandList({
         height="6.75rem"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText fontSize="1.75rem" lineHeight="2.25rem" fontWeight="700">
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
             {currentRunStatus}
           </StyledText>
           <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>

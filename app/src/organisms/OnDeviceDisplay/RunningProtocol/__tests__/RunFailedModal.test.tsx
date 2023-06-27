@@ -66,6 +66,9 @@ describe('RunFailedModal', () => {
     getByText(
       'ProtocolEngineError [line 16]: ModuleNotAttachedError: No available'
     )
+    getByText(
+      'Download the run logs from the Opentrons App and send it to support@opentrons.com for assistance.'
+    )
     getByText('Close')
   })
 
