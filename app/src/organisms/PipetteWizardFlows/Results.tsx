@@ -134,7 +134,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       currentStepIndex !== totalStepCount
     ) {
       const axes: MotorAxis =
-        mount === LEFT ? ['leftPlunger', 'leftZ'] : ['rightPlunger', 'rightZ']
+        mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
       chainRunCommands(
         [
           {
@@ -150,13 +150,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
             commandType: 'home' as const,
             params: {
               axes: axes,
-            },
-          },
-          {
-            // @ts-expect-error calibration type not yet supported
-            commandType: 'calibration/moveToMaintenancePosition' as const,
-            params: {
-              mount: mount,
             },
           },
         ],

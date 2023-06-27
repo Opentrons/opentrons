@@ -61,6 +61,10 @@ describe('AttachProbe', () => {
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
         {
+          commandType: 'home',
+          params: { axes: ['leftZ'] },
+        },
+        {
           commandType: 'calibration/calibratePipette',
           params: { mount: 'left' },
         },
@@ -164,6 +168,10 @@ describe('AttachProbe', () => {
     getByRole('button', { name: 'Begin calibration' }).click()
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
+        {
+          commandType: 'home',
+          params: { axes: ['leftZ'] },
+        },
         {
           commandType: 'calibration/calibratePipette',
           params: { mount: 'left' },
