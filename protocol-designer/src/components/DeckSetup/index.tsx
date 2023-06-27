@@ -84,9 +84,9 @@ type ContentsProps = RobotWorkSpaceRenderProps & {
 }
 
 export const VIEWBOX_MIN_X = -64
-export const VIEWBOX_MIN_Y = -30
+export const VIEWBOX_MIN_Y = -10
 export const VIEWBOX_WIDTH = 520
-export const VIEWBOX_HEIGHT = 480
+export const VIEWBOX_HEIGHT = 414
 
 const OT2_VIEWBOX = `${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`
 const FLEX_VIEWBOX = '-144.31 -76.59 750 580'

@@ -29,14 +29,12 @@ export function ModuleFromDef(props: ModuleFromDataProps): JSX.Element {
   }
 
   return (
-    <>
-      <g>
-        {parseHtml(
-          stringify(standaloneSVG ? filteredSVGWrapper : groupNodeWrapper, {
-            selfClose: false,
-          })
-        )}
-      </g>
-    </>
+    <g>
+      {parseHtml(
+        stringify(standaloneSVG ? filteredSVGWrapper : groupNodeWrapper, {
+          selfClose: false,
+        })
+      )}
+    </g>
   )
 }

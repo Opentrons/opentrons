@@ -47,6 +47,8 @@ interface Props {
   innerProps?:
     | React.ComponentProps<typeof Thermocycler>
     | React.ComponentProps<typeof ModuleFromDef>
+    | React.ComponentProps<typeof HeaterShaker>
+    | React.ComponentProps<typeof Temperature>
     | {}
   statusInfo?: React.ReactNode // contents of small status rectangle, not displayed if absent
   children?: React.ReactNode // contents to be rendered on top of the labware mating surface of the module
