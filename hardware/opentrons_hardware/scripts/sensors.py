@@ -11,7 +11,7 @@ from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
-from .sensor_utils import (
+from sensor_utils import (
     SensorRun,
     handle_capacitive_sensor,
     handle_environment_sensor,
