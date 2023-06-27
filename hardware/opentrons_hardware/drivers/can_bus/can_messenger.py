@@ -16,7 +16,11 @@ from typing import (
 
 import logging
 
-from opentrons_hardware.drivers.errors import CANCommunicationError
+from opentrons_shared_data.errors.exceptions import (
+    CanbusCommunicationError,
+    EnumeratedError,
+    PythonException,
+)
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
@@ -238,11 +242,13 @@ class CanMessenger:
             await self._drive.send(
                 message=CanMessage(arbitration_id=arbitration_id, data=data)
             )
-        except CANCommunicationError:
+        except EnumeratedError:
             raise
         except Exception as exc:
             log.exception("Exception in CAN send")
-            raise CANCommunicationError(exc=exc) from exc
+            raise CanbusCommunicationError(
+                message="Exception in canbus.send", wrapping=[PythonException(exc)]
+            )
 
     async def ensure_send_exclusive(
         self,
@@ -293,11 +299,13 @@ class CanMessenger:
         )
         try:
             return await listener.send_and_verify_recieved()
-        except CANCommunicationError:
+        except EnumeratedError:
             raise
         except Exception as exc:
             log.exception("Exception in CAN ensure_send")
-            raise CANCommunicationError(exc=exc) from exc
+            raise CanbusCommunicationError(
+                message="Exception in CAN ensure_send", wrapping=[PythonException(exc)]
+            )
 
     async def __aenter__(self: CanMessenger) -> CanMessenger:
         """Start messenger."""
@@ -313,9 +321,10 @@ class CanMessenger:
         """Stop messenger."""
         await self.stop()
         if exc_val:
-            if isinstance(exc_val, CANCommunicationError):
+            if isinstance(exc_val, EnumeratedError):
                 raise exc_val
-            raise CANCommunicationError(exc=exc_val)
+            # Don't want a specific error here because this wraps other code
+            raise PythonException(exc_val)
 
     def start(self) -> None:
         """Start the reader task."""
@@ -349,18 +358,19 @@ class CanMessenger:
             self._listeners.pop(listener)
 
     async def _read_task_shield(self) -> None:
-        while True:
-            try:
-                await self._read_task()
-            except (asyncio.CancelledError, StopAsyncIteration):
-                return
-            except (CANCommunicationError, AsyncHardwareError, CanError) as e:
-                log.exception(f"Nonfatal error in CAN read task: {e}")
-                continue
-            except Exception as e:
-                # Log this separately if it's some unknown error
-                log.exception(f"Unexpected error in CAN read task: {e}")
-                continue
+        try:
+            await self._read_task()
+        except asyncio.CancelledError:
+            pass
+        except EnumeratedError:
+            raise
+        except AsyncHardwareError:
+            raise
+        except Exception as exc:
+            log.exception("Exception in read")
+            raise CanbusCommunicationError(
+                message="Exception in read", wrapping=[PythonException(exc)]
+            )
 
     async def _read_task(self) -> None:
         """Read task."""
