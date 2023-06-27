@@ -64,7 +64,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
-              {t('home_robot_arm')}
+              {t('home_gantry')}
             </StyledText>
           </Flex>
         </MenuItem>
