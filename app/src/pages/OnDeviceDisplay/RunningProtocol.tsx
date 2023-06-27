@@ -21,6 +21,7 @@ import {
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
+import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 
 import { TertiaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
@@ -131,7 +132,7 @@ export function RunningProtocol(): JSX.Element {
             }
           />
         ) : null}
-        {runStatus === 'stop-requested' ? <CancelingRunModal /> : null}
+        {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
         {showConfirmCancelRunModal ? (
           <ConfirmCancelRunModal
             runId={runId}

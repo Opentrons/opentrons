@@ -16,7 +16,7 @@ const render = () => {
 }
 
 describe('CancelingRunModal', () => {
-  it('should render text and buttons', () => {
+  it('should render text and icon', () => {
     const [{ getByText, getByLabelText }] = render()
     getByText('Canceling run...')
     getByLabelText('CancelingRunModal_icon')
