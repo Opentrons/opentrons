@@ -26,9 +26,9 @@ _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
 
 
 _MAP_OT3_TO_FLEX_LOAD_NAMES: Dict[str, str] = {
-    "opentrons_ot3_96_tiprack_50ul" : "opentrons_flex_96_tiprack_50ul",
-    "opentrons_ot3_96_tiprack_200ul" : "opentrons_flex_96_tiprack_200ul",
-    "opentrons_ot3_96_tiprack_1000ul" : "opentrons_flex_96_tiprack_1000ul",
+    "opentrons_ot3_96_tiprack_50ul": "opentrons_flex_96_tiprack_50ul",
+    "opentrons_ot3_96_tiprack_200ul": "opentrons_flex_96_tiprack_200ul",
+    "opentrons_ot3_96_tiprack_1000ul": "opentrons_flex_96_tiprack_1000ul",
 }
 
 
@@ -45,9 +45,10 @@ def resolve_loadname(load_name: str) -> str:
 
     Returns:
         Either the updated loadname or the original loadname if no match.
-    
+
     """
     return _MAP_OT3_TO_FLEX_LOAD_NAMES.get(load_name, load_name)
+
 
 def resolve(
     load_name: str,
