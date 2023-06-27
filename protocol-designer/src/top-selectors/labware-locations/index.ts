@@ -144,9 +144,17 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
       )
       .map(slotId => ({ name: slotId, value: slotId }))
 
-    const offDeck = { name: 'Off Deck', value: 'offDeck' }
+    const offDeckSlot = Object.values(labware)
+      .map(lw => lw.slot)
+      .find(slot => slot === 'offDeck')
+    const offDeck =
+      offDeckSlot !== 'offDeck' ? { name: 'Off Deck', value: 'offDeck' } : null
 
-    return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions, offDeck]
+    if (offDeck == null) {
+      return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions]
+    } else {
+      return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions, offDeck]
+    }
   }
 )
 
