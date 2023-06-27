@@ -468,12 +468,7 @@ function RowLabware({
       : null
 
   const moduleInstructions = (
-    <StyledText
-      color={COLORS.darkBlack70}
-      fontSize={TYPOGRAPHY.fontSize22}
-      fontWeight={TYPOGRAPHY.fontWeightRegular}
-      lineHeight={TYPOGRAPHY.lineHeight24}
-    >
+    <StyledText color={COLORS.darkBlack70} as="label">
       {setupTextTranslator('labware_latch_instructions')}
     </StyledText>
   )
@@ -516,19 +511,10 @@ function RowLabware({
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_EVENLY}
         >
-          <StyledText
-            fontSize={TYPOGRAPHY.fontSize22}
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            lineHeight={TYPOGRAPHY.lineHeight28}
-          >
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {getLabwareDisplayName(definition)}
           </StyledText>
-          <StyledText
-            color={COLORS.darkBlack70}
-            fontSize={TYPOGRAPHY.fontSize22}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-            lineHeight={TYPOGRAPHY.lineHeight28}
-          >
+          <StyledText color={COLORS.darkBlack70} as="p">
             {nickName}
           </StyledText>
           {matchingHeaterShaker != null ? moduleInstructions : null}

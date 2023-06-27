@@ -247,7 +247,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   }, [dispatch, isIdle, usersBrightness])
 
   return (
-    <ApiHostProvider hostname="10.13.11.47">
+    <ApiHostProvider hostname="localhost">
       <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
         <Box width="100%" css="user-select: none;">
           {isIdle ? (
