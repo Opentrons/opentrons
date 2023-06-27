@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import time
 from functools import partial, lru_cache
 from dataclasses import replace
 import logging
@@ -1632,7 +1633,7 @@ class OT3API(
             await self._move(target_up)
 
     async def _motor_pick_up_tip(
-        self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
+        self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec, accelerate_during_pickup: bool = False,
     ) -> None:
         async with self._backend.restore_current():
             await self._backend.set_active_current(
@@ -1647,26 +1648,39 @@ class OT3API(
             await self._move(target_down)
             # perform pick up tip
 
-            gear_motor_origin = await self._backend.gear_motor_position_estimation()
-            gear_origin_dict = {OT3Axis.Q: gear_motor_origin[0]}
+            # if accelerate_during_pickup:
+            # gear_motor_origin = await self._backend.gear_motor_position_estimation()
+            # gear_origin_dict = {OT3Axis.Q: gear_motor_origin[0]}
+            gear_origin_dict = {OT3Axis.Q: 0}
             gear_motor_target = pipette_spec.pick_up_distance
             gear_target_dict = {OT3Axis.Q: gear_motor_target}
-            moves = self._build_moves(gear_origin_dict, gear_target_dict)
-            blocks = moves[0][0].blocks
+            clamp_moves = self._build_moves(gear_origin_dict, gear_target_dict)
 
-            for block in blocks:
-                await self._backend.tip_action(
-                    [OT3Axis.of_main_tool_actuator(mount)],
-                    float(block.distance),
-                    float(block.initial_speed),
-                    float(block.acceleration),
-                    "clamp",
-                )
-            # back clamps off the adapter posts
+            await self._backend.fast_tip_action(gear_origin_dict, clamp_moves[0], "clamp")
+
+            # else:
+            #     await self._backend.tip_action(
+            #         [OT3Axis.of_main_tool_actuator(mount)],
+            #         float(pipette_spec.pick_up_distance),
+            #         float(pipette_spec.speed),
+            #         float(0),
+            #         "clamp",
+            #     )
+
+            gear_motor_position = {OT3Axis.Q: self._backend.gear_motor_position}
+            # print(f"gear motor pos = {gear_motor_position}")
+            home_target = {OT3Axis.Q: 5}
+            # print(f"passing in gear motor position = {gear_motor_position}")
+            home_moves = self._build_moves(gear_motor_position, home_target)
+            # print(f"home moves = {home_moves[0]}")
+            await self._backend.fast_tip_action(gear_motor_position, home_moves[0], "clamp")
+            print(f"done almost homing at {time.time()}")
+
             await self._backend.tip_action(
                 [OT3Axis.of_main_tool_actuator(mount)],
-                float(pipette_spec.pick_up_distance + pipette_spec.home_buffer),
-                float(pipette_spec.speed),
+                # float(pipette_spec.pick_up_distance + pipette_spec.home_buffer),
+                float(5.5),
+                float(pipette_spec.speed - 1),
                 float(0),
                 "home",
             )
@@ -1678,6 +1692,7 @@ class OT3API(
         presses: Optional[int] = None,
         increment: Optional[float] = None,
         prep_after: bool = True,
+        accelerate_during_pickup: bool = True,
     ) -> None:
         """Pick up tip from current location."""
         realmount = OT3Mount.from_mount(mount)
@@ -1687,7 +1702,7 @@ class OT3API(
 
         await self._move_to_plunger_bottom(realmount, rate=1.0)
         if spec.pick_up_motor_actions:
-            await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
+            await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions, accelerate_during_pickup)
         else:
             await self._force_pick_up_tip(realmount, spec)
 
@@ -1727,6 +1742,7 @@ class OT3API(
             f"{mount.name}, tip volume: {tip_volume} ul"
         )
         instrument.working_volume = tip_volume
+
 
     async def drop_tip(
         self, mount: Union[top_types.Mount, OT3Mount], home_after: bool = False
@@ -1780,6 +1796,7 @@ class OT3API(
             await self._home([Axis.by_mount(mount)])
 
         _remove()
+
 
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""

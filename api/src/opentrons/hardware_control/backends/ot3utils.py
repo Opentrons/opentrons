@@ -328,10 +328,15 @@ def create_move_group(
     origin: Coordinates[Axis, CoordinateValue],
     moves: List[Move[Axis]],
     present_nodes: Iterable[NodeId],
-    stop_condition: MoveStopCondition = MoveStopCondition.none,
+    stop_condition: MoveStopCondition,
+    tip_action_type: Optional[PipetteTipActionType] = None,
 ) -> Tuple[MoveGroup, Dict[NodeId, float]]:
     pos = _convert_to_node_id_dict(origin)
     move_group: MoveGroup = []
+    if tip_action_type is not None:
+        tip_action_step = PipetteTipActionType[tip_action_type]
+    else:
+        tip_action_step = None
     for move in moves:
         unit_vector = move.unit_vector
         for block in move.blocks:
@@ -346,6 +351,7 @@ def create_move_group(
                 duration=block.time,
                 present_nodes=present_nodes,
                 stop_condition=stop_condition,
+                tip_action_step=tip_action_step,
             )
             for ax in pos.keys():
                 pos[ax] += node_id_distances.get(ax, 0)
@@ -368,6 +374,27 @@ def create_home_group(
 
     move_group: MoveGroup = [home, backoff]
     return move_group
+
+
+def create_fast_tip_action_group(
+    axes: Sequence[OT3Axis],
+    move: Move,
+    action: str = "clamp",
+) -> MoveGroup:
+    current_nodes = [axis_to_node(ax) for ax in axes]
+    tip_action_group = []
+    for block in move.blocks:
+        if block.initial_speed == 0:
+            continue
+        step = create_tip_action_step(
+            velocity={node_id: np.float64(block.initial_speed) for node_id in current_nodes},
+            distance={node_id: np.float64(block.distance) for node_id in current_nodes},
+            acceleration={node_id: np.float64(block.acceleration) for node_id in current_nodes},
+            present_nodes=current_nodes,
+            action=PipetteTipActionType[action],
+        )
+        tip_action_group.append(step)
+    return tip_action_group
 
 
 def create_tip_action_group(

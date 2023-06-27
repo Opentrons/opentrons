@@ -5,6 +5,7 @@ import asyncio
 from contextlib import asynccontextmanager
 from functools import wraps
 import logging
+import time
 from copy import deepcopy
 from typing import (
     Any,
@@ -40,6 +41,7 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
     create_tip_action_group,
+    create_fast_tip_action_group,
     PipetteAction,
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
@@ -66,6 +68,7 @@ from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunne
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
+    Block,
 )
 
 from opentrons_hardware.hardware_control.motor_enable_disable import (
@@ -75,7 +78,7 @@ from opentrons_hardware.hardware_control.motor_enable_disable import (
 from opentrons_hardware.hardware_control.motor_position_status import (
     get_motor_position,
     update_motor_position_estimation,
-    update_gear_motor_position_estimation,
+    # update_gear_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.tip_presence import get_tip_ejector_state
@@ -251,6 +254,7 @@ class OT3Controller:
             FirmwareUpdate(),
         )
         self._position = self._get_home_position()
+        self._gear_motor_position = None
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._check_updates = check_updates
@@ -321,6 +325,10 @@ class OT3Controller:
             eeprom_driver,
             usb_messenger=usb_messenger,
         )
+
+    @property
+    def gear_motor_position(self) -> float:
+        return self._gear_motor_position
 
     def _motor_nodes(self) -> Set[NodeId]:
         """Get a list of the motor controller nodes of all attached and ok devices."""
@@ -625,6 +633,29 @@ class OT3Controller:
             )
         return new_group
 
+    async def fast_tip_action(
+            self,
+            origin: Dict[OT3Axis, float],
+            moves: List[Move],
+            tip_action: str = "clamp",
+    ) -> None:
+        if tip_action == "home":
+            stop_condition = MoveStopCondition.limit_switch
+        else:
+            stop_condition = MoveStopCondition.none
+        breakpoint()
+        group = create_move_group(origin, moves, [NodeId.pipette_left], stop_condition, tip_action)
+        move_group, _ = group
+        runner = MoveGroupRunner(
+            move_groups=[move_group],
+            ignore_stalls=True if not ff.stall_detection_enabled() else False,
+        )
+        positions = await runner.run(can_messenger=self._messenger)
+        # print(f"done w move group runner: {positions} at {time.time()}")
+        if NodeId.pipette_left in positions:
+            self._gear_motor_position = positions[NodeId.pipette_left][0]
+        # print(f"gear position is now {self._gear_motor_position}")
+
     async def tip_action(
         self,
         axes: Sequence[Axis],
@@ -638,11 +669,11 @@ class OT3Controller:
         move_group = create_tip_action_group(
             axes, distance, speed, acceleration, cast(PipetteAction, tip_action)
         )
+        # print(f"about to create runner at {time.time()}")
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
-        for axis, point in positions.items():
-            self._position.update({axis: point[0]})
-            self._encoder_position.update({axis: point[1]})
+        # print(f"positions returned {positions}, at {time.time()}")
+        # await update_gear_motor_position_estimation(self._messenger)
 
     @requires_update
     async def gripper_grip_jaw(

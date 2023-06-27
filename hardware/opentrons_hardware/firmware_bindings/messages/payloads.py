@@ -568,6 +568,12 @@ class TipActionResponsePayload(MoveCompletedPayload):
     success: utils.UInt8Field
     gear_motor_id: GearMotorIdField
 
+    seq_id: utils.UInt8Field
+    current_position_um: utils.UInt32Field
+    encoder_position_um: utils.Int32Field
+    position_flags: MotorPositionFlagsField
+    ack_id: utils.UInt8Field
+
 
 @dataclass(eq=False)
 class PeripheralStatusResponsePayload(SensorPayload):
