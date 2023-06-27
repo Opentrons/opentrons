@@ -47,11 +47,11 @@ PARTIAL_TESTS: Dict[str, Tuple[Point, float]] = {
         PARTIAL_CURRENTS[1],
     ),
     "8-tips-left": (
-        Point(x=9 * 11),
+        Point(x=9 * 10),
         PARTIAL_CURRENTS[8],
     ),
     "24-tips-left": (
-        Point(x=9 * 9),
+        Point(x=9 * 7),
         PARTIAL_CURRENTS[24],
     ),
 }
@@ -223,13 +223,22 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 api, OT3Mount.LEFT, tip_rack_96_a1_nominal + Point(z=30)
             )
             await helpers_ot3.jog_mount_ot3(api, OT3Mount.LEFT)
-            print("picking up tips")
-            await api.pick_up_tip(
-                OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME)
+            tip_rack_96_a1_actual = await api.gantry_position(OT3Mount.LEFT)
+            PickTimeNum = 5
+            for pick_up_time in range(PickTimeNum):
+                ui.get_user_ready(f"{pick_up_time +1 }: picking up tips")
+                await helpers_ot3.move_to_arched_ot3(
+                    api, OT3Mount.LEFT, tip_rack_96_a1_actual
             )
-            await api.home_z(OT3Mount.LEFT)
-            if not api.is_simulator:
-                ui.get_user_ready("check tips are OK")
+                await api.pick_up_tip(
+                    OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME)
+                )
+                await api.home_z(OT3Mount.LEFT)
+                if not api.is_simulator:
+                    ui.get_user_ready("check tips are OK")
+                if pick_up_time < (PickTimeNum - 1):
+                    # drop
+                    await _drop_tip(api, tip_rack_96_a1_actual + Point(z=-70))
         else:
             await api.add_tip(
                 OT3Mount.LEFT, helpers_ot3.get_default_tip_length(TIP_VOLUME)
