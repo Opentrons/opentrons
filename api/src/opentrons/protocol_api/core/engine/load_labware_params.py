@@ -25,8 +25,29 @@ _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
 }
 
 
+_MAP_OT3_TO_FLEX_LOAD_NAMES: Dict[str, str] = {
+    "opentrons_ot3_96_tiprack_50ul": "opentrons_flex_96_tiprack_50ul",
+    "opentrons_ot3_96_tiprack_200ul": "opentrons_flex_96_tiprack_200ul",
+    "opentrons_ot3_96_tiprack_1000ul": "opentrons_flex_96_tiprack_1000ul",
+}
+
+
 class AmbiguousLoadLabwareParamsError(RuntimeError):
     """Error raised when specific labware parameters cannot be found due to multiple matching labware definitions."""
+
+
+def resolve_loadname(load_name: str) -> str:
+    """Temporarily check for old Flex tiprack loadnames so that an error is not raised.
+
+    REMOVE FOR LAUNCH.
+    Args:
+        load_name: Load name of the labware.
+
+    Returns:
+        Either the updated loadname or the original loadname if no match.
+
+    """
+    return _MAP_OT3_TO_FLEX_LOAD_NAMES.get(load_name, load_name)
 
 
 def resolve(
