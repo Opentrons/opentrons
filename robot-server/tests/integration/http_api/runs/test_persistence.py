@@ -34,7 +34,7 @@ async def client_and_server(
     async with RobotClient.make(
         base_url=f"http://localhost:{port}",
         version="*",
-        system_server_port=session_system_server_port,
+        system_server_base_url=f"http://localhost:{session_system_server_port}",
     ) as client:
         assert await client.wait_until_dead(), "Server is running and must not be."
 

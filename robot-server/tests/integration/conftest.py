@@ -26,7 +26,9 @@ _SESSION_SYSTEM_SERVER_PORT = "32950"
 def get_auth_token() -> str:
     """Obtains an auth token from the system server on startup."""
     session = requests.Session()
-    base_url = f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_SESSION_SYSTEM_SERVER_PORT}"
+    base_url = (
+        f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_SESSION_SYSTEM_SERVER_PORT}"
+    )
 
     registration: str = session.post(
         url=f"{base_url}/system/register",
@@ -83,7 +85,9 @@ def ot2_server_set_disable_fast_analysis(
 
 
 @pytest.fixture
-def ot2_server_base_url(_ot2_session_server: str) -> Generator[str, None, None]:
+def ot2_server_base_url(
+    _ot2_session_server: str, system_server_session_server: str
+) -> Generator[str, None, None]:
     """Return the URL for a running dev server.
 
     Because it can take several seconds to start up and shut down, one server is shared across all
@@ -91,25 +95,27 @@ def ot2_server_base_url(_ot2_session_server: str) -> Generator[str, None, None]:
     runs and protocols, which provides good enough isolation in practice.
     """
     yield _ot2_session_server
-    _clean_server_state(_ot2_session_server)
+    _clean_server_state(_ot2_session_server, system_server_session_server)
 
 
 @pytest.fixture
-def ot3_server_base_url(_ot3_session_server: str) -> Generator[str, None, None]:
+def ot3_server_base_url(
+    _ot3_session_server: str, system_server_session_server: str
+) -> Generator[str, None, None]:
     """Like `ot2_server_base_url()`, but the server is configured as an OT-3 instead of an OT-2."""
     yield _ot3_session_server
-    _clean_server_state(_ot3_session_server)
+    _clean_server_state(_ot3_session_server, system_server_session_server)
 
 
 @pytest.fixture
-def session_system_server_port(_system_server_session_server: str) -> str:
+def session_system_server_port(system_server_session_server: str) -> str:
     """Return the port of the running session-scoped dev server."""
     return _SESSION_SYSTEM_SERVER_PORT
 
 
 @pytest.fixture(scope="session")
-def _system_server_session_server() -> Generator[str, None, None]:
-    """Run the system server as a background process."""
+def system_server_session_server() -> Generator[str, None, None]:
+    """Run the system server as a background process and yield the base url."""
     base_url = (
         f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_SESSION_SYSTEM_SERVER_PORT}"
     )
@@ -122,9 +128,7 @@ def _system_server_session_server() -> Generator[str, None, None]:
 
             while True:
                 try:
-                    requests_session.get(
-                        base_url
-                    )
+                    requests_session.get(base_url)
                 except ConnectionError:
                     # The server isn't up yet to accept requests. Keep polling.
                     pass
@@ -138,7 +142,7 @@ def _system_server_session_server() -> Generator[str, None, None]:
 
 
 @pytest.fixture(scope="session")
-def _ot2_session_server(server_temp_directory: str, _system_server_session_server: str) -> Generator[str, None, None]:
+def _ot2_session_server(server_temp_directory: str) -> Generator[str, None, None]:
     base_url = (
         f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_OT2_SESSION_SERVER_PORT}"
     )
@@ -153,7 +157,7 @@ def _ot2_session_server(server_temp_directory: str, _system_server_session_serve
 
 
 @pytest.fixture(scope="session")
-def _ot3_session_server(server_temp_directory: str, _system_server_session_server: str) -> Generator[str, None, None]:
+def _ot3_session_server(server_temp_directory: str) -> Generator[str, None, None]:
     base_url = (
         f"{_SESSION_SERVER_SCHEME}{_SESSION_SERVER_HOST}:{_OT3_SESSION_SERVER_PORT}"
     )
@@ -194,9 +198,13 @@ def _wait_until_ready(base_url: str) -> None:
             time.sleep(0.1)
 
 
-def _clean_server_state(base_url: str, _system_server_session_server: str) -> None:
+def _clean_server_state(base_url: str, system_server_session_server: str) -> None:
     async def _clean_server_state_async() -> None:
-        async with RobotClient.make(base_url=base_url, version="*", system_server_base_url=_system_server_session_server) as robot_client:
+        async with RobotClient.make(
+            base_url=base_url,
+            version="*",
+            system_server_base_url=system_server_session_server,
+        ) as robot_client:
             # Delete runs first because protocols can't be deleted if a run refers to them.
             await robot_client.get_auth_token()
             await _delete_all_runs(robot_client)

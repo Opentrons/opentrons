@@ -1,11 +1,11 @@
 test_name: Invalid authentication token handling.
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages: 
   - name: Invalid auth token with version 2
     request:
-      url: '{host:s}:{port:d}/robot/lights'
+      url: '{ot2_server_base_url}/robot/lights'
       method: POST
       json:
         "on": "true"
@@ -17,7 +17,7 @@ stages:
 
   - name: Invalid auth token with version 3
     request:
-      url: '{host:s}:{port:d}/robot/lights'
+      url: '{ot2_server_base_url}/robot/lights'
       method: POST
       json:
         "on": "true"
@@ -29,7 +29,7 @@ stages:
 
   - name: Invalid auth token with version 4
     request:
-      url: '{host:s}:{port:d}/robot/lights'
+      url: '{ot2_server_base_url}/robot/lights'
       method: POST
       json:
         "on": "true"
@@ -41,7 +41,7 @@ stages:
 
   - name: Invalid auth token with version 5
     request:
-      url: '{host:s}:{port:d}/robot/lights'
+      url: '{ot2_server_base_url}/robot/lights'
       method: POST
       json:
         "on": "true"
@@ -53,7 +53,7 @@ stages:
 
   - name: Missing auth token with version 5
     request:
-      url: '{host:s}:{port:d}/robot/lights'
+      url: '{ot2_server_base_url}/robot/lights'
       method: POST
       json:
         "on": "true"
@@ -65,7 +65,7 @@ stages:
 
   - name: Valid auth token with version 5
     request:
-      url: '{host:s}:{port:d}/robot/lights'
+      url: '{ot2_server_base_url}/robot/lights'
       method: POST
       json:
         "on": "true"
@@ -76,7 +76,7 @@ stages:
 
   - name: Missing auth token on a GET endpoint with version 5
     request:
-      url: '{host:s}:{port:d}/robot/lights'
+      url: '{ot2_server_base_url}/robot/lights'
       method: GET
       headers:
         Opentrons-Version: 5
@@ -86,7 +86,7 @@ stages:
 
   - name: Valid auth token on a GET endpoint with version 5
     request:
-      url: '{host:s}:{port:d}/robot/lights'
+      url: '{ot2_server_base_url}/robot/lights'
       method: GET
       headers:
         Opentrons-Version: 5

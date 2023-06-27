@@ -7,8 +7,15 @@ from ...robot_client import RobotClient
 
 
 @pytest.fixture
-async def robot_client(base_url: str) -> AsyncGenerator[RobotClient, None]:
-    async with RobotClient.make(base_url=base_url, version="*") as robot_client:
+async def robot_client(
+    base_url: str, system_server_session_server: str
+) -> AsyncGenerator[RobotClient, None]:
+    async with RobotClient.make(
+        base_url=base_url,
+        version="*",
+        system_server_base_url=system_server_session_server,
+    ) as robot_client:
+        await robot_client.get_auth_token()
         yield robot_client
 
 

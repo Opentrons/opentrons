@@ -12,10 +12,9 @@ async def client_no_system_server() -> AsyncGenerator[RobotClient, None]:
     robot_port = "54321"
     system_port = "65432"
     async with RobotClient.make(
-        host="http://localhost",
-        port=robot_port,
+        base_url=f"http://localhost:{robot_port}",
         version="*",
-        system_server_port=system_port,
+        system_server_base_url=f"http://localhost:{system_port}",
     ) as client:
         assert await client.wait_until_dead(), "Server is running and must not be."
 
