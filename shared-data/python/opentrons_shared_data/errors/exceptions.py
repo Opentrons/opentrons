@@ -286,6 +286,18 @@ class FirmwareUpdateFailedError(CommunicationError):
         super().__init__(ErrorCodes.FIRMWARE_UPDATE_FAILED, message, detail, wrapping)
 
 
+class InternalMessageFormatError(CommunicationError):
+    """An error indicating that an internal message was formatted incorrectly."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InternalMesasgeFormatError."""
+        super().__init__(ErrorCodes.FIRMWARE_UPDATE_FAILED, message, detail, wrapping)
+
 class MotionFailedError(RoboticsControlError):
     """An error indicating that a motion failed."""
 

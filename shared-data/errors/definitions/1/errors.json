@@ -42,6 +42,10 @@
       "detail": "Firmware Update Failed",
       "category": "hardwareCommunicationError"
     },
+    "1006": {
+      "detail": "Internal Message Format Error",
+      "category": "hardwareCommunicationError"
+    },
     "2000": {
       "detail": "Robotics Control Error",
       "category": "roboticsControlError"
