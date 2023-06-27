@@ -100,13 +100,7 @@ describe('Results', () => {
         {
           commandType: 'home' as const,
           params: {
-            axes: ['leftPlunger', 'leftZ'],
-          },
-        },
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: 'left',
+            axes: ['leftPlunger'],
           },
         },
       ],
@@ -138,13 +132,7 @@ describe('Results', () => {
         {
           commandType: 'home' as const,
           params: {
-            axes: ['leftPlunger', 'leftZ'],
-          },
-        },
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: 'left',
+            axes: ['leftPlunger'],
           },
         },
       ],
