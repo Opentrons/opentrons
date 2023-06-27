@@ -160,7 +160,10 @@ def _load_pipette(
     if cfg.pipette_channels not in load_str_channels:
         raise ValueError(f"unexpected number of channels: {cfg.pipette_channels}")
     chnl_str = load_str_channels[cfg.pipette_channels]
-    pip_name = f"p{cfg.pipette_volume}_{chnl_str}_gen3"
+    if cfg.pipette_channels == 96:
+        pip_name = "p1000_96"
+    else:
+        pip_name = f"p{cfg.pipette_volume}_{chnl_str}_gen3"
     print(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
     pipette = ctx.load_instrument(pip_name, cfg.pipette_mount)
     assert pipette.channels == cfg.pipette_channels, (
@@ -490,7 +493,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     test_volumes = _get_volumes(ctx, cfg)
     for v in test_volumes:
         print(f"\t{v} uL")
-    tips = get_tips(ctx, pipette, all_channels=cfg.increment)
+    all_channels_same_time = cfg.increment or cfg.pipette_channels == 96
+    tips = get_tips(ctx, pipette, all_channels=all_channels_same_time)
     total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips])
     channels_to_test = _get_test_channels(cfg)
     if len(channels_to_test) > 1:
@@ -545,33 +549,33 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         liquid="None",
     )
 
-    ui.print_title("FIND LIQUID HEIGHT")
-    print("homing...")
-    ctx.home()
-    # get the first channel's first-used tip
-    # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
-    #       and so we can use pick-up-tip from there again
-    setup_tip = tips[0][0]
-    setup_channel_offset = _get_channel_offset(cfg, channel=0)
-    setup_tip_location = setup_tip.top().move(setup_channel_offset)
-    _pick_up_tip(ctx, pipette, cfg, location=setup_tip_location)
-    print("moving to vial")
-    well = labware_on_scale["A1"]
-    pipette.move_to(well.top())
-    _liquid_height = _jog_to_find_liquid_height(ctx, pipette, well)
-    height_below_top = well.depth - _liquid_height
-    print(f"liquid is {height_below_top} mm below top of vial")
-    liquid_tracker.set_start_volume_from_liquid_height(
-        labware_on_scale["A1"], _liquid_height, name="Water"
-    )
-    vial_volume = liquid_tracker.get_volume(well)
-    print(f"software thinks there is {vial_volume} uL of liquid in the vial")
-    print("dropping tip")
-    _drop_tip(ctx, pipette, cfg)
-    if not ctx.is_simulating():
-        ui.get_user_ready("REPLACE first Tip with NEW Tip")
-
     try:
+        ui.print_title("FIND LIQUID HEIGHT")
+        print("homing...")
+        ctx.home()
+        # get the first channel's first-used tip
+        # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
+        #       and so we can use pick-up-tip from there again
+        setup_tip = tips[0][0]
+        setup_channel_offset = _get_channel_offset(cfg, channel=0)
+        setup_tip_location = setup_tip.top().move(setup_channel_offset)
+        _pick_up_tip(ctx, pipette, cfg, location=setup_tip_location)
+        print("moving to vial")
+        well = labware_on_scale["A1"]
+        pipette.move_to(well.top())
+        _liquid_height = _jog_to_find_liquid_height(ctx, pipette, well)
+        height_below_top = well.depth - _liquid_height
+        print(f"liquid is {height_below_top} mm below top of vial")
+        liquid_tracker.set_start_volume_from_liquid_height(
+            labware_on_scale["A1"], _liquid_height, name="Water"
+        )
+        vial_volume = liquid_tracker.get_volume(well)
+        print(f"software thinks there is {vial_volume} uL of liquid in the vial")
+        print("dropping tip")
+        _drop_tip(ctx, pipette, cfg)
+        if not ctx.is_simulating():
+            ui.get_user_ready("REPLACE first Tip with NEW Tip")
+
         if not cfg.blank or cfg.inspect:
             average_aspirate_evaporation_ul = 0.0
             average_dispense_evaporation_ul = 0.0
@@ -825,9 +829,20 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         print("ending recording")
         recorder.stop()
         recorder.deactivate()
-        # FIXME: instead keep motors engaged, and move to an ATTACH position
-        hw_api = ctx._core.get_hardware()
-        hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])  # disengage xy axis
+        ui.print_title("CHANGE PIPETTES")
+        if pipette.has_tip:
+            if pipette.current_volume > 0:
+                print("dispensing liquid to trash")
+                trash = pipette.trash_container.wells()[0]
+                # FIXME: this should be a blow_out() at max volume,
+                #        but that is not available through PyAPI yet
+                #        so instead just dispensing.
+                pipette.dispense(pipette.current_volume, trash.top())
+                pipette.aspirate(10)  # to pull any droplets back up
+            print("dropping tip")
+            _drop_tip(ctx, pipette, cfg)
+        print("moving to attach position")
+        pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))
     ui.print_title("RESULTS")
     _print_final_results(
         volumes=test_volumes,

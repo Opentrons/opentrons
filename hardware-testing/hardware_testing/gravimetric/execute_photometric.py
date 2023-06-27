@@ -542,13 +542,14 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         ui.print_title("CHANGE PIPETTES")
         if pipette.has_tip:
             if pipette.current_volume > 0:
+                print("dispensing liquid to trash")
                 trash = pipette.trash_container.wells()[0]
                 # FIXME: this should be a blow_out() at max volume,
                 #        but that is not available through PyAPI yet
                 #        so instead just dispensing.
                 pipette.dispense(pipette.current_volume, trash.top())
                 pipette.aspirate(10)  # to pull any droplets back up
+            print("dropping tip")
             _drop_tip(ctx, pipette, cfg)
-        ctx.home()
-        # move to attach point
+        print("moving to attach position")
         pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))
