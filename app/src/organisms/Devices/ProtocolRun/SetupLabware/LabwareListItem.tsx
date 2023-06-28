@@ -42,7 +42,7 @@ import { SecureLabwareModal } from './SecureLabwareModal'
 import type {
   HeaterShakerCloseLatchCreateCommand,
   HeaterShakerOpenLatchCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 import type { ModuleRenderInfoForProtocol } from '../../hooks'
 import type { LabwareSetupItem } from '../../../../pages/Protocols/utils'
 import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTypesThatRequireExtraAttention'

@@ -76,7 +76,6 @@ export type LabwareLocation =
   | 'offDeck'
   | { slotName: string }
   | { moduleId: string }
-  | { labwareId: string }
 
 export interface ModuleLocation {
   slotName: string

@@ -17,10 +17,13 @@ export const chainRunCommandsRecursive = (
     waitUntilComplete: true,
   })
     .then(response => {
-      if (!continuePastCommandFailure && response.data.status === 'failed') {
+      if (
+        !continuePastCommandFailure &&
+        response.data.result.status === 'failed'
+      ) {
         setIsLoading(false)
         return Promise.reject(
-          new Error(response.data.error?.detail ?? 'command failed')
+          new Error(response.data.result.error ?? 'command failed')
         )
       }
       if (commands.slice(1).length < 1) {

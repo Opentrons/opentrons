@@ -1,6 +1,6 @@
 import { getPrimaryPipetteId } from '../getPrimaryPipetteId'
 import type { LoadedPipette } from '@opentrons/shared-data'
-import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { LoadPipetteRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 describe('getPrimaryPipetteId', () => {
   it('should return the one and only pipette if there is only one pipette in the protocol', () => {

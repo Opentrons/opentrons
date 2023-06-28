@@ -7,15 +7,14 @@ import {
   getLabwareDefURI,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
+import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
 import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV7'
+import type { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 import type { LabwareToOrder } from '../types'
-import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
-import { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
-import { getAdapterInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getAdapterInitialLoadInfo'
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,
@@ -164,27 +163,6 @@ export const getLabwareIdsInOrder = (
           } else if ('moduleId' in loc) {
             slot = getModuleInitialLoadInfo(loc.moduleId, commands).location
               .slotName
-          } else if ('labwareId' in loc) {
-            const adapterLabwareLocation = getAdapterInitialLoadInfo(
-              loc.labwareId,
-              commands
-            ).location
-            if (
-              adapterLabwareLocation === 'offDeck' ||
-              'labwareId' in adapterLabwareLocation
-            ) {
-              slot = ''
-              throw new Error(
-                'could not find the labware definition on top of the adapter'
-              )
-            } else if ('moduleId' in adapterLabwareLocation) {
-              slot = getModuleInitialLoadInfo(
-                adapterLabwareLocation.moduleId,
-                commands
-              ).location.slotName
-            } else {
-              slot = adapterLabwareLocation.slotName
-            }
           } else {
             slot = loc.slotName
           }

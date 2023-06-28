@@ -29,7 +29,7 @@ import { SubmitPrimaryButton } from '../../atoms/buttons'
 import type { TFunctionResult } from 'i18next'
 import type { MagneticModule } from '../../redux/modules/types'
 import type { MagneticModuleModel } from '@opentrons/shared-data'
-import type { MagneticModuleEngageMagnetCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { MagneticModuleEngageMagnetCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 
 interface ModelContents {
   version: string

@@ -32,9 +32,6 @@ import { configReducer } from './config/reducer'
 // discovery state
 import { discoveryReducer } from './discovery/reducer'
 
-// protocol state
-import { protocolReducer } from './protocol/reducer'
-
 // custom labware state
 import { customLabwareReducer } from './custom-labware/reducer'
 
@@ -72,7 +69,6 @@ export const rootReducer: Reducer<State, Action> = combineReducers<
   config: configReducer,
   discovery: discoveryReducer,
   labware: customLabwareReducer,
-  protocol: protocolReducer,
   shell: shellReducer,
   systemInfo: systemInfoReducer,
   alerts: alertsReducer,

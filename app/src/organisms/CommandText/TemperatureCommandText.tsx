@@ -5,7 +5,7 @@ import type {
   TCSetTargetBlockTemperatureCreateCommand,
   TCSetTargetLidTemperatureCreateCommand,
   HeaterShakerSetTargetTemperatureCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 
 type TemperatureCreateCommand =
   | TemperatureModuleSetTargetTemperatureCreateCommand

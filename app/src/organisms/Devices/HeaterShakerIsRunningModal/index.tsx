@@ -20,7 +20,7 @@ import { HeaterShakerModule } from '../../../redux/modules/types'
 import { HeaterShakerModuleCard } from '../HeaterShakerWizard/HeaterShakerModuleCard'
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+import type { HeaterShakerDeactivateShakerCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 
 interface HeaterShakerIsRunningModalProps {
   closeModal: () => void

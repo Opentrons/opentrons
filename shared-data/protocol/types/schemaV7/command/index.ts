@@ -32,10 +32,11 @@ export interface CommonCommandRunTimeInfo {
   key?: string
   id: string
   status: CommandStatus
-  error: string | null
+  error?: RunCommandError | null
   createdAt: string
   startedAt: string | null
   completedAt: string | null
+  intent?: 'protocol' | 'setup'
 }
 export interface CommonCommandCreateInfo {
   key?: string
@@ -48,17 +49,24 @@ export type CreateCommand =
   | ModuleCreateCommand // directed at a hardware module
   | SetupCreateCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
   | TimingCreateCommand // effecting the timing of command execution
-  // TODO (sb 10/26/22): Separate out calibration commands from protocol schema in RAUT-272
   | CalibrationCreateCommand // for automatic pipette calibration
   | AnnotationCreateCommand // annotating command execution
 
 // commands will be required to have a key, but will not be created with one
+type ExtendedRunTimeCommand<T> = T & CommonCommandRunTimeInfo
+
 export type RunTimeCommand =
-  | PipettingRunTimeCommand // involves the pipettes plunger motor
-  | GantryRunTimeCommand // movement that only effects the x,y,z position of the gantry/pipette
-  | ModuleRunTimeCommand // directed at a hardware module
-  | SetupRunTimeCommand // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
-  | TimingRunTimeCommand // effecting the timing of command execution
-  // TODO (sb 10/26/22): Separate out calibration commands from protocol schema in RAUT-272
-  | CalibrationRunTimeCommand // for automatic pipette calibration
-  | AnnotationRunTimeCommand // annotating command execution
+  | ExtendedRunTimeCommand<PipettingRunTimeCommand> // involves the pipettes plunger motor
+  | ExtendedRunTimeCommand<GantryRunTimeCommand> // movement that only effects the x,y,z position of the gantry/pipette
+  | ExtendedRunTimeCommand<ModuleRunTimeCommand> // directed at a hardware module
+  | ExtendedRunTimeCommand<SetupRunTimeCommand> // only effecting robot's equipment setup (pipettes, labware, modules, liquid), no hardware side-effects
+  | ExtendedRunTimeCommand<TimingRunTimeCommand> // effecting the timing of command execution
+  | ExtendedRunTimeCommand<CalibrationRunTimeCommand> // for automatic pipette calibration
+  | ExtendedRunTimeCommand<AnnotationRunTimeCommand> // annotating command execution
+
+interface RunCommandError {
+  id: string
+  errorType: string
+  createdAt: string
+  detail: string
+}

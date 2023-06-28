@@ -3,7 +3,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { ProtocolLabwareDetails } from '../ProtocolLabwareDetails'
 
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 const mockRequiredLabwareDetails = [
   {

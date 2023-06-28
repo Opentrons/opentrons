@@ -43,7 +43,7 @@ import type {
   HeaterShakerSetAndWaitForShakeSpeedCreateCommand,
   HeaterShakerDeactivateShakerCreateCommand,
   HeaterShakerCloseLatchCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 
 interface TestShakeSlideoutProps {
   module: HeaterShakerModule

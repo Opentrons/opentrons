@@ -27,7 +27,7 @@ import type {
   TemperatureModuleDeactivateCreateCommand,
   TCOpenLidCreateCommand,
   TCCloseLidCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/module'
 
 import type { AttachedModule } from '../../redux/modules/types'
 
