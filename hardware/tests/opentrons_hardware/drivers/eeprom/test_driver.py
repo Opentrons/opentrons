@@ -3,28 +3,32 @@
 import mock
 import pytest
 import tempfile
+
+from pathlib import Path
 from datetime import datetime
 from typing import Generator
 
 
+from opentrons_hardware.drivers import OT3GPIO
 from opentrons_hardware.drivers.eeprom import (
-    EEPROM,
+    EEPROMDriver,
     PropId,
 )
 
 
 @pytest.fixture
-def eeprom_api() -> Generator[EEPROM, None, None]:
+def eeprom_api() -> Generator[EEPROMDriver, None, None]:
     """Mock out OT3GPIO"""
     with mock.patch("opentrons_hardware.drivers.gpio.OT3GPIO"):
-        temp_path = tempfile.NamedTemporaryFile()
-        yield EEPROM(filepath=temp_path.name)
+        gpio = mock.Mock(spec=OT3GPIO)
+        temp_path = Path(tempfile.NamedTemporaryFile().name)
+        yield EEPROMDriver(gpio, eeprom_path=temp_path)
 
 
-def test_eeprom_setup(eeprom_api: EEPROM) -> None:
+def test_eeprom_setup(eeprom_api: EEPROMDriver) -> None:
     """Test that the eeprom is setup successfully."""
     # write some data to load from
-    with open(eeprom_api._eeprom_filepath, "wb") as fh:
+    with open(eeprom_api._eeprom_path, "wb") as fh:
         fh.write(b"\x02\x11FLXA1020230602001")
 
     # Make sure we dont have any data loaded yet
@@ -51,7 +55,7 @@ def test_eeprom_setup(eeprom_api: EEPROM) -> None:
     assert eeprom_api.data.unit_number == 1
 
 
-def test_eeprom_setup_no_data(eeprom_api: EEPROM) -> None:
+def test_eeprom_setup_no_data(eeprom_api: EEPROMDriver) -> None:
     """Test that we have default values if there is no data to load during setup."""
     # Make sure we dont have any data loaded yet
     assert eeprom_api._eeprom_fd == -1
@@ -77,10 +81,10 @@ def test_eeprom_setup_no_data(eeprom_api: EEPROM) -> None:
     assert eeprom_api.data.unit_number is None
 
 
-def test_eeprom_open(eeprom_api: EEPROM) -> None:
+def test_eeprom_open(eeprom_api: EEPROMDriver) -> None:
     """Test that eeprom fd is opened before anything else."""
     # write some data to load from
-    with open(eeprom_api._eeprom_filepath, "wb") as fh:
+    with open(eeprom_api._eeprom_path, "wb") as fh:
         fh.write(b"\x02\x11FLXA1020230602001")
 
     # Make sure we dont have any data loaded yet
@@ -105,9 +109,9 @@ def test_eeprom_open(eeprom_api: EEPROM) -> None:
     assert {prop.id == PropId.SERIAL_NUMBER for prop in result}
 
 
-def test_eeprom_open_context(eeprom_api: EEPROM) -> None:
-    """Test that we can use the EEPROM class as a context manager."""
-    with open(eeprom_api._eeprom_filepath, "wb") as fh:
+def test_eeprom_open_context(eeprom_api: EEPROMDriver) -> None:
+    """Test that we can use the EEPROMDriver class as a context manager."""
+    with open(eeprom_api._eeprom_path, "wb") as fh:
         fh.write(b"\x02\x11FLXA1020230602001")
 
     # Make sure we dont have any data loaded yet
@@ -128,7 +132,7 @@ def test_eeprom_open_context(eeprom_api: EEPROM) -> None:
     assert eeprom_api._eeprom_fd == -1
 
 
-def test_eeprom_open_more_than_once(eeprom_api: EEPROM) -> None:
+def test_eeprom_open_more_than_once(eeprom_api: EEPROMDriver) -> None:
     """Test that we can only have one fd open at once."""
     # the file descriptor is closed by default
     assert eeprom_api._eeprom_fd == -1
@@ -141,7 +145,7 @@ def test_eeprom_open_more_than_once(eeprom_api: EEPROM) -> None:
     assert new_fd == old_fd
 
 
-def test_eeprom_close(eeprom_api: EEPROM) -> None:
+def test_eeprom_close(eeprom_api: EEPROMDriver) -> None:
     """Test closing of the file descriptor."""
     # nothing happens if the fd is already closed
     assert eeprom_api._eeprom_fd == -1

@@ -282,6 +282,11 @@ class OT3Controller:
         }
 
     @property
+    def eeprom_driver(self) -> EEPROMDriver:
+        """The eeprom driver interface."""
+        return self._drivers.eeprom
+
+    @property
     def eeprom_data(self) -> EEPROMData:
         """Get the data on the eeprom."""
         return self._drivers.eeprom.data

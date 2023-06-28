@@ -34,7 +34,7 @@ class EEPROMDriver:
         gpio: OT3GPIO,
         bus: Optional[int] = DEFAULT_BUS,
         address: Optional[str] = DEFAULT_ADDRESS,
-        filepath: Optional[str] = None,
+        eeprom_path: Optional[Path] = None,
     ) -> None:
         """Contructor
 
@@ -42,12 +42,12 @@ class EEPROMDriver:
             gpio: An instance of the gpio class so we can toggle lines on the SOM
             bus: The i2c bus this device is on
             address: The unique address for this device
-            filepath: The filepath of the eeprom, for testing.
+            eeprom_path: The path of the eeprom device, for testing.
         """
         self._gpio = gpio
         self._bus = bus
         self._address = address
-        self._eeprom_filepath = filepath or Path(
+        self._eeprom_path = eeprom_path or Path(
             f"/sys/bus/i2c/devices/{bus}-{address}/eeprom"
         )
         self._eeprom_fd = -1
@@ -69,15 +69,16 @@ class EEPROMDriver:
         """Returns a set of Property objects that are on the eeprom."""
         return self._properties
 
-    def __enter__(self) -> "EEPROM":
+    def __enter__(self) -> "EEPROMDriver":
         """Enter runtime context."""
+        self._eeprom_fd = self.open()
         return self
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
+        exc_type: Optional[Type[BaseException]] = None,
+        exc_value: Optional[BaseException] = None,
+        traceback: Optional[TracebackType] = None,
     ) -> bool:
         """Exit runtime context and close the file descriptor."""
         self._gpio.deactivate_eeprom_wp()
@@ -99,9 +100,9 @@ class EEPROMDriver:
             logger.warning("File descriptor already opened for eeprom")
             return self._eeprom_fd
         try:
-            self._eeprom_fd = os.open(self._eeprom_filepath, os.O_RDWR)
+            self._eeprom_fd = os.open(self._eeprom_path, os.O_RDWR)
         except OSError:
-            logger.error(f"Could not open eeprom file - {self._eeprom_filepath}")
+            logger.error(f"Could not open eeprom file - {self._eeprom_path}")
             self._eeprom_fd = -1
         return self._eeprom_fd
 

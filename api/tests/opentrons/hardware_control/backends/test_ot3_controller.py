@@ -25,6 +25,7 @@ from opentrons.hardware_control.backends.ot3utils import (
     target_to_subsystem,
 )
 from opentrons.hardware_control.backends.subsystem_manager import SubsystemManager
+from opentrons_hardware.drivers.eeprom import EEPROMDriver
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
     MessageListenerCallbackFilter,
@@ -129,10 +130,19 @@ def mock_usb_driver() -> SerialUsbDriver:
 
 
 @pytest.fixture
+def mock_eeprom_driver() -> EEPROMDriver:
+    """Mock eeprom driver."""
+    return mock.Mock(spec=EEPROMDriver)
+
+
+@pytest.fixture
 def controller(
-    mock_config: OT3Config, mock_can_driver: AbstractCanDriver
+        mock_config: OT3Config, mock_can_driver: AbstractCanDriver, mock_eeprom_driver: EEPROMDriver
 ) -> Iterator[OT3Controller]:
-    with mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO"):
+    with (
+            mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO"),
+            mock.patch("opentrons.hardware_control.backends.ot3controller.EEPROMDriver")
+        ):
         yield OT3Controller(mock_config, mock_can_driver)
 
 
