@@ -5,6 +5,7 @@ from typing import Dict
 from starlette import status
 from fastapi import APIRouter, Depends
 
+from opentrons_shared_data.errors import ErrorCodes
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.system import log_control
 from opentrons.config import (
@@ -59,10 +60,10 @@ async def post_settings(
         await advanced_settings.set_adv_setting(update.id, update.value)
         await hardware.set_status_bar_enabled(ff.status_bar_enabled())
     except ValueError as e:
-        raise LegacyErrorResponse(message=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
+        raise LegacyErrorResponse.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
     except advanced_settings.SettingException as e:
         # Severe internal error
-        raise LegacyErrorResponse(message=str(e)).as_error(
+        raise LegacyErrorResponse.from_exc(e).as_error(
             status.HTTP_500_INTERNAL_SERVER_ERROR
         )
     return _create_settings_response()
@@ -119,9 +120,10 @@ async def post_log_level_local(
     """Update local log level"""
     level = log_level.log_level
     if not level:
-        raise LegacyErrorResponse(message="log_level must be set").as_error(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
-        )
+        raise LegacyErrorResponse(
+            message="log_level must be set",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
     # Level name is upper case
     level_name = level.value.upper()
     # Set the log levels
@@ -165,8 +167,10 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
     if code != 0:
         msg = f"Could not reload config: {stdout} {stderr}"
         log.error(msg)
-        raise LegacyErrorResponse(message=msg).as_error(
-            status.HTTP_500_INTERNAL_SERVER_ERROR
+        raise LegacyErrorResponse(
+            message=msg, errorCode=ErrorCodes.GENERAL_ERROR.value.code
+        ).as_error(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
     if log_level_name:
@@ -217,7 +221,8 @@ async def post_settings_reset_options(
     if not_allowed_options:
         not_allowed_array_to_str = " ".join(not_allowed_options)
         raise LegacyErrorResponse(
-            message=f"{not_allowed_array_to_str} is not a valid reset option."
+            message=f"{not_allowed_array_to_str} is not a valid reset option.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
         ).as_error(status.HTTP_403_FORBIDDEN)
 
     options = set(k for k, v in factory_reset_commands.items() if v)
@@ -278,7 +283,8 @@ async def get_pipette_settings() -> MultiPipetteSettings:
 async def get_pipette_setting(pipette_id: str) -> PipetteSettings:
     if pipette_id not in pipette_config.known_pipettes():
         raise LegacyErrorResponse(
-            message=f"{pipette_id} is not a valid pipette id"
+            message=f"{pipette_id} is not a valid pipette id",
+            errorCode=ErrorCodes.PIPETTE_NOT_PRESENT.value.code,
         ).as_error(status.HTTP_404_NOT_FOUND)
     r = _pipette_settings_from_config(pipette_config, pipette_id)
     return r
@@ -305,9 +311,9 @@ async def patch_pipette_setting(
         try:
             pipette_config.override(fields=field_values, pipette_id=pipette_id)
         except ValueError as e:
-            raise LegacyErrorResponse(message=str(e)).as_error(
-                status.HTTP_412_PRECONDITION_FAILED
-            )
+            raise LegacyErrorResponse(
+                message=str(e), errorCode=ErrorCodes.GENERAL_ERROR.value.code
+            ).as_error(status.HTTP_412_PRECONDITION_FAILED)
     r = _pipette_settings_from_config(pipette_config, pipette_id)
     return r
 

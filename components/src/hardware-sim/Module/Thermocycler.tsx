@@ -5,11 +5,11 @@ import * as React from 'react'
 
 import { THERMOCYCLER_MODULE_V1, getModuleDef2 } from '@opentrons/shared-data'
 
-import { RobotCoordsForeignDiv } from '../Deck'
-import { ModuleFromDef } from './ModuleFromDef'
-
 import { C_MED_LIGHT_GRAY } from '../../styles'
 import { COLORS, BORDERS } from '../../ui-style-constants'
+
+import { RobotCoordsForeignDiv } from '../Deck'
+import { ModuleFromDef } from './ModuleFromDef'
 
 const ROOM_TEMPERATURE_C = 23 // value taken from TC firmware
 export interface ThermocyclerVizProps {

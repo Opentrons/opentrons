@@ -2,8 +2,10 @@
 # robot_server/errors/error_responses.py and robot_server/errors/global_errors.py
 from dataclasses import dataclass, asdict
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Sequence, Tuple
 from starlette import status as status_codes
+
+from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors import ApiError, ErrorSource, ErrorDetails, ErrorBody
 from robot_server.service.json_api import ResourceLinks
@@ -14,6 +16,7 @@ class ErrorCreateDef:
     status_code: int
     title: str
     format_string: str
+    error_code: str
 
 
 class ErrorDef(ErrorCreateDef, Enum):
@@ -38,6 +41,7 @@ class RobotServerError(ApiError):
         links: Optional[ResourceLinks] = None,
         source: Optional[ErrorSource] = None,
         meta: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[BaseException]] = None,
         *fmt_args,
         **fmt_kw_args
     ):
@@ -51,6 +55,11 @@ class RobotServerError(ApiError):
         :param fmt_args: format_string args
         :param fmt_kw_args: format_string kw_args
         """
+        checked_wrapping = wrapping or []
+        wrapped_details: Tuple[ErrorDetails, ...] = tuple(
+            ErrorDetails.from_exc(exc) for exc in checked_wrapping
+        )
+
         content = ErrorBody(
             errors=(
                 ErrorDetails(
@@ -59,7 +68,9 @@ class RobotServerError(ApiError):
                     detail=definition.format_string.format(*fmt_args, **fmt_kw_args),
                     source=source,
                     meta=meta,
+                    errorCode=definition.error_code,
                 ),
+                *wrapped_details,
             ),
             links=links,
         ).dict(exclude_none=True)
@@ -77,24 +88,29 @@ class CommonErrorDef(ErrorDef):
         status_code=status_codes.HTTP_500_INTERNAL_SERVER_ERROR,
         title="Internal Server Error",
         format_string="{error}",
+        error_code=ErrorCodes.GENERAL_ERROR.value.code,
     )
     NOT_IMPLEMENTED = ErrorCreateDef(
         status_code=status_codes.HTTP_501_NOT_IMPLEMENTED,
         title="Not implemented",
         format_string="Method not implemented. {error}",
+        error_code=ErrorCodes.GENERAL_ERROR.value.code,
     )
     RESOURCE_NOT_FOUND = ErrorCreateDef(
         status_code=status_codes.HTTP_404_NOT_FOUND,
         title="Resource Not Found",
         format_string="Resource type '{resource}' with id '{id}' was not found",
+        error_code=ErrorCodes.GENERAL_ERROR.value.code,
     )
     ACTION_FORBIDDEN = ErrorCreateDef(
         status_code=status_codes.HTTP_403_FORBIDDEN,
         title="Action Forbidden",
         format_string="{reason}",
+        error_code=ErrorCodes.GENERAL_ERROR.value.code,
     )
     RESOURCE_ALREADY_EXISTS = ErrorCreateDef(
         status_code=status_codes.HTTP_403_FORBIDDEN,
         title="Resource Exists",
         format_string="A '{resource}' with id '{id}' already exists",
+        error_code=ErrorCodes.GENERAL_ERROR.value.code,
     )

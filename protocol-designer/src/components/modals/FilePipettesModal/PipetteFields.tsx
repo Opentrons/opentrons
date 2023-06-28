@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
-import reduce from 'lodash/reduce'
 import {
   DropdownField,
   FormGroup,
@@ -11,18 +10,17 @@ import {
 } from '@opentrons/components'
 import {
   getIncompatiblePipetteNames,
-  getLabwareDefURI,
-  getLabwareDisplayName,
   OT2_PIPETTES,
   OT2_ROBOT_TYPE,
   OT3_PIPETTES,
   RobotType,
 } from '@opentrons/shared-data'
-import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
 import { i18n } from '../../../localization'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { FormPipettesByMount } from '../../../step-forms'
+import { getAllowAllTipracks } from '../../../feature-flags/selectors'
+import { getTiprackOptions } from '../utils'
 import { PipetteDiagram } from './PipetteDiagram'
 
 import styles from './FilePipettesModal.css'
@@ -70,6 +68,11 @@ interface PipetteSelectProps {
   nameBlocklist?: string[]
 }
 
+interface TiprackSelectProps {
+  mount: Mount
+  robotType: RobotType
+}
+
 export function PipetteFields(props: Props): JSX.Element {
   const {
     values,
@@ -82,36 +85,23 @@ export function PipetteFields(props: Props): JSX.Element {
     robotType,
   } = props
 
+  const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch()
-
   const allLabware = useSelector(getLabwareDefsByURI)
-
-  type Values<T> = T[keyof T]
-
-  const tiprackOptions = reduce<typeof allLabware, DropdownOption[]>(
-    allLabware,
-    (acc, def: Values<typeof allLabware>) => {
-      if (def.metadata.displayCategory !== 'tipRack') return acc
-      return [
-        ...acc,
-        {
-          name: getLabwareDisplayName(def),
-          value: getLabwareDefURI(def),
-        },
-      ]
-    },
-    []
-  )
 
   const initialTabIndex = props.initialTabIndex || 1
 
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
+
+    //  adding 96-channel to the nameBlockstlist for the Flex for now
+    const nameBlockList = [...OT2_PIPETTES, 'p1000_96']
+
     return (
       <PipetteSelect
         nameBlocklist={
-          robotType === OT2_ROBOT_TYPE ? OT3_PIPETTES : OT2_PIPETTES
+          robotType === OT2_ROBOT_TYPE ? OT3_PIPETTES : nameBlockList
         }
         enableNoneOption
         tabIndex={tabIndex}
@@ -130,8 +120,40 @@ export function PipetteFields(props: Props): JSX.Element {
     )
   }
 
+  const renderTiprackSelect = (props: TiprackSelectProps): JSX.Element => {
+    const { mount } = props
+    const selectedPipetteName = values[mount].pipetteName
+    const tiprackOptions = getTiprackOptions({
+      allLabware: allLabware,
+      allowAllTipracks: allowAllTipracks,
+      selectedPipetteName: selectedPipetteName,
+    })
+
+    return (
+      <DropdownField
+        error={
+          touched &&
+          typeof touched !== 'boolean' &&
+          touched[mount]?.tiprackDefURI &&
+          errors !== null &&
+          typeof errors !== 'string' &&
+          errors[mount] != null
+            ? errors[mount]?.tiprackDefURI
+            : null
+        }
+        tabIndex={initialTabIndex + 2}
+        disabled={isEmpty(values[mount].pipetteName)}
+        options={tiprackOptions}
+        value={values[mount].tiprackDefURI}
+        name={`pipettesByMount.${mount}.tiprackDefURI`}
+        onChange={onFieldChange}
+        onBlur={onBlur}
+      />
+    )
+  }
+
   return (
-    <React.Fragment>
+    <>
       <div className={styles.mount_fields_row}>
         <div className={styles.mount_column}>
           <FormGroup
@@ -153,28 +175,7 @@ export function PipetteFields(props: Props): JSX.Element {
             label={i18n.t('modal.pipette_fields.left_tiprack')}
             className={formStyles.stacked_row}
           >
-            <DropdownField
-              error={
-                // TODO JF 2020-3-19 allow dropdowns to take error
-                // components from formik so we avoid manually doing this
-                touched &&
-                typeof touched !== 'boolean' &&
-                touched.left &&
-                touched.left.tiprackDefURI &&
-                errors !== null &&
-                typeof errors !== 'string' &&
-                errors.left
-                  ? errors.left.tiprackDefURI
-                  : null
-              }
-              tabIndex={initialTabIndex + 2}
-              disabled={isEmpty(values.left.pipetteName)}
-              options={tiprackOptions}
-              value={values.left.tiprackDefURI}
-              name="pipettesByMount.left.tiprackDefURI"
-              onChange={onFieldChange}
-              onBlur={onBlur}
-            />
+            {renderTiprackSelect({ mount: 'left', robotType })}
           </FormGroup>
         </div>
         <PipetteDiagram
@@ -201,28 +202,7 @@ export function PipetteFields(props: Props): JSX.Element {
             label={i18n.t('modal.pipette_fields.right_tiprack')}
             className={formStyles.stacked_row}
           >
-            <DropdownField
-              error={
-                // TODO JF 2020-3-19 allow dropdowns to take error
-                // components from formik so we avoid manually doing this
-                touched &&
-                typeof touched !== 'boolean' &&
-                touched.right &&
-                touched.right.tiprackDefURI &&
-                errors !== null &&
-                typeof errors !== 'string' &&
-                errors.right
-                  ? errors.right.tiprackDefURI
-                  : null
-              }
-              tabIndex={initialTabIndex + 4}
-              disabled={isEmpty(values.right.pipetteName)}
-              options={tiprackOptions}
-              value={values.right.tiprackDefURI}
-              name="pipettesByMount.right.tiprackDefURI"
-              onChange={onFieldChange}
-              onBlur={onBlur}
-            />
+            {renderTiprackSelect({ mount: 'right', robotType })}
           </FormGroup>
         </div>
       </div>
@@ -235,6 +215,6 @@ export function PipetteFields(props: Props): JSX.Element {
           />
         </OutlineButton>
       </div>
-    </React.Fragment>
+    </>
   )
 }

@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, Query, status
 
 from opentrons.protocol_engine import ProtocolEngine, CommandIntent
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
+from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
@@ -31,6 +32,7 @@ class CommandNotFound(ErrorDetails):
 
     id: Literal["StatelessCommandNotFound"] = "StatelessCommandNotFound"
     title: str = "Stateless Command Not Found"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
 @commands_router.post(
@@ -177,7 +179,7 @@ async def get_command(
         command = engine.state_view.commands.get(commandId)
 
     except CommandDoesNotExistError as e:
-        raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+        raise CommandNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=cast(StatelessCommand, command)),

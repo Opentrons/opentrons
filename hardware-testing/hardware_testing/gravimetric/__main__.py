@@ -17,6 +17,10 @@ from hardware_testing.protocols import (
     gravimetric_ot3_p1000_96_1000ul_tip,
     photometric_ot3_p1000_96_50ul_tip,
     photometric_ot3_p1000_96_200ul_tip,
+    gravimetric_ot3_p50_multi_50ul_tip_increment,
+    gravimetric_ot3_p1000_multi_50ul_tip_increment,
+    gravimetric_ot3_p1000_multi_200ul_tip_increment,
+    gravimetric_ot3_p1000_multi_1000ul_tip_increment,
 )
 
 from . import execute, helpers, workarounds, execute_photometric
@@ -53,6 +57,30 @@ GRAVIMETRIC_CFG = {
     },
 }
 
+GRAVIMETRIC_CFG_INCREMENT = {
+    50: {
+        1: {50: gravimetric_ot3_p50_single},
+        8: {50: gravimetric_ot3_p50_multi_50ul_tip_increment},
+    },
+    1000: {
+        1: {
+            50: gravimetric_ot3_p1000_single,
+            200: gravimetric_ot3_p1000_single,
+            1000: gravimetric_ot3_p1000_single,
+        },
+        8: {
+            50: gravimetric_ot3_p1000_multi_50ul_tip_increment,
+            200: gravimetric_ot3_p1000_multi_200ul_tip_increment,
+            1000: gravimetric_ot3_p1000_multi_1000ul_tip_increment,
+        },
+        96: {
+            50: gravimetric_ot3_p1000_96_50ul_tip,
+            200: gravimetric_ot3_p1000_96_200ul_tip,
+            1000: gravimetric_ot3_p1000_96_1000ul_tip,
+        },
+    },
+}
+
 PHOTOMETRIC_CFG = {
     50: photometric_ot3_p1000_96_50ul_tip,
     200: photometric_ot3_p1000_96_200ul_tip,
@@ -75,7 +103,12 @@ def run_gravimetric(
     scale_delay: int,
 ) -> None:
     """Run."""
-    protocol_cfg = GRAVIMETRIC_CFG[pipette_volume][pipette_channels][tip_volume]
+    if increment:
+        protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[pipette_volume][pipette_channels][
+            tip_volume
+        ]
+    else:
+        protocol_cfg = GRAVIMETRIC_CFG[pipette_volume][pipette_channels][tip_volume]
     execute.run(
         protocol,
         GravimetricConfig(
@@ -173,7 +206,10 @@ if __name__ == "__main__":
             print(f"\t\t{offset['definitionUri']}")
             print(f"\t\t{offset['vector']}")
             LABWARE_OFFSETS.append(offset)
-    _protocol = GRAVIMETRIC_CFG[args.pipette][args.channels][args.tip]
+    if args.increment:
+        _protocol = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][args.tip]
+    else:
+        _protocol = GRAVIMETRIC_CFG[args.pipette][args.channels][args.tip]
     _ctx = helpers.get_api_context(
         API_LEVEL,  # type: ignore[attr-defined]
         is_simulating=args.simulate,

@@ -79,7 +79,10 @@ export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
           className={styles.small_field}
           label={i18n.t('form.step_edit_form.field.newLocation.label')}
         >
-          <LabwareLocationField {...propsForFields.newLocation} />
+          <LabwareLocationField
+            {...propsForFields.newLocation}
+            useGripper={propsForFields.useGripper.value === true}
+          />
         </FormGroup>
       </div>
     </div>
