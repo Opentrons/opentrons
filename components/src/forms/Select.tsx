@@ -67,38 +67,38 @@ export type SelectProps = ReactSelectProps<SelectOption>
 const VOID_STYLE: unknown = undefined
 const NO_STYLE_FN = (): CSSObjectWithLabel => VOID_STYLE as CSSObjectWithLabel
 
-export function Select(props: SelectProps): JSX.Element {
-  const CLEAR_STYLES: StylesConfig<SelectOption> = {
-    clearIndicator: NO_STYLE_FN,
-    container: NO_STYLE_FN,
-    control: NO_STYLE_FN,
-    dropdownIndicator: NO_STYLE_FN,
-    group: NO_STYLE_FN,
-    groupHeading: NO_STYLE_FN,
-    indicatorsContainer: NO_STYLE_FN,
-    indicatorSeparator: NO_STYLE_FN,
-    input: (styles: CSSObjectWithLabel) => ({
-      ...styles,
-      zIndex: 2,
-      position: 'absolute',
-    }),
-    loadingIndicator: NO_STYLE_FN,
-    loadingMessage: NO_STYLE_FN,
-    menu: NO_STYLE_FN,
-    menuList: NO_STYLE_FN,
-    multiValue: NO_STYLE_FN,
-    multiValueLabel: NO_STYLE_FN,
-    multiValueRemove: NO_STYLE_FN,
-    option: NO_STYLE_FN,
-    // the following should not be cleared to ensure proper positioning
-    // included as comments so we can see what we're not touching
-    // noOptionsMessage: NO_STYLE_FN,
-    // menuPortal: _ => _,
-    // placeholder: _ => _,
-    // singleValue: _ => _,
-    // valueContainer: _ => _,
-  }
+const CLEAR_STYLES: StylesConfig<SelectOption> = {
+  clearIndicator: NO_STYLE_FN,
+  container: NO_STYLE_FN,
+  control: NO_STYLE_FN,
+  dropdownIndicator: NO_STYLE_FN,
+  group: NO_STYLE_FN,
+  groupHeading: NO_STYLE_FN,
+  indicatorsContainer: NO_STYLE_FN,
+  indicatorSeparator: NO_STYLE_FN,
+  input: (styles: CSSObjectWithLabel) => ({
+    ...styles,
+    zIndex: 2,
+    position: 'absolute',
+  }),
+  loadingIndicator: NO_STYLE_FN,
+  loadingMessage: NO_STYLE_FN,
+  menu: NO_STYLE_FN,
+  menuList: NO_STYLE_FN,
+  multiValue: NO_STYLE_FN,
+  multiValueLabel: NO_STYLE_FN,
+  multiValueRemove: NO_STYLE_FN,
+  option: NO_STYLE_FN,
+  // the following should not be cleared to ensure proper positioning
+  // included as comments so we can see what we're not touching
+  // noOptionsMessage: NO_STYLE_FN,
+  // menuPortal: _ => _,
+  // placeholder: _ => _,
+  // singleValue: _ => _,
+  // valueContainer: _ => _,
+}
 
+export function Select(props: SelectProps): JSX.Element {
   return (
     <ReactSelect
       {...props}
