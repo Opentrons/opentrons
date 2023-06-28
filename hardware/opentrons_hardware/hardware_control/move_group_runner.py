@@ -6,6 +6,13 @@ from typing import List, Set, Tuple, Iterator, Union, Optional
 import numpy as np
 import time
 
+from opentrons_shared_data.errors.exceptions import (
+    GeneralError,
+    MoveConditionNotMetError,
+    EnumeratedError,
+    MotionFailedError,
+)
+
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -44,6 +51,7 @@ from .constants import (
     tip_interrupts_per_sec,
     brushed_motor_interrupts_per_sec,
 )
+from opentrons_hardware.errors import raise_from_error_message
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
@@ -62,9 +70,7 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
     MoveStopConditionField,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
-from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    MoveConditionNotMet,
-)
+
 from .types import NodeDict
 
 log = logging.getLogger(__name__)
@@ -130,12 +136,10 @@ class MoveGroupRunner:
             log.debug("No moves. Nothing to do.")
             return {}
         if not self._is_prepped:
-            raise RuntimeError("A group must be prepped before it can be executed.")
-        try:
-            move_completion_data = await self._move(can_messenger, self._start_at_index)
-        except RuntimeError:
-            log.error("raising error from Move group runner")
-            raise
+            raise GeneralError(
+                message="A move group must be prepped before it can be executed."
+            )
+        move_completion_data = await self._move(can_messenger, self._start_at_index)
         return self._accumulate_move_completions(move_completion_data)
 
     async def run(
@@ -359,7 +363,7 @@ class MoveScheduler:
         log.debug(f"Move scheduler running for groups {move_groups}")
         self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
         self._event = asyncio.Event()
-        self._error: Optional[ErrorMessage] = None
+        self._errors: List[EnumeratedError] = []
         self._current_group: Optional[int] = None
         self._should_stop = False
 
@@ -393,7 +397,10 @@ class MoveScheduler:
     def _handle_error(
         self, message: ErrorMessage, arbitration_id: ArbitrationId
     ) -> None:
-        self._error = message
+        try:
+            message = raise_from_error_message(message, arbitration_id)
+        except EnumeratedError as e:
+            self._errors.append(e)
         severity = message.payload.severity.value
         log.error(f"Error during move group: {message}")
         if severity == ErrorSeverity.unrecoverable:
@@ -419,6 +426,11 @@ class MoveScheduler:
             ):
                 log.error(
                     f"Homing move from node {node_id} completed without meeting condition {stop_cond}"
+                )
+                self._errors.append(
+                    MoveConditionNotMetError(
+                        detail={"node": node_id.name, "stop-condition": stop_cond.name}
+                    )
                 )
                 self._should_stop = True
                 self._event.set()
@@ -461,15 +473,20 @@ class MoveScheduler:
             )
             if err != ErrorCode.stop_requested:
                 log.warning("Stop request failed")
-            if self._error:
-                raise RuntimeError(
-                    f"Unrecoverable firmware error during move group {group_id}: {self._error}"
-                )
+            if self._errors:
+                if len(self._errors) > 1:
+                    raise MotionFailedError(
+                        "Motion failed with multiple errors", wrapping=self._errors
+                    )
+                else:
+                    raise self._errors[0]
             else:
                 # This happens when the move completed without stop condition
-                raise MoveConditionNotMet
-        elif self._error is not None:
-            log.warning(f"Recoverable firmware error during {group_id}: {self._error}")
+                raise MoveConditionNotMetError(detail={"group-id": str(group_id)})
+        elif self._errors:
+            log.warning(
+                f"Recoverable firmware errors during {group_id}: {self._errors}"
+            )
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
@@ -528,9 +545,6 @@ class MoveScheduler:
                 log.warning(
                     f"Expected nodes in group {str(group_id)}: {str(self._get_nodes_in_move_group(group_id))}"
                 )
-            except (RuntimeError, MoveConditionNotMet) as e:
-                log.error("canceling move group scheduler")
-                raise e
 
         def _reify_queue_iter() -> Iterator[_CompletionPacket]:
             while not self._completion_queue.empty():
