@@ -50,13 +50,13 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
       ) : null}
       <MenuList onClick={onClick} isOnDevice={true}>
         <MenuItem
-          key="home-robot-arm"
+          key="home-gantry"
           onClick={() => dispatch(home(robotName, ROBOT))}
         >
           <Flex alignItems={ALIGN_CENTER}>
             <Icon
-              name="home-robot-arm"
-              aria-label="home-robot-arm_icon"
+              name="home-gantry"
+              aria-label="home-gantry_icon"
               size="2.5rem"
             />
             <StyledText
