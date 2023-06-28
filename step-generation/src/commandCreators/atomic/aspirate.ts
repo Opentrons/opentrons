@@ -60,9 +60,7 @@ export const aspirate: CommandCreator<AspirateParams> = (
         labware,
       })
     )
-  }
-
-  if (prevRobotState.labware[labware].slot === 'offDeck') {
+  } else if (prevRobotState.labware[labware].slot === 'offDeck') {
     errors.push(errorCreators.labwareOffDeck())
   }
 
