@@ -1,4 +1,3 @@
-export * from './deckMapRenderUtils'
 export * from './getRunLabwareRenderInfo'
 export * from './getRunModuleRenderInfo'
 export * from './getLabwareDisplayLocationFromRunData'
