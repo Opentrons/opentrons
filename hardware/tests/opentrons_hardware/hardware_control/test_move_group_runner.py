@@ -4,6 +4,7 @@ from typing import List, Any, Tuple
 from numpy import float64, float32, int32
 from mock import AsyncMock, call, MagicMock, patch
 import asyncio
+from opentrons_shared_data.errors.exceptions import MoveConditionNotMetError
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
 from opentrons_hardware.firmware_bindings.constants import (
@@ -54,9 +55,7 @@ from opentrons_hardware.hardware_control.move_group_runner import (
     MoveScheduler,
     _CompletionPacket,
 )
-from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    MoveConditionNotMet,
-)
+
 from opentrons_hardware.hardware_control.types import NodeMap
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions as md,
@@ -745,7 +744,7 @@ async def test_home_timeout(
     mock_sender = MockSendMoveCompleter(move_group_home_single, subject, ack_id=3)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    with pytest.raises(MoveConditionNotMet):
+    with pytest.raises(MoveConditionNotMetError):
         await subject.run(can_messenger=mock_can_messenger)
 
 
