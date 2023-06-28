@@ -256,6 +256,14 @@ from .set_status_bar import (
     SetStatusBarCommandType,
 )
 
+from .retract_axis import (
+    RetractAxis,
+    RetractAxisParams,
+    RetractAxisCreate,
+    RetractAxisResult,
+    RetractAxisCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -327,6 +335,12 @@ __all__ = [
     "HomeCreate",
     "HomeResult",
     "HomeCommandType",
+    # retract axis command models
+    "RetractAxis",
+    "RetractAxisCreate",
+    "RetractAxisParams",
+    "RetractAxisResult",
+    "RetractAxisCommandType",
     # load labware command models
     "LoadLabware",
     "LoadLabwareCreate",
