@@ -220,12 +220,19 @@ def _load_labware(
         tiprack_namespace = "opentrons"
         tiprack_loadname = f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul"
     tiprack_load_settings: List[Tuple[int, str, str]] = [
-        (slot, tiprack_loadname, tiprack_namespace,)
+        (
+            slot,
+            tiprack_loadname,
+            tiprack_namespace,
+        )
         for slot in cfg.slots_tiprack
     ]
     for ls in tiprack_load_settings:
         print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]} with namespace "{ls[2]}"')
-    tipracks = [ctx.load_labware(ls[1], location=ls[0], namespace=ls[2]) for ls in tiprack_load_settings]
+    tipracks = [
+        ctx.load_labware(ls[1], location=ls[0], namespace=ls[2])
+        for ls in tiprack_load_settings
+    ]
     _apply_labware_offsets(cfg, tipracks, labware_on_scale)
     return labware_on_scale, tipracks
 
@@ -509,6 +516,9 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         trial_total <= total_tips
     ), f"more trials ({trial_total}) than tips ({total_tips})"
 
+    def _next_tip_for_channel(channel: int) -> Well:
+        return tips[channel].pop(0)
+
     ui.print_header("LOAD SCALE")
     print(
         "Some Radwag settings cannot be controlled remotely.\n"
@@ -556,13 +566,11 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         ui.print_title("FIND LIQUID HEIGHT")
         print("homing...")
         ctx.home()
-        # get the first channel's first-used tip
-        # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
-        #       and so we can use pick-up-tip from there again
-        setup_tip = tips[0][0]
+        pipette.home_plunger()
+        first_tip = _next_tip_for_channel(channel=0)
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
-        setup_tip_location = setup_tip.top().move(setup_channel_offset)
-        _pick_up_tip(ctx, pipette, cfg, location=setup_tip_location)
+        first_tip_location = first_tip.top().move(setup_channel_offset)
+        _pick_up_tip(ctx, pipette, cfg, location=first_tip_location)
         print("moving to vial")
         well = labware_on_scale["A1"]
         pipette.move_to(well.top())
@@ -574,10 +582,11 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         )
         vial_volume = liquid_tracker.get_volume(well)
         print(f"software thinks there is {vial_volume} uL of liquid in the vial")
-        print("dropping tip")
-        _drop_tip(ctx, pipette, cfg)
-        if not ctx.is_simulating():
-            ui.get_user_ready("REPLACE first Tip with NEW Tip")
+        # NOTE: keep this same tip on to do the first trial
+        # print("dropping tip")
+        # _drop_tip(ctx, pipette, cfg)
+        # if not ctx.is_simulating():
+        #     ui.get_user_ready("REPLACE first Tip with NEW Tip")
 
         if not cfg.blank or cfg.inspect:
             average_aspirate_evaporation_ul = 0.0
@@ -589,8 +598,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             actual_disp_list_evap: List[float] = []
             for trial in range(config.NUM_BLANK_TRIALS):
                 ui.print_header(f"BLANK {trial + 1}/{config.NUM_BLANK_TRIALS}")
-                hover_above_setup_tip = setup_tip_location.move(Point(z=20))
-                _pick_up_tip(ctx, pipette, cfg, location=hover_above_setup_tip)
+                print("moving back to tip-rack")
+                pipette.move_to(first_tip.top(20))
                 evap_aspirate, _, evap_dispense, _ = _run_trial(
                     ctx=ctx,
                     pipette=pipette,
@@ -617,8 +626,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 )
                 actual_asp_list_evap.append(evap_aspirate)
                 actual_disp_list_evap.append(evap_dispense)
-                print("dropping tip")
-                _drop_tip(ctx, pipette, cfg)
+                print("moving back to tip-rack")
+                pipette.move_to(first_tip.top(20))
             ui.print_header("EVAPORATION AVERAGE")
             average_aspirate_evaporation_ul = _calculate_average(actual_asp_list_evap)
             average_dispense_evaporation_ul = _calculate_average(actual_disp_list_evap)
@@ -656,10 +665,10 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         f"{volume} uL channel {channel + 1} ({trial + 1}/{cfg.trials})"
                     )
                     print(f"trial total {trial_count}/{trial_total}")
-                    # remove it so it's not used again
-                    next_tip: Well = tips[channel].pop(0)
-                    next_tip_location = next_tip.top().move(channel_offset)
-                    _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
+                    if not pipette.has_tip:
+                        next_tip: Well = _next_tip_for_channel(channel)
+                        next_tip_location = next_tip.top().move(channel_offset)
+                        _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
                     (
                         actual_aspirate,
                         aspirate_data,
