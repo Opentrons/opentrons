@@ -43,7 +43,7 @@ from .actions import (
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
 )
-from .errors.error_occurrence import ErrorOccurrenceWrapper
+from .errors.error_occurrence import _TransportErrorOccurrence
 
 
 class ProtocolEngine:
@@ -250,7 +250,7 @@ class ProtocolEngine:
         """
         if error:
             if (
-                isinstance(error, ErrorOccurrenceWrapper)
+                isinstance(error, _TransportErrorOccurrence)
                 and error.error.errorCode == ErrorCodes.E_STOP_ACTIVATED.value.code
             ):
                 drop_tips_and_home = False

@@ -10,6 +10,7 @@ from opentrons_shared_data.errors.exceptions import EnumeratedError
 
 log = getLogger(__name__)
 
+
 # TODO(mc, 2021-11-12): flesh this model out with structured error data
 # for each error type so client may produce better error messages
 class ErrorOccurrence(BaseModel):
@@ -70,16 +71,13 @@ class ErrorOccurrence(BaseModel):
             schema["required"].extend(["errorCode", "wrappedErrors", "errorInfo"])
 
 
-class ErrorOccurrenceWrapper(Exception):
-    """Do not use this with public. only use this to transport data from thread"""
+class _TransportErrorOccurrence(Exception):
+    """Wrap a ErrorOccurrence exception from a child thread.
+
+    Should not be exposed to the public.
+    """
 
     def __init__(self, wrapped_error: ErrorOccurrence) -> None:
-        """Initialize the computed view of liquid state.
-
-        Arguments:
-            state: Liquid state dataclass used for all calculations.
-        """
-        log.info(f"wrapped_errors init: {wrapped_error}")
         self.error = wrapped_error
 
 

@@ -39,7 +39,7 @@ from ..errors import (
     ProtocolCommandFailedError,
     UnexpectedProtocolError,
 )
-from ..errors.error_occurrence import ErrorOccurrenceWrapper
+from ..errors.error_occurrence import _TransportErrorOccurrence
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
 from .config import Config
@@ -342,7 +342,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     log.info("in finish action")
                     error_id = action.error_details.error_id
                     created_at = action.error_details.created_at
-                    if isinstance(action.error_details.error, ErrorOccurrenceWrapper):
+                    if isinstance(
+                        action.error_details.error, _TransportErrorOccurrence
+                    ):
                         error_occurrence = action.error_details.error.error
                         log.info(f"finish command will have {error_occurrence}")
                         self._state.errors_by_id[error_id] = error_occurrence

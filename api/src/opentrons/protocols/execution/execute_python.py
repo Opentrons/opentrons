@@ -10,7 +10,7 @@ from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.types import PythonProtocol, MalformedProtocolError
 from opentrons.hardware_control import ExecutionCancelledError
-from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrenceWrapper
+from opentrons.protocol_engine.errors.error_occurrence import _TransportErrorOccurrence
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ def run_python(proto: PythonProtocol, context: ProtocolContext):
         SmoothieAlarm,
         asyncio.CancelledError,
         ExecutionCancelledError,
-        ErrorOccurrenceWrapper,
+        _TransportErrorOccurrence,
     ):
         # this is a protocol cancel and shouldn't have special logging
         raise
