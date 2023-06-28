@@ -435,7 +435,10 @@ class MoveScheduler:
                 )
                 self._errors.append(
                     MoveConditionNotMetError(
-                        detail={"node": node_id.name, "stop-condition": stop_cond.name}
+                        detail={
+                            "node": NodeId(node_id).name,
+                            "stop-condition": stop_cond.name,
+                        }
                     )
                 )
                 self._should_stop = True

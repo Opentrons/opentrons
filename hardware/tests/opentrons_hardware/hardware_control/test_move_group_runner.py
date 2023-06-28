@@ -4,7 +4,10 @@ from typing import List, Any, Tuple
 from numpy import float64, float32, int32
 from mock import AsyncMock, call, MagicMock, patch
 import asyncio
-from opentrons_shared_data.errors.exceptions import MoveConditionNotMetError
+from opentrons_shared_data.errors.exceptions import (
+    MoveConditionNotMetError,
+    EnumeratedError,
+)
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
 from opentrons_hardware.firmware_bindings.constants import (
@@ -1213,7 +1216,7 @@ async def test_single_move_error(
     mock_sender = MockSendMoveErrorCompleter(move_group_single, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    with pytest.raises(RuntimeError):
+    with pytest.raises(EnumeratedError):
         await subject.run(can_messenger=mock_can_messenger)
     assert mock_sender.call_count == 1
 
@@ -1252,7 +1255,7 @@ async def test_multiple_move_error(
     mock_sender = MockSendMoveErrorCompleter(move_group_multiple_axes, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    with pytest.raises(RuntimeError):
+    with pytest.raises(EnumeratedError):
         await subject.run(can_messenger=mock_can_messenger)
     assert mock_sender.call_count == 2
 

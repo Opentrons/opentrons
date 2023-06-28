@@ -43,11 +43,9 @@ def _safe_details_from_message(
         "hardware-severity": str(message.payload.severity.value),
     }
     if arbitration_id:
-        detail_dict["hardware-node"] = str(
-            arbitration_id.parts.originating_node_id.value
-        )
+        detail_dict["hardware-node"] = str(arbitration_id.parts.originating_node_id)
         try:
-            originator = NodeId(arbitration_id.parts.originating_node_id.value)
+            originator = NodeId(arbitration_id.parts.originating_node_id)
         except BaseException as e:
             raise InternalMessageFormatError(
                 message="Invalid or unknown message sender",
