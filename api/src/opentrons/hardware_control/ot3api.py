@@ -1262,6 +1262,22 @@ class OT3API(
                     await self._cache_current_position()
                     await self._cache_encoder_position()
 
+    async def home_gear_motors(self, accelerate_during_move: bool = False) -> None:
+        if accelerate_during_move:
+            current_pos = await self._backend.gear_motor_position_estimation()
+            if current_pos == 0:
+                return
+            print(f"got current gear position = {current_pos}")
+            current_pos_dict = {OT3Axis.Q: current_pos[0]}
+            # current_pos_dict = {OT3Axis.Q: 5}
+        # breakpoint()
+        else:
+            current_pos_dict = {OT3Axis.Q: 50}
+        home_target = {OT3Axis.Q: 0}
+        home_moves = self._build_moves(current_pos_dict, home_target)
+        await self._backend.tip_action(home_moves[0], "home", accelerate_during_move)
+
+
     @ExecutionManagerProvider.wait_for_running
     async def home(self, axes: Optional[List[Axis]] = None) -> None:
         """
@@ -1276,7 +1292,8 @@ class OT3API(
         else:
             checked_axes = [ax for ax in Axis if ax != Axis.Q]
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
-            checked_axes.append(Axis.Q)
+            # checked_axes.append(OT3Axis.Q)
+            await self.home_gear_motors()
         self._log.info(f"Homing {axes}")
 
         home_seq = [
@@ -1688,7 +1705,7 @@ class OT3API(
             gear_target_dict = {OT3Axis.Q: gear_motor_target}
             clamp_moves = self._build_moves(gear_origin_dict, gear_target_dict)
 
-            await self._backend.fast_tip_action(gear_origin_dict, clamp_moves[0], "clamp")
+            await self._backend.tip_action(clamp_moves[0], "clamp")
 
             # else:
             #     await self._backend.tip_action(
@@ -1700,22 +1717,22 @@ class OT3API(
             #     )
 
             gear_motor_position = {OT3Axis.Q: self._backend.gear_motor_position}
-            # print(f"gear motor pos = {gear_motor_position}")
-            home_target = {OT3Axis.Q: 5}
+            print(f"gear motor pos = {gear_motor_position}")
+            home_target = {OT3Axis.Q: 0}
             # print(f"passing in gear motor position = {gear_motor_position}")
             home_moves = self._build_moves(gear_motor_position, home_target)
             # print(f"home moves = {home_moves[0]}")
-            await self._backend.fast_tip_action(gear_motor_position, home_moves[0], "clamp")
-            print(f"done almost homing at {time.time()}")
+            await self._backend.tip_action(home_moves[0], "home")
+            # print(f"done almost homing at {time.time()}")
 
-            await self._backend.tip_action(
-                [OT3Axis.of_main_tool_actuator(mount)],
-                # float(pipette_spec.pick_up_distance + pipette_spec.home_buffer),
-                float(5.5),
-                float(pipette_spec.speed - 1),
-                float(0),
-                "home",
-            )
+            # await self._backend.tip_action(
+            #     [OT3Axis.of_main_tool_actuator(mount)],
+            #     # float(pipette_spec.pick_up_distance + pipette_spec.home_buffer),
+            #     float(5.5),
+            #     float(pipette_spec.speed - 1),
+            #     float(0),
+            #     "home",
+            # )
 
     async def pick_up_tip(
         self,

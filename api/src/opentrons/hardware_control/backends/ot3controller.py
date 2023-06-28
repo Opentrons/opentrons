@@ -41,7 +41,6 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
     create_tip_action_group,
-    create_tip_action_home_group,
     PipetteAction,
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
@@ -83,7 +82,7 @@ from opentrons_hardware.hardware_control.motor_enable_disable import (
 from opentrons_hardware.hardware_control.motor_position_status import (
     get_motor_position,
     update_motor_position_estimation,
-    # update_gear_motor_position_estimation,
+    update_gear_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.tip_presence import get_tip_ejector_state

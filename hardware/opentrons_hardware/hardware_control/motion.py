@@ -56,11 +56,11 @@ class MoveGroupSingleAxisStep:
 class MoveGroupTipActionStep:
     """A single tip handling action that requires movement in a move group."""
 
-    velocity_mm_sec: np.float64
-    acceleration_mm_sec_sq: np.float64
     duration_sec: np.float64
+    velocity_mm_sec: np.float64
     action: PipetteTipActionType
     stop_condition: MoveStopCondition
+    acceleration_mm_sec_sq: np.float64
 
 
 @dataclass(frozen=True)
@@ -107,7 +107,6 @@ def create_step(
     duration: np.float64,
     present_nodes: Iterable[NodeId],
     stop_condition: MoveStopCondition = MoveStopCondition.none,
-    tip_action_step: Optional[PipetteTipActionType] = None,
 ) -> MoveGroupStep:
     """Create a move from a block.
 
@@ -126,28 +125,16 @@ def create_step(
     # adds a MoveGroupSingleGripperStep
     ordered_nodes = list([n for n in present_nodes if n != NodeId.gripper_g])
     step: MoveGroupStep = {}
-    if tip_action_step is not None:
-
-        step[NodeId.pipette_left] = MoveGroupTipActionStep(
+    for axis_node in ordered_nodes:
+        step[axis_node] = MoveGroupSingleAxisStep(
+            distance_mm=distance.get(axis_node, np.float64(0)),
+            acceleration_mm_sec_sq=acceleration.get(axis_node, np.float64(0)),
+            velocity_mm_sec=velocity.get(axis_node, np.float64(0)),
             duration_sec=duration,
-            velocity_mm_sec=velocity.get(NodeId.pipette_left, np.float64(0)),
-            action=tip_action_step,
             stop_condition=stop_condition,
-            acceleration_mm_sec_sq=acceleration.get(NodeId.pipette_left, np.float64(0)),
+            move_type=MoveType.get_move_type(stop_condition),
         )
-        return step
-
-    else:
-        for axis_node in ordered_nodes:
-            step[axis_node] = MoveGroupSingleAxisStep(
-                distance_mm=distance.get(axis_node, np.float64(0)),
-                acceleration_mm_sec_sq=acceleration.get(axis_node, np.float64(0)),
-                velocity_mm_sec=velocity.get(axis_node, np.float64(0)),
-                duration_sec=duration,
-                stop_condition=stop_condition,
-                move_type=MoveType.get_move_type(stop_condition),
-            )
-        return step
+    return step
 
 
 def create_backoff_step(velocity: Dict[NodeId, np.float64]) -> MoveGroupStep:
@@ -198,27 +185,24 @@ def create_tip_action_backoff_step(velocity: Dict[NodeId, np.float64]) -> MoveGr
 
 def create_tip_action_step(
     velocity: Dict[NodeId, np.float64],
-    distance: Dict[NodeId, np.float64],
     acceleration: Dict[NodeId, np.float64],
+    duration: np.float64,
     present_nodes: Iterable[NodeId],
     action: PipetteTipActionType,
 ) -> MoveGroupStep:
-    """Creates a step for tip handling actions that require motor movement."""
+    if action == PipetteTipActionType.home:
+        stop_condition = MoveStopCondition.limit_switch
+    else:
+        stop_condition = MoveStopCondition.none
     step: MoveGroupStep = {}
-    stop_condition = (
-        MoveStopCondition.limit_switch
-        if action == PipetteTipActionType.home
-        else MoveStopCondition.none
-    )
     for axis_node in present_nodes:
         step[axis_node] = MoveGroupTipActionStep(
-            duration_sec=abs(distance[axis_node] / velocity[axis_node]),
-            velocity_mm_sec=velocity[axis_node],
+            duration_sec=duration,
+            velocity_mm_sec=velocity.get(axis_node, np.float64(0)),
             action=action,
             stop_condition=stop_condition,
-            acceleration_mm_sec_sq=acceleration[axis_node],
+            acceleration_mm_sec_sq=acceleration.get(axis_node, np.float64(0)),
         )
-        # breakpoint()
     return step
 
 

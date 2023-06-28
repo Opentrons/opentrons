@@ -180,7 +180,7 @@ class MoveGroupRunner:
                 # breakpoint()
                 # assuming the two gear motors finish at the same time in the case of
                 # the 96 channel, return their position
-                # print(f"got completion for tip motor {completion, arbid}")
+                print(f"got completion for tip motor {completion, arbid}, at {time.time()}")
                 return {
                     arbid.parts.originating_node_id:
                         (
@@ -383,7 +383,7 @@ class MoveScheduler:
         self._expected_tip_action_motors: List[List[List[GearMotorId]]] = []
 
         for move_group in move_groups:
-            print(f"move_group = {move_group}")
+            # print(f"move_group = {move_group}")
             move_set = set()
             duration = 0.0
             stop_cond = []
@@ -429,7 +429,6 @@ class MoveScheduler:
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 f", which {'is' if in_group else 'isn''t'} in group"
             )
-            print(f"moves = {self._moves[group_id]}")
 
             if not self._moves[group_id]:
                 log.debug(f"Move group {group_id+self._start_at_index} has completed.")
@@ -519,7 +518,7 @@ class MoveScheduler:
         elif isinstance(message, TipActionResponse):
             if self._handle_tip_action_motors(message):
                 self._remove_move_group(message, arbitration_id)
-                # print(f"done removing move group at {time.time()}")
+                print(f"done removing move group at {time.time()}")
             # self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
