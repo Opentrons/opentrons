@@ -81,15 +81,16 @@ def raise_from_error_message(  # noqa: C901
     arbitration_id: Optional[ArbitrationId] = None,
     *,
     detail: Optional[Dict[str, str]] = None,
+    ignore_severity: bool = False,
 ) -> ErrorMessage:
     """Raise a proper enumerated error based on an error message if required, or return."""
     detail_dict = detail or {}
     maybe_node, error_code, error_severity = _safe_details_from_message(
         message, arbitration_id
     )
-    if error_severity == ErrorSeverity.warning:
+    if error_severity == ErrorSeverity.warning and not ignore_severity:
         return message
-    if error_code == ErrorCode.ok:
+    if error_code == ErrorCode.ok and not ignore_severity:
         log.warning(f"Error message with ok error code: {message}")
         return message
 

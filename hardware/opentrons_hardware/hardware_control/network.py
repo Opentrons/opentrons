@@ -14,7 +14,6 @@ from opentrons_hardware.firmware_bindings.constants import (
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
 )
-from opentrons_hardware.drivers.errors import CommunicationError
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoRequest as CanDeviceInfoRequest,
@@ -239,7 +238,7 @@ class UsbNetworkInfo:
             self._log_failure(
                 devices, set(iter(targets.keys())), "Timeout during probe_specific"
             )
-        except CommunicationError:
+        except BaseException:
             self._log_failure(
                 devices,
                 set(iter(targets.keys())),
@@ -293,7 +292,7 @@ class UsbNetworkInfo:
             self._log_failure(
                 expected_targets, set(iter(targets.keys())), "Timeout during probe"
             )
-        except CommunicationError:
+        except BaseException:
             self._log_failure(
                 expected_targets,
                 set(iter(targets.keys())),

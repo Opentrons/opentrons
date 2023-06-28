@@ -53,7 +53,7 @@ from opentrons_hardware.firmware_bindings.messages.payloads import ErrorMessageP
 
 from opentrons_hardware.firmware_bindings.utils import BinarySerializableException
 
-from .errors import AsyncHardwareError, CanError
+from opentrons_hardware.errors import raise_from_error_message
 
 log = logging.getLogger(__name__)
 
@@ -364,8 +364,6 @@ class CanMessenger:
             pass
         except EnumeratedError:
             raise
-        except AsyncHardwareError:
-            raise
         except Exception as exc:
             log.exception("Exception in read")
             raise CanbusCommunicationError(
@@ -385,36 +383,26 @@ class CanMessenger:
                         f"Received <--\n\tarbitration_id: {message.arbitration_id},\n\t"
                         f"payload: {build}"
                     )
+                    handled = False
                     for listener, filter in self._listeners.values():
                         if filter and not filter(message.arbitration_id):
                             log.debug("message ignored by filter")
                             continue
                         listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]
-                    if (
-                        message.arbitration_id.parts.message_id
-                        == MessageId.error_message
-                    ):
-                        await self._handle_error(build)
+                        handled = True
+                    if not handled:
+                        if (
+                            message.arbitration_id.parts.message_id
+                            == MessageId.error_message
+                        ):
+                            log.error(f"Asynchronous error message ignored: {message}")
+                        else:
+                            log.info(f"Message ignored: {message}")
                 except BinarySerializableException:
                     log.exception(f"Failed to build from {message}")
             else:
                 log.error(f"Message {message} is not recognized.")
         raise StopAsyncIteration
-
-    async def _handle_error(self, build: BinarySerializable) -> None:
-        err_msg = ErrorMessage(payload=build)  # type: ignore[arg-type]
-        error_payload: ErrorMessagePayload = err_msg.payload
-        err_msg.log_error(log)
-
-        if error_payload.message_index == 0:
-            log.error(
-                f"error {str(err_msg)} recieved is asyncronous, raising exception"
-            )
-            raise AsyncHardwareError(
-                "Async firmware error: " + str(err_msg),
-                ErrorCode(error_payload.error_code.value),
-                ErrorSeverity(error_payload.severity.value),
-            )
 
     @property
     def exclusive_writer(self) -> asyncio.Lock:
