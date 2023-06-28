@@ -74,6 +74,10 @@
       "detail": "Motion Planning Failure",
       "category": "roboticsControlError"
     },
+    "2005": {
+      "detail": "Position Estimation Invalid",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"
@@ -132,6 +136,10 @@
     },
     "3015": {
       "detail": "Module Not Present",
+      "category": "roboticsInteractionError"
+    },
+    "3016": {
+      "detail": "Invalid Instrument Data",
       "category": "roboticsInteractionError"
     },
     "4000": {
