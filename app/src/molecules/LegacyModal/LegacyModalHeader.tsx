@@ -21,6 +21,7 @@ export interface LegacyModalHeaderProps {
   title: React.ReactNode
   icon?: IconProps
   closeButton?: JSX.Element
+  isError?: boolean
 }
 
 const closeIconStyles = css`
@@ -42,18 +43,25 @@ const closeIconStyles = css`
 export const LegacyModalHeader = (
   props: LegacyModalHeaderProps
 ): JSX.Element => {
-  const { icon, onClose, title, closeButton } = props
+  const { icon, onClose, title, closeButton, isError = false } = props
   return (
     <>
       <Flex
+        backgroundColor={isError ? COLORS.errorEnabled : undefined}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         paddingX={SPACING.spacing24}
         paddingY={SPACING.spacing16}
       >
         <Flex>
-          {icon != null && <Icon {...icon} />}
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {icon != null && (
+            <Icon {...icon} color={isError ? COLORS.white : icon.color} />
+          )}
+          <StyledText
+            as="h3"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            color={isError ? COLORS.white : COLORS.darkBlackEnabled}
+          >
             {title}
           </StyledText>
         </Flex>
@@ -71,6 +79,7 @@ export const LegacyModalHeader = (
                   name="close"
                   width={SPACING.spacing24}
                   height={SPACING.spacing24}
+                  color={isError ? COLORS.white : undefined}
                 />
               </Btn>
             )}

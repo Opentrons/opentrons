@@ -3,6 +3,7 @@ import { SPACING, COLORS, Box } from '@opentrons/components'
 import { LegacyModalHeader } from './LegacyModalHeader'
 import { LegacyModalShell } from './LegacyModalShell'
 import type { StyleProps } from '@opentrons/components'
+import { isError } from 'lodash'
 
 type ModalType = 'info' | 'warning' | 'error'
 export * from './LegacyModalShell'
@@ -16,6 +17,7 @@ export interface LegacyModalProps extends StyleProps {
   fullPage?: boolean
   childrenPadding?: string | number
   children?: React.ReactNode
+  isError?: boolean
 }
 
 export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
@@ -26,6 +28,7 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
     title,
     childrenPadding = `${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24}`,
     children,
+    isError = false,
     ...styleProps
   } = props
 
@@ -44,6 +47,7 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
             }
           : undefined
       }
+      isError={isError}
     />
   )
 

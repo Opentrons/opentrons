@@ -26,6 +26,8 @@ export interface LegacyModalShellProps extends StyleProps {
   footer?: React.ReactNode
   /** Optional full page takeover */
   fullPage?: boolean
+  /** an option for adding additional styles for an error modal */
+  isError?: boolean
 }
 
 /**
@@ -46,6 +48,7 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
     footer,
     fullPage = false,
     children,
+    isError = false,
     ...styleProps
   } = props
 
@@ -63,6 +66,7 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
           onClick={e => {
             e.stopPropagation()
           }}
+          isError={isError}
           {...styleProps}
         >
           {header != null ? <Header>{header}</Header> : null}
@@ -104,7 +108,11 @@ const ContentArea = styled.div<{ zIndex: string | number }>`
 `
 
 const ModalArea = styled.div<
-  { isFullPage: boolean; backgroundColor?: string } & StyleProps
+  {
+    isFullPage: boolean
+    backgroundColor?: string
+    isError?: boolean
+  } & StyleProps
 >`
   position: ${POSITION_RELATIVE};
   overflow-y: ${OVERFLOW_AUTO};
@@ -117,6 +125,8 @@ const ModalArea = styled.div<
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-radius: ${BORDERS.borderRadiusSize4};
   }
+  border: ${({ isError }) =>
+    isError ? `0.375rem solid ${COLORS.errorEnabled}` : 'none'};
   ${styleProps};
 `
 
