@@ -33,6 +33,7 @@ import { InlineNotification } from '../../atoms/InlineNotification'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
+import { LocationIcon } from '../../molecules/LocationIcon'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
 import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModules/MultipleModulesModal'
@@ -91,15 +92,13 @@ function RowModule({
         </StyledText>
       </Flex>
       <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
-        <StyledText>
-          {/* todo (kj:06/09/2023) need to use LocationIcon */}
-          {t('slot_location', {
-            slotName:
-              getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
-                ? TC_MODULE_LOCATION_OT3
-                : module.slotName,
-          })}
-        </StyledText>
+        <LocationIcon
+          slotName={
+            getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
+              ? TC_MODULE_LOCATION_OT3
+              : module.slotName
+          }
+        />
       </Flex>
       {isNonConnectingModule ? (
         <Flex

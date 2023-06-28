@@ -30,7 +30,9 @@ export function LocationIcon({
       alignItems={ALIGN_CENTER}
       height="2rem"
       width="max-content"
-      padding={`${SPACING.spacing4} ${SPACING.spacing8}`}
+      padding={`${SPACING.spacing4}  ${
+        slotName != null ? SPACING.spacing8 : '0.375rem'
+      }`}
       border={`2px solid ${COLORS.darkBlack100}`}
       borderRadius={BORDERS.borderRadiusSize3}
       data-testid={
