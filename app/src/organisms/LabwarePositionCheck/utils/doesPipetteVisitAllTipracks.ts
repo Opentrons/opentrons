@@ -1,7 +1,7 @@
 import { getIsTiprack, LabwareDefinition2 } from '@opentrons/shared-data'
 import { getPickUpTipCommandsWithPipette } from '../../Devices/ProtocolRun/utils/getPickUpTipCommandsWithPipette'
 import { getTipracksVisited } from '../../Devices/ProtocolRun/utils/getTipracksVisited'
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
 import type { LoadedLabware } from '@opentrons/shared-data'
 
 export const doesPipetteVisitAllTipracks = (

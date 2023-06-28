@@ -5,7 +5,7 @@ import type {
   ProtocolAnalysisOutput,
   LoadedLabware,
 } from '@opentrons/shared-data'
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
 
 // TODO: update these fixtures to be v6 protocols
 const protocolMultipleTipracks = (_uncastedProtocolMultipleTipracks as unknown) as ProtocolAnalysisOutput
