@@ -375,6 +375,18 @@ class MotionPlanningFailureError(RoboticsControlError):
         super().__init__(ErrorCodes.MOTION_PLANNING_FAILURE, message, detail, wrapping)
 
 
+class PositionEstimationInvalidError(RoboticsControlError):
+    """An error indicating that motion planning failed."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PositionEstimationFailedError."""
+        super().__init__(ErrorCodes.POSITION_ESTIMATION_INVALID, message, detail, wrapping)
+
 class LabwareDroppedError(RoboticsInteractionError):
     """An error indicating that the gripper dropped labware it was holding."""
 
@@ -548,6 +560,18 @@ class ModuleNotPresent(RoboticsInteractionError):
         super().__init__(
             ErrorCodes.MODULE_NOT_PRESENT, checked_message, checked_detail, wrapping
         )
+
+class InvalidInstrumentData(RoboticsInteractionError):
+    """An error indicating that instrument data is invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an GripperNotPresentError."""
+        super().__init__(ErrorCodes.INVALID_INSTRUMENT_DATA, message, detail, wrapping)
 
 
 class APIRemoved(GeneralError):
