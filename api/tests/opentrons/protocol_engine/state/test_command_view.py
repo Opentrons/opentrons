@@ -24,6 +24,7 @@ from opentrons.protocol_engine.state.commands import (
     RunResult,
     QueueStatus,
 )
+from opentrons.protocol_engine.errors.error_occurrence import _ErrorOccurrenceFromChildThread
 
 from .command_fixtures import (
     create_queued_command,
@@ -254,7 +255,7 @@ def test_get_all_complete_fatal_command_failure() -> None:
         commands=[completed_command, failed_command],
     )
 
-    with pytest.raises(errors.ProtocolCommandFailedError, match="Oh no"):
+    with pytest.raises(_ErrorOccurrenceFromChildThread):
         subject.get_all_commands_final()
 
 
