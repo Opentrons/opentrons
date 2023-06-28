@@ -132,7 +132,7 @@ class OT3Simulator:
         """
         self._configuration = config
         self._loop = loop
-        self._strict_attached = False
+        self._strict_attached = bool(strict_attached_instruments)
         self._stubbed_attached_modules = attached_modules
         self._update_required = False
         self._initialized = False

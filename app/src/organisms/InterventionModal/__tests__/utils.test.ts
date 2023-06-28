@@ -2,25 +2,18 @@ import deepClone from 'lodash/cloneDeep'
 
 import { getSlotHasMatingSurfaceUnitVector } from '@opentrons/shared-data'
 import deckDefFixture from '@opentrons/shared-data/deck/fixtures/3/deckExample.json'
-import deckDefFixtureFlex from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import {
   mockLabwareDefinition,
   mockLabwareDefinitionsByUri,
   mockLabwareOnSlot,
-  mockLabwareRenderInfo,
   mockModule,
-  mockModuleRenderInfoWithoutLabware,
-  mockMoveLabwareCommandFromSlot,
-  mockMoveLabwareCommandToModule,
-  mockMoveLabwareCommandToOffDeck,
   mockRunData,
   mockThermocyclerModule,
 } from '../__fixtures__'
 import {
-  getCurrentRunLabwareRenderInfo,
-  getCurrentRunModulesRenderInfo,
-  getLabwareAnimationParams,
+  getRunLabwareRenderInfo,
+  getRunModuleRenderInfo,
   getLabwareDisplayLocationFromRunData,
   getLabwareNameFromRunData,
   getModuleDisplayLocationFromRunData,
@@ -182,7 +175,7 @@ describe('getModuleModelFromRunData', () => {
   })
 })
 
-describe('getCurrentRunLabwareRenderInfo', () => {
+describe('getRunLabwareRenderInfo', () => {
   beforeEach(() => {
     mockGetSlotHasMatingSurfaceUnitVector.mockReturnValue(true)
   })
@@ -191,7 +184,7 @@ describe('getCurrentRunLabwareRenderInfo', () => {
   })
 
   it('returns an empty array if there is no loaded labware for the run', () => {
-    const res = getCurrentRunLabwareRenderInfo(
+    const res = getRunLabwareRenderInfo(
       { labware: [] } as any,
       {},
       {} as any
@@ -202,7 +195,7 @@ describe('getCurrentRunLabwareRenderInfo', () => {
   })
 
   it('returns run labware render info', () => {
-    const res = getCurrentRunLabwareRenderInfo(
+    const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
       deckDefFixture as any
@@ -219,7 +212,7 @@ describe('getCurrentRunLabwareRenderInfo', () => {
 
   it('does not add labware to results array if the labware is on deck and the slot does not have a mating surface vector', () => {
     mockGetSlotHasMatingSurfaceUnitVector.mockReturnValue(false)
-    const res = getCurrentRunLabwareRenderInfo(
+    const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
       deckDefFixture as any
@@ -228,7 +221,7 @@ describe('getCurrentRunLabwareRenderInfo', () => {
   })
 
   it('does add offdeck labware to the results array', () => {
-    const res = getCurrentRunLabwareRenderInfo(
+    const res = getRunLabwareRenderInfo(
       mockRunData,
       mockLabwareDefinitionsByUri,
       deckDefFixture as any
@@ -254,7 +247,7 @@ describe('getCurrentRunLabwareRenderInfo', () => {
         slotName: '0',
       },
     }
-    const res = getCurrentRunLabwareRenderInfo(
+    const res = getRunLabwareRenderInfo(
       { labware: [mockBadSlotLabware] } as any,
       mockLabwareDefinitionsByUri,
       deckDefFixture as any
@@ -267,7 +260,7 @@ describe('getCurrentRunLabwareRenderInfo', () => {
 
 describe('getCurrentRunModuleRenderInfo', () => {
   it('returns an empty array if there is no loaded module for the run', () => {
-    const res = getCurrentRunModulesRenderInfo(
+    const res = getRunModuleRenderInfo(
       { modules: [] } as any,
       {} as any,
       {}
@@ -277,7 +270,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
   })
 
   it('returns run module render info with nested labware', () => {
-    const res = getCurrentRunModulesRenderInfo(
+    const res = getRunModuleRenderInfo(
       mockRunData,
       deckDefFixture as any,
       mockLabwareDefinitionsByUri
@@ -298,7 +291,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
       modules: [mockModule],
     } as any
 
-    const res = getCurrentRunModulesRenderInfo(
+    const res = getRunModuleRenderInfo(
       mockRunDataNoNesting,
       deckDefFixture as any,
       mockLabwareDefinitionsByUri
@@ -315,7 +308,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
       modules: [mockThermocyclerModule],
     } as any
 
-    const res = getCurrentRunModulesRenderInfo(
+    const res = getRunModuleRenderInfo(
       mockRunDataWithTC,
       deckDefFixture as any,
       mockLabwareDefinitionsByUri
@@ -340,7 +333,7 @@ describe('getCurrentRunModuleRenderInfo', () => {
       ],
     } as any
 
-    const res = getCurrentRunModulesRenderInfo(
+    const res = getRunModuleRenderInfo(
       mockRunDataWithBadModuleSlot,
       deckDefFixture as any,
       mockLabwareDefinitionsByUri
@@ -348,135 +341,5 @@ describe('getCurrentRunModuleRenderInfo', () => {
 
     expect(res[0].x).toEqual(0)
     expect(res[0].y).toEqual(0)
-  })
-})
-
-describe('getLabwareAnimationParams', () => {
-  it('returns null if it does not find the command specified labware in the labware or module render arrays', () => {
-    const res = getLabwareAnimationParams(
-      [{ labwareId: 'no-match' }] as any,
-      [{ nestedLabwareId: 'no-match' }] as any,
-      { params: { labwareId: 'match' } } as any,
-      deckDefFixture as any
-    )
-
-    expect(res).toEqual(null)
-  })
-
-  it('returns null if the new location does not exist', () => {
-    const res = getLabwareAnimationParams(
-      [
-        {
-          x: 0,
-          y: 0,
-          labwareDef: mockLabwareDefinition,
-          labwareId: 'mockLabwareID2',
-        },
-      ],
-      [],
-      {
-        commandType: 'moveLabware',
-        params: {
-          labwareId: 'mockLabwareID',
-          newLocation: {
-            slotName: '42',
-          },
-          strategy: 'manualMoveWithPause',
-        },
-      } as any,
-      deckDefFixture as any
-    )
-
-    expect(res).toEqual(null)
-  })
-
-  it('returns expected animation params given a move from slot to slot', () => {
-    const res = getLabwareAnimationParams(
-      mockLabwareRenderInfo,
-      [],
-      mockMoveLabwareCommandFromSlot,
-      deckDefFixture as any
-    )
-
-    expect(res).toBeTruthy()
-    expect(res?.movementParams.xMovement).toEqual(132.5)
-    expect(res?.movementParams.yMovement).toEqual(90.5)
-    expect(res?.movementParams.begin).toEqual('800ms;deck-in.end+0ms')
-    expect(res?.movementParams.duration).toEqual('800ms')
-    expect(res?.splashParams.inParams.begin).toEqual('labware-move.end+300ms')
-    expect(res?.splashParams.inParams.duration).toEqual('300ms')
-    expect(res?.splashParams.outParams.begin).toEqual('splash-in.end+300ms')
-    expect(res?.splashParams.outParams.duration).toEqual('300ms')
-  })
-
-  it('returns expected animation params given a move from slot to module', () => {
-    const res = getLabwareAnimationParams(
-      mockLabwareRenderInfo,
-      mockModuleRenderInfoWithoutLabware,
-      mockMoveLabwareCommandToModule,
-      deckDefFixture as any
-    )
-
-    expect(res).toBeTruthy()
-    expect(res?.movementParams.xMovement).toEqual(100)
-    expect(res?.movementParams.yMovement).toEqual(100)
-    expect(res?.movementParams.begin).toEqual('800ms;deck-in.end+0ms')
-    expect(res?.movementParams.duration).toEqual('800ms')
-    expect(res?.splashParams.inParams.begin).toEqual('labware-move.end+300ms')
-    expect(res?.splashParams.inParams.duration).toEqual('300ms')
-    expect(res?.splashParams.outParams.begin).toEqual('splash-in.end+300ms')
-    expect(res?.splashParams.outParams.duration).toEqual('300ms')
-  })
-
-  it('returns expected animation params given a move to offdeck - OT2', () => {
-    const res = getLabwareAnimationParams(
-      [
-        {
-          x: 0,
-          y: 0,
-          labwareDef: mockLabwareDefinition,
-          labwareId: 'offDeckMove',
-        },
-      ],
-      [],
-      mockMoveLabwareCommandToOffDeck,
-      deckDefFixture as any
-    )
-
-    expect(res).toBeTruthy()
-    expect(res?.movementParams.xMovement).toEqual(0)
-    expect(res?.movementParams.yMovement).toEqual(
-      deckDefFixture.cornerOffsetFromOrigin[1] -
-        mockLabwareDefinition.dimensions.yDimension
-    )
-    expect(res?.movementParams.begin).toEqual('splash-out.end+500ms')
-    expect(res?.movementParams.duration).toEqual('800ms')
-    expect(res?.splashParams.inParams.begin).toEqual('800ms;deck-in.end+800ms')
-    expect(res?.splashParams.inParams.duration).toEqual('300ms')
-    expect(res?.splashParams.outParams.begin).toEqual('splash-in.end+300ms')
-    expect(res?.splashParams.outParams.duration).toEqual('300ms')
-  })
-
-  it('returns expected animation params given a move to offdeck - OT3', () => {
-    const res = getLabwareAnimationParams(
-      [
-        {
-          x: 0,
-          y: 0,
-          labwareDef: mockLabwareDefinition,
-          labwareId: 'offDeckMove',
-        },
-      ],
-      [],
-      mockMoveLabwareCommandToOffDeck,
-      deckDefFixtureFlex as any
-    )
-
-    expect(res).toBeTruthy()
-    expect(res?.movementParams.xMovement).toEqual(0)
-    expect(res?.movementParams.yMovement).toEqual(
-      deckDefFixtureFlex.cornerOffsetFromOrigin[1] -
-        mockLabwareDefinition.dimensions.yDimension
-    )
   })
 })

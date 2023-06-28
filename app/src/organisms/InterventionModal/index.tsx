@@ -28,13 +28,8 @@ import { StyledText } from '../../atoms/text'
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 
-import type { DeckDefinition, LabwareLocation, RobotType } from '@opentrons/shared-data'
-import type { RunCommandSummary } from '@opentrons/api-client'
-import type {
-  LabwareAnimationParams,
-  RunLabwareInfo,
-  RunModuleInfo,
-} from './utils'
+import type { RunCommandSummary, RunData } from '@opentrons/api-client'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -94,32 +89,16 @@ export interface InterventionModalProps {
   robotName: string
   onResume: () => void
   command: RunCommandSummary
-  robotType?: RobotType
-  moduleRenderInfo?: RunModuleInfo[] | null
-  labwareRenderInfo?: RunLabwareInfo[] | null
-  labwareAnimationParams?: LabwareAnimationParams | null
-  labwareName?: string | null
-  oldDisplayLocation?: string
-  oldLocation: LabwareLocation
-  newDisplayLocation?: string
-  newLocation: LabwareLocation
-  deckDef?: DeckDefinition
+  run: RunData
+  analysis: CompletedProtocolAnalysis | null
 }
 
 export function InterventionModal({
   robotName,
   onResume,
   command,
-  robotType,
-  moduleRenderInfo,
-  labwareRenderInfo,
-  labwareAnimationParams,
-  labwareName,
-  oldDisplayLocation,
-  oldLocation,
-  newDisplayLocation,
-  newLocation,
-  deckDef,
+  run,
+  analysis,
 }: InterventionModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
 
@@ -135,36 +114,11 @@ export function InterventionModal({
         />
       )
     } else if (command.commandType === 'moveLabware') {
-      return robotType != null &&
-        moduleRenderInfo != null &&
-        oldDisplayLocation != null &&
-        newDisplayLocation != null &&
-        labwareRenderInfo != null &&
-        deckDef != null &&
-        labwareAnimationParams != null ? (
-        <MoveLabwareInterventionContent
-          robotType={robotType}
-          moduleRenderInfo={moduleRenderInfo}
-          labwareRenderInfo={labwareRenderInfo}
-          labwareAnimationParams={labwareAnimationParams}
-          labwareName={labwareName ?? ''}
-          movedLabwareId={command.params.labwareId}
-          oldDisplayLocation={oldDisplayLocation}
-          newDisplayLocation={newDisplayLocation}
-          oldLocation={oldLocation}
-          newLocation={newLocation}
-          deckDef={deckDef}
-        />
-      ) : null
+      return <MoveLabwareInterventionContent {...{command, run, analysis}} />
     } else {
       return null
     }
-  }, [
-    command.id,
-    Boolean(labwareRenderInfo),
-    Boolean(moduleRenderInfo),
-    Boolean(labwareAnimationParams),
-  ])
+  }, [command.id, analysis?.status, run.labware.map(l => l.id).join(), run.modules.map(m => m.id).join()])
 
   return (
     <Flex

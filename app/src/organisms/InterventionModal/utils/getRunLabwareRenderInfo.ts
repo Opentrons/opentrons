@@ -14,7 +14,7 @@ export interface RunLabwareInfo {
   labwareId: string
 }
 
-export function getCurrentRunLabwareRenderInfo(
+export function getRunLabwareRenderInfo(
   runData: RunData,
   labwareDefs: LabwareDefinitionsByUri,
   deckDef: DeckDefinition

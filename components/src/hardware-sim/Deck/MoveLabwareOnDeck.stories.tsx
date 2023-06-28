@@ -1,9 +1,7 @@
 import * as React from 'react'
-import { animated, useSpring } from '@react-spring/web'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import { MoveLabwareOnDeck as MoveLabwareOnDeckComponent } from './MoveLabwareOnDeck'
-import { RobotCoordsForeignDiv, Module } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, LabwareDefinition2, OT2_ROBOT_TYPE, getDeckDefFromRobotType, getModuleDef2 } from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE, LabwareDefinition2 } from '@opentrons/shared-data'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -22,7 +20,7 @@ export const MoveLabwareOnDeck: Story = {
       movedLabwareDef={fixture_96_plate as LabwareDefinition2}
       initialLabwareLocation={args.initialLabwareLocation}
       finalLabwareLocation={args.finalLabwareLocation}
-      moduleInfoById={{}}
+      loadedModules={[]}
       robotType={args.robotType} />
   ),
   args: {

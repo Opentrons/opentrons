@@ -11,72 +11,45 @@ import {
   TYPOGRAPHY,
   BORDERS,
   Box,
-  RobotWorkSpace,
   MoveLabwareOnDeck,
+  Module,
+  LabwareRender,
 } from '@opentrons/components'
 
-import { getLabwareRenderComponents, getModuleRenderComponents } from './utils'
+import { getRunLabwareRenderInfo, getRunModuleRenderInfo, getLabwareNameFromRunData, getModuleModelFromRunData, getModuleDisplayLocationFromRunData } from './utils'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
-import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 
-import type { DeckDefinition, LabwareLocation, RobotType } from '@opentrons/shared-data'
-import type {
-  LabwareAnimationParams,
-  RunLabwareInfo,
-  RunModuleInfo,
-} from './utils'
+import { CompletedProtocolAnalysis, LabwareLocation, MoveLabwareRunTimeCommand, RobotType, getDeckDefFromRobotType, getLoadedLabwareDefinitionsByUri, getModuleDisplayName, getModuleType, getOccludedSlotCountForModule, getRobotTypeFromLoadedLabware } from '@opentrons/shared-data'
+import type { RunData } from '@opentrons/api-client'
+import { getLoadedLabware } from '../CommandText/utils/accessors'
 
 export interface MoveLabwareInterventionProps {
-  robotType: RobotType
-  moduleRenderInfo: RunModuleInfo[]
-  labwareRenderInfo: RunLabwareInfo[]
-  labwareAnimationParams: LabwareAnimationParams
-  labwareName: string
-  movedLabwareId: string
-  oldDisplayLocation: string
-  oldLocation: LabwareLocation
-  newDisplayLocation: string
-  newLocation: LabwareLocation
-  deckDef: DeckDefinition
+  command: MoveLabwareRunTimeCommand
+  analysis: CompletedProtocolAnalysis | null
+  run: RunData
 }
 
 export function MoveLabwareInterventionContent({
-  robotType,
-  labwareAnimationParams,
-  labwareName,
-  movedLabwareId,
-  moduleRenderInfo,
-  labwareRenderInfo,
-  oldDisplayLocation,
-  newDisplayLocation,
-  oldLocation,
-  newLocation,
-  deckDef,
+  command,
+  analysis,
+  run
 }: MoveLabwareInterventionProps): JSX.Element | null {
-  const { t: protocolSetupTranslator } = useTranslation('protocol_setup')
+  const { t } = useTranslation(['protocol_setup', 'protocol_command_text'])
 
-  // the module/labware render info needs to be 'sorted' so that the labware that is being moved comes last in the list.
-  // This ensures that the labware being moved is on-top of all other svg layers and so won't have weird visual bugs
-  // where it appears to slide under some labware and over others. This also means that the order in which modules/labware
-  // lists are rendered also need to be dynamic based on wether the labware is nested in a module or not
-  const movedLabwareIndex = labwareRenderInfo.findIndex(
-    labware => labware.labwareId === movedLabwareId
-  )
-  if (movedLabwareIndex !== -1) {
-    labwareRenderInfo.push(...labwareRenderInfo.splice(movedLabwareIndex, 1))
-  } else {
-    const moduleWithLabwareIndex = moduleRenderInfo.findIndex(
-      module => module.nestedLabwareId === movedLabwareId
-    )
-    if (moduleWithLabwareIndex !== -1) {
-      moduleRenderInfo.push(
-        ...moduleRenderInfo.splice(moduleWithLabwareIndex, 1)
-      )
-    }
-  }
-  const movedLabwareDef = labwareRenderInfo.find(l => l.labwareId === movedLabwareId)?.labwareDef
-if (movedLabwareDef == null) return null
+  const analysisCommands = analysis?.commands ?? []
+  const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
+  const robotType = getRobotTypeFromLoadedLabware(run.labware)
+  const deckDef = getDeckDefFromRobotType(robotType)
+
+  const moduleRenderInfo = getRunModuleRenderInfo(run, deckDef, labwareDefsByUri)
+  const labwareRenderInfo = getRunLabwareRenderInfo(run, labwareDefsByUri, deckDef)
+  const oldLabwareLocation = getLoadedLabware(run, command.params.labwareId)?.location ?? null
+
+  const labwareName = getLabwareNameFromRunData(run, command.params.labwareId, analysisCommands)
+  const movedLabwareDef = labwareRenderInfo.find(l => l.labwareId === command.params.labwareId)?.labwareDef
+
+  if (oldLabwareLocation == null || movedLabwareDef == null) return null
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.75rem" width="100%">
       <MoveLabwareHeader />
@@ -93,7 +66,7 @@ if (movedLabwareDef == null) return null
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginBottom={SPACING.spacing2}
             >
-              {protocolSetupTranslator('labware_name')}
+              {t('labware_name')}
             </StyledText>
             <StyledText as="p">{labwareName}</StyledText>
             <Divider marginY={SPACING.spacing8} />
@@ -102,60 +75,39 @@ if (movedLabwareDef == null) return null
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginBottom={SPACING.spacing2}
             >
-              {protocolSetupTranslator('labware_location')}
+              {t('labware_location')}
             </StyledText>
             <StyledText as="p">
-              {oldDisplayLocation} &rarr; {newDisplayLocation}
+              <LabwareDisplayLocation protocolData={run} location={oldLabwareLocation} robotType={robotType} />
+               &rarr;
+              <LabwareDisplayLocation protocolData={run} location={command.params.newLocation} robotType={robotType} />
             </StyledText>
           </Flex>
         </Flex>
         <Flex width="50%">
           <Box margin="0 auto" width="100%">
-            <MoveLabwareOnDeck 
+            <MoveLabwareOnDeck
+              key={command.id} // important so that back to back move labware commands bust the cache
               robotType={robotType}
-              initialLabwareLocation={oldLocation}
-              finalLabwareLocation={newLocation}
+              initialLabwareLocation={oldLabwareLocation}
+              finalLabwareLocation={command.params.newLocation}
               movedLabwareDef={movedLabwareDef}
-              moduleInfoById={{}}
-            />
-            {/* <RobotWorkSpace
-              deckDef={deckDef}
-              deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
-              id="InterventionModal_deckMap"
-              animateDeckDependantEvent={
-                newDisplayLocation === 'offDeck' ? 'move' : 'splash'
-              }
-            >
-              {() => (
+              loadedModules={run.modules}
+              backgroundItems={(
                 <>
-                  {movedLabwareIndex !== -1
-                    ? [
-                        ...getModuleRenderComponents(
-                          moduleRenderInfo,
-                          movedLabwareId,
-                          labwareAnimationParams
-                        ),
-                        ...getLabwareRenderComponents(
-                          labwareRenderInfo,
-                          movedLabwareId,
-                          labwareAnimationParams
-                        ),
-                      ]
-                    : [
-                        ...getLabwareRenderComponents(
-                          labwareRenderInfo,
-                          movedLabwareId,
-                          labwareAnimationParams
-                        ),
-                        ...getModuleRenderComponents(
-                          moduleRenderInfo,
-                          movedLabwareId,
-                          labwareAnimationParams
-                        ),
-                      ]}
+                  {moduleRenderInfo.map(({ x, y, moduleId, moduleDef, nestedLabwareDef }) => (
+                    <Module key={moduleId} def={moduleDef} x={x} y={y}>
+                      {nestedLabwareDef != null ? <LabwareRender definition={nestedLabwareDef} /> : null}
+                    </Module>
+                  ))}
+                  {labwareRenderInfo.filter(l => l.labwareId !== command.params.labwareId).map(({ x, y, labwareDef, labwareId }) => (
+                    <g key={labwareId} transform={`translate(${x},${y})`} >
+                      <LabwareRender definition={labwareDef} />
+                    </g>
+                  ))}
                 </>
               )}
-            </RobotWorkSpace> */}
+            />
           </Box>
         </Flex>
       </Flex>
@@ -176,4 +128,43 @@ function MoveLabwareHeader(): JSX.Element {
       <StyledText as="h1">{t('move_labware')}</StyledText>
     </Flex>
   )
+}
+
+interface LabwareDisplayLocationProps {
+  protocolData: RunData,
+  location: LabwareLocation,
+  robotType: RobotType
+}
+function LabwareDisplayLocation(props: LabwareDisplayLocationProps): JSX.Element{
+  const { t } = useTranslation('protocol_command_text')
+  const {protocolData, location, robotType} = props
+  let displayLocation = ''
+  if (location === 'offDeck') {
+    displayLocation = t('off_deck')
+  } else if ('slotName' in location) {
+    displayLocation = t('slot', { slot_name: location.slotName })
+  } else if ('moduleId' in location) {
+    const moduleModel = getModuleModelFromRunData(
+      protocolData,
+      location.moduleId
+    )
+    if (moduleModel == null) {
+      console.warn('labware is located on an unknown module model')
+    } else {
+      displayLocation = t('module_in_slot', {
+        count: getOccludedSlotCountForModule(
+          getModuleType(moduleModel),
+          robotType
+        ),
+        module: getModuleDisplayName(moduleModel),
+        slot_name: getModuleDisplayLocationFromRunData(
+          protocolData,
+          location.moduleId
+        ),
+      })
+    }
+  } else {
+    console.warn('display location could not be established: ', location)
+  }
+  return <>{displayLocation}</>
 }

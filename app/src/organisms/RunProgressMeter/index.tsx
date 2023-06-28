@@ -30,12 +30,6 @@ import {
   useCommandQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
-import {
-  OT2_STANDARD_MODEL,
-  getDeckDefFromRobotType,
-  getLoadedLabwareDefinitionsByUri,
-  getRobotTypeFromLoadedLabware,
-} from '@opentrons/shared-data'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { Portal } from '../../App/portal'
@@ -45,25 +39,11 @@ import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { InterventionModal } from '../InterventionModal'
 import { ProgressBar } from '../../atoms/ProgressBar'
-import { getLoadedLabware } from '../CommandText/utils/accessors'
 import { useDownloadRunLog } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
-import {
-  isInterventionCommand,
-  getLabwareDisplayLocationFromRunData,
-  getLabwareNameFromRunData,
-  getCurrentRunModulesRenderInfo,
-  getCurrentRunLabwareRenderInfo,
-  getLabwareAnimationParams,
-} from '../InterventionModal/utils'
+import { isInterventionCommand } from '../InterventionModal/utils'
 
 import type { RunStatus } from '@opentrons/api-client'
-import type { LabwareLocation } from '@opentrons/shared-data'
-import type {
-  RunModuleInfo,
-  RunLabwareInfo,
-  LabwareAnimationParams,
-} from '../InterventionModal/utils'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,
@@ -85,7 +65,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     setShowInterventionModal,
   ] = React.useState<boolean>(false)
   const { t } = useTranslation('run_details')
-  const { t: commandTextTranslator } = useTranslation('protocol_command_text')
   const runStatus = useRunStatus(runId)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
@@ -112,7 +91,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
    * find the index of the analysis command within the analysis
    * that has the same commandKey as the most recent
    * command from the run record.
-   * Or in the case of a non-deterministic protocol
+   * Or in the case of a non-ooooooooooooo protocol
    * source from the run rather than the analysis
    * NOTE: the most recent
    * command may not always be "current", for instance if
@@ -128,9 +107,8 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     lastRunAnalysisCommandIndex >= 0 &&
     lastRunAnalysisCommandIndex <= analysisCommands.length - 1
   ) {
-    countOfTotalText = ` ${lastRunAnalysisCommandIndex + 1}/${
-      analysisCommands.length
-    }`
+    countOfTotalText = ` ${lastRunAnalysisCommandIndex + 1}/${analysisCommands.length
+      }`
   } else if (
     lastRunAnalysisCommandIndex === -1 &&
     lastRunCommand?.key != null &&
@@ -197,103 +175,25 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     downloadRunLog()
   }
 
-  let oldLabwareLocation: LabwareLocation | null = null
-  if (lastRunCommand?.commandType === 'moveLabware' && runData != null) {
-    oldLabwareLocation =
-      getLoadedLabware(runData, lastRunCommand.params.labwareId)?.location ??
-      null
-  }
-  const robotType =
-    runData != null
-      ? getRobotTypeFromLoadedLabware(runData.labware)
-      : OT2_STANDARD_MODEL
-
-  const deckDef = getDeckDefFromRobotType(robotType)
-
-  let moduleRunRenderInfo: RunModuleInfo[] | null = null
-  let labwareRunRenderInfo: RunLabwareInfo[] | null = null
-  let labwareAnimationParams: LabwareAnimationParams | null = null
-  if (
-    lastRunCommand?.commandType === 'moveLabware' &&
-    runData != null &&
-    analysisCommands != null
-  ) {
-    const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
-    moduleRunRenderInfo = getCurrentRunModulesRenderInfo(
-      runData,
-      deckDef,
-      labwareDefsByUri
-    )
-    labwareRunRenderInfo = getCurrentRunLabwareRenderInfo(
-      runData,
-      labwareDefsByUri,
-      deckDef
-    )
-
-    labwareAnimationParams =
-      moduleRunRenderInfo != null && labwareRunRenderInfo != null
-        ? getLabwareAnimationParams(
-            labwareRunRenderInfo,
-            moduleRunRenderInfo,
-            lastRunCommand,
-            deckDef
-          )
-        : null
-  }
-
   return (
     <>
       {showInterventionModal &&
-      lastRunCommand != null &&
-      isInterventionCommand(lastRunCommand) &&
-      analysisCommands != null &&
-      runStatus != null &&
-      runData != null &&
-      !TERMINAL_RUN_STATUSES.includes(runStatus) ? (
+        lastRunCommand != null &&
+        isInterventionCommand(lastRunCommand) &&
+        analysisCommands != null &&
+        runStatus != null &&
+        runData != null &&
+        !TERMINAL_RUN_STATUSES.includes(runStatus) ? (
         <Portal level="top">
           <InterventionModal
             robotName={robotName}
             command={lastRunCommand}
-            moduleRenderInfo={moduleRunRenderInfo}
-            labwareRenderInfo={labwareRunRenderInfo}
-            labwareAnimationParams={labwareAnimationParams}
-            labwareName={
-              lastRunCommand.commandType === 'moveLabware'
-                ? getLabwareNameFromRunData(
-                    runData,
-                    lastRunCommand.params.labwareId,
-                    analysisCommands
-                  )
-                : null
-            }
-            oldLocation={oldLabwareLocation ?? 'offDeck'}
-            oldDisplayLocation={
-              oldLabwareLocation != null
-                ? getLabwareDisplayLocationFromRunData(
-                    runData,
-                    oldLabwareLocation,
-                    commandTextTranslator,
-                    robotType
-                  )
-                : ''
-            }
-            newLocation={lastRunCommand.params?.newLocation ?? 'offDeck'}
-            newDisplayLocation={
-              lastRunCommand?.commandType === 'moveLabware'
-                ? getLabwareDisplayLocationFromRunData(
-                    runData,
-                    lastRunCommand.params.newLocation,
-                    commandTextTranslator,
-                    robotType
-                  )
-                : ''
-            }
-            robotType={robotType}
-            deckDef={deckDef}
             onResume={() => {
               setShowInterventionModal(false)
               resumeRunHandler()
             }}
+            run={runData}
+            analysis={analysis}
           />
         </Portal>
       ) : null}
@@ -303,13 +203,11 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             <StyledText
               as="h2"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >{`${t('current_step')}${
-              runStatus === RUN_STATUS_IDLE
+            >{`${t('current_step')}${runStatus === RUN_STATUS_IDLE
                 ? ':'
-                : ` ${countOfTotalText}${
-                    currentStepContents != null ? ': ' : ''
-                  }`
-            }`}</StyledText>
+                : ` ${countOfTotalText}${currentStepContents != null ? ': ' : ''
+                }`
+              }`}</StyledText>
 
             {currentStepContents}
           </Flex>
@@ -319,10 +217,9 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             css={css`
             ${TYPOGRAPHY.darkLinkH4SemiBold}
             &:hover {
-              color: ${
-                downloadIsDisabled
-                  ? COLORS.darkGreyEnabled
-                  : COLORS.darkBlackEnabled
+              color: ${downloadIsDisabled
+                ? COLORS.darkGreyEnabled
+                : COLORS.darkBlackEnabled
               };
             }
             cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
@@ -348,8 +245,8 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
               runHasNotBeenStarted
                 ? 0
                 : ((lastRunAnalysisCommandIndex + 1) /
-                    analysisCommands.length) *
-                  100
+                  analysisCommands.length) *
+                100
             }
             outerStyles={css`
               height: 0.375rem;
