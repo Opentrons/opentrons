@@ -41,7 +41,6 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
     create_tip_action_group,
-    create_fast_tip_action_group,
     PipetteAction,
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
@@ -78,7 +77,7 @@ from opentrons_hardware.hardware_control.motor_enable_disable import (
 from opentrons_hardware.hardware_control.motor_position_status import (
     get_motor_position,
     update_motor_position_estimation,
-    # update_gear_motor_position_estimation,
+    update_gear_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.tip_presence import get_tip_ejector_state
@@ -633,19 +632,14 @@ class OT3Controller:
             )
         return new_group
 
-    async def fast_tip_action(
-            self,
-            origin: Dict[OT3Axis, float],
-            moves: List[Move],
-            tip_action: str = "clamp",
+    async def tip_action(
+        self,
+        moves: List[Move],
+        tip_action: str = "home",
+        accelerate_during_move: bool = True,
     ) -> None:
-        if tip_action == "home":
-            stop_condition = MoveStopCondition.limit_switch
-        else:
-            stop_condition = MoveStopCondition.none
-        breakpoint()
-        group = create_move_group(origin, moves, [NodeId.pipette_left], stop_condition, tip_action)
-        move_group, _ = group
+        group = create_tip_action_group(moves, [NodeId.pipette_left], tip_action, accelerate_during_move)
+        move_group = group
         runner = MoveGroupRunner(
             move_groups=[move_group],
             ignore_stalls=True if not ff.stall_detection_enabled() else False,
@@ -654,7 +648,7 @@ class OT3Controller:
         # print(f"done w move group runner: {positions} at {time.time()}")
         if NodeId.pipette_left in positions:
             self._gear_motor_position = positions[NodeId.pipette_left][0]
-        # print(f"gear position is now {self._gear_motor_position}")
+        print(f"gear position is now {self._gear_motor_position}")
 
     async def tip_action(
         self,
