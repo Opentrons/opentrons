@@ -25,9 +25,9 @@ export function TouchScreenSleep({
   setCurrentOption,
 }: TouchScreenSleepProps): JSX.Element {
   const { t } = useTranslation(['device_settings'])
-  // ToDo (kj:02/06/2023) This will be replaced config value via redux
   const { sleepMs } = useSelector(getOnDeviceDisplaySettings) ?? SLEEP_NEVER_MS
   const dispatch = useDispatch<Dispatch>()
+  const screenRef = React.useRef<HTMLDivElement | null>(null)
 
   // Note (kj:02/10/2023) value's unit is ms
   const settingsButtons = [
@@ -49,8 +49,12 @@ export function TouchScreenSleep({
     )
   }
 
+  React.useEffect(() => {
+    if (screenRef.current != null) screenRef.current.scrollIntoView()
+  }, [])
+
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex flexDirection={DIRECTION_COLUMN} ref={screenRef}>
       <ChildNavigation
         header={t('touchscreen_sleep')}
         onClickBack={() => setCurrentOption(null)}
