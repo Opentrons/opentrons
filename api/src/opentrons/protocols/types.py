@@ -1,5 +1,7 @@
 from typing import Any, Dict, NamedTuple, Optional, Union, TYPE_CHECKING
 from dataclasses import dataclass
+
+from opentrons_shared_data.robot.dev_types import RobotType
 from .api_support.definitions import MIN_SUPPORTED_VERSION
 from .api_support.types import APIVersion
 
@@ -31,7 +33,11 @@ class StaticPythonInfo:
 class _ProtocolCommon:
     text: str
     filename: Optional[str]
+    # TODO(mm, 2023-06-22): Move api_level out of _ProtocolCommon and into PythonProtocol.
+    # JSON protocols do not have an intrinsic api_level, especially since JSONv6,
+    # where they are no longer executed via the Python Protocol API.
     api_level: "APIVersion"
+    robot_type: RobotType
 
 
 @dataclass(frozen=True)
