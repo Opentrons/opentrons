@@ -95,15 +95,14 @@ export function PipetteFields(props: Props): JSX.Element {
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
-
-    //  adding 96-channel to the nameBlockstlist for the Flex for now
-    const nameBlockList = [...OT2_PIPETTES, 'p1000_96']
-
     return (
       <Flex width="15rem">
         <PipetteSelect
           nameBlocklist={
-            robotType === OT2_ROBOT_TYPE ? OT3_PIPETTES : nameBlockList
+            //  filtering out 96-channel for Flex for now
+            robotType === OT2_ROBOT_TYPE
+              ? OT3_PIPETTES
+              : [...OT2_PIPETTES, 'p1000_96']
           }
           enableNoneOption
           tabIndex={tabIndex}
