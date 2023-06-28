@@ -77,9 +77,13 @@ export function MoveLabwareInterventionContent({
     command.params.labwareId,
     analysisCommands
   )
-  const movedLabwareDef = labwareRenderInfo.find(
-    l => l.labwareId === command.params.labwareId
-  )?.labwareDef
+  const movedLabwareDefUri = run.labware.find(
+    l => l.id === command.params.labwareId
+  )?.definitionUri
+  const movedLabwareDef =
+    movedLabwareDefUri != null
+      ? labwareDefsByUri?.[movedLabwareDefUri] ?? null
+      : null
 
   if (oldLabwareLocation == null || movedLabwareDef == null) return null
   return (
@@ -110,17 +114,19 @@ export function MoveLabwareInterventionContent({
               {t('labware_location')}
             </StyledText>
             <StyledText as="p">
-              <LabwareDisplayLocation
-                protocolData={run}
-                location={oldLabwareLocation}
-                robotType={robotType}
-              />
-              &rarr;
-              <LabwareDisplayLocation
-                protocolData={run}
-                location={command.params.newLocation}
-                robotType={robotType}
-              />
+              <span>
+                <LabwareDisplayLocation
+                  protocolData={run}
+                  location={oldLabwareLocation}
+                  robotType={robotType}
+                />
+                &rarr;
+                <LabwareDisplayLocation
+                  protocolData={run}
+                  location={command.params.newLocation}
+                  robotType={robotType}
+                />
+              </span>
             </StyledText>
           </Flex>
         </Flex>

@@ -61,7 +61,7 @@ export const mockMoveLabwareCommandFromSlot = {
   params: {
     labwareId: 'mockLabwareID2',
     newLocation: {
-      slotName: '5',
+      slotName: 'D3',
     },
     strategy: 'manualMoveWithPause',
   },
@@ -72,7 +72,7 @@ export const mockMoveLabwareCommandFromModule = {
   params: {
     labwareId: 'mockLabwareID',
     newLocation: {
-      slotName: '5',
+      slotName: 'C1',
     },
     strategy: 'manualMoveWithPause',
   },
