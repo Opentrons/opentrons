@@ -2,7 +2,12 @@ import * as React from 'react'
 import styled from 'styled-components'
 import flatMap from 'lodash/flatMap'
 import { animated, useSpring, easings } from '@react-spring/web'
-import { LabwareWell, LoadedModule, getDeckDefFromRobotType, getModuleDef2 } from "@opentrons/shared-data"
+import {
+  LabwareWell,
+  LoadedModule,
+  getDeckDefFromRobotType,
+  getModuleDef2,
+} from '@opentrons/shared-data'
 
 import type {
   Coordinates,
@@ -10,34 +15,51 @@ import type {
   LabwareLocation,
   RobotType,
   DeckSlot,
-  DeckDefinition
-} from "@opentrons/shared-data"
+  DeckDefinition,
+} from '@opentrons/shared-data'
 import { IDENTITY_AFFINE_TRANSFORM, multiplyMatrices } from '../utils'
 import { DeckFromData } from './DeckFromData'
 import { StyleProps } from '../../primitives'
 import { COLORS } from '../../ui-style-constants'
 
-function getLabwareCoordinates({ orderedSlots, location, deckId, loadedModules}: {
-  orderedSlots: DeckSlot[],
-  location: LabwareLocation,
+function getLabwareCoordinates({
+  orderedSlots,
+  location,
+  deckId,
+  loadedModules,
+}: {
+  orderedSlots: DeckSlot[]
+  location: LabwareLocation
   deckId: DeckDefinition['otId']
   loadedModules: LoadedModule[]
 }): Coordinates | null {
   if (location === 'offDeck') {
     return null
   } else if ('slotName' in location) {
-    const slotCoordinateTuple = orderedSlots.find(s => s.id === location.slotName)?.position ?? null
+    const slotCoordinateTuple =
+      orderedSlots.find(s => s.id === location.slotName)?.position ?? null
     return slotCoordinateTuple != null
-      ? { x: slotCoordinateTuple[0], y: slotCoordinateTuple[1], z: slotCoordinateTuple[2] }
+      ? {
+          x: slotCoordinateTuple[0],
+          y: slotCoordinateTuple[1],
+          z: slotCoordinateTuple[2],
+        }
       : null
   } else {
     const loadedModule = loadedModules.find(m => m.id === location.moduleId)
     if (loadedModule == null) return null
-    const modSlot = orderedSlots.find(s => s.id === loadedModule.location.slotName)
+    const modSlot = orderedSlots.find(
+      s => s.id === loadedModule.location.slotName
+    )
     if (modSlot == null) return null
     const [modX, modY] = modSlot.position
-    const deckSpecificAffineTransform = getModuleDef2(loadedModule.model).slotTransforms?.[deckId]?.[modSlot.id]?.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM
-    const [[labwareX], [labwareY], [labwareZ]] = multiplyMatrices([[modX], [modY], [1], [1]], deckSpecificAffineTransform)
+    const deckSpecificAffineTransform =
+      getModuleDef2(loadedModule.model).slotTransforms?.[deckId]?.[modSlot.id]
+        ?.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM
+    const [[labwareX], [labwareY], [labwareZ]] = multiplyMatrices(
+      [[modX], [modY], [1], [1]],
+      deckSpecificAffineTransform
+    )
     return { x: labwareX, y: labwareY, z: labwareZ }
   }
 }
@@ -53,7 +75,9 @@ interface MoveLabwareOnDeckProps extends StyleProps {
   loadedModules: LoadedModule[]
   backgroundItems?: React.ReactNode
 }
-export function MoveLabwareOnDeck(props: MoveLabwareOnDeckProps): JSX.Element | null {
+export function MoveLabwareOnDeck(
+  props: MoveLabwareOnDeckProps
+): JSX.Element | null {
   const {
     robotType,
     movedLabwareDef,
@@ -63,24 +87,31 @@ export function MoveLabwareOnDeck(props: MoveLabwareOnDeckProps): JSX.Element | 
     backgroundItems = null,
     ...styleProps
   } = props
-  const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
+  const deckDef = React.useMemo(() => getDeckDefFromRobotType(robotType), [
+    robotType,
+  ])
 
   const offDeckPosition = {
     x: deckDef.locations.orderedSlots[1].position[0],
-    y: deckDef.cornerOffsetFromOrigin[1] - movedLabwareDef.dimensions.xDimension - SPLASH_Y_BUFFER_MM
+    y:
+      deckDef.cornerOffsetFromOrigin[1] -
+      movedLabwareDef.dimensions.xDimension -
+      SPLASH_Y_BUFFER_MM,
   }
-  const initialPosition = getLabwareCoordinates({
-    orderedSlots: deckDef.locations.orderedSlots,
-    location: initialLabwareLocation,
-    loadedModules,
-    deckId: deckDef.otId
-  }) ?? offDeckPosition
-  const finalPosition = getLabwareCoordinates({
-    orderedSlots: deckDef.locations.orderedSlots,
-    location: finalLabwareLocation,
-    loadedModules,
-    deckId: deckDef.otId
-  }) ?? offDeckPosition
+  const initialPosition =
+    getLabwareCoordinates({
+      orderedSlots: deckDef.locations.orderedSlots,
+      location: initialLabwareLocation,
+      loadedModules,
+      deckId: deckDef.otId,
+    }) ?? offDeckPosition
+  const finalPosition =
+    getLabwareCoordinates({
+      orderedSlots: deckDef.locations.orderedSlots,
+      location: finalLabwareLocation,
+      loadedModules,
+      deckId: deckDef.otId,
+    }) ?? offDeckPosition
 
   const springProps = useSpring({
     config: { duration: 1000, easing: easings.easeInOutSine },
@@ -111,29 +142,39 @@ export function MoveLabwareOnDeck(props: MoveLabwareOnDeckProps): JSX.Element | 
     <AnimatedSvg
       viewBox={wholeDeckViewBox}
       opacity="1"
-      style={{opacity: springProps.deckOpacity}}
-      transform="scale(1, -1)" // reflect horizontally about the center 
+      style={{ opacity: springProps.deckOpacity }}
+      transform="scale(1, -1)" // reflect horizontally about the center
       {...styleProps}
     >
       {deckDef != null && <DeckFromData def={deckDef} layerBlocklist={[]} />}
       {backgroundItems}
       <AnimatedG style={{ x: springProps.x, y: springProps.y }}>
-        <g transform={`translate(${movedLabwareDef.cornerOffsetFromSlot.x}, ${movedLabwareDef.cornerOffsetFromSlot.y})`} >
+        <g
+          transform={`translate(${movedLabwareDef.cornerOffsetFromSlot.x}, ${movedLabwareDef.cornerOffsetFromSlot.y})`}
+        >
           <rect
             x={OUTLINE_THICKNESS_MM}
             y={OUTLINE_THICKNESS_MM}
             strokeWidth={OUTLINE_THICKNESS_MM}
             stroke={COLORS.blueEnabled}
             fill={COLORS.white}
-            width={movedLabwareDef.dimensions.xDimension - (2 * OUTLINE_THICKNESS_MM)}
-            height={movedLabwareDef.dimensions.yDimension - (2 * OUTLINE_THICKNESS_MM)}
+            width={
+              movedLabwareDef.dimensions.xDimension - 2 * OUTLINE_THICKNESS_MM
+            }
+            height={
+              movedLabwareDef.dimensions.yDimension - 2 * OUTLINE_THICKNESS_MM
+            }
             rx={3 * OUTLINE_THICKNESS_MM}
           />
           {flatMap(
             movedLabwareDef.ordering,
-            (row: string[], i: number, c: string[][]) => (
-              row.map(wellName => <Well key={wellName} wellDef={movedLabwareDef.wells[wellName]} />)
-            )
+            (row: string[], i: number, c: string[][]) =>
+              row.map(wellName => (
+                <Well
+                  key={wellName}
+                  wellDef={movedLabwareDef.wells[wellName]}
+                />
+              ))
           )}
           <AnimatedG style={{ opacity: springProps.splashOpacity }}>
             <path
@@ -150,11 +191,11 @@ export function MoveLabwareOnDeck(props: MoveLabwareOnDeckProps): JSX.Element | 
   )
 }
 
-/** 
+/**
  * These animated components needs to be split out because react-spring and styled-components don't play nice
  * @see https://github.com/pmndrs/react-spring/issues/1515 */
-const AnimatedG = styled(animated.g) <any>``
-const AnimatedSvg = styled(animated.svg) <any>``
+const AnimatedG = styled(animated.g)<any>``
+const AnimatedSvg = styled(animated.svg)<any>``
 
 interface WellProps {
   wellDef: LabwareWell
@@ -163,21 +204,22 @@ function Well(props: WellProps): JSX.Element {
   const { wellDef } = props
   const { x, y } = wellDef
 
-  return wellDef.shape === 'rectangular'
-    ? (
-      <rect
-        fill={COLORS.white}
-        stroke={COLORS.black}
-        x={x - wellDef.xDimension / 2}
-        y={y - wellDef.yDimension / 2}
-        width={wellDef.xDimension}
-        height={wellDef.yDimension} />
-    ) : (
-      <circle
-        fill={COLORS.white}
-        stroke={COLORS.black}
-        cx={x}
-        cy={y}
-        r={wellDef.diameter / 2} />
-    )
+  return wellDef.shape === 'rectangular' ? (
+    <rect
+      fill={COLORS.white}
+      stroke={COLORS.black}
+      x={x - wellDef.xDimension / 2}
+      y={y - wellDef.yDimension / 2}
+      width={wellDef.xDimension}
+      height={wellDef.yDimension}
+    />
+  ) : (
+    <circle
+      fill={COLORS.white}
+      stroke={COLORS.black}
+      cx={x}
+      cy={y}
+      r={wellDef.diameter / 2}
+    />
+  )
 }

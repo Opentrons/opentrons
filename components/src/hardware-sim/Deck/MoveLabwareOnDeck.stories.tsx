@@ -11,21 +11,22 @@ const meta: Meta<React.ComponentProps<typeof MoveLabwareOnDeckComponent>> = {
 } as Meta
 
 export default meta
-type Story = StoryObj<React.ComponentProps<typeof MoveLabwareOnDeckComponent>>;
+type Story = StoryObj<React.ComponentProps<typeof MoveLabwareOnDeckComponent>>
 
 export const MoveLabwareOnDeck: Story = {
   render: args => (
     <MoveLabwareOnDeckComponent
-      height='400px'
+      height="400px"
       movedLabwareDef={fixture_96_plate as LabwareDefinition2}
       initialLabwareLocation={args.initialLabwareLocation}
       finalLabwareLocation={args.finalLabwareLocation}
       loadedModules={[]}
-      robotType={args.robotType} />
+      robotType={args.robotType}
+    />
   ),
   args: {
     initialLabwareLocation: { slotName: 'A1' },
-    finalLabwareLocation: "offDeck",
-    robotType: FLEX_ROBOT_TYPE
+    finalLabwareLocation: 'offDeck',
+    robotType: FLEX_ROBOT_TYPE,
   },
 }

@@ -91,7 +91,7 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
    * find the index of the analysis command within the analysis
    * that has the same commandKey as the most recent
    * command from the run record.
-   * Or in the case of a non-ooooooooooooo protocol
+   * Or in the case of a non-deterministic protocol
    * source from the run rather than the analysis
    * NOTE: the most recent
    * command may not always be "current", for instance if
@@ -107,8 +107,9 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     lastRunAnalysisCommandIndex >= 0 &&
     lastRunAnalysisCommandIndex <= analysisCommands.length - 1
   ) {
-    countOfTotalText = ` ${lastRunAnalysisCommandIndex + 1}/${analysisCommands.length
-      }`
+    countOfTotalText = ` ${lastRunAnalysisCommandIndex + 1}/${
+      analysisCommands.length
+    }`
   } else if (
     lastRunAnalysisCommandIndex === -1 &&
     lastRunCommand?.key != null &&
@@ -178,12 +179,12 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   return (
     <>
       {showInterventionModal &&
-        lastRunCommand != null &&
-        isInterventionCommand(lastRunCommand) &&
-        analysisCommands != null &&
-        runStatus != null &&
-        runData != null &&
-        !TERMINAL_RUN_STATUSES.includes(runStatus) ? (
+      lastRunCommand != null &&
+      isInterventionCommand(lastRunCommand) &&
+      analysisCommands != null &&
+      runStatus != null &&
+      runData != null &&
+      !TERMINAL_RUN_STATUSES.includes(runStatus) ? (
         <Portal level="top">
           <InterventionModal
             robotName={robotName}
@@ -203,11 +204,13 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             <StyledText
               as="h2"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            >{`${t('current_step')}${runStatus === RUN_STATUS_IDLE
+            >{`${t('current_step')}${
+              runStatus === RUN_STATUS_IDLE
                 ? ':'
-                : ` ${countOfTotalText}${currentStepContents != null ? ': ' : ''
-                }`
-              }`}</StyledText>
+                : ` ${countOfTotalText}${
+                    currentStepContents != null ? ': ' : ''
+                  }`
+            }`}</StyledText>
 
             {currentStepContents}
           </Flex>
@@ -217,9 +220,10 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
             css={css`
             ${TYPOGRAPHY.darkLinkH4SemiBold}
             &:hover {
-              color: ${downloadIsDisabled
-                ? COLORS.darkGreyEnabled
-                : COLORS.darkBlackEnabled
+              color: ${
+                downloadIsDisabled
+                  ? COLORS.darkGreyEnabled
+                  : COLORS.darkBlackEnabled
               };
             }
             cursor: ${downloadIsDisabled ? 'default' : 'pointer'};
@@ -245,8 +249,8 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
               runHasNotBeenStarted
                 ? 0
                 : ((lastRunAnalysisCommandIndex + 1) /
-                  analysisCommands.length) *
-                100
+                    analysisCommands.length) *
+                  100
             }
             outerStyles={css`
               height: 0.375rem;

@@ -184,11 +184,7 @@ describe('getRunLabwareRenderInfo', () => {
   })
 
   it('returns an empty array if there is no loaded labware for the run', () => {
-    const res = getRunLabwareRenderInfo(
-      { labware: [] } as any,
-      {},
-      {} as any
-    )
+    const res = getRunLabwareRenderInfo({ labware: [] } as any, {}, {} as any)
 
     expect(res).toBeInstanceOf(Array)
     expect(res).toHaveLength(0)
@@ -260,11 +256,7 @@ describe('getRunLabwareRenderInfo', () => {
 
 describe('getCurrentRunModuleRenderInfo', () => {
   it('returns an empty array if there is no loaded module for the run', () => {
-    const res = getRunModuleRenderInfo(
-      { modules: [] } as any,
-      {} as any,
-      {}
-    )
+    const res = getRunModuleRenderInfo({ modules: [] } as any, {} as any, {})
     expect(res).toBeInstanceOf(Array)
     expect(res).toHaveLength(0)
   })

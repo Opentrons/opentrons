@@ -1,10 +1,10 @@
-import { AffineTransformMatrix } from "@opentrons/shared-data"
+import { AffineTransformMatrix } from '@opentrons/shared-data'
 
 export const IDENTITY_AFFINE_TRANSFORM: AffineTransformMatrix = [
   [1, 0, 0, 0],
   [0, 1, 0, 0],
   [0, 0, 1, 0],
-  [0, 0, 0, 1]
+  [0, 0, 0, 1],
 ]
 
 // multiply two matrices together (dot product)

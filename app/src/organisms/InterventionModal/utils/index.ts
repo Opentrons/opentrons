@@ -1,4 +1,3 @@
-export * from './animationConstants'
 export * from './deckMapRenderUtils'
 export * from './getRunLabwareRenderInfo'
 export * from './getRunModuleRenderInfo'

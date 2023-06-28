@@ -94,9 +94,19 @@ Deck.args = {
 function Wrapper(props): JSX.Element {
   const [isOn, setIsOn] = React.useState(false)
   return isOn ? (
-    <MyRect {...props} onClick={() => { setIsOn(!isOn) }}/>
+    <MyRect
+      {...props}
+      onClick={() => {
+        setIsOn(!isOn)
+      }}
+    />
   ) : (
-    <rect onClick={() => { setIsOn(!isOn) }} {...props} /> 
+    <rect
+      onClick={() => {
+        setIsOn(!isOn)
+      }}
+      {...props}
+    />
   )
 }
 
@@ -115,7 +125,5 @@ function MyRect(props): JSX.Element {
     loop: true,
   })
 
-  return (
-    <animated.rect style={springProps} {...props}  />
-  )
+  return <animated.rect style={springProps} {...props} />
 }

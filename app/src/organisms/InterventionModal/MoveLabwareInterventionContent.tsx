@@ -16,11 +16,28 @@ import {
   LabwareRender,
 } from '@opentrons/components'
 
-import { getRunLabwareRenderInfo, getRunModuleRenderInfo, getLabwareNameFromRunData, getModuleModelFromRunData, getModuleDisplayLocationFromRunData } from './utils'
+import {
+  getRunLabwareRenderInfo,
+  getRunModuleRenderInfo,
+  getLabwareNameFromRunData,
+  getModuleModelFromRunData,
+  getModuleDisplayLocationFromRunData,
+} from './utils'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
 
-import { CompletedProtocolAnalysis, LabwareLocation, MoveLabwareRunTimeCommand, RobotType, getDeckDefFromRobotType, getLoadedLabwareDefinitionsByUri, getModuleDisplayName, getModuleType, getOccludedSlotCountForModule, getRobotTypeFromLoadedLabware } from '@opentrons/shared-data'
+import {
+  CompletedProtocolAnalysis,
+  LabwareLocation,
+  MoveLabwareRunTimeCommand,
+  RobotType,
+  getDeckDefFromRobotType,
+  getLoadedLabwareDefinitionsByUri,
+  getModuleDisplayName,
+  getModuleType,
+  getOccludedSlotCountForModule,
+  getRobotTypeFromLoadedLabware,
+} from '@opentrons/shared-data'
 import type { RunData } from '@opentrons/api-client'
 import { getLoadedLabware } from '../CommandText/utils/accessors'
 
@@ -33,7 +50,7 @@ export interface MoveLabwareInterventionProps {
 export function MoveLabwareInterventionContent({
   command,
   analysis,
-  run
+  run,
 }: MoveLabwareInterventionProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'protocol_command_text'])
 
@@ -42,12 +59,27 @@ export function MoveLabwareInterventionContent({
   const robotType = getRobotTypeFromLoadedLabware(run.labware)
   const deckDef = getDeckDefFromRobotType(robotType)
 
-  const moduleRenderInfo = getRunModuleRenderInfo(run, deckDef, labwareDefsByUri)
-  const labwareRenderInfo = getRunLabwareRenderInfo(run, labwareDefsByUri, deckDef)
-  const oldLabwareLocation = getLoadedLabware(run, command.params.labwareId)?.location ?? null
+  const moduleRenderInfo = getRunModuleRenderInfo(
+    run,
+    deckDef,
+    labwareDefsByUri
+  )
+  const labwareRenderInfo = getRunLabwareRenderInfo(
+    run,
+    labwareDefsByUri,
+    deckDef
+  )
+  const oldLabwareLocation =
+    getLoadedLabware(run, command.params.labwareId)?.location ?? null
 
-  const labwareName = getLabwareNameFromRunData(run, command.params.labwareId, analysisCommands)
-  const movedLabwareDef = labwareRenderInfo.find(l => l.labwareId === command.params.labwareId)?.labwareDef
+  const labwareName = getLabwareNameFromRunData(
+    run,
+    command.params.labwareId,
+    analysisCommands
+  )
+  const movedLabwareDef = labwareRenderInfo.find(
+    l => l.labwareId === command.params.labwareId
+  )?.labwareDef
 
   if (oldLabwareLocation == null || movedLabwareDef == null) return null
   return (
@@ -78,9 +110,17 @@ export function MoveLabwareInterventionContent({
               {t('labware_location')}
             </StyledText>
             <StyledText as="p">
-              <LabwareDisplayLocation protocolData={run} location={oldLabwareLocation} robotType={robotType} />
-               &rarr;
-              <LabwareDisplayLocation protocolData={run} location={command.params.newLocation} robotType={robotType} />
+              <LabwareDisplayLocation
+                protocolData={run}
+                location={oldLabwareLocation}
+                robotType={robotType}
+              />
+              &rarr;
+              <LabwareDisplayLocation
+                protocolData={run}
+                location={command.params.newLocation}
+                robotType={robotType}
+              />
             </StyledText>
           </Flex>
         </Flex>
@@ -93,20 +133,26 @@ export function MoveLabwareInterventionContent({
               finalLabwareLocation={command.params.newLocation}
               movedLabwareDef={movedLabwareDef}
               loadedModules={run.modules}
-              backgroundItems={(
+              backgroundItems={
                 <>
-                  {moduleRenderInfo.map(({ x, y, moduleId, moduleDef, nestedLabwareDef }) => (
-                    <Module key={moduleId} def={moduleDef} x={x} y={y}>
-                      {nestedLabwareDef != null ? <LabwareRender definition={nestedLabwareDef} /> : null}
-                    </Module>
-                  ))}
-                  {labwareRenderInfo.filter(l => l.labwareId !== command.params.labwareId).map(({ x, y, labwareDef, labwareId }) => (
-                    <g key={labwareId} transform={`translate(${x},${y})`} >
-                      <LabwareRender definition={labwareDef} />
-                    </g>
-                  ))}
+                  {moduleRenderInfo.map(
+                    ({ x, y, moduleId, moduleDef, nestedLabwareDef }) => (
+                      <Module key={moduleId} def={moduleDef} x={x} y={y}>
+                        {nestedLabwareDef != null ? (
+                          <LabwareRender definition={nestedLabwareDef} />
+                        ) : null}
+                      </Module>
+                    )
+                  )}
+                  {labwareRenderInfo
+                    .filter(l => l.labwareId !== command.params.labwareId)
+                    .map(({ x, y, labwareDef, labwareId }) => (
+                      <g key={labwareId} transform={`translate(${x},${y})`}>
+                        <LabwareRender definition={labwareDef} />
+                      </g>
+                    ))}
                 </>
-              )}
+              }
             />
           </Box>
         </Flex>
@@ -131,13 +177,15 @@ function MoveLabwareHeader(): JSX.Element {
 }
 
 interface LabwareDisplayLocationProps {
-  protocolData: RunData,
-  location: LabwareLocation,
+  protocolData: RunData
+  location: LabwareLocation
   robotType: RobotType
 }
-function LabwareDisplayLocation(props: LabwareDisplayLocationProps): JSX.Element{
+function LabwareDisplayLocation(
+  props: LabwareDisplayLocationProps
+): JSX.Element {
   const { t } = useTranslation('protocol_command_text')
-  const {protocolData, location, robotType} = props
+  const { protocolData, location, robotType } = props
   let displayLocation = ''
   if (location === 'offDeck') {
     displayLocation = t('off_deck')

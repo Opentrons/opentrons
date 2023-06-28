@@ -114,11 +114,16 @@ export function InterventionModal({
         />
       )
     } else if (command.commandType === 'moveLabware') {
-      return <MoveLabwareInterventionContent {...{command, run, analysis}} />
+      return <MoveLabwareInterventionContent {...{ command, run, analysis }} />
     } else {
       return null
     }
-  }, [command.id, analysis?.status, run.labware.map(l => l.id).join(), run.modules.map(m => m.id).join()])
+  }, [
+    command.id,
+    analysis?.status,
+    run.labware.map(l => l.id).join(),
+    run.modules.map(m => m.id).join(),
+  ])
 
   return (
     <Flex
