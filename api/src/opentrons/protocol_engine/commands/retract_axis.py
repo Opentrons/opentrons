@@ -51,9 +51,9 @@ class RetractAxisImplementation(
 class RetractAxis(BaseCommand[RetractAxisParams, RetractAxisResult]):
     """Command to retract the specified axis near its home position."""
 
-    commandType = RetractAxisCommandType = "retractAxis"
-    params = RetractAxisParams
-    result = Optional[RetractAxisResult]
+    commandType: RetractAxisCommandType = "retractAxis"
+    params: RetractAxisParams
+    result: Optional[RetractAxisResult]
 
     _ImplementationCls: Type[RetractAxisImplementation] = RetractAxisImplementation
 
@@ -61,7 +61,7 @@ class RetractAxis(BaseCommand[RetractAxisParams, RetractAxisResult]):
 class RetractAxisCreate(BaseCommandCreate[RetractAxisParams]):
     """Data to create a Retract Axis command."""
 
-    commandType = RetractAxisCommandType = "retractAxis"
-    params = RetractAxisParams
+    commandType: RetractAxisCommandType = "retractAxis"
+    params: RetractAxisParams
 
     _CommandCls: Type[RetractAxis] = RetractAxis
