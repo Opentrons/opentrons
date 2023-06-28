@@ -1,5 +1,8 @@
 """Protocol engine commands sub-state."""
 from __future__ import annotations
+
+from logging import getLogger
+
 from collections import OrderedDict
 from enum import Enum
 from dataclasses import dataclass
@@ -40,6 +43,8 @@ from ..errors.error_occurrence import ErrorOccurrenceWrapper
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
 from .config import Config
+
+log = getLogger(__name__)
 
 
 class QueueStatus(str, Enum):
@@ -254,10 +259,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 self._state.running_command_id = None
 
         elif isinstance(action, FailCommandAction):
+            log.info("in failed acation")
+            log.info(f"failed action error: {action.error} type {type(action.error)}")
             error_occurrence = ErrorOccurrence.from_failed(
                 id=action.error_id, createdAt=action.failed_at, error=action.error
             )
-
+            log.info(f"error_occurrence:: {error_occurrence}")
             prev_entry = self._state.commands_by_id[action.command_id]
             self._state.commands_by_id[action.command_id] = CommandEntry(
                 index=prev_entry.index,
@@ -332,10 +339,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.run_result = RunResult.STOPPED
 
                 if action.error_details:
+                    log.info("in finish action")
                     error_id = action.error_details.error_id
                     created_at = action.error_details.created_at
                     if isinstance(action.error_details.error, ErrorOccurrenceWrapper):
-                        error_occurrence = action.error_details.error.error_details
+                        error_occurrence = action.error_details.error.error
+                        log.info(f"finish command will have {error_occurrence}")
                         self._state.errors_by_id[error_id] = error_occurrence
                     else:
                         if not isinstance(

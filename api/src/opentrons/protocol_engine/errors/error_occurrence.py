@@ -1,4 +1,6 @@
 """Models for concrete occurrences of specific errors."""
+from logging import getLogger
+
 from datetime import datetime
 from typing import Any, Dict, List, Type, Union
 from pydantic import BaseModel, Field
@@ -6,6 +8,7 @@ from opentrons_shared_data.errors.codes import ErrorCodes
 from .exceptions import ProtocolEngineError
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 
+log = getLogger(__name__)
 
 # TODO(mc, 2021-11-12): flesh this model out with structured error data
 # for each error type so client may produce better error messages
@@ -67,11 +70,17 @@ class ErrorOccurrence(BaseModel):
             schema["required"].extend(["errorCode", "wrappedErrors", "errorInfo"])
 
 
-ErrorOccurrence.update_forward_refs()
-
-
 class ErrorOccurrenceWrapper(Exception):
     """Do not use this with public. only use this to transport data from thread"""
 
-    def __init__(self, error: ErrorOccurrence):
-        self.error_details = error
+    def __init__(self, wrapped_error: ErrorOccurrence) -> None:
+        """Initialize the computed view of liquid state.
+
+        Arguments:
+            state: Liquid state dataclass used for all calculations.
+        """
+        log.info(f"wrapped_errors init: {wrapped_error}")
+        self.error = wrapped_error
+
+
+ErrorOccurrence.update_forward_refs()

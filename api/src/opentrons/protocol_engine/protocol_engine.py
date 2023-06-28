@@ -1,11 +1,12 @@
 """ProtocolEngine class definition."""
-from logging import getLogger
 from typing import Dict, Optional
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
+
+from opentrons_shared_data.errors import ErrorCodes
 
 from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
@@ -42,8 +43,7 @@ from .actions import (
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
 )
-
-log = getLogger(__name__)
+from .errors.error_occurrence import ErrorOccurrenceWrapper
 
 
 class ProtocolEngine:
@@ -249,7 +249,12 @@ class ProtocolEngine:
                 If `False`, will set status to `stopped`.
         """
         if error:
-            log.info(f"did we get a estop error? {error}")
+            if (
+                isinstance(error, ErrorOccurrenceWrapper)
+                and error.error.errorCode == ErrorCodes.E_STOP_ACTIVATED.value.code
+            ):
+                drop_tips_and_home = False
+
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
                 created_at=self._model_utils.get_timestamp(),
