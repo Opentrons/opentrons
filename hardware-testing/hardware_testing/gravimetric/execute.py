@@ -571,7 +571,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
         first_tip_location = first_tip.top().move(setup_channel_offset)
         _pick_up_tip(ctx, pipette, cfg, location=first_tip_location)
-        print("moving to vial")
+        print("moving to scale")
         well = labware_on_scale["A1"]
         pipette.move_to(well.top())
         _liquid_height = _jog_to_find_liquid_height(ctx, pipette, well)
@@ -582,11 +582,13 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         )
         vial_volume = liquid_tracker.get_volume(well)
         print(f"software thinks there is {vial_volume} uL of liquid in the vial")
-        # NOTE: keep this same tip on to do the first trial
-        # print("dropping tip")
-        # _drop_tip(ctx, pipette, cfg)
-        # if not ctx.is_simulating():
-        #     ui.get_user_ready("REPLACE first Tip with NEW Tip")
+        print("dropping tip")
+        _drop_tip(ctx, pipette, cfg)
+        if not ctx.is_simulating():
+            ui.get_user_ready("REPLACE first Tip with NEW Tip")
+        # NOTE: pick that same tip up again
+        print("picking up tip")
+        _pick_up_tip(ctx, pipette, cfg, first_tip_location)
 
         if not cfg.blank or cfg.inspect:
             average_aspirate_evaporation_ul = 0.0
@@ -599,7 +601,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             for trial in range(config.NUM_BLANK_TRIALS):
                 ui.print_header(f"BLANK {trial + 1}/{config.NUM_BLANK_TRIALS}")
                 print("moving back to tip-rack")
-                pipette.move_to(first_tip.top(20))
+                pipette.move_to(first_tip_location.move(Point(z=20)))
                 evap_aspirate, _, evap_dispense, _ = _run_trial(
                     ctx=ctx,
                     pipette=pipette,
