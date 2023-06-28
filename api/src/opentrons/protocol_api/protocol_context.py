@@ -22,7 +22,6 @@ from opentrons.hardware_control.modules.types import MagneticBlockModel
 from opentrons.commands import protocol_commands as cmds, types as cmd_types
 from opentrons.commands.publisher import CommandPublisher, publish
 from opentrons.protocols.api_support import instrument as instrument_support
-from opentrons.protocols.api_support.constants import ENGINE_CORE_API_VERSION
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -41,6 +40,7 @@ from .core.module import (
     AbstractHeaterShakerCore,
     AbstractMagneticBlockCore,
 )
+from .core.engine import ENGINE_CORE_API_VERSION
 from .core.engine.protocol import ProtocolCore as ProtocolEngineCore
 from .core.legacy.legacy_protocol_core import LegacyProtocolCore
 

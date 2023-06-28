@@ -14,9 +14,8 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_engine import ProtocolEngine
 from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
-from opentrons.protocols.api_support.constants import ENGINE_CORE_API_VERSION
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
 from .protocol_context import ProtocolContext
 from .deck import Deck
@@ -30,7 +29,7 @@ from .core.legacy.labware_offset_provider import (
     NullLabwareOffsetProvider,
 )
 from .core.legacy_simulator.legacy_protocol_core import LegacyProtocolCoreSimulator
-from .core.engine import ProtocolCore
+from .core.engine import ENGINE_CORE_API_VERSION, ProtocolCore
 
 
 class ProtocolEngineCoreRequiredError(Exception):
