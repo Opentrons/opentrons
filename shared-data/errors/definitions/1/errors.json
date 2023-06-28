@@ -78,6 +78,10 @@
       "detail": "Position Estimation Invalid",
       "category": "roboticsControlError"
     },
+    "2006": {
+      "detail": "Move Condition Not Met",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"

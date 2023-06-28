@@ -376,7 +376,7 @@ class MotionPlanningFailureError(RoboticsControlError):
 
 
 class PositionEstimationInvalidError(RoboticsControlError):
-    """An error indicating that motion planning failed."""
+    """An error indicating that a command failed because position estimation was invalid."""
 
     def __init__(
         self,
@@ -386,6 +386,22 @@ class PositionEstimationInvalidError(RoboticsControlError):
     ) -> None:
         """Build a PositionEstimationFailedError."""
         super().__init__(ErrorCodes.POSITION_ESTIMATION_INVALID, message, detail, wrapping)
+
+
+class MoveConditionNotMetError(RoboticsControlError):
+    """An error indicating that a move completed without its condition being met."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a MoveConditionNotMetError."""
+        super().__init__(
+            ErrorCodes.MOVE_CONDITION_NOT_MET,
+            message or 'Move completed without its complete condition being met', detail, wrapping)
+
 
 class LabwareDroppedError(RoboticsInteractionError):
     """An error indicating that the gripper dropped labware it was holding."""

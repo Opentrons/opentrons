@@ -49,6 +49,7 @@ class ErrorCodes(Enum):
     STALL_OR_COLLISION_DETECTED = _code_from_dict_entry("2003")
     MOTION_PLANNING_FAILURE = _code_from_dict_entry("2004")
     POSITION_ESTIMATION_INVALID = _code_from_dict_entry('2005')
+    MOVE_CONDITION_NOT_MET = _code_from_dict_entry('2006')
     ROBOTICS_INTERACTION_ERROR = _code_from_dict_entry("3000")
     LABWARE_DROPPED = _code_from_dict_entry("3001")
     LABWARE_NOT_PICKED_UP = _code_from_dict_entry("3002")
