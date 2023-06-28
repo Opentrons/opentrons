@@ -7,6 +7,8 @@ from numpy import float64
 from math import copysign
 from typing_extensions import Literal
 
+from opentrons_shared_data.errors.exceptions import CanbusCommunicationError
+
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorId,
@@ -178,7 +180,14 @@ async def capacitive_probe(
         messenger,
     )
     if not threshold:
-        raise RuntimeError("Could not set threshold for probe")
+        raise CanbusCommunicationError(
+            message="Could not set threshold for probe",
+            detail={
+                "tool": tool.name,
+                "sensor": sensor_id.name,
+                "threshold": relative_threshold_pf,
+            },
+        )
     LOG.info(f"starting capacitive probe with threshold {threshold.to_float()}")
     pass_group = _build_pass_step([mover], {mover: distance}, {mover: speed})
     runner = MoveGroupRunner(move_groups=[[pass_group]])
