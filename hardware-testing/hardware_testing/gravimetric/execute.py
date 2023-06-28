@@ -1,10 +1,7 @@
 """Gravimetric."""
-from inspect import getsource
-from statistics import stdev
 from typing import Optional, Tuple, List, Dict
 
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
-from opentrons.types import Location
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
@@ -14,10 +11,21 @@ from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 from . import report
 from . import config
-from .helpers import get_pipette_unique_name
-from .workarounds import get_sync_hw_api, get_latest_offset_for_labware
-from .increments import get_volume_increments
-from .liquid_class.defaults import get_test_volumes, get_liquid_class
+from .helpers import (
+    get_pipette_unique_name,
+    _calculate_stats,
+    _get_operator_name,
+    _get_robot_serial,
+    _get_channel_offset,
+    _calculate_average,
+    _jog_to_find_liquid_height,
+    _get_tip_batch,
+    _apply_labware_offsets,
+    _pick_up_tip,
+    _drop_tip,
+    _get_volumes,
+)
+from .workarounds import get_sync_hw_api
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,
     dispense_with_liquid_class,
@@ -95,65 +103,6 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
     report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
 
 
-def _check_if_software_supports_high_volumes() -> bool:
-    src_a = getsource(Pipette.set_current_volume)
-    src_b = getsource(Pipette.ok_to_add_volume)
-    modified_a = "# assert new_volume <= self.working_volume" in src_a
-    modified_b = "return True" in src_b
-    return modified_a and modified_b
-
-
-def _reduce_volumes_to_not_exceed_software_limit(
-    test_volumes: List[float], cfg: config.GravimetricConfig
-) -> List[float]:
-    for i, v in enumerate(test_volumes):
-        liq_cls = get_liquid_class(
-            cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume, int(v)
-        )
-        max_vol = cfg.tip_volume - liq_cls.aspirate.air_gap.trailing_air_gap
-        test_volumes[i] = min(v, max_vol - 0.1)
-    return test_volumes
-
-
-def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[float]:
-    if cfg.increment:
-        test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
-    elif cfg.user_volumes and not ctx.is_simulating():
-        _inp = input('Enter desired volumes, comma separated (eg: "10,100,1000") :')
-        test_volumes = [
-            float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
-        ]
-    else:
-        test_volumes = get_test_volumes(
-            cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume
-        )
-    if not test_volumes:
-        raise ValueError("no volumes to test, check the configuration")
-    if not _check_if_software_supports_high_volumes():
-        if ctx.is_simulating():
-            test_volumes = _reduce_volumes_to_not_exceed_software_limit(
-                test_volumes, cfg
-            )
-        else:
-            raise RuntimeError("you are not the correct branch")
-    return sorted(test_volumes, reverse=False)  # lowest volumes first
-
-
-def _get_channel_offset(cfg: config.GravimetricConfig, channel: int) -> Point:
-    assert (
-        channel < cfg.pipette_channels
-    ), f"unexpected channel on {cfg.pipette_channels} channel pipette: {channel}"
-    if cfg.pipette_channels == 1:
-        return Point()
-    if cfg.pipette_channels == 8:
-        return Point(y=channel * 9.0)
-    if cfg.pipette_channels == 96:
-        row = channel % 8  # A-H
-        col = int(float(channel) / 8.0)  # 1-12
-        return Point(x=col * 9.0, y=row * 9.0)
-    raise ValueError(f"unexpected number of channels in config: {cfg.pipette_channels}")
-
-
 def _load_pipette(
     ctx: ProtocolContext, cfg: config.GravimetricConfig
 ) -> InstrumentContext:
@@ -186,22 +135,6 @@ def _load_pipette(
     return pipette
 
 
-def _apply_labware_offsets(
-    cfg: config.GravimetricConfig, tip_racks: List[Labware], labware_on_scale: Labware
-) -> None:
-    def _apply(labware: Labware) -> None:
-        o = get_latest_offset_for_labware(cfg.labware_offsets, labware)
-        print(
-            f'Apply labware offset to "{labware.name}" (slot={labware.parent}): '
-            f"x={round(o.x, 2)}, y={round(o.y, 2)}, z={round(o.z, 2)}"
-        )
-        labware.set_calibration(o)
-
-    _apply(labware_on_scale)
-    for rack in tip_racks:
-        _apply(rack)
-
-
 def _load_labware(
     ctx: ProtocolContext, cfg: config.GravimetricConfig
 ) -> Tuple[Labware, List[Labware]]:
@@ -231,50 +164,9 @@ def _load_labware(
     for ls in tiprack_load_settings:
         print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]} with namespace "{ls[2]}"')
         tipracks.append(ctx.load_labware(ls[1], location=ls[0], namespace=ls[2]))
-    _apply_labware_offsets(cfg, tipracks, labware_on_scale)
+    _apply_labware_offsets(cfg, tipracks)
+    _apply_labware_offsets(cfg, [labware_on_scale])
     return labware_on_scale, tipracks
-
-
-def _jog_to_find_liquid_height(
-    ctx: ProtocolContext, pipette: InstrumentContext, well: Well
-) -> float:
-    _well_depth = well.depth
-    _liquid_height = _well_depth
-    _jog_size = -1.0
-    if ctx.is_simulating():
-        return _liquid_height - 1
-    while True:
-        pipette.move_to(well.bottom(_liquid_height))
-        inp = input(
-            f"height={_liquid_height}: ENTER to jog {_jog_size} mm, "
-            f'or enter new jog size, or "yes" to save: '
-        )
-        if inp:
-            if inp[0] == "y":
-                break
-            try:
-                _jog_size = min(max(float(inp), -1.0), 1.0)
-            except ValueError:
-                continue
-        _liquid_height = min(max(_liquid_height + _jog_size, 0), _well_depth)
-    return _liquid_height
-
-
-def _calculate_average(volume_list: List[float]) -> float:
-    return sum(volume_list) / len(volume_list)
-
-
-def _calculate_stats(
-    volume_list: List[float], total_volume: float
-) -> Tuple[float, float, float]:
-    average = _calculate_average(volume_list)
-    if len(volume_list) <= 1:
-        print("skipping CV, only 1x trial per volume")
-        cv = -0.01  # negative number is impossible
-    else:
-        cv = stdev(volume_list) / average
-    d = (average - total_volume) / total_volume
-    return average, cv, d
 
 
 def _print_stats(mode: str, average: float, cv: float, d: float) -> None:
@@ -422,55 +314,6 @@ def _run_trial(
     volume_aspirate = calculate_change_in_volume(m_data_init, m_data_aspirate)
     volume_dispense = calculate_change_in_volume(m_data_aspirate, m_data_dispense)
     return volume_aspirate, m_data_aspirate, volume_dispense, m_data_dispense
-
-
-def _get_operator_name(is_simulating: bool) -> str:
-    if not is_simulating:
-        return input("OPERATOR name:").strip()
-    else:
-        return "simulation"
-
-
-def _get_robot_serial(is_simulating: bool) -> str:
-    if not is_simulating:
-        return input("ROBOT SERIAL NUMBER:").strip()
-    else:
-        return "simulation-serial-number"
-
-
-def _get_tip_batch(is_simulating: bool) -> str:
-    if not is_simulating:
-        return input("TIP BATCH:").strip()
-    else:
-        return "simulation-tip-batch"
-
-
-def _pick_up_tip(
-    ctx: ProtocolContext,
-    pipette: InstrumentContext,
-    cfg: config.GravimetricConfig,
-    location: Location,
-) -> None:
-    print(
-        f"picking tip {location.labware.as_well().well_name} "
-        f"from slot #{location.labware.parent.parent}"
-    )
-    pipette.pick_up_tip(location)
-    # NOTE: the accuracy-adjust function gets set on the Pipette
-    #       each time we pick-up a new tip.
-    if cfg.increment:
-        print("clearing pipette ul-per-mm table to be linear")
-        clear_pipette_ul_per_mm(
-            get_sync_hw_api(ctx)._obj_to_adapt,  # type: ignore[arg-type]
-            OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
-        )
-
-
-def _drop_tip(pipette: InstrumentContext, return_tip: bool) -> None:
-    if return_tip:
-        pipette.return_tip(home_after=False)
-    else:
-        pipette.drop_tip(home_after=False)
 
 
 def _get_test_channels(cfg: config.GravimetricConfig) -> List[int]:

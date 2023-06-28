@@ -1,11 +1,7 @@
 """Gravimetric."""
-from inspect import getsource
-from statistics import stdev
 from typing import Tuple, List, Dict
 from math import ceil
 
-from opentrons.hardware_control.instruments.ot3.pipette import Pipette
-from opentrons.types import Location
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 
 
@@ -20,9 +16,17 @@ from .measurement import (
 from .measurement.environment import read_environment_data
 from . import report
 from . import config
-from .helpers import get_pipette_unique_name
-from .workarounds import get_latest_offset_for_labware
-from .liquid_class.defaults import get_test_volumes, get_liquid_class
+from .helpers import (
+    get_pipette_unique_name,
+    _get_operator_name,
+    _get_robot_serial,
+    _jog_to_find_liquid_height,
+    _get_tip_batch,
+    _apply_labware_offsets,
+    _pick_up_tip,
+    _drop_tip,
+    _get_volumes,
+)
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,
     dispense_with_liquid_class,
@@ -59,50 +63,6 @@ def _get_dye_type(volume: float) -> str:
     return dye_type
 
 
-def _check_if_software_supports_high_volumes() -> bool:
-    src_a = getsource(Pipette.set_current_volume)
-    src_b = getsource(Pipette.ok_to_add_volume)
-    modified_a = "# assert new_volume <= self.working_volume" in src_a
-    modified_b = "return True" in src_b
-    return modified_a and modified_b
-
-
-def _reduce_volumes_to_not_exceed_software_limit(
-    test_volumes: List[float], cfg: config.PhotometricConfig
-) -> List[float]:
-    for i, v in enumerate(test_volumes):
-        liq_cls = get_liquid_class(cfg.pipette_volume, 96, cfg.tip_volume, int(v))
-        max_vol = cfg.tip_volume - liq_cls.aspirate.air_gap.trailing_air_gap
-        test_volumes[i] = min(v, max_vol - 0.1)
-    return test_volumes
-
-
-def _get_volumes(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> List[float]:
-    if cfg.user_volumes and not ctx.is_simulating():
-        _inp = input('Enter desired volumes, comma separated (eg: "10,100,1000") :')
-        test_volumes = [
-            float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
-        ]
-    else:
-        test_volumes = get_test_volumes(cfg.pipette_volume, 96, cfg.tip_volume)
-    if not test_volumes:
-        raise ValueError("no volumes to test, check the configuration")
-    if not _check_if_software_supports_high_volumes():
-        if ctx.is_simulating():
-            test_volumes = _reduce_volumes_to_not_exceed_software_limit(
-                test_volumes, cfg
-            )
-        else:
-            raise RuntimeError("you are not the correct branch")
-    return sorted(test_volumes, reverse=False)  # lowest volumes first
-
-
-def _get_channel_offset(cfg: config.PhotometricConfig, channel: int) -> Point:
-    row = channel % 8  # A-H
-    col = int(float(channel) / 8.0)  # 1-12
-    return Point(x=col * 9.0, y=row * 9.0)
-
-
 def _load_pipette(
     ctx: ProtocolContext, cfg: config.PhotometricConfig
 ) -> InstrumentContext:
@@ -115,26 +75,6 @@ def _load_pipette(
     )
     # pipette.default_speed = cfg.gantry_speed
     return pipette
-
-
-def _apply_labware_offsets(
-    cfg: config.PhotometricConfig,
-    tip_racks: List[Labware],
-    photoplate: Labware,
-    reservoir: Labware,
-) -> None:
-    def _apply(labware: Labware) -> None:
-        o = get_latest_offset_for_labware(cfg.labware_offsets, labware)
-        print(
-            f'Apply labware offset to "{labware.name}" (slot={labware.parent}): '
-            f"x={round(o.x, 2)}, y={round(o.y, 2)}, z={round(o.z, 2)}"
-        )
-        labware.set_calibration(o)
-
-    _apply(photoplate)
-    for rack in tip_racks:
-        _apply(rack)
-    _apply(reservoir)
 
 
 def _load_labware(
@@ -157,50 +97,9 @@ def _load_labware(
         ctx.load_labware(ls[1], location=ls[0], namespace=tiprack_namespace)
         for ls in tiprack_load_settings
     ]
-    _apply_labware_offsets(cfg, tipracks, photoplate, reservoir)
+    _apply_labware_offsets(cfg, tipracks)
+    _apply_labware_offsets(cfg, [photoplate, reservoir])
     return photoplate, reservoir, tipracks
-
-
-def _jog_to_find_liquid_height(
-    ctx: ProtocolContext, pipette: InstrumentContext, well: Well
-) -> float:
-    _well_depth = well.depth
-    _liquid_height = _well_depth
-    _jog_size = -1.0
-    if ctx.is_simulating():
-        return _liquid_height - 1
-    while True:
-        pipette.move_to(well.bottom(_liquid_height))
-        inp = input(
-            f"height={_liquid_height}: ENTER to jog {_jog_size} mm, "
-            f'or enter new jog size, or "yes" to save: '
-        )
-        if inp:
-            if inp[0] == "y":
-                break
-            try:
-                _jog_size = min(max(float(inp), -1.0), 1.0)
-            except ValueError:
-                continue
-        _liquid_height = min(max(_liquid_height + _jog_size, 0), _well_depth)
-    return _liquid_height
-
-
-def _calculate_average(volume_list: List[float]) -> float:
-    return sum(volume_list) / len(volume_list)
-
-
-def _calculate_stats(
-    volume_list: List[float], total_volume: float
-) -> Tuple[float, float, float]:
-    average = _calculate_average(volume_list)
-    if len(volume_list) <= 1:
-        print("skipping CV, only 1x trial per volume")
-        cv = -0.01  # negative number is impossible
-    else:
-        cv = stdev(volume_list) / average
-    d = (average - total_volume) / total_volume
-    return average, cv, d
 
 
 def _print_stats(mode: str, average: float, cv: float, d: float) -> None:
@@ -375,49 +274,6 @@ def _run_trial(
         if not ctx.is_simulating():
             ui.get_user_ready("add SEAL to plate and remove from DECK")
     return
-
-
-def _get_operator_name(is_simulating: bool) -> str:
-    if not is_simulating:
-        return input("OPERATOR name:").strip()
-    else:
-        return "simulation"
-
-
-def _get_robot_serial(is_simulating: bool) -> str:
-    if not is_simulating:
-        return input("ROBOT SERIAL NUMBER:").strip()
-    else:
-        return "simulation-serial-number"
-
-
-def _get_tip_batch(is_simulating: bool) -> str:
-    if not is_simulating:
-        return input("TIP BATCH:").strip()
-    else:
-        return "simulation-tip-batch"
-
-
-def _pick_up_tip(
-    ctx: ProtocolContext,
-    pipette: InstrumentContext,
-    cfg: config.PhotometricConfig,
-    location: Location,
-) -> None:
-    print(
-        f"picking tip {location.labware.as_well().well_name} "
-        f"from slot #{location.labware.parent.parent}"
-    )
-    pipette.pick_up_tip(location)
-
-
-def _drop_tip(
-    ctx: ProtocolContext, pipette: InstrumentContext, cfg: config.PhotometricConfig
-) -> None:
-    if cfg.return_tip:
-        pipette.return_tip(home_after=False)
-    else:
-        pipette.drop_tip(home_after=False)
 
 
 def _display_dye_information(
