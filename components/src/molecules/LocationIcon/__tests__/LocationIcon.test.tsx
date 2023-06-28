@@ -7,7 +7,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
-import { LocationIcon } from '../'
+import { LocationIcon } from '..'
 
 const render = (props: React.ComponentProps<typeof LocationIcon>) => {
   return renderWithProviders(<LocationIcon {...props} />)

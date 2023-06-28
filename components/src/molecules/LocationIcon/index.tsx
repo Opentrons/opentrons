@@ -1,25 +1,27 @@
 import * as React from 'react'
 
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  COLORS,
-  Flex,
-  Icon,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { Icon } from '../../icons'
+import { Flex, Text } from '../../primitives'
+import { ALIGN_CENTER } from '../../styles'
+import { BORDERS, COLORS, SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-import { StyledText } from '../../atoms/text'
+import type { IconName } from '../../icons'
+import type { StyleProps } from '../../primitives'
 
-import type { IconName, StyleProps } from '@opentrons/components'
-
-interface LocationIconProps extends StyleProps {
+interface SlotLocationProps extends StyleProps {
   /** name constant of the slot to display */
-  slotName?: string
-  /** name constant of the slot to display */
-  iconName?: IconName
+  slotName: string
+  iconName?: undefined
 }
+
+interface HardwareIconProps extends StyleProps {
+  /** hardware icon name */
+  iconName: IconName
+  slotName?: undefined
+}
+
+// type union requires one of slotName or iconName, but not both
+type LocationIconProps = SlotLocationProps | HardwareIconProps
 
 export function LocationIcon({
   slotName,
@@ -49,9 +51,7 @@ export function LocationIcon({
           aria-label={iconName}
         />
       ) : (
-        <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightBold}>
-          {slotName}
-        </StyledText>
+        <Text css={TYPOGRAPHY.smallBodyTextBold}>{slotName}</Text>
       )}
     </Flex>
   )

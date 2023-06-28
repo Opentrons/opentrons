@@ -1,12 +1,9 @@
 import * as React from 'react'
 
-import {
-  Flex,
-  RobotCoordsForeignObject,
-  DIRECTION_COLUMN,
-} from '@opentrons/components'
-
-import { LocationIcon } from '../LocationIcon'
+import { LocationIcon } from '../../molecules'
+import { Flex } from '../../primitives'
+import { DIRECTION_COLUMN } from '../../styles'
+import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import type { RobotType } from '@opentrons/shared-data'
 
