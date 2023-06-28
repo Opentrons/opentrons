@@ -31,7 +31,7 @@ export function LocationIcon({
       height="2rem"
       width="max-content"
       padding={`${SPACING.spacing4}  ${
-        slotName != null ? SPACING.spacing8 : '6px'
+        slotName != null ? SPACING.spacing8 : '0.375rem'
       }`}
       border={`2px solid ${COLORS.darkBlack100}`}
       borderRadius={BORDERS.borderRadiusSize3}
