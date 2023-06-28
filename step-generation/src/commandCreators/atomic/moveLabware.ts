@@ -55,6 +55,9 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
       ? newLocation.moduleId
       : null
 
+  if (newLocation === 'offDeck' && useGripper) {
+    errors.push(errorCreators.labwareOffDeck())
+  }
   if (destModuleId != null) {
     const destModuleState = prevRobotState.modules[destModuleId].moduleState
     if (
