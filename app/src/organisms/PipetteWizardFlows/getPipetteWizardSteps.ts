@@ -39,6 +39,11 @@ export const getPipetteWizardSteps = (
             flowType: flowType,
           },
           { section: SECTIONS.MOUNT_PIPETTE, mount: mount, flowType: flowType },
+          {
+            section: SECTIONS.FIRMWARE_UPDATE,
+            mount: mount,
+            flowType: flowType,
+          },
           { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
           { section: SECTIONS.ATTACH_PROBE, mount: mount, flowType: flowType },
           { section: SECTIONS.DETACH_PROBE, mount: mount, flowType: flowType },
@@ -86,6 +91,11 @@ export const getPipetteWizardSteps = (
               mount: LEFT,
               flowType: flowType,
             },
+            {
+              section: SECTIONS.FIRMWARE_UPDATE,
+              mount: mount,
+              flowType: flowType,
+            },
             { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
             {
               section: SECTIONS.ATTACH_PROBE,
@@ -123,6 +133,11 @@ export const getPipetteWizardSteps = (
             },
             {
               section: SECTIONS.MOUNT_PIPETTE,
+              mount: mount,
+              flowType: flowType,
+            },
+            {
+              section: SECTIONS.FIRMWARE_UPDATE,
               mount: mount,
               flowType: flowType,
             },

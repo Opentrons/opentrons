@@ -30,6 +30,10 @@ class MoveManager(Generic[AxisKey]):
         """Update system constraints when instruments are changed."""
         self._constraints = constraints
 
+    def get_constraints(self) -> SystemConstraints[AxisKey]:
+        """Retrieve current system constraints."""
+        return self._constraints
+
     def _clear_blend_log(self) -> None:
         """Empty the blend log."""
         self._blend_log = []

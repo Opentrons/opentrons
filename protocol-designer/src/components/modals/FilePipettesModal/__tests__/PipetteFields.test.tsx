@@ -6,20 +6,24 @@ import {
   DropdownField,
   OutlineButton,
 } from '@opentrons/components'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
+import { LabwareDefinition2 } from '../../../../../../shared-data/lib/js/types.d'
 import { actions as labwareDefActions } from '../../../../labware-defs'
 import { getOnlyLatestDefs } from '../../../../labware-defs/utils'
+import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
+import { FormPipette } from '../../../../step-forms'
+
 import { PipetteFields, Props } from '../PipetteFields'
 import { PipetteDiagram } from '../PipetteDiagram'
-import { FormPipette } from '../../../../step-forms'
-import { LabwareDefinition2 } from '../../../../../../shared-data/lib/js/types.d'
 
 import type { ActionMeta } from 'react-select'
 import type { SelectOption } from '@opentrons/components'
 
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/selectors')
+jest.mock('../../../../file-data/selectors')
 jest.mock('../../../../labware-defs/utils')
 jest.mock('../../../../labware-defs/actions')
 
@@ -29,6 +33,10 @@ const getOnlyLatestDefsMock = getOnlyLatestDefs as jest.MockedFunction<
 
 const createCustomTiprackDefMock = labwareDefActions.createCustomTiprackDef as jest.MockedFunction<
   typeof labwareDefActions.createCustomTiprackDef
+>
+
+const getAllowAllTipracksMock = getAllowAllTipracks as jest.MockedFunction<
+  typeof getAllowAllTipracks
 >
 
 describe('PipetteFields', () => {
@@ -73,13 +81,14 @@ describe('PipetteFields', () => {
       },
       errors: null,
       touched: null,
-      robotType: 'OT-2 Standard',
+      robotType: OT2_ROBOT_TYPE,
     }
 
     getOnlyLatestDefsMock.mockReturnValue({
       tiprack_300: fixture_tiprack_300_ul as LabwareDefinition2,
       tiprack_1000: fixture_tiprack_1000_ul as LabwareDefinition2,
     })
+    getAllowAllTipracksMock.mockReturnValue(false)
   })
 
   function render(props: Props) {
