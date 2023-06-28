@@ -2,7 +2,6 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   CompletedProtocolAnalysis,
-  LoadLabwareRunTimeCommand,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 
@@ -15,7 +14,6 @@ import {
   mockMoveLabwareCommandFromModule,
   truncatedCommandMessage,
 } from '../__fixtures__'
-import { RunData } from '@opentrons/api-client'
 import { mockTipRackDefinition } from '../../../redux/custom-labware/__fixtures__'
 
 const ROBOT_NAME = 'Otie'
