@@ -3,7 +3,6 @@ import { SPACING, COLORS, Box } from '@opentrons/components'
 import { LegacyModalHeader } from './LegacyModalHeader'
 import { LegacyModalShell } from './LegacyModalShell'
 import type { StyleProps } from '@opentrons/components'
-import { isError } from 'lodash'
 
 type ModalType = 'info' | 'warning' | 'error'
 export * from './LegacyModalShell'
