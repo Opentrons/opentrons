@@ -47,7 +47,7 @@ export function NetworkSetupMenu(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={5} currentStep={1} />
+      <StepMeter totalSteps={6} currentStep={1} />
       <Flex
         padding={`${SPACING.spacing32} ${SPACING.spacing60} ${SPACING.spacing60}`}
         flexDirection={DIRECTION_COLUMN}
