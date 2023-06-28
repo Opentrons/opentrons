@@ -296,10 +296,14 @@ class InternalMessageFormatError(CommunicationError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build an InternalMesasgeFormatError."""
-        super().__init__(ErrorCodes.INTERNAL_MESSAGE_FORMAT_ERROR, message, detail, wrapping)
+        super().__init__(
+            ErrorCodes.INTERNAL_MESSAGE_FORMAT_ERROR, message, detail, wrapping
+        )
+
 
 class CANBusConfigurationError(CommunicationError):
     """An error indicating a misconfiguration of the CANbus."""
+
     def __init__(
         self,
         message: Optional[str] = None,
@@ -307,10 +311,14 @@ class CANBusConfigurationError(CommunicationError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a CANBus Configuration Error."""
-        super().__init__(ErrorCodes.CANBUS_CONFIGURATION_ERROR, message, detail, wrapping)
+        super().__init__(
+            ErrorCodes.CANBUS_CONFIGURATION_ERROR, message, detail, wrapping
+        )
+
 
 class CANBusBusError(CommunicationError):
     """An error indicating a low-level bus error on the CANbus like an error frame."""
+
     def __init__(
         self,
         message: Optional[str] = None,
@@ -385,7 +393,9 @@ class PositionEstimationInvalidError(RoboticsControlError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a PositionEstimationFailedError."""
-        super().__init__(ErrorCodes.POSITION_ESTIMATION_INVALID, message, detail, wrapping)
+        super().__init__(
+            ErrorCodes.POSITION_ESTIMATION_INVALID, message, detail, wrapping
+        )
 
 
 class MoveConditionNotMetError(RoboticsControlError):
@@ -400,7 +410,10 @@ class MoveConditionNotMetError(RoboticsControlError):
         """Build a MoveConditionNotMetError."""
         super().__init__(
             ErrorCodes.MOVE_CONDITION_NOT_MET,
-            message or 'Move completed without its complete condition being met', detail, wrapping)
+            message or "Move completed without its complete condition being met",
+            detail,
+            wrapping,
+        )
 
 
 class LabwareDroppedError(RoboticsInteractionError):
@@ -576,6 +589,7 @@ class ModuleNotPresent(RoboticsInteractionError):
         super().__init__(
             ErrorCodes.MODULE_NOT_PRESENT, checked_message, checked_detail, wrapping
         )
+
 
 class InvalidInstrumentData(RoboticsInteractionError):
     """An error indicating that instrument data is invalid."""
