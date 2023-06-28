@@ -51,6 +51,7 @@ class PhotometricConfig:
     gantry_speed: int
     touch_tip: bool
     refill: bool
+    pipette_channels: int = 96
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]

@@ -1,23 +1,32 @@
 """Opentrons helper methods."""
 import asyncio
 from types import MethodType
-from typing import Any, List, Dict, Optional
+from typing import Any, List, Dict, Optional, Union, Tuple
+from statistics import stdev
+from . import config
+from .liquid_class.defaults import get_liquid_class, get_test_volumes
+from .increments import get_volume_increments
+from inspect import getsource
 
 from opentrons import protocol_api
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
-from opentrons.protocol_api.labware import Well
+from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control.thread_manager import ThreadManager
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 
-from opentrons.types import Point
+from opentrons.types import Point, Location
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 from hardware_testing.opentrons_api import helpers_ot3
+from opentrons.protocol_api import ProtocolContext, InstrumentContext
+from .workarounds import get_sync_hw_api, get_latest_offset_for_labware
+from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
 
 
 def _add_fake_simulate(
@@ -104,3 +113,181 @@ def get_pipette_unique_name(pipette: protocol_api.InstrumentContext) -> str:
 def gantry_position_as_point(position: Dict[Axis, float]) -> Point:
     """Helper to convert Dict[Axis, float] to a Point()."""
     return Point(x=position[Axis.X], y=position[Axis.Y], z=position[Axis.Z])
+
+
+def _jog_to_find_liquid_height(
+    ctx: ProtocolContext, pipette: InstrumentContext, well: Well
+) -> float:
+    _well_depth = well.depth
+    _liquid_height = _well_depth
+    _jog_size = -1.0
+    if ctx.is_simulating():
+        return _liquid_height - 1
+    while True:
+        pipette.move_to(well.bottom(_liquid_height))
+        inp = input(
+            f"height={_liquid_height}: ENTER to jog {_jog_size} mm, "
+            f'or enter new jog size, or "yes" to save: '
+        )
+        if inp:
+            if inp[0] == "y":
+                break
+            try:
+                _jog_size = min(max(float(inp), -1.0), 1.0)
+            except ValueError:
+                continue
+        _liquid_height = min(max(_liquid_height + _jog_size, 0), _well_depth)
+    return _liquid_height
+
+
+def _calculate_average(volume_list: List[float]) -> float:
+    return sum(volume_list) / len(volume_list)
+
+
+def _reduce_volumes_to_not_exceed_software_limit(
+    test_volumes: List[float],
+    cfg: Union[config.GravimetricConfig, config.PhotometricConfig],
+) -> List[float]:
+    for i, v in enumerate(test_volumes):
+        liq_cls = get_liquid_class(
+            cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume, int(v)
+        )
+        max_vol = cfg.tip_volume - liq_cls.aspirate.air_gap.trailing_air_gap
+        test_volumes[i] = min(v, max_vol - 0.1)
+    return test_volumes
+
+
+def _check_if_software_supports_high_volumes() -> bool:
+    src_a = getsource(Pipette.set_current_volume)
+    src_b = getsource(Pipette.ok_to_add_volume)
+    modified_a = "# assert new_volume <= self.working_volume" in src_a
+    modified_b = "return True" in src_b
+    return modified_a and modified_b
+
+
+def _get_channel_offset(
+    cfg: Union[config.GravimetricConfig, config.PhotometricConfig], channel: int
+) -> Point:
+    assert (
+        channel < cfg.pipette_channels
+    ), f"unexpected channel on {cfg.pipette_channels} channel pipette: {channel}"
+    if cfg.pipette_channels == 1:
+        return Point()
+    if cfg.pipette_channels == 8:
+        return Point(y=channel * 9.0)
+    if cfg.pipette_channels == 96:
+        row = channel % 8  # A-H
+        col = int(float(channel) / 8.0)  # 1-12
+        return Point(x=col * 9.0, y=row * 9.0)
+    raise ValueError(f"unexpected number of channels in config: {cfg.pipette_channels}")
+
+
+def _get_robot_serial(is_simulating: bool) -> str:
+    if not is_simulating:
+        return input("ROBOT SERIAL NUMBER:").strip()
+    else:
+        return "simulation-serial-number"
+
+
+def _get_operator_name(is_simulating: bool) -> str:
+    if not is_simulating:
+        return input("OPERATOR name:").strip()
+    else:
+        return "simulation"
+
+
+def _calculate_stats(
+    volume_list: List[float], total_volume: float
+) -> Tuple[float, float, float]:
+    average = _calculate_average(volume_list)
+    if len(volume_list) <= 1:
+        print("skipping CV, only 1x trial per volume")
+        cv = -0.01  # negative number is impossible
+    else:
+        cv = stdev(volume_list) / average
+    d = (average - total_volume) / total_volume
+    return average, cv, d
+
+
+def _get_tip_batch(is_simulating: bool) -> str:
+    if not is_simulating:
+        return input("TIP BATCH:").strip()
+    else:
+        return "simulation-tip-batch"
+
+
+def _apply(
+    labware: Labware, cfg: Union[config.GravimetricConfig, config.PhotometricConfig]
+) -> None:
+    o = get_latest_offset_for_labware(cfg.labware_offsets, labware)
+    print(
+        f'Apply labware offset to "{labware.name}" (slot={labware.parent}): '
+        f"x={round(o.x, 2)}, y={round(o.y, 2)}, z={round(o.z, 2)}"
+    )
+    labware.set_calibration(o)
+
+
+def _apply_labware_offsets(
+    cfg: Union[config.GravimetricConfig, config.PhotometricConfig],
+    labwares: List[Labware],
+) -> None:
+    for lw in labwares:
+        _apply(lw, cfg)
+
+
+def _pick_up_tip(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    cfg: Union[config.GravimetricConfig, config.PhotometricConfig],
+    location: Location,
+) -> None:
+    print(
+        f"picking tip {location.labware.as_well().well_name} "
+        f"from slot #{location.labware.parent.parent}"
+    )
+    pipette.pick_up_tip(location)
+    # NOTE: the accuracy-adjust function gets set on the Pipette
+    #       each time we pick-up a new tip.
+    if getattr(cfg, "increment", False):
+        print("clearing pipette ul-per-mm table to be linear")
+        clear_pipette_ul_per_mm(
+            get_sync_hw_api(ctx)._obj_to_adapt,  # type: ignore[arg-type]
+            OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
+        )
+
+
+def _drop_tip(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+    cfg: Union[config.GravimetricConfig, config.PhotometricConfig],
+) -> None:
+    if cfg.return_tip:
+        pipette.return_tip(home_after=False)
+    else:
+        pipette.drop_tip(home_after=False)
+
+
+def _get_volumes(
+    ctx: ProtocolContext, cfg: Union[config.GravimetricConfig, config.PhotometricConfig]
+) -> List[float]:
+    if getattr(cfg, "increment", False):
+        test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
+    elif cfg.user_volumes and not ctx.is_simulating():
+        _inp = input('Enter desired volumes, comma separated (eg: "10,100,1000") :')
+        test_volumes = [
+            float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
+        ]
+    else:
+        test_volumes = get_test_volumes(
+            cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume
+        )
+    if not test_volumes:
+        raise ValueError("no volumes to test, check the configuration")
+    if not _check_if_software_supports_high_volumes():
+        if ctx.is_simulating():
+            test_volumes = _reduce_volumes_to_not_exceed_software_limit(
+                test_volumes, cfg
+            )
+        else:
+            raise RuntimeError("you are not the correct branch")
+    return sorted(test_volumes, reverse=False)  # lowest volumes first
