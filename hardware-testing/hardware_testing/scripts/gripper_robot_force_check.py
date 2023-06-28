@@ -38,7 +38,7 @@ def build_arg_parser():
     arg_parser.add_argument('-n', '--part_number', type=str, required=False, help='Sets the gripper part number', default="DVT-00")
     arg_parser.add_argument('-i', '--continuous', action="store_true", required=False, help='Continuous grip')
     arg_parser.add_argument('-b', '--backlash', action="store_true", required=False, help='Backlash test')
-    arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Sets the slider slot number', default=5)
+    arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Sets the slider slot number', default=6)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
@@ -70,6 +70,7 @@ class Gripper_Robot_Force_Check:
         self.test_data = {
             "Time":"None",
             "Cycle":"None",
+            "Slot":"None",
             "Part Number":"None",
             "Serial Number":"None",
             "Input Force":"None",
