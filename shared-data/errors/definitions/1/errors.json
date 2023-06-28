@@ -110,8 +110,28 @@
       "detail": "Unexpected Tip Presence",
       "category": "roboticsInteractionError"
     },
+    "3013": {
+      "detail": "Firmware Update Required",
+      "category": "roboticsInteractionError"
+    },
+    "3014": {
+      "detail": "Invalid Actuator",
+      "category": "roboticsInteractionError"
+    },
+    "3015": {
+      "detail": "Module Not Present",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
+      "category": "generalError"
+    },
+    "4001": {
+      "detail": "Robot In Use",
+      "category": "generalError"
+    },
+    "4002": {
+      "detail": "API Removed",
       "category": "generalError"
     }
   }

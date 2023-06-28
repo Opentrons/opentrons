@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { COLORS, PrimaryButton } from '@opentrons/components'
-import { ModalShell } from '../Modal'
+import { LegacyModalShell } from '../LegacyModal'
 import { WizardHeader } from '../WizardHeader'
 import { SimpleWizardBody } from './index'
 
@@ -12,10 +12,10 @@ export default {
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof SimpleWizardBody>> = args => (
-  <ModalShell>
+  <LegacyModalShell>
     <WizardHeader currentStep={3} totalSteps={4} title="Attach a pipette" />
     <SimpleWizardBody {...args} />
-  </ModalShell>
+  </LegacyModalShell>
 )
 
 export const AlertIcon = Template.bind({})

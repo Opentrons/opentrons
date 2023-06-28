@@ -120,7 +120,7 @@ const ProtocolNameText = styled.span`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};

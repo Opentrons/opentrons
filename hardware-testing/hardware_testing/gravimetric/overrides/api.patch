@@ -1,69 +1,49 @@
+diff --cc hardware-testing/hardware_testing/gravimetric/overrides/api.patch
+index 4035e961fa,1dfde3aa43..0000000000
+deleted file mode 100644,100644
+--- a/hardware-testing/hardware_testing/gravimetric/overrides/api.patch
++++ /dev/null
 diff --git a/api/src/opentrons/config/defaults_ot3.py b/api/src/opentrons/config/defaults_ot3.py
-index 5b21328a92..1bb9a6ceb8 100644
+index 7d5560b54a..ecd2656f1e 100644
 --- a/api/src/opentrons/config/defaults_ot3.py
 +++ b/api/src/opentrons/config/defaults_ot3.py
-@@ -83,7 +83,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
-         OT3AxisKind.X: 375,
-         OT3AxisKind.Y: 375,
-         OT3AxisKind.Z: 35,
--        OT3AxisKind.P: 5,
-+        OT3AxisKind.P: 15,
-         OT3AxisKind.Z_G: 50,
-         OT3AxisKind.Q: 5.5,
-     },
-@@ -91,25 +91,25 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
-         OT3AxisKind.X: 375,
-         OT3AxisKind.Y: 375,
+@@ -92,25 +92,25 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
+         OT3AxisKind.X: 400,
+         OT3AxisKind.Y: 325,
          OT3AxisKind.Z: 100,
--        OT3AxisKind.P: 45,
-+        OT3AxisKind.P: 70,
+         OT3AxisKind.P: 70,
          OT3AxisKind.Z_G: 50,
      },
  )
  
  DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
      high_throughput={
--        OT3AxisKind.X: 600,
--        OT3AxisKind.Y: 600,
-+        OT3AxisKind.X: 500,
-+        OT3AxisKind.Y: 500,
-         OT3AxisKind.Z: 120,
+         OT3AxisKind.X: 800,
+         OT3AxisKind.Y: 500,
+         OT3AxisKind.Z: 150,
 -        OT3AxisKind.P: 30,
-+        OT3AxisKind.P: 1000,
++        OT3AxisKind.P: 1000,  # FIXME: move to liquid-class
          OT3AxisKind.Z_G: 150,
          OT3AxisKind.Q: 10,
      },
      low_throughput={
--        OT3AxisKind.X: 600,
--        OT3AxisKind.Y: 600,
-+        OT3AxisKind.X: 500,
-+        OT3AxisKind.Y: 200,
-         OT3AxisKind.Z: 300,
+         OT3AxisKind.X: 800,
+         OT3AxisKind.Y: 600,
+         OT3AxisKind.Z: 150,
 -        OT3AxisKind.P: 100,
-+        OT3AxisKind.P: 1500,
++        OT3AxisKind.P: 1500,  # FIXME: move to liquid-class
          OT3AxisKind.Z_G: 150,
      },
  )
-@@ -120,7 +120,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
+@@ -121,7 +121,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
      high_throughput={
          OT3AxisKind.X: 10,
          OT3AxisKind.Y: 10,
 -        OT3AxisKind.Z: 5,
-+        OT3AxisKind.Z: 15,
++        OT3AxisKind.Z: 15,  # FIXME: move to liquid-class
          OT3AxisKind.P: 5,
          OT3AxisKind.Z_G: 10,
          OT3AxisKind.Q: 5,
-@@ -176,8 +176,8 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
-     high_throughput={
-         OT3AxisKind.X: 1.4,
-         OT3AxisKind.Y: 1.4,
--        OT3AxisKind.Z: 1.4,
--        OT3AxisKind.P: 2.2,
-+        OT3AxisKind.Z: 1.5,
-+        OT3AxisKind.P: 0.8,
-         OT3AxisKind.Z_G: 0.67,
-         OT3AxisKind.Q: 1.5,
-     },
 diff --git a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
 index 815dada3b9..30121fc4c8 100644
 --- a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
@@ -93,10 +73,10 @@ index 815dada3b9..30121fc4c8 100644
      def add_tip(self, tip_length: float) -> None:
          """
 diff --git a/api/src/opentrons/hardware_control/ot3api.py b/api/src/opentrons/hardware_control/ot3api.py
-index 58a768a775..b1dc2d7e5b 100644
+index 3b3d96fdbf..ca9b0e045b 100644
 --- a/api/src/opentrons/hardware_control/ot3api.py
 +++ b/api/src/opentrons/hardware_control/ot3api.py
-@@ -1662,8 +1662,8 @@ class OT3API(
+@@ -1682,8 +1682,8 @@ class OT3API(
          # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
          #       but not with DVT pipettes because those can only detect drops
  
@@ -107,17 +87,17 @@ index 58a768a775..b1dc2d7e5b 100644
  
          _add_tip_to_instrs()
  
-@@ -1744,8 +1744,8 @@ class OT3API(
+@@ -1764,8 +1764,8 @@ class OT3API(
          )
  
          # TODO: implement tip-detection sequence during drop-tip for 96ch
 -        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
 -            await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
 +        # if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
-+        #     await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
-         _remove()
++        #    await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
  
-     async def clean_up(self) -> None:
+         # home mount axis
+         if home_after:
 diff --git a/api/src/opentrons/protocol_api/core/legacy/deck.py b/api/src/opentrons/protocol_api/core/legacy/deck.py
 index 54bca33742..e6b49e47fe 100644
 --- a/api/src/opentrons/protocol_api/core/legacy/deck.py

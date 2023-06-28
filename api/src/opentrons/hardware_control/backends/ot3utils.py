@@ -1,6 +1,7 @@
 """Shared utilities for ot3 hardware control."""
 from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence
 from typing_extensions import Literal
+from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
     OT3Axis,
@@ -234,6 +235,29 @@ def get_system_constraints(
                 conf_by_pip["max_speed_discontinuity"][axis_kind],
                 conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
                 conf_by_pip["default_max_speed"][axis_kind],
+            )
+    return constraints
+
+
+def get_system_constraints_for_calibration(
+    config: OT3MotionSettings,
+    gantry_load: GantryLoad,
+) -> "SystemConstraints[OT3Axis]":
+    conf_by_pip = config.by_gantry_load(gantry_load)
+    constraints = {}
+    for axis_kind in [
+        OT3AxisKind.P,
+        OT3AxisKind.X,
+        OT3AxisKind.Y,
+        OT3AxisKind.Z,
+        OT3AxisKind.Z_G,
+    ]:
+        for axis in OT3Axis.of_kind(axis_kind):
+            constraints[axis] = AxisConstraints.build(
+                conf_by_pip["acceleration"][axis_kind],
+                conf_by_pip["max_speed_discontinuity"][axis_kind],
+                conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
+                DEFAULT_CALIBRATION_AXIS_MAX_SPEED,
             )
     return constraints
 

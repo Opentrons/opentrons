@@ -32,6 +32,8 @@ const mockGripperData = {
       last_modified: 'date',
     },
   },
+  subsystem: 'gripper',
+  ok: true,
 }
 const mockLeftPipetteData = {
   instrumentModel: 'p1000_multi_gen3',
@@ -49,6 +51,8 @@ const mockLeftPipetteData = {
       last_modified: 'date',
     },
   },
+  subsystem: 'pipette_left',
+  ok: true,
 }
 
 const render = (
