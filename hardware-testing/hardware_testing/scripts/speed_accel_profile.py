@@ -49,9 +49,9 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
             "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25}
         },
         "Y": {
-            "SPEED": {"MIN": 250, "MAX": 400, "INC": 75},
+            "SPEED": {"MIN": 225, "MAX": 375, "INC": 75},
             "ACCEL": {"MIN": 550, "MAX": 750, "INC": 100},
-            "CURRENT": {"MIN": 0.9, "MAX": 1.4, "INC": 0.25}
+            "CURRENT": {"MIN": 1, "MAX": 1.4, "INC": 0.2}
         },
         "L": {
             "SPEED": {"MIN": 80, "MAX": 120, "INC": 20},
@@ -76,8 +76,8 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
             "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25}
         },
         "Y": {
-            "SPEED": {"MIN": 250, "MAX": 400, "INC": 75},
-            "ACCEL": {"MIN": 400, "MAX": 600, "INC": 100},
+            "SPEED": {"MIN": 225, "MAX": 375, "INC": 75},
+            "ACCEL": {"MIN": 500, "MAX": 700, "INC": 100},
             "CURRENT": {"MIN": 1.3, "MAX": 1.5, "INC": 0.1}
         },
         "L": {
