@@ -104,7 +104,9 @@ def run_gravimetric(
 ) -> None:
     """Run."""
     if increment:
-        protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[pipette_volume][pipette_channels][tip_volume]
+        protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[pipette_volume][pipette_channels][
+            tip_volume
+        ]
     else:
         protocol_cfg = GRAVIMETRIC_CFG[pipette_volume][pipette_channels][tip_volume]
     execute.run(
