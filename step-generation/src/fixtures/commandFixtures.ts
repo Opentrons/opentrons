@@ -3,7 +3,7 @@ import type {
   AspDispAirgapParams,
   BlowoutParams,
   TouchTipParams,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import { FIXED_TRASH_ID } from '../constants'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { CommandsAndWarnings, CommandCreatorErrorResponse } from '../types'

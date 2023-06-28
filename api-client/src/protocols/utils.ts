@@ -11,13 +11,13 @@ import type {
   LoadedLabware,
   LoadedModule,
 } from '@opentrons/shared-data'
-import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7'
 import type {
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
   LoadPipetteRunTimeCommand,
   LoadLiquidRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 interface PipetteNamesByMount {
   left: PipetteName | null

@@ -42,14 +42,13 @@ import type {
 import type {
   CreateCommand,
   ProtocolFile,
-} from '@opentrons/shared-data/protocol/types/schemaV6'
+} from '@opentrons/shared-data/protocol/types/schemaV7'
 import type { Selector } from '../../types'
 import type {
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
@@ -102,6 +101,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
+
   (
     fileMetadata,
     initialRobotState,
@@ -310,8 +310,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     }
     return {
       ...protocolFile,
-      $otSharedSchema: '#/protocol/schemas/6',
-      schemaVersion: 6,
+      $otSharedSchema: '#/protocol/schemas/7',
+      schemaVersion: 7,
       modules,
       commands,
     }

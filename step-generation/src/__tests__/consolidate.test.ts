@@ -25,7 +25,7 @@ import {
 } from '../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
-import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type { ConsolidateArgs, InvariantContext, RobotState } from '../types'
 const airGapHelper = makeAirGapHelper({
   wellLocation: {

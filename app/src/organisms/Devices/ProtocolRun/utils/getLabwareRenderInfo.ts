@@ -6,7 +6,7 @@ import {
   ProtocolAnalysisFile,
   ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 const getSlotPosition = (
   deckDef: DeckDefinition,
@@ -61,7 +61,12 @@ export const getLabwareRenderInfo = (
       const location = command.params.location
       const displayName = command.params.displayName ?? null
       const labwareDef = command.result?.definition
-      if (location === 'offDeck' || 'moduleId' in location) return acc
+      if (
+        location === 'offDeck' ||
+        'moduleId' in location ||
+        'labwareId' in location
+      )
+        return acc
       if (labwareId == null) {
         throw new Error('expected to find labware id but could not')
       }

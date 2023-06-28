@@ -72,7 +72,11 @@ export type SetupCreateCommand =
   | LoadLiquidCreateCommand
   | MoveLabwareCreateCommand
 
-export type LabwareLocation = { slotName: string } | { moduleId: string }
+export type LabwareLocation =
+  | 'offDeck'
+  | { slotName: string }
+  | { moduleId: string }
+  | { labwareId: string }
 
 export interface ModuleLocation {
   slotName: string
@@ -94,9 +98,16 @@ interface LoadLabwareResult {
   definition: LabwareDefinition2
   offset: LabwareOffset
 }
-interface MoveLabwareParams {
+
+export type LabwareMovementStrategy =
+  | 'usingGripper'
+  | 'manualMoveWithPause'
+  | 'manualMoveWithoutPause'
+
+export interface MoveLabwareParams {
   labwareId: string
   newLocation: LabwareLocation
+  strategy: LabwareMovementStrategy
 }
 interface MoveLabwareResult {
   offsetId: string
