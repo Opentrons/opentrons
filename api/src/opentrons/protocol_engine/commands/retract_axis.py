@@ -19,13 +19,15 @@ class RetractAxisParams(BaseModel):
     axis: MotorAxis = Field(
         ...,
         description=(
-            "Axis to retract as close to its home positions as safely possible."
+            "Axis to retract to its home position as safely as possible."
             " The difference between retracting an axis and homing an axis using the"
-            " home command is that a home will move the axis (slowly) until it finds"
-            " the home limit switch, while retraction attempts to move the axis"
-            " either to the previously recorded home position in case of the Flex,"
-            " or a safe distance away from the previously recorded home position"
-            " in the case of the OT-2."
+            " home command is that a home will always probe the limit switch and"
+            " will work as the first motion command a robot will need to execute;"
+            " On the other hand, retraction will rely on this previously determined "
+            " home position to move to it as fast as safely possible."
+            " So on the Flex, it will move (fast) the axis to the previously recorded home position"
+            " and on the OT2, it will move (fast) the axis a safe distance from the previously"
+            " recorded home position, and then slowly approach the limit switch."
         ),
     )
 
@@ -49,7 +51,7 @@ class RetractAxisImplementation(
 
 
 class RetractAxis(BaseCommand[RetractAxisParams, RetractAxisResult]):
-    """Command to retract the specified axis near its home position."""
+    """Command to retract the specified axis to its home position."""
 
     commandType: RetractAxisCommandType = "retractAxis"
     params: RetractAxisParams

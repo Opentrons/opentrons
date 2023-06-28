@@ -198,6 +198,7 @@ class MovementHandler:
     async def retract_axis(self, axis: MotorAxis) -> None:
         """Retract the requested axis as close to its home positions as safely possible.
 
-        For the OT2, the axis will retract to a safe distance from its limit switch.
+        For the OT2, the axis will retract to a safe distance from its limit switch,
+        and then probe the limit switch to reach the home position.
         For the OT3, the axis will retract to its known home position.
         """
