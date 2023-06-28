@@ -63,7 +63,9 @@ class FirmwareUpdateInitiator:
                         if i < retry_count:
                             i += 1
                         else:
-                            raise BootloaderNotReady()
+                            raise BootloaderNotReady(
+                                target.bootloader_node.application_for()
+                            )
             logger.info("initiate: released exclusive")
 
     async def _wait_bootloader(self, reader: WaitableCallback, target: Target) -> None:

@@ -69,7 +69,7 @@ class FirmwareUpdateDownloader:
                         self._wait_data_message_ack(node_id, reader), ack_wait_seconds
                     )
                 except asyncio.TimeoutError:
-                    raise TimeoutResponse(data_message)
+                    raise TimeoutResponse(data_message, node_id)
 
                 crc32 = binascii.crc32(data, crc32)
                 num_messages += 1
@@ -88,7 +88,7 @@ class FirmwareUpdateDownloader:
                     self._wait_update_complete_ack(node_id, reader), ack_wait_seconds
                 )
             except asyncio.TimeoutError:
-                raise TimeoutResponse(complete_message)
+                raise TimeoutResponse(complete_message, node_id)
 
     @staticmethod
     async def _wait_data_message_ack(node_id: NodeId, reader: WaitableCallback) -> None:
@@ -99,7 +99,7 @@ class FirmwareUpdateDownloader:
                     response, message_definitions.FirmwareUpdateDataAcknowledge
                 ):
                     if response.payload.error_code.value != ErrorCode.ok:
-                        raise ErrorResponse(response)
+                        raise ErrorResponse(response, node_id)
                     break
 
     @staticmethod
@@ -113,5 +113,5 @@ class FirmwareUpdateDownloader:
                     response, message_definitions.FirmwareUpdateCompleteAcknowledge
                 ):
                     if response.payload.error_code.value != ErrorCode.ok:
-                        raise ErrorResponse(response)
+                        raise ErrorResponse(response, node_id)
                     break

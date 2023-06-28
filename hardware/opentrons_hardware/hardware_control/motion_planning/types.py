@@ -19,6 +19,8 @@ from typing import (
     TYPE_CHECKING,
 )
 
+from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
+
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
@@ -104,7 +106,14 @@ class Move(Generic[AxisKey]):
         """Constructor."""
         # verify unit vector before creating Move
         if not is_unit_vector(unit_vector):
-            raise ValueError(f"{unit_vector} is not a valid unit vector.")
+            raise MotionPlanningFailureError(
+                f"Invalid unit vector: {unit_vector}",
+                detail={
+                    "unit_vector": str(unit_vector),
+                    "distance": str(distance),
+                    "max_speed": str(max_speed),
+                },
+            )
         self.unit_vector = unit_vector
         self.distance = distance
         self.max_speed = max_speed
@@ -241,7 +250,9 @@ class AxisConstraints:
 SystemConstraints = Dict[AxisKey, AxisConstraints]
 
 
-class ZeroLengthMoveError(ValueError, Generic[AxisKey, CoordinateValue]):
+class ZeroLengthMoveError(
+    MotionPlanningFailureError, Generic[AxisKey, CoordinateValue]
+):
     """Error that handles trying to make a unit vector from a 0-length input.
 
     A unit vector would be undefined in this scenario, so this is the only safe way to
@@ -258,7 +269,10 @@ class ZeroLengthMoveError(ValueError, Generic[AxisKey, CoordinateValue]):
         """Build the exception with the data that caused it."""
         self._origin: Coordinates[AxisKey, CoordinateValue] = origin
         self._destination: Coordinates[AxisKey, CoordinateValue] = destination
-        super().__init__()
+        super(MotionPlanningFailureError, self).__init__(
+            message="Zero length move",
+            detail={"origin": str(origin), "destination": str(destination)},
+        )
 
     def __repr__(self) -> str:
         """Stringify."""
