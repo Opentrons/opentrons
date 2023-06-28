@@ -60,7 +60,7 @@ def info_from_serial_string(serialval: str) -> Tuple[PipetteName, int, bytes]:
     except KeyError:
         raise InvalidInstrumentData(
             message=f"The pipette name part of the serial number ({matches.group('name')}) is unknown. {SERIAL_FORMAT_MSG}",
-            detail={"serial": name, "name": matches.group("name")},
+            detail={"name": matches.group("name")},
         )
     model = int(matches.group("model"))
 

@@ -27,33 +27,21 @@ from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationIdParts,
 )
 from opentrons_hardware.firmware_bindings.message import CanMessage
-from opentrons_hardware.firmware_bindings.utils.binary_serializable import (
-    BinarySerializable,
-)
-
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     MessageId,
     FunctionCode,
-    ErrorSeverity,
     ErrorCode,
 )
-
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     Acknowledgement,
     ErrorMessage,
 )
-
 from opentrons_hardware.firmware_bindings.messages.messages import (
     MessageDefinition,
     get_definition,
 )
-
-from opentrons_hardware.firmware_bindings.messages.payloads import ErrorMessagePayload
-
 from opentrons_hardware.firmware_bindings.utils import BinarySerializableException
-
-from opentrons_hardware.errors import raise_from_error_message
 
 log = logging.getLogger(__name__)
 

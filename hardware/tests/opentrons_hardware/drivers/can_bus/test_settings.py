@@ -2,6 +2,7 @@
 import pytest
 
 from typing import Optional
+from opentrons_shared_data.errors.exceptions import CANBusConfigurationError
 from opentrons_hardware.drivers.can_bus import settings
 
 
@@ -94,7 +95,7 @@ def test_invalid_calculate_bit_timings(
     match_str: str,
 ) -> None:
     """Test invalid bit timing calculations."""
-    with pytest.raises(ValueError, match=match_str):
+    with pytest.raises(CANBusConfigurationError, match=match_str):
         settings.calculate_fdcan_parameters(
             fcan_clock, bitrate, sample_rate, jump_width
         )
