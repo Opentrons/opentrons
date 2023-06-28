@@ -241,6 +241,17 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
               lidMotorState,
               blockTargetTemp: moduleState.blockTargetTemp,
             }
+          } else if (
+            'targetTemperature' in moduleState &&
+            moduleState.type === 'temperatureModuleType'
+          ) {
+            return {
+              targetTemperature: moduleState.targetTemperature,
+            }
+          } else if ('targetTemp' in moduleState) {
+            return {
+              targetTemp: moduleState.targetTemp,
+            }
           }
         }
         const labwareLoadedOnModule = allLabware.find(

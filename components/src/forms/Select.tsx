@@ -15,6 +15,7 @@ import type {
   StylesConfig,
   CSSObjectWithLabel,
 } from 'react-select'
+import { Box, SPACING } from '..'
 
 export { reactSelectComponents }
 
@@ -68,7 +69,10 @@ const NO_STYLE_FN = (): CSSObjectWithLabel => VOID_STYLE as CSSObjectWithLabel
 const CLEAR_STYLES: StylesConfig<SelectOption> = {
   clearIndicator: NO_STYLE_FN,
   container: NO_STYLE_FN,
-  control: NO_STYLE_FN,
+  control: (styles: CSSObjectWithLabel) => ({
+    ...styles,
+    width: '15rem',
+  }),
   dropdownIndicator: NO_STYLE_FN,
   group: NO_STYLE_FN,
   groupHeading: NO_STYLE_FN,
@@ -113,13 +117,20 @@ function DropdownIndicator(
 ): JSX.Element {
   return (
     <reactSelectComponents.DropdownIndicator {...props}>
-      <div
-        className={cx(styles.dropdown_indicator, {
-          [styles.flipped]: props.selectProps.menuIsOpen,
-        })}
+      <Box
+        position={POSITION_ABSOLUTE}
+        top="0.55rem"
+        right={SPACING.spacing8}
+        width={SPACING.spacing20}
       >
-        <Icon name="menu-down" className={cx(styles.dropdown_indicator_icon)} />
-      </div>
+        <Icon
+          name="menu-down"
+          transform={`rotate(${
+            props.selectProps.menuIsOpen === true ? '180' : '0'
+          })`}
+          height="1.25rem"
+        />
+      </Box>
     </reactSelectComponents.DropdownIndicator>
   )
 }
