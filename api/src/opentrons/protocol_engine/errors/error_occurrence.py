@@ -71,7 +71,7 @@ class ErrorOccurrence(BaseModel):
             schema["required"].extend(["errorCode", "wrappedErrors", "errorInfo"])
 
 
-class _TransportErrorOccurrence(Exception):
+class _ErrorOccurrenceFromChildThread(Exception):
     """Wrap a ErrorOccurrence exception from a child thread.
 
     Should not be exposed to the public.

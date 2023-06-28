@@ -1,5 +1,6 @@
 """ProtocolEngine class definition."""
 from typing import Dict, Optional
+from logging import getLogger
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -43,7 +44,10 @@ from .actions import (
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
 )
-from .errors.error_occurrence import _TransportErrorOccurrence
+from .errors.error_occurrence import _ErrorOccurrenceFromChildThread
+
+
+log = getLogger(__name__)
 
 
 class ProtocolEngine:
@@ -249,8 +253,9 @@ class ProtocolEngine:
                 If `False`, will set status to `stopped`.
         """
         if error:
+            log.info(f"got and estop? {error}")
             if (
-                isinstance(error, _TransportErrorOccurrence)
+                isinstance(error, _ErrorOccurrenceFromChildThread)
                 and error.error.errorCode == ErrorCodes.E_STOP_ACTIVATED.value.code
             ):
                 drop_tips_and_home = False

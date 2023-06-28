@@ -36,10 +36,9 @@ from ..errors import (
     RobotDoorOpenError,
     SetupCommandNotAllowedError,
     PauseNotAllowedError,
-    ProtocolCommandFailedError,
     UnexpectedProtocolError,
 )
-from ..errors.error_occurrence import _TransportErrorOccurrence
+from ..errors.error_occurrence import _ErrorOccurrenceFromChildThread
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
 from .config import Config
@@ -343,7 +342,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     error_id = action.error_details.error_id
                     created_at = action.error_details.created_at
                     if isinstance(
-                        action.error_details.error, _TransportErrorOccurrence
+                        action.error_details.error, _ErrorOccurrenceFromChildThread
                     ):
                         error_occurrence = action.error_details.error.error
                         log.info(f"finish command will have {error_occurrence}")
@@ -573,7 +572,7 @@ class CommandView(HasState[CommandState]):
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
-                    raise ProtocolCommandFailedError(command.error.detail)
+                    raise _ErrorOccurrenceFromChildThread(wrapped_error=command.error)
             return True
         else:
             return False
