@@ -10,7 +10,16 @@ import argparse
 import logging
 import os
 import sys
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional, TextIO, Union
+from typing import (
+    TYPE_CHECKING,
+    BinaryIO,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    TextIO,
+    Union,
+)
 
 from opentrons import protocol_api, __version__, should_use_ot3
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
@@ -227,7 +236,7 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
 
 
 def execute(
-    protocol_file: TextIO,
+    protocol_file: Union[BinaryIO, TextIO],
     protocol_name: str,
     propagate_logs: bool = False,
     log_level: str = "warning",
