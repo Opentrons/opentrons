@@ -100,6 +100,7 @@ def test_sessions_create_error(sessions_api_client, mock_session_manager):
                 "id": "UncategorizedError",
                 "detail": "Please attach pipettes before proceeding",
                 "title": "Action Forbidden",
+                "errorCode": "4000",
             }
         ]
     }
@@ -167,6 +168,7 @@ def test_sessions_delete_not_found(sessions_api_client, mock_session_manager):
                 "id": "UncategorizedError",
                 "title": "Resource Not Found",
                 "detail": "Resource type 'session' with id 'check' was not found",
+                "errorCode": "4000",
             }
         ],
         "links": {
@@ -217,6 +219,7 @@ def test_sessions_get_not_found(mock_session_manager, sessions_api_client):
                 "id": "UncategorizedError",
                 "detail": "Resource type 'session' with id '1234' was not found",
                 "title": "Resource Not Found",
+                "errorCode": "4000",
             }
         ],
         "links": {
@@ -306,6 +309,7 @@ def test_sessions_execute_command_no_session(sessions_api_client, mock_session_m
                 "id": "UncategorizedError",
                 "title": "Resource Not Found",
                 "detail": "Resource type 'session' with id '1234' was not found",
+                "errorCode": "4000",
             }
         ],
         "links": {
@@ -402,6 +406,7 @@ def test_execute_command_error(
                 "detail": "Cannot do it",
                 "title": "Action Forbidden",
                 "id": "UncategorizedError",
+                "errorCode": "4000",
             }
         ]
     }
@@ -431,6 +436,7 @@ def test_execute_command_session_inactive(
                 "detail": f"Session '{mock_session.meta.identifier}'"
                 f" is not active. Only the active session can "
                 f"execute commands",
+                "errorCode": "4000",
             }
         ]
     }

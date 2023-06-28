@@ -6,6 +6,8 @@ from fastapi import Depends, status
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import ProtocolEngine
 
+from opentrons_shared_data.errors import ErrorCodes
+
 from robot_server.errors import ErrorDetails
 from robot_server.hardware import get_hardware
 from robot_server.runs import EngineStore, EngineConflictError, get_engine_store
@@ -24,6 +26,7 @@ class RunActive(ErrorDetails):
         "There is an active run. Close the current run"
         " to issue commands via POST /commands."
     )
+    errorCode: str = ErrorCodes.ROBOT_IN_USE.value.code
 
 
 async def get_default_engine(
@@ -35,7 +38,7 @@ async def get_default_engine(
     try:
         engine = await engine_store.get_default_engine()
     except EngineConflictError as e:
-        raise RunActive().as_error(status.HTTP_409_CONFLICT) from e
+        raise RunActive.from_exc(e).as_error(status.HTTP_409_CONFLICT) from e
 
     attached_modules = hardware_api.attached_modules
     attached_module_spec = {

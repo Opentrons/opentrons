@@ -202,6 +202,19 @@ class PythonException(GeneralError):
         )
 
 
+class RobotInUseError(CommunicationError):
+    """An error indicating that an action cannot proceed because another is in progress."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CanbusCommunicationError."""
+        super().__init__(ErrorCodes.ROBOT_IN_USE, message, detail, wrapping)
+
+
 class CanbusCommunicationError(CommunicationError):
     """An error indicating a problem with canbus communication."""
 
@@ -392,6 +405,19 @@ class UnexpectedTipAttachError(RoboticsInteractionError):
         super().__init__(ErrorCodes.UNEXPECTED_TIP_ATTACH, message, detail, wrapping)
 
 
+class FirmwareUpdateRequiredError(RoboticsInteractionError):
+    """An error indicating that a firmware update is required."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FirmwareUpdateRequiredError."""
+        super().__init__(ErrorCodes.FIRMWARE_UPDATE_REQUIRED, message, detail, wrapping)
+
+
 class PipetteOverpressureError(RoboticsInteractionError):
     """An error indicating that a pipette experienced an overpressure event, likely because of a clog."""
 
@@ -453,5 +479,61 @@ class GripperNotPresentError(RoboticsInteractionError):
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build an GripperNotPresentError."""
+        """Build a GripperNotPresentError."""
         super().__init__(ErrorCodes.GRIPPER_NOT_PRESENT, message, detail, wrapping)
+
+
+class InvalidActuator(RoboticsInteractionError):
+    """An error indicating that a specified actuator is not valid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an GripperNotPresentError."""
+        super().__init__(ErrorCodes.INVALID_ACTUATOR, message, detail, wrapping)
+
+
+class ModuleNotPresent(RoboticsInteractionError):
+    """An error indicating that a specific module was not present."""
+
+    def __init__(
+        self,
+        identifier: str,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ModuleNotPresentError."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["identifier"] = identifier
+        checked_message = message or f"Module {identifier} is not present"
+        super().__init__(
+            ErrorCodes.MODULE_NOT_PRESENT, checked_message, checked_detail, wrapping
+        )
+
+
+class APIRemoved(GeneralError):
+    """An error indicating that a specific API is no longer available."""
+
+    def __init__(
+        self,
+        api_element: str,
+        since_version: str,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an APIRemoved error."""
+        checked_detail: Dict[str, Any] = detail or {}
+        checked_detail["identifier"] = api_element
+        checked_detail["since_version"] = since_version
+        checked_message = (
+            message
+            or f"{api_element} is no longer available since version {since_version}."
+        )
+        super().__init__(
+            ErrorCodes.API_REMOVED, checked_message, checked_detail, wrapping
+        )

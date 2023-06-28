@@ -52,7 +52,10 @@ def test_post_log_level_upstream_fails_reload(api_client):
         )
         body = response.json()
         assert response.status_code == 500
-        assert body == {"message": "Could not reload config: stdout stderr"}
+        assert body == {
+            "message": "Could not reload config: stdout stderr",
+            "errorCode": "4000",
+        }
         m.assert_called_once_with(log_level)
 
 
@@ -207,7 +210,7 @@ def test_modify_pipette_settings_failure(api_client, mock_pipette_config):
     )
     patch_body = resp.json()
     assert resp.status_code == 412
-    assert patch_body == {"message": "Failed!"}
+    assert patch_body == {"message": "Failed!", "errorCode": "4000"}
 
 
 def test_available_resets(api_client):
@@ -433,14 +436,23 @@ def test_get(
 
 
 @pytest.mark.parametrize(
-    argnames=["exc", "expected_status"],
+    argnames=["exc", "expected_status", "message"],
     argvalues=[
-        [ValueError("Failure"), 400],
-        [advanced_settings.SettingException("Fail", "e"), 500],
+        [ValueError("Failure"), 400, "ValueError: Failure"],
+        [
+            advanced_settings.SettingException("Fail", "e"),
+            500,
+            "opentrons.config.advanced_settings.SettingException: Fail",
+        ],
     ],
 )
 def test_set_err(
-    api_client, mock_is_restart_required, mock_set_adv_setting, exc, expected_status
+    api_client,
+    mock_is_restart_required,
+    mock_set_adv_setting,
+    exc,
+    expected_status,
+    message,
 ):
     mock_is_restart_required.return_value = False
 
@@ -454,7 +466,7 @@ def test_set_err(
     resp = api_client.post("/settings", json={"id": test_id, "value": True})
     body = resp.json()
     assert resp.status_code == expected_status
-    assert body == {"message": str(exc)}
+    assert body == {"message": message, "errorCode": "4000"}
 
 
 def test_set(api_client, mock_set_adv_setting, mock_is_restart_required):
