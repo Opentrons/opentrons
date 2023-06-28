@@ -2,7 +2,7 @@ import type { RunTimeCommand } from '@opentrons/shared-data'
 import type {
   LoadModuleRunTimeCommand,
   ModuleLocation,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 
 interface ModuleInitialLoadInfo {
   location: ModuleLocation

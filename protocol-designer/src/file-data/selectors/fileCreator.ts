@@ -175,6 +175,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           key: uuid(),
           commandType: 'loadPipette' as const,
           params: {
+            pipetteName: pipettes[pipette.mount].name,
             pipetteId: pipetteId,
             mount: pipette.mount,
           },

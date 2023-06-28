@@ -23,11 +23,11 @@ import {
   GRIPPER_V1_1,
   MAGNETIC_BLOCK_V1,
 } from './constants'
+import { EXTENSION } from '.'
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
 import type { PipetteName } from './pipettes'
-import { LabwareLocation } from '../protocol/types/schemaV6/command/setup'
-import { EXTENSION } from '.'
+import type { LabwareLocation } from '../protocol/types/schemaV7/command/setup'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 

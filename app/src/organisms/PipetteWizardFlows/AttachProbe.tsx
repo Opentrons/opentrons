@@ -61,14 +61,12 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     chainRunCommands(
       [
         {
-          // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/calibratePipette' as const,
           params: {
             mount: mount,
           },
         },
         {
-          // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: mount,

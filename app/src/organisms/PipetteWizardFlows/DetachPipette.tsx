@@ -41,7 +41,6 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
     chainRunCommands(
       [
         {
-          // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: RIGHT,

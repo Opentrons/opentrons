@@ -7,14 +7,15 @@ import {
   getLabwareDefURI,
   CompletedProtocolAnalysis,
 } from '@opentrons/shared-data'
-import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { PickUpTipRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6'
+} from '@opentrons/shared-data/protocol/types/schemaV7'
 import type { LabwareToOrder } from '../types'
 import { getModuleInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getModuleInitialLoadInfo'
-import { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import { getAdapterInitialLoadInfo } from '../../Devices/ProtocolRun/utils/getAdapterInitialLoadInfo'
 
 export const tipRackOrderSort = (
   tiprack1: LabwareToOrder,
@@ -160,12 +161,32 @@ export const getLabwareIdsInOrder = (
           let slot = ''
           if (loc === 'offDeck') {
             slot = 'offDeck'
+          } else if ('moduleId' in loc) {
+            slot = getModuleInitialLoadInfo(loc.moduleId, commands).location
+              .slotName
+          } else if ('labwareId' in loc) {
+            const adapterLabwareLocation = getAdapterInitialLoadInfo(
+              loc.labwareId,
+              commands
+            ).location
+            if (
+              adapterLabwareLocation === 'offDeck' ||
+              'labwareId' in adapterLabwareLocation
+            ) {
+              slot = ''
+              throw new Error(
+                'could not find the labware definition on top of the adapter'
+              )
+            } else if ('moduleId' in adapterLabwareLocation) {
+              slot = getModuleInitialLoadInfo(
+                adapterLabwareLocation.moduleId,
+                commands
+              ).location.slotName
+            } else {
+              slot = adapterLabwareLocation.slotName
+            }
           } else {
-            slot =
-              'moduleId' in loc
-                ? getModuleInitialLoadInfo(loc.moduleId, commands).location
-                    .slotName
-                : loc.slotName
+            slot = loc.slotName
           }
           return [
             ...innerAcc,
@@ -210,12 +231,17 @@ export const getAllUniqLocationsForLabware = (
     return [{ slotName: '12' }]
   }
   const labwareLocation = commands.reduce<LabwareLocation[]>(
-    (acc, command: RunTimeCommand) =>
-      command.commandType === 'loadLabware' &&
-      command.result?.definition.parameters.format !== 'trash' &&
-      command.result?.labwareId === labwareId
-        ? [...acc, command.params.location]
-        : acc,
+    (acc, command: RunTimeCommand) => {
+      if (
+        command.commandType === 'loadLabware' &&
+        command.result?.definition.parameters.format !== 'trash' &&
+        command.result?.labwareId === labwareId
+      ) {
+        const { location } = command.params
+        return [...acc, location]
+      }
+      return acc
+    },
     []
   )
 

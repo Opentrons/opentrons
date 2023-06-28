@@ -17,7 +17,6 @@ import type { ShellState, ShellAction } from './shell/types'
 import type { ConfigState, ConfigAction } from './config/types'
 import type { DiscoveryState, DiscoveryAction } from './discovery/types'
 import type { NetworkingState, NetworkingAction } from './networking/types'
-import type { ProtocolState, ProtocolAction } from './protocol/types'
 import type {
   ProtocolStorageState,
   ProtocolStorageAction,
@@ -54,7 +53,6 @@ export interface State {
   readonly discovery: DiscoveryState
   readonly networking: NetworkingState
   readonly labware: CustomLabwareState
-  readonly protocol: ProtocolState
   readonly shell: ShellState
   readonly systemInfo: SystemInfoState
   readonly alerts: AlertsState
@@ -76,7 +74,6 @@ export type Action =
   | ConfigAction
   | RouterAction
   | DiscoveryAction
-  | ProtocolAction
   | ProtocolAnalysisAction
   | ProtocolStorageAction
   | CustomLabwareAction

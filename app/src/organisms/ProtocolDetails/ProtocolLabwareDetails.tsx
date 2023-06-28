@@ -21,7 +21,7 @@ import { Portal } from '../../App/portal'
 import { LabwareDetails } from '../LabwareDetails'
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 
-import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+import type { LoadLabwareRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 import type { LabwareDefAndDate } from '../../pages/Labware/hooks'
 
 interface ProtocolLabwareDetailsProps {

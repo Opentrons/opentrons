@@ -108,7 +108,7 @@ export const ReturnTip = (props: ReturnTipProps): JSX.Element | null => {
             labwareId: labwareId,
             wellName: 'A1',
             wellLocation: {
-              origin: 'default',
+              origin: 'bottom',
               offset: tipPickUpOffset ?? undefined,
             },
           },

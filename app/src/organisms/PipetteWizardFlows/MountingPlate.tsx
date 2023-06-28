@@ -32,7 +32,6 @@ export const MountingPlate = (
           params: { axes: ['rightZ'] },
         },
         {
-          // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: LEFT,

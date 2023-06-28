@@ -33,7 +33,6 @@ export function CalibrationErrorModal(
     chainRunCommands(
       [
         {
-          // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/moveToMaintenancePosition' as const,
           params: {
             mount: mount,

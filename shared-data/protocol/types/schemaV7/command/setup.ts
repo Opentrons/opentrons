@@ -81,7 +81,8 @@ export type LabwareLocation =
 export interface ModuleLocation {
   slotName: string
 }
-interface LoadPipetteParams {
+export interface LoadPipetteParams {
+  pipetteName: string
   pipetteId: string
   mount: 'left' | 'right'
 }
