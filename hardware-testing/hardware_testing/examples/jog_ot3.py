@@ -61,7 +61,9 @@ async def _exercise_gripper(api: OT3API) -> None:
             print(f"unexpected input: {inp}")
 
 
-async def _main(is_simulating: bool, mount: types.OT3Mount, speed: Optional[float]) -> None:
+async def _main(
+    is_simulating: bool, mount: types.OT3Mount, speed: Optional[float]
+) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
     while True:

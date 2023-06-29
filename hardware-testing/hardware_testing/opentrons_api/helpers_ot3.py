@@ -546,7 +546,11 @@ def _jog_read_user_input(terminator: str, home_key: str) -> Tuple[str, float, bo
 
 
 async def _jog_axis_some_distance(
-    api: OT3API, mount: OT3Mount, axis: str, distance: float, speed: Optional[float],
+    api: OT3API,
+    mount: OT3Mount,
+    axis: str,
+    distance: float,
+    speed: Optional[float],
 ) -> None:
     if not axis or distance == 0.0:
         return
@@ -618,7 +622,7 @@ async def jog_mount_ot3(
     mount: OT3Mount,
     critical_point: Optional[CriticalPoint] = None,
     display: Optional[bool] = True,
-    speed: Optional[float] = None
+    speed: Optional[float] = None,
 ) -> Dict[OT3Axis, float]:
     """Jog an OT3 mount's gantry XYZ and pipettes axes."""
     if api.is_simulator:
@@ -632,7 +636,14 @@ async def jog_mount_ot3(
     while True:
         try:
             axis, distance, do_home = await _jog_do_print_then_input_then_move(
-                api, mount, critical_point, axis, distance, do_home, display=display, speed=speed,
+                api,
+                mount,
+                critical_point,
+                axis,
+                distance,
+                do_home,
+                display=display,
+                speed=speed,
             )
         except ValueError as e:
             print(e)
