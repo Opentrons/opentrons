@@ -67,9 +67,11 @@ class ErrorCodes(Enum):
     MODULE_NOT_PRESENT = _code_from_dict_entry("3015")
     INVALID_INSTRUMENT_DATA = _code_from_dict_entry("3016")
     OUT_OF_BOUNDS_MOVE = _code_from_dict_entry('3017')
+    INVALID_PARAMETER = _code_from_dict_entry('3018')
     GENERAL_ERROR = _code_from_dict_entry("4000")
     ROBOT_IN_USE = _code_from_dict_entry("4001")
     API_REMOVED = _code_from_dict_entry("4002")
+    NOT_SUPPORTED_BY_HARDWARE = _code_from_dict_entry("4003")
 
     @classmethod
     @lru_cache(25)

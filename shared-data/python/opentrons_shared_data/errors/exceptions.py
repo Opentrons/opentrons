@@ -614,6 +614,17 @@ class OutOfBoundsMoveError(RoboticsInteractionError):
         """Build an OutOfBoundsMoveError."""
         super().__init__(ErrorCodes.OUT_OF_BOUNDS_MOVE, message, detail, wrapping)
 
+class InvalidParameterError(RoboticsInteractionError):
+    """An error indicating a robotcs interaction had an invalid parameter."""
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InvalidParameterError."""
+        super().__init__(ErrorCodes.INVALID_PARAMETER, message, detail, wrapping)
+
 class APIRemoved(GeneralError):
     """An error indicating that a specific API is no longer available."""
 
@@ -636,3 +647,13 @@ class APIRemoved(GeneralError):
         super().__init__(
             ErrorCodes.API_REMOVED, checked_message, checked_detail, wrapping
         )
+
+class NotSupportedByHardwareError(GeneralError):
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a NotSupportedByHardwareError."""
+        super().__init__(ErrorCodes.NOT_SUPPORTED_BY_HARDWARE, message, detail, wrapping)

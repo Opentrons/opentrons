@@ -150,6 +150,10 @@
       "detail": "Out Of Bounds Move",
       "category": "roboticsInteractionError"
     },
+    "3018": {
+      "detail": "Invalid Parameter",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"
@@ -160,6 +164,10 @@
     },
     "4002": {
       "detail": "API Removed",
+      "category": "generalError"
+    },
+    "4003": {
+      "detail": "Not Supported By Hardware",
       "category": "generalError"
     }
   }
