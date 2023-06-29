@@ -52,31 +52,6 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
     marginRight: SPACING.spacing8,
   }
 
-  // const MODAL_PROPS_BY_TYPE: Record<
-  //   ModalType,
-  //   { icon?: IconProps; backgroundColor?: string; hasOutline?: boolean }
-  // > = {
-  //   info: {
-  //     icon: undefined,
-  //     hasOutline: false,
-  //   },
-  //   warning: {
-  //     icon: modalIcon,
-  //     backgroundColor: '',
-  //     hasOutline: false,
-  //   },
-  //   error: {
-  //     icon: modalIcon,
-  //     backgroundColor: '',
-  //     hasOutline: false,
-  //   },
-  //   outlinedError: {
-  //     icon: modalIcon,
-  //     backgroundColor: '',
-  //     hasOutline: true,
-  //   },
-  // }
-
   const modalHeader = (
     <LegacyModalHeader
       onClose={onClose}
