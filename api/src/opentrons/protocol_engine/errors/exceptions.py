@@ -301,6 +301,19 @@ class LabwareIsTipRackError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class LabwareIsAdapterError(ProtocolEngineError):
+    """Raised when trying to use a command not allowed on adapter."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsAdapterError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class TouchTipDisabledError(ProtocolEngineError):
     """Raised when touch tip is used on well with touchTipDisabled quirk."""
 

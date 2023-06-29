@@ -18,6 +18,7 @@ from typing import (
 )
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from opentrons.types import DeckSlotName, Point, MountType
@@ -485,6 +486,10 @@ class LabwareView(HasState[LabwareState]):
         if labware_definition.parameters.isTiprack:
             raise errors.LabwareIsTipRackError(
                 f"Given labware: {labware_id} is a tiprack. Can not load liquid."
+            )
+        if LabwareRole.adapter in labware_definition.allowedRoles:
+            raise errors.LabwareIsAdapterError(
+                f"Given labware: {labware_id} is an adapter. Can not load liquid."
             )
         if not contains_wells:
             raise errors.WellDoesNotExistError(
