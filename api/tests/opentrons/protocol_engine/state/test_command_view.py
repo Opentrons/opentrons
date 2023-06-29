@@ -24,7 +24,9 @@ from opentrons.protocol_engine.state.commands import (
     RunResult,
     QueueStatus,
 )
-from opentrons.protocol_engine.errors.error_occurrence import _ErrorOccurrenceFromChildThread
+from opentrons.protocol_engine.errors.error_occurrence import (
+    _ErrorOccurrenceFromChildThread,
+)
 
 from .command_fixtures import (
     create_queued_command,
