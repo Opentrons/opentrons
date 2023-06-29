@@ -6,6 +6,8 @@ import ReactSelect, {
 import cx from 'classnames'
 
 import { Icon } from '../icons'
+import { Box } from '../primitives'
+import { SPACING } from '../ui-style-constants'
 import { POSITION_ABSOLUTE, POSITION_FIXED } from '../styles'
 import styles from './Select.css'
 
@@ -15,8 +17,6 @@ import type {
   StylesConfig,
   CSSObjectWithLabel,
 } from 'react-select'
-import { Box } from '../primitives'
-import { SPACING } from '../ui-style-constants'
 
 export { reactSelectComponents }
 
