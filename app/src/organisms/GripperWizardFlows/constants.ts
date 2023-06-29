@@ -1,6 +1,7 @@
 export const SECTIONS = {
   BEFORE_BEGINNING: 'BEFORE_BEGINNING',
   MOUNT_GRIPPER: 'MOUNT_GRIPPER',
+  FIRMWARE_UPDATE: 'FIRMWARE_UPDATE',
   MOVE_PIN: 'MOVE_PIN',
   SUCCESS: 'SUCCESS',
   UNMOUNT_GRIPPER: 'UNMOUNT_GRIPPER',
@@ -27,5 +28,5 @@ export const SUCCESSFULLY_CALIBRATED = 'successfullyCalibrated' as const
 
 //  required equipment list
 export const CAL_PIN_LOADNAME = 'calibration_pin' as const
-export const SCREWDRIVER_LOADNAME = 't10_torx_screwdriver' as const
+export const SCREWDRIVER_LOADNAME = 'hex_screwdriver' as const
 export const GRIPPER_LOADNAME = 'flex_gripper' as const

@@ -123,6 +123,7 @@ describe('ProtocolSetupLabware', () => {
           moduleId: '8bcc37fdfcb4c2b5ab69963c589ceb1f9b1d1c4f',
         },
       },
+      waitUntilComplete: true,
     })
   })
 
@@ -140,6 +141,7 @@ describe('ProtocolSetupLabware', () => {
           moduleId: '8bcc37fdfcb4c2b5ab69963c589ceb1f9b1d1c4f',
         },
       },
+      waitUntilComplete: true,
     })
   })
 

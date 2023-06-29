@@ -97,6 +97,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
       {
         section: SECTIONS.ATTACH_PROBE,
@@ -147,6 +152,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -203,6 +213,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
       {
         section: SECTIONS.ATTACH_PROBE,
@@ -253,6 +268,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -315,6 +335,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
       {
         section: SECTIONS.ATTACH_PROBE,
@@ -352,6 +377,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -399,6 +429,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },

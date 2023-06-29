@@ -69,10 +69,19 @@ def test_handles_unexpected_errors(app: FastAPI, client: TestClient) -> None:
                 "id": "UnexpectedError",
                 "title": "Unexpected Internal Error",
                 "detail": "Exception: Oh no!",
+                "errorCode": "4000",
                 "meta": {
-                    "stacktrace": matchers.StringMatching(
-                        r'raise Exception\("Oh no!"\)'
-                    )
+                    "code": "4000",
+                    "message": "Exception: Oh no!",
+                    "type": "Exception",
+                    "detail": {
+                        "args": "('Oh no!',)",
+                        "class": "Exception",
+                        "traceback": matchers.StringMatching(
+                            r'raise Exception\("Oh no!"\)'
+                        ),
+                    },
+                    "wrapping": [],
                 },
             }
         ]
@@ -89,7 +98,7 @@ def test_handles_legacy_unexpected_errors(app: FastAPI, client: TestClient) -> N
     response = client.get("/internal-server-error-legacy")
 
     assert response.status_code == 500
-    assert response.json() == {"message": "Exception: Oh no!"}
+    assert response.json() == {"message": "Exception: Oh no!", "errorCode": "4000"}
 
 
 def test_handles_framework_exceptions(app: FastAPI, client: TestClient) -> None:
@@ -105,6 +114,7 @@ def test_handles_framework_exceptions(app: FastAPI, client: TestClient) -> None:
     assert response.json() == {
         "errors": [
             {
+                "errorCode": "4000",
                 "id": "BadRequest",
                 "title": "Bad Request",
                 "detail": "Method Not Allowed",
@@ -124,6 +134,7 @@ def test_handles_legacy_framework_exceptions(app: FastAPI, client: TestClient) -
 
     assert response.status_code == status.HTTP_405_METHOD_NOT_ALLOWED
     assert response.json() == {
+        "errorCode": "4000",
         "message": "Method Not Allowed",
     }
 
@@ -144,18 +155,21 @@ def test_handles_body_validation_error(app: FastAPI, client: TestClient) -> None
     assert response.json() == {
         "errors": [
             {
+                "errorCode": "4000",
                 "id": "InvalidRequest",
                 "title": "Invalid Request",
                 "detail": "field required",
                 "source": {"pointer": "/string_field"},
             },
             {
+                "errorCode": "4000",
                 "id": "InvalidRequest",
                 "title": "Invalid Request",
                 "detail": "value is not a valid integer",
                 "source": {"pointer": "/int_field"},
             },
             {
+                "errorCode": "4000",
                 "id": "InvalidRequest",
                 "title": "Invalid Request",
                 "detail": "value could not be parsed to a boolean",
@@ -178,6 +192,7 @@ def test_handles_query_validation_error(app: FastAPI, client: TestClient) -> Non
     assert response.json() == {
         "errors": [
             {
+                "errorCode": "4000",
                 "id": "InvalidRequest",
                 "title": "Invalid Request",
                 "detail": "value is not a valid integer",
@@ -200,6 +215,7 @@ def test_handles_header_validation_error(app: FastAPI, client: TestClient) -> No
     assert response.json() == {
         "errors": [
             {
+                "errorCode": "4000",
                 "id": "InvalidRequest",
                 "title": "Invalid Request",
                 "detail": "field required",
@@ -223,9 +239,10 @@ def test_handles_legacy_validation_error(app: FastAPI, client: TestClient) -> No
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert response.json() == {
+        "errorCode": "4000",
         "message": (
             "body.string_field: none is not an allowed value; "
             "body.int_field: value is not a valid integer; "
             "body.array_field.0: value could not be parsed to a boolean"
-        )
+        ),
     }

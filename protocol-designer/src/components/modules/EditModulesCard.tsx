@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -8,6 +8,7 @@ import {
   ModuleType,
   PipetteName,
   getPipetteNameSpecs,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
   selectors as stepFormSelectors,
@@ -16,9 +17,12 @@ import {
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
+import { getAdditionalEquipment } from '../../step-forms/selectors'
+import { toggleIsGripperRequired } from '../../step-forms/actions/additionalItems'
 import { getRobotType } from '../../file-data/selectors'
 import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
+import { GripperRow } from './GripperRow'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
@@ -29,10 +33,15 @@ export interface Props {
 
 export function EditModulesCard(props: Props): JSX.Element {
   const { modules, openEditModuleModal } = props
-
   const pipettesByMount = useSelector(
     stepFormSelectors.getPipettesForEditPipetteForm
   )
+  const additionalEquipment = useSelector(getAdditionalEquipment)
+  const isGripperAttached = Object.values(additionalEquipment).some(
+    equipment => equipment?.name === 'gripper'
+  )
+
+  const dispatch = useDispatch()
   const robotType = useSelector(getRobotType)
 
   const magneticModuleOnDeck = modules[MAGNETIC_MODULE_TYPE]
@@ -67,18 +76,22 @@ export function EditModulesCard(props: Props): JSX.Element {
     ].some(pipetteSpecs => pipetteSpecs?.channels !== 1)
 
   const warningsEnabled = !moduleRestrictionsDisabled
+  const isFlex = robotType === FLEX_ROBOT_TYPE
 
   const SUPPORTED_MODULE_TYPES_FILTERED = SUPPORTED_MODULE_TYPES.filter(
     moduleType =>
-      robotType === 'OT-3 Standard'
+      isFlex
         ? moduleType !== 'magneticModuleType'
         : moduleType !== 'magneticBlockType'
   )
 
+  const handleGripperClick = (): void => {
+    dispatch(toggleIsGripperRequired())
+  }
   return (
-    <Card title="Modules">
+    <Card title={isFlex ? 'Additional Items' : 'Modules'}>
       <div className={styles.modules_card_content}>
-        {warningsEnabled && (
+        {warningsEnabled && !isFlex && (
           <CrashInfoBox
             showMagPipetteCollisons={showMagPipetteCollisons}
             showTempPipetteCollisons={showTempPipetteCollisons}
@@ -99,6 +112,7 @@ export function EditModulesCard(props: Props): JSX.Element {
                 showCollisionWarnings={warningsEnabled}
                 key={i}
                 openEditModuleModal={openEditModuleModal}
+                robotType={robotType}
               />
             )
           } else {
@@ -111,6 +125,12 @@ export function EditModulesCard(props: Props): JSX.Element {
             )
           }
         })}
+        {isFlex ? (
+          <GripperRow
+            handleGripper={handleGripperClick}
+            isGripperAdded={isGripperAttached}
+          />
+        ) : null}
       </div>
     </Card>
   )

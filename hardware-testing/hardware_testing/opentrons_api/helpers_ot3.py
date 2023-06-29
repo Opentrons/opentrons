@@ -164,7 +164,11 @@ async def build_async_ot3_hardware_api(
         print(e)
         kwargs["use_usb_bus"] = False  # type: ignore[assignment]
         api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
-    await api.cache_instruments()
+    if not is_simulating:
+        await asyncio.sleep(0.5)
+        await api.cache_instruments()
+        async for update in api.update_firmware():
+            print(f"Update: {update.subsystem.name}: {update.progress}%")
     return api
 
 

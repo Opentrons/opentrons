@@ -96,7 +96,7 @@ describe('MovePin', () => {
 
   it('renders correct loader for move pin to front jaw', () => {
     const { getByText } = render({ isRobotMoving: true })[0]
-    getByText('Stand Back, Gripper is Calibrating')
+    getByText('Stand Back, Flex Gripper is Calibrating')
   })
 
   it('renders correct text for move pin from front jaw to rear with correct callbacks', async () => {
@@ -138,7 +138,7 @@ describe('MovePin', () => {
       isRobotMoving: true,
       movement: MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
     })[0]
-    getByText('Stand Back, Gripper is Calibrating')
+    getByText('Stand Back, Flex Gripper is Calibrating')
   })
 
   it('renders correct text for remove pin from rear jaw', () => {

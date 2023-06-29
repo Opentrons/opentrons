@@ -80,6 +80,8 @@ export const dispense: CommandCreator<DispenseParams> = (
         labware,
       })
     )
+  } else if (prevRobotState.labware[labware].slot === 'offDeck') {
+    errors.push(errorCreators.labwareOffDeck())
   }
 
   if (

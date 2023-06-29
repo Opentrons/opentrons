@@ -26,16 +26,7 @@ import { toggleDevtools } from '../../../redux/config'
 
 import type { IconName } from '@opentrons/components'
 import type { Dispatch } from '../../../redux/types'
-
-export type SettingOption =
-  | 'NetworkSettings'
-  | 'RobotName'
-  | 'RobotSystemVersion'
-  | 'TouchscreenSleep'
-  | 'TouchscreenBrightness'
-  | 'TextSize'
-  | 'DeviceReset'
-  | 'UpdateChannel'
+import type { SettingOption, SetSettingOption } from '../RobotSettingsDashboard'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
@@ -50,7 +41,7 @@ interface RobotSettingButtonProps {
   iconName: IconName
   settingInfo?: string
   currentOption?: SettingOption
-  setCurrentOption?: (currentOption: SettingOption) => void
+  setCurrentOption?: SetSettingOption
   robotName?: string
   isUpdateAvailable?: boolean
   enabledDevTools?: boolean
