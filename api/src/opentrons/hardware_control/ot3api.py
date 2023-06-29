@@ -1497,7 +1497,7 @@ class OT3API(
         checked_mount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(checked_mount)
         self._pipette_handler.ready_for_tip_action(
-            instrument, HardwareAction.PREPARE_ASPIRATE
+            instrument, HardwareAction.PREPARE_ASPIRATE, checked_mount
         )
         if instrument.current_volume == 0:
             await self._move_to_plunger_bottom(checked_mount, rate)
@@ -2058,7 +2058,7 @@ class OT3API(
         checked_mount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(checked_mount)
         self._pipette_handler.ready_for_tip_action(
-            instrument, HardwareAction.LIQUID_PROBE
+            instrument, HardwareAction.LIQUID_PROBE, checked_mount
         )
 
         if not probe_settings:

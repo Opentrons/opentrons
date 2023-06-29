@@ -205,6 +205,11 @@ def test_get_hardware_pipette_raises_with_name_mismatch() -> None:
 def test_get_aspirated_volume() -> None:
     """It should get the aspirate volume for a pipette."""
     subject = get_pipette_view(
+        pipettes_by_id={
+            "pipette-id-no-tip": LoadedPipette(
+                id="pipette-id-no-tip", pipetteName="p1000_96", mount=MountType.LEFT
+            )
+        },
         aspirated_volume_by_id={
             "pipette-id": 42,
             "pipette-id-none": None,
@@ -254,6 +259,11 @@ def test_get_pipette_working_volume() -> None:
 def test_get_pipette_working_volume_raises_if_tip_volume_is_none() -> None:
     """Should raise an exception that no tip is attached."""
     subject = get_pipette_view(
+        pipettes_by_id={
+            "pipette-id": LoadedPipette(
+                id="pipette-id", pipetteName="p1000_96", mount=MountType.LEFT
+            )
+        },
         attached_tip_by_id={
             "pipette-id": None,
         },
@@ -340,10 +350,22 @@ def test_get_attached_tip() -> None:
 def test_validate_tip_state() -> None:
     """It should validate a pipette's tip attached state."""
     subject = get_pipette_view(
+        pipettes_by_id={
+            "has-tip": LoadedPipette(
+                id="has-tip",
+                pipetteName=PipetteNameType.P300_SINGLE,
+                mount=MountType.LEFT,
+            ),
+            "no-tip": LoadedPipette(
+                id="no-tip",
+                pipetteName=PipetteNameType.P50_MULTI,
+                mount=MountType.RIGHT,
+            ),
+        },
         attached_tip_by_id={
             "has-tip": TipGeometry(length=1, volume=2, diameter=3),
             "no-tip": None,
-        }
+        },
     )
 
     subject.validate_tip_state(pipette_id="has-tip", expected_has_tip=True)

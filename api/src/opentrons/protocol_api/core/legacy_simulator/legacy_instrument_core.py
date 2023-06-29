@@ -410,9 +410,15 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
     def _raise_if_no_tip(self, action: str) -> None:
         """Raise NoTipAttachedError if no tip."""
         if not self.has_tip():
-            raise NoTipAttachedError(f"Cannot perform {action} without a tip attached")
+            raise NoTipAttachedError(
+                message=f"Cannot perform {action} without a tip attached",
+                detail={"operation": action, "mount": self.get_mount().name},
+            )
 
     def _raise_if_tip(self, action: str) -> None:
         """Raise TipAttachedError if tip."""
         if self.has_tip():
-            raise TipAttachedError(f"Cannot {action} with a tip attached")
+            raise TipAttachedError(
+                message=f"Cannot {action} with a tip attached",
+                detail={"operation": action, "mount": self.get_mount().name},
+            )

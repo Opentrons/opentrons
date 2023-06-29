@@ -929,7 +929,7 @@ class API(
         Prepare the pipette for aspiration.
         """
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.PREPARE_ASPIRATE)
+        self.ready_for_tip_action(instrument, HardwareAction.PREPARE_ASPIRATE, mount)
 
         if instrument.current_volume == 0:
             speed = self.plunger_speed(

@@ -600,7 +600,7 @@ class InvalidInstrumentData(RoboticsInteractionError):
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build an GripperNotPresentError."""
+        """Build an InvalidInstrumentData."""
         super().__init__(ErrorCodes.INVALID_INSTRUMENT_DATA, message, detail, wrapping)
 
 class OutOfBoundsMoveError(RoboticsInteractionError):
@@ -611,7 +611,7 @@ class OutOfBoundsMoveError(RoboticsInteractionError):
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build an GripperNotPresentError."""
+        """Build an OutOfBoundsMoveError."""
         super().__init__(ErrorCodes.OUT_OF_BOUNDS_MOVE, message, detail, wrapping)
 
 class APIRemoved(GeneralError):

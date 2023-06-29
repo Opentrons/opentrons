@@ -2,6 +2,8 @@ from typing import Optional, Dict, Any, Sequence
 from opentrons_shared_data.errors.exceptions import (
     PositionEstimationInvalidError,
     EnumeratedError,
+    UnexpectedTipRemovalError,
+    UnexpectedTipAttachError,
 )
 
 from .types import OT3Mount
@@ -26,11 +28,11 @@ class MustHomeError(PositionEstimationInvalidError):
         )
 
 
-class NoTipAttachedError(RuntimeError):
+class NoTipAttachedError(UnexpectedTipRemovalError):
     pass
 
 
-class TipAttachedError(RuntimeError):
+class TipAttachedError(UnexpectedTipAttachError):
     pass
 
 

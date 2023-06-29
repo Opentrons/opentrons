@@ -429,9 +429,14 @@ class PipetteHandlerProvider(Generic[MountType]):
             # configured such that the end of a p300 single gen1's tip is 0.
             return top_types.Point(0, 0, 30)
 
-    def ready_for_tip_action(self, target: Pipette, action: HardwareAction) -> None:
+    def ready_for_tip_action(
+        self, target: Pipette, action: HardwareAction, mount: MountType
+    ) -> None:
         if not target.has_tip:
-            raise NoTipAttachedError(f"Cannot perform {action} without a tip attached")
+            raise NoTipAttachedError(
+                message=f"Cannot perform {action} without a tip attached",
+                detail={"action": action.name, "mount": mount.name},
+            )
         if (
             action == HardwareAction.ASPIRATE
             and target.current_volume == 0
@@ -494,7 +499,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         - Plunger distances (possibly calling an overridden plunger_volume)
         """
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.ASPIRATE)
+        self.ready_for_tip_action(instrument, HardwareAction.ASPIRATE, mount)
         if volume is None:
             self._ihp_log.debug(
                 "No aspirate volume defined. Aspirating up to "
@@ -571,7 +576,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         """
 
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.DISPENSE)
+        self.ready_for_tip_action(instrument, HardwareAction.DISPENSE, mount)
 
         if volume is None:
             disp_vol = instrument.current_volume
@@ -624,7 +629,7 @@ class PipetteHandlerProvider(Generic[MountType]):
     def plan_check_blow_out(self, mount):  # type: ignore[no-untyped-def]
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
+        self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT, mount)
         speed = self.plunger_speed(
             instrument, instrument.blow_out_flow_rate, "dispense"
         )
@@ -701,7 +706,10 @@ class PipetteHandlerProvider(Generic[MountType]):
         # Prechecks: ready for pickup tip and press/increment are valid
         instrument = self.get_pipette(mount)
         if instrument.has_tip:
-            raise TipAttachedError("Cannot pick up tip with a tip attached")
+            raise TipAttachedError(
+                message="Cannot pick up tip with a tip attached",
+                detail={"mount": mount.name, "operation": "pick_up_tip"},
+            )
         self._ihp_log.debug(f"Picking up tip on {mount.name}")
 
         if presses is None or presses < 0:
@@ -856,7 +864,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         home_after,
     ):
         instrument = self.get_pipette(mount)
-        self.ready_for_tip_action(instrument, HardwareAction.DROPTIP)
+        self.ready_for_tip_action(instrument, HardwareAction.DROPTIP, mount)
 
         bottom = instrument.config.bottom
         droptip = instrument.config.drop_tip

@@ -213,7 +213,11 @@ class VirtualPipettingHandler(PipettingHandler):
         tip_geometry = self._state_view.pipettes.get_attached_tip(pipette_id)
         if not tip_geometry:
             raise TipNotAttachedError(
-                f"Cannot perform {command_name} without a tip attached"
+                message=f"Cannot perform {command_name} without a tip attached",
+                details={
+                    "mount": str(self._state_view.pipettes.get_mount(pipette_id)),
+                    "operation": "command_name",
+                },
             )
 
 

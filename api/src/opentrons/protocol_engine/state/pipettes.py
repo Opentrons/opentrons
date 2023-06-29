@@ -432,7 +432,11 @@ class PipetteView(HasState[PipetteState]):
 
         if not attached_tip:
             raise errors.TipNotAttachedError(
-                f"Pipette {pipette_id} has no tip attached; unable to calculate working maximum volume."
+                message=f"Pipette {pipette_id} has no tip attached; unable to calculate working maximum volume.",
+                details={
+                    "mount": self.get_mount(pipette_id),
+                    "operation": "get_working_volume",
+                },
             )
 
         return min(attached_tip.volume, max_volume)
@@ -450,11 +454,13 @@ class PipetteView(HasState[PipetteState]):
 
         if expected_has_tip is True and attached_tip is None:
             raise errors.TipNotAttachedError(
-                "Pipette should have a tip attached, but does not."
+                message="Pipette should have a tip attached, but does not.",
+                details={"mount": self.get_mount(pipette_id)},
             )
         if expected_has_tip is False and attached_tip is not None:
             raise errors.TipAttachedError(
-                "Pipette should not have a tip attached, but does."
+                message="Pipette should not have a tip attached, but does.",
+                details={"mount": self.get_mount(pipette_id)},
             )
 
     def get_movement_speed(
