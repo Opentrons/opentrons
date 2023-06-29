@@ -142,9 +142,7 @@ from .dev_types import (
     InstrumentDict,
     GripperDict,
 )
-from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    MoveConditionNotMet,
-)
+
 
 from .status_bar_state import StatusBarStateController
 
@@ -1227,7 +1225,7 @@ class OT3API(
                 except ZeroLengthMoveError:
                     self._log.info(f"{axis} already at home position, skip homing")
                     continue
-                except (MoveConditionNotMet, Exception) as e:
+                except BaseException as e:
                     self._log.exception(f"Homing failed: {e}")
                     self._current_position.clear()
                     raise
