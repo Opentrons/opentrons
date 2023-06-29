@@ -266,7 +266,7 @@ class ProtocolContext(CommandPublisher):
     def load_labware_from_definition(
         self,
         labware_def: "LabwareDefinition",
-        location: DeckLocation,
+        location: Union[DeckLocation, OffDeckType],
         label: Optional[str] = None,
     ) -> Labware:
         """Specify the presence of a piece of labware on the OT2 deck.
@@ -277,7 +277,7 @@ class ProtocolContext(CommandPublisher):
         :param labware_def: The labware definition to load
         :param location: The slot into which to load the labware,
                          such as ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
-        :type location: int or str
+        :type location: int or str or :py:obj:`OFF_DECK`
         :param str label: An optional special name to give the labware. If
                           specified, this is the name the labware will appear
                           as in the run log and the calibration view in the
@@ -390,7 +390,7 @@ class ProtocolContext(CommandPublisher):
     def load_adapter_from_definition(
         self,
         adapter_def: "LabwareDefinition",
-        location: DeckLocation,
+        location: Union[DeckLocation, OffDeckType],
     ) -> Labware:
         """Specify the presence of an adapter on the deck.
 
@@ -400,7 +400,7 @@ class ProtocolContext(CommandPublisher):
         :param adapter_def: The adapter's labware definition to load
         :param location: The slot into which to load the labware,
                          such as ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
-        :type location: int or str
+        :type location: int or str or :py:obj:`OFF_DECK`
         """
         load_params = self._core.add_labware_definition(adapter_def)
 
