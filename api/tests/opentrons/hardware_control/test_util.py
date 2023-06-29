@@ -1,19 +1,16 @@
-from typing import List
+from typing import List, Dict, Tuple
+
+from opentrons_shared_data.errors.exceptions import OutOfBoundsMoveError
 
 from opentrons.hardware_control.util import plan_arc, check_motion_bounds
-from opentrons.hardware_control.types import (
-    CriticalPoint,
-    MotionChecks,
-    Axis,
-)
-from opentrons.hardware_control.errors import OutOfBoundsMove
+from opentrons.hardware_control.types import CriticalPoint, MotionChecks, Axis
 from opentrons.types import Point
 
 
 import pytest
 
 
-def check_arc_basic(arc: List[Point], from_pt: Point, to_pt: Point):
+def check_arc_basic(arc: List[Point], from_pt: Point, to_pt: Point) -> None:
     """Check the tests that should always be true for different-well moves
     - we should always go only up, then only xy, then only down
     - we should have three moves
@@ -42,11 +39,11 @@ def check_arc_basic(arc: List[Point], from_pt: Point, to_pt: Point):
         [Point(10, 20, 30), Point(10, 30, 40), 40],
     ],
 )
-def test_basic_arcs(from_pt, to_pt, z_height):
+def test_basic_arcs(from_pt: Point, to_pt: Point, z_height: float) -> None:
     check_arc_basic([a[0] for a in plan_arc(from_pt, to_pt, z_height)], from_pt, to_pt)
 
 
-def test_arc_with_waypoint():
+def test_arc_with_waypoint() -> None:
     from_pt = Point(20, 20, 40)
     to_pt = Point(0, 0, 10)
     arc = plan_arc(from_pt, to_pt, 50, extra_waypoints=[(5, 10), (20, 30)])
@@ -59,7 +56,7 @@ def test_arc_with_waypoint():
     assert arc[2][0].z == 50
 
 
-def test_cp_blending():
+def test_cp_blending() -> None:
     from_pt = Point(10, 10, 10)
     to_pt = Point(0, 0, 10)
     arc = plan_arc(from_pt, to_pt, 50, None, CriticalPoint.XY_CENTER)
@@ -95,9 +92,16 @@ def test_cp_blending():
         ({Axis.Z: 5}, {Axis.Z: 3}, {Axis.Z: (2, 4)}, MotionChecks.BOTH, True, "high"),
     ],
 )
-def test_check_motion_bounds(xformed, deck, bounds, check, catch, phrase):
+def test_check_motion_bounds(
+    xformed: Dict[Axis, float],
+    deck: Dict[Axis, float],
+    bounds: Dict[Axis, Tuple[float, float]],
+    check: MotionChecks,
+    catch: bool,
+    phrase: str,
+) -> None:
     if catch:
-        with pytest.raises(OutOfBoundsMove, match=phrase):
+        with pytest.raises(OutOfBoundsMoveError, match=phrase):
             check_motion_bounds(xformed, deck, bounds, check)
     else:
         check_motion_bounds(xformed, deck, bounds, check)
