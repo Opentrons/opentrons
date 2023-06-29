@@ -98,14 +98,19 @@ class HardwareGantryMover(GantryMover):
             pipette_id=pipette_id,
             current_well=current_well,
         )
+        hw_mount = pipette_location.mount.to_hw_mount()
         try:
             return await self._hardware_api.gantry_position(
-                mount=pipette_location.mount.to_hw_mount(),
+                mount=hw_mount,
                 critical_point=pipette_location.critical_point,
                 fail_on_not_homed=fail_on_not_homed,
             )
         except HardwareMustHomeError as e:
-            raise MustHomeError(str(e)) from e
+            raise MustHomeError(
+                message=e.message,
+                details={"operation": "get_position", "mount": hw_mount.name},
+                wrapping=[e],
+            ) from e
 
     def get_max_travel_z(self, pipette_id: str) -> float:
         """Get the maximum allowed z-height for pipette movement.
@@ -165,7 +170,15 @@ class HardwareGantryMover(GantryMover):
                 fail_on_not_homed=True,
             )
         except HardwareMustHomeError as e:
-            raise MustHomeError(str(e)) from e
+            raise MustHomeError(
+                message=e.message,
+                details={
+                    "operation": "move_relative",
+                    "mount": hw_mount.name,
+                    "delta": str(delta),
+                },
+                wrapping=[e],
+            ) from e
 
         return point
 

@@ -623,13 +623,19 @@ class API(
         z_ax = Axis.by_mount(mount)
         plunger_ax = Axis.of_plunger(mount)
         position_axes = [Axis.X, Axis.Y, z_ax, plunger_ax]
+        is_homed = self._backend.is_homed([str(a) for a in position_axes])
 
-        if fail_on_not_homed and (
-            not self._backend.is_homed([str(a) for a in position_axes])
-            or not self._current_position
-        ):
+        if fail_on_not_homed and (not is_homed or not self._current_position):
             raise MustHomeError(
-                f"Current position of {str(mount)} pipette is unknown, please home."
+                message=f"Current position of {str(mount)} pipette is unknown, please home.",
+                detail={
+                    "operation": "current_position",
+                    "mount": mount.name,
+                    "critical_point": critical_point,
+                    "is_homed": str(is_homed),
+                    "position_cache": str(self._current_position),
+                    "checked_axes": str(position_axes),
+                },
             )
 
         elif not self._current_position and not refresh:
@@ -730,12 +736,16 @@ class API(
         # TODO: Remove the fail_on_not_homed and make this the behavior all the time.
         # Having the optional arg makes the bug stick around in existing code and we
         # really want to fix it when we're not gearing up for a release.
-        mhe = MustHomeError(
-            "Cannot make a relative move because absolute position is unknown"
-        )
         if not self._current_position:
             if fail_on_not_homed:
-                raise mhe
+                raise MustHomeError(
+                    message="Cannot make a relative move because absolute position is unknown",
+                    detail={
+                        "operation": "move_rel",
+                        "mount": mount.name,
+                        "position_cache": str(self._current_position),
+                    },
+                )
             else:
                 await self.home()
 
@@ -743,10 +753,20 @@ class API(
             mount, delta, self._current_position
         )
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
-        if fail_on_not_homed and not self._backend.is_homed(
+        is_homed = self._backend.is_homed(
             [axis.name for axis in axes_moving if axis is not None]
-        ):
-            raise mhe
+        )
+        if fail_on_not_homed and not is_homed:
+            raise MustHomeError(
+                message="Cannot make a relative move because absolute position is unknown",
+                detail={
+                    "operation": "move_rel",
+                    "mount": mount.name,
+                    "position_cache": str(self._current_position),
+                    "is_homed": str(is_homed),
+                    "checked_axes": str(axes_moving),
+                },
+            )
         await self._cache_and_maybe_retract_mount(mount)
         await self._move(
             target_position,

@@ -398,7 +398,9 @@ class MustHomeError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a MustHomeError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(
+            ErrorCodes.POSITION_ESTIMATION_INVALID, message, details, wrapping
+        )
 
 
 class SetupCommandNotAllowedError(ProtocolEngineError):

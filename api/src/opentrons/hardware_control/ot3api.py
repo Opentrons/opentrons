@@ -760,12 +760,19 @@ class OT3API(
             await self.refresh_positions()
 
         position_axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
-        valid_motor = self._current_position and self._backend.check_motor_status(
-            position_axes
-        )
+        motor_status = self._backend.check_motor_status(position_axes)
+        valid_motor = bool(self._current_position) and motor_status
         if not valid_motor:
             raise MustHomeError(
-                f"Current position of {str(mount)} is invalid; please home motors."
+                message=f"Current position of {str(mount)} is invalid; please home motors.",
+                detail={
+                    "operation": "current_position_ot3",
+                    "mount": mount.name,
+                    "critical_point": critical_point,
+                    "motor_status": motor_status,
+                    "cached_position": str(self._current_position),
+                    "checked_axes": str(position_axes),
+                },
             )
 
         return self._effector_pos_from_carriage_pos(
@@ -827,12 +834,19 @@ class OT3API(
             )
 
         position_axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
-        valid_motor = self._encoder_position and self._backend.check_encoder_status(
-            position_axes
-        )
+        encoder_status = self._backend.check_encoder_status(position_axes)
+        valid_motor = self._encoder_position and encoder_status
         if not valid_motor:
             raise MustHomeError(
-                f"Encoder position of {str(mount)} is invalid; please home motors."
+                message=f"Encoder position of {str(mount)} is invalid; please home motors.",
+                detail={
+                    "operation": "encoder_current_position_ot3",
+                    "mount": mount.name,
+                    "critical_point": critical_point,
+                    "encoder_position_cache": str(self._encoder_position),
+                    "encoder_status": str(encoder_status),
+                    "checked_axes": str(position_axes),
+                },
             )
 
         ot3pos = self._effector_pos_from_carriage_pos(
@@ -908,7 +922,14 @@ class OT3API(
             await self.home()
         elif not self._backend.check_motor_status(axes_moving):
             raise MustHomeError(
-                f"Inaccurate motor position for {str(realmount)}, please home motors."
+                message=f"Inaccurate motor position for {str(realmount)}, please home motors.",
+                detail={
+                    "operation": "move_to",
+                    "mount": mount.name,
+                    "target_position": str(abs_position),
+                    "critical_point": str(critical_point),
+                    "checked_axes": str(axes_moving),
+                },
             )
 
         target_position = target_position_from_absolute(
@@ -955,11 +976,18 @@ class OT3API(
         if not self._backend.check_encoder_status(list(position.keys())):
             await self.home()
 
-        valid_motor = self._current_position and self._backend.check_motor_status(
-            list(position.keys())
-        )
+        motor_status = self._backend.check_motor_status(list(position.keys()))
+        valid_motor = self._current_position and motor_status
         if not valid_motor:
-            raise MustHomeError("Current position is invalid; please home motors.")
+            raise MustHomeError(
+                message="Current position is invalid; please home motors.",
+                detail={
+                    "operation": "move_axes",
+                    "target_position": str(position),
+                    "motor_status": str(motor_status),
+                    "position_cache": str(self._current_position),
+                },
+            )
 
         absolute_positions: "OrderedDict[OT3Axis, float]" = OrderedDict()
         current_position = self._current_position
@@ -1022,10 +1050,17 @@ class OT3API(
         # Cache current position from backend
         await self._cache_current_position()
         await self._cache_encoder_position()
+        motor_status = self._backend.check_motor_status([axis for axis in axes_moving])
 
-        if not self._backend.check_motor_status([axis for axis in axes_moving]):
+        if not motor_status:
             raise MustHomeError(
-                f"Inaccurate motor position for {str(realmount)}, please home motors."
+                message=f"Inaccurate motor position for {str(realmount)}, please home motors.",
+                detail={
+                    "operation": "move_rel",
+                    "mount": mount.name,
+                    "motor_status": str(motor_status),
+                    "checked_axes": str(axes_moving),
+                },
             )
 
         target_position = target_position_from_relative(

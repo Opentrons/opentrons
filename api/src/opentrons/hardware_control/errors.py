@@ -1,3 +1,9 @@
+from typing import Optional, Dict, Any, Sequence
+from opentrons_shared_data.errors.exceptions import (
+    PositionEstimationInvalidError,
+    EnumeratedError,
+)
+
 from .types import OT3Mount
 
 
@@ -5,8 +11,19 @@ class ExecutionCancelledError(RuntimeError):
     pass
 
 
-class MustHomeError(RuntimeError):
-    pass
+class MustHomeError(PositionEstimationInvalidError):
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PositionEstimationFailedError."""
+        super().__init__(
+            message or "The machine must be homed before this operation",
+            detail,
+            wrapping,
+        )
 
 
 class NoTipAttachedError(RuntimeError):
