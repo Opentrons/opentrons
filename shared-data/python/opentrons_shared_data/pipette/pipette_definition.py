@@ -260,6 +260,9 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The distance of backlash on the plunger motor.",
         alias="backlashDistance",
     )
+    quirks: List[pip_types.Quirks] = Field(
+        ..., description="The list of quirks available for the loaded configuration"
+    )
 
     @validator("pipette_type", pre=True)
     def convert_pipette_model_string(cls, v: str) -> PipetteModelType:
@@ -274,6 +277,12 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         if not v:
             return PipetteGenerationType.GEN1
         return PipetteGenerationType(v)
+    
+    @validator("quirks", pre=True)
+    def convert_quirks(cls, v: str) -> List[pip_types.Quirks]:
+        if not v:
+            return []
+        return [pip_types.Quirks(q) for q in v]
 
     class Config:
         json_encoders = {
@@ -337,6 +346,4 @@ class PipetteConfigurations(
     mount_configurations: pip_types.RobotMountConfigs = Field(
         ...,
     )
-    quirks: List[pip_types.Quirks] = Field(
-        ..., description="The list of quirks available for the loaded configuration"
-    )
+

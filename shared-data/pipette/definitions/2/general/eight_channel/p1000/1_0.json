@@ -32,5 +32,6 @@
   "channels": 8,
   "shaftDiameter": 9.0,
   "shaftULperMM": 63.617,
-  "backlashDistance": 0.0
+  "backlashDistance": 0.0,
+  "quirks": []
 }

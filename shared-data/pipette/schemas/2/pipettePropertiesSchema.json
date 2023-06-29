@@ -97,6 +97,11 @@
       "description": "Array of pipette names that are compatible with the given pipette",
       "items": { "type": "string" }
     },
+    "quirks": {
+      "type": "array",
+      "description": "Array of pipette quirks supported on the current pipette",
+      "items": { "type": "string" }
+    },
     "channels": { "$ref": "#/definitions/channels" },
     "partialTipConfigurations": {
       "type": "object",

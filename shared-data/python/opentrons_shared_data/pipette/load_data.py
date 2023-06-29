@@ -16,7 +16,7 @@ from .pipette_definition import (
     PipetteModelMajorVersion,
     PipetteModelMinorVersion,
 )
-from .model_constants import QUIRKS_LOOKUP_TABLE, MOUNT_CONFIG_LOOKUP_TABLE
+from .model_constants import MOUNT_CONFIG_LOOKUP_TABLE
 
 
 LoadedConfiguration = Dict[str, Union[str, Dict[str, Any]]]
@@ -113,16 +113,7 @@ def load_definition(
 
     generation = PipetteGenerationType(physical_dict["displayCategory"])
     mount_configs = MOUNT_CONFIG_LOOKUP_TABLE[generation.value]
-    model_channel = f"{max_volume.value}_{channels}"
 
-    if generation != PipetteGenerationType.FLEX:
-        model_quirks_dict = QUIRKS_LOOKUP_TABLE[model_channel]
-        generation_quirks_dict = model_quirks_dict.get(generation.value, {})
-        quirks = generation_quirks_dict.get(
-            f"{str(version)}", generation_quirks_dict["default"]
-        )
-    else:
-        quirks = []
     return PipetteConfigurations.parse_obj(
         {
             **geometry_dict,
@@ -130,6 +121,5 @@ def load_definition(
             **liquid_dict,
             "version": version,
             "mount_configurations": mount_configs,
-            "quirks": quirks,
         }
     )

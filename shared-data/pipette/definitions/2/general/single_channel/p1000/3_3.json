@@ -29,5 +29,6 @@
   "channels": 1,
   "shaftDiameter": 4.5,
   "shaftULperMM": 15.904,
-  "backlashDistance": 0.1
+  "backlashDistance": 0.1,
+  "quirks": []
 }
