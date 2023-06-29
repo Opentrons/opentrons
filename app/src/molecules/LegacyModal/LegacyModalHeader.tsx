@@ -19,9 +19,10 @@ import type { IconProps } from '@opentrons/components'
 export interface LegacyModalHeaderProps {
   onClose?: React.MouseEventHandler
   title: React.ReactNode
+  backgroundColor: string
+  color: string
   icon?: IconProps
   closeButton?: JSX.Element
-  isError?: boolean
 }
 
 const closeIconStyles = css`
@@ -43,24 +44,22 @@ const closeIconStyles = css`
 export const LegacyModalHeader = (
   props: LegacyModalHeaderProps
 ): JSX.Element => {
-  const { icon, onClose, title, closeButton, isError = false } = props
+  const { icon, onClose, title, backgroundColor, color, closeButton } = props
   return (
     <>
       <Flex
-        backgroundColor={isError ? COLORS.errorEnabled : undefined}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         paddingX={SPACING.spacing24}
         paddingY={SPACING.spacing16}
+        backgroundColor={backgroundColor}
       >
         <Flex>
-          {icon != null && (
-            <Icon {...icon} color={isError ? COLORS.white : icon.color} />
-          )}
+          {icon != null && <Icon {...icon} />}
           <StyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            color={isError ? COLORS.white : COLORS.darkBlackEnabled}
+            color={color}
           >
             {title}
           </StyledText>
@@ -79,7 +78,7 @@ export const LegacyModalHeader = (
                   name="close"
                   width={SPACING.spacing24}
                   height={SPACING.spacing24}
-                  color={isError ? COLORS.white : undefined}
+                  color={color}
                 />
               </Btn>
             )}

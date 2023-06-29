@@ -48,13 +48,3 @@ Primary.args = {
   title: 'Modal Title',
   children: Children,
 }
-
-export const Error = Template.bind({})
-Error.args = {
-  type: 'error',
-  onClose: () => {},
-  closeOnOutsideClick: false,
-  title: 'Error Modal',
-  children: Children,
-  isError: true,
-}

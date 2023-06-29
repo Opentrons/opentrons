@@ -2,9 +2,9 @@ import * as React from 'react'
 import { SPACING, COLORS, Box } from '@opentrons/components'
 import { LegacyModalHeader } from './LegacyModalHeader'
 import { LegacyModalShell } from './LegacyModalShell'
-import type { StyleProps } from '@opentrons/components'
+import type { IconProps, StyleProps } from '@opentrons/components'
 
-type ModalType = 'info' | 'warning' | 'error'
+type ModalType = 'info' | 'warning' | 'error' | 'outlinedError'
 export * from './LegacyModalShell'
 export * from './LegacyModalHeader'
 
@@ -16,7 +16,6 @@ export interface LegacyModalProps extends StyleProps {
   fullPage?: boolean
   childrenPadding?: string | number
   children?: React.ReactNode
-  isError?: boolean
 }
 
 export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
@@ -27,26 +26,70 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
     title,
     childrenPadding = `${SPACING.spacing16} ${SPACING.spacing24} ${SPACING.spacing24}`,
     children,
-    isError = false,
     ...styleProps
   } = props
+
+  const iconColor = (type: ModalType): string => {
+    let iconColor: string = ''
+    switch (type) {
+      case 'warning':
+        iconColor = COLORS.warningEnabled
+        break
+      case 'error':
+        iconColor = COLORS.errorEnabled
+        break
+      case 'outlinedError':
+        iconColor = COLORS.white
+        break
+    }
+    return iconColor
+  }
+
+  const modalIcon: IconProps = {
+    name: 'ot-alert',
+    color: iconColor(type),
+    size: '1.25rem',
+    marginRight: SPACING.spacing8,
+  }
+
+  // const MODAL_PROPS_BY_TYPE: Record<
+  //   ModalType,
+  //   { icon?: IconProps; backgroundColor?: string; hasOutline?: boolean }
+  // > = {
+  //   info: {
+  //     icon: undefined,
+  //     hasOutline: false,
+  //   },
+  //   warning: {
+  //     icon: modalIcon,
+  //     backgroundColor: '',
+  //     hasOutline: false,
+  //   },
+  //   error: {
+  //     icon: modalIcon,
+  //     backgroundColor: '',
+  //     hasOutline: false,
+  //   },
+  //   outlinedError: {
+  //     icon: modalIcon,
+  //     backgroundColor: '',
+  //     hasOutline: true,
+  //   },
+  // }
 
   const modalHeader = (
     <LegacyModalHeader
       onClose={onClose}
       title={title}
       icon={
-        ['error', 'warning'].includes(type)
-          ? {
-              name: 'ot-alert',
-              color:
-                type === 'error' ? COLORS.errorEnabled : COLORS.warningEnabled,
-              size: SPACING.spacing20,
-              marginRight: SPACING.spacing8,
-            }
+        ['error', 'warning', 'outlinedError'].includes(type)
+          ? modalIcon
           : undefined
       }
-      isError={isError}
+      color={type === 'outlinedError' ? COLORS.white : COLORS.darkBlackEnabled}
+      backgroundColor={
+        type === 'outlinedError' ? COLORS.errorEnabled : COLORS.white
+      }
     />
   )
 
@@ -57,6 +100,11 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
       onOutsideClick={closeOnOutsideClick ?? false ? onClose : undefined}
       // center within viewport aside from nav
       marginLeft="7.125rem"
+      border={
+        type === 'outlinedError'
+          ? `0.375rem solid ${COLORS.errorEnabled}`
+          : 'none'
+      }
       {...props}
     >
       <Box padding={childrenPadding}>{children}</Box>
