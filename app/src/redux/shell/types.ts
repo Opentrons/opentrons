@@ -57,6 +57,17 @@ export type UsbRequestsAction =
 
 export interface AppRestartAction {
   type: 'shell:APP_RESTART'
+  payload: {
+    message: string
+  }
+  meta: { shell: true }
+}
+
+export interface SendLogAction {
+  type: 'shell:SEND_LOG'
+  payload: {
+    message: string
+  }
   meta: { shell: true }
 }
 
@@ -67,3 +78,4 @@ export type ShellAction =
   | RobotSystemAction
   | UsbRequestsAction
   | AppRestartAction
+  | SendLogAction
