@@ -42,76 +42,78 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING.spacing40}>
+    <Flex flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
-      <RobotSettingButton
-        settingName={t('network_settings')}
-        settingInfo={networkConnection?.connectionStatus}
-        currentOption="NetworkSettings"
-        setCurrentOption={setCurrentOption}
-        iconName="wifi"
-      />
-      <Link to="/robot-settings/rename-robot">
+      <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING.spacing40}>
         <RobotSettingButton
-          settingName={t('robot_name')}
-          settingInfo={robotName}
-          currentOption="RobotName"
+          settingName={t('network_settings')}
+          settingInfo={networkConnection?.connectionStatus}
+          currentOption="NetworkSettings"
           setCurrentOption={setCurrentOption}
-          iconName="flex-robot"
+          iconName="wifi"
         />
-      </Link>
-      <RobotSettingButton
-        settingName={t('robot_system_version')}
-        settingInfo={
-          robotServerVersion != null
-            ? `v${robotServerVersion}`
-            : t('robot_settings_advanced_unknown')
-        }
-        currentOption="RobotSystemVersion"
-        setCurrentOption={setCurrentOption}
-        isUpdateAvailable={isUpdateAvailable}
-        iconName="update"
-      />
-      <RobotSettingButton
-        settingName={t('display_led_lights')}
-        settingInfo={t('display_led_lights_description')}
-        setCurrentOption={setCurrentOption}
-        iconName="light"
-        ledLights
-        lightsOn={lightsEnabled}
-        toggleLights={toggleLights}
-      />
-      <RobotSettingButton
-        settingName={t('touchscreen_sleep')}
-        currentOption="TouchscreenSleep"
-        setCurrentOption={setCurrentOption}
-        iconName="sleep"
-      />
-      <RobotSettingButton
-        settingName={t('touchscreen_brightness')}
-        currentOption="TouchscreenBrightness"
-        setCurrentOption={setCurrentOption}
-        iconName="brightness"
-      />
-      <RobotSettingButton
-        settingName={t('device_reset')}
-        currentOption="DeviceReset"
-        setCurrentOption={setCurrentOption}
-        iconName="reset"
-      />
-      <RobotSettingButton
-        settingName={t('app_settings:update_channel')}
-        currentOption="UpdateChannel"
-        setCurrentOption={setCurrentOption}
-        iconName="update-channel"
-      />
-      <RobotSettingButton
-        settingName={t('app_settings:enable_dev_tools')}
-        settingInfo={t('dev_tools_description')}
-        iconName="build"
-        enabledDevTools
-        devToolsOn={devToolsOn}
-      />
+        <Link to="/robot-settings/rename-robot">
+          <RobotSettingButton
+            settingName={t('robot_name')}
+            settingInfo={robotName}
+            currentOption="RobotName"
+            setCurrentOption={setCurrentOption}
+            iconName="flex-robot"
+          />
+        </Link>
+        <RobotSettingButton
+          settingName={t('robot_system_version')}
+          settingInfo={
+            robotServerVersion != null
+              ? `v${robotServerVersion}`
+              : t('robot_settings_advanced_unknown')
+          }
+          currentOption="RobotSystemVersion"
+          setCurrentOption={setCurrentOption}
+          isUpdateAvailable={isUpdateAvailable}
+          iconName="update"
+        />
+        <RobotSettingButton
+          settingName={t('display_led_lights')}
+          settingInfo={t('display_led_lights_description')}
+          setCurrentOption={setCurrentOption}
+          iconName="light"
+          ledLights
+          lightsOn={lightsEnabled}
+          toggleLights={toggleLights}
+        />
+        <RobotSettingButton
+          settingName={t('touchscreen_sleep')}
+          currentOption="TouchscreenSleep"
+          setCurrentOption={setCurrentOption}
+          iconName="sleep"
+        />
+        <RobotSettingButton
+          settingName={t('touchscreen_brightness')}
+          currentOption="TouchscreenBrightness"
+          setCurrentOption={setCurrentOption}
+          iconName="brightness"
+        />
+        <RobotSettingButton
+          settingName={t('device_reset')}
+          currentOption="DeviceReset"
+          setCurrentOption={setCurrentOption}
+          iconName="reset"
+        />
+        <RobotSettingButton
+          settingName={t('app_settings:update_channel')}
+          currentOption="UpdateChannel"
+          setCurrentOption={setCurrentOption}
+          iconName="update-channel"
+        />
+        <RobotSettingButton
+          settingName={t('app_settings:enable_dev_tools')}
+          settingInfo={t('dev_tools_description')}
+          iconName="build"
+          enabledDevTools
+          devToolsOn={devToolsOn}
+        />
+      </Flex>
     </Flex>
   )
 }
