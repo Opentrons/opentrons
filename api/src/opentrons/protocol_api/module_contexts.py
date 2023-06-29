@@ -197,6 +197,58 @@ class ModuleContext(CommandPublisher):
             name=name, label=label, namespace=namespace, version=version
         )
 
+    @requires_version(2, 15)
+    def load_adapter(
+        self,
+        name: str,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        """Load an adapter onto the module using its load parameters.
+
+        The parameters of this function behave like those of
+        :py:obj:`ProtocolContext.load_adapter` (which loads adapters directly
+        onto the deck). Note that the parameter ``name`` here corresponds to
+        ``load_name`` on the ``ProtocolContext`` function.
+
+        :returns: The initialized and loaded labware object.
+        """
+        labware_core = self._protocol_core.load_adapter(
+            load_name=name,
+            namespace=namespace,
+            version=version,
+            location=self._core,
+        )
+
+        if isinstance(self._core, LegacyModuleCore):
+            adapter = self._core.add_labware_core(cast(LegacyLabwareCore, labware_core))
+        else:
+            adapter = Labware(
+                core=labware_core,
+                api_version=self._api_version,
+                protocol_core=self._protocol_core,
+                core_map=self._core_map,
+            )
+
+        self._core_map.add(labware_core, adapter)
+
+        return adapter
+
+    @requires_version(2, 15)
+    def load_adapter_from_definition(self, definition: LabwareDefinition) -> Labware:
+        """Load an adapter onto the module using an inline definition.
+
+        :param definition: The labware definition.
+        :returns: The initialized and loaded labware object.
+        """
+        load_params = self._protocol_core.add_labware_definition(definition)
+
+        return self.load_adapter(
+            name=load_params.load_name,
+            namespace=load_params.namespace,
+            version=load_params.version,
+        )
+
     @property  # type: ignore[misc]
     @requires_version(2, 0)
     def labware(self) -> Optional[Labware]:
