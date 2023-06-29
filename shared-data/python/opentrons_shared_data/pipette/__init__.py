@@ -4,7 +4,7 @@ from __future__ import annotations
 opentrons_shared_data.pipette: functions and types for pipette config
 """
 import copy
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 import json
 from functools import lru_cache
 
@@ -17,7 +17,20 @@ if TYPE_CHECKING:
         PipetteName,
         PipetteModel,
         PipetteFusedSpec,
+        ChannelCount,
     )
+
+
+# TODO (spp, 2023-06-22: should probably move this to definition)
+"""
+The span of pipettes in X-direction based on number of channels.
+This is needed in order to determine safe tip drop location within a labware.
+"""
+PIPETTE_X_SPAN: Dict[ChannelCount, float] = {
+    1: 75,  # includes a margin
+    8: 75,  # includes a margin
+    96: 161,
+}
 
 
 def model_config() -> PipetteModelSpecs:

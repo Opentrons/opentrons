@@ -1,7 +1,6 @@
 """Basic labware data state and store."""
 from __future__ import annotations
 
-import random
 from dataclasses import dataclass
 from typing import (
     Any,
@@ -45,9 +44,6 @@ from ..types import (
     LoadedLabware,
     ModuleLocation,
     ModuleModel,
-    DropTipWellLocation,
-    DropTipWellOrigin,
-    WellOffset,
     OverlapOffset,
 )
 from ..actions import (
@@ -701,22 +697,6 @@ class LabwareView(HasState[LabwareState]):
                     f"Labware {top_labware_definition.parameters.loadName} cannot be loaded"
                     f" onto labware on top of adapter"
                 )
-
-    def get_random_drop_tip_location(
-        self, labware_id: str, well_name: str
-    ) -> DropTipWellLocation:
-        """Get a random location along the x-axis within 3/4th length of the well top plane."""
-        well_dims = self.get_well_size(labware_id=labware_id, well_name=well_name)
-        random_offset_in_well = WellOffset(
-            x=random.randrange(
-                start=int(well_dims[0] * -3 / 8), stop=int(well_dims[0] * 3 / 8), step=1
-            ),
-            y=0,
-            z=0,
-        )
-        return DropTipWellLocation(
-            origin=DropTipWellOrigin.DEFAULT, offset=random_offset_in_well
-        )
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""
