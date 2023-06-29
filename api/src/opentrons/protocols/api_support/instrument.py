@@ -100,7 +100,9 @@ def validate_tiprack(
             )
 
 
-def validate_takes_liquid(location: types.Location, reject_module: bool) -> None:
+def validate_takes_liquid(
+    location: types.Location, reject_module: bool, check_for_adapter: bool
+) -> None:
     """Validate that a location is a valid liquid handling target.
 
     Args:
@@ -122,3 +124,6 @@ def validate_takes_liquid(location: types.Location, reject_module: bool) -> None
 
     if labware is not None and labware.is_tiprack:
         raise ValueError("Cannot aspirate/dispense to a tip rack")
+
+    if check_for_adapter and (labware is not None and labware.is_adapter):
+        raise ValueError("Cannot aspirate/dispense to an adapter")

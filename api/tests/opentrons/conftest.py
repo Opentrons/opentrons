@@ -283,7 +283,7 @@ def _make_ot3_pe_ctx(
     """Return a ProtocolContext configured for an OT-3 and backed by Protocol Engine."""
     with protocol_engine_in_thread(hardware=hardware) as (engine, loop):
         yield create_protocol_context(
-            api_version=APIVersion(2, 14),
+            api_version=APIVersion(2, 15),
             hardware_api=hardware,
             deck_type=deck_type,
             protocol_engine=engine,
