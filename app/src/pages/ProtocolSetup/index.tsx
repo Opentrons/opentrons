@@ -565,7 +565,7 @@ export function ProtocolSetup(): JSX.Element {
     cancel: cancelExit,
   } = useConditionalConfirm(
     handleProceedToRunClick,
-    configBypassHeaterShakerAttachmentConfirmation
+    !configBypassHeaterShakerAttachmentConfirmation
   )
 
   // orchestrate setup subpages/components
