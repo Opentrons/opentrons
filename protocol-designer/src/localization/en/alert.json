@@ -141,12 +141,12 @@
         "body": "8-Channel pipettes cannot access labware in front of or behind a Heater-Shaker. They can access Opentrons Tip Racks in this slot. Move labware to a different slot."
       },
       "LABWARE_OFF_DECK": {
-        "title": "Robot interacting with an off deck labware",
-        "body": "Labware must be on the deck for the robot to interact with it. To resolve this error, please make sure the labware is on deck."
+        "title": "Labware is off deck",
+        "body": "The robot can only perform steps on labware that is on the deck. Add or change a Move Labware step to put it on the deck before this step."
       },
       "HEATER_SHAKER_LATCH_CLOSED": {
         "title": "Heater-Shaker labware latch is closed",
-        "body": "Before the robot can interact with labware on the Heater-Shaker module, the labware latch must be open. To resolve this error, please add a Heater-Shaker step ahead of the current step, and set the labware latch status to \"open\"."
+        "body": "The Heater-Shaker’s labware latch must be open when moving labware to or from the module. Add a Heater-Shaker step that opens the latch before this step."
       }
     },
     "warning": {
@@ -212,7 +212,7 @@
     },
     "unused_gripper": {
       "heading": "Unused gripper",
-      "body1": "The Flex Gripper is specified in your protocol is not currently used in any step. In order to run this protocol you will need to connect it to your robot.",
+      "body1": "The Flex Gripper specified in your protocol is not currently used in any step. In order to run this protocol you will need to connect it to your robot.",
       "body2": "If you don't intend to use the Flex Gripper, please consider removing it from your protocol."
     }
   },
