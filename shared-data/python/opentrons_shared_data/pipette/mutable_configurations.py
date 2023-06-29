@@ -74,7 +74,7 @@ def _migrate_to_v2_configurations(
 def _load_available_overrides(
     pipette_serial_number: str,
 ) -> OverrideType:
-    # returns quirks: model: + extra keys
+    """Load the available overrides from disk."""
     pipette_override = infer_config_pipette_base_dir() / f"{pipette_serial_number}.json"
     try:
         with open(pipette_override, "r") as f:
@@ -114,6 +114,7 @@ def _list_all_mutable_configs(
 
 
 def _find_default(name: str, configs: Dict[str, Any]) -> MutableConfig:
+    """Find the default value from the configs and return it as a mutable config."""
     lookup_dict = _MAP_KEY_TO_V2[name]
     nested_name = lookup_dict["nested_name"]
 
