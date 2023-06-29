@@ -27,7 +27,6 @@ from opentrons.protocol_engine.types import (
     OnLabwareLocation,
     LabwareLocation,
     OFF_DECK_LOCATION,
-    DropTipWellLocation,
     OverlapOffset,
 )
 from opentrons.protocol_engine.state.move_types import EdgePathType

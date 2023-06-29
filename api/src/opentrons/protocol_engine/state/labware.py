@@ -44,9 +44,6 @@ from ..types import (
     LoadedLabware,
     ModuleLocation,
     ModuleModel,
-    DropTipWellLocation,
-    DropTipWellOrigin,
-    WellOffset,
     OverlapOffset,
 )
 from ..actions import (
