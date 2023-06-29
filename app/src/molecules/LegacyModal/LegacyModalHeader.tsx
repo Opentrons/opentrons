@@ -19,8 +19,8 @@ import type { IconProps } from '@opentrons/components'
 export interface LegacyModalHeaderProps {
   onClose?: React.MouseEventHandler
   title: React.ReactNode
-  backgroundColor: string
-  color: string
+  backgroundColor?: string
+  color?: string
   icon?: IconProps
   closeButton?: JSX.Element
 }
