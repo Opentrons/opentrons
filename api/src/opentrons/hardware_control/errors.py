@@ -6,6 +6,8 @@ from opentrons_shared_data.errors.exceptions import (
     UnexpectedTipAttachError,
     InvalidParameterError,
     NotSupportedByHardwareError,
+    GripperNotPresentError,
+    InvalidActuator,
 )
 
 from .types import OT3Mount
@@ -46,16 +48,12 @@ class NotSupportedByHardware(NotSupportedByHardwareError):
     """Error raised when attempting to use arguments and values not supported by the specific hardware."""
 
 
-class GripperNotAttachedError(Exception):
+class GripperNotAttachedError(GripperNotPresentError):
     """An error raised if a gripper is accessed that is not attached."""
 
-    pass
 
-
-class AxisNotPresentError(Exception):
+class AxisNotPresentError(InvalidActuator):
     """An error raised if an axis that is not present."""
-
-    pass
 
 
 class FirmwareUpdateRequired(RuntimeError):

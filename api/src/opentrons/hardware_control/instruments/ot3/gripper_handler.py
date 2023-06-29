@@ -48,7 +48,8 @@ class GripperHandler:
         gripper = self._gripper
         if not gripper:
             raise GripperNotAttachedError(
-                "Cannot perform action without gripper attached"
+                message="Cannot perform action without gripper attached",
+                detail={"operation": "get_gripper"},
             )
         return gripper
 
@@ -92,8 +93,7 @@ class GripperHandler:
         return gripper.save_offset(delta)
 
     def get_critical_point(self, cp_override: Optional[CriticalPoint] = None) -> Point:
-        if not self._gripper:
-            raise GripperNotAttachedError()
+        gripper = self.get_gripper()
         if cp_override == CriticalPoint.MOUNT:
             raise InvalidMoveError(
                 message="The gripper mount may not be moved directly.",
@@ -102,7 +102,7 @@ class GripperHandler:
                     "value": str(CriticalPoint.MOUNT),
                 },
             )
-        return self._gripper.critical_point(cp_override)
+        return gripper.critical_point(cp_override)
 
     def get_gripper_dict(self) -> Optional[GripperDict]:
         if not self._gripper:

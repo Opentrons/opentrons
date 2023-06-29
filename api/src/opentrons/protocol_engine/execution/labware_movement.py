@@ -103,7 +103,7 @@ class LabwareMovementHandler:
 
         if not ot3api.has_gripper():
             raise GripperNotAttachedError(
-                "No gripper found for performing labware movements."
+                message="No gripper found for performing labware movements."
             )
 
         is_tc2_pickup = False

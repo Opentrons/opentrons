@@ -753,7 +753,8 @@ class OT3API(
         """
         if mount == OT3Mount.GRIPPER and not self._gripper_handler.has_gripper():
             raise GripperNotAttachedError(
-                f"Cannot return position for {mount} if no gripper is attached"
+                message=f"Cannot return position for {mount} if no gripper is attached",
+                detail={"mount": mount.name, "operation": "current_position_ot3"},
             )
 
         if refresh:
@@ -830,7 +831,11 @@ class OT3API(
 
         if mount == OT3Mount.GRIPPER and not self._gripper_handler.has_gripper():
             raise GripperNotAttachedError(
-                f"Cannot return encoder position for {mount} if no gripper is attached"
+                message=f"Cannot return encoder position for {mount} if no gripper is attached",
+                detail={
+                    "operation": "encoder_current_position_ot3",
+                    "mount": mount.name,
+                },
             )
 
         position_axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.by_mount(mount)]
