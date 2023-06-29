@@ -27,6 +27,8 @@ from opentrons.hardware_control.robot_calibration import (
 )
 from opentrons.hardware_control.types import OT3Axis
 
+from opentrons_shared_data.errors.exceptions import MoveConditionNotMetError
+
 
 async def test_controller_must_home(hardware_api):
     abs_position = types.Point(30, 20, 10)
@@ -100,12 +102,9 @@ async def test_home(ot3_hardware, mock_home):
 
 
 async def test_home_unmet(ot3_hardware, mock_home):
-    from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-        MoveConditionNotMet,
-    )
 
-    mock_home.side_effect = MoveConditionNotMet()
-    with pytest.raises(MoveConditionNotMet):
+    mock_home.side_effect = MoveConditionNotMetError()
+    with pytest.raises(MoveConditionNotMetError):
         await ot3_hardware.home([OT3Axis.X])
     assert ot3_hardware.gantry_load == GantryLoad.LOW_THROUGHPUT
     mock_home.assert_called_once_with([OT3Axis.X], GantryLoad.LOW_THROUGHPUT)
