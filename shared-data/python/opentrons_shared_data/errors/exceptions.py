@@ -338,7 +338,7 @@ class MotionFailedError(RoboticsControlError):
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build a FirmwareUpdateFailedError."""
+        """Build a MotionFailedError."""
         super().__init__(ErrorCodes.MOTION_FAILED, message, detail, wrapping)
 
 
@@ -351,7 +351,7 @@ class HomingFailedError(RoboticsControlError):
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build a FirmwareUpdateFailedError."""
+        """Build a HomingFailedError."""
         super().__init__(ErrorCodes.HOMING_FAILED, message, detail, wrapping)
 
 

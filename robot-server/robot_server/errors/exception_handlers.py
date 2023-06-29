@@ -7,7 +7,14 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from typing import Any, Callable, Coroutine, Dict, Optional, Sequence, Type, Union
 
-from opentrons_shared_data.errors import ErrorCodes, EnumeratedError, PythonException
+from opentrons_shared_data.errors import (
+    ErrorCodes,
+)
+from opentrons_shared_data.errors.exceptions import (
+    EnumeratedError,
+    PythonException,
+    FirmwareUpdateRequiredError,
+)
 
 from robot_server.versioning import (
     API_VERSION,
@@ -21,10 +28,6 @@ from .global_errors import (
     BadRequest,
     InvalidRequest,
     FirmwareUpdateRequired,
-)
-
-from opentrons.hardware_control.errors import (
-    FirmwareUpdateRequired as HWFirmwareUpdateRequired,
 )
 
 from .error_responses import (
@@ -170,7 +173,7 @@ async def handle_unexpected_error(
 
 
 async def handle_firmware_upgrade_required_error(
-    request: Request, error: HWFirmwareUpdateRequired
+    request: Request, error: FirmwareUpdateRequiredError
 ) -> JSONResponse:
     """Map a FirmwareUpdateRequired error from hardware to an API response."""
     if _route_is_legacy(request):
@@ -189,6 +192,6 @@ exception_handlers: Dict[
     ApiError: handle_api_error,
     StarletteHTTPException: handle_framework_error,
     RequestValidationError: handle_validation_error,
-    HWFirmwareUpdateRequired: handle_firmware_upgrade_required_error,
+    FirmwareUpdateRequiredError: handle_firmware_upgrade_required_error,
     Exception: handle_unexpected_error,
 }

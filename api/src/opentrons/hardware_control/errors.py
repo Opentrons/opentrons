@@ -56,18 +56,6 @@ class AxisNotPresentError(InvalidActuator):
     """An error raised if an axis that is not present."""
 
 
-class FirmwareUpdateRequired(RuntimeError):
-    """An error raised when the firmware of the submodules needs to be updated."""
-
-    pass
-
-
-class FirmwareUpdateFailed(RuntimeError):
-    """An error raised when a firmware update fails."""
-
-    pass
-
-
 class OverPressureDetected(RuntimeError):
     """An error raised when the pressure sensor max value is exceeded."""
 

@@ -25,7 +25,10 @@ from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
 
-
+from opentrons_shared_data.errors.exceptions import (
+    FirmwareUpdateFailedError,
+    PythonException,
+)
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
@@ -104,7 +107,6 @@ from .errors import (
     GripperNotAttachedError,
     AxisNotPresentError,
     UpdateOngoingError,
-    FirmwareUpdateFailed,
 )
 from . import modules
 from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
@@ -422,9 +424,15 @@ class OT3API(
                 yield update_status
         except SubsystemUpdating as e:
             raise UpdateOngoingError(e.msg) from e
-        except Exception as e:
+        except FirmwareUpdateFailedError:
+            raise
+        except BaseException as e:
             mod_log.exception("Firmware update failed")
-            raise FirmwareUpdateFailed() from e
+            raise FirmwareUpdateFailedError(
+                message="Unexpected failure in firmware update",
+                detail={"subsystems_updating": str(subsystems)},
+                wrapping=[PythonException(e)],
+            ) from e
 
     # Incidentals (i.e. not motion) API
 

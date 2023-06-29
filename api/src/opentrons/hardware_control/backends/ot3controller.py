@@ -24,6 +24,7 @@ from typing import (
     KeysView,
     Union,
 )
+from opentrons_shared_data.errors.exceptions import FirmwareUpdateRequiredError
 from opentrons.config.types import OT3Config, GantryLoad
 from opentrons.config import gripper_config, feature_flags as ff
 from .ot3utils import (
@@ -119,7 +120,6 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
     InvalidPipetteModel,
-    FirmwareUpdateRequired,
     OverPressureDetected,
 )
 from opentrons_hardware.hardware_control.motion import (
@@ -170,7 +170,17 @@ def requires_update(func: Wrapped) -> Wrapped:
     @wraps(func)
     async def wrapper(self: Any, *args: Any, **kwargs: Any) -> Any:
         if self.update_required and self.initialized:
-            raise FirmwareUpdateRequired()
+            raise FirmwareUpdateRequiredError(
+                message="A firmware update is required before the operation can run",
+                detail={
+                    "operation": func.__name__,
+                    "devices": ", ".join(
+                        subsys.name
+                        for subsys, state in self._subsystem_manager.subsystems.items()
+                        if state.fw_update_needed
+                    ),
+                },
+            )
         return await func(self, *args, **kwargs)
 
     return cast(Wrapped, wrapper)

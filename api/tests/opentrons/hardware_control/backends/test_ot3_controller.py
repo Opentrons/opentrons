@@ -15,7 +15,7 @@ from typing import (
     AsyncIterator,
     ContextManager,
 )
-
+from opentrons_shared_data.errors.exceptions import FirmwareUpdateRequiredError
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
     node_to_axis,
@@ -53,7 +53,6 @@ from opentrons.hardware_control.types import (
     FailedTipStateCheck,
 )
 from opentrons.hardware_control.errors import (
-    FirmwareUpdateRequired,
     InvalidPipetteName,
     InvalidPipetteModel,
 )
@@ -856,8 +855,31 @@ async def test_update_required_flag(
     """Test that FirmwareUpdateRequired is raised when update_required flag is set."""
     axes = [OT3Axis.X, OT3Axis.Y]
     decoy.when(mock_subsystem_manager.update_required).then_return(True)
+    decoy.when(mock_subsystem_manager.subsystems).then_return(
+        {
+            SubSystem.gantry_x: SubSystemState(
+                ok=False,
+                current_fw_version=1,
+                next_fw_version=2,
+                fw_update_needed=True,
+                current_fw_sha="asdasd",
+                pcba_revision="A2",
+                update_state=None,
+            ),
+            SubSystem.gantry_y: SubSystemState(
+                ok=True,
+                current_fw_version=1,
+                next_fw_version=2,
+                fw_update_needed=False,
+                current_fw_sha="asdasd",
+                pcba_revision="A2",
+                update_state=None,
+            ),
+        }
+    )
+
     controller._initialized = True
-    with pytest.raises(FirmwareUpdateRequired):
+    with pytest.raises(FirmwareUpdateRequiredError):
         await controller.home(axes, gantry_load=GantryLoad.LOW_THROUGHPUT)
 
 
@@ -866,6 +888,19 @@ async def test_update_required_bypass_firmware_update(
 ) -> None:
     """Do not raise FirmwareUpdateRequired for update_firmware."""
     decoy.when(mock_subsystem_manager.update_required).then_return(True)
+    decoy.when(mock_subsystem_manager.subsystems).then_return(
+        {
+            SubSystem.gantry_x: SubSystemState(
+                ok=False,
+                current_fw_version=1,
+                next_fw_version=2,
+                fw_update_needed=True,
+                current_fw_sha="asdasd",
+                pcba_revision="A2",
+                update_state=None,
+            )
+        }
+    )
 
     async def _mock_update() -> AsyncIterator[UpdateStatus]:
         yield UpdateStatus(
@@ -880,7 +915,7 @@ async def test_update_required_bypass_firmware_update(
         pass
     # raise FirmwareUpdateRequired if the _update_required flag is set
     controller._initialized = True
-    with pytest.raises(FirmwareUpdateRequired):
+    with pytest.raises(FirmwareUpdateRequiredError):
         await controller.home([OT3Axis.X], gantry_load=GantryLoad.LOW_THROUGHPUT)
 
 
