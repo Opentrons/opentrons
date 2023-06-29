@@ -1,6 +1,7 @@
 import Ajv from 'ajv'
 import isEmpty from 'lodash/isEmpty'
 import protocolV7Schema from '@opentrons/shared-data/protocol/schemas/7.json'
+import commandV7Schema from '@opentrons/shared-data/command/schemas/7.json'
 import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
@@ -44,6 +45,7 @@ const getAjvValidator = (_protocolSchema: Record<string, any>) => {
   })
   // v3 and v4 protocol schema contain reference to v2 labware schema, so give AJV access to it
   ajv.addSchema(labwareV2Schema)
+  ajv.addSchema(commandV7Schema)
   const validateProtocol = ajv.compile(_protocolSchema)
   return validateProtocol
 }
