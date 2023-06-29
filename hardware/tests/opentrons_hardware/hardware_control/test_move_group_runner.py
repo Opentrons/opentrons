@@ -259,7 +259,7 @@ async def test_single_group_clear(
     """It should send a clear group command before setup."""
     subject = MoveGroupRunner(move_groups=move_group_single)
     await subject._clear_groups(can_messenger=mock_can_messenger)
-    mock_can_messenger.send.assert_has_calls(
+    mock_can_messenger.ensure_send.assert_has_calls(
         [call(node_id=NodeId.broadcast, message=md.ClearAllMoveGroupsRequest())],
     )
 
@@ -270,7 +270,7 @@ async def test_multi_group_clear(
     """It should send a clear group command before setup."""
     subject = MoveGroupRunner(move_groups=move_group_multiple)
     await subject.prep(can_messenger=mock_can_messenger)
-    mock_can_messenger.send.assert_has_calls(
+    mock_can_messenger.ensure_send.assert_has_calls(
         [call(node_id=NodeId.broadcast, message=md.ClearAllMoveGroupsRequest())],
     )
 
@@ -620,7 +620,7 @@ class MockSendMoveCompleter:
     ) -> ErrorCode:
         """Mock ensure_send function."""
         await self.mock_send_failure(node_id, message)
-        return ErrorCode.ok
+        return ErrorCode.timeout
 
     async def mock_ensure_send(
         self,
