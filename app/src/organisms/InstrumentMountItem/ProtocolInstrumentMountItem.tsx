@@ -94,7 +94,11 @@ export function ProtocolInstrumentMountItem(
   return (
     <>
       <MountItem isReady={isAttachedWithCal}>
-        <Flex width="100%" alignItems={ALIGN_CENTER}>
+        <Flex
+          width="100%"
+          alignItems={ALIGN_CENTER}
+          gridGap={SPACING.spacing24}
+        >
           <Flex
             flex={isAttachedWithCal ? 1 : 2}
             flexDirection={DIRECTION_COLUMN}
