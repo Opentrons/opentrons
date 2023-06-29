@@ -7,6 +7,7 @@ import {
   PipetteSelect,
   OutlineButton,
   Mount,
+  Flex,
 } from '@opentrons/components'
 import {
   getIncompatiblePipetteNames,
@@ -94,29 +95,31 @@ export function PipetteFields(props: Props): JSX.Element {
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
-
-    //  adding 96-channel to the nameBlockstlist for the Flex for now
-    const nameBlockList = [...OT2_PIPETTES, 'p1000_96']
-
     return (
-      <PipetteSelect
-        nameBlocklist={
-          robotType === OT2_ROBOT_TYPE ? OT3_PIPETTES : nameBlockList
-        }
-        enableNoneOption
-        tabIndex={tabIndex}
-        pipetteName={pipetteName != null ? pipetteName : null}
-        onPipetteChange={pipetteName => {
-          const nameAccessor = `pipettesByMount.${mount}.pipetteName`
-          const value = pipetteName
-          const targetToClear = `pipettesByMount.${mount}.tiprackDefURI`
-          // this select does not return an event so we have to manually set the field val
-          onSetFieldValue(nameAccessor, value)
-          onSetFieldValue(targetToClear, null)
-          onSetFieldTouched(targetToClear, false)
-        }}
-        id={`PipetteSelect_${mount}`}
-      />
+      <Flex width="15rem">
+        <PipetteSelect
+          nameBlocklist={
+            //  filtering out 96-channel for Flex for now
+            robotType === OT2_ROBOT_TYPE
+              ? OT3_PIPETTES
+              : [...OT2_PIPETTES, 'p1000_96']
+          }
+          enableNoneOption
+          tabIndex={tabIndex}
+          pipetteName={pipetteName != null ? pipetteName : null}
+          onPipetteChange={pipetteName => {
+            const nameAccessor = `pipettesByMount.${mount}.pipetteName`
+            const value = pipetteName
+            const targetToClear = `pipettesByMount.${mount}.tiprackDefURI`
+            // this select does not return an event so we have to manually set the field val
+            onSetFieldValue(nameAccessor, value)
+            onSetFieldValue(targetToClear, null)
+            onSetFieldTouched(targetToClear, false)
+          }}
+          id={`PipetteSelect_${mount}`}
+          className={styles.pipette_select}
+        />
+      </Flex>
     )
   }
 

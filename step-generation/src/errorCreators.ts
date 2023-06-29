@@ -181,3 +181,10 @@ export const heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = (): Com
     message: '8-Channel pipette cannot access labware',
   }
 }
+
+export const labwareOffDeck = (): CommandCreatorError => {
+  return {
+    type: 'LABWARE_OFF_DECK',
+    message: 'Attempted to interact with labware off deck',
+  }
+}

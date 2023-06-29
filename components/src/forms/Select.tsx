@@ -6,6 +6,8 @@ import ReactSelect, {
 import cx from 'classnames'
 
 import { Icon } from '../icons'
+import { Box } from '../primitives'
+import { SPACING } from '../ui-style-constants'
 import { POSITION_ABSOLUTE, POSITION_FIXED } from '../styles'
 import styles from './Select.css'
 
@@ -15,7 +17,6 @@ import type {
   StylesConfig,
   CSSObjectWithLabel,
 } from 'react-select'
-import { Box, SPACING } from '..'
 
 export { reactSelectComponents }
 
@@ -69,10 +70,7 @@ const NO_STYLE_FN = (): CSSObjectWithLabel => VOID_STYLE as CSSObjectWithLabel
 const CLEAR_STYLES: StylesConfig<SelectOption> = {
   clearIndicator: NO_STYLE_FN,
   container: NO_STYLE_FN,
-  control: (styles: CSSObjectWithLabel) => ({
-    ...styles,
-    width: '15rem',
-  }),
+  control: NO_STYLE_FN,
   dropdownIndicator: NO_STYLE_FN,
   group: NO_STYLE_FN,
   groupHeading: NO_STYLE_FN,
@@ -119,7 +117,7 @@ function DropdownIndicator(
     <reactSelectComponents.DropdownIndicator {...props}>
       <Box
         position={POSITION_ABSOLUTE}
-        top="0.55rem"
+        top="0.25rem"
         right={SPACING.spacing8}
         width={SPACING.spacing20}
       >
