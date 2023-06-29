@@ -26,7 +26,7 @@ describe('LegacyModalShell', () => {
 
   it('should render full size modal when fullSize is true', () => {
     props.fullPage = true
-    const [{ getByText, getByLabelText }] = render(props)
+    const [{ getByLabelText }] = render(props)
     expect(getByLabelText('ModalShell_ModalArea')).toHaveStyle('height: 100%')
   })
 
