@@ -277,6 +277,12 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         if not v:
             return PipetteGenerationType.GEN1
         return PipetteGenerationType(v)
+    
+    @validator("quirks", pre=True)
+    def convert_quirks(cls, v: str) -> List[pip_types.Quirks]:
+        if not v:
+            return []
+        return [pip_types.Quirks(q) for q in v]
 
     @validator("quirks", pre=True)
     def convert_quirks(cls, v: str) -> List[pip_types.Quirks]:
@@ -346,4 +352,3 @@ class PipetteConfigurations(
     mount_configurations: pip_types.RobotMountConfigs = Field(
         ...,
     )
-    quirks: List[pip_types.Quirks] = Field(..., description="The list of quirks available for the loaded configuration")
