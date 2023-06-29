@@ -91,7 +91,7 @@ export const VIEWBOX_HEIGHT = 414
 
 const OT2_VIEWBOX = `${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`
 const FLEX_VIEWBOX = '-144.31 -76.59 750 580'
-
+const FLEX_TRASH_SLOT = 'A3'
 export interface SwapBlockedArgs {
   hoveredLabware?: LabwareOnDeckType | null
   draggedLabware?: LabwareOnDeckType | null
@@ -146,7 +146,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     deckDef,
     robotType,
   } = props
-
+  const trashSlot = robotType === FLEX_ROBOT_TYPE ? FLEX_TRASH_SLOT : 12
   // NOTE: handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls.
   // But when swapping labware when at least one is on a module, we need to be aware
@@ -357,7 +357,8 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         .filter(
           slot =>
             !slotIdsBlockedBySpanning.includes(slot.id) &&
-            getSlotIsEmpty(activeDeckSetup, slot.id)
+            getSlotIsEmpty(activeDeckSetup, slot.id) &&
+            slot.id !== trashSlot
         )
         .map(slot => {
           return (

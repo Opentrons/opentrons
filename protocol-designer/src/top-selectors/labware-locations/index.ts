@@ -4,6 +4,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getModuleDisplayName,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
   START_TERMINAL_ITEM_ID,
@@ -93,6 +94,7 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
   getRobotType,
   (robotState, moduleEntities, robotType) => {
     const deckDef = getDeckDefFromRobotType(robotType)
+    const trashSlot = robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'
     const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
     if (robotState == null) return null
 
@@ -140,7 +142,8 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
           !slotIdsOccupiedByModules.includes(slotId) &&
           !Object.values(labware)
             .map(lw => lw.slot)
-            .includes(slotId)
+            .includes(slotId) &&
+          slotId !== trashSlot
       )
       .map(slotId => ({ name: slotId, value: slotId }))
 
