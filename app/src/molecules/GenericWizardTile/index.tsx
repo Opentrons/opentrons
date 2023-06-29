@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
+  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -11,7 +12,6 @@ import {
   TYPOGRAPHY,
   COLORS,
   Btn,
-  ALIGN_FLEX_END,
   JUSTIFY_FLEX_END,
   JUSTIFY_START,
   JUSTIFY_CENTER,
@@ -64,7 +64,7 @@ const TILE_CONTAINER_STYLE = css`
   padding: ${SPACING.spacing32};
   height: 24.625rem;
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    height: 30rem;
+    height: 29.5rem;
   }
 `
 export interface GenericWizardTileProps {
@@ -114,20 +114,20 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
 
   return (
     <Flex css={TILE_CONTAINER_STYLE}>
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"
-          gridGap={SPACING.spacing16}
+          gridGap={SPACING.spacing8}
         >
           {typeof header === 'string' ? <Title>{header}</Title> : header}
-          {bodyText}
+          <StyledText as="p">{bodyText}</StyledText>
         </Flex>
         <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
           {rightHandBody}
         </Flex>
       </Flex>
-      <Flex justifyContent={buttonPositioning} alignItems={ALIGN_FLEX_END}>
+      <Flex justifyContent={buttonPositioning} alignItems={ALIGN_CENTER}>
         {back != null ? (
           <Btn onClick={back} disabled={backIsDisabled} aria-label="back">
             <StyledText

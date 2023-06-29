@@ -129,6 +129,14 @@ export const heaterShakerLatchOpen = (): CommandCreatorError => {
   }
 }
 
+export const heaterShakerLatchClosed = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_LATCH_CLOSED',
+    message:
+      'Attempted to move the contents of a heater-shaker with the latch closed.',
+  }
+}
+
 export const heaterShakerIsShaking = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_IS_SHAKING',

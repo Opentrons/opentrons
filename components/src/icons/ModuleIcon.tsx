@@ -11,7 +11,7 @@ import {
 import type { ModuleType } from '@opentrons/shared-data'
 import type { StyleProps } from '../primitives/types'
 
-const MODULE_ICON_NAME_BY_TYPE: { [type in ModuleType]: IconName } = {
+export const MODULE_ICON_NAME_BY_TYPE: { [type in ModuleType]: IconName } = {
   [MAGNETIC_BLOCK_TYPE]: 'ot-magnet-v2',
   [HEATERSHAKER_MODULE_TYPE]: 'ot-heater-shaker',
   [TEMPERATURE_MODULE_TYPE]: 'ot-temperature-v2',

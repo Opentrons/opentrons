@@ -58,7 +58,7 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               minHeight="74px" // leave room for error if present
               gridGap={SPACING.spacing4}
             >
-              <Text as="p">
+              <Text as="p" fontSize={TYPOGRAPHY.fontSizeP}>
                 {`${t('modal.create_file_wizard.protocol_name')} *`}
               </Text>
               <InputField
@@ -87,7 +87,9 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               width="30rem"
               gridGap={SPACING.spacing4}
             >
-              <Text as="p">{t('modal.create_file_wizard.description')}</Text>
+              <Text as="p" fontSize={TYPOGRAPHY.fontSizeP}>
+                {t('modal.create_file_wizard.description')}
+              </Text>
               <DescriptionField
                 name="fields.description"
                 value={values.fields.description ?? ''}
@@ -100,7 +102,7 @@ export function MetadataTile(props: WizardTileProps): JSX.Element {
               width="30rem"
               gridGap={SPACING.spacing4}
             >
-              <Text as="p">
+              <Text as="p" fontSize={TYPOGRAPHY.fontSizeP}>
                 {t('modal.create_file_wizard.organization_or_author')}
               </Text>
               <InputField
