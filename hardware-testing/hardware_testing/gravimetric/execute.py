@@ -215,10 +215,10 @@ def _load_labware(
         )
     if cfg.pipette_channels == 96:
         tiprack_namespace = "custom_beta"
-        tiprack_loadname = f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul_adp"
+        tiprack_loadname = f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul_adp"
     else:
         tiprack_namespace = "opentrons"
-        tiprack_loadname = f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul"
+        tiprack_loadname = f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul"
     tiprack_load_settings: List[Tuple[int, str, str]] = [
         (
             slot,
