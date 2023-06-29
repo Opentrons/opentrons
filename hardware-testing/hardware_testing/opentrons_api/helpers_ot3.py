@@ -167,6 +167,8 @@ async def build_async_ot3_hardware_api(
     if not is_simulating:
         await asyncio.sleep(0.5)
         await api.cache_instruments()
+        async for update in api.update_firmware():
+            print(f"Update: {update.subsystem.name}: {update.progress}%")
     return api
 
 
