@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { LocationIcon } from '../../molecules'
 import { Flex } from '../../primitives'
-import { DIRECTION_COLUMN } from '../../styles'
+import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
 import { RobotCoordsForeignObject } from './RobotCoordsForeignObject'
 
 import type { RobotType } from '@opentrons/shared-data'
@@ -27,22 +27,22 @@ export const SlotLabels = ({
         y="-10"
       >
         <Flex
-          alignItems="center"
+          alignItems={ALIGN_CENTER}
           flexDirection={DIRECTION_COLUMN}
           flex="1"
           height="100%"
           width="2.5rem"
         >
-          <Flex alignItems="center" flex="1">
+          <Flex alignItems={ALIGN_CENTER} flex="1">
             <LocationIcon slotName="A" height="max-content" width="100%" />
           </Flex>
-          <Flex alignItems="center" flex="1">
+          <Flex alignItems={ALIGN_CENTER} flex="1">
             <LocationIcon slotName="B" height="max-content" width="100%" />
           </Flex>
-          <Flex alignItems="center" flex="1">
+          <Flex alignItems={ALIGN_CENTER} flex="1">
             <LocationIcon slotName="C" height="max-content" width="100%" />
           </Flex>
-          <Flex alignItems="center" flex="1">
+          <Flex alignItems={ALIGN_CENTER} flex="1">
             <LocationIcon slotName="D" height="max-content" width="100%" />
           </Flex>
         </Flex>
@@ -53,15 +53,32 @@ export const SlotLabels = ({
         x="-15"
         y="-55"
       >
-        <Flex alignItems="center" flex="1" width="30.375rem" height="2.5rem">
-          <Flex alignItems="center" justifyContent="center" flex="1">
-            <LocationIcon slotName="1" height="100%" width="" />
+        <Flex
+          alignItems={ALIGN_CENTER}
+          flex="1"
+          width="30.375rem"
+          height="2.5rem"
+        >
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_CENTER}
+            flex="1"
+          >
+            <LocationIcon slotName="1" height="100%" />
           </Flex>
-          <Flex alignItems="center" justifyContent="center" flex="1">
-            <LocationIcon slotName="2" height="100%" width="" />
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_CENTER}
+            flex="1"
+          >
+            <LocationIcon slotName="2" height="100%" />
           </Flex>
-          <Flex alignItems="center" justifyContent="center" flex="1">
-            <LocationIcon slotName="3" height="100%" width="" />
+          <Flex
+            alignItems={ALIGN_CENTER}
+            justifyContent={JUSTIFY_CENTER}
+            flex="1"
+          >
+            <LocationIcon slotName="3" height="100%" />
           </Flex>
         </Flex>
       </RobotCoordsForeignObject>
