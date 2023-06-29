@@ -419,7 +419,38 @@ class ProtocolContext(CommandPublisher):
         namespace: Optional[str] = None,
         version: Optional[int] = None,
     ) -> Labware:
-        """add doc string here"""
+        """Load an adapter onto a location.
+
+        For adapters already defined by Opentrons, this is a convenient way
+        to collapse the two stages of adapters initialization (creating
+        the adapter and adding it to the protocol) into one.
+
+        This function returns the created and initialized adapter for use
+        later in the protocol.
+
+        :param str load_name: A string to use for looking up a labware definition for the adapter.
+            You can find the ``load_name`` for any standard adapter on the Opentrons
+            `Labware Library <https://labware.opentrons.com>`_.
+
+        :param location: Either a :ref:`deck slot <deck-slots>`,
+            like ``1``, ``"1"``, or ``"D1"``, or the special value :py:obj:`OFF_DECK`.
+
+        :type location: int or str or :py:obj:`OFF_DECK`
+
+        :param str namespace: The namespace that the labware definition belongs to.
+            If unspecified, will search both:
+
+              * ``"opentrons"``, to load standard Opentrons labware definitions.
+              * ``"custom_beta"``, to load custom labware definitions created with the
+                `Custom Labware Creator <https://labware.opentrons.com/create>`_.
+
+            You might need to specify an explicit ``namespace`` if you have a custom
+            definition whose ``load_name`` is the same as an Opentrons standard
+            definition, and you want to explicitly choose one or the other.
+
+        :param version: The version of the labware definition. You should normally
+            leave this unspecified to let the implementation choose a good default.
+        """
         load_name = validation.ensure_lowercase_name(load_name)
         load_location: Union[OffDeckType, DeckSlotName]
         if isinstance(location, OffDeckType):
@@ -501,6 +532,8 @@ class ProtocolContext(CommandPublisher):
                 * A deck slot like ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
                 * A hardware module that's already been loaded on the deck
                   with :py:meth:`load_module`.
+                * A labware or adapter that's already been loaded on the deck
+                  with :py:meth:`load_labware` or :py:meth:`load_adapter`.
                 * The special constant :py:obj:`OFF_DECK`.
 
         :param use_gripper: Whether to use gripper to perform this move.
