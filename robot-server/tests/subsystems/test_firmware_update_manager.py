@@ -14,6 +14,8 @@ from typing import (
 from typing_extensions import Protocol
 from decoy import Decoy
 
+from opentrons_shared_data.errors.exceptions import FirmwareUpdateOngoingError
+
 from opentrons.hardware_control.types import (
     UpdateState as HWUpdateState,
     SubSystem as HWSubSystem,
@@ -21,7 +23,7 @@ from opentrons.hardware_control.types import (
     SubSystemState,
     StatusBarState,
 )
-from opentrons.hardware_control.errors import UpdateOngoingError as HWUpdateOngoingError
+
 
 from robot_server.service.task_runner import TaskRunner
 from robot_server.subsystems.firmware_update_manager import (
@@ -158,7 +160,7 @@ async def _instant_update(
 async def _conflicting_update(
     subsystems: Optional[Set[HWSubSystem]] = None, force: bool = False
 ) -> AsyncIterator[HWUpdateStatus]:
-    raise HWUpdateOngoingError("uh oh")
+    raise FirmwareUpdateOngoingError("uh oh")
     # this yield is here to make python make this a generator
     yield
 

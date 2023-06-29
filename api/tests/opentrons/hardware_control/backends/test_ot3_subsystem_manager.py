@@ -6,6 +6,8 @@ import pytest
 
 from decoy import Decoy, matchers
 
+from opentrons_shared_data.errors.exceptions import FirmwareUpdateOngoingError
+
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     USBTarget,
@@ -19,7 +21,6 @@ from opentrons_hardware.firmware_update.types import StatusElement, FirmwareUpda
 from opentrons_hardware.drivers import can_bus, binary_usb
 
 from opentrons.hardware_control.backends.subsystem_manager import SubsystemManager
-from opentrons.hardware_control.backends.errors import SubsystemUpdating
 from opentrons.hardware_control.types import SubSystem, SubSystemState
 
 
@@ -764,7 +765,7 @@ async def test_exception_on_multiple_updates(
     )
 
     try:
-        with pytest.raises(SubsystemUpdating):
+        with pytest.raises(FirmwareUpdateOngoingError):
             async for _ in subject.update_firmware({SubSystem.pipette_right}):
                 await asyncio.sleep(0)
     finally:

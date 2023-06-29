@@ -98,16 +98,3 @@ class InvalidPipetteModel(InvalidInstrumentData):
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}: {self.name} on {self.mount.name} has an unknown model {self.model}"
-
-
-class UpdateOngoingError(RuntimeError):
-    """Error when an update is already happening."""
-
-    def __init__(self, msg: str) -> None:
-        self.msg = msg
-
-    def __repr__(self) -> str:
-        return f"<{self.__class__.__name__}: msg={self.msg}>"
-
-    def __str__(self) -> str:
-        return self.msg

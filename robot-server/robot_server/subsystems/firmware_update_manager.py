@@ -14,11 +14,11 @@ from typing import (
     Set,
 )
 
+from opentrons_shared_data.errors.exceptions import FirmwareUpdateOngoingError
 from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
     StatusBarState,
 )
-from opentrons.hardware_control.errors import UpdateOngoingError
 
 from robot_server.service.task_runner import TaskRunner
 from .models import SubSystem, UpdateState
@@ -193,7 +193,7 @@ class _UpdateProcess:
                 )
             last_progress = 100
             await self._status_queue.put(UpdateProgress(UpdateState.done, 100, None))
-        except UpdateOngoingError:
+        except FirmwareUpdateOngoingError:
             log.exception(f"Update was already in progress for {self.subsystem.value}")
             await self._status_queue.put(
                 UpdateProgress(

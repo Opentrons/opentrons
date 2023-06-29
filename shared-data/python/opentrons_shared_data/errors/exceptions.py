@@ -625,6 +625,17 @@ class InvalidParameterError(RoboticsInteractionError):
         """Build an InvalidParameterError."""
         super().__init__(ErrorCodes.INVALID_PARAMETER, message, detail, wrapping)
 
+class FirmwareUpdateOngoingError(RoboticsInteractionError):
+    """An error indicating a robotcs interaction failed because a firmware update was ongoing."""
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an FirmwareUpdateOngoingError."""
+        super().__init__(ErrorCodes.FIRMWARE_UPDATE_ONGOING, message, detail, wrapping)
+
 class APIRemoved(GeneralError):
     """An error indicating that a specific API is no longer available."""
 

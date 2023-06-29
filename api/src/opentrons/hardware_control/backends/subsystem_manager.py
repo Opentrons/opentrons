@@ -15,6 +15,7 @@ from typing import (
     Union,
 )
 
+from opentrons_shared_data.errors.exceptions import FirmwareUpdateOngoingError
 from opentrons_hardware.hardware_control import network, tools
 from opentrons_hardware.drivers import can_bus, binary_usb
 from opentrons_hardware.firmware_bindings.constants import (
@@ -27,7 +28,6 @@ from opentrons_hardware.firmware_update import FirmwareUpdate
 
 from ..types import SubSystem, SubSystemState, UpdateStatus, UpdateState
 from .ot3utils import subsystem_to_target, target_to_subsystem
-from .errors import SubsystemUpdating
 
 
 log = logging.getLogger(__name__)
@@ -224,7 +224,10 @@ class SubsystemManager:
         subsystems_to_update = subsystems_to_check - subsystems_updating
         if not subsystems_to_update:
             if subsystems:
-                raise SubsystemUpdating(f"Ongoing update for {subsystems}")
+                raise FirmwareUpdateOngoingError(
+                    message=f"Ongoing update for {subsystems}",
+                    detail={"subsystems": str(subsystems)},
+                )
             else:
                 log.info("No viable subsystem to update.")
                 return

@@ -68,6 +68,7 @@ class ErrorCodes(Enum):
     INVALID_INSTRUMENT_DATA = _code_from_dict_entry("3016")
     OUT_OF_BOUNDS_MOVE = _code_from_dict_entry('3017')
     INVALID_PARAMETER = _code_from_dict_entry('3018')
+    FIRMWARE_UPDATE_ONGOING = _code_from_dict_entry('3019')
     GENERAL_ERROR = _code_from_dict_entry("4000")
     ROBOT_IN_USE = _code_from_dict_entry("4001")
     API_REMOVED = _code_from_dict_entry("4002")

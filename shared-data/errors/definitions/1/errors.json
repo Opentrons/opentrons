@@ -154,6 +154,10 @@
       "detail": "Invalid Parameter",
       "category": "roboticsInteractionError"
     },
+    "3019": {
+      "detail": "Firmware Update Ongoing",
+      "category": "roboticsInteractionError"
+    },
     "4000": {
       "detail": "Unknown or Uncategorized Error",
       "category": "generalError"

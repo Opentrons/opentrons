@@ -73,7 +73,6 @@ from .backends.ot3utils import (
     get_system_constraints_for_calibration,
     axis_convert,
 )
-from .backends.errors import SubsystemUpdating
 from .execution_manager import ExecutionManagerProvider
 from .pause_manager import PauseManager
 from .module_control import AttachedModulesControl
@@ -106,7 +105,6 @@ from .errors import (
     MustHomeError,
     GripperNotAttachedError,
     AxisNotPresentError,
-    UpdateOngoingError,
 )
 from . import modules
 from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
@@ -422,8 +420,6 @@ class OT3API(
         try:
             async for update_status in self._backend.update_firmware(subsystems, force):
                 yield update_status
-        except SubsystemUpdating as e:
-            raise UpdateOngoingError(e.msg) from e
         except FirmwareUpdateFailedError:
             raise
         except BaseException as e:
