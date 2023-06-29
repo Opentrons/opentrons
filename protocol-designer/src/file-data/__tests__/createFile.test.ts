@@ -1,6 +1,6 @@
 import Ajv from 'ajv'
 import isEmpty from 'lodash/isEmpty'
-import protocolV6Schema from '@opentrons/shared-data/protocol/schemas/6.json'
+import protocolV7Schema from '@opentrons/shared-data/protocol/schemas/7.json'
 import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
@@ -24,7 +24,7 @@ import {
   pipetteEntities,
   ot2Robot,
 } from '../__fixtures__/createFile/commonFields'
-import * as v6Fixture from '../__fixtures__/createFile/v6Fixture'
+import * as v7Fixture from '../__fixtures__/createFile/v7Fixture'
 import {
   LabwareEntities,
   PipetteEntities,
@@ -71,25 +71,25 @@ describe('createFile selector', () => {
   afterEach(() => {
     jest.restoreAllMocks()
   })
-  it('should return a schema-valid JSON V6 protocol', () => {
+  it('should return a schema-valid JSON V7 protocol', () => {
     // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = createFile.resultFunc(
       fileMetadata,
-      v6Fixture.initialRobotState,
-      v6Fixture.robotStateTimeline,
+      v7Fixture.initialRobotState,
+      v7Fixture.robotStateTimeline,
       ot2Robot,
       dismissedWarnings,
       ingredients,
       ingredLocations,
-      v6Fixture.savedStepForms,
-      v6Fixture.orderedStepIds,
+      v7Fixture.savedStepForms,
+      v7Fixture.orderedStepIds,
       labwareEntities,
-      v6Fixture.moduleEntities,
+      v7Fixture.moduleEntities,
       pipetteEntities,
       labwareNicknamesById,
       labwareDefsByURI
     )
-    expectResultToMatchSchema(result, protocolV6Schema)
+    expectResultToMatchSchema(result, protocolV7Schema)
     // check for false positives: if the output is lacking these entities, we don't
     // have the opportunity to validate their part of the schema
     expect(!isEmpty(result.labware)).toBe(true)
