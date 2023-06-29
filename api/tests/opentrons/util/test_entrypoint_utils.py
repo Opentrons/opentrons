@@ -1,13 +1,17 @@
+import io
 import json
 import os
 from pathlib import Path
 from typing import Callable
+
+import pytest
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 from opentrons.util.entrypoint_util import (
     FoundLabware,
     labware_from_paths,
     datafiles_from_paths,
+    copy_file_like,
 )
 
 
@@ -75,3 +79,79 @@ def test_datafiles_from_paths(tmp_path: Path) -> None:
         "test1": "wait theres a second file???".encode(),
         "test-file": "this isnt even in a directory".encode(),
     }
+
+
+class TestCopyFileLike:
+    """Tests for `copy_file_like()`."""
+
+    @pytest.fixture(params=["abc", "µ", "🥸", "\n", "\r\n"])
+    def source_text(self, request: pytest.FixtureRequest) -> str:
+        return request.param  # type: ignore[attr-defined,no-any-return]
+
+    @pytest.fixture(params=["utf-8", "utf-16"])
+    def source_encoding(self, request: pytest.FixtureRequest) -> str:
+        return request.param  # type: ignore[attr-defined,no-any-return]
+
+    @pytest.fixture
+    def source_path(self, tmp_path: Path) -> Path:
+        return tmp_path / "source"
+
+    @pytest.fixture
+    def destination_path(self, tmp_path: Path) -> Path:
+        return tmp_path / "destination"
+
+    def test_from_text_file(
+        self,
+        source_text: str,
+        source_encoding: str,
+        source_path: Path,
+        destination_path: Path,
+    ) -> None:
+        """Test that it correctly copies from a text-mode `open()`."""
+        source_path.write_bytes(source_text.encode(source_encoding))
+
+        with open(
+            source_path,
+            mode="rt",
+            encoding=source_encoding,
+            newline="",  # Leave newlines in source_text alone; do not translate them.
+        ) as source_file:  # TODO: Newlines.
+            copy_file_like(source=source_file, destination=destination_path)
+
+        assert destination_path.read_bytes() == source_path.read_bytes()
+
+    def test_from_binary_file(
+        self,
+        source_text: str,
+        source_encoding: str,
+        source_path: Path,
+        destination_path: Path,
+    ) -> None:
+        """Test that it correctly copies from a binary-mode `open()`."""
+        source_path.write_bytes(source_text.encode(source_encoding))
+
+        with open(source_path, mode="rb") as source_file:
+            copy_file_like(source=source_file, destination=destination_path)
+
+        assert destination_path.read_bytes() == source_path.read_bytes()
+
+    def test_from_stringio(self, source_text: str, destination_path: Path) -> None:
+        """Test that it correctly copies from an `io.StringIO`."""
+        stringio = io.StringIO(
+            source_text,
+            newline="",  # Leave newlines in source_text alone; do not translate them.
+        )
+
+        copy_file_like(source=stringio, destination=destination_path)
+
+        assert destination_path.read_bytes() == source_text.encode("utf-8")
+
+    def test_from_bytesio(
+        self, source_text: str, source_encoding: str, destination_path: Path
+    ) -> None:
+        """Test that it correctly copies from an `io.BytesIO`."""
+        bytesio = io.BytesIO(source_text.encode(source_encoding))
+
+        copy_file_like(source=bytesio, destination=destination_path)
+
+        assert destination_path.read_bytes() == source_text.encode(source_encoding)
