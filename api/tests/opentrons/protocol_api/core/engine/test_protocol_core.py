@@ -309,8 +309,14 @@ def test_load_labware_on_labware(
     ).then_return([EngineLabwareLoadParams("hello", "world", 654)])
 
     decoy.when(
-        load_labware_params.resolve(
+        load_labware_params.resolve_loadname(
             "some_labware",
+        )
+    ).then_return("labware_some")
+
+    decoy.when(
+        load_labware_params.resolve(
+            "labware_some",
             "a_namespace",
             456,
             [EngineLabwareLoadParams("hello", "world", 654)],
@@ -320,7 +326,7 @@ def test_load_labware_on_labware(
     decoy.when(
         mock_engine_client.load_labware(
             location=OnLabwareLocation(labwareId="labware-id"),
-            load_name="some_labware",
+            load_name="labware_some",
             display_name="some_display_name",
             namespace="some_namespace",
             version=9001,
