@@ -55,7 +55,7 @@ export const LegacyModalHeader = (
         backgroundColor={backgroundColor}
       >
         <Flex>
-          {icon != null && <Icon {...icon} />}
+          {icon != null && <Icon {...icon} data-testid="Modal_header_icon" />}
           <StyledText
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
