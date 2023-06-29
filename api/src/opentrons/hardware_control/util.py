@@ -4,8 +4,9 @@ import logging
 from enum import Enum
 from typing import Dict, Any, Optional, List, Mapping, Tuple, TypeVar
 
+from opentrons_shared_data.errors.exceptions import OutOfBoundsMoveError
+
 from .types import CriticalPoint, MotionChecks
-from .errors import OutOfBoundsMove
 from opentrons.types import Point
 
 mod_log = logging.getLogger(__name__)
@@ -87,7 +88,16 @@ def check_motion_bounds(
             )
             mod_log.warning(bounds_message)
             if checks.value & MotionChecks.LOW.value:
-                raise OutOfBoundsMove(bounds_message)
+                raise OutOfBoundsMoveError(
+                    message=bounds_message,
+                    detail={
+                        "axis": str(ax),
+                        "target-machine": target_smoothie[ax],
+                        "target-deck": target_deck.get(ax, "unknown"),
+                        "dir": "low",
+                        "limit-machine": bounds.get(ax, ("unknown",))[0],
+                    },
+                )
         elif target_smoothie[ax] > bounds[ax][1]:
             bounds_message = bounds_message_format.format(
                 axis=ax,
@@ -98,4 +108,13 @@ def check_motion_bounds(
             )
             mod_log.warning(bounds_message)
             if checks.value & MotionChecks.HIGH.value:
-                raise OutOfBoundsMove(bounds_message)
+                raise OutOfBoundsMoveError(
+                    message=bounds_message,
+                    detail={
+                        "axis": str(ax),
+                        "target-machine": target_smoothie[ax],
+                        "target-deck": target_deck.get(ax, "unknown"),
+                        "dir": "high",
+                        "limit-machine": bounds.get(ax, (None, "unknown"))[1],
+                    },
+                )

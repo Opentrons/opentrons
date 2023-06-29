@@ -4,6 +4,8 @@ import mock
 import pytest
 from decoy import Decoy
 
+from opentrons_shared_data.errors.exceptions import OutOfBoundsMoveError
+
 from opentrons import config, types
 from opentrons import hardware_control as hc
 from opentrons.calibration_storage.types import (
@@ -19,7 +21,6 @@ from opentrons.hardware_control.types import (
 from opentrons.hardware_control.errors import (
     MustHomeError,
     InvalidMoveError,
-    OutOfBoundsMove,
 )
 from opentrons.hardware_control.robot_calibration import (
     RobotCalibration,
@@ -478,7 +479,7 @@ async def test_shake_during_drop(hardware_api, monkeypatch):
 
 
 async def test_move_rel_bounds(hardware_api):
-    with pytest.raises(OutOfBoundsMove):
+    with pytest.raises(OutOfBoundsMoveError):
         await hardware_api.move_rel(
             types.Mount.RIGHT, types.Point(0, 0, 2000), check_bounds=MotionChecks.HIGH
         )
