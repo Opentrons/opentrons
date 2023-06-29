@@ -568,7 +568,7 @@ class InvalidActuator(RoboticsInteractionError):
         detail: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build an GripperNotPresentError."""
+        """Build an InvalidActuator."""
         super().__init__(ErrorCodes.INVALID_ACTUATOR, message, detail, wrapping)
 
 

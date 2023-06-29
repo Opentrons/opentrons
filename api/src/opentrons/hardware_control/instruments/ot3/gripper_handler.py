@@ -95,7 +95,13 @@ class GripperHandler:
         if not self._gripper:
             raise GripperNotAttachedError()
         if cp_override == CriticalPoint.MOUNT:
-            raise InvalidMoveError("The gripper mount may not be moved directly.")
+            raise InvalidMoveError(
+                message="The gripper mount may not be moved directly.",
+                detail={
+                    "parameter": "critical_point",
+                    "value": str(CriticalPoint.MOUNT),
+                },
+            )
         return self._gripper.critical_point(cp_override)
 
     def get_gripper_dict(self) -> Optional[GripperDict]:

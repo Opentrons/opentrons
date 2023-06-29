@@ -4,6 +4,8 @@ from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
     UnexpectedTipRemovalError,
     UnexpectedTipAttachError,
+    InvalidParameterError,
+    NotSupportedByHardwareError,
 )
 
 from .types import OT3Mount
@@ -36,11 +38,11 @@ class TipAttachedError(UnexpectedTipAttachError):
     pass
 
 
-class InvalidMoveError(ValueError):
+class InvalidMoveError(InvalidParameterError):
     pass
 
 
-class NotSupportedByHardware(ValueError):
+class NotSupportedByHardware(NotSupportedByHardwareError):
     """Error raised when attempting to use arguments and values not supported by the specific hardware."""
 
 

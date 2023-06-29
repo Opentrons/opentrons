@@ -587,7 +587,13 @@ class API(
         # Adding this check in order to prevent misuse of axes types.
         if axes and any(axis not in Axis.ot2_axes() for axis in axes):
             raise NotSupportedByHardware(
-                f"At least one axis in {axes} is not supported on the OT2."
+                message=f"At least one axis in {axes} is not supported on the OT2.",
+                detail={
+                    "operation": "home",
+                    "axes": str(axes),
+                    "hardware": "OT-2 Standard",
+                    "thing-not-supported": "axes",
+                },
             )
         self._reset_last_mount()
         # Initialize/update current_position
@@ -718,7 +724,14 @@ class API(
         The effector of the x,y axis is the center of the carriage.
         The effector of the pipette mount axis are the mount critical points but only in z.
         """
-        raise NotSupportedByHardware("move_axes is not supported on the OT-2.")
+        raise NotSupportedByHardware(
+            message="move_axes is not supported on the OT-2.",
+            detail={
+                "operation": "move_axes",
+                "thing-not-supported": "call",
+                "hardware": "OT-2 Standard",
+            },
+        )
 
     async def move_rel(
         self,

@@ -183,7 +183,8 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         """
         if cp_override in [CriticalPoint.NOZZLE, CriticalPoint.TIP]:
             raise InvalidMoveError(
-                f"Critical point {cp_override.name} is not valid for a gripper"
+                message=f"Critical point {cp_override.name} is not valid for a gripper",
+                detail={"parameter": "critical_point", "value": cp_override.name},
             )
 
         if not self._attached_probe:
@@ -211,7 +212,10 @@ class Gripper(AbstractInstrument[GripperDefinition]):
                 - Point(y=self.current_jaw_displacement)
             )
         else:
-            raise InvalidMoveError(f"Critical point {cp_override} is not valid")
+            raise InvalidMoveError(
+                message=f"Critical point {cp_override} is not valid",
+                detail={"parameter": "critical_point", "value": str(cp_override)},
+            )
 
     def duty_cycle_by_force(self, newton: float) -> float:
         return gripper_config.duty_cycle_by_force(newton, self.grip_force_profile)

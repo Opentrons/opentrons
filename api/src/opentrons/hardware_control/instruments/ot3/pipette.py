@@ -302,7 +302,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN,
         ]:
             raise InvalidMoveError(
-                f"Critical point {cp_override.name} is not valid for a pipette"
+                message=f"Critical point {cp_override.name} is not valid for a pipette",
+                detail={"parameter": "critical_point", "value": cp_override.name},
             )
         if not self.has_tip or cp_override == CriticalPoint.NOZZLE:
             cp_type = CriticalPoint.NOZZLE
