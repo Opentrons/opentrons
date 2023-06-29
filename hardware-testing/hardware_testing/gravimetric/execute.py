@@ -455,10 +455,8 @@ def _pick_up_tip(
         )
 
 
-def _drop_tip(
-    ctx: ProtocolContext, pipette: InstrumentContext, cfg: config.GravimetricConfig
-) -> None:
-    if cfg.return_tip:
+def _drop_tip(pipette: InstrumentContext, return_tip: bool) -> None:
+    if return_tip:
         pipette.return_tip(home_after=False)
     else:
         pipette.drop_tip(home_after=False)
@@ -572,12 +570,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         first_tip_location = first_tip.top().move(setup_channel_offset)
         _pick_up_tip(ctx, pipette, cfg, location=first_tip_location)
         pipette.home()
-        pipette.home_plunger()
-        if cfg.return_tip:
-            print("leave first tip EMPTY so we can RETURN-TIP")
-        elif not ctx.is_simulating():
-            ui.get_user_ready("REPLACE first tip with NEW TIP")
         if not ctx.is_simulating():
+            ui.get_user_ready("REPLACE first tip with NEW TIP")
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         print("moving to scale")
         well = labware_on_scale["A1"]
@@ -649,7 +643,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 average_dispense_evaporation_ul,
             )
         print("dropping tip")
-        _drop_tip(ctx, pipette, cfg)
+        _drop_tip(pipette, return_tip=True)  # always trash calibration tips
         trial_count = 0
         for volume in test_volumes:
             actual_asp_list_all = []
@@ -737,7 +731,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         disp_with_evap,
                     )
                     print("dropping tip")
-                    _drop_tip(ctx, pipette, cfg)
+                    _drop_tip(pipette, cfg.return_tip)
 
                 ui.print_header(f"{volume} uL channel {channel + 1} CALCULATIONS")
                 aspirate_average, aspirate_cv, aspirate_d = _calculate_stats(
@@ -862,7 +856,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 pipette.dispense(pipette.current_volume, trash.top())
                 pipette.aspirate(10)  # to pull any droplets back up
             print("dropping tip")
-            _drop_tip(ctx, pipette, cfg)
+            _drop_tip(pipette, cfg.return_tip)
         print("moving to attach position")
         pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))
     ui.print_title("RESULTS")
