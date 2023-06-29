@@ -372,18 +372,13 @@ class OT3Simulator:
         """Get the state of the tip ejector flag for a given mount."""
         pass
 
-    @ensure_yield
     async def tip_action(
         self,
-        axes: Sequence[Axis],
-        distance: float = 33,
-        speed: float = -5.5,
-        acceleration: float = 0,
-        tip_action: str = "drop",
+        moves: List[Move],
+        tip_action: str = "home",
+        accelerate_during_move: bool = True,
     ) -> None:
-        _ = create_tip_action_group(
-            axes, distance, speed, acceleration, cast(PipetteAction, tip_action)
-        )
+        pass
 
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]

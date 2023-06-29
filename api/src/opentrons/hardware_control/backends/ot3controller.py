@@ -5,7 +5,6 @@ import asyncio
 from contextlib import asynccontextmanager
 from functools import wraps
 import logging
-import time
 from copy import deepcopy
 from typing import (
     Any,
@@ -67,7 +66,6 @@ from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunne
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
-    Block,
 )
 from opentrons_hardware.hardware_control.estop.detector import (
     EstopDetector,
@@ -612,24 +610,35 @@ class OT3Controller:
             self._handle_motor_status_response(position)
         return axis_convert(self._position, 0.0)
 
+    def _filter_move_group(self, move_group: MoveGroup) -> MoveGroup:
+        new_group: MoveGroup = []
+        for step in move_group:
+            new_group.append(
+                {
+                    node: axis_step
+                    for node, axis_step in step.items()
+                    if node in self._motor_nodes()
+                }
+            )
+        return new_group
+
     async def tip_action(
         self,
-        axes: Sequence[Axis],
-        distance: float,
-        speed: float,
-        acceleration: float = 0,
+        moves: List[Move],
         tip_action: str = "home",
+        accelerate_during_move: bool = True,
     ) -> None:
-        if tip_action == "home":
-            speed = speed * -1
-        move_group = create_tip_action_group(
-            axes, distance, speed, acceleration, cast(PipetteAction, tip_action)
+        group = create_tip_action_group(moves, [NodeId.pipette_left], tip_action, accelerate_during_move)
+        move_group = group
+        runner = MoveGroupRunner(
+            move_groups=[move_group],
+            ignore_stalls=True if not ff.stall_detection_enabled() else False,
         )
-        # print(f"about to create runner at {time.time()}")
-        runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
-        # print(f"positions returned {positions}, at {time.time()}")
-        # await update_gear_motor_position_estimation(self._messenger)
+        print(f"positions returned = {positions}")
+        if NodeId.pipette_left in positions:
+            self._gear_motor_position = positions[NodeId.pipette_left][0]
+        print(f"gear position is now {self._gear_motor_position}")
 
     @requires_update
     async def gripper_grip_jaw(
