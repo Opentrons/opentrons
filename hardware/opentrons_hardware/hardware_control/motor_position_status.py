@@ -101,7 +101,7 @@ async def _parser_update_motor_position_response(
         node = NodeId(arb_id.parts.originating_node_id)
         if node == expected:
             return (
-                float(response.payload.current_position.value / 1000.0),
+                float(response.payload.current_position.value),
                 float(response.payload.encoder_position.value) / 1000.0,
                 bool(
                     response.payload.position_flags.value

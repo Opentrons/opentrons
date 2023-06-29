@@ -328,7 +328,7 @@ def create_move_group(
     origin: Coordinates[Axis, CoordinateValue],
     moves: List[Move[Axis]],
     present_nodes: Iterable[NodeId],
-    stop_condition: MoveStopCondition,
+    stop_condition: MoveStopCondition = MoveStopCondition.none,
 ) -> Tuple[MoveGroup, Dict[NodeId, float]]:
     pos = _convert_to_node_id_dict(origin)
     move_group: MoveGroup = []
@@ -394,24 +394,6 @@ def create_tip_action_group(
             )
             move_group.append(step)
     return move_group
-
-
-# def create_tip_action_group(
-#     axes: Sequence[OT3Axis],
-#     distance: float,
-#     velocity: float,
-#     acceleration: float,
-#     action: PipetteAction,
-# ) -> MoveGroup:
-#     current_nodes = [axis_to_node(ax) for ax in axes]
-#     step = create_tip_action_step(
-#         velocity={node_id: np.float64(velocity) for node_id in current_nodes},
-#         distance={node_id: np.float64(distance) for node_id in current_nodes},
-#         acceleration={node_id: np.float64(acceleration) for node_id in current_nodes},
-#         present_nodes=current_nodes,
-#         action=PipetteTipActionType[action],
-#     )
-#     return [step]
 
 
 def create_gripper_jaw_grip_group(

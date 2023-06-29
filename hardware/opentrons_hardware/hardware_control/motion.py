@@ -177,6 +177,7 @@ def create_tip_action_step(
     present_nodes: Iterable[NodeId],
     action: PipetteTipActionType,
 ) -> MoveGroupStep:
+    """Creates a step for tip handling actions that require motor movement."""
     if action == PipetteTipActionType.home:
         stop_condition = MoveStopCondition.limit_switch
     else:

@@ -97,8 +97,6 @@ def targets_to_moves(
     for target in targets:
         position = {k: np.float64(target.position.get(k, 0)) for k in all_axes}
         unit_vector, distance = get_unit_vector(initial_checked, position)
-        # print(f"using unit vector = {unit_vector}")
-        # print(f"using max speed = {target.max_speed}")
         speed = limit_max_speed(unit_vector, target.max_speed, constraints)
         third_distance = np.float64(distance / 3)
         m = Move(

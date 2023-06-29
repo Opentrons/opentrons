@@ -150,7 +150,6 @@ class AcknowledgeListener:
                 max(1.0, self._timeout),
             )
         except asyncio.TimeoutError:
-            print(f"\n\n no ack received\n\n")
             log.error(
                 f"Message did not receive ack for message index {self._message.payload.message_index}"
             )
@@ -272,7 +271,6 @@ class CanMessenger:
         exclusive: bool = False,
     ) -> ErrorCode:
         if len(expected_nodes) == 0:
-            print(f"no expected nodes")
             log.warning("Expected Nodes should have been specified")
             if node_id == NodeId.broadcast:
                 expected_nodes = _Basic_Nodes.copy()

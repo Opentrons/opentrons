@@ -169,27 +169,30 @@ class MoveGroupRunner:
 
     @staticmethod
     def _accumulate_move_completions(
+        self,
         completions: _Completions,
     ) -> NodeDict[Tuple[float, float, bool, bool]]:
         position: NodeDict[
             List[Tuple[Tuple[int, int], float, float, bool, bool]]
         ] = defaultdict(list)
-        # print(f"\ngot any completion {completions}")
         for arbid, completion in completions:
             if isinstance(completion, TipActionResponse):
-                # breakpoint()
                 # assuming the two gear motors finish at the same time in the case of
                 # the 96 channel, return their position
-                print(f"got completion for tip motor {completion, arbid}, at {time.time()}")
-                return {
-                    arbid.parts.originating_node_id:
-                        (
-                            completion.payload.current_position_um.value / 1000.0,
-                            completion.payload.encoder_position_um.value,
-                            True,
-                            True,
-                        )
-                }
+                for move in self._expected_tip_action_motors:
+                    if not any(self._expected_tip_action_motors):
+                        # if the nested list is empty, we are done with all 3
+                        # tip action moves and should return the current position
+
+                        return {
+                            arbid.parts.originating_node_id:
+                                (
+                                    completion.payload.current_position_um.value / 1000.0,
+                                    completion.payload.encoder_position_um.value / 1000.0,
+                                    True,
+                                    True,
+                                )
+                        }
             position[NodeId(arbid.parts.originating_node_id)].append(
                 (
                     (
@@ -331,7 +334,6 @@ class MoveGroupRunner:
     def _get_tip_action_motor_message(
         self, step: MoveGroupTipActionStep, group: int, seq: int
     ) -> TipActionRequest:
-        # breakpoint()
         tip_action_payload = TipActionRequestPayload(
             group_id=UInt8Field(group),
             seq_id=UInt8Field(seq),
@@ -353,7 +355,6 @@ class MoveGroupRunner:
                 )
             ),
         )
-        # breakpoint()
         return TipActionRequest(payload=tip_action_payload)
 
     async def _move(
@@ -366,7 +367,6 @@ class MoveGroupRunner:
             completions = await scheduler.run(can_messenger)
         finally:
             can_messenger.remove_listener(scheduler)
-            # print(f"done removing listener at {time.time()}")
         return completions
 
 
@@ -380,12 +380,9 @@ class MoveScheduler:
         self._durations: List[float] = []
         self._stop_condition: List[List[MoveStopCondition]] = []
         self._start_at_index = start_at_index
-        self._expected_tip_action_motors = 2 * len(move_groups[0])
-        # print(f"LEN OF MOVE GROUP = {len(move_groups[0])}")
-        # print(f"move group = {move_groups}")
+        self._expected_tip_action_motors = []
 
         for move_group in move_groups:
-            # print(f"move_group = {move_group}")
             move_set = set()
             duration = 0.0
             stop_cond = []
@@ -394,12 +391,7 @@ class MoveScheduler:
                 move_set.update(set((k.value, seq_id) for k in move.keys()))
                 duration += float(movesteps[0].duration_sec)
                 if any(isinstance(g, MoveGroupTipActionStep) for g in movesteps):
-                    # breakpoint()
-                    self._expected_tip_action_motors = [
-                        GearMotorId.left,
-                        GearMotorId.right,
-                    ]
-                    self._expected_tip_action_motors = 6
+                    self._expected_tip_action_motors.append([GearMotorId.left, GearMotorId.right])
                 for step in move_group[seq_id]:
                     stop_cond.append(move_group[seq_id][step].stop_condition)
 
@@ -420,8 +412,10 @@ class MoveScheduler:
         group_id = message.payload.group_id.value - self._start_at_index
         node_id = arbitration_id.parts.originating_node_id
         try:
+
             in_group = (node_id, seq_id) in self._moves[group_id]
             self._moves[group_id].remove((node_id, seq_id))
+            print(f"removing {node_id}, {seq_id}")
             self._completion_queue.put_nowait((arbitration_id, message))
             log.debug(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
@@ -429,8 +423,8 @@ class MoveScheduler:
             )
 
             if not self._moves[group_id]:
+                print(f"\nsetting event: {node_id}\n")
                 log.debug(f"Move group {group_id+self._start_at_index} has completed.")
-                print(f"event.set at {time.time()}")
                 self._event.set()
 
         except KeyError:
@@ -509,29 +503,18 @@ class MoveScheduler:
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
         """Incoming message handler."""
-        # print(f"call got message {message, arbitration_id}")
         if isinstance(message, MoveCompleted):
             self._remove_move_group(message, arbitration_id)
             self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, TipActionResponse):
-            # print(f"got tip action response at {time.time()}")
-            # breakpoint()
-            # print(f"expected tip motors = {self._expected_tip_action_motors}")
-            # self._remove_move_group(message, arbitration_id)
-            # breakpoint()
             gear_id = GearMotorId(message.payload.gear_motor_id.value)
-            # self._expected_tip_action_motors.remove(gear_id)
-            # if len(self._expected_tip_action_motors) == 0:
-            #     self._remove_move_group(message, arbitration_id)
-            self._expected_tip_action_motors -= 1
-            if self._expected_tip_action_motors == 0:
-                # print(f"0 expected tip action motors left")
+            seq_id = message.payload.seq_id.value
+            self._expected_tip_action_motors[seq_id].remove(gear_id)
+            print(f"expected tip motors = {self._expected_tip_action_motors}")
+            if len(self._expected_tip_action_motors[seq_id]) == 0:
                 self._remove_move_group(message, arbitration_id)
-                print(f"done removing move group at {time.time()}")
-            # self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
-        # else:
 
     def _get_nodes_in_move_group(self, group_id: int) -> List[NodeId]:
         nodes = []
@@ -634,10 +617,8 @@ class MoveScheduler:
             self._start_at_index, self._start_at_index + len(self._moves)
         ):
             await self._run_one_group(group_id, can_messenger)
-
         def _reify_queue_iter() -> Iterator[_CompletionPacket]:
             while not self._completion_queue.empty():
-                # print(f"yielding queue at {time.time()}")
                 yield self._completion_queue.get_nowait()
 
         return list(_reify_queue_iter())

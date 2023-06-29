@@ -5,7 +5,6 @@ import asyncio
 from contextlib import asynccontextmanager
 from functools import wraps
 import logging
-import time
 from copy import deepcopy
 from typing import (
     Any,
@@ -67,7 +66,6 @@ from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunne
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
-    Block,
 )
 
 from opentrons_hardware.hardware_control.motor_enable_disable import (
@@ -645,29 +643,10 @@ class OT3Controller:
             ignore_stalls=True if not ff.stall_detection_enabled() else False,
         )
         positions = await runner.run(can_messenger=self._messenger)
-        # print(f"done w move group runner: {positions} at {time.time()}")
+        print(f"positions returned = {positions}")
         if NodeId.pipette_left in positions:
             self._gear_motor_position = positions[NodeId.pipette_left][0]
         print(f"gear position is now {self._gear_motor_position}")
-
-    async def tip_action(
-        self,
-        axes: Sequence[Axis],
-        distance: float,
-        speed: float,
-        acceleration: float = 0,
-        tip_action: str = "home",
-    ) -> None:
-        if tip_action == "home":
-            speed = speed * -1
-        move_group = create_tip_action_group(
-            axes, distance, speed, acceleration, cast(PipetteAction, tip_action)
-        )
-        # print(f"about to create runner at {time.time()}")
-        runner = MoveGroupRunner(move_groups=[move_group])
-        positions = await runner.run(can_messenger=self._messenger)
-        # print(f"positions returned {positions}, at {time.time()}")
-        # await update_gear_motor_position_estimation(self._messenger)
 
     @requires_update
     async def gripper_grip_jaw(

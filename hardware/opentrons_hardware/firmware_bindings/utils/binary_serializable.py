@@ -187,7 +187,6 @@ class BinarySerializable:
         """
         string = self._get_format_string()
         vals = [x.value for x in astuple(self)]
-        # breakpoint()
         try:
             return struct.pack(string, *vals)
         except struct.error as e:
