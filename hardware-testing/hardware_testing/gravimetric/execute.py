@@ -560,6 +560,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         liquid="None",
     )
 
+    calibration_tip_in_use = True
     try:
         ui.print_title("FIND LIQUID HEIGHT")
         print("homing...")
@@ -643,7 +644,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 average_dispense_evaporation_ul,
             )
         print("dropping tip")
-        _drop_tip(pipette, return_tip=True)  # always trash calibration tips
+        _drop_tip(pipette, return_tip=False)  # always trash calibration tips
+        calibration_tip_in_use = False
         trial_count = 0
         for volume in test_volumes:
             actual_asp_list_all = []
@@ -856,7 +858,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 pipette.dispense(pipette.current_volume, trash.top())
                 pipette.aspirate(10)  # to pull any droplets back up
             print("dropping tip")
-            _drop_tip(pipette, cfg.return_tip)
+            _return_tip = False if calibration_tip_in_use else cfg.return_tip
+            _drop_tip(pipette, _return_tip)
         print("moving to attach position")
         pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))
     ui.print_title("RESULTS")
