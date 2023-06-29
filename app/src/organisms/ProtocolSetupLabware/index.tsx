@@ -41,7 +41,6 @@ import { LegacyModal } from '../../molecules/LegacyModal'
 import { LocationIcon } from '../../molecules/LocationIcon'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getLabwareDisplayLocation } from '../CommandText/utils'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { getProtocolModulesInfo } from '../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { getAttachedProtocolModuleMatches } from '../ProtocolSetupModules/utils'
@@ -59,6 +58,7 @@ import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from '../ProtocolSetupModules/utils'
 import type { HeaterShakerModule, Modules } from '@opentrons/api-client'
 import type { UseQueryResult } from 'react-query'
+import { Modal } from '../../molecules/Modal'
 
 const OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'DECK_BASE',
@@ -86,7 +86,6 @@ export function ProtocolSetupLabware({
   setSetupScreen,
 }: ProtocolSetupLabwareProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const { t: commandTextTranslator } = useTranslation('protocol_command_text')
   const [showDeckMapModal, setShowDeckMapModal] = React.useState<boolean>(false)
   const [
     showLabwareDetailsModal,
@@ -131,6 +130,34 @@ export function ProtocolSetupLabware({
         location: foundLabwareLocation,
       })
       setShowLabwareDetailsModal(true)
+    }
+  }
+
+  let location: JSX.Element | string | null = null
+  if (
+    selectedLabware != null &&
+    typeof selectedLabware.location === 'object' &&
+    'slotName' in selectedLabware?.location
+  ) {
+    location = <LocationIcon slotName={selectedLabware?.location.slotName} />
+  } else if (selectedLabware != null) {
+    const matchedModule = attachedProtocolModuleMatches.find(
+      module =>
+        typeof selectedLabware.location === 'object' &&
+        'moduleId' in selectedLabware?.location &&
+        module.moduleId === selectedLabware.location.moduleId
+    )
+    if (matchedModule != null) {
+      location = (
+        <>
+          <LocationIcon slotName={matchedModule?.slotName} />
+          <LocationIcon
+            iconName={
+              MODULE_ICON_NAME_BY_TYPE[matchedModule?.moduleDef.moduleType]
+            }
+          />
+        </>
+      )
     }
   }
 
@@ -217,13 +244,11 @@ export function ProtocolSetupLabware({
           </LegacyModal>
         ) : null}
         {showLabwareDetailsModal && selectedLabware != null ? (
-          <LegacyModal
-            onClose={() => {
+          <Modal
+            onOutsideClick={() => {
               setShowLabwareDetailsModal(false)
               setSelectedLabware(null)
             }}
-            minHeight="14.375rem"
-            minWidth="43.1875rem"
           >
             <Flex alignItems={ALIGN_STRETCH} gridGap={SPACING.spacing48}>
               <LabwareThumbnail
@@ -238,15 +263,7 @@ export function ProtocolSetupLabware({
                 alignItems={ALIGN_FLEX_START}
                 gridGap={SPACING.spacing16}
               >
-                <StyledText>
-                  {mostRecentAnalysis != null
-                    ? getLabwareDisplayLocation(
-                        mostRecentAnalysis,
-                        selectedLabware.location,
-                        commandTextTranslator
-                      )
-                    : null}
-                </StyledText>
+                <Flex gridGap={SPACING.spacing4}>{location}</Flex>
                 <StyledText
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSize22}
@@ -255,7 +272,7 @@ export function ProtocolSetupLabware({
                 </StyledText>
               </Flex>
             </Flex>
-          </LegacyModal>
+          </Modal>
         ) : null}
       </Portal>
       <ODDBackButton
