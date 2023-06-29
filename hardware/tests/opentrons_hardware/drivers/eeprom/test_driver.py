@@ -19,10 +19,10 @@ from opentrons_hardware.drivers.eeprom import (
 @pytest.fixture
 def eeprom_api() -> Generator[EEPROMDriver, None, None]:
     """Mock out OT3GPIO"""
-    with mock.patch("opentrons_hardware.drivers.gpio.OT3GPIO"):
+    with tempfile.NamedTemporaryFile() as eeprom_path:
         gpio = mock.Mock(spec=OT3GPIO)
-        temp_path = Path(tempfile.NamedTemporaryFile().name)
-        yield EEPROMDriver(gpio, eeprom_path=temp_path)
+        print("EEPROM_PATH: ", eeprom_path.name)
+        yield EEPROMDriver(gpio, eeprom_path=Path(eeprom_path.name))
 
 
 def test_eeprom_setup(eeprom_api: EEPROMDriver) -> None:
@@ -158,3 +158,8 @@ def test_eeprom_close(eeprom_api: EEPROMDriver) -> None:
     assert eeprom_api.close()
     assert eeprom_api._eeprom_fd != old_fd
     assert eeprom_api._eeprom_fd == -1
+
+
+def test_eeprom_read(eeprom_api: EEPROMDriver) -> None:
+    """Test that we can read data from file descriptor."""
+    pass

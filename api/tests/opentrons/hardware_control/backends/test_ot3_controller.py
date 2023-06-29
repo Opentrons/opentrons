@@ -137,13 +137,14 @@ def mock_eeprom_driver() -> EEPROMDriver:
 
 @pytest.fixture
 def controller(
-        mock_config: OT3Config, mock_can_driver: AbstractCanDriver, mock_eeprom_driver: EEPROMDriver
+    mock_config: OT3Config,
+    mock_can_driver: AbstractCanDriver,
+    mock_eeprom_driver: EEPROMDriver,
 ) -> Iterator[OT3Controller]:
-    with (
-            mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO"),
-            mock.patch("opentrons.hardware_control.backends.ot3controller.EEPROMDriver")
-        ):
-        yield OT3Controller(mock_config, mock_can_driver)
+    with (mock.patch("opentrons.hardware_control.backends.ot3controller.OT3GPIO")):
+        yield OT3Controller(
+            mock_config, mock_can_driver, eeprom_driver=mock_eeprom_driver
+        )
 
 
 @pytest.fixture

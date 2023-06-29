@@ -223,6 +223,7 @@ class OT3Controller:
         config: OT3Config,
         driver: AbstractCanDriver,
         usb_driver: Optional[SerialUsbDriver] = None,
+        eeprom_driver: Optional[EEPROMDriver] = None,
         check_updates: bool = True,
     ) -> None:
         """Construct.
@@ -235,7 +236,9 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
-        self._drivers = self._build_system_hardware(self._messenger, usb_driver)
+        self._drivers = self._build_system_hardware(
+            self._messenger, usb_driver, eeprom_driver
+        )
         self._usb_messenger = self._drivers.usb_messenger
         self._gpio_dev = self._drivers.gpio_dev
         self._subsystem_manager = SubsystemManager(
@@ -299,9 +302,10 @@ class OT3Controller:
     def _build_system_hardware(
         can_messenger: CanMessenger,
         usb_driver: Optional[SerialUsbDriver],
+        eeprom_driver: Optional[EEPROMDriver],
     ) -> SystemDrivers:
         gpio = OT3GPIO("hardware_control")
-        eeprom_driver = EEPROMDriver(gpio)
+        eeprom_driver = eeprom_driver or EEPROMDriver(gpio)
         eeprom_driver.setup()
         gpio_dev: Union[OT3GPIO, RemoteOT3GPIO] = gpio
         usb_messenger: Optional[BinaryMessenger] = None

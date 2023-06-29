@@ -71,7 +71,6 @@ class EEPROMDriver:
 
     def __enter__(self) -> "EEPROMDriver":
         """Enter runtime context."""
-        self._eeprom_fd = self.open()
         return self
 
     def __exit__(
