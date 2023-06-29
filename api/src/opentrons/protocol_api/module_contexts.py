@@ -114,7 +114,7 @@ class ModuleContext(CommandPublisher):
         name: str,
         label: Optional[str] = None,
         namespace: Optional[str] = None,
-        version: int = 1,
+        version: Optional[int] = None,
     ) -> Labware:
         """Load a labware onto the module using its load parameters.
 
@@ -186,7 +186,7 @@ class ModuleContext(CommandPublisher):
         name: str,
         label: Optional[str] = None,
         namespace: Optional[str] = None,
-        version: int = 1,
+        version: Optional[int] = None,
     ) -> Labware:
         """
         .. deprecated:: 2.0
