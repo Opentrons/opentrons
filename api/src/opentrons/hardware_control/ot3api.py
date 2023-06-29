@@ -976,7 +976,10 @@ class OT3API(
 
         for axis in position.keys():
             if not self._backend.axis_is_present(axis):
-                raise AxisNotPresentError(f"{axis} is not present")
+                raise AxisNotPresentError(
+                    message=f"{axis} is not present",
+                    detail={"operation": "move_axes", "axis": axis.name},
+                )
 
         if not self._backend.check_encoder_status(list(position.keys())):
             await self.home()
