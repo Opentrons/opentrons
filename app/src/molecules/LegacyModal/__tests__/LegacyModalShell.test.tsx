@@ -1,10 +1,6 @@
 import * as React from 'react'
 
-import {
-  COLORS,
-  POSITION_STICKY,
-  renderWithProviders,
-} from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
 
 import { LegacyModalShell } from '../LegacyModalShell'
 

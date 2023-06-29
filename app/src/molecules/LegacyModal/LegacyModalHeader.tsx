@@ -53,6 +53,7 @@ export const LegacyModalHeader = (
         paddingX={SPACING.spacing24}
         paddingY={SPACING.spacing16}
         backgroundColor={backgroundColor}
+        data-testid="Modal_header"
       >
         <Flex>
           {icon != null && <Icon {...icon} data-testid="Modal_header_icon" />}
