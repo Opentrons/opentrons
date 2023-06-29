@@ -8,6 +8,7 @@ from opentrons_shared_data.errors.exceptions import (
     NotSupportedByHardwareError,
     GripperNotPresentError,
     InvalidActuator,
+    InvalidInstrumentData,
 )
 
 from .types import OT3Mount
@@ -62,12 +63,16 @@ class OverPressureDetected(RuntimeError):
     pass
 
 
-class InvalidPipetteName(KeyError):
+class InvalidPipetteName(InvalidInstrumentData):
     """Raised for an invalid pipette."""
 
     def __init__(self, name: int, mount: OT3Mount) -> None:
         self.name = name
         self.mount = mount
+        super().__init__(
+            f"Invalid pipette name on {self.mount.name}",
+            detail={"name": str(name), "mount": mount.name},
+        )
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: name={self.name} mount={self.mount}>"
@@ -76,13 +81,17 @@ class InvalidPipetteName(KeyError):
         return f"{self.__class__.__name__}: Pipette name key {self.name} on mount {self.mount.name} is not valid"
 
 
-class InvalidPipetteModel(KeyError):
+class InvalidPipetteModel(InvalidInstrumentData):
     """Raised for a pipette with an unknown model."""
 
     def __init__(self, name: str, model: str, mount: OT3Mount) -> None:
         self.name = name
         self.model = model
         self.mount = mount
+        super().__init__(
+            f"Invalid pipette model {model} on {self.mount.name}",
+            detail={"name": name, "model": model, "mount": mount.name},
+        )
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}: name={self.name}, model={self.model}, mount={self.mount}>"
