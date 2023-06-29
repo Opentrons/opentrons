@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, cast
+from typing import List, Optional, Union, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
@@ -15,6 +15,7 @@ from opentrons.protocols.api_support.util import APIVersionError, requires_versi
 
 from .core.common import (
     ProtocolCore,
+    LabwareCore,
     ModuleCore,
     TemperatureModuleCore,
     MagneticModuleCore,
@@ -115,6 +116,7 @@ class ModuleContext(CommandPublisher):
         label: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
+        adapter: Optional[str] = None,
     ) -> Labware:
         """Load a labware onto the module using its load parameters.
 
@@ -136,12 +138,26 @@ class ModuleContext(CommandPublisher):
                 "are trying to utilize new load_labware parameters in 2.1"
             )
 
+        load_location: Union[ModuleCore, LabwareCore]
+        if adapter is not None:
+            if self._api_version < APIVersion(2, 15):
+                raise APIVersionError(
+                    "Loading a labware on an adapter requires apiLevel 2.15 or higher."
+                )
+            loaded_adapter = self.load_adapter(
+                name=adapter,
+                namespace=namespace,
+            )
+            load_location = loaded_adapter._core
+        else:
+            load_location = self._core
+
         labware_core = self._protocol_core.load_labware(
             load_name=name,
             label=label,
             namespace=namespace,
             version=version,
-            location=self._core,
+            location=load_location,
         )
 
         if isinstance(self._core, LegacyModuleCore):

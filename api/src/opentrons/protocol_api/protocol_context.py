@@ -301,6 +301,7 @@ class ProtocolContext(CommandPublisher):
         label: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
+        adapter: Optional[str] = None,
     ) -> Labware:
         """Load a labware onto a location.
 
@@ -340,14 +341,28 @@ class ProtocolContext(CommandPublisher):
 
         :param version: The version of the labware definition. You should normally
             leave this unspecified to let the implementation choose a good default.
+        :param adapter: An load name of an adapter to load the labware on top of. The adapter
+            will be loaded from the same given namespace, but version will be automatically chosen.
         """
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
             raise APIVersionError(
                 "Loading a labware off-deck requires apiLevel 2.15 or higher."
             )
+
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName]
-        if isinstance(location, OffDeckType):
+        load_location: Union[OffDeckType, DeckSlotName, LabwareCore]
+        if adapter is not None:
+            if self._api_version < APIVersion(2, 15):
+                raise APIVersionError(
+                    "Loading a labware on an adapter requires apiLevel 2.15 or higher."
+                )
+            loaded_adapter = self.load_adapter(
+                load_name=adapter,
+                location=location,
+                namespace=namespace,
+            )
+            load_location = loaded_adapter._core
+        elif isinstance(location, OffDeckType):
             load_location = location
         else:
             load_location = validation.ensure_deck_slot(location, self._api_version)
