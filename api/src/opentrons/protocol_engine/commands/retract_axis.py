@@ -19,7 +19,7 @@ class RetractAxisParams(BaseModel):
     axis: MotorAxis = Field(
         ...,
         description=(
-            "Axis to retract to its home position as safely as possible."
+            "Axis to retract to its home position as quickly as safely possible."
             " The difference between retracting an axis and homing an axis using the"
             " home command is that a home will always probe the limit switch and"
             " will work as the first motion command a robot will need to execute;"
