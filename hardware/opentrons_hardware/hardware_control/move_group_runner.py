@@ -530,6 +530,7 @@ class MoveScheduler:
                 log.warning(
                     f"Expected nodes in group {str(group_id)}: {str(self._get_nodes_in_move_group(group_id))}"
                 )
+                raise
             except (RuntimeError, MoveConditionNotMet) as e:
                 log.error("canceling move group scheduler")
                 raise e

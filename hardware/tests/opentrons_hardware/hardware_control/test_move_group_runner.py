@@ -620,7 +620,7 @@ class MockSendMoveCompleter:
     ) -> ErrorCode:
         """Mock ensure_send function."""
         await self.mock_send_failure(node_id, message)
-        return ErrorCode.ok
+        return ErrorCode.timeout
 
     async def mock_ensure_send(
         self,
