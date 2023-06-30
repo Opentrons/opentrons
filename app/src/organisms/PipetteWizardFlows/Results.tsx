@@ -1,7 +1,10 @@
 import * as React from 'react'
+import { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
+  Btn,
   COLORS,
+  RESPONSIVENESS,
   TYPOGRAPHY,
   SPACING,
   PrimaryButton,
@@ -17,6 +20,7 @@ import {
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { SmallButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { FLOWS } from './constants'
 import type { PipetteWizardStepProps } from './types'
@@ -33,6 +37,7 @@ interface ResultsProps extends PipetteWizardStepProps {
 
 export const Results = (props: ResultsProps): JSX.Element => {
   const {
+    goBack,
     proceed,
     flowType,
     attachedPipettes,
@@ -237,10 +242,33 @@ export const Results = (props: ResultsProps): JSX.Element => {
     requiredPipDisplayName == null &&
     (flowType === FLOWS.ATTACH || flowType === FLOWS.DETACH)
   ) {
+    const GO_BACK_BUTTON_STYLE = css`
+      ${TYPOGRAPHY.pSemiBold};
+      color: ${COLORS.darkGreyEnabled};
+
+      &:hover {
+        opacity: 70%;
+      }
+
+      @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+        font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+        font-size: ${TYPOGRAPHY.fontSize22};
+
+        &:hover {
+          opacity: 100%;
+        }
+      }
+    `
     subHeader = numberOfTryAgains > 2 ? t('something_seems_wrong') : undefined
     button = (
       <>
-        {isOnDevice ? null : (
+        {isOnDevice ? (
+          <Btn onClick={goBack} aria-label="back">
+            <StyledText css={GO_BACK_BUTTON_STYLE}>
+              {t('shared:go_back')}
+            </StyledText>
+          </Btn>
+        ) : (
           <SecondaryButton
             isDangerous
             onClick={handleCleanUpAndClose}
