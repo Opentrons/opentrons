@@ -733,6 +733,8 @@ def get_test_volumes(pipette: int, channels: int, tip: int) -> List[float]:
             return [5.0]
         elif tip == 200:
             return [200.0]
+        elif tip == 1000:
+            return [1000.0]
         else:
             raise ValueError(f"no volumes to test for tip size: {tip} uL")
     else:
