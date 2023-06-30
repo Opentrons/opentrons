@@ -15,6 +15,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_SPACE_EVENLY,
   LabwareRender,
+  LocationIcon,
   Module,
   MODULE_ICON_NAME_BY_TYPE,
   RobotWorkSpace,
@@ -40,7 +41,6 @@ import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { Portal } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { LocationIcon } from '../../molecules/LocationIcon'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
@@ -511,7 +511,7 @@ function RowLabware({
     location = commandTextTranslator('off_deck')
   } else if ('slotName' in initialLocation) {
     location = <LocationIcon slotName={initialLocation.slotName} />
-  } else if (matchedModuleType != null) {
+  } else if (matchedModuleType != null && matchedModule?.slotName != null) {
     location = (
       <>
         <LocationIcon slotName={matchedModule?.slotName} />{' '}
