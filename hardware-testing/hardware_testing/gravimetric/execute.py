@@ -477,6 +477,20 @@ def _get_channel_divider(cfg: config.GravimetricConfig) -> float:
         return float(cfg.pipette_channels)
 
 
+def _get_tag_from_pipette(
+    pipette: InstrumentContext, cfg: config.GravimetricConfig
+) -> str:
+    pipette_tag = get_pipette_unique_name(pipette)
+    print(f'found pipette "{pipette_tag}"')
+    if cfg.increment:
+        pipette_tag += "-increment"
+    elif cfg.user_volumes:
+        pipette_tag += "-user-volume"
+    else:
+        pipette_tag += "-qc"
+    return pipette_tag
+
+
 def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     """Run."""
     run_id, start_time = create_run_id_and_start_time()
@@ -488,14 +502,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
 
     ui.print_header("LOAD PIPETTE")
     pipette = _load_pipette(ctx, cfg)
-    pipette_tag = get_pipette_unique_name(pipette)
-    print(f'found pipette "{pipette_tag}"')
-    if cfg.increment:
-        pipette_tag += "-increment"
-    elif cfg.user_volumes:
-        pipette_tag += "-user-volume"
-    else:
-        pipette_tag += "-qc"
+    pipette_tag = _get_tag_from_pipette(pipette, cfg)
 
     ui.print_header("GET PARAMETERS")
     test_volumes = _get_volumes(ctx, cfg)
