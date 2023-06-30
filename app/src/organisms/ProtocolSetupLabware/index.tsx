@@ -23,6 +23,7 @@ import {
 } from '@opentrons/components'
 import {
   getDeckDefFromRobotType,
+  getLabwareDefURI,
   getLabwareDisplayName,
   HEATERSHAKER_MODULE_TYPE,
   inferModuleOrientationFromXCoordinate,
@@ -92,7 +93,11 @@ export function ProtocolSetupLabware({
     setShowLabwareDetailsModal,
   ] = React.useState<boolean>(false)
   const [selectedLabware, setSelectedLabware] = React.useState<
-    (LabwareDefinition2 & { location: LabwareLocation }) | null
+    | (LabwareDefinition2 & {
+        location: LabwareLocation
+        nickName: string | null
+      })
+    | null
   >(null)
 
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -121,13 +126,17 @@ export function ProtocolSetupLabware({
     labwareDef: LabwareDefinition2,
     labwareId: string
   ): void => {
-    const foundLabwareLocation = mostRecentAnalysis?.labware.find(
+    const foundLabware = mostRecentAnalysis?.labware.find(
       labware => labware.id === labwareId
-    )?.location
-    if (foundLabwareLocation != null) {
+    )
+    if (foundLabware != null) {
+      const nickName = onDeckItems.find(
+        item => getLabwareDefURI(item.definition) === foundLabware.definitionUri
+      )?.nickName
       setSelectedLabware({
         ...labwareDef,
-        location: foundLabwareLocation,
+        location: foundLabware.location,
+        nickName: nickName ?? null,
       })
       setShowLabwareDetailsModal(true)
     }
@@ -261,7 +270,7 @@ export function ProtocolSetupLabware({
               <Flex
                 flexDirection={DIRECTION_COLUMN}
                 alignItems={ALIGN_FLEX_START}
-                gridGap={SPACING.spacing16}
+                gridGap={SPACING.spacing12}
               >
                 <Flex gridGap={SPACING.spacing4}>{location}</Flex>
                 <StyledText
@@ -269,6 +278,9 @@ export function ProtocolSetupLabware({
                   fontSize={TYPOGRAPHY.fontSize22}
                 >
                   {getLabwareDisplayName(selectedLabware)}
+                </StyledText>
+                <StyledText as="p" color={COLORS.darkBlack70}>
+                  {selectedLabware.nickName}
                 </StyledText>
               </Flex>
             </Flex>
