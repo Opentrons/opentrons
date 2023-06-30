@@ -58,8 +58,6 @@ Everything else in the protocol file will be required. Next, you’ll specify th
 
 For this tutorial, you’ll write very little Python outside of the ``run()`` function. But for more complex applications it’s worth remembering that your protocol file *is* a Python script, so any Python code that can run on the OT-2 can be a part of a protocol. 
 
-.. For more information, see Protocol Structure.
-
 Metadata
 ^^^^^^^^
 
@@ -103,7 +101,7 @@ Flex users need to specify the API version in the ``requirements`` instead of th
     # Flex
     requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
-OT-2 users working with API v2.15 (or higher) also need to specify the API version in the ``requirements`` instead of the ``metadata`` code block.
+OT-2 users working with API v2.15 (or higher) also need to specify the API version in the ``requirements`` instead of in the ``metadata`` code block.
 
 .. code-block:: python
     :substitutions:
@@ -116,7 +114,7 @@ With the metadata and requirements defined, you can move on to creating the ``ru
 The ``run()`` function
 ^^^^^^^^^^^^^^^^^^^^^^
 
-Now it’s time to actually instruct the OT-2 how to perform serial dilution. All of this information is contained in a single Python function, which has to be named ``run``. This function takes one argument, which is the *protocol context*. Many examples in these docs use the argument name ``protocol``, and sometimes they specify the argument’s type:
+Now it’s time to actually instruct the Flex or OT-2 how to perform serial dilution. All of this information is contained in a single Python function, which has to be named ``run``. This function takes one argument, which is the *protocol context*. Many examples in these docs use the argument name ``protocol``, and sometimes they specify the argument’s type:
 
 .. code-block:: python
 
