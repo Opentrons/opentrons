@@ -54,7 +54,7 @@
   "instruments_connected": "{{count}} instrument connected",
   "instruments": "Instruments",
   "labware_help_example": "<block>Alice is using a labware in Slot 6. During labware position check, she adjust the pipette position while checking the A1 of the labware to 0.2mm in X, and 1.2mm in Z. Later, Bob is preparing to run the same protocol on that robot. The labware offset that Alice created in Slot 6 will be applied for Bob’s protocol unless he changes or clears it.</block>",
-  "labware_latch_instructions": "To add labware to the Heater-Shaker Module, use the labware latch in the controls to the right.",
+  "labware_latch_instructions": "Use latch control for easy placement of labware.",
   "labware_latch": "Labware Latch",
   "labware_location": "Labware Location",
   "labware_name": "Labware Name",

@@ -63,7 +63,13 @@ const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
       ${TYPOGRAPHY.bodyTextSemiBold}
     }
   `,
-  labelSemiBold: TYPOGRAPHY.labelSemiBold,
+  labelSemiBold: css`
+    ${TYPOGRAPHY.labelSemiBold}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      font-size: ${TYPOGRAPHY.fontSize20};
+      line-height: ${TYPOGRAPHY.lineHeight24};
+    }
+  `,
   h2Bold: TYPOGRAPHY.level2HeaderBold,
   h3Bold: TYPOGRAPHY.level3HeaderBold,
   h4Bold: TYPOGRAPHY.level4HeaderBold,

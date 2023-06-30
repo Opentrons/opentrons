@@ -302,6 +302,7 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
     castValue: Number,
   },
   newLocation: {
+    getErrors: composeErrors(requiredField),
     hydrate: getLabwareLocation,
   },
 }

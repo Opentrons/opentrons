@@ -19,6 +19,7 @@ from opentrons_shared_data.protocol import (
     Schema as JSONProtocolSchema,
     load_schema as load_protocol_schema,
 )
+from opentrons_shared_data.robot.dev_types import RobotType
 
 from .api_support.types import APIVersion
 from .types import (
@@ -104,6 +105,7 @@ def _parse_json(protocol_contents: str, filename: Optional[str] = None) -> JsonP
         schema_version=version,
         api_level=API_VERSION_FOR_JSON_V5_AND_BELOW,
         metadata=validated["metadata"],
+        robot_type=validated["robot"]["model"],
     )
 
 
@@ -127,6 +129,7 @@ def _parse_python(
     static_info = extract_static_python_info(parsed)
     protocol = compile(parsed, filename=ast_filename, mode="exec")
     version = get_version(static_info, parsed)
+    robot_type = robot_type_from_static_python_info(static_info)
 
     if version >= APIVersion(2, 0):
         _validate_v2_ast(parsed)
@@ -139,6 +142,7 @@ def _parse_python(
         contents=protocol,
         metadata=static_info.metadata,
         api_level=version,
+        robot_type=robot_type,
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
         bundled_python=bundled_python,
@@ -374,6 +378,29 @@ def version_from_static_python_info(
         return APIVersion(1, 0)
     else:
         return version_from_string(requested_level)
+
+
+def robot_type_from_python_identifier(python_robot_type: str) -> RobotType:
+    if python_robot_type == "OT-2":
+        return "OT-2 Standard"
+    # Allow "OT-3" as a deprecated alias of "Flex" to support internal-to-Opentrons Python protocols
+    # that were written before the "Flex" name existed.
+    elif python_robot_type in ("Flex", "OT-3"):
+        return "OT-3 Standard"
+    else:
+        raise ValueError(
+            f"robotType must be 'OT-2' or 'Flex', not {repr(python_robot_type)}."
+        )
+
+
+def robot_type_from_static_python_info(
+    static_python_info: StaticPythonInfo,
+) -> RobotType:
+    python_robot_type = (static_python_info.requirements or {}).get("robotType", None)
+    if python_robot_type is None:
+        return "OT-2 Standard"
+    else:
+        return robot_type_from_python_identifier(python_robot_type)
 
 
 def get_version(static_python_info: StaticPythonInfo, parsed: ast.Module) -> APIVersion:

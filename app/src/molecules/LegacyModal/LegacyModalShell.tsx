@@ -59,6 +59,7 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
     >
       <ContentArea zIndex={zIndex}>
         <ModalArea
+          aria-label="ModalShell_ModalArea"
           isFullPage={fullPage}
           onClick={e => {
             e.stopPropagation()
@@ -114,6 +115,9 @@ const ModalArea = styled.div<
   box-shadow: ${BORDERS.smallDropShadow};
   height: ${({ isFullPage }) => (isFullPage ? '100%' : 'auto')};
   background-color: ${COLORS.white};
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    border-radius: ${BORDERS.borderRadiusSize4};
+  }
   ${styleProps};
 `
 

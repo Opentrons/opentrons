@@ -10,6 +10,9 @@ import {
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V2,
   getIsLabwareAboveHeight,
+  FLEX_ROBOT_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import {
   getMockDeckSetup,
@@ -221,7 +224,7 @@ describe('Edit Modules Modal', () => {
   })
 
   describe('Model Dropdown', () => {
-    it('should pass the correct props for magnetic module', () => {
+    it('should pass the correct props for magnetic module for Ot-2', () => {
       props.moduleType = MAGNETIC_MODULE_TYPE
       const wrapper = render(props)
       const expectedProps = {
@@ -231,12 +234,45 @@ describe('Edit Modules Modal', () => {
       }
       expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
     })
-    it('should pass the correct props for temperature module', () => {
+    it('should pass the correct props for temperature module for Ot-2', () => {
       props.moduleType = TEMPERATURE_MODULE_TYPE
       const wrapper = render(props)
       const expectedProps = {
         fieldName: MODEL_FIELD,
         options: MODELS_FOR_MODULE_TYPE[TEMPERATURE_MODULE_TYPE],
+        tabIndex: 0,
+      }
+      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
+    })
+    it('should pass the correct props for temperature module for Flex', () => {
+      getRobotTypeMock.mockReturnValue(FLEX_ROBOT_TYPE)
+      props.moduleType = TEMPERATURE_MODULE_TYPE
+      const wrapper = render(props)
+      const expectedProps = {
+        fieldName: MODEL_FIELD,
+        options: [{ name: 'GEN2', value: 'temperatureModuleV2' }],
+        tabIndex: 0,
+      }
+      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
+    })
+    it('should pass the correct props for thermocycler module for Flex', () => {
+      getRobotTypeMock.mockReturnValue(FLEX_ROBOT_TYPE)
+      props.moduleType = THERMOCYCLER_MODULE_TYPE
+      const wrapper = render(props)
+      const expectedProps = {
+        fieldName: MODEL_FIELD,
+        options: [{ name: 'GEN2', value: 'thermocyclerModuleV2' }],
+        tabIndex: 0,
+      }
+      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
+    })
+    it('should pass the correct props for magnetic block module for Flex', () => {
+      getRobotTypeMock.mockReturnValue(FLEX_ROBOT_TYPE)
+      props.moduleType = MAGNETIC_BLOCK_TYPE
+      const wrapper = render(props)
+      const expectedProps = {
+        fieldName: MODEL_FIELD,
+        options: MODELS_FOR_MODULE_TYPE[MAGNETIC_BLOCK_TYPE],
         tabIndex: 0,
       }
       expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)

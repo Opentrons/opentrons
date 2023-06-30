@@ -140,7 +140,7 @@ push-no-restart-ot3: sdist
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3
-	$(call restart-server,$(host),,$(ssh_opts),"opentrons-robot-server")
+	$(call restart-server,$(host),,$(ssh_opts),"opentrons-notify-server")
 
 
 .PHONY: install-key

@@ -573,16 +573,19 @@ export const getInvariantContext: Selector<
   getModuleEntities,
   getPipetteEntities,
   featureFlagSelectors.getDisableModuleRestrictions,
+  featureFlagSelectors.getAllowAllTipracks,
   (
     labwareEntities,
     moduleEntities,
     pipetteEntities,
-    disableModuleRestrictions
+    disableModuleRestrictions,
+    allowAllTipracks
   ) => ({
     labwareEntities,
     moduleEntities,
     pipetteEntities,
     config: {
+      OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
       OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
     },
   })
