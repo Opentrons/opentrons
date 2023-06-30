@@ -206,19 +206,17 @@ def _load_labware(
 ) -> Tuple[Labware, List[Labware]]:
     print(f'Loading labware on scale: "{cfg.labware_on_scale}"')
     if cfg.labware_on_scale == "radwag_pipette_calibration_vial":
-        labware_on_scale = ctx.load_labware_from_definition(
-            VIAL_DEFINITION, location=cfg.slot_scale
-        )
+        namespace = "custom_beta"
     else:
-        labware_on_scale = ctx.load_labware(
-            cfg.labware_on_scale, location=cfg.slot_scale
-        )
-    tiprack_namespace = "opentrons"
+        namespace = "opentrons"
+    labware_on_scale = ctx.load_labware(
+        cfg.labware_on_scale, location=cfg.slot_scale, namespace=namespace
+    )
     if cfg.pipette_channels == 96:
-        # NOTE: protocol uses "custom-beta", but script uses "opentrons"
-        # FIXME: use official tip-racks once available
+        tiprack_namespace = "custom_beta"
         tiprack_loadname = f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul_adp"
     else:
+        tiprack_namespace = "opentrons"
         tiprack_loadname = f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul"
     tiprack_load_settings: List[Tuple[int, str, str]] = [
         (
