@@ -102,7 +102,7 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(7000)
+      jest.advanceTimersByTime(8000)
     })
     expect(props.onClose).toHaveBeenCalled()
   })
@@ -144,7 +144,7 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(8000)
+      jest.advanceTimersByTime(9000)
     })
     expect(props.onClose).toHaveBeenCalled()
   })
