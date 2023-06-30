@@ -1,10 +1,13 @@
 import * as React from 'react'
 import { act, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../i18n'
 import { Toast } from '..'
 
 const render = (props: React.ComponentProps<typeof Toast>) => {
-  return renderWithProviders(<Toast {...props} displayType="desktop" />)[0]
+  return renderWithProviders(<Toast {...props} displayType="desktop" />, {
+    i18nInstance: i18n,
+  })[0]
 }
 
 describe('Toast', () => {
