@@ -24,6 +24,10 @@ CommandPickUpTip: dev_types.PickUpTipCommandId = "pickUpTip"
 CommandDropTip: dev_types.DropTipCommandId = "dropTip"
 CommandMoveToSlot: dev_types.MoveToSlotCommandId = "moveToSlot"
 CommandMoveToWell: dev_types.MoveToWellCommandId = "moveToWell"
+CommandMoveToCoordinates: dev_types.MoveToCoordinatesId= "moveToCoordinates"
+CommandMoveRelative: dev_types.MoveRelativeId= "moveRelative"
+CommandSavePosition: dev_types.SavePositionId= "savePosition"
+CommandHome: dev_types.HomeId= "home"
 CommandDelay: dev_types.DelayCommandId = "delay"
 CommandMagneticModuleEngage: dev_types.MagneticModuleEngageCommandId = (
     "magneticModule/engageMagnet"
@@ -70,8 +74,45 @@ CommandThermocyclerRunProfile: dev_types.ThermocyclerRunProfileCommandId = (
 CommandThermocyclerAwaitProfile: dev_types.ThermocyclerAwaitProfileCommandId = (
     "thermocycler/awaitProfileComplete"
 )
-
-
+CommandHeaterShakerSetTargetTemperature: dev_types.HeaterShakerSetTargetTemperatureId= (
+    "heaterShaker/setTargetTemperature"
+)
+CommandHeaterShakerWaitForTemperature: dev_types.HeaterShakerWaitForTemperatureId= (
+    "heaterShaker/waitForTemperature"
+)
+CommandHeaterShakerSetAndWaitForShakeSpeed: dev_types.HeaterShakerSetAndWaitForShakeSpeedId= (
+    "heaterShaker/setAndWaitForShakeSpeed"
+)
+CommandHeaterShakerDeactivateHeater: dev_types.HeaterShakerDeactivateHeaterId= (
+    "heaterShaker/deactivateHeater"
+)
+CommandHeaterShakerOpenLatch: dev_types.HeaterShakerOpenLatchId= (
+    "heaterShaker/openLabwareLatch"
+)
+CommandHeaterShakerCloseLatch: dev_types.HeaterShakerCloseLatchId= (
+    "heaterShaker/closeLabwareLatch"
+)
+CommandHeaterShakerDeactivateShaker: dev_types.HeaterShakerDeactivateShakerId= (
+    "heaterShaker/deactivateShaker"
+)
+CommandLoadLabware: dev_types.LoadLabwareId= (
+    "loadLabware"
+)
+CommandLoadModule: dev_types.LoadModuleId= (
+    "loadModule"
+)
+CommandLoadLiquid: dev_types.LoadLiquidId= (
+    "loadLiquid"
+)
+CommandLoadPipette: dev_types.LoadPipetteId= (
+    "loadPipette"
+)
+CommandWaitForResume: dev_types.WaitForResumeId= (
+    "waitForResume"
+)
+CommandWaitForDuration: dev_types.WaitForDurationId= (
+    "waitForDuration"
+)
 class Metadata(BaseModel):
     """
     Optional metadata about the protocol
@@ -132,6 +173,7 @@ class Robot(BaseModel):
         description="Model of the robot this protocol is written for "
         "(currently only OT-2 Standard is supported)",
     )
+    deckId: Literal["ot2_standard"]
 
 
 class ModuleOnlyParams(BaseModel):
@@ -147,12 +189,25 @@ class OffsetFromBottomMm(BaseModel):
         ..., description="Millimeters for pipette location offsets"
     )
 
+class WellLocationOffset(BaseModel):
+    x: Optional[float] = 0.0
+    y: Optional[float] = 0.0
+    z: Optional[float] = 0.0
+
+
+class WellLocationParam(BaseModel):
+    origin: Optional[Literal['top', 'bottom', 'center', 'default']] = 'top'
+    offset: Optional[WellLocationOffset] = WellLocationOffset()
 
 class PipetteAccessParams(BaseModel):
     pipette: str
     labware: str
     well: str
 
+class PipetteAccessParamsV6(BaseModel):
+    pipetteId: str
+    labwareId: str
+    wellName: str
 
 class VolumeParams(BaseModel):
     volume: float
@@ -175,6 +230,16 @@ class Params1(Params2, FlowRate):
 class Params(Params1, Params2, VolumeParams):
     pass
 
+class Params2V6(PipetteAccessParamsV6, WellLocationParam):
+    pass
+
+
+class Params1V6(Params2V6, FlowRate):
+    pass
+
+
+class ParamsV6(Params1, Params2, VolumeParams):
+    pass
 
 class LiquidCommand(BaseModel):
     """
@@ -182,7 +247,7 @@ class LiquidCommand(BaseModel):
     """
 
     command: Literal["aspirate", "dispense", "airGap"]
-    params: Params
+    params: Union[Params1, Params1V6]
 
 
 class BlowoutCommand(BaseModel):
@@ -191,7 +256,7 @@ class BlowoutCommand(BaseModel):
     """
 
     command: Literal["blowout"]
-    params: Params1
+    params: Union[Params1, Params1V6]
 
 
 class TouchTipCommand(BaseModel):
@@ -251,8 +316,6 @@ class Params3(BaseModel):
         "the 'minimumZHeight' param to be ignored. A 'direct' movement "
         "is in X/Y/Z simultaneously",
     )
-
-
 class MoveToSlotCommand(BaseModel):
     """
     Move to slot command. NOTE: this is an EXPERIMENTAL command, its behavior is
@@ -262,6 +325,108 @@ class MoveToSlotCommand(BaseModel):
     command: Literal["moveToSlot"]
     params: Params3
 
+class Offset(BaseModel):
+    x: Optional[float]
+    y: Optional[float]
+    z: Optional[float]
+class WellLocation(BaseModel):
+    origin: Optional[str]
+    offset: Optional[Offset]
+
+class ParamsMoveToWell(BaseModel):
+    pipetteId: str
+    wellLocation: Optional[WellLocation]
+    minimumZHeight: Optional[float] = Field(
+        None,
+        description="Optional minimal Z margin in mm. If this is larger than "
+        "the API's default safe Z margin, it will make the arc "
+        "higher. If it's smaller, it will have no effect. Specifying "
+        "this for movements that would not arc (moving within the "
+        "same well in the same labware) will cause an arc movement "
+        "instead.",
+        ge=0.0,
+    )
+    forceDirect: Optional[bool] = Field(
+        None,
+        description="Default is false. If true, moving from one labware/well to "
+        "another will not arc to the default safe z, but instead will "
+        "move directly to the specified location. This will also force "
+        "the 'minimumZHeight' param to be ignored. A 'direct' movement "
+        "is in X/Y/Z simultaneously",
+    )
+
+class MoveToWellCommand(BaseModel):
+    """
+    Move to Well command
+    """
+
+    command: Literal["moveToWell"]
+    params: ParamsMoveToWell
+
+class ParamsMoveToCoordinates(BaseModel):
+    pipetteId: str
+    coordinates: Offset = Field(
+        None, description="coordinates in x, y, z"
+    )
+    minimumZHeight: Optional[float] = Field(
+        None,
+        description="Optional minimal Z margin in mm. If this is larger than "
+        "the API's default safe Z margin, it will make the arc "
+        "higher. If it's smaller, it will have no effect. Specifying "
+        "this for movements that would not arc (moving within the "
+        "same well in the same labware) will cause an arc movement "
+        "instead.",
+        ge=0.0,
+    )
+    forceDirect: Optional[bool] = Field(
+        None,
+        description="Default is false. If true, moving from one labware/well to "
+        "another will not arc to the default safe z, but instead will "
+        "move directly to the specified location. This will also force "
+        "the 'minimumZHeight' param to be ignored. A 'direct' movement "
+        "is in X/Y/Z simultaneously",
+    )
+class MoveToCoordinatesCommand(BaseModel):
+    """
+    Move to coodinates command
+    """
+
+    command: Literal["moveToCoordinates"]
+    params: ParamsMoveToCoordinates
+class ParamsMoveRelative(BaseModel):
+    pipetteId: str
+    axis: str
+    distance: float
+class MoveRelativeCommand(BaseModel):
+    """
+    Move relative command
+    """
+
+    command: Literal["moveRelative"]
+    params: ParamsMoveRelative
+
+class ParamsSavePosition(BaseModel):
+    pipetteId: str
+    positionId: Optional[str]
+
+class SavePositionCommand(BaseModel):
+    """
+    Move to save position command
+    """
+
+    command: Literal["savePosition"]
+    params: ParamsSavePosition
+
+class ParamsHome(BaseModel):
+    axes: Optional[List[str]]
+
+class HomeCommand(BaseModel):
+    """
+    Move to save position command
+    """
+
+    command: Literal["home"]
+    params: ParamsHome
 
 class DelayCommandParams(BaseModel):
     wait: Union[Literal[True], float] = Field(
@@ -493,6 +658,17 @@ class ThermocyclerAwaitProfileCompleteCommand(BaseModel):
     command: Literal["thermocycler/awaitProfileComplete"]
     params: ModuleOnlyParams
 
+class TemperatureParams(BaseModel):
+    moduleId: str
+    celsius: float
+
+class HeaterShakerSetTargetTemperatureCommand(BaseModel):
+    """
+    Heater shaker set target temperature command
+    """
+
+    command: Literal["heaterShaker/setTargetTemperature"]
+    params: TemperatureParams
 
 class Offset1(BaseModel):
     """
@@ -544,6 +720,56 @@ class MoveToWellCommand(BaseModel):
     command: Literal["moveToWell"]
     params: Params13
 
+class SlotLocation(BaseModel):
+    slotName: str
+
+class ModuleLocation(BaseModel):
+    moduleId: str
+class LoadLabwareParams(BaseModel):
+    labwareId: str
+    location: Union[SlotLocation, ModuleLocation]
+class LoadLabwareCommand(BaseModel):
+    """
+    Load labware
+    """
+
+    command: Literal["loadLabware"]
+    params: LoadLabwareParams
+
+class LoadModuleParams(BaseModel):
+    moduleId: str
+    location: ModuleLocation
+class LoadModuleCommand(BaseModel):
+    """
+    Load module
+    """
+
+    command: Literal["loadModule"]
+    params: LoadModuleParams
+
+class LoadPipetteParams(BaseModel):
+    pipetteId: str
+    mount: Literal['left', 'right']
+class LoadPipetteCommand(BaseModel):
+    """
+    Load pipette
+    """
+
+    command: Literal["loadPipette"]
+    params: LoadPipetteParams
+
+
+class LoadLiquidParams(BaseModel):
+    liquidId: str
+    labwareId: str
+    volumeByWell: Dict[str, float]
+class LoadLiquidCommand(BaseModel):
+    """
+    Load liquid
+    """
+
+    command: Literal["loadLiquid"]
+    params: LoadLiquidParams
 
 AllCommands = Union[
     LiquidCommand,
@@ -551,6 +777,11 @@ AllCommands = Union[
     TouchTipCommand,
     PickUpDropTipCommand,
     MoveToSlotCommand,
+    MoveToWellCommand,
+    MoveToCoordinatesCommand,
+    MoveRelativeCommand,
+    SavePositionCommand,
+    HomeCommand,
     DelayCommand,
     MagneticModuleEngageCommand,
     MagneticModuleDisengageCommand,
@@ -567,7 +798,19 @@ AllCommands = Union[
     ThermocyclerCloseLidCommand,
     ThermocyclerRunProfile,
     ThermocyclerAwaitProfileCompleteCommand,
-    MoveToWellCommand,
+    HeaterShakerSetTargetTemperatureCommand,
+    # HeaterShakerWaitForTemperatureCommand,
+    # HeaterShakerSetAndWaitForShakeSpeedCommand,
+    # HeaterShakerDeactivateHeaterCommand,
+    # HeaterShakerOpenLatchCommand,
+    # HeaterShakerCloseLatchCommand,
+    # HeaterSHakerDeactivateShakerCommand,
+    LoadLabwareCommand,
+    LoadModuleCommand,
+    LoadPipetteCommand,
+    LoadLiquidCommand,
+    # WaitForResumeCommand,
+    # WaitForDurationCommand
 ]
 
 
@@ -579,9 +822,9 @@ class Pipettes(BaseModel):
     class Config:
         extra = Extra.allow
 
-    mount: Literal["left", "right"] = Field(
-        ..., description="Where the pipette is mounted"
-    )
+    # mount: Literal["left", "right"] = Field(
+    #     ..., description="Where the pipette is mounted"
+    # )
     name: str = Field(
         ...,
         description="Name of a pipette. Does not contain info about specific "
@@ -597,12 +840,12 @@ class Labware(BaseModel):
     class Config:
         extra = Extra.allow
 
-    slot: str = Field(
-        ...,
-        description="string '1'-'12', or special string 'span7_8_10_11' signify "
-        "it's a slot on the OT-2 deck. If it's a UUID, it's the "
-        "slot on the module referenced by that ID.",
-    )
+    # slot: str = Field(
+    #     ...,
+    #     description="string '1'-'12', or special string 'span7_8_10_11' signify "
+    #     "it's a slot on the OT-2 deck. If it's a UUID, it's the "
+    #     "slot on the module referenced by that ID.",
+    # )
     definitionId: str = Field(
         ..., description='reference to this labware\'s ID in "labwareDefinitions"'
     )
@@ -637,14 +880,14 @@ class Modules(BaseModel):
 
 class Model(BaseModel):
     otSharedSchema: Optional[
-        Literal["#/protocol/schemas/5", "#/protocol/schemas/4"]
+        Literal["#/protocol/schemas/6", "#/protocol/schemas/5", "#/protocol/schemas/4"]
     ] = Field(
         None,
         alias="$otSharedSchema",
         description="The path to a valid Opentrons shared schema relative to "
         "the shared-data directory, without its extension.",
     )
-    schemaVersion: Literal[1, 2, 3, 4, 5] = Field(
+    schemaVersion: Literal[1, 2, 3, 4, 5, 6] = Field(
         ..., description="Schema version of a protocol is a single integer"
     )
     metadata: Metadata = Field(..., description="Optional metadata about the protocol")

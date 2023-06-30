@@ -3,7 +3,7 @@ from typing import cast, List
 from pydantic import parse_obj_as
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
-from opentrons_shared_data.protocol.models import ProtocolSchemaV6, protocol_schema_v6
+from opentrons_shared_data.protocol.models import ProtocolSchemaV7, protocol_schema_v7
 
 from opentrons.types import MountType
 from opentrons.protocol_engine import (
@@ -23,10 +23,10 @@ class CommandTranslatorError(Exception):
 
 
 def _translate_labware_command(
-    protocol: ProtocolSchemaV6, command: protocol_schema_v6.Command
+    protocol: ProtocolSchemaV7, command: protocol_schema_v7.Command
 ) -> pe_commands.LoadLabwareCreate:
     labware_id = command.params.labwareId
-    # v6 data model supports all commands and therefor most props are optional.
+    # v7 data model supports all commands and therefor most props are optional.
     # load labware command must contain labware_id and definition_id.
     assert labware_id is not None
     definition_id = protocol.labware[labware_id].definitionId
@@ -50,11 +50,11 @@ def _translate_labware_command(
 
 
 def _translate_module_command(
-    protocol: ProtocolSchemaV6, command: protocol_schema_v6.Command
+    protocol: ProtocolSchemaV7, command: protocol_schema_v7.Command
 ) -> pe_commands.CommandCreate:
     module_id = command.params.moduleId
     modules = protocol.modules
-    # v6 data model supports all commands and therefor most props are optional.
+    # v7 data model supports all commands and therefor most props are optional.
     # load module command must contain module_id. modules cannot be None.
     assert module_id is not None
     assert modules is not None
@@ -70,10 +70,10 @@ def _translate_module_command(
 
 
 def _translate_pipette_command(
-    protocol: ProtocolSchemaV6, command: protocol_schema_v6.Command
+    protocol: ProtocolSchemaV7, command: protocol_schema_v7.Command
 ) -> pe_commands.CommandCreate:
     pipette_id = command.params.pipetteId
-    # v6 data model supports all commands and therefor most props are optional.
+    # v7 data model supports all commands and therefor most props are optional.
     # load pipette command must contain pipette_id.
     assert pipette_id is not None
     translated_obj = pe_commands.LoadPipetteCreate(
@@ -88,7 +88,7 @@ def _translate_pipette_command(
 
 
 def _translate_simple_command(
-    command: protocol_schema_v6.Command,
+    command: protocol_schema_v7.Command,
 ) -> pe_commands.CommandCreate:
     dict_command = command.dict(exclude_none=True)
 
@@ -113,8 +113,8 @@ def _translate_simple_command(
 class JsonTranslator:
     """Class that translates commands/liquids from PD/JSON to ProtocolEngine."""
 
-    def translate_liquids(self, protocol: ProtocolSchemaV6) -> List[Liquid]:
-        """Takes json protocol v6 and translates liquids->protocol engine liquids."""
+    def translate_liquids(self, protocol: ProtocolSchemaV7) -> List[Liquid]:
+        """Takes json protocol v7 and translates liquids->protocol engine liquids."""
         protocol_liquids = protocol.liquids or {}
 
         return [
@@ -131,9 +131,9 @@ class JsonTranslator:
 
     def translate_commands(
         self,
-        protocol: ProtocolSchemaV6,
+        protocol: ProtocolSchemaV7,
     ) -> List[pe_commands.CommandCreate]:
-        """Takes json protocol v6 and translates commands->protocol engine commands."""
+        """Takes json protocol v7 and translates commands->protocol engine commands."""
         commands_list: List[pe_commands.CommandCreate] = []
         for command in protocol.commands:
             if command.commandType == "loadPipette":
