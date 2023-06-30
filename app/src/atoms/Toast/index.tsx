@@ -210,7 +210,7 @@ export function Toast(props: ToastProps): JSX.Element {
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing8}
         overflow="hidden"
         width="100%"
       >
@@ -219,7 +219,7 @@ export function Toast(props: ToastProps): JSX.Element {
           color={toastStyleByType[type].color}
           maxWidth={showODDStyle ? SPACING.spacing32 : SPACING.spacing16}
           minWidth={showODDStyle ? SPACING.spacing32 : SPACING.spacing16}
-          marginRight={SPACING.spacing8}
+          marginRight={showODDStyle ? SPACING.spacing8 : '0'}
           spin={icon?.spin != null ? icon.spin : false}
           aria-label={`icon_${type}`}
         />
