@@ -325,6 +325,7 @@ def _run_trial(
     mix: bool = False,
     stable: bool = True,
     scale_delay: int = DELAY_FOR_MEASUREMENT,
+    measure_height: float = 50,
 ) -> Tuple[float, MeasurementData, float, MeasurementData]:
     pipetting_callbacks = _generate_callbacks_for_trial(
         recorder, volume, channel, trial, blank
@@ -362,7 +363,6 @@ def _run_trial(
     print("recorded weights:")
 
     # RUN INIT
-    measure_height = config.SCALE_Z_DISTANCE_TO_AVOID_STATIC
     pipette.move_to(well.top(measure_height).move(channel_offset))
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     print(f"\tinitial grams: {m_data_init.grams_average} g")
@@ -566,6 +566,12 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         liquid="None",
     )
 
+    # need to be as far away from the scale as possible
+    # to avoid static from distorting the measurement
+    if cfg.labware_on_scale == "radwag_pipette_calibration_vial":
+        measure_height = 50
+    else:
+        measure_height = 120
     calibration_tip_in_use = True
     try:
         ui.print_title("FIND LIQUID HEIGHT")
@@ -628,6 +634,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     mix=cfg.mix,
                     stable=True,
                     scale_delay=cfg.scale_delay,
+                    measure_height=measure_height,
                 )
                 print(
                     f"blank {trial + 1}/{config.NUM_BLANK_TRIALS}:\n"
@@ -704,6 +711,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         mix=cfg.mix,
                         stable=True,
                         scale_delay=cfg.scale_delay,
+                        measure_height=measure_height,
                     )
                     print(
                         "measured volumes:\n"
