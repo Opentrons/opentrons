@@ -32,7 +32,7 @@ export function ConfirmAttachedModal({
   }
 
   return (
-    <Modal header={modalHeader}>
+    <Modal header={modalHeader} onOutsideClick={onCloseClick}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <StyledText as="p">
           {t('confirm_heater_shaker_module_modal_description')}
