@@ -315,7 +315,7 @@ async def patch_pipette_setting(
             raise LegacyErrorResponse(
                 message=str(e), errorCode=ErrorCodes.GENERAL_ERROR.value.code
             ).as_error(status.HTTP_412_PRECONDITION_FAILED)
-    r = _pipette_settings_from_config(pipette_config, pipette_id)
+    r = _pipette_settings_from_config(pipette_id)
     return r
 
 
