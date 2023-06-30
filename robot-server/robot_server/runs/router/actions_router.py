@@ -116,12 +116,10 @@ async def create_run_action(
         )
 
     except RunActionNotAllowedError as e:
-        raise RunActionNotAllowed(detail=str(e)).as_error(
-            status.HTTP_409_CONFLICT
-        ) from e
+        raise RunActionNotAllowed.from_exc(e).as_error(status.HTTP_409_CONFLICT) from e
 
     except RunNotFoundError as e:
-        raise RunNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+        raise RunNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=action),

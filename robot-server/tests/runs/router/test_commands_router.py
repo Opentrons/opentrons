@@ -214,8 +214,9 @@ async def test_add_conflicting_setup_command(
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["detail"] == matchers.StringMatching(
-        ".*4000.*oh no"
+        "oh no"
     )
+    assert exc_info.value.content["errors"][0]["errorCode"] == "4000"
 
 
 async def test_add_command_to_stopped_engine(
@@ -241,8 +242,9 @@ async def test_add_command_to_stopped_engine(
 
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["detail"] == matchers.StringMatching(
-        ".*4000.*oh no"
+        "oh no"
     )
+    assert exc_info.value.content["errors"][0]["errorCode"] == "4000"
 
 
 async def test_get_run_commands(

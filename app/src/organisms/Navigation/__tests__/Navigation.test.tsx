@@ -57,6 +57,24 @@ const mockRoutes = [
 
 mockConnectedRobot.name = '12345678901234567'
 
+class MockIntersectionObserver {
+  observe = jest.fn()
+  disconnect = jest.fn()
+  unobserve = jest.fn()
+}
+
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: MockIntersectionObserver,
+})
+
+Object.defineProperty(global, 'IntersectionObserver', {
+  writable: true,
+  configurable: true,
+  value: MockIntersectionObserver,
+})
+
 const render = (props: React.ComponentProps<typeof Navigation>) => {
   return renderWithProviders(
     <MemoryRouter>

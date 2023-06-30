@@ -129,6 +129,14 @@ export const heaterShakerLatchOpen = (): CommandCreatorError => {
   }
 }
 
+export const heaterShakerLatchClosed = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_LATCH_CLOSED',
+    message:
+      'Attempted to move the contents of a heater-shaker with the latch closed.',
+  }
+}
+
 export const heaterShakerIsShaking = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_IS_SHAKING',
@@ -171,5 +179,12 @@ export const heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = (): Com
   return {
     type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
     message: '8-Channel pipette cannot access labware',
+  }
+}
+
+export const labwareOffDeck = (): CommandCreatorError => {
+  return {
+    type: 'LABWARE_OFF_DECK',
+    message: 'Attempted to interact with labware off deck',
   }
 }

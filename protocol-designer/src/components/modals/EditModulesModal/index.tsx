@@ -19,6 +19,10 @@ import {
   ModuleType,
   ModuleModel,
   OT2_STANDARD_MODEL,
+  THERMOCYCLER_MODULE_V1,
+  TEMPERATURE_MODULE_V1,
+  RobotType,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
@@ -254,6 +258,23 @@ const EditModulesModalComponent = (
     placement: 'top',
   })
 
+  //  TODO(jr, 6/26/23): should probably move this into a util component
+  function getModuleOptionsForRobotType(
+    options: Array<{ name: string; value: ModuleModel }>,
+    robotType: RobotType
+  ): Array<{ name: string; value: ModuleModel }> {
+    const filterOutModels: ModuleModel[] =
+      robotType === FLEX_ROBOT_TYPE
+        ? [THERMOCYCLER_MODULE_V1, TEMPERATURE_MODULE_V1]
+        : []
+
+    const filteredOptions = options.filter(
+      option => !filterOutModels.includes(option.value)
+    )
+
+    return filteredOptions
+  }
+
   return (
     <Modal
       heading={i18n.t(`modules.module_long_names.${moduleType}`)}
@@ -272,9 +293,12 @@ const EditModulesModalComponent = (
           <div className={styles.form_row}>
             <FormGroup label="Model" className={styles.option_model}>
               <ModelDropdown
-                fieldName={'selectedModel'}
+                fieldName="selectedModel"
                 tabIndex={0}
-                options={MODELS_FOR_MODULE_TYPE[moduleType]}
+                options={getModuleOptionsForRobotType(
+                  MODELS_FOR_MODULE_TYPE[moduleType],
+                  robotType
+                )}
               />
             </FormGroup>
             {showSlotOption && (
