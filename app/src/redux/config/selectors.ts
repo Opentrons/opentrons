@@ -17,7 +17,7 @@ export const getApplyHistoricOffsets: (
   state: State
 ) => boolean = createSelector(
   getConfig,
-  config => config?.protocols.applyHistoricOffsets ?? false
+  config => config?.protocols.applyHistoricOffsets ?? true
 )
 
 export const getDevtoolsEnabled = (state: State): boolean => {

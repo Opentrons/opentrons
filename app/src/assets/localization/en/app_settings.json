@@ -14,6 +14,7 @@
   "analytics_description": "Help Opentrons improve its products and services by automatically sending anonymous diagnostics and usage data.",
   "app_changes": "App Changes in ",
   "app_settings": "App Settings",
+  "apply_historic_offsets": "Always Apply Historic Offset Data",
   "bug_fixes": "Bug Fixes",
   "cal_block": "Always use calibration block to calibrate",
   "change_folder_button": "Change labware source folder",
