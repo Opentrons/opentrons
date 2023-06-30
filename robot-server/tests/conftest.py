@@ -176,7 +176,7 @@ def attach_pipettes(server_temp_directory: str) -> Iterator[None]:
     pipette = {"dropTipShake": True, "model": "p300_multi_v1"}
 
     pipette_dir_path = os.path.join(server_temp_directory, "pipettes")
-    pipette_file_path = os.path.join(pipette_dir_path, "testpipette01.json")
+    pipette_file_path = os.path.join(pipette_dir_path, "P300MV1020230630.json")
 
     with open(pipette_file_path, "w") as pipette_file:
         json.dump(pipette, pipette_file)

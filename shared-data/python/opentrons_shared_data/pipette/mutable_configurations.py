@@ -1,5 +1,6 @@
 import logging
 import json
+import re
 from typing import Optional, List, Dict, Any, cast
 
 from .pipette_definition import PipetteConfigurations
@@ -26,6 +27,7 @@ from .dev_types import PipetteModel
 log = logging.getLogger(__name__)
 
 PIPETTE_SERIAL_MODEL_LOOKUP = load_serial_lookup_table()
+SERIAL_STUB_REGEX = re.compile(r"P[0-9]{1,3}[KSMHV]{1,2}V[0-9]{2}")
 
 
 def _migrate_to_v2_configurations(
@@ -159,8 +161,9 @@ def list_mutable_configs(pipette_serial_number: str) -> OverrideType:
 
     mutable_configs: OverrideType = {}
 
+    serial_key = SERIAL_STUB_REGEX.match(pipette_serial_number).group(0)
     pipette_model = convert_pipette_model(
-        cast(PipetteModel, PIPETTE_SERIAL_MODEL_LOOKUP[pipette_serial_number[0:7]])
+        cast(PipetteModel, PIPETTE_SERIAL_MODEL_LOOKUP[serial_key])
     )
 
     base_configs = load_definition(

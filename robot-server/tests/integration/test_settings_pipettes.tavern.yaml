@@ -30,7 +30,7 @@ stages:
             top: !anydict
           info:
             model: p300_multi_v1
-            name: p300_multi
+            name: !anystr
       strict: false 
 ---
 test_name: GET Pipette {pipette_id}
@@ -41,7 +41,7 @@ marks:
 stages:
   - name: GET Pipette Settings of specific pipette request returns correct info
     request:
-      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/P300MV1020230630"
       method: GET
     response:
       status_code: 200
@@ -63,7 +63,7 @@ stages:
           top: !anydict
         info:
           model: p300_multi_v1
-          name: p300_multi
+          name: !anystr
       strict: true
 ---
 test_name: PATCH Pipette {pipette_id} single value
@@ -74,7 +74,7 @@ marks:
 stages:
   - name: PATCH Pipette Settings of a single value
     request:
-      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/P300MV1020230630"
       method: PATCH
       json:
         fields:
@@ -106,7 +106,7 @@ stages:
           top: !anydict
         info:
           model: p300_multi_v1
-          name: p300_multi
+          name: !anystr
       strict: true
 ---
 test_name: PATCH Pipette {pipette_id} multiple values
@@ -117,7 +117,7 @@ marks:
 stages:
   - name: PATCH Pipette Settings of multiple values
     request:
-      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/P300MV1020230630"
       method: PATCH
       json:
         fields:
@@ -165,7 +165,7 @@ stages:
             value: 18.0
         info:
           model: p300_multi_v1
-          name: p300_multi
+          name: !anystr
       strict: true
 ---
 test_name: PATCH Pipette {pipette_id} value too low
@@ -176,7 +176,7 @@ marks:
 stages:
   - name: PATCH Pipette Settings with too low of a value
     request:
-      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/P300MV1020230630"
       method: PATCH
       json:
         fields:
@@ -197,7 +197,7 @@ marks:
 stages:
   - name: PATCH Pipette Settings with too high of a value
     request:
-      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/P300MV1020230630"
       method: PATCH
       json:
         fields:
@@ -218,7 +218,7 @@ marks:
 stages:
   - name: PATCH Pipette Settings with no value at all (should reset to default)
     request:
-      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/P300MV1020230630"
       method: PATCH
       json:
         fields:
@@ -250,5 +250,5 @@ stages:
           top: !anydict
         info:
           model: p300_multi_v1
-          name: p300_multi
+          name: !anystr
       strict: true
