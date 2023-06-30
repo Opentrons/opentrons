@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Analyze a can log of a motion and display encoder variance over time"""
 
-from abc import abstractmethod
 from dataclasses import dataclass
 import re
 import sys
@@ -15,7 +14,6 @@ from typing import (
     Union,
     TypeVar,
     Type,
-    Tuple,
     Set,
     TYPE_CHECKING,
 )
@@ -30,6 +28,8 @@ if TYPE_CHECKING:
 
 
 class IgnoredMessage(BaseException):
+    """Ignored."""
+
     pass
 
 
@@ -38,20 +38,25 @@ RecordSlfType = TypeVar("RecordSlfType", bound="Record")
 
 @dataclass
 class Record:
+    """Base record, instantiated only as an intermediate."""
+
     date: datetime
     sender: NodeId
     dest: NodeId
 
     def format_date_offset(self: RecordSlfType, date: datetime) -> str:
+        """Print with a time offset from some other time rather than a timestamp."""
         return (
             f"{self.__class__.__name__}: offset={(self.date-date).total_seconds()}, sender={self.sender.name}, dest={self.dest.name}, "
             + self.format_fields()
         )
 
     def format_fields(self: RecordSlfType) -> str:
+        """Subclasses implement to stringify under their own control."""
         raise NotImplementedError()
 
     def __str__(self) -> str:
+        """String."""
         return f'{self.__class__.__name__}: date={self.date.strftime("%b %d %H:%M:%S")}.{self.date.time().microsecond/1000000}, sender={self.sender.name}, dest={self.dest.name}'
 
 
@@ -66,10 +71,13 @@ _MOVE_COMPLETE_RE = re.compile(
 
 @dataclass
 class MoveComplete(Record):
+    """Represents a MoveCompletedMessage."""
+
     @classmethod
     def from_payload_log(
         cls: Type["MoveComplete"], record: Record, line: str
     ) -> "MoveComplete":
+        """Build from a log record."""
         data = _MOVE_COMPLETE_RE.search(line)
         assert data, f"Could not parse move complete payload from {line}"
         return MoveComplete(
@@ -88,12 +96,11 @@ class MoveComplete(Record):
     seq_id: int
 
     def __str__(self) -> str:
-        return (
-            super().__str__()
-            + f", motor_pos={self.motor_pos}, encoder_pos={self.encoder_pos}, index={self.index}, seq_id={self.seq_id}"
-        )
+        """String."""
+        return super().__str__() + ", " + self.format_fields()
 
     def format_fields(self) -> str:
+        """Used by super to print values."""
         return f"motor_pos={self.motor_pos}, encoder_pos={self.encoder_pos}, index={self.index}, seq_id={self.seq_id}"
 
 
@@ -106,8 +113,11 @@ _ERROR_RE = re.compile(
 
 @dataclass
 class Error(Record):
+    """Represents an error message."""
+
     @classmethod
     def from_payload_log(cls: Type["Error"], record: Record, line: str) -> "Error":
+        """Build from a log record."""
         data = _ERROR_RE.search(line)
         assert data, f"Could not parse error payload from {line}"
         return Error(
@@ -122,9 +132,11 @@ class Error(Record):
     index: int
 
     def __str__(self) -> str:
-        return super().__str__() + f", error_type={self.error_type}, index={self.index}"
+        """String."""
+        return super().__str__() + ", " + self.format_fields()
 
     def format_fields(self) -> str:
+        """Used by super to print values."""
         return f"error_type={self.error_type}, index={self.index}"
 
 
@@ -140,10 +152,13 @@ _MOVE_RE = re.compile(
 
 @dataclass
 class MoveCommand(Record):
+    """Represents an AddLinearMoveRequest."""
+
     @classmethod
     def from_payload_log(
         cls: Type["MoveCommand"], record: Record, line: str
     ) -> "MoveCommand":
+        """Build from a log line."""
         data = _MOVE_RE.search(line)
         assert data, f"Could not parse move command from {line}"
         return MoveCommand(
@@ -168,12 +183,11 @@ class MoveCommand(Record):
     index: int
 
     def __str__(self) -> str:
-        return (
-            super().__str__()
-            + f", seq_id={self.seq_id}, velocity={self.velocity}, acceleration={self.acceleration}, duration={self.duration}, index={self.index}"
-        )
+        """String."""
+        return super().__str__() + ", " + self.format_fields()
 
     def format_fields(self) -> str:
+        """Prints values."""
         return f"velocity={self.velocity}, acceleration={self.acceleration}, duration={self.duration}, seq_id={self.seq_id}, index={self.index}"
 
 
@@ -190,7 +204,7 @@ def _lines(logfile: io.TextIOBase) -> Iterator[str]:
 
 
 _ARB_RE = re.compile(
-    "node_id: (?P<node_id>\w+), originating_node_id: (?P<originating_node_id>\w+),"
+    r"node_id: (?P<node_id>\w+), originating_node_id: (?P<originating_node_id>\w+),"
 )
 
 
@@ -249,6 +263,7 @@ def _record(lines: Iterator[str]) -> Union[MoveCommand, MoveComplete, Error]:
 
 
 def records(logfile: io.TextIOBase) -> Iterator[Record]:
+    """Parse a log into records."""
     lines = _lines(logfile)
     while True:
         try:
@@ -261,6 +276,7 @@ def records(logfile: io.TextIOBase) -> Iterator[Record]:
 
 
 def receive_records(records: Iterator[Record]) -> Iterator[Union[MoveComplete, Error]]:
+    """Filter only received messages."""
     for record in records:
         if isinstance(record, (MoveComplete, Error)):
             yield record
@@ -269,6 +285,7 @@ def receive_records(records: Iterator[Record]) -> Iterator[Union[MoveComplete, E
 def complete_records(
     records: Union[Iterator[Record], Iterator[Union[MoveComplete, Error]]]
 ) -> Iterator[MoveComplete]:
+    """Filter only move-complete."""
     for record in records:
         if isinstance(record, MoveComplete):
             yield record
@@ -277,6 +294,7 @@ def complete_records(
 def error_records(
     records: Union[Iterator[Record], Iterator[Union[MoveComplete, Error]]]
 ) -> Iterator[Error]:
+    """Filter only errors."""
     for record in records:
         if isinstance(record, Error):
             yield record
@@ -287,6 +305,7 @@ def date_limited(
     since: Optional[datetime],
     until: Optional[datetime],
 ) -> Iterator[RecordTypeVar]:
+    """Filter only records between specified dates."""
     for record in records:
         if since and since > record.date:
             continue
@@ -298,6 +317,7 @@ def date_limited(
 def sender_limited(
     records: Iterator[RecordTypeVar], nodes: Set[NodeId]
 ) -> Iterator[RecordTypeVar]:
+    """Filter only records of messages from nodes."""
     for record in records:
         if record.sender not in nodes:
             continue
@@ -307,6 +327,7 @@ def sender_limited(
 def dest_limited(
     records: Iterator[RecordTypeVar], nodes: Set[NodeId]
 ) -> Iterator[RecordTypeVar]:
+    """Filter only records of messages to nodes."""
     for record in records:
         if record.dest not in nodes:
             continue
@@ -315,6 +336,8 @@ def dest_limited(
 
 @dataclass
 class PositionLogEntry:
+    """Quick class for a position log."""
+
     date: datetime
     motor_pos: float
     encoder_pos: float
@@ -324,6 +347,7 @@ class PositionLogEntry:
     def build_from_record(
         cls: Type["PositionLogEntry"], record: MoveComplete
     ) -> "PositionLogEntry":
+        """Build from a record."""
         return PositionLogEntry(
             date=record.date,
             motor_pos=record.motor_pos,
@@ -332,10 +356,12 @@ class PositionLogEntry:
         )
 
     def format_date_offset(self, date: datetime) -> str:
+        """Print with a time offset."""
         return f"{self.__class__.__name__}: time={(self.date - date).total_seconds()}, motor_pos={self.motor_pos}, encoder_pos={self.encoder_pos}, diff={self.diff}"
 
 
 def position_log(records: Iterator[MoveComplete]) -> Iterator[PositionLogEntry]:
+    """Print a log of positions."""
     for record in records:
         yield PositionLogEntry(
             record.date,
@@ -349,6 +375,38 @@ Operation = Literal["print-positions", "print-errors", "plot-positions"]
 OPERATIONS: List[Operation] = ["print-positions", "print-errors", "plot-positions"]
 
 
+def _print_positions(
+    records_to_check: Iterator[RecordTypeVar],
+    nodes: Set[NodeId],
+    annotate_errors: bool,
+) -> None:
+    t0: Optional[datetime] = None
+    for record in sender_limited(receive_records(records_to_check), nodes):
+        if not t0:
+            t0 = record.date
+        if isinstance(record, Error):
+            if not annotate_errors:
+                continue
+            print(record.format_date_offset(t0))
+        else:
+            print(
+                f"{record.sender.name}: {PositionLogEntry.build_from_record(record).format_date_offset(t0)}"
+            )
+
+
+def _print_errors(
+    records_to_check: Iterator[RecordTypeVar],
+    nodes: Set[NodeId],
+    annotate_errors: bool,
+) -> None:
+    if not annotate_errors:
+        raise RuntimeError(
+            "now how could i print errors without annotating them. cmon."
+        )
+    for record in sender_limited(error_records(records_to_check), nodes):
+        print(record)
+
+
 def main(
     operation: Operation,
     logfile: io.TextIOBase,
@@ -357,39 +415,15 @@ def main(
     until: Optional[datetime],
     annotate_errors: bool,
 ) -> None:
+    """Main function."""
+    records_to_check = date_limited(records(logfile), since, until)
     if operation == "print-positions":
-        print(
-            f'Printing positions between {since if since else "<beginning>"} and {until if until else "<end>"}'
-        )
-        t0: Optional[datetime] = None
-        for record in date_limited(
-            sender_limited(receive_records(records(logfile)), nodes), since, until
-        ):
-            if not t0:
-                t0 = record.date
-            if isinstance(record, Error):
-                if not annotate_errors:
-                    continue
-                print(record.format_date_offset(t0))
-            else:
-                print(
-                    f"{record.sender.name}: {PositionLogEntry.build_from_record(record).format_date_offset(t0)}"
-                )
+        _print_positions(records_to_check, nodes, annotate_errors)
     elif operation == "print-errors":
-        if not annotate_errors:
-            raise RuntimeError(
-                "now how could i print errors without annotating them. cmon."
-            )
-        print(
-            f'Printing errors for between {since if since else "<beginning>"} and {until if until else "<end>"} for {", ".join(node.name for node in nodes)}'
-        )
-        for record in date_limited(
-            sender_limited(error_records(records(logfile)), nodes), since, until
-        ):
-            print(record)
+        _print_errors(records_to_check, nodes, annotate_errors)
     elif operation == "plot-positions":
         print("plotting positions")
-        ind_records = tee(records(logfile), len(nodes))
+        ind_records = tee(records_to_check, len(nodes))
         plots = [
             PlotParams(
                 records=date_limited(
@@ -407,12 +441,15 @@ def main(
 
 @dataclass
 class PlotParams:
+    """Gather plotting params for later iteration."""
+
     records: Iterator[Union[MoveComplete, Error]]
     title: str
     annotate_errors: bool
 
 
 def plot_one(plot: PlotParams) -> "pp.Figure":
+    """Plot a single figure. Requires pyplot."""
     import matplotlib.pyplot as pp
 
     fig, subplots = pp.subplots(
@@ -485,9 +522,12 @@ def plot_one(plot: PlotParams) -> "pp.Figure":
 
 
 def plot_position_errors(plots: List[PlotParams]) -> None:
+    """Plot more than one axis worth of data. Requires pyplot."""
     import matplotlib.pyplot as pp
 
-    figs = [plot_one(plot) for plot in plots]
+    for plot in plots:
+        plot_one(plot)
+
     pp.show()
 
 
