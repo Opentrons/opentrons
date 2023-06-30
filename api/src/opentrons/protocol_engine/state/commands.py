@@ -37,6 +37,7 @@ from ..errors import (
     SetupCommandNotAllowedError,
     PauseNotAllowedError,
     UnexpectedProtocolError,
+    ProtocolCommandFailedError,
 )
 from ..errors.error_occurrence import _ErrorOccurrenceFromChildThread
 from ..types import EngineStatus
@@ -261,7 +262,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
             log.info("in failed acation")
             log.info(f"failed action error: {action.error} type {type(action.error)}")
             error_occurrence = ErrorOccurrence.from_failed(
-                id=action.error_id, createdAt=action.failed_at, error=action.error
+                id=action.error_id,
+                createdAt=action.failed_at,
+                error=action.error,
+                unexepctedError=action.unexepctedError,
             )
             log.info(f"error_occurrence:: {error_occurrence}")
             prev_entry = self._state.commands_by_id[action.command_id]
@@ -572,7 +576,12 @@ class CommandView(HasState[CommandState]):
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
-                    raise _ErrorOccurrenceFromChildThread(wrapped_error=command.error)
+                    if command.error.unexpectedFail:
+                        raise _ErrorOccurrenceFromChildThread(
+                            wrapped_error=command.error
+                        )
+                    else:
+                        raise ProtocolCommandFailedError()
             return True
         else:
             return False

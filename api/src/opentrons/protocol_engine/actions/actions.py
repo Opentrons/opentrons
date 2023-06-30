@@ -118,6 +118,7 @@ class FailCommandAction:
     error_id: str
     failed_at: datetime
     error: ProtocolEngineError
+    unexepctedError: bool = False
 
 
 @dataclass(frozen=True)
