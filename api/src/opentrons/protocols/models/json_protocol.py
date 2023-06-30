@@ -637,14 +637,14 @@ class Modules(BaseModel):
 
 class Model(BaseModel):
     otSharedSchema: Optional[
-        Literal["#/protocol/schemas/6", "#/protocol/schemas/5", "#/protocol/schemas/4"]
+        Literal["#/protocol/schemas/5", "#/protocol/schemas/4"]
     ] = Field(
         None,
         alias="$otSharedSchema",
         description="The path to a valid Opentrons shared schema relative to "
         "the shared-data directory, without its extension.",
     )
-    schemaVersion: Literal[1, 2, 3, 4, 5, 6] = Field(
+    schemaVersion: Literal[1, 2, 3, 4, 5] = Field(
         ..., description="Schema version of a protocol is a single integer"
     )
     metadata: Metadata = Field(..., description="Optional metadata about the protocol")
