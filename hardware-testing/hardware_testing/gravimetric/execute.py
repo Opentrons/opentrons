@@ -37,7 +37,6 @@ from .measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
-from .labware.radwag_pipette_calibration_vial import VIAL_DEFINITION
 from .tips import get_tips, MULTI_CHANNEL_TEST_ORDER
 
 
