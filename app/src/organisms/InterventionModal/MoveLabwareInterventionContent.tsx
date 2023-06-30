@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { map } from 'lodash'
 
 import {
   Flex,
@@ -12,46 +11,81 @@ import {
   TYPOGRAPHY,
   BORDERS,
   Box,
-  RobotWorkSpace,
-  LabwareRender,
+  MoveLabwareOnDeck,
   Module,
+  LabwareRender,
 } from '@opentrons/components'
-import {
-  THERMOCYCLER_MODULE_V1,
-  inferModuleOrientationFromXCoordinate,
-} from '@opentrons/shared-data'
 
+import {
+  getRunLabwareRenderInfo,
+  getRunModuleRenderInfo,
+  getLabwareNameFromRunData,
+  getModuleModelFromRunData,
+  getModuleDisplayLocationFromRunData,
+} from './utils'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
-import { getStandardDeckViewLayerBlockList } from '../Devices/ProtocolRun/utils/getStandardDeckViewLayerBlockList'
 
-import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
-import type { RunLabwareInfo, RunModuleInfo } from './utils'
-import { LabwareDisabledOverlay } from './LabwareDisabledOverlay'
+import {
+  CompletedProtocolAnalysis,
+  LabwareLocation,
+  MoveLabwareRunTimeCommand,
+  RobotType,
+  getDeckDefFromRobotType,
+  getLoadedLabwareDefinitionsByUri,
+  getModuleDisplayName,
+  getModuleType,
+  getOccludedSlotCountForModule,
+  getRobotTypeFromLoadedLabware,
+} from '@opentrons/shared-data'
+import type { RunData } from '@opentrons/api-client'
+import { getLoadedLabware } from '../CommandText/utils/accessors'
 
 export interface MoveLabwareInterventionProps {
-  robotType: RobotType
-  moduleRenderInfo: RunModuleInfo[]
-  labwareRenderInfo: RunLabwareInfo[]
-  labwareName: string
-  movedLabwareId: string
-  oldDisplayLocation: string
-  newDisplayLocation: string
-  deckDef: DeckDefinition
+  command: MoveLabwareRunTimeCommand
+  analysis: CompletedProtocolAnalysis | null
+  run: RunData
 }
 
 export function MoveLabwareInterventionContent({
-  robotType,
-  labwareName,
-  movedLabwareId,
-  moduleRenderInfo,
-  labwareRenderInfo,
-  oldDisplayLocation,
-  newDisplayLocation,
-  deckDef,
-}: MoveLabwareInterventionProps): JSX.Element {
-  const { t: protocolSetupTranslator } = useTranslation('protocol_setup')
+  command,
+  analysis,
+  run,
+}: MoveLabwareInterventionProps): JSX.Element | null {
+  const { t } = useTranslation(['protocol_setup', 'protocol_command_text'])
 
+  const analysisCommands = analysis?.commands ?? []
+  const labwareDefsByUri = getLoadedLabwareDefinitionsByUri(analysisCommands)
+  const robotType = getRobotTypeFromLoadedLabware(run.labware)
+  const deckDef = getDeckDefFromRobotType(robotType)
+
+  const moduleRenderInfo = getRunModuleRenderInfo(
+    run,
+    deckDef,
+    labwareDefsByUri
+  )
+  const labwareRenderInfo = getRunLabwareRenderInfo(
+    run,
+    labwareDefsByUri,
+    deckDef
+  )
+  const oldLabwareLocation =
+    getLoadedLabware(run, command.params.labwareId)?.location ?? null
+
+  const labwareName = getLabwareNameFromRunData(
+    run,
+    command.params.labwareId,
+    analysisCommands
+  )
+  const movedLabwareDefUri = run.labware.find(
+    l => l.id === command.params.labwareId
+  )?.definitionUri
+  const movedLabwareDef =
+    movedLabwareDefUri != null
+      ? labwareDefsByUri?.[movedLabwareDefUri] ?? null
+      : null
+
+  if (oldLabwareLocation == null || movedLabwareDef == null) return null
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.75rem" width="100%">
       <MoveLabwareHeader />
@@ -68,7 +102,7 @@ export function MoveLabwareInterventionContent({
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginBottom={SPACING.spacing2}
             >
-              {protocolSetupTranslator('labware_name')}
+              {t('labware_name')}
             </StyledText>
             <StyledText as="p">{labwareName}</StyledText>
             <Divider marginY={SPACING.spacing8} />
@@ -77,89 +111,55 @@ export function MoveLabwareInterventionContent({
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginBottom={SPACING.spacing2}
             >
-              {protocolSetupTranslator('labware_location')}
+              {t('labware_location')}
             </StyledText>
             <StyledText as="p">
-              {oldDisplayLocation} &rarr; {newDisplayLocation}
+              <span>
+                <LabwareDisplayLocation
+                  protocolData={run}
+                  location={oldLabwareLocation}
+                  robotType={robotType}
+                />
+                &rarr;
+                <LabwareDisplayLocation
+                  protocolData={run}
+                  location={command.params.newLocation}
+                  robotType={robotType}
+                />
+              </span>
             </StyledText>
           </Flex>
         </Flex>
         <Flex width="50%">
           <Box margin="0 auto" width="100%">
-            <RobotWorkSpace
-              deckDef={deckDef}
-              deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
-              id="InterventionModal_deckMap"
-            >
-              {() => (
+            <MoveLabwareOnDeck
+              key={command.id} // important so that back to back move labware commands bust the cache
+              robotType={robotType}
+              initialLabwareLocation={oldLabwareLocation}
+              finalLabwareLocation={command.params.newLocation}
+              movedLabwareDef={movedLabwareDef}
+              loadedModules={run.modules}
+              backgroundItems={
                 <>
-                  {map(
-                    moduleRenderInfo,
-                    ({
-                      x,
-                      y,
-                      moduleDef,
-                      nestedLabwareDef,
-                      nestedLabwareId,
-                    }) => (
-                      <Module
-                        key={`InterventionModal_Module_${String(
-                          moduleDef.model
-                        )}_${x}${y}`}
-                        x={x}
-                        y={y}
-                        orientation={inferModuleOrientationFromXCoordinate(x)}
-                        def={moduleDef}
-                        innerProps={
-                          moduleDef.model === THERMOCYCLER_MODULE_V1
-                            ? { lidMotorState: 'open' }
-                            : {}
-                        }
-                      >
-                        {nestedLabwareDef != null && nestedLabwareId != null ? (
-                          <React.Fragment
-                            key={`InterventionModal_Labware_${String(
-                              nestedLabwareDef.metadata.displayName
-                            )}_${x}${y}`}
-                          >
-                            <LabwareRender
-                              definition={nestedLabwareDef}
-                              highlightLabware={
-                                movedLabwareId === nestedLabwareId
-                              }
-                            />
-                            {movedLabwareId !== nestedLabwareId ? (
-                              <LabwareDisabledOverlay
-                                definition={nestedLabwareDef}
-                              />
-                            ) : null}
-                          </React.Fragment>
+                  {moduleRenderInfo.map(
+                    ({ x, y, moduleId, moduleDef, nestedLabwareDef }) => (
+                      <Module key={moduleId} def={moduleDef} x={x} y={y}>
+                        {nestedLabwareDef != null ? (
+                          <LabwareRender definition={nestedLabwareDef} />
                         ) : null}
                       </Module>
                     )
                   )}
-                  {map(labwareRenderInfo, ({ x, y, labwareDef, labwareId }) => {
-                    return (
-                      <React.Fragment
-                        key={`InterventionModal_Labware_${String(
-                          labwareDef.metadata.displayName
-                        )}_${x}${y}`}
-                      >
-                        <g transform={`translate(${x},${y})`}>
-                          <LabwareRender
-                            definition={labwareDef}
-                            highlightLabware={movedLabwareId === labwareId}
-                          />
-                          {movedLabwareId !== labwareId ? (
-                            <LabwareDisabledOverlay definition={labwareDef} />
-                          ) : null}
-                        </g>
-                      </React.Fragment>
-                    )
-                  })}
+                  {labwareRenderInfo
+                    .filter(l => l.labwareId !== command.params.labwareId)
+                    .map(({ x, y, labwareDef, labwareId }) => (
+                      <g key={labwareId} transform={`translate(${x},${y})`}>
+                        <LabwareRender definition={labwareDef} />
+                      </g>
+                    ))}
                 </>
-              )}
-            </RobotWorkSpace>
+              }
+            />
           </Box>
         </Flex>
       </Flex>
@@ -180,4 +180,45 @@ function MoveLabwareHeader(): JSX.Element {
       <StyledText as="h1">{t('move_labware')}</StyledText>
     </Flex>
   )
+}
+
+interface LabwareDisplayLocationProps {
+  protocolData: RunData
+  location: LabwareLocation
+  robotType: RobotType
+}
+function LabwareDisplayLocation(
+  props: LabwareDisplayLocationProps
+): JSX.Element {
+  const { t } = useTranslation('protocol_command_text')
+  const { protocolData, location, robotType } = props
+  let displayLocation = ''
+  if (location === 'offDeck') {
+    displayLocation = t('off_deck')
+  } else if ('slotName' in location) {
+    displayLocation = t('slot', { slot_name: location.slotName })
+  } else if ('moduleId' in location) {
+    const moduleModel = getModuleModelFromRunData(
+      protocolData,
+      location.moduleId
+    )
+    if (moduleModel == null) {
+      console.warn('labware is located on an unknown module model')
+    } else {
+      displayLocation = t('module_in_slot', {
+        count: getOccludedSlotCountForModule(
+          getModuleType(moduleModel),
+          robotType
+        ),
+        module: getModuleDisplayName(moduleModel),
+        slot_name: getModuleDisplayLocationFromRunData(
+          protocolData,
+          location.moduleId
+        ),
+      })
+    }
+  } else {
+    console.warn('display location could not be established: ', location)
+  }
+  return <>{displayLocation}</>
 }
