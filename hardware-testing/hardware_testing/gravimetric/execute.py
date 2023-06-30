@@ -362,7 +362,8 @@ def _run_trial(
     print("recorded weights:")
 
     # RUN INIT
-    pipette.move_to(well.top().move(channel_offset))
+    measure_height = config.SCALE_Z_DISTANCE_TO_AVOID_STATIC
+    pipette.move_to(well.top(measure_height).move(channel_offset))
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     print(f"\tinitial grams: {m_data_init.grams_average} g")
 
@@ -381,6 +382,7 @@ def _run_trial(
         inspect=inspect,
         mix=mix,
     )
+    pipette.move_to(well.top(measure_height).move(channel_offset))
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     print(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
     print(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
@@ -400,6 +402,7 @@ def _run_trial(
         inspect=inspect,
         mix=mix,
     )
+    pipette.move_to(well.top(measure_height).move(channel_offset))
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     print(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
 
