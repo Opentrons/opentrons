@@ -260,6 +260,8 @@ export const pipetteDataLeftFixture = {
   instrumentType: 'pipette',
   mount: 'left',
   serialNumber: 'abc',
+  subsystem: 'pipette_left',
+  ok: true,
 }
 
 export const pipetteResponseRightFixture = {
@@ -269,4 +271,6 @@ export const pipetteResponseRightFixture = {
   instrumentType: 'pipette',
   mount: 'right',
   serialNumber: 'cba',
+  subsystem: 'pipette_right',
+  ok: true,
 }

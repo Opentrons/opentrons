@@ -218,7 +218,7 @@ describe('SetupModulesList', () => {
 
     const { getByText } = render(props)
     getByText('Thermocycler Module')
-    getByText('Slot 7+10')
+    getByText('Slot A1+B1')
     getByText('Connected')
   })
 

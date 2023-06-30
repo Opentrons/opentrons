@@ -2,6 +2,8 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
 import { format, formatDistance } from 'date-fns'
+import styled from 'styled-components'
+
 import {
   ALIGN_FLEX_START,
   BORDERS,
@@ -11,7 +13,6 @@ import {
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  truncateString,
   TYPOGRAPHY,
   useLongPress,
 } from '@opentrons/components'
@@ -23,6 +24,38 @@ import type { UseLongPressResult } from '@opentrons/components'
 import type { ProtocolResource } from '@opentrons/shared-data'
 
 export type CardSizeType = 'full' | 'half' | 'regular'
+
+const cardStyleBySize: {
+  [s in CardSizeType]: {
+    fontSize: string
+    height: string
+    lineHeight: string
+    fontWeight: number
+    width: string
+  }
+} = {
+  full: {
+    fontSize: TYPOGRAPHY.fontSize32,
+    height: '8.875rem',
+    lineHeight: TYPOGRAPHY.lineHeight42,
+    fontWeight: TYPOGRAPHY.fontWeightBold,
+    width: '59rem',
+  },
+  half: {
+    fontSize: TYPOGRAPHY.fontSize28,
+    height: '10.75rem',
+    lineHeight: TYPOGRAPHY.lineHeight36,
+    fontWeight: TYPOGRAPHY.fontWeightSemiBold,
+    width: '29.25rem',
+  },
+  regular: {
+    fontSize: TYPOGRAPHY.fontSize28,
+    height: '10.75rem',
+    lineHeight: TYPOGRAPHY.lineHeight36,
+    fontWeight: TYPOGRAPHY.fontWeightSemiBold,
+    width: '28.375rem',
+  },
+}
 
 export function PinnedProtocol(props: {
   protocol: ProtocolResource
@@ -36,36 +69,7 @@ export function PinnedProtocol(props: {
   const history = useHistory()
   const longpress = useLongPress()
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
-  const displayedName = truncateString(protocolName, 59)
   const { t } = useTranslation('protocol_info')
-
-  const cardStyleBySize: {
-    [s in CardSizeType]: {
-      fontSize: string
-      height: string
-      lineHeight: string
-      width: string
-    }
-  } = {
-    full: {
-      fontSize: TYPOGRAPHY.fontSize32,
-      height: '8.875rem',
-      lineHeight: TYPOGRAPHY.lineHeight42,
-      width: '100%',
-    },
-    half: {
-      fontSize: TYPOGRAPHY.fontSize28,
-      height: '10.75rem',
-      lineHeight: TYPOGRAPHY.lineHeight36,
-      width: '29.25rem',
-    },
-    regular: {
-      fontSize: TYPOGRAPHY.fontSize28,
-      height: '10.75rem',
-      lineHeight: TYPOGRAPHY.lineHeight36,
-      width: '28.375rem',
-    },
-  }
 
   const handleProtocolClick = (
     longpress: UseLongPressResult,
@@ -97,13 +101,14 @@ export function PinnedProtocol(props: {
       padding={SPACING.spacing24}
       ref={longpress.ref}
     >
-      <StyledText
+      <ProtocolNameText
+        cardSize={cardSize}
         fontSize={cardStyleBySize[cardSize].fontSize}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        fontWeight={cardStyleBySize[cardSize].fontWeight}
         lineHeight={cardStyleBySize[cardSize].lineHeight}
       >
-        {displayedName}
-      </StyledText>
+        {protocolName}
+      </ProtocolNameText>
       <Flex
         flexDirection={DIRECTION_ROW}
         gridGap={SPACING.spacing8}
@@ -113,17 +118,13 @@ export function PinnedProtocol(props: {
       >
         <StyledText as="p">
           {lastRun !== undefined
-            ? `${t('last_run')} ${formatDistance(
-                new Date(lastRun),
-                new Date(),
-                {
-                  addSuffix: true,
-                }
-              ).replace('about ', '')}`
+            ? `${formatDistance(new Date(lastRun), new Date(), {
+                addSuffix: true,
+              }).replace('about ', '')}`
             : t('no_history')}
         </StyledText>
         <StyledText as="p">
-          {format(new Date(protocol.createdAt), 'M/d/yyyy HH:mm')}
+          {format(new Date(protocol.createdAt), 'M/d/yy HH:mm')}
         </StyledText>
       </Flex>
       {longpress.isLongPressed === true && (
@@ -136,3 +137,18 @@ export function PinnedProtocol(props: {
     </Flex>
   )
 }
+
+const ProtocolNameText = styled(StyledText)`
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: ${(props: { cardSize: CardSizeType }) =>
+    props.cardSize === 'full' ? 1 : 2};
+  overflow: hidden;
+  overflow-wrap: break-word;
+  font-size: ${(props: { cardSize: CardSizeType }) =>
+    cardStyleBySize[props.cardSize].fontSize};
+  font-weight: ${(props: { cardSize: CardSizeType }) =>
+    cardStyleBySize[props.cardSize].fontWeight};
+  line-height: ${(props: { cardSize: CardSizeType }) =>
+    cardStyleBySize[props.cardSize].lineHeight};
+`

@@ -13,6 +13,7 @@ export type PipetteWizardStep =
   | DetachPipetteStep
   | MountingPlateStep
   | CarriageStep
+  | FirmwareUpdateStep
 
 export type PipetteWizardFlow =
   | typeof FLOWS.ATTACH
@@ -50,6 +51,10 @@ export interface CarriageStep extends BaseStep {
 }
 export interface MountingPlateStep extends BaseStep {
   section: typeof SECTIONS.MOUNTING_PLATE
+}
+
+export interface FirmwareUpdateStep extends BaseStep {
+  section: typeof SECTIONS.FIRMWARE_UPDATE
 }
 
 type CreateCommandMutate = ReturnType<

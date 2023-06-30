@@ -28,10 +28,9 @@ import { StyledText } from '../../atoms/text'
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 
-import type { RobotType } from '@opentrons/shared-data'
+import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
 import type { RunCommandSummary } from '@opentrons/api-client'
-import type { LabwareRenderInfoById } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
-import type { ModuleRenderInfoById } from '../Devices/hooks'
+import type { RunLabwareInfo, RunModuleInfo } from './utils'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -92,11 +91,12 @@ export interface InterventionModalProps {
   onResume: () => void
   command: RunCommandSummary
   robotType?: RobotType
-  moduleRenderInfo?: ModuleRenderInfoById
-  labwareRenderInfo?: LabwareRenderInfoById
+  moduleRenderInfo?: RunModuleInfo[] | null
+  labwareRenderInfo?: RunLabwareInfo[] | null
   labwareName?: string
   oldDisplayLocation?: string
   newDisplayLocation?: string
+  deckDef?: DeckDefinition
 }
 
 export function InterventionModal({
@@ -109,38 +109,41 @@ export function InterventionModal({
   labwareName,
   oldDisplayLocation,
   newDisplayLocation,
+  deckDef,
 }: InterventionModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
 
   let modalContent: JSX.Element | null = null
 
-  switch (command.commandType) {
-    case 'pause': // legacy pause command
-    case 'waitForResume':
-      modalContent = (
-        <PauseInterventionContent
-          startedAt={command.startedAt ?? null}
-          message={command.params?.message ?? null}
+  if (
+    command.commandType === 'waitForResume' ||
+    command.commandType === 'pause' // legacy pause command
+  ) {
+    modalContent = (
+      <PauseInterventionContent
+        startedAt={command.startedAt ?? null}
+        message={command.params.message ?? null}
+      />
+    )
+  } else if (command.commandType === 'moveLabware') {
+    modalContent =
+      robotType != null &&
+      moduleRenderInfo != null &&
+      oldDisplayLocation != null &&
+      newDisplayLocation != null &&
+      labwareRenderInfo != null &&
+      deckDef != null ? (
+        <MoveLabwareInterventionContent
+          robotType={robotType}
+          moduleRenderInfo={moduleRenderInfo}
+          labwareRenderInfo={labwareRenderInfo}
+          labwareName={labwareName ?? ''}
+          movedLabwareId={command.params.labwareId}
+          oldDisplayLocation={oldDisplayLocation}
+          newDisplayLocation={newDisplayLocation}
+          deckDef={deckDef}
         />
-      )
-      break
-    case 'moveLabware':
-      modalContent =
-        robotType != null &&
-        moduleRenderInfo != null &&
-        oldDisplayLocation != null &&
-        newDisplayLocation != null &&
-        labwareRenderInfo != null ? (
-          <MoveLabwareInterventionContent
-            robotType={robotType}
-            moduleRenderInfo={moduleRenderInfo}
-            labwareRenderInfo={labwareRenderInfo}
-            labwareName={labwareName ?? ''}
-            oldDisplayLocation={oldDisplayLocation}
-            newDisplayLocation={newDisplayLocation}
-          />
-        ) : null
-      break
+      ) : null
   }
 
   return (

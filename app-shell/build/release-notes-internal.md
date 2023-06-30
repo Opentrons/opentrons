@@ -3,15 +3,15 @@ For more details about this release, please see the full [technical changelog][]
 
 ---
 
-# Internal Release 0.11.0
+# Internal Release 0.12.0
 
-This is 0.11.0, an internal release for the app supporting the Opentrons Flex.
+This is 0.12.0, an internal release for the app supporting the Opentrons Flex.
 
 This is still pretty early in the process, so some things are known not to work, and are listed below. Some things that may surprise you do work, and are also listed below. There may also be some littler things of note, and those are at the bottom.
 
 ## Update Notes
 
-- ⚠️ After upgrading your robot to 0.11.0, you'll need to factory-reset its run history before you can use it.
+- ⚠️ After upgrading your robot to 0.12.0 from 0.10.0 or previous, you'll need to factory-reset its run history before you can use it.
 
   1. From the robot's 3-dot menu (⋮), go to **Robot settings.**
   2. Under **Advanced > Factory reset**, select **Choose reset settings.**
@@ -21,23 +21,13 @@ This is still pretty early in the process, so some things are known not to work,
 
   You will need to follow these steps if you subsequently downgrade back to a prior release, too.
 
-## New Stuff In This Release
-
-- The HTTP API will now accept both styles of deck slot name: coordinates like "C2", and integers like "5". Flexes will now return the "C2" style, and OT-2s will continue to return the "5" style.
-
-# Internal Release 0.9.0
-
-This is 0.9.0, an internal release for the app supporting the Opentrons Flex.
-
-This is still pretty early in the process, so some things are known not to work, and are listed below. Some things that may surprise you do work, and are also listed below. There may also be some littler things of note, and those are at the bottom.
-
-## Smaller Known Issues In This Release
-- Gripper calibration occasionally seems like it "skipped a step", going straight from front to rear calibration. If this happens, exit and rerun. This is because of a server error that isn't getting properly reported. We're working on both fixing the error and its reporting, but in the meantime exiting and rerunning the process should fix it. This is RQA-844.
+- After upgrading your app, the protocols that you already had imported to the app will display blank deck maps. To fix this, select **Reanalyze** from the protocol's 3-dot menu (⋮).
 
 ## New Stuff In This Release
-- USB connectivity improvements: the app will display a nice big icon in the network settings page for a USB robot, USB robots will disappear properly when disconnected, things of this nature.
-- 96-channel detach improvements
-- Visual fixes and improvements
+- You can disable the LED bar at the top now!
+- Attach flow updates and fixes for 96 channel
+- Many (many) visual and workflow fixes and improvements from design QA for the app
+
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 - Attach, detach, and calibration flows for anything from the protocol setup page

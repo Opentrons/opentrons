@@ -65,7 +65,7 @@ interface ProtocolInstrumentMountItemProps {
 export function ProtocolInstrumentMountItem(
   props: ProtocolInstrumentMountItemProps
 ): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_setup')
+  const { i18n, t } = useTranslation('protocol_setup')
   const { mount, attachedInstrument, speccedName, mostRecentAnalysis } = props
   const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
   const [
@@ -88,20 +88,26 @@ export function ProtocolInstrumentMountItem(
   }
   const is96ChannelPipette = speccedName === 'p1000_96'
   const isAttachedWithCal =
+    attachedInstrument != null &&
+    attachedInstrument.ok &&
     attachedInstrument?.data?.calibratedOffset?.last_modified != null
   return (
     <>
       <MountItem isReady={isAttachedWithCal}>
-        <Flex width="100%" alignItems={ALIGN_CENTER}>
+        <Flex
+          width="100%"
+          alignItems={ALIGN_CENTER}
+          gridGap={SPACING.spacing24}
+        >
           <Flex
-            flex="2"
+            flex={isAttachedWithCal ? 1 : 2}
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing4}
           >
             <MountLabel>
               {i18n.format(
                 is96ChannelPipette ? t('96_mount') : t('mount', { mount }),
-                'capitalize'
+                'titleCase'
               )}
             </MountLabel>
             <SpeccedInstrumentName>
@@ -120,11 +126,7 @@ export function ProtocolInstrumentMountItem(
             <Icon
               size="1.5rem"
               name={isAttachedWithCal ? 'ot-check' : 'ot-alert'}
-              color={
-                isAttachedWithCal
-                  ? COLORS.successEnabled
-                  : COLORS.warningEnabled
-              }
+              color={isAttachedWithCal ? COLORS.green1 : COLORS.yellow1}
             />
             <CalibrationStatus
               color={isAttachedWithCal ? COLORS.green1 : COLORS.yellow1}

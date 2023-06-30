@@ -255,13 +255,16 @@ export function RunSummary(): JSX.Element {
                   onClick={handleViewErrorDetails}
                   buttonText={t('view_error_details')}
                   height="17rem"
+                  disabled={
+                    runRecord?.data.errors == null ||
+                    runRecord?.data.errors.length === 0
+                  }
                 />
               ) : null}
             </Flex>
           </Flex>
         )}
       </Btn>
-      {/* temporary */}
       <Flex
         alignSelf={ALIGN_FLEX_END}
         marginTop={SPACING.spacing24}
@@ -291,7 +294,7 @@ const SplashBody = styled.h4`
   overflow: hidden;
   overflow-wrap: break-word;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  text-align: ${TYPOGRAPHY.textAlignLeft};
+  text-align: ${TYPOGRAPHY.textAlignCenter};
   text-transform: ${TYPOGRAPHY.textTransformCapitalize};
   font-size: ${TYPOGRAPHY.fontSize32};
   line-height: ${TYPOGRAPHY.lineHeight42};

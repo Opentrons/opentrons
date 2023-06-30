@@ -33,8 +33,8 @@ export function getUniqueWellProperties(
             }
     )
 
-    const xStart = wellProps[0].x
-    const yStart = wellProps[0].y
+    const xStart = wellProps[0]?.x ?? 0
+    const yStart = wellProps[0]?.y ?? 0
 
     return {
       metadata: group.metadata,

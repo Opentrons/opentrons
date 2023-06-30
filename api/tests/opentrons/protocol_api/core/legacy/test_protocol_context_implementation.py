@@ -10,6 +10,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 from opentrons.types import DeckSlotName, Location, Mount, Point
+from opentrons.protocol_api import OFF_DECK
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -17,6 +18,7 @@ from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules import AbstractModule
 from opentrons.hardware_control.modules.types import ModuleType, TemperatureModuleModel
 from opentrons.protocols import labware as mock_labware
+from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.labware import LabwareLoadParams
@@ -161,6 +163,24 @@ def test_load_instrument(
             )
         ),
     )
+
+
+def test_load_labware_off_deck_raises(
+    decoy: Decoy,
+    mock_deck: Deck,
+    mock_labware_offset_provider: AbstractLabwareOffsetProvider,
+    mock_equipment_broker: EquipmentBroker[LoadInfo],
+    subject: LegacyProtocolCore,
+) -> None:
+    """It should raise an api error."""
+    with pytest.raises(APIVersionError):
+        subject.load_labware(
+            load_name="cool load name",
+            location=OFF_DECK,
+            label="cool label",
+            namespace="cool namespace",
+            version=1337,
+        )
 
 
 def test_load_labware(

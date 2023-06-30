@@ -26,21 +26,12 @@ import { toggleDevtools } from '../../../redux/config'
 
 import type { IconName } from '@opentrons/components'
 import type { Dispatch } from '../../../redux/types'
-
-export type SettingOption =
-  | 'NetworkSettings'
-  | 'RobotName'
-  | 'RobotSystemVersion'
-  | 'TouchscreenSleep'
-  | 'TouchscreenBrightness'
-  | 'TextSize'
-  | 'DeviceReset'
-  | 'UpdateChannel'
+import type { SettingOption, SetSettingOption } from '../RobotSettingsDashboard'
 
 const SETTING_BUTTON_STYLE = css`
   width: 100%;
   margin-bottom: ${SPACING.spacing8};
-  background-color: ${COLORS.medGreyEnabled};
+  background-color: ${COLORS.light1};
   padding: ${SPACING.spacing20} ${SPACING.spacing24};
   border-radius: ${BORDERS.borderRadiusSize4};
 `
@@ -50,7 +41,7 @@ interface RobotSettingButtonProps {
   iconName: IconName
   settingInfo?: string
   currentOption?: SettingOption
-  setCurrentOption?: (currentOption: SettingOption) => void
+  setCurrentOption?: SetSettingOption
   robotName?: string
   isUpdateAvailable?: boolean
   enabledDevTools?: boolean
@@ -101,7 +92,7 @@ export function RobotSettingButton({
         gridGap={SPACING.spacing24}
         alignItems={ALIGN_CENTER}
       >
-        <Icon name={iconName} size="3rem" />
+        <Icon name={iconName} size="3rem" color={COLORS.darkBlack100} />
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing2}
@@ -161,7 +152,7 @@ export function RobotSettingButton({
           />
         ) : null}
         {enabledDevTools == null && ledLights == null ? (
-          <Icon name="more" size="3rem" />
+          <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
         ) : null}
       </Flex>
     </Btn>

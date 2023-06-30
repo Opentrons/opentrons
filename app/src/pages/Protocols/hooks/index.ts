@@ -1,5 +1,8 @@
 import last from 'lodash/last'
-import { useProtocolAnalysesQuery } from '@opentrons/react-api-client'
+import {
+  useInstrumentsQuery,
+  useProtocolAnalysesQuery,
+} from '@opentrons/react-api-client'
 import {
   useAttachedModules,
   useAttachedPipettes,
@@ -12,6 +15,7 @@ import type {
   PipetteName,
 } from '@opentrons/shared-data'
 import type { LabwareSetupItem } from '../utils'
+import { getProtocolUsesGripper } from '../../../organisms/ProtocolSetupInstruments/utils'
 
 interface ProtocolPipette {
   hardwareType: 'pipette'
@@ -30,7 +34,15 @@ interface ProtocolModule {
   connected: boolean
 }
 
-export type ProtocolHardware = ProtocolPipette | ProtocolModule
+interface ProtocolGripper {
+  hardwareType: 'gripper'
+  connected: boolean
+}
+
+export type ProtocolHardware =
+  | ProtocolPipette
+  | ProtocolModule
+  | ProtocolGripper
 
 /**
  * Returns an array of ProtocolHardware objects that are required by the given protocol ID.
@@ -47,6 +59,7 @@ export const useRequiredProtocolHardware = (
   const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
   const attachedModules = useAttachedModules()
   const attachedPipettes = useAttachedPipettes()
+  const { data: instrumentsData } = useInstrumentsQuery()
 
   if (
     mostRecentAnalysis == null ||
@@ -54,6 +67,19 @@ export const useRequiredProtocolHardware = (
   ) {
     return []
   }
+
+  const requiredGripper: ProtocolGripper[] = getProtocolUsesGripper(
+    mostRecentAnalysis
+  )
+    ? [
+        {
+          hardwareType: 'gripper',
+          connected:
+            instrumentsData?.data.some(i => i.instrumentType === 'gripper') ??
+            false,
+        },
+      ]
+    : []
 
   const requiredModules: ProtocolModule[] = mostRecentAnalysis.modules.map(
     ({ location, model }) => {
@@ -76,7 +102,7 @@ export const useRequiredProtocolHardware = (
     })
   )
 
-  return [...requiredPipettes, ...requiredModules]
+  return [...requiredPipettes, ...requiredModules, ...requiredGripper]
 }
 
 /**

@@ -10,6 +10,9 @@ import {
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V2,
   getIsLabwareAboveHeight,
+  FLEX_ROBOT_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
 import {
   getMockDeckSetup,
@@ -24,12 +27,13 @@ import {
 } from '../../../../step-forms'
 import {
   getLabwareOnSlot,
-  getSlotsBlockedBySpanning,
+  getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
 } from '../../../../step-forms/utils'
 import * as moduleData from '../../../../modules/moduleData'
 import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
 import { selectors as featureSelectors } from '../../../../feature-flags'
+import { getRobotType } from '../../../../file-data/selectors'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
 import { isModuleWithCollisionIssue } from '../../../modules/utils'
 import { PDAlert } from '../../../alerts/PDAlert'
@@ -51,6 +55,7 @@ jest.mock('../../../../step-forms/selectors')
 jest.mock('../../../modules/utils')
 jest.mock('../../../../step-forms/utils')
 jest.mock('../form-state')
+jest.mock('../../../../file-data/selectors')
 
 const MODEL_FIELD = 'selectedModel'
 const SLOT_FIELD = 'selectedSlot'
@@ -65,7 +70,7 @@ const getDisableModuleRestrictionsMock: jest.MockedFunction<any> =
 
 const isModuleWithCollisionIssueMock: jest.MockedFunction<any> = isModuleWithCollisionIssue
 
-const getSlotsBlockedBySpanningMock: jest.MockedFunction<any> = getSlotsBlockedBySpanning
+const getSlotIdsBlockedBySpanningMock: jest.MockedFunction<any> = getSlotIdsBlockedBySpanning
 
 const getSlotIsEmptyMock: jest.MockedFunction<any> = getSlotIsEmpty
 
@@ -73,12 +78,15 @@ const getLabwareOnSlotMock: jest.MockedFunction<any> = getLabwareOnSlot
 
 const getIsLabwareAboveHeightMock: jest.MockedFunction<any> = getIsLabwareAboveHeight
 
+const getRobotTypeMock: jest.MockedFunction<any> = getRobotType
+
 describe('Edit Modules Modal', () => {
   let mockStore: any
   let props: EditModulesModalProps
   beforeEach(() => {
+    getRobotTypeMock.mockReturnValue('OT-2 Standard')
     getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
-    getSlotsBlockedBySpanningMock.mockReturnValue([])
+    getSlotIdsBlockedBySpanningMock.mockReturnValue([])
     getLabwareOnSlotMock.mockReturnValue({})
     getIsLabwareAboveHeightMock.mockReturnValue(false)
     props = {
@@ -160,7 +168,7 @@ describe('Edit Modules Modal', () => {
 
     it('should error when slot is empty but blocked', () => {
       getSlotIsEmptyMock.mockReturnValueOnce(true)
-      getSlotsBlockedBySpanningMock.mockReturnValue(['1']) // 1 is default slot
+      getSlotIdsBlockedBySpanningMock.mockReturnValue(['1']) // 1 is default slot
       const wrapper = render(props)
       expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
         'labware incompatible'
@@ -216,7 +224,7 @@ describe('Edit Modules Modal', () => {
   })
 
   describe('Model Dropdown', () => {
-    it('should pass the correct props for magnetic module', () => {
+    it('should pass the correct props for magnetic module for Ot-2', () => {
       props.moduleType = MAGNETIC_MODULE_TYPE
       const wrapper = render(props)
       const expectedProps = {
@@ -226,12 +234,45 @@ describe('Edit Modules Modal', () => {
       }
       expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
     })
-    it('should pass the correct props for temperature module', () => {
+    it('should pass the correct props for temperature module for Ot-2', () => {
       props.moduleType = TEMPERATURE_MODULE_TYPE
       const wrapper = render(props)
       const expectedProps = {
         fieldName: MODEL_FIELD,
         options: MODELS_FOR_MODULE_TYPE[TEMPERATURE_MODULE_TYPE],
+        tabIndex: 0,
+      }
+      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
+    })
+    it('should pass the correct props for temperature module for Flex', () => {
+      getRobotTypeMock.mockReturnValue(FLEX_ROBOT_TYPE)
+      props.moduleType = TEMPERATURE_MODULE_TYPE
+      const wrapper = render(props)
+      const expectedProps = {
+        fieldName: MODEL_FIELD,
+        options: [{ name: 'GEN2', value: 'temperatureModuleV2' }],
+        tabIndex: 0,
+      }
+      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
+    })
+    it('should pass the correct props for thermocycler module for Flex', () => {
+      getRobotTypeMock.mockReturnValue(FLEX_ROBOT_TYPE)
+      props.moduleType = THERMOCYCLER_MODULE_TYPE
+      const wrapper = render(props)
+      const expectedProps = {
+        fieldName: MODEL_FIELD,
+        options: [{ name: 'GEN2', value: 'thermocyclerModuleV2' }],
+        tabIndex: 0,
+      }
+      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
+    })
+    it('should pass the correct props for magnetic block module for Flex', () => {
+      getRobotTypeMock.mockReturnValue(FLEX_ROBOT_TYPE)
+      props.moduleType = MAGNETIC_BLOCK_TYPE
+      const wrapper = render(props)
+      const expectedProps = {
+        fieldName: MODEL_FIELD,
+        options: MODELS_FOR_MODULE_TYPE[MAGNETIC_BLOCK_TYPE],
         tabIndex: 0,
       }
       expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)

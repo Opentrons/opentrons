@@ -11,7 +11,7 @@ import {
   Link,
   ALIGN_CENTER,
 } from '@opentrons/components'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { StyledText } from '../../atoms/text'
 
 interface ConfirmDeleteProtocolModalProps {
@@ -24,7 +24,7 @@ export function ConfirmDeleteProtocolModal(
 ): JSX.Element {
   const { t } = useTranslation(['protocol_list', 'shared'])
   return (
-    <Modal
+    <LegacyModal
       type="warning"
       onClose={props.cancelDeleteProtocol}
       title={t('should_delete_this_protocol')}
@@ -51,6 +51,6 @@ export function ConfirmDeleteProtocolModal(
           </AlertPrimaryButton>
         </Flex>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

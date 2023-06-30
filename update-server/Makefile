@@ -19,6 +19,8 @@ tests ?= tests
 test_opts ?=
 wheel_file = $(call python_get_wheelname,update-server,$(project_rs_default),otupdate)
 sdist_file = $(call python_get_sdistname,update-server,$(project_ot3_default),otupdate)
+# Find the branch, sha, version that will be used to update the VERSION.json file
+version_file = $(call python_get_git_version,update-server,$(project_ot3_default),update-server)
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)
 # Other SSH args for buildroot robots
@@ -98,5 +100,5 @@ push: wheel
 
 .PHONY: push-ot3
 push-ot3: sdist
-	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/opentrons-update-server,otupdate)
+	$(call push-python-sdist,$(host),,$(br_ssh_opts),dist/$(sdist_file),/opt/opentrons-update-server,"otupdate",,,$(version_file))
 	$(call restart-service,$(host),,$(br_ssh_opts),opentrons-update-server)

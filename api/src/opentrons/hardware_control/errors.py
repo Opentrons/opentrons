@@ -43,8 +43,26 @@ class GripperNotAttachedError(Exception):
     pass
 
 
+class AxisNotPresentError(Exception):
+    """An error raised if an axis that is not present."""
+
+    pass
+
+
 class FirmwareUpdateRequired(RuntimeError):
     """An error raised when the firmware of the submodules needs to be updated."""
+
+    pass
+
+
+class FirmwareUpdateFailed(RuntimeError):
+    """An error raised when a firmware update fails."""
+
+    pass
+
+
+class OverPressureDetected(RuntimeError):
+    """An error raised when the pressure sensor max value is exceeded."""
 
     pass
 
@@ -76,3 +94,16 @@ class InvalidPipetteModel(KeyError):
 
     def __str__(self) -> str:
         return f"{self.__class__.__name__}: {self.name} on {self.mount.name} has an unknown model {self.model}"
+
+
+class UpdateOngoingError(RuntimeError):
+    """Error when an update is already happening."""
+
+    def __init__(self, msg: str) -> None:
+        self.msg = msg
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__}: msg={self.msg}>"
+
+    def __str__(self) -> str:
+        return self.msg

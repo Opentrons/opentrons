@@ -83,6 +83,7 @@ def calc_acceleration(step: MoveGroupSingleAxisStep) -> int:
     """Calculate acceleration."""
     return int(
         step.acceleration_mm_sec_sq
+        * 1000
         / interrupts_per_sec
         / interrupts_per_sec
         * (2**31)
@@ -289,7 +290,7 @@ async def test_home(
             payload=HomeRequestPayload(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
-                velocity=Int32Field(calc_velocity(step)),
+                velocity_mm=Int32Field(calc_velocity(step)),
                 duration=UInt32Field(calc_duration(step)),
             )
         ),
@@ -311,8 +312,8 @@ async def test_single_send_setup_commands(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
                 request_stop_condition=MoveStopConditionField(0),
-                velocity=Int32Field(calc_velocity(step)),
-                acceleration=Int32Field(calc_acceleration(step)),
+                velocity_mm=Int32Field(calc_velocity(step)),
+                acceleration_um=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
             )
         ),
@@ -359,8 +360,8 @@ async def test_send_ignore_stalls_requests(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
                 request_stop_condition=request_stop_condition,
-                velocity=Int32Field(calc_velocity(step)),
-                acceleration=Int32Field(calc_acceleration(step)),
+                velocity_mm=Int32Field(calc_velocity(step)),
+                acceleration_um=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
             )
         ),
@@ -384,8 +385,8 @@ async def test_multi_send_setup_commands(
                 group_id=UInt8Field(0),
                 seq_id=UInt8Field(0),
                 request_stop_condition=MoveStopConditionField(0),
-                velocity=Int32Field(calc_velocity(step)),
-                acceleration=Int32Field(calc_acceleration(step)),
+                velocity_mm=Int32Field(calc_velocity(step)),
+                acceleration_um=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
             )
         ),
@@ -401,8 +402,8 @@ async def test_multi_send_setup_commands(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
                 request_stop_condition=MoveStopConditionField(0),
-                velocity=Int32Field(calc_velocity(step)),
-                acceleration=Int32Field(calc_acceleration(step)),
+                velocity_mm=Int32Field(calc_velocity(step)),
+                acceleration_um=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
             )
         ),
@@ -417,8 +418,8 @@ async def test_multi_send_setup_commands(
                 group_id=UInt8Field(1),
                 seq_id=UInt8Field(0),
                 request_stop_condition=MoveStopConditionField(0),
-                velocity=Int32Field(calc_velocity(step)),
-                acceleration=Int32Field(calc_acceleration(step)),
+                velocity_mm=Int32Field(calc_velocity(step)),
+                acceleration_um=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
             )
         ),
@@ -434,8 +435,8 @@ async def test_multi_send_setup_commands(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(0),
                 request_stop_condition=MoveStopConditionField(0),
-                velocity=Int32Field(calc_velocity(step)),
-                acceleration=Int32Field(calc_acceleration(step)),
+                velocity_mm=Int32Field(calc_velocity(step)),
+                acceleration_um=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
             )
         ),
@@ -450,8 +451,8 @@ async def test_multi_send_setup_commands(
                 group_id=UInt8Field(2),
                 seq_id=UInt8Field(1),
                 request_stop_condition=MoveStopConditionField(0),
-                velocity=Int32Field(calc_velocity(step)),
-                acceleration=Int32Field(calc_acceleration(step)),
+                velocity_mm=Int32Field(calc_velocity(step)),
+                acceleration_um=Int32Field(calc_acceleration(step)),
                 duration=UInt32Field(calc_duration(step)),
             )
         ),
@@ -794,7 +795,7 @@ async def test_tip_action_move_runner_fail_receives_one_response(
         (
             "opentrons_hardware.hardware_control.move_group_runner",
             30,
-            "Move set 0 timed out, expected duration 1.1",
+            "Move set 0 timed out of max duration 2.0. Expected time: 1.1",
         ),
         (
             "opentrons_hardware.hardware_control.move_group_runner",

@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Trans, useTranslation } from 'react-i18next'
 import { css } from 'styled-components'
-import { InstrumentData } from '@opentrons/api-client'
+import { GripperData } from '@opentrons/api-client'
 import { SPACING } from '@opentrons/components'
 import { getGripperDisplayName, GripperModel } from '@opentrons/shared-data'
 import { Banner } from '../../atoms/Banner'
@@ -12,7 +12,7 @@ import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 import type { GripperWizardFlowType } from '../GripperWizardFlows/types'
 
 interface GripperCardProps {
-  attachedGripper: InstrumentData | null
+  attachedGripper: GripperData | null
   isCalibrated: boolean
 }
 

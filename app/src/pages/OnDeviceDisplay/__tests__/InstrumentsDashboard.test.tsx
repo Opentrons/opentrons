@@ -6,7 +6,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { ChoosePipette } from '../../../organisms/PipetteWizardFlows/ChoosePipette'
-import { Navigation } from '../../../organisms/OnDeviceDisplay/Navigation'
+import { Navigation } from '../../../organisms/Navigation'
 import { formatTimestamp } from '../../../organisms/Devices/utils'
 import { PipetteWizardFlows } from '../../../organisms/PipetteWizardFlows'
 import { GripperWizardFlows } from '../../../organisms/GripperWizardFlows'
@@ -17,7 +17,7 @@ jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/GripperWizardFlows')
 jest.mock('../../../organisms/PipetteWizardFlows')
 jest.mock('../../../organisms/PipetteWizardFlows/ChoosePipette')
-jest.mock('../../../organisms/OnDeviceDisplay/Navigation')
+jest.mock('../../../organisms/Navigation')
 
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
 const mockGripperWizardFlows = GripperWizardFlows as jest.MockedFunction<
@@ -54,6 +54,8 @@ const mockGripperData = {
   instrumentType: 'gripper',
   mount: 'extension',
   serialNumber: 'ghi789',
+  ok: true,
+  subsystem: 'gripper',
   data: {
     calibratedOffset: {
       offset: { x: 0, y: 0, z: 0 },
@@ -67,6 +69,8 @@ const mockRightPipetteData = {
   instrumentType: 'p50',
   mount: 'right',
   serialNumber: 'abc123',
+  ok: true,
+  subsystem: 'pipette_right',
   data: {
     calibratedOffset: {
       offset: { x: 0, y: 0, z: 0 },
@@ -80,7 +84,25 @@ const mockLeftPipetteData = {
   instrumentType: 'p1000',
   mount: 'left',
   serialNumber: 'def456',
+  ok: true,
+  subsystem: 'pipette_left',
   data: {
+    calibratedOffset: {
+      offset: { x: 0, y: 0, z: 0 },
+      source: 'default',
+      last_modified: '2023-05-04T13:38:26.649Z',
+    },
+  },
+}
+const mock96ChannelData = {
+  instrumentModel: 'p1000_96_v3.0',
+  instrumentType: 'p1000',
+  mount: 'left',
+  serialNumber: 'def456',
+  ok: true,
+  subsystem: 'pipette_left',
+  data: {
+    channels: 96,
     calibratedOffset: {
       offset: { x: 0, y: 0, z: 0 },
       source: 'default',
@@ -153,5 +175,15 @@ describe('InstrumentsDashboard', () => {
     const [{ getByText }] = render()
     await getByText('extension Mount').click()
     getByText('mock gripper wizard flows')
+  })
+  it('should render the correct info for 96 channel attached', async () => {
+    mockUseInstrumentsQuery.mockReturnValue({
+      data: {
+        data: [mock96ChannelData, mockGripperData],
+      },
+    } as any)
+    const [{ getByText }] = render()
+    getByText('Left+Right Mounts')
+    getByText('extension Mount')
   })
 })

@@ -54,6 +54,16 @@ class CornerOffsetFromSlot(BaseModel):
     z: _Number
 
 
+class OverlapOffset(BaseModel):
+    """
+    Overlap dimensions of labware with another labware/module that it can be stacked on top of.
+    """
+
+    x: _Number
+    y: _Number
+    z: _Number
+
+
 class BrandData(BaseModel):
     brand: str = Field(..., description="Brand/manufacturer name")
     brandId: Optional[List[str]] = Field(
@@ -72,7 +82,15 @@ class DisplayCategory(str, Enum):
     trash = "trash"
     wellPlate = "wellPlate"
     aluminumBlock = "aluminumBlock"
+    adapter = "adapter"
     other = "other"
+
+
+class LabwareRole(str, Enum):
+    labware = "labware"
+    fixture = "fixture"
+    adapter = "adapter"
+    maintenance = "maintenance"
 
 
 class Metadata(BaseModel):
@@ -205,7 +223,7 @@ class Metadata1(BaseModel):
 
 class Group(BaseModel):
     wells: List[str] = Field(
-        ..., description="An array of wells that contain the same metadata", min_items=1
+        ..., description="An array of wells that contain the same metadata"
     )
     metadata: Metadata1 = Field(
         ..., description="Metadata specific to a grid of wells in a labware"
@@ -261,4 +279,18 @@ class LabwareDefinition(BaseModel):
         ...,
         description="Logical well groupings for metadata/display purposes; "
         "changes in groups do not affect protocol execution",
+    )
+    allowedRoles: List[LabwareRole] = Field(
+        default_factory=list,
+        description="Allowed behaviors and usage of a labware in a protocol.",
+    )
+    stackingOffsetWithLabware: Dict[str, OverlapOffset] = Field(
+        default_factory=dict,
+        description="Supported labware that can be stacked upon,"
+        " with overlap vector offset between both labware.",
+    )
+    stackingOffsetWithModule: Dict[str, OverlapOffset] = Field(
+        default_factory=dict,
+        description="Supported module that can be stacked upon,"
+        " with overlap vector offset between labware and module.",
     )

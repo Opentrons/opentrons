@@ -135,7 +135,7 @@ def test_wifi_configure_value_error(api_client, monkeypatch):
     resp = api_client.post("/wifi/configure", json={"ssid": "asasd", "foo": "bar"})
     assert resp.status_code == 400
     body = resp.json()
-    assert {"message": "nope!"} == body
+    assert {"message": "ValueError: nope!", "errorCode": "4000"} == body
 
 
 def test_wifi_configure_nmcli_error(api_client, monkeypatch):
@@ -149,7 +149,7 @@ def test_wifi_configure_nmcli_error(api_client, monkeypatch):
     resp = api_client.post("/wifi/configure", json={"ssid": "asasd", "foo": "bar"})
     assert resp.status_code == 401
     body = resp.json()
-    assert {"message": "no"} == body
+    assert {"errorCode": "4000", "message": "no"} == body
 
 
 def test_wifi_disconnect(api_client, monkeypatch):
@@ -299,7 +299,12 @@ def test_add_key_response(add_key_return, expected_status, expected_body, api_cl
 @pytest.mark.parametrize(
     "arg,remove_key_return,expected_status,expected_body",
     [
-        ("12345", None, 404, {"message": "No such key file 12345"}),
+        (
+            "12345",
+            None,
+            404,
+            {"message": "No such key file 12345", "errorCode": "4000"},
+        ),
         ("54321", "myfile.pem", 200, {"message": "Key file myfile.pem deleted"}),
     ],
 )
