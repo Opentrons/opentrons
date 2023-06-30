@@ -213,11 +213,12 @@ def _load_labware(
         labware_on_scale = ctx.load_labware(
             cfg.labware_on_scale, location=cfg.slot_scale
         )
+    tiprack_namespace = "opentrons"
     if cfg.pipette_channels == 96:
-        tiprack_namespace = "custom_beta"
+        # NOTE: protocol uses "custom-beta", but script uses "opentrons"
+        # FIXME: use official tip-racks once available
         tiprack_loadname = f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul_adp"
     else:
-        tiprack_namespace = "opentrons"
         tiprack_loadname = f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul"
     tiprack_load_settings: List[Tuple[int, str, str]] = [
         (
@@ -227,12 +228,10 @@ def _load_labware(
         )
         for slot in cfg.slots_tiprack
     ]
+    tipracks: List[Labware] = []
     for ls in tiprack_load_settings:
         print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]} with namespace "{ls[2]}"')
-    tipracks = [
-        ctx.load_labware(ls[1], location=ls[0], namespace=ls[2])
-        for ls in tiprack_load_settings
-    ]
+        tipracks.append(ctx.load_labware(ls[1], location=ls[0], namespace=ls[2]))
     _apply_labware_offsets(cfg, tipracks, labware_on_scale)
     return labware_on_scale, tipracks
 

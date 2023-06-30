@@ -1884,7 +1884,7 @@ index 0000000000..697c437104
 +    "isMagneticModuleCompatible": false,
 +    "loadName": "opentrons_flex_96_tiprack_1000ul_adp"
 +  },
-+  "namespace": "custom_beta",
++  "namespace": "opentrons",
 +  "version": 1,
 +  "schemaVersion": 2,
 +  "cornerOffsetFromSlot": {
@@ -2907,7 +2907,7 @@ index 0000000000..7f0470f3bb
 +    "isMagneticModuleCompatible": false,
 +    "loadName": "opentrons_flex_96_tiprack_200ul_adp"
 +  },
-+  "namespace": "custom_beta",
++  "namespace": "opentrons",
 +  "version": 1,
 +  "schemaVersion": 2,
 +  "cornerOffsetFromSlot": {
@@ -3930,7 +3930,7 @@ index 0000000000..d443279540
 +    "isMagneticModuleCompatible": false,
 +    "loadName": "opentrons_flex_96_tiprack_50ul_adp"
 +  },
-+  "namespace": "custom_beta",
++  "namespace": "opentrons",
 +  "version": 1,
 +  "schemaVersion": 2,
 +  "cornerOffsetFromSlot": {
