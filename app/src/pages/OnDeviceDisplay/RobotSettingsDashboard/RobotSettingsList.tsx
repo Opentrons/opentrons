@@ -99,6 +99,13 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="brightness"
         />
         <RobotSettingButton
+          settingName={t('app_settings:apply_historic_offsets')}
+          settingInfo={t('historic_offsets_description')}
+          iconName="reticle"
+          enabledHistoricOffests
+          historicOffsetsOn={historicOffsetsOn}
+        />
+        <RobotSettingButton
           settingName={t('device_reset')}
           currentOption="DeviceReset"
           setCurrentOption={setCurrentOption}
@@ -109,13 +116,6 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           currentOption="UpdateChannel"
           setCurrentOption={setCurrentOption}
           iconName="update-channel"
-        />
-        <RobotSettingButton
-          settingName={t('app_settings:apply_historic_offsets')}
-          settingInfo={t('historic_offsets_description')}
-          iconName="settings"
-          enabledHistoricOffests
-          historicOffsetsOn={historicOffsetsOn}
         />
         <RobotSettingButton
           settingName={t('app_settings:enable_dev_tools')}

@@ -128,10 +128,8 @@ describe('RobotSettingsDashboard', () => {
     getByText('Touchscreen Brightness')
     getByText('Device Reset')
     getByText('Update Channel')
-    getByText('Always Apply Historic Offset Data')
-    getByText(
-      'Apply stored labware offset data when setting up and running protocols.'
-    )
+    getByText('Apply labware offsets')
+    getByText('Use stored data when setting up a protocol.')
     getByText('Enable Developer Tools')
     getByText('Enable additional logging and allow access to feature flags.')
     expect(getAllByText('Off').length).toBe(3) // LED & DEV tools & historic offsets
@@ -205,7 +203,7 @@ describe('RobotSettingsDashboard', () => {
 
   it('should call a mock function when tapping enable historic offset', () => {
     const [{ getByText }] = render()
-    const button = getByText('Always Apply Historic Offset Data')
+    const button = getByText('Apply labware offsets')
     fireEvent.click(button)
     expect(mockToggleHistoricOffsets).toHaveBeenCalled()
   })

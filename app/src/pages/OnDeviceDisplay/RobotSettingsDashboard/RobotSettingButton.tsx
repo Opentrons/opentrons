@@ -104,6 +104,7 @@ export function RobotSettingButton({
           gridGap={SPACING.spacing2}
           alignItems={ALIGN_FLEX_START}
           justifyContent={JUSTIFY_CENTER}
+          width="46.25rem"
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {settingName}

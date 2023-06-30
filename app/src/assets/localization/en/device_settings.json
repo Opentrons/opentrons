@@ -109,7 +109,7 @@
   "gripper_calibration_title": "Gripper Calibration",
   "health_check": "Check health",
   "hide": "Hide",
-  "historic_offsets_description": "Apply stored labware offset data when setting up and running protocols.",
+  "historic_offsets_description": "Use stored data when setting up a protocol.",
   "incorrect_password_for_ssid": "Oops! Incorrect password for {{ssid}}",
   "installing_software": "Installing software...",
   "ip_address": "IP Address",
