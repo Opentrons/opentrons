@@ -33,6 +33,8 @@ import {
   useRunControls,
   useRunStatus,
 } from '../../../../organisms/RunTimeControl/hooks'
+import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
+import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
 import { ProtocolSetup } from '..'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
@@ -65,6 +67,9 @@ jest.mock('../../../../organisms/ProtocolSetupModules/utils')
 jest.mock('../../../../organisms/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../../../organisms/RunTimeControl/hooks')
 jest.mock('../../../../organisms/ProtocolSetupLiquids')
+jest.mock('../../../../organisms/ModuleCard/hooks')
+jest.mock('../../../../redux/config')
+jest.mock('../ConfirmAttachedModal')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -114,6 +119,12 @@ const mockUseLaunchLPC = useLaunchLPC as jest.MockedFunction<
 >
 const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
   typeof useLPCDisabledReason
+>
+const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.MockedFunction<
+  typeof useIsHeaterShakerInProtocol
+>
+const mockConfirmAttachedModal = ConfirmAttachedModal as jest.MockedFunction<
+  typeof ConfirmAttachedModal
 >
 
 const render = (path = '/') => {
@@ -234,6 +245,10 @@ describe('ProtocolSetup', () => {
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,
       })
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(false)
+    mockConfirmAttachedModal.mockReturnValue(
+      <div>mock ConfirmAttachedModal</div>
+    )
   })
 
   afterEach(() => {
@@ -310,5 +325,12 @@ describe('ProtocolSetup', () => {
     getByText('Labware Position Check').click()
     expect(mockLaunchLPC).toHaveBeenCalled()
     getByText('mock LPC Wizard')
+  })
+
+  it('should render a confirmation modal when heater-shaker is in a protocol and it is not shaking', () => {
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
+    const [{ getByRole, getByText }] = render(`/runs/${RUN_ID}/setup/`)
+    getByRole('button', { name: 'play' }).click()
+    getByText('mock ConfirmAttachedModal')
   })
 })
