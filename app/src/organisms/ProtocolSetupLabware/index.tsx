@@ -15,6 +15,7 @@ import {
   LabwareRender,
   Module,
   RobotWorkSpace,
+  SlotLabels,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -203,6 +204,7 @@ export function ProtocolSetupLabware({
                       </React.Fragment>
                     )
                   })}
+                  <SlotLabels robotType={ROBOT_MODEL_OT3} />
                 </>
               )}
             </RobotWorkSpace>
