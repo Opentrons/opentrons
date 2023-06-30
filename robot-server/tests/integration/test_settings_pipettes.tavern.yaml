@@ -30,7 +30,7 @@ stages:
             top: !anydict
           info:
             model: p300_multi_v1
-            name: p300_multi
+            name: !anystr
       strict: false 
 ---
 test_name: GET Pipette {pipette_id}
@@ -63,7 +63,7 @@ stages:
           top: !anydict
         info:
           model: p300_multi_v1
-          name: p300_multi
+          name: !anystr
       strict: true
 ---
 test_name: PATCH Pipette {pipette_id} single value
@@ -106,7 +106,7 @@ stages:
           top: !anydict
         info:
           model: p300_multi_v1
-          name: p300_multi
+          name: !anystr
       strict: true
 ---
 test_name: PATCH Pipette {pipette_id} multiple values
@@ -165,7 +165,7 @@ stages:
             value: 18.0
         info:
           model: p300_multi_v1
-          name: p300_multi
+          name: !anystr
       strict: true
 ---
 test_name: PATCH Pipette {pipette_id} value too low
@@ -250,5 +250,5 @@ stages:
           top: !anydict
         info:
           model: p300_multi_v1
-          name: p300_multi
+          name: !anystr
       strict: true

@@ -277,7 +277,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         if not v:
             return PipetteGenerationType.GEN1
         return PipetteGenerationType(v)
-    
+
     @validator("quirks", pre=True)
     def convert_quirks(cls, v: str) -> List[pip_types.Quirks]:
         if not v:
