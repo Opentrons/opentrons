@@ -293,7 +293,7 @@ def _pipette_with_liquid_settings(
 
     # EXIT
     callbacks.on_exiting()
-    pipette.move_to(well.top(0).move(channel_offset), force_direct=True)
+    pipette.move_to(well.top().move(channel_offset), force_direct=True)
 
 
 def aspirate_with_liquid_class(
