@@ -54,6 +54,7 @@ from .constants import (
 )
 from opentrons_hardware.errors import raise_from_error_message
 from opentrons_hardware.hardware_control.motion import (
+    MoveGroup,
     MoveGroups,
     MoveGroupSingleAxisStep,
     MoveGroupSingleGripperStep,
@@ -79,6 +80,9 @@ log = logging.getLogger(__name__)
 _AcceptableMoves = Union[MoveCompleted, TipActionResponse]
 _CompletionPacket = Tuple[ArbitrationId, _AcceptableMoves]
 _Completions = List[_CompletionPacket]
+
+_MoveSeqInfo = Tuple[int, int, MoveStopCondition]
+_MoveGroupInfo = Set[_MoveSeqInfo]
 
 
 class MoveGroupRunner:
@@ -347,41 +351,53 @@ class MoveScheduler:
 
     def __init__(self, move_groups: MoveGroups, start_at_index: int = 0) -> None:
         """Constructor."""
-        # For each move group create a set identifying the node and seq id.
-        self._moves: List[Set[Tuple[int, int]]] = []
+        # For each move group create a set identifying the node and seq id and stop condition.
+        self._moves: List[_MoveGroupInfo] = []
         self._durations: List[float] = []
-        self._stop_condition: List[List[MoveStopCondition]] = []
         self._start_at_index = start_at_index
-        self._expected_tip_action_motors = []
+        self._expected_tip_action_motors: List[List[List[GearMotorId]]] = []
 
         for move_group in move_groups:
-            move_set = set()
-            duration = 0.0
-            stop_cond = []
-            for seq_id, move in enumerate(move_group):
-                movesteps = list(move.values())
-                move_set.update(set((k.value, seq_id) for k in move.keys()))
-                duration += float(movesteps[0].duration_sec)
-                if any(isinstance(g, MoveGroupTipActionStep) for g in movesteps):
-                    self._expected_tip_action_motors = [
-                        GearMotorId.left,
-                        GearMotorId.right,
-                    ]
-                for step in move_group[seq_id]:
-                    stop_cond.append(move_group[seq_id][step].stop_condition)
+            self._moves.append(self._get_group_info(move_group))
+            self._durations.append(self._get_group_duration(move_group))
+            motors = self._get_expected_tip_motors(move_group)
+            self._expected_tip_action_motors.append(
+                motors 
+            )
 
-            self._moves.append(move_set)
-            self._stop_condition.append(stop_cond)
-            self._durations.append(duration)
         log.debug(f"Move scheduler running for groups {move_groups}")
         self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
         self._event = asyncio.Event()
         self._errors: List[EnumeratedError] = []
         self._current_group: Optional[int] = None
         self._should_stop = False
+    
+    @staticmethod
+    def _get_group_duration(move_group: MoveGroup) -> float:
+        """The sum of one of each step's duration."""
+        return sum(list(step.values())[0].duration_sec for step in move_group)
+    
+    @staticmethod
+    def _get_group_info(move_group: MoveGroup) -> _MoveGroupInfo:
+        group_info: _MoveGroupInfo = set()
+        for seq_id, move in enumerate(move_group):
+            move_seq: _MoveSeqInfo = set(
+                (k.value, seq_id, move[k].stop_condition)
+                for k in move.keys()
+            )
+            group_info.update(move_seq)
+        return group_info
 
-    def _remove_move_group(
-        self, message: _AcceptableMoves, arbitration_id: ArbitrationId
+    @staticmethod
+    def _get_expected_tip_motors(move_group: MoveGroup) -> List[List[GearMotorId]]:
+        for move in move_group:
+            if any(isinstance(s, MoveGroupTipActionStep) for s in move.values()):
+                yield [GearMotorId.left, GearMotorId.right]
+            else:
+                yield []
+        
+    def _handle_error(
+        self, message: ErrorMessage, arbitration_id: ArbitrationId
     ) -> None:
         seq_id = message.payload.seq_id.value
         group_id = message.payload.group_id.value - self._start_at_index
