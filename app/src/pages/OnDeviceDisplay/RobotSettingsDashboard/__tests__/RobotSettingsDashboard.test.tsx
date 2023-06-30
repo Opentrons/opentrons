@@ -129,7 +129,9 @@ describe('RobotSettingsDashboard', () => {
     getByText('Device Reset')
     getByText('Update Channel')
     getByText('Always Apply Historic Offset Data')
-    getByText('Apply stored labware offset data when setting up and running protocols.')
+    getByText(
+      'Apply stored labware offset data when setting up and running protocols.'
+    )
     getByText('Enable Developer Tools')
     getByText('Enable additional logging and allow access to feature flags.')
     expect(getAllByText('Off').length).toBe(3) // LED & DEV tools & historic offsets
