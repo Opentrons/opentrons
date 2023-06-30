@@ -192,13 +192,26 @@ def mock_grip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
 
 
 @pytest.fixture
-def mock_ungrip(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+def mock_home_gripper_jaw(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
     with patch.object(
         ot3_hardware.managed_obj,
-        "_ungrip",
+        "_home_gripper_jaw",
         AsyncMock(
-            spec=ot3_hardware.managed_obj._ungrip,
-            wraps=ot3_hardware.managed_obj._ungrip,
+            spec=ot3_hardware.managed_obj._home_gripper_jaw,
+            wraps=ot3_hardware.managed_obj._home_gripper_jaw,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
+def mock_hold_jaw_open(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_hold_jaw_open",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj._hold_jaw_open,
+            wraps=ot3_hardware.managed_obj._hold_jaw_open,
         ),
     ) as mock_move:
         yield mock_move
@@ -580,10 +593,10 @@ async def test_liquid_probe(
     fake_liquid_settings: LiquidProbeSettings,
     mock_instrument_handlers: Tuple[Mock],
     mock_current_position_ot3: AsyncMock,
-    mock_ungrip: AsyncMock,
+    mock_home_gripper_jaw: AsyncMock,
     mock_home_plunger: AsyncMock,
 ) -> None:
-    mock_ungrip.return_value = None
+    mock_home_gripper_jaw.return_value = None
     backend = ot3_hardware.managed_obj._backend
     await ot3_hardware.home()
     mock_move_to.return_value = None
@@ -651,10 +664,10 @@ async def test_liquid_sensing_errors(
     mock_instrument_handlers: Tuple[Mock],
     mock_current_position_ot3: AsyncMock,
     mock_home_plunger: AsyncMock,
-    mock_ungrip: AsyncMock,
+    mock_home_gripper_jaw: AsyncMock,
 ) -> None:
     backend = ot3_hardware.managed_obj._backend
-    mock_ungrip.return_value = None
+    mock_home_gripper_jaw.return_value = None
     await ot3_hardware.home()
     mock_move_to.return_value = None
 
@@ -921,7 +934,7 @@ async def test_has_gripper(
 async def test_gripper_action_fails_with_no_gripper(
     ot3_hardware: ThreadManager[OT3API],
     mock_grip: AsyncMock,
-    mock_ungrip: AsyncMock,
+    mock_hold_jaw_open: AsyncMock,
 ) -> None:
     with pytest.raises(
         GripperNotAttachedError, match="Cannot perform action without gripper attached"
@@ -933,14 +946,15 @@ async def test_gripper_action_fails_with_no_gripper(
         GripperNotAttachedError, match="Cannot perform action without gripper attached"
     ):
         await ot3_hardware.ungrip()
-    mock_ungrip.assert_not_called()
+    mock_hold_jaw_open.assert_not_called()
 
 
 async def test_gripper_action_works_with_gripper(
     ot3_hardware: ThreadManager[OT3API],
     mock_grip: AsyncMock,
-    mock_ungrip: AsyncMock,
+    mock_home_gripper_jaw: AsyncMock,
     mock_hold_jaw_width: AsyncMock,
+    mock_hold_jaw_open: AsyncMock,
     gripper_present: None,
 ) -> None:
 
@@ -955,18 +969,18 @@ async def test_gripper_action_works_with_gripper(
     with pytest.raises(GripError, match="Gripper jaw must be homed before moving"):
         await ot3_hardware.grip(5.0)
     await ot3_hardware.home_gripper_jaw()
-    mock_ungrip.assert_called_once()
-    mock_ungrip.reset_mock()
+    mock_home_gripper_jaw.assert_called_once()
+    mock_home_gripper_jaw.reset_mock()
     await ot3_hardware.home([OT3Axis.G])
-    mock_ungrip.assert_called_once()
-    mock_ungrip.reset_mock()
+    mock_home_gripper_jaw.assert_called_once()
+    mock_home_gripper_jaw.reset_mock()
     await ot3_hardware.grip(5.0)
     mock_grip.assert_called_once_with(
         gc.duty_cycle_by_force(5.0, gripper_config.grip_force_profile),
     )
 
     await ot3_hardware.ungrip()
-    mock_ungrip.assert_called_once()
+    mock_hold_jaw_open.assert_called_once()
 
     with pytest.raises(ValueError, match="Setting gripper jaw width out of bounds"):
         await ot3_hardware.hold_jaw_width(200)
@@ -1338,9 +1352,9 @@ async def test_save_instrument_offset(
 async def test_pick_up_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
     mock_instrument_handlers: Tuple[Mock],
-    mock_ungrip: AsyncMock,
+    mock_home_gripper_jaw: AsyncMock,
 ) -> None:
-    mock_ungrip.return_value = None
+    mock_home_gripper_jaw.return_value = None
     await ot3_hardware.home()
     _, pipette_handler = mock_instrument_handlers
     backend = ot3_hardware.managed_obj._backend

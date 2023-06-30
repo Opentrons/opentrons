@@ -707,7 +707,7 @@ class OT3API(
             dc = self._gripper_handler.get_duty_cycle_by_grip_force(
                 gripper.default_home_force
             )
-            await self._ungrip(duty_cycle=dc)
+            await self._home_gripper_jaw(duty_cycle=dc)
             gripper.state = GripperJawState.HOMED_READY
         except GripperNotAttachedError:
             pass
@@ -1343,7 +1343,7 @@ class OT3API(
             raise
 
     @ExecutionManagerProvider.wait_for_running
-    async def _ungrip(self, duty_cycle: float) -> None:
+    async def _home_gripper_jaw(self, duty_cycle: float) -> None:
         """Move the gripper jaw outward to reach the homing switch."""
         try:
             await self._backend.gripper_home_jaw(duty_cycle=duty_cycle)
@@ -1367,6 +1367,16 @@ class OT3API(
             self._log.exception("Gripper set width failed")
             raise
 
+    @ExecutionManagerProvider.wait_for_running
+    async def _hold_jaw_open(self) -> None:
+        """Move the gripper jaw to its maximum width."""
+        try:
+            await self._backend.gripper_hold_jaw(0)
+            await self._cache_encoder_position()
+        except Exception:
+            self._log.exception("Gripper set width failed")
+            raise
+
     async def grip(self, force_newtons: Optional[float] = None) -> None:
         self._gripper_handler.check_ready_for_jaw_move()
         dc = self._gripper_handler.get_duty_cycle_by_grip_force(
@@ -1375,14 +1385,10 @@ class OT3API(
         await self._grip(duty_cycle=dc)
         self._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
 
-    async def ungrip(self, force_newtons: Optional[float] = None) -> None:
-        # get default grip force for release if not provided
+    async def ungrip(self) -> None:
         self._gripper_handler.check_ready_for_jaw_move()
-        dc = self._gripper_handler.get_duty_cycle_by_grip_force(
-            force_newtons or self._gripper_handler.get_gripper().default_home_force
-        )
-        await self._ungrip(duty_cycle=dc)
-        self._gripper_handler.set_jaw_state(GripperJawState.HOMED_READY)
+        await self._hold_jaw_open()
+        self._gripper_handler.set_jaw_state(GripperJawState.HOLDING_OPENED)
 
     async def hold_jaw_width(self, jaw_width_mm: int) -> None:
         self._gripper_handler.check_ready_for_jaw_move()
