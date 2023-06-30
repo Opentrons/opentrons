@@ -460,6 +460,14 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         test_volumes
     )
 
+    def _next_tip() -> Well:
+        nonlocal tips
+        if not len(tips[0]):
+            if not ctx.is_simulating():
+                ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
+            tips = get_tips(ctx, pipette)
+        return tips[0].pop(0)
+
     assert (
         trial_total <= total_tips
     ), f"more trials ({trial_total}) than tips ({total_tips})"
@@ -490,12 +498,12 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
 
     print("homing...")
     ctx.home()
+    pipette.home_plunger()
     # get the first channel's first-used tip
     # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
     #       and so we can use pick-up-tip from there again
     try:
         trial_count = 0
-        tip_iter = 0
         for volume in test_volumes:
             ui.print_title(f"{volume} uL")
             do_jog = True
@@ -505,7 +513,7 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                 print(f"trial total {trial_count}/{trial_total}")
                 if not ctx.is_simulating():
                     ui.get_user_ready(f"put PLATE #{trial + 1} and remove SEAL")
-                next_tip: Well = tips[0][tip_iter]
+                next_tip: Well = _next_tip()
                 next_tip_location = next_tip.top()
                 _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
 
@@ -527,15 +535,6 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     mix=cfg.mix,
                     stable=True,
                 )
-                tip_iter += 1
-                if tip_iter >= len(tips[0]) and not (
-                    (trial + 1) == cfg.trials and volume == test_volumes[-1]
-                ):
-                    if not ctx.is_simulating():
-                        ui.get_user_ready(
-                            f"replace TIPRACKS in slots {cfg.slots_tiprack}"
-                        )
-                    tip_iter = 0
                 if volume < 250:
                     do_jog = False
 
@@ -543,13 +542,14 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         ui.print_title("CHANGE PIPETTES")
         if pipette.has_tip:
             if pipette.current_volume > 0:
+                print("dispensing liquid to trash")
                 trash = pipette.trash_container.wells()[0]
                 # FIXME: this should be a blow_out() at max volume,
                 #        but that is not available through PyAPI yet
                 #        so instead just dispensing.
                 pipette.dispense(pipette.current_volume, trash.top())
                 pipette.aspirate(10)  # to pull any droplets back up
+            print("dropping tip")
             _drop_tip(ctx, pipette, cfg)
-        ctx.home()
-        # move to attach point
+        print("moving to attach position")
         pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))
