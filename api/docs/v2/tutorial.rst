@@ -10,8 +10,7 @@ Tutorial
 Introduction
 ************
 
-
-This tutorial will guide you through creating a Python protocol file from scratch. At the end of this process you’ll have a complete protocol that can run on an OT-2 robot. If you don’t have an OT-2 yet (or if you’re away from your lab, or if your robot is in use) you can use the same file to simulate the protocol on your computer instead. 
+This tutorial will guide you through creating a Python protocol file from scratch. At the end of this process you’ll have a complete protocol that can run on a Flex or OT-2 robot. If you don’t have a Flex or OT-2 (or if you’re away from your lab, or if your robot is in use) you can use the same file to simulate the protocol on your computer instead.
 
 What You’ll Automate
 ^^^^^^^^^^^^^^^^^^^^
@@ -21,15 +20,22 @@ The lab task that you’ll automate in this tutorial is `serial dilution`: takin
 Before You Begin
 ^^^^^^^^^^^^^^^^
 
-You're going to write some Python code, but by no means do you need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses `indentation <https://docs.python.org/3/reference/lexical_analysis.html#indentation>`_ to group blocks of code, dot notation for `calling methods <https://docs.python.org/3/tutorial/classes.html#method-objects>`_, and the format of `lists <https://docs.python.org/3/tutorial/introduction.html#lists>`_ and `dictionaries <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_. You’ll also be using `common control structures <https://docs.python.org/3/tutorial/controlflow.html#if-statements>`_ like ``if`` statements and ``for`` loops. 
+You're going to write some Python code, but you don't need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses `indentation <https://docs.python.org/3/reference/lexical_analysis.html#indentation>`_ to group blocks of code, dot notation for `calling methods <https://docs.python.org/3/tutorial/classes.html#method-objects>`_, and the format of `lists <https://docs.python.org/3/tutorial/introduction.html#lists>`_ and `dictionaries <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_. You’ll also be using `common control structures <https://docs.python.org/3/tutorial/controlflow.html#if-statements>`_ like ``if`` statements and ``for`` loops. 
 
 To run your code, make sure that you've installed `Python 3 <https://wiki.python.org/moin/BeginnersGuide/Download>`_ and the `pip package installer <https://pip.pypa.io/en/stable/getting-started/>`_. You should write your code in your favorite plaintext editor or IDE and save it in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
 
-If you plan to run your protocol on an OT-2, you’ll want to have it ready with the right kind of hardware and labware:
+Hardware and Labware
+^^^^^^^^^^^^^^^^^^^^
 
-- `Set up your OT-2 <https://support.opentrons.com/s/ot2-get-started>`_, including `attaching pipettes <https://support.opentrons.com/s/article/Get-started-Attach-pipettes>`_ and `initial calibration <https://support.opentrons.com/s/article/Get-started-Calibrate-the-deck>`_. You can use either a single-channel or 8-channel pipette for this tutorial. Most code examples will use a `P300 Single-Channel GEN2 <https://shop.opentrons.com/single-channel-electronic-pipette-p20/>`_ pipette.
+Before running a protocol, you’ll want to have the right kind of hardware and labware ready for your Flex or OT-2.
 
-- Prepare the labware you need for serial dilution. The code examples will use the following labware definitions, but as long as you have labware of each type you can modify the code to run with your labware.
+.. Placeholders for Flex content that needs links to online manual.
+
+Flex users should review Chapter 2: Installation and Relocation (**LINK TBD**) in the instruction manual. Specifically, see the pipette information in the Instrument Installation and Calibration section (**LINK TBD**). You can use either a 1-channel or 8-channel pipette for this tutorial. Most Flex code examples will use a `1-channel, 1000 uL pipette <https://opentrons.com/products/flex-pipettes/>`_.
+
+OT-2 users should review the robot setup and pipette information on the `Get Started page <https://support.opentrons.com/s/ot2-get-started>`_. Specifically, see `attaching pipettes <https://support.opentrons.com/s/article/Get-started-Attach-pipettes>`_ and `initial calibration <https://support.opentrons.com/s/article/Get-started-Calibrate-the-deck>`_. You can use either a single-channel or 8-channel pipette for this tutorial. Most OT-2 code examples will use a `P300 Single-Channel GEN2 <https://shop.opentrons.com/single-channel-electronic-pipette-p20/>`_ pipette.
+
+The Flex and OT-2 use the same labware for serial dilution. The tutorial code will use the following labware definitions, but as long as you have labware of each type you can modify the code to run with your labware.
 
     - **Reservoir**: `NEST 12 Well Reservoir 15 mL <https://labware.opentrons.com/nest_12_reservoir_15ml>`_ ``nest_12_reservoir_15ml``
     - **Well plate**: `NEST 96 Well Plate 200 µL Flat <https://labware.opentrons.com/nest_96_wellplate_200ul_flat>`_ ``nest_96_wellplate_200ul_flat``
@@ -79,7 +85,33 @@ You can include any other information you like in the metadata dictionary. The f
         'author': 'New API User'
         }
 
-With your metadata defined, you can move on to creating the ``run()`` function for your protocol.
+If you have a Flex, or you’re using an OT-2 with API v2.15 (or higher), see the Requirements section below.
+
+.. With your metadata defined, you can move on to creating the ``run()`` function for your protocol.
+
+Requirements
+^^^^^^^^^^^^
+.. This is how I understand the requirements code block. Need to check w/ the experts.
+
+The ``requirements`` code block appears after ``meatadata``. It defines the robot model and the API version used in your protocol.  
+
+Flex users need to specify the API version in the ``requirements`` instead of the ``metadata`` code block. The minimum required API version for a Flex is v2.15.
+
+.. code-block:: python
+    :substitutions:
+
+    # Flex
+    requirements = {"robotType": "Flex", "apiLevel": "2.15"}
+
+OT-2 users working with API v2.15 (or higher) also need to specify the API version in the ``requirements`` instead of the ``metadata`` code block.
+
+.. code-block:: python
+    :substitutions:
+
+    # OT-2
+    requirements = {"robotType": "OT-2", "apiLevel": "2.15"}
+
+With the metadata and requirements defined, you can move on to creating the ``run()`` function for your protocol.
 
 The ``run()`` function
 ^^^^^^^^^^^^^^^^^^^^^^
