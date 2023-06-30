@@ -293,7 +293,8 @@ def _pipette_with_liquid_settings(
 
     # EXIT
     callbacks.on_exiting()
-    pipette.move_to(well.top().move(channel_offset), force_direct=True)
+    exit_height = config.SCALE_Z_DISTANCE_TO_AVOID_STATIC
+    pipette.move_to(well.top(exit_height).move(channel_offset), force_direct=True)
 
 
 def aspirate_with_liquid_class(
