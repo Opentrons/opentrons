@@ -1,26 +1,29 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useHistory, useParams } from 'react-router-dom'
 import first from 'lodash/first'
 import { css } from 'styled-components'
 
+import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
-  Btn,
-  Flex,
-  Icon,
   ALIGN_CENTER,
+  BORDERS,
+  Btn,
   COLORS,
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
+  Flex,
+  Icon,
   JUSTIFY_CENTER,
   JUSTIFY_END,
   JUSTIFY_SPACE_BETWEEN,
+  POSITION_STICKY,
+  SPACING,
   TEXT_ALIGN_RIGHT,
   truncateString,
   TYPOGRAPHY,
-  BORDERS,
-  SPACING,
-  POSITION_STICKY,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import {
   useProtocolQuery,
@@ -31,35 +34,47 @@ import {
 import {
   getDeckDefFromRobotType,
   getModuleDisplayName,
+  HEATERSHAKER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { StyledText } from '../../atoms/text'
-import { Skeleton } from '../../atoms/Skeleton'
-import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
-import { useMaintenanceRunTakeover } from '../../organisms/TakeoverModal'
+import { StyledText } from '../../../atoms/text'
+import { Skeleton } from '../../../atoms/Skeleton'
+import { ODD_FOCUS_VISIBLE } from '../../../atoms/buttons/constants'
+import { useMaintenanceRunTakeover } from '../../../organisms/TakeoverModal'
 import {
   useAttachedModules,
   useLPCDisabledReason,
-} from '../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
-import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
-import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
-import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
-import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
-import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
-import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
+} from '../../../organisms/Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { ProtocolSetupLabware } from '../../../organisms/ProtocolSetupLabware'
+import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
+import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
+import { ProtocolSetupInstruments } from '../../../organisms/ProtocolSetupInstruments'
+import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
+import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
+import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
   getAreInstrumentsReady,
   getProtocolUsesGripper,
-} from '../../organisms/ProtocolSetupInstruments/utils'
-import { useRunControls } from '../../organisms/RunTimeControl/hooks'
-import { useToaster } from '../../organisms/ToasterOven'
-import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
-import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
+} from '../../../organisms/ProtocolSetupInstruments/utils'
+import {
+  useRunControls,
+  useRunStatus,
+} from '../../../organisms/RunTimeControl/hooks'
+import { useToaster } from '../../../organisms/ToasterOven'
+import { useIsHeaterShakerInProtocol } from '../../../organisms/ModuleCard/hooks'
+import { getLabwareSetupItemGroups } from '../../Protocols/utils'
+import { ROBOT_MODEL_OT3 } from '../../../redux/discovery'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../../redux/analytics'
+import { getIsHeaterShakerAttached } from '../../../redux/config'
+import { ConfirmAttachedModal } from './ConfirmAttachedModal'
 
-import type { OnDeviceRouteParams } from '../../App/types'
+import type { OnDeviceRouteParams } from '../../../App/types'
+import type { HeaterShakerModule } from '../../../redux/modules/types'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -263,11 +278,15 @@ function PlayButton({
 interface PrepareToRunProps {
   runId: string
   setSetupScreen: React.Dispatch<React.SetStateAction<SetupScreens>>
+  confirmAttachment: () => void
+  play: () => void
 }
 
 function PrepareToRun({
   runId,
   setSetupScreen,
+  confirmAttachment,
+  play,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
   const history = useHistory()
@@ -300,8 +319,6 @@ function PrepareToRun({
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
   const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
 
-  const { play } = useRunControls(runId)
-
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
     history.goBack()
@@ -311,6 +328,15 @@ function PrepareToRun({
     mostRecentAnalysis?.modules != null &&
     mostRecentAnalysis?.modules.length > 0
   const attachedModules = useAttachedModules()
+
+  const runStatus = useRunStatus(runId)
+  const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
+  const isHeaterShakerShaking = attachedModules
+    .filter(
+      (module): module is HeaterShakerModule =>
+        module.moduleType === HEATERSHAKER_MODULE_TYPE
+    )
+    .some(module => module?.data != null && module.data.speedStatus !== 'idle')
 
   const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
 
@@ -363,12 +389,20 @@ function PrepareToRun({
   const isReadyToRun = areInstrumentsReady && !isMissingModules
 
   const onPlay = (): void => {
-    if (isReadyToRun) {
-      play()
+    if (
+      isHeaterShakerInProtocol &&
+      !isHeaterShakerShaking &&
+      (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
+    ) {
+      confirmAttachment()
     } else {
-      makeSnackbar(
-        i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
-      )
+      if (isReadyToRun) {
+        play()
+      } else {
+        makeSnackbar(
+          i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
+        )
+      }
     }
   }
 
@@ -543,6 +577,23 @@ export type SetupScreens =
 
 export function ProtocolSetup(): JSX.Element {
   const { runId } = useParams<OnDeviceRouteParams>()
+  const trackEvent = useTrackEvent()
+  const { play } = useRunControls(runId)
+  const handleProceedToRunClick = (): void => {
+    trackEvent({ name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN, properties: {} })
+    play()
+  }
+  const configBypassHeaterShakerAttachmentConfirmation = useSelector(
+    getIsHeaterShakerAttached
+  )
+  const {
+    confirm: confirmAttachment,
+    showConfirmation: showConfirmationModal,
+    cancel: cancelExit,
+  } = useConditionalConfirm(
+    handleProceedToRunClick,
+    !configBypassHeaterShakerAttachmentConfirmation
+  )
 
   // orchestrate setup subpages/components
   const [setupScreen, setSetupScreen] = React.useState<SetupScreens>(
@@ -550,7 +601,12 @@ export function ProtocolSetup(): JSX.Element {
   )
   const setupComponentByScreen = {
     'prepare to run': (
-      <PrepareToRun runId={runId} setSetupScreen={setSetupScreen} />
+      <PrepareToRun
+        runId={runId}
+        setSetupScreen={setSetupScreen}
+        confirmAttachment={confirmAttachment}
+        play={play}
+      />
     ),
     instruments: (
       <ProtocolSetupInstruments runId={runId} setSetupScreen={setSetupScreen} />
@@ -567,16 +623,25 @@ export function ProtocolSetup(): JSX.Element {
   }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      padding={
-        setupScreen === 'prepare to run'
-          ? `0 ${SPACING.spacing32} ${SPACING.spacing40}`
-          : `${SPACING.spacing32} ${SPACING.spacing40}`
-      }
-    >
-      {setupComponentByScreen[setupScreen]}
-    </Flex>
+    <>
+      {showConfirmationModal ? (
+        <ConfirmAttachedModal
+          onCloseClick={cancelExit}
+          isProceedToRunModal={true}
+          onConfirmClick={handleProceedToRunClick}
+        />
+      ) : null}
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        padding={
+          setupScreen === 'prepare to run'
+            ? `0 ${SPACING.spacing32} ${SPACING.spacing40}`
+            : `${SPACING.spacing32} ${SPACING.spacing40}`
+        }
+      >
+        {setupComponentByScreen[setupScreen]}
+      </Flex>
+    </>
   )
 }
 
