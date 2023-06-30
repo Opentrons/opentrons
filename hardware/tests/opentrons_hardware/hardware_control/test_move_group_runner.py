@@ -837,10 +837,7 @@ async def test_multi_group_move(
     # order as the one move_group_runner uses since sets hash things
     # in a way that doesn't preserve order
     for movegroup in move_group_multiple:
-        expected_nodes = set()
-        for seq_id, mgs in enumerate(movegroup):
-            expected_nodes.update(set((k.value, seq_id) for k in mgs.keys()))
-        expected_nodes_list.append([NodeId(n) for n, s in expected_nodes])
+        expected_nodes_list.append(MoveScheduler.get_expected_nodes(movegroup))
 
     # remove duplicates from the expected nodes lists
     for i, enl in enumerate(expected_nodes_list):

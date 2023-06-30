@@ -2,7 +2,7 @@
 import asyncio
 from collections import defaultdict
 import logging
-from typing import List, Set, Tuple, Iterator, Union, Optional
+from typing import List, Set, Tuple, Iterator, Union, Optional, Dict
 import numpy as np
 import time
 
@@ -81,7 +81,7 @@ _AcceptableMoves = Union[MoveCompleted, TipActionResponse]
 _CompletionPacket = Tuple[ArbitrationId, _AcceptableMoves]
 _Completions = List[_CompletionPacket]
 
-_MoveSeqInfo = Tuple[int, int, MoveStopCondition]
+_MoveSeqInfo = Tuple[Tuple[int, int], MoveStopCondition]
 _MoveGroupInfo = Set[_MoveSeqInfo]
 
 
@@ -370,6 +370,7 @@ class MoveScheduler:
         self._event = asyncio.Event()
         self._errors: List[EnumeratedError] = []
         self._current_group: Optional[int] = None
+        self._current_nodes: List[NodeId] = []
         self._should_stop = False
     
     @staticmethod
@@ -382,7 +383,7 @@ class MoveScheduler:
         group_info: _MoveGroupInfo = set()
         for seq_id, move in enumerate(move_group):
             move_seq: _MoveSeqInfo = set(
-                (k.value, seq_id, move[k].stop_condition)
+                ((k.value, seq_id), move[k].stop_condition)
                 for k in move.keys()
             )
             group_info.update(move_seq)
@@ -399,33 +400,6 @@ class MoveScheduler:
     def _handle_error(
         self, message: ErrorMessage, arbitration_id: ArbitrationId
     ) -> None:
-        seq_id = message.payload.seq_id.value
-        group_id = message.payload.group_id.value - self._start_at_index
-        node_id = arbitration_id.parts.originating_node_id
-        try:
-            in_group = (node_id, seq_id) in self._moves[group_id]
-            self._moves[group_id].remove((node_id, seq_id))
-            self._completion_queue.put_nowait((arbitration_id, message))
-            log.debug(
-                f"Received completion for {node_id} group {group_id} seq {seq_id}"
-                f", which {'is' if in_group else 'isn''t'} in group"
-            )
-            if not self._moves[group_id]:
-                log.debug(f"Move group {group_id+self._start_at_index} has completed.")
-                self._event.set()
-        except KeyError:
-            log.warning(
-                f"Got a move ack for ({node_id}, {seq_id}) which is not in this "
-                "group; may have leaked from an earlier timed-out group"
-            )
-        except IndexError:
-            # If we have two move groups running at once, we need to handle
-            # moves from a group we don't own
-            return
-
-    def _handle_error(
-        self, message: ErrorMessage, arbitration_id: ArbitrationId
-    ) -> None:
         try:
             message = raise_from_error_message(message, arbitration_id)
         except EnumeratedError as e:
@@ -437,85 +411,110 @@ class MoveScheduler:
             self._should_stop = True
             self._event.set()
 
-    def _handle_move_completed(
+
+    def _handle_move_responses(
         self, message: _AcceptableMoves, arbitration_id: ArbitrationId
     ) -> None:
         group_id = message.payload.group_id.value - self._start_at_index
         seq_id = message.payload.seq_id.value
         ack_id = message.payload.ack_id.value
         node_id = arbitration_id.parts.originating_node_id
+
         try:
-            stop_cond = self._stop_condition[group_id][seq_id]
-            if (
-                (
-                    stop_cond.value
-                    & (
-                        MoveStopCondition.limit_switch.value
-                        | MoveStopCondition.limit_switch_backoff.value
+            matched = list(filter(lambda m: (node_id, seq_id) == m[0], self._moves[self._current_group_id]))
+
+            log.debug(
+                f"Received completion for {node_id} group {group_id} seq {seq_id}"
+                f", which {'is' if matched else 'isn''t'} in group"
+            )
+
+            if len(matched) == 1:
+                if isinstance(message, TipActionRequest):
+                    gear_id = GearMotorId(message.payload.gear_motor_id.value)
+                    self._expected_tip_action_motors.remove(gear_id)
+                    if len(self._expected_tip_action_motors):
+                        return
+                
+                if self._check_for_mismatched_ack(
+                    matched[0][1], ack_id
+                ):
+                    self._errors.append(
+                        MoveConditionNotMetError(
+                            detail={
+                                "node": NodeId(node_id).name,
+                                "stop-condition": matched[0][1].name,
+                            }
+                        )
                     )
-                )
-                != 0
-            ) and ack_id != MoveAckId.stopped_by_condition:
-                log.error(
-                    f"Homing move from node {node_id} completed without meeting condition {stop_cond}"
-                )
-                self._errors.append(
-                    MoveConditionNotMetError(
-                        detail={
-                            "node": NodeId(node_id).name,
-                            "stop-condition": stop_cond.name,
-                        }
-                    )
-                )
-                self._should_stop = True
-                self._event.set()
-            if (
-                stop_cond.value & MoveStopCondition.stall.value
-            ) and ack_id == MoveAckId.stopped_by_condition:
-                # When an axis has a stop-on-stall move and stalls, it will clear the rest of its executing moves.
-                # If we wait for those moves, we'll time out.
-                remaining = [elem for elem in self._moves[group_id]]
-                for move_node, move_seq in remaining:
-                    if node_id == move_node:
-                        self._moves[group_id].remove((move_node, move_seq))
-                if not self._moves[group_id]:
+                    self._should_stop = True
                     self._event.set()
+                    return
+                
+                self._completion_queue.put_nowait((arbitration_id, message))
+                self._moves[group_id].remove(matched[0])
+
+                if ack_id == MoveAckId.stopped_by_condition:
+                    # When an axis has a stop-on-stall move and stalls, it will clear the rest of its executing moves.
+                    # If we wait for those moves, we'll time out.
+                    remaining = [elem for elem in self._moves[group_id]]
+                    for move_node, move_seq in remaining:
+                        if node_id == move_node:
+                            self._moves[group_id].remove((move_node, move_seq))
+                    log.debug(f"Move condition met by {node_id}")
+
+                if not self._moves[group_id]:
+                    log.debug(f"Move group {group_id+self._start_at_index} has completed.")
+                    self._event.set()
+            else:
+                if len(matched) > 1:
+                    log.error("Something is really wrong")
+                
+        except KeyError:
+            log.warning(
+                f"Got a move ack for ({node_id}, {seq_id}) which is not in this "
+                "group; may have leaked from an earlier timed-out group"
+            )
         except IndexError:
-            # If we have two move group runners running at once, they each
-            # pick up groups they don't care about, and need to not fail.
-            pass
+            # If we have two move groups running at once, we need to handle
+            # moves from a group we don't own
+            return
+
+    def _check_for_mismatched_ack(
+        self, stop_condition: MoveStopCondition, ack_id: MoveAckId
+    ) -> bool:
+        """Return True if the ack id does not match stop condition."""
+
+        if (
+            MoveStopCondition.is_enforced(stop_condition)
+            and ack_id != MoveAckId.stopped_by_condition
+        ):
+            log.error(f"Move failed: condition {stop_condition} not met")
+            return True
+        if (
+            stop_condition == MoveStopCondition.none
+            and ack_id == MoveAckId.stopped_by_condition
+        ):
+            log.error(
+                f"Move ack {ack_id} does not match move condition {stop_condition}"
+            )
+            return True
+        return False
 
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
     ) -> None:
         """Incoming message handler."""
-        if isinstance(message, MoveCompleted):
-            self._remove_move_group(message, arbitration_id)
-            self._handle_move_completed(message, arbitration_id)
-        elif isinstance(message, TipActionResponse):
-            gear_id = GearMotorId(message.payload.gear_motor_id.value)
-            self._expected_tip_action_motors.remove(gear_id)
-            if len(self._expected_tip_action_motors) == 0:
-                self._remove_move_group(message, arbitration_id)
-            self._handle_move_completed(message, arbitration_id)
+        if isinstance(message, MoveCompleted) or isinstance(message, TipActionResponse):
+            self._handle_move_responses(message, arbitration_id)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
 
-    def _get_nodes_in_move_group(self, group_id: int) -> List[NodeId]:
-        nodes = []
-        for (node_id, seq_id) in self._moves[group_id - self._start_at_index]:
-            if node_id not in nodes:
-                nodes.append(NodeId(node_id))
-        return nodes
-
-    async def _send_stop_if_necessary(
-        self, can_messenger: CanMessenger, group_id: int
-    ) -> None:
+    async def _send_stop_if_necessary(self, can_messenger: CanMessenger) -> None:
         if self._should_stop:
             err = await can_messenger.ensure_send(
                 node_id=NodeId.broadcast,
                 message=StopRequest(payload=EmptyPayload()),
-                expected_nodes=self._get_nodes_in_move_group(group_id),
+                expected_nodes=self._current_nodes,
             )
             if err != ErrorCode.stop_requested:
                 log.warning("Stop request failed")
@@ -539,6 +538,7 @@ class MoveScheduler:
 
         log.debug(f"Executing move group {group_id}.")
         self._current_group = group_id - self._start_at_index
+        self._current_nodes = self.get_expected_nodes(self._current_group)
         error = await can_messenger.ensure_send(
             node_id=NodeId.broadcast,
             message=ExecuteMoveGroupRequest(
@@ -550,13 +550,13 @@ class MoveScheduler:
                     cancel_trigger=UInt8Field(0),
                 )
             ),
-            expected_nodes=self._get_nodes_in_move_group(group_id),
+            expected_nodes=self._current_nodes,
         )
         if error != ErrorCode.ok:
             log.error(f"received error trying to execute move group: {str(error)}")
 
-        expected_time = max(1.0, self._durations[group_id - self._start_at_index] * 1.1)
-        full_timeout = max(1.0, self._durations[group_id - self._start_at_index] * 2)
+        expected_time = max(1.0, self._durations[self._current_group] * 1.1)
+        full_timeout = max(1.0, self._durations[self._current_group] * 2)
         start_time = time.time()
 
         try:
@@ -596,8 +596,19 @@ class MoveScheduler:
             log.exception("canceling move group scheduler")
             raise PythonException(e) from e
 
+    @staticmethod
+    def get_expected_nodes(move_group: MoveGroup) -> List[NodeId]:
+        """Update the active nodes of the current move group."""
+        expected = []
+        for m in move_group:
+            node_id = m[0][0]
+            if node_id not in expected:
+                expected.append(NodeId(node_id))
+        return expected
+
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
+
         for group_id in range(
             self._start_at_index, self._start_at_index + len(self._moves)
         ):

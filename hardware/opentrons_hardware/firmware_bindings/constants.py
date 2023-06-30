@@ -345,6 +345,11 @@ class MoveStopCondition(int, Enum):
     ignore_stalls = 0x20
     limit_switch_backoff = 0x40
 
+    @classmethod
+    def is_enforced(cls, cond: "MoveStopCondition") -> bool:
+        """Condition must be observed when the move completes."""
+        return cond in [cls.limit_switch, cls.limit_switch_backoff]
+
 
 @unique
 class MotorUsageValueType(int, Enum):
