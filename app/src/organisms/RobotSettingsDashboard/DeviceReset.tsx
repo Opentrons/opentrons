@@ -7,13 +7,13 @@ import {
   Flex,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
-  AlertPrimaryButton,
   COLORS,
   SPACING,
   BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { MediumButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   getResetConfigOptions,
@@ -40,8 +40,10 @@ const OptionLabel = styled.label<LabelProps>`
     ${({ isSelected }) =>
       isSelected === true ? COLORS.blueEnabled : COLORS.light2};
   border-radius: ${BORDERS.borderRadiusSize4};
+  color: ${({ isSelected }) =>
+    isSelected === true ? COLORS.white : COLORS.darkBlack100};
   background: ${({ isSelected }) =>
-    isSelected === true ? COLORS.medBlue : COLORS.white};
+    isSelected === true ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
 `
 
 interface DeviceResetProps {
@@ -64,7 +66,7 @@ export function DeviceReset({
   // Currently boot script will be added in the future
   const targetOptions = [
     'pipetteOffsetCalibrations',
-    'gripperCalibration',
+    'gripperOffsetCalibrations',
     'runsHistory',
   ]
   const availableOptions = options.filter(option =>
@@ -78,15 +80,23 @@ export function DeviceReset({
     }
   }
 
+  let subText: string
   const renderText = (optionId: string): string => {
     switch (optionId) {
       case 'pipetteOffsetCalibrations':
         return t('clear_option_pipette_calibrations')
-      // ToDo (kj:02/07/2023) gripperCalibration same as the above
-      case 'gripperCalibration':
+      case 'gripperOffsetCalibrations':
         return t('clear_option_gripper_calibration')
       case 'runsHistory':
+        subText = t('clear_option_runs_history_subtext')
         return t('clear_option_runs_history')
+      // ToDo (kj:07/01/2023) we need to add factory reset case
+      // Asking a question about text Desktop Factory Reset/Touchscreen Factory rest
+      case 'factoryReset':
+        subText = t(
+          'Resets all settings. You’ll have to redo initial setup before using the robot again.'
+        )
+        return t('factory_reset')
       default:
         return ''
     }
@@ -128,33 +138,37 @@ export function DeviceReset({
                 htmlFor={option.id}
                 isSelected={resetOptions[option.id]}
               >
-                <StyledText
-                  fontSize="1.375rem"
-                  lineHeight="1.875rem"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                >
-                  {renderText(option.id)}
-                </StyledText>
+                <Flex flexDirection={DIRECTION_COLUMN}>
+                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+                    {renderText(option.id)}
+                  </StyledText>
+                  {option.id === 'runsHistory' ? (
+                    <StyledText
+                      as="p"
+                      color={
+                        resetOptions[option.id]
+                          ? COLORS.white
+                          : COLORS.darkBlack70
+                      }
+                    >
+                      {subText}
+                    </StyledText>
+                  ) : null}
+                </Flex>
               </OptionLabel>
             </React.Fragment>
           ))}
         </Flex>
-        <AlertPrimaryButton
-          paddingY={SPACING.spacing24}
+        <MediumButton
+          data-testid="DeviceReset_clear_data_button"
+          buttonText={t('clear_data_and_restart_robot')}
+          buttonType="alert"
           disabled={
             Object.keys(resetOptions).length === 0 ||
             availableOptions.every(option => resetOptions[option.id] === false)
           }
           onClick={handleClick}
-        >
-          <StyledText
-            fontSize="1.5rem"
-            lineHeight="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          >
-            {t('clear_data_and_restart_robot')}
-          </StyledText>
-        </AlertPrimaryButton>
+        />
       </Flex>
     </Flex>
   )

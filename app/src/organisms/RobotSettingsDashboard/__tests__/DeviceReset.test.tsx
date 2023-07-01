@@ -20,6 +20,11 @@ const mockResetConfigOptions = [
     description: 'pipette calibration fooBar description',
   },
   {
+    id: 'gripperOffsetCalibrations',
+    name: 'gripper calibration FooBar',
+    description: 'runsHistory fooBar description',
+  },
+  {
     id: 'runsHistory',
     name: 'RunsHistory FooBar',
     description: 'runsHistory fooBar description',
@@ -61,20 +66,18 @@ describe('DeviceReset', () => {
   })
 
   it('should render text and button', () => {
-    const [{ getByText, getByRole }] = render(props)
-    getByText('Clear pipette calibration(s)')
-    getByText('Clear protocol run history')
-    expect(
-      getByRole('button', { name: 'Clear data and restart robot' })
-    ).toBeDisabled()
+    const [{ getByText, getByTestId }] = render(props)
+    getByText('Clear pipette calibrations')
+    getByText('Clear gripper calibration')
+    getByText('Clear run history')
+    getByText('Clears information about past runs of all protocols.')
+    expect(getByTestId('DeviceReset_clear_data_button')).toBeDisabled()
   })
 
   it('when tapping a option button, the clear button is enabled', () => {
-    const [{ getByText, getByRole }] = render(props)
-    fireEvent.click(getByText('Clear pipette calibration(s)'))
-    expect(
-      getByRole('button', { name: 'Clear data and restart robot' })
-    ).not.toBeDisabled()
+    const [{ getByText, getByTestId }] = render(props)
+    fireEvent.click(getByText('Clear pipette calibrations'))
+    expect(getByTestId('DeviceReset_clear_data_button')).not.toBeDisabled()
   })
 
   it('when tapping a option button and tapping the clear button, a mock function is called', () => {
@@ -82,12 +85,10 @@ describe('DeviceReset', () => {
       pipetteOffsetCalibrations: true,
       runsHistory: true,
     }
-    const [{ getByText, getByRole }] = render(props)
-    fireEvent.click(getByText('Clear pipette calibration(s)'))
-    fireEvent.click(getByText('Clear protocol run history'))
-    const clearButton = getByRole('button', {
-      name: 'Clear data and restart robot',
-    })
+    const [{ getByText }] = render(props)
+    fireEvent.click(getByText('Clear pipette calibrations'))
+    fireEvent.click(getByText('Clear run history'))
+    const clearButton = getByText('Clear data and restart robot')
     fireEvent.click(clearButton)
     expect(dispatchApiRequest).toBeCalledWith(
       mockResetConfig('mockRobot', clearMockResetOptions)
