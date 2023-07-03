@@ -493,7 +493,9 @@ def plot_one(plot: PlotParams) -> "pp.Figure":
     absolute_axes.plot(time_offsets, absolute_motor, color="g", label="motor")
     diff_axes.plot(time_offsets, diff, color="b")
     dymin, dymax = diff_axes.get_ylim()
-    diff_axes.set_ylim(max(dymin, -1.0), min(dymax, 1.0))
+    dymin = max(dymin, -1.0)
+    dymax = min(dymax, 1.0)
+    diff_axes.set_ylim(dymin, dymax)
 
     abs_max, abs_min = absolute_axes.dataLim.ymax, absolute_axes.dataLim.ymin
     diff_max, diff_min = diff_axes.dataLim.ymax, diff_axes.dataLim.ymin
@@ -507,16 +509,21 @@ def plot_one(plot: PlotParams) -> "pp.Figure":
             ymax=diff_max,
             colors="r",
         )
-        diff_axes.text(
-            x=(error.date - t0).total_seconds(),
-            y=diff_min + (diff_max - diff_min) / 4,
-            s=error.error_type,
-            fontdict={
-                "color": "r",
-                "rotation": "vertical",
-                "fontsize": "xx-small",
-                "horizontalalignment": "left",
-            },
+        error_time = (error.date - t0).total_seconds()
+        try:
+            error_data_index = time_offsets.index(
+                next(t for t in time_offsets if t >= error_time)
+            )
+        except StopIteration:
+            error_data_index = -1
+            print(f"no data for error at {error_time}")
+        diff_axes.annotate(
+            text=error.error_type,
+            xy=((error.date - t0).total_seconds(), diff[error_data_index]),
+            color="r",
+            rotation="vertical",
+            fontsize="xx-small",
+            horizontalalignment="left",
         )
 
     absolute_axes.legend()
