@@ -54,16 +54,8 @@ Deck.args = {
   children: ({ deckSlotsById }) => {
     const divSlot = deckSlotsById['9']
     const moduleSlot = deckSlotsById['10']
-    const rectSlot = deckSlotsById['11']
     return (
       <>
-        <rect
-          x={rectSlot.position[0]}
-          y={rectSlot.position[1]}
-          width={rectSlot.boundingBox.xDimension}
-          height={rectSlot.boundingBox.yDimension}
-          fill="#0075ff33"
-        />
         <RobotCoordsForeignDiv
           x={divSlot.position[0] - 30}
           y={divSlot.position[1]}

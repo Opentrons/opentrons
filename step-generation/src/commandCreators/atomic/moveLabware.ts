@@ -28,6 +28,8 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
         labware,
       })
     )
+  } else if (prevRobotState.labware[labware].slot === 'offDeck' && useGripper) {
+    errors.push(errorCreators.labwareOffDeck())
   }
 
   const initialLabwareSlot = prevRobotState.labware[labware]?.slot
@@ -53,6 +55,9 @@ export const moveLabware: CommandCreator<MoveLabwareArgs> = (
       ? newLocation.moduleId
       : null
 
+  if (newLocation === 'offDeck' && useGripper) {
+    errors.push(errorCreators.labwareOffDeck())
+  }
   if (destModuleId != null) {
     const destModuleState = prevRobotState.modules[destModuleId].moduleState
     if (
