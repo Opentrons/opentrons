@@ -541,6 +541,8 @@ def plot_one(plot: PlotParams) -> "pp.Figure":  # noqa: C901
     annvline_diff = diff_axes.axvline(x=0, color="k")
     annvline_abs.set_visible(False)
     annvline_diff.set_visible(False)
+    annvline_abs.set_lw(0.5)
+    annvline_diff.set_lw(0.5)
 
     def on_mouse_move(event: Any) -> None:
         if not annvline_abs.get_visible():
