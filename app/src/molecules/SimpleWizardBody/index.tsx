@@ -61,6 +61,7 @@ const BUTTON_STYLE = css`
   padding-bottom: ${SPACING.spacing32};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    justify-content: ${JUSTIFY_SPACE_BETWEEN};
     padding-bottom: ${SPACING.spacing32};
     padding-left: ${SPACING.spacing32};
   }
