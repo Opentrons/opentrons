@@ -19,7 +19,7 @@ _dispense_defaults = {
             50: {  # T50
                 1: DispenseSettings(  # 1uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=1180,  # ul/sec/sec
+                    plunger_acceleration=1200,  # ul/sec/sec
                     plunger_flow_rate=57,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -28,7 +28,7 @@ _dispense_defaults = {
                 ),
                 10: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=1180,  # ul/sec/sec
+                    plunger_acceleration=1200,  # ul/sec/sec
                     plunger_flow_rate=57,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -37,7 +37,7 @@ _dispense_defaults = {
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=1180,  # ul/sec/sec
+                    plunger_acceleration=1200,  # ul/sec/sec
                     plunger_flow_rate=57,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -50,7 +50,7 @@ _dispense_defaults = {
             50: {  # T50
                 5: DispenseSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -59,7 +59,7 @@ _dispense_defaults = {
                 ),
                 10: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -68,7 +68,7 @@ _dispense_defaults = {
                 ),
                 50: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -79,7 +79,7 @@ _dispense_defaults = {
             200: {  # T200
                 5: DispenseSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -88,7 +88,7 @@ _dispense_defaults = {
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -97,7 +97,7 @@ _dispense_defaults = {
                 ),
                 200: DispenseSettings(  # 200uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -108,7 +108,7 @@ _dispense_defaults = {
             1000: {  # T1000
                 10: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -117,7 +117,7 @@ _dispense_defaults = {
                 ),
                 100: DispenseSettings(  # 100uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -126,7 +126,7 @@ _dispense_defaults = {
                 ),
                 1000: DispenseSettings(  # 1000uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -141,7 +141,7 @@ _dispense_defaults = {
             50: {  # T50
                 1: DispenseSettings(  # 1uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=1180,  # ul/sec/sec
+                    plunger_acceleration=1200,  # ul/sec/sec
                     plunger_flow_rate=57,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -150,7 +150,7 @@ _dispense_defaults = {
                 ),
                 10: DispenseSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=1180,  # ul/sec/sec
+                    plunger_acceleration=1200,  # ul/sec/sec
                     plunger_flow_rate=57,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -159,7 +159,7 @@ _dispense_defaults = {
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=1180,  # ul/sec/sec
+                    plunger_acceleration=1200,  # ul/sec/sec
                     plunger_flow_rate=57,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -172,7 +172,7 @@ _dispense_defaults = {
             50: {  # T50
                 5: DispenseSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -181,7 +181,7 @@ _dispense_defaults = {
                 ),
                 10: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -190,7 +190,7 @@ _dispense_defaults = {
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -201,7 +201,7 @@ _dispense_defaults = {
             200: {  # T200
                 5: DispenseSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -210,7 +210,7 @@ _dispense_defaults = {
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -219,7 +219,7 @@ _dispense_defaults = {
                 ),
                 200: DispenseSettings(  # 200uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -230,7 +230,7 @@ _dispense_defaults = {
             1000: {  # T1000
                 10: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -239,7 +239,7 @@ _dispense_defaults = {
                 ),
                 100: DispenseSettings(  # 100uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -248,7 +248,7 @@ _dispense_defaults = {
                 ),
                 1000: DispenseSettings(  # 1000uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -263,7 +263,7 @@ _dispense_defaults = {
             50: {  # T50
                 5: DispenseSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=80,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -272,7 +272,7 @@ _dispense_defaults = {
                 ),
                 10: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=80,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -281,7 +281,7 @@ _dispense_defaults = {
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=80,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -292,7 +292,7 @@ _dispense_defaults = {
             200: {  # T200
                 5: DispenseSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=80,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -301,7 +301,7 @@ _dispense_defaults = {
                 ),
                 50: DispenseSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=80,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -310,7 +310,7 @@ _dispense_defaults = {
                 ),
                 200: DispenseSettings(  # 200uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=80,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -321,7 +321,7 @@ _dispense_defaults = {
             1000: {  # T1000
                 10: DispenseSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=80,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -330,7 +330,7 @@ _dispense_defaults = {
                 ),
                 100: DispenseSettings(  # 100uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=80,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -339,7 +339,7 @@ _dispense_defaults = {
                 ),
                 1000: DispenseSettings(  # 1000uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=80,  # ul/sec
                     delay=0.5,
                     z_retract_discontinuity=20,
@@ -357,7 +357,7 @@ _aspirate_defaults = {
             50: {  # T50
                 1: AspirateSettings(  # 1uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=1180,  # ul/sec/sec
+                    plunger_acceleration=1200,  # ul/sec/sec
                     plunger_flow_rate=35,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -366,7 +366,7 @@ _aspirate_defaults = {
                 ),
                 10: AspirateSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=1180,  # ul/sec/sec
+                    plunger_acceleration=1200,  # ul/sec/sec
                     plunger_flow_rate=23.5,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -375,7 +375,7 @@ _aspirate_defaults = {
                 ),
                 50: AspirateSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=1180,  # ul/sec/sec
+                    plunger_acceleration=1200,  # ul/sec/sec
                     plunger_flow_rate=35,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -388,7 +388,7 @@ _aspirate_defaults = {
             50: {  # T50
                 5: AspirateSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=318,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -397,7 +397,7 @@ _aspirate_defaults = {
                 ),
                 10: AspirateSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=478,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -406,7 +406,7 @@ _aspirate_defaults = {
                 ),
                 50: AspirateSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=478,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -417,7 +417,7 @@ _aspirate_defaults = {
             200: {  # T200
                 5: AspirateSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=716,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -426,7 +426,7 @@ _aspirate_defaults = {
                 ),
                 50: AspirateSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=716,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -435,7 +435,7 @@ _aspirate_defaults = {
                 ),
                 200: AspirateSettings(  # 200uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=716,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -446,7 +446,7 @@ _aspirate_defaults = {
             1000: {  # T1000
                 10: AspirateSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -455,7 +455,7 @@ _aspirate_defaults = {
                 ),
                 100: AspirateSettings(  # 100uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=716,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -464,7 +464,7 @@ _aspirate_defaults = {
                 ),
                 1000: AspirateSettings(  # 1000uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=716,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -479,7 +479,7 @@ _aspirate_defaults = {
             50: {  # T50
                 1: AspirateSettings(  # 1uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=1180,  # ul/sec/sec
+                    plunger_acceleration=1200,  # ul/sec/sec
                     plunger_flow_rate=35,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -488,7 +488,7 @@ _aspirate_defaults = {
                 ),
                 10: AspirateSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=1180,  # ul/sec/sec
+                    plunger_acceleration=1200,  # ul/sec/sec
                     plunger_flow_rate=23.5,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -497,7 +497,7 @@ _aspirate_defaults = {
                 ),
                 50: AspirateSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=1180,  # ul/sec/sec
+                    plunger_acceleration=1200,  # ul/sec/sec
                     plunger_flow_rate=35,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -510,7 +510,7 @@ _aspirate_defaults = {
             50: {  # T50
                 5: AspirateSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=318,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -519,7 +519,7 @@ _aspirate_defaults = {
                 ),
                 10: AspirateSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=478,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -528,7 +528,7 @@ _aspirate_defaults = {
                 ),
                 50: AspirateSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=478,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -539,7 +539,7 @@ _aspirate_defaults = {
             200: {  # T200
                 5: AspirateSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=716,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -548,7 +548,7 @@ _aspirate_defaults = {
                 ),
                 50: AspirateSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=716,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -557,7 +557,7 @@ _aspirate_defaults = {
                 ),
                 200: AspirateSettings(  # 200uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=716,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -568,7 +568,7 @@ _aspirate_defaults = {
             1000: {  # T1000
                 10: AspirateSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -577,7 +577,7 @@ _aspirate_defaults = {
                 ),
                 100: AspirateSettings(  # 100uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=716,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -586,7 +586,7 @@ _aspirate_defaults = {
                 ),
                 1000: AspirateSettings(  # 1000uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=23856,  # ul/sec/sec
+                    plunger_acceleration=24000,  # ul/sec/sec
                     plunger_flow_rate=716,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -601,7 +601,7 @@ _aspirate_defaults = {
             50: {  # T50
                 5: AspirateSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=6.5,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -610,7 +610,7 @@ _aspirate_defaults = {
                 ),
                 10: AspirateSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=6.5,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -619,7 +619,7 @@ _aspirate_defaults = {
                 ),
                 50: AspirateSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=6.5,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -630,7 +630,7 @@ _aspirate_defaults = {
             200: {  # T200
                 5: AspirateSettings(  # 5uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=80,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -639,7 +639,7 @@ _aspirate_defaults = {
                 ),
                 50: AspirateSettings(  # 50uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=80,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -648,7 +648,7 @@ _aspirate_defaults = {
                 ),
                 200: AspirateSettings(  # 200uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=80,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -659,7 +659,7 @@ _aspirate_defaults = {
             1000: {  # T1000
                 10: AspirateSettings(  # 10uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -668,7 +668,7 @@ _aspirate_defaults = {
                 ),
                 100: AspirateSettings(  # 100uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
@@ -677,7 +677,7 @@ _aspirate_defaults = {
                 ),
                 1000: AspirateSettings(  # 1000uL
                     z_submerge_depth=_default_submerge_mm,
-                    plunger_acceleration=15904,  # ul/sec/sec
+                    plunger_acceleration=16000,  # ul/sec/sec
                     plunger_flow_rate=160,  # ul/sec
                     delay=1.0,
                     z_retract_discontinuity=20,
