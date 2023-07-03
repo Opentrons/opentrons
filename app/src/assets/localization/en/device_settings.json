@@ -36,7 +36,7 @@
   "clear_option_gripper_calibration": "Clear gripper calibration",
   "clear_option_gripper_offset_calibrations": "Clear gripper calibration",
   "clear_option_pipette_calibrations": "Clear pipette calibrations",
-  "clear_option_pipette_offset_calibrations": "Clear pipette offset calibrations",
+  "clear_option_pipette_offset_calibrations": "Clear all pipette calibration(s)",
   "clear_option_runs_history_subtext": "Clears information about past runs of all protocols.",
   "clear_option_runs_history": "Clear run history",
   "clear_option_tip_length_calibrations": "Clear tip length calibrations",

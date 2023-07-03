@@ -67,7 +67,7 @@ describe('DeviceReset', () => {
 
   it('should render text and button', () => {
     const [{ getByText, getByTestId }] = render(props)
-    getByText('Clear pipette calibrations')
+    getByText('Clear all pipette calibration(s)')
     getByText('Clear gripper calibration')
     getByText('Clear run history')
     getByText('Clears information about past runs of all protocols.')
@@ -76,7 +76,7 @@ describe('DeviceReset', () => {
 
   it('when tapping a option button, the clear button is enabled', () => {
     const [{ getByText, getByTestId }] = render(props)
-    fireEvent.click(getByText('Clear pipette calibrations'))
+    fireEvent.click(getByText('Clear all pipette calibration(s)'))
     expect(getByTestId('DeviceReset_clear_data_button')).not.toBeDisabled()
   })
 
@@ -86,7 +86,7 @@ describe('DeviceReset', () => {
       runsHistory: true,
     }
     const [{ getByText }] = render(props)
-    fireEvent.click(getByText('Clear pipette calibrations'))
+    fireEvent.click(getByText('Clear all pipette calibration(s)'))
     fireEvent.click(getByText('Clear run history'))
     const clearButton = getByText('Clear data and restart robot')
     fireEvent.click(clearButton)

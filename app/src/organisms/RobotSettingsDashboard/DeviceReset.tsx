@@ -84,7 +84,7 @@ export function DeviceReset({
   const renderText = (optionId: string): string => {
     switch (optionId) {
       case 'pipetteOffsetCalibrations':
-        return t('clear_option_pipette_calibrations')
+        return t('clear_option_pipette_offset_calibrations')
       case 'gripperOffsetCalibrations':
         return t('clear_option_gripper_calibration')
       case 'runsHistory':
