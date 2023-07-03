@@ -125,24 +125,42 @@ With the protocol context argument named and typed, you can start calling method
 Labware
 -------
 
-For serial dilution, you need to load a tip rack, reservoir, and 96-well plate on the deck of your OT-2. Loading labware is done with the :py:meth:`~.ProtocolContext.load_labware` method of the protocol context, which takes two arguments: the standard labware name as defined in the `Opentrons Labware Library <https://labware.opentrons.com/>`_, and the position where you'll place the labware on the OT-2’s deck. Here’s how to load the labware into slots 1, 2, and 3 (repeating the ``def`` statement from above to show proper indenting):
+For serial dilution, you need to load a tip rack, reservoir, and 96-well plate on the deck of your Flex or OT-2. Loading labware is done with the :py:meth:`~.ProtocolContext.load_labware` method of the protocol context, which takes two arguments: the standard labware name as defined in the `Opentrons Labware Library <https://labware.opentrons.com/>`_, and the position where you'll place the labware on the robot's deck. Here’s how to load the labware into slots 1, 2, and 3 (repeating the ``def`` statement from above to show proper indenting):
 
-.. code-block:: python
+.. tabs::
 
-    def run(protocol: protocol_api.ProtocolContext):
-        tips = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
-        reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
-        plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
+    .. tab:: Flex
+
+        .. code-block:: python
+            :substitutions:
+
+            #Flex code here
+
+        If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
         
-If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
+        Now the robot will expect to find labware in a configuration that looks like this:
 
-Now the robot will expect to find labware in a configuration that looks like this:
+        **PLACEHOLDER FOR FLEX DECK IMAGE**
+    
+    .. tab:: OT-2
+        
+        .. code-block:: python
+            :substitutions:
 
-.. image:: ../img/tutorial/initial-deck-map.png
-    :scale: 50 %
-    :name: Initial Deck State
-    :align: center
-    :alt: OT-2 deck map with a tip rack in slot 1, reservoir in slot 2, and well plate in slot 3.
+            def run(protocol: protocol_api.ProtocolContext):
+                tips = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
+                reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
+                plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
+       
+       If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
+       
+       Now the robot will expect to find labware in a configuration that looks like this:
+
+        .. image:: ../img/tutorial/initial-deck-map.png
+            :scale: 50 %
+            :name: Initial Deck State
+            :align: center
+            :alt: OT-2 deck map with a tip rack in slot 1, reservoir in slot 2, and well plate in slot 3.
 
 You may notice that this deck map doesn’t show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in `Protocol Designer <https://designer.opentrons.com/>`_. (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
 
