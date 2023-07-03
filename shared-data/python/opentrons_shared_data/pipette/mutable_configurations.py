@@ -163,29 +163,32 @@ def list_mutable_configs(
 
     mutable_configs: OverrideType = {}
 
-    serial_key_match = SERIAL_STUB_REGEX.match(pipette_serial_number)
-    if serial_key_match:
-        serial_key = serial_key_match.group(0)
-    else:
-        serial_key = ""
-    pipette_model = convert_pipette_model(
-        cast(PipetteModel, PIPETTE_SERIAL_MODEL_LOOKUP[serial_key])
-    )
-
-    base_configs = load_definition(
-        pipette_model.pipette_type,
-        pipette_model.pipette_channels,
-        pipette_model.pipette_version,
-    )
-    base_configs_dict = base_configs.dict(by_alias=True)
-
     try:
         mutable_configs = _load_available_overrides(
             pipette_serial_number, pipette_override_path
         )
     except FileNotFoundError:
         log.info(f"Pipette id {pipette_serial_number} not found")
-    finally:
+        # This is mimicing behavior from the original file
+        # which returned an empty dict if no on disk value was found.
+        return mutable_configs
+    else:
+        serial_key_match = SERIAL_STUB_REGEX.match(pipette_serial_number)
+
+        if serial_key_match:
+            serial_key = serial_key_match.group(0)
+        else:
+            serial_key = ""
+        pipette_model = convert_pipette_model(
+            cast(PipetteModel, PIPETTE_SERIAL_MODEL_LOOKUP[serial_key])
+        )
+
+        base_configs = load_definition(
+            pipette_model.pipette_type,
+            pipette_model.pipette_channels,
+            pipette_model.pipette_version,
+        )
+        base_configs_dict = base_configs.dict(by_alias=True)
         full_mutable_configs = _list_all_mutable_configs(
             mutable_configs, base_configs_dict
         )
@@ -255,7 +258,10 @@ def _add_new_overrides_to_existing(
 ) -> OverrideType:
     """Helper function to add new overrides to the existing ones"""
     # FIXME remove the validation here for the file save and rely
-    # on the validation in the robot server.
+    # on the validation in the robot server. We unfortunately have
+    # to keep the validation here until we decide to fully wipe/migrate
+    # files saved on disk because some of them have unexpected
+    # data entries.
     for key, value in overrides.items():
         # If an existing override is saved as null from endpoint, remove from
         # overrides file
@@ -296,8 +302,13 @@ def save_overrides(
     :return: None
     """
     # need to load defaults
+    serial_key_match = SERIAL_STUB_REGEX.match(pipette_serial_number)
+    if serial_key_match:
+        serial_key = serial_key_match.group(0)
+    else:
+        serial_key = ""
     pipette_model = convert_pipette_model(
-        cast(PipetteModel, PIPETTE_SERIAL_MODEL_LOOKUP[pipette_serial_number[0:7]])
+        cast(PipetteModel, PIPETTE_SERIAL_MODEL_LOOKUP[serial_key])
     )
 
     base_configs = load_definition(

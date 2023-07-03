@@ -139,9 +139,7 @@ def test_save_new_overrides_new_file(
     mutable_configurations.save_overrides(
         TEST_SERIAL_NUMBER, overrides_dict, override_configuration_path
     )
-    with open(
-        override_configuration_path / f"{TEST_SERIAL_NUMBER}.json"
-    ) as f:
+    with open(override_configuration_path / f"{TEST_SERIAL_NUMBER}.json") as f:
         new_file = json.load(f)
     assert saved_dict == new_file
 
@@ -162,9 +160,7 @@ def test_save_new_overrides_update_file(
     mutable_configurations.save_overrides(
         TEST_SERIAL_NUMBER, overrides_dict, override_configuration_path
     )
-    with open(
-        override_configuration_path / f"{TEST_SERIAL_NUMBER}.json"
-    ) as f:
+    with open(override_configuration_path / f"{TEST_SERIAL_NUMBER}.json") as f:
         new_file = json.load(f)
 
     for k, v in overrides_dict.items():
@@ -203,9 +199,7 @@ def test_save_invalid_overrides(
         mutable_configurations.save_overrides(
             TEST_SERIAL_NUMBER, overrides_dict, override_configuration_path
         )
-    with open(
-        override_configuration_path / f"{TEST_SERIAL_NUMBER}.json"
-    ) as f:
+    with open(override_configuration_path / f"{TEST_SERIAL_NUMBER}.json") as f:
         new_file = json.load(f)
     assert TMPFILE_DATA == new_file
 
