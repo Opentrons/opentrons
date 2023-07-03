@@ -581,18 +581,30 @@ def plot_position_errors(plots: List[PlotParams]) -> None:
     pp.show()
 
 
+def _motion_nodes(node: NodeId) -> Set[NodeId]:
+    if node.application_for() == NodeId.head:
+        return {NodeId.head_l, NodeId.head_r}
+    if node.application_for() == NodeId.gripper:
+        return {NodeId.gripper_g, NodeId.gripper_z}
+    return {node}
+
+
 def _verify_nodes(nodes: Optional[List[str]]) -> Iterator[NodeId]:
     valid_node_strs = [n.name for n in set([id.application_for() for id in NodeId])]
     if not nodes:
         nodes = valid_node_strs
+    to_check: Set[NodeId] = set()
     for node in nodes:
         try:
-            yield NodeId[node]
-        except BaseException:
+            to_check |= _motion_nodes(NodeId[node])
+        except BaseException as e:
+            print(repr(e))
             print(
                 f'Invalid node name {node}, must be one of: {", ".join(valid_node_strs)}'
             )
             sys.exit(-1)
+    for node_element in to_check:
+        yield node_element
 
 
 def _date_from_spec(userstr: str) -> Optional[datetime]:
