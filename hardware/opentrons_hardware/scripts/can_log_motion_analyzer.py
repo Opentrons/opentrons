@@ -33,6 +33,12 @@ class IgnoredMessage(BaseException):
     pass
 
 
+class NoRecords(BaseException):
+    """No records for the given filters."""
+
+    pass
+
+
 RecordSlfType = TypeVar("RecordSlfType", bound="Record")
 
 
@@ -422,7 +428,7 @@ def main(
     elif operation == "print-errors":
         _print_errors(records_to_check, nodes, annotate_errors)
     elif operation == "plot-positions":
-        print("plotting positions")
+        print(f"plotting positions for {', '.join(n.name for n in nodes)}")
         ind_records = tee(records_to_check, len(nodes))
         plots = [
             PlotParams(
@@ -452,23 +458,13 @@ def plot_one(plot: PlotParams) -> "pp.Figure":
     """Plot a single figure. Requires pyplot."""
     import matplotlib.pyplot as pp
 
-    fig, subplots = pp.subplots(
-        nrows=2,
-        ncols=1,
-        sharex=True,
-        squeeze=True,
-    )
-    fig.suptitle(plot.title)
-    absolute_axes = subplots[0]
-    diff_axes = subplots[1]
-
     time_offsets: List[float] = []
     absolute_encoder: List[float] = []
     absolute_motor: List[float] = []
     diff: List[float] = []
     t0: Optional[datetime] = None
     errors: List[Error] = []
-
+    print(f"checking plot {plot}")
     for record in plot.records:
         if not t0:
             t0 = record.date
@@ -480,13 +476,27 @@ def plot_one(plot: PlotParams) -> "pp.Figure":
             diff.append(record.motor_pos - record.encoder_pos)
         elif isinstance(record, Error):
             errors.append(record)
+    if not t0:
+        raise NoRecords()
+
+    fig, subplots = pp.subplots(
+        nrows=2,
+        ncols=1,
+        sharex=True,
+        squeeze=True,
+    )
+    fig.suptitle(plot.title)
+    absolute_axes = subplots[0]
+    diff_axes = subplots[1]
+
     absolute_axes.plot(time_offsets, absolute_encoder, color="b", label="encoder")
     absolute_axes.plot(time_offsets, absolute_motor, color="g", label="motor")
     diff_axes.plot(time_offsets, diff, color="b")
+    dymin, dymax = diff_axes.get_ylim()
+    diff_axes.set_ylim(max(dymin, -1.0), min(dymax, 1.0))
 
     abs_max, abs_min = absolute_axes.dataLim.ymax, absolute_axes.dataLim.ymin
     diff_max, diff_min = diff_axes.dataLim.ymax, diff_axes.dataLim.ymin
-    assert t0
     for error in errors:
         absolute_axes.vlines(
             x=(error.date - t0).total_seconds(), ymin=abs_min, ymax=abs_max, colors="r"
@@ -526,7 +536,10 @@ def plot_position_errors(plots: List[PlotParams]) -> None:
     import matplotlib.pyplot as pp
 
     for plot in plots:
-        plot_one(plot)
+        try:
+            plot_one(plot)
+        except NoRecords:
+            pass
 
     pp.show()
 
