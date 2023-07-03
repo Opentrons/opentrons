@@ -41,7 +41,9 @@ def override_configuration_path(tmp_path: Path) -> Generator[Path, None, None]:
     os.environ["OT_API_CONFIG_DIR"] = str(tmp_path)
 
     tmp_path.mkdir(parents=True, exist_ok=True)
-    yield tmp_path
+    with_pip_path = tmp_path / Path("pipettes")
+    with_pip_path.mkdir(parents=True, exist_ok=True)
+    yield with_pip_path
 
     del os.environ["OT_API_CONFIG_DIR"]
 
@@ -50,9 +52,7 @@ def override_configuration_path(tmp_path: Path) -> Generator[Path, None, None]:
 def overrides_fixture(
     override_configuration_path: Path, TMPFILE_DATA: Dict[str, Any]
 ) -> types.MutableConfig:
-    parent = override_configuration_path / Path("pipettes")
-    parent.mkdir(parents=True, exist_ok=True)
-    with open(parent / f"{TEST_SERIAL_NUMBER}.json", "w") as f:
+    with open(override_configuration_path / f"{TEST_SERIAL_NUMBER}.json", "w") as f:
         json.dump(TMPFILE_DATA, f)
     return types.MutableConfig.build(**TMPFILE_DATA["pickUpSpeed"], name="pickUpSpeed")
 
@@ -67,7 +67,7 @@ def test_list_mutable_configs_unknown_pipette_id(
     """
 
     found_configurations = mutable_configurations.list_mutable_configs(
-        TEST_SERIAL_NUMBER
+        TEST_SERIAL_NUMBER, override_configuration_path
     )
     for c in found_configurations:
         if isinstance(c, str):
@@ -80,7 +80,7 @@ def test_list_mutable_configs_unknown_pipette_id(
 
 
 def test_list_mutable_configs_known_pipette_id(
-    overrides_fixture: types.MutableConfig,
+    overrides_fixture: types.MutableConfig, override_configuration_path: Path
 ) -> None:
     """Test known pipette id mutable configs.
 
@@ -88,7 +88,7 @@ def test_list_mutable_configs_known_pipette_id(
     with the expected overrides also listed.
     """
     found_configurations = mutable_configurations.list_mutable_configs(
-        TEST_SERIAL_NUMBER
+        TEST_SERIAL_NUMBER, override_configuration_path
     )
 
     for c in found_configurations:
@@ -136,9 +136,11 @@ def test_save_new_overrides_new_file(
     overrides_dict: TestOverrideType,
     saved_dict: Dict[str, Any],
 ) -> None:
-    mutable_configurations.save_overrides(TEST_SERIAL_NUMBER, overrides_dict)
+    mutable_configurations.save_overrides(
+        TEST_SERIAL_NUMBER, overrides_dict, override_configuration_path
+    )
     with open(
-        override_configuration_path / Path("pipettes") / f"{TEST_SERIAL_NUMBER}.json"
+        override_configuration_path / f"{TEST_SERIAL_NUMBER}.json"
     ) as f:
         new_file = json.load(f)
     assert saved_dict == new_file
@@ -157,9 +159,11 @@ def test_save_new_overrides_update_file(
     overrides_dict: TestOverrideType,
     TMPFILE_DATA: Dict[str, Any],
 ) -> None:
-    mutable_configurations.save_overrides(TEST_SERIAL_NUMBER, overrides_dict)
+    mutable_configurations.save_overrides(
+        TEST_SERIAL_NUMBER, overrides_dict, override_configuration_path
+    )
     with open(
-        override_configuration_path / Path("pipettes") / f"{TEST_SERIAL_NUMBER}.json"
+        override_configuration_path / f"{TEST_SERIAL_NUMBER}.json"
     ) as f:
         new_file = json.load(f)
 
@@ -196,9 +200,11 @@ def test_save_invalid_overrides(
     TMPFILE_DATA: Dict[str, Any],
 ) -> None:
     with pytest.raises(ValueError):
-        mutable_configurations.save_overrides(TEST_SERIAL_NUMBER, overrides_dict)
+        mutable_configurations.save_overrides(
+            TEST_SERIAL_NUMBER, overrides_dict, override_configuration_path
+        )
     with open(
-        override_configuration_path / Path("pipettes") / f"{TEST_SERIAL_NUMBER}.json"
+        override_configuration_path / f"{TEST_SERIAL_NUMBER}.json"
     ) as f:
         new_file = json.load(f)
     assert TMPFILE_DATA == new_file
@@ -225,10 +231,11 @@ def test_load_with_overrides(
     overrides_fixture: types.MutableConfig,
     pipette_model: pip_conversions.PipetteModelVersionType,
     serial_number: str,
+    override_configuration_path: Path,
 ) -> None:
     """Test that you can load configurations both with pre-existing overrides and non-pre-existing overrides."""
     updated_configurations = mutable_configurations.load_with_mutable_configurations(
-        pipette_model, serial_number
+        pipette_model, override_configuration_path, serial_number
     )
 
     loaded_base_configurations = load_data.load_definition(

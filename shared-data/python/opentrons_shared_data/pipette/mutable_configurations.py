@@ -1,6 +1,7 @@
 import logging
 import json
 import re
+from pathlib import Path
 from typing import Optional, List, Dict, Any, cast
 
 from .pipette_definition import PipetteConfigurations
@@ -19,7 +20,6 @@ from .pipette_load_name_conversions import convert_pipette_model
 from .file_operation_helpers import (
     MutableConfigurationEncoder,
     MutableConfigurationDecoder,
-    infer_config_pipette_base_dir,
 )
 from .dev_types import PipetteModel
 
@@ -74,10 +74,10 @@ def _migrate_to_v2_configurations(
 
 
 def _load_available_overrides(
-    pipette_serial_number: str,
+    pipette_serial_number: str, pipette_override_path: Path
 ) -> OverrideType:
     """Load the available overrides from disk."""
-    pipette_override = infer_config_pipette_base_dir() / f"{pipette_serial_number}.json"
+    pipette_override = pipette_override_path / f"{pipette_serial_number}.json"
     try:
         with open(pipette_override, "r") as f:
             return json.load(f, cls=MutableConfigurationDecoder)
@@ -145,23 +145,29 @@ def _find_default(name: str, configs: Dict[str, Any]) -> MutableConfig:
     )
 
 
-def known_pipettes() -> List[str]:
+def known_pipettes(pipette_override_path: Path) -> List[str]:
     """List pipette IDs for which we have known overrides"""
     return [
         fi.stem
-        for fi in infer_config_pipette_base_dir().iterdir()
+        for fi in pipette_override_path.iterdir()
         if fi.is_file() and ".json" in fi.suffixes
     ]
 
 
-def list_mutable_configs(pipette_serial_number: str) -> OverrideType:
+def list_mutable_configs(
+    pipette_serial_number: str, pipette_override_path: Path
+) -> OverrideType:
     """
     Returns dict of mutable configs only.
     """
 
     mutable_configs: OverrideType = {}
 
-    serial_key = SERIAL_STUB_REGEX.match(pipette_serial_number).group(0)
+    serial_key_match = SERIAL_STUB_REGEX.match(pipette_serial_number)
+    if serial_key_match:
+        serial_key = serial_key_match.group(0)
+    else:
+        serial_key = ""
     pipette_model = convert_pipette_model(
         cast(PipetteModel, PIPETTE_SERIAL_MODEL_LOOKUP[serial_key])
     )
@@ -174,7 +180,9 @@ def list_mutable_configs(pipette_serial_number: str) -> OverrideType:
     base_configs_dict = base_configs.dict(by_alias=True)
 
     try:
-        mutable_configs = _load_available_overrides(pipette_serial_number)
+        mutable_configs = _load_available_overrides(
+            pipette_serial_number, pipette_override_path
+        )
     except FileNotFoundError:
         log.info(f"Pipette id {pipette_serial_number} not found")
     finally:
@@ -185,7 +193,9 @@ def list_mutable_configs(pipette_serial_number: str) -> OverrideType:
 
 
 def load_with_mutable_configurations(
-    pipette_model: PipetteModelVersionType, pipette_serial_number: Optional[str] = None
+    pipette_model: PipetteModelVersionType,
+    pipette_override_path: Path,
+    pipette_serial_number: Optional[str] = None,
 ) -> PipetteConfigurations:
     """
     Load pipette config data with any overrides available.
@@ -216,7 +226,9 @@ def load_with_mutable_configurations(
     # Load overrides if we have a pipette id
     if pipette_serial_number:
         try:
-            override = _load_available_overrides(pipette_serial_number)
+            override = _load_available_overrides(
+                pipette_serial_number, pipette_override_path
+            )
         except FileNotFoundError:
             pass
         else:
@@ -273,7 +285,9 @@ def _add_new_overrides_to_existing(
     return existing_overrides
 
 
-def save_overrides(pipette_serial_number: str, overrides: TypeOverrides) -> None:
+def save_overrides(
+    pipette_serial_number: str, overrides: TypeOverrides, pipette_override_path: Path
+) -> None:
     """
     Save overrides for the pipette.
 
@@ -282,7 +296,6 @@ def save_overrides(pipette_serial_number: str, overrides: TypeOverrides) -> None
     :return: None
     """
     # need to load defaults
-    override_dir = infer_config_pipette_base_dir()
     pipette_model = convert_pipette_model(
         cast(PipetteModel, PIPETTE_SERIAL_MODEL_LOOKUP[pipette_serial_number[0:7]])
     )
@@ -294,7 +307,9 @@ def save_overrides(pipette_serial_number: str, overrides: TypeOverrides) -> None
     )
     base_configs_dict = base_configs.dict(by_alias=True)
     try:
-        existing_overrides = _load_available_overrides(pipette_serial_number)
+        existing_overrides = _load_available_overrides(
+            pipette_serial_number, pipette_override_path
+        )
     except FileNotFoundError:
         existing_overrides = {"quirks": {}}
 
@@ -305,5 +320,5 @@ def save_overrides(pipette_serial_number: str, overrides: TypeOverrides) -> None
     if not updated_overrides.get("model"):
         updated_overrides["model"] = str(pipette_model)
 
-    with open(override_dir / f"{pipette_serial_number}.json", "w") as file:
+    with open(pipette_override_path / f"{pipette_serial_number}.json", "w") as file:
         json.dump(updated_overrides, file, cls=MutableConfigurationEncoder)

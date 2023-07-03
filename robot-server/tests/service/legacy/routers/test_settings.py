@@ -2,6 +2,7 @@ import logging
 from mock import patch, call
 from dataclasses import make_dataclass
 from typing import Generator
+from pathlib import Path
 
 import pytest
 
@@ -132,16 +133,35 @@ def mock_save_overrides(decoy: Decoy) -> Decoy:
         yield m
 
 
+@pytest.fixture
+def mock_get_opentrons_dir(decoy: Decoy) -> Decoy:
+    with patch(
+        "robot_server.service.legacy.routers.settings.get_opentrons_path",
+        new=decoy.mock(),
+    ) as m:
+        yield m
+
+
 def test_receive_pipette_settings(
     decoy: Decoy,
     api_client,
     mock_known_pipettes: Decoy,
     mock_list_mutable_configs: Decoy,
+    mock_get_opentrons_dir: Decoy,
     mock_pipette_data,
 ):
-    decoy.when(mock_known_pipettes()).then_return(["p1", "p2"])
+    funny_path = Path("funny/path/pipettes")
+    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
+        funny_path
+    )
 
-    decoy.when(mock_list_mutable_configs(pipette_serial_number="p1")).then_return(
+    decoy.when(mock_known_pipettes(funny_path)).then_return(["p1", "p2"])
+
+    decoy.when(
+        mock_list_mutable_configs(
+            pipette_serial_number="p1", pipette_override_path=funny_path
+        )
+    ).then_return(
         {
             "pickUpCurrent": pip_types.MutableConfig.build(
                 **{
@@ -161,7 +181,11 @@ def test_receive_pipette_settings(
         }
     )
 
-    decoy.when(mock_list_mutable_configs(pipette_serial_number="p2")).then_return(
+    decoy.when(
+        mock_list_mutable_configs(
+            pipette_serial_number="p2", pipette_override_path=funny_path
+        )
+    ).then_return(
         {
             "pickUpIncrement": pip_types.MutableConfig.build(
                 **{
@@ -184,9 +208,13 @@ def test_receive_pipette_settings(
 
 
 def test_receive_pipette_settings_unknown(
-    api_client, mock_known_pipettes: Decoy, decoy: Decoy
+    api_client, mock_known_pipettes: Decoy, mock_get_opentrons_dir: Decoy, decoy: Decoy
 ):
-    decoy.when(mock_known_pipettes()).then_return([])
+    funny_path = Path("funny/path/pipettes")
+    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
+        funny_path
+    )
+    decoy.when(mock_known_pipettes(funny_path)).then_return([])
     # Non-existent pipette id and get 404
     resp = api_client.get("/settings/pipettes/wannabepipette")
     assert resp.status_code == 404
@@ -196,11 +224,20 @@ def test_receive_pipette_settings_found(
     decoy: Decoy,
     mock_known_pipettes: Decoy,
     mock_list_mutable_configs: Decoy,
+    mock_get_opentrons_dir: Decoy,
     api_client,
     mock_pipette_data,
 ):
-    decoy.when(mock_known_pipettes()).then_return(["p1"])
-    decoy.when(mock_list_mutable_configs(pipette_serial_number="p1")).then_return(
+    funny_path = Path("funny/path/pipettes")
+    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
+        funny_path
+    )
+    decoy.when(mock_known_pipettes(funny_path)).then_return(["p1"])
+    decoy.when(
+        mock_list_mutable_configs(
+            pipette_serial_number="p1", pipette_override_path=funny_path
+        )
+    ).then_return(
         {
             "pickUpCurrent": pip_types.MutableConfig.build(
                 **{
@@ -231,9 +268,19 @@ def test_modify_pipette_settings_call_override(
     mock_known_pipettes: Decoy,
     mock_save_overrides: Decoy,
     mock_list_mutable_configs: Decoy,
+    mock_get_opentrons_dir: Decoy,
 ):
-    decoy.when(mock_known_pipettes()).then_return(["p1"])
-    decoy.when(mock_list_mutable_configs(pipette_serial_number="p1")).then_return(
+    funny_path = Path("funny/path/pipettes")
+    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
+        funny_path
+    )
+
+    decoy.when(mock_known_pipettes(funny_path)).then_return(["p1"])
+    decoy.when(
+        mock_list_mutable_configs(
+            pipette_serial_number="p1", pipette_override_path=funny_path
+        )
+    ).then_return(
         {
             "pickUpCurrent": pip_types.MutableConfig.build(
                 **{
@@ -272,6 +319,7 @@ def test_modify_pipette_settings_call_override(
             "pickUpDistance": None,
         },
         pipette_id=pipette_id,
+        pipette_override_path=funny_path,
     )
 
     mock_pipette_data[pipette_id]["fields"] = {
@@ -302,10 +350,20 @@ def test_modify_pipette_settings_do_not_call_override(
     mock_known_pipettes: Decoy,
     mock_save_overrides: Decoy,
     mock_list_mutable_configs: Decoy,
+    mock_get_opentrons_dir: Decoy,
 ):
     pipette_id = "p1"
-    decoy.when(mock_known_pipettes()).then_return(["p1"])
-    decoy.when(mock_list_mutable_configs(pipette_serial_number="p1")).then_return(
+    funny_path = Path("funny/path/pipettes")
+    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
+        funny_path
+    )
+
+    decoy.when(mock_known_pipettes(funny_path)).then_return(["p1"])
+    decoy.when(
+        mock_list_mutable_configs(
+            pipette_serial_number="p1", pipette_override_path=funny_path
+        )
+    ).then_return(
         {
             "pickUpCurrent": pip_types.MutableConfig.build(
                 **{
@@ -336,15 +394,24 @@ def test_modify_pipette_settings_do_not_call_override(
 
 
 def test_modify_pipette_settings_failure(
-    decoy: Decoy, api_client, mock_save_overrides: Decoy
+    decoy: Decoy,
+    api_client,
+    mock_save_overrides: Decoy,
+    mock_get_opentrons_dir: Decoy,
 ):
     test_id = "p1"
+    funny_path = Path("funny/path/pipettes")
+    decoy.when(mock_get_opentrons_dir("pipette_config_overrides_dir")).then_return(
+        funny_path
+    )
 
     test_fields = {"pickUpCurrent": {"value": 1}}
 
     decoy.when(
         mock_save_overrides(
-            overrides={"pickUpCurrent": 1.0}, pipette_serial_number=test_id
+            overrides={"pickUpCurrent": 1.0},
+            pipette_serial_number=test_id,
+            pipette_override_path=funny_path,
         )
     ).then_raise(ValueError("Failed!"))
 

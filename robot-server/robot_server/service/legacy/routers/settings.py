@@ -14,6 +14,7 @@ from opentrons.config import (
     robot_configs,
     advanced_settings,
     feature_flags as ff,
+    get_opentrons_path,
 )
 
 from robot_server.errors import LegacyErrorResponse
@@ -261,7 +262,9 @@ async def get_robot_settings(
 )
 async def get_pipette_settings() -> MultiPipetteSettings:
     res = {}
-    for pipette_id in mutable_configurations.known_pipettes():
+    for pipette_id in mutable_configurations.known_pipettes(
+        get_opentrons_path("pipette_config_overrides_dir")
+    ):
         # Have to convert to dict using by_alias due to bug in fastapi
         res[pipette_id] = _pipette_settings_from_config(
             pipette_id,
@@ -280,7 +283,9 @@ async def get_pipette_settings() -> MultiPipetteSettings:
     },
 )
 async def get_pipette_setting(pipette_id: str) -> PipetteSettings:
-    if pipette_id not in mutable_configurations.known_pipettes():
+    if pipette_id not in mutable_configurations.known_pipettes(
+        get_opentrons_path("pipette_config_overrides_dir")
+    ):
         raise LegacyErrorResponse(
             message=f"{pipette_id} is not a valid pipette id",
             errorCode=ErrorCodes.PIPETTE_NOT_PRESENT.value.code,
@@ -309,7 +314,11 @@ async def patch_pipette_setting(
     if field_values:
         try:
             mutable_configurations.save_overrides(
-                overrides=field_values, pipette_serial_number=pipette_id
+                overrides=field_values,
+                pipette_serial_number=pipette_id,
+                pipette_override_path=get_opentrons_path(
+                    "pipette_config_overrides_dir"
+                ),
             )
         except ValueError as e:
             raise LegacyErrorResponse(
@@ -328,7 +337,8 @@ def _pipette_settings_from_config(pipette_id: str) -> PipetteSettings:
     :return: PipetteSettings object
     """
     mutable_configs = mutable_configurations.list_mutable_configs(
-        pipette_serial_number=pipette_id
+        pipette_serial_number=pipette_id,
+        pipette_override_path=get_opentrons_path("pipette_config_overrides_dir"),
     )
     converted_dict: Dict[str, Union[str, Dict[str, Any]]] = {}
     # TODO rather than doing this gross thing, we should
