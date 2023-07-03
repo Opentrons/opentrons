@@ -91,9 +91,9 @@ Requirements
 ^^^^^^^^^^^^
 .. This is how I understand the requirements code block. Need to check w/ the experts.
 
-The ``requirements`` code block appears after ``meatadata``. It defines the robot model and the API version used in your protocol.  
+The ``requirements`` code block appears after ``metadata``. It defines the robot model and the API version used in your protocol.  
 
-Flex users need to specify the API version in the ``requirements`` instead of the ``metadata`` code block. The minimum required API version for a Flex is v2.15.
+Flex users need to specify the API version in the ``requirements`` instead of the ``metadata`` code block. The minimum required API version for Flex is v2.15.
 
 .. code-block:: python
     :substitutions:
@@ -169,15 +169,21 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
            :align: center
            :alt: OT-2 deck map with a tip rack in slot 1, reservoir in slot 2, and well plate in slot 3.
 
-You may notice that this deck map doesn’t show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in `Protocol Designer <https://designer.opentrons.com/>`_. (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
+You may notice that these deck maps don't show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in `Protocol Designer <https://designer.opentrons.com/>`_. (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
 
 Pipettes
 --------
 
-Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the :py:meth:`.load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its :ref:`standard pipette name <new-pipette-models>`. Here’s how to load a P300 Single-Channel GEN2 pipette that’s installed in the left mount:
+Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the :py:meth:`.load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its :ref:`standard pipette name <new-pipette-models>`. Here’s how to load Flex or OT-2 pipettes installed in the left mount:
 
 .. code-block:: python
 
+        # Flex
+        p200 = protocol.load_instrument('LOAD_NAME_PLACEHOLDER', 'left', tip_racks[tips])
+
+.. code-block:: python
+
+        # OT-2
         p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips])
 
 Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are loaded after labware: you need to have already loaded ``tips`` in order to tell the pipette to use it. And now you won’t have to reference ``tips`` again in your code — it’s assigned to the ``p300`` pipette and the robot will know to use it when commanded to pick up tips.
@@ -202,9 +208,15 @@ Let’s start with the diluent. This phase takes a larger quantity of liquid and
 
 .. code-block:: python
 
+        #Flex
+        p200.transfer(100, reservoir['A1'], plate.wells())
+
+.. code-block:: python
+
+        #OT-2
         p300.transfer(100, reservoir['A1'], plate.wells())
 
-Breaking down this single line of code shows the power of :ref:`complex commands <v2-complex-commands>`. The first argument is the amount to transfer to each destination, 100 µL. The second argument is the source, column 1 of the reservoir (which is still specified with grid-style coordinates as ``A1`` — a reservoir only has an A row). The third argument is the destination. Here, calling the :py:meth:`.wells` method of ``plate`` returns a list of *every well*, and the command will apply to all of them. 
+Breaking down these single lines of code shows the power of :ref:`complex commands <v2-complex-commands>`. The first argument is the amount to transfer to each destination, 100 µL. The second argument is the source, column 1 of the reservoir (which is still specified with grid-style coordinates as ``A1`` — a reservoir only has an A row). The third argument is the destination. Here, calling the :py:meth:`.wells` method of ``plate`` returns a list of *every well*, and the command will apply to all of them. 
 
 .. image:: ../img/tutorial/diluent.gif
     :name: Transfer of diluent to plate
@@ -230,7 +242,13 @@ Using Python's built-in :py:class:`range` class is an easy way to repeat this bl
 In each row, you first need to add solution. This will be similar to what you did with the diluent, but putting it only in column 1 of the plate. It’s best to mix the combined solution and diluent thoroughly, so add the optional ``mix_after`` argument to ``transfer()``:
 
 .. code-block:: python
+            
+            #Flex
+            p200.transfer(100, reservoir['A2'], row[0], mix_after(3,50))
 
+.. code-block:: python
+
+            #OT-2
             p300.transfer(100, reservoir['A2'], row[0], mix_after=(3, 50))
 
 As before, the first argument specifies to transfer 100 µL. The second argument is the source, column 2 of the reservoir. The third argument is the destination, the element at index 0 of the current ``row``. Since Python lists are zero-indexed, but columns on labware start numbering at 1, this will be well A1 on the first time through the loop, B1 the second time, and so on. The fourth argument specifies to mix 3 times with 50 µL of fluid each time.
@@ -244,6 +262,12 @@ Finally, it’s time to dilute the solution down the row. One approach would be 
 
 .. code-block:: python
 
+            #Flex
+            p200.transfer(11, row[:11], row[1:], mix_after(3, 50))
+
+.. code-block:: python
+
+            #OT-2
             p300.transfer(100, row[:11], row[1:], mix_after=(3, 50))
 
 There’s some Python shorthand here, so let’s unpack it. You can get a range of indices from a list using the colon ``:`` operator, and omitting it at either end means “from the beginning” or “until the end” of the list. So the source is ``row[:11]``, from the beginning of the row until its 11th item. And the destination is ``row[1:]``, from index 1 (column 2!) until the end. Since both of these lists have 11 items, ``transfer()`` will *step through them in parallel*, and they’re constructed so when the source is 0, the destination is 1; when the source is 1, the destination is 2; and so on. This condenses all of the subsequent transfers down the row into a single line of code.
@@ -271,15 +295,29 @@ Thus, when adding the diluent, instead of targeting every well on the plate, you
 
 .. code-block:: python
 
-		p300.transfer(100, reservoir['A1'], plate.rows()[0])  
+        #Flex
+        p200.transfer(100, reservoir['A1'], plate.rows()[0])
+
+.. code-block:: python
+
+       #OT-2
+       p300.transfer(100, reservoir['A1'], plate.rows()[0])  
 
 And by accessing an entire column at once, the 8-channel pipette effectively implements the ``for`` loop in hardware, so you’ll need to remove it: 
 
 .. code-block:: python
+    
+    #Flex
+    row = plate.rows()[0]
+    p200.transfer(100, reservoir['A2'], row[0], mix_after=(3, 50))
+    p200.transfer(100, row[:11], row[1:], mix_after=(3, 50))
 
-        row = plate.rows()[0]
-        p300.transfer(100, reservoir['A2'], row[0], mix_after=(3, 50))
-        p300.transfer(100, row[:11], row[1:], mix_after=(3, 50))
+.. code-block:: python
+
+    #OT-2
+    row = plate.rows()[0]
+    p300.transfer(100, reservoir['A2'], row[0], mix_after=(3, 50))
+    p300.transfer(100, row[:11], row[1:], mix_after=(3, 50))
 
 Instead of tracking the current row in the ``row`` variable, this code sets it to always be row A (index 0). 
 
@@ -299,7 +337,7 @@ If you get any errors in simulation, or you don't get the outcome you expected w
 In Simulation
 ^^^^^^^^^^^^^
 
-Simulation doesn’t require having an OT-2 connected to your computer. You just need to install the ``opentrons`` Python module using ``pip``. This will give you access to the ``opentrons_simulate`` command-line utility (``opentrons_simulate.exe`` on Windows). To see a text preview of the steps the OT-2 will take, ``cd`` to the directory where you saved your protocol file and run:
+Simulation doesn’t require having a robot to your computer. You just need to install the ``opentrons`` Python module using ``pip``. This will give you access to the ``opentrons_simulate`` command-line utility (``opentrons_simulate.exe`` on Windows). To see a text preview of the steps the OT-2 will take, ``cd`` to the directory where you saved your protocol file and run:
 
 .. prompt:: bash
 
@@ -318,7 +356,7 @@ If that’s too long, you can always cancel your run partway through or modify `
 On a Robot
 ^^^^^^^^^^
 
-The simplest way to run your protocol on an OT-2 is to use the `Opentrons App <https://opentrons.com/ot-app>`_. Once you’ve installed the app and connected to your robot, navigate to the **Protocol** tab. Click **Choose File…** and open your protocol from the file picker. You should see “Protocol - Serial Dilution Tutorial” (or whatever ``protocolName`` you entered in the metadata) in a banner at the top of the page. 
+The simplest way to run your protocol on a Flex or OT-2 is to use the `Opentrons App <https://opentrons.com/ot-app>`_. Once you’ve installed the app and connected to your robot, navigate to the **Protocol** tab. Click **Choose File…** and open your protocol from the file picker. You should see “Protocol - Serial Dilution Tutorial” (or whatever ``protocolName`` you entered in the metadata) in a banner at the top of the page. 
 
 If you have any remaining calibration tasks to do, you can finish them up here. Below the calibration section is a preview of the initial deck state. Optionally you can run Labware Position Check, or you can go ahead and click **Proceed to Run**.
 
