@@ -88,10 +88,9 @@ class EEPROMDriver:
         self.close()
 
     def setup(self) -> None:
-        """Setup the class and instantiate from memory."""
+        """Setup the class and serialize the eeprom data."""
         self._eeprom_fd = self.open()
-        self._properties = self.property_read()
-        self._eeprom_data = self._populate_data()
+        self.property_read()
 
     def open(self) -> int:
         """Opens up the eeprom file and returns the file descriptor."""
@@ -117,10 +116,11 @@ class EEPROMDriver:
         """Returns a set of properties read from the eeprom."""
         properties: Set[Property] = set()
         address = 0
-        overflow = b""
-        for idx in range(len(PropId)):
-            logger.debug(f"Reading eeprom page {idx}.")
-            # read data in n byte chunks andprepend any leftover data from previous read
+        old_overflow = overflow = b""
+        while True:
+            page = address // DEFAULT_READ_SIZE + 1
+            logger.debug(f"Reading eeprom page {page}")
+            # read data in n byte chunks and prepend any leftover data from previous read
             data = overflow + self._read(size=DEFAULT_READ_SIZE, address=address)
             props, overflow = parse_data(data, prop_ids=prop_ids)
             if props:
@@ -128,12 +128,22 @@ class EEPROMDriver:
             elif not props and not overflow:
                 # we dont have any more valid data to read so break out.
                 break
+            elif old_overflow == overflow:
+                # we have stale data
+                break
 
             # read the next page
+            old_overflow = overflow
             address += DEFAULT_READ_SIZE
 
         # sort by PropId value to keep things in order
-        return set(sorted(properties, key=lambda prop: prop.id.value))
+        properties = set(sorted(properties, key=lambda prop: prop.id.value))
+
+        # update internal states
+        if properties:
+            self._properties = properties
+            self._populate_data()
+        return properties
 
     def property_write(self, properties: Set[Tuple[PropId, Any]]) -> Set[PropId]:
         """Write the given properties to the eeprom, returning a set of the successful ones."""
