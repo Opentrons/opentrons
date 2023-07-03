@@ -9,7 +9,7 @@ from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, UnifiedDSN
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -1203,7 +1203,8 @@ def test_get_extra_waypoints(
 
     decoy.when(
         module_view.should_dodge_thermocycler(
-            from_slot=DeckSlotName.SLOT_1, to_slot=DeckSlotName.SLOT_2
+            from_slot=UnifiedDSN.get_unified(DeckSlotName.SLOT_1),
+            to_slot=UnifiedDSN.get_unified(DeckSlotName.SLOT_2)
         )
     ).then_return(should_dodge)
     decoy.when(

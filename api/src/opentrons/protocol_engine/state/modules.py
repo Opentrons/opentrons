@@ -28,7 +28,7 @@ from opentrons.motion_planning.adjacent_slots_getters import (
 from opentrons.protocol_engine.commands.calibration.calibrate_module import (
     CalibrateModuleResult,
 )
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import UnifiedDSN, DeckSlotName, MountType
 from ..errors import ModuleNotConnectedError
 
 from ..types import (
@@ -76,11 +76,11 @@ ModuleSubStateT = TypeVar("ModuleSubStateT", bound=ModuleSubStateType)
 class SlotTransit(NamedTuple):
     """Class defining starting and ending slots in a pipette movement."""
 
-    start: DeckSlotName
-    end: DeckSlotName
+    start: UnifiedDSN
+    end: UnifiedDSN
 
 
-_OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
+'''_OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.FIXED_TRASH),
     SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_1),
     SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.FIXED_TRASH),
@@ -100,11 +100,24 @@ _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
 _OT3_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
     SlotTransit(start=t.start.to_ot3_equivalent(), end=t.end.to_ot3_equivalent())
     for t in _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE
-}
+}'''
 
-_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = (
-    _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE | _OT3_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE
-)
+_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.SLOT_1), end=UnifiedDSN.get_unified(DeckSlotName.FIXED_TRASH)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.FIXED_TRASH), end=UnifiedDSN.get_unified(1)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.SLOT_4), end=UnifiedDSN.get_unified(DeckSlotName.FIXED_TRASH)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.FIXED_TRASH), end=UnifiedDSN.get_unified(DeckSlotName.SLOT_4)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.SLOT_4), end=UnifiedDSN.get_unified(DeckSlotName.SLOT_9)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.SLOT_9), end=UnifiedDSN.get_unified(DeckSlotName.SLOT_4)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.SLOT_4), end=UnifiedDSN.get_unified(DeckSlotName.SLOT_8)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.SLOT_8), end=UnifiedDSN.get_unified(DeckSlotName.SLOT_4)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.SLOT_1), end=UnifiedDSN.get_unified(DeckSlotName.SLOT_8)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.SLOT_8), end=UnifiedDSN.get_unified(DeckSlotName.SLOT_1)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.SLOT_4), end=UnifiedDSN.get_unified(DeckSlotName.SLOT_11)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.SLOT_11), end=UnifiedDSN.get_unified(DeckSlotName.SLOT_4)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.SLOT_1), end=UnifiedDSN.get_unified(DeckSlotName.SLOT_11)),
+    SlotTransit(start=UnifiedDSN.get_unified(DeckSlotName.SLOT_11), end=UnifiedDSN.get_unified(DeckSlotName.SLOT_1)),
+}
 
 
 @dataclass(frozen=True)
@@ -829,8 +842,8 @@ class ModuleView(HasState[ModuleState]):
 
     def should_dodge_thermocycler(
         self,
-        from_slot: DeckSlotName,
-        to_slot: DeckSlotName,
+        from_slot: UnifiedDSN,
+        to_slot: UnifiedDSN,
     ) -> bool:
         """Decide if the requested path would cross the thermocycler, if installed.
 

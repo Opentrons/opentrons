@@ -6,7 +6,7 @@ from contextlib import nullcontext as does_not_raise
 from typing import ContextManager, Dict, NamedTuple, Optional, Type, Union, Any
 
 from opentrons_shared_data import load_shared_data
-from opentrons.types import DeckSlotName, MountType
+from opentrons.types import DeckSlotName, UnifiedDSN, MountType
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
     LoadedModule,
@@ -689,8 +689,8 @@ def test_calculate_magnet_height(module_model: ModuleModel) -> None:
 )
 def test_thermocycler_dodging_by_slots(
     thermocycler_v1_def: ModuleDefinition,
-    from_slot: DeckSlotName,
-    to_slot: DeckSlotName,
+    from_slot: UnifiedDSN,
+    to_slot: UnifiedDSN,
     should_dodge: bool,
 ) -> None:
     """It should specify if thermocycler dodging is needed.
@@ -699,7 +699,7 @@ def test_thermocycler_dodging_by_slots(
     slot locations.
     """
     subject = make_module_view(
-        slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        slot_by_module_id={"module-id": UnifiedDSN.get_unified(DeckSlotName.SLOT_1)},
         hardware_by_module_id={
             "module-id": HardwareModule(
                 serial_number="serial-number",

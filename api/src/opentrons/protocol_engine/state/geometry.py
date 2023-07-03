@@ -1,7 +1,7 @@
 """Geometry state getters."""
 from typing import Optional, List, Set, Tuple, Union
 
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, UnifiedDSN
 
 from .. import errors
 from ..types import (
@@ -431,8 +431,8 @@ class GeometryView:
     ) -> List[Tuple[float, float]]:
         """Get extra waypoints for movement if thermocycler needs to be dodged."""
         if location is not None and self._modules.should_dodge_thermocycler(
-            from_slot=self.get_ancestor_slot_name(location.labware_id),
-            to_slot=self.get_ancestor_slot_name(labware_id),
+            from_slot=UnifiedDSN.get_unified(self.get_ancestor_slot_name(location.labware_id)),
+            to_slot=UnifiedDSN.get_unified(self.get_ancestor_slot_name(labware_id)),
         ):
             middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
                 self._config.robot_type

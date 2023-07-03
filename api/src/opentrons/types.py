@@ -338,6 +338,61 @@ class DeckSlotName(enum.Enum):
         return self.id
 
 
+class UnifiedDSN:
+    """A helper class to unify deck slots across OT-2 and OT-Flex for internal use.
+    Follows OT-Flex naming convention but works for both OT-2 and OT-Flex types.
+    You mostly want to do UnifiedDSN.get_unified(<DeckSlotName enum>)
+    """
+
+    ot2_val = None
+    ot3_val = None
+
+    def __init__(self, deckslot: DeckSlotName) -> None:
+        self.ot2_val = deckslot.to_ot2_equivalent()
+        self.ot3_val = deckslot.to_ot3_equivalent()
+
+    @classmethod
+    def __get_from_ot2(cls, deck_slot_int):
+        """Inputs OT-2 integer and returns internal unified deck slot"""
+        try:
+            return _ot2_int_to_iv[deck_slot_int]
+        except KeyError:
+            raise ValueError("Argument is OT-2 integer, but slot " + str(deck_slot_int) + " does not exist.")
+
+    @classmethod
+    def __get_from_otflex(cls, deck_slot_string):
+        """Inputs OT-Flex string and returns internal unified deck slot"""
+        try:
+            return _otflex_str_to_iv[deck_slot_string]
+        except KeyError:
+            raise ValueError("Argument is OT-Flex string, but slot " + deck_slot_string + " does not exist.")
+
+    @classmethod
+    def __get_from_dsn(cls, deck_slot_name):
+        """Inputs DeckSlotName and returns internal unified deck slot"""
+        try:
+            return _ot3_dsn_to_iv[deck_slot_name]
+        except KeyError:
+            raise ValueError("Argument is DeckSlotName object, but slot " + deck_slot_name.id() + " does not exist.")
+
+    @classmethod
+    def get_unified(cls, deck_slot):
+        """Takes in an OT-2 int, OT-Flex string, or DeckSlotName and provides the new internal version"""
+        if isinstance(deck_slot, int):
+            return cls.__get_from_ot2(deck_slot)
+        elif isinstance(deck_slot, str):
+            return cls.__get_from_otflex(deck_slot)
+        elif isinstance(deck_slot, DeckSlotName):
+            return cls.__get_from_dsn(deck_slot.to_ot3_equivalent())
+        else:
+            raise TypeError("Argument must be one of: OT-2 integer, OT-Flex string, DeckSlotName")
+
+    def __repr__(self):
+        to_print = "UnfifiedDeckSlotName: " + self.ot3_val.id
+        return to_print
+
+
+# fmt: off
 _slot_equivalencies = [
     (DeckSlotName.SLOT_1, DeckSlotName.SLOT_D1),
     (DeckSlotName.SLOT_2, DeckSlotName.SLOT_D2),
@@ -355,6 +410,16 @@ _slot_equivalencies = [
 
 _ot2_to_ot3 = {ot2: ot3 for ot2, ot3 in _slot_equivalencies}
 _ot3_to_ot2 = {ot3: ot2 for ot2, ot3 in _slot_equivalencies}
+
+_iv = [
+        UnifiedDSN(dsn[1]) for dsn in _slot_equivalencies
+    ]
+
+_ot2_int_to_iv = dict(zip([i for i in range(1, 13)], _iv))
+
+_otflex_str_to_iv = dict(zip([ot3[1].id for ot3 in _slot_equivalencies], _iv))
+
+_ot3_dsn_to_iv = dict(zip([ot3[1] for ot3 in _slot_equivalencies], _iv))
 
 
 class TransferTipPolicy(enum.Enum):
