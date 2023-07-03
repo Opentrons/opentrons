@@ -5,7 +5,9 @@ import asyncio
 from opentrons.hardware_control.ot3api import OT3API
 
 from opentrons.config.defaults_ot3 import DEFAULT_MACHINE_TRANSFORM
-from opentrons_shared_data.deck import get_calibration_square_position_in_slot
+from opentrons_shared_data.deck import (
+    get_calibration_square_position_in_slot,
+)
 from opentrons.hardware_control.ot3_calibration import (
     CalibrationStructureNotFoundError,
     calibrate_belts,
@@ -17,6 +19,55 @@ from hardware_testing.data import ui
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 
+from hardware_testing.drivers import mitutoyo_digimatic_indicator
+
+DIAL_HEIGHT = 10
+DIAL_JOG_DISTANCE = 25
+DIAL_JOG_SPEED = 10
+
+gauges = {}
+gauge_slot = {
+    "XL"=1,
+    "XR"=3,
+    "YF"=1,
+    "YB"=10,
+}
+gauge_zero = {
+    "XL"=0,
+    "XR"=0,
+    "YF"=0,
+    "YB"=0,
+}
+gauge_ports = {
+    "XL":"/dev/ttyUSB0",
+    "XR":"/dev/ttyUSB1",
+    "YF":"/dev/ttyUSB2",
+    "YB":"/dev/ttyUSB3",
+}
+
+def _gauge_setup():
+    for key, value in gauge_ports.items():
+        gauges[key] = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(port=value)
+        gauges[key].connect()
+
+ def _zero_gauges():
+    for key, value in gauges.items():
+        print(f"\nPlace Gauge Block on Deck Slot #{gauge_slot[key]}")
+        input(f"\nPush block against {key} Gauge and Press ENTER\n")
+        _reading = True
+        while _reading:
+            zeros = []
+            for i in range(5):
+                gauge = self.gauges[axis].read_stable(timeout=20)
+                zeros.append(gauge)
+            _variance = abs(max(zeros) - min(zeros))
+            print(f"Variance = {_variance}")
+            if _variance < 0.1:
+                _reading = False
+        zero = sum(zeros) / len(zeros)
+        gauge_zero[key] = zero
+        print(f"{key} Gauge Zero = {zero}mm")
+    input(f"\nRemove Gauge Block from Deck and Press ENTER\n")
 
 async def _calibrate_pipette(api: OT3API, mount: types.OT3Mount) -> None:
     ui.print_header("CALIBRATE PIPETTE")
@@ -51,6 +102,54 @@ async def _check_belt_accuracy_probe(api: OT3API, mount: types.OT3Mount) -> None
         await api.home_z(mount)
 
 
+async def _check_belt_accuracy_dial(api: OT3API, mount: types.OT3Mount) -> None:
+    await api.home()
+    await api.add_tip(mount, api.config.calibration.probe_length)
+    distance_x = await _measure_axis(api, mount, "X")
+    distance_y = await _measure_axis(api, mount, "Y")
+    await api.home()
+    await api.remove_tip(mount)
+
+
+async def _measure_axis(api: OT3API, mount: types.OT3Mount, axis: str) -> None:
+    await api.home_z(mount)
+    current_position = await api.gantry_position(mount)
+    if "X" in axis:
+        left_center = types.Point(*get_calibration_square_position_in_slot(1))._replace(z=DIAL_HEIGHT)
+        right_center = types.Point(*get_calibration_square_position_in_slot(3))._replace(z=DIAL_HEIGHT)
+        above_left = left_center._replace(z=current_position.z)
+        await api.move_to(mount, above_left)
+        await api.move_to(mount, left_center)
+        await _read_gauge(api, mount, "left")
+        await api.move_to(mount, right_center)
+        await _read_gauge(api, mount, "right")
+        await api.move_to(mount, right_center)
+        distance = 0
+    elif "Y" in axis:
+        front_center = types.Point(*get_calibration_square_position_in_slot(1))._replace(z=DIAL_HEIGHT)
+        back_center = types.Point(*get_calibration_square_position_in_slot(10))._replace(z=DIAL_HEIGHT)
+        above_front = front_center._replace(z=current_position.z)
+        await api.move_to(mount, above_front)
+        await api.move_to(mount, front_center)
+        await _read_gauge(api, mount, "front")
+        await api.move_to(mount, back_center)
+        await _read_gauge(api, mount, "back")
+        await api.move_to(mount, back_center)
+        distance = 0
+    return distance
+
+
+async def _read_gauge(api: OT3API, mount: types.OT3Mount, direction: str) -> None:
+    if "left" in direction:
+        await api.move_rel(mount, types.Point(x=-DIAL_JOG_DISTANCE), DIAL_JOG_SPEED)
+    elif "right" in direction:
+        await api.move_rel(mount, types.Point(x=DIAL_JOG_DISTANCE), DIAL_JOG_SPEED)
+    elif "front" in direction:
+        await api.move_rel(mount, types.Point(y=-DIAL_JOG_DISTANCE), DIAL_JOG_SPEED)
+    elif "back" in direction:
+        await api.move_rel(mount, types.Point(y=DIAL_JOG_DISTANCE), DIAL_JOG_SPEED)
+
+
 async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> None:
     ui.print_header("PROBE the DECK")
     await api.reset_instrument_offset(mount)
@@ -77,12 +176,13 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         pipette_left="p1000_single_v3.4",
         pipette_right="p1000_single_v3.4",
     )
-    print("homing")
+    print("homing...")
     await api.home()
     await api.cache_instruments()
-    print("resetting robot calibration")
-    await api.reset_instrument_offset(mount)
-    api.reset_robot_calibration()
+    print("resetting instrument calibration...")
+    # await api.reset_instrument_offset(mount)
+    print("resetting robot calibration...")
+    # api.reset_robot_calibration()
 
     if args.mode == "all":
         # SKIP calibrating the belts, then check accuracy
@@ -107,13 +207,15 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         await _calibrate_pipette(api, mount)
         await _check_belt_accuracy_probe(api, mount)
     elif args.mode == "dial":
+        _gauge_setup()
+        _zero_gauges()
         # SKIP calibrating the belts, then check accuracy
-        await _calibrate_pipette(api, mount)
-        await _check_belt_accuracy_dial(api, mount)
+        # await _calibrate_pipette(api, mount)
+        # await _check_belt_accuracy_dial(api, mount)
 
         # DO calibrate the belts, then check accuracy
-        await _calibrate_belts(api, mount)  # <-- !!!
-        await _calibrate_pipette(api, mount)
+        # await _calibrate_belts(api, mount)  # <-- !!!
+        # await _calibrate_pipette(api, mount)
         await _check_belt_accuracy_dial(api, mount)
 
     print("done")
