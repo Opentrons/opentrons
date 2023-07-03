@@ -16,6 +16,7 @@ from typing import (
     Type,
     Set,
     TYPE_CHECKING,
+    Any,
 )
 from typing_extensions import Literal
 from itertools import chain, tee
@@ -454,7 +455,7 @@ class PlotParams:
     annotate_errors: bool
 
 
-def plot_one(plot: PlotParams) -> "pp.Figure":
+def plot_one(plot: PlotParams) -> "pp.Figure":  # noqa: C901
     """Plot a single figure. Requires pyplot."""
     import matplotlib.pyplot as pp
 
@@ -535,6 +536,33 @@ def plot_one(plot: PlotParams) -> "pp.Figure":
     )
     diff_axes.set_ylabel("Position difference (mm)")
     diff_axes.set_xlabel("time since beginning of log (s)")
+
+    annvline_abs = absolute_axes.axvline(x=0, color="k")
+    annvline_diff = diff_axes.axvline(x=0, color="k")
+    annvline_abs.set_visible(False)
+    annvline_diff.set_visible(False)
+
+    def on_mouse_move(event: Any) -> None:
+        if not annvline_abs.get_visible():
+            return
+        diff_contains, _ = diff_axes.contains(event)
+        abs_contains, _ = absolute_axes.contains(event)
+        if not (diff_contains or abs_contains):
+            return
+        annvline_abs.set_data([event.xdata, event.xdata], [0, 1])
+        annvline_diff.set_data([event.xdata, event.xdata], [0, 1])
+        fig.canvas.draw()
+
+    def on_button(event: Any) -> None:
+        diff_contains, _ = diff_axes.contains(event)
+        abs_contains, _ = absolute_axes.contains(event)
+        if diff_contains or abs_contains:
+            annvline_abs.set_visible(not annvline_abs.get_visible())
+            annvline_diff.set_visible(not annvline_diff.get_visible())
+            fig.canvas.draw()
+
+    fig.canvas.mpl_connect("motion_notify_event", on_mouse_move)
+    fig.canvas.mpl_connect("button_press_event", on_button)
     return fig
 
 
