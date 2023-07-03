@@ -55,7 +55,7 @@ def clear_module_offset_calibrations() -> None:
 def save_module_calibration(
     offset: types.Point,
     mount: OT3Mount,
-    slot: int,
+    slot: str,
     module: ModuleType,
     module_id: str,
     instrument_id: Optional[str] = None,
@@ -94,7 +94,7 @@ def save_module_calibration(
 @no_type_check
 @lru_cache(maxsize=10)
 def get_module_offset(
-    module: ModuleType, module_id: str, slot: Optional[int] = None
+    module: ModuleType, module_id: str, slot: Optional[str] = None
 ) -> Optional[v1.ModuleOffsetModel]:
     try:
         module_calibration_filepath = (

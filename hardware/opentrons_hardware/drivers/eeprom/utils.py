@@ -85,9 +85,10 @@ def generate_packet(prop_id: PropId, value: Any) -> Optional[bytes]:
 def _encode_data(prop_id: PropId, value: Any) -> Optional[bytes]:  # noqa: C901
     if prop_id == PropId.INVALID:
         return None
-    data_type = PROP_ID_TYPES[prop_id]
     encoded_data: bytes = b""
     try:
+        prop_id = PropId(prop_id)
+        data_type = PROP_ID_TYPES[prop_id]
         if data_type == PropType.BYTE:
             encoded_data = struct.pack("!B", value)
         elif data_type == PropType.CHAR:
@@ -101,5 +102,5 @@ def _encode_data(prop_id: PropId, value: Any) -> Optional[bytes]:  # noqa: C901
         elif data_type == PropType.BIN:
             encoded_data = bytes(value)
         return encoded_data
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, struct.error):
         return None

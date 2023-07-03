@@ -43,6 +43,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
     'sphinxext.opengraph',
+    'sphinx_tabs.tabs',
     # todo(mm, 2021-09-30): Remove numpydoc when we're done transitioning to
     # Google-style docstrings. github.com/Opentrons/opentrons/issues/7051
     'numpydoc'
@@ -421,3 +422,7 @@ ogp_site_name = "Opentrons Python Protocol API"
 ogp_image = "_static/PythonAPI.png"
 ogp_description_length = 170
 ogp_enable_meta_description = False
+
+# -- Options for tabs -----------------------------------------------------
+
+sphinx_tabs_disable_tab_closing = True

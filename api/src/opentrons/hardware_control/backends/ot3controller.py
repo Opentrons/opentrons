@@ -25,7 +25,7 @@ from typing import (
     Union,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import ot3_pipette_config, gripper_config, feature_flags as ff
+from opentrons.config import gripper_config, feature_flags as ff
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -34,6 +34,7 @@ from .ot3utils import (
     create_home_group,
     node_to_axis,
     sensor_node_for_mount,
+    sensor_node_for_pipette,
     sensor_id_for_instrument,
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
@@ -49,6 +50,8 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
+
+from opentrons_hardware.drivers import SystemDrivers
 from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
@@ -57,7 +60,7 @@ from opentrons_hardware.drivers.binary_usb import (
     SerialUsbDriver,
     build_rear_panel_driver,
 )
-from opentrons_hardware.drivers.eeprom import EEPROM, EEPROMData
+from opentrons_hardware.drivers.eeprom import EEPROMDriver, EEPROMData
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
@@ -73,6 +76,7 @@ from opentrons_hardware.hardware_control.motor_position_status import (
     update_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
+from opentrons_hardware.hardware_control.tip_presence import get_tip_ejector_state
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
     set_hold_current,
@@ -112,11 +116,14 @@ from opentrons.hardware_control.types import (
     DoorState,
     SubSystemState,
     SubSystem,
+    TipStateType,
+    FailedTipStateCheck,
 )
 from opentrons.hardware_control.errors import (
     InvalidPipetteName,
     InvalidPipetteModel,
     FirmwareUpdateRequired,
+    OverPressureDetected,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
@@ -129,6 +136,7 @@ from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
     liquid_probe,
+    check_overpressure,
 )
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
@@ -138,6 +146,10 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+    load_data as load_pipette_data,
+)
 from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
 
 from .subsystem_manager import SubsystemManager
@@ -211,6 +223,7 @@ class OT3Controller:
         config: OT3Config,
         driver: AbstractCanDriver,
         usb_driver: Optional[SerialUsbDriver] = None,
+        eeprom_driver: Optional[EEPROMDriver] = None,
         check_updates: bool = True,
     ) -> None:
         """Construct.
@@ -223,7 +236,11 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
-        self._gpio_dev, self._usb_messenger = self._build_system_hardware(usb_driver)
+        self._drivers = self._build_system_hardware(
+            self._messenger, usb_driver, eeprom_driver
+        )
+        self._usb_messenger = self._drivers.usb_messenger
+        self._gpio_dev = self._drivers.gpio_dev
         self._subsystem_manager = SubsystemManager(
             self._messenger,
             self._usb_messenger,
@@ -231,8 +248,6 @@ class OT3Controller:
             network.NetworkInfo(self._messenger, self._usb_messenger),
             FirmwareUpdate(),
         )
-        self._eeprom = EEPROM()
-        self._eeprom.setup()
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
@@ -270,9 +285,14 @@ class OT3Controller:
         }
 
     @property
+    def eeprom_driver(self) -> EEPROMDriver:
+        """The eeprom driver interface."""
+        return self._drivers.eeprom
+
+    @property
     def eeprom_data(self) -> EEPROMData:
         """Get the data on the eeprom."""
-        return self._eeprom.data
+        return self._drivers.eeprom.data
 
     @property
     def update_required(self) -> bool:
@@ -280,14 +300,25 @@ class OT3Controller:
 
     @staticmethod
     def _build_system_hardware(
+        can_messenger: CanMessenger,
         usb_driver: Optional[SerialUsbDriver],
-    ) -> Tuple[Union[OT3GPIO, RemoteOT3GPIO], Optional[BinaryMessenger]]:
-        if usb_driver is None:
-            return OT3GPIO("hardware_control"), None
-        else:
+        eeprom_driver: Optional[EEPROMDriver],
+    ) -> SystemDrivers:
+        gpio = OT3GPIO("hardware_control")
+        eeprom_driver = eeprom_driver or EEPROMDriver(gpio)
+        eeprom_driver.setup()
+        gpio_dev: Union[OT3GPIO, RemoteOT3GPIO] = gpio
+        usb_messenger: Optional[BinaryMessenger] = None
+        if usb_driver:
             usb_messenger = BinaryMessenger(usb_driver)
             usb_messenger.start()
-            return RemoteOT3GPIO(usb_messenger), usb_messenger
+            gpio_dev = RemoteOT3GPIO(usb_messenger)
+        return SystemDrivers(
+            can_messenger,
+            gpio_dev,
+            eeprom_driver,
+            usb_messenger=usb_messenger,
+        )
 
     def _motor_nodes(self) -> Set[NodeId]:
         """Get a list of the motor controller nodes of all attached and ok devices."""
@@ -353,7 +384,7 @@ class OT3Controller:
     @property
     def board_revision(self) -> BoardRevision:
         """Get the board revision"""
-        return BoardRevision.UNKNOWN
+        return BoardRevision.FLEX_B2
 
     @property
     def module_controls(self) -> AttachedModulesControl:
@@ -646,7 +677,7 @@ class OT3Controller:
     @staticmethod
     def _combine_serial_number(pipette_info: ohc_tool_types.PipetteInformation) -> str:
         serialized_name = OT3Controller._lookup_serial_key(pipette_info.name)
-        version = ot3_pipette_config.version_from_string(pipette_info.model)
+        version = pipette_load_name.version_from_string(pipette_info.model)
         return f"{serialized_name}V{version.major}{version.minor}{pipette_info.serial}"
 
     @staticmethod
@@ -662,11 +693,14 @@ class OT3Controller:
             # for PipetteInformation.serial so we don't have to use
             # helper methods to convert the serial back to what was flashed
             # on the eeprom.
+            converted_name = pipette_load_name.convert_pipette_name(
+                cast(PipetteName, attached.name.name), attached.model
+            )
             return {
-                "config": ot3_pipette_config.load_ot3_pipette(
-                    ot3_pipette_config.convert_pipette_name(
-                        cast(PipetteName, attached.name.name), attached.model
-                    )
+                "config": load_pipette_data.load_definition(
+                    converted_name.pipette_type,
+                    converted_name.pipette_channels,
+                    converted_name.pipette_version,
                 ),
                 "id": OT3Controller._combine_serial_number(attached),
             }
@@ -727,6 +761,17 @@ class OT3Controller:
         assert motor_nodes, "No nodes available to read limit switch status from"
         res = await get_limit_switches(self._messenger, motor_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
+
+    async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+        """Get the state of the tip ejector flag for a given mount."""
+        # TODO (lc 06/09/2023) We should create a separate type for
+        # pipette specific sensors. This work is done in the overpressure
+        # PR.
+        res = await get_tip_ejector_state(
+            self._messenger, sensor_node_for_mount(OT3Mount(mount.value))  # type: ignore
+        )
+        if res != tip_state.value:
+            raise FailedTipStateCheck(tip_state, res)
 
     @staticmethod
     def _tip_motor_nodes(axis_current_keys: KeysView[OT3Axis]) -> List[NodeId]:
@@ -941,6 +986,38 @@ class OT3Controller:
         by_node = {axis_to_node(k): v for k, v in to_xform.items()}
         return {k: v for k, v in by_node.items() if k in self._motor_nodes()}
 
+    @asynccontextmanager
+    async def monitor_overpressure(
+        self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
+    ) -> AsyncIterator[None]:
+        if ff.overpressure_detection_enabled():
+            tool = sensor_node_for_pipette(OT3Mount(mount.value))
+            # FIXME we should switch the sensor type based on the channel
+            # used when partial tip pick up is implemented.
+            # FIXME we should also monitor pressure in all available channels
+            provided_context_manager = await check_overpressure(
+                self._messenger, tool, sensor_id
+            )
+            errors: asyncio.Queue[ErrorCode] = asyncio.Queue()
+
+            async with provided_context_manager() as errors:
+                try:
+                    yield
+                finally:
+
+                    def _pop_queue() -> Optional[ErrorCode]:
+                        try:
+                            return errors.get_nowait()
+                        except asyncio.QueueEmpty:
+                            return None
+
+                    if _pop_queue():
+                        raise OverPressureDetected(
+                            f"The pressure sensor on the {mount} mount has exceeded operational limits."
+                        )
+        else:
+            yield
+
     async def liquid_probe(
         self,
         mount: OT3Mount,
@@ -954,7 +1031,7 @@ class OT3Controller:
         sensor_id: SensorId = SensorId.S0,
     ) -> Dict[NodeId, float]:
         head_node = axis_to_node(OT3Axis.by_mount(mount))
-        tool = sensor_node_for_mount(OT3Mount(mount.value))
+        tool = sensor_node_for_pipette(OT3Mount(mount.value))
         positions = await liquid_probe(
             self._messenger,
             tool,

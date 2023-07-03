@@ -48,6 +48,7 @@ def test_delete_tip_length_calibration(
                 "title": "Resource Not Found",
                 "detail": "Resource type 'TipLengthCalibration' with id "
                 "'wronghash&fake_pip' was not found",
+                "errorCode": "4000",
             }
         ]
     }

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory, useParams } from 'react-router-dom'
 import first from 'lodash/first'
+import { css } from 'styled-components'
 
 import {
   Btn,
@@ -34,6 +35,8 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { useMaintenanceRunTakeover } from '../../organisms/TakeoverModal'
 import {
   useAttachedModules,
   useLPCDisabledReason,
@@ -45,7 +48,6 @@ import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
 import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
 import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
-import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
@@ -144,6 +146,33 @@ function ProtocolSetupStep({
   )
 }
 
+const CLOSE_BUTTON_STYLE = css`
+  -webkit-tap-highlight-color: transparent;
+  &:focus {
+    background-color: ${COLORS.red2Pressed};
+    color: ${COLORS.white};
+  }
+
+  &:hover {
+    background-color: ${COLORS.red2};
+    color: ${COLORS.white};
+  }
+
+  &:focus-visible {
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.red2};
+  }
+
+  &:active {
+    background-color: ${COLORS.red2Pressed};
+    color: ${COLORS.white};
+  }
+
+  &:disabled {
+    background-color: ${COLORS.darkBlack20};
+    color: ${COLORS.darkBlack60};
+  }
+`
 // TODO(ew, 05/03/2023): refactor the run buttons into a shared component
 interface CloseButtonProps {
   onClose: () => void
@@ -161,22 +190,57 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
       width="6.25rem"
       onClick={onClose}
       aria-label="close"
+      css={CLOSE_BUTTON_STYLE}
     >
       <Icon color={COLORS.white} name="close-icon" size="2.5rem" />
     </Btn>
   )
 }
 
+const PLAY_BUTTON_STYLE = css`
+  -webkit-tap-highlight-color: transparent;
+  &:focus {
+    background-color: ${COLORS.bluePressed};
+    color: ${COLORS.white};
+  }
+
+  &:hover {
+    background-color: ${COLORS.blueEnabled};
+    color: ${COLORS.white};
+  }
+
+  &:focus-visible {
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.blueEnabled};
+  }
+
+  &:active {
+    background-color: ${COLORS.bluePressed};
+    color: ${COLORS.white};
+  }
+
+  &:disabled {
+    background-color: ${COLORS.darkBlack20};
+    color: ${COLORS.darkBlack60};
+  }
+`
 interface PlayButtonProps {
-  disabled: boolean
+  ready: boolean
   onPlay: () => void
+  disabled?: boolean
 }
 
-function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
+function PlayButton({
+  disabled = false,
+  onPlay,
+  ready,
+}: PlayButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={disabled ? COLORS.darkBlack20 : COLORS.blueEnabled}
+      backgroundColor={
+        disabled || !ready ? COLORS.darkBlack20 : COLORS.blueEnabled
+      }
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
       height="6.25rem"
@@ -185,9 +249,10 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
       disabled={disabled}
       onClick={onPlay}
       aria-label="play"
+      css={PLAY_BUTTON_STYLE}
     >
       <Icon
-        color={disabled ? COLORS.darkBlack60 : COLORS.white}
+        color={disabled || !ready ? COLORS.darkBlack60 : COLORS.white}
         name="play-icon"
         size="2.5rem"
       />
@@ -208,6 +273,16 @@ function PrepareToRun({
   const history = useHistory()
   const { makeSnackbar } = useToaster()
 
+  // Watch for scrolling to toggle dropshadow
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
+  const observer = new IntersectionObserver(([entry]) => {
+    setIsScrolled(!entry.isIntersecting)
+  })
+  if (scrollRef.current) {
+    observer.observe(scrollRef.current)
+  }
+
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
@@ -223,6 +298,7 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
+  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
 
   const { play } = useRunControls(runId)
 
@@ -343,16 +419,19 @@ function PrepareToRun({
 
   return (
     <>
+      {/* Empty box to detect scrolling */}
+      <Flex ref={scrollRef} />
       {/* Protocol Setup Header */}
       <Flex
+        boxShadow={isScrolled ? BORDERS.shadowBig : undefined}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing24}
-        paddingBottom={SPACING.spacing40}
-        paddingTop={SPACING.spacing32}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
         position={POSITION_STICKY}
         top={0}
         backgroundColor={COLORS.white}
         overflowY="hidden"
+        marginX={`-${SPACING.spacing32}`}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
@@ -382,6 +461,7 @@ function PrepareToRun({
                 allPipettesCalibrationData == null
               }
               onPlay={onPlay}
+              ready={isReadyToRun}
             />
           </Flex>
         </Flex>
@@ -390,12 +470,14 @@ function PrepareToRun({
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing8}
+        paddingX={SPACING.spacing8}
       >
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('instruments')}
           title={t('instruments')}
           detail={instrumentsDetail}
           status={instrumentsStatus}
+          disabled={speccedInstrumentCount === 0}
         />
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('modules')}
@@ -405,7 +487,10 @@ function PrepareToRun({
           disabled={protocolModulesInfo.length === 0}
         />
         <ProtocolSetupStep
-          onClickSetupStep={launchLPC}
+          onClickSetupStep={() => {
+            setODDMaintenanceFlowInProgress()
+            launchLPC()
+          }}
           title={t('labware_position_check')}
           detail={t(
             lpcDisabledReason != null ? 'currently_unavailable' : 'recommended'
@@ -420,6 +505,7 @@ function PrepareToRun({
           detail={labwareDetail}
           subDetail={labwareSubDetail}
           status="general"
+          disabled={labwareDetail === null}
         />
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('liquids')}
@@ -432,6 +518,7 @@ function PrepareToRun({
                 })
               : t('liquids_not_in_setup')
           }
+          disabled={liquidsInProtocol.length === 0}
         />
       </Flex>
       {LPCWizard}
@@ -474,12 +561,6 @@ export function ProtocolSetup(): JSX.Element {
     labware: (
       <ProtocolSetupLabware runId={runId} setSetupScreen={setSetupScreen} />
     ),
-    lpc: (
-      <ProtocolSetupLabwarePositionCheck
-        runId={runId}
-        setSetupScreen={setSetupScreen}
-      />
-    ),
     liquids: (
       <ProtocolSetupLiquids runId={runId} setSetupScreen={setSetupScreen} />
     ),
@@ -516,7 +597,7 @@ function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
         </Flex>
         <Flex gridGap={SPACING.spacing24}>
           <CloseButton onClose={() => props.cancelAndClose()} />
-          <PlayButton disabled onPlay={() => {}} />
+          <PlayButton onPlay={() => {}} ready={false} />
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>

@@ -7,7 +7,7 @@ import {
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
-import { ModalShell } from '../Modal'
+import { LegacyModalShell } from '../LegacyModal'
 import { WizardHeader } from '../WizardHeader'
 import { GenericWizardTile } from './index'
 
@@ -21,10 +21,10 @@ export default {
 const Template: Story<
   React.ComponentProps<typeof GenericWizardTile>
 > = args => (
-  <ModalShell>
+  <LegacyModalShell>
     <WizardHeader currentStep={3} totalSteps={4} title="Example Title" />
     <GenericWizardTile {...args} />
-  </ModalShell>
+  </LegacyModalShell>
 )
 const body = (
   <StyledText as="p">

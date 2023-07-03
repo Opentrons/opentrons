@@ -17,7 +17,8 @@ import type {
 } from '@opentrons/api-client'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
-import { CreateCommand, LEFT } from '@opentrons/shared-data'
+import { EXTENSION } from '@opentrons/shared-data'
+import type { CreateCommand } from '@opentrons/shared-data'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string
@@ -71,15 +72,12 @@ export const BeforeBeginning = (
   }, [])
 
   const commandsOnProceed: CreateCommand[] = [
-    // TODO: this needs to go once we're properly handling the axes for the commands
-    // below instead of using the left pipette axis as a proxy, but until then we need
-    // to make sure that proxy axis is homed.
     { commandType: 'home' as const, params: {} },
     {
       // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+        mount: EXTENSION,
       },
     },
   ]
@@ -96,8 +94,8 @@ export const BeforeBeginning = (
     [loadName: string]: { displayName: string; subtitle?: string }
   } = {
     calibration_pin: { displayName: t('calibration_pin') },
-    t10_torx_screwdriver: {
-      displayName: t('t10_torx_screwdriver'),
+    hex_screwdriver: {
+      displayName: t('hex_screwdriver'),
       subtitle: t('provided_with_robot_use_right_size'),
     },
     [GRIPPER_LOADNAME]: { displayName: t('gripper') },

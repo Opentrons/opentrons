@@ -13,9 +13,9 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal/OnDeviceDisplay'
+import { Modal } from '../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface AlternativeSecurityTypeModalProps {
   setShowAlternativeSecurityTypeModal: (
@@ -49,7 +49,7 @@ export function AlternativeSecurityTypeModal({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_CENTER}
-        gridGap={SPACING.spacing40}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>

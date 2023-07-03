@@ -26,29 +26,31 @@ DEFAULT_ADDRESS = "0050"
 DEFAULT_READ_SIZE = 64
 
 
-class EEPROM:
+class EEPROMDriver:
     """This class lets you read/write to the eeprom using a sysfs file."""
 
     def __init__(
         self,
+        gpio: OT3GPIO,
         bus: Optional[int] = DEFAULT_BUS,
         address: Optional[str] = DEFAULT_ADDRESS,
-        filepath: Optional[str] = None,
+        eeprom_path: Optional[Path] = None,
     ) -> None:
         """Contructor
 
         Args:
+            gpio: An instance of the gpio class so we can toggle lines on the SOM
             bus: The i2c bus this device is on
             address: The unique address for this device
-            filepath: The filepath of the eeprom, for testing.
+            eeprom_path: The path of the eeprom device, for testing.
         """
+        self._gpio = gpio
         self._bus = bus
         self._address = address
-        self._eeprom_filepath = filepath or Path(
+        self._eeprom_path = eeprom_path or Path(
             f"/sys/bus/i2c/devices/{bus}-{address}/eeprom"
         )
         self._eeprom_fd = -1
-        self._gpio = OT3GPIO("eeprom_hw_control")
         self._eeprom_data: EEPROMData = EEPROMData()
         self._properties: Set[Property] = set()
 
@@ -67,15 +69,15 @@ class EEPROM:
         """Returns a set of Property objects that are on the eeprom."""
         return self._properties
 
-    def __enter__(self) -> "EEPROM":
+    def __enter__(self) -> "EEPROMDriver":
         """Enter runtime context."""
         return self
 
     def __exit__(
         self,
-        exc_type: Optional[Type[BaseException]],
-        exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
+        exc_type: Optional[Type[BaseException]] = None,
+        exc_value: Optional[BaseException] = None,
+        traceback: Optional[TracebackType] = None,
     ) -> bool:
         """Exit runtime context and close the file descriptor."""
         self._gpio.deactivate_eeprom_wp()
@@ -86,10 +88,9 @@ class EEPROM:
         self.close()
 
     def setup(self) -> None:
-        """Setup the class and instantiate from memory."""
+        """Setup the class and serialize the eeprom data."""
         self._eeprom_fd = self.open()
-        self._properties = self.property_read()
-        self._eeprom_data = self._populate_data()
+        self.property_read()
 
     def open(self) -> int:
         """Opens up the eeprom file and returns the file descriptor."""
@@ -97,9 +98,9 @@ class EEPROM:
             logger.warning("File descriptor already opened for eeprom")
             return self._eeprom_fd
         try:
-            self._eeprom_fd = os.open(self._eeprom_filepath, os.O_RDWR)
+            self._eeprom_fd = os.open(self._eeprom_path, os.O_RDWR)
         except OSError:
-            logger.error(f"Could not open eeprom file - {self._eeprom_filepath}")
+            logger.error(f"Could not open eeprom file - {self._eeprom_path}")
             self._eeprom_fd = -1
         return self._eeprom_fd
 
@@ -115,10 +116,11 @@ class EEPROM:
         """Returns a set of properties read from the eeprom."""
         properties: Set[Property] = set()
         address = 0
-        overflow = b""
-        for idx in range(len(PropId)):
-            logger.debug(f"Reading eeprom page {idx}.")
-            # read data in n byte chunks andprepend any leftover data from previous read
+        old_overflow = overflow = b""
+        while True:
+            page = address // DEFAULT_READ_SIZE + 1
+            logger.debug(f"Reading eeprom page {page}")
+            # read data in n byte chunks and prepend any leftover data from previous read
             data = overflow + self._read(size=DEFAULT_READ_SIZE, address=address)
             props, overflow = parse_data(data, prop_ids=prop_ids)
             if props:
@@ -126,12 +128,22 @@ class EEPROM:
             elif not props and not overflow:
                 # we dont have any more valid data to read so break out.
                 break
+            elif old_overflow == overflow:
+                # we have stale data
+                break
 
             # read the next page
+            old_overflow = overflow
             address += DEFAULT_READ_SIZE
 
         # sort by PropId value to keep things in order
-        return set(sorted(properties, key=lambda prop: prop.id.value))
+        properties = set(sorted(properties, key=lambda prop: prop.id.value))
+
+        # update internal states
+        if properties:
+            self._properties = properties
+            self._populate_data()
+        return properties
 
     def property_write(self, properties: Set[Tuple[PropId, Any]]) -> Set[PropId]:
         """Write the given properties to the eeprom, returning a set of the successful ones."""
