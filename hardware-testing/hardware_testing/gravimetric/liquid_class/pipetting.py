@@ -67,11 +67,6 @@ class PipettingCallbacks:
     on_exiting: Callable
 
 
-def _do_user_pause(ctx: ProtocolContext, inspect: bool, msg: str = "") -> None:
-    if not ctx.is_simulating() and inspect:
-        input(f"{msg}, ENTER to continue")
-
-
 def _check_aspirate_dispense_args(
     aspirate: Optional[float], dispense: Optional[float]
 ) -> None:
@@ -207,7 +202,6 @@ def _pipette_with_liquid_settings(
     def _dispense_with_added_blow_out() -> None:
         # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
         # FIXME: this is a hack, until there's an equivalent `pipette.blow_out(location, volume)`
-        pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
         hw_api.blow_out(hw_mount, liquid_class.dispense.leading_air_gap)
@@ -239,14 +233,7 @@ def _pipette_with_liquid_settings(
 
     # CREATE CALLBACKS FOR EACH PHASE
     def _aspirate_on_approach() -> None:
-        # set plunger speeds
-        pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
-        pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
-        pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
-        # set accelerations
-        _change_plunger_acceleration(
-            ctx, pipette, liquid_class.aspirate.plunger_acceleration
-        )
+        pass
 
     def _aspirate_on_submerge() -> None:
         # mix 5x times
@@ -272,19 +259,9 @@ def _pipette_with_liquid_settings(
 
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
-        # NOTE: temporarily set aspirate flow-rate to be the faster dispense flow-rate
-        pipette.flow_rate.aspirate = liquid_class.dispense.plunger_flow_rate
         pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
-        pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
-        # reset plunger accelerations
-        _reset_plunger_acceleration(ctx, pipette)
 
     def _dispense_on_approach() -> None:
-        _do_user_pause(ctx, inspect, "about to dispense")
-        # set accelerations
-        _change_plunger_acceleration(
-            ctx, pipette, liquid_class.dispense.plunger_acceleration
-        )
         # remove trailing-air-gap
         pipette.dispense(liquid_class.aspirate.trailing_air_gap)
 
@@ -300,13 +277,11 @@ def _pipette_with_liquid_settings(
         )
         # delay
         ctx.delay(liquid_class.dispense.delay)
-        _do_user_pause(ctx, inspect, "about to retract")
 
     def _dispense_on_retract() -> None:
-        if added_blow_out:
+        if pipette.current_volume <= 0 and added_blow_out:
             # blow-out any remaining air in pipette (any reason why not?)
             callbacks.on_blowing_out()
-            _do_user_pause(ctx, inspect, "about to blow-out")
             # FIXME: using the HW-API to specify that we want to blow-out the full
             #        available blow-out volume
             hw_api = ctx._core.get_hardware()
@@ -318,14 +293,15 @@ def _pipette_with_liquid_settings(
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
         # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
         #       to avoid droplets from forming and falling off the tip
-        # NOTE: temporarily set aspirate flow-rate to be the faster dispense flow-rate
-        pipette.flow_rate.aspirate = liquid_class.dispense.plunger_flow_rate
         pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
-        pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
-        # reset plunger accelerations back to defaults
-        _reset_plunger_acceleration(ctx, pipette)
 
     # PHASE 1: APPROACH
+    pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
+    pipette.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
+    pipette.flow_rate.blow_out = liquid_class.dispense.plunger_flow_rate
+    _change_plunger_acceleration(
+        ctx, pipette, liquid_class.dispense.plunger_acceleration
+    )
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
     _aspirate_on_approach() if aspirate else _dispense_on_approach()
 
@@ -342,6 +318,7 @@ def _pipette_with_liquid_settings(
     # EXIT
     callbacks.on_exiting()
     pipette.move_to(well.top().move(channel_offset), force_direct=True)
+    _reset_plunger_acceleration(ctx, pipette)
 
 
 def aspirate_with_liquid_class(
