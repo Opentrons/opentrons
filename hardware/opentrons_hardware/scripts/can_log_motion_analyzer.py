@@ -152,8 +152,8 @@ _MOVE_RE = re.compile(
     r".*message_index=UInt32Field\(value=(?P<index>\d+)\)"
     r".*seq_id=UInt8Field\(value=(?P<seq_id>\d+)\)"
     r".*duration=UInt32Field\(value=(?P<duration>\d+)\)"
-    r".*acceleration_um=Int32Field\(value=(?P<acceleration>[-\d]+)\)"
-    r".*velocity_mm=Int32Field\(value=(?P<velocity>[-\d]+)\)"
+    r".*acceleration(?P<acceleration_unit>_um)?=Int32Field\(value=(?P<acceleration>[-\d]+)\)"
+    r".*velocity(_mm)?=Int32Field\(value=(?P<velocity>[-\d]+)\)"
 )
 
 
@@ -168,6 +168,11 @@ class MoveCommand(Record):
         """Build from a log line."""
         data = _MOVE_RE.search(line)
         assert data, f"Could not parse move command from {line}"
+        if data["acceleration_unit"] == "_ul":
+            acceleration_mul = 1000
+        else:
+            acceleration_mul = 1
+
         return MoveCommand(
             date=record.date,
             sender=record.sender,
@@ -179,7 +184,7 @@ class MoveCommand(Record):
             / (2**31)
             * interrupts_per_sec
             * interrupts_per_sec
-            / 1000,
+            / acceleration_mul,
             index=int(data["index"]),
         )
 
@@ -256,7 +261,7 @@ def _record(lines: Iterator[str]) -> Union[MoveCommand, MoveComplete, Error]:
         )
     else:
         date = datetime.strptime(
-            " ".join(dirline.split(" ")[:3]) + "+0000", "%b %H:%M:%S%z"
+            " ".join(dirline.split(" ")[:3]) + "+0000", "%b %d %H:%M:%S%z"
         )
     arbline = next(lines)
     record = _arb_from_line(arbline, date)
