@@ -1,6 +1,7 @@
 """Class that schedules motion on can bus."""
 import asyncio
 from collections import defaultdict
+from dataclasses import dataclass, field
 import logging
 from typing import List, Set, Tuple, Iterator, Union, Optional, Dict
 import numpy as np
@@ -81,8 +82,30 @@ _AcceptableMoves = Union[MoveCompleted, TipActionResponse]
 _CompletionPacket = Tuple[ArbitrationId, _AcceptableMoves]
 _Completions = List[_CompletionPacket]
 
-_MoveSeqInfo = Tuple[Tuple[int, int], MoveStopCondition]
-_MoveGroupInfo = Set[_MoveSeqInfo]
+
+
+@dataclass(order=True)
+class ScheduledMove:
+
+    seq_id: int
+    node_id: int
+    stop_condition: MoveStopCondition
+    duration: float
+    tip_action_motors: List[GearMotorId] = field(default_factory=list)
+
+    def is_done(self):
+        return True if not self.tip_action_motors else False
+    
+    def reject_ack(self, ack: MoveAckId):
+        if ack not in MoveStopCondition.acceptable_ack(self.stop_condition):
+            log.error(f"Move failed: condition {self.stop_condition} not met")
+            return True
+        return False
+
+
+
+
+_MoveGroupInfo = Set[ScheduledMove]
 
 
 class MoveGroupRunner:
@@ -359,11 +382,9 @@ class MoveScheduler:
 
         for move_group in move_groups:
             self._moves.append(self._get_group_info(move_group))
-            self._durations.append(self._get_group_duration(move_group))
-            motors = self._get_expected_tip_motors(move_group)
-            self._expected_tip_action_motors.append(
-                motors 
-            )
+
+        self._durations: List[float] = list(
+            sum(group.duration for group in move) for move in self._moves)
 
         log.debug(f"Move scheduler running for groups {move_groups}")
         self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
@@ -372,31 +393,23 @@ class MoveScheduler:
         self._current_group: Optional[int] = None
         self._current_nodes: List[NodeId] = []
         self._should_stop = False
-    
-    @staticmethod
-    def _get_group_duration(move_group: MoveGroup) -> float:
-        """The sum of one of each step's duration."""
-        return sum(list(step.values())[0].duration_sec for step in move_group)
-    
-    @staticmethod
-    def _get_group_info(move_group: MoveGroup) -> _MoveGroupInfo:
-        group_info: _MoveGroupInfo = set()
-        for seq_id, move in enumerate(move_group):
-            move_seq: _MoveSeqInfo = set(
-                ((k.value, seq_id), move[k].stop_condition)
-                for k in move.keys()
-            )
-            group_info.update(move_seq)
-        return group_info
 
     @staticmethod
-    def _get_expected_tip_motors(move_group: MoveGroup) -> List[List[GearMotorId]]:
-        for move in move_group:
-            if any(isinstance(s, MoveGroupTipActionStep) for s in move.values()):
-                yield [GearMotorId.left, GearMotorId.right]
-            else:
-                yield []
-        
+    def _get_group_info(move_group: MoveGroup) -> _MoveGroupInfo:
+        group_info: _MoveGroupInfo = []
+        for seq_id, node_move in enumerate(move_group):
+            for node, move in node_move.items():
+                node_seq = ScheduledMove(
+                    seq_id=seq_id,
+                    node_id=node.value,
+                    stop_condition=move.stop_condition,
+                    duration=float(move.duration_sec),
+                    tip_action_motors=([
+                        GearMotorId.left, GearMotorId.right] if isinstance(move, MoveGroupTipActionStep) else []))
+                group_info.append(node_seq)
+        return group_info
+
+
     def _handle_error(
         self, message: ErrorMessage, arbitration_id: ArbitrationId
     ) -> None:
@@ -411,7 +424,6 @@ class MoveScheduler:
             self._should_stop = True
             self._event.set()
 
-
     def _handle_move_responses(
         self, message: _AcceptableMoves, arbitration_id: ArbitrationId
     ) -> None:
@@ -421,18 +433,21 @@ class MoveScheduler:
         node_id = arbitration_id.parts.originating_node_id
 
         try:
-            matched = list(filter(lambda m: (node_id, seq_id) == m[0], self._moves[self._current_group_id]))
-
+            print(f"message: {node_id}, {seq_id}")
+            matched = next(filter(lambda m: m.seq_id == seq_id and m.node_id == node_id, self._moves[group_id]), None)
+            print(matched)
+            
             log.debug(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 f", which {'is' if matched else 'isn''t'} in group"
             )
 
-            if len(matched) == 1:
-                if isinstance(message, TipActionRequest):
+            if matched:
+                print(f"ack: {ack_id}")
+                if isinstance(message, TipActionResponse):
                     gear_id = GearMotorId(message.payload.gear_motor_id.value)
-                    self._expected_tip_action_motors.remove(gear_id)
-                    if len(self._expected_tip_action_motors):
+                    matched.tip_action_motors.remove(gear_id)
+                    if not matched.is_done():
                         return
                 
                 if self._check_for_mismatched_ack(
@@ -446,12 +461,17 @@ class MoveScheduler:
                             }
                         )
                     )
+
+                if matched.reject_ack(ack_id):
+                    print("rejected")
+                    print(f"ack: {ack_id}")
                     self._should_stop = True
                     self._event.set()
                     return
+                print("we have completed")
                 
                 self._completion_queue.put_nowait((arbitration_id, message))
-                self._moves[group_id].remove(matched[0])
+                self._moves[group_id].remove(matched)
 
                 if ack_id == MoveAckId.stopped_by_condition:
                     # When an axis has a stop-on-stall move and stalls, it will clear the rest of its executing moves.
@@ -465,10 +485,7 @@ class MoveScheduler:
                 if not self._moves[group_id]:
                     log.debug(f"Move group {group_id+self._start_at_index} has completed.")
                     self._event.set()
-            else:
-                if len(matched) > 1:
-                    log.error("Something is really wrong")
-                
+
         except KeyError:
             log.warning(
                 f"Got a move ack for ({node_id}, {seq_id}) which is not in this "
@@ -478,27 +495,6 @@ class MoveScheduler:
             # If we have two move groups running at once, we need to handle
             # moves from a group we don't own
             return
-
-    def _check_for_mismatched_ack(
-        self, stop_condition: MoveStopCondition, ack_id: MoveAckId
-    ) -> bool:
-        """Return True if the ack id does not match stop condition."""
-
-        if (
-            MoveStopCondition.is_enforced(stop_condition)
-            and ack_id != MoveAckId.stopped_by_condition
-        ):
-            log.error(f"Move failed: condition {stop_condition} not met")
-            return True
-        if (
-            stop_condition == MoveStopCondition.none
-            and ack_id == MoveAckId.stopped_by_condition
-        ):
-            log.error(
-                f"Move ack {ack_id} does not match move condition {stop_condition}"
-            )
-            return True
-        return False
 
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId
@@ -597,14 +593,9 @@ class MoveScheduler:
             raise PythonException(e) from e
 
     @staticmethod
-    def get_expected_nodes(move_group: MoveGroup) -> List[NodeId]:
+    def get_expected_nodes(move_group: MoveGroup) -> Set[NodeId]:
         """Update the active nodes of the current move group."""
-        expected = []
-        for m in move_group:
-            node_id = m[0][0]
-            if node_id not in expected:
-                expected.append(NodeId(node_id))
-        return expected
+        return set(m.node_id for m in move_group)
 
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
