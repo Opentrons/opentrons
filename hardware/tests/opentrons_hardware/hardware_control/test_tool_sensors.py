@@ -3,7 +3,7 @@ import logging
 from mock import patch, ANY, AsyncMock, call
 import pytest
 from contextlib import asynccontextmanager
-from typing import Iterator, List, Tuple, AsyncIterator, Any
+from typing import Iterator, List, Tuple, AsyncIterator, Any, Dict
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ExecuteMoveGroupRequest,
     MoveCompleted,
@@ -373,21 +373,27 @@ async def test_capacitive_sweep(
 
 
 @pytest.mark.parametrize(
-    "target_node,sensor_id",
+    "target_node",
     [
-        ([NodeId.pipette_left], SensorId.S0),
-        ([NodeId.pipette_right], SensorId.S1),
-        ([NodeId.pipette_left, NodeId.pipette_right], SensorId.S1),
+        ({NodeId.pipette_left: [SensorId.S0]}),
+        ({NodeId.pipette_right: [SensorId.S1]}),
+        ({NodeId.pipette_right: [SensorId.S1], NodeId.pipette_left: [SensorId.S1]}),
+        (
+            {
+                NodeId.pipette_right: [SensorId.S0, SensorId.S1],
+                NodeId.pipette_left: [SensorId.S1],
+            }
+        ),
     ],
 )
 async def test_overpressure_closure(
     mock_messenger: AsyncMock,
-    target_node: List[PipetteProbeTarget],
-    sensor_id: SensorId,
+    target_node: Dict[PipetteProbeTarget, List[SensorId]],
 ) -> None:
     """Test that we can use partial context manager."""
     partial_context_manager = await check_overpressure(
-        mock_messenger, target_node, sensor_id
+        mock_messenger,
+        target_node,
     )
 
     # Execute the actual partial context manager and see that the correct
@@ -400,7 +406,7 @@ async def test_overpressure_closure(
                     message=BindSensorOutputRequest(
                         payload=BindSensorOutputRequestPayload(
                             sensor=SensorTypeField(SensorType.pressure),
-                            sensor_id=SensorIdField(sensor_id),
+                            sensor_id=SensorIdField(s),
                             binding=SensorOutputBindingField(
                                 SensorOutputBinding.max_threshold_sync
                             ),
@@ -408,7 +414,8 @@ async def test_overpressure_closure(
                     ),
                     expected_nodes=[n],
                 )
-                for n in target_node
+                for n, sids in target_node.items()
+                for s in sids
             ],
             any_order=True,
         )
@@ -419,13 +426,14 @@ async def test_overpressure_closure(
                 message=BindSensorOutputRequest(
                     payload=BindSensorOutputRequestPayload(
                         sensor=SensorTypeField(SensorType.pressure),
-                        sensor_id=SensorIdField(sensor_id),
+                        sensor_id=SensorIdField(s),
                         binding=SensorOutputBindingField(SensorOutputBinding.none),
                     )
                 ),
                 expected_nodes=[n],
             )
-            for n in target_node
+            for n, sids in target_node.items()
+            for s in sids
         ],
         any_order=True,
     )

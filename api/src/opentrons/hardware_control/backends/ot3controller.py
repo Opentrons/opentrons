@@ -43,6 +43,7 @@ from .ot3utils import (
     PipetteAction,
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
+    map_pipette_type_to_sensor_id,
 )
 
 try:
@@ -440,12 +441,12 @@ class OT3Controller:
             ignore_stalls=True if not ff.stall_detection_enabled() else False,
         )
         mounts_moving = [
-            OT3Axis.to_mount(node_to_axis(k))
+            k
             for g in move_group
             for k in g.keys()
             if k in [NodeId.pipette_left, NodeId.pipette_right]
         ]
-        async with self.monitor_overpressure(mounts_moving):
+        async with self._monitor_overpressure(mounts_moving):
             positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
@@ -567,9 +568,9 @@ class OT3Controller:
             if runner
         ]
         moving_pipettes = [
-            OT3Axis.to_mount(ax) for ax in checked_axes if ax in OT3Axis.pipette_axes()
+            axis_to_node(ax) for ax in checked_axes if ax in OT3Axis.pipette_axes()
         ]
-        async with self.monitor_overpressure(moving_pipettes):
+        async with self._monitor_overpressure(moving_pipettes):
             positions = await asyncio.gather(*coros)
         if OT3Axis.Q in checked_axes:
             await self.tip_action(
@@ -955,16 +956,15 @@ class OT3Controller:
         return {k: v for k, v in by_node.items() if k in self._motor_nodes()}
 
     @asynccontextmanager
-    async def monitor_overpressure(
-        self, mounts: List[OT3Mount], sensor_id: SensorId = SensorId.S0
-    ) -> AsyncIterator[None]:
+    async def _monitor_overpressure(self, mounts: List[NodeId]) -> AsyncIterator[None]:
         if ff.overpressure_detection_enabled() and mounts:
-            tools = [sensor_node_for_pipette(OT3Mount(m.value)) for m in mounts]
+            tools_with_id = map_pipette_type_to_sensor_id(
+                mounts, self._subsystem_manager.device_info
+            )
             # FIXME we should switch the sensor type based on the channel
             # used when partial tip pick up is implemented.
-            # FIXME we should also monitor pressure in all available channels
             provided_context_manager = await check_overpressure(
-                self._messenger, tools, sensor_id
+                self._messenger, tools_with_id
             )
             errors: asyncio.Queue[Tuple[NodeId, ErrorCode]] = asyncio.Queue()
 

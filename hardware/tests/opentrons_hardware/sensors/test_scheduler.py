@@ -134,11 +134,13 @@ async def test_capture_error_max_threshold(
 
     # an error message is received
     async with subject.monitor_exceed_max_threshold(
-        [sensor_types.SensorInformation(
-            sensor_type=SensorType.pressure,
-            sensor_id=SensorId.S0,
-            node_id=NodeId.pipette_left,
-        )],
+        [
+            sensor_types.SensorInformation(
+                sensor_type=SensorType.pressure,
+                sensor_id=SensorId.S0,
+                node_id=NodeId.pipette_left,
+            )
+        ],
         mock_messenger,
     ) as output_queue:
         mock_messenger.ensure_send.assert_called_with(
@@ -182,11 +184,13 @@ async def test_capture_error_max_threshold(
     mock_messenger.reset_mock()
     # no error message is received, the queue should be empty
     async with subject.monitor_exceed_max_threshold(
-        [sensor_types.SensorInformation(
-            sensor_type=SensorType.pressure,
-            sensor_id=SensorId.S0,
-            node_id=NodeId.pipette_left,
-        )],
+        [
+            sensor_types.SensorInformation(
+                sensor_type=SensorType.pressure,
+                sensor_id=SensorId.S0,
+                node_id=NodeId.pipette_left,
+            )
+        ],
         mock_messenger,
     ) as output_queue:
         mock_messenger.ensure_send.assert_called_with(
