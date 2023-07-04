@@ -267,24 +267,27 @@ class MoveGroupRunner:
                         ),
                     )
 
-    def _convert_velocity(
-        self, velocity: Union[float, np.float64], interrupts: int
+    @classmethod
+    def convert_velocity(
+        cls, velocity: Union[float, np.float64], interrupts: int
     ) -> Int32Field:
         return Int32Field(int((velocity / interrupts) * (2**31)))
 
-    def _get_message_type(
-        self, step: SingleMoveStep, group: int, seq: int
+    @classmethod
+    def get_message_type(
+        cls, step: SingleMoveStep, group: int, seq: int
     ) -> MessageDefinition:
         """Return the correct payload type."""
         if isinstance(step, MoveGroupSingleAxisStep):
-            return self._get_stepper_motor_message(step, group, seq)
+            return cls._get_stepper_motor_message(step, group, seq)
         elif isinstance(step, MoveGroupTipActionStep):
-            return self._get_tip_action_motor_message(step, group, seq)
+            return cls._get_tip_action_motor_message(step, group, seq)
         else:
-            return self._get_brushed_motor_message(step, group, seq)
+            return cls._get_brushed_motor_message(step, group, seq)
 
-    def _get_brushed_motor_message(
-        self, step: MoveGroupSingleGripperStep, group: int, seq: int
+    @classmethod
+    def get_brushed_motor_message(
+        cls, step: MoveGroupSingleGripperStep, group: int, seq: int
     ) -> MessageDefinition:
         payload = GripperMoveRequestPayload(
             group_id=UInt8Field(group),
@@ -336,21 +339,21 @@ class MoveGroupRunner:
                         * (2**31)
                     )
                 ),
-                velocity_mm=Int32Field(
-                    int((step.velocity_mm_sec / INTERRUPTS_PER_SEC) * (2**31))
-                    Int32Field(int((velocity / interrupts) * (2**31)))
+                velocity_mm=cls.convert_velocity(
+                    step.velocity_mm_sec, INTERRUPTS_PER_SEC
                 ),
             )
             return AddLinearMoveRequest(payload=linear_payload)
 
-    def _get_tip_action_motor_message(
-        self, step: MoveGroupTipActionStep, group: int, seq: int
+    @classmethod
+    def get_tip_action_motor_message(
+        cls, step: MoveGroupTipActionStep, group: int, seq: int
     ) -> TipActionRequest:
         tip_action_payload = TipActionRequestPayload(
             group_id=UInt8Field(group),
             seq_id=UInt8Field(seq),
             duration=UInt32Field(int(step.duration_sec * TIP_INTERRUPTS_PER_SEC)),
-            velocity=self.convert_velocity(
+            velocity=cls.convert_velocity(
                 step.velocity_mm_sec, TIP_INTERRUPTS_PER_SEC
             ),
             action=PipetteTipActionTypeField(step.action),
