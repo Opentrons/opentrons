@@ -203,7 +203,6 @@ export function NameRobot(): JSX.Element {
                   />
                 ) : (
                   <SmallButton
-                    buttonType="primary"
                     buttonText={t('shared:confirm')}
                     buttonCategory="rounded"
                     onClick={handleConfirm}
