@@ -5,7 +5,7 @@ by default. Please do not unconditionally import things outside the python stand
 library.
 """
 from enum import Enum, unique
-from typing import Union
+from typing import Union, List
 
 
 @unique
@@ -332,6 +332,15 @@ class MotorPositionFlags(Enum):
     encoder_position_ok = 0x2
 
 
+class MoveAckId(int, Enum):
+    """Move Ack IDs."""
+
+    complete_without_condition = 0x1
+    stopped_by_condition = 0x2
+    timeout = 0x3
+    position_error = 0x4
+
+
 @unique
 class MoveStopCondition(int, Enum):
     """Move Stop Condition."""
@@ -346,9 +355,18 @@ class MoveStopCondition(int, Enum):
     limit_switch_backoff = 0x40
 
     @classmethod
-    def is_enforced(cls, cond: "MoveStopCondition") -> bool:
-        """Condition must be observed when the move completes."""
-        return cond in [cls.limit_switch, cls.limit_switch_backoff]
+    def acceptable_ack(cls, cond: "MoveStopCondition") -> List[MoveAckId]:
+        acc_ack = {
+            cls.none: [MoveAckId.complete_without_condition],
+            cls.limit_switch: [MoveAckId.stopped_by_condition],
+            cls.sync_line: [MoveAckId.complete_without_condition, MoveAckId.stopped_by_condition],
+            cls.encoder_position: [MoveAckId.stopped_by_condition],
+            cls.gripper_force: [MoveAckId.stopped_by_condition],
+            cls.stall: [MoveAckId.complete_without_condition, MoveAckId.stopped_by_condition],
+            cls.ignore_stalls: [MoveAckId.complete_without_condition],
+            cls.limit_switch_backoff: [MoveAckId.stopped_by_condition],
+        }
+        return acc_ack[cond]
 
 
 @unique
@@ -360,12 +378,3 @@ class MotorUsageValueType(int, Enum):
     right_gear_motor_distance = 0x2
     force_application_time = 0x3
     total_error_count = 0x4
-
-
-class MoveAckId(int, Enum):
-    """Move Ack IDs."""
-
-    complete_without_condition = 0x1
-    stopped_by_condition = 0x2
-    timeout = 0x3
-    position_error = 0x4
