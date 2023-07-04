@@ -224,14 +224,18 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     if "single" in test_pip['name']:
         multi_pip = False
         check_tip_presence = True
-        if args.pick_up_num != 60:
+        if args.pick_up_num == 60:
             PICKUPS_PER_TIP = 20
+        else:
+            PICKUPS_PER_TIP = args.pick_up_num
     else:
         multi_pip = True
         ROWS = 1
         CYCLES = 2
-        if args.pick_up_num != 60:
+        if args.pick_up_num == 60:
             PICKUPS_PER_TIP = 60
+        else:
+            PICKUPS_PER_TIP = args.pick_up_num
         check_tip_presence = True
 
     slot_loc = {
