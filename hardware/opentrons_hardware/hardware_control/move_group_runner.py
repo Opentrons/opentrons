@@ -49,9 +49,9 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     EmptyPayload,
 )
 from .constants import (
-    interrupts_per_sec,
-    tip_interrupts_per_sec,
-    brushed_motor_interrupts_per_sec,
+    INTERRUPTS_PER_SEC,
+    TIP_INTERRUPTS_PER_SEC,
+    BRUSHED_MOTOR_INTERRUPTS_PER_SEC,
 )
 from opentrons_hardware.errors import raise_from_error_message
 from opentrons_hardware.hardware_control.motion import (
@@ -290,7 +290,7 @@ class MoveGroupRunner:
             group_id=UInt8Field(group),
             seq_id=UInt8Field(seq),
             duration=UInt32Field(
-                int(step.duration_sec * brushed_motor_interrupts_per_sec)
+                int(step.duration_sec * BRUSHED_MOTOR_INTERRUPTS_PER_SEC)
             ),
             duty_cycle=UInt32Field(int(step.pwm_duty_cycle)),
             encoder_position_um=Int32Field(int(step.encoder_position_um)),
@@ -302,41 +302,43 @@ class MoveGroupRunner:
         else:
             return AddBrushedLinearMoveRequest(payload=payload)
 
-    def _get_stepper_motor_message(
-        self, step: MoveGroupSingleAxisStep, group: int, seq: int
+    @classmethod
+    def get_stepper_motor_message(
+        cls, step: MoveGroupSingleAxisStep, group: int, seq: int, ignore_stalls: bool = False,
     ) -> MessageDefinition:
         if step.move_type == MoveType.home:
             home_payload = HomeRequestPayload(
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
-                duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
-                velocity_mm=self._convert_velocity(
-                    step.velocity_mm_sec, interrupts_per_sec
+                duration=UInt32Field(int(step.duration_sec * INTERRUPTS_PER_SEC)),
+                velocity_mm=cls.convert_velocity(
+                    step.velocity_mm_sec, INTERRUPTS_PER_SEC
                 ),
             )
             return HomeRequest(payload=home_payload)
         else:
             stop_cond = step.stop_condition.value
-            if self._ignore_stalls:
+            if ignore_stalls:
                 stop_cond += MoveStopCondition.ignore_stalls.value
             linear_payload = AddLinearMoveRequestPayload(
                 request_stop_condition=MoveStopConditionField(stop_cond),
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
-                duration=UInt32Field(int(step.duration_sec * interrupts_per_sec)),
+                duration=UInt32Field(int(step.duration_sec * INTERRUPTS_PER_SEC)),
                 acceleration_um=Int32Field(
                     int(
                         (
                             step.acceleration_mm_sec_sq
                             * 1000.0
-                            / interrupts_per_sec
-                            / interrupts_per_sec
+                            / INTERRUPTS_PER_SEC
+                            / INTERRUPTS_PER_SEC
                         )
                         * (2**31)
                     )
                 ),
                 velocity_mm=Int32Field(
-                    int((step.velocity_mm_sec / interrupts_per_sec) * (2**31))
+                    int((step.velocity_mm_sec / INTERRUPTS_PER_SEC) * (2**31))
+                    Int32Field(int((velocity / interrupts) * (2**31)))
                 ),
             )
             return AddLinearMoveRequest(payload=linear_payload)
@@ -347,9 +349,9 @@ class MoveGroupRunner:
         tip_action_payload = TipActionRequestPayload(
             group_id=UInt8Field(group),
             seq_id=UInt8Field(seq),
-            duration=UInt32Field(int(step.duration_sec * tip_interrupts_per_sec)),
-            velocity=self._convert_velocity(
-                step.velocity_mm_sec, tip_interrupts_per_sec
+            duration=UInt32Field(int(step.duration_sec * TIP_INTERRUPTS_PER_SEC)),
+            velocity=self.convert_velocity(
+                step.velocity_mm_sec, TIP_INTERRUPTS_PER_SEC
             ),
             action=PipetteTipActionTypeField(step.action),
             request_stop_condition=MoveStopConditionField(step.stop_condition),

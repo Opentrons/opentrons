@@ -25,7 +25,7 @@ from opentrons_hardware.firmware_bindings.utils import (
     Int32Field,
 )
 from opentrons_hardware.firmware_bindings.constants import NodeId, ErrorCode
-from .constants import brushed_motor_interrupts_per_sec
+from .constants import BRUSHED_MOTOR_INTERRUPTS_PER_SEC
 
 log = logging.getLogger(__name__)
 
@@ -137,7 +137,7 @@ async def grip(
                 group_id=UInt8Field(group_id),
                 seq_id=UInt8Field(seq_id),
                 duration=UInt32Field(
-                    int(duration_sec * brushed_motor_interrupts_per_sec)
+                    int(duration_sec * BRUSHED_MOTOR_INTERRUPTS_PER_SEC)
                 ),
                 duty_cycle=UInt32Field(duty_cycle),
                 encoder_position_um=Int32Field(0),

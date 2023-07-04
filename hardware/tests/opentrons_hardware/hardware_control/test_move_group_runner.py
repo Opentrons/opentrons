@@ -43,7 +43,7 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
     PipetteTipActionTypeField,
 )
 from opentrons_hardware.hardware_control.constants import (
-    interrupts_per_sec,
+    INTERRUPTS_PER_SEC,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
@@ -73,12 +73,12 @@ from opentrons_hardware.firmware_bindings.utils import (
 
 def calc_duration(step: MoveGroupSingleAxisStep) -> int:
     """Calculate duration."""
-    return int(step.duration_sec * interrupts_per_sec)
+    return int(step.duration_sec * INTERRUPTS_PER_SEC)
 
 
 def calc_velocity(step: MoveGroupSingleAxisStep) -> int:
     """Calculate velocity."""
-    return int(step.velocity_mm_sec / interrupts_per_sec * (2**31))
+    return int(step.velocity_mm_sec / INTERRUPTS_PER_SEC * (2**31))
 
 
 def calc_acceleration(step: MoveGroupSingleAxisStep) -> int:
@@ -86,8 +86,8 @@ def calc_acceleration(step: MoveGroupSingleAxisStep) -> int:
     return int(
         step.acceleration_mm_sec_sq
         * 1000
-        / interrupts_per_sec
-        / interrupts_per_sec
+        / INTERRUPTS_PER_SEC
+        / INTERRUPTS_PER_SEC
         * (2**31)
     )
 
