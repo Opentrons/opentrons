@@ -1,6 +1,6 @@
 import {
   HostConfig,
-  EstopState,
+  // EstopState,
   setEstopPhysicalStatus,
   EstopPhysicalStatus,
 } from '@opentrons/api-client'

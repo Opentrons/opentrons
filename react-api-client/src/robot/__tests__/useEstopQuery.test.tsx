@@ -40,7 +40,7 @@ describe('useEstopQuery hook', () => {
   })
 
   it('should return no data if no host', () => {
-    when(useHost).calledWith().mockReturnValue(null)
+    when(mockUseHost).calledWith().mockReturnValue(null)
 
     const { result } = renderHook(useEstopQuery, { wrapper })
 

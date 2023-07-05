@@ -27,7 +27,9 @@ const UPDATE_ESTOP_PHYSICAL_STATUS_RESPONSE = {
 
 describe('useSetEstopPhysicalStatusMutation hook', () => {
   let wrapper: React.FunctionComponent<{}>
-  let updatedEstopPhysicalStatus: EstopPhysicalStatus = { status: 'disengaged' }
+  const updatedEstopPhysicalStatus: EstopPhysicalStatus = {
+    status: 'disengaged',
+  }
 
   beforeEach(() => {
     const queryClient = new QueryClient()
