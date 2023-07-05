@@ -260,14 +260,16 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         module: typeof initialRobotState.modules[keyof typeof initialRobotState.modules],
         moduleId: string
       ): LoadModuleCreateCommand => {
+        const model = moduleEntities[moduleId].model
         const loadModuleCommand = {
           key: uuid(),
           commandType: 'loadModule' as const,
           params: {
-            moduleId: moduleId,
+            model: model,
             location: {
               slotName: module.slot === SPAN7_8_10_11_SLOT ? '7' : module.slot,
             },
+            moduleId: moduleId,
           },
         }
         return loadModuleCommand
