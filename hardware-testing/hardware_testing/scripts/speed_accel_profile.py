@@ -44,14 +44,14 @@ FAKE_GRIPPER = {NodeId.gripper_g: MotorStatus(motor_ok=True, encoder_ok=True)}
 TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
     GantryLoad.LOW_THROUGHPUT: {
         "X": {
-            "SPEED": {"MIN": 250, "MAX": 450, "INC": 100},
-            "ACCEL": {"MIN": 700, "MAX": 900, "INC": 100},
-            "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25}
+            "SPEED": {"MIN": 400, "MAX": 600, "INC": 200},
+            "ACCEL": {"MIN": 800, "MAX": 1200, "INC": 400},
+            "CURRENT": {"MIN": 1.25, "MAX": 1.4, "INC": 0.15}
         },
         "Y": {
-            "SPEED": {"MIN": 225, "MAX": 375, "INC": 75},
-            "ACCEL": {"MIN": 550, "MAX": 750, "INC": 100},
-            "CURRENT": {"MIN": 1, "MAX": 1.4, "INC": 0.2}
+            "SPEED": {"MIN": 325, "MAX": 500, "INC": 175},
+            "ACCEL": {"MIN": 600, "MAX": 1000, "INC": 400},
+            "CURRENT": {"MIN": 1.25, "MAX": 1.4, "INC": 0.15}
         },
         "L": {
             "SPEED": {"MIN": 80, "MAX": 120, "INC": 20},
@@ -76,7 +76,7 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
             "CURRENT": {"MIN": 1, "MAX": 1.5, "INC": 0.25}
         },
         "Y": {
-            "SPEED": {"MIN": 225, "MAX": 375, "INC": 75},
+            "SPEED": {"MIN": 200, "MAX": 350, "INC": 75},
             "ACCEL": {"MIN": 500, "MAX": 700, "INC": 100},
             "CURRENT": {"MIN": 1.3, "MAX": 1.5, "INC": 0.1}
         },
