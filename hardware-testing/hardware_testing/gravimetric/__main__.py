@@ -147,7 +147,6 @@ def run_photometric(
     mix: bool,
     inspect: bool,
     user_volumes: bool,
-    gantry_speed: int,
     touch_tip: bool,
     refill: bool,
 ) -> None:
@@ -171,7 +170,6 @@ def run_photometric(
             mix=mix,
             inspect=inspect,
             user_volumes=user_volumes,
-            gantry_speed=gantry_speed,
             touch_tip=touch_tip,
             refill=refill,
         ),
@@ -245,7 +243,6 @@ if __name__ == "__main__":
             args.mix,
             args.inspect,
             args.user_volumes,
-            args.gantry_speed,
             args.touch_tip,
             args.refill,
         )
