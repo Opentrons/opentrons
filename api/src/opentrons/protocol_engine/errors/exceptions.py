@@ -146,7 +146,7 @@ class LabwareNotLoadedError(ProtocolEngineError):
 
 
 class LabwareNotLoadedOnModuleError(ProtocolEngineError):
-    """Raised when referencing a labware on a module that has not been loaded."""
+    """Raised when there is no labware loaded on the requested module."""
 
     def __init__(
         self,
@@ -159,7 +159,7 @@ class LabwareNotLoadedOnModuleError(ProtocolEngineError):
 
 
 class LabwareNotLoadedOnLabwareError(ProtocolEngineError):
-    """Raised when referencing a labware on a labware that has not been loaded."""
+    """Raised when there is no labware loaded on the requested labware."""
 
     def __init__(
         self,
