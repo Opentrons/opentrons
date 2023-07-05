@@ -80,26 +80,38 @@ export function DeviceReset({
     }
   }
 
-  const renderText = (optionId: string): string[] => {
+  const renderText = (
+    optionId: string
+  ): { optionText: string; subText?: string } => {
+    let optionText = ''
+    let subText
     switch (optionId) {
       case 'pipetteOffsetCalibrations':
-        return [t('clear_option_pipette_calibrations')]
+        optionText = t('clear_option_pipette_calibrations')
+        break
       case 'gripperOffsetCalibrations':
-        return [t('clear_option_gripper_calibration')]
+        optionText = t('clear_option_gripper_calibration')
+        break
       case 'runsHistory':
-        return [
-          t('clear_option_runs_history'),
-          t('clear_option_runs_history_subtext'),
-        ]
+        optionText = t('clear_option_runs_history')
+        subText = t('clear_option_runs_history_subtext')
+        break
+
       case 'bootScripts':
-        return [
-          t('clear_option_boot_scripts'),
-          t('clear_option_boot_scripts_description'),
-        ]
+        optionText = t('clear_option_boot_scripts')
+        subText = t('clear_option_boot_scripts_description')
+        break
+
       case 'factoryReset':
-        return [t('factory_reset'), t('factory_reset_description')]
+        optionText = t('factory_reset')
+        subText = t('factory_reset_description')
+        break
       default:
-        return []
+        break
+    }
+    return {
+      optionText,
+      subText,
     }
   }
   React.useEffect(() => {
@@ -122,43 +134,49 @@ export function DeviceReset({
         paddingX={SPACING.spacing40}
       >
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-          {availableOptions.map(option => (
-            <React.Fragment key={option.id}>
-              <OptionButton
-                id={option.id}
-                type="checkbox"
-                value={option.id}
-                onChange={() =>
-                  setResetOptions({
-                    ...resetOptions,
-                    [option.id]: !(resetOptions[option.id] ?? false),
-                  })
-                }
-              />
-              <OptionLabel
-                htmlFor={option.id}
-                isSelected={resetOptions[option.id]}
-              >
-                <Flex flexDirection={DIRECTION_COLUMN}>
-                  <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                    {renderText(option.id)[0]}
-                  </StyledText>
-                  {renderText(option.id).length === 2 ? (
+          {availableOptions.map(option => {
+            const { optionText, subText } = renderText(option.id)
+            return (
+              <React.Fragment key={option.id}>
+                <OptionButton
+                  id={option.id}
+                  type="checkbox"
+                  value={option.id}
+                  onChange={() =>
+                    setResetOptions({
+                      ...resetOptions,
+                      [option.id]: !(resetOptions[option.id] ?? false),
+                    })
+                  }
+                />
+                <OptionLabel
+                  htmlFor={option.id}
+                  isSelected={resetOptions[option.id]}
+                >
+                  <Flex flexDirection={DIRECTION_COLUMN}>
                     <StyledText
                       as="p"
-                      color={
-                        resetOptions[option.id]
-                          ? COLORS.white
-                          : COLORS.darkBlack70
-                      }
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
-                      {renderText(option.id)[1]}
+                      {optionText}
                     </StyledText>
-                  ) : null}
-                </Flex>
-              </OptionLabel>
-            </React.Fragment>
-          ))}
+                    {subText != null ? (
+                      <StyledText
+                        as="p"
+                        color={
+                          resetOptions[option.id]
+                            ? COLORS.white
+                            : COLORS.darkBlack70
+                        }
+                      >
+                        {subText}
+                      </StyledText>
+                    ) : null}
+                  </Flex>
+                </OptionLabel>
+              </React.Fragment>
+            )
+          })}
         </Flex>
         <MediumButton
           data-testid="DeviceReset_clear_data_button"
