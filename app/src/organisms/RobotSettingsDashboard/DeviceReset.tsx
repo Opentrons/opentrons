@@ -23,10 +23,7 @@ import {
 import { useDispatchApiRequest } from '../../redux/robot-api'
 
 import type { Dispatch, State } from '../../redux/types'
-import type {
-  ResetConfigRequest,
-  ResetConfigOption,
-} from '../../redux/robot-admin/types'
+import type { ResetConfigRequest } from '../../redux/robot-admin/types'
 import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 interface LabelProps {

@@ -29,6 +29,11 @@ const mockResetConfigOptions = [
     name: 'RunsHistory FooBar',
     description: 'runsHistory fooBar description',
   },
+  {
+    id: 'bootScripts',
+    name: 'Boot Scripts FooBar',
+    description: 'bootScripts fooBar description',
+  },
 ]
 
 const mockGetResetConfigOptions = getResetConfigOptions as jest.MockedFunction<
@@ -71,6 +76,10 @@ describe('DeviceReset', () => {
     getByText('Clear gripper calibration')
     getByText('Clear protocol run history')
     getByText('Clears information about past runs of all protocols.')
+    getByText('Clear custom boot scripts')
+    getByText(
+      "Clears scripts that modify the robot's behavior when powered on."
+    )
     expect(getByTestId('DeviceReset_clear_data_button')).toBeDisabled()
   })
 
