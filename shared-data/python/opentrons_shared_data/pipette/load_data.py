@@ -83,7 +83,7 @@ def load_serial_lookup_table() -> Dict[str, str]:
         "ninety_six_channel": "96",
         "eight_channel": "multi",
     }
-    _model_shorthand = {"p1000": "p1k"}
+    _model_shorthand = {"p1000": "p1k", "p300": "p3h"}
     for channel_dir in os.listdir(config_path):
         for model_dir in os.listdir(config_path / channel_dir):
             for version_file in os.listdir(config_path / channel_dir / model_dir):
@@ -91,6 +91,11 @@ def load_serial_lookup_table() -> Dict[str, str]:
                 built_model = f"{model_dir}_{_channel_model_str[channel_dir]}_v{version_list[0]}.{version_list[1]}"
 
                 model_shorthand = _model_shorthand.get(model_dir, model_dir)
+
+                if model_dir == "p300" and int(version_list[0]) == 1 and int(version_list[1]) == 0:
+                    # Well apparently, we decided to switch the shorthand of the p300 depending
+                    # on whether it's a "V1" model or not...so...here is the lovely workaround.
+                    model_shorthand = model_dir
                 serial_shorthand = f"{model_shorthand.upper()}{_channel_shorthand[channel_dir]}V{version_list[0]}{version_list[1]}"
                 _lookup_table[serial_shorthand] = built_model
     return _lookup_table

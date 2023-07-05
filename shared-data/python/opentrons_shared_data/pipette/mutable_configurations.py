@@ -91,7 +91,7 @@ def _list_all_mutable_configs(
     on_disk_overrides: OverrideType, base_configurations: Dict[str, Any]
 ) -> OverrideType:
     """Get all available mutable configurations"""
-    all_mutable_configs = set([*MUTABLE_CONFIGS_V1, *VALID_QUIRKS])
+    all_mutable_configs = set([*MUTABLE_CONFIGS_V1, *VALID_QUIRKS]) - set(["quirks"])
     on_disk_configs = set(
         [
             v.name

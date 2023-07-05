@@ -24,6 +24,7 @@ MUTABLE_CONFIGS_V1 = [
     "dropTipCurrent",
     "dropTipSpeed",
     "tipLength",
+    "quirks",
 ]
 
 # Version 2 Configuration Keys.
