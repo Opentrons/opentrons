@@ -314,7 +314,7 @@ def test_labware_property(
     ).then_return(mock_child_labware_core)
     decoy.when(mock_map_core.get(mock_child_labware_core)).then_return(mock_labware)
 
-    assert subject.labware == mock_labware
+    assert subject.child_labware == mock_labware
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
