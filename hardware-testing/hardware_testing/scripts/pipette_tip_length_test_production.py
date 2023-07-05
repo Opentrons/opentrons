@@ -378,7 +378,7 @@ if __name__ == "__main__":
     parser.add_argument("--dial_slot", type=str, choices=slot_locs, default="C1")
     parser.add_argument("--dial_indicator", action="store_true")
     parser.add_argument("--tip_size", type=str, default="T200", help="Tip Size")
-    parser.add_argument("--tips_to_use", type=int, default=40)
+    parser.add_argument("--tips_to_use", type=int, default=96)
     args = parser.parse_args()
     if args.mount == "left":
         mount = OT3Mount.LEFT
