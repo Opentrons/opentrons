@@ -223,6 +223,8 @@ Let’s start with the diluent. This phase takes a larger quantity of liquid and
 
 Breaking down these single lines of code shows the power of :ref:`complex commands <v2-complex-commands>`. The first argument is the amount to transfer to each destination, 100 µL. The second argument is the source, column 1 of the reservoir (which is still specified with grid-style coordinates as ``A1`` — a reservoir only has an A row). The third argument is the destination. Here, calling the :py:meth:`.wells` method of ``plate`` returns a list of *every well*, and the command will apply to all of them.
 
+.. Possible text to explain the animation uses OT-2 code but applies to Flex as well?
+
 .. image:: ../img/tutorial/diluent.gif
     :name: Transfer of diluent to plate
     :align: center
