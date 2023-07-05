@@ -26,6 +26,7 @@ from .helpers import (
     _pick_up_tip,
     _drop_tip,
     _get_volumes,
+    _load_pipette,
 )
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,
@@ -61,20 +62,6 @@ def _get_dye_type(volume: float) -> str:
         dye_type is not None
     ), f"volume {volume} is outside of the available dye range"
     return dye_type
-
-
-def _load_pipette(
-    ctx: ProtocolContext, cfg: config.PhotometricConfig
-) -> InstrumentContext:
-    pip_name = f"p{cfg.pipette_volume}_96"
-    print(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
-    pipette = ctx.load_instrument(pip_name, cfg.pipette_mount)
-    assert pipette.max_volume == cfg.pipette_volume, (
-        f"expected {cfg.pipette_volume} uL pipette, "
-        f"but got a {pipette.max_volume} uL pipette"
-    )
-    # pipette.default_speed = cfg.gantry_speed
-    return pipette
 
 
 def _load_labware(

@@ -1,8 +1,7 @@
 """Gravimetric."""
 from typing import Optional, Tuple, List, Dict
 
-from opentrons.hardware_control.instruments.ot3.pipette import Pipette
-from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
+from opentrons.protocol_api import ProtocolContext, Well, Labware
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.data.csv_report import CSVReport
@@ -24,9 +23,9 @@ from .helpers import (
     _pick_up_tip,
     _drop_tip,
     _get_volumes,
+    _load_pipette,
 )
 from .trial import build_gravimetric_trials, GravimetricTrial
-from .workarounds import get_sync_hw_api
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,
     dispense_with_liquid_class,
@@ -101,38 +100,6 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
     report.store_environment(test_report, report.EnvironmentReportState.LAST, last_data)
     report.store_environment(test_report, report.EnvironmentReportState.MIN, min_data)
     report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
-
-
-def _load_pipette(
-    ctx: ProtocolContext, cfg: config.GravimetricConfig
-) -> InstrumentContext:
-    load_str_channels = {1: "single", 8: "multi", 96: "96"}
-    if cfg.pipette_channels not in load_str_channels:
-        raise ValueError(f"unexpected number of channels: {cfg.pipette_channels}")
-    chnl_str = load_str_channels[cfg.pipette_channels]
-    if cfg.pipette_channels == 96:
-        pip_name = "p1000_96"
-    else:
-        pip_name = f"p{cfg.pipette_volume}_{chnl_str}_gen3"
-    print(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
-    pipette = ctx.load_instrument(pip_name, cfg.pipette_mount)
-    assert pipette.channels == cfg.pipette_channels, (
-        f"expected {cfg.pipette_channels} channels, "
-        f"but got pipette with {pipette.channels} channels"
-    )
-    assert pipette.max_volume == cfg.pipette_volume, (
-        f"expected {cfg.pipette_volume} uL pipette, "
-        f"but got a {pipette.max_volume} uL pipette"
-    )
-    pipette.default_speed = cfg.gantry_speed
-    # NOTE: 8ch QC testing means testing 1 channel at a time,
-    #       so we need to decrease the pick-up current to work with 1 tip.
-    if pipette.channels == 8 and not cfg.increment:
-        hwapi = get_sync_hw_api(ctx)
-        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
-        hwpipette: Pipette = hwapi.hardware_pipettes[mnt.to_mount()]
-        hwpipette.pick_up_configurations.current = 0.2
-    return pipette
 
 
 def _load_labware(
