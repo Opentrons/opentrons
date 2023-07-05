@@ -89,6 +89,6 @@ describe('ConnectViaUSB', () => {
     const [{ getByText }] = render()
     const button = getByText('Continue')
     button.click()
-    expect(mockPush).toHaveBeenCalledWith('/robot-settings/rename-robot')
+    expect(mockPush).toHaveBeenCalledWith('/emergency-stop')
   })
 })

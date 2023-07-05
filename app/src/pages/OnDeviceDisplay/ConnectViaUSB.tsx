@@ -34,7 +34,7 @@ export function ConnectViaUSB(): JSX.Element {
 
   return (
     <>
-      <StepMeter totalSteps={5} currentStep={2} />
+      <StepMeter totalSteps={6} currentStep={2} />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
@@ -98,7 +98,7 @@ export function ConnectViaUSB(): JSX.Element {
             </Flex>
             <MediumButton
               buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-              onClick={() => history.push('/robot-settings/rename-robot')}
+              onClick={() => history.push('/emergency-stop')}
             />
           </Flex>
         ) : (
