@@ -172,7 +172,6 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
               t('shared:confirm_placement'),
               'capitalize'
             )}
-            buttonType="primary"
             onClick={props.confirmPlacement}
           />
         </Flex>
