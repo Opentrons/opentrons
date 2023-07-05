@@ -227,7 +227,7 @@ class ModuleContext(CommandPublisher):
         onto the deck). Note that the parameter ``name`` here corresponds to
         ``load_name`` on the ``ProtocolContext`` function.
 
-        :returns: The initialized and loaded labware object.
+        :returns: The initialized and loaded adapter object.
         """
         labware_core = self._protocol_core.load_adapter(
             load_name=name,

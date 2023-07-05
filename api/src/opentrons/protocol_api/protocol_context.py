@@ -341,7 +341,7 @@ class ProtocolContext(CommandPublisher):
 
         :param version: The version of the labware definition. You should normally
             leave this unspecified to let the implementation choose a good default.
-        :param adapter: An load name of an adapter to load the labware on top of. The adapter
+        :param adapter: Load name of an adapter to load the labware on top of. The adapter
             will be loaded from the same given namespace, but version will be automatically chosen.
         """
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
@@ -409,10 +409,10 @@ class ProtocolContext(CommandPublisher):
     ) -> Labware:
         """Specify the presence of an adapter on the deck.
 
-        This function loads the adapter definition specified by `adapter_def`
-        to the location specified by `location`.
+        This function loads the adapter definition specified by ``adapter_def``
+        to the location specified by ``location``.
 
-        :param adapter_def: The adapter's labware definition to load
+        :param adapter_def: The adapter's labware definition.
         :param location: The slot into which to load the labware,
                          such as ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
         :type location: int or str or :py:obj:`OFF_DECK`
@@ -437,7 +437,7 @@ class ProtocolContext(CommandPublisher):
         """Load an adapter onto a location.
 
         For adapters already defined by Opentrons, this is a convenient way
-        to collapse the two stages of adapters initialization (creating
+        to collapse the two stages of adapter initialization (creating
         the adapter and adding it to the protocol) into one.
 
         This function returns the created and initialized adapter for use

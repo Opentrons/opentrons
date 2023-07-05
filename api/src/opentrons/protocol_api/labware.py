@@ -498,7 +498,7 @@ class Labware:
         :param str label: An optional special name to give the labware. If
                           specified, this is the name the labware will appear
                           as in the run log and the calibration view in the
-                          Opentrons app.
+                          Opentrons App.
         :returns: The initialized and loaded labware object.
         """
         load_params = self._protocol_core.add_labware_definition(definition)
