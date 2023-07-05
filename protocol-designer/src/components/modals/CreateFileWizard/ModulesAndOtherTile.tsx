@@ -1,6 +1,5 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import without from 'lodash/without'
 import {
@@ -33,6 +32,7 @@ import {
   getIsCrashablePipetteSelected,
 } from '../../../step-forms'
 import gripperImage from '../../../images/flex_gripper.svg'
+import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import {
   CrashInfoBox,
@@ -40,7 +40,7 @@ import {
   isModuleWithCollisionIssue,
 } from '../../modules'
 import { ModuleFields } from '../FilePipettesModal/ModuleFields'
-import { GoBackLink } from './GoBackLink'
+import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
@@ -70,7 +70,6 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
     goBack,
     proceed,
   } = props
-  const { t } = useTranslation()
   const moduleRestrictionsDisabled = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
@@ -124,7 +123,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           gridGap={SPACING.spacing32}
         >
           <Text as="h2">
-            {t('modal.create_file_wizard.choose_additional_items')}
+            {i18n.t('modal.create_file_wizard.choose_additional_items')}
           </Text>
           {robotType === OT2_ROBOT_TYPE ? (
             <ModuleFields
@@ -151,7 +150,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           width="100%"
         >
-          <GoBackLink
+          <GoBack
             onClick={() => {
               if (
                 props.values.pipettesByMount.left.pipetteName === 'p1000_96'
@@ -167,7 +166,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
             }}
           />
           <PrimaryButton onClick={() => proceed()}>
-            {t('modal.create_file_wizard.review_file_details')}
+            {i18n.t('modal.create_file_wizard.review_file_details')}
           </PrimaryButton>
         </Flex>
       </Flex>

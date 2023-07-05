@@ -8,7 +8,7 @@ const LABWARE_FIXTURE_PATTERN = path.join(
   __dirname,
   '../../../../shared-data/labware/fixtures/2/*.json'
 )
-const allLabware: LabwareDefByDefURI = glob
+export const allLabware: LabwareDefByDefURI = glob
   .sync(LABWARE_FIXTURE_PATTERN)
   .map(require)
   // @ts-expect-error(sa, 2021-6-20): not sure why TS thinks d is void

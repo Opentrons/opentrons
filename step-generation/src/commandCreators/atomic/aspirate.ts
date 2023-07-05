@@ -43,7 +43,6 @@ export const aspirate: CommandCreator<AspirateParams> = (
     prevRobotState.labware,
     prevRobotState.modules
   )
-
   if (!pipetteSpec) {
     errors.push(
       errorCreators.pipetteDoesNotExist({

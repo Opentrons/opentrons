@@ -41,6 +41,9 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
     >
       {showCheckbox ? (
         <Icon
+          aria-label={`EquipmentOption_${
+            isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'
+          }`}
           color={isSelected ? COLORS.blueEnabled : COLORS.darkGreyEnabled}
           size="1.5rem"
           name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
