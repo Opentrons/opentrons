@@ -61,6 +61,15 @@ export interface HomeRunTimeCommand
     HomeCreateCommand {
   result?: {}
 }
+export interface RetractAxisCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'retractAxis'
+  params: RetractAxisParams
+}
+export interface RetractAxisRunTimeCommand
+  extends CommonCommandRunTimeInfo,
+    RetractAxisCreateCommand {
+  result?: {}
+}
 export type GantryRunTimeCommand =
   | MoveToSlotRunTimeCommand
   | MoveToWellRunTimeCommand
@@ -68,6 +77,7 @@ export type GantryRunTimeCommand =
   | MoveRelativeRunTimeCommand
   | SavePositionRunTimeCommand
   | HomeRunTimeCommand
+  | RetractAxisRunTimeCommand
 export type GantryCreateCommand =
   | MoveToSlotCreateCommand
   | MoveToWellCreateCommand
@@ -75,6 +85,7 @@ export type GantryCreateCommand =
   | MoveRelativeCreateCommand
   | SavePositionCreateCommand
   | HomeCreateCommand
+  | RetractAxisCreateCommand
 
 interface MoveToSlotParams {
   pipetteId: string
@@ -128,4 +139,8 @@ interface SavePositionParams {
 
 interface HomeParams {
   axes?: MotorAxis
+}
+
+interface RetractAxisParams {
+  axis: MotorAxis
 }
