@@ -68,9 +68,9 @@ const BUTTON_STYLE = css`
 `
 const WIZARD_CONTAINER_STYLE = css`
   min-height: 394px;
-  flex-direction: ${DIRECTION_COLUMN}
-  justify-content: ${JUSTIFY_SPACE_BETWEEN}
-  height: 'auto'
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  height: 'auto';
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     height: 472px;
   }

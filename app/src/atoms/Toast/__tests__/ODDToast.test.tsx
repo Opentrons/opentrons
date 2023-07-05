@@ -1,10 +1,13 @@
 import * as React from 'react'
 import { act, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../i18n'
 import { Toast } from '..'
 
 const render = (props: React.ComponentProps<typeof Toast>) => {
-  return renderWithProviders(<Toast {...props} displayType="odd" />)[0]
+  return renderWithProviders(<Toast {...props} displayType="odd" />, {
+    i18nInstance: i18n,
+  })[0]
 }
 
 describe('Toast', () => {
@@ -102,7 +105,7 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(7000)
+      jest.advanceTimersByTime(8000)
     })
     expect(props.onClose).toHaveBeenCalled()
   })
@@ -144,7 +147,7 @@ describe('Toast', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(8000)
+      jest.advanceTimersByTime(9000)
     })
     expect(props.onClose).toHaveBeenCalled()
   })
