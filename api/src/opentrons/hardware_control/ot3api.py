@@ -1291,12 +1291,10 @@ class OT3API(
 
         Works regardless of critical point or home status.
         """
-        await self.restract_axis(OT3Axis.by_mount(mount))
+        await self.retract_axis(OT3Axis.by_mount(mount))
 
     @ExecutionManagerProvider.wait_for_running
-    async def retract_axis(
-        self, axis: Union[top_types.Axis, OT3Axis]
-        ) -> None:
+    async def retract_axis(self, axis: Union[Axis, OT3Axis]) -> None:
         """
         Move an axis to its home position, without engaing the limit switch,
         whenever we can.
@@ -1308,10 +1306,10 @@ class OT3API(
         checked_axis = OT3Axis.from_axis(axis)
         motor_ok = self._backend.check_motor_status([checked_axis])
         encoder_ok = self._backend.check_encoder_status([checked_axis])
-    
+
         if motor_ok and encoder_ok:
             # we can move to the home position without checking the limit switch
-            origin = await self._backend.update_position()[checked_axis]
+            origin = await self._backend.update_position()
             target_pos = {checked_axis: self._backend.home_position()[checked_axis]}
             moves = self._build_moves(origin, target_pos)
             await self._backend.move(origin, moves[0], MoveStopCondition.none)

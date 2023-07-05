@@ -845,7 +845,7 @@ class API(
         Works regardless of critical point or home status.
         """
         await self.retract_axis(Axis.by_mount(mount), margin)
-    
+
     @ExecutionManagerProvider.wait_for_running
     async def retract_axis(self, axis: Axis, margin: float = 10) -> None:
         """Pull the specified axis up to its home position.
