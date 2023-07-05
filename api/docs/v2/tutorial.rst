@@ -92,7 +92,7 @@ You can include any other information you like in the metadata dictionary. The f
 
 Requirements
 ^^^^^^^^^^^^
-.. This is how I understand the requirements code block.
+.. My understanding of the requirements code block. Needs verification.
 
 The ``requirements`` code block appears after the ``metadata`` code block in a Python protocol. It defines the robot model (e.g. ``Flex`` or ``OT-2``) and the API version you're using.
 
