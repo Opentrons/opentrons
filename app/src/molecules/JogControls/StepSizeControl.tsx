@@ -14,13 +14,14 @@ import {
   Box,
   PrimaryButton,
   BORDERS,
+  ALIGN_FLEX_START,
 } from '@opentrons/components'
 
-import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
 
 import type { StepSize } from './types'
+import { TouchControlButton } from './TouchControlButton'
 
 const JUMP_SIZE_SUBTITLE = '- / +'
 const JUMP_SIZE_ICON_STYLE = css`
@@ -167,35 +168,48 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
 
 export function TouchStepSizeControl(props: StepSizeControlProps): JSX.Element {
   const { stepSizes, currentStepSize, setCurrentStepSize } = props
-  const { t } = useTranslation('robot_calibration')
+  const { i18n, t } = useTranslation('robot_calibration')
   return (
     <Flex
-      flex="1"
+      flex="3"
       flexDirection={DIRECTION_COLUMN}
       border={`1px solid ${COLORS.darkBlack40}`}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadiusSize4}
       padding={SPACING.spacing16}
-      gridGap={SPACING.spacing8}
+      gridGap={SPACING.spacing16}
     >
-      <TouchControlLabel>{t('jump_size')}</TouchControlLabel>
+      <TouchControlLabel>
+        {i18n.format(t('jump_size'), 'capitalize')}
+      </TouchControlLabel>
       {stepSizes.map((stepSize: StepSize, index) => {
+        const selected = currentStepSize === stepSize
         return (
-          <SmallButton
+          <TouchControlButton
             key={index}
-            buttonType={currentStepSize === stepSize ? 'primary' : 'secondary'}
+            selected={selected}
             onClick={() => {
               setCurrentStepSize(stepSize)
             }}
-            buttonText={
-              <Flex flexDirection={DIRECTION_COLUMN}>
+          >
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              alignItems={ALIGN_FLEX_START}
+            >
+              <StyledText
+                as="p"
+                fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                color={selected ? COLORS.white : COLORS.darkBlackEnabled}
+              >
                 {t(stepSizeTranslationKeyByStep[stepSize])}
-                <StyledText
-                  color={COLORS.darkGreyEnabled}
-                  css={TYPOGRAPHY.labelRegular}
-                >{`${stepSize} mm`}</StyledText>
-              </Flex>
-            }
-          />
+              </StyledText>
+              <StyledText
+                as="p"
+                color={selected ? COLORS.white : COLORS.darkBlack70}
+              >
+                {`${stepSize} mm`}
+              </StyledText>
+            </Flex>
+          </TouchControlButton>
         )
       })}
     </Flex>

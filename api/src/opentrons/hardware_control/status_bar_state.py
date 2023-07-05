@@ -71,7 +71,8 @@ class StatusBarStateController:
         # This animation uses an intermediate color between the blue and the white.
         # This results in a sort of light-blue effect.
         steps: List[status_bar.ColorStep] = [
-            status_bar.ColorStep(LightTransitionType.instant, 1000, status_bar.OFF),
+            status_bar.ColorStep(LightTransitionType.linear, 250, status_bar.OFF),
+            status_bar.ColorStep(LightTransitionType.linear, 750, status_bar.OFF),
             status_bar.ColorStep(LightTransitionType.linear, 1000, status_bar.BLUE),
             status_bar.ColorStep(
                 LightTransitionType.linear,

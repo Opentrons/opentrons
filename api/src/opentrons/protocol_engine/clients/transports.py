@@ -103,9 +103,10 @@ class ChildThreadTransport(AbstractSyncTransport):
             loop=self._loop,
         ).result()
 
+        # TODO: this needs to have an actual code
         if command.error is not None:
             error = command.error
-            raise ProtocolEngineError(f"{error.errorType}: {error.detail}")
+            raise ProtocolEngineError(message=f"{error.errorType}: {error.detail}")
 
         # FIXME(mm, 2023-04-10): This assert can easily trigger from this sequence:
         #

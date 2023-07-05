@@ -22,7 +22,7 @@ import {
   NON_DETERMINISTIC_COMMAND_KEY,
 } from '../__fixtures__'
 import {
-  mockMoveLabwareCommand,
+  mockMoveLabwareCommandFromSlot,
   mockPauseCommandWithStartTime,
   mockRunData,
 } from '../../InterventionModal/__fixtures__'
@@ -118,25 +118,28 @@ describe('RunProgressMeter', () => {
     getByText('Not started yet')
     getByText('Download run log')
   })
-  it('should render an intervention modal when lastRunCommand is a pause command', () => {
+  it('should render an intervention modal when lastRunCommand is a pause command', async () => {
     mockUseAllCommandsQuery.mockReturnValue({
       data: { data: [mockPauseCommandWithStartTime], meta: { totalLength: 1 } },
     } as any)
     mockUseRunQuery.mockReturnValue({ data: { data: { labware: [] } } } as any)
     mockUseCommandQuery.mockReturnValue({ data: null } as any)
     mockUseMostRecentCompletedAnalysis.mockReturnValue({} as any)
-    const { getByText } = render(props)
-    expect(getByText('MOCK INTERVENTION MODAL')).toBeTruthy()
+    const { findByText } = render(props)
+    expect(await findByText('MOCK INTERVENTION MODAL')).toBeTruthy()
   })
 
-  it('should render an intervention modal when lastRunCommand is a move labware command', () => {
+  it('should render an intervention modal when lastRunCommand is a move labware command', async () => {
     mockUseAllCommandsQuery.mockReturnValue({
-      data: { data: [mockMoveLabwareCommand], meta: { totalLength: 1 } },
+      data: {
+        data: [mockMoveLabwareCommandFromSlot],
+        meta: { totalLength: 1 },
+      },
     } as any)
     mockUseRunQuery.mockReturnValue({ data: { data: mockRunData } } as any)
     mockUseCommandQuery.mockReturnValue({ data: null } as any)
     mockUseMostRecentCompletedAnalysis.mockReturnValue({} as any)
-    const { getByText } = render(props)
-    expect(getByText('MOCK INTERVENTION MODAL')).toBeTruthy()
+    const { findByText } = render(props)
+    expect(await findByText('MOCK INTERVENTION MODAL')).toBeTruthy()
   })
 })

@@ -15,6 +15,7 @@ import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
 } from '../utils'
+import { SetupInstructionsModal } from '../SetupInstructionsModal'
 import { ProtocolSetupModules } from '..'
 
 jest.mock('@opentrons/shared-data/js/helpers')
@@ -24,6 +25,7 @@ jest.mock(
 )
 jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../utils')
+jest.mock('../SetupInstructionsModal')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -42,6 +44,9 @@ const mockGetUnmatchedModulesForProtocol = getUnmatchedModulesForProtocol as jes
 >
 const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
   typeof useMostRecentCompletedAnalysis
+>
+const mockSetupInstructionsModal = SetupInstructionsModal as jest.MockedFunction<
+  typeof SetupInstructionsModal
 >
 
 const RUN_ID = "otie's run"
@@ -79,6 +84,9 @@ describe('ProtocolSetupModules', () => {
     when(mockGetDeckDefFromRobotType)
       .calledWith('OT-3 Standard')
       .mockReturnValue(ot3StandardDeckDef as any)
+    mockSetupInstructionsModal.mockReturnValue(
+      <div>mock SetupInstructionsModal</div>
+    )
   })
 
   afterEach(() => {
@@ -105,6 +113,6 @@ describe('ProtocolSetupModules', () => {
     const [{ getByText }] = render()
 
     getByText('Setup Instructions').click()
-    getByText('TODO: setup instructions modal')
+    getByText('mock SetupInstructionsModal')
   })
 })

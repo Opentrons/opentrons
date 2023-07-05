@@ -183,6 +183,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             as="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             data-testid={`ProtocolCard_${protocolDisplayName}`}
+            overflowWrap="anywhere"
           >
             {protocolDisplayName}
           </StyledText>

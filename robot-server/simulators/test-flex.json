@@ -1,19 +1,20 @@
 {
   "machine": "OT-3 Standard",
+  "strict_attached_instruments": false,
   "attached_instruments": {
     "right": {
-      "model": "p1000_single_v3.4",
+      "model": "p1000_single_3.4",
       "id": "321",
       "max_volume": 1000,
-      "name": "p1000_single",
+      "name": "p1000_single_gen3",
       "tip_length": 0,
       "channels": 1
     },
     "left": {
-      "model": "p50_single_v3.4",
+      "model": "p50_single_3.4",
       "id": "123",
       "max_volume": 50,
-      "name": "p50_single",
+      "name": "p50_single_gen3",
       "tip_length": 0,
       "channels": 1
     }

@@ -19,7 +19,7 @@ from typing import (
 )
 
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import ot3_pipette_config, gripper_config
+from opentrons.config import gripper_config
 from .ot3utils import (
     axis_convert,
     create_move_group,
@@ -60,11 +60,16 @@ from opentrons.hardware_control.types import (
     UpdateState,
     SubSystem,
     SubSystemState,
+    TipStateType,
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control import status_bar
 
 from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+    load_data as load_pipette_data,
+)
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
@@ -149,7 +154,7 @@ class OT3Simulator:
             if not passed_ai or not passed_ai.get("model"):
                 return pipette_spec
 
-            if ot3_pipette_config.supported_pipette(
+            if pipette_load_name.supported_pipette(
                 cast(PipetteModel, passed_ai["model"])
             ):
                 pipette_spec["model"] = cast(PipetteModel, passed_ai.get("model"))
@@ -267,6 +272,12 @@ class OT3Simulator:
         """Get the encoder current position."""
         return axis_convert(self._encoder_position, 0.0)
 
+    @asynccontextmanager
+    async def monitor_overpressure(
+        self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
+    ) -> AsyncIterator[None]:
+        yield
+
     @ensure_yield
     async def liquid_probe(
         self,
@@ -353,6 +364,10 @@ class OT3Simulator:
         _ = create_gripper_jaw_hold_group(encoder_position_um)
         self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
 
+    async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+        """Get the state of the tip ejector flag for a given mount."""
+        pass
+
     @ensure_yield
     async def tip_action(
         self,
@@ -396,7 +411,7 @@ class OT3Simulator:
         # TODO (lc 12-05-2022) When the time comes, we should think about supporting
         # backwards compatability -- hopefully not relying on config keys only,
         # but TBD.
-        if expected_instr and not ot3_pipette_config.supported_pipette(
+        if expected_instr and not pipette_load_name.supported_pipette(
             cast(PipetteModel, expected_instr)
         ):
             raise RuntimeError(
@@ -410,9 +425,12 @@ class OT3Simulator:
                     )
                 )
             else:
+                converted_name = pipette_load_name.convert_pipette_name(expected_instr)
                 return {
-                    "config": ot3_pipette_config.load_ot3_pipette(
-                        ot3_pipette_config.convert_pipette_name(expected_instr)
+                    "config": load_pipette_data.load_definition(
+                        converted_name.pipette_type,
+                        converted_name.pipette_channels,
+                        converted_name.pipette_version,
                     ),
                     "id": None,
                 }
@@ -422,17 +440,23 @@ class OT3Simulator:
             # constructor of this class)
 
             # OR Instrument detected and no expected instrument specified
+            converted_name = pipette_load_name.convert_pipette_model(found_model)
             return {
-                "config": ot3_pipette_config.load_ot3_pipette(
-                    ot3_pipette_config.convert_pipette_model(found_model)
+                "config": load_pipette_data.load_definition(
+                    converted_name.pipette_type,
+                    converted_name.pipette_channels,
+                    converted_name.pipette_version,
                 ),
                 "id": init_instr["id"],
             }
         elif expected_instr:
             # Expected instrument specified and no instrument detected
+            converted_name = pipette_load_name.convert_pipette_name(expected_instr)
             return {
-                "config": ot3_pipette_config.load_ot3_pipette(
-                    ot3_pipette_config.convert_pipette_name(expected_instr)
+                "config": load_pipette_data.load_definition(
+                    converted_name.pipette_type,
+                    converted_name.pipette_channels,
+                    converted_name.pipette_version,
                 ),
                 "id": None,
             }

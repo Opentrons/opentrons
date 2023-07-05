@@ -5,10 +5,17 @@ if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware, Well
     from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
     from opentrons.protocol_api.module_contexts import ModuleContext
-
+    from opentrons.protocol_api._types import OffDeckType
 
 WrappableLabwareLike = Union[
-    "Labware", "Well", str, "ModuleGeometry", "LabwareLike", None, "ModuleContext"
+    "Labware",
+    "Well",
+    str,
+    "ModuleGeometry",
+    "LabwareLike",
+    None,
+    "OffDeckType",
+    "ModuleContext",
 ]
 
 
@@ -18,6 +25,7 @@ class LabwareLikeType(int, Enum):
     WELL = auto()
     MODULE = auto()
     NONE = auto()
+    OFF_DECK = auto()
 
 
 class LabwareLike:
@@ -33,6 +41,7 @@ class LabwareLike:
             ModuleGeometry,
         )
         from opentrons.protocol_api.module_contexts import ModuleContext
+        from opentrons.protocol_api._types import OffDeckType
 
         self._labware_like = labware_like
         self._type = LabwareLikeType.NONE
@@ -55,6 +64,9 @@ class LabwareLike:
             self._type = self._labware_like._type
             self._as_str = self._labware_like._as_str
             self._labware_like = self._labware_like.object
+        elif isinstance(self._labware_like, OffDeckType):
+            self._type = LabwareLikeType.OFF_DECK
+            self._as_str = repr(self._labware_like)
         else:
             self._as_str = ""
 

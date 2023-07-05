@@ -27,7 +27,7 @@ import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
 import { StyledText } from '../../atoms/text'
 import { Divider } from '../../atoms/structure'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import {
   deleteCustomLabwareFile,
@@ -125,14 +125,18 @@ export function CustomLabwareOverflowMenu(
           <MenuItem onClick={handleClickLabwareCreator}>
             <StyledText css={TYPOGRAPHY.linkPSemiBold}>
               {t('open_labware_creator')}
-              <Icon name="open-in-new" height="10px" marginLeft="0.375rem" />
+              <Icon
+                name="open-in-new"
+                height="10px"
+                marginLeft={SPACING.spacing6}
+              />
             </StyledText>
           </MenuItem>
         </Flex>
       )}
       {showDeleteConfirmation && (
         <Portal level="top">
-          <Modal
+          <LegacyModal
             type="warning"
             title={t('delete_this_labware')}
             onClose={handleCancelModal}
@@ -160,7 +164,7 @@ export function CustomLabwareOverflowMenu(
                 </AlertPrimaryButton>
               </Flex>
             </Flex>
-          </Modal>
+          </LegacyModal>
         </Portal>
       )}
     </Flex>

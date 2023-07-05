@@ -14,7 +14,7 @@ import {
 
 import { Portal } from '../../../App/portal'
 import { Banner } from '../../../atoms/Banner'
-import { Modal } from '../../../molecules/Modal'
+import { LegacyModal } from '../../../molecules/LegacyModal'
 import { StyledText } from '../../../atoms/text'
 
 import type { AnalysisError } from '@opentrons/shared-data'
@@ -64,7 +64,7 @@ export function ProtocolAnalysisErrorBanner(
       </Flex>
       {showErrorDetails ? (
         <Portal level="top">
-          <Modal
+          <LegacyModal
             type="error"
             title={t('protocol_analysis_failure')}
             onClose={handleToggleDetails}
@@ -85,7 +85,7 @@ export function ProtocolAnalysisErrorBanner(
                 {t('shared:close')}
               </PrimaryButton>
             </Flex>
-          </Modal>
+          </LegacyModal>
         </Portal>
       ) : null}
     </Banner>

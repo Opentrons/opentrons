@@ -54,6 +54,7 @@ export function WizardRequiredEquipmentList(
             backgroundColor="#16212D33"
             flexDirection={DIRECTION_COLUMN}
             borderRadius={BORDERS.borderRadiusSize3}
+            width="428px"
           >
             {equipmentList.map((requiredEquipmentProps, index) => (
               <Box

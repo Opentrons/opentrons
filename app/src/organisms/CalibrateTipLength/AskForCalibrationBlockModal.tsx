@@ -17,7 +17,7 @@ import { useDispatch } from 'react-redux'
 
 import styles from './styles.css'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
 import { setUseTrashSurfaceForTipCal } from '../../redux/calibration'
@@ -54,7 +54,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
 
   return (
     <Portal level="top">
-      <ModalShell
+      <LegacyModalShell
         width="47rem"
         header={
           <WizardHeader
@@ -125,7 +125,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
             </Flex>
           </Flex>
         </Flex>
-      </ModalShell>
+      </LegacyModalShell>
     </Portal>
   )
 }

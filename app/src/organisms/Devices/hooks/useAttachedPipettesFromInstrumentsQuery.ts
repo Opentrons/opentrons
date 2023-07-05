@@ -14,7 +14,7 @@ export function useAttachedPipettesFromInstrumentsQuery(): AttachedPipettesFromI
   const { data: attachedInstruments } = useInstrumentsQuery()
   return (attachedInstruments?.data ?? []).reduce(
     (acc, instrumentData) => {
-      if (instrumentData.instrumentType !== 'pipette') {
+      if (instrumentData.instrumentType !== 'pipette' || !instrumentData.ok) {
         return acc
       }
       const { mount, instrumentModel } = instrumentData
@@ -22,10 +22,11 @@ export function useAttachedPipettesFromInstrumentsQuery(): AttachedPipettesFromI
         ...acc,
         [mount as Mount]: {
           ...instrumentData,
-          displayName: instrumentModel
-            ? getPipetteModelSpecs(instrumentModel as PipetteModel)
-                ?.displayName ?? ''
-            : '',
+          displayName:
+            instrumentModel != null
+              ? getPipetteModelSpecs(instrumentModel as PipetteModel)
+                  ?.displayName ?? ''
+              : '',
         },
       }
     },
