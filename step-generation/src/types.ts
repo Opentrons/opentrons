@@ -110,6 +110,13 @@ export interface NormalizedPipetteById {
   }
 }
 
+export interface NormalizedAdditionalEquipmentById {
+  [additionalEquipmentId: string]: {
+    name: 'gripper'
+    id: string
+  }
+}
+
 export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteById]
 
 // "entities" have only properties that are time-invariant
@@ -123,7 +130,6 @@ export type PipetteEntity = NormalizedPipette & {
 export interface PipetteEntities {
   [pipetteId: string]: PipetteEntity
 }
-
 // ===== MIX-IN TYPES =====
 export type ChangeTipOptions =
   | 'always'
@@ -494,6 +500,8 @@ export type ErrorType =
   | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
   | 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL'
   | 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL'
+  | 'HEATER_SHAKER_LATCH_CLOSED'
+  | 'LABWARE_OFF_DECK'
 
 export interface CommandCreatorError {
   message: string

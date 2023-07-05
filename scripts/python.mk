@@ -71,3 +71,12 @@ endef
 define python_upload_package
 $(python) -m twine upload --repository-url $(2) $(1) $(3)
 endef
+
+# Get an enhanced version dict of the project
+# parameter 1: name of the package (aka api, robot-server, etc)
+# parameter 2: name of the project (aka robot-stack, ot3, etc)
+# parameter 3: an extra version tag string
+# parameter 4: override python_br_version.py path (default: ../scripts/python_build_utils.py)
+define python_get_git_version
+$(shell $(python) $(if $(4),$(4),../scripts/python_build_utils.py) $(1) $(2) dump_br_version $(if $(3),-e $(3)))
+endef

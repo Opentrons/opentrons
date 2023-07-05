@@ -12,6 +12,7 @@ from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.parse import (
     extract_static_python_info,
+    robot_type_from_static_python_info,
     version_from_static_python_info,
 )
 from opentrons.protocols.api_support.types import APIVersion
@@ -228,20 +229,9 @@ def _analyze_python_protocol(
             f"Unable to extract metadata from {py_file.name}."
         ) from e
 
-    try:
-        api_version = version_from_static_python_info(static_info)
-    except ValueError as e:
-        raise FileIdentificationError(str(e)) from e
-    if api_version is None:
-        raise FileIdentificationError(f"apiLevel not declared in {py_file.name}")
-    if api_version > MAX_SUPPORTED_VERSION:
-        raise FileIdentificationError(
-            f"API version {api_version} is not supported by this "
-            f"robot software. Please either reduce your requested API "
-            f"version or update your robot."
-        )
+    api_version = _get_api_version(static_info, py_file.name)
 
-    robot_type = _robot_type_from_static_python_info(static_info)
+    robot_type = _get_robot_type(static_info)
 
     return IdentifiedPythonMain(
         original_file=py_file,
@@ -251,17 +241,27 @@ def _analyze_python_protocol(
     )
 
 
-def _robot_type_from_static_python_info(
-    static_python_info: StaticPythonInfo,
-) -> RobotType:
-    python_robot_type = (static_python_info.requirements or {}).get("robotType", None)
-    if python_robot_type in (None, "OT-2"):
-        return "OT-2 Standard"
-    # Allow "OT-3" as a deprecated alias of "Flex" to support internal-to-Opentrons Python protocols
-    # that were written before the "Flex" name existed.
-    elif python_robot_type in ("Flex", "OT-3"):
-        return "OT-3 Standard"
-    else:
+def _get_api_version(
+    static_python_info: StaticPythonInfo, file_name_for_error: str
+) -> APIVersion:
+    try:
+        api_version = version_from_static_python_info(static_python_info)
+    except ValueError as e:
+        raise FileIdentificationError(str(e)) from e
+    if api_version is None:
+        raise FileIdentificationError(f"apiLevel not declared in {file_name_for_error}")
+    if api_version > MAX_SUPPORTED_VERSION:
         raise FileIdentificationError(
-            f"robotType must be 'OT-2' or 'Flex', not {repr(python_robot_type)}."
+            f"API version {api_version} is not supported by this "
+            f"robot software. Please either reduce your requested API "
+            f"version or update your robot."
         )
+
+    return api_version
+
+
+def _get_robot_type(static_python_info: StaticPythonInfo) -> RobotType:
+    try:
+        return robot_type_from_static_python_info(static_python_info)
+    except ValueError as e:
+        raise FileIdentificationError(str(e)) from e

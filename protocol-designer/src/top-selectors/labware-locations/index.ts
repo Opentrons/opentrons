@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect'
-import { useSelector } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 import {
   THERMOCYCLER_MODULE_TYPE,
@@ -91,8 +90,8 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
 > = createSelector(
   getRobotStateAtActiveItem,
   getModuleEntities,
-  (robotState, moduleEntities) => {
-    const robotType = useSelector(getRobotType)
+  getRobotType,
+  (robotState, moduleEntities, robotType) => {
     const deckDef = getDeckDefFromRobotType(robotType)
     const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
     if (robotState == null) return null
@@ -123,7 +122,11 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
               {
                 name: `${getModuleDisplayName(
                   moduleEntities[modId].model
-                )} in slot ${modOnDeck.slot}`,
+                )} in slot ${
+                  modOnDeck.slot === 'span7_8_10_11'
+                    ? '7, 8, 10, 11'
+                    : modOnDeck.slot
+                }`,
                 value: modId,
               },
             ]
@@ -141,7 +144,17 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
       )
       .map(slotId => ({ name: slotId, value: slotId }))
 
-    return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions]
+    const offDeckSlot = Object.values(labware)
+      .map(lw => lw.slot)
+      .find(slot => slot === 'offDeck')
+    const offDeck =
+      offDeckSlot !== 'offDeck' ? { name: 'Off Deck', value: 'offDeck' } : null
+
+    if (offDeck == null) {
+      return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions]
+    } else {
+      return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions, offDeck]
+    }
   }
 )
 

@@ -242,6 +242,10 @@ push-ot3-gravimetric:
 	$(MAKE) apply-patches-gravimetric
 	-$(MAKE) sync-sw-ot3
 	$(MAKE) remove-patches-gravimetric
+	scp -r -O hardware_testing/labware/opentrons_flex_96_tiprack_50ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	scp -r -O hardware_testing/labware/opentrons_flex_96_tiprack_200ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	scp -r -O hardware_testing/labware/opentrons_flex_96_tiprack_1000ul_adp/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
+	scp -r -O hardware_testing/labware/radwag_pipette_calibration_vial/ root@$(host):/data/labware/v2/custom_definitions/custom_beta/
 
 .PHONY: apply-patches-gravimetric
 apply-patches-gravimetric:
@@ -251,15 +255,20 @@ apply-patches-gravimetric:
 remove-patches-gravimetric:
 	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --reverse --allow-empty
 
+upstream ?= origin/edge
 .PHONY: update-patches-gravimetric
 update-patches-gravimetric:
 	rm ./hardware_testing/gravimetric/overrides/*.patch
-	cd ../ && git diff origin/edge ./hardware/** > ./hardware-testing/hardware_testing/gravimetric/overrides/hardware.patch
-	cd ../ && git diff origin/edge ./api/** > ./hardware-testing/hardware_testing/gravimetric/overrides/api.patch
-	cd ../ && git diff origin/edge ./shared-data/** > ./hardware-testing/hardware_testing/gravimetric/overrides/shared-data.patch
-	cd ../ && git diff origin/edge ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/robot-server.patch
+	cd ../ && git diff $(upstream) ./hardware/** > ./hardware-testing/hardware_testing/gravimetric/overrides/hardware.patch
+	cd ../ && git diff $(upstream) ./api/** > ./hardware-testing/hardware_testing/gravimetric/overrides/api.patch
+	cd ../ && git diff $(upstream) ./shared-data/** > ./hardware-testing/hardware_testing/gravimetric/overrides/shared-data.patch
+	cd ../ && git diff $(upstream) ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/robot-server.patch
 	$(MAKE) remove-patches-gravimetric
 
 .PHONY: push-photometric-ot2
 push-photometric-ot2:
 	scp -r -O photometric-ot2/photometric_ot2 root@$(host):/data/user_storage
+
+.PHONY: get-latest-tag
+get-latest-tag:
+	git tag -l --sort=-v:refname "ot3@*" --merged | (head -n 1 || Select -First 1)

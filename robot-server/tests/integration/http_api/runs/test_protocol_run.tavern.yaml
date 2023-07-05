@@ -279,3 +279,4 @@ stages:
           - id: 'ProtocolUsedByRun'
             title: 'Protocol Used by Run'
             detail: 'Protocol {protocol_id} is used by a run and cannot be deleted.'
+            errorCode: '4000'

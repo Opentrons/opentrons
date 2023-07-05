@@ -55,6 +55,7 @@ export const GEN1: 'GEN1' = 'GEN1'
 // pipette mounts
 export const LEFT: 'left' = 'left'
 export const RIGHT: 'right' = 'right'
+export const EXTENSION: 'extension' = 'extension'
 
 // fake slot that PD uses to represent the slot the thermocycler sits in
 export const SPAN7_8_10_11_SLOT: 'span7_8_10_11' = 'span7_8_10_11'

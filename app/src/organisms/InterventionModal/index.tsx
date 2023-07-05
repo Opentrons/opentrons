@@ -28,10 +28,8 @@ import { StyledText } from '../../atoms/text'
 import { PauseInterventionContent } from './PauseInterventionContent'
 import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
 
-import type { RobotType } from '@opentrons/shared-data'
-import type { RunCommandSummary } from '@opentrons/api-client'
-import type { LabwareRenderInfoById } from '../Devices/ProtocolRun/utils/getLabwareRenderInfo'
-import type { ModuleRenderInfoById } from '../Devices/hooks'
+import type { RunCommandSummary, RunData } from '@opentrons/api-client'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -91,57 +89,41 @@ export interface InterventionModalProps {
   robotName: string
   onResume: () => void
   command: RunCommandSummary
-  robotType?: RobotType
-  moduleRenderInfo?: ModuleRenderInfoById
-  labwareRenderInfo?: LabwareRenderInfoById
-  labwareName?: string
-  oldDisplayLocation?: string
-  newDisplayLocation?: string
+  run: RunData
+  analysis: CompletedProtocolAnalysis | null
 }
 
 export function InterventionModal({
   robotName,
   onResume,
   command,
-  robotType,
-  moduleRenderInfo,
-  labwareRenderInfo,
-  labwareName,
-  oldDisplayLocation,
-  newDisplayLocation,
+  run,
+  analysis,
 }: InterventionModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
 
-  let modalContent: JSX.Element | null = null
-
-  switch (command.commandType) {
-    case 'pause': // legacy pause command
-    case 'waitForResume':
-      modalContent = (
+  const childContent = React.useMemo(() => {
+    if (
+      command.commandType === 'waitForResume' ||
+      command.commandType === 'pause' // legacy pause command
+    ) {
+      return (
         <PauseInterventionContent
           startedAt={command.startedAt ?? null}
-          message={command.params?.message ?? null}
+          message={command.params.message ?? null}
         />
       )
-      break
-    case 'moveLabware':
-      modalContent =
-        robotType != null &&
-        moduleRenderInfo != null &&
-        oldDisplayLocation != null &&
-        newDisplayLocation != null &&
-        labwareRenderInfo != null ? (
-          <MoveLabwareInterventionContent
-            robotType={robotType}
-            moduleRenderInfo={moduleRenderInfo}
-            labwareRenderInfo={labwareRenderInfo}
-            labwareName={labwareName ?? ''}
-            oldDisplayLocation={oldDisplayLocation}
-            newDisplayLocation={newDisplayLocation}
-          />
-        ) : null
-      break
-  }
+    } else if (command.commandType === 'moveLabware') {
+      return <MoveLabwareInterventionContent {...{ command, run, analysis }} />
+    } else {
+      return null
+    }
+  }, [
+    command.id,
+    analysis?.status,
+    run.labware.map(l => l.id).join(),
+    run.modules.map(m => m.id).join(),
+  ])
 
   return (
     <Flex
@@ -167,7 +149,7 @@ export function InterventionModal({
             </StyledText>
           </Box>
           <Box {...CONTENT_STYLE}>
-            {modalContent}
+            {childContent}
             <Box {...FOOTER_STYLE}>
               <StyledText>
                 <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} href="" external>

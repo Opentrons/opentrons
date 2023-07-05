@@ -125,7 +125,7 @@ export function ProtocolWithLastRun({
 
   return isProtocolFetching ? (
     <Skeleton
-      height="27.25rem"
+      height="24.5rem"
       width="25.8125rem"
       backgroundSize="64rem"
       borderRadius={BORDERS.borderRadiusSize3}
@@ -139,6 +139,7 @@ export function ProtocolWithLastRun({
       gridGap={SPACING.spacing24}
       backgroundColor={isReadyToBeReRun ? COLORS.green3 : COLORS.yellow3}
       width="25.8125rem"
+      height="24.5rem"
       borderRadius={BORDERS.borderRadiusSize4}
       onClick={handleCardClick}
     >

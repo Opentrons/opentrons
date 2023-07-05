@@ -19,6 +19,7 @@ import {
   UpdateChannel,
 } from '../../../../organisms/RobotSettingsDashboard'
 import { getBuildrootUpdateAvailable } from '../../../../redux/buildroot'
+import { useNetworkConnection } from '../../hooks'
 import { useLEDLights } from '../../../../organisms/Devices/hooks'
 
 import { RobotSettingsDashboard } from '..'
@@ -71,6 +72,9 @@ const mockuseLEDLights = useLEDLights as jest.MockedFunction<
 const mockGetBuildrootUpdateAvailable = getBuildrootUpdateAvailable as jest.MockedFunction<
   typeof getBuildrootUpdateAvailable
 >
+const mockUseNetworkConnection = useNetworkConnection as jest.MockedFunction<
+  typeof useNetworkConnection
+>
 
 const render = () => {
   return renderWithProviders(
@@ -101,6 +105,7 @@ describe('RobotSettingsDashboard', () => {
       lightsEnabled: false,
       toggleLights: mockToggleLights,
     })
+    mockUseNetworkConnection.mockReturnValue({} as any)
   })
 
   it('should render Navigation', () => {

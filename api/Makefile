@@ -29,6 +29,9 @@ wheel_file = dist/$(call python_get_wheelname,api,$(project_rs_default),opentron
 # Find the version of the sdist file from git using a helper script.
 sdist_file = dist/$(call python_get_sdistname,api,$(project_ot3_default),opentrons)
 
+# Find the branch, sha, version that will be used to update the VERSION.json file
+version_file = $(call python_get_git_version,api,$(project_ot3_default),opentrons)
+
 # These variables are for simulating python protocols
 sim_log_level ?= info
 simfile ?=
@@ -177,7 +180,7 @@ push: push-no-restart
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: sdist
 	echo $(sdist_file)
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src)
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src,,$(version_file))
 	ssh $(ssh_opts) root@$(host) "mount -o remount,rw / && mkdir -p /usr/local/bin"
 	scp $(ssh_opts) ./src/opentrons/hardware_control/scripts/ot3repl root@$(host):/usr/local/bin/ot3repl
 	scp $(ssh_opts) ./src/opentrons/hardware_control/scripts/ot3gripper root@$(host):/usr/local/bin/ot3gripper

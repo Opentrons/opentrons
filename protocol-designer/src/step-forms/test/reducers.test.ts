@@ -336,6 +336,7 @@ describe('labwareInvariantProperties reducer', () => {
     })
   })
 })
+
 describe('moduleInvariantProperties reducer', () => {
   let prevState: Record<string, ModuleEntity>
   const existingModuleId = 'existingModuleId'
@@ -977,42 +978,39 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       }> = [
         {
           testName: 'create mag mod -> override mag step module id',
-          // @ts-expect-error(sa, 2021-6-14): not a valid module model
           action: {
             type: 'CREATE_MODULE',
             payload: {
               id: 'newMagdeckId',
               slot: '1',
               type: MAGNETIC_MODULE_TYPE,
-              model: 'someMagModel',
+              model: 'magneticModuleV1',
             },
           },
           expectedModuleId: 'newMagdeckId',
         },
         {
           testName: 'create temp mod -> DO NOT override mag step module id',
-          // @ts-expect-error(sa, 2021-6-14): not a valid module model
           action: {
             type: 'CREATE_MODULE',
             payload: {
               id: 'tempdeckId',
               slot: '1',
               type: TEMPERATURE_MODULE_TYPE,
-              model: 'someTempModel',
+              model: 'temperatureModuleV1',
             },
           },
           expectedModuleId: 'magdeckId',
         },
         {
           testName: 'create TC -> DO NOT override mag step module id',
-          // @ts-expect-error(sa, 2021-6-14): not a valid module model
           action: {
             type: 'CREATE_MODULE',
             payload: {
               id: 'ThermocyclerId',
               slot: '1',
               type: THERMOCYCLER_MODULE_TYPE,
-              model: 'someThermoModel',
+              model: 'thermocyclerModuleV1',
             },
           },
           expectedModuleId: 'magdeckId',
@@ -1025,42 +1023,39 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       }> = [
         {
           testName: 'create TC -> override TC step module id',
-          // @ts-expect-error(sa, 2021-6-14): not a valid module model
           action: {
             type: 'CREATE_MODULE',
             payload: {
               id: 'NewTCId',
               slot: SPAN7_8_10_11_SLOT,
               type: THERMOCYCLER_MODULE_TYPE,
-              model: 'someTCModel',
+              model: 'thermocyclerModuleV1',
             },
           },
           expectedModuleId: 'NewTCId',
         },
         {
           testName: 'create temp mod -> DO NOT override TC step module id',
-          // @ts-expect-error(sa, 2021-6-14): not a valid module model
           action: {
             type: 'CREATE_MODULE',
             payload: {
               id: 'tempdeckId',
               slot: '1',
               type: TEMPERATURE_MODULE_TYPE,
-              model: 'someTempModel',
+              model: 'temperatureModuleV1',
             },
           },
           expectedModuleId: 'TCId',
         },
         {
           testName: 'create magnetic mod -> DO NOT override TC step module id',
-          // @ts-expect-error(sa, 2021-6-14): not a valid module model
           action: {
             type: 'CREATE_MODULE',
             payload: {
               id: 'newMagdeckId',
               slot: '1',
               type: MAGNETIC_MODULE_TYPE,
-              model: 'someMagModel',
+              model: 'magneticModuleV2',
             },
           },
           expectedModuleId: 'TCId',
@@ -1652,6 +1647,7 @@ describe('unsavedForm reducer', () => {
     'SAVE_STEP_FORM',
     'SELECT_TERMINAL_ITEM',
     'SELECT_MULTIPLE_STEPS',
+    'TOGGLE_IS_GRIPPER_REQUIRED',
   ]
   actionTypes.forEach(actionType => {
     it(`should clear the unsaved form when any ${actionType} action is dispatched`, () => {

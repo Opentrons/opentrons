@@ -30,10 +30,6 @@ import {
   useCommandQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
-import {
-  OT2_STANDARD_MODEL,
-  getRobotTypeFromLoadedLabware,
-} from '@opentrons/shared-data'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { Portal } from '../../App/portal'
@@ -43,21 +39,11 @@ import { CommandText } from '../CommandText'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { InterventionModal } from '../InterventionModal'
 import { ProgressBar } from '../../atoms/ProgressBar'
-import { getLoadedLabware } from '../CommandText/utils/accessors'
-import {
-  useDownloadRunLog,
-  useLabwareRenderInfoForRunById,
-  useModuleRenderInfoForProtocolById,
-} from '../Devices/hooks'
+import { useDownloadRunLog } from '../Devices/hooks'
 import { InterventionTicks } from './InterventionTicks'
-import {
-  isInterventionCommand,
-  getLabwareDisplayLocationFromRunData,
-  getLabwareNameFromRunData,
-} from '../InterventionModal/utils'
+import { isInterventionCommand } from '../InterventionModal/utils'
 
 import type { RunStatus } from '@opentrons/api-client'
-import type { LabwareLocation } from '@opentrons/shared-data'
 
 const TERMINAL_RUN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,
@@ -79,7 +65,6 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     setShowInterventionModal,
   ] = React.useState<boolean>(false)
   const { t } = useTranslation('run_details')
-  const { t: commandTextTranslator } = useTranslation('protocol_command_text')
   const runStatus = useRunStatus(runId)
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
@@ -177,7 +162,11 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     isInterventionCommand(lastRunCommand) &&
     !showInterventionModal
   ) {
-    setShowInterventionModal(true)
+    // this setTimeout is a hacky way to make sure the modal closes when we tell it to
+    // we can run into issues when there are 2 back to back move labware commands
+    // the modal never really un-renders and so the animations break after the first modal
+    // not really a fan of this, but haven't been able to fix the problem any other way
+    setTimeout(() => setShowInterventionModal(true), 0)
   }
 
   const onDownloadClick: React.MouseEventHandler<HTMLAnchorElement> = e => {
@@ -187,68 +176,25 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
     downloadRunLog()
   }
 
-  const moduleRenderInfoById = useModuleRenderInfoForProtocolById(
-    robotName,
-    runId
-  )
-  const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
-
-  let oldLabwareLocation: LabwareLocation | null = null
-  if (lastRunCommand?.commandType === 'moveLabware' && runData != null) {
-    oldLabwareLocation =
-      getLoadedLabware(runData, lastRunCommand.params.labwareId)?.location ??
-      null
-  }
-  const robotType =
-    runData != null
-      ? getRobotTypeFromLoadedLabware(runData.labware)
-      : OT2_STANDARD_MODEL
-
   return (
     <>
       {showInterventionModal &&
-      analysis != null &&
+      lastRunCommand != null &&
+      isInterventionCommand(lastRunCommand) &&
+      analysisCommands != null &&
       runStatus != null &&
       runData != null &&
-      lastRunCommand != null &&
-      !TERMINAL_RUN_STATUSES.includes(runStatus) &&
-      isInterventionCommand(lastRunCommand) ? (
+      !TERMINAL_RUN_STATUSES.includes(runStatus) ? (
         <Portal level="top">
           <InterventionModal
             robotName={robotName}
             command={lastRunCommand}
-            moduleRenderInfo={moduleRenderInfoById}
-            labwareRenderInfo={labwareRenderInfoById}
-            labwareName={getLabwareNameFromRunData(
-              runData,
-              lastRunCommand.params.labwareId,
-              analysis.commands
-            )}
-            oldDisplayLocation={
-              oldLabwareLocation != null
-                ? getLabwareDisplayLocationFromRunData(
-                    runData,
-                    oldLabwareLocation,
-                    commandTextTranslator,
-                    robotType
-                  )
-                : ''
-            }
-            newDisplayLocation={
-              lastRunCommand?.commandType === 'moveLabware'
-                ? getLabwareDisplayLocationFromRunData(
-                    runData,
-                    lastRunCommand.params.newLocation,
-                    commandTextTranslator,
-                    robotType
-                  )
-                : ''
-            }
-            robotType={robotType}
             onResume={() => {
               setShowInterventionModal(false)
               resumeRunHandler()
             }}
+            run={runData}
+            analysis={analysis}
           />
         </Portal>
       ) : null}
