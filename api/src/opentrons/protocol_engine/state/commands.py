@@ -265,7 +265,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 id=action.error_id,
                 createdAt=action.failed_at,
                 error=action.error,
-                unexepctedError=action.unexepctedError,
+                unexepctedError=action.unexpectedError,
             )
             log.info(f"error_occurrence:: {error_occurrence}")
             prev_entry = self._state.commands_by_id[action.command_id]
@@ -581,7 +581,7 @@ class CommandView(HasState[CommandState]):
                             wrapped_error=command.error
                         )
                     else:
-                        raise ProtocolCommandFailedError()
+                        raise ProtocolCommandFailedError(command.error.detail)
             return True
         else:
             return False
