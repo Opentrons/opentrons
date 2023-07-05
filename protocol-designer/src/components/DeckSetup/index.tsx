@@ -11,6 +11,7 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   RobotWorkSpaceRenderProps,
   Module,
+  SlotLabels,
 } from '@opentrons/components'
 import {
   MODULES_WITH_COLLISION_ISSUES,
@@ -457,17 +458,20 @@ export const DeckSetup = (): JSX.Element => {
           height="100%"
         >
           {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
-            <DeckSetupContents
-              robotType={robotType}
-              activeDeckSetup={activeDeckSetup}
-              selectedTerminalItemId={selectedTerminalItemId}
-              {...{
-                deckDef,
-                deckSlotsById,
-                getRobotCoordsFromDOMCoords,
-                showGen1MultichannelCollisionWarnings,
-              }}
-            />
+            <>
+              <DeckSetupContents
+                robotType={robotType}
+                activeDeckSetup={activeDeckSetup}
+                selectedTerminalItemId={selectedTerminalItemId}
+                {...{
+                  deckDef,
+                  deckSlotsById,
+                  getRobotCoordsFromDOMCoords,
+                  showGen1MultichannelCollisionWarnings,
+                }}
+              />
+              <SlotLabels robotType={robotType} />
+            </>
           )}
         </RobotWorkSpace>
       </div>
