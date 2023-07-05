@@ -238,7 +238,7 @@ export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
   params: { ..._defaultTouchTipParams, ...bakedParams, wellName, ...params },
 })
 export const delayCommand = (seconds: number): CreateCommand => ({
-  commandType: 'delay',
+  commandType: 'waitForDuration',
   key: expect.any(String),
   params: {
     seconds: seconds,
@@ -268,7 +268,7 @@ export const delayWithOffset = (
     },
   },
   {
-    commandType: 'delay',
+    commandType: 'waitForDuration',
     key: expect.any(String),
     params: {
       seconds: seconds ?? 12,
