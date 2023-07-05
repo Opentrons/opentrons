@@ -48,7 +48,6 @@ class PhotometricConfig:
     mix: bool
     inspect: bool
     user_volumes: bool
-    gantry_speed: int
     touch_tip: bool
     refill: bool
     pipette_channels: int = 96
