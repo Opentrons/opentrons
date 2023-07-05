@@ -176,8 +176,8 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           commandType: 'loadPipette' as const,
           params: {
             pipetteName: pipettes[pipetteId].name,
-            pipetteId: pipetteId,
             mount: pipette.mount,
+            pipetteId: pipetteId,
           },
         }
         return loadPipetteCommand
@@ -222,11 +222,17 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ): LoadLabwareCreateCommand[] => {
         if (labwareId === FIXED_TRASH_ID) return [...acc]
         const isLabwareOnTopOfModule = labware.slot in initialRobotState.modules
+        const { labwareDefURI, def } = labwareEntities[labwareId]
+        const namespace = def.namespace
+        const version = def.version
         const loadLabwareCommand = {
           key: uuid(),
           commandType: 'loadLabware' as const,
           params: {
             labwareId: labwareId,
+            loadName: labwareDefURI,
+            namespace: namespace,
+            version: version,
             location: isLabwareOnTopOfModule
               ? { moduleId: labware.slot }
               : { slotName: labware.slot },

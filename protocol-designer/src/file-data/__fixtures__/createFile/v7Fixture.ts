@@ -74,9 +74,9 @@ export const robotStateTimeline: Timeline = {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForResume',
           params: {
-            seconds: 1,
+            message: 'wait',
           },
         },
         {
@@ -96,7 +96,7 @@ export const robotStateTimeline: Timeline = {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           params: {
             seconds: 1,
           },
@@ -180,7 +180,7 @@ export const robotStateTimeline: Timeline = {
           },
         },
         {
-          commandType: 'delay',
+          commandType: 'waitForDuration',
           params: {
             seconds: 1,
           },
@@ -202,10 +202,8 @@ export const robotStateTimeline: Timeline = {
           },
         },
         {
-          commandType: 'delay',
-          params: {
-            seconds: 1,
-          },
+          commandType: 'waitForResume',
+          params: {},
         },
         {
           commandType: 'dispense',

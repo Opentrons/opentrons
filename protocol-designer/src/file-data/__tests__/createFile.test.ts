@@ -38,25 +38,20 @@ const mockGetLoadLiquidCommands = getLoadLiquidCommands as jest.MockedFunction<
   typeof getLoadLiquidCommands
 >
 
-const getAjvValidator = (_protocolSchema: Record<string, any>) => {
-  const ajv = new Ajv({
-    allErrors: true,
-    jsonPointers: true,
-  })
-  // v3 and v4 protocol schema contain reference to v2 labware schema, so give AJV access to it
-  ajv.addSchema(labwareV2Schema)
-  ajv.addSchema(commandV7Schema)
-  const validateProtocol = ajv.compile(_protocolSchema)
-  return validateProtocol
-}
+const ajv = new Ajv({
+  allErrors: true,
+  jsonPointers: true,
+})
+// v3 and v4 protocol schema contain reference to v2 labware schema, so give AJV access to it
+// and add v7 command schema
+ajv.addSchema(labwareV2Schema)
+ajv.addSchema(commandV7Schema)
 
-const expectResultToMatchSchema = (
-  result: any,
-  _protocolSchema: Record<string, any>
-): void => {
-  const validate = getAjvValidator(_protocolSchema)
-  const valid = validate(result)
-  const validationErrors = validate.errors
+const validateProtocol = ajv.compile(protocolV7Schema)
+
+const expectResultToMatchSchema = (result: any): void => {
+  const valid = validateProtocol(result)
+  const validationErrors = validateProtocol.errors
 
   if (validationErrors) {
     console.log(JSON.stringify(validationErrors, null, 4))
@@ -91,7 +86,8 @@ describe('createFile selector', () => {
       labwareNicknamesById,
       labwareDefsByURI
     )
-    expectResultToMatchSchema(result, protocolV7Schema)
+    expectResultToMatchSchema(result)
+
     // check for false positives: if the output is lacking these entities, we don't
     // have the opportunity to validate their part of the schema
     expect(!isEmpty(result.labware)).toBe(true)
