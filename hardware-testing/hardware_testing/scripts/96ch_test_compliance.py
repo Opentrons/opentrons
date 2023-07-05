@@ -64,7 +64,7 @@ async def _main() -> None:
             await api.home_gripper_jaw()
 
             # home every 50 cycles in case we have drifted
-            if (c + 1) % 50 == 0:
+            if (i + 1) % 50 == 0:
                 await api.home()
                 home_pos = await api.gantry_position(OT3Mount.LEFT)
                 home_pos_grip = await api.gantry_position(OT3Mount.GRIPPER)
