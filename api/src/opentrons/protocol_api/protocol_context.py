@@ -579,9 +579,7 @@ class ProtocolContext(CommandPublisher):
             )
 
         location: Union[ModuleCore, LabwareCore, OffDeckType, DeckSlotName]
-        if isinstance(new_location, Labware):
-            location = new_location._core
-        elif isinstance(new_location, ModuleContext):
+        if isinstance(new_location, (Labware, ModuleContext)):
             location = new_location._core
         elif isinstance(new_location, OffDeckType):
             location = new_location

@@ -573,20 +573,16 @@ class ProtocolCore(
 
         return OffDeckType.OFF_DECK
 
-    @staticmethod
     def _convert_labware_location(
+        self,
         location: Union[
             DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
-        ]
+        ],
     ) -> LabwareLocation:
-        if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
-            return ModuleLocation(moduleId=location.module_id)
-        elif location is OffDeckType.OFF_DECK:
-            return OFF_DECK_LOCATION
-        elif isinstance(location, DeckSlotName):
-            return DeckSlotLocation(slotName=location)
-        elif isinstance(location, LabwareCore):
+        if isinstance(location, LabwareCore):
             return OnLabwareLocation(labwareId=location.labware_id)
+        else:
+            return self._convert_non_stacked_location(location)
 
     @staticmethod
     def _convert_non_stacked_location(
