@@ -23,7 +23,10 @@ import {
 import { useDispatchApiRequest } from '../../redux/robot-api'
 
 import type { Dispatch, State } from '../../redux/types'
-import type { ResetConfigRequest } from '../../redux/robot-admin/types'
+import type {
+  ResetConfigRequest,
+  ResetConfigOption,
+} from '../../redux/robot-admin/types'
 import type { SetSettingOption } from '../../pages/OnDeviceDisplay/RobotSettingsDashboard'
 
 interface LabelProps {
@@ -62,15 +65,15 @@ export function DeviceReset({
   )
   const [dispatchRequest] = useDispatchApiRequest()
 
-  // ToDo (kj:02/07/2023) gripperCalibration might be different since the option isn't implemented yet
-  // Currently boot script will be added in the future
-  const targetOptions = [
+  const targetOptionsOrder = [
     'pipetteOffsetCalibrations',
     'gripperOffsetCalibrations',
     'runsHistory',
+    'bootScripts',
   ]
-  const availableOptions = options.filter(option =>
-    targetOptions.includes(option.id)
+  const availableOptions = options.sort(
+    (a, b) =>
+      targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
   )
   const dispatch = useDispatch<Dispatch>()
 
@@ -80,25 +83,26 @@ export function DeviceReset({
     }
   }
 
-  let subText: string
-  const renderText = (optionId: string): string => {
+  const renderText = (optionId: string): string[] => {
     switch (optionId) {
       case 'pipetteOffsetCalibrations':
-        return t('clear_option_pipette_calibrations')
+        return [t('clear_option_pipette_calibrations')]
       case 'gripperOffsetCalibrations':
-        return t('clear_option_gripper_calibration')
+        return [t('clear_option_gripper_calibration')]
       case 'runsHistory':
-        subText = t('clear_option_runs_history_subtext')
-        return t('clear_option_runs_history')
-      // ToDo (kj:07/01/2023) we need to add factory reset case
-      // Asking a question about text Desktop Factory Reset/Touchscreen Factory rest
+        return [
+          t('clear_option_runs_history'),
+          t('clear_option_runs_history_subtext'),
+        ]
+      case 'bootScripts':
+        return [
+          t('clear_option_boot_scripts'),
+          t('clear_option_boot_scripts_description'),
+        ]
       case 'factoryReset':
-        subText = t(
-          'Resets all settings. You’ll have to redo initial setup before using the robot again.'
-        )
-        return t('factory_reset')
+        return [t('factory_reset'), t('factory_reset_description')]
       default:
-        return ''
+        return []
     }
   }
   React.useEffect(() => {
@@ -140,9 +144,9 @@ export function DeviceReset({
               >
                 <Flex flexDirection={DIRECTION_COLUMN}>
                   <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-                    {renderText(option.id)}
+                    {renderText(option.id)[0]}
                   </StyledText>
-                  {option.id === 'runsHistory' ? (
+                  {renderText(option.id).length === 2 ? (
                     <StyledText
                       as="p"
                       color={
@@ -151,7 +155,7 @@ export function DeviceReset({
                           : COLORS.darkBlack70
                       }
                     >
-                      {subText}
+                      {renderText(option.id)[1]}
                     </StyledText>
                   ) : null}
                 </Flex>
