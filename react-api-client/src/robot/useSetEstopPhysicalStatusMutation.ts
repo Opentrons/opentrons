@@ -16,19 +16,19 @@ import { useHost } from '../api'
 import type { AxiosError } from 'axios'
 
 export type UseSetEstopPhysicalStatusMutationResult = UseMutationResult<
-  EstopState,
+  EstopPhysicalStatus,
   AxiosError,
   EstopPhysicalStatus
 > & {
   setEstopPhysicalStatus: UseMutateFunction<
-    EstopState,
+    EstopPhysicalStatus,
     AxiosError,
     EstopPhysicalStatus
   >
 }
 
 export type UseSetEstopPhysicalStatusMutationOptions = UseMutationOptions<
-  EstopState,
+  EstopPhysicalStatus,
   AxiosError,
   EstopPhysicalStatus
 >
@@ -41,7 +41,11 @@ export function useSetEstopPhysicalStatusMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
-  const mutation = useMutation<EstopState, AxiosError, EstopPhysicalStatus>(
+  const mutation = useMutation<
+    EstopPhysicalStatus,
+    AxiosError,
+    EstopPhysicalStatus
+  >(
     [host, 'robot', 'control/acknowledgeEstopDisengage'],
     (newStatus: EstopPhysicalStatus) =>
       setEstopPhysicalStatus(host as HostConfig, newStatus)
