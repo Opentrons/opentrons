@@ -290,12 +290,23 @@ def _run_trial(
         liquid_tracker.set_start_volume_from_liquid_height(
             source, _liquid_height, name="Dye"
         )
-    reservoir_ml = round(liquid_tracker.get_volume(source) / 1000, 1)
-    print(f"software thinks there is {reservoir_ml} mL of liquid in the reservoir")
-    assert (reservoir_ml * 1000) - _MIN_END_VOLUME_UL > volume * channel_count, (
-        f"not enough volume in reservoir to aspirate {volume} uL "
-        f"across {channel_count} channels"
-    )
+        reservoir_ml = liquid_tracker.get_volume(source)
+        required_ml = max(
+            (volume * channel_count * cfg.trials) + _MIN_END_VOLUME_UL,
+            _MIN_START_VOLUME_UL,
+        )
+        print(
+            f"software thinks there is {reservoir_ml} mL of liquid in the reservoir (required = {required_ml} ml"
+        )
+        if required_ml > _MAX_VOLUME_UL:
+            raise NotImplementedError(
+                "too many trials, refilling reservoir is currently not supported"
+            )
+        elif reservoir_ml < required_ml:
+            raise RuntimeError(
+                f"not enough volume in reservoir to aspirate {volume} uL "
+                f"across {channel_count}x channels for {cfg.trials}x trials"
+            )
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         ctx,
