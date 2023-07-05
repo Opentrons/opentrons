@@ -9,7 +9,6 @@ import type {
   HostConfig,
   Response,
   EstopPhysicalStatus,
-  ResponsePromise,
 } from '@opentrons/api-client'
 import { useHost } from '../../api'
 
