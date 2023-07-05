@@ -1311,8 +1311,11 @@ class OT3API(
             # we can move to the home position without checking the limit switch
             origin = await self._backend.update_position()
             target_pos = {checked_axis: self._backend.home_position()[checked_axis]}
-            moves = self._build_moves(origin, target_pos)
-            await self._backend.move(origin, moves[0], MoveStopCondition.none)
+            try:
+                moves = self._build_moves(origin, target_pos)
+                await self._backend.move(origin, moves[0], MoveStopCondition.none)
+            except ZeroLengthMoveError:
+                self._log.info(f"{axis} already at home position, skip retract")
         else:
             # home the axis
             await self._home_axis(checked_axis)
