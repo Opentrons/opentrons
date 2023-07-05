@@ -297,11 +297,10 @@ def _run_trial(
             liquid_tracker.set_start_volume(source, required_ul)
         reservoir_ul = liquid_tracker.get_volume(source)
         print(
-            f"software thinks there is {reservoir_ul} mL "
-            f"of liquid in the reservoir (required = {required_ul} ml)"
+            f"software thinks there is {round(reservoir_ul / 1000, 1)} mL "
+            f"of liquid in the reservoir (required = {round(required_ul / 1000, 1)} ml)"
         )
         if required_ul <= reservoir_ul < _MAX_VOLUME_UL:
-            print("good")
             break
         elif required_ul > _MAX_VOLUME_UL:
             raise NotImplementedError(
@@ -323,7 +322,9 @@ def _run_trial(
             )
             pipette.move_to(location=source.top().move(channel_offset))
         else:
-            print("huh?")
+            raise RuntimeError(
+                f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
+            )
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         ctx,
