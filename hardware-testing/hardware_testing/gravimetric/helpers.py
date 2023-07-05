@@ -291,3 +291,31 @@ def _get_volumes(
         else:
             raise RuntimeError("you are not the correct branch")
     return sorted(test_volumes, reverse=False)  # lowest volumes first
+
+
+def _load_pipette(
+    ctx: ProtocolContext, cfg: Union[config.GravimetricConfig, config.PhotometricConfig]
+) -> InstrumentContext:
+    load_str_channels = {1: "single_gen3", 8: "multi_gen3", 96: "96"}
+    pip_channels = getattr(cfg, "pipette_channels", 96)
+    if pip_channels not in load_str_channels:
+        raise ValueError(f"unexpected number of channels: {pip_channels}")
+    chnl_str = load_str_channels[pip_channels]
+    pip_name = f"p{cfg.pipette_volume}_{chnl_str}"
+    print(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
+    pipette = ctx.load_instrument(pip_name, cfg.pipette_mount)
+    assert pipette.max_volume == cfg.pipette_volume, (
+        f"expected {cfg.pipette_volume} uL pipette, "
+        f"but got a {pipette.max_volume} uL pipette"
+    )
+    if hasattr(cfg, "gantry_speed"):
+        pipette.default_speed = getattr(cfg, "gantry_speed")
+
+    # NOTE: 8ch QC testing means testing 1 channel at a time,
+    #       so we need to decrease the pick-up current to work with 1 tip.
+    if pipette.channels == 8 and not getattr(cfg, "increment", False):
+        hwapi = get_sync_hw_api(ctx)
+        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+        hwpipette: Pipette = hwapi.hardware_pipettes[mnt.to_mount()]
+        hwpipette.pick_up_configurations.current = 0.2
+    return pipette
