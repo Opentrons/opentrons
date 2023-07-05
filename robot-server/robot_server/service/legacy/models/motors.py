@@ -12,10 +12,11 @@ class MotorName(str, Enum):
     # https://docs.python.org/3/library/enum.html#timeperiod to
     # dynamically create an enum with the same keys as Axis but whose values
     # are also the keys. (ie X=0 becomes  X='X')
-    _ignore_ = "MotorName _current_axis"
+    _ignore_ = "MotorName _axis_name _axis_value"
     MotorName = vars()
-    for _current_axis in types.Axis:
-        MotorName[_current_axis.name] = _current_axis.name.lower()
+    for _axis_name, _axis_value in types.Axis.__members__.items():
+        # We need to use Axis.__members__ in order to access names of aliased axes
+        MotorName[_axis_name] = _axis_name.lower()
 
 
 class EngagedMotor(BaseModel):
@@ -30,6 +31,13 @@ class EngagedMotors(BaseModel):
 
     x: EngagedMotor
     y: EngagedMotor
+    z_l: EngagedMotor
+    z_r: EngagedMotor
+    p_l: EngagedMotor
+    p_r: EngagedMotor
+    q: EngagedMotor
+    g: EngagedMotor
+
     z: EngagedMotor
     a: EngagedMotor
     b: EngagedMotor
