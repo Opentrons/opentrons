@@ -4,7 +4,7 @@ import {
   Flex,
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_AROUND,
-  SPACING_3,
+  SPACING,
 } from '@opentrons/components'
 import styles from './AnnouncementModal.css'
 
@@ -17,7 +17,7 @@ export interface Announcement {
 
 const batchEditStyles = css`
   justify-content: ${JUSTIFY_SPACE_AROUND};
-  padding: ${SPACING_3};
+  padding: ${SPACING.spacing16};
 
   & img {
     height: 13rem;
