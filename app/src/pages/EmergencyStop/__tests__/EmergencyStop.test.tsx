@@ -24,16 +24,9 @@ const render = () => {
 describe('EmergencyStop', () => {
   // Note (kk:06/28/2023) commented test cases will be activated when added the function to check e-stop status
 
-  // it('should render text, image, and button when e-stop button is not connected', () => {
-  //   const [{ getByText, getByRole }] = render()
-  //   getByText('Install the E-stop')
-
-  //   getByText(
-  //     'Connect the E-stop to an auxiliary port on the back of the robot.'
-  //   )
-  //   expect(getByRole('img').getAttribute('src')).toEqual(ESTOP_IMAGE_NAME)
-  //   expect(getByRole('button')).toBeDisabled()
-  // })
+  it.todo(
+    'should render text, image, and button when e-stop button is not connected'
+  )
 
   it('should render text, icon, button when e-stop button is connected', () => {
     const [{ getByText, getByTestId, getByRole }] = render()
@@ -41,10 +34,6 @@ describe('EmergencyStop', () => {
     getByText('E-stop successfully connected')
     expect(getByRole('button')).not.toBeDisabled()
   })
-  // it('should call a mock function when tapping continue button', () => {
-  //   const [{ getByText }] = render(props)
-  //   const button = getByText('Continue')
-  //   button.click()
-  //   expect(mockPush).toHaveBeenCalledWith('/robot-settings/rename-robot')
-  // })
+
+  it.todo('should call a mock function when tapping continue button')
 })
