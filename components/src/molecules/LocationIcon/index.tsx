@@ -43,7 +43,7 @@ const LOCATION_ICON_STYLE = css<{
   width: ${props => props.width ?? 'max-content'};
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: ${SPACING.spacing4}
-      ${props => (props.slotName != null ? SPACING.spacing8 : '0.375rem')};
+      ${props => (props.slotName != null ? SPACING.spacing8 : SPACING.spacing6)};
   }
 `
 
