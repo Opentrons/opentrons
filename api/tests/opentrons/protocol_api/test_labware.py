@@ -298,7 +298,7 @@ def test_parent_labware(
     assert subject.parent == mock_labware
 
 
-def test_labware_property(
+def test_child_labware(
     decoy: Decoy,
     subject: Labware,
     mock_labware_core: LabwareCore,
