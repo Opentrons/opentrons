@@ -17,8 +17,9 @@ PHOTOPLATE_LABWARE = "corning_96_wellplate_360ul_flat"
 def run(ctx: ProtocolContext) -> None:
     """Run."""
     tipracks = [
+        # FIXME: use official tip-racks once available
         ctx.load_labware(
-            f"opentrons_ot3_96_tiprack_{size}uL_adp", slot, namespace="custom_beta"
+            f"opentrons_flex_96_tiprack_{size}uL_adp", slot, namespace="custom_beta"
         )
         for size, slots in SLOTS_TIPRACK.items()
         for slot in slots

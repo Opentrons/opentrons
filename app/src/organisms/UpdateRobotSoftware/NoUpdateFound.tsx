@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 
 import {
@@ -16,10 +17,12 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
+import { updateConfigValue } from '../../redux/config'
 
 export function NoUpdateFound(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
+  const dispatch = useDispatch()
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -48,7 +51,15 @@ export function NoUpdateFound(): JSX.Element {
       </Flex>
       <MediumButton
         buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-        onClick={() => history.push('/emergency-stop')}
+        onClick={() => {
+          dispatch(
+            updateConfigValue(
+              'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
+              '/robot-settings/rename-robot'
+            )
+          )
+          history.push('/robot-settings/rename-robot')
+        }}
       />
     </Flex>
   )

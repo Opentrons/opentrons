@@ -21,10 +21,10 @@ import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { css } from 'styled-components'
 import opentronsFlexImage from '../../../images/OpentronsFlex.png'
 import OT2Image from '../../../images/OT2.png'
+import { HandleEnter } from './HandleEnter'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { WizardTileProps } from './types'
-import { HandleEnter } from './HandleEnter'
 
 const ROBOT_TYPES: RobotType[] = [OT2_ROBOT_TYPE, FLEX_ROBOT_TYPE]
 
@@ -77,7 +77,7 @@ const CONTENTS_BY_ROBOT_TYPE: {
   [robotType in RobotType]: { displayName: string; imageSrc: string }
 } = {
   [OT2_ROBOT_TYPE]: {
-    displayName: 'OT2',
+    displayName: 'OT-2',
     imageSrc: OT2Image,
   },
   [FLEX_ROBOT_TYPE]: {
