@@ -153,8 +153,6 @@ def _load_labware(
         print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
     reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
     tiprack_namespace = "custom_beta"
-    if ctx.is_simulating():
-        tiprack_namespace = "opentrons"
     tipracks = [
         ctx.load_labware(ls[1], location=ls[0], namespace=tiprack_namespace)
         for ls in tiprack_load_settings
