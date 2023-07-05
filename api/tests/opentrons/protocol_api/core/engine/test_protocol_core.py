@@ -343,6 +343,10 @@ def test_load_labware_on_labware(
         LabwareDefinition.construct(ordering=[])  # type: ignore[call-arg]
     )
 
+    decoy.when(
+        mock_engine_client.state.labware.get_id_by_labware("labware-id")
+    ).then_return("abc123")
+
     result = subject.load_labware(
         load_name="some_labware",
         location=mock_labware_core,
@@ -364,7 +368,7 @@ def test_load_labware_on_labware(
         )
     )
 
-    # TODO add a relevant check here that labware is on top of another labware, location
+    assert subject.get_labware_on_labware(mock_labware_core) is result
 
 
 def test_load_labware_off_deck(
