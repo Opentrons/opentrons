@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 async def _main() -> None:
     api = await build_async_ot3_hardware_api(
         pipette_left="p1000_96_v3.4",
-        stall_detection_enable=False,
+        stall_detection_enable=True,
         gripper="GRPV1120230323A01"
     )
     await api.reset()
@@ -62,6 +62,12 @@ async def _main() -> None:
 
             #grip plate
             await api.home_gripper_jaw()
+
+            # home every 50 cycles in case we have drifted
+            if (c + 1) % 50 == 0:
+                await api.home()
+                home_pos = await api.gantry_position(OT3Mount.LEFT)
+                home_pos_grip = await api.gantry_position(OT3Mount.GRIPPER)
     except KeyboardInterrupt:
         pass
     finally:
