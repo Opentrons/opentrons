@@ -29,8 +29,8 @@ def read_environment_data(mount: str, is_simulating: bool) -> EnvironmentData:
         celsius_pipette, humidity_pipette = data
     except SensorResponseBad as e:
         print(e)
-        celsius_pipette = 0.0
-        humidity_pipette = 0.0
+        celsius_pipette = 25.0
+        humidity_pipette = 50.0
     # TODO: implement USB environmental sensors
     d = EnvironmentData(
         celsius_pipette=celsius_pipette,
