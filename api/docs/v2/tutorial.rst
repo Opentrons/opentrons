@@ -10,7 +10,7 @@ Tutorial
 Introduction
 ************
 
-This tutorial will guide you through creating a Python protocol file from scratch. At the end of this process you’ll have a complete protocol that can run on a Flex or OT-2 robot. If you don’t have a Flex or an OT-2 (or if you’re away from your lab, or if your robot is in use), you can use the same file to simulate the protocol on your computer instead.
+This tutorial will guide you through creating a Python protocol file from scratch. At the end of this process you’ll have a complete protocol that can run on a Flex or an OT-2 robot. If you don’t have a Flex or an OT-2 (or if you’re away from your lab, or if your robot is in use), you can use the same file to simulate the protocol on your computer instead.
 
 What You’ll Automate
 ^^^^^^^^^^^^^^^^^^^^
@@ -54,7 +54,7 @@ Let’s start from scratch to create your serial dilution protocol. Open up a ne
 
 .. Suggest simplifying this paragraph
 
-Throughout this documentation, you’ll see protocols that begin with the ``import`` statement shown above. It identifies your code as an Opentrons protocol. This statement is not required, but including it allows most code editors to provide helpful autocomplete suggestions. 
+Throughout this documentation, you’ll see protocols that begin with the ``opentrons import`` statement shown above. It identifies your code as an Opentrons protocol. This statement is not required, but including it is a good practice and allows most code editors to provide helpful autocomplete suggestions. 
 
 Everything else in the protocol file is required. Next, you’ll specify the version of the API you’re using. Then comes the core of the protocol: defining a single ``run()`` function that provides the locations of your labware, states which kind of pipettes you’ll use, and finally issues the commands that the robot will perform.
 
@@ -179,19 +179,17 @@ Pipettes
 
 Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the :py:meth:`.load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its :ref:`standard pipette name <new-pipette-models>`. Here’s how to load Flex and OT-2 pipettes installed in the left mount:
 
-.. Need to find Flex pipette load name. Using XXXX as placeholder.
-
 .. code-block:: python
 
         # Flex
-        XXXX = protocol.load_instrument('LOAD_NAME_PLACEHOLDER', 'left', tip_racks[tips])
+        p1000 = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks[tips])
 
 .. code-block:: python
 
         # OT-2
         p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips])
 
-Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are loaded after labware: you need to have already loaded ``tips`` in order to tell the pipette to use it. And now you won’t have to reference ``tips`` again in your code — it’s assigned to the ``XXXX`` (Flex) or ``p300`` (OT-2) pipette and the robot will know to use it when commanded to pick up tips.
+Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are loaded after labware: you need to have already loaded ``tips`` in order to tell the pipette to use it. And now you won’t have to reference ``tips`` again in your code — it’s assigned to the ``p1000`` (Flex) or ``p300`` (OT-2) pipette and the robot will know to use it when commanded to pick up tips.
 
 .. note::
 
@@ -215,7 +213,7 @@ Let’s start with the diluent. This phase takes a larger quantity of liquid and
 .. code-block:: python
 
         #Flex
-        XXXX.transfer(100, reservoir['A1'], plate.wells())
+        p1000.transfer(100, reservoir['A1'], plate.wells())
 
 .. code-block:: python
 
@@ -224,7 +222,7 @@ Let’s start with the diluent. This phase takes a larger quantity of liquid and
 
 Breaking down these single lines of code shows the power of :ref:`complex commands <v2-complex-commands>`. The first argument is the amount to transfer to each destination, 100 µL. The second argument is the source, column 1 of the reservoir (which is still specified with grid-style coordinates as ``A1`` — a reservoir only has an A row). The third argument is the destination. Here, calling the :py:meth:`.wells` method of ``plate`` returns a list of *every well*, and the command will apply to all of them.
 
-.. Possible text to explain the animation uses OT-2 code but applies to Flex as well?
+.. Possible short text to explain the animation uses OT-2 code but applies to Flex as well?
 
 .. image:: ../img/tutorial/diluent.gif
     :name: Transfer of diluent to plate
@@ -252,7 +250,7 @@ In each row, you first need to add solution. This will be similar to what you di
 .. code-block:: python
             
             #Flex
-            XXXX.transfer(100, reservoir['A2'], row[0], mix_after(3,50))
+            p1000.transfer(100, reservoir['A2'], row[0], mix_after(3,50))
 
 .. code-block:: python
 
@@ -271,7 +269,7 @@ Finally, it’s time to dilute the solution down the row. One approach would be 
 .. code-block:: python
 
             #Flex
-            XXXX.transfer(11, row[:11], row[1:], mix_after(3, 50))
+            p1000.transfer(11, row[:11], row[1:], mix_after(3, 50))
 
 .. code-block:: python
 
@@ -304,7 +302,7 @@ Thus, when adding the diluent, instead of targeting every well on the plate, you
 .. code-block:: python
 
         #Flex
-        XXXX.transfer(100, reservoir['A1'], plate.rows()[0])
+        p1000.transfer(100, reservoir['A1'], plate.rows()[0])
 
 .. code-block:: python
 
@@ -317,8 +315,8 @@ And by accessing an entire column at once, the 8-channel pipette effectively imp
     
     #Flex
     row = plate.rows()[0]
-    XXXX.transfer(100, reservoir['A2'], row[0], mix_after=(3, 50))
-    XXXX.transfer(100, row[:11], row[1:], mix_after=(3, 50))
+    p1000.transfer(100, reservoir['A2'], row[0], mix_after=(3, 50))
+    p1000.transfer(100, row[:11], row[1:], mix_after=(3, 50))
 
 .. code-block:: python
 
