@@ -281,30 +281,49 @@ def _run_trial(
 
     _record_measurement_and_store(MeasurementType.INIT)
     pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
-    if do_jog:
-        _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
-        height_below_top = source.depth - _liquid_height
-        print(f"liquid is {height_below_top} mm below top of reservoir")
-        liquid_tracker.set_start_volume_from_liquid_height(
-            source, _liquid_height, name="Dye"
-        )
-        reservoir_ml = liquid_tracker.get_volume(source)
-        required_ml = max(
+    while do_jog:
+        required_ul = max(
             (volume * channel_count * cfg.trials) + _MIN_END_VOLUME_UL,
             _MIN_START_VOLUME_UL,
         )
-        print(
-            f"software thinks there is {reservoir_ml} mL of liquid in the reservoir (required = {required_ml} ml"
-        )
-        if required_ml > _MAX_VOLUME_UL:
-            raise NotImplementedError(
-                "too many trials, refilling reservoir is currently not supported"
+        if not ctx.is_simulating():
+            _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
+            height_below_top = source.depth - _liquid_height
+            print(f"liquid is {height_below_top} mm below top of reservoir")
+            liquid_tracker.set_start_volume_from_liquid_height(
+                source, _liquid_height, name="Dye"
             )
-        elif reservoir_ml < required_ml:
-            raise RuntimeError(
+        else:
+            liquid_tracker.set_start_volume(source, required_ul)
+        reservoir_ul = liquid_tracker.get_volume(source)
+        print(
+            f"software thinks there is {reservoir_ul} mL "
+            f"of liquid in the reservoir (required = {required_ul} ml)"
+        )
+        if required_ul <= reservoir_ul < _MAX_VOLUME_UL:
+            print("good")
+            break
+        elif required_ul > _MAX_VOLUME_UL:
+            raise NotImplementedError(
+                f"too many trials ({cfg.trials}) at {volume} uL, "
+                f"refilling reservoir is currently not supported"
+            )
+        elif reservoir_ul < required_ul:
+            error_msg = (
                 f"not enough volume in reservoir to aspirate {volume} uL "
                 f"across {channel_count}x channels for {cfg.trials}x trials"
             )
+            if ctx.is_simulating():
+                raise ValueError(error_msg)
+            ui.print_error(error_msg)
+            pipette.move_to(location=source.top(100).move(channel_offset))
+            difference_ul = required_ul - reservoir_ul
+            ui.get_user_ready(
+                f"ADD {round(difference_ul / 1000.0, 1)} mL more liquid to RESERVOIR"
+            )
+            pipette.move_to(location=source.top().move(channel_offset))
+        else:
+            print("huh?")
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         ctx,
