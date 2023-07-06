@@ -2,7 +2,7 @@
 from typing import Tuple, List, Dict
 from math import ceil
 
-from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
+from opentrons.protocol_api import ProtocolContext, Well, Labware
 
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
@@ -27,6 +27,10 @@ from .helpers import (
     _get_volumes,
     _load_pipette,
     _load_tipracks,
+)
+from .trial import (
+    PhotometricTrial,
+    build_photometric_trials,
 )
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,
@@ -82,24 +86,7 @@ def _dispense_volumes(volume: float) -> Tuple[float, float, int]:
     return target_volume, volume_to_dispense, num_dispenses
 
 
-def _run_trial(
-    ctx: ProtocolContext,
-    test_report: CSVReport,
-    pipette: InstrumentContext,
-    source: Well,
-    dest: Labware,
-    channel_offset: Point,
-    tip_volume: int,
-    volume: float,
-    trial: int,
-    liquid_tracker: LiquidTracker,
-    blank: bool,
-    inspect: bool,
-    do_jog: bool,
-    cfg: config.PhotometricConfig,
-    mix: bool = False,
-    stable: bool = True,
-) -> None:
+def _run_trial(trial: PhotometricTrial) -> None:
     """Aspirate dye and dispense into a photometric plate."""
 
     def _no_op() -> None:
@@ -107,12 +94,14 @@ def _run_trial(
         return
 
     def _tag(m_type: MeasurementType) -> str:
-        return create_measurement_tag(m_type, volume, 0, trial)
+        return create_measurement_tag(m_type, trial.volume, 0, trial.trial)
 
     def _record_measurement_and_store(m_type: MeasurementType) -> EnvironmentData:
         m_tag = _tag(m_type)
-        m_data = read_environment_data(cfg.pipette_mount, ctx.is_simulating())
-        report.store_measurements_pm(test_report, m_tag, m_data)
+        m_data = read_environment_data(
+            trial.cfg.pipette_mount, trial.ctx.is_simulating()
+        )
+        report.store_measurements_pm(trial.test_report, m_tag, m_data)
         _MEASUREMENTS.append(
             (
                 m_tag,
@@ -133,32 +122,34 @@ def _run_trial(
 
     channel_count = 96
     # RUN INIT
-    target_volume, volume_to_dispense, num_dispenses = _dispense_volumes(volume)
+    target_volume, volume_to_dispense, num_dispenses = _dispense_volumes(trial.volume)
     photoplate_preped_vol = max(target_volume - volume_to_dispense, 0)
 
-    if num_dispenses > 1 and not ctx.is_simulating():
+    if num_dispenses > 1 and not trial.ctx.is_simulating():
         # TODO: Likely will not test 1000 uL in the near-term,
         #       but eventually we'll want to be more helpful here in prompting
         #       what volumes need to be added between trials.
         ui.get_user_ready("check DYE is enough")
 
     _record_measurement_and_store(MeasurementType.INIT)
-    pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
-    while do_jog:
+    trial.pipette.move_to(location=trial.source.top(), minimum_z_height=133)
+    while trial.do_jog:
         required_ul = max(
-            (volume * channel_count * cfg.trials) + _MIN_END_VOLUME_UL,
+            (trial.volume * channel_count * trial.cfg.trials) + _MIN_END_VOLUME_UL,
             _MIN_START_VOLUME_UL,
         )
-        if not ctx.is_simulating():
-            _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
-            height_below_top = source.depth - _liquid_height
+        if not trial.ctx.is_simulating():
+            _liquid_height = _jog_to_find_liquid_height(
+                trial.ctx, trial.pipette, trial.source
+            )
+            height_below_top = trial.source.depth - _liquid_height
             print(f"liquid is {height_below_top} mm below top of reservoir")
-            liquid_tracker.set_start_volume_from_liquid_height(
-                source, _liquid_height, name="Dye"
+            trial.liquid_tracker.set_start_volume_from_liquid_height(
+                trial.source, _liquid_height, name="Dye"
             )
         else:
-            liquid_tracker.set_start_volume(source, required_ul)
-        reservoir_ul = liquid_tracker.get_volume(source)
+            trial.liquid_tracker.set_start_volume(trial.source, required_ul)
+        reservoir_ul = trial.liquid_tracker.get_volume(trial.source)
         print(
             f"software thinks there is {round(reservoir_ul / 1000, 1)} mL "
             f"of liquid in the reservoir (required = {round(required_ul / 1000, 1)} ml)"
@@ -167,75 +158,77 @@ def _run_trial(
             break
         elif required_ul > _MAX_VOLUME_UL:
             raise NotImplementedError(
-                f"too many trials ({cfg.trials}) at {volume} uL, "
+                f"too many trials ({trial.cfg.trials}) at {trial.volume} uL, "
                 f"refilling reservoir is currently not supported"
             )
         elif reservoir_ul < required_ul:
             error_msg = (
-                f"not enough volume in reservoir to aspirate {volume} uL "
-                f"across {channel_count}x channels for {cfg.trials}x trials"
+                f"not enough volume in reservoir to aspirate {trial.volume} uL "
+                f"across {channel_count}x channels for {trial.cfg.trials}x trials"
             )
-            if ctx.is_simulating():
+            if trial.ctx.is_simulating():
                 raise ValueError(error_msg)
             ui.print_error(error_msg)
-            pipette.move_to(location=source.top(100).move(channel_offset))
+            trial.pipette.move_to(location=trial.source.top(100))
             difference_ul = required_ul - reservoir_ul
             ui.get_user_ready(
                 f"ADD {round(difference_ul / 1000.0, 1)} mL more liquid to RESERVOIR"
             )
-            pipette.move_to(location=source.top().move(channel_offset))
+            trial.pipette.move_to(location=trial.source.top())
         else:
             raise RuntimeError(
                 f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
             )
     # RUN ASPIRATE
     aspirate_with_liquid_class(
-        ctx,
-        pipette,
-        tip_volume,
-        volume,
-        source,
-        channel_offset,
+        trial.ctx,
+        trial.pipette,
+        trial.tip_volume,
+        trial.volume,
+        trial.source,
+        Point(),
         channel_count,
-        liquid_tracker,
+        trial.liquid_tracker,
         callbacks=pipetting_callbacks,
-        blank=blank,
-        inspect=inspect,
-        mix=mix,
+        blank=False,
+        inspect=trial.inspect,
+        mix=trial.mix,
         touch_tip=False,
     )
 
     _record_measurement_and_store(MeasurementType.ASPIRATE)
     for i in range(num_dispenses):
 
-        for w in dest.wells():
-            liquid_tracker.set_start_volume(w, photoplate_preped_vol)
-        pipette.move_to(dest["A1"].top().move(channel_offset))
+        for w in trial.dest.wells():
+            trial.liquid_tracker.set_start_volume(w, photoplate_preped_vol)
+        trial.pipette.move_to(trial.dest["A1"].top())
 
         # RUN DISPENSE
         dispense_with_liquid_class(
-            ctx,
-            pipette,
-            tip_volume,
+            trial.ctx,
+            trial.pipette,
+            trial.tip_volume,
             volume_to_dispense,
-            dest["A1"],
-            channel_offset,
+            trial.dest["A1"],
+            Point(),
             channel_count,
-            liquid_tracker,
+            trial.liquid_tracker,
             callbacks=pipetting_callbacks,
-            blank=blank,
-            inspect=inspect,
-            mix=mix,
+            blank=False,
+            inspect=trial.inspect,
+            mix=trial.mix,
             added_blow_out=(i + 1) == num_dispenses,
-            touch_tip=cfg.touch_tip,
+            touch_tip=trial.cfg.touch_tip,
         )
         _record_measurement_and_store(MeasurementType.DISPENSE)
-        pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
+        trial.pipette.move_to(location=trial.dest["A1"].top().move(Point(0, 0, 133)))
         if (i + 1) == num_dispenses:
-            _drop_tip(pipette, cfg.return_tip)
+            _drop_tip(trial.pipette, trial.cfg.return_tip)
         else:
-            pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))
-        if not ctx.is_simulating():
+            trial.pipette.move_to(
+                location=trial.dest["A1"].top().move(Point(0, 107, 133))
+            )
+        if not trial.ctx.is_simulating():
             ui.get_user_ready("add SEAL to plate and remove from DECK")
     return
 
@@ -345,6 +338,17 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     ]
     _display_dye_information(ctx, dye_types_req, cfg.refill, can_swap_a_for_hv)
 
+    trials = build_photometric_trials(
+        ctx,
+        test_report,
+        pipette,
+        reservoir["A1"],
+        photoplate,
+        test_volumes,
+        liquid_tracker,
+        cfg,
+    )
+
     print("homing...")
     ctx.home()
     pipette.home_plunger()
@@ -353,39 +357,18 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     #       and so we can use pick-up-tip from there again
     try:
         trial_count = 0
-        for volume in test_volumes:
+        for volume in trials.keys():
             ui.print_title(f"{volume} uL")
-            do_jog = True
-            for trial in range(cfg.trials):
+            for trial in trials[volume]:
                 trial_count += 1
-                ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
+                ui.print_header(f"{volume} uL ({trial.trial + 1}/{cfg.trials})")
                 print(f"trial total {trial_count}/{trial_total}")
                 if not ctx.is_simulating():
-                    ui.get_user_ready(f"put PLATE #{trial + 1} and remove SEAL")
+                    ui.get_user_ready(f"put PLATE #{trial.trial + 1} and remove SEAL")
                 next_tip: Well = _next_tip()
                 next_tip_location = next_tip.top()
                 _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
-
-                _run_trial(
-                    ctx=ctx,
-                    test_report=test_report,
-                    pipette=pipette,
-                    source=reservoir["A1"],
-                    dest=photoplate,
-                    channel_offset=Point(),
-                    tip_volume=cfg.tip_volume,
-                    volume=volume,
-                    trial=trial,
-                    liquid_tracker=liquid_tracker,
-                    blank=False,
-                    inspect=cfg.inspect,
-                    do_jog=do_jog,
-                    cfg=cfg,
-                    mix=cfg.mix,
-                    stable=True,
-                )
-                if volume < 250:
-                    do_jog = False
+                _run_trial(trial)
 
     finally:
         ui.print_title("CHANGE PIPETTES")
