@@ -75,15 +75,6 @@ def _load_labware(
     return photoplate, reservoir, tipracks
 
 
-def _print_stats(mode: str, average: float, cv: float, d: float) -> None:
-    print(
-        f"{mode}:\n"
-        f"\tavg: {round(average, 2)} uL\n"
-        f"\tcv: {round(cv * 100.0, 2)}%\n"
-        f"\td: {round(d * 100.0, 2)}%"
-    )
-
-
 def _dispense_volumes(volume: float) -> Tuple[float, float, int]:
     num_dispenses = ceil(volume / 250)
     volume_to_dispense = volume / num_dispenses
