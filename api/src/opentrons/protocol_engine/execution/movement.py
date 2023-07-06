@@ -202,3 +202,4 @@ class MovementHandler:
         and then probe the limit switch to reach the home position.
         For the OT3, the axis will retract to its known home position.
         """
+        await self._gantry_mover.retract_axis(axis)

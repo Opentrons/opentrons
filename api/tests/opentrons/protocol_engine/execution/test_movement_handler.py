@@ -16,6 +16,7 @@ from opentrons.protocol_engine.types import (
     WellOffset,
     DeckSlotLocation,
     CurrentWell,
+    MotorAxis,
 )
 from opentrons.protocol_engine.state import (
     StateStore,
@@ -418,3 +419,15 @@ async def test_move_to_coordinates(
     )
 
     assert result == Point(x=1, y=5, z=9)
+
+
+async def test_retract_axis(
+    decoy: Decoy,
+    state_store: StateStore,
+    mock_gantry_mover: GantryMover,
+    subject: MovementHandler,
+) -> None:
+    """It should delegate to gantry mover to retract the specified axis."""
+    await subject.retract_axis(axis=MotorAxis.RIGHT_Z)
+
+    decoy.verify(await mock_gantry_mover.retract_axis(MotorAxis.RIGHT_Z), times=1)

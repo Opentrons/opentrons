@@ -30,6 +30,7 @@ from ..commands import (
     DropTipResult,
     DropTipInPlaceResult,
     HomeResult,
+    RetractAxisResult,
     BlowOutResult,
     TouchTipResult,
     thermocycler,
@@ -207,9 +208,11 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             command.result,
             (
                 HomeResult,
+                RetractAxisResult,
                 MoveToCoordinatesResult,
                 thermocycler.OpenLidResult,
                 thermocycler.CloseLidResult,
+
             ),
         ):
             self._state.current_well = None
@@ -274,6 +277,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             command.result,
             (
                 HomeResult,
+                RetractAxisResult,
                 thermocycler.OpenLidResult,
                 thermocycler.CloseLidResult,
             ),
