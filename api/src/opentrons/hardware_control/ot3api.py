@@ -730,21 +730,29 @@ class OT3API(
             axes = list(Axis.ot3_mount_axes())
         await self.home(axes)
 
-    async def home_gear_motors(self, accelerate_during_move: bool = False) -> None:
-        if accelerate_during_move:
-            current_pos = await self._backend.gear_motor_position_estimation()
-            if current_pos == 0:
-                return
-            current_pos_dict = {OT3Axis.Q: current_pos[0]}
-        else:
-            # start at the axis boundary, and move without acceleration
-            # to avoid crashing if the gear motors' positions are not available
-            axis_bound = self._backend.axis_bounds[OT3Axis.Q][1]
-            current_pos_dict = {OT3Axis.Q: axis_bound}
+    async def home_gear_motors(self) -> None:
+        gear_motor_axis_bound = self._backend.axis_bounds[OT3Axis.Q][1]
+        position_estimation = self._backend.gear_motor_position
+        velocity = self._config.motion_settings.default_max_speed[
+            GantryLoad.HIGH_THROUGHPUT
+        ][OT3AxisKind.Q]
+        if position_estimation is not None:
+            position_valid = abs(position_estimation) < gear_motor_axis_bound
+            if position_valid:
+                position_dict = {OT3Axis.Q: position_estimation}
+                safe_home_target = {OT3Axis.Q: self._config.safe_home_distance}
+                moves = self._build_moves(position_dict, safe_home_target)
 
-        home_target = {OT3Axis.Q: 0}
-        home_moves = self._build_moves(current_pos_dict, home_target)
-        await self._backend.tip_action(home_moves[0], "home", accelerate_during_move)
+                await self._backend.tip_action(moves[0], "clamp")
+                distance = self._backend.gear_motor_position
+
+                await self._backend.home_gear_motors(distance, velocity)
+                return
+        # if gear motor position is not known:
+        #   start at the axis boundary, and move without acceleration
+        #   to avoid crashing if the gear motors' positions are not available
+        axis_bound = self._backend.axis_bounds[OT3Axis.Q][1]
+        await self._backend.home_gear_motors(axis_bound, velocity)
 
     async def home_gripper_jaw(self) -> None:
         """
@@ -1704,12 +1712,7 @@ class OT3API(
 
             await self._backend.tip_action(clamp_moves[0], "clamp")
 
-            # adjust move group for home so that only third tip action request
-            # expects to hit the limit switch
-            gear_motor_position = {OT3Axis.Q: self._backend.gear_motor_position}
-            home_target = {OT3Axis.Q: 0}
-            home_moves = self._build_moves(gear_motor_position, home_target)
-            await self._backend.tip_action(home_moves[0], "home")
+            await self.home_gear_motors()
 
     async def pick_up_tip(
         self,
@@ -1782,7 +1785,9 @@ class OT3API(
                 # The speed check is needed because speed can sometimes be None.
                 # Not sure why
 
-                gear_start_position = await self._backend.gear_motor_position_estimation()
+                gear_start_position = (
+                    await self._backend.gear_motor_position_estimation()
+                )
                 gear_start_pos_dict = {OT3Axis.Q: gear_start_position[0]}
                 drop_target_dict = {OT3Axis.Q: move.target_position}
                 drop_moves = self._build_moves(gear_start_pos_dict, drop_target_dict)
@@ -1791,7 +1796,7 @@ class OT3API(
 
                 current_gear_pos = await self._backend.gear_motor_position_estimation()
                 gear_pos_dict = {OT3Axis.Q: current_gear_pos[0]}
-                home_target_dict = {OT3Axis.Q: 0}
+                home_target_dict = {OT3Axis.Q: 0.0}
                 home_moves = self._build_moves(gear_pos_dict, home_target_dict)
 
                 await self._backend.tip_action(home_moves[0], "home")
@@ -1821,7 +1826,6 @@ class OT3API(
             await self._home([Axis.by_mount(mount)])
 
         _remove()
-
 
     async def clean_up(self) -> None:
         """Get the API ready to stop cleanly."""

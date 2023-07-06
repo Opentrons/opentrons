@@ -99,8 +99,7 @@ class MoveGroupRunner:
         """
         self._move_groups = move_groups
         self._start_at_index = start_at_index
-        # self._ignore_stalls = ignore_stalls
-        self._ignore_stalls = True
+        self._ignore_stalls = ignore_stalls
         self._is_prepped: bool = False
 
     @staticmethod
@@ -169,30 +168,12 @@ class MoveGroupRunner:
 
     @staticmethod
     def _accumulate_move_completions(
-        self,
         completions: _Completions,
     ) -> NodeDict[Tuple[float, float, bool, bool]]:
         position: NodeDict[
             List[Tuple[Tuple[int, int], float, float, bool, bool]]
         ] = defaultdict(list)
         for arbid, completion in completions:
-            if isinstance(completion, TipActionResponse):
-                # assuming the two gear motors finish at the same time in the case of
-                # the 96 channel, return their position
-                for move in self._expected_tip_action_motors:
-                    if not any(self._expected_tip_action_motors):
-                        # if the nested list is empty, we are done with all 3
-                        # tip action moves and should return the current position
-
-                        return {
-                            arbid.parts.originating_node_id:
-                                (
-                                    completion.payload.current_position_um.value / 1000.0,
-                                    completion.payload.encoder_position_um.value / 1000.0,
-                                    True,
-                                    True,
-                                )
-                        }
             position[NodeId(arbid.parts.originating_node_id)].append(
                 (
                     (
@@ -518,6 +499,7 @@ class MoveScheduler:
         elif isinstance(message, TipActionResponse):
             if self._handle_tip_action_motors(message):
                 self._remove_move_group(message, arbitration_id)
+                self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
 
