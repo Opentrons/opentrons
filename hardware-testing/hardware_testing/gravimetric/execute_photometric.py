@@ -4,7 +4,7 @@ from math import ceil
 
 from opentrons.protocol_api import ProtocolContext, Well, Labware
 
-from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
+from hardware_testing.data import ui
 from hardware_testing.opentrons_api.types import Point
 from .measurement import (
     MeasurementType,
@@ -15,21 +15,15 @@ from .measurement.environment import read_environment_data
 from . import report
 from . import config
 from .helpers import (
-    get_pipette_unique_name,
-    _get_operator_name,
-    _get_robot_serial,
     _jog_to_find_liquid_height,
-    _get_tip_batch,
     _apply_labware_offsets,
     _pick_up_tip,
     _drop_tip,
-    _get_volumes,
-    _load_pipette,
-    _load_tipracks,
 )
 from .trial import (
     PhotometricTrial,
     build_photometric_trials,
+    TestResources,
 )
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,
@@ -69,13 +63,12 @@ def _get_dye_type(volume: float) -> str:
 
 def _load_labware(
     ctx: ProtocolContext, cfg: config.PhotometricConfig
-) -> Tuple[Labware, Labware, List[Labware]]:
+) -> Tuple[Labware, Labware]:
     print(f'Loading photoplate labware: "{cfg.photoplate}"')
     photoplate = ctx.load_labware(cfg.photoplate, location=cfg.photoplate_slot)
     reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
-    tipracks = _load_tipracks(ctx, cfg, use_adapters=True)
     _apply_labware_offsets(cfg, [photoplate, reservoir])
-    return photoplate, reservoir, tipracks
+    return photoplate, reservoir
 
 
 def _dispense_volumes(volume: float) -> Tuple[float, float, int]:
@@ -263,50 +256,34 @@ def _display_dye_information(
                     )
 
 
-def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
+def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     """Run."""
-    run_id, start_time = create_run_id_and_start_time()
     dye_types_req: Dict[str, float] = {dye: 0 for dye in _DYE_MAP.keys()}
-    test_volumes = _get_volumes(ctx, cfg)
     total_photoplates = 0
-    for vol in test_volumes:
+    for vol in resources.test_volumes:
         target_volume, volume_to_dispense, num_dispenses = _dispense_volumes(vol)
         total_photoplates += num_dispenses * cfg.trials
         dye_per_vol = vol * 96 * cfg.trials
         dye_types_req[_get_dye_type(volume_to_dispense)] += dye_per_vol
 
-    trial_total = len(test_volumes) * cfg.trials
+    trial_total = len(resources.test_volumes) * cfg.trials
 
     ui.print_header("LOAD LABWARE")
-    photoplate, reservoir, tipracks = _load_labware(ctx, cfg)
+    photoplate, reservoir = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker()
-    initialize_liquid_from_deck(ctx, liquid_tracker)
+    initialize_liquid_from_deck(resources.ctx, liquid_tracker)
 
-    ui.print_header("LOAD PIPETTE")
-    pipette = _load_pipette(ctx, cfg)
-    pipette_tag = get_pipette_unique_name(pipette)
-    print(f"found pipette: {pipette_tag}")
-    if not ctx.is_simulating():
-        ui.get_user_ready("create pipette QR code")
-    if cfg.user_volumes:
-        pipette_tag += "-user-volume"
-    else:
-        pipette_tag += "-qc"
-
-    ui.print_header("GET PARAMETERS")
-    for v in test_volumes:
-        print(f"\t{v} uL")
-    tips = get_tips(ctx, pipette)
+    tips = get_tips(resources.ctx, resources.pipette)
     total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips]) * len(
-        test_volumes
+        resources.test_volumes
     )
 
     def _next_tip() -> Well:
         nonlocal tips
         if not len(tips[0]):
-            if not ctx.is_simulating():
+            if not resources.ctx.is_simulating():
                 ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
-            tips = get_tips(ctx, pipette)
+            tips = get_tips(resources.ctx, resources.pipette)
         return tips[0].pop(0)
 
     assert (
@@ -315,42 +292,44 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
 
     ui.print_header("CREATE TEST-REPORT")
     test_report = report.create_csv_test_report_photometric(
-        test_volumes, cfg, run_id=run_id
+        resources.test_volumes, cfg, run_id=resources.run_id
     )
-    test_report.set_tag(pipette_tag)
-    test_report.set_operator(_get_operator_name(ctx.is_simulating()))
-    serial_number = _get_robot_serial(ctx.is_simulating())
-    tip_batch = _get_tip_batch(ctx.is_simulating())
-    test_report.set_version(get_git_description())
+    test_report.set_tag(resources.pipette_tag)
+    test_report.set_operator(resources.operator_name)
+    test_report.set_version(resources.git_description)
     report.store_serial_numbers_pm(
         test_report,
-        robot=serial_number,
-        pipette=pipette_tag,
-        tips=tip_batch,
+        robot=resources.robot_serial,
+        pipette=resources.pipette_tag,
+        tips=resources.tip_batch,
         environment="None",
         liquid="None",
     )
 
     ui.print_header("PREPARE")
     can_swap_a_for_hv = not [
-        v for v in test_volumes if _DYE_MAP["A"]["min"] <= v < _DYE_MAP["A"]["max"]
+        v
+        for v in resources.test_volumes
+        if _DYE_MAP["A"]["min"] <= v < _DYE_MAP["A"]["max"]
     ]
-    _display_dye_information(ctx, dye_types_req, cfg.refill, can_swap_a_for_hv)
+    _display_dye_information(
+        resources.ctx, dye_types_req, cfg.refill, can_swap_a_for_hv
+    )
 
     trials = build_photometric_trials(
-        ctx,
+        resources.ctx,
         test_report,
-        pipette,
+        resources.pipette,
         reservoir["A1"],
         photoplate,
-        test_volumes,
+        resources.test_volumes,
         liquid_tracker,
         cfg,
     )
 
     print("homing...")
-    ctx.home()
-    pipette.home_plunger()
+    resources.ctx.home()
+    resources.pipette.home_plunger()
     # get the first channel's first-used tip
     # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
     #       and so we can use pick-up-tip from there again
@@ -362,25 +341,31 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                 trial_count += 1
                 ui.print_header(f"{volume} uL ({trial.trial + 1}/{cfg.trials})")
                 print(f"trial total {trial_count}/{trial_total}")
-                if not ctx.is_simulating():
+                if not resources.ctx.is_simulating():
                     ui.get_user_ready(f"put PLATE #{trial.trial + 1} and remove SEAL")
                 next_tip: Well = _next_tip()
                 next_tip_location = next_tip.top()
-                _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
+                _pick_up_tip(
+                    resources.ctx, resources.pipette, cfg, location=next_tip_location
+                )
                 _run_trial(trial)
 
     finally:
         ui.print_title("CHANGE PIPETTES")
-        if pipette.has_tip:
-            if pipette.current_volume > 0:
+        if resources.pipette.has_tip:
+            if resources.pipette.current_volume > 0:
                 print("dispensing liquid to trash")
-                trash = pipette.trash_container.wells()[0]
+                trash = resources.pipette.trash_container.wells()[0]
                 # FIXME: this should be a blow_out() at max volume,
                 #        but that is not available through PyAPI yet
                 #        so instead just dispensing.
-                pipette.dispense(pipette.current_volume, trash.top())
-                pipette.aspirate(10)  # to pull any droplets back up
+                resources.pipette.dispense(
+                    resources.pipette.current_volume, trash.top()
+                )
+                resources.pipette.aspirate(10)  # to pull any droplets back up
             print("dropping tip")
-            _drop_tip(pipette, cfg.return_tip)
+            _drop_tip(resources.pipette, cfg.return_tip)
         print("moving to attach position")
-        pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))
+        resources.pipette.move_to(
+            resources.ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150))
+        )
