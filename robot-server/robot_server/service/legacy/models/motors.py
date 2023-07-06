@@ -25,23 +25,19 @@ class EngagedMotor(BaseModel):
     enabled: bool = Field(..., description="Is engine enabled")
 
 
-# Dynamically create the Engaged motors. It has one EngagedMotor per MotorName
 class EngagedMotors(BaseModel):
     """Which motors are engaged."""
 
+    # TODO (spp, 2023-07-06): check if changing this model's fields causes any
+    #  backweards compatibility issues or needs any app side changes.
     x: EngagedMotor
     y: EngagedMotor
     z_l: EngagedMotor
     z_r: EngagedMotor
     p_l: EngagedMotor
     p_r: EngagedMotor
-    q: EngagedMotor
-    g: EngagedMotor
-
-    z: EngagedMotor
-    a: EngagedMotor
-    b: EngagedMotor
-    c: EngagedMotor
+    q: typing.Optional[EngagedMotor]  # Optional since OT2 doesn't have these axes
+    g: typing.Optional[EngagedMotor]
 
 
 class Axes(BaseModel):

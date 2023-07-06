@@ -22,7 +22,9 @@ stages:
         p_l:
           enabled: !anybool 
         p_r:
-          enabled: !anybool 
+          enabled: !anybool
+        g: !anything
+        q: !anything
 ---
 test_name: Disengage motors
 marks:

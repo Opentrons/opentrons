@@ -3,12 +3,12 @@ from opentrons.hardware_control.types import Axis
 
 def test_engage_axes(api_client, hardware):
     hardware.engaged_axes = {
-        "x": True,
-        "y": True,
-        "z": True,
-        "z_l": True,
-        "b": True,
-        "c": True,
+        Axis.X: True,
+        Axis.Y: True,
+        Axis.Z_L: True,
+        Axis.Z_R: False,
+        Axis.P_L: True,
+        Axis.P_R: True,
     }
 
     res0 = api_client.get("/motors/engaged")
@@ -17,10 +17,12 @@ def test_engage_axes(api_client, hardware):
     assert result0 == {
         "x": {"enabled": True},
         "y": {"enabled": True},
-        "z": {"enabled": True},
-        "a": {"enabled": True},
-        "b": {"enabled": True},
-        "c": {"enabled": True},
+        "z_l": {"enabled": True},
+        "z_r": {"enabled": False},
+        "p_l": {"enabled": True},
+        "p_r": {"enabled": True},
+        "g": None,
+        "q": None,
     }
 
 

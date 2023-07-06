@@ -26,6 +26,8 @@ router = APIRouter()
 async def get_engaged_motors(
     hardware: HardwareControlAPI = Depends(get_hardware),
 ) -> model.EngagedMotors:
+    # TODO (spp, 2023-07-06): Implement fetching Flex's engaged motors
+    #  https://opentrons.atlassian.net/browse/RET-1371
     try:
         engaged_axes = hardware.engaged_axes
         axes_dict = {
