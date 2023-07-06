@@ -3,7 +3,6 @@ import { COLORS, renderWithProviders } from '@opentrons/components'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { getIsOnDevice } from '../../../redux/config'
 import { SimpleWizardBody } from '..'
-import image from '*.png'
 
 jest.mock('../../../atoms/Skeleton')
 jest.mock('../../../redux/config')
