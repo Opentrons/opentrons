@@ -362,7 +362,7 @@ The simplest way to run your protocol on a Flex or OT-2 is to use the `Opentrons
 
 If you have any remaining calibration tasks to do, you can finish them up here. Below the calibration section is a preview of the initial deck state. Optionally you can run Labware Position Check, or you can go ahead and click **Proceed to Run**.
 
-On the Run tab, you can double-check the Protocol Steps, which are similar to the command-line simulation output. Make sure all your labware and liquids are in the right place, and then click **Start run**. The run log will update in real time as your robot proceeds through the steps. 
+On the Run tab, you can double-check the Run Preview, which are similar to the command-line simulation output. Make sure all your labware and liquids are in the right place, and then click **Start run**. The run log will update in real time as your robot proceeds through the steps. 
 
 When it’s all done, check the results of your serial dilution procedure — you should have a beautiful dye gradient running across the plate!
 
