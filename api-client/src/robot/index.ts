@@ -6,5 +6,6 @@ export type {
   EstopPhysicalStatus,
   EstopState,
   Lights,
+  SetEstopState,
   SetLightsData,
 } from './types'

@@ -9,6 +9,8 @@ import type {
   HostConfig,
   Response,
   EstopPhysicalStatus,
+  SetEstopState,
+  EstopState,
 } from '@opentrons/api-client'
 import { useHost } from '../../api'
 
@@ -22,7 +24,7 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 const UPDATE_ESTOP_PHYSICAL_STATUS_RESPONSE = {
-  status: 'disengaged',
+  status: {},
 }
 
 describe('useSetEstopPhysicalStatusMutation hook', () => {
@@ -60,13 +62,13 @@ describe('useSetEstopPhysicalStatusMutation hook', () => {
     expect(result.current.data).toBeUndefined()
   })
 
-  it('should update a estop status when calling the setEstopPhysicalStatus with a new status', async () => {
+  it('should update a estop status when calling the setEstopPhysicalStatus with empty payload', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockSetEstopPhysicalStatus)
       .calledWith(HOST_CONFIG, updatedEstopPhysicalStatus)
       .mockResolvedValue({
         data: UPDATE_ESTOP_PHYSICAL_STATUS_RESPONSE,
-      } as Response<EstopPhysicalStatus>)
+      } as Response<EstopState>)
 
     const { result, waitFor } = renderHook(
       () => useSetEstopPhysicalStatusMutation(),
@@ -74,6 +76,6 @@ describe('useSetEstopPhysicalStatusMutation hook', () => {
     )
     act(() => result.current.setEstopPhysicalStatus(updatedEstopPhysicalStatus))
     await waitFor(() => result.current.data != null)
-    expect(result.current.data).toEqual(UPDATE_ESTOP_PHYSICAL_STATUS_RESPONSE)
+    expect(result.current.data).toEqual('disengaged')
   })
 })

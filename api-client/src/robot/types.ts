@@ -1,5 +1,5 @@
 export interface EstopPhysicalStatus {
-  status: 'disengaged' | 'not-present'
+  status: 'engaged' | 'disengaged' | 'not-present'
 }
 
 export interface EstopState {
@@ -9,6 +9,10 @@ export interface EstopState {
     | 'not-present'
     | 'disengaged'
   estopPhysicalStatus: EstopPhysicalStatus
+}
+
+export interface SetEstopState {
+  status: {}
 }
 
 export interface Lights {

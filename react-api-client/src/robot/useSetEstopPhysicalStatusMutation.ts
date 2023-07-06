@@ -1,8 +1,8 @@
 import {
   HostConfig,
-  // EstopState,
+  EstopState,
   setEstopPhysicalStatus,
-  EstopPhysicalStatus,
+  SetEstopState,
 } from '@opentrons/api-client'
 
 import {
@@ -16,21 +16,21 @@ import { useHost } from '../api'
 import type { AxiosError } from 'axios'
 
 export type UseSetEstopPhysicalStatusMutationResult = UseMutationResult<
-  EstopPhysicalStatus,
+  EstopState,
   AxiosError,
-  EstopPhysicalStatus
+  SetEstopState
 > & {
   setEstopPhysicalStatus: UseMutateFunction<
-    EstopPhysicalStatus,
+    EstopState,
     AxiosError,
-    EstopPhysicalStatus
+    SetEstopState
   >
 }
 
 export type UseSetEstopPhysicalStatusMutationOptions = UseMutationOptions<
-  EstopPhysicalStatus,
+  EstopState,
   AxiosError,
-  EstopPhysicalStatus
+  SetEstopState
 >
 
 export function useSetEstopPhysicalStatusMutation(
@@ -41,13 +41,9 @@ export function useSetEstopPhysicalStatusMutation(
   const host =
     hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
 
-  const mutation = useMutation<
-    EstopPhysicalStatus,
-    AxiosError,
-    EstopPhysicalStatus
-  >(
-    [host, 'robot', 'control/acknowledgeEstopDisengage'],
-    (newStatus: EstopPhysicalStatus) =>
+  const mutation = useMutation<EstopState, AxiosError, SetEstopState>(
+    [host, 'robot/control/acknowledgeEstopDisengage'],
+    (newStatus: SetEstopState) =>
       setEstopPhysicalStatus(host as HostConfig, newStatus)
         .then(response => response.data)
         .catch(e => {
