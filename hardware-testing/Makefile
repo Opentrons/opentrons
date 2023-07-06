@@ -223,7 +223,7 @@ cleanup"
 endef
 
 .PHONY: sync-sw-ot3
-sync-sw-ot3:
+sync-sw-ot3: push-ot3
 	cd .. && $(MAKE) push-ot3 host=$(host)
 
 .PHONY: sync-fw-ot3
