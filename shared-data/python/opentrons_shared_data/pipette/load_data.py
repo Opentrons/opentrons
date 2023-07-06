@@ -15,6 +15,8 @@ from .pipette_definition import (
     PipetteGenerationType,
     PipetteModelMajorVersion,
     PipetteModelMinorVersion,
+    PipetteModelVersionType,
+    PipetteNameType,
 )
 from .model_constants import MOUNT_CONFIG_LOOKUP_TABLE
 

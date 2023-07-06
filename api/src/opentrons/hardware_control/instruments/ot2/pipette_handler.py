@@ -240,9 +240,19 @@ class PipetteHandlerProvider(Generic[MountType]):
             result["ready_to_aspirate"] = instr.ready_to_aspirate
             # TODO (12-5-2022) figure out why this is using default aspirate flow rate
             # rather than default dispense flow rate.
-            result["default_blow_out_speeds"] = self.plunger_speed(instr, instr.active_tip_settings.default_blowout_flowrate, "blowout")
-            result["default_dispense_speeds"] = self.plunger_speed(instr, instr.active_tip_settings.default_dispense_flowrate, "dispense")
-            result["default_aspirate_speeds"] = self.plunger_speed(instr, instr.active_tip_settings.default_aspirate_flowrate, "aspirate")
+            result["default_blow_out_speeds"] = {
+                alvl: self.plunger_speed(instr, fr, "blowout")
+                for alvl, fr in instr.blow_out_flow_rates_lookup.items()
+            }
+
+            result["default_dispense_speeds"] = {
+                alvl: self.plunger_speed(instr, fr, "dispense")
+                for alvl, fr in instr.dispense_flow_rates_lookup.items()
+            }
+            result["default_aspirate_speeds"] = {
+                alvl: self.plunger_speed(instr, fr, "aspirate")
+                for alvl, fr in instr.aspirate_flow_rates_lookup.items()
+            }
         return cast(PipetteDict, result)
 
     @property

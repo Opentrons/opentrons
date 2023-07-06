@@ -2,12 +2,11 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t1000": {
-      "defaultAspirateFlowRate": 500.0,
-      "defaultDispenseFlowRate": 1000.0,
-      "defaultBlowOutFlowRate": 1000.0,
+      "defaultAspirateFlowRate": {"valuesByApiLevel": { "2.0": 500 }},
+      "defaultDispenseFlowRate": {"valuesByApiLevel": { "2.0": 1000 }},
+      "defaultBlowOutFlowRate": {"valuesByApiLevel": { "2.0": 1000 }},
       "defaultTipLength": 76.7,
       "defaultTipOverlap": 7.95,
-      "defaultReturnTipHeight": null,
       "aspirate": {
         "opentrons/opentrons_96_tiprack_1000ul/1": [
           [148.9157, 0.0213, 56.3986],

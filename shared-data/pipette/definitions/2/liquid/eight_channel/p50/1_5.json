@@ -2,12 +2,11 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t200": {
-      "defaultAspirateFlowRate": 25.0,
-      "defaultDispenseFlowRate": 50.0,
-      "defaultBlowOutFlowRate": 1000.0,
+      "defaultAspirateFlowRate": {"valuesByApiLevel": { "2.0": 25 }},
+      "defaultDispenseFlowRate": {"valuesByApiLevel": { "2.0": 50 }},
+      "defaultBlowOutFlowRate": {"valuesByApiLevel": { "2.0": 1000 }},
       "defaultTipLength": 51.7,
       "defaultTipOverlap": 7.47,
-      "defaultReturnTipHeight": null,
       "aspirate": {
         "opentrons/tipone_96_tiprack_200ul/1": [
           [6.190392157, -0.01092438778, 3.1628],
@@ -45,12 +44,11 @@
       "defaultBlowoutVolume": 4.712
     },
     "t300": {
-      "defaultAspirateFlowRate": 25.0,
-      "defaultDispenseFlowRate": 50.0,
-      "defaultBlowOutFlowRate": 1000.0,
+      "defaultAspirateFlowRate": {"valuesByApiLevel": { "2.0": 25 }},
+      "defaultDispenseFlowRate": {"valuesByApiLevel": { "2.0": 50 }},
+      "defaultBlowOutFlowRate": {"valuesByApiLevel": { "2.0": 1000 }},
       "defaultTipLength": 51.7,
       "defaultTipOverlap": 7.47,
-      "defaultReturnTipHeight": null,
       "aspirate": {
         "opentrons/opentrons_96_tiprack_300ul/1": [
           [6.190392157, -0.01092438778, 3.1628],

@@ -20,6 +20,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
+    types as pip_types
 )
 
 from opentrons.types import Point, Mount
@@ -120,9 +121,12 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             PipetteTipType(self._working_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
-        self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate
-        self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate
-        self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate
+        self._aspirate_flow_rates_lookup = self._active_tip_settings.default_aspirate_flowrate["valuesByApiLevel"]
+        self._dispense_flow_rates_lookup = self._active_tip_settings.default_dispense_flowrate["valuesByApiLevel"]
+        self._blowout_flow_rates_lookup = self._active_tip_settings.default_blowout_flowrate["valuesByApiLevel"]
+        self._aspirate_flow_rate = self._aspirate_flow_rates_lookup["2.0"]
+        self._dispense_flow_rate = self._dispense_flow_rates_lookup["2.0"]
+        self._blow_out_flow_rate = self._blowout_flow_rates_lookup["2.0"]
 
         # TODO (lc 12-6-2022) When we switch over to sending pipette state, we
         # we should also try to make sure the python api isn't reaching into
@@ -132,7 +136,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         # TODO Need to update this!!
         self._tip_overlap = {"default": self._active_tip_settings.default_tip_overlap}
 
-    def act_as(self, name: pipette_load_name.PipetteModelVersionType) -> None:
+    def act_as(self, name: pipette_load_name.PipetteNameType) -> None:
         """Reconfigure to act as ``name``. ``name`` must be either the
         actual name of the pipette, or a name in its back-compatibility
         config.
@@ -222,9 +226,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             PipetteTipType(self._working_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
-        self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate
-        self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate
-        self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate
+
+        self._aspirate_flow_rate = self.aspirate_flow_rates_lookup["2.0"]
+        self._dispense_flow_rate = self.dispense_flow_rates_lookup["2.0"]
+        self._blow_out_flow_rate = self.blow_out_flow_rates_lookup["2.0"]
 
         self._tip_overlap = {"default": self._active_tip_settings.default_tip_overlap}
 
@@ -373,6 +378,18 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def blow_out_flow_rate(self, new_flow_rate: float) -> None:
         assert new_flow_rate > 0
         self._blow_out_flow_rate = new_flow_rate
+
+    @property
+    def aspirate_flow_rates_lookup(self) -> Dict[str, float]:
+        return self._aspirate_flow_rates_lookup
+    
+    @property
+    def dispense_flow_rates_lookup(self) -> Dict[str, float]:
+        return self._dispense_flow_rates_lookup
+
+    @property
+    def blow_out_flow_rates_lookup(self) -> Dict[str, float]:
+        return self._blowout_flow_rates_lookup
 
     @property
     def working_volume(self) -> float:
@@ -551,13 +568,13 @@ def load_from_config_and_check_skip(
                 # to checking if the old and new responses are the same
                 # we also have to make sure the old pipette is properly
                 # configured to the request
-                if requested == attached.acting_as:
+                if requested == str(attached.acting_as):
                     # similar enough to check
                     return _reload_and_check_skip(config, attached, pipette_offset)
             else:
                 # if there is no request, make sure that the old pipette
                 # did not have backcompat applied
-                if attached.acting_as == attached.name:
+                if str(attached.acting_as) == attached.name:
                     # similar enough to check
                     return _reload_and_check_skip(config, attached, pipette_offset)
 
@@ -568,7 +585,7 @@ def load_from_config_and_check_skip(
 
 
 def _build_splits(pipette: Pipette) -> Optional[MoveSplit]:
-    if "needsUnstick" in pipette.config.quirks:
+    if pip_types.Quirks.needsUnstick in pipette.config.quirks:
         return MoveSplit(
             split_distance=1,
             split_current=1.75,

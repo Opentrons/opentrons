@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 from typing import Optional, List, Dict, Any, cast
 
-from .pipette_definition import PipetteConfigurations
+from .pipette_definition import PipetteConfigurations, PipetteModelVersionType
 from .model_constants import (
     MUTABLE_CONFIGS_V1,
     VALID_QUIRKS,
@@ -13,7 +13,6 @@ from .model_constants import (
     _TYPE_LOOKUP,
     _UNITS_LOOKUP,
 )
-from .pipette_load_name_conversions import PipetteModelVersionType
 from .load_data import load_definition, load_serial_lookup_table
 from .types import MutableConfig, Quirks, QuirkConfig, TypeOverrides, OverrideType
 from .pipette_load_name_conversions import (

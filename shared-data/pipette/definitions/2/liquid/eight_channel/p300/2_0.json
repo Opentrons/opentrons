@@ -2,9 +2,19 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t200": {
-      "defaultAspirateFlowRate": 94.0,
-      "defaultDispenseFlowRate": 94.0,
-      "defaultBlowOutFlowRate": 94.0,
+      "defaultAspirateFlowRate": {
+        "valuesByApiLevel": {
+        "2.0": 94
+      }},
+      "defaultDispenseFlowRate": {
+        "valuesByApiLevel": {
+          "2.0": 94
+        }
+      },
+      "defaultBlowOutFlowRate": {
+        "valuesByApiLevel": {
+        "2.0": 94
+      }},
       "defaultTipLength": 51.0,
       "defaultTipOverlap": 8.2,
       "defaultReturnTipHeight": 0.4,
@@ -111,9 +121,19 @@
       "defaultBlowoutVolume": 43.295
     },
     "t300": {
-      "defaultAspirateFlowRate": 94.0,
-      "defaultDispenseFlowRate": 94.0,
-      "defaultBlowOutFlowRate": 94.0,
+      "defaultAspirateFlowRate": {
+        "valuesByApiLevel": {
+        "2.0": 94
+      }},
+      "defaultDispenseFlowRate": {
+        "valuesByApiLevel": {
+          "2.0": 94
+        }
+      },
+      "defaultBlowOutFlowRate": {
+        "valuesByApiLevel": {
+        "2.0": 94
+      }},
       "defaultTipLength": 51.0,
       "defaultTipOverlap": 8.2,
       "defaultReturnTipHeight": 0.4,

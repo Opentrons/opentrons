@@ -1,6 +1,5 @@
 import re
 from typing import List, Optional, Union, cast
-from dataclasses import dataclass
 from .dev_types import PipetteModel, PipetteName
 from .pipette_definition import (
     PipetteChannelType,
@@ -11,6 +10,8 @@ from .pipette_definition import (
     PIPETTE_CHANNELS_INTS,
     PipetteModelMajorVersionType,
     PipetteModelMinorVersionType,
+    PipetteNameType,
+    PipetteModelVersionType
 )
 
 DEFAULT_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
@@ -19,34 +20,16 @@ DEFAULT_CHANNELS = PipetteChannelType.SINGLE_CHANNEL
 DEFAULT_MODEL_VERSION = PipetteVersionType(major=1, minor=0)
 
 
-# TODO (lc 12-5-2022) Ideally we can deprecate this
-# at somepoint once we load pipettes by channels and type
-@dataclass
-class PipetteNameType:
-    pipette_type: PipetteModelType
-    pipette_channels: PipetteChannelType
-    pipette_generation: PipetteGenerationType
+def is_model(model_or_name: Union[PipetteName, PipetteModel, None]) -> bool:
+    """Determine if we have a real model or just a PipetteName.
 
-    def __repr__(self) -> str:
-        base_name = f"{self.pipette_type.name}_{self.pipette_channels}"
-        if self.pipette_generation == PipetteGenerationType.GEN1:
-            return base_name
-        elif self.pipette_channels == PipetteChannelType.NINETY_SIX_CHANNEL:
-            return base_name
-        else:
-            return f"{base_name}_{self.pipette_generation.name.lower()}"
+    Args:
+        model_or_name (Union[PipetteName, PipetteModel, None]): The pipette we want to check.
 
-
-@dataclass
-class PipetteModelVersionType:
-    pipette_type: PipetteModelType
-    pipette_channels: PipetteChannelType
-    pipette_version: PipetteVersionType
-
-    def __repr__(self) -> str:
-        base_name = f"{self.pipette_type.name}_{self.pipette_channels}"
-
-        return f"{base_name}_v{self.pipette_version}"
+    Returns:
+        bool: Whether or not the given string is a PipetteModel
+    """
+    return "v" in model_or_name
 
 
 def supported_pipette(model_or_name: Union[PipetteName, PipetteModel, None]) -> bool:

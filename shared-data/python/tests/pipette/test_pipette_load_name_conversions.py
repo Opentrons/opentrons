@@ -7,7 +7,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteGenerationType,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
-from opentrons_shared_data.pipette import pipette_load_name_conversions as pc
+from opentrons_shared_data.pipette import pipette_definition as pc, pipette_load_name_conversions as ps
 
 
 @pytest.mark.parametrize(
@@ -42,7 +42,7 @@ from opentrons_shared_data.pipette import pipette_load_name_conversions as pc
 def test_convert_pipette_model(
     model: PipetteModel, output: pc.PipetteModelVersionType
 ) -> None:
-    assert output == pc.convert_pipette_model(model)
+    assert output == ps.convert_pipette_model(model)
 
 
 @pytest.mark.parametrize(
@@ -80,7 +80,7 @@ def test_convert_pipette_model(
 def test_convert_pipette_model_provided_version(
     model: PipetteModel, version: str, output: pc.PipetteModelVersionType
 ) -> None:
-    assert output == pc.convert_pipette_model(model, version)
+    assert output == ps.convert_pipette_model(model, version)
 
 
 @pytest.mark.parametrize(
@@ -115,7 +115,7 @@ def test_convert_pipette_model_provided_version(
 def test_convert_pipette_name(
     name: PipetteName, output: pc.PipetteModelVersionType
 ) -> None:
-    assert output == pc.convert_pipette_name(name)
+    assert output == ps.convert_pipette_name(name)
 
 
 @pytest.mark.parametrize(

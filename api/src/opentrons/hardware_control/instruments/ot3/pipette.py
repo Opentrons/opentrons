@@ -101,9 +101,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             PipetteTipType(self._working_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
-        self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate
-        self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate
-        self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate
+    
+        self._aspirate_flow_rates_lookup = self._active_tip_settings.default_aspirate_flowrate["valuesByApiLevel"]
+        self._dispense_flow_rates_lookup = self._active_tip_settings.default_dispense_flowrate["valuesByApiLevel"]
+        self._blowout_flow_rates_lookup = self._active_tip_settings.default_blowout_flowrate["valuesByApiLevel"]
+        self._aspirate_flow_rate = self._aspirate_flow_rates_lookup["2.0"]
+        self._dispense_flow_rate = self._dispense_flow_rates_lookup["2.0"]
+        self._blow_out_flow_rate = self._blowout_flow_rates_lookup["2.0"]
 
         # TODO (lc 12-6-2022) When we switch over to sending pipette state, we
         # we should also try to make sure the python api isn't reaching into
@@ -198,9 +202,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             PipetteTipType(self._working_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
-        self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate
-        self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate
-        self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate
+    
+        self._aspirate_flow_rate = self.aspirate_flow_rates_lookup["2.0"]
+        self._dispense_flow_rate = self.dispense_flow_rates_lookup["2.0"]
+        self._blow_out_flow_rate = self.blow_out_flow_rates_lookup["2.0"]
 
         self._tip_overlap = {"default": self._active_tip_settings.default_tip_overlap}
 
@@ -372,6 +377,18 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def blow_out_flow_rate(self, new_flow_rate: float) -> None:
         assert new_flow_rate > 0
         self._blow_out_flow_rate = new_flow_rate
+
+    @property
+    def aspirate_flow_rates_lookup(self) -> Dict[str, float]:
+        return self._aspirate_flow_rates_lookup
+    
+    @property
+    def dispense_flow_rates_lookup(self) -> Dict[str, float]:
+        return self._dispense_flow_rates_lookup
+
+    @property
+    def blow_out_flow_rates_lookup(self) -> Dict[str, float]:
+        return self._blowout_flow_rates_lookup
 
     @property
     def working_volume(self) -> float:

@@ -250,29 +250,19 @@ class PipetteHandlerProvider:
                 instr, instr.blow_out_flow_rate, "dispense"
             )
             result["ready_to_aspirate"] = instr.ready_to_aspirate
-            # TODO (12-5-2022) Not really sure what this is supposed to
-            # be for.... revisit when we separate out static configs and
-            # stateful configs.
+
             result["default_blow_out_speeds"] = {
-                "2.0": self.plunger_speed(
-                    instr,
-                    instr.active_tip_settings.default_dispense_flowrate,
-                    "dispense",
-                )
+                alvl: self.plunger_speed(instr, fr, "blowout")
+                for alvl, fr in instr.blow_out_flow_rates_lookup.items()
             }
+
             result["default_dispense_speeds"] = {
-                "2.0": self.plunger_speed(
-                    instr,
-                    instr.active_tip_settings.default_dispense_flowrate,
-                    "dispense",
-                )
+                alvl: self.plunger_speed(instr, fr, "dispense")
+                for alvl, fr in instr.dispense_flow_rates_lookup.items()
             }
             result["default_aspirate_speeds"] = {
-                "2.0": self.plunger_speed(
-                    instr,
-                    instr._active_tip_settings.default_aspirate_flowrate,
-                    "aspirate",
-                )
+                alvl: self.plunger_speed(instr, fr, "aspirate")
+                for alvl, fr in instr.aspirate_flow_rates_lookup.items()
             }
             result[
                 "default_blow_out_volume"

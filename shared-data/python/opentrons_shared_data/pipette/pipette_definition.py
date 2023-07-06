@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, validator
 from enum import Enum
 from dataclasses import dataclass
 
-from . import types as pip_types
+from . import types as pip_types, dev_types
 
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
@@ -88,20 +88,50 @@ class PipetteVersionType:
         return (self.major, self.minor)
 
 
+# TODO (lc 12-5-2022) Ideally we can deprecate this
+# at somepoint once we load pipettes by channels and type
+@dataclass
+class PipetteNameType:
+    pipette_type: PipetteModelType
+    pipette_channels: PipetteChannelType
+    pipette_generation: PipetteGenerationType
+
+    def __repr__(self) -> str:
+        base_name = f"{self.pipette_type.name}_{self.pipette_channels}"
+        if self.pipette_generation == PipetteGenerationType.GEN1:
+            return base_name
+        elif self.pipette_channels == PipetteChannelType.NINETY_SIX_CHANNEL:
+            return base_name
+        else:
+            return f"{base_name}_{self.pipette_generation.name.lower()}"
+
+
+@dataclass
+class PipetteModelVersionType:
+    pipette_type: PipetteModelType
+    pipette_channels: PipetteChannelType
+    pipette_version: PipetteVersionType
+
+    def __repr__(self) -> str:
+        base_name = f"{self.pipette_type.name}_{self.pipette_channels}"
+
+        return f"{base_name}_v{self.pipette_version}"
+
+
 class SupportedTipsDefinition(BaseModel):
     """Tip parameters available for every tip size."""
 
-    default_aspirate_flowrate: float = Field(
+    default_aspirate_flowrate: Dict[str, Dict[str, float]] = Field(
         ...,
         description="The flowrate used in aspirations by default.",
         alias="defaultAspirateFlowRate",
     )
-    default_dispense_flowrate: float = Field(
+    default_dispense_flowrate: Dict[str, Dict[str, float]]  = Field(
         ...,
         description="The flowrate used in dispenses by default.",
         alias="defaultDispenseFlowRate",
     )
-    default_blowout_flowrate: float = Field(
+    default_blowout_flowrate: Dict[str, Dict[str, float]] = Field(
         ...,
         description="The flowrate used in blowouts by default.",
         alias="defaultBlowOutFlowRate",
@@ -116,8 +146,8 @@ class SupportedTipsDefinition(BaseModel):
         description="The default tip overlap associated with this tip type.",
         alias="defaultTipOverlap",
     )
-    default_return_tip_height: Optional[float] = Field(
-        ...,
+    default_return_tip_height: float = Field(
+        default=0.5,
         description="The height to return a tip to its tiprack.",
         alias="defaultReturnTipHeight",
     )
@@ -215,7 +245,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The display or full product name of the pipette.",
         alias="displayName",
     )
-    pipette_backcompat_names: List[str] = Field(
+    pipette_backcompat_names: List[dev_types.PipetteName] = Field(
         ...,
         description="A list of pipette names that are compatible with this pipette.",
         alias="backCompatNames",
@@ -352,3 +382,4 @@ class PipetteConfigurations(
     mount_configurations: pip_types.RobotMountConfigs = Field(
         ...,
     )
+
