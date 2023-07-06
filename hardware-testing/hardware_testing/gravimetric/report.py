@@ -269,13 +269,7 @@ def create_csv_test_report(
     for field in fields(config.GravimetricConfig):
         if field.name in config.GRAV_CONFIG_EXCLUDE_FROM_REPORT:
             continue
-        cfg_val = getattr(cfg, field.name)
-        # print(field.type, type(cfg_val), cfg_val)
-        # if field.type == List[int]:
-        #     print("changing")
-        #     cfg_val = list([v for v in cfg_val])
-        #     print(type(cfg_val), cfg_val)
-        report("CONFIG", field.name, [cfg_val])
+        report("CONFIG", field.name, [getattr(cfg, field.name)])
     return report
 
 
