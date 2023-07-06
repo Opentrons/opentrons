@@ -41,6 +41,7 @@ from .ot3utils import (
     create_gripper_jaw_hold_group,
     create_tip_action_group,
     PipetteAction,
+    create_gear_motor_home_group,
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
     map_pipette_type_to_sensor_id,
@@ -251,7 +252,7 @@ class OT3Controller:
             FirmwareUpdate(),
         )
         self._position = self._get_home_position()
-        self._gear_motor_position = None
+        self._gear_motor_position: float
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._check_updates = check_updates
@@ -630,20 +631,31 @@ class OT3Controller:
             )
         return new_group
 
-    async def tip_action(
+    async def home_gear_motors(
         self,
-        moves: List[Move],
-        tip_action: str = "home",
-        accelerate_during_move: bool = True,
+        distance: float,
+        velocity: float,
     ) -> None:
-        group = create_tip_action_group(moves, [NodeId.pipette_left], tip_action, accelerate_during_move)
-        move_group = group
+        move_group = create_gear_motor_home_group(distance, velocity)
         runner = MoveGroupRunner(
             move_groups=[move_group],
             ignore_stalls=True if not ff.stall_detection_enabled() else False,
         )
         positions = await runner.run(can_messenger=self._messenger)
-        print(f"positions returned = {positions}")
+        if NodeId.pipette_left in positions:
+            self._gear_motor_position = positions[NodeId.pipette_left][0]
+
+    async def tip_action(
+        self,
+        moves: List[Move[OT3Axis]],
+        tip_action: str = "home",
+    ) -> None:
+        move_group = create_tip_action_group(moves, [NodeId.pipette_left], tip_action)
+        runner = MoveGroupRunner(
+            move_groups=[move_group],
+            ignore_stalls=True if not ff.stall_detection_enabled() else False,
+        )
+        positions = await runner.run(can_messenger=self._messenger)
         if NodeId.pipette_left in positions:
             self._gear_motor_position = positions[NodeId.pipette_left][0]
         print(f"gear position is now {self._gear_motor_position}")

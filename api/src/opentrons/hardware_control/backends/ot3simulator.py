@@ -137,6 +137,7 @@ class OT3Simulator:
         self._update_required = False
         self._initialized = False
         self._lights = {"button": False, "rails": False}
+        self._gear_motor_position = 0
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -200,6 +201,10 @@ class OT3Simulator:
     @property
     def eeprom_data(self) -> EEPROMData:
         return EEPROMData()
+
+    @property
+    def gear_motor_position(self) -> Optional[float]:
+        return self._gear_motor_position
 
     @property
     def board_revision(self) -> BoardRevision:
@@ -372,9 +377,8 @@ class OT3Simulator:
 
     async def tip_action(
         self,
-        moves: List[Move],
+        moves: List[Move[OT3Axis]],
         tip_action: str = "home",
-        accelerate_during_move: bool = True,
     ) -> None:
         pass
 

@@ -1,7 +1,10 @@
 """Shared utilities for ot3 hardware control."""
 from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence, cast
 from typing_extensions import Literal
-from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
+from opentrons.config.defaults_ot3 import (
+    DEFAULT_CALIBRATION_AXIS_MAX_SPEED,
+    DEFAULT_MAX_SPEED_DISCONTINUITY,
+)
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
     Axis,
@@ -373,18 +376,14 @@ def create_home_group(
 def create_tip_action_group(
     moves: List[Move[OT3Axis]],
     present_nodes: Iterable[NodeId],
-    action: PipetteTipActionType,
-    accelerate_during_move: bool = True,
+    action: str,
 ) -> MoveGroup:
     move_group: MoveGroup = []
     for move in moves:
         unit_vector = move.unit_vector
         for block in move.blocks:
             velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
-            if accelerate_during_move:
-                accelerations = unit_vector_multiplication(unit_vector, block.acceleration)
-            else:
-                accelerations = {OT3Axis.Q: 0}
+            accelerations = unit_vector_multiplication(unit_vector, block.acceleration)
             step = create_tip_action_step(
                 velocity=_convert_to_node_id_dict(velocities),
                 acceleration=_convert_to_node_id_dict(accelerations),
@@ -394,6 +393,20 @@ def create_tip_action_group(
             )
             move_group.append(step)
     return move_group
+
+
+def create_gear_motor_home_group(
+    distance: float,
+    velocity: float,
+) -> MoveGroup:
+    step = create_tip_action_step(
+        velocity={NodeId.pipette_left: np.float64(velocity)},
+        acceleration={NodeId.pipette_left: np.float64(0)},
+        duration=np.float64(distance / velocity),
+        present_nodes=[NodeId.pipette_left],
+        action=PipetteTipActionType.home,
+    )
+    return [step]
 
 
 def create_gripper_jaw_grip_group(
