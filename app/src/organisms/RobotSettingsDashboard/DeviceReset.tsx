@@ -36,9 +36,6 @@ const OptionButton = styled.input`
 
 const OptionLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border: 2px solid
-    ${({ isSelected }) =>
-      isSelected === true ? COLORS.blueEnabled : COLORS.light2};
   border-radius: ${BORDERS.borderRadiusSize4};
   color: ${({ isSelected }) =>
     isSelected === true ? COLORS.white : COLORS.darkBlack100};
@@ -184,7 +181,11 @@ export function DeviceReset({
           buttonType="alert"
           disabled={
             Object.keys(resetOptions).length === 0 ||
-            availableOptions.every(option => resetOptions[option.id] === false)
+            availableOptions.every(
+              option =>
+                resetOptions[option.id] === false ||
+                resetOptions[option.id] === undefined
+            )
           }
           onClick={handleClick}
         />
