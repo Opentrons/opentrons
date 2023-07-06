@@ -17,10 +17,6 @@ const mockSetEstopPhysicalStatus = setEstopPhysicalStatus as jest.MockedFunction
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
-const UPDATE_ESTOP_PHYSICAL_STATUS_RESPONSE = {
-  status: {},
-}
-
 describe('useSetEstopPhysicalStatusMutation hook', () => {
   let wrapper: React.FunctionComponent<{}>
   const updatedEstopPhysicalStatus: EstopState = {
