@@ -79,6 +79,7 @@ test-cov:
 test-photometric:
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 50 --trials 5
 	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 200 --trials 5
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 1000 --trials 5
 
 .PHONY: test-gravimetric-single
 test-gravimetric-single:
@@ -95,6 +96,12 @@ test-gravimetric-multi:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 1000 --trials 1
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 200 --trials 1
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1
+
+.PHONY: test-gravimetric-96
+test-gravimetric-96:
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --tip 50 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --tip 200 --trials 1
+	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 96 --tip 1000 --trials 1
 
 .PHONY: test-gravimetric
 test-gravimetric:
