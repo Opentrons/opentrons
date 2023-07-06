@@ -43,7 +43,6 @@ import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningPr
 import { getLocalRobot } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
-import { Portal } from '../../App/portal'
 
 interface BulletProps {
   isActive: boolean
