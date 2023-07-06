@@ -343,7 +343,7 @@ If you get any errors in simulation, or you don't get the outcome you expected w
 In Simulation
 ^^^^^^^^^^^^^
 
-Simulation doesn’t require having a robot to your computer. You just need to install the ``opentrons`` Python module using ``pip``. This will give you access to the ``opentrons_simulate`` command-line utility (``opentrons_simulate.exe`` on Windows). To see a text preview of the steps the OT-2 will take, ``cd`` to the directory where you saved your protocol file and run:
+Simulation doesn’t require having a robot connected to your computer. You just need to install the ``opentrons`` Python module using ``pip``. This will give you access to the ``opentrons_simulate`` command-line utility (``opentrons_simulate.exe`` on Windows). To see a text preview of the steps the OT-2 will take, ``cd`` to the directory where you saved your protocol file and run:
 
 .. prompt:: bash
 
