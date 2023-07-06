@@ -320,6 +320,21 @@ def _load_pipette(
     return pipette
 
 
+def _get_tag_from_pipette(
+    pipette: InstrumentContext,
+    cfg: Union[config.GravimetricConfig, config.PhotometricConfig],
+) -> str:
+    pipette_tag = get_pipette_unique_name(pipette)
+    print(f'found pipette "{pipette_tag}"')
+    if getattr(cfg, "increment", False):
+        pipette_tag += "-increment"
+    elif cfg.user_volumes:
+        pipette_tag += "-user-volume"
+    else:
+        pipette_tag += "-qc"
+    return pipette_tag
+
+
 def _load_tipracks(
     ctx: ProtocolContext,
     cfg: Union[config.GravimetricConfig, config.PhotometricConfig],

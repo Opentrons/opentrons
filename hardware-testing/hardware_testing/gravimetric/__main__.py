@@ -2,11 +2,11 @@
 from json import load as json_load
 from pathlib import Path
 import argparse
-from typing import List
+from typing import List, Union
 
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing.data import ui
+from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.protocols import (
     gravimetric_ot3_p50_single,
     gravimetric_ot3_p50_multi_50ul_tip,
@@ -28,6 +28,7 @@ from hardware_testing.protocols import (
 from . import execute, helpers, workarounds, execute_photometric
 from .config import GravimetricConfig, GANTRY_MAX_SPEED, PhotometricConfig
 from .measurement import DELAY_FOR_MEASUREMENT
+from .trial import TestResources
 
 # FIXME: bump to v2.15 to utilize protocol engine
 API_LEVEL = "2.13"
@@ -89,7 +90,7 @@ PHOTOMETRIC_CFG = {
 }
 
 
-def run_gravimetric(
+def build_gravimetric_cfg(
     protocol: ProtocolContext,
     pipette_volume: int,
     pipette_channels: int,
@@ -104,41 +105,38 @@ def run_gravimetric(
     gantry_speed: int,
     scale_delay: int,
     isolate_channels: List[int],
-) -> None:
-    """Run."""
+) -> GravimetricConfig:
+jkjqjkjaqq    """Run."""
     if increment:
         protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[pipette_volume][pipette_channels][
             tip_volume
         ]
     else:
         protocol_cfg = GRAVIMETRIC_CFG[pipette_volume][pipette_channels][tip_volume]
-    execute.run(
-        protocol,
-        GravimetricConfig(
-            name=protocol_cfg.metadata["protocolName"],  # type: ignore[attr-defined]
-            pipette_mount="left",
-            pipette_volume=pipette_volume,
-            pipette_channels=pipette_channels,
-            tip_volume=tip_volume,
-            trials=trials,
-            labware_offsets=LABWARE_OFFSETS,
-            labware_on_scale=protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
-            slot_scale=protocol_cfg.SLOT_SCALE,  # type: ignore[attr-defined]
-            slots_tiprack=protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
-            increment=increment,
-            return_tip=return_tip,
-            blank=blank,
-            mix=mix,
-            inspect=inspect,
-            user_volumes=user_volumes,
-            gantry_speed=gantry_speed,
-            scale_delay=scale_delay,
-            isolate_channels=isolate_channels,
-        ),
+    return GravimetricConfig(
+        name=protocol_cfg.metadata["protocolName"],  # type: ignore[attr-defined]
+        pipette_mount="left",
+        pipette_volume=pipette_volume,
+        pipette_channels=pipette_channels,
+        tip_volume=tip_volume,
+        trials=trials,
+        labware_offsets=LABWARE_OFFSETS,
+        labware_on_scale=protocol_cfg.LABWARE_ON_SCALE,  # type: ignore[attr-defined]
+        slot_scale=protocol_cfg.SLOT_SCALE,  # type: ignore[attr-defined]
+        slots_tiprack=protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
+        increment=increment,
+        return_tip=return_tip,
+        blank=blank,
+        mix=mix,
+        inspect=inspect,
+        user_volumes=user_volumes,
+        gantry_speed=gantry_speed,
+        scale_delay=scale_delay,
+        isolate_channels=isolate_channels,
     )
 
 
-def run_photometric(
+def build_photometric_cfg(
     protocol: ProtocolContext,
     pipette_volume: int,
     tip_volume: int,
@@ -149,30 +147,27 @@ def run_photometric(
     user_volumes: bool,
     touch_tip: bool,
     refill: bool,
-) -> None:
+) -> PhotometricConfig:
     """Run."""
     protocol_cfg = PHOTOMETRIC_CFG[tip_volume]
-    execute_photometric.run(
-        protocol,
-        PhotometricConfig(
-            name=protocol_cfg.metadata["protocolName"],  # type: ignore[attr-defined]
-            pipette_mount="left",
-            pipette_volume=pipette_volume,
-            tip_volume=tip_volume,
-            trials=trials,
-            labware_offsets=LABWARE_OFFSETS,
-            photoplate=protocol_cfg.PHOTOPLATE_LABWARE,  # type: ignore[attr-defined]
-            photoplate_slot=protocol_cfg.SLOT_PLATE,  # type: ignore[attr-defined]
-            reservoir=protocol_cfg.RESERVOIR_LABWARE,  # type: ignore[attr-defined]
-            reservoir_slot=protocol_cfg.SLOT_RESERVOIR,  # type: ignore[attr-defined]
-            slots_tiprack=protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
-            return_tip=return_tip,
-            mix=mix,
-            inspect=inspect,
-            user_volumes=user_volumes,
-            touch_tip=touch_tip,
-            refill=refill,
-        ),
+    return PhotometricConfig(
+        name=protocol_cfg.metadata["protocolName"],  # type: ignore[attr-defined]
+        pipette_mount="left",
+        pipette_volume=pipette_volume,
+        tip_volume=tip_volume,
+        trials=trials,
+        labware_offsets=LABWARE_OFFSETS,
+        photoplate=protocol_cfg.PHOTOPLATE_LABWARE,  # type: ignore[attr-defined]
+        photoplate_slot=protocol_cfg.SLOT_PLATE,  # type: ignore[attr-defined]
+        reservoir=protocol_cfg.RESERVOIR_LABWARE,  # type: ignore[attr-defined]
+        reservoir_slot=protocol_cfg.SLOT_RESERVOIR,  # type: ignore[attr-defined]
+        slots_tiprack=protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
+        return_tip=return_tip,
+        mix=mix,
+        inspect=inspect,
+        user_volumes=user_volumes,
+        touch_tip=touch_tip,
+        refill=refill,
     )
 
 
@@ -233,8 +228,9 @@ if __name__ == "__main__":
         deck_version="2",
         extra_labware=custom_defs,
     )
+    union_cfg: Union[PhotometricConfig, GravimetricConfig]
     if args.photometric:
-        run_photometric(
+        cfg_pm: PhotometricConfig = build_photometric_cfg(
             _ctx,
             args.pipette,
             args.tip,
@@ -246,8 +242,9 @@ if __name__ == "__main__":
             args.touch_tip,
             args.refill,
         )
+        union_cfg = cfg_pm
     else:
-        run_gravimetric(
+        cfg_gm: GravimetricConfig = build_gravimetric_cfg(
             _ctx,
             args.pipette,
             args.channels,
@@ -263,3 +260,32 @@ if __name__ == "__main__":
             args.scale_delay,
             args.isolate_channels if args.isolate_channels else [],
         )
+        union_cfg = cfg_gm
+    run_id, start_time = create_run_id_and_start_time()
+    ui.print_header("LOAD PIPETTE")
+    pipette = helpers._load_pipette(_ctx, union_cfg)
+    ui.print_header("GET PARAMETERS")
+    test_volumes = helpers._get_volumes(_ctx, union_cfg)
+    for v in test_volumes:
+        print(f"\t{v} uL")
+
+    run_args = TestResources(
+        ctx=_ctx,
+        pipette=pipette,
+        pipette_tag=helpers._get_tag_from_pipette(pipette, union_cfg),
+        tipracks=helpers._load_tipracks(
+            _ctx, union_cfg, use_adapters=args.channels == 96
+        ),
+        test_volumes=test_volumes,
+        run_id=run_id,
+        start_time=start_time,
+        operator_name=helpers._get_operator_name(_ctx.is_simulating()),
+        robot_serial=helpers._get_robot_serial(_ctx.is_simulating()),
+        tip_batch=helpers._get_tip_batch(_ctx.is_simulating()),
+        git_description=get_git_description(),
+    )
+
+    if args.photometric:
+        execute_photometric.run(cfg_pm, run_args)
+    else:
+        execute.run(cfg_gm, run_args)
