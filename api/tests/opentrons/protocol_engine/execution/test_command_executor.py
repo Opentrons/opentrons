@@ -399,7 +399,6 @@ async def test_execute_raises_protocol_engine_error(
                 error_id="error-id",
                 failed_at=datetime(year=2023, month=3, day=3),
                 error=expected_error,
-                unexpectedError=unexpected_error,
             )
         ),
     )

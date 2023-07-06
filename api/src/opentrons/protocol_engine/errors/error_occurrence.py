@@ -2,7 +2,7 @@
 from logging import getLogger
 
 from datetime import datetime
-from typing import Any, Dict, List, Type, Union
+from typing import Any, Dict, List, Type, Union, Optional, Sequence
 from pydantic import BaseModel, Field
 from opentrons_shared_data.errors.codes import ErrorCodes
 from .exceptions import ProtocolEngineError
@@ -78,15 +78,19 @@ class ErrorOccurrence(BaseModel):
                 ["errorCode", "wrappedErrors", "errorInfo", "unexpectedFail"]
             )
 
+class ProtocolCommandFailedError(ProtocolEngineError):
+    """Raised if a fatal command execution error has occurred."""
 
-class _ErrorOccurrenceFromChildThread(Exception):
-    """Wrap a ErrorOccurrence exception from a child thread.
-
-    Should not be exposed to the public.
-    """
-
-    def __init__(self, wrapped_error: ErrorOccurrence) -> None:
-        self.error = wrapped_error
+    def __init__(
+        self,
+        original_error: ErrorOccurrence,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ProtocolCommandFailedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        self.original_error = original_error
 
 
 ErrorOccurrence.update_forward_refs()

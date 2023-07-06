@@ -39,7 +39,6 @@ from ..errors import (
     UnexpectedProtocolError,
     ProtocolCommandFailedError,
 )
-from ..errors.error_occurrence import _ErrorOccurrenceFromChildThread
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
 from .config import Config
@@ -265,7 +264,6 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 id=action.error_id,
                 createdAt=action.failed_at,
                 error=action.error,
-                unexepctedError=action.unexpectedError,
             )
             log.info(f"error_occurrence:: {error_occurrence}")
             prev_entry = self._state.commands_by_id[action.command_id]
@@ -346,9 +344,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     error_id = action.error_details.error_id
                     created_at = action.error_details.created_at
                     if isinstance(
-                        action.error_details.error, _ErrorOccurrenceFromChildThread
+                        action.error_details.error, ProtocolCommandFailedError
                     ):
-                        error_occurrence = action.error_details.error.error
+                        error_occurrence = action.error_details.error.original_error
                         log.info(f"finish command will have {error_occurrence}")
                         self._state.errors_by_id[error_id] = error_occurrence
                     else:
@@ -576,12 +574,9 @@ class CommandView(HasState[CommandState]):
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
-                    if command.error.unexpectedFail:
-                        raise _ErrorOccurrenceFromChildThread(
-                            wrapped_error=command.error
-                        )
-                    else:
-                        raise ProtocolCommandFailedError(command.error.detail)
+                    raise ProtocolCommandFailedError(
+                        original_error=command.error, message=command.error.detail
+                    )
             return True
         else:
             return False

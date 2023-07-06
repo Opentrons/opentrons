@@ -9,6 +9,7 @@ from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
 from opentrons_shared_data.errors import ErrorCodes
 
+from .errors import ProtocolCommandFailedError
 from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
 from .types import (
@@ -44,7 +45,6 @@ from .actions import (
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
 )
-from .errors.error_occurrence import _ErrorOccurrenceFromChildThread
 
 
 log = getLogger(__name__)
@@ -255,8 +255,9 @@ class ProtocolEngine:
         if error:
             log.info(f"got and estop? {error}")
             if (
-                isinstance(error, _ErrorOccurrenceFromChildThread)
-                and error.error.errorCode == ErrorCodes.E_STOP_ACTIVATED.value.code
+                isinstance(error, ProtocolCommandFailedError)
+                and error.original_error.errorCode
+                == ErrorCodes.E_STOP_ACTIVATED.value.code
             ):
                 drop_tips_and_home = False
 

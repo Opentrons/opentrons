@@ -105,17 +105,14 @@ class CommandExecutor:
 
         except (Exception, asyncio.CancelledError) as error:
             log.warning(f"Execution of {command.id} failed", exc_info=error)
-            unexpectedError: bool = False
             # TODO(mc, 2022-11-14): mark command as stopped rather than failed
             # https://opentrons.atlassian.net/browse/RCORE-390
             if isinstance(error, asyncio.CancelledError):
                 error = RunStoppedError("Run was cancelled")
             elif isinstance(error, EStopActivatedError):
                 error = PE_EStopActivatedError(message=str(error), wrapping=[error])
-                unexpectedError = True
             elif not isinstance(error, ProtocolEngineError):
                 error = UnexpectedProtocolError(message=str(error), wrapping=[error])
-                unexpectedError = True
 
             self._action_dispatcher.dispatch(
                 FailCommandAction(
@@ -123,7 +120,6 @@ class CommandExecutor:
                     command_id=command_id,
                     error_id=self._model_utils.generate_id(),
                     failed_at=self._model_utils.get_timestamp(),
-                    unexpectedError=unexpectedError,
                 )
             )
 

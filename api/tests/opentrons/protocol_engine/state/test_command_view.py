@@ -24,7 +24,7 @@ from opentrons.protocol_engine.state.commands import (
     RunResult,
     QueueStatus,
 )
-from opentrons.protocol_engine.errors.exceptions import ProtocolCommandFailedError
+from opentrons.protocol_engine.errors import ProtocolCommandFailedError
 
 from .command_fixtures import (
     create_queued_command,

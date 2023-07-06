@@ -1,4 +1,5 @@
 """Base transport interfaces for communicating with a Protocol Engine."""
+from logging import getLogger
 from abc import ABC, abstractmethod
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
 from typing import Any, overload
@@ -8,9 +9,11 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..protocol_engine import ProtocolEngine
-from ..errors.error_occurrence import _ErrorOccurrenceFromChildThread
+from ..errors import ProtocolCommandFailedError
 from ..state import StateView
 from ..commands import CommandCreate, CommandResult
+
+log = getLogger(__name__)
 
 
 class AbstractSyncTransport(ABC):
@@ -106,7 +109,9 @@ class ChildThreadTransport(AbstractSyncTransport):
         # TODO: this needs to have an actual code
         if command.error is not None:
             error = command.error
-            raise _ErrorOccurrenceFromChildThread(wrapped_error=error)
+            raise ProtocolCommandFailedError(
+                original_error=error, message=f"{error.errorType}: {error.detail}"
+            )
 
         # FIXME(mm, 2023-04-10): This assert can easily trigger from this sequence:
         #
