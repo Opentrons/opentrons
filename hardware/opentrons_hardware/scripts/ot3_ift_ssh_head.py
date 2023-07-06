@@ -9,6 +9,7 @@ import datetime
 from typing import Callable
 from logging.config import dictConfig
 import subprocess
+import re
 
 from opentrons_hardware.drivers.can_bus.build import build_driver
 from opentrons_hardware.drivers.can_bus import build, CanMessenger,  WaitableCallback
@@ -24,6 +25,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     EnableMotorRequest,
     MotorPositionRequest,
     InstrumentInfoRequest,
+    DeviceInfoRequest,
 )
 
 from opentrons_hardware.hardware_control.motion import (
@@ -268,7 +270,20 @@ async def read_epprom(messenger: CanMessenger, node):
                             pipette_version + \
                             str(message.payload.serial.value.decode('ascii').rstrip('\x00'))
                 return serial_number
-    except asyncio.TimeoutError:
+    except Exception as errval:
+        print("errval",errval)
+        return "None"
+
+async def read_version(messenger: CanMessenger, node):
+    await messenger.send(node, DeviceInfoRequest())
+    target = datetime.datetime.now()
+    try:
+        while True:
+            with WaitableCallback(messenger) as wc:
+                message, arb = await asyncio.wait_for(wc.read(), 1.0)
+                return message
+    except Exception as errval:
+        #print("errval",errval)
         return "None"
 
 async def  run(args: argparse.Namespace) -> None:
@@ -331,6 +346,15 @@ async def  run(args: argparse.Namespace) -> None:
         res = await move_for_input(messenger, node,position,"up",args)
         #print("moveup=Pass")
         #return res
+    if args.read_version:
+        serial_version = await read_version(messenger, node)
+        pattern = r'version=UInt32Field\(value=(\d+)\)'
+        match = re.search(pattern, str(serial_version))
+        value = 0
+        if match:
+            value = match.group(1)
+        print(f'READVERSION={value}')
+
 
 log = logging.getLogger(__name__)
 
@@ -394,6 +418,7 @@ def main() -> None:
     parser.add_argument("--limit_switch", action="store_true")
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--read_epprom", action="store_true")
+    parser.add_argument("--read_version", action="store_true")
     parser.add_argument("--home", action="store_true")
     parser.add_argument("--downward", action="store_true")
     parser.add_argument("--up", action="store_true")

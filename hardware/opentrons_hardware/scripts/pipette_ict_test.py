@@ -176,13 +176,17 @@ async def read_epprom(messenger: CanMessenger, node):
         while True:
             with WaitableCallback(messenger) as wc:
                 message, arb = await asyncio.wait_for(wc.read(), 1.0)
+                print(message)
                 pipette_name = PipetteName(message.payload.name.value).name
+                print(pipette_name)
                 pipette_version = str(message.payload.model.value)
+                print(pipette_version)
                 serial_number = determine_abbreviation(pipette_name) + \
                             pipette_version + \
                             str(message.payload.serial.value.decode('ascii').rstrip('\x00'))
                 return serial_number
-    except asyncio.TimeoutError:
+    except Exception as errval:
+        print("errval",errval)
         pass
 
 async def run(args: argparse.Namespace) -> None:
