@@ -1,4 +1,5 @@
 """Gravimetric."""
+from asyncio import sleep
 from inspect import getsource
 from statistics import stdev
 from typing import Optional, Tuple, List, Dict
@@ -608,9 +609,9 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             pipette.move_to(hover_pos)
             for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
                 print(
-                    f"wait {i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE} seconds before"
-                    f" measuring evaporation"
+                    f"wait for scale to stabilize ({i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE})"
                 )
+                await sleep(1)
             actual_asp_list_evap: List[float] = []
             actual_disp_list_evap: List[float] = []
             for trial in range(config.NUM_BLANK_TRIALS):
