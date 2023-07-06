@@ -23,7 +23,7 @@ export const chainRunCommandsRecursive = (
       ) {
         setIsLoading(false)
         return Promise.reject(
-          new Error(response.data.result.error ?? 'command failed')
+          new Error(response.data.error?.detail ?? 'command failed')
         )
       }
       if (commands.slice(1).length < 1) {

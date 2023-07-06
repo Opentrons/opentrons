@@ -43,7 +43,7 @@ import {
   InvariantContext,
 } from '@opentrons/step-generation'
 import { StepFieldName } from '../../form-types'
-import { LabwareLocation } from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
+import type { LabwareLocation } from '@opentrons/shared-data'
 export type { StepFieldName }
 
 const getLabwareEntity = (

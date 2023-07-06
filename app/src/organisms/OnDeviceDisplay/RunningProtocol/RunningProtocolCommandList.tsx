@@ -172,7 +172,7 @@ export function RunningProtocolCommandList({
                   : COLORS.light1
               return (
                 <Flex
-                  key={command.key}
+                  key={command.id}
                   alignItems={ALIGN_CENTER}
                   gridGap={SPACING.spacing8}
                 >

@@ -100,7 +100,7 @@ export const RunPreviewComponent = (
             : COLORS.darkGreyEnabled
           return (
             <Flex
-              key={command.key}
+              key={command.id}
               alignItems={ALIGN_CENTER}
               gridGap={SPACING.spacing8}
             >

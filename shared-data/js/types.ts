@@ -23,7 +23,7 @@ import {
   GRIPPER_V1_1,
   MAGNETIC_BLOCK_V1,
 } from './constants'
-import { EXTENSION } from '.'
+import { EXTENSION } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
 import type { PipetteName } from './pipettes'
