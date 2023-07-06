@@ -1696,6 +1696,7 @@ class OT3API(
             realmount, tip_length, presses, increment
         )
 
+        await self._move_to_plunger_bottom(realmount, rate=1.0)
         if spec.pick_up_motor_actions:
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
         else:

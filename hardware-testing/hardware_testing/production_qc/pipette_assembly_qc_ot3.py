@@ -795,7 +795,7 @@ async def _test_diagnostics_pressure(
     if not api.is_simulator:
         _get_operator_answer_to_question('REMOVE tip to nozzle, enter "y" when ready')
     print("moving plunger back down to BOTTOM position")
-    await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom)
+    await api.dispense(mount)
     await api.remove_tip(mount)
     return pressure_open_air_pass and pressure_sealed_pass and pressure_compress_pass
 
