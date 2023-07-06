@@ -24,6 +24,8 @@ log = logging.getLogger(__name__)
 
 FLOAT_THRESHOLD = 0.001  # TODO: re-evaluate this value based on system limitations
 
+MINIMUM_DISPLACEMENT = 0.05
+
 
 class MoveConditionNotMet(ValueError):
     """Error raised if a move does not meet its stop condition before finishing."""
@@ -47,6 +49,10 @@ def get_unit_vector(
     initial_vectorized = vectorize({k: np.float64(v) for k, v in initial.items()})
     target_vectorized = vectorize({k: np.float64(v) for k, v in target.items()})
     displacement: "NDArray[np.float64]" = target_vectorized - initial_vectorized
+    # minimum distance of 0.05mm
+    for i in range(len(displacement)):
+        if abs(displacement[i]) < MINIMUM_DISPLACEMENT:
+            displacement[i] = 0
     distance = np.linalg.norm(displacement)  # type: ignore[no-untyped-call]
     if not distance or np.array_equal(initial_vectorized, target_vectorized):
         raise ZeroLengthMoveError(initial, target)
