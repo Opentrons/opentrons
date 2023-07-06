@@ -319,3 +319,30 @@ def _load_pipette(
         hwpipette: Pipette = hwapi.hardware_pipettes[mnt.to_mount()]
         hwpipette.pick_up_configurations.current = 0.2
     return pipette
+
+
+def _load_tipracks(
+    ctx: ProtocolContext,
+    cfg: Union[config.GravimetricConfig, config.PhotometricConfig],
+    use_adapters: bool = False,
+) -> List[Labware]:
+    adp_str = "_adp" if use_adapters else ""
+    tiprack_load_settings: List[Tuple[int, str]] = [
+        (
+            slot,
+            f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul{adp_str}",
+        )
+        for slot in cfg.slots_tiprack
+    ]
+    for ls in tiprack_load_settings:
+        print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
+    if use_adapters:
+        tiprack_namespace = "custom_beta"
+    else:
+        tiprack_namespace = "opentrons"
+    tipracks = [
+        ctx.load_labware(ls[1], location=ls[0], namespace=tiprack_namespace)
+        for ls in tiprack_load_settings
+    ]
+    _apply_labware_offsets(cfg, tipracks)
+    return tipracks

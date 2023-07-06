@@ -26,6 +26,7 @@ from .helpers import (
     _drop_tip,
     _get_volumes,
     _load_pipette,
+    _load_tipracks,
 )
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,
@@ -68,22 +69,8 @@ def _load_labware(
 ) -> Tuple[Labware, Labware, List[Labware]]:
     print(f'Loading photoplate labware: "{cfg.photoplate}"')
     photoplate = ctx.load_labware(cfg.photoplate, location=cfg.photoplate_slot)
-    tiprack_load_settings: List[Tuple[int, str]] = [
-        (
-            slot,
-            f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul_adp",
-        )
-        for slot in cfg.slots_tiprack
-    ]
-    for ls in tiprack_load_settings:
-        print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
     reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
-    tiprack_namespace = "custom_beta"
-    tipracks = [
-        ctx.load_labware(ls[1], location=ls[0], namespace=tiprack_namespace)
-        for ls in tiprack_load_settings
-    ]
-    _apply_labware_offsets(cfg, tipracks)
+    tipracks = _load_tipracks(ctx, cfg, use_adapters=True)
     _apply_labware_offsets(cfg, [photoplate, reservoir])
     return photoplate, reservoir, tipracks
 
