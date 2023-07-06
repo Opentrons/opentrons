@@ -3,6 +3,7 @@ import { COLORS, renderWithProviders } from '@opentrons/components'
 import { Skeleton } from '../../../atoms/Skeleton'
 import { getIsOnDevice } from '../../../redux/config'
 import { SimpleWizardBody } from '..'
+import image from '*.png'
 
 jest.mock('../../../atoms/Skeleton')
 jest.mock('../../../redux/config')
@@ -45,10 +46,10 @@ describe('SimpleWizardBody', () => {
       ...props,
       isSuccess: true,
     }
-    const { getByText, getByLabelText } = render(props)
+    const { getByText, getByRole } = render(props)
     getByText('header')
     getByText('subheader')
-    getByLabelText('ot-check')
+    getByRole('img', { name: 'Success Icon' })
   })
   it('renders a few skeletons  when it is pending', () => {
     props = {

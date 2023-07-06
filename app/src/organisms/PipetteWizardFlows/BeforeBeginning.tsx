@@ -62,7 +62,7 @@ export const BeforeBeginning = (
     isOnDevice,
     requiredPipette,
   } = props
-  const { t } = useTranslation('pipette_wizard_flows', 'shared')
+  const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   React.useEffect(() => {
     createMaintenanceRun({})
   }, [])
