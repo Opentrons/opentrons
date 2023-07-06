@@ -14,26 +14,28 @@ import { renderWithProviders } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import ot3StandardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
-import { i18n } from '../../../i18n'
-import { mockRobotSideAnalysis } from '../../../organisms/CommandText/__fixtures__'
+import { i18n } from '../../../../i18n'
+import { mockRobotSideAnalysis } from '../../../../organisms/CommandText/__fixtures__'
 import {
   useAttachedModules,
   useLPCDisabledReason,
   useRunCreatedAtTimestamp,
-} from '../../../organisms/Devices/hooks'
-import { useMostRecentCompletedAnalysis } from '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
-import { ProtocolSetupLiquids } from '../../../organisms/ProtocolSetupLiquids'
-import { getProtocolModulesInfo } from '../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
-import { ProtocolSetupModules } from '../../../organisms/ProtocolSetupModules'
-import { getUnmatchedModulesForProtocol } from '../../../organisms/ProtocolSetupModules/utils'
-import { useLaunchLPC } from '../../../organisms/LabwarePositionCheck/useLaunchLPC'
-import { ConfirmCancelRunModal } from '../../../organisms/OnDeviceDisplay/RunningProtocol'
-import { mockProtocolModuleInfo } from '../../../organisms/ProtocolSetupInstruments/__fixtures__'
+} from '../../../../organisms/Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+import { ProtocolSetupLiquids } from '../../../../organisms/ProtocolSetupLiquids'
+import { getProtocolModulesInfo } from '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+import { ProtocolSetupModules } from '../../../../organisms/ProtocolSetupModules'
+import { getUnmatchedModulesForProtocol } from '../../../../organisms/ProtocolSetupModules/utils'
+import { useLaunchLPC } from '../../../../organisms/LabwarePositionCheck/useLaunchLPC'
+import { ConfirmCancelRunModal } from '../../../../organisms/OnDeviceDisplay/RunningProtocol'
+import { mockProtocolModuleInfo } from '../../../../organisms/ProtocolSetupInstruments/__fixtures__'
 import {
   useRunControls,
   useRunStatus,
-} from '../../../organisms/RunTimeControl/hooks'
-import { ProtocolSetup } from '../ProtocolSetup'
+} from '../../../../organisms/RunTimeControl/hooks'
+import { useIsHeaterShakerInProtocol } from '../../../../organisms/ModuleCard/hooks'
+import { ConfirmAttachedModal } from '../ConfirmAttachedModal'
+import { ProtocolSetup } from '..'
 
 import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
@@ -52,17 +54,22 @@ Object.defineProperty(window, 'IntersectionObserver', {
 
 jest.mock('@opentrons/shared-data/js/helpers')
 jest.mock('@opentrons/react-api-client')
-jest.mock('../../../organisms/LabwarePositionCheck/useLaunchLPC')
-jest.mock('../../../organisms/Devices/hooks')
+jest.mock('../../../../organisms/LabwarePositionCheck/useLaunchLPC')
+jest.mock('../../../../organisms/Devices/hooks')
 jest.mock(
-  '../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+  '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 )
-jest.mock('../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo')
-jest.mock('../../../organisms/ProtocolSetupModules')
-jest.mock('../../../organisms/ProtocolSetupModules/utils')
-jest.mock('../../../organisms/OnDeviceDisplay/RunningProtocol')
-jest.mock('../../../organisms/RunTimeControl/hooks')
-jest.mock('../../../organisms/ProtocolSetupLiquids')
+jest.mock(
+  '../../../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
+)
+jest.mock('../../../../organisms/ProtocolSetupModules')
+jest.mock('../../../../organisms/ProtocolSetupModules/utils')
+jest.mock('../../../../organisms/OnDeviceDisplay/RunningProtocol')
+jest.mock('../../../../organisms/RunTimeControl/hooks')
+jest.mock('../../../../organisms/ProtocolSetupLiquids')
+jest.mock('../../../../organisms/ModuleCard/hooks')
+jest.mock('../../../../redux/config')
+jest.mock('../ConfirmAttachedModal')
 
 const mockGetDeckDefFromRobotType = getDeckDefFromRobotType as jest.MockedFunction<
   typeof getDeckDefFromRobotType
@@ -112,6 +119,12 @@ const mockUseLaunchLPC = useLaunchLPC as jest.MockedFunction<
 >
 const mockUseLPCDisabledReason = useLPCDisabledReason as jest.MockedFunction<
   typeof useLPCDisabledReason
+>
+const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.MockedFunction<
+  typeof useIsHeaterShakerInProtocol
+>
+const mockConfirmAttachedModal = ConfirmAttachedModal as jest.MockedFunction<
+  typeof ConfirmAttachedModal
 >
 
 const render = (path = '/') => {
@@ -232,6 +245,10 @@ describe('ProtocolSetup', () => {
         launchLPC: mockLaunchLPC,
         LPCWizard: <div>mock LPC Wizard</div>,
       })
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(false)
+    mockConfirmAttachedModal.mockReturnValue(
+      <div>mock ConfirmAttachedModal</div>
+    )
   })
 
   afterEach(() => {
@@ -308,5 +325,12 @@ describe('ProtocolSetup', () => {
     getByText('Labware Position Check').click()
     expect(mockLaunchLPC).toHaveBeenCalled()
     getByText('mock LPC Wizard')
+  })
+
+  it('should render a confirmation modal when heater-shaker is in a protocol and it is not shaking', () => {
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
+    const [{ getByRole, getByText }] = render(`/runs/${RUN_ID}/setup/`)
+    getByRole('button', { name: 'play' }).click()
+    getByText('mock ConfirmAttachedModal')
   })
 })
