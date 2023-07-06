@@ -234,14 +234,14 @@ async def _measure_axis(api: OT3API, mount: types.OT3Mount, axis: str) -> None:
         y_front_gauge = await _read_gauge(api, mount, "YF")
         test_data["YF Gauge"] = str(y_front_gauge)
         test_data["YF Position"] = y_front_pos
-        print(f"Y-Front = {y_front_gauge} mm")
+        print(f"Y-Front Gauge = {y_front_gauge} mm")
         print(f"Y-Front Position = {y_front_pos}\n")
         await api.move_to(mount, back_center)
         y_back_pos = await _get_position(api, mount)
         y_back_gauge = await _read_gauge(api, mount, "YB")
         test_data["YB Gauge"] = str(y_back_gauge)
         test_data["YB Position"] = y_back_pos
-        print(f"Y-Back = {y_back_gauge} mm")
+        print(f"Y-Back Gauge = {y_back_gauge} mm")
         print(f"Y-Back Position = {y_back_pos}\n")
         await api.move_to(mount, back_center)
         distance = 0
@@ -261,15 +261,29 @@ async def _read_gauge(api: OT3API, mount: types.OT3Mount, axis: str) -> float:
     return gauge
 
 
-async def _get_position(api: OT3API, mount: types.OT3Mount) -> str:
-    current_position = await api.gantry_position(mount)
-    position = str(current_position).replace(", ",";")
-    return position
-
 def _get_attitude(api: OT3API) -> str:
     belt_attitude = api._robot_calibration.deck_calibration.belt_attitude
     attitude = str(belt_attitude).replace(", ",";")
     return attitude
+
+
+async def _get_position(api: OT3API, mount: types.OT3Mount) -> str:
+    current_position = await api.gantry_position(mount)
+    trunc_position = _trunc_point(current_position)
+    position = str(trunc_position).replace(", ",";")
+    return position
+
+
+def _trunc_point(p: types.Point) -> types.Point:
+
+    def _trunc_float(f: float) -> float:
+        return float(f'{f:.3f}')
+
+    return types.Point(
+        _trunc_float(p.x),
+        _trunc_float(p.y),
+        _trunc_float(p.z),
+    )
 
 
 async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> None:
