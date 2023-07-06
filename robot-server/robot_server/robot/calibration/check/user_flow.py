@@ -533,7 +533,7 @@ class CheckCalibrationUserFlow:
             CheckAttachedPipette(
                 model=hw_pip.model,
                 name=hw_pip.name,
-                tipLength=hw_pip.config.tip_length,
+                tipLength=hw_pip.current_tip_length,
                 tipRackLoadName=info_pip.tip_rack.load_name,
                 tipRackDisplay=info_pip.tip_rack._core.get_definition()["metadata"][
                     "displayName"
@@ -840,8 +840,8 @@ class CheckCalibrationUserFlow:
                 self.active_tiprack._core.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:
-            tip_overlap = self.hw_pipette.config.tip_overlap.get(
-                self.active_tiprack.uri, self.hw_pipette.config.tip_overlap["default"]
+            tip_overlap = self.hw_pipette.tip_overlap.get(
+                self.active_tiprack.uri, self.hw_pipette.tip_overlap["default"]
             )
             tip_length = self.active_tiprack.tip_length
             return tip_length - tip_overlap

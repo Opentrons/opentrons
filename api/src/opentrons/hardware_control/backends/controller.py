@@ -21,10 +21,15 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+    mutable_configurations,
+    pipette_definition
+)
+
 from opentrons.drivers.smoothie_drivers import SmoothieDriver
 from opentrons.drivers.rpi_drivers import build_gpio_chardev
 import opentrons.config
-from opentrons.config import pipette_config
 from opentrons.config.types import RobotConfig
 from opentrons.types import Mount
 
@@ -180,7 +185,7 @@ class Controller:
         ] = await self._smoothie_driver.read_pipette_model(  # type: ignore
             mount.name.lower()
         )
-        if found_model and found_model not in pipette_config.config_models:
+        if found_model and pipette_load_name.supported_pipette(found_model):
             # TODO: Consider how to handle this error - it bubbles up now
             # and will cause problems at higher levels
             MODULE_LOG.error(f"Bad model on {mount.name}: {found_model}")
@@ -188,9 +193,11 @@ class Controller:
         found_id = await self._smoothie_driver.read_pipette_id(mount.name.lower())
 
         if found_model:
-            config = pipette_config.load(found_model, found_id)
+            path_to_overrides = opentrons.config.get_opentrons_path("pipette_config_overrides_dir")
+            converted_found_model = pipette_load_name.convert_pipette_model(found_model)
+            config = mutable_configurations.load_with_mutable_configurations(converted_found_model, path_to_overrides,found_id)
             if expected:
-                acceptable = [config.name] + config.back_compat_names
+                acceptable = [config.name] + config.pipette_backcompat_names
                 if expected not in acceptable:
                     raise RuntimeError(
                         f"mount {mount}: instrument"

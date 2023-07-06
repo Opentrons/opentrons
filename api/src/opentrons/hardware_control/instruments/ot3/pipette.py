@@ -16,7 +16,7 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteModelType,
     PipetteChannelType,
 )
-from ..instrument_abc import AbstractInstrument
+from ..instrument_abc import AbstractInstrument, piecewise_volume_conversion
 from .instrument_calibration import (
     save_pipette_offset_calibration,
     load_pipette_offset,
@@ -38,33 +38,6 @@ mod_log = logging.getLogger(__name__)
 
 # TODO (lc 12-2-2022) We should move this to the geometry configurations
 INTERNOZZLE_SPACING_MM: Final[float] = 9
-
-
-def piecewise_volume_conversion(
-    ul: float, sequence: List[Tuple[float, float, float]]
-) -> float:
-    """
-    Takes a volume in microliters and a sequence representing a piecewise
-    function for the slope and y-intercept of a ul/mm function, where each
-    sub-list in the sequence contains:
-
-      - the max volume for the piece of the function (minimum implied from the
-        max of the previous item or 0
-      - the slope of the segment
-      - the y-intercept of the segment
-
-    :return: the ul/mm value for the specified volume
-    """
-    # pick the first item from the seq for which the target is less than
-    # the bracketing element
-    for x in sequence:
-        if ul <= x[0]:
-            # use that element to calculate the movement distance in mm
-            return x[1] * ul + x[2]
-
-    # Compatibility with previous implementation of search.
-    #  list(filter(lambda x: ul <= x[0], sequence))[0]
-    raise IndexError()
 
 
 class Pipette(AbstractInstrument[PipetteConfigurations]):
