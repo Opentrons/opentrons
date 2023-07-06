@@ -1,6 +1,11 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { Flex, JUSTIFY_SPACE_AROUND, SPACING_3 } from '@opentrons/components'
+import {
+  Flex,
+  JUSTIFY_CENTER,
+  JUSTIFY_SPACE_AROUND,
+  SPACING,
+} from '@opentrons/components'
 import styles from './AnnouncementModal.css'
 
 export interface Announcement {
@@ -12,7 +17,7 @@ export interface Announcement {
 
 const batchEditStyles = css`
   justify-content: ${JUSTIFY_SPACE_AROUND};
-  padding: ${SPACING_3};
+  padding: ${SPACING.spacing16};
 
   & img {
     height: 13rem;
@@ -186,6 +191,30 @@ export const announcements: Announcement[] = [
         <p>
           All protocols now require Opentrons App version
           <strong> 6.2+ </strong> to run.
+        </p>
+      </>
+    ),
+  },
+  {
+    announcementKey: 'flexSupport7.0',
+    image: (
+      <Flex justifyContent={JUSTIFY_CENTER}>
+        <img
+          height="240"
+          width="240"
+          src={require('../../../images/OpentronsFlex.png')}
+        />
+      </Flex>
+    ),
+    heading: "We've updated the Protocol Designer",
+    message: (
+      <>
+        <p>
+          Introducing the Protocol Designer 7.0 with Opentrons Flex support!
+        </p>
+        <p>
+          All protocols now require Opentrons App version
+          <strong> 7.0+ </strong> to run.
         </p>
       </>
     ),

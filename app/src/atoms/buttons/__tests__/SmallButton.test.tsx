@@ -13,7 +13,6 @@ describe('SmallButton', () => {
   beforeEach(() => {
     props = {
       onClick: jest.fn(),
-      buttonType: 'primary',
       buttonText: 'small button',
     }
   })

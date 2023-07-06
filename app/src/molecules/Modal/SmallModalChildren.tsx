@@ -52,7 +52,6 @@ export function SmallModalChildren(
           <SmallButton
             flex="1"
             buttonText={buttonText}
-            buttonType="primary"
             onClick={handleCloseMaxPinsAlert}
           />
         </Flex>

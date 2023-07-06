@@ -153,8 +153,6 @@ def _load_labware(
         print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
     reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
     tiprack_namespace = "custom_beta"
-    if ctx.is_simulating():
-        tiprack_namespace = "opentrons"
     tipracks = [
         ctx.load_labware(ls[1], location=ls[0], namespace=tiprack_namespace)
         for ls in tiprack_load_settings
@@ -283,19 +281,50 @@ def _run_trial(
 
     _record_measurement_and_store(MeasurementType.INIT)
     pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
-    if do_jog:
-        _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
-        height_below_top = source.depth - _liquid_height
-        print(f"liquid is {height_below_top} mm below top of reservoir")
-        liquid_tracker.set_start_volume_from_liquid_height(
-            source, _liquid_height, name="Dye"
+    while do_jog:
+        required_ul = max(
+            (volume * channel_count * cfg.trials) + _MIN_END_VOLUME_UL,
+            _MIN_START_VOLUME_UL,
         )
-    reservoir_ml = round(liquid_tracker.get_volume(source) / 1000, 1)
-    print(f"software thinks there is {reservoir_ml} mL of liquid in the reservoir")
-    assert (reservoir_ml * 1000) - _MIN_END_VOLUME_UL > volume * channel_count, (
-        f"not enough volume in reservoir to aspirate {volume} uL "
-        f"across {channel_count} channels"
-    )
+        if not ctx.is_simulating():
+            _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
+            height_below_top = source.depth - _liquid_height
+            print(f"liquid is {height_below_top} mm below top of reservoir")
+            liquid_tracker.set_start_volume_from_liquid_height(
+                source, _liquid_height, name="Dye"
+            )
+        else:
+            liquid_tracker.set_start_volume(source, required_ul)
+        reservoir_ul = liquid_tracker.get_volume(source)
+        print(
+            f"software thinks there is {round(reservoir_ul / 1000, 1)} mL "
+            f"of liquid in the reservoir (required = {round(required_ul / 1000, 1)} ml)"
+        )
+        if required_ul <= reservoir_ul < _MAX_VOLUME_UL:
+            break
+        elif required_ul > _MAX_VOLUME_UL:
+            raise NotImplementedError(
+                f"too many trials ({cfg.trials}) at {volume} uL, "
+                f"refilling reservoir is currently not supported"
+            )
+        elif reservoir_ul < required_ul:
+            error_msg = (
+                f"not enough volume in reservoir to aspirate {volume} uL "
+                f"across {channel_count}x channels for {cfg.trials}x trials"
+            )
+            if ctx.is_simulating():
+                raise ValueError(error_msg)
+            ui.print_error(error_msg)
+            pipette.move_to(location=source.top(100).move(channel_offset))
+            difference_ul = required_ul - reservoir_ul
+            ui.get_user_ready(
+                f"ADD {round(difference_ul / 1000.0, 1)} mL more liquid to RESERVOIR"
+            )
+            pipette.move_to(location=source.top().move(channel_offset))
+        else:
+            raise RuntimeError(
+                f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
+            )
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         ctx,

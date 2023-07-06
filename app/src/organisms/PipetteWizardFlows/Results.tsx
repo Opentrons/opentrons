@@ -208,7 +208,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
       textTransform={TYPOGRAPHY.textTransformCapitalize}
       onClick={handleProceed}
       buttonText={buttonText}
-      buttonType="primary"
     />
   ) : (
     <PrimaryButton

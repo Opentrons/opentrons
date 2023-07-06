@@ -45,7 +45,6 @@ export function TipConfirmation(props: TipConfirmationProps): JSX.Element {
         />
         <SmallButton
           buttonText={i18n.format(t('yes'), 'capitalize')}
-          buttonType="primary"
           onClick={confirmTip}
         />
       </Flex>

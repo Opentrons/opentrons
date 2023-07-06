@@ -7,16 +7,13 @@ import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
 import {
   FIXED_TRASH_ID,
-  GEN2,
-  GEN3,
-  getPipetteNameSpecs,
+  FLEX_ROBOT_TYPE,
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
   OT3_STANDARD_DECKID,
-  OT3_STANDARD_MODEL,
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
-import { getFileMetadata } from './fileFields'
+import { getFileMetadata, getRobotType } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import { selectors as dismissSelectors } from '../../dismiss'
 import {
@@ -52,7 +49,7 @@ import type {
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-import type { PipetteName } from '@opentrons/shared-data/js/pipettes'
+
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
@@ -94,6 +91,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,
+  getRobotType,
   dismissSelectors.getAllDismissedWarnings,
   ingredSelectors.getLiquidGroupsById,
   ingredSelectors.getLiquidsByLabwareId,
@@ -108,6 +106,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     fileMetadata,
     initialRobotState,
     robotStateTimeline,
+    robotType,
     dismissedWarnings,
     ingredients,
     ingredLocations,
@@ -287,40 +286,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
 
     const commands = [...loadCommands, ...nonLoadCommands]
 
-    interface RobotModel {
-      [pipetteId: string]: { name: PipetteName }
-    }
-
-    //  TODO(jr 6/22/23):  entire method should be replaced with the contents of robotType key
-    //  on the protocol file instead of inferring it from pipette types.
-    const getRobotModelFromPipettes = (
-      pipettes: RobotModel
-    ): {
-      model: typeof OT2_STANDARD_MODEL | typeof OT3_STANDARD_MODEL
-      deckId: typeof OT2_STANDARD_DECKID | typeof OT3_STANDARD_DECKID
-    } => {
-      const loadedPipettes = Object.values(pipettes)
-      const pipetteGEN = loadedPipettes.some(
-        pipette =>
-          getPipetteNameSpecs(pipette.name)?.displayCategory === GEN3 ||
-          getPipetteNameSpecs(pipette.name)?.channels === 96
-      )
-        ? GEN3
-        : GEN2
-      switch (pipetteGEN) {
-        case GEN3:
-          return {
-            model: OT3_STANDARD_MODEL,
-            deckId: OT3_STANDARD_DECKID,
-          }
-        default:
-          return {
-            model: OT2_STANDARD_MODEL,
-            deckId: OT2_STANDARD_DECKID,
-          }
-      }
-    }
-
     const protocolFile = {
       metadata: {
         protocolName: name,
@@ -334,7 +299,10 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         tags: [],
       },
       designerApplication,
-      robot: getRobotModelFromPipettes(pipettes),
+      robot:
+        robotType === FLEX_ROBOT_TYPE
+          ? { model: FLEX_ROBOT_TYPE, deckId: OT3_STANDARD_DECKID }
+          : { model: OT2_STANDARD_MODEL, deckId: OT2_STANDARD_DECKID },
       pipettes,
       labware,
       liquids,
