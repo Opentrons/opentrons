@@ -173,19 +173,19 @@ You may notice that these deck maps don't show where the liquids will be at the 
 Pipettes
 --------
 
-Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the :py:meth:`.load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its :ref:`standard pipette name <new-pipette-models>`. Here’s how to load the pipette in the left mount:
+Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the :py:meth:`.load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its :ref:`standard pipette name <new-pipette-models>`. Here’s how to load the pipette in the left mount and assign it the variable name ``left_pipette``:
 
 .. code-block:: python
 
         # Flex
-        p1000 = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks[tips])
+        left_pipette = protocol.load_instrument('flex_1channel_1000', 'left', tip_racks[tips])
 
 .. code-block:: python
 
         # OT-2
-        p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips])
+        left_pipette = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips])
 
-Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are loaded after labware: you need to have already loaded ``tips`` in order to tell the pipette to use it. And now you won’t have to reference ``tips`` again in your code — it’s assigned to the ``p1000`` (Flex) or ``p300`` (OT-2) pipette and the robot will know to use it when commanded to pick up tips.
+Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are loaded after labware: you need to have already loaded ``tips`` in order to tell the pipette to use it. And now you won’t have to reference ``tips`` again in your code — it’s assigned to the ``left_pipette`` and both robots will know to use it when commanded to pick up tips.
 
 .. note::
 
@@ -208,13 +208,7 @@ Let’s start with the diluent. This phase takes a larger quantity of liquid and
 
 .. code-block:: python
 
-        #Flex
-        p1000.transfer(100, reservoir['A1'], plate.wells())
-
-.. code-block:: python
-
-        #OT-2
-        p300.transfer(100, reservoir['A1'], plate.wells())
+        left_pipette.transfer(100, reservoir['A1'], plate.wells())
 
 Breaking down these single lines of code shows the power of :ref:`complex commands <v2-complex-commands>`. The first argument is the amount to transfer to each destination, 100 µL. The second argument is the source, column 1 of the reservoir (which is still specified with grid-style coordinates as ``A1`` — a reservoir only has an A row). The third argument is the destination. Here, calling the :py:meth:`.wells` method of ``plate`` returns a list of *every well*, and the command will apply to all of them.
 
@@ -245,13 +239,7 @@ In each row, you first need to add solution. This will be similar to what you di
 
 .. code-block:: python
             
-            #Flex
-            p1000.transfer(100, reservoir['A2'], row[0], mix_after(3,50))
-
-.. code-block:: python
-
-            #OT-2
-            p300.transfer(100, reservoir['A2'], row[0], mix_after=(3, 50))
+        left_pipette.transfer(100, reservoir['A2'], row[0], mix_after(3, 50))
 
 As before, the first argument specifies to transfer 100 µL. The second argument is the source, column 2 of the reservoir. The third argument is the destination, the element at index 0 of the current ``row``. Since Python lists are zero-indexed, but columns on labware start numbering at 1, this will be well A1 on the first time through the loop, B1 the second time, and so on. The fourth argument specifies to mix 3 times with 50 µL of fluid each time.
 
@@ -264,13 +252,7 @@ Finally, it’s time to dilute the solution down the row. One approach would be 
 
 .. code-block:: python
 
-            #Flex
-            p1000.transfer(11, row[:11], row[1:], mix_after(3, 50))
-
-.. code-block:: python
-
-            #OT-2
-            p300.transfer(100, row[:11], row[1:], mix_after=(3, 50))
+        left_pipette.transfer(100, row[:11], row[1:], mix_after(3, 50))
 
 There’s some Python shorthand here, so let’s unpack it. You can get a range of indices from a list using the colon ``:`` operator, and omitting it at either end means “from the beginning” or “until the end” of the list. So the source is ``row[:11]``, from the beginning of the row until its 11th item. And the destination is ``row[1:]``, from index 1 (column 2!) until the end. Since both of these lists have 11 items, ``transfer()`` will *step through them in parallel*, and they’re constructed so when the source is 0, the destination is 1; when the source is 1, the destination is 2; and so on. This condenses all of the subsequent transfers down the row into a single line of code.
 
@@ -297,29 +279,15 @@ Thus, when adding the diluent, instead of targeting every well on the plate, you
 
 .. code-block:: python
 
-        #Flex
-        p1000.transfer(100, reservoir['A1'], plate.rows()[0])
-
-.. code-block:: python
-
-       #OT-2
-       p300.transfer(100, reservoir['A1'], plate.rows()[0])  
+        left_pipette.transfer(100, reservoir['A1'], plate.rows()[0]) 
 
 And by accessing an entire column at once, the 8-channel pipette effectively implements the ``for`` loop in hardware, so you’ll need to remove it: 
 
 .. code-block:: python
     
-    #Flex
     row = plate.rows()[0]
-    p1000.transfer(100, reservoir['A2'], row[0], mix_after=(3, 50))
-    p1000.transfer(100, row[:11], row[1:], mix_after=(3, 50))
-
-.. code-block:: python
-
-    #OT-2
-    row = plate.rows()[0]
-    p300.transfer(100, reservoir['A2'], row[0], mix_after=(3, 50))
-    p300.transfer(100, row[:11], row[1:], mix_after=(3, 50))
+    left_pipette.transfer(100, reservoir['A2'], row[0], mix_after=(3, 50))
+    left_pipette.transfer(100, row[:11], row[1:], mix_after=(3, 50))
 
 Instead of tracking the current row in the ``row`` variable, this code sets it to always be row A (index 0). 
 
