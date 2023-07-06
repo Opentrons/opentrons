@@ -131,6 +131,23 @@ class TrialOrder:
     trials: List[Union[GravimetricTrial, PhotometricTrial]]
 
 
+@dataclass
+class TestResources:
+    """Common arguments to the run method of volumetric tests."""
+
+    ctx: ProtocolContext
+    pipette: InstrumentContext
+    pipette_tag: str
+    tipracks: List[Labware]
+    test_volumes: List[float]
+    run_id: str
+    start_time: float
+    operator_name: str
+    robot_serial: str
+    tip_batch: str
+    git_description: str
+
+
 def build_gravimetric_trials(
     ctx: ProtocolContext,
     instr: InstrumentContext,
