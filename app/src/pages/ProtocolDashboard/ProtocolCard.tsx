@@ -182,7 +182,8 @@ export function ProtocolCard(props: {
             setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
           />
         )}
-        {showFailedAnalysisModal && (
+        {(showFailedAnalysisModal ||
+          (isFailedAnalysis && longpress.isLongPressed)) && (
           <Modal
             header={failedAnalysisHeader}
             onOutsideClick={() => setShowFailedAnalysisModal(false)}
