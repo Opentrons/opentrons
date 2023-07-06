@@ -47,7 +47,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       migrationModal: 'noBehaviorChange',
     },
     {
-      title: 'doItAllV6 (schema 6, PD version 6.0.0) -> PD 7.0.x, schema 7',
+      title: 'doItAllV6 (schema 6, PD version 6.1.0) -> PD 7.0.x, schema 7',
       importFixture: '../../fixtures/protocol/6/doItAllV4MigratedToV6.json',
       expectedExportFixture:
         '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
