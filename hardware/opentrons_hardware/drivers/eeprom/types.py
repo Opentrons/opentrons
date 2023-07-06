@@ -6,6 +6,10 @@ from enum import Enum
 from typing import Any, Optional
 
 
+# The version of the properties format
+FORMAT_VERSION = 1
+
+
 # NOTE: a serialized property can be up-to 255 (0xff) bytes long,
 # this includes the property id (1b) + data length (1b) + data (1-253b)
 MAX_DATA_LEN = 253
@@ -59,7 +63,7 @@ class Property:
 class EEPROMData:
     """Dataclass that represents the serialized data from the eeprom."""
 
-    format_version: int = 1
+    format_version: int = FORMAT_VERSION
     serial_number: Optional[str] = None
     machine_type: Optional[str] = None
     machine_version: Optional[str] = None

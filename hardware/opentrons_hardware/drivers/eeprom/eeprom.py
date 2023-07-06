@@ -1,5 +1,6 @@
 """Module to read/write to the eeprom on the Flex SOM."""
 
+import re
 import os
 import logging
 from datetime import datetime
@@ -50,14 +51,26 @@ class EEPROMDriver:
         self._eeprom_path = eeprom_path or Path(
             f"/sys/bus/i2c/devices/{bus}-{address}/eeprom"
         )
+        self._size = 0
+        self._name = ""
         self._eeprom_fd = -1
         self._eeprom_data: EEPROMData = EEPROMData()
         self._properties: Set[Property] = set()
 
     @property
     def name(self) -> str:
-        """The name of the i2c device."""
+        """The name of this eeprom device."""
+        return self._name
+
+    @property
+    def address(self) -> str:
+        """The address of the i2c device."""
         return f"{self._bus}-{self._address}"
+
+    @property
+    def size(self) -> int:
+        """The size in bytes of the eeprom."""
+        return self._size
 
     @property
     def data(self) -> EEPROMData:
@@ -89,7 +102,11 @@ class EEPROMDriver:
 
     def setup(self) -> None:
         """Setup the class and serialize the eeprom data."""
+        # Open a file descriptor for the eeprom
         self._eeprom_fd = self.open()
+        # Get the eeeprom metadata
+        self._name, self._size = self._get_eeprom_info()
+        # Read and serialize eeprom data
         self.property_read()
 
     def open(self) -> int:
@@ -97,6 +114,7 @@ class EEPROMDriver:
         if self._eeprom_fd > 0:
             logger.warning("File descriptor already opened for eeprom")
             return self._eeprom_fd
+
         try:
             self._eeprom_fd = os.open(self._eeprom_path, os.O_RDWR)
         except OSError:
@@ -198,9 +216,24 @@ class EEPROMDriver:
             return os.write(self._eeprom_fd, data)
         except TimeoutError:
             logging.error(
-                f"Could not write data to eeprom {self.name}, make sure the write bit is low."
+                f"Could not write data to eeprom {self.address}, make sure the write bit is low."
             )
             raise
+
+    def _get_eeprom_info(self) -> Tuple[str, int]:
+        """This will get the name and size in bytes of the eeprom."""
+        name = ""
+        size = 0
+        eeprom_name = self._eeprom_path.parent / "name"
+        if os.path.exists(eeprom_name):
+            with open(eeprom_name) as fh:
+                name = fh.read().strip()
+            match = re.match(r"24c([\d]+)", name)
+            if match:
+                # The eeprom size is in kbytes so we need to
+                # multiply by 128 to get the bytes
+                size = int(match[1]) * 128
+        return name, size
 
     def _populate_data(self) -> EEPROMData:
         """This will create and populate the EEPROMData object."""
