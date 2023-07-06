@@ -24,6 +24,7 @@
   "empty": "empty",
   "ending": "ending",
   "error": "error",
+  "error_encountered": "Error encountered",
   "exit": "exit",
   "extension_mount": "extension mount",
   "flow_complete": "{{flowName}} complete!",
