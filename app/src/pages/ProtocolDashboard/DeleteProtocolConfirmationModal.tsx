@@ -97,7 +97,6 @@ export function DeleteProtocolConfirmationModal({
         >
           <SmallButton
             flex="1"
-            buttonType="primary"
             buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
             onClick={handleCloseModal}
           />
