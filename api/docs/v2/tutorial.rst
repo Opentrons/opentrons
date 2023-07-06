@@ -33,12 +33,29 @@ Before running a protocol, you’ll want to have the right kind of hardware and 
 
 - **OT-2 users** should review the robot setup and pipette information on the `Get Started page <https://support.opentrons.com/s/ot2-get-started>`_. Specifically, see `attaching pipettes <https://support.opentrons.com/s/article/Get-started-Attach-pipettes>`_ and `initial calibration <https://support.opentrons.com/s/article/Get-started-Calibrate-the-deck>`_. You can use either a single-channel or 8-channel pipette for this tutorial. Most OT-2 code examples will use a `P300 Single-Channel GEN2 <https://shop.opentrons.com/single-channel-electronic-pipette-p20/>`_ pipette.
 
-The Flex and OT-2 use the same labware for serial dilution. The tutorial code will use the following labware definitions, but as long as you have labware of each type you can modify the code to run with your labware.
+The Flex and OT-2 use similar labware for serial dilution. The tutorial code will use the labware listed in the table below, but as long as you have labware of each type you can modify the code to run with your labware.
 
-    - **Reservoir**: `NEST 12 Well Reservoir 15 mL <https://labware.opentrons.com/nest_12_reservoir_15ml>`_ ``nest_12_reservoir_15ml``
-    - **Well plate**: `NEST 96 Well Plate 200 µL Flat <https://labware.opentrons.com/nest_96_wellplate_200ul_flat>`_ ``nest_96_wellplate_200ul_flat``
-    - **Tip rack**: An `Opentrons 96 Tip Rack <https://labware.opentrons.com/?category=tipRack&manufacturer=Opentrons>`_ of the correct size for your pipette, e.g. ``opentrons_96_tiprack_300ul``
-    - **Liquids**: For demonstration purposes, you can use plain water as the diluent and water dyed with food coloring as the solution.
+.. list-table::
+   :widths: 20 40 50
+   :header-rows: 1
+
+   * - Labware type
+     - Name
+     - API load name
+   * - Reservoir
+     - `NEST 12 Well Reservoir 15 mL <https://labware.opentrons.com/nest_12_reservoir_15ml>`_
+     - ``nest_12_reservoir_15ml``
+   * - Well late
+     - `NEST 96 Well Plate 200 µL Flat <https://labware.opentrons.com/nest_96_wellplate_200ul_flat>`_
+     - ``nest_96_wellplate_200ul_flat``
+   * - Flex tiprack
+     - `Opentrons Flex Tips, 200 µL <https://shop.opentrons.com/opentrons-flex-tips-200-l/>`_
+     - ``opentrons_flex_96_tiprack_200ul``
+   * - OT-2 tiprack
+     - `Opentrons 96 Tip Rack <https://labware.opentrons.com/?category=tipRack&manufacturer=Opentrons>`_
+     - ``opentrons_96_tiprack_300ul``
+
+For the liquids, you can use plain water as the diluent and water dyed with food coloring as the solution.
 
 **********************
 Create a Protocol File
@@ -84,11 +101,11 @@ You can include any other information you like in the metadata dictionary. The f
 .. note::
     If you have a Flex, or an OT-2 with API v2.15 (or higher), you set the API version in the ``requirements`` code block, not the ``metadata`` code block. See the Requirements section below.
 
-.. With your metadata defined, you can move on to creating the ``run()`` function for your protocol.
-
 Requirements
 ^^^^^^^^^^^^
-.. My understanding of the requirements code block. Needs verification.
+.. Max suggests putting this before the metadata, but notes order doesn't matter
+
+.. Requirements is still undefined/in progress
 
 The ``requirements`` code block appears after the ``metadata`` code block in a Python protocol. It defines the robot model (e.g. ``Flex`` or ``OT-2``) and the API version you're using.
 
@@ -168,12 +185,12 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
            :align: center
            :alt: OT-2 deck map with a tip rack in slot 1, reservoir in slot 2, and well plate in slot 3.
 
-You may notice that these deck maps don't show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in `Protocol Designer <https://designer.opentrons.com/>`_. (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
+You may notice that these deck maps don't show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in `Protocol Designer <https://designer.opentrons.com/>`_. If you want to identify liquids, see `Labeling Liquids in Wells <https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-wells>`_. (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
 
 Pipettes
 --------
 
-Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the :py:meth:`.load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its :ref:`standard pipette name <new-pipette-models>`. Here’s how to load the pipette in the left mount and assign it the variable name ``left_pipette``:
+Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the :py:meth:`.load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its :ref:`standard pipette name <new-pipette-models>`. Here’s how to load the pipette in the left mount and instantiate it as a variable named ``left_pipette``:
 
 .. code-block:: python
 
@@ -295,7 +312,7 @@ Instead of tracking the current row in the ``row`` variable, this code sets it t
 Try Your Protocol
 *****************
 
-There are two ways to try out your protocol: simulation on your computer, or a live run on an OT-2. Even if you plan to run your protocol on a robot, it’s a good idea to check the simulation output first.
+There are two ways to try out your protocol: simulation on your computer, or a live run on a Flex or OT-2. Even if you plan to run your protocol on a robot, it’s a good idea to check the simulation output first.
 
 If you get any errors in simulation, or you don't get the outcome you expected when running your protocol, you can check your code against these reference protocols on GitHub:
 
@@ -326,7 +343,7 @@ If that’s too long, you can always cancel your run partway through or modify `
 On a Robot
 ^^^^^^^^^^
 
-The simplest way to run your protocol on a Flex or OT-2 is to use the `Opentrons App <https://opentrons.com/ot-app>`_. Once you’ve installed the app and connected to your robot, navigate to the **Protocol** tab. Click **Choose File…** and open your protocol from the file picker. You should see “Protocol - Serial Dilution Tutorial” (or whatever ``protocolName`` you entered in the metadata) in a banner at the top of the page. 
+The simplest way to run your protocol on a Flex or OT-2 is to use the `Opentrons App <https://opentrons.com/ot-app>`_. Once you’ve installed the app and connected to your robot, navigate to the **Protocols** tab. Click **Import** and open your protocol from the file picker. You should see “Protocol - Serial Dilution Tutorial” (or whatever ``protocolName`` you entered in the metadata) in a banner at the top of the page. 
 
 If you have any remaining calibration tasks to do, you can finish them up here. Below the calibration section is a preview of the initial deck state. Optionally you can run Labware Position Check, or you can go ahead and click **Proceed to Run**.
 
