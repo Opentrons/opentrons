@@ -157,13 +157,19 @@ async def build_async_ot3_hardware_api(
         restart_canbus_ot3()
         kwargs["use_usb_bus"] = True  # type: ignore[assignment]
     try:
-        return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
+        api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
     except Exception as e:
         if is_simulating:
             raise e
         print(e)
         kwargs["use_usb_bus"] = False  # type: ignore[assignment]
-        return await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
+        api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
+    if not is_simulating:
+        await asyncio.sleep(0.5)
+        await api.cache_instruments()
+        async for update in api.update_firmware():
+            print(f"Update: {update.subsystem.name}: {update.progress}%")
+    return api
 
 
 def set_gantry_per_axis_setting_ot3(
@@ -542,17 +548,21 @@ def _jog_read_user_input(terminator: str, home_key: str) -> Tuple[str, float, bo
 
 
 async def _jog_axis_some_distance(
-    api: OT3API, mount: OT3Mount, axis: str, distance: float
+    api: OT3API,
+    mount: OT3Mount,
+    axis: str,
+    distance: float,
+    speed: Optional[float],
 ) -> None:
     if not axis or distance == 0.0:
         return
     elif axis == "G":
         await move_gripper_jaw_relative_ot3(api, distance)
     elif axis == "P":
-        await move_plunger_relative_ot3(api, mount, distance)
+        await move_plunger_relative_ot3(api, mount, distance, speed=speed)
     else:
         delta = Point(**{axis.lower(): distance})
-        await api.move_rel(mount=mount, delta=delta)
+        await api.move_rel(mount=mount, delta=delta, speed=speed)
 
 
 async def _jog_print_current_position(
@@ -584,6 +594,7 @@ async def _jog_do_print_then_input_then_move(
     distance: float,
     do_home: bool,
     display: Optional[bool] = True,
+    speed: Optional[float] = None,
 ) -> Tuple[str, float, bool]:
     try:
         if display:
@@ -604,7 +615,7 @@ async def _jog_do_print_then_input_then_move(
         }
         await api.home([str_to_axes[axis]])
     else:
-        await _jog_axis_some_distance(api, mount, axis, distance)
+        await _jog_axis_some_distance(api, mount, axis, distance, speed)
     return axis, distance, do_home
 
 
@@ -613,6 +624,7 @@ async def jog_mount_ot3(
     mount: OT3Mount,
     critical_point: Optional[CriticalPoint] = None,
     display: Optional[bool] = True,
+    speed: Optional[float] = None,
 ) -> Dict[OT3Axis, float]:
     """Jog an OT3 mount's gantry XYZ and pipettes axes."""
     if api.is_simulator:
@@ -626,7 +638,14 @@ async def jog_mount_ot3(
     while True:
         try:
             axis, distance, do_home = await _jog_do_print_then_input_then_move(
-                api, mount, critical_point, axis, distance, do_home, display=display
+                api,
+                mount,
+                critical_point,
+                axis,
+                distance,
+                do_home,
+                display=display,
+                speed=speed,
             )
         except ValueError as e:
             print(e)

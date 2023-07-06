@@ -3,15 +3,15 @@ For more details about this release, please see the full [technical changelog][]
 
 ---
 
-# Internal Release 0.11.0
+# Internal Release 0.12.0
 
-This is 0.11.0, an internal release for the app supporting the Opentrons Flex.
+This is 0.12.0, an internal release for the app supporting the Opentrons Flex.
 
 This is still pretty early in the process, so some things are known not to work, and are listed below. Some things that may surprise you do work, and are also listed below. There may also be some littler things of note, and those are at the bottom.
 
 ## Update Notes
 
-- ⚠️ After upgrading your robot to 0.11.0, you'll need to factory-reset its run history before you can use it.
+- ⚠️ After upgrading your robot to 0.12.0 from 0.10.0 or previous, you'll need to factory-reset its run history before you can use it.
 
   1. From the robot's 3-dot menu (⋮), go to **Robot settings.**
   2. Under **Advanced > Factory reset**, select **Choose reset settings.**
@@ -24,9 +24,10 @@ This is still pretty early in the process, so some things are known not to work,
 - After upgrading your app, the protocols that you already had imported to the app will display blank deck maps. To fix this, select **Reanalyze** from the protocol's 3-dot menu (⋮).
 
 ## New Stuff In This Release
+- You can disable the LED bar at the top now!
+- Attach flow updates and fixes for 96 channel
+- Many (many) visual and workflow fixes and improvements from design QA for the app
 
-- When interacting with an OT-3, the app will use the newer names for the deck slots, like "C2", instead of the names from the OT-2, like "5".
-- The `requirements` dict in Python protocols can now have `"robotType": "Flex"` instead of `"robotType": "OT-3"`. `"OT-3"` will still work, but it's discouraged because it's not the customer-facing name.
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 - Attach, detach, and calibration flows for anything from the protocol setup page

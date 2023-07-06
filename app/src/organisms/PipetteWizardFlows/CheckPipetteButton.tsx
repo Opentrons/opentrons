@@ -31,7 +31,6 @@ export const CheckPipetteButton = (
     <SmallButton
       disabled={isFetching}
       buttonText={proceedButtonText}
-      buttonType="primary"
       onClick={() => {
         setFetching(true)
         refetch()

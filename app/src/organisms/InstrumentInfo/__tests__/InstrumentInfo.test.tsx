@@ -45,6 +45,8 @@ const mockGripperData: GripperData = {
   instrumentType: 'gripper',
   mount: 'extension',
   serialNumber: '123',
+  subsystem: 'gripper',
+  ok: true,
 }
 
 const mockGripperDataWithCalData: GripperData = {
@@ -60,6 +62,8 @@ const mockGripperDataWithCalData: GripperData = {
   instrumentType: 'gripper',
   mount: 'extension',
   serialNumber: '123',
+  subsystem: 'gripper',
+  ok: true,
 }
 
 describe('InstrumentInfo', () => {

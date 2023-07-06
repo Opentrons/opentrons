@@ -11,7 +11,7 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Lab
 
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
-from hardware_testing.opentrons_api.types import Point, OT3Axis
+from hardware_testing.opentrons_api.types import Point
 from .measurement import (
     MeasurementType,
     create_measurement_tag,
@@ -145,7 +145,7 @@ def _load_labware(
     tiprack_load_settings: List[Tuple[int, str]] = [
         (
             slot,
-            f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul_adp",
+            f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul_adp",
         )
         for slot in cfg.slots_tiprack
     ]
@@ -153,8 +153,6 @@ def _load_labware(
         print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
     reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
     tiprack_namespace = "custom_beta"
-    if ctx.is_simulating():
-        tiprack_namespace = "opentrons"
     tipracks = [
         ctx.load_labware(ls[1], location=ls[0], namespace=tiprack_namespace)
         for ls in tiprack_load_settings
@@ -283,15 +281,50 @@ def _run_trial(
 
     _record_measurement_and_store(MeasurementType.INIT)
     pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
-    if do_jog:
-        _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
-        height_below_top = source.depth - _liquid_height
-        print(f"liquid is {height_below_top} mm below top of reservoir")
-        liquid_tracker.set_start_volume_from_liquid_height(
-            source, _liquid_height, name="Dye"
+    while do_jog:
+        required_ul = max(
+            (volume * channel_count * cfg.trials) + _MIN_END_VOLUME_UL,
+            _MIN_START_VOLUME_UL,
         )
-    reservoir_ml = round(liquid_tracker.get_volume(source) / 1000, 1)
-    print(f"software thinks there is {reservoir_ml} mL of liquid in the reservoir")
+        if not ctx.is_simulating():
+            _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
+            height_below_top = source.depth - _liquid_height
+            print(f"liquid is {height_below_top} mm below top of reservoir")
+            liquid_tracker.set_start_volume_from_liquid_height(
+                source, _liquid_height, name="Dye"
+            )
+        else:
+            liquid_tracker.set_start_volume(source, required_ul)
+        reservoir_ul = liquid_tracker.get_volume(source)
+        print(
+            f"software thinks there is {round(reservoir_ul / 1000, 1)} mL "
+            f"of liquid in the reservoir (required = {round(required_ul / 1000, 1)} ml)"
+        )
+        if required_ul <= reservoir_ul < _MAX_VOLUME_UL:
+            break
+        elif required_ul > _MAX_VOLUME_UL:
+            raise NotImplementedError(
+                f"too many trials ({cfg.trials}) at {volume} uL, "
+                f"refilling reservoir is currently not supported"
+            )
+        elif reservoir_ul < required_ul:
+            error_msg = (
+                f"not enough volume in reservoir to aspirate {volume} uL "
+                f"across {channel_count}x channels for {cfg.trials}x trials"
+            )
+            if ctx.is_simulating():
+                raise ValueError(error_msg)
+            ui.print_error(error_msg)
+            pipette.move_to(location=source.top(100).move(channel_offset))
+            difference_ul = required_ul - reservoir_ul
+            ui.get_user_ready(
+                f"ADD {round(difference_ul / 1000.0, 1)} mL more liquid to RESERVOIR"
+            )
+            pipette.move_to(location=source.top().move(channel_offset))
+        else:
+            raise RuntimeError(
+                f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
+            )
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         ctx,
@@ -306,6 +339,7 @@ def _run_trial(
         blank=blank,
         inspect=inspect,
         mix=mix,
+        touch_tip=False,
     )
 
     _record_measurement_and_store(MeasurementType.ASPIRATE)
@@ -330,9 +364,8 @@ def _run_trial(
             inspect=inspect,
             mix=mix,
             added_blow_out=(i + 1) == num_dispenses,
+            touch_tip=cfg.touch_tip,
         )
-        if cfg.touch_tip:
-            pipette.touch_tip(speed=30)
         _record_measurement_and_store(MeasurementType.DISPENSE)
         pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
         if (i + 1) == num_dispenses:
@@ -340,7 +373,7 @@ def _run_trial(
         else:
             pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))
         if not ctx.is_simulating():
-            ui.get_user_ready("add SEAL to plate")
+            ui.get_user_ready("add SEAL to plate and remove from DECK")
     return
 
 
@@ -356,6 +389,13 @@ def _get_robot_serial(is_simulating: bool) -> str:
         return input("ROBOT SERIAL NUMBER:").strip()
     else:
         return "simulation-serial-number"
+
+
+def _get_tip_batch(is_simulating: bool) -> str:
+    if not is_simulating:
+        return input("TIP BATCH:").strip()
+    else:
+        return "simulation-tip-batch"
 
 
 def _pick_up_tip(
@@ -381,7 +421,10 @@ def _drop_tip(
 
 
 def _display_dye_information(
-    ctx: ProtocolContext, dye_types_req: Dict[str, float], refill: bool
+    ctx: ProtocolContext,
+    dye_types_req: Dict[str, float],
+    refill: bool,
+    include_hv: bool,
 ) -> None:
     for dye in dye_types_req.keys():
         transfered_ul = dye_types_req[dye]
@@ -402,8 +445,9 @@ def _display_dye_information(
             else:
                 # add minimum required volume PLUS labware's dead-volume
                 if not ctx.is_simulating():
+                    dye_msg = 'A" or "HV' if include_hv and dye == "A" else dye
                     ui.get_user_ready(
-                        f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye}"'
+                        f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye_msg}"'
                     )
 
 
@@ -445,6 +489,14 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         test_volumes
     )
 
+    def _next_tip() -> Well:
+        nonlocal tips
+        if not len(tips[0]):
+            if not ctx.is_simulating():
+                ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
+            tips = get_tips(ctx, pipette)
+        return tips[0].pop(0)
+
     assert (
         trial_total <= total_tips
     ), f"more trials ({trial_total}) than tips ({total_tips})"
@@ -456,26 +508,31 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
     test_report.set_tag(pipette_tag)
     test_report.set_operator(_get_operator_name(ctx.is_simulating()))
     serial_number = _get_robot_serial(ctx.is_simulating())
+    tip_batch = _get_tip_batch(ctx.is_simulating())
     test_report.set_version(get_git_description())
     report.store_serial_numbers_pm(
         test_report,
         robot=serial_number,
         pipette=pipette_tag,
+        tips=tip_batch,
         environment="None",
         liquid="None",
     )
 
     ui.print_header("PREPARE")
-    _display_dye_information(ctx, dye_types_req, cfg.refill)
+    can_swap_a_for_hv = not [
+        v for v in test_volumes if _DYE_MAP["A"]["min"] <= v < _DYE_MAP["A"]["max"]
+    ]
+    _display_dye_information(ctx, dye_types_req, cfg.refill, can_swap_a_for_hv)
 
     print("homing...")
     ctx.home()
+    pipette.home_plunger()
     # get the first channel's first-used tip
     # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
     #       and so we can use pick-up-tip from there again
     try:
         trial_count = 0
-        tip_iter = 0
         for volume in test_volumes:
             ui.print_title(f"{volume} uL")
             do_jog = True
@@ -483,7 +540,9 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                 trial_count += 1
                 ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
                 print(f"trial total {trial_count}/{trial_total}")
-                next_tip: Well = tips[0][tip_iter]
+                if not ctx.is_simulating():
+                    ui.get_user_ready(f"put PLATE #{trial + 1} and remove SEAL")
+                next_tip: Well = _next_tip()
                 next_tip_location = next_tip.top()
                 _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
 
@@ -505,21 +564,21 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                     mix=cfg.mix,
                     stable=True,
                 )
-                tip_iter += 1
-                if tip_iter >= len(tips[0]) and not (
-                    (trial + 1) == cfg.trials and volume == test_volumes[-1]
-                ):
-                    if not ctx.is_simulating():
-                        ui.get_user_ready(
-                            f"replace TIPRACKS in slots {cfg.slots_tiprack}"
-                        )
-                    tip_iter = 0
                 if volume < 250:
                     do_jog = False
 
     finally:
-        # FIXME: instead keep motors engaged, and move to an ATTACH position
-        hw_api = ctx._core.get_hardware()
-        hw_api.disengage_axes([OT3Axis.X, OT3Axis.Y])  # disengage xy axis
-    ui.print_title("RESULTS")
-    print(test_report)
+        ui.print_title("CHANGE PIPETTES")
+        if pipette.has_tip:
+            if pipette.current_volume > 0:
+                print("dispensing liquid to trash")
+                trash = pipette.trash_container.wells()[0]
+                # FIXME: this should be a blow_out() at max volume,
+                #        but that is not available through PyAPI yet
+                #        so instead just dispensing.
+                pipette.dispense(pipette.current_volume, trash.top())
+                pipette.aspirate(10)  # to pull any droplets back up
+            print("dropping tip")
+            _drop_tip(ctx, pipette, cfg)
+        print("moving to attach position")
+        pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))

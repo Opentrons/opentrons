@@ -50,7 +50,6 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
             </StyledText>
             <Flex flex="1" gridGap={SPACING.spacing8}>
               <SmallButton
-                buttonType="primary"
                 onClick={() => setShowConfirmTerminateModal(false)}
                 buttonText={t('continue_activity')}
                 width="50%"

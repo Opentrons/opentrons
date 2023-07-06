@@ -25,7 +25,6 @@ import {
   ALIGN_STRETCH,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
@@ -33,6 +32,7 @@ import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 import type { IconName } from '@opentrons/components'
 import type { CSSProperties } from 'styled-components'
 import type { Jog, Plane, Sign, Bearing, Axis, StepSize } from './types'
+import { TouchControlButton } from './TouchControlButton'
 
 interface Control {
   bearing: Bearing
@@ -42,6 +42,7 @@ interface Control {
   iconName: IconName
   axis: Axis
   sign: Sign
+  disabled: boolean
 }
 interface ControlsContents {
   controls: Control[]
@@ -53,6 +54,26 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
   [VERTICAL_PLANE]: {
     controls: [
       {
+        keyName: 'ArrowLeft',
+        shiftKey: false,
+        bearing: 'left',
+        iconName: 'ot-arrow-left',
+        axis: 'x',
+        sign: -1,
+        gridColumn: 0,
+        disabled: true,
+      },
+      {
+        keyName: 'ArrowRight',
+        shiftKey: false,
+        bearing: 'right',
+        iconName: 'ot-arrow-right',
+        axis: 'x',
+        sign: 1,
+        gridColumn: 2,
+        disabled: true,
+      },
+      {
         keyName: 'ArrowUp',
         shiftKey: true,
         bearing: 'up',
@@ -60,6 +81,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         axis: 'z',
         sign: 1,
         gridColumn: 1,
+        disabled: false,
       },
       {
         keyName: 'ArrowDown',
@@ -69,6 +91,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         axis: 'z',
         sign: -1,
         gridColumn: 1,
+        disabled: false,
       },
     ],
     title: 'Z-axis',
@@ -84,6 +107,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         axis: 'x',
         sign: -1,
         gridColumn: 0,
+        disabled: false,
       },
       {
         keyName: 'ArrowRight',
@@ -93,6 +117,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         axis: 'x',
         sign: 1,
         gridColumn: 2,
+        disabled: false,
       },
       {
         keyName: 'ArrowUp',
@@ -102,6 +127,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         axis: 'y',
         sign: 1,
         gridColumn: 1,
+        disabled: false,
       },
       {
         keyName: 'ArrowDown',
@@ -111,6 +137,7 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         axis: 'y',
         sign: -1,
         gridColumn: 1,
+        disabled: false,
       },
     ],
     title: 'X- and Y-axis',
@@ -132,9 +159,8 @@ const DIRECTION_CONTROL_LAYOUT = css`
 
 const PLANE_BUTTONS_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
-  justify-content: ${JUSTIFY_CENTER};
   grid-gap: ${SPACING.spacing8};
-  min-width: 9.8125rem;
+  min-width: 11.8125rem;
 
   @media (max-width: 750px) {
     flex-direction: ${DIRECTION_ROW};
@@ -341,6 +367,39 @@ const ARROW_BUTTON_STYLES = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     width: 125px;
     height: 125px;
+    background-color: ${COLORS.light1};
+    color: ${COLORS.darkBlackEnabled};
+    border-radius: ${BORDERS.borderRadiusSize4};
+
+    &:hover {
+      background-color: ${COLORS.light1Pressed};
+      color: ${COLORS.darkBlackHover};
+      border: 1px ${COLORS.transparent} solid;
+    }
+
+    &:active {
+      background-color: ${COLORS.light1Pressed};
+      color: ${COLORS.darkGreyPressed};
+    }
+
+    &:focus {
+      background-color: ${COLORS.light1Pressed};
+    }
+
+    &:disabled {
+      background-color: ${COLORS.darkBlack20};
+      color: ${COLORS.darkBlack40};
+      border: 1px ${COLORS.transparent} solid;
+    }
+  }
+`
+const ARROW_ICON_STYLES = css`
+  height: 1.125rem;
+  width: 1.125rem;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 84px;
+    height: 84px;
   }
 `
 
@@ -365,7 +424,7 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
   return (
     <Box css={ARROW_GRID_STYLES}>
       {controls.map(
-        ({ bearing, iconName, axis, sign, gridColumn, keyName }) => (
+        ({ bearing, iconName, axis, sign, gridColumn, keyName, disabled }) => (
           <PrimaryButton
             key={bearing}
             onClick={() => jog(axis, sign, stepSize)}
@@ -373,8 +432,9 @@ export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
             title={bearing}
             gridArea={keyName}
             alignSelf={BUTTON_ALIGN_BY_KEY_NAME[keyName] ?? 'center'}
+            disabled={disabled}
           >
-            <Icon size="1.125rem" name={iconName} />
+            <Icon css={ARROW_ICON_STYLES} name={iconName} />
           </PrimaryButton>
         )
       )}
@@ -389,30 +449,47 @@ export function TouchDirectionControl(
   const [currentPlane, setCurrentPlane] = React.useState<Plane>(
     initialPlane ?? planes[0]
   )
-  const { t } = useTranslation(['robot_calibration'])
+  const { i18n, t } = useTranslation(['robot_calibration'])
 
   return (
     <Flex
       flex="1"
       flexDirection={DIRECTION_COLUMN}
       border={`1px solid ${COLORS.darkBlack40}`}
-      borderRadius={BORDERS.radiusSoftCorners}
+      borderRadius={BORDERS.borderRadiusSize4}
       padding={SPACING.spacing16}
-      gridGap={SPACING.spacing8}
+      gridGap={SPACING.spacing16}
     >
-      <TouchControlLabel>{t('jog_controls')}</TouchControlLabel>
       <Flex css={DIRECTION_CONTROL_LAYOUT}>
         <Flex css={PLANE_BUTTONS_STYLE}>
+          <TouchControlLabel>
+            {i18n.format(t('jog_controls'), 'capitalize')}
+          </TouchControlLabel>
           {planes.map((plane: Plane) => {
+            const selected = currentPlane === plane
             return (
-              <SmallButton
+              <TouchControlButton
                 key={plane}
-                buttonType={currentPlane === plane ? 'primary' : 'secondary'}
+                selected={selected}
                 onClick={() => {
                   setCurrentPlane(plane)
                 }}
-                buttonText={CONTROLS_CONTENTS_BY_PLANE[plane].title}
-              />
+              >
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  alignItems={ALIGN_FLEX_START}
+                  justifyContent={JUSTIFY_CENTER}
+                  height="74px"
+                >
+                  <StyledText
+                    as="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    color={selected ? COLORS.white : COLORS.darkBlackEnabled}
+                  >
+                    {CONTROLS_CONTENTS_BY_PLANE[plane].title}
+                  </StyledText>
+                </Flex>
+              </TouchControlButton>
             )
           })}
         </Flex>

@@ -11,8 +11,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LocationIcon,
   Module,
   RobotWorkSpace,
+  SlotLabels,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -43,6 +45,7 @@ import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
 } from './utils'
+import { SetupInstructionsModal } from './SetupInstructionsModal'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from './utils'
@@ -90,15 +93,13 @@ function RowModule({
         </StyledText>
       </Flex>
       <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
-        <StyledText>
-          {/* todo (kj:06/09/2023) need to use LocationIcon */}
-          {t('slot_location', {
-            slotName:
-              getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
-                ? TC_MODULE_LOCATION_OT3
-                : module.slotName,
-          })}
-        </StyledText>
+        <LocationIcon
+          slotName={
+            getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
+              ? TC_MODULE_LOCATION_OT3
+              : module.slotName
+          }
+        />
       </Flex>
       {isNonConnectingModule ? (
         <Flex
@@ -145,7 +146,7 @@ export function ProtocolSetupModules({
   runId,
   setSetupScreen,
 }: ProtocolSetupModulesProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { i18n, t } = useTranslation('protocol_setup')
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
@@ -193,12 +194,9 @@ export function ProtocolSetupModules({
           />
         ) : null}
         {showSetupInstructionsModal ? (
-          <LegacyModal
-            title={t('setup_instructions')}
-            onClose={() => setShowSetupInstructionsModal(false)}
-          >
-            TODO: setup instructions modal
-          </LegacyModal>
+          <SetupInstructionsModal
+            setShowSetupInstructionsModal={setShowSetupInstructionsModal}
+          />
         ) : null}
         {showDeckMapModal ? (
           <LegacyModal
@@ -211,27 +209,34 @@ export function ProtocolSetupModules({
               deckLayerBlocklist={OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
               id="ModuleSetup_deckMap"
             >
-              {() =>
-                attachedProtocolModuleMatches.map(module => (
-                  <Module
-                    key={module.moduleId}
-                    x={module.x}
-                    y={module.y}
-                    orientation={inferModuleOrientationFromXCoordinate(
-                      module.x
-                    )}
-                    def={module.moduleDef}
-                  >
-                    <ModuleInfo
-                      moduleModel={module.moduleDef.model}
-                      isAttached={module.attachedModuleMatch != null}
-                      usbPort={module.attachedModuleMatch?.usbPort.port ?? null}
-                      hubPort={module.attachedModuleMatch?.usbPort.hub ?? null}
-                      runId={runId}
-                    />
-                  </Module>
-                ))
-              }
+              {() => (
+                <>
+                  {attachedProtocolModuleMatches.map(module => (
+                    <Module
+                      key={module.moduleId}
+                      x={module.x}
+                      y={module.y}
+                      orientation={inferModuleOrientationFromXCoordinate(
+                        module.x
+                      )}
+                      def={module.moduleDef}
+                    >
+                      <ModuleInfo
+                        moduleModel={module.moduleDef.model}
+                        isAttached={module.attachedModuleMatch != null}
+                        usbPort={
+                          module.attachedModuleMatch?.usbPort.port ?? null
+                        }
+                        hubPort={
+                          module.attachedModuleMatch?.usbPort.hub ?? null
+                        }
+                        runId={runId}
+                      />
+                    </Module>
+                  ))}
+                  <SlotLabels robotType={ROBOT_MODEL_OT3} />
+                </>
+              )}
             </RobotWorkSpace>
           </LegacyModal>
         ) : null}
@@ -247,7 +252,7 @@ export function ProtocolSetupModules({
         />
         <SmallButton
           alignSelf={ALIGN_FLEX_END}
-          buttonText={t('setup_instructions')}
+          buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
           buttonType="tertiaryLowLight"
           iconName="information"
           iconPlacement="startIcon"

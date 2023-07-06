@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { StyledText } from './index'
 import type { Story, Meta } from '@storybook/react'
+import { TYPOGRAPHY } from '@opentrons/components'
 
 export default {
   title: 'App/Atoms/StyledText',
@@ -52,30 +53,35 @@ label.args = {
 
 export const h2SemiBold = Template.bind({})
 h2SemiBold.args = {
-  as: 'h2SemiBold',
+  as: 'h2',
+  fontWeight: TYPOGRAPHY.fontWeightSemiBold,
   children: dummyText,
 }
 
 export const h3SemiBold = Template.bind({})
 h3SemiBold.args = {
-  as: 'h3SemiBold',
+  as: 'h3',
+  fontWeight: TYPOGRAPHY.fontWeightSemiBold,
   children: dummyText,
 }
 
 export const h6SemiBold = Template.bind({})
 h6SemiBold.args = {
-  as: 'h6SemiBold',
+  as: 'h6',
+  fontWeight: TYPOGRAPHY.fontWeightSemiBold,
   children: dummyText,
 }
 
 export const pSemiBold = Template.bind({})
 pSemiBold.args = {
-  as: 'pSemiBold',
+  as: 'p',
+  fontWeight: TYPOGRAPHY.fontWeightSemiBold,
   children: dummyText,
 }
 
 export const labelSemiBold = Template.bind({})
 labelSemiBold.args = {
-  as: 'labelSemiBold',
+  as: 'label',
+  fontWeight: TYPOGRAPHY.fontWeightSemiBold,
   children: dummyText,
 }

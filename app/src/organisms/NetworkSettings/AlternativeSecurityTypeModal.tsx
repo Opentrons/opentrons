@@ -62,7 +62,6 @@ export function AlternativeSecurityTypeModal({
           </StyledText>
         </Flex>
         <SmallButton
-          buttonType="primary"
           buttonText={t('connect_via', { type: t('usb') })}
           onClick={handleClick}
         />

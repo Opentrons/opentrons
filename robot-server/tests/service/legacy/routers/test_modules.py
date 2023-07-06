@@ -236,7 +236,10 @@ def test_post_serial_update_no_bundled_fw(api_client, hardware, magdeck):
 
     body = resp.json()
     assert resp.status_code == 500
-    assert body == {"message": "Bundled fw file not found for module of type: magdeck"}
+    assert body == {
+        "message": "Bundled fw file not found for module of type: magdeck",
+        "errorCode": "1005",
+    }
 
 
 def test_post_serial_update_no_modules(api_client, hardware):
@@ -244,7 +247,7 @@ def test_post_serial_update_no_modules(api_client, hardware):
 
     body = resp.json()
     assert resp.status_code == 404
-    assert body == {"message": "Module dummySerialMD not found"}
+    assert body == {"message": "Module dummySerialMD not found", "errorCode": "3015"}
 
 
 def test_post_serial_update_no_match(api_client, hardware, tempdeck):
@@ -254,7 +257,10 @@ def test_post_serial_update_no_match(api_client, hardware, tempdeck):
 
     body = resp.json()
     assert resp.status_code == 404
-    assert body == {"message": "Module superDummySerialMD not found"}
+    assert body == {
+        "message": "Module superDummySerialMD not found",
+        "errorCode": "3015",
+    }
 
 
 def test_post_serial_update_error(api_client, hardware, magdeck):
@@ -271,7 +277,7 @@ def test_post_serial_update_error(api_client, hardware, magdeck):
 
         body = resp.json()
         assert resp.status_code == 500
-        assert body == {"message": "Update error: not possible"}
+        assert body == {"message": "Update error: not possible", "errorCode": "1005"}
 
 
 def test_post_serial_timeout_error(api_client, hardware, magdeck):
@@ -288,7 +294,7 @@ def test_post_serial_timeout_error(api_client, hardware, magdeck):
 
         body = resp.json()
         assert resp.status_code == 500
-        assert body == {"message": "Module not responding"}
+        assert body == {"message": "Module not responding", "errorCode": "1005"}
 
 
 def test_post_serial_update(api_client, hardware, tempdeck):

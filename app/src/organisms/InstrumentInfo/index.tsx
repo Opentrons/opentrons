@@ -59,7 +59,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
 
   const handleDetach: React.MouseEventHandler = () => {
     setODDMaintenanceFlowInProgress()
-    if (instrument != null) {
+    if (instrument != null && instrument.ok) {
       setWizardProps(
         instrument.mount === 'extension'
           ? { ...sharedGripperWizardProps, flowType: GRIPPER_FLOW_TYPES.DETACH }
@@ -81,7 +81,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
   }
   const handleRecalibrate: React.MouseEventHandler = () => {
     setODDMaintenanceFlowInProgress()
-    if (instrument != null) {
+    if (instrument != null && instrument.ok) {
       setWizardProps(
         instrument.mount === 'extension'
           ? {
@@ -108,7 +108,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       height="100%"
     >
-      {instrument != null ? (
+      {instrument != null && instrument.ok ? (
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing8}

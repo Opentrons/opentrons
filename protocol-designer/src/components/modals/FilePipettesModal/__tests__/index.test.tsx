@@ -11,6 +11,7 @@ import {
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
+  OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { Modal, InputField, OutlineButton } from '@opentrons/components'
 import { i18n } from '../../../../localization'
@@ -74,6 +75,7 @@ describe('FilePipettesModal', () => {
       onCancel: jest.fn(),
       onSave: jest.fn(),
       moduleRestrictionsDisabled: false,
+      robotType: OT2_ROBOT_TYPE,
     }
   })
 
@@ -179,7 +181,7 @@ describe('FilePipettesModal', () => {
         ],
         newProtocolFields: {
           name: '',
-          robotType: 'OT-2 Standard',
+          robotType: OT2_ROBOT_TYPE,
           description: '',
           organizationOrAuthor: '',
         },
@@ -229,7 +231,7 @@ describe('FilePipettesModal', () => {
         ],
         newProtocolFields: {
           name: '',
-          robotType: 'OT-2 Standard',
+          robotType: OT2_ROBOT_TYPE,
           description: '',
           organizationOrAuthor: '',
         },

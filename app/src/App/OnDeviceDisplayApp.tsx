@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Switch, Route, Redirect, useRouteMatch } from 'react-router-dom'
 import { css } from 'styled-components'
+import { ErrorBoundary } from 'react-error-boundary'
 
 import {
   Box,
@@ -20,6 +21,7 @@ import { MaintenanceRunTakeover } from '../organisms/TakeoverModal'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
+import { EmergencyStop } from '../pages/EmergencyStop'
 import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { ProtocolSetup } from '../pages/OnDeviceDisplay/ProtocolSetup'
@@ -39,6 +41,7 @@ import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { SLEEP_NEVER_MS } from './constants'
 import { useCurrentRunRoute, useProtocolReceiptToast } from './hooks'
+import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
 import type { Dispatch } from '../redux/types'
 import type { RouteProps } from './types'
@@ -171,6 +174,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     path: '/robot-settings/update-robot',
   },
   {
+    Component: EmergencyStop,
+    exact: true,
+    name: 'Emergency Stop',
+    path: '/emergency-stop',
+  },
+  {
     Component: () => (
       <>
         <BackButton />
@@ -246,32 +255,34 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
 
   return (
     <ApiHostProvider hostname="localhost">
-      <Box width="100%" css="user-select: none;">
-        {isIdle ? (
-          <SleepScreen />
-        ) : (
-          <MaintenanceRunTakeover>
-            <ToasterOven>
-              <ProtocolReceiptToasts />
-              <Switch>
-                {onDeviceDisplayRoutes.map(
-                  ({ Component, exact, path }: RouteProps) => {
-                    return (
-                      <Route key={path} exact={exact} path={path}>
-                        <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
-                          <ModalPortalRoot />
-                          <Component />
-                        </Box>
-                      </Route>
-                    )
-                  }
-                )}
-                <Redirect exact from="/" to={'/loading'} />
-              </Switch>
-            </ToasterOven>
-          </MaintenanceRunTakeover>
-        )}
-      </Box>
+      <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>
+        <Box width="100%" css="user-select: none;">
+          {isIdle ? (
+            <SleepScreen />
+          ) : (
+            <MaintenanceRunTakeover>
+              <ToasterOven>
+                <ProtocolReceiptToasts />
+                <Switch>
+                  {onDeviceDisplayRoutes.map(
+                    ({ Component, exact, path }: RouteProps) => {
+                      return (
+                        <Route key={path} exact={exact} path={path}>
+                          <Box css={TOUCH_SCREEN_STYLE} ref={scrollRef}>
+                            <ModalPortalRoot />
+                            <Component />
+                          </Box>
+                        </Route>
+                      )
+                    }
+                  )}
+                  <Redirect exact from="/" to={'/loading'} />
+                </Switch>
+              </ToasterOven>
+            </MaintenanceRunTakeover>
+          )}
+        </Box>
+      </ErrorBoundary>
       <TopLevelRedirects />
     </ApiHostProvider>
   )

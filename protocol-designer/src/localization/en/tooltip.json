@@ -70,6 +70,11 @@
         "blowout_checkbox": "Redundant with disposal volume"
       }
     },
+    "moveLabware": {
+      "disabled": {
+        "gripper_not_used": "Attach Gripper to move labware"
+      }
+    },
     "batch_edit": {
       "disabled": {
         "pipette-different": "Cannot edit unless selected steps share the same pipette.",

@@ -26,14 +26,14 @@ describe('getLabwareDefinitionUri', () => {
       } as LoadedLabware,
     ]
 
-    const mockLabwareDefinitions = {
+    const mockLabwareDefinitionsByUri = {
       [MOCK_DEFINITION_URI]: MOCK_DEF,
     }
     expect(
       getLabwareDefinitionUri(
         MOCK_LABWARE_ID,
         mockLabware,
-        mockLabwareDefinitions
+        mockLabwareDefinitionsByUri
       )
     ).toBe(MOCK_DEFINITION_URI)
   })
