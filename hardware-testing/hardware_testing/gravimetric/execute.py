@@ -6,8 +6,7 @@ from opentrons.protocol_api import ProtocolContext, Well, Labware
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.data.csv_report import CSVReport
-from hardware_testing.opentrons_api.types import OT3Mount, Point
-from hardware_testing.opentrons_api.helpers_ot3 import clear_pipette_ul_per_mm
+from hardware_testing.opentrons_api.types import Point
 
 from . import report
 from . import config
@@ -150,6 +149,19 @@ def _print_final_results(
                 print(f"        avg: {avg}ul")
                 print(f"        cv:  {cv}%")
                 print(f"        d:   {d}%")
+
+def _get_tag_from_pipette(
+    pipette: InstrumentContext, cfg: config.GravimetricConfig
+) -> str:
+    pipette_tag = get_pipette_unique_name(pipette)
+    print(f'found pipette "{pipette_tag}"')
+    if cfg.increment:
+        pipette_tag += "-increment"
+    elif cfg.user_volumes:
+        pipette_tag += "-user-volume"
+    else:
+        pipette_tag += "-qc"
+    return pipette_tag
 
 
 def _run_trial(
@@ -377,6 +389,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         50 if cfg.labware_on_scale == "radwag_pipette_calibration_vial" else 120
     )
     calibration_tip_in_use = True
+
     try:
         ui.print_title("FIND LIQUID HEIGHT")
         print("homing...")
