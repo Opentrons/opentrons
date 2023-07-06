@@ -4,6 +4,7 @@ from .eeprom import (
     EEPROMDriver,
     DEFAULT_BUS,
     DEFAULT_ADDRESS,
+    DEFAULT_READ_SIZE,
 )
 
 from .types import (
@@ -11,6 +12,7 @@ from .types import (
     PropType,
     Property,
     EEPROMData,
+    FORMAT_VERSION,
 )
 
 
@@ -22,4 +24,6 @@ __all__ = [
     "EEPROMDriver",
     "DEFAULT_BUS",
     "DEFAULT_ADDRESS",
+    "DEFAULT_READ_SIZE",
+    "FORMAT_VERSION",
 ]

@@ -19,10 +19,16 @@ from opentrons_hardware.drivers.eeprom import (
 
 @pytest.fixture
 def eeprom_api() -> Generator[EEPROMDriver, None, None]:
-    """Mock out OT3GPIO"""
-    with tempfile.NamedTemporaryFile() as eeprom_path:
+    """Mock out OT3GPIO and create a temp /eeprom and /name files."""
+    with tempfile.TemporaryDirectory() as eeprom_dir:
+        # create eeprom and name files
+        eeprom_path = Path(eeprom_dir) / "eeprom"
+        eeprom_name_path = eeprom_path.parent / "name"
+        with open(eeprom_path, "wb"), open(eeprom_name_path, "w") as fh:
+            # write we can get the name and size of the eeprom
+            fh.write("24c128")
         gpio = mock.Mock(spec=OT3GPIO)
-        yield EEPROMDriver(gpio, eeprom_path=Path(eeprom_path.name))
+        yield EEPROMDriver(gpio, eeprom_path=eeprom_path)
 
 
 def test_eeprom_setup(eeprom_api: EEPROMDriver) -> None:
@@ -32,6 +38,8 @@ def test_eeprom_setup(eeprom_api: EEPROMDriver) -> None:
         fh.write(b"\x02\x11FLXA1020230602001")
 
     # Make sure we dont have any data loaded yet
+    assert eeprom_api._name == ""
+    assert eeprom_api._size == 0
     assert eeprom_api._eeprom_fd == -1
     assert len(eeprom_api._properties) == 0
     assert eeprom_api.data.serial_number is None
@@ -43,7 +51,11 @@ def test_eeprom_setup(eeprom_api: EEPROMDriver) -> None:
     # call the setup function
     eeprom_api.setup()
 
-    # We know have a file descriptor pointing to the eeprom
+    # We now have the name and size of the eeprom
+    assert eeprom_api.name == "24c128"
+    assert eeprom_api.size == 16384
+
+    # We now have a file descriptor pointing to the eeprom
     assert eeprom_api._eeprom_fd != -1
     # As well as some properties the setup function deserialized
     assert len(eeprom_api._properties) == 1
