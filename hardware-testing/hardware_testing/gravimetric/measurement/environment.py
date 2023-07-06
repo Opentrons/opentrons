@@ -4,6 +4,7 @@ from typing import Callable, List
 
 from hardware_testing.opentrons_api.helpers_ot3 import (
     get_temperature_humidity_outside_api_ot3,
+    SensorResponseBad,
 )
 from hardware_testing.opentrons_api.types import OT3Mount
 
@@ -23,8 +24,13 @@ class EnvironmentData:
 def read_environment_data(mount: str, is_simulating: bool) -> EnvironmentData:
     """Read blank environment data."""
     mnt = OT3Mount.LEFT if mount == "left" else OT3Mount.RIGHT
-    data = get_temperature_humidity_outside_api_ot3(mnt, is_simulating)
-    celsius_pipette, humidity_pipette = data
+    try:
+        data = get_temperature_humidity_outside_api_ot3(mnt, is_simulating)
+        celsius_pipette, humidity_pipette = data
+    except SensorResponseBad as e:
+        print(e)
+        celsius_pipette = 25.0
+        humidity_pipette = 50.0
     # TODO: implement USB environmental sensors
     d = EnvironmentData(
         celsius_pipette=celsius_pipette,
