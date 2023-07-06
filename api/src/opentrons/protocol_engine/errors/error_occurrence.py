@@ -22,7 +22,6 @@ class ErrorOccurrence(BaseModel):
         id: str,
         createdAt: datetime,
         error: Union[ProtocolEngineError, EnumeratedError],
-        unexepctedError: bool = False,
     ) -> "ErrorOccurrence":
         """Build an ErrorOccurrence from the details available from a FailedAction or FinishAction."""
         return cls.construct(
@@ -35,7 +34,6 @@ class ErrorOccurrence(BaseModel):
             wrappedErrors=[
                 cls.from_failed(id, createdAt, err) for err in error.wrapping
             ],
-            unexpectedFail=unexepctedError,
         )
 
     id: str = Field(..., description="Unique identifier of this error occurrence.")
@@ -74,9 +72,8 @@ class ErrorOccurrence(BaseModel):
             errorCode defined. This hack is required because it informs the client
             that it does not, in fact, have to account for a missing errorCode, wrappedError, or errorInfo.
             """
-            schema["required"].extend(
-                ["errorCode", "wrappedErrors", "errorInfo", "unexpectedFail"]
-            )
+            schema["required"].extend(["errorCode", "wrappedErrors", "errorInfo"])
+
 
 class ProtocolCommandFailedError(ProtocolEngineError):
     """Raised if a fatal command execution error has occurred."""
