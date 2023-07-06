@@ -83,6 +83,13 @@ export function getDefaultsForStepType(
         dispense_delay_mmFromBottom: null,
       }
 
+    case 'moveLabware':
+      return {
+        labware: null,
+        useGripper: false,
+        newLocation: null,
+      }
+
     case 'pause':
       return {
         pauseAction: null,

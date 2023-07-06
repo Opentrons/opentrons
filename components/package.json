@@ -22,6 +22,8 @@
   "dependencies": {
     "@opentrons/shared-data": "link:../shared-data",
     "@popperjs/core": "2.1.1",
+    "@react-spring/types": "9.6.1",
+    "@react-spring/web": "9.6.1",
     "@types/classnames": "2.2.5",
     "@types/lodash": "^4.14.191",
     "@types/react": "^17.0.1",

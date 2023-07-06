@@ -564,30 +564,32 @@ async def _calibrate_mount(
     from the current instrument offset to set a new instrument offset.
     """
     nominal_center = Point(*get_calibration_square_position_in_slot(slot))
-    try:
-        # find the center of the calibration sqaure
-        offset = await find_calibration_structure_position(
-            hcapi,
-            mount,
-            nominal_center,
-            method=method,
-            raise_verify_error=raise_verify_error,
-        )
-        # update center with values obtained during calibration
-        LOG.info(f"Found calibration value {offset} for mount {mount.name}")
-        return offset
+    async with hcapi.restore_system_constrants():
+        await hcapi.set_system_constraints_for_calibration()
+        try:
+            # find the center of the calibration sqaure
+            offset = await find_calibration_structure_position(
+                hcapi,
+                mount,
+                nominal_center,
+                method=method,
+                raise_verify_error=raise_verify_error,
+            )
+            # update center with values obtained during calibration
+            LOG.info(f"Found calibration value {offset} for mount {mount.name}")
+            return offset
 
-    except (
-        InaccurateNonContactSweepError,
-        EarlyCapacitiveSenseTrigger,
-        CalibrationStructureNotFoundError,
-    ):
-        LOG.info(
-            "Error occurred during calibration. Resetting to current saved calibration value."
-        )
-        await hcapi.reset_instrument_offset(mount, to_default=False)
-        # re-raise exception after resetting instrument offset
-        raise
+        except (
+            InaccurateNonContactSweepError,
+            EarlyCapacitiveSenseTrigger,
+            CalibrationStructureNotFoundError,
+        ):
+            LOG.info(
+                "Error occurred during calibration. Resetting to current saved calibration value."
+            )
+            await hcapi.reset_instrument_offset(mount, to_default=False)
+            # re-raise exception after resetting instrument offset
+            raise
 
 
 async def find_calibration_structure_position(

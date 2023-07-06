@@ -28,6 +28,7 @@ from ..errors import (
 from ..types import (
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     LabwareLocation,
     LabwareOffsetVector,
     ExperimentalOffsetData,
@@ -86,8 +87,8 @@ class LabwareMovementHandler:
     async def move_labware_with_gripper(
         self,
         labware_id: str,
-        current_location: Union[DeckSlotLocation, ModuleLocation],
-        new_location: Union[DeckSlotLocation, ModuleLocation],
+        current_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
+        new_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
         experimental_offset_data: ExperimentalOffsetData,
         new_offset_id: Optional[str],
     ) -> None:
@@ -193,7 +194,7 @@ class LabwareMovementHandler:
     def _get_gripper_movement_waypoints(
         self,
         labware_id: str,
-        location: Union[DeckSlotLocation, ModuleLocation],
+        location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
         current_position: Point,
         gripper_home_z: float,
         labware_offset_vector: LabwareOffsetVector,
@@ -249,9 +250,11 @@ class LabwareMovementHandler:
     @staticmethod
     def ensure_valid_gripper_location(
         location: LabwareLocation,
-    ) -> Union[DeckSlotLocation, ModuleLocation]:
+    ) -> Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation]:
         """Ensure valid on-deck location for gripper, otherwise raise error."""
-        if not isinstance(location, (DeckSlotLocation, ModuleLocation)):
+        if not isinstance(
+            location, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
+        ):
             raise LabwareMovementNotAllowedError(
                 "Off-deck labware movements are not supported using the gripper."
             )
@@ -266,7 +269,13 @@ class LabwareMovementHandler:
         new location is a module that is in a state that prevents the labware from
         being moved (either manually or using gripper).
         """
-        current_parent = self._state_store.labware.get_location(labware_id=labware_id)
+        current_parent = self._state_store.labware.get_parent_location(
+            labware_id=labware_id
+        )
+        if isinstance(new_location, OnLabwareLocation):
+            new_location = self._state_store.labware.get_parent_location(
+                labware_id=new_location.labwareId
+            )
         for parent in (current_parent, new_location):
             try:
                 await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(

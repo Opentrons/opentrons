@@ -13,9 +13,9 @@ import {
 import { Portal } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal/OnDeviceDisplay'
+import { Modal } from '../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface TakeoverModalProps {
   showConfirmTerminateModal: boolean
@@ -34,7 +34,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
   const { i18n, t } = useTranslation('shared')
 
   const terminateHeader: ModalHeaderBaseProps = {
-    title: t('terminate_activity') + '?',
+    title: t('terminate') + '?',
     iconName: 'ot-alert',
     iconColor: COLORS.yellow2,
   }
@@ -45,12 +45,11 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
         //    confirm terminate modal
         <Modal header={terminateHeader}>
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText as="p" marginBottom={SPACING.spacing40}>
+            <StyledText as="p" marginBottom={SPACING.spacing32}>
               {t('confirm_terminate')}
             </StyledText>
             <Flex flex="1" gridGap={SPACING.spacing8}>
               <SmallButton
-                buttonType="primary"
                 onClick={() => setShowConfirmTerminateModal(false)}
                 buttonText={t('continue_activity')}
                 width="50%"

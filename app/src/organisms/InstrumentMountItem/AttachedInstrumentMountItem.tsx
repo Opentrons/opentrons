@@ -61,15 +61,17 @@ export function AttachedInstrumentMountItem(
       history.push(`/instruments/${mount}`)
     }
   }
-
-  const displayName =
-    attachedInstrument?.mount !== 'extension'
-      ? getPipetteModelSpecs(
-          attachedInstrument?.instrumentModel as PipetteModel
-        )?.displayName
-      : getGripperDisplayName(
-          attachedInstrument?.instrumentModel as GripperModel
-        )
+  let displayName
+  if (attachedInstrument != null && attachedInstrument.ok) {
+    displayName =
+      attachedInstrument?.mount !== 'extension'
+        ? getPipetteModelSpecs(
+            attachedInstrument?.instrumentModel as PipetteModel
+          )?.displayName
+        : getGripperDisplayName(
+            attachedInstrument?.instrumentModel as GripperModel
+          )
+  }
   return (
     <>
       <LabeledMount

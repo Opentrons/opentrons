@@ -137,6 +137,7 @@ class AttachedModulesControl:
 
         # destroy removed mods
         await self.unregister_modules(removed_mods_at_ports)
+        self._new_mods_at_ports = new_mods_at_ports
         unsorted_mods_at_port = self._usb.match_virtual_ports(new_mods_at_ports)
 
         # build new mods

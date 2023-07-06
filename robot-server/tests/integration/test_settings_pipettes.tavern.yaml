@@ -186,6 +186,7 @@ stages:
       status_code: 412
       json: 
         message: "dropTip out of range with {tavern.request_vars.json.fields.dropTip.value}"
+        errorCode: "4000"
       strict: true
 ---
 test_name: PATCH Pipette {pipette_id} value too high
@@ -206,6 +207,7 @@ stages:
       status_code: 412
       json: 
         message: "dropTip out of range with {tavern.request_vars.json.fields.dropTip.value}"
+        errorCode: "4000"
       strict: true
 ---
 test_name: PATCH Pipette {pipette_id} no value

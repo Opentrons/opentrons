@@ -56,11 +56,7 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
               buttonType="alert"
             />
           </Flex>
-          <SmallButton
-            buttonText={t('shared:go_back')}
-            buttonType="primary"
-            onClick={goBack}
-          />
+          <SmallButton buttonText={t('shared:go_back')} onClick={goBack} />
         </>
       ) : (
         <>

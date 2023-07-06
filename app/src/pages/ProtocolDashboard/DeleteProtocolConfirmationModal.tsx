@@ -17,9 +17,9 @@ import {
 import { useHost } from '@opentrons/react-api-client'
 
 import { SmallButton } from '../../atoms/buttons'
-import { Modal } from '../../molecules/Modal/OnDeviceDisplay'
+import { Modal } from '../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface DeleteProtocolConfirmationModalProps {
   protocolName?: string
@@ -83,7 +83,7 @@ export function DeleteProtocolConfirmationModal({
     <Modal header={modalHeader}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing40}
+        gridGap={SPACING.spacing32}
         width="100%"
       >
         <Box width="100%">
@@ -97,7 +97,6 @@ export function DeleteProtocolConfirmationModal({
         >
           <SmallButton
             flex="1"
-            buttonType="primary"
             buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
             onClick={handleCloseModal}
           />
@@ -116,10 +115,11 @@ export function DeleteProtocolConfirmationModal({
 }
 
 const ProtocolNameText = styled.span`
+  display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   overflow: hidden;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   font-weight: ${TYPOGRAPHY.fontWeightBold};
   font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};

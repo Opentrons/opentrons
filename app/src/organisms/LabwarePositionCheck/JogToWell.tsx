@@ -31,7 +31,7 @@ import levelWithTip from '../../assets/images/lpc_level_with_tip.svg'
 import levelWithLabware from '../../assets/images/lpc_level_with_labware.svg'
 import { getIsOnDevice } from '../../redux/config'
 import { Portal } from '../../App/portal'
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { NeedHelpLink } from '../CalibrationPanels'
@@ -175,14 +175,13 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
               }}
             />
             <SmallButton
-              buttonType="primary"
               buttonText={t('shared:confirm_position')}
               onClick={handleConfirmPosition}
             />
           </Flex>
           <Portal level="top">
             {showFullJogControls ? (
-              <ModalShell
+              <LegacyModalShell
                 width="60rem"
                 height="33.5rem"
                 padding={SPACING.spacing32}
@@ -205,7 +204,6 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   <SmallButton
                     width="100%"
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    buttonType="primary"
                     buttonText={t('shared:close')}
                     onClick={() => {
                       setShowFullJogControls(false)
@@ -219,7 +217,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   }
                   isOnDevice={true}
                 />
-              </ModalShell>
+              </LegacyModalShell>
             ) : null}
           </Portal>
         </Flex>

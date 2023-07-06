@@ -17,7 +17,7 @@
   },
   "plungerMotorConfigurations": {
     "idle": 0.3,
-    "run": 2.0
+    "run": 0.8
   },
   "plungerPositionsConfigurations": {
     "top": 0.5,

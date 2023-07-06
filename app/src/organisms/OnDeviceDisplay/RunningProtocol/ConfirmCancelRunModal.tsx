@@ -16,11 +16,11 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
-import { Modal } from '../../../molecules/Modal/OnDeviceDisplay/Modal'
+import { Modal } from '../../../molecules/Modal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../../redux/analytics'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 
 interface ConfirmCancelRunModalProps {
   runId: string
@@ -83,7 +83,7 @@ export function ConfirmCancelRunModal({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing12}
-          paddingBottom={SPACING.spacing40}
+          paddingBottom={SPACING.spacing32}
           paddingTop={`${isActiveRun ? SPACING.spacing32 : '0'}`}
         >
           <StyledText as="p">{t('cancel_run_alert_info')}</StyledText>
@@ -96,7 +96,6 @@ export function ConfirmCancelRunModal({
         >
           <SmallButton
             flex="1"
-            buttonType="primary"
             buttonText={t('shared:go_back')}
             onClick={() => setShowConfirmCancelRunModal(false)}
           />

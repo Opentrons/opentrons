@@ -3,6 +3,7 @@ import contextlib
 from functools import partial, lru_cache
 from dataclasses import replace
 import logging
+from copy import deepcopy
 from collections import OrderedDict
 from typing import (
     AsyncIterator,
@@ -28,11 +29,14 @@ from opentrons.hardware_control.modules.module_calibration import (
 from opentrons_shared_data.pipette.dev_types import (
     PipetteName,
 )
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
 from opentrons_shared_data.gripper.constants import IDLE_STATE_GRIP_FORCE
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons import types as top_types
-from opentrons.config import robot_configs, ot3_pipette_config
+from opentrons.config import robot_configs
 from opentrons.config.types import (
     RobotConfig,
     OT3Config,
@@ -64,6 +68,7 @@ from .backends.ot3controller import OT3Controller
 from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import (
     get_system_constraints,
+    get_system_constraints_for_calibration,
     axis_convert,
 )
 from .backends.errors import SubsystemUpdating
@@ -92,6 +97,7 @@ from .types import (
     UpdateStatus,
     StatusBarState,
     SubSystemState,
+    TipStateType,
 )
 from .errors import (
     MustHomeError,
@@ -248,6 +254,27 @@ class OT3API(
         )
         await self._backend.update_to_default_current_settings(gantry_load)
 
+    async def set_system_constraints_for_calibration(self) -> None:
+        self._move_manager.update_constraints(
+            get_system_constraints_for_calibration(
+                self._config.motion_settings, self._gantry_load
+            )
+        )
+        mod_log.debug(
+            f"Set system constraints for calibration: {self._move_manager.get_constraints()}"
+        )
+
+    @contextlib.asynccontextmanager
+    async def restore_system_constrants(self) -> AsyncIterator[None]:
+        old_system_constraints = deepcopy(self._move_manager.get_constraints())
+        try:
+            yield
+        finally:
+            self._move_manager.update_constraints(old_system_constraints)
+            mod_log.debug(
+                f"Restore previous system constraints: {old_system_constraints}"
+            )
+
     def _update_door_state(self, door_state: DoorState) -> None:
         mod_log.info(f"Updating the window switch status: {door_state}")
         self.door_state = door_state
@@ -296,9 +323,6 @@ class OT3API(
         api_instance = cls(backend, loop=checked_loop, config=checked_config)
 
         await api_instance.set_status_bar_enabled(status_bar_enabled)
-        # TODO: Remove this line once the robot server runs the startup
-        # animation after initialization!
-        await api_instance.set_status_bar_state(StatusBarState.IDLE)
         module_controls = await AttachedModulesControl.build(
             api_instance, board_revision=backend.board_revision
         )
@@ -554,7 +578,7 @@ class OT3API(
             # TODO (lc 12-5-2022) cache instruments should be receiving
             # a pipette type / channels rather than the named config.
             # We should also check version here once we're comfortable.
-            if not ot3_pipette_config.supported_pipette(name):
+            if not pipette_load_name.supported_pipette(name):
                 raise RuntimeError(f"{name} is not a valid pipette name")
         async with self._motion_lock:
             # we're not actually checking the required instrument except in the context
@@ -704,7 +728,9 @@ class OT3API(
         """
 
         checked_mount = OT3Mount.from_mount(mount)
-        await self.home([Axis.of_main_tool_actuator(checked_mount)])
+        async with self._backend.monitor_overpressure(mount):
+            await self.home([Axis.of_main_tool_actuator(checked_mount)])
+
         instr = self._pipette_handler.hardware_instruments[checked_mount]
         if instr:
             self._log.info("Attempting to move the plunger to bottom.")
@@ -1481,16 +1507,17 @@ class OT3API(
             )
             backlash_pos = target_pos.copy()
             backlash_pos[pip_ax] -= instrument.backlash_distance
-            await self._move(
-                backlash_pos,
-                speed=aspirate_spec.speed,
-                home_flagged_axes=False,
-            )
-            await self._move(
-                target_pos,
-                speed=aspirate_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self._backend.monitor_overpressure(mount):
+                await self._move(
+                    backlash_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
+                await self._move(
+                    target_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Aspirate failed")
             aspirate_spec.instr.set_current_volume(0)
@@ -1522,11 +1549,12 @@ class OT3API(
             await self._backend.set_active_current(
                 {dispense_spec.axis: dispense_spec.current}
             )
-            await self._move(
-                target_pos,
-                speed=dispense_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self._backend.monitor_overpressure(mount):
+                await self._move(
+                    target_pos,
+                    speed=dispense_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Dispense failed")
             dispense_spec.instr.set_current_volume(0)
@@ -1570,11 +1598,12 @@ class OT3API(
         )
 
         try:
-            await self._move(
-                target_pos,
-                speed=blowout_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self._backend.monitor_overpressure(realmount):
+                await self._move(
+                    target_pos,
+                    speed=blowout_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Blow out failed")
             raise
@@ -1645,6 +1674,7 @@ class OT3API(
             realmount, tip_length, presses, increment
         )
 
+        await self._move_to_plunger_bottom(realmount, rate=1.0)
         if spec.pick_up_motor_actions:
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
         else:
@@ -1655,6 +1685,12 @@ class OT3API(
         # This extra shake ensures those tips are removed
         for rel_point, speed in spec.shake_off_list:
             await self.move_rel(realmount, rel_point, speed=speed)
+
+        # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
+        #       but not with DVT pipettes because those can only detect drops
+
+        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+            await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
 
         _add_tip_to_instrs()
 
@@ -1687,6 +1723,7 @@ class OT3API(
         """Drop tip at the current location."""
         realmount = OT3Mount.from_mount(mount)
         spec, _remove = self._pipette_handler.plan_check_drop_tip(realmount, home_after)
+
         for move in spec.drop_moves:
             await self._backend.set_active_current(move.current)
 
@@ -1709,20 +1746,27 @@ class OT3API(
                 target_pos = target_position_from_plunger(
                     realmount, move.target_position, self._current_position
                 )
-                await self._move(
-                    target_pos,
-                    speed=move.speed,
-                    home_flagged_axes=False,
-                )
-            if (
-                move.home_after
-            ):  # (spp): this check was outside the loop previously; I think that was a bug?
+                async with self._backend.monitor_overpressure(mount):
+                    await self._move(
+                        target_pos,
+                        speed=move.speed,
+                        home_flagged_axes=False,
+                    )
+            if move.home_after:
                 await self._home(move.home_axes)
 
         for shake in spec.shake_moves:
             await self.move_rel(mount, shake[0], speed=shake[1])
 
         await self._backend.set_active_current(spec.ending_current)
+        # TODO: implement tip-detection sequence during drop-tip for 96ch
+        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
+            await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
+
+        # home mount axis
+        if home_after:
+            await self._home([Axis.by_mount(mount)])
+
         _remove()
 
     async def clean_up(self) -> None:

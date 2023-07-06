@@ -2,17 +2,19 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  Flex,
-  Icon,
-  Module,
-  RobotWorkSpace,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   BORDERS,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LocationIcon,
+  Module,
+  RobotWorkSpace,
+  SlotLabels,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -30,7 +32,7 @@ import { Portal } from '../../App/portal'
 import { FloatingActionButton, SmallButton } from '../../atoms/buttons'
 import { Chip } from '../../atoms/Chip'
 import { InlineNotification } from '../../atoms/InlineNotification'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
@@ -43,6 +45,7 @@ import {
   getAttachedProtocolModuleMatches,
   getUnmatchedModulesForProtocol,
 } from './utils'
+import { SetupInstructionsModal } from './SetupInstructionsModal'
 
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
 import type { AttachedProtocolModuleMatch } from './utils'
@@ -84,24 +87,19 @@ function RowModule({
         isDuplicateModuleModel ? setShowMultipleModulesModal(true) : null
       }
     >
-      <Flex
-        flex="4 0 0"
-        fontSize={TYPOGRAPHY.fontSize22}
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        lineHeight={TYPOGRAPHY.lineHeight28}
-      >
-        <StyledText>{getModuleDisplayName(module.moduleDef.model)}</StyledText>
+      <Flex flex="4 0 0" alignItems={ALIGN_CENTER}>
+        <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          {getModuleDisplayName(module.moduleDef.model)}
+        </StyledText>
       </Flex>
       <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
-        <StyledText>
-          {/* TODO(bh, 2023-02-07): adjust slot location when hi-fi designs finalized */}
-          {t('slot_location', {
-            slotName:
-              getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
-                ? TC_MODULE_LOCATION_OT3
-                : module.slotName,
-          })}
-        </StyledText>
+        <LocationIcon
+          slotName={
+            getModuleType(module.moduleDef.model) === THERMOCYCLER_MODULE_TYPE
+              ? TC_MODULE_LOCATION_OT3
+              : module.slotName
+          }
+        />
       </Flex>
       {isNonConnectingModule ? (
         <Flex
@@ -148,7 +146,7 @@ export function ProtocolSetupModules({
   runId,
   setSetupScreen,
 }: ProtocolSetupModulesProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { i18n, t } = useTranslation('protocol_setup')
   const [
     showMultipleModulesModal,
     setShowMultipleModulesModal,
@@ -196,15 +194,12 @@ export function ProtocolSetupModules({
           />
         ) : null}
         {showSetupInstructionsModal ? (
-          <Modal
-            title={t('setup_instructions')}
-            onClose={() => setShowSetupInstructionsModal(false)}
-          >
-            TODO: setup instructions modal
-          </Modal>
+          <SetupInstructionsModal
+            setShowSetupInstructionsModal={setShowSetupInstructionsModal}
+          />
         ) : null}
         {showDeckMapModal ? (
-          <Modal
+          <LegacyModal
             title={t('map_view')}
             onClose={() => setShowDeckMapModal(false)}
             fullPage
@@ -214,29 +209,36 @@ export function ProtocolSetupModules({
               deckLayerBlocklist={OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
               id="ModuleSetup_deckMap"
             >
-              {() =>
-                attachedProtocolModuleMatches.map(module => (
-                  <Module
-                    key={module.moduleId}
-                    x={module.x}
-                    y={module.y}
-                    orientation={inferModuleOrientationFromXCoordinate(
-                      module.x
-                    )}
-                    def={module.moduleDef}
-                  >
-                    <ModuleInfo
-                      moduleModel={module.moduleDef.model}
-                      isAttached={module.attachedModuleMatch != null}
-                      usbPort={module.attachedModuleMatch?.usbPort.port ?? null}
-                      hubPort={module.attachedModuleMatch?.usbPort.hub ?? null}
-                      runId={runId}
-                    />
-                  </Module>
-                ))
-              }
+              {() => (
+                <>
+                  {attachedProtocolModuleMatches.map(module => (
+                    <Module
+                      key={module.moduleId}
+                      x={module.x}
+                      y={module.y}
+                      orientation={inferModuleOrientationFromXCoordinate(
+                        module.x
+                      )}
+                      def={module.moduleDef}
+                    >
+                      <ModuleInfo
+                        moduleModel={module.moduleDef.model}
+                        isAttached={module.attachedModuleMatch != null}
+                        usbPort={
+                          module.attachedModuleMatch?.usbPort.port ?? null
+                        }
+                        hubPort={
+                          module.attachedModuleMatch?.usbPort.hub ?? null
+                        }
+                        runId={runId}
+                      />
+                    </Module>
+                  ))}
+                  <SlotLabels robotType={ROBOT_MODEL_OT3} />
+                </>
+              )}
             </RobotWorkSpace>
-          </Modal>
+          </LegacyModal>
         ) : null}
       </Portal>
       <Flex
@@ -250,7 +252,7 @@ export function ProtocolSetupModules({
         />
         <SmallButton
           alignSelf={ALIGN_FLEX_END}
-          buttonText={t('setup_instructions')}
+          buttonText={i18n.format(t('setup_instructions'), 'titleCase')}
           buttonType="tertiaryLowLight"
           iconName="information"
           iconPlacement="startIcon"

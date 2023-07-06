@@ -14,7 +14,7 @@ import {
 } from '@opentrons/shared-data'
 import { isGripperInCommands } from '../../../resources/protocols/utils'
 import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { Instruments, PipetteData } from '@opentrons/api-client'
+import { GripperData, Instruments, PipetteData } from '@opentrons/api-client'
 
 export interface ProtocolCalibrationStatus {
   complete: boolean
@@ -59,7 +59,9 @@ function getFlexRunCalibrationStatus(
   const wrongPipettesAttached = requiredPipettes.some(speccedPipette => {
     const pipetteOnThisMount = instrumentsQueryData?.data.find(
       (i): i is PipetteData =>
-        i.instrumentType === 'pipette' && i.mount === speccedPipette.mount
+        i.instrumentType === 'pipette' &&
+        i.ok &&
+        i.mount === speccedPipette.mount
     )
     return pipetteOnThisMount?.instrumentName !== speccedPipette.pipetteName
   })
@@ -70,6 +72,7 @@ function getFlexRunCalibrationStatus(
     const pipetteMatch = instrumentsQueryData?.data.find(
       (i): i is PipetteData =>
         i.instrumentType === 'pipette' &&
+        i.ok &&
         i.mount === speccedPipette.mount &&
         i?.instrumentName === speccedPipette.pipetteName
     )
@@ -83,7 +86,7 @@ function getFlexRunCalibrationStatus(
   )
   if (protocolRequiresGripper) {
     const attachedGripper = attachedInstruments.find(
-      i => i.instrumentType === 'gripper'
+      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
     )
     if (attachedGripper == null) {
       return { complete: false, reason: 'attach_gripper_failure_reason' }

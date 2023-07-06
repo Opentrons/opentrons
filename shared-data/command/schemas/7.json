@@ -39,6 +39,9 @@
       "$ref": "#/definitions/LoadLabwareCreate"
     },
     {
+      "$ref": "#/definitions/LoadAdapterCreate"
+    },
+    {
       "$ref": "#/definitions/LoadLiquidCreate"
     },
     {
@@ -76,6 +79,9 @@
     },
     {
       "$ref": "#/definitions/TouchTipCreate"
+    },
+    {
+      "$ref": "#/definitions/SetStatusBarCreate"
     },
     {
       "$ref": "#/definitions/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate"
@@ -900,7 +906,7 @@
       "type": "object",
       "properties": {
         "slotName": {
-          "description": "A slot on the robot's deck.\n\nThe plain numbers like `\"5\"` are for the OT-2, and the letter-number pairs like `\"C2\"` are for the Flex.\n\nWhen you provide one of these values, you can use either style. It will automatically be converted to match the robot.\n\nWhen one of these values is returned, it will always match the robot.",
+          "description": "A slot on the robot's deck.\n\nThe plain numbers like `\"5\"` are for the OT-2, and the coordinates like `\"C2\"` are for the Flex.\n\nWhen you provide one of these values, you can use either style. It will automatically be converted to match the robot.\n\nWhen one of these values is returned, it will always match the robot.",
           "allOf": [
             {
               "$ref": "#/definitions/DeckSlotName"
@@ -923,6 +929,19 @@
       },
       "required": ["moduleId"]
     },
+    "OnLabwareLocation": {
+      "title": "OnLabwareLocation",
+      "description": "The location of something placed atop another labware.",
+      "type": "object",
+      "properties": {
+        "labwareId": {
+          "title": "Labwareid",
+          "description": "The ID of a loaded Labware from a prior `loadLabware` command.",
+          "type": "string"
+        }
+      },
+      "required": ["labwareId"]
+    },
     "LoadLabwareParams": {
       "title": "LoadLabwareParams",
       "description": "Payload required to load a labware into a slot.",
@@ -937,6 +956,9 @@
             },
             {
               "$ref": "#/definitions/ModuleLocation"
+            },
+            {
+              "$ref": "#/definitions/OnLabwareLocation"
             },
             {
               "enum": ["offDeck"],
@@ -985,6 +1007,80 @@
         },
         "params": {
           "$ref": "#/definitions/LoadLabwareParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "LoadAdapterParams": {
+      "title": "LoadAdapterParams",
+      "description": "Payload required to load an adapter into a slot.",
+      "type": "object",
+      "properties": {
+        "location": {
+          "title": "Location",
+          "description": "Location the adapter should be loaded into.",
+          "anyOf": [
+            {
+              "$ref": "#/definitions/DeckSlotLocation"
+            },
+            {
+              "$ref": "#/definitions/ModuleLocation"
+            },
+            {
+              "enum": ["offDeck"],
+              "type": "string"
+            }
+          ]
+        },
+        "loadName": {
+          "title": "Loadname",
+          "description": "Name used to reference a labware definition.",
+          "type": "string"
+        },
+        "namespace": {
+          "title": "Namespace",
+          "description": "The namespace the labware definition belongs to.",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "description": "The labware definition version.",
+          "type": "integer"
+        },
+        "adapterId": {
+          "title": "Adapterid",
+          "description": "An optional ID to assign to this adapter. If None, an ID will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["location", "loadName", "namespace", "version"]
+    },
+    "LoadAdapterCreate": {
+      "title": "LoadAdapterCreate",
+      "description": "Load adapter command creation request.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "loadAdapter",
+          "enum": ["loadAdapter"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/LoadAdapterParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
@@ -1272,6 +1368,9 @@
             },
             {
               "$ref": "#/definitions/ModuleLocation"
+            },
+            {
+              "$ref": "#/definitions/OnLabwareLocation"
             },
             {
               "enum": ["offDeck"],
@@ -1877,6 +1976,57 @@
         },
         "params": {
           "$ref": "#/definitions/TouchTipParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "StatusBarAnimation": {
+      "title": "StatusBarAnimation",
+      "description": "Status Bar animation options.",
+      "enum": ["idle", "confirm", "updating", "disco", "off"]
+    },
+    "SetStatusBarParams": {
+      "title": "SetStatusBarParams",
+      "description": "Payload required to set the status bar to run an animation.",
+      "type": "object",
+      "properties": {
+        "animation": {
+          "description": "The animation that should be executed on the status bar.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/StatusBarAnimation"
+            }
+          ]
+        }
+      },
+      "required": ["animation"]
+    },
+    "SetStatusBarCreate": {
+      "title": "SetStatusBarCreate",
+      "description": "setStatusBar command request model.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "setStatusBar",
+          "enum": ["setStatusBar"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/SetStatusBarParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

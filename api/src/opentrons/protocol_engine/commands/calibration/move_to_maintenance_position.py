@@ -4,7 +4,6 @@ from __future__ import annotations
 import enum
 from typing import TYPE_CHECKING, Type, Optional
 from typing_extensions import Literal
-import logging
 
 from pydantic import BaseModel, Field
 
@@ -20,8 +19,6 @@ from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardwa
 if TYPE_CHECKING:
     from opentrons.hardware_control import HardwareControlAPI
     from ...state import StateView
-
-logger = logging.getLogger(__name__)
 
 # These offsets supplied from HW
 _ATTACH_POINT = Point(x=0, y=110)

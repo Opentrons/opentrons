@@ -23,5 +23,6 @@ stages:
           - id: ProtocolRobotTypeMismatch
             title: Protocol For Different Robot Type
             detail: "This protocol is for OT-3 Standard robots. It can't be analyzed or run on this robot, which is an OT-2 Standard."
+            errorCode: '4000'
 
 # TODO(mm, 2022-12-12): Also make sure an OT-3 server rejects OT-2 protocols.

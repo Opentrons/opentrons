@@ -5,6 +5,7 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import {
+  getDevtoolsEnabled,
   getUpdateChannelOptions,
   updateConfigValue,
 } from '../../../redux/config'
@@ -22,13 +23,16 @@ const mockChannelOptions = [
   { label: 'Alpha', value: 'alpha' },
 ]
 
-const mockSetCurrentOption = jest.fn()
+const mockhandleBackPress = jest.fn()
 
 const mockGetChannelOptions = getUpdateChannelOptions as jest.MockedFunction<
   typeof getUpdateChannelOptions
 >
 const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
   typeof updateConfigValue
+>
+const mockGetDevtoolsEnabled = getDevtoolsEnabled as jest.MockedFunction<
+  typeof getDevtoolsEnabled
 >
 
 const render = (props: React.ComponentProps<typeof UpdateChannel>) => {
@@ -41,8 +45,7 @@ describe('UpdateChannel', () => {
   let props: React.ComponentProps<typeof UpdateChannel>
   beforeEach(() => {
     props = {
-      setCurrentOption: mockSetCurrentOption,
-      devToolsOn: false,
+      handleBackPress: mockhandleBackPress,
     }
     mockGetChannelOptions.mockReturnValue(mockChannelOptions)
   })
@@ -68,7 +71,7 @@ describe('UpdateChannel', () => {
   })
 
   it('should render alpha when dev tools on', () => {
-    props.devToolsOn = true
+    mockGetDevtoolsEnabled.mockReturnValue(true)
     const [{ getByText }] = render(props)
     getByText('Alpha')
     getByText(
@@ -84,9 +87,9 @@ describe('UpdateChannel', () => {
   })
 
   it('should call mock function when tapping back button', () => {
-    const [{ getByTestId }] = render(props)
-    const button = getByTestId('UpdateChannel_back_button')
+    const [{ getByRole }] = render(props)
+    const button = getByRole('button')
     fireEvent.click(button)
-    expect(props.setCurrentOption).toHaveBeenCalled()
+    expect(props.handleBackPress).toHaveBeenCalled()
   })
 })
