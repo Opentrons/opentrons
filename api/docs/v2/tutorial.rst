@@ -50,7 +50,7 @@ Let’s start from scratch to create your serial dilution protocol. Open up a ne
 
     from opentrons import protocol_api
 
-Throughout this documentation, you’ll see protocols that begin with the ``opentrons import`` statement shown above. It identifies your code as an Opentrons protocol. This statement is not required, but including it is a good practice and allows most code editors to provide helpful autocomplete suggestions. 
+Throughout this documentation, you’ll see protocols that begin with the ``import`` statement shown above. It identifies your code as an Opentrons protocol. This statement is not required, but including it is a good practice and allows most code editors to provide helpful autocomplete suggestions. 
 
 Everything else in the protocol file is required. Next, you’ll specify the version of the API you’re using. Then comes the core of the protocol: defining a single ``run()`` function that provides the locations of your labware, states which kind of pipettes you’ll use, and finally issues the commands that the robot will perform.
 
