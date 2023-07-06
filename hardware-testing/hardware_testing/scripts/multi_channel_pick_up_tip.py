@@ -238,10 +238,14 @@ async def _main() -> None:
         "D3": (341.03, 75.5, 110),
     }
     hw_api = await build_async_ot3_hardware_api(
-        is_simulating=args.simulate, use_defaults=True
+        is_simulating=args.simulate, use_defaults=True,
+        stall_detection_enable = False
     )
+    await hw_api.home()
+    await hw_api.home_plunger(mount)
+    await hw_api.cache_instruments()
     tip_length = {"T1K": 85.7, "T200": 48.35, "T50": 47.9}
-    pipette_model = hw_api.get_all_attached_instr()[OT3Mount.RIGHT]["pipette_id"]
+    pipette_model = hw_api.get_all_attached_instr()[mount]["pipette_id"]
     dial_data = {
         "Ch1": None,
         "Ch2": None,
@@ -259,15 +263,14 @@ async def _main() -> None:
     pick_up_speed = float(input("pick up tip speed in mm/s: "))
     details = [pipette_model, m_current]
     test_n, test_f = file_setup(dial_data, details)
-    file_name = "/home/root/.opentrons/testing_data/enc_data/enc_pu_test_%s-%s.csv" % (
+    file_name = "/data/testing_data/enc_data/enc_pu_test_%s-%s.csv" % (
         m_current,
         datetime.datetime.now().strftime("%m-%d-%y_%H-%M"),
     )
     print(file_name)
     print(test_n)
     print(test_f)
-    await home_ot3(hw_api, [OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.X, OT3Axis.Y])
-    await hw_api.home_plunger(mount)
+
     await hw_api.set_lights(rails=True)
     plunger_pos = get_plunger_positions_ot3(hw_api, mount)
     home_position = await hw_api.current_position_ot3(mount)
@@ -475,7 +478,7 @@ async def _main() -> None:
         expected_liquid_height=args.expected_liquid_height,
         log_pressure=args.log_pressure,
         aspirate_while_sensing=False,
-        auto_zero_sensor=True,
+        auto_zero_sensor=False,
         num_baseline_reads=10,
         data_file=lp_file_name,
     )
@@ -898,9 +901,9 @@ if __name__ == "__main__":
     parser.add_argument("--max_z_distance", type=float, default=40)
     parser.add_argument("--min_z_distance", type=float, default=5)
     parser.add_argument("--mount_speed", type=float, default=5)
-    parser.add_argument("--plunger_speed", type=float, default=7)
+    parser.add_argument("--plunger_speed", type=float, default=11)
     parser.add_argument(
-        "--sensor_threshold", type=float, default=100, help="Threshold in Pascals"
+        "--sensor_threshold", type=float, default=50, help="Threshold in Pascals"
     )
     parser.add_argument("--expected_liquid_height", type=int, default=0)
     parser.add_argument("--log_pressure", action="store_true")
