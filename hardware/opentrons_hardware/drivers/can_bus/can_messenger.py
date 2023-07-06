@@ -346,17 +346,14 @@ class CanMessenger:
             self._listeners.pop(listener)
 
     async def _read_task_shield(self) -> None:
-        try:
-            await self._read_task()
-        except asyncio.CancelledError:
-            pass
-        except EnumeratedError:
-            raise
-        except Exception as exc:
-            log.exception("Exception in read")
-            raise CanbusCommunicationError(
-                message="Exception in read", wrapping=[PythonException(exc)]
-            )
+        while True:
+            try:
+                await self._read_task()
+            except (asyncio.CancelledError, StopAsyncIteration):
+               return
+            except BaseException as exc:
+                log.exception("Exception in read")
+                continue
 
     async def _read_task(self) -> None:
         """Read task."""
