@@ -24,6 +24,7 @@ from .helpers import (
     _drop_tip,
     _get_volumes,
     _load_pipette,
+    _load_tipracks,
 )
 from .trial import build_gravimetric_trials, GravimetricTrial
 from .liquid_class.pipetting import (
@@ -113,25 +114,7 @@ def _load_labware(
     labware_on_scale = ctx.load_labware(
         cfg.labware_on_scale, location=cfg.slot_scale, namespace=namespace
     )
-    if cfg.pipette_channels == 96:
-        tiprack_namespace = "custom_beta"
-        tiprack_loadname = f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul_adp"
-    else:
-        tiprack_namespace = "opentrons"
-        tiprack_loadname = f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul"
-    tiprack_load_settings: List[Tuple[int, str, str]] = [
-        (
-            slot,
-            tiprack_loadname,
-            tiprack_namespace,
-        )
-        for slot in cfg.slots_tiprack
-    ]
-    tipracks: List[Labware] = []
-    for ls in tiprack_load_settings:
-        print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]} with namespace "{ls[2]}"')
-        tipracks.append(ctx.load_labware(ls[1], location=ls[0], namespace=ls[2]))
-    _apply_labware_offsets(cfg, tipracks)
+    tipracks = _load_tipracks(ctx, cfg, use_adapter=cfg.pipette_channels == 96)
     _apply_labware_offsets(cfg, [labware_on_scale])
     return labware_on_scale, tipracks
 
