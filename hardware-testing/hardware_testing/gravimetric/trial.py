@@ -84,49 +84,44 @@ QC_VOLUMES_P = {
 
 
 @dataclass
-class GravimetricTrial:
-    """All the arguments for a single gravimetric trial."""
+class VolumetricTrial:
+    """Common arguments for volumetric scripts."""
 
     ctx: ProtocolContext
     pipette: InstrumentContext
-    well: Well
-    channel_offset: Point
-    tip_volume: int
-    volume: float
-    channel: int
-    channel_count: int
-    trial: int
-    recorder: GravimetricRecorder
     test_report: CSVReport
     liquid_tracker: LiquidTracker
-    blank: bool
     inspect: bool
-    measure_height: float
-    mix: bool = False
-    stable: bool = True
-    scale_delay: int = DELAY_FOR_MEASUREMENT
-    acceptable_cv: Optional[float] = None
+    trial: int
+    tip_volume: int
+    volume: float
+    mix: bool
+    acceptable_cv: Optional[float]
 
 
 @dataclass
-class PhotometricTrial:
+class GravimetricTrial(VolumetricTrial):
+    """All the arguments for a single gravimetric trial."""
+
+    well: Well
+    channel_offset: Point
+    channel: int
+    channel_count: int
+    recorder: GravimetricRecorder
+    blank: bool
+    measure_height: float
+    stable: bool
+    scale_delay: int = DELAY_FOR_MEASUREMENT
+
+
+@dataclass
+class PhotometricTrial(VolumetricTrial):
     """All the arguments for a single photometric trial."""
 
-    ctx: ProtocolContext
-    test_report: CSVReport
-    pipette: InstrumentContext
     source: Well
     dest: Labware
-    tip_volume: int
-    volume: float
-    trial: int
-    liquid_tracker: LiquidTracker
-    inspect: bool
     do_jog: bool
     cfg: config.PhotometricConfig
-    mix: bool = False
-    stable: bool = True
-    acceptable_cv: Optional[float] = None
 
 
 @dataclass
@@ -178,6 +173,7 @@ def build_gravimetric_trials(
                     mix=cfg.mix,
                     stable=False,
                     scale_delay=cfg.scale_delay,
+                    acceptable_cv=None,
                 )
             )
     else:
@@ -209,6 +205,7 @@ def build_gravimetric_trials(
                             mix=cfg.mix,
                             stable=True,
                             scale_delay=cfg.scale_delay,
+                            acceptable_cv=None,
                         )
                     )
     return trial_list
@@ -245,6 +242,7 @@ def build_photometric_trials(
                     do_jog=do_jog,
                     cfg=cfg,
                     mix=cfg.mix,
+                    acceptable_cv=None,
                 )
             )
             if volume < 250:
