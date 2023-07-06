@@ -1,9 +1,14 @@
 import { useSelector } from 'react-redux'
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { COLORS, PrimaryButton } from '@opentrons/components'
+import {
+  COLORS,
+  PrimaryButton,
+  TEXT_TRANSFORM_CAPITALIZE,
+} from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { SmallButton } from '../../atoms/buttons'
 import {
   SUCCESSFULLY_ATTACHED,
@@ -14,9 +19,11 @@ import {
 import type { GripperWizardStepProps, SuccessStep } from './types'
 
 export const Success = (
-  props: Pick<GripperWizardStepProps, 'proceed'> & SuccessStep
+  props: Pick<GripperWizardStepProps, 'proceed'> &
+    Pick<GripperWizardStepProps, 'isRobotMoving'> &
+    SuccessStep
 ): JSX.Element => {
-  const { proceed, successfulAction } = props
+  const { proceed, successfulAction, isRobotMoving } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
 
@@ -45,6 +52,13 @@ export const Success = (
   }
   const { header, buttonText } = infoByAction[successfulAction]
 
+  if (isRobotMoving)
+    return (
+      <InProgressModal
+        description={t('shared:stand_back_robot_is_in_motion')}
+      />
+    )
+
   return (
     <SimpleWizardBody
       iconColor={COLORS.successEnabled}
@@ -52,7 +66,12 @@ export const Success = (
       isSuccess
     >
       {isOnDevice ? (
-        <SmallButton buttonText={buttonText} onClick={proceed} />
+        <SmallButton
+          textTransform={TEXT_TRANSFORM_CAPITALIZE}
+          buttonText={buttonText}
+          buttonType="primary"
+          onClick={proceed}
+        />
       ) : (
         <PrimaryButton onClick={proceed}>{buttonText}</PrimaryButton>
       )}

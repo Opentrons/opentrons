@@ -65,7 +65,6 @@ const STEP_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 1.375rem;
-    font-weight: 700;
     margin-left: ${SPACING.spacing16};
   }
 `

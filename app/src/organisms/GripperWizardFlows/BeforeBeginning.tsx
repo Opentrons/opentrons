@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
+import { COLORS } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardRequiredEquipmentList } from '../../molecules/WizardRequiredEquipmentList'
 import {
@@ -65,6 +67,8 @@ export const BeforeBeginning = (
     isCreateLoading,
     isRobotMoving,
     chainRunCommands,
+    errorMessage,
+    setShowErrorMessage,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
@@ -83,11 +87,13 @@ export const BeforeBeginning = (
   ]
 
   const handleOnClick = (): void => {
-    chainRunCommands(commandsOnProceed, true)
+    chainRunCommands(commandsOnProceed, false)
       .then(() => {
         proceed()
       })
-      .catch(() => {})
+      .catch(error => {
+        setShowErrorMessage(error.message)
+      })
   }
 
   const equipmentInfoByLoadName: {
@@ -113,7 +119,14 @@ export const BeforeBeginning = (
         description={t('shared:stand_back_robot_is_in_motion')}
       />
     )
-  return (
+  return errorMessage != null ? (
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('error_encountered')}
+      subHeader={errorMessage}
+    />
+  ) : (
     <GenericWizardTile
       header={t('before_you_begin')}
       //  TODO(BC, 11/8/22): wire up this URL and unhide the link!

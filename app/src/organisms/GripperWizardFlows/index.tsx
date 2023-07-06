@@ -66,14 +66,22 @@ export function GripperWizardFlows(
     },
   })
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
+  const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
+    null
+  )
+
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    chainRunCommands([{ commandType: 'home' as const, params: {} }], true).then(
-      () => {
+    chainRunCommands([{ commandType: 'home' as const, params: {} }], true)
+      .then(() => {
         setIsExiting(false)
         closeFlow()
-      }
-    )
+      })
+      .catch(error => {
+        console.error(error.message)
+        setIsExiting(false)
+        closeFlow()
+      })
   }
 
   return (
@@ -89,6 +97,8 @@ export function GripperWizardFlows(
       handleCleanUpAndClose={handleCleanUpAndClose}
       chainRunCommands={chainRunCommands}
       createRunCommand={createMaintenanceCommand}
+      errorMessage={errorMessage}
+      setShowErrorMessage={setShowErrorMessage}
     />
   )
 }
@@ -105,6 +115,8 @@ interface GripperWizardProps {
   >
   isCreateLoading: boolean
   isRobotMoving: boolean
+  setShowErrorMessage: (message: string | null) => void
+  errorMessage: string | null
   handleCleanUpAndClose: () => void
   chainRunCommands: ReturnType<
     typeof useChainMaintenanceCommands
@@ -127,6 +139,8 @@ export const GripperWizard = (
     isCreateLoading,
     isRobotMoving,
     createRunCommand,
+    setShowErrorMessage,
+    errorMessage,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
@@ -167,6 +181,8 @@ export const GripperWizard = (
     proceed: handleProceed,
     goBack,
     chainRunCommands,
+    setShowErrorMessage,
+    errorMessage,
   }
   let onExit
   if (currentStep == null) return null
@@ -177,6 +193,7 @@ export const GripperWizard = (
         handleGoBack={cancelExit}
         handleExit={confirmExit}
         flowType={flowType}
+        isRobotMoving={isRobotMoving}
       />
     )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
@@ -219,7 +236,11 @@ export const GripperWizard = (
   } else if (currentStep.section === SECTIONS.SUCCESS) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <Success {...currentStep} proceed={handleProceed} />
+      <Success
+        isRobotMoving={isRobotMoving}
+        {...currentStep}
+        proceed={handleProceed}
+      />
     )
   }
 

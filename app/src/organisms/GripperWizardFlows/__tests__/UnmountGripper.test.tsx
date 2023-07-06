@@ -56,7 +56,7 @@ describe('UnmountGripper', () => {
       data: null,
     } as any)
     const { getByRole } = render({ attachedGripper: null })[0]
-    await getByRole('button', { name: 'continue' }).click()
+    await getByRole('button', { name: 'Continue' }).click()
     await expect(mockChainRunCommands).toHaveBeenCalledWith(
       [{ commandType: 'home', params: {} }],
       true

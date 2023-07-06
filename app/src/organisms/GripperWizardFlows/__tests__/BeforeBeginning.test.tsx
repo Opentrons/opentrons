@@ -71,7 +71,7 @@ describe('BeforeBeginning', () => {
           params: { mount: 'extension' },
         },
       ],
-      true
+      false
     )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
@@ -100,7 +100,7 @@ describe('BeforeBeginning', () => {
           params: { mount: 'extension' },
         },
       ],
-      true
+      false
     )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
@@ -133,7 +133,7 @@ describe('BeforeBeginning', () => {
           params: { mount: 'extension' },
         },
       ],
-      true
+      false
     )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()

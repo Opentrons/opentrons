@@ -107,7 +107,7 @@ describe('MovePin', () => {
     getByText(
       'Remove the calibration pin from the front jaw and attach it to the similar location on the rear jaw'
     )
-    await getByRole('button', { name: 'continue' }).click()
+    await getByRole('button', { name: 'Continue' }).click()
 
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
       command: { commandType: 'home', params: { axes: [] } },

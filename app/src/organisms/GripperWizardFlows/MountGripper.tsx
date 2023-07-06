@@ -3,7 +3,6 @@ import {
   Flex,
   Btn,
   TYPOGRAPHY,
-  COLOR_ERROR,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   COLORS,
@@ -78,7 +77,7 @@ export const MountGripper = (
   return showUnableToDetect ? (
     <SimpleWizardBody
       header={t('unable_to_detect_gripper')}
-      iconColor={COLOR_ERROR}
+      iconColor={COLORS.errorEnabled}
       isSuccess={false}
     >
       <Flex
