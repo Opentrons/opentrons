@@ -502,6 +502,24 @@ def _get_tag_from_pipette(
     return pipette_tag
 
 
+def _change_pipettes(
+    ctx: ProtocolContext, pipette: InstrumentContext, return_tip: bool
+) -> None:
+    if pipette.has_tip:
+        if pipette.current_volume > 0:
+            print("dispensing liquid to trash")
+            trash = pipette.trash_container.wells()[0]
+            # FIXME: this should be a blow_out() at max volume,
+            #        but that is not available through PyAPI yet
+            #        so instead just dispensing.
+            pipette.dispense(pipette.current_volume, trash.top())
+            pipette.aspirate(10)  # to pull any droplets back up
+        print("dropping tip")
+        _drop_tip(pipette, return_tip)
+    print("moving to attach position")
+    pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))
+
+
 def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     """Run."""
     run_id, start_time = create_run_id_and_start_time()
@@ -580,10 +598,9 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
 
     # need to be as far away from the scale as possible
     # to avoid static from distorting the measurement
-    if cfg.labware_on_scale == "radwag_pipette_calibration_vial":
-        measure_height = 50
-    else:
-        measure_height = 120
+    measure_height = (
+        50 if cfg.labware_on_scale == "radwag_pipette_calibration_vial" else 120
+    )
     calibration_tip_in_use = True
     try:
         ui.print_title("FIND LIQUID HEIGHT")
@@ -684,6 +701,9 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 trial: [] for trial in range(cfg.trials)
             }
             for channel in channels_to_test:
+                if cfg.isolate_channels and (channel + 1) not in cfg.isolate_channels:
+                    print(f"skipping channel {channel + 1}")
+                    continue
                 channel_offset = _get_channel_offset(cfg, channel)
                 actual_asp_list_channel = []
                 actual_disp_list_channel = []
@@ -874,20 +894,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         recorder.stop()
         recorder.deactivate()
         ui.print_title("CHANGE PIPETTES")
-        if pipette.has_tip:
-            if pipette.current_volume > 0:
-                print("dispensing liquid to trash")
-                trash = pipette.trash_container.wells()[0]
-                # FIXME: this should be a blow_out() at max volume,
-                #        but that is not available through PyAPI yet
-                #        so instead just dispensing.
-                pipette.dispense(pipette.current_volume, trash.top())
-                pipette.aspirate(10)  # to pull any droplets back up
-            print("dropping tip")
-            _return_tip = False if calibration_tip_in_use else cfg.return_tip
-            _drop_tip(pipette, _return_tip)
-        print("moving to attach position")
-        pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))
+        _return_tip = False if calibration_tip_in_use else cfg.return_tip
+        _change_pipettes(ctx, pipette, _return_tip)
     ui.print_title("RESULTS")
     _print_final_results(
         volumes=test_volumes,
