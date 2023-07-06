@@ -211,3 +211,7 @@ class MotionController(Protocol[AxisType]):
         Works regardless of critical point or home status.
         """
         ...
+
+    async def retract_axis(self, axis: Axis) -> None:
+        """Retract the specified axis to its home position."""
+        ...
