@@ -175,7 +175,7 @@ export function ProtocolCard(props: {
         <StyledText as="p" color={COLORS.darkBlack70}>
           {format(new Date(protocol.createdAt), 'M/d/yy HH:mm')}
         </StyledText>
-        {longpress.isLongPressed && (
+        {longpress.isLongPressed && !isFailedAnalysis && (
           <LongPressModal
             longpress={longpress}
             protocolId={protocol.id}
