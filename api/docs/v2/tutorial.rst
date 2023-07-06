@@ -31,7 +31,7 @@ Before running a protocol, you’ll want to have the right kind of hardware and 
 
 .. Placeholders for Flex content that needs links to online manual.
 
-- **Flex users** should review Chapter 2: Installation and Relocation (**LINK TBD**) in the instruction manual. Specifically, see the pipette information in the Instrument Installation and Calibration section (**LINK TBD**). You can use either a 1-channel or 8-channel pipette for this tutorial. Most Flex code examples will use a `1-channel, 1000 uL pipette <https://opentrons.com/products/flex-pipettes/>`_.
+- **Flex users** should review Chapter 2: Installation and Relocation in the `instruction manual <https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20Manual.pdf>`_. Specifically, see the pipette information in the Instrument Installation and Calibration section. You can use either a 1-channel or 8-channel pipette for this tutorial. Most Flex code examples will use a `Flex 1-Channel 1000 μL pipette <https://shop.opentrons.com/opentrons-flex-1-channel-pipette/>`_.
 
 - **OT-2 users** should review the robot setup and pipette information on the `Get Started page <https://support.opentrons.com/s/ot2-get-started>`_. Specifically, see `attaching pipettes <https://support.opentrons.com/s/article/Get-started-Attach-pipettes>`_ and `initial calibration <https://support.opentrons.com/s/article/Get-started-Calibrate-the-deck>`_. You can use either a single-channel or 8-channel pipette for this tutorial. Most OT-2 code examples will use a `P300 Single-Channel GEN2 <https://shop.opentrons.com/single-channel-electronic-pipette-p20/>`_ pipette.
 
