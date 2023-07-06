@@ -37,6 +37,8 @@ describe('BeforeBeginning', () => {
       createMaintenanceRun: jest.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
+      setShowErrorMessage: jest.fn(),
+      errorMessage: null,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)

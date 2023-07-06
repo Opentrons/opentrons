@@ -20,6 +20,7 @@ describe('ExitConfirmation', () => {
           handleExit={mockExit}
           handleGoBack={mockBack}
           flowType={GRIPPER_FLOW_TYPES.ATTACH}
+          isRobotMoving={false}
           {...props}
         />,
         { i18nInstance: i18n }

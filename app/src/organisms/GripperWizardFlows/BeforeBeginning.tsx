@@ -123,7 +123,7 @@ export const BeforeBeginning = (
     <SimpleWizardBody
       isSuccess={false}
       iconColor={COLORS.errorEnabled}
-      header={t('error_encountered')}
+      header={t('shared:error_encountered')}
       subHeader={errorMessage}
     />
   ) : (

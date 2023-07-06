@@ -42,6 +42,7 @@ interface MaintenanceRunManagerProps {
   flowType: GripperWizardFlowType
   attachedGripper: InstrumentData | null
   closeFlow: () => void
+  onComplete?: () => void
 }
 export function GripperWizardFlows(
   props: MaintenanceRunManagerProps
@@ -75,11 +76,13 @@ export function GripperWizardFlows(
     chainRunCommands([{ commandType: 'home' as const, params: {} }], true)
       .then(() => {
         setIsExiting(false)
+        props.onComplete?.()
         closeFlow()
       })
       .catch(error => {
         console.error(error.message)
         setIsExiting(false)
+        props.onComplete?.()
         closeFlow()
       })
   }

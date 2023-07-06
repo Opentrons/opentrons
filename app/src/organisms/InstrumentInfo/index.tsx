@@ -65,7 +65,13 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     if (instrument != null && instrument.ok) {
       setWizardProps(
         instrument.mount === 'extension'
-          ? { ...sharedGripperWizardProps, flowType: GRIPPER_FLOW_TYPES.DETACH }
+          ? {
+              ...sharedGripperWizardProps,
+              flowType: GRIPPER_FLOW_TYPES.DETACH,
+              onComplete: () => {
+                history.goBack()
+              },
+            }
           : {
               closeFlow: () => {
                 setWizardProps(null)

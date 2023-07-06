@@ -23,6 +23,7 @@ describe('UnmountGripper', () => {
   let mockGoBack: jest.Mock
   let mockProceed: jest.Mock
   let mockChainRunCommands: jest.Mock
+  let mockSetShowErrorMessage: jest.Mock
 
   beforeEach(() => {
     mockGoBack = jest.fn()
@@ -39,6 +40,8 @@ describe('UnmountGripper', () => {
           chainRunCommands={mockChainRunCommands}
           isRobotMoving={false}
           goBack={mockGoBack}
+          errorMessage={null}
+          setShowErrorMessage={mockSetShowErrorMessage}
           {...props}
         />,
         { i18nInstance: i18n }
