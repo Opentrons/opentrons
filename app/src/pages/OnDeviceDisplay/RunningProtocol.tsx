@@ -21,8 +21,6 @@ import {
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
-import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
-
 import { TertiaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -45,6 +43,7 @@ import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningPr
 import { getLocalRobot } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
+import { Portal } from '../../App/portal'
 
 interface BulletProps {
   isActive: boolean
@@ -91,12 +90,13 @@ export function RunningProtocol(): JSX.Element {
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-  const { playRun, pauseRun } = useRunActionMutations(runId)
+  const { playRun, pauseRun, isStopRunActionLoading } = useRunActionMutations(
+    runId
+  )
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
-
   React.useEffect(() => {
     if (
       currentOption === 'CurrentRunningProtocolCommand' &&
@@ -117,6 +117,8 @@ export function RunningProtocol(): JSX.Element {
 
   return (
     <>
+      {isStopRunActionLoading ? <CancelingRunModal /> : null}
+
       <Flex
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}
@@ -132,7 +134,6 @@ export function RunningProtocol(): JSX.Element {
             }
           />
         ) : null}
-        {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
         {showConfirmCancelRunModal ? (
           <ConfirmCancelRunModal
             runId={runId}

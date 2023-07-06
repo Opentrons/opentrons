@@ -4,10 +4,7 @@ import { UseQueryResult } from 'react-query'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import {
-  RUN_STATUS_IDLE,
-  RUN_STATUS_STOP_REQUESTED,
-} from '@opentrons/api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { renderWithProviders } from '@opentrons/components'
 import {
   useProtocolAnalysesQuery,
@@ -179,8 +176,15 @@ describe('RunningProtocol', () => {
     const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
     getByText('mock RunningProtocolSkeleton')
   })
-  it('should render the canceling run modal when the run status is stop-requested', () => {
-    mockUseRunStatus.mockReturnValue(RUN_STATUS_STOP_REQUESTED)
+  it('should render the canceling run modal when stop run action loading is true', () => {
+    when(mockUseRunActionMutations).calledWith(RUN_ID).mockReturnValue({
+      playRun: mockPlayRun,
+      pauseRun: mockPauseRun,
+      stopRun: mockStopRun,
+      isPlayRunActionLoading: false,
+      isPauseRunActionLoading: false,
+      isStopRunActionLoading: true,
+    })
     const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
     getByText('mock CancelingRunModal')
   })
