@@ -107,6 +107,8 @@ def validate_takes_liquid(
 
     Args:
         location: target location.
+        reject_module: if set to True, disallow liquid handling directly to module
+        check_for_adapter: if set to True, check that labware is not an adapter
 
     Raises:
         ValueError: the given location is not a valid liquid handling target.
