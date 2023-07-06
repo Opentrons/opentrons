@@ -5,7 +5,7 @@ import {
   getSpacingIfUniform,
   getUniqueWellProperties,
 } from '../labwareInference'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { LabwareDefinition2 } from '../../types'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixtureIrregular = _fixtureIrregular as LabwareDefinition2

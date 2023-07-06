@@ -1,4 +1,4 @@
-import { getUniqueWellProperties } from '../labwareInference'
+import { getUniqueWellProperties } from '@opentrons/shared-data'
 import type {
   LabwareDefinition2,
   LabwareWellGroup,

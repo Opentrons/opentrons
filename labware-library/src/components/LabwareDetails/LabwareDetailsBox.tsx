@@ -1,6 +1,6 @@
 // full-width labware details
 import * as React from 'react'
-import { getUniqueWellProperties } from '../../labwareInference'
+import { getUniqueWellProperties } from '@opentrons/shared-data'
 import {
   getWellLabel,
   WellCount,
