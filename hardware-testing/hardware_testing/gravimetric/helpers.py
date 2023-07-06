@@ -257,11 +257,10 @@ def _pick_up_tip(
 
 
 def _drop_tip(
-    ctx: ProtocolContext,
     pipette: InstrumentContext,
-    cfg: Union[config.GravimetricConfig, config.PhotometricConfig],
+    return_tip: bool,
 ) -> None:
-    if cfg.return_tip:
+    if return_tip:
         pipette.return_tip(home_after=False)
     else:
         pipette.drop_tip(home_after=False)
