@@ -101,10 +101,10 @@ class GravimetricTrial:
     liquid_tracker: LiquidTracker
     blank: bool
     inspect: bool
+    measure_height: float
     mix: bool = False
     stable: bool = True
     scale_delay: int = DELAY_FOR_MEASUREMENT
-    measure_height: float = 50
     acceptable_cv: Optional[float] = None
 
 
@@ -149,6 +149,7 @@ def build_gravimetric_trials(
     test_report: report.CSVReport,
     liquid_tracker: LiquidTracker,
     blank: bool,
+    measure_height: float = 50,
 ) -> Dict[float, Dict[int, List[GravimetricTrial]]]:
     """Build a list of all the trials that will be run."""
     trial_list: Dict[float, Dict[int, List[GravimetricTrial]]] = {}
@@ -175,6 +176,7 @@ def build_gravimetric_trials(
                     liquid_tracker=liquid_tracker,
                     blank=blank,
                     inspect=cfg.inspect,
+                    measure_height=measure_height,
                     mix=cfg.mix,
                     stable=False,
                     scale_delay=cfg.scale_delay,
@@ -205,6 +207,7 @@ def build_gravimetric_trials(
                             liquid_tracker=liquid_tracker,
                             blank=blank,
                             inspect=cfg.inspect,
+                            measure_height=measure_height,
                             mix=cfg.mix,
                             stable=True,
                             scale_delay=cfg.scale_delay,

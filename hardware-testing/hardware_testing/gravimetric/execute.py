@@ -2,7 +2,7 @@
 from time import sleep
 from typing import Optional, Tuple, List, Dict
 
-from opentrons.protocol_api import ProtocolContext, Well, Labware
+from opentrons.protocol_api import ProtocolContext, Well, Labware, InstrumentContext
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.data.csv_report import CSVReport
@@ -114,7 +114,7 @@ def _load_labware(
     labware_on_scale = ctx.load_labware(
         cfg.labware_on_scale, location=cfg.slot_scale, namespace=namespace
     )
-    tipracks = _load_tipracks(ctx, cfg, use_adapter=cfg.pipette_channels == 96)
+    tipracks = _load_tipracks(ctx, cfg, use_adapters=cfg.pipette_channels == 96)
     _apply_labware_offsets(cfg, [labware_on_scale])
     return labware_on_scale, tipracks
 
@@ -149,6 +149,7 @@ def _print_final_results(
                 print(f"        avg: {avg}ul")
                 print(f"        cv:  {cv}%")
                 print(f"        d:   {d}%")
+
 
 def _get_tag_from_pipette(
     pipette: InstrumentContext, cfg: config.GravimetricConfig
@@ -206,7 +207,9 @@ def _run_trial(
     print("recorded weights:")
 
     # RUN INIT
-    trial.pipette.move_to(trial.well.top(trial.measure_height).move(trial.channel_offset))
+    trial.pipette.move_to(
+        trial.well.top(trial.measure_height).move(trial.channel_offset)
+    )
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     print(f"\tinitial grams: {m_data_init.grams_average} g")
     if _PREV_TRIAL_GRAMS is not None:
@@ -214,8 +217,8 @@ def _run_trial(
             calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_init)
         )
         print(f"{_evaporation_loss_ul} ul evaporated since last trial")
-        liquid_tracker.update_affected_wells(
-            well, aspirate=_evaporation_loss_ul, channels=1
+        trial.liquid_tracker.update_affected_wells(
+            trial.well, aspirate=_evaporation_loss_ul, channels=1
         )
     _PREV_TRIAL_GRAMS = m_data_init
 
@@ -234,7 +237,9 @@ def _run_trial(
         inspect=trial.inspect,
         mix=trial.mix,
     )
-    pipette.move_to(well.top(measure_height).move(channel_offset))
+    trial.pipette.move_to(
+        trial.well.top(trial.measure_height).move(trial.channel_offset)
+    )
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     print(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
     print(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
@@ -254,7 +259,9 @@ def _run_trial(
         inspect=trial.inspect,
         mix=trial.mix,
     )
-    pipette.move_to(well.top(measure_height).move(channel_offset))
+    trial.pipette.move_to(
+        trial.well.top(trial.measure_height).move(trial.channel_offset)
+    )
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     print(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
 
@@ -277,38 +284,6 @@ def _get_channel_divider(cfg: config.GravimetricConfig) -> float:
         return 1.0
     else:
         return float(cfg.pipette_channels)
-
-
-def _get_tag_from_pipette(
-    pipette: InstrumentContext, cfg: config.GravimetricConfig
-) -> str:
-    pipette_tag = get_pipette_unique_name(pipette)
-    print(f'found pipette "{pipette_tag}"')
-    if cfg.increment:
-        pipette_tag += "-increment"
-    elif cfg.user_volumes:
-        pipette_tag += "-user-volume"
-    else:
-        pipette_tag += "-qc"
-    return pipette_tag
-
-
-def _change_pipettes(
-    ctx: ProtocolContext, pipette: InstrumentContext, return_tip: bool
-) -> None:
-    if pipette.has_tip:
-        if pipette.current_volume > 0:
-            print("dispensing liquid to trash")
-            trash = pipette.trash_container.wells()[0]
-            # FIXME: this should be a blow_out() at max volume,
-            #        but that is not available through PyAPI yet
-            #        so instead just dispensing.
-            pipette.dispense(pipette.current_volume, trash.top())
-            pipette.aspirate(10)  # to pull any droplets back up
-        print("dropping tip")
-        _drop_tip(pipette, return_tip)
-    print("moving to attach position")
-    pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))
 
 
 def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
@@ -484,7 +459,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             test_report,
             liquid_tracker,
             False,
-            measure_height=measure_height
+            measure_height=measure_height,
         )
         for volume in trials.keys():
             actual_asp_list_all = []
@@ -518,7 +493,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         actual_aspirate,
                         aspirate_data,
                         actual_dispense,
-                        dispense_data) = _run_trial(run_trial)
+                        dispense_data,
+                    ) = _run_trial(run_trial)
                     print(
                         "measured volumes:\n"
                         f"\taspirate: {round(actual_aspirate, 2)} uL\n"
