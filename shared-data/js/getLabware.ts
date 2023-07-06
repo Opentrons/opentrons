@@ -57,9 +57,6 @@ export const LABWAREV2_DO_NOT_LIST = [
 export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
-  'opentrons_flex_96_tiprack_200ul',
-  'opentrons_flex_96_tiprack_1000ul',
-  'opentrons_flex_96_tiprack_50ul',
 ]
 
 export function getLabwareV1Def(
