@@ -1,7 +1,8 @@
 import * as React from 'react'
 import { RobotWorkSpace } from './RobotWorkSpace'
+import { SlotLabels } from './SlotLabels'
 import { RobotCoordsForeignDiv, Module } from '@opentrons/components'
-import { getModuleDef2 } from '@opentrons/shared-data'
+import { getModuleDef2, OT3_STANDARD_MODEL } from '@opentrons/shared-data'
 import { getDeckDefinitions } from './getDeckDefinitions'
 import type { INode } from 'svgson'
 
@@ -20,25 +21,6 @@ const getLayerIds = (layers: INode[]): string[] => {
 
 export default {
   title: 'Library/Molecules/Simulation/Deck',
-  argTypes: {
-    deckDef: {
-      options: Object.keys(allDeckDefs),
-      control: {
-        type: 'select',
-      },
-      defaultValue: 'ot2_standard',
-    },
-    deckLayerBlocklist: {
-      options: [
-        ...getLayerIds(allDeckDefs.ot2_standard.layers),
-        ...getLayerIds(allDeckDefs.ot3_standard.layers),
-      ],
-      control: {
-        type: 'check',
-      },
-      defaultValue: '',
-    },
-  },
 } as Meta
 
 const Template: Story<React.ComponentProps<typeof RobotWorkSpace>> = ({
@@ -50,20 +32,31 @@ const Template: Story<React.ComponentProps<typeof RobotWorkSpace>> = ({
   return <RobotWorkSpace deckDef={resolvedDef} {...args} />
 }
 export const Deck = Template.bind({})
+Deck.argTypes = {
+  deckDef: {
+    options: Object.keys(allDeckDefs),
+    control: {
+      type: 'select',
+    },
+    defaultValue: 'ot2_standard',
+  },
+  deckLayerBlocklist: {
+    options: [
+      ...getLayerIds(allDeckDefs.ot2_standard.layers),
+      ...getLayerIds(allDeckDefs.ot3_standard.layers),
+    ],
+    control: {
+      type: 'check',
+    },
+    defaultValue: '',
+  },
+}
 Deck.args = {
   children: ({ deckSlotsById }) => {
-    const divSlot = deckSlotsById['9']
-    const moduleSlot = deckSlotsById['10']
-    const rectSlot = deckSlotsById['11']
+    const divSlot = Object.values(deckSlotsById)[2] as any
+    const moduleSlot = Object.values(deckSlotsById)[0] as any
     return (
       <>
-        <rect
-          x={rectSlot.position[0]}
-          y={rectSlot.position[1]}
-          width={rectSlot.boundingBox.xDimension}
-          height={rectSlot.boundingBox.yDimension}
-          fill="#0075ff33"
-        />
         <RobotCoordsForeignDiv
           x={divSlot.position[0] - 30}
           y={divSlot.position[1]}
@@ -87,5 +80,56 @@ Deck.args = {
         />
       </>
     )
+  },
+}
+
+const SlotLabelTemplate: Story<
+  React.ComponentProps<typeof RobotWorkSpace> & { hasSlotLabels: boolean }
+> = ({ hasSlotLabels }) => {
+  return (
+    <RobotWorkSpace deckDef={getDeckDefinitions().ot3_standard}>
+      {({ deckSlotsById }) => {
+        const divSlot = Object.values(deckSlotsById)[2] as any
+        const moduleSlot = Object.values(deckSlotsById)[0] as any
+        return (
+          <>
+            <RobotCoordsForeignDiv
+              x={divSlot.position[0] - 30}
+              y={divSlot.position[1]}
+              width={divSlot.boundingBox.xDimension}
+              height={divSlot.boundingBox.yDimension}
+            >
+              <input
+                style={{
+                  backgroundColor: 'lightgray',
+                  margin: '1rem',
+                  width: '6rem',
+                }}
+                placeholder="example input"
+              />
+            </RobotCoordsForeignDiv>
+
+            <Module
+              def={getModuleDef2('temperatureModuleV1')}
+              x={moduleSlot.position[0]}
+              y={moduleSlot.position[1]}
+            />
+            {hasSlotLabels ? (
+              <SlotLabels robotType={OT3_STANDARD_MODEL} />
+            ) : null}
+          </>
+        )
+      }}
+    </RobotWorkSpace>
+  )
+}
+
+export const FlexDeckWithSlotLabels = SlotLabelTemplate.bind({})
+FlexDeckWithSlotLabels.argTypes = {
+  hasSlotLabels: {
+    control: {
+      type: 'boolean',
+    },
+    defaultValue: true,
   },
 }

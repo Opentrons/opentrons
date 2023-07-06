@@ -1,4 +1,9 @@
-import { SPAN7_8_10_11_SLOT } from '@opentrons/shared-data'
+import {
+  LabwareDefinition2,
+  ModuleDefinition,
+  SPAN7_8_10_11_SLOT,
+} from '@opentrons/shared-data'
+import thermocyclerModuleV1 from '@opentrons/shared-data/module/definitions/3/thermocyclerModuleV1.json'
 
 import type { RunData } from '@opentrons/api-client'
 import type {
@@ -51,15 +56,46 @@ export const mockPauseCommandWithNoMessage = {
   },
 } as any
 
-export const mockMoveLabwareCommand = {
+export const mockMoveLabwareCommandFromSlot = {
   commandType: 'moveLabware',
   params: {
-    labwareId: MOCK_LABWARE_ID,
+    labwareId: 'mockLabwareID2',
     newLocation: {
-      slotName: '5',
+      slotName: 'D3',
     },
     strategy: 'manualMoveWithPause',
   },
+} as any
+
+export const mockMoveLabwareCommandFromModule = {
+  commandType: 'moveLabware',
+  params: {
+    labwareId: 'mockLabwareID',
+    newLocation: {
+      slotName: 'C1',
+    },
+    strategy: 'manualMoveWithPause',
+  },
+} as any
+
+export const mockMoveLabwareCommandToModule = {
+  commandType: 'moveLabware',
+  params: {
+    labwareId: 'mockLabwareID2',
+    newLocation: {
+      moduleId: 'mockTCModuleID',
+    },
+    strategy: 'manualMoveWithPause',
+  },
+} as any
+
+export const mockMoveLabwareCommandToOffDeck = {
+  commandType: 'moveLabware',
+  params: {
+    labwareId: 'offDeckMove',
+    newLocation: 'offDeck',
+  },
+  strategy: 'manualMoveWithPause',
 } as any
 
 export const mockLabwareOnModule: LoadedLabware = {
@@ -80,13 +116,45 @@ export const mockLabwareOnSlot: LoadedLabware = {
   },
 }
 
-export const mockLabwareDefinitions = ({
-  'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': {
-    metadata: {
-      displayName: 'mock labware display name',
-    },
+export const mockLabwareOffDeck: LoadedLabware = {
+  id: 'mockLabwareID3',
+  loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
+  definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+  location: 'offDeck',
+}
+
+export const mockLabwareDefinition = ({
+  schemaVersion: 2,
+  version: 1,
+  namespace: 'opentrons',
+  metadata: {
+    displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+    displayCategory: 'wellPlate',
+    displayVolumeUnits: 'µL',
+    tags: [],
   },
-} as unknown) as LabwareDefinitionsByUri
+  parameters: {
+    format: '96Standard',
+    isTiprack: false,
+    loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
+    isMagneticModuleCompatible: true,
+    magneticModuleEngageHeight: 20,
+  },
+  cornerOffsetFromSlot: {
+    x: 0,
+    y: 0,
+    z: 0,
+  },
+  dimensions: {
+    yDimension: 85.48,
+    zDimension: 15.7,
+    xDimension: 127.76,
+  },
+} as unknown) as LabwareDefinition2
+
+export const mockLabwareDefinitionsByUri = {
+  'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': mockLabwareDefinition,
+} as LabwareDefinitionsByUri
 
 export const mockModule: LoadedModule = {
   id: 'mockModuleID',
@@ -116,6 +184,37 @@ export const mockRunData: RunData = {
   actions: [],
   errors: [],
   pipettes: [],
-  labware: [mockLabwareOnModule, mockLabwareOnSlot],
+  labware: [mockLabwareOnModule, mockLabwareOnSlot, mockLabwareOffDeck],
   modules: [mockModule],
 }
+
+export const mockLabwareRenderInfo = [
+  {
+    x: 0,
+    y: 0,
+    labwareId: 'mockLabwareID2',
+    labwareDef: mockLabwareDefinition,
+  },
+]
+
+export const mockModuleRenderInfoWithLabware = [
+  {
+    moduleId: 'mockTCModuleID',
+    x: 100,
+    y: 100,
+    moduleDef: (thermocyclerModuleV1 as unknown) as ModuleDefinition,
+    nestedLabwareDef: mockLabwareDefinition,
+    nestedLabwareId: 'mockLabwareID',
+  },
+]
+
+export const mockModuleRenderInfoWithoutLabware = [
+  {
+    moduleId: 'mockTCModuleID',
+    x: 100,
+    y: 100,
+    moduleDef: (thermocyclerModuleV1 as unknown) as ModuleDefinition,
+    nestedLabwareDef: null,
+    nestedLabwareId: null,
+  },
+]

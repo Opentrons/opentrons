@@ -166,12 +166,12 @@ function getWarningContent({
   return null
 }
 
-export const v6WarningContent: JSX.Element = (
+export const v7WarningContent: JSX.Element = (
   <div>
     <p>
-      {i18n.t(`alert.hint.export_v6_protocol_6_20.body1`)}{' '}
-      <strong>{i18n.t(`alert.hint.export_v6_protocol_6_20.body2`)}</strong>
-      {i18n.t(`alert.hint.export_v6_protocol_6_20.body3`)}
+      {i18n.t(`alert.hint.export_v7_protocol_7_0.body1`)}{' '}
+      <strong>{i18n.t(`alert.hint.export_v7_protocol_7_0.body2`)}</strong>
+      {i18n.t(`alert.hint.export_v7_protocol_7_0.body3`)}
     </p>
   </div>
 )
@@ -249,8 +249,8 @@ export function FileSidebar(props: Props): JSX.Element {
     content: React.ReactNode
   } => {
     return {
-      hintKey: 'export_v6_protocol_6_20',
-      content: v6WarningContent,
+      hintKey: 'export_v7_protocol_7_0',
+      content: v7WarningContent,
     }
   }
 

@@ -6,6 +6,7 @@ import {
   BORDERS,
   COLORS,
   Flex,
+  LocationIcon,
   ModuleIcon,
   SPACING,
   TYPOGRAPHY,
@@ -19,7 +20,6 @@ import {
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import { StyledText } from '../../../atoms/text'
-import { LocationIcon } from '../../../molecules/LocationIcon'
 import { useRequiredProtocolHardware } from '../../Protocols/hooks'
 import { EmptySection } from './EmptySection'
 

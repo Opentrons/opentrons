@@ -48,7 +48,7 @@ export function NoUpdateFound(): JSX.Element {
       </Flex>
       <MediumButton
         buttonText={i18n.format(t('shared:continue'), 'capitalize')}
-        onClick={() => history.push('/robot-settings/rename-robot')}
+        onClick={() => history.push('/emergency-stop')}
       />
     </Flex>
   )

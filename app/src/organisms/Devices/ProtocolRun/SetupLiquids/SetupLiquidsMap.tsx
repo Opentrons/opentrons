@@ -9,6 +9,7 @@ import {
   DIRECTION_COLUMN,
   Flex,
   RobotWorkSpace,
+  SlotLabels,
   LabwareRender,
   Module,
   ALIGN_CENTER,
@@ -19,6 +20,7 @@ import {
   inferModuleOrientationFromXCoordinate,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
@@ -174,6 +176,7 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 )
               }
             )}
+            <SlotLabels robotType={robotType} />
           </>
         )}
       </RobotWorkSpace>

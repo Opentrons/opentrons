@@ -7,6 +7,7 @@ import {
   LabwareRender,
   Module,
   RobotWorkSpace,
+  SlotLabels,
   DIRECTION_COLUMN,
   SPACING,
 } from '@opentrons/components'
@@ -121,6 +122,7 @@ export function SetupLabwareMap({
                     )
                   }
                 )}
+                <SlotLabels robotType={robotType} />
               </>
             )}
           </RobotWorkSpace>

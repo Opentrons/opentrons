@@ -11,10 +11,7 @@ import {
   TEXT_TRANSFORM_UPPERCASE,
   RobotWorkSpaceRenderProps,
   Module,
-  RobotCoordsForeignDiv,
-  Text,
-  COLORS,
-  SPACING,
+  SlotLabels,
 } from '@opentrons/components'
 import {
   MODULES_WITH_COLLISION_ISSUES,
@@ -33,6 +30,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   getModuleDisplayName,
   DeckDefinition,
+  RobotType,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'
@@ -64,6 +63,8 @@ import { BrowseLabwareModal } from '../labware'
 import { SlotWarning } from './SlotWarning'
 import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
+import { FlexModuleTag } from './FlexModuleTag'
+import { Ot2ModuleTag } from './Ot2ModuleTag'
 import styles from './DeckSetup.css'
 
 export const DECK_LAYER_BLOCKLIST = [
@@ -81,6 +82,7 @@ type ContentsProps = RobotWorkSpaceRenderProps & {
   selectedTerminalItemId?: TerminalItemId | null
   showGen1MultichannelCollisionWarnings: boolean
   deckDef: DeckDefinition
+  robotType: RobotType
 }
 
 export const VIEWBOX_MIN_X = -64
@@ -143,6 +145,7 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
     getRobotCoordsFromDOMCoords,
     showGen1MultichannelCollisionWarnings,
     deckDef,
+    robotType,
   } = props
 
   // NOTE: handling module<>labware compat when moving labware to empty module
@@ -273,6 +276,10 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
           compatibleModules: [THERMOCYCLER_MODULE_TYPE],
         }
 
+        const moduleOrientation = inferModuleOrientationFromSlot(
+          moduleOnDeck.slot
+        )
+
         return (
           <Module
             key={slot.id}
@@ -317,21 +324,18 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
                 handleDragHover={handleHoverEmptySlot}
               />
             ) : null}
-            <RobotCoordsForeignDiv
-              width={moduleDef.dimensions.labwareInterfaceXDimension}
-              height={16}
-              y={-22}
-              innerDivProps={{
-                backgroundColor: COLORS.darkGreyEnabled,
-                padding: SPACING.spacing4,
-                height: '100%',
-                color: COLORS.white,
-              }}
-            >
-              <Text as="p" fontSize="0.5rem">
-                {getModuleDisplayName(moduleOnDeck.model)}
-              </Text>
-            </RobotCoordsForeignDiv>
+            {robotType === FLEX_ROBOT_TYPE ? (
+              <FlexModuleTag
+                dimensions={moduleDef.dimensions}
+                displayName={getModuleDisplayName(moduleOnDeck.model)}
+              />
+            ) : (
+              <Ot2ModuleTag
+                orientation={moduleOrientation}
+                dimensions={moduleDef.dimensions}
+                model={moduleOnDeck.model}
+              />
+            )}
           </Module>
         )
       })}
@@ -454,16 +458,20 @@ export const DeckSetup = (): JSX.Element => {
           height="100%"
         >
           {({ deckSlotsById, getRobotCoordsFromDOMCoords }) => (
-            <DeckSetupContents
-              activeDeckSetup={activeDeckSetup}
-              selectedTerminalItemId={selectedTerminalItemId}
-              {...{
-                deckDef,
-                deckSlotsById,
-                getRobotCoordsFromDOMCoords,
-                showGen1MultichannelCollisionWarnings,
-              }}
-            />
+            <>
+              <DeckSetupContents
+                robotType={robotType}
+                activeDeckSetup={activeDeckSetup}
+                selectedTerminalItemId={selectedTerminalItemId}
+                {...{
+                  deckDef,
+                  deckSlotsById,
+                  getRobotCoordsFromDOMCoords,
+                  showGen1MultichannelCollisionWarnings,
+                }}
+              />
+              <SlotLabels robotType={robotType} />
+            </>
           )}
         </RobotWorkSpace>
       </div>
