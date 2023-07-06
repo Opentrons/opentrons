@@ -233,7 +233,7 @@ def _run_trial(
         _record_measurement_and_store(MeasurementType.DISPENSE)
         pipette.move_to(location=dest["A1"].top().move(Point(0, 0, 133)))
         if (i + 1) == num_dispenses:
-            _drop_tip(ctx, pipette, cfg)
+            _drop_tip(pipette, cfg.return_tip)
         else:
             pipette.move_to(location=dest["A1"].top().move(Point(0, 107, 133)))
         if not ctx.is_simulating():
@@ -400,6 +400,6 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
                 pipette.dispense(pipette.current_volume, trash.top())
                 pipette.aspirate(10)  # to pull any droplets back up
             print("dropping tip")
-            _drop_tip(ctx, pipette, cfg)
+            _drop_tip(pipette, cfg.return_tip)
         print("moving to attach position")
         pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))
