@@ -117,12 +117,10 @@ class PhotometricTrial:
     pipette: InstrumentContext
     source: Well
     dest: Labware
-    channel_offset: Point
     tip_volume: int
     volume: float
     trial: int
     liquid_tracker: LiquidTracker
-    blank: bool
     inspect: bool
     do_jog: bool
     cfg: config.PhotometricConfig
@@ -213,4 +211,42 @@ def build_gravimetric_trials(
                             scale_delay=cfg.scale_delay,
                         )
                     )
+    return trial_list
+
+
+def build_photometric_trials(
+    ctx: ProtocolContext,
+    test_report: CSVReport,
+    pipette: InstrumentContext,
+    source: Well,
+    dest: Labware,
+    test_volumes: List[float],
+    liquid_tracker: LiquidTracker,
+    cfg: config.PhotometricConfig,
+) -> Dict[float, List[PhotometricTrial]]:
+    """Build a list of all the trials that will be run."""
+    trial_list: Dict[float, List[PhotometricTrial]] = {}
+    for volume in test_volumes:
+        do_jog = True
+        trial_list[volume] = []
+        for trial in range(cfg.trials):
+            trial_list[volume].append(
+                PhotometricTrial(
+                    ctx=ctx,
+                    test_report=test_report,
+                    pipette=pipette,
+                    source=source,
+                    dest=dest,
+                    tip_volume=cfg.tip_volume,
+                    volume=volume,
+                    trial=trial,
+                    liquid_tracker=liquid_tracker,
+                    inspect=cfg.inspect,
+                    do_jog=do_jog,
+                    cfg=cfg,
+                    mix=cfg.mix,
+                )
+            )
+            if volume < 250:
+                do_jog = False
     return trial_list
