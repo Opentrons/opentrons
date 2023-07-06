@@ -42,6 +42,8 @@ from .tips import get_tips, MULTI_CHANNEL_TEST_ORDER
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
+_PREV_TRIAL_GRAMS: Optional[MeasurementData] = None
+
 
 def _generate_callbacks_for_trial(
     recorder: GravimetricRecorder,
@@ -327,6 +329,7 @@ def _run_trial(
     scale_delay: int = DELAY_FOR_MEASUREMENT,
     measure_height: float = 50,
 ) -> Tuple[float, MeasurementData, float, MeasurementData]:
+    global _PREV_TRIAL_GRAMS
     pipetting_callbacks = _generate_callbacks_for_trial(
         recorder, volume, channel, trial, blank
     )
@@ -366,6 +369,15 @@ def _run_trial(
     pipette.move_to(well.top(measure_height).move(channel_offset))
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     print(f"\tinitial grams: {m_data_init.grams_average} g")
+    if _PREV_TRIAL_GRAMS is not None:
+        _evaporation_loss_ul = abs(
+            calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_init)
+        )
+        print(f"{_evaporation_loss_ul} ul evaporated since last trial")
+        liquid_tracker.update_affected_wells(
+            well, aspirate=_evaporation_loss_ul, channels=1
+        )
+    _PREV_TRIAL_GRAMS = m_data_init
 
     # RUN ASPIRATE
     aspirate_with_liquid_class(

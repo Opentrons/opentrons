@@ -15,7 +15,6 @@ const Template: Story<React.ComponentProps<typeof SmallButton>> = args => (
 
 export const Primary = Template.bind({})
 Primary.args = {
-  buttonType: 'primary',
   buttonText: 'Button text',
 }
 

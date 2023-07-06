@@ -168,7 +168,6 @@ export const ResultsSummary = (
           alignSelf={ALIGN_FLEX_END}
           onClick={() => handleApplyOffsets(offsetsToApply)}
           buttonText={i18n.format(t('apply_offsets'), 'capitalize')}
-          buttonType="primary"
         />
       ) : (
         <Flex

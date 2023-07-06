@@ -32,7 +32,7 @@ export function RobotDashboard(): JSX.Element {
     getOnDeviceDisplaySettings
   )
   const [showWelcomeModal, setShowWelcomeModal] = React.useState<boolean>(
-    unfinishedUnboxingFlowRoute === '/robot-settings/rename-robot'
+    unfinishedUnboxingFlowRoute !== null
   )
 
   const recentRunsOfUniqueProtocols = allRuns
