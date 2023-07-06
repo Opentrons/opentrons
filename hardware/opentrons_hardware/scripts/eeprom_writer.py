@@ -9,10 +9,10 @@ write - Writes at least one property to the eeprom
 
 Examples:
     clear
-        python3 -m opentrons_hardware.scripts.eeprom_writter --action clear
+        python3 -m opentrons_hardware.scripts.eeprom_writer --action clear
 
     print
-        python3 -m opentrons_hardware.scripts.eeprom_writter --action print
+        python3 -m opentrons_hardware.scripts.eeprom_writer --action print
 
     write
         The write action requires the --property arg to be passed in
@@ -20,15 +20,28 @@ Examples:
         the PROPERTY_NAME and property_value
         Note that you can pass in more than one --property
 
-        python3 -m opentrons_hardware.scripts.eeprom_writter --action write \
+        python3 -m opentrons_hardware.scripts.eeprom_writer --action write \\
         --property SERIAL_NUMBER FLXA1020230602001 --property EXAMPLE value
 
 Notes:
+    The SERIAL_NUMBER format:
+        We use the following format for the serial number.
+
+        FLX - Flex
+        A10 - Version A1.0
+        2023 - Year
+        06 - Month
+        05 - Day
+        001 - Unit number
+
+        ex:
+            FLXA1020230605001
+
     Changing I2c device:
         By default we perform actions on the 3-0050 i2c device but this can
         be changed by passing in the --bus and --address arguments like so
 
-        python3 -m opentrons_hardware.scripts.eeprom_writter --bus 3 --adress 0050 \
+        python3 -m opentrons_hardware.scripts.eeprom_writer --bus 3 --address 0050 \\
         --action print
 
     Overriding the FORMAT_VERSION:
@@ -37,7 +50,7 @@ Notes:
         in the FORMAT_VERSION property. This should not be manually set at the factory
         as this is only meant to be used for testing.
 
-        python3 -m opentrons_hardware.scripts.eeprom_writter --action write \
+        python3 -m opentrons_hardware.scripts.eeprom_writer --action write \\
         --property FORMAT_VERSION 2
 """
 
@@ -86,7 +99,7 @@ def clear_eeprom(eeprom_api: EEPROMDriver) -> Tuple[bool, str]:
         print("The eeprom is not empty!")
         print_eeprom(eeprom_api)
         if not _confirm_action("CLEAR EEPROM"):
-            exit(1)
+            return False, "User Cancelled"
 
     print(f"Clearing the eeprom - {eeprom_api.address}")
     address = 0
@@ -114,17 +127,17 @@ def write_eeprom(
 ) -> Tuple[bool, str]:
     """Write properties to the eeprom, this will clear any data already stored."""
     if not properties:
-        print(
+        msg = (
             "Need at least one valid property and value to write.\n"
             "Pass in the '--help' arg for an example."
         )
-        exit(1)
+        raise RuntimeError(msg)
 
     # clear the eeprom first
     success, msg = clear_eeprom(eeprom_api)
     if not success:
-        print(f"Error writting to eeprom: Could not clear eeprom - {msg}")
-        exit(1)
+        msg = f"Error writting to eeprom: Could not clear eeprom - {msg}"
+        raise RuntimeError(msg)
 
     # convert dict to set and write to eeprom
     print(f"Writting properties {properties}")
@@ -209,22 +222,21 @@ def _format_properties(properties: List[List[Any]]) -> Dict[PropId, Any]:
         print(f"Validating property {property}")
         parsed_property = _parse_property(prop_name, value)
         if not parsed_property:
-            print("Error parsing property {property}")
+            print(f"Error parsing property {property}")
             continue
 
         prop_id, prop_value = parsed_property
         formated_properties[prop_id] = prop_value
 
     # always add the FORMAT_VERSION property
-    if not formated_properties.get(PropId.FORMAT_VERSION):
+    if formated_properties and not formated_properties.get(PropId.FORMAT_VERSION):
         formated_properties[PropId.FORMAT_VERSION] = FORMAT_VERSION
     return formated_properties
 
 
 def _main(args: argparse.Namespace, eeprom_api: EEPROMDriver) -> None:
     if eeprom_api.open() == -1:
-        print("Could not setup eeprom")
-        exit(1)
+        raise RuntimeError("Could not setup eeprom")
 
     # Check if we have properties passed in and convert them to PropId
     properties = _format_properties(args.property) if args.property else dict()
@@ -239,12 +251,10 @@ def _main(args: argparse.Namespace, eeprom_api: EEPROMDriver) -> None:
     elif args.action == "print":
         success, msg = print_eeprom(eeprom_api)
     else:
-        print(f"Unknown action - {args.action}")
-        exit(1)
+        raise RuntimeError(f"Unknown action - {args.action}")
 
     if not success:
-        print(f"Error running action: {args.action} - {msg}")
-        exit(1)
+        raise RuntimeError(f"Error running action: {args.action} - {msg}")
 
     # do something here
     print(f"Finished action ({args.action})")
@@ -282,7 +292,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     try:
         stop_robot_server()
-        eeprom_path = Path(f"/sys/bus/i2c/devices/{args.bus}-{args.address}")
+        eeprom_path = Path(f"/sys/bus/i2c/devices/{args.bus}-{args.address}/eeprom")
         eeprom_api = build_eeprom_driver(eeprom_path=eeprom_path)
         _main(args, eeprom_api)
     except Exception as e:
