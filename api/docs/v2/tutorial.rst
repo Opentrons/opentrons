@@ -173,7 +173,7 @@ You may notice that these deck maps don't show where the liquids will be at the 
 Pipettes
 --------
 
-Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the :py:meth:`.load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its :ref:`standard pipette name <new-pipette-models>`. Here’s how to load Flex and OT-2 pipettes installed in the left mount:
+Next you’ll specify what pipette to use in the protocol. Loading a pipette is done with the :py:meth:`.load_instrument` method, which takes three arguments: the name of the pipette, the mount it’s installed in, and the tip racks it should use when performing transfers. Load whatever pipette you have installed in your robot by using its :ref:`standard pipette name <new-pipette-models>`. Here’s how to load the pipette in the left mount:
 
 .. code-block:: python
 
