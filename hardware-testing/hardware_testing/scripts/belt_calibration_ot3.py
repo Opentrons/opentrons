@@ -1,6 +1,7 @@
 """Belt Calibration OT3."""
 import argparse
 import asyncio
+import time
 
 from opentrons.hardware_control.ot3api import OT3API
 
@@ -14,15 +15,18 @@ from opentrons.hardware_control.ot3_calibration import (
     calibrate_pipette,
     find_calibration_structure_position,
 )
+from hardware_testing import data
 from hardware_testing.data import ui
 from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 
 from hardware_testing.drivers import mitutoyo_digimatic_indicator
 
-DIAL_HEIGHT = 10
-DIAL_JOG_DISTANCE = 25
-DIAL_JOG_SPEED = 10
+DIAL_HEIGHT = 10 # mm
+DIAL_JOG_DISTANCE = 22 # mm
+DIAL_JOG_SPEED = 10 # mm/s
+GAUGE_BLOCK = 12 # mm
+PROBE_TIP_DIA = 4 # mm
 
 gauges = {}
 gauge_slot = {
@@ -43,6 +47,62 @@ gauge_ports = {
     "YF":"/dev/ttyUSB2",
     "YB":"/dev/ttyUSB3",
 }
+slot_center = {
+    "XL":None,
+    "XR":None,
+    "YF":None,
+    "YB":None,
+}
+test_data = {
+    "Time":"None",
+    "Cycle":"None",
+    "Pipette":"None",
+    "XL Zero":"None",
+    "XR Zero":"None",
+    "YF Zero":"None",
+    "YB Zero":"None",
+    "XL Gauge":"None",
+    "XR Gauge":"None",
+    "YF Gauge":"None",
+    "YB Gauge":"None",
+    "XL Position":"None",
+    "XR Position":"None",
+    "YF Position":"None",
+    "YB Position":"None",
+    "Belt Attitude":"None",
+}
+test_name = None
+test_file = None
+start_time = None
+pipette_id = None
+
+def _dict_keys_to_line(dict):
+    return str.join(",", list(dict.keys()))+"\n"
+
+
+def _dict_values_to_line(dict):
+    return str.join(",", list(dict.values()))+"\n"
+
+
+def _test_setup(api: OT3API, mount: types.OT3Mount):
+    _file_setup()
+    _gauge_setup()
+    _deck_setup()
+    _instrument_setup(api, mount)
+
+
+def _file_setup():
+    global test_name, test_file
+    test_name = "belt_calibration"
+    test_tag = f"slot5"
+    test_header = _dict_keys_to_line(test_data)
+    test_id = data.create_run_id()
+    test_path = data.create_folder_for_test_data(test_name)
+    test_file = data.create_file_name(test_name, test_id, test_tag)
+    data.append_data_to_file(test_name, test_file, test_header)
+    print("FILE PATH = ", test_path)
+    print("FILE NAME = ", test_file)
+
 
 def _gauge_setup():
     for key, value in gauge_ports.items():
@@ -50,7 +110,23 @@ def _gauge_setup():
         gauges[key].connect()
 
 
+def _deck_setup():
+    global slot_center
+    for key, value in gauge_slot.items():
+        slot_center[key] = types.Point(*get_calibration_square_position_in_slot(value))._replace(z=DIAL_HEIGHT)
+
+
+def _instrument_setup(api: OT3API, mount: types.OT3Mount):
+    global test_data, pipette_id
+    if args.simulate:
+        pipette_id = "SIMULATION"
+    else:
+        pipette_id = api._pipette_handler.get_pipette(mount).pipette_id
+    test_data["Pipette"] = str(pipette_id)
+
+
 def _zero_gauges():
+    global test_data
     for key, value in gauges.items():
         print(f"\nPlace Gauge Block on Deck Slot #{gauge_slot[key]}")
         input(f"\nPush block against {key} Gauge and Press ENTER\n")
@@ -66,8 +142,19 @@ def _zero_gauges():
                 _reading = False
         zero = sum(zeros) / len(zeros)
         gauge_zero[key] = zero
+        test_data[f"{key} Zero"] = str(zero)
         print(f"{key} Gauge Zero = {zero}mm")
     input(f"\nRemove Gauge Block from Deck and Press ENTER\n")
+
+
+def _record_data(api: OT3API, cycle: int):
+    global test_data
+    elapsed_time = (time.time() - start_time)/60
+    test_data["Time"] = str(round(elapsed_time, 3))
+    test_data["Cycle"] = str(cycle)
+    test_data["Belt Attitude"] = _get_attitude(api)
+    test_info = _dict_values_to_line(test_data)
+    data.append_data_to_file(test_name, test_file, test_info)
 
 
 async def _calibrate_pipette(api: OT3API, mount: types.OT3Mount) -> None:
@@ -113,38 +200,55 @@ async def _check_belt_accuracy_dial(api: OT3API, mount: types.OT3Mount) -> None:
 
 
 async def _measure_axis(api: OT3API, mount: types.OT3Mount, axis: str) -> None:
+    global test_data, slot_center
     await api.home_z(mount)
     current_position = await api.gantry_position(mount)
+    left_center = slot_center["XL"]
+    right_center = slot_center["XR"]
+    front_center = slot_center["YF"]
+    back_center = slot_center["YB"]
     if "X" in axis:
-        left_center = types.Point(*get_calibration_square_position_in_slot(1))._replace(z=DIAL_HEIGHT)
-        right_center = types.Point(*get_calibration_square_position_in_slot(3))._replace(z=DIAL_HEIGHT)
         above_left = left_center._replace(z=current_position.z)
         await api.move_to(mount, above_left)
         await api.move_to(mount, left_center)
-        x_left = await _read_gauge(api, mount, "XL")
-        print(f"X Left = {x_left}mm")
+        x_left_pos = await _get_position(api, mount)
+        x_left_gauge = await _read_gauge(api, mount, "XL")
+        test_data["XL Gauge"] = str(x_left_gauge)
+        test_data["XL Position"] = x_left_pos
+        print(f"X-Left Gauge = {x_left_gauge} mm")
+        print(f"X-Left Position = {x_left_pos}\n")
         await api.move_to(mount, right_center)
-        x_right = await _read_gauge(api, mount, "XR")
-        print(f"Y Right = {x_right}mm")
+        x_right_pos = await _get_position(api, mount)
+        x_right_gauge = await _read_gauge(api, mount, "XR")
+        test_data["XR Gauge"] = str(x_right_gauge)
+        test_data["XR Position"] = x_right_pos
+        print(f"X-Right Gauge = {x_right_gauge} mm")
+        print(f"X-Right Position = {x_right_pos}\n")
         await api.move_to(mount, right_center)
         distance = 0
     elif "Y" in axis:
-        front_center = types.Point(*get_calibration_square_position_in_slot(1))._replace(z=DIAL_HEIGHT)
-        back_center = types.Point(*get_calibration_square_position_in_slot(10))._replace(z=DIAL_HEIGHT)
         above_front = front_center._replace(z=current_position.z)
         await api.move_to(mount, above_front)
         await api.move_to(mount, front_center)
-        y_front = await _read_gauge(api, mount, "YF")
-        print(f"Y Front = {y_front}mm")
+        y_front_pos = await _get_position(api, mount)
+        y_front_gauge = await _read_gauge(api, mount, "YF")
+        test_data["YF Gauge"] = str(y_front_gauge)
+        test_data["YF Position"] = y_front_pos
+        print(f"Y-Front = {y_front_gauge} mm")
+        print(f"Y-Front Position = {y_front_pos}\n")
         await api.move_to(mount, back_center)
-        y_back = await _read_gauge(api, mount, "YB")
-        print(f"Y Back = {y_back}mm")
+        y_back_pos = await _get_position(api, mount)
+        y_back_gauge = await _read_gauge(api, mount, "YB")
+        test_data["YB Gauge"] = str(y_back_gauge)
+        test_data["YB Position"] = y_back_pos
+        print(f"Y-Back = {y_back_gauge} mm")
+        print(f"Y-Back Position = {y_back_pos}\n")
         await api.move_to(mount, back_center)
         distance = 0
     return distance
 
 
-async def _read_gauge(api: OT3API, mount: types.OT3Mount, axis: str) -> None:
+async def _read_gauge(api: OT3API, mount: types.OT3Mount, axis: str) -> float:
     if "XL" in axis:
         await api.move_rel(mount, types.Point(x=-DIAL_JOG_DISTANCE), DIAL_JOG_SPEED)
     elif "XR" in axis:
@@ -155,6 +259,17 @@ async def _read_gauge(api: OT3API, mount: types.OT3Mount, axis: str) -> None:
         await api.move_rel(mount, types.Point(y=DIAL_JOG_DISTANCE), DIAL_JOG_SPEED)
     gauge = gauges[axis].read_stable(timeout=20)
     return gauge
+
+
+async def _get_position(api: OT3API, mount: types.OT3Mount) -> str:
+    current_position = await api.gantry_position(mount)
+    position = str(current_position).replace(", ",";")
+    return position
+
+def _get_attitude(api: OT3API) -> str:
+    belt_attitude = api._robot_calibration.deck_calibration.belt_attitude
+    attitude = str(belt_attitude).replace(", ",";")
+    return attitude
 
 
 async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> None:
@@ -214,8 +329,10 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         await _calibrate_pipette(api, mount)
         await _check_belt_accuracy_probe(api, mount)
     elif args.mode == "dial":
-        _gauge_setup()
+        global start_time
+        _test_setup(api, mount)
         _zero_gauges()
+        start_time = time.time()
         for i in range(args.cycles):
             cycle = i + 1
             print(f"\n-> Starting Test Cycle {cycle}/{args.cycles}")
@@ -227,6 +344,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
             # await _calibrate_belts(api, mount)  # <-- !!!
             # await _calibrate_pipette(api, mount)
             await _check_belt_accuracy_dial(api, mount)
+            _record_data(api, cycle)
 
     print("done")
 
