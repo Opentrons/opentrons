@@ -350,8 +350,8 @@ class CanMessenger:
             try:
                 await self._read_task()
             except (asyncio.CancelledError, StopAsyncIteration):
-               return
-            except BaseException as exc:
+                return
+            except BaseException:
                 log.exception("Exception in read")
                 continue
 
