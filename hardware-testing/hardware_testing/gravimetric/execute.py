@@ -39,7 +39,7 @@ from .measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
-from .tips import get_tips, MULTI_CHANNEL_TEST_ORDER
+from .tips import MULTI_CHANNEL_TEST_ORDER
 
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
@@ -294,11 +294,9 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     labware_on_scale = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)
 
-    all_channels_same_time = cfg.increment or cfg.pipette_channels == 96
-    tips = get_tips(
-        resources.ctx, resources.pipette, all_channels=all_channels_same_time
+    total_tips = len(
+        [tip for chnl_tips in resources.tips.values() for tip in chnl_tips]
     )
-    total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips])
     channels_to_test = _get_test_channels(cfg)
     trial_total = len(resources.test_volumes) * cfg.trials * len(channels_to_test)
     assert (
@@ -306,7 +304,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     ), f"more trials ({trial_total}) than tips ({total_tips})"
 
     def _next_tip_for_channel(channel: int) -> Well:
-        return tips[channel].pop(0)
+        return resources.tips[channel].pop(0)
 
     ui.print_header("LOAD SCALE")
     print(
@@ -348,7 +346,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         print("homing...")
         resources.ctx.home()
         resources.pipette.home_plunger()
-        first_tip = tips[0][0]
+        first_tip = resources.tips[0][0]
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
         first_tip_location = first_tip.top().move(setup_channel_offset)
         _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)

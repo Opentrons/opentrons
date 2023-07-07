@@ -29,6 +29,7 @@ from . import execute, helpers, workarounds, execute_photometric
 from .config import GravimetricConfig, GANTRY_MAX_SPEED, PhotometricConfig
 from .measurement import DELAY_FOR_MEASUREMENT
 from .trial import TestResources
+from .tips import get_tips
 
 # FIXME: bump to v2.15 to utilize protocol engine
 API_LEVEL = "2.13"
@@ -268,7 +269,9 @@ if __name__ == "__main__":
     test_volumes = helpers._get_volumes(_ctx, union_cfg)
     for v in test_volumes:
         print(f"\t{v} uL")
-
+    all_channels_same_time = (
+        getattr(union_cfg, "increment", False) or union_cfg.pipette_channels == 96
+    )
     run_args = TestResources(
         ctx=_ctx,
         pipette=pipette,
@@ -283,6 +286,7 @@ if __name__ == "__main__":
         robot_serial=helpers._get_robot_serial(_ctx.is_simulating()),
         tip_batch=helpers._get_tip_batch(_ctx.is_simulating()),
         git_description=get_git_description(),
+        tips=get_tips(_ctx, pipette, all_channels=all_channels_same_time),
     )
 
     if args.photometric:
