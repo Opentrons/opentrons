@@ -1319,8 +1319,36 @@ class OT3API(
 
         Works regardless of critical point or home status.
         """
-        machine_ax = OT3Axis.by_mount(mount)
-        await self._home((machine_ax,))
+        await self.retract_axis(OT3Axis.by_mount(mount))
+
+    @ExecutionManagerProvider.wait_for_running
+    async def retract_axis(self, axis: Union[Axis, OT3Axis]) -> None:
+        """
+        Move an axis to its home position, without engaing the limit switch,
+        whenever we can.
+
+        OT-2 uses this function to recover from a stall. In order to keep
+        the behaviors between the two robots similar, retract_axis on the FLEX
+        will call home if the stepper position is inaccurate.
+        """
+        checked_axis = OT3Axis.from_axis(axis)
+        motor_ok = self._backend.check_motor_status([checked_axis])
+        encoder_ok = self._backend.check_encoder_status([checked_axis])
+
+        if motor_ok and encoder_ok:
+            # we can move to the home position without checking the limit switch
+            origin = await self._backend.update_position()
+            target_pos = {checked_axis: self._backend.home_position()[checked_axis]}
+            try:
+                moves = self._build_moves(origin, target_pos)
+                await self._backend.move(origin, moves[0], MoveStopCondition.none)
+            except ZeroLengthMoveError:
+                self._log.info(f"{axis} already at home position, skip retract")
+        else:
+            # home the axis
+            await self._home_axis(checked_axis)
+        await self._cache_current_position()
+        await self._cache_encoder_position()
 
     # Gantry/frame (i.e. not pipette) config API
     @property
