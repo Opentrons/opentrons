@@ -308,7 +308,7 @@ def execute_trials(
         if not len(tips[0]):
             if not resources.ctx.is_simulating():
                 ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
-            tips = get_tips(resources.ctx, resources.pipette)
+            tips = get_tips(resources.ctx, resources.pipette, True)
         return tips[0].pop(0)
 
     trial_total = len(resources.test_volumes) * cfg.trials
@@ -337,10 +337,9 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     photoplate, reservoir = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)
 
-    tips = get_tips(resources.ctx, resources.pipette)
-    total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips]) * len(
-        resources.test_volumes
-    )
+    total_tips = len(
+        [tip for chnl_tips in resources.tips.values() for tip in chnl_tips]
+    ) * len(resources.test_volumes)
 
     assert (
         trial_total <= total_tips
@@ -362,6 +361,6 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     )
 
     try:
-        execute_trials(cfg, resources, tips, trials)
+        execute_trials(cfg, resources, resources.tips, trials)
     finally:
         _finish_test(cfg, resources, cfg.return_tip)

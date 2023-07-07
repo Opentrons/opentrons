@@ -146,6 +146,7 @@ class TestResources:
     robot_serial: str
     tip_batch: str
     git_description: str
+    tips: Dict[int, List[Well]]
 
 
 def build_gravimetric_trials(
