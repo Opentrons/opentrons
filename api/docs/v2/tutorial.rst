@@ -50,10 +50,10 @@ The Flex and OT-2 use similar labware for serial dilution. The tutorial code wil
    * - Well plate
      - `NEST 96 Well Plate 200 µL Flat <https://labware.opentrons.com/nest_96_wellplate_200ul_flat>`_
      - ``nest_96_wellplate_200ul_flat``
-   * - Flex tiprack
+   * - Flex tip rack
      - `Opentrons Flex Tips, 200 µL <https://shop.opentrons.com/opentrons-flex-tips-200-l/>`_
      - ``opentrons_flex_96_tiprack_200ul``
-   * - OT-2 tiprack
+   * - OT-2 tip rack
      - `Opentrons 96 Tip Rack <https://labware.opentrons.com/?category=tipRack&manufacturer=Opentrons>`_
      - ``opentrons_96_tiprack_300ul``
 
@@ -157,37 +157,41 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
             :substitutions:
 
             def run(protocol: protocol_api.ProtocolContext):
-                tips = protocol.load_labware('opentrons_flex_96_tiprack_200ul', D1)
-                reservoir = protocol.load_labware('nest_12_reservoir_15ml', D2)
-                plate = protocol.load_labware('nest_96_wellplate_200ul_flat', D3)
+                tips = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'D1')
+                reservoir = protocol.load_labware('nest_12_reservoir_15ml', 'D2')
+                plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'D3')
 
         If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
         
         Now the robot will expect to find labware in a configuration that looks like this:
 
-        **PLACEHOLDER FOR FLEX DECK IMAGE**
+        .. image:: ../img/tutorial/initial-deck-map-flex.png
+            :scale: 50 %
+            :name: Initial Deck State – Flex
+            :align: center
+            :alt: Flex deck map with a tip rack in slot D1, reservoir in slot D2, and well plate in slot D3.
     
     .. tab:: OT-2
 
-       Here’s how to load the labware into OT-2 slots 1, 2, and 3 (repeating the ``def`` statement from above to show proper indenting):
+        Here’s how to load the labware into OT-2 slots 1, 2, and 3 (repeating the ``def`` statement from above to show proper indenting):
         
-       .. code-block:: python
-           :substitutions:
-
-           def run(protocol: protocol_api.ProtocolContext):
-               tips = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
-               reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
-               plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
+        .. code-block:: python
+            :substitutions:
+ 
+            def run(protocol: protocol_api.ProtocolContext):
+                tips = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
+                reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
+                plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
+        
+        If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
        
-       If you’re using a different model of labware, find its name in the Labware Library and replace it in your code.
-       
-       Now the robot will expect to find labware in a configuration that looks like this:
+        Now the robot will expect to find labware in a configuration that looks like this:
 
-       .. image:: ../img/tutorial/initial-deck-map.png
-           :scale: 50 %
-           :name: Initial Deck State
-           :align: center
-           :alt: OT-2 deck map with a tip rack in slot 1, reservoir in slot 2, and well plate in slot 3.
+        .. image:: ../img/tutorial/initial-deck-map.png
+            :scale: 50 %
+            :name: Initial Deck State – OT-2
+            :align: center
+            :alt: OT-2 deck map with a tip rack in slot 1, reservoir in slot 2, and well plate in slot 3.
 
 You may notice that these deck maps don't show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in `Protocol Designer <https://designer.opentrons.com/>`_. If you want to identify liquids, see `Labeling Liquids in Wells <https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-wells>`_. (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
 
