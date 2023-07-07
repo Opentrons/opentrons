@@ -259,6 +259,7 @@ def _display_dye_information(
 def build_pm_report(
     cfg: config.PhotometricConfig, resources: TestResources
 ) -> report.CSVReport:
+    ui.print_header("CREATE TEST-REPORT")
     """Build a CSVReport formated for photometric tests."""
     test_report = report.create_csv_test_report_photometric(
         resources.test_volumes, cfg, run_id=resources.run_id
@@ -340,7 +341,6 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
         trial_total <= total_tips
     ), f"more trials ({trial_total}) than tips ({total_tips})"
 
-    ui.print_header("CREATE TEST-REPORT")
     test_report = build_pm_report(cfg, resources)
 
     ui.print_header("PREPARE")
