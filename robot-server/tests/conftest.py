@@ -181,7 +181,9 @@ def attach_pipettes(server_temp_directory: str) -> Iterator[None]:
     # FIXME There are random files somehow getting added to this directory
     # with the IDs 123 & 321. This is a temporary solution to remove
     # any unexpected files.
-    [fi.unlink() for fi in Path(pipette_dir_path).iterdir() if fi.is_file()]
+    for fi in Path(pipette_dir_path).iterdir():
+        if fi.is_file():
+            fi.unlink()
 
     os.environ["OT_API_CONFIG_DIR"] = server_temp_directory
     with open(pipette_file_path, "w") as pipette_file:

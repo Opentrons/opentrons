@@ -356,7 +356,8 @@ def _pipette_settings_from_config(pipette_id: str) -> PipetteSettings:
     # need model and name?
     return PipetteSettings(  # type: ignore[call-arg]
         info=PipetteSettingsInfo(
-            name="", model=cast(str, mutable_configs.get("model"))
+            name=cast(str, mutable_configs.get("name", "")),
+            model=cast(str, mutable_configs.get("model", "")),
         ),
         fields=fields,
     )

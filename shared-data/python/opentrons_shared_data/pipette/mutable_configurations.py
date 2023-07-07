@@ -16,12 +16,15 @@ from .model_constants import (
 from .pipette_load_name_conversions import PipetteModelVersionType
 from .load_data import load_definition, load_serial_lookup_table
 from .types import MutableConfig, Quirks, QuirkConfig, TypeOverrides, OverrideType
-from .pipette_load_name_conversions import convert_pipette_model
+from .pipette_load_name_conversions import (
+    convert_pipette_model,
+    convert_to_pipette_name_type,
+)
 from .file_operation_helpers import (
     MutableConfigurationEncoder,
     MutableConfigurationDecoder,
 )
-from .dev_types import PipetteModel
+from .dev_types import PipetteModel, PipetteName
 
 
 log = logging.getLogger(__name__)
@@ -192,6 +195,15 @@ def list_mutable_configs(
         full_mutable_configs = _list_all_mutable_configs(
             mutable_configs, base_configs_dict
         )
+
+        if not full_mutable_configs.get("name"):
+            full_mutable_configs["name"] = str(
+                convert_to_pipette_name_type(cast(PipetteName, str(pipette_model)))
+            )
+
+        if not full_mutable_configs.get("model"):
+            full_mutable_configs["model"] = str(pipette_model)
+
         return full_mutable_configs
 
 

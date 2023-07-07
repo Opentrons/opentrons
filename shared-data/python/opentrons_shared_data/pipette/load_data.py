@@ -92,7 +92,11 @@ def load_serial_lookup_table() -> Dict[str, str]:
 
                 model_shorthand = _model_shorthand.get(model_dir, model_dir)
 
-                if model_dir == "p300" and int(version_list[0]) == 1 and int(version_list[1]) == 0:
+                if (
+                    model_dir == "p300"
+                    and int(version_list[0]) == 1
+                    and int(version_list[1]) == 0
+                ):
                     # Well apparently, we decided to switch the shorthand of the p300 depending
                     # on whether it's a "V1" model or not...so...here is the lovely workaround.
                     model_shorthand = model_dir
