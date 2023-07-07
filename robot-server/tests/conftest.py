@@ -178,6 +178,11 @@ def attach_pipettes(server_temp_directory: str) -> Iterator[None]:
     pipette_dir_path = os.path.join(server_temp_directory, "pipettes")
     pipette_file_path = os.path.join(pipette_dir_path, "P300MV1020230630.json")
 
+    # FIXME There are random files somehow getting added to this directory
+    # with the IDs 123 & 321. This is a temporary solution to remove
+    # any unexpected files.
+    [fi.unlink() for fi in Path(pipette_dir_path).iterdir() if fi.is_file()]
+
     os.environ["OT_API_CONFIG_DIR"] = server_temp_directory
     with open(pipette_file_path, "w") as pipette_file:
         json.dump(pipette, pipette_file)
