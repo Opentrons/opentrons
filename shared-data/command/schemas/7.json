@@ -36,6 +36,9 @@
       "$ref": "#/definitions/HomeCreate"
     },
     {
+      "$ref": "#/definitions/RetractAxisCreate"
+    },
+    {
       "$ref": "#/definitions/LoadLabwareCreate"
     },
     {
@@ -853,6 +856,52 @@
         },
         "params": {
           "$ref": "#/definitions/HomeParams"
+        },
+        "intent": {
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/CommandIntent"
+            }
+          ]
+        },
+        "key": {
+          "title": "Key",
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "type": "string"
+        }
+      },
+      "required": ["params"]
+    },
+    "RetractAxisParams": {
+      "title": "RetractAxisParams",
+      "description": "Payload required for a Retract Axis command.",
+      "type": "object",
+      "properties": {
+        "axis": {
+          "description": "Axis to retract to its home position as quickly as safely possible. The difference between retracting an axis and homing an axis using the home command is that a home will always probe the limit switch and will work as the first motion command a robot will need to execute; On the other hand, retraction will rely on this previously determined  home position to move to it as fast as safely possible. So on the Flex, it will move (fast) the axis to the previously recorded home position and on the OT2, it will move (fast) the axis a safe distance from the previously recorded home position, and then slowly approach the limit switch.",
+          "allOf": [
+            {
+              "$ref": "#/definitions/MotorAxis"
+            }
+          ]
+        }
+      },
+      "required": ["axis"]
+    },
+    "RetractAxisCreate": {
+      "title": "RetractAxisCreate",
+      "description": "Data to create a Retract Axis command.",
+      "type": "object",
+      "properties": {
+        "commandType": {
+          "title": "Commandtype",
+          "default": "retractAxis",
+          "enum": ["retractAxis"],
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/RetractAxisParams"
         },
         "intent": {
           "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",

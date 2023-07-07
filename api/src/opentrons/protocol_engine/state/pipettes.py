@@ -212,7 +212,6 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 MoveToCoordinatesResult,
                 thermocycler.OpenLidResult,
                 thermocycler.CloseLidResult,
-
             ),
         ):
             self._state.current_well = None
