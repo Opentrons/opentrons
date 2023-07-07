@@ -25,7 +25,7 @@ from .liquid_class.pipetting import (
     dispense_with_liquid_class,
     PipettingCallbacks,
 )
-from .liquid_height.height import LiquidTracker, initialize_liquid_from_deck
+from .liquid_height.height import LiquidTracker
 from .measurement import (
     MeasurementData,
     MeasurementType,
@@ -291,8 +291,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     """Run."""
     ui.print_header("LOAD LABWARE")
     labware_on_scale = _load_labware(resources.ctx, cfg)
-    liquid_tracker = LiquidTracker()
-    initialize_liquid_from_deck(resources.ctx, liquid_tracker)
+    liquid_tracker = LiquidTracker(resources.ctx)
 
     all_channels_same_time = cfg.increment or cfg.pipette_channels == 96
     tips = get_tips(
