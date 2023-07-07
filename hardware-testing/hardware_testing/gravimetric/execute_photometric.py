@@ -255,7 +255,10 @@ def _display_dye_information(
                         f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye_msg}"'
                     )
 
-def build_pm_report(cfg: config.PhotometricConfig, resources: TestResources) -> report.CSVReport:
+
+def build_pm_report(
+    cfg: config.PhotometricConfig, resources: TestResources
+) -> report.CSVReport:
     """Build a CSVReport formated for photometric tests."""
     test_report = report.create_csv_test_report_photometric(
         resources.test_volumes, cfg, run_id=resources.run_id
@@ -273,9 +276,15 @@ def build_pm_report(cfg: config.PhotometricConfig, resources: TestResources) -> 
     )
     return test_report
 
-def execute_trials(cfg: config.PhotometricConfig, resources: TestResources,
-                   tips: Dict[int, List[Well]]:, trials: Dict[float, List[PhotometricTrial]]) -> None:
-    """Execute a batch of pre-constructed trials"""
+
+def execute_trials(
+    cfg: config.PhotometricConfig,
+    resources: TestResources,
+    tips: Dict[int, List[Well]],
+    trials: Dict[float, List[PhotometricTrial]],
+) -> None:
+    """Execute a batch of pre-constructed trials."""
+
     def _next_tip() -> Well:
         # get the first channel's first-used tip
         # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
@@ -286,6 +295,7 @@ def execute_trials(cfg: config.PhotometricConfig, resources: TestResources,
                 ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
             tips = get_tips(resources.ctx, resources.pipette)
         return tips[0].pop(0)
+
     trial_total = len(resources.test_volumes) * cfg.trials
     trial_count = 0
     for volume in trials.keys():
@@ -302,6 +312,7 @@ def execute_trials(cfg: config.PhotometricConfig, resources: TestResources,
                 resources.ctx, resources.pipette, cfg, location=next_tip_location
             )
             _run_trial(trial)
+
 
 def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     """Run."""
@@ -358,7 +369,7 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     resources.pipette.home_plunger()
 
     try:
-        execute_trials(cfg,resources,tips,trials)
+        execute_trials(cfg, resources, tips, trials)
     finally:
         ui.print_title("CHANGE PIPETTES")
         if resources.pipette.has_tip:
