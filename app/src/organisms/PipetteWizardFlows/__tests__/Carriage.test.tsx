@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LEFT, NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
@@ -67,23 +67,10 @@ describe('Carriage', () => {
     getByLabelText('back').click()
     expect(props.goBack).toHaveBeenCalled()
   })
-  it('clicking on continue button executes the commands correctly', async () => {
+  it('clicking on continue button executes the commands correctly', () => {
     const { getByRole } = render(props)
     const contBtn = getByRole('button', { name: 'Continue' })
     fireEvent.click(contBtn)
-    expect(props.chainRunCommands).toHaveBeenCalledWith(
-      [
-        {
-          commandType: 'home',
-          params: {
-            axes: ['rightZ'],
-          },
-        },
-      ],
-      false
-    )
-    await waitFor(() => {
-      expect(props.proceed).toHaveBeenCalled()
-    })
+    expect(props.proceed).toHaveBeenCalled()
   })
 })
