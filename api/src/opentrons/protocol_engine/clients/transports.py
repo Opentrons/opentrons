@@ -1,5 +1,4 @@
 """Base transport interfaces for communicating with a Protocol Engine."""
-from abc import ABC, abstractmethod
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
 from typing import Any, overload
 from typing_extensions import Literal
@@ -13,64 +12,7 @@ from ..state import StateView
 from ..commands import CommandCreate, CommandResult
 
 
-class AbstractSyncTransport(ABC):
-    """Interface describing a sync. ProtocolEngine state/command transport."""
-
-    @property
-    @abstractmethod
-    def state(self) -> StateView:
-        """Get a view of the ProtocolEngine's state."""
-        ...
-
-    @abstractmethod
-    def execute_command(self, request: CommandCreate) -> CommandResult:
-        """Execute a ProtocolEngine command, blocking until the command completes.
-
-        Args:
-            request: The ProtocolEngine command request
-
-        Returns:
-            The command's result data.
-
-        Raises:
-            ProtocolEngineError: if the command execution is not successful,
-                the specific error that cause the command to fail is raised.
-        """
-        ...
-
-    @overload
-    def call_method(
-        self,
-        method_name: Literal["add_labware_definition"],
-        *,
-        definition: LabwareDefinition,
-    ) -> LabwareUri:
-        ...
-
-    @overload
-    def call_method(
-        self,
-        method_name: Literal["reset_tips"],
-        *,
-        labware_id: str,
-    ) -> None:
-        ...
-
-    @overload
-    def call_method(
-        self,
-        method_name: str,
-        **kwargs: Any,
-    ) -> Any:
-        ...
-
-    @abstractmethod
-    def call_method(self, method_name: str, **kwargs: Any) -> Any:
-        """Execute a ProtocolEngine method, returning the result."""
-        ...
-
-
-class ChildThreadTransport(AbstractSyncTransport):
+class ChildThreadTransport:
     """Concrete transport implementation using asyncio.run_coroutine_threadsafe."""
 
     def __init__(self, engine: ProtocolEngine, loop: AbstractEventLoop) -> None:
@@ -97,7 +39,18 @@ class ChildThreadTransport(AbstractSyncTransport):
         return self._engine.state_view
 
     def execute_command(self, request: CommandCreate) -> CommandResult:
-        """Execute a command synchronously on the main thread."""
+        """Execute a ProtocolEngine command, blocking until the command completes.
+
+        Args:
+            request: The ProtocolEngine command request
+
+        Returns:
+            The command's result data.
+
+        Raises:
+            ProtocolEngineError: if the command execution is not successful,
+                the specific error that cause the command to fail is raised.
+        """
         command = run_coroutine_threadsafe(
             self._engine.add_and_execute_command(request=request),
             loop=self._loop,
@@ -122,6 +75,32 @@ class ChildThreadTransport(AbstractSyncTransport):
         assert command.result is not None, f"Expected Command {command} to have result"
 
         return command.result
+
+    @overload
+    def call_method(
+        self,
+        method_name: Literal["add_labware_definition"],
+        *,
+        definition: LabwareDefinition,
+    ) -> LabwareUri:
+        ...
+
+    @overload
+    def call_method(
+        self,
+        method_name: Literal["reset_tips"],
+        *,
+        labware_id: str,
+    ) -> None:
+        ...
+
+    @overload
+    def call_method(
+        self,
+        method_name: str,
+        **kwargs: Any,
+    ) -> Any:
+        ...
 
     def call_method(self, method_name: str, **kwargs: Any) -> Any:
         """Execute a ProtocolEngine method, returning the result."""

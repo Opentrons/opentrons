@@ -24,13 +24,13 @@ from ..types import (
     MotorAxis,
     Liquid,
 )
-from .transports import AbstractSyncTransport
+from .transports import ChildThreadTransport
 
 
 class SyncClient:
     """Synchronous Protocol Engine client."""
 
-    def __init__(self, transport: AbstractSyncTransport) -> None:
+    def __init__(self, transport: ChildThreadTransport) -> None:
         """Initialize the client with a transport."""
         self._transport = transport
 

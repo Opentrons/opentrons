@@ -19,7 +19,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_engine import DeckSlotLocation, DeckPoint, commands
-from opentrons.protocol_engine.clients import SyncClient, AbstractSyncTransport
+from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
 from opentrons.protocol_engine.types import (
     ModuleDefinition,
     ModuleModel,
@@ -33,20 +33,20 @@ from opentrons.protocol_engine.types import (
 
 
 @pytest.fixture
-def transport(decoy: Decoy) -> AbstractSyncTransport:
-    """Get a stubbed out AbstractSyncTransport."""
-    return decoy.mock(cls=AbstractSyncTransport)
+def transport(decoy: Decoy) -> ChildThreadTransport:
+    """Get a stubbed out ChildThreadTransport."""
+    return decoy.mock(cls=ChildThreadTransport)
 
 
 @pytest.fixture
-def subject(transport: AbstractSyncTransport) -> SyncClient:
+def subject(transport: ChildThreadTransport) -> SyncClient:
     """Get a SyncProtocolEngine test subject."""
     return SyncClient(transport=transport)
 
 
 def test_add_labware_definition(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should add a labware definition."""
@@ -67,7 +67,7 @@ def test_add_labware_definition(
 
 def test_add_liquid(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should add a liquid to engine state."""
@@ -88,7 +88,7 @@ def test_add_liquid(
 
 
 def test_reset_tips(
-    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+    decoy: Decoy, transport: ChildThreadTransport, subject: SyncClient
 ) -> None:
     """It should reset the tip tracking state of a labware."""
     subject.reset_tips(labware_id="cool-labware")
@@ -104,7 +104,7 @@ def test_reset_tips(
 
 def test_load_labware(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     tip_rack_def: LabwareDefinition,
     subject: SyncClient,
 ) -> None:
@@ -143,7 +143,7 @@ def test_load_labware(
 
 def test_load_module(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
     thermocycler_v1_def: ModuleDefinition,
 ) -> None:
@@ -175,7 +175,7 @@ def test_load_module(
 
 def test_load_pipette(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a load pipette command and return its result."""
@@ -200,7 +200,7 @@ def test_load_pipette(
 
 def test_move_to_well(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a move to well command."""
@@ -238,7 +238,7 @@ def test_move_to_well(
 
 def test_move_to_coordinates(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a move to coordinates command."""
@@ -268,7 +268,7 @@ def test_move_to_coordinates(
 
 def test_pick_up_tip(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a pick up tip command."""
@@ -292,7 +292,7 @@ def test_pick_up_tip(
 
 def test_drop_tip(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a drop up tip command."""
@@ -324,7 +324,7 @@ def test_drop_tip(
 
 def test_aspirate(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should send an AspirateCommand through the transport."""
@@ -367,7 +367,7 @@ def test_aspirate(
 
 def test_aspirate_in_place(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should send an AspirateInPlaceCommand through the transport."""
@@ -396,7 +396,7 @@ def test_aspirate_in_place(
 
 def test_dispense(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a dispense command."""
@@ -434,7 +434,7 @@ def test_dispense(
 
 def test_dispense_in_place(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a DispenceInPlace command."""
@@ -461,7 +461,7 @@ def test_dispense_in_place(
 
 def test_touch_tip(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a touch tip command."""
@@ -496,7 +496,7 @@ def test_touch_tip(
 @pytest.mark.parametrize("message", [None, "Hello, world!", ""])
 def test_wait_for_duration(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
     seconds: float,
     message: Optional[str],
@@ -516,7 +516,7 @@ def test_wait_for_duration(
 
 def test_wait_for_resume(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a wait for resume command."""
@@ -533,7 +533,7 @@ def test_wait_for_resume(
 
 
 def test_comment(
-    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+    decoy: Decoy, transport: ChildThreadTransport, subject: SyncClient
 ) -> None:
     """It should execute a comment command."""
     # TODO(mm, 2022-11-09): Use a proper Protocol Engine Comment command instead of
@@ -559,7 +559,7 @@ def test_comment(
 
 def test_set_rail_lights(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a setRailLights command."""
@@ -575,7 +575,7 @@ def test_set_rail_lights(
 
 def test_magnetic_module_engage(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Magnetic Module engage command."""
@@ -593,7 +593,7 @@ def test_magnetic_module_engage(
 
 def test_magnetic_module_disengage(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Magnetic Module disengage command."""
@@ -611,7 +611,7 @@ def test_magnetic_module_disengage(
 
 def test_thermocycler_set_target_lid_temperature(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Thermocycler's set target lid temperature command."""
@@ -633,7 +633,7 @@ def test_thermocycler_set_target_lid_temperature(
 
 def test_thermocycler_set_target_block_temperature(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Thermocycler's set target block temperature command."""
@@ -661,7 +661,7 @@ def test_thermocycler_set_target_block_temperature(
 
 def test_thermocycler_wait_for_lid_temperature(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Thermocycler's wait for lid temperature command."""
@@ -677,7 +677,7 @@ def test_thermocycler_wait_for_lid_temperature(
 
 def test_thermocycler_wait_for_block_temperature(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Thermocycler's wait for block temperature command."""
@@ -693,7 +693,7 @@ def test_thermocycler_wait_for_block_temperature(
 
 def test_thermocycler_run_profile(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Thermocycler's run profile command."""
@@ -721,7 +721,7 @@ def test_thermocycler_run_profile(
 
 def test_thermocycler_deactivate_block(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Thermocycler's deactivate block command."""
@@ -737,7 +737,7 @@ def test_thermocycler_deactivate_block(
 
 def test_thermocycler_deactivate_lid(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Thermocycler's deactivate lid command."""
@@ -753,7 +753,7 @@ def test_thermocycler_deactivate_lid(
 
 def test_thermocycler_open_lid(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Thermocycler's open lid command."""
@@ -769,7 +769,7 @@ def test_thermocycler_open_lid(
 
 def test_thermocycler_close_lid(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Thermocycler's close lid command."""
@@ -785,7 +785,7 @@ def test_thermocycler_close_lid(
 
 def test_blow_out(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a blow_out command."""
@@ -816,7 +816,7 @@ def test_blow_out(
 
 def test_blow_out_in_place(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a blow_out command."""
@@ -841,7 +841,7 @@ def test_blow_out_in_place(
 
 def test_heater_shaker_set_target_temperature(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Heater-Shaker's set target temperature command."""
@@ -861,7 +861,7 @@ def test_heater_shaker_set_target_temperature(
 
 def test_heater_shaker_wait_for_temperature(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Heater-Shaker's wait for temperature command."""
@@ -877,7 +877,7 @@ def test_heater_shaker_wait_for_temperature(
 
 def test_heater_shaker_set_and_wait_for_shake_speed(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Heater-Shaker's set and wait for shake speed command."""
@@ -899,7 +899,7 @@ def test_heater_shaker_set_and_wait_for_shake_speed(
 
 def test_heater_shaker_open_labware_latch(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Heater-Shaker's open labware latch command."""
@@ -915,7 +915,7 @@ def test_heater_shaker_open_labware_latch(
 
 def test_heater_shaker_close_labware_latch(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Heater-Shaker's close labware latch command."""
@@ -931,7 +931,7 @@ def test_heater_shaker_close_labware_latch(
 
 def test_heater_shaker_deactivate_shaker(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Heater-Shaker's deactivate shaker command."""
@@ -947,7 +947,7 @@ def test_heater_shaker_deactivate_shaker(
 
 def test_heater_shaker_deactivate_heater(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     subject: SyncClient,
 ) -> None:
     """It should execute a Heater-Shaker's deactivate heater command."""
@@ -962,7 +962,7 @@ def test_heater_shaker_deactivate_heater(
 
 
 def test_temperature_module_set_target_temperature(
-    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+    decoy: Decoy, transport: ChildThreadTransport, subject: SyncClient
 ) -> None:
     """Should execute a PE set_target_temperature command."""
     request = commands.temperature_module.SetTargetTemperatureCreate(
@@ -984,7 +984,7 @@ def test_temperature_module_set_target_temperature(
 
 
 def test_temperature_module_deactivate(
-    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+    decoy: Decoy, transport: ChildThreadTransport, subject: SyncClient
 ) -> None:
     """Should execute a PE deactivate temperature command."""
     request = commands.temperature_module.DeactivateTemperatureCreate(
@@ -1002,7 +1002,7 @@ def test_temperature_module_deactivate(
 
 
 def test_temperature_module_wait_for_target_temperature(
-    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+    decoy: Decoy, transport: ChildThreadTransport, subject: SyncClient
 ) -> None:
     """Should execute a PE wait_for_target_temperature command."""
     request = commands.temperature_module.WaitForTemperatureCreate(
@@ -1022,7 +1022,7 @@ def test_temperature_module_wait_for_target_temperature(
 
 
 def test_home(
-    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+    decoy: Decoy, transport: ChildThreadTransport, subject: SyncClient
 ) -> None:
     """It should execute a home command."""
     request = commands.HomeCreate(
@@ -1038,7 +1038,7 @@ def test_home(
 
 
 def test_load_liquid(
-    decoy: Decoy, transport: AbstractSyncTransport, subject: SyncClient
+    decoy: Decoy, transport: ChildThreadTransport, subject: SyncClient
 ) -> None:
     """It should execute load liquid command."""
     request = commands.LoadLiquidCreate(
