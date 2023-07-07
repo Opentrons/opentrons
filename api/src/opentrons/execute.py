@@ -374,7 +374,7 @@ def execute(  # noqa: C901
     if custom_labware_paths:
         extra_labware = labware_from_paths(custom_labware_paths)
     else:
-        extra_labware = {}
+        extra_labware = _get_jupyter_labware()
 
     if custom_data_paths:
         extra_data = datafiles_from_paths(custom_data_paths)
@@ -555,12 +555,6 @@ def _run_file_non_pe(
     """Run a protocol file without Protocol Engine, with the older infrastructure instead."""
     if isinstance(protocol, PythonProtocol):
         extra_labware = protocol.extra_labware
-        if extra_labware is None:
-            # TODO: Is a None check correct here, or should this be {}?
-            extra_labware = {
-                uri: details.definition
-                for uri, details in _get_jupyter_labware().items()
-            }
         bundled_labware = protocol.bundled_labware
         bundled_data = protocol.bundled_data
     else:
