@@ -12,6 +12,8 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import DoorState
 from opentrons.hardware_control.modules import LiveData
 
+from opentrons_shared_data.errors import EnumeratedError
+
 from ..resources import pipette_data_provider
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
@@ -117,7 +119,7 @@ class FailCommandAction:
     command_id: str
     error_id: str
     failed_at: datetime
-    error: ProtocolEngineError
+    error: Union[ProtocolEngineError, EnumeratedError]
 
 
 @dataclass(frozen=True)

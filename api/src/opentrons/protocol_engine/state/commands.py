@@ -263,7 +263,9 @@ class CommandStore(HasState[CommandState], HandlesActions):
             error_occurrence = ErrorOccurrence.from_failed(
                 id=action.error_id,
                 createdAt=action.failed_at,
-                error=action.error,
+                error=ProtocolCommandFailedError(
+                    wrapping=[action.error],
+                ),
             )
             log.info(f"error_occurrence:: {error_occurrence}")
             prev_entry = self._state.commands_by_id[action.command_id]
@@ -343,29 +345,27 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     log.info("in finish action")
                     error_id = action.error_details.error_id
                     created_at = action.error_details.created_at
-                    if isinstance(
-                        action.error_details.error, ProtocolCommandFailedError
+                    # if isinstance(
+                    #     action.error_details.error, ProtocolCommandFailedError
+                    # ):
+                    #     error_occurrence = action.error_details.error.original_error
+                    #     log.info(f"finish command will have {error_occurrence}")
+                    #     self._state.errors_by_id[error_id] = error_occurrence
+                    # else:
+                    if not isinstance(
+                        action.error_details.error,
+                        EnumeratedError,
                     ):
-                        error_occurrence = action.error_details.error.original_error
-                        log.info(f"finish command will have {error_occurrence}")
-                        self._state.errors_by_id[error_id] = error_occurrence
-                    else:
-                        if not isinstance(
-                            action.error_details.error,
-                            EnumeratedError,
-                        ):
-                            error: EnumeratedError = UnexpectedProtocolError(
-                                message=str(action.error_details.error),
-                                wrapping=[action.error_details.error],
-                            )
-                        else:
-                            error = action.error_details.error
-
-                        self._state.errors_by_id[
-                            error_id
-                        ] = ErrorOccurrence.from_failed(
-                            id=error_id, createdAt=created_at, error=error
+                        error: EnumeratedError = UnexpectedProtocolError(
+                            message=str(action.error_details.error),
+                            wrapping=[action.error_details.error],
                         )
+                    else:
+                        error = action.error_details.error
+
+                    self._state.errors_by_id[error_id] = ErrorOccurrence.from_failed(
+                        id=error_id, createdAt=created_at, error=error
+                    )
 
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.PAUSED

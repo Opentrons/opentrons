@@ -51,10 +51,6 @@ class ErrorOccurrence(BaseModel):
     wrappedErrors: List["ErrorOccurrence"] = Field(
         default=[], description="Errors that may have caused this one."
     )
-    unexpectedFail: bool = Field(
-        default=False,
-        description="Was this error raised of an unexpected reason or did a command fail.",
-    )
 
     class Config:
         """Customize configuration for this model."""
@@ -80,7 +76,7 @@ class ProtocolCommandFailedError(ProtocolEngineError):
 
     def __init__(
         self,
-        original_error: ErrorOccurrence,
+        original_error: Optional[ErrorOccurrence] = None,
         message: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,

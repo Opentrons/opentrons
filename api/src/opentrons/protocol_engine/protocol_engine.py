@@ -256,8 +256,11 @@ class ProtocolEngine:
             log.info(f"got and estop? {error}")
             if (
                 isinstance(error, ProtocolCommandFailedError)
-                and error.original_error.errorCode
-                == ErrorCodes.E_STOP_ACTIVATED.value.code
+                and error.wrapping is not None
+                and any(
+                    ErrorCodes.E_STOP_ACTIVATED == wrapped_error.code
+                    for wrapped_error in error.wrapping
+                )
             ):
                 drop_tips_and_home = False
 
