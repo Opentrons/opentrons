@@ -15,6 +15,7 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
 CONSUMER_NAME_DEFAULT: Final[str] = "opentrons"
 ESTOP_OUT_GPIO_NAME: Final[str] = "SODIMM_210"
 NSYNC_OUT_GPIO_NAME: Final[str] = "SODIMM_206"
+EEPROM_WP_OUT_GPIO_NAME: Final[str] = "SODIMM_222"
 
 LOG = getLogger(__name__)
 
@@ -53,8 +54,13 @@ class OT3GPIO:
         self._nsync_out_line.request(
             self._consumer_name, type=self._gpiod.LINE_REQ_DIR_OUT
         )
+        self._eeprom_wp_out_line = self._gpiod.find_line(EEPROM_WP_OUT_GPIO_NAME)
+        self._eeprom_wp_out_line.request(
+            self._consumer_name, type=self._gpiod.LINE_REQ_DIR_OUT
+        )
         self.deactivate_estop()
         self.deactivate_nsync_out()
+        self.deactivate_eeprom_wp()
         sleep(1)
 
     def activate_estop(self) -> None:
@@ -76,6 +82,14 @@ class OT3GPIO:
     def deactivate_nsync_out(self) -> None:
         """Stop asserting the nsync out line."""
         self._nsync_out_line.set_value(1)
+
+    def activate_eeprom_wp(self) -> None:
+        """Assert the eeprom write protect, which will enable writes to the eeprom."""
+        self._eeprom_wp_out_line.set_value(0)
+
+    def deactivate_eeprom_wp(self) -> None:
+        """Stop asserting the eeprom wp line."""
+        self._eeprom_wp_out_line.set_value(1)
 
 
 class RemoteOT3GPIO:

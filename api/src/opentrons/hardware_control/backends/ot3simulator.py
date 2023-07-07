@@ -45,7 +45,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
 )
-
+from opentrons_hardware.drivers.eeprom import EEPROMData
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import (
@@ -196,6 +196,10 @@ class OT3Simulator:
     @initialized.setter
     def initialized(self, value: bool) -> None:
         self._initialized = value
+
+    @property
+    def eeprom_data(self) -> EEPROMData:
+        return EEPROMData()
 
     @property
     def board_revision(self) -> BoardRevision:
