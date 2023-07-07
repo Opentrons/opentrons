@@ -38,7 +38,7 @@ describe('RobotTypeTile', () => {
   })
 
   it('renders robot images and clicking on them changing the style', () => {
-    const { getByLabelText, getByText } = render(props)
+    const { getByLabelText, getByRole } = render(props)
     getByLabelText('OpentronsFlex.png')
     getByLabelText('OT2.png')
     const flex = getByLabelText('RobotTypeTile_OT-3 Standard')
@@ -49,7 +49,7 @@ describe('RobotTypeTile', () => {
     ot2.click()
     expect(props.setFieldValue).toHaveBeenCalled()
     expect(ot2).toHaveStyle(`background-color: ${COLORS.white}`)
-    getByText('Next').click()
+    getByRole('button', { name: 'Next' }).click()
     expect(props.proceed).toHaveBeenCalled()
   })
 })

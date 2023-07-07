@@ -76,10 +76,11 @@ describe('ModulesAndOtherTile', () => {
   })
 
   it('renders correct module + gripper length for flex', () => {
-    const { getByText, getAllByText } = render(props)
+    const { getByText, getAllByText, getByRole } = render(props)
     getByText('Choose additional items')
     expect(getAllByText('mock EquipmentOption')).toHaveLength(5)
-    getByText('Go back').click()
+    getByText('Go back')
+    getByRole('button', { name: 'GoBack_button' }).click()
     expect(props.goBack).toHaveBeenCalled()
     getByText('Review file details').click()
     expect(props.proceed).toHaveBeenCalled()

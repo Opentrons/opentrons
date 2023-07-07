@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import { Btn, Text, TYPOGRAPHY } from '@opentrons/components'
 import { i18n } from '../../../localization'
 
@@ -13,9 +12,7 @@ export function GoBack(props: GoBackProps): JSX.Element {
   return (
     <Btn
       aria-label="GoBack_button"
-      css={css`
-        ${TYPOGRAPHY.darkLinkH4SemiBold}
-      `}
+      css={TYPOGRAPHY.darkLinkH4SemiBold}
       onClick={onClick}
     >
       <Text>{i18n.t('application.go_back')}</Text>

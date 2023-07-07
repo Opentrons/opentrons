@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { COLORS, renderWithProviders } from '@opentrons/components'
+import { BORDERS, COLORS, renderWithProviders } from '@opentrons/components'
 import { EquipmentOption } from '../EquipmentOption'
 
 const render = (props: React.ComponentProps<typeof EquipmentOption>) => {
@@ -13,12 +13,12 @@ describe('EquipmentOption', () => {
     props = {
       onClick: jest.fn(),
       isSelected: false,
-      text: 'text',
+      text: 'mockText',
     }
   })
   it('renders the equipment option without checkbox or image', () => {
     const { getByText } = render(props)
-    getByText('text')
+    getByText('mockText')
   })
   it('renders the equipment option without check not selected and image', () => {
     props = {
@@ -27,11 +27,14 @@ describe('EquipmentOption', () => {
       image: <img src="img" />,
     }
     const { getByText, getByRole, getByLabelText } = render(props)
-    getByText('text')
-    getByRole('img', { name: '' })
+    getByText('mockText')
+    getByRole('img')
     expect(
       getByLabelText('EquipmentOption_checkbox-blank-outline')
     ).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
+    expect(getByLabelText('EquipmentOption_flex')).toHaveStyle(
+      `border: ${BORDERS.lineBorder}`
+    )
   })
   it('renders the equipment option without check selected', () => {
     props = {
@@ -40,9 +43,12 @@ describe('EquipmentOption', () => {
       showCheckbox: true,
     }
     const { getByText, getByLabelText } = render(props)
-    getByText('text')
+    getByText('mockText')
     expect(getByLabelText('EquipmentOption_checkbox-marked')).toHaveStyle(
       `color: ${COLORS.blueEnabled}`
+    )
+    expect(getByLabelText('EquipmentOption_flex')).toHaveStyle(
+      `border: ${BORDERS.activeLineBorder}`
     )
   })
 })

@@ -105,12 +105,13 @@ describe('PipetteTipsTile', () => {
     ])
   })
   it('renders default tiprack options for 50uL flex pipette and btn ctas work', () => {
-    const { getByText } = render(props)
+    const { getByText, getByRole } = render(props)
     getByText('Choose tips for Flex 1-Channel 50 μL')
     getByText('mock EquipmentOption')
-    getByText('Go back').click()
+    getByText('Go back')
+    getByRole('button', { name: 'GoBack_button' }).click()
     expect(props.goBack).toHaveBeenCalled()
-    getByText('Next').click()
+    getByRole('button', { name: 'Next' }).click()
     expect(props.proceed).toHaveBeenCalled()
   })
   it('renders the custom tip btn and section with no custom tips', () => {

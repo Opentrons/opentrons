@@ -30,6 +30,7 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
   } = props
   return (
     <Flex
+      aria-label="EquipmentOption_flex"
       alignItems={ALIGN_CENTER}
       width="21.75rem"
       padding={SPACING.spacing8}
