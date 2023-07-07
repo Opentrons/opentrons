@@ -844,7 +844,15 @@ class API(
 
         Works regardless of critical point or home status.
         """
-        smoothie_ax = (Axis.by_mount(mount).name.upper(),)
+        await self.retract_axis(Axis.by_mount(mount), margin)
+
+    @ExecutionManagerProvider.wait_for_running
+    async def retract_axis(self, axis: Axis, margin: float = 10) -> None:
+        """Pull the specified axis up to its home position.
+
+        Works regardless of critical point or home status.
+        """
+        smoothie_ax = (axis.name.upper(),)
 
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
