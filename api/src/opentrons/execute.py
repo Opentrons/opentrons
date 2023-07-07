@@ -188,11 +188,6 @@ def get_protocol_api(
             extra_labware=extra_labware,
         )
     else:
-        if bundled_data is not None:
-            raise NotImplementedError(
-                f"The bundled_data argument is not currently supported for Python protocols"
-                f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
-            )
         if bundled_labware is not None:
             raise NotImplementedError(
                 f"The bundled_labware argument is not currently supported for Python protocols"
