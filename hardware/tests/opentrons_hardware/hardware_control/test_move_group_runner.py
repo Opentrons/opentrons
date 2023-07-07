@@ -56,6 +56,7 @@ from opentrons_hardware.hardware_control.motion import (
 from opentrons_hardware.hardware_control.move_group_runner import (
     MoveGroupRunner,
     MoveScheduler,
+    ScheduledMove,
     _CompletionPacket,
 )
 
@@ -497,13 +498,13 @@ class MockSendMoveCompleter:
         move_groups: MoveGroups,
         listener: MessageListenerCallback,
         start_at_index: int = 0,
-        ack_id: int = 1,
+        ack_id: int = None,
         ignore_seq_ids: List[int] = [],
     ) -> None:
         """Constructor."""
         self._move_groups = move_groups
-        self._listener = listener
         self._start_at_index = start_at_index
+        self._listener = listener
         self._ack_id = ack_id
         self._ignore_seq_ids = ignore_seq_ids
 
@@ -511,6 +512,76 @@ class MockSendMoveCompleter:
     def groups(self) -> MoveGroups:
         """Retrieve the groups, for instance from a child class."""
         return self._move_groups
+    
+    def build_arb_id(self, message_id: int, node_id: NodeId):
+        return ArbitrationId(
+                parts=ArbitrationIdParts(
+                    message_id=message_id,
+                    originating_node_id=node_id)
+            )
+
+    def _create_move_complete_payload(
+        self,
+        move: MoveGroupSingleAxisStep,
+        group_id: int,
+        seq_id: int,
+        position_flags: MotorPositionFlagsField = MotorPositionFlagsField(3),
+    ):
+        ack_id = self._ack_id
+        if not self._ack_id and move.stop_condition in [MoveStopCondition.limit_switch, MoveStopCondition.limit_switch_backoff]:
+            ack_id = MoveAckId.stopped_by_condition
+
+        return MoveCompletedPayload(
+            group_id=UInt8Field(group_id),
+            seq_id=UInt8Field(seq_id),
+            current_position_um=UInt32Field(int(move.distance_mm * 1000)),
+            encoder_position_um=Int32Field(int(move.distance_mm * 4000)),
+            position_flags=position_flags,
+            ack_id=UInt8Field(
+                ack_id or MoveAckId.complete_without_condition),
+        )
+    
+    def _create_tip_action_response_payload(
+        self,
+        move: MoveGroupTipActionStep,
+        group_id: int,
+        seq_id: int,
+        gear_motor_id: GearMotorIdField,
+        success: int = 1,
+    ):
+        ack_id = self._ack_id
+        if not self._ack_id and move.stop_condition in [MoveStopCondition.limit_switch, MoveStopCondition.limit_switch_backoff]:
+            ack_id = MoveAckId.stopped_by_condition
+        return TipActionResponsePayload(
+            group_id=UInt8Field(group_id),
+            seq_id=UInt8Field(seq_id),
+            current_position_um=UInt32Field(
+                int(move.velocity_mm_sec * move.duration_sec * 1000)
+            ),
+            encoder_position_um=Int32Field(0),  # no encoder
+            position_flags=MotorPositionFlagsField(0),  # always 0
+            ack_id=UInt8Field(
+                ack_id or MoveAckId.complete_without_condition),
+            action=PipetteTipActionTypeField(move.action.value),
+            success=UInt8Field(success),
+            gear_motor_id=gear_motor_id,
+        )
+
+    def _create_gripper_response_payload(
+        self,
+        move: MoveGroupTipActionStep,
+        group_id: int,
+        seq_id: int,
+    ):  
+        return MoveCompletedPayload(
+                group_id=UInt8Field(group_id),
+                seq_id=UInt8Field(seq_id),
+                current_position_um=UInt32Field(int(0)),
+                encoder_position_um=Int32Field(int(0)),
+                position_flags=MotorPositionFlagsField(0),
+                ack_id=UInt8Field(self._ack_id or MoveAckId.stopped_by_condition),
+            )
+    
 
     async def mock_send(
         self,
@@ -523,76 +594,38 @@ class MockSendMoveCompleter:
             # completed for it.
             payload = EmptyPayload()
             payload.message_index = message.payload.message_index
-            arbitration_id = ArbitrationId(
-                parts=ArbitrationIdParts(originating_node_id=node_id)
+            group_id = message.payload.group_id.value
+            self._listener(md.Acknowledgement(payload=payload),
+                self.build_arb_id(md.Acknowledgement.message_id, node_id)
             )
-            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
-            for seq_id, moves in enumerate(
-                self._move_groups[message.payload.group_id.value - self._start_at_index]
-            ):
+    
+            for seq_id, moves in enumerate(self._move_groups[group_id]):
                 if seq_id in self._ignore_seq_ids:
                     continue
-                for node, move in moves.items():
-                    if isinstance(move, MoveGroupSingleAxisStep):
-                        payload = MoveCompletedPayload(
-                            group_id=message.payload.group_id,
-                            seq_id=UInt8Field(seq_id),
-                            current_position_um=UInt32Field(
-                                int(move.distance_mm * 1000)
-                            ),
-                            encoder_position_um=Int32Field(
-                                int(move.distance_mm * 4000)
-                            ),
-                            position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(self._ack_id),
-                        )
-                        arbitration_id = ArbitrationId(
-                            parts=ArbitrationIdParts(originating_node_id=node)
-                        )
+                for node, move in moves.items():                        
+                    if isinstance(move, MoveGroupTipActionStep):
+                        payload_1 = self._create_tip_action_response_payload(
+                            move, group_id, seq_id, GearMotorIdField(1))
                         self._listener(
-                            md.MoveCompleted(payload=payload), arbitration_id
-                        )
-                    elif isinstance(move, MoveGroupTipActionStep):
-                        payload_1 = TipActionResponsePayload(
-                            group_id=message.payload.group_id,
-                            seq_id=UInt8Field(seq_id),
-                            current_position_um=UInt32Field(
-                                int(move.velocity_mm_sec * move.duration_sec * 1000)
-                            ),
-                            encoder_position_um=Int32Field(
-                                int(move.velocity_mm_sec * 0)
-                            ),
-                            position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(self._ack_id),
-                            action=PipetteTipActionTypeField(move.action.value),
-                            success=UInt8Field(1),
-                            gear_motor_id=GearMotorIdField(1),
-                        )
-                        arbitration_id = ArbitrationId(
-                            parts=ArbitrationIdParts(originating_node_id=node)
-                        )
-                        self._listener(
-                            md.TipActionResponse(payload=payload_1), arbitration_id
+                            md.TipActionResponse(payload=payload_1), self.build_arb_id(
+                            md.TipActionResponse.message_id, node)
                         )
 
-                        payload_2 = TipActionResponsePayload(
-                            group_id=message.payload.group_id,
-                            seq_id=UInt8Field(seq_id),
-                            current_position_um=UInt32Field(
-                                int(move.velocity_mm_sec * move.duration_sec * 1000)
-                            ),
-                            encoder_position_um=Int32Field(
-                                int(move.velocity_mm_sec * 0)
-                            ),
-                            position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(self._ack_id),
-                            action=PipetteTipActionTypeField(move.action.value),
-                            success=UInt8Field(1),
-                            gear_motor_id=GearMotorIdField(0),
+                        payload_2 = self._create_tip_action_response_payload(
+                            move, group_id, seq_id, GearMotorIdField(0))
+                        self._listener(
+                            md.TipActionResponse(payload=payload_2), self.build_arb_id(
+                            md.TipActionResponse.message_id, node)
                         )
 
+                    else:
+                        if isinstance(move, MoveGroupSingleAxisStep):
+                            payload = self._create_move_complete_payload(move, group_id, seq_id)
+                        else:  
+                            payload = self._create_gripper_response_payload(move, group_id, seq_id)
                         self._listener(
-                            md.TipActionResponse(payload=payload_2), arbitration_id
+                            md.MoveCompleted(payload=payload), self.build_arb_id(
+                            md.MoveCompleted.message_id, node)
                         )
 
     async def mock_send_failure(
@@ -606,36 +639,17 @@ class MockSendMoveCompleter:
             # completed for it.
             payload = EmptyPayload()
             payload.message_index = message.payload.message_index
-            arbitration_id = ArbitrationId(
-                parts=ArbitrationIdParts(originating_node_id=node_id)
-            )
-            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
-            for seq_id, moves in enumerate(
-                self._move_groups[message.payload.group_id.value - self._start_at_index]
-            ):
+            group_id = message.payload.group_id.value
+            self._listener(md.Acknowledgement(payload=payload), self.build_arb_id(node_id))
+
+            for seq_id, moves in enumerate(self._move_groups[group_id]):
                 for node, move in moves.items():
-                    if isinstance(move, MoveGroupTipActionStep):
-                        payload_1 = TipActionResponsePayload(
-                            group_id=message.payload.group_id,
-                            seq_id=UInt8Field(seq_id),
-                            current_position_um=UInt32Field(
-                                int(move.velocity_mm_sec * move.duration_sec * 1000)
-                            ),
-                            encoder_position_um=Int32Field(
-                                int(move.velocity_mm_sec * 0)
-                            ),
-                            position_flags=MotorPositionFlagsField(0),
-                            ack_id=UInt8Field(self._ack_id),
-                            action=PipetteTipActionTypeField(move.action.value),
-                            success=UInt8Field(1),
-                            gear_motor_id=GearMotorIdField(1),
-                        )
-                        arbitration_id = ArbitrationId(
-                            parts=ArbitrationIdParts(originating_node_id=node)
-                        )
-                        self._listener(
-                            md.TipActionResponse(payload=payload_1), arbitration_id
-                        )
+                    assert isinstance(move, MoveGroupTipActionStep)
+                    payload_1 = self._create_tip_action_response_payload(
+                        move, group_id, seq_id, GearMotorIdField(1))
+                    self._listener(
+                        md.TipActionResponse(payload=payload_1), self.build_arb_id(node)
+                    )
 
     async def mock_ensure_send_failure(
         self,
@@ -647,73 +661,6 @@ class MockSendMoveCompleter:
         """Mock ensure_send function."""
         await self.mock_send_failure(node_id, message)
         return ErrorCode.timeout
-
-    async def mock_ensure_send(
-        self,
-        node_id: NodeId,
-        message: MessageDefinition,
-        timeout: float = 3,
-        expected_nodes: List[NodeId] = [],
-    ) -> ErrorCode:
-        """Mock ensure_send function."""
-        await self.mock_send(node_id, message)
-        return ErrorCode.ok
-
-
-class MockGripperSendMoveCompleter:
-    """Side effect mock of CanMessenger.send that immediately completes moves."""
-
-    def __init__(
-        self,
-        move_groups: MoveGroups,
-        listener: MessageListenerCallback,
-        start_at_index: int = 0,
-    ) -> None:
-        """Constructor."""
-        self._move_groups = move_groups
-        self._listener = listener
-        self._start_at_index = start_at_index
-
-    @property
-    def groups(self) -> MoveGroups:
-        """Retrieve the groups, for instance from a child class."""
-        return self._move_groups
-
-    async def mock_send(
-        self,
-        node_id: NodeId,
-        message: MessageDefinition,
-    ) -> None:
-        """Mock send function."""
-        if isinstance(message, md.ExecuteMoveGroupRequest):
-            # Iterate through each move in each sequence and send a move
-            # completed for it.
-            payload = EmptyPayload()
-            payload.message_index = message.payload.message_index
-            arbitration_id = ArbitrationId(
-                parts=ArbitrationIdParts(originating_node_id=node_id)
-            )
-            self._listener(md.Acknowledgement(payload=payload), arbitration_id)
-            for seq_id, moves in enumerate(
-                self._move_groups[message.payload.group_id.value - self._start_at_index]
-            ):
-                for node, move in moves.items():
-                    ack_id = UInt8Field(1)
-                    assert isinstance(move, MoveGroupSingleGripperStep)
-                    if move.stop_condition == MoveStopCondition.limit_switch:
-                        ack_id = UInt8Field(2)
-                    payload = MoveCompletedPayload(
-                        group_id=message.payload.group_id,
-                        seq_id=UInt8Field(seq_id),
-                        current_position_um=UInt32Field(int(0)),
-                        encoder_position_um=Int32Field(int(0)),
-                        position_flags=MotorPositionFlagsField(0),
-                        ack_id=ack_id,
-                    )
-                    arbitration_id = ArbitrationId(
-                        parts=ArbitrationIdParts(originating_node_id=node)
-                    )
-                    self._listener(md.MoveCompleted(payload=payload), arbitration_id)
 
     async def mock_ensure_send(
         self,
@@ -739,21 +686,22 @@ async def test_single_move(
     expected_nodes = []
     for mgs in move_group_single[0]:
         expected_nodes.extend([k for k in mgs.keys()])
-    mock_can_messenger.ensure_send.assert_has_calls(
-        calls=[
-            call(
-                node_id=NodeId.broadcast,
-                message=md.ExecuteMoveGroupRequest(
-                    payload=ExecuteMoveGroupRequestPayload(
-                        group_id=UInt8Field(0),
-                        cancel_trigger=UInt8Field(0),
-                        start_trigger=UInt8Field(0),
-                    )
-                ),
-                expected_nodes=expected_nodes,
-            )
-        ]
-    )
+
+        mock_can_messenger.ensure_send.assert_has_calls(
+            calls=[
+                call(
+                    node_id=NodeId.broadcast,
+                    message=md.ExecuteMoveGroupRequest(
+                        payload=ExecuteMoveGroupRequestPayload(
+                            group_id=UInt8Field(0),
+                            cancel_trigger=UInt8Field(0),
+                            start_trigger=UInt8Field(0),
+                        )
+                    ),
+                    expected_nodes=expected_nodes,
+                )
+            ]
+        )
     assert len(position) == 1
     assert position[0][1].payload.current_position_um.value == 246000
 
@@ -774,26 +722,11 @@ async def test_tip_action_move_runner_receives_two_responses(
     mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups
 ) -> None:
     """The magic call function should receive two responses for a tip action."""
-    with patch.object(MoveScheduler, "_handle_move_completed") as mock_move_complete:
-        subject = MoveScheduler(move_groups=move_group_tip_action)
-        mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
-        mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
-        mock_can_messenger.send.side_effect = mock_sender.mock_send
-        await subject.run(can_messenger=mock_can_messenger)
-
-        assert isinstance(
-            mock_move_complete.call_args_list[0][0][0], md.TipActionResponse
-        )
-        assert mock_move_complete.call_args_list[0][0][
-            0
-        ].payload.gear_motor_id == GearMotorIdField(1)
-
-        assert isinstance(
-            mock_move_complete.call_args_list[1][0][0], md.TipActionResponse
-        )
-        assert mock_move_complete.call_args_list[1][0][
-            0
-        ].payload.gear_motor_id == GearMotorIdField(0)
+    subject = MoveScheduler(move_groups=move_group_tip_action)
+    mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    completioin = await subject.run(can_messenger=mock_can_messenger)
 
 
 async def test_tip_action_move_runner_position_updated(
@@ -830,60 +763,29 @@ async def test_multi_group_move(
     mock_sender = MockSendMoveCompleter(move_group_multiple, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
+    expected_nodes_list = [
+        list(subject.get_expected_nodes(group)) for group in subject._moves
+    ]
+
     position = await subject.run(can_messenger=mock_can_messenger)
-    expected_nodes_list: List[List[NodeId]] = []
-
-    # we have to do this weird list->set->list conversion to get the same
-    # order as the one move_group_runner uses since sets hash things
-    # in a way that doesn't preserve order
-    for movegroup in move_group_multiple:
-        expected_nodes_list.append(MoveScheduler.get_expected_nodes(movegroup))
-
-    # remove duplicates from the expected nodes lists
-    for i, enl in enumerate(expected_nodes_list):
-        res = []
-        for n in enl:
-            if n not in res:
-                res.append(n)
-        expected_nodes_list[i] = res
 
     mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
-            call(
-                node_id=NodeId.broadcast,
-                message=md.ExecuteMoveGroupRequest(
-                    payload=ExecuteMoveGroupRequestPayload(
-                        group_id=UInt8Field(0),
-                        cancel_trigger=UInt8Field(0),
-                        start_trigger=UInt8Field(0),
-                    )
-                ),
-                expected_nodes=expected_nodes_list[0],
-            ),
-            call(
-                node_id=NodeId.broadcast,
-                message=md.ExecuteMoveGroupRequest(
-                    payload=ExecuteMoveGroupRequestPayload(
-                        group_id=UInt8Field(1),
-                        cancel_trigger=UInt8Field(0),
-                        start_trigger=UInt8Field(0),
-                    )
-                ),
-                expected_nodes=expected_nodes_list[1],
-            ),
-            call(
-                node_id=NodeId.broadcast,
-                message=md.ExecuteMoveGroupRequest(
-                    payload=ExecuteMoveGroupRequestPayload(
-                        group_id=UInt8Field(2),
-                        cancel_trigger=UInt8Field(0),
-                        start_trigger=UInt8Field(0),
-                    )
-                ),
-                expected_nodes=expected_nodes_list[2],
-            ),
-        ]
-    )
+                call(
+                    node_id=NodeId.broadcast,
+                    message=md.ExecuteMoveGroupRequest(
+                        payload=ExecuteMoveGroupRequestPayload(
+                            group_id=UInt8Field(group_id),
+                            start_trigger=UInt8Field(0),
+                            cancel_trigger=UInt8Field(0)
+                        )
+                    ),
+                    expected_nodes=expected_nodes_list[group_id],
+                )
+                for group_id in range(len(subject._moves))
+            ]
+        )
+
     assert len(position) == 5
     assert position[0][1].payload.current_position_um.value == 229000
     assert position[1][1].payload.current_position_um.value == 522000
@@ -897,7 +799,7 @@ async def test_multi_gripper_group_move(
 ) -> None:
     """It should start next group once the prior has completed."""
     subject = MoveScheduler(move_groups=move_group_gripper_multiple)
-    mock_sender = MockGripperSendMoveCompleter(move_group_gripper_multiple, subject)
+    mock_sender = MockSendMoveCompleter(move_group_gripper_multiple, subject)
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     position = await subject.run(can_messenger=mock_can_messenger)
@@ -1132,17 +1034,16 @@ async def test_handles_unknown_group_ids(
 
 
 async def test_groups_from_nonzero_index(
-    mock_can_messenger: AsyncMock, move_group_single: MoveGroups
+    mock_can_messenger: AsyncMock, move_group_multiple: MoveGroups
 ) -> None:
     """Callers can specify a non-zero starting group."""
-    subject = MoveScheduler(move_group_single, 1)
-    mock_sender = MockSendMoveCompleter(move_group_single, subject, 1)
+    subject = MoveScheduler(move_group_multiple, 1)
+    mock_sender = MockSendMoveCompleter(move_group_multiple, subject, 1)
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
-    expected_nodes = []
-    for mgs in move_group_single[0]:
-        expected_nodes.extend([k for k in mgs.keys()])
-    # this should not throw
+    expected_nodes_list = [
+        list(subject.get_expected_nodes(group)) for group in subject._moves
+    ]
     await subject.run(can_messenger=mock_can_messenger)
     mock_can_messenger.ensure_send.assert_has_calls(
         calls=[
@@ -1155,7 +1056,18 @@ async def test_groups_from_nonzero_index(
                         start_trigger=UInt8Field(0),
                     )
                 ),
-                expected_nodes=expected_nodes,
+                expected_nodes=expected_nodes_list[1],
+            ),
+            call(
+                node_id=NodeId.broadcast,
+                message=md.ExecuteMoveGroupRequest(
+                    payload=ExecuteMoveGroupRequestPayload(
+                        group_id=UInt8Field(2),
+                        cancel_trigger=UInt8Field(0),
+                        start_trigger=UInt8Field(0),
+                    )
+                ),
+                expected_nodes=expected_nodes_list[2],
             )
         ]
     )
@@ -1197,7 +1109,7 @@ class MockSendMoveErrorCompleter:
             )
             self._listener(md.Acknowledgement(payload=payload), arbitration_id)
             for seq_id, moves in enumerate(
-                self._move_groups[message.payload.group_id.value - self._start_at_index]
+                self._move_groups[message.payload.group_id.value]
             ):
                 for node, move in moves.items():
                     assert isinstance(move, MoveGroupSingleAxisStep)

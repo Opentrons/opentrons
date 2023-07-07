@@ -383,14 +383,13 @@ class MoveScheduler:
         self._moves: List[_MoveGroupInfo] = []
         self._durations: List[float] = []
         self._start_at_index = start_at_index
-        self._expected_tip_action_motors: List[List[List[GearMotorId]]] = []
 
         for move_group in move_groups:
-            self._moves.append(self._get_group_info(move_group))
+            group_info = self._get_group_info(move_group)
+            self._moves.append(group_info)
+            self._durations.append(sum(step.duration for step in group_info))
 
-        self._durations: List[float] = list(
-            sum(group.duration for group in move) for move in self._moves)
-
+        self._start_index = start_at_index
         log.debug(f"Move scheduler running for groups {move_groups}")
         self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
         self._event = asyncio.Event()
@@ -438,42 +437,31 @@ class MoveScheduler:
         node_id = arbitration_id.parts.originating_node_id
 
         try:
-            print(f"message: {node_id}, {seq_id}")
             matched = next(filter(lambda m: m.seq_id == seq_id and m.node_id == node_id, self._moves[group_id]), None)
-            print(matched)
-            
             log.debug(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 f", which {'is' if matched else 'isn''t'} in group"
             )
 
             if matched:
-                print(f"ack: {ack_id}")
                 if isinstance(message, TipActionResponse):
                     gear_id = GearMotorId(message.payload.gear_motor_id.value)
                     matched.tip_action_motors.remove(gear_id)
                     if not matched.is_done():
                         return
-                
-                if self._check_for_mismatched_ack(
-                    matched[0][1], ack_id
-                ):
+
+                if matched.reject_ack(ack_id):
                     self._errors.append(
                         MoveConditionNotMetError(
                             detail={
                                 "node": NodeId(node_id).name,
-                                "stop-condition": matched[0][1].name,
+                                "stop-condition": matched.name,
                             }
                         )
                     )
-
-                if matched.reject_ack(ack_id):
-                    print("rejected")
-                    print(f"ack: {ack_id}")
                     self._should_stop = True
                     self._event.set()
                     return
-                print("we have completed")
                 
                 self._completion_queue.put_nowait((arbitration_id, message))
                 self._moves[group_id].remove(matched)
@@ -528,10 +516,10 @@ class MoveScheduler:
                     raise self._errors[0]
             else:
                 # This happens when the move completed without stop condition
-                raise MoveConditionNotMetError(detail={"group-id": str(group_id)})
+                raise MoveConditionNotMetError(detail={"group-id": str(self._current_group + self._start_at_index)})
         elif self._errors:
             log.warning(
-                f"Recoverable firmware errors during {group_id}: {self._errors}"
+                f"Recoverable firmware errors during {self._current_group + self._start_at_index}: {self._errors}"
             )
 
     async def _run_one_group(self, group_id: int, can_messenger: CanMessenger) -> None:
@@ -597,7 +585,7 @@ class MoveScheduler:
             log.exception("canceling move group scheduler")
             raise PythonException(e) from e
 
-    @staticmethod
+    @classmethod
     def get_expected_nodes(move_group: MoveGroup) -> Set[NodeId]:
         """Update the active nodes of the current move group."""
         return set(m.node_id for m in move_group)
