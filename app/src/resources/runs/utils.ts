@@ -1,7 +1,7 @@
 import * as React from 'react'
+import type { CommandData } from '@opentrons/api-client'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type { CreateMaintenaceCommand, CreateRunCommand } from './hooks'
-import { CommandData } from '@opentrons/api-client'
 
 export const chainRunCommandsRecursive = (
   commands: CreateCommand[],
@@ -17,10 +17,7 @@ export const chainRunCommandsRecursive = (
     waitUntilComplete: true,
   })
     .then(response => {
-      if (
-        !continuePastCommandFailure &&
-        response.data.result.status === 'failed'
-      ) {
+      if (!continuePastCommandFailure && response.data.status === 'failed') {
         setIsLoading(false)
         return Promise.reject(
           new Error(response.data.error?.detail ?? 'command failed')
