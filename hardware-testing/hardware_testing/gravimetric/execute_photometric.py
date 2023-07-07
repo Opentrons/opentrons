@@ -226,11 +226,21 @@ def _run_trial(trial: PhotometricTrial) -> None:
 
 
 def _display_dye_information(
-    ctx: ProtocolContext,
-    dye_types_req: Dict[str, float],
-    refill: bool,
-    include_hv: bool,
+    cfg: config.PhotometricConfig, resources: TestResources
 ) -> None:
+    ui.print_header("PREPARE")
+    dye_types_req: Dict[str, float] = {dye: 0 for dye in _DYE_MAP.keys()}
+    for vol in resources.test_volumes:
+        _, volume_to_dispense, num_dispenses = _dispense_volumes(vol)
+        dye_per_vol = vol * 96 * cfg.trials
+        dye_types_req[_get_dye_type(volume_to_dispense)] += dye_per_vol
+
+    include_hv = not [
+        v
+        for v in resources.test_volumes
+        if _DYE_MAP["A"]["min"] <= v < _DYE_MAP["A"]["max"]
+    ]
+
     for dye in dye_types_req.keys():
         transfered_ul = dye_types_req[dye]
         reservoir_ul = max(_MIN_START_VOLUME_UL, transfered_ul + _MIN_END_VOLUME_UL)
@@ -240,16 +250,16 @@ def _display_dye_information(
             return round(x / 1000.0, 1)
 
         if dye_types_req[dye] > 0:
-            if refill:
+            if cfg.refill:
                 # only add the minimum required volume
                 print(f' * {_ul_to_ml(leftover_ul)} mL "{dye}" LEFTOVER in reservoir')
-                if not ctx.is_simulating():
+                if not resources.ctx.is_simulating():
                     ui.get_user_ready(
                         f'[refill] ADD {_ul_to_ml(transfered_ul)} mL more DYE type "{dye}"'
                     )
             else:
                 # add minimum required volume PLUS labware's dead-volume
-                if not ctx.is_simulating():
+                if not resources.ctx.is_simulating():
                     dye_msg = 'A" or "HV' if include_hv and dye == "A" else dye
                     ui.get_user_ready(
                         f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye_msg}"'
@@ -259,8 +269,8 @@ def _display_dye_information(
 def build_pm_report(
     cfg: config.PhotometricConfig, resources: TestResources
 ) -> report.CSVReport:
-    ui.print_header("CREATE TEST-REPORT")
     """Build a CSVReport formated for photometric tests."""
+    ui.print_header("CREATE TEST-REPORT")
     test_report = report.create_csv_test_report_photometric(
         resources.test_volumes, cfg, run_id=resources.run_id
     )
@@ -317,14 +327,6 @@ def execute_trials(
 
 def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     """Run."""
-    dye_types_req: Dict[str, float] = {dye: 0 for dye in _DYE_MAP.keys()}
-    total_photoplates = 0
-    for vol in resources.test_volumes:
-        target_volume, volume_to_dispense, num_dispenses = _dispense_volumes(vol)
-        total_photoplates += num_dispenses * cfg.trials
-        dye_per_vol = vol * 96 * cfg.trials
-        dye_types_req[_get_dye_type(volume_to_dispense)] += dye_per_vol
-
     trial_total = len(resources.test_volumes) * cfg.trials
 
     ui.print_header("LOAD LABWARE")
@@ -343,15 +345,7 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
 
     test_report = build_pm_report(cfg, resources)
 
-    ui.print_header("PREPARE")
-    can_swap_a_for_hv = not [
-        v
-        for v in resources.test_volumes
-        if _DYE_MAP["A"]["min"] <= v < _DYE_MAP["A"]["max"]
-    ]
-    _display_dye_information(
-        resources.ctx, dye_types_req, cfg.refill, can_swap_a_for_hv
-    )
+    _display_dye_information(cfg, resources)
 
     trials = build_photometric_trials(
         resources.ctx,
