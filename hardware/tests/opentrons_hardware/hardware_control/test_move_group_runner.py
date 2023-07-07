@@ -11,6 +11,7 @@ from opentrons_hardware.firmware_bindings.constants import (
     ErrorCode,
     ErrorSeverity,
     PipetteTipActionType,
+    MoveAckId,
 )
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
@@ -476,12 +477,14 @@ class MockSendMoveCompleter:
         listener: MessageListenerCallback,
         start_at_index: int = 0,
         ack_id: int = 1,
+        ignore_seq_ids: List[int] = [],
     ) -> None:
         """Constructor."""
         self._move_groups = move_groups
         self._listener = listener
         self._start_at_index = start_at_index
         self._ack_id = ack_id
+        self._ignore_seq_ids = ignore_seq_ids
 
     @property
     def groups(self) -> MoveGroups:
@@ -506,6 +509,8 @@ class MockSendMoveCompleter:
             for seq_id, moves in enumerate(
                 self._move_groups[message.payload.group_id.value - self._start_at_index]
             ):
+                if seq_id in self._ignore_seq_ids:
+                    continue
                 for node, move in moves.items():
                     if isinstance(move, MoveGroupSingleAxisStep):
                         payload = MoveCompletedPayload(
@@ -1251,3 +1256,47 @@ async def test_multiple_move_error(
     with pytest.raises(RuntimeError):
         await subject.run(can_messenger=mock_can_messenger)
     assert mock_sender.call_count == 2
+
+
+@pytest.fixture
+def move_group_with_stall() -> MoveGroups:
+    """Move group with a stop-on-stall."""
+    return [
+        # Group 0
+        [
+            {
+                NodeId.head_l: MoveGroupSingleAxisStep(
+                    distance_mm=float64(229),
+                    velocity_mm_sec=float64(235),
+                    duration_sec=float64(2142),
+                    acceleration_mm_sec_sq=float64(1000),
+                    stop_condition=MoveStopCondition.stall,
+                ),
+            },
+            {
+                NodeId.head_l: MoveGroupSingleAxisStep(
+                    distance_mm=float64(229),
+                    velocity_mm_sec=float64(235),
+                    duration_sec=float64(2142),
+                    acceleration_mm_sec_sq=float64(1000),
+                    stop_condition=MoveStopCondition.stall,
+                ),
+            },
+        ],
+    ]
+
+
+async def test_moves_removed_on_stall_detected(
+    mock_can_messenger: AsyncMock, move_group_with_stall: MoveGroups
+) -> None:
+    """Check that remaining moves for a node are removed when it stops on stall."""
+    subject = MoveScheduler(move_groups=move_group_with_stall)
+    mock_sender = MockSendMoveCompleter(
+        move_group_with_stall,
+        subject,
+        ack_id=MoveAckId.stopped_by_condition,
+        ignore_seq_ids=[1],
+    )
+    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
+    mock_can_messenger.send.side_effect = mock_sender.mock_send
+    await subject.run(can_messenger=mock_can_messenger)
