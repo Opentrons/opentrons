@@ -1,9 +1,9 @@
-"""This script is able to read/write to/from the Flex EEPROM.
+r"""This script is able to read/write to/from the Flex EEPROM.
 
 The script performs 'actions' on the robot eeprom denoted by the '--actions' arg
 These actions are as followed
 
-clear - Clears all the contents on the eeprom by writting it with 0xff.
+clear - Clears all the contents on the eeprom by writing it with 0xff.
 print - Prints all of the properties on the eeprom
 write - Writes at least one property to the eeprom
 
@@ -20,7 +20,7 @@ Examples:
         the PROPERTY_NAME and property_value
         Note that you can pass in more than one --property
 
-        python3 -m opentrons_hardware.scripts.eeprom_writer --action write \\
+        python3 -m opentrons_hardware.scripts.eeprom_writer --action write \
         --property SERIAL_NUMBER FLXA1020230602001 --property EXAMPLE value
 
 Notes:
@@ -41,7 +41,7 @@ Notes:
         By default we perform actions on the 3-0050 i2c device but this can
         be changed by passing in the --bus and --address arguments like so
 
-        python3 -m opentrons_hardware.scripts.eeprom_writer --bus 3 --address 0050 \\
+        python3 -m opentrons_hardware.scripts.eeprom_writer --bus 3 --address 0050 \
         --action print
 
     Overriding the FORMAT_VERSION:
@@ -50,7 +50,7 @@ Notes:
         in the FORMAT_VERSION property. This should not be manually set at the factory
         as this is only meant to be used for testing.
 
-        python3 -m opentrons_hardware.scripts.eeprom_writer --action write \\
+        python3 -m opentrons_hardware.scripts.eeprom_writer --action write \
         --property FORMAT_VERSION 2
 """
 
@@ -109,9 +109,9 @@ def clear_eeprom(eeprom_api: EEPROMDriver) -> Tuple[bool, str]:
     eeprom_api._gpio.activate_eeprom_wp()
 
     # write
+    data = b"\xff" * DEFAULT_READ_SIZE
     try:
         for idx in range(pages):
-            data = b"\xff" * DEFAULT_READ_SIZE
             eeprom_api._write(data, address)
             address += DEFAULT_READ_SIZE
         print("Cleared Successfully")
@@ -136,21 +136,21 @@ def write_eeprom(
     # clear the eeprom first
     success, msg = clear_eeprom(eeprom_api)
     if not success:
-        msg = f"Error writting to eeprom: Could not clear eeprom - {msg}"
+        msg = f"Error writing to eeprom: Could not clear eeprom - {msg}"
         raise RuntimeError(msg)
 
     # convert dict to set and write to eeprom
-    print(f"Writting properties {properties}")
+    print(f"Writing properties {properties}")
     eeprom_api.property_write(set(properties.items()))
 
-    print("Verifying written properties")
+    print("Verifying writen properties")
     success = True
     msg = ""
-    # verify what was written
+    # verify what was writen
     failed_to_write = []
-    written_props = [prop.id for prop in eeprom_api.property_read()]
+    writen_props = [prop.id for prop in eeprom_api.property_read()]
     for prop in properties:
-        if prop in written_props:
+        if prop in writen_props:
             print(f"Write Sucess: {prop}")
         else:
             print(f"Write Failed: {prop}")
