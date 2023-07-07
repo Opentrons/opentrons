@@ -115,7 +115,7 @@ class TestCopyFileLike:
             mode="rt",
             encoding=source_encoding,
             newline="",  # Leave newlines in source_text alone; do not translate them.
-        ) as source_file:  # TODO: Newlines.
+        ) as source_file:
             copy_file_like(source=source_file, destination=destination_path)
 
         assert destination_path.read_bytes() == source_path.read_bytes()

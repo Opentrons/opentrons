@@ -6,7 +6,7 @@ import logging
 from json import JSONDecodeError
 import pathlib
 import shutil
-from typing import BinaryIO, Dict, Sequence, Optional, TextIO, Union, TYPE_CHECKING
+from typing import BinaryIO, Dict, Optional, Sequence, TextIO, Union, TYPE_CHECKING
 
 from jsonschema import ValidationError  # type: ignore
 
@@ -96,8 +96,9 @@ def copy_file_like(source: Union[BinaryIO, TextIO], destination: pathlib.Path) -
     This is a hack to support this use case:
 
     1. A user has a Python source file with an unusual encoding.
+       They have a matching encoding declaration at the top of the file.
        (https://docs.python.org/3.7/reference/lexical_analysis.html#encoding-declarations)
-    2. They `open()` that file in text mode and send the text stream to
+    2. They `open()` that file in text mode, with the correct encoding, and send the text stream to
        `opentrons.simulate.simulate()` or `opentrons.execute.execute()`.
     3. Because of temporary implementation cruft (https://opentrons.atlassian.net/browse/RSS-281),
        those functions sometimes need to save the stream to the filesystem, reopen it in
@@ -142,5 +143,5 @@ def copy_file_like(source: Union[BinaryIO, TextIO], destination: pathlib.Path) -
     with open(
         destination, mode=destination_mode, encoding=destination_encoding
     ) as destination_file:
-        # Use copyfileobj to limit memory usage.
+        # Use copyfileobj() to limit memory usage.
         shutil.copyfileobj(fsrc=source, fdst=destination_file)
