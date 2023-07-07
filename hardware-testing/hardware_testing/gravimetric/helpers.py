@@ -7,6 +7,8 @@ from . import config
 from .liquid_class.defaults import get_liquid_class, get_test_volumes
 from .increments import get_volume_increments
 from inspect import getsource
+from .trial import TestResources
+from hardware_testing.data import ui
 
 from opentrons import protocol_api
 from opentrons.protocols.api_support.deck_type import (
@@ -360,3 +362,26 @@ def _load_tipracks(
     ]
     _apply_labware_offsets(cfg, tipracks)
     return tipracks
+
+
+def _finish_test(
+    cfg: Union[config.GravimetricConfig, config.PhotometricConfig],
+    resources: TestResources,
+    return_tip: bool,
+) -> None:
+    ui.print_title("CHANGE PIPETTES")
+    if resources.pipette.has_tip:
+        if resources.pipette.current_volume > 0:
+            print("dispensing liquid to trash")
+            trash = resources.pipette.trash_container.wells()[0]
+            # FIXME: this should be a blow_out() at max volume,
+            #        but that is not available through PyAPI yet
+            #        so instead just dispensing.
+            resources.pipette.dispense(resources.pipette.current_volume, trash.top())
+            resources.pipette.aspirate(10)  # to pull any droplets back up
+        print("dropping tip")
+        _drop_tip(resources.pipette, return_tip)
+    print("moving to attach position")
+    resources.pipette.move_to(
+        resources.ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150))
+    )

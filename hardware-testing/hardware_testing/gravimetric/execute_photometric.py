@@ -19,6 +19,7 @@ from .helpers import (
     _apply_labware_offsets,
     _pick_up_tip,
     _drop_tip,
+    _finish_test,
 )
 from .trial import (
     PhotometricTrial,
@@ -295,7 +296,6 @@ def execute_trials(
     trials: Dict[float, List[PhotometricTrial]],
 ) -> None:
     """Execute a batch of pre-constructed trials."""
-
     print("homing...")
     resources.ctx.home()
     resources.pipette.home_plunger()
@@ -364,21 +364,4 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     try:
         execute_trials(cfg, resources, tips, trials)
     finally:
-        ui.print_title("CHANGE PIPETTES")
-        if resources.pipette.has_tip:
-            if resources.pipette.current_volume > 0:
-                print("dispensing liquid to trash")
-                trash = resources.pipette.trash_container.wells()[0]
-                # FIXME: this should be a blow_out() at max volume,
-                #        but that is not available through PyAPI yet
-                #        so instead just dispensing.
-                resources.pipette.dispense(
-                    resources.pipette.current_volume, trash.top()
-                )
-                resources.pipette.aspirate(10)  # to pull any droplets back up
-            print("dropping tip")
-            _drop_tip(resources.pipette, cfg.return_tip)
-        print("moving to attach position")
-        resources.pipette.move_to(
-            resources.ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150))
-        )
+        _finish_test(cfg, resources, cfg.return_tip)
