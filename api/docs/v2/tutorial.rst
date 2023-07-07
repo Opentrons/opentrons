@@ -35,8 +35,6 @@ Before running a protocol, you’ll want to have the right kind of hardware and 
 
 The Flex and OT-2 use similar labware for serial dilution. The tutorial code will use the labware listed in the table below, but as long as you have labware of each type you can modify the code to run with your labware.
 
-.. suggest turning bullet list into table
-
 .. list-table::
    :widths: 20 40 50
    :header-rows: 1
@@ -56,8 +54,6 @@ The Flex and OT-2 use similar labware for serial dilution. The tutorial code wil
    * - OT-2 tip rack
      - `Opentrons 96 Tip Rack <https://labware.opentrons.com/?category=tipRack&manufacturer=Opentrons>`_
      - ``opentrons_96_tiprack_300ul``
-
-.. as water isn't really labware, let's try this as a sentence.
 
 For the liquids, you can use plain water as the diluent and water dyed with food coloring as the solution.
 
@@ -102,32 +98,26 @@ You can include any other information you like in the metadata dictionary. The f
         'author': 'New API User'
         }
 
-.. note::
-    If you have a Flex, or an OT-2 with API v2.15 (or higher), you set the API version in the ``requirements`` code block, not the ``metadata`` code block. See the Requirements section below.
+Note, if you have a Flex, or are using an OT-2 with API v2.15 (or higher), we recommend adding a ``requirements`` section to your code. See the Requirements section below.
 
 Requirements
 ^^^^^^^^^^^^
-.. Max suggests putting requirements before the metadata, but also notes order doesn't matter
 
-.. Requirements is still undefined/in progress
-
-The ``requirements`` code block appears after the ``metadata`` code block in a Python protocol. It defines the robot model (e.g. ``Flex`` or ``OT-2``) and the API version you're using.
-
-Flex users must specify the API version in the ``requirements`` instead of in the ``metadata``. The minimum required API version for Flex is v2.15. For example:
+The ``requirements`` code block can appear before *or* after the ``metadata`` code block in a Python protocol. It uses the following syntax and accepts two arguments.
 
 .. code-block:: python
-    :substitutions:
+    
+    requirements = {"robotType": <"Flex" or "OT-2">, "apiLevel": <"x.xx">}
 
-    # Flex
+You may or may not need a requirements block in your protocol. Usage depends on your robot model and/or API version.
+
+- **Flex use case:** The ``requirements`` block is always required. And, the API version does not go in the ``metadata`` section. The API version belongs in the ``requirements``. For example::
+
     requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
-OT-2 users working with API v2.15 (or higher) also need to specify the API version in the ``requirements`` instead of in the ``metadata``. For example:
-
-.. code-block:: python
-    :substitutions:
-
-    # OT-2
-    requirements = {"robotType": "OT-2", "apiLevel": "2.15"}
+- **OT-2 use case:** The ``requirements`` block is optional, but including it is a recommended best practice, particularly if you’re using API version 2.15 or greater. If you do use it, remember to remove the API version from the ``metadata``. For example::
+    
+    requirements = {"robotType": "OT-2", "apiLevel": "2.xx"} 
 
 With the metadata and requirements defined, you can move on to creating the ``run()`` function for your protocol.
 
