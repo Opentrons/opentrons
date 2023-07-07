@@ -13,6 +13,7 @@ import {
 } from '../utils'
 import {
   getRobotStateWithTipStandard,
+  getInitialRobotStateWithOffDeckLabwareStandard,
   makeContext,
   getSuccessResult,
   getErrorResult,
@@ -139,6 +140,24 @@ describe('moveToWell', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'LABWARE_DOES_NOT_EXIST',
+    })
+  })
+  it('should return an error when dispensing from labware off deck', () => {
+    const initialRobotState = getInitialRobotStateWithOffDeckLabwareStandard(
+      invariantContext
+    )
+    const result = moveToWell(
+      {
+        pipette: DEFAULT_PIPETTE,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      },
+      invariantContext,
+      initialRobotState
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'LABWARE_OFF_DECK',
     })
   })
   it('should return an error when moving to well in a thermocycler with pipette collision', () => {

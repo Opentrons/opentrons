@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { FormikProps } from 'formik'
 import {
@@ -22,13 +21,15 @@ import {
   JUSTIFY_CENTER,
   WRAP,
   Btn,
+  JUSTIFY_END,
 } from '@opentrons/components'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { i18n } from '../../../localization'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { getTiprackOptions } from '../utils'
-import { GoBackLink } from './GoBackLink'
+import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
@@ -60,7 +61,6 @@ interface PipetteTipsTileProps extends WizardTileProps {
   mount: Mount
 }
 export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
-  const { i18n, t } = useTranslation()
   const { proceed, goBack, mount, values } = props
 
   const firstPipetteName = values.pipettesByMount[mount].pipetteName
@@ -91,9 +91,9 @@ export function PipetteTipsTile(props: PipetteTipsTileProps): JSX.Element {
           width="100%"
           paddingTop={SPACING.spacing8}
         >
-          <GoBackLink onClick={() => goBack()} />
+          <GoBack onClick={() => goBack()} />
           <PrimaryButton onClick={() => proceed()}>
-            {i18n.format(t('shared.next'), 'capitalize')}
+            {i18n.t('application.next')}
           </PrimaryButton>
         </Flex>
       </Flex>
@@ -146,7 +146,6 @@ interface PipetteTipsFieldProps extends FormikProps<FormState> {
 
 function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   const { mount, values, setFieldValue } = props
-  const { t } = useTranslation()
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch()
   const [showCustomTipracks, setShowCustomTipracks] = React.useState<boolean>(
@@ -204,8 +203,11 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
           />
         ))}
       </Flex>
-      <Flex justifyContent="end" alignItems="center">
-        <Btn onClick={() => setShowCustomTipracks(!showCustomTipracks)}>
+      <Flex justifyContent={JUSTIFY_END} alignItems={ALIGN_CENTER}>
+        <Btn
+          aria-label="PipetteTipsTile_customTipButton"
+          onClick={() => setShowCustomTipracks(!showCustomTipracks)}
+        >
           <Icon
             css={ACCORDION_STYLE}
             size="1.5rem"
@@ -220,7 +222,9 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
-            <Text as="h4">{t('modal.create_file_wizard.custom_tiprack')}</Text>
+            <Text as="h4">
+              {i18n.t('modal.create_file_wizard.custom_tiprack')}
+            </Text>
 
             <OutlineButton Component="label" css={INPUT_STYLE}>
               <Flex
@@ -229,7 +233,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
                 gridGap={SPACING.spacing2}
               >
                 <Icon name="plus" size="1rem" />
-                {t('modal.create_file_wizard.upload')}
+                {i18n.t('modal.create_file_wizard.upload')}
               </Flex>
               <input
                 type="file"
@@ -274,7 +278,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
                 color={COLORS.darkBlack70}
               >
-                {t('modal.create_file_wizard.upload_tiprack')}
+                {i18n.t('modal.create_file_wizard.upload_tiprack')}
               </Text>
             </Flex>
           )}

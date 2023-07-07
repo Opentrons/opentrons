@@ -6,7 +6,7 @@ import {
 } from '@opentrons/shared-data'
 import { LabwareDefByDefURI } from '../../labware-defs'
 
-interface TiprackOption {
+export interface TiprackOption {
   name: string
   value: string
 }
