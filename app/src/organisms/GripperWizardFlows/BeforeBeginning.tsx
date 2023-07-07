@@ -19,7 +19,7 @@ import type {
 } from '@opentrons/api-client'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
-import { EXTENSION } from '@opentrons/shared-data'
+import { LEFT } from '@opentrons/shared-data'
 import type { CreateCommand } from '@opentrons/shared-data'
 
 interface BeforeBeginningInfo {
@@ -81,7 +81,7 @@ export const BeforeBeginning = (
       // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount: EXTENSION,
+        mount: LEFT,
       },
     },
   ]

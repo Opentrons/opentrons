@@ -5,6 +5,8 @@ import {
   COLORS,
   PrimaryButton,
   TEXT_TRANSFORM_CAPITALIZE,
+  JUSTIFY_FLEX_END,
+  Flex,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -66,12 +68,13 @@ export const Success = (
       isSuccess
     >
       {isOnDevice ? (
-        <SmallButton
-          textTransform={TEXT_TRANSFORM_CAPITALIZE}
-          buttonText={buttonText}
-          buttonType="primary"
-          onClick={proceed}
-        />
+        <Flex justifyContent={JUSTIFY_FLEX_END} width="100%">
+          <SmallButton
+            textTransform={TEXT_TRANSFORM_CAPITALIZE}
+            buttonText={buttonText}
+            onClick={proceed}
+          />
+        </Flex>
       ) : (
         <PrimaryButton onClick={proceed}>{buttonText}</PrimaryButton>
       )}

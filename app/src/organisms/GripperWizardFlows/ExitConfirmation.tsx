@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
+import i18n from 'i18next'
 import {
+  Flex,
   COLORS,
   SPACING,
-  TEXT_TRANSFORM_CAPITALIZE,
   AlertPrimaryButton,
   SecondaryButton,
+  JUSTIFY_FLEX_END,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -49,20 +51,18 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
       isSuccess={false}
     >
       {isOnDevice ? (
-        <>
+        <Flex justifyContent={JUSTIFY_FLEX_END} gridGap={SPACING.spacing4}>
           <SmallButton
             buttonType="alert"
-            buttonText={t('shared:exit')}
+            buttonText={i18n.format(t('shred:exit'), 'capitalize')}
             onClick={handleExit}
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
             marginRight={SPACING.spacing4}
           />
           <SmallButton
-            buttonType="primary"
             buttonText={t('shared:go_back')}
             onClick={handleGoBack}
           />
-        </>
+        </Flex>
       ) : (
         <>
           <SecondaryButton
@@ -71,11 +71,8 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
           >
             {t('shared:go_back')}
           </SecondaryButton>
-          <AlertPrimaryButton
-            textTransform={TEXT_TRANSFORM_CAPITALIZE}
-            onClick={handleExit}
-          >
-            {t('shared:exit')}
+          <AlertPrimaryButton onClick={handleExit}>
+            {i18n.format(t('shred:exit'), 'capitalize')}
           </AlertPrimaryButton>
         </>
       )}

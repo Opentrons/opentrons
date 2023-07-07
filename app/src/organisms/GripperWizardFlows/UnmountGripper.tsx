@@ -107,11 +107,7 @@ export const UnmountGripper = (
           </StyledText>
         </Btn>
         {isOnDevice ? (
-          <SmallButton
-            buttonText={t('try_again')}
-            buttonType="primary"
-            onClick={handleContinue}
-          />
+          <SmallButton buttonText={t('try_again')} onClick={handleContinue} />
         ) : (
           <PrimaryButton onClick={handleContinue}>
             {t('try_again')}

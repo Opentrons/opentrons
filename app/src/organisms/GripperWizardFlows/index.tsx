@@ -262,8 +262,8 @@ export const GripperWizard = (
   const wizardHeader = (
     <WizardHeader
       title={titleByFlowType[flowType]}
-      currentStep={currentStepIndex}
-      totalSteps={totalStepCount}
+      currentStep={currentStepIndex + 1}
+      totalSteps={totalStepCount + 1}
       onExit={handleExit}
     />
   )

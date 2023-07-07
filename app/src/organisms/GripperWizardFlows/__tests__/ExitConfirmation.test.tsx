@@ -34,7 +34,7 @@ describe('ExitConfirmation', () => {
 
   it('clicking confirm exit calls exit', () => {
     const { getByRole } = render()[0]
-    getByRole('button', { name: 'exit' }).click()
+    getByRole('button', { name: 'Exit' }).click()
     expect(mockExit).toHaveBeenCalled()
   })
 
