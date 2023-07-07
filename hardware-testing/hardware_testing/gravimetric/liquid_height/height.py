@@ -208,9 +208,11 @@ def _get_actual_volume_change_in_well(
 class LiquidTracker:
     """Liquid Tracker."""
 
-    def __init__(self) -> None:
+    def __init__(self, ctx: Optional[ProtocolContext] = None) -> None:
         """Liquid Tracker."""
         self._items: dict = dict({})
+        if ctx is not None:
+            initialize_liquid_from_deck(ctx, self)
 
     def reset(self) -> None:
         """Reset."""

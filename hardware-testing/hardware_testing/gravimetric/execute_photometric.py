@@ -30,7 +30,7 @@ from .liquid_class.pipetting import (
     dispense_with_liquid_class,
     PipettingCallbacks,
 )
-from .liquid_height.height import LiquidTracker, initialize_liquid_from_deck
+from .liquid_height.height import LiquidTracker
 
 from .tips import get_tips
 
@@ -331,8 +331,7 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
 
     ui.print_header("LOAD LABWARE")
     photoplate, reservoir = _load_labware(resources.ctx, cfg)
-    liquid_tracker = LiquidTracker()
-    initialize_liquid_from_deck(resources.ctx, liquid_tracker)
+    liquid_tracker = LiquidTracker(resources.ctx)
 
     tips = get_tips(resources.ctx, resources.pipette)
     total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips]) * len(
