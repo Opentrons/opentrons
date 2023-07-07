@@ -385,7 +385,7 @@ describe('PickUpTip', () => {
         {
           commandType: 'retractAxis' as const,
           params: {
-            axis: ['leftZ'],
+            axis: 'leftZ',
           },
         },
         {
@@ -400,7 +400,7 @@ describe('PickUpTip', () => {
         {
           commandType: 'retractAxis' as const,
           params: {
-            axis: ['leftZ'],
+            axis: 'leftZ',
           },
         },
         {

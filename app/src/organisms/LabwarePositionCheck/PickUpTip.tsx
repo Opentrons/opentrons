@@ -211,7 +211,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         {
           commandType: 'retractAxis' as const,
           params: {
-            axis: [pipetteZMotorAxis],
+            axis: pipetteZMotorAxis,
           },
         },
         {
@@ -226,7 +226,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
         {
           commandType: 'retractAxis' as const,
           params: {
-            axis: [pipetteZMotorAxis],
+            axis: pipetteZMotorAxis,
           },
         },
         {

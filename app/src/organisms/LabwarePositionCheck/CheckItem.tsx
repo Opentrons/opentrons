@@ -213,7 +213,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       {
         commandType: 'retractAxis' as const,
         params: {
-          axis: [pipetteZMotorAxis],
+          axis: pipetteZMotorAxis,
         },
       },
       {
@@ -228,7 +228,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       {
         commandType: 'retractAxis' as const,
         params: {
-          axis: [pipetteZMotorAxis],
+          axis: pipetteZMotorAxis,
         },
       },
       {

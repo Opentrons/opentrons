@@ -214,7 +214,7 @@ describe('CheckItem', () => {
           {
             commandType: 'retractAxis' as const,
             params: {
-              axis: ['leftZ'],
+              axis: 'leftZ',
             },
           },
           {
@@ -229,7 +229,7 @@ describe('CheckItem', () => {
           {
             commandType: 'retractAxis' as const,
             params: {
-              axis: ['leftZ'],
+              axis: 'leftZ',
             },
           },
           {
@@ -279,7 +279,7 @@ describe('CheckItem', () => {
         {
           commandType: 'retractAxis' as const,
           params: {
-            axis: ['leftZ'],
+            axis: 'leftZ',
           },
         },
         {
@@ -294,7 +294,7 @@ describe('CheckItem', () => {
         {
           commandType: 'retractAxis' as const,
           params: {
-            axis: ['leftZ'],
+            axis: 'leftZ',
           },
         },
         {
