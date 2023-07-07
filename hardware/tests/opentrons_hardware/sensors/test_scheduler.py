@@ -3,7 +3,7 @@
 import pytest
 import mock
 import asyncio
-from typing import Iterator
+from typing import Iterator, Tuple
 from opentrons_hardware.sensors import scheduler, sensor_types
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
@@ -134,11 +134,13 @@ async def test_capture_error_max_threshold(
 
     # an error message is received
     async with subject.monitor_exceed_max_threshold(
-        sensor_types.SensorInformation(
-            sensor_type=SensorType.pressure,
-            sensor_id=SensorId.S0,
-            node_id=NodeId.pipette_left,
-        ),
+        [
+            sensor_types.SensorInformation(
+                sensor_type=SensorType.pressure,
+                sensor_id=SensorId.S0,
+                node_id=NodeId.pipette_left,
+            )
+        ],
         mock_messenger,
     ) as output_queue:
         mock_messenger.ensure_send.assert_called_with(
@@ -168,24 +170,27 @@ async def test_capture_error_max_threshold(
         expected_nodes=[NodeId.pipette_left],
     )
 
-    def _drain() -> Iterator[ErrorCode]:
+    def _drain() -> Iterator[Tuple[NodeId, ErrorCode]]:
         while True:
             try:
                 yield output_queue.get_nowait()
             except asyncio.QueueEmpty:
                 break
 
-    for value in _drain():
+    for _id, value in _drain():
+        assert _id == NodeId.pipette_left
         assert value == ErrorCode.over_pressure
 
     mock_messenger.reset_mock()
     # no error message is received, the queue should be empty
     async with subject.monitor_exceed_max_threshold(
-        sensor_types.SensorInformation(
-            sensor_type=SensorType.pressure,
-            sensor_id=SensorId.S0,
-            node_id=NodeId.pipette_left,
-        ),
+        [
+            sensor_types.SensorInformation(
+                sensor_type=SensorType.pressure,
+                sensor_id=SensorId.S0,
+                node_id=NodeId.pipette_left,
+            )
+        ],
         mock_messenger,
     ) as output_queue:
         mock_messenger.ensure_send.assert_called_with(

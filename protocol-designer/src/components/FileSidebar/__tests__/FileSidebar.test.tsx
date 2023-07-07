@@ -16,7 +16,7 @@ import {
 } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { useBlockingHint } from '../../Hints/useBlockingHint'
-import { FileSidebar, v6WarningContent } from '../FileSidebar'
+import { FileSidebar, v7WarningContent } from '../FileSidebar'
 
 jest.mock('../../Hints/useBlockingHint')
 jest.mock('../../../file-data/selectors')
@@ -233,8 +233,8 @@ describe('FileSidebar', () => {
     // Before save button is clicked, enabled should be false
     expect(mockUseBlockingHint).toHaveBeenNthCalledWith(1, {
       enabled: false,
-      hintKey: 'export_v6_protocol_6_20',
-      content: v6WarningContent,
+      hintKey: 'export_v7_protocol_7_0',
+      content: v7WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
     })
@@ -245,8 +245,8 @@ describe('FileSidebar', () => {
     // After save button is clicked, enabled should be true
     expect(mockUseBlockingHint).toHaveBeenLastCalledWith({
       enabled: true,
-      hintKey: 'export_v6_protocol_6_20',
-      content: v6WarningContent,
+      hintKey: 'export_v7_protocol_7_0',
+      content: v7WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
     })

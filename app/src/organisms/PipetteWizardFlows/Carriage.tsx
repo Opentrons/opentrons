@@ -96,7 +96,6 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
           <SmallButton
             onClick={handleCheckZAxis}
             buttonText={capitalize(t('shared:continue'))}
-            buttonType="primary"
           />
         ) : (
           <PrimaryButton onClick={handleCheckZAxis}>

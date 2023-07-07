@@ -67,7 +67,6 @@ export function RobotSystemVersionModal({
             flex="1"
             onClick={() => history.push('/robot-settings/update-robot')}
             buttonText={t('shared:update')}
-            buttonType="primary"
           />
         </Flex>
       </Flex>

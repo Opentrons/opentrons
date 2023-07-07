@@ -6,6 +6,7 @@ import {
   TYPOGRAPHY,
   Flex,
   ALIGN_CENTER,
+  DIRECTION_COLUMN,
 } from '@opentrons/components'
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
 import { MiniCard } from './'
@@ -19,13 +20,17 @@ export default {
   component: MiniCard,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof MiniCard>> = args => (
-  <Slideout title="MiniCard" onCloseClick={() => {}} isExpanded={true}>
-    <MiniCard {...args} />
-    <MiniCard {...args} isSelected={false} />
-    <MiniCard {...args} isSelected={false} />
-  </Slideout>
-)
+const Template: Story<React.ComponentProps<typeof MiniCard>> = args => {
+  return (
+    <Slideout title="MiniCard" onCloseClick={() => {}} isExpanded={true}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+        <MiniCard {...args} />
+        <MiniCard {...args} isSelected={false} />
+        <MiniCard {...args} isSelected={false} />
+      </Flex>
+    </Slideout>
+  )
+}
 
 const Children = (
   <Flex alignItems={ALIGN_CENTER}>

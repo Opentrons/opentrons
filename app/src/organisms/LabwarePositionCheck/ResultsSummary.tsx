@@ -28,6 +28,7 @@ import {
   MODULE_ICON_NAME_BY_TYPE,
   BORDERS,
   ALIGN_FLEX_END,
+  LocationIcon,
 } from '@opentrons/components'
 import { getCurrentOffsetForLabwareInLocation } from '../Devices/ProtocolRun/utils/getCurrentOffsetForLabwareInLocation'
 import { getLabwareDefinitionsFromCommands } from './utils/labware'
@@ -44,7 +45,6 @@ import type {
 } from '@opentrons/api-client'
 import { getDisplayLocation } from './utils/getDisplayLocation'
 import { LabwareOffsetTabs } from '../LabwareOffsetTabs'
-import { LocationIcon } from '../../molecules/LocationIcon'
 import { SmallButton } from '../../atoms/buttons'
 
 const LPC_HELP_LINK_URL =
@@ -168,7 +168,6 @@ export const ResultsSummary = (
           alignSelf={ALIGN_FLEX_END}
           onClick={() => handleApplyOffsets(offsetsToApply)}
           buttonText={i18n.format(t('apply_offsets'), 'capitalize')}
-          buttonType="primary"
         />
       ) : (
         <Flex
