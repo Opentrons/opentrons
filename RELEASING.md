@@ -72,8 +72,9 @@ The app and API projects are currently versioned together to ensure interoperabi
    The tag push will kick off release builds and deploy the results to customers. It will also create a release page where those builds and automatically generated in-depth changelogs will be posted.
 
 9. Ensure all deploy jobs succeeded:
-   * The Opentrons App should be prompting people to update to the new version.
-   * https://pypi.org/project/opentrons/ should be showing the new version.
+
+   - The Opentrons App should be prompting people to update to the new version.
+   - https://pypi.org/project/opentrons/ should be showing the new version.
 
 10. Release the Python Protocol API docs for this version (see below under Releasing Web Projects).
 
@@ -160,8 +161,9 @@ The app and API projects are currently versioned together to ensure interoperabi
    Pushing the tag will create release builds and a github release page with the in-depth changelogs.
 
 10. Ensure all deploy jobs succeeded:
-    * The Opentrons App should be prompting people to update to the new version.
-    * https://pypi.org/project/opentrons/ should be showing the new version.
+
+    - The Opentrons App should be prompting people to update to the new version.
+    - https://pypi.org/project/opentrons/ should be showing the new version.
 
 11. Update the download links on https://opentrons.com/ot-app/. That page is defined in an Opentrons private repository.
 
