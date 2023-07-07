@@ -261,6 +261,30 @@ def _get_channel_divider(cfg: config.GravimetricConfig) -> float:
         return float(cfg.pipette_channels)
 
 
+def build_gm_report(
+    cfg: config.GravimetricConfig,
+    resources: TestResources,
+    recorder: GravimetricRecorder,
+) -> report.CSVReport:
+    """Build a CSVReport formated for gravimetric tests."""
+    test_report = report.create_csv_test_report(
+        resources.test_volumes, cfg, run_id=resources.run_id
+    )
+    test_report.set_tag(resources.pipette_tag)
+    test_report.set_operator(resources.operator_name)
+    test_report.set_version(resources.git_description)
+    report.store_serial_numbers(
+        test_report,
+        robot=resources.robot_serial,
+        pipette=resources.pipette_tag,
+        tips=resources.tip_batch,
+        scale=recorder.serial_number,
+        environment="None",
+        liquid="None",
+    )
+    return test_report
+
+
 def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     """Run."""
     ui.print_header("LOAD LABWARE")
@@ -309,21 +333,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     print(f'scale is recording to "{recorder.file_name}"')
 
     ui.print_header("CREATE TEST-REPORT")
-    test_report = report.create_csv_test_report(
-        resources.test_volumes, cfg, run_id=resources.run_id
-    )
-    test_report.set_tag(resources.pipette_tag)
-    test_report.set_operator(resources.operator_name)
-    test_report.set_version(resources.git_description)
-    report.store_serial_numbers(
-        test_report,
-        robot=resources.robot_serial,
-        pipette=resources.pipette_tag,
-        tips=resources.tip_batch,
-        scale=recorder.serial_number,
-        environment="None",
-        liquid="None",
-    )
+    test_report = build_gm_report(cfg, resources, recorder)
 
     # need to be as far away from the scale as possible
     # to avoid static from distorting the measurement
