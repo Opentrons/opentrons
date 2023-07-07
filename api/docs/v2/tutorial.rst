@@ -22,30 +22,32 @@ Before You Begin
 
 You're going to write some Python code, but you don't need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses `indentation <https://docs.python.org/3/reference/lexical_analysis.html#indentation>`_ to group blocks of code, dot notation for `calling methods <https://docs.python.org/3/tutorial/classes.html#method-objects>`_, and the format of `lists <https://docs.python.org/3/tutorial/introduction.html#lists>`_ and `dictionaries <https://docs.python.org/3/tutorial/datastructures.html#dictionaries>`_. You’ll also be using `common control structures <https://docs.python.org/3/tutorial/controlflow.html#if-statements>`_ like ``if`` statements and ``for`` loops. 
 
-To run your code, make sure that you've installed `Python 3 <https://wiki.python.org/moin/BeginnersGuide/Download>`_ and the `pip package installer <https://pip.pypa.io/en/stable/getting-started/>`_. You should write your code in your favorite plaintext editor or IDE and save it in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
+To run your code, make sure that you've installed `Python 3 <https://wiki.python.org/moin/BeginnersGuide/Download>`_ and the `pip package installer <https://pip.pypa.io/en/stable/getting-started/>`_. You should write your code in your favorite plaintext editor or development environment and save it in a file with a ``.py`` extension, like ``dilution-tutorial.py``.
 
 Hardware and Labware
 ^^^^^^^^^^^^^^^^^^^^
 
 Before running a protocol, you’ll want to have the right kind of hardware and labware ready for your Flex or OT-2.
 
-- **Flex users** should review Chapter 2: Installation and Relocation in the `instruction manual <https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20Manual.pdf>`_. Specifically, see the pipette information in the Instrument Installation and Calibration section. You can use either a 1-channel or 8-channel pipette for this tutorial. Most Flex code examples will use a `Flex 1-Channel 1000 μL pipette <https://shop.opentrons.com/opentrons-flex-1-channel-pipette/>`_.
+- **Flex users** should review Chapter 2: Installation and Relocation in the `instruction manual <https://insights.opentrons.com/hubfs/Products/Flex/Opentrons%20Flex%20Manual.pdf>`_. Specifically, see the pipette information in the "Instrument Installation and Calibration" section. You can use either a 1-channel or 8-channel pipette for this tutorial. Most Flex code examples will use a `Flex 1-Channel 1000 μL pipette <https://shop.opentrons.com/opentrons-flex-1-channel-pipette/>`_.
 
 - **OT-2 users** should review the robot setup and pipette information on the `Get Started page <https://support.opentrons.com/s/ot2-get-started>`_. Specifically, see `attaching pipettes <https://support.opentrons.com/s/article/Get-started-Attach-pipettes>`_ and `initial calibration <https://support.opentrons.com/s/article/Get-started-Calibrate-the-deck>`_. You can use either a single-channel or 8-channel pipette for this tutorial. Most OT-2 code examples will use a `P300 Single-Channel GEN2 <https://shop.opentrons.com/single-channel-electronic-pipette-p20/>`_ pipette.
 
 The Flex and OT-2 use similar labware for serial dilution. The tutorial code will use the labware listed in the table below, but as long as you have labware of each type you can modify the code to run with your labware.
+
+.. suggest turning bullet list into table
 
 .. list-table::
    :widths: 20 40 50
    :header-rows: 1
 
    * - Labware type
-     - Name
+     - Labware name
      - API load name
    * - Reservoir
      - `NEST 12 Well Reservoir 15 mL <https://labware.opentrons.com/nest_12_reservoir_15ml>`_
      - ``nest_12_reservoir_15ml``
-   * - Well late
+   * - Well plate
      - `NEST 96 Well Plate 200 µL Flat <https://labware.opentrons.com/nest_96_wellplate_200ul_flat>`_
      - ``nest_96_wellplate_200ul_flat``
    * - Flex tiprack
@@ -54,6 +56,8 @@ The Flex and OT-2 use similar labware for serial dilution. The tutorial code wil
    * - OT-2 tiprack
      - `Opentrons 96 Tip Rack <https://labware.opentrons.com/?category=tipRack&manufacturer=Opentrons>`_
      - ``opentrons_96_tiprack_300ul``
+
+.. as water isn't really labware, let's try this as a sentence.
 
 For the liquids, you can use plain water as the diluent and water dyed with food coloring as the solution.
 
@@ -103,7 +107,7 @@ You can include any other information you like in the metadata dictionary. The f
 
 Requirements
 ^^^^^^^^^^^^
-.. Max suggests putting this before the metadata, but notes order doesn't matter
+.. Max suggests putting requirements before the metadata, but also notes order doesn't matter
 
 .. Requirements is still undefined/in progress
 
@@ -229,8 +233,6 @@ Let’s start with the diluent. This phase takes a larger quantity of liquid and
 
 Breaking down these single lines of code shows the power of :ref:`complex commands <v2-complex-commands>`. The first argument is the amount to transfer to each destination, 100 µL. The second argument is the source, column 1 of the reservoir (which is still specified with grid-style coordinates as ``A1`` — a reservoir only has an A row). The third argument is the destination. Here, calling the :py:meth:`.wells` method of ``plate`` returns a list of *every well*, and the command will apply to all of them.
 
-.. Possible short text to explain the animation uses OT-2 code but applies to Flex as well?
-
 .. image:: ../img/tutorial/diluent.gif
     :name: Transfer of diluent to plate
     :align: center
@@ -323,8 +325,13 @@ If you get any errors in simulation, or you don't get the outcome you expected w
 
 In Simulation
 ^^^^^^^^^^^^^
+.. suggest linking to pip install rather than just using text in ``code`` format. Help reader find resource
 
-Simulation doesn’t require having a robot connected to your computer. You just need to install the ``opentrons`` Python module using ``pip``. This will give you access to the ``opentrons_simulate`` command-line utility (``opentrons_simulate.exe`` on Windows). To see a text preview of the steps the OT-2 will take, ``cd`` to the directory where you saved your protocol file and run:
+Simulation doesn’t require having a robot connected to your computer. You just need to install the `Opentrons Python module <https://pypi.org/project/opentrons/>`_ from Pip. This will give you access to the ``opentrons_simulate`` command-line utility (``opentrons_simulate.exe`` on Windows).
+
+.. suggest providing more info about cd than just text in ``code`` format. readers may not know or need a reminder
+
+To see a text preview of the steps your Flex or OT-2 will take, use the `change directory <https://en.wikipedia.org/wiki/Cd_(command)>`_ (``cd``) command to navigate to the location of your saved protocol file and run:
 
 .. prompt:: bash
 
