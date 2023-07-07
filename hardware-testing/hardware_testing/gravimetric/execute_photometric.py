@@ -296,6 +296,10 @@ def execute_trials(
 ) -> None:
     """Execute a batch of pre-constructed trials."""
 
+    print("homing...")
+    resources.ctx.home()
+    resources.pipette.home_plunger()
+
     def _next_tip() -> Well:
         # get the first channel's first-used tip
         # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
@@ -356,10 +360,6 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
         liquid_tracker,
         cfg,
     )
-
-    print("homing...")
-    resources.ctx.home()
-    resources.pipette.home_plunger()
 
     try:
         execute_trials(cfg, resources, tips, trials)
