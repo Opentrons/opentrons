@@ -255,6 +255,23 @@ def _display_dye_information(
                         f'add {_ul_to_ml(reservoir_ul)} mL of DYE type "{dye_msg}"'
                     )
 
+def build_pm_report(cfg: config.PhotometricConfig, resources: TestResources) -> report.CSVReport:
+    """Build a CSVReport formated for photometric tests."""
+    test_report = report.create_csv_test_report_photometric(
+        resources.test_volumes, cfg, run_id=resources.run_id
+    )
+    test_report.set_tag(resources.pipette_tag)
+    test_report.set_operator(resources.operator_name)
+    test_report.set_version(resources.git_description)
+    report.store_serial_numbers_pm(
+        test_report,
+        robot=resources.robot_serial,
+        pipette=resources.pipette_tag,
+        tips=resources.tip_batch,
+        environment="None",
+        liquid="None",
+    )
+    return test_report
 
 def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     """Run."""
@@ -291,20 +308,7 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     ), f"more trials ({trial_total}) than tips ({total_tips})"
 
     ui.print_header("CREATE TEST-REPORT")
-    test_report = report.create_csv_test_report_photometric(
-        resources.test_volumes, cfg, run_id=resources.run_id
-    )
-    test_report.set_tag(resources.pipette_tag)
-    test_report.set_operator(resources.operator_name)
-    test_report.set_version(resources.git_description)
-    report.store_serial_numbers_pm(
-        test_report,
-        robot=resources.robot_serial,
-        pipette=resources.pipette_tag,
-        tips=resources.tip_batch,
-        environment="None",
-        liquid="None",
-    )
+    test_report = build_pm_report(cfg, resources)
 
     ui.print_header("PREPARE")
     can_swap_a_for_hv = not [
