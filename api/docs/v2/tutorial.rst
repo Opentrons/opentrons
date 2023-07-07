@@ -331,11 +331,9 @@ In Simulation
 ^^^^^^^^^^^^^
 .. suggest linking to pip install rather than just using text in ``code`` format. Help reader find resource
 
-Simulation doesn’t require having a robot connected to your computer. You just need to install the `Opentrons Python module <https://pypi.org/project/opentrons/>`_ from Pip. This will give you access to the ``opentrons_simulate`` command-line utility (``opentrons_simulate.exe`` on Windows).
+Simulation doesn’t require having a robot connected to your computer. You just need to install the `Opentrons Python module <https://pypi.org/project/opentrons/>`_ from Pip (``pip install opentrons``). This will give you access to the ``opentrons_simulate`` command-line utility (``opentrons_simulate.exe`` on Windows).
 
-.. suggest providing more info about cd than just text in ``code`` format. readers may not know or need a reminder
-
-To see a text preview of the steps your Flex or OT-2 will take, use the `change directory <https://en.wikipedia.org/wiki/Cd_(command)>`_ (``cd``) command to navigate to the location of your saved protocol file and run:
+To see a text preview of the steps your Flex or OT-2 will take, use the change directory (``cd``) command to navigate to the location of your saved protocol file and run:
 
 .. prompt:: bash
 
