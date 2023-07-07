@@ -568,9 +568,9 @@ def _run_file_non_pe(
         # the parsed Protocol object and we don't need to create the ProtocolContext with them.
         # execute_apiv2.run_protocol() will pull them out of the JSON and load them into the
         # ProtocolContext.
-        extra_labware = {}
-        bundled_labware = {}
-        bundled_data = {}
+        extra_labware = None
+        bundled_labware = None
+        bundled_data = None
 
     context = _create_live_context_non_pe(
         api_version=protocol.api_level,
