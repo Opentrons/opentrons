@@ -267,6 +267,7 @@ def build_gm_report(
     recorder: GravimetricRecorder,
 ) -> report.CSVReport:
     """Build a CSVReport formated for gravimetric tests."""
+    ui.print_header("CREATE TEST-REPORT")
     test_report = report.create_csv_test_report(
         resources.test_volumes, cfg, run_id=resources.run_id
     )
@@ -332,7 +333,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     recorder.record(in_thread=True)
     print(f'scale is recording to "{recorder.file_name}"')
 
-    ui.print_header("CREATE TEST-REPORT")
     test_report = build_gm_report(cfg, resources, recorder)
 
     # need to be as far away from the scale as possible
