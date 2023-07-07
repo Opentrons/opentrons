@@ -412,18 +412,31 @@ class MoveScheduler:
         try:
             stop_cond = self._stop_condition[group_id][seq_id]
             if (
-                stop_cond
-                in [
-                    MoveStopCondition.limit_switch,
-                    MoveStopCondition.limit_switch_backoff,
-                ]
-                and ack_id != MoveAckId.stopped_by_condition
-            ):
+                (
+                    stop_cond.value
+                    & (
+                        MoveStopCondition.limit_switch.value
+                        | MoveStopCondition.limit_switch_backoff.value
+                    )
+                )
+                != 0
+            ) and ack_id != MoveAckId.stopped_by_condition:
                 log.error(
                     f"Homing move from node {node_id} completed without meeting condition {stop_cond}"
                 )
                 self._should_stop = True
                 self._event.set()
+            if (
+                stop_cond.value & MoveStopCondition.stall.value
+            ) and ack_id == MoveAckId.stopped_by_condition:
+                # When an axis has a stop-on-stall move and stalls, it will clear the rest of its executing moves.
+                # If we wait for those moves, we'll time out.
+                remaining = [elem for elem in self._moves[group_id]]
+                for move_node, move_seq in remaining:
+                    if node_id == move_node:
+                        self._moves[group_id].remove((move_node, move_seq))
+                if not self._moves[group_id]:
+                    self._event.set()
         except IndexError:
             # If we have two move group runners running at once, they each
             # pick up groups they don't care about, and need to not fail.
