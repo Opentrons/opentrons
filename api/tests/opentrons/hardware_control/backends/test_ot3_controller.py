@@ -1018,11 +1018,11 @@ async def test_monitor_pressure(
     mock_move_group_run: mock.AsyncMock,
     mock_present_devices: None,
 ) -> None:
-    mount = OT3Mount.LEFT
+    mount = NodeId.pipette_left
     mock_move_group_run.side_effect = move_group_run_side_effect(
         controller, [OT3Axis.P_L]
     )
-    async with controller.monitor_overpressure(mount):
+    async with controller._monitor_overpressure([mount]):
         await controller.home([OT3Axis.P_L], GantryLoad.LOW_THROUGHPUT)
     mock_move_group_run.assert_called_once()
 

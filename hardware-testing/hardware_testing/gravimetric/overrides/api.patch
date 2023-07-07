@@ -72,32 +72,6 @@ index 815dada3b9..30121fc4c8 100644
  
      def add_tip(self, tip_length: float) -> None:
          """
-diff --git a/api/src/opentrons/hardware_control/ot3api.py b/api/src/opentrons/hardware_control/ot3api.py
-index 3b3d96fdbf..ca9b0e045b 100644
---- a/api/src/opentrons/hardware_control/ot3api.py
-+++ b/api/src/opentrons/hardware_control/ot3api.py
-@@ -1682,8 +1682,8 @@ class OT3API(
-         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
-         #       but not with DVT pipettes because those can only detect drops
- 
--        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
--            await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
-+        # if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
-+        #     await self._backend.get_tip_present(realmount, TipStateType.PRESENT)
- 
-         _add_tip_to_instrs()
- 
-@@ -1764,8 +1764,8 @@ class OT3API(
-         )
- 
-         # TODO: implement tip-detection sequence during drop-tip for 96ch
--        if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
--            await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
-+        # if self.gantry_load != GantryLoad.HIGH_THROUGHPUT:
-+        #    await self._backend.get_tip_present(realmount, TipStateType.ABSENT)
- 
-         # home mount axis
-         if home_after:
 diff --git a/api/src/opentrons/protocol_api/core/legacy/deck.py b/api/src/opentrons/protocol_api/core/legacy/deck.py
 index 54bca33742..e6b49e47fe 100644
 --- a/api/src/opentrons/protocol_api/core/legacy/deck.py

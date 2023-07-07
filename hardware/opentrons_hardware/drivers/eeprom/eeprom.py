@@ -210,7 +210,7 @@ class EEPROMDriver:
 
         try:
             logger.debug(
-                f"Writting {len(data)} bytes to address {hex(address)} for device {self.name} - {data.hex()}"
+                f"Writing {len(data)} bytes to address {hex(address)} for device {self.name} - {data.hex()}"
             )
             os.lseek(self._eeprom_fd, address, os.SEEK_SET)
             return os.write(self._eeprom_fd, data)

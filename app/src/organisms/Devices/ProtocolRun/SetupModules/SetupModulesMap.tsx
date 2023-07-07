@@ -6,6 +6,7 @@ import {
   Box,
   Module,
   RobotWorkSpace,
+  SlotLabels,
   DIRECTION_COLUMN,
   SPACING,
 } from '@opentrons/components'
@@ -13,6 +14,7 @@ import {
   getDeckDefFromRobotType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
+
 import { ModuleInfo } from '../../ModuleInfo'
 import {
   useModuleRenderInfoForProtocolById,
@@ -79,6 +81,7 @@ export const SetupModulesMap = ({
                   )
                 }
               )}
+              <SlotLabels robotType={robotType} />
             </>
           )}
         </RobotWorkSpace>
