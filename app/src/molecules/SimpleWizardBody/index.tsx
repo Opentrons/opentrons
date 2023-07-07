@@ -132,10 +132,10 @@ export function SimpleWizardBody(props: Props): JSX.Element {
               />
             ) : (
               <Icon
-                name={'ot-alert'}
+                name="ot-alert"
                 size={isOnDevice ? '3.75rem' : '2.5rem'}
                 color={iconColor}
-                aria-label={'ot-alert'}
+                aria-label="ot-alert"
               />
             )}
             <StyledText css={HEADER_STYLE}>{header}</StyledText>

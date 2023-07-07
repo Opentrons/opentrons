@@ -51,7 +51,11 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
       isSuccess={false}
     >
       {isOnDevice ? (
-        <Flex justifyContent={JUSTIFY_FLEX_END} gridGap={SPACING.spacing4}>
+        <Flex
+          width="100%"
+          justifyContent={JUSTIFY_FLEX_END}
+          gridGap={SPACING.spacing4}
+        >
           <SmallButton
             buttonType="alert"
             buttonText={i18n.format(t('shred:exit'), 'capitalize')}

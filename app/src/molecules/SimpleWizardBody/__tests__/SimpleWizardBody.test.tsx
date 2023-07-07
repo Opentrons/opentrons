@@ -48,7 +48,8 @@ describe('SimpleWizardBody', () => {
     const { getByText, getByRole } = render(props)
     getByText('header')
     getByText('subheader')
-    getByRole('img', { name: 'Success Icon' })
+    const image = getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual('icon_success.png')
   })
   it('renders a few skeletons  when it is pending', () => {
     props = {

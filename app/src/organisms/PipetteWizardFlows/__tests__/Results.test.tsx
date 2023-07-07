@@ -65,7 +65,9 @@ describe('Results', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('Flex 1-Channel 1000 μL successfully recalibrated')
-    getByRole('img', { name: 'Success Icon' })
+    const image = getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual('icon_success.png')
+
     getByText('Exit')
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
@@ -79,6 +81,8 @@ describe('Results', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('Flex 1-Channel 1000 μL successfully attached')
+    const image = getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual('icon_success.png')
     getByRole('img', { name: 'Success Icon' })
     getByText('Calibrate pipette')
     const exit = getByRole('button', { name: 'Results_exit' })
@@ -160,6 +164,8 @@ describe('Results', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('Pipette successfully detached')
+    const image = getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual('icon_success.png')
     getByRole('img', { name: 'Success Icon' })
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
@@ -220,6 +226,8 @@ describe('Results', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('All pipettes successfully detached')
+    const image = getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual('icon_success.png')
     getByRole('img', { name: 'Success Icon' })
     getByText('attach pipette')
     const exit = getByRole('button', { name: 'Results_exit' })
@@ -243,6 +251,8 @@ describe('Results', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
+    const image = getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual('icon_success.png')
     getByRole('img', { name: 'Success Icon' })
     getByRole('button', { name: 'Results_exit' }).click()
     expect(props.proceed).toHaveBeenCalled()
@@ -256,6 +266,8 @@ describe('Results', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
+    const image = getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual('icon_success.png')
     getByRole('img', { name: 'Success Icon' })
     getByRole('button', { name: 'Results_exit' }).click()
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
@@ -269,6 +281,8 @@ describe('Results', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('Flex 1-Channel 1000 μL successfully attached and calibrated')
+    const image = getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual('icon_success.png')
     getByRole('img', { name: 'Success Icon' })
     getByRole('button', { name: 'Results_exit' }).click()
     expect(props.handleCleanUpAndClose).toHaveBeenCalled()
@@ -281,6 +295,8 @@ describe('Results', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('Flex 1-Channel 1000 μL successfully recalibrated')
+    const image = getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual('icon_success.png')
     getByRole('img', { name: 'Success Icon' })
     getByRole('button', { name: 'SmallButton_primary' }).click()
     expect(props.proceed).toHaveBeenCalled()
@@ -313,6 +329,8 @@ describe('Results', () => {
     }
     const { getByText, getByRole } = render(props)
     getByText('Flex 1-Channel 1000 μL successfully attached')
+    const image = getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual('icon_success.png')
     getByRole('img', { name: 'Success Icon' })
   })
   it('renders the correct information when attaching wrong pipette for run setup', async () => {
