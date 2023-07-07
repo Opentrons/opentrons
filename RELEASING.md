@@ -5,7 +5,7 @@ neatly document any changes that may happen during QA, such as bug fixes, and se
 
 ## Releasing Robot Software Stacks
 
-Our release process is still a work-in-progress. The app and API projects are currently versioned together to ensure interoperability.
+The app and API projects are currently versioned together to ensure interoperability.
 
 1. Ensure you have a release created in GitHub for the robot stack you're releasing - buildroot for ot-2, oe-core for ot-3 - with all the changes you want in this release, if any. If there are no system changes, you don't have to create a new release; the last tag in the system repo is used for release builds.
 
@@ -18,7 +18,7 @@ Our release process is still a work-in-progress. The app and API projects are cu
    git push --set-upstream origin release_${version}
    ```
 
-3. Open a PR into `release` for your release branch; this should contain all the changes that were in edge and not yet release. This PR will stick around for the duration of the release process, as QA-discovered bugs will have their fixes merged to this PR.
+3. Open a PR into `release` for your release branch; this should contain all the changes that were in `edge` and not yet `release`. This PR will stick around for the duration of the release process, as QA-discovered bugs will have their fixes merged to this PR.
 
    Part of what should happen in this branch is soliciting input and changes for the user-facing release notes at `app-shell/build/release-notes.md` for the app and `api/release-notes.md` for the robot software. Any changes should be done in a PR just like a QA bug. You should have final approval before the alpha process concludes.
 
@@ -71,17 +71,23 @@ Our release process is still a work-in-progress. The app and API projects are cu
 
    The tag push will kick off release builds and deploy the results to customers. It will also create a release page where those builds and automatically generated in-depth changelogs will be posted.
 
-9. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
+9. Ensure all deploy jobs succeeded:
+   * The Opentrons App should be prompting people to update to the new version.
+   * https://pypi.org/project/opentrons/ should be showing the new version.
 
-   ```shell
-   git checkout edge
-   git pull
-   git merge --no-ff release
-   ```
+10. Release the Python Protocol API docs for this version (see below under Releasing Web Projects).
 
-10. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
+11. Update the download links on https://opentrons.com/ot-app/. That page is defined in an Opentrons private repository.
 
-11. Release the docs for this version (see below under Releasing Web Projects)
+12. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
+
+    ```shell
+    git checkout edge
+    git pull
+    git merge --no-ff release
+    ```
+
+13. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
 
 ## Releasing Robot Software Stack Hotfixes
 
@@ -153,7 +159,15 @@ Our release process is still a work-in-progress. The app and API projects are cu
 
    Pushing the tag will create release builds and a github release page with the in-depth changelogs.
 
-10. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
+10. Ensure all deploy jobs succeeded:
+    * The Opentrons App should be prompting people to update to the new version.
+    * https://pypi.org/project/opentrons/ should be showing the new version.
+
+11. Update the download links on https://opentrons.com/ot-app/. That page is defined in an Opentrons private repository.
+
+12. Release the Python Protocol API docs for this version (see below under Releasing Web Projects)
+
+13. Open a PR of `release` into `edge`. Give the PR a name like `chore(release): Merge changes from ${version} into edge`. Once it passes, on the command line merge it into `edge`:
 
     ```shell
     git checkout edge
@@ -161,9 +175,7 @@ Our release process is still a work-in-progress. The app and API projects are cu
     git merge --no-ff release
     ```
 
-11. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
-
-12. Release the docs for this version (see below under Releasing Web Projects)
+14. Use the PR title for the merge commit title. You can then `git push origin edge`, which will succeed as long as the PR is approved and status checks pass.
 
 ### tag usage
 
