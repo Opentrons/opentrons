@@ -273,6 +273,36 @@ def build_pm_report(cfg: config.PhotometricConfig, resources: TestResources) -> 
     )
     return test_report
 
+def execute_trials(cfg: config.PhotometricConfig, resources: TestResources,
+                   tips: Dict[int, List[Well]]:, trials: Dict[float, List[PhotometricTrial]]) -> None:
+    """Execute a batch of pre-constructed trials"""
+    def _next_tip() -> Well:
+        # get the first channel's first-used tip
+        # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
+        #       and so we can use pick-up-tip from there again
+        nonlocal tips
+        if not len(tips[0]):
+            if not resources.ctx.is_simulating():
+                ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
+            tips = get_tips(resources.ctx, resources.pipette)
+        return tips[0].pop(0)
+    trial_total = len(resources.test_volumes) * cfg.trials
+    trial_count = 0
+    for volume in trials.keys():
+        ui.print_title(f"{volume} uL")
+        for trial in trials[volume]:
+            trial_count += 1
+            ui.print_header(f"{volume} uL ({trial.trial + 1}/{cfg.trials})")
+            print(f"trial total {trial_count}/{trial_total}")
+            if not resources.ctx.is_simulating():
+                ui.get_user_ready(f"put PLATE #{trial.trial + 1} and remove SEAL")
+            next_tip: Well = _next_tip()
+            next_tip_location = next_tip.top()
+            _pick_up_tip(
+                resources.ctx, resources.pipette, cfg, location=next_tip_location
+            )
+            _run_trial(trial)
+
 def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     """Run."""
     dye_types_req: Dict[str, float] = {dye: 0 for dye in _DYE_MAP.keys()}
@@ -294,14 +324,6 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     total_tips = len([tip for chnl_tips in tips.values() for tip in chnl_tips]) * len(
         resources.test_volumes
     )
-
-    def _next_tip() -> Well:
-        nonlocal tips
-        if not len(tips[0]):
-            if not resources.ctx.is_simulating():
-                ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
-            tips = get_tips(resources.ctx, resources.pipette)
-        return tips[0].pop(0)
 
     assert (
         trial_total <= total_tips
@@ -334,26 +356,9 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     print("homing...")
     resources.ctx.home()
     resources.pipette.home_plunger()
-    # get the first channel's first-used tip
-    # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
-    #       and so we can use pick-up-tip from there again
-    try:
-        trial_count = 0
-        for volume in trials.keys():
-            ui.print_title(f"{volume} uL")
-            for trial in trials[volume]:
-                trial_count += 1
-                ui.print_header(f"{volume} uL ({trial.trial + 1}/{cfg.trials})")
-                print(f"trial total {trial_count}/{trial_total}")
-                if not resources.ctx.is_simulating():
-                    ui.get_user_ready(f"put PLATE #{trial.trial + 1} and remove SEAL")
-                next_tip: Well = _next_tip()
-                next_tip_location = next_tip.top()
-                _pick_up_tip(
-                    resources.ctx, resources.pipette, cfg, location=next_tip_location
-                )
-                _run_trial(trial)
 
+    try:
+        execute_trials(cfg,resources,tips,trials)
     finally:
         ui.print_title("CHANGE PIPETTES")
         if resources.pipette.has_tip:
