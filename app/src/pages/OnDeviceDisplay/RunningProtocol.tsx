@@ -45,7 +45,7 @@ import { getLocalRobot } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
-const RUN_STATUS_REFETCH_INTERVAL = 3000
+const RUN_STATUS_REFETCH_INTERVAL = 5000
 interface BulletProps {
   isActive: boolean
 }
@@ -81,7 +81,9 @@ export function RunningProtocol(): JSX.Element {
   const currentRunCommandIndex = robotSideAnalysis?.commands.findIndex(
     c => c.key === currentRunCommandKey
   )
-  const runStatus = useRunStatus(runId, undefined, RUN_STATUS_REFETCH_INTERVAL)
+  const runStatus = useRunStatus(runId, {
+    refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
+  })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data.protocolId ?? null

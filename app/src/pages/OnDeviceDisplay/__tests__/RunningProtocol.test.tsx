@@ -181,7 +181,7 @@ describe('RunningProtocol', () => {
   })
   it('should render the canceling run modal when run status is stop requested', () => {
     when(mockUseRunStatus)
-      .calledWith(RUN_ID, undefined, 3000)
+      .calledWith(RUN_ID, { refetchInterval: 5000 })
       .mockReturnValue(RUN_STATUS_STOP_REQUESTED)
     const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
     getByText('mock CancelingRunModal')

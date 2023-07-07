@@ -67,13 +67,12 @@ export function useRunControls(
 const DEFAULT_STATUS_REFETCH_INTERVAL = 10000 // 10 seconds
 export function useRunStatus(
   runId: string | null,
-  options?: UseQueryOptions<Run>,
-  customRefetchInterval?: number
+  options?: UseQueryOptions<Run>
 ): RunStatus | null {
   const lastRunStatus = React.useRef<RunStatus | null>(null)
 
   const { data } = useRunQuery(runId ?? null, {
-    refetchInterval: customRefetchInterval ?? DEFAULT_STATUS_REFETCH_INTERVAL,
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
     enabled:
       lastRunStatus.current == null ||
       !([
