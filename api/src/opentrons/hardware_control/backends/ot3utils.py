@@ -242,7 +242,7 @@ def get_system_constraints(
 def get_system_constraints_for_calibration(
     config: OT3MotionSettings,
     gantry_load: GantryLoad,
-) -> "SystemConstraints[OT3Axis]":
+) -> "SystemConstraints[Axis]":
     conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
     for axis_kind in [
@@ -252,7 +252,7 @@ def get_system_constraints_for_calibration(
         OT3AxisKind.Z,
         OT3AxisKind.Z_G,
     ]:
-        for axis in OT3Axis.of_kind(axis_kind):
+        for axis in Axis.of_kind(axis_kind):
             constraints[axis] = AxisConstraints.build(
                 conf_by_pip["acceleration"][axis_kind],
                 conf_by_pip["max_speed_discontinuity"][axis_kind],
