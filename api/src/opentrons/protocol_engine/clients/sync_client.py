@@ -1,4 +1,5 @@
-"""Synchronous ProtocolEngine client module."""
+"""Control a `ProtocolEngine` without async/await."""
+
 from typing import cast, List, Optional, Union, Dict
 from typing_extensions import Literal
 
@@ -28,10 +29,33 @@ from .transports import ChildThreadTransport
 
 
 class SyncClient:
-    """Synchronous Protocol Engine client."""
+    """Control a `ProtocolEngine` without async/await.
+
+    Normally, `ProtocolEngine` provides an async/await interface, like this:
+
+    ```
+    aspirate_result = await protocol_engine.add_and_execute_command(aspirate_command)
+    dispense_result = await protocol_engine.add_and_execute_command(dispense_command)
+    ```
+
+    But we sometimes want to control it with plain old non-async blocking method calls.
+    To accomplish that, this class adapts `ProtocolEngine`'s interface into this:
+
+    ```
+    aspirate_result = sync_client.aspirate(...)
+    dispense_result = sync_client.dispense(...)
+    ```
+
+    This is intended to help implement the Python Protocol API, which is all non-async.
+    """
 
     def __init__(self, transport: ChildThreadTransport) -> None:
-        """Initialize the client with a transport."""
+        """Initialize the `SyncClient`.
+
+        Params:
+            transport: The interface for the new `SyncClient` to use to
+                communicate with the `ProtocolEngine`.
+        """
         self._transport = transport
 
     @property
