@@ -41,7 +41,7 @@ from opentrons.protocol_engine.execution import (
     StatusBarHandler,
 )
 
-from opentrons_shared_data.errors.exceptions import EStopActivatedError
+from opentrons_shared_data.errors.exceptions import EStopActivatedError, PythonException
 
 
 @pytest.fixture
@@ -291,7 +291,7 @@ async def test_execute(
         ),
         (
             RuntimeError("oh no"),
-            matchers.ErrorMatching(errors.UnexpectedProtocolError, match="oh no"),
+            matchers.ErrorMatching(PythonException, match="oh no"),
             True,
         ),
         (

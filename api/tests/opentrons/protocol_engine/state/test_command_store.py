@@ -464,10 +464,19 @@ def test_command_failure_clears_queues() -> None:
         key="command-key-1",
         error=errors.ErrorOccurrence(
             id="error-id",
-            errorType="ProtocolEngineError",
-            detail="oh no",
+            errorType="ProtocolCommandFailedError",
             createdAt=datetime(year=2023, month=3, day=3),
+            detail="Error 4000 GENERAL_ERROR (ProtocolCommandFailedError)",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+            wrappedErrors=[
+                errors.ErrorOccurrence(
+                    id="error-id",
+                    errorType="ProtocolEngineError",
+                    createdAt=datetime(year=2023, month=3, day=3),
+                    detail="oh no",
+                    errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+                )
+            ],
         ),
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
@@ -566,16 +575,18 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         error=errors.ErrorOccurrence(
             id="error-id",
             errorType="ProtocolCommandFailedError",
-            detail="Error 4000 GENERAL_ERROR (ProtocolCommandFailedError)",
             createdAt=datetime(year=2023, month=3, day=3),
+            detail="Error 4000 GENERAL_ERROR (ProtocolCommandFailedError)",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
-            wrappedError=errors.ErrorOccurrence(
-                id="error-id",
-                errorType="ProtocolEngineError",
-                detail="oh no",
-                createdAt=datetime(year=2023, month=3, day=3),
-                errorCode=ErrorCodes.GENERAL_ERROR.value.code,
-            ),
+            wrappedErrors=[
+                errors.ErrorOccurrence(
+                    id="error-id",
+                    errorType="ProtocolEngineError",
+                    createdAt=datetime(year=2023, month=3, day=3),
+                    detail="oh no",
+                    errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+                )
+            ],
         ),
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
@@ -955,12 +966,15 @@ def test_command_store_handles_command_failed() -> None:
         createdAt=datetime(year=2022, month=2, day=2),
         detail="Error 4000 GENERAL_ERROR (ProtocolCommandFailedError)",
         errorCode=ErrorCodes.GENERAL_ERROR.value.code,
-        wrappedErrors=[errors.ErrorOccurrence(
-            id="error-id",
-            errorType="ProtocolEngineError",
-            createdAt=datetime(year=2022, month=2, day=2),
-            detail="oh no",
-            errorCode=ErrorCodes.GENERAL_ERROR.value.code,)]
+        wrappedErrors=[
+            errors.ErrorOccurrence(
+                id="error-id",
+                errorType="ProtocolEngineError",
+                createdAt=datetime(year=2022, month=2, day=2),
+                detail="oh no",
+                errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+            )
+        ],
     )
 
     expected_failed_command = create_failed_command(
