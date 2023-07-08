@@ -461,16 +461,10 @@ class MoveScheduler:
         if error.payload.error_code.value == ErrorCode.estop_detected:
             raise EStopActivatedError(
                 message=f"estop detected for move group {group_id}",
-                # detail={error.message_id.value: error},
-                # should be an EnumeratedError
-                # wrapping=[error],
             )
         else:
             raise CanbusCommunicationError(
                 message=f"Unrecoverable firmware error during move group {group_id}: {error}",
-                # detail={error.message_id.value: error},
-                # should be an EnumeratedError
-                # wrapping=[error],
             )
 
     async def _send_stop_if_necessary(
