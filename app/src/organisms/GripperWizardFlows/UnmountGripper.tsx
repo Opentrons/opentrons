@@ -36,6 +36,7 @@ const GO_BACK_BUTTON_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
     font-size: ${TYPOGRAPHY.fontSize22};
+    line-height: ${TYPOGRAPHY.lineHeight28};
 
     &:hover {
       opacity: 100%;
