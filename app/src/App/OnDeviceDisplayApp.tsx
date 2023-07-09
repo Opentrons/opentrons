@@ -18,6 +18,7 @@ import { BackButton } from '../atoms/buttons'
 import { SleepScreen } from '../atoms/SleepScreen'
 import { ToasterOven } from '../organisms/ToasterOven'
 import { MaintenanceRunTakeover } from '../organisms/TakeoverModal'
+import { FirmwareUpdateTakeover } from '../organisms/FirmwareUpdateModal/FirmwareUpdateTakeover'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
@@ -261,6 +262,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
             <SleepScreen />
           ) : (
             <MaintenanceRunTakeover>
+              <FirmwareUpdateTakeover />
               <ToasterOven>
                 <ProtocolReceiptToasts />
                 <Switch>

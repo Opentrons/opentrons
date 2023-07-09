@@ -7,7 +7,7 @@ import {
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
-import { FirmwareUpdateModal } from '../'
+import { FirmwareUpdateModal } from '..'
 import {
   BadPipette,
   PipetteData,
