@@ -61,7 +61,7 @@
   "receive_alert": "Receive an alert when an Opentrons software update is available.",
   "remind_later": "Remind me later",
   "reset_to_default": "Reset to default",
-  "restart_app": "Restart app",
+  "restart_touchscreen": "Restart touchscreen",
   "restore_description": "Opentrons does not recommend reverting to previous software versions, but you can access previous releases below. For best results, uninstall the existing app and remove its configuration files before installing the previous version.",
   "restore_previous": "See how to restore a previous software version",
   "searching": "Searching for 30s",

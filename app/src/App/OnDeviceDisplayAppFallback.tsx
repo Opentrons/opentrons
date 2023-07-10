@@ -63,7 +63,7 @@ export function OnDeviceDisplayAppFallback({
         <MediumButton
           width="100%"
           buttonType="alert"
-          buttonText={t('restart_app')}
+          buttonText={t('restart_touchscreen')}
           onClick={handleRestartClick}
         />
       </Flex>
