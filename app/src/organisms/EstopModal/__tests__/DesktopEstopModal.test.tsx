@@ -56,4 +56,6 @@ describe('DesktopEstopModal', () => {
       getByRole('button', { name: 'Resume robot operations' })
     ).not.toBeDisabled()
   })
+
+  it.todo('should call a mock function when clicking resume robot operations')
 })
