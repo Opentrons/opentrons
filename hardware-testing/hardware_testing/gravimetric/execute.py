@@ -664,7 +664,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
         first_tip_location = first_tip.top().move(setup_channel_offset)
         _pick_up_tip(ctx, pipette, cfg, location=first_tip_location)
-        pipette.home()
+        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+        ctx._core.get_hardware().retract(mnt)
         if not ctx.is_simulating():
             ui.get_user_ready("REPLACE first tip with NEW TIP")
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")

@@ -11,7 +11,7 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Lab
 
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
-from hardware_testing.opentrons_api.types import Point
+from hardware_testing.opentrons_api.types import Point, OT3Mount
 from .measurement import (
     MeasurementType,
     create_measurement_tag,
@@ -493,7 +493,8 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         setup_tip = tips[0][0]
         volume_for_setup = max(test_volumes)
         _pick_up_tip(ctx, pipette, cfg, location=setup_tip.top())
-        pipette.home()
+        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+        ctx._core.get_hardware().retract(mnt)
         if not ctx.is_simulating():
             ui.get_user_ready("REPLACE first tip with NEW TIP")
         required_ul = max(
