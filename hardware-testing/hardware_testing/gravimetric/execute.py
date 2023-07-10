@@ -18,9 +18,13 @@ from .helpers import (
     _apply_labware_offsets,
     _pick_up_tip,
     _drop_tip,
+)
+from .trial import (
+    build_gravimetric_trials,
+    GravimetricTrial,
+    TestResources,
     _finish_test,
 )
-from .trial import build_gravimetric_trials, GravimetricTrial, TestResources
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,
     dispense_with_liquid_class,
