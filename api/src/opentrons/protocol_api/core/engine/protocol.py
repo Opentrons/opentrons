@@ -206,7 +206,7 @@ class ProtocolCore(
         version: Optional[int],
     ) -> LabwareCore:
         """Load an adapter using its identifying parameters"""
-        load_location = self._convert_non_stacked_location(location=location)
+        load_location = self._get_non_stacked_location(location=location)
 
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
@@ -582,10 +582,10 @@ class ProtocolCore(
         if isinstance(location, LabwareCore):
             return OnLabwareLocation(labwareId=location.labware_id)
         else:
-            return self._convert_non_stacked_location(location)
+            return self._get_non_stacked_location(location)
 
     @staticmethod
-    def _convert_non_stacked_location(
+    def _get_non_stacked_location(
         location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
     ) -> NonStackedLocation:
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
