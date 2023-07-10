@@ -81,16 +81,16 @@ DEFAULT_CALIBRATION_AXIS_MAX_SPEED: Final = 30
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 400,
-        OT3AxisKind.Y: 325,
+        OT3AxisKind.X: 350, # modified for gantry lifetime # 400,
+        OT3AxisKind.Y: 300, # modified for gantry lifetime # 325,
         OT3AxisKind.Z: 35,
         OT3AxisKind.P: 15,
         OT3AxisKind.Z_G: 50,
         OT3AxisKind.Q: 5.5,
     },
     low_throughput={
-        OT3AxisKind.X: 400,
-        OT3AxisKind.Y: 325,
+        OT3AxisKind.X: 350, # modified for gantry lifetime # 400,
+        OT3AxisKind.Y: 300, # modified for gantry lifetime # 325,
         OT3AxisKind.Z: 100,
         OT3AxisKind.P: 70,
         OT3AxisKind.Z_G: 50,
@@ -99,8 +99,8 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 800,
-        OT3AxisKind.Y: 500,
+        OT3AxisKind.X: 700, # modified for gantry lifetime # 800,
+        OT3AxisKind.Y: 600, # modified for gantry lifetime # 500,
         OT3AxisKind.Z: 150,
         OT3AxisKind.P: 30,
         OT3AxisKind.Z_G: 150,
@@ -157,17 +157,17 @@ DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
 
 DEFAULT_HOLD_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 0.5,
-        OT3AxisKind.Y: 0.5,
-        OT3AxisKind.Z: 0.8,
+        OT3AxisKind.X: 1.25, # modified for gantry lifetime # 0.5,
+        OT3AxisKind.Y: 1.4, # modified for gantry lifetime # 0.5,
+        OT3AxisKind.Z: 1.5, # modified for gantry lifetime # 0.8,
         OT3AxisKind.P: 0.3,
         OT3AxisKind.Z_G: 0.2,
         OT3AxisKind.Q: 0.3,
     },
     low_throughput={
-        OT3AxisKind.X: 0.5,
-        OT3AxisKind.Y: 0.5,
-        OT3AxisKind.Z: 0.1,
+        OT3AxisKind.X: 1.25, # modified for gantry lifetime # 0.5,
+        OT3AxisKind.Y: 1.2, # modified for gantry lifetime # 0.5,
+        OT3AxisKind.Z: 1.0, # modified for gantry lifetime # 0.1,
         OT3AxisKind.P: 0.3,
         OT3AxisKind.Z_G: 0.2,
     },

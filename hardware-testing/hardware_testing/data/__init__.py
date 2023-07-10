@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from subprocess import check_output
 from time import time
-from typing import Tuple
+from typing import Tuple, List, Any
 
 from opentrons.config import infer_config_base_dir, IS_ROBOT
 
@@ -115,6 +115,11 @@ def dump_data_to_file(test_name: str, file_name: str, data: str) -> Path:
 def append_data_to_file(test_name: str, file_name: str, data: str) -> Path:
     """Append new content to an already existing file on disk."""
     return _save_data(test_name, file_name, data, perm="a+")
+
+
+def convert_list_to_csv_line(data: List[Any]) -> str:
+    """Convert list to csv line."""
+    return ",".join([str(n) for n in data]) + '\n'
 
 
 def insert_data_to_file(test_name: str, file_name: str, data: str, line: int) -> None:
