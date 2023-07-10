@@ -11,7 +11,7 @@ from opentrons_shared_data.errors.exceptions import (
     MoveConditionNotMetError,
     EnumeratedError,
     MotionFailedError,
-    PythonException
+    PythonException,
 )
 
 from opentrons_hardware.firmware_bindings import ArbitrationId
@@ -508,73 +508,74 @@ class MoveScheduler:
                 f"Recoverable firmware errors during {group_id}: {self._errors}"
             )
 
+    async def _run_one_group(self, group_id: int, can_messenger: CanMessenger) -> None:
+        self._event.clear()
+
+        log.debug(f"Executing move group {group_id}.")
+        self._current_group = group_id - self._start_at_index
+        error = await can_messenger.ensure_send(
+            node_id=NodeId.broadcast,
+            message=ExecuteMoveGroupRequest(
+                payload=ExecuteMoveGroupRequestPayload(
+                    group_id=UInt8Field(group_id),
+                    # TODO (al, 2021-11-8): The triggers should be populated
+                    #  with actual values.
+                    start_trigger=UInt8Field(0),
+                    cancel_trigger=UInt8Field(0),
+                )
+            ),
+            expected_nodes=self._get_nodes_in_move_group(group_id),
+        )
+        if error != ErrorCode.ok:
+            log.error(f"received error trying to execute move group: {str(error)}")
+
+        expected_time = max(1.0, self._durations[group_id - self._start_at_index] * 1.1)
+        full_timeout = max(1.0, self._durations[group_id - self._start_at_index] * 2)
+        start_time = time.time()
+
+        try:
+            # The staged timeout handles some times when a move takes a liiiittle extra
+            await asyncio.wait_for(
+                self._event.wait(),
+                full_timeout,
+            )
+            duration = time.time() - start_time
+            await self._send_stop_if_necessary(can_messenger, group_id)
+
+            if duration >= expected_time:
+                log.warning(
+                    f"Move set {str(group_id)} took longer ({duration} seconds) than expected ({expected_time} seconds)."
+                )
+        except asyncio.TimeoutError:
+            missing_node_msg = ", ".join(
+                node.name for node in self._get_nodes_in_move_group(group_id)
+            )
+            log.error(
+                f"Move set {str(group_id)} timed out of max duration {full_timeout}. Expected time: {expected_time}. Missing: {missing_node_msg}"
+            )
+
+            raise MotionFailedError(
+                message="Command timed out",
+                detail={
+                    "missing-nodes": missing_node_msg,
+                    "full-timeout": str(full_timeout),
+                    "expected-time": expected_time,
+                    "elapsed": str(time.time() - start_time),
+                },
+            )
+        except EnumeratedError:
+            log.exception("Cancelling move group scheduler")
+            raise
+        except BaseException as e:
+            log.exception("canceling move group scheduler")
+            raise PythonException(e) from e
+
     async def run(self, can_messenger: CanMessenger) -> _Completions:
         """Start each move group after the prior has completed."""
         for group_id in range(
             self._start_at_index, self._start_at_index + len(self._moves)
         ):
-            self._event.clear()
-
-            log.debug(f"Executing move group {group_id}.")
-            self._current_group = group_id - self._start_at_index
-            error = await can_messenger.ensure_send(
-                node_id=NodeId.broadcast,
-                message=ExecuteMoveGroupRequest(
-                    payload=ExecuteMoveGroupRequestPayload(
-                        group_id=UInt8Field(group_id),
-                        # TODO (al, 2021-11-8): The triggers should be populated
-                        #  with actual values.
-                        start_trigger=UInt8Field(0),
-                        cancel_trigger=UInt8Field(0),
-                    )
-                ),
-                expected_nodes=self._get_nodes_in_move_group(group_id),
-            )
-            if error != ErrorCode.ok:
-                log.error(f"recieved error trying to execute move group {str(error)}")
-
-            expected_time = max(
-                1.0, self._durations[group_id - self._start_at_index] * 1.1
-            )
-            full_timeout = max(
-                1.0, self._durations[group_id - self._start_at_index] * 2
-            )
-            start_time = time.time()
-
-            try:
-                # TODO: The max here can be removed once can_driver.send() no longer
-                # returns before the message actually hits the bus. Right now it
-                # returns when the message is enqueued in the kernel, meaning that
-                # for short move durations we can see the timeout expiring before
-                # the execute even gets sent.
-                await asyncio.wait_for(
-                    self._event.wait(),
-                    full_timeout,
-                )
-                duration = time.time() - start_time
-                await self._send_stop_if_necessary(can_messenger, group_id)
-
-                if duration >= expected_time:
-                    log.warning(
-                        f"Move set {str(group_id)} took longer ({duration} seconds) than expected ({expected_time} seconds)."
-                    )
-            except asyncio.TimeoutError:
-                missing_node_msg = ', '.join(node.name for node in self._get_nodes_in_move_group(group_id))
-                log.error(
-                    f"Move set {str(group_id)} timed out of max duration {full_timeout}. Expected time: {expected_time}. Missing: {missing_node_Msg}"
-                )
-
-                raise MotionFailedError(message='Command timed out', detail={
-                    'missing-nodes': missing_node_msg,
-                    'full-timeout': str(full_timeout),
-                    'expected-time': expected_time,
-                    'elapsed': str(time.time() - start_time)})
-            except EnumeratedError:
-                log.exception('Cancelling move group scheduler')
-                raise
-            except BaseException as e:
-                log.exception("canceling move group scheduler")
-                raise PythonException(e) from e
+            await self._run_one_group(group_id, can_messenger)
 
         def _reify_queue_iter() -> Iterator[_CompletionPacket]:
             while not self._completion_queue.empty():

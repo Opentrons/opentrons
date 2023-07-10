@@ -3,10 +3,10 @@ import pytest
 from typing import List, Any, Tuple
 from numpy import float64, float32, int32
 from mock import AsyncMock, call, MagicMock, patch
-import asyncio
 from opentrons_shared_data.errors.exceptions import (
     MoveConditionNotMetError,
     EnumeratedError,
+    MotionFailedError,
 )
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
@@ -799,7 +799,7 @@ async def test_tip_action_move_runner_fail_receives_one_response(
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send_failure
     mock_can_messenger.send.side_effect = mock_sender.mock_send_failure
 
-    with pytest.raises(asyncio.TimeoutError):
+    with pytest.raises(MotionFailedError):
         await subject.run(can_messenger=mock_can_messenger)
 
 
