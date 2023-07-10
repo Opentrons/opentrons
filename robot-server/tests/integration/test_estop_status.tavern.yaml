@@ -1,0 +1,54 @@
+---
+test_name: GET estop status 
+marks:
+  - usefixtures:
+    - ot3_server_base_url
+    - ot2_server_base_url
+stages: 
+  - name: Get estop status 
+    request:
+      method: GET 
+      url: "{ot3_server_base_url}/robot/control/estopStatus"
+    response:
+      status_code: 200
+      json: 
+        data:
+          status: disengaged
+          physical_status:
+            - mount: left 
+              status: disengaged 
+            - mount: right 
+              status: disengaged
+  - name: Get estop status from OT-2
+    request:
+      method: GET 
+      url: "{ot2_server_base_url}/robot/control/estopStatus"
+    response:
+      status_code: 403
+---
+test_name: POST estop acknowledge & disengage 
+marks:
+  - usefixtures:
+    - ot3_server_base_url
+    - ot2_server_base_url
+stages: 
+  - name: POST acknowledgeEstopDisengage
+    request:
+      method: POST 
+      url: "{ot3_server_base_url}/robot/control/acknowledgeEstopDisengage"
+    response:
+      status_code: 200
+      json: 
+        data:
+          status: disengaged
+          physical_status:
+            - mount: left 
+              status: disengaged 
+            - mount: right 
+              status: disengaged
+  - name: POST acknowledgeEstopDisengage on ot-2
+    request:
+      method: POST 
+      url: "{ot2_server_base_url}/robot/control/acknowledgeEstopDisengage"
+    response:
+      status_code: 403
