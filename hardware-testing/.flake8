@@ -5,8 +5,8 @@
 max-line-length = 100
 
 # max cyclomatic complexity
-# NOTE: (andy s) increasing this from 9 to 15 b/c test scripts often handle all logic in main
-max-complexity = 15
+# NOTE: (andy s) increasing this from 9 to 20 b/c test scripts often handle all logic in main
+max-complexity = 20
 
 extend-ignore =
     # ignore E203 because black might reformat it
