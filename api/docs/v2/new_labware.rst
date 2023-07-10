@@ -11,7 +11,24 @@ When writing a protocol, you must inform the Protocol API about the labware you 
 
 When loading labware, you specify its name (e.g. ``corning_96_wellplate_360ul_flat``) and deck slot location. (e.g. ``D2`` or ``2`` for a Flex and OT-2, respectively).
 
-When looking for labware names, start in the `Opentrons Labware Library <https://labware.opentrons.com>`_. The library is a labware database. It contains their names in the API, what they look like, manufacturer part numbers, and more. In this section, we’ll use ``'corning_96_wellplate_360ul_flat'`` (`an ANSI standard 96-well plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_) and ``'opentrons_96_tiprack_300ul'`` (`the Opentrons standard 300 µL tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_).
+When looking for labware names, start in the `Opentrons Labware Library <https://labware.opentrons.com>`_. The library is a labware database. It contains their names in the API, what they look like, manufacturer part numbers, and more. Refer to the following table for the labware used in this section.
+
+.. list-table::
+    :widths: 20 40 45
+    :header-rows: 1
+
+    * - Labware type
+      - Labware name
+      - API load name
+    * - Well plate
+      - `Corning 96 Well Plate 360 µL Flat <https://labware.opentrons.com/corning_96_wellplate_360ul_flat/>`_
+      - ``corning_96_wellplate_360ul_flat``
+    * - Flex tiprack
+      - `Opentrons Flex 96 Tips 200 µL <https://shop.opentrons.com/opentrons-flex-tips-200-l/>`_
+      - ``opentrons_flex_96_tiprack_200ul``
+    * - OT-2 tiprack
+      - `Opentrons 96 Tip Rack 300 µL <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_
+      - ``opentrons_96_tiprack_300ul``
 
 In the example given in the :ref:`overview-section-v2` section, we loaded labware like this:
 
