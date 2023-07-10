@@ -43,7 +43,7 @@ from opentrons.config.types import (
     CapacitivePassSettings,
     LiquidProbeSettings,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     MoveManager,
@@ -485,7 +485,7 @@ class OT3API(
 
         return await self._backend.module_controls.build_module(
             port="",
-            usb_port=USBPort(name="", port_number=0),
+            usb_port=USBPort(name="", port_number=1, port_group=PortGroup.LEFT),
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )
