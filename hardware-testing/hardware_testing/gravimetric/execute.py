@@ -287,6 +287,37 @@ def build_gm_report(
     return test_report
 
 
+def _load_scale(
+    cfg: config.GravimetricConfig, resources: TestResources
+) -> GravimetricRecorder:
+    ui.print_header("LOAD SCALE")
+    print(
+        "Some Radwag settings cannot be controlled remotely.\n"
+        "Listed below are the things the must be done using the touchscreen:\n"
+        "  1) Set profile to USER\n"
+        "  2) Set screensaver to NONE\n"
+    )
+    recorder = GravimetricRecorder(
+        GravimetricRecorderConfig(
+            test_name=cfg.name,
+            run_id=resources.run_id,
+            tag=resources.pipette_tag,
+            start_time=resources.start_time,
+            duration=0,
+            frequency=1000 if resources.ctx.is_simulating() else 5,
+            stable=False,
+        ),
+        simulate=resources.ctx.is_simulating(),
+    )
+    print(f'found scale "{recorder.serial_number}"')
+    if resources.ctx.is_simulating():
+        start_sim_mass = {50: 15, 200: 200, 1000: 200}
+        recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
+    recorder.record(in_thread=True)
+    print(f'scale is recording to "{recorder.file_name}"')
+    return recorder
+
+
 def _calculate_evaporation(
     cfg: config.GravimetricConfig,
     resources: TestResources,
@@ -369,32 +400,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     def _next_tip_for_channel(channel: int) -> Well:
         return resources.tips[channel].pop(0)
 
-    ui.print_header("LOAD SCALE")
-    print(
-        "Some Radwag settings cannot be controlled remotely.\n"
-        "Listed below are the things the must be done using the touchscreen:\n"
-        "  1) Set profile to USER\n"
-        "  2) Set screensaver to NONE\n"
-    )
-    recorder = GravimetricRecorder(
-        GravimetricRecorderConfig(
-            test_name=cfg.name,
-            run_id=resources.run_id,
-            tag=resources.pipette_tag,
-            start_time=resources.start_time,
-            duration=0,
-            frequency=1000 if resources.ctx.is_simulating() else 5,
-            stable=False,
-        ),
-        simulate=resources.ctx.is_simulating(),
-    )
-    print(f'found scale "{recorder.serial_number}"')
-    if resources.ctx.is_simulating():
-        start_sim_mass = {50: 15, 200: 200, 1000: 200}
-        recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
-    recorder.record(in_thread=True)
-    print(f'scale is recording to "{recorder.file_name}"')
-
+    recorder = _load_scale(cfg, resources)
     test_report = build_gm_report(cfg, resources, recorder)
 
     # need to be as far away from the scale as possible
