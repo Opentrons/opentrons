@@ -11,7 +11,7 @@ When writing a protocol, you must inform the Protocol API about the labware you 
 
 When loading labware, you specify its name (e.g. ``corning_96_wellplate_360ul_flat``) and deck slot location. (e.g. ``D2`` or ``2`` for a Flex and OT-2, respectively).
 
-When looking for labware names, start in the `Opentrons Labware Library <https://labware.opentrons.com>`_. The library is a labware database. It contains their names in the API, what they look like, manufacturer part numbers, and more. Refer to the following table for the labware used in this section.
+When looking for labware names, start in the `Opentrons Labware Library <https://labware.opentrons.com>`_. This database contains API load names, labware images, manufacturer part numbers, and more. Refer to the following table for the labware used in this section.
 
 .. list-table::
     :widths: 20 40 45
@@ -30,23 +30,33 @@ When looking for labware names, start in the `Opentrons Labware Library <https:/
       - `Opentrons 96 Tip Rack 300 µL <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_
       - ``opentrons_96_tiprack_300ul``
 
-In the example given in the :ref:`overview-section-v2` section, we loaded labware like this:
+In the example given in the :ref:`overview-section-v2` section, we loaded Flex and OT-2 labware like this:
 
 .. code-block:: python
 
-    plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '2')
+    #Flex
+    tiprack = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'D1')
+    plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D2')
+
+The Flex code informs the protocol context that the deck contains a 200 uL tiprack in slot D1 and a 96-well plate in slot D2.
+
+.. code-block:: python
+
+    #OT-2
     tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
+    plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '2')
 
+The OT-2 code informs the protocol context that the deck contains a 300 µL tiprack in slot 1 and a 96 well plate in slot 2.
 
-which informed the protocol context that the deck contains a 300 µL tiprack in slot 1 and a 96 well plate in slot 2.
+The ``load_labware`` method also accepts an optional third argument, ``label``. You can use it to name the labware. The label value is displayed in the Opentrons App. This example shows Flex code, but the method syntax works the same way for an OT-2:
 
-A third optional argument can be used to give the labware a nickname to be displayed in the Opentrons App.
+.. maybe 1 code sample for this optional argument? 2 seems like a bit much.
 
 .. code-block:: python
 
-    plate = protocol.load_labware('corning_96_wellplate_360ul_flat',
-                                  location='2',
-                                  label='any-name-you-want')
+    tiprack = protocol.load_labware('opentrons_flex_96_tiprack_200ul',
+                                    location= 'D1',
+                                    label= 'any-name-you-want')
 
 Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`, which returns
 :py:class:`opentrons.protocol_api.labware.Labware` object.
