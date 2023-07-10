@@ -114,7 +114,7 @@ Whether you need a ``requirements`` block depends on your robot model and API ve
 
 - **OT-2:** The ``requirements`` block is optional, but including it is a recommended best practice, particularly if you’re using API version 2.15 or greater. If you do use it, remember to remove the API version from the ``metadata``. For example::
     
-    requirements = {"robotType": "OT-2", "apiLevel": "2.xx"} 
+    requirements = {"robotType": "OT-2", "apiLevel": "2.15"} 
 
 With the metadata and requirements defined, you can move on to creating the ``run()`` function for your protocol.
 
