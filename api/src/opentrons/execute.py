@@ -188,8 +188,9 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         "Only directories specified directly by "
         "this argument are searched, not their children. JSON files that "
         "do not define labware will be ignored with a message. "
-        "By default, the current directory (the one in which you are "
-        "invoking this program) will be searched for labware.",
+        "The current directory (the one from which you are "
+        "invoking this program) will always be included implicitly, "
+        "in addition to any directories that you specify.",
     )
     parser.add_argument(
         "-D",
