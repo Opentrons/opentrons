@@ -1,7 +1,9 @@
 """Geometry state getters."""
-from typing import Optional, List, Set, Tuple, Union
+import enum
+from typing import Optional, List, Set, Tuple, Union, cast
 
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, MountType
+from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from .. import errors
 from ..types import (
@@ -28,6 +30,19 @@ from .labware import LabwareView
 from .modules import ModuleView
 from .pipettes import PipetteView
 
+from opentrons_shared_data.pipette import PIPETTE_X_SPAN
+from opentrons_shared_data.pipette.dev_types import ChannelCount
+
+
+SLOT_WIDTH = 128
+
+
+class _TipDropSection(enum.Enum):
+    """Well sections to drop tips in."""
+
+    LEFT = "left"
+    RIGHT = "right"
+
 
 # TODO(mc, 2021-06-03): continue evaluation of which selectors should go here
 # vs which selectors should be in LabwareView
@@ -46,6 +61,7 @@ class GeometryView:
         self._labware = labware_view
         self._modules = module_view
         self._pipettes = pipette_view
+        self._last_drop_tip_location_spot: Optional[_TipDropSection] = None
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
@@ -325,13 +341,17 @@ class GeometryView:
             volume=int(well_def.totalLiquidVolume),
         )
 
-    def get_tip_drop_location(
+    def get_checked_tip_drop_location(
         self,
         pipette_id: str,
         labware_id: str,
         well_location: DropTipWellLocation,
     ) -> WellLocation:
-        """Get tip drop location given labware and hardware pipette."""
+        """Get tip drop location given labware and hardware pipette.
+
+        This makes sure that the well location has an appropriate origin & offset
+        if one is not already set previously.
+        """
         if well_location.origin != DropTipWellOrigin.DEFAULT:
             return WellLocation(
                 origin=WellOrigin(well_location.origin.value),
@@ -463,3 +483,136 @@ class GeometryView:
         )
 
         return maybe_labware or maybe_module or None
+
+    @staticmethod
+    def get_slot_column(slot_name: DeckSlotName) -> int:
+        """Get the column number for the specified slot."""
+        row_col_name = slot_name.to_ot3_equivalent()
+        slot_name_match = WELL_NAME_PATTERN.match(row_col_name.value)
+        assert (
+            slot_name_match is not None
+        ), f"Slot name {row_col_name} did not match required pattern; please check labware location."
+
+        row_name, column_name = slot_name_match.group(1, 2)
+        return int(column_name)
+
+    def get_next_tip_drop_location(
+        self, labware_id: str, well_name: str, pipette_id: str
+    ) -> DropTipWellLocation:
+        """Get the next location within the specified well to drop the tip into.
+
+        In order to prevent tip stacking, we will alternate between two tip drop locations:
+        1. location in left section: a safe distance from left edge of the well
+        2. location in right section: a safe distance from right edge of the well
+
+        This safe distance for most cases would be a location where all tips drop
+        reliably inside the labware's well. This can be calculated based off of the
+        span of a pipette, including all its tips, in the x-direction.
+
+        But we also need to account for the not-so-uncommon case of a left pipette
+        trying to drop tips in a labware in the rightmost deck column and vice versa.
+        If this labware extends beyond a regular deck slot, like the Flex's default trash,
+        then even after keeping a margin for x-span of a pipette, we will get
+        a location that's unreachable for the pipette. In such cases, we try to drop tips
+        at the rightmost location that a left pipette is able to reach,
+        and leftmost location that a right pipette is able to reach respectively.
+
+        In these calculations we assume that the critical point of a pipette
+        is considered to be the midpoint of the pipette's tip for single channel,
+        and the midpoint of the entire tip assembly for multi-channel pipettes.
+        We also assume that the pipette_x_span includes any safety margins required.
+        """
+        if not self._labware.is_fixed_trash(labware_id=labware_id):
+            # In order to avoid the complexity of finding tip drop locations for
+            # variety of labware with different well configs, we will allow
+            # location cycling only for fixed trash labware right now.
+            return DropTipWellLocation(
+                origin=DropTipWellOrigin.DEFAULT,
+                offset=WellOffset(x=0, y=0, z=0),
+            )
+
+        well_x_dim = self._labware.get_well_size(
+            labware_id=labware_id, well_name=well_name
+        )[0]
+        pipette_channels = self._pipettes.get_config(pipette_id).channels
+        pipette_mount = self._pipettes.get_mount(pipette_id)
+
+        labware_slot_column = self.get_slot_column(
+            slot_name=self.get_ancestor_slot_name(labware_id)
+        )
+
+        if self._last_drop_tip_location_spot == _TipDropSection.RIGHT:
+            # Drop tip in LEFT section
+            x_offset = self._get_drop_tip_well_x_offset(
+                tip_drop_section=_TipDropSection.LEFT,
+                well_x_dim=well_x_dim,
+                pipette_channels=pipette_channels,
+                pipette_mount=pipette_mount,
+                labware_slot_column=labware_slot_column,
+            )
+            self._last_drop_tip_location_spot = _TipDropSection.LEFT
+        else:
+            # Drop tip in RIGHT section
+            x_offset = self._get_drop_tip_well_x_offset(
+                tip_drop_section=_TipDropSection.RIGHT,
+                well_x_dim=well_x_dim,
+                pipette_channels=pipette_channels,
+                pipette_mount=pipette_mount,
+                labware_slot_column=labware_slot_column,
+            )
+            self._last_drop_tip_location_spot = _TipDropSection.RIGHT
+
+        return DropTipWellLocation(
+            origin=DropTipWellOrigin.TOP,
+            offset=WellOffset(
+                x=x_offset,
+                y=0,
+                z=0,
+            ),
+        )
+
+    @staticmethod
+    def _get_drop_tip_well_x_offset(
+        tip_drop_section: _TipDropSection,
+        well_x_dim: float,
+        pipette_channels: int,
+        pipette_mount: MountType,
+        labware_slot_column: int,
+    ) -> float:
+        """Get the well x offset for DropTipWellLocation."""
+        drop_location_margin_from_labware_edge = (
+            PIPETTE_X_SPAN[cast(ChannelCount, pipette_channels)] / 2
+        )
+        if tip_drop_section == _TipDropSection.LEFT:
+            if (
+                well_x_dim > SLOT_WIDTH
+                and pipette_channels != 96
+                and pipette_mount == MountType.RIGHT
+                and labware_slot_column == 1
+            ):
+                # Pipette might not reach the default left spot so use a different left spot
+                x_well_offset = (
+                    well_x_dim / 2 - SLOT_WIDTH + drop_location_margin_from_labware_edge
+                )
+            else:
+                x_well_offset = -well_x_dim / 2 + drop_location_margin_from_labware_edge
+                if x_well_offset > 0:
+                    x_well_offset = 0
+        else:
+            if (
+                well_x_dim > SLOT_WIDTH
+                and pipette_channels != 96
+                and pipette_mount == MountType.LEFT
+                and labware_slot_column == 3
+            ):
+                # Pipette might not reach the default right spot so use a different right spot
+                x_well_offset = (
+                    -well_x_dim / 2
+                    + SLOT_WIDTH
+                    - drop_location_margin_from_labware_edge
+                )
+            else:
+                x_well_offset = well_x_dim / 2 - drop_location_margin_from_labware_edge
+                if x_well_offset < 0:
+                    x_well_offset = 0
+        return x_well_offset

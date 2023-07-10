@@ -212,12 +212,24 @@ describe('CheckItem', () => {
             params: { pipetteId: 'pipetteId1' },
           },
           {
+            commandType: 'retractAxis' as const,
+            params: {
+              axis: 'leftZ',
+            },
+          },
+          {
             commandType: 'moveToWell',
             params: {
               pipetteId: 'pipetteId1',
               labwareId: 'fixedTrash',
               wellName: 'A1',
               wellLocation: { origin: 'top', offset: undefined },
+            },
+          },
+          {
+            commandType: 'retractAxis' as const,
+            params: {
+              axis: 'leftZ',
             },
           },
           {
@@ -265,12 +277,24 @@ describe('CheckItem', () => {
           params: { pipetteId: 'pipetteId1' },
         },
         {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: 'leftZ',
+          },
+        },
+        {
           commandType: 'moveToWell',
           params: {
             pipetteId: 'pipetteId1',
             labwareId: 'fixedTrash',
             wellName: 'A1',
             wellLocation: { origin: 'top', offset: undefined },
+          },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: 'leftZ',
           },
         },
         {
