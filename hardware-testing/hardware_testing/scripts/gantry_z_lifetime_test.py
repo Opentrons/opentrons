@@ -33,7 +33,7 @@ def _create_points(pos_max_left, pos_max_right, pos_min_left, pos_min_right, x_p
          6: [Point(0, 396.3, 99.0), OT3Mount.RIGHT, 'Z_R'],
          'Tip Pick Up - Right 2': ['', OT3Mount.RIGHT, 'P'],
 
-         7: [Point(510.0, 75.0, 245.0), OT3Mount.RIGHT, 'XY'],
+         7: [Point(509.0, 75.0, 245.0), OT3Mount.RIGHT, 'XY'], ### was 510.0
          8: [Point(x_pt, y_pt, z_pt), OT3Mount.LEFT, 'M'],
          9: [Point(x_pt, y_pt, z_pt) - types.Point(x=0, y=0, z=150), OT3Mount.LEFT, 'Z_L'],
         'Tip Pick Up - Left 2': ['', OT3Mount.LEFT, 'P'],
