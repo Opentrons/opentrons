@@ -120,7 +120,6 @@ class PhotometricTrial(VolumetricTrial):
 
     source: Well
     dest: Labware
-    do_jog: bool
     cfg: config.PhotometricConfig
 
 
@@ -242,7 +241,6 @@ def build_photometric_trials(
     """Build a list of all the trials that will be run."""
     trial_list: Dict[float, List[PhotometricTrial]] = {}
     for volume in test_volumes:
-        do_jog = True
         trial_list[volume] = []
         for trial in range(cfg.trials):
             trial_list[volume].append(
@@ -257,12 +255,9 @@ def build_photometric_trials(
                     trial=trial,
                     liquid_tracker=liquid_tracker,
                     inspect=cfg.inspect,
-                    do_jog=do_jog,
                     cfg=cfg,
                     mix=cfg.mix,
                     acceptable_cv=None,
                 )
             )
-            if volume < 250:
-                do_jog = False
     return trial_list

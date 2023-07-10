@@ -126,52 +126,6 @@ def _run_trial(trial: PhotometricTrial) -> None:
 
     _record_measurement_and_store(MeasurementType.INIT)
     trial.pipette.move_to(location=trial.source.top(), minimum_z_height=133)
-    while trial.do_jog:
-        required_ul = max(
-            (trial.volume * channel_count * trial.cfg.trials) + _MIN_END_VOLUME_UL,
-            _MIN_START_VOLUME_UL,
-        )
-        if not trial.ctx.is_simulating():
-            _liquid_height = _jog_to_find_liquid_height(
-                trial.ctx, trial.pipette, trial.source
-            )
-            height_below_top = trial.source.depth - _liquid_height
-            print(f"liquid is {height_below_top} mm below top of reservoir")
-            trial.liquid_tracker.set_start_volume_from_liquid_height(
-                trial.source, _liquid_height, name="Dye"
-            )
-        else:
-            trial.liquid_tracker.set_start_volume(trial.source, required_ul)
-        reservoir_ul = trial.liquid_tracker.get_volume(trial.source)
-        print(
-            f"software thinks there is {round(reservoir_ul / 1000, 1)} mL "
-            f"of liquid in the reservoir (required = {round(required_ul / 1000, 1)} ml)"
-        )
-        if required_ul <= reservoir_ul < _MAX_VOLUME_UL:
-            break
-        elif required_ul > _MAX_VOLUME_UL:
-            raise NotImplementedError(
-                f"too many trials ({trial.cfg.trials}) at {trial.volume} uL, "
-                f"refilling reservoir is currently not supported"
-            )
-        elif reservoir_ul < required_ul:
-            error_msg = (
-                f"not enough volume in reservoir to aspirate {trial.volume} uL "
-                f"across {channel_count}x channels for {trial.cfg.trials}x trials"
-            )
-            if trial.ctx.is_simulating():
-                raise ValueError(error_msg)
-            ui.print_error(error_msg)
-            trial.pipette.move_to(location=trial.source.top(100))
-            difference_ul = required_ul - reservoir_ul
-            ui.get_user_ready(
-                f"ADD {round(difference_ul / 1000.0, 1)} mL more liquid to RESERVOIR"
-            )
-            trial.pipette.move_to(location=trial.source.top())
-        else:
-            raise RuntimeError(
-                f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
-            )
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         trial.ctx,
@@ -329,6 +283,69 @@ def execute_trials(
             _run_trial(trial)
 
 
+def _find_liquid_height(
+    cfg: config.PhotometricConfig,
+    resources: TestResources,
+    liquid_tracker: LiquidTracker,
+    reservoir: Well,
+) -> None:
+    channel_count = 96
+    setup_tip = resources.tips[0][0]
+    volume_for_setup = max(resources.test_volumes)
+    _pick_up_tip(resources.ctx, resources.pipette, cfg, location=setup_tip.top())
+    resources.pipette.home()
+    if not resources.ctx.is_simulating():
+        ui.get_user_ready("REPLACE first tip with NEW TIP")
+    required_ul = max(
+        (volume_for_setup * channel_count * cfg.trials) + _MIN_END_VOLUME_UL,
+        _MIN_START_VOLUME_UL,
+    )
+    if not resources.ctx.is_simulating():
+        _liquid_height = _jog_to_find_liquid_height(
+            resources.ctx, resources.pipette, reservoir
+        )
+        height_below_top = reservoir.depth - _liquid_height
+        print(f"liquid is {height_below_top} mm below top of reservoir")
+        liquid_tracker.set_start_volume_from_liquid_height(
+            reservoir, _liquid_height, name="Dye"
+        )
+    else:
+        liquid_tracker.set_start_volume(reservoir, required_ul)
+    reservoir_ul = liquid_tracker.get_volume(reservoir)
+    print(
+        f"software thinks there is {round(reservoir_ul / 1000, 1)} mL "
+        f"of liquid in the reservoir (required = {round(required_ul / 1000, 1)} ml)"
+    )
+    if required_ul <= reservoir_ul < _MAX_VOLUME_UL:
+        print("valid liquid height")
+    elif required_ul > _MAX_VOLUME_UL:
+        raise NotImplementedError(
+            f"too many trials ({cfg.trials}) at {volume_for_setup} uL, "
+            f"refilling reservoir is currently not supported"
+        )
+    elif reservoir_ul < required_ul:
+        error_msg = (
+            f"not enough volume in reservoir to aspirate {volume_for_setup} uL "
+            f"across {channel_count}x channels for {cfg.trials}x trials"
+        )
+        if resources.ctx.is_simulating():
+            raise ValueError(error_msg)
+        ui.print_error(error_msg)
+        resources.pipette.move_to(location=reservoir.top(100))
+        difference_ul = required_ul - reservoir_ul
+        ui.get_user_ready(
+            f"ADD {round(difference_ul / 1000.0, 1)} mL more liquid to RESERVOIR"
+        )
+        resources.pipette.move_to(location=reservoir.top())
+    else:
+        raise RuntimeError(
+            f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
+        )
+    resources.pipette.drop_tip(home_after=False)  # always trash setup tips
+    # NOTE: the first tip-rack should have already been replaced
+    #       with new tips by the operator
+
+
 def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     """Run."""
     trial_total = len(resources.test_volumes) * cfg.trials
@@ -348,6 +365,7 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
     test_report = build_pm_report(cfg, resources)
 
     _display_dye_information(cfg, resources)
+    _find_liquid_height(cfg, resources, liquid_tracker, reservoir["A1"])
 
     trials = build_photometric_trials(
         resources.ctx,
