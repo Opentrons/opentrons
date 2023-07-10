@@ -7,7 +7,7 @@ import {
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
+import { NINETY_SIX_CHANNEL, LEFT, MotorAxes } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { CalibrationErrorModal } from './CalibrationErrorModal'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -55,11 +55,18 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const is8Channel = attachedPipettes[mount]?.data.channels === 8
   const is96Channel = attachedPipettes[mount]?.data.channels === 96
   const calSlotNum = 'C2'
+  const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
     chainRunCommands(
       [
+        {
+          commandType: 'home' as const,
+          params: {
+            axes: axes,
+          },
+        },
         {
           // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/calibratePipette' as const,
