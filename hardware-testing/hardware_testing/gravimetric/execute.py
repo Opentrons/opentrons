@@ -1,5 +1,5 @@
 """Gravimetric."""
-from asyncio import sleep
+from time import sleep
 from dataclasses import dataclass
 from inspect import getsource
 from statistics import stdev
@@ -692,7 +692,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                 print(
                     f"wait for scale to stabilize ({i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE})"
                 )
-                await sleep(1)
+                sleep(1)
             actual_asp_list_evap: List[float] = []
             actual_disp_list_evap: List[float] = []
             for trial in range(config.NUM_BLANK_TRIALS):
