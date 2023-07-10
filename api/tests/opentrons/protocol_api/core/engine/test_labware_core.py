@@ -175,18 +175,27 @@ def test_is_tip_rack(subject: LabwareCore) -> None:
 
 
 @pytest.mark.parametrize(
-    "labware_definition",
-    [
-        LabwareDefinition.construct(  # type: ignore[call-arg]
-            ordering=[], allowedRoles=[LabwareRole.adapter]
-        )
+    argnames=["labware_definition", "expected_result"],
+    argvalues=[
+        (
+            LabwareDefinition.construct(  # type: ignore[call-arg]
+                ordering=[], allowedRoles=[LabwareRole.adapter]
+            ),
+            True,
+        ),
+        (
+            LabwareDefinition.construct(  # type: ignore[call-arg]
+                ordering=[], allowedRoles=[LabwareRole.labware]
+            ),
+            False,
+        ),
     ],
 )
-def test_is_adapter(subject: LabwareCore) -> None:
+def test_is_adapter(expected_result: bool, subject: LabwareCore) -> None:
     """It should know whether it's an adapter."""
     result = subject.is_adapter()
 
-    assert result is True
+    assert result is expected_result
 
 
 @pytest.mark.parametrize(
