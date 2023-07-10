@@ -45,6 +45,8 @@ _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
 _PREV_TRIAL_GRAMS: Optional[MeasurementData] = None
 
+_tip_counter: Dict[int, int] = {}
+
 
 def _generate_callbacks_for_trial(
     recorder: GravimetricRecorder,
@@ -139,6 +141,25 @@ def _print_final_results(
                 print(f"        avg: {avg}ul")
                 print(f"        cv:  {cv}%")
                 print(f"        d:   {d}%")
+
+
+def _next_tip_for_channel(
+    cfg: config.GravimetricConfig,
+    resources: TestResources,
+    channel: int,
+    max_tips: int,
+) -> Well:
+    _tips_used = sum([tc for tc in _tip_counter.values()])
+    if _tips_used >= max_tips:
+        if cfg.pipette_channels != 96:
+            raise RuntimeError("ran out of tips")
+        if not resources.ctx.is_simulating():
+            ui.print_title("Reset 96ch Tip Racks")
+            ui.get_user_ready(f"ADD {max_tips}x new tip-racks")
+        _tip_counter[channel] = 0
+    _tip = resources.tips[channel][_tip_counter[channel]]
+    _tip_counter[channel] += 1
+    return _tip
 
 
 def _run_trial(
@@ -392,14 +413,16 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         [tip for chnl_tips in resources.tips.values() for tip in chnl_tips]
     )
     channels_to_test = _get_test_channels(cfg)
+    for channel in channels_to_test:
+        # initialize the global tip counter, per each channel that will be tested
+        _tip_counter[channel] = 0
     trial_total = len(resources.test_volumes) * cfg.trials * len(channels_to_test)
-    assert (
-        trial_total <= total_tips
-    ), f"more trials ({trial_total}) than tips ({total_tips})"
-
-    def _next_tip_for_channel(channel: int) -> Well:
-        return resources.tips[channel].pop(0)
-
+    support_tip_resupply = bool(cfg.pipette_channels == 96 and cfg.increment)
+    if trial_total > total_tips:
+        if not support_tip_resupply:
+            raise ValueError(f"more trials ({trial_total}) than tips ({total_tips})")
+        elif not resources.ctx.is_simulating():
+            ui.get_user_ready(f"prepare {trial_total - total_tips} extra tip-racks")
     recorder = _load_scale(cfg, resources)
     test_report = build_gm_report(cfg, resources, recorder)
 
@@ -492,7 +515,9 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                     print(f"trial total {trial_count}/{trial_total}")
                     # NOTE: always pick-up new tip for each trial
                     #       b/c it seems tips heatup
-                    next_tip: Well = _next_tip_for_channel(channel)
+                    next_tip: Well = _next_tip_for_channel(
+                        cfg, resources, channel, total_tips
+                    )
                     next_tip_location = next_tip.top().move(channel_offset)
                     _pick_up_tip(
                         resources.ctx,
