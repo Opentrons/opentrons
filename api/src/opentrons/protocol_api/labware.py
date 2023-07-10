@@ -447,7 +447,7 @@ class Labware:
 
     @property  # type: ignore[misc]
     @requires_version(2, 15)
-    def child_labware(self) -> Optional[Labware]:
+    def child(self) -> Optional[Labware]:
         """The labware (if any) present on this labware."""
         labware_core = self._protocol_core.get_labware_on_labware(self._core)
         return self._core_map.get(labware_core)

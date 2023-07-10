@@ -298,7 +298,7 @@ def test_parent_labware(
     assert subject.parent == mock_labware
 
 
-def test_child_labware(
+def test_child(
     decoy: Decoy,
     subject: Labware,
     mock_labware_core: LabwareCore,
@@ -314,7 +314,7 @@ def test_child_labware(
     ).then_return(mock_child_labware_core)
     decoy.when(mock_map_core.get(mock_child_labware_core)).then_return(mock_labware)
 
-    assert subject.child_labware == mock_labware
+    assert subject.child == mock_labware
 
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
