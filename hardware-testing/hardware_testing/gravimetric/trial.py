@@ -8,7 +8,7 @@ from .measurement import DELAY_FOR_MEASUREMENT
 from .liquid_height.height import LiquidTracker
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.opentrons_api.types import Point
-from .helpers import _get_channel_offset
+from . import helpers
 from . import report
 
 QC_VOLUMES_G = {
@@ -201,7 +201,7 @@ def build_gravimetric_trials(
                     print(f"skipping channel {channel + 1}")
                     continue
                 trial_list[volume] = {channel: []}
-                channel_offset = _get_channel_offset(cfg, channel)
+                channel_offset = helpers._get_channel_offset(cfg, channel)
                 for trial in range(cfg.trials):
                     trial_list[volume][channel].append(
                         GravimetricTrial(
