@@ -263,7 +263,7 @@ def load_with_mutable_configurations(
     return base_configurations
 
 
-def _add_new_overrides_to_existing(
+def _add_new_overrides_to_existing(  # noqa: C901
     base_configs_dict: Dict[str, Any],
     existing_overrides: OverrideType,
     overrides: TypeOverrides,
