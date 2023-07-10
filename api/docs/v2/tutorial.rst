@@ -71,16 +71,16 @@ Throughout this documentation, you’ll see protocols that begin with the ``impo
 
 Everything else in the protocol file is required. Next, you’ll specify the version of the API you’re using. Then comes the core of the protocol: defining a single ``run()`` function that provides the locations of your labware, states which kind of pipettes you’ll use, and finally issues the commands that the robot will perform.
 
-For this tutorial, you’ll write very little Python outside of the ``run()`` function. But for more complex applications it’s worth remembering that your protocol file *is* a Python script, so any Python code that can run on the OT-2 can be a part of a protocol. 
+For this tutorial, you’ll write very little Python outside of the ``run()`` function. But for more complex applications it’s worth remembering that your protocol file *is* a Python script, so any Python code that can run on your robot can be a part of a protocol. 
 
 Metadata
 ^^^^^^^^
 
-Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what :ref:`version <version-table>` of the API the protocol requires. The `scripts <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/>`_ for this tutorial were validated against API version 2.13, so specify:
+Every protocol needs to have a metadata dictionary with information about the protocol. At minimum, you need to specify what :ref:`version <version-table>` of the API the protocol requires. The `scripts <https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/>`_ for this tutorial were validated against API version 2.15, so specify:
 
 .. code-block:: python
 
-    metadata = {'apiLevel': '2.13'}
+    metadata = {'apiLevel': '2.15'}
 
 You can include any other information you like in the metadata dictionary. The fields ``protocolName``, ``description``, and ``author`` are all displayed in the Opentrons App, so it’s a good idea to expand the dictionary to include them:
 
@@ -88,7 +88,7 @@ You can include any other information you like in the metadata dictionary. The f
     :substitutions:
 
     metadata = {
-        'apiLevel': '2.13',
+        'apiLevel': '2.15',
         'protocolName': 'Serial Dilution Tutorial',
         'description': '''This protocol is the outcome of following the 
                        Python Protocol API Tutorial located at 
@@ -103,19 +103,16 @@ Note, if you have a Flex, or are using an OT-2 with API v2.15 (or higher), we re
 Requirements
 ^^^^^^^^^^^^
 
-The ``requirements`` code block can appear before *or* after the ``metadata`` code block in a Python protocol. It uses the following syntax and accepts two arguments.
+The ``requirements`` code block can appear before *or* after the ``metadata`` code block in a Python protocol. It uses the following syntax and accepts two arguments: ``robotType`` and ``apiLevel``.
 
-.. code-block:: python
-    
-    requirements = {"robotType": <"Flex" or "OT-2">, "apiLevel": <"x.xx">}
 
-You may or may not need a requirements block in your protocol. Usage depends on your robot model and/or API version.
+Whether you need a ``requirements`` block depends on your robot model and API version.
 
-- **Flex use case:** The ``requirements`` block is always required. And, the API version does not go in the ``metadata`` section. The API version belongs in the ``requirements``. For example::
+- **Flex:** The ``requirements`` block is always required. And, the API version does not go in the ``metadata`` section. The API version belongs in the ``requirements``. For example::
 
     requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
-- **OT-2 use case:** The ``requirements`` block is optional, but including it is a recommended best practice, particularly if you’re using API version 2.15 or greater. If you do use it, remember to remove the API version from the ``metadata``. For example::
+- **OT-2:** The ``requirements`` block is optional, but including it is a recommended best practice, particularly if you’re using API version 2.15 or greater. If you do use it, remember to remove the API version from the ``metadata``. For example::
     
     requirements = {"robotType": "OT-2", "apiLevel": "2.xx"} 
 
@@ -141,7 +138,7 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
 
     .. tab:: Flex
 
-        Here’s how to load the labware into Flex slots D1, D2, and D3 (repeating the ``def`` statement from above to show proper indenting):
+        Here’s how to load the labware on a Flex in slots D1, D2, and D3 (repeating the ``def`` statement from above to show proper indenting):
 
         .. code-block:: python
             :substitutions:
@@ -163,7 +160,7 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
     
     .. tab:: OT-2
 
-        Here’s how to load the labware into OT-2 slots 1, 2, and 3 (repeating the ``def`` statement from above to show proper indenting):
+        Here’s how to load the labware on an OT-2 in slots 1, 2, and 3 (repeating the ``def`` statement from above to show proper indenting):
         
         .. code-block:: python
             :substitutions:
@@ -200,7 +197,7 @@ Next you’ll specify what pipette to use in the protocol. Loading a pipette is 
         # OT-2
         left_pipette = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips])
 
-Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are loaded after labware: you need to have already loaded ``tips`` in order to tell the pipette to use it. And now you won’t have to reference ``tips`` again in your code — it’s assigned to the ``left_pipette`` and both robots will know to use it when commanded to pick up tips.
+Since the pipette is so fundamental to the protocol, it might seem like you should have specified it first. But there’s a good reason why pipettes are loaded after labware: you need to have already loaded ``tips`` in order to tell the pipette to use it. And now you won’t have to reference ``tips`` again in your code — it’s assigned to the ``left_pipette`` and the robot will know to use it when commanded to pick up tips.
 
 .. note::
 
@@ -342,11 +339,13 @@ If that’s too long, you can always cancel your run partway through or modify `
 On a Robot
 ^^^^^^^^^^
 
-The simplest way to run your protocol on a Flex or OT-2 is to use the `Opentrons App <https://opentrons.com/ot-app>`_. Once you’ve installed the app and connected to your robot, navigate to the **Protocols** tab. Click **Import** and open your protocol from the file picker. You should see “Protocol - Serial Dilution Tutorial” (or whatever ``protocolName`` you entered in the metadata) in a banner at the top of the page. 
+The simplest way to run your protocol on a Flex or OT-2 is to use the `Opentrons App <https://opentrons.com/ot-app>`_. When you first launch the Opentrons App, you will see the Protocols screen. (Click **Protocols** in the left sidebar to access it at any other time.) Click **Import** in the top right corner to reveal the Import a Protocol pane. Then click **Choose File** and find your protocol in the system file picker, or drag and drop your protocol file into the well.
+
+You should see “Protocol - Serial Dilution Tutorial” (or whatever ``protocolName`` you entered in the metadata) in the list of protocols. Click the three-dot menu (⋮) for your protocol and choose **Start setup**. 
 
 If you have any remaining calibration tasks to do, you can finish them up here. Below the calibration section is a preview of the initial deck state. Optionally you can run Labware Position Check, or you can go ahead and click **Proceed to Run**.
 
-On the Run tab, you can double-check the Run Preview, which are similar to the command-line simulation output. Make sure all your labware and liquids are in the right place, and then click **Start run**. The run log will update in real time as your robot proceeds through the steps. 
+On the Run tab, you can double-check the Run Preview, which is similar to the command-line simulation output. Make sure all your labware and liquids are in the right place, and then click **Start run**. The run log will update in real time as your robot proceeds through the steps. 
 
 When it’s all done, check the results of your serial dilution procedure — you should have a beautiful dye gradient running across the plate!
 
