@@ -413,8 +413,10 @@ def execute(  # noqa: C901
         # the enclosing if-else block and running everything through _run_file_pe() for simplicity.
         if emit_runlog:
             raise NotImplementedError(
-                f"The emit_runlog argument is not currently supported for Python protocols"
+                f"Printing the run log is not currently supported for Python protocols"
                 f" with apiLevel {ENGINE_CORE_API_VERSION} or newer."
+                f" Pass --no-print-runlog to opentrons_execute"
+                f" or emit_runlog=None to opentrons.execute.execute()."
             )
         if custom_data_paths:
             raise NotImplementedError(
