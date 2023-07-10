@@ -13,6 +13,6 @@ const Template: Story<
 
 export const Primary = Template.bind({})
 Primary.args = {
-  isActiveRun: false,
-  isEngaged: false,
+  isActiveRun: true,
+  isEngaged: true,
 }
