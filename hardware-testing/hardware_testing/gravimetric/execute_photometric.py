@@ -19,12 +19,12 @@ from .helpers import (
     _apply_labware_offsets,
     _pick_up_tip,
     _drop_tip,
-    _finish_test,
 )
 from .trial import (
     PhotometricTrial,
     build_photometric_trials,
     TestResources,
+    _finish_test,
 )
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,

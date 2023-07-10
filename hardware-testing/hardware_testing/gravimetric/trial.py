@@ -10,6 +10,7 @@ from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.opentrons_api.types import Point
 from . import helpers
 from . import report
+from hardware_testing.data import ui
 
 QC_VOLUMES_G = {
     1: {
@@ -261,3 +262,26 @@ def build_photometric_trials(
                 )
             )
     return trial_list
+
+
+def _finish_test(
+    cfg: Union[config.GravimetricConfig, config.PhotometricConfig],
+    resources: TestResources,
+    return_tip: bool,
+) -> None:
+    ui.print_title("CHANGE PIPETTES")
+    if resources.pipette.has_tip:
+        if resources.pipette.current_volume > 0:
+            print("dispensing liquid to trash")
+            trash = resources.pipette.trash_container.wells()[0]
+            # FIXME: this should be a blow_out() at max volume,
+            #        but that is not available through PyAPI yet
+            #        so instead just dispensing.
+            resources.pipette.dispense(resources.pipette.current_volume, trash.top())
+            resources.pipette.aspirate(10)  # to pull any droplets back up
+        print("dropping tip")
+        helpers._drop_tip(resources.pipette, return_tip)
+    print("moving to attach position")
+    resources.pipette.move_to(
+        resources.ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150))
+    )
