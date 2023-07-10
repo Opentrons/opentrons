@@ -690,7 +690,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             pipette.move_to(hover_pos)
             for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
                 print(
-                    f"wait for scale to stabilize ({i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE})"
+                    f"wait for scale to stabilize "
+                    f"({i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE})"
                 )
                 sleep(1)
             actual_asp_list_evap: List[float] = []
