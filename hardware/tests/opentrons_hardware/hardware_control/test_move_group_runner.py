@@ -726,7 +726,7 @@ async def test_tip_action_move_runner_receives_two_responses(
     mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    completioin = await subject.run(can_messenger=mock_can_messenger)
+    completion = await subject.run(can_messenger=mock_can_messenger)
 
 
 async def test_tip_action_move_runner_position_updated(
