@@ -666,10 +666,13 @@ def main() -> int:
     duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]
 
     runlog, maybe_bundle = simulate(
-        args.protocol,
-        args.protocol.name,
-        getattr(args, "custom_labware_path", []),
-        getattr(args, "custom_data_path", []) + getattr(args, "custom_data_file", []),
+        protocol_file=args.protocol,
+        file_name=args.protocol.name,
+        custom_labware_paths=getattr(args, "custom_labware_path", []),
+        custom_data_paths=(
+            getattr(args, "custom_data_path", [])
+            + getattr(args, "custom_data_file", [])
+        ),
         duration_estimator=duration_estimator,
         hardware_simulator_file_path=getattr(args, "custom_hardware_simulator_file"),
         log_level=args.log_level,

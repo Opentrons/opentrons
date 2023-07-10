@@ -411,8 +411,8 @@ def main() -> int:
         log_level = "warning"
     # Try to migrate containers from database to v2 format
     execute(
-        args.protocol,
-        args.protocol.name,
+        protocol_file=args.protocol,
+        protocol_name=args.protocol.name,
         log_level=log_level,
         emit_runlog=printer,
     )
