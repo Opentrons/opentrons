@@ -27,7 +27,7 @@ import type { MenuOverlayItemProps } from './MenuOverlay'
 interface InstrumentCardProps extends StyleProps {
   description: string
   label: string
-  menuOverlayItems: MenuOverlayItemProps[]
+  menuOverlayItems?: MenuOverlayItemProps[]
   hasDivider?: boolean
   instrumentDiagramProps?: InstrumentDiagramProps
   // special casing the gripper at least for now
@@ -106,21 +106,23 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
           {description}
         </StyledText>
       </Flex>
-      <Box
-        position={POSITION_ABSOLUTE}
-        top={SPACING.spacing4}
-        right={SPACING.spacing4}
-      >
-        <OverflowBtn onClick={handleOverflowClick} />
-        {menuOverlay}
-        {showOverflowMenu ? (
-          <MenuOverlay
-            hasDivider={hasDivider}
-            menuOverlayItems={menuOverlayItems}
-            setShowMenuOverlay={setShowOverflowMenu}
-          />
-        ) : null}
-      </Box>
+      {menuOverlayItems != null && (
+        <Box
+          position={POSITION_ABSOLUTE}
+          top={SPACING.spacing4}
+          right={SPACING.spacing4}
+        >
+          <OverflowBtn onClick={handleOverflowClick} />
+          {menuOverlay}
+          {showOverflowMenu ? (
+            <MenuOverlay
+              hasDivider={hasDivider}
+              menuOverlayItems={menuOverlayItems}
+              setShowMenuOverlay={setShowOverflowMenu}
+            />
+          ) : null}
+        </Box>
+      )}
     </Flex>
   )
 }

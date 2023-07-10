@@ -41,6 +41,7 @@
   "hot_to_the_touch": "<block>Module is <bold>hot</bold> to the touch</block>",
   "input_out_of_range": "Input out of range",
   "instruments_and_modules": "Instruments and Modules",
+  "instrument_attached": "Instrument attached",
   "labware_bottom": "Labware Bottom",
   "last_run_time": "last run {{number}}",
   "left_right": "Left+Right Mounts",
