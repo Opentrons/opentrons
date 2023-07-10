@@ -125,7 +125,6 @@ export function ProtocolCard(props: {
       )
     }
   }
-  aaa
   return (
     <Flex
       alignItems={isFailedAnalysis ? ALIGN_END : ALIGN_CENTER}
