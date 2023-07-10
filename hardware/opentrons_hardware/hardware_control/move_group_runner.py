@@ -206,16 +206,16 @@ class MoveGroupRunner:
         Args:
             can_messenger: a can messenger
         """
-
         error = await can_messenger.ensure_send(
             node_id=NodeId.broadcast,
             message=ClearAllMoveGroupsRequest(payload=EmptyPayload()),
-            expected_nodes=list(self._all_nodes()),
+            expected_nodes=list(self.all_nodes()),
         )
         if error != ErrorCode.ok:
             log.warning("Clear move group failed")
 
-    def _all_nodes(self) -> Set[NodeId]:
+    def all_nodes(self) -> Set[NodeId]:
+        """Get all of the nodes in the move group runner's move gruops."""
         node_set: Set[NodeId] = set()
         for group in self._move_groups:
             for sequence in group:

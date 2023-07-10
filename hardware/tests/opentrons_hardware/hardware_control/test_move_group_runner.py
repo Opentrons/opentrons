@@ -277,7 +277,13 @@ async def test_multi_group_clear(
     """It should send a clear group command before setup."""
     subject = MoveGroupRunner(move_groups=move_group_multiple)
     await subject.prep(can_messenger=mock_can_messenger)
-    expected = subject._all_nodes()
+    expected = subject.all_nodes()
+    # Test that the expected nodes are correct
+    for group in move_group_multiple:
+        for step in group:
+            for node in step.keys():
+                assert node in expected
+
     mock_can_messenger.ensure_send.assert_has_calls(
         [
             call(
