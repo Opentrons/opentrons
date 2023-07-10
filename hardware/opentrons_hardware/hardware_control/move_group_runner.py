@@ -133,7 +133,7 @@ class MoveGroupRunner:
             raise RuntimeError("A group must be prepped before it can be executed.")
         try:
             move_completion_data = await self._move(can_messenger, self._start_at_index)
-        except RuntimeError:
+        except (RuntimeError, asyncio.TimeoutError):
             log.error("raising error from Move group runner")
             raise
         return self._accumulate_move_completions(move_completion_data)
@@ -206,10 +206,12 @@ class MoveGroupRunner:
         Args:
             can_messenger: a can messenger
         """
-        await can_messenger.send(
+        error = await can_messenger.ensure_send(
             node_id=NodeId.broadcast,
             message=ClearAllMoveGroupsRequest(payload=EmptyPayload()),
         )
+        if error != ErrorCode.ok:
+            log.warning("Clear move group failed")
 
     async def _send_groups(self, can_messenger: CanMessenger) -> None:
         """Send commands to set up the message groups."""
@@ -411,18 +413,31 @@ class MoveScheduler:
         try:
             stop_cond = self._stop_condition[group_id][seq_id]
             if (
-                stop_cond
-                in [
-                    MoveStopCondition.limit_switch,
-                    MoveStopCondition.limit_switch_backoff,
-                ]
-                and ack_id != MoveAckId.stopped_by_condition
-            ):
+                (
+                    stop_cond.value
+                    & (
+                        MoveStopCondition.limit_switch.value
+                        | MoveStopCondition.limit_switch_backoff.value
+                    )
+                )
+                != 0
+            ) and ack_id != MoveAckId.stopped_by_condition:
                 log.error(
                     f"Homing move from node {node_id} completed without meeting condition {stop_cond}"
                 )
                 self._should_stop = True
                 self._event.set()
+            if (
+                stop_cond.value & MoveStopCondition.stall.value
+            ) and ack_id == MoveAckId.stopped_by_condition:
+                # When an axis has a stop-on-stall move and stalls, it will clear the rest of its executing moves.
+                # If we wait for those moves, we'll time out.
+                remaining = [elem for elem in self._moves[group_id]]
+                for move_node, move_seq in remaining:
+                    if node_id == move_node:
+                        self._moves[group_id].remove((move_node, move_seq))
+                if not self._moves[group_id]:
+                    self._event.set()
         except IndexError:
             # If we have two move group runners running at once, they each
             # pick up groups they don't care about, and need to not fail.
@@ -529,6 +544,7 @@ class MoveScheduler:
                 log.warning(
                     f"Expected nodes in group {str(group_id)}: {str(self._get_nodes_in_move_group(group_id))}"
                 )
+                raise
             except (RuntimeError, MoveConditionNotMet) as e:
                 log.error("canceling move group scheduler")
                 raise e

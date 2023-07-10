@@ -3,13 +3,13 @@ import inspect
 
 import pytest
 from decoy import Decoy
-from typing import cast, List, Tuple, Union, Optional
+from typing import cast, List, Tuple, Union, Optional, NamedTuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, MountType
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.types import (
@@ -36,7 +36,7 @@ from opentrons.protocol_engine.state import move_types
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
-from opentrons.protocol_engine.state.pipettes import PipetteView
+from opentrons.protocol_engine.state.pipettes import PipetteView, StaticPipetteConfig
 from opentrons.protocol_engine.state.geometry import GeometryView
 
 
@@ -952,7 +952,7 @@ def test_get_tip_drop_location(
         )
     ).then_return(1337)
 
-    location = subject.get_tip_drop_location(
+    location = subject.get_checked_tip_drop_location(
         pipette_id="pipette-id",
         labware_id="tip-rack-id",
         well_location=DropTipWellLocation(
@@ -974,7 +974,7 @@ def test_get_tip_drop_location_with_trash(
         labware_view.get_has_quirk(labware_id="labware-id", quirk="fixedTrash")
     ).then_return(True)
 
-    location = subject.get_tip_drop_location(
+    location = subject.get_checked_tip_drop_location(
         pipette_id="pipette-id",
         labware_id="labware-id",
         well_location=DropTipWellLocation(
@@ -996,10 +996,8 @@ def test_get_tip_drop_explicit_location(subject: GeometryView) -> None:
         offset=WellOffset(x=1, y=2, z=3),
     )
 
-    result = subject.get_tip_drop_location(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_location=input_location,
+    result = subject.get_checked_tip_drop_location(
+        pipette_id="pipette-id", labware_id="labware-id", well_location=input_location
     )
 
     assert result == WellLocation(
@@ -1265,4 +1263,149 @@ def test_get_slot_item(
             DeckSlotName.SLOT_3, allowed_labware_ids, allowed_module_ids
         )
         == module
+    )
+
+
+@pytest.mark.parametrize(
+    argnames=["slot_name", "expected_column"],
+    argvalues=[
+        (DeckSlotName.SLOT_3, 3),
+        (DeckSlotName.SLOT_5, 2),
+        (DeckSlotName.SLOT_7, 1),
+        (DeckSlotName.SLOT_A1, 1),
+        (DeckSlotName.SLOT_B2, 2),
+        (DeckSlotName.SLOT_C3, 3),
+    ],
+)
+def test_get_slot_column(
+    subject: GeometryView,
+    slot_name: DeckSlotName,
+    expected_column: int,
+) -> None:
+    """It should return the correct column number for the slot."""
+    assert subject.get_slot_column(slot_name) == expected_column
+
+
+class DropTipLocationFinderSpec(NamedTuple):
+    """Test data for get_next_tip_drop_location."""
+
+    labware_slot: DeckSlotName
+    well_size: float
+    pipette_channels: int
+    pipette_mount: MountType
+    expected_locations: List[DropTipWellLocation]
+
+
+# TODO (spp, 2023-06-22): need to test more trash-pipette-mount combinations
+@pytest.mark.parametrize(
+    argnames=DropTipLocationFinderSpec._fields,
+    argvalues=[
+        DropTipLocationFinderSpec(
+            labware_slot=DeckSlotName.FIXED_TRASH,
+            well_size=225,
+            pipette_channels=1,
+            pipette_mount=MountType.LEFT,
+            expected_locations=[
+                DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=-22, y=0, z=0)
+                ),
+                DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=-75, y=0, z=0)
+                ),
+            ],
+        ),
+        DropTipLocationFinderSpec(
+            labware_slot=DeckSlotName.SLOT_3,
+            well_size=225,
+            pipette_channels=8,
+            pipette_mount=MountType.RIGHT,
+            expected_locations=[
+                DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=75, y=0, z=0)
+                ),
+                DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=-75, y=0, z=0)
+                ),
+            ],
+        ),
+        DropTipLocationFinderSpec(
+            labware_slot=DeckSlotName.SLOT_B3,
+            well_size=225,
+            pipette_channels=96,
+            pipette_mount=MountType.LEFT,
+            expected_locations=[
+                DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=32, y=0, z=0)
+                ),
+                DropTipWellLocation(
+                    origin=DropTipWellOrigin.TOP, offset=WellOffset(x=-32, y=0, z=0)
+                ),
+            ],
+        ),
+    ],
+)
+def test_get_next_drop_tip_location(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
+    subject: GeometryView,
+    labware_slot: DeckSlotName,
+    well_size: float,
+    pipette_channels: int,
+    pipette_mount: MountType,
+    expected_locations: List[DropTipWellLocation],
+) -> None:
+    """It should provide the next location to drop tips into within a labware."""
+    decoy.when(labware_view.is_fixed_trash(labware_id="abc")).then_return(True)
+    decoy.when(
+        labware_view.get_well_size(labware_id="abc", well_name="A1")
+    ).then_return((well_size, 0, 0))
+    decoy.when(mock_pipette_view.get_config("pip-123")).then_return(
+        StaticPipetteConfig(
+            min_volume=1,
+            max_volume=9001,
+            channels=pipette_channels,
+            model="blah",
+            display_name="bleh",
+            serial_number="",
+            return_tip_scale=0,
+            nominal_tip_overlap={},
+            home_position=0,
+            nozzle_offset_z=0,
+        )
+    )
+    decoy.when(mock_pipette_view.get_mount("pip-123")).then_return(pipette_mount)
+    decoy.when(labware_view.get("abc")).then_return(
+        LoadedLabware(
+            id="abc",
+            loadName="load-name2",
+            definitionUri="4567",
+            location=DeckSlotLocation(slotName=labware_slot),
+        )
+    )
+    drop_location: List[DropTipWellLocation] = []
+    for i in range(4):
+        drop_location.append(
+            subject.get_next_tip_drop_location(
+                labware_id="abc", well_name="A1", pipette_id="pip-123"
+            )
+        )
+
+    assert drop_location[0] == drop_location[2] == expected_locations[0]
+    assert drop_location[1] == drop_location[3] == expected_locations[1]
+
+
+def test_get_next_drop_tip_location_in_non_trash_labware(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
+    subject: GeometryView,
+) -> None:
+    """It should provide the default drop tip location when dropping into a non-fixed-trash labware."""
+    decoy.when(labware_view.is_fixed_trash(labware_id="abc")).then_return(False)
+    assert subject.get_next_tip_drop_location(
+        labware_id="abc", well_name="A1", pipette_id="pip-123"
+    ) == DropTipWellLocation(
+        origin=DropTipWellOrigin.DEFAULT,
+        offset=WellOffset(x=0, y=0, z=0),
     )

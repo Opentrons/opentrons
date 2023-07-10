@@ -184,8 +184,8 @@ async def test_find_edge(
     # all other moves should only move in the search axis
     for call in checked_calls:
         assert call[0][0] == OT3Mount.RIGHT
-        assert _other_axis_val(call[0][1], search_axis) == _other_axis_val(
-            Point(0, 0, 0), search_axis
+        assert _other_axis_val(call[0][1], search_axis) == pytest.approx(
+            _other_axis_val(Point(0, 0, 0), search_axis)
         )
 
 

@@ -87,7 +87,7 @@ async def test_drop_tip_implementation(
     )
 
     decoy.when(
-        mock_state_view.geometry.get_tip_drop_location(
+        mock_state_view.geometry.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
@@ -113,7 +113,7 @@ async def test_drop_tip_implementation(
     )
 
 
-async def test_drop_tip_with_randomization(
+async def test_drop_tip_with_alternating_locations(
     decoy: Decoy,
     mock_state_view: StateView,
     mock_movement_handler: MovementHandler,
@@ -131,22 +131,20 @@ async def test_drop_tip_with_randomization(
         wellName="A3",
         wellLocation=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
         homeAfter=True,
-        randomizeDropLocation=True,
+        alternateDropLocation=True,
     )
     drop_location = DropTipWellLocation(
         origin=DropTipWellOrigin.DEFAULT, offset=WellOffset(x=10, y=20, z=30)
     )
     decoy.when(
-        mock_state_view.labware.get_random_drop_tip_location(
-            labware_id="123", well_name="A3"
+        mock_state_view.geometry.get_next_tip_drop_location(
+            labware_id="123", well_name="A3", pipette_id="abc"
         )
     ).then_return(drop_location)
 
     decoy.when(
-        mock_state_view.geometry.get_tip_drop_location(
-            pipette_id="abc",
-            labware_id="123",
-            well_location=drop_location,
+        mock_state_view.geometry.get_checked_tip_drop_location(
+            pipette_id="abc", labware_id="123", well_location=drop_location
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
 
