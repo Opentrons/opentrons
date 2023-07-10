@@ -68,6 +68,7 @@ from opentrons_hardware.firmware_bindings.utils import (
     UInt32Field,
 )
 
+from opentrons_shared_data.errors.exceptions import CanbusCommunicationError
 
 def calc_duration(step: MoveGroupSingleAxisStep) -> int:
     """Calculate duration."""
@@ -1311,7 +1312,7 @@ async def test_single_move_error(
     mock_sender = MockSendMoveErrorCompleter(move_group_single, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    with pytest.raises(RuntimeError):
+    with pytest.raises(CanbusCommunicationError):
         await subject.run(can_messenger=mock_can_messenger)
     assert mock_sender.call_count == 1
 
@@ -1350,6 +1351,6 @@ async def test_multiple_move_error(
     mock_sender = MockSendMoveErrorCompleter(move_group_multiple_axes, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    with pytest.raises(RuntimeError):
+    with pytest.raises(CanbusCommunicationError):
         await subject.run(can_messenger=mock_can_messenger)
     assert mock_sender.call_count == 2
