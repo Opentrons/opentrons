@@ -75,7 +75,7 @@ describe('MovePin', () => {
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
-        params: { mount: 'extension' },
+        params: { mount: 'left' },
       },
       waitUntilComplete: true,
     })
@@ -129,7 +129,7 @@ describe('MovePin', () => {
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(3, {
       command: {
         commandType: 'calibration/moveToMaintenancePosition',
-        params: { mount: 'extension' },
+        params: { mount: 'left' },
       },
       waitUntilComplete: true,
     })
