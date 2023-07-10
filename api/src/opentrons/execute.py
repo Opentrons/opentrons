@@ -413,6 +413,8 @@ def main() -> int:
     execute(
         protocol_file=args.protocol,
         protocol_name=args.protocol.name,
+        custom_labware_paths=args.custom_labware_path,
+        custom_data_paths=(args.custom_data_path + args.custom_data_file),
         log_level=log_level,
         emit_runlog=printer,
     )
