@@ -107,7 +107,7 @@ def build_gravimetric_cfg(
     scale_delay: int,
     isolate_channels: List[int],
 ) -> GravimetricConfig:
-jkjqjkjaqq    """Run."""
+    """Run."""
     if increment:
         protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[pipette_volume][pipette_channels][
             tip_volume
