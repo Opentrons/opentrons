@@ -7,6 +7,7 @@ import {
   Btn,
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_FLEX_END,
+  ALIGN_CENTER,
   SPACING,
   TYPOGRAPHY,
   RESPONSIVENESS,
@@ -50,6 +51,7 @@ export const UnmountGripper = (
   const { proceed, isRobotMoving, goBack, chainRunCommands } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
+  const [isPending, setIsPending] = React.useState<boolean>(false)
 
   // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
@@ -64,8 +66,10 @@ export const UnmountGripper = (
     setShowGripperStillDetected,
   ] = React.useState(false)
   const handleContinue = (): void => {
+    setIsPending(true)
     refetch()
       .then(() => {
+        setIsPending(false)
         if (!isGripperStillAttached) {
           chainRunCommands([{ commandType: 'home' as const, params: {} }], true)
             .then(() => {
@@ -79,6 +83,7 @@ export const UnmountGripper = (
         }
       })
       .catch(() => {
+        setIsPending(false)
         setShowGripperStillDetected(true)
       })
   }
@@ -99,7 +104,7 @@ export const UnmountGripper = (
       <Flex
         width="100%"
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        alignItems={ALIGN_FLEX_END}
+        alignItems={isOnDevice ? ALIGN_CENTER : ALIGN_FLEX_END}
         gridGap={SPACING.spacing8}
       >
         <Btn onClick={() => setShowGripperStillDetected(false)}>
@@ -108,9 +113,13 @@ export const UnmountGripper = (
           </StyledText>
         </Btn>
         {isOnDevice ? (
-          <SmallButton buttonText={t('try_again')} onClick={handleContinue} />
+          <SmallButton
+            disabled={isPending}
+            buttonText={t('try_again')}
+            onClick={handleContinue}
+          />
         ) : (
-          <PrimaryButton onClick={handleContinue}>
+          <PrimaryButton disabled={isPending} onClick={handleContinue}>
             {t('try_again')}
           </PrimaryButton>
         )}
@@ -138,6 +147,7 @@ export const UnmountGripper = (
       }
       proceedButtonText={t('continue')}
       proceed={handleContinue}
+      proceedIsDisabled={isPending}
       back={goBack}
     />
   )
