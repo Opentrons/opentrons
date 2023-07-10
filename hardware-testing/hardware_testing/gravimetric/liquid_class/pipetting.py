@@ -142,6 +142,8 @@ def _retract(
         hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
             OT3AxisKind.Z
         ] = z_discontinuity
+    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
+    hw_api.set_gantry_load(hw_api.gantry_load)
     # retract out of well
     pipette.move_to(
         well.top().move(channel_offset),
@@ -157,6 +159,8 @@ def _retract(
         hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
             OT3AxisKind.Z
         ] = DEFAULT_MAX_SPEED_DISCONTINUITY.low_throughput[OT3AxisKind.Z]
+    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
+    hw_api.set_gantry_load(hw_api.gantry_load)
 
 
 def _change_plunger_acceleration(
@@ -180,6 +184,8 @@ def _change_plunger_acceleration(
         hw_api.config.motion_settings.acceleration.low_throughput[
             OT3AxisKind.P
         ] = p_accel
+    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
+    hw_api.set_gantry_load(hw_api.gantry_load)
 
 
 def _reset_plunger_acceleration(
@@ -196,6 +202,8 @@ def _reset_plunger_acceleration(
         hw_api.config.motion_settings.acceleration.low_throughput[
             OT3AxisKind.P
         ] = p_accel
+    # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
+    hw_api.set_gantry_load(hw_api.gantry_load)
 
 
 def _pipette_with_liquid_settings(
