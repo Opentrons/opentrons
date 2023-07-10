@@ -620,6 +620,7 @@ def test_add_pipette_config(subject: PipetteStore) -> None:
         display_name="pipette name",
         min_volume=1.23,
         max_volume=4.56,
+        channels=7,
         return_tip_scale=4,
         nominal_tip_overlap={"default": 5},
         home_position=8.9,

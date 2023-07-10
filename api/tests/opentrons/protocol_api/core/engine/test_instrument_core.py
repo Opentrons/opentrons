@@ -265,12 +265,7 @@ def test_drop_tip_no_location(
         engine_client=mock_engine_client,
     )
 
-    subject.drop_tip(
-        location=None,
-        well_core=well_core,
-        home_after=True,
-        randomize_drop_location=False,
-    )
+    subject.drop_tip(location=None, well_core=well_core, home_after=True)
 
     decoy.verify(
         mock_engine_client.drop_tip(
@@ -282,7 +277,7 @@ def test_drop_tip_no_location(
                 offset=WellOffset(x=0, y=0, z=0),
             ),
             home_after=True,
-            randomize_drop_location=False,
+            alternateDropLocation=False,
         ),
         times=1,
     )
@@ -307,12 +302,7 @@ def test_drop_tip_with_location(
         )
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)))
 
-    subject.drop_tip(
-        location=location,
-        well_core=well_core,
-        home_after=True,
-        randomize_drop_location=True,
-    )
+    subject.drop_tip(location=location, well_core=well_core, home_after=True)
 
     decoy.verify(
         mock_engine_client.drop_tip(
@@ -323,7 +313,7 @@ def test_drop_tip_with_location(
                 origin=DropTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
             home_after=True,
-            randomize_drop_location=True,
+            alternateDropLocation=False,
         ),
         times=1,
     )
