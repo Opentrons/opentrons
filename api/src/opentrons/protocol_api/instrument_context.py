@@ -205,6 +205,7 @@ class InstrumentContext(publisher.CommandPublisher):
             instrument.validate_takes_liquid(
                 location=move_to_location,
                 reject_module=self.api_version >= APIVersion(2, 13),
+                reject_adapter=self.api_version >= APIVersion(2, 15),
             )
 
         c_vol = self._core.get_available_volume() if not volume else volume
@@ -315,6 +316,7 @@ class InstrumentContext(publisher.CommandPublisher):
             instrument.validate_takes_liquid(
                 location=move_to_location,
                 reject_module=self.api_version >= APIVersion(2, 13),
+                reject_adapter=self.api_version >= APIVersion(2, 15),
             )
 
         c_vol = self._core.get_current_volume() if not volume else volume

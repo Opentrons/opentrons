@@ -11,6 +11,7 @@ from opentrons_shared_data.labware.dev_types import (
 )
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
+    LabwareRole,
     Parameters as LabwareDefinitionParameters,
     Metadata as LabwareDefinitionMetadata,
 )
@@ -171,6 +172,30 @@ def test_is_tip_rack(subject: LabwareCore) -> None:
     result = subject.is_tip_rack()
 
     assert result is True
+
+
+@pytest.mark.parametrize(
+    argnames=["labware_definition", "expected_result"],
+    argvalues=[
+        (
+            LabwareDefinition.construct(  # type: ignore[call-arg]
+                ordering=[], allowedRoles=[LabwareRole.adapter]
+            ),
+            True,
+        ),
+        (
+            LabwareDefinition.construct(  # type: ignore[call-arg]
+                ordering=[], allowedRoles=[LabwareRole.labware]
+            ),
+            False,
+        ),
+    ],
+)
+def test_is_adapter(expected_result: bool, subject: LabwareCore) -> None:
+    """It should know whether it's an adapter."""
+    result = subject.is_adapter()
+
+    assert result is expected_result
 
 
 @pytest.mark.parametrize(

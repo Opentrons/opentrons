@@ -5,6 +5,8 @@ from contextlib import asynccontextmanager
 
 from typing import Optional, TypeVar, Callable, AsyncIterator, List, Tuple
 
+from opentrons_shared_data.errors.exceptions import CommandTimedOutError
+
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorOutputBinding,
@@ -135,8 +137,17 @@ class SensorScheduler:
                     self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
                 )
-            except asyncio.TimeoutError:
-                log.warning("Sensor poll timed out")
+            except asyncio.TimeoutError as te:
+                msg = f"Sensor poll of {sensor_info.node_id.name} timed out"
+                log.warning(msg)
+                raise CommandTimedOutError(
+                    message=msg,
+                    detail={
+                        "node": sensor_info.node_id.name,
+                        "sensor": sensor_info.sensor_type.name,
+                        "sensor_id": sensor_info.sensor_id.name,
+                    },
+                ) from te
             finally:
                 return data_list
 
@@ -160,7 +171,7 @@ class SensorScheduler:
         )
         if error != ErrorCode.ok:
             log.error(
-                f"recieved error {str(error)} trying to write sensor info to {str(sensor_info.node_id)}"
+                f"recieved error {str(error)} trying to write sensor info to {sensor_info.node_id.name}"
             )
 
     async def send_read(
@@ -195,8 +206,17 @@ class SensorScheduler:
                     self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
                 )
-            except asyncio.TimeoutError:
-                log.warning("Sensor Read timed out")
+            except asyncio.TimeoutError as te:
+                msg = f"Sensor Read from {sensor_info.node_id.name} timed out"
+                log.warning(msg)
+                raise CommandTimedOutError(
+                    message=msg,
+                    detail={
+                        "node": sensor_info.node_id.name,
+                        "sensor": sensor_info.sensor_type.name,
+                        "sensor_id": sensor_info.sensor_id.name,
+                    },
+                ) from te
             finally:
                 return data_list
 
@@ -226,7 +246,7 @@ class SensorScheduler:
                     timeout,
                 )
             except asyncio.TimeoutError:
-                log.warning("Sensor Read timed out")
+                log.warning(f"Sensor Read from {node_id.name} timed out")
             finally:
                 return data_list
 
@@ -268,9 +288,17 @@ class SensorScheduler:
                     self._wait_for_response(reader, _format),
                     timeout,
                 )
-            except asyncio.TimeoutError:
-                log.error(f"Sensor Threshold Read from {sensor_info.node_id} timed out")
-                raise
+            except asyncio.TimeoutError as te:
+                msg = f"Sensor Threshold Read from {sensor_info.node_id.name} timed out"
+                log.error(msg)
+                raise CommandTimedOutError(
+                    message=msg,
+                    detail={
+                        "node": sensor_info.node_id.name,
+                        "sensor": sensor_info.sensor_type.name,
+                        "sensor_id": sensor_info.sensor_id.name,
+                    },
+                ) from te
 
     @staticmethod
     async def _multi_wait_for_response(
@@ -334,8 +362,18 @@ class SensorScheduler:
                 return await asyncio.wait_for(
                     self._read_peripheral_response(reader), timeout
                 )
-            except asyncio.TimeoutError:
-                log.warning(f"No PeripheralStatusResponse from node {node_id}")
+            except asyncio.TimeoutError as te:
+                msg = f"No PeripheralStatusResponse from node {node_id}"
+                log.warning(msg)
+                raise CommandTimedOutError(
+                    message=msg,
+                    detail={
+                        "node": node_id.name,
+                        "sensor": sensor.name,
+                        "sensor_id": sensor_id.name,
+                        "timeout": str(timeout),
+                    },
+                ) from te
                 return False
 
     @staticmethod

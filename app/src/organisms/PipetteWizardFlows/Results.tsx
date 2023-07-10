@@ -138,7 +138,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       flowType === FLOWS.ATTACH &&
       currentStepIndex !== totalStepCount
     ) {
-      const axes: MotorAxis =
+      const axes: MotorAxes =
         mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
       chainRunCommands(
         [

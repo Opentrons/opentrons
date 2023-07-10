@@ -27,10 +27,6 @@ FLOAT_THRESHOLD = 0.001  # TODO: re-evaluate this value based on system limitati
 MINIMUM_DISPLACEMENT = 0.05
 
 
-class MoveConditionNotMet(ValueError):
-    """Error raised if a move does not meet its stop condition before finishing."""
-
-
 def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
     """Keep the sign of the input but cap the numeric value at the constraint value."""
     return cast(np.float64, np.copysign(np.minimum(abs(constraint), abs(input)), input))
