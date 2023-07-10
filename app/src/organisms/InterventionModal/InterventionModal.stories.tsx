@@ -1,5 +1,5 @@
 import * as React from 'react'
-
+import { mockRunData } from './__fixtures__'
 import { InterventionModal as InterventionModalComponent } from './'
 
 import type { Story, Meta } from '@storybook/react'
@@ -28,4 +28,5 @@ export const PauseIntervention = Template.bind({})
 PauseIntervention.args = {
   robotName: 'Otie',
   command: pauseCommand,
+  run: mockRunData,
 }
