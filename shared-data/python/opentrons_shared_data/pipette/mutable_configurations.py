@@ -274,6 +274,8 @@ def _add_new_overrides_to_existing(
     # to keep the validation here until we decide to fully wipe/migrate
     # files saved on disk because some of them have unexpected
     # data entries.
+    if not existing_overrides.get("quirks"):
+        existing_overrides["quirks"] = {}
     for key, value in overrides.items():
         # If an existing override is saved as null from endpoint, remove from
         # overrides file
