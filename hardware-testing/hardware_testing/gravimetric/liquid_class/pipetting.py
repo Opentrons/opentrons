@@ -3,7 +3,10 @@ from math import pi
 from dataclasses import dataclass
 from typing import Optional, Callable, Tuple
 
-from opentrons.config.defaults_ot3 import DEFAULT_ACCELERATIONS
+from opentrons.config.defaults_ot3 import (
+    DEFAULT_ACCELERATIONS,
+    DEFAULT_MAX_SPEED_DISCONTINUITY,
+)
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_api.labware import Well
 
@@ -77,7 +80,6 @@ def _check_aspirate_dispense_args(
 
 
 def _get_approach_submerge_retract_heights(
-    pipette: InstrumentContext,
     well: Well,
     liquid_tracker: LiquidTracker,
     liquid_class: LiquidClassSettings,
@@ -123,21 +125,38 @@ def _submerge(
 
 
 def _retract(
+    ctx: ProtocolContext,
     pipette: InstrumentContext,
     well: Well,
-    height: float,
     channel_offset: Point,
     speed: float,
+    z_discontinuity: float,
 ) -> None:
-    pipette.move_to(
-        well.bottom(height).move(channel_offset),
-        force_direct=True,
-        speed=speed,
-    )
+    # change discontinuity per the liquid-class settings
+    hw_api = ctx._core.get_hardware()
+    if pipette.channels == 96:
+        hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
+            OT3AxisKind.Z
+        ] = z_discontinuity
+    else:
+        hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
+            OT3AxisKind.Z
+        ] = z_discontinuity
+    # retract out of well
     pipette.move_to(
         well.top().move(channel_offset),
         force_direct=True,
+        speed=speed,
     )
+    # reset discontinuity back to default
+    if pipette.channels == 96:
+        hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
+            OT3AxisKind.Z
+        ] = DEFAULT_MAX_SPEED_DISCONTINUITY.high_throughput[OT3AxisKind.Z]
+    else:
+        hw_api.config.motion_settings.max_speed_discontinuity.low_throughput[
+            OT3AxisKind.Z
+        ] = DEFAULT_MAX_SPEED_DISCONTINUITY.low_throughput[OT3AxisKind.Z]
 
 
 def _change_plunger_acceleration(
@@ -213,7 +232,6 @@ def _pipette_with_liquid_settings(
 
     # CALCULATE TIP HEIGHTS FOR EACH PHASE
     approach_mm, submerge_mm, retract_mm = _get_approach_submerge_retract_heights(
-        pipette,
         well,
         liquid_tracker,
         liquid_class,
@@ -242,8 +260,9 @@ def _pipette_with_liquid_settings(
             for i in range(config.NUM_MIXES_BEFORE_ASPIRATE):
                 pipette.aspirate(aspirate)
                 pipette.dispense(aspirate)
+                _z_disc = liquid_class.aspirate.z_retract_discontinuity
                 _retract(
-                    pipette, well, approach_mm, channel_offset, retract_speed
+                    ctx, pipette, well, channel_offset, retract_speed, _z_disc
                 )  # retract to the approach height
                 pipette.blow_out().aspirate(pipette.min_volume).dispense()
                 _submerge(pipette, well, submerge_mm, channel_offset, submerge_speed)
@@ -312,7 +331,11 @@ def _pipette_with_liquid_settings(
 
     # PHASE 3: RETRACT
     callbacks.on_retracting()
-    _retract(pipette, well, retract_mm, channel_offset, retract_speed)
+    if aspirate:
+        _z_disc = liquid_class.aspirate.z_retract_discontinuity
+    else:
+        _z_disc = liquid_class.dispense.z_retract_discontinuity
+    _retract(ctx, pipette, well, channel_offset, retract_speed, _z_disc)
     _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
     # EXIT
