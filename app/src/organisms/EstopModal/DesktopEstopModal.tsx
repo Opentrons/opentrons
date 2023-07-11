@@ -34,6 +34,7 @@ export function DesktopEstopModal({
   }
 
   const handleClick = (): void => {
+    // ToDo (kk:07/11/2023) this will be implemented by a following pr
     console.log('resume robot operations')
   }
 

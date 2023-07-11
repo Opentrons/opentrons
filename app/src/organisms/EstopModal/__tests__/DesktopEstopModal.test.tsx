@@ -4,7 +4,6 @@ import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
 import { DesktopEstopModal } from '../DesktopEstopModal'
-import { get } from 'lodash'
 
 const render = (props: React.ComponentProps<typeof DesktopEstopModal>) => {
   return renderWithProviders(<DesktopEstopModal {...props} />, {
