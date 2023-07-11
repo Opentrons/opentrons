@@ -70,6 +70,7 @@ from opentrons_hardware.firmware_bindings.utils import (
 
 from opentrons_shared_data.errors.exceptions import CanbusCommunicationError
 
+
 def calc_duration(step: MoveGroupSingleAxisStep) -> int:
     """Calculate duration."""
     return int(step.duration_sec * interrupts_per_sec)

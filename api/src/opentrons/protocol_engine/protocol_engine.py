@@ -253,13 +253,13 @@ class ProtocolEngine:
                 If `False`, will set status to `stopped`.
         """
         if error:
-            log.info(f"got and estop? {error}")
+            log.info(f"original error: {error.original_error}")
             if (
                 isinstance(error, ProtocolCommandFailedError)
-                and error.wrapping is not None
+                and error.original_error is not None
                 and any(
-                    ErrorCodes.E_STOP_ACTIVATED == wrapped_error.code
-                    for wrapped_error in error.wrapping
+                    ErrorCodes.E_STOP_ACTIVATED.value.code == wrapped_error.errorCode
+                    for wrapped_error in error.original_error.wrappedErrors
                 )
             ):
                 drop_tips_and_home = False

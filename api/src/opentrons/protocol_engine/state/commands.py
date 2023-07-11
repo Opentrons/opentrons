@@ -574,6 +574,7 @@ class CommandView(HasState[CommandState]):
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
+                    log.info(f"error in command: {command.error}")
                     raise ProtocolCommandFailedError(
                         original_error=command.error, message=command.error.detail
                     )
