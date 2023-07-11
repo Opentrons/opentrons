@@ -2,6 +2,7 @@ import * as React from 'react'
 import { UseMutateFunction } from 'react-query'
 import { Trans, useTranslation } from 'react-i18next'
 import { COLORS } from '@opentrons/components'
+import { LEFT } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -17,10 +18,9 @@ import type {
   CreateMaintenanceRunData,
   MaintenanceRun,
 } from '@opentrons/api-client'
-import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
-import { LEFT } from '@opentrons/shared-data'
 import type { CreateCommand } from '@opentrons/shared-data'
+import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string

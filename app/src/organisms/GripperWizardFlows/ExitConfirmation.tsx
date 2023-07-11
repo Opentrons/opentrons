@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import i18n from 'i18next'
 import {
   Flex,
   COLORS,
@@ -26,7 +25,7 @@ interface ExitConfirmationProps {
 
 export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
   const { handleGoBack, handleExit, flowType, isRobotMoving } = props
-  const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+  const { i18n, t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
   const titleFlowType: { [flowType in GripperWizardFlowType]: string } = {
     [GRIPPER_FLOW_TYPES.ATTACH]: t('attach_gripper'),
@@ -58,7 +57,7 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
         >
           <SmallButton
             buttonType="alert"
-            buttonText={i18n.format(t('shred:exit'), 'capitalize')}
+            buttonText={i18n.format(t('shared:exit'), 'capitalize')}
             onClick={handleExit}
             marginRight={SPACING.spacing4}
           />
@@ -76,7 +75,7 @@ export function ExitConfirmation(props: ExitConfirmationProps): JSX.Element {
             {t('shared:go_back')}
           </SecondaryButton>
           <AlertPrimaryButton onClick={handleExit}>
-            {i18n.format(t('shred:exit'), 'capitalize')}
+            {i18n.format(t('shared:exit'), 'capitalize')}
           </AlertPrimaryButton>
         </>
       )}

@@ -26,7 +26,7 @@ import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.
 import type { GripperWizardStepProps } from './types'
 import type { GripperData } from '@opentrons/api-client'
 
-const GO_BACK_BUTTON_STYLE = css`
+const GO_BACK_BUTTON_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   color: ${COLORS.darkGreyEnabled};
 
@@ -108,7 +108,7 @@ export const UnmountGripper = (
         gridGap={SPACING.spacing8}
       >
         <Btn onClick={() => setShowGripperStillDetected(false)}>
-          <StyledText css={GO_BACK_BUTTON_STYLE}>
+          <StyledText css={GO_BACK_BUTTON_TEXT_STYLE}>
             {t('shared:go_back')}
           </StyledText>
         </Btn>
