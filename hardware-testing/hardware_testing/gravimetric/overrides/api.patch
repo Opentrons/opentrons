@@ -3,47 +3,6 @@ index 4035e961fa,1dfde3aa43..0000000000
 deleted file mode 100644,100644
 --- a/hardware-testing/hardware_testing/gravimetric/overrides/api.patch
 +++ /dev/null
-diff --git a/api/src/opentrons/config/defaults_ot3.py b/api/src/opentrons/config/defaults_ot3.py
-index 7d5560b54a..ecd2656f1e 100644
---- a/api/src/opentrons/config/defaults_ot3.py
-+++ b/api/src/opentrons/config/defaults_ot3.py
-@@ -92,25 +92,25 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
-         OT3AxisKind.X: 400,
-         OT3AxisKind.Y: 325,
-         OT3AxisKind.Z: 100,
-         OT3AxisKind.P: 70,
-         OT3AxisKind.Z_G: 50,
-     },
- )
- 
- DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
-     high_throughput={
-         OT3AxisKind.X: 800,
-         OT3AxisKind.Y: 500,
-         OT3AxisKind.Z: 150,
--        OT3AxisKind.P: 30,
-+        OT3AxisKind.P: 1000,  # FIXME: move to liquid-class
-         OT3AxisKind.Z_G: 150,
-         OT3AxisKind.Q: 10,
-     },
-     low_throughput={
-         OT3AxisKind.X: 800,
-         OT3AxisKind.Y: 600,
-         OT3AxisKind.Z: 150,
--        OT3AxisKind.P: 100,
-+        OT3AxisKind.P: 1500,  # FIXME: move to liquid-class
-         OT3AxisKind.Z_G: 150,
-     },
- )
-@@ -121,7 +121,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
-     high_throughput={
-         OT3AxisKind.X: 10,
-         OT3AxisKind.Y: 10,
--        OT3AxisKind.Z: 5,
-+        OT3AxisKind.Z: 15,  # FIXME: move to liquid-class
-         OT3AxisKind.P: 5,
-         OT3AxisKind.Z_G: 10,
-         OT3AxisKind.Q: 5,
 diff --git a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
 index 815dada3b9..30121fc4c8 100644
 --- a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py

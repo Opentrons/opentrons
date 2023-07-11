@@ -223,12 +223,8 @@ cleanup"
 endef
 
 .PHONY: sync-sw-ot3
-sync-sw-ot3:
-	cd ../hardware && $(MAKE) push-ot3 host=$(host)
-	cd ../api && $(MAKE) push-ot3 host=$(host)
-	cd ../shared-data && $(MAKE) all push-ot3 host=$(host)
-	cd ../robot-server && $(MAKE) push-ot3 host=$(host)
-	cd ../hardware-testing && $(MAKE) push-ot3 host=$(host)
+sync-sw-ot3: push-ot3
+	cd .. && $(MAKE) push-ot3 host=$(host)
 
 .PHONY: sync-fw-ot3
 sync-fw-ot3:
