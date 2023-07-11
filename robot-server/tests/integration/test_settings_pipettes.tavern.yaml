@@ -12,7 +12,7 @@ stages:
     response:
       status_code: 200
       json: 
-        testpipette01: 
+        P300MV1020230630: 
           fields: 
             blowout: !anydict
             bottom: !anydict
@@ -41,7 +41,7 @@ marks:
 stages:
   - name: GET Pipette Settings of specific pipette request returns correct info
     request:
-      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/P300MV1020230630"
       method: GET
     response:
       status_code: 200
@@ -74,7 +74,7 @@ marks:
 stages:
   - name: PATCH Pipette Settings of a single value
     request:
-      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/P300MV1020230630"
       method: PATCH
       json:
         fields:
@@ -89,8 +89,8 @@ stages:
           dropTip:
             units: mm
             type: float
-            min: -6.0
-            max: 2.0
+            min: -20.0
+            max: 30.0
             default: -2.0
             value: 1.0
           dropTipCurrent: !anydict
@@ -117,7 +117,7 @@ marks:
 stages:
   - name: PATCH Pipette Settings of multiple values
     request:
-      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/P300MV1020230630"
       method: PATCH
       json:
         fields:
@@ -134,15 +134,15 @@ stages:
           blowout:
             units: mm
             type: float
-            min: -4.0
-            max: 10.0
+            min: -20.0
+            max: 30.0
             default: 3.0
             value: 5.0
           bottom:
             units: mm
             type: float
-            min: -2.0
-            max: 19.0
+            min: -20.0
+            max: 30.0
             default: 3.5
             value: 3.0
           dropTip: !anydict
@@ -159,8 +159,8 @@ stages:
           top:
             units: mm
             type: float
-            min: 5.0
-            max: 19.5
+            min: -20.0
+            max: 30.0
             default: 19.5
             value: 18.0
         info:
@@ -176,12 +176,12 @@ marks:
 stages:
   - name: PATCH Pipette Settings with too low of a value
     request:
-      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/P300MV1020230630"
       method: PATCH
       json:
         fields:
           dropTip:
-            value: -10.0
+            value: -40.0
     response:
       status_code: 412
       json: 
@@ -197,12 +197,12 @@ marks:
 stages:
   - name: PATCH Pipette Settings with too high of a value
     request:
-      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/P300MV1020230630"
       method: PATCH
       json:
         fields:
           dropTip:
-            value: 5.0
+            value: 50.0
     response:
       status_code: 412
       json: 
@@ -218,7 +218,7 @@ marks:
 stages:
   - name: PATCH Pipette Settings with no value at all (should reset to default)
     request:
-      url: "{ot2_server_base_url}/settings/pipettes/testpipette01"
+      url: "{ot2_server_base_url}/settings/pipettes/P300MV1020230630"
       method: PATCH
       json:
         fields:
@@ -233,8 +233,8 @@ stages:
           dropTip:
             units: mm
             type: float
-            min: -6.0
-            max: 2.0
+            min: -20.0
+            max: 30.0
             default: -2.0
             value: -2.0
           dropTipCurrent: !anydict
