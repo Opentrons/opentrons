@@ -340,8 +340,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                         )
                         and action.error_details.error.original_error is not None
                     ):
-                        error_occurrence = action.error_details.error.original_error
-                        self._state.errors_by_id[error_id] = error_occurrence
+                        self._state.errors_by_id[error_id] = action.error_details.error.original_error
                     else:
                         if not isinstance(
                             action.error_details.error,
