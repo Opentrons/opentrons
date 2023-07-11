@@ -51,6 +51,7 @@ const RETIRED_LABWARE = [
   'tipone_96_tiprack_200ul',
   'eppendorf_96_tiprack_1000ul_eptips',
   'eppendorf_96_tiprack_10ul_eptips',
+  'armadillo_96_wellplate_200ul_pcr_full_skirt',
 ]
 
 export const getLabwareDisplayName = (
