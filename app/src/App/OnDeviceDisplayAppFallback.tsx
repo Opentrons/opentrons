@@ -45,7 +45,7 @@ export function OnDeviceDisplayAppFallback({
   // immediately report to robot logs that something fatal happened
   React.useEffect(() => {
     dispatch(sendLog(`ODD app encountered a fatal error: ${error.message}`))
-  }, [dispatch, error.message])
+  }, [])
 
   return (
     <Modal header={modalHeader} isError>
