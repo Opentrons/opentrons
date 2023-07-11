@@ -296,6 +296,7 @@ def _make_ot3_pe_ctx(
             use_virtual_gripper=True,
             block_on_door_open=False,
         ),
+        drop_tips_and_home_after=False,
     ) as (
         engine,
         loop,

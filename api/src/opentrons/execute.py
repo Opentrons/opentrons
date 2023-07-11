@@ -536,6 +536,7 @@ def _create_live_context_pe(
         create_protocol_engine_in_thread(
             hardware_api=hardware_api.wrapped(),
             config=_get_protocol_engine_config(),
+            drop_tips_and_home_after=False,
         )
     )
 
@@ -715,6 +716,14 @@ def _clear_cached_hardware_controller() -> None:
     if _THREAD_MANAGED_HW:
         _THREAD_MANAGED_HW.clean_up()
         _THREAD_MANAGED_HW = None
+
+
+# This atexit registration must come after _clear_cached_hardware_controller()
+# to ensure we tear things down in order from highest level to lowest level.
+@atexit.register
+def _clear_live_protocol_engine_contexts() -> None:
+    global _LIVE_PROTOCOL_ENGINE_CONTEXTS
+    _LIVE_PROTOCOL_ENGINE_CONTEXTS.close()
 
 
 if __name__ == "__main__":

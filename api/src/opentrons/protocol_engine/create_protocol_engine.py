@@ -44,6 +44,7 @@ async def create_protocol_engine(
 def create_protocol_engine_in_thread(
     hardware_api: HardwareControlAPI,
     config: Config,
+    drop_tips_and_home_after: bool,
 ) -> typing.Generator[
     typing.Tuple[ProtocolEngine, asyncio.AbstractEventLoop], None, None
 ]:
@@ -64,7 +65,9 @@ def create_protocol_engine_in_thread(
     2. Stops and cleans up the event loop.
     3. Joins the thread.
     """
-    with async_context_manager_in_thread(_protocol_engine(hardware_api, config)) as (
+    with async_context_manager_in_thread(
+        _protocol_engine(hardware_api, config, drop_tips_and_home_after)
+    ) as (
         protocol_engine,
         loop,
     ):
@@ -73,7 +76,9 @@ def create_protocol_engine_in_thread(
 
 @contextlib.asynccontextmanager
 async def _protocol_engine(
-    hardware_api: HardwareControlAPI, config: Config
+    hardware_api: HardwareControlAPI,
+    config: Config,
+    drop_tips_and_home_after: bool,
 ) -> typing.AsyncGenerator[ProtocolEngine, None]:
     protocol_engine = await create_protocol_engine(
         hardware_api=hardware_api,
@@ -83,4 +88,4 @@ async def _protocol_engine(
         protocol_engine.play()
         yield protocol_engine
     finally:
-        await protocol_engine.finish()
+        await protocol_engine.finish(drop_tips_and_home=drop_tips_and_home_after)
