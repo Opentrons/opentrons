@@ -16,7 +16,6 @@ from opentrons_shared_data.errors import EnumeratedError
 
 from ..resources import pipette_data_provider
 from ..commands import Command, CommandCreate
-from ..errors import ProtocolEngineError
 from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
 
 
@@ -119,7 +118,7 @@ class FailCommandAction:
     command_id: str
     error_id: str
     failed_at: datetime
-    error: Union[ProtocolEngineError, EnumeratedError]
+    error: EnumeratedError
 
 
 @dataclass(frozen=True)

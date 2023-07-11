@@ -1,6 +1,5 @@
 """ProtocolEngine class definition."""
 from typing import Dict, Optional
-from logging import getLogger
 
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control import HardwareControlAPI
@@ -45,9 +44,6 @@ from .actions import (
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
 )
-
-
-log = getLogger(__name__)
 
 
 class ProtocolEngine:

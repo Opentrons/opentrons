@@ -833,7 +833,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
                         id="error-id",
                         createdAt=datetime(year=2021, month=1, day=1),
                         errorType="PythonException",
-                        detail="RuntimeError: oh no\n",
+                        detail="RuntimeError: oh no",
                         errorCode="4000",
                         # and we get some fun extra info if this wraps a normal exception
                         errorInfo={
