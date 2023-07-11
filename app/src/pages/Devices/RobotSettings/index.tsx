@@ -104,11 +104,7 @@ export function RobotSettings(): JSX.Element | null {
   )
 
   return (
-    <Box
-      minWidth={SIZE_6}
-      height="max-content"
-      padding={SPACING.spacing16}
-    >
+    <Box minWidth={SIZE_6} height="max-content" padding={SPACING.spacing16}>
       <Flex
         backgroundColor={COLORS.white}
         border={BORDERS.lineBorder}
