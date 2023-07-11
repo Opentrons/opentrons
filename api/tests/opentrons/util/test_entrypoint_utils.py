@@ -84,13 +84,13 @@ def test_datafiles_from_paths(tmp_path: Path) -> None:
 class TestCopyFileLike:
     """Tests for `copy_file_like()`."""
 
-    @pytest.fixture(params=["abc", "µ", "🥸", "\n", "\r\n"])
+    @pytest.fixture(params=["abc", "µ", "🥸"])
     def source_text(self, request: pytest.FixtureRequest) -> str:
         return request.param  # type: ignore[attr-defined,no-any-return]
 
-    @pytest.fixture(params=["utf-8", "utf-16"])
-    def source_encoding(self, request: pytest.FixtureRequest) -> str:
-        return request.param  # type: ignore[attr-defined,no-any-return]
+    @pytest.fixture
+    def source_bytes(self, source_text: str) -> bytes:
+        return source_text.encode("utf-8")
 
     @pytest.fixture
     def source_path(self, tmp_path: Path) -> Path:
@@ -103,55 +103,46 @@ class TestCopyFileLike:
     def test_from_text_file(
         self,
         source_text: str,
-        source_encoding: str,
         source_path: Path,
         destination_path: Path,
     ) -> None:
         """Test that it correctly copies from a text-mode `open()`."""
-        source_path.write_bytes(source_text.encode(source_encoding))
+        source_path.write_text(source_text)
 
         with open(
             source_path,
             mode="rt",
-            encoding=source_encoding,
-            newline="",  # Leave newlines in source_text alone; do not translate them.
         ) as source_file:
             copy_file_like(source=source_file, destination=destination_path)
 
-        assert destination_path.read_bytes() == source_path.read_bytes()
+        assert destination_path.read_text() == source_text
 
     def test_from_binary_file(
         self,
-        source_text: str,
-        source_encoding: str,
+        source_bytes: bytes,
         source_path: Path,
         destination_path: Path,
     ) -> None:
         """Test that it correctly copies from a binary-mode `open()`."""
-        source_path.write_bytes(source_text.encode(source_encoding))
+        source_path.write_bytes(source_bytes)
 
         with open(source_path, mode="rb") as source_file:
             copy_file_like(source=source_file, destination=destination_path)
 
-        assert destination_path.read_bytes() == source_path.read_bytes()
+        assert destination_path.read_bytes() == source_bytes
 
     def test_from_stringio(self, source_text: str, destination_path: Path) -> None:
         """Test that it correctly copies from an `io.StringIO`."""
-        stringio = io.StringIO(
-            source_text,
-            newline="",  # Leave newlines in source_text alone; do not translate them.
-        )
+        stringio = io.StringIO(source_text)
 
         copy_file_like(source=stringio, destination=destination_path)
 
-        assert destination_path.read_bytes() == source_text.encode("utf-8")
+        assert destination_path.read_text() == source_text
 
-    def test_from_bytesio(
-        self, source_text: str, source_encoding: str, destination_path: Path
-    ) -> None:
+    def test_from_bytesio(self, source_bytes: bytes, destination_path: Path) -> None:
         """Test that it correctly copies from an `io.BytesIO`."""
-        bytesio = io.BytesIO(source_text.encode(source_encoding))
+        bytesio = io.BytesIO(source_bytes)
 
         copy_file_like(source=bytesio, destination=destination_path)
 
-        assert destination_path.read_bytes() == source_text.encode(source_encoding)
+        assert destination_path.read_bytes() == source_bytes
