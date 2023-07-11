@@ -6,7 +6,7 @@ from opentrons.protocol_api import ProtocolContext, Well, Labware
 
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import CSVReport
-from hardware_testing.opentrons_api.types import Point
+from hardware_testing.opentrons_api.types import Point, OT3Mount
 
 from . import report
 from . import config
@@ -372,9 +372,10 @@ def _calculate_evaporation(
     resources.pipette.move_to(hover_pos)
     for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
         ui.print_info(
-            f"wait {i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE} seconds before"
-            f" measuring evaporation"
+            f"wait for scale to stabilize "
+            f"({i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE})"
         )
+        sleep(1)
     actual_asp_list_evap: List[float] = []
     actual_disp_list_evap: List[float] = []
     for b_trial in blank_trials[resources.test_volumes[-1]][0]:
@@ -444,7 +445,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         first_tip_location = first_tip.top().move(setup_channel_offset)
         _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
         mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
-        ctx._core.get_hardware().retract(mnt)
+        resources.ctx._core.get_hardware().retract(mnt)
         if not resources.ctx.is_simulating():
             ui.get_user_ready("REPLACE first tip with NEW TIP")
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")

@@ -5,7 +5,7 @@ from math import ceil
 from opentrons.protocol_api import ProtocolContext, Well, Labware
 
 from hardware_testing.data import ui
-from hardware_testing.opentrons_api.types import Point
+from hardware_testing.opentrons_api.types import Point, OT3Mount
 from .measurement import (
     MeasurementType,
     create_measurement_tag,
@@ -295,7 +295,8 @@ def _find_liquid_height(
     setup_tip = resources.tips[0][0]
     volume_for_setup = max(resources.test_volumes)
     _pick_up_tip(resources.ctx, resources.pipette, cfg, location=setup_tip.top())
-    resources.pipette.home()
+    mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+    resources.ctx._core.get_hardware().retract(mnt)
     if not resources.ctx.is_simulating():
         ui.get_user_ready("REPLACE first tip with NEW TIP")
     required_ul = max(
