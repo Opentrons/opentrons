@@ -1,6 +1,5 @@
 """Protocol engine commands sub-state."""
 from __future__ import annotations
-
 from collections import OrderedDict
 from enum import Enum
 from dataclasses import dataclass
