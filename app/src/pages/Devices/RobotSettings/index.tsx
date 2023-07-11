@@ -6,7 +6,6 @@ import {
   Box,
   Flex,
   DIRECTION_COLUMN,
-  OVERFLOW_SCROLL,
   SIZE_6,
   BORDERS,
   COLORS,
@@ -107,8 +106,7 @@ export function RobotSettings(): JSX.Element | null {
   return (
     <Box
       minWidth={SIZE_6}
-      height="100%"
-      overflow={OVERFLOW_SCROLL}
+      height="max-content"
       padding={SPACING.spacing16}
     >
       <Flex

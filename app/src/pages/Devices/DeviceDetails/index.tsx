@@ -41,7 +41,6 @@ export function DeviceDetails(): JSX.Element | null {
       <Box
         minWidth="36rem"
         height="100%"
-        overflow={OVERFLOW_SCROLL}
         paddingX={SPACING.spacing16}
         paddingTop={SPACING.spacing16}
         paddingBottom={SPACING.spacing48}
