@@ -46,6 +46,8 @@ SPEED_REDUCTION_PERCENTAGE = 0.3
 
 MULTI_CHANNEL_1_OFFSET = Point(y=9 * 7 * 0.5)
 
+ChangedPressureFixtureHover = 20
+
 # NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
 #       so here we cache these readings, and append them to the CSV in the end
 PRESSURE_DATA_CACHE = []
@@ -290,7 +292,7 @@ async def _move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
     CALIBRATED_LABWARE_LOCATIONS.fixture = await _move_to_or_calibrate(
         api,
         mount,
-        IDEAL_LABWARE_LOCATIONS.fixture,
+        IDEAL_LABWARE_LOCATIONS.fixture + Point(z=ChangedPressureFixtureHover),
         CALIBRATED_LABWARE_LOCATIONS.fixture,
     )
 
