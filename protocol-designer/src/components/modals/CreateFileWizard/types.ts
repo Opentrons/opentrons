@@ -6,7 +6,7 @@ import type {
 
 import type { NewProtocolFields } from '../../../load-file'
 
-type AdditionalEquipment = 'gripper'
+export type AdditionalEquipment = 'gripper'
 
 export interface FormState {
   fields: NewProtocolFields

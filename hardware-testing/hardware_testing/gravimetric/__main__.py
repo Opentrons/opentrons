@@ -1,4 +1,6 @@
 """Gravimetric OT3."""
+from json import load as json_load
+from pathlib import Path
 import argparse
 from typing import List
 
@@ -17,6 +19,10 @@ from hardware_testing.protocols import (
     gravimetric_ot3_p1000_96_1000ul_tip,
     photometric_ot3_p1000_96_50ul_tip,
     photometric_ot3_p1000_96_200ul_tip,
+    gravimetric_ot3_p50_multi_50ul_tip_increment,
+    gravimetric_ot3_p1000_multi_50ul_tip_increment,
+    gravimetric_ot3_p1000_multi_200ul_tip_increment,
+    gravimetric_ot3_p1000_multi_1000ul_tip_increment,
 )
 
 from . import execute, helpers, workarounds, execute_photometric
@@ -53,6 +59,30 @@ GRAVIMETRIC_CFG = {
     },
 }
 
+GRAVIMETRIC_CFG_INCREMENT = {
+    50: {
+        1: {50: gravimetric_ot3_p50_single},
+        8: {50: gravimetric_ot3_p50_multi_50ul_tip_increment},
+    },
+    1000: {
+        1: {
+            50: gravimetric_ot3_p1000_single,
+            200: gravimetric_ot3_p1000_single,
+            1000: gravimetric_ot3_p1000_single,
+        },
+        8: {
+            50: gravimetric_ot3_p1000_multi_50ul_tip_increment,
+            200: gravimetric_ot3_p1000_multi_200ul_tip_increment,
+            1000: gravimetric_ot3_p1000_multi_1000ul_tip_increment,
+        },
+        96: {
+            50: gravimetric_ot3_p1000_96_50ul_tip,
+            200: gravimetric_ot3_p1000_96_200ul_tip,
+            1000: gravimetric_ot3_p1000_96_1000ul_tip,
+        },
+    },
+}
+
 PHOTOMETRIC_CFG = {
     50: photometric_ot3_p1000_96_50ul_tip,
     200: photometric_ot3_p1000_96_200ul_tip,
@@ -73,9 +103,15 @@ def run_gravimetric(
     user_volumes: bool,
     gantry_speed: int,
     scale_delay: int,
+    isolate_channels: List[int],
 ) -> None:
     """Run."""
-    protocol_cfg = GRAVIMETRIC_CFG[pipette_volume][pipette_channels][tip_volume]
+    if increment:
+        protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[pipette_volume][pipette_channels][
+            tip_volume
+        ]
+    else:
+        protocol_cfg = GRAVIMETRIC_CFG[pipette_volume][pipette_channels][tip_volume]
     execute.run(
         protocol,
         GravimetricConfig(
@@ -97,6 +133,7 @@ def run_gravimetric(
             user_volumes=user_volumes,
             gantry_speed=gantry_speed,
             scale_delay=scale_delay,
+            isolate_channels=isolate_channels,
         ),
     )
 
@@ -160,6 +197,7 @@ if __name__ == "__main__":
     parser.add_argument("--photometric", action="store_true")
     parser.add_argument("--touch-tip", action="store_true")
     parser.add_argument("--refill", action="store_true")
+    parser.add_argument("--isolate-channels", nargs="+", type=int, default=None)
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context
@@ -173,11 +211,29 @@ if __name__ == "__main__":
             print(f"\t\t{offset['definitionUri']}")
             print(f"\t\t{offset['vector']}")
             LABWARE_OFFSETS.append(offset)
-    _protocol = GRAVIMETRIC_CFG[args.pipette][args.channels][args.tip]
+    if args.increment:
+        _protocol = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][args.tip]
+    else:
+        _protocol = GRAVIMETRIC_CFG[args.pipette][args.channels][args.tip]
+    # gather the custom labware (for simulation)
+    custom_defs = {}
+    if args.simulate:
+        labware_dir = Path(__file__).parent.parent / "labware"
+        custom_def_uris = [
+            "radwag_pipette_calibration_vial",
+            "opentrons_flex_96_tiprack_50ul_adp",
+            "opentrons_flex_96_tiprack_200ul_adp",
+            "opentrons_flex_96_tiprack_1000ul_adp",
+        ]
+        for def_uri in custom_def_uris:
+            with open(labware_dir / def_uri / "1.json", "r") as f:
+                custom_def = json_load(f)
+            custom_defs[def_uri] = custom_def
     _ctx = helpers.get_api_context(
         API_LEVEL,  # type: ignore[attr-defined]
         is_simulating=args.simulate,
         deck_version="2",
+        extra_labware=custom_defs,
     )
     if args.photometric:
         run_photometric(
@@ -208,4 +264,5 @@ if __name__ == "__main__":
             args.user_volumes,
             args.gantry_speed,
             args.scale_delay,
+            args.isolate_channels if args.isolate_channels else [],
         )

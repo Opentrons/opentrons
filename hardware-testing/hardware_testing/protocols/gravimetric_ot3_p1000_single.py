@@ -16,7 +16,7 @@ LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
 def run(ctx: ProtocolContext) -> None:
     """Run."""
     tipracks = [
-        ctx.load_labware(f"opentrons_ot3_96_tiprack_{size}uL", slot)
+        ctx.load_labware(f"opentrons_flex_96_tiprack_{size}uL", slot)
         for size, slots in SLOTS_TIPRACK.items()
         for slot in slots
     ]

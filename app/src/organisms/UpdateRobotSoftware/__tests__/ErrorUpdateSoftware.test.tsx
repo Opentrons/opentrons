@@ -41,7 +41,7 @@ describe('ErrorUpdateSoftware', () => {
   it('call mockPush when tapping Proceed without updating', () => {
     const [{ getByText }] = render(props)
     getByText('Proceed without updating').click()
-    expect(mockPush).toBeCalledWith('/robot-settings/rename-robot')
+    expect(mockPush).toBeCalledWith('/emergency-stop')
   })
 
   it('call mock function when tapping Try again', () => {

@@ -7,9 +7,9 @@ export function registerAppRestart(): (action: Action) => unknown {
   return function handleAction(action: Action) {
     switch (action.type) {
       case APP_RESTART:
-        systemd.sendStatus('restart app')
+        systemd.sendStatus(`restarting app: ${action.payload.message}`)
+        console.log(`restarting app: ${action.payload.message}`)
         systemd.restartApp()
-
         break
     }
   }

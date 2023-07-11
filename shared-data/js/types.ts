@@ -27,6 +27,7 @@ import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
 import type { PipetteName } from './pipettes'
 import { LabwareLocation } from '../protocol/types/schemaV6/command/setup'
+import { EXTENSION } from '.'
 
 export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
 
@@ -341,7 +342,7 @@ export type PipetteChannels = 1 | 8 | 96
 export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof GEN3
 
 export type PipetteMount = typeof LEFT | typeof RIGHT
-
+export type GantryMount = typeof LEFT | typeof RIGHT | typeof EXTENSION
 export interface FlowRateSpec {
   value: number
   min: number
@@ -460,10 +461,15 @@ export interface ProtocolResource {
 export interface ProtocolAnalysesResource {
   analyses: Array<PendingProtocolAnalysis | CompletedProtocolAnalysis>
 }
+export type MotorAxis =
+  | 'x'
+  | 'y'
+  | 'leftZ'
+  | 'rightZ'
+  | 'leftPlunger'
+  | 'rightPlunger'
 
-export type MotorAxis = Array<
-  'x' | 'y' | 'leftZ' | 'rightZ' | 'leftPlunger' | 'rightPlunger'
->
+export type MotorAxes = MotorAxis[]
 
 export type ThermalAdapterName =
   | 'PCR Adapter'

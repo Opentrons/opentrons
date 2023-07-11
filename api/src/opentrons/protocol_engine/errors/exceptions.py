@@ -146,7 +146,7 @@ class LabwareNotLoadedError(ProtocolEngineError):
 
 
 class LabwareNotLoadedOnModuleError(ProtocolEngineError):
-    """Raised when referencing a labware on a module that has not been loaded."""
+    """Raised when there is no labware loaded on the requested module."""
 
     def __init__(
         self,
@@ -155,6 +155,19 @@ class LabwareNotLoadedOnModuleError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LabwareNotLoadedOnModuleError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareNotLoadedOnLabwareError(ProtocolEngineError):
+    """Raised when there is no labware loaded on the requested labware."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareNotLoadedOnLabwareError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -197,6 +210,58 @@ class LabwareDefinitionDoesNotExistError(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
+class LabwareDefinitionIsNotLabwareError(ProtocolEngineError):
+    """Raised when trying to load a labware via loadLabware that is not a labware."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareDefinitionIsNotLabwareError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareDefinitionIsNotAdapterError(ProtocolEngineError):
+    """Raised when trying to load an adapter via loadAdapter that is not an adapter."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareDefinitionIsNotAdapterError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareCannotBeStackedError(ProtocolEngineError):
+    """Raised when trying to load labware onto another labware it is not defined to be loaded onto."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareCannotBeStackedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareIsInStackError(ProtocolEngineError):
+    """Raised when trying to move to or physically interact with a labware that has another labware on top."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsInStackError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
 class LabwareOffsetDoesNotExistError(ProtocolEngineError):
     """Raised when referencing a labware offset that does not exist."""
 
@@ -233,6 +298,19 @@ class LabwareIsTipRackError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LabwareIsTiprackError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareIsAdapterError(ProtocolEngineError):
+    """Raised when trying to use a command not allowed on adapter."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsAdapterError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 

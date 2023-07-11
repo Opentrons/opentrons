@@ -171,11 +171,11 @@ def _get_ideal_labware_locations(
 ) -> LabwareLocations:
     tip_rack_liquid_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_tip_rack_liquid,
-        f"opentrons_ot3_96_tiprack_{pipette_volume}ul",
+        f"opentrons_flex_96_tiprack_{pipette_volume}ul",
     )
     tip_rack_fixture_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_tip_rack_fixture,
-        f"opentrons_ot3_96_tiprack_{PRESSURE_FIXTURE_TIP_VOLUME}ul",
+        f"opentrons_flex_96_tiprack_{PRESSURE_FIXTURE_TIP_VOLUME}ul",
     )
     reservoir_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_reservoir, "nest_1_reservoir_195ml"
@@ -795,7 +795,7 @@ async def _test_diagnostics_pressure(
     if not api.is_simulator:
         _get_operator_answer_to_question('REMOVE tip to nozzle, enter "y" when ready')
     print("moving plunger back down to BOTTOM position")
-    await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom)
+    await api.dispense(mount)
     await api.remove_tip(mount)
     return pressure_open_air_pass and pressure_sealed_pass and pressure_compress_pass
 

@@ -31,6 +31,6 @@ describe('NoUpdateFound', () => {
   it('should call mock function when tapping next button', () => {
     const [{ getByText }] = render()
     getByText('Continue').click()
-    expect(mockPush).toBeCalledWith('/robot-settings/rename-robot')
+    expect(mockPush).toBeCalledWith('/emergency-stop')
   })
 })

@@ -48,7 +48,6 @@ describe('TouchscreenBrightness', () => {
   it('should render text and buttons', () => {
     const [{ getByText, getByTestId }] = render(props)
     getByText('Touchscreen Brightness')
-    getByTestId('TouchscreenBrightness_back_button')
     getByTestId('TouchscreenBrightness_decrease')
     getByTestId('TouchscreenBrightness_increase')
   })
@@ -87,12 +86,5 @@ describe('TouchscreenBrightness', () => {
     const button = getByTestId('TouchscreenBrightness_decrease')
     fireEvent.click(button)
     expect(mockUpdateConfigValue).toHaveBeenCalled()
-  })
-
-  it('should call mock function when tapping back button', () => {
-    const [{ getByTestId }] = render(props)
-    const button = getByTestId('TouchscreenBrightness_back_button')
-    fireEvent.click(button)
-    expect(props.setCurrentOption).toHaveBeenCalled()
   })
 })

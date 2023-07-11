@@ -6,6 +6,9 @@ from fastapi import Path, APIRouter, Depends
 from opentrons.hardware_control import modules, HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule
 
+from opentrons_shared_data.errors.exceptions import APIRemoved, ModuleNotPresent
+from opentrons_shared_data.errors.codes import ErrorCodes
+
 from robot_server.errors import LegacyErrorResponse
 from robot_server.hardware import get_hardware
 from robot_server.versioning import get_requested_version
@@ -77,23 +80,27 @@ async def post_serial_command(
 ) -> SerialCommandResponse:
     """Send a command on device identified by serial"""
     if requested_version >= 3:
-        raise LegacyErrorResponse(
-            message=("This endpoint has been removed. Use POST /commands instead.")
+        raise LegacyErrorResponse.from_exc(
+            APIRemoved(
+                "/modules/{serial}",
+                "3",
+                "This endpoint has been removed. Use POST /commands instead.",
+            ),
         ).as_error(status.HTTP_410_GONE)
 
     attached_modules = hardware.attached_modules
     if not attached_modules:
-        raise LegacyErrorResponse(message="No connected modules").as_error(
-            status.HTTP_404_NOT_FOUND
-        )
+        raise LegacyErrorResponse.from_exc(
+            ModuleNotPresent(serial, message="No connected modules")
+        ).as_error(status.HTTP_404_NOT_FOUND)
 
     # Search for the module
     matching_mod = find_matching_module(serial, attached_modules)
 
     if not matching_mod:
-        raise LegacyErrorResponse(message="Specified module not found").as_error(
-            status.HTTP_404_NOT_FOUND
-        )
+        raise LegacyErrorResponse.from_exc(
+            ModuleNotPresent(serial, message="Specified module not found")
+        ).as_error(status.HTTP_404_NOT_FOUND)
 
     if hasattr(matching_mod, command.command_type):
         clean_args = command.args or []
@@ -107,13 +114,15 @@ async def post_serial_command(
             raise LegacyErrorResponse(
                 message=f"Server encountered a TypeError "
                 f"while running {method} : {e}. "
-                f"Possibly a type mismatch in args"
+                f"Possibly a type mismatch in args",
+                errorCode=ErrorCodes.ROBOTICS_INTERACTION_ERROR.value.code,
             ).as_error(status.HTTP_400_BAD_REQUEST)
         else:
             return SerialCommandResponse(message="Success", returnValue=val)
     else:
         raise LegacyErrorResponse(
-            message=f"Module does not have command: {command.command_type}"
+            message=f"Module does not have command: {command.command_type}",
+            errorCode=ErrorCodes.ROBOTICS_INTERACTION_ERROR.value.code,
         ).as_error(status.HTTP_400_BAD_REQUEST)
 
 
@@ -139,9 +148,9 @@ async def post_serial_update(
     matching_module = find_matching_module(serial, attached_modules)
 
     if not matching_module:
-        raise LegacyErrorResponse(message=f"Module {serial} not found").as_error(
-            status.HTTP_404_NOT_FOUND
-        )
+        raise LegacyErrorResponse.from_exc(
+            ModuleNotPresent(serial, message=f"Module {serial} not found")
+        ).as_error(status.HTTP_404_NOT_FOUND)
 
     try:
         if matching_module.bundled_fw:
@@ -166,7 +175,9 @@ async def post_serial_update(
     except asyncio.TimeoutError:
         res = "Module not responding"
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-    raise LegacyErrorResponse(message=res).as_error(status_code)
+    raise LegacyErrorResponse(
+        message=res, errorCode=ErrorCodes.FIRMWARE_UPDATE_FAILED.value.code
+    ).as_error(status_code)
 
 
 def find_matching_module(

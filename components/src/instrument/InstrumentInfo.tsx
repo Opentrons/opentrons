@@ -1,9 +1,12 @@
 import * as React from 'react'
-import cx from 'classnames'
 
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { InfoItem } from './InfoItem'
 import { InstrumentDiagram } from './InstrumentDiagram'
 import styles from './instrument.css'
+import { Flex } from '../primitives'
+import { SPACING } from '../ui-style-constants'
+import { DIRECTION_COLUMN, JUSTIFY_CENTER } from '../styles'
 
 import type { Mount } from '../robot-types'
 import type { InstrumentDiagramProps } from './InstrumentDiagram'
@@ -30,32 +33,32 @@ export interface InstrumentInfoProps {
 }
 
 export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
-  const className = cx(
-    styles.pipette,
-    styles[props.mount],
-    { [styles.disabled]: props.isDisabled },
-    props.className
-  )
-
   return (
-    <div className={className}>
-      <div className={cx(styles.pipette_info, props.infoClassName)}>
-        <InfoItem
-          title={props.showMountLabel ? `${props.mount} pipette` : 'pipette'}
-          value={props.description}
-        />
-        {props.tiprackModel && (
-          <InfoItem title={'tip rack'} value={props.tiprackModel} />
-        )}
-        {props.children}
-      </div>
-      {props.pipetteSpecs && (
+    <Flex justifyContent={JUSTIFY_CENTER} gridGap={SPACING.spacing16}>
+      {props.mount === RIGHT && props.pipetteSpecs && (
         <InstrumentDiagram
           pipetteSpecs={props.pipetteSpecs}
           className={styles.pipette_icon}
           mount={props.mount}
         />
       )}
-    </div>
+      <Flex flexDirection={DIRECTION_COLUMN}>
+        <InfoItem
+          title={props.showMountLabel ? `${props.mount} pipette` : 'pipette'}
+          value={props.description}
+        />
+        {props.tiprackModel && (
+          <InfoItem title="tip rack" value={props.tiprackModel} />
+        )}
+      </Flex>
+      {props.children}
+      {props.mount === LEFT && props.pipetteSpecs && (
+        <InstrumentDiagram
+          pipetteSpecs={props.pipetteSpecs}
+          className={styles.pipette_icon}
+          mount={props.mount}
+        />
+      )}
+    </Flex>
   )
 }

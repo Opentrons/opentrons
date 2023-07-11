@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { useTranslation } from 'react-i18next'
 import { FormikProps } from 'formik'
 import {
   DIRECTION_COLUMN,
@@ -26,11 +25,11 @@ import {
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
-import { GoBackLink } from './GoBackLink'
-
-import type { FormState, WizardTileProps } from './types'
+import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
+
+import type { FormState, WizardTileProps } from './types'
 
 export function FirstPipetteTypeTile(props: WizardTileProps): JSX.Element {
   const mount = LEFT
@@ -66,7 +65,6 @@ interface PipetteTypeTileProps extends WizardTileProps {
   tileHeader: string
 }
 export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
-  const { i18n, t } = useTranslation()
   const { allowNoPipette, tileHeader, proceed, goBack } = props
   return (
     <HandleEnter onEnter={proceed}>
@@ -84,9 +82,9 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           width="100%"
         >
-          <GoBackLink onClick={() => goBack()} />
+          <GoBack onClick={() => goBack()} />
           <PrimaryButton onClick={() => proceed()}>
-            {i18n.format(t('shared.next'), 'capitalize')}
+            {i18n.t('application.next')}
           </PrimaryButton>
         </Flex>
       </Flex>
@@ -125,12 +123,20 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
   }, [robotType])
   const nameAccessor = `pipettesByMount.${mount}.pipetteName`
   const currentValue = values.pipettesByMount[mount].pipetteName
-  if (currentValue === undefined) {
-    setFieldValue(
-      nameAccessor,
-      allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
-    )
-  }
+  React.useEffect(() => {
+    if (currentValue === undefined) {
+      setFieldValue(
+        nameAccessor,
+        allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
+      )
+    }
+  }, [
+    currentValue,
+    setFieldValue,
+    nameAccessor,
+    allowNoPipette,
+    pipetteOptions,
+  ])
 
   return (
     <Flex

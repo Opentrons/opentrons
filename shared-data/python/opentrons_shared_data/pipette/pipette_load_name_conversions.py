@@ -124,12 +124,52 @@ def version_from_generation(pipette_name_list: List[str]) -> PipetteVersionType:
         PipetteVersionType: A pipette version object.
 
     """
-    if "gen3" in pipette_name_list:
+    if "flex" in pipette_name_list or "gen3" in pipette_name_list:
         return PipetteVersionType(3, 0)
     elif "gen2" in pipette_name_list:
         return PipetteVersionType(2, 0)
     else:
         return PipetteVersionType(1, 0)
+
+
+def generation_from_string(pipette_name_list: List[str]) -> PipetteGenerationType:
+    """Convert a string generation name to a py:obj:PipetteGenerationType.
+
+    Args:
+        pipette_name_list (List[str]): A list of strings from the separated by `_`
+        py:data:PipetteName or py:data:PipetteModel.
+
+    Returns:
+        PipetteGenerationType: A pipette version object.
+
+    """
+    if "flex" in pipette_name_list or "3." in pipette_name_list[-1]:
+        return PipetteGenerationType.FLEX
+    elif "gen2" in pipette_name_list or "2." in pipette_name_list[-1]:
+        return PipetteGenerationType.GEN2
+    else:
+        return PipetteGenerationType.GEN1
+
+
+def convert_to_pipette_name_type(name: PipetteName) -> PipetteNameType:
+    """Convert the py:data:PipetteName to a py:obj:PipetteModelVersionType.
+
+    `PipetteNames` are in the format of "p300_single" or "p300_single_gen1".
+
+    Args:
+        name (PipetteName): The pipette name we want to convert.
+
+    Returns:
+        PipetteNameType: An object representing a broken out PipetteName
+        string.
+
+    """
+    split_pipette_name = name.split("_")
+    channels = channels_from_string(split_pipette_name[1])
+    generation = generation_from_string(split_pipette_name)
+    pipette_type = PipetteModelType[split_pipette_name[0]]
+
+    return PipetteNameType(pipette_type, channels, generation)
 
 
 def convert_pipette_name(

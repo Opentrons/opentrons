@@ -97,7 +97,6 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
           backgroundColor={COLORS.white}
           height="3.75rem"
           width="3.75rem"
-          marginRight={SPACING.spacing16}
         >
           <Icon
             name="circle"
@@ -110,11 +109,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           alignItems={TYPOGRAPHY.textAlignCenter}
         >
-          <StyledText
-            lineHeight={TYPOGRAPHY.lineHeight28}
-            fontSize="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {liquid.displayName}
           </StyledText>
         </Flex>

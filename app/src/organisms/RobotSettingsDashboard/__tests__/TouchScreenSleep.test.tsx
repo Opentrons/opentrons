@@ -8,6 +8,8 @@ import { TouchScreenSleep } from '../TouchScreenSleep'
 
 jest.mock('../../../redux/config')
 
+// Note (kj:06/28/2023) this line is to avoid causing errors for scrollIntoView
+window.HTMLElement.prototype.scrollIntoView = jest.fn()
 const mockUpdateConfigValue = updateConfigValue as jest.MockedFunction<
   typeof updateConfigValue
 >

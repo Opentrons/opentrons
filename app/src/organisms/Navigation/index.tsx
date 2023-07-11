@@ -17,6 +17,7 @@ import {
   DIRECTION_COLUMN,
   POSITION_STICKY,
   POSITION_STATIC,
+  BORDERS,
 } from '@opentrons/components'
 
 import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
@@ -58,8 +59,21 @@ export function Navigation(props: NavigationProps): JSX.Element {
     }
     setShowNavMenu(openMenu)
   }
+
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
+
+  const observer = new IntersectionObserver(([entry]) => {
+    setIsScrolled(!entry.isIntersecting)
+  })
+  if (scrollRef.current != null) {
+    observer.observe(scrollRef.current)
+  }
+
   return (
     <>
+      {/* Empty box to detect scrolling */}
+      <Flex ref={scrollRef} />
       <Flex
         flexDirection={DIRECTION_ROW}
         alignItems={ALIGN_CENTER}
@@ -71,9 +85,11 @@ export function Navigation(props: NavigationProps): JSX.Element {
             ? POSITION_STATIC
             : POSITION_STICKY
         }
+        paddingX={SPACING.spacing40}
         top="0"
         width="100%"
         backgroundColor={COLORS.white}
+        boxShadow={isScrolled ? BORDERS.shadowBig : ''}
         gridGap={SPACING.spacing24}
         aria-label="Navigation_container"
       >

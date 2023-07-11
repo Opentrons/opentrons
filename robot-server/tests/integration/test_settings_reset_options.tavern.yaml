@@ -121,6 +121,7 @@ stages:
       status_code: 403
       json:
         message: "gripperOffsetCalibrations is not a valid reset option."
+        errorCode: "4000"
 ---
 test_name: POST Reset non existant option
 marks:
@@ -137,3 +138,4 @@ stages:
       status_code: 422
       json:
         message: !re_search 'value is not a valid enumeration member'
+        errorCode: "4000"

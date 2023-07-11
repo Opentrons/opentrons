@@ -4,6 +4,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getModuleDisplayName,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
   START_TERMINAL_ITEM_ID,
@@ -93,6 +94,7 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
   getRobotType,
   (robotState, moduleEntities, robotType) => {
     const deckDef = getDeckDefFromRobotType(robotType)
+    const trashSlot = robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'
     const allSlotIds = deckDef.locations.orderedSlots.map(slot => slot.id)
     if (robotState == null) return null
 
@@ -122,7 +124,11 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
               {
                 name: `${getModuleDisplayName(
                   moduleEntities[modId].model
-                )} in slot ${modOnDeck.slot}`,
+                )} in slot ${
+                  modOnDeck.slot === 'span7_8_10_11'
+                    ? '7, 8, 10, 11'
+                    : modOnDeck.slot
+                }`,
                 value: modId,
               },
             ]
@@ -136,11 +142,22 @@ export const getUnocuppiedLabwareLocationOptions: Selector<
           !slotIdsOccupiedByModules.includes(slotId) &&
           !Object.values(labware)
             .map(lw => lw.slot)
-            .includes(slotId)
+            .includes(slotId) &&
+          slotId !== trashSlot
       )
       .map(slotId => ({ name: slotId, value: slotId }))
 
-    return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions]
+    const offDeckSlot = Object.values(labware)
+      .map(lw => lw.slot)
+      .find(slot => slot === 'offDeck')
+    const offDeck =
+      offDeckSlot !== 'offDeck' ? { name: 'Off Deck', value: 'offDeck' } : null
+
+    if (offDeck == null) {
+      return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions]
+    } else {
+      return [...unoccupiedModuleOptions, ...unoccupiedSlotOptions, offDeck]
+    }
   }
 )
 

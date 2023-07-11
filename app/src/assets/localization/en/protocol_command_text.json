@@ -14,7 +14,7 @@
   "drop_tip": "Dropping tip in {{well_name}} of {{labware}}",
   "engaging_magnetic_module": "Engaging Magnetic Module",
   "fixed_trash": "Fixed Trash",
-  "home_robot_arm": "Homing all robot arm, pipette, and plunger axes",
+  "home_gantry": "Homing all gantry, pipette, and plunger axes",
   "latching_hs_latch": "Latching labware on Heater-Shaker",
   "module_in_slot_plural": "{{module}}",
   "module_in_slot": "{{module}} in Slot {{slot_name}}",

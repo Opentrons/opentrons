@@ -76,7 +76,7 @@ export function ErrorUpdateSoftware({
           flex="1"
           buttonType="secondary"
           buttonText={t('proceed_without_updating')}
-          onClick={() => history.push('/robot-settings/rename-robot')}
+          onClick={() => history.push('/emergency-stop')}
         />
         <MediumButton
           flex="1"

@@ -26,6 +26,7 @@ export const Deck = (props: { protocolId: string }): JSX.Element => {
           ? (mostRecentAnalysis as CompletedProtocolAnalysis)?.liquids
           : []
       }
+      showSlotLabels
       marginX="12rem"
     />
   )

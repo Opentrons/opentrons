@@ -126,11 +126,11 @@ exports[`InstrumentDiagram single-channel GEN3 renders correctly 1`] = `
 `;
 
 exports[`InstrumentGroup Renders correctly 1`] = `
-.c0 {
+.c2 {
   min-width: 0;
 }
 
-.c1 {
+.c3 {
   min-width: 0;
   -webkit-transform: scaleX(-1);
   -ms-transform: scaleX(-1);
@@ -139,14 +139,36 @@ exports[`InstrumentGroup Renders correctly 1`] = `
   filter: FlipH;
 }
 
+.c0 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  grid-gap: 1rem;
+}
+
+.c1 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
 <section
   className="pipette_group"
 >
   <div
-    className="pipette left foo"
+    className="c0"
   >
     <div
-      className="pipette_info"
+      className="c1"
     >
       <div>
         <h2
@@ -162,7 +184,7 @@ exports[`InstrumentGroup Renders correctly 1`] = `
       </div>
     </div>
     <div
-      className="c0 pipette_icon"
+      className="c2 pipette_icon"
     >
       <img
         className=""
@@ -171,10 +193,18 @@ exports[`InstrumentGroup Renders correctly 1`] = `
     </div>
   </div>
   <div
-    className="pipette right disabled blah"
+    className="c0"
   >
     <div
-      className="pipette_info"
+      className="c3 pipette_icon"
+    >
+      <img
+        className=""
+        src="single_channel_GEN1_800px.png"
+      />
+    </div>
+    <div
+      className="c1"
     >
       <div>
         <h2
@@ -188,14 +218,6 @@ exports[`InstrumentGroup Renders correctly 1`] = `
           p10 Single
         </span>
       </div>
-    </div>
-    <div
-      className="c1 pipette_icon"
-    >
-      <img
-        className=""
-        src="single_channel_GEN1_800px.png"
-      />
     </div>
   </div>
 </section>

@@ -4,11 +4,18 @@ import { getUnocuppiedLabwareLocationOptions } from '../../../../top-selectors/l
 import { StepFormDropdown } from '../StepFormDropdownField'
 
 export function LabwareLocationField(
-  props: Omit<React.ComponentProps<typeof StepFormDropdown>, 'options'>
+  props: Omit<React.ComponentProps<typeof StepFormDropdown>, 'options'> & {
+    useGripper: boolean
+  }
 ): JSX.Element {
-  const unoccupiedLabwareLocationsOptions =
+  let unoccupiedLabwareLocationsOptions =
     useSelector(getUnocuppiedLabwareLocationOptions) ?? []
 
+  if (props.useGripper) {
+    unoccupiedLabwareLocationsOptions = unoccupiedLabwareLocationsOptions.filter(
+      option => option.value !== 'offDeck'
+    )
+  }
   return (
     <StepFormDropdown {...props} options={unoccupiedLabwareLocationsOptions} />
   )

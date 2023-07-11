@@ -38,7 +38,7 @@ export function ProtocolAnalysisErrorModal({
         title="Protocol analysis failure"
         onClose={onClose}
       >
-        <StyledText as="p">
+        <StyledText as="p" overflowWrap="anywhere">
           {t('analysis_failure_on_robot', {
             protocolName: displayName,
             robotName,

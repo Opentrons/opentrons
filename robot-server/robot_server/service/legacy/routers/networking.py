@@ -5,6 +5,7 @@ import subprocess
 from starlette import status
 from starlette.responses import JSONResponse
 from fastapi import APIRouter, HTTPException, File, Path, UploadFile
+from opentrons_shared_data.errors import ErrorCodes
 from opentrons.system import nmcli, wifi
 
 from robot_server.errors import LegacyErrorResponse
@@ -98,12 +99,12 @@ async def post_wifi_configure(
     except (ValueError, TypeError) as e:
         # Indicates an unexpected kwarg; check is done here to avoid keeping
         # the _check_configure_args signature up to date with nmcli.configure
-        raise LegacyErrorResponse(message=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
+        raise LegacyErrorResponse.from_exc(e).as_error(status.HTTP_400_BAD_REQUEST)
 
     if not ok:
-        raise LegacyErrorResponse(message=message).as_error(
-            status.HTTP_401_UNAUTHORIZED
-        )
+        raise LegacyErrorResponse(
+            message=message, errorCode=ErrorCodes.GENERAL_ERROR.value.code
+        ).as_error(status.HTTP_401_UNAUTHORIZED)
 
     return WifiConfigurationResponse(message=message, ssid=configuration.ssid)
 
@@ -173,9 +174,10 @@ async def delete_wifi_key(
     """Delete wifi key handler"""
     deleted_file = wifi.remove_key(key_uuid)
     if not deleted_file:
-        raise LegacyErrorResponse(message=f"No such key file {key_uuid}").as_error(
-            status.HTTP_404_NOT_FOUND
-        )
+        raise LegacyErrorResponse(
+            message=f"No such key file {key_uuid}",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_404_NOT_FOUND)
     return V1BasicResponse(message=f"Key file {deleted_file} deleted")
 
 

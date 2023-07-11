@@ -163,6 +163,128 @@ def test_load_labware_from_definition(
     decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
 
+def test_load_adapter(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    mock_core: ModuleCore,
+    subject: ModuleContext,
+) -> None:
+    """It should load adapter by load parameters."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(
+        mock_protocol_core.load_adapter(
+            load_name="an adapter",
+            namespace="spacename",
+            version=101,
+            location=mock_core,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_adapter(
+        name="an adapter",
+        namespace="spacename",
+        version=101,
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "Full Name"
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
+
+
+def test_load_adapter_from_definition(
+    decoy: Decoy,
+    mock_core: ModuleCore,
+    mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    subject: ModuleContext,
+) -> None:
+    """It should be able to load a labware from a definition dictionary."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    labware_definition_dict = cast(LabwareDefDict, {"labwareDef": True})
+    labware_load_params = LabwareLoadParams("you", "are", 1337)
+
+    decoy.when(
+        mock_protocol_core.add_labware_definition(labware_definition_dict)
+    ).then_return(labware_load_params)
+
+    decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    decoy.when(
+        mock_protocol_core.load_adapter(
+            namespace="you",
+            load_name="are",
+            version=1337,
+            location=mock_core,
+        )
+    ).then_return(mock_labware_core)
+
+    result = subject.load_adapter_from_definition(
+        definition=labware_definition_dict,
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "Full Name"
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 1234)])
+def test_load_labware_with_adapter(
+    decoy: Decoy,
+    mock_protocol_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    mock_core: ModuleCore,
+    api_version: APIVersion,
+    subject: ModuleContext,
+) -> None:
+    """It should load labware by load parameters."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+    mock_adapter_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(
+        mock_protocol_core.load_adapter(
+            load_name="adaptation",
+            namespace="ideal",
+            version=None,
+            location=mock_core,
+        )
+    ).then_return(mock_adapter_core)
+
+    decoy.when(mock_adapter_core.get_well_columns()).then_return([])
+
+    decoy.when(
+        mock_protocol_core.load_labware(
+            load_name="the platonic labware",
+            label="perfect",
+            namespace="ideal",
+            version=101,
+            location=mock_adapter_core,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_labware(
+        name="the platonic labware",
+        label="perfect",
+        namespace="ideal",
+        version=101,
+        adapter="adaptation",
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "Full Name"
+    assert result.api_version == api_version
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
+
+
 def test_parent(decoy: Decoy, mock_core: ModuleCore, subject: ModuleContext) -> None:
     """Should get the parent slot name."""
     decoy.when(mock_core.get_deck_slot_id()).then_return("bar")

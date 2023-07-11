@@ -14,7 +14,7 @@ LABWARE_ON_SCALE = "usascientific_12_reservoir_22ml"
 def run(ctx: ProtocolContext) -> None:
     """Run."""
     tipracks = [
-        ctx.load_labware(f"opentrons_ot3_96_tiprack_{size}uL", slot)
+        ctx.load_labware(f"opentrons_flex_96_tiprack_{size}uL", slot)
         for size, slots in SLOTS_TIPRACK.items()
         for slot in slots
     ]

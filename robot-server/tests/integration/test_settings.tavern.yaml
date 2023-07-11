@@ -157,4 +157,5 @@ stages:
     response:
       status_code: 400
       json:
-        message: '{tavern.request_vars.json.id} is not recognized'
+        message: 'ValueError: {tavern.request_vars.json.id} is not recognized'
+        errorCode: '4000'

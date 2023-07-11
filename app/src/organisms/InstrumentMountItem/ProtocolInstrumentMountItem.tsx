@@ -88,11 +88,17 @@ export function ProtocolInstrumentMountItem(
   }
   const is96ChannelPipette = speccedName === 'p1000_96'
   const isAttachedWithCal =
+    attachedInstrument != null &&
+    attachedInstrument.ok &&
     attachedInstrument?.data?.calibratedOffset?.last_modified != null
   return (
     <>
       <MountItem isReady={isAttachedWithCal}>
-        <Flex width="100%" alignItems={ALIGN_CENTER}>
+        <Flex
+          width="100%"
+          alignItems={ALIGN_CENTER}
+          gridGap={SPACING.spacing24}
+        >
           <Flex
             flex={isAttachedWithCal ? 1 : 2}
             flexDirection={DIRECTION_COLUMN}
@@ -141,7 +147,6 @@ export function ProtocolInstrumentMountItem(
                   t(attachedInstrument != null ? 'calibrate' : 'attach'),
                   'capitalize'
                 )}
-                buttonType="primary"
                 buttonCategory="rounded"
               />
             </Flex>

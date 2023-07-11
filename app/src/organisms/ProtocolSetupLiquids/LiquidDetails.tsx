@@ -10,6 +10,7 @@ import {
   WRAP,
   Icon,
   DIRECTION_ROW,
+  LocationIcon,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
@@ -100,16 +101,7 @@ export function LiquidDetails(props: LiquidDetailsProps): JSX.Element {
               >
                 <TableDatum>
                   <Flex>
-                    <Flex
-                      padding="0.375rem"
-                      textAlign={TYPOGRAPHY.textAlignLeft}
-                      borderRadius={BORDERS.borderRadiusSize3}
-                      border={`3px solid ${COLORS.darkBlackEnabled}`}
-                      fontSize={TYPOGRAPHY.fontSize20}
-                      fontWeight={TYPOGRAPHY.fontWeightBold}
-                    >
-                      {slotName}
-                    </Flex>
+                    <LocationIcon slotName={slotName} />
                   </Flex>
                 </TableDatum>
                 <TableDatum>

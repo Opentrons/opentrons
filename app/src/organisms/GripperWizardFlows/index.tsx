@@ -8,6 +8,7 @@ import {
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   COLORS,
+  BORDERS,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
@@ -16,6 +17,7 @@ import {
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { FirmwareUpdateModal } from '../../molecules/FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
@@ -200,6 +202,15 @@ export const GripperWizard = (
     modalContent = modalContent = (
       <MountGripper {...currentStep} {...sharedProps} />
     )
+  } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
+    onExit = confirmExit
+    modalContent = modalContent = (
+      <FirmwareUpdateModal
+        proceed={handleProceed}
+        subsystem="gripper"
+        description={t('firmware_updating')}
+      />
+    )
   } else if (currentStep.section === SECTIONS.UNMOUNT_GRIPPER) {
     onExit = confirmExit
     modalContent = modalContent = (
@@ -238,7 +249,13 @@ export const GripperWizard = (
       {isOnDevice ? (
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          width="100%"
+          width="992px"
+          height="568px"
+          left="14.5px"
+          top="16px"
+          border={BORDERS.lineBorder}
+          boxShadow={BORDERS.shadowSmall}
+          borderRadius={BORDERS.borderRadiusSize4}
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
         >

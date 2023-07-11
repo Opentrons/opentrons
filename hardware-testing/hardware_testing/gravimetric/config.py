@@ -26,6 +26,7 @@ class GravimetricConfig:
     user_volumes: bool
     gantry_speed: int
     scale_delay: int
+    isolate_channels: List[int]
 
 
 @dataclass
@@ -57,6 +58,7 @@ PHOTO_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]
 
 NUM_BLANK_TRIALS: Final = 3
 NUM_MIXES_BEFORE_ASPIRATE = 5
+SCALE_SECONDS_TO_TRUE_STABILIZE = 30
 
 LOW_VOLUME_UPPER_LIMIT_UL: Final = 2.0
 

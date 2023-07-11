@@ -11,6 +11,8 @@ from typing_extensions import Literal
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
 
+from opentrons_shared_data.errors import ErrorCodes
+
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
 
@@ -48,6 +50,7 @@ class RunNotFound(ErrorDetails):
 
     id: Literal["RunNotFound"] = "RunNotFound"
     title: str = "Run Not Found"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
 class RunAlreadyActive(ErrorDetails):
@@ -55,6 +58,7 @@ class RunAlreadyActive(ErrorDetails):
 
     id: Literal["RunAlreadyActive"] = "RunAlreadyActive"
     title: str = "Run Already Active"
+    errorCode: str = ErrorCodes.ROBOT_IN_USE.value.code
 
 
 class RunNotIdle(ErrorDetails):
@@ -66,6 +70,7 @@ class RunNotIdle(ErrorDetails):
         "Run is currently active. Allow the run to finish or"
         " stop it with a `stop` action before attempting to modify it."
     )
+    errorCode: str = ErrorCodes.ROBOT_IN_USE.value.code
 
 
 class RunStopped(ErrorDetails):
@@ -73,6 +78,7 @@ class RunStopped(ErrorDetails):
 
     id: Literal["RunStopped"] = "RunStopped"
     title: str = "Run Stopped"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
 class AllRunsLinks(BaseModel):

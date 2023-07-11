@@ -60,7 +60,6 @@ export function RestartRobotConfirmationModal({
         <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
           <SmallButton
             flex="1"
-            buttonType="primary"
             buttonText={t('shared:go_back')}
             onClick={() => setShowRestartRobotConfirmationModal(false)}
           />

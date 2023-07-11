@@ -37,6 +37,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   OT2_ROBOT_TYPE,
   FLEX_ROBOT_TYPE,
+  RobotType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -84,6 +85,7 @@ export interface Props {
     modules: ModuleCreationArgs[]
   }) => unknown
   moduleRestrictionsDisabled?: boolean | null
+  robotType: RobotType
 }
 const initialFormState: FormState = {
   fields: {
@@ -288,210 +290,207 @@ export class FilePipettesModal extends React.Component<Props, State> {
 
   render(): React.ReactNode | null {
     if (this.props.hideModal) return null
-    const { showProtocolFields, moduleRestrictionsDisabled } = this.props
+    const {
+      showProtocolFields,
+      moduleRestrictionsDisabled,
+      robotType,
+    } = this.props
 
     return (
-      <React.Fragment>
-        <Modal
-          contentsClassName={cx(
-            styles.new_file_modal_contents,
-            modalStyles.scrollable_modal_wrapper,
-            { [styles.edit_pipettes_modal]: !showProtocolFields }
-          )}
-          className={cx(modalStyles.modal, styles.new_file_modal)}
-        >
-          <div className={modalStyles.scrollable_modal_wrapper}>
-            <div className={modalStyles.scrollable_modal_scroll}>
-              <Formik
-                enableReinitialize
-                initialValues={this.getInitialValues()}
-                onSubmit={this.handleSubmit}
-                validationSchema={validationSchema}
-                validateOnChange={false}
-              >
-                {({
-                  handleChange,
-                  handleSubmit,
-                  errors,
-                  setFieldValue,
-                  touched,
-                  values,
-                  handleBlur,
-                  setFieldTouched,
-                }: FormikProps<FormState>) => {
-                  const { left, right } = values.pipettesByMount
+      <Modal
+        contentsClassName={cx(
+          styles.new_file_modal_contents,
+          modalStyles.scrollable_modal_wrapper,
+          { [styles.edit_pipettes_modal]: !showProtocolFields }
+        )}
+        className={cx(modalStyles.modal, styles.new_file_modal)}
+      >
+        <div className={modalStyles.scrollable_modal_wrapper}>
+          <div className={modalStyles.scrollable_modal_scroll}>
+            <Formik
+              enableReinitialize
+              initialValues={this.getInitialValues()}
+              onSubmit={this.handleSubmit}
+              validationSchema={validationSchema}
+              validateOnChange={false}
+            >
+              {({
+                handleChange,
+                handleSubmit,
+                errors,
+                setFieldValue,
+                touched,
+                values,
+                handleBlur,
+                setFieldTouched,
+              }: FormikProps<FormState>) => {
+                const { left, right } = values.pipettesByMount
 
-                  const pipetteSelectionIsValid =
-                    // at least one must not be none (empty string)
-                    left.pipetteName || right.pipetteName
+                const pipetteSelectionIsValid =
+                  // at least one must not be none (empty string)
+                  left.pipetteName || right.pipetteName
 
-                  const hasCrashableMagnetModuleSelected = this.getCrashableModuleSelected(
-                    values.modulesByType,
-                    MAGNETIC_MODULE_TYPE
-                  )
-                  const hasCrashableTemperatureModuleSelected = this.getCrashableModuleSelected(
-                    values.modulesByType,
-                    TEMPERATURE_MODULE_TYPE
-                  )
-                  const hasHeaterShakerSelected = Boolean(
-                    values.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
-                  )
+                const hasCrashableMagnetModuleSelected = this.getCrashableModuleSelected(
+                  values.modulesByType,
+                  MAGNETIC_MODULE_TYPE
+                )
+                const hasCrashableTemperatureModuleSelected = this.getCrashableModuleSelected(
+                  values.modulesByType,
+                  TEMPERATURE_MODULE_TYPE
+                )
+                const hasHeaterShakerSelected = Boolean(
+                  values.modulesByType[HEATERSHAKER_MODULE_TYPE].onDeck
+                )
 
-                  const showHeaterShakerPipetteCollisions =
-                    hasHeaterShakerSelected &&
-                    [
-                      getPipetteNameSpecs(left.pipetteName as PipetteName),
-                      getPipetteNameSpecs(right.pipetteName as PipetteName),
-                    ].some(
-                      pipetteSpecs =>
-                        pipetteSpecs && pipetteSpecs.channels !== 1
-                    )
-
-                  const crashablePipetteSelected = getIsCrashablePipetteSelected(
-                    values.pipettesByMount
+                const showHeaterShakerPipetteCollisions =
+                  hasHeaterShakerSelected &&
+                  [
+                    getPipetteNameSpecs(left.pipetteName as PipetteName),
+                    getPipetteNameSpecs(right.pipetteName as PipetteName),
+                  ].some(
+                    pipetteSpecs => pipetteSpecs && pipetteSpecs.channels !== 1
                   )
 
-                  const showTempPipetteCollisons =
-                    crashablePipetteSelected &&
-                    hasCrashableTemperatureModuleSelected
-                  const showMagPipetteCollisons =
-                    crashablePipetteSelected && hasCrashableMagnetModuleSelected
+                const crashablePipetteSelected = getIsCrashablePipetteSelected(
+                  values.pipettesByMount
+                )
 
-                  return (
-                    <>
-                      <form onSubmit={handleSubmit}>
-                        {showProtocolFields && (
-                          <div className={styles.protocol_file_group}>
-                            <Flex gridGap={SPACING.spacing16}>
-                              <h2 className={styles.new_file_modal_title}>
-                                {i18n.t(
-                                  'modal.new_protocol.title.PROTOCOL_FILE'
-                                )}
-                              </h2>
-                              <Flex
-                                flexDirection={DIRECTION_COLUMN}
-                                width="10rem"
-                                alignItems={ALIGN_STRETCH}
-                              >
-                                <DropdownField
-                                  options={ROBOT_TYPE_OPTIONS}
-                                  onChange={handleChange}
-                                  value={values.fields.robotType}
-                                  name="fields.robotType"
-                                />
-                              </Flex>
-                            </Flex>
-                            <FormGroup
-                              className={formStyles.stacked_row}
-                              label="Name"
-                            >
-                              <InputField
-                                autoFocus
-                                tabIndex={1}
-                                placeholder={i18n.t(
-                                  'form.generic.default_protocol_name'
-                                )}
-                                name="fields.name"
-                                value={values.fields.name}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                              />
-                            </FormGroup>
-                          </div>
-                        )}
+                const showTempPipetteCollisons =
+                  crashablePipetteSelected &&
+                  hasCrashableTemperatureModuleSelected
+                const showMagPipetteCollisons =
+                  crashablePipetteSelected && hasCrashableMagnetModuleSelected
 
-                        <h2 className={styles.new_file_modal_title}>
-                          {showProtocolFields
-                            ? i18n.t(
-                                'modal.new_protocol.title.PROTOCOL_PIPETTES'
-                              )
-                            : i18n.t('modal.edit_pipettes.title')}
-                        </h2>
-
-                        <PipetteFields
-                          initialTabIndex={1}
-                          values={values.pipettesByMount}
-                          onFieldChange={handleChange}
-                          onSetFieldValue={setFieldValue}
-                          onBlur={handleBlur}
-                          // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
-                          errors={errors.pipettesByMount ?? null}
-                          // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
-                          touched={touched.pipettesByMount ?? null}
-                          onSetFieldTouched={setFieldTouched}
-                          robotType={values.fields.robotType}
-                        />
-
-                        {this.props.showModulesFields && (
-                          <div className={styles.protocol_modules_group}>
+                return (
+                  <>
+                    <form onSubmit={handleSubmit}>
+                      {showProtocolFields && (
+                        <div className={styles.protocol_file_group}>
+                          <Flex gridGap={SPACING.spacing16}>
                             <h2 className={styles.new_file_modal_title}>
-                              {i18n.t(
-                                'modal.new_protocol.title.PROTOCOL_MODULES'
-                              )}
+                              {i18n.t('modal.new_protocol.title.PROTOCOL_FILE')}
                             </h2>
-                            <ModuleFields
-                              // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module model inside of modulesByType exists, because it could be undefined
-                              errors={errors.modulesByType ?? null}
-                              values={values.modulesByType}
-                              onFieldChange={handleChange}
-                              onSetFieldValue={setFieldValue}
+                            <Flex
+                              flexDirection={DIRECTION_COLUMN}
+                              width="10rem"
+                              alignItems={ALIGN_STRETCH}
+                            >
+                              <DropdownField
+                                options={ROBOT_TYPE_OPTIONS}
+                                onChange={handleChange}
+                                value={values.fields.robotType}
+                                name="fields.robotType"
+                              />
+                            </Flex>
+                          </Flex>
+                          <FormGroup
+                            className={formStyles.stacked_row}
+                            label="Name"
+                          >
+                            <InputField
+                              autoFocus
+                              tabIndex={1}
+                              placeholder={i18n.t(
+                                'form.generic.default_protocol_name'
+                              )}
+                              name="fields.name"
+                              value={values.fields.name}
+                              onChange={handleChange}
                               onBlur={handleBlur}
-                              // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module model inside of modulesByType exists, because it could be undefined
-                              touched={touched.modulesByType ?? null}
-                              onSetFieldTouched={setFieldTouched}
                             />
-                          </div>
-                        )}
-                        {!moduleRestrictionsDisabled && (
-                          <CrashInfoBox
-                            showDiagram
-                            showMagPipetteCollisons={showMagPipetteCollisons}
-                            showTempPipetteCollisons={showTempPipetteCollisons}
-                            showHeaterShakerLabwareCollisions={
-                              hasHeaterShakerSelected
-                            }
-                            showHeaterShakerModuleCollisions={
-                              hasHeaterShakerSelected
-                            }
-                            showHeaterShakerPipetteCollisions={
-                              showHeaterShakerPipetteCollisions
-                            }
-                          />
-                        )}
-                        <div className={modalStyles.button_row}>
-                          <OutlineButton
-                            onClick={this.props.onCancel}
-                            tabIndex={7}
-                            className={styles.button}
-                          >
-                            {i18n.t('button.cancel')}
-                          </OutlineButton>
-                          <OutlineButton
-                            disabled={!pipetteSelectionIsValid}
-                            // @ts-expect-error(sa, 2021-6-21): Formik handleSubmit type not cooporating with OutlineButton onClick type
-                            onClick={handleSubmit}
-                            tabIndex={6}
-                            className={styles.button}
-                          >
-                            {i18n.t('button.save')}
-                          </OutlineButton>
+                          </FormGroup>
                         </div>
-                      </form>
+                      )}
 
-                      {this.state.showEditPipetteConfirmation && (
-                        <StepChangesConfirmModal
-                          onCancel={this.handleCancel}
-                          onConfirm={handleSubmit}
+                      <h2 className={styles.new_file_modal_title}>
+                        {showProtocolFields
+                          ? i18n.t('modal.new_protocol.title.PROTOCOL_PIPETTES')
+                          : i18n.t('modal.edit_pipettes.title')}
+                      </h2>
+
+                      <PipetteFields
+                        initialTabIndex={1}
+                        values={values.pipettesByMount}
+                        onFieldChange={handleChange}
+                        onSetFieldValue={setFieldValue}
+                        onBlur={handleBlur}
+                        // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
+                        errors={errors.pipettesByMount ?? null}
+                        // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
+                        touched={touched.pipettesByMount ?? null}
+                        onSetFieldTouched={setFieldTouched}
+                        robotType={robotType}
+                      />
+
+                      {this.props.showModulesFields && (
+                        <div className={styles.protocol_modules_group}>
+                          <h2 className={styles.new_file_modal_title}>
+                            {i18n.t(
+                              'modal.new_protocol.title.PROTOCOL_MODULES'
+                            )}
+                          </h2>
+                          <ModuleFields
+                            // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module model inside of modulesByType exists, because it could be undefined
+                            errors={errors.modulesByType ?? null}
+                            values={values.modulesByType}
+                            onFieldChange={handleChange}
+                            onSetFieldValue={setFieldValue}
+                            onBlur={handleBlur}
+                            // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module model inside of modulesByType exists, because it could be undefined
+                            touched={touched.modulesByType ?? null}
+                            onSetFieldTouched={setFieldTouched}
+                          />
+                        </div>
+                      )}
+                      {!moduleRestrictionsDisabled && (
+                        <CrashInfoBox
+                          showDiagram
+                          showMagPipetteCollisons={showMagPipetteCollisons}
+                          showTempPipetteCollisons={showTempPipetteCollisons}
+                          showHeaterShakerLabwareCollisions={
+                            hasHeaterShakerSelected
+                          }
+                          showHeaterShakerModuleCollisions={
+                            hasHeaterShakerSelected
+                          }
+                          showHeaterShakerPipetteCollisions={
+                            showHeaterShakerPipetteCollisions
+                          }
                         />
                       )}
-                    </>
-                  )
-                }}
-              </Formik>
-            </div>
+                      <div className={modalStyles.button_row}>
+                        <OutlineButton
+                          onClick={this.props.onCancel}
+                          tabIndex={7}
+                          className={styles.button}
+                        >
+                          {i18n.t('button.cancel')}
+                        </OutlineButton>
+                        <OutlineButton
+                          disabled={!pipetteSelectionIsValid}
+                          // @ts-expect-error(sa, 2021-6-21): Formik handleSubmit type not cooporating with OutlineButton onClick type
+                          onClick={handleSubmit}
+                          tabIndex={6}
+                          className={styles.button}
+                        >
+                          {i18n.t('button.save')}
+                        </OutlineButton>
+                      </div>
+                    </form>
+
+                    {this.state.showEditPipetteConfirmation && (
+                      <StepChangesConfirmModal
+                        onCancel={this.handleCancel}
+                        onConfirm={handleSubmit}
+                      />
+                    )}
+                  </>
+                )
+              }}
+            </Formik>
           </div>
-        </Modal>
-      </React.Fragment>
+        </div>
+      </Modal>
     )
   }
 }

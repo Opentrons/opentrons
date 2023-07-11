@@ -41,10 +41,14 @@ export const LABWAREV2_DO_NOT_LIST = [
   // out ot-3 labware definitions right now. We should
   // have a way to filter these in the future to display
   // the definitions. See RLIQ-117 for details.
-  'opentrons_ot3_96_tiprack_20ul',
-  'opentrons_ot3_96_tiprack_200ul',
-  'opentrons_ot3_96_tiprack_1000ul',
-  'opentrons_ot3_96_tiprack_50ul',
+  'opentrons_flex_96_tiprack_20ul',
+  'opentrons_flex_96_tiprack_200ul',
+  'opentrons_flex_96_tiprack_1000ul',
+  'opentrons_flex_96_tiprack_50ul',
+  'opentrons_calibration_adapter_heatershaker_module',
+  'opentrons_calibration_adapter_magnetic_module',
+  'opentrons_calibration_adapter_temperature_module',
+  'opentrons_calibration_adapter_thermocycler_module',
 ]
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
 // but we still might want the rest of the labware in LABWAREV2_DO_NOT_LIST
@@ -52,9 +56,9 @@ export const LABWAREV2_DO_NOT_LIST = [
 export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
-  'opentrons_ot3_96_tiprack_200ul',
-  'opentrons_ot3_96_tiprack_1000ul',
-  'opentrons_ot3_96_tiprack_50ul',
+  'opentrons_flex_96_tiprack_200ul',
+  'opentrons_flex_96_tiprack_1000ul',
+  'opentrons_flex_96_tiprack_50ul',
 ]
 
 export function getLabwareV1Def(

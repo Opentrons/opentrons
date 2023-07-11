@@ -75,8 +75,8 @@ export function getPipetteAnimations(
     <video
       css={css`
         padding-top: ${SPACING.spacing4};
-        max-width: 100%;
-        max-height: ${section === SECTIONS.ATTACH_PROBE ||
+        width: 100%;
+        min-height: ${section === SECTIONS.ATTACH_PROBE ||
         section === SECTIONS.DETACH_PROBE
           ? `20rem`
           : `12rem`};

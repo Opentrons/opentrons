@@ -12,11 +12,7 @@ import {
   DIRECTION_ROW,
   Flex,
   Icon,
-  JUSTIFY_CENTER,
-  JUSTIFY_SPACE_BETWEEN,
-  POSITION_ABSOLUTE,
   POSITION_FIXED,
-  POSITION_RELATIVE,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -24,10 +20,6 @@ import {
 import { StyledText } from '../../atoms/text'
 import { InputField } from '../../atoms/InputField'
 import { NormalKeyboard } from '../../atoms/SoftwareKeyboard'
-import { SmallButton } from '../../atoms/buttons'
-import { useIsFinishedUnboxing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
-
-import type { WifiSecurityType } from '@opentrons/api-client'
 
 const SSID_INPUT_FIELD_STYLE = css`
   padding-top: 2.125rem;
@@ -48,60 +40,20 @@ const SSID_INPUT_FIELD_STYLE = css`
 `
 
 interface SetWifiCredProps {
-  ssid: string
-  authType: WifiSecurityType
-  setShowSelectAuthenticationType: (isShow: boolean) => void
   password: string
   setPassword: (password: string) => void
-  handleConnect: () => void
 }
 
 export function SetWifiCred({
-  ssid,
-  authType,
-  setShowSelectAuthenticationType,
   password,
   setPassword,
-  handleConnect,
 }: SetWifiCredProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const keyboardRef = React.useRef(null)
   const [showPassword, setShowPassword] = React.useState<boolean>(false)
-  const isInitialSetup = useIsFinishedUnboxing()
 
   return (
     <>
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        alignItems={ALIGN_CENTER}
-        marginBottom={SPACING.spacing48}
-        justifyContent={isInitialSetup ? JUSTIFY_CENTER : JUSTIFY_SPACE_BETWEEN}
-        position={POSITION_RELATIVE}
-      >
-        <Flex position={POSITION_ABSOLUTE} left="0">
-          <Btn
-            onClick={() => setShowSelectAuthenticationType(true)}
-            data-testid="SetWifiCred_back_button"
-          >
-            <Flex flexDirection={DIRECTION_ROW}>
-              <Icon name="back" marginRight={SPACING.spacing4} size="3rem" />
-            </Flex>
-          </Btn>
-        </Flex>
-        <Flex marginLeft={isInitialSetup ? '0' : '4rem'}>
-          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
-            {t('sign_into_wifi')}
-          </StyledText>
-        </Flex>
-        <Flex position={POSITION_ABSOLUTE} right="0">
-          <SmallButton
-            buttonType="primary"
-            buttonCategory="rounded"
-            buttonText={t('connect')}
-            onClick={handleConnect}
-          />
-        </Flex>
-      </Flex>
       <Flex width="100%" flexDirection={DIRECTION_COLUMN} paddingLeft="6.25rem">
         <StyledText as="p" marginBottom={SPACING.spacing12}>
           {t('enter_password')}

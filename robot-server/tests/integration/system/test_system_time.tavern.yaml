@@ -39,6 +39,7 @@ stages:
           - id: "InvalidRequest"
             title: "Invalid Request"
             detail: "field required"
+            errorCode: '4000'
             source:
               pointer: "/data/systemTime"
   - name: System Time PUT request on a dev server raises error
@@ -56,3 +57,4 @@ stages:
           - id: "UncategorizedError"
             title: "Not implemented"
             detail: "Method not implemented. Not supported on dev server."
+            errorCode: '4000'

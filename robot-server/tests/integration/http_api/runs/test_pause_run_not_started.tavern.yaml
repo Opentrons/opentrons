@@ -36,4 +36,6 @@ stages:
         errors:
           - id: 'RunActionNotAllowed'
             title: 'Run Action Not Allowed'
-            detail: 'Error 4000 GENERAL_ERROR (PauseNotAllowedError): Cannot pause a run that is not running.'
+            detail: 'Cannot pause a run that is not running.'
+            errorCode: '3000'
+            meta: !anydict

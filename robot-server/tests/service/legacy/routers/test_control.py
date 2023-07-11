@@ -244,7 +244,8 @@ async def test_concurrent_motion_fails(hardware, blocking_call, blocking_call_da
         with pytest.raises(ApiError) as exc_info:
             await func
         assert exc_info.value.status_code == 403
-        assert exc_info.value.content["message"].find("Robot is currently moving") == 0
+        assert "currently moving" in exc_info.value.content["message"]
+        assert exc_info.value.content["errorCode"] == "4000"
 
     forbidden_home = loop.create_task(
         failure(

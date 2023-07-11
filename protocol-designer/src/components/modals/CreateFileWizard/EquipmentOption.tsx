@@ -30,19 +30,23 @@ export function EquipmentOption(props: EquipmentOptionProps): JSX.Element {
   } = props
   return (
     <Flex
+      aria-label="EquipmentOption_flex"
       alignItems={ALIGN_CENTER}
       width="21.75rem"
       padding={SPACING.spacing8}
-      border={BORDERS.lineBorder}
+      border={isSelected ? BORDERS.activeLineBorder : BORDERS.lineBorder}
       borderRadius={BORDERS.borderRadiusSize2}
       cursor="pointer"
       onClick={onClick}
-      borderColor={isSelected ? COLORS.blueEnabled : COLORS.medGreyEnabled}
       {...styleProps}
     >
       {showCheckbox ? (
         <Icon
-          size="2rem"
+          aria-label={`EquipmentOption_${
+            isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'
+          }`}
+          color={isSelected ? COLORS.blueEnabled : COLORS.darkGreyEnabled}
+          size="1.5rem"
           name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
         />
       ) : null}

@@ -171,7 +171,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
         expected_name = "1-1.7"
         assert updated_list[0].usb_port == USBPort(
             name=expected_name,
-            port_number=1,
+            port_number=9,
             port_group=PortGroup.FRONT,
             device_path="1.0/tty/ttyACM4/dev",
             hub=False,
@@ -188,7 +188,7 @@ def test_modify_module_list(revision: BoardRevision, usb_bus: USBBus):
         expected_name = "1-1.7.4"
         assert updated_list[0].usb_port == USBPort(
             name=expected_name,
-            port_number=1,
+            port_number=9,
             port_group=PortGroup.FRONT,
             device_path="1.0/tty/ttyACM5/dev",
             hub=True,

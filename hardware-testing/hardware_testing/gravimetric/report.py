@@ -1,7 +1,7 @@
 """Report."""
 from dataclasses import fields
 from enum import Enum
-from typing import List, Tuple
+from typing import List, Tuple, Any
 
 from hardware_testing.data.csv_report import (
     CSVReport,
@@ -104,6 +104,7 @@ def create_csv_test_report_photometric(
                 lines=[
                     CSVLine("robot", [str]),
                     CSVLine("pipette", [str]),
+                    CSVLine("tips", [str]),
                     CSVLine("environment", [str]),
                     CSVLine("liquid", [str]),
                 ],
@@ -177,6 +178,11 @@ def create_csv_test_report(
         + [f"trial_{t+1}" for t in range(cfg.trials)]
     )
 
+    def _field_type_not_using_typing(t: Any) -> Any:
+        if t == List[int]:
+            return list
+        return t
+
     report = CSVReport(
         test_name=cfg.name,
         run_id=run_id,
@@ -186,6 +192,7 @@ def create_csv_test_report(
                 lines=[
                     CSVLine("robot", [str]),
                     CSVLine("pipette", [str]),
+                    CSVLine("tips", [str]),
                     CSVLine("scale", [str]),
                     CSVLine("environment", [str]),
                     CSVLine("liquid", [str]),
@@ -194,7 +201,7 @@ def create_csv_test_report(
             CSVSection(
                 title="CONFIG",
                 lines=[
-                    CSVLine(field.name, [field.type])
+                    CSVLine(field.name, [_field_type_not_using_typing(field.type)])
                     for field in fields(config.GravimetricConfig)
                     if field.name not in config.GRAV_CONFIG_EXCLUDE_FROM_REPORT
                 ],
@@ -270,12 +277,14 @@ def store_serial_numbers_pm(
     report: CSVReport,
     robot: str,
     pipette: str,
+    tips: str,
     environment: str,
     liquid: str,
 ) -> None:
     """Report serial numbers."""
     report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "pipette", [pipette])
+    report("SERIAL-NUMBERS", "tips", [tips])
     report("SERIAL-NUMBERS", "environment", [environment])
     report("SERIAL-NUMBERS", "liquid", [liquid])
 
@@ -295,6 +304,7 @@ def store_serial_numbers(
     report: CSVReport,
     robot: str,
     pipette: str,
+    tips: str,
     scale: str,
     environment: str,
     liquid: str,
@@ -302,6 +312,7 @@ def store_serial_numbers(
     """Report serial numbers."""
     report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "pipette", [pipette])
+    report("SERIAL-NUMBERS", "tips", [tips])
     report("SERIAL-NUMBERS", "scale", [scale])
     report("SERIAL-NUMBERS", "environment", [environment])
     report("SERIAL-NUMBERS", "liquid", [liquid])

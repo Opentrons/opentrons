@@ -2,9 +2,9 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t50": {
-      "defaultAspirateFlowRate": 8,
-      "defaultDispenseFlowRate": 8,
-      "defaultBlowOutFlowRate": 4,
+      "defaultAspirateFlowRate": 35,
+      "defaultDispenseFlowRate": 57,
+      "defaultBlowOutFlowRate": 57,
       "defaultTipLength": 57.9,
       "defaultTipOverlap": 10.5,
       "defaultReturnTipHeight": 0.71,
@@ -79,5 +79,5 @@
   },
   "maxVolume": 50,
   "minVolume": 0.5,
-  "defaultTipracks": ["opentrons/opentrons_ot3_96_tiprack_50ul/1"]
+  "defaultTipracks": ["opentrons/opentrons_flex_96_tiprack_50ul/1"]
 }

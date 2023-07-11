@@ -15,7 +15,7 @@ import {
 import { StyledText } from '../atoms/text'
 import { MediumButton } from '../atoms/buttons'
 import { Modal } from '../molecules/Modal'
-import { appRestart } from '../redux/shell'
+import { appRestart, sendLog } from '../redux/shell'
 
 import type { Dispatch } from '../redux/types'
 import type { ModalHeaderBaseProps } from '../molecules/Modal/types'
@@ -25,13 +25,18 @@ export function OnDeviceDisplayAppFallback({
 }: FallbackProps): JSX.Element {
   const dispatch = useDispatch<Dispatch>()
   const handleRestartClick = (): void => {
-    dispatch(appRestart())
+    dispatch(appRestart(`${error.message}`))
   }
   const modalHeader: ModalHeaderBaseProps = {
     title: 'Restart the app',
     iconName: 'information',
     iconColor: COLORS.white,
   }
+
+  // immediately report to robot logs that something fatal happened
+  React.useEffect(() => {
+    dispatch(sendLog(`ODD app encountered a fatal error: ${error.message}`))
+  }, [])
 
   return (
     <Modal header={modalHeader} isError>

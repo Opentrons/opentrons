@@ -41,6 +41,7 @@ import * as labwareDefSelectors from '../../../labware-defs/selectors'
 import * as labwareDefActions from '../../../labware-defs/actions'
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as steplistActions } from '../../../steplist'
+import { toggleIsGripperRequired } from '../../../step-forms/actions/additionalItems'
 import { RobotTypeTile } from './RobotTypeTile'
 import { MetadataTile } from './MetadataTile'
 import { FirstPipetteTypeTile, SecondPipetteTypeTile } from './PipetteTypeTile'
@@ -183,6 +184,10 @@ export function CreateFileWizard(): JSX.Element | null {
       modules.forEach(moduleArgs =>
         dispatch(stepFormActions.createModule(moduleArgs))
       )
+      // add gripper
+      if (values.additionalEquipment.includes('gripper')) {
+        dispatch(toggleIsGripperRequired())
+      }
       // auto-generate tipracks for pipettes
       const newTiprackModels: string[] = uniq(
         pipettes.map(pipette => pipette.tiprackDefURI)
@@ -200,7 +205,7 @@ export function CreateFileWizard(): JSX.Element | null {
     <WizardHeader
       title={t('modal.create_file_wizard.create_new_protocol')}
       currentStep={currentStepIndex}
-      totalSteps={WIZARD_STEPS.length}
+      totalSteps={WIZARD_STEPS.length - 1}
       onExit={handleCancel}
     />
   )
@@ -342,7 +347,7 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
       <RobotTypeTile {...{ ...formikProps, proceed, goBack }} />
     ),
     metadata: (formikProps: FormikProps<FormState>) => (
-      <MetadataTile {...{ ...formikProps, proceed, goBack }} />
+      <MetadataTile {...formikProps} proceed={proceed} goBack={goBack} />
     ),
     first_pipette_type: (formikProps: FormikProps<FormState>) => (
       <FirstPipetteTypeTile {...{ ...formikProps, proceed, goBack }} />
@@ -379,10 +384,14 @@ function CreateFileForm(props: CreateFileFormProps): JSX.Element {
           formikProps.setFieldTouched(name, true)
         }
 
-        return contentsByWizardStep[currentWizardStep]({
-          ...formikProps,
-          handleChange,
-        })
+        return currentWizardStep === 'metadata'
+          ? contentsByWizardStep.metadata({
+              ...formikProps,
+              handleChange,
+            })
+          : contentsByWizardStep[currentWizardStep]({
+              ...formikProps,
+            })
       }}
     </Formik>
   )

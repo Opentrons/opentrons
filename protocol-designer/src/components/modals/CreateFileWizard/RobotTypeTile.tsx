@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -17,19 +16,19 @@ import {
   PrimaryButton,
   JUSTIFY_FLEX_END,
 } from '@opentrons/components'
+import { i18n } from '../../../localization'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import { css } from 'styled-components'
 import opentronsFlexImage from '../../../images/OpentronsFlex.png'
 import OT2Image from '../../../images/OT2.png'
+import { HandleEnter } from './HandleEnter'
 
 import type { RobotType } from '@opentrons/shared-data'
 import type { WizardTileProps } from './types'
-import { HandleEnter } from './HandleEnter'
 
 const ROBOT_TYPES: RobotType[] = [OT2_ROBOT_TYPE, FLEX_ROBOT_TYPE]
 
 export function RobotTypeTile(props: WizardTileProps): JSX.Element {
-  const { i18n, t } = useTranslation()
   const { values, setFieldValue, proceed } = props
   return (
     <HandleEnter onEnter={proceed}>
@@ -65,7 +64,7 @@ export function RobotTypeTile(props: WizardTileProps): JSX.Element {
           width="100%"
         >
           <PrimaryButton onClick={() => proceed()}>
-            {i18n.format(t('shared.next'), 'capitalize')}
+            {i18n.t('application.next')}
           </PrimaryButton>
         </Flex>
       </Flex>
@@ -77,7 +76,7 @@ const CONTENTS_BY_ROBOT_TYPE: {
   [robotType in RobotType]: { displayName: string; imageSrc: string }
 } = {
   [OT2_ROBOT_TYPE]: {
-    displayName: 'OT2',
+    displayName: 'OT-2',
     imageSrc: OT2Image,
   },
   [FLEX_ROBOT_TYPE]: {
@@ -96,11 +95,13 @@ function RobotTypeOption(props: RobotTypeOptionProps): JSX.Element {
   const { displayName, imageSrc } = CONTENTS_BY_ROBOT_TYPE[robotType]
   return (
     <Flex
+      aria-label={`RobotTypeTile_${robotType}`}
       flex="1 0 auto"
       onClick={onClick}
       css={isSelected ? SELECTED_OPTIONS_STYLE : UNSELECTED_OPTIONS_STYLE}
     >
       <img
+        aria-label={imageSrc}
         src={imageSrc}
         css={css`
           max-width: 11rem;

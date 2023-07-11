@@ -15,10 +15,12 @@ import {
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import { FileSidebar, v6WarningContent } from '../FileSidebar'
 import { useBlockingHint } from '../../Hints/useBlockingHint'
+import { FileSidebar, v7WarningContent } from '../FileSidebar'
 
 jest.mock('../../Hints/useBlockingHint')
+jest.mock('../../../file-data/selectors')
+jest.mock('../../../step-forms/selectors')
 
 const mockUseBlockingHint = useBlockingHint as jest.MockedFunction<
   typeof useBlockingHint
@@ -50,6 +52,8 @@ describe('FileSidebar', () => {
       pipettesOnDeck: {},
       modulesOnDeck: {},
       savedStepForms: {},
+      robotType: 'OT-2 Standard',
+      additionalEquipment: {},
     }
 
     commands = [
@@ -94,7 +98,6 @@ describe('FileSidebar', () => {
   afterEach(() => {
     jest.resetAllMocks()
   })
-
   it('create new button creates new protocol', () => {
     const wrapper = shallow(<FileSidebar {...props} />)
     const createButton = wrapper.find(OutlineButton).at(0)
@@ -154,6 +157,25 @@ describe('FileSidebar', () => {
     )
   })
 
+  it('warning modal is shown when export is clicked with unused gripper', () => {
+    const gripperId = 'gripperId'
+    props.modulesOnDeck = modulesOnDeck
+    props.savedStepForms = savedStepForms
+    // @ts-expect-error(sa, 2021-6-22): props.fileData might be null
+    props.fileData.commands = commands
+    props.additionalEquipment = {
+      [gripperId]: { name: 'gripper', id: gripperId },
+    }
+
+    const wrapper = shallow(<FileSidebar {...props} />)
+    const downloadButton = wrapper.find(DeprecatedPrimaryButton).at(0)
+    downloadButton.simulate('click')
+    const alertModal = wrapper.find(AlertModal)
+
+    expect(alertModal).toHaveLength(1)
+    expect(alertModal.prop('heading')).toEqual('Unused gripper')
+  })
+
   it('warning modal is shown when export is clicked with unused module', () => {
     props.modulesOnDeck = modulesOnDeck
     props.savedStepForms = savedStepForms
@@ -211,8 +233,8 @@ describe('FileSidebar', () => {
     // Before save button is clicked, enabled should be false
     expect(mockUseBlockingHint).toHaveBeenNthCalledWith(1, {
       enabled: false,
-      hintKey: 'export_v6_protocol_6_20',
-      content: v6WarningContent,
+      hintKey: 'export_v7_protocol_7_0',
+      content: v7WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
     })
@@ -223,8 +245,8 @@ describe('FileSidebar', () => {
     // After save button is clicked, enabled should be true
     expect(mockUseBlockingHint).toHaveBeenLastCalledWith({
       enabled: true,
-      hintKey: 'export_v6_protocol_6_20',
-      content: v6WarningContent,
+      hintKey: 'export_v7_protocol_7_0',
+      content: v7WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
     })

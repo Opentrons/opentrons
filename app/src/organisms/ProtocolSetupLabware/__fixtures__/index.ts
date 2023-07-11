@@ -22,7 +22,7 @@ export const mockRecentAnalysis = {
       loadName: 'opentrons_1_trash_1100ml_fixed',
       definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1',
       location: {
-        slotName: '12',
+        slotName: 'A3',
       },
     },
     {
@@ -31,7 +31,7 @@ export const mockRecentAnalysis = {
       loadName: 'opentrons_96_filtertiprack_1000ul',
       definitionUri: 'opentrons/opentrons_96_filtertiprack_1000ul/1',
       location: {
-        slotName: '2',
+        slotName: 'D2',
       },
       displayName: 'Opentrons 96 Filter Tip Rack 1000 µL',
     },
@@ -41,7 +41,7 @@ export const mockRecentAnalysis = {
       loadName: 'opentrons_96_filtertiprack_200ul',
       definitionUri: 'opentrons/opentrons_96_filtertiprack_200ul/1',
       location: {
-        slotName: '3',
+        slotName: 'D3',
       },
       displayName: 'Opentrons 96 Filter Tip Rack 200 µL',
     },
@@ -62,7 +62,7 @@ export const mockRecentAnalysis = {
       id: 'ebdc5f07-57de-4b3f-a946-583f78f65675:heaterShakerModuleType',
       model: 'heaterShakerModuleV1',
       location: {
-        slotName: '10',
+        slotName: 'A1',
       },
       serialNumber: 'fake-serial-number-56867127-faca-488a-bbbd-e5f63cdf93b8',
     },
@@ -111,7 +111,7 @@ export const mockRecentAnalysis = {
       params: {
         model: 'heaterShakerModuleV1',
         location: {
-          slotName: '10',
+          slotName: 'B1',
         },
         moduleId: 'ebdc5f07-57de-4b3f-a946-583f78f65675:heaterShakerModuleType',
       },
@@ -265,7 +265,7 @@ export const mockRecentAnalysis = {
       status: 'succeeded',
       params: {
         location: {
-          slotName: '2',
+          slotName: 'D2',
         },
         loadName: 'opentrons_96_filtertiprack_1000ul',
         namespace: 'opentrons',
@@ -1306,7 +1306,7 @@ export const mockRecentAnalysis = {
       status: 'succeeded',
       params: {
         location: {
-          slotName: '3',
+          slotName: 'D3',
         },
         loadName: 'opentrons_96_filtertiprack_200ul',
         namespace: 'opentrons',
@@ -5427,6 +5427,6 @@ export const mockProtocolModuleInfo = [
     nestedLabwareId:
       '8057ec40-8d53-4d44-aeb7-726a76c10901:opentrons/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1',
     protocolLoadOrder: 0,
-    slotName: '10',
+    slotName: 'B1',
   },
 ] as any

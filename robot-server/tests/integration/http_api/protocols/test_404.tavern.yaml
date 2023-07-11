@@ -15,6 +15,7 @@ stages:
           - id: ProtocolNotFound
             title: Protocol Not Found
             detail: "'Protocol idontexist was not found.'"
+            errorCode: '4000'
 
 ---
 test_name: Verify error upon DELETE of nonexistent protocol id.
@@ -34,3 +35,4 @@ stages:
         - id: ProtocolNotFound
           title: Protocol Not Found
           detail: "'Protocol idontexist was not found.'"
+          errorCode: '4000'

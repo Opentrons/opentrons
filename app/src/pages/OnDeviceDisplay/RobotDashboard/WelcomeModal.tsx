@@ -71,11 +71,7 @@ export function WelcomedModal({
             {t('welcome_modal_description')}
           </StyledText>
         </Flex>
-        <SmallButton
-          buttonType="primary"
-          buttonText={t('got_it')}
-          onClick={handleCloseModal}
-        />
+        <SmallButton buttonText={t('got_it')} onClick={handleCloseModal} />
       </Flex>
     </Modal>
   )

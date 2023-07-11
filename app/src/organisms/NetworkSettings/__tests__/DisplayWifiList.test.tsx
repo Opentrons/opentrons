@@ -9,9 +9,6 @@ import { DisplaySearchNetwork } from '../DisplaySearchNetwork'
 import { DisplayWifiList } from '../DisplayWifiList'
 
 const mockPush = jest.fn()
-const mockSetShowSelectAuthenticationType = jest.fn()
-const mockSetChangeState = jest.fn()
-const mockSetSelectedSsid = jest.fn()
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
   { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
@@ -47,9 +44,8 @@ describe('DisplayWifiList', () => {
   beforeEach(() => {
     props = {
       list: mockWifiList,
-      setShowSelectAuthenticationType: mockSetShowSelectAuthenticationType,
-      setChangeState: mockSetChangeState,
-      setSelectedSsid: mockSetSelectedSsid,
+      handleJoinAnotherNetwork: jest.fn(),
+      handleNetworkPress: jest.fn(),
       isHeader: true,
     }
     mockDisplaySearchNetwork.mockReturnValue(
@@ -62,12 +58,12 @@ describe('DisplayWifiList', () => {
   })
 
   it('should render a wifi list, button and spinner', () => {
-    const [{ getByText, getByTestId }] = render(props)
+    const [{ getByText, getByLabelText }] = render(props)
     getByText('Select a network')
     getByText('foo')
     getByText('bar')
     getByText('baz')
-    getByTestId('back-button')
+    getByLabelText('back-button')
   })
 
   it('should not render a spinner', () => {
@@ -77,8 +73,8 @@ describe('DisplayWifiList', () => {
   })
 
   it('should call mock functions when back', () => {
-    const [{ getByTestId }] = render(props)
-    const button = getByTestId('back-button')
+    const [{ getByLabelText }] = render(props)
+    const button = getByLabelText('back-button')
     fireEvent.click(button)
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
@@ -87,8 +83,6 @@ describe('DisplayWifiList', () => {
     const [{ getByText }] = render(props)
     const button = getByText('foo')
     fireEvent.click(button)
-    expect(props.setShowSelectAuthenticationType).toHaveBeenCalled()
-    expect(props.setChangeState).toHaveBeenCalled()
-    expect(props.setSelectedSsid).toHaveBeenCalled()
+    expect(props.handleNetworkPress).toHaveBeenCalledWith('foo')
   })
 })
