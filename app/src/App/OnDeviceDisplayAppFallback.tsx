@@ -30,6 +30,10 @@ export function OnDeviceDisplayAppFallback({
   const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
   const handleRestartClick = (): void => {
+    trackEvent({
+      name: ANALYTICS_ODD_APP_ERROR,
+      properties: { errorMessage: error.message },
+    })
     dispatch(appRestart(error.message))
   }
   const modalHeader: ModalHeaderBaseProps = {
@@ -40,10 +44,6 @@ export function OnDeviceDisplayAppFallback({
 
   // immediately report to robot logs that something fatal happened
   React.useEffect(() => {
-    trackEvent({
-      name: ANALYTICS_ODD_APP_ERROR,
-      properties: { errorMessage: error.message },
-    })
     dispatch(sendLog(`ODD app encountered a fatal error: ${error.message}`))
   }, [dispatch, error.message])
 
