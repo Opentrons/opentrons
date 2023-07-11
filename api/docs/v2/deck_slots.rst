@@ -7,9 +7,9 @@
 
 .. _deck-slots:
 
-##########
+**********
 Deck Slots
-##########
+**********
 
 When you load an item onto the robot's deck, like with :py:obj:`ProtocolContext.load_labware()` or :py:obj:`ProtocolContext.load_module()`, you need to specify which slot to put it in.
 

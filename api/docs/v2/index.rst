@@ -1,8 +1,8 @@
 :og:description: The Opentrons Python Protocol API is a Python framework that makes it easy to write automated biology lab protocols that use Opentrons robots and hardware modules.
 
-=======
+*******
 Welcome
-=======
+*******
 
 .. toctree::
 
@@ -28,7 +28,7 @@ As a programmer, you can leverage the full power of Python for advanced automati
 
 
 Getting Started
----------------
+===============
 
 **New to Python protocols?** Check out the :ref:`tutorial` to learn about the different parts of a protocol file and build a working protocol from scratch. 
 
@@ -40,7 +40,7 @@ When you're ready to **try out a protocol**, you can :ref:`simulate it on your c
 .. _overview-section-v2:
 
 How the API Works
------------------
+=================
 
 The design goal of this API is to make code readable and easy to understand. A protocol, in its most basic form:
 
@@ -163,25 +163,25 @@ There is much more that the OT-2 robot and the API can do! The :ref:`v2-atomic-c
 
 
 More Resources
---------------
+==============
 
 Opentrons App
-+++++++++++++
+-------------
 
 The `Opentrons App <https://opentrons.com/ot-app/>`_ is the easiest way to run your Python protocols. The app `supports <https://support.opentrons.com/en/articles/2687536-get-started-supported-operating-systems-for-the-opentrons-app>`_ the latest versions of macOS, Windows, and Ubuntu.
 
 Support
-+++++++
+-------
 
 Questions about `setting up your OT-2 <https://support.opentrons.com/s/ot2-get-started>`_, `using Opentrons software <https://support.opentrons.com/s/ot2-software>`_, or `troubleshooting <https://support.opentrons.com/s/ot2-troubleshooting>`_? Check out our `support articles <https://support.opentrons.com/s/>`_ or `get in touch directly <https://support.opentrons.com/s/article/Getting-help-from-Opentrons-Support>`_ with Opentrons Support.
 
 Custom Protocol Service
-+++++++++++++++++++++++
+-----------------------
 
 Don't have the time or resources to write your own protocols? The `Opentrons Custom Protocols <https://shop.opentrons.com/opentrons-custom-protocol-1-expedite-workflow/>`_ service can get you set up in as little as a week. 
 
 Contributing
-++++++++++++
+------------
 
 Opentrons software, including the Python API and this documentation, is open source. If you have an improvement or an interesting idea, you can create an issue on GitHub by following our `guidelines`__.
 

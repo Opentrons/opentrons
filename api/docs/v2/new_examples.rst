@@ -2,17 +2,14 @@
 
 .. _new-examples:
 
-########
+********
 Examples
-########
+********
 
 All examples on this page use a ``'corning_96_wellplate_360ul_flat'`` (`an ANSI standard 96-well plate <https://labware.opentrons.com/corning_96_wellplate_360ul_flat>`_) in slot 1, and two ``'opentrons_96_tiprack_300ul'`` (`the Opentrons standard 300 µL tiprack <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_) in slots 2 and 3. They also require a P300 Single attached to the right mount. Some examples also use a ``'usascientific_12_reservoir_22ml'`` (`a USA Scientific 12-row reservoir <https://labware.opentrons.com/usascientific_12_reservoir_22ml>`_) in slot 4.
 
-******************************
-
-**************
 Basic Transfer
-**************
+==============
 
 Moving 100 µL from one well to another:
 
@@ -50,11 +47,8 @@ This accomplishes the same thing as the following basic commands:
         p300.dispense(100, plate['B1'])
         p300.drop_tip()
 
-******************************
-
-*****
 Loops
-*****
+=====
 
 Loops in Python allow your protocol to perform many actions, or act upon many wells, all within just a few lines. The below example loops through the numbers ``0`` to ``7``, and uses that loop's current value to transfer from all wells in a reservoir to each row of a plate:
 
@@ -78,11 +72,8 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
         for i in range(8):
             p300.distribute(200, reservoir.wells()[i], plate.rows()[i])
 
-******************************
-
-*****************
 Multiple Air Gaps
-*****************
+=================
 
 The OT-2 pipettes can do some things that a human cannot do with a pipette, like accurately alternate between aspirating and creating air gaps within the same tip. The below example will aspirate from the first five wells in the reservoir, while creating an air gap between each sample.
 
@@ -109,11 +100,8 @@ The OT-2 pipettes can do some things that a human cannot do with a pipette, like
 
         p300.return_tip()
 
-******************************
-
-********
 Dilution
-********
+========
 
 This example first spreads a diluent to all wells of a plate. It then dilutes 8 samples from the reservoir across the 8 columns of the plate.
 
@@ -147,11 +135,8 @@ This example first spreads a diluent to all wells of a plate. It then dilutes 8 
                 30, row[:11], row[1:],
                 mix_after=(3, 25))
 
-******************************
-
-*************
 Plate Mapping
-*************
+=============
 
 This example deposits various volumes of liquids into the same plate of wells and automatically refill the tip volume when it runs out.
 

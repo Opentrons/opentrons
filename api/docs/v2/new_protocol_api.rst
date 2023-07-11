@@ -2,13 +2,15 @@
 
 .. _protocol-api-reference:
 
+***********************
 API Version 2 Reference
-=======================
+***********************
 
 .. _protocol_api-protocols-and-instruments:
 
 Protocols and Instruments
--------------------------
+=========================
+
 .. module:: opentrons.protocol_api
 
 ..
@@ -28,7 +30,8 @@ Protocols and Instruments
 .. _protocol-api-labware:
 
 Labware and Wells
------------------
+=================
+
 .. autoclass:: opentrons.protocol_api.Labware
    :members:
    :exclude-members: next_tip, use_tips, previous_tip, return_tips
@@ -40,7 +43,7 @@ Labware and Wells
 .. _protocol-api-modules:
 
 Modules
--------
+=======
 
 .. autoclass:: opentrons.protocol_api.TemperatureModuleContext
    :members:
@@ -66,7 +69,7 @@ Modules
 .. _protocol-api-types:
 
 Useful Types and Definitions
-----------------------------
+============================
 
 ..
    The opentrons.types module contains a mixture of public Protocol API things and private internal things.
@@ -82,7 +85,7 @@ Useful Types and Definitions
       :no-value:
 
 Executing and Simulating Protocols
-----------------------------------
+==================================
 
 .. automodule:: opentrons.execute
    :members:

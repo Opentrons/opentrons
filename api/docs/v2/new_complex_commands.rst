@@ -2,9 +2,9 @@
 
 .. _v2-complex-commands:
 
-################
+****************
 Complex Commands
-################
+****************
 
 .. _overview:
 
@@ -287,7 +287,8 @@ will have the steps...
     Dropping tip well A1 in "12"
 
 Skipping Wells
-++++++++++++++
+--------------
+
 If you only wish to transfer to certain wells from a column, you
 can use a list of volumes to skip over certain wells by setting the volume to zero.
 
@@ -312,8 +313,6 @@ will have the steps...
 
 
 .. versionadded:: 2.0
-
-**********************
 
 Distribute and Consolidate
 ==========================
@@ -509,7 +508,7 @@ will have the steps...
 
 
 Skipping Wells
-++++++++++++++
+--------------
 
 If you only wish to distribute or consolidate certain wells from a column, you
 can use a list of volumes to skip over certain wells by setting the volume to zero.
@@ -563,8 +562,6 @@ Parameters to complex commands add behaviors to the generated complex command in
 
 Notice how blow out only occurs after getting rid of disposal volume. If you want blow out to occu  after every dispense, you should not include a disposal volume.
 
-**********************
-
 .. _complex_params:
 
 Complex Liquid Handling Parameters
@@ -582,7 +579,7 @@ If you want to avoid cross-contamination and increase accuracy, you should set t
 .. versionadded:: 2.0
 
 Always Get a New Tip
-++++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^^
 
 Transfer commands will by default use the same tip for each well, then finally drop it in the trash once finished.
 
@@ -617,7 +614,7 @@ will have the steps...
 
 
 Never Get a New Tip
-+++++++++++++++++++
+^^^^^^^^^^^^^^^^^^^
 
 For scenarios where you instead are calling ``pick_up_tip()`` and ``drop_tip()`` elsewhere in your protocol, the transfer command can ignore picking up or dropping tips.
 
@@ -652,7 +649,7 @@ will have the steps...
 
 
 Use One Tip
-+++++++++++
+^^^^^^^^^^^
 
 The default behavior of complex commands is to use one tip:
 

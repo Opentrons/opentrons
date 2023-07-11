@@ -1,0 +1,12 @@
+.. include:: index.rst
+.. include:: tutorial.rst
+.. include:: versioning.rst
+.. include:: new_labware.rst
+.. include:: new_modules.rst
+.. include:: new_pipette.rst
+.. include:: new_atomic_commands.rst
+.. include:: new_complex_commands.rst
+.. include:: robot_position.rst
+.. include:: new_advanced_running.rst
+.. include:: new_examples.rst
+.. include:: new_protocol_api.rst

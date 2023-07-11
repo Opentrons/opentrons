@@ -2,9 +2,9 @@
 
 .. _new-labware:
 
-#######
+*******
 Labware
-#######
+*******
 
 
 When writing a protocol, you must inform the Protocol API about the labware you will be placing on the OT-2's deck.
@@ -32,12 +32,11 @@ A third optional argument can be used to give the labware a nickname to be displ
 Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`, which returns
 :py:class:`opentrons.protocol_api.labware.Labware` object.
 
-***************
 Finding Labware
-***************
+===============
 
 Default Labware
-^^^^^^^^^^^^^^^
+---------------
 
 The OT-2 has a set of labware well-supported by Opentrons defined internally. This set of labware is always available to protocols. This labware can be found on the `Opentrons Labware Library <https://labware.opentrons.com>`_. You can copy the load names that should be passed to ``protocol.load_labware`` statements to get the correct definitions.
 
@@ -45,7 +44,7 @@ The OT-2 has a set of labware well-supported by Opentrons defined internally. Th
 .. _v2-custom-labware:
 
 Custom Labware
-^^^^^^^^^^^^^^
+--------------
 
 If you have a piece of labware that is not in the Labware Library, you can create your own definition using the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. Before using the Labware Creator, you should read the introduction article `here <https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions>`__.
 
@@ -54,12 +53,11 @@ Once you have created your labware and saved it as a ``.json`` file, you can add
 
 .. _new-well-access:
 
-**************************
 Accessing Wells in Labware
-**************************
+==========================
 
 Well Ordering
-^^^^^^^^^^^^^
+-------------
 
 When writing a protocol, you will need to select which wells to
 transfer liquids to and from.
@@ -92,7 +90,7 @@ The ending well will be in the bottom right, see the diagram below for further e
 
 
 Accessor Methods
-^^^^^^^^^^^^^^^^
+----------------
 
 There are many different ways to access wells inside labware. Different methods are useful in different contexts. The table below lists out the methods available to access wells and their differences.
 
@@ -113,10 +111,10 @@ There are many different ways to access wells inside labware. Different methods 
 +-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 
 Accessing Individual Wells
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+--------------------------
 
 Dictionary Access
------------------
+^^^^^^^^^^^^^^^^^
 
 Once a labware is loaded into your protocol, you can easily access the many
 wells within it by using dictionary indexing. If a well does not exist in this labware,
@@ -131,7 +129,7 @@ you will receive a ``KeyError``. This is equivalent to using the return value of
 .. versionadded:: 2.0
 
 List Access From ``wells``
---------------------------
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Wells can be referenced by their name, as demonstrated above. However, they can also be referenced with zero-indexing, with the first well in a labware being at position 0.
 
@@ -151,7 +149,7 @@ Wells can be referenced by their name, as demonstrated above. However, they can 
 .. versionadded:: 2.0
 
 Accessing Groups of Wells
-^^^^^^^^^^^^^^^^^^^^^^^^^
+-------------------------
 
 When describing a liquid transfer, you can point to groups of wells for the
 liquid's source and/or destination. Or, you can get a group of wells and loop
@@ -198,9 +196,8 @@ and it will return the individual well objects in row A.
 
 .. versionadded:: 2.0
 
-*************************
 Labeling Liquids in Wells
-*************************
+=========================
 
 Optionally, you can specify the liquids that should be in various wells at the beginning of your protocol. Doing so helps you identify well contents by name and volume, and adds corresponding labels to a single well, or group of wells, in well plates and reservoirs. Viewing the initial liquid setup in a Python protocol is available in the Opentrons App v6.3.0 or higher.
 
@@ -209,7 +206,7 @@ To use these optional methods, first create a liquid object with :py:meth:`.Prot
 Let's examine how these two methods work. The following examples demonstrate how to define colored water samples for a well plate and reservoir.
 
 Defining Liquids
-^^^^^^^^^^^^^^^^
+----------------
 
 This example uses ``define_liquid`` to create two liquid objects and instantiates them with the variables ``greenWater`` and ``blueWater``, respectively. The arguments for ``define_liquid`` are all required, and let you name the liquid, describe it, and assign it a color:
 
@@ -231,7 +228,7 @@ This example uses ``define_liquid`` to create two liquid objects and instantiate
 The ``display_color`` parameter accepts a hex color code, which adds a color to that liquid's label when you import your protocol into the Opentrons App. The ``define_liquid`` method accepts standard 3-, 4-, 6-, and 8-character hex color codes.
 
 Labeling Wells and Reservoirs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------------
 
 This example uses ``load_liquid`` to label the initial well location, contents, and volume (in µL) for the liquid objects created by ``define_liquid``. Notice how values of the ``liquid`` argument use the variable names ``greenWater`` and ``blueWater`` (defined above) to associate each well with a particular liquid: 
 
@@ -252,7 +249,7 @@ This information shows up in the Opentrons App (v6.3.0 or higher) after you impo
     ``load_liquid`` does not validate volume for your labware nor does it prevent you from adding multiple liquids to each well. For example, you could label a 40 µL well plate with ``greenWater``, ``volume=50``, and then also add blue water to the well. The API won't stop you. It's your responsibility to ensure the labels you use accurately reflect the amounts and types of liquid you plan to place into wells and reservoirs.
 
 Labeling vs Handling Liquids
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------
 
 The ``load_liquid`` arguments include a volume amount (``volume=n`` in µL). This amount is just a label. It isn't a command or function that manipulates liquids. It only tells you how much liquid should be in a well at the start of the protocol. You need to use a method like :py:meth:`.transfer` to physically move liquids from a source to a destination.
 
@@ -260,14 +257,13 @@ The ``load_liquid`` arguments include a volume amount (``volume=n`` in µL). Thi
 .. _v2-location-within-wells:
 .. _new-labware-well-properties:
 
-***************
 Well Dimensions
-***************
+===============
 
 The functions in the :ref:`new-well-access` section above return a single :py:class:`.Well` object or a larger object representing many wells. :py:class:`.Well` objects have attributes that provide information about their physical shape, such as the depth or diameter, as specified in their corresponding labware definition. These properties can be used for different applications, such as calculating the volume of a well or a :ref:`position-relative-labware`.
 
 Depth
-^^^^^
+-----
 
 Use :py:attr:`.Well.depth` to get the distance in mm between the very top of the well and the very bottom. For example, a conical well's depth is measured from the top center to the bottom center of the well.
 
@@ -281,7 +277,8 @@ Use :py:attr:`.Well.depth` to get the distance in mm between the very top of the
         depth = plate['A1'].depth # 10.67
 
 Diameter
-^^^^^^^^
+--------
+
 Use :py:attr:`.Well.diameter` to get the diameter of a given well in mm. Since diameter is a circular measurement, this attribute is only present on labware with circular wells. If the well is not circular, the value will be ``None``. Use length and width (see below) for non-circular wells.
 
 .. code-block:: python
@@ -295,7 +292,8 @@ Use :py:attr:`.Well.diameter` to get the diameter of a given well in mm. Since d
 
 
 Length
-^^^^^^
+------
+
 Use :py:attr:`.Well.length` to get the length of a given well in mm. Length is defined as the distance along the robot's x-axis (left to right). This attribute is only present on rectangular wells. If the well is not rectangular, the value will be ``None``. Use diameter (see above) for circular wells.
 
 .. code-block:: python
@@ -309,7 +307,8 @@ Use :py:attr:`.Well.length` to get the length of a given well in mm. Length is d
 
 
 Width
-^^^^^
+-----
+
 Use :py:attr:`.Well.width` to get the width of a given well in mm. Width is defined as the distance along the y-axis (front to back). This attribute is only present on rectangular wells. If the well is not rectangular, the value will be ``None``. Use diameter (see above) for circular wells.
 
 

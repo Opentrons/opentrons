@@ -2,9 +2,9 @@
 
 .. _new-pipette:
 
-########
+********
 Pipettes
-########
+********
 
 When writing a protocol, you must inform the Protocol API about the pipettes you will be using on your OT-2. The Protocol API then creates software objects called :py:class:`.InstrumentContext`, that represent the attached pipettes.
 
@@ -13,8 +13,8 @@ for liquid handling commands from the :py:class:`.InstrumentContext` class.
 
 .. _new-create-pipette:
 
-Loading A Pipette
-------------------
+Loading a Pipette
+=================
 
 Pipettes are specified in a protocol using the method :py:meth:`.ProtocolContext.load_instrument`. This method requires the model of the instrument to load, the mount to load it in, and (optionally) a list of associated tipracks:
 
@@ -316,7 +316,7 @@ For other ways of controlling pipette movement, see :ref:`gantry_speed` and :ref
 .. _defaults:
 
 Defaults
---------
+========
 
 **Head Speed**: 400 mm/s
 

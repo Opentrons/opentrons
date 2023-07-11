@@ -2,15 +2,16 @@
 
 .. _advanced-control:
 
+****************
 Advanced Control
-================
+****************
 
 As its name implies, the Python Protocol API is primarily designed for creating protocols that you upload via the Opentrons App and execute on the robot as a unit. But sometimes it's more convenient to control the robot outside of the app. For example, you might want to have variables in your code that change based on user input or the contents of a CSV file. Or you might want to only execute part of your protocol at a time, especially when developing or debugging a new protocol.
 
 The OT-2 offers two ways of issuing Python API commands to the robot outside of the app: through Jupyter Notebook or on the command line with ``opentrons_execute``.
 
 Jupyter Notebook
-----------------
+================
 
 The OT-2 runs a `Jupyter Notebook <https://jupyter.org>`_ server on port 48888, which you can connect to with your web browser. This is a convenient environment for writing and debugging protocols, since you can define different parts of your protocol in different notebook cells and run a single cell at a time.
 
@@ -25,7 +26,7 @@ Access the OT-2’s Jupyter Notebook by either:
 Once you've launched Jupyter Notebook, you can create a notebook file or edit an existing one. These notebook files are stored on the OT-2 itself. If you want to save code from a notebook to your computer, go to **File > Download As** in the notebook interface.
 
 Protocol Structure
-++++++++++++++++++
+------------------
 
 Jupyter Notebook is structured around `cells`: discrete chunks of code that can be run individually. This is nearly the opposite of Opentrons protocols, which bundle all commands into a single ``run`` function. Therefore, to take full advantage of Jupyter Notebook, you have to restructure your protocol. 
 
@@ -42,7 +43,7 @@ The first command you execute should always be :py:meth:`~opentrons.protocol_api
 You should use the same :py:class:`.ProtocolContext` throughout your notebook, unless you need to start over from the beginning of your protocol logic. In that case, call :py:meth:`~opentrons.execute.get_protocol_api` again to get a new :py:class:`.ProtocolContext`.
 
 Running a Previously Written Protocol
-+++++++++++++++++++++++++++++++++++++
+-------------------------------------
 
 You can also use Jupyter to run a protocol that you have already written. To do so, first copy the entire text of the protocol into a cell and run that cell:
 
@@ -63,12 +64,12 @@ Since a typical protocol only `defines` the ``run`` function but doesn't `call` 
 
 
 Using Custom Labware
-++++++++++++++++++++
+--------------------
 
 If you have custom labware definitions you want to use with Jupyter, make a new directory called ``labware`` in Jupyter and put the definitions there. These definitions will be available when you call :py:meth:`~opentrons.protocol_api.ProtocolContext.load_labware`.
 
 Using Modules
-+++++++++++++
+-------------
 
 If your protocol uses :ref:`new_modules`, you need to take additional steps to make sure that Jupyter Notebook doesn't send commands that conflict with the robot server. Sending commands to modules while the robot server is running will likely cause errors, and the module commands may not execute as expected.
 
@@ -80,7 +81,7 @@ To disable the robot server, open a Jupyter terminal session by going to **New >
 
 
 Command Line
-------------
+============
 
 The OT-2's command line is accessible either by going to **New > Terminal** in Jupyter or `via SSH <https://support.opentrons.com/s/article/Connecting-to-your-OT-2-with-SSH>`_.
 

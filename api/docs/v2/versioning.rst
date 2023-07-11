@@ -2,13 +2,14 @@
 
 .. _v2-versioning:
 
+**********
 Versioning
-==========
+**********
 
 The Python Protocol API has its own versioning system, which is separate from the versioning system used for the robot software and the Opentrons App. This allows you to specify the API version that your protocol requires without worrying about what robot software versions it will work with.
 
 Major and Minor Versions
-------------------------
+========================
 
 The API uses a major and minor version number and does not use patch version numbers. For instance, major version 2 and minor version 0 is written as ``2.0``. Versions are not decimal numbers, so ``2.10`` indicates major version 2 and minor version 10, which is 9 minor versions newer than ``2.1``. The Python Protocol API version will only increase based on changes that affect protocol behavior.
 
@@ -17,7 +18,7 @@ The major version of the API increases whenever there are significant structural
 The minor version of the API increases whenever there is new functionality that might change the way a protocol is written, or when a behavior changes in one aspect of the API but does not affect all protocols. For instance, adding support for a new hardware module, adding new parameters for a function, or deprecating a feature would increase the minor version of the API.
 
 Specifying Versions
--------------------
+===================
 
 You must specify the API version you are targeting in the ``metadata`` block at the top of your Python protocol. Use the ``'apiLevel'`` key, alongside any other metadata elements:
 
@@ -46,7 +47,7 @@ When choosing an API level, consider what features you need and how widely you p
 
 
 Maximum Supported Versions
---------------------------
+==========================
 
 From version 3.15.0 to 5.0.2 of the OT-2 software and Opentrons App, the maximum supported API level was listed in the robot's **Information** card in the app. Since version 6.0.0, the same information is listed under **Robot Settings > Advanced**.
 
@@ -54,7 +55,7 @@ If you upload a protocol that specifies a higher API level than the maximum supp
 
 
 Added Features
---------------
+==============
 
 Throughout the Python Protocol API documentation, there are version statements indicating when elements (features, function calls, available properties, etc.) were introduced. Keep these in mind when specifying your protocol's API version. Version statements look like this:
 
@@ -64,7 +65,7 @@ Throughout the Python Protocol API documentation, there are version statements i
 .. _version-table:
 
 API and Robot Software Versions
--------------------------------
+===============================
 
 This table lists the correspondence between Protocol API versions and robot software versions.
 
@@ -107,10 +108,10 @@ This table lists the correspondence between Protocol API versions and robot soft
 .. _version-notes:
 
 Changes in API Versions
------------------------
+=======================
 
 Version 2.0
-+++++++++++
+-----------
 
 Version 2 of the API is a new way to write Python protocols, with support for new modules like the Thermocycler. To transition your protocols from version 1 to version 2 of the API, follow this `migration guide <http://support.opentrons.com/en/articles/3425727-switching-your-protocols-from-api-version-1-to-version-2>`_.
 
@@ -118,7 +119,7 @@ We've also published a `more in-depth discussion <http://support.opentrons.com/e
 
 
 Version 2.1
-+++++++++++
+-----------
 
 - When loading labware onto a module, you can now specify a label with the ``label`` parameter of
   :py:meth:`.MagneticModuleContext.load_labware`,
@@ -128,7 +129,7 @@ Version 2.1
 
 
 Version 2.2
-+++++++++++
+-----------
 
 - You should now specify Magnetic Module engage height using the
   ``height_from_base`` parameter, which specifies the height of the top of the
@@ -138,7 +139,7 @@ Version 2.2
 
 
 Version 2.3
-+++++++++++
+-----------
 
 - Magnetic Module GEN2 and Temperature Module GEN2 are now supported; you can load them with the names ``"magnetic
   module gen2"`` and ``"temperature module gen2"``, respectively.
@@ -150,7 +151,7 @@ Version 2.3
 
 
 Version 2.4
-+++++++++++
+-----------
 
 - The following improvements were made to the ``touch_tip`` command:
 
@@ -160,7 +161,7 @@ Version 2.4
 
 
 Version 2.5
-+++++++++++
+-----------
 
 - New :ref:`new-utility-commands` were added:
 
@@ -170,7 +171,7 @@ Version 2.5
 
 
 Version 2.6
-+++++++++++
+-----------
 
 - GEN2 Single pipettes now default to flow rates equivalent to 10 mm/s plunger
   speeds
@@ -181,7 +182,7 @@ Version 2.6
 
 
 Version 2.7
-+++++++++++
+-----------
 
 - Added :py:meth:`.InstrumentContext.pair_with`, an experimental feature for moving both pipettes simultaneously.
 
@@ -194,7 +195,7 @@ Version 2.7
 
 
 Version 2.8
-+++++++++++
+-----------
 
 - You can now pass in a list of volumes to distribute and consolidate. See :ref:`distribute-consolidate-volume-list` for more information.
 
@@ -209,32 +210,32 @@ Version 2.8
 
 
 Version 2.9
-+++++++++++
+-----------
 
 - You can now access certain geometry data regarding a labware's well via a Well Object. See :ref:`new-labware-well-properties` for more information.
 
 
 Version 2.10
-++++++++++++
+------------
 
 - Moving to the same well twice in a row with different pipettes no longer results in strange diagonal movements.
 
 
 Version 2.11
-++++++++++++
+------------
 
 - Attempting to aspirate from or dispense to tip racks will raise an error.
 
 
 Version 2.12
-++++++++++++
+------------
 
 - :py:meth:`.ProtocolContext.resume` has been deprecated.
 - :py:meth:`.Labware.set_offset` has been added to apply labware offsets to protocols run (exclusively) outside of the Opentrons App (Jupyter Notebook and SSH).
 
 
 Version 2.13
-++++++++++++
+------------
 
 - Adds :py:class:`.HeaterShakerContext` to support the Heater-Shaker Module. You can use the load name ``heaterShakerModuleV1`` with :py:meth:`.ProtocolContext.load_module` to add a Heater-Shaker to a protocol.
 - :py:meth:`.InstrumentContext.drop_tip` now has a ``prep_after`` parameter.
@@ -243,7 +244,7 @@ Version 2.13
 
 
 Version 2.14
-++++++++++++
+------------
 
 This version introduces a new protocol runtime that offers more reliable run control
 and builds a strong foundation for future Protocol API improvements.
