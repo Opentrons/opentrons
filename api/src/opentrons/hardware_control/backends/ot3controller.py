@@ -31,7 +31,7 @@ from .ot3utils import (
     create_move_group,
     axis_to_node,
     get_current_settings,
-    create_home_group,
+    create_home_groups,
     node_to_axis,
     sensor_node_for_mount,
     sensor_node_for_pipette,
@@ -512,10 +512,8 @@ class OT3Controller:
 
         move_group_pipette = []
         if distances_pipette and velocities_pipette:
-            pipette_move = self._filter_move_group(
-                create_home_group(distances_pipette, velocities_pipette)
-            )
-            move_group_pipette.append(pipette_move)
+            for group in create_home_groups(distances_pipette, velocities_pipette):
+                move_group_pipette.append(self._filter_move_group(group))
 
         if move_group_pipette:
             return MoveGroupRunner(move_groups=move_group_pipette, start_at_index=2)
@@ -552,21 +550,17 @@ class OT3Controller:
         }
         move_group_gantry_z = []
         if distances_z and velocities_z:
-            z_move = self._filter_move_group(
-                create_home_group(distances_z, velocities_z)
-            )
-            move_group_gantry_z.append(z_move)
+            for group in create_home_groups(distances_z, velocities_z):
+                move_group_gantry_z.append(self._filter_move_group(group))
         if distances_gantry and velocities_gantry:
             # home X axis before Y axis, to avoid collision with thermo-cycler lid
             # that could be in the back-left corner
             for ax in [OT3Axis.X, OT3Axis.Y]:
                 if ax in axes:
-                    gantry_move = self._filter_move_group(
-                        create_home_group(
-                            {ax: distances_gantry[ax]}, {ax: velocities_gantry[ax]}
-                        )
-                    )
-                    move_group_gantry_z.append(gantry_move)
+                    for group in create_home_groups(
+                        {ax: distances_gantry[ax]}, {ax: velocities_gantry[ax]}
+                    ):
+                        move_group_gantry_z.append(self._filter_move_group(group))
         if move_group_gantry_z:
             return MoveGroupRunner(move_groups=move_group_gantry_z)
         return None
