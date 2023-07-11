@@ -1,9 +1,9 @@
 ---
-test_name: GET estop status 
+test_name: GET estop status on OT-3
 marks:
+  - ot3_only
   - usefixtures:
     - ot3_server_base_url
-    - ot2_server_base_url
 stages: 
   - name: Get estop status 
     request:
@@ -16,6 +16,12 @@ stages:
           status: disengaged
           leftEstopPhysicalStatus: disengaged
           rightEstopPhysicalStatus: disengaged
+---
+test_name: GET estop status on OT-2
+marks:
+  - usefixtures:
+    - ot2_server_base_url
+stages: 
   - name: Get estop status from OT-2
     request:
       method: GET 
@@ -23,11 +29,11 @@ stages:
     response:
       status_code: 403
 ---
-test_name: PUT estop acknowledge & disengage 
+test_name: PUT estop acknowledge & disengage on OT-3
 marks:
+  - ot3_only
   - usefixtures:
     - ot3_server_base_url
-    - ot2_server_base_url
 stages: 
   - name: PUT acknowledgeEstopDisengage
     request:
@@ -40,6 +46,12 @@ stages:
           status: disengaged
           leftEstopPhysicalStatus: disengaged
           rightEstopPhysicalStatus: disengaged
+---
+test_name: PUT estop acknowledge & disengage on OT-2
+marks:
+  - usefixtures:
+    - ot2_server_base_url
+stages: 
   - name: PUT acknowledgeEstopDisengage on ot-2
     request:
       method: PUT 
