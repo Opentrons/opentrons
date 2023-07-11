@@ -112,7 +112,6 @@ stages:
               errorCode: '4000'
               errorInfo: !anydict
               wrappedErrors: !anylist
-              unexpectedFail: False
             params:
               pipetteId: !anystr
               labwareId: !anystr

@@ -110,7 +110,8 @@ class ChildThreadTransport(AbstractSyncTransport):
         if command.error is not None:
             error = command.error
             raise ProtocolCommandFailedError(
-                original_error=error, message=f"{error.errorType}: {error.detail}"
+                original_error=error,
+                message=f"{error.errorType}: {error.detail}",
             )
 
         # FIXME(mm, 2023-04-10): This assert can easily trigger from this sequence:

@@ -263,9 +263,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             error_occurrence = ErrorOccurrence.from_failed(
                 id=action.error_id,
                 createdAt=action.failed_at,
-                error=ProtocolCommandFailedError(
-                    wrapping=[action.error],
-                ),
+                error=action.error,
             )
             log.info(f"error_occurrence:: {error_occurrence}")
             prev_entry = self._state.commands_by_id[action.command_id]
@@ -580,7 +578,7 @@ class CommandView(HasState[CommandState]):
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
-                    log.info(f"error in command: {command.error}")
+                    # TODO(tz, 7-11-23): avoid raising an error and return the status instead
                     raise ProtocolCommandFailedError(
                         original_error=command.error, message=command.error.detail
                     )

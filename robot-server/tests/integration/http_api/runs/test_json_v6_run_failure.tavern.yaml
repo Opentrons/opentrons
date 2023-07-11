@@ -56,12 +56,9 @@ stages:
           status: failed
           errors:
             - id: !anystr
-              errorType: ProtocolCommandFailedError
+              errorType: PythonException
               createdAt: !anystr
-              detail: 'Error 4000 GENERAL_ERROR (ProtocolCommandFailedError)'
-              wrappedErrors:
-                - errorType: PythonException
-                  detail: 'Cannot perform DROPTIP without a tip attached'
+              detail: 'opentrons.hardware_control.errors.NoTipAttachedError: Cannot perform DROPTIP without a tip attached'
   - name: Verify commands contain the expected results
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/commands'
@@ -110,9 +107,9 @@ stages:
             status: failed
             error:
               id: !anystr
-              errorType: UnexpectedProtocolError
+              errorType: PythonException
               createdAt: !anystr
-              detail: 'Cannot perform DROPTIP without a tip attached'
+              detail: 'opentrons.hardware_control.errors.NoTipAttachedError: Cannot perform DROPTIP without a tip attached'
               errorCode: '4000'
               errorInfo: !anydict
               wrappedErrors: !anylist

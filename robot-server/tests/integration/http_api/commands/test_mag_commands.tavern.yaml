@@ -62,11 +62,8 @@ stages:
             moduleId: '{magneticModuleV1_id}'
             height: 21
           error:
-            errorType: ProtocolCommandFailedError
-            detail: 'Error 4000 GENERAL_ERROR (ProtocolCommandFailedError)'
-            wrappedErrors:
-              - errorType: EngageHeightOutOfRangeError
-                detail: 'Invalid engage height for magneticModuleV1: 47.0. Must be 0 - 45.'
+            errorType: EngageHeightOutOfRangeError
+            detail: 'Invalid engage height for magneticModuleV1: 47.0. Must be 0 - 45.'
       save:
         json:
           command_id_engage_error: data.id

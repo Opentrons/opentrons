@@ -118,6 +118,7 @@ class CommandExecutor:
             elif not isinstance(error, EnumeratedError):
                 error = PythonException(error)
 
+            log.info(f"exeute command error: {error}")
             self._action_dispatcher.dispatch(
                 FailCommandAction(
                     error=error,
