@@ -6,12 +6,33 @@
 Labware
 #######
 
+Labware are those durable components and consumable items that you work with, reuse, or discard while running a protocol on a Flex or OT-2. This definition includes default labware, custom labware, and their related software files that capture the physical dimensions of the labware objects you need to write and run a protocol. This section covers how to use the Opentrons Python API to create a protocol for your Flex or OT-2.
 
-When writing a protocol, you must inform the Protocol API about the labware you will be placing on the robot's deck.
+*************
+Labware Types
+*************
 
-When loading labware, you specify its name (e.g. ``corning_96_wellplate_360ul_flat``) and deck slot location. (e.g. ``D2`` or ``2`` for a Flex and OT-2, respectively).
+Default Labware
+^^^^^^^^^^^^^^^
 
-When looking for labware names, start in the `Opentrons Labware Library <https://labware.opentrons.com>`_. This database contains API load names, labware images, manufacturer part numbers, and more. The following table lists the labware used in this section.
+Default labware encompasses the hardware and software definitions found in the `Opentrons Labware Library <https://labware.opentrons.com/>`_. This database includes plain-text labware names, API ``load_labware`` names, images, manufacturer part numbers, physical dimensions, and more. 
+
+When writing a protocol, you must inform the API about the labware you will be placing on the robot's deck. Search the library when you’re looking for the API load names of the labware used in your protocol. You can copy the load names that should be passed to the ``load_labware`` method.
+
+Custom Labware
+^^^^^^^^^^^^^^
+
+If you have labware that is not in the Labware Library, try creating your own definition using the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. Before using the Labware Creator, see `Creating Custom Labware Definitions <https://support.opentrons.com/s/article/Creating-Custom-Labware-Definitions>`_ .
+
+After you've created your labware, save it as a ``.json`` file and add it to the Opentrons App. See `Using Labware in Your Protocols <https://support.opentrons.com/s/article/Using-labware-in-your-protocols>`_ for instructions. 
+
+If other people need to use your custom labware definition, they must also add it to their Opentrons App.
+
+***************
+Loading Labware
+***************
+
+Throughout this section, we'll use the labware listed in the following table.
 
 .. list-table::
     :widths: 20 40 45
@@ -30,7 +51,7 @@ When looking for labware names, start in the `Opentrons Labware Library <https:/
       - `Opentrons 96 Tip Rack 300 µL <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_
       - ``opentrons_96_tiprack_300ul``
 
-In the example given in the :ref:`overview-section-v2` section, we loaded Flex and OT-2 labware like this:
+From the example in the :ref:`overview-section-v2`, we used the :py:meth:`.ProtocolContext.load_labware` method to load Flex and OT-2 labware as shown below. 
 
 .. code-block:: python
 
@@ -38,44 +59,27 @@ In the example given in the :ref:`overview-section-v2` section, we loaded Flex a
     tiprack = protocol.load_labware('opentrons_flex_96_tiprack_200ul', 'D1')
     plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D2')
 
-Flex code informs the protocol context that the deck contains a 200 µL tiprack in slot D1 and a 96-well plate in slot D2.
-
 .. code-block:: python
 
     #OT-2
     tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
     plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '2')
 
-OT-2 code informs the protocol context that the deck contains a 300 µL tiprack in slot 1 and a 96 well plate in slot 2.
+After the ``load_labware`` method loads labware into your protocol, it returns a :py:class:`opentrons.protocol_api.labware.Labware` object.
 
-The ``load_labware`` method also accepts an optional third argument, ``label``. You can use it to name the labware and the label value is displayed in the Opentrons App. For example::
+Labeling Labware
+^^^^^^^^^^^^^^^^
+
+Along with the required labware API name and deck location, the ``load_labware`` method also accepts an optional ``label`` argument. You can use it to name the labware. If used, the label value is displayed in the Opentrons App. For example::
 
     tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat',
                                     location= '1',
                                     label= 'any-name-you-want')
 
-Labware is loaded into a protocol using :py:meth:`.ProtocolContext.load_labware`, which returns
-:py:class:`opentrons.protocol_api.labware.Labware` object.
+Stacking or Moving Labware
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-***************
-Finding Labware
-***************
-
-Default Labware
-^^^^^^^^^^^^^^^
-
-The OT-2 has a set of labware well-supported by Opentrons defined internally. This set of labware is always available to protocols. This labware can be found on the `Opentrons Labware Library <https://labware.opentrons.com>`_. You can copy the load names that should be passed to ``protocol.load_labware`` statements to get the correct definitions.
-
-
-.. _v2-custom-labware:
-
-Custom Labware
-^^^^^^^^^^^^^^
-
-If you have a piece of labware that is not in the Labware Library, you can create your own definition using the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. Before using the Labware Creator, you should read the introduction article `here <https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions>`__.
-
-Once you have created your labware and saved it as a ``.json`` file, you can add it to the Opentrons App by clicking "More" and then "Labware". Once you have added your labware to the Opentrons App, it will be available to all Python Protocol API version 2 protocols uploaded to your robot through that Opentrons App. If other people will be using this custom labware definition, they must also add it to their Opentrons App. You can find a support article about this custom labware process `here <https://support.opentrons.com/en/articles/3136506-using-labware-in-your-protocols>`__.
-
+Some text here.
 
 .. _new-well-access:
 
@@ -114,7 +118,6 @@ The ending well will be in the bottom right, see the diagram below for further e
 
 
 .. versionadded:: 2.0
-
 
 Accessor Methods
 ^^^^^^^^^^^^^^^^
