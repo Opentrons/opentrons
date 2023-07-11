@@ -8,6 +8,7 @@ from .liquid_class.defaults import get_liquid_class, get_test_volumes
 from .increments import get_volume_increments
 from inspect import getsource
 
+from hardware_testing.data import ui
 from opentrons import protocol_api
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
@@ -43,10 +44,10 @@ def _add_fake_comment_pause(
     ctx: protocol_api.ProtocolContext,
 ) -> protocol_api.ProtocolContext:
     def _comment(_: protocol_api.ProtocolContext, a: Any) -> None:
-        print(a)
+        ui.print_info(a)
 
     def _pause(_: protocol_api.ProtocolContext, a: Any) -> None:
-        input(a)
+        ui.get_user_ready(a)
 
     setattr(ctx, "comment", MethodType(_comment, ctx))
     setattr(ctx, "pause", MethodType(_pause, ctx))
@@ -201,7 +202,7 @@ def _calculate_stats(
 ) -> Tuple[float, float, float]:
     average = _calculate_average(volume_list)
     if len(volume_list) <= 1:
-        print("skipping CV, only 1x trial per volume")
+        ui.print_info("skipping CV, only 1x trial per volume")
         cv = -0.01  # negative number is impossible
     else:
         cv = stdev(volume_list) / average
@@ -220,7 +221,7 @@ def _apply(
     labware: Labware, cfg: Union[config.GravimetricConfig, config.PhotometricConfig]
 ) -> None:
     o = get_latest_offset_for_labware(cfg.labware_offsets, labware)
-    print(
+    ui.print_info(
         f'Apply labware offset to "{labware.name}" (slot={labware.parent}): '
         f"x={round(o.x, 2)}, y={round(o.y, 2)}, z={round(o.z, 2)}"
     )
@@ -241,7 +242,7 @@ def _pick_up_tip(
     cfg: Union[config.GravimetricConfig, config.PhotometricConfig],
     location: Location,
 ) -> None:
-    print(
+    ui.print_info(
         f"picking tip {location.labware.as_well().well_name} "
         f"from slot #{location.labware.parent.parent}"
     )
@@ -249,7 +250,7 @@ def _pick_up_tip(
     # NOTE: the accuracy-adjust function gets set on the Pipette
     #       each time we pick-up a new tip.
     if getattr(cfg, "increment", False):
-        print("clearing pipette ul-per-mm table to be linear")
+        ui.print_info("clearing pipette ul-per-mm table to be linear")
         clear_pipette_ul_per_mm(
             get_sync_hw_api(ctx)._obj_to_adapt,  # type: ignore[arg-type]
             OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT,
@@ -301,7 +302,7 @@ def _load_pipette(
         raise ValueError(f"unexpected number of channels: {pip_channels}")
     chnl_str = load_str_channels[pip_channels]
     pip_name = f"p{cfg.pipette_volume}_{chnl_str}"
-    print(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
+    ui.print_info(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
     pipette = ctx.load_instrument(pip_name, cfg.pipette_mount)
     assert pipette.max_volume == cfg.pipette_volume, (
         f"expected {cfg.pipette_volume} uL pipette, "
@@ -325,7 +326,7 @@ def _get_tag_from_pipette(
     cfg: Union[config.GravimetricConfig, config.PhotometricConfig],
 ) -> str:
     pipette_tag = get_pipette_unique_name(pipette)
-    print(f'found pipette "{pipette_tag}"')
+    ui.print_info(f'found pipette "{pipette_tag}"')
     if getattr(cfg, "increment", False):
         pipette_tag += "-increment"
     elif cfg.user_volumes:
@@ -349,7 +350,7 @@ def _load_tipracks(
         for slot in cfg.slots_tiprack
     ]
     for ls in tiprack_load_settings:
-        print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
+        ui.print_info(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
     if use_adapters:
         tiprack_namespace = "custom_beta"
     else:

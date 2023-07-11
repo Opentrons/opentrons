@@ -198,7 +198,7 @@ def build_gravimetric_trials(
         for volume in test_volumes:
             for channel in channels_to_test:
                 if cfg.isolate_channels and (channel + 1) not in cfg.isolate_channels:
-                    print(f"skipping channel {channel + 1}")
+                    ui.print_info(f"skipping channel {channel + 1}")
                     continue
                 trial_list[volume] = {channel: []}
                 channel_offset = helpers._get_channel_offset(cfg, channel)
@@ -272,16 +272,16 @@ def _finish_test(
     ui.print_title("CHANGE PIPETTES")
     if resources.pipette.has_tip:
         if resources.pipette.current_volume > 0:
-            print("dispensing liquid to trash")
+            ui.print_info("dispensing liquid to trash")
             trash = resources.pipette.trash_container.wells()[0]
             # FIXME: this should be a blow_out() at max volume,
             #        but that is not available through PyAPI yet
             #        so instead just dispensing.
             resources.pipette.dispense(resources.pipette.current_volume, trash.top())
             resources.pipette.aspirate(10)  # to pull any droplets back up
-        print("dropping tip")
+        ui.print_info("dropping tip")
         helpers._drop_tip(resources.pipette, return_tip)
-    print("moving to attach position")
+    ui.print_info("moving to attach position")
     resources.pipette.move_to(
         resources.ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150))
     )

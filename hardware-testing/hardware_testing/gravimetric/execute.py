@@ -104,7 +104,7 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
 
 
 def _load_labware(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> Labware:
-    print(f'Loading labware on scale: "{cfg.labware_on_scale}"')
+    ui.print_info(f'Loading labware on scale: "{cfg.labware_on_scale}"')
     if cfg.labware_on_scale == "radwag_pipette_calibration_vial":
         namespace = "custom_beta"
     else:
@@ -117,7 +117,7 @@ def _load_labware(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> Labwar
 
 
 def _print_stats(mode: str, average: float, cv: float, d: float) -> None:
-    print(
+    ui.print_info(
         f"{mode}:\n"
         f"\tavg: {round(average, 2)} uL\n"
         f"\tcv: {round(cv * 100.0, 2)}%\n"
@@ -129,23 +129,23 @@ def _print_final_results(
     volumes: List[float], channel_count: int, test_report: CSVReport
 ) -> None:
     for vol in volumes:
-        print(f"  * {vol}ul channel all:")
+        ui.print_info(f"  * {vol}ul channel all:")
         for mode in ["aspirate", "dispense"]:
             avg, cv, d = report.get_volume_results_all(test_report, mode, vol)
-            print(f"    - {mode}:")
-            print(f"        avg: {avg}ul")
-            print(f"        cv:  {cv}%")
-            print(f"        d:   {d}%")
+            ui.print_info(f"    - {mode}:")
+            ui.print_info(f"        avg: {avg}ul")
+            ui.print_info(f"        cv:  {cv}%")
+            ui.print_info(f"        d:   {d}%")
         for channel in range(channel_count):
-            print(f"  * vol {vol}ul channel {channel + 1}:")
+            ui.print_info(f"  * vol {vol}ul channel {channel + 1}:")
             for mode in ["aspirate", "dispense"]:
                 avg, cv, d = report.get_volume_results_per_channel(
                     test_report, mode, vol, channel
                 )
-                print(f"    - {mode}:")
-                print(f"        avg: {avg}ul")
-                print(f"        cv:  {cv}%")
-                print(f"        d:   {d}%")
+                ui.print_info(f"    - {mode}:")
+                ui.print_info(f"        avg: {avg}ul")
+                ui.print_info(f"        cv:  {cv}%")
+                ui.print_info(f"        d:   {d}%")
 
 
 def _next_tip_for_channel(
@@ -206,19 +206,19 @@ def _run_trial(
         _update_environment_first_last_min_max(trial.test_report)
         return m_data
 
-    print("recorded weights:")
+    ui.print_info("recorded weights:")
 
     # RUN INIT
     trial.pipette.move_to(
         trial.well.top(trial.measure_height).move(trial.channel_offset)
     )
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
-    print(f"\tinitial grams: {m_data_init.grams_average} g")
+    ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
     if _PREV_TRIAL_GRAMS is not None:
         _evaporation_loss_ul = abs(
             calculate_change_in_volume(_PREV_TRIAL_GRAMS, m_data_init)
         )
-        print(f"{_evaporation_loss_ul} ul evaporated since last trial")
+        ui.print_info(f"{_evaporation_loss_ul} ul evaporated since last trial")
         trial.liquid_tracker.update_affected_wells(
             trial.well, aspirate=_evaporation_loss_ul, channels=1
         )
@@ -243,8 +243,8 @@ def _run_trial(
         trial.well.top(trial.measure_height).move(trial.channel_offset)
     )
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
-    print(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
-    print(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
+    ui.print_info(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
+    ui.print_info(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
 
     # RUN DISPENSE
     dispense_with_liquid_class(
@@ -265,7 +265,7 @@ def _run_trial(
         trial.well.top(trial.measure_height).move(trial.channel_offset)
     )
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
-    print(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
+    ui.print_info(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
 
     # calculate volumes
     volume_aspirate = calculate_change_in_volume(m_data_init, m_data_aspirate)
@@ -317,7 +317,7 @@ def _load_scale(
     cfg: config.GravimetricConfig, resources: TestResources
 ) -> GravimetricRecorder:
     ui.print_header("LOAD SCALE")
-    print(
+    ui.print_info(
         "Some Radwag settings cannot be controlled remotely.\n"
         "Listed below are the things the must be done using the touchscreen:\n"
         "  1) Set profile to USER\n"
@@ -335,12 +335,12 @@ def _load_scale(
         ),
         simulate=resources.ctx.is_simulating(),
     )
-    print(f'found scale "{recorder.serial_number}"')
+    ui.print_info(f'found scale "{recorder.serial_number}"')
     if resources.ctx.is_simulating():
         start_sim_mass = {50: 15, 200: 200, 1000: 200}
         recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
     recorder.record(in_thread=True)
-    print(f'scale is recording to "{recorder.file_name}"')
+    ui.print_info(f'scale is recording to "{recorder.file_name}"')
     return recorder
 
 
@@ -371,11 +371,11 @@ def _calculate_evaporation(
             True,
             measure_height=measure_height,
         )
-        print(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
+        ui.print_info(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
         hover_pos = labware_on_scale["A1"].top().move(Point(z=50))
         resources.pipette.move_to(hover_pos)
         for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
-            print(
+            ui.print_info(
                 f"wait {i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE} seconds before"
                 f" measuring evaporation"
             )
@@ -385,7 +385,7 @@ def _calculate_evaporation(
             ui.print_header(f"BLANK {b_trial.trial + 1}/{config.NUM_BLANK_TRIALS}")
             resources.pipette.move_to(hover_pos)
             evap_aspirate, _, evap_dispense, _ = _run_trial(b_trial)
-            print(
+            ui.print_info(
                 f"blank {b_trial.trial + 1}/{config.NUM_BLANK_TRIALS}:\n"
                 f"\taspirate: {evap_aspirate} uL\n"
                 f"\tdispense: {evap_dispense} uL"
@@ -395,7 +395,7 @@ def _calculate_evaporation(
         ui.print_header("EVAPORATION AVERAGE")
         average_aspirate_evaporation_ul = _calculate_average(actual_asp_list_evap)
         average_dispense_evaporation_ul = _calculate_average(actual_disp_list_evap)
-        print(
+        ui.print_info(
             "average:\n"
             f"\taspirate: {average_aspirate_evaporation_ul} uL\n"
             f"\tdispense: {average_dispense_evaporation_ul} uL"
@@ -440,7 +440,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
 
     try:
         ui.print_title("FIND LIQUID HEIGHT")
-        print("homing...")
+        ui.print_info("homing...")
         resources.ctx.home()
         resources.pipette.home_plunger()
         first_tip = resources.tips[0][0]
@@ -452,19 +452,21 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         if not resources.ctx.is_simulating():
             ui.get_user_ready("REPLACE first tip with NEW TIP")
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
-        print("moving to scale")
+        ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
         resources.pipette.move_to(well.top())
         _liquid_height = _jog_to_find_liquid_height(
             resources.ctx, resources.pipette, well
         )
         height_below_top = well.depth - _liquid_height
-        print(f"liquid is {height_below_top} mm below top of vial")
+        ui.print_info(f"liquid is {height_below_top} mm below top of vial")
         liquid_tracker.set_start_volume_from_liquid_height(
             labware_on_scale["A1"], _liquid_height, name="Water"
         )
         vial_volume = liquid_tracker.get_volume(well)
-        print(f"software thinks there is {vial_volume} uL of liquid in the vial")
+        ui.print_info(
+            f"software thinks there is {vial_volume} uL of liquid in the vial"
+        )
 
         (
             average_aspirate_evaporation_ul,
@@ -479,7 +481,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
             measure_height,
         )
 
-        print("dropping tip")
+        ui.print_info("dropping tip")
         _drop_tip(resources.pipette, return_tip=False)  # always trash calibration tips
         calibration_tip_in_use = False
         trial_count = 0
@@ -518,7 +520,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                     ui.print_header(
                         f"{volume} uL channel {channel + 1} ({run_trial.trial + 1}/{cfg.trials})"
                     )
-                    print(f"trial total {trial_count}/{trial_total}")
+                    ui.print_info(f"trial total {trial_count}/{trial_total}")
                     # NOTE: always pick-up new tip for each trial
                     #       b/c it seems tips heatup
                     next_tip: Well = _next_tip_for_channel(
@@ -537,7 +539,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                         actual_dispense,
                         dispense_data,
                     ) = _run_trial(run_trial)
-                    print(
+                    ui.print_info(
                         "measured volumes:\n"
                         f"\taspirate: {round(actual_aspirate, 2)} uL\n"
                         f"\tdispense: {round(actual_dispense, 2)} uL"
@@ -547,7 +549,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                     chnl_div = _get_channel_divider(cfg)
                     disp_with_evap /= chnl_div
                     asp_with_evap /= chnl_div
-                    print(
+                    ui.print_info(
                         "per-channel volume, with evaporation:\n"
                         f"\taspirate: {round(asp_with_evap, 2)} uL\n"
                         f"\tdispense: {round(disp_with_evap, 2)} uL"
@@ -570,7 +572,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                         asp_with_evap,
                         disp_with_evap,
                     )
-                    print("dropping tip")
+                    ui.print_info("dropping tip")
                     _drop_tip(resources.pipette, cfg.return_tip)
 
                 ui.print_header(f"{volume} uL channel {channel + 1} CALCULATIONS")
@@ -682,7 +684,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                 d=dispense_d,
             )
     finally:
-        print("ending recording")
+        ui.print_info("ending recording")
         recorder.stop()
         recorder.deactivate()
         _return_tip = False if calibration_tip_in_use else cfg.return_tip

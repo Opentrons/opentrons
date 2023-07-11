@@ -54,3 +54,8 @@ def print_header(header: str) -> None:
 def print_error(message: str) -> None:
     """Print error."""
     print(f"ERROR: {message}")
+
+
+def print_info(message: str) -> None:
+    """Print information."""
+    print(message)
