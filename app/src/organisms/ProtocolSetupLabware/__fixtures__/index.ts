@@ -3477,7 +3477,9 @@ export const mockRecentAnalysis = {
               brand: {
                 brand: 'NEST',
                 brandId: ['503501', '503001'],
-                links: ['https://www.nest-biotech.com/deep-well-plates/59253726.html'],
+                links: [
+                  'https://www.nest-biotech.com/deep-well-plates/59253726.html',
+                ],
               },
             },
           ],
@@ -5418,7 +5420,9 @@ export const mockProtocolModuleInfo = [
           brand: {
             brand: 'NEST',
             brandId: ['503501', '503001'],
-            links: ['https://www.nest-biotech.com/deep-well-plates/59253726.html'],
+            links: [
+              'https://www.nest-biotech.com/deep-well-plates/59253726.html',
+            ],
           },
         },
       ],

@@ -32,7 +32,7 @@ export function AppComponent(props: DefinitionRouteRenderProps): JSX.Element {
       })}
     >
       <Nav />
-      <Breadcrumbs show={isDetailPage}/> 
+      <Breadcrumbs show={isDetailPage} />
       <Page
         scrollRef={scrollRef}
         isDetailPage={isDetailPage}

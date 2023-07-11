@@ -1564,9 +1564,7 @@
           "brand": {
             "brand": "NEST",
             "brandId": ["402501"],
-            "links": [
-              "https://www.nest-biotech.com/pcr-plates/58773587.html"
-            ]
+            "links": ["https://www.nest-biotech.com/pcr-plates/58773587.html"]
           },
           "parameters": {
             "format": "96Standard",

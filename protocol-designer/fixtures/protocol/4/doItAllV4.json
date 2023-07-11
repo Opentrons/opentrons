@@ -1299,9 +1299,7 @@
       "brand": {
         "brand": "NEST",
         "brandId": ["402501"],
-        "links": [
-          "https://www.nest-biotech.com/pcr-plates/58773587.html"
-        ]
+        "links": ["https://www.nest-biotech.com/pcr-plates/58773587.html"]
       },
       "metadata": {
         "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",

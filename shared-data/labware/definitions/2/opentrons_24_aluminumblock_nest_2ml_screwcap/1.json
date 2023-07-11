@@ -251,9 +251,7 @@
       "brand": {
         "brand": "NEST",
         "brandId": ["635001"],
-        "links": [
-          "https://www.nest-biotech.com/sample-vials/59249854.html"
-        ]
+        "links": ["https://www.nest-biotech.com/sample-vials/59249854.html"]
       },
       "wells": [
         "A1",
