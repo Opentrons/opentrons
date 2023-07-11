@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { LEFT } from '@opentrons/shared-data'
+import { EXTENSION } from '@opentrons/shared-data'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -73,7 +73,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                 command: {
                   commandType: 'calibration/moveToMaintenancePosition' as const,
                   params: {
-                    mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+                    mount: EXTENSION,
                   },
                 },
                 waitUntilComplete: true,

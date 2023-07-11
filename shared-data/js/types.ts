@@ -461,10 +461,15 @@ export interface ProtocolResource {
 export interface ProtocolAnalysesResource {
   analyses: Array<PendingProtocolAnalysis | CompletedProtocolAnalysis>
 }
+export type MotorAxis =
+  | 'x'
+  | 'y'
+  | 'leftZ'
+  | 'rightZ'
+  | 'leftPlunger'
+  | 'rightPlunger'
 
-export type MotorAxis = Array<
-  'x' | 'y' | 'leftZ' | 'rightZ' | 'leftPlunger' | 'rightPlunger'
->
+export type MotorAxes = MotorAxis[]
 
 export type ThermalAdapterName =
   | 'PCR Adapter'

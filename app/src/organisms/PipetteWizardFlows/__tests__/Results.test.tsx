@@ -103,12 +103,6 @@ describe('Results', () => {
             axes: ['leftPlunger'],
           },
         },
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: 'left',
-          },
-        },
       ],
       false
     )
@@ -139,12 +133,6 @@ describe('Results', () => {
           commandType: 'home' as const,
           params: {
             axes: ['leftPlunger'],
-          },
-        },
-        {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: {
-            mount: 'left',
           },
         },
       ],

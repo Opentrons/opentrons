@@ -183,6 +183,10 @@ describe('PipetteWizardFlows', () => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
           {
+            commandType: 'home',
+            params: { axes: ['leftZ'] },
+          },
+          {
             commandType: 'calibration/calibratePipette',
             params: { mount: LEFT },
           },
@@ -575,6 +579,10 @@ describe('PipetteWizardFlows', () => {
     await waitFor(() => {
       expect(mockChainRunCommands).toHaveBeenCalledWith(
         [
+          {
+            commandType: 'home',
+            params: { axes: ['leftZ'] },
+          },
           {
             commandType: 'calibration/calibratePipette',
             params: { mount: LEFT },

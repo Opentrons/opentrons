@@ -16,6 +16,7 @@ from ..types import (
     DeckPoint,
     DeckSlotLocation,
     LabwareLocation,
+    NonStackedLocation,
     LabwareMovementStrategy,
     ModuleModel,
     WellLocation,
@@ -93,6 +94,26 @@ class SyncClient:
         result = self._transport.execute_command(request=request)
 
         return cast(commands.LoadLabwareResult, result)
+
+    def load_adapter(
+        self,
+        location: NonStackedLocation,
+        load_name: str,
+        namespace: str,
+        version: int,
+    ) -> commands.LoadAdapterResult:
+        """Execute a LoadLabware command and return the result."""
+        request = commands.LoadAdapterCreate(
+            params=commands.LoadAdapterParams(
+                location=location,
+                loadName=load_name,
+                namespace=namespace,
+                version=version,
+            )
+        )
+        result = self._transport.execute_command(request=request)
+
+        return cast(commands.LoadAdapterResult, result)
 
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
@@ -224,7 +245,7 @@ class SyncClient:
         well_name: str,
         well_location: DropTipWellLocation,
         home_after: Optional[bool],
-        randomize_drop_location: Optional[bool],
+        alternateDropLocation: Optional[bool],
     ) -> commands.DropTipResult:
         """Execute a DropTip command and return the result."""
         request = commands.DropTipCreate(
@@ -234,7 +255,7 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 homeAfter=home_after,
-                randomizeDropLocation=randomize_drop_location,
+                alternateDropLocation=alternateDropLocation,
             )
         )
         result = self._transport.execute_command(request=request)

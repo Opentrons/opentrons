@@ -3,6 +3,8 @@ from typing_extensions import Final, TypedDict
 from typing import Optional
 from pydantic import BaseSettings, Field
 
+from opentrons_shared_data.errors.exceptions import CANBusConfigurationError
+
 from math import floor
 
 DEFAULT_INTERFACE: Final = "socketcan"
@@ -72,13 +74,24 @@ def _check_calculated_bit_timing_values(
     brp: float, tseg_1: float, tseg_2: float
 ) -> None:
     if not brp.is_integer():
-        raise ValueError(f"BRP is {brp} and must be an integer")
+        raise CANBusConfigurationError(
+            message=f"BRP is {brp} and must be an integer", detail={"brp": str(brp)}
+        )
     if brp > MAX_BRP:
-        raise ValueError(f"Calculated BRP {brp} exceeds max value {MAX_BRP}")
+        raise CANBusConfigurationError(
+            message=f"Calculated BRP {brp} exceeds max value {MAX_BRP}",
+            detail={"brp": str(brp), "max": str(MAX_BRP)},
+        )
     if tseg_1 > MAX_TSEG1:
-        raise ValueError(f"Calculated TSEG1 {tseg_1} exceeds max value {MAX_TSEG1}")
+        raise CANBusConfigurationError(
+            message=f"Calculated TSEG1 {tseg_1} exceeds max value {MAX_TSEG1}",
+            detail={"tseg1": str(tseg_1), "max": str(MAX_TSEG1)},
+        )
     if tseg_2 > MAX_TSEG2:
-        raise ValueError(f"Calculated TSEG2 {tseg_2} exceeds max value {MAX_TSEG2}")
+        raise CANBusConfigurationError(
+            message=f"Calculated TSEG2 {tseg_2} exceeds max value {MAX_TSEG2}",
+            detail={"tseg2": str(tseg_2), "max": str(MAX_TSEG2)},
+        )
 
 
 def calculate_fdcan_parameters(
@@ -107,12 +120,14 @@ def calculate_fdcan_parameters(
         jump_width = DEFAULT_JUMP_WIDTH_SEG
 
     if fcan_clock > MAX_FCAN_CLK:
-        raise ValueError(
-            f"Clock value {fcan_clock} exceeds max value of {MAX_FCAN_CLK}"
+        raise CANBusConfigurationError(
+            message=f"Clock value {fcan_clock} exceeds max value of {MAX_FCAN_CLK}",
+            detail={"clock": str(fcan_clock), "max": str(MAX_FCAN_CLK)},
         )
     if jump_width > MAX_SJW:
-        raise ValueError(
-            f"Jump width value {jump_width} exceeds max value of {MAX_SJW}"
+        raise CANBusConfigurationError(
+            message=f"Jump width value {jump_width} exceeds max value of {MAX_SJW}",
+            detail={"sjw": str(jump_width), "max": str(MAX_SJW)},
         )
 
     sample_rate_percent = sample_rate / 100
