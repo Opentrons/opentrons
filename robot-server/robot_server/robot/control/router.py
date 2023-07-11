@@ -16,10 +16,8 @@ from opentrons.hardware_control import ThreadManagedHardware
 
 from .models import (
     EstopState,
-    EstopAttachLocation,
     EstopStatusModel,
     EstopPhysicalStatus,
-    EstopPhysicalStatusModel,
 )
 
 if TYPE_CHECKING:
@@ -33,17 +31,12 @@ async def _get_estop_status(
 ) -> PydanticResponse[SimpleBody[EstopStatusModel]]:
     """Helper to generate the current Estop Status as a response model."""
     get_ot3_hardware(thread_manager)
-    physical_status = [
-        EstopPhysicalStatusModel.construct(
-            mount=mount, status=EstopPhysicalStatus.DISENGAGED
-        )
-        for mount in [EstopAttachLocation.LEFT, EstopAttachLocation.RIGHT]
-    ]
 
     # TODO - unstub the response here
     data = EstopStatusModel.construct(
         status=EstopState.DISENGAGED,
-        physical_status=physical_status,
+        leftEstopPhysicalStatus=EstopPhysicalStatus.DISENGAGED,
+        rightEstopPhysicalStatus=EstopPhysicalStatus.DISENGAGED,
     )
     return await PydanticResponse.create(content=SimpleBody.construct(data=data))
 

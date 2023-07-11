@@ -14,11 +14,8 @@ stages:
       json: 
         data:
           status: disengaged
-          physical_status:
-            - mount: left 
-              status: disengaged 
-            - mount: right 
-              status: disengaged
+          leftEstopPhysicalStatus: disengaged
+          rightEstopPhysicalStatus: disengaged
   - name: Get estop status from OT-2
     request:
       method: GET 
@@ -41,11 +38,8 @@ stages:
       json: 
         data:
           status: disengaged
-          physical_status:
-            - mount: left 
-              status: disengaged 
-            - mount: right 
-              status: disengaged
+          leftEstopPhysicalStatus: disengaged
+          rightEstopPhysicalStatus: disengaged
   - name: PUT acknowledgeEstopDisengage on ot-2
     request:
       method: PUT 
