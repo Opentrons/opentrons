@@ -1,4 +1,6 @@
 import * as React from 'react'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -9,9 +11,19 @@ import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
 import { LegacyModalShell } from '../LegacyModal'
 import { WizardHeader } from '../WizardHeader'
+import { configReducer } from '../../redux/config/reducer'
 import { GenericWizardTile } from './index'
 
+import type { Store } from 'redux'
 import type { Story, Meta } from '@storybook/react'
+
+const dummyConfig = {
+  config: {
+    isOnDevice: false,
+  },
+} as any
+
+const store: Store<any> = createStore(configReducer, dummyConfig)
 
 export default {
   title: 'App/Molecules/GenericWizardTile',
@@ -21,10 +33,12 @@ export default {
 const Template: Story<
   React.ComponentProps<typeof GenericWizardTile>
 > = args => (
-  <LegacyModalShell>
-    <WizardHeader currentStep={3} totalSteps={4} title="Example Title" />
-    <GenericWizardTile {...args} />
-  </LegacyModalShell>
+  <Provider store={store}>
+    <LegacyModalShell>
+      <WizardHeader currentStep={3} totalSteps={4} title="Example Title" />
+      <GenericWizardTile {...args} />
+    </LegacyModalShell>
+  </Provider>
 )
 const body = (
   <StyledText as="p">

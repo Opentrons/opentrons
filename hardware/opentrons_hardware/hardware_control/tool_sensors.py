@@ -7,6 +7,8 @@ from numpy import float64
 from math import copysign
 from typing_extensions import Literal
 
+from opentrons_shared_data.errors.exceptions import CanbusCommunicationError
+
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorId,
@@ -131,15 +133,19 @@ async def liquid_probe(
 
 
 async def check_overpressure(
-    messenger: CanMessenger, tool: PipetteProbeTarget, sensor_id: SensorId = SensorId.S0
-) -> Callable[..., AsyncContextManager["asyncio.Queue[ErrorCode]"]]:
+    messenger: CanMessenger,
+    tools: Dict[PipetteProbeTarget, List[SensorId]],
+) -> Callable[..., AsyncContextManager["asyncio.Queue[Tuple[NodeId, ErrorCode]]"]]:
     """Montior for overpressure in the system.
 
     Returns a partial context manager to be used in the hardware controller so
     we can wrap moves.
     """
     sensor_scheduler = SensorScheduler()
-    sensor_info = SensorInformation(SensorType.pressure, sensor_id, tool)
+    sensor_info = []
+    for tool, sensor_ids in tools.items():
+        for _ids in sensor_ids:
+            sensor_info.append(SensorInformation(SensorType.pressure, _ids, tool))
     return partial(
         sensor_scheduler.monitor_exceed_max_threshold, sensor_info, messenger
     )
@@ -174,7 +180,14 @@ async def capacitive_probe(
         messenger,
     )
     if not threshold:
-        raise RuntimeError("Could not set threshold for probe")
+        raise CanbusCommunicationError(
+            message="Could not set threshold for probe",
+            detail={
+                "tool": tool.name,
+                "sensor": sensor_id.name,
+                "threshold": relative_threshold_pf,
+            },
+        )
     LOG.info(f"starting capacitive probe with threshold {threshold.to_float()}")
     pass_group = _build_pass_step([mover], {mover: distance}, {mover: speed})
     runner = MoveGroupRunner(move_groups=[[pass_group]])

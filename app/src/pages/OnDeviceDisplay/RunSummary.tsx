@@ -242,7 +242,6 @@ export function RunSummary(): JSX.Element {
               <LargeButton
                 flex="1"
                 iconName="play-round-corners"
-                buttonType="primary"
                 onClick={handleRunAgain}
                 buttonText={t('run_again')}
                 height="17rem"

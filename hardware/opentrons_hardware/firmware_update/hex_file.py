@@ -8,6 +8,8 @@ import binascii
 import struct
 import logging
 
+from opentrons_shared_data.errors.exceptions import FirmwareUpdateFailedError
+
 from typing_extensions import Final
 
 
@@ -36,34 +38,68 @@ class HexRecord:
     checksum: int
 
 
-class HexFileException(BaseException):
-    """Base of all hex file exceptions."""
-
-    pass
-
-
-class MalformedLineException(HexFileException):
+class MalformedLineException(FirmwareUpdateFailedError):
     """Line is malformed."""
 
-    pass
+    def __init__(self, message: str, line: str, line_no: int, filename: str) -> None:
+        """Build a MalformedLineException."""
+        super().__init__(
+            message=f"Could not parse firmware update file: {message}",
+            detail={"line": line, "line_number": str(line_no), "filename": filename},
+        )
 
 
-class ChecksumException(HexFileException):
+class ChecksumException(FirmwareUpdateFailedError):
     """Wrong checksum."""
 
-    pass
+    def __init__(
+        self,
+        line: str,
+        line_no: int,
+        filename: str,
+        calculated_checksum: int,
+        expected_checksum: int,
+    ) -> None:
+        """Build a ChecksumException."""
+        super().__init__(
+            message="Bad line checksum in firmware update file",
+            detail={
+                "line": line,
+                "line_number": str(line_no),
+                "filename": filename,
+                "calculated": str(calculated_checksum),
+                "expected": str(expected_checksum),
+            },
+        )
 
 
-class StartAddressException(HexFileException):
+class StartAddressException(FirmwareUpdateFailedError):
     """Start address error."""
 
-    pass
+    def __init__(
+        self, line: str, line_no: int, filename: str, bad_address: int
+    ) -> None:
+        """Build a StartAddressException."""
+        super().__init__(
+            message="Bad start address in firmware update file",
+            detail={
+                "line": line,
+                "line_number": str(line_no),
+                "filename": filename,
+                "address": str(bad_address),
+            },
+        )
 
 
-class BadChunkSizeException(HexFileException):
+class BadChunkSizeException(FirmwareUpdateFailedError):
     """Invalid chunk size."""
 
-    pass
+    def __init__(self, filename: str, actual_size: int) -> None:
+        """Build a BadChunkSizeException."""
+        super().__init__(
+            message="Bad chunk size: must be >0",
+            detail={"filename": filename, "actual": str(actual_size)},
+        )
 
 
 def from_hex_file_path(file_path: Path) -> Iterable[HexRecord]:
@@ -74,18 +110,26 @@ def from_hex_file_path(file_path: Path) -> Iterable[HexRecord]:
 
 def from_hex_file(hex_file: TextIO) -> Iterable[HexRecord]:
     """A generator that processes a hex file contents."""
-    for line in hex_file.readlines():
-        yield process_line(line)
+    for idx, line in enumerate(hex_file.readlines()):
+        yield process_line(line, idx, hex_file.name)
 
 
-def process_line(line: str) -> HexRecord:
+def process_line(
+    line: str,
+    line_no_for_error: int,
+    filename_for_error: str,
+) -> HexRecord:
     """Convert a line in a HEX file into a HexRecord."""
     if len(line) < 11:
         # 11 = 1 (':') + 2 (byte count) + 4 (address) + 2 (record type) + 2 (checksum)
-        raise MalformedLineException(f"Line is missing fields '{line}'")
+        raise MalformedLineException(
+            "Line is missing fields", line, line_no_for_error, filename_for_error
+        )
 
     if line[0] != ":":
-        raise MalformedLineException(f"Missing ':' in '{line}'")
+        raise MalformedLineException(
+            "Missing ':'", line, line_no_for_error, filename_for_error
+        )
 
     # Skip the ':' and strip
     binary_line = binascii.unhexlify(line[1:].rstrip())
@@ -98,11 +142,18 @@ def process_line(line: str) -> HexRecord:
     try:
         record_type = RecordType(binary_line[3])
     except ValueError:
-        raise MalformedLineException(f"'{binary_line[3]}' is not a valid record type.")
+        raise MalformedLineException(
+            f"Invalid record type '{binary_line[3]}'",
+            line,
+            line_no_for_error,
+            filename_for_error,
+        )
 
     # 5 is 1 for byte count, 2 for address, 1 for record type, and 1 for checksum
     if len(binary_line) != (byte_count + 5):
-        raise MalformedLineException("Incorrect byte count")
+        raise MalformedLineException(
+            "Incorrect byte count", line, line_no_for_error, filename_for_error
+        )
 
     byte_count_index: Final = 4
     checksum_index: Final = byte_count_index + byte_count
@@ -116,7 +167,9 @@ def process_line(line: str) -> HexRecord:
     computed_checksum = 0xFF & (~sum(binary_line[:checksum_index]) + 1)
 
     if computed_checksum != checksum:
-        raise ChecksumException(f"Expected {checksum} but computed {computed_checksum}")
+        raise ChecksumException(
+            line, line_no_for_error, filename_for_error, computed_checksum, checksum
+        )
 
     return HexRecord(
         byte_count=byte_count,
@@ -141,20 +194,21 @@ class HexRecordProcessor:
     Iterate through the process generator to get data chunks and start_address.
     """
 
-    def __init__(self, records: Iterable[HexRecord]) -> None:
+    def __init__(self, records: Iterable[HexRecord], filename: str) -> None:
         """Constructor."""
         self._records = records
         self._start_address: int = 0
+        self._filename = filename
 
     @classmethod
     def from_file_path(cls, file_path: Path) -> HexRecordProcessor:
         """Construct from file."""
-        return HexRecordProcessor(from_hex_file_path(file_path))
+        return HexRecordProcessor(from_hex_file_path(file_path), str(file_path))
 
     @classmethod
     def from_file(cls, hex_file: TextIO) -> HexRecordProcessor:
         """Construct from file."""
-        return HexRecordProcessor(from_hex_file(hex_file))
+        return HexRecordProcessor(from_hex_file(hex_file), hex_file.name)
 
     @property
     def start_address(self) -> int:
@@ -175,7 +229,7 @@ class HexRecordProcessor:
 
         """
         if chunk_size <= 0:
-            raise BadChunkSizeException("chunk size must be greater than 0.")
+            raise BadChunkSizeException(self._filename, chunk_size)
 
         # Address offset set by the StartLinearAddress record type
         address_offset = 0

@@ -93,11 +93,7 @@ export const MountGripper = (
           </StyledText>
         </Btn>
         {isOnDevice ? (
-          <SmallButton
-            buttonText={t('try_again')}
-            buttonType="primary"
-            onClick={proceed}
-          />
+          <SmallButton buttonText={t('try_again')} onClick={proceed} />
         ) : (
           <PrimaryButton onClick={() => setShowUnableToDetect(false)}>
             {t('try_again')}

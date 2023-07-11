@@ -57,6 +57,7 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.types import Location, Point
 
 
@@ -300,7 +301,7 @@ def _make_ot3_pe_ctx(
         loop,
     ):
         yield create_protocol_context(
-            api_version=APIVersion(2, 14),
+            api_version=MAX_SUPPORTED_VERSION,
             hardware_api=hardware,
             deck_type=deck_type,
             protocol_engine=engine,

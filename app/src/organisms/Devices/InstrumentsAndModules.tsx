@@ -59,7 +59,7 @@ export function InstrumentsAndModules({
   // { refetchInterval: EQUIPMENT_POLL_MS, },
   const attachedGripper =
     (attachedInstruments?.data ?? []).find(
-      (i): i is GripperData => i.instrumentType === 'gripper' && !i.ok
+      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
     ) ?? null
   const attachedLeftPipette =
     attachedInstruments?.data?.find(

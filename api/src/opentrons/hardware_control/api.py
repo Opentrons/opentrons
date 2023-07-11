@@ -24,7 +24,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 
 from .util import use_or_initialize_loop, check_motion_bounds
 from .instruments.ot2.pipette import (
@@ -844,7 +844,15 @@ class API(
 
         Works regardless of critical point or home status.
         """
-        smoothie_ax = (Axis.by_mount(mount).name.upper(),)
+        await self.retract_axis(Axis.by_mount(mount), margin)
+
+    @ExecutionManagerProvider.wait_for_running
+    async def retract_axis(self, axis: Axis, margin: float = 10) -> None:
+        """Pull the specified axis up to its home position.
+
+        Works regardless of critical point or home status.
+        """
+        smoothie_ax = (axis.name.upper(),)
 
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
@@ -1109,7 +1117,7 @@ class API(
 
         return await self._backend.module_controls.build_module(
             port="",
-            usb_port=USBPort(name="", port_number=0),
+            usb_port=USBPort(name="", port_number=1, port_group=PortGroup.MAIN),
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )

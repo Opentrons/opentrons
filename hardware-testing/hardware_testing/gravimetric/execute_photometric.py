@@ -11,7 +11,7 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Lab
 
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
-from hardware_testing.opentrons_api.types import Point
+from hardware_testing.opentrons_api.types import Point, OT3Mount
 from .measurement import (
     MeasurementType,
     create_measurement_tag,
@@ -72,7 +72,7 @@ def _reduce_volumes_to_not_exceed_software_limit(
 ) -> List[float]:
     for i, v in enumerate(test_volumes):
         liq_cls = get_liquid_class(cfg.pipette_volume, 96, cfg.tip_volume, int(v))
-        max_vol = cfg.tip_volume - liq_cls.aspirate.air_gap.trailing_air_gap
+        max_vol = cfg.tip_volume - liq_cls.aspirate.trailing_air_gap
         test_volumes[i] = min(v, max_vol - 0.1)
     return test_volumes
 
@@ -153,8 +153,6 @@ def _load_labware(
         print(f'Loading tiprack "{ls[1]}" in slot #{ls[0]}')
     reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
     tiprack_namespace = "custom_beta"
-    if ctx.is_simulating():
-        tiprack_namespace = "opentrons"
     tipracks = [
         ctx.load_labware(ls[1], location=ls[0], namespace=tiprack_namespace)
         for ls in tiprack_load_settings
@@ -234,10 +232,8 @@ def _run_trial(
     liquid_tracker: LiquidTracker,
     blank: bool,
     inspect: bool,
-    do_jog: bool,
     cfg: config.PhotometricConfig,
     mix: bool = False,
-    stable: bool = True,
 ) -> None:
     """Aspirate dye and dispense into a photometric plate."""
 
@@ -283,18 +279,6 @@ def _run_trial(
 
     _record_measurement_and_store(MeasurementType.INIT)
     pipette.move_to(location=source.top().move(channel_offset), minimum_z_height=133)
-    if do_jog:
-        _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
-        height_below_top = source.depth - _liquid_height
-        print(f"liquid is {height_below_top} mm below top of reservoir")
-        liquid_tracker.set_start_volume_from_liquid_height(
-            source, _liquid_height, name="Dye"
-        )
-    reservoir_ml = round(liquid_tracker.get_volume(source) / 1000, 1)
-    print(f"software thinks there is {reservoir_ml} mL of liquid in the reservoir")
-    assert (
-        reservoir_ml - _MIN_END_VOLUME_UL > volume * channel_count
-    ), f"not enough volume in reservoir to aspirate {volume} uL across {channel_count} channels"
     # RUN ASPIRATE
     aspirate_with_liquid_class(
         ctx,
@@ -459,6 +443,14 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         test_volumes
     )
 
+    def _next_tip() -> Well:
+        nonlocal tips
+        if not len(tips[0]):
+            if not ctx.is_simulating():
+                ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
+            tips = get_tips(ctx, pipette)
+        return tips[0].pop(0)
+
     assert (
         trial_total <= total_tips
     ), f"more trials ({trial_total}) than tips ({total_tips})"
@@ -489,66 +481,108 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
 
     print("homing...")
     ctx.home()
+    pipette.home_plunger()
     # get the first channel's first-used tip
     # NOTE: note using list.pop(), b/c tip will be re-filled by operator,
     #       and so we can use pick-up-tip from there again
     try:
         trial_count = 0
-        tip_iter = 0
+        source = reservoir["A1"]
+        channel_count = 96
+        channel_offset = Point()
+        setup_tip = tips[0][0]
+        volume_for_setup = max(test_volumes)
+        _pick_up_tip(ctx, pipette, cfg, location=setup_tip.top())
+        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+        ctx._core.get_hardware().retract(mnt)
+        if not ctx.is_simulating():
+            ui.get_user_ready("REPLACE first tip with NEW TIP")
+        required_ul = max(
+            (volume_for_setup * channel_count * cfg.trials) + _MIN_END_VOLUME_UL,
+            _MIN_START_VOLUME_UL,
+        )
+        if not ctx.is_simulating():
+            _liquid_height = _jog_to_find_liquid_height(ctx, pipette, source)
+            height_below_top = source.depth - _liquid_height
+            print(f"liquid is {height_below_top} mm below top of reservoir")
+            liquid_tracker.set_start_volume_from_liquid_height(
+                source, _liquid_height, name="Dye"
+            )
+        else:
+            liquid_tracker.set_start_volume(source, required_ul)
+        reservoir_ul = liquid_tracker.get_volume(source)
+        print(
+            f"software thinks there is {round(reservoir_ul / 1000, 1)} mL "
+            f"of liquid in the reservoir (required = {round(required_ul / 1000, 1)} ml)"
+        )
+        if required_ul <= reservoir_ul < _MAX_VOLUME_UL:
+            print("valid liquid height")
+        elif required_ul > _MAX_VOLUME_UL:
+            raise NotImplementedError(
+                f"too many trials ({cfg.trials}) at {volume_for_setup} uL, "
+                f"refilling reservoir is currently not supported"
+            )
+        elif reservoir_ul < required_ul:
+            error_msg = (
+                f"not enough volume in reservoir to aspirate {volume_for_setup} uL "
+                f"across {channel_count}x channels for {cfg.trials}x trials"
+            )
+            if ctx.is_simulating():
+                raise ValueError(error_msg)
+            ui.print_error(error_msg)
+            pipette.move_to(location=source.top(100).move(channel_offset))
+            difference_ul = required_ul - reservoir_ul
+            ui.get_user_ready(
+                f"ADD {round(difference_ul / 1000.0, 1)} mL more liquid to RESERVOIR"
+            )
+            pipette.move_to(location=source.top().move(channel_offset))
+        else:
+            raise RuntimeError(
+                f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
+            )
+        pipette.drop_tip(home_after=False)  # always trash setup tips
+        # NOTE: the first tip-rack should have already been replaced
+        #       with new tips by the operator
         for volume in test_volumes:
             ui.print_title(f"{volume} uL")
-            do_jog = True
             for trial in range(cfg.trials):
                 trial_count += 1
                 ui.print_header(f"{volume} uL ({trial + 1}/{cfg.trials})")
                 print(f"trial total {trial_count}/{trial_total}")
                 if not ctx.is_simulating():
                     ui.get_user_ready(f"put PLATE #{trial + 1} and remove SEAL")
-                next_tip: Well = tips[0][tip_iter]
+                next_tip: Well = _next_tip()
                 next_tip_location = next_tip.top()
                 _pick_up_tip(ctx, pipette, cfg, location=next_tip_location)
-
                 _run_trial(
                     ctx=ctx,
                     test_report=test_report,
                     pipette=pipette,
-                    source=reservoir["A1"],
+                    source=source,
                     dest=photoplate,
-                    channel_offset=Point(),
+                    channel_offset=channel_offset,
                     tip_volume=cfg.tip_volume,
                     volume=volume,
                     trial=trial,
                     liquid_tracker=liquid_tracker,
                     blank=False,
                     inspect=cfg.inspect,
-                    do_jog=do_jog,
                     cfg=cfg,
                     mix=cfg.mix,
-                    stable=True,
                 )
-                tip_iter += 1
-                if tip_iter >= len(tips[0]) and not (
-                    (trial + 1) == cfg.trials and volume == test_volumes[-1]
-                ):
-                    if not ctx.is_simulating():
-                        ui.get_user_ready(
-                            f"replace TIPRACKS in slots {cfg.slots_tiprack}"
-                        )
-                    tip_iter = 0
-                if volume < 250:
-                    do_jog = False
 
     finally:
         ui.print_title("CHANGE PIPETTES")
         if pipette.has_tip:
             if pipette.current_volume > 0:
+                print("dispensing liquid to trash")
                 trash = pipette.trash_container.wells()[0]
                 # FIXME: this should be a blow_out() at max volume,
                 #        but that is not available through PyAPI yet
                 #        so instead just dispensing.
                 pipette.dispense(pipette.current_volume, trash.top())
                 pipette.aspirate(10)  # to pull any droplets back up
+            print("dropping tip")
             _drop_tip(ctx, pipette, cfg)
-        ctx.home()
-        # move to attach point
+        print("moving to attach position")
         pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))

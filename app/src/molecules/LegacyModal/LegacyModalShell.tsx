@@ -59,6 +59,7 @@ export function LegacyModalShell(props: LegacyModalShellProps): JSX.Element {
     >
       <ContentArea zIndex={zIndex}>
         <ModalArea
+          aria-label="ModalShell_ModalArea"
           isFullPage={fullPage}
           onClick={e => {
             e.stopPropagation()
