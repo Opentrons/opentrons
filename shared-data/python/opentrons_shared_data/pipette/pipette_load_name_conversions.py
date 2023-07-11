@@ -124,7 +124,7 @@ def version_from_generation(pipette_name_list: List[str]) -> PipetteVersionType:
         PipetteVersionType: A pipette version object.
 
     """
-    if "flex" in pipette_name_list:
+    if "flex" in pipette_name_list or "gen3" in pipette_name_list:
         return PipetteVersionType(3, 0)
     elif "gen2" in pipette_name_list:
         return PipetteVersionType(2, 0)
