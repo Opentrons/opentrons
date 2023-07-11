@@ -62,9 +62,14 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
   const [showTipConfirmation, setShowTipConfirmation] = React.useState(false)
 
   const labwareDef = getLabwareDef(labwareId, protocolData)
-  const pipetteName =
-    protocolData.pipettes.find(p => p.id === pipetteId)?.pipetteName ?? null
-  if (pipetteName == null || labwareDef == null) return null
+  const pipette = protocolData.pipettes.find(p => p.id === pipetteId)
+  const pipetteName = pipette?.pipetteName
+  const pipetteMount = pipette?.mount
+  if (pipetteName == null || labwareDef == null || pipetteMount == null)
+    return null
+
+  const pipetteZMotorAxis: 'leftZ' | 'rightZ' =
+    pipetteMount === 'left' ? 'leftZ' : 'rightZ'
 
   const displayLocation = getDisplayLocation(location, t)
   const labwareDisplayName = getLabwareDisplayName(labwareDef)
@@ -204,12 +209,24 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
     chainRunCommands(
       [
         {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: pipetteZMotorAxis,
+          },
+        },
+        {
           commandType: 'moveToWell' as const,
           params: {
             pipetteId: pipetteId,
             labwareId: FIXED_TRASH_ID,
             wellName: 'A1',
             wellLocation: { origin: 'top' as const },
+          },
+        },
+        {
+          commandType: 'retractAxis' as const,
+          params: {
+            axis: pipetteZMotorAxis,
           },
         },
         {

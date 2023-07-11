@@ -1339,6 +1339,7 @@ async def test_pick_up_tip_full_tiprack(
     ot3_hardware: ThreadManager[OT3API],
     mock_instrument_handlers: Tuple[Mock],
     mock_ungrip: AsyncMock,
+    mock_move_to_plunger_bottom: AsyncMock,
 ) -> None:
     mock_ungrip.return_value = None
     await ot3_hardware.home()

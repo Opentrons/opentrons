@@ -52,11 +52,7 @@ export const Success = (
       isSuccess
     >
       {isOnDevice ? (
-        <SmallButton
-          buttonText={buttonText}
-          buttonType="primary"
-          onClick={proceed}
-        />
+        <SmallButton buttonText={buttonText} onClick={proceed} />
       ) : (
         <PrimaryButton onClick={proceed}>{buttonText}</PrimaryButton>
       )}

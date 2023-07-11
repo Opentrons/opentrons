@@ -5,7 +5,7 @@ from typing import Optional, List, Dict, Any, Union
 
 from pydantic import BaseModel, Field, create_model, validator
 
-from opentrons.config.pipette_config import MUTABLE_CONFIGS, VALID_QUIRKS
+from opentrons_shared_data.pipette import model_constants
 from opentrons.config.reset import ResetOptionId
 
 
@@ -175,7 +175,7 @@ PipetteSettingsFields = create_model(
     __base__=BasePipetteSettingFields,
     **{  # type: ignore[arg-type]
         conf: (PipetteSettingsField, None)
-        for conf in MUTABLE_CONFIGS
+        for conf in model_constants.MUTABLE_CONFIGS_V1
         if conf != "quirks"
     },
 )
@@ -214,11 +214,11 @@ class PipetteSettingsUpdate(BaseModel):
         for key, value in v.items():
             if value is None:
                 pass
-            elif key in MUTABLE_CONFIGS:
+            elif key in model_constants.MUTABLE_CONFIGS_V1:
                 if value.value is not None:
                     # Must be a float for overriding a config field
                     value.value = float(value.value)
-            elif key in VALID_QUIRKS:
+            elif key in model_constants.VALID_QUIRKS:
                 if not isinstance(value.value, bool):
                     raise ValueError(
                         f"{key} quirk value must " f"be a boolean. Got {value.value}"

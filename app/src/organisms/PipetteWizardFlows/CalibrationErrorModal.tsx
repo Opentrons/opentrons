@@ -58,7 +58,6 @@ export function CalibrationErrorModal(
         <SmallButton
           onClick={handleProceed}
           buttonText={i18n.format(t('next'), 'capitalize')}
-          buttonType="primary"
         />
       ) : (
         <PrimaryButton onClick={handleProceed}>

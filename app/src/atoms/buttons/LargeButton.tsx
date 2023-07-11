@@ -18,7 +18,7 @@ import type { IconName, StyleProps } from '@opentrons/components'
 type LargeButtonTypes = 'primary' | 'secondary' | 'alert'
 interface LargeButtonProps extends StyleProps {
   onClick: () => void
-  buttonType: LargeButtonTypes
+  buttonType?: LargeButtonTypes
   buttonText: React.ReactNode
   iconName: IconName
   disabled?: boolean
@@ -26,7 +26,7 @@ interface LargeButtonProps extends StyleProps {
 
 export function LargeButton(props: LargeButtonProps): JSX.Element {
   const {
-    buttonType,
+    buttonType = 'primary',
     buttonText,
     iconName,
     disabled = false,

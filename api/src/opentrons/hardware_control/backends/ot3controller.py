@@ -43,6 +43,7 @@ from .ot3utils import (
     PipetteAction,
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
+    map_pipette_type_to_sensor_id,
 )
 
 try:
@@ -50,6 +51,8 @@ try:
 except (OSError, ModuleNotFoundError):
     aionotify = None
 
+
+from opentrons_hardware.drivers import SystemDrivers
 from opentrons_hardware.drivers.can_bus import CanMessenger, DriverSettings
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.can_bus.build import build_driver
@@ -58,6 +61,7 @@ from opentrons_hardware.drivers.binary_usb import (
     SerialUsbDriver,
     build_rear_panel_driver,
 )
+from opentrons_hardware.drivers.eeprom import EEPROMDriver, EEPROMData
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
@@ -220,6 +224,7 @@ class OT3Controller:
         config: OT3Config,
         driver: AbstractCanDriver,
         usb_driver: Optional[SerialUsbDriver] = None,
+        eeprom_driver: Optional[EEPROMDriver] = None,
         check_updates: bool = True,
     ) -> None:
         """Construct.
@@ -232,7 +237,11 @@ class OT3Controller:
         self._module_controls: Optional[AttachedModulesControl] = None
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
-        self._gpio_dev, self._usb_messenger = self._build_system_hardware(usb_driver)
+        self._drivers = self._build_system_hardware(
+            self._messenger, usb_driver, eeprom_driver
+        )
+        self._usb_messenger = self._drivers.usb_messenger
+        self._gpio_dev = self._drivers.gpio_dev
         self._subsystem_manager = SubsystemManager(
             self._messenger,
             self._usb_messenger,
@@ -277,19 +286,40 @@ class OT3Controller:
         }
 
     @property
+    def eeprom_driver(self) -> EEPROMDriver:
+        """The eeprom driver interface."""
+        return self._drivers.eeprom
+
+    @property
+    def eeprom_data(self) -> EEPROMData:
+        """Get the data on the eeprom."""
+        return self._drivers.eeprom.data
+
+    @property
     def update_required(self) -> bool:
         return self._subsystem_manager.update_required and self._check_updates
 
     @staticmethod
     def _build_system_hardware(
+        can_messenger: CanMessenger,
         usb_driver: Optional[SerialUsbDriver],
-    ) -> Tuple[Union[OT3GPIO, RemoteOT3GPIO], Optional[BinaryMessenger]]:
-        if usb_driver is None:
-            return OT3GPIO("hardware_control"), None
-        else:
+        eeprom_driver: Optional[EEPROMDriver],
+    ) -> SystemDrivers:
+        gpio = OT3GPIO("hardware_control")
+        eeprom_driver = eeprom_driver or EEPROMDriver(gpio)
+        eeprom_driver.setup()
+        gpio_dev: Union[OT3GPIO, RemoteOT3GPIO] = gpio
+        usb_messenger: Optional[BinaryMessenger] = None
+        if usb_driver:
             usb_messenger = BinaryMessenger(usb_driver)
             usb_messenger.start()
-            return RemoteOT3GPIO(usb_messenger), usb_messenger
+            gpio_dev = RemoteOT3GPIO(usb_messenger)
+        return SystemDrivers(
+            can_messenger,
+            gpio_dev,
+            eeprom_driver,
+            usb_messenger=usb_messenger,
+        )
 
     def _motor_nodes(self) -> Set[NodeId]:
         """Get a list of the motor controller nodes of all attached and ok devices."""
@@ -442,7 +472,14 @@ class OT3Controller:
             move_groups=[move_group],
             ignore_stalls=True if not ff.stall_detection_enabled() else False,
         )
-        positions = await runner.run(can_messenger=self._messenger)
+        mounts_moving = [
+            k
+            for g in move_group
+            for k in g.keys()
+            if k in [NodeId.pipette_left, NodeId.pipette_right]
+        ]
+        async with self._monitor_overpressure(mounts_moving):
+            positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
     def _get_axis_home_distance(self, axis: OT3Axis) -> float:
@@ -562,7 +599,11 @@ class OT3Controller:
             for runner in maybe_runners
             if runner
         ]
-        positions = await asyncio.gather(*coros)
+        moving_pipettes = [
+            axis_to_node(ax) for ax in checked_axes if ax in OT3Axis.pipette_axes()
+        ]
+        async with self._monitor_overpressure(moving_pipettes):
+            positions = await asyncio.gather(*coros)
         if OT3Axis.Q in checked_axes:
             await self.tip_action(
                 [OT3Axis.Q],
@@ -958,31 +999,32 @@ class OT3Controller:
         return {k: v for k, v in by_node.items() if k in self._motor_nodes()}
 
     @asynccontextmanager
-    async def monitor_overpressure(
-        self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
-    ) -> AsyncIterator[None]:
-        if ff.overpressure_detection_enabled():
-            tool = sensor_node_for_pipette(OT3Mount(mount.value))
+    async def _monitor_overpressure(self, mounts: List[NodeId]) -> AsyncIterator[None]:
+        if ff.overpressure_detection_enabled() and mounts:
+            tools_with_id = map_pipette_type_to_sensor_id(
+                mounts, self._subsystem_manager.device_info
+            )
             # FIXME we should switch the sensor type based on the channel
             # used when partial tip pick up is implemented.
-            # FIXME we should also monitor pressure in all available channels
             provided_context_manager = await check_overpressure(
-                self._messenger, tool, sensor_id
+                self._messenger, tools_with_id
             )
-            errors: asyncio.Queue[ErrorCode] = asyncio.Queue()
+            errors: asyncio.Queue[Tuple[NodeId, ErrorCode]] = asyncio.Queue()
 
             async with provided_context_manager() as errors:
                 try:
                     yield
                 finally:
 
-                    def _pop_queue() -> Optional[ErrorCode]:
+                    def _pop_queue() -> Optional[Tuple[NodeId, ErrorCode]]:
                         try:
                             return errors.get_nowait()
                         except asyncio.QueueEmpty:
                             return None
 
-                    if _pop_queue():
+                    q_msg = _pop_queue()
+                    if q_msg:
+                        mount = OT3Axis.to_mount(node_to_axis(q_msg[0]))
                         raise OverPressureDetected(
                             f"The pressure sensor on the {mount} mount has exceeded operational limits."
                         )

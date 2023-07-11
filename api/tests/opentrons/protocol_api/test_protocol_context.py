@@ -294,9 +294,6 @@ def test_load_labware_off_deck(
 
 @pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
 def test_load_labware_off_deck_raises(
-    decoy: Decoy,
-    mock_core: ProtocolCore,
-    mock_core_map: LoadedCoreMap,
     subject: ProtocolContext,
 ) -> None:
     """It should raise and api error."""
@@ -351,6 +348,107 @@ def test_load_labware_from_definition(
 
     assert isinstance(result, Labware)
     assert result.name == "Full Name"
+
+
+def test_load_adapter(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should create an adapter using its execution core."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_ADAPTER")).then_return(
+        "lowercase_adapter"
+    )
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_5
+    )
+
+    decoy.when(
+        mock_core.load_adapter(
+            load_name="lowercase_adapter",
+            location=DeckSlotName.SLOT_5,
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_adapter(
+        load_name="UPPERCASE_ADAPTER",
+        location=42,
+        namespace="some_namespace",
+        version=1337,
+    )
+
+    assert isinstance(result, Labware)
+
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
+
+
+def test_load_labware_on_adapter(
+    decoy: Decoy,
+    mock_core: ProtocolCore,
+    mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: ProtocolContext,
+) -> None:
+    """It should create a labware using its execution core."""
+    mock_labware_core = decoy.mock(cls=LabwareCore)
+    mock_adapter_core = decoy.mock(cls=LabwareCore)
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
+        "lowercase_labware"
+    )
+
+    decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_ADAPTER")).then_return(
+        "lowercase_adapter"
+    )
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_5
+    )
+    decoy.when(
+        mock_core.load_adapter(
+            load_name="lowercase_adapter",
+            location=DeckSlotName.SLOT_5,
+            namespace="some_namespace",
+            version=None,
+        )
+    ).then_return(mock_adapter_core)
+
+    decoy.when(mock_adapter_core.get_well_columns()).then_return([])
+
+    decoy.when(
+        mock_core.load_labware(
+            load_name="lowercase_labware",
+            location=mock_adapter_core,
+            label="some_display_name",
+            namespace="some_namespace",
+            version=1337,
+        )
+    ).then_return(mock_labware_core)
+
+    decoy.when(mock_labware_core.get_name()).then_return("Full Name")
+    decoy.when(mock_labware_core.get_display_name()).then_return("Display Name")
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+
+    result = subject.load_labware(
+        load_name="UPPERCASE_LABWARE",
+        location=42,
+        label="some_display_name",
+        namespace="some_namespace",
+        version=1337,
+        adapter="UPPERCASE_ADAPTER",
+    )
+
+    assert isinstance(result, Labware)
+    assert result.name == "Full Name"
+
+    decoy.verify(mock_core_map.add(mock_labware_core, result), times=1)
 
 
 def test_loaded_labware(

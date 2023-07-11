@@ -117,7 +117,6 @@ const ProtocolHeader = (props: {
         buttonCategory="rounded"
         onClick={handleRunProtocol}
         buttonText={t('protocol_details:start_setup')}
-        buttonType="primary"
       />
     </Flex>
   )
@@ -377,7 +376,6 @@ export function ProtocolDetails(): JSX.Element | null {
                 <SmallButton
                   onClick={() => setShowConfirmationDeleteProtocol(false)}
                   buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
-                  buttonType="primary"
                   width="50%"
                 />
                 <SmallButton
