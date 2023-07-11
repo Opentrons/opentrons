@@ -2,10 +2,7 @@ import * as React from 'react'
 import { useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 
-import {
-  useTrackEvent,
-  ANALYTICS_TOUCHSCREEN_APP_ERROR,
-} from '../redux/analytics'
+import { useTrackEvent, ANALYTICS_ODD_APP_ERROR } from '../redux/analytics'
 
 import type { FallbackProps } from 'react-error-boundary'
 
@@ -44,7 +41,7 @@ export function OnDeviceDisplayAppFallback({
   // immediately report to robot logs that something fatal happened
   React.useEffect(() => {
     trackEvent({
-      name: ANALYTICS_TOUCHSCREEN_APP_ERROR,
+      name: ANALYTICS_ODD_APP_ERROR,
       properties: { errorMessage: error.message },
     })
     dispatch(sendLog(`ODD app encountered a fatal error: ${error.message}`))
