@@ -197,13 +197,15 @@ if __name__ == "__main__":
         # getting labware offsets must be done before creating the protocol context
         # because it requires the robot-server to be running
         ui.print_title("SETUP")
-        print("Starting opentrons-robot-server, so we can http GET labware offsets")
+        ui.print_info(
+            "Starting opentrons-robot-server, so we can http GET labware offsets"
+        )
         offsets = workarounds.http_get_all_labware_offsets()
-        print(f"found {len(offsets)} offsets:")
+        ui.print_info(f"found {len(offsets)} offsets:")
         for offset in offsets:
-            print(f"\t{offset['createdAt']}:")
-            print(f"\t\t{offset['definitionUri']}")
-            print(f"\t\t{offset['vector']}")
+            ui.print_info(f"\t{offset['createdAt']}:")
+            ui.print_info(f"\t\t{offset['definitionUri']}")
+            ui.print_info(f"\t\t{offset['vector']}")
             LABWARE_OFFSETS.append(offset)
     if args.increment:
         _protocol = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][args.tip]
@@ -268,7 +270,7 @@ if __name__ == "__main__":
     ui.print_header("GET PARAMETERS")
     test_volumes = helpers._get_volumes(_ctx, union_cfg)
     for v in test_volumes:
-        print(f"\t{v} uL")
+        ui.print_info(f"\t{v} uL")
     all_channels_same_time = (
         getattr(union_cfg, "increment", False) or union_cfg.pipette_channels == 96
     )

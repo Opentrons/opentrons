@@ -65,7 +65,7 @@ def _get_dye_type(volume: float) -> str:
 def _load_labware(
     ctx: ProtocolContext, cfg: config.PhotometricConfig
 ) -> Tuple[Labware, Labware]:
-    print(f'Loading photoplate labware: "{cfg.photoplate}"')
+    ui.print_info(f'Loading photoplate labware: "{cfg.photoplate}"')
     photoplate = ctx.load_labware(cfg.photoplate, location=cfg.photoplate_slot)
     reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
     _apply_labware_offsets(cfg, [photoplate, reservoir])
@@ -207,7 +207,9 @@ def _display_dye_information(
         if dye_types_req[dye] > 0:
             if cfg.refill:
                 # only add the minimum required volume
-                print(f' * {_ul_to_ml(leftover_ul)} mL "{dye}" LEFTOVER in reservoir')
+                ui.print_info(
+                    f' * {_ul_to_ml(leftover_ul)} mL "{dye}" LEFTOVER in reservoir'
+                )
                 if not resources.ctx.is_simulating():
                     ui.get_user_ready(
                         f'[refill] ADD {_ul_to_ml(transfered_ul)} mL more DYE type "{dye}"'
@@ -250,7 +252,7 @@ def execute_trials(
     trials: Dict[float, List[PhotometricTrial]],
 ) -> None:
     """Execute a batch of pre-constructed trials."""
-    print("homing...")
+    ui.print_info("homing...")
     resources.ctx.home()
     resources.pipette.home_plunger()
 
@@ -272,7 +274,7 @@ def execute_trials(
         for trial in trials[volume]:
             trial_count += 1
             ui.print_header(f"{volume} uL ({trial.trial + 1}/{cfg.trials})")
-            print(f"trial total {trial_count}/{trial_total}")
+            ui.print_info(f"trial total {trial_count}/{trial_total}")
             if not resources.ctx.is_simulating():
                 ui.get_user_ready(f"put PLATE #{trial.trial + 1} and remove SEAL")
             next_tip: Well = _next_tip()
@@ -305,19 +307,19 @@ def _find_liquid_height(
             resources.ctx, resources.pipette, reservoir
         )
         height_below_top = reservoir.depth - _liquid_height
-        print(f"liquid is {height_below_top} mm below top of reservoir")
+        ui.print_info(f"liquid is {height_below_top} mm below top of reservoir")
         liquid_tracker.set_start_volume_from_liquid_height(
             reservoir, _liquid_height, name="Dye"
         )
     else:
         liquid_tracker.set_start_volume(reservoir, required_ul)
     reservoir_ul = liquid_tracker.get_volume(reservoir)
-    print(
+    ui.print_info(
         f"software thinks there is {round(reservoir_ul / 1000, 1)} mL "
         f"of liquid in the reservoir (required = {round(required_ul / 1000, 1)} ml)"
     )
     if required_ul <= reservoir_ul < _MAX_VOLUME_UL:
-        print("valid liquid height")
+        ui.print_info("valid liquid height")
     elif required_ul > _MAX_VOLUME_UL:
         raise NotImplementedError(
             f"too many trials ({cfg.trials}) at {volume_for_setup} uL, "
