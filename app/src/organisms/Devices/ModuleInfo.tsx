@@ -16,6 +16,7 @@ import {
   ModuleModel,
   getModuleDisplayName,
   getModuleDef2,
+  MAGNETIC_BLOCK_V1,
 } from '@opentrons/shared-data'
 
 import { StyledText } from '../../atoms/text'
@@ -43,6 +44,9 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   const runHasStarted = useRunHasStarted(runId)
 
   let connectionStatus = t('no_usb_port_yet')
+  if (moduleModel === MAGNETIC_BLOCK_V1) {
+    connectionStatus = t('no_usb_required')
+  }
   if (usbPort === null && hubPort === null && isAttached) {
     connectionStatus = t('usb_connected_no_port_info')
   } else if (hubPort === null && usbPort !== null && isAttached) {
@@ -64,7 +68,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         gridGap={SPACING.spacing2}
         justifyContent={JUSTIFY_CENTER}
       >
-        {!runHasStarted ? (
+        {!runHasStarted && moduleModel !== MAGNETIC_BLOCK_V1 ? (
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <Icon
               name={isAttached ? 'ot-check' : 'alert-circle'}
@@ -73,6 +77,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
               size="10px"
               marginRight={SPACING.spacing4}
             />
+
             <StyledText
               color={COLORS.darkGreyEnabled}
               fontSize={TYPOGRAPHY.fontSizeCaption}

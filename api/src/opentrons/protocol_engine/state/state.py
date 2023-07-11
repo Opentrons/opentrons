@@ -263,6 +263,7 @@ class StateStore(StateView, ActionHandler):
 
         # Derived states
         self._geometry = GeometryView(
+            config=self._config,
             labware_view=self._labware,
             module_view=self._modules,
             pipette_view=self._pipettes,

@@ -6,6 +6,7 @@ export interface HostConfig {
   requestor?: <ResData>(config: AxiosRequestConfig) => ResponsePromise<ResData>
   port?: number | null
   robotName?: string | null
+  token?: string
 }
 
 export interface ResourceLink {

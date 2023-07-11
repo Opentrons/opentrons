@@ -11,7 +11,11 @@ from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
-from opentrons.protocols.api_support.util import FlowRates, PlungerSpeeds
+from opentrons.protocols.api_support.util import (
+    FlowRates,
+    PlungerSpeeds,
+    APIVersionError,
+)
 from opentrons.protocols.geometry import planning
 
 from ..instrument import AbstractInstrument
@@ -190,7 +194,12 @@ class LegacyInstrumentCoreSimulator(AbstractInstrument[LegacyWellCore]):
         location: Optional[types.Location],
         well_core: LegacyWellCore,
         home_after: Optional[bool],
+        randomize_drop_location: Optional[bool] = False,
     ) -> None:
+        if randomize_drop_location:
+            raise APIVersionError(
+                "Tip drop randomization is not supported in this API version."
+            )
         labware_core = well_core.geometry.parent
 
         if location is None:

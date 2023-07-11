@@ -61,6 +61,7 @@ class ProxySettings(BaseModel):
     host: str = "0.0.0.0"
     emulator_port: int
     driver_port: int
+    use_local_host: bool = True
 
 
 class ModuleServerSettings(BaseModel):

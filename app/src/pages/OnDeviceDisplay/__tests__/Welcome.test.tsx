@@ -37,14 +37,14 @@ describe('Welcome', () => {
       "Quickly run protocols and check on your robot's status right on your lab bench."
     )
     getByText('Get started')
-    getByLabelText('SmallButton_primary')
+    getByLabelText('MediumButton_primary')
     const image = getByRole('img')
     expect(image.getAttribute('src')).toEqual(PNG_FILE_NAME)
   })
 
   it('should call mockPush when tapping Get started', () => {
     const [{ getByLabelText }] = render()
-    const button = getByLabelText('SmallButton_primary')
+    const button = getByLabelText('MediumButton_primary')
     fireEvent.click(button)
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })

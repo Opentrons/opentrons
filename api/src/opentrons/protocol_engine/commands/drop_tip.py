@@ -1,5 +1,6 @@
 """Drop tip command request, result, and implementation models."""
 from __future__ import annotations
+
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
@@ -33,6 +34,15 @@ class DropTipParams(PipetteIdMixin):
             " a safe default depending on its hardware."
         ),
     )
+    randomizeDropLocation: Optional[bool] = Field(
+        False,
+        description=(
+            "Whether to randomize the location where tip is dropped within the labware."
+            " If True, this command will ignore the wellLocation provided and"
+            " drop tip at a random location within a set area of the specified labware well."
+            " If False, the tip will be dropped at the top center of the well."
+        ),
+    )
 
 
 class DropTipResult(DestinationPositionResult):
@@ -60,8 +70,20 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
         pipette_id = params.pipetteId
         labware_id = params.labwareId
         well_name = params.wellName
-        drop_tip_well_location = params.wellLocation
         home_after = params.homeAfter
+
+        if params.randomizeDropLocation:
+            # TODO (spp, 2023-05-30): we might make this cycle through pre-defined
+            #  locations to drop tip instead of a completely random location.
+            #  That would make sw as well as hw testing more robust.
+            drop_tip_well_location = (
+                self._state_view.labware.get_random_drop_tip_location(
+                    labware_id=labware_id,
+                    well_name=well_name,
+                )
+            )
+        else:
+            drop_tip_well_location = params.wellLocation
 
         well_location = self._state_view.geometry.get_tip_drop_location(
             pipette_id=pipette_id,

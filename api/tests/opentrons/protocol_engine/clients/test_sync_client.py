@@ -303,6 +303,7 @@ def test_drop_tip(
             wellName="A2",
             wellLocation=DropTipWellLocation(),
             homeAfter=True,
+            randomizeDropLocation=True,
         )
     )
     response = commands.DropTipResult(position=DeckPoint(x=4, y=5, z=6))
@@ -315,6 +316,7 @@ def test_drop_tip(
         well_name="A2",
         well_location=DropTipWellLocation(),
         home_after=True,
+        randomize_drop_location=True,
     )
 
     assert result == response
@@ -637,7 +639,10 @@ def test_thermocycler_set_target_block_temperature(
     """It should execute a Thermocycler's set target block temperature command."""
     request = commands.thermocycler.SetTargetBlockTemperatureCreate(
         params=commands.thermocycler.SetTargetBlockTemperatureParams(
-            moduleId="module-id", celsius=45.6, blockMaxVolumeUl=12.3
+            moduleId="module-id",
+            celsius=45.6,
+            blockMaxVolumeUl=12.3,
+            holdTimeSeconds=123.4,
         )
     )
     response = commands.thermocycler.SetTargetBlockTemperatureResult(
@@ -645,7 +650,10 @@ def test_thermocycler_set_target_block_temperature(
     )
     decoy.when(transport.execute_command(request=request)).then_return(response)
     result = subject.thermocycler_set_target_block_temperature(
-        module_id="module-id", celsius=45.6, block_max_volume=12.3
+        module_id="module-id",
+        celsius=45.6,
+        block_max_volume=12.3,
+        hold_time_seconds=123.4,
     )
 
     assert result == response

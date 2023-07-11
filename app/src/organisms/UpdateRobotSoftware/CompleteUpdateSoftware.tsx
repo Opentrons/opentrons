@@ -33,7 +33,7 @@ export function CompleteUpdateSoftware({
         gridGap={SPACING.spacing40}
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
-        borderRadius={BORDERS.size3}
+        borderRadius={BORDERS.borderRadiusSize3}
       >
         <StyledText
           as="h2"

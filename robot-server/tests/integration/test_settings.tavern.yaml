@@ -2,12 +2,12 @@
 test_name: GET Settings
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Settings GET request returns correct info
     request:
       method: GET
-      url: '{host:s}:{port:d}/settings'
+      url: '{ot2_server_base_url}/settings'
     response:
       status_code: 200
       json:
@@ -66,6 +66,12 @@ stages:
             description: !re_search 'This is an Opentrons-internal setting for hardware-testing.'
             restart_required: false
             value: !anything
+          - id: disableStatusBar
+            old_id: Null
+            title: 'Disable the LED status bar on the Flex.'
+            description: !re_search 'This setting disables the LED status bar on the Flex.'
+            restart_required: false
+            value: !anything
         links: !anydict
 
 ---
@@ -73,7 +79,7 @@ stages:
 test_name: POST Setting and value
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
   - parametrize:
       key: id
       vals:
@@ -92,7 +98,7 @@ stages:
   - name: Set each setting to acceptable values
     request:
       method: POST
-      url: '{host:s}:{port:d}/settings'
+      url: '{ot2_server_base_url}/settings'
       json:
         id: '{id}'
         value: '{value}'
@@ -109,7 +115,7 @@ stages:
 test_name: POST Settings with no values
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
   - parametrize:
       key: id
       vals:
@@ -123,7 +129,7 @@ stages:
   - name: Set each setting to acceptable values
     request:
       method: POST
-      url: '{host:s}:{port:d}/settings'
+      url: '{ot2_server_base_url}/settings'
       json:
         id: '{id}'
     response:
@@ -139,12 +145,12 @@ stages:
 test_name: POST With incorrect ID
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Post with incorrect ID
     request:
       method: POST
-      url: '{host:s}:{port:d}/settings'
+      url: '{ot2_server_base_url}/settings'
       json:
         id: notARealID
         value: true

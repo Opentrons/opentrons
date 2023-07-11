@@ -44,6 +44,7 @@ if config.feature_flags.enable_ot3_hardware_controller():
         clear_module_offset_calibrations,
         get_module_offset,
         delete_module_offset_file,
+        load_all_module_offsets,
     )
 else:
     from .ot2.pipette_offset import (
@@ -87,6 +88,7 @@ __all__ = [
     "clear_module_offset_calibrations",
     "get_module_offset",
     "delete_module_offset_file",
+    "load_all_module_offsets",
     # functions only used in robot server
     "_save_custom_tiprack_definition",
     "get_custom_tiprack_definition_for_tlc",

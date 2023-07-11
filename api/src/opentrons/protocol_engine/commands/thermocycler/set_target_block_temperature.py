@@ -25,6 +25,12 @@ class SetTargetBlockTemperatureParams(BaseModel):
         description="Amount of liquid in uL of the most-full well"
         " in labware loaded onto the thermocycler.",
     )
+    holdTimeSeconds: Optional[float] = Field(
+        None,
+        description="Amount of time, in seconds, to hold the temperature for."
+        " If specified, a waitForBlockTemperature command will block until"
+        " the given hold time has elapsed.",
+    )
 
 
 class SetTargetBlockTemperatureResult(BaseModel):
@@ -71,13 +77,19 @@ class SetTargetBlockTemperatureImpl(
             )
         else:
             target_volume = None
+        hold_time: Optional[float]
+        if params.holdTimeSeconds is not None:
+            hold_time = thermocycler_state.validate_hold_time(params.holdTimeSeconds)
+        else:
+            hold_time = None
+
         thermocycler_hardware = self._equipment.get_module_hardware_api(
             thermocycler_state.module_id
         )
 
         if thermocycler_hardware is not None:
             await thermocycler_hardware.set_target_block_temperature(
-                target_temperature, volume=target_volume
+                target_temperature, volume=target_volume, hold_time_seconds=hold_time
             )
 
         return SetTargetBlockTemperatureResult(

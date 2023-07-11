@@ -34,39 +34,43 @@ class FirmwareUpdateInitiator:
             None
         """
         with WaitableCallback(self._messenger) as reader:
-            # Create initiate message
-            initiate_message = message_definitions.FirmwareUpdateInitiate()
-            # Send it to system node
-            await self._messenger.send(
-                node_id=target.system_node, message=initiate_message
-            )
-            # and to bootloader node. Just in case we're already in bootloader mode.
-            await self._messenger.send(
-                node_id=target.bootloader_node, message=initiate_message
-            )
+            logger.info("initiate: acquiring exclusive")
+            async with self._messenger.exclusive_writer:
+                logger.info("initiate: acquired exclusive")
+                # Create initiate message
+                initiate_message = message_definitions.FirmwareUpdateInitiate()
+                # Send it to system node
+                await self._messenger.send_exclusive(
+                    node_id=target.system_node, message=initiate_message
+                )
+                # and to bootloader node. Just in case we're already in bootloader mode.
+                await self._messenger.send_exclusive(
+                    node_id=target.bootloader_node, message=initiate_message
+                )
 
-            i = 1
-            while True:
-                try:
-                    await asyncio.wait_for(
-                        self._wait_bootloader(reader, target), ready_wait_time_sec
-                    )
-                    break
-                except asyncio.TimeoutError:
-                    logger.warning(
-                        f"Try {i}: Bootloader not ready "
-                        f"after {ready_wait_time_sec} seconds."
-                    )
-                    if i < retry_count:
-                        i += 1
-                    else:
-                        raise BootloaderNotReady()
+                i = 1
+                while True:
+                    try:
+                        await asyncio.wait_for(
+                            self._wait_bootloader(reader, target), ready_wait_time_sec
+                        )
+                        break
+                    except asyncio.TimeoutError:
+                        logger.warning(
+                            f"Try {i}: Bootloader not ready "
+                            f"after {ready_wait_time_sec} seconds."
+                        )
+                        if i < retry_count:
+                            i += 1
+                        else:
+                            raise BootloaderNotReady()
+            logger.info("initiate: released exclusive")
 
     async def _wait_bootloader(self, reader: WaitableCallback, target: Target) -> None:
         """Wait for bootloader to be ready."""
         # Send device info request
         device_info_request_message = message_definitions.DeviceInfoRequest()
-        await self._messenger.send(
+        await self._messenger.send_exclusive(
             node_id=target.bootloader_node, message=device_info_request_message
         )
         # Poll for device info response.

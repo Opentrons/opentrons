@@ -157,6 +157,6 @@ export const SINGLE_MOUNT_PIPETTES: 'Single-Channel_and_8-Channel' =
 
 // Thermocycler module info
 export const TC_MODULE_LOCATION_OT2: '7,8,10,11' = '7,8,10,11'
-export const TC_MODULE_LOCATION_OT3: '7+10' = '7+10'
+export const TC_MODULE_LOCATION_OT3: 'A1+B1' = 'A1+B1'
 
 export const WEIGHT_OF_96_CHANNEL: '~10kg' = '~10kg'

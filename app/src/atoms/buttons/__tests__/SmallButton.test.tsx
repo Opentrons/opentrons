@@ -24,7 +24,9 @@ describe('SmallButton', () => {
     expect(getByRole('button')).toHaveStyle(
       `background-color: ${COLORS.blueEnabled}`
     )
-    expect(getByRole('button')).toHaveStyle(`border-radius: ${BORDERS.size4}`)
+    expect(getByRole('button')).toHaveStyle(
+      `border-radius: ${BORDERS.borderRadiusSize4}`
+    )
   })
   it('renders the alert button', () => {
     props = {
@@ -76,7 +78,9 @@ describe('SmallButton', () => {
       buttonCategory: 'rounded',
     }
     const { getByRole } = render(props)
-    expect(getByRole('button')).toHaveStyle(`border-radius: ${BORDERS.size5}`)
+    expect(getByRole('button')).toHaveStyle(
+      `border-radius: ${BORDERS.borderRadiusSize5}`
+    )
   })
   it('renders an icon with start placement', () => {
     props = {

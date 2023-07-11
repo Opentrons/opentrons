@@ -2,11 +2,11 @@
 test_name: Get modules
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Get all the modules (legacy)
     request:
-      url: '{host:s}:{port:d}/modules'
+      url: '{ot2_server_base_url}/modules'
       method: GET
       headers:
         Opentrons-Version: '2'
@@ -87,7 +87,7 @@ stages:
               engaged: !anybool
   - name: Get all the modules
     request:
-      url: '{host:s}:{port:d}/modules'
+      url: '{ot2_server_base_url}/modules'
       method: GET
     response:
       status_code: 200

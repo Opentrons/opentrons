@@ -50,7 +50,7 @@ export function UpdateSoftware({
       justifyContent={JUSTIFY_CENTER}
       width="100%"
       height="33rem"
-      borderRadius={BORDERS.size3}
+      borderRadius={BORDERS.borderRadiusSize3}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}

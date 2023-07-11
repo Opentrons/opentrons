@@ -77,20 +77,84 @@ describe('useLPCDisabledReason', () => {
   })
   it('renders no disabled reason', () => {
     const { result } = renderHook(
-      () => useLPCDisabledReason('otie', RUN_ID_1),
+      () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
       { wrapper }
     )
     expect(result.current).toBeNull()
   })
+  it('renders no disabled reason for odd', () => {
+    const { result } = renderHook(
+      () =>
+        useLPCDisabledReason({
+          runId: RUN_ID_1,
+          hasMissingModulesForOdd: false,
+          hasMissingPipCalForOdd: false,
+        }),
+      { wrapper }
+    )
+    expect(result.current).toBeNull()
+  })
+  it('renders disabled reason for module and calibration incomponent for odd', () => {
+    const { result } = renderHook(
+      () =>
+        useLPCDisabledReason({
+          runId: RUN_ID_1,
+          hasMissingModulesForOdd: true,
+          hasMissingPipCalForOdd: true,
+        }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual(
+      'Connect and calibrate all hardware first'
+    )
+  })
+  it('renders disabled reason for module and calibration incomponent', () => {
+    mockUseUnmatchedModulesForProtocol.mockReturnValue({
+      missingModuleIds: ['mockId'],
+      remainingAttachedModules: [],
+    })
+    mockUseRunCalibrationStatus.mockReturnValue({ complete: false })
+    const { result } = renderHook(
+      () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual(
+      'Make sure robot calibration is complete and all modules are connected before running Labware Position Check'
+    )
+  })
+  it('renders disabled reason for calibration incomponent for odd', () => {
+    const { result } = renderHook(
+      () =>
+        useLPCDisabledReason({
+          runId: RUN_ID_1,
+          hasMissingModulesForOdd: false,
+          hasMissingPipCalForOdd: true,
+        }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual('Calibrate pipettes first')
+  })
   it('renders disabled reason for calibration incomponent', () => {
     mockUseRunCalibrationStatus.mockReturnValue({ complete: false })
     const { result } = renderHook(
-      () => useLPCDisabledReason('otie', RUN_ID_1),
+      () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
       { wrapper }
     )
     expect(result.current).toStrictEqual(
       'Make sure robot calibration is complete before running Labware Position Check'
     )
+  })
+  it('renders disabled reason for missing modules for odd', () => {
+    const { result } = renderHook(
+      () =>
+        useLPCDisabledReason({
+          runId: RUN_ID_1,
+          hasMissingModulesForOdd: true,
+          hasMissingPipCalForOdd: false,
+        }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual('Connect all modules first')
   })
   it('renders disabled reason for missing modules', () => {
     mockUseUnmatchedModulesForProtocol.mockReturnValue({
@@ -98,32 +162,77 @@ describe('useLPCDisabledReason', () => {
       remainingAttachedModules: [],
     })
     const { result } = renderHook(
-      () => useLPCDisabledReason('otie', RUN_ID_1),
+      () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
       { wrapper }
     )
     expect(result.current).toStrictEqual(
       'Make sure all modules are connected before running Labware Position Check'
     )
   })
+  it('renders disabled reason for run has started for odd', () => {
+    mockUseRunHasStarted.mockReturnValue(true)
+
+    const { result } = renderHook(
+      () =>
+        useLPCDisabledReason({
+          runId: RUN_ID_1,
+          hasMissingModulesForOdd: false,
+          hasMissingPipCalForOdd: false,
+        }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual('Robot is busy')
+  })
   it('renders disabled reason for run has started', () => {
     mockUseRunHasStarted.mockReturnValue(true)
 
     const { result } = renderHook(
-      () => useLPCDisabledReason('otie', RUN_ID_1),
+      () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
       { wrapper }
     )
     expect(result.current).toStrictEqual(
       'Labware Position Check is not available after run has started'
     )
   })
+  it('renders disabled reason if robot protocol anaylsis is null for odd', () => {
+    mockUseMostRecentCompletedAnalysis.mockReturnValue(null as any)
+    const { result } = renderHook(
+      () =>
+        useLPCDisabledReason({
+          runId: RUN_ID_1,
+          hasMissingModulesForOdd: false,
+          hasMissingPipCalForOdd: false,
+        }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual('Robot is analyzing')
+  })
   it('renders disabled reason if robot protocol anaylsis is null', () => {
     mockUseMostRecentCompletedAnalysis.mockReturnValue(null as any)
     const { result } = renderHook(
-      () => useLPCDisabledReason('otie', RUN_ID_1),
+      () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
       { wrapper }
     )
     expect(result.current).toStrictEqual(
       'Labware Position Check is not available while protocol is analyzing on robot'
+    )
+  })
+  it('renders disabled reason if no pipettes in protocol for odd', () => {
+    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+      ...simpleV6Protocol,
+      pipettes: {},
+    } as any)
+    const { result } = renderHook(
+      () =>
+        useLPCDisabledReason({
+          runId: RUN_ID_1,
+          hasMissingModulesForOdd: false,
+          hasMissingPipCalForOdd: false,
+        }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual(
+      'Protocol must load labware and a pipette'
     )
   })
   it('renders disabled reason if no pipettes in protocol', () => {
@@ -132,23 +241,53 @@ describe('useLPCDisabledReason', () => {
       pipettes: {},
     } as any)
     const { result } = renderHook(
-      () => useLPCDisabledReason('otie', RUN_ID_1),
+      () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
       { wrapper }
     )
     expect(result.current).toStrictEqual(
       'Labware Position Check requires that the protocol loads labware and pipettes'
     )
   })
+  it('renders disabled reason if no tipracks in protocols for odd', () => {
+    mockGetLoadedLabwareDefinitionsByUri.mockReturnValue({})
+
+    const { result } = renderHook(
+      () =>
+        useLPCDisabledReason({
+          runId: RUN_ID_1,
+          hasMissingModulesForOdd: false,
+          hasMissingPipCalForOdd: false,
+        }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual('Protocol must load a tip rack')
+  })
   it('renders disabled reason if no tipracks in protocols', () => {
     mockGetLoadedLabwareDefinitionsByUri.mockReturnValue({})
 
     const { result } = renderHook(
-      () => useLPCDisabledReason('otie', RUN_ID_1),
+      () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
       { wrapper }
     )
     expect(result.current).toStrictEqual(
       'Labware Position Check requires that the protocol loads a tip rack'
     )
+  })
+  it('renders disabled reason if no tips are being used in the protocols for odd', () => {
+    mockUseMostRecentCompletedAnalysis.mockReturnValue({
+      ...simpleV6Protocol,
+      commands: {},
+    } as any)
+    const { result } = renderHook(
+      () =>
+        useLPCDisabledReason({
+          runId: RUN_ID_1,
+          hasMissingModulesForOdd: false,
+          hasMissingPipCalForOdd: false,
+        }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual('Protocol must pick up a tip')
   })
   it('renders disabled reason if no tips are being used in the protocols', () => {
     mockUseMostRecentCompletedAnalysis.mockReturnValue({
@@ -156,11 +295,18 @@ describe('useLPCDisabledReason', () => {
       commands: {},
     } as any)
     const { result } = renderHook(
-      () => useLPCDisabledReason('otie', RUN_ID_1),
+      () => useLPCDisabledReason({ robotName: 'otie', runId: RUN_ID_1 }),
       { wrapper }
     )
     expect(result.current).toStrictEqual(
       'Labware Position Check requires that the protocol has at least one pipette that picks up a tip'
     )
+  })
+  it('renders disabled reason as null if only runId is present', () => {
+    const { result } = renderHook(
+      () => useLPCDisabledReason({ runId: RUN_ID_1 }),
+      { wrapper }
+    )
+    expect(result.current).toStrictEqual(null)
   })
 })

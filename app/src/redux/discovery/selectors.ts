@@ -20,6 +20,7 @@ import {
   RE_ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT2,
   ROBOT_MODEL_OT3,
+  OPENTRONS_USB,
 } from './constants'
 
 import type { State } from '../types'
@@ -50,7 +51,8 @@ const isLocal = (ip: string): boolean => {
     RE_HOSTNAME_IPV6_LL.test(ip) ||
     RE_HOSTNAME_IPV4_LL.test(ip) ||
     RE_HOSTNAME_LOCALHOST.test(ip) ||
-    RE_HOSTNAME_LOOPBACK.test(ip)
+    RE_HOSTNAME_LOOPBACK.test(ip) ||
+    ip === OPENTRONS_USB
   )
 }
 

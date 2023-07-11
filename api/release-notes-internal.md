@@ -4,17 +4,30 @@ For more details about this release, please see the full [technical change log][
 
 ---
 
-# Internal Release 0.9.0
+# Internal Release 0.12.0
 
-This is internal release 0.9.0 for the Opentrons Flex robot software, involving both robot control and the on-device display.
+## Update Notes
 
-Some things are known not to work, and are listed below. Specific compatibility notes about peripheral hardware are also listed.
+- If your Python protocol specifies a Flex-style slot name like `"C2"`, its `apiLevel` must now be `2.15`.
 
-## Big New Things
-### Robot Control
-- move_labware now requires apiLevel to be at least 2.15. You can now move labware off-deck using the python API by supplying OFF_DECK to the new_location arg.
+- ⚠️ After upgrading your robot to 0.12.0 from 0.10.0 or previous, you'll need to factory-reset its run history before you can use it.
 
-For more details about this release, please see the full [technical change log][]. 
+  1. From the robot's 3-dot menu (⋮), go to **Robot settings.**
+  2. Under **Advanced > Factory reset**, select **Choose reset settings.**
+  3. Choose **Clear protocol run history,** and then select **Clear data and restart robot.**
+
+  Note that this will remove all of your saved labware offsets.
+
+  You will need to follow these steps if you subsequently downgrade back to a prior release, too.
+
+## New Stuff In This Release
+
+- Many (many) visual and workflow fixes and improvements from design QA for the ODD
+- Pipette plunger backlash compensation should improve pipetting performance on the 96 channel
+- More slot name fixes to make them D1 instead of 1
+- 96 channel attach flow fixes
+- Firmware updates now use an HTTP API; there's no frontend, so continue to follow the rules abotu restarting with an instrument attached after an update.
+- Several ODD white screen fixes
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
@@ -49,7 +62,5 @@ For more details about this release, please see the full [technical change log][
 - Chrome remote devtools - if you enable them and then use Chrome to go to robotip:9223 you'll get devtools
 - After a while, the ODD should go into idle; if you touch it, it will come back online
 
-## Smaller Known Issues
 
-## Smaller fun features
-- The lights work (don't do anything yet though)
+

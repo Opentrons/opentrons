@@ -25,6 +25,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareLocation,
     ExperimentalOffsetData,
+    ModuleModel,
 )
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
     ThermocyclerPlateLifter,
@@ -125,15 +126,23 @@ def subject(
 #  1. Should write an acceptance test w/ real labware on ot3 deck.
 #  2. This test will be split once waypoints generation is moved to motion planning.
 @pytest.mark.parametrize(
-    argnames=["from_location", "to_location"],
+    argnames=["from_location", "to_location", "extra_pickup_offset"],
     argvalues=[
         (
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
+            0,
         ),
         (
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             ModuleLocation(moduleId="module-id"),
+            0,
+        ),
+        (
+            ModuleLocation(moduleId="tc2-id"),
+            DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            # This test picks up from a TC2, so it should pick up 3.5mm higher.
+            3.5,
         ),
     ],
 )
@@ -146,10 +155,15 @@ async def test_move_labware_with_gripper(
     subject: LabwareMovementHandler,
     from_location: Union[DeckSlotLocation, ModuleLocation],
     to_location: Union[DeckSlotLocation, ModuleLocation],
+    extra_pickup_offset: float,
 ) -> None:
     """It should perform a labware movement with gripper by delegating to OT3API."""
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
+
+    decoy.when(state_store.modules.get_connected_model("tc2-id")).then_return(
+        ModuleModel.THERMOCYCLER_MODULE_V2
+    )
 
     decoy.when(
         await ot3_hardware_api.gantry_position(mount=OT3Mount.GRIPPER)
@@ -170,6 +184,13 @@ async def test_move_labware_with_gripper(
     decoy.when(
         state_store.labware.get_labware_offset_vector("my-teleporting-labware")
     ).then_return(LabwareOffsetVector(x=0.1, y=0.2, z=0.3))
+
+    mock_tc_context_manager = decoy.mock()
+    decoy.when(
+        thermocycler_plate_lifter.lift_plate_for_labware_movement(
+            labware_location=from_location
+        )
+    ).then_return(mock_tc_context_manager)
 
     decoy.when(state_store.labware.get_labware_offset("new-offset-id")).then_return(
         LabwareOffset(
@@ -192,7 +213,7 @@ async def test_move_labware_with_gripper(
     expected_waypoints = [
         Point(777, 888, 999),  # gripper retract at current location
         Point(100.1, 100.2, 999),  # move to above slot 1
-        Point(100.1, 100.2, 116.8),  # move to labware on slot 1
+        Point(100.1, 100.2, 116.8 + extra_pickup_offset),  # move to labware on slot 1
         Point(100.1, 100.2, 999),  # gripper retract at current location
         Point(202.0, 204.0, 999),  # move to above slot 3
         Point(202.0, 204.0, 222.5),  # move down to labware drop height on slot 3
@@ -210,7 +231,7 @@ async def test_move_labware_with_gripper(
     gripper = OT3Mount.GRIPPER
     decoy.verify(
         await ot3_hardware_api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G]),
-        await thermocycler_plate_lifter.lift_plate_for_labware_movement(from_location),
+        await mock_tc_context_manager.__aenter__(),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[0]
         ),

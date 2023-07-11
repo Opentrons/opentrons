@@ -454,6 +454,7 @@ export interface ProtocolResource {
   id: string
   createdAt: string
   protocolType: 'json' | 'python'
+  robotType: RobotType
   metadata: ProtocolMetadata
   analysisSummaries: ProtocolAnalysisSummary[]
   files: ResourceFile[]

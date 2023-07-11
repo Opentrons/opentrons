@@ -210,6 +210,7 @@ def test_load_labware(
     decoy: Decoy,
     mock_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should create a labware using its execution core."""
@@ -218,7 +219,9 @@ def test_load_labware(
     decoy.when(mock_validation.ensure_lowercase_name("UPPERCASE_LABWARE")).then_return(
         "lowercase_labware"
     )
-    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_5)
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_5
+    )
 
     decoy.when(
         mock_core.load_labware(
@@ -251,6 +254,7 @@ def test_load_labware(
 def test_load_labware_from_definition(
     decoy: Decoy,
     mock_core: ProtocolCore,
+    api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should be able to load a labware from a definition dictionary."""
@@ -260,7 +264,9 @@ def test_load_labware_from_definition(
     labware_load_params = LabwareLoadParams("you", "are", 1337)
 
     decoy.when(mock_validation.ensure_lowercase_name("are")).then_return("are")
-    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_1
+    )
     decoy.when(mock_core.add_labware_definition(labware_definition_dict)).then_return(
         labware_load_params
     )
@@ -317,13 +323,16 @@ def test_move_labware_to_slot(
     decoy: Decoy,
     mock_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should move labware to new slot location."""
     drop_offset = {"x": 4, "y": 5, "z": 6}
     mock_labware_core = decoy.mock(cls=LabwareCore)
 
-    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_1)
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_1
+    )
     decoy.when(mock_labware_core.get_well_columns()).then_return([])
 
     movable_labware = Labware(
@@ -455,6 +464,7 @@ def test_load_module(
     decoy: Decoy,
     mock_core: ProtocolCore,
     mock_core_map: LoadedCoreMap,
+    api_version: APIVersion,
     subject: ProtocolContext,
 ) -> None:
     """It should load a module."""
@@ -463,7 +473,9 @@ def test_load_module(
     decoy.when(mock_validation.ensure_module_model("spline reticulator")).then_return(
         TemperatureModuleModel.TEMPERATURE_V1
     )
-    decoy.when(mock_validation.ensure_deck_slot(42)).then_return(DeckSlotName.SLOT_3)
+    decoy.when(mock_validation.ensure_deck_slot(42, api_version)).then_return(
+        DeckSlotName.SLOT_3
+    )
 
     decoy.when(
         mock_core.load_module(

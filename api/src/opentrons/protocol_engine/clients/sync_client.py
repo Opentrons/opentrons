@@ -224,6 +224,7 @@ class SyncClient:
         well_name: str,
         well_location: DropTipWellLocation,
         home_after: Optional[bool],
+        randomize_drop_location: Optional[bool],
     ) -> commands.DropTipResult:
         """Execute a DropTip command and return the result."""
         request = commands.DropTipCreate(
@@ -233,6 +234,7 @@ class SyncClient:
                 wellName=well_name,
                 wellLocation=well_location,
                 homeAfter=home_after,
+                randomizeDropLocation=randomize_drop_location,
             )
         )
         result = self._transport.execute_command(request=request)
@@ -465,12 +467,19 @@ class SyncClient:
         return cast(commands.thermocycler.SetTargetLidTemperatureResult, result)
 
     def thermocycler_set_target_block_temperature(
-        self, module_id: str, celsius: float, block_max_volume: Optional[float]
+        self,
+        module_id: str,
+        celsius: float,
+        block_max_volume: Optional[float],
+        hold_time_seconds: Optional[float],
     ) -> commands.thermocycler.SetTargetBlockTemperatureResult:
         """Execute a `thermocycler/setTargetLidTemperature` command and return the result."""
         request = commands.thermocycler.SetTargetBlockTemperatureCreate(
             params=commands.thermocycler.SetTargetBlockTemperatureParams(
-                moduleId=module_id, celsius=celsius, blockMaxVolumeUl=block_max_volume
+                moduleId=module_id,
+                celsius=celsius,
+                blockMaxVolumeUl=block_max_volume,
+                holdTimeSeconds=hold_time_seconds,
             )
         )
         result = self._transport.execute_command(request=request)

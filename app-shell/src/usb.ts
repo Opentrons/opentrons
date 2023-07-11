@@ -127,7 +127,8 @@ function startUsbHttpRequests(dispatch: Dispatch): void {
       }
 
       createSerialPortHttpAgent(ot3UsbSerialPort.path)
-
+      // remove any existing handler
+      ipcMain.removeHandler('usb:request')
       ipcMain.handle('usb:request', usbListener)
 
       dispatch(usbRequestsStart())
@@ -156,6 +157,13 @@ export function registerUsb(dispatch: Dispatch): (action: Action) => unknown {
           destroyUsbHttpAgent()
           ipcMain.removeHandler('usb:request')
           dispatch(usbRequestsStop())
+          // handle any additional invocations of usb:request
+          ipcMain.handle('usb:request', () =>
+            Promise.resolve({
+              status: 400,
+              statusText: 'USB robot disconnected',
+            })
+          )
         }
         break
     }

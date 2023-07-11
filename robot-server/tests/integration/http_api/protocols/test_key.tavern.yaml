@@ -2,12 +2,11 @@ test_name: Verify protocol key.
 
 marks:
   - usefixtures:
-      - run_server
-      - clean_server_state
+      - ot2_server_base_url
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
@@ -38,7 +37,7 @@ stages:
           key: protocol_key
   - name: Verify the key in GET /protocols
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: GET
     response:
       strict:
@@ -51,7 +50,7 @@ stages:
 
   - name: Verify the key in GET /protocols/{protocol_id}
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
       method: GET
     response:
       strict:
@@ -67,12 +66,11 @@ test_name: Protocols may have a duplicate key.
 
 marks:
   - usefixtures:
-      - run_server
-      - clean_server_state
+      - ot2_server_base_url
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
@@ -99,7 +97,7 @@ stages:
           key: duplicate_key
   - name: Upload basic_transfer_with_config protocol with same key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_with_config.py'
@@ -124,7 +122,7 @@ stages:
           key: duplicate_key
   - name: Get protocols and validate id and key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: GET
     response:
       strict:
@@ -141,12 +139,11 @@ test_name: Protocols sources not get duplicated.
 
 marks:
   - usefixtures:
-      - run_server
-      - clean_server_state
+      - ot2_server_base_url
 stages:
   - name: Upload basic_transfer_standalone protocol with key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
@@ -173,7 +170,7 @@ stages:
           key: duplicate_key
   - name: Upload basic_transfer_standalone protocol with same key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
@@ -199,7 +196,7 @@ stages:
           key: duplicate_key
   - name: Get protocols and validate id and key
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: GET
     response:
       strict:

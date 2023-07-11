@@ -184,6 +184,10 @@ class InvalidBlockVolumeError(ProtocolEngineError):
     """Raised when attempting to set an invalid block max volume."""
 
 
+class InvalidHoldTimeError(ProtocolEngineError):
+    """An error raised when attempting to set an invalid temperature hold time."""
+
+
 class InvalidTargetSpeedError(ProtocolEngineError):
     """Raised when attempting to set an invalid target speed."""
 

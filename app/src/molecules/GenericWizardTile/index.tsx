@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -49,12 +49,11 @@ const GO_BACK_BUTTON_DISABLED_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   color: ${COLORS.darkBlack70};
 `
-const HEADER_STYLE = css`
+const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: ${TYPOGRAPHY.fontSize28};
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+    ${TYPOGRAPHY.level4HeaderSemiBold};
   }
 `
 
@@ -118,15 +117,9 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"
-          gridGap={SPACING.spacing8}
+          gridGap={SPACING.spacing16}
         >
-          {typeof header === 'string' ? (
-            <StyledText as="h1" css={HEADER_STYLE}>
-              {header}
-            </StyledText>
-          ) : (
-            header
-          )}
+          {typeof header === 'string' ? <Title>{header}</Title> : header}
           {bodyText}
         </Flex>
         <Flex flex="1" justifyContent={JUSTIFY_CENTER}>

@@ -14,6 +14,7 @@ from opentrons.protocols.api_support.util import (
     build_edges,
     FlowRates,
     PlungerSpeeds,
+    APIVersionError,
 )
 from opentrons.protocols.geometry import planning
 
@@ -219,6 +220,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
         location: Optional[types.Location],
         well_core: LegacyWellCore,
         home_after: Optional[bool],
+        randomize_drop_location: Optional[bool] = False,
     ) -> None:
         """Move to and drop a tip into a given well.
 
@@ -228,6 +230,10 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore]):
             well_core: The well we're dropping into
             home_after: Whether to home the pipette after the tip is dropped.
         """
+        if randomize_drop_location:
+            raise APIVersionError(
+                "Tip drop randomization is not supported in this API version."
+            )
         labware_core = well_core.geometry.parent
 
         if location is None:

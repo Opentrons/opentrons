@@ -93,11 +93,6 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
         section: SECTIONS.MOUNT_PIPETTE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -151,11 +146,6 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
         section: SECTIONS.MOUNT_PIPETTE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -198,11 +188,6 @@ describe('getPipetteWizardStepsForProtocol', () => {
         flowType: FLOWS.DETACH,
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
-      {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
@@ -257,11 +242,6 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -315,21 +295,11 @@ describe('getPipetteWizardStepsForProtocol', () => {
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: RIGHT,
-        flowType: FLOWS.DETACH,
-      },
-      {
         section: SECTIONS.DETACH_PIPETTE,
         mount: RIGHT,
         flowType: FLOWS.DETACH,
       },
       { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
-      {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,

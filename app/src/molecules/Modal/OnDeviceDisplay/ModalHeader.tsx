@@ -9,6 +9,7 @@ import {
   ALIGN_CENTER,
   COLORS,
   SIZE_2,
+  BORDERS,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import type { ModalHeaderBaseProps } from './types'
@@ -29,6 +30,7 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
+      borderRadius={`${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3} 0px 0px`}
     >
       <Flex flexDirection={DIRECTION_ROW}>
         {iconName != null && iconColor != null ? (

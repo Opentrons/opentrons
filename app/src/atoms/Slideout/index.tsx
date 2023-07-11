@@ -30,7 +30,7 @@ export interface SlideoutProps {
 
 const SHARED_STYLE = css`
   z-index: 2;
-  overflow-x: hidden;
+  overflow: hidden;
   @keyframes slidein {
     from {
       transform: translateX(100%);

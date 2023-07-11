@@ -20,7 +20,7 @@ export function BackButton({
       onClick={onClick != null ? onClick : () => history.goBack()}
     >
       <Flex alignItems={ALIGN_CENTER}>
-        <Icon name="chevron-left" height="3rem" />
+        <Icon name="back" height="3rem" />
         <Box fontSize="2rem" fontWeight="700">
           {/* render "Back" if no children given */}
           {children != null ? children : t('back')}

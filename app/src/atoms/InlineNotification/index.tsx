@@ -72,7 +72,7 @@ export function InlineNotification(
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={INLINE_NOTIFICATION_PROPS_BY_TYPE[type].backgroundColor}
-      borderRadius={BORDERS.size3}
+      borderRadius={BORDERS.borderRadiusSize3}
       data-testid={`InlineNotification_${type}`}
       flexDirection={DIRECTION_ROW}
       gridGap={SPACING.spacing12}

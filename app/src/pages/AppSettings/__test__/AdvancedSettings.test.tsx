@@ -136,10 +136,12 @@ describe('AdvancedSettings', () => {
     const [{ getByText }] = render()
     getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
-    getByText('Tip Length Calibration Method')
     getByText('Prevent Robot Caching')
     getByText('Clear Unavailable Robots')
     getByText('Enable Developer Tools')
+    getByText('OT-2 Advanced Settings')
+    getByText('Tip Length Calibration Method')
+    getByText('USB-to-Ethernet Adapter Information')
   })
   it('renders the update channel combobox and section', () => {
     const [{ getByText, getByRole }] = render()

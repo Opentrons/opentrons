@@ -20,13 +20,13 @@ import { GripperWizardFlows } from '../GripperWizardFlows'
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
 import { FLOWS } from '../PipetteWizardFlows/constants'
+import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { formatTimestamp } from '../Devices/utils'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 
 import type { InstrumentData } from '@opentrons/api-client'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { StyleProps } from '@opentrons/components'
-
 interface InstrumentInfoProps {
   // NOTE: instrument will only be null while
   // in the middle of detach wizard which occludes
@@ -34,7 +34,8 @@ interface InstrumentInfoProps {
   instrument: InstrumentData | null
 }
 export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
-  const { t } = useTranslation('instruments_dashboard')
+  const { t, i18n } = useTranslation('instruments_dashboard')
+  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
   const { instrument } = props
   const history = useHistory()
   const [wizardProps, setWizardProps] = React.useState<
@@ -42,6 +43,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
     | React.ComponentProps<typeof PipetteWizardFlows>
     | null
   >(null)
+
   const sharedGripperWizardProps: Pick<
     React.ComponentProps<typeof GripperWizardFlows>,
     'attachedGripper' | 'closeFlow'
@@ -51,7 +53,12 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       setWizardProps(null)
     },
   }
+  const is96Channel =
+    // @ts-expect-error the mount acts as a type narrower here
+    instrument.mount !== 'extension' && instrument.data?.channels === 96
+
   const handleDetach: React.MouseEventHandler = () => {
+    setODDMaintenanceFlowInProgress()
     if (instrument != null) {
       setWizardProps(
         instrument.mount === 'extension'
@@ -64,16 +71,16 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
                 history.goBack()
               },
               mount: instrument.mount as PipetteMount,
-              selectedPipette:
-                instrument.instrumentModel === 'p1000_96'
-                  ? NINETY_SIX_CHANNEL
-                  : SINGLE_MOUNT_PIPETTES,
+              selectedPipette: is96Channel
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
               flowType: FLOWS.DETACH,
             }
       )
     }
   }
   const handleRecalibrate: React.MouseEventHandler = () => {
+    setODDMaintenanceFlowInProgress()
     if (instrument != null) {
       setWizardProps(
         instrument.mount === 'extension'
@@ -86,10 +93,9 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
                 setWizardProps(null)
               },
               mount: instrument.mount as PipetteMount,
-              selectedPipette:
-                instrument.instrumentModel === 'p1000_96'
-                  ? NINETY_SIX_CHANNEL
-                  : SINGLE_MOUNT_PIPETTES,
+              selectedPipette: is96Channel
+                ? NINETY_SIX_CHANNEL
+                : SINGLE_MOUNT_PIPETTES,
               flowType: FLOWS.CALIBRATE,
             }
       )
@@ -115,7 +121,7 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
                 ? formatTimestamp(
                     instrument.data.calibratedOffset?.last_modified
                   )
-                : t('no_cal_data')
+                : i18n.format(t('no_cal_data'), 'capitalize')
             }
           />
           <InfoItem label={t('firmware_version')} value="TODO" />
@@ -160,7 +166,7 @@ interface InfoItemProps extends StyleProps {
 function InfoItem(props: InfoItemProps): JSX.Element {
   return (
     <Flex
-      borderRadius={BORDERS.size3}
+      borderRadius={BORDERS.borderRadiusSize3}
       backgroundColor={COLORS.lightGreyPressed}
       padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       justifyContent={JUSTIFY_SPACE_BETWEEN}

@@ -1,26 +1,66 @@
 diff --git a/api/src/opentrons/config/defaults_ot3.py b/api/src/opentrons/config/defaults_ot3.py
-index beae5cc110..b9c706a5e0 100644
+index 89696c5b2a..4c2d6184b8 100644
 --- a/api/src/opentrons/config/defaults_ot3.py
 +++ b/api/src/opentrons/config/defaults_ot3.py
-@@ -101,10 +101,10 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
+@@ -83,7 +83,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
+         OT3AxisKind.X: 400,
+         OT3AxisKind.Y: 325,
+         OT3AxisKind.Z: 35,
+-        OT3AxisKind.P: 5,
++        OT3AxisKind.P: 20,
+         OT3AxisKind.Z_G: 50,
+         OT3AxisKind.Q: 5.5,
+     },
+@@ -100,18 +100,18 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
+ 
+ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
+     high_throughput={
+-        OT3AxisKind.X: 800,
+-        OT3AxisKind.Y: 500,
++        OT3AxisKind.X: 500,
++        OT3AxisKind.Y: 500,
+         OT3AxisKind.Z: 150,
+-        OT3AxisKind.P: 30,
++        OT3AxisKind.P: 1000,
+         OT3AxisKind.Z_G: 150,
          OT3AxisKind.Q: 10,
      },
      low_throughput={
--        OT3AxisKind.X: 1600,
--        OT3AxisKind.Y: 1000,
+-        OT3AxisKind.X: 800,
+-        OT3AxisKind.Y: 600,
 +        OT3AxisKind.X: 500,
 +        OT3AxisKind.Y: 200,
-         OT3AxisKind.Z: 300,
+         OT3AxisKind.Z: 150,
 -        OT3AxisKind.P: 100,
 +        OT3AxisKind.P: 1500,
          OT3AxisKind.Z_G: 150,
      },
  )
+@@ -120,7 +120,7 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
+     high_throughput={
+         OT3AxisKind.X: 10,
+         OT3AxisKind.Y: 10,
+-        OT3AxisKind.Z: 5,
++        OT3AxisKind.Z: 15,
+         OT3AxisKind.P: 5,
+         OT3AxisKind.Z_G: 10,
+         OT3AxisKind.Q: 5,
+@@ -176,8 +176,8 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
+     high_throughput={
+         OT3AxisKind.X: 1.25,
+         OT3AxisKind.Y: 1.4,
+-        OT3AxisKind.Z: 1.5,
+-        OT3AxisKind.P: 2.2,
++        OT3AxisKind.Z: 1.5,
++        OT3AxisKind.P: 0.8,
+         OT3AxisKind.Z_G: 0.67,
+         OT3AxisKind.Q: 1.5,
+     },
 diff --git a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
-index 5f96add2a4..047dc58add 100644
+index 3610fc8857..6b4db5dfe5 100644
 --- a/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
 +++ b/api/src/opentrons/hardware_control/instruments/ot3/pipette.py
-@@ -422,11 +422,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
+@@ -427,11 +427,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
  
      def set_current_volume(self, new_volume: float) -> None:
          assert new_volume >= 0
@@ -34,7 +74,7 @@ index 5f96add2a4..047dc58add 100644
          self._current_volume += volume_incr
  
      def remove_current_volume(self, volume_incr: float) -> None:
-@@ -434,7 +434,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
+@@ -439,7 +439,8 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
          self._current_volume -= volume_incr
  
      def ok_to_add_volume(self, volume_incr: float) -> bool:
@@ -44,3 +84,61 @@ index 5f96add2a4..047dc58add 100644
  
      def add_tip(self, tip_length: float) -> None:
          """
+diff --git a/api/src/opentrons/protocol_api/core/legacy/deck.py b/api/src/opentrons/protocol_api/core/legacy/deck.py
+index 54bca33742..e6b49e47fe 100644
+--- a/api/src/opentrons/protocol_api/core/legacy/deck.py
++++ b/api/src/opentrons/protocol_api/core/legacy/deck.py
+@@ -47,11 +47,11 @@ class DeckItem(Protocol):
+ class Deck(UserDict):  # type: ignore[type-arg]
+     data: Dict[int, Optional[DeckItem]]
+ 
+-    def __init__(self, deck_type: str) -> None:
++    def __init__(
++        self, deck_type: str, version: int = DEFAULT_DECK_DEFINITION_VERSION
++    ) -> None:
+         super().__init__()
+-        self._definition = load_deck(
+-            name=deck_type, version=DEFAULT_DECK_DEFINITION_VERSION
+-        )
++        self._definition = load_deck(name=deck_type, version=version)
+         self._positions = {}
+         for slot in self._definition["locations"]["orderedSlots"]:
+             self.data[int(slot["id"])] = None
+diff --git a/api/src/opentrons/protocol_api/create_protocol_context.py b/api/src/opentrons/protocol_api/create_protocol_context.py
+index f2d8e492ec..dd4fd9102e 100644
+--- a/api/src/opentrons/protocol_api/create_protocol_context.py
++++ b/api/src/opentrons/protocol_api/create_protocol_context.py
+@@ -22,6 +22,7 @@ from .deck import Deck
+ 
+ from .core.common import ProtocolCore as AbstractProtocolCore
+ from .core.legacy.deck import Deck as LegacyDeck
++from opentrons_shared_data.deck import DEFAULT_DECK_DEFINITION_VERSION
+ from .core.legacy.legacy_protocol_core import LegacyProtocolCore
+ from .core.legacy.labware_offset_provider import (
+     AbstractLabwareOffsetProvider,
+@@ -52,6 +53,7 @@ def create_protocol_context(
+     extra_labware: Optional[Dict[str, LabwareDefinition]] = None,
+     bundled_labware: Optional[Dict[str, LabwareDefinition]] = None,
+     bundled_data: Optional[Dict[str, bytes]] = None,
++    deck_version: int = DEFAULT_DECK_DEFINITION_VERSION,
+ ) -> ProtocolContext:
+     """Create a ProtocolContext for use in a Python protocol.
+ 
+@@ -121,7 +123,7 @@ def create_protocol_context(
+ 
+     # TODO(mc, 2022-8-22): remove `disable_fast_protocol_upload`
+     elif use_simulating_core and not feature_flags.disable_fast_protocol_upload():
+-        legacy_deck = LegacyDeck(deck_type=deck_type)
++        legacy_deck = LegacyDeck(deck_type=deck_type, version=deck_version)
+         core = LegacyProtocolCoreSimulator(
+             sync_hardware=sync_hardware,
+             labware_offset_provider=labware_offset_provider,
+@@ -133,7 +135,7 @@ def create_protocol_context(
+         )
+ 
+     else:
+-        legacy_deck = LegacyDeck(deck_type=deck_type)
++        legacy_deck = LegacyDeck(deck_type=deck_type, version=deck_version)
+         core = LegacyProtocolCore(
+             sync_hardware=sync_hardware,
+             labware_offset_provider=labware_offset_provider,

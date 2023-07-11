@@ -11,7 +11,6 @@ from opentrons.hardware_control.types import (
     GripperProbe,
     CriticalPoint,
     GripperJawState,
-    InstrumentFWInfo,
 )
 from opentrons.hardware_control.errors import InvalidMoveError
 from .instrument_calibration import (
@@ -46,7 +45,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         config: GripperDefinition,
         gripper_cal_offset: GripperCalibrationOffset,
         gripper_id: str,
-        fw_update_info: InstrumentFWInfo,
     ) -> None:
         self._config = config
         self._model = config.model
@@ -78,8 +76,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
         self._log.info(
             f"loaded: {self._model}, gripper offset: {self._calibration_offset}"
         )
-        #: firmware update states
-        self._fw_update_info = fw_update_info
 
     @property
     def grip_force_profile(self) -> GripForceProfile:
@@ -155,14 +151,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     @property
     def gripper_id(self) -> str:
         return self._gripper_id
-
-    @property
-    def fw_update_info(self) -> InstrumentFWInfo:
-        return self._fw_update_info
-
-    @fw_update_info.setter
-    def fw_update_info(self, value: InstrumentFWInfo) -> None:
-        self._fw_update_info = value
 
     def reload_configurations(self) -> None:
         return None
@@ -241,9 +229,6 @@ class Gripper(AbstractInstrument[GripperDefinition]):
             "display_name": self._config.display_name,
             "state": self._state,
             "calibration_offset": self._calibration_offset,
-            "fw_update_required": self._fw_update_info.update_required,
-            "fw_current_version": self._fw_update_info.current_version,
-            "fw_next_version": self._fw_update_info.next_version,
         }
         return d
 
@@ -252,7 +237,6 @@ def _reload_gripper(
     new_config: GripperDefinition,
     attached_instr: Gripper,
     cal_offset: GripperCalibrationOffset,
-    fw_update_info: InstrumentFWInfo,
 ) -> Gripper:
     # Once we have determined that the new and attached grippers
     # are similar enough that we might skip, see if the configs
@@ -261,7 +245,6 @@ def _reload_gripper(
     if (
         new_config == attached_instr.config
         and cal_offset == attached_instr._calibration_offset
-        and fw_update_info == attached_instr.fw_update_info
     ):
         # Same config, good enough
         return attached_instr
@@ -275,12 +258,13 @@ def _reload_gripper(
         if changed.intersection(RECONFIG_KEYS):
             # Something has changed that requires reconfig
             return Gripper(
-                new_config, cal_offset, attached_instr._gripper_id, fw_update_info
+                new_config,
+                cal_offset,
+                attached_instr._gripper_id,
             )
         else:
             # update just the cal offset and update info
             attached_instr._calibration_offset = cal_offset
-            attached_instr.fw_update_info = fw_update_info
             return attached_instr
 
 
@@ -288,7 +272,6 @@ def compare_gripper_config_and_check_skip(
     freshly_detected: AttachedGripper,
     attached: Optional[Gripper],
     cal_offset: GripperCalibrationOffset,
-    fw_update_info: InstrumentFWInfo,
 ) -> Optional[Gripper]:
     """
     Given the gripper config for an attached gripper (if any) freshly read
@@ -312,9 +295,9 @@ def compare_gripper_config_and_check_skip(
         # the same? we can tell by comparing serials
         if serial == attached.gripper_id:
             # similar enough to check
-            return _reload_gripper(config, attached, cal_offset, fw_update_info)
+            return _reload_gripper(config, attached, cal_offset)
 
     if config:
-        return Gripper(config, cal_offset, serial, fw_update_info)
+        return Gripper(config, cal_offset, serial)
     else:
         return None

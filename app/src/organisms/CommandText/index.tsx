@@ -15,7 +15,7 @@ import type { StyleProps } from '@opentrons/components'
 const SIMPLE_TRANSLATION_KEY_BY_COMMAND_TYPE: {
   [commandType in RunTimeCommand['commandType']]?: string
 } = {
-  home: 'home_gantry',
+  home: 'home_robot_arm',
   savePosition: 'save_position',
   touchTip: 'touch_tip',
   'magneticModule/engage': 'engaging_magnetic_module',

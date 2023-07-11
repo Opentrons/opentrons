@@ -1,5 +1,6 @@
 import type {
   LoadedLabware,
+  LoadedModule,
   LoadedPipette,
   ModuleModel,
 } from '@opentrons/shared-data'
@@ -41,6 +42,7 @@ export interface RunData {
   errors: RunError[]
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
+  modules: LoadedModule[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
 }

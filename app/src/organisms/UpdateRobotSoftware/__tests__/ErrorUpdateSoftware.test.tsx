@@ -40,15 +40,13 @@ describe('ErrorUpdateSoftware', () => {
 
   it('call mockPush when tapping Proceed without updating', () => {
     const [{ getByText }] = render(props)
-    const button = getByText('Proceed without updating')
-    button.click()
+    getByText('Proceed without updating').click()
     expect(mockPush).toBeCalledWith('/robot-settings/rename-robot')
   })
 
   it('call mock function when tapping Try again', () => {
     const [{ getByText }, store] = render(props)
-    const button = getByText('Try again')
-    button.click()
+    getByText('Try again').click()
     expect(store.dispatch).toHaveBeenCalledWith(
       startBuildrootUpdate(props.robotName)
     )

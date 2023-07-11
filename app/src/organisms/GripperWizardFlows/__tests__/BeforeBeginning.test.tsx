@@ -94,6 +94,7 @@ describe('BeforeBeginning', () => {
     getByRole('button', { name: 'Move gantry to front' }).click()
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
+        { commandType: 'home', params: {} },
         {
           commandType: 'calibration/moveToMaintenancePosition',
           params: { mount: 'left' },

@@ -2,7 +2,16 @@
 from typing import List, Union
 from typing_extensions import Final
 
-from opentrons.config.defaults_ot3 import DEFAULT_MACHINE_TRANSFORM
+try:
+    from opentrons.config.defaults_ot3 import (
+        DEFAULT_MACHINE_TRANSFORM as DEFAULT_TRANSFORM,
+    )
+except ImportError as e:
+    print(e)
+    # FIXME: delete this once there is no risk of machines running <=0.7.0
+    from opentrons.config.defaults_ot3 import (  # type: ignore[attr-defined, no-redef]
+        DEFAULT_DECK_TRANSFORM as DEFAULT_TRANSFORM,
+    )
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     find_calibration_structure_height,
@@ -65,7 +74,7 @@ async def _find_slot(api: OT3API, mount: OT3Mount, expected: Point) -> Point:
 
 def _assert_deck_transform_is_default(api: OT3API) -> None:
     att_matrix = api.config.deck_transform
-    for def_row, att_row in zip(DEFAULT_MACHINE_TRANSFORM, att_matrix):
+    for def_row, att_row in zip(DEFAULT_TRANSFORM, att_matrix):
         for default_val, current_val in zip(def_row, att_row):
             assert (
                 current_val == default_val

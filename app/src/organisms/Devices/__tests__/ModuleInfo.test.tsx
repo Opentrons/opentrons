@@ -82,4 +82,14 @@ describe('ModuleInfo', () => {
     expect(queryByText('Connected')).toBeNull()
     getByText('Connection info not available once run has started')
   })
+
+  it('should show the correct information when the magnetic block is in the protocol', () => {
+    props = {
+      ...props,
+      moduleModel: 'magneticBlockV1',
+    }
+    const { getByText, queryByText } = render(props)
+    getByText('No USB required')
+    expect(queryByText('Connected')).toBeNull()
+  })
 })

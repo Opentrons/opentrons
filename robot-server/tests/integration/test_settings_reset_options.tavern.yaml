@@ -2,11 +2,11 @@
 test_name: GET Settings Reset Options
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Reset Options GET request returns correct option
     request:
-      url: '{host:s}:{port:d}/settings/reset/options'
+      url: '{ot2_server_base_url}/settings/reset/options'
       method: GET
     response:
       status_code: 200
@@ -31,11 +31,11 @@ stages:
 test_name: POST Reset bootScripts option
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: POST Reset bootScripts true
     request:
-      url: '{host:s}:{port:d}/settings/reset'
+      url: '{ot2_server_base_url}/settings/reset'
       method: POST
       json:
         bootScripts: true
@@ -45,7 +45,7 @@ stages:
         message: "Options 'boot_scripts' were reset"
   - name: POST Reset bootScripts false
     request:
-      url: '{host:s}:{port:d}/settings/reset'
+      url: '{ot2_server_base_url}/settings/reset'
       method: POST
       json:
         bootScripts: false
@@ -57,11 +57,11 @@ stages:
 test_name: POST Reset deck calibration option
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: POST Reset deckCalibration true
     request:
-      url: '{host:s}:{port:d}/settings/reset'
+      url: '{ot2_server_base_url}/settings/reset'
       method: POST
       json:
         deckCalibration: true
@@ -71,7 +71,7 @@ stages:
         message: "Options 'deck_calibration' were reset"
   - name: POST Reset deckCalibration false
     request:
-      url: '{host:s}:{port:d}/settings/reset'
+      url: '{ot2_server_base_url}/settings/reset'
       method: POST
       json:
         deckCalibration: false
@@ -83,11 +83,11 @@ stages:
 test_name: POST Reset pipette offset calibrations option
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: POST Reset pipetteOffsetCalibrations true
     request:
-      url: '{host:s}:{port:d}/settings/reset'
+      url: '{ot2_server_base_url}/settings/reset'
       method: POST
       json:
         pipetteOffsetCalibrations: true
@@ -97,7 +97,7 @@ stages:
         message: "Options 'pipette_offset' were reset"
   - name: POST Reset pipetteOffsetCalibrations false
     request:
-      url: '{host:s}:{port:d}/settings/reset'
+      url: '{ot2_server_base_url}/settings/reset'
       method: POST
       json:
         pipetteOffsetCalibrations: false
@@ -109,11 +109,11 @@ stages:
 test_name: POST Reset non existant option
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: POST Reset non existant option
     request:
-      url: '{host:s}:{port:d}/settings/reset'
+      url: '{ot2_server_base_url}/settings/reset'
       method: POST
       json:
         doesNotExist: true

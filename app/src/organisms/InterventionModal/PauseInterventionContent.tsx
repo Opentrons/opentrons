@@ -11,35 +11,24 @@ import {
   useInterval,
 } from '@opentrons/components'
 
+import { StyledText } from '../../atoms/text'
 import { EMPTY_TIMESTAMP } from '../Devices/constants'
 import { formatInterval } from '../RunTimeControl/utils'
-import { StyledText } from '../../atoms/text'
-
-import type { WaitForResumeRunTimeCommand } from '@opentrons/shared-data'
-
+import { InterventionCommandMessage } from './InterventionCommandMessage'
 export interface PauseContentProps {
-  command: WaitForResumeRunTimeCommand
+  startedAt: string | null
+  message: string | null
 }
 
 export function PauseInterventionContent({
-  command,
+  startedAt,
+  message,
 }: PauseContentProps): JSX.Element {
-  const { t, i18n } = useTranslation('protocol_command_text')
-
   return (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.75rem">
-      <PauseHeader startedAt={command.startedAt} />
+      <PauseHeader startedAt={startedAt} />
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        <StyledText as="h6" color={COLORS.errorDisabled}>
-          {i18n.format(t('notes'), 'upperCase')}:
-        </StyledText>
-        <StyledText as="p">
-          {command.params?.message != null && command.params.message !== ''
-            ? command.params.message.length > 220
-              ? `${command.params.message.substring(0, 217)}...`
-              : command.params.message
-            : t('wait_for_resume')}
-        </StyledText>
+        <InterventionCommandMessage commandMessage={message} />
       </Flex>
     </Flex>
   )

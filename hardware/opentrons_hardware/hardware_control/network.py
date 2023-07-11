@@ -1,8 +1,9 @@
 """Utilities for managing the CANbus network on the OT3."""
 import asyncio
 from dataclasses import dataclass
+from itertools import chain
 import logging
-from typing import Any, Dict, Set, Optional, Union
+from typing import Any, Dict, Set, Optional, Union, cast, Iterable, Tuple
 from .types import PCBARevision
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -13,6 +14,7 @@ from opentrons_hardware.firmware_bindings.constants import (
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
 )
+from opentrons_hardware.drivers.errors import CommunicationError
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoRequest as CanDeviceInfoRequest,
@@ -44,10 +46,11 @@ class DeviceInfoCache:
     flags: Any
     revision: PCBARevision
     subidentifier: int
+    ok: bool
 
     def __repr__(self) -> str:
         """Readable representation of the device info."""
-        return f"<{self.__class__.__name__}: node={self.target}, version={self.version}, sha={self.shortsha}>"
+        return f"<{self.__class__.__name__}: node={self.target}, version={self.version}, sha={self.shortsha}, ok={self.ok}>"
 
 
 class NetworkInfo:
@@ -66,17 +69,32 @@ class NetworkInfo:
         """
         self._can_network_info = CanNetworkInfo(can_messenger)
         self._usb_network_info = UsbNetworkInfo(usb_messenger)
-        self._device_info_cache: Dict[FirmwareTarget, DeviceInfoCache] = dict()
 
     @property
     def device_info(self) -> Dict[FirmwareTarget, DeviceInfoCache]:
         """Dictionary containing known devices and their device info."""
-        return self._device_info_cache
+        return {
+            k: v
+            for k, v in cast(  # necessary because chain erases key types
+                Iterable[
+                    Union[
+                        Tuple[NodeId, DeviceInfoCache],
+                        Tuple[USBTarget, DeviceInfoCache],
+                    ]
+                ],
+                chain(
+                    self._can_network_info.device_info.items(),
+                    self._usb_network_info.device_info.items(),
+                ),
+            )
+        }
 
     @property
     def targets(self) -> Set[FirmwareTarget]:
         """Set of usb devices on the network."""
-        return set(self._device_info_cache)
+        return cast(Set[FirmwareTarget], self._can_network_info.nodes).union(
+            self._usb_network_info.targets
+        )
 
     async def probe(
         self, expected: Optional[Set[FirmwareTarget]] = None, timeout: float = 1.0
@@ -95,22 +113,57 @@ class NetworkInfo:
         expected_can: Optional[Set[NodeId]] = None
         expected_usb: Optional[Set[USBTarget]] = None
         if expected is not None:
-            expected_can = {NodeId(target) for target in expected if target in NodeId}
-            expected_usb = {
-                USBTarget(target) for target in expected if target in USBTarget
-            }
+            expected_can, expected_usb = self._split_devices(expected)
+
         can_device_info, usb_device_info = await asyncio.gather(
             self._can_network_info.probe(expected_can, timeout),
             self._usb_network_info.probe(expected_usb, timeout),
         )
-        device_info: Dict[FirmwareTarget, DeviceInfoCache] = {
-            node: cache for (node, cache) in can_device_info.items()
-        }
-        device_info.update(
-            {target: cache for (target, cache) in usb_device_info.items()}
+        return self._fuse_info(can_device_info, usb_device_info)
+
+    async def probe_specific(
+        self, devices: Set[FirmwareTarget], timeout: float = 1.0
+    ) -> Dict[FirmwareTarget, DeviceInfoCache]:
+        """Probe for specific connected devices determined by the arguments.
+
+        This method checks for the presence of specific devices on the network, as opposed to
+        getting a general assessment of what's present. It will also update the internal cache
+        of device state for what it finds, but only for the devices in the argument.
+        """
+        can_devs, usb_devs = self._split_devices(devices)
+        can_device_info, usb_device_info = await asyncio.gather(
+            self._can_network_info.probe_specific(can_devs, timeout),
+            self._usb_network_info.probe_specific(usb_devs, timeout),
         )
-        self._device_info_cache = device_info
+        return self._fuse_info(can_device_info, usb_device_info)
+
+    def mark_absent(
+        self, devices: Set[FirmwareTarget]
+    ) -> Dict[FirmwareTarget, DeviceInfoCache]:
+        """Mark the specified devices as absent. Best used in combination with probe_specific."""
+        can_devices, usb_devices = self._split_devices(devices)
+        can_info = self._can_network_info.mark_absent(can_devices)
+        usb_info = self._usb_network_info.mark_absent(usb_devices)
+        return self._fuse_info(can_info, usb_info)
+
+    @staticmethod
+    def _fuse_info(
+        can_info: Dict[NodeId, DeviceInfoCache],
+        usb_info: Dict[USBTarget, DeviceInfoCache],
+    ) -> Dict[FirmwareTarget, DeviceInfoCache]:
+        device_info: Dict[FirmwareTarget, DeviceInfoCache] = {
+            node: cache for (node, cache) in can_info.items()
+        }
+        device_info.update({target: cache for (target, cache) in usb_info.items()})
         return device_info
+
+    @staticmethod
+    def _split_devices(
+        devices: Set[FirmwareTarget],
+    ) -> Tuple[Set[NodeId], Set[USBTarget]]:
+        return {NodeId(target) for target in devices if target in NodeId}, {
+            USBTarget(target) for target in devices if target in USBTarget
+        }
 
 
 class UsbNetworkInfo:
@@ -135,6 +188,68 @@ class UsbNetworkInfo:
         """Set of usb devices on the network."""
         return set(self._device_info_cache)
 
+    @staticmethod
+    def _log_failure(expected: Set[USBTarget], found: Set[USBTarget], msg: str) -> None:
+        if expected:
+            log.warning(f"{msg} found {found} of {expected}")
+        else:
+            log.debug(f"{msg} found {found} with nothing expected")
+
+    def _update_only(
+        self, only_devices: Set[USBTarget], found: Dict[USBTarget, DeviceInfoCache]
+    ) -> None:
+        for device in only_devices:
+            if device not in found:
+                self._device_info_cache.pop(device, None)
+            else:
+                self._device_info_cache[device] = found[device]
+
+    async def probe_specific(  # noqa: C901
+        self, devices: Set[USBTarget], timeout: float = 1.0
+    ) -> Dict[USBTarget, DeviceInfoCache]:
+        """Probe for a specific set of usb connected devices.
+
+        Sends a status requets to the usb messenger and waits for responses, ending when all devices
+        response or when a timeout occurs. Will cache the results but only for the targets passed as argument.
+        """
+        event = asyncio.Event()
+        targets: Dict[USBTarget, DeviceInfoCache] = dict()
+        if self._usb_messenger is None:
+            self._device_info_cache = {}
+            return targets
+
+        if not devices:
+            return targets
+
+        def listener(message: BinaryMessageDefinition) -> None:
+            if isinstance(message, USBDeviceInfoResponse):
+                device_info_cache = _parse_usb_device_info_response(message)
+                if device_info_cache:
+                    targets[USBTarget(device_info_cache.target)] = device_info_cache
+            if devices.issubset(targets):
+                event.set()
+
+        try:
+            self._usb_messenger.add_listener(listener)
+            await self._usb_messenger.send(
+                message=USBDeviceInfoRequest(),
+            )
+            await asyncio.wait_for(event.wait(), timeout)
+        except asyncio.TimeoutError:
+            self._log_failure(
+                devices, set(iter(targets.keys())), "Timeout during probe_specific"
+            )
+        except CommunicationError:
+            self._log_failure(
+                devices,
+                set(iter(targets.keys())),
+                "USB communications error during probe_specific",
+            )
+        finally:
+            self._usb_messenger.remove_listener(listener)
+            self._update_only(devices, targets)
+        return targets
+
     async def probe(
         self, expected: Optional[Set[USBTarget]] = None, timeout: float = 1.0
     ) -> Dict[USBTarget, DeviceInfoCache]:
@@ -157,6 +272,7 @@ class UsbNetworkInfo:
         targets: Dict[USBTarget, DeviceInfoCache] = dict()
 
         if self._usb_messenger is None:
+            self._device_info_cache = {}
             return targets
 
         def listener(message: BinaryMessageDefinition) -> None:
@@ -167,24 +283,32 @@ class UsbNetworkInfo:
             if expected_targets and expected_targets.issubset(targets):
                 event.set()
 
-        self._usb_messenger.add_listener(listener)
-        await self._usb_messenger.send(
-            message=USBDeviceInfoRequest(),
-        )
         try:
+            self._usb_messenger.add_listener(listener)
+            await self._usb_messenger.send(
+                message=USBDeviceInfoRequest(),
+            )
             await asyncio.wait_for(event.wait(), timeout)
         except asyncio.TimeoutError:
-            if expected_targets:
-                log.warning(
-                    "probe timed out before expected targets found, missing "
-                    f"{expected_targets.difference(targets)}"
-                )
-            else:
-                log.debug("probe terminated (no expected set)")
+            self._log_failure(
+                expected_targets, set(iter(targets.keys())), "Timeout during probe"
+            )
+        except CommunicationError:
+            self._log_failure(
+                expected_targets,
+                set(iter(targets.keys())),
+                "USB communications error during probe",
+            )
         finally:
             self._usb_messenger.remove_listener(listener)
             self._device_info_cache = targets
         return targets
+
+    def mark_absent(self, devices: Set[USBTarget]) -> Dict[USBTarget, DeviceInfoCache]:
+        """Mark the specified devices as absent. Best used in combination with probe_specific."""
+        for device in devices:
+            self._device_info_cache.pop(device, None)
+        return self._device_info_cache
 
 
 class CanNetworkInfo:
@@ -232,13 +356,17 @@ class CanNetworkInfo:
         nodes: Dict[NodeId, DeviceInfoCache] = dict()
 
         def listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
-            if isinstance(message, CanDeviceInfoResponse):
-                device_info_cache = _parse_can_device_info_response(
-                    message, arbitration_id
-                )
-                if device_info_cache:
-                    nodes[NodeId(device_info_cache.target)] = device_info_cache
-            if expected_nodes and expected_nodes.issubset(nodes):
+            if not isinstance(message, CanDeviceInfoResponse):
+                return
+            device_info_cache = _parse_can_device_info_response(message, arbitration_id)
+            if not device_info_cache:
+                return
+            nodes[
+                NodeId(device_info_cache.target).application_for()
+            ] = device_info_cache
+            if expected_nodes and expected_nodes.issubset(
+                {node.application_for() for node in nodes}
+            ):
                 event.set()
 
         self._can_messenger.add_listener(listener)
@@ -261,6 +389,66 @@ class CanNetworkInfo:
             self._device_info_cache = nodes
         return nodes
 
+    async def probe_specific(
+        self, targets: Set[NodeId], timeout: float = 1.0
+    ) -> Dict[NodeId, DeviceInfoCache]:
+        """Probe specific devices to see whether they're present on the bus.
+
+        Sends a status request to the broadcast address and waits for responses from only
+        the specified devices. Ends either when the given devices respond or when a timeout
+        happens, whichever is first.
+
+        This will also update the cached values of present nodes, but unlike probe() does not
+        check for or care about any node not given and will not add or remove them from the
+        cache.
+        """
+        event = asyncio.Event()
+        nodes: Dict[NodeId, DeviceInfoCache] = dict()
+        target_applications = {target.application_for() for target in targets}
+
+        def listener(message: MessageDefinition, arbitration_id: ArbitrationId) -> None:
+            if not isinstance(message, CanDeviceInfoResponse):
+                return
+            device_info_cache = _parse_can_device_info_response(message, arbitration_id)
+
+            if not device_info_cache:
+                return
+
+            originating_device = NodeId(device_info_cache.target)
+            originating_application = originating_device.application_for()
+            if originating_application not in target_applications:
+                return
+            nodes[originating_application] = device_info_cache
+            if target_applications.issubset(nodes):
+                event.set()
+
+        self._can_messenger.add_listener(listener)
+        await self._can_messenger.send(
+            node_id=NodeId.broadcast,
+            message=CanDeviceInfoRequest(),
+        )
+        try:
+            await asyncio.wait_for(event.wait(), timeout)
+        except asyncio.TimeoutError:
+            log.warning(
+                "probe timed out before expected nodes found, missing "
+                f"{target_applications.difference(nodes)}"
+            )
+        finally:
+            self._can_messenger.remove_listener(listener)
+            for target in target_applications:
+                if target in nodes:
+                    self._device_info_cache[target] = nodes[target]
+                else:
+                    self._device_info_cache.pop(target, None)
+        return nodes
+
+    def mark_absent(self, devices: Set[NodeId]) -> Dict[NodeId, DeviceInfoCache]:
+        """Mark the specified devices as absent. Best used in combination with probe_specific."""
+        for device in devices:
+            self._device_info_cache.pop(device.application_for(), None)
+        return self._device_info_cache
+
 
 def _parse_usb_device_info_response(
     message: BinaryMessageDefinition,
@@ -278,6 +466,7 @@ def _parse_usb_device_info_response(
                     message.revision.revision, message.revision.tertiary
                 ),
                 subidentifier=message.subidentifier.value,
+                ok=True,
             )
         except (ValueError, UnicodeDecodeError) as e:
             log.error(f"Could not parse DeviceInfoResponse {e}")
@@ -299,7 +488,7 @@ def _parse_can_device_info_response(
             return None
         try:
             return DeviceInfoCache(
-                target=node,
+                target=node.application_for(),
                 version=int(message.payload.version.value),
                 shortsha=message.payload.shortsha.value.decode(),
                 flags=message.payload.flags.value,
@@ -307,6 +496,7 @@ def _parse_can_device_info_response(
                     message.payload.revision.revision, message.payload.revision.tertiary
                 ),
                 subidentifier=message.payload.subidentifier.value,
+                ok=(not node.is_bootloader()),
             )
         except (ValueError, UnicodeDecodeError) as e:
             log.error(f"Could not parse DeviceInfoResponse {e}")

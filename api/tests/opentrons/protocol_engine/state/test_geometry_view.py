@@ -30,6 +30,7 @@ from opentrons.protocol_engine.types import (
     CurrentWell,
 )
 from opentrons.protocol_engine.state import move_types
+from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.labware import LabwareView
 from opentrons.protocol_engine.state.modules import ModuleView
 from opentrons.protocol_engine.state.pipettes import PipetteView
@@ -67,6 +68,10 @@ def subject(
 ) -> GeometryView:
     """Get a GeometryView with its store dependencies mocked out."""
     return GeometryView(
+        config=Config(
+            robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
+        ),
         labware_view=labware_view,
         module_view=module_view,
         pipette_view=mock_pipette_view,
@@ -1064,7 +1069,8 @@ def test_get_extra_waypoints(
         )
     ).then_return(should_dodge)
     decoy.when(
-        labware_view.get_slot_center_position(slot=DeckSlotName.SLOT_5)
+        # Assume the subject's Config is for an OT-3, so use an OT-3 slot name.
+        labware_view.get_slot_center_position(slot=DeckSlotName.SLOT_C2)
     ).then_return(Point(x=11, y=22, z=33))
 
     extra_waypoints = subject.get_extra_waypoints("to-labware-id", location)

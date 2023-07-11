@@ -596,12 +596,16 @@ def test_drop_tip_to_well(
 
     decoy.verify(
         mock_instrument_core.drop_tip(
-            location=None, well_core=mock_well._core, home_after=False
+            location=None,
+            well_core=mock_well._core,
+            home_after=False,
+            randomize_drop_location=False,
         ),
         times=1,
     )
 
 
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
 def test_drop_tip_to_trash(
     decoy: Decoy,
     mock_instrument_core: InstrumentCore,
@@ -617,7 +621,35 @@ def test_drop_tip_to_trash(
 
     decoy.verify(
         mock_instrument_core.drop_tip(
-            location=None, well_core=mock_well._core, home_after=None
+            location=None,
+            well_core=mock_well._core,
+            home_after=None,
+            randomize_drop_location=False,
+        ),
+        times=1,
+    )
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
+def test_drop_tip_to_randomized_trash_location(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    mock_trash: Labware,
+    subject: InstrumentContext,
+) -> None:
+    """It should drop a tip in the trash if not given a location ."""
+    mock_well = decoy.mock(cls=Well)
+
+    decoy.when(mock_trash.wells()).then_return([mock_well])
+
+    subject.drop_tip()
+
+    decoy.verify(
+        mock_instrument_core.drop_tip(
+            location=None,
+            well_core=mock_well._core,
+            home_after=None,
+            randomize_drop_location=True,
         ),
         times=1,
     )
@@ -643,7 +675,10 @@ def test_return_tip(
             prep_after=True,
         ),
         mock_instrument_core.drop_tip(
-            location=None, well_core=mock_well._core, home_after=None
+            location=None,
+            well_core=mock_well._core,
+            home_after=None,
+            randomize_drop_location=False,
         ),
     )
 

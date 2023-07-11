@@ -12,10 +12,13 @@ from hardware_testing.protocols import (
     gravimetric_ot3_p1000_multi_50ul_tip,
     gravimetric_ot3_p1000_multi_200ul_tip,
     gravimetric_ot3_p1000_multi_1000ul_tip,
+    photometric_ot3_p1000_96_50ul_tip,
+    photometric_ot3_p1000_96_200ul_tip,
+    photometric_ot3_p1000_96_1000ul_tip,
 )
 
-from . import execute, helpers, workarounds
-from .config import GravimetricConfig, GANTRY_MAX_SPEED
+from . import execute, helpers, workarounds, execute_photometric
+from .config import GravimetricConfig, GANTRY_MAX_SPEED, PhotometricConfig
 from .measurement import DELAY_FOR_MEASUREMENT
 
 LABWARE_OFFSETS: List[dict] = []
@@ -36,6 +39,11 @@ PROTOCOL_CFG = {
             50: gravimetric_ot3_p1000_multi_50ul_tip,
             200: gravimetric_ot3_p1000_multi_200ul_tip,
             1000: gravimetric_ot3_p1000_multi_1000ul_tip,
+        },
+        96: {
+            50: photometric_ot3_p1000_96_50ul_tip,
+            200: photometric_ot3_p1000_96_200ul_tip,
+            1000: photometric_ot3_p1000_96_1000ul_tip,
         },
     },
 }
@@ -83,6 +91,45 @@ def run(
     )
 
 
+def run_pm(
+    protocol: ProtocolContext,
+    pipette_volume: int,
+    tip_volume: int,
+    trials: int,
+    return_tip: bool,
+    blank: bool,
+    mix: bool,
+    inspect: bool,
+    user_volumes: bool,
+    gantry_speed: int,
+    touch_tip: bool,
+) -> None:
+    """Run."""
+    protocol_cfg = PROTOCOL_CFG[pipette_volume][96][tip_volume]
+    execute_photometric.run(
+        protocol,
+        PhotometricConfig(
+            name=protocol_cfg.metadata["protocolName"],  # type: ignore[attr-defined]
+            pipette_mount="left",
+            pipette_volume=pipette_volume,
+            tip_volume=tip_volume,
+            trials=trials,
+            labware_offsets=LABWARE_OFFSETS,
+            photoplate=protocol_cfg.PHOTOPLATE_LABWARE,  # type: ignore[attr-defined]
+            photoplate_slot=protocol_cfg.SLOT_PLATE,  # type: ignore[attr-defined]
+            reservoir=protocol_cfg.RESERVOIR_LABWARE,  # type: ignore[attr-defined]
+            reservoir_slot=protocol_cfg.SLOT_RESERVOIR,  # type: ignore[attr-defined]
+            slots_tiprack=protocol_cfg.SLOTS_TIPRACK[tip_volume],  # type: ignore[attr-defined]
+            return_tip=return_tip,
+            mix=mix,
+            inspect=inspect,
+            user_volumes=user_volumes,
+            gantry_speed=gantry_speed,
+            touch_tip=touch_tip,
+        ),
+    )
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Pipette Testing")
     parser.add_argument("--simulate", action="store_true")
@@ -99,6 +146,8 @@ if __name__ == "__main__":
     parser.add_argument("--user-volumes", action="store_true")
     parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
     parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
+    parser.add_argument("--photometric", action="store_true")
+    parser.add_argument("--touch-tip", action="store_true")
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context
@@ -117,18 +166,42 @@ if __name__ == "__main__":
         _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
         is_simulating=args.simulate,
     )
-    run(
-        _ctx,
-        args.pipette,
-        args.channels,
-        args.tip,
-        args.trials,
-        args.increment,
-        args.return_tip,
-        args.blank,
-        args.mix,
-        args.inspect,
-        args.user_volumes,
-        args.gantry_speed,
-        args.scale_delay,
-    )
+    if args.photometric:
+        _ctx = helpers.get_api_context(
+            _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
+            is_simulating=args.simulate,
+            deck_version="2",
+        )
+        run_pm(
+            _ctx,
+            args.pipette,
+            args.tip,
+            args.trials,
+            args.return_tip,
+            args.blank,
+            args.mix,
+            args.inspect,
+            args.user_volumes,
+            args.gantry_speed,
+            args.touch_tip,
+        )
+    else:
+        _ctx = helpers.get_api_context(
+            _protocol.requirements["apiLevel"],  # type: ignore[attr-defined]
+            is_simulating=args.simulate,
+        )
+        run(
+            _ctx,
+            args.pipette,
+            args.channels,
+            args.tip,
+            args.trials,
+            args.increment,
+            args.return_tip,
+            args.blank,
+            args.mix,
+            args.inspect,
+            args.user_volumes,
+            args.gantry_speed,
+            args.scale_delay,
+        )

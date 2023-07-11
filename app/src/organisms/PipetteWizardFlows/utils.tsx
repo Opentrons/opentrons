@@ -15,8 +15,15 @@ import attachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Attac
 import detachProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_1.webm'
 import detachProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Probe_8.webm'
 
+import attach96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_96.webm'
+import attachPlate96 from '../../assets/videos/pipette-wizard-flows/Pipette_Attach_Plate_96.webm'
+import detach96 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_96.webm'
+import detachPlate96 from '../../assets/videos/pipette-wizard-flows/Pipette_Detach_Plate_96.webm'
+import zAxisAttach96 from '../../assets/videos/pipette-wizard-flows/Pipette_Zaxis_Attach_96.webm'
+import zAxisDetach96 from '../../assets/videos/pipette-wizard-flows/Pipette_Zaxis_Detach_96.webm'
+
 import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
-import type { PipetteWizardStep } from './types'
+import type { PipetteWizardFlow, PipetteWizardStep } from './types'
 
 export function getIsGantryEmpty(
   attachedPipette: AttachedPipettesFromInstrumentsQuery
@@ -90,6 +97,48 @@ export function getPipetteAnimations(
             : sourcePipette
         }
       />
+    </video>
+  )
+}
+
+interface PipetteAnimation96Props {
+  section: PipetteWizardStep['section']
+  flowType: PipetteWizardFlow
+}
+export function getPipetteAnimations96(
+  props: PipetteAnimation96Props
+): JSX.Element {
+  const { section, flowType } = props
+
+  let src = 'unknown src'
+  if (section === SECTIONS.MOUNT_PIPETTE) {
+    src = attach96
+  } else if (section === SECTIONS.MOUNTING_PLATE) {
+    src = flowType === FLOWS.ATTACH ? attachPlate96 : detachPlate96
+  } else if (section === SECTIONS.DETACH_PIPETTE) {
+    src = detach96
+  } else if (section === SECTIONS.CARRIAGE)
+    src = flowType === FLOWS.ATTACH ? zAxisAttach96 : zAxisDetach96
+  //  todo(jr, 5/30/23):add the detach/attach probe assets when they're final!
+  // } else if (section === SECTIONS.ATTACH_PROBE) {
+  //   src =
+  // } else if (section === SECTIONS.DETACH_PROBE) {
+  //   src =
+  // }
+
+  return (
+    <video
+      css={css`
+        padding-top: ${SPACING.spacing4};
+        max-width: 100%;
+        max-height: 12rem;
+      `}
+      autoPlay={true}
+      loop={true}
+      controls={false}
+      data-testid={src}
+    >
+      <source src={src} />
     </video>
   )
 }

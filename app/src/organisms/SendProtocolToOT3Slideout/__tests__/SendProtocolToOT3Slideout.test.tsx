@@ -30,14 +30,18 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
+import { getNetworkInterfaces } from '../../../redux/networking'
 import { getIsProtocolAnalysisInProgress } from '../../../redux/protocol-storage/selectors'
 import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/protocol-storage/__fixtures__'
 import { SendProtocolToOT3Slideout } from '..'
+
+import type { State } from '../../../redux/types'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/ToasterOven')
 jest.mock('../../../redux/buildroot')
 jest.mock('../../../redux/discovery')
+jest.mock('../../../redux/networking')
 jest.mock('../../../redux/protocol-storage/selectors')
 
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
@@ -65,6 +69,9 @@ const mockUseCreateProtocolMutation = useCreateProtocolMutation as jest.MockedFu
 >
 const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as jest.MockedFunction<
   typeof getIsProtocolAnalysisInProgress
+>
+const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
+  typeof getNetworkInterfaces
 >
 
 const render = (
@@ -134,6 +141,9 @@ describe('SendProtocolToOT3Slideout', () => {
       .calledWith(expect.any(Object), expect.any(Object))
       .mockReturnValue({ mutateAsync: mockMutateAsync } as any)
     when(mockMutateAsync).mockImplementation(() => Promise.resolve())
+    when(mockGetNetworkInterfaces)
+      .calledWith({} as State, expect.any(String))
+      .mockReturnValue({ wifi: null, ethernet: null })
   })
   afterEach(() => {
     jest.resetAllMocks()

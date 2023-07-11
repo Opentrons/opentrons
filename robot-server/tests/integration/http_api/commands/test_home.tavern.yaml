@@ -2,23 +2,12 @@ test_name: home standalone command
 
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 
 stages:
-  - name: Delete all runs # Ensure there is no active run
-    request:
-      url: '{host:s}:{port:d}/runs'
-      method: GET
-    response:
-      status_code: 200
-      verify_response_with:
-        - function: 'tests.integration.fixtures:delete_all_runs'
-          extra_kwargs:
-            host: '{host:s}'
-            port: '{port:d}'
   - name: issue home Command params all
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{ot2_server_base_url}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -45,7 +34,7 @@ stages:
           command_id_all: data.id
   - name: issue home Command params empty
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{ot2_server_base_url}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -65,7 +54,7 @@ stages:
           command_id_empty: data.id
   - name: Get command by id
     request:
-      url: '{host:s}:{port:d}/commands/{command_id_empty}'
+      url: '{ot2_server_base_url}/commands/{command_id_empty}'
       method: GET
     response:
       strict:
@@ -77,7 +66,7 @@ stages:
           status: succeeded
   - name: Get commands
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{ot2_server_base_url}/commands'
       method: GET
     response:
       strict:
@@ -89,7 +78,7 @@ stages:
             - id: '{command_id_empty}'
   - name: Create Empty Run
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{ot2_server_base_url}/runs'
       json:
         data: {}
       method: POST
@@ -107,7 +96,7 @@ stages:
           run_id: data.id
   - name: issue home Command
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{ot2_server_base_url}/commands'
       method: POST
       params:
         waitUntilComplete: true

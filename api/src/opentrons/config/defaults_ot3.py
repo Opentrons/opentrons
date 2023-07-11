@@ -77,19 +77,20 @@ DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (40.5, -60.5, 255.675)
 DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (84.55, -12.75, 93.85)
 DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 DEFAULT_SAFE_HOME_DISTANCE: Final = 5
+DEFAULT_CALIBRATION_AXIS_MAX_SPEED: Final = 30
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 500,
-        OT3AxisKind.Y: 375,
+        OT3AxisKind.X: 400,
+        OT3AxisKind.Y: 325,
         OT3AxisKind.Z: 35,
         OT3AxisKind.P: 5,
         OT3AxisKind.Z_G: 50,
         OT3AxisKind.Q: 5.5,
     },
     low_throughput={
-        OT3AxisKind.X: 600,
-        OT3AxisKind.Y: 500,
+        OT3AxisKind.X: 400,
+        OT3AxisKind.Y: 325,
         OT3AxisKind.Z: 100,
         OT3AxisKind.P: 45,
         OT3AxisKind.Z_G: 50,
@@ -98,17 +99,17 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 1000,
-        OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 120,
+        OT3AxisKind.X: 800,
+        OT3AxisKind.Y: 500,
+        OT3AxisKind.Z: 150,
         OT3AxisKind.P: 30,
         OT3AxisKind.Z_G: 150,
         OT3AxisKind.Q: 10,
     },
     low_throughput={
-        OT3AxisKind.X: 1600,
-        OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 300,
+        OT3AxisKind.X: 800,
+        OT3AxisKind.Y: 600,
+        OT3AxisKind.Z: 150,
         OT3AxisKind.P: 100,
         OT3AxisKind.Z_G: 150,
     },
@@ -174,17 +175,17 @@ DEFAULT_HOLD_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLo
 
 DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 1.4,
+        OT3AxisKind.X: 1.25,
         OT3AxisKind.Y: 1.4,
-        OT3AxisKind.Z: 1.4,
+        OT3AxisKind.Z: 1.5,
         OT3AxisKind.P: 2.2,
         OT3AxisKind.Z_G: 0.67,
         OT3AxisKind.Q: 1.5,
     },
     low_throughput={
-        OT3AxisKind.X: 1.4,
-        OT3AxisKind.Y: 1.4,
-        OT3AxisKind.Z: 1.4,
+        OT3AxisKind.X: 1.25,
+        OT3AxisKind.Y: 1.25,
+        OT3AxisKind.Z: 1.0,
         # TODO: verify this value
         OT3AxisKind.P: 1.0,
         OT3AxisKind.Z_G: 0.67,

@@ -34,8 +34,7 @@ describe('TitleHeader', () => {
 
   it('should call a mock function when tapping back button', () => {
     const [{ getByTestId }] = render(props)
-    const button = getByTestId('Ethernet_header_back_button')
-    button.click()
+    getByTestId('Ethernet_header_back_button').click()
     expect(mockPush).toHaveBeenCalledWith('/network-setup')
   })
 })

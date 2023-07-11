@@ -13,10 +13,7 @@ from .adapters import SynchronousAdapter
 from .api import API
 from .pause_manager import PauseManager
 from .backends import Controller, Simulator
-from .types import (
-    CriticalPoint,
-    ExecutionState,
-)
+from .types import CriticalPoint, ExecutionState, Axis, OT3Axis
 from .errors import ExecutionCancelledError, NoTipAttachedError, TipAttachedError
 from .constants import DROP_TIP_RELEASE_DISTANCE
 from .thread_manager import ThreadManager
@@ -33,8 +30,8 @@ from .robot_calibration import RobotCalibration
 # and 2. how to properly export an ot2 and ot3 pipette.
 from .instruments.ot2.pipette import Pipette
 
-OT2HardwareControlAPI = HardwareControlInterface[RobotCalibration]
-OT3HardwareControlAPI = HardwareControlInterface[OT3Transforms]
+OT2HardwareControlAPI = HardwareControlInterface[RobotCalibration, Axis]
+OT3HardwareControlAPI = HardwareControlInterface[OT3Transforms, OT3Axis]
 HardwareControlAPI = Union[OT2HardwareControlAPI, OT3HardwareControlAPI]
 
 ThreadManagedHardware = ThreadManager[HardwareControlAPI]

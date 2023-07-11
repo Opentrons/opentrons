@@ -4,7 +4,7 @@ from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons.hardware_control.types import OT3Axis
 
 
-def test_create_step():
+def test_create_step() -> None:
     origin = {
         OT3Axis.X: 0,
         OT3Axis.Y: 0,
@@ -27,13 +27,7 @@ def test_create_step():
         assert set(present_nodes) == set(step.keys())
 
 
-def test_nodeid_filter_probed_core():
-    assert ot3utils.filter_probed_core_nodes(
-        set([NodeId.gantry_x, NodeId.pipette_left]), set([NodeId.gantry_y])
-    ) == set([NodeId.gantry_y, NodeId.pipette_left])
-
-
-def test_nodeid_replace_head():
+def test_nodeid_replace_head() -> None:
     assert ot3utils.replace_head_node(set([NodeId.head, NodeId.gantry_x])) == set(
         [NodeId.head_l, NodeId.head_r, NodeId.gantry_x]
     )
@@ -41,7 +35,7 @@ def test_nodeid_replace_head():
     assert ot3utils.replace_head_node(set([NodeId.head_l])) == set([NodeId.head_l])
 
 
-def test_nodeid_replace_gripper():
+def test_nodeid_replace_gripper() -> None:
     assert ot3utils.replace_gripper_node(set([NodeId.gripper, NodeId.head])) == set(
         [NodeId.gripper_g, NodeId.gripper_z, NodeId.head]
     )

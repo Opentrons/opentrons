@@ -42,12 +42,12 @@ const TableDatum = styled('td')`
   white-space: break-spaces;
   text-overflow: ${WRAP};
   &:first-child {
-    border-top-left-radius: ${BORDERS.size4};
-    border-bottom-left-radius: ${BORDERS.size4};
+    border-top-left-radius: ${BORDERS.borderRadiusSize4};
+    border-bottom-left-radius: ${BORDERS.borderRadiusSize4};
   }
   &:last-child {
-    border-top-right-radius: ${BORDERS.size4};
-    border-bottom-right-radius: ${BORDERS.size4};
+    border-top-right-radius: ${BORDERS.borderRadiusSize4};
+    border-bottom-right-radius: ${BORDERS.borderRadiusSize4};
   }
 `
 

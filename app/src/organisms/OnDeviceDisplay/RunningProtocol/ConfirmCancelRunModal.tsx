@@ -83,7 +83,7 @@ export function ConfirmCancelRunModal({
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing12}
-          paddingBottom={SPACING.spacing40}
+          paddingBottom={SPACING.spacing32}
           paddingTop={`${isActiveRun ? SPACING.spacing32 : '0'}`}
         >
           <StyledText as="p">{t('cancel_run_alert_info')}</StyledText>

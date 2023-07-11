@@ -82,7 +82,7 @@ export function RunFailedModal({
             overflowY="scroll"
             maxHeight="5.375rem"
           >
-            {errors.map(error => (
+            {errors?.map(error => (
               <StyledText
                 as="p"
                 key={error.id}

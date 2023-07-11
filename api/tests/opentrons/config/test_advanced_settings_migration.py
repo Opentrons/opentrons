@@ -7,7 +7,7 @@ from opentrons.config.advanced_settings import _migrate, _ensure
 
 @pytest.fixture
 def migrated_file_version() -> int:
-    return 25
+    return 26
 
 
 # make sure to set a boolean value in default_file_settings only if
@@ -25,6 +25,7 @@ def default_file_settings() -> Dict[str, Any]:
         "enableOT3HardwareController": None,
         "rearPanelIntegration": True,
         "disableStallDetection": None,
+        "disableStatusBar": None,
     }
 
 
@@ -307,6 +308,18 @@ def v25_config(v24_config: Dict[str, Any]) -> Dict[str, Any]:
     return r
 
 
+@pytest.fixture
+def v26_config(v25_config: Dict[str, Any]) -> Dict[str, Any]:
+    r = v25_config.copy()
+    r.update(
+        {
+            "_version": 26,
+            "disableStatusBar": None,
+        }
+    )
+    return r
+
+
 @pytest.fixture(
     scope="session",
     params=[
@@ -337,6 +350,7 @@ def v25_config(v24_config: Dict[str, Any]) -> Dict[str, Any]:
         lazy_fixture("v23_config"),
         lazy_fixture("v24_config"),
         lazy_fixture("v25_config"),
+        lazy_fixture("v26_config"),
     ],
 )
 def old_settings(request: pytest.FixtureRequest) -> Dict[str, Any]:
@@ -425,4 +439,5 @@ def test_ensures_config() -> None:
         "enableOT3HardwareController": None,
         "rearPanelIntegration": None,
         "disableStallDetection": None,
+        "disableStatusBar": None,
     }

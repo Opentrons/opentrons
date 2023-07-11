@@ -65,11 +65,19 @@ wheel: $(wheel_file)
 
 .PHONY: test
 test:
+	$(MAKE) apply-patches-gravimetric
 	$(pytest) $(tests) $(test_opts)
 
 .PHONY: test-cov
 test-cov:
+	$(MAKE) apply-patches-gravimetric
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
+
+.PHONY: test-photometric
+test-photometric:
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 50 --trials 1
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 200 --trials 1
+	$(python) -m hardware_testing.gravimetric --photometric --simulate --pipette 1000 --channels 96 --tip 1000 --trials 1
 
 .PHONY: test-gravimetric-single
 test-gravimetric-single:
@@ -88,7 +96,7 @@ test-gravimetric-multi:
 	$(python) -m hardware_testing.gravimetric --simulate --pipette 1000 --channels 8 --tip 50 --trials 1
 
 .PHONY: test-gravimetric
-test-gravimetric: patch-for-gravimetric test-gravimetric-single test-gravimetric-multi
+test-gravimetric: apply-patches-gravimetric test-gravimetric-single test-gravimetric-multi
 
 .PHONY: test-production-qc
 test-production-qc:
@@ -115,9 +123,11 @@ test-integration: test-production-qc test-examples test-scripts test-gravimetric
 
 .PHONY: lint
 lint:
+	$(MAKE) apply-patches-gravimetric
 	$(python) -m mypy hardware_testing tests
 	$(python) -m black --check hardware_testing tests setup.py
 	$(python) -m flake8 hardware_testing tests setup.py
+	$(MAKE) remove-patches-gravimetric
 
 .PHONY: format
 format:
@@ -224,22 +234,26 @@ sync-ot3: sync-sw-ot3 sync-fw-ot3
 
 .PHONY: push-ot3-gravimetric
 push-ot3-gravimetric:
-	-$(MAKE) patch-for-gravimetric
+	-$(MAKE) apply-patches-gravimetric
 	$(MAKE) sync-sw-ot3
 
 .PHONY: apply-patches-gravimetric
-patch-for-gravimetric:
+apply-patches-gravimetric:
 	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --allow-empty
 
 .PHONY: remove-patches-gravimetric
-unpatch-for-gravimetric:
+remove-patches-gravimetric:
 	cd ../ && git apply ./hardware-testing/hardware_testing/gravimetric/overrides/*.patch --reverse --allow-empty
 
 .PHONY: update-patches-gravimetric
-gen-patches-for-gravimetric:
+update-patches-gravimetric:
 	rm ./hardware_testing/gravimetric/overrides/*.patch
 	cd ../ && git diff origin/edge ./hardware/** > ./hardware-testing/hardware_testing/gravimetric/overrides/hardware.patch
 	cd ../ && git diff origin/edge ./api/** > ./hardware-testing/hardware_testing/gravimetric/overrides/api.patch
 	cd ../ && git diff origin/edge ./shared-data/** > ./hardware-testing/hardware_testing/gravimetric/overrides/shared-data.patch
 	cd ../ && git diff origin/edge ./robot-server/** > ./hardware-testing/hardware_testing/gravimetric/overrides/robot-server.patch
 	$(MAKE) remove-patches-gravimetric
+
+.PHONY: push-photometric-ot2
+push-photometric-ot2:
+	scp -r -O photometric-ot2/photometric_ot2 root@$(host):/data/user_storage

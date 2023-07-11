@@ -3,6 +3,8 @@ import enum
 from math import sqrt, isclose
 from typing import TYPE_CHECKING, Any, NamedTuple, Iterable, Union, List
 
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from .protocols.api_support.labware_like import LabwareLike
 
 if TYPE_CHECKING:
@@ -217,33 +219,13 @@ class OT3MountType(str, enum.Enum):
     GRIPPER = "gripper"
 
 
-DECK_COORDINATE_TO_SLOT_NAME = {
-    "D1": "1",
-    "D2": "2",
-    "D3": "3",
-    "C1": "4",
-    "C2": "5",
-    "C3": "6",
-    "B1": "7",
-    "B2": "8",
-    "B3": "9",
-    "A1": "10",
-    "A2": "11",
-    "A3": "12",
-}
-
-DECK_SLOT_NAME_TO_COORDINATE = {
-    slot_name: coordinate
-    for coordinate, slot_name in DECK_COORDINATE_TO_SLOT_NAME.items()
-}
-
-
 # TODO(mc, 2020-11-09): this makes sense in shared-data or other common
 # model library
 # https://github.com/Opentrons/opentrons/pull/6943#discussion_r519029833
 class DeckSlotName(enum.Enum):
     """Deck slot identifiers."""
 
+    # OT-2:
     SLOT_1 = "1"
     SLOT_2 = "2"
     SLOT_3 = "3"
@@ -257,18 +239,64 @@ class DeckSlotName(enum.Enum):
     SLOT_11 = "11"
     FIXED_TRASH = "12"
 
+    # OT-3:
+    SLOT_A1 = "A1"
+    SLOT_A2 = "A2"
+    SLOT_A3 = "A3"
+    SLOT_B1 = "B1"
+    SLOT_B2 = "B2"
+    SLOT_B3 = "B3"
+    SLOT_C1 = "C1"
+    SLOT_C2 = "C2"
+    SLOT_C3 = "C3"
+    SLOT_D1 = "D1"
+    SLOT_D2 = "D2"
+    SLOT_D3 = "D3"
+
     @classmethod
     def from_primitive(cls, value: DeckLocation) -> DeckSlotName:
         str_val = str(value).upper()
-        if str_val in DECK_COORDINATE_TO_SLOT_NAME:
-            str_val = DECK_COORDINATE_TO_SLOT_NAME[str_val]
         return cls(str_val)
 
+    # TODO(mm, 2023-05-08):
+    # Migrate callers off of this method. https://opentrons.atlassian.net/browse/RLAB-345
     def as_int(self) -> int:
-        return int(self.value)
+        """Return this deck slot as an OT-2-style integer.
 
-    def as_coordinate(self) -> str:
-        return DECK_SLOT_NAME_TO_COORDINATE[self.value]
+        For example, `SLOT_5.as_int()` and `SLOT_C2.as_int()` are both `5`.
+
+        Deprecated:
+            This will not make sense when the OT-3 has staging area slots.
+        """
+        return int(self.to_ot2_equivalent().value)
+
+    def to_ot2_equivalent(self) -> DeckSlotName:
+        """Return the OT-2 deck slot that's in the same place as this one.
+
+        For example, `SLOT_C2.to_ot3_equivalent()` is `SLOT_5`.
+
+        If this is already an OT-2 deck slot, returns itself.
+        """
+        return _ot3_to_ot2.get(self, self)
+
+    def to_ot3_equivalent(self) -> DeckSlotName:
+        """Return the OT-3 deck slot that's in the same place as this one.
+
+        For example, `SLOT_5.to_ot3_equivalent()` is `SLOT_C2`.
+
+        If this is already an OT-3 deck slot, returns itself.
+        """
+        return _ot2_to_ot3.get(self, self)
+
+    def to_equivalent_for_robot_type(self, robot_type: RobotType) -> DeckSlotName:
+        """Return the deck slot, for the given robot type, that's in the same place as this one.
+
+        See `to_ot2_equivalent()` and `to_ot3_equivalent()`.
+        """
+        if robot_type == "OT-2 Standard":
+            return self.to_ot2_equivalent()
+        elif robot_type == "OT-3 Standard":
+            return self.to_ot3_equivalent()
 
     @property
     def id(self) -> str:
@@ -286,6 +314,27 @@ class DeckSlotName(enum.Enum):
         For explicitness, prefer using `.id` instead.
         """
         return self.id
+
+
+# fmt: off
+_slot_equivalencies = [
+    (DeckSlotName.SLOT_1,      DeckSlotName.SLOT_D1),
+    (DeckSlotName.SLOT_2,      DeckSlotName.SLOT_D2),
+    (DeckSlotName.SLOT_3,      DeckSlotName.SLOT_D3),
+    (DeckSlotName.SLOT_4,      DeckSlotName.SLOT_C1),
+    (DeckSlotName.SLOT_5,      DeckSlotName.SLOT_C2),
+    (DeckSlotName.SLOT_6,      DeckSlotName.SLOT_C3),
+    (DeckSlotName.SLOT_7,      DeckSlotName.SLOT_B1),
+    (DeckSlotName.SLOT_8,      DeckSlotName.SLOT_B2),
+    (DeckSlotName.SLOT_9,      DeckSlotName.SLOT_B3),
+    (DeckSlotName.SLOT_10,     DeckSlotName.SLOT_A1),
+    (DeckSlotName.SLOT_11,     DeckSlotName.SLOT_A2),
+    (DeckSlotName.FIXED_TRASH, DeckSlotName.SLOT_A3),
+]
+# fmt: on
+
+_ot2_to_ot3 = {ot2: ot3 for ot2, ot3 in _slot_equivalencies}
+_ot3_to_ot2 = {ot3: ot2 for ot2, ot3 in _slot_equivalencies}
 
 
 class TransferTipPolicy(enum.Enum):

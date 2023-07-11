@@ -123,7 +123,9 @@ class ProtocolContext(CommandPublisher):
         self._api_version = api_version
         self._core = core
         self._core_map = core_map or LoadedCoreMap()
-        self._deck = deck or Deck(protocol_core=core, core_map=self._core_map)
+        self._deck = deck or Deck(
+            protocol_core=core, core_map=self._core_map, api_version=api_version
+        )
 
         # With the introduction of Extension mount type, this dict initializes to include
         # the extension mount, for both ot2 & 3. While it doesn't seem like it would
@@ -337,7 +339,7 @@ class ProtocolContext(CommandPublisher):
             leave this unspecified to let the implementation choose a good default.
         """
         load_name = validation.ensure_lowercase_name(load_name)
-        deck_slot = validation.ensure_deck_slot(location)
+        deck_slot = validation.ensure_deck_slot(location, self._api_version)
 
         labware_core = self._core.load_labware(
             load_name=load_name,
@@ -459,7 +461,7 @@ class ProtocolContext(CommandPublisher):
         elif isinstance(new_location, OffDeckType):
             location = new_location
         else:
-            location = validation.ensure_deck_slot(new_location)
+            location = validation.ensure_deck_slot(new_location, self._api_version)
 
         _pick_up_offset = (
             validation.ensure_valid_labware_offset_vector(pick_up_offset)
@@ -544,7 +546,11 @@ class ProtocolContext(CommandPublisher):
                 f"Module of type {module_name} is only available in versions 2.15 and above."
             )
 
-        deck_slot = None if location is None else validation.ensure_deck_slot(location)
+        deck_slot = (
+            None
+            if location is None
+            else validation.ensure_deck_slot(location, self._api_version)
+        )
 
         module_core = self._core.load_module(
             model=requested_model,

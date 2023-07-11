@@ -9,7 +9,9 @@ import {
 } from '@opentrons/components'
 import {
   getPipetteNameSpecs,
+  LEFT,
   LoadedPipette,
+  MotorAxis,
   NINETY_SIX_CHANNEL,
 } from '@opentrons/shared-data'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
@@ -46,6 +48,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
     hasCalData,
     isRobotMoving,
     requiredPipette,
+    setShowErrorMessage,
   } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const pipetteName =
@@ -103,6 +106,9 @@ export const Results = (props: ResultsProps): JSX.Element => {
         isSuccess = false
       } else {
         header = i18n.format(t('pipette_detached'), 'capitalize')
+        if (requiredPipette != null) {
+          buttonText = t('attach_pip')
+        }
         if (selectedPipette === NINETY_SIX_CHANNEL) {
           if (currentStepIndex === totalStepCount) {
             header = t('ninety_six_detached_success', {
@@ -127,13 +133,26 @@ export const Results = (props: ResultsProps): JSX.Element => {
       flowType === FLOWS.ATTACH &&
       currentStepIndex !== totalStepCount
     ) {
-      const axis = mount === 'left' ? 'leftPlunger' : 'rightPlunger'
+      let axes: MotorAxis = mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
+      // TODO: (sb)5/25/23 Stop homing leftZ for 96 once motor is disabled
+      if (attachedPipettes[mount]?.instrumentName === 'p1000_96') {
+        axes = ['leftPlunger', 'leftZ']
+      }
       chainRunCommands(
         [
           {
+            commandType: 'loadPipette' as const,
+            params: {
+              // @ts-expect-error pipetteName is required but missing in schema v6 type
+              pipetteName: attachedPipettes[mount]?.instrumentName,
+              pipetteId: attachedPipettes[mount]?.serialNumber,
+              mount: mount,
+            },
+          },
+          {
             commandType: 'home' as const,
             params: {
-              axes: [axis],
+              axes: axes,
             },
           },
           {
@@ -144,10 +163,37 @@ export const Results = (props: ResultsProps): JSX.Element => {
             },
           },
         ],
-        true
-      ).then(() => {
-        proceed()
-      })
+        false
+      )
+        .then(() => {
+          proceed()
+        })
+        .catch(error => {
+          setShowErrorMessage(error.message)
+        })
+    } else if (
+      isSuccess &&
+      flowType === FLOWS.DETACH &&
+      currentStepIndex !== totalStepCount
+    ) {
+      chainRunCommands(
+        [
+          {
+            // @ts-expect-error calibration type not yet supported
+            commandType: 'calibration/moveToMaintenancePosition' as const,
+            params: {
+              mount: mount,
+            },
+          },
+        ],
+        false
+      )
+        .then(() => {
+          proceed()
+        })
+        .catch(error => {
+          setShowErrorMessage(error.message)
+        })
     } else {
       proceed()
     }

@@ -2,23 +2,12 @@ test_name: temperatureModuleV1 standalone commands
 
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 
 stages:
-  - name: Delete all runs # Ensure there is no active run
-    request:
-      url: '{host:s}:{port:d}/runs'
-      method: GET
-    response:
-      status_code: 200
-      verify_response_with:
-        - function: 'tests.integration.fixtures:delete_all_runs'
-          extra_kwargs:
-            host: '{host:s}'
-            port: '{port:d}'
   - name: Get tempModule id
     request:
-      url: '{host:s}:{port:d}/modules'
+      url: '{ot2_server_base_url}/modules'
       method: GET
     response:
       status_code: 200
@@ -29,7 +18,7 @@ stages:
             module_model: temperatureModuleV1
   - name: issue temperatureModule/setTargetTemperature Command
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{ot2_server_base_url}/commands'
       method: POST
       params: # on simulations will return immediately
         waitUntilComplete: true
@@ -51,7 +40,7 @@ stages:
           command_id_set_temp: data.id
   - name: issue temperatureModule/setTargetTemperature Command with error
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{ot2_server_base_url}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -80,7 +69,7 @@ stages:
           command_id_set_temp_error: data.id
   - name: issue temperatureModule/deactivate Command
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{ot2_server_base_url}/commands'
       method: POST
       params:
         waitUntilComplete: true
@@ -101,7 +90,7 @@ stages:
           command_id_deactivate: data.id
   - name: Get command by id
     request:
-      url: '{host:s}:{port:d}/commands/{command_id_set_temp}'
+      url: '{ot2_server_base_url}/commands/{command_id_set_temp}'
       method: GET
     response:
       strict:
@@ -113,7 +102,7 @@ stages:
           status: succeeded
   - name: Get commands
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{ot2_server_base_url}/commands'
       method: GET
     response:
       strict:
@@ -126,7 +115,7 @@ stages:
           - id: '{command_id_deactivate}'
   - name: Create Empty Run
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{ot2_server_base_url}/runs'
       json:
         data: {}
       method: POST
@@ -144,7 +133,7 @@ stages:
           run_id: data.id
   - name: issue temperatureModule/setTargetTemperature Command
     request:
-      url: '{host:s}:{port:d}/commands'
+      url: '{ot2_server_base_url}/commands'
       method: POST
       params:
         waitUntilComplete: true

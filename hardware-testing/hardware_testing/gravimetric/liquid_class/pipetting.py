@@ -1,9 +1,6 @@
 """Pipette motions."""
 from dataclasses import dataclass
-from math import pi
 from typing import Optional, Callable, Tuple
-
-from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 
 from opentrons.protocol_api import InstrumentContext, ProtocolContext
 from opentrons.protocol_api.labware import Well
@@ -159,32 +156,18 @@ def _pipette_with_liquid_settings(
     blank: bool = True,
     inspect: bool = False,
     mix: bool = False,
+    added_blow_out: bool = True,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
     _check_aspirate_dispense_args(aspirate, dispense)
 
     def _dispense_with_added_blow_out() -> None:
         # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
-        # TODO: if P50 has droplets inside the tip after dispense with a full blow-out,
-        #       try increasing the blow-out volume by raising the "bottom" plunger position
         # FIXME: this is a hack, until there's an equivalent `pipette.blow_out(location, volume)`
+        pipette.flow_rate.blow_out = liquid_class.dispense.flow_rate
         hw_api = ctx._core.get_hardware()
         hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
-        pip = hw_api.hardware_pipettes[hw_mount.to_mount()]
-        assert pip is not None
-        shaft_diameter = 4.5 if pipette.max_volume >= 1000 else 1
-        ul_per_mm = pi * pow(shaft_diameter / 2, 2)
-        dist_mm = liquid_class.aspirate.air_gap.leading_air_gap / ul_per_mm
-        target_pos = target_position_from_plunger(
-            hw_mount, pip.plunger_positions.bottom + dist_mm, hw_api._current_position
-        )
-        hw_api._move(
-            target_pos,
-            speed=pipette.flow_rate.dispense / ul_per_mm,
-            home_flagged_axes=False,
-        )
-        pip.set_current_volume(0)
-        pip.ready_to_aspirate = False
+        hw_api.blow_out(hw_mount, liquid_class.aspirate.air_gap.leading_air_gap)
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:
     #  1. APPROACH
@@ -216,6 +199,7 @@ def _pipette_with_liquid_settings(
         # set plunger speeds
         pipette.flow_rate.aspirate = liquid_class.aspirate.flow_rate
         pipette.flow_rate.dispense = liquid_class.dispense.flow_rate
+        pipette.flow_rate.blow_out = liquid_class.dispense.flow_rate
         # Note: Here, we previously would aspirate some air, to account for the leading-air-gap.
         #       However, we can instead use the already-present air between the pipette's
         #       "bottom" and "blow-out" plunger positions. This would require the `pipette.blow_out`
@@ -256,7 +240,10 @@ def _pipette_with_liquid_settings(
 
     def _dispense_on_submerge() -> None:
         callbacks.on_dispensing()
-        _dispense_with_added_blow_out()
+        if added_blow_out:
+            _dispense_with_added_blow_out()
+        else:
+            pipette.dispense(dispense)
         # update liquid-height tracker
         liquid_tracker.update_affected_wells(
             well, dispense=dispense, channels=channel_count
@@ -268,8 +255,17 @@ def _pipette_with_liquid_settings(
     def _dispense_on_retract() -> None:
         # blow-out any remaining air in pipette (any reason why not?)
         callbacks.on_blowing_out()
-        _do_user_pause(ctx, inspect, "about to blow-out")
-        pipette.blow_out()
+        if added_blow_out:
+            _do_user_pause(ctx, inspect, "about to blow-out")
+            # FIXME: using the HW-API to specify that we want to blow-out the full
+            #        available blow-out volume
+            hw_api = ctx._core.get_hardware()
+            hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
+            # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
+            max_blow_out_volume = 79.5 if pipette.max_volume >= 1000 else 3.9
+            hw_api.blow_out(hw_mount, max_blow_out_volume)
+        else:
+            pipette.aspirate(liquid_class.aspirate.air_gap.trailing_air_gap)
 
     # PHASE 1: APPROACH
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
@@ -337,6 +333,7 @@ def dispense_with_liquid_class(
     blank: bool = False,
     inspect: bool = False,
     mix: bool = False,
+    added_blow_out: bool = True,
 ) -> None:
     """Dispense with liquid class."""
     liquid_class = get_liquid_class(
@@ -355,4 +352,5 @@ def dispense_with_liquid_class(
         blank=blank,
         inspect=inspect,
         mix=mix,
+        added_blow_out=added_blow_out,
     )

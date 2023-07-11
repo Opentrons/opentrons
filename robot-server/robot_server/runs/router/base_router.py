@@ -6,7 +6,7 @@ import logging
 from datetime import datetime
 from textwrap import dedent
 from typing import Optional, Union
-from typing_extensions import Literal, Final
+from typing_extensions import Literal
 
 from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
@@ -41,8 +41,6 @@ from ..dependencies import get_run_data_manager, get_run_auto_deleter
 
 log = logging.getLogger(__name__)
 base_router = APIRouter()
-
-_DEFAULT_RUNS_LIST_LENGTH: Final = 20
 
 
 class RunNotFound(ErrorDetails):

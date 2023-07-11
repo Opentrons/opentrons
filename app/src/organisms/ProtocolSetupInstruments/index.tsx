@@ -33,7 +33,7 @@ export function ProtocolSetupInstruments({
   setSetupScreen,
 }: ProtocolSetupInstrumentsProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
-  const { data: attachedInstruments } = useInstrumentsQuery()
+  const { data: attachedInstruments, refetch } = useInstrumentsQuery()
   const {
     data: allPipettesCalibrationData,
   } = useAllPipetteOffsetCalibrationsQuery()
@@ -93,6 +93,7 @@ export function ProtocolSetupInstruments({
                   ) ?? null
                 : null
             }
+            instrumentsRefetch={refetch}
           />
         )
       })}
@@ -114,7 +115,7 @@ export function ProtocolSetupInstruments({
 const ColumnLabel = styled.p`
   flex: 1;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  font-size: ${TYPOGRAPHY.fontWeightSemiBold};
+  font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   color: ${COLORS.darkBlack70};
 `

@@ -172,7 +172,7 @@ export const RobotOverviewOverflowMenu = (
               robot.name
             )}`}
           >
-            {t('home_gantry')}
+            {t('home_robot_arm')}
           </MenuItem>
           {robot.status === CONNECTABLE ? (
             <MenuItem

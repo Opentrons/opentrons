@@ -331,44 +331,6 @@ export function AdvancedSettings(): JSX.Element {
           }
         </Flex>
         <Divider marginY={SPACING.spacing24} />
-        <Box>
-          <StyledText
-            css={TYPOGRAPHY.h3SemiBold}
-            paddingBottom={SPACING.spacing8}
-            id="AdvancedSettings_tipLengthCalibration"
-          >
-            {t('tip_length_cal_method')}
-          </StyledText>
-          <RadioGroup
-            useBlueChecked
-            css={css`
-              ${TYPOGRAPHY.pRegular}
-              line-height: ${TYPOGRAPHY.lineHeight20};
-            `}
-            value={
-              useTrashSurfaceForTipCal === true
-                ? ALWAYS_TRASH
-                : useTrashSurfaceForTipCal === false
-                ? ALWAYS_BLOCK
-                : ALWAYS_PROMPT
-            }
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              // you know this is a limited-selection field whose values are only
-              // the elements of BlockSelection; i know this is a limited-selection
-              // field whose values are only the elements of BlockSelection; but sadly,
-              // neither of us can get Flow to know it
-              handleUseTrashSelection(
-                event.currentTarget.value as BlockSelection
-              )
-            }}
-            options={[
-              { name: t('cal_block'), value: ALWAYS_BLOCK },
-              { name: t('trash_bin'), value: ALWAYS_TRASH },
-              { name: t('prompt'), value: ALWAYS_PROMPT },
-            ]}
-          />
-        </Box>
-        <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Box width="70%">
             <StyledText
@@ -425,82 +387,6 @@ export function AdvancedSettings(): JSX.Element {
           >
             {t('clear_robots_button')}
           </TertiaryButton>
-        </Flex>
-        <Divider marginY={SPACING.spacing24} />
-        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Box>
-            <StyledText
-              css={TYPOGRAPHY.h3SemiBold}
-              paddingBottom={SPACING.spacing8}
-              id="AdvancedSettings_u2eInformation"
-            >
-              {t('usb_to_ethernet_adapter_info')}
-            </StyledText>
-            <StyledText as="p">
-              {t('usb_to_ethernet_adapter_info_description')}
-            </StyledText>
-            {driverOutdated && (
-              <Banner type="warning" marginTop={SPACING.spacing16}>
-                <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
-                  <StyledText as="p" color={COLORS.darkBlackEnabled}>
-                    {t('usb_to_ethernet_adapter_toast_message')}
-                  </StyledText>
-                  <Link
-                    external
-                    href={REALTEK_URL}
-                    css={TYPOGRAPHY.pRegular}
-                    color={COLORS.darkBlackEnabled}
-                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
-                    id="AdvancedSettings_realtekLink"
-                  >
-                    {t('usb_to_ethernet_adapter_link')}
-                  </Link>
-                </Flex>
-              </Banner>
-            )}
-            {device === null ? (
-              <StyledText as="p" marginTop={SPACING.spacing16}>
-                {t('usb_to_ethernet_not_connected')}
-              </StyledText>
-            ) : (
-              <Flex
-                justifyContent={JUSTIFY_SPACE_BETWEEN}
-                marginTop={SPACING.spacing16}
-              >
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacing16}
-                >
-                  <StyledText css={TYPOGRAPHY.pSemiBold}>
-                    {t('usb_to_ethernet_adapter_description')}
-                  </StyledText>
-                  <StyledText as="p">{device?.deviceName}</StyledText>
-                </Flex>
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacing16}
-                >
-                  <StyledText css={TYPOGRAPHY.pSemiBold}>
-                    {t('usb_to_ethernet_adapter_manufacturer')}
-                  </StyledText>
-                  <StyledText as="p">{device?.manufacturer}</StyledText>
-                </Flex>
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  paddingRight={SPACING.spacing16}
-                >
-                  <StyledText css={TYPOGRAPHY.pSemiBold}>
-                    {t('usb_to_ethernet_adapter_driver_version')}
-                  </StyledText>
-                  <StyledText as="p">
-                    {device?.windowsDriverVersion
-                      ? device.windowsDriverVersion
-                      : t('usb_to_ethernet_adapter_no_driver_version')}
-                  </StyledText>
-                </Flex>
-              </Flex>
-            )}
-          </Box>
         </Flex>
         <Divider marginY={SPACING.spacing24} />
         <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -652,6 +538,127 @@ export function AdvancedSettings(): JSX.Element {
             onClick={toggleDevtools}
             id="AdvancedSettings_devTooltoggle"
           />
+        </Flex>
+        <Divider marginY={SPACING.spacing24} />
+        <StyledText
+          css={TYPOGRAPHY.h3SemiBold}
+          paddingBottom={SPACING.spacing24}
+          id="OT-2_Advanced_Settings"
+        >
+          {t('ot2_advanced_settings')}
+        </StyledText>
+        <Box>
+          <StyledText
+            css={TYPOGRAPHY.h3SemiBold}
+            paddingBottom={SPACING.spacing8}
+            id="AdvancedSettings_tipLengthCalibration"
+          >
+            {t('tip_length_cal_method')}
+          </StyledText>
+          <RadioGroup
+            useBlueChecked
+            css={css`
+              ${TYPOGRAPHY.pRegular}
+              line-height: ${TYPOGRAPHY.lineHeight20};
+            `}
+            value={
+              useTrashSurfaceForTipCal === true
+                ? ALWAYS_TRASH
+                : useTrashSurfaceForTipCal === false
+                ? ALWAYS_BLOCK
+                : ALWAYS_PROMPT
+            }
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              // you know this is a limited-selection field whose values are only
+              // the elements of BlockSelection; i know this is a limited-selection
+              // field whose values are only the elements of BlockSelection; but sadly,
+              // neither of us can get Flow to know it
+              handleUseTrashSelection(
+                event.currentTarget.value as BlockSelection
+              )
+            }}
+            options={[
+              { name: t('cal_block'), value: ALWAYS_BLOCK },
+              { name: t('trash_bin'), value: ALWAYS_TRASH },
+              { name: t('prompt'), value: ALWAYS_PROMPT },
+            ]}
+          />
+        </Box>
+        <Divider marginY={SPACING.spacing24} />
+        <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
+          <Box>
+            <StyledText
+              css={TYPOGRAPHY.h3SemiBold}
+              paddingBottom={SPACING.spacing8}
+              id="AdvancedSettings_u2eInformation"
+            >
+              {t('usb_to_ethernet_adapter_info')}
+            </StyledText>
+            <StyledText as="p">
+              {t('usb_to_ethernet_adapter_info_description')}
+            </StyledText>
+            {driverOutdated && (
+              <Banner type="warning" marginTop={SPACING.spacing16}>
+                <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
+                  <StyledText as="p" color={COLORS.darkBlackEnabled}>
+                    {t('usb_to_ethernet_adapter_toast_message')}
+                  </StyledText>
+                  <Link
+                    external
+                    href={REALTEK_URL}
+                    css={TYPOGRAPHY.pRegular}
+                    color={COLORS.darkBlackEnabled}
+                    textDecoration={TYPOGRAPHY.textDecorationUnderline}
+                    id="AdvancedSettings_realtekLink"
+                  >
+                    {t('usb_to_ethernet_adapter_link')}
+                  </Link>
+                </Flex>
+              </Banner>
+            )}
+            {device === null ? (
+              <StyledText as="p" marginTop={SPACING.spacing16}>
+                {t('usb_to_ethernet_not_connected')}
+              </StyledText>
+            ) : (
+              <Flex
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                marginTop={SPACING.spacing16}
+              >
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  paddingRight={SPACING.spacing16}
+                >
+                  <StyledText css={TYPOGRAPHY.pSemiBold}>
+                    {t('usb_to_ethernet_adapter_description')}
+                  </StyledText>
+                  <StyledText as="p">{device?.deviceName}</StyledText>
+                </Flex>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  paddingRight={SPACING.spacing16}
+                >
+                  <StyledText css={TYPOGRAPHY.pSemiBold}>
+                    {t('usb_to_ethernet_adapter_manufacturer')}
+                  </StyledText>
+                  <StyledText as="p">{device?.manufacturer}</StyledText>
+                </Flex>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  paddingRight={SPACING.spacing16}
+                >
+                  <StyledText css={TYPOGRAPHY.pSemiBold}>
+                    {t('usb_to_ethernet_adapter_driver_version')}
+                  </StyledText>
+                  <StyledText as="p">
+                    {device?.windowsDriverVersion
+                      ? device.windowsDriverVersion
+                      : t('usb_to_ethernet_adapter_no_driver_version')}
+                  </StyledText>
+                </Flex>
+              </Flex>
+            )}
+          </Box>
         </Flex>
       </Box>
     </>

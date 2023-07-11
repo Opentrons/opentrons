@@ -48,6 +48,7 @@
   "no_unavail_robots_to_clear": "No unavailable robots to clear",
   "not_found": "Not Found",
   "opentrons_app_will_use_interpreter": "If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.",
+  "ot2_advanced_settings": "OT-2 Advanced Settings",
   "override_path_to_python": "Override Path to Python",
   "override_path": "override path",
   "prevent_robot_caching_description": "The app <strong>will immediately clear unavailable robots</strong> and will not remember unavailable robots while this is enabled. On networks with many robots, preventing caching may improve network performance at the expense of slower and less reliable robot discovery on app launch.",

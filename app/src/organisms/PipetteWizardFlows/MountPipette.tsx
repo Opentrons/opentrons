@@ -8,11 +8,10 @@ import { Flex, JUSTIFY_CENTER, SPACING, SIZE_1 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import attach96Pipette from '../../assets/images/change-pip/attach-96-pipette.png'
 import { Skeleton } from '../../atoms/Skeleton'
 import { CheckPipetteButton } from './CheckPipetteButton'
 import { BODY_STYLE, SECTIONS } from './constants'
-import { getPipetteAnimations } from './utils'
+import { getPipetteAnimations, getPipetteAnimations96 } from './utils'
 import type { PipetteWizardStepProps } from './types'
 
 interface MountPipetteProps extends PipetteWizardStepProps {
@@ -98,17 +97,12 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
           />
         ) : (
           <Flex justifyContent={JUSTIFY_CENTER}>
-            {isSingleMountPipette ? (
-              getPipetteAnimations({ pipetteWizardStep })
-            ) : (
-              <img
-                //  TODO(jr, 11/18/22): attach real image
-                src={attach96Pipette}
-                width="171px"
-                height="248px"
-                alt={'Attach 96 channel pipette'}
-              />
-            )}
+            {isSingleMountPipette
+              ? getPipetteAnimations({ pipetteWizardStep })
+              : getPipetteAnimations96({
+                  section: pipetteWizardStep.section,
+                  flowType: flowType,
+                })}
           </Flex>
         )
       }

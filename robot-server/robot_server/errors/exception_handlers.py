@@ -15,7 +15,16 @@ from robot_server.versioning import (
     MIN_API_VERSION_HEADER,
 )
 from robot_server.constants import V1_TAG
-from .global_errors import UnexpectedError, BadRequest, InvalidRequest
+from .global_errors import (
+    UnexpectedError,
+    BadRequest,
+    InvalidRequest,
+    FirmwareUpdateRequired,
+)
+
+from opentrons.hardware_control.errors import (
+    FirmwareUpdateRequired as HWFirmwareUpdateRequired,
+)
 
 from .error_responses import (
     ApiError,
@@ -141,6 +150,24 @@ async def handle_unexpected_error(request: Request, error: Exception) -> JSONRes
     )
 
 
+async def handle_firmware_upgrade_required_error(
+    request: Request, error: HWFirmwareUpdateRequired
+) -> JSONResponse:
+    """Map a FirmwareUpdateRequired error from hardware to an API response."""
+    detail = "".join(
+        format_exception(type(error), error, error.__traceback__, limit=0)
+    ).strip()
+    if _route_is_legacy(request):
+        response: BaseErrorBody = LegacyErrorResponse(message=detail)
+    else:
+        response = FirmwareUpdateRequired(
+            detail=detail, meta={"status_url": "/subsystems/status"}
+        )
+    return await handle_api_error(
+        request, response.as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
+    )
+
+
 exception_handlers: Dict[
     Union[int, Type[Exception]],
     Callable[[Request, Any], Coroutine[Any, Any, Response]],
@@ -148,5 +175,6 @@ exception_handlers: Dict[
     ApiError: handle_api_error,
     StarletteHTTPException: handle_framework_error,
     RequestValidationError: handle_validation_error,
+    HWFirmwareUpdateRequired: handle_firmware_upgrade_required_error,
     Exception: handle_unexpected_error,
 }

@@ -15,6 +15,13 @@ _APILEVEL_2_14_OT_DEFAULT_VERSIONS: Dict[str, int] = {
     # easily cause collisions. (Jira RSS-197.)
     "opentrons_24_aluminumblock_generic_2ml_screwcap": 2,
     "opentrons_96_aluminumblock_generic_pcr_strip_200ul": 2,
+    # The following labware definitions have had a version bump due to using new properties
+    # introduced in an inplace schema v2 update
+    "armadillo_96_wellplate_200ul_pcr_full_skirt": 2,
+    "corning_384_wellplate_112ul_flat": 2,
+    "nest_96_wellplate_100ul_pcr_full_skirt": 2,
+    "nest_96_wellplate_200ul_flat": 2,
+    "nest_96_wellplate_2ml_deep": 2,
 }
 
 

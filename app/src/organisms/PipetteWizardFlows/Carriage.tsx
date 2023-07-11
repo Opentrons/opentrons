@@ -8,13 +8,12 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { LEFT } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import unscrewCarriage from '../../assets/images/change-pip/unscrew-carriage.png'
-import { BODY_STYLE, FLOWS } from './constants'
+import { getPipetteAnimations96 } from './utils'
+import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
 
 import type { PipetteWizardStepProps } from './types'
 
@@ -30,11 +29,6 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         {
           commandType: 'home' as const,
           params: { axes: ['rightZ'] },
-        },
-        {
-          // @ts-expect-error calibration command types not yet supported
-          commandType: 'calibration/moveToMaintenancePosition' as const,
-          params: { mount: LEFT },
         },
       ],
       false
@@ -79,16 +73,10 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         t(flowType === FLOWS.ATTACH ? 'unscrew_carriage' : 'reattach_carriage'),
         'capitalize'
       )}
-      rightHandBody={
-        <img
-          //  TODO(jr 12/2/22): update images
-          src={flowType === FLOWS.ATTACH ? unscrewCarriage : unscrewCarriage}
-          style={{ marginTop: '-3.5rem' }}
-          alt={
-            flowType === FLOWS.ATTACH ? 'Unscrew gantry' : 'Reattach carriage'
-          }
-        />
-      }
+      rightHandBody={getPipetteAnimations96({
+        section: SECTIONS.CARRIAGE,
+        flowType: flowType,
+      })}
       bodyText={
         <Trans
           t={t}

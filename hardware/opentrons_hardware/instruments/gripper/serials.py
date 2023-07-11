@@ -5,7 +5,19 @@ import struct
 
 from opentrons_hardware.instruments.serial_utils import ensure_serial_length
 
-SERIAL_RE = re.compile("^(?:GRPV)(?P<model>[0-9]{2,2})(?P<code>.{,12})$")
+# Separate string into 2 groups
+#  - model
+#  - code
+
+GRIPPER_REGEX_STRING = (
+    "^"  # start of string
+    "GRPV"  # The characters GRPV
+    r"(?P<model>\d{2})"  # "model" group contains exactly 2 digits
+    r"(?P<code>[\w\d]{0,12})"  # "code" group contains 0 to 12 inclusive alphanumeric characters
+    "$"  # end of string
+)
+
+SERIAL_RE = re.compile(GRIPPER_REGEX_STRING)
 
 SERIAL_FORMAT_MSG = (
     "Serial numbers must have the format GRPVMMXXXXXX... where"
