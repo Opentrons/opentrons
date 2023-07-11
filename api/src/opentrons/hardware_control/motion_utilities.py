@@ -1,6 +1,6 @@
 """Utilities for calculating motion correctly."""
 from functools import lru_cache
-from typing import Callable, Dict, Union, overload, Optional, cast
+from typing import Callable, Dict, Union, Optional, cast
 from collections import OrderedDict
 
 from opentrons_shared_data.robot.dev_types import RobotType
@@ -54,60 +54,15 @@ def offset_for_mount(
     return offsets[primary_mount]
 
 
-@overload
 def target_position_from_absolute(
-    mount: Mount,
+    mount: Union[Mount, OT3Mount],
     abs_position: Point,
-    get_critical_point: Callable[[Mount], Point],
+    get_critical_point: Callable[[Union[Mount, OT3Mount]], Point],
     left_mount_offset: Point,
     right_mount_offset: Point,
-    gripper_mount_offset: None = None,
+    gripper_mount_offset: Optional[Point] = None,
 ) -> "OrderedDict[Axis, float]":
-    ...
-
-
-@overload
-def target_position_from_absolute(
-    mount: OT3Mount,
-    abs_position: Point,
-    get_critical_point: Callable[[OT3Mount], Point],
-    left_mount_offset: Point,
-    right_mount_offset: Point,
-    gripper_mount_offset: Point,
-) -> "OrderedDict[Axis, float]":
-    ...
-
-
-# a note on the type ignoring of this and other overload implementation
-# functions: These functions are overloads in the first place because
-# that's the only way to create a semantic link between syntactically
-# unrelated types - the types of different arguments and return types
-# that can't really be related to each other in the type system. for
-# instance,
-# def do_something(a: Union[str, int], b: Union[str, int])
-# implies that all of the four cases of (a: int, b: str), (a: str, b: str),
-# (a: int, b: int, a: str, b: int) are semantically valid. typing
-# @overload
-# def do_something(a: int, b: int)
-# @overload
-# def do_something(a: str, b: str)
-# narrows that to 2.
-#
-# It's needed here because OT3Mount and Axis can't really be
-# related, neither can Mount and Axis and str, etc.
-# The problem is that this is for _external callers_. When typechecking
-# the implementation of the overload, mypy doesn't consider the overload
-# type signatures (see e.g. https://github.com/python/mypy/issues/9503).
-# And as discussed above, there's no way to write the type signature without
-# them. So, ignored.
-def target_position_from_absolute(  # type: ignore[no-untyped-def]
-    mount,
-    abs_position,
-    get_critical_point,
-    left_mount_offset,
-    right_mount_offset,
-    gripper_mount_offset=None,
-):
+    """Create a target position for all specified machine axes."""
     offset = offset_for_mount(
         mount, left_mount_offset, right_mount_offset, gripper_mount_offset
     )
