@@ -1,4 +1,5 @@
 """Gravimetric."""
+from time import sleep
 from dataclasses import dataclass
 from inspect import getsource
 from statistics import stdev
@@ -113,7 +114,7 @@ def _reduce_volumes_to_not_exceed_software_limit(
         liq_cls = get_liquid_class(
             cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume, int(v)
         )
-        max_vol = cfg.tip_volume - liq_cls.aspirate.air_gap.trailing_air_gap
+        max_vol = cfg.tip_volume - liq_cls.aspirate.trailing_air_gap
         test_volumes[i] = min(v, max_vol - 0.1)
     return test_volumes
 
@@ -663,7 +664,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
         first_tip_location = first_tip.top().move(setup_channel_offset)
         _pick_up_tip(ctx, pipette, cfg, location=first_tip_location)
-        pipette.home()
+        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+        ctx._core.get_hardware().retract(mnt)
         if not ctx.is_simulating():
             ui.get_user_ready("REPLACE first tip with NEW TIP")
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
@@ -689,9 +691,10 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             pipette.move_to(hover_pos)
             for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
                 print(
-                    f"wait {i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE} seconds before"
-                    f" measuring evaporation"
+                    f"wait for scale to stabilize "
+                    f"({i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE})"
                 )
+                sleep(1)
             actual_asp_list_evap: List[float] = []
             actual_disp_list_evap: List[float] = []
             for trial in range(config.NUM_BLANK_TRIALS):
