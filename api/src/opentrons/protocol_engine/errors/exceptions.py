@@ -146,7 +146,7 @@ class LabwareNotLoadedError(ProtocolEngineError):
 
 
 class LabwareNotLoadedOnModuleError(ProtocolEngineError):
-    """Raised when referencing a labware on a module that has not been loaded."""
+    """Raised when there is no labware loaded on the requested module."""
 
     def __init__(
         self,
@@ -155,6 +155,19 @@ class LabwareNotLoadedOnModuleError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LabwareNotLoadedOnModuleError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareNotLoadedOnLabwareError(ProtocolEngineError):
+    """Raised when there is no labware loaded on the requested labware."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareNotLoadedOnLabwareError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
@@ -285,6 +298,19 @@ class LabwareIsTipRackError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a LabwareIsTiprackError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareIsAdapterError(ProtocolEngineError):
+    """Raised when trying to use a command not allowed on adapter."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsAdapterError."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 

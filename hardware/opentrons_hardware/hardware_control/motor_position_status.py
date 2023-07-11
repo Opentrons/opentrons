@@ -2,6 +2,11 @@
 import asyncio
 from typing import Set, Tuple
 import logging
+
+from opentrons_shared_data.errors.exceptions import (
+    RoboticsControlError,
+    CommandTimedOutError,
+)
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     WaitableCallback,
@@ -135,11 +140,22 @@ async def update_motor_position_estimation(
                 )
                 if not data[node][2]:
                     # If the stepper_ok flag isn't set, that means the node didn't update position.
-                    raise RuntimeError(
-                        f"Failed to update motor position for node: {node}"
+                    # This probably is because the motor is off. It's rare.
+                    raise RoboticsControlError(
+                        message="Failed to update motor position",
+                        detail={
+                            "node": node.name,
+                        },
                     )
             except asyncio.TimeoutError:
                 log.warning("Update motor position estimation timed out")
-                raise StopAsyncIteration
+                raise CommandTimedOutError(
+                    "Update motor position estimation timed out",
+                    detail={
+                        "missing-nodes": ", ".join(
+                            node.name for node in set(nodes).difference(set(data))
+                        )
+                    },
+                )
 
     return data
