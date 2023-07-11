@@ -45,7 +45,6 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_flex_96_tiprack_200ul',
   'opentrons_flex_96_tiprack_1000ul',
   'opentrons_flex_96_tiprack_50ul',
-  // TODO(ba, 2023-06-23): exclude module calibration adapters
   'opentrons_calibration_adapter_heatershaker_module',
   'opentrons_calibration_adapter_magnetic_module',
   'opentrons_calibration_adapter_temperature_module',
@@ -57,6 +56,9 @@ export const LABWAREV2_DO_NOT_LIST = [
 export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
+  'opentrons_flex_96_tiprack_200ul',
+  'opentrons_flex_96_tiprack_1000ul',
+  'opentrons_flex_96_tiprack_50ul',
 ]
 
 export function getLabwareV1Def(

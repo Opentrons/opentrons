@@ -114,12 +114,13 @@ class Axis(enum.Enum):
     @classmethod
     def ot2_mount_axes(cls) -> Tuple["Axis", "Axis"]:
         """The OT2 axes which are used for moving instruments up and down."""
+        # Does this need to be Z_R, Z_L ?
         return cls.Z_L, cls.Z_R
 
     @classmethod
     def ot3_mount_axes(cls) -> Tuple["Axis", "Axis", "Axis"]:
         """The OT3 axes which are used for moving instruments up and down."""
-        return cls.Z_L, cls.Z_R, cls.Z_G
+        return cls.Z_R, cls.Z_L, cls.Z_G
 
     @classmethod
     def gantry_axes(

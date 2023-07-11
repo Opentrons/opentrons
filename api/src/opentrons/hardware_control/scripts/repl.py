@@ -9,6 +9,8 @@ from functools import wraps
 import asyncio
 import logging
 from logging.config import dictConfig
+from opentrons.hardware_control.api import API
+from opentrons.hardware_control.ot3api import OT3API
 
 update_firmware = True
 has_robot_server = True
@@ -54,7 +56,6 @@ from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     find_axis_center,
     gripper_pin_offsets_mean,
 )
-from opentrons.hardware_control import HardwareControlAPI  # noqa: E402
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
 
 
@@ -85,11 +86,10 @@ LOG_CONFIG = {
 }
 
 if ff.enable_ot3_hardware_controller():
-    from opentrons.hardware_control.ot3api import OT3API
 
-    HCApi: Union[Type[OT3API], Type["API"]] = OT3API
+    HCApi: Union[Type[OT3API], Type[API]] = OT3API
 
-    def build_thread_manager() -> ThreadManager[Union["API", OT3API]]:
+    def build_thread_manager() -> ThreadManager[Union[API, OT3API]]:
         return ThreadManager(
             OT3API.build_hardware_controller,
             use_usb_bus=ff.rear_panel_integration(),
@@ -99,14 +99,13 @@ if ff.enable_ot3_hardware_controller():
     def wrap_async_util_fn(fn: Any, *bind_args: Any, **bind_kwargs: Any) -> Any:
         @wraps(fn)
         def synchronizer(*args: Any, **kwargs: Any) -> Any:
-            return asyncio.get_event_loop().run_until_complete(
+            return asyncio.new_event_loop().run_until_complete(
                 fn(*bind_args, *args, **bind_kwargs, **kwargs)
             )
 
         return synchronizer
 
 else:
-    from opentrons.hardware_control.api import API
 
     HCApi = API
 
@@ -125,7 +124,7 @@ def stop_server() -> None:
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
-def build_api() -> ThreadManager[HardwareControlAPI]:
+def build_api() -> ThreadManager[Union[API, OT3API]]:
     # NOTE: We are using StreamHandler so when the hw controller is
     # being built we can log firmware update progress to stdout.
     stream_handler = logging.StreamHandler()
@@ -146,7 +145,7 @@ def build_api() -> ThreadManager[HardwareControlAPI]:
     return tm
 
 
-def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
+def do_interact(api: ThreadManager[Union[API, OT3API]]) -> None:
     interact(
         banner=(
             "Hardware Control API REPL\nCall methods on api like "

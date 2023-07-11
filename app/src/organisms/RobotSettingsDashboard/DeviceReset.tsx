@@ -7,13 +7,13 @@ import {
   Flex,
   DIRECTION_COLUMN,
   TYPOGRAPHY,
-  AlertPrimaryButton,
   COLORS,
   SPACING,
   BORDERS,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { MediumButton } from '../../atoms/buttons'
 import { ChildNavigation } from '../../organisms/ChildNavigation'
 import {
   getResetConfigOptions,
@@ -36,12 +36,11 @@ const OptionButton = styled.input`
 
 const OptionLabel = styled.label<LabelProps>`
   padding: ${SPACING.spacing16} ${SPACING.spacing24};
-  border: 2px solid
-    ${({ isSelected }) =>
-      isSelected === true ? COLORS.blueEnabled : COLORS.light2};
   border-radius: ${BORDERS.borderRadiusSize4};
+  color: ${({ isSelected }) =>
+    isSelected === true ? COLORS.white : COLORS.darkBlack100};
   background: ${({ isSelected }) =>
-    isSelected === true ? COLORS.medBlue : COLORS.white};
+    isSelected === true ? COLORS.blueEnabled : COLORS.mediumBlueEnabled};
 `
 
 interface DeviceResetProps {
@@ -60,15 +59,15 @@ export function DeviceReset({
   )
   const [dispatchRequest] = useDispatchApiRequest()
 
-  // ToDo (kj:02/07/2023) gripperCalibration might be different since the option isn't implemented yet
-  // Currently boot script will be added in the future
-  const targetOptions = [
+  const targetOptionsOrder = [
     'pipetteOffsetCalibrations',
-    'gripperCalibration',
+    'gripperOffsetCalibrations',
     'runsHistory',
+    'bootScripts',
   ]
-  const availableOptions = options.filter(option =>
-    targetOptions.includes(option.id)
+  const availableOptions = options.sort(
+    (a, b) =>
+      targetOptionsOrder.indexOf(a.id) - targetOptionsOrder.indexOf(b.id)
   )
   const dispatch = useDispatch<Dispatch>()
 
@@ -78,17 +77,38 @@ export function DeviceReset({
     }
   }
 
-  const renderText = (optionId: string): string => {
+  const renderText = (
+    optionId: string
+  ): { optionText: string; subText?: string } => {
+    let optionText = ''
+    let subText
     switch (optionId) {
       case 'pipetteOffsetCalibrations':
-        return t('clear_option_pipette_calibrations')
-      // ToDo (kj:02/07/2023) gripperCalibration same as the above
-      case 'gripperCalibration':
-        return t('clear_option_gripper_calibration')
+        optionText = t('clear_option_pipette_calibrations')
+        break
+      case 'gripperOffsetCalibrations':
+        optionText = t('clear_option_gripper_calibration')
+        break
       case 'runsHistory':
-        return t('clear_option_runs_history')
+        optionText = t('clear_option_runs_history')
+        subText = t('clear_option_runs_history_subtext')
+        break
+
+      case 'bootScripts':
+        optionText = t('clear_option_boot_scripts')
+        subText = t('clear_option_boot_scripts_description')
+        break
+
+      case 'factoryReset':
+        optionText = t('factory_reset')
+        subText = t('factory_reset_description')
+        break
       default:
-        return ''
+        break
+    }
+    return {
+      optionText,
+      subText,
     }
   }
   React.useEffect(() => {
@@ -111,50 +131,64 @@ export function DeviceReset({
         paddingX={SPACING.spacing40}
       >
         <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-          {availableOptions.map(option => (
-            <React.Fragment key={option.id}>
-              <OptionButton
-                id={option.id}
-                type="checkbox"
-                value={option.id}
-                onChange={() =>
-                  setResetOptions({
-                    ...resetOptions,
-                    [option.id]: !(resetOptions[option.id] ?? false),
-                  })
-                }
-              />
-              <OptionLabel
-                htmlFor={option.id}
-                isSelected={resetOptions[option.id]}
-              >
-                <StyledText
-                  fontSize="1.375rem"
-                  lineHeight="1.875rem"
-                  fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          {availableOptions.map(option => {
+            const { optionText, subText } = renderText(option.id)
+            return (
+              <React.Fragment key={option.id}>
+                <OptionButton
+                  id={option.id}
+                  type="checkbox"
+                  value={option.id}
+                  onChange={() =>
+                    setResetOptions({
+                      ...resetOptions,
+                      [option.id]: !(resetOptions[option.id] ?? false),
+                    })
+                  }
+                />
+                <OptionLabel
+                  htmlFor={option.id}
+                  isSelected={resetOptions[option.id]}
                 >
-                  {renderText(option.id)}
-                </StyledText>
-              </OptionLabel>
-            </React.Fragment>
-          ))}
+                  <Flex flexDirection={DIRECTION_COLUMN}>
+                    <StyledText
+                      as="p"
+                      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    >
+                      {optionText}
+                    </StyledText>
+                    {subText != null ? (
+                      <StyledText
+                        as="p"
+                        color={
+                          resetOptions[option.id]
+                            ? COLORS.white
+                            : COLORS.darkBlack70
+                        }
+                      >
+                        {subText}
+                      </StyledText>
+                    ) : null}
+                  </Flex>
+                </OptionLabel>
+              </React.Fragment>
+            )
+          })}
         </Flex>
-        <AlertPrimaryButton
-          paddingY={SPACING.spacing24}
+        <MediumButton
+          data-testid="DeviceReset_clear_data_button"
+          buttonText={t('clear_data_and_restart_robot')}
+          buttonType="alert"
           disabled={
             Object.keys(resetOptions).length === 0 ||
-            availableOptions.every(option => resetOptions[option.id] === false)
+            availableOptions.every(
+              option =>
+                resetOptions[option.id] === false ||
+                resetOptions[option.id] === undefined
+            )
           }
           onClick={handleClick}
-        >
-          <StyledText
-            fontSize="1.5rem"
-            lineHeight="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          >
-            {t('clear_data_and_restart_robot')}
-          </StyledText>
-        </AlertPrimaryButton>
+        />
       </Flex>
     </Flex>
   )

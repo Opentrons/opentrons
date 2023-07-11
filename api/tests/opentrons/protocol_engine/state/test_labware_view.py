@@ -1,7 +1,7 @@
 """Labware state store tests."""
 import pytest
 from datetime import datetime
-from typing import Dict, Optional, cast, ContextManager, Any, Union, List
+from typing import Dict, Optional, cast, ContextManager, Any, Union
 from contextlib import nullcontext as does_not_raise
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
@@ -27,7 +27,6 @@ from opentrons.protocol_engine.types import (
     OnLabwareLocation,
     LabwareLocation,
     OFF_DECK_LOCATION,
-    DropTipWellLocation,
     OverlapOffset,
 )
 from opentrons.protocol_engine.state.move_types import EdgePathType
@@ -141,6 +140,37 @@ def test_get_id_by_module_raises_error() -> None:
     )
     with pytest.raises(errors.exceptions.LabwareNotLoadedOnModuleError):
         subject.get_id_by_module(module_id="no-module-id")
+
+
+def test_get_id_by_labware() -> None:
+    """Should return the labware id associated to the labware."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="test-uri",
+                location=OnLabwareLocation(labwareId="other-labware-id"),
+            )
+        }
+    )
+    assert subject.get_id_by_labware(labware_id="other-labware-id") == "labware-id"
+
+
+def test_get_id_by_labware_raises_error() -> None:
+    """Should raise error that labware not found."""
+    subject = get_labware_view(
+        labware_by_id={
+            "labware-id": LoadedLabware(
+                id="labware-id",
+                loadName="test",
+                definitionUri="test-uri",
+                location=OnLabwareLocation(labwareId="other-labware-id"),
+            )
+        }
+    )
+    with pytest.raises(errors.exceptions.LabwareNotLoadedOnLabwareError):
+        subject.get_id_by_labware(labware_id="no-labware-id")
 
 
 def test_raise_if_labware_has_labware_on_top() -> None:
@@ -458,6 +488,43 @@ def test_labware_has_well(falcon_tuberack_def: LabwareDefinition) -> None:
 
     with pytest.raises(errors.LabwareNotLoadedError):
         subject.validate_liquid_allowed_in_labware(labware_id="no-id", wells={"A1": 30})
+
+
+def test_validate_liquid_allowed_raises_incompatible_labware() -> None:
+    """It should raise when validating labware that is a tiprack or an adapter."""
+    subject = get_labware_view(
+        labware_by_id={
+            "tiprack-id": LoadedLabware(
+                id="tiprack-id",
+                loadName="test1",
+                definitionUri="some-tiprack-uri",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+            ),
+            "adapter-id": LoadedLabware(
+                id="adapter-id",
+                loadName="test2",
+                definitionUri="some-adapter-uri",
+                location=DeckSlotLocation(slotName=DeckSlotName.SLOT_2),
+            ),
+        },
+        definitions_by_uri={
+            "some-tiprack-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+                parameters=Parameters.construct(isTiprack=True),  # type: ignore[call-arg]
+                wells={},
+            ),
+            "some-adapter-uri": LabwareDefinition.construct(  # type: ignore[call-arg]
+                parameters=Parameters.construct(isTiprack=False),  # type: ignore[call-arg]
+                allowedRoles=[LabwareRole.adapter],
+                wells={},
+            ),
+        },
+    )
+
+    with pytest.raises(errors.LabwareIsTipRackError):
+        subject.validate_liquid_allowed_in_labware(labware_id="tiprack-id", wells={})
+
+    with pytest.raises(errors.LabwareIsAdapterError):
+        subject.validate_liquid_allowed_in_labware(labware_id="adapter-id", wells={})
 
 
 def test_get_tip_length_raises_with_non_tip_rack(
@@ -1204,31 +1271,3 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
             ),
             bottom_labware_id="labware-id",
         )
-
-
-def test_get_random_drop_tip_location(
-    ot3_fixed_trash_def: LabwareDefinition,
-) -> None:
-    """It should provide a random location within 3/4th of well top center every time."""
-    subject = get_labware_view(
-        labware_by_id={
-            "trash-id": trash,
-        },
-        definitions_by_uri={
-            "some-trash-uri": ot3_fixed_trash_def,
-        },
-    )
-    drop_location: List[DropTipWellLocation] = []
-    for i in range(50):
-        drop_location.append(
-            subject.get_random_drop_tip_location(labware_id="trash-id", well_name="A1")
-        )
-
-    for i in range(50):
-        print(drop_location[i])
-        assert not all(drop_location[i] == another_loc for another_loc in drop_location)
-        # trash's well A1 dimensions:
-        # "xDimension": 225
-        assert -84 <= drop_location[i].offset.x < 84
-        assert drop_location[i].offset.y == 0
-        assert drop_location[i].offset.z == 0

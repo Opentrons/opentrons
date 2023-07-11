@@ -1,5 +1,5 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
-import type { Coordinates, MotorAxis } from '../../../../js/types'
+import type { Coordinates, MotorAxes } from '../../../../js/types'
 
 export interface MoveToSlotCreateCommand extends CommonCommandCreateInfo {
   commandType: 'moveToSlot'
@@ -127,5 +127,5 @@ interface SavePositionParams {
 }
 
 interface HomeParams {
-  axes?: MotorAxis
+  axes?: MotorAxes
 }

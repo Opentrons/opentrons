@@ -11,6 +11,7 @@ import {
 } from '../utils'
 import {
   getInitialRobotStateStandard,
+  getInitialRobotStateWithOffDeckLabwareStandard,
   getRobotStateWithTipStandard,
   makeContext,
   getErrorResult,
@@ -20,7 +21,10 @@ import {
 } from '../fixtures'
 import { dispense } from '../commandCreators/atomic/dispense'
 import { InvariantContext, RobotState } from '../types'
-import type { AspDispAirgapParams as V3AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type {
+  AspDispAirgapParams as V3AspDispAirgapParams,
+  DispenseParams,
+} from '@opentrons/shared-data/protocol/types/schemaV3'
 
 jest.mock('../utils/thermocyclerPipetteCollision')
 jest.mock('../utils/heaterShakerCollision')
@@ -102,6 +106,27 @@ describe('dispense', () => {
       expect(res.errors).toHaveLength(1)
       expect(res.errors[0]).toMatchObject({
         type: 'NO_TIP_ON_PIPETTE',
+      })
+    })
+    it('should return an error when dispensing from labware off deck', () => {
+      initialRobotState = getInitialRobotStateWithOffDeckLabwareStandard(
+        invariantContext
+      )
+      const result = dispense(
+        {
+          flowRate: 10,
+          offsetFromBottomMm: 5,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as DispenseParams,
+        invariantContext,
+        initialRobotState
+      )
+      expect(getErrorResult(result).errors).toHaveLength(2)
+      expect(getErrorResult(result).errors[1]).toMatchObject({
+        type: 'LABWARE_OFF_DECK',
       })
     })
     it('dispense to nonexistent labware should throw error', () => {
