@@ -198,7 +198,6 @@ def get_protocol_api(
             robot_type=robot_type,
             deck_type=guess_deck_type_from_global_config(),
             hardware_api=_THREAD_MANAGED_HW,  # type: ignore[arg-type]
-            bundled_labware=bundled_labware,
             bundled_data=bundled_data,
             extra_labware=extra_labware,
         )
@@ -524,7 +523,6 @@ def _create_live_context_pe(
     robot_type: RobotType,
     deck_type: str,
     extra_labware: Optional[Dict[str, "LabwareDefinition"]],
-    bundled_labware: Optional[Dict[str, "LabwareDefinition"]],
     bundled_data: Optional[Dict[str, bytes]],
 ) -> ProtocolContext:
     """Return a live ProtocolContext that controls the robot through ProtocolEngine."""
