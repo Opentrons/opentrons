@@ -35,14 +35,14 @@ async def _get_estop_status(
     get_ot3_hardware(thread_manager)
     physical_status = [
         EstopPhysicalStatusModel.construct(
-            mount=mount, status=EstopPhysicalStatus.disengaged
+            mount=mount, status=EstopPhysicalStatus.DISENGAGED
         )
-        for mount in [EstopAttachLocation.left, EstopAttachLocation.right]
+        for mount in [EstopAttachLocation.LEFT, EstopAttachLocation.RIGHT]
     ]
 
     # TODO - unstub the response here
     data = EstopStatusModel.construct(
-        status=EstopState.disengaged,
+        status=EstopState.DISENGAGED,
         physical_status=physical_status,
     )
     return await PydanticResponse.create(content=SimpleBody.construct(data=data))

@@ -8,25 +8,25 @@ from typing import List
 class EstopState(enum.Enum):
     """Current status of the estop on this robot."""
 
-    not_present = "not_present"
-    physically_engaged = "physically_engaged"
-    logically_engaged = "logically_engaged"
-    disengaged = "disengaged"
+    NOT_PRESENT = "notPresent"
+    PHYSICALLY_ENGAGED = "physicallyEngaged"
+    LOGICALLY_ENGAGED = "logicallyEngaged"
+    DISENGAGED = "disengaged"
 
 
 class EstopAttachLocation(enum.Enum):
     """Physical location where estop can be attached."""
 
-    left = "left"
-    right = "right"
+    LEFT = "left"
+    RIGHT = "right"
 
 
 class EstopPhysicalStatus(enum.Enum):
     """Physical status of a specific estop."""
 
-    engaged = "engaged"
-    disengaged = "disengaged"
-    not_present = "not_present"
+    ENGAGED = "engaged"
+    DISENGAGED = "disengaged"
+    NOT_PRESENT = "notPresent"
 
 
 class EstopPhysicalStatusModel(BaseModel):
