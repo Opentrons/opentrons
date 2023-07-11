@@ -119,7 +119,6 @@ def _submerge(
 ) -> None:
     pipette.move_to(
         well.bottom(height).move(channel_offset),
-        force_direct=True,
         speed=speed,
     )
 
@@ -147,7 +146,6 @@ def _retract(
     # retract out of well
     pipette.move_to(
         well.top().move(channel_offset),
-        force_direct=True,
         speed=speed,
     )
     # reset discontinuity back to default
@@ -348,7 +346,7 @@ def _pipette_with_liquid_settings(
 
     # EXIT
     callbacks.on_exiting()
-    pipette.move_to(well.top().move(channel_offset), force_direct=True)
+    pipette.move_to(well.top().move(channel_offset))
     _reset_plunger_acceleration(ctx, pipette)
 
 
