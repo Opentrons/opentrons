@@ -6,9 +6,12 @@ import { Link } from '../ui'
 
 import styles from './styles.css'
 
-export function Breadcrumbs(): JSX.Element {
+interface BreadcrumbsProps {
+  show: boolean
+}
+export function Breadcrumbs(props: BreadcrumbsProps): JSX.Element {
   return (
-    <div className={styles.breadcrumbs}>
+    <div className={styles.breadcrumbs} style={{ display: props.show ? 'block' : 'none' }}>
       <div className={styles.breadcrumbs_contents}>
         <span className={styles.breadcrumbs_separator}>{' < '}</span>
         <Link to={getPublicPath()} className={styles.breadcrumbs_link}>

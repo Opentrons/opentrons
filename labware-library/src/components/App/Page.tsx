@@ -5,13 +5,13 @@ import styles from './styles.css'
 
 export interface PageProps {
   scrollRef: React.RefObject<HTMLDivElement>
-  detailPage: boolean
+  isDetailPage: boolean
   sidebar: React.ReactNode
   content: React.ReactNode
 }
 
 export function Page(props: PageProps): JSX.Element {
-  const { scrollRef, detailPage, sidebar, content } = props
+  const { scrollRef, isDetailPage, sidebar, content } = props
 
   return (
     <div className={styles.page}>
@@ -19,14 +19,14 @@ export function Page(props: PageProps): JSX.Element {
         <div className={styles.content_width_limiter}>
           <div
             className={cx(styles.sidebar_container, {
-              [styles.is_detail_page]: detailPage,
+              [styles.is_detail_page]: isDetailPage,
             })}
           >
             {sidebar}
           </div>
           <section
             className={cx(styles.content_container, {
-              [styles.is_detail_page]: detailPage,
+              [styles.is_detail_page]: isDetailPage,
             })}
           >
             {content}
