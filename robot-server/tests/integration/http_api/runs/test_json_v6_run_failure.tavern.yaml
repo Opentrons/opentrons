@@ -58,7 +58,10 @@ stages:
             - id: !anystr
               errorType: ProtocolCommandFailedError
               createdAt: !anystr
-              detail: 'Cannot perform DROPTIP without a tip attached'
+              detail: 'Error 4000 GENERAL_ERROR (ProtocolCommandFailedError)'
+              wrappedErrors:
+                - errorType: PythonException
+                  detail: 'Cannot perform DROPTIP without a tip attached'
   - name: Verify commands contain the expected results
     request:
       url: '{ot2_server_base_url}/runs/{run_id}/commands'
