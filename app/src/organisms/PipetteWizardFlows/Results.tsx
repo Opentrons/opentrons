@@ -156,12 +156,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
               axes: axes,
             },
           },
-          {
-            commandType: 'calibration/moveToMaintenancePosition' as const,
-            params: {
-              mount: mount,
-            },
-          },
         ],
         false
       )
