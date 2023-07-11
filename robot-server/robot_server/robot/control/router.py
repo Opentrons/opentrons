@@ -64,7 +64,7 @@ async def get_estop_status(
     return await _get_estop_status(thread_manager)
 
 
-@control_router.post(
+@control_router.put(
     "/robot/control/acknowledgeEstopDisengage",
     summary="Acknowledge and clear an Estop event.",
     description="If the estop is currently logically engaged (the estop was previously pressed but is "
@@ -74,7 +74,7 @@ async def get_estop_status(
         status.HTTP_403_FORBIDDEN: {"model": ErrorBody[NotSupportedOnOT2]},
     },
 )
-async def post_acknowledge_estop_disengage(
+async def put_acknowledge_estop_disengage(
     thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
 ) -> PydanticResponse[SimpleBody[EstopStatusModel]]:
     """Transition from the `logically_engaged` status if applicable."""
