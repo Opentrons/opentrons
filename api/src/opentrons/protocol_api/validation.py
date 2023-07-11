@@ -84,9 +84,24 @@ def ensure_mount(mount: Union[str, Mount]) -> Mount:
 def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
     """Ensure that an input value represents a valid pipette name."""
     pipette_name = ensure_lowercase_name(pipette_name)
+    ot3_to_flex_name_map = {
+        "p50_single_ot3": "p50_single_flex",
+        "p50_multi_ot3": "p50_multi_flex",
+        "p1000_single_ot3": "p1000_single_flex",
+        "p1000_multi_ot3": "p1000_multi_flex",
+    }
 
     try:
-        return PipetteNameType(pipette_name)
+        if pipette_name in ot3_to_flex_name_map.keys():
+            # TODO (spp: 2023-07-11): !!! VERY IMPORTANT!!!
+            #  We DO NOT want to support the old 'ot3' suffixed names for Flex launch.
+            #  This provision to accept the old names is added only for maintaining
+            #  backwards compatibility during internal testing and should be phased out.
+            #  So remove this name mapping and conversion at an appropriate time before launch
+            checked_name = PipetteNameType(ot3_to_flex_name_map[pipette_name])
+        else:
+            checked_name = PipetteNameType(pipette_name)
+        return checked_name
     except ValueError as e:
         raise ValueError(
             f"Cannot resolve {pipette_name} to pipette, must be given valid pipette name."
