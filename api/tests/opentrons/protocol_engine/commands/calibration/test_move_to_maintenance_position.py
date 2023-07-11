@@ -158,14 +158,14 @@ async def test_calibration_move_to_location_implementation_for_gripper(
 
     decoy.verify(
         await ot3_hardware_api.move_axes(
-            position={OT3Axis.Z_G: 400},
+            position={Axis.Z_G: 400},
         ),
         times=0,
     )
 
     decoy.verify(
         await ot3_hardware_api.disengage_axes(
-            [OT3Axis.Z_G],
+            [Axis.Z_G],
         ),
         times=0,
     )

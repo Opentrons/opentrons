@@ -1020,7 +1020,7 @@ class OT3Controller:
 
                     q_msg = _pop_queue()
                     if q_msg:
-                        mount = OT3Axis.to_mount(node_to_axis(q_msg[0]))
+                        mount = Axis.to_ot3_mount(node_to_axis(q_msg[0]))
                         raise OverPressureDetected(
                             f"The pressure sensor on the {mount} mount has exceeded operational limits."
                         )
