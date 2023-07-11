@@ -353,58 +353,54 @@ def _calculate_evaporation(
     labware_on_scale: Labware,
     measure_height: float,
 ) -> Tuple[float, float]:
-    if not cfg.blank or cfg.inspect:
-        average_aspirate_evaporation_ul = 0.0
-        average_dispense_evaporation_ul = 0.0
-    else:
-        ui.print_title("MEASURE EVAPORATION")
-        blank_trials = build_gravimetric_trials(
-            resources.ctx,
-            resources.pipette,
-            cfg,
-            labware_on_scale["A1"],
-            [resources.test_volumes[-1]],
-            [],
-            recorder,
-            test_report,
-            liquid_tracker,
-            True,
-            measure_height=measure_height,
-        )
-        ui.print_info(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
-        hover_pos = labware_on_scale["A1"].top().move(Point(z=50))
-        resources.pipette.move_to(hover_pos)
-        for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
-            ui.print_info(
-                f"wait {i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE} seconds before"
-                f" measuring evaporation"
-            )
-        actual_asp_list_evap: List[float] = []
-        actual_disp_list_evap: List[float] = []
-        for b_trial in blank_trials[resources.test_volumes[-1]][0]:
-            ui.print_header(f"BLANK {b_trial.trial + 1}/{config.NUM_BLANK_TRIALS}")
-            resources.pipette.move_to(hover_pos)
-            evap_aspirate, _, evap_dispense, _ = _run_trial(b_trial)
-            ui.print_info(
-                f"blank {b_trial.trial + 1}/{config.NUM_BLANK_TRIALS}:\n"
-                f"\taspirate: {evap_aspirate} uL\n"
-                f"\tdispense: {evap_dispense} uL"
-            )
-            actual_asp_list_evap.append(evap_aspirate)
-            actual_disp_list_evap.append(evap_dispense)
-        ui.print_header("EVAPORATION AVERAGE")
-        average_aspirate_evaporation_ul = _calculate_average(actual_asp_list_evap)
-        average_dispense_evaporation_ul = _calculate_average(actual_disp_list_evap)
+    ui.print_title("MEASURE EVAPORATION")
+    blank_trials = build_gravimetric_trials(
+        resources.ctx,
+        resources.pipette,
+        cfg,
+        labware_on_scale["A1"],
+        [resources.test_volumes[-1]],
+        [],
+        recorder,
+        test_report,
+        liquid_tracker,
+        True,
+        measure_height=measure_height,
+    )
+    ui.print_info(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
+    hover_pos = labware_on_scale["A1"].top().move(Point(z=50))
+    resources.pipette.move_to(hover_pos)
+    for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
         ui.print_info(
-            "average:\n"
-            f"\taspirate: {average_aspirate_evaporation_ul} uL\n"
-            f"\tdispense: {average_dispense_evaporation_ul} uL"
+            f"wait {i + 1}/{config.SCALE_SECONDS_TO_TRUE_STABILIZE} seconds before"
+            f" measuring evaporation"
         )
-        report.store_average_evaporation(
-            test_report,
-            average_aspirate_evaporation_ul,
-            average_dispense_evaporation_ul,
+    actual_asp_list_evap: List[float] = []
+    actual_disp_list_evap: List[float] = []
+    for b_trial in blank_trials[resources.test_volumes[-1]][0]:
+        ui.print_header(f"BLANK {b_trial.trial + 1}/{config.NUM_BLANK_TRIALS}")
+        resources.pipette.move_to(hover_pos)
+        evap_aspirate, _, evap_dispense, _ = _run_trial(b_trial)
+        ui.print_info(
+            f"blank {b_trial.trial + 1}/{config.NUM_BLANK_TRIALS}:\n"
+            f"\taspirate: {evap_aspirate} uL\n"
+            f"\tdispense: {evap_dispense} uL"
         )
+        actual_asp_list_evap.append(evap_aspirate)
+        actual_disp_list_evap.append(evap_dispense)
+    ui.print_header("EVAPORATION AVERAGE")
+    average_aspirate_evaporation_ul = _calculate_average(actual_asp_list_evap)
+    average_dispense_evaporation_ul = _calculate_average(actual_disp_list_evap)
+    ui.print_info(
+        "average:\n"
+        f"\taspirate: {average_aspirate_evaporation_ul} uL\n"
+        f"\tdispense: {average_dispense_evaporation_ul} uL"
+    )
+    report.store_average_evaporation(
+        test_report,
+        average_aspirate_evaporation_ul,
+        average_dispense_evaporation_ul,
+    )
     return average_aspirate_evaporation_ul, average_dispense_evaporation_ul
 
 
@@ -467,19 +463,22 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         ui.print_info(
             f"software thinks there is {vial_volume} uL of liquid in the vial"
         )
-
-        (
-            average_aspirate_evaporation_ul,
-            average_dispense_evaporation_ul,
-        ) = _calculate_evaporation(
-            cfg,
-            resources,
-            recorder,
-            liquid_tracker,
-            test_report,
-            labware_on_scale,
-            measure_height,
-        )
+        if not cfg.blank or cfg.inspect:
+            average_aspirate_evaporation_ul = 0.0
+            average_dispense_evaporation_ul = 0.0
+        else:
+            (
+                average_aspirate_evaporation_ul,
+                average_dispense_evaporation_ul,
+            ) = _calculate_evaporation(
+                cfg,
+                resources,
+                recorder,
+                liquid_tracker,
+                test_report,
+                labware_on_scale,
+                measure_height,
+            )
 
         ui.print_info("dropping tip")
         _drop_tip(resources.pipette, return_tip=False)  # always trash calibration tips
