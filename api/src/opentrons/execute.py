@@ -26,6 +26,7 @@ from typing import (
     Union,
 )
 
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons import protocol_api, __version__, should_use_ot3
@@ -75,7 +76,9 @@ from .util.entrypoint_util import (
 )
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.labware.dev_types import (
+        LabwareDefinition as LabwareDefinitionDict,
+    )
 
 
 _THREAD_MANAGED_HW: Optional[ThreadManagedHardware] = None
@@ -114,9 +117,9 @@ _EmitRunlogCallable = Callable[[command_types.CommandMessage], None]
 
 def get_protocol_api(
     version: Union[str, APIVersion],
-    bundled_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
+    bundled_labware: Optional[Dict[str, "LabwareDefinitionDict"]] = None,
     bundled_data: Optional[Dict[str, bytes]] = None,
-    extra_labware: Optional[Dict[str, "LabwareDefinition"]] = None,
+    extra_labware: Optional[Dict[str, "LabwareDefinitionDict"]] = None,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a ``protocol_api.ProtocolContext``
@@ -498,8 +501,8 @@ def _create_live_context_non_pe(
     api_version: APIVersion,
     hardware_api: ThreadManagedHardware,
     deck_type: str,
-    extra_labware: Optional[Dict[str, "LabwareDefinition"]],
-    bundled_labware: Optional[Dict[str, "LabwareDefinition"]],
+    extra_labware: Optional[Dict[str, "LabwareDefinitionDict"]],
+    bundled_labware: Optional[Dict[str, "LabwareDefinitionDict"]],
     bundled_data: Optional[Dict[str, bytes]],
 ) -> ProtocolContext:
     """Return a live ProtocolContext.
@@ -522,7 +525,7 @@ def _create_live_context_pe(
     hardware_api: ThreadManagedHardware,
     robot_type: RobotType,
     deck_type: str,
-    extra_labware: Optional[Dict[str, "LabwareDefinition"]],
+    extra_labware: Dict[str, "LabwareDefinitionDict"],
     bundled_data: Optional[Dict[str, bytes]],
 ) -> ProtocolContext:
     """Return a live ProtocolContext that controls the robot through ProtocolEngine."""
@@ -535,6 +538,18 @@ def _create_live_context_pe(
             config=_get_protocol_engine_config(),
         )
     )
+
+    # `async def` so we can use loop.run_coroutine_threadsafe() to wait for its completion.
+    # Non-async would use call_soon_threadsafe(), which makes the waiting harder.
+    async def add_all_extra_labware() -> None:
+        for labware_definition_dict in extra_labware.values():
+            labware_definition = LabwareDefinition.parse_obj(labware_definition_dict)
+            pe.add_labware_definition(labware_definition)
+
+    # Add extra_labware to ProtocolEngine, being careful not to modify ProtocolEngine from this
+    # thread. See concurrency notes in ProtocolEngine docstring.
+    future = asyncio.run_coroutine_threadsafe(add_all_extra_labware(), loop)
+    future.result()
 
     return protocol_api.create_protocol_context(
         api_version=api_version,
