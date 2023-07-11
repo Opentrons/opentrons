@@ -1107,6 +1107,7 @@ async def test_move_to_plunger_bottom(
     await ot3_hardware.cache_pipette(mount, instr_data, None)
     pipette = ot3_hardware.hardware_pipettes[mount.to_mount()]
     assert pipette
+    pip_ax = OT3Axis.of_main_tool_actuator(mount)
 
     max_speeds = ot3_hardware.config.motion_settings.default_max_speed
     target_pos = target_position_from_plunger(
@@ -1114,6 +1115,8 @@ async def test_move_to_plunger_bottom(
         pipette.plunger_positions.bottom,
         ot3_hardware._current_position,
     )
+    backlash_pos = target_pos.copy()
+    backlash_pos[pip_ax] += pipette.backlash_distance
 
     # plunger will move at different speeds, depending on if:
     #  - no tip attached (max speed)
@@ -1131,7 +1134,12 @@ async def test_move_to_plunger_bottom(
     await ot3_hardware.home()
     mock_move.reset_mock()
     await ot3_hardware.home_plunger(mount)
-    mock_move.assert_called_once_with(
+    # make sure we've done the backlash compensation
+    mock_move.assert_any_call(
+        backlash_pos, speed=expected_speed_no_tip, acquire_lock=False
+    )
+    # make sure the final move is to our target position
+    mock_move.assert_called_with(
         target_pos, speed=expected_speed_no_tip, acquire_lock=False
     )
 
@@ -1140,25 +1148,21 @@ async def test_move_to_plunger_bottom(
     await ot3_hardware.add_tip(mount, 100)
     mock_move.reset_mock()
     await ot3_hardware.prepare_for_aspirate(mount)
-    # make sure when plunger is going down that only one move is called,
-    # and there's no backlash move queued
-    mock_move.assert_called_once_with(
+    # make sure we've done the backlash compensation
+    mock_move.assert_any_call(
+        backlash_pos, speed=expected_speed_moving_down, acquire_lock=True
+    )
+    # make sure the final move is to our target position
+    mock_move.assert_called_with(
         target_pos, speed=expected_speed_moving_down, acquire_lock=True
     )
 
     # tip attached, moving UP towards "bottom" position
     # NOTE: _move() is mocked, so we need to update the OT3API's
     #       cached coordinates in the test
-    pip_ax = OT3Axis.of_main_tool_actuator(mount)
     ot3_hardware._current_position[pip_ax] = target_pos[pip_ax] + 1
     mock_move.reset_mock()
     await ot3_hardware.prepare_for_aspirate(mount)
-    # make sure we've done the backlash compensation
-    backlash_pos = target_pos.copy()
-    backlash_pos[pip_ax] -= pipette.backlash_distance
-    mock_move.assert_any_call(
-        backlash_pos, speed=expected_speed_moving_up, acquire_lock=True
-    )
     # make sure the final move is to our target position
     mock_move.assert_called_with(
         target_pos, speed=expected_speed_moving_up, acquire_lock=True
