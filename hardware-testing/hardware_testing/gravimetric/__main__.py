@@ -155,6 +155,8 @@ def build_photometric_cfg(
         name=protocol_cfg.metadata["protocolName"],  # type: ignore[attr-defined]
         pipette_mount="left",
         pipette_volume=pipette_volume,
+        pipette_channels=96,
+        increment=False,
         tip_volume=tip_volume,
         trials=trials,
         labware_offsets=LABWARE_OFFSETS,

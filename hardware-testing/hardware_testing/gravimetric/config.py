@@ -5,8 +5,8 @@ from typing_extensions import Final
 
 
 @dataclass
-class GravimetricConfig:
-    """Execute Gravimetric Setup Config."""
+class VolumetricConfig:
+    """Execute shared volumetric Setup Config."""
 
     name: str
     pipette_volume: int
@@ -15,42 +15,36 @@ class GravimetricConfig:
     tip_volume: int
     trials: int
     labware_offsets: List[dict]
-    labware_on_scale: str
-    slot_scale: int
     slots_tiprack: List[int]
     increment: bool
     return_tip: bool
-    blank: bool
     mix: bool
     inspect: bool
     user_volumes: bool
+
+
+@dataclass
+class GravimetricConfig(VolumetricConfig):
+    """Execute Gravimetric Setup Config."""
+
+    labware_on_scale: str
+    slot_scale: int
+    blank: bool
     gantry_speed: int
     scale_delay: int
     isolate_channels: List[int]
 
 
 @dataclass
-class PhotometricConfig:
+class PhotometricConfig(VolumetricConfig):
     """Execute photometric Setup Config."""
 
-    name: str
-    pipette_volume: int
-    pipette_mount: str
-    tip_volume: int
-    trials: int
-    labware_offsets: List[dict]
     photoplate: str
     photoplate_slot: int
     reservoir: str
     reservoir_slot: int
-    slots_tiprack: List[int]
-    return_tip: bool
-    mix: bool
-    inspect: bool
-    user_volumes: bool
     touch_tip: bool
     refill: bool
-    pipette_channels: int = 96
 
 
 GRAV_CONFIG_EXCLUDE_FROM_REPORT = ["labware_offsets", "slots_tiprack"]

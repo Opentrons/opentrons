@@ -265,7 +265,7 @@ def build_photometric_trials(
 
 
 def _finish_test(
-    cfg: Union[config.GravimetricConfig, config.PhotometricConfig],
+    cfg: config.VolumetricConfig,
     resources: TestResources,
     return_tip: bool,
 ) -> None:
