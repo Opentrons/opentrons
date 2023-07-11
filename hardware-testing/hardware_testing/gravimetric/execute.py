@@ -331,7 +331,6 @@ def _run_trial(
     mix: bool = False,
     stable: bool = True,
     scale_delay: int = DELAY_FOR_MEASUREMENT,
-    measure_height: float = 50,
 ) -> Tuple[float, MeasurementData, float, MeasurementData]:
     global _PREV_TRIAL_GRAMS
     pipetting_callbacks = _generate_callbacks_for_trial(
@@ -370,7 +369,8 @@ def _run_trial(
     print("recorded weights:")
 
     # RUN INIT
-    pipette.move_to(well.top(measure_height).move(channel_offset))
+    mnt = OT3Mount.RIGHT if pipette.mount == "right" else OT3Mount.LEFT
+    ctx._core.get_hardware().retract(mnt)
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     print(f"\tinitial grams: {m_data_init.grams_average} g")
     if _PREV_TRIAL_GRAMS is not None:
@@ -398,7 +398,7 @@ def _run_trial(
         inspect=inspect,
         mix=mix,
     )
-    pipette.move_to(well.top(measure_height).move(channel_offset))
+    ctx._core.get_hardware().retract(mnt)
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     print(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
     print(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
@@ -418,7 +418,7 @@ def _run_trial(
         inspect=inspect,
         mix=mix,
     )
-    pipette.move_to(well.top(measure_height).move(channel_offset))
+    ctx._core.get_hardware().retract(mnt)
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     print(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
 
@@ -649,11 +649,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         liquid="None",
     )
 
-    # need to be as far away from the scale as possible
-    # to avoid static from distorting the measurement
-    measure_height = (
-        50 if cfg.labware_on_scale == "radwag_pipette_calibration_vial" else 120
-    )
     calibration_tip_in_use = True
     try:
         ui.print_title("FIND LIQUID HEIGHT")
@@ -718,7 +713,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                     mix=cfg.mix,
                     stable=True,
                     scale_delay=cfg.scale_delay,
-                    measure_height=measure_height,
                 )
                 print(
                     f"blank {trial + 1}/{config.NUM_BLANK_TRIALS}:\n"
@@ -800,7 +794,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
                         mix=cfg.mix,
                         stable=True,
                         scale_delay=cfg.scale_delay,
-                        measure_height=measure_height,
                     )
                     print(
                         "measured volumes:\n"
