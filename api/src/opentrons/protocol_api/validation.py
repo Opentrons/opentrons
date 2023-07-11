@@ -85,10 +85,10 @@ def ensure_pipette_name(pipette_name: str) -> PipetteNameType:
     """Ensure that an input value represents a valid pipette name."""
     pipette_name = ensure_lowercase_name(pipette_name)
     ot3_to_flex_name_map = {
-        "p50_single_ot3": "p50_single_flex",
-        "p50_multi_ot3": "p50_multi_flex",
-        "p1000_single_ot3": "p1000_single_flex",
-        "p1000_multi_ot3": "p1000_multi_flex",
+        "p50_single_gen3": "p50_single_flex",
+        "p50_multi_gen3": "p50_multi_flex",
+        "p1000_single_gen3": "p1000_single_flex",
+        "p1000_multi_gen3": "p1000_multi_flex",
     }
 
     try:
