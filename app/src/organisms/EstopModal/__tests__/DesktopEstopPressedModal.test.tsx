@@ -3,21 +3,24 @@ import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../i18n'
-import { DesktopEstopModal } from '../DesktopEstopModal'
+import { DesktopEstopPressedModal } from '../DesktopEstopPressedModal'
 
-const render = (props: React.ComponentProps<typeof DesktopEstopModal>) => {
-  return renderWithProviders(<DesktopEstopModal {...props} />, {
+const render = (
+  props: React.ComponentProps<typeof DesktopEstopPressedModal>
+) => {
+  return renderWithProviders(<DesktopEstopPressedModal {...props} />, {
     i18nInstance: i18n,
   })
 }
 
-describe('DesktopEstopModal', () => {
-  let props: React.ComponentProps<typeof DesktopEstopModal>
+describe('DesktopEstopPressedModal', () => {
+  let props: React.ComponentProps<typeof DesktopEstopPressedModal>
 
   beforeEach(() => {
     props = {
       isActiveRun: true,
       isEngaged: true,
+      closeModal: jest.fn(),
     }
   })
 
@@ -54,6 +57,12 @@ describe('DesktopEstopModal', () => {
     expect(
       getByRole('button', { name: 'Resume robot operations' })
     ).not.toBeDisabled()
+  })
+
+  it('should call a mock function when clicking close icon', () => {
+    const [{ getByTestId }] = render(props)
+    getByTestId('ModalHeader_icon_close_E-stop pressed').click()
+    expect(props.closeModal).toBeCalled()
   })
 
   it.todo('should call a mock function when clicking resume robot operations')

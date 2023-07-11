@@ -16,19 +16,23 @@ import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
-interface DesktopEstopModalProps {
+interface DesktopEstopPressedModalProps {
   isActiveRun: boolean
   isEngaged: boolean
+  closeModal: () => void
 }
 
-export function DesktopEstopModal({
+export function DesktopEstopPressedModal({
   isActiveRun,
   isEngaged,
-}: DesktopEstopModalProps): JSX.Element {
+  closeModal,
+}: DesktopEstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalProps: LegacyModalProps = {
     type: isActiveRun ? 'outlinedError' : 'error',
     title: t('estop_pressed'),
+    onClose: () => closeModal(),
+    closeOnOutsideClick: false,
     childrenPadding: isActiveRun ? SPACING.spacing32 : SPACING.spacing24,
     width: '47rem',
   }
