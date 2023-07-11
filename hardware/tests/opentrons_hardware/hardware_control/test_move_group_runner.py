@@ -3,7 +3,11 @@ import pytest
 from typing import List, Any, Tuple
 from numpy import float64, float32, int32
 from mock import AsyncMock, call, MagicMock, patch
-import asyncio
+from opentrons_shared_data.errors.exceptions import (
+    MoveConditionNotMetError,
+    EnumeratedError,
+    MotionFailedError,
+)
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 
 from opentrons_hardware.firmware_bindings.constants import (
@@ -54,9 +58,7 @@ from opentrons_hardware.hardware_control.move_group_runner import (
     MoveScheduler,
     _CompletionPacket,
 )
-from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    MoveConditionNotMet,
-)
+
 from opentrons_hardware.hardware_control.types import NodeMap
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions as md,
@@ -261,7 +263,13 @@ async def test_single_group_clear(
     subject = MoveGroupRunner(move_groups=move_group_single)
     await subject._clear_groups(can_messenger=mock_can_messenger)
     mock_can_messenger.ensure_send.assert_has_calls(
-        [call(node_id=NodeId.broadcast, message=md.ClearAllMoveGroupsRequest())],
+        [
+            call(
+                node_id=NodeId.broadcast,
+                message=md.ClearAllMoveGroupsRequest(),
+                expected_nodes=[NodeId.head],
+            )
+        ],
     )
 
 
@@ -271,8 +279,21 @@ async def test_multi_group_clear(
     """It should send a clear group command before setup."""
     subject = MoveGroupRunner(move_groups=move_group_multiple)
     await subject.prep(can_messenger=mock_can_messenger)
+    expected = subject.all_nodes()
+    # Test that the expected nodes are correct
+    for group in move_group_multiple:
+        for step in group:
+            for node in step.keys():
+                assert node in expected
+
     mock_can_messenger.ensure_send.assert_has_calls(
-        [call(node_id=NodeId.broadcast, message=md.ClearAllMoveGroupsRequest())],
+        [
+            call(
+                node_id=NodeId.broadcast,
+                message=md.ClearAllMoveGroupsRequest(),
+                expected_nodes=list(expected),
+            )
+        ],
     )
 
 
@@ -745,7 +766,7 @@ async def test_home_timeout(
     mock_sender = MockSendMoveCompleter(move_group_home_single, subject, ack_id=3)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    with pytest.raises(MoveConditionNotMet):
+    with pytest.raises(MoveConditionNotMetError):
         await subject.run(can_messenger=mock_can_messenger)
 
 
@@ -797,7 +818,7 @@ async def test_tip_action_move_runner_fail_receives_one_response(
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send_failure
     mock_can_messenger.send.side_effect = mock_sender.mock_send_failure
 
-    with pytest.raises(asyncio.TimeoutError):
+    with pytest.raises(MotionFailedError):
         await subject.run(can_messenger=mock_can_messenger)
 
 
@@ -1214,7 +1235,7 @@ async def test_single_move_error(
     mock_sender = MockSendMoveErrorCompleter(move_group_single, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    with pytest.raises(RuntimeError):
+    with pytest.raises(EnumeratedError):
         await subject.run(can_messenger=mock_can_messenger)
     assert mock_sender.call_count == 1
 
@@ -1253,7 +1274,7 @@ async def test_multiple_move_error(
     mock_sender = MockSendMoveErrorCompleter(move_group_multiple_axes, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
     mock_can_messenger.send.side_effect = mock_sender.mock_send
-    with pytest.raises(RuntimeError):
+    with pytest.raises(EnumeratedError):
         await subject.run(can_messenger=mock_can_messenger)
     assert mock_sender.call_count == 2
 

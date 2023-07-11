@@ -1,5 +1,6 @@
 """Test serial setting."""
 import pytest
+from opentrons_shared_data.errors.exceptions import InvalidInstrumentData
 from opentrons_hardware.instruments.serial_utils import model_versionstring_from_int
 from opentrons_hardware.instruments.pipettes import serials as pip_serials
 from opentrons_hardware.instruments.gripper import serials as grip_serials
@@ -56,7 +57,7 @@ def test_scan_valid_pipette_serials(
 @pytest.mark.parametrize("scannedval", ["P111V02", "P1ksV22", "P3HSV12"])
 def test_pipette_name_validity(scannedval: str) -> None:
     """Pipette name lookup matching."""
-    with pytest.raises(ValueError, match="The pipette name part.*"):
+    with pytest.raises(InvalidInstrumentData, match="The pipette name part.*"):
         pip_serials.info_from_serial_string(scannedval)
 
 
@@ -75,7 +76,7 @@ def test_pipette_name_validity(scannedval: str) -> None:
 )
 def test_pipette_serial_validity(scannedval: str) -> None:
     """Various regex failures."""
-    with pytest.raises(ValueError, match="The serial number.*"):
+    with pytest.raises(InvalidInstrumentData, match="The serial number.*"):
         pip_serials.info_from_serial_string(scannedval)
 
 
@@ -133,7 +134,7 @@ def test_scan_valid_gripper_serials(
 )
 def test_gripper_serial_validity(scannedval: str) -> None:
     """Various regex failures for gripper."""
-    with pytest.raises(ValueError, match="The serial number.*"):
+    with pytest.raises(InvalidInstrumentData, match="The serial number.*"):
         grip_serials.gripper_info_from_serial_string(scannedval)
 
 

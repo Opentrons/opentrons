@@ -17,6 +17,7 @@ from typing import (
 )
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from opentrons.types import DeckSlotName, Point, MountType
@@ -255,6 +256,18 @@ class LabwareView(HasState[LabwareState]):
             "There is no labware loaded on this Module"
         )
 
+    def get_id_by_labware(self, labware_id: str) -> str:
+        """Return the ID of the labware loaded on the given labware."""
+        for labware in self.state.labware_by_id.values():
+            if (
+                isinstance(labware.location, OnLabwareLocation)
+                and labware.location.labwareId == labware_id
+            ):
+                return labware.id
+        raise errors.exceptions.LabwareNotLoadedOnLabwareError(
+            f"There is not labware loaded onto labware {labware_id}"
+        )
+
     def raise_if_labware_has_labware_on_top(self, labware_id: str) -> None:
         """Raise if labware has another labware on top."""
         for labware in self._state.labware_by_id.values():
@@ -469,6 +482,10 @@ class LabwareView(HasState[LabwareState]):
         if labware_definition.parameters.isTiprack:
             raise errors.LabwareIsTipRackError(
                 f"Given labware: {labware_id} is a tiprack. Can not load liquid."
+            )
+        if LabwareRole.adapter in labware_definition.allowedRoles:
+            raise errors.LabwareIsAdapterError(
+                f"Given labware: {labware_id} is an adapter. Can not load liquid."
             )
         if not contains_wells:
             raise errors.WellDoesNotExistError(

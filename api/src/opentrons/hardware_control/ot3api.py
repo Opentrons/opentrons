@@ -43,7 +43,7 @@ from opentrons.config.types import (
     CapacitivePassSettings,
     LiquidProbeSettings,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     MoveManager,
@@ -142,9 +142,7 @@ from .dev_types import (
     InstrumentDict,
     GripperDict,
 )
-from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    MoveConditionNotMet,
-)
+
 
 from .status_bar_state import StatusBarStateController
 
@@ -485,7 +483,7 @@ class OT3API(
 
         return await self._backend.module_controls.build_module(
             port="",
-            usb_port=USBPort(name="", port_number=0),
+            usb_port=USBPort(name="", port_number=1, port_group=PortGroup.LEFT),
             type=modules.ModuleType.from_model(model),
             sim_model=model.value,
         )
@@ -1227,7 +1225,7 @@ class OT3API(
                 except ZeroLengthMoveError:
                     self._log.info(f"{axis} already at home position, skip homing")
                     continue
-                except (MoveConditionNotMet, Exception) as e:
+                except BaseException as e:
                     self._log.exception(f"Homing failed: {e}")
                     self._current_position.clear()
                     raise
