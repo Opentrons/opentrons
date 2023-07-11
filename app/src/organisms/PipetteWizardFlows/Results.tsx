@@ -288,6 +288,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       isSuccess={isSuccess}
       subHeader={subHeader}
       isPending={isFetching}
+      width="100%"
     >
       {button}
     </SimpleWizardBody>
