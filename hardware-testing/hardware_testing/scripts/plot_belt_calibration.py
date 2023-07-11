@@ -11,8 +11,13 @@ class Plot:
         self.data = data
         self.list_colors = px.colors.qualitative.Plotly
         self.LIMIT = 1000
-        self.PROBE_DIA = 4
+        self.CUTOUT_SIZE = 20 # mm
+        self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
+        self.PROBE_DIA = 4 # mm
         self.PROBE_RAD = self.PROBE_DIA / 2
+        self.GAUGE_BLOCK = 12 # mm
+        self.CALIPER_X = 348.40 # mm
+        self.CALIPER_Y = 341.05 # mm
         self.PLOT_HEIGHT = 800
         self.PLOT_WIDTH = 1000
         self.PLOT_FONT = 16
@@ -31,12 +36,15 @@ class Plot:
             "legend":None,
             "annotation":None
         }
+        self.axes = ["X","Y"]
         self.gauges = ["XL","XR","YF","YB"]
         self.gauge_legend = ["X-Left","X-Right","Y-Front","Y-Back"]
         self.create_folder()
         self.df_data = self.import_file(self.data)
         self.df_error = self.error_df(self.df_data)
         self.df_avg_error = self.avg_error_df(self.df_error)
+        self.df_distance = self.distance_df(self.df_data, self.df_error)
+        self.df_avg_distance = self.avg_distance_df(self.df_distance)
 
     def import_file(self, file):
         df = pd.read_csv(file)
@@ -53,7 +61,6 @@ class Plot:
         df_error["Cycle"] = df["Cycle"]
         for gauge in self.gauges:
             df_error[f"{gauge} Error"] = (df[f"{gauge} Gauge"] - df[f"{gauge} Zero"]) - self.PROBE_RAD
-        print(df_error)
         return df_error
 
     def avg_error_df(self, df):
@@ -61,8 +68,35 @@ class Plot:
         for i in range(len(self.gauge_legend)):
             avg_list.append([self.gauge_legend[i], abs(df[f"{self.gauges[i]} Error"].mean())])
         df_avg_err = pd.DataFrame(avg_list, columns=["Gauge","Average Error"])
-        print(df_avg_err)
         return df_avg_err
+
+    def distance_df(self, df, error):
+        df_distance = pd.DataFrame()
+        x_left_gantry = df["XL Position"].str.strip(")(").str.split(";").str[0].astype(float)
+        x_right_gantry = df["XR Position"].str.strip(")(").str.split(";").str[0].astype(float)
+        y_front_gantry = df["YF Position"].str.strip(")(").str.split(";").str[1].astype(float)
+        y_back_gantry = df["YB Position"].str.strip(")(").str.split(";").str[1].astype(float)
+        x_error = error["XL Error"] + error["XR Error"]
+        y_error = error["YF Error"] + error["YB Error"]
+        df_distance["X Gantry"] = (x_right_gantry - x_left_gantry) - self.GAUGE_BLOCK*2
+        df_distance["Y Gantry"] = (y_back_gantry - y_front_gantry) - self.GAUGE_BLOCK*2
+        df_distance["X Measured"] = self.CALIPER_X + x_error
+        df_distance["Y Measured"] = self.CALIPER_Y + y_error
+        df_distance["X Gantry Error"] = df_distance["X Gantry"] - self.CALIPER_X
+        df_distance["Y Gantry Error"] = df_distance["Y Gantry"] - self.CALIPER_Y
+        df_distance["X Measured Error"] = df_distance["X Measured"] - self.CALIPER_X
+        df_distance["Y Measured Error"] = df_distance["Y Measured"] - self.CALIPER_Y
+        return df_distance
+
+    def avg_distance_df(self, df):
+        avg_list = []
+        for axis in self.axes:
+            avg_list.append([axis, "Gantry Position", df[f"{axis} Gantry"].mean(), abs(df[f"{axis} Gantry Error"].mean()), df[f"{axis} Gantry Error"].std()])
+        for axis in self.axes:
+            avg_list.append([axis, "Measured", df[f"{axis} Measured"].mean(), abs(df[f"{axis} Measured Error"].mean()), df[f"{axis} Measured Error"].std()])
+        df_avg_distance = pd.DataFrame(avg_list, columns=["Axis","Type","Distance","Average Error","StdDev"])
+        print(df_avg_distance)
+        return df_avg_distance
 
     def create_plot(self):
         print("Plotting Gauge Data...")
@@ -71,6 +105,8 @@ class Plot:
         self.plot_error()
         print("Plotting Average Error...")
         self.plot_avg_error()
+        print("Plotting Average Distance...")
+        self.plot_avg_distance()
         print("Plots Saved!")
 
     def set_legend(self, figure, legend):
@@ -188,6 +224,26 @@ class Plot:
         self.plot_param["y_title"] = "Average Absolute Error (mm)"
         self.plot_param["x_range"] = [x_start, x_end]
         self.plot_param["y_range"] = [0, 0.5]
+        self.plot_param["legend"] = "Data"
+        self.plot_param["annotation"] = None
+        self.write_plot(self.plot_param)
+
+    def plot_avg_distance(self):
+        df = self.df_avg_distance
+        x_axis = "Axis"
+        y_axis = "Average Error"
+        x_start = df[x_axis].iloc[0]
+        x_end = df[x_axis].iloc[-1]
+        y_start = df[y_axis].iloc[0]
+        y_end = df[y_axis].iloc[-1]
+        fig = px.bar(df, x=x_axis, y=[y_axis], color="Type", error_y="StdDev", barmode="group")
+        self.plot_param["figure"] = fig
+        self.plot_param["filename"] = "plot_avg_distance"
+        self.plot_param["title"] = f"Average Absolute Error"
+        self.plot_param["x_title"] = "Axis"
+        self.plot_param["y_title"] = "Average Absolute Error (mm)"
+        self.plot_param["x_range"] = [x_start, x_end]
+        self.plot_param["y_range"] = [0, 1]
         self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
