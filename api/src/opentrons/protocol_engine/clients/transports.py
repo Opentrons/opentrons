@@ -1,5 +1,4 @@
 """Base transport interfaces for communicating with a Protocol Engine."""
-from logging import getLogger
 from abc import ABC, abstractmethod
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
 from typing import Any, overload
@@ -12,8 +11,6 @@ from ..protocol_engine import ProtocolEngine
 from ..errors import ProtocolCommandFailedError
 from ..state import StateView
 from ..commands import CommandCreate, CommandResult
-
-log = getLogger(__name__)
 
 
 class AbstractSyncTransport(ABC):
