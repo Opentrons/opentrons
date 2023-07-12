@@ -3,8 +3,12 @@ import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { renderWithProviders } from '@opentrons/components'
-import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
-import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
+import {
+  mockOT2HealthResponse,
+  mockOT2ServerHealthResponse,
+  mockOT3HealthResponse,
+  mockOT3ServerHealthResponse,
+} from '@opentrons/discovery-client/src/__fixtures__'
 
 import { i18n } from '../../../i18n'
 import { mockFetchModulesSuccessActionPayloadModules } from '../../../redux/modules/__fixtures__'
@@ -14,74 +18,111 @@ import {
 } from '../../../redux/pipettes/__fixtures__'
 import { mockConnectableRobot } from '../../../redux/discovery/__fixtures__'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
+import { getRobotModelByName } from '../../../redux/discovery'
 import {
-  useAttachedModules,
-  useAttachedPipettes,
-  useProtocolDetailsForRun,
-} from '../hooks'
-import { useCurrentRunId } from '../../../organisms/ProtocolUpload/hooks'
-import { useCurrentRunStatus } from '../../../organisms/RunTimeControl/hooks'
-import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
+  HEALTH_STATUS_OK,
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
+} from '../../../redux/discovery/constants'
+import { useAttachedModules, useAttachedPipettes } from '../hooks'
 import { UpdateRobotBanner } from '../../UpdateRobotBanner'
+import { RobotOverflowMenu } from '../RobotOverflowMenu'
+import { RobotStatusHeader } from '../RobotStatusHeader'
 import { RobotCard } from '../RobotCard'
 
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { State } from '../../../redux/types'
 
 jest.mock('../../../redux/buildroot/selectors')
-jest.mock('../../../organisms/ProtocolUpload/hooks')
-jest.mock('../../../organisms/RunTimeControl/hooks')
-jest.mock('../../ProtocolUpload/hooks')
+jest.mock('../../../redux/discovery/selectors')
 jest.mock('../hooks')
 jest.mock('../../UpdateRobotBanner')
-jest.mock('../../ChooseProtocolSlideout')
+jest.mock('../../../redux/config')
+jest.mock('../RobotOverflowMenu')
+jest.mock('../RobotStatusHeader')
 
 const OT2_PNG_FILE_NAME = 'OT2-R_HERO.png'
+const FLEX_PNG_FILE_NAME = 'FLEX.png'
+const MOCK_STATE: State = {
+  discovery: {
+    robot: { connection: { connectedTo: null } },
+    robotsByName: {
+      'opentrons-robot-name': {
+        name: 'opentrons-robot-name',
+        health: mockOT2HealthResponse,
+        serverHealth: mockOT2ServerHealthResponse,
+        addresses: [
+          {
+            ip: '10.0.0.3',
+            port: 31950,
+            seen: true,
+            healthStatus: HEALTH_STATUS_OK,
+            serverHealthStatus: HEALTH_STATUS_OK,
+            healthError: null,
+            serverHealthError: null,
+            advertisedModel: ROBOT_MODEL_OT2,
+          },
+        ],
+      },
+      buzz: {
+        name: 'buzz',
+        health: mockOT3HealthResponse,
+        serverHealth: mockOT3ServerHealthResponse,
+        addresses: [
+          {
+            ip: '10.0.0.4',
+            port: 31950,
+            seen: true,
+            healthStatus: HEALTH_STATUS_OK,
+            serverHealthStatus: HEALTH_STATUS_OK,
+            healthError: null,
+            serverHealthError: null,
+            advertisedModel: ROBOT_MODEL_OT3,
+          },
+        ],
+      },
+    },
+  },
+} as any
 
-const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
-  typeof useCurrentRunId
->
-const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
-  typeof useCurrentRunStatus
->
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
->
 const mockUseAttachedModules = useAttachedModules as jest.MockedFunction<
   typeof useAttachedModules
 >
 const mockUseAttachedPipettes = useAttachedPipettes as jest.MockedFunction<
   typeof useAttachedPipettes
 >
-const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction<
-  typeof ChooseProtocolSlideout
->
 const mockUpdateRobotBanner = UpdateRobotBanner as jest.MockedFunction<
   typeof UpdateRobotBanner
+>
+const mockRobotOverflowMenu = RobotOverflowMenu as jest.MockedFunction<
+  typeof RobotOverflowMenu
+>
+const mockRobotStatusHeader = RobotStatusHeader as jest.MockedFunction<
+  typeof RobotStatusHeader
 >
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof getBuildrootUpdateDisplayInfo
 >
+const mockGetRobotModelByName = getRobotModelByName as jest.MockedFunction<
+  typeof getRobotModelByName
+>
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
-const PROTOCOL_DETAILS = {
-  displayName: 'Testosaur',
-  protocolData: simpleV6Protocol,
-  protocolKey: 'fakeProtocolKey',
-}
-
-const render = () => {
+const render = (props: React.ComponentProps<typeof RobotCard>) => {
   return renderWithProviders(
     <MemoryRouter>
-      <RobotCard robot={mockConnectableRobot} />
+      <RobotCard {...props} />
     </MemoryRouter>,
     {
       i18nInstance: i18n,
+      initialState: MOCK_STATE,
     }
   )
 }
 
 describe('RobotCard', () => {
+  let props: React.ComponentProps<typeof RobotCard>
+
   beforeEach(() => {
+    props = { robot: mockConnectableRobot }
     mockUseAttachedModules.mockReturnValue(
       mockFetchModulesSuccessActionPayloadModules
     )
@@ -89,88 +130,53 @@ describe('RobotCard', () => {
       left: mockLeftProtoPipette,
       right: mockRightProtoPipette,
     })
-    mockChooseProtocolSlideout.mockImplementation(({ showSlideout }) => (
-      <div>
-        Mock Choose Protocol Slideout {showSlideout ? 'showing' : 'hidden'}
-      </div>
-    ))
     mockUpdateRobotBanner.mockReturnValue(<div>Mock UpdateRobotBanner</div>)
+    mockRobotOverflowMenu.mockReturnValue(<div>Mock RobotOverflowMenu</div>)
+    mockRobotStatusHeader.mockReturnValue(<div>Mock RobotStatusHeader</div>)
     mockGetBuildrootUpdateDisplayInfo.mockReturnValue({
       autoUpdateAction: 'reinstall',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    when(mockUseCurrentRunId).calledWith().mockReturnValue(null)
-    when(mockUseCurrentRunStatus).calledWith().mockReturnValue(null)
-    when(mockUseProtocolDetailsForRun)
-      .calledWith(null)
-      .mockReturnValue({
-        displayName: null,
-        protocolData: {} as ProtocolAnalysisFile<{}>,
-        protocolKey: null,
-      })
+    when(mockGetRobotModelByName)
+      .calledWith(MOCK_STATE, mockConnectableRobot.name)
+      .mockReturnValue('OT-2')
   })
   afterEach(() => {
     jest.resetAllMocks()
     resetAllWhenMocks()
   })
 
-  it('renders an OT image', () => {
-    const [{ getByRole }] = render()
+  it('renders an OT-2 image when robot model is OT-2', () => {
+    const [{ getByRole }] = render(props)
     const image = getByRole('img')
 
     expect(image.getAttribute('src')).toEqual(OT2_PNG_FILE_NAME)
   })
 
+  it('renders an OT-3 image when robot model is OT-3', () => {
+    props = { robot: { ...mockConnectableRobot, name: 'buzz' } }
+    when(mockGetRobotModelByName)
+      .calledWith(MOCK_STATE, 'buzz')
+      .mockReturnValue('Opentrons Flex')
+    const [{ getByRole }] = render(props)
+    const image = getByRole('img')
+
+    expect(image.getAttribute('src')).toEqual(FLEX_PNG_FILE_NAME)
+  })
+
   it('renders a UpdateRobotBanner component', () => {
-    const [{ getByText }] = render()
+    const [{ getByText }] = render(props)
     getByText('Mock UpdateRobotBanner')
   })
 
-  it('renders the type of pipettes attached to left and right mounts', () => {
-    const [{ getByText }] = render()
-
-    getByText('Left Mount')
-    getByText('Left Pipette')
-    getByText('Right Mount')
-    getByText('Right Pipette')
+  it('renders a RobotOverflowMenu component', () => {
+    const [{ getByText }] = render(props)
+    getByText('Mock RobotOverflowMenu')
   })
 
-  it('renders a modules section', () => {
-    const [{ getByText }] = render()
-
-    getByText('Modules')
-  })
-
-  it('renders the type of robot and robot name', () => {
-    const [{ getByText }] = render()
-    getByText('OT-2')
-    getByText(mockConnectableRobot.name)
-  })
-
-  it('does not render a running protocol banner when a protocol is not running', () => {
-    const [{ queryByText }] = render()
-
-    expect(queryByText('Testosaur;')).toBeFalsy()
-    expect(queryByText('Go to Run')).toBeFalsy()
-  })
-
-  it('renders a running protocol banner when a protocol is running', () => {
-    when(mockUseCurrentRunId).calledWith().mockReturnValue('1')
-    when(mockUseCurrentRunStatus)
-      .calledWith()
-      .mockReturnValue(RUN_STATUS_RUNNING)
-    when(mockUseProtocolDetailsForRun)
-      .calledWith('1')
-      .mockReturnValue(PROTOCOL_DETAILS)
-
-    const [{ getByRole, getByText }] = render()
-
-    getByText('Testosaur; Running')
-
-    const runLink = getByRole('link', { name: 'Go to Run' })
-    expect(runLink.getAttribute('href')).toEqual(
-      '/devices/opentrons-robot-name/protocol-runs/1/run-log'
-    )
+  it('renders a RobotStatusHeader component', () => {
+    const [{ getByText }] = render(props)
+    getByText('Mock RobotStatusHeader')
   })
 })

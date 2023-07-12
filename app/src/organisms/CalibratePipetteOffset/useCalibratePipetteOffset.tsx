@@ -14,25 +14,18 @@ import type {
   PipetteOffsetCalibrationSessionParams,
 } from '../../redux/sessions/types'
 import type { RequestState } from '../../redux/robot-api/types'
-import type { PipetteOffsetIntent } from '../../organisms/CalibrationPanels/types'
 
 import { Portal } from '../../App/portal'
 import { CalibratePipetteOffset } from '.'
-import { INTENT_CALIBRATE_PIPETTE_OFFSET } from '../../organisms/CalibrationPanels'
 import { pipetteOffsetCalibrationStarted } from '../../redux/analytics'
+import { useTranslation } from 'react-i18next'
 
 // pipette calibration commands for which the full page spinner should not appear
 const spinnerCommandBlockList: SessionCommandString[] = [
   Sessions.sharedCalCommands.JOG,
 ]
-
-const PIPETTE_OFFSET_TITLE = 'Pipette offset calibration'
-const TIP_LENGTH_TITLE = 'Tip length calibration'
-const EXIT = 'exit'
-
 export interface InvokerProps {
   overrideParams?: Partial<PipetteOffsetCalibrationSessionParams>
-  withIntent?: PipetteOffsetIntent
 }
 
 export type Invoker = (props: InvokerProps | undefined) => void
@@ -43,6 +36,7 @@ export function useCalibratePipetteOffset(
     Partial<Omit<PipetteOffsetCalibrationSessionParams, 'mount'>>,
   onComplete: (() => unknown) | null = null
 ): [Invoker, JSX.Element | null] {
+  const { t } = useTranslation(['robot_calibration', 'shared'])
   const createRequestId = React.useRef<string | null>(null)
   const deleteRequestId = React.useRef<string | null>(null)
   const jogRequestId = React.useRef<string | null>(null)
@@ -91,42 +85,38 @@ export function useCalibratePipetteOffset(
 
   const startingSession =
     useSelector<State, RequestState | null>(state =>
-      createRequestId.current
+      createRequestId.current != null
         ? RobotApi.getRequestById(state, createRequestId.current)
         : null
     )?.status === RobotApi.PENDING
 
   const showSpinner =
     useSelector<State, RequestState | null>(state =>
-      spinnerRequestId.current
+      spinnerRequestId.current != null
         ? RobotApi.getRequestById(state, spinnerRequestId.current)
         : null
     )?.status === RobotApi.PENDING
 
   const shouldClose =
     useSelector<State, RequestState | null>(state =>
-      deleteRequestId.current
+      deleteRequestId.current != null
         ? RobotApi.getRequestById(state, deleteRequestId.current)
         : null
     )?.status === RobotApi.SUCCESS
 
   const isJogging =
     useSelector((state: State) =>
-      jogRequestId.current
+      jogRequestId.current != null
         ? RobotApi.getRequestById(state, jogRequestId.current)
         : null
     )?.status === RobotApi.PENDING
 
   React.useEffect(() => {
     if (shouldClose) {
-      onComplete && onComplete()
+      onComplete?.()
       deleteRequestId.current = null
     }
   }, [shouldClose, onComplete])
-
-  const [intent, setIntent] = React.useState<PipetteOffsetIntent>(
-    INTENT_CALIBRATE_PIPETTE_OFFSET
-  )
 
   const {
     mount,
@@ -135,11 +125,7 @@ export function useCalibratePipetteOffset(
     tipRackDefinition = null,
   } = sessionParams
   const handleStartPipOffsetCalSession: Invoker = (props = {}) => {
-    const {
-      overrideParams = {},
-      withIntent = INTENT_CALIBRATE_PIPETTE_OFFSET,
-    } = props
-    setIntent(withIntent)
+    const { overrideParams = {} } = props
     dispatchRequests(
       Sessions.ensureSession(
         robotName,
@@ -155,50 +141,45 @@ export function useCalibratePipetteOffset(
     )
     dispatch(
       pipetteOffsetCalibrationStarted(
-        withIntent,
         mount,
         hasCalibrationBlock,
         shouldRecalibrateTipLength,
-        tipRackDefinition
+        tipRackDefinition != null
           ? `${tipRackDefinition.namespace}/${tipRackDefinition.parameters.loadName}/${tipRackDefinition.version}`
           : null
       )
     )
   }
   const isCorrectSession =
-    pipOffsetCalSession &&
+    pipOffsetCalSession != null &&
     mount === pipOffsetCalSession.createParams.mount &&
     tipRackDefinition === pipOffsetCalSession.createParams.tipRackDefinition
 
-  const Wizard =
-    startingSession || isCorrectSession ? (
-      <Portal level="top">
-        {startingSession ? (
-          <SpinnerModalPage
-            titleBar={{
-              title:
-                intent === INTENT_CALIBRATE_PIPETTE_OFFSET
-                  ? PIPETTE_OFFSET_TITLE
-                  : TIP_LENGTH_TITLE,
-              back: {
-                disabled: true,
-                title: EXIT,
-                children: EXIT,
-              },
-            }}
-          />
-        ) : (
-          <CalibratePipetteOffset
-            session={pipOffsetCalSession}
-            robotName={robotName}
-            showSpinner={startingSession || showSpinner}
-            dispatchRequests={dispatchRequests}
-            isJogging={isJogging}
-            intent={intent}
-          />
-        )}
-      </Portal>
-    ) : null
+  let Wizard: JSX.Element | null = (
+    <Portal level="top">
+      {startingSession ? (
+        <SpinnerModalPage
+          titleBar={{
+            title: t('pipette_offset_calibration'),
+            back: {
+              disabled: true,
+              title: t('shared:exit'),
+              children: t('shared:exit'),
+            },
+          }}
+        />
+      ) : (
+        <CalibratePipetteOffset
+          session={pipOffsetCalSession}
+          robotName={robotName}
+          showSpinner={startingSession || showSpinner}
+          dispatchRequests={dispatchRequests}
+          isJogging={isJogging}
+        />
+      )}
+    </Portal>
+  )
+  if (!(startingSession || isCorrectSession)) Wizard = null
 
   return [handleStartPipOffsetCalSession, Wizard]
 }

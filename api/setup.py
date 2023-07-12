@@ -22,11 +22,13 @@ if os.name == "posix":
 
 def get_version():
     buildno = os.getenv("BUILD_NUMBER")
+    project = os.getenv("OPENTRONS_PROJECT", "robot-stack")
+    git_dir = os.getenv("OPENTRONS_GIT_DIR", None)
     if buildno:
         normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version("api", **normalize_opts)
+    return normalize_version("api", project, git_dir=git_dir, **normalize_opts)
 
 
 VERSION = get_version()
@@ -66,6 +68,7 @@ INSTALL_REQUIRES = [
     "pyserial==3.5",
     "typing-extensions>=4.0.0,<5",
     "click>=8.0.0,<9",
+    'importlib-metadata >= 1.0 ; python_version < "3.8"',
 ]
 
 
@@ -97,7 +100,7 @@ if __name__ == "__main__":
         install_requires=INSTALL_REQUIRES,
         include_package_data=True,
         package_dir={"": "src"},
-        package_data={"opentrons": ["py.typed", "package.json"]},
+        package_data={"opentrons": ["py.typed"]},
         entry_points={
             "console_scripts": [
                 "opentrons_simulate = opentrons.simulate:main",

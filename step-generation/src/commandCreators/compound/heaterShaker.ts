@@ -4,7 +4,6 @@ import {
   CommandCreator,
   CurriedCommandCreator,
   HeaterShakerArgs,
-  HeaterShakerModuleState,
 } from '../../types'
 import { getModuleState } from '../../robotStateSelectors'
 import { delay } from '../atomic/delay'
@@ -12,7 +11,6 @@ import { heaterShakerOpenLatch } from '../atomic/heaterShakerOpenLatch'
 import { heaterShakerCloseLatch } from '../atomic/heaterShakerCloseLatch'
 import { heaterShakerDeactivateHeater } from '../atomic/heaterShakerDeactivateHeater'
 import { setTemperature } from '../atomic/setTemperature'
-import { waitForTemperature } from '../atomic'
 import { heaterShakerStopShake } from '../atomic/heaterShakerStopShake'
 import { heaterShakerSetTargetShakeSpeed } from '../atomic/heaterShakerSetTargetShakeSpeed'
 
@@ -21,12 +19,14 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
   invariantContext,
   prevRobotState
 ) => {
-  const heaterShakerState = getModuleState(
-    prevRobotState,
-    args.module
-  ) as HeaterShakerModuleState
+  if (args.module == null) {
+    return {
+      errors: [errorCreators.missingModuleError()],
+    }
+  }
+  const heaterShakerState = getModuleState(prevRobotState, args.module)
 
-  if (heaterShakerState === null) {
+  if (heaterShakerState == null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }
@@ -34,13 +34,7 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
 
   const commandCreators: CurriedCommandCreator[] = []
 
-  if (args.latchOpen) {
-    commandCreators.push(
-      curryCommandCreator(heaterShakerOpenLatch, {
-        moduleId: args.module,
-      })
-    )
-  } else {
+  if (!args.latchOpen) {
     commandCreators.push(
       curryCommandCreator(heaterShakerCloseLatch, {
         moduleId: args.module,
@@ -62,28 +56,32 @@ export const heaterShaker: CommandCreator<HeaterShakerArgs> = (
         commandCreatorFnName: 'setTemperature',
       })
     )
-
-    commandCreators.push(
-      curryCommandCreator(waitForTemperature, {
-        module: args.module,
-        temperature: args.targetTemperature,
-        commandCreatorFnName: 'waitForTemperature',
-      })
-    )
   }
 
-  if (args.rpm === null) {
+  if (
+    args.rpm === null &&
+    'targetSpeed' in heaterShakerState &&
+    heaterShakerState.targetSpeed !== null
+  ) {
     commandCreators.push(
       curryCommandCreator(heaterShakerStopShake, {
         moduleId: args.module,
       })
     )
-  } else {
+  } else if (args.rpm !== null) {
     commandCreators.push(
       curryCommandCreator(heaterShakerSetTargetShakeSpeed, {
         moduleId: args.module,
         commandCreatorFnName: 'setShakeSpeed',
         rpm: args.rpm,
+      })
+    )
+  }
+
+  if (args.latchOpen) {
+    commandCreators.push(
+      curryCommandCreator(heaterShakerOpenLatch, {
+        moduleId: args.module,
       })
     )
   }

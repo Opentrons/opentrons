@@ -116,21 +116,32 @@ export const modulePipetteCollisionDanger = (): CommandCreatorError => {
 export const thermocyclerLidClosed = (): CommandCreatorError => {
   return {
     type: 'THERMOCYCLER_LID_CLOSED',
-    message: 'Attempted to pipette into a thermocycler with the lid closed.',
+    message:
+      'Attempted to interact with contents of a thermocycler with the lid closed.',
   }
 }
 
 export const heaterShakerLatchOpen = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_LATCH_OPEN',
-    message: 'Attempted to pipette into a heater-shaker with the latch open.',
+    message:
+      'Attempted to interact with contents of a heater-shaker with the latch open.',
+  }
+}
+
+export const heaterShakerLatchClosed = (): CommandCreatorError => {
+  return {
+    type: 'HEATER_SHAKER_LATCH_CLOSED',
+    message:
+      'Attempted to move the contents of a heater-shaker with the latch closed.',
   }
 }
 
 export const heaterShakerIsShaking = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_IS_SHAKING',
-    message: 'Attempted to pipette into a heater-shaker when it is shaking.',
+    message:
+      'Attempted to interact with the contents of a heater-shaker when it is shaking.',
   }
 }
 
@@ -168,5 +179,12 @@ export const heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = (): Com
   return {
     type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
     message: '8-Channel pipette cannot access labware',
+  }
+}
+
+export const labwareOffDeck = (): CommandCreatorError => {
+  return {
+    type: 'LABWARE_OFF_DECK',
+    message: 'Attempted to interact with labware off deck',
   }
 }

@@ -1,13 +1,7 @@
 import { createSelector } from 'reselect'
 import find from 'lodash/find'
 import map from 'lodash/map'
-import orderBy from 'lodash/orderBy'
-import uniqBy from 'lodash/uniqBy'
 import { long2ip } from 'netmask'
-import Semver from 'semver'
-
-import { getFeatureFlags } from '../config'
-import { getRobotApiVersionByName } from '../discovery'
 
 import { INTERFACE_WIFI, INTERFACE_ETHERNET } from './constants'
 
@@ -56,19 +50,6 @@ export const getNetworkInterfaces: (
   }
 )
 
-const LIST_ORDER = [
-  ['active', 'ssid'],
-  ['desc', 'asc'],
-]
-
-export const getWifiList: (
-  state: State,
-  robotName: string
-) => Types.WifiNetwork[] = createSelector(
-  (state: State, robotName: string) => state.networking[robotName]?.wifiList,
-  (wifiList = []) => uniqBy(orderBy(wifiList, ...LIST_ORDER), 'ssid')
-)
-
 export const getWifiKeys: (
   state: State,
   robotName: string
@@ -100,22 +81,3 @@ export const getEapOptions = (
 ): Types.EapOption[] => {
   return state.networking[robotName]?.eapOptions ?? []
 }
-
-const API_MIN_DISCONNECT_VERSION = '3.17.0-alpha.0'
-
-export const getCanDisconnect: (
-  state: State,
-  robotName: string
-) => boolean = createSelector(
-  getWifiList,
-  getRobotApiVersionByName,
-  getFeatureFlags,
-  (list, apiVersion, featureFlags) => {
-    const active = list.some(nw => nw.active)
-    const supportsDisconnect = Semver.valid(apiVersion)
-      ? Semver.gte(apiVersion as string, API_MIN_DISCONNECT_VERSION)
-      : false
-
-    return Boolean(active && supportsDisconnect)
-  }
-)

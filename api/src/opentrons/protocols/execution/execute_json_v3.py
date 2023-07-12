@@ -1,8 +1,7 @@
 import logging
 from typing import Dict, TYPE_CHECKING
 
-from opentrons.protocol_api.contexts import ProtocolContext, InstrumentContext
-from opentrons.protocol_api import labware
+from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware, Well
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.types import Point, Location
 from opentrons_shared_data.protocol.constants import (
@@ -44,8 +43,8 @@ def load_pipettes_from_json(
 
 
 def _get_well(
-    loaded_labware: Dict[str, labware.Labware], params: "PipetteAccessParams"
-) -> labware.Well:
+    loaded_labware: Dict[str, Labware], params: "PipetteAccessParams"
+) -> Well:
     labwareId = params["labware"]
     well = params["well"]
     plate = loaded_labware[labwareId]
@@ -71,7 +70,7 @@ def _set_flow_rate(pipette: InstrumentContext, params: "FlowRateParams") -> None
 
 def load_labware_from_json_defs(
     ctx: ProtocolContext, protocol: "JsonProtocolV3"
-) -> Dict[str, labware.Labware]:
+) -> Dict[str, Labware]:
     protocol_labware = protocol["labware"]
     definitions = protocol["labwareDefinitions"]
     loaded_labware = {}
@@ -88,7 +87,7 @@ def load_labware_from_json_defs(
 
 
 def _get_location_with_offset(
-    loaded_labware: Dict[str, labware.Labware], params: "PipetteAccessWithOffsetParams"
+    loaded_labware: Dict[str, Labware], params: "PipetteAccessWithOffsetParams"
 ) -> Location:
     well = _get_well(loaded_labware, params)
 
@@ -115,7 +114,7 @@ def _delay(context: ProtocolContext, params: "DelayParams") -> None:
 
 def _blowout(
     instruments: Dict[str, InstrumentContext],
-    loaded_labware: Dict[str, labware.Labware],
+    loaded_labware: Dict[str, Labware],
     params: "BlowoutParams",
 ) -> None:
     pipette_id = params["pipette"]
@@ -127,7 +126,7 @@ def _blowout(
 
 def _pick_up_tip(
     instruments: Dict[str, InstrumentContext],
-    loaded_labware: Dict[str, labware.Labware],
+    loaded_labware: Dict[str, Labware],
     params: "PipetteAccessParams",
 ) -> None:
     pipette_id = params["pipette"]
@@ -138,7 +137,7 @@ def _pick_up_tip(
 
 def _drop_tip(
     instruments: Dict[str, InstrumentContext],
-    loaded_labware: Dict[str, labware.Labware],
+    loaded_labware: Dict[str, Labware],
     params: "PipetteAccessParams",
 ) -> None:
     pipette_id = params["pipette"]
@@ -149,7 +148,7 @@ def _drop_tip(
 
 def _aspirate(
     instruments: Dict[str, InstrumentContext],
-    loaded_labware: Dict[str, labware.Labware],
+    loaded_labware: Dict[str, Labware],
     params: "StandardLiquidHandlingParams",
 ) -> None:
     pipette_id = params["pipette"]
@@ -162,7 +161,7 @@ def _aspirate(
 
 def _dispense(
     instruments: Dict[str, InstrumentContext],
-    loaded_labware: Dict[str, labware.Labware],
+    loaded_labware: Dict[str, Labware],
     params: "StandardLiquidHandlingParams",
 ) -> None:
     pipette_id = params["pipette"]
@@ -175,7 +174,7 @@ def _dispense(
 
 def _air_gap(
     instruments: Dict[str, InstrumentContext],
-    loaded_labware: Dict[str, labware.Labware],
+    loaded_labware: Dict[str, Labware],
     params: "StandardLiquidHandlingParams",
 ) -> None:
     pipette_id = params["pipette"]
@@ -196,7 +195,7 @@ def _air_gap(
 
 def _touch_tip(
     instruments: Dict[str, InstrumentContext],
-    loaded_labware: Dict[str, labware.Labware],
+    loaded_labware: Dict[str, Labware],
     params: "TouchTipParams",
 ) -> None:
     pipette_id = params["pipette"]
@@ -246,7 +245,7 @@ def dispatch_json(
     context: ProtocolContext,
     protocol_data: "JsonProtocolV3",
     instruments: Dict[str, InstrumentContext],
-    loaded_labware: Dict[str, labware.Labware],
+    loaded_labware: Dict[str, Labware],
 ) -> None:
     commands = protocol_data["commands"]
 

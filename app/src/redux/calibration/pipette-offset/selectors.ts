@@ -1,4 +1,4 @@
-import { head } from 'lodash'
+import head from 'lodash/head'
 
 import type { State } from '../../types'
 import type { PipetteOffsetCalibration } from '../api-types'

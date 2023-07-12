@@ -1,6 +1,6 @@
 import logging
 
-from opentrons.protocol_api.contexts import ProtocolContext
+from opentrons.protocol_api import ProtocolContext
 from opentrons.protocols.execution.execute_python import run_python
 from opentrons.protocols.execution.json_dispatchers import (
     pipette_command_map,

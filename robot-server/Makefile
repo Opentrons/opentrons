@@ -4,19 +4,29 @@ include ../scripts/push.mk
 include ../scripts/python.mk
 
 SHX := npx shx
+REDOC := npx @redocly/cli
 
 # Path of source package
 SRC_PATH = robot_server
 
-# Find the version of the wheel from package.json using a helper script. We
+# Project to get the version for
+ot_project := $(OPENTRONS_PROJECT)
+project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
+project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+
+
+# Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,robot-server,robot_server,$(BUILD_NUMBER))
+wheel_file = dist/$(call python_get_wheelname,robot-server,$(project_rs_default),robot_server,$(BUILD_NUMBER))
 
-# Find the version of the sdist from package.json using a helper script. We
+# Find the version of the sdist from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the sdist.
-sdist_file = dist/$(call python_get_sdistname,robot-server,robot_server)
+sdist_file = dist/$(call python_get_sdistname,robot-server,$(project_ot3_default),robot_server)
+
+# Find the branch, sha, version that will be used to update the VERSION.json file
+version_file = $(call python_get_git_version,robot-server,$(project_ot3_default),robot_server)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -40,8 +50,10 @@ ot_sources := $(ot_py_sources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'robot_server/**/.mypy_cache'
-
+clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'robot_server/**/.mypy_cache'
+clean_wheel_cmd = $(clean_cmd) dist/*.whl
+clean_sdist_cmd = $(clean_cmd) dist/*.tar.gz
+clean_all_cmd = $(clean_cmd) dist
 # Uvicorn command to run the robot server in dev mode.
 #
 # "--lifespan on" ensures errors in startup and shutdown handlers won't be hidden.
@@ -75,27 +87,27 @@ setup-ot2:
 
 .PHONY: clean
 clean:
-	$(clean_cmd)
+	$(clean_all_cmd)
 
 .PHONY: teardown
 teardown:
 	$(pipenv) --rm
 
-$(wheel_file): setup.py $(ot_sources)
-	$(clean_cmd)
+.PHONY: wheel
+wheel: export OPENTRONS_PROJECT=$(project_rs_default)
+wheel: setup.py $(ot_sources)
+	$(clean_wheel_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
-wheel: $(wheel_file)
-
-$(sdist_file): setup.py $(ot_sources)
-	$(clean_cmd)
+.PHONY: sdist
+sdist: export OPENTRONS_PROJECT=$(project_ot3_default)
+sdist: setup.py $(ot_sources)
+	$(clean_sdist_cmd)
 	$(python) setup.py sdist
 	$(SHX) rm -rf build
 	$(SHX) ls dist
-
-sdist: $(sdist_file)
 
 .PHONY: test
 test:
@@ -144,7 +156,7 @@ push: wheel
 
 .PHONY: push-ot3
 push-ot3: sdist
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","robot_server")
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),"/opt/opentrons-robot-server","robot_server",,,$(version_file))
 
 .PHONY: install-key
 install-key:
@@ -184,8 +196,10 @@ change-left:
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
 
-.PHONY: docs
-docs: settings_schema.json
 
-settings_schema.json: robot_server/settings.py
-	$(python) -m scripts.settings_schema $@
+.PHONY: docs
+docs:
+	$(SHX) mkdir -p docs/build/
+	$(python) ./scripts/spec_generator.py docs/build/openapi.json
+	$(SHX) mkdir -p docs/dist/http
+	$(REDOC) build-docs docs/build/openapi.json -o docs/dist/http/api_reference.html

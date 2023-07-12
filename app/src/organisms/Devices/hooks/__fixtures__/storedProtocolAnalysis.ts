@@ -1,34 +1,37 @@
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
 
 import type {
-  LoadedLabwareById,
-  LoadedLabwareDefinitionsById,
-  ModuleModelsById,
-  PipetteNamesById,
-} from '@opentrons/api-client'
-import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { StoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
+  LoadedLabware,
+  LoadedModule,
+  LoadedPipette,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 
-export const LABWARE_BY_ID: LoadedLabwareById = {
-  'labware-0': {
-    definitionId: 'fakeLabwareDefinitionId',
-    displayName: 'a fake labware',
+export const LABWARE_ENTITY: LoadedLabware = {
+  id: 'labware-0',
+  loadName: 'fakeLoadName',
+  definitionUri: 'fakeLabwareDefinitionUri',
+  displayName: 'a fake labware',
+  location: {
+    slotName: '1',
   },
 }
-export const LABWARE_DEFINITIONS: LoadedLabwareDefinitionsById = {
-  fakeLabwareDefinitionId: {} as LabwareDefinition2,
+export const MODULE_ENTITY: LoadedModule = {
+  id: 'module-0',
+  model: 'thermocyclerModuleV1',
+  location: { slotName: '4' },
+  serialNumber: 'xyz',
 }
-export const MODULE_MODELS_BY_ID: ModuleModelsById = {
-  'module-0': { model: 'thermocyclerModuleV1' },
-}
-export const PIPETTE_NAMES_BY_ID: PipetteNamesById = {
-  'pipette-0': { name: 'p10_single' },
+
+export const PIPETTE_ENTITY: LoadedPipette = {
+  id: 'pipette-0',
+  pipetteName: 'p10_single',
+  mount: 'left',
 }
 
 export const STORED_PROTOCOL_ANALYSIS = {
   ...storedProtocolData.mostRecentAnalysis,
-  modules: MODULE_MODELS_BY_ID,
-  labware: LABWARE_BY_ID,
-  labwareDefinitions: LABWARE_DEFINITIONS,
-  pipettes: PIPETTE_NAMES_BY_ID,
-} as StoredProtocolAnalysis
+  modules: [MODULE_ENTITY],
+  labware: [LABWARE_ENTITY],
+  pipettes: [PIPETTE_ENTITY],
+} as ProtocolAnalysisOutput

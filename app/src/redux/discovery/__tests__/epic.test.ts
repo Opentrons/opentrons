@@ -50,21 +50,4 @@ describe('discovery actions', () => {
       })
     })
   })
-
-  it('startDiscoveryOnRestartEpic', () => {
-    testScheduler.run(({ hot, expectObservable }) => {
-      const serverSuccessAction = {
-        type: 'api:SERVER_SUCCESS',
-        payload: { path: 'restart' },
-      }
-
-      const action$ = hot<Action>('-a', { a: serverSuccessAction } as any)
-      const state$ = hot<State>('s-', {})
-      const output$ = discoveryEpic(action$, state$)
-
-      expectObservable(output$).toBe('-a ', {
-        a: Actions.startDiscovery(60000),
-      })
-    })
-  })
 })

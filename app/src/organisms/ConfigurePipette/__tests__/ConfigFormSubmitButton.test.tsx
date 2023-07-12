@@ -14,6 +14,7 @@ describe('ConfigFormSubmitButton', () => {
   beforeEach(() => {
     props = {
       disabled: false,
+      formId: 'id',
     }
   })
   afterEach(() => {
@@ -27,6 +28,7 @@ describe('ConfigFormSubmitButton', () => {
   it('renders bottom button text and disabled', () => {
     props = {
       disabled: true,
+      formId: 'id',
     }
     const { getByRole } = render(props)
     const button = getByRole('button', { name: 'Confirm' })

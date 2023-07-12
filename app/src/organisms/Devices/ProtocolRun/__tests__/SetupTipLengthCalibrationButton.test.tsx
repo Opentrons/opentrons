@@ -1,48 +1,36 @@
 import * as React from 'react'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import {
-  renderWithProviders,
-  useConditionalConfirm,
-} from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 
 import { i18n } from '../../../../i18n'
-import { AskForCalibrationBlockModal } from '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { getHasCalibrationBlock } from '../../../../redux/config'
+import { mockTipLengthCalLauncher } from '../../hooks/__fixtures__/taskListFixtures'
 import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
+import { useDashboardCalibrateTipLength } from '../../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
 import { SetupTipLengthCalibrationButton } from '../SetupTipLengthCalibrationButton'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 jest.mock('@opentrons/components/src/hooks')
-jest.mock(
-  '../../../../organisms/CalibrateTipLength/AskForCalibrationBlockModal'
-)
 jest.mock('../../../../organisms/RunTimeControl/hooks')
-jest.mock('../../../../redux/config/selectors')
+jest.mock(
+  '../../../../pages/Devices/CalibrationDashboard/hooks/useDashboardCalibrateTipLength'
+)
+jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/sessions/selectors')
 jest.mock('../../hooks')
 
-const mockUseConditionalConfirm = useConditionalConfirm as jest.MockedFunction<
-  typeof useConditionalConfirm
->
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
->
-const mockGetHasCalibrationBlock = getHasCalibrationBlock as jest.MockedFunction<
-  typeof getHasCalibrationBlock
->
-const mockAskForCalibrationBlockModal = AskForCalibrationBlockModal as jest.MockedFunction<
-  typeof AskForCalibrationBlockModal
 >
 const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
   typeof useDeckCalibrationData
 >
-
-const mockConfirm = jest.fn()
-const mockCancel = jest.fn()
+const mockUseDashboardCalibrateTipLength = useDashboardCalibrateTipLength as jest.MockedFunction<
+  typeof useDashboardCalibrateTipLength
+>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -77,19 +65,14 @@ describe('SetupTipLengthCalibrationButton', () => {
 
   beforeEach(() => {
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
-    when(mockUseConditionalConfirm).mockReturnValue({
-      confirm: mockConfirm,
-      showConfirmation: true,
-      cancel: mockCancel,
-    })
-    when(mockGetHasCalibrationBlock).mockReturnValue(null)
-    when(mockAskForCalibrationBlockModal).mockReturnValue(
-      <div>Mock AskForCalibrationBlockModal</div>
-    )
     when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
       deckCalibrationData: mockDeckCalData,
       isDeckCalibrated: true,
     })
+    mockUseDashboardCalibrateTipLength.mockReturnValue([
+      mockTipLengthCalLauncher,
+      null,
+    ])
   })
 
   afterEach(() => {
@@ -104,9 +87,21 @@ describe('SetupTipLengthCalibrationButton', () => {
 
   it('renders the recalibrate link if tip length calibrated and run unstarted', () => {
     const { getByText } = render({ hasCalibrated: true })
-    const recalibrate = getByText('Recalibrate')
-    recalibrate.click()
-    expect(mockConfirm).toBeCalled()
+    expect(getByText('Recalibrate')).toBeTruthy()
+  })
+
+  it('button launches the tip length calibration wizard when clicked - no calibration', () => {
+    const { getByText } = render()
+    const calibrateBtn = getByText('Calibrate Now')
+    calibrateBtn.click()
+    expect(mockTipLengthCalLauncher).toHaveBeenCalled()
+  })
+
+  it('button launches the tip length calibration wizard when clicked - recalibration', () => {
+    const { getByText } = render({ hasCalibrated: true })
+    const recalibrateBtn = getByText('Recalibrate')
+    recalibrateBtn.click()
+    expect(mockTipLengthCalLauncher).toHaveBeenCalled()
   })
 
   it('disables the recalibrate link if tip length calibrated and run started', () => {
@@ -114,6 +109,6 @@ describe('SetupTipLengthCalibrationButton', () => {
     const { getByText } = render({ hasCalibrated: true })
     const recalibrate = getByText('Recalibrate')
     recalibrate.click()
-    expect(mockConfirm).not.toBeCalled()
+    expect(mockTipLengthCalLauncher).not.toBeCalled()
   })
 })

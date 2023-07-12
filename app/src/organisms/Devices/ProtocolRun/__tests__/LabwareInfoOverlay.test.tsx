@@ -4,22 +4,22 @@ import {
   getLabwareDisplayName,
   LabwareDefinition2,
   ProtocolFile,
+  LoadedLabware,
 } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import { nestedTextMatcher, renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { useCurrentRun } from '../../../ProtocolUpload/hooks'
-import { useLabwareOffsetForLabware } from '../../../LabwarePositionCheck/hooks/useLabwareOffsetForLabware'
-import { useProtocolDetailsForRun } from '../../hooks'
 import { getLabwareLocation } from '../utils/getLabwareLocation'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
 import { getLabwareDefinitionUri } from '../utils/getLabwareDefinitionUri'
+import { useLabwareOffsetForLabware } from '../useLabwareOffsetForLabware'
 
 jest.mock('../../../ProtocolUpload/hooks')
-jest.mock('../../../LabwarePositionCheck/hooks/useLabwareOffsetForLabware')
 jest.mock('../utils/getLabwareLocation')
 jest.mock('../../hooks')
 jest.mock('../utils/getLabwareDefinitionUri')
+jest.mock('../useLabwareOffsetForLabware')
 
 jest.mock('@opentrons/shared-data', () => {
   const actualSharedData = jest.requireActual('@opentrons/shared-data')
@@ -46,9 +46,6 @@ const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
 const mockUseCurrentRun = useCurrentRun as jest.MockedFunction<
   typeof useCurrentRun
 >
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
->
 const mockUseLabwareOffsetForLabware = useLabwareOffsetForLabware as jest.MockedFunction<
   typeof useLabwareOffsetForLabware
 >
@@ -59,7 +56,6 @@ const mockGetLabwareDefinitionUri = getLabwareDefinitionUri as jest.MockedFuncti
   typeof getLabwareDefinitionUri
 >
 const MOCK_LABWARE_ID = 'some_labware_id'
-const MOCK_LABWARE_DEFINITION_ID = 'some_labware_definition_id'
 const MOCK_LABWARE_DEFINITION_URI = 'some_labware_definition_uri'
 const MOCK_SLOT_NAME = '4'
 const MOCK_LABWARE_VECTOR = { x: 1, y: 2, z: 3 }
@@ -67,7 +63,7 @@ const MOCK_RUN_ID = 'fake_run_id'
 
 describe('LabwareInfoOverlay', () => {
   let props: React.ComponentProps<typeof LabwareInfoOverlay>
-  let labware: ProtocolFile<{}>['labware']
+  let labware: LoadedLabware[]
   let labwareDefinitions: ProtocolFile<{}>['labwareDefinitions']
   beforeEach(() => {
     props = {
@@ -76,32 +72,28 @@ describe('LabwareInfoOverlay', () => {
       labwareId: MOCK_LABWARE_ID,
       runId: MOCK_RUN_ID,
     }
-    labware = {
-      [MOCK_LABWARE_ID]: {
-        definitionId: MOCK_LABWARE_DEFINITION_ID,
-      },
-    }
+    labware = [
+      {
+        id: MOCK_LABWARE_ID,
+        definitionUri: MOCK_LABWARE_DEFINITION_URI,
+      } as LoadedLabware,
+    ]
     labwareDefinitions = {
-      [MOCK_LABWARE_DEFINITION_ID]: fixture_tiprack_300_ul as LabwareDefinition2,
+      [MOCK_LABWARE_DEFINITION_URI]: fixture_tiprack_300_ul as LabwareDefinition2,
     }
     when(mockGetLabwareDisplayName)
       .calledWith(props.definition)
       .mockReturnValue('mock definition display name')
 
-    when(mockUseProtocolDetailsForRun)
-      .calledWith(MOCK_RUN_ID)
-      .mockReturnValue({
-        protocolData: {
-          commands: [],
-          labware,
-          labwareDefinitions,
-          modules: [],
-        },
-      } as any)
-
     when(mockUseLabwareOffsetForLabware)
       .calledWith(MOCK_RUN_ID, MOCK_LABWARE_ID)
-      .mockReturnValue({ vector: MOCK_LABWARE_VECTOR } as any)
+      .mockReturnValue({
+        id: 'fake_offset_id',
+        createdAt: 'fake_timestamp',
+        definitionUri: 'fake_def_uri',
+        location: { slotName: MOCK_SLOT_NAME },
+        vector: MOCK_LABWARE_VECTOR,
+      })
 
     when(mockUseCurrentRun)
       .calledWith()

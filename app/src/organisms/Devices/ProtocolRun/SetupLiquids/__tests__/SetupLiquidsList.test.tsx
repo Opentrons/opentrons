@@ -11,23 +11,28 @@ import {
   parseLiquidsInLoadOrder,
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
+import {
+  useTrackEvent,
+  ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
+  ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
+} from '../../../../../redux/analytics'
+import { getSlotLabwareName } from '../../utils/getSlotLabwareName'
 import { SetupLiquidsList } from '../SetupLiquidsList'
 import {
   getTotalVolumePerLiquidId,
   getTotalVolumePerLiquidLabwarePair,
-  getSlotLabwareName,
 } from '../utils'
 import { LiquidsLabwareDetailsModal } from '../LiquidsLabwareDetailsModal'
 
 const MOCK_LIQUIDS_IN_LOAD_ORDER = [
   {
-    liquidId: '0',
+    id: '0',
     displayName: 'mock liquid 1',
     description: 'mock sample',
     displayColor: '#ff4888',
   },
   {
-    liquidId: '1',
+    id: '1',
     displayName: 'mock liquid 2',
     description: 'another mock sample',
     displayColor: '#ff8999',
@@ -47,9 +52,14 @@ const MOCK_LABWARE_INFO_BY_LIQUID_ID = {
 }
 
 jest.mock('../utils')
+jest.mock('../../utils/getSlotLabwareName')
 jest.mock('../LiquidsLabwareDetailsModal')
 jest.mock('@opentrons/api-client')
+jest.mock('../../../../../redux/analytics')
 
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
+>
 const mockGetTotalVolumePerLiquidId = getTotalVolumePerLiquidId as jest.MockedFunction<
   typeof getTotalVolumePerLiquidId
 >
@@ -74,6 +84,7 @@ const render = (props: React.ComponentProps<typeof SetupLiquidsList>) => {
     i18nInstance: i18n,
   })
 }
+let mockTrackEvent: jest.Mock
 
 describe('SetupLiquidsList', () => {
   let props: React.ComponentProps<typeof SetupLiquidsList>
@@ -85,6 +96,8 @@ describe('SetupLiquidsList', () => {
       labwareName: 'mock labware name',
       slotName: '4',
     })
+    mockTrackEvent = jest.fn()
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockParseLiquidsInLoadOrder.mockReturnValue(MOCK_LIQUIDS_IN_LOAD_ORDER)
     mockParseLabwareInfoByLiquidId.mockReturnValue(
       MOCK_LABWARE_INFO_BY_LIQUID_ID as any
@@ -109,6 +122,10 @@ describe('SetupLiquidsList', () => {
     const [{ getByText, getAllByText }] = render(props)
     const row = getByText('mock liquid 1')
     fireEvent.click(row)
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: ANALYTICS_EXPAND_LIQUID_SETUP_ROW,
+      properties: {},
+    })
     getByText('Location')
     getByText('Labware Name')
     getByText('Volume')
@@ -123,6 +140,10 @@ describe('SetupLiquidsList', () => {
     fireEvent.click(row)
     const subRow = getByText('mock labware name')
     fireEvent.click(subRow)
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: ANALYTICS_OPEN_LIQUID_LABWARE_DETAIL_MODAL,
+      properties: {},
+    })
     getByText('Mock liquids labwaqre details modal')
   })
 })

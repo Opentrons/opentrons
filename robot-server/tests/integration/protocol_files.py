@@ -20,18 +20,26 @@ def get_protocol(
 
 def get_json_protocol(protocol_name: str) -> IO[bytes]:
     """A NamedTemporaryFile valid python protocol."""
-    return create_temp_protocol(".json", get_protocol(protocol_name, ".json"))
+    return create_temp_file(".json", get_protocol(protocol_name, ".json"))
 
 
 def get_py_protocol(protocol_name: str) -> IO[bytes]:
     """A NamedTemporaryFile valid python protocol."""
-    return create_temp_protocol(".py", get_protocol(protocol_name, ".py"))
+    return create_temp_file(".py", get_protocol(protocol_name, ".py"))
 
 
-def create_temp_protocol(
-    protocol_extension: Literal[".py", ".json"], protocol_contents: str
+def get_bundled_data(data_extension: Literal[".txt", ".csv"]) -> IO[bytes]:
+    """A NamedTemporaryFile valid data file."""
+    contents = Path(
+        f"./tests/integration/protocols/bundled_data{data_extension}"
+    ).read_text()
+    return create_temp_file(data_extension, contents)
+
+
+def create_temp_file(
+    protocol_extension: Literal[".py", ".json", ".txt", ".csv"], protocol_contents: str
 ) -> IO[bytes]:
-    """Create a temporary protocol file."""
+    """Create a temporary file."""
     file = tempfile.NamedTemporaryFile(suffix=protocol_extension)
     file_contents = protocol_contents
     file.write(str.encode(file_contents))

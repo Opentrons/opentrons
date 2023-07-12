@@ -8,24 +8,18 @@ import {
   TEMP_BLOCK_MAX,
   TEMP_MIN,
 } from '@opentrons/shared-data'
-import {
-  useCreateCommandMutation,
-  useCreateLiveCommandMutation,
-} from '@opentrons/react-api-client'
-import { Slideout } from '../../atoms/Slideout'
-import { InputField } from '../../atoms/InputField'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  FONT_WEIGHT_REGULAR,
   SPACING,
-  Text,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { Slideout } from '../../atoms/Slideout'
+import { InputField } from '../../atoms/InputField'
+import { StyledText } from '../../atoms/text'
 import { SubmitPrimaryButton } from '../../atoms/buttons'
-import { useRunStatuses } from '../Devices/hooks'
-import { useModuleIdFromRun } from './useModuleIdFromRun'
 
 import type { ThermocyclerModule } from '../../redux/modules/types'
 import type {
@@ -37,41 +31,19 @@ interface ThermocyclerModuleSlideoutProps {
   module: ThermocyclerModule
   onCloseClick: () => unknown
   isExpanded: boolean
-  isLoadedInRun: boolean
   isSecondaryTemp?: boolean
-  currentRunId?: string
 }
 
 export const ThermocyclerModuleSlideout = (
   props: ThermocyclerModuleSlideoutProps
 ): JSX.Element | null => {
-  const {
-    module,
-    onCloseClick,
-    isExpanded,
-    isLoadedInRun,
-    isSecondaryTemp,
-    currentRunId,
-  } = props
+  const { module, onCloseClick, isExpanded, isSecondaryTemp } = props
   const { t } = useTranslation('device_details')
   const [tempValue, setTempValue] = React.useState<number | null>(null)
   const { createLiveCommand } = useCreateLiveCommandMutation()
-  const { createCommand } = useCreateCommandMutation()
-  const { isRunIdle, isRunTerminal } = useRunStatuses()
-  const { moduleIdFromRun } = useModuleIdFromRun(
-    module,
-    currentRunId != null ? currentRunId : null
-  )
   const moduleName = getModuleDisplayName(module.moduleModel)
   const modulePart = isSecondaryTemp ? 'Lid' : 'Block'
   const tempRanges = getTCTempRange(isSecondaryTemp)
-
-  let moduleId: string
-  if (isRunIdle && currentRunId != null && isLoadedInRun) {
-    moduleId = moduleIdFromRun
-  } else if ((currentRunId != null && isRunTerminal) || currentRunId == null) {
-    moduleId = module.id
-  }
 
   let errorMessage
   if (isSecondaryTemp) {
@@ -92,43 +64,27 @@ export const ThermocyclerModuleSlideout = (
       const saveLidCommand: TCSetTargetLidTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetLidTemperature',
         params: {
-          moduleId: moduleId,
+          moduleId: module.id,
           celsius: tempValue,
         },
       }
       const saveBlockCommand: TCSetTargetBlockTemperatureCreateCommand = {
         commandType: 'thermocycler/setTargetBlockTemperature',
         params: {
-          moduleId: moduleId,
+          moduleId: module.id,
           celsius: tempValue,
           //  TODO(jr, 3/17/22): add volume, which will be provided by PD protocols
         },
       }
-      if (isRunIdle && currentRunId != null && isLoadedInRun) {
-        createCommand({
-          runId: currentRunId,
-          command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
-        }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${
-              saveLidCommand.commandType ?? saveBlockCommand.commandType
-            } and run id ${currentRunId}: ${e.message}`
-          )
-        })
-      } else if (
-        (currentRunId != null && isRunTerminal) ||
-        currentRunId == null
-      ) {
-        createLiveCommand({
-          command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
-        }).catch((e: Error) => {
-          console.error(
-            `error setting module status with command type ${
-              saveLidCommand.commandType ?? saveBlockCommand.commandType
-            }: ${e.message}`
-          )
-        })
-      }
+      createLiveCommand({
+        command: isSecondaryTemp ? saveLidCommand : saveBlockCommand,
+      }).catch((e: Error) => {
+        console.error(
+          `error setting module status with command type ${
+            saveLidCommand.commandType ?? saveBlockCommand.commandType
+          }: ${e.message}`
+        )
+      })
     }
     setTempValue(null)
     onCloseClick()
@@ -154,10 +110,10 @@ export const ThermocyclerModuleSlideout = (
         />
       }
     >
-      <Text
-        fontWeight={FONT_WEIGHT_REGULAR}
+      <StyledText
+        fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING.spacing2}
+        paddingTop={SPACING.spacing4}
         data-testid={`ThermocyclerSlideout_text_${module.serialNumber}`}
       >
         {t('tc_set_temperature_body', {
@@ -165,24 +121,26 @@ export const ThermocyclerModuleSlideout = (
           min: tempRanges.min,
           max: tempRanges.max,
         })}
-      </Text>
+      </StyledText>
       <Flex
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
       >
-        <Text
+        <StyledText
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          color={COLORS.darkGrey}
-          paddingBottom={SPACING.spacing3}
+          color={COLORS.darkGreyEnabled}
+          paddingBottom={SPACING.spacing8}
         >
           {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
-        </Text>
+        </StyledText>
         <form id="ThermocyclerModuleSlideout_submitValue">
           <InputField
-            data-testid={`${module.moduleModel}_${isSecondaryTemp}`}
-            id={`${module.moduleModel}_${isSecondaryTemp}`}
+            data-testid={`${String(module.moduleModel)}_${String(
+              isSecondaryTemp
+            )}`}
+            id={`${String(module.moduleModel)}_${String(isSecondaryTemp)}`}
             units={CELSIUS}
             value={tempValue != null ? Math.round(tempValue) : null}
             autoFocus

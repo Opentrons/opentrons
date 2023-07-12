@@ -1,12 +1,14 @@
 from unittest.mock import MagicMock
 
 import pytest
-from opentrons.protocol_api import labware
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.hardware_control.modules.types import TemperatureModuleModel
+from opentrons.protocol_api import labware, OFF_DECK
 from opentrons.protocols.api_support.labware_like import LabwareLike, LabwareLikeType
-from opentrons.protocols.geometry import module_geometry
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
+from opentrons.protocol_api.core.legacy import module_geometry
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location
+
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
@@ -17,17 +19,19 @@ def trough_definition() -> LabwareDefinition:
 
 @pytest.fixture(scope="session")
 def trough(trough_definition):
-    deck = Deck()
+    deck = Deck(deck_type=STANDARD_OT2_DECK)
     return labware.load_from_definition(trough_definition, deck.position_for(1))
 
 
 @pytest.fixture(scope="session")
 def module(trough):
-    deck = Deck()
-    mod = module_geometry.load_module(
-        module_geometry.TemperatureModuleModel.TEMPERATURE_V2,
-        deck.position_for("6"),
-        MAX_SUPPORTED_VERSION,
+    deck = Deck(deck_type=STANDARD_OT2_DECK)
+    mod = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(
+            TemperatureModuleModel.TEMPERATURE_V2
+        ),
+        parent=deck.position_for("6"),
+        configuration=None,
     )
     return mod
 
@@ -83,6 +87,14 @@ def test_empty():
     assert ll.object_type == LabwareLikeType.NONE
 
 
+def test_off_deck():
+    ll = LabwareLike(OFF_DECK)
+    assert ll.has_parent is False
+    assert ll.parent.object is None
+    assert ll.object is OFF_DECK
+    assert ll.object_type == LabwareLikeType.OFF_DECK
+
+
 def test_module_parent(trough, module, mod_trough):
     assert LabwareLike(mod_trough).module_parent() == module
     assert LabwareLike(mod_trough["A1"]).module_parent() == module
@@ -104,9 +116,7 @@ def test_first_parent(trough, module, mod_trough):
     # Set up recursion cycle test.
     mock_labware_geometry = MagicMock()
     mock_labware_geometry.parent = Location(point=None, labware=mod_trough)
-    mod_trough._implementation.get_geometry = MagicMock(
-        return_value=mock_labware_geometry
-    )
+    mod_trough._core.get_geometry = MagicMock(return_value=mock_labware_geometry)
 
     with pytest.raises(RuntimeError):
         # make sure we catch cycles

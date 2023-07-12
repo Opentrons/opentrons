@@ -7,10 +7,13 @@ import functools
 
 from dataclasses import dataclass
 
-from opentrons.protocols.geometry.deck import Deck
 from opentrons.commands import types
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocols.api_support.labware_like import LabwareLike
 from opentrons.protocols.duration.errors import DurationEstimatorException
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Location
 
 
@@ -60,7 +63,9 @@ class DurationEstimator:
         self._last_thermocycler_module_temperature = START_MODULE_TEMPERATURE
         # Per step time estimate.
         self._increments: List[TimerEntry] = []
-        self._deck = Deck()
+
+        # TODO(mm, 2022-12-01): Allow the caller to configure the deck type.
+        self._deck = Deck(deck_type=guess_deck_type_from_global_config())
 
     def get_total_duration(self) -> float:
         """Return the total duration"""
@@ -122,7 +127,7 @@ class DurationEstimator:
         duration = 0.0
         # TODO (al, 2021-09-09):
         #  - Make this into a map
-        #  - Remove "# noqa: C901"
+        #  - Remove "noqa: C901"
         #  - type the payload in the on_X methods.
         if message_name == types.PICK_UP_TIP:
             duration = self.on_pick_up_tip(payload=payload)

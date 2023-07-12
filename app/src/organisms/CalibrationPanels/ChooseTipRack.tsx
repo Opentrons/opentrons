@@ -1,84 +1,51 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import { Trans, useTranslation } from 'react-i18next'
 import head from 'lodash/head'
 import isEqual from 'lodash/isEqual'
-
 import {
-  AlertItem,
-  ALIGN_FLEX_START,
-  BORDER_SOLID_MEDIUM,
-  Box,
   DIRECTION_COLUMN,
   Flex,
-  FONT_HEADER_DARK,
-  FONT_SIZE_BODY_2,
   JUSTIFY_SPACE_BETWEEN,
-  JUSTIFY_CENTER,
-  POSITION_RELATIVE,
-  PrimaryBtn,
-  Select,
-  SPACING_1,
-  SPACING_2,
-  SPACING_3,
-  SPACING_4,
-  Text,
-  TEXT_TRANSFORM_UPPERCASE,
-  TEXT_TRANSFORM_CAPITALIZE,
-  FONT_WEIGHT_SEMIBOLD,
   ALIGN_CENTER,
-  SecondaryBtn,
-  SIZE_5,
+  SPACING,
+  TYPOGRAPHY,
+  Box,
+  COLORS,
+  Link,
+  PrimaryButton,
 } from '@opentrons/components'
 import { usePipettesQuery } from '@opentrons/react-api-client'
-
-import * as Sessions from '../../redux/sessions'
-import { NeedHelpLink } from './NeedHelpLink'
-import { ChosenTipRackRender } from './ChosenTipRackRender'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import { getCustomTipRackDefinitions } from '../../redux/custom-labware'
 import {
   getCalibrationForPipette,
   getTipLengthCalibrations,
   getTipLengthForPipetteAndTiprack,
 } from '../../redux/calibration/'
-import { getLabwareDefURI } from '@opentrons/shared-data'
-import styles from './styles.css'
+import { Select } from '../../atoms/SelectField/Select'
+import { Banner } from '../../atoms/Banner'
+import { Divider } from '../../atoms/structure'
+import { StyledText } from '../../atoms/text'
+import { NeedHelpLink } from './NeedHelpLink'
+import { ChosenTipRackRender } from './ChosenTipRackRender'
 
-import type { TipRackMap } from './ChosenTipRackRender'
-import type {
-  SessionType,
-  CalibrationLabware,
-} from '../../redux/sessions/types'
-import type { State } from '../../redux/types'
-import type { SelectOption, SelectOptionOrGroup } from '@opentrons/components'
+import type { MultiValue, SingleValue } from 'react-select'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import { Mount } from '../../redux/pipettes/types'
+import type { SelectOption, SelectOptionOrGroup } from '@opentrons/components'
+import type { CalibrationLabware } from '../../redux/sessions/types'
+import type { State } from '../../redux/types'
+import type { Mount } from '../../redux/pipettes/types'
+import type { TipLengthCalibration } from '../../redux/calibration/api-types'
 
-const HEADER = 'choose tip rack'
-const INTRO = 'Choose what tip rack you would like to use to calibrate your'
-const PIP_OFFSET_INTRO_FRAGMENT = 'Pipette Offset'
-const DECK_CAL_INTRO_FRAGMENT = 'Deck'
-
-const PROMPT =
-  'Want to use a tip rack that is not listed here? Go to More > Custom Labware to add labware.'
-
-const SELECT_TIP_RACK = 'select tip rack'
-const ALERT_TEXT =
-  'Opentrons tip racks are strongly recommended. Accuracy cannot be guaranteed with other tip racks.'
-
-const OPENTRONS_LABEL = 'opentrons'
-const CUSTOM_LABEL = 'custom'
-const USE_THIS_TIP_RACK = 'use this tip rack'
-
-const introContentByType = (sessionType: SessionType): string => {
-  switch (sessionType) {
-    case Sessions.SESSION_TYPE_DECK_CALIBRATION:
-      return `${INTRO} ${DECK_CAL_INTRO_FRAGMENT}.`
-    case Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION:
-      return `${INTRO} ${PIP_OFFSET_INTRO_FRAGMENT}.`
-    default:
-      return 'This panel is shown in error'
-  }
+interface TipRackInfo {
+  definition: LabwareDefinition2
+  calibration: TipLengthCalibration | null
 }
+
+export type TipRackMap = Partial<{
+  [uri: string]: TipRackInfo
+}>
 
 const EQUIPMENT_POLL_MS = 5000
 
@@ -88,11 +55,9 @@ function formatOptionsFromLabwareDef(lw: LabwareDefinition2): SelectOption {
     label: lw.metadata.displayName,
   }
 }
-
 interface ChooseTipRackProps {
   tipRack: CalibrationLabware
   mount: Mount
-  sessionType: SessionType
   chosenTipRack: LabwareDefinition2 | null
   handleChosenTipRack: (arg: LabwareDefinition2 | null) => unknown
   closeModal: () => unknown
@@ -104,25 +69,27 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
   const {
     tipRack,
     mount,
-    sessionType,
     chosenTipRack,
     handleChosenTipRack,
     closeModal,
     robotName,
     defaultTipracks,
   } = props
-
-  const pipSerial = usePipettesQuery({
-    refetchInterval: EQUIPMENT_POLL_MS,
-  })?.data?.[mount].id
+  const { t } = useTranslation(['robot_calibration', 'shared'])
+  const pipSerial = usePipettesQuery(
+    {},
+    {
+      refetchInterval: EQUIPMENT_POLL_MS,
+    }
+  )?.data?.[mount].id
 
   const pipetteOffsetCal = useSelector((state: State) =>
-    robotName && pipSerial
+    robotName != null && pipSerial != null
       ? getCalibrationForPipette(state, robotName, pipSerial, mount)
       : null
   )
   const tipLengthCal = useSelector((state: State) =>
-    robotName && pipSerial && pipetteOffsetCal
+    robotName != null && pipSerial != null && pipetteOffsetCal != null
       ? getTipLengthForPipetteAndTiprack(
           state,
           robotName,
@@ -132,13 +99,14 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
       : null
   )
   const allTipLengthCal = useSelector((state: State) =>
-    robotName ? getTipLengthCalibrations(state, robotName) : []
+    robotName != null ? getTipLengthCalibrations(state, robotName) : []
   )
   const customTipRacks = useSelector(getCustomTipRackDefinitions)
 
-  const allTipRackDefs = defaultTipracks
-    ? defaultTipracks.concat(customTipRacks)
-    : customTipRacks
+  const allTipRackDefs =
+    defaultTipracks != null
+      ? defaultTipracks.concat(customTipRacks)
+      : customTipRacks
   const tipRackByUriMap = allTipRackDefs.reduce<TipRackMap>((obj, lw) => {
     if (lw) {
       obj[getLabwareDefURI(lw)] = {
@@ -153,8 +121,8 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
           // Old tip length data don't have tiprack uri info, so we are using the
           // tiprack hash in pipette offset to check against tip length cal for
           // backward compatability purposes
-          (pipetteOffsetCal &&
-          tipLengthCal &&
+          (pipetteOffsetCal != null &&
+          tipLengthCal != null &&
           pipetteOffsetCal.tiprackUri === getLabwareDefURI(lw)
             ? tipLengthCal
             : null),
@@ -163,9 +131,10 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     return obj
   }, {})
 
-  const opentronsTipRacksOptions: SelectOption[] = defaultTipracks
-    ? defaultTipracks.map(lw => formatOptionsFromLabwareDef(lw))
-    : []
+  const opentronsTipRacksOptions: SelectOption[] =
+    defaultTipracks != null
+      ? defaultTipracks.map(lw => formatOptionsFromLabwareDef(lw))
+      : []
   const customTipRacksOptions: SelectOption[] = customTipRacks.map(lw =>
     formatOptionsFromLabwareDef(lw)
   )
@@ -174,122 +143,128 @@ export function ChooseTipRack(props: ChooseTipRackProps): JSX.Element {
     customTipRacks.length > 0
       ? [
           {
-            label: OPENTRONS_LABEL,
+            label: t('opentrons'),
             options: opentronsTipRacksOptions,
           },
           {
-            label: CUSTOM_LABEL,
+            label: t('custom'),
             options: customTipRacksOptions,
           },
         ]
       : [...opentronsTipRacksOptions]
 
-  const [selectedValue, setSelectedValue] = React.useState<SelectOption>(
-    chosenTipRack
+  const [selectedValue, setSelectedValue] = React.useState<
+    SingleValue<SelectOption> | MultiValue<SelectOption>
+  >(
+    chosenTipRack != null
       ? formatOptionsFromLabwareDef(chosenTipRack)
       : formatOptionsFromLabwareDef(tipRack.definition)
   )
 
   const handleValueChange = (
-    selected: SelectOption | null,
+    selected: SingleValue<SelectOption> | MultiValue<SelectOption>,
     _: unknown
   ): void => {
-    selected && setSelectedValue(selected)
+    selected != null && setSelectedValue(selected)
   }
   const handleUseTipRack = (): void => {
-    const selectedTipRack = tipRackByUriMap[selectedValue.value]
-    // @ts-expect-error(sa, 2021-05-26): need to type narrow, avoiding src code change for now
-    if (!isEqual(chosenTipRack, selectedTipRack.definition)) {
-      // @ts-expect-error(sa, 2021-05-26): need to type narrow, avoiding src code change for now
-      handleChosenTipRack(selectedTipRack.definition)
+    const value = (selectedValue as SelectOption).value
+    const selectedTipRack = tipRackByUriMap[value]
+    if (!isEqual(chosenTipRack, selectedTipRack?.definition)) {
+      handleChosenTipRack(
+        (selectedTipRack?.definition != null && selectedTipRack.definition) ||
+          null
+      )
     }
     closeModal()
   }
-  const introText = introContentByType(sessionType)
   return (
     <Flex
-      key="chooseTipRack"
-      marginTop={SPACING_2}
-      marginBottom={SPACING_3}
       flexDirection={DIRECTION_COLUMN}
-      alignItems={ALIGN_FLEX_START}
-      position={POSITION_RELATIVE}
-      fontSize={FONT_SIZE_BODY_2}
-      width="100%"
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING.spacing32}
+      minHeight="25rem"
     >
-      <Flex width="100%" justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Text
-          css={FONT_HEADER_DARK}
-          marginBottom={SPACING_3}
-          textTransform={TEXT_TRANSFORM_UPPERCASE}
-        >
-          {HEADER}
-        </Text>
-        <NeedHelpLink />
-      </Flex>
-      <Box marginBottom={SPACING_3}>
-        <Text marginBottom={SPACING_3}>{introText}</Text>
-        <Text>{PROMPT}</Text>
-      </Box>
-      <Flex marginBottom={SPACING_4}>
-        <AlertItem type="warning" title={ALERT_TEXT} />
-      </Flex>
-      <Flex
-        width="80%"
-        marginBottom={SPACING_4}
-        justifyContent={JUSTIFY_CENTER}
-        flexDirection={DIRECTION_COLUMN}
-        alignSelf={ALIGN_CENTER}
-      >
+      <Flex gridGap={SPACING.spacing40}>
         <Flex
-          height={SIZE_5}
-          border={BORDER_SOLID_MEDIUM}
-          paddingTop={SPACING_4}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          marginBottom={SPACING_2}
+          flex="1"
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing8}
         >
-          <Box width="55%" paddingLeft={SPACING_4}>
-            <Text
-              textTransform={TEXT_TRANSFORM_CAPITALIZE}
-              fontWeight={FONT_WEIGHT_SEMIBOLD}
-              marginBottom={SPACING_1}
-            >
-              {SELECT_TIP_RACK}
-            </Text>
+          <StyledText
+            css={TYPOGRAPHY.h1Default}
+            marginBottom={SPACING.spacing16}
+          >
+            {t('choose_a_tip_rack')}
+          </StyledText>
+          <StyledText
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            css={TYPOGRAPHY.labelSemiBold}
+          >
+            {t('select_tip_rack')}
+          </StyledText>
+          <Box marginBottom={SPACING.spacing12}>
             <Select
-              className={styles.select_tiprack_menu}
+              isSearchable={false}
               options={groupOptions}
               onChange={handleValueChange}
               value={selectedValue}
+              width="16rem"
+              menuPortalTarget={document.body}
+              styles={{ menuPortal: base => ({ ...base, zIndex: 10 }) }}
             />
           </Box>
-          <Box width="45%" height="100%">
-            <ChosenTipRackRender
-              showCalibrationText={
-                sessionType === Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION
-              }
-              selectedValue={selectedValue}
-              tipRackByUriMap={tipRackByUriMap}
-            />
-          </Box>
+          <Trans
+            t={t}
+            i18nKey="choose_tip_rack"
+            components={{
+              strong: (
+                <strong
+                  style={{
+                    marginRight: SPACING.spacing4,
+                    fontWeight: TYPOGRAPHY.fontWeightSemiBold,
+                  }}
+                />
+              ),
+              block: <StyledText as="p" />,
+            }}
+          />
+        </Flex>
+        <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
+          <Banner type="warning">
+            <StyledText as="p" marginRight={SPACING.spacing16}>
+              {t('opentrons_tip_racks_recommended')}
+            </StyledText>
+          </Banner>
+          <Divider marginY={SPACING.spacing8} width="100%" />
+          <ChosenTipRackRender selectedValue={selectedValue as SelectOption} />
+          <Divider marginY={SPACING.spacing8} width="100%" />
+          <StyledText as="label" color={COLORS.darkGreyEnabled}>
+            {t('calibration_on_opentrons_tips_is_important')}
+          </StyledText>
         </Flex>
       </Flex>
-      <Flex width="100%" justifyContent={JUSTIFY_CENTER}>
-        <SecondaryBtn
-          data-test="useThisTipRackButton"
-          width="25%"
-          marginRight={SPACING_3}
-          onClick={() => closeModal()}
-        >
-          Cancel
-        </SecondaryBtn>
-        <PrimaryBtn
-          data-test="useThisTipRackButton"
-          width="48%"
-          onClick={handleUseTipRack}
-        >
-          {USE_THIS_TIP_RACK}
-        </PrimaryBtn>
+      <Flex
+        width="100%"
+        marginTop={SPACING.spacing32}
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_CENTER}
+      >
+        <NeedHelpLink />
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+          <Link
+            role="button"
+            css={TYPOGRAPHY.darkLinkH4SemiBold}
+            textTransform={TYPOGRAPHY.textTransformCapitalize}
+            onClick={() => closeModal()}
+            marginRight={SPACING.spacing16}
+          >
+            {t('shared:cancel')}
+          </Link>
+          <PrimaryButton onClick={handleUseTipRack}>
+            {t('confirm_tip_rack')}
+          </PrimaryButton>
+        </Flex>
       </Flex>
     </Flex>
   )

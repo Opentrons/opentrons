@@ -68,7 +68,6 @@ export const TerminalItem = (props: TerminalItemProps): JSX.Element => {
           onCancelClick={cancel}
         />
       )}
-      {/* @ts-expect-error(sa, 2021-6-21): type mismatch with useConditionalConfirm. see https://github.com/Opentrons/opentrons/issues/8054 */}
       <PDTitledList
         {...{
           id: `TerminalItem_${id}`,

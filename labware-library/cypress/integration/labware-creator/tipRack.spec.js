@@ -273,7 +273,7 @@ describe('Create a Tip Rack', () => {
     cy.get('#DefinitionTest a').should(
       'have.attr',
       'href',
-      'https://opentrons-publications.s3.us-east-2.amazonaws.com/labwareDefinition_tipRack_testGuide.pdf'
+      'https://insights.opentrons.com/hubfs/Products/Consumables%20and%20Reagents/labwareDefinition_tipRack_testGuide.pdf'
     )
   })
 

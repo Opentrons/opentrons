@@ -1,6 +1,6 @@
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-
+import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 import { getLabwareRenderInfo } from '../ProtocolRun/utils/getLabwareRenderInfo'
+import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useProtocolDetailsForRun, useStoredProtocolAnalysis } from '.'
 
 import type { LabwareRenderInfoById } from '../ProtocolRun/utils/getLabwareRenderInfo'
@@ -8,13 +8,12 @@ import type { LabwareRenderInfoById } from '../ProtocolRun/utils/getLabwareRende
 export function useLabwareRenderInfoForRunById(
   runId: string
 ): LabwareRenderInfoById {
-  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
-    runId
-  )
+  const { robotType } = useProtocolDetailsForRun(runId)
+  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
+
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
+  const deckDef = getDeckDefFromRobotType(robotType)
 
-  return protocolData != null
-    ? getLabwareRenderInfo(protocolData, standardDeckDef as any)
-    : {}
+  return protocolData != null ? getLabwareRenderInfo(protocolData, deckDef) : {}
 }

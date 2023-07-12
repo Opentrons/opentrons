@@ -1,20 +1,9 @@
 // Pipette Offset Calibration Orchestration Component
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import {
-  ModalPage,
-  SpinnerModalPage,
-  useConditionalConfirm,
-  DISPLAY_FLEX,
-  DIRECTION_COLUMN,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  SPACING_3,
-  C_TRANSPARENT,
-  ALIGN_FLEX_START,
-  C_WHITE,
-} from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
 import {
@@ -24,13 +13,15 @@ import {
   TipConfirmation,
   SaveZPoint,
   SaveXYPoint,
+  ConfirmExit,
+  LoadingState,
   CompleteConfirmation,
-  ConfirmExitModal,
-  MeasureNozzle,
-  MeasureTip,
 } from '../../organisms/CalibrationPanels'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
+import { WizardHeader } from '../../molecules/WizardHeader'
+import { Portal } from '../../App/portal'
 
-import type { StyleProps, Mount } from '@opentrons/components'
+import type { Mount } from '@opentrons/components'
 import type {
   CalibrationLabware,
   CalibrationSessionStep,
@@ -39,74 +30,35 @@ import type {
 import type { CalibratePipetteOffsetParentProps } from './types'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 
-const PIPETTE_OFFSET_CALIBRATION_SUBTITLE = 'Pipette offset calibration'
-const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
-const EXIT = 'exit'
-
-const darkContentsStyleProps = {
-  display: DISPLAY_FLEX,
-  flexDirection: DIRECTION_COLUMN,
-  alignItems: ALIGN_CENTER,
-  padding: SPACING_3,
-  backgroundColor: C_TRANSPARENT,
-  height: '100%',
-}
-const contentsStyleProps = {
-  display: DISPLAY_FLEX,
-  backgroundColor: C_WHITE,
-  flexDirection: DIRECTION_COLUMN,
-  justifyContent: JUSTIFY_CENTER,
-  alignItems: ALIGN_FLEX_START,
-  padding: SPACING_3,
-  maxWidth: '48rem',
-  minHeight: '14rem',
-}
-
-const terminalContentsStyleProps = {
-  ...contentsStyleProps,
-  paddingX: '1.5rem',
-}
-
 const PANEL_BY_STEP: Partial<
   Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>
 > = {
   [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: Introduction,
   [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: DeckSetup,
-  [Sessions.PIP_OFFSET_STEP_MEASURING_NOZZLE_OFFSET]: MeasureNozzle,
-  [Sessions.PIP_OFFSET_STEP_MEASURING_TIP_OFFSET]: MeasureTip,
   [Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE]: TipPickUp,
   [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: TipConfirmation,
   [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: SaveZPoint,
   [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: SaveXYPoint,
-  [Sessions.PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE]: CompleteConfirmation,
-  [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
+  [Sessions.PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE]: PipetteOffsetCalibrationComplete,
+  [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: PipetteOffsetCalibrationComplete,
 }
+const STEPS_IN_ORDER: CalibrationSessionStep[] = [
+  Sessions.PIP_OFFSET_STEP_SESSION_STARTED,
+  Sessions.PIP_OFFSET_STEP_LABWARE_LOADED,
+  Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE,
+  Sessions.PIP_OFFSET_STEP_INSPECTING_TIP,
+  Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK,
+  Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE,
+  Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
+]
 
-const PANEL_STYLE_PROPS_BY_STEP: Partial<
-  Record<CalibrationSessionStep, StyleProps>
-> = {
-  [Sessions.PIP_OFFSET_STEP_SESSION_STARTED]: terminalContentsStyleProps,
-  [Sessions.PIP_OFFSET_STEP_LABWARE_LOADED]: darkContentsStyleProps,
-  [Sessions.PIP_OFFSET_STEP_PREPARING_PIPETTE]: contentsStyleProps,
-  [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: contentsStyleProps,
-  [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: contentsStyleProps,
-  [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: contentsStyleProps,
-  [Sessions.PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE]: terminalContentsStyleProps,
-  [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
-}
 export function CalibratePipetteOffset(
   props: CalibratePipetteOffsetParentProps
 ): JSX.Element | null {
-  const {
-    session,
-    robotName,
-    dispatchRequests,
-    showSpinner,
-    isJogging,
-    intent,
-  } = props
+  const { t } = useTranslation('robot_calibration')
+  const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
   const { currentStep, instrument, labware, supportedCommands } =
-    session?.details || {}
+    session?.details ?? {}
 
   const {
     showConfirmation: showConfirmExit,
@@ -117,18 +69,18 @@ export function CalibratePipetteOffset(
   }, true)
 
   const tipRack: CalibrationLabware | null =
-    (labware && labware.find(l => l.isTiprack)) ?? null
-  const calBlock: CalibrationLabware | null = labware
-    ? labware.find(l => !l.isTiprack) ?? null
-    : null
+    labware != null ? labware.find(l => l.isTiprack) ?? null : null
+  const calBlock: CalibrationLabware | null =
+    labware != null ? labware.find(l => !l.isTiprack) ?? null : null
 
   const isMulti = React.useMemo(() => {
-    const spec = instrument && getPipetteModelSpecs(instrument.model)
-    return spec ? spec.channels > 1 : false
+    const spec =
+      instrument != null ? getPipetteModelSpecs(instrument.model) : null
+    return spec != null ? spec.channels > 1 : false
   }, [instrument])
 
   function sendCommands(...commands: SessionCommandParams[]): void {
-    if (session?.id && !isJogging) {
+    if (session?.id != null && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
           command: c.command,
@@ -140,7 +92,7 @@ export function CalibratePipetteOffset(
   }
 
   function cleanUpAndExit(): void {
-    if (session?.id) {
+    if (session?.id != null) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
           command: Sessions.sharedCalCommands.EXIT,
@@ -151,54 +103,74 @@ export function CalibratePipetteOffset(
     }
   }
 
-  if (!session || !tipRack) {
+  if (session == null || tipRack == null) {
     return null
   }
-  const shouldPerformTipLength = session.details.shouldPerformTipLength
-  const titleBarProps = {
-    title: shouldPerformTipLength
-      ? TIP_LENGTH_CALIBRATION_SUBTITLE
-      : PIPETTE_OFFSET_CALIBRATION_SUBTITLE,
-    back: { onClick: confirmExit, title: EXIT, children: EXIT },
-  }
 
-  if (showSpinner) {
-    return <SpinnerModalPage key={instrument?.mount} titleBar={titleBarProps} />
-  }
-
-  // @ts-expect-error TODO protect against currentStep === undefined
-  const Panel = PANEL_BY_STEP[currentStep]
-  return Panel ? (
-    <>
-      <ModalPage
-        titleBar={titleBarProps}
-        // @ts-expect-error TODO protect against currentStep === undefined
-        innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
-        key={instrument?.mount}
+  const Panel =
+    currentStep != null && currentStep in PANEL_BY_STEP
+      ? PANEL_BY_STEP[currentStep]
+      : null
+  return (
+    <Portal level="top">
+      <LegacyModalShell
+        width="47rem"
+        header={
+          <WizardHeader
+            title={t('pipette_offset_calibration')}
+            currentStep={
+              STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0
+            }
+            totalSteps={STEPS_IN_ORDER.length - 1}
+            onExit={confirmExit}
+          />
+        }
       >
-        <Panel
-          sendCommands={sendCommands}
-          cleanUpAndExit={cleanUpAndExit}
-          tipRack={tipRack}
-          isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase() as Mount}
-          calBlock={calBlock}
-          currentStep={currentStep}
-          sessionType={session.sessionType}
-          shouldPerformTipLength={shouldPerformTipLength}
-          intent={intent}
-          robotName={robotName}
-          supportedCommands={supportedCommands}
-          defaultTipracks={instrument?.defaultTipracks}
-        />
-      </ModalPage>
-      {showConfirmExit && (
-        <ConfirmExitModal
-          exit={confirmExit}
-          back={cancelExit}
-          sessionType={session.sessionType}
-        />
-      )}
-    </>
-  ) : null
+        {showSpinner || currentStep == null || Panel == null ? (
+          <LoadingState />
+        ) : showConfirmExit ? (
+          <ConfirmExit
+            exit={confirmExit}
+            back={cancelExit}
+            heading={t('progress_will_be_lost', {
+              sessionType: t('pipette_offset_calibration'),
+            })}
+            body={t('confirm_exit_before_completion', {
+              sessionType: t('pipette_offset_calibration'),
+            })}
+          />
+        ) : (
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            tipRack={tipRack}
+            isMulti={isMulti}
+            mount={instrument?.mount.toLowerCase() as Mount}
+            calBlock={calBlock}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            robotName={robotName}
+            supportedCommands={supportedCommands}
+            defaultTipracks={instrument?.defaultTipracks}
+          />
+        )}
+      </LegacyModalShell>
+    </Portal>
+  )
+}
+
+function PipetteOffsetCalibrationComplete(
+  props: CalibrationPanelProps
+): JSX.Element {
+  const { t } = useTranslation('robot_calibration')
+  const { cleanUpAndExit } = props
+
+  return (
+    <CompleteConfirmation
+      {...{
+        proceed: cleanUpAndExit,
+        flowName: t('pipette_offset_calibration'),
+      }}
+    />
+  )
 }

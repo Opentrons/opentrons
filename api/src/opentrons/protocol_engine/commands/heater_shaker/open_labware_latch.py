@@ -2,14 +2,13 @@
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
-
 from pydantic import BaseModel, Field
 
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state import StateView
-    from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
 OpenLabwareLatchCommandType = Literal["heaterShaker/openLabwareLatch"]
 
@@ -23,6 +22,14 @@ class OpenLabwareLatchParams(BaseModel):
 class OpenLabwareLatchResult(BaseModel):
     """Result data from opening a Heater-Shaker's labware latch."""
 
+    pipetteRetracted: bool = Field(
+        ...,
+        description=(
+            "Whether this command automatically retracted the pipettes"
+            " before opening the latch, to avoid a potential collision."
+        ),
+    )
+
 
 class OpenLabwareLatchImpl(
     AbstractCommandImpl[OpenLabwareLatchParams, OpenLabwareLatchResult]
@@ -33,10 +40,12 @@ class OpenLabwareLatchImpl(
         self,
         state_view: StateView,
         equipment: EquipmentHandler,
+        movement: MovementHandler,
         **unused_dependencies: object,
     ) -> None:
         self._state_view = state_view
         self._equipment = equipment
+        self._movement = movement
 
     async def execute(self, params: OpenLabwareLatchParams) -> OpenLabwareLatchResult:
         """Open a Heater-Shaker's labware latch."""
@@ -47,6 +56,18 @@ class OpenLabwareLatchImpl(
 
         hs_module_substate.raise_if_shaking()
 
+        pipette_should_retract = (
+            self._state_view.motion.check_pipette_blocking_hs_latch(
+                hs_module_substate.module_id
+            )
+        )
+        if pipette_should_retract:
+            # Move pipette away if it is close to the heater-shaker
+            # TODO(jbl 2022-07-28) replace home movement with a retract movement
+            await self._movement.home(
+                axes=self._state_view.motion.get_robot_mount_axes()
+            )
+
         # Allow propagation of ModuleNotAttachedError.
         hs_hardware_module = self._equipment.get_module_hardware_api(
             hs_module_substate.module_id
@@ -55,7 +76,7 @@ class OpenLabwareLatchImpl(
         if hs_hardware_module is not None:
             await hs_hardware_module.open_labware_latch()
 
-        return OpenLabwareLatchResult()
+        return OpenLabwareLatchResult(pipetteRetracted=pipette_should_retract)
 
 
 class OpenLabwareLatch(BaseCommand[OpenLabwareLatchParams, OpenLabwareLatchResult]):
@@ -71,7 +92,7 @@ class OpenLabwareLatch(BaseCommand[OpenLabwareLatchParams, OpenLabwareLatchResul
 class OpenLabwareLatchCreate(BaseCommandCreate[OpenLabwareLatchParams]):
     """A request to create a Heater-Shaker's open labware latch command."""
 
-    commandType: OpenLabwareLatchCommandType
+    commandType: OpenLabwareLatchCommandType = "heaterShaker/openLabwareLatch"
     params: OpenLabwareLatchParams
 
     _CommandCls: Type[OpenLabwareLatch] = OpenLabwareLatch

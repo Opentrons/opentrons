@@ -5,6 +5,12 @@
   stroke: var(--c-black);
 }
 
+.labware_outline_highlight {
+  fill: var(--c-white);
+  stroke: var(--c-blue-enabled);
+  stroke-width: 3.57;
+}
+
 .tiprack_outline {
   fill: var(--c-plate-bg);
   stroke: var(--c-charcoal);
@@ -12,5 +18,4 @@
 
 .hover_outline {
   stroke: #006cfa;
-  filter: drop-shadow(0 0 3px rgba(0, 108, 250, 1));
 }

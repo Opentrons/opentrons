@@ -65,11 +65,12 @@ export function HistoricalProtocolRun(
       <Flex
         justifyContent={JUSTIFY_SPACE_AROUND}
         alignItems={ALIGN_CENTER}
-        padding={SPACING.spacing3}
-        borderBottom={offsetDrawerOpen ? '' : BORDERS.lineBorder}
+        padding={SPACING.spacing8}
+        borderTop={BORDERS.lineBorder}
         backgroundColor={
           run.status === 'running' ? COLORS.lightBlue : COLORS.white
         }
+        width="100%"
       >
         <Box
           onClick={() => setOffsetDrawerOpen(!offsetDrawerOpen)}
@@ -78,14 +79,14 @@ export function HistoricalProtocolRun(
           <Icon
             name={offsetDrawerOpen ? 'chevron-up' : 'chevron-down'}
             width="15px"
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
             css={{ cursor: 'pointer' }}
           />
         </Box>
         <StyledText
           as="p"
           width="25%"
-          data-testid={`RecentProtocolRuns_Run_${protocolKey}`}
+          data-testid={`RecentProtocolRuns_Run_${String(protocolKey)}`}
           onClick={() =>
             history.push(
               `${robotName}/protocol-runs/${run.id}/protocolRunDetailsTab?`
@@ -101,10 +102,10 @@ export function HistoricalProtocolRun(
           <StyledText
             as="p"
             width="35%"
-            data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
+            data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
             onClick={() => history.push(`/protocols/${protocolKey}`)}
             css={CLICK_STYLE}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           >
             {protocolName}
           </StyledText>
@@ -112,8 +113,9 @@ export function HistoricalProtocolRun(
           <StyledText
             as="p"
             width="35%"
-            data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
+            data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
             overflowWrap="anywhere"
+            marginRight={SPACING.spacing16}
           >
             {protocolName}
           </StyledText>
@@ -122,23 +124,23 @@ export function HistoricalProtocolRun(
           as="p"
           width="20%"
           textTransform="capitalize"
-          data-testid={`RecentProtocolRuns_Status_${protocolKey}`}
+          data-testid={`RecentProtocolRuns_Status_${String(protocolKey)}`}
         >
           {runStatus === 'running' && (
             <Icon
               name="circle"
-              color={COLORS.blue}
-              size={SPACING.spacing2}
-              marginX={SPACING.spacing2}
-              marginBottom={SPACING.spacing2}
+              color={COLORS.blueEnabled}
+              size={SPACING.spacing4}
+              marginX={SPACING.spacing4}
+              marginBottom={SPACING.spacing4}
             />
           )}
-          {runStatus != null ? t(`status_${runStatus}`) : ''}
+          {runStatus != null ? t(`status_${String(runStatus)}`) : ''}
         </StyledText>
         <StyledText
           as="p"
           width="20%"
-          data-testid={`RecentProtocolRuns_Duration`}
+          data-testid="RecentProtocolRuns_Duration"
         >
           {duration}
         </StyledText>

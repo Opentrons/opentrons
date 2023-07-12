@@ -1,6 +1,7 @@
 import * as Constants from './constants'
 
 import type { RobotHost } from '../robot-api/types'
+import type { ViewableRobot } from '../discovery/types'
 import type {
   BuildrootAction,
   UpdateSessionStep,
@@ -77,7 +78,7 @@ export function readUserBuildrootFile(systemFile: string): BuildrootAction {
 }
 
 export function uploadBuildrootFile(
-  host: RobotHost,
+  host: ViewableRobot,
   path: string,
   systemFile: string | null
 ): BuildrootAction {

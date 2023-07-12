@@ -6,7 +6,8 @@ from typing import Any, Dict, List, Optional, Union
 from typing_extensions import Literal
 
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.models import LabwareDefinition
+
+from opentrons_shared_data.robot.dev_types import RobotType
 
 
 class ProtocolType(str, Enum):
@@ -16,7 +17,7 @@ class ProtocolType(str, Enum):
     PYTHON = "python"
 
 
-# TODO(mc, 2021-12-07): add data and python support roles
+# TODO(mc, 2021-12-07): add python support roles
 class ProtocolFileRole(str, Enum):
     """The purpose of a given file in a protocol.
 
@@ -26,10 +27,13 @@ class ProtocolFileRole(str, Enum):
             that exports the main `run` method.
         LABWARE: A labware definition file, loadable by a
             Python file in the same protocol.
+        DATA: An arbitrary text or csv file for usage in `bundled_data`
+            for a Python protool
     """
 
     MAIN = "main"
     LABWARE = "labware"
+    DATA = "data"
 
 
 @dataclass(frozen=True)
@@ -100,6 +104,8 @@ class ProtocolSource:
         directory: The directory containing the protocol files
             (and only the protocol files), or ``None`` if this is unknown.
         main_file: The location of the protocol's main file on disk.
+        content_hash: A md5 hex digest of the protocol source combined with
+            custom labware that was provided at the time of protocol creation
         files: Descriptions of all files that make up the protocol.
         metadata: Arbitrary metadata specified by the protocols.
         config: Protocol execution configuration.
@@ -111,7 +117,8 @@ class ProtocolSource:
 
     directory: Optional[Path]
     main_file: Path
+    content_hash: str
     files: List[ProtocolSourceFile]
     metadata: Metadata
+    robot_type: RobotType
     config: ProtocolConfig
-    labware_definitions: List[LabwareDefinition]

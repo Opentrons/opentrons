@@ -1,16 +1,22 @@
 // set of functions that parse details out of a protocol record and it's internals
 import reduce from 'lodash/reduce'
 
+import { COLORS } from '@opentrons/components/src/ui-style-constants'
+import { getLabwareDefURI } from '@opentrons/shared-data'
 import type {
-  LabwareDefinition2,
   ModuleModel,
   PipetteName,
+  Liquid,
+  LoadedPipette,
+  LoadedLabware,
+  LoadedModule,
 } from '@opentrons/shared-data'
 import type { RunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type {
   LoadLabwareRunTimeCommand,
   LoadModuleRunTimeCommand,
   LoadPipetteRunTimeCommand,
+  LoadLiquidRunTimeCommand,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
 
 interface PipetteNamesByMount {
@@ -34,42 +40,34 @@ export function parseInitialPipetteNamesByMount(
   }
 }
 
-export interface PipetteNamesById {
-  [pipetteId: string]: { name: PipetteName }
-}
-
-export function parseInitialPipetteNamesById(
+export function parsePipetteEntity(
   commands: RunTimeCommand[]
-): PipetteNamesById {
-  const rightPipette = commands.find(
+): LoadedPipette[] {
+  const pipetteEntity = []
+  const rightPipetteCommand = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'right'
   )
-  const leftPipette = commands.find(
+  const leftPipetteCommand = commands.find(
     (command): command is LoadPipetteRunTimeCommand =>
       command.commandType === 'loadPipette' && command.params.mount === 'left'
   )
-
-  const rightPipetteById =
-    rightPipette != null
-      ? {
-          [rightPipette.result.pipetteId]: {
-            name: rightPipette.params.pipetteName,
-          },
-        }
-      : {}
-  const leftPipetteById =
-    leftPipette != null
-      ? {
-          [leftPipette.result.pipetteId]: {
-            name: leftPipette.params.pipetteName,
-          },
-        }
-      : {}
-  return {
-    ...rightPipetteById,
-    ...leftPipetteById,
+  if (rightPipetteCommand != null) {
+    pipetteEntity.push({
+      id: rightPipetteCommand.result?.pipetteId ?? '',
+      pipetteName: rightPipetteCommand.params.pipetteName,
+      mount: rightPipetteCommand.params.mount,
+    })
   }
+  if (leftPipetteCommand != null) {
+    pipetteEntity.push({
+      id: leftPipetteCommand.result?.pipetteId ?? '',
+      pipetteName: leftPipetteCommand.params.pipetteName,
+      mount: leftPipetteCommand.params.mount,
+    })
+  }
+
+  return pipetteEntity
 }
 
 export function parseAllRequiredModuleModels(
@@ -84,23 +82,25 @@ export function parseAllRequiredModuleModels(
   )
 }
 
-export interface ModuleModelsById {
-  [moduleId: string]: { model: ModuleModel }
-}
-
-export function parseAllRequiredModuleModelsById(
+// This function is only used to compile modules from commands in the case that the
+// app-side protocol analysis is being referenced and stale.
+// The only time this will happen is in the protocol list page, where the serialNumber
+// should NOT be referenced
+export function parseRequiredModulesEntity(
   commands: RunTimeCommand[]
-): ModuleModelsById {
-  return commands.reduce<ModuleModelsById>(
-    (acc, command) =>
+): LoadedModule[] {
+  const loadModuleCommands = commands.filter(
+    (command): command is LoadModuleRunTimeCommand =>
       command.commandType === 'loadModule'
-        ? {
-            ...acc,
-            [command.result?.moduleId]: { model: command.params.model },
-          }
-        : acc,
-    {}
   )
+  return loadModuleCommands.map(command => {
+    return {
+      id: command.result?.moduleId ?? '',
+      model: command.params.model,
+      location: command.params.location,
+      serialNumber: '',
+    }
+  })
 }
 
 interface LoadedLabwareBySlot {
@@ -118,6 +118,7 @@ export function parseInitialLoadedLabwareBySlot(
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareBySlot>(
     loadLabwareCommandsReversed,
     (acc, command) =>
+      typeof command.params.location === 'object' &&
       'slotName' in command.params.location
         ? { ...acc, [command.params.location.slotName]: command }
         : acc,
@@ -140,6 +141,7 @@ export function parseInitialLoadedLabwareByModuleId(
   return reduce<LoadLabwareRunTimeCommand, LoadedLabwareByModuleId>(
     loadLabwareCommandsReversed,
     (acc, command) =>
+      typeof command.params.location === 'object' &&
       'moduleId' in command.params.location
         ? { ...acc, [command.params.location.moduleId]: command }
         : acc,
@@ -147,80 +149,26 @@ export function parseInitialLoadedLabwareByModuleId(
   )
 }
 
-export interface LoadedLabwareById {
-  [labwareId: string]: {
-    definitionId: string
-    displayName?: string
-  }
-}
-
-export function parseInitialLoadedLabwareById(
+export function parseInitialLoadedLabwareEntity(
   commands: RunTimeCommand[]
-): LoadedLabwareById {
-  const loadLabwareCommandsReversed = commands
-    .filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware'
-    )
-    .reverse()
-  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareById>(
-    loadLabwareCommandsReversed,
-    (acc, command) => {
-      const quirks = command.result.definition.parameters.quirks ?? []
-      if (quirks.includes('fixedTrash')) {
-        return { ...acc }
-      }
-      const labwareId = command.result.labwareId ?? ''
-      const {
-        namespace,
-        version,
-        parameters: { loadName },
-      } = command.result.definition
-      const definitionId = `${namespace}/${loadName}/${version}_id`
-
-      return {
-        ...acc,
-        [labwareId]: {
-          definitionId,
-          displayName: command.params.displayName,
-        },
-      }
-    },
-    {}
+): LoadedLabware[] {
+  const loadLabwareCommands = commands.filter(
+    (command): command is LoadLabwareRunTimeCommand =>
+      command.commandType === 'loadLabware'
   )
-}
-
-export interface LoadedLabwareDefinitionsById {
-  [definitionId: string]: LabwareDefinition2
-}
-export function parseInitialLoadedLabwareDefinitionsById(
-  commands: RunTimeCommand[]
-): LoadedLabwareDefinitionsById {
-  const labware = parseInitialLoadedLabwareById(commands)
-  const loadLabwareCommandsReversed = commands
-    .filter(
-      (command): command is LoadLabwareRunTimeCommand =>
-        command.commandType === 'loadLabware'
-    )
-    .reverse()
-  return reduce<LoadLabwareRunTimeCommand, LoadedLabwareDefinitionsById>(
-    loadLabwareCommandsReversed,
-    (acc, command) => {
-      const quirks = command.result.definition.parameters.quirks ?? []
-      if (quirks.includes('fixedTrash')) {
-        return { ...acc }
-      }
-      const labwareDef: LabwareDefinition2 = command.result?.definition
-      const labwareId = command.result?.labwareId ?? ''
-      const definitionId = labware[labwareId]?.definitionId
-
-      return {
-        ...acc,
-        [definitionId]: labwareDef,
-      }
-    },
-    {}
+  const filterOutTrashCommands = loadLabwareCommands.filter(
+    command => command.result?.definition?.metadata.displayCategory !== 'trash'
   )
+  return filterOutTrashCommands.map(command => {
+    const definition = command.result?.definition
+    return {
+      id: command.result?.labwareId ?? '',
+      loadName: definition?.parameters?.loadName ?? '',
+      definitionUri: definition != null ? getLabwareDefURI(definition) : '',
+      location: command.params.location,
+      displayName: command.params.displayName,
+    }
+  })
 }
 
 interface LoadedModulesBySlot {
@@ -245,42 +193,48 @@ export function parseInitialLoadedModulesBySlot(
   )
 }
 
-export interface Liquid {
-  liquidId: string
-  displayName: string
-  description: string
+export interface LiquidsById {
+  [liquidId: string]: {
+    displayName: string
+    description: string
+    displayColor?: string
+  }
+}
+
+// NOTE: a parsed liquid only differs from an analysis liquid in that
+// it will always have a displayColor
+export interface ParsedLiquid extends Omit<Liquid, 'displayColor'> {
   displayColor: string
 }
 
-// TODO: sb 6/21/22 replace mock data with real function once liquid data is
-// present in commands list
-export function parseLiquidsInLoadOrder(): Liquid[] {
-  return [
-    {
-      liquidId: '7',
-      displayName: 'liquid 2',
-      description: 'water',
-      displayColor: '#00d781',
+export function parseLiquidsInLoadOrder(
+  liquids: Liquid[],
+  commands: RunTimeCommand[]
+): ParsedLiquid[] {
+  const loadLiquidCommands = commands.filter(
+    (command): command is LoadLiquidRunTimeCommand =>
+      command.commandType === 'loadLiquid'
+  )
+  const loadedLiquids = liquids.map((liquid, index) => {
+    return {
+      ...liquid,
+      displayColor:
+        liquid.displayColor ??
+        COLORS.liquidColors[index % COLORS.liquidColors.length],
+    }
+  })
+
+  return reduce<LoadLiquidRunTimeCommand, ParsedLiquid[]>(
+    loadLiquidCommands,
+    (acc, command) => {
+      const liquid = loadedLiquids.find(
+        liquid => liquid.id === command.params.liquidId
+      )
+      if (liquid != null && !acc.some(item => item === liquid)) acc.push(liquid)
+      return acc
     },
-    {
-      liquidId: '123',
-      displayName: 'liquid 1',
-      description: 'saline',
-      displayColor: '#0076ff',
-    },
-    {
-      liquidId: '19',
-      displayName: 'liquid 3',
-      description: 'reagent',
-      displayColor: '#ff4888',
-    },
-    {
-      liquidId: '4',
-      displayName: 'liquid 4',
-      description: 'saliva',
-      displayColor: '#B925FF',
-    },
-  ]
+    []
+  )
 }
 
 interface LabwareLiquidInfo {
@@ -292,71 +246,38 @@ export interface LabwareByLiquidId {
   [liquidId: string]: LabwareLiquidInfo[]
 }
 
-export function parseLabwareInfoByLiquidId(): LabwareByLiquidId {
-  return {
-    '123': [
-      {
-        labwareId:
-          '5ae317e0-3412-11eb-ad93-ed232a2337cf:opentrons/nest_1_reservoir_195ml/1',
-        volumeByWell: { A1: 1000 },
-      },
-    ],
-    '7': [
-      {
-        labwareId:
-          '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
-        volumeByWell: {
-          A1: 100,
-          B1: 100,
-          C1: 100,
-          D1: 100,
-          A2: 100,
-          B2: 100,
-          C2: 100,
-          D2: 100,
-        },
-      },
-      {
-        labwareId: '53d3b350-a9c0-11eb-bce6-9f1d5b9c1a1b',
-        volumeByWell: {
-          A1: 50,
-          B1: 50,
-          C1: 50,
-          D1: 50,
-        },
-      },
-    ],
-    '4': [
-      {
-        labwareId:
-          '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
-        volumeByWell: {
-          A3: 100,
-          B3: 100,
-          C3: 100,
-          D3: 100,
-          A4: 100,
-          B4: 100,
-          C4: 100,
-          D4: 100,
-        },
-      },
-    ],
-    '19': [
-      {
-        labwareId:
-          '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
-        volumeByWell: {
-          A5: 100,
-          B5: 100,
-          C5: 100,
-          D5: 100,
-          A6: 100,
-          B6: 100,
-          C6: 100,
-          D6: 100,
-        },
-      },
-    ],
-  }
+export function parseLabwareInfoByLiquidId(
+  commands: RunTimeCommand[]
+): LabwareByLiquidId {
+  const loadLiquidCommands =
+    commands.length !== 0
+      ? commands.filter(
+          (command): command is LoadLiquidRunTimeCommand =>
+            command.commandType === 'loadLiquid'
+        )
+      : []
+
+  return reduce<LoadLiquidRunTimeCommand, LabwareByLiquidId>(
+    loadLiquidCommands,
+    (acc, command) => {
+      if (!(command.params.liquidId in acc)) {
+        acc[command.params.liquidId] = []
+      }
+      const labwareId = command.params.labwareId
+      const volumeByWell = command.params.volumeByWell
+      const labwareIndex = acc[command.params.liquidId].findIndex(
+        i => i.labwareId === labwareId
+      )
+      if (labwareIndex >= 0) {
+        acc[command.params.liquidId][labwareIndex].volumeByWell = {
+          ...acc[command.params.liquidId][labwareIndex].volumeByWell,
+          ...volumeByWell,
+        }
+      } else {
+        acc[command.params.liquidId].push({ labwareId, volumeByWell })
+      }
+      return acc
+    },
+    {}
+  )
 }

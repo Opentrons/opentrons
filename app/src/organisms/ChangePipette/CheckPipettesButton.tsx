@@ -1,62 +1,97 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
-
+import { usePipettesQuery } from '@opentrons/react-api-client'
+import { useTranslation } from 'react-i18next'
+import { StyledText } from '../../atoms/text'
 import {
-  useDispatchApiRequests,
-  getRequestById,
-  PENDING,
-  SUCCESS,
-} from '../../redux/robot-api'
-
-import { fetchPipettes, FETCH_PIPETTES } from '../../redux/pipettes'
-import { PrimaryButton, Icon } from '@opentrons/components'
-
-import type { State } from '../../redux/types'
-import type { RequestState } from '../../redux/robot-api/types'
+  Icon,
+  DIRECTION_ROW,
+  Flex,
+  COLORS,
+  ALIGN_CENTER,
+  SPACING,
+  SIZE_1,
+  PrimaryButton,
+} from '@opentrons/components'
+import { DETACH } from './constants'
 
 export interface CheckPipetteButtonProps {
   robotName: string
-  className: string
-  children: React.ReactNode
-  hidden?: boolean
-  onDone?: () => unknown
+  children?: React.ReactNode
+  direction?: 'detach' | 'attach'
+  onDone?: () => void
 }
 
 export function CheckPipettesButton(
   props: CheckPipetteButtonProps
 ): JSX.Element | null {
-  const { robotName, onDone, className, children, hidden = false } = props
-  const fetchPipettesRequestId = React.useRef<string | null>(null)
-  const [dispatch] = useDispatchApiRequests(dispatchedAction => {
-    if (
-      dispatchedAction.type === FETCH_PIPETTES &&
-      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
-      dispatchedAction.meta.requestId
-    ) {
-      // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
-      fetchPipettesRequestId.current = dispatchedAction.meta.requestId
+  const { onDone, children, direction } = props
+  const { t } = useTranslation('change_pipette')
+  const [isPending, setIsPending] = React.useState(false)
+  const { refetch: refetchPipettes } = usePipettesQuery(
+    { refresh: true },
+    {
+      enabled: false,
+      onSettled: () => {
+        setIsPending(false)
+      },
     }
-  })
+  )
+  const handleClick = (): void => {
+    setIsPending(true)
+    refetchPipettes()
+      .then(() => {
+        onDone?.()
+      })
+      .catch(() => {})
+  }
+  const icon = (
+    <Icon name="ot-spinner" height="1rem" spin marginRight={SPACING.spacing8} />
+  )
 
-  const handleClick = (): void => dispatch(fetchPipettes(robotName, true))
-  const requestStatus = useSelector<State, RequestState | null>(state =>
-    fetchPipettesRequestId.current
-      ? getRequestById(state, fetchPipettesRequestId.current)
-      : null
-  )?.status
-  const pending = requestStatus === PENDING
+  let body
+  if (children != null && !isPending) {
+    body = children
+  } else if (children != null && isPending) {
+    body = (
+      <>
+        {icon}
+        {children}
+      </>
+    )
+  } else if (children == null && isPending) {
+    body = (
+      <>
+        <Icon
+          name="ot-spinner"
+          height={SIZE_1}
+          spin
+          marginRight={SPACING.spacing8}
+        />
+        <StyledText>
+          {direction === DETACH
+            ? t('confirming_detachment')
+            : t('confirming_attachment')}
+        </StyledText>
+      </>
+    )
+  } else if (children == null && !isPending) {
+    body =
+      direction === DETACH ? t('confirm_detachment') : t('confirm_attachment')
+  }
 
-  React.useEffect(() => {
-    if (requestStatus === SUCCESS && onDone) onDone()
-  }, [onDone, requestStatus])
-
-  return hidden ? null : (
+  return (
     <PrimaryButton
       onClick={handleClick}
-      disabled={pending}
-      className={className}
+      aria-label="Confirm"
+      disabled={isPending}
     >
-      {pending ? <Icon name="ot-spinner" height="1em" spin /> : children}
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        color={COLORS.white}
+        alignItems={ALIGN_CENTER}
+      >
+        {body}
+      </Flex>
     </PrimaryButton>
   )
 }

@@ -1,15 +1,10 @@
 **/node_modules/**
 **/coverage/**
-**/dist/**
+**/dist/**/*
+**/lib/**/*
 **/build/**
 **/venv/**
 .opentrons_config
-
-# typescript
-app-shell/lib/**
-discovery-client/lib/**
-**/lib/**/*.d.ts
-**/lib/**/*.json
 
 # prettier
 **/package.json
@@ -32,3 +27,6 @@ update-server/**
 robot-server/**
 notify-server/**
 shared-data/python/**
+
+# app-testing don't format the json protocols
+app-testing/files

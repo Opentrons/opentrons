@@ -5,7 +5,6 @@ import startCase from 'lodash/startCase'
 import mapValues from 'lodash/mapValues'
 import forOwn from 'lodash/forOwn'
 import keys from 'lodash/keys'
-import pick from 'lodash/pick'
 import omit from 'lodash/omit'
 import set from 'lodash/set'
 import { Box } from '@opentrons/components'
@@ -40,9 +39,8 @@ export interface ConfigFormProps {
   settings: PipetteSettingsFieldsMap
   updateInProgress: boolean
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => unknown
-  closeModal: () => unknown
   groupLabels: string[]
-  __showHiddenFields: boolean
+  formId: string
 }
 
 const PLUNGER_KEYS = ['top', 'bottom', 'blowout', 'dropTip']
@@ -83,12 +81,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   getVisibleFields: () => PipetteSettingsFieldsMap = () => {
-    if (this.props.__showHiddenFields) return this.props.settings
-    return pick(this.props.settings, [
-      ...PLUNGER_KEYS,
-      ...POWER_KEYS,
-      ...TIP_KEYS,
-    ])
+    return omit(this.props.settings, [QUIRK_KEY])
   }
 
   getUnknownKeys: () => string[] = () => {
@@ -184,7 +177,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
   }
 
   render(): JSX.Element {
-    const { updateInProgress } = this.props
+    const { updateInProgress, formId } = this.props
     const fields = this.getVisibleFields()
     const UNKNOWN_KEYS = this.getUnknownKeys()
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
@@ -192,7 +185,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     const tipFields = this.getFieldsByKey(TIP_KEYS, fields)
     const quirkFields = this.getKnownQuirks()
     const quirksPresent = quirkFields.length > 0
-    const devFields = this.getFieldsByKey(UNKNOWN_KEYS, fields)
+    const unknownFields = this.getFieldsByKey(UNKNOWN_KEYS, fields)
     const initialValues = this.getInitialValues()
 
     return (
@@ -217,7 +210,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
           }
           return (
             <Box overflowY="scroll">
-              <Form>
+              <Form id={formId}>
                 <ConfigFormResetButton
                   onClick={handleReset}
                   disabled={updateInProgress}
@@ -230,19 +223,13 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
                   />
                   <ConfigFormGroup
                     groupLabel={this.props.groupLabels[1]}
-                    formFields={tipFields}
+                    formFields={[...tipFields, ...unknownFields]}
                   />
                   {quirksPresent && <ConfigQuirkGroup quirks={quirkFields} />}
-                  {this.props.__showHiddenFields && (
-                    <ConfigFormGroup
-                      groupLabel={this.props.groupLabels[2]}
-                      formFields={devFields}
-                    />
-                  )}
                 </FormColumn>
                 <FormColumn>
                   <ConfigFormGroup
-                    groupLabel={this.props.groupLabels[3]}
+                    groupLabel={this.props.groupLabels[2]}
                     formFields={powerFields}
                   />
                 </FormColumn>

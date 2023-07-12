@@ -2,8 +2,12 @@ from starlette import status
 from fastapi import APIRouter, Depends
 from pydantic import ValidationError
 
+from opentrons_shared_data.errors import ErrorCodes
+
 from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.errors import HardwareNotSupportedError
+from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
 from robot_server.errors import LegacyErrorResponse
 from robot_server.hardware import get_hardware
@@ -32,8 +36,10 @@ async def get_engaged_motors(
         }
         return model.EngagedMotors(**axes_dict)
     except ValidationError as e:
-        raise LegacyErrorResponse(message=str(e)).as_error(
-            status.HTTP_500_INTERNAL_SERVER_ERROR
+        raise LegacyErrorResponse(
+            message=str(e), errorCode=ErrorCodes.GENERAL_ERROR.value.code
+        ).as_error(
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
 
@@ -45,7 +51,13 @@ async def get_engaged_motors(
 async def post_disengage_motors(
     axes: model.Axes, hardware: HardwareControlAPI = Depends(get_hardware)
 ) -> V1BasicResponse:
-
     input_axes = [Axis[ax.upper()] for ax in axes.axes]
+    # Do we want this endpoint to run on OT3?
+    try:
+        hardware = ensure_ot3_hardware(hardware)
+    except HardwareNotSupportedError:
+        # Filter out non-ot2 axes when running on OT2
+        input_axes = [axis for axis in input_axes if axis in Axis.ot2_axes()]
+
     await hardware.disengage_axes(input_axes)
     return V1BasicResponse(message="Disengaged axes: {}".format(", ".join(axes.axes)))

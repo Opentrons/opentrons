@@ -3,11 +3,15 @@ from __future__ import annotations
 import asyncio
 import logging
 from enum import Enum
-from typing import Optional, Dict
+from typing import Optional, Dict, Union
 
 from opentrons.drivers import utils
 from opentrons.drivers.command_builder import CommandBuilder
-from opentrons.drivers.asyncio.communication import SerialConnection, AsyncSerial
+from opentrons.drivers.asyncio.communication import (
+    SerialConnection,
+    AsyncResponseSerialConnection,
+    AsyncSerial,
+)
 from opentrons.drivers.thermocycler.abstract import AbstractThermocyclerDriver
 from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
 
@@ -17,6 +21,7 @@ log = logging.getLogger(__name__)
 class GCODE(str, Enum):
     OPEN_LID = "M126"
     CLOSE_LID = "M127"
+    PLATE_LIFT = "M128"
     GET_LID_STATUS = "M119"
     SET_LID_TEMP = "M140"
     GET_LID_TEMP = "M141"
@@ -57,6 +62,9 @@ DEFAULT_COMMAND_RETRIES = 3
 TC_GEN2_SERIAL_ACK = "\n"
 TC_GEN2_ACK = " OK" + TC_GEN2_SERIAL_ACK
 TC_GEN2_ERROR_WORD = "ERR"
+TC_GEN2_ASYNC_ERROR_ACK = "async"
+
+SerialKind = Union[AsyncResponseSerialConnection, SerialConnection]
 
 
 class ThermocyclerDriverFactory:
@@ -96,7 +104,7 @@ class ThermocyclerDriverFactory:
         serial_port.reset_input_buffer()
 
         if is_gen2:
-            connection = SerialConnection(
+            async_connection = AsyncResponseSerialConnection(
                 serial=serial_port,
                 port=port,
                 name=port,
@@ -104,8 +112,9 @@ class ThermocyclerDriverFactory:
                 retry_wait_time_seconds=0.1,
                 error_keyword=TC_GEN2_ERROR_WORD,
                 alarm_keyword="alarm",
+                async_error_ack=TC_GEN2_ASYNC_ERROR_ACK,
             )
-            return ThermocyclerDriverV2(connection)
+            return ThermocyclerDriverV2(async_connection)
         else:
             connection = SerialConnection(
                 serial=serial_port,
@@ -138,7 +147,10 @@ class ThermocyclerDriverFactory:
 
 
 class ThermocyclerDriver(AbstractThermocyclerDriver):
-    def __init__(self, connection: SerialConnection) -> None:
+    def __init__(
+        self,
+        connection: SerialKind,
+    ) -> None:
         """
         Constructor
 
@@ -297,13 +309,29 @@ class ThermocyclerDriver(AbstractThermocyclerDriver):
         await trigger_connection.close()
         await self._connection.close()
 
+    async def lift_plate(self) -> None:
+        """Send the Plate Lift command.
+
+        NOT SUPPORTED on TC Gen1."""
+        raise NotImplementedError(
+            "Gen1 Thermocyclers do not support the Plate Lift command."
+        )
+
+    async def jog_lid(self, angle: float) -> None:
+        """Send the Jog Lid command.
+
+        NOT SUPPORTED on TC Gen1."""
+        raise NotImplementedError(
+            "Gen1 Thermocyclers do not support the Jog Lid command."
+        )
+
 
 class ThermocyclerDriverV2(ThermocyclerDriver):
     """
     This driver is for Thermocycler model Gen2.
     """
 
-    def __init__(self, connection: SerialConnection) -> None:
+    def __init__(self, connection: AsyncResponseSerialConnection) -> None:
         """
         Constructor
 
@@ -331,8 +359,23 @@ class ThermocyclerDriverV2(ThermocyclerDriver):
         c = CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
             gcode=GCODE.ENTER_PROGRAMMING
         )
-        # The timeout is overwritten because no response should ever come
-        await self._connection.send_command(
-            command=c, retries=DEFAULT_COMMAND_RETRIES, timeout=1
-        )
+        # No response expected, USB connection should terminate after this
+        await self._connection.send_dfu_command(command=c)
         await self._connection.close()
+
+    async def lift_plate(self) -> None:
+        """Send the Plate Lift command."""
+        c = CommandBuilder(terminator=TC_COMMAND_TERMINATOR).add_gcode(
+            gcode=GCODE.PLATE_LIFT
+        )
+        await self._connection.send_command(command=c, retries=DEFAULT_COMMAND_RETRIES)
+
+    async def jog_lid(self, angle: float) -> None:
+        """Send the Jog Lid command."""
+        c = (
+            CommandBuilder(terminator=TC_COMMAND_TERMINATOR)
+            .add_gcode(gcode="M240.D")
+            .add_float(prefix="", value=angle, precision=2)
+            .add_element("O")
+        )
+        await self._connection.send_command(command=c, retries=1)

@@ -1,10 +1,14 @@
-from typing import Type
+from typing import Type, Union
 
 import pytest
 from mock import AsyncMock, call
+import mock
 
 from opentrons.drivers.asyncio.communication.async_serial import AsyncSerial
-from opentrons.drivers.asyncio.communication.serial_connection import SerialConnection
+from opentrons.drivers.asyncio.communication.serial_connection import (
+    SerialConnection,
+    AsyncResponseSerialConnection,
+)
 from opentrons.drivers.asyncio.communication import (
     NoResponse,
     AlarmResponse,
@@ -22,25 +26,70 @@ def ack() -> str:
     return "ack"
 
 
+SerialKind = Union[AsyncResponseSerialConnection, SerialConnection]
+
+
 # Async because SerialConnection.__init__() needs an event loop,
 # so this fixture needs to run in an event loop.
-@pytest.fixture
-async def subject(mock_serial_port: AsyncMock, ack: str) -> SerialConnection:
+@pytest.fixture(
+    params=[AsyncResponseSerialConnection, SerialConnection],  # type: ignore[return]
+)
+async def subject(
+    request: pytest.FixtureRequest, mock_serial_port: AsyncMock, ack: str
+) -> SerialKind:
     """Create the test subject."""
-    SerialConnection.RETRY_WAIT_TIME = 0  # type: ignore[attr-defined]
-    return SerialConnection(
+    serial_class = request.param  # type: ignore[attr-defined]
+    serial_class.RETRY_WAIT_TIME = 0
+    if serial_class == AsyncResponseSerialConnection:
+        return serial_class(  # type: ignore[no-any-return]
+            serial=mock_serial_port,
+            ack=ack,
+            name="name",
+            port="port",
+            retry_wait_time_seconds=0,
+            error_keyword="err",
+            alarm_keyword="alarm",
+            async_error_ack="async",
+        )
+    elif serial_class == SerialConnection:
+        return serial_class(  # type: ignore[no-any-return]
+            serial=mock_serial_port,
+            ack=ack,
+            name="name",
+            port="port",
+            retry_wait_time_seconds=0,
+            error_keyword="error",
+            alarm_keyword="alarm",
+        )
+
+
+@pytest.fixture
+async def async_subject(
+    mock_serial_port: AsyncMock, ack: str
+) -> AsyncResponseSerialConnection:
+    """Create the test async subject."""
+    AsyncResponseSerialConnection.RETRY_WAIT_TIME = 0  # type: ignore[attr-defined]
+    return AsyncResponseSerialConnection(
         serial=mock_serial_port,
         ack=ack,
         name="name",
         port="port",
         retry_wait_time_seconds=0,
-        error_keyword="error",
+        error_keyword="err",
         alarm_keyword="alarm",
+        async_error_ack="async",
     )
 
 
+@pytest.fixture
+async def subject_raise_on_error_patched(async_subject):
+    raise_on_error_mock = mock.MagicMock()
+    with mock.patch.object(async_subject, "raise_on_error", raise_on_error_mock):
+        yield async_subject
+
+
 async def test_send_command(
-    mock_serial_port: AsyncMock, subject: SerialConnection, ack: str
+    mock_serial_port: AsyncMock, subject: SerialKind, ack: str
 ) -> None:
     """It should send a command."""
     serial_response = "response data " + ack
@@ -54,7 +103,7 @@ async def test_send_command(
 
 
 async def test_send_command_with_retry(
-    mock_serial_port: AsyncMock, subject: SerialConnection, ack: str
+    mock_serial_port: AsyncMock, subject: SerialKind, ack: str
 ) -> None:
     """It should retry sending after a read failure."""
     serial_response = "response data " + ack
@@ -75,7 +124,7 @@ async def test_send_command_with_retry(
 
 
 async def test_send_command_with_retry_exhausted(
-    mock_serial_port: AsyncMock, subject: SerialConnection
+    mock_serial_port: AsyncMock, subject: SerialKind
 ) -> None:
     """It should raise after retries exhausted."""
     mock_serial_port.read_until.side_effect = (b"", b"", b"")
@@ -85,7 +134,7 @@ async def test_send_command_with_retry_exhausted(
 
 
 async def test_send_command_response(
-    mock_serial_port: AsyncMock, subject: SerialConnection, ack: str
+    mock_serial_port: AsyncMock, subject: SerialKind, ack: str
 ) -> None:
     """It should return response without the ack and stripped."""
     response_data = "response data"
@@ -112,16 +161,82 @@ async def test_send_command_response(
     ],
 )
 def test_raise_on_error(
-    subject: SerialConnection, response: str, exception_type: Type[Exception]
+    subject: SerialKind, response: str, exception_type: Type[Exception]
 ) -> None:
     """It should raise an exception on error/alarm responses."""
     with pytest.raises(expected_exception=exception_type, match=response):
         subject.raise_on_error(response)
 
 
-async def test_on_retry(mock_serial_port: AsyncMock, subject: SerialConnection) -> None:
+async def test_on_retry(mock_serial_port: AsyncMock, subject: SerialKind) -> None:
     """It should try to re-open connection."""
     await subject.on_retry()
 
     mock_serial_port.close.assert_called_once()
     mock_serial_port.open.assert_called_once()
+
+
+async def test_send_data_with_async_error_before(
+    mock_serial_port: AsyncMock,
+    subject_raise_on_error_patched: AsyncResponseSerialConnection,
+    ack: str,
+) -> None:
+    """It should return response without the ack and stripped. It should also handle the async error."""
+    error_response = "async ERR106:main motor:speedsensor failed"
+    serial_error_response = f" {error_response}  {ack}"
+    encoded_error_response = serial_error_response.encode()
+    successful_response = "G28"
+    serial_successful_response = f" {successful_response}  {ack}"
+    encoded_successful_response = serial_successful_response.encode()
+    mock_serial_port.read_until.side_effect = [
+        encoded_error_response,
+        encoded_successful_response,
+    ]
+
+    response = await subject_raise_on_error_patched._send_data(data="G28")
+
+    assert response == successful_response
+    mock_serial_port.read_until.assert_has_calls(
+        calls=[
+            call(match=ack.encode()),
+            call(match=ack.encode()),
+        ]
+    )
+    subject_raise_on_error_patched.raise_on_error.assert_has_calls(  # type: ignore[attr-defined]
+        calls=[
+            call(response=error_response),
+            call(response=successful_response),
+        ]
+    )
+
+
+async def test_send_data_with_async_error_after(
+    mock_serial_port: AsyncMock,
+    subject_raise_on_error_patched: AsyncResponseSerialConnection,
+    ack: str,
+) -> None:
+    """It should return response without the ack and stripped. It should not handle the async error."""
+    error_response = "async ERR106:main motor:speedsensor failed"
+    serial_error_response = f" {error_response}  {ack}"
+    encoded_error_response = serial_error_response.encode()
+    successful_response = "G28"
+    serial_successful_response = f" {successful_response}  {ack}"
+    encoded_successful_response = serial_successful_response.encode()
+    mock_serial_port.read_until.side_effect = [
+        encoded_successful_response,
+        encoded_error_response,
+    ]
+
+    response = await subject_raise_on_error_patched._send_data(data="G28")
+
+    assert response == successful_response
+    mock_serial_port.read_until.assert_has_calls(
+        calls=[
+            call(match=ack.encode()),
+        ]
+    )
+    subject_raise_on_error_patched.raise_on_error.assert_has_calls(  # type: ignore[attr-defined]
+        calls=[
+            call(response=successful_response),
+        ]
+    )

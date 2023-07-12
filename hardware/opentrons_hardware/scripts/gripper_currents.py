@@ -128,7 +128,7 @@ LOG_CONFIG = {
         "file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "basic",
-            "filename": "gripper.log",
+            "filename": "/var/log/gripper.log",
             "maxBytes": 5000000,
             "level": logging.INFO,
             "backupCount": 3,

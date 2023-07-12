@@ -17,7 +17,16 @@ from opentrons.protocol_reader import (
     ProtocolFilesInvalidError,
 )
 from opentrons.protocol_runner import create_simulating_runner
-from opentrons.protocol_engine import Command, ErrorOccurrence
+from opentrons.protocol_engine import (
+    Command,
+    ErrorOccurrence,
+    LoadedLabware,
+    LoadedPipette,
+    LoadedModule,
+    Liquid,
+)
+
+from opentrons_shared_data.robot.dev_types import RobotType
 
 
 @click.command()
@@ -67,24 +76,35 @@ async def _analyze(
     except ProtocolFilesInvalidError as error:
         raise click.ClickException(str(error))
 
-    runner = await create_simulating_runner()
+    runner = await create_simulating_runner(
+        robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
+    )
     analysis = await runner.run(protocol_source)
 
     if json_output:
-        results = AnalyzeResults(
+        results = AnalyzeResults.construct(
             createdAt=datetime.now(tz=timezone.utc),
             files=[
-                ProtocolFile(name=f.path.name, role=f.role)
+                ProtocolFile.construct(name=f.path.name, role=f.role)
                 for f in protocol_source.files
             ],
             config=(
-                JsonConfig(schemaVersion=protocol_source.config.schema_version)
+                JsonConfig.construct(
+                    schemaVersion=protocol_source.config.schema_version
+                )
                 if isinstance(protocol_source.config, JsonProtocolConfig)
-                else PythonConfig(apiVersion=protocol_source.config.api_version)
+                else PythonConfig.construct(
+                    apiVersion=protocol_source.config.api_version
+                )
             ),
             metadata=protocol_source.metadata,
+            robotType=protocol_source.robot_type,
             commands=analysis.commands,
             errors=analysis.state_summary.errors,
+            labware=analysis.state_summary.labware,
+            pipettes=analysis.state_summary.pipettes,
+            modules=analysis.state_summary.modules,
+            liquids=analysis.state_summary.liquids,
         )
 
         await json_output.write_text(
@@ -126,5 +146,10 @@ class AnalyzeResults(BaseModel):
     files: List[ProtocolFile]
     config: Union[JsonConfig, PythonConfig]
     metadata: Dict[str, Any]
+    robotType: RobotType
     commands: List[Command]
+    labware: List[LoadedLabware]
+    pipettes: List[LoadedPipette]
+    modules: List[LoadedModule]
+    liquids: List[Liquid]
     errors: List[ErrorOccurrence]

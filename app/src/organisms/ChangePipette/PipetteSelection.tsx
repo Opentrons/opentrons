@@ -1,22 +1,31 @@
 import * as React from 'react'
-
-import { PipetteSelect } from '@opentrons/components'
-import styles from './styles.css'
+import { useTranslation } from 'react-i18next'
+import {
+  Flex,
+  DIRECTION_COLUMN,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 import { OT3_PIPETTES } from '@opentrons/shared-data'
-
-const LABEL = 'Select the pipette you wish to attach:'
+import { StyledText } from '../../atoms/text'
+import { PipetteSelect } from '../../molecules/PipetteSelect'
 
 export type PipetteSelectionProps = React.ComponentProps<typeof PipetteSelect>
 
 export function PipetteSelection(props: PipetteSelectionProps): JSX.Element {
+  const { t } = useTranslation('change_pipette')
   return (
-    <label className={styles.pipette_selection}>
-      <span className={styles.pipette_selection_label}>{LABEL}</span>
-      <PipetteSelect
-        pipetteName={props.pipetteName}
-        onPipetteChange={props.onPipetteChange}
-        nameBlocklist={OT3_PIPETTES}
-      />
-    </label>
+    <Flex flexDirection={DIRECTION_COLUMN}>
+      <StyledText css={TYPOGRAPHY.h1Default} marginBottom={SPACING.spacing24}>
+        {t('choose_pipette')}
+      </StyledText>
+      <Flex marginBottom="1.2rem">
+        <PipetteSelect
+          pipetteName={props.pipetteName}
+          onPipetteChange={props.onPipetteChange}
+          nameBlocklist={OT3_PIPETTES}
+        />
+      </Flex>
+    </Flex>
   )
 }

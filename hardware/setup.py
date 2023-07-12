@@ -17,11 +17,12 @@ from python_build_utils import normalize_version  # noqa: E402
 def get_version() -> str:
     """Get the version."""
     buildno = os.getenv("BUILD_NUMBER")
+    project = os.getenv("OPENTRONS_PROJECT", "robot-stack")
     if buildno:
         normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version("hardware", **normalize_opts)
+    return normalize_version("hardware", project, **normalize_opts)
 
 
 VERSION = get_version()
@@ -45,7 +46,11 @@ CLASSIFIERS = [
 KEYWORDS = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 DESCRIPTION = "Hardware control for Opentrons Robots."
 PACKAGES = find_packages(where=".", exclude=["tests.*", "tests"])
-INSTALL_REQUIRES = ["python-can==3.3.4", "pyserial==3.5"]
+INSTALL_REQUIRES = [
+    "python-can==3.3.4",
+    "pyserial==3.5",
+    f"opentrons_shared_data=={VERSION}",
+]
 
 
 def read(*parts: str) -> str:

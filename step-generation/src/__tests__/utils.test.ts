@@ -951,6 +951,10 @@ describe('getIsHeaterShakerEastWestWithLatchOpen', () => {
   it('should return true when there is heater shaker with its latch open next to the labware', () => {
     expect(getIsHeaterShakerEastWestWithLatchOpen(modules, slot)).toBe(true)
   })
+  it('should return true when there is heater shaker with its latch open state null to the labware', () => {
+    ;(modules.heaterShakerId.moduleState as any).latchOpen = null
+    expect(getIsHeaterShakerEastWestWithLatchOpen(modules, slot)).toBe(true)
+  })
   it('should return false when there is no heater shaker in the protocol', () => {
     modules = {}
     expect(getIsHeaterShakerEastWestWithLatchOpen(modules, slot)).toBe(false)

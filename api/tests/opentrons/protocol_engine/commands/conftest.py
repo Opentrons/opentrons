@@ -1,14 +1,17 @@
 """Fixtures for protocol engine command tests."""
+from __future__ import annotations
+
 import pytest
 from decoy import Decoy
 
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
     MovementHandler,
     PipettingHandler,
     RunControlHandler,
     RailLightsHandler,
+    LabwareMovementHandler,
+    StatusBarHandler,
 )
 from opentrons.protocol_engine.state import StateView
 
@@ -17,12 +20,6 @@ from opentrons.protocol_engine.state import StateView
 def state_view(decoy: Decoy) -> StateView:
     """Get a mocked out StateView."""
     return decoy.mock(cls=StateView)
-
-
-@pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mocked out HardwareControlAPI."""
-    return decoy.mock(cls=HardwareControlAPI)
 
 
 @pytest.fixture
@@ -35,6 +32,12 @@ def equipment(decoy: Decoy) -> EquipmentHandler:
 def movement(decoy: Decoy) -> MovementHandler:
     """Get a mocked out MovementHandler."""
     return decoy.mock(cls=MovementHandler)
+
+
+@pytest.fixture
+def labware_movement(decoy: Decoy) -> LabwareMovementHandler:
+    """Get a mocked out LabwareMovementHandler."""
+    return decoy.mock(cls=LabwareMovementHandler)
 
 
 @pytest.fixture
@@ -53,3 +56,9 @@ def run_control(decoy: Decoy) -> RunControlHandler:
 def rail_lights(decoy: Decoy) -> RailLightsHandler:
     """Get a mocked out RailLightsHandler."""
     return decoy.mock(cls=RailLightsHandler)
+
+
+@pytest.fixture
+def status_bar(decoy: Decoy) -> StatusBarHandler:
+    """Get a mocked out StatusBarHandler."""
+    return decoy.mock(cls=StatusBarHandler)

@@ -4,7 +4,7 @@ import asyncio
 import concurrent.futures
 import contextlib
 from pathlib import Path
-from typing import Any, AsyncGenerator, Dict, List
+from typing import Any, AsyncGenerator, BinaryIO, Dict, List, Optional, Tuple, Union
 
 import httpx
 from httpx import Response
@@ -26,28 +26,29 @@ class RobotClient:
         self,
         httpx_client: httpx.AsyncClient,
         worker_executor: concurrent.futures.ThreadPoolExecutor,
-        host: str,
-        port: str,
+        base_url: str,
     ) -> None:
         """Initialize the client."""
-        self.base_url: str = f"{host}:{port}"
-        self.httpx_client: httpx.AsyncClient = httpx_client
-        self.worker_executor: concurrent.futures.ThreadPoolExecutor = worker_executor
+        self.httpx_client = httpx_client
+        self.worker_executor = worker_executor
+        self.base_url = base_url
 
     @staticmethod
     @contextlib.asynccontextmanager
-    async def make(
-        host: str, port: str, version: str
-    ) -> AsyncGenerator[RobotClient, None]:
+    async def make(base_url: str, version: str) -> AsyncGenerator[RobotClient, None]:
         with concurrent.futures.ThreadPoolExecutor() as worker_executor:
             async with httpx.AsyncClient(
-                headers={"opentrons-version": version}
+                headers={"opentrons-version": version},
+                # Set the default timeout high enough for our heaviest requests
+                # (like fetching a large protocol analysis) to fit comfortably.
+                # If an individual test wants to shorten this timeout, it should wrap
+                # its request in anyio.fail_after().
+                timeout=30,
             ) as httpx_client:
                 yield RobotClient(
                     httpx_client=httpx_client,
                     worker_executor=worker_executor,
-                    host=host,
-                    port=port,
+                    base_url=base_url,
                 )
 
     async def alive(self) -> bool:
@@ -118,20 +119,45 @@ class RobotClient:
         )
         return response
 
-    async def post_protocol(self, files: List[Path]) -> Response:
-        """POST /protocols."""
-        file_payload = []
-        for file in files:
-            file_payload.append(("files", open(file, "rb")))
-        response = await self.httpx_client.post(
-            url=f"{self.base_url}/protocols", files=file_payload
-        )
+    async def post_protocol(
+        self, files: List[Union[Path, Tuple[str, bytes]]]
+    ) -> Response:
+        """POST /protocols.
+
+        Params:
+            files: The files to upload, representing the protocol, custom labware, etc.
+                Each file file can be provided as a Path, in which case it's read
+                from the filesystem, or as a (name, contents) tuple.
+        """
+        multipart_upload_name = "files"
+
+        with contextlib.ExitStack() as file_exit_stack:
+            opened_files: List[
+                Union[BinaryIO, Tuple[str, bytes]],
+            ] = []
+
+            for file in files:
+                if isinstance(file, Path):
+                    opened_file = file_exit_stack.enter_context(file.open("rb"))
+                    opened_files.append(opened_file)
+                else:
+                    opened_files.append(file)
+
+            response = await self.httpx_client.post(
+                url=f"{self.base_url}/protocols",
+                files=[(multipart_upload_name, f) for f in opened_files],
+            )
+
         response.raise_for_status()
         return response
 
-    async def get_runs(self) -> Response:
+    async def get_runs(self, length: Optional[int] = None) -> Response:
         """GET /runs."""
-        response = await self.httpx_client.get(url=f"{self.base_url}/runs")
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/runs"
+            if length is None
+            else f"{self.base_url}/runs?pageLength={length}"
+        )
         response.raise_for_status()
         return response
 
@@ -173,10 +199,21 @@ class RobotClient:
         response.raise_for_status()
         return response
 
-    async def get_run_commands(self, run_id: str) -> Response:
+    async def get_run_commands(
+        self,
+        run_id: str,
+        cursor: Optional[int] = None,
+        page_length: Optional[int] = None,
+    ) -> Response:
         """GET /runs/:run_id/commands."""
+        query_params = {}
+        if cursor is not None:
+            query_params["cursor"] = cursor
+        if page_length is not None:
+            query_params["pageLength"] = page_length
+
         response = await self.httpx_client.get(
-            url=f"{self.base_url}/runs/{run_id}/commands",
+            url=f"{self.base_url}/runs/{run_id}/commands", params=query_params
         )
         response.raise_for_status()
         return response
@@ -215,6 +252,14 @@ class RobotClient:
         response.raise_for_status()
         return response
 
+    async def get_analyses(self, protocol_id: str) -> Response:
+        """GET /protocols/{protocol_id}/analyses."""
+        response = await self.httpx_client.get(
+            url=f"{self.base_url}/protocols/{protocol_id}/analyses"
+        )
+        response.raise_for_status()
+        return response
+
     async def get_analysis(self, protocol_id: str, analysis_id: str) -> Response:
         """GET /protocols/{protocol_id}/{analysis_id}."""
         response = await self.httpx_client.get(
@@ -226,6 +271,14 @@ class RobotClient:
     async def delete_run(self, run_id: str) -> Response:
         """DELETE /runs/{run_id}."""
         response = await self.httpx_client.delete(f"{self.base_url}/runs/{run_id}")
+        response.raise_for_status()
+        return response
+
+    async def delete_protocol(self, protocol_id: str) -> Response:
+        """DELETE /protocols/{protocol_id}."""
+        response = await self.httpx_client.delete(
+            f"{self.base_url}/protocols/{protocol_id}"
+        )
         response.raise_for_status()
         return response
 

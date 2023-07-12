@@ -45,7 +45,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   } = useMenuHandleClickOutside()
   const [targetProps, tooltipProps] = useHoverTooltip()
   const dispatch = useDispatch<Dispatch>()
-  const runId = useCurrentRunId()
+  const runId = useCurrentRunId({ enabled: robot.status === CONNECTABLE })
   const [
     showChooseProtocolSlideout,
     setShowChooseProtocolSlideout,
@@ -54,11 +54,12 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
     showConnectionTroubleshootingModal,
     setShowConnectionTroubleshootingModal,
   ] = React.useState<boolean>(false)
-  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
-    useSelector((state: State) => {
-      return getBuildrootUpdateDisplayInfo(state, robot.name)
-    })?.autoUpdateAction
-  )
+
+  const { autoUpdateAction } = useSelector((state: State) => {
+    return getBuildrootUpdateDisplayInfo(state, robot.name)
+  })
+  const isRobotOnWrongVersionOfSoftware =
+    autoUpdateAction === 'upgrade' || autoUpdateAction === 'downgrade'
 
   const handleClickRun: React.MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()
@@ -86,11 +87,11 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
           {t('run_a_protocol')}
         </MenuItem>
         {isRobotOnWrongVersionOfSoftware && (
-          <Tooltip tooltipProps={tooltipProps}>
+          <Tooltip tooltipProps={tooltipProps} whiteSpace="normal">
             {t('shared:a_software_update_is_available')}
           </Tooltip>
         )}
-        <Divider marginY={'0'} />
+        <Divider marginY="0" />
         <MenuItem
           to={`/devices/${robot.name}/robot-settings`}
           as={Link}
@@ -117,13 +118,13 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       <>
         <MenuItem
           onClick={handleClickConnectionTroubleshooting}
-          id={`RobotOverflowMenu_${robot.name}_robotUnavailable`}
+          id={`RobotOverflowMenu_${String(robot.name)}_robotUnavailable`}
         >
           {t('why_is_this_robot_unavailable')}
         </MenuItem>
         <MenuItem
           onClick={() => dispatch(removeRobot(robot.name))}
-          id={`RobotOverflowMenu_${robot.name}_removeRobot`}
+          id={`RobotOverflowMenu_${String(robot.name)}_removeRobot`}
         >
           {t('forget_unavailable_robot')}
         </MenuItem>
@@ -132,7 +133,7 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
   }
   return (
     <Flex
-      data-testid={`RobotCard_${robot.name}_overflowMenu`}
+      data-testid={`RobotCard_${String(robot.name)}_overflowMenu`}
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
       onClick={e => {
@@ -147,31 +148,32 @@ export function RobotOverflowMenu(props: RobotOverflowMenuProps): JSX.Element {
       />
       {showOverflowMenu && !showConnectionTroubleshootingModal ? (
         <Flex
-          width={'11rem'}
+          whiteSpace="nowrap"
           zIndex={10}
-          borderRadius={'4px 4px 0px 0px'}
-          boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+          borderRadius="4px 4px 0px 0px"
+          boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
           top="2.25rem"
           right="0"
           flexDirection={DIRECTION_COLUMN}
-          id={`RobotOverflowMenu_${robot.name}_buttons`}
+          id={`RobotOverflowMenu_${String(robot.name)}_buttons`}
         >
           {menuItems}
         </Flex>
       ) : null}
+      {showChooseProtocolSlideout && robot.status === CONNECTABLE ? (
+        <ChooseProtocolSlideout
+          robot={robot}
+          showSlideout={showChooseProtocolSlideout}
+          onCloseClick={() => {
+            setShowChooseProtocolSlideout(false)
+          }}
+        />
+      ) : null}
       <Portal level="top">
         {showOverflowMenu && menuOverlay}
-        {robot.status === CONNECTABLE ? (
-          <ChooseProtocolSlideout
-            robot={robot}
-            showSlideout={showChooseProtocolSlideout}
-            onCloseClick={() => {
-              setShowChooseProtocolSlideout(false)
-            }}
-          />
-        ) : null}
+
         {showConnectionTroubleshootingModal ? (
           <ConnectionTroubleshootingModal
             onClose={() => {

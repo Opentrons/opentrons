@@ -10,13 +10,14 @@ import {
   Btn,
   JUSTIFY_FLEX_END,
   TYPOGRAPHY,
+  PrimaryButton,
+  WRAP_REVERSE,
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
 import { Banner } from '../../atoms/Banner'
 import { Portal } from '../../App/portal'
-import { Modal } from '../../atoms/Modal'
-import { PrimaryButton } from '../../atoms/buttons'
+import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { Dispatch } from '../../redux/types'
 import { analyzeProtocol } from '../../redux/protocol-storage'
@@ -49,13 +50,11 @@ export function ProtocolAnalysisFailure(
     dispatch(analyzeProtocol(protocolKey))
   }
   return (
-    <Banner
-      type="error"
-      marginBottom={SPACING.spacing4}
-      paddingRight={SPACING.spacing4}
-      marginRight={SPACING.spacing5}
-    >
+    <Banner type="warning" marginRight={SPACING.spacing24}>
       <Flex
+        columnGap={SPACING.spacing8}
+        flex="1"
+        flexWrap={WRAP_REVERSE}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
         width="100%"
@@ -88,7 +87,7 @@ export function ProtocolAnalysisFailure(
       </Flex>
       {showErrorDetails ? (
         <Portal level="top">
-          <Modal
+          <LegacyModal
             type="error"
             title={t('protocol_analysis_failure')}
             onClose={handleClickHideDetails}
@@ -102,12 +101,12 @@ export function ProtocolAnalysisFailure(
               <PrimaryButton
                 onClick={handleClickHideDetails}
                 textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginTop={SPACING.spacing4}
+                marginTop={SPACING.spacing16}
               >
                 {t('shared:close')}
               </PrimaryButton>
             </Flex>
-          </Modal>
+          </LegacyModal>
         </Portal>
       ) : null}
     </Banner>

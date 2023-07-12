@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { when, resetAllWhenMocks } from 'jest-when'
-import { fireEvent, screen } from '@testing-library/react'
+import { fireEvent } from '@testing-library/react'
+
 import { renderWithProviders } from '@opentrons/components'
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+
 import { i18n } from '../../../i18n'
 import { home } from '../../../redux/robot-controls'
 import * as Buildroot from '../../../redux/buildroot'
@@ -11,23 +12,34 @@ import { restartRobot } from '../../../redux/robot-admin'
 import {
   mockConnectableRobot,
   mockReachableRobot,
+  mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { useCurrentRunStatus } from '../../RunTimeControl/hooks'
+import { useCanDisconnect } from '../../../resources/networking/hooks'
+import { DisconnectModal } from '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
+import { ChooseProtocolSlideout } from '../../ChooseProtocolSlideout'
+import { useCurrentRunId } from '../../ProtocolUpload/hooks'
 import { RobotOverviewOverflowMenu } from '../RobotOverviewOverflowMenu'
 import { useIsRobotBusy } from '../hooks'
 import { UpdateBuildroot } from '../RobotSettings/UpdateBuildroot'
 
-jest.mock('../../RunTimeControl/hooks')
+import type { State } from '../../../redux/types'
+
 jest.mock('../../../redux/robot-controls')
 jest.mock('../../../redux/robot-admin')
 jest.mock('../hooks')
 jest.mock('../../../redux/buildroot')
+jest.mock('../../../resources/networking/hooks')
+jest.mock(
+  '../../../organisms/Devices/RobotSettings/ConnectNetwork/DisconnectModal'
+)
+jest.mock('../../ChooseProtocolSlideout')
+jest.mock('../../ProtocolUpload/hooks')
 jest.mock('../RobotSettings/UpdateBuildroot')
 
-const mockUseCurrentRunStatus = useCurrentRunStatus as jest.MockedFunction<
-  typeof useCurrentRunStatus
+const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
+  typeof useCurrentRunId
 >
-const getBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<
+const mockGetBuildrootUpdateDisplayInfo = Buildroot.getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof Buildroot.getBuildrootUpdateDisplayInfo
 >
 const mockHome = home as jest.MockedFunction<typeof home>
@@ -39,6 +51,15 @@ const mockUseIsRobotBusy = useIsRobotBusy as jest.MockedFunction<
 >
 const mockUpdateBuildroot = UpdateBuildroot as jest.MockedFunction<
   typeof UpdateBuildroot
+>
+const mockChooseProtocolSlideout = ChooseProtocolSlideout as jest.MockedFunction<
+  typeof ChooseProtocolSlideout
+>
+const mockDisconnectModal = DisconnectModal as jest.MockedFunction<
+  typeof DisconnectModal
+>
+const mockUseCanDisconnect = useCanDisconnect as jest.MockedFunction<
+  typeof useCanDisconnect
 >
 
 const render = (
@@ -56,22 +77,66 @@ const render = (
 
 describe('RobotOverviewOverflowMenu', () => {
   let props: React.ComponentProps<typeof RobotOverviewOverflowMenu>
+  jest.useFakeTimers()
+
   beforeEach(() => {
     props = { robot: mockConnectableRobot }
-    when(getBuildrootUpdateDisplayInfo).mockReturnValue({
-      autoUpdateAction: 'upgrade',
-      autoUpdateDisabledReason: null,
-      updateFromFileDisabledReason: null,
-    })
-    when(mockUseCurrentRunStatus).calledWith().mockReturnValue(RUN_STATUS_IDLE)
+    when(mockGetBuildrootUpdateDisplayInfo)
+      .calledWith({} as State, mockConnectableRobot.name)
+      .mockReturnValue({
+        autoUpdateAction: 'reinstall',
+        autoUpdateDisabledReason: null,
+        updateFromFileDisabledReason: null,
+      })
+    when(mockUseCurrentRunId).calledWith().mockReturnValue(null)
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(false)
     when(mockUpdateBuildroot).mockReturnValue(<div>mock update buildroot</div>)
+    when(mockChooseProtocolSlideout).mockReturnValue(
+      <div>choose protocol slideout</div>
+    )
+    when(mockDisconnectModal).mockReturnValue(<div>mock disconnect modal</div>)
+    when(mockUseCanDisconnect)
+      .calledWith(mockConnectableRobot.name)
+      .mockReturnValue(true)
   })
   afterEach(() => {
     resetAllWhenMocks()
+    jest.resetAllMocks()
   })
 
   it('should render enabled buttons in the menu when the status is idle', () => {
+    const { getByRole, queryByText } = render(props)
+
+    const btn = getByRole('button')
+    fireEvent.click(btn)
+
+    const runAProtocolBtn = getByRole('button', {
+      name: 'Run a protocol',
+    })
+    const restartBtn = getByRole('button', { name: 'Restart robot' })
+    const homeBtn = getByRole('button', { name: 'Home gantry' })
+    const disconnectBtn = getByRole('button', {
+      name: 'Disconnect from network',
+    })
+    const settingsBtn = getByRole('button', { name: 'Robot settings' })
+
+    expect(queryByText('Update robot software')).toBeNull()
+    expect(runAProtocolBtn).toBeEnabled()
+    expect(restartBtn).toBeEnabled()
+    expect(homeBtn).toBeEnabled()
+    expect(disconnectBtn).toBeEnabled()
+    expect(settingsBtn).toBeEnabled()
+  })
+
+  it('should render update robot software button when robot is on wrong version of software', () => {
+    when(mockGetBuildrootUpdateDisplayInfo)
+      .calledWith({} as State, mockConnectableRobot.name)
+      .mockReturnValue({
+        autoUpdateAction: 'upgrade',
+        autoUpdateDisabledReason: null,
+        updateFromFileDisabledReason: null,
+      })
+
     const { getByRole, getByText } = render(props)
 
     const btn = getByRole('button')
@@ -80,11 +145,15 @@ describe('RobotOverviewOverflowMenu', () => {
     const updateRobotSoftwareBtn = getByRole('button', {
       name: 'Update robot software',
     })
+    const runAProtocolBtn = getByRole('button', {
+      name: 'Run a protocol',
+    })
     const restartBtn = getByRole('button', { name: 'Restart robot' })
     const homeBtn = getByRole('button', { name: 'Home gantry' })
     const settingsBtn = getByRole('button', { name: 'Robot settings' })
 
     expect(updateRobotSoftwareBtn).toBeEnabled()
+    expect(runAProtocolBtn).toBeDisabled()
     expect(restartBtn).toBeEnabled()
     expect(homeBtn).toBeEnabled()
     expect(settingsBtn).toBeEnabled()
@@ -92,41 +161,36 @@ describe('RobotOverviewOverflowMenu', () => {
     getByText('mock update buildroot')
   })
 
-  it('should not render the menu items when robot is busy', () => {
+  it('should render disabled run a protocol, restart, disconnect, and home gantry menu items when robot is busy', () => {
     when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
-    when(mockUseCurrentRunStatus)
-      .calledWith()
-      .mockReturnValue(RUN_STATUS_RUNNING)
 
     const { getByRole } = render(props)
 
     const btn = getByRole('button')
     fireEvent.click(btn)
 
-    expect(screen.queryByText('Update robot software')).toBeNull()
-    expect(screen.queryByText('Restart robot')).toBeNull()
-    expect(screen.queryByText('Home gantry')).toBeNull()
-    getByRole('button', { name: 'Robot settings' })
+    expect(getByRole('button', { name: 'Run a protocol' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Restart robot' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
+    expect(
+      getByRole('button', { name: 'Disconnect from network' })
+    ).toBeDisabled()
+    expect(getByRole('button', { name: 'Robot settings' })).toBeEnabled()
   })
 
-  it('should not render menu items when the robot is not connectable', () => {
-    when(mockUseIsRobotBusy).calledWith().mockReturnValue(true)
-    when(mockUseCurrentRunStatus)
-      .calledWith()
-      .mockReturnValue(RUN_STATUS_RUNNING)
+  it('should render menu items when the robot is reachable', () => {
+    const { getByRole, queryByRole } = render({ robot: mockReachableRobot })
 
-    const { getByRole } = render({ robot: mockReachableRobot })
-
-    const btn = getByRole('button')
-    fireEvent.click(btn)
-
-    expect(screen.queryByText('Update robot software')).toBeNull()
-    expect(screen.queryByText('Restart robot')).toBeNull()
-    expect(screen.queryByText('Home gantry')).toBeNull()
-    getByRole('button', { name: 'Robot settings' })
+    getByRole('button').click()
+    expect(getByRole('button', { name: 'Restart robot' })).toBeDisabled()
+    expect(getByRole('button', { name: 'Home gantry' })).toBeDisabled()
+    expect(
+      queryByRole('button', { name: 'Disconnect from network' })
+    ).toBeNull()
+    expect(getByRole('button', { name: 'Robot settings' })).toBeEnabled()
   })
 
-  it('clicking home gantry should home the gantry', () => {
+  it('clicking home gantry should home the robot arm', () => {
     const { getByRole } = render(props)
 
     const btn = getByRole('button')
@@ -136,6 +200,50 @@ describe('RobotOverviewOverflowMenu', () => {
     fireEvent.click(homeBtn)
 
     expect(mockHome).toBeCalled()
+  })
+
+  it('should render disabled disconnect button in the menu when the robot cannot disconnect', () => {
+    when(mockUseCanDisconnect)
+      .calledWith(mockConnectableRobot.name)
+      .mockReturnValue(false)
+
+    const { getByRole, queryByText } = render(props)
+
+    const btn = getByRole('button')
+    fireEvent.click(btn)
+
+    const runAProtocolBtn = getByRole('button', {
+      name: 'Run a protocol',
+    })
+    const restartBtn = getByRole('button', { name: 'Restart robot' })
+    const homeBtn = getByRole('button', { name: 'Home gantry' })
+    const disconnectBtn = getByRole('button', {
+      name: 'Disconnect from network',
+    })
+    const settingsBtn = getByRole('button', { name: 'Robot settings' })
+
+    expect(queryByText('Update robot software')).toBeNull()
+    expect(runAProtocolBtn).toBeEnabled()
+    expect(restartBtn).toBeEnabled()
+    expect(homeBtn).toBeEnabled()
+    expect(disconnectBtn).toBeDisabled()
+    expect(settingsBtn).toBeEnabled()
+  })
+
+  it('clicking disconnect from network should launch the disconnect modal', () => {
+    const { getByRole, getByText, queryByText } = render(props)
+
+    const btn = getByRole('button')
+    fireEvent.click(btn)
+
+    expect(queryByText('mock disconnect modal')).toBeNull()
+
+    const disconnectBtn = getByRole('button', {
+      name: 'Disconnect from network',
+    })
+    fireEvent.click(disconnectBtn)
+
+    getByText('mock disconnect modal')
   })
 
   it('clicking the restart robot button should restart the robot', () => {
@@ -150,16 +258,25 @@ describe('RobotOverviewOverflowMenu', () => {
     expect(mockRestartRobot).toBeCalled()
   })
   it('render overflow menu buttons without the update robot software button', () => {
-    when(getBuildrootUpdateDisplayInfo).mockReturnValue({
+    when(mockGetBuildrootUpdateDisplayInfo).mockReturnValue({
       autoUpdateAction: 'reinstall',
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    const { getByRole } = render(props)
+    const { getByRole, queryByRole } = render(props)
     const btn = getByRole('button')
-    fireEvent.click(btn)
+    btn.click()
+    expect(queryByRole('Update robot software')).toBeNull()
+    getByRole('button', { name: 'Run a protocol' })
     getByRole('button', { name: 'Restart robot' })
     getByRole('button', { name: 'Home gantry' })
+    getByRole('button', { name: 'Disconnect from network' })
     getByRole('button', { name: 'Robot settings' })
+  })
+  it('should disable settings link when the robot is unreachable', () => {
+    const { getByRole } = render({ robot: mockUnreachableRobot })
+    const btn = getByRole('button')
+    fireEvent.click(btn)
+    expect(getByRole('button', { name: 'Robot settings' })).toBeDisabled()
   })
 })

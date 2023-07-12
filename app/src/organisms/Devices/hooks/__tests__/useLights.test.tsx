@@ -1,33 +1,31 @@
 import * as React from 'react'
-import { when, resetAllWhenMocks } from 'jest-when'
+import { resetAllWhenMocks } from 'jest-when'
 import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import {
+  useLightsQuery,
+  useSetLightsMutation,
+} from '@opentrons/react-api-client'
 
-import { useDispatchApiRequest } from '../../../../redux/robot-api'
-import { updateLights, getLightsOn } from '../../../../redux/robot-controls'
 import { useLights } from '..'
 
-import type { DispatchApiRequestType } from '../../../../redux/robot-api'
+jest.mock('@opentrons/react-api-client')
 
-jest.mock('../../../../redux/robot-api')
-jest.mock('../../../../redux/robot-controls')
-
-const mockGetLightsOn = getLightsOn as jest.MockedFunction<typeof getLightsOn>
-const mockUpdateLights = updateLights as jest.MockedFunction<
-  typeof updateLights
+const mockUseLightsQuery = useLightsQuery as jest.MockedFunction<
+  typeof useLightsQuery
 >
-const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
-  typeof useDispatchApiRequest
+const mockUseSetLightsMutation = useSetLightsMutation as jest.MockedFunction<
+  typeof useSetLightsMutation
 >
 
 const store: Store<any> = createStore(jest.fn(), {})
 
 describe('useLights hook', () => {
-  let dispatchApiRequest: DispatchApiRequestType
-
   let wrapper: React.FunctionComponent<{}>
+  let setLights: jest.Mock
+
   beforeEach(() => {
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
@@ -37,8 +35,9 @@ describe('useLights hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    dispatchApiRequest = jest.fn()
-    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
+    mockUseLightsQuery.mockReturnValue({ data: { on: false } } as any)
+    setLights = jest.fn()
+    mockUseSetLightsMutation.mockReturnValue({ setLights } as any)
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -46,28 +45,24 @@ describe('useLights hook', () => {
   })
 
   it('toggles lights off when on', () => {
-    when(mockGetLightsOn)
-      .calledWith(undefined as any, 'otie')
-      .mockReturnValue(true)
+    mockUseLightsQuery.mockReturnValue({ data: { on: true } } as any)
 
-    const { result } = renderHook(() => useLights('otie'), { wrapper })
+    const { result } = renderHook(() => useLights(), { wrapper })
 
     expect(result.current.lightsOn).toEqual(true)
     result.current.toggleLights()
-    expect(dispatchApiRequest).toBeCalledWith(mockUpdateLights('otie', false))
+    expect(setLights).toBeCalledWith({ on: false })
   })
 
   it('toggles lights on when off', () => {
-    when(mockGetLightsOn)
-      .calledWith(undefined as any, 'otie')
-      .mockReturnValue(false)
+    mockUseLightsQuery.mockReturnValue({ data: { on: false } } as any)
 
-    const { result } = renderHook(() => useLights('otie'), {
+    const { result } = renderHook(() => useLights(), {
       wrapper,
     })
 
     expect(result.current.lightsOn).toEqual(false)
     result.current.toggleLights()
-    expect(dispatchApiRequest).toBeCalledWith(mockUpdateLights('otie', true))
+    expect(setLights).toBeCalledWith({ on: true })
   })
 })

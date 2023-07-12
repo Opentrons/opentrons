@@ -3,33 +3,30 @@ import { format } from 'date-fns'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
-import { css } from 'styled-components'
 
 import {
   getModuleType,
   getPipetteNameSpecs,
   ProtocolAnalysisOutput,
+  OT3_STANDARD_MODEL,
+  getGripperDisplayName,
 } from '@opentrons/shared-data'
 import {
   Box,
   Flex,
   Icon,
-  DIRECTION_ROW,
-  COLORS,
-  SPACING,
-  JUSTIFY_SPACE_BETWEEN,
-  DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
-  ALIGN_CENTER,
-  SIZE_4,
   ModuleIcon,
-  POSITION_ABSOLUTE,
+  ALIGN_FLEX_START,
   BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
+  JUSTIFY_FLEX_END,
+  POSITION_ABSOLUTE,
+  SIZE_2,
+  SIZE_3,
+  SPACING,
   TYPOGRAPHY,
   WRAP,
-  ALIGN_START,
-  JUSTIFY_FLEX_END,
-  FLEX_NONE,
 } from '@opentrons/components'
 
 import {
@@ -38,48 +35,40 @@ import {
 } from '@opentrons/api-client'
 
 import { getIsProtocolAnalysisInProgress } from '../../redux/protocol-storage'
+import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
 import { DeckThumbnail } from '../../molecules/DeckThumbnail'
 import { ProtocolOverflowMenu } from './ProtocolOverflowMenu'
 import { ProtocolAnalysisFailure } from '../ProtocolAnalysisFailure'
-import { getAnalysisStatus, getProtocolDisplayName } from './utils'
+import {
+  getAnalysisStatus,
+  getProtocolDisplayName,
+  getRobotTypeDisplayName,
+} from './utils'
 
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { State } from '../../redux/types'
+import { getProtocolUsesGripper } from '../ProtocolSetupInstruments/utils'
 
-interface ProtocolCardProps extends StoredProtocolData {
-  handleRunProtocol: () => void
+interface ProtocolCardProps {
+  handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
+  handleSendProtocolToOT3: (storedProtocolData: StoredProtocolData) => void
+  storedProtocolData: StoredProtocolData
 }
-
-// TODO kj 07/06/2022: Currently, using hardcoded number to align elements
-// This should be removed in the future
-const PROTOCOL_CARD_BREAKPOINT = '800px'
-
-const PROTOCOL_CARD_ALIGN_ITEMS_STYLING = css`
-  align-items: ${ALIGN_START};
-
-  @media (min-width: ${PROTOCOL_CARD_BREAKPOINT}) {
-    align-items: ${ALIGN_CENTER};
-  }
-`
-
-const PROTOCOL_CARD_UPDATED_JUSTIFY_CONTENT_STYLING = css`
-  justify-content: ${JUSTIFY_FLEX_END};
-
-  @media (min-width: ${PROTOCOL_CARD_BREAKPOINT}) {
-    justify-content: ${FLEX_NONE};
-  }
-`
 
 export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   const history = useHistory()
   const {
     handleRunProtocol,
+    handleSendProtocolToOT3,
+    storedProtocolData,
+  } = props
+  const {
     protocolKey,
     srcFileNames,
     mostRecentAnalysis,
     modified,
-  } = props
+  } = storedProtocolData
   const isAnalyzing = useSelector((state: State) =>
     getIsProtocolAnalysisInProgress(state, protocolKey)
   )
@@ -90,17 +79,13 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
   )
 
   return (
-    <Flex
+    <Box
       backgroundColor={COLORS.white}
-      border={`1px solid ${COLORS.medGrey}`}
-      borderRadius="4px"
-      flexDirection={DIRECTION_ROW}
-      marginBottom={SPACING.spacing2}
-      padding={SPACING.spacing4}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      width="100%"
-      position="relative"
+      borderRadius={BORDERS.radiusSoftCorners}
       cursor="pointer"
+      minWidth="36rem"
+      padding={SPACING.spacing16}
+      position="relative"
       onClick={() => history.push(`/protocols/${protocolKey}`)}
       css={BORDERS.cardOutlineBorder}
     >
@@ -113,15 +98,16 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element | null {
       />
       <Box
         position={POSITION_ABSOLUTE}
-        top={SPACING.spacing2}
-        right={SPACING.spacing2}
+        top={SPACING.spacing4}
+        right={SPACING.spacing4}
       >
         <ProtocolOverflowMenu
-          protocolKey={protocolKey}
           handleRunProtocol={handleRunProtocol}
+          handleSendProtocolToOT3={handleSendProtocolToOT3}
+          storedProtocolData={storedProtocolData}
         />
       </Box>
-    </Flex>
+    </Box>
   )
 }
 
@@ -141,142 +127,152 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
     modified,
   } = props
   const { t } = useTranslation(['protocol_list', 'shared'])
-
   const analysisStatus = getAnalysisStatus(isAnalyzing, mostRecentAnalysis)
 
   const { left: leftMountPipetteName, right: rightMountPipetteName } =
     mostRecentAnalysis != null
       ? parseInitialPipetteNamesByMount(mostRecentAnalysis.commands)
       : { left: null, right: null }
-  const requiredModuleTypes = parseAllRequiredModuleModels(
+  const requiredModuleModels = parseAllRequiredModuleModels(
     mostRecentAnalysis != null ? mostRecentAnalysis.commands : []
-  ).map(getModuleType)
+  )
+
+  const requiredModuleTypes = requiredModuleModels.map(getModuleType)
+
+  const robotType = mostRecentAnalysis?.robotType ?? null
 
   return (
-    <Flex flex="1">
-      <Flex
-        marginRight={SPACING.spacing4}
+    <Flex
+      alignItems={ALIGN_FLEX_START}
+      flex="1 0 100%"
+      gridGap={SPACING.spacing16}
+    >
+      <Box
         size="6rem"
         height="auto"
-        justifyContent={JUSTIFY_CENTER}
-        css={PROTOCOL_CARD_ALIGN_ITEMS_STYLING}
         data-testid={`ProtocolCard_deckLayout_${protocolDisplayName}`}
       >
         {
           {
-            missing: <Icon name="ot-spinner" spin size={SIZE_4} />,
-            loading: <Icon name="ot-spinner" spin size={SIZE_4} />,
-            error: <Box size="6rem" backgroundColor={COLORS.medGrey} />,
+            missing: <Icon name="ot-spinner" spin size={SIZE_3} />,
+            loading: <Icon name="ot-spinner" spin size={SIZE_3} />,
+            error: <Box size="6rem" backgroundColor={COLORS.medGreyEnabled} />,
             complete: (
-              <DeckThumbnail commands={mostRecentAnalysis?.commands ?? []} />
+              <DeckThumbnail
+                commands={mostRecentAnalysis?.commands ?? []}
+                labware={mostRecentAnalysis?.labware ?? []}
+              />
             ),
           }[analysisStatus]
         }
-      </Flex>
-      <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
-        {analysisStatus === 'error' ? (
-          <ProtocolAnalysisFailure
-            protocolKey={protocolKey}
-            errors={mostRecentAnalysis?.errors.map(e => e.detail) ?? []}
-          />
-        ) : null}
-        <StyledText
-          as="h3"
-          marginBottom={SPACING.spacing4}
-          data-testid={`ProtocolCard_${protocolDisplayName}`}
-        >
-          {protocolDisplayName}
-        </StyledText>
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          {analysisStatus === 'loading' ? (
-            <StyledText as="p" flex="1" color={COLORS.darkGreyEnabled}>
-              {t('loading_data')}
-            </StyledText>
-          ) : (
-            <Flex flexWrap={WRAP}>
-              {/* TODO: kj 07/01/2022 for 6.1 we need to user flex-wrap */}
+      </Box>
+      <Flex
+        flex="1 0"
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing16}
+      >
+        {/* error and protocol name section */}
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+          {analysisStatus === 'error' ? (
+            <ProtocolAnalysisFailure
+              protocolKey={protocolKey}
+              errors={mostRecentAnalysis?.errors.map(e => e.detail) ?? []}
+            />
+          ) : null}
+          <StyledText
+            as="h3"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            data-testid={`ProtocolCard_${protocolDisplayName}`}
+            overflowWrap="anywhere"
+          >
+            {protocolDisplayName}
+          </StyledText>
+        </Flex>
+        {/* data section */}
+        {analysisStatus === 'loading' ? (
+          <StyledText as="p" flex="1" color={COLORS.darkGreyEnabled}>
+            {t('loading_data')}
+          </StyledText>
+        ) : (
+          <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
+            <Flex gridGap={SPACING.spacing16}>
               <Flex
-                flex="1"
+                flex={`0 0 ${
+                  robotType === OT3_STANDARD_MODEL ? '6.2rem' : SIZE_2
+                }`}
                 flexDirection={DIRECTION_COLUMN}
-                marginRight={SPACING.spacing4}
-                data-testid={`ProtocolCard_leftMount_${protocolDisplayName}`}
-                minWidth="10.625rem"
+                gridGap={SPACING.spacing4}
               >
-                <StyledText
-                  as="h6"
-                  marginTop={SPACING.spacing3}
-                  marginBottom={SPACING.spacing2}
-                  color={COLORS.darkGreyEnabled}
-                >
-                  {t('left_mount')}
+                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  {t('robot')}
                 </StyledText>
                 <StyledText as="p">
-                  {
-                    {
-                      missing: t('no_data'),
-                      loading: t('no_data'),
-                      error: t('no_data'),
-                      complete:
-                        leftMountPipetteName != null
-                          ? getPipetteNameSpecs(leftMountPipetteName)
-                              ?.displayName
-                          : t('shared:not_used'),
-                    }[analysisStatus]
-                  }
+                  {getRobotTypeDisplayName(robotType)}
                 </StyledText>
               </Flex>
               <Flex
                 flex="1"
                 flexDirection={DIRECTION_COLUMN}
-                marginRight={SPACING.spacing4}
-                data-testid={`ProtocolCard_rightMount_${protocolDisplayName}`}
+                gridGap={SPACING.spacing4}
+                data-testid={`ProtocolCard_instruments_${protocolDisplayName}`}
                 minWidth="10.625rem"
               >
-                <StyledText
-                  as="h6"
-                  marginTop={SPACING.spacing3}
-                  marginBottom={SPACING.spacing2}
-                  color={COLORS.darkGreyEnabled}
-                >
-                  {t('right_mount')}
+                <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+                  {t('shared:instruments')}
                 </StyledText>
-                <StyledText as="p">
+                {
                   {
-                    {
-                      missing: t('no_data'),
-                      loading: t('no_data'),
-                      error: t('no_data'),
-                      complete:
-                        rightMountPipetteName != null
-                          ? getPipetteNameSpecs(rightMountPipetteName)
-                              ?.displayName
-                          : t('shared:not_used'),
-                    }[analysisStatus]
-                  }
-                </StyledText>
+                    missing: <StyledText as="p">{t('no_data')}</StyledText>,
+                    loading: <StyledText as="p">{t('no_data')}</StyledText>,
+                    error: <StyledText as="p">{t('no_data')}</StyledText>,
+                    complete: (
+                      <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
+                        {/* TODO(bh, 2022-10-14): insert 96-channel pipette if found */}
+                        {leftMountPipetteName != null ? (
+                          <InstrumentContainer
+                            displayName={
+                              getPipetteNameSpecs(leftMountPipetteName)
+                                ?.displayName as string
+                            }
+                          />
+                        ) : null}
+                        {rightMountPipetteName != null ? (
+                          <InstrumentContainer
+                            displayName={
+                              getPipetteNameSpecs(rightMountPipetteName)
+                                ?.displayName as string
+                            }
+                          />
+                        ) : null}
+                        {mostRecentAnalysis != null &&
+                        getProtocolUsesGripper(mostRecentAnalysis) ? (
+                          <InstrumentContainer
+                            displayName={getGripperDisplayName('gripperV1')}
+                          />
+                        ) : null}
+                      </Flex>
+                    ),
+                  }[analysisStatus]
+                }
               </Flex>
               <Flex
-                flex="1"
+                flex="0 0 6rem"
                 flexDirection={DIRECTION_COLUMN}
-                marginRight={SPACING.spacing4}
+                gridGap={SPACING.spacing4}
               >
                 {requiredModuleTypes.length > 0 ? (
                   <>
-                    <StyledText
-                      as="h6"
-                      marginTop={SPACING.spacing3}
-                      marginBottom={SPACING.spacing2}
-                      color={COLORS.darkGreyEnabled}
-                    >
+                    <StyledText as="h6" color={COLORS.darkGreyEnabled}>
                       {t('modules')}
                     </StyledText>
                     <Flex>
                       {requiredModuleTypes.map((moduleType, index) => (
                         <ModuleIcon
                           key={index}
+                          color={COLORS.darkGreyEnabled}
                           moduleType={moduleType}
                           height="1rem"
-                          marginRight={SPACING.spacing3}
+                          marginRight={SPACING.spacing8}
                         />
                       ))}
                     </Flex>
@@ -284,31 +280,19 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 ) : null}
               </Flex>
             </Flex>
-          )}
-          <Flex
-            flex="0 0 8rem"
-            flexDirection={DIRECTION_COLUMN}
-            data-testid={`ProtocolCard_date_${protocolDisplayName}`}
-            marginTop={SPACING.spacing3}
-            css={PROTOCOL_CARD_UPDATED_JUSTIFY_CONTENT_STYLING}
-          >
-            <StyledText
-              as="label"
-              marginBottom={SPACING.spacing3}
-              color={COLORS.darkGreyEnabled}
-              textAlign={TYPOGRAPHY.textAlignRight}
+            <Flex
+              justifyContent={JUSTIFY_FLEX_END}
+              data-testid={`ProtocolCard_date_${protocolDisplayName}`}
             >
-              {t('updated')}
-            </StyledText>
-            <StyledText
-              as="label"
-              color={COLORS.darkGreyEnabled}
-              textAlign={TYPOGRAPHY.textAlignRight}
-            >
-              {format(new Date(modified), 'MM/dd/yy HH:mm:ss')}
-            </StyledText>
+              <StyledText as="label" color={COLORS.darkGreyEnabled}>
+                {`${t('updated')} ${format(
+                  new Date(modified),
+                  'MMM dd yy HH:mm'
+                )}`}
+              </StyledText>
+            </Flex>
           </Flex>
-        </Flex>
+        )}
       </Flex>
     </Flex>
   )

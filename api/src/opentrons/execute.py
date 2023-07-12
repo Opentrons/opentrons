@@ -10,28 +10,62 @@ import argparse
 import logging
 import os
 import sys
-from typing import TYPE_CHECKING, Callable, Dict, List, Optional, TextIO, Union
-
-from opentrons import protocol_api, __version__
-from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
-from opentrons.protocols.execution import execute as execute_apiv2
-from opentrons.protocols.context.protocol_api.protocol_context import (
-    ProtocolContextImplementation,
+from typing import (
+    TYPE_CHECKING,
+    BinaryIO,
+    Callable,
+    Dict,
+    List,
+    Optional,
+    TextIO,
+    Union,
 )
+
+from opentrons import protocol_api, __version__, should_use_ot3
+from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
+from opentrons.protocols.execution import execute as execute_apiv2
+
 from opentrons.commands import types as command_types
-from opentrons.protocols.parse import parse, version_from_string
+from opentrons.protocols import parse
 from opentrons.protocols.types import ApiDeprecationError
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.hardware_control import API, ThreadManager, HardwareControlAPI
+from opentrons.hardware_control import (
+    API as OT2API,
+    ThreadManagedHardware,
+    ThreadManager,
+)
+from opentrons_shared_data.robot.dev_types import RobotType
+
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
-_THREAD_MANAGED_HW: Optional[ThreadManager[HardwareControlAPI]] = None
+_THREAD_MANAGED_HW: Optional[ThreadManagedHardware] = None
 #: The background global cache that all protocol contexts created by
 #: :py:meth:`get_protocol_api` will share
+
+
+# See Jira RCORE-535.
+_PYTHON_TOO_NEW_MESSAGE = (
+    "Python protocols with apiLevels higher than 2.13"
+    " cannot currently be executed with"
+    " the opentrons_execute command-line tool,"
+    " the opentrons.execute.execute() function,"
+    " or the opentrons.execute.get_protocol_api() function."
+    " Use a lower apiLevel"
+    " or use the Opentrons App instead."
+)
+_JSON_TOO_NEW_MESSAGE = (
+    "Protocols created by recent versions of Protocol Designer"
+    " cannot currently be executed with"
+    " the opentrons_execute command-line tool"
+    " or the opentrons.execute.execute() function."
+    " Use the Opentrons App instead."
+)
 
 
 def get_protocol_api(
@@ -83,16 +117,8 @@ def get_protocol_api(
                           custom labware.
     :return: The protocol context.
     """
-    global _THREAD_MANAGED_HW
-    if not _THREAD_MANAGED_HW:
-        # Build a hardware controller in a worker thread, which is necessary
-        # because ipython runs its notebook in asyncio but the notebook
-        # is at script/repl scope not function scope and is synchronous so
-        # you can't control the loop from inside. If we update to
-        # IPython 7 we can avoid this, but for now we can't
-        _THREAD_MANAGED_HW = ThreadManager(API.build_hardware_controller)
     if isinstance(version, str):
-        checked_version = version_from_string(version)
+        checked_version = parse.version_from_string(version)
     elif not isinstance(version, APIVersion):
         raise TypeError("version must be either a string or an APIVersion")
     else:
@@ -103,20 +129,31 @@ def get_protocol_api(
         and IS_ROBOT
         and JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir()  # type: ignore[union-attr]
     ):
-        extra_labware = labware_from_paths([str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
+        extra_labware = {
+            uri: details.definition
+            for uri, details in labware_from_paths(
+                [str(JUPYTER_NOTEBOOK_LABWARE_DIR)]
+            ).items()
+        }
 
-    context_imp = ProtocolContextImplementation(
-        sync_hardware=_THREAD_MANAGED_HW.sync,
-        bundled_labware=bundled_labware,
-        bundled_data=bundled_data,
-        extra_labware=extra_labware,
-        api_version=checked_version,
-    )
+    robot_type = _get_robot_type()
+    deck_type = guess_deck_type_from_global_config()
 
-    context = protocol_api.ProtocolContext(
-        implementation=context_imp, api_version=checked_version
-    )
-    context_imp.get_hardware().cache_instruments()
+    hardware_controller = _get_global_hardware_controller(robot_type)
+
+    try:
+        context = protocol_api.create_protocol_context(
+            api_version=checked_version,
+            deck_type=deck_type,
+            hardware_api=hardware_controller,
+            bundled_labware=bundled_labware,
+            bundled_data=bundled_data,
+            extra_labware=extra_labware,
+        )
+    except protocol_api.ProtocolEngineCoreRequiredError as e:
+        raise NotImplementedError(_PYTHON_TOO_NEW_MESSAGE) from e  # See Jira RCORE-535.
+
+    hardware_controller.sync.cache_instruments()
     return context
 
 
@@ -151,8 +188,9 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         "Only directories specified directly by "
         "this argument are searched, not their children. JSON files that "
         "do not define labware will be ignored with a message. "
-        "By default, the current directory (the one in which you are "
-        "invoking this program) will be searched for labware.",
+        "The current directory (the one from which you are "
+        "invoking this program) will always be included implicitly, "
+        "in addition to any directories that you specify.",
     )
     parser.add_argument(
         "-D",
@@ -199,7 +237,7 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
 
 
 def execute(
-    protocol_file: TextIO,
+    protocol_file: Union[BinaryIO, TextIO],
     protocol_name: str,
     propagate_logs: bool = False,
     log_level: str = "warning",
@@ -211,7 +249,7 @@ def execute(
     Run the protocol itself.
 
     This is a one-stop function to run a protocol, whether python or json,
-    no matter the api verson, from external (i.e. not bound up in other
+    no matter the api version, from external (i.e. not bound up in other
     internal server infrastructure) sources.
 
     To run an opentrons protocol from other places, pass in a file like
@@ -277,24 +315,36 @@ def execute(
     stack_logger.setLevel(getattr(logging, log_level.upper(), logging.WARNING))
     contents = protocol_file.read()
     if custom_labware_paths:
-        extra_labware = labware_from_paths(custom_labware_paths)
+        extra_labware = {
+            uri: details.definition
+            for uri, details in labware_from_paths(custom_labware_paths).items()
+        }
     else:
         extra_labware = {}
     if custom_data_paths:
         extra_data = datafiles_from_paths(custom_data_paths)
     else:
         extra_data = {}
-    protocol = parse(
-        contents, protocol_name, extra_labware=extra_labware, extra_data=extra_data
-    )
-    if getattr(protocol, "api_level", APIVersion(2, 0)) < APIVersion(2, 0):
-        raise ApiDeprecationError(getattr(protocol, "api_level"))
+
+    try:
+        protocol = parse.parse(
+            contents, protocol_name, extra_labware=extra_labware, extra_data=extra_data
+        )
+    except parse.JSONSchemaVersionTooNewError as e:
+        if e.attempted_schema_version == 6:
+            # See Jira RCORE-535.
+            raise NotImplementedError(_JSON_TOO_NEW_MESSAGE) from e
+        else:
+            raise
+
+    if protocol.api_level < APIVersion(2, 0):
+        raise ApiDeprecationError(version=protocol.api_level)
     else:
         bundled_data = getattr(protocol, "bundled_data", {})
         bundled_data.update(extra_data)
         gpa_extras = getattr(protocol, "extra_labware", None) or None
         context = get_protocol_api(
-            getattr(protocol, "api_level", MAX_SUPPORTED_VERSION),
+            protocol.api_level,
             bundled_labware=getattr(protocol, "bundled_labware", None),
             bundled_data=bundled_data,
             extra_labware=gpa_extras,
@@ -360,8 +410,39 @@ def main() -> int:
     else:
         log_level = "warning"
     # Try to migrate containers from database to v2 format
-    execute(args.protocol, args.protocol.name, log_level=log_level, emit_runlog=printer)
+    execute(
+        protocol_file=args.protocol,
+        protocol_name=args.protocol.name,
+        custom_labware_paths=args.custom_labware_path,
+        custom_data_paths=(args.custom_data_path + args.custom_data_file),
+        log_level=log_level,
+        emit_runlog=printer,
+    )
     return 0
+
+
+def _get_robot_type() -> RobotType:
+    """Return what kind of robot we're currently running on."""
+    return "OT-3 Standard" if should_use_ot3() else "OT-2 Standard"
+
+
+def _get_global_hardware_controller(robot_type: RobotType) -> ThreadManagedHardware:
+    # Build a hardware controller in a worker thread, which is necessary
+    # because ipython runs its notebook in asyncio but the notebook
+    # is at script/repl scope not function scope and is synchronous so
+    # you can't control the loop from inside. If we update to
+    # IPython 7 we can avoid this, but for now we can't
+    global _THREAD_MANAGED_HW
+    if not _THREAD_MANAGED_HW:
+        if robot_type == "OT-3 Standard":
+            # Conditional import because this isn't installed on OT-2s.
+            from opentrons.hardware_control.ot3api import OT3API
+
+            _THREAD_MANAGED_HW = ThreadManager(OT3API.build_hardware_controller)
+        else:
+            _THREAD_MANAGED_HW = ThreadManager(OT2API.build_hardware_controller)
+
+    return _THREAD_MANAGED_HW
 
 
 @atexit.register

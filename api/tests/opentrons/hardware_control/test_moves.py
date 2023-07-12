@@ -1,23 +1,33 @@
 import asyncio
+
 import mock
 import pytest
-from opentrons import types
+from decoy import Decoy
+
+from opentrons import config, types
 from opentrons import hardware_control as hc
 from opentrons.calibration_storage.types import (
-    DeckCalibration,
     SourceType,
     CalibrationStatus,
 )
+from opentrons.config.types import GantryLoad
 from opentrons.hardware_control.types import (
     Axis,
     CriticalPoint,
-    OutOfBoundsMove,
     MotionChecks,
+)
+from opentrons.hardware_control.errors import (
     MustHomeError,
     InvalidMoveError,
+    OutOfBoundsMove,
 )
-from opentrons.hardware_control.robot_calibration import RobotCalibration
+from opentrons.hardware_control.robot_calibration import (
+    RobotCalibration,
+    DeckCalibration,
+)
 from opentrons.hardware_control.types import OT3Axis
+
+from opentrons_shared_data.errors.exceptions import MoveConditionNotMetError
 
 
 async def test_controller_must_home(hardware_api):
@@ -79,25 +89,25 @@ def mock_home(ot3_hardware):
 async def test_home(ot3_hardware, mock_home):
     with mock.patch("opentrons.hardware_control.ot3api.deck_from_machine") as dfm_mock:
         dfm_mock.return_value = {OT3Axis.X: 20}
-        await ot3_hardware.home([OT3Axis.X])
-        mock_home.assert_called_once_with([OT3Axis.X])
-        dfm_mock.assert_called_once_with(
+        await ot3_hardware._home([OT3Axis.X])
+        assert ot3_hardware.gantry_load == GantryLoad.LOW_THROUGHPUT
+        mock_home.assert_called_once_with([OT3Axis.X], GantryLoad.LOW_THROUGHPUT)
+        assert dfm_mock.call_count == 2
+        dfm_mock.assert_called_with(
             mock_home.return_value,
-            ot3_hardware._transforms.deck_calibration.attitude,
-            ot3_hardware._transforms.carriage_offset,
+            ot3_hardware._robot_calibration.deck_calibration.attitude,
+            ot3_hardware._robot_calibration.carriage_offset,
         )
     assert ot3_hardware._current_position[OT3Axis.X] == 20
 
 
 async def test_home_unmet(ot3_hardware, mock_home):
-    from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-        MoveConditionNotMet,
-    )
 
-    mock_home.side_effect = MoveConditionNotMet()
-    with pytest.raises(MoveConditionNotMet):
+    mock_home.side_effect = MoveConditionNotMetError()
+    with pytest.raises(MoveConditionNotMetError):
         await ot3_hardware.home([OT3Axis.X])
-    mock_home.assert_called_once_with([OT3Axis.X])
+    assert ot3_hardware.gantry_load == GantryLoad.LOW_THROUGHPUT
+    mock_home.assert_called_once_with([OT3Axis.X], GantryLoad.LOW_THROUGHPUT)
     assert ot3_hardware._current_position == {}
 
 
@@ -175,7 +185,7 @@ async def test_mount_offset_applied(hardware_api, is_robot):
     [
         CriticalPoint.GRIPPER_JAW_CENTER,
         CriticalPoint.GRIPPER_FRONT_CALIBRATION_PIN,
-        CriticalPoint.GRIPPER_BACK_CALIBRATION_PIN,
+        CriticalPoint.GRIPPER_REAR_CALIBRATION_PIN,
     ],
 )
 async def test_gripper_critical_points_fail_on_pipettes(
@@ -530,3 +540,114 @@ async def test_current_position_homing_failures(hardware_api):
         mount=types.Mount.RIGHT,
         fail_on_not_homed=True,
     )
+
+
+async def test_home_z(decoy: Decoy) -> None:
+    """It should home both Z axes by default."""
+    loop = asyncio.get_running_loop()
+    mock_config = decoy.mock(cls=config.types.RobotConfig)
+    mock_backend = decoy.mock(cls=hc.Controller)
+
+    subject = hc.API(backend=mock_backend, config=mock_config, loop=loop)
+
+    decoy.when(mock_config.left_mount_offset).then_return(types.Point(0, 0, 100))
+    decoy.when(await mock_backend.home(["Z", "A"])).then_return(
+        {"X": 0, "Y": 0, "Z": 12.3, "A": 45.6, "B": 0, "C": 0}
+    )
+
+    await subject.home_z()
+
+    left_result = (await subject.current_position(types.Mount.LEFT))[Axis.Z]
+    right_result = (await subject.current_position(types.Mount.RIGHT))[Axis.A]
+
+    assert left_result == 112.3 + subject.critical_point_for(types.Mount.LEFT, None).z
+    assert right_result == 45.6 + subject.critical_point_for(types.Mount.RIGHT, None).z
+
+
+async def test_home_z_one_mount(decoy: Decoy) -> None:
+    """It should home a single Z mount."""
+    loop = asyncio.get_running_loop()
+    mock_config = decoy.mock(cls=config.types.RobotConfig)
+    mock_backend = decoy.mock(cls=hc.Controller)
+
+    subject = hc.API(backend=mock_backend, config=mock_config, loop=loop)
+
+    decoy.when(await mock_backend.home(["A"])).then_return(
+        {"X": 0, "Y": 0, "Z": 12.3, "A": 45.6, "B": 0, "C": 0}
+    )
+
+    await subject.home_z(types.Mount.RIGHT)
+
+    right_result = (await subject.current_position(types.Mount.RIGHT))[Axis.A]
+
+    assert right_result == 45.6 + subject.critical_point_for(types.Mount.RIGHT, None).z
+
+
+async def test_home_z_both_mounts(decoy: Decoy) -> None:
+    """It should home both Z axes if needed, even if an explicit mount is passed."""
+    loop = asyncio.get_running_loop()
+    mock_config = decoy.mock(cls=config.types.RobotConfig)
+    mock_backend = decoy.mock(cls=hc.Controller)
+
+    subject = hc.API(backend=mock_backend, config=mock_config, loop=loop)
+
+    decoy.when(mock_config.left_mount_offset).then_return(types.Point(0, 0, 100))
+    decoy.when(mock_backend.axis_bounds).then_return(
+        {
+            Axis.X: (0, 1),
+            Axis.Y: (0, 1),
+            Axis.Z: (0, 1),
+            Axis.A: (0, 1),
+        }
+    )
+
+    decoy.when(await mock_backend.home(["X", "Y", "Z", "A"])).then_return(
+        {"X": 0, "Y": 0, "Z": 0, "A": 0, "B": 0, "C": 0}
+    )
+    decoy.when(await mock_backend.home(["Z", "A"])).then_return(
+        {"X": 0, "Y": 0, "Z": 12.3, "A": 45.6, "B": 0, "C": 0}
+    )
+
+    await subject.move_rel(mount=types.Mount.LEFT, delta=types.Point(0, 0, 0))
+    await subject.home_z(types.Mount.RIGHT)
+
+    left_result = (await subject.current_position(types.Mount.LEFT))[Axis.Z]
+    right_result = (await subject.current_position(types.Mount.RIGHT))[Axis.A]
+
+    assert left_result == 112.3 + subject.critical_point_for(types.Mount.LEFT, None).z
+    assert right_result == 45.6 + subject.critical_point_for(types.Mount.RIGHT, None).z
+
+
+async def test_home_z_ignore_other_mount(decoy: Decoy) -> None:
+    """It should only home one mount, even if other needs homing, if not `allow_other_mount`."""
+    loop = asyncio.get_running_loop()
+    mock_config = decoy.mock(cls=config.types.RobotConfig)
+    mock_backend = decoy.mock(cls=hc.Controller)
+
+    subject = hc.API(backend=mock_backend, config=mock_config, loop=loop)
+
+    decoy.when(mock_config.left_mount_offset).then_return(types.Point(0, 0, 100))
+    decoy.when(mock_backend.axis_bounds).then_return(
+        {
+            Axis.X: (0, 1),
+            Axis.Y: (0, 1),
+            Axis.Z: (0, 1),
+            Axis.A: (0, 1),
+        }
+    )
+
+    decoy.when(await mock_backend.home(["X", "Y", "Z", "A"])).then_return(
+        {"X": 0, "Y": 0, "Z": 0, "A": 0, "B": 0, "C": 0}
+    )
+    decoy.when(await mock_backend.home(["A"])).then_return(
+        {"X": 0, "Y": 0, "Z": 0, "A": 45.6, "B": 0, "C": 0}
+    )
+
+    await subject.move_rel(mount=types.Mount.LEFT, delta=types.Point(0, 0, 0))
+    await subject.home_z(types.Mount.RIGHT, allow_home_other=False)
+
+    left_result = (await subject.current_position(types.Mount.LEFT))[Axis.Z]
+    right_result = (await subject.current_position(types.Mount.RIGHT))[Axis.A]
+
+    assert left_result == 100.0 + subject.critical_point_for(types.Mount.LEFT, None).z
+    assert right_result == 45.6 + subject.critical_point_for(types.Mount.RIGHT, None).z

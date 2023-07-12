@@ -23,7 +23,7 @@ export const getIsHeaterShakerEastWestWithLatchOpen = (
     hwModules,
     hwModule =>
       hwModule.moduleState.type === HEATERSHAKER_MODULE_TYPE &&
-      hwModule.moduleState.latchOpen === true &&
+      hwModule.moduleState.latchOpen !== false &&
       getAreSlotsHorizontallyAdjacent(hwModule.slot, slot)
   )
 

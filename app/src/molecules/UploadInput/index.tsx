@@ -12,8 +12,8 @@ import {
   ALIGN_CENTER,
   JUSTIFY_CENTER,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 const DROP_ZONE_STYLES = css`
@@ -22,8 +22,8 @@ const DROP_ZONE_STYLES = css`
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
   width: 100%;
-  padding: ${SPACING.spacing6};
-  border: 2px dashed ${COLORS.medGrey};
+  padding: ${SPACING.spacing32};
+  border: 2px dashed ${COLORS.medGreyEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
   text-align: center;
   background-color: ${COLORS.white};
@@ -31,12 +31,12 @@ const DROP_ZONE_STYLES = css`
   &:hover,
   &:focus-within {
     background-color: ${COLORS.lightBlue};
-    border: 2px dashed ${COLORS.blue};
+    border: 2px dashed ${COLORS.blueEnabled};
   }
 `
 const DRAG_OVER_STYLES = css`
   background-color: ${COLORS.lightBlue};
-  border: 2px dashed ${COLORS.blue};
+  border: 2px dashed ${COLORS.blueEnabled};
 `
 
 const INPUT_STYLES = css`
@@ -102,18 +102,18 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
       alignItems={ALIGN_CENTER}
-      gridGap={SPACING.spacing5}
+      gridGap={SPACING.spacing24}
     >
       <StyledText
         as="p"
         textAlign={TYPOGRAPHY.textAlignCenter}
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
       >
         {props.uploadText}
       </StyledText>
       <PrimaryButton
         onClick={handleClick}
-        id={'UploadInput_protocolUploadButton'}
+        id="UploadInput_protocolUploadButton"
       >
         {t('choose_protocol_file')}
       </PrimaryButton>
@@ -130,7 +130,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
           width={SIZE_3}
           color={COLORS.darkGreyEnabled}
           name="upload"
-          marginBottom={SPACING.spacing5}
+          marginBottom={SPACING.spacing24}
         />
         {props.dragAndDropText}
         <input

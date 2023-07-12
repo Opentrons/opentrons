@@ -5,18 +5,21 @@ import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
+} from '../../../../redux/analytics'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
-import { useDeckCalibrationData, useRunHasStarted } from '../../hooks'
+import { useDeckCalibrationData, useIsOT3, useRunHasStarted } from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
-import { SetupPipetteCalibration } from '../SetupPipetteCalibration'
+import { SetupInstrumentCalibration } from '../SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from '../SetupTipLengthCalibration'
 import { SetupRobotCalibration } from '../SetupRobotCalibration'
 
 jest.mock('../../../../redux/analytics')
 jest.mock('../../hooks')
 jest.mock('../SetupDeckCalibration')
-jest.mock('../SetupPipetteCalibration')
+jest.mock('../SetupInstrumentCalibration')
 jest.mock('../SetupTipLengthCalibration')
 
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
@@ -25,8 +28,8 @@ const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
 const mockSetupDeckCalibration = SetupDeckCalibration as jest.MockedFunction<
   typeof SetupDeckCalibration
 >
-const mockSetupPipetteCalibration = SetupPipetteCalibration as jest.MockedFunction<
-  typeof SetupPipetteCalibration
+const mockSetupInstrumentCalibration = SetupInstrumentCalibration as jest.MockedFunction<
+  typeof SetupInstrumentCalibration
 >
 const mockSetupTipLengthCalibration = SetupTipLengthCalibration as jest.MockedFunction<
   typeof SetupTipLengthCalibration
@@ -37,6 +40,7 @@ const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction
 const mockUseRunHasStarted = useRunHasStarted as jest.MockedFunction<
   typeof useRunHasStarted
 >
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
@@ -71,8 +75,8 @@ describe('SetupRobotCalibration', () => {
     when(mockSetupDeckCalibration).mockReturnValue(
       <div>Mock SetupDeckCalibration</div>
     )
-    when(mockSetupPipetteCalibration).mockReturnValue(
-      <div>Mock SetupPipetteCalibration</div>
+    when(mockSetupInstrumentCalibration).mockReturnValue(
+      <div>Mock SetupInstrumentCalibration</div>
     )
     when(mockSetupTipLengthCalibration).mockReturnValue(
       <div>Mock SetupTipLengthCalibration</div>
@@ -82,6 +86,7 @@ describe('SetupRobotCalibration', () => {
       isDeckCalibrated: true,
     })
     when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
+    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -92,8 +97,17 @@ describe('SetupRobotCalibration', () => {
     const { getByText } = render()[0]
 
     getByText('Mock SetupDeckCalibration')
-    getByText('Mock SetupPipetteCalibration')
+    getByText('Mock SetupInstrumentCalibration')
     getByText('Mock SetupTipLengthCalibration')
+  })
+
+  it('renders only pipette calibration component for OT-3', () => {
+    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+    const { getByText, queryByText } = render()[0]
+
+    expect(queryByText('Mock SetupDeckCalibration')).toBeNull()
+    getByText('Mock SetupInstrumentCalibration')
+    expect(queryByText('Mock SetupTipLengthCalibration')).toBeNull()
   })
 
   it('changes Proceed CTA copy based on next step', () => {
@@ -108,7 +122,7 @@ describe('SetupRobotCalibration', () => {
     fireEvent.click(getByRole('button', { name: 'Proceed to module setup' }))
     expect(mockExpandStep).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'proceed_to_module_setup_step',
+      name: ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
       properties: {},
     })
   })

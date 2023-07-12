@@ -71,11 +71,7 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
       }
 
       case 'buildroot:UPLOAD_FILE': {
-        const { host, path, systemFile } = action.payload as {
-          host: RobotHost
-          path: string
-          systemFile: string | null
-        }
+        const { host, path, systemFile } = action.payload
         const file = systemFile !== null ? systemFile : updateSet?.system
 
         if (file == null) {
@@ -131,7 +127,9 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
 }
 
 export function getBuildrootUpdateUrls(): Promise<ReleaseSetUrls | null> {
-  const manifestUrl: string = getConfig('buildroot').manifestUrl
+  const manifestUrl: string = getConfig('robotSystemUpdate').manifestUrls[
+    _DEFAULT_ROBOT_UPDATE_SOURCE_CONFIG_SELECTION_
+  ]
 
   return downloadManifest(manifestUrl, MANIFEST_CACHE)
     .then(manifest => {

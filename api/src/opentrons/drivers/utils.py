@@ -72,6 +72,8 @@ def parse_rpm_response(rpm_string: str) -> RPM:
     """Example input: T:1233 C:212"""
     data = parse_key_values(rpm_string)
     try:
+        # target is listed as Optional for below assignment,
+        # but None will be represented as 0 in G-code
         target: Optional[int] = int(parse_number(data["T"], 0))
         if target == 0:
             target = None

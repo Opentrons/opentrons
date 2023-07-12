@@ -18,7 +18,7 @@ import { TertiaryButton } from '../../../../atoms/buttons'
 import { getRobotApiVersion, UNREACHABLE } from '../../../../redux/discovery'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 import { UpdateRobotBanner } from '../../../UpdateRobotBanner'
-import { useRobot } from '../../hooks'
+import { useIsOT3, useRobot } from '../../hooks'
 import { UpdateBuildroot } from '../UpdateBuildroot'
 
 import type { State } from '../../../../redux/types'
@@ -35,6 +35,7 @@ export function RobotServerVersion({
 }: RobotServerVersionProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'shared'])
   const robot = useRobot(robotName)
+  const isOT3 = useIsOT3(robotName)
   const [showVersionInfoModal, setShowVersionInfoModal] = React.useState(false)
   const { autoUpdateAction } = useSelector((state: State) => {
     return getBuildrootUpdateDisplayInfo(state, robotName)
@@ -54,7 +55,7 @@ export function RobotServerVersion({
         </Portal>
       ) : null}
       {autoUpdateAction !== 'reinstall' && robot != null ? (
-        <Box marginBottom={SPACING.spacing4} width="100%">
+        <Box marginBottom={SPACING.spacing16} width="100%">
           <UpdateRobotBanner robot={robot} />
         </Box>
       ) : null}
@@ -62,16 +63,21 @@ export function RobotServerVersion({
         <Box width="70%">
           <StyledText
             css={TYPOGRAPHY.pSemiBold}
-            paddingBottom={SPACING.spacing2}
+            paddingBottom={SPACING.spacing4}
             id="AdvancedSettings_RobotServerVersion"
           >
-            {t('robot_server_versions')}
+            {t('robot_server_version')}
           </StyledText>
-          <StyledText as="p" paddingBottom={SPACING.spacing2}>
+          <StyledText as="p" paddingBottom={SPACING.spacing4}>
             {robotServerVersion != null
               ? `v${robotServerVersion}`
               : t('robot_settings_advanced_unknown')}
           </StyledText>
+          {isOT3 ? (
+            <StyledText as="p" paddingBottom={SPACING.spacing4}>
+              {t('robot_server_version_ot3_description')}
+            </StyledText>
+          ) : null}
           <StyledText as="p">
             {t('shared:view_latest_release_notes')}
             <Link
@@ -83,13 +89,13 @@ export function RobotServerVersion({
           </StyledText>
         </Box>
         {autoUpdateAction !== 'reinstall' && robot != null ? null : (
-          <Flex justifyContent={JUSTIFY_FLEX_END} alignItems="center">
+          <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
             <StyledText
               as="label"
               color={COLORS.darkGreyEnabled}
-              paddingRight={SPACING.spacing4}
+              paddingRight={SPACING.spacing16}
             >
-              {t('robot_server_versions_status')}
+              {t('up_to_date')}
             </StyledText>
             <TertiaryButton
               onClick={() => setShowVersionInfoModal(true)}

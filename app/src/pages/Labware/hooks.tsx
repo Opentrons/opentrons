@@ -1,11 +1,11 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import {
-  getCustomLabware,
   getAddLabwareFailure,
   clearAddCustomLabwareFailure,
   getAddNewLabwareName,
   clearNewLabwareName,
+  getValidCustomLabware,
 } from '../../redux/custom-labware'
 import { getAllDefinitions } from './helpers/definitions'
 import type { Dispatch } from '../../redux/types'
@@ -25,10 +25,9 @@ export function useAllLabware(
 ): LabwareDefAndDate[] {
   const fullLabwareList: LabwareDefAndDate[] = []
   const labwareDefinitions = getAllDefinitions()
-  labwareDefinitions.map(def => fullLabwareList.push({ definition: def }))
-  const customLabwareList = useSelector(getCustomLabware)
-
-  customLabwareList.map(customLabware =>
+  labwareDefinitions.forEach(def => fullLabwareList.push({ definition: def }))
+  const customLabwareList = useSelector(getValidCustomLabware)
+  customLabwareList.forEach(customLabware =>
     'definition' in customLabware
       ? fullLabwareList.push({
           modified: customLabware.modified,
@@ -37,7 +36,7 @@ export function useAllLabware(
         })
       : null
   )
-  fullLabwareList.sort(function (a, b) {
+  const sortLabware = (a: LabwareDefAndDate, b: LabwareDefAndDate): number => {
     if (a.definition.metadata.displayName < b.definition.metadata.displayName) {
       return sortBy === 'alphabetical' ? -1 : 1
     }
@@ -45,7 +44,12 @@ export function useAllLabware(
       return sortBy === 'alphabetical' ? 1 : -1
     }
     return 0
-  })
+  }
+
+  if (filterBy === 'customLabware') {
+    return (customLabwareList as LabwareDefAndDate[]).sort(sortLabware)
+  }
+  fullLabwareList.sort(sortLabware)
   if (filterBy !== 'all') {
     return fullLabwareList.filter(
       labwareItem =>

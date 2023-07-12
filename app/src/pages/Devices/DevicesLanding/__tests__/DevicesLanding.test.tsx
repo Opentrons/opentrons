@@ -99,31 +99,31 @@ describe('DevicesLanding', () => {
     getByLabelText('ot-spinner')
   })
 
-  it('renders available and unavailable sections when both are present', () => {
+  it('renders available and not available sections when both are present', () => {
     const [{ getByText, getByTestId, queryByText }] = render()
 
     getByText('Mock Robot connectableRobot')
     getByText('Available (1)')
-    getByText('Unavailable (2)')
+    getByText('Not available (2)')
 
     expect(queryByText('Mock Robot unreachableRobot')).toBeNull()
     expect(queryByText('Mock Robot reachableRobot')).toBeNull()
 
     const expandButton = getByTestId(
-      'CollapsibleSection_expand_Unavailable (2)'
+      'CollapsibleSection_expand_Not available (2)'
     )
     fireEvent.click(expandButton)
 
     getByText('Mock Robot unreachableRobot')
     getByText('Mock Robot reachableRobot')
   })
-  it('does not render available or unavailable sections when none are present', () => {
+  it('does not render available or not available sections when none are present', () => {
     mockGetConnectableRobots.mockReturnValue([])
     mockGetReachableRobots.mockReturnValue([])
     mockGetUnreachableRobots.mockReturnValue([])
     const [{ queryByText }] = render()
 
-    expect(queryByText('Available')).toBeFalsy()
-    expect(queryByText('Unavailable')).toBeFalsy()
+    expect(queryByText('Available')).toBeNull()
+    expect(queryByText('Not available')).toBeNull()
   })
 })

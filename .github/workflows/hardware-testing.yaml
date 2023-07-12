@@ -9,7 +9,7 @@ on:
     paths:
       - 'Makefile'
       - 'hardware-testing/**'
-      - '.github/workflows/hardware-testing-lint-test.yaml'
+      - '.github/workflows/hardware-testing.yaml'
       - '.github/actions/python/**'
     branches:
       - 'edge'
@@ -20,10 +20,14 @@ on:
     paths:
       - 'Makefile'
       - 'hardware-testing/**'
-      - '.github/workflows/hardware-testing-lint-test.yaml'
+      - '.github/workflows/hardware-testing.yaml'
       - '.github/actions/python/**'
 
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
 
 defaults:
   run:
@@ -36,15 +40,17 @@ jobs:
     runs-on: 'ubuntu-20.04'
     steps:
       - name: Checkout opentrons repo
-        uses: 'actions/checkout@v2'
+        uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
-        uses: 'actions/setup-node@v1'
+        uses: 'actions/setup-node@v3'
         with:
           node-version: '12'
 
       - name: Setup Python
-        uses: 'actions/setup-python@v2'
+        uses: 'actions/setup-python@v4'
         with:
           python-version: '3.7'
 
@@ -60,7 +66,7 @@ jobs:
         run: make -C hardware-testing test-cov
 
       - name: Coverage
-        uses: 'codecov/codecov-action@v2'
+        uses: 'codecov/codecov-action@v3'
         with:
           files: ./hardware-testing/coverage.xml
           flags: hardware-testing

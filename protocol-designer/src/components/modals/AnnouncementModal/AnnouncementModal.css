@@ -2,6 +2,7 @@
 
 .announcement_modal {
   border-radius: 0;
+  position: fixed;
 }
 
 .modal_contents {
@@ -34,6 +35,13 @@
   */
   padding-left: 19.294%;
   padding-right: 19.294%;
+}
+
+.modules_diagrams_color_enhancements {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 6%;
 }
 
 .thermocycler_diagram_row {

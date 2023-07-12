@@ -43,13 +43,13 @@ const mockHeaterShakeShaking: HeaterShakerModule = {
 
 describe('AttachAdapter', () => {
   let props: React.ComponentProps<typeof AttachAdapter>
-
+  const mockToggleLatch = jest.fn()
   beforeEach(() => {
     props = {
       module: mockHeaterShaker,
     }
     mockUseLatchControls.mockReturnValue({
-      toggleLatch: jest.fn(),
+      toggleLatch: mockToggleLatch,
       isLatchClosed: true,
     })
   })
@@ -79,17 +79,17 @@ describe('AttachAdapter', () => {
     const { getByRole } = render(props)
     const btn = getByRole('button', { name: 'Open Labware Latch' })
     fireEvent.click(btn)
-    expect(mockUseLatchControls).toHaveBeenCalled()
+    expect(mockToggleLatch).toHaveBeenCalled()
   })
   it('renders button and clicking on it sends latch command to close', () => {
     mockUseLatchControls.mockReturnValue({
-      toggleLatch: jest.fn(),
+      toggleLatch: mockToggleLatch,
       isLatchClosed: false,
     })
     const { getByRole } = render(props)
     const btn = getByRole('button', { name: 'Close Labware Latch' })
     fireEvent.click(btn)
-    expect(mockUseLatchControls).toHaveBeenCalled()
+    expect(mockToggleLatch).toHaveBeenCalled()
   })
   it('renders button and it is disabled when heater-shaker is shaking', () => {
     props = {

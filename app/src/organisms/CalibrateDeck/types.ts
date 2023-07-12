@@ -7,4 +7,5 @@ export interface CalibrateDeckParentProps {
   dispatchRequests: DispatchRequestsType
   showSpinner: boolean
   isJogging: boolean
+  offsetInvalidationHandler?: () => void
 }

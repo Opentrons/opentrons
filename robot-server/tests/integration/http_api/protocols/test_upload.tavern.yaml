@@ -2,11 +2,11 @@ test_name: Upload, analyze, delete basic_transfer_standalone protocol.
 
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Upload basic_transfer_standalone protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/basic_transfer_standalone.py'
@@ -24,6 +24,7 @@ stages:
             - name: basic_transfer_standalone.py
               role: main
           createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          robotType: OT-2 Standard
           metadata:
             apiLevel: '2.6'
             protocolName: basic_transfer_standalone
@@ -36,7 +37,7 @@ stages:
     max_retries: 5
     delay_after: 1
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       strict:
@@ -49,13 +50,13 @@ stages:
             result: ok
   - name: Delete the protocol
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
       method: DELETE
     response:
       status_code: 200
   - name: Get protocol with id to verify it is deleted
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
       method: GET
     response:
       strict:
@@ -65,3 +66,41 @@ stages:
         errors:
           - id: ProtocolNotFound
             title: Protocol Not Found
+
+---
+test_name: Upload, analyze and analyze using "slow analysis"
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+      - ot2_server_set_disable_fast_analysis
+
+stages:
+  - name: Upload simple Python protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/simple.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      status_code: 201
+
+  - name: Retry until analyses status is completed and result is ok.
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+            result: ok

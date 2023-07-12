@@ -2,13 +2,13 @@ import {
   getWellFillFromLabwareId,
   getTotalVolumePerLiquidId,
   getTotalVolumePerLiquidLabwarePair,
-  getSlotLabwareName,
   getLiquidsByIdForLabware,
   getWellGroupForLiquidId,
   getWellRangeForLiquidLabwarePair,
+  getDisabledWellGroupForLiquidId,
 } from '../utils'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
-import type { LabwareByLiquidId, Liquid } from '@opentrons/api-client'
+import type { LabwareByLiquidId } from '@opentrons/api-client'
+import type { Liquid } from '@opentrons/shared-data'
 
 const LABWARE_ID =
   '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1'
@@ -18,25 +18,25 @@ const MOCK_LIQUIDS_IN_LOAD_ORDER: Liquid[] = [
     description: 'water',
     displayColor: '#00d781',
     displayName: 'liquid 2',
-    liquidId: '7',
+    id: '7',
   },
   {
     description: 'saline',
     displayColor: '#0076ff',
     displayName: 'liquid 1',
-    liquidId: '123',
+    id: '123',
   },
   {
     description: 'reagent',
     displayColor: '#ff4888',
     displayName: 'liquid 3',
-    liquidId: '19',
+    id: '19',
   },
   {
     description: 'saliva',
     displayColor: '#B925FF',
     displayName: 'liquid 4',
-    liquidId: '4',
+    id: '4',
   },
 ]
 const MOCK_LABWARE_BY_LIQUID_ID: LabwareByLiquidId = {
@@ -108,48 +108,24 @@ const MOCK_LABWARE_BY_LIQUID_ID: LabwareByLiquidId = {
   ],
 }
 
-const MOCK_LOAD_LABWARE_COMMANDS = [
-  {
-    commandType: 'loadLabware',
-    params: {
-      location: {
-        slotName: '5',
-      },
-    },
-    result: {
+const MOCK_LABWARE_BY_LIQUID_ID_DECIMALS: LabwareByLiquidId = {
+  '4': [
+    {
       labwareId:
         '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
-      definition: {},
-    },
-  },
-]
-
-const MOCK_COMMANDS = [
-  {
-    commandType: 'loadLabware',
-    params: {
-      location: {
-        moduleId: '12345',
+      volumeByWell: {
+        A3: 100.1111111,
+        A4: 100,
+        B3: 100,
+        B4: 100,
+        C3: 100,
+        C4: 100,
+        D3: 100,
+        D4: 100,
       },
     },
-    result: {
-      labwareId:
-        '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1',
-      definition: {},
-    },
-  },
-  {
-    commandType: 'loadModule',
-    params: {
-      location: {
-        slotName: '4',
-      },
-    },
-    result: {
-      moduleId: '12345',
-    },
-  },
-]
+  ],
+}
 
 const MOCK_LABWARE_BY_LIQUID_ID_FOR_LABWARE = {
   '4': [
@@ -223,11 +199,6 @@ const MOCK_VOLUME_BY_WELL = {
   D4: 100,
 }
 
-jest.mock('@opentrons/shared-data')
-const mockGetLabwareDisplayName = getLabwareDisplayName as jest.MockedFunction<
-  typeof getLabwareDisplayName
->
-
 describe('getWellFillFromLabwareId', () => {
   it('returns wellfill object for the labwareId', () => {
     const expected = {
@@ -273,6 +244,12 @@ describe('getTotalVolumePerLiquidId', () => {
       getTotalVolumePerLiquidId(LIQUID_ID, MOCK_LABWARE_BY_LIQUID_ID)
     ).toEqual(expected)
   })
+  it('returns volume of liquid needed accross all labware when there are decimal points', () => {
+    const expected = 800.1
+    expect(
+      getTotalVolumePerLiquidId('4', MOCK_LABWARE_BY_LIQUID_ID_DECIMALS)
+    ).toEqual(expected)
+  })
 })
 
 describe('getTotalVolumePerLiquidLabwarePair', () => {
@@ -285,32 +262,6 @@ describe('getTotalVolumePerLiquidLabwarePair', () => {
         MOCK_LABWARE_BY_LIQUID_ID
       )
     ).toEqual(expected)
-  })
-})
-
-describe('getSlotLabwareName', () => {
-  beforeEach(() => {
-    mockGetLabwareDisplayName.mockReturnValue(
-      'Corning 24 Well Plate 3.4 mL Flat'
-    )
-  })
-  it('returns labware name and slot number for labware id', () => {
-    const expected = {
-      slotName: '5',
-      labwareName: 'Corning 24 Well Plate 3.4 mL Flat',
-    }
-    expect(
-      getSlotLabwareName(LABWARE_ID, MOCK_LOAD_LABWARE_COMMANDS as any)
-    ).toEqual(expected)
-  })
-  it('returns the module slot number if the labware is on a module', () => {
-    const expected = {
-      slotName: '4',
-      labwareName: 'Corning 24 Well Plate 3.4 mL Flat',
-    }
-    expect(getSlotLabwareName(LABWARE_ID, MOCK_COMMANDS as any)).toEqual(
-      expected
-    )
   })
 })
 
@@ -336,6 +287,41 @@ describe('getWellGroupForLiquidId', () => {
     }
     expect(
       getWellGroupForLiquidId(MOCK_LABWARE_BY_LIQUID_ID_FOR_LABWARE, '7')
+    ).toEqual(expected)
+  })
+})
+
+describe('getDisabledWellGroupForLiquidId', () => {
+  it('returns wellgroup object for the specified liquidId', () => {
+    const expectedSeven = {
+      A1: null,
+      A2: null,
+      B1: null,
+      B2: null,
+      C1: null,
+      C2: null,
+      D1: null,
+      D2: null,
+    }
+
+    const expectedNineteen = {
+      A5: null,
+      A6: null,
+      B5: null,
+      B6: null,
+      C5: null,
+      C6: null,
+      D5: null,
+      D6: null,
+    }
+
+    const expected = [expectedSeven, expectedNineteen]
+
+    expect(
+      getDisabledWellGroupForLiquidId(MOCK_LABWARE_BY_LIQUID_ID_FOR_LABWARE, [
+        '7',
+        '19',
+      ])
     ).toEqual(expected)
   })
 })

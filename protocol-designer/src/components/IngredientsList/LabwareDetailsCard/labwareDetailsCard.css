@@ -6,6 +6,10 @@
 
 .column_2_3 {
   lost-column: 2/3;
+  margin-bottom: 0.2rem;
+  overflow: hidden;
+  display: inline-block;
+  text-overflow: ellipsis;
 }
 
 .row {

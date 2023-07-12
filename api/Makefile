@@ -17,14 +17,20 @@ sphinx_build := $(pipenv) run sphinx-build -W --keep-going
 # github.com/Opentrons/opentrons/issues/6135
 sphinx_build_allow_warnings := $(pipenv) run sphinx-build
 
+ot_project := $(OPENTRONS_PROJECT)
+project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
+project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
 
-# Find the version of the wheel from package.json using a helper script. We
+# Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,api,opentrons,$(BUILD_NUMBER))
+wheel_file = dist/$(call python_get_wheelname,api,$(project_rs_default),opentrons,$(BUILD_NUMBER))
 
-# Find the version of the sdist file from package.json using a helper script.
-sdist_file = dist/$(call python_get_sdistname,api,opentrons)
+# Find the version of the sdist file from git using a helper script.
+sdist_file = dist/$(call python_get_sdistname,api,$(project_ot3_default),opentrons)
+
+# Find the branch, sha, version that will be used to update the VERSION.json file
+version_file = $(call python_get_git_version,api,$(project_ot3_default),opentrons)
 
 # These variables are for simulating python protocols
 sim_log_level ?= info
@@ -51,18 +57,12 @@ ssh_opts ?= $(default_ssh_opts)
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 twine_repository_url ?= $(pypi_test_upload_url)
 
-# Source discovery
-# For the python sources
-ot_py_sources := $(filter %.py,$(shell $(SHX) find src/opentrons/))
-# And the out of tree shared data
-ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
-# And the arbitrary stuff in resources
-ot_resources := $(filter %,$(shell $(SHX) find src/opentrons/resources))
-ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
-
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
-clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'src/**/.mypy_cache'
+clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' 'src/**/.mypy_cache'
+clean_wheel_cmd = $(clean_cmd) dist/*.whl
+clean_sdist_cmd = $(clean_cmd) dist/*.tar.gz
+clean_all_cmd = $(clean_cmd) dist
 
 plot_type ?=
 
@@ -82,27 +82,28 @@ setup-ot2:
 
 .PHONY: clean
 clean: docs-clean
-	$(clean_cmd)
+	$(clean_all_cmd)
 
 .PHONY: teardown
 teardown:
 	$(pipenv) --rm
 
-$(wheel_file): setup.py $(ot_sources)
-	$(clean_cmd)
+.PHONY: wheel
+wheel: export OPENTRONS_PROJECT=$(project_rs_default)
+wheel:
+	$(clean_wheel_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
-wheel: $(wheel_file)
 
-$(sdist_file): setup.py $(ot_sources)
-	$(clean_cmd)
+.PHONY: sdist
+sdist: export OPENTRONS_PROJECT=$(project_ot3_default)
+sdist:
+	$(clean_sdist_cmd)
 	$(python) setup.py sdist
 	$(SHX) rm -rf build
 	$(SHX) ls dist
-
-sdist: $(sdist_file)
 
 .PHONY: test
 test:
@@ -114,7 +115,7 @@ test-cov:
 
 .PHONY: test-ot2
 test-ot2:
-	$(pytest) $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
+	$(pytest) -m 'not ot3_only' $(tests) $(test_opts) --ot2-only --ignore-glob="**/*ot3*"
 
 .PHONY: lint
 lint:
@@ -177,11 +178,13 @@ push: push-no-restart
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: $(sdist_file)
+push-no-restart-ot3: sdist
 	echo $(sdist_file)
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src)
-	ssh $(ssh_opts) root@$(host) "mkdir -p /usr/local/bin"
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,opentrons,src,,$(version_file))
+	ssh $(ssh_opts) root@$(host) "mount -o remount,rw / && mkdir -p /usr/local/bin"
 	scp $(ssh_opts) ./src/opentrons/hardware_control/scripts/ot3repl root@$(host):/usr/local/bin/ot3repl
+	scp $(ssh_opts) ./src/opentrons/hardware_control/scripts/ot3gripper root@$(host):/usr/local/bin/ot3gripper
+	ssh $(ssh_opts) root@$(host) "mount -o remount,ro /"
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3
@@ -208,3 +211,7 @@ term:
 .PHONY: plot-session
 plot-session:
 	$(python) util/plot_session.py $(plot_type) $(plot_type).pdf
+
+PHONY: command-schema
+command-schema: 
+	$(python) src/opentrons/protocol_engine/commands/generate_command_schema.py $(COMMAND_SCHEMA_VERSION) > ../shared-data/command/schemas/$(COMMAND_SCHEMA_VERSION).json

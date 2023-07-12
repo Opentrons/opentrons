@@ -45,12 +45,6 @@ export function ViewUpdateModal(
   }
   const showReleaseNotes = robotUpdateType === UPGRADE
 
-  React.useLayoutEffect(() => {
-    if (updateInfo && !showReleaseNotes && !showMigrationWarning) {
-      proceed()
-    }
-  }, [updateInfo, showReleaseNotes, showMigrationWarning, proceed])
-
   if (showMigrationWarning) {
     return (
       <MigrationWarningModal

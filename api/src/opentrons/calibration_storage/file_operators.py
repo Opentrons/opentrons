@@ -8,8 +8,9 @@ the v1 API.
 import json
 import datetime
 import typing
+from pydantic import BaseModel
+from pathlib import Path
 
-from .types import StrPath
 from .encoder_decoder import DateTimeEncoder, DateTimeDecoder
 
 
@@ -17,8 +18,36 @@ DecoderType = typing.Type[json.JSONDecoder]
 EncoderType = typing.Type[json.JSONEncoder]
 
 
+# TODO(mc, 2022-06-07): replace with Path.unlink(missing_ok=True)
+# when we are on Python >= 3.8
+def delete_file(path: Path) -> None:
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        pass
+
+
+def _remove_json_files_in_directories(p: Path) -> None:
+    """Delete json file by the path"""
+    for item in p.iterdir():
+        if item.is_dir():
+            _remove_json_files_in_directories(item)
+        elif item.suffix == ".json":
+            delete_file(item)
+
+
+def _assert_last_modified_value(calibration_dict: typing.Dict[str, typing.Any]) -> None:
+    last_modified = calibration_dict.get("lastModified")
+    if last_modified:
+        assert isinstance(calibration_dict["lastModified"], datetime.datetime), (
+            "invalid decoded value type for lastModified: got "
+            f"{type(calibration_dict['lastModified']).__name__},"
+            "expected datetime"
+        )
+
+
 def read_cal_file(
-    filepath: StrPath, decoder: DecoderType = DateTimeDecoder
+    filepath: Path, decoder: DecoderType = DateTimeDecoder
 ) -> typing.Dict[str, typing.Any]:
     """
     Function used to read data from a file
@@ -40,19 +69,16 @@ def read_cal_file(
             json.load(f, cls=decoder),
         )
     if isinstance(calibration_data.values(), dict):
-        for value in calibration_data.values():
-            if value.get("lastModified"):
-                assert isinstance(value["lastModified"], datetime.datetime), (
-                    "invalid decoded value type for lastModified: got "
-                    f"{type(value['lastModified']).__name__},"
-                    "expected datetime"
-                )
+        _assert_last_modified_value(dict(calibration_data.values()))
+    else:
+        _assert_last_modified_value(calibration_data)
     return calibration_data
 
 
 def save_to_file(
-    filepath: StrPath,
-    data: typing.Mapping[str, typing.Any],
+    directorypath: Path,
+    file_name: str,
+    data: typing.Union[BaseModel, typing.Dict[str, typing.Any], typing.Any],
     encoder: EncoderType = DateTimeEncoder,
 ) -> None:
     """
@@ -63,5 +89,9 @@ def save_to_file(
     :param encoder: if there is any specialized encoder needed.
     The default encoder is the date time encoder.
     """
-    with open(filepath, "w") as f:
-        json.dump(data, f, cls=encoder)
+    directorypath.mkdir(parents=True, exist_ok=True)
+    filepath = directorypath / f"{file_name}.json"
+    json_data = (
+        data.json() if isinstance(data, BaseModel) else json.dumps(data, cls=encoder)
+    )
+    filepath.write_text(json_data, encoding="utf-8")

@@ -10,10 +10,11 @@
       "gitTagVersion": false,
       "push": false,
       "preid": "alpha",
-      "forcePublish": "*"
+      "forcePublish": "*",
+      "noChangelog": true
     }
   },
   "npmClient": "yarn",
   "useWorkspaces": true,
-  "version": "6.0.0"
+  "version": "6.2.1"
 }

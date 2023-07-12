@@ -1,5 +1,9 @@
 import * as React from 'react'
-import { AlertModal, OutlineButton, PrimaryButton } from '@opentrons/components'
+import {
+  AlertModal,
+  OutlineButton,
+  DeprecatedPrimaryButton,
+} from '@opentrons/components'
 import { i18n } from '../../localization'
 import modalStyles from './modal.css'
 import styles from './AutoAddPauseUntilTempStepModal.css'
@@ -43,12 +47,12 @@ export const AutoAddPauseUntilHeaterShakerTempStepModal = (
       >
         {i18n.t('modal.auto_add_pause_until_temp_step.later_button')}
       </OutlineButton>
-      <PrimaryButton
+      <DeprecatedPrimaryButton
         className={styles.now_button}
         onClick={props.handleContinueClick}
       >
         {i18n.t('modal.auto_add_pause_until_temp_step.now_button')}
-      </PrimaryButton>
+      </DeprecatedPrimaryButton>
     </div>
   </AlertModal>
 )

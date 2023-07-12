@@ -10,4 +10,4 @@ Schema = NewType("Schema", Dict[str, Any])
 
 
 def load_schema(version: int) -> "Schema":
-    return json.loads(load_shared_data(f"protocol/schema/{version}.json"))
+    return json.loads(load_shared_data(f"protocol/schemas/{version}.json"))

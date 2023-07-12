@@ -1,17 +1,21 @@
 """Public protocol engine value types and models."""
 from __future__ import annotations
+import re
 from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from typing import Optional, Union, List, Dict, Any, NamedTuple
 from typing_extensions import Literal, TypeGuard
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType, DeckSlotName
-from opentrons.hardware_control.modules import ModuleType as ModuleType
+from opentrons.hardware_control.modules import (
+    ModuleType as ModuleType,
+)
 
-# convenience re-export of LabwareUri type
 from opentrons_shared_data.pipette.dev_types import (  # noqa: F401
+    # convenience re-export of LabwareUri type
     LabwareUri as LabwareUri,
 )
 
@@ -33,7 +37,21 @@ class EngineStatus(str, Enum):
 class DeckSlotLocation(BaseModel):
     """The location of something placed in a single deck slot."""
 
-    slotName: DeckSlotName
+    slotName: DeckSlotName = Field(
+        ...,
+        description=(
+            # This description should be kept in sync with LabwareOffsetLocation.slotName.
+            "A slot on the robot's deck."
+            "\n\n"
+            'The plain numbers like `"5"` are for the OT-2,'
+            ' and the coordinates like `"C2"` are for the Flex.'
+            "\n\n"
+            "When you provide one of these values, you can use either style."
+            " It will automatically be converted to match the robot."
+            "\n\n"
+            "When one of these values is returned, it will always match the robot."
+        ),
+    )
 
 
 class ModuleLocation(BaseModel):
@@ -45,17 +63,78 @@ class ModuleLocation(BaseModel):
     )
 
 
-LabwareLocation = Union[DeckSlotLocation, ModuleLocation]
-"""Union of all locations where it's legal to load a labware."""
+class OnLabwareLocation(BaseModel):
+    """The location of something placed atop another labware."""
+
+    labwareId: str = Field(
+        ...,
+        description="The ID of a loaded Labware from a prior `loadLabware` command.",
+    )
+
+
+_OffDeckLocationType = Literal["offDeck"]
+OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
+
+LabwareLocation = Union[
+    DeckSlotLocation, ModuleLocation, OnLabwareLocation, _OffDeckLocationType
+]
+"""Union of all locations where it's legal to keep a labware."""
+
+NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
+"""Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
+
+
+class LabwareMovementStrategy(str, Enum):
+    """Strategy to use for labware movement."""
+
+    USING_GRIPPER = "usingGripper"
+    MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
+    MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
+
+
+# TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
+@dataclass(frozen=True)
+class ExperimentalOffsetData(BaseModel):
+    """The result of a load module procedure."""
+
+    usePickUpLocationLpcOffset: bool
+    useDropLocationLpcOffset: bool
+    pickUpOffset: Optional[LabwareOffsetVector]
+    dropOffset: Optional[LabwareOffsetVector]
 
 
 class WellOrigin(str, Enum):
-    """Origin of WellLocation offset."""
+    """Origin of WellLocation offset.
+
+    Props:
+        TOP: the top-center of the well
+        BOTTOM: the bottom-center of the well
+        CENTER: the middle-center of the well
+    """
 
     TOP = "top"
     BOTTOM = "bottom"
+    CENTER = "center"
 
 
+class DropTipWellOrigin(str, Enum):
+    """The origin of a DropTipWellLocation offset.
+
+    Props:
+        TOP: the top-center of the well
+        BOTTOM: the bottom-center of the well
+        CENTER: the middle-center of the well
+        DEFAULT: the default drop-tip location of the well,
+            based on pipette configuration and length of the tip.
+    """
+
+    TOP = "top"
+    BOTTOM = "bottom"
+    CENTER = "center"
+    DEFAULT = "default"
+
+
+# This is deliberately a separate type from Vec3f to let components default to 0.
 class WellOffset(BaseModel):
     """An offset vector in (x, y, z)."""
 
@@ -71,6 +150,17 @@ class WellLocation(BaseModel):
     offset: WellOffset = Field(default_factory=WellOffset)
 
 
+class DropTipWellLocation(BaseModel):
+    """Like WellLocation, but for dropping tips.
+
+    Unlike a typical WellLocation, the location for a drop tip
+    defaults to location based on the tip length rather than the well's top.
+    """
+
+    origin: DropTipWellOrigin = DropTipWellOrigin.DEFAULT
+    offset: WellOffset = Field(default_factory=WellOffset)
+
+
 @dataclass(frozen=True)
 class Dimensions:
     """Dimensions of an object in deck-space."""
@@ -80,6 +170,7 @@ class Dimensions:
     z: float
 
 
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class DeckPoint(BaseModel):
     """Coordinates of a point in deck space."""
 
@@ -88,33 +179,58 @@ class DeckPoint(BaseModel):
     z: float
 
 
-# TODO(mc, 2021-04-16): reconcile with opentrons_shared_data
-# shared-data/python/opentrons_shared_data/pipette/dev_types.py
-class PipetteName(str, Enum):
-    """Pipette load name values."""
+# TODO(mm, 2023-05-10): Deduplicate with constants in
+# opentrons.protocols.api_support.deck_type
+# and consider moving to shared-data.
+class DeckType(str, Enum):
+    """Types of deck available."""
 
-    P10_SINGLE = "p10_single"
-    P10_MULTI = "p10_multi"
-    P20_SINGLE_GEN2 = "p20_single_gen2"
-    P20_MULTI_GEN2 = "p20_multi_gen2"
-    P50_SINGLE = "p50_single"
-    P50_MULTI = "p50_multi"
-    P300_SINGLE = "p300_single"
-    P300_MULTI = "p300_multi"
-    P300_SINGLE_GEN2 = "p300_single_gen2"
-    P300_MULTI_GEN2 = "p300_multi_gen2"
-    P1000_SINGLE = "p1000_single"
-    P1000_SINGLE_GEN2 = "p1000_single_gen2"
-    P300_SINGLE_GEN3 = "p300_single_gen3"
-    P1000_SINGLE_GEN3 = "p1000_single_gen3"
+    OT2_STANDARD = "ot2_standard"
+    OT2_SHORT_TRASH = "ot2_short_trash"
+    OT3_STANDARD = "ot3_standard"
 
 
 class LoadedPipette(BaseModel):
     """A pipette that has been loaded."""
 
     id: str
-    pipetteName: PipetteName
+    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
+    pipetteName: Union[PipetteNameType, Literal["p1000_96"]]
     mount: MountType
+
+
+@dataclass
+class FlowRates:
+    """Default and current flow rates for a pipette."""
+
+    default_blow_out: Dict[str, float]
+    default_aspirate: Dict[str, float]
+    default_dispense: Dict[str, float]
+
+
+@dataclass(frozen=True)
+class CurrentWell:
+    """The latest well that the robot has accessed."""
+
+    pipette_id: str
+    labware_id: str
+    well_name: str
+
+
+@dataclass(frozen=True)
+class TipGeometry:
+    """Tip geometry data.
+
+    Props:
+        length: The effective length (total length minus overlap) of a tip in mm.
+        diameter: Tip diameter in mm.
+        volume: Maximum volume in µL.
+    """
+
+    length: float
+    diameter: float
+    volume: float
 
 
 class MovementAxis(str, Enum):
@@ -134,6 +250,8 @@ class MotorAxis(str, Enum):
     RIGHT_Z = "rightZ"
     LEFT_PLUNGER = "leftPlunger"
     RIGHT_PLUNGER = "rightPlunger"
+    EXTENSION_Z = "extensionZ"
+    EXTENSION_JAW = "extensionJaw"
 
 
 # TODO(mc, 2022-01-18): use opentrons_shared_data.module.dev_types.ModuleModel
@@ -147,6 +265,7 @@ class ModuleModel(str, Enum):
     THERMOCYCLER_MODULE_V1 = "thermocyclerModuleV1"
     THERMOCYCLER_MODULE_V2 = "thermocyclerModuleV2"
     HEATER_SHAKER_MODULE_V1 = "heaterShakerModuleV1"
+    MAGNETIC_BLOCK_V1 = "magneticBlockV1"
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""
@@ -158,6 +277,8 @@ class ModuleModel(str, Enum):
             return ModuleType.THERMOCYCLER
         elif ModuleModel.is_heater_shaker_module_model(self):
             return ModuleType.HEATER_SHAKER
+        elif ModuleModel.is_magnetic_block(self):
+            return ModuleType.MAGNETIC_BLOCK
 
         assert False, f"Invalid ModuleModel {self}"
 
@@ -179,7 +300,7 @@ class ModuleModel(str, Enum):
     def is_thermocycler_module_model(
         cls, model: ModuleModel
     ) -> TypeGuard[ThermocyclerModuleModel]:
-        """Whether a given model is a Thermocyler Module."""
+        """Whether a given model is a Thermocycler Module."""
         return model in [cls.THERMOCYCLER_MODULE_V1, cls.THERMOCYCLER_MODULE_V2]
 
     @classmethod
@@ -188,6 +309,11 @@ class ModuleModel(str, Enum):
     ) -> TypeGuard[HeaterShakerModuleModel]:
         """Whether a given model is a Heater-Shaker Module."""
         return model == cls.HEATER_SHAKER_MODULE_V1
+
+    @classmethod
+    def is_magnetic_block(cls, model: ModuleModel) -> TypeGuard[MagneticBlockModel]:
+        """Whether a given model is a Magnetic block."""
+        return model == cls.MAGNETIC_BLOCK_V1
 
 
 TemperatureModuleModel = Literal[
@@ -200,6 +326,7 @@ ThermocyclerModuleModel = Literal[
     ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2
 ]
 HeaterShakerModuleModel = Literal[ModuleModel.HEATER_SHAKER_MODULE_V1]
+MagneticBlockModel = Literal[ModuleModel.MAGNETIC_BLOCK_V1]
 
 
 class ModuleDimensions(BaseModel):
@@ -210,6 +337,15 @@ class ModuleDimensions(BaseModel):
     lidHeight: Optional[float]
 
 
+class Vec3f(BaseModel):
+    """A 3D vector of floats."""
+
+    x: float
+    y: float
+    z: float
+
+
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class ModuleCalibrationPoint(BaseModel):
     """Calibration Point type for module definition."""
 
@@ -218,6 +354,7 @@ class ModuleCalibrationPoint(BaseModel):
     z: float
 
 
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class LabwareOffsetVector(BaseModel):
     """Offset, in deck coordinates from nominal to actual position."""
 
@@ -225,31 +362,99 @@ class LabwareOffsetVector(BaseModel):
     y: float
     z: float
 
+    def __add__(self, other: Any) -> LabwareOffsetVector:
+        """Adds two vectors together."""
+        if not isinstance(other, LabwareOffsetVector):
+            return NotImplemented
+        return LabwareOffsetVector(
+            x=self.x + other.x, y=self.y + other.y, z=self.z + other.z
+        )
 
+    def __sub__(self, other: Any) -> LabwareOffsetVector:
+        """Subtracts two vectors."""
+        if not isinstance(other, LabwareOffsetVector):
+            return NotImplemented
+        return LabwareOffsetVector(
+            x=self.x - other.x, y=self.y - other.y, z=self.z - other.z
+        )
+
+
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
+class InstrumentOffsetVector(BaseModel):
+    """Instrument Offset from home position to robot deck."""
+
+    x: float
+    y: float
+    z: float
+
+
+# TODO(mm, 2022-11-07): Deduplicate with Vec3f.
+class ModuleOffsetVector(BaseModel):
+    """Offset, in deck coordinates, from nominal to actual position of labware on a module."""
+
+    x: float
+    y: float
+    z: float
+
+
+class OverlapOffset(Vec3f):
+    """Offset representing overlap space of one labware on top of another labware or module."""
+
+
+# TODO(mm, 2023-04-13): Move to shared-data, so this binding can be maintained alongside the JSON
+# schema that it's sourced from. We already do that for labware definitions and JSON protocols.
 class ModuleDefinition(BaseModel):
-    """Module definition class."""
+    """A module definition conforming to module definition schema v3."""
 
+    # Note: This field is misleading.
+    #
+    # This class only models v3 definitions ("module/schemas/3"), not v2 ("module/schemas/2").
+    # labwareOffset is required to have a z-component, for example.
+    #
+    # When parsing from a schema v3 JSON definition into this model,
+    # the definition's `"$otSharedSchema": "module/schemas/3"` field will be thrown away
+    # because it has a dollar sign, which doesn't match this field.
+    # Then, this field will default to "module/schemas/2", because no value was provided.
+    #
+    # We should fix this field once Jira RSS-221 is resolved. RSS-221 makes it difficult to fix
+    # because robot-server has been storing and loading these bad fields in its database.
     otSharedSchema: str = Field("module/schemas/2", description="The current schema.")
+
     moduleType: ModuleType = Field(
         ...,
         description="Module type (Temperature/Magnetic/Thermocycler)",
     )
+
     model: ModuleModel = Field(..., description="Model name of the module")
+
     labwareOffset: LabwareOffsetVector = Field(
         ...,
         description="Labware offset in x, y, z.",
     )
+
     dimensions: ModuleDimensions = Field(..., description="Module dimension")
+
     calibrationPoint: ModuleCalibrationPoint = Field(
         ...,
         description="Calibration point of module.",
     )
+
     displayName: str = Field(..., description="Display name.")
+
     quirks: List[str] = Field(..., description="Module quirks")
+
+    # In releases prior to https://github.com/Opentrons/opentrons/pull/11873 (v6.3.0),
+    # the matrices in slotTransforms were 3x3.
+    # After, they are 4x4, even though there was no schema version bump.
+    #
+    # Because old objects of this class, with the 3x3 matrices, were stored in robot-server's
+    # database, this field needs to stay typed loosely enough to support both sizes.
+    # We can fix this once Jira RSS-221 is resolved.
     slotTransforms: Dict[str, Any] = Field(
         ...,
         description="Dictionary of transforms for each slot.",
     )
+
     compatibleWith: List[ModuleModel] = Field(
         ...,
         description="List of module models this model is compatible with.",
@@ -262,7 +467,7 @@ class LoadedModule(BaseModel):
     id: str
     model: ModuleModel
     location: Optional[DeckSlotLocation]
-    serialNumber: str
+    serialNumber: Optional[str]
 
 
 class LabwareOffsetLocation(BaseModel):
@@ -274,6 +479,15 @@ class LabwareOffsetLocation(BaseModel):
             "The deck slot where the protocol will load the labware."
             " Or, if the protocol will load the labware on a module,"
             " the deck slot where the protocol will load that module."
+            "\n\n"
+            # This description should be kept in sync with DeckSlotLocation.slotName.
+            'The plain numbers like `"5"` are for the OT-2,'
+            ' and the coordinates like `"C2"` are for the Flex.'
+            "\n\n"
+            "When you provide one of these values, you can use either style."
+            " It will automatically be converted to match the robot."
+            "\n\n"
+            "When one of these values is returned, it will always match the robot."
         ),
     )
     moduleModel: Optional[ModuleModel] = Field(
@@ -289,6 +503,13 @@ class LabwareOffsetLocation(BaseModel):
             " this field must be the *requested* model, not the connected one."
             " You can retrieve this from a `loadModule` command's `params.model`"
             " in the protocol's analysis."
+        ),
+    )
+    definitionUri: Optional[str] = Field(
+        None,
+        description=(
+            "The definition URI of a labware that a labware can be loaded onto,"
+            " if applicable."
         ),
     )
 
@@ -334,16 +555,44 @@ class LoadedLabware(BaseModel):
     id: str
     loadName: str
     definitionUri: str
-    location: LabwareLocation
+    location: LabwareLocation = Field(
+        ..., description="The labware's current location."
+    )
     offsetId: Optional[str] = Field(
         None,
         description=(
-            "An ID referencing the offset applied to this labware placement,"
-            " decided at load time."
+            "An ID referencing the labware offset"
+            " that applies to this labware placement."
             " Null or undefined means no offset was provided for this load,"
             " so the default of (0, 0, 0) will be used."
         ),
     )
+    displayName: Optional[str] = Field(
+        None,
+        description="A user-specified display name for this labware, if provided.",
+    )
+
+
+class HexColor(BaseModel):
+    """Hex color representation."""
+
+    __root__: str
+
+    @validator("__root__")
+    def _color_is_a_valid_hex(cls, v: str) -> str:
+        match = re.search(r"^#(?:[0-9a-fA-F]{3,4}){1,2}$", v)
+        if not match:
+            raise ValueError("Color is not a valid hex color.")
+        return v
+
+
+class Liquid(BaseModel):
+    """Payload required to create a liquid."""
+
+    id: str
+    displayName: str
+    description: str
+    displayColor: Optional[HexColor]
 
 
 class SpeedRange(NamedTuple):
@@ -360,10 +609,18 @@ class TemperatureRange(NamedTuple):
     max: float
 
 
+class HeaterShakerLatchStatus(Enum):
+    """Heater-Shaker latch status for determining pipette and labware movement errors."""
+
+    CLOSED = "closed"
+    OPEN = "open"
+    UNKNOWN = "unknown"
+
+
 @dataclass(frozen=True)
 class HeaterShakerMovementRestrictors:
     """Shaking status, latch status and slot location for determining movement restrictions."""
 
     plate_shaking: bool
-    latch_closed: bool
+    latch_status: HeaterShakerLatchStatus
     deck_slot: int

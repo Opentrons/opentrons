@@ -5,6 +5,11 @@ import {
   componentPropsMatcher,
   renderWithProviders,
 } from '@opentrons/components'
+import {
+  CompletedProtocolAnalysis,
+  ModuleModel,
+  ModuleType,
+} from '@opentrons/shared-data'
 import { ProtocolRunModuleControls } from '../ProtocolRunModuleControls'
 import { ModuleCard } from '../../../ModuleCard'
 import {
@@ -18,11 +23,6 @@ import {
   mockHeaterShaker,
 } from '../../../../redux/modules/__fixtures__'
 import fixtureAnalysis from '../../../../organisms/RunDetails/__fixtures__/analysis.json'
-import {
-  ModuleModel,
-  ModuleType,
-  ProtocolAnalysisFile,
-} from '@opentrons/shared-data'
 
 jest.mock('../../../ModuleCard')
 jest.mock('../../hooks')
@@ -35,7 +35,7 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
   typeof useProtocolDetailsForRun
 >
 
-const _fixtureAnalysis = (fixtureAnalysis as unknown) as ProtocolAnalysisFile
+const _fixtureAnalysis = (fixtureAnalysis as unknown) as CompletedProtocolAnalysis
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = 'test123'
@@ -81,6 +81,7 @@ describe('ProtocolRunModuleControls', () => {
       protocolData: _fixtureAnalysis,
       displayName: 'mock display name',
       protocolKey: 'fakeProtocolKey',
+      robotType: 'OT-2 Standard',
     })
   })
 

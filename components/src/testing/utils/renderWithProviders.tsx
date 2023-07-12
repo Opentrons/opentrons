@@ -24,6 +24,7 @@ export function renderWithProviders<State>(
 
   const store: Store<State> = createStore(jest.fn(), initialState)
   store.dispatch = jest.fn()
+  store.getState = jest.fn(() => initialState)
 
   const queryClient = new QueryClient()
 

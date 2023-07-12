@@ -22,7 +22,6 @@ export const protocolReducer: Reducer<ProtocolState, Action> = (
       return { ...state, ...action.payload }
 
     case 'protocol:CLOSE':
-    case 'robot:DISCONNECT':
       return INITIAL_STATE
   }
 

@@ -9,7 +9,9 @@ from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
     LoadedLabware,
+    LoadedModule,
     LoadedPipette,
+    Liquid,
 )
 
 
@@ -88,7 +90,17 @@ class CompletedAnalysis(BaseModel):
     )
     labware: List[LoadedLabware] = Field(
         ...,
-        description="Labware used by the protocol",
+        description=(
+            "Labware used by the protocol."
+            "\n\n"
+            "If a piece of labware moves between locations as part of the protocol,"
+            " its *final* location will be reported in this list,"
+            " not its *initial* location."
+        ),
+    )
+    modules: List[LoadedModule] = Field(
+        default_factory=list,
+        description="Modules that have been loaded into the run.",
     )
     commands: List[Command] = Field(
         ...,
@@ -97,6 +109,10 @@ class CompletedAnalysis(BaseModel):
     errors: List[ErrorOccurrence] = Field(
         ...,
         description="Any errors the protocol run produced",
+    )
+    liquids: List[Liquid] = Field(
+        default_factory=list,
+        description="Liquids used by the protocol",
     )
 
 

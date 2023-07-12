@@ -5,13 +5,15 @@ from typing import List, Optional, Type
 import pytest
 from sqlalchemy.engine import Engine
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
+
 from robot_server.protocols.protocol_store import ProtocolNotFoundError
 from robot_server.runs.run_store import (
     RunStore,
     RunResource,
-    RunNotFoundError,
     CommandNotFoundError,
 )
+from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.action_models import RunAction, RunActionType
 
 from opentrons.protocol_engine import (
@@ -20,9 +22,10 @@ from opentrons.protocol_engine import (
     types as pe_types,
     StateSummary,
     CommandSlice,
+    Liquid,
+    EngineStatus,
 )
 from opentrons.types import MountType, DeckSlotName
-from opentrons.protocol_engine import EngineStatus
 
 
 @pytest.fixture
@@ -82,9 +85,11 @@ def state_summary() -> StateSummary:
 
     analysis_pipette = pe_types.LoadedPipette(
         id="pipette-id",
-        pipetteName=pe_types.PipetteName.P300_SINGLE,
+        pipetteName=PipetteNameType.P300_SINGLE,
         mount=MountType.LEFT,
     )
+
+    liquids = [Liquid(id="some-id", displayName="water", description="water desc")]
 
     return StateSummary(
         errors=[analysis_error],
@@ -95,6 +100,7 @@ def state_summary() -> StateSummary:
         # TODO (tz 22-4-19): added the field to class. make sure what to initialize
         labwareOffsets=[],
         status=EngineStatus.IDLE,
+        liquids=liquids,
     )
 
 
@@ -241,8 +247,61 @@ def test_get_run_missing(subject: RunStore) -> None:
         subject.get(run_id="run-id")
 
 
-def test_get_all_runs(subject: RunStore) -> None:
-    """It can get all created runs."""
+@pytest.mark.parametrize(
+    "length, expected_result",
+    [
+        (0, []),
+        (
+            1,
+            [
+                RunResource(
+                    run_id="run-id-2",
+                    protocol_id=None,
+                    created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+                    actions=[],
+                )
+            ],
+        ),
+        (
+            20,
+            [
+                RunResource(
+                    run_id="run-id-1",
+                    protocol_id=None,
+                    created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+                    actions=[],
+                ),
+                RunResource(
+                    run_id="run-id-2",
+                    protocol_id=None,
+                    created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+                    actions=[],
+                ),
+            ],
+        ),
+        (
+            None,
+            [
+                RunResource(
+                    run_id="run-id-1",
+                    protocol_id=None,
+                    created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
+                    actions=[],
+                ),
+                RunResource(
+                    run_id="run-id-2",
+                    protocol_id=None,
+                    created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
+                    actions=[],
+                ),
+            ],
+        ),
+    ],
+)
+def test_get_all_runs(
+    subject: RunStore, length: Optional[int], expected_result: List[RunResource]
+) -> None:
+    """It gets the number of created runs supplied in length."""
     subject.insert(
         run_id="run-id-1",
         protocol_id=None,
@@ -254,22 +313,9 @@ def test_get_all_runs(subject: RunStore) -> None:
         created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
     )
 
-    result = subject.get_all()
+    result = subject.get_all(length=length)
 
-    assert result == [
-        RunResource(
-            run_id="run-id-1",
-            protocol_id=None,
-            created_at=datetime(year=2021, month=1, day=1, tzinfo=timezone.utc),
-            actions=[],
-        ),
-        RunResource(
-            run_id="run-id-2",
-            protocol_id=None,
-            created_at=datetime(year=2022, month=2, day=2, tzinfo=timezone.utc),
-            actions=[],
-        ),
-    ]
+    assert result == expected_result
 
 
 def test_remove_run(subject: RunStore) -> None:
@@ -288,7 +334,7 @@ def test_remove_run(subject: RunStore) -> None:
     subject.insert_action(run_id="run-id", action=action)
     subject.remove(run_id="run-id")
 
-    assert subject.get_all() == []
+    assert subject.get_all(length=20) == []
 
 
 def test_remove_run_missing_id(subject: RunStore) -> None:
@@ -426,6 +472,8 @@ def test_get_command_slice(
 @pytest.mark.parametrize(
     ("input_cursor", "input_length", "expected_cursor", "expected_command_ids"),
     [
+        (0, 0, 0, []),
+        (None, 0, 2, []),
         (0, 3, 0, ["pause-1", "pause-2", "pause-3"]),
         (0, 1, 0, ["pause-1"]),
         (1, 2, 1, ["pause-2", "pause-3"]),

@@ -1,4 +1,5 @@
 import {
+  CompletedProtocolAnalysis,
   DeckDefinition,
   getSlotHasMatingSurfaceUnitVector,
   LabwareDefinition2,
@@ -20,7 +21,9 @@ const getSlotPosition = (
 
   if (slotPosition == null) {
     console.error(
-      `expected to find a slot position for slot ${slotName} in ${deckDef.metadata.displayName}, but could not`
+      `expected to find a slot position for slot ${slotName} in ${String(
+        deckDef.metadata.displayName
+      )}, but could not`
     )
   } else {
     x = slotPosition[0]
@@ -42,7 +45,10 @@ export interface LabwareRenderInfoById {
 }
 
 export const getLabwareRenderInfo = (
-  protocolData: ProtocolAnalysisFile<{}> | ProtocolAnalysisOutput,
+  protocolData:
+    | ProtocolAnalysisFile<{}>
+    | CompletedProtocolAnalysis
+    | ProtocolAnalysisOutput,
   deckDef: DeckDefinition
 ): LabwareRenderInfoById =>
   protocolData.commands
@@ -55,15 +61,15 @@ export const getLabwareRenderInfo = (
       const location = command.params.location
       const displayName = command.params.displayName ?? null
       const labwareDef = command.result?.definition
-      if ('moduleId' in location) {
-        return { ...acc }
-      }
+      if (location === 'offDeck' || 'moduleId' in location) return acc
       if (labwareId == null) {
         throw new Error('expected to find labware id but could not')
       }
       if (labwareDef == null) {
         throw new Error(
-          `expected to find labware def for labware id ${labwareId} but could not`
+          `expected to find labware def for labware id ${String(
+            labwareId
+          )} but could not`
         )
       }
       const slotName = location.slotName.toString()

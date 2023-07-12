@@ -20,6 +20,7 @@ from opentrons_hardware.firmware_bindings.utils import (
     Int32Field,
     UInt32Field,
 )
+from opentrons_hardware.firmware_bindings.messages.fields import MoveStopConditionField
 
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
@@ -57,9 +58,9 @@ async def test_add_moves(
                 group_id=UInt8Field(group_id),
                 seq_id=UInt8Field(i),
                 duration=UInt32Field(duration),
-                request_stop_condition=UInt8Field(0),
-                acceleration=Int32Field(0),
-                velocity=Int32Field(0),
+                request_stop_condition=MoveStopConditionField(0),
+                acceleration_um=Int32Field(0),
+                velocity_mm=Int32Field(0),
             )
         )
         for i, duration in enumerate(durations)
@@ -123,7 +124,9 @@ async def test_move_integration(
     ]
     home_runner = MoveGroupRunner([home_move])
     position = await home_runner.run(can_messenger)
-    assert position == {motor_node: (0.0, 0.0) for motor_node in all_motor_nodes}
+    assert position == {
+        motor_node: (0.0, 0.0, False, False) for motor_node in all_motor_nodes
+    }
     # these moves test position accumulation to reasonably realistic values
     # and have to do it over a kind of long time so that the velocities are low
     # enough that the pipettes, with their extremely high steps/mm values,

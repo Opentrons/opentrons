@@ -1,4 +1,5 @@
 import { when } from 'jest-when'
+import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   thermocyclerPipetteCollision,
   pipetteIntoHeaterShakerLatchOpen,
@@ -10,6 +11,7 @@ import {
 } from '../utils'
 import {
   getInitialRobotStateStandard,
+  getInitialRobotStateWithOffDeckLabwareStandard,
   getRobotStateWithTipStandard,
   makeContext,
   getErrorResult,
@@ -19,7 +21,10 @@ import {
 } from '../fixtures'
 import { dispense } from '../commandCreators/atomic/dispense'
 import { InvariantContext, RobotState } from '../types'
-import type { AspDispAirgapParams as V3AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
+import type {
+  AspDispAirgapParams as V3AspDispAirgapParams,
+  DispenseParams,
+} from '@opentrons/shared-data/protocol/types/schemaV3'
 
 jest.mock('../utils/thermocyclerPipetteCollision')
 jest.mock('../utils/heaterShakerCollision')
@@ -45,6 +50,9 @@ const mockPipetteAdjacentHeaterShakerWhileShaking = pipetteAdjacentHeaterShakerW
 const mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette as jest.MockedFunction<
   typeof getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette
 >
+
+const FLEX_PIPETTE = 'p1000_single_gen3'
+const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
 
 describe('dispense', () => {
   let initialRobotState: RobotState
@@ -100,6 +108,27 @@ describe('dispense', () => {
         type: 'NO_TIP_ON_PIPETTE',
       })
     })
+    it('should return an error when dispensing from labware off deck', () => {
+      initialRobotState = getInitialRobotStateWithOffDeckLabwareStandard(
+        invariantContext
+      )
+      const result = dispense(
+        {
+          flowRate: 10,
+          offsetFromBottomMm: 5,
+          pipette: DEFAULT_PIPETTE,
+          volume: 50,
+          labware: SOURCE_LABWARE,
+          well: 'A1',
+        } as DispenseParams,
+        invariantContext,
+        initialRobotState
+      )
+      expect(getErrorResult(result).errors).toHaveLength(2)
+      expect(getErrorResult(result).errors[1]).toMatchObject({
+        type: 'LABWARE_OFF_DECK',
+      })
+    })
     it('dispense to nonexistent labware should throw error', () => {
       const result = dispense(
         { ...params, labware: 'someBadLabwareId' },
@@ -152,7 +181,59 @@ describe('dispense', () => {
         type: 'HEATER_SHAKER_LATCH_OPEN',
       })
     })
+    it('should return an error when dispensing into heater shaker with latch open for flex', () => {
+      if (FlexPipetteNameSpecs != null) {
+        invariantContext.pipetteEntities[
+          DEFAULT_PIPETTE
+        ].spec = FlexPipetteNameSpecs
+      }
+
+      mockPipetteIntoHeaterShakerLatchOpen.mockImplementationOnce(
+        (
+          modules: RobotState['modules'],
+          labware: RobotState['labware'],
+          labwareId: string
+        ) => {
+          expect(modules).toBe(robotStateWithTip.modules)
+          expect(labware).toBe(robotStateWithTip.labware)
+          expect(labwareId).toBe(SOURCE_LABWARE)
+          return true
+        }
+      )
+      const result = dispense(params, invariantContext, robotStateWithTip)
+      const res = getErrorResult(result)
+      expect(res.errors).toHaveLength(1)
+      expect(res.errors[0]).toMatchObject({
+        type: 'HEATER_SHAKER_LATCH_OPEN',
+      })
+    })
     it('should return an error when dispensing into heater-shaker when it is shaking', () => {
+      mockPipetteIntoHeaterShakerWhileShaking.mockImplementationOnce(
+        (
+          modules: RobotState['modules'],
+          labware: RobotState['labware'],
+          labwareId: string
+        ) => {
+          expect(modules).toBe(robotStateWithTip.modules)
+          expect(labware).toBe(robotStateWithTip.labware)
+          expect(labwareId).toBe(SOURCE_LABWARE)
+          return true
+        }
+      )
+      const result = dispense(params, invariantContext, robotStateWithTip)
+      const res = getErrorResult(result)
+      expect(res.errors).toHaveLength(1)
+      expect(res.errors[0]).toMatchObject({
+        type: 'HEATER_SHAKER_IS_SHAKING',
+      })
+    })
+    it('should return an error when dispensing into heater-shaker when it is shaking for flex', () => {
+      if (FlexPipetteNameSpecs != null) {
+        invariantContext.pipetteEntities[
+          DEFAULT_PIPETTE
+        ].spec = FlexPipetteNameSpecs
+      }
+
       mockPipetteIntoHeaterShakerWhileShaking.mockImplementationOnce(
         (
           modules: RobotState['modules'],

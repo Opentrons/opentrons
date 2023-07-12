@@ -20,7 +20,7 @@ async def test_cli(
     """
     Build an app using dummy versions, then build a test client and return it
     """
-    app = buildroot.get_app(
+    app = await buildroot.get_app(
         name_synchronizer=mock_name_synchronizer,
         system_version_file=version_file_path,
         config_file_override=otupdate_config,

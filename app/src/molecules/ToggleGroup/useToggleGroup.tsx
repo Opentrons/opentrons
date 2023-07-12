@@ -1,12 +1,13 @@
 import * as React from 'react'
 import { css } from 'styled-components'
-import { BORDERS, COLORS, Flex, SPACING } from '@opentrons/components'
 import {
-  blue,
-  lightGrey,
-  medGrey,
-} from '@opentrons/components/src/ui-style-constants/colors'
-import { PrimaryButton } from '../../atoms/buttons'
+  BORDERS,
+  COLORS,
+  Flex,
+  SPACING,
+  PrimaryButton,
+} from '@opentrons/components'
+import { useTrackEvent } from '../../redux/analytics'
 
 const BUTTON_GROUP_STYLES = css`
   border-radius: ${BORDERS.radiusSoftCorners};
@@ -28,19 +29,19 @@ const BUTTON_GROUP_STYLES = css`
     }
 
     &:hover {
-      background-color: ${lightGrey};
+      background-color: ${COLORS.fundamentalsBackground};
       color: ${COLORS.black};
       box-shadow: 0 0 0;
     }
 
     &.active {
-      background-color: ${blue};
+      background-color: ${COLORS.blueEnabled};
       color: ${COLORS.white};
     }
 
     &:disabled {
       background-color: inherit;
-      color: ${COLORS.disabled};
+      color: ${COLORS.errorDisabled};
     }
   }
 
@@ -56,28 +57,46 @@ const BUTTON_GROUP_STYLES = css`
 `
 
 const ACTIVE_STYLE = css`
-  padding-left: ${SPACING.spacing3};
-  padding-right: ${SPACING.spacing3};
-  background-color: ${blue};
+  padding-left: ${SPACING.spacing8};
+  padding-right: ${SPACING.spacing8};
+  background-color: ${COLORS.blueEnabled};
   color: ${COLORS.white};
   pointer-events: none;
 `
 
 const DEFAULT_STYLE = css`
-  padding-left: ${SPACING.spacing3};
-  padding-right: ${SPACING.spacing3};
+  padding-left: ${SPACING.spacing8};
+  padding-right: ${SPACING.spacing8};
   background-color: ${COLORS.white};
   color: ${COLORS.black};
-  border: 1px ${medGrey} solid;
+  border: 1px ${COLORS.medGreyEnabled} solid;
 `
 
 export const useToggleGroup = (
   left: string,
-  right: string
+  right: string,
+  trackEventName?: string
 ): [string, React.ReactNode] => {
-  const [selectedValue, setSelectedValue] = React.useState<
-    typeof left | typeof right
-  >(left)
+  const [selectedValue, setSelectedValue] = React.useState<string>(left)
+  const trackEvent = useTrackEvent()
+  const handleLeftClick = (): void => {
+    setSelectedValue(left)
+    if (trackEventName != null) {
+      trackEvent({
+        name: trackEventName,
+        properties: { view: 'list' },
+      })
+    }
+  }
+  const handleRightClick = (): void => {
+    setSelectedValue(right)
+    if (trackEventName != null) {
+      trackEvent({
+        name: trackEventName,
+        properties: { view: 'map' },
+      })
+    }
+  }
 
   return [
     selectedValue,
@@ -85,14 +104,16 @@ export const useToggleGroup = (
       <PrimaryButton
         css={selectedValue === left ? ACTIVE_STYLE : DEFAULT_STYLE}
         key={left}
-        onClick={() => setSelectedValue(left)}
+        onClick={handleLeftClick}
+        data-testid="useToggleGroup_leftButton"
       >
         {left}
       </PrimaryButton>
       <PrimaryButton
         css={selectedValue === right ? ACTIVE_STYLE : DEFAULT_STYLE}
         key={right}
-        onClick={() => setSelectedValue(right)}
+        onClick={handleRightClick}
+        data-testid="useToggleGroup_rightButton"
       >
         {right}
       </PrimaryButton>

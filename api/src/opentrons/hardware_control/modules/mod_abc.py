@@ -3,12 +3,13 @@ import asyncio
 import logging
 import re
 from pkg_resources import parse_version
-from typing import Mapping, Optional, cast, TypeVar
+from typing import ClassVar, Mapping, Optional, cast, TypeVar
+
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
-from opentrons.hardware_control.util import use_or_initialize_loop
 from opentrons.drivers.rpi_drivers.types import USBPort
+
 from ..execution_manager import ExecutionManager
-from .types import BundledFirmware, UploadFunction, LiveData
+from .types import BundledFirmware, UploadFunction, LiveData, ModuleType
 
 mod_log = logging.getLogger(__name__)
 
@@ -18,6 +19,8 @@ TaskPayload = TypeVar("TaskPayload")
 class AbstractModule(abc.ABC):
     """Defines the common methods of a module."""
 
+    MODULE_TYPE: ClassVar[ModuleType]
+
     @classmethod
     @abc.abstractmethod
     async def build(
@@ -25,30 +28,27 @@ class AbstractModule(abc.ABC):
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
+        hw_control_loop: asyncio.AbstractEventLoop,
+        poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
         sim_model: Optional[str] = None,
-        **kwargs: float,
     ) -> "AbstractModule":
         """Modules should always be created using this factory.
 
         This lets the (perhaps blocking) work of connecting to and initializing
         a module be in a place that can be async.
         """
-        pass
 
     def __init__(
         self,
         port: str,
         usb_port: USBPort,
         execution_manager: ExecutionManager,
-        simulating: bool = False,
-        loop: Optional[asyncio.AbstractEventLoop] = None,
-        sim_model: Optional[str] = None,
+        hw_control_loop: asyncio.AbstractEventLoop,
     ) -> None:
         self._port = port
         self._usb_port = usb_port
-        self._loop = use_or_initialize_loop(loop)
+        self._loop = hw_control_loop
         self._execution_manager = execution_manager
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
 
@@ -56,11 +56,11 @@ class AbstractModule(abc.ABC):
     def sort_key(inst: "AbstractModule") -> int:
         usb_port = inst.usb_port
 
-        if usb_port.hub is not None:
-            primary_port = usb_port.hub
-            secondary_port = usb_port.port_number
+        primary_port = usb_port.port_number
+
+        if usb_port.hub_port is not None:
+            secondary_port = usb_port.hub_port
         else:
-            primary_port = usb_port.port_number
             secondary_port = 0
 
         return primary_port * 1000 + secondary_port
@@ -73,12 +73,7 @@ class AbstractModule(abc.ABC):
         """Get absolute path to bundled version of module fw if available."""
         if not IS_ROBOT:
             return None
-        name_to_fw_file_prefix = {
-            "tempdeck": "temperature-module",
-            "magdeck": "magnetic-module",
-        }
-        name = self.name()
-        file_prefix = name_to_fw_file_prefix.get(name, name)
+        file_prefix = self.firmware_prefix()
 
         MODULE_FW_RE = re.compile(f"^{file_prefix}@v(.*)[.](hex|bin)$")
         for fw_resource in ROBOT_FIRMWARE_DIR.iterdir():  # type: ignore
@@ -168,7 +163,12 @@ class AbstractModule(abc.ABC):
     @classmethod
     @abc.abstractmethod
     def name(cls) -> str:
-        """A shortname used for looking up firmware, among other things"""
+        """A shortname used for matching usb ports, among other things"""
+        pass
+
+    @abc.abstractmethod
+    def firmware_prefix(self) -> str:
+        """The prefix used for looking up firmware"""
         pass
 
     @abc.abstractmethod

@@ -14,21 +14,22 @@ import {
 
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
+import { INFO_TOAST } from '../../../../atoms/Toast'
+import { useToaster } from '../../../../organisms/ToasterOven'
 import { downloadLogs } from '../../../../redux/shell/robot-logs/actions'
 import { getRobotLogsDownloading } from '../../../../redux/shell/robot-logs/selectors'
 import { CONNECTABLE } from '../../../../redux/discovery'
 import { useRobot } from '../../hooks'
 
+import type { IconProps } from '@opentrons/components'
 import type { Dispatch } from '../../../../redux/types'
 
 interface TroubleshootingProps {
   robotName: string
-  updateDownloadLogsStatus: (status: boolean) => void
 }
 
 export function Troubleshooting({
   robotName,
-  updateDownloadLogsStatus,
 }: TroubleshootingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const dispatch = useDispatch<Dispatch>()
@@ -36,37 +37,46 @@ export function Troubleshooting({
   const controlDisabled = robot?.status !== CONNECTABLE
   const logsAvailable = robot?.health != null && robot.health.logs
   const robotLogsDownloading = useSelector(getRobotLogsDownloading)
+  const [toastId, setToastId] = React.useState<string | null>(null)
+  const { makeToast, eatToast } = useToaster()
+  const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
 
   const handleClick: React.MouseEventHandler<HTMLButtonElement> = () => {
-    updateDownloadLogsStatus(robotLogsDownloading)
+    const newToastId = makeToast(t('downloading_logs'), INFO_TOAST, {
+      icon: toastIcon,
+    })
+    setToastId(newToastId)
     if (!controlDisabled && robot?.status === CONNECTABLE)
       dispatch(downloadLogs(robot))
   }
 
   React.useEffect(() => {
-    updateDownloadLogsStatus(robotLogsDownloading)
-  }, [robotLogsDownloading, updateDownloadLogsStatus])
+    if (!robotLogsDownloading && toastId != null) {
+      eatToast(toastId)
+      setToastId(null)
+    }
+  }, [robotLogsDownloading, eatToast, toastId])
 
   return (
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginTop="2.5rem"
+      marginTop={SPACING.spacing24}
     >
       <Box width="70%">
         <StyledText
-          as="h2"
+          as="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing20}
         >
-          {t('update_robot_software_troubleshooting')}
+          {t('troubleshooting')}
         </StyledText>
         <StyledText
           as="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           data-testid="RobotSettings_Troubleshooting"
         >
-          {t('update_robot_software_download_logs')}
+          {t('download_logs')}
         </StyledText>
       </Box>
       <TertiaryButton
@@ -77,7 +87,7 @@ export function Troubleshooting({
         onClick={handleClick}
         id="AdvancedSettings_downloadLogsButton"
       >
-        {t('update_robot_software_download_logs')}
+        {t('download_logs')}
       </TertiaryButton>
     </Flex>
   )

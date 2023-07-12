@@ -5,42 +5,44 @@ import { useTranslation } from 'react-i18next'
 import {
   Box,
   Flex,
-  useInterval,
   ALIGN_CENTER,
   ALIGN_START,
-  C_MED_LIGHT_GRAY,
+  BORDERS,
   COLORS,
-  C_WHITE,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   JUSTIFY_SPACE_BETWEEN,
-  SPACING,
-  TYPOGRAPHY,
   POSITION_ABSOLUTE,
   POSITION_RELATIVE,
-  useHoverTooltip,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
+import { useAuthorization } from '@opentrons/react-api-client'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import { ToggleButton, PrimaryButton } from '../../atoms/buttons'
-import { Tooltip } from '../../atoms/Tooltip'
+import FLEX_PNG from '../../assets/images/FLEX.png'
+import { ToggleButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { useDispatchApiRequest } from '../../redux/robot-api'
-import { fetchLights } from '../../redux/robot-controls'
-import { ChooseProtocolSlideout } from '../ChooseProtocolSlideout'
-import { Portal } from '../../App/portal'
-import { CONNECTABLE } from '../../redux/discovery'
-import { useCurrentRunId } from '../ProtocolUpload/hooks'
+import { getConfig } from '../../redux/config'
+import {
+  CONNECTABLE,
+  getRobotAddressesByName,
+  getRobotModelByName,
+  OPENTRONS_USB,
+} from '../../redux/discovery'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import { RobotStatusBanner } from './RobotStatusBanner'
+import { RobotStatusHeader } from './RobotStatusHeader'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
-import { useLights, useRobot, useRunStatuses } from './hooks'
-import { getBuildrootUpdateDisplayInfo } from '../../redux/buildroot'
+import {
+  useIsRobotBusy,
+  useIsRobotViewable,
+  useLights,
+  useRobot,
+} from './hooks'
+import { CalibrationStatusBanner } from './CalibrationStatusBanner'
 
 import type { State } from '../../redux/types'
-
-const EQUIPMENT_POLL_MS = 5000
 
 interface RobotOverviewProps {
   robotName: string
@@ -49,117 +51,139 @@ interface RobotOverviewProps {
 export function RobotOverview({
   robotName,
 }: RobotOverviewProps): JSX.Element | null {
-  const { t } = useTranslation(['device_details', 'shared'])
-  const [targetProps, tooltipProps] = useHoverTooltip()
-  const [dispatchRequest] = useDispatchApiRequest()
-  const isRobotOnWrongVersionOfSoftware = ['upgrade', 'downgrade'].includes(
-    useSelector((state: State) => {
-      return getBuildrootUpdateDisplayInfo(state, robotName)
-    })?.autoUpdateAction
-  )
+  const { t } = useTranslation([
+    'device_details',
+    'shared',
+    'robot_calibration',
+  ])
+
+  const isRobotBusy = useIsRobotBusy({ poll: true })
 
   const robot = useRobot(robotName)
-  const [
-    showChooseProtocolSlideout,
-    setShowChooseProtocolSlideout,
-  ] = React.useState<boolean>(false)
-  const { lightsOn, toggleLights } = useLights(robotName)
-  const { isRunTerminal } = useRunStatuses()
-  const currentRunId = useCurrentRunId()
-
-  useInterval(
-    () => {
-      dispatchRequest(fetchLights(robotName))
-    },
-    EQUIPMENT_POLL_MS,
-    true
+  const robotModel = useSelector((state: State) =>
+    getRobotModelByName(state, robot?.name ?? '')
   )
+  const isRobotViewable = useIsRobotViewable(robot?.name ?? '')
+  const { lightsOn, toggleLights } = useLights()
+
+  const userId = useSelector(getConfig)?.support?.userId ?? 'Opentrons-user'
+
+  const addresses = useSelector((state: State) =>
+    getRobotAddressesByName(state, robot?.name ?? '')
+  )
+  const isUsbConnected = addresses.some(address => address.ip === OPENTRONS_USB)
+
+  // TODO(bh, 2023-05-31): remove registration/authorization here when AppApiHostProvider exists
+  useAuthorization({
+    subject: 'Opentrons',
+    agent:
+      // define the registration agent as usb if any usb hostname address exists
+      // may change when ODD no longer needs to rely on this
+      isUsbConnected ? 'com.opentrons.app.usb' : 'com.opentrons.app',
+    agentId: userId,
+  })
 
   return robot != null ? (
-    <Flex
-      alignItems={ALIGN_START}
-      backgroundColor={C_WHITE}
-      borderBottom={`1px solid ${C_MED_LIGHT_GRAY}`}
-      flexDirection={DIRECTION_ROW}
-      marginBottom={SPACING.spacing4}
-      padding={SPACING.spacing3}
-      position={POSITION_RELATIVE}
-      width="100%"
-    >
-      <img
-        src={OT2_PNG}
-        style={{ paddingTop: SPACING.spacing3, width: '6rem' }}
-        id="RobotOverview_robotImage"
-      />
-      <Box padding={SPACING.spacing3} width="100%">
-        <ReachableBanner robot={robot} />
-        {robot != null ? (
-          <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
-        ) : null}
-        {robot?.status === CONNECTABLE ? (
-          <RobotStatusBanner name={robot.name} local={robot.local} />
-        ) : null}
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
-          <Flex
-            flexDirection={DIRECTION_COLUMN}
-            paddingRight={SPACING.spacing4}
-          >
-            <StyledText
-              as="h6"
-              color={COLORS.darkGreyEnabled}
-              paddingBottom={SPACING.spacing1}
-              textTransform={TYPOGRAPHY.textTransformUppercase}
-            >
-              {t('controls')}
-            </StyledText>
-            <Flex alignItems={ALIGN_CENTER}>
-              <ToggleButton
-                label={t('lights')}
-                toggledOn={lightsOn != null ? lightsOn : false}
-                disabled={lightsOn === null || robot.status !== CONNECTABLE}
-                onClick={toggleLights}
-                height=".875rem"
-                width="1.375rem"
-                marginRight={SPACING.spacing3}
-                id={`RobotOverview_lightsToggle`}
-              />
-              <StyledText as="p">{t('lights')}</StyledText>
-            </Flex>
+    <>
+      <Flex
+        alignItems={ALIGN_START}
+        backgroundColor={COLORS.white}
+        flexDirection={DIRECTION_COLUMN}
+        paddingTop={SPACING.spacing8}
+        position={POSITION_RELATIVE}
+        width="100%"
+      >
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          marginBottom={SPACING.spacing16}
+          width="100%"
+        >
+          <Flex>
+            <img
+              src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
+              style={{
+                width: '6rem',
+                height: '5.4375rem',
+              }}
+              id="RobotOverview_robotImage"
+            />
           </Flex>
-          <PrimaryButton
-            {...targetProps}
-            marginBottom={SPACING.spacing4}
-            textTransform={TYPOGRAPHY.textTransformNone}
-            disabled={
-              (currentRunId != null ? !isRunTerminal : false) ||
-              robot.status !== CONNECTABLE ||
-              isRobotOnWrongVersionOfSoftware
-            }
-            onClick={() => {
-              setShowChooseProtocolSlideout(true)
-            }}
-          >
-            {t('run_a_protocol')}
-          </PrimaryButton>
-          {isRobotOnWrongVersionOfSoftware && (
-            <Tooltip tooltipProps={tooltipProps}>
-              {t('shared:a_software_update_is_available')}
-            </Tooltip>
-          )}
-          {robot.status === CONNECTABLE ? (
-            <Portal level="top">
-              <ChooseProtocolSlideout
+          <Box padding={SPACING.spacing8} width="100%">
+            <Box marginBottom={SPACING.spacing8}>
+              <ReachableBanner robot={robot} />
+            </Box>
+            {robot != null ? (
+              <UpdateRobotBanner
                 robot={robot}
-                showSlideout={showChooseProtocolSlideout}
-                onCloseClick={() => setShowChooseProtocolSlideout(false)}
+                marginBottom={SPACING.spacing8}
               />
-            </Portal>
-          ) : null}
+            ) : null}
+            <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+              <RobotStatusHeader
+                name={robot.name}
+                local={robot.local}
+                robotModel={robotModel}
+              />
+              <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  paddingRight={SPACING.spacing16}
+                >
+                  <StyledText
+                    as="h6"
+                    color={COLORS.darkGreyEnabled}
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    paddingBottom={SPACING.spacing4}
+                    textTransform={TYPOGRAPHY.textTransformUppercase}
+                  >
+                    {t('controls')}
+                  </StyledText>
+                  <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
+                    <Flex paddingBottom={SPACING.spacing4}>
+                      <ToggleButton
+                        label={t('lights')}
+                        toggledOn={lightsOn != null ? lightsOn : false}
+                        disabled={
+                          lightsOn === null || robot.status !== CONNECTABLE
+                        }
+                        onClick={toggleLights}
+                        height="0.813rem"
+                        id="RobotOverview_lightsToggle"
+                      />
+                    </Flex>
+                    <StyledText
+                      as="p"
+                      color={
+                        isRobotViewable
+                          ? COLORS.darkBlackEnabled
+                          : COLORS.errorDisabled
+                      }
+                    >
+                      {t('lights')}
+                    </StyledText>
+                  </Flex>
+                </Flex>
+              </Flex>
+            </Flex>
+          </Box>
+          <Box
+            position={POSITION_ABSOLUTE}
+            top={SPACING.spacing4}
+            right="-.75rem"
+          >
+            <RobotOverviewOverflowMenu robot={robot} />
+          </Box>
         </Flex>
-      </Box>
-      <Box position={POSITION_ABSOLUTE} top={SPACING.spacing2} right="-.75rem">
-        <RobotOverviewOverflowMenu robot={robot} />
-      </Box>
-    </Flex>
+      </Flex>
+      {robotModel === 'OT-2' && !isRobotBusy ? (
+        <CalibrationStatusBanner robotName={robotName} />
+      ) : null}
+      <Flex
+        borderBottom={BORDERS.lineBorder}
+        marginBottom={SPACING.spacing16}
+        position={POSITION_RELATIVE}
+        width="100%"
+      />
+    </>
   ) : null
 }

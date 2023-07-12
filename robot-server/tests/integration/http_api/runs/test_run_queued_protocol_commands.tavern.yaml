@@ -1,0 +1,191 @@
+test_name: Make sure multiple commands can be queued and played on a basic run
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Create empty run
+    request:
+      url: '{ot2_server_base_url}/runs'
+      json:
+        data: {}
+      method: POST
+    response:
+      strict:
+        - json:off
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          status: idle
+          current: true
+      save:
+        json:
+          run_id: data.id
+
+  - name: Create protocol commands
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      method: POST
+      json:
+        data:
+          commandType: 'comment'
+          intent: 'protocol'
+          params:
+            message: 'test 1'
+    response:
+      status_code: 201
+
+  - name: Create protocol commands
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      method: POST
+      json:
+        data:
+          commandType: 'comment'
+          intent: 'protocol'
+          params:
+            message: 'test 2'
+    response:
+      status_code: 201
+
+  - name: Create protocol commands
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      method: POST
+      json:
+        data:
+          commandType: 'comment'
+          intent: 'protocol'
+          params:
+            message: 'test 3'
+    response:
+      status_code: 201
+
+  - name: Create protocol commands
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      method: POST
+      json:
+        data:
+          commandType: 'comment'
+          intent: 'protocol'
+          params:
+            message: 'test 4'
+    response:
+      status_code: 201
+
+  - name: Get run
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          actions: []
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          current: True
+          errors: []
+          id: '{run_id}'
+          labware:
+            - id: 'fixedTrash'
+              loadName: 'opentrons_1_trash_1100ml_fixed'
+              definitionUri: 'opentrons/opentrons_1_trash_1100ml_fixed/1'
+              location:
+                slotName: '12'
+          labwareOffsets: []
+          liquids: []
+          modules: []
+          pipettes: []
+          status: 'idle'
+
+  - name: Play the run
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
+      method: POST
+      json:
+        data:
+          actionType: play
+    response:
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          actionType: play
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+      save:
+        json:
+          play_action_id: data.id
+
+  # While the protocol is ongoing, several fields (like labware)
+  # are nondeterministic depending on request timing.
+  # Wait for the protocol to complete so things settle.
+  - name: Wait for the protocol to complete
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}'
+      method: GET
+    response:
+      status_code: 200
+      strict:
+        - json:off
+      json:
+        data:
+          status: succeeded
+
+  - name: Verify commands succeeded with the expected results
+    request:
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links:
+          current: !anydict
+        meta:
+          cursor: 0
+          totalLength: 4
+        data:
+          - id: !anystr
+            key: !anystr
+            commandType: comment
+            status: succeeded
+            intent: protocol
+            params:
+              message: 'test 1'
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          - id: !anystr
+            key: !anystr
+            commandType: comment
+            status: succeeded
+            intent: protocol
+            params:
+              message: 'test 2'
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          - id: !anystr
+            key: !anystr
+            commandType: comment
+            status: succeeded
+            intent: protocol
+            params:
+              message: 'test 3'
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          - id: !anystr
+            key: !anystr
+            commandType: comment
+            status: succeeded
+            intent: protocol
+            params:
+              message: 'test 4'
+            createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            startedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+            completedAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"

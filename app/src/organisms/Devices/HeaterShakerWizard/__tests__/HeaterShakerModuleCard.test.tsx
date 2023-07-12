@@ -30,7 +30,7 @@ describe('HeaterShakerModuleCard', () => {
 
   it('renders the correct info', () => {
     const { getByText, getByAltText, getByLabelText } = render(props)
-    getByText('usb port 1')
+    getByText('usb-1')
     getByText('Heater-Shaker Module GEN1')
     getByText('mock heater shaker module data')
     getByAltText('Heater-Shaker')

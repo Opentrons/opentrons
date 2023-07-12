@@ -3,7 +3,6 @@ import {
   ANALYTICS_PIPETTE_OFFSET_STARTED,
   ANALYTICS_TIP_LENGTH_STARTED,
 } from './constants'
-import * as CalUITypes from '../../organisms/CalibrationPanels/types'
 
 import type { CalibrationCheckComparisonsPerCalibration } from '../sessions/types'
 import type { DeckCalibrationStatus } from '../calibration/types'
@@ -101,7 +100,6 @@ export type TrackEventArgs = [AnalyticsEvent | null, AnalyticsConfig | null]
 export interface PipetteOffsetStartedAnalyticsAction {
   type: typeof ANALYTICS_PIPETTE_OFFSET_STARTED
   payload: {
-    intent: CalUITypes.PipetteOffsetIntent
     mount: string
     calBlock: boolean
     shouldPerformTipLength: boolean
@@ -112,7 +110,6 @@ export interface PipetteOffsetStartedAnalyticsAction {
 export interface TipLengthStartedAnalyticsAction {
   type: typeof ANALYTICS_TIP_LENGTH_STARTED
   payload: {
-    intent: CalUITypes.PipetteOffsetIntent
     mount: string
     calBlock: boolean
     tipRackURI: string

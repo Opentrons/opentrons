@@ -4,21 +4,16 @@ from dataclasses import dataclass
 import numpy as np
 from logging import getLogger
 from enum import Enum, unique
-from opentrons_hardware.firmware_bindings.constants import NodeId, PipetteTipActionType
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    PipetteTipActionType,
+    MoveStopCondition as MoveStopCondition,
+)
 
 LOG = getLogger(__name__)
 
 
 NodeIdMotionValues = Dict[NodeId, np.float64]
-
-
-@unique
-class MoveStopCondition(int, Enum):
-    """Move Stop Condition."""
-
-    none = 0x0
-    limit_switch = 0x1
-    cap_sensor = 0x2
 
 
 @unique
@@ -28,6 +23,7 @@ class MoveType(int, Enum):
     linear = 0x0
     home = 0x1
     calibration = 0x2
+    grip = 0x3
 
     @classmethod
     def get_move_type(cls, condition: MoveStopCondition) -> "MoveType":
@@ -35,7 +31,11 @@ class MoveType(int, Enum):
         mapping = {
             MoveStopCondition.none: cls.linear,
             MoveStopCondition.limit_switch: cls.home,
-            MoveStopCondition.cap_sensor: cls.calibration,
+            MoveStopCondition.sync_line: cls.calibration,
+            MoveStopCondition.encoder_position: cls.linear,
+            MoveStopCondition.gripper_force: cls.grip,
+            MoveStopCondition.stall: cls.linear,
+            MoveStopCondition.limit_switch_backoff: cls.linear,
         }
         return mapping[condition]
 
@@ -68,9 +68,10 @@ class MoveGroupSingleGripperStep:
 
     duration_sec: np.float64
     pwm_duty_cycle: np.float32
+    encoder_position_um: np.int32
     pwm_frequency: np.float32 = np.float32(320000)
-    stop_condition: MoveStopCondition = MoveStopCondition.none
-    move_type: MoveType = MoveType.linear
+    stop_condition: MoveStopCondition = MoveStopCondition.gripper_force
+    move_type: MoveType = MoveType.grip
 
 
 SingleMoveStep = Union[
@@ -95,6 +96,8 @@ MAX_SPEEDS = {
     NodeId.pipette_right: 2,
 }
 
+BACKOFF_MAX_MM = 5
+
 
 def create_step(
     distance: Dict[NodeId, np.float64],
@@ -115,6 +118,12 @@ def create_step(
         A Move
     """
     ordered_nodes = sorted(present_nodes, key=lambda node: node.value)
+    # Gripper G cannont process this type of move and this will
+    # result in numerous move set timeouts if the gripper is attached
+    # possible TODO if requested is to also add a move group step that
+    # adds a MoveGroupeSingleGripperStep
+    ordered_nodes = list([n for n in present_nodes if n != NodeId.gripper_g])
+
     step: MoveGroupStep = {}
     for axis_node in ordered_nodes:
         step[axis_node] = MoveGroupSingleAxisStep(
@@ -126,6 +135,22 @@ def create_step(
             move_type=MoveType.get_move_type(stop_condition),
         )
     return step
+
+
+def create_backoff_step(velocity: Dict[NodeId, np.float64]) -> MoveGroupStep:
+    """Create a sequence to back away from the limit switch and re-home."""
+    backoff: MoveGroupStep = {}
+
+    for axis, v in velocity.items():
+        backoff[axis] = MoveGroupSingleAxisStep(
+            distance_mm=np.float64(BACKOFF_MAX_MM),
+            acceleration_mm_sec_sq=np.float64(0),
+            velocity_mm_sec=abs(v),
+            duration_sec=np.float64(BACKOFF_MAX_MM) / abs(v),
+            stop_condition=MoveStopCondition.limit_switch_backoff,
+            move_type=MoveType.linear,
+        )
+    return backoff
 
 
 def create_home_step(
@@ -147,22 +172,21 @@ def create_home_step(
 
 def create_tip_action_step(
     velocity: Dict[NodeId, np.float64],
-    duration: np.float64,
+    distance: Dict[NodeId, np.float64],
     present_nodes: Iterable[NodeId],
     action: PipetteTipActionType,
 ) -> MoveGroupStep:
     """Creates a step for tip handling actions that require motor movement."""
-    ordered_nodes = sorted(present_nodes, key=lambda node: node.value)
     step: MoveGroupStep = {}
     stop_condition = (
         MoveStopCondition.limit_switch
-        if action == PipetteTipActionType.drop
+        if action == PipetteTipActionType.home
         else MoveStopCondition.none
     )
-    for axis_node in ordered_nodes:
+    for axis_node in present_nodes:
         step[axis_node] = MoveGroupTipActionStep(
-            velocity_mm_sec=velocity.get(axis_node, np.float64(0)),
-            duration_sec=duration,
+            velocity_mm_sec=velocity[axis_node],
+            duration_sec=abs(distance[axis_node] / velocity[axis_node]),
             stop_condition=stop_condition,
             action=action,
         )
@@ -172,9 +196,10 @@ def create_tip_action_step(
 def create_gripper_jaw_step(
     duration: np.float64,
     duty_cycle: np.float32,
+    encoder_position_um: np.int32 = np.int32(0),
     frequency: np.float32 = np.float32(320000),
-    stop_condition: MoveStopCondition = MoveStopCondition.none,
-    move_type: MoveType = MoveType.linear,
+    stop_condition: MoveStopCondition = MoveStopCondition.gripper_force,
+    move_type: MoveType = MoveType.grip,
 ) -> MoveGroupStep:
     """Creates a step for gripper jaw action."""
     step: MoveGroupStep = {}
@@ -184,5 +209,6 @@ def create_gripper_jaw_step(
         pwm_duty_cycle=duty_cycle,
         stop_condition=stop_condition,
         move_type=move_type,
+        encoder_position_um=encoder_position_um,
     )
     return step

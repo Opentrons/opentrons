@@ -20,49 +20,48 @@ import { GeneralSettings } from './GeneralSettings'
 import { PrivacySettings } from './PrivacySettings'
 import { AdvancedSettings } from './AdvancedSettings'
 import { FeatureFlags } from '../../organisms/AppSettings/FeatureFlags'
-import { NavTab } from '../../atoms/NavTab'
+import { NavTab } from '../../molecules/NavTab'
 import { Line } from '../../atoms/structure'
 
-import type { NavRouteParams, AppSettingsTab } from '../../App/types'
+import type { DesktopRouteParams, AppSettingsTab } from '../../App/types'
 
 export function AppSettings(): JSX.Element {
   const { t } = useTranslation('app_settings')
   const devToolsOn = useSelector(Config.getDevtoolsEnabled)
-  const { appSettingsTab } = useParams<NavRouteParams>()
+  const { appSettingsTab } = useParams<DesktopRouteParams>()
 
   const appSettingsContentByTab: {
-    [K in AppSettingsTab]: () => JSX.Element
+    [K in AppSettingsTab]: JSX.Element
   } = {
-    general: GeneralSettings,
-    privacy: PrivacySettings,
-    advanced: AdvancedSettings,
-    'feature-flags': FeatureFlags,
+    general: <GeneralSettings />,
+    privacy: <PrivacySettings />,
+    advanced: <AdvancedSettings />,
+    'feature-flags': <FeatureFlags />,
   }
 
-  const AppSettingsContent =
-    appSettingsContentByTab[appSettingsTab] ??
+  const appSettingsContent = appSettingsContentByTab[appSettingsTab] ?? (
     // default to the general tab if no tab or nonexistent tab is passed as a param
-    (() => <Redirect to={`/app-settings/general`} />)
+    <Redirect to="/app-settings/general" />
+  )
 
   return (
-    <Flex paddingX={SPACING.spacing4} paddingY={SPACING.spacing4}>
+    <Flex paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
       <Box
         backgroundColor={COLORS.white}
         height="100%"
         width="100%"
-        margin={SPACING.spacing4}
-        border={`${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey}`}
+        border={`1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled}`}
         borderRadius={BORDERS.radiusSoftCorners}
         minHeight="95%"
       >
-        <Box padding={SPACING.spacing4} paddingBottom="0">
-          <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing5}>
+        <Box padding={SPACING.spacing16} paddingBottom="0">
+          <Text css={TYPOGRAPHY.h1Default} paddingBottom={SPACING.spacing24}>
             {t('app_settings')}
           </Text>
           <Flex
             alignItems={ALIGN_START}
             flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacingM}
+            gridGap={SPACING.spacing20}
           >
             <NavTab to="/app-settings/general" tabName={t('general')} />
             <NavTab to="/app-settings/privacy" tabName={t('privacy')} />
@@ -76,7 +75,7 @@ export function AppSettings(): JSX.Element {
           </Flex>
         </Box>
         <Line />
-        <AppSettingsContent />
+        {appSettingsContent}
       </Box>
     </Flex>
   )

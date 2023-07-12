@@ -4,10 +4,11 @@ from mock import ANY, patch, call
 from typing import List, Tuple, Dict, Any
 from opentrons import config
 from opentrons.types import Mount, Point
-from opentrons.hardware_control.instruments import pipette
+from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.protocol_api.labware import get_labware_definition
 from opentrons.config.pipette_config import load
-from opentrons.calibration_storage import types as cal_types
+from opentrons.util.helpers import utc_now
+from opentrons.calibration_storage import types as cal_types, models
 
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command_definitions import CalibrationCommand
@@ -15,10 +16,12 @@ from robot_server.robot.calibration.tip_length.user_flow import TipCalibrationUs
 
 stub_jog_data = {"vector": Point(1, 1, 1)}
 
-PIP_CAL = cal_types.PipetteOffsetByPipetteMount(
+PIP_CAL = models.v1.InstrumentOffsetModel(
     offset=[0, 0, 0],
+    tiprack="some_tiprack",
+    uri="custom/some_tiprack/1",
     source=cal_types.SourceType.user,
-    status=cal_types.CalibrationStatus(),
+    last_modified=utc_now(),
 )
 
 pipette_map = {
@@ -115,6 +118,19 @@ def mock_user_flow_with_custom_tiprack(mock_hw, custom_tiprack_def, request):
         mount=mount,
         has_calibration_block=has_calibration_block,
         tip_rack=custom_tiprack_def,
+    )
+
+    yield m
+
+
+@pytest.fixture(params=[True, False])
+def mock_user_flow_with_default_tiprack(mock_hw, request):
+    has_calibration_block = request.param
+    mount = next(k for k, v in mock_hw.hardware_instruments.items() if v)
+    m = TipCalibrationUserFlow(
+        hardware=mock_hw,
+        mount=mount,
+        has_calibration_block=has_calibration_block,
     )
 
     yield m
@@ -286,7 +302,7 @@ async def test_get_reference_location(mock_user_flow_all_combos):
 
 async def test_save_offsets(mock_user_flow):
     with patch(
-        "opentrons.calibration_storage.modify.create_tip_length_data"
+        "robot_server.robot.calibration.util.save_tip_length_calibration"
     ) as create_tip_length_data_patch:
         uf = mock_user_flow
         uf._current_state = "measuringNozzleOffset"
@@ -307,7 +323,9 @@ async def test_save_offsets(mock_user_flow):
             critical_point=uf.critical_point_override,
         )
         await uf.save_offset()
-        create_tip_length_data_patch.assert_called_with(ANY, 30)
+        create_tip_length_data_patch.assert_called_with(
+            pipette_id="testId", tip_length_offset=30, tip_rack=ANY
+        )
 
 
 async def test_save_custom_tiprack_def(
@@ -326,6 +344,12 @@ async def test_save_custom_tiprack_def(
     assert os.path.exists(
         config.get_custom_tiprack_def_path() / "custom/minimal_labware_def/1.json"
     )
+
+
+async def test_default_tiprack_def(mock_user_flow_with_default_tiprack):
+    uf = mock_user_flow_with_default_tiprack
+
+    assert uf._tip_rack.load_name == "opentrons_96_tiprack_300ul"
 
 
 @pytest.mark.parametrize(argnames="mount", argvalues=[Mount.RIGHT, Mount.LEFT])

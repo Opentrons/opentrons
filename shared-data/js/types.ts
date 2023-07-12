@@ -13,14 +13,29 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
   GEN1,
   GEN2,
+  GEN3,
   LEFT,
   RIGHT,
+  GRIPPER_V1,
+  GRIPPER_V1_1,
+  MAGNETIC_BLOCK_V1,
 } from './constants'
 import type { INode } from 'svgson'
 import type { RunTimeCommand } from '../protocol'
 import type { PipetteName } from './pipettes'
+import { LabwareLocation } from '../protocol/types/schemaV6/command/setup'
+import { EXTENSION } from '.'
+
+export type RobotType = 'OT-2 Standard' | 'OT-3 Standard'
+
+export interface RobotDefinition {
+  displayName: string
+  robotType: RobotType
+  models: string[]
+}
 
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export interface WellDefinition {
@@ -171,6 +186,7 @@ export type ModuleType =
   | typeof TEMPERATURE_MODULE_TYPE
   | typeof THERMOCYCLER_MODULE_TYPE
   | typeof HEATERSHAKER_MODULE_TYPE
+  | typeof MAGNETIC_BLOCK_TYPE
 
 // ModuleModel corresponds to top-level keys in shared-data/module/definitions/2
 export type MagneticModuleModel =
@@ -187,11 +203,16 @@ export type ThermocyclerModuleModel =
 
 export type HeaterShakerModuleModel = typeof HEATERSHAKER_MODULE_V1
 
+export type MagneticBlockModel = typeof MAGNETIC_BLOCK_V1
+
 export type ModuleModel =
   | MagneticModuleModel
   | TemperatureModuleModel
   | ThermocyclerModuleModel
   | HeaterShakerModuleModel
+  | MagneticBlockModel
+
+export type GripperModel = typeof GRIPPER_V1 | typeof GRIPPER_V1_1
 
 export type ModuleModelWithLegacy =
   | ModuleModel
@@ -256,12 +277,6 @@ export interface DeckMetadata {
   tags: string[]
 }
 
-export interface DeckLayerFeature {
-  footprint: string
-}
-
-export type DeckLayer = DeckLayerFeature[]
-
 export interface DeckDefinition {
   otId: string
   cornerOffsetFromOrigin: CoordinateTuple
@@ -269,7 +284,7 @@ export interface DeckDefinition {
   robot: DeckRobot
   locations: DeckLocations
   metadata: DeckMetadata
-  layers: Record<string, DeckLayer>
+  layers: INode[]
 }
 
 export interface ModuleDimensions {
@@ -310,11 +325,7 @@ export interface ModuleDefinition {
   twoDimensionalRendering: INode
 }
 
-export type AffineTransformMatrix = [
-  [number, number, number],
-  [number, number, number],
-  [number, number, number]
-]
+export type AffineTransformMatrix = number[][]
 
 export interface SlotTransforms {
   [deckOtId: string]: {
@@ -326,12 +337,12 @@ export interface SlotTransforms {
 
 export type ModuleOrientation = 'left' | 'right'
 
-export type PipetteChannels = 1 | 8
+export type PipetteChannels = 1 | 8 | 96
 
-export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2
+export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof GEN3
 
 export type PipetteMount = typeof LEFT | typeof RIGHT
-
+export type GantryMount = typeof LEFT | typeof RIGHT | typeof EXTENSION
 export interface FlowRateSpec {
   value: number
   min: number
@@ -393,10 +404,25 @@ export interface LoadedLabware {
   id: string
   loadName: string
   definitionUri: string
-  location: {
-    slotName: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
-  }
+  location: LabwareLocation
+  offsetId?: string
+  displayName?: string
 }
+export interface LoadedModule {
+  id: string
+  model: ModuleModel
+  location: {
+    slotName: string
+  }
+  serialNumber: string
+}
+export interface Liquid {
+  id: string
+  displayName: string
+  description: string
+  displayColor?: string
+}
+
 export interface AnalysisError {
   id: string
   detail: string
@@ -410,8 +436,11 @@ export interface CompletedProtocolAnalysis {
   result: 'ok' | 'not-ok' | 'error'
   pipettes: LoadedPipette[]
   labware: LoadedLabware[]
+  modules: LoadedModule[]
+  liquids: Liquid[]
   commands: RunTimeCommand[]
   errors: AnalysisError[]
+  robotType?: RobotType
 }
 
 export interface ResourceFile {
@@ -422,6 +451,7 @@ export interface ProtocolResource {
   id: string
   createdAt: string
   protocolType: 'json' | 'python'
+  robotType: RobotType
   metadata: ProtocolMetadata
   analysisSummaries: ProtocolAnalysisSummary[]
   files: ResourceFile[]
@@ -431,13 +461,42 @@ export interface ProtocolResource {
 export interface ProtocolAnalysesResource {
   analyses: Array<PendingProtocolAnalysis | CompletedProtocolAnalysis>
 }
+export type MotorAxis =
+  | 'x'
+  | 'y'
+  | 'leftZ'
+  | 'rightZ'
+  | 'leftPlunger'
+  | 'rightPlunger'
 
-export type MotorAxis = Array<
-  'x' | 'y' | 'leftZ' | 'rightZ' | 'leftPlunger' | 'rightPlunger'
->
+export type MotorAxes = MotorAxis[]
 
 export type ThermalAdapterName =
   | 'PCR Adapter'
   | 'Deep Well Adapter'
   | '96 Flat Bottom Adapter'
   | 'Universal Flat Adapter'
+
+// gripper definition that adheres to the v1 gripper json schema
+export interface GripperDefinition {
+  $otSharedSchema: string
+  model: GripperModel
+  schemaVersion: number
+  displayName: string
+  zMotorConfigurations: { idle: number; run: number }
+  jawMotorConfigurations: { vref: number }
+  gripForceProfile: {
+    polynomial: [[number, number], [number, number]]
+    defaultGripForce: number
+    defaultHomeForce: number
+    min: number
+    max: number
+  }
+  geometry: {
+    baseOffsetFromMount: [number, number, number]
+    jawCenterOffsetFromBase: [number, number, number]
+    pinOneOffsetFromBase: [number, number, number]
+    pinTwoOffsetFromBase: [number, number, number]
+    jawWidth: { min: number; max: number }
+  }
+}

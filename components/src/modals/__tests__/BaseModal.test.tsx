@@ -22,7 +22,7 @@ describe('BaseModal', () => {
       height: '100%',
       alignItems: 'center',
       justifyContent: 'center',
-      padding: `${SPACING.spacing4}, ${SPACING.spacing5}`,
+      padding: `${SPACING.spacing16}, ${SPACING.spacing24}`,
     })
   })
 
@@ -30,7 +30,7 @@ describe('BaseModal', () => {
     const wrapper = shallow(<BaseModal />)
     const box = wrapper.find(Flex).first()
 
-    expect(box.prop('backgroundColor')).toBe('#16212D35')
+    expect(box.prop('backgroundColor')).toBe('#16212d59')
 
     wrapper.setProps({ overlayColor: OVERLAY_BLACK_90 })
     expect(wrapper.find(Flex).first().prop('backgroundColor')).toBe(

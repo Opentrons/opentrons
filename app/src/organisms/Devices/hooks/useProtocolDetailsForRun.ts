@@ -1,19 +1,24 @@
 import * as React from 'react'
 import last from 'lodash/last'
-import { schemaV6Adapter } from '@opentrons/shared-data'
+import { getRobotTypeFromLoadedLabware } from '@opentrons/shared-data'
 import {
   useProtocolQuery,
   useProtocolAnalysesQuery,
   useRunQuery,
 } from '@opentrons/react-api-client'
 
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type {
+  RobotType,
+  CompletedProtocolAnalysis,
+  PendingProtocolAnalysis,
+} from '@opentrons/shared-data'
 
 export interface ProtocolDetails {
   displayName: string | null
-  protocolData: ProtocolAnalysisFile<{}> | null
+  protocolData: CompletedProtocolAnalysis | PendingProtocolAnalysis | null
   protocolKey: string | null
   isProtocolAnalyzing?: boolean
+  robotType: RobotType
 }
 
 export function useProtocolDetailsForRun(
@@ -54,10 +59,14 @@ export function useProtocolDetailsForRun(
 
   return {
     displayName: displayName ?? null,
-    protocolData:
-      mostRecentAnalysis != null ? schemaV6Adapter(mostRecentAnalysis) : null,
+    protocolData: mostRecentAnalysis ?? null,
     protocolKey: protocolRecord?.data.key ?? null,
     isProtocolAnalyzing:
       mostRecentAnalysis != null && mostRecentAnalysis?.status === 'pending',
+    // this should be deleted as soon as analysis tells us intended robot type
+    robotType:
+      mostRecentAnalysis?.status === 'completed'
+        ? getRobotTypeFromLoadedLabware(mostRecentAnalysis.labware)
+        : 'OT-2 Standard',
   }
 }

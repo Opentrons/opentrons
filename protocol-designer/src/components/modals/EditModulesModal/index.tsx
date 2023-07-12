@@ -16,13 +16,17 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
-  THERMOCYCLER_MODULE_V1,
   ModuleType,
   ModuleModel,
+  OT2_STANDARD_MODEL,
+  THERMOCYCLER_MODULE_V1,
+  TEMPERATURE_MODULE_V1,
+  RobotType,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
-  getSlotsBlockedBySpanning,
+  getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
   getLabwareOnSlot,
 } from '../../../step-forms/utils'
@@ -32,7 +36,8 @@ import {
   actions as stepFormActions,
 } from '../../../step-forms'
 import {
-  SUPPORTED_MODULE_SLOTS,
+  SUPPORTED_MODULE_SLOTS_OT2,
+  SUPPORTED_MODULE_SLOTS_FLEX,
   getAllModuleSlotsByType,
 } from '../../../modules/moduleData'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -48,6 +53,7 @@ import { useResetSlotOnModelChange } from './form-state'
 
 import { ModuleOnDeck } from '../../../step-forms/types'
 import { ModelModuleInfo } from '../../EditModules'
+import { getRobotType } from '../../../file-data/selectors'
 
 export interface EditModulesModalProps {
   moduleType: ModuleType
@@ -76,16 +82,20 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     onCloseClick,
     moduleOnDeck,
   } = props
-  const supportedModuleSlot = SUPPORTED_MODULE_SLOTS[moduleType][0].value
+  const robotType = useSelector(getRobotType)
+  const supportedModuleSlot =
+    robotType === OT2_STANDARD_MODEL
+      ? SUPPORTED_MODULE_SLOTS_OT2[moduleType][0].value
+      : SUPPORTED_MODULE_SLOTS_FLEX[moduleType][0].value
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const dispatch = useDispatch()
 
   const hasSlotIssue = (selectedSlot: string): boolean => {
     const previousModuleSlot = moduleOnDeck?.slot
     const hasModuleMoved = previousModuleSlot !== selectedSlot
-    const isSlotBlocked = getSlotsBlockedBySpanning(initialDeckSetup).includes(
-      selectedSlot
-    )
+    const isSlotBlocked = getSlotIdsBlockedBySpanning(
+      initialDeckSetup
+    ).includes(selectedSlot)
     const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, selectedSlot)
     const labwareOnSlot = getLabwareOnSlot(initialDeckSetup, selectedSlot)
     const isLabwareCompatible =
@@ -98,17 +108,10 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
     return !isLabwareCompatible
   }
 
-  const moduleIsThermocycler = moduleType === THERMOCYCLER_MODULE_TYPE
-
-  const initialValues = moduleIsThermocycler
-    ? {
-        selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
-        selectedModel: THERMOCYCLER_MODULE_V1,
-      }
-    : {
-        selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
-        selectedModel: moduleOnDeck?.model || null,
-      }
+  const initialValues = {
+    selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
+    selectedModel: moduleOnDeck?.model || null,
+  }
 
   const validator = ({
     selectedModel,
@@ -134,7 +137,10 @@ export const EditModulesModal = (props: EditModulesModalProps): JSX.Element => {
         'alert.module_placement.HEATER_SHAKER_ADJACENT_TO_MODULE.body',
         { selectedSlot }
       )
-    } else if (moduleOnDeck?.type === HEATERSHAKER_MODULE_TYPE) {
+    } else if (
+      moduleOnDeck?.type === HEATERSHAKER_MODULE_TYPE &&
+      !hasSlotIssue(selectedSlot)
+    ) {
       const isHeaterShakerAdjacentToAnotherModule = some(
         initialDeckSetup.modules,
         hwModule =>
@@ -224,10 +230,10 @@ const EditModulesModalComponent = (
   const { moduleType, onCloseClick, supportedModuleSlot } = props
   const { values, errors, isValid } = useFormikContext<EditModulesFormValues>()
   const { selectedModel } = values
-
   const disabledModuleRestriction = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
+  const robotType = useSelector(getRobotType)
 
   const noCollisionIssue =
     selectedModel && !isModuleWithCollisionIssue(selectedModel)
@@ -252,6 +258,23 @@ const EditModulesModalComponent = (
     placement: 'top',
   })
 
+  //  TODO(jr, 6/26/23): should probably move this into a util component
+  function getModuleOptionsForRobotType(
+    options: Array<{ name: string; value: ModuleModel }>,
+    robotType: RobotType
+  ): Array<{ name: string; value: ModuleModel }> {
+    const filterOutModels: ModuleModel[] =
+      robotType === FLEX_ROBOT_TYPE
+        ? [THERMOCYCLER_MODULE_V1, TEMPERATURE_MODULE_V1]
+        : []
+
+    const filteredOptions = options.filter(
+      option => !filterOutModels.includes(option.value)
+    )
+
+    return filteredOptions
+  }
+
   return (
     <Modal
       heading={i18n.t(`modules.module_long_names.${moduleType}`)}
@@ -268,11 +291,14 @@ const EditModulesModalComponent = (
         )}
         <Form>
           <div className={styles.form_row}>
-            <FormGroup label="Model*" className={styles.option_model}>
+            <FormGroup label="Model" className={styles.option_model}>
               <ModelDropdown
-                fieldName={'selectedModel'}
+                fieldName="selectedModel"
                 tabIndex={0}
-                options={MODELS_FOR_MODULE_TYPE[moduleType]}
+                options={getModuleOptionsForRobotType(
+                  MODELS_FOR_MODULE_TYPE[moduleType],
+                  robotType
+                )}
               />
             </FormGroup>
             {showSlotOption && (
@@ -284,15 +310,18 @@ const EditModulesModalComponent = (
                 <div {...targetProps} className={styles.option_slot}>
                   <FormGroup label="Position">
                     <SlotDropdown
-                      fieldName={'selectedSlot'}
-                      options={getAllModuleSlotsByType(moduleType)}
+                      fieldName="selectedSlot"
+                      options={getAllModuleSlotsByType(moduleType, robotType)}
                       disabled={!enableSlotSelection}
                       tabIndex={1}
                     />
                   </FormGroup>
                 </div>
 
-                <ConnectedSlotMap fieldName={'selectedSlot'} />
+                <ConnectedSlotMap
+                  fieldName="selectedSlot"
+                  robotType={robotType}
+                />
               </>
             )}
           </div>

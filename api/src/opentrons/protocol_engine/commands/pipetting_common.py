@@ -1,7 +1,8 @@
 """Common pipetting command base models."""
 from pydantic import BaseModel, Field
+from typing import Optional
 
-from ..types import WellLocation
+from ..types import WellLocation, DeckPoint
 
 
 class PipetteIdMixin(BaseModel):
@@ -22,10 +23,6 @@ class VolumeMixin(BaseModel):
         "than a pipette-specific maximum volume.",
         gt=0,
     )
-
-    # todo(mm, 2021-03-26): This class or one of its subclasses should have a
-    # field for liquid flow rate in microliters per second.
-    # See Opentrons/opentrons#4837 for terminology concerns.
 
 
 class FlowRateMixin(BaseModel):
@@ -53,6 +50,38 @@ class WellLocationMixin(BaseModel):
     )
 
 
+class MovementMixin(BaseModel):
+    """Mixin for command requests that move a pipette."""
+
+    minimumZHeight: Optional[float] = Field(
+        None,
+        description=(
+            "Optional minimal Z margin in mm."
+            " If this is larger than the API's default safe Z margin,"
+            " it will make the arc higher. If it's smaller, it will have no effect."
+        ),
+    )
+
+    forceDirect: bool = Field(
+        False,
+        description=(
+            "If true, moving from one labware/well to another"
+            " will not arc to the default safe z,"
+            " but instead will move directly to the specified location."
+            " This will also force the `minimumZHeight` param to be ignored."
+            " A 'direct' movement is in X/Y/Z simultaneously."
+        ),
+    )
+
+    speed: Optional[float] = Field(
+        None,
+        description=(
+            "Override the travel speed in mm/s."
+            " This controls the straight linear speed of motion."
+        ),
+    )
+
+
 class BaseLiquidHandlingResult(BaseModel):
     """Base properties of a liquid handling result."""
 
@@ -60,4 +89,16 @@ class BaseLiquidHandlingResult(BaseModel):
         ...,
         description="Amount of liquid in uL handled in the operation.",
         gt=0,
+    )
+
+
+class DestinationPositionResult(BaseModel):
+    """Mixin for command results that move a pipette."""
+
+    position: DeckPoint = Field(
+        DeckPoint(x=0, y=0, z=0),
+        description=(
+            "The (x,y,z) coordinates of the pipette's critical point in deck space"
+            " after the move was completed."
+        ),
     )

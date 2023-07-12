@@ -1,11 +1,14 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Mapping, TypeVar
 from typing_extensions import Protocol
 
 from opentrons.types import Mount, Point
-from ..types import Axis, CriticalPoint, MotionChecks
+from ..types import Axis, CriticalPoint, MotionChecks, OT3Axis
 
 
-class MotionController(Protocol):
+AxisType = TypeVar("AxisType", Axis, OT3Axis)
+
+
+class MotionController(Protocol[AxisType]):
     """Protocol specifying fundamental motion controls."""
 
     async def halt(self) -> None:
@@ -41,7 +44,11 @@ class MotionController(Protocol):
         ...
 
     # Gantry/frame (i.e. not pipette) action API
-    async def home_z(self, mount: Optional[Mount] = None) -> None:
+    async def home_z(
+        self,
+        mount: Optional[Mount] = None,
+        allow_home_other: bool = True,
+    ) -> None:
         """Home a selected z-axis, or both if not specified."""
         ...
 
@@ -154,6 +161,18 @@ class MotionController(Protocol):
         """
         ...
 
+    async def move_axes(
+        self,
+        position: Mapping[AxisType, float],
+        speed: Optional[float] = None,
+        max_speeds: Optional[Dict[AxisType, float]] = None,
+    ) -> None:
+        """Moves the effectors of the specified axis to the specified position.
+        The effector of the x,y axis is the center of the carriage.
+        The effector of the pipette mount axis are the mount critical points but only in z.
+        """
+        ...
+
     async def move_rel(
         self,
         mount: Mount,
@@ -191,4 +210,8 @@ class MotionController(Protocol):
 
         Works regardless of critical point or home status.
         """
+        ...
+
+    async def retract_axis(self, axis: Axis) -> None:
+        """Retract the specified axis to its home position."""
         ...

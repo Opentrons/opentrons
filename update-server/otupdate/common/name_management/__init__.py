@@ -112,7 +112,7 @@ async def get_name_endpoint(request: web.Request) -> web.Response:
     """
     name_synchronizer = get_name_synchronizer(request)
     return web.json_response(  # type: ignore[no-untyped-call,no-any-return]
-        data={"name": name_synchronizer.get_name()}, status=200
+        data={"name": await name_synchronizer.get_name()}, status=200
     )
 
 

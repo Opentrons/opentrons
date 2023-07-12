@@ -2,13 +2,17 @@ import logging
 import contextlib
 from typing import Set, Dict, Any, Union, List, Optional, TYPE_CHECKING
 
-from opentrons.hardware_control.instruments import Pipette
+from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.util import plan_arc
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api import labware
 from opentrons.protocols.geometry import planning
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.calibration_storage import modify, helpers
+from opentrons.protocol_api.core.legacy.deck import Deck
+from opentrons.calibration_storage import (
+    helpers,
+    create_tip_length_data,
+    save_tip_length_calibration as cal_storage_save_tip_length,
+)
 from opentrons.types import Point, Location
 
 from robot_server.service.errors import RobotServerError
@@ -186,7 +190,7 @@ def get_reference_location(
     else:
         trash = deck.get_fixed_trash()
         assert trash
-        trash_loc = trash.wells_by_name()[TRASH_WELL].top()
+        trash_loc = trash.wells_by_name()[TRASH_WELL].top()  # type: ignore[union-attr]
         ref_loc = trash_loc.move(
             TRASH_REF_POINT_OFFSET + MOVE_TO_REF_POINT_SAFETY_BUFFER
         )
@@ -199,10 +203,10 @@ def save_tip_length_calibration(
     # TODO: 07-22-2020 parent slot is not important when tracking
     # tip length data, hence the empty string, we should remove it
     # from create_tip_length_data in a refactor
-    tip_length_data = modify.create_tip_length_data(
-        tip_rack._implementation.get_definition(), tip_length_offset
+    tip_length_data = create_tip_length_data(
+        tip_rack._core.get_definition(), tip_length_offset
     )
-    modify.save_tip_length_calibration(pipette_id, tip_length_data)
+    cal_storage_save_tip_length(pipette_id, tip_length_data)
 
 
 def get_default_tipracks(default_uris: List["LabwareUri"]) -> List["LabwareDefinition"]:

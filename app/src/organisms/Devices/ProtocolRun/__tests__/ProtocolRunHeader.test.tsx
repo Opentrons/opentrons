@@ -45,7 +45,15 @@ import {
   mockSucceededRun,
 } from '../../../../organisms/RunTimeControl/__fixtures__'
 import { mockHeaterShaker } from '../../../../redux/modules/__fixtures__'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+  ANALYTICS_PROTOCOL_RUN_AGAIN,
+  ANALYTICS_PROTOCOL_RUN_FINISH,
+  ANALYTICS_PROTOCOL_RUN_PAUSE,
+  ANALYTICS_PROTOCOL_RUN_START,
+  ANALYTICS_PROTOCOL_RUN_RESUME,
+} from '../../../../redux/analytics'
 import { getBuildrootUpdateDisplayInfo } from '../../../../redux/buildroot'
 import { getIsHeaterShakerAttached } from '../../../../redux/config'
 
@@ -60,13 +68,14 @@ import {
 } from '../../hooks'
 import { useIsHeaterShakerInProtocol } from '../../../ModuleCard/hooks'
 import { ConfirmAttachmentModal } from '../../../ModuleCard/ConfirmAttachmentModal'
+import { RunProgressMeter } from '../../../RunProgressMeter'
 import { formatTimestamp } from '../../utils'
 import { ProtocolRunHeader } from '../ProtocolRunHeader'
 import { HeaterShakerIsRunningModal } from '../../HeaterShakerIsRunningModal'
 
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const mockPush = jest.fn()
 
@@ -92,6 +101,7 @@ jest.mock('../../hooks')
 jest.mock('../../HeaterShakerIsRunningModal')
 jest.mock('../../../ModuleCard/ConfirmAttachmentModal')
 jest.mock('../../../ModuleCard/hooks')
+jest.mock('../../../RunProgressMeter')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../../redux/config')
 jest.mock('../../../../redux/buildroot/selectors')
@@ -145,7 +155,7 @@ const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.Mo
 const mockConfirmCancelModal = ConfirmCancelModal as jest.MockedFunction<
   typeof ConfirmCancelModal
 >
-const mockMockHeaterShakerIsRunningModal = HeaterShakerIsRunningModal as jest.MockedFunction<
+const mockHeaterShakerIsRunningModal = HeaterShakerIsRunningModal as jest.MockedFunction<
   typeof HeaterShakerIsRunningModal
 >
 const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.MockedFunction<
@@ -153,6 +163,9 @@ const mockUseIsHeaterShakerInProtocol = useIsHeaterShakerInProtocol as jest.Mock
 >
 const mockConfirmAttachmentModal = ConfirmAttachmentModal as jest.MockedFunction<
   typeof ConfirmAttachmentModal
+>
+const mockRunProgressMeter = RunProgressMeter as jest.MockedFunction<
+  typeof RunProgressMeter
 >
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
@@ -171,13 +184,14 @@ const STARTED_AT = '2022-03-03T19:09:40.620530+00:00'
 const COMPLETED_AT = '2022-03-03T19:39:53.620530+00:00'
 const PROTOCOL_NAME = 'A Protocol for Otie'
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
+const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as CompletedProtocolAnalysis
 
 const PROTOCOL_DETAILS = {
   displayName: PROTOCOL_NAME,
   protocolData: simpleV6Protocol,
   protocolKey: 'fakeProtocolKey',
   isProtocolAnalyzing: false,
+  robotType: 'OT-2 Standard' as const,
 }
 
 const mockMovingHeaterShaker = {
@@ -209,6 +223,7 @@ const render = () => {
         protocolRunHeaderRef={null}
         robotName={ROBOT_NAME}
         runId={RUN_ID}
+        makeHandleJumpToStep={jest.fn(() => jest.fn())}
       />
     </BrowserRouter>,
     { i18nInstance: i18n }
@@ -226,9 +241,10 @@ describe('ProtocolRunHeader', () => {
     )
     mockCloseCurrentRun = jest.fn()
 
-    when(mockUseTrackEvent).calledWith().mockReturnValue(mockTrackEvent)
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockConfirmCancelModal.mockReturnValue(<div>Mock ConfirmCancelModal</div>)
-    mockMockHeaterShakerIsRunningModal.mockReturnValue(
+    mockRunProgressMeter.mockReturnValue(<div>Mock RunProgressMeter</div>)
+    mockHeaterShakerIsRunningModal.mockReturnValue(
       <div>Mock HeaterShakerIsRunningModal</div>
     )
     mockUseModulesQuery.mockReturnValue({
@@ -346,6 +362,7 @@ describe('ProtocolRunHeader', () => {
       protocolData: null,
       protocolKey: null,
       isProtocolAnalyzing: true,
+      robotType: 'OT-2 Standard',
     })
 
     const [{ getByRole }] = render()
@@ -363,6 +380,7 @@ describe('ProtocolRunHeader', () => {
     queryByText('Protocol end')
     getByRole('button', { name: 'Cancel run' }).click()
     getByText('Mock ConfirmCancelModal')
+    getByText('Mock RunProgressMeter')
   })
 
   it('calls trackProtocolRunEvent when start run button clicked', () => {
@@ -372,7 +390,7 @@ describe('ProtocolRunHeader', () => {
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: 'runStart',
+      name: ANALYTICS_PROTOCOL_RUN_START,
       properties: {},
     })
   })
@@ -390,7 +408,7 @@ describe('ProtocolRunHeader', () => {
     expect(mockCloseCurrentRun).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalled()
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: 'runFinish',
+      name: ANALYTICS_PROTOCOL_RUN_FINISH,
       properties: {},
     })
   })
@@ -452,7 +470,9 @@ describe('ProtocolRunHeader', () => {
     getByText('Protocol start')
     getByText('Protocol end')
     fireEvent.click(button)
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runPause' })
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: ANALYTICS_PROTOCOL_RUN_PAUSE,
+    })
   })
 
   it('renders a cancel run button when running and shows a confirm cancel modal when clicked', () => {
@@ -487,7 +507,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Paused')
     fireEvent.click(button)
     expect(mockTrackProtocolRunEvent).toBeCalledWith({
-      name: 'runResume',
+      name: ANALYTICS_PROTOCOL_RUN_RESUME,
       properties: {},
     })
   })
@@ -549,7 +569,9 @@ describe('ProtocolRunHeader', () => {
     getByText('Canceled')
     getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+    })
   })
 
   it('renders a Run Again button and end time when run has failed and calls trackProtocolRunEvent when run again button clicked', () => {
@@ -572,7 +594,9 @@ describe('ProtocolRunHeader', () => {
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+    })
   })
 
   it('renders a Run Again button and end time when run has succeeded and calls trackProtocolRunEvent when run again button clicked', () => {
@@ -597,7 +621,13 @@ describe('ProtocolRunHeader', () => {
     getByText('Completed')
     getByText(formatTimestamp(COMPLETED_AT))
     fireEvent.click(button)
-    expect(mockTrackProtocolRunEvent).toBeCalledWith({ name: 'runAgain' })
+    expect(mockTrackEvent).toBeCalledWith({
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+      properties: { sourceLocation: 'RunRecordDetail' },
+    })
+    expect(mockTrackProtocolRunEvent).toBeCalledWith({
+      name: ANALYTICS_PROTOCOL_RUN_AGAIN,
+    })
   })
 
   it('disables the Run Again button with tooltip for a completed run if the robot is busy', () => {
@@ -664,6 +694,8 @@ describe('ProtocolRunHeader', () => {
   })
 
   it('if a heater shaker is shaking, clicking on start run should render HeaterShakerIsRunningModal', () => {
+    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_IDLE)
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     mockUseModulesQuery.mockReturnValue({
       data: { data: [mockMovingHeaterShaker] },
     } as any)
@@ -673,7 +705,7 @@ describe('ProtocolRunHeader', () => {
     getByText('Mock HeaterShakerIsRunningModal')
   })
 
-  it('renders the confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status', () => {
+  it('does not render the confirm attachment modal when there is a heater shaker in the protocol and run is idle', () => {
     mockUseModulesQuery.mockReturnValue({
       data: { data: [mockHeaterShaker] },
     } as any)
@@ -684,6 +716,21 @@ describe('ProtocolRunHeader', () => {
     fireEvent.click(button)
     getByText('mock confirm attachment modal')
     expect(mockTrackProtocolRunEvent).toBeCalledTimes(0)
+  })
+
+  it('renders the confirm attachment modal when there is a heater shaker in the protocol and the heater shaker is idle status and run is paused', () => {
+    when(mockUseRunStatus).calledWith(RUN_ID).mockReturnValue(RUN_STATUS_PAUSED)
+
+    mockUseModulesQuery.mockReturnValue({
+      data: { data: [mockHeaterShaker] },
+    } as any)
+    mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
+    const [{ queryByText, getByRole }] = render()
+
+    const button = getByRole('button', { name: 'Resume run' })
+    fireEvent.click(button)
+    expect(queryByText('mock confirm attachment modal')).toBeFalsy()
+    expect(mockTrackProtocolRunEvent).toBeCalledTimes(1)
   })
 
   it('does NOT render confirm attachment modal when the user already confirmed the heater shaker is attached', () => {

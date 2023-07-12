@@ -21,10 +21,17 @@ from opentrons import types as top_types
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control.types import Axis
 
+
 if TYPE_CHECKING:
-    from opentrons.protocols.context.instrument import AbstractInstrument
     from opentrons.protocol_api.labware import Well, Labware
-    from opentrons.protocols.geometry.deck import Deck
+    from opentrons.protocol_api.core.engine.instrument import InstrumentCore
+    from opentrons.protocol_api.core.legacy.deck import Deck
+    from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
+        LegacyInstrumentCore,
+    )
+    from opentrons.protocol_api.core.legacy_simulator.legacy_instrument_core import (
+        LegacyInstrumentCoreSimulator,
+    )
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -137,24 +144,28 @@ def labware_column_shift(
 class FlowRates:
     """Utility class for rich setters/getters for flow rates"""
 
-    def __init__(self, instr: AbstractInstrument) -> None:
+    def __init__(
+        self,
+        instr: Union[
+            InstrumentCore, LegacyInstrumentCore, LegacyInstrumentCoreSimulator
+        ],
+    ) -> None:
         self._instr = instr
 
-    def set_defaults(self, api_level: APIVersion):
-        pipette = self._instr.get_pipette()
-        self.aspirate = _find_value_for_api_version(
-            api_level, pipette["default_aspirate_flow_rates"]
-        )
-        self.dispense = _find_value_for_api_version(
-            api_level, pipette["default_dispense_flow_rates"]
-        )
-        self.blow_out = _find_value_for_api_version(
-            api_level, pipette["default_blow_out_flow_rates"]
-        )
+    def set_defaults(
+        self,
+        aspirate_defaults: Dict[str, float],
+        dispense_defaults: Dict[str, float],
+        blow_out_defaults: Dict[str, float],
+        api_level: APIVersion,
+    ) -> None:
+        self.aspirate = find_value_for_api_version(api_level, aspirate_defaults)
+        self.dispense = find_value_for_api_version(api_level, dispense_defaults)
+        self.blow_out = find_value_for_api_version(api_level, blow_out_defaults)
 
     @property
     def aspirate(self) -> float:
-        return self._instr.get_pipette()["aspirate_flow_rate"]
+        return self._instr.get_aspirate_flow_rate()
 
     @aspirate.setter
     def aspirate(self, new_val: float):
@@ -166,7 +177,7 @@ class FlowRates:
 
     @property
     def dispense(self) -> float:
-        return self._instr.get_pipette()["dispense_flow_rate"]
+        return self._instr.get_dispense_flow_rate()
 
     @dispense.setter
     def dispense(self, new_val: float):
@@ -178,7 +189,7 @@ class FlowRates:
 
     @property
     def blow_out(self) -> float:
-        return self._instr.get_pipette()["blow_out_flow_rate"]
+        return self._instr.get_blow_out_flow_rate()
 
     @blow_out.setter
     def blow_out(self, new_val: float):
@@ -189,16 +200,19 @@ class FlowRates:
         )
 
 
-def _find_value_for_api_version(
+def find_value_for_api_version(
     for_version: APIVersion, values: Dict[str, float]
 ) -> float:
     """
-    Parse a dict that looks like
+    Either parse a dict that looks like
     {"2.0": 5,
     "2.5": 4}
     (aka the flow rate values from pipette config) and return the value for
-    the highest api level that is at or underneath ``for_version``
+    the highest api level that is at or underneath ``for_version``,
+    or return the value passed in, if it's only a float.
     """
+    if isinstance(values, float):
+        return values
     sorted_versions = sorted({APIVersion.from_string(k): v for k, v in values.items()})
     last = values[str(sorted_versions[0])]
     for version in sorted_versions:
@@ -211,12 +225,14 @@ def _find_value_for_api_version(
 class PlungerSpeeds:
     """Utility class for rich setters/getters for speeds"""
 
-    def __init__(self, instr: AbstractInstrument) -> None:
+    def __init__(
+        self, instr: Union[LegacyInstrumentCore, LegacyInstrumentCoreSimulator]
+    ) -> None:
         self._instr = instr
 
     @property
     def aspirate(self) -> float:
-        return self._instr.get_pipette()["aspirate_speed"]
+        return self._instr.get_hardware_state()["aspirate_speed"]
 
     @aspirate.setter
     def aspirate(self, new_val: float):
@@ -226,7 +242,7 @@ class PlungerSpeeds:
 
     @property
     def dispense(self) -> float:
-        return self._instr.get_pipette()["dispense_speed"]
+        return self._instr.get_hardware_state()["dispense_speed"]
 
     @dispense.setter
     def dispense(self, new_val: float):
@@ -236,35 +252,13 @@ class PlungerSpeeds:
 
     @property
     def blow_out(self) -> float:
-        return self._instr.get_pipette()["blow_out_speed"]
+        return self._instr.get_hardware_state()["blow_out_speed"]
 
     @blow_out.setter
     def blow_out(self, new_val: float):
         self._instr.set_pipette_speed(
             blow_out=_assert_gzero(new_val, "speed should be a numerical value in mm/s")
         )
-
-
-class Clearances:
-    def __init__(self, default_aspirate: float, default_dispense: float) -> None:
-        self._aspirate = default_aspirate
-        self._dispense = default_dispense
-
-    @property
-    def aspirate(self) -> float:
-        return self._aspirate
-
-    @aspirate.setter
-    def aspirate(self, new_val: float):
-        self._aspirate = float(new_val)
-
-    @property
-    def dispense(self) -> float:
-        return self._dispense
-
-    @dispense.setter
-    def dispense(self, new_val: float):
-        self._dispense = float(new_val)
 
 
 class AxisMaxSpeeds(UserDict):

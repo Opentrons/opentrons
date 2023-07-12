@@ -1,18 +1,26 @@
 // mock HTTP responses for pipettes endpoints
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
-import type { PipetteSettings } from '../types'
+import type {
+  AttachedPipette,
+  PipetteSettings,
+  PipetteSettingsFieldsMap,
+} from '../types'
 import type {
   RobotApiResponse,
   RobotApiResponseMeta,
 } from '../../robot-api/types'
 import { mockTipRackDefinition } from '../../custom-labware/__fixtures__'
-import { PipetteInfo } from '../../../organisms/ProtocolSetup/RunSetupCard/hooks/useCurrentRunPipetteInfoByMount'
+import type {
+  PipetteInfo,
+  PipetteInformation,
+} from '../../../organisms/Devices/hooks'
+import { PipetteData } from '@opentrons/api-client'
 
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
 // fetch pipette fixtures
 
-export const mockAttachedPipette = {
+export const mockAttachedPipette: Omit<AttachedPipette, 'modelSpecs'> = {
   id: 'abc',
   name: 'p300_single_gen2',
   model: 'p300_single_v2.0',
@@ -33,6 +41,29 @@ export const mockUnattachedPipette = {
   model: null,
   mount_axis: 'a',
   plunger_axis: 'b',
+}
+
+export const mockAttachedGen3Pipette: Omit<AttachedPipette, 'modelSpecs'> = {
+  id: 'abc',
+  name: 'p1000_single_gen3',
+  model: 'p1000_single_v3.0',
+  tip_length: 42,
+  mount_axis: 'c',
+  plunger_axis: 'd',
+}
+
+export const mockGen3P1000PipetteSpecs: any = {
+  displayName: 'Flex 1-Channel 1000 μL',
+  name: 'p1000_single_gen3',
+  backCompatNames: ['p1000_single'],
+  channels: 1,
+}
+
+export const mockGen3P1000Pipette8ChannelSpecs: any = {
+  displayName: 'Flex 8-Channel 1000 μL',
+  name: 'p1000_multi_gen3',
+  channels: 8,
+  backCompatNames: ['p1000_multi'],
 }
 
 export const mockFetchPipettesSuccessMeta: RobotApiResponseMeta = {
@@ -69,6 +100,113 @@ export const mockFetchPipettesFailure: RobotApiResponse = {
 export const mockPipetteSettings: PipetteSettings = {
   info: { name: 'p300_single_gen2', model: 'p300_single_v2.0' },
   fields: { fieldId: { value: 42, default: 42 } },
+}
+
+export const mockPipetteSettingsFieldsMap: PipetteSettingsFieldsMap = {
+  top: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 10,
+    default: 0,
+    value: 4,
+  },
+  bottom: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 10,
+    default: 0,
+    value: 3,
+  },
+  blowout: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 10,
+    default: 0,
+    value: 2,
+  },
+  dropTip: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 10,
+    default: 0,
+    value: 1,
+  },
+  pickUpCurrent: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  pickUpDistance: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  pickUpIncrement: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  pickUpPresses: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  pickUpSpeed: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  plungerCurrent: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  dropTipCurrent: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  dropTipSpeed: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
+  tipLength: {
+    units: 'string',
+    type: 'float',
+    min: 0,
+    max: 0,
+    default: 0,
+    value: 0,
+  },
 }
 
 export const mockFetchPipetteSettingsSuccessMeta: RobotApiResponseMeta = {
@@ -166,16 +304,16 @@ export const mockRightSpecs: any = {
   name: 'mock_right',
 }
 
-// NOTE: protocol pipettes use "name" for the exact "model" because reasons
+// NOTE: protocol pipettes use "pipetteName" for the exact "model" because reasons
 export const mockLeftProtoPipette: any = {
   mount: 'left',
-  name: 'mock_left_model',
+  pipetteName: 'mock_left_model',
   modelSpecs: mockLeftSpecs,
 }
 
 export const mockRightProtoPipette: any = {
   mount: 'right',
-  name: 'mock_right_model',
+  pipetteName: 'mock_right_model',
   modelSpecs: mockRightSpecs,
 }
 
@@ -193,4 +331,76 @@ export const mockRightPipetteCalibration: any = {
   offset: [1, 2, 3],
   tiprack: 'some-other-tiprack',
   lastModified: '2020-08-25T20:25',
+}
+
+export const mockPipetteData1Channel: PipetteData = {
+  data: {
+    channels: 1,
+    min_volume: 1,
+    max_volume: 50,
+    calibratedOffset: {
+      offset: { x: 0, y: 2, z: 1 },
+      source: 'default',
+      last_modified: '2020-08-25T20:25',
+    },
+  },
+  instrumentModel: 'p1000_single_v3.0',
+  instrumentName: 'p1000_single_gen3',
+  instrumentType: 'pipette',
+  mount: 'left',
+  serialNumber: 'abc',
+  subsystem: 'pipette_left',
+  ok: true,
+}
+export const mockAttachedPipetteInformation: PipetteInformation = {
+  ...mockPipetteData1Channel,
+  displayName: 'Flex 1-Channel 1000 μL',
+}
+
+export const mockPipetteData8Channel: PipetteData = {
+  data: {
+    channels: 8,
+    min_volume: 1,
+    max_volume: 50,
+    calibratedOffset: {
+      offset: { x: 0, y: 2, z: 1 },
+      source: 'default',
+      last_modified: '2020-08-25T20:25',
+    },
+  },
+  instrumentModel: 'p1000_multi_v3.0',
+  instrumentName: 'p1000_multi_gen3',
+  instrumentType: 'pipette',
+  mount: 'right',
+  serialNumber: 'cba',
+  subsystem: 'pipette_right',
+  ok: true,
+}
+export const mock8ChannelAttachedPipetteInformation: PipetteInformation = {
+  ...mockPipetteData8Channel,
+  displayName: 'Flex 8-Channel 1000 μL',
+}
+
+export const mockPipetteData96Channel: PipetteData = {
+  data: {
+    channels: 96,
+    min_volume: 1,
+    max_volume: 50,
+    calibratedOffset: {
+      offset: { x: 0, y: 2, z: 1 },
+      source: 'default',
+      last_modified: '2020-08-25T20:25',
+    },
+  },
+  instrumentModel: 'p1000_96_v1',
+  instrumentName: 'p1000_96',
+  instrumentType: 'pipette',
+  mount: 'left',
+  serialNumber: 'cba',
+  subsystem: 'pipette_left',
+  ok: true,
+}
+export const mock96ChannelAttachedPipetteInformation: PipetteInformation = {
+  ...mockPipetteData96Channel,
+  displayName: 'Flex 96-Channel 1000 μL',
 }

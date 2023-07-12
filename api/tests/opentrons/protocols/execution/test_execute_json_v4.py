@@ -471,6 +471,7 @@ def test_dispatch_json_invalid_command(
         )
 
 
+@pytest.mark.ot2_only
 def test_papi_execute_json_v4(monkeypatch, ctx, get_json_protocol_fixture):
     protocol_data = get_json_protocol_fixture("4", "testModulesProtocol", False)
     protocol = parse(protocol_data, None)

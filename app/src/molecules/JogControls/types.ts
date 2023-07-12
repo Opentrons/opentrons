@@ -1,8 +1,19 @@
-import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
+import {
+  HORIZONTAL_PLANE,
+  VERTICAL_PLANE,
+  NULL_STEP_SIZE_MM,
+  SMALL_STEP_SIZE_MM,
+  MEDIUM_STEP_SIZE_MM,
+  LARGE_STEP_SIZE_MM,
+} from './constants'
 
 export type Axis = 'x' | 'y' | 'z'
 export type Sign = -1 | 1
-export type StepSize = number
+export type StepSize =
+  | typeof NULL_STEP_SIZE_MM
+  | typeof SMALL_STEP_SIZE_MM
+  | typeof MEDIUM_STEP_SIZE_MM
+  | typeof LARGE_STEP_SIZE_MM
 
 // TODO: bc(2020-12-14) instead of three params, prefer single vector
 // param e.g. [0,0,-0.1]. All Instance of JogVector currently translate to vector

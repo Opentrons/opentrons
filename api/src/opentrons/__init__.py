@@ -1,13 +1,10 @@
-import json
 import os
-import sys
+
 from pathlib import Path
 import logging
-import asyncio
 import re
 from typing import Any, List, Tuple
 
-from opentrons.config.feature_flags import enable_ot3_hardware_controller
 from opentrons.drivers.serial_communication import get_ports_by_name
 from opentrons.hardware_control import (
     API as HardwareAPI,
@@ -26,28 +23,16 @@ from opentrons.util import logging_config
 from opentrons.protocols.types import ApiDeprecationError
 from opentrons.protocols.api_support.types import APIVersion
 
-version = sys.version_info[0:2]
-if version < (3, 7):
-    raise RuntimeError(
-        "opentrons requires Python 3.7 or above, this is {0}.{1}".format(
-            version[0], version[1]
-        )
-    )
+from ._version import version
 
 HERE = os.path.abspath(os.path.dirname(__file__))
+__version__ = version
 
-try:
-    with open(os.path.join(HERE, "package.json")) as pkg:
-        package_json = json.load(pkg)
-        __version__ = package_json.get("version")
-except (FileNotFoundError, OSError):
-    __version__ = "unknown"
-
-from opentrons import config  # noqa: E402
 
 LEGACY_MODULES = ["robot", "reset", "instruments", "containers", "labware", "modules"]
 
-__all__ = ["version", "HERE", "config"]
+
+__all__ = ["version", "__version__", "HERE", "config"]
 
 
 def __getattr__(attrname: str) -> None:
@@ -104,7 +89,7 @@ def _get_motor_control_serial_port() -> Any:
 
 def should_use_ot3() -> bool:
     """Return true if ot3 hardware controller should be used."""
-    if enable_ot3_hardware_controller():
+    if ff.enable_ot3_hardware_controller():
         try:
             from opentrons_hardware.drivers.can_bus import CanDriver  # noqa: F401
 
@@ -130,7 +115,9 @@ async def _create_thread_manager() -> ThreadManagedHardware:
 
         thread_manager = ThreadManager(
             OT3API.build_hardware_controller,
+            use_usb_bus=ff.rear_panel_integration(),
             threadmanager_nonblocking=True,
+            status_bar_enabled=ff.status_bar_enabled(),
         )
     else:
         thread_manager = ThreadManager(
@@ -156,34 +143,7 @@ async def initialize() -> ThreadManagedHardware:
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
 
-    log.info(f"API server version: {__version__}")
+    log.info(f"API server version: {version}")
     log.info(f"Robot Name: {name()}")
 
-    hardware = await _create_thread_manager()
-
-    async def _blink() -> None:
-        while True:
-            await hardware.set_lights(button=True)
-            await asyncio.sleep(0.5)
-            await hardware.set_lights(button=False)
-            await asyncio.sleep(0.5)
-
-    # While the hardware was initializing in _create_hardware_api(), it blinked the
-    # front button light. But that blinking stops when the completed hardware object
-    # is returned. Do our own blinking here to keep it going while we home the robot.
-    blink_task = asyncio.create_task(_blink())
-
-    try:
-        if not ff.disable_home_on_boot():
-            log.info("Homing Z axes")
-            await hardware.home_z()
-
-        await hardware.set_lights(button=True)
-
-        return hardware
-    finally:
-        blink_task.cancel()
-        try:
-            await blink_task
-        except asyncio.CancelledError:
-            pass
+    return await _create_thread_manager()

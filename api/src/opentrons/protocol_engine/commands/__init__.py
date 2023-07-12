@@ -17,6 +17,10 @@ from . import heater_shaker
 from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
+from . import calibration
+
+from .hash_command_params import hash_command_params
+from .generate_command_schema import generate_command_schema
 
 from .command import (
     AbstractCommandImpl,
@@ -42,9 +46,26 @@ from .aspirate import (
     AspirateCommandType,
 )
 
+from .aspirate_in_place import (
+    AspirateInPlace,
+    AspirateInPlaceParams,
+    AspirateInPlaceCreate,
+    AspirateInPlaceResult,
+    AspirateInPlaceCommandType,
+)
+
+from .comment import (
+    Comment,
+    CommentParams,
+    CommentCreate,
+    CommentResult,
+    CommentCommandType,
+)
+
 from .custom import (
     Custom,
     CustomParams,
+    CustomCreate,
     CustomResult,
     CustomCommandType,
 )
@@ -57,12 +78,28 @@ from .dispense import (
     DispenseCommandType,
 )
 
+from .dispense_in_place import (
+    DispenseInPlace,
+    DispenseInPlaceParams,
+    DispenseInPlaceCreate,
+    DispenseInPlaceResult,
+    DispenseInPlaceCommandType,
+)
+
 from .drop_tip import (
     DropTip,
     DropTipParams,
     DropTipCreate,
     DropTipResult,
     DropTipCommandType,
+)
+
+from .drop_tip_in_place import (
+    DropTipInPlace,
+    DropTipInPlaceParams,
+    DropTipInPlaceCreate,
+    DropTipInPlaceResult,
+    DropTipInPlaceCommandType,
 )
 
 from .home import (
@@ -81,6 +118,23 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
+from .load_adapter import (
+    LoadAdapter,
+    LoadAdapterParams,
+    LoadAdapterCreate,
+    LoadAdapterResult,
+    LoadAdapterCommandType,
+)
+
+from .load_liquid import (
+    LoadLiquid,
+    LoadLiquidParams,
+    LoadLiquidResult,
+    LoadLiquidCreate,
+    LoadLiquidCommandType,
+    LoadLiquidImplementation,
+)
+
 from .load_module import (
     LoadModule,
     LoadModuleParams,
@@ -95,6 +149,14 @@ from .load_pipette import (
     LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
+)
+
+from .move_labware import (
+    MoveLabware,
+    MoveLabwareParams,
+    MoveLabwareCreate,
+    MoveLabwareResult,
+    MoveLabwareCommandType,
 )
 
 from .move_relative import (
@@ -177,6 +239,31 @@ from .blow_out import (
     BlowOut,
 )
 
+from .blow_out_in_place import (
+    BlowOutInPlaceParams,
+    BlowOutInPlaceResult,
+    BlowOutInPlaceCreate,
+    BlowOutInPlaceImplementation,
+    BlowOutInPlace,
+)
+
+from .set_status_bar import (
+    SetStatusBar,
+    SetStatusBarParams,
+    SetStatusBarCreate,
+    SetStatusBarResult,
+    SetStatusBarImplementation,
+    SetStatusBarCommandType,
+)
+
+from .retract_axis import (
+    RetractAxis,
+    RetractAxisParams,
+    RetractAxisCreate,
+    RetractAxisResult,
+    RetractAxisCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -190,14 +277,31 @@ __all__ = [
     "BaseCommandCreate",
     "CommandStatus",
     "CommandIntent",
+    # command parameter hashing
+    "hash_command_params",
+    # command schema generation
+    "generate_command_schema",
     # aspirate command models
     "Aspirate",
     "AspirateCreate",
     "AspirateParams",
     "AspirateResult",
     "AspirateCommandType",
+    # aspirate in place command models
+    "AspirateInPlace",
+    "AspirateInPlaceCreate",
+    "AspirateInPlaceParams",
+    "AspirateInPlaceResult",
+    "AspirateInPlaceCommandType",
+    # comment command models
+    "Comment",
+    "CommentParams",
+    "CommentCreate",
+    "CommentResult",
+    "CommentCommandType",
     # custom command models
     "Custom",
+    "CustomCreate",
     "CustomParams",
     "CustomResult",
     "CustomCommandType",
@@ -207,24 +311,48 @@ __all__ = [
     "DispenseParams",
     "DispenseResult",
     "DispenseCommandType",
+    # dispense in place command models
+    "DispenseInPlace",
+    "DispenseInPlaceCreate",
+    "DispenseInPlaceParams",
+    "DispenseInPlaceResult",
+    "DispenseInPlaceCommandType",
     # drop tip command models
     "DropTip",
     "DropTipCreate",
     "DropTipParams",
     "DropTipResult",
     "DropTipCommandType",
+    # drop tip in place command models
+    "DropTipInPlace",
+    "DropTipInPlaceCreate",
+    "DropTipInPlaceParams",
+    "DropTipInPlaceResult",
+    "DropTipInPlaceCommandType",
     # home command models
     "Home",
     "HomeParams",
     "HomeCreate",
     "HomeResult",
     "HomeCommandType",
+    # retract axis command models
+    "RetractAxis",
+    "RetractAxisCreate",
+    "RetractAxisParams",
+    "RetractAxisResult",
+    "RetractAxisCommandType",
     # load labware command models
     "LoadLabware",
     "LoadLabwareCreate",
     "LoadLabwareParams",
     "LoadLabwareResult",
     "LoadLabwareCommandType",
+    # load adapter command models
+    "LoadAdapter",
+    "LoadAdapterCreate",
+    "LoadAdapterParams",
+    "LoadAdapterResult",
+    "LoadAdapterCommandType",
     # load module command models
     "LoadModule",
     "LoadModuleCreate",
@@ -237,6 +365,12 @@ __all__ = [
     "LoadPipetteParams",
     "LoadPipetteResult",
     "LoadPipetteCommandType",
+    # move labware command models
+    "MoveLabware",
+    "MoveLabwareCreate",
+    "MoveLabwareParams",
+    "MoveLabwareResult",
+    "MoveLabwareCommandType",
     # move relative command models
     "MoveRelative",
     "MoveRelativeParams",
@@ -297,9 +431,31 @@ __all__ = [
     "BlowOutImplementation",
     "BlowOutParams",
     "BlowOut",
-    # module command bundles
+    # blow out in place command models
+    "BlowOutInPlaceParams",
+    "BlowOutInPlaceResult",
+    "BlowOutInPlaceCreate",
+    "BlowOutInPlaceImplementation",
+    "BlowOutInPlace",
+    # set status bar command models
+    "SetStatusBar",
+    "SetStatusBarParams",
+    "SetStatusBarCreate",
+    "SetStatusBarResult",
+    "SetStatusBarImplementation",
+    "SetStatusBarCommandType",
+    # load liquid command models
+    "LoadLiquid",
+    "LoadLiquidCreate",
+    "LoadLiquidImplementation",
+    "LoadLiquidParams",
+    "LoadLiquidResult",
+    "LoadLiquidCommandType",
+    # hardware module command bundles
     "heater_shaker",
     "magnetic_module",
     "temperature_module",
     "thermocycler",
+    # calibration command bundle
+    "calibration",
 ]

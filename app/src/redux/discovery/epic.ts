@@ -1,9 +1,9 @@
 import { of } from 'rxjs'
-import { filter, switchMap, delay } from 'rxjs/operators'
+import { switchMap, delay } from 'rxjs/operators'
 import { ofType, combineEpics } from 'redux-observable'
 
 import { UI_INITIALIZED } from '../shell'
-import { DISCOVERY_START, startDiscovery, finishDiscovery } from './actions'
+import { DISCOVERY_START, finishDiscovery } from './actions'
 
 import type { Observable } from 'rxjs'
 import type { Action, Epic } from '../types'
@@ -33,21 +33,4 @@ export const startDiscoveryEpic: Epic = action$ =>
     })
   )
 
-// TODO(bc, 2021-05-17): nuke this epic, it is now dead code, functionality is covered by restartEpic in robot-admin
-// TODO(mc, 2019-08-01): handle restart requests using robot-api actions
-export const startDiscoveryOnRestartEpic: Epic = action$ =>
-  action$.pipe(
-    filter(
-      action =>
-        // @ts-expect-error TODO: remove this whole epic, it is dead code
-        action.type === 'api:SERVER_SUCCESS' &&
-        // @ts-expect-error TODO: remove this whole epic, it is dead code
-        action.payload.path === 'restart'
-    ),
-    switchMap(() => of(startDiscovery(RESTART_DISCOVERY_TIMEOUT_MS)))
-  )
-
-export const discoveryEpic: Epic = combineEpics<Epic>(
-  startDiscoveryEpic,
-  startDiscoveryOnRestartEpic
-)
+export const discoveryEpic: Epic = combineEpics<Epic>(startDiscoveryEpic)

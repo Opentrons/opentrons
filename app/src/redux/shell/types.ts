@@ -1,8 +1,12 @@
 import type { Error } from '../types'
 import type { RobotLogsState, RobotLogsAction } from './robot-logs/types'
+import type { RobotSystemAction } from './is-ready/types'
 
 export interface Remote {
-  ipcRenderer: { send: (s: string, ...args: unknown[]) => void }
+  ipcRenderer: {
+    invoke: (channel: string, ...args: unknown[]) => Promise<any>
+    send: (channel: string, ...args: unknown[]) => void
+  }
 }
 
 interface File {
@@ -13,7 +17,7 @@ interface File {
 export interface UpdateInfo {
   version: string
   files: File[]
-  releaseDate: string
+  releaseDate?: string
   releaseNotes?: string
 }
 
@@ -39,6 +43,7 @@ export type ShellUpdateAction =
 export interface ShellState {
   update: ShellUpdateState
   robotLogs: RobotLogsState
+  isReady: boolean
 }
 
 export interface UiInitializedAction {
@@ -46,7 +51,31 @@ export interface UiInitializedAction {
   meta: { shell: true }
 }
 
+export type UsbRequestsAction =
+  | { type: 'shell:USB_HTTP_REQUESTS_START'; meta: { shell: true } }
+  | { type: 'shell:USB_HTTP_REQUESTS_STOP'; meta: { shell: true } }
+
+export interface AppRestartAction {
+  type: 'shell:APP_RESTART'
+  payload: {
+    message: string
+  }
+  meta: { shell: true }
+}
+
+export interface SendLogAction {
+  type: 'shell:SEND_LOG'
+  payload: {
+    message: string
+  }
+  meta: { shell: true }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
   | RobotLogsAction
+  | RobotSystemAction
+  | UsbRequestsAction
+  | AppRestartAction
+  | SendLogAction

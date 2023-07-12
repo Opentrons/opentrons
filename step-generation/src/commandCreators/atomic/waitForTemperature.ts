@@ -77,6 +77,7 @@ export const waitForTemperature: CommandCreator<WaitForTemperatureArgs> = (
             key: uuid(),
             params: {
               moduleId: module,
+              celsius: temperature,
             },
           },
         ],

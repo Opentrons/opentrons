@@ -27,7 +27,7 @@ export function Gallery(props: GalleryProps): JSX.Element {
     <Box width="100%">
       <RobotWorkSpace
         key="center"
-        viewBox={`0 0 ${dims.xDimension} ${dims.yDimension}`}
+        viewBox={`0 0 ${String(dims.xDimension)} ${String(dims.yDimension)}`}
       >
         {() => <LabwareRender definition={definition} />}
       </RobotWorkSpace>
@@ -47,20 +47,21 @@ export function Gallery(props: GalleryProps): JSX.Element {
         display={DISPLAY_BLOCK}
         margin={SPACING_AUTO}
       >
-        <Box>{images[currentImage]}</Box>
+        <Box data-testid="gallery_main_svg">{images[currentImage]}</Box>
       </Box>
       {images.length > 1 && (
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing16}
           justifyContent={JUSTIFY_SPACE_EVENLY}
         >
           {images.map((img, index) => {
             return (
               <Box
-                padding={SPACING.spacing3}
+                padding={SPACING.spacing8}
                 key={index}
                 onClick={() => setCurrentImage(index)}
+                data-testid="gallery_mini_image"
               >
                 <Box width="5rem">{img}</Box>
               </Box>

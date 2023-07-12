@@ -34,9 +34,9 @@ async def test_attached_tools_request(
     message, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
 
     expected_payload = ToolsDetectedNotificationPayload(
-        z_motor=ToolField(ToolType.undefined_tool),
-        a_motor=ToolField(ToolType.undefined_tool),
-        gripper=ToolField(ToolType.undefined_tool),
+        z_motor=ToolField(ToolType.nothing_attached),
+        a_motor=ToolField(ToolType.tool_error),
+        gripper=ToolField(ToolType.nothing_attached),
     )
 
     assert arbitration_id.parts.message_id == PushToolsDetectedNotification.message_id

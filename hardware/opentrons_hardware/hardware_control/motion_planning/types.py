@@ -19,6 +19,8 @@ from typing import (
     TYPE_CHECKING,
 )
 
+from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
+
 if TYPE_CHECKING:
     from numpy.typing import NDArray
 
@@ -56,12 +58,18 @@ class Block:
 
         def _final_speed() -> np.float64:
             """Get final speed of the block."""
-            return cast(
-                np.float64,
-                np.sqrt(
-                    self.initial_speed**2 + self.acceleration * self.distance * 2
-                ),
+            speed_squared = (
+                self.initial_speed**2 + self.acceleration * self.distance * 2
             )
+            if speed_squared < 0:
+                # NOTE (AS, 2022-09-14): calculated value occasionally rounds to a negative,
+                #                        like -1E-11, which should really just be zero
+                log.warning(
+                    f"Block encountered negative value in final_speed ({speed_squared}). "
+                    f"Setting Block.final_speed to 0.0 instead."
+                )
+                return np.float64(0.0)
+            return cast(np.float64, np.sqrt(speed_squared))
 
         def _time() -> np.float64:
             """Get the time it takes for the block to complete its motion."""
@@ -98,7 +106,14 @@ class Move(Generic[AxisKey]):
         """Constructor."""
         # verify unit vector before creating Move
         if not is_unit_vector(unit_vector):
-            raise ValueError(f"{unit_vector} is not a valid unit vector.")
+            raise MotionPlanningFailureError(
+                f"Invalid unit vector: {unit_vector}",
+                detail={
+                    "unit_vector": str(unit_vector),
+                    "distance": str(distance),
+                    "max_speed": str(max_speed),
+                },
+            )
         self.unit_vector = unit_vector
         self.distance = distance
         self.max_speed = max_speed
@@ -211,6 +226,7 @@ class AxisConstraints:
     max_acceleration: np.float64
     max_speed_discont: np.float64
     max_direction_change_speed_discont: np.float64
+    max_speed: np.float64
 
     @classmethod
     def build(
@@ -218,6 +234,7 @@ class AxisConstraints:
         max_acceleration: CoordinateValue,
         max_speed_discont: CoordinateValue,
         max_direction_change_speed_discont: CoordinateValue,
+        max_speed: CoordinateValue,
     ) -> AxisConstraints:
         """Build AxisConstraints."""
         return cls(
@@ -226,13 +243,16 @@ class AxisConstraints:
             max_direction_change_speed_discont=np.float64(
                 max_direction_change_speed_discont
             ),
+            max_speed=np.float64(max_speed),
         )
 
 
 SystemConstraints = Dict[AxisKey, AxisConstraints]
 
 
-class ZeroLengthMoveError(ValueError, Generic[AxisKey, CoordinateValue]):
+class ZeroLengthMoveError(
+    MotionPlanningFailureError, Generic[AxisKey, CoordinateValue]
+):
     """Error that handles trying to make a unit vector from a 0-length input.
 
     A unit vector would be undefined in this scenario, so this is the only safe way to
@@ -249,7 +269,10 @@ class ZeroLengthMoveError(ValueError, Generic[AxisKey, CoordinateValue]):
         """Build the exception with the data that caused it."""
         self._origin: Coordinates[AxisKey, CoordinateValue] = origin
         self._destination: Coordinates[AxisKey, CoordinateValue] = destination
-        super().__init__()
+        super(MotionPlanningFailureError, self).__init__(
+            message="Zero length move",
+            detail={"origin": str(origin), "destination": str(destination)},
+        )
 
     def __repr__(self) -> str:
         """Stringify."""

@@ -1,11 +1,13 @@
 """Smoke tests for the CommandExecutor class."""
-import pytest
+import asyncio
 from datetime import datetime
-from decoy import Decoy, matchers
-from pydantic import BaseModel
 from typing import Any, Optional, Type, cast
 
-from opentrons.hardware_control import HardwareControlAPI
+import pytest
+from decoy import Decoy, matchers
+from pydantic import BaseModel
+
+from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 
 from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.resources import ModelUtils
@@ -27,16 +29,20 @@ from opentrons.protocol_engine.execution import (
     CommandExecutor,
     EquipmentHandler,
     MovementHandler,
+    GantryMover,
+    LabwareMovementHandler,
     PipettingHandler,
+    TipHandler,
     RunControlHandler,
     RailLightsHandler,
+    StatusBarHandler,
 )
 
 
 @pytest.fixture
 def hardware_api(decoy: Decoy) -> HardwareControlAPI:
     """Get a mocked out StateStore."""
-    return decoy.mock(cls=HardwareControlAPI)
+    return decoy.mock(cls=OT2HardwareControlAPI)
 
 
 @pytest.fixture
@@ -64,9 +70,27 @@ def movement(decoy: Decoy) -> MovementHandler:
 
 
 @pytest.fixture
+def mock_gantry_mover(decoy: Decoy) -> GantryMover:
+    """Get a mocked out GantryMover."""
+    return decoy.mock(cls=GantryMover)
+
+
+@pytest.fixture
+def labware_movement(decoy: Decoy) -> LabwareMovementHandler:
+    """Get a mocked out LabwareMovementHandler."""
+    return decoy.mock(cls=LabwareMovementHandler)
+
+
+@pytest.fixture
 def pipetting(decoy: Decoy) -> PipettingHandler:
     """Get a mocked out PipettingHandler."""
     return decoy.mock(cls=PipettingHandler)
+
+
+@pytest.fixture
+def mock_tip_handler(decoy: Decoy) -> TipHandler:
+    """Get a mocked out TipHandler."""
+    return decoy.mock(cls=TipHandler)
 
 
 @pytest.fixture
@@ -88,15 +112,25 @@ def rail_lights(decoy: Decoy) -> RailLightsHandler:
 
 
 @pytest.fixture
+def status_bar(decoy: Decoy) -> StatusBarHandler:
+    """Get a mocked out StatusBarHandler."""
+    return decoy.mock(cls=StatusBarHandler)
+
+
+@pytest.fixture
 def subject(
     hardware_api: HardwareControlAPI,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    mock_gantry_mover: GantryMover,
+    labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
+    mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
+    status_bar: StatusBarHandler,
     model_utils: ModelUtils,
 ) -> CommandExecutor:
     """Get a CommandExecutor test subject with its dependencies mocked out."""
@@ -106,10 +140,14 @@ def subject(
         action_dispatcher=action_dispatcher,
         equipment=equipment,
         movement=movement,
+        gantry_mover=mock_gantry_mover,
+        labware_movement=labware_movement,
         pipetting=pipetting,
+        tip_handler=mock_tip_handler,
         run_control=run_control,
         model_utils=model_utils,
         rail_lights=rail_lights,
+        status_bar=status_bar,
     )
 
 
@@ -133,13 +171,17 @@ async def test_execute(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    mock_gantry_mover: GantryMover,
+    labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
+    mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
+    status_bar: StatusBarHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
 ) -> None:
-    """It should be able execute a command."""
+    """It should be able to execute a command."""
     TestCommandImplCls = decoy.mock(func=_TestCommandImpl)
     command_impl = decoy.mock(cls=_TestCommandImpl)
 
@@ -202,9 +244,13 @@ async def test_execute(
             hardware_api=hardware_api,
             equipment=equipment,
             movement=movement,
+            gantry_mover=mock_gantry_mover,
+            labware_movement=labware_movement,
             pipetting=pipetting,
+            tip_handler=mock_tip_handler,
             run_control=run_control,
             rail_lights=rail_lights,
+            status_bar=status_bar,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]
@@ -229,12 +275,16 @@ async def test_execute(
     ["command_error", "expected_error"],
     [
         (
-            errors.ProtocolEngineError("oh no"),
+            errors.ProtocolEngineError(message="oh no"),
             matchers.ErrorMatching(errors.ProtocolEngineError, match="oh no"),
         ),
         (
             RuntimeError("oh no"),
             matchers.ErrorMatching(errors.UnexpectedProtocolError, match="oh no"),
+        ),
+        (
+            asyncio.CancelledError(),
+            matchers.ErrorMatching(errors.RunStoppedError),
         ),
     ],
 )
@@ -245,9 +295,13 @@ async def test_execute_raises_protocol_engine_error(
     action_dispatcher: ActionDispatcher,
     equipment: EquipmentHandler,
     movement: MovementHandler,
+    mock_gantry_mover: GantryMover,
+    labware_movement: LabwareMovementHandler,
     pipetting: PipettingHandler,
+    mock_tip_handler: TipHandler,
     run_control: RunControlHandler,
     rail_lights: RailLightsHandler,
+    status_bar: StatusBarHandler,
     model_utils: ModelUtils,
     subject: CommandExecutor,
     command_error: Exception,
@@ -301,9 +355,13 @@ async def test_execute_raises_protocol_engine_error(
             hardware_api=hardware_api,
             equipment=equipment,
             movement=movement,
+            gantry_mover=mock_gantry_mover,
+            labware_movement=labware_movement,
             pipetting=pipetting,
+            tip_handler=mock_tip_handler,
             run_control=run_control,
             rail_lights=rail_lights,
+            status_bar=status_bar,
         )
     ).then_return(
         command_impl  # type: ignore[arg-type]

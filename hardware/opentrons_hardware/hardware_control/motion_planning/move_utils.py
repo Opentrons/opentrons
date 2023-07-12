@@ -24,9 +24,7 @@ log = logging.getLogger(__name__)
 
 FLOAT_THRESHOLD = 0.001  # TODO: re-evaluate this value based on system limitations
 
-
-class MoveConditionNotMet(ValueError):
-    """Error raised if a move does not meet its stop condition before finishing."""
+MINIMUM_DISPLACEMENT = 0.05
 
 
 def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
@@ -47,6 +45,10 @@ def get_unit_vector(
     initial_vectorized = vectorize({k: np.float64(v) for k, v in initial.items()})
     target_vectorized = vectorize({k: np.float64(v) for k, v in target.items()})
     displacement: "NDArray[np.float64]" = target_vectorized - initial_vectorized
+    # minimum distance of 0.05mm
+    for i in range(len(displacement)):
+        if abs(displacement[i]) < MINIMUM_DISPLACEMENT:
+            displacement[i] = 0
     distance = np.linalg.norm(displacement)  # type: ignore[no-untyped-call]
     if not distance or np.array_equal(initial_vectorized, target_vectorized):
         raise ZeroLengthMoveError(initial, target)
@@ -55,8 +57,36 @@ def get_unit_vector(
     return unit_vector, distance
 
 
+def limit_max_speed(
+    unit_vector: Coordinates[AxisKey, np.float64],
+    max_linear_speed: np.float64,
+    constraints: SystemConstraints[AxisKey],
+) -> np.float64:
+    """Limit a linear speed to fall inside the max speed of any component.
+
+    The most-limiting max speed is a combination of the smallest-value max
+    speed for an axis and the value of that axis' unit vector component.
+    """
+    requested_axis_speeds = unit_vector_multiplication(unit_vector, max_linear_speed)
+    scale = np.float64(1)
+    for axis, speed in requested_axis_speeds.items():
+        if speed == 0.0:
+            continue
+        abs_speed = np.abs(speed)
+        axis_speed = constraints[axis].max_speed
+        axis_ratio = axis_speed / abs_speed
+        if axis_ratio < scale:
+            log.info(
+                f"speed {max_linear_speed} decreased by {axis_ratio} because {axis} speed limit is {axis_speed}"
+            )
+            scale = axis_ratio
+    return max_linear_speed * scale
+
+
 def targets_to_moves(
-    initial: Coordinates[AxisKey, CoordinateValue], targets: List[MoveTarget[AxisKey]]
+    initial: Coordinates[AxisKey, CoordinateValue],
+    targets: List[MoveTarget[AxisKey]],
+    constraints: SystemConstraints[AxisKey],
 ) -> Iterator[Move[AxisKey]]:
     """Transform a list of MoveTargets into a list of Moves."""
     all_axes: Set[AxisKey] = set()
@@ -67,25 +97,26 @@ def targets_to_moves(
     for target in targets:
         position = {k: np.float64(target.position.get(k, 0)) for k in all_axes}
         unit_vector, distance = get_unit_vector(initial_checked, position)
+        speed = limit_max_speed(unit_vector, target.max_speed, constraints)
         third_distance = np.float64(distance / 3)
         m = Move(
             unit_vector=unit_vector,
             distance=distance,
-            max_speed=target.max_speed,
+            max_speed=speed,
             blocks=(
                 Block(
                     distance=third_distance,
-                    initial_speed=target.max_speed,
+                    initial_speed=speed,
                     acceleration=np.float64(0),
                 ),
                 Block(
                     distance=third_distance,
-                    initial_speed=target.max_speed,
+                    initial_speed=speed,
                     acceleration=np.float64(0),
                 ),
                 Block(
                     distance=third_distance,
-                    initial_speed=target.max_speed,
+                    initial_speed=speed,
                     acceleration=np.float64(0),
                 ),
             ),

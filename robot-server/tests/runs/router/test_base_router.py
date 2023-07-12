@@ -28,7 +28,7 @@ from robot_server.runs.run_auto_deleter import RunAutoDeleter
 from robot_server.runs.run_models import Run, RunCreate, RunUpdate
 from robot_server.runs.engine_store import EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
-from robot_server.runs.run_store import RunNotFoundError
+from robot_server.runs.run_models import RunNotFoundError
 from robot_server.runs.router.base_router import (
     AllRunsLinks,
     create_run,
@@ -72,6 +72,7 @@ async def test_create_run(
         labware=[],
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
+        liquids=[],
     )
 
     decoy.when(
@@ -120,7 +121,8 @@ async def test_create_protocol_run(
             config=JsonProtocolConfig(schema_version=123),
             files=[],
             metadata={},
-            labware_definitions=[],
+            robot_type="OT-2 Standard",
+            content_hash="abc123",
         ),
     )
 
@@ -136,6 +138,7 @@ async def test_create_protocol_run(
         labware=[],
         labwareOffsets=[],
         status=pe_types.EngineStatus.IDLE,
+        liquids=[],
     )
 
     decoy.when(mock_protocol_store.get(protocol_id=protocol_id)).then_return(
@@ -232,6 +235,7 @@ async def test_get_run_data_from_url(
         modules=[],
         labware=[],
         labwareOffsets=[],
+        liquids=[],
     )
 
     decoy.when(mock_run_data_manager.get("run-id")).then_return(expected_response)
@@ -277,6 +281,7 @@ async def test_get_run() -> None:
         modules=[],
         labware=[],
         labwareOffsets=[],
+        liquids=[],
     )
 
     result = await get_run(run_data=run_data)
@@ -290,10 +295,10 @@ async def test_get_runs_empty(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should return an empty collection response when no runs exist."""
-    decoy.when(mock_run_data_manager.get_all()).then_return([])
+    decoy.when(mock_run_data_manager.get_all(length=20)).then_return([])
     decoy.when(mock_run_data_manager.current_run_id).then_return(None)
 
-    result = await get_runs(run_data_manager=mock_run_data_manager)
+    result = await get_runs(run_data_manager=mock_run_data_manager, pageLength=20)
 
     assert result.content.data == []
     assert result.content.links == AllRunsLinks(current=None)
@@ -321,6 +326,7 @@ async def test_get_runs_not_empty(
         modules=[],
         labware=[],
         labwareOffsets=[],
+        liquids=[],
     )
 
     response_2 = Run(
@@ -335,12 +341,13 @@ async def test_get_runs_not_empty(
         modules=[],
         labware=[],
         labwareOffsets=[],
+        liquids=[],
     )
 
-    decoy.when(mock_run_data_manager.get_all()).then_return([response_1, response_2])
+    decoy.when(mock_run_data_manager.get_all(20)).then_return([response_1, response_2])
     decoy.when(mock_run_data_manager.current_run_id).then_return("unique-id-2")
 
-    result = await get_runs(run_data_manager=mock_run_data_manager)
+    result = await get_runs(run_data_manager=mock_run_data_manager, pageLength=20)
 
     assert result.content.data == [response_1, response_2]
     assert result.content.links == AllRunsLinks(
@@ -412,6 +419,7 @@ async def test_update_run_to_not_current(
         modules=[],
         labware=[],
         labwareOffsets=[],
+        liquids=[],
     )
 
     decoy.when(await mock_run_data_manager.update("run-id", current=False)).then_return(
@@ -445,6 +453,7 @@ async def test_update_current_none_noop(
         modules=[],
         labware=[],
         labwareOffsets=[],
+        liquids=[],
     )
 
     decoy.when(await mock_run_data_manager.update("run-id", current=None)).then_return(

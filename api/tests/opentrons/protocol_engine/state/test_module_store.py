@@ -13,6 +13,7 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleDefinition,
     ModuleModel,
+    HeaterShakerLatchStatus,
 )
 
 from opentrons.protocol_engine.state.modules import (
@@ -41,17 +42,20 @@ def test_initial_state() -> None:
     subject = ModuleStore()
 
     assert subject.state == ModuleState(
+        requested_model_by_id={},
         slot_by_module_id={},
         hardware_by_module_id={},
         substate_by_module_id={},
+        module_offset_by_serial={},
     )
 
 
 @pytest.mark.parametrize(
-    argnames=["module_definition", "model", "expected_substate"],
+    argnames=["module_definition", "params_model", "result_model", "expected_substate"],
     argvalues=[
         (
             lazy_fixture("magdeck_v2_def"),
+            ModuleModel.MAGNETIC_MODULE_V2,
             ModuleModel.MAGNETIC_MODULE_V2,
             MagneticModuleSubState(
                 module_id=MagneticModuleId("module-id"),
@@ -61,9 +65,10 @@ def test_initial_state() -> None:
         (
             lazy_fixture("heater_shaker_v1_def"),
             ModuleModel.HEATER_SHAKER_MODULE_V1,
+            ModuleModel.HEATER_SHAKER_MODULE_V1,
             HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=False,
+                labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
                 is_plate_shaking=False,
                 plate_target_temperature=None,
             ),
@@ -71,6 +76,34 @@ def test_initial_state() -> None:
         (
             lazy_fixture("tempdeck_v1_def"),
             ModuleModel.TEMPERATURE_MODULE_V1,
+            ModuleModel.TEMPERATURE_MODULE_V1,
+            TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            ),
+        ),
+        (
+            lazy_fixture("tempdeck_v1_def"),
+            ModuleModel.TEMPERATURE_MODULE_V2,
+            ModuleModel.TEMPERATURE_MODULE_V1,
+            TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            ),
+        ),
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            ModuleModel.TEMPERATURE_MODULE_V1,
+            ModuleModel.TEMPERATURE_MODULE_V2,
+            TemperatureModuleSubState(
+                module_id=TemperatureModuleId("module-id"),
+                plate_target_temperature=None,
+            ),
+        ),
+        (
+            lazy_fixture("tempdeck_v2_def"),
+            ModuleModel.TEMPERATURE_MODULE_V2,
+            ModuleModel.TEMPERATURE_MODULE_V2,
             TemperatureModuleSubState(
                 module_id=TemperatureModuleId("module-id"),
                 plate_target_temperature=None,
@@ -79,8 +112,10 @@ def test_initial_state() -> None:
         (
             lazy_fixture("thermocycler_v1_def"),
             ModuleModel.THERMOCYCLER_MODULE_V1,
+            ModuleModel.THERMOCYCLER_MODULE_V1,
             ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
+                is_lid_open=False,
                 target_block_temperature=None,
                 target_lid_temperature=None,
             ),
@@ -89,19 +124,20 @@ def test_initial_state() -> None:
 )
 def test_load_module(
     module_definition: ModuleDefinition,
-    model: ModuleModel,
+    params_model: ModuleModel,
+    result_model: ModuleModel,
     expected_substate: ModuleSubStateType,
 ) -> None:
     """It should handle a successful LoadModule command."""
     action = actions.UpdateCommandAction(
         command=commands.LoadModule.construct(  # type: ignore[call-arg]
             params=commands.LoadModuleParams(
-                model=model,
+                model=params_model,
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             ),
             result=commands.LoadModuleResult(
                 moduleId="module-id",
-                model=model,
+                model=result_model,
                 serialNumber="serial-number",
                 definition=module_definition,
             ),
@@ -113,6 +149,7 @@ def test_load_module(
 
     assert subject.state == ModuleState(
         slot_by_module_id={"module-id": DeckSlotName.SLOT_1},
+        requested_model_by_id={"module-id": params_model},
         hardware_by_module_id={
             "module-id": HardwareModule(
                 serial_number="serial-number",
@@ -120,6 +157,7 @@ def test_load_module(
             )
         },
         substate_by_module_id={"module-id": expected_substate},
+        module_offset_by_serial={},
     )
 
 
@@ -147,7 +185,7 @@ def test_load_module(
             },
             HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId("module-id"),
-                is_labware_latch_closed=True,
+                labware_latch_status=HeaterShakerLatchStatus.CLOSED,
                 is_plate_shaking=True,
                 plate_target_temperature=123,
             ),
@@ -167,10 +205,12 @@ def test_load_module(
                 "data": {
                     "targetTemp": 123,
                     "lidTarget": 321,
+                    "lid": "open",
                 },
             },
             ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId("module-id"),
+                is_lid_open=True,
                 target_block_temperature=123,
                 target_lid_temperature=321,
             ),
@@ -195,6 +235,7 @@ def test_add_module_action(
 
     assert subject.state == ModuleState(
         slot_by_module_id={"module-id": None},
+        requested_model_by_id={"module-id": None},
         hardware_by_module_id={
             "module-id": HardwareModule(
                 serial_number="serial-number",
@@ -202,6 +243,7 @@ def test_add_module_action(
             )
         },
         substate_by_module_id={"module-id": expected_substate},
+        module_offset_by_serial={},
     )
 
 
@@ -234,7 +276,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=False,
+            labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
             is_plate_shaking=False,
             plate_target_temperature=42,
         )
@@ -243,7 +285,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=False,
+            labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
@@ -266,7 +308,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
     )
     set_shake_cmd = hs_commands.SetAndWaitForShakeSpeed.construct(  # type: ignore[call-arg]
         params=hs_commands.SetAndWaitForShakeSpeedParams(moduleId="module-id", rpm=111),
-        result=hs_commands.SetAndWaitForShakeSpeedResult(),
+        result=hs_commands.SetAndWaitForShakeSpeedResult(pipetteRetracted=False),
     )
     deactivate_cmd = hs_commands.DeactivateShaker.construct(  # type: ignore[call-arg]
         params=hs_commands.DeactivateShakerParams(moduleId="module-id"),
@@ -279,7 +321,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=False,
+            labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
             is_plate_shaking=True,
             plate_target_temperature=None,
         )
@@ -288,7 +330,7 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=False,
+            labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
@@ -317,16 +359,25 @@ def test_handle_hs_labware_latch_commands(
     )
     open_latch_cmd = hs_commands.OpenLabwareLatch.construct(  # type: ignore[call-arg]
         params=hs_commands.OpenLabwareLatchParams(moduleId="module-id"),
-        result=hs_commands.OpenLabwareLatchResult(),
+        result=hs_commands.OpenLabwareLatchResult(pipetteRetracted=False),
     )
     subject = ModuleStore()
 
     subject.handle_action(actions.UpdateCommandAction(command=load_module_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
+            is_plate_shaking=False,
+            plate_target_temperature=None,
+        )
+    }
+
     subject.handle_action(actions.UpdateCommandAction(command=close_latch_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=True,
+            labware_latch_status=HeaterShakerLatchStatus.CLOSED,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
@@ -335,7 +386,7 @@ def test_handle_hs_labware_latch_commands(
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
-            is_labware_latch_closed=False,
+            labware_latch_status=HeaterShakerLatchStatus.OPEN,
             is_plate_shaking=False,
             plate_target_temperature=None,
         )
@@ -385,10 +436,10 @@ def test_handle_tempdeck_temperature_commands(
     }
 
 
-def test_handle_thermocycler_block_temperature_commands(
+def test_handle_thermocycler_temperature_commands(
     thermocycler_v1_def: ModuleDefinition,
 ) -> None:
-    """It should update Tempdeck's `plate_target_temperature` correctly."""
+    """It should update thermocycler's temperature statuses correctly."""
     load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
         params=commands.LoadModuleParams(
             model=ModuleModel.THERMOCYCLER_MODULE_V1,
@@ -428,6 +479,7 @@ def test_handle_thermocycler_block_temperature_commands(
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
             module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=False,
             target_block_temperature=42.4,
             target_lid_temperature=None,
         )
@@ -436,6 +488,7 @@ def test_handle_thermocycler_block_temperature_commands(
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
             module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=False,
             target_block_temperature=42.4,
             target_lid_temperature=35.3,
         )
@@ -444,6 +497,7 @@ def test_handle_thermocycler_block_temperature_commands(
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
             module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=False,
             target_block_temperature=42.4,
             target_lid_temperature=None,
         )
@@ -452,6 +506,57 @@ def test_handle_thermocycler_block_temperature_commands(
     assert subject.state.substate_by_module_id == {
         "module-id": ThermocyclerModuleSubState(
             module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=False,
+            target_block_temperature=None,
+            target_lid_temperature=None,
+        )
+    }
+
+
+def test_handle_thermocycler_lid_commands(
+    thermocycler_v1_def: ModuleDefinition,
+) -> None:
+    """It should update thermocycler's lid status after executing lid commands."""
+    load_module_cmd = commands.LoadModule.construct(  # type: ignore[call-arg]
+        params=commands.LoadModuleParams(
+            model=ModuleModel.THERMOCYCLER_MODULE_V1,
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+        ),
+        result=commands.LoadModuleResult(
+            moduleId="module-id",
+            model=ModuleModel.THERMOCYCLER_MODULE_V1,
+            serialNumber="serial-number",
+            definition=thermocycler_v1_def,
+        ),
+    )
+
+    open_lid_cmd = tc_commands.OpenLid.construct(  # type: ignore[call-arg]
+        params=tc_commands.OpenLidParams(moduleId="module-id"),
+        result=tc_commands.OpenLidResult(),
+    )
+    close_lid_cmd = tc_commands.CloseLid.construct(  # type: ignore[call-arg]
+        params=tc_commands.CloseLidParams(moduleId="module-id"),
+        result=tc_commands.CloseLidResult(),
+    )
+
+    subject = ModuleStore()
+
+    subject.handle_action(actions.UpdateCommandAction(command=load_module_cmd))
+    subject.handle_action(actions.UpdateCommandAction(command=open_lid_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": ThermocyclerModuleSubState(
+            module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=True,
+            target_block_temperature=None,
+            target_lid_temperature=None,
+        )
+    }
+
+    subject.handle_action(actions.UpdateCommandAction(command=close_lid_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": ThermocyclerModuleSubState(
+            module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=False,
             target_block_temperature=None,
             target_lid_temperature=None,
         )

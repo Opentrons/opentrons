@@ -4,7 +4,7 @@ from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons.hardware_control.types import OT3Axis
 
 
-def test_create_step():
+def test_create_step() -> None:
     origin = {
         OT3Axis.X: 0,
         OT3Axis.Y: 0,
@@ -25,3 +25,21 @@ def test_create_step():
     assert len(move_group) == 3
     for step in move_group:
         assert set(present_nodes) == set(step.keys())
+
+
+def test_nodeid_replace_head() -> None:
+    assert ot3utils.replace_head_node(set([NodeId.head, NodeId.gantry_x])) == set(
+        [NodeId.head_l, NodeId.head_r, NodeId.gantry_x]
+    )
+    assert ot3utils.replace_head_node(set([NodeId.gantry_x])) == set([NodeId.gantry_x])
+    assert ot3utils.replace_head_node(set([NodeId.head_l])) == set([NodeId.head_l])
+
+
+def test_nodeid_replace_gripper() -> None:
+    assert ot3utils.replace_gripper_node(set([NodeId.gripper, NodeId.head])) == set(
+        [NodeId.gripper_g, NodeId.gripper_z, NodeId.head]
+    )
+    assert ot3utils.replace_gripper_node(set([NodeId.head])) == set([NodeId.head])
+    assert ot3utils.replace_gripper_node(set([NodeId.gripper_g])) == set(
+        [NodeId.gripper_g]
+    )

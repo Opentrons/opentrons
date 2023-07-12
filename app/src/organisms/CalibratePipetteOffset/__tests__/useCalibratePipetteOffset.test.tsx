@@ -1,6 +1,7 @@
 import * as React from 'react'
 import uniqueId from 'lodash/uniqueId'
-import { mountWithStore } from '@opentrons/components'
+import { i18n } from '../../../i18n'
+import { mountWithProviders, AlertPrimaryButton } from '@opentrons/components'
 import { act } from 'react-dom/test-utils'
 
 import * as RobotApi from '../../../redux/robot-api'
@@ -8,7 +9,6 @@ import * as Sessions from '../../../redux/sessions'
 import { mockPipetteOffsetCalibrationSessionAttributes } from '../../../redux/sessions/__fixtures__'
 
 import { useCalibratePipetteOffset } from '../useCalibratePipetteOffset'
-import { INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL } from '../../../organisms/CalibrationPanels'
 import { pipetteOffsetCalibrationStarted } from '../../../redux/analytics'
 
 import type { Invoker } from '../useCalibratePipetteOffset'
@@ -60,8 +60,9 @@ describe('useCalibratePipetteOffset hook', () => {
   })
 
   it('returns start callback, and no wizard if session not present', () => {
-    const { store } = mountWithStore(<TestUseCalibratePipetteOffset />, {
+    const { store } = mountWithProviders(<TestUseCalibratePipetteOffset />, {
       initialState: { robotApi: {}, sessions: {} },
+      i18nInstance: i18n,
     })
     expect(typeof startCalibration).toBe('function')
     expect(CalWizardComponent).toBe(null)
@@ -82,19 +83,14 @@ describe('useCalibratePipetteOffset hook', () => {
       meta: { requestId: expect.any(String) },
     })
     expect(store.dispatch).toHaveBeenCalledWith(
-      pipetteOffsetCalibrationStarted(
-        'pipette-offset',
-        mountString,
-        false,
-        false,
-        null
-      )
+      pipetteOffsetCalibrationStarted(mountString, false, false, null)
     )
   })
 
   it('accepts createParam overrides in start callback', () => {
-    const { store } = mountWithStore(<TestUseCalibratePipetteOffset />, {
+    const { store } = mountWithProviders(<TestUseCalibratePipetteOffset />, {
       initialState: { robotApi: {}, sessions: {} },
+      i18nInstance: i18n,
     })
     expect(typeof startCalibration).toBe('function')
     expect(CalWizardComponent).toBe(null)
@@ -120,43 +116,6 @@ describe('useCalibratePipetteOffset hook', () => {
     })
   })
 
-  it('accepts intent in start callback', () => {
-    const { wrapper } = mountWithStore(<TestUseCalibratePipetteOffset />, {
-      initialState: { robotApi: {}, sessions: {} },
-    })
-    expect(typeof startCalibration).toBe('function')
-    expect(CalWizardComponent).toBe(null)
-    const seshId = 'fake-session-id'
-    const mockPipOffsetCalSession = {
-      id: seshId,
-      ...mockPipetteOffsetCalibrationSessionAttributes,
-      details: {
-        ...mockPipetteOffsetCalibrationSessionAttributes.details,
-        currentStep: Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
-      },
-    }
-    mockGetRobotSessionOfType.mockReturnValue(mockPipOffsetCalSession)
-    mockGetRequestById.mockReturnValue({
-      status: RobotApi.SUCCESS,
-      response: {
-        method: 'POST',
-        ok: true,
-        path: '/',
-        status: 200,
-      },
-    })
-    act(() =>
-      startCalibration({
-        withIntent: INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL,
-      })
-    )
-    wrapper.setProps({})
-    expect(CalWizardComponent).not.toBe(null)
-    expect(wrapper.find('CalibratePipetteOffset').prop('intent')).toEqual(
-      INTENT_TIP_LENGTH_OUTSIDE_PROTOCOL
-    )
-  })
-
   it('wizard should appear after create request succeeds with session and close on closeWizard', () => {
     const seshId = 'fake-session-id'
     const mockPipOffsetCalSession = {
@@ -167,10 +126,12 @@ describe('useCalibratePipetteOffset hook', () => {
         currentStep: Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE,
       },
     }
-    const { store, wrapper } = mountWithStore(
+
+    const { store, wrapper } = mountWithProviders(
       <TestUseCalibratePipetteOffset />,
       {
         initialState: { robotApi: {} },
+        i18nInstance: i18n,
       }
     )
     mockGetRobotSessionOfType.mockReturnValue(mockPipOffsetCalSession)
@@ -187,9 +148,10 @@ describe('useCalibratePipetteOffset hook', () => {
     wrapper.setProps({})
     expect(CalWizardComponent).not.toBe(null)
 
-    wrapper
-      .find('button[title="Return tip to tip rack and exit"]')
-      .invoke('onClick')?.({} as React.MouseEvent)
+    wrapper.find('button[aria-label="Exit"]').invoke('onClick')?.(
+      {} as React.MouseEvent
+    )
+    wrapper.find(AlertPrimaryButton).invoke('onClick')?.({} as React.MouseEvent)
     wrapper.setProps({})
     expect(store.dispatch).toHaveBeenCalledWith({
       ...Sessions.deleteSession(robotName, seshId),

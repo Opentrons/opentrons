@@ -1,4 +1,6 @@
+import { OT2_MANIFEST_URL, OT3_MANIFEST_URL } from './constants'
 import type { LogLevel } from '../../logger'
+import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
 
 export type UrlProtocol = 'file:' | 'http:'
 
@@ -6,12 +8,24 @@ export type UpdateChannel = 'latest' | 'beta' | 'alpha'
 
 export type DiscoveryCandidates = string[]
 
-export type DevInternalFlag =
-  | 'allPipetteConfig'
-  | 'enableBundleUpload'
-  | 'enableLiquidSetup'
+export type DevInternalFlag = 'enableExtendedHardware'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
+
+export type ProtocolsOnDeviceSortKey =
+  | 'alphabetical'
+  | 'reverse'
+  | 'recentRun'
+  | 'oldRun'
+  | 'recentCreated'
+  | 'oldCreated'
+
+export interface OnDeviceDisplaySettings {
+  sleepMs: number
+  brightness: number
+  textSize: number
+  unfinishedUnboxingFlowRoute: string | null
+}
 
 export interface ConfigV0 {
   version: 0
@@ -139,4 +153,58 @@ export interface ConfigV8 extends Omit<ConfigV7, 'version'> {
   version: 8
 }
 
-export type Config = ConfigV8
+export interface ConfigV9 extends Omit<ConfigV8, 'version'> {
+  version: 9
+  isOnDevice: boolean
+}
+
+export interface ConfigV10 extends Omit<ConfigV9, 'version'> {
+  version: 10
+  protocols: { sendAllProtocolsToOT3: boolean }
+}
+
+export interface ConfigV11 extends Omit<ConfigV10, 'version'> {
+  version: 11
+  protocols: ConfigV10['protocols'] & {
+    protocolsStoredSortKey: ProtocolSort | null
+  }
+}
+
+export interface ConfigV12 extends Omit<ConfigV11, 'version' | 'buildroot'> {
+  version: 12
+  robotSystemUpdate: {
+    manifestUrls: { OT2: typeof OT2_MANIFEST_URL; OT3: typeof OT3_MANIFEST_URL }
+  }
+}
+
+export interface ConfigV13 extends Omit<ConfigV12, 'version'> {
+  version: 13
+  protocols: ConfigV12['protocols'] & {
+    protocolsOnDeviceSortKey: ProtocolsOnDeviceSortKey | null
+  }
+}
+
+export interface ConfigV14 extends Omit<ConfigV13, 'version'> {
+  version: 14
+  protocols: ConfigV13['protocols'] & {
+    pinnedProtocolIds: string[]
+  }
+}
+
+export interface ConfigV15 extends Omit<ConfigV14, 'version'> {
+  version: 15
+  onDeviceDisplaySettings: {
+    sleepMs: number
+    brightness: number
+    textSize: number
+  }
+}
+
+export interface ConfigV16 extends Omit<ConfigV15, 'version'> {
+  version: 16
+  onDeviceDisplaySettings: ConfigV15['onDeviceDisplaySettings'] & {
+    unfinishedUnboxingFlowRoute: string | null
+  }
+}
+
+export type Config = ConfigV16

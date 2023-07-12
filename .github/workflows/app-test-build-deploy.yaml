@@ -8,6 +8,7 @@ on:
       - 'Makefile'
       - 'app/**/*'
       - 'app-shell/**/*'
+      - 'app-shell-odd/**/*'
       - 'components/**/*'
       - 'shared-data/**/*'
       - 'webpack-config/**/*'
@@ -22,11 +23,13 @@ on:
       - '**'
     tags:
       - 'v*'
+      - 'ot3@*'
   pull_request:
     paths:
       - 'Makefile'
       - 'app/**/*'
       - 'app-shell/**/*'
+      - 'app-shell-odd/**/*'
       - 'components/**/*'
       - 'shared-data/**/*'
       - 'webpack-config/**/*'
@@ -37,34 +40,39 @@ on:
       - 'scripts/**/*'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
 env:
   CI: true
-  OT_APP_DEPLOY_BUCKET: opentrons-app
-  OT_APP_DEPLOY_FOLDER: builds
+  _APP_DEPLOY_BUCKET_ROBOTSTACK: opentrons-app
+  _APP_DEPLOY_FOLDER_ROBOTSTACK: builds
+  _APP_DEPLOY_BUCKET_OT3: ot3-development.builds.opentrons.com
+  _APP_DEPLOY_FOLDER_OT3: app
 
 jobs:
   js-unit-test:
-    # unit tests for js frontend projects (e.g. not app-shell or discovery-client) do not need
-    # to run cross-platform
-    runs-on: 'ubuntu-18.04'
+    # unit tests for the app's view layer (not the node layer)
+    runs-on: 'ubuntu-22.04'
     name: 'opentrons app frontend unit tests'
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      - uses: 'actions/setup-node@v3'
         with:
-          node-version: '14'
+          node-version: '16'
       - name: 'install udev'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: 'cache yarn cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild
@@ -79,7 +87,7 @@ jobs:
         run: |
           yarn jest --coverage=true --ci=true --collectCoverageFrom="app/src/**/*.(js|ts|tsx)" app/src components/src shared-data/js
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: ./coverage/lcov.info
           flags: app
@@ -89,30 +97,42 @@ jobs:
     # to run cross-platform just like builds, might as well do them in the same job
     strategy:
       matrix:
-        os: ['windows-2019', 'ubuntu-18.04', 'macos-latest']
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-11']
+
     name: 'opentrons app backend unit tests and build'
-    needs: ['js-unit-test']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
         with:
-          node-version: '14'
-      - uses: actions/setup-python@v3
+          fetch-depth: 0
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
-      - name: 'install libudev'
+      - name: 'downgrade npm version'
+        run: npm install -g npm@6
+      - name: check make version
+        run: make --version
+      - name: 'install libudev and libsystemd'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: 'cache yarn cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ github.workspace }}/.npm-cache/_prebuild
@@ -122,18 +142,20 @@ jobs:
         run: |
           npm config set cache ${{ github.workspace }}/.npm-cache
           yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+      - name: setup-js
+        run: |
           make setup-js
       - name: 'test native(er) packages'
         run: |
-          yarn jest --coverage=true --ci=true --collectCoverageFrom="(app-shell|discovery-client)/src/**/*.(js|ts|tsx)" app-shell/src discovery-client/src
+          yarn jest --coverage=true --ci=true --collectCoverageFrom="(app-shell|app-shell-odd| discovery-client)/src/**/*.(js|ts|tsx)" app-shell/src app-shell-odd/src discovery-client/src
       - name: 'Upload coverage report'
-        uses: 'codecov/codecov-action@v2'
+        uses: 'codecov/codecov-action@v3'
         with:
           files: ./coverage/lcov.info
           flags: app
 
-      # build the app and deploy it
-      - if: github.event_name != 'pull_request'
+      # build the desktop app and deploy it
+      - if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
         name: 'build app for ${{ matrix.os }}'
         timeout-minutes: 60
         env:
@@ -144,26 +166,121 @@ jobs:
           CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS }}
           CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS }}
           APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID }}
           HOST_PYTHON: python
+          OPENTRONS_PROJECT: robot-stack
+          OT_APP_DEPLOY_BUCKET: ${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}
+          OT_APP_DEPLOY_FOLDER: ${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}
+
         run: |
           make -C app-shell dist-${{ matrix.os }}
 
-      - if: github.event_name != 'pull_request'
+      - if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
         name: 'upload github artifact'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: 'opentrons-${{ matrix.os }}'
           path: app-shell/dist/publish
 
+      # build the ODD app
+      - if: ${{ github.event_name != 'pull_request' && matrix.os == 'ubuntu-22.04' }}
+        name: 'build ODD app for linux'
+        timeout-minutes: 60
+        run: |
+          make -C app-shell-odd dist-ot3
+
+  build-app-ot3:
+    strategy:
+      matrix:
+        os: ['windows-2022', 'ubuntu-22.04', 'macos-latest']
+        exclude:
+          - os: format('macos-latest{0}', startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build') || null)
+          - os: format('windows-2022{0}', startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build') || null)
+
+    name: 'opentrons app backend unit tests and build for OT3'
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: 'actions/checkout@v3'
+        with:
+          fetch-depth: 0
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: 'downgrade npm version'
+        run: npm install -g npm@6
+      - name: check make version
+        run: make --version
+      - name: 'install libudev'
+        if: startsWith(matrix.os, 'ubuntu')
+        run: sudo apt-get update && sudo apt-get install libudev-dev libsystemd-dev
+      - name: 'set complex environment variables'
+        id: 'set-vars'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+      - name: setup-js
+        run: |
+          npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+          make setup-js
+
+      # build the app and deploy it
+      - if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
+        name: 'build app for ${{ matrix.os }}'
+        timeout-minutes: 60
+        env:
+          OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
+          OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
+          WIN_CSC_LINK: ${{ secrets.OT_APP_CSC_WINDOWS }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_WINDOWS }}
+          CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS }}
+          CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS }}
+          APPLE_ID: ${{ secrets.OT_APP_APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID }}
+          HOST_PYTHON: python
+          OPENTRONS_PROJECT: ot3
+          OT_APP_DEPLOY_BUCKET: ${{ env._APP_DEPLOY_BUCKET_OT3 }}
+          OT_APP_DEPLOY_FOLDER: ${{ env._APP_DEPLOY_FOLDER_OT3 }}
+
+        run: |
+          make -C app-shell dist-${{ matrix.os }}
+
+      - if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
+        name: 'upload github artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: 'opentrons-ot3-${{ matrix.os }}'
+          path: app-shell/dist/publish
+
+
   deploy-app:
     name: 'Deploy built app artifacts to S3'
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'build-app-test-backend']
-    if: github.event_name != 'pull_request'
+    if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
     steps:
       - name: 'download run app builds'
-        uses: 'actions/download-artifact@v2'
+        uses: 'actions/download-artifact@v3'
         with:
           path: .
       - name: 'deploy builds to s3'
@@ -173,5 +290,95 @@ jobs:
           AWS_DEFAULT_REGION: us-east-2
         run: |
           mkdir to_upload
+          rm -rf ./opentrons-ot3-*
           cp ./opentrons-*/* ./to_upload/
-          aws s3 sync --acl=public-read to_upload/ s3://${{ env.OT_APP_DEPLOY_BUCKET }}/${{ env.OT_APP_DEPLOY_FOLDER }}
+          aws s3 sync --acl=public-read to_upload/ s3://${{ env._APP_DEPLOY_BUCKET_ROBOTSTACK }}/${{ env._APP_DEPLOY_FOLDER_ROBOTSTACK }}
+
+  deploy-app-ot3:
+    name: 'Deploy built OT3 app artifacts to S3'
+    runs-on: 'ubuntu-22.04'
+    needs: ['js-unit-test', 'build-app-ot3']
+    if: (github.event_name != 'pull_request') && (startsWith(github.ref, 'refs/tags') || startsWith(github.ref, 'refs/heads/edge') || startsWith(github.ref, 'refs/heads/internal-release') || startsWith(github.ref, 'refs/heads/release') || endsWith(github.ref, 'app-build'))
+    steps:
+      - name: 'download run app builds'
+        uses: 'actions/download-artifact@v3'
+        with:
+          path: .
+      - name: 'configure ot3 s3 deploy creds'
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.S3_OT3_APP_DEPLOY_KEY_ID }} --profile identity
+          aws configure set aws_secret_access_key ${{ secrets.S3_OT3_APP_DEPLOY_SECRET }} --profile identity
+          aws configure set region us-east-2 --profile identity
+          aws configure set output json --profile identity
+          aws configure set region us-east-2 --profile deploy
+          aws configure set role_arn ${{ secrets.OT_APP_OT3_DEPLOY_ROLE }} --profile deploy
+          aws configure set source_profile identity --profile deploy
+        shell: bash
+      - name: 'deploy builds to s3'
+        run: |
+          mkdir to_upload
+          cp ./opentrons-ot3-*/* ./to_upload
+          aws --profile=deploy s3 sync --acl=public-read to_upload s3://${{ env._APP_DEPLOY_BUCKET_OT3 }}/${{ env._APP_DEPLOY_FOLDER_OT3 }}
+      - name: 'create GH release'
+        uses: 'ncipollo/release-action@v1.12.0'
+        if: startsWith(github.ref, 'refs/tags/ot3@')
+        with:
+          allowUpdates: true
+          replacesArtifacts: true
+          omitBodyDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+      - name: 'upload windows artifact to GH release'
+        uses: 'ncipollo/release-action@v1.12.0'
+        if: startsWith(github.ref, 'refs/tags/ot3@')
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          artifacts: ./to_upload/*.exe
+          artifactContentType: application/vnd.microsoft.portable-executable
+      - name: 'upload mac artifact to GH release'
+        uses: 'ncipollo/release-action@v1.12.0'
+        if: startsWith(github.ref, 'refs/tags/ot3@')
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          artifacts: ./to_upload/*.dmg
+          artifactContentType: application/octet-stream
+      - name: 'upload linux artifact to GH release'
+        uses: 'ncipollo/release-action@v1.12.0'
+        if: startsWith(github.ref, 'refs/tags/ot3@')
+        with:
+          allowUpdates: true
+          omitBodyDuringUpdate: true
+          omitDraftDuringUpdate: true
+          omitNameDuringUpdate: true
+          omitPrereleaseDuringUpdate: true
+          artifacts: ./to_upload/*.AppImage
+          artifactContentType: application/octet-stream
+      - name: 'detect build data for notification'
+        id: names
+        run: |
+          ls ./to_upload
+          _windows_build=$(basename $(ls ./to_upload/Opentrons-OT3*.exe))
+          _mac_build=$(basename $(ls ./to_upload/Opentrons-OT3*.dmg))
+          _linux_build=$(basename $(ls ./to_upload/Opentrons-OT3*.AppImage))
+          if [[ -e latest.yml ]] ; then
+              echo "TYPE=release" >> $GITHUB_OUTPUT
+          else
+              echo "TYPE=branch" >> $GITHUB_OUTPUT
+          fi
+          echo "WINDOWS=$_windows_build">>$GITHUB_OUTPUT
+          echo "MAC=$_mac_build">>$GITHUB_OUTPUT
+          echo "LINUX=$_linux_build">>$GITHUB_OUTPUT
+      - name: 'slack notify for ot3 builds'
+        uses: slackapi/slack-github-action@v1.14.0
+        with:
+          payload: "{\"branch_or_tag\":\"${{ github.ref_name }}\",\"build_type\":\"${{ steps.names.outputs.TYPE }}\", \"gh_linkback\":\"https://github.com/Opentrons/opentrons/tree/${{ github.ref_name }}\", \"windows_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.WINDOWS}}\", \"mac_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.MAC}}\", \"linux_build\":\"${{ env._ACCESS_URL }}/${{steps.names.outputs.LINUX}}\"}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_OT3_SLACK_NOTIFICATION_WEBHOOK_URL }}
+          _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_OT3}}/${{env._APP_DEPLOY_FOLDER_OT3}}

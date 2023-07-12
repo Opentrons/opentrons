@@ -12,9 +12,10 @@ from opentrons.protocols.models import LabwareDefinition
 from opentrons.hardware_control.types import DoorState
 from opentrons.hardware_control.modules import LiveData
 
+from ..resources import pipette_data_provider
 from ..commands import Command, CommandCreate
 from ..errors import ProtocolEngineError
-from ..types import LabwareOffsetCreate, ModuleDefinition
+from ..types import LabwareOffsetCreate, ModuleDefinition, Liquid
 
 
 @dataclass(frozen=True)
@@ -93,6 +94,7 @@ class QueueCommandAction:
     command_id: str
     created_at: datetime
     request: CommandCreate
+    request_hash: Optional[str]
 
 
 @dataclass(frozen=True)
@@ -135,6 +137,13 @@ class AddLabwareDefinitionAction:
 
 
 @dataclass(frozen=True)
+class AddLiquidAction:
+    """Add a liquid, to apply to subsequent `LoadLiquid`s."""
+
+    liquid: Liquid
+
+
+@dataclass(frozen=True)
 class AddModuleAction:
     """Add an attached module directly to state without a location."""
 
@@ -142,6 +151,33 @@ class AddModuleAction:
     serial_number: str
     definition: ModuleDefinition
     module_live_data: LiveData
+
+
+@dataclass(frozen=True)
+class ResetTipsAction:
+    """Reset the tip tracking state of a given tip rack."""
+
+    labware_id: str
+
+
+@dataclass(frozen=True)
+class SetPipetteMovementSpeedAction:
+    """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
+
+    None will use the hardware API's default.
+    """
+
+    pipette_id: str
+    speed: Optional[float]
+
+
+@dataclass(frozen=True)
+class AddPipetteConfigAction:
+    """Adds a pipette's static config to the state store."""
+
+    pipette_id: str
+    serial_number: str
+    config: pipette_data_provider.LoadedStaticPipetteData
 
 
 Action = Union[
@@ -157,4 +193,8 @@ Action = Union[
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddModuleAction,
+    AddLiquidAction,
+    ResetTipsAction,
+    SetPipetteMovementSpeedAction,
+    AddPipetteConfigAction,
 ]

@@ -7,7 +7,7 @@ import { I18nextProvider } from 'react-i18next'
 import { getAllDefs } from '../helpers/getAllDefs'
 
 import {
-  getCustomLabware,
+  getValidCustomLabware,
   getAddLabwareFailure,
   getAddNewLabwareName,
 } from '../../../redux/custom-labware'
@@ -25,8 +25,8 @@ import { FailedLabwareFile } from '../../../redux/custom-labware/types'
 jest.mock('../../../redux/custom-labware')
 jest.mock('../helpers/getAllDefs')
 
-const mockGetCustomLabware = getCustomLabware as jest.MockedFunction<
-  typeof getCustomLabware
+const mockGetValidCustomLabware = getValidCustomLabware as jest.MockedFunction<
+  typeof getValidCustomLabware
 >
 const mockGetAllAllDefs = getAllDefs as jest.MockedFunction<typeof getAllDefs>
 const mockGetAddLabwareFailure = getAddLabwareFailure as jest.MockedFunction<
@@ -40,7 +40,7 @@ describe('useAllLabware hook', () => {
   const store: Store<State> = createStore(jest.fn(), {})
   beforeEach(() => {
     mockGetAllAllDefs.mockReturnValue([mockDefinition])
-    mockGetCustomLabware.mockReturnValue([mockValidLabware])
+    mockGetValidCustomLabware.mockReturnValue([mockValidLabware])
     store.dispatch = jest.fn()
   })
   afterEach(() => {
@@ -101,6 +101,22 @@ describe('useAllLabware hook', () => {
     expect(labware1.definition).toBe(mockDefinition)
     expect(labware2.modified).toBe(mockValidLabware.modified)
     expect(labware2.definition).toBe(mockValidLabware.definition)
+  })
+  it('should return custom labware with customLabware filter', () => {
+    const wrapper: React.FunctionComponent<{}> = ({ children }) => (
+      <Provider store={store}>{children}</Provider>
+    )
+    const { result } = renderHook(
+      () => useAllLabware('alphabetical', 'customLabware'),
+      {
+        wrapper,
+      }
+    )
+    const labware1 = result.current[0]
+    const labware2 = result.current[1]
+
+    expect(labware1).toBe(mockValidLabware)
+    expect(labware2).toBeUndefined()
   })
 })
 

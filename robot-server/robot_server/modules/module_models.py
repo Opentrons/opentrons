@@ -1,9 +1,11 @@
 """Request and response models for /modules endpoints."""
+from datetime import datetime
 from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 from typing import Generic, Optional, TypeVar, Union
 from typing_extensions import Literal
 
+from opentrons.calibration_storage.types import SourceType
 from opentrons.hardware_control.modules import (
     ModuleType,
     TemperatureStatus,
@@ -16,10 +18,20 @@ from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
 )
 from opentrons.protocol_engine import ModuleModel
+from opentrons.protocol_engine.types import Vec3f
 
 ModuleT = TypeVar("ModuleT", bound=ModuleType)
 ModuleModelT = TypeVar("ModuleModelT", bound=ModuleModel)
 ModuleDataT = TypeVar("ModuleDataT", bound=BaseModel)
+
+
+class ModuleCalibrationData(BaseModel):
+    """A module's calibration data."""
+
+    offset: Vec3f
+    slot: Optional[str] = None
+    source: Optional[SourceType] = None
+    last_modified: Optional[datetime] = None
 
 
 class UsbPort(BaseModel):
@@ -28,16 +40,26 @@ class UsbPort(BaseModel):
     port: int = Field(
         ...,
         description=(
-            "The USB port the module is connected to."
-            " If connected via a hub, ``port`` represents a port on the hub."
+            "The USB port the module is plugged into."
+            " If connected via a hub, ``port`` represents the port the hub is plugged into."
         ),
     )
 
-    hub: Optional[int] = Field(
+    portGroup: str = Field(
+        ...,
+        description=("The physical USB port bank the module is plugged into."),
+    )
+
+    hub: bool = Field(
+        ...,
+        description=("If the module is connected via a USB hub."),
+    )
+
+    hubPort: Optional[int] = Field(
         ...,
         description=(
             "If the module is connected via a USB hub,"
-            " the USB port the hub is plugged into."
+            " the port on the hub the module is plugged into."
         ),
     )
 
@@ -47,7 +69,7 @@ class UsbPort(BaseModel):
     )
 
 
-class GenericModule(GenericModel, Generic[ModuleT, ModuleModelT, ModuleDataT]):
+class _GenericModule(GenericModel, Generic[ModuleT, ModuleModelT, ModuleDataT]):
     """Base module response."""
 
     id: str = Field(
@@ -65,6 +87,9 @@ class GenericModule(GenericModel, Generic[ModuleT, ModuleModelT, ModuleDataT]):
     )
     moduleType: ModuleT = Field(..., description="General type of the module.")
     moduleModel: ModuleModelT = Field(..., description="Specific model of the module.")
+    moduleOffset: Optional[ModuleCalibrationData] = Field(
+        None, description="The calibrated module offset."
+    )
     data: ModuleDataT
     usbPort: UsbPort
 
@@ -74,15 +99,15 @@ class TemperatureModuleData(BaseModel):
 
     status: TemperatureStatus
     currentTemperature: float = Field(
-        ..., description="The module's current temperature, in degrees Celcius."
+        ..., description="The module's current temperature, in degrees Celsius."
     )
     targetTemperature: Optional[float] = Field(
-        ..., description="The module's target temperature, if set, in degrees Celcius."
+        ..., description="The module's target temperature, if set, in degrees Celsius."
     )
 
 
 class TemperatureModule(
-    GenericModule[
+    _GenericModule[
         Literal[ModuleType.TEMPERATURE],
         Literal[ModuleModel.TEMPERATURE_MODULE_V1, ModuleModel.TEMPERATURE_MODULE_V2],
         TemperatureModuleData,
@@ -113,7 +138,7 @@ class MagneticModuleData(BaseModel):
 
 
 class MagneticModule(
-    GenericModule[
+    _GenericModule[
         Literal[ModuleType.MAGNETIC],
         Literal[ModuleModel.MAGNETIC_MODULE_V1, ModuleModel.MAGNETIC_MODULE_V2],
         MagneticModuleData,
@@ -137,27 +162,30 @@ class ThermocyclerModuleData(BaseModel):
         ...,
         description=(
             "The current temperature of the thermocycler block, if known,"
-            " in degrees Celcius."
+            " in degrees Celsius."
         ),
     )
     targetTemperature: Optional[float] = Field(
         ...,
         description=(
             "The target temperature of the thermocycler block, if set,"
-            " in degrees Celcius."
+            " in degrees Celsius."
         ),
     )
     lidStatus: ThermocyclerLidStatus = Field(
         ...,
-        description="The current heating status of the lid.",
+        description="The current lid status of the thermocycler.",
+    )
+    lidTemperatureStatus: TemperatureStatus = Field(
+        ..., description="The current heating status of the lid."
     )
     lidTemperature: Optional[float] = Field(
         ...,
-        description="The current temperature of the lid, if known, in degrees Celcius.",
+        description="The current temperature of the lid, if known, in degrees Celsius.",
     )
     lidTargetTemperature: Optional[float] = Field(
         ...,
-        description="The target temperature of the lid, if set, in degrees Celcius.",
+        description="The target temperature of the lid, if set, in degrees Celsius.",
     )
     holdTime: Optional[float] = Field(
         ...,
@@ -201,7 +229,7 @@ class ThermocyclerModuleData(BaseModel):
 
 
 class ThermocyclerModule(
-    GenericModule[
+    _GenericModule[
         Literal[ModuleType.THERMOCYCLER],
         Literal[ModuleModel.THERMOCYCLER_MODULE_V1, ModuleModel.THERMOCYCLER_MODULE_V2],
         ThermocyclerModuleData,
@@ -245,11 +273,11 @@ class HeaterShakerModuleData(BaseModel):
     )
     currentTemperature: float = Field(
         ...,
-        description="Current temperature of the heater, in degrees Celcius.",
+        description="Current temperature of the heater, in degrees Celsius.",
     )
     targetTemperature: Optional[float] = Field(
         ...,
-        description="Target temperature of the heater, if set, in degrees Celcius.",
+        description="Target temperature of the heater, if set, in degrees Celsius.",
     )
     errorDetails: Optional[str] = Field(
         ...,
@@ -261,7 +289,7 @@ class HeaterShakerModuleData(BaseModel):
 
 
 class HeaterShakerModule(
-    GenericModule[
+    _GenericModule[
         Literal[ModuleType.HEATER_SHAKER],
         Literal[ModuleModel.HEATER_SHAKER_MODULE_V1],
         HeaterShakerModuleData,

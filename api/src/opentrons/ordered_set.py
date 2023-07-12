@@ -1,11 +1,17 @@
 """A set that preserves the order in which elements are added."""
 
 
-from typing import Dict, Generic, Hashable, Iterable, Iterator, TypeVar
+from typing import Dict, Generic, Hashable, Iterable, Iterator, TypeVar, Union, overload
 from typing_extensions import Literal
 
 
 _SetElementT = TypeVar("_SetElementT", bound=Hashable)
+
+_DefaultValueT = TypeVar("_DefaultValueT")
+
+
+class _NOT_SPECIFIED:
+    """Value not specified sentinel."""
 
 
 # Implemented as a standalone class for clarity.
@@ -20,6 +26,7 @@ class OrderedSet(Generic[_SetElementT]):
 
     def __init__(self, source_iterable: Iterable[_SetElementT] = tuple()) -> None:
         self._elements: Dict[_SetElementT, Literal[True]] = {}
+
         for element in source_iterable:
             self.add(element)
 
@@ -49,6 +56,38 @@ class OrderedSet(Generic[_SetElementT]):
     def clear(self) -> None:
         """Remove all elements from the set."""
         self._elements.clear()
+
+    @overload
+    def head(self) -> _SetElementT:
+        ...
+
+    @overload
+    def head(
+        self, default_value: _DefaultValueT
+    ) -> Union[_SetElementT, _DefaultValueT]:
+        ...
+
+    def head(
+        self, default_value: Union[_DefaultValueT, _NOT_SPECIFIED] = _NOT_SPECIFIED()
+    ) -> Union[_SetElementT, _DefaultValueT]:
+        """Get the head of the set.
+
+        Args:
+            default_value: A value to return if set is empty.
+
+        Returns:
+            The head of the set, or the default value, if specified.
+
+        Raises:
+            IndexError: set is empty and default was not specified.
+        """
+        try:
+            return next(iter(self))
+        except StopIteration as e:
+            if isinstance(default_value, _NOT_SPECIFIED):
+                raise IndexError("Set is empty") from e
+
+        return default_value
 
     def __iter__(self) -> Iterator[_SetElementT]:
         """Enable iteration over all elements in the set.

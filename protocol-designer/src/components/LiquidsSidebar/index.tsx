@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { i18n } from '../../localization'
-import { PrimaryButton, SidePanel } from '@opentrons/components'
+import { DeprecatedPrimaryButton, SidePanel } from '@opentrons/components'
 import { PDTitledList } from '../lists'
 import { swatchColors } from '../swatchColors'
 import listButtonStyles from '../listButtons.css'
@@ -36,16 +36,20 @@ function LiquidsSidebarComponent(props: Props): JSX.Element {
           onClick={() => selectLiquid(ingredientId)}
           iconName="circle"
           iconProps={{
-            style: { fill: displayColor ?? swatchColors(ingredientId) },
-            className: styles.liquid_icon_container,
+            style: {
+              fill: displayColor ?? swatchColors(ingredientId),
+            },
+            ...{
+              className: styles.liquid_icon_container,
+            },
           }}
           title={name || `Unnamed Ingredient ${ingredientId}`} // fallback, should not happen
         />
       ))}
       <div className={listButtonStyles.list_item_button}>
-        <PrimaryButton iconName="water" onClick={createNewLiquid}>
+        <DeprecatedPrimaryButton iconName="water" onClick={createNewLiquid}>
           {i18n.t('button.new_liquid')}
-        </PrimaryButton>
+        </DeprecatedPrimaryButton>
       </div>
     </SidePanel>
   )

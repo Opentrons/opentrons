@@ -13,9 +13,8 @@ import {
 
 import * as stepFormSelectors from '../../step-forms/selectors'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
-import { selectors } from '../../feature-flags'
 
-import { PrimaryButton, Tooltip } from '@opentrons/components'
+import { DeprecatedPrimaryButton, Tooltip } from '@opentrons/components'
 import {
   StepCreationButton,
   StepCreationButtonComponent,
@@ -33,17 +32,11 @@ const getCurrentFormHasUnsavedChangesMock =
   stepFormSelectors.getCurrentFormHasUnsavedChanges
 const getInitialDeckSetupMock = stepFormSelectors.getInitialDeckSetup
 const getIsMultiSelectModeMock = getIsMultiSelectMode
-const getEnabledHeaterShaker = selectors.getEnabledHeaterShaker
-
 describe('StepCreationButton', () => {
   let store: any
 
   beforeEach(() => {
     store = mockStore()
-
-    when(getEnabledHeaterShaker)
-      .calledWith(expect.anything())
-      .mockReturnValue(true)
 
     when(getCurrentFormIsPresavedMock)
       .calledWith(expect.anything())
@@ -84,7 +77,7 @@ describe('StepCreationButton', () => {
       .mockReturnValue(false)
 
     const wrapper = render()
-    const button = wrapper.find(PrimaryButton)
+    const button = wrapper.find(DeprecatedPrimaryButton)
     expect(button.prop('disabled')).toBe(false)
   })
 
@@ -94,14 +87,14 @@ describe('StepCreationButton', () => {
       .mockReturnValue(true)
 
     const wrapper = render()
-    const button = wrapper.find(PrimaryButton)
+    const button = wrapper.find(DeprecatedPrimaryButton)
     expect(button.prop('disabled')).toBe(true)
   })
 
   describe('when clicking add step', () => {
     it('expands StepCreationButtonComponent onClick', () => {
       const wrapper = render()
-      const button = wrapper.find(PrimaryButton)
+      const button = wrapper.find(DeprecatedPrimaryButton)
       const initAddStepButton = wrapper.find(StepCreationButtonComponent)
       // component starts off !expanded until click
       expect(initAddStepButton.prop('expanded')).toBe(false)
@@ -119,7 +112,7 @@ describe('StepCreationButton', () => {
 
     it('renders step button items when expanded', () => {
       const wrapper = render()
-      const button = wrapper.find(PrimaryButton)
+      const button = wrapper.find(DeprecatedPrimaryButton)
       act(() => {
         button.simulate('click')
       })
@@ -127,15 +120,15 @@ describe('StepCreationButton', () => {
       const updatedAddStepButton = wrapper.find(StepCreationButtonComponent)
       // all 6 step button items render as children
       const stepButtonItems = updatedAddStepButton.find(StepButtonItem)
-      expect(stepButtonItems).toHaveLength(7)
+      expect(stepButtonItems).toHaveLength(8)
       // modules are disabled since there are no modules on deck
       const disabledModuleSteps = stepButtonItems.find({ disabled: true })
       expect(disabledModuleSteps).toHaveLength(4)
       // enabled button tooltip
-      const mixTooltip = stepButtonItems.at(1).find(Tooltip)
+      const mixTooltip = stepButtonItems.at(2).find(Tooltip)
       expect(mixTooltip.prop('children')).toBe('Mix contents of wells/tubes.')
       // disabled module step button tooltip
-      const disabledButtonTooltip = stepButtonItems.at(3).find(Tooltip)
+      const disabledButtonTooltip = stepButtonItems.at(4).find(Tooltip)
       expect(disabledButtonTooltip.prop('children')).toBe(
         'Add a relevant module to use this step'
       )
@@ -157,7 +150,7 @@ describe('StepCreationButton', () => {
           },
         })
       const wrapper = render()
-      const button = wrapper.find(PrimaryButton)
+      const button = wrapper.find(DeprecatedPrimaryButton)
 
       act(() => {
         button.simulate('click')
@@ -170,7 +163,7 @@ describe('StepCreationButton', () => {
       const disabledModuleSteps = stepButtonItems.find({ disabled: true })
       expect(disabledModuleSteps).toHaveLength(3)
       // enabled temperature module step tooltip
-      const enabledButtonTooltip = stepButtonItems.at(5).find(Tooltip)
+      const enabledButtonTooltip = stepButtonItems.at(6).find(Tooltip)
       expect(enabledButtonTooltip.prop('children')).toBe(
         'Set temperature command for Temperature module.'
       )
@@ -183,7 +176,7 @@ describe('StepCreationButton', () => {
         .mockImplementation(() => () => null) // mockImplementation is just to avoid calling the real action creator
 
       const wrapper = render()
-      const button = wrapper.find(PrimaryButton)
+      const button = wrapper.find(DeprecatedPrimaryButton)
 
       act(() => {
         button.simulate('click')

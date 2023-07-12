@@ -1,0 +1,109 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "positiveNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "xyzArray": {
+      "type": "array",
+      "description": "Array of 3 numbers, [x, y, z]",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "liquidHandlingSpecs": {
+      "description": "Object containing linear equations for translating between uL of liquid and mm of plunger travel. There is one linear equation for aspiration and one for dispense",
+      "type": "object",
+      "required": ["aspirate", "dispense"],
+      "additionalProperties": false,
+      "properties": {
+        "aspirate": { "$ref": "#/definitions/xyzArray" },
+        "dispense": { "$ref": "#/definitions/xyzArray" }
+      }
+    },
+    "flowRate": {
+      "type": "object",
+      "required": ["value", "min", "max"],
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/positiveNumber",
+          "$comment": "This key is deprecated in favor of valuesByApiLevel"
+        },
+        "min": { "$ref": "#/definitions/positiveNumber" },
+        "max": { "$ref": "#/definitions/positiveNumber" }
+      }
+    }
+  },
+  "type": "object",
+  "required": [
+    "$otSharedSchema",
+    "maxVolume",
+    "minVolume",
+    "defaultTipracks",
+    "supportedTips"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$otSharedSchema": {
+      "type": "string",
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/pipette/schemas/2/pipetteLiquidPropertiesSchema.json is a reference to this schema."
+    },
+    "supportedTips": {
+      "type": "object",
+      "description": "A container of supported tip types",
+      "properties": {
+        "patternProperties": {
+          "description": "Tip specific liquid handling properties for a given pipette. Using the active tip on a pipette, we will look up the pipetting configurations associated with that tip+pipette combo.",
+          "type": "object",
+          "$comment": "Example key: 't50'",
+          "^t[0-9]{2,4}": {
+            "required": [
+              "defaultAspirateFlowRate",
+              "defaultDispenseFlowRate",
+              "defaultBlowOutFlowRate",
+              "aspirate",
+              "dispense"
+            ],
+            "properties": {
+              "defaultAspirateFlowRate": {
+                "$ref": "#/definitions/flowRate"
+              },
+              "defaultDispenseFlowRate": {
+                "$ref": "#/definitions/flowRate"
+              },
+              "defaultBlowOutFlowRate": {
+                "$ref": "#/definitions/flowRate"
+              },
+              "defaultTipLength": {
+                "$ref": "#/definitions/positiveNumber"
+              },
+              "defaultTipOverlap": {
+                "$ref": "#/definitions/positiveNumber"
+              },
+              "defaultReturnTipHeight": {
+                "$ref": "#/definitions/positiveNumber"
+              },
+              "aspirate": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/liquidHandlingSpecs" }
+              },
+              "dispense": {
+                "type": "array",
+                "items": { "$ref": "#/definitions/liquidHandlingSpecs" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "maxVolume": { "$ref": "#/definitions/positiveNumber" },
+    "minVolume": { "$ref": "#/definitions/positiveNumber" },
+    "defaultTipracks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

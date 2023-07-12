@@ -1,22 +1,17 @@
 import * as React from 'react'
 import { i18n } from '../../../i18n'
-import { fireEvent } from '@testing-library/react'
-import {
-  useCreateCommandMutation,
-  useCreateLiveCommandMutation,
-} from '@opentrons/react-api-client'
+import { fireEvent, waitFor } from '@testing-library/react'
+import { useCreateLiveCommandMutation } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '../../../redux/config'
-import { TestShakeSlideout } from '../TestShakeSlideout'
 import { mockHeaterShaker } from '../../../redux/modules/__fixtures__'
-import { useLatchControls } from '../hooks'
-import { useModuleIdFromRun } from '../useModuleIdFromRun'
 import { HeaterShakerWizard } from '../../Devices/HeaterShakerWizard'
+import { useLatchControls } from '../hooks'
+import { TestShakeSlideout } from '../TestShakeSlideout'
 
 jest.mock('../../../redux/config')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../hooks')
-jest.mock('../useModuleIdFromRun')
 jest.mock('../../Devices/HeaterShakerWizard')
 
 const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFunction<
@@ -25,14 +20,8 @@ const mockGetIsHeaterShakerAttached = getIsHeaterShakerAttached as jest.MockedFu
 const mockUseLiveCommandMutation = useCreateLiveCommandMutation as jest.MockedFunction<
   typeof useCreateLiveCommandMutation
 >
-const mockUseCommandMutation = useCreateCommandMutation as jest.MockedFunction<
-  typeof useCreateCommandMutation
->
 const mockUseLatchControls = useLatchControls as jest.MockedFunction<
   typeof useLatchControls
->
-const mockUseModuleIdFromRun = useModuleIdFromRun as jest.MockedFunction<
-  typeof useModuleIdFromRun
 >
 const mockHeaterShakerWizard = HeaterShakerWizard as jest.MockedFunction<
   typeof HeaterShakerWizard
@@ -113,7 +102,7 @@ const mockMovingHeaterShaker = {
 describe('TestShakeSlideout', () => {
   let props: React.ComponentProps<typeof TestShakeSlideout>
   let mockCreateLiveCommand = jest.fn()
-  let mockCreateCommand = jest.fn()
+  const mockToggleLatch = jest.fn()
   beforeEach(() => {
     props = {
       module: mockHeaterShaker,
@@ -121,7 +110,7 @@ describe('TestShakeSlideout', () => {
       isExpanded: true,
     }
     mockUseLatchControls.mockReturnValue({
-      handleLatch: jest.fn(),
+      toggleLatch: mockToggleLatch,
       isLatchClosed: true,
     } as any)
     mockCreateLiveCommand = jest.fn()
@@ -129,15 +118,6 @@ describe('TestShakeSlideout', () => {
     mockUseLiveCommandMutation.mockReturnValue({
       createLiveCommand: mockCreateLiveCommand,
     } as any)
-
-    mockCreateCommand = jest.fn()
-    mockCreateCommand.mockResolvedValue(null)
-    mockUseCommandMutation.mockReturnValue({
-      createCommand: mockCreateCommand,
-    } as any)
-    mockUseModuleIdFromRun.mockReturnValue({
-      moduleIdFromRun: 'heatershaker_id',
-    })
     mockGetIsHeaterShakerAttached.mockReturnValue(true)
   })
 
@@ -186,7 +166,7 @@ describe('TestShakeSlideout', () => {
       isExpanded: true,
     }
     mockUseLatchControls.mockReturnValue({
-      toggleLatch: jest.fn(),
+      toggleLatch: mockToggleLatch,
       isLatchClosed: false,
     })
 
@@ -195,7 +175,7 @@ describe('TestShakeSlideout', () => {
     expect(button).toBeDisabled()
   })
 
-  it('open latch button should be disabled if the module is shaking', () => {
+  it('open latch button and input field should be disabled if the module is shaking', () => {
     props = {
       module: mockMovingHeaterShaker,
       onCloseClick: jest.fn(),
@@ -204,6 +184,8 @@ describe('TestShakeSlideout', () => {
 
     const { getByRole } = render(props)
     const button = getByRole('button', { name: /Open/i })
+    const input = getByRole('spinbutton')
+    expect(input).toBeDisabled()
     expect(button).toBeDisabled()
   })
 
@@ -220,7 +202,7 @@ describe('TestShakeSlideout', () => {
     expect(mockUseLatchControls).toHaveBeenCalled()
   })
 
-  it('entering an input for shake speed and clicking start should begin shaking', () => {
+  it('entering an input for shake speed and clicking start should begin shaking', async () => {
     props = {
       module: mockHeaterShaker,
       onCloseClick: jest.fn(),
@@ -233,54 +215,24 @@ describe('TestShakeSlideout', () => {
     fireEvent.change(input, { target: { value: '300' } })
     fireEvent.click(button)
 
-    expect(mockCreateLiveCommand).toHaveBeenCalledWith({
-      command: {
-        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
-        params: {
-          moduleId: 'heatershaker_id',
-          rpm: 300,
+    await waitFor(() => {
+      expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+        command: {
+          commandType: 'heaterShaker/closeLabwareLatch',
+          params: {
+            moduleId: 'heatershaker_id',
+          },
         },
-      },
-    })
-  })
-
-  it('renders the open labware latch button and clicking it opens the latch when there is a runId', () => {
-    props = {
-      module: mockCloseLatchHeaterShaker,
-      onCloseClick: jest.fn(),
-      isExpanded: true,
-      runId: 'test123',
-    }
-
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: /Open/i })
-    fireEvent.click(button)
-    expect(mockUseLatchControls).toHaveBeenCalled()
-  })
-
-  it('entering an input for shake speed and clicking start should begin shaking when there is a runId', () => {
-    props = {
-      module: mockHeaterShaker,
-      onCloseClick: jest.fn(),
-      isExpanded: true,
-      runId: 'test123',
-    }
-
-    const { getByRole } = render(props)
-    const button = getByRole('button', { name: /Start/i })
-    const input = getByRole('spinbutton')
-    fireEvent.change(input, { target: { value: '300' } })
-    fireEvent.click(button)
-
-    expect(mockCreateCommand).toHaveBeenCalledWith({
-      runId: props.runId,
-      command: {
-        commandType: 'heaterShaker/setAndWaitForShakeSpeed',
-        params: {
-          moduleId: 'heatershaker_id',
-          rpm: 300,
+      })
+      expect(mockCreateLiveCommand).toHaveBeenCalledWith({
+        command: {
+          commandType: 'heaterShaker/setAndWaitForShakeSpeed',
+          params: {
+            moduleId: 'heatershaker_id',
+            rpm: 300,
+          },
         },
-      },
+      })
     })
   })
 })

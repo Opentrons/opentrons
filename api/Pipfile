@@ -23,12 +23,14 @@ twine = "==2.0.0"
 wheel = "==0.30.0"
 typeguard = "==2.12.1"
 sphinx-substitution-extensions = "==2020.9.30.0"
+sphinxext-opengraph = "==0.8.1"
+sphinx-tabs = ">=3.4.1,<4"
 mock = "~=4.0.2"
 flake8 = "~=3.9.0"
 flake8-annotations = "~=2.6.2"
 flake8-docstrings = "~=1.6.0"
 flake8-noqa = "~=1.2.1"
-decoy = "~=1.10.3"
+decoy = "~=1.11"
 black = "==22.3.0"
 types-mock = "==4.0.1"
 types-setuptools = "==57.0.2"
@@ -37,5 +39,7 @@ opentrons = { editable = true, path = "." }
 opentrons-hardware = { editable = true, path = "./../hardware" }
 # specify typing-extensions explicitly to force lockfile inclusion on Python >= 3.8
 typing-extensions = ">=4.0.0,<5"
+pytest-profiling = "~=1.7.0"
 # TODO(mc, 2022-03-31): upgrade sphinx, remove this subdep pin
 jinja2 = ">=2.3,<3.1"
+hypothesis = ">=6.36,<7"

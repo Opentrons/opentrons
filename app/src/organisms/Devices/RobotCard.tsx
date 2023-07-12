@@ -1,73 +1,50 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
-import { Link, useHistory } from 'react-router-dom'
-import { css } from 'styled-components'
+import { useHistory } from 'react-router-dom'
 
 import {
   Box,
   Flex,
-  Icon,
-  ALIGN_CENTER,
   ALIGN_START,
-  SIZE_1,
-  JUSTIFY_SPACE_BETWEEN,
+  BORDERS,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
+  JUSTIFY_FLEX_START,
+  JUSTIFY_SPACE_BETWEEN,
+  POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
   SPACING,
-  COLORS,
-  BORDERS,
   TYPOGRAPHY,
+  WRAP,
 } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getGripperDisplayName,
+  getModuleDisplayName,
+  getPipetteModelSpecs,
+} from '@opentrons/shared-data'
+import {
+  useInstrumentsQuery,
+  usePipettesQuery,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
+import FLEX_PNG from '../../assets/images/FLEX.png'
+import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
-import { SecondaryTertiaryButton } from '../../atoms/buttons'
-import { CONNECTABLE, UNREACHABLE } from '../../redux/discovery'
+import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
-import { useCurrentRunId } from '../../organisms/ProtocolUpload/hooks'
-import { useCurrentRunStatus } from '../../organisms/RunTimeControl/hooks'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import {
-  useAttachedModules,
-  useAttachedPipettes,
-  useProtocolDetailsForRun,
-} from './hooks'
+import { useIsOT3 } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
+import { RobotStatusHeader } from './RobotStatusHeader'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
-
-const ROBOT_CARD_STYLE = css`
-  border: 1px solid ${COLORS.medGrey};
-  &:hover {
-    border: 1px solid ${COLORS.medGreyHover};
-  }
-`
-
-const ROBOT_CARD_BREAKPOINT = '750px'
-
-const ROBOT_CARD_ATTACHMENTS_GRID = css`
-  display: grid;
-  grid-template-columns: none;
-  grid-template-rows: 2fr 1fr;
-
-  @media (min-width: ${ROBOT_CARD_BREAKPOINT}) {
-    grid-template-columns: 4fr 1fr;
-    grid-template-rows: none;
-  }
-`
-
-const ROBOT_CARD_PIPETTES_GRID = css`
-  display: grid;
-  grid-template-columns: none;
-  grid-template-rows: 1fr;
-
-  @media (min-width: ${ROBOT_CARD_BREAKPOINT}) {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: none;
-  }
-`
+import type { State } from '../../redux/types'
+import { GripperData } from '@opentrons/api-client'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -75,74 +52,67 @@ interface RobotCardProps {
 
 export function RobotCard(props: RobotCardProps): JSX.Element | null {
   const { robot } = props
-  const { name: robotName = null, local } = robot
+  const { name: robotName, local } = robot
   const history = useHistory()
+  const robotModel = useSelector((state: State) =>
+    getRobotModelByName(state, robotName)
+  )
 
-  return robotName != null ? (
+  return robot != null ? (
     <Flex
-      alignItems={ALIGN_CENTER}
+      alignItems={ALIGN_START}
       backgroundColor={COLORS.white}
-      css={ROBOT_CARD_STYLE}
-      borderRadius={BORDERS.radiusSoftCorners}
-      flexDirection={DIRECTION_ROW}
-      marginBottom={SPACING.spacing3}
-      padding={`${SPACING.spacing2} ${SPACING.spacing2} ${SPACING.spacing3} ${SPACING.spacing3}`}
-      width="100%"
-      onClick={() => history.push(`/devices/${robotName}`)}
       cursor="pointer"
+      flexDirection={DIRECTION_ROW}
+      gridGap={SPACING.spacing16}
+      minWidth="36rem"
+      padding={SPACING.spacing16}
+      position={POSITION_RELATIVE}
+      onClick={() => history.push(`/devices/${robotName}`)}
+      css={BORDERS.cardOutlineBorder}
     >
       <img
-        src={OT2_PNG}
+        src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
         style={{ width: '6rem' }}
-        id={`RobotCard_${robotName}_robotImage`}
+        id={`RobotCard_${String(robotName)}_robotImage`}
       />
-      <Box padding={SPACING.spacing3} width="100%">
-        <UpdateRobotBanner robot={robot} marginBottom={SPACING.spacing3} />
+      <Flex
+        flexDirection={DIRECTION_COLUMN}
+        gridGap={SPACING.spacing12}
+        justifyContent={JUSTIFY_FLEX_START}
+        width="100%"
+      >
+        <UpdateRobotBanner robot={robot} marginRight={SPACING.spacing24} />
         <ReachableBanner robot={robot} />
-        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} alignItems={ALIGN_START}>
-          <Flex flexDirection={DIRECTION_COLUMN}>
-            <StyledText
-              as="h6"
-              paddingBottom={SPACING.spacing1}
-              id={`RobotStatusBanner_${robotName}_robotModel`}
-              color={COLORS.darkGreyEnabled}
-            >
-              {/* robot_model can be seen in the health response, but only for "connectable" robots. Probably best to leave as "OT-2" for now */}
-              OT-2
-            </StyledText>
-            <Flex alignItems={ALIGN_CENTER} paddingBottom={SPACING.spacing4}>
-              <Flex alignItems={ALIGN_CENTER}>
-                <StyledText
-                  as="h3"
-                  marginRight={SPACING.spacing4}
-                  id={`RobotStatusBanner_${robotName}_robotName`}
-                >
-                  {robotName}
-                </StyledText>
-                {robot.status !== UNREACHABLE && local != null ? (
-                  <Icon
-                    // local boolean corresponds to a wired usb connection
-                    name={local ? 'usb' : 'wifi'}
-                    size={SIZE_1}
-                    marginRight={SPACING.spacing3}
-                  />
-                ) : null}
-              </Flex>
-            </Flex>
-          </Flex>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
+          <RobotStatusHeader
+            local={local}
+            name={robotName}
+            robotModel={robotModel}
+            alignItems={ALIGN_START}
+            paddingRight={SPACING.spacing24}
+          />
 
           {robot.status === CONNECTABLE ? (
-            <RunningProtocolBanner robotName={robotName} />
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              flexWrap={WRAP}
+              gridGap={SPACING.spacing16}
+              justifyContent={JUSTIFY_SPACE_BETWEEN}
+            >
+              <AttachedInstruments robotName={robotName} />
+              <AttachedModules robotName={robotName} />
+            </Flex>
           ) : null}
         </Flex>
-        {robot.status === CONNECTABLE ? (
-          <Box css={ROBOT_CARD_ATTACHMENTS_GRID}>
-            <AttachedPipettes robotName={robotName} />
-            <AttachedModules robotName={robotName} />
-          </Box>
-        ) : null}
+      </Flex>
+      <Box
+        position={POSITION_ABSOLUTE}
+        top={SPACING.spacing4}
+        right={SPACING.spacing4}
+      >
+        <RobotOverflowMenu robot={robot} alignSelf={ALIGN_START} />
       </Box>
-      <RobotOverflowMenu robot={robot} alignSelf={ALIGN_START} />
     </Flex>
   ) : null
 }
@@ -150,25 +120,25 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
 function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
-  const attachedModules = useAttachedModules()
-  return attachedModules.length > 0 ? (
-    <Box
-      display="grid"
-      gridTemplateRows="1fr 1fr"
-      paddingRight={SPACING.spacing4}
-    >
+  const {
+    data: modulesData,
+    isLoading: isModulesQueryLoading,
+  } = useModulesQuery()
+  const attachedModules = modulesData?.data ?? []
+
+  return !isModulesQueryLoading && attachedModules.length > 0 ? (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <StyledText
         as="h6"
         textTransform={TYPOGRAPHY.textTransformUppercase}
         color={COLORS.darkGreyEnabled}
-        marginBottom={SPACING.spacing2}
       >
         {t('modules')}
       </StyledText>
       <Flex>
         {attachedModules.map((module, i) => (
           <ModuleIcon
-            key={`${module.moduleModel}_${i}_${robotName}`}
+            key={`${String(module.moduleModel)}_${i}_${robotName}`}
             tooltipText={t('this_robot_has_connected_and_power_on_module', {
               moduleName: getModuleDisplayName(module.moduleModel),
             })}
@@ -176,70 +146,74 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
           />
         ))}
       </Flex>
-    </Box>
-  ) : (
-    <Flex width="100%"></Flex>
-  )
-}
-function AttachedPipettes(props: { robotName: string }): JSX.Element {
-  const { robotName } = props
-  const { t } = useTranslation('devices_landing')
-  const attachedPipettes = useAttachedPipettes()
-
-  return (
-    <Box css={ROBOT_CARD_PIPETTES_GRID}>
-      <Box gridTemplateRows="1fr 1fr" paddingRight={SPACING.spacing4}>
-        <StyledText
-          as="h6"
-          textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.darkGreyEnabled}
-          marginBottom={SPACING.spacing2}
-        >
-          {t('left_mount')}
-        </StyledText>
-        <StyledText as="p" id={`RobotCard_${robotName}_leftMountPipette`}>
-          {attachedPipettes?.left?.modelSpecs.displayName ?? t('empty')}
-        </StyledText>
-      </Box>
-      <Box gridTemplateRows="1fr 1fr" paddingRight={SPACING.spacing4}>
-        <StyledText
-          as="h6"
-          textTransform={TYPOGRAPHY.textTransformUppercase}
-          color={COLORS.darkGreyEnabled}
-          marginBottom={SPACING.spacing2}
-        >
-          {t('right_mount')}
-        </StyledText>
-        <StyledText as="p" id={`RobotCard_${robotName}_rightMountPipette`}>
-          {attachedPipettes?.right?.modelSpecs.displayName ?? t('empty')}
-        </StyledText>
-      </Box>
-    </Box>
-  )
-}
-
-function RunningProtocolBanner(props: {
-  robotName: string
-}): JSX.Element | null {
-  const { robotName } = props
-  const { t } = useTranslation('devices_landing')
-  const currentRunId = useCurrentRunId()
-  const currentRunStatus = useCurrentRunStatus()
-  const { displayName } = useProtocolDetailsForRun(currentRunId)
-
-  return currentRunId != null &&
-    currentRunStatus != null &&
-    displayName != null ? (
-    <Flex alignItems={ALIGN_CENTER} onClick={e => e.stopPropagation()}>
-      <StyledText as="label" paddingRight={SPACING.spacing3}>
-        {`${displayName}; ${t(`run_details:status_${currentRunStatus}`)}`}
-      </StyledText>
-      <Link
-        to={`/devices/${robotName}/protocol-runs/${currentRunId}/run-log`}
-        id={`RobotStatusBanner_${robotName}_goToRun`}
-      >
-        <SecondaryTertiaryButton>{t('go_to_run')}</SecondaryTertiaryButton>
-      </Link>
     </Flex>
   ) : null
+}
+
+function AttachedInstruments(props: { robotName: string }): JSX.Element {
+  const { t } = useTranslation('devices_landing')
+  const isOT3 = useIsOT3(props.robotName)
+  const {
+    data: pipettesData,
+    isLoading: isPipetteQueryLoading,
+  } = usePipettesQuery()
+
+  const {
+    data: attachedInstruments,
+    isLoading: isInstrumentsQueryLoading,
+  } = useInstrumentsQuery({ enabled: isOT3 })
+  const attachedGripper =
+    (attachedInstruments?.data ?? []).find(
+      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
+    ) ?? null
+  const leftPipetteModel = pipettesData?.left?.model ?? null
+  const rightPipetteModel = pipettesData?.right?.model ?? null
+  const gripperDisplayName =
+    attachedGripper != null && attachedGripper.instrumentModel === 'gripperV1'
+      ? getGripperDisplayName(attachedGripper.instrumentModel)
+      : null
+
+  // TODO(bh, 2022-11-1): insert actual 96-channel data
+  // const leftAndRightMountsPipetteDisplayName = 'P20 96-Channel GEN1'
+  const leftAndRightMountsPipetteDisplayName = null
+
+  return (
+    <Flex
+      flex="1"
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing4}
+      minWidth="24rem"
+    >
+      <StyledText as="h6" color={COLORS.darkGreyEnabled}>
+        {t('shared:instruments')}
+      </StyledText>
+
+      {isPipetteQueryLoading || isInstrumentsQueryLoading ? null : (
+        <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
+          {leftAndRightMountsPipetteDisplayName != null ? (
+            <InstrumentContainer
+              displayName={leftAndRightMountsPipetteDisplayName}
+            />
+          ) : null}
+          {leftPipetteModel != null ? (
+            <InstrumentContainer
+              displayName={
+                getPipetteModelSpecs(leftPipetteModel)?.displayName ?? ''
+              }
+            />
+          ) : null}
+          {rightPipetteModel != null ? (
+            <InstrumentContainer
+              displayName={
+                getPipetteModelSpecs(rightPipetteModel)?.displayName ?? ''
+              }
+            />
+          ) : null}
+          {gripperDisplayName != null ? (
+            <InstrumentContainer displayName={gripperDisplayName} />
+          ) : null}
+        </Flex>
+      )}
+    </Flex>
+  )
 }

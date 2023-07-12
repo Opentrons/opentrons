@@ -27,8 +27,8 @@ export function IpHostnameField({
     <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        paddingRight={SPACING.spacing3}
-        marginTop={SPACING.spacing2}
+        paddingRight={SPACING.spacing8}
+        marginTop={SPACING.spacing4}
       >
         <input
           id="ip"
@@ -43,7 +43,7 @@ export function IpHostnameField({
         fontSize={TYPOGRAPHY.fontSizeH6}
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         lineHeight={TYPOGRAPHY.lineHeight12}
-        marginTop={SPACING.spacing2}
+        marginTop={SPACING.spacing4}
         width="100%"
       >
         {t('add_ip_button')}

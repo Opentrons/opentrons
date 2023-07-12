@@ -4,15 +4,18 @@ from typing import Any, AsyncGenerator, Dict, Generator, Sequence, cast
 from unittest.mock import patch
 
 import pytest
+from decoy import Decoy
 from numpy import isclose
 
 from opentrons.config import CONFIG, pipette_config, feature_flags as ff
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import API
 from opentrons.hardware_control.dev_types import PipetteSpec
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
 
-defs = json.loads(load_shared_data("pipette/definitions/pipetteModelSpecs.json"))
+from opentrons.hardware_control.backends import Simulator
+
+defs = json.loads(load_shared_data("pipette/definitions/1/pipetteModelSpecs.json"))
 
 
 def check_sequences_close(
@@ -39,15 +42,17 @@ def check_sequences_close(
             or c.endswith("1.6")
             or "v2" in c
             or "v3" in c
+            or "v4" in c
         )
     ],
 )
 def test_versioned_aspiration(
+    decoy: Decoy,
     pipette_model: PipetteModel,
-    monkeypatch: pytest.MonkeyPatch,
+    mock_feature_flags: None,
 ) -> None:
+    decoy.when(ff.use_old_aspiration_functions()).then_return(True)
 
-    monkeypatch.setattr(ff, "use_old_aspiration_functions", lambda: True)
     was = pipette_config.load(pipette_model)
     check_sequences_close(
         was.ul_per_mm["aspirate"],
@@ -58,7 +63,8 @@ def test_versioned_aspiration(
         defs["config"][pipette_model]["ulPerMm"][0]["dispense"],
     )
 
-    monkeypatch.setattr(ff, "use_old_aspiration_functions", lambda: False)
+    decoy.when(ff.use_old_aspiration_functions()).then_return(False)
+
     now = pipette_config.load(pipette_model)
     check_sequences_close(
         now.ul_per_mm["aspirate"],
@@ -271,9 +277,12 @@ def test_validate_overrides_pass(
 # TODO(mc, 2022-06-10): this fixture reaches into internals of the HardwareAPI
 # that are only present in the simulator, not the actual controller. It is not
 # an effective test of whether anything actually works
+# TODO (lc, 12-05-2022): Re-write these tests when the OT2 pipette
+# configurations are ported over to the new format.
+@pytest.mark.ot2_only
 @pytest.fixture
 async def attached_pipettes(
-    hardware: HardwareControlAPI,
+    hardware: API,
     request: pytest.FixtureRequest,
 ) -> AsyncGenerator[Dict[str, PipetteSpec], None]:
     """Fixture the robot to have attached pipettes
@@ -297,22 +306,30 @@ async def attached_pipettes(
     right_name = right_mod.split("_v")[0]
     left_id = marker_with_default("attach_left_id", "abc123")
     right_id = marker_with_default("attach_right_id", "abcd123")
-    mount_type = type(list(hardware._backend._attached_instruments.keys())[0])  # type: ignore[attr-defined]
+    backend = cast(Simulator, hardware._backend)
+    mount_type = type(list(backend._attached_instruments.keys())[0])
 
-    hardware._backend._attached_instruments = {  # type: ignore[attr-defined]
-        mount_type.RIGHT: {"model": right_mod, "id": right_id, "name": right_name},
-        mount_type.LEFT: {"model": left_mod, "id": left_id, "name": left_name},
+    backend._attached_instruments = {
+        mount_type.RIGHT: {  # type: ignore[typeddict-item]
+            "model": right_mod,
+            "id": right_id,
+            "name": right_name,
+        },
+        mount_type.LEFT: {  # type: ignore[typeddict-item]
+            "model": left_mod,
+            "id": left_id,
+            "name": left_name,
+        },
     }
     await hardware.cache_instruments()
-    yield {
-        k.name.lower(): v for k, v in hardware._backend._attached_instruments.items()  # type: ignore[attr-defined]
-    }
+    yield {k.name.lower(): v for k, v in backend._attached_instruments.items()}
 
     # Delete created config files
     (CONFIG["pipette_config_overrides_dir"] / "abc123.json").unlink()
     (CONFIG["pipette_config_overrides_dir"] / "abcd123.json").unlink()
 
 
+@pytest.mark.ot2_only
 async def test_override(attached_pipettes: Dict[str, PipetteSpec]) -> None:
     # This test will check that setting modified pipette configs
     # works as expected
@@ -346,6 +363,7 @@ async def test_override(attached_pipettes: Dict[str, PipetteSpec]) -> None:
     )
 
 
+@pytest.mark.ot2_only
 async def test_incorrect_modify_pipette_settings(
     attached_pipettes: Dict[str, PipetteSpec]
 ) -> None:

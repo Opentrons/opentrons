@@ -1,6 +1,8 @@
 import pytest
 from mock import AsyncMock
-from opentrons.drivers.asyncio.communication.serial_connection import SerialConnection
+from opentrons.drivers.asyncio.communication.serial_connection import (
+    AsyncResponseSerialConnection,
+)
 from opentrons.drivers.heater_shaker import driver
 from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
@@ -8,7 +10,7 @@ from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchSt
 
 @pytest.fixture
 def connection() -> AsyncMock:
-    return AsyncMock(spec=SerialConnection)
+    return AsyncMock(spec=AsyncResponseSerialConnection)
 
 
 @pytest.fixture
@@ -145,10 +147,10 @@ async def test_enter_bootloader(
     subject: driver.HeaterShakerDriver, connection: AsyncMock
 ) -> None:
     """It should enter the bootloader"""
-    connection.send_command.return_value = None
+    connection.send_dfu_command.return_value = None
     await subject.enter_programming_mode()
     expected = CommandBuilder(terminator=driver.HS_COMMAND_TERMINATOR).add_gcode(
         gcode="dfu"
     )
-    connection.send_command.assert_called_once_with(command=expected, retries=0)
+    connection.send_dfu_command.assert_called_once_with(command=expected)
     connection.close.assert_called_once()

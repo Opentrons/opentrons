@@ -16,10 +16,8 @@ from opentrons.motion_planning import (
 )
 
 from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.geometry.module_geometry import (
-    ModuleGeometry,
-)
+from opentrons.protocol_api.core.legacy.deck import Deck
+from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 
 
 MODULE_LOG = logging.getLogger(__name__)

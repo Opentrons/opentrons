@@ -1,36 +1,27 @@
 // Deck Calibration Orchestration Component
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import {
-  ModalPage,
-  SpinnerModalPage,
-  useConditionalConfirm,
-  DISPLAY_FLEX,
-  DIRECTION_COLUMN,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  SPACING_3,
-  C_TRANSPARENT,
-  ALIGN_FLEX_START,
-  C_WHITE,
-} from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-
 import {
-  DeckSetup,
   Introduction,
+  DeckSetup,
   TipPickUp,
   TipConfirmation,
   SaveZPoint,
   SaveXYPoint,
+  ConfirmExit,
+  LoadingState,
   CompleteConfirmation,
-  ConfirmExitModal,
-  INTENT_DECK_CALIBRATION,
 } from '../../organisms/CalibrationPanels'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
+import { WizardHeader } from '../../molecules/WizardHeader'
+import { Portal } from '../../App/portal'
 
-import type { StyleProps, Mount } from '@opentrons/components'
+import type { Mount } from '@opentrons/components'
 import type {
   CalibrationLabware,
   CalibrationSessionStep,
@@ -38,33 +29,6 @@ import type {
 } from '../../redux/sessions/types'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { CalibrateDeckParentProps } from './types'
-
-const DECK_CALIBRATION_SUBTITLE = 'Deck calibration'
-const EXIT = 'exit'
-
-const darkContentsStyleProps = {
-  display: DISPLAY_FLEX,
-  flexDirection: DIRECTION_COLUMN,
-  alignItems: ALIGN_CENTER,
-  padding: SPACING_3,
-  backgroundColor: C_TRANSPARENT,
-  height: '100%',
-}
-const contentsStyleProps = {
-  display: DISPLAY_FLEX,
-  backgroundColor: C_WHITE,
-  flexDirection: DIRECTION_COLUMN,
-  justifyContent: JUSTIFY_CENTER,
-  alignItems: ALIGN_FLEX_START,
-  padding: SPACING_3,
-  maxWidth: '48rem',
-  minHeight: '14rem',
-}
-
-const terminalContentsStyleProps = {
-  ...contentsStyleProps,
-  paddingX: '1.5rem',
-}
 
 const PANEL_BY_STEP: Partial<
   Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>
@@ -77,26 +41,32 @@ const PANEL_BY_STEP: Partial<
   [Sessions.DECK_STEP_SAVING_POINT_ONE]: SaveXYPoint,
   [Sessions.DECK_STEP_SAVING_POINT_TWO]: SaveXYPoint,
   [Sessions.DECK_STEP_SAVING_POINT_THREE]: SaveXYPoint,
-  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: CompleteConfirmation,
+  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: DeckCalibrationComplete,
 }
+const STEPS_IN_ORDER: CalibrationSessionStep[] = [
+  Sessions.DECK_STEP_SESSION_STARTED,
+  Sessions.DECK_STEP_LABWARE_LOADED,
+  Sessions.DECK_STEP_PREPARING_PIPETTE,
+  Sessions.DECK_STEP_INSPECTING_TIP,
+  Sessions.DECK_STEP_JOGGING_TO_DECK,
+  Sessions.DECK_STEP_SAVING_POINT_ONE,
+  Sessions.DECK_STEP_SAVING_POINT_TWO,
+  Sessions.DECK_STEP_SAVING_POINT_THREE,
+  Sessions.DECK_STEP_CALIBRATION_COMPLETE,
+]
 
-const PANEL_STYLE_PROPS_BY_STEP: Partial<
-  Record<CalibrationSessionStep, StyleProps>
-> = {
-  [Sessions.DECK_STEP_SESSION_STARTED]: terminalContentsStyleProps,
-  [Sessions.DECK_STEP_LABWARE_LOADED]: darkContentsStyleProps,
-  [Sessions.DECK_STEP_PREPARING_PIPETTE]: contentsStyleProps,
-  [Sessions.DECK_STEP_INSPECTING_TIP]: contentsStyleProps,
-  [Sessions.DECK_STEP_JOGGING_TO_DECK]: contentsStyleProps,
-  [Sessions.DECK_STEP_SAVING_POINT_ONE]: contentsStyleProps,
-  [Sessions.DECK_STEP_SAVING_POINT_TWO]: contentsStyleProps,
-  [Sessions.DECK_STEP_SAVING_POINT_THREE]: contentsStyleProps,
-  [Sessions.DECK_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
-}
 export function CalibrateDeck(
   props: CalibrateDeckParentProps
 ): JSX.Element | null {
-  const { session, robotName, dispatchRequests, showSpinner, isJogging } = props
+  const { t } = useTranslation('robot_calibration')
+  const {
+    session,
+    robotName,
+    dispatchRequests,
+    showSpinner,
+    isJogging,
+    offsetInvalidationHandler,
+  } = props
   const { currentStep, instrument, labware, supportedCommands } =
     session?.details || {}
 
@@ -144,39 +114,67 @@ export function CalibrateDeck(
     return null
   }
 
-  const titleBarProps = {
-    title: DECK_CALIBRATION_SUBTITLE,
-    back: { onClick: confirmExit, title: EXIT, children: EXIT },
-  }
-
-  if (showSpinner) {
-    return <SpinnerModalPage titleBar={titleBarProps} />
-  }
-  // @ts-expect-error TODO: cannot index with undefined. Also, add test coverage for null case when no panel
-  const Panel = PANEL_BY_STEP[currentStep]
-  return Panel ? (
-    <>
-      <ModalPage
-        titleBar={titleBarProps}
-        innerProps={currentStep ? PANEL_STYLE_PROPS_BY_STEP[currentStep] : {}}
+  const Panel =
+    currentStep != null && currentStep in PANEL_BY_STEP
+      ? PANEL_BY_STEP[currentStep]
+      : null
+  return (
+    <Portal level="top">
+      <LegacyModalShell
+        width="47rem"
+        header={
+          <WizardHeader
+            title={t('deck_calibration')}
+            currentStep={
+              STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0
+            }
+            totalSteps={STEPS_IN_ORDER.length - 1}
+            onExit={confirmExit}
+          />
+        }
       >
-        <Panel
-          sendCommands={sendCommands}
-          cleanUpAndExit={cleanUpAndExit}
-          tipRack={tipRack}
-          isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase() as Mount}
-          currentStep={currentStep}
-          sessionType={session.sessionType}
-          intent={INTENT_DECK_CALIBRATION}
-          supportedCommands={supportedCommands}
-          defaultTipracks={instrument?.defaultTipracks}
-        />
-      </ModalPage>
-      {showConfirmExit && (
-        // @ts-expect-error TODO: ConfirmExitModal expects sessionType
-        <ConfirmExitModal exit={confirmExit} back={cancelExit} />
-      )}
-    </>
-  ) : null
+        {showSpinner || currentStep == null || Panel == null ? (
+          <LoadingState />
+        ) : showConfirmExit ? (
+          <ConfirmExit
+            exit={confirmExit}
+            back={cancelExit}
+            heading={t('progress_will_be_lost', {
+              sessionType: t('deck_calibration'),
+            })}
+            body={t('confirm_exit_before_completion', {
+              sessionType: t('deck_calibration'),
+            })}
+          />
+        ) : (
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            tipRack={tipRack}
+            isMulti={isMulti}
+            mount={instrument?.mount.toLowerCase() as Mount}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            supportedCommands={supportedCommands}
+            defaultTipracks={instrument?.defaultTipracks}
+            calInvalidationHandler={offsetInvalidationHandler}
+          />
+        )}
+      </LegacyModalShell>
+    </Portal>
+  )
+}
+
+function DeckCalibrationComplete(props: CalibrationPanelProps): JSX.Element {
+  const { t } = useTranslation('robot_calibration')
+  const { cleanUpAndExit } = props
+
+  return (
+    <CompleteConfirmation
+      {...{
+        proceed: cleanUpAndExit,
+        flowName: t('deck_calibration'),
+      }}
+    />
+  )
 }

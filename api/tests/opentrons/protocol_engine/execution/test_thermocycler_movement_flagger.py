@@ -9,19 +9,20 @@ from decoy import Decoy
 
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine.state import StateStore
+from opentrons.protocol_engine.state.module_substates.thermocycler_module_substate import (
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
+)
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
-    ModuleModel as PEModuleModel,
 )
-from opentrons.protocol_engine.errors import ThermocyclerNotOpenError
+from opentrons.protocol_engine.errors import (
+    ThermocyclerNotOpenError,
+    WrongModuleTypeError,
+)
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.hardware_control.modules import Thermocycler as HardwareThermocycler
-from opentrons.hardware_control.modules.types import (
-    # Renamed to avoid conflicting with ..types.ModuleModel.
-    ModuleType as OpentronsModuleType,
-    ThermocyclerModuleModel as OpentronsThermocyclerModuleModel,
-)
 from opentrons.drivers.types import ThermocyclerLidStatus
 
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
@@ -53,6 +54,29 @@ def subject(
     )
 
 
+async def test_raises_depending_on_thermocycler_substate_lid_status(
+    subject: ThermocyclerMovementFlagger,
+    state_store: StateStore,
+    decoy: Decoy,
+) -> None:
+    """It should flag movement depending on engine's thermocycler state."""
+    decoy.when(
+        state_store.modules.get_thermocycler_module_substate(module_id="module-id")
+    ).then_return(
+        ThermocyclerModuleSubState(
+            module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=False,
+            target_lid_temperature=None,
+            target_block_temperature=None,
+        ),
+    )
+
+    with pytest.raises(ThermocyclerNotOpenError):
+        await subject.raise_if_labware_in_non_open_thermocycler(
+            labware_parent=ModuleLocation(moduleId="module-id"),
+        )
+
+
 class LidStatusAndRaiseSpec(NamedTuple):
     """Test parametrization data.
 
@@ -78,7 +102,7 @@ class LidStatusAndRaiseSpec(NamedTuple):
             expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
         ),
         LidStatusAndRaiseSpec(
-            lid_status=None,
+            lid_status=ThermocyclerLidStatus.UNKNOWN,
             expected_raise_cm=pytest.raises(ThermocyclerNotOpenError),
         ),
         LidStatusAndRaiseSpec(
@@ -87,8 +111,8 @@ class LidStatusAndRaiseSpec(NamedTuple):
         ),
     ],
 )
-async def test_raises_depending_on_thermocycler_lid_status(
-    lid_status: Optional[ThermocyclerLidStatus],
+async def test_raises_depending_on_thermocycler_hardware_lid_status(
+    lid_status: ThermocyclerLidStatus,
     expected_raise_cm: ContextManager[Any],
     subject: ThermocyclerMovementFlagger,
     state_store: StateStore,
@@ -96,32 +120,30 @@ async def test_raises_depending_on_thermocycler_lid_status(
     decoy: Decoy,
 ) -> None:
     """When on a Thermocycler, it should raise if the lid isn't open."""
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
-        ModuleLocation(moduleId="module-id")
+    decoy.when(
+        state_store.modules.get_thermocycler_module_substate(module_id="module-id")
+    ).then_return(
+        ThermocyclerModuleSubState(
+            module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=True,
+            target_lid_temperature=None,
+            target_block_temperature=None,
+        ),
     )
 
-    decoy.when(state_store.modules.get_model(module_id="module-id")).then_return(
-        PEModuleModel.THERMOCYCLER_MODULE_V1,
-    )
+    decoy.when(state_store.config.use_virtual_modules).then_return(False)
     decoy.when(
         state_store.modules.get_serial_number(module_id="module-id")
     ).then_return("module-serial")
 
-    # These "type: ignore[misc]" comments let us assign to read-only properties,
-    # necessary to work around Decoy not being able to stub properties.
     thermocycler = decoy.mock(cls=HardwareThermocycler)
     decoy.when(thermocycler.device_info).then_return({"serial": "module-serial"})
     decoy.when(thermocycler.lid_status).then_return(lid_status)
-    decoy.when(
-        await hardware_api.find_modules(
-            by_model=OpentronsThermocyclerModuleModel.THERMOCYCLER_V1,
-            resolved_type=OpentronsModuleType.THERMOCYCLER,
-        )
-    ).then_return(([thermocycler], None))
+    decoy.when(hardware_api.attached_modules).then_return([thermocycler])
 
     with expected_raise_cm:
         await subject.raise_if_labware_in_non_open_thermocycler(
-            labware_id="labware-id",
+            labware_parent=ModuleLocation(moduleId="module-id"),
         )
 
 
@@ -132,28 +154,49 @@ async def test_raises_if_hardware_module_has_gone_missing(
     decoy: Decoy,
 ) -> None:
     """It should raise if the hardware module can't be found by its serial no."""
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
-        ModuleLocation(moduleId="module-id")
+    decoy.when(
+        state_store.modules.get_thermocycler_module_substate(module_id="module-id")
+    ).then_return(
+        ThermocyclerModuleSubState(
+            module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=True,
+            target_lid_temperature=None,
+            target_block_temperature=None,
+        ),
     )
 
-    decoy.when(state_store.modules.get_model(module_id="module-id")).then_return(
-        PEModuleModel.THERMOCYCLER_MODULE_V1,
-    )
+    decoy.when(state_store.config.use_virtual_modules).then_return(False)
     decoy.when(
         state_store.modules.get_serial_number(module_id="module-id")
     ).then_return("module-serial")
-
-    decoy.when(
-        await hardware_api.find_modules(
-            by_model=OpentronsThermocyclerModuleModel.THERMOCYCLER_V1,
-            resolved_type=OpentronsModuleType.THERMOCYCLER,
-        )
-    ).then_return(([], None))
+    decoy.when(hardware_api.attached_modules).then_return([])
 
     with pytest.raises(ThermocyclerNotOpenError):
         await subject.raise_if_labware_in_non_open_thermocycler(
-            labware_id="labware-id",
+            labware_parent=ModuleLocation(moduleId="module-id"),
         )
+
+
+async def test_passes_if_virtual_module_lid_open(
+    subject: ThermocyclerMovementFlagger,
+    state_store: StateStore,
+    decoy: Decoy,
+) -> None:
+    """It shouldn't raise if a virtual module in analysis has lid open."""
+    decoy.when(
+        state_store.modules.get_thermocycler_module_substate(module_id="module-id")
+    ).then_return(
+        ThermocyclerModuleSubState(
+            module_id=ThermocyclerModuleId("module-id"),
+            is_lid_open=True,
+            target_lid_temperature=None,
+            target_block_temperature=None,
+        ),
+    )
+    decoy.when(state_store.config.use_virtual_modules).then_return(True)
+    await subject.raise_if_labware_in_non_open_thermocycler(
+        labware_parent=ModuleLocation(moduleId="module-id")
+    )
 
 
 async def test_passes_if_labware_on_non_thermocycler_module(
@@ -163,13 +206,12 @@ async def test_passes_if_labware_on_non_thermocycler_module(
     decoy: Decoy,
 ) -> None:
     """It shouldn't raise if the labware is on a module other than a Thermocycler."""
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+    decoy.when(
+        state_store.modules.get_thermocycler_module_substate(module_id="module-id")
+    ).then_raise(WrongModuleTypeError("Woops"))
+    await subject.raise_if_labware_in_non_open_thermocycler(
         ModuleLocation(moduleId="module-id")
     )
-    decoy.when(state_store.modules.get_model(module_id="module-id")).then_return(
-        PEModuleModel.MAGNETIC_MODULE_V1,
-    )
-    await subject.raise_if_labware_in_non_open_thermocycler("labware-id")
 
 
 async def test_passes_if_labware_not_on_any_module(
@@ -179,7 +221,6 @@ async def test_passes_if_labware_not_on_any_module(
     decoy: Decoy,
 ) -> None:
     """It shouldn't raise if the labware isn't on a module."""
-    decoy.when(state_store.labware.get_location(labware_id="labware-id")).then_return(
+    await subject.raise_if_labware_in_non_open_thermocycler(
         DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     )
-    await subject.raise_if_labware_in_non_open_thermocycler("labware-id")

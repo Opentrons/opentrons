@@ -1,37 +1,23 @@
 import * as React from 'react'
-import { mount } from 'enzyme'
+import { renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../i18n'
 import { mockDeckCalTipRack } from '../../../redux/sessions/__fixtures__'
 import * as Sessions from '../../../redux/sessions'
 
 import { TipConfirmation } from '../TipConfirmation'
 
-import type { Mount } from '@opentrons/components'
-import type { ReactWrapper, HTMLAttributes } from 'enzyme'
-
 describe('TipConfirmation', () => {
   let render: (
-    props?: Partial<
-      React.ComponentProps<typeof TipConfirmation> & { pipMount: Mount }
-    >
-  ) => ReactWrapper<React.ComponentProps<typeof TipConfirmation>>
+    props?: Partial<React.ComponentProps<typeof TipConfirmation>>
+  ) => ReturnType<typeof renderWithProviders>
 
   const mockSendCommands = jest.fn()
   const mockDeleteSession = jest.fn()
 
-  const getConfirmTipButton = (
-    wrapper: ReactWrapper<React.ComponentProps<typeof TipConfirmation>>
-  ): ReactWrapper<HTMLAttributes> =>
-    wrapper.find('button[title="confirmTipAttachedButton"]')
-
-  const getInvalidateTipButton = (
-    wrapper: ReactWrapper<React.ComponentProps<typeof TipConfirmation>>
-  ): ReactWrapper<HTMLAttributes> =>
-    wrapper.find('button[title="invalidateTipButton"]')
-
   beforeEach(() => {
     render = (props = {}) => {
       const {
-        pipMount = 'left',
+        mount = 'left',
         isMulti = false,
         tipRack = mockDeckCalTipRack,
         sendCommands = mockSendCommands,
@@ -39,16 +25,17 @@ describe('TipConfirmation', () => {
         currentStep = Sessions.DECK_STEP_INSPECTING_TIP,
         sessionType = Sessions.SESSION_TYPE_DECK_CALIBRATION,
       } = props
-      return mount(
+      return renderWithProviders(
         <TipConfirmation
           isMulti={isMulti}
-          mount={pipMount}
+          mount={mount}
           tipRack={tipRack}
           sendCommands={sendCommands}
           cleanUpAndExit={cleanUpAndExit}
           currentStep={currentStep}
           sessionType={sessionType}
-        />
+        />,
+        { i18nInstance: i18n }
       )
     }
   })
@@ -57,47 +44,51 @@ describe('TipConfirmation', () => {
     jest.resetAllMocks()
   })
 
-  it('clicking invalidate tip send invalidate tip command', () => {
-    const wrapper = render()
+  it('renders correct heading', () => {
+    const { getByRole } = render()[0]
 
-    getInvalidateTipButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    wrapper.update()
+    getByRole('heading', { name: 'Did pipette pick up tip successfully?' })
+  })
+  it('clicking invalidate tip send invalidate tip command', () => {
+    const { getByRole } = render()[0]
+
+    getByRole('button', { name: 'try again' }).click()
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: Sessions.sharedCalCommands.INVALIDATE_TIP,
     })
   })
-  it('contents are correct for pipette offset calibration ', () => {
-    const wrapper = render({
+  it('proceeds to move to deck for pipette offset calibration', () => {
+    const { getByRole } = render({
       sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-    })
-    expect(wrapper.text()).toContain('Yes, move to slot 5')
-    getConfirmTipButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    wrapper.update()
-
+    })[0]
+    getByRole('button', { name: 'yes' }).click()
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: Sessions.sharedCalCommands.MOVE_TO_DECK,
     })
   })
-  it('contents are correct for deck calibration ', () => {
-    const wrapper = render({
-      sessionType: Sessions.SESSION_TYPE_DECK_CALIBRATION,
-    })
-    expect(wrapper.text()).toContain('Yes, move to slot 5')
-    getConfirmTipButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    wrapper.update()
-
+  it('proceeds to move to deck for deck calibration', () => {
+    const { getByRole } = render({
+      sessionType: Sessions.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+    })[0]
+    getByRole('button', { name: 'yes' }).click()
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: Sessions.sharedCalCommands.MOVE_TO_DECK,
     })
   })
-  it('contents are correct for tip length calibration ', () => {
-    const wrapper = render({
+  it('proceeds to move to reference point for tip length calibration', () => {
+    const { getByRole } = render({
       sessionType: Sessions.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+    })[0]
+    getByRole('button', { name: 'yes' }).click()
+    expect(mockSendCommands).toHaveBeenCalledWith({
+      command: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
     })
-    expect(wrapper.text()).toContain('Yes, move to measure tip length')
-    getConfirmTipButton(wrapper).invoke('onClick')?.({} as React.MouseEvent)
-    wrapper.update()
-
+  })
+  it('proceeds to move to reference point for calibration health check', () => {
+    const { getByRole } = render({
+      sessionType: Sessions.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+    })[0]
+    getByRole('button', { name: 'yes' }).click()
     expect(mockSendCommands).toHaveBeenCalledWith({
       command: Sessions.sharedCalCommands.MOVE_TO_REFERENCE_POINT,
     })

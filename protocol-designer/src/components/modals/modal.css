@@ -1,6 +1,7 @@
 .modal {
   z-index: 100;
   align-items: flex-start;
+  position: fixed;
 
   & p {
     line-height: 1.5;

@@ -1,1 +1,0 @@
-"""Gravimetric test tests."""

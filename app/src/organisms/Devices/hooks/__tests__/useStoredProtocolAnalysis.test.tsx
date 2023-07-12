@@ -6,26 +6,28 @@ import { createStore, Store } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 
 import {
-  parseAllRequiredModuleModelsById,
-  parseInitialLoadedLabwareById,
-  parseInitialLoadedLabwareDefinitionsById,
-  parseInitialPipetteNamesById,
+  parseRequiredModulesEntity,
+  parseInitialLoadedLabwareEntity,
+  parsePipetteEntity,
 } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { storedProtocolData } from '../../../../redux/protocol-storage/__fixtures__'
-import { getStoredProtocol } from '../../../../redux/protocol-storage'
+import {
+  getStoredProtocol,
+  StoredProtocolData,
+} from '../../../../redux/protocol-storage'
 import { useStoredProtocolAnalysis } from '../useStoredProtocolAnalysis'
 import {
-  LABWARE_BY_ID,
-  LABWARE_DEFINITIONS,
-  MODULE_MODELS_BY_ID,
-  PIPETTE_NAMES_BY_ID,
+  LABWARE_ENTITY,
+  MODULE_ENTITY,
+  PIPETTE_ENTITY,
   STORED_PROTOCOL_ANALYSIS,
 } from '../__fixtures__/storedProtocolAnalysis'
 
 import type { Protocol, Run } from '@opentrons/api-client'
 
+jest.mock('@opentrons/shared-data')
 jest.mock('@opentrons/api-client')
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../redux/protocol-storage/selectors')
@@ -37,19 +39,25 @@ const mockUseRunQuery = useRunQuery as jest.MockedFunction<typeof useRunQuery>
 const mockGetStoredProtocol = getStoredProtocol as jest.MockedFunction<
   typeof getStoredProtocol
 >
-const mockParseAllRequiredModuleModelsById = parseAllRequiredModuleModelsById as jest.MockedFunction<
-  typeof parseAllRequiredModuleModelsById
+const mockParseRequiredModulesEntity = parseRequiredModulesEntity as jest.MockedFunction<
+  typeof parseRequiredModulesEntity
 >
-const mockParseInitialLoadedLabwareById = parseInitialLoadedLabwareById as jest.MockedFunction<
-  typeof parseInitialLoadedLabwareById
+const mockParseInitialLoadedLabwareEntity = parseInitialLoadedLabwareEntity as jest.MockedFunction<
+  typeof parseInitialLoadedLabwareEntity
 >
-const mockParseInitialLoadedLabwareDefinitionsById = parseInitialLoadedLabwareDefinitionsById as jest.MockedFunction<
-  typeof parseInitialLoadedLabwareDefinitionsById
->
-const mockParseInitialPipetteNamesById = parseInitialPipetteNamesById as jest.MockedFunction<
-  typeof parseInitialPipetteNamesById
+const mockParsePipetteEntity = parsePipetteEntity as jest.MockedFunction<
+  typeof parsePipetteEntity
 >
 const store: Store<any> = createStore(jest.fn(), {})
+
+const modifiedStoredProtocolData = {
+  ...storedProtocolData,
+  mostRecentAnalysis: {
+    commands: storedProtocolData?.mostRecentAnalysis?.commands,
+    liquids: storedProtocolData?.mostRecentAnalysis?.liquids,
+    errors: storedProtocolData?.mostRecentAnalysis?.errors,
+  },
+}
 
 const RUN_ID = 'the_run_id'
 const PROTOCOL_ID = 'the_protocol_id'
@@ -76,14 +84,9 @@ describe('useStoredProtocolAnalysis hook', () => {
     when(mockGetStoredProtocol)
       .calledWith(undefined as any)
       .mockReturnValue(null)
-    when(mockParseAllRequiredModuleModelsById).mockReturnValue(
-      MODULE_MODELS_BY_ID
-    )
-    when(mockParseInitialLoadedLabwareById).mockReturnValue(LABWARE_BY_ID)
-    when(mockParseInitialLoadedLabwareDefinitionsById).mockReturnValue(
-      LABWARE_DEFINITIONS
-    )
-    when(mockParseInitialPipetteNamesById).mockReturnValue(PIPETTE_NAMES_BY_ID)
+    when(mockParseRequiredModulesEntity).mockReturnValue([MODULE_ENTITY])
+    when(mockParseInitialLoadedLabwareEntity).mockReturnValue([LABWARE_ENTITY])
+    when(mockParsePipetteEntity).mockReturnValue([PIPETTE_ENTITY])
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -133,7 +136,7 @@ describe('useStoredProtocolAnalysis hook', () => {
       } as UseQueryResult<Protocol>)
     when(mockGetStoredProtocol)
       .calledWith(undefined as any, PROTOCOL_KEY)
-      .mockReturnValue(storedProtocolData)
+      .mockReturnValue(modifiedStoredProtocolData as StoredProtocolData)
 
     const { result } = renderHook(() => useStoredProtocolAnalysis(RUN_ID), {
       wrapper,

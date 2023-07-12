@@ -8,13 +8,13 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
   SPACING,
+  PrimaryButton,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
 import { Portal } from '../../../App/portal'
 import { Banner } from '../../../atoms/Banner'
-import { PrimaryButton } from '../../../atoms/buttons'
-import { Modal } from '../../../atoms/Modal'
+import { LegacyModal } from '../../../molecules/LegacyModal'
 import { StyledText } from '../../../atoms/text'
 
 import type { AnalysisError } from '@opentrons/shared-data'
@@ -37,7 +37,7 @@ export function ProtocolAnalysisErrorBanner(
   }
 
   return (
-    <Banner type="error" marginBottom={SPACING.spacing4}>
+    <Banner type="error" marginBottom={SPACING.spacing16}>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
@@ -64,7 +64,7 @@ export function ProtocolAnalysisErrorBanner(
       </Flex>
       {showErrorDetails ? (
         <Portal level="top">
-          <Modal
+          <LegacyModal
             type="error"
             title={t('protocol_analysis_failure')}
             onClose={handleToggleDetails}
@@ -80,12 +80,12 @@ export function ProtocolAnalysisErrorBanner(
                 aria-label="close_modal_button"
                 onClick={handleToggleDetails}
                 textTransform={TYPOGRAPHY.textTransformCapitalize}
-                marginTop={SPACING.spacing4}
+                marginTop={SPACING.spacing16}
               >
                 {t('shared:close')}
               </PrimaryButton>
             </Flex>
-          </Modal>
+          </LegacyModal>
         </Portal>
       ) : null}
     </Banner>

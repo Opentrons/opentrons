@@ -34,10 +34,14 @@ export function Dimensions(props: DimensionsProps): JSX.Element {
   })?.map((src, index) => <img width="250px" src={src} key={index} />)
 
   return (
-    <Box marginBottom={SPACING.spacing4}>
+    <Box marginBottom={SPACING.spacing16}>
       <ExpandingTitle label={t('footprint')} diagram={diagram} />
       {dimensions.map(d => (
-        <LabeledValue key={d.value} label={d.label} value={d.value} />
+        <LabeledValue
+          key={`${d.label}_${d.value}`}
+          label={d.label}
+          value={d.value}
+        />
       ))}
     </Box>
   )

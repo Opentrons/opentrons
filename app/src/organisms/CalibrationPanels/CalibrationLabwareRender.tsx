@@ -8,8 +8,8 @@ import {
   C_MED_DARK_GRAY,
   C_MED_GRAY,
   C_MED_LIGHT_GRAY,
-  FONT_SIZE_CAPTION,
   FONT_WEIGHT_SEMIBOLD,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { getLabwareDisplayName, getIsTiprack } from '@opentrons/shared-data'
 import styles from './styles.css'
@@ -33,7 +33,11 @@ export function CalibrationLabwareRender(
 
   // TODO: we can change this boolean to check to isCalibrationBlock instead of isTiprack to render any labware
   return isTiprack ? (
-    <g transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`}>
+    <g
+      transform={`translate(${String(slotDef.position[0])}, ${String(
+        slotDef.position[1]
+      )})`}
+    >
       <LabwareRender definition={labwareDef} />
       <RobotCoordsForeignDiv
         width={labwareDef.dimensions.xDimension}
@@ -61,7 +65,9 @@ export function CalibrationBlockRender(
     case 'opentrons_calibrationblock_short_side_right': {
       return (
         <g
-          transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`}
+          transform={`translate(${String(slotDef.position[0])}, ${String(
+            slotDef.position[1]
+          )})`}
         >
           <rect
             width={labwareDef.dimensions.xDimension}
@@ -86,7 +92,7 @@ export function CalibrationBlockRender(
               x={-55}
               y={5}
               fill={C_MED_LIGHT_GRAY}
-              fontSize={FONT_SIZE_CAPTION}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
             >
               {TALL}
@@ -97,7 +103,7 @@ export function CalibrationBlockRender(
               x={25}
               y={-labwareDef.dimensions.xDimension + 5}
               fill={C_MED_LIGHT_GRAY}
-              fontSize={FONT_SIZE_CAPTION}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
             >
               {SHORT}
@@ -109,7 +115,9 @@ export function CalibrationBlockRender(
     case 'opentrons_calibrationblock_short_side_left': {
       return (
         <g
-          transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`}
+          transform={`translate(${String(slotDef.position[0])}, ${String(
+            slotDef.position[1]
+          )})`}
         >
           <rect
             width={labwareDef.dimensions.xDimension}
@@ -134,7 +142,7 @@ export function CalibrationBlockRender(
               x={-55}
               y={5}
               fill={C_MED_LIGHT_GRAY}
-              fontSize={FONT_SIZE_CAPTION}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
             >
               {SHORT}
@@ -145,7 +153,7 @@ export function CalibrationBlockRender(
               x={30}
               y={-labwareDef.dimensions.xDimension + 5}
               fill={C_MED_LIGHT_GRAY}
-              fontSize={FONT_SIZE_CAPTION}
+              fontSize={TYPOGRAPHY.fontSizeCaption}
               fontWeight={FONT_WEIGHT_SEMIBOLD}
             >
               {TALL}

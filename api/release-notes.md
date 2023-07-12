@@ -1,34 +1,124 @@
 For more details about this release, please see the full [technical change
 log][]. For a list of currently known issues, please see the [Opentrons issue tracker][].
 
-[technical change log]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
+[technical change log]: https://github.com/Opentrons/opentrons/releases
 [opentrons issue tracker]: https://github.com/Opentrons/opentrons/issues?q=is%3Aopen+is%3Aissue+label%3Abug
 
 ---
+## OT-2 Software Changes in 6.3.1
 
-# OT-2 Software Changes in 6.0.0
+Welcome to the v6.3.1 release of the OT-2 software! This hotfix release addresses a few problems.
 
-Welcome to the v6.0.0 release of the OT-2 software!
+### Improved Features
+- Changed the Thermocycler GEN2 plate ejection behavior to prevent plates from getting stuck after PCR cycles or being ejected too forcefully.
 
-In conjunction with [changes on the app side](https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md), the 6.0.0 release reshapes the way your OT-2 stores runs and protocols.
+### Bug Fixes
 
-## New Features
+- Specifying Python API version 2.14 no longer prevents ``set_block_temperature`` from executing a hold time.
+
+
+---
+
+## OT-2 Software Changes in 6.3.0
+
+Welcome to the v6.3.0 release of the OT-2 software!
+
+### Improved Features
+
+- The `/calibrations` endpoint now accepts `DELETE` requests.
+
+### Bug Fixes
+
+- Fixed a problem where labware offsets would sometimes be ignored for labware atop a Temperature Module.
+- Calls to the `/commands` endpoint with `waitUntilComplete=true` no longer time out after 30 seconds if you don't specify a timeout interval.
+- Fixed improper pagination and cursor placement for the `/commands` endpoint.
+
+### Known Issues
+
+- Some protocols can't be simulated with the `opentrons_simulate` command-line tool:
+    - JSON protocols created or modified with Protocol Designer v6.0.0 or higher
+    - Python protocols specifying an `apiLevel` of 2.14
+
+---
+## OT-2 Software Changes in 6.2.1
+
+Welcome to the v6.2.1 release of the OT-2 software! This hotfix release addresses a few problems.
+
+### Bug Fixes
+
+- When you upload a protocol or set up a run, the OT-2 is now less likely to show connection errors.
+- When you upload a protocol file larger than 2 megabytes, you will no longer get an error saying "Protocol run could not be created on the robot."
+- When you run a Thermocycler GEN2 for 50 days without a power cycle, it will no longer miscalculate hold times.
+- When you upload a Python protocol that aspirates or dispenses with an effective volume of 0 µL, it will no longer get stuck analyzing forever.
+
+---
+
+## OT-2 Software Changes in 6.2.0
+
+Welcome to the v6.2.0 release of the OT-2 software! This release focuses on adding support for the Thermocycler Module GEN2.
+
+### New Features
+
+- Thermocycler GEN2 support
+    - Lid temperature is now available when querying module status
+    - Pipettes properly move to avoid the GEN2 module
+
+### Bug Fixes
+
+- Fixed a bug that could cause hardware modules to become unresponsive
+
+---
+
+## OT-2 Software Changes in 6.1.0
+
+Welcome to the v6.1.0 release of the OT-2 software! This release adds support for the Opentrons Heater-Shaker Module.
+
+### New Features
+
+- Heater-Shaker support
+  - The OT-2 can run JSON and Python protocols that control the Heater-Shaker Module
+  - Implements restrictions on module and labware placement around the Heater-Shaker
+  - When possible, the OT-2 will automatically move its pipettes or the Heater-Shaker's labware latch to shake safely and avoid crashes
+  - The OT-2 can update the firmware on an attached Heater-Shaker
+
+### Bug Fixes
+
+- Improved tip pickup and drop behavior
+- Fixed issues when running Thermocycler profiles
+- Fixed a bug that prevented pipetting to arbitrary deck coordinates
+
+---
+
+## OT-2 Software Changes in 6.0.1
+
+Welcome to the v6.0.1 release of the OT-2 software!
+
+In conjunction with [changes in the Opentrons App](https://github.com/Opentrons/opentrons/blob/edge/app-shell/build/release-notes.md), the 6.0 release reshapes the way your OT-2 stores runs and protocols.
+
+### New Features
 
 - The OT-2 will retain the past 20 protocol runs on the robot, even across reboots.
 - Supports renaming robots via the Opentrons App.
 
-## Bug Fixes
+### 6.0.0 to 6.0.1
+
+The 6.0.1 hotfix release fixes one robot software bug:
+
+- Protocol uploads to the OT-2 work again when the robot's "Use older protocol analysis method" advanced setting is enabled
+
+As noted below, the 6.0.0 release fixed various protocol analysis bugs. **If you have been using the "Use older protocol analysis method" setting, we recommend you turn it off.** You might no longer need it, and your protocols will upload to your OT-2 faster with the setting disabled!
+
+### Bug Fixes
 
 - The `opentrons` Python module is now compatible with Python 3.10.
 - Protocols will correctly fail analysis when attempting to place a Thermocycler in a slot that conflicts with already-placed labware.
 - Improved handling of loading multiple modules of the same type.
 - Fixed various pipette bugs in protocol analysis.
-- Fixed [a bug](https://github.com/Opentrons/opentrons/issues/10126) where a robot would be undiscoverable if it happened to have the same name as another device on the network. 
+- Fixed [a bug](https://github.com/Opentrons/opentrons/issues/10126) where a robot would be undiscoverable if it happened to have the same name as another device on the network.
 
-## Known Issues
+### Known Issues
 
 - Sometimes module load order is affected by the order in which you power the modules on. We strongly suggest connecting and powering on modules in the order they will be used in the protocol.
-
 
 ---
 
@@ -40,10 +130,10 @@ This release is a complete refactor of how the OT-2 communicates with the Opentr
 
 ### New Features
 
- - A modern, http-based interface has replaced the RPC endpoints for communicating with the Opentrons App
- - More thorough information about a protocol is returned to the Opentrons App to enable the display of live protocol status
- - The most recent protocol analysis and run are stored on the robot to enable easy, quick re-running via the Opentrons App
- - A new way to use labware offsets in Jupyter notebook and SSH sessions
+- A modern, http-based interface has replaced the RPC endpoints for communicating with the Opentrons App
+- More thorough information about a protocol is returned to the Opentrons App to enable the display of live protocol status
+- The most recent protocol analysis and run are stored on the robot to enable easy, quick re-running via the Opentrons App
+- A new way to use labware offsets in Jupyter notebook and SSH sessions
 
 ### 5.0.1 to 5.0.2
 

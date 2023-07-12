@@ -21,9 +21,6 @@ import os
 import sys
 import json
 import pkgutil
-# This load means sphinx docs builds must be run in a virtualenv with the
-# newly-built module
-_package_json = json.loads(pkgutil.get_data('opentrons', 'package.json'))
 
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, os.path.abspath('../sphinxext'))
@@ -45,6 +42,8 @@ extensions = [
     'sphinx.ext.imgmath',
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
+    'sphinxext.opengraph',
+    'sphinx_tabs.tabs',
     # todo(mm, 2021-09-30): Remove numpydoc when we're done transitioning to
     # Google-style docstrings. github.com/Opentrons/opentrons/issues/7051
     'numpydoc'
@@ -74,7 +73,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'OT-2 API V2'
 copyright = '2010, Opentrons'
-author = _package_json['author']['name']
+author = 'Opentrons Labworks'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -82,11 +81,17 @@ author = _package_json['author']['name']
 #
 # todo(mm, 2021-09-30): Depending on where these show up, would it be more correct
 # to use the latest-supported *apiLevel* instead of the *Python package version*?
-#
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'scripts'))
+import python_build_utils
+sys.path = sys.path[:-1]
+_vers = python_build_utils.get_version('api', 'robot-stack')
+
+
 # The short X.Y version.
-version = '.'.join(_package_json['version'].split('.')[:2])
+version = '.'.join(_vers.split('.')[:2])
 # The full version, including alpha/beta/rc tags.
-release = _package_json['version']
+release = _vers
 
 # setup the code block substitution extension to auto-update apiLevel
 extensions += ['sphinx-prompt', 'sphinx_substitution_extensions']
@@ -106,7 +111,7 @@ rst_prolog = f"""
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -333,7 +338,7 @@ latex_elements = {
 latex_documents = [
     (master_doc, 'OpentronsPythonAPIV2.tex',
      'Opentrons Python API V2 Documentation',
-     _package_json['author']['name'], 'howto'),
+     'Opentrons Labworks', 'howto'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -409,3 +414,15 @@ suppress_warnings = []
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #
 # texinfo_no_detailmenu = False
+
+# -- Options for Opengraph tags -------------------------------------------
+
+ogp_site_url = "https://docs.opentrons.com/v2/"
+ogp_site_name = "Opentrons Python Protocol API"
+ogp_image = "_static/PythonAPI.png"
+ogp_description_length = 170
+ogp_enable_meta_description = False
+
+# -- Options for tabs -----------------------------------------------------
+
+sphinx_tabs_disable_tab_closing = True

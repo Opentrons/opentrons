@@ -7,6 +7,7 @@ import {
   pipetteIntoHeaterShakerWhileShaking,
   getIsHeaterShakerEastWestWithLatchOpen,
   pipetteAdjacentHeaterShakerWhileShaking,
+  getLabwareSlot,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette,
   uuid,
@@ -21,10 +22,27 @@ export const aspirate: CommandCreator<AspirateParams> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
+  const {
+    pipette,
+    volume,
+    labware,
+    well,
+    offsetFromBottomMm,
+    flowRate,
+    isAirGap,
+  } = args
   const actionName = 'aspirate'
   const errors: CommandCreatorError[] = []
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
+  const isFlexPipette =
+    (pipetteSpec?.displayCategory === 'GEN3' || pipetteSpec?.channels === 96) ??
+    false
+
+  const slotName = getLabwareSlot(
+    labware,
+    prevRobotState.labware,
+    prevRobotState.modules
+  )
 
   if (!pipetteSpec) {
     errors.push(
@@ -42,6 +60,8 @@ export const aspirate: CommandCreator<AspirateParams> = (
         labware,
       })
     )
+  } else if (prevRobotState.labware[labware].slot === 'offDeck') {
+    errors.push(errorCreators.labwareOffDeck())
   }
 
   if (
@@ -95,43 +115,39 @@ export const aspirate: CommandCreator<AspirateParams> = (
   ) {
     errors.push(errorCreators.heaterShakerIsShaking())
   }
-  if (
-    pipetteAdjacentHeaterShakerWhileShaking(
-      prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot
-    )
-  ) {
-    errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
-  }
-  if (
-    getIsHeaterShakerEastWestWithLatchOpen(
-      prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot
-    )
-  ) {
-    errors.push(errorCreators.heaterShakerEastWestWithLatchOpen())
-  }
+  if (!isFlexPipette) {
+    if (
+      pipetteAdjacentHeaterShakerWhileShaking(prevRobotState.modules, slotName)
+    ) {
+      errors.push(errorCreators.heaterShakerNorthSouthEastWestShaking())
+    }
+    if (
+      getIsHeaterShakerEastWestWithLatchOpen(prevRobotState.modules, slotName)
+    ) {
+      errors.push(errorCreators.heaterShakerEastWestWithLatchOpen())
+    }
 
-  if (
-    getIsHeaterShakerEastWestMultiChannelPipette(
-      prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot,
-      pipetteSpec
-    )
-  ) {
-    errors.push(errorCreators.heaterShakerEastWestOfMultiChannelPipette())
-  }
-  if (
-    getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
-      prevRobotState.modules,
-      prevRobotState.labware[labware]?.slot,
-      pipetteSpec,
-      invariantContext.labwareEntities[labware]
-    )
-  ) {
-    errors.push(
-      errorCreators.heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette()
-    )
+    if (
+      getIsHeaterShakerEastWestMultiChannelPipette(
+        prevRobotState.modules,
+        slotName,
+        pipetteSpec
+      )
+    ) {
+      errors.push(errorCreators.heaterShakerEastWestOfMultiChannelPipette())
+    }
+    if (
+      getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette(
+        prevRobotState.modules,
+        slotName,
+        pipetteSpec,
+        invariantContext.labwareEntities[labware]
+      )
+    ) {
+      errors.push(
+        errorCreators.heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette()
+      )
+    }
   }
   if (errors.length === 0 && pipetteSpec && pipetteSpec.maxVolume < volume) {
     errors.push(
@@ -180,6 +196,7 @@ export const aspirate: CommandCreator<AspirateParams> = (
         },
         flowRate,
       },
+      ...(isAirGap && { meta: { isAirGap } }),
     },
   ]
   return {

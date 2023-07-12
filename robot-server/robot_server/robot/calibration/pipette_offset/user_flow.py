@@ -9,20 +9,23 @@ from typing import (
     Union,
     Tuple,
 )
-
-from opentrons.calibration_storage import get, modify, helpers, delete
+from opentrons.calibration_storage import (
+    helpers,
+    get_pipette_offset,
+    save_pipette_calibration,
+    delete_pipette_offset_file,
+    load_tip_length_calibration,
+)
+from opentrons.calibration_storage.ot2 import models
 from opentrons.calibration_storage.types import (
     TipLengthCalNotFound,
-    PipetteOffsetByPipetteMount,
 )
-from opentrons.hardware_control import (
-    HardwareControlAPI,
-    CriticalPoint,
-    Pipette,
-    robot_calibration as robot_cal,
+from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
 )
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Mount, Point, Location
 from robot_server.service.errors import RobotServerError
 from robot_server.service.session.models.command_definitions import CalibrationCommand
@@ -88,7 +91,7 @@ class PipetteOffsetCalibrationUserFlow:
             )
         self._hw_pipette = pip
 
-        self._deck = Deck()
+        self._deck = Deck(guess_deck_type_from_global_config())
 
         self._saved_offset_this_session = False
 
@@ -139,9 +142,7 @@ class PipetteOffsetCalibrationUserFlow:
             CalibrationCommand.invalidate_last_action: self.invalidate_last_action,
         }
 
-        self._hw_pipette.update_pipette_offset(
-            robot_cal.load_pipette_offset(pip_id=None, mount=self._mount)
-        )
+        self._hw_pipette.reset_pipette_offset(self._mount, to_default=True)
         self._default_tipracks = util.get_default_tipracks(
             self.hw_pipette.config.default_tipracks
         )
@@ -304,17 +305,17 @@ class PipetteOffsetCalibrationUserFlow:
 
     def _get_stored_tip_length_cal(self) -> Optional[float]:
         try:
-            return get.load_tip_length_calibration(
-                self._hw_pipette.pipette_id,  # type: ignore[arg-type]
-                self._tip_rack._implementation.get_definition(),
-            ).tip_length
+            return load_tip_length_calibration(
+                self._hw_pipette.pipette_id,
+                self._tip_rack._core.get_definition(),
+            ).tipLength
         except TipLengthCalNotFound:
             return None
 
-    def _get_stored_pipette_offset_cal(self) -> Optional[PipetteOffsetByPipetteMount]:
-        return get.get_pipette_offset(
-            self._hw_pipette.pipette_id, self._mount  # type: ignore[arg-type]
-        )
+    def _get_stored_pipette_offset_cal(
+        self,
+    ) -> Optional[models.v1.InstrumentOffsetModel]:
+        return get_pipette_offset(self._hw_pipette.pipette_id, self._mount)
 
     def _get_tip_length(self) -> float:
         stored_tip_length_cal = self._get_stored_tip_length_cal()
@@ -338,7 +339,7 @@ class PipetteOffsetCalibrationUserFlow:
     @staticmethod
     def _get_tr_lw(
         tip_rack_def: Optional[LabwareDefinition],
-        existing_calibration: Optional[PipetteOffsetByPipetteMount],
+        existing_calibration: Optional[models.v1.InstrumentOffsetModel],
         volume: float,
         position: Location,
     ) -> Tuple[bool, labware.Labware]:
@@ -367,7 +368,7 @@ class PipetteOffsetCalibrationUserFlow:
     def _load_tip_rack(
         self,
         tip_rack_def: Optional[LabwareDefinition],
-        existing_calibration: Optional[PipetteOffsetByPipetteMount],
+        existing_calibration: Optional[models.v1.InstrumentOffsetModel],
     ):
         """
         load onto the deck the default opentrons tip rack labware for this
@@ -440,13 +441,13 @@ class PipetteOffsetCalibrationUserFlow:
                     critical_point=CriticalPoint.FRONT_NOZZLE
                 )
             tiprack_hash = helpers.hash_labware_def(
-                self._tip_rack._implementation.get_definition()
+                self._tip_rack._core.get_definition()
             )
             offset = self._cal_ref_point - cur_pt
-            modify.save_pipette_calibration(
+            save_pipette_calibration(
                 offset=offset,
                 mount=self._mount,
-                pip_id=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
+                pip_id=self._hw_pipette.pipette_id,
                 tiprack_hash=tiprack_hash,
                 tiprack_uri=self._tip_rack.uri,
             )
@@ -464,15 +465,12 @@ class PipetteOffsetCalibrationUserFlow:
             assert self._nozzle_height_at_reference is not None
             # set critical point explicitly to nozzle
             noz_pt = await self.get_current_point(critical_point=CriticalPoint.NOZZLE)
-
             util.save_tip_length_calibration(
                 pipette_id=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
                 tip_length_offset=noz_pt.z - self._nozzle_height_at_reference,
                 tip_rack=self._tip_rack,
             )
-            delete.delete_pipette_offset_file(
-                self._hw_pipette.pipette_id, self.mount  # type: ignore[arg-type]
-            )
+            delete_pipette_offset_file(self._hw_pipette.pipette_id, self.mount)
             new_tip_length = self._get_stored_tip_length_cal()
             self._has_calibrated_tip_length = new_tip_length is not None
             # load the new tip length for the rest of the session
@@ -517,7 +515,7 @@ class PipetteOffsetCalibrationUserFlow:
             await self._hardware.gantry_position(self.mount, refresh=True)
             trash = self._deck.get_fixed_trash()
             assert trash, "Bad deck setup"
-            await util.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)
+            await util.move(self, trash["A1"].top(), CriticalPoint.XY_CENTER)  # type: ignore[index]
             await self.hardware.drop_tip(self.mount)
             await self.move_to_tip_rack()
 

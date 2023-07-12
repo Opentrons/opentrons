@@ -2,7 +2,8 @@
 from decoy import Decoy
 
 from opentrons.protocol_engine.types import DeckPoint, MovementAxis
-from opentrons.protocol_engine.execution import MovementHandler, MoveRelativeData
+from opentrons.protocol_engine.execution import MovementHandler
+from opentrons.types import Point
 
 from opentrons.protocol_engine.commands.move_relative import (
     MoveRelativeParams,
@@ -29,7 +30,7 @@ async def test_move_relative_implementation(
             axis=MovementAxis.X,
             distance=42.0,
         )
-    ).then_return(MoveRelativeData(position=DeckPoint(x=1, y=2, z=3)))
+    ).then_return(Point(x=1, y=2, z=3))
 
     result = await subject.execute(data)
 

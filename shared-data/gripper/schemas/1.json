@@ -1,95 +1,175 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-
-  "definitions": {
-    "idleZCurrentRange": {
-      "type": "number",
-      "minimum": 0.01,
-      "maximum": 1.0
+  "title": "GripperDefinition",
+  "description": "Gripper definition.",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "title": "Schemaversion",
+      "description": "Which schema version a gripper is using",
+      "enum": [1],
+      "type": "integer"
     },
-    "activeZCurrentRange": {
-      "type": "number",
-      "minimum": 0.02,
-      "maximum": 2.0
+    "displayName": {
+      "title": "Displayname",
+      "description": "Gripper display name.",
+      "type": "string"
     },
-    "jawReferenceVoltageRange": {
-      "type": "number",
-      "minimum": 0.01,
-      "maximum": 3.3
+    "model": {
+      "$ref": "#/definitions/GripperModel"
     },
-    "percentage": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 100
+    "geometry": {
+      "$ref": "#/definitions/Geometry"
     },
-    "coordinates": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["x", "y", "z"],
-      "properties": {
-        "x": { "type": "number" },
-        "y": { "type": "number" },
-        "z": { "type": "number" }
-      }
+    "gripForceProfile": {
+      "$ref": "#/definitions/GripForceProfile"
     }
   },
-
-  "description": "Gripper specification",
-  "type": "object",
   "required": [
-    "$otSharedSchema",
+    "schemaVersion",
     "displayName",
     "model",
-    "idleZCurrent",
-    "activeZCurrent",
-    "jawReferenceVoltage",
-    "jawForcePerDutyCycle",
-    "baseOffsetFromMount",
-    "jawCenterOffsetFromBase",
-    "pinOneOffsetFromBase",
-    "pinTwoOffsetFromBase",
-    "quirks"
+    "geometry",
+    "gripForceProfile"
   ],
-  "additionalProperties": false,
-  "properties": {
-    "$otSharedSchema": {
-      "type": "string",
-      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/gripper/schemas/1 is a reference to this schema."
+  "definitions": {
+    "GripperModel": {
+      "title": "GripperModel",
+      "description": "Gripper models.",
+      "enum": ["gripperV1"],
+      "type": "string"
     },
-    "displayName": { "type": "string" },
-    "model": {
-      "type": "string",
-      "pattern": "^gripperV[0-9]$"
-    },
-    "idleZCurrent": {
+    "Geometry": {
+      "title": "Geometry",
+      "description": "Gripper geometry definition.",
       "type": "object",
-      "value": { "$ref": "#/definitions/idleZCurrentRange" }
+      "properties": {
+        "baseOffsetFromMount": {
+          "title": "Baseoffsetfrommount",
+          "type": "array",
+          "items": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "jawCenterOffsetFromBase": {
+          "title": "Jawcenteroffsetfrombase",
+          "type": "array",
+          "items": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "pinOneOffsetFromBase": {
+          "title": "Pinoneoffsetfrombase",
+          "type": "array",
+          "items": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "pinTwoOffsetFromBase": {
+          "title": "Pintwooffsetfrombase",
+          "type": "array",
+          "items": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "number"
+            }
+          ]
+        },
+        "jawWidth": {
+          "title": "Jawwidth",
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        }
+      },
+      "required": [
+        "baseOffsetFromMount",
+        "jawCenterOffsetFromBase",
+        "pinOneOffsetFromBase",
+        "pinTwoOffsetFromBase",
+        "jawWidth"
+      ]
     },
-    "activeZCurrent": {
+    "GripForceProfile": {
+      "title": "GripForceProfile",
+      "description": "Gripper force profile.",
       "type": "object",
-      "value": { "$ref": "#/definitions/activeZCurrentRange" }
-    },
-    "jawReferenceVoltage": {
-      "type": "object",
-      "value": { "$ref": "#/definitions/jawReferenceVoltageRange" }
-    },
-    "jawForcePerDutyCycle": {
-      "type": "array",
-      "items": {
-        "type": "array",
-        "items": [{ "type": "number" }, { "$ref": "#/definitions/percentage" }],
-        "minItems": 2,
-        "maxItems": 2
-      }
-    },
-    "baseOffsetFromMount": { "$ref": "#/definitions/coordinates" },
-    "jawCenterOffsetFromBase": { "$ref": "#/definitions/coordinates" },
-    "pinOneOffsetFromBase": { "$ref": "#/definitions/coordinates" },
-    "pinTwoOffsetFromBase": { "$ref": "#/definitions/coordinates" },
-    "quirks": {
-      "type": "array",
-      "description": "Array of valid quirks for a given gripper",
-      "items": { "type": "string" }
+      "properties": {
+        "polynomial": {
+          "title": "Polynomial",
+          "description": "Polynomial function to convert a grip force in Newton to the jaw motor duty cycle value, which will be read by the gripper firmware.",
+          "minItems": 1,
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "number"
+              }
+            ]
+          }
+        },
+        "defaultGripForce": {
+          "title": "Defaultgripforce",
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "defaultHomeForce": {
+          "title": "Defaulthomeforce",
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "min": {
+          "title": "Min",
+          "minimum": 0.0,
+          "type": "number"
+        },
+        "max": {
+          "title": "Max",
+          "minimum": 0.0,
+          "type": "number"
+        }
+      },
+      "required": [
+        "polynomial",
+        "defaultGripForce",
+        "defaultHomeForce",
+        "min",
+        "max"
+      ]
     }
   }
 }

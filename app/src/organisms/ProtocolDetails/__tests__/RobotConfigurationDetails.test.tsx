@@ -1,8 +1,17 @@
 import * as React from 'react'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
+import { OT2_STANDARD_MODEL, OT3_STANDARD_MODEL } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
+import { useFeatureFlag } from '../../../redux/config'
 import { RobotConfigurationDetails } from '../RobotConfigurationDetails'
 import { LoadModuleRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+
+jest.mock('../../../redux/config')
+
+const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
+  typeof useFeatureFlag
+>
 
 const mockRequiredModuleDetails = [
   {
@@ -62,19 +71,58 @@ const render = (
 
 describe('RobotConfigurationDetails', () => {
   let props: React.ComponentProps<typeof RobotConfigurationDetails>
-  beforeEach(() => {})
+
+  beforeEach(() => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableExtendedHardware')
+      .mockReturnValue(false)
+  })
+
+  afterEach(() => {
+    resetAllWhenMocks()
+  })
+  it('renders a robot section showing the intended robot model for an OT-2 protocol', () => {
+    props = {
+      leftMountPipetteName: 'p10_single',
+      rightMountPipetteName: null,
+      requiredModuleDetails: null,
+      extensionInstrumentName: null,
+      isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
+    }
+    const { getByText } = render(props)
+    getByText('robot')
+    getByText('OT-2')
+  })
+
+  it('renders a robot section showing the intended robot model for an OT-3 protocol', () => {
+    props = {
+      leftMountPipetteName: 'p10_single',
+      rightMountPipetteName: null,
+      requiredModuleDetails: null,
+      extensionInstrumentName: null,
+      isLoading: false,
+      robotType: OT3_STANDARD_MODEL,
+    }
+    const { getByText } = render(props)
+    getByText('robot')
+    getByText('Opentrons Flex')
+  })
+
   it('renders left mount pipette when there is a pipette only in the left mount', () => {
     props = {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
       requiredModuleDetails: null,
+      extensionInstrumentName: null,
       isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
     }
     const { getByText } = render(props)
     getByText('left mount')
     getByText('P10 Single-Channel GEN1')
     getByText('right mount')
-    getByText('Not Used')
+    getByText('empty')
   })
 
   it('renders right mount pipette when there is a pipette only in the right mount', () => {
@@ -82,21 +130,34 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: null,
       rightMountPipetteName: 'p10_single',
       requiredModuleDetails: null,
+      extensionInstrumentName: null,
       isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
     }
     const { getByText } = render(props)
     getByText('left mount')
     getByText('P10 Single-Channel GEN1')
     getByText('right mount')
-    getByText('Not Used')
+    getByText('empty')
+  })
+
+  it('renders extension mount section when extended hardware feature flag is on', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableExtendedHardware')
+      .mockReturnValue(true)
+
+    const { getByText } = render(props)
+    getByText('extension mount')
   })
 
   it('renders the magnetic module when the protocol contains a magnetic module', () => {
     props = {
       leftMountPipetteName: null,
       rightMountPipetteName: 'p10_single',
+      extensionInstrumentName: null,
       requiredModuleDetails: mockRequiredModuleDetails,
       isLoading: false,
+      robotType: OT2_STANDARD_MODEL,
     }
 
     const { getByText } = render(props)
@@ -109,7 +170,9 @@ describe('RobotConfigurationDetails', () => {
       leftMountPipetteName: 'p10_single',
       rightMountPipetteName: null,
       requiredModuleDetails: null,
+      extensionInstrumentName: null,
       isLoading: true,
+      robotType: OT2_STANDARD_MODEL,
     }
     const { getAllByText, getByText } = render(props)
     getByText('right mount')

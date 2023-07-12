@@ -1278,8 +1278,7 @@
         "labwareId": "destPlateId",
         "location": {
           "moduleId": "magneticModuleId"
-        },
-        "displayName": "Sample Collection Plate"
+        }
       }
     },
     {
@@ -1373,7 +1372,9 @@
         "wellLocation": {
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 11 }
-        }
+        },
+        "radius": 0.5,
+        "speed": 42.0
       }
     },
     {
@@ -1387,18 +1388,6 @@
         "wellLocation": {
           "origin": "bottom",
           "offset": { "x": 0, "y": 0, "z": 12 }
-        }
-      }
-    },
-    {
-      "commandType": "moveToSlot",
-      "id": "14abc123",
-      "params": {
-        "pipetteId": "pipetteId",
-        "slotName": "5",
-        "wellLocation": {
-          "origin": "bottom",
-          "offset": { "x": 1, "y": 2, "z": 3 }
         }
       }
     },
@@ -1423,7 +1412,8 @@
           "offset": { "x": 2, "y": 3, "z": 10 }
         },
         "minimumZHeight": 35,
-        "forceDirect": true
+        "forceDirect": true,
+        "speed": 12.3
       }
     },
     {
@@ -1450,7 +1440,8 @@
         "pipetteId": "pipetteId",
         "coordinates": { "x": 0, "y": 0, "z": 0 },
         "minimumZHeight": 35,
-        "forceDirect": true
+        "forceDirect": true,
+        "speed": 12.3
       }
     },
     {

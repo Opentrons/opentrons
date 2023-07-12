@@ -1,19 +1,13 @@
 // events map tests
 import { makeEvent } from '../make-event'
-import { connect } from '../../robot'
-import * as discoverySelectors from '../../discovery/selectors'
 import * as selectors from '../selectors'
 
 jest.mock('../selectors')
-jest.mock('../../robot/selectors')
 jest.mock('../../sessions/selectors')
 jest.mock('../../discovery/selectors')
 jest.mock('../../pipettes/selectors')
 jest.mock('../../calibration/selectors')
 
-const getConnectedRobot = discoverySelectors.getConnectedRobot as jest.MockedFunction<
-  typeof discoverySelectors.getConnectedRobot
->
 const getAnalyticsSessionExitDetails = selectors.getAnalyticsSessionExitDetails as jest.MockedFunction<
   typeof selectors.getAnalyticsSessionExitDetails
 >
@@ -32,78 +26,13 @@ const getAnalyticsPipetteCalibrationData = selectors.getAnalyticsPipetteCalibrat
 const getAnalyticsTipLengthCalibrationData = selectors.getAnalyticsTipLengthCalibrationData as jest.MockedFunction<
   typeof selectors.getAnalyticsTipLengthCalibrationData
 >
-const getProtocolAnalyticsData = selectors.getProtocolAnalyticsData as jest.MockedFunction<
-  typeof selectors.getProtocolAnalyticsData
->
 
 describe('analytics events map', () => {
   beforeEach(() => {
     jest.resetAllMocks()
   })
 
-  it('robot:CONNECT -> robotConnected event', () => {
-    getConnectedRobot.mockImplementation((state: any): any => {
-      if (state === 'wired') {
-        return {
-          name: 'wired',
-          ip: 'foo',
-          port: 123,
-          ok: true,
-          serverOk: true,
-          local: true,
-          health: {},
-          serverHealth: {},
-        }
-      }
-
-      if (state === 'wireless') {
-        return {
-          name: 'wireless',
-          ip: 'bar',
-          port: 456,
-          ok: true,
-          serverOk: true,
-          local: false,
-          health: {},
-          serverHealth: {},
-        }
-      }
-
-      return null
-    })
-
-    return Promise.all([
-      expect(makeEvent(connect('wired'), 'wired' as any)).resolves.toEqual({
-        name: 'robotConnect',
-        properties: { method: 'usb', success: true },
-      }),
-
-      expect(
-        makeEvent(connect('wireless'), 'wireless' as any)
-      ).resolves.toEqual({
-        name: 'robotConnect',
-        properties: { method: 'wifi', success: true },
-      }),
-    ])
-  })
-
   describe('events with protocol data', () => {
-    const protocolData = { foo: 'bar' } as any
-
-    beforeEach(() => {
-      getProtocolAnalyticsData.mockResolvedValue(protocolData)
-    })
-
-    it('robot:PROTOCOL_LOAD > protocolUploadRequest', () => {
-      const nextState = {} as any
-      const success = { type: 'protocol:LOAD', payload: {} } as any
-
-      return expect(makeEvent(success, nextState)).resolves.toEqual({
-        name: 'protocolUploadRequest',
-        properties: protocolData,
-      })
-    })
-
     it('robotAdmin:RESET_CONFIG -> resetRobotConfig event', () => {
       const state = {} as any
       const action = {

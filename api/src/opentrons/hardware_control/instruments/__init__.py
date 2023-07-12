@@ -1,6 +1,5 @@
 from .instrument_abc import AbstractInstrument
-from .pipette import Pipette
-from .gripper import Gripper
+from .ot3.gripper import Gripper
 
 
-__all__ = ["AbstractInstrument", "Pipette", "Gripper"]
+__all__ = ["AbstractInstrument", "Gripper"]

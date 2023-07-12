@@ -1,7 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { CheckboxField } from '../forms'
+import { DeprecatedCheckboxField } from '../forms'
 import { LabeledControl } from './LabeledControl'
 import styles from './styles.css'
 
@@ -21,7 +21,7 @@ export function LabeledCheckbox(props: LabeledCheckboxProps): JSX.Element {
     <LabeledControl
       label={label}
       control={
-        <CheckboxField
+        <DeprecatedCheckboxField
           className={checkboxClass}
           name={name}
           value={value}

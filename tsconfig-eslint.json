@@ -9,6 +9,8 @@
     "app/typings",
     "app-shell/src",
     "app-shell/typings",
+    "app-shell-odd/src",
+    "app-shell-odd/typings",
     "components/src",
     "components/typings",
     "discovery-client/src",
@@ -27,6 +29,7 @@
     "protocol-library-kludge/src",
     "protocol-library-kludge/typings",
     "api-client/src",
-    "react-api-client/src"
+    "react-api-client/src",
+    "usb-bridge/node-client/src"
   ]
 }

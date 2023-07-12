@@ -1,7 +1,7 @@
 // tests for the app-shell's discovery module
 import { app } from 'electron'
 import Store from 'electron-store'
-import { noop } from 'lodash'
+import noop from 'lodash/noop'
 import { when } from 'jest-when'
 
 import * as DiscoveryClient from '@opentrons/discovery-client'
@@ -294,6 +294,7 @@ describe('app-shell/discovery', () => {
                   serverHealthStatus: null,
                   healthError: null,
                   serverHealthError: null,
+                  advertisedModel: null,
                 },
                 {
                   ip: '169.254.92.130',
@@ -303,6 +304,7 @@ describe('app-shell/discovery', () => {
                   serverHealthStatus: null,
                   healthError: null,
                   serverHealthError: null,
+                  advertisedModel: null,
                 },
                 {
                   ip: '169.254.239.127',
@@ -312,6 +314,7 @@ describe('app-shell/discovery', () => {
                   serverHealthStatus: null,
                   healthError: null,
                   serverHealthError: null,
+                  advertisedModel: null,
                 },
               ],
             },

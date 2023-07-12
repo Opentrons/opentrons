@@ -1,625 +1,382 @@
 """Pipetting execution handler."""
+from typing import cast
+
 import pytest
 from decoy import Decoy
-from typing import Tuple
 
-from opentrons.types import Mount, MountType, Point
+from opentrons.types import Mount
 from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.dev_types import PipetteDict
 
-from opentrons.protocols.models import LabwareDefinition
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset
-from opentrons.protocol_engine.state import (
-    StateStore,
-    TipGeometry,
-    HardwarePipette,
-    CurrentWell,
-    PipetteLocationData,
+from opentrons.protocol_engine.state import StateView, HardwarePipette
+from opentrons.protocol_engine.types import TipGeometry
+from opentrons.protocol_engine.execution.pipetting import (
+    HardwarePipettingHandler,
+    VirtualPipettingHandler,
+    create_pipetting_handler,
 )
-from opentrons.protocol_engine.execution.movement import MovementHandler
-from opentrons.protocol_engine.execution.pipetting import PipettingHandler
-from opentrons.protocol_engine.resources import LabwareDataProvider
-
-from .mock_defs import MockPipettes
+from opentrons.protocol_engine.errors.exceptions import (
+    TipNotAttachedError,
+    InvalidPipettingVolumeError,
+)
 
 
 @pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareAPI:
+def mock_hardware_api(decoy: Decoy) -> HardwareAPI:
     """Get a mock in the shape of a HardwareAPI."""
     return decoy.mock(cls=HardwareAPI)
 
 
 @pytest.fixture
-def state_store(decoy: Decoy) -> StateStore:
-    """Get a mock in the shape of a StateStore."""
-    return decoy.mock(cls=StateStore)
+def mock_state_view(decoy: Decoy) -> StateView:
+    """Get a mock in the shape of a StateView."""
+    return decoy.mock(cls=StateView)
 
 
 @pytest.fixture
-def movement_handler(decoy: Decoy) -> MovementHandler:
-    """Get a mock in the shape of a MovementHandler."""
-    return decoy.mock(cls=MovementHandler)
-
-
-@pytest.fixture
-def labware_data_provider(decoy: Decoy) -> LabwareDataProvider:
-    """Get a mock LabwareDataProvider."""
-    return decoy.mock(cls=LabwareDataProvider)
-
-
-@pytest.fixture
-def mock_hw_pipettes(hardware_api: HardwareAPI) -> MockPipettes:
-    """Get mock pipette configs and attach them to the mock HW controller."""
-    mock_hw_pipettes = MockPipettes()
-    hardware_api.attached_instruments = mock_hw_pipettes.by_mount  # type: ignore[misc]
-
-    return mock_hw_pipettes
-
-
-@pytest.fixture
-def mock_left_pipette_config(
-    mock_pipette_configs: Tuple[PipetteDict, PipetteDict]
-) -> PipetteDict:
-    """Get mock pipette config for the left pipette."""
-    return mock_pipette_configs[0]
-
-
-@pytest.fixture
-def mock_right_pipette_config(
-    mock_pipette_configs: Tuple[PipetteDict, PipetteDict]
-) -> PipetteDict:
-    """Get mock pipette config for the right pipette."""
-    return mock_pipette_configs[1]
-
-
-@pytest.fixture
-def subject(
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    labware_data_provider: LabwareDataProvider,
-) -> PipettingHandler:
-    """Create a PipettingHandler with its dependencies mocked out."""
-    return PipettingHandler(
-        state_store=state_store,
-        hardware_api=hardware_api,
-        movement_handler=movement_handler,
-        labware_data_provider=labware_data_provider,
+def hardware_subject(
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+) -> HardwarePipettingHandler:
+    """Get a HardwarePipettingHandler test subject."""
+    return HardwarePipettingHandler(
+        state_view=mock_state_view, hardware_api=mock_hardware_api
     )
 
 
-async def test_handle_pick_up_tip_request(
+async def test_create_pipette_handler(
     decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    labware_data_provider: LabwareDataProvider,
-    mock_hw_pipettes: MockPipettes,
-    tip_rack_def: LabwareDefinition,
-    subject: PipettingHandler,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
 ) -> None:
-    """It should handle a PickUpTipCreate properly."""
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
-    )
-
-    decoy.when(state_store.labware.get_definition("labware-id")).then_return(
-        tip_rack_def
-    )
-
-    decoy.when(
-        state_store.geometry.get_nominal_tip_geometry(
-            labware_id="labware-id",
-            well_name="B2",
-            pipette_config=mock_hw_pipettes.left_config,
-        )
-    ).then_return(
-        TipGeometry(
-            effective_length=50,
-            diameter=5,
-            volume=300,
-        )
-    )
-
-    decoy.when(
-        await labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=mock_hw_pipettes.left_config["pipette_id"],
-            labware_definition=tip_rack_def,
-        )
-    ).then_return(42)
-
-    await subject.pick_up_tip(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
-    )
-
-    decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="B2",
-            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+    """It should return virtual or real tip handlers depending on config."""
+    decoy.when(mock_state_view.config.use_virtual_pipettes).then_return(False)
+    assert isinstance(
+        create_pipetting_handler(
+            state_view=mock_state_view, hardware_api=mock_hardware_api
         ),
-        await hardware_api.pick_up_tip(
-            mount=Mount.LEFT,
-            tip_length=42,
-            presses=None,
-            increment=None,
+        HardwarePipettingHandler,
+    )
+
+    decoy.when(mock_state_view.config.use_virtual_pipettes).then_return(True)
+    assert isinstance(
+        create_pipetting_handler(
+            state_view=mock_state_view, hardware_api=mock_hardware_api
         ),
-        hardware_api.set_current_tiprack_diameter(mount=Mount.LEFT, tiprack_diameter=5),
-        hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
+        VirtualPipettingHandler,
     )
 
 
-async def test_handle_pick_up_tip_request_tip_length_fallback(
+@pytest.mark.parametrize(
+    ("aspirated_volume", "ready_to_aspirate", "expected"),
+    [
+        (0.0, True, True),
+        (1.0, True, True),
+        (1.0, False, False),
+    ],
+)
+def test_get_is_ready_to_aspirate(
     decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    labware_data_provider: LabwareDataProvider,
-    mock_hw_pipettes: MockPipettes,
-    tip_rack_def: LabwareDefinition,
-    subject: PipettingHandler,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwarePipettingHandler,
+    aspirated_volume: float,
+    ready_to_aspirate: bool,
+    expected: bool,
 ) -> None:
-    """It should pick up a tip even if there's no calibrated tip length available."""
+    """It should be ready to aspirate if state and HW agree that we're ready."""
+    decoy.when(mock_hardware_api.attached_instruments).then_return({})
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        aspirated_volume
+    )
     decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
+        mock_state_view.pipettes.get_hardware_pipette("pipette-id", {})
     ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
-    )
-
-    decoy.when(state_store.labware.get_definition("labware-id")).then_return(
-        tip_rack_def
-    )
-
-    decoy.when(
-        state_store.geometry.get_nominal_tip_geometry(
-            labware_id="labware-id",
-            well_name="B2",
-            pipette_config=mock_hw_pipettes.left_config,
-        )
-    ).then_return(
-        TipGeometry(
-            effective_length=50,
-            diameter=5,
-            volume=300,
+        HardwarePipette(
+            mount=Mount.RIGHT,
+            config=cast(PipetteDict, {"ready_to_aspirate": ready_to_aspirate}),
         )
     )
 
-    decoy.when(
-        await labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=mock_hw_pipettes.left_config["pipette_id"],
-            labware_definition=tip_rack_def,
-        )
-    ).then_return(None)
-
-    await subject.pick_up_tip(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="B2",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
-    )
-
-    decoy.verify(
-        await hardware_api.pick_up_tip(
-            mount=Mount.LEFT,
-            tip_length=50,
-            presses=None,
-            increment=None,
-        ),
-    )
+    assert hardware_subject.get_is_ready_to_aspirate("pipette-id") == expected
 
 
-async def test_handle_drop_up_tip_request(
+def test_get_is_ready_to_aspirate_raises_no_tip_attached(
     decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    mock_hw_pipettes: MockPipettes,
-    subject: PipettingHandler,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwarePipettingHandler,
 ) -> None:
-    """It should handle a DropTipCreate properly."""
+    """Should raise a TipNotAttachedError error."""
+    decoy.when(mock_hardware_api.attached_instruments).then_return({})
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_raise(
+        TipNotAttachedError()
+    )
     decoy.when(
-        state_store.pipettes.get_hardware_pipette(
+        mock_state_view.pipettes.get_hardware_pipette("pipette-id", {})
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.RIGHT,
+            config=cast(PipetteDict, {"ready_to_aspirate": True}),
+        )
+    )
+
+    with pytest.raises(TipNotAttachedError):
+        assert hardware_subject.get_is_ready_to_aspirate("pipette-id")
+
+
+async def test_dispense_in_place(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwarePipettingHandler,
+) -> None:
+    """It should find the pipette by ID and use it to dispense."""
+    decoy.when(mock_hardware_api.attached_instruments).then_return({})
+    decoy.when(
+        mock_state_view.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
+            attached_pipettes={},
         )
     ).then_return(
         HardwarePipette(
             mount=Mount.RIGHT,
-            config=mock_hw_pipettes.right_config,
-        )
-    )
-
-    decoy.when(
-        state_store.geometry.get_tip_drop_location(
-            pipette_config=mock_hw_pipettes.right_config,
-            labware_id="labware-id",
-            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
-        )
-    ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
-
-    await subject.drop_tip(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="A1",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
-    )
-
-    decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="A1",
-            well_location=WellLocation(offset=WellOffset(x=4, y=5, z=6)),
-        ),
-        await hardware_api.drop_tip(mount=Mount.RIGHT, home_after=True),
-    )
-
-
-async def test_handle_aspirate_request_without_prep(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    mock_hw_pipettes: MockPipettes,
-    subject: PipettingHandler,
-) -> None:
-    """It should aspirate from a well if pipette is ready to aspirate."""
-    well_location = WellLocation(
-        origin=WellOrigin.BOTTOM,
-        offset=WellOffset(x=0, y=0, z=1),
-    )
-
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(
-            mount=Mount.LEFT,
-            config=mock_hw_pipettes.left_config,
-        )
-    )
-
-    decoy.when(
-        state_store.pipettes.get_is_ready_to_aspirate(
-            pipette_id="pipette-id",
-            pipette_config=mock_hw_pipettes.left_config,
-        )
-    ).then_return(True)
-
-    volume = await subject.aspirate(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="C6",
-        well_location=well_location,
-        volume=25,
-        flow_rate=2.5,
-    )
-
-    assert volume == 25
-
-    decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="C6",
-            well_location=well_location,
-            current_well=None,
-        ),
-        hardware_api.set_flow_rate(
-            mount=Mount.LEFT, aspirate=2.5, dispense=None, blow_out=None
-        ),
-        await hardware_api.aspirate(
-            mount=Mount.LEFT,
-            volume=25,
-        ),
-        hardware_api.set_flow_rate(
-            mount=Mount.LEFT, aspirate=1.23, dispense=1.23, blow_out=1.23
-        ),
-    )
-
-
-async def test_handle_aspirate_request_with_prep(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    mock_hw_pipettes: MockPipettes,
-    subject: PipettingHandler,
-) -> None:
-    """It should aspirate from a well if pipette isn't ready to aspirate."""
-    well_location = WellLocation(
-        origin=WellOrigin.BOTTOM,
-        offset=WellOffset(x=0, y=0, z=1),
-    )
-
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(
-            mount=Mount.LEFT,
-            config=mock_hw_pipettes.left_config,
-        )
-    )
-
-    decoy.when(
-        state_store.pipettes.get_is_ready_to_aspirate(
-            pipette_id="pipette-id",
-            pipette_config=mock_hw_pipettes.left_config,
-        )
-    ).then_return(False)
-
-    volume = await subject.aspirate(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="C6",
-        well_location=well_location,
-        volume=25,
-        flow_rate=2.5,
-    )
-
-    assert volume == 25
-
-    decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="C6",
-            well_location=WellLocation(origin=WellOrigin.TOP),
-        ),
-        await hardware_api.prepare_for_aspirate(mount=Mount.LEFT),
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="C6",
-            well_location=well_location,
-            current_well=CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="C6",
+            config=cast(
+                PipetteDict,
+                {
+                    "aspirate_flow_rate": 1.23,
+                    "dispense_flow_rate": 4.56,
+                    "blow_out_flow_rate": 7.89,
+                },
             ),
-        ),
-        hardware_api.set_flow_rate(
-            mount=Mount.LEFT, aspirate=2.5, dispense=None, blow_out=None
-        ),
-        await hardware_api.aspirate(mount=Mount.LEFT, volume=25),
-        hardware_api.set_flow_rate(
-            mount=Mount.LEFT, aspirate=1.23, dispense=1.23, blow_out=1.23
-        ),
-    )
-
-
-async def test_handle_dispense_request(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    mock_hw_pipettes: MockPipettes,
-    subject: PipettingHandler,
-) -> None:
-    """It should be able to dispense to a well."""
-    well_location = WellLocation(
-        origin=WellOrigin.BOTTOM,
-        offset=WellOffset(x=0, y=0, z=1),
-    )
-
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(
-            mount=Mount.RIGHT,
-            config=mock_hw_pipettes.right_config,
         )
     )
 
-    volume = await subject.dispense(
+    result = await hardware_subject.dispense_in_place(
         pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="C6",
-        well_location=well_location,
         volume=25,
         flow_rate=2.5,
     )
 
-    assert volume == 25
+    assert result == 25
 
     decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="C6",
-            well_location=well_location,
-        ),
-        hardware_api.set_flow_rate(
+        mock_hardware_api.set_flow_rate(
             mount=Mount.RIGHT, aspirate=None, dispense=2.5, blow_out=None
         ),
-        await hardware_api.dispense(mount=Mount.RIGHT, volume=25),
-        hardware_api.set_flow_rate(
-            mount=Mount.RIGHT, aspirate=1.23, dispense=1.23, blow_out=1.23
+        await mock_hardware_api.dispense(mount=Mount.RIGHT, volume=25),
+        mock_hardware_api.set_flow_rate(
+            mount=Mount.RIGHT, aspirate=1.23, dispense=4.56, blow_out=7.89
         ),
     )
 
 
-async def test_handle_add_tip(
+async def test_aspirate_in_place(
     decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    labware_data_provider: LabwareDataProvider,
-    mock_hw_pipettes: MockPipettes,
-    tip_rack_def: LabwareDefinition,
-    subject: PipettingHandler,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwarePipettingHandler,
 ) -> None:
-    """It should add a tip manually to the hardware API."""
+    """Should set flow_rate and call hardware_api aspirate."""
+    decoy.when(mock_hardware_api.attached_instruments).then_return({})
     decoy.when(
-        state_store.pipettes.get_hardware_pipette(
+        mock_state_view.pipettes.get_hardware_pipette(
             pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
+            attached_pipettes={},
         )
     ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
-    )
-
-    decoy.when(state_store.labware.get_definition("labware-id")).then_return(
-        tip_rack_def
-    )
-
-    decoy.when(
-        state_store.geometry.get_nominal_tip_geometry(
-            labware_id="labware-id",
-            pipette_config=mock_hw_pipettes.left_config,
-            well_name=None,
-        )
-    ).then_return(
-        TipGeometry(
-            effective_length=50,
-            diameter=5,
-            volume=300,
-        )
-    )
-
-    decoy.when(
-        await labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=mock_hw_pipettes.left_config["pipette_id"],
-            labware_definition=tip_rack_def,
-        )
-    ).then_return(42)
-
-    await subject.add_tip(pipette_id="pipette-id", labware_id="labware-id")
-
-    decoy.verify(
-        await hardware_api.add_tip(mount=Mount.LEFT, tip_length=42),
-        hardware_api.set_current_tiprack_diameter(mount=Mount.LEFT, tiprack_diameter=5),
-        hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
-    )
-
-
-async def test_handle_add_tip_length_fallback(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    labware_data_provider: LabwareDataProvider,
-    mock_hw_pipettes: MockPipettes,
-    tip_rack_def: LabwareDefinition,
-    subject: PipettingHandler,
-) -> None:
-    """It should add a tip to the HW API even if there's no calibrated length."""
-    decoy.when(
-        state_store.pipettes.get_hardware_pipette(
-            pipette_id="pipette-id",
-            attached_pipettes=mock_hw_pipettes.by_mount,
-        )
-    ).then_return(
-        HardwarePipette(mount=Mount.LEFT, config=mock_hw_pipettes.left_config)
-    )
-
-    decoy.when(state_store.labware.get_definition("labware-id")).then_return(
-        tip_rack_def
-    )
-
-    decoy.when(
-        state_store.geometry.get_nominal_tip_geometry(
-            labware_id="labware-id",
-            pipette_config=mock_hw_pipettes.left_config,
-            well_name=None,
-        )
-    ).then_return(
-        TipGeometry(
-            effective_length=50,
-            diameter=5,
-            volume=300,
-        )
-    )
-
-    decoy.when(
-        await labware_data_provider.get_calibrated_tip_length(
-            pipette_serial=mock_hw_pipettes.left_config["pipette_id"],
-            labware_definition=tip_rack_def,
-        )
-    ).then_return(None)
-
-    await subject.add_tip(pipette_id="pipette-id", labware_id="labware-id")
-
-    decoy.verify(
-        await hardware_api.add_tip(mount=Mount.LEFT, tip_length=50),
-        hardware_api.set_current_tiprack_diameter(mount=Mount.LEFT, tiprack_diameter=5),
-        hardware_api.set_working_volume(mount=Mount.LEFT, tip_volume=300),
-    )
-
-
-async def test_touch_tip(
-    decoy: Decoy,
-    state_store: StateStore,
-    hardware_api: HardwareAPI,
-    movement_handler: MovementHandler,
-    subject: PipettingHandler,
-) -> None:
-    """It should be able to touch tip to the edges of a well."""
-    decoy.when(
-        state_store.motion.get_pipette_location(
-            pipette_id="pipette-id",
-            current_well=CurrentWell(
-                pipette_id="pipette-id",
-                labware_id="labware-id",
-                well_name="A3",
+        HardwarePipette(
+            mount=Mount.LEFT,
+            config=cast(
+                PipetteDict,
+                {
+                    "aspirate_flow_rate": 1.23,
+                    "dispense_flow_rate": 4.56,
+                    "blow_out_flow_rate": 7.89,
+                },
             ),
         )
-    ).then_return(
-        PipetteLocationData(
-            mount=MountType.LEFT,
-            critical_point=CriticalPoint.XY_CENTER,
-        )
     )
 
-    decoy.when(
-        state_store.geometry.get_well_edges(
-            labware_id="labware-id",
-            well_name="A3",
-            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
-        )
-    ).then_return([Point(x=0, y=1, z=2), Point(x=3, y=4, z=5)])
-
-    await subject.touch_tip(
-        pipette_id="pipette-id",
-        labware_id="labware-id",
-        well_name="A3",
-        well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+    result = await hardware_subject.aspirate_in_place(
+        pipette_id="pipette-id", volume=25, flow_rate=2.5
     )
+
+    assert result == 25
 
     decoy.verify(
-        await movement_handler.move_to_well(
-            pipette_id="pipette-id",
-            labware_id="labware-id",
-            well_name="A3",
-            well_location=WellLocation(offset=WellOffset(x=1, y=2, z=3)),
+        mock_hardware_api.set_flow_rate(
+            mount=Mount.LEFT, aspirate=2.5, dispense=None, blow_out=None
         ),
-        await hardware_api.move_to(
-            mount=Mount.LEFT,
-            critical_point=CriticalPoint.XY_CENTER,
-            abs_position=Point(x=0, y=1, z=2),
-        ),
-        await hardware_api.move_to(
-            mount=Mount.LEFT,
-            critical_point=CriticalPoint.XY_CENTER,
-            abs_position=Point(x=3, y=4, z=5),
+        await mock_hardware_api.aspirate(mount=Mount.LEFT, volume=25),
+        mock_hardware_api.set_flow_rate(
+            mount=Mount.LEFT, aspirate=1.23, dispense=4.56, blow_out=7.89
         ),
     )
+
+
+async def test_virtual_validate_aspirated_volume_raises(
+    decoy: Decoy,
+    mock_state_view: StateView,
+) -> None:
+    """Should validate if trying to aspirate more than the working volume."""
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=1, diameter=2, volume=3)
+    )
+
+    decoy.when(mock_state_view.pipettes.get_working_volume("pipette-id")).then_return(3)
+
+    decoy.when(mock_state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(
+        2
+    )
+
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    with pytest.raises(InvalidPipettingVolumeError):
+        await subject.aspirate_in_place(pipette_id="pipette-id", volume=4, flow_rate=1)
+
+
+async def test_blow_out_in_place(
+    decoy: Decoy,
+    mock_state_view: StateView,
+    mock_hardware_api: HardwareAPI,
+    hardware_subject: HardwarePipettingHandler,
+) -> None:
+    """Should set flow_rate and call hardware_api blow-out."""
+    decoy.when(mock_hardware_api.attached_instruments).then_return({})
+    decoy.when(
+        mock_state_view.pipettes.get_hardware_pipette(
+            pipette_id="pipette-id",
+            attached_pipettes={},
+        )
+    ).then_return(
+        HardwarePipette(
+            mount=Mount.LEFT,
+            config=cast(
+                PipetteDict,
+                {
+                    "aspirate_flow_rate": 1.23,
+                    "dispense_flow_rate": 4.56,
+                    "blow_out_flow_rate": 7.89,
+                },
+            ),
+        )
+    )
+
+    await hardware_subject.blow_out_in_place(pipette_id="pipette-id", flow_rate=2.5)
+
+    decoy.verify(
+        mock_hardware_api.set_flow_rate(
+            mount=Mount.LEFT, aspirate=None, dispense=None, blow_out=2.5
+        ),
+        await mock_hardware_api.blow_out(mount=Mount.LEFT),
+        mock_hardware_api.set_flow_rate(
+            mount=Mount.LEFT, aspirate=1.23, dispense=4.56, blow_out=7.89
+        ),
+    )
+
+
+def test_get_is_ready_to_aspirate_virtual(
+    decoy: Decoy, mock_state_view: StateView
+) -> None:
+    """Should check if pipette is ready to aspirate."""
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(
+        mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id")
+    ).then_raise(TipNotAttachedError())
+
+    with pytest.raises(TipNotAttachedError):
+        subject.get_is_ready_to_aspirate(pipette_id="pipette-id")
+
+    decoy.when(
+        mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id-123")
+    ).then_return(0)
+
+    assert subject.get_is_ready_to_aspirate(pipette_id="pipette-id-123") is True
+
+
+async def test_aspirate_in_place_virtual(
+    mock_state_view: StateView, decoy: Decoy
+) -> None:
+    """Should return the volume."""
+    decoy.when(
+        mock_state_view.pipettes.get_working_volume(pipette_id="pipette-id")
+    ).then_return(3)
+
+    decoy.when(
+        mock_state_view.pipettes.get_aspirated_volume(pipette_id="pipette-id")
+    ).then_return(1)
+
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=1, diameter=2, volume=3)
+    )
+
+    result = await subject.aspirate_in_place(
+        pipette_id="pipette-id", volume=2, flow_rate=5
+    )
+    assert result == 2
+
+
+async def test_dispense_in_place_virtual(
+    decoy: Decoy, mock_state_view: StateView
+) -> None:
+    """Should return the volume."""
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        TipGeometry(length=1, diameter=2, volume=3)
+    )
+
+    result = await subject.dispense_in_place(
+        pipette_id="pipette-id", volume=3, flow_rate=5
+    )
+    assert result == 3
+
+
+async def test_validate_tip_attached_in_blow_out(
+    mock_state_view: StateView, decoy: Decoy
+) -> None:
+    """Should raise an error that a tip is not attached."""
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        None
+    )
+
+    with pytest.raises(TipNotAttachedError):
+        await subject.blow_out_in_place("pipette-id", flow_rate=1)
+
+
+async def test_validate_tip_attached_in_aspirate(
+    mock_state_view: StateView, decoy: Decoy
+) -> None:
+    """Should raise an error that a tip is not attached."""
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        None
+    )
+
+    with pytest.raises(
+        TipNotAttachedError, match="Cannot perform aspirate without a tip attached"
+    ):
+        await subject.aspirate_in_place("pipette-id", volume=20, flow_rate=1)
+
+
+async def test_validate_tip_attached_in_dispense(
+    mock_state_view: StateView, decoy: Decoy
+) -> None:
+    """Should raise an error that a tip is not attached."""
+    subject = VirtualPipettingHandler(state_view=mock_state_view)
+
+    decoy.when(mock_state_view.pipettes.get_attached_tip("pipette-id")).then_return(
+        None
+    )
+
+    with pytest.raises(
+        TipNotAttachedError, match="Cannot perform dispense without a tip attached"
+    ):
+        await subject.dispense_in_place("pipette-id", volume=20, flow_rate=1)

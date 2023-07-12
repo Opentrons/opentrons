@@ -19,6 +19,7 @@ import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_stand
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
 } from '../../../hooks'
 import { getWellFillFromLabwareId } from '../utils'
 import { SetupLiquidsMap } from '../SetupLiquidsMap'
@@ -44,6 +45,9 @@ jest.mock('../../LabwareInfoOverlay')
 jest.mock('../../../hooks')
 jest.mock('../utils')
 
+const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
+  typeof useProtocolDetailsForRun
+>
 const mockLabwareInfoOverlay = LabwareInfoOverlay as jest.MockedFunction<
   typeof LabwareInfoOverlay
 >
@@ -176,6 +180,29 @@ describe('SetupLiquidsMap', () => {
           })}
         </svg>
       ))
+    when(mockUseProtocolDetailsForRun)
+      .calledWith(RUN_ID)
+      .mockReturnValue({
+        protocolData: {
+          pipettes: {},
+          labware: {},
+          modules: {
+            heatershaker_id: {
+              model: 'heaterShakerModuleV1',
+            },
+          },
+          liquids: [
+            {
+              id: '1',
+              displayName: 'mock liquid',
+              description: '',
+              displayColor: '#FFFFFF',
+            },
+          ],
+          labwareDefinitions: {},
+          commands: [],
+        },
+      } as any)
   })
   afterEach(() => resetAllWhenMocks())
 

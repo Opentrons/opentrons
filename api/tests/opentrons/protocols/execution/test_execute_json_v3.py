@@ -1,13 +1,13 @@
-from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
-from opentrons.protocols.context.well import WellImplementation
+from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
+from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 
 from unittest import mock
 from copy import deepcopy
 import pytest
 from opentrons.types import Location, Point
 from opentrons.protocols.parse import parse
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocol_api import (
     ProtocolContext,
     InstrumentContext,
@@ -54,7 +54,10 @@ def test_get_well(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), "deck")
     well_name = "A2"
     some_labware = labware.Labware(
-        implementation=LabwareImplementation(minimal_labware_def2, deck)
+        core=LegacyLabwareCore(minimal_labware_def2, deck),
+        api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,
+        core_map=None,
     )
     loaded_labware = {"someLabwareId": some_labware}
     params = {"labware": "someLabwareId", "well": well_name}
@@ -113,7 +116,10 @@ def test_get_location_with_offset_fixed_trash(minimal_labware_def2):
     trash_labware_def = deepcopy(minimal_labware_def2)
     trash_labware_def["parameters"]["quirks"] = ["fixedTrash"]
     trash_labware = labware.Labware(
-        implementation=LabwareImplementation(trash_labware_def, deck)
+        core=LegacyLabwareCore(trash_labware_def, deck),
+        api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,
+        core_map=None,
     )
 
     loaded_labware = {"someLabwareId": trash_labware}
@@ -202,7 +208,10 @@ def test_air_gap(minimal_labware_def2):
     deck = Location(Point(0, 0, 0), "deck")
     well_name = "A2"
     some_labware = labware.Labware(
-        implementation=LabwareImplementation(minimal_labware_def2, deck)
+        core=LegacyLabwareCore(minimal_labware_def2, deck),
+        api_version=MAX_SUPPORTED_VERSION,
+        protocol_core=None,
+        core_map=None,
     )
     loaded_labware = {"someLabwareId": some_labware}
     params = {"labware": "someLabwareId", "well": well_name}
@@ -305,7 +314,8 @@ def test_dispense():
 def test_touch_tip():
     location = Location(Point(1, 2, 3), "deck")
     well = labware.Well(
-        well_implementation=WellImplementation(
+        parent=None,
+        core=LegacyWellCore(
             well_geometry=WellGeometry(
                 {
                     "shape": "circular",
@@ -319,11 +329,11 @@ def test_touch_tip():
                 parent_point=Point(10, 20, 30),
                 parent_object=1,
             ),
-            has_tip=False,
             display_name="some well",
+            has_tip=False,
             name="A2",
         ),
-        api_level=MAX_SUPPORTED_VERSION,
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
     pipette_mock = mock.create_autospec(InstrumentContext, name="pipette_mock")
@@ -455,6 +465,7 @@ def test_dispatch_json_invalid_command():
         )
 
 
+@pytest.mark.ot2_only
 def test_papi_execute_json_v3(monkeypatch, ctx, get_json_protocol_fixture):
     protocol_data = get_json_protocol_fixture("3", "testAllAtomicSingleV3", False)
     protocol = parse(protocol_data, None)

@@ -5,7 +5,6 @@ import { of, interval, concat, EMPTY } from 'rxjs'
 import {
   filter,
   map,
-  mapTo,
   switchMap,
   mergeMap,
   takeUntil,
@@ -29,8 +28,6 @@ import {
   RESTART_TIMED_OUT_STATUS,
   restartRobotSuccess,
 } from '../robot-admin'
-
-import { disconnect } from '../robot'
 
 import {
   getBuildrootTargetVersion,
@@ -137,7 +134,9 @@ export const startUpdateEpic: Epic = (action$, state$) =>
       // otherwise robot is ready for migration or update, so get token
       // capabilities response has the correct request path to use
       const sessionPath =
-        capabilities.buildrootUpdate || capabilities.buildrootMigration
+        capabilities.buildrootUpdate ||
+        capabilities.buildrootMigration ||
+        capabilities.systemUpdate
 
       if (sessionPath == null) {
         return unexpectedBuildrootError(
@@ -284,7 +283,6 @@ export const uploadFileEpic: Epic = (_, state$) => {
       const systemFile = session?.userFileInfo?.systemFile || null
 
       return uploadBuildrootFile(
-        // @ts-expect-error TODO: host is actually of type Robot|ReachableRobot but this action expects a RobotHost
         host,
         `${pathPrefix}/${token}/file`,
         systemFile
@@ -424,10 +422,6 @@ export const removeMigratedRobotsEpic: Epic = (_, state$) => {
   )
 }
 
-export const disconnectRpcOnStartEpic: Epic = action$ => {
-  return action$.pipe(ofType(BR_START_UPDATE), mapTo(disconnect()))
-}
-
 export const buildrootEpic = combineEpics<Epic>(
   startUpdateEpic,
   retryAfterPremigrationEpic,
@@ -438,6 +432,5 @@ export const buildrootEpic = combineEpics<Epic>(
   commitUpdateEpic,
   restartAfterCommitEpic,
   finishAfterRestartEpic,
-  removeMigratedRobotsEpic,
-  disconnectRpcOnStartEpic
+  removeMigratedRobotsEpic
 )

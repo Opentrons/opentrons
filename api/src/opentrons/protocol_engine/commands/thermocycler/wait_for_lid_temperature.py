@@ -52,14 +52,14 @@ class WaitForLidTemperatureImpl(
         )
 
         # Raises error if no target temperature
-        target_temperature = thermocycler_state.get_target_lid_temperature()
+        thermocycler_state.get_target_lid_temperature()
 
         thermocycler_hardware = self._equipment.get_module_hardware_api(
             thermocycler_state.module_id
         )
 
         if thermocycler_hardware is not None:
-            await thermocycler_hardware.wait_for_lid_temperature(target_temperature)
+            await thermocycler_hardware.wait_for_lid_target()
 
         return WaitForLidTemperatureResult()
 
@@ -79,7 +79,7 @@ class WaitForLidTemperature(
 class WaitForLidTemperatureCreate(BaseCommandCreate[WaitForLidTemperatureParams]):
     """A request to create Thermocycler's wait for lid temperature command."""
 
-    commandType: WaitForLidTemperatureCommandType
+    commandType: WaitForLidTemperatureCommandType = "thermocycler/waitForLidTemperature"
     params: WaitForLidTemperatureParams
 
     _CommandCls: Type[WaitForLidTemperature] = WaitForLidTemperature

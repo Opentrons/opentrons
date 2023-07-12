@@ -1,0 +1,189 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "opentronsPipetteGeometrySchemaV2",
+  "definitions": {
+    "channels": {
+      "enum": [1, 8, 96, 384]
+    },
+    "displayCategory": {
+      "type": "string",
+      "enum": ["GEN1"]
+    },
+    "positiveNumber": {
+      "type": "number",
+      "minimum": 0
+    },
+    "currentRange": {
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 2.5
+    },
+    "xyzArray": {
+      "type": "array",
+      "description": "Array of 3 numbers, [x, y, z]",
+      "items": { "type": "number" },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "linearEquations": {
+      "description": "Array containing any number of 3-arrays. Each inner 3-array describes a line segment: [boundary, slope, intercept]. So [1, 2, 3] would mean 'where (next_boundary > x >= 1), y = 2x + 3'",
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": { "type": "number" },
+        "minItems": 3,
+        "maxItems": 3
+      }
+    },
+    "liquidHandlingSpecs": {
+      "description": "Object containing linear equations for translating between uL of liquid and mm of plunger travel. There is one linear equation for aspiration and one for dispense",
+      "type": "object",
+      "required": ["aspirate", "dispense"],
+      "additionalProperties": false,
+      "properties": {
+        "aspirate": { "$ref": "#/definitions/linearEquations" },
+        "dispense": { "$ref": "#/definitions/linearEquations" }
+      }
+    },
+    "editConfigurations": {
+      "type": "object",
+      "description": "Object allowing you to modify a config",
+      "required": ["value"],
+      "properties": {
+        "value": { "type": ["number", "array"] },
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "units": { "type": "string" },
+        "type": { "type": "string" },
+        "displayName": { "type": "string" }
+      }
+    },
+    "tipConfigurations": {
+      "type": "object",
+      "description": "Object containing configurations specific to tip handling",
+      "required": ["current", "speed"],
+      "properties": {
+        "current": { "$ref": "#/definitions/currentRange" },
+        "presses": {},
+        "speed": { "$ref": "#/definitions/editConfigurations" },
+        "increment": {},
+        "distance": {}
+      }
+    }
+  },
+  "description": "Version-level pipette specifications, which may vary across different versions of the same pipette",
+  "type": "object",
+  "required": [
+    "$otSharedSchema",
+    "pickUpTipConfigurations",
+    "dropTipConfigurations",
+    "partialTipConfigurations",
+    "plungerPositionsConfigurations",
+    "plungerMotorConfigurations",
+    "displayCategory",
+    "channels",
+    "model",
+    "displayName",
+    "backCompatNames"
+  ],
+  "properties": {
+    "additionalProperties": false,
+    "$otSharedSchema": {
+      "type": "string",
+      "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/pipette/schemas/2/pipettePropertiesSchema.json is a reference to this schema."
+    },
+    "backCompatNames": {
+      "type": "array",
+      "description": "Array of pipette names that are compatible with the given pipette",
+      "items": { "type": "string" }
+    },
+    "quirks": {
+      "type": "array",
+      "description": "Array of pipette quirks supported on the current pipette",
+      "items": { "type": "string" }
+    },
+    "channels": { "$ref": "#/definitions/channels" },
+    "partialTipConfigurations": {
+      "type": "object",
+      "description": "Object containing information on partial tip configurations",
+      "required": ["partialTipSupported"],
+      "properties": {
+        "partialTipSupported": { "type": "boolean" },
+        "availableConfigurations": {
+          "type": "array",
+          "description": "Array of available configurations",
+          "items": {
+            "type": "number",
+            "enum": [1, 2, 3, 4, 5, 6, 7, 8, 12, 96, 384]
+          }
+        }
+      }
+    },
+    "availableSensors": {
+      "type": "object",
+      "description": "object with keyed by sensor and number available",
+      "required": ["sensors"],
+      "properties": {
+        "sensors": {
+          "type": "array",
+          "description": "Array of available sensor types",
+          "items": {
+            "type": "string"
+          }
+        },
+        "patternProperties": {
+          "description": "The count of each sensor type available on a given pipette model.",
+          "type": "object",
+          ".*": {
+            "required": ["count"],
+            "count": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "plungerPositionsConfigurations": {
+      "type": "object",
+      "description": "Object containing configurations specific to tip handling",
+      "required": ["top", "bottom", "blowout", "drop"],
+      "properties": {
+        "top": { "$ref": "#/definitions/currentRange" },
+        "bottom": {},
+        "blowout": { "$ref": "#/definitions/editConfigurations" },
+        "drop": {}
+      }
+    },
+    "plungerMotorConfigurations": {
+      "type": "object",
+      "description": "Object containing configurations specific to the plunger motor",
+      "required": ["idle", "run"],
+      "properties": {
+        "idle": { "$ref": "#/definitions/currentRange" },
+        "run": { "$ref": "#/definitions/currentRange" }
+      }
+    },
+    "gearMotorConfigurations": {
+      "type": "object",
+      "description": "Object containing configurations specific to the clamp motors, if applicable",
+      "required": ["idle", "run"],
+      "properties": {
+        "idle": { "$ref": "#/definitions/currentRange" },
+        "run": { "$ref": "#/definitions/currentRange" }
+      }
+    },
+    "pickUpTipConfigurations": {
+      "$ref": "#/definitions/tipConfigurations"
+    },
+    "dropTipConfigurations": {
+      "$ref": "#/definitions/tipConfigurations"
+    },
+    "displayName": {
+      "type": "string",
+      "description": "Display name of the pipette include model and generation number in readable format."
+    },
+    "model": {
+      "type": "string",
+      "description": "the model of the pipette, for example an eightChannel pipette"
+    },
+    "displayCategory": { "$ref": "#/definitions/displayCategory" }
+  }
+}

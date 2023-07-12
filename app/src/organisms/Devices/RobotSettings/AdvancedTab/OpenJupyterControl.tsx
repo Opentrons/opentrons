@@ -9,12 +9,15 @@ import {
   Box,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useTrackEvent } from '../../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_JUPYTER_OPEN,
+} from '../../../../redux/analytics'
 import { StyledText } from '../../../../atoms/text'
 import { TertiaryButton } from '../../../../atoms/buttons'
 import { ExternalLink } from '../../../../atoms/Link/ExternalLink'
 
-const EVENT_JUPYTER_OPEN = { name: 'jupyterOpen', properties: {} }
+const EVENT_JUPYTER_OPEN = { name: ANALYTICS_JUPYTER_OPEN, properties: {} }
 
 const JUPYTER_NOTEBOOK_LINK =
   'https://docs.opentrons.com/v2/new_advanced_running.html#jupyter-notebook'
@@ -35,12 +38,14 @@ export function OpenJupyterControl({
       <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
-          marginBottom={SPACING.spacing2}
+          marginBottom={SPACING.spacing8}
           id="AdvancedSettings_About"
         >
           {t('jupyter_notebook')}
         </StyledText>
-        <StyledText as="p">{t('jupyter_notebook_description')}</StyledText>
+        <StyledText as="p" marginBottom={SPACING.spacing8}>
+          {t('jupyter_notebook_description')}
+        </StyledText>
         <ExternalLink href={JUPYTER_NOTEBOOK_LINK}>
           {t('jupyter_notebook_link')}
         </ExternalLink>
@@ -49,10 +54,10 @@ export function OpenJupyterControl({
         onClick={() => trackEvent(EVENT_JUPYTER_OPEN)}
         as={Link}
         href={href}
-        marginLeft={SPACING.spacing6}
+        marginLeft={SPACING.spacing32}
         external
       >
-        {t('launch_jupyter_notebook_button')}
+        {t('launch_jupyter_notebook')}
       </TertiaryButton>
     </Flex>
   )

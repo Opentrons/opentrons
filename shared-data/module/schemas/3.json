@@ -12,14 +12,14 @@
       }
     },
     "affineTransform": {
-      "description": "A 3x3 row-major matrix describing an affine transform to apply to the labwareOffset and calibrationPoint coordinates of the module (in certain circumstances, e.g. per slot)",
+      "description": "A 4x4 row-major matrix describing an affine transform to apply to the labwareOffset and calibrationPoint coordinates of the module (in certain circumstances, e.g. per slot)",
       "type": "array",
-      "minItems": 3,
-      "maxItems": 3,
+      "minItems": 4,
+      "maxItems": 4,
       "items": {
         "type": "array",
-        "minItems": 3,
-        "maxItems": 3,
+        "minItems": 4,
+        "maxItems": 4,
         "items": {
           "type": "number"
         }
@@ -80,13 +80,14 @@
         "temperatureModuleType",
         "magneticModuleType",
         "thermocyclerModuleType",
-        "heaterShakerModuleType"
+        "heaterShakerModuleType",
+        "magneticBlockType"
       ],
       "type": "string"
     },
     "model": {
       "type": "string",
-      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule)V[0-9]+$"
+      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule|heaterShakerModule|magneticBlock)V[0-9]+$"
     },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
     "dimensions": {

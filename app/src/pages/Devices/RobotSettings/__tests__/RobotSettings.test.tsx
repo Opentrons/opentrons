@@ -4,9 +4,10 @@ import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
-import { RobotSettingsCalibration } from '../../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
+import { RobotSettingsCalibration } from '../../../../organisms/RobotSettingsCalibration'
 import { RobotSettingsNetworking } from '../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking'
 import { RobotSettingsAdvanced } from '../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced'
+import { RobotSettingsPrivacy } from '../../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy'
 import { useRobot } from '../../../../organisms/Devices/hooks'
 import { RobotSettings } from '..'
 import { when } from 'jest-when'
@@ -15,14 +16,15 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../../redux/discovery/__fixtures__'
+import { getBuildrootSession } from '../../../../redux/buildroot'
 
-jest.mock(
-  '../../../../organisms/Devices/RobotSettings/RobotSettingsCalibration'
-)
+jest.mock('../../../../organisms/RobotSettingsCalibration')
 jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsNetworking')
 jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsAdvanced')
+jest.mock('../../../../organisms/Devices/RobotSettings/RobotSettingsPrivacy')
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../redux/discovery/selectors')
+jest.mock('../../../../redux/buildroot')
 
 const mockRobotSettingsCalibration = RobotSettingsCalibration as jest.MockedFunction<
   typeof RobotSettingsCalibration
@@ -33,7 +35,14 @@ const mockRobotSettingsNetworking = RobotSettingsNetworking as jest.MockedFuncti
 const mockRobotSettingsAdvanced = RobotSettingsAdvanced as jest.MockedFunction<
   typeof RobotSettingsAdvanced
 >
+const mockRobotSettingsPrivacy = RobotSettingsPrivacy as jest.MockedFunction<
+  typeof RobotSettingsPrivacy
+>
 const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
+
+const mockGetBuildrootSession = getBuildrootSession as jest.MockedFunction<
+  typeof getBuildrootSession
+>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -63,6 +72,9 @@ describe('RobotSettings', () => {
     mockRobotSettingsAdvanced.mockReturnValue(
       <div>Mock RobotSettingsAdvanced</div>
     )
+    mockRobotSettingsPrivacy.mockReturnValue(
+      <div>Mock RobotSettingsPrivacy</div>
+    )
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -89,6 +101,22 @@ describe('RobotSettings', () => {
     getByText('mock device details')
   })
 
+  it('does NOT redirect to device details if robot is null but a buildroot session is active', () => {
+    when(mockUseRobot).calledWith('otie').mockReturnValue(null)
+    mockGetBuildrootSession.mockReturnValue({
+      robotName: 'some robot',
+      userFileInfo: null,
+      token: null,
+      pathPrefix: null,
+      step: null,
+      stage: null,
+      progress: null,
+      error: null,
+    })
+    const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
+    getByText('Robot Settings')
+  })
+
   it('redirects to device details if robot is reachable but server is down', () => {
     when(mockUseRobot)
       .calledWith('otie')
@@ -100,6 +128,12 @@ describe('RobotSettings', () => {
   it('redirects to networking tab if robot not connectable', () => {
     when(mockUseRobot).calledWith('otie').mockReturnValue(mockReachableRobot)
     const [{ getByText }] = render('/devices/otie/robot-settings/calibration')
+    getByText('Mock RobotSettingsNetworking')
+  })
+
+  it('redirects to networking tab if feature flags hidden', () => {
+    when(mockUseRobot).calledWith('otie').mockReturnValue(mockReachableRobot)
+    const [{ getByText }] = render('/devices/otie/robot-settings/feature-flags')
     getByText('Mock RobotSettingsNetworking')
   })
 
@@ -142,5 +176,16 @@ describe('RobotSettings', () => {
     expect(queryByText('Mock RobotSettingsAdvanced')).toBeFalsy()
     AdvancedTab.click()
     getByText('Mock RobotSettingsAdvanced')
+  })
+
+  it('renders privacy content when the privacy tab is clicked', () => {
+    const [{ getByText, queryByText }] = render(
+      '/devices/otie/robot-settings/calibration'
+    )
+
+    const PrivacyTab = getByText('Privacy')
+    expect(queryByText('Mock RobotSettingsPrivacy')).toBeFalsy()
+    PrivacyTab.click()
+    getByText('Mock RobotSettingsPrivacy')
   })
 })

@@ -13,7 +13,7 @@ You will need the following tools installed to develop on the Opentrons platform
 - curl
 - ssh
 - Python v3.7
-- Node.js v14
+- Node.js v16
 
 ### macOS
 
@@ -63,7 +63,7 @@ If you haven't used `git` before, **be sure to complete [first-time Git setup][]
 
 Our recommended installation instructions for Node.js differ between `x86_64` (Intel) and `ARM` (M1) Macs.
 
-##### x86-64 Mac (Intel)
+##### x86-64 Mac (Intel) & ARM Mac(M1)
 
 On x86, we recommend [nvs][] to install Node.js because it works well and is compatible with macOS, Windows, and Linux.
 
@@ -82,10 +82,10 @@ Close and re-open your terminal to confirm `nvs` is installed.
 nvs --version
 ```
 
-Now we can use nvs to install Node.js v14 and switch on `auto` mode, which will make sure Node.js v14 is used any time we're in the `opentrons` project directory.
+Now we can use nvs to install Node.js v16 and switch on `auto` mode, which will make sure Node.js v16 is used any time we're in the `opentrons` project directory.
 
 ```shell
-nvs add 14
+nvs add 16
 nvs auto on
 ```
 
@@ -99,44 +99,14 @@ export NVS_HOME="$HOME/.nvs"
 # ...
 ```
 
-##### ARM Mac (M1)
-
-If you are running an ARM (M1) Mac, you **should not use `nvs` nor `nvm`**, because those tools do not have access to Node.js v14 for the ARM architecture. Until we upgrade to version 16 or higher, you need to use an alternative installation method for Node.js.
-
-Fortunately, you can use `brew` to install an ARM-native version of Node v14.
-
-```shell
-brew install node@14
-```
-
-Once `brew` finishes installing Node, it will print one additional step to complete the installation to ensure your system selects the proper Node executable to use.
-
-```shell
-echo 'export PATH="/opt/homebrew/opt/node@14/bin:$PATH"' >> ~/.zshrc
-```
-
-Close and re-open your terminal to confirm that the correct version of Node is installed for the correct architecture.
-
-```shell
-node -e "console.log(process.version, process.arch)"
-# > v14.19.1 arm64
-```
-
-If your `node` command isn't working or is printing the wrong information, confirm that your shell is set up properly. If you print out the contents of `~/.zshrc`, you should see something similar to the following:
-
-```shell
-# ~/.zshrc
-# ...
-export PATH="/opt/homebrew/opt/node@14/bin:$PATH"
-# ...
-```
-
 #### 2. Install `pyenv` and Python
 
 On macOS, we recommend [pyenv][] to install different versions of Python.
 
-1. Go to [https://github.com/pyenv/pyenv][pyenv]
-2. Follow the instructions for [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout)
+1. Go to [pyenv suggested build environment](https://github.com/pyenv/pyenv/wiki#suggested-build-environment)
+2. Follow instructions for your operating system
+3. Go to [pyenv](https://github.com/pyenv/pyenv)
+4. Follow the instructions for [Basic GitHub Checkout](https://github.com/pyenv/pyenv#basic-github-checkout)
    - **Do not install `pyenv` with `brew`**
    - We've found the GitHub checkout installation to be more reliable, _especially_ on M1/ARM macs
 
@@ -154,10 +124,10 @@ Close and re-open your terminal to verify that `pyenv` is installed
 pyenv --version
 ```
 
-Now, install the required version of Python. Use the latest available version of `3.7.x`, which is `3.7.13` at the time of writing.
+Now, install the required version of Python. Use the latest available version of `3.7.x`, which is `3.7.15` at the time of writing.
 
 ```shell
-pyenv install 3.7.13
+pyenv install 3.7.15
 ```
 
 If your `pyenv` command isn't working, confirm that your shell is set up properly. If you print out the contents of `~/.zprofile` and `~/.zshrc`, you should see something similar to the following:
@@ -183,7 +153,7 @@ eval "$(pyenv init -)"
 `/hardware` depends on the Python library Pillow. On ARM Macs, `pip` will build Pillow from source, which requires [jpeg](https://formulae.brew.sh/formula/jpeg) to be installed.
 
 ```shell
-brew install jpeg
+brew install jpeg-turbo
 ```
 
 ### Windows
@@ -194,12 +164,15 @@ On Windows, we rely on:
 
 - [scoop][] to install general dependencies and Python
 - [Node Version Switcher][nvs] to install and manage Node.js
+- [Visual Studio][visual studio] to run electron-rebuild
 
 #### 0. Install `scoop` and general dependencies
 
 #### 1. Install `nvs` and Node.js
 
 #### 2. Install Python
+
+#### 3. Install build tools via Visual Studio Installer
 
 ### Linux
 
@@ -226,13 +199,14 @@ Once you are inside the repository for the first time, you should do two things:
 
 1. Confirm that `nvs` selected the proper version of Node.js to use
 2. Tell `pyenv` to use Python 3.7
+3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `eval "$(pyenv init --path)"` and then `pyenv local 3.7.15`. Then check `python --version` again.
 
 ```shell
-# confirm Node v14
+# confirm Node v16
 node --version
 
 # set Python version, and confirm
-pyenv local 3.7.13
+pyenv local 3.7.15
 python --version
 ```
 
@@ -257,6 +231,7 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [xcode command line tools]: https://developer.apple.com/xcode/resources/
 [scoop]: https://scoop.sh/
 [nvs]: https://github.com/jasongin/nvs
+[visual studio]: https://visualstudio.microsoft.com/downloads/
 [pyenv]: https://github.com/pyenv/pyenv
 [yarn]: https://classic.yarnpkg.com/
 [pipenv]: https://github.com/pypa/pipenv

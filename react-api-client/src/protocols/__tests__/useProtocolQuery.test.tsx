@@ -24,6 +24,7 @@ const PROTOCOL_RESPONSE = {
     metadata: {},
     analysisSummaries: [],
     files: [],
+    robotType: 'OT-3 Standard',
   },
 } as Protocol
 

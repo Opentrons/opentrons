@@ -32,11 +32,7 @@ Actual storage access is handled elsewhere.
 
 
 from typing import Sequence, Set
-from typing_extensions import Final, Protocol as InterfaceShape
-
-
-MAXIMUM_RUNS: Final = 20
-MAXIMUM_UNUSED_PROTOCOLS: Final = 5
+from typing_extensions import Protocol as InterfaceShape
 
 
 class ProtocolSpec(InterfaceShape):
@@ -55,9 +51,7 @@ class ProtocolSpec(InterfaceShape):
 
 
 class ProtocolDeletionPlanner:  # noqa: D101
-    def __init__(
-        self, maximum_unused_protocols: int = MAXIMUM_UNUSED_PROTOCOLS
-    ) -> None:
+    def __init__(self, maximum_unused_protocols: int) -> None:
         """Return a configured protocol deletion planner.
 
         Args:
@@ -101,7 +95,7 @@ class ProtocolDeletionPlanner:  # noqa: D101
 
 
 class RunDeletionPlanner:  # noqa: D101
-    def __init__(self, maximum_runs: int = MAXIMUM_RUNS) -> None:
+    def __init__(self, maximum_runs: int) -> None:
         """Return a configured run deletion planner.
 
         Args:

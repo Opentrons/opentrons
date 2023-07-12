@@ -1,21 +1,49 @@
 import pytest
 
 from opentrons.types import Location, Point
+from opentrons.protocols.api_support.deck_type import (
+    SHORT_TRASH_DECK,
+    STANDARD_OT2_DECK,
+)
 from opentrons.protocols.geometry.planning import (
     plan_moves,
     safe_height,
     should_dodge_thermocycler,
 )
-from opentrons.protocols.geometry.deck import Deck
+from opentrons.protocol_api.core.legacy import module_geometry
+from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.protocol_api import labware
-from opentrons.protocols.geometry import module_geometry
 from opentrons.hardware_control.types import CriticalPoint
-from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.hardware_control.modules.types import (
+    ThermocyclerModuleModel,
+    TemperatureModuleModel,
+    MagneticModuleModel,
+)
 
 tall_lw_name = "opentrons_96_tiprack_1000ul"
 labware_name = "corning_96_wellplate_360ul_flat"
 trough_name = "usascientific_12_reservoir_22ml"
 P300M_GEN2_MAX_HEIGHT = 155.75
+
+
+@pytest.fixture(
+    # Limit the tests in this file to just test with OT-2 deck definitions.
+    #
+    # We need to do this because the tests in this file use the `Deck` class from
+    # the older, non-Protocol-Engine versions of the Python Protocol API (apiLevel<=2.13),
+    # and those versions do not support OT-3s.
+    #
+    # TODO(mm, 2023-05-18) We should either:
+    #
+    # * Decide that the functions tested here are only for PAPIv<=2.13.
+    #   Then, we should move them to `opentrons.protocol_api.core.legacy` to indicate that.
+    #
+    # * Or, decide that the functions tested here are for all versions of PAPI.
+    #   Then, we should rewrite these tests to not depend on the OT-2-only `Deck` class.
+    params=[STANDARD_OT2_DECK, SHORT_TRASH_DECK]
+)
+def deck(request) -> Deck:
+    return Deck(deck_type=request.param)
 
 
 def check_arc_basic(arc, from_loc, to_loc):
@@ -32,8 +60,7 @@ def check_arc_basic(arc, from_loc, to_loc):
     assert arc[1][0].z >= to_loc.point.z
 
 
-def test_direct_moves():
-    deck = Deck()
+def test_direct_moves(deck):
     lw1 = labware.load(labware_name, deck.position_for(1))
 
     same_place = plan_moves(
@@ -53,8 +80,7 @@ def test_direct_moves():
     assert same_well == [(lw1.wells()[0].bottom().point, None)]
 
 
-def test_basic_arc():
-    deck = Deck()
+def test_basic_arc(deck):
     lw1 = labware.load(labware_name, deck.position_for(1))
     lw2 = labware.load(labware_name, deck.position_for(2))
     deck[1] = lw1
@@ -86,8 +112,7 @@ def test_basic_arc():
     assert different_lw[0][0].z == deck.highest_z + 10.0
 
 
-def test_force_direct():
-    deck = Deck()
+def test_force_direct(deck):
     lw1 = labware.load(labware_name, deck.position_for(1))
     lw2 = labware.load(labware_name, deck.position_for(2))
     # same-labware moves should move direct
@@ -115,10 +140,9 @@ def test_force_direct():
     assert different_lw == [(lw2.wells()[0].bottom().point, None)]
 
 
-def test_no_labware_loc(labware_offset_tempdir):
+def test_no_labware_loc(deck):
     labware_def = labware.get_labware_definition(labware_name)
 
-    deck = Deck()
     lw1 = labware.load(labware_name, deck.position_for(1))
     lw2 = labware.load(labware_name, deck.position_for(2))
     deck[1] = lw1
@@ -157,8 +181,7 @@ def test_no_labware_loc(labware_offset_tempdir):
     assert no_to_well_height == lw_height_expected
 
 
-def test_arc_tall_point():
-    deck = Deck()
+def test_arc_tall_point(deck):
     lw1 = labware.load(labware_name, deck.position_for(1))
     tall_z = 100
     old_top = lw1.wells()[0].top()
@@ -177,8 +200,7 @@ def test_arc_tall_point():
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
 
 
-def test_arc_lower_minimum_z_height():
-    deck = Deck()
+def test_arc_lower_minimum_z_height(deck):
     lw1 = labware.load(labware_name, deck.position_for(1))
     tall_z = 100
     minimum_z_height = 42
@@ -217,8 +239,7 @@ def test_arc_lower_minimum_z_height():
     check_arc_basic(from_tall_lw, no_well, lw1.wells()[4].bottom())
 
 
-def test_direct_minimum_z_height():
-    deck = Deck()
+def test_direct_minimum_z_height(deck):
     lw1 = labware.load(labware_name, deck.position_for(1))
     from_loc = lw1.wells()[0].bottom().move(Point(x=-2))
     to_loc = lw1.wells()[0].bottom().move(Point(x=2))
@@ -233,8 +254,7 @@ def test_direct_minimum_z_height():
     check_arc_basic(moves, from_loc, to_loc)
 
 
-def test_direct_cp():
-    deck = Deck()
+def test_direct_cp(deck):
     trough = labware.load(trough_name, deck.position_for(1))
     lw1 = labware.load(labware_name, deck.position_for(2))
     # when moving from no origin location to a centered labware we should
@@ -277,37 +297,40 @@ def test_direct_cp():
     assert to_normal[2][1] is None
 
 
-def test_gen2_module_transforms():
-    deck = Deck()
-    tmod = module_geometry.load_module(
-        module_geometry.TemperatureModuleModel.TEMPERATURE_V2,
-        deck.position_for("1"),
-        MAX_SUPPORTED_VERSION,
+@pytest.mark.ot2_only  # Due to usage of create_geometry_for_ot2_deck().
+def test_gen2_module_transforms(deck):
+    tmod = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(
+            TemperatureModuleModel.TEMPERATURE_V2
+        ),
+        parent=deck.position_for("1"),
+        configuration=None,
     )
     assert tmod.labware_offset == Point(-1.45, -0.15, 80.09)
-    tmod2 = module_geometry.load_module(
-        module_geometry.TemperatureModuleModel.TEMPERATURE_V2,
-        deck.position_for("3"),
-        MAX_SUPPORTED_VERSION,
+    tmod2 = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(
+            TemperatureModuleModel.TEMPERATURE_V2
+        ),
+        parent=deck.position_for("3"),
+        configuration=None,
     )
     assert tmod2.labware_offset == Point(1.15, -0.15, 80.09)
 
-    mmod = module_geometry.load_module(
-        module_geometry.MagneticModuleModel.MAGNETIC_V2,
-        deck.position_for("1"),
-        MAX_SUPPORTED_VERSION,
+    mmod = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(MagneticModuleModel.MAGNETIC_V2),
+        parent=deck.position_for("1"),
+        configuration=None,
     )
     assert mmod.labware_offset == Point(-1.175, -0.125, 82.25)
-    mmod2 = module_geometry.load_module(
-        module_geometry.MagneticModuleModel.MAGNETIC_V2,
-        deck.position_for("3"),
-        MAX_SUPPORTED_VERSION,
+    mmod2 = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(MagneticModuleModel.MAGNETIC_V2),
+        parent=deck.position_for("3"),
+        configuration=None,
     )
     assert mmod2.labware_offset == Point(1.425, -0.125, 82.25)
 
 
-def test_instr_max_height():
-    deck = Deck()
+def test_instr_max_height(deck):
     fixed_trash = deck.get_fixed_trash()
     trough = labware.load(trough_name, deck.position_for(1))
     trough2 = labware.load(trough_name, deck.position_for(2))
@@ -355,14 +378,17 @@ def test_instr_max_height():
         )
 
 
-def test_should_dodge():
-    deck = Deck()
+def test_should_dodge(deck):
     # with no tc loaded, doesn't matter what the positions are
     assert not should_dodge_thermocycler(
         deck, deck.position_for(4), deck.position_for(9)
     )
-    deck[7] = module_geometry.load_module(
-        module_geometry.ThermocyclerModuleModel.THERMOCYCLER_V1, deck.position_for(7)
+    deck[7] = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(
+            ThermocyclerModuleModel.THERMOCYCLER_V1
+        ),
+        parent=deck.position_for(7),
+        configuration=None,
     )
     # with a tc loaded, some positions should require dodging
     assert should_dodge_thermocycler(deck, deck.position_for(12), deck.position_for(1))
@@ -380,8 +406,7 @@ def test_should_dodge():
     )
 
 
-def test_labware_in_next_slot():
-    deck = Deck()
+def test_labware_in_next_slot(deck):
     trough = labware.load(trough_name, deck.position_for(4))
     trough2 = labware.load(trough_name, deck.position_for(1))
     trough3 = labware.load(trough_name, deck.position_for(3))
@@ -395,24 +420,25 @@ def test_labware_in_next_slot():
     assert deck.right_of("9") is None
 
 
-def test_get_non_fixture_slots():
-    deck = Deck()
+def test_get_non_fixture_slots(deck):
     trough = labware.load(trough_name, deck.position_for(4))
     deck[4] = trough
 
     assert deck.get_non_fixture_slots() == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 
 
-def test_thermocycler_present() -> None:
+def test_thermocycler_present(deck) -> None:
     """It should change when thermocycler is added/removed"""
-    deck = Deck()
-
     # Empty deck. No thermocycler
     assert not deck.thermocycler_present
 
     # Add a thermocycler
-    deck[7] = module_geometry.load_module(
-        module_geometry.ThermocyclerModuleModel.THERMOCYCLER_V1, deck.position_for(7)
+    deck[7] = module_geometry.create_geometry(
+        definition=module_geometry.load_definition(
+            ThermocyclerModuleModel.THERMOCYCLER_V1
+        ),
+        parent=deck.position_for(7),
+        configuration=None,
     )
     assert deck.thermocycler_present
 

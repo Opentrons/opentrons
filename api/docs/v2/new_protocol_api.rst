@@ -1,3 +1,5 @@
+:og:description: A comprehensive reference of classes and methods that make up the Opentrons Python Protocol API.
+
 .. _protocol-api-reference:
 
 API Version 2 Reference
@@ -7,39 +9,57 @@ API Version 2 Reference
 
 Protocols and Instruments
 -------------------------
-.. module:: opentrons.protocol_api.contexts
+.. module:: opentrons.protocol_api
 
-.. autoclass:: opentrons.protocol_api.contexts.ProtocolContext
+..
+   TODO(mm, 2023-06-06): When we want to publish move_labware(), un-exclude it here and
+   and also uncomment the inclusion of OFF_DECK, below in this file.
+   https://opentrons.atlassian.net/browse/RTC-288
+.. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
-   :exclude-members: location_cache, _hw_manager
+   :exclude-members: location_cache, cleanup, clear_commands, commands, move_labware
 
-.. autoclass:: opentrons.protocol_api.contexts.InstrumentContext
+.. autoclass:: opentrons.protocol_api.InstrumentContext
    :members:
+   :exclude-members: delay
+
+.. autoclass:: opentrons.protocol_api.Liquid
 
 .. _protocol-api-labware:
 
 Labware and Wells
 -----------------
-.. automodule:: opentrons.protocol_api.labware
+.. autoclass:: opentrons.protocol_api.Labware
    :members:
-   :exclude-members: _depth, _width, _length
+   :exclude-members: next_tip, use_tips, previous_tip, return_tips
+
+.. autoclass:: opentrons.protocol_api.Well
+   :members:
+   :exclude-members: geometry
 
 .. _protocol-api-modules:
 
 Modules
 -------
-.. autoclass:: opentrons.protocol_api.contexts.TemperatureModuleContext
+
+.. autoclass:: opentrons.protocol_api.TemperatureModuleContext
    :members:
-   :exclude-members: start_set_temperature
+   :exclude-members: start_set_temperature, await_temperature, broker, geometry, load_labware_object
    :inherited-members:
 
-.. autoclass:: opentrons.protocol_api.contexts.MagneticModuleContext
+.. autoclass:: opentrons.protocol_api.MagneticModuleContext
    :members:
+   :exclude-members: calibrate, broker, geometry, load_labware_object
    :inherited-members:
 
-.. autoclass:: opentrons.protocol_api.contexts.ThermocyclerContext
+.. autoclass:: opentrons.protocol_api.ThermocyclerContext
    :members:
-   :exclude-members: total_step_count, current_cycle_index, total_cycle_count, hold_time, ramp_rate, current_step_index, flag_unsafe_move
+   :exclude-members: total_step_count, current_cycle_index, total_cycle_count, hold_time, ramp_rate, current_step_index, broker, geometry, load_labware_object
+   :inherited-members:
+   
+.. autoclass:: opentrons.protocol_api.HeaterShakerContext
+   :members:
+   :exclude-members: broker, geometry, load_labware_object
    :inherited-members:
 
 
@@ -47,9 +67,19 @@ Modules
 
 Useful Types and Definitions
 ----------------------------
-.. automodule:: opentrons.types
-   :members:
 
+..
+   The opentrons.types module contains a mixture of public Protocol API things and private internal things.
+   Explicitly name the things that we expect to be public, excluding everything else.
+
+.. automodule:: opentrons.types
+   :members: PipetteNotAttachedError, Point, Location, Mount
+
+..
+   TODO(mm, 2023-06-06): This should be uncommented when move_labware() is published. See above.
+   https://opentrons.atlassian.net/browse/RTC-288
+   .. autodata:: opentrons.protocol_api.OFF_DECK
+      :no-value:
 
 Executing and Simulating Protocols
 ----------------------------------

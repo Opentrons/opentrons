@@ -1,5 +1,4 @@
 import * as React from 'react'
-import pick from 'lodash/pick'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import { parseAllRequiredModuleModels } from '@opentrons/api-client'
@@ -11,12 +10,10 @@ import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simple
 import withModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/testModulesProtocol.json'
 
 import { i18n } from '../../../../i18n'
-import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
-import { useFeatureFlag } from '../../../../redux/config'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import {
-  useDeckCalibrationData,
-  useProtocolDetailsForRun,
+  useIsOT3,
   useRobot,
   useRunCalibrationStatus,
   useRunHasStarted,
@@ -29,8 +26,10 @@ import { SetupLiquids } from '../SetupLiquids'
 import { ProtocolRunSetup } from '../ProtocolRunSetup'
 import { SetupModules } from '../SetupModules'
 
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
-import type { StoredProtocolAnalysis } from '../../hooks'
+import {
+  ProtocolAnalysisOutput,
+  protocolHasLiquids,
+} from '@opentrons/shared-data'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../hooks')
@@ -38,13 +37,12 @@ jest.mock('../SetupLabware')
 jest.mock('../SetupRobotCalibration')
 jest.mock('../SetupModules')
 jest.mock('../SetupLiquids')
-jest.mock('../../../../redux/config')
+jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
+jest.mock('@opentrons/shared-data/js/helpers/parseProtocolData')
 
-const mockUseDeckCalibrationData = useDeckCalibrationData as jest.MockedFunction<
-  typeof useDeckCalibrationData
->
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
+const mockUseIsOT3 = useIsOT3 as jest.MockedFunction<typeof useIsOT3>
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
 >
 const mockUseProtocolAnalysisErrors = useProtocolAnalysisErrors as jest.MockedFunction<
   typeof useProtocolAnalysisErrors
@@ -71,18 +69,16 @@ const mockSetupRobotCalibration = SetupRobotCalibration as jest.MockedFunction<
 const mockSetupModules = SetupModules as jest.MockedFunction<
   typeof SetupModules
 >
-
 const mockSetupLiquids = SetupLiquids as jest.MockedFunction<
   typeof SetupLiquids
 >
-
-const mockUseFeatureFlag = useFeatureFlag as jest.MockedFunction<
-  typeof useFeatureFlag
+const mockProtocolHasLiquids = protocolHasLiquids as jest.MockedFunction<
+  typeof protocolHasLiquids
 >
 
 const ROBOT_NAME = 'otie'
 const RUN_ID = '1'
-
+const MOCK_ROTOCOL_LIQUID_KEY = { liquids: [] }
 const render = () => {
   return renderWithProviders(
     <ProtocolRunSetup
@@ -98,23 +94,22 @@ const render = () => {
 
 describe('ProtocolRunSetup', () => {
   beforeEach(() => {
-    when(mockUseDeckCalibrationData).calledWith(ROBOT_NAME).mockReturnValue({
-      deckCalibrationData: mockDeckCalData,
-      isDeckCalibrated: true,
-    })
-    when(mockUseProtocolDetailsForRun)
+    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(false)
+    when(mockUseMostRecentCompletedAnalysis)
       .calledWith(RUN_ID)
       .mockReturnValue({
-        protocolData: (noModulesProtocol as unknown) as ProtocolAnalysisFile,
-        displayName: 'mock display name',
-        protocolKey: 'fakeProtocolKey',
-      })
+        ...noModulesProtocol,
+        ...MOCK_ROTOCOL_LIQUID_KEY,
+      } as any)
     when(mockUseProtocolAnalysisErrors).calledWith(RUN_ID).mockReturnValue({
       analysisErrors: null,
     })
     when(mockUseStoredProtocolAnalysis)
       .calledWith(RUN_ID)
-      .mockReturnValue((noModulesProtocol as unknown) as StoredProtocolAnalysis)
+      .mockReturnValue(({
+        ...noModulesProtocol,
+        ...MOCK_ROTOCOL_LIQUID_KEY,
+      } as unknown) as ProtocolAnalysisOutput)
     when(mockParseAllRequiredModuleModels).mockReturnValue([])
     when(mockUseRobot)
       .calledWith(ROBOT_NAME)
@@ -154,11 +149,9 @@ describe('ProtocolRunSetup', () => {
   })
 
   it('renders loading data message if robot-analyzed and app-analyzed protocol data is null', () => {
-    when(mockUseProtocolDetailsForRun).calledWith(RUN_ID).mockReturnValue({
-      protocolData: null,
-      displayName: null,
-      protocolKey: null,
-    })
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith(RUN_ID)
+      .mockReturnValue(null)
     when(mockUseStoredProtocolAnalysis).calledWith(RUN_ID).mockReturnValue(null)
     const { getByText } = render()
     getByText('Loading data...')
@@ -185,12 +178,21 @@ describe('ProtocolRunSetup', () => {
   })
 
   describe('when no modules are in the protocol', () => {
-    it('renders robot calibration setup', () => {
+    it('renders robot calibration setup for OT-2', () => {
       const { getByText } = render()
 
       getByText(
         'Review required pipettes and tip length calibrations for this protocol.'
       )
+      const robotCalibrationSetup = getByText('Robot Calibration')
+      robotCalibrationSetup.click()
+      expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
+    })
+    it('renders robot calibration setup for OT-3', () => {
+      when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+      const { getByText } = render()
+
+      getByText('Review required pipettes for this protocol.')
       const robotCalibrationSetup = getByText('Robot Calibration')
       robotCalibrationSetup.click()
       expect(getByText('Mock SetupRobotCalibration')).toBeVisible()
@@ -227,10 +229,14 @@ describe('ProtocolRunSetup', () => {
   })
 
   describe('when liquids are in the protocol', () => {
-    it('renders correct text for liquids when FF is on', () => {
-      when(mockUseFeatureFlag)
-        .calledWith('enableLiquidSetup')
-        .mockReturnValue(true)
+    it('renders correct text for liquids', () => {
+      when(mockUseMostRecentCompletedAnalysis)
+        .calledWith(RUN_ID)
+        .mockReturnValue({
+          ...noModulesProtocol,
+          liquids: [{ displayName: 'water', description: 'liquid H2O' }],
+        } as any)
+      mockProtocolHasLiquids.mockReturnValue(true)
 
       const { getByText } = render()
       getByText('STEP 3')
@@ -246,13 +252,12 @@ describe('ProtocolRunSetup', () => {
         'magneticModuleV1',
         'temperatureModuleV1',
       ])
-      when(mockUseProtocolDetailsForRun)
+      when(mockUseMostRecentCompletedAnalysis)
         .calledWith(RUN_ID)
         .mockReturnValue({
-          protocolData: (withModulesProtocol as unknown) as ProtocolAnalysisFile,
-          displayName: 'mock display name',
-          protocolKey: 'fakeProtocolKey',
-        })
+          ...withModulesProtocol,
+          ...MOCK_ROTOCOL_LIQUID_KEY,
+        } as any)
       when(mockUseRunHasStarted).calledWith(RUN_ID).mockReturnValue(false)
     })
     afterEach(() => {
@@ -278,7 +283,7 @@ describe('ProtocolRunSetup', () => {
       getByText('Module Setup')
 
       getByText(
-        'Plug in and turn on the required modules via the OT-2 USB Ports. Place the modules as shown in the deck map.'
+        "Plug in and turn on the required modules via the robot's USB Ports. Place the modules as shown in the deck map."
       )
       getByText('STEP 3')
       getByText('Labware Setup')
@@ -289,19 +294,19 @@ describe('ProtocolRunSetup', () => {
     })
 
     it('renders correct text contents for single module', () => {
-      when(mockUseProtocolDetailsForRun)
+      when(mockUseMostRecentCompletedAnalysis)
         .calledWith(RUN_ID)
         .mockReturnValue({
-          protocolData: ({
-            ...withModulesProtocol,
-            modules: pick(
-              withModulesProtocol.modules,
-              Object.keys(withModulesProtocol.modules)[0]
-            ),
-          } as unknown) as ProtocolAnalysisFile,
-          displayName: 'mock display name',
-          protocolKey: 'fakeProtocolKey',
-        })
+          ...withModulesProtocol,
+          ...MOCK_ROTOCOL_LIQUID_KEY,
+          modules: [
+            {
+              id: '1d57adf0-67ad-11ea-9f8b-3b50068bd62d:magneticModuleType',
+              location: { slot: '1' },
+              model: 'magneticModuleV1',
+            },
+          ],
+        } as any)
       when(mockParseAllRequiredModuleModels).mockReturnValue([
         'magneticModuleV1',
       ])
@@ -316,7 +321,7 @@ describe('ProtocolRunSetup', () => {
       getByText('Module Setup')
 
       getByText(
-        'Plug in and turn on the required module via the OT-2 USB Port. Place the module as shown in the deck map.'
+        "Plug in and turn on the required module via the robot's USB Port. Place the module as shown in the deck map."
       )
       getByText('STEP 3')
       getByText('Labware Setup')

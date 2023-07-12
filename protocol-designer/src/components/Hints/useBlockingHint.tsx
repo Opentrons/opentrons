@@ -4,7 +4,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions, selectors, HintKey } from '../../tutorial'
-import { ContinueModal, CheckboxField } from '@opentrons/components'
+import { ContinueModal, DeprecatedCheckboxField } from '@opentrons/components'
 import { Portal } from '../portals/MainPageModalPortal'
 import { i18n } from '../../localization'
 import styles from './hints.css'
@@ -49,7 +49,7 @@ export const BlockingHint = (props: HintProps): JSX.Element => {
       >
         <div className={styles.hint_contents}>{props.content}</div>
         <div>
-          <CheckboxField
+          <DeprecatedCheckboxField
             className={styles.dont_show_again}
             label={i18n.t('alert.hint.dont_show_again')}
             onChange={toggleRememberDismissal}

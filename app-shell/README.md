@@ -45,7 +45,7 @@ The feature flags are part of the configuration under the path `devInternal`. To
 
 - CLI: `--devInternal.nameOfFlag`
 - Environment variable: `OT_APP_DEV_INTERNAL__NAME_OF_FLAG`
-- Configuration JSON: `devInteral.nameOfFlag`
+- Configuration JSON: `devInternal.nameOfFlag`
 
 The app also presents UI for enabling these flags when the [`devtools`](#devtools) setting is enabled.
 
@@ -266,6 +266,7 @@ Email of app user to populate "Email" in support conversations.
 - Default: `[]`
 
 `Array<string>` of extra IP address(es)/hosts for the discovery client to track. For example, to get the discovery client to find an instance of the API server running on your own computer.
+Currently this config only allows one hostname/IP address as the value.
 
 ##### labware.directory
 

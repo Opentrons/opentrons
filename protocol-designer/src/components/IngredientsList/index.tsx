@@ -48,7 +48,6 @@ const LiquidGroupCard = (props: LiquidGroupCardProps): JSX.Element | null => {
   const wellsWithIngred = Object.keys(labwareWellContents)
     .sort(sortWells)
     .filter(well => labwareWellContents[well][groupId])
-
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
   if (wellsWithIngred.length < 1) {

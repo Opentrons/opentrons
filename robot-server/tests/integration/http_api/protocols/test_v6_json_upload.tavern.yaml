@@ -1,12 +1,13 @@
-test_name: Upload, analyze, delete basic_transfer_standalone protocol.
+test_name: Upload and analyze a JSONv6 protocol
 
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
+
 stages:
   - name: Upload simple v6 protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: '../shared-data/protocol/fixtures/6/simpleV6.json'
@@ -26,10 +27,10 @@ stages:
             - id: !anystr
               status: pending
   - name: Retry until analyses status is completed.
-    max_retries: 20
-    delay_after: 2
+    max_retries: 10
+    delay_after: 0.1
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: GET
     response:
       strict:
@@ -43,7 +44,7 @@ stages:
                 status: completed
   - name: Get protocol by ID
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}'
       method: GET
     response:
       status_code: 200
@@ -55,6 +56,7 @@ stages:
             - name: simpleV6.json
               role: main
           protocolType: json
+          robotType: OT-2 Standard
           metadata:
             tags:
               - unitTest
@@ -66,9 +68,11 @@ stages:
           analysisSummaries:
             - id: '{analysis_id}'
               status: completed
+        links: 
+          referencingRuns: []
   - name: Get protocol analysis by ID
     request:
-      url: '{host:s}:{port:d}/protocols/{protocol_id}/analyses'
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
       method: GET
     response:
       status_code: 200
@@ -88,23 +92,38 @@ stages:
               - id: fixedTrash
                 loadName: opentrons_1_trash_1100ml_fixed
                 definitionUri: opentrons/opentrons_1_trash_1100ml_fixed/1
+                displayName: Trash
                 location:
                   slotName: '12'
               - id: sourcePlateId
                 loadName: foo_8_plate_33ul
                 definitionUri: example/foo_8_plate_33ul/1
+                displayName: Source Plate
                 location:
                   moduleId: temperatureModuleId
               - id: destPlateId
                 loadName: foo_8_plate_33ul
                 definitionUri: example/foo_8_plate_33ul/1
+                displayName: Sample Collection Plate
                 location:
                   moduleId: magneticModuleId
               - id: tipRackId
                 loadName: opentrons_96_tiprack_10ul
                 definitionUri: opentrons/opentrons_96_tiprack_10ul/1
+                displayName: Opentrons 96 Tip Rack 10 µL
                 location:
                   slotName: '8'
+            modules:
+              - id: magneticModuleId
+                serialNumber: !anystr
+                model: magneticModuleV2
+                location:
+                  slotName: '3'
+              - id: temperatureModuleId
+                serialNumber: !anystr
+                model: temperatureModuleV2
+                location:
+                  slotName: '1'
             commands:
               - id: !anystr
                 createdAt: !anystr
@@ -227,6 +246,20 @@ stages:
                 completedAt: !anystr
               - id: !anystr
                 createdAt: !anystr
+                commandType: loadLiquid
+                key: !anystr
+                status: succeeded
+                params:
+                  liquidId: 'waterId'
+                  labwareId: 'sourcePlateId'
+                  volumeByWell:
+                    A1: 100
+                    B1: 100
+                result: {}
+                startedAt: !anystr
+                completedAt: !anystr
+              - id: !anystr
+                createdAt: !anystr
                 commandType: home
                 key: !anystr
                 status: succeeded
@@ -249,7 +282,11 @@ stages:
                       x: 0
                       y: 0
                       z: 0
-                result: {}
+                result:
+                  position: { 'x': 146.88, 'y': 246.24, 'z': 64.69 }
+                  tipVolume: 10.0
+                  tipLength: 35.910000000000004
+                  tipDiameter: 3.27
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -270,6 +307,7 @@ stages:
                   volume: 5
                   flowRate: 3
                 result:
+                  position: { 'x': 16.76, 'y': 75.28, 'z': 157.09 }
                   volume: 5
                 startedAt: !anystr
                 completedAt: !anystr
@@ -301,6 +339,7 @@ stages:
                   volume: 4.5
                   flowRate: 2.5
                 result:
+                  position: { 'x': 284.635, 'y': 56.025, 'z': 158.25 }
                   volume: 4.5
                 startedAt: !anystr
                 completedAt: !anystr
@@ -319,7 +358,10 @@ stages:
                       x: 0
                       y: 0
                       z: 11
-                result: {}
+                  radius: 0.5
+                  speed: 42.0
+                result:
+                  position: { 'x': 284.635, 'y': 56.025, 'z': 168.25 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -338,7 +380,8 @@ stages:
                       y: 0
                       z: 12
                   flowRate: 2
-                result: {}
+                result:
+                  position: { 'x': 284.635, 'y': 56.025, 'z': 169.25 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -356,7 +399,10 @@ stages:
                       x: 0
                       y: 0
                       z: 0
-                result: {}
+                  forceDirect: false
+                result:
+                  position:
+                    { 'x': 304.52500000000003, 'y': 56.025, 'z': 182.25 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -374,7 +420,12 @@ stages:
                       x: 2
                       y: 3
                       z: 10
-                result: {}
+                  minimumZHeight: 35
+                  forceDirect: true
+                  speed: 12.3
+                result:
+                  position:
+                    { 'x': 306.52500000000003, 'y': 59.025, 'z': 167.25 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -387,12 +438,14 @@ stages:
                   labwareId: fixedTrash
                   wellName: A1
                   wellLocation:
-                    origin: top
+                    origin: default
                     offset:
                       x: 0
                       y: 0
                       z: 0
-                result: {}
+                  alternateDropLocation: false
+                result:
+                  position: { 'x': 347.84000000000003, 'y': 325.06, 'z': 82.0 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -418,7 +471,9 @@ stages:
                     z: 0
                   minimumZHeight: 35
                   forceDirect: true
-                result: {}
+                  speed: 12.3
+                result:
+                  position: { 'x': 0.0, 'y': 0.0, 'z': 0.0 }
                 startedAt: !anystr
                 completedAt: !anystr
               - id: !anystr
@@ -501,3 +556,73 @@ stages:
                 startedAt: !anystr
                 completedAt: !anystr
             errors: []
+            liquids:
+              - id: waterId
+                displayName: Water
+                description: Liquid H2O
+                displayColor: '#7332a8'
+
+---
+test_name: Upload and analyze a JSONv6 protocol, with liquids
+
+marks:
+  - usefixtures:
+      - ot2_server_base_url
+
+stages:
+  - name: Upload simple v6 protocol
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: POST
+      files:
+        files: '../shared-data/protocol/fixtures/6/simpleV6.json'
+    response:
+      strict:
+        - json:off
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: json
+          analysisSummaries:
+            - id: !anystr
+              status: pending
+  - name: Retry until analyses status is completed.
+    max_retries: 10
+    delay_after: 0.1
+    request:
+      url: '{ot2_server_base_url}/protocols'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{protocol_id}'
+            analysisSummaries:
+              - id: '{analysis_id}'
+                status: completed
+  - name: Get protocol analysis by ID
+    request:
+      url: '{ot2_server_base_url}/protocols/{protocol_id}/analyses'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+            result: ok
+            errors: []
+            liquids:
+              - id: waterId
+                displayName: Water
+                description: Liquid H2O
+                displayColor: '#7332a8'

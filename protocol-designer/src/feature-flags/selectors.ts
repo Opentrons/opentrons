@@ -15,13 +15,11 @@ export const getDisableModuleRestrictions: Selector<
   getFeatureFlagData,
   flags => flags.OT_PD_DISABLE_MODULE_RESTRICTIONS
 )
-
-export const getEnabledHeaterShaker: Selector<boolean> = createSelector(
+export const getEnabledOT3: Selector<boolean> = createSelector(
   getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_HEATER_SHAKER ?? false
+  flags => flags.OT_PD_ENABLE_OT_3 ?? false
 )
-
-export const getEnabledLiquidColorEnhancements: Selector<boolean> = createSelector(
+export const getAllowAllTipracks: Selector<boolean> = createSelector(
   getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_LIQUID_COLOR_ENHANCEMENTS ?? false
+  flags => flags.OT_PD_ALLOW_ALL_TIPRACKS ?? false
 )

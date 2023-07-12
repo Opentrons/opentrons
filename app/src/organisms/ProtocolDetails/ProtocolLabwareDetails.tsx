@@ -38,14 +38,16 @@ export const ProtocolLabwareDetails = (
     requiredLabwareDetails != null
       ? [
           ...requiredLabwareDetails
-            .reduce((obj, labware) => {
-              if (!obj.has(getLabwareDefURI(labware.result.definition)))
-                obj.set(getLabwareDefURI(labware.result.definition), {
+            .reduce((acc, labware) => {
+              if (labware.result?.definition == null) return acc
+              else if (!acc.has(getLabwareDefURI(labware.result.definition))) {
+                acc.set(getLabwareDefURI(labware.result.definition), {
                   ...labware,
                   quantity: 0,
                 })
-              obj.get(getLabwareDefURI(labware.result.definition)).quantity++
-              return obj
+              }
+              acc.get(getLabwareDefURI(labware.result?.definition)).quantity++
+              return acc
             }, new Map())
             .values(),
         ]
@@ -55,14 +57,14 @@ export const ProtocolLabwareDetails = (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
-      marginBottom={SPACING.spacing3}
+      marginBottom={SPACING.spacing8}
     >
       <Flex flexDirection={DIRECTION_ROW}>
         <StyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing3}
-          data-testid={'ProtocolLabwareDetails_labware_name'}
+          marginBottom={SPACING.spacing8}
+          data-testid="ProtocolLabwareDetails_labware_name"
           width="66%"
         >
           {t('labware_name')}
@@ -70,24 +72,21 @@ export const ProtocolLabwareDetails = (
         <StyledText
           as="label"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          data-testid={'ProtocolLabwareDetails_quantity'}
+          data-testid="ProtocolLabwareDetails_quantity"
         >
           {t('quantity')}
         </StyledText>
       </Flex>
-      {labwareDetails?.map((labware, index) => {
-        return (
-          <React.Fragment key={index}>
-            <ProtocolLabwareDetailItem
-              namespace={labware.params.namespace}
-              displayName={labware.result.definition.metadata.displayName}
-              quantity={labware.quantity}
-              labware={{ definition: labware.result.definition }}
-              data-testid={`ProtocolLabwareDetails_item_${index}`}
-            />
-          </React.Fragment>
-        )
-      })}
+      {labwareDetails?.map((labware, index) => (
+        <ProtocolLabwareDetailItem
+          key={index}
+          namespace={labware.params.namespace}
+          displayName={labware.result?.definition?.metadata?.displayName}
+          quantity={labware.quantity}
+          labware={{ definition: labware.result?.definition }}
+          data-testid={`ProtocolLabwareDetails_item_${index}`}
+        />
+      ))}
     </Flex>
   )
 }
@@ -108,28 +107,28 @@ export const ProtocolLabwareDetailItem = (
       <Divider width="100%" />
       <Flex
         flexDirection={DIRECTION_ROW}
-        marginY={SPACING.spacing3}
+        marginY={SPACING.spacing8}
         alignItems={ALIGN_CENTER}
       >
         <Flex
           flexDirection={DIRECTION_ROW}
           alignItems={ALIGN_CENTER}
           width="66%"
-          marginRight={SPACING.spacingM}
+          marginRight={SPACING.spacing20}
         >
           {namespace === 'opentrons' ? (
             <Icon
-              color={COLORS.blue}
+              color={COLORS.blueEnabled}
               name="check-decagram"
               height="0.75rem"
               minHeight="0.75rem"
               minWidth="0.75rem"
-              marginRight={SPACING.spacing3}
+              marginRight={SPACING.spacing8}
             />
           ) : (
-            <Flex marginLeft={SPACING.spacingM} />
+            <Flex marginLeft={SPACING.spacing20} />
           )}
-          <StyledText as="p" paddingRight={SPACING.spacing6}>
+          <StyledText as="p" paddingRight={SPACING.spacing32}>
             {displayName}
           </StyledText>
         </Flex>
@@ -169,18 +168,18 @@ export const LabwareDetailOverflowMenu = (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       position={POSITION_RELATIVE}
-      marginRight={SPACING.spacing3}
-      marginLeft="auto"
+      marginRight={SPACING.spacing8}
+      marginLeft={SPACING.spacingAuto}
     >
       <Flex>
         <OverflowBtn onClick={handleOverflowClick} />
       </Flex>
       {showOverflowMenu ? (
         <Flex
-          width="11rem"
+          whiteSpace="nowrap"
           zIndex={10}
-          borderRadius={'4px 4px 0px 0px'}
-          boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+          borderRadius="4px 4px 0px 0px"
+          boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
           top="2.3rem"

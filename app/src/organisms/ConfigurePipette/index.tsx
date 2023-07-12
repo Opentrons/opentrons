@@ -1,35 +1,44 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { Box } from '@opentrons/components'
-import { usePipetteSettingsQuery } from '@opentrons/react-api-client'
 import { SUCCESS, FAILURE, PENDING } from '../../redux/robot-api'
-import { useFeatureFlag } from '../../redux/config'
 import { ConfigForm } from './ConfigForm'
 import { ConfigErrorBanner } from './ConfigErrorBanner'
 import type {
   AttachedPipette,
   PipetteSettingsFieldsUpdate,
 } from '../../redux/pipettes/types'
+import { getAttachedPipetteSettingsFieldsById } from '../../redux/pipettes'
 import type { RequestState } from '../../redux/robot-api/types'
+import type { State } from '../../redux/types'
 
-const PIPETTE_SETTINGS_POLL_MS = 5000
 interface Props {
-  closeModal: () => unknown
+  closeModal: () => void
   pipetteId: AttachedPipette['id']
   updateRequest: RequestState | null
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => void
+  robotName: string
+  formId: string
 }
 
 export function ConfigurePipette(props: Props): JSX.Element {
-  const { closeModal, pipetteId, updateRequest, updateSettings } = props
+  const {
+    closeModal,
+    pipetteId,
+    updateRequest,
+    updateSettings,
+    robotName,
+    formId,
+  } = props
   const { t } = useTranslation('device_details')
-  const settings = usePipetteSettingsQuery({
-    refetchInterval: PIPETTE_SETTINGS_POLL_MS,
-  })?.data
+
+  const settings = useSelector((state: State) =>
+    getAttachedPipetteSettingsFieldsById(state, robotName, pipetteId)
+  )
   const groupLabels = [
     t('plunger_positions'),
     t('tip_pickup_drop'),
-    t('for_dev_use_only'),
     t('power_force'),
   ]
 
@@ -38,9 +47,6 @@ export function ConfigurePipette(props: Props): JSX.Element {
       ? // @ts-expect-error(sa, 2021-05-27): avoiding src code change, need to type narrow
         updateRequest.error.message || t('an_error_occurred_while_updating')
       : null
-
-  // TODO(mc, 2019-12-09): remove this feature flag
-  const __showHiddenFields = useFeatureFlag('allPipetteConfig')
 
   // when an in-progress request completes, close modal if response was ok
   React.useEffect(() => {
@@ -54,13 +60,11 @@ export function ConfigurePipette(props: Props): JSX.Element {
       {updateError && <ConfigErrorBanner message={updateError} />}
       {settings != null && pipetteId != null && (
         <ConfigForm
-          //  @ts-expect-error: pipetteId and settings should not be undefined
-          settings={settings[pipetteId].fields}
+          settings={settings}
           updateInProgress={updateRequest?.status === PENDING}
           updateSettings={updateSettings}
-          closeModal={closeModal}
           groupLabels={groupLabels}
-          __showHiddenFields={__showHiddenFields}
+          formId={formId}
         />
       )}
     </Box>

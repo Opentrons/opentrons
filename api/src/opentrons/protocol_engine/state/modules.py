@@ -9,10 +9,11 @@ from typing import (
     NamedTuple,
     Optional,
     Sequence,
-    overload,
-    Union,
+    Set,
     Type,
     TypeVar,
+    Union,
+    overload,
 )
 from numpy import array, dot
 
@@ -20,18 +21,29 @@ from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
 )
 from opentrons.hardware_control.modules.types import LiveData
-
-from opentrons.types import DeckSlotName
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_east_slot,
+    get_west_slot,
+)
+from opentrons.protocol_engine.commands.calibration.calibrate_module import (
+    CalibrateModuleResult,
+)
+from opentrons.types import DeckSlotName, MountType
+from ..errors import ModuleNotConnectedError
 
 from ..types import (
     LoadedModule,
     ModuleModel,
+    ModuleOffsetVector,
     ModuleType,
     ModuleDefinition,
     DeckSlotLocation,
     ModuleDimensions,
     LabwareOffsetVector,
+    HeaterShakerLatchStatus,
     HeaterShakerMovementRestrictors,
+    ModuleLocation,
+    DeckType,
 )
 from .. import errors
 from ..commands import (
@@ -52,6 +64,8 @@ from .module_substates import (
     HeaterShakerModuleId,
     TemperatureModuleId,
     ThermocyclerModuleId,
+    MagneticBlockSubState,
+    MagneticBlockId,
     ModuleSubStateType,
 )
 
@@ -66,7 +80,7 @@ class SlotTransit(NamedTuple):
     end: DeckSlotName
 
 
-_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
+_OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.FIXED_TRASH),
     SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_1),
     SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.FIXED_TRASH),
@@ -81,24 +95,56 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
     SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_4),
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.SLOT_11),
     SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_1),
-]
+}
+
+_OT3_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
+    SlotTransit(start=t.start.to_ot3_equivalent(), end=t.end.to_ot3_equivalent())
+    for t in _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE
+}
+
+_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = (
+    _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE | _OT3_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE
+)
 
 
 @dataclass(frozen=True)
 class HardwareModule:
     """Data describing an actually connected module."""
 
-    serial_number: str
+    serial_number: Optional[str]
     definition: ModuleDefinition
 
 
 @dataclass
 class ModuleState:
-    """Basic module data state and getter methods."""
+    """The internal data to keep track of loaded modules."""
 
     slot_by_module_id: Dict[str, Optional[DeckSlotName]]
+    """The deck slot that each module has been loaded into.
+
+    This will be None when the module was added via
+    ProtocolEngine.use_attached_modules() instead of an explicit loadModule command.
+    """
+
+    requested_model_by_id: Dict[str, Optional[ModuleModel]]
+    """The model by which each loaded module was requested.
+
+    Becuse of module compatibility, this can differ from the model found through
+    hardware_module_by_id. See `ModuleView.get_requested_model()` versus
+    `ModuleView.get_connected_model()`.
+
+    This will be None when the module was added via
+    ProtocolEngine.use_attached_modules() instead of an explicit loadModule command.
+    """
+
     hardware_by_module_id: Dict[str, HardwareModule]
+    """Information about each module's physical hardware."""
+
     substate_by_module_id: Dict[str, ModuleSubStateType]
+    """Information about each module that's specific to the module type."""
+
+    module_offset_by_serial: Dict[str, ModuleOffsetVector]
+    """Information about each modules offsets."""
 
 
 class ModuleStore(HasState[ModuleState], HandlesActions):
@@ -106,10 +152,16 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
 
     _state: ModuleState
 
-    def __init__(self) -> None:
+    def __init__(
+        self, module_calibration_offsets: Optional[Dict[str, ModuleOffsetVector]] = None
+    ) -> None:
         """Initialize a ModuleStore and its state."""
         self._state = ModuleState(
-            slot_by_module_id={}, hardware_by_module_id={}, substate_by_module_id={}
+            slot_by_module_id={},
+            requested_model_by_id={},
+            hardware_by_module_id={},
+            substate_by_module_id={},
+            module_offset_by_serial=module_calibration_offsets or {},
         )
 
     def handle_action(self, action: Action) -> None:
@@ -122,6 +174,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 module_id=action.module_id,
                 serial_number=action.serial_number,
                 definition=action.definition,
+                slot_name=None,
+                requested_model=None,
                 module_live_data=action.module_live_data,
             )
 
@@ -132,6 +186,14 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 serial_number=command.result.serialNumber,
                 definition=command.result.definition,
                 slot_name=command.params.location.slotName,
+                requested_model=command.params.model,
+                module_live_data=None,
+            )
+
+        if isinstance(command.result, CalibrateModuleResult):
+            self._update_module_calibration(
+                module_id=command.params.moduleId,
+                module_offset=command.result.moduleOffset,
             )
 
         if isinstance(
@@ -163,6 +225,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 thermocycler.DeactivateBlockResult,
                 thermocycler.SetTargetLidTemperatureResult,
                 thermocycler.DeactivateLidResult,
+                thermocycler.OpenLidResult,
+                thermocycler.CloseLidResult,
             ),
         ):
             self._handle_thermocycler_module_commands(command)
@@ -170,48 +234,69 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     def _add_module_substate(
         self,
         module_id: str,
-        serial_number: str,
+        serial_number: Optional[str],
         definition: ModuleDefinition,
-        slot_name: Optional[DeckSlotName] = None,
-        module_live_data: Optional[LiveData] = None,
+        slot_name: Optional[DeckSlotName],
+        requested_model: Optional[ModuleModel],
+        module_live_data: Optional[LiveData],
     ) -> None:
-        model = definition.model
+        actual_model = definition.model
         live_data = module_live_data["data"] if module_live_data else None
 
+        self._state.requested_model_by_id[module_id] = requested_model
         self._state.slot_by_module_id[module_id] = slot_name
         self._state.hardware_by_module_id[module_id] = HardwareModule(
             serial_number=serial_number,
             definition=definition,
         )
 
-        if ModuleModel.is_magnetic_module_model(model):
+        if ModuleModel.is_magnetic_module_model(actual_model):
             self._state.substate_by_module_id[module_id] = MagneticModuleSubState(
                 module_id=MagneticModuleId(module_id),
-                model=model,
+                model=actual_model,
             )
-        elif ModuleModel.is_heater_shaker_module_model(model):
+        elif ModuleModel.is_heater_shaker_module_model(actual_model):
+            if live_data is None:
+                labware_latch_status = HeaterShakerLatchStatus.UNKNOWN
+            elif live_data["labwareLatchStatus"] == "idle_closed":
+                labware_latch_status = HeaterShakerLatchStatus.CLOSED
+            else:
+                labware_latch_status = HeaterShakerLatchStatus.OPEN
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=(
-                    live_data is not None
-                    and live_data["labwareLatchStatus"] == "idle_closed"
-                ),
+                labware_latch_status=labware_latch_status,
                 is_plate_shaking=(
                     live_data is not None and live_data["targetSpeed"] is not None
                 ),
                 plate_target_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
             )
-        elif ModuleModel.is_temperature_module_model(model):
+        elif ModuleModel.is_temperature_module_model(actual_model):
             self._state.substate_by_module_id[module_id] = TemperatureModuleSubState(
                 module_id=TemperatureModuleId(module_id),
                 plate_target_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
             )
-        elif ModuleModel.is_thermocycler_module_model(model):
+        elif ModuleModel.is_thermocycler_module_model(actual_model):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=live_data is not None and live_data["lid"] == "open",
                 target_block_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
                 target_lid_temperature=live_data["lidTarget"] if live_data else None,  # type: ignore[arg-type]
             )
+        elif ModuleModel.is_magnetic_block(actual_model):
+            self._state.substate_by_module_id[module_id] = MagneticBlockSubState(
+                module_id=MagneticBlockId(module_id)
+            )
+
+    def _update_module_calibration(
+        self, module_id: str, module_offset: ModuleOffsetVector
+    ) -> None:
+        module = self._state.hardware_by_module_id.get(module_id)
+        if module:
+            module_serial = module.serial_number
+            assert (
+                module_serial is not None
+            ), "Expected a module SN and got None instead."
+            self._state.module_offset_by_serial[module_serial] = module_offset
 
     def _handle_heater_shaker_commands(
         self,
@@ -236,42 +321,42 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         if isinstance(command.result, heater_shaker.SetTargetTemperatureResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                labware_latch_status=prev_state.labware_latch_status,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=command.params.celsius,
             )
         elif isinstance(command.result, heater_shaker.DeactivateHeaterResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                labware_latch_status=prev_state.labware_latch_status,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=None,
             )
         elif isinstance(command.result, heater_shaker.SetAndWaitForShakeSpeedResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                labware_latch_status=prev_state.labware_latch_status,
                 is_plate_shaking=True,
                 plate_target_temperature=prev_state.plate_target_temperature,
             )
         elif isinstance(command.result, heater_shaker.DeactivateShakerResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=prev_state.is_labware_latch_closed,
+                labware_latch_status=prev_state.labware_latch_status,
                 is_plate_shaking=False,
                 plate_target_temperature=prev_state.plate_target_temperature,
             )
         elif isinstance(command.result, heater_shaker.OpenLabwareLatchResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=False,
+                labware_latch_status=HeaterShakerLatchStatus.OPEN,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=prev_state.plate_target_temperature,
             )
         elif isinstance(command.result, heater_shaker.CloseLabwareLatchResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
-                is_labware_latch_closed=True,
+                labware_latch_status=HeaterShakerLatchStatus.CLOSED,
                 is_plate_shaking=prev_state.is_plate_shaking,
                 plate_target_temperature=prev_state.plate_target_temperature,
             )
@@ -306,6 +391,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             thermocycler.DeactivateBlock,
             thermocycler.SetTargetLidTemperature,
             thermocycler.DeactivateLid,
+            thermocycler.OpenLid,
+            thermocycler.CloseLid,
         ],
     ) -> None:
         module_id = command.params.moduleId
@@ -317,30 +404,50 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         # Get current values to preserve target temperature not being set/deactivated
         block_temperature = thermocycler_substate.target_block_temperature
         lid_temperature = thermocycler_substate.target_lid_temperature
+        is_lid_open = thermocycler_substate.is_lid_open
 
         if isinstance(command.result, thermocycler.SetTargetBlockTemperatureResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=is_lid_open,
                 target_block_temperature=command.result.targetBlockTemperature,
                 target_lid_temperature=lid_temperature,
             )
         elif isinstance(command.result, thermocycler.DeactivateBlockResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=is_lid_open,
                 target_block_temperature=None,
                 target_lid_temperature=lid_temperature,
             )
         elif isinstance(command.result, thermocycler.SetTargetLidTemperatureResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=is_lid_open,
                 target_block_temperature=block_temperature,
                 target_lid_temperature=command.result.targetLidTemperature,
             )
         elif isinstance(command.result, thermocycler.DeactivateLidResult):
             self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
                 module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=is_lid_open,
                 target_block_temperature=block_temperature,
                 target_lid_temperature=None,
+            )
+        # TODO (spp, 2022-08-01): set is_lid_open to False upon lid commands' failure
+        elif isinstance(command.result, thermocycler.OpenLidResult):
+            self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=True,
+                target_block_temperature=block_temperature,
+                target_lid_temperature=lid_temperature,
+            )
+        elif isinstance(command.result, thermocycler.CloseLidResult):
+            self._state.substate_by_module_id[module_id] = ThermocyclerModuleSubState(
+                module_id=ThermocyclerModuleId(module_id),
+                is_lid_open=False,
+                target_block_temperature=block_temperature,
+                target_lid_temperature=lid_temperature,
             )
 
 
@@ -360,7 +467,7 @@ class ModuleView(HasState[ModuleState]):
             attached_module = self._state.hardware_by_module_id[module_id]
 
         except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+            raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
         location = (
             DeckSlotLocation(slotName=slot_name) if slot_name is not None else None
@@ -376,6 +483,21 @@ class ModuleView(HasState[ModuleState]):
     def get_all(self) -> List[LoadedModule]:
         """Get a list of all module entries in state."""
         return [self.get(mod_id) for mod_id in self._state.slot_by_module_id.keys()]
+
+    # TODO(mc, 2022-12-09): enforce data integrity (e.g. one module per slot)
+    # rather than shunting this work to callers via `allowed_ids`.
+    # This has larger implications and is tied up in splitting LPC out of the protocol run
+    def get_by_slot(
+        self, slot_name: DeckSlotName, allowed_ids: Set[str]
+    ) -> Optional[LoadedModule]:
+        """Get the module located in a given slot, if any."""
+        slots_by_id = reversed(list(self._state.slot_by_module_id.items()))
+
+        for module_id, module_slot in slots_by_id:
+            if module_slot == slot_name and module_id in allowed_ids:
+                return self.get(module_id)
+
+        return None
 
     def _get_module_substate(
         self, module_id: str, expected_type: Type[ModuleSubStateT], expected_name: str
@@ -396,7 +518,7 @@ class ModuleView(HasState[ModuleState]):
         try:
             substate = self._state.substate_by_module_id[module_id]
         except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+            raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
         if isinstance(substate, expected_type):
             return substate
@@ -474,8 +596,31 @@ class ModuleView(HasState[ModuleState]):
             )
         return location
 
-    def get_model(self, module_id: str) -> ModuleModel:
-        """Get the model name of the given module."""
+    def get_requested_model(self, module_id: str) -> Optional[ModuleModel]:
+        """Return the model by which this module was requested.
+
+        Or, if this module was not loaded with an explicit ``loadModule`` command,
+        return ``None``.
+
+        See also `get_connected_model()`.
+        """
+        try:
+            return self._state.requested_model_by_id[module_id]
+        except KeyError as e:
+            raise errors.ModuleNotLoadedError(module_id=module_id) from e
+
+    # TODO(jbl 2023-06-20) rename this method to better reflect it's not just "connected" modules
+    def get_connected_model(self, module_id: str) -> ModuleModel:
+        """Return the model of the connected module.
+
+        NOTE: This method will return the name for any module loaded, not just electronically connected ones.
+            This includes the Magnetic Block.
+
+        This can differ from `get_requested_model()` because of module compatibility.
+        For example, a ``loadModule`` command might request a ``temperatureModuleV1``
+        but return a ``temperatureModuleV2`` if that's what it finds actually connected
+        at run time.
+        """
         return self.get(module_id).model
 
     def get_serial_number(self, module_id: str) -> str:
@@ -484,14 +629,19 @@ class ModuleView(HasState[ModuleState]):
         If the underlying hardware API is simulating, this will be a dummy value
         provided by the hardware API.
         """
-        return self.get(module_id).serialNumber
+        module = self.get(module_id)
+        if module.serialNumber is None:
+            raise ModuleNotConnectedError(
+                f"Expected a connected module and got a {module.model.name}"
+            )
+        return module.serialNumber
 
     def get_definition(self, module_id: str) -> ModuleDefinition:
         """Module definition by ID."""
         try:
             attached_module = self._state.hardware_by_module_id[module_id]
         except KeyError as e:
-            raise errors.ModuleNotLoadedError(f"Module {module_id} not found.") from e
+            raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
         return attached_module.definition
 
@@ -499,30 +649,61 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
-    # TODO(mc, 2022-01-19): this method is missing unit test coverage
-    def get_module_offset(self, module_id: str) -> LabwareOffsetVector:
+    def get_module_calibration_offset(self, module_id: str) -> ModuleOffsetVector:
+        """Get the stored module calibration offset."""
+        module_serial = self.get(module_id).serialNumber
+        if module_serial is not None:
+            offset = self._state.module_offset_by_serial.get(module_serial)
+            if offset:
+                return offset
+        return ModuleOffsetVector(x=0, y=0, z=0)
+
+    def get_nominal_module_offset(
+        self, module_id: str, deck_type: DeckType
+    ) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform."""
         definition = self.get_definition(module_id)
-        slot = self.get_location(module_id).slotName.value
+        slot = self.get_location(module_id).slotName.id
+
         pre_transform = array(
-            (definition.labwareOffset.x, definition.labwareOffset.y, 1)
+            (
+                definition.labwareOffset.x,
+                definition.labwareOffset.y,
+                definition.labwareOffset.z,
+                1,
+            )
         )
-        xforms_ser = definition.slotTransforms.get("ot2_standard", {}).get(
-            slot, {"labwareOffset": [[1, 0, 0], [0, 1, 0], [0, 0, 1]]}
+        xforms_ser = definition.slotTransforms.get(str(deck_type.value), {}).get(
+            slot,
+            {"labwareOffset": [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]},
         )
-        xforms_ser = xforms_ser["labwareOffset"]
+        xforms_ser_offset = xforms_ser["labwareOffset"]
 
         # Apply the slot transform, if any
-        xform = array(xforms_ser)
+        xform = array(xforms_ser_offset)
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],
-            z=definition.labwareOffset.z,
+            z=xformed[2],
+        )
+
+    def get_module_offset(
+        self, module_id: str, deck_type: DeckType
+    ) -> LabwareOffsetVector:
+        """Get the module's offset vector computed with slot transform and calibrated module offsets."""
+        offset_vector = self.get_nominal_module_offset(module_id, deck_type)
+
+        # add the calibrated module offset if there is one
+        cal_offset = self.get_module_calibration_offset(module_id)
+        return LabwareOffsetVector(
+            x=offset_vector.x + cal_offset.x,
+            y=offset_vector.y + cal_offset.y,
+            z=offset_vector.z + cal_offset.z,
         )
 
     def get_overall_height(self, module_id: str) -> float:
-        """Get the height of the module."""
+        """Get the height of the module, excluding any labware loaded atop it."""
         return self.get_dimensions(module_id).bareOverallHeight
 
     # TODO(mc, 2022-01-19): this method is missing unit test coverage
@@ -656,13 +837,32 @@ class ModuleView(HasState[ModuleState]):
         Returns True if we need to dodge, False otherwise.
         """
         all_mods = self.get_all()
-        if all_mods and ModuleModel.THERMOCYCLER_MODULE_V1 in [
-            mod.model for mod in all_mods
-        ]:
+        if any(ModuleModel.is_thermocycler_module_model(mod.model) for mod in all_mods):
             transit = (from_slot, to_slot)
             if transit in _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE:
                 return True
         return False
+
+    def is_edge_move_unsafe(self, mount: MountType, target_slot: DeckSlotName) -> bool:
+        """Check if the slot next to target contains a module to be avoided, depending on mount."""
+        slot_int = target_slot.as_int()
+
+        if mount is MountType.RIGHT:
+            # Check left of the target
+            neighbor_int = get_west_slot(slot_int)
+            if neighbor_int is None:
+                return False
+            else:
+                neighbor_slot = DeckSlotName.from_primitive(neighbor_int)
+        else:
+            # Check right of the target
+            neighbor_int = get_east_slot(slot_int)
+            if neighbor_int is None:
+                return False
+            else:
+                neighbor_slot = DeckSlotName.from_primitive(neighbor_int)
+
+        return neighbor_slot in self._state.slot_by_module_id.values()
 
     def select_hardware_module_to_load(
         self,
@@ -729,9 +929,19 @@ class ModuleView(HasState[ModuleState]):
         hs_restrictors = [
             HeaterShakerMovementRestrictors(
                 plate_shaking=substate.is_plate_shaking,
-                latch_closed=substate.is_labware_latch_closed,
-                deck_slot=int(self.get_location(substate.module_id).slotName),
+                latch_status=substate.labware_latch_status,
+                deck_slot=self.get_location(substate.module_id).slotName.as_int(),
             )
             for substate in hs_substates
         ]
         return hs_restrictors
+
+    def raise_if_module_in_location(
+        self, location: Union[DeckSlotLocation, ModuleLocation]
+    ) -> None:
+        """Raise if the given location has a module in it."""
+        for module in self.get_all():
+            if module.location == location:
+                raise errors.LocationIsOccupiedError(
+                    f"Module {module.model} is already present at {location}."
+                )

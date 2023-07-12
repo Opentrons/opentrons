@@ -2,31 +2,33 @@ import * as React from 'react'
 import { Route } from 'react-router'
 import { MemoryRouter } from 'react-router-dom'
 import { renderWithProviders } from '@opentrons/components'
-import noModulesProtocol from '@opentrons/shared-data/protocol/fixtures/4/simpleV4.json'
 
 import { i18n } from '../../../../i18n'
 import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 import {
   useModuleRenderInfoForProtocolById,
-  useProtocolDetailsForRun,
   useRobot,
   useRunStatuses,
   useSyncRobotClock,
 } from '../../../../organisms/Devices/hooks'
+import { useMostRecentCompletedAnalysis } from '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { ProtocolRunHeader } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader'
 import { ProtocolRunModuleControls } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls'
 import { ProtocolRunSetup } from '../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup'
-import { RunLog } from '../../../../organisms/Devices/ProtocolRun/RunLog'
+import { RunPreviewComponent } from '../../../../organisms/RunPreview'
 import { useCurrentRunId } from '../../../../organisms/ProtocolUpload/hooks'
 import { ProtocolRunDetails } from '..'
 import { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import { mockRobotSideAnalysis } from '../../../../organisms/CommandText/__fixtures__'
 
+jest.mock(
+  '../../../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
+)
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunHeader')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunSetup')
-jest.mock('../../../../organisms/Devices/ProtocolRun/RunLog')
+jest.mock('../../../../organisms/RunPreview')
 jest.mock('../../../../organisms/Devices/ProtocolRun/ProtocolRunModuleControls')
 jest.mock('../../../../organisms/ProtocolUpload/hooks')
 
@@ -37,7 +39,9 @@ const mockUseSyncRobotClock = useSyncRobotClock as jest.MockedFunction<
 const mockProtocolRunHeader = ProtocolRunHeader as jest.MockedFunction<
   typeof ProtocolRunHeader
 >
-const mockRunLog = RunLog as jest.MockedFunction<typeof RunLog>
+const mockRunPreview = RunPreviewComponent as jest.MockedFunction<
+  typeof RunPreviewComponent
+>
 const mockProtocolRunSetup = ProtocolRunSetup as jest.MockedFunction<
   typeof ProtocolRunSetup
 >
@@ -53,8 +57,8 @@ const mockUseCurrentRunId = useCurrentRunId as jest.MockedFunction<
 const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
-const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunction<
-  typeof useProtocolDetailsForRun
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
 >
 
 const MOCK_MAGNETIC_MODULE_COORDS = [10, 20, 0]
@@ -95,13 +99,13 @@ describe('ProtocolRunDetails', () => {
   beforeEach(() => {
     mockUseRobot.mockReturnValue(mockConnectableRobot)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
+      isRunRunning: false,
       isRunStill: true,
       isRunTerminal: false,
       isRunIdle: true,
     })
     mockProtocolRunHeader.mockReturnValue(<div>Mock ProtocolRunHeader</div>)
-    mockRunLog.mockReturnValue(<div>Mock RunLog</div>)
+    mockRunPreview.mockReturnValue(<div>Mock RunPreview</div>)
     mockProtocolRunSetup.mockReturnValue(<div>Mock ProtocolRunSetup</div>)
     mockProtocolRunModuleControls.mockReturnValue(
       <div>Mock ProtocolRunModuleControls</div>
@@ -120,11 +124,7 @@ describe('ProtocolRunDetails', () => {
       },
     } as any)
     mockUseCurrentRunId.mockReturnValue(RUN_ID)
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: (noModulesProtocol as unknown) as ProtocolAnalysisFile,
-      displayName: 'mock display name',
-      protocolKey: 'fakeProtocolKey',
-    })
+    mockUseMostRecentCompletedAnalysis.mockReturnValue(mockRobotSideAnalysis)
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -160,7 +160,7 @@ describe('ProtocolRunDetails', () => {
 
     getByText('Setup')
     getByText('Module Controls')
-    getByText('Run Log')
+    getByText('Run Preview')
   })
 
   it('defaults to setup content when given an unspecified tab', () => {
@@ -171,15 +171,15 @@ describe('ProtocolRunDetails', () => {
     getByText('Mock ProtocolRunSetup')
   })
 
-  it('renders a run log when the run log tab is clicked', () => {
+  it('renders a run  when the run  tab is clicked', () => {
     const [{ getByText, queryByText }] = render(
       `/devices/otie/protocol-runs/${RUN_ID}`
     )
 
-    expect(queryByText('Mock RunLog')).toBeFalsy()
-    const runTab = getByText('Run Log')
+    expect(queryByText('Mock RunPreview')).toBeFalsy()
+    const runTab = getByText('Run Preview')
     runTab.click()
-    getByText('Mock RunLog')
+    getByText('Mock RunPreview')
   })
 
   it('renders protocol run setup when the setup tab is clicked', () => {
@@ -188,9 +188,9 @@ describe('ProtocolRunDetails', () => {
     )
 
     const setupTab = getByText('Setup')
-    const runTab = getByText('Run Log')
+    const runTab = getByText('Run Preview')
     runTab.click()
-    getByText('Mock RunLog')
+    getByText('Mock RunPreview')
     expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
     setupTab.click()
     getByText('Mock ProtocolRunSetup')
@@ -220,7 +220,7 @@ describe('ProtocolRunDetails', () => {
   it('disables module controls tab when the run current but not idle', () => {
     mockUseCurrentRunId.mockReturnValue(RUN_ID)
     mockUseRunStatuses.mockReturnValue({
-      isLegacySessionInProgress: false,
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: false,
       isRunIdle: false,
@@ -235,30 +235,26 @@ describe('ProtocolRunDetails', () => {
     expect(queryByText('Mock ProtocolRunModuleControls')).toBeFalsy()
   })
 
-  it('disables run log tab if robot-analyzed protocol data is null', () => {
-    mockUseProtocolDetailsForRun.mockReturnValue({
-      protocolData: null,
-      displayName: null,
-      protocolKey: null,
-    })
+  it('disables run  tab if robot-analyzed protocol data is null', () => {
+    mockUseMostRecentCompletedAnalysis.mockReturnValue(null)
     const [{ getByText, queryByText }] = render(
       `/devices/otie/protocol-runs/${RUN_ID}`
     )
 
-    const runTab = getByText('Run Log')
+    const runTab = getByText('Run Preview')
     getByText('Mock ProtocolRunSetup')
-    expect(queryByText('Mock RunLog')).toBeFalsy()
+    expect(queryByText('Mock RunPreview')).toBeFalsy()
     runTab.click()
-    expect(queryByText('Mock RunLog')).toBeFalsy()
+    expect(queryByText('Mock RunPreview')).toBeFalsy()
   })
 
-  it('redirects to the run log tab when the run is not current', () => {
+  it('redirects to the run  tab when the run is not current', () => {
     mockUseCurrentRunId.mockReturnValue(null)
     const [{ getByText, queryByText }] = render(
       `/devices/otie/protocol-runs/${RUN_ID}/setup`
     )
 
-    getByText('Mock RunLog')
+    getByText('Mock RunPreview')
     expect(queryByText('Mock ProtocolRunSetup')).toBeFalsy()
   })
 })

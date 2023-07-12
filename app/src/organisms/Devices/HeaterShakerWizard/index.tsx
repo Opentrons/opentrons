@@ -4,10 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { getAdapterName } from '@opentrons/shared-data'
 import { Portal } from '../../../App/portal'
 import { Interstitial } from '../../../atoms/Interstitial/Interstitial'
-import { HEATERSHAKER_MODULE_TYPE } from '../../../redux/modules'
-import { PrimaryButton, SecondaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
-import { useAttachedModules } from '../hooks'
 import { Introduction } from './Introduction'
 import { KeyParts } from './KeyParts'
 import { AttachModule } from './AttachModule'
@@ -20,45 +17,40 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_FLEX_END,
   useHoverTooltip,
+  PrimaryButton,
+  SecondaryButton,
 } from '@opentrons/components'
 
 import type { ModuleModel } from '@opentrons/shared-data'
-import type { NavRouteParams } from '../../../App/types'
+import type { DesktopRouteParams } from '../../../App/types'
 import type { HeaterShakerModule } from '../../../redux/modules/types'
 import type { ProtocolModuleInfo } from '../../Devices/ProtocolRun/utils/getProtocolModulesInfo'
 
 interface HeaterShakerWizardProps {
   onCloseClick: () => unknown
   moduleFromProtocol?: ProtocolModuleInfo
-  runId?: string
+  attachedModule: HeaterShakerModule | null
 }
 
 export const HeaterShakerWizard = (
   props: HeaterShakerWizardProps
 ): JSX.Element | null => {
-  const { onCloseClick, moduleFromProtocol, runId } = props
+  const { onCloseClick, moduleFromProtocol, attachedModule } = props
   const { t } = useTranslation(['heater_shaker', 'shared'])
   const [currentPage, setCurrentPage] = React.useState(0)
-  const { robotName } = useParams<NavRouteParams>()
-  const attachedModules = useAttachedModules()
+  const { robotName } = useParams<DesktopRouteParams>()
   const [targetProps, tooltipProps] = useHoverTooltip()
-  const heaterShaker =
-    attachedModules.find(
-      (module): module is HeaterShakerModule =>
-        module.moduleType === HEATERSHAKER_MODULE_TYPE
-    ) ?? null
 
   let isPrimaryCTAEnabled: boolean = true
-
   if (currentPage === 3) {
-    isPrimaryCTAEnabled = Boolean(heaterShaker)
+    isPrimaryCTAEnabled = Boolean(attachedModule)
   }
   const labwareDef =
     moduleFromProtocol != null ? moduleFromProtocol.nestedLabwareDef : null
 
   let heaterShakerModel: ModuleModel
-  if (heaterShaker != null) {
-    heaterShakerModel = heaterShaker.moduleModel
+  if (attachedModule != null) {
+    heaterShakerModel = attachedModule.moduleModel
   } else if (moduleFromProtocol != null) {
     heaterShakerModel = moduleFromProtocol.moduleDef.model
   }
@@ -87,28 +79,24 @@ export const HeaterShakerWizard = (
         return <AttachModule moduleFromProtocol={moduleFromProtocol} />
       case 3:
         buttonContent = t('btn_thermal_adapter')
-        return <PowerOn attachedModule={heaterShaker} />
+        return <PowerOn attachedModule={attachedModule} />
       case 4:
         buttonContent = t('btn_test_shake')
         return (
-          // heaterShaker should never be null because isPrimaryCTAEnabled would be disabled otherwise
-          heaterShaker != null ? (
-            <AttachAdapter module={heaterShaker} runId={runId} />
+          // attachedModule should never be null because isPrimaryCTAEnabled would be disabled otherwise
+          attachedModule != null ? (
+            <AttachAdapter module={attachedModule} />
           ) : null
         )
       case 5:
         buttonContent = t('complete')
-        return (
-          // heaterShaker should never be null because isPrimaryCTAEnabled would be disabled otherwise
-          heaterShaker != null ? (
-            <TestShake
-              module={heaterShaker}
-              setCurrentPage={setCurrentPage}
-              moduleFromProtocol={moduleFromProtocol}
-              runId={runId}
-            />
-          ) : null
-        )
+        return attachedModule != null ? (
+          <TestShake
+            module={attachedModule}
+            setCurrentPage={setCurrentPage}
+            moduleFromProtocol={moduleFromProtocol}
+          />
+        ) : null
       default:
         return null
     }
@@ -135,7 +123,7 @@ export const HeaterShakerWizard = (
         >
           {currentPage > 0 ? (
             <SecondaryButton
-              data-testid={`wizard_back_btn`}
+              data-testid="wizard_back_btn"
               onClick={() => setCurrentPage(currentPage => currentPage - 1)}
             >
               {t('back')}
@@ -145,7 +133,7 @@ export const HeaterShakerWizard = (
             <PrimaryButton
               disabled={!isPrimaryCTAEnabled}
               {...targetProps}
-              data-testid={`wizard_next_btn`}
+              data-testid="wizard_next_btn"
               onClick={
                 currentPage === 5
                   ? () => onCloseClick()

@@ -169,7 +169,7 @@ settings = [
     ),
     SettingDefinition(
         _id="enableOT3HardwareController",
-        title="Enable experimental OT3 hardware controller",
+        title="Enable experimental OT-3 hardware controller",
         description=(
             "Do not enable. This is an Opentrons-internal setting to test "
             "new hardware."
@@ -177,12 +177,19 @@ settings = [
         restart_required=True,
     ),
     SettingDefinition(
-        _id="enableHeaterShakerPAPI",
-        title="Enable Heater-Shaker Python API support",
-        description=(
-            "Do not enable. This is an Opentrons internal setting to test a new module."
-        ),
-        restart_required=False,
+        _id="rearPanelIntegration",
+        title="Enable robots with the new usb connected rear-panel board.",
+        description="This is an Opentrons-internal setting to test new rear-panel.",
+    ),
+    SettingDefinition(
+        _id="disableStallDetection",
+        title="Disable stall detection on the Flex.",
+        description="This is an Opentrons-internal setting for hardware-testing.",
+    ),
+    SettingDefinition(
+        _id="disableStatusBar",
+        title="Disable the LED status bar on the Flex.",
+        description="This setting disables the LED status bar on the Flex.",
     ),
 ]
 
@@ -460,6 +467,126 @@ def _migrate14to15(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate15to16(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 16 of the feature flags file.
+
+    - Removes deprecated enableHeaterShakerPAPI option
+    """
+    removals = ["enableHeaterShakerPAPI"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
+def _migrate16to17(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 17 of the advanced settings file.
+
+    - Adds enableProtocolEnginePAPICore option
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableProtocolEnginePAPICore"] = None
+    return newmap
+
+
+def _migrate17to18(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 18 of the advanced settings file.
+
+    - Adds enableLoadLiquid option
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableLoadLiquid"] = None
+    return newmap
+
+
+def _migrate18to19(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 19 of the feature flags file.
+
+    - Removes deprecated enableLoadLiquid option
+    """
+    removals = ["enableLoadLiquid"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
+def _migrate19to20(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 20 of the feature flags file.
+
+    - Adds the enableOT3FirmwareUpdates config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["enableOT3FirmwareUpdates"] = None
+    return newmap
+
+
+def _migrate20to21(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 21 of the feature flags file.
+
+    - Removes deprecated enableProtocolEnginePAPICore option
+    """
+    removals = ["enableProtocolEnginePAPICore"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
+def _migrate21to22(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 22 of the feature flags file.
+
+    - Removes deprecated enableOT3FirmwareUpdates option
+    """
+    removals = ["enableOT3FirmwareUpdates"]
+    newmap = {k: v for k, v in previous.items() if k not in removals}
+    return newmap
+
+
+def _migrate22to23(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 23 of the feature flags file.
+
+    - Adds the rearPanelIntegration config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["rearPanelIntegration"] = None
+    return newmap
+
+
+def _migrate23to24(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 24 of the feature flags file.
+
+    - flips the rearPanelIntegration config element default to true.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["rearPanelIntegration"] = True
+    return newmap
+
+
+def _migrate24to25(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 25 of the feature flags file.
+
+    - Adds the disableStallDetection config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableStallDetection"] = None
+    return newmap
+
+
+def _migrate25to26(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 26 of the feature flags file.
+
+    - Adds the disableStatusBar config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableStatusBar"] = None
+    return newmap
+
+
+def _migrate26to27(previous: SettingsMap) -> SettingsMap:
+    """Migrate to version 27 of the feature flags file.
+
+    - Adds the disableOverpressureDetection config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap["disableOverpressureDetection"] = None
+    return newmap
+
+
 _MIGRATIONS = [
     _migrate0to1,
     _migrate1to2,
@@ -476,6 +603,18 @@ _MIGRATIONS = [
     _migrate12to13,
     _migrate13to14,
     _migrate14to15,
+    _migrate15to16,
+    _migrate16to17,
+    _migrate17to18,
+    _migrate18to19,
+    _migrate19to20,
+    _migrate20to21,
+    _migrate21to22,
+    _migrate22to23,
+    _migrate23to24,
+    _migrate24to25,
+    _migrate25to26,
+    _migrate26to27,
 ]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below

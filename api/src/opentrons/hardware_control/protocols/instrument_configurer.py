@@ -4,7 +4,9 @@ from typing_extensions import Protocol
 from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons.types import Mount
 
-from opentrons.hardware_control.instruments.pipette import Pipette
+# TODO (lc 12-05-2022) This protocol has deviated from the OT3 api. We
+# need to figure out how to combine them again in follow-up refactors.
+from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from ..dev_types import PipetteDict
 from ..types import CriticalPoint
 
@@ -152,7 +154,7 @@ class InstrumentConfigurer(Protocol):
         """
         ...
 
-    def set_working_volume(self, mount: Mount, tip_volume: int) -> None:
+    def set_working_volume(self, mount: Mount, tip_volume: float) -> None:
         """Inform the hardware how much volume a pipette can aspirate.
 
         This will set the limit of aspiration for the pipette, and is

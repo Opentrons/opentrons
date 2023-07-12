@@ -40,7 +40,7 @@ const addDriverVersion = (device: Device): Promise<UsbDevice> => {
 export function registerSystemInfo(
   dispatch: Dispatch
 ): (action: Action) => void {
-  let usbMonitor: UsbDeviceMonitor
+  let usbMonitorPromise: Promise<UsbDeviceMonitor>
   let ifaceMonitor: NetworkInterfaceMonitor
 
   const handleDeviceAdd = (device: Device): void => {
@@ -58,9 +58,11 @@ export function registerSystemInfo(
 
   app.once('will-quit', () => {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (usbMonitor) {
+    if (usbMonitorPromise != null) {
       log.debug('stopping usb monitoring')
-      usbMonitor.stop()
+      usbMonitorPromise
+        .then(usbMonitor => usbMonitor.stop())
+        .catch((error: Error) => log.debug(error.message))
     }
 
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -73,8 +75,8 @@ export function registerSystemInfo(
   return function handleSystemAction(action: Action) {
     switch (action.type) {
       case UI_INITIALIZED: {
-        usbMonitor =
-          usbMonitor ??
+        usbMonitorPromise =
+          usbMonitorPromise ??
           createUsbDeviceMonitor({
             onDeviceAdd: handleDeviceAdd,
             onDeviceRemove: handleDeviceRemove,
@@ -87,13 +89,15 @@ export function registerSystemInfo(
             onInterfaceChange: handleIfacesChanged,
           })
 
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        usbMonitor
-          .getAllDevices()
+        usbMonitorPromise
+          .then(usbMonitor => usbMonitor.getAllDevices())
           .then(devices => Promise.all(devices.map(addDriverVersion)))
           .then(devices => {
             dispatch(SystemInfo.initialized(devices, getActiveInterfaces()))
           })
+          .catch((error: Error) =>
+            log.warn(`unable to start usb monitor with error: ${error.message}`)
+          )
       }
     }
   }

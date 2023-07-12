@@ -1,32 +1,16 @@
-import React from 'react'
-import { useSelector } from 'react-redux'
-
-import {
-  fetchPipetteOffsetCalibrations,
-  getPipetteOffsetCalibrations,
-} from '../../../redux/calibration'
-import { useDispatchApiRequest } from '../../../redux/robot-api'
-import { useRobot } from '.'
+import { useAllPipetteOffsetCalibrationsQuery } from '@opentrons/react-api-client'
 
 import type { PipetteOffsetCalibration } from '../../../redux/calibration/types'
-import type { State } from '../../../redux/types'
 
-export function usePipetteOffsetCalibrations(
-  robotName: string | null = null
-): PipetteOffsetCalibration[] | null {
-  const [dispatchRequest] = useDispatchApiRequest()
+const CALIBRATION_DATA_POLL_MS = 5000
 
-  const robot = useRobot(robotName)
-
-  const pipetteOffsetCalibrations = useSelector((state: State) =>
-    getPipetteOffsetCalibrations(state, robotName)
-  )
-
-  React.useEffect(() => {
-    if (robotName != null) {
-      dispatchRequest(fetchPipetteOffsetCalibrations(robotName))
-    }
-  }, [dispatchRequest, robotName, robot?.status])
+export function usePipetteOffsetCalibrations():
+  | PipetteOffsetCalibration[]
+  | null {
+  const pipetteOffsetCalibrations =
+    useAllPipetteOffsetCalibrationsQuery({
+      refetchInterval: CALIBRATION_DATA_POLL_MS,
+    })?.data?.data ?? []
 
   return pipetteOffsetCalibrations
 }

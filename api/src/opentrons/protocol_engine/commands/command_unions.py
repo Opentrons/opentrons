@@ -7,6 +7,8 @@ from . import magnetic_module
 from . import temperature_module
 from . import thermocycler
 
+from . import calibration
+
 from .set_rail_lights import (
     SetRailLights,
     SetRailLightsCommandType,
@@ -23,9 +25,26 @@ from .aspirate import (
     AspirateCommandType,
 )
 
+from .aspirate_in_place import (
+    AspirateInPlace,
+    AspirateInPlaceParams,
+    AspirateInPlaceCreate,
+    AspirateInPlaceResult,
+    AspirateInPlaceCommandType,
+)
+
+from .comment import (
+    Comment,
+    CommentParams,
+    CommentCreate,
+    CommentResult,
+    CommentCommandType,
+)
+
 from .custom import (
     Custom,
     CustomParams,
+    CustomCreate,
     CustomResult,
     CustomCommandType,
 )
@@ -38,12 +57,28 @@ from .dispense import (
     DispenseCommandType,
 )
 
+from .dispense_in_place import (
+    DispenseInPlace,
+    DispenseInPlaceParams,
+    DispenseInPlaceCreate,
+    DispenseInPlaceResult,
+    DispenseInPlaceCommandType,
+)
+
 from .drop_tip import (
     DropTip,
     DropTipParams,
     DropTipCreate,
     DropTipResult,
     DropTipCommandType,
+)
+
+from .drop_tip_in_place import (
+    DropTipInPlace,
+    DropTipInPlaceParams,
+    DropTipInPlaceCreate,
+    DropTipInPlaceResult,
+    DropTipInPlaceCommandType,
 )
 
 from .home import (
@@ -62,6 +97,22 @@ from .load_labware import (
     LoadLabwareCommandType,
 )
 
+from .load_adapter import (
+    LoadAdapter,
+    LoadAdapterParams,
+    LoadAdapterCreate,
+    LoadAdapterResult,
+    LoadAdapterCommandType,
+)
+
+from .load_liquid import (
+    LoadLiquid,
+    LoadLiquidParams,
+    LoadLiquidCreate,
+    LoadLiquidResult,
+    LoadLiquidCommandType,
+)
+
 from .load_module import (
     LoadModule,
     LoadModuleParams,
@@ -76,6 +127,14 @@ from .load_pipette import (
     LoadPipetteCreate,
     LoadPipetteResult,
     LoadPipetteCommandType,
+)
+
+from .move_labware import (
+    MoveLabware,
+    MoveLabwareParams,
+    MoveLabwareCreate,
+    MoveLabwareResult,
+    MoveLabwareCommandType,
 )
 
 from .move_relative import (
@@ -150,16 +209,49 @@ from .blow_out import (
     BlowOutResult,
 )
 
+from .blow_out_in_place import (
+    BlowOutInPlaceParams,
+    BlowOutInPlace,
+    BlowOutInPlaceCreate,
+    BlowOutInPlaceCommandType,
+    BlowOutInPlaceResult,
+)
+
+from .set_status_bar import (
+    SetStatusBar,
+    SetStatusBarParams,
+    SetStatusBarCreate,
+    SetStatusBarResult,
+    SetStatusBarCommandType,
+)
+
+from .retract_axis import (
+    RetractAxis,
+    RetractAxisParams,
+    RetractAxisCreate,
+    RetractAxisResult,
+    RetractAxisCommandType,
+)
+
 Command = Union[
     Aspirate,
+    AspirateInPlace,
+    Comment,
     Custom,
     Dispense,
+    DispenseInPlace,
     BlowOut,
+    BlowOutInPlace,
     DropTip,
+    DropTipInPlace,
     Home,
+    RetractAxis,
     LoadLabware,
+    LoadAdapter,
+    LoadLiquid,
     LoadModule,
     LoadPipette,
+    MoveLabware,
     MoveRelative,
     MoveToCoordinates,
     MoveToWell,
@@ -169,6 +261,7 @@ Command = Union[
     SavePosition,
     SetRailLights,
     TouchTip,
+    SetStatusBar,
     heater_shaker.WaitForTemperature,
     heater_shaker.SetTargetTemperature,
     heater_shaker.DeactivateHeater,
@@ -190,18 +283,31 @@ Command = Union[
     thermocycler.OpenLid,
     thermocycler.CloseLid,
     thermocycler.RunProfile,
+    calibration.CalibrateGripper,
+    calibration.CalibratePipette,
+    calibration.CalibrateModule,
+    calibration.MoveToMaintenancePosition,
 ]
 
 CommandParams = Union[
     AspirateParams,
+    AspirateInPlaceParams,
+    CommentParams,
     CustomParams,
     DispenseParams,
+    DispenseInPlaceParams,
     BlowOutParams,
+    BlowOutInPlaceParams,
     DropTipParams,
+    DropTipInPlaceParams,
     HomeParams,
+    RetractAxisParams,
     LoadLabwareParams,
+    LoadAdapterParams,
+    LoadLiquidParams,
     LoadModuleParams,
     LoadPipetteParams,
+    MoveLabwareParams,
     MoveRelativeParams,
     MoveToCoordinatesParams,
     MoveToWellParams,
@@ -211,6 +317,7 @@ CommandParams = Union[
     SavePositionParams,
     SetRailLightsParams,
     TouchTipParams,
+    SetStatusBarParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -233,18 +340,31 @@ CommandParams = Union[
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
     thermocycler.RunProfileStepParams,
+    calibration.CalibrateGripperParams,
+    calibration.CalibratePipetteParams,
+    calibration.CalibrateModuleParams,
+    calibration.MoveToMaintenancePositionParams,
 ]
 
 CommandType = Union[
     AspirateCommandType,
+    AspirateInPlaceCommandType,
+    CommentCommandType,
     CustomCommandType,
     DispenseCommandType,
+    DispenseInPlaceCommandType,
     BlowOutCommandType,
+    BlowOutInPlaceCommandType,
     DropTipCommandType,
+    DropTipInPlaceCommandType,
     HomeCommandType,
+    RetractAxisCommandType,
     LoadLabwareCommandType,
+    LoadAdapterCommandType,
+    LoadLiquidCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
+    MoveLabwareCommandType,
     MoveRelativeCommandType,
     MoveToCoordinatesCommandType,
     MoveToWellCommandType,
@@ -254,6 +374,7 @@ CommandType = Union[
     SavePositionCommandType,
     SetRailLightsCommandType,
     TouchTipCommandType,
+    SetStatusBarCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -275,17 +396,31 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
+    calibration.CalibrateGripperCommandType,
+    calibration.CalibratePipetteCommandType,
+    calibration.CalibrateModuleCommandType,
+    calibration.MoveToMaintenancePositionCommandType,
 ]
 
 CommandCreate = Union[
     AspirateCreate,
+    AspirateInPlaceCreate,
+    CommentCreate,
+    CustomCreate,
     DispenseCreate,
+    DispenseInPlaceCreate,
     BlowOutCreate,
+    BlowOutInPlaceCreate,
     DropTipCreate,
+    DropTipInPlaceCreate,
     HomeCreate,
+    RetractAxisCreate,
     LoadLabwareCreate,
+    LoadAdapterCreate,
+    LoadLiquidCreate,
     LoadModuleCreate,
     LoadPipetteCreate,
+    MoveLabwareCreate,
     MoveRelativeCreate,
     MoveToCoordinatesCreate,
     MoveToWellCreate,
@@ -295,6 +430,7 @@ CommandCreate = Union[
     SavePositionCreate,
     SetRailLightsCreate,
     TouchTipCreate,
+    SetStatusBarCreate,
     heater_shaker.WaitForTemperatureCreate,
     heater_shaker.SetTargetTemperatureCreate,
     heater_shaker.DeactivateHeaterCreate,
@@ -316,18 +452,31 @@ CommandCreate = Union[
     thermocycler.OpenLidCreate,
     thermocycler.CloseLidCreate,
     thermocycler.RunProfileCreate,
+    calibration.CalibrateGripperCreate,
+    calibration.CalibratePipetteCreate,
+    calibration.CalibrateModuleCreate,
+    calibration.MoveToMaintenancePositionCreate,
 ]
 
 CommandResult = Union[
     AspirateResult,
+    AspirateInPlaceResult,
+    CommentResult,
     CustomResult,
     DispenseResult,
+    DispenseInPlaceResult,
     BlowOutResult,
+    BlowOutInPlaceResult,
     DropTipResult,
+    DropTipInPlaceResult,
     HomeResult,
+    RetractAxisResult,
     LoadLabwareResult,
+    LoadAdapterResult,
+    LoadLiquidResult,
     LoadModuleResult,
     LoadPipetteResult,
+    MoveLabwareResult,
     MoveRelativeResult,
     MoveToCoordinatesResult,
     MoveToWellResult,
@@ -337,6 +486,7 @@ CommandResult = Union[
     SavePositionResult,
     SetRailLightsResult,
     TouchTipResult,
+    SetStatusBarResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
@@ -358,4 +508,8 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
+    calibration.CalibrateGripperResult,
+    calibration.CalibratePipetteResult,
+    calibration.CalibrateModuleResult,
+    calibration.MoveToMaintenancePositionResult,
 ]

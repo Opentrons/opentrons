@@ -44,6 +44,7 @@ def get_command_view(
     queued_setup_command_ids: Sequence[str] = (),
     errors_by_id: Optional[Dict[str, errors.ErrorOccurrence]] = None,
     commands: Sequence[cmd.Command] = (),
+    latest_command_hash: Optional[str] = None,
 ) -> CommandView:
     """Get a command view test subject."""
     all_command_ids = [command.id for command in commands]
@@ -64,6 +65,7 @@ def get_command_view(
         all_command_ids=all_command_ids,
         commands_by_id=commands_by_id,
         run_started_at=run_started_at,
+        latest_command_hash=latest_command_hash,
     )
 
     return CommandView(state=state)
@@ -97,21 +99,21 @@ def test_get_all() -> None:
     assert subject.get_all() == [command_1, command_2, command_3]
 
 
-def test_get_next_queued_returns_first_queued() -> None:
+def test_get_next_to_execute_returns_first_queued() -> None:
     """It should return the next queued command ID."""
     subject = get_command_view(
         queue_status=QueueStatus.RUNNING,
         queued_command_ids=["command-id-1", "command-id-2"],
     )
 
-    assert subject.get_next_queued() == "command-id-1"
+    assert subject.get_next_to_execute() == "command-id-1"
 
 
 @pytest.mark.parametrize(
     "queue_status",
     [QueueStatus.SETUP, QueueStatus.RUNNING],
 )
-def test_get_next_queued_prioritizes_setup_command_queue(
+def test_get_next_to_execute_prioritizes_setup_command_queue(
     queue_status: QueueStatus,
 ) -> None:
     """It should prioritize setup command queue over protocol command queue."""
@@ -121,51 +123,53 @@ def test_get_next_queued_prioritizes_setup_command_queue(
         queued_setup_command_ids=["setup-command-id"],
     )
 
-    assert subject.get_next_queued() == "setup-command-id"
+    assert subject.get_next_to_execute() == "setup-command-id"
 
 
-def test_get_next_queued_returns_none_when_no_pending() -> None:
+def test_get_next_to_execute_returns_none_when_no_queued() -> None:
     """It should return None if there are no queued commands."""
     subject = get_command_view(
         queue_status=QueueStatus.RUNNING,
         queued_command_ids=[],
     )
 
-    assert subject.get_next_queued() is None
+    assert subject.get_next_to_execute() is None
 
 
 @pytest.mark.parametrize("queue_status", [QueueStatus.SETUP, QueueStatus.PAUSED])
-def test_get_next_queued_returns_none_if_not_running(queue_status: QueueStatus) -> None:
+def test_get_next_to_execute_returns_none_if_not_running(
+    queue_status: QueueStatus,
+) -> None:
     """It should not return protocol commands if the engine is not running."""
     subject = get_command_view(
         queue_status=queue_status,
         queued_setup_command_ids=[],
         queued_command_ids=["command-id-1", "command-id-2"],
     )
-    result = subject.get_next_queued()
+    result = subject.get_next_to_execute()
 
     assert result is None
 
 
-def test_get_next_queued_returns_no_commands_if_paused() -> None:
+def test_get_next_to_execute_returns_no_commands_if_paused() -> None:
     """It should not return any type of command if the engine is paused."""
     subject = get_command_view(
         queue_status=QueueStatus.PAUSED,
         queued_setup_command_ids=["setup-id-1", "setup-id-2"],
         queued_command_ids=["command-id-1", "command-id-2"],
     )
-    result = subject.get_next_queued()
+    result = subject.get_next_to_execute()
 
     assert result is None
 
 
 @pytest.mark.parametrize("run_result", RunResult)
-def test_get_next_queued_raises_if_stopped(run_result: RunResult) -> None:
+def test_get_next_to_execute_raises_if_stopped(run_result: RunResult) -> None:
     """It should raise if an engine stop has been requested."""
     subject = get_command_view(run_result=run_result)
 
     with pytest.raises(errors.RunStoppedError):
-        subject.get_next_queued()
+        subject.get_next_to_execute()
 
 
 def test_get_is_running_queue() -> None:
@@ -180,35 +184,54 @@ def test_get_is_running_queue() -> None:
     assert subject.get_is_running() is False
 
 
-def test_get_is_complete() -> None:
+def test_get_command_is_final() -> None:
     """It should be able to tell if a command is complete."""
-    completed_command = create_succeeded_command(command_id="command-id-1")
-    failed_command = create_failed_command(command_id="command-id-2")
-    running_command = create_running_command(command_id="command-id-3")
-    pending_command = create_queued_command(command_id="command-id-4")
+    completed_command = create_succeeded_command(command_id="completed-command-id")
+    failed_command = create_failed_command(command_id="failed-command-id")
+    running_command = create_running_command(command_id="running-command-id")
+    pending_command = create_queued_command(command_id="queued-command-id")
 
     subject = get_command_view(
         commands=[completed_command, failed_command, running_command, pending_command]
     )
 
-    assert subject.get_is_complete("command-id-1") is True
-    assert subject.get_is_complete("command-id-2") is True
-    assert subject.get_is_complete("command-id-3") is False
-    assert subject.get_is_complete("command-id-4") is False
+    assert subject.get_command_is_final("completed-command-id") is True
+    assert subject.get_command_is_final("failed-command-id") is True
+    assert subject.get_command_is_final("running-command-id") is False
+    assert subject.get_command_is_final("queued-command-id") is False
 
 
-def test_get_all_complete() -> None:
+@pytest.mark.parametrize("run_result", RunResult)
+def test_get_command_is_final_when_run_has_result(run_result: RunResult) -> None:
+    """Queued commands are final when the run will never execute any more commands."""
+    completed_command = create_succeeded_command(command_id="completed-command-id")
+    failed_command = create_failed_command(command_id="failed-command-id")
+    running_command = create_running_command(command_id="running-command-id")
+    pending_command = create_queued_command(command_id="queued-command-id")
+
+    subject = get_command_view(
+        commands=[completed_command, failed_command, running_command, pending_command],
+        run_result=run_result,
+    )
+
+    assert subject.get_command_is_final("completed-command-id") is True
+    assert subject.get_command_is_final("failed-command-id") is True
+    assert subject.get_command_is_final("running-command-id") is False
+    assert subject.get_command_is_final("queued-command-id") is True
+
+
+def test_get_all_commands_final() -> None:
     """It should return True if no commands queued or running."""
     subject = get_command_view(queued_command_ids=[])
-    assert subject.get_all_complete() is True
+    assert subject.get_all_commands_final() is True
 
     subject = get_command_view(queued_command_ids=["queued-command-id"])
-    assert subject.get_all_complete() is False
+    assert subject.get_all_commands_final() is False
 
     subject = get_command_view(
         queued_command_ids=[], running_command_id="running-command-id"
     )
-    assert subject.get_all_complete() is False
+    assert subject.get_all_commands_final() is False
 
 
 def test_get_all_complete_fatal_command_failure() -> None:
@@ -221,6 +244,7 @@ def test_get_all_complete_fatal_command_failure() -> None:
             errorType="PrettyBadError",
             createdAt=datetime(year=2021, month=1, day=1),
             detail="Oh no",
+            errorCode="4321",
         ),
     )
 
@@ -230,10 +254,8 @@ def test_get_all_complete_fatal_command_failure() -> None:
         commands=[completed_command, failed_command],
     )
 
-    with pytest.raises(errors.ProtocolCommandFailedError) as exc_info:
-        subject.get_all_complete()
-
-    assert exc_info.value.command_id == "command-id-2"
+    with pytest.raises(errors.ProtocolCommandFailedError, match="Oh no"):
+        subject.get_all_commands_final()
 
 
 def test_get_all_complete_setup_not_fatal() -> None:
@@ -247,6 +269,7 @@ def test_get_all_complete_setup_not_fatal() -> None:
             errorType="PrettyBadError",
             createdAt=datetime(year=2021, month=1, day=1),
             detail="Oh no",
+            errorCode="4321",
         ),
     )
 
@@ -256,23 +279,8 @@ def test_get_all_complete_setup_not_fatal() -> None:
         commands=[completed_command, failed_command],
     )
 
-    result = subject.get_all_complete()
+    result = subject.get_all_commands_final()
     assert result is True
-
-
-def test_get_should_stop() -> None:
-    """It should return true if the run_result status is set."""
-    subject = get_command_view(run_result=RunResult.SUCCEEDED)
-    assert subject.get_stop_requested() is True
-
-    subject = get_command_view(run_result=RunResult.FAILED)
-    assert subject.get_stop_requested() is True
-
-    subject = get_command_view(run_result=RunResult.STOPPED)
-    assert subject.get_stop_requested() is True
-
-    subject = get_command_view(run_result=None)
-    assert subject.get_stop_requested() is False
 
 
 def test_get_is_stopped() -> None:
@@ -337,6 +345,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         subject=get_command_view(queue_status=QueueStatus.SETUP),
         action=QueueCommandAction(
             request=cmd.HomeCreate(params=cmd.HomeParams()),
+            request_hash=None,
             command_id="command-id",
             created_at=datetime(year=2021, month=1, day=1),
         ),
@@ -385,6 +394,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
         subject=get_command_view(run_result=RunResult.STOPPED),
         action=QueueCommandAction(
             request=cmd.HomeCreate(params=cmd.HomeParams()),
+            request_hash=None,
             command_id="command-id",
             created_at=datetime(year=2021, month=1, day=1),
         ),
@@ -398,6 +408,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
                 params=cmd.HomeParams(),
                 intent=cmd.CommandIntent.SETUP,
             ),
+            request_hash=None,
             command_id="command-id",
             created_at=datetime(year=2021, month=1, day=1),
         ),
@@ -411,6 +422,7 @@ action_allowed_specs: List[ActionAllowedSpec] = [
                 params=cmd.HomeParams(),
                 intent=cmd.CommandIntent.SETUP,
             ),
+            request_hash=None,
             command_id="command-id",
             created_at=datetime(year=2021, month=1, day=1),
         ),
@@ -442,12 +454,14 @@ def test_get_errors() -> None:
         createdAt=datetime(year=2021, month=1, day=1),
         errorType="ReallyBadError",
         detail="things could not get worse",
+        errorCode="4321",
     )
     error_2 = errors.ErrorOccurrence(
         id="error-2",
         createdAt=datetime(year=2022, month=2, day=2),
         errorType="EvenWorseError",
         detail="things got worse",
+        errorCode="1234",
     )
 
     subject = get_command_view(errors_by_id={"error-1": error_1, "error-2": error_2})
@@ -713,26 +727,6 @@ def test_get_slice() -> None:
     )
 
 
-def test_get_slice_default_cursor() -> None:
-    """It should use the tail as the default cursor location."""
-    command_1 = create_succeeded_command(command_id="command-id-1")
-    command_2 = create_succeeded_command(command_id="command-id-2")
-    command_3 = create_running_command(command_id="command-id-3")
-    command_4 = create_queued_command(command_id="command-id-4")
-
-    subject = get_command_view(
-        commands=[command_1, command_2, command_3, command_4],
-    )
-
-    result = subject.get_slice(cursor=None, length=2)
-
-    assert result == CommandSlice(
-        commands=[command_3, command_4],
-        cursor=2,
-        total_length=4,
-    )
-
-
 def test_get_slice_default_cursor_no_current() -> None:
     """It should return a slice from the tail if no current command."""
     command_1 = create_succeeded_command(command_id="command-id-1")
@@ -749,3 +743,54 @@ def test_get_slice_default_cursor_no_current() -> None:
         cursor=1,
         total_length=4,
     )
+
+
+def test_get_slice_default_cursor_running() -> None:
+    """It should select a cursor based on the running command, if present."""
+    command_1 = create_succeeded_command(command_id="command-id-1")
+    command_2 = create_succeeded_command(command_id="command-id-2")
+    command_3 = create_running_command(command_id="command-id-3")
+    command_4 = create_queued_command(command_id="command-id-4")
+    command_5 = create_queued_command(command_id="command-id-5")
+
+    subject = get_command_view(
+        commands=[command_1, command_2, command_3, command_4, command_5],
+        running_command_id="command-id-3",
+    )
+
+    result = subject.get_slice(cursor=None, length=2)
+
+    assert result == CommandSlice(
+        commands=[command_3, command_4],
+        cursor=2,
+        total_length=5,
+    )
+
+
+def test_get_slice_default_cursor_queued() -> None:
+    """It should select a cursor based on the next queued command, if present."""
+    command_1 = create_succeeded_command(command_id="command-id-1")
+    command_2 = create_succeeded_command(command_id="command-id-2")
+    command_3 = create_succeeded_command(command_id="command-id-3")
+    command_4 = create_queued_command(command_id="command-id-4")
+    command_5 = create_queued_command(command_id="command-id-5")
+
+    subject = get_command_view(
+        commands=[command_1, command_2, command_3, command_4, command_5],
+        running_command_id=None,
+        queued_command_ids=["command-id-4", "command-id-4", "command-id-5"],
+    )
+
+    result = subject.get_slice(cursor=None, length=2)
+
+    assert result == CommandSlice(
+        commands=[command_3, command_4],
+        cursor=2,
+        total_length=5,
+    )
+
+
+def test_get_latest_command_hash() -> None:
+    """It should get the latest command hash from state, if set."""
+    subject = get_command_view(latest_command_hash="abc123")
+    assert subject.get_latest_command_hash() == "abc123"

@@ -3,29 +3,48 @@ import {
   COLORS,
   POSITION_ABSOLUTE,
   DIRECTION_COLUMN,
-  ButtonProps,
   Flex,
   SPACING,
+  BORDERS,
+  JUSTIFY_CENTER,
 } from '@opentrons/components'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 
 interface MenuListProps {
-  buttons: Array<ButtonProps | null | undefined>
+  children: React.ReactNode
+  isOnDevice?: boolean
+  onClick?: React.MouseEventHandler
 }
 
 export const MenuList = (props: MenuListProps): JSX.Element | null => {
-  return (
+  const { children, isOnDevice = false, onClick = null } = props
+  return isOnDevice && onClick != null ? (
+    <LegacyModalShell
+      borderRadius={BORDERS.borderRadiusSize4}
+      width="19.625rem"
+      onOutsideClick={onClick}
+    >
+      <Flex
+        boxShadow={BORDERS.shadowSmall}
+        flexDirection={DIRECTION_COLUMN}
+        justifyContent={JUSTIFY_CENTER}
+      >
+        {children}
+      </Flex>
+    </LegacyModalShell>
+  ) : (
     <Flex
-      borderRadius={'4px 4px 0px 0px'}
+      borderRadius="4px 4px 0px 0px"
       zIndex={10}
-      boxShadow={'0px 1px 3px rgba(0, 0, 0, 0.2)'}
+      boxShadow="0px 1px 3px rgba(0, 0, 0, 0.2)"
       position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.white}
       top="2.6rem"
-      right={`calc(50% + ${SPACING.spacing2})`}
+      right={`calc(50% + ${SPACING.spacing4})`}
       flexDirection={DIRECTION_COLUMN}
-      whiteSpace="nowrap"
+      width="max-content"
     >
-      {props.buttons}
+      {children}
     </Flex>
   )
 }

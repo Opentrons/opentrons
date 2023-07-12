@@ -7,9 +7,6 @@ import {
   FETCH_STATUS,
   FETCH_STATUS_SUCCESS,
   FETCH_STATUS_FAILURE,
-  FETCH_WIFI_LIST,
-  FETCH_WIFI_LIST_SUCCESS,
-  FETCH_WIFI_LIST_FAILURE,
   POST_WIFI_CONFIGURE,
   POST_WIFI_CONFIGURE_SUCCESS,
   POST_WIFI_CONFIGURE_FAILURE,
@@ -49,26 +46,6 @@ export interface FetchStatusSuccessAction {
 export interface FetchStatusFailureAction {
   type: typeof FETCH_STATUS_FAILURE
   payload: { robotName: string; error: {} }
-  meta: RobotApiRequestMeta
-}
-
-// fetch wifi list
-
-export interface FetchWifiListAction {
-  type: typeof FETCH_WIFI_LIST
-  payload: { robotName: string }
-  meta: RobotApiRequestMeta | {}
-}
-
-export interface FetchWifiListSuccessAction {
-  type: typeof FETCH_WIFI_LIST_SUCCESS
-  payload: { robotName: string; wifiList: ApiTypes.WifiNetwork[] }
-  meta: RobotApiRequestMeta
-}
-
-export interface FetchWifiListFailureAction {
-  type: typeof FETCH_WIFI_LIST_FAILURE
-  payload: { robotName: string; error: RobotApiErrorResponse }
   meta: RobotApiRequestMeta
 }
 
@@ -182,9 +159,6 @@ export type NetworkingAction =
   | FetchStatusAction
   | FetchStatusSuccessAction
   | FetchStatusFailureAction
-  | FetchWifiListAction
-  | FetchWifiListSuccessAction
-  | FetchWifiListFailureAction
   | PostWifiConfigureAction
   | PostWifiConfigureSuccessAction
   | PostWifiConfigureFailureAction

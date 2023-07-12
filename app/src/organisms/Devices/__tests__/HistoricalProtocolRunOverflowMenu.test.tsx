@@ -10,19 +10,22 @@ import {
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import runRecord from '../../../organisms/RunDetails/__fixtures__/runRecord.json'
-import { useTrackProtocolRunEvent } from '../hooks'
+import { useDownloadRunLog, useTrackProtocolRunEvent } from '../hooks'
 import { useRunControls } from '../../RunTimeControl/hooks'
 import { HistoricalProtocolRunOverflowMenu } from '../HistoricalProtocolRunOverflowMenu'
-import { DownloadRunLogToast } from '../DownloadRunLogToast'
+import {
+  useTrackEvent,
+  ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+} from '../../../redux/analytics'
 import { getBuildrootUpdateDisplayInfo } from '../../../redux/buildroot'
 
 import type { CommandsData } from '@opentrons/api-client'
 
 const mockPush = jest.fn()
 
+jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/buildroot/selectors')
 jest.mock('../../Devices/hooks')
-jest.mock('../DownloadRunLogToast')
 jest.mock('../../RunTimeControl/hooks')
 jest.mock('../../../redux/analytics')
 jest.mock('../../../redux/config')
@@ -44,14 +47,17 @@ const mockUseRunControls = useRunControls as jest.MockedFunction<
 const mockUseDeleteRunMutation = useDeleteRunMutation as jest.MockedFunction<
   typeof useDeleteRunMutation
 >
-const mockDownloadRunLogToast = DownloadRunLogToast as jest.MockedFunction<
-  typeof DownloadRunLogToast
+const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
+  typeof useTrackEvent
 >
 const mockUseTrackProtocolRunEvent = useTrackProtocolRunEvent as jest.MockedFunction<
   typeof useTrackProtocolRunEvent
 >
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
   typeof getBuildrootUpdateDisplayInfo
+>
+const mockUseDownloadRunLog = useDownloadRunLog as jest.MockedFunction<
+  typeof useDownloadRunLog
 >
 
 const render = (
@@ -68,11 +74,15 @@ const render = (
 }
 const PAGE_LENGTH = 101
 const RUN_ID = 'id'
+let mockTrackEvent: jest.Mock
 let mockTrackProtocolRunEvent: jest.Mock
+const mockDownloadRunLog = jest.fn()
 
 describe('HistoricalProtocolRunOverflowMenu', () => {
   let props: React.ComponentProps<typeof HistoricalProtocolRunOverflowMenu>
   beforeEach(() => {
+    mockTrackEvent = jest.fn()
+    mockUseTrackEvent.mockReturnValue(mockTrackEvent)
     mockTrackProtocolRunEvent = jest.fn(
       () => new Promise(resolve => resolve({}))
     )
@@ -81,9 +91,10 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       autoUpdateDisabledReason: null,
       updateFromFileDisabledReason: null,
     })
-    when(mockDownloadRunLogToast).mockReturnValue(
-      <div>mock downlaod run log toast</div>
-    )
+    when(mockUseDownloadRunLog).mockReturnValue({
+      downloadRunLog: mockDownloadRunLog,
+      isRunLogLoading: false,
+    })
     when(
       mockUseDeleteRunMutation.mockReturnValue({
         deleteRun: jest.fn(),
@@ -142,6 +153,10 @@ describe('HistoricalProtocolRunOverflowMenu', () => {
       name: 'Delete protocol run record',
     })
     fireEvent.click(rerunBtn)
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
+      properties: { sourceLocation: 'HistoricalProtocolRun' },
+    })
     expect(mockUseRunControls).toHaveBeenCalled()
     expect(mockTrackProtocolRunEvent).toHaveBeenCalled()
     fireEvent.click(deleteBtn)

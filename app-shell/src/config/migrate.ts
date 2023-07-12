@@ -1,7 +1,11 @@
 import path from 'path'
 import { app } from 'electron'
 import uuid from 'uuid/v4'
-import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/redux/config'
+import {
+  CONFIG_VERSION_LATEST,
+  OT2_MANIFEST_URL,
+  OT3_MANIFEST_URL,
+} from '@opentrons/app/src/redux/config'
 
 import type {
   Config,
@@ -14,11 +18,20 @@ import type {
   ConfigV6,
   ConfigV7,
   ConfigV8,
+  ConfigV9,
+  ConfigV10,
+  ConfigV11,
+  ConfigV12,
+  ConfigV13,
+  ConfigV14,
+  ConfigV15,
+  ConfigV16,
 } from '@opentrons/app/src/redux/config/types'
-
+// format
 // base config v0 defaults
 // any default values for later config versions are specified in the migration
 // functions for those version below
+
 export const DEFAULTS_V0: ConfigV0 = {
   version: 0,
   devtools: false,
@@ -30,8 +43,7 @@ export const DEFAULTS_V0: ConfigV0 = {
   },
 
   buildroot: {
-    manifestUrl:
-      'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
+    manifestUrl: OT2_MANIFEST_URL,
   },
 
   // logging config
@@ -58,7 +70,7 @@ export const DEFAULTS_V0: ConfigV0 = {
   // analytics (mixpanel)
   analytics: {
     appId: uuid(),
-    optedIn: false,
+    optedIn: true,
     seenOptIn: false,
   },
 
@@ -202,6 +214,116 @@ const toVersion8 = (prevConfig: ConfigV7): ConfigV8 => {
 
   return nextConfig
 }
+
+// config version 9 migration and defaults
+const toVersion9 = (prevConfig: ConfigV8): ConfigV9 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 9 as const,
+    isOnDevice: false,
+  }
+
+  return nextConfig
+}
+
+// config version 10 migration and defaults
+const toVersion10 = (prevConfig: ConfigV9): ConfigV10 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 10 as const,
+    protocols: { sendAllProtocolsToOT3: false },
+  }
+
+  return nextConfig
+}
+
+// config version 11 migration and defaults
+const toVersion11 = (prevConfig: ConfigV10): ConfigV11 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 11 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      protocolsStoredSortKey: null,
+    },
+  }
+
+  return nextConfig
+}
+
+// config version 12 migration and defaults
+const toVersion12 = (prevConfig: ConfigV11): ConfigV12 => {
+  // @ts-expect-error deleting a key from the config removes a required param from the prev config
+  delete prevConfig.buildroot
+  const nextConfig = {
+    ...prevConfig,
+    version: 12 as const,
+    robotSystemUpdate: {
+      manifestUrls: {
+        OT2: OT2_MANIFEST_URL,
+        OT3: OT3_MANIFEST_URL,
+      },
+    },
+  }
+
+  return nextConfig
+}
+
+// config version 13 migration and defaults
+const toVersion13 = (prevConfig: ConfigV12): ConfigV13 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 13 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      protocolsOnDeviceSortKey: null,
+    },
+  }
+  return nextConfig
+}
+
+// config version 14 migration and defaults
+const toVersion14 = (prevConfig: ConfigV13): ConfigV14 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 14 as const,
+    protocols: {
+      ...prevConfig.protocols,
+      pinnedProtocolIds: [],
+    },
+  }
+  return nextConfig
+}
+
+// config version 15 migration and defaults
+const toVersion15 = (prevConfig: ConfigV14): ConfigV15 => {
+  // Note (kj:02/10/2023) default settings
+  // sleepMs: never(24h x 7 days), brightness device default settings, textSize x1
+  const nextConfig = {
+    ...prevConfig,
+    version: 15 as const,
+    onDeviceDisplaySettings: {
+      sleepMs: 60 * 1000 * 60 * 24 * 7,
+      brightness: 4,
+      textSize: 1,
+    },
+  }
+  return nextConfig
+}
+
+// config version 16 migration and defaults
+const toVersion16 = (prevConfig: ConfigV15): ConfigV16 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 16 as const,
+    onDeviceDisplaySettings: {
+      ...prevConfig.onDeviceDisplaySettings,
+      unfinishedUnboxingFlowRoute: '/welcome',
+    },
+  }
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
   (prevConfig: ConfigV1) => ConfigV2,
@@ -210,7 +332,15 @@ const MIGRATIONS: [
   (prevConfig: ConfigV4) => ConfigV5,
   (prevConfig: ConfigV5) => ConfigV6,
   (prevConfig: ConfigV6) => ConfigV7,
-  (prevConfig: ConfigV7) => ConfigV8
+  (prevConfig: ConfigV7) => ConfigV8,
+  (prevConfig: ConfigV8) => ConfigV9,
+  (prevConfig: ConfigV9) => ConfigV10,
+  (prevConfig: ConfigV10) => ConfigV11,
+  (prevConfig: ConfigV11) => ConfigV12,
+  (prevConfig: ConfigV12) => ConfigV13,
+  (prevConfig: ConfigV13) => ConfigV14,
+  (prevConfig: ConfigV14) => ConfigV15,
+  (prevConfig: ConfigV15) => ConfigV16
 ] = [
   toVersion1,
   toVersion2,
@@ -220,6 +350,14 @@ const MIGRATIONS: [
   toVersion6,
   toVersion7,
   toVersion8,
+  toVersion9,
+  toVersion10,
+  toVersion11,
+  toVersion12,
+  toVersion13,
+  toVersion14,
+  toVersion15,
+  toVersion16,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -235,6 +373,14 @@ export function migrate(
     | ConfigV6
     | ConfigV7
     | ConfigV8
+    | ConfigV9
+    | ConfigV10
+    | ConfigV11
+    | ConfigV12
+    | ConfigV13
+    | ConfigV14
+    | ConfigV15
+    | ConfigV16
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig

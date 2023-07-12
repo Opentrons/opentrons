@@ -1,13 +1,22 @@
 // jog controls component
 import * as React from 'react'
+import { css } from 'styled-components'
+import {
+  Flex,
+  ALIGN_STRETCH,
+  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+} from '@opentrons/components'
 
-import { Flex, JUSTIFY_CENTER, ALIGN_STRETCH } from '@opentrons/components'
-
-import { DirectionControl } from './DirectionControl'
-import { StepSizeControl } from './StepSizeControl'
+import { DirectionControl, TouchDirectionControl } from './DirectionControl'
+import { StepSizeControl, TouchStepSizeControl } from './StepSizeControl'
 import {
   HORIZONTAL_PLANE,
   VERTICAL_PLANE,
+  SMALL_STEP_SIZE_MM,
+  MEDIUM_STEP_SIZE_MM,
+  LARGE_STEP_SIZE_MM,
   DEFAULT_STEP_SIZES,
 } from './constants'
 
@@ -21,43 +30,88 @@ export interface JogControlsProps extends StyleProps {
   stepSizes?: StepSize[]
   auxiliaryControl?: React.ReactNode | null
   directionControlButtonColor?: string
-  //  TODO: remove this prop after all primary buttons are changed to blue in the next gen app work
-  isLPC?: boolean
+  initialPlane?: Plane
+  isOnDevice?: boolean
 }
 
-export { HORIZONTAL_PLANE, VERTICAL_PLANE }
+export {
+  HORIZONTAL_PLANE,
+  VERTICAL_PLANE,
+  SMALL_STEP_SIZE_MM,
+  MEDIUM_STEP_SIZE_MM,
+  LARGE_STEP_SIZE_MM,
+}
 
 export function JogControls(props: JogControlsProps): JSX.Element {
   const {
     jog,
-    isLPC,
     directionControlButtonColor,
     stepSizes = DEFAULT_STEP_SIZES,
     planes = [HORIZONTAL_PLANE, VERTICAL_PLANE],
     auxiliaryControl = null,
+    initialPlane = HORIZONTAL_PLANE,
+    isOnDevice = false,
     ...styleProps
   } = props
-  const [currentStepSize, setCurrentStepSize] = React.useState<number>(
+  const [currentStepSize, setCurrentStepSize] = React.useState<StepSize>(
     stepSizes[0]
   )
-  return (
-    <Flex
-      justifyContent={JUSTIFY_CENTER}
-      alignSelf={ALIGN_STRETCH}
-      {...styleProps}
-    >
-      <StepSizeControl
-        {...{ currentStepSize, setCurrentStepSize, stepSizes, isLPC }}
+
+  const controls = isOnDevice ? (
+    <>
+      <TouchStepSizeControl
+        {...{ currentStepSize, setCurrentStepSize, stepSizes }}
       />
-      {planes.map(plane => (
+      <TouchDirectionControl
+        planes={planes}
+        jog={jog}
+        stepSize={currentStepSize}
+        buttonColor={directionControlButtonColor}
+        initialPlane={initialPlane}
+      />
+    </>
+  ) : (
+    <>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        css={css`
+          flex: 1;
+          @media screen and (max-width: 750px) {
+            flex: 3;
+          }
+        `}
+      >
+        <StepSizeControl
+          {...{ currentStepSize, setCurrentStepSize, stepSizes }}
+        />
+      </Flex>
+      <Flex
+        alignItems={ALIGN_CENTER}
+        css={css`
+          flex: 1;
+          @media screen and (max-width: 750px) {
+            flex: 7;
+          }
+        `}
+      >
         <DirectionControl
-          key={plane}
-          plane={plane}
+          planes={planes}
           jog={jog}
           stepSize={currentStepSize}
           buttonColor={directionControlButtonColor}
+          initialPlane={initialPlane}
         />
-      ))}
+      </Flex>
+    </>
+  )
+  return (
+    <Flex
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignSelf={ALIGN_STRETCH}
+      gridGap={SPACING.spacing8}
+      {...styleProps}
+    >
+      {controls}
       {auxiliaryControl}
     </Flex>
   )

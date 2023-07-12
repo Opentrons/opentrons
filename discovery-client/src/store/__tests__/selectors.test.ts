@@ -1,6 +1,8 @@
+import type { Agent } from 'http'
+
 import {
-  mockHealthResponse,
-  mockServerHealthResponse,
+  mockLegacyHealthResponse,
+  mockLegacyServerHealthResponse,
   mockHealthErrorJsonResponse,
   mockHealthFetchErrorResponse,
 } from '../../__fixtures__/health'
@@ -19,17 +21,17 @@ const STATE: State = {
   robotsByName: {
     'opentrons-1': {
       name: 'opentrons-1',
-      health: mockHealthResponse,
-      serverHealth: mockServerHealthResponse,
+      health: mockLegacyHealthResponse,
+      serverHealth: mockLegacyServerHealthResponse,
     },
     'opentrons-2': {
       name: 'opentrons-2',
       health: null,
-      serverHealth: mockServerHealthResponse,
+      serverHealth: mockLegacyServerHealthResponse,
     },
     'opentrons-3': {
       name: 'opentrons-3',
-      health: mockHealthResponse,
+      health: mockLegacyHealthResponse,
       serverHealth: null,
     },
   },
@@ -43,6 +45,7 @@ const STATE: State = {
       healthError: null,
       serverHealthError: null,
       robotName: 'opentrons-1',
+      advertisedModel: null,
     },
     '127.0.0.3': {
       ip: '127.0.0.3',
@@ -53,6 +56,7 @@ const STATE: State = {
       healthError: mockHealthErrorJsonResponse,
       serverHealthError: mockHealthErrorJsonResponse,
       robotName: 'opentrons-2',
+      advertisedModel: 'OT-2 Standard',
     },
     '127.0.0.4': {
       ip: '127.0.0.4',
@@ -63,6 +67,7 @@ const STATE: State = {
       healthError: mockHealthFetchErrorResponse,
       serverHealthError: mockHealthFetchErrorResponse,
       robotName: 'opentrons-2',
+      advertisedModel: 'OT-2 Standard',
     },
   },
   manualAddresses: [
@@ -77,17 +82,17 @@ describe('discovery client state selectors', () => {
     expect(Selectors.getRobotStates(STATE)).toEqual([
       {
         name: 'opentrons-1',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
       {
         name: 'opentrons-2',
         health: null,
-        serverHealth: mockServerHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
       },
       {
         name: 'opentrons-3',
-        health: mockHealthResponse,
+        health: mockLegacyHealthResponse,
         serverHealth: null,
       },
     ])
@@ -104,6 +109,7 @@ describe('discovery client state selectors', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-1',
+        advertisedModel: null,
       },
       {
         ip: '127.0.0.3',
@@ -114,6 +120,7 @@ describe('discovery client state selectors', () => {
         healthError: mockHealthErrorJsonResponse,
         serverHealthError: mockHealthErrorJsonResponse,
         robotName: 'opentrons-2',
+        advertisedModel: 'OT-2 Standard',
       },
       {
         ip: '127.0.0.4',
@@ -124,6 +131,7 @@ describe('discovery client state selectors', () => {
         healthError: mockHealthFetchErrorResponse,
         serverHealthError: mockHealthFetchErrorResponse,
         robotName: 'opentrons-2',
+        advertisedModel: 'OT-2 Standard',
       },
     ])
   })
@@ -132,8 +140,8 @@ describe('discovery client state selectors', () => {
     expect(Selectors.getRobots(STATE)).toEqual([
       {
         name: 'opentrons-1',
-        health: mockHealthResponse,
-        serverHealth: mockServerHealthResponse,
+        health: mockLegacyHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
         addresses: [
           {
             ip: '127.0.0.2',
@@ -143,13 +151,14 @@ describe('discovery client state selectors', () => {
             serverHealthStatus: null,
             healthError: null,
             serverHealthError: null,
+            advertisedModel: null,
           },
         ],
       },
       {
         name: 'opentrons-2',
         health: null,
-        serverHealth: mockServerHealthResponse,
+        serverHealth: mockLegacyServerHealthResponse,
         addresses: [
           {
             ip: '127.0.0.3',
@@ -159,6 +168,7 @@ describe('discovery client state selectors', () => {
             serverHealthStatus: HEALTH_STATUS_NOT_OK,
             healthError: mockHealthErrorJsonResponse,
             serverHealthError: mockHealthErrorJsonResponse,
+            advertisedModel: 'OT-2 Standard',
           },
           {
             ip: '127.0.0.4',
@@ -168,25 +178,45 @@ describe('discovery client state selectors', () => {
             serverHealthStatus: HEALTH_STATUS_UNREACHABLE,
             healthError: mockHealthFetchErrorResponse,
             serverHealthError: mockHealthFetchErrorResponse,
+            advertisedModel: 'OT-2 Standard',
           },
         ],
       },
       {
         name: 'opentrons-3',
-        health: mockHealthResponse,
+        health: mockLegacyHealthResponse,
         serverHealth: null,
         addresses: [],
       },
     ])
   })
 
-  it('should be able to get a list addresses to poll', () => {
+  it('should to get a list addresses to poll', () => {
     expect(Selectors.getAddresses(STATE)).toEqual([
-      { ip: '127.0.0.2', port: 31950 },
-      { ip: '127.0.0.3', port: 31950 },
       { ip: '127.0.0.4', port: 31950 },
       { ip: '127.0.0.5', port: 31950 },
       { ip: '127.0.0.6', port: 31950 },
+      { ip: '127.0.0.2', port: 31950 },
+      { ip: '127.0.0.3', port: 31950 },
+    ])
+  })
+
+  it('should prefer manual address entries', () => {
+    expect(
+      Selectors.getAddresses({
+        ...STATE,
+        manualAddresses: [
+          { ip: '127.0.0.4', port: 31950, agent: {} as Agent },
+          { ip: '127.0.0.5', port: 31950 },
+          { ip: '127.0.0.6', port: 31950 },
+        ],
+      })
+    ).toEqual([
+      { agent: {}, ip: '127.0.0.4', port: 31950 },
+      { ip: '127.0.0.5', port: 31950 },
+      { ip: '127.0.0.6', port: 31950 },
+      { ip: '127.0.0.2', port: 31950 },
+      { ip: '127.0.0.3', port: 31950 },
     ])
   })
 
@@ -284,13 +314,27 @@ describe('discovery client state selectors', () => {
         serverHealthStatus: HEALTH_STATUS_OK,
       }
 
-      const result = sort([regular, linkLocalV6, linkLocalV4, localhost, home])
+      const usb: Partial<HostState> = {
+        ip: 'opentrons-usb',
+        healthStatus: HEALTH_STATUS_OK,
+        serverHealthStatus: HEALTH_STATUS_OK,
+      }
+
+      const result = sort([
+        usb,
+        regular,
+        linkLocalV6,
+        linkLocalV4,
+        localhost,
+        home,
+      ])
       expect(result).toEqual([
         home,
         localhost,
         linkLocalV4,
         linkLocalV6,
         regular,
+        usb,
       ])
     })
 

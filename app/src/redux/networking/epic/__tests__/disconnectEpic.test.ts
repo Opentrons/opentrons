@@ -78,20 +78,4 @@ describe('networking disconnectEpic', () => {
       })
     })
   })
-
-  it('dispatches FETCH_WIFI_LIST on POST_WIFI_DISCONNECT_SUCCESS', () => {
-    const mocks = setupEpicTestMocks(robotName =>
-      Actions.postWifiDisconnectSuccess(robotName, {} as any)
-    )
-
-    runEpicTest(mocks, ({ hot, expectObservable }) => {
-      const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('s-s', { s: mocks.state })
-      const output$ = networkingEpic(action$, state$)
-
-      expectObservable(output$).toBe('--a', {
-        a: Actions.fetchWifiList(mocks.robot.name),
-      })
-    })
-  })
 })

@@ -23,12 +23,12 @@ export interface InfoMessageProps {
 export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
   return (
     <Flex
-      backgroundColor={COLORS.background}
+      backgroundColor={COLORS.fundamentalsBackground}
       flexDirection={DIRECTION_ROW}
       alignItems={body != null ? ALIGN_FLEX_START : ALIGN_CENTER}
       borderRadius={BORDERS.radiusSoftCorners}
-      gridGap={SPACING.spacing3}
-      padding={SPACING.spacing4}
+      gridGap={SPACING.spacing8}
+      padding={SPACING.spacing16}
       data-testid={`InfoMessage_${title}`}
     >
       <Icon
@@ -40,8 +40,8 @@ export function InfoMessage({ title, body }: InfoMessageProps): JSX.Element {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={body != null ? ALIGN_FLEX_START : ALIGN_CENTER}
-        gridGap={SPACING.spacing2}
-        color={COLORS.darkBlack}
+        gridGap={SPACING.spacing4}
+        color={COLORS.darkBlackEnabled}
       >
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {title}

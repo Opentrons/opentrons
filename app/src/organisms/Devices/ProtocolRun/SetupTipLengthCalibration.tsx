@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   Flex,
@@ -8,19 +7,13 @@ import {
   COLORS,
   SPACING,
   TYPOGRAPHY,
-  useInterval,
 } from '@opentrons/components'
 
 import { StyledText } from '../../../atoms/text'
 import * as PipetteConstants from '../../../redux/pipettes/constants'
-import * as TipLength from '../../../redux/calibration/tip-length'
 import { useRunPipetteInfoByMount } from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 import { SetupTipLengthCalibrationButton } from './SetupTipLengthCalibrationButton'
-
-import type { Dispatch } from '../../../redux/types'
-
-const CALIBRATIONS_FETCH_MS = 5000
 interface SetupTipLengthCalibrationProps {
   robotName: string
   runId: string
@@ -31,23 +24,14 @@ export function SetupTipLengthCalibration({
   runId,
 }: SetupTipLengthCalibrationProps): JSX.Element {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
-  const dispatch = useDispatch<Dispatch>()
-  const runPipetteInfoByMount = useRunPipetteInfoByMount(robotName, runId)
-
-  useInterval(
-    () =>
-      robotName != null &&
-      dispatch(TipLength.fetchTipLengthCalibrations(robotName)),
-    CALIBRATIONS_FETCH_MS,
-    true
-  )
+  const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <StyledText
         color={COLORS.black}
         css={TYPOGRAPHY.pSemiBold}
-        id={'TipRackCalibration_requiredTipLengthTitle'}
+        id="TipRackCalibration_requiredTipLengthTitle"
       >
         {t('required_tip_racks_title')}
       </StyledText>

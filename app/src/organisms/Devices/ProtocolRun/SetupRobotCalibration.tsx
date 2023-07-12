@@ -7,14 +7,18 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
   SPACING,
+  PrimaryButton,
 } from '@opentrons/components'
 
-import { PrimaryButton } from '../../../atoms/buttons'
 import { Tooltip } from '../../../atoms/Tooltip'
-import { useTrackEvent } from '../../../redux/analytics'
-import { useDeckCalibrationData, useRunHasStarted } from '../hooks'
+import {
+  useTrackEvent,
+  ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
+  ANALYTICS_PROCEED_TO_LABWARE_SETUP_STEP,
+} from '../../../redux/analytics'
+import { useIsOT3, useRunHasStarted } from '../hooks'
 import { SetupDeckCalibration } from './SetupDeckCalibration'
-import { SetupPipetteCalibration } from './SetupPipetteCalibration'
+import { SetupInstrumentCalibration } from './SetupInstrumentCalibration'
 import { SetupTipLengthCalibration } from './SetupTipLengthCalibration'
 
 import type { ProtocolCalibrationStatus } from '../../../redux/calibration/types'
@@ -38,19 +42,17 @@ export function SetupRobotCalibration({
   const { t } = useTranslation('protocol_setup')
   const nextStepButtonKey =
     nextStep === 'module_setup_step'
-      ? 'proceed_to_module_setup_step'
-      : 'proceed_to_labware_setup_step'
+      ? ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP
+      : ANALYTICS_PROCEED_TO_LABWARE_SETUP_STEP
   const [targetProps, tooltipProps] = useHoverTooltip()
   const trackEvent = useTrackEvent()
 
-  const { isDeckCalibrated } = useDeckCalibrationData(robotName)
   const runHasStarted = useRunHasStarted(runId)
+  const isOT3 = useIsOT3(robotName)
 
   let tooltipText: string | null = null
   if (runHasStarted) {
     tooltipText = t('protocol_run_started')
-  } else if (!isDeckCalibrated) {
-    tooltipText = t('calibrate_deck_to_proceed_to_next_step')
   } else if (calibrationStatus.reason != null) {
     tooltipText = t(calibrationStatus.reason)
   }
@@ -60,17 +62,19 @@ export function SetupRobotCalibration({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         width="100%"
-        gridGap={SPACING.spacing4}
-        marginY={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
+        marginY={SPACING.spacing16}
       >
-        <SetupDeckCalibration robotName={robotName} runId={runId} />
-        <SetupPipetteCalibration robotName={robotName} runId={runId} />
-        <SetupTipLengthCalibration robotName={robotName} runId={runId} />
+        {!isOT3 ? (
+          <SetupDeckCalibration robotName={robotName} runId={runId} />
+        ) : null}
+        <SetupInstrumentCalibration robotName={robotName} runId={runId} />
+        {!isOT3 ? (
+          <SetupTipLengthCalibration robotName={robotName} runId={runId} />
+        ) : null}
       </Flex>
       <PrimaryButton
-        disabled={
-          !calibrationStatus.complete || !isDeckCalibrated || runHasStarted
-        }
+        disabled={!calibrationStatus.complete || runHasStarted}
         onClick={() => {
           expandStep(nextStep)
           trackEvent({
@@ -79,7 +83,7 @@ export function SetupRobotCalibration({
           })
         }}
         {...targetProps}
-        id={'RobotCalStep_proceedButton'}
+        id="RobotCalStep_proceedButton"
       >
         {t(nextStepButtonKey)}
       </PrimaryButton>

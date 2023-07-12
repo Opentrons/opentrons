@@ -6,9 +6,16 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
+from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
-from .commands import Command, CommandCreate
-from .types import LabwareOffset, LabwareOffsetCreate, LabwareUri, ModuleModel
+from .types import (
+    LabwareOffset,
+    LabwareOffsetCreate,
+    LabwareUri,
+    ModuleModel,
+    Liquid,
+    HexColor,
+)
 from .execution import (
     QueueWorker,
     create_queue_worker,
@@ -28,8 +35,11 @@ from .actions import (
     QueueCommandAction,
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
+    AddLiquidAction,
     AddModuleAction,
     HardwareStoppedAction,
+    ResetTipsAction,
+    SetPipetteMovementSpeedAction,
 )
 
 
@@ -77,7 +87,8 @@ class ProtocolEngine:
             action_dispatcher=self._action_dispatcher,
         )
         self._hardware_stopper = hardware_stopper or HardwareStopper(
-            hardware_api=hardware_api, state_store=state_store
+            hardware_api=hardware_api,
+            state_store=state_store,
         )
         self._door_watcher = door_watcher or DoorWatcher(
             state_store=state_store,
@@ -121,7 +132,7 @@ class ProtocolEngine:
         self._action_dispatcher.dispatch(action)
         self._hardware_api.pause(HardwarePauseType.PAUSE)
 
-    def add_command(self, request: CommandCreate) -> Command:
+    def add_command(self, request: commands.CommandCreate) -> commands.Command:
         """Add a command to the `ProtocolEngine`'s queue.
 
         Arguments:
@@ -137,11 +148,20 @@ class ProtocolEngine:
             RunStoppedError: the run has been stopped, so no new commands
                 may be added.
         """
+        request = slot_standardization.standardize_command(
+            request, self.state_view.config.robot_type
+        )
+
         command_id = self._model_utils.generate_id()
+        request_hash = commands.hash_command_params(
+            create=request,
+            last_hash=self._state_store.commands.get_latest_command_hash(),
+        )
 
         action = self.state_view.commands.validate_action_allowed(
             QueueCommandAction(
                 request=request,
+                request_hash=request_hash,
                 command_id=command_id,
                 created_at=self._model_utils.get_timestamp(),
             )
@@ -150,13 +170,18 @@ class ProtocolEngine:
         return self._state_store.commands.get(command_id)
 
     async def wait_for_command(self, command_id: str) -> None:
-        """Wait for a command to be completed."""
+        """Wait for a command to be completed.
+
+        Will also return if the engine was stopped before it reached the command.
+        """
         await self._state_store.wait_for(
-            self._state_store.commands.get_is_complete,
+            self._state_store.commands.get_command_is_final,
             command_id=command_id,
         )
 
-    async def add_and_execute_command(self, request: CommandCreate) -> Command:
+    async def add_and_execute_command(
+        self, request: commands.CommandCreate
+    ) -> commands.Command:
         """Add a command to the queue and wait for it to complete.
 
         The engine must be started by calling `play` before the command will
@@ -167,7 +192,9 @@ class ProtocolEngine:
                 the command in state.
 
         Returns:
-            The completed command, whether it succeeded or failed.
+            The command. If the command completed, it will be succeeded or failed.
+            If the engine was stopped before it reached the command,
+            the command will be queued.
         """
         command = self.add_command(request)
         await self.wait_for_command(command.id)
@@ -193,7 +220,7 @@ class ProtocolEngine:
             CommandExecutionFailedError: if any protocol command failed.
         """
         await self._state_store.wait_for(
-            condition=self._state_store.commands.get_all_complete
+            condition=self._state_store.commands.get_all_commands_final
         )
 
     async def finish(
@@ -258,6 +285,10 @@ class ProtocolEngine:
 
         To retrieve offsets later, see `.state_view.labware`.
         """
+        request = slot_standardization.standardize_labware_offset(
+            request, self.state_view.config.robot_type
+        )
+
         labware_offset_id = self._model_utils.generate_id()
         created_at = self._model_utils.get_timestamp()
         self._action_dispatcher.dispatch(
@@ -277,6 +308,48 @@ class ProtocolEngine:
             AddLabwareDefinitionAction(definition=definition)
         )
         return self._state_store.labware.get_uri_from_definition(definition)
+
+    def add_liquid(
+        self,
+        name: str,
+        color: Optional[HexColor],
+        description: Optional[str],
+        id: Optional[str] = None,
+    ) -> Liquid:
+        """Add a liquid to the state for subsequent liquid loads."""
+        if id is None:
+            id = self._model_utils.generate_id()
+
+        liquid = Liquid(
+            id=id,
+            displayName=name,
+            description=(description or ""),
+            displayColor=color,
+        )
+
+        self._action_dispatcher.dispatch(AddLiquidAction(liquid=liquid))
+        return liquid
+
+    def reset_tips(self, labware_id: str) -> None:
+        """Reset the tip state of a given labware."""
+        # TODO(mm, 2023-03-10): Safely raise an error if the given labware isn't a
+        # tip rack?
+        self._action_dispatcher.dispatch(ResetTipsAction(labware_id=labware_id))
+
+    # TODO(mm, 2022-11-10): This is a method on ProtocolEngine instead of a command
+    # as a quick hack to support Python protocols. We should consider making this a
+    # command, or adding speed parameters to existing commands.
+    # https://opentrons.atlassian.net/browse/RCORE-373
+    def set_pipette_movement_speed(
+        self, pipette_id: str, speed: Optional[float]
+    ) -> None:
+        """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
+
+        None will use the hardware API's default.
+        """
+        self._action_dispatcher.dispatch(
+            SetPipetteMovementSpeedAction(pipette_id=pipette_id, speed=speed)
+        )
 
     async def use_attached_modules(
         self,

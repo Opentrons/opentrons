@@ -1,17 +1,54 @@
-export const mockHealthResponse = {
+export const mockLegacyHealthResponse = {
   name: 'opentrons-dev',
   api_version: '1.2.3',
   fw_version: '4.5.6',
   system_version: '7.8.9',
+  robot_model: 'OT-2 Standard',
 }
 
-export const mockServerHealthResponse = {
+export const mockOT3HealthResponse = {
+  name: 'opentrons-dev',
+  api_version: '1.2.3',
+  fw_version: '4.5.6',
+  system_version: '7.8.9',
+  robot_model: 'OT-3 Standard',
+}
+
+export const mockOT2HealthResponse = {
+  name: 'opentrons-dev',
+  api_version: '1.2.3',
+  fw_version: '4.5.6',
+  system_version: '7.8.9',
+  robot_model: 'OT-2 Standard',
+}
+
+export const mockLegacyServerHealthResponse = {
   name: 'opentrons-dev',
   apiServerVersion: '1.2.3',
   serialNumber: '12345',
   updateServerVersion: '1.2.3',
   smoothieVersion: '4.5.6',
   systemVersion: '7.8.9',
+}
+
+export const mockOT3ServerHealthResponse = {
+  name: 'opentrons-dev',
+  apiServerVersion: '1.2.3',
+  serialNumber: '12345',
+  updateServerVersion: '1.2.3',
+  smoothieVersion: '4.5.6',
+  systemVersion: '7.8.9',
+  robotModel: 'OT-3 Standard',
+}
+
+export const mockOT2ServerHealthResponse = {
+  name: 'opentrons-dev',
+  apiServerVersion: '1.2.3',
+  serialNumber: '12345',
+  updateServerVersion: '1.2.3',
+  smoothieVersion: '4.5.6',
+  systemVersion: '7.8.9',
+  robotModel: 'OT-2 Standard',
 }
 
 export const mockHealthErrorJsonResponse = {

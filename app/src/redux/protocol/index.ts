@@ -1,5 +1,5 @@
+// TODO(bc, 2023-02-06): This entire branch of the redux store is dead code and can be removed
 // protocol state and loading actions
-import { getFeatureFlags } from '../config/selectors'
 import {
   fileToProtocolFile,
   parseProtocolData,
@@ -38,8 +38,6 @@ export function openProtocol(file: File): ThunkAction {
       type: 'protocol:OPEN',
       payload: { file: protocolFile },
     }
-    const bundlesEnabled =
-      getFeatureFlags(getState())?.enableBundleUpload === true
 
     reader.onload = () => {
       // when we use readAsText below, reader.result will be a string,
@@ -58,7 +56,7 @@ export function openProtocol(file: File): ThunkAction {
       dispatch(uploadAction)
     }
 
-    if (fileIsBundle(protocolFile) && !bundlesEnabled) {
+    if (fileIsBundle(protocolFile)) {
       const invalidFileAction: InvalidProtocolFileAction = {
         type: 'protocol:INVALID_FILE',
         payload: {

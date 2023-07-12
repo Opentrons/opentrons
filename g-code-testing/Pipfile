@@ -7,6 +7,7 @@ name = "pypi"
 opentrons = { editable = true, path = "./../api" }
 notify-server = { editable = true, path = "./../notify-server" }
 robot-server = { editable = true, path = "./../robot-server" }
+server-utils = { editable = true, path = "./../server-utils" }
 opentrons-shared-data = { editable = true, path = "../shared-data/python" }
 opentrons_hardware = { editable = true, path = "../hardware" }
 g-code-testing = { editable = true, path = "." }

@@ -21,6 +21,7 @@ import {
   makeTouchTipHelper,
   pickUpTipHelper,
   SOURCE_LABWARE,
+  AIR_GAP_META,
 } from '../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../utils'
 import type { CreateCommand } from '@opentrons/shared-data'
@@ -1133,6 +1134,7 @@ describe('consolidate single-channel', () => {
         // Air Gap: after aspirating from A1
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -1215,6 +1217,7 @@ describe('consolidate single-channel', () => {
         // Aspirate > air gap: after aspirating from A2
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -1476,6 +1479,7 @@ describe('consolidate single-channel', () => {
         // Aspirate > air gap: after aspirating from A3
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -1627,6 +1631,7 @@ describe('consolidate single-channel', () => {
         // Dispense > air gap in dest well
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -1811,6 +1816,7 @@ describe('consolidate single-channel', () => {
         // Air Gap: after aspirating from A1
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -1893,6 +1899,7 @@ describe('consolidate single-channel', () => {
         // Aspirate > air gap: after aspirating from A2
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2154,6 +2161,7 @@ describe('consolidate single-channel', () => {
         // Aspirate > air gap: after aspirating from A3
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2303,6 +2311,7 @@ describe('consolidate single-channel', () => {
         // Dispense > air gap in dest well
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2487,6 +2496,7 @@ describe('consolidate single-channel', () => {
         // Air Gap: after aspirating from A1
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2569,6 +2579,7 @@ describe('consolidate single-channel', () => {
         // Aspirate > air gap: after aspirating from A2
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2720,6 +2731,7 @@ describe('consolidate single-channel', () => {
         // Change tip is "always" so we can Dispense > Air Gap here
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -2872,6 +2884,7 @@ describe('consolidate single-channel', () => {
         // Aspirate > air gap: after aspirating from A3
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',
@@ -3021,6 +3034,7 @@ describe('consolidate single-channel', () => {
         // Dispense > air gap in dest well
         {
           commandType: 'aspirate',
+          meta: AIR_GAP_META,
           key: expect.any(String),
           params: {
             pipetteId: 'p300SingleId',

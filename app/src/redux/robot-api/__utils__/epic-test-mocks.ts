@@ -52,7 +52,6 @@ export const setupEpicTestMocks = <A = TriggerAction, R = RobotApiResponse>(
     ...triggerAction,
     meta: { ...(triggerAction.meta || {}), ...mockRequestMeta },
   }
-  // @ts-expect-error(sa, 2021-05-17): mockRobot does not have all properties in the return value of getRobotByName
   mockGetRobotByName.mockImplementation((state: State, robotName: string) => {
     expect(state).toBe(mockState)
     expect(robotName).toBe(mockRobot.name)

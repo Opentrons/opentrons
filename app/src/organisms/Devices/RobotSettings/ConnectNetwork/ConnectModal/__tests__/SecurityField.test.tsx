@@ -8,6 +8,8 @@ import * as FormState from '../form-state'
 
 import { LABEL_SECURITY_NONE, LABEL_SECURITY_PSK } from '../../i18n'
 import { SECURITY_NONE, SECURITY_WPA_PSK } from '../../constants'
+import type { ActionMeta } from 'react-select'
+import type { SelectOption } from '@opentrons/components'
 
 jest.mock('../form-state')
 
@@ -112,7 +114,12 @@ describe('ConnectModal SecurityField', () => {
     const wrapper = render()
     const select = wrapper.find(SelectField)
 
-    select.invoke('onValueChange')?.(fieldName, SECURITY_NONE)
+    select.invoke('onValueChange')?.(
+      fieldName,
+      SECURITY_NONE,
+      ('input-change' as unknown) as ActionMeta<SelectOption>
+    )
+
     expect(setValue).toHaveBeenCalledWith(SECURITY_NONE)
   })
 

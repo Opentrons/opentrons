@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, Query, status
 
 from opentrons.protocol_engine import ProtocolEngine, CommandIntent
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
+from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.json_api import (
@@ -20,7 +21,6 @@ from robot_server.service.json_api import (
 from .get_default_engine import get_default_engine, RunActive
 from .stateless_commands import StatelessCommand, StatelessCommandCreate
 
-_DEFAULT_COMMAND_WAIT_MS: Final = 30_000
 _DEFAULT_COMMAND_LIST_LENGTH: Final = 20
 
 
@@ -32,11 +32,12 @@ class CommandNotFound(ErrorDetails):
 
     id: Literal["StatelessCommandNotFound"] = "StatelessCommandNotFound"
     title: str = "Stateless Command Not Found"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
 @commands_router.post(
     path="/commands",
-    summary="Add a command to be executed.",
+    summary="Add a command to be executed",
     description=(
         "Run a single command on the robot. This endpoint is meant for"
         " simple, stateless control of the robot. For complex control,"
@@ -58,14 +59,24 @@ async def create_command(
             " or when the timeout is reached. See the `timeout` query parameter."
         ),
     ),
-    timeout: int = Query(
-        _DEFAULT_COMMAND_WAIT_MS,
+    timeout: Optional[int] = Query(
+        default=None,
         gt=0,
         description=(
-            "If `waitUntilComplete` is true, the maximum time in milliseconds to wait,"
-            " **starting from when the command is queued**, before returning."
-            " If the timeout elapses before the command succeeds or fails,"
+            "If `waitUntilComplete` is `true`,"
+            " the maximum time in milliseconds to wait before returning."
+            " The default is infinite."
+            "\n\n"
+            "The timer starts as soon as you enqueue the new command with this request,"
+            " *not* when the new command starts running. So if there are other commands"
+            " in the queue before the new one, they will also count towards the"
+            " timeout."
+            "\n\n"
+            "If the timeout elapses before the command succeeds or fails,"
             " the command will be returned with its current status."
+            "\n\n"
+            "Compatibility note: on robot software v6.2.0 and older,"
+            " the default was 30 seconds, not infinite."
         ),
     ),
     engine: ProtocolEngine = Depends(get_default_engine),
@@ -85,7 +96,8 @@ async def create_command(
     command = engine.add_command(command_create)
 
     if waitUntilComplete:
-        with move_on_after(timeout / 1000.0):
+        timeout_sec = None if timeout is None else timeout / 1000.0
+        with move_on_after(timeout_sec):
             await engine.wait_for_command(command.id)
 
     response_data = cast(StatelessCommand, engine.state_view.commands.get(command.id))
@@ -167,7 +179,7 @@ async def get_command(
         command = engine.state_view.commands.get(commandId)
 
     except CommandDoesNotExistError as e:
-        raise CommandNotFound(detail=str(e)).as_error(status.HTTP_404_NOT_FOUND) from e
+        raise CommandNotFound.from_exc(e).as_error(status.HTTP_404_NOT_FOUND) from e
 
     return await PydanticResponse.create(
         content=SimpleBody.construct(data=cast(StatelessCommand, command)),

@@ -1,7 +1,7 @@
 from unittest import mock
 
-from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.context.well import WellImplementation
+from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
+from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
 from opentrons.types import Point
 from opentrons.protocol_api import InstrumentContext, labware, MAX_SUPPORTED_VERSION
 from opentrons.protocols.execution.execute_json_v5 import _move_to_well
@@ -12,7 +12,8 @@ def test_move_to_well_with_optional_params():
     instruments = {"somePipetteId": pipette_mock}
 
     well = labware.Well(
-        well_implementation=WellImplementation(
+        parent=None,
+        core=LegacyWellCore(
             well_geometry=WellGeometry(
                 {
                     "shape": "circular",
@@ -26,11 +27,11 @@ def test_move_to_well_with_optional_params():
                 parent_point=Point(10, 20, 30),
                 parent_object=1,
             ),
-            has_tip=False,
             display_name="some well",
+            has_tip=False,
             name="A2",
         ),
-        api_level=MAX_SUPPORTED_VERSION,
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
     mock_get_well = mock.MagicMock(return_value=well, name="mock_get_well")
@@ -65,7 +66,8 @@ def test_move_to_well_without_optional_params():
     instruments = {"somePipetteId": pipette_mock}
 
     well = labware.Well(
-        well_implementation=WellImplementation(
+        parent=None,
+        core=LegacyWellCore(
             well_geometry=WellGeometry(
                 {
                     "shape": "circular",
@@ -79,11 +81,11 @@ def test_move_to_well_without_optional_params():
                 parent_point=Point(10, 20, 30),
                 parent_object=1,
             ),
-            has_tip=False,
             display_name="some well",
+            has_tip=False,
             name="A2",
         ),
-        api_level=MAX_SUPPORTED_VERSION,
+        api_version=MAX_SUPPORTED_VERSION,
     )
 
     mock_get_well = mock.MagicMock(return_value=well, name="mock_get_well")

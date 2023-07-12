@@ -10,17 +10,13 @@ import {
   DIRECTION_COLUMN,
   DISPLAY_FLEX,
   FONT_SIZE_BODY_1,
-  FONT_SIZE_BODY_2,
   FONT_SIZE_HEADER,
   FONT_STYLE_ITALIC,
   FONT_WEIGHT_REGULAR,
   JUSTIFY_FLEX_END,
   SIZE_4,
   SIZE_6,
-  SPACING_2,
-  SPACING_3,
-  SPACING_4,
-  SPACING_AUTO,
+  SPACING,
   useMountEffect,
   BaseModal,
   Btn,
@@ -29,6 +25,7 @@ import {
   Icon,
   SecondaryBtn,
   Text,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import {
@@ -71,12 +68,12 @@ const NOTIFICATIONS_DISABLED_DESCRIPTION = (
 
 const FINISH_UPDATE_INSTRUCTIONS = (
   <>
-    <Text marginBottom={SPACING_3}>
+    <Text marginBottom={SPACING.spacing16}>
       Restart your app to complete the update. Please note the following:
     </Text>
-    <Box as="ol" paddingLeft={SPACING_3}>
+    <Box as="ol" paddingLeft={SPACING.spacing16}>
       <li>
-        <Text marginBottom={SPACING_2}>
+        <Text marginBottom={SPACING.spacing8}>
           After updating the Opentrons App, <strong>update your OT-2</strong> to
           ensure the app and robot software is in sync.
         </Text>
@@ -95,12 +92,12 @@ const SPINNER = (
   <BaseModal
     color={C_WHITE}
     backgroundColor={C_TRANSPARENT}
-    fontSize={FONT_SIZE_BODY_2}
+    fontSize={TYPOGRAPHY.fontSizeH3}
     fontStyle={FONT_STYLE_ITALIC}
   >
     <Flex alignItems={ALIGN_CENTER} flexDirection={DIRECTION_COLUMN}>
       <Icon spin name="ot-spinner" width={SIZE_4} />
-      <Text marginTop={SPACING_4}>{DOWNLOAD_IN_PROGRESS}</Text>
+      <Text marginTop={SPACING.spacing32}>{DOWNLOAD_IN_PROGRESS}</Text>
     </Flex>
   </BaseModal>
 )
@@ -159,7 +156,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
     <BaseModal
       overlayColor="#737373e6"
       maxWidth="38rem"
-      fontSize={FONT_SIZE_BODY_2}
+      fontSize={TYPOGRAPHY.fontSizeH3}
       header={
         <Text
           as="h2"
@@ -168,7 +165,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
           fontSize={FONT_SIZE_HEADER}
           fontWeight={FONT_WEIGHT_REGULAR}
         >
-          <Icon name="alert" width="1em" marginRight={SPACING_2} />
+          <Icon name="alert" width="1em" marginRight={SPACING.spacing8} />
           {updatesIgnored
             ? YOUVE_TURNED_OFF_NOTIFICATIONS
             : `${APP_VERSION} ${version} ${
@@ -184,7 +181,7 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
                 as={InternalLink}
                 to="/more/app"
                 onClick={handleCloseClick}
-                marginRight={SPACING_3}
+                marginRight={SPACING.spacing16}
               >
                 {VIEW_APP_SOFTWARE_SETTINGS}
               </SecondaryBtn>
@@ -195,14 +192,17 @@ export function UpdateAppModal(props: UpdateAppModalProps): JSX.Element {
               {dismissAlert != null && !downloaded ? (
                 <Btn
                   color={C_BLUE}
-                  marginRight={SPACING_AUTO}
+                  marginRight={SPACING.spacingAuto}
                   fontSize={FONT_SIZE_BODY_1}
                   onClick={() => setUpdatesIgnored(true)}
                 >
                   {TURN_OFF_UPDATE_NOTIFICATIONS}
                 </Btn>
               ) : null}
-              <SecondaryBtn marginRight={SPACING_3} onClick={handleCloseClick}>
+              <SecondaryBtn
+                marginRight={SPACING.spacing16}
+                onClick={handleCloseClick}
+              >
                 {NOT_NOW}
               </SecondaryBtn>
               <SecondaryBtn onClick={handleUpdateClick}>

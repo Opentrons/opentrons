@@ -11,10 +11,13 @@ on:
       - 'hardware/**/*'
       - 'Makefile'
       - 'shared-data/**/*'
+      - 'server-utils/**/*'
       - '!shared-data/js/**/*'
       - 'robot-server/**/*'
       - 'notify-server/**/*'
-      - '.github/workflows/robot-server-test-lint.yaml'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
+      - '.github/workflows/robot-server-lint-test.yaml'
       - '.github/actions/python/**'
     branches:
       - 'edge'
@@ -28,10 +31,19 @@ on:
       - 'hardware/**/*'
       - 'Makefile'
       - 'shared-data/**/*'
+      - 'server-utils/**/*'
       - '!shared-data/js/**/*'
       - 'robot-server/**/*'
       - 'notify-server/**/*'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
+      - '.github/workflows/robot-server-lint-test.yaml'
+      - '.github/actions/python/**'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
 
 defaults:
   run:
@@ -41,16 +53,18 @@ jobs:
   lint-test:
     name: 'robot server package linting and tests'
     timeout-minutes: 20
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     strategy:
       matrix:
         with-ot-hardware: ['true', 'false']
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
         with:
-          node-version: '14'
-      - uses: 'actions/setup-python@v2'
+          fetch-depth: 0
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+      - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.7'
 
@@ -62,12 +76,16 @@ jobs:
         run: make -C robot-server setup-ot2
       - name: Lint
         run: make -C robot-server lint
-      - name: Test
+      - if: ${{ matrix.with-ot-hardware == 'false' }}
+        name: Test without opentrons_hardware
+        run: make -C robot-server test-cov test_opts="-m 'not ot3_only'"
+      - if: ${{ matrix.with-ot-hardware == 'true' }}
+        name: Test with opentrons_hardware
         run: make -C robot-server test-cov
       - name: Ensure assets build
         run: make -C robot-server sdist wheel
       - name: Upload coverage report
-        uses: 'codecov/codecov-action@v2'
+        uses: 'codecov/codecov-action@v3'
         with:
           files: ./robot-server/coverage.xml
           flags: robot-server

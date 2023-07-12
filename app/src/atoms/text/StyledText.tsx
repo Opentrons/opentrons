@@ -1,30 +1,90 @@
 import * as React from 'react'
-import { Text, TYPOGRAPHY } from '@opentrons/components'
-import styled, { FlattenSimpleInterpolation } from 'styled-components'
+import styled, { FlattenSimpleInterpolation, css } from 'styled-components'
+import { Text, TYPOGRAPHY, RESPONSIVENESS } from '@opentrons/components'
 
 export interface Props extends React.ComponentProps<typeof Text> {
   children: React.ReactNode
 }
 
 const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
-  h1: TYPOGRAPHY.h1Default,
-  h2: TYPOGRAPHY.h2Regular,
-  h3: TYPOGRAPHY.h3Regular,
+  h1: css`
+    ${TYPOGRAPHY.h1Default};
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      ${TYPOGRAPHY.level1Header};
+    }
+  `,
+  h2: css`
+    ${TYPOGRAPHY.h2Regular}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      ${TYPOGRAPHY.level2HeaderRegular};
+    }
+  `,
+  h3: css`
+    ${TYPOGRAPHY.h3Regular}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      ${TYPOGRAPHY.level3HeaderRegular};
+    }
+  `,
+  h4: css`
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      ${TYPOGRAPHY.level4HeaderRegular};
+    }
+  `,
   h6: TYPOGRAPHY.h6Default,
-  p: TYPOGRAPHY.pRegular,
-  label: TYPOGRAPHY.labelRegular,
-  h2SemiBold: TYPOGRAPHY.h2SemiBold,
-  h3SemiBold: TYPOGRAPHY.h3SemiBold,
+  p: css`
+    ${TYPOGRAPHY.pRegular}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      ${TYPOGRAPHY.bodyTextRegular}
+    }
+  `,
+  label: css`
+    ${TYPOGRAPHY.labelRegular}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      ${TYPOGRAPHY.smallBodyTextRegular}
+    }
+  `,
+  h2SemiBold: css`
+    ${TYPOGRAPHY.h2SemiBold}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      ${TYPOGRAPHY.level2HeaderSemiBold}
+    }
+  `,
+  h3SemiBold: css`
+    ${TYPOGRAPHY.h3SemiBold}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      ${TYPOGRAPHY.level3HeaderSemiBold}
+    }
+  `,
+  h4SemiBold: TYPOGRAPHY.level4HeaderSemiBold,
   h6SemiBold: TYPOGRAPHY.h6SemiBold,
-  pSemiBold: TYPOGRAPHY.pSemiBold,
-  labelSemiBold: TYPOGRAPHY.labelSemiBold,
+  pSemiBold: css`
+    ${TYPOGRAPHY.pSemiBold}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      ${TYPOGRAPHY.bodyTextSemiBold}
+    }
+  `,
+  labelSemiBold: css`
+    ${TYPOGRAPHY.labelSemiBold}
+    @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+      font-size: ${TYPOGRAPHY.fontSize20};
+      line-height: ${TYPOGRAPHY.lineHeight24};
+    }
+  `,
+  h2Bold: TYPOGRAPHY.level2HeaderBold,
+  h3Bold: TYPOGRAPHY.level3HeaderBold,
+  h4Bold: TYPOGRAPHY.level4HeaderBold,
+  pBold: TYPOGRAPHY.bodyTextBold,
+  labelBold: TYPOGRAPHY.smallBodyTextBold,
 }
 
 export const StyledText = styled(Text)<Props>`
-  ${props =>
-    styleMap[
-      `${String(props.as)}${
-        props.fontWeight === TYPOGRAPHY.fontWeightSemiBold ? 'SemiBold' : ''
-      }`
-    ]}
+  ${props => {
+    let fontWeight = ''
+    if (props.fontWeight === TYPOGRAPHY.fontWeightSemiBold) {
+      fontWeight = 'SemiBold'
+    } else if (props.fontWeight === TYPOGRAPHY.fontWeightBold) {
+      fontWeight = 'Bold'
+    }
+    return styleMap[`${props.as}${fontWeight}`]
+  }}
 `

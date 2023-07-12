@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Formik, FormikProps } from 'formik'
 import { format } from 'date-fns'
+import cx from 'classnames'
 
 import {
   Card,
@@ -8,21 +9,22 @@ import {
   InputField,
   InstrumentGroup,
   OutlineButton,
-  PrimaryButton,
+  DeprecatedPrimaryButton,
 } from '@opentrons/components'
-import cx from 'classnames'
 import { i18n } from '../localization'
 import { resetScrollElements } from '../ui/steps/utils'
 import { Portal } from './portals/MainPageModalPortal'
 import { EditPipettesModal } from './modals/EditPipettesModal'
 import { EditModulesCard } from './modules'
 import { EditModules } from './EditModules'
+
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
-import { ModuleType } from '@opentrons/shared-data'
-import { FileMetadataFields } from '../file-data'
-import { ModulesForEditModulesCard } from '../step-forms'
+
+import type { ModuleType } from '@opentrons/shared-data'
+import type { FileMetadataFields } from '../file-data'
+import type { ModulesForEditModulesCard } from '../step-forms'
 
 export interface Props {
   formValues: FileMetadataFields
@@ -179,13 +181,13 @@ export class FilePage extends React.Component<Props, State> {
           <div className={styles.card_content}>
             <InstrumentGroup {...instruments} showMountLabel />
             <div className={styles.pipette_button_row}>
-              <PrimaryButton
+              <DeprecatedPrimaryButton
                 onClick={this.openEditPipetteModal}
                 className={styles.edit_button}
                 name={'editPipettes'}
               >
                 {i18n.t('button.edit')}
-              </PrimaryButton>
+              </DeprecatedPrimaryButton>
               <OutlineButton
                 onClick={swapPipettes}
                 className={styles.swap_button}
@@ -204,14 +206,14 @@ export class FilePage extends React.Component<Props, State> {
         />
 
         <div className={modalStyles.button_row}>
-          <PrimaryButton
+          <DeprecatedPrimaryButton
             onClick={goToNextPage}
             className={styles.continue_button}
             iconName="arrow-right"
             name={'continueToLiquids'}
           >
             {i18n.t('button.continue_to_liquids')}
-          </PrimaryButton>
+          </DeprecatedPrimaryButton>
         </div>
 
         <Portal>

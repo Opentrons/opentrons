@@ -36,7 +36,24 @@
   },
   "displayName": "Thermocycler Module GEN2",
   "quirks": [],
-  "slotTransforms": {},
+  "slotTransforms": {
+    "ot3_standard": {
+      "B1": {
+        "labwareOffset": [
+          [1, 0, 0, -20.005],
+          [0, 1, 0, -0.1],
+          [0, 0, 1, -98],
+          [0, 0, 0, 1]
+        ],
+        "cornerOffsetFromSlot": [
+          [1, 0, 0, -20.005],
+          [0, 1, 0, -0.1],
+          [0, 0, 1, -98],
+          [0, 0, 0, 1]
+        ]
+      }
+    }
+  },
   "compatibleWith": [],
   "twoDimensionalRendering": {
     "name": "svg",

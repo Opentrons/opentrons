@@ -1,6 +1,10 @@
 import React from 'react'
 import { shallow } from 'enzyme'
-import { PrimaryButton, OutlineButton, Tooltip } from '@opentrons/components'
+import {
+  DeprecatedPrimaryButton,
+  OutlineButton,
+  Tooltip,
+} from '@opentrons/components'
 import { i18n } from '../../../localization'
 import {
   BatchEditMoveLiquid,
@@ -37,7 +41,7 @@ describe('BatchEditMoveLiquid', () => {
       const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
 
       const saveButton = wrapper
-        .find(PrimaryButton)
+        .find(DeprecatedPrimaryButton)
         .filterWhere(el => el.prop('children') === saveButtonText)
 
       expect(saveButton.prop('disabled')).toBe(false)
@@ -57,7 +61,7 @@ describe('BatchEditMoveLiquid', () => {
       const wrapper = shallow(<BatchEditMoveLiquid {...props} />)
 
       const saveButton = wrapper
-        .find(PrimaryButton)
+        .find(DeprecatedPrimaryButton)
         .filterWhere(el => el.prop('children') === saveButtonText)
 
       expect(saveButton.prop('disabled')).toBe(true)

@@ -4,29 +4,36 @@ import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 import { QueryClient, QueryClientProvider } from 'react-query'
+import { useCalibrationStatusQuery } from '@opentrons/react-api-client'
 
 import {
-  fetchCalibrationStatus,
-  getDeckCalibrationData,
+  DECK_CAL_STATUS_OK,
+  DECK_CAL_STATUS_BAD_CALIBRATION,
+  DECK_CAL_STATUS_IDENTITY,
 } from '../../../../redux/calibration'
+import { getDiscoverableRobotByName } from '../../../../redux/discovery'
 import { mockDeckCalData } from '../../../../redux/calibration/__fixtures__'
 import { useDispatchApiRequest } from '../../../../redux/robot-api'
 
 import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
 import { useDeckCalibrationData } from '..'
+import { mockConnectableRobot } from '../../../../redux/discovery/__fixtures__'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../redux/calibration')
 jest.mock('../../../../redux/robot-api')
+jest.mock('../../../../redux/discovery')
 
-const mockFetchCalibrationStatus = fetchCalibrationStatus as jest.MockedFunction<
-  typeof fetchCalibrationStatus
+const mockGetDiscoverableRobotByName = getDiscoverableRobotByName as jest.MockedFunction<
+  typeof getDiscoverableRobotByName
 >
-const mockGetDeckCalibrationData = getDeckCalibrationData as jest.MockedFunction<
-  typeof getDeckCalibrationData
->
+
 const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
   typeof useDispatchApiRequest
+>
+const mockUseCalibrationStatusQuery = useCalibrationStatusQuery as jest.MockedFunction<
+  typeof useCalibrationStatusQuery
 >
 
 const store: Store<any> = createStore(jest.fn(), {})
@@ -52,9 +59,18 @@ describe('useDeckCalibrationData hook', () => {
   })
 
   it('returns no deck calibration data when given a null robot name', () => {
-    when(mockGetDeckCalibrationData)
-      .calledWith(undefined as any, null)
-      .mockReturnValue(null)
+    when(mockUseCalibrationStatusQuery)
+      .calledWith({}, null)
+      .mockReturnValue({
+        data: {
+          data: {
+            deckCalibration: {
+              data: mockDeckCalData,
+              status: DECK_CAL_STATUS_IDENTITY,
+            },
+          },
+        },
+      } as any)
 
     const { result } = renderHook(() => useDeckCalibrationData(null), {
       wrapper,
@@ -63,14 +79,26 @@ describe('useDeckCalibrationData hook', () => {
     expect(result.current).toEqual({
       deckCalibrationData: null,
       isDeckCalibrated: false,
+      markedBad: false,
     })
     expect(dispatchApiRequest).not.toBeCalled()
   })
 
   it('returns deck calibration data when given a robot name', () => {
-    when(mockGetDeckCalibrationData)
+    when(mockGetDiscoverableRobotByName)
       .calledWith(undefined as any, 'otie')
-      .mockReturnValue(mockDeckCalData)
+      .mockReturnValue(mockConnectableRobot)
+
+    when(mockUseCalibrationStatusQuery)
+      .calledWith({}, { hostname: mockConnectableRobot.ip })
+      .mockReturnValue({
+        data: {
+          deckCalibration: {
+            data: mockDeckCalData,
+            status: DECK_CAL_STATUS_OK,
+          },
+        },
+      } as any)
 
     const { result } = renderHook(() => useDeckCalibrationData('otie'), {
       wrapper,
@@ -79,9 +107,33 @@ describe('useDeckCalibrationData hook', () => {
     expect(result.current).toEqual({
       deckCalibrationData: mockDeckCalData,
       isDeckCalibrated: true,
+      markedBad: false,
     })
-    expect(dispatchApiRequest).toBeCalledWith(
-      mockFetchCalibrationStatus('otie')
-    )
+  })
+
+  it('returns markedBad deck calibration data when given a failed status', () => {
+    when(mockGetDiscoverableRobotByName)
+      .calledWith(undefined as any, 'otie')
+      .mockReturnValue(mockConnectableRobot)
+    when(mockUseCalibrationStatusQuery)
+      .calledWith({}, { hostname: mockConnectableRobot.ip })
+      .mockReturnValue({
+        data: {
+          deckCalibration: {
+            data: mockDeckCalData,
+            status: DECK_CAL_STATUS_BAD_CALIBRATION,
+          },
+        },
+      } as any)
+
+    const { result } = renderHook(() => useDeckCalibrationData('otie'), {
+      wrapper,
+    })
+
+    expect(result.current).toEqual({
+      deckCalibrationData: mockDeckCalData,
+      isDeckCalibrated: false,
+      markedBad: true,
+    })
   })
 })

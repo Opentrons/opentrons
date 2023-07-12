@@ -1,7 +1,11 @@
 // discovery client reducer
 import {
-  mockHealthResponse,
-  mockServerHealthResponse,
+  mockLegacyHealthResponse,
+  mockLegacyServerHealthResponse,
+  mockOT3ServerHealthResponse,
+  mockOT2HealthResponse,
+  mockOT2ServerHealthResponse,
+  mockOT3HealthResponse,
   mockHealthErrorJsonResponse,
   mockHealthFetchErrorResponse,
 } from '../../__fixtures__/health'
@@ -29,6 +33,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
     }
     const action = Actions.initializeState({})
@@ -48,6 +53,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
     }
 
@@ -55,8 +61,8 @@ describe('hostsByIp reducer', () => {
       initialRobots: [
         {
           name: 'opentrons-1',
-          health: mockHealthResponse,
-          serverHealth: mockServerHealthResponse,
+          health: mockLegacyHealthResponse,
+          serverHealth: mockLegacyServerHealthResponse,
           addresses: [
             {
               ip: '127.0.0.2',
@@ -66,13 +72,14 @@ describe('hostsByIp reducer', () => {
               serverHealthStatus: null,
               healthError: null,
               serverHealthError: null,
+              advertisedModel: null,
             },
           ],
         },
         {
           name: 'opentrons-2',
           health: null,
-          serverHealth: mockServerHealthResponse,
+          serverHealth: mockOT3ServerHealthResponse,
           addresses: [
             {
               ip: '127.0.0.3',
@@ -82,6 +89,7 @@ describe('hostsByIp reducer', () => {
               serverHealthStatus: Constants.HEALTH_STATUS_NOT_OK,
               healthError: mockHealthErrorJsonResponse,
               serverHealthError: mockHealthErrorJsonResponse,
+              advertisedModel: 'OT-3 Standard',
             },
             {
               ip: '127.0.0.4',
@@ -91,12 +99,13 @@ describe('hostsByIp reducer', () => {
               serverHealthStatus: Constants.HEALTH_STATUS_UNREACHABLE,
               healthError: mockHealthFetchErrorResponse,
               serverHealthError: mockHealthFetchErrorResponse,
+              advertisedModel: 'OT-3 Standard',
             },
           ],
         },
         {
           name: 'opentrons-3',
-          health: mockHealthResponse,
+          health: mockOT2HealthResponse,
           serverHealth: null,
           addresses: [],
         },
@@ -114,6 +123,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-1',
+        advertisedModel: null,
       },
       '127.0.0.3': {
         ip: '127.0.0.3',
@@ -124,6 +134,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-2',
+        advertisedModel: 'OT-3 Standard',
       },
       '127.0.0.4': {
         ip: '127.0.0.4',
@@ -134,6 +145,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-2',
+        advertisedModel: 'OT-3 Standard',
       },
     })
   })
@@ -143,6 +155,7 @@ describe('hostsByIp reducer', () => {
       name: 'opentrons-dev',
       ip: '127.0.0.1',
       port: 31950,
+      robotModel: null,
     })
     const initialState = {}
 
@@ -156,6 +169,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
     })
   })
@@ -165,6 +179,7 @@ describe('hostsByIp reducer', () => {
       name: 'opentrons-dev',
       ip: '127.0.0.1',
       port: 31950,
+      robotModel: 'OT-3 Standard',
     })
     const initialState = {
       '127.0.0.1': {
@@ -176,6 +191,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
     }
     const nextState = hostsByIpReducer(initialState, action)
@@ -190,6 +206,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: 'OT-3 Standard',
       },
     })
   })
@@ -199,6 +216,7 @@ describe('hostsByIp reducer', () => {
       name: 'opentrons-dev',
       ip: '127.0.0.1',
       port: 31950,
+      robotModel: 'OT-2 Standard',
     })
     const initialState = {
       '127.0.0.1': {
@@ -210,6 +228,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: mockHealthErrorJsonResponse,
         robotName: 'opentrons-dev',
+        advertisedModel: 'OT-2 Standard',
       },
     }
     const nextState = hostsByIpReducer(initialState, action)
@@ -223,6 +242,7 @@ describe('hostsByIp reducer', () => {
       name: 'opentrons-dev',
       ip: '127.0.0.1',
       port: 31950,
+      robotModel: null,
     })
     const initialState = {
       '127.0.0.1': {
@@ -234,6 +254,7 @@ describe('hostsByIp reducer', () => {
         healthError: mockHealthErrorJsonResponse,
         serverHealthError: mockHealthErrorJsonResponse,
         robotName: 'opentrons-old-dev',
+        advertisedModel: null,
       },
     }
     const nextState = hostsByIpReducer(initialState, action)
@@ -248,6 +269,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
     })
   })
@@ -256,8 +278,8 @@ describe('hostsByIp reducer', () => {
     const action = Actions.healthPolled({
       ip: '127.0.0.1',
       port: 31950,
-      health: mockHealthResponse,
-      serverHealth: mockServerHealthResponse,
+      health: mockOT2HealthResponse,
+      serverHealth: mockOT2ServerHealthResponse,
       healthError: null,
       serverHealthError: null,
     })
@@ -274,6 +296,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
     })
   })
@@ -282,8 +305,8 @@ describe('hostsByIp reducer', () => {
     const action = Actions.healthPolled({
       ip: '127.0.0.1',
       port: 31950,
-      health: mockHealthResponse,
-      serverHealth: mockServerHealthResponse,
+      health: mockOT2HealthResponse,
+      serverHealth: mockOT2ServerHealthResponse,
       healthError: null,
       serverHealthError: null,
     })
@@ -297,6 +320,7 @@ describe('hostsByIp reducer', () => {
         healthError: mockHealthFetchErrorResponse,
         serverHealthError: mockHealthFetchErrorResponse,
         robotName: 'opentrons-dev',
+        advertisedModel: 'OT-2 Standard',
       },
     }
     const nextState = hostsByIpReducer(initialState, action)
@@ -311,6 +335,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: 'OT-2 Standard',
       },
     })
   })
@@ -319,8 +344,8 @@ describe('hostsByIp reducer', () => {
     const action = Actions.healthPolled({
       ip: '127.0.0.1',
       port: 31950,
-      health: mockHealthResponse,
-      serverHealth: mockServerHealthResponse,
+      health: mockOT3HealthResponse,
+      serverHealth: mockOT3ServerHealthResponse,
       healthError: null,
       serverHealthError: null,
     })
@@ -334,6 +359,7 @@ describe('hostsByIp reducer', () => {
         healthError: mockHealthFetchErrorResponse,
         serverHealthError: mockHealthFetchErrorResponse,
         robotName: 'not-opentrons-dev',
+        advertisedModel: 'OT-3 Standard',
       },
     }
     const nextState = hostsByIpReducer(initialState, action)
@@ -348,6 +374,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: 'OT-3 Standard',
       },
     })
   })
@@ -356,8 +383,8 @@ describe('hostsByIp reducer', () => {
     const action = Actions.healthPolled({
       ip: '127.0.0.1',
       port: 31950,
-      health: mockHealthResponse,
-      serverHealth: mockServerHealthResponse,
+      health: mockOT2HealthResponse,
+      serverHealth: mockOT2ServerHealthResponse,
       healthError: null,
       serverHealthError: null,
     })
@@ -371,6 +398,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
     }
     const nextState = hostsByIpReducer(initialState, action)
@@ -397,6 +425,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: 'OT-3 Standard',
       },
     }
     const nextState = hostsByIpReducer(initialState, action)
@@ -411,6 +440,7 @@ describe('hostsByIp reducer', () => {
         healthError: mockHealthFetchErrorResponse,
         serverHealthError: mockHealthFetchErrorResponse,
         robotName: 'opentrons-dev',
+        advertisedModel: 'OT-3 Standard',
       },
     })
   })
@@ -419,8 +449,8 @@ describe('hostsByIp reducer', () => {
     const action = Actions.healthPolled({
       ip: '127.0.0.1',
       port: 31950,
-      health: mockHealthResponse,
-      serverHealth: mockServerHealthResponse,
+      health: mockOT2HealthResponse,
+      serverHealth: mockOT2ServerHealthResponse,
       healthError: null,
       serverHealthError: null,
     })
@@ -434,6 +464,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
       '127.0.0.3': {
         ip: '127.0.0.3',
@@ -444,6 +475,7 @@ describe('hostsByIp reducer', () => {
         healthError: mockHealthErrorJsonResponse,
         serverHealthError: mockHealthErrorJsonResponse,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
       '127.0.0.4': {
         ip: '127.0.0.4',
@@ -454,6 +486,7 @@ describe('hostsByIp reducer', () => {
         healthError: mockHealthFetchErrorResponse,
         serverHealthError: mockHealthFetchErrorResponse,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
       '127.0.0.5': {
         ip: '127.0.0.5',
@@ -464,6 +497,7 @@ describe('hostsByIp reducer', () => {
         healthError: mockHealthFetchErrorResponse,
         serverHealthError: mockHealthFetchErrorResponse,
         robotName: 'opentrons-other',
+        advertisedModel: null,
       },
     }
     const nextState = hostsByIpReducer(initialState, action)
@@ -478,6 +512,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
       '127.0.0.2': {
         ip: '127.0.0.2',
@@ -488,6 +523,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
       '127.0.0.3': {
         ip: '127.0.0.3',
@@ -498,6 +534,7 @@ describe('hostsByIp reducer', () => {
         healthError: mockHealthErrorJsonResponse,
         serverHealthError: mockHealthErrorJsonResponse,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
       '127.0.0.5': {
         ip: '127.0.0.5',
@@ -508,6 +545,7 @@ describe('hostsByIp reducer', () => {
         healthError: mockHealthFetchErrorResponse,
         serverHealthError: mockHealthFetchErrorResponse,
         robotName: 'opentrons-other',
+        advertisedModel: null,
       },
     })
   })
@@ -524,6 +562,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
     }
     const nextState = hostsByIpReducer(initialState, action)
@@ -543,6 +582,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
       '127.0.0.2': {
         ip: '127.0.0.2',
@@ -553,6 +593,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-dev',
+        advertisedModel: null,
       },
       '127.0.0.3': {
         ip: '127.0.0.3',
@@ -563,6 +604,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-other',
+        advertisedModel: null,
       },
     }
     const nextState = hostsByIpReducer(initialState, action)
@@ -577,6 +619,7 @@ describe('hostsByIp reducer', () => {
         healthError: null,
         serverHealthError: null,
         robotName: 'opentrons-other',
+        advertisedModel: null,
       },
     })
   })

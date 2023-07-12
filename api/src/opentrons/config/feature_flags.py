@@ -26,11 +26,25 @@ def disable_fast_protocol_upload() -> bool:
 
 
 def enable_ot3_hardware_controller() -> bool:
-    """Get whether to use the ot3 hardware controller."""
+    """Get whether to use the OT-3 hardware controller."""
 
     return advs.get_setting_with_env_overload("enableOT3HardwareController")
 
 
-def enable_heater_shaker_python_api() -> bool:
-    """Get whether to use the Heater-Shaker python API."""
-    return advs.get_setting_with_env_overload("enableHeaterShakerPAPI")
+def rear_panel_integration() -> bool:
+    """Whether to enable usb connected rear_panel for the OT-3."""
+
+    return advs.get_setting_with_env_overload("rearPanelIntegration")
+
+
+def stall_detection_enabled() -> bool:
+    return not advs.get_setting_with_env_overload("disableStallDetection")
+
+
+def overpressure_detection_enabled() -> bool:
+    return not advs.get_setting_with_env_overload("disableOverpressureDetection")
+
+
+def status_bar_enabled() -> bool:
+    """Whether the status bar is enabled."""
+    return not advs.get_setting_with_env_overload("disableStatusBar")

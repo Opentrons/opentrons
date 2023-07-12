@@ -1,5 +1,5 @@
 """Public protocol run data models."""
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
 
@@ -10,6 +10,7 @@ from ..types import (
     LabwareOffset,
     LoadedModule,
     LoadedPipette,
+    Liquid,
 )
 
 
@@ -24,3 +25,4 @@ class StateSummary(BaseModel):
     labwareOffsets: List[LabwareOffset]
     startedAt: Optional[datetime]
     completedAt: Optional[datetime]
+    liquids: List[Liquid] = Field(default_factory=list)

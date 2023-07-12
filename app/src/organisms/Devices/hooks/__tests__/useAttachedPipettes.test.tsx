@@ -4,7 +4,7 @@ import { UseQueryResult } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
 import { usePipettesQuery } from '@opentrons/react-api-client'
 import { getPipetteModelSpecs, PipetteModelSpecs } from '@opentrons/shared-data'
-import { useAttachedPipettes } from '..'
+import { useAttachedPipettes } from '../useAttachedPipettes'
 import {
   pipetteResponseFixtureLeft,
   pipetteResponseFixtureRight,
@@ -35,7 +35,7 @@ describe('useAttachedPipettes hook', () => {
 
   it('returns attached pipettes', () => {
     when(mockUsePipettesQuery)
-      .calledWith()
+      .calledWith({}, {})
       .mockReturnValue({
         data: {
           left: pipetteResponseFixtureLeft,
@@ -44,6 +44,29 @@ describe('useAttachedPipettes hook', () => {
       } as UseQueryResult<FetchPipettesResponseBody, unknown>)
 
     const { result } = renderHook(() => useAttachedPipettes(), {
+      wrapper,
+    })
+
+    expect(result.current).toEqual({
+      left: { ...pipetteResponseFixtureLeft, modelSpecs: { name: 'mockName' } },
+      right: {
+        ...pipetteResponseFixtureRight,
+        modelSpecs: { name: 'mockName' },
+      },
+    })
+  })
+
+  it('returns attached pipettes polled every 5 seconds if poll true', () => {
+    when(mockUsePipettesQuery)
+      .calledWith({}, { refetchInterval: 5000 })
+      .mockReturnValue({
+        data: {
+          left: pipetteResponseFixtureLeft,
+          right: pipetteResponseFixtureRight,
+        },
+      } as UseQueryResult<FetchPipettesResponseBody, unknown>)
+
+    const { result } = renderHook(() => useAttachedPipettes(true), {
       wrapper,
     })
 

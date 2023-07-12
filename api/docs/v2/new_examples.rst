@@ -1,3 +1,5 @@
+:og:description: Useful code snippets for working with Opentrons robots.
+
 .. _new-examples:
 
 ########

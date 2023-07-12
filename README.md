@@ -41,7 +41,7 @@ Easily upload a protocol, calibrate positions, and run your experiment from your
 Easily create a protocol to run on your robot with this graphical tool.
 
 - [Access Here](https://designer.opentrons.com/)
-- [Documentation](https://support.opentrons.com/en/collections/493886-protocol-designer)
+- [Documentation](https://support.opentrons.com/s/protocol-designer)
 - [Source code](./protocol-designer)
 
 ## Contributing

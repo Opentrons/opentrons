@@ -119,24 +119,6 @@ describe('ViewUpdateModal', () => {
     expect(handleProceed).toHaveBeenCalled()
   })
 
-  it('should proceed straight to update if downgrade', () => {
-    getBuildrootUpdateInfo.mockReturnValue({
-      releaseNotes: 'hey look a release',
-    })
-
-    render(Buildroot.DOWNGRADE)
-    expect(handleProceed).toHaveBeenCalled()
-  })
-
-  it('should proceed straight to update if reinstall', () => {
-    getBuildrootUpdateInfo.mockReturnValue({
-      releaseNotes: 'hey look a release',
-    })
-
-    render(Buildroot.REINSTALL)
-    expect(handleProceed).toHaveBeenCalled()
-  })
-
   it('should show a MigrationWarningModal if the robot is on Balena', () => {
     const { wrapper } = render(Buildroot.UPGRADE, Buildroot.BALENA)
     const migrationWarning = wrapper.find(MigrationWarningModal)

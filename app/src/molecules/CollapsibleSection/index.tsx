@@ -8,17 +8,18 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   StyleProps,
+  COLORS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 
-// Note hex codes will be replaced when PR-10664 is merged into release-6.0.0
 const ACCORDION_STYLE = css`
   border-radius: 50%;
   &:hover {
-    background: #16212d26;
+    background: ${COLORS.lightGreyHover};
   }
   &:active {
-    background: #16212d40;
+    background: ${COLORS.lightGreyPressed};
   }
 `
 
@@ -42,7 +43,9 @@ export function CollapsibleSection(
           cursor: 'pointer',
         }}
       >
-        <StyledText as="p">{title}</StyledText>
+        <StyledText as="p" textTransform={TYPOGRAPHY.textTransformCapitalize}>
+          {title}
+        </StyledText>
         <Btn
           onClick={() => setIsExpanded(!isExpanded)}
           data-testid={
@@ -52,7 +55,7 @@ export function CollapsibleSection(
           }
         >
           <Icon
-            size={'1.5rem'}
+            size="1.5rem"
             name={isExpanded ? 'minus' : 'plus'}
             css={ACCORDION_STYLE}
           />

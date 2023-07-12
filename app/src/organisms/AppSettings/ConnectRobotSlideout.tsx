@@ -12,12 +12,12 @@ import {
   COLORS,
   Icon,
   Link,
+  PrimaryButton,
 } from '@opentrons/components'
 
 import { ManualIpHostnameForm } from './ManualIpHostnameForm'
 import { ManualIpHostnameList } from './ManualIpHostnameList'
 import { Slideout } from '../../atoms/Slideout'
-import { PrimaryButton } from '../../atoms/buttons'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
@@ -52,8 +52,7 @@ export function ConnectRobotSlideout({
     return (
       <Link
         role="button"
-        css={TYPOGRAPHY.pSemiBold}
-        color={COLORS.blue}
+        css={TYPOGRAPHY.linkPSemiBold}
         onClick={refreshDiscovery}
         id="AppSettings_Connection_Button"
         textTransform={TYPOGRAPHY.textTransformCapitalize}
@@ -79,7 +78,7 @@ export function ConnectRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing3}>
+        <StyledText as="p" marginBottom={SPACING.spacing8}>
           {t('ip_description_first')}
         </StyledText>
         <StyledText as="p">{t('ip_description_second')}</StyledText>
@@ -87,27 +86,27 @@ export function ConnectRobotSlideout({
           href={SUPPORT_PAGE_LINK}
           css={TYPOGRAPHY.pSemiBold}
           id="ConnectIPAddressSupportPage"
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
         >
           {t('connect_ip_link')}
         </ExternalLink>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
           {t('add_ip_hostname')}
         </StyledText>
         <ManualIpHostnameForm setMostRecentAddition={setMostRecentAddition} />
 
         <Flex
-          marginTop={SPACING.spacing5}
-          marginBottom={SPACING.spacing4}
+          marginTop={SPACING.spacing24}
+          marginBottom={SPACING.spacing16}
           justifyContent={ALIGN_FLEX_END}
         >
-          {isScanning ? (
+          {Boolean(isScanning) ? (
             <Flex flexDirection={DIRECTION_ROW}>
               <StyledText
                 as="p"
                 color={COLORS.darkGreyEnabled}
-                marginRight={SPACING.spacing3}
+                marginRight={SPACING.spacing8}
               >
                 {t('searching')}
               </StyledText>{' '}
@@ -120,11 +119,11 @@ export function ConnectRobotSlideout({
                   <StyledText
                     as="p"
                     color={COLORS.darkGreyEnabled}
-                    margin={`0 ${SPACING.spacing2}`}
+                    marginX={SPACING.spacing4}
                   >
                     {t('discovery_timeout')}
                   </StyledText>
-                  {displayLinkButton(t('try_again'))}
+                  {displayLinkButton(t('shared:try_again'))}
                 </>
               ) : (
                 displayLinkButton(t('shared:refresh'))

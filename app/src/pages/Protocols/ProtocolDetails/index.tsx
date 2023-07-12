@@ -9,10 +9,10 @@ import {
 import { ProtocolDetails as ProtocolDetailsContents } from '../../../organisms/ProtocolDetails'
 
 import type { Dispatch, State } from '../../../redux/types'
-import type { NavRouteParams } from '../../../App/types'
+import type { DesktopRouteParams } from '../../../App/types'
 
 export function ProtocolDetails(): JSX.Element {
-  const { protocolKey } = useParams<NavRouteParams>()
+  const { protocolKey } = useParams<DesktopRouteParams>()
 
   const dispatch = useDispatch<Dispatch>()
   const storedProtocol = useSelector((state: State) =>
@@ -21,7 +21,7 @@ export function ProtocolDetails(): JSX.Element {
 
   React.useEffect(() => {
     dispatch(fetchProtocols())
-  }, [])
+  }, [dispatch])
 
   return storedProtocol != null ? (
     <ProtocolDetailsContents {...storedProtocol} />

@@ -6,30 +6,33 @@ import asyncio
 from decoy import matchers
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import (
+    ModuleType,
     MagDeck,
     Thermocycler,
     TempDeck,
     HeaterShaker,
 )
 from opentrons.hardware_control.modules import utils, UpdateError, BundledFirmware
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 
 
 @pytest.fixture
 async def magdeck():
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=0,
+        port_group=PortGroup.UNKNOWN,
+        hub_port=None,
         device_path="/dev/ot_module_magdeck1",
     )
     m = await utils.build(
         port="/dev/ot_module_magdeck1",
         usb_port=usb_port,
-        which="magdeck",
+        type=ModuleType.MAGNETIC,
         simulating=True,
         execution_manager=ExecutionManager(),
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
     )
     MagDeck.current_height = PropertyMock(return_value=321)
 
@@ -42,17 +45,19 @@ async def magdeck():
 async def tempdeck():
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=1,
+        port_group=PortGroup.UNKNOWN,
+        hub_port=None,
         device_path="/dev/ot_module_tempdeck1",
     )
     t = await utils.build(
         port="/dev/ot_module_tempdeck1",
         usb_port=usb_port,
-        which="tempdeck",
+        type=ModuleType.TEMPERATURE,
         simulating=True,
         execution_manager=ExecutionManager(),
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
     )
     TempDeck.temperature = PropertyMock(return_value=123.0)
     TempDeck.target = PropertyMock(return_value=321.0)
@@ -66,17 +71,19 @@ async def tempdeck():
 async def thermocycler():
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=2,
+        port_group=PortGroup.UNKNOWN,
+        hub_port=None,
         device_path="/dev/ot_module_thermocycler1",
     )
     t = await utils.build(
         port="/dev/ot_module_thermocycler1",
         usb_port=usb_port,
-        which="thermocycler",
+        type=ModuleType.THERMOCYCLER,
         simulating=True,
         execution_manager=ExecutionManager(),
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
     )
 
     Thermocycler.lid_status = PropertyMock(return_value="open")
@@ -100,17 +107,19 @@ async def heater_shaker():
     """Get a mocked out heater-shaker hardware control object."""
     usb_port = USBPort(
         name="",
-        hub=None,
+        hub=False,
         port_number=3,
+        port_group=PortGroup.UNKNOWN,
+        hub_port=None,
         device_path="/dev/ot_module_heatershaker1",
     )
     heatershaker = await utils.build(
         port="/dev/ot_module_heatershaker1",
         usb_port=usb_port,
-        which="heatershaker",
+        type=ModuleType.HEATER_SHAKER,
         simulating=True,
         execution_manager=ExecutionManager(),
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
     )
 
     HeaterShaker.live_data = PropertyMock(
@@ -227,7 +236,10 @@ def test_post_serial_update_no_bundled_fw(api_client, hardware, magdeck):
 
     body = resp.json()
     assert resp.status_code == 500
-    assert body == {"message": "Bundled fw file not found for module of type: magdeck"}
+    assert body == {
+        "message": "Bundled fw file not found for module of type: magdeck",
+        "errorCode": "1005",
+    }
 
 
 def test_post_serial_update_no_modules(api_client, hardware):
@@ -235,7 +247,7 @@ def test_post_serial_update_no_modules(api_client, hardware):
 
     body = resp.json()
     assert resp.status_code == 404
-    assert body == {"message": "Module dummySerialMD not found"}
+    assert body == {"message": "Module dummySerialMD not found", "errorCode": "3015"}
 
 
 def test_post_serial_update_no_match(api_client, hardware, tempdeck):
@@ -245,7 +257,10 @@ def test_post_serial_update_no_match(api_client, hardware, tempdeck):
 
     body = resp.json()
     assert resp.status_code == 404
-    assert body == {"message": "Module superDummySerialMD not found"}
+    assert body == {
+        "message": "Module superDummySerialMD not found",
+        "errorCode": "3015",
+    }
 
 
 def test_post_serial_update_error(api_client, hardware, magdeck):
@@ -262,7 +277,7 @@ def test_post_serial_update_error(api_client, hardware, magdeck):
 
         body = resp.json()
         assert resp.status_code == 500
-        assert body == {"message": "Update error: not possible"}
+        assert body == {"message": "Update error: not possible", "errorCode": "1005"}
 
 
 def test_post_serial_timeout_error(api_client, hardware, magdeck):
@@ -279,7 +294,7 @@ def test_post_serial_timeout_error(api_client, hardware, magdeck):
 
         body = resp.json()
         assert resp.status_code == 500
-        assert body == {"message": "Module not responding"}
+        assert body == {"message": "Module not responding", "errorCode": "1005"}
 
 
 def test_post_serial_update(api_client, hardware, tempdeck):

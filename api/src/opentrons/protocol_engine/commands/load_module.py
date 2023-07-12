@@ -24,6 +24,11 @@ class LoadModuleParams(BaseModel):
             "\n\n"
             "Protocol Engine will look for a connected module that either"
             " exactly matches this one, or is compatible."
+            "\n\n"
+            " For example, if you request a `temperatureModuleV1` here,"
+            " Protocol Engine might load a `temperatureModuleV1` or a `temperatureModuleV2`."
+            "\n\n"
+            " The model that it finds connected will be available through `result.model`."
         ),
     )
 
@@ -57,24 +62,33 @@ class LoadModuleResult(BaseModel):
         description="An ID to reference this module in subsequent commands."
     )
 
-    # TODO (spp, 2021-11-24): Evaluate if this needs to be in the result
-    definition: ModuleDefinition = Field(description="The definition of this module.")
+    # TODO(mm, 2023-04-13): Remove this field. Jira RSS-221.
+    definition: ModuleDefinition = Field(
+        deprecated=True,
+        description=(
+            "The definition of the connected module."
+            " This field is an implementation detail. We might change or remove it without warning."
+            " Do not access it or rely on it being present."
+        ),
+    )
 
     model: ModuleModel = Field(
         ...,
         description=(
             "The hardware model of the connected module."
-            " May be different than the requested model"
-            " if the connected module is still compatible."
+            " This can be different from the exact model that this command requested."
+            " See `params.model`."
             "\n\n"
             "This field is only meaningful in the run's actual execution,"
             " not in the protocol's analysis."
+            " In analysis, it will be an arbitrary placeholder."
         ),
     )
 
-    serialNumber: str = Field(
+    serialNumber: Optional[str] = Field(
         ...,
-        description="Hardware serial number of the connected module.",
+        description="Hardware serial number of the connected module. "
+        "Will be `None` if a module is not electrically connected to the robot (like the Magnetic Block).",
     )
 
 
@@ -86,11 +100,18 @@ class LoadModuleImplementation(AbstractCommandImpl[LoadModuleParams, LoadModuleR
 
     async def execute(self, params: LoadModuleParams) -> LoadModuleResult:
         """Check that the requested module is attached and assign its identifier."""
-        loaded_module = await self._equipment.load_module(
-            model=params.model,
-            location=params.location,
-            module_id=params.moduleId,
-        )
+        if params.model == ModuleModel.MAGNETIC_BLOCK_V1:
+            loaded_module = await self._equipment.load_magnetic_block(
+                model=params.model,
+                location=params.location,
+                module_id=params.moduleId,
+            )
+        else:
+            loaded_module = await self._equipment.load_module(
+                model=params.model,
+                location=params.location,
+                module_id=params.moduleId,
+            )
 
         return LoadModuleResult(
             moduleId=loaded_module.module_id,

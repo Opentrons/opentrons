@@ -41,14 +41,17 @@ class NameSynchronizer:
       configurable. https://datatracker.ietf.org/doc/html/rfc6763#section-4.1.1
     """
 
-    def __init__(self, avahi_client: AvahiClient) -> None:
+    def __init__(self, avahi_client: AvahiClient, machine_type: str) -> None:
         """For internal use by this class only. Use `start()` instead."""
         self._avahi_client = avahi_client
+        self._machine_type = machine_type
 
     @classmethod
     @asynccontextmanager
     async def start(
-        cls, avahi_client: Optional[AvahiClient] = None
+        cls,
+        machine_type: str,
+        avahi_client: Optional[AvahiClient] = None,
     ) -> AsyncGenerator[NameSynchronizer, None]:
         """Build a NameSynchronizer and keep it running in the background.
 
@@ -63,6 +66,9 @@ class NameSynchronizer:
         Collision monitoring will stop when this context manager exits.
 
         Args:
+            machine_type: The robot model to advertise. This will be set in a TXT
+                record as "robotModel=${machine_type}" for clients to use to
+                identify the robot.
             avahi_client: The interface for communicating with Avahi.
                 Changeable for testing this class; should normally be left as
                 the default.
@@ -70,12 +76,13 @@ class NameSynchronizer:
         if avahi_client is None:
             avahi_client = await AvahiClient.connect()
 
-        name_synchronizer = cls(avahi_client)
+        name_synchronizer = cls(avahi_client, machine_type)
         async with avahi_client.listen_for_collisions(
             callback=name_synchronizer._on_avahi_collision
         ):
             await avahi_client.start_advertising(
-                service_name=name_synchronizer.get_name()
+                service_name=await name_synchronizer.get_name(),
+                machine_type=machine_type,
             )
             yield name_synchronizer
 
@@ -88,26 +95,28 @@ class NameSynchronizer:
         Returns the new name. This is normally the same as the requested name,
         but it it might be different if it had to be truncated, sanitized, etc.
         """
-        await self._avahi_client.start_advertising(service_name=new_name)
+        await self._avahi_client.start_advertising(
+            service_name=new_name, machine_type=self._machine_type
+        )
         # Setting the Avahi service name can fail if Avahi doesn't like the new name.
         # Persist only after it succeeds, so we don't persist something invalid.
-        persisted_pretty_hostname = persist_pretty_hostname(new_name)
+        persisted_pretty_hostname = await persist_pretty_hostname(new_name)
         _log.info(
             f"Changed name to {repr(new_name)}"
             f" (persisted {repr(persisted_pretty_hostname)})."
         )
         return persisted_pretty_hostname
 
-    def get_name(self) -> str:
+    async def get_name(self) -> str:
         """Return the machine's current human-readable name.
 
         Note that this can change even if you haven't called `set_name()`,
         if it was necessary to avoid conflicts with other devices on the network.
         """
-        return get_pretty_hostname()
+        return await get_pretty_hostname()
 
     async def _on_avahi_collision(self) -> None:
-        current_name = self.get_name()
+        current_name = await self.get_name()
 
         # Assume that the service name was the thing that collided.
         # Theoretically it also could have been the static hostname,

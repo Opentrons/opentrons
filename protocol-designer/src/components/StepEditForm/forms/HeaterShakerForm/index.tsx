@@ -120,8 +120,8 @@ export const HeaterShakerForm = (props: StepFormProps): JSX.Element | null => {
           </FormGroup>
         </Flex>
       </div>
-      <Flex paddingBottom={'8.4rem'}>
-        <Flex width={SPACING.spacingM}>
+      <Flex paddingBottom="8.4rem">
+        <Flex width={SPACING.spacing20}>
           <CheckboxRowField
             tooltipPlacement={TOOLTIP_BOTTOM}
             {...propsForFields.heaterShakerSetTimer}

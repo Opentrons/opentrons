@@ -1,60 +1,41 @@
 import { useSelector } from 'react-redux'
 import {
-  parseAllRequiredModuleModelsById,
-  parseInitialLoadedLabwareById,
-  parseInitialLoadedLabwareDefinitionsById,
-  parseInitialPipetteNamesById,
+  parseRequiredModulesEntity,
+  parseInitialLoadedLabwareEntity,
+  parsePipetteEntity,
 } from '@opentrons/api-client'
 import { useProtocolQuery, useRunQuery } from '@opentrons/react-api-client'
 
 import { getStoredProtocol } from '../../../redux/protocol-storage'
 
-import type {
-  LoadedLabwareById,
-  LoadedLabwareDefinitionsById,
-  ModuleModelsById,
-  PipetteNamesById,
-} from '@opentrons/api-client'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { State } from '../../../redux/types'
 
-export interface StoredProtocolAnalysis extends ProtocolAnalysisOutput {
-  pipettes: PipetteNamesById
-  modules: ModuleModelsById
-  labware: LoadedLabwareById
-  labwareDefinitions: LoadedLabwareDefinitionsById
-}
-
 export const parseProtocolAnalysisOutput = (
   storedProtocolAnalysis: ProtocolAnalysisOutput | null
-): StoredProtocolAnalysis | null => {
-  const pipettesNamesById = parseInitialPipetteNamesById(
+): ProtocolAnalysisOutput | null => {
+  const pipetteEntity = parsePipetteEntity(
     storedProtocolAnalysis?.commands ?? []
   )
-  const moduleModelsById = parseAllRequiredModuleModelsById(
+  const moduleEntity = parseRequiredModulesEntity(
     storedProtocolAnalysis?.commands ?? []
   )
-  const labwareById = parseInitialLoadedLabwareById(
+  const labwareEntity = parseInitialLoadedLabwareEntity(
     storedProtocolAnalysis?.commands ?? []
   )
-  const labwareDefinitionsById = parseInitialLoadedLabwareDefinitionsById(
-    storedProtocolAnalysis?.commands ?? []
-  )
-
   return storedProtocolAnalysis != null
     ? {
         ...storedProtocolAnalysis,
-        pipettes: pipettesNamesById,
-        modules: moduleModelsById,
-        labware: labwareById,
-        labwareDefinitions: labwareDefinitionsById,
+        pipettes: storedProtocolAnalysis.pipettes ?? pipetteEntity,
+        labware: storedProtocolAnalysis.labware ?? labwareEntity,
+        modules: storedProtocolAnalysis.modules ?? moduleEntity,
       }
     : null
 }
 
 export function useStoredProtocolAnalysis(
   runId: string | null
-): StoredProtocolAnalysis | null {
+): ProtocolAnalysisOutput | null {
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
 
@@ -68,5 +49,7 @@ export function useStoredProtocolAnalysis(
     useSelector((state: State) => getStoredProtocol(state, protocolKey))
       ?.mostRecentAnalysis ?? null
 
-  return parseProtocolAnalysisOutput(storedProtocolAnalysis)
+  return storedProtocolAnalysis != null
+    ? parseProtocolAnalysisOutput(storedProtocolAnalysis)
+    : null
 }

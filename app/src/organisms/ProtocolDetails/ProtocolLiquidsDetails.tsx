@@ -8,9 +8,19 @@ import { DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
 import { Divider } from '../../atoms/structure'
 import { LiquidsListItemDetails } from '../Devices/ProtocolRun/SetupLiquids/SetupLiquidsList'
 
-export const ProtocolLiquidsDetails = (): JSX.Element => {
-  const liquidsInLoadOrder = parseLiquidsInLoadOrder()
-  const labwareByLiquidId = parseLabwareInfoByLiquidId()
+import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
+
+interface ProtocolLiquidsDetailsProps {
+  commands: RunTimeCommand[]
+  liquids: Liquid[]
+}
+
+export const ProtocolLiquidsDetails = (
+  props: ProtocolLiquidsDetailsProps
+): JSX.Element => {
+  const { commands, liquids } = props
+  const liquidsInLoadOrder = parseLiquidsInLoadOrder(liquids, commands)
+  const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
   const HIDE_SCROLLBAR = css`
     ::-webkit-scrollbar {
       display: none;
@@ -20,20 +30,16 @@ export const ProtocolLiquidsDetails = (): JSX.Element => {
     <Flex
       css={HIDE_SCROLLBAR}
       flexDirection={DIRECTION_COLUMN}
-      maxHeight={'25rem'}
-      overflowY={'auto'}
-      data-testid={'LiquidsDetailsTab'}
+      maxHeight="25rem"
+      overflowY="auto"
+      data-testid="LiquidsDetailsTab"
     >
       {liquidsInLoadOrder?.map((liquid, index) => {
         return (
-          <>
-            <Flex
-              key={liquid.liquidId}
-              flexDirection={DIRECTION_COLUMN}
-              marginY={SPACING.spacing4}
-            >
+          <React.Fragment key={liquid.id}>
+            <Flex flexDirection={DIRECTION_COLUMN} marginY={SPACING.spacing16}>
               <LiquidsListItemDetails
-                liquidId={liquid.liquidId}
+                liquidId={liquid.id}
                 displayColor={liquid.displayColor}
                 displayName={liquid.displayName}
                 description={liquid.description}
@@ -41,7 +47,7 @@ export const ProtocolLiquidsDetails = (): JSX.Element => {
               />
             </Flex>
             {index < liquidsInLoadOrder.length - 1 && <Divider />}
-          </>
+          </React.Fragment>
         )
       })}
     </Flex>

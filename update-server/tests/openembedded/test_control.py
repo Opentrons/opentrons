@@ -16,7 +16,7 @@ async def test_health(
     mock_name_synchronizer: NameSynchronizer,
     decoy: Decoy,
 ):
-    decoy.when(mock_name_synchronizer.get_name()).then_return("test name")
+    decoy.when(await mock_name_synchronizer.get_name()).then_return("test name")
     resp = await test_cli.get("/server/update/health")
     assert resp.status == 200
     body = await resp.json()
@@ -27,8 +27,9 @@ async def test_health(
         "systemVersion": version_dict["openembedded_version"],
         "bootId": "dummy-boot-id-abc123",
         "capabilities": {
-            "openembeddedUpdate": "/server/update/begin",
+            "systemUpdate": "/server/update/begin",
             "restart": "/server/restart",
         },
         "serialNumber": "unknown",
+        "robotModel": "OT-3 Standard",
     }

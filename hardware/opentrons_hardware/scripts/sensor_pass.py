@@ -15,8 +15,8 @@ from opentrons_hardware.firmware_bindings.constants import (
     SensorThresholdMode,
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.hardware_control.network import probe
-import opentrons_hardware.sensors.utils as sensor_utils
+from opentrons_hardware.hardware_control.network import NetworkInfo
+import opentrons_hardware.sensors.types as sensor_types
 
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions,
@@ -87,8 +87,8 @@ class Capturer:
         """Callback entry point for capturing messages."""
         if isinstance(message, message_definitions.ReadFromSensorResponse):
             self.response_queue.put_nowait(
-                sensor_utils.SensorDataType.build(
-                    message.payload.sensor_data
+                sensor_types.SensorDataType.build(
+                    message.payload.sensor_data, message.payload.sensor
                 ).to_float()
             )
 
@@ -97,7 +97,8 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
     """Run the test."""
     target_z = NodeId["head_" + args.mount[0]]
     target_pipette = NodeId["pipette_" + args.mount]
-    found = await probe(messenger, {NodeId.head, target_pipette}, 10)
+    network_info = NetworkInfo(messenger)
+    found = set(await network_info.probe({NodeId.head, target_pipette}, 10))
     if NodeId.head not in found or target_pipette not in found:
         raise RuntimeError(f"could not find targets for {args.mount} in {found}")
 
@@ -126,7 +127,7 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
                 {},
                 float64(args.distance / args.speed),
                 [target_z],
-                MoveStopCondition.cap_sensor,
+                MoveStopCondition.sync_line,
             ),
         ],
     ]
@@ -135,7 +136,7 @@ async def run_test(messenger: CanMessenger, args: argparse.Namespace) -> None:
         sensor=fields.SensorTypeField(SensorType.capacitive),
         sensor_id=fields.SensorIdField(SensorId.S0),
         threshold=Int32Field(
-            int(args.threshold * sensor_utils.sensor_fixed_point_conversion)
+            int(args.threshold * sensor_types.sensor_fixed_point_conversion)
         ),
         mode=fields.SensorThresholdModeField(SensorThresholdMode.auto_baseline),
     )

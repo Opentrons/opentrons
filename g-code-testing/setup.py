@@ -14,18 +14,19 @@ if os.name == "posix":
     fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
 
 HERE = os.path.abspath(os.path.dirname(__file__))
-sys.path.append(os.path.join(HERE, "..", "..", "..", "scripts"))
+sys.path.append(os.path.join(HERE, "..", "scripts"))
 
 from python_build_utils import normalize_version  # noqa: E402
 
 
 def get_version():
     buildno = os.getenv("BUILD_NUMBER")
+    project = os.getenv("OPENTRONS_PROJECT", "robot-stack")
     if buildno:
         normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version("g-code-testing", **normalize_opts)
+    return normalize_version("g-code-testing", project, **normalize_opts)
 
 
 VERSION = get_version()
@@ -64,22 +65,23 @@ def read(*parts):
         return f.read()
 
 
-setup(
-    python_requires=">=3.7",
-    name=DISTNAME,
-    description=DESCRIPTION,
-    license=LICENSE,
-    url=URL,
-    version=VERSION,
-    author=AUTHOR,
-    author_email=EMAIL,
-    maintainer=AUTHOR,
-    maintainer_email=EMAIL,
-    keywords=KEYWORDS,
-    long_description=__doc__,
-    packages=PACKAGES,
-    zip_safe=False,
-    classifiers=CLASSIFIERS,
-    install_requires=INSTALL_REQUIRES,
-    include_package_data=True,
-)
+if __name__ == "__main__":
+    setup(
+        python_requires=">=3.7",
+        name=DISTNAME,
+        description=DESCRIPTION,
+        license=LICENSE,
+        url=URL,
+        version=VERSION,
+        author=AUTHOR,
+        author_email=EMAIL,
+        maintainer=AUTHOR,
+        maintainer_email=EMAIL,
+        keywords=KEYWORDS,
+        long_description=__doc__,
+        packages=PACKAGES,
+        zip_safe=False,
+        classifiers=CLASSIFIERS,
+        install_requires=INSTALL_REQUIRES,
+        include_package_data=True,
+    )

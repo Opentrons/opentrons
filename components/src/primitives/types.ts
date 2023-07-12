@@ -58,9 +58,12 @@ export interface FlexboxProps {
 }
 
 export interface GridProps {
+  columnGap?: string | number
   gridGap?: string | number
+  gridTemplateAreas?: string
   gridTemplateRows?: string
   gridTemplateColumns?: string
+  gridArea?: string | number
   gridRow?: string | number
   gridColumn?: string | number
 }
@@ -90,6 +93,7 @@ export interface PositionProps {
   bottom?: string | number
   left?: string | number
   transform?: string
+  filter?: string
   transformOrigin?: CSSProperties['transformOrigin']
 }
 

@@ -20,9 +20,9 @@ async def test_sim_initialization(usb_port):
     mag = await modules.build(
         port="/dev/ot_module_sim_magdeck0",
         usb_port=usb_port,
-        which="magdeck",
+        type=modules.ModuleType.MAGNETIC,
         simulating=True,
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     assert isinstance(mag, modules.AbstractModule)
@@ -32,9 +32,9 @@ async def test_sim_data(usb_port):
     mag = await modules.build(
         port="/dev/ot_module_sim_magdeck0",
         usb_port=usb_port,
-        which="magdeck",
+        type=modules.ModuleType.MAGNETIC,
         simulating=True,
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     assert mag.status == "disengaged"
@@ -50,9 +50,9 @@ async def test_sim_state_update(usb_port):
     mag = await modules.build(
         port="/dev/ot_module_sim_magdeck0",
         usb_port=usb_port,
-        which="magdeck",
+        type=modules.ModuleType.MAGNETIC,
         simulating=True,
-        loop=asyncio.get_running_loop(),
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     await mag.calibrate()
@@ -65,11 +65,11 @@ async def test_sim_state_update(usb_port):
 
 async def test_revision_model_parsing(usb_port):
     mag = await modules.build(
-        "",
-        "magdeck",
-        True,
-        usb_port,
-        loop=asyncio.get_running_loop(),
+        port="",
+        type=modules.ModuleType.MAGNETIC,
+        simulating=True,
+        usb_port=usb_port,
+        hw_control_loop=asyncio.get_running_loop(),
         execution_manager=ExecutionManager(),
     )
     mag._device_info["model"] = "mag_deck_v1.1"

@@ -6,7 +6,7 @@ from datetime import datetime
 from decoy import Decoy, matchers
 
 from opentrons.types import DeckSlotName
-from opentrons.protocol_runner import ProtocolRunResult
+from opentrons.protocol_runner import RunResult
 from opentrons.protocol_engine import (
     EngineStatus,
     StateSummary,
@@ -24,14 +24,17 @@ from opentrons.protocol_engine import (
 from robot_server.protocols import ProtocolResource
 from robot_server.runs.engine_store import EngineStore, EngineConflictError
 from robot_server.runs.run_data_manager import RunDataManager, RunNotCurrentError
-from robot_server.runs.run_models import Run
+from robot_server.runs.run_models import Run, RunNotFoundError
 from robot_server.runs.run_store import (
     RunStore,
     RunResource,
-    RunNotFoundError,
     CommandNotFoundError,
 )
 from robot_server.service.task_runner import TaskRunner
+
+from opentrons.protocol_engine import Liquid
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 
 @pytest.fixture
@@ -64,6 +67,7 @@ def engine_state_summary() -> StateSummary:
         labwareOffsets=[LabwareOffset.construct(id="some-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="some-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="some-module-id")],  # type: ignore[call-arg]
+        liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
     )
 
 
@@ -146,6 +150,7 @@ async def test_create(
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
     )
 
 
@@ -209,6 +214,7 @@ async def test_create_with_options(
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
     )
 
 
@@ -275,6 +281,7 @@ async def test_get_current_run(
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
     )
     assert subject.current_run_id == run_id
 
@@ -310,6 +317,7 @@ async def test_get_historical_run(
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
     )
 
 
@@ -341,6 +349,7 @@ async def test_get_historical_run_no_data(
         labwareOffsets=[],
         pipettes=[],
         modules=[],
+        liquids=[],
     )
 
 
@@ -358,6 +367,7 @@ async def test_get_all_runs(
         labwareOffsets=[LabwareOffset.construct(id="current-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="current-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="current-module-id")],  # type: ignore[call-arg]
+        liquids=[Liquid(id="some-liquid-id", displayName="liquid", description="desc")],
     )
 
     historical_run_data = StateSummary(
@@ -367,6 +377,7 @@ async def test_get_all_runs(
         labwareOffsets=[LabwareOffset.construct(id="old-labware-offset-id")],  # type: ignore[call-arg]
         pipettes=[LoadedPipette.construct(id="old-pipette-id")],  # type: ignore[call-arg]
         modules=[LoadedModule.construct(id="old-module-id")],  # type: ignore[call-arg]
+        liquids=[],
     )
 
     current_run_resource = RunResource(
@@ -390,11 +401,11 @@ async def test_get_all_runs(
     decoy.when(mock_run_store.get_state_summary("historical-run")).then_return(
         historical_run_data
     )
-    decoy.when(mock_run_store.get_all()).then_return(
+    decoy.when(mock_run_store.get_all(length=20)).then_return(
         [historical_run_resource, current_run_resource]
     )
 
-    result = subject.get_all()
+    result = subject.get_all(length=20)
 
     assert result == [
         Run(
@@ -409,6 +420,7 @@ async def test_get_all_runs(
             labwareOffsets=historical_run_data.labwareOffsets,
             pipettes=historical_run_data.pipettes,
             modules=historical_run_data.modules,
+            liquids=historical_run_data.liquids,
         ),
         Run(
             current=True,
@@ -422,6 +434,7 @@ async def test_get_all_runs(
             labwareOffsets=current_run_data.labwareOffsets,
             pipettes=current_run_data.pipettes,
             modules=current_run_data.modules,
+            liquids=current_run_data.liquids,
         ),
     ]
 
@@ -473,7 +486,7 @@ async def test_update_current(
     run_id = "hello world"
     decoy.when(mock_engine_store.current_run_id).then_return(run_id)
     decoy.when(await mock_engine_store.clear()).then_return(
-        ProtocolRunResult(commands=[run_command], state_summary=engine_state_summary)
+        RunResult(commands=[run_command], state_summary=engine_state_summary)
     )
 
     decoy.when(
@@ -498,6 +511,7 @@ async def test_update_current(
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
     )
 
 
@@ -544,6 +558,7 @@ async def test_update_current_noop(
         labwareOffsets=engine_state_summary.labwareOffsets,
         pipettes=engine_state_summary.pipettes,
         modules=engine_state_summary.modules,
+        liquids=engine_state_summary.liquids,
     )
 
 
@@ -579,7 +594,7 @@ async def test_create_archives_existing(
 
     decoy.when(mock_engine_store.current_run_id).then_return(run_id_old)
     decoy.when(await mock_engine_store.clear()).then_return(
-        ProtocolRunResult(commands=[run_command], state_summary=engine_state_summary)
+        RunResult(commands=[run_command], state_summary=engine_state_summary)
     )
 
     decoy.when(
@@ -788,3 +803,29 @@ def test_get_command_from_db_command_not_found(
 
     with pytest.raises(CommandNotFoundError):
         subject.get_command("run-id", "command-id")
+
+
+async def test_get_current_run_labware_definition(
+    decoy: Decoy,
+    mock_engine_store: EngineStore,
+    subject: RunDataManager,
+    engine_state_summary: StateSummary,
+    run_resource: RunResource,
+) -> None:
+    """It should get the current run labware definition from the engine."""
+    decoy.when(mock_engine_store.current_run_id).then_return("run-id")
+    decoy.when(
+        mock_engine_store.engine.state_view.labware.get_loaded_labware_definitions()
+    ).then_return(
+        [
+            LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
+            LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
+        ]
+    )
+
+    result = subject.get_run_loaded_labware_definitions(run_id="run-id")
+
+    assert result == [
+        LabwareDefinition.construct(namespace="test_1"),  # type: ignore[call-arg]
+        LabwareDefinition.construct(namespace="test_2"),  # type: ignore[call-arg]
+    ]

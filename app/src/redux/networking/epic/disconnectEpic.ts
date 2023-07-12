@@ -1,5 +1,4 @@
 import { ofType, combineEpics } from 'redux-observable'
-import { map } from 'rxjs/operators'
 
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
@@ -11,10 +10,7 @@ import * as Actions from '../actions'
 import * as Constants from '../constants'
 
 import type { Action, Epic } from '../../types'
-import {
-  PostWifiDisconnectAction,
-  PostWifiDisconnectSuccessAction,
-} from '../types'
+import { PostWifiDisconnectAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<PostWifiDisconnectAction> = action => ({
   method: POST,
@@ -45,16 +41,4 @@ const postDisconnectEpic: Epic = (action$, state$) =>
     )
   )
 
-const handlePostDisconnectNetworkSuccessEpic: Epic = action$ => {
-  return action$.pipe(
-    ofType<Action, PostWifiDisconnectSuccessAction>(
-      Constants.POST_WIFI_DISCONNECT_SUCCESS
-    ),
-    map(action => Actions.fetchWifiList(action.payload.robotName))
-  )
-}
-
-export const disconnectEpic: Epic = combineEpics<Epic>(
-  postDisconnectEpic,
-  handlePostDisconnectNetworkSuccessEpic
-)
+export const disconnectEpic: Epic = combineEpics<Epic>(postDisconnectEpic)

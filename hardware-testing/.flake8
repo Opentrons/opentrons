@@ -5,7 +5,8 @@
 max-line-length = 100
 
 # max cyclomatic complexity
-max-complexity = 9
+# NOTE: (andy s) increasing this from 9 to 20 b/c test scripts often handle all logic in main
+max-complexity = 20
 
 extend-ignore =
     # ignore E203 because black might reformat it
@@ -19,3 +20,9 @@ extend-ignore =
 docstring-convention = google
 
 noqa-require-code = true
+
+per-file-ignores =
+    tests/hardware_testing/drivers/*:ANN,D
+    tests/hardware_testing/drivers/radwag*:ANN,D
+    tests/hardware_testing/execute/*:ANN,D
+    tests/hardware_testing/liquid/*:ANN,D

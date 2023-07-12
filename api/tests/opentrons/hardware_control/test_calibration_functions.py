@@ -1,10 +1,23 @@
+import importlib
+from pathlib import Path
+
+import pytest
 import numpy as np
 
-from opentrons import config
-from opentrons.calibration_storage import file_operators as io
+from opentrons import config, calibration_storage
+
 from opentrons.hardware_control import robot_calibration
+from opentrons.hardware_control.instruments.ot2 import instrument_calibration
 from opentrons.util.helpers import utc_now
-from opentrons.types import Mount
+from opentrons.types import Mount, Point
+
+
+# TODO(mc, 2023-02-17): this reload resolves test polution from repeated
+# reloads of this module in tests/opentrons/calibration_storage.
+# module reloads to be removed in https://github.com/Opentrons/opentrons/pull/12049
+@pytest.fixture(autouse=True, scope="module")
+def reload_module() -> None:
+    importlib.reload(calibration_storage)
 
 
 def test_migrate_affine_xy_to_attitude():
@@ -36,41 +49,38 @@ def test_save_calibration(ot_config_tempdir):
         "last_modified": None,
         "tiprack": lw_hash,
         "source": "user",
-        "status": {"markedBad": False},
+        "status": {"markedBad": False, "markedAt": None, "source": None},
     }
     robot_calibration.save_attitude_matrix(e, a, pip_id, lw_hash)
-    data = io.read_cal_file(pathway)
+    data = calibration_storage.file_operators.read_cal_file(pathway)
     data["last_modified"] = None
     assert data == expected
 
 
 def test_load_calibration(ot_config_tempdir):
-    pathway = (
-        config.get_opentrons_path("robot_calibration_dir") / "deck_calibration.json"
-    )
+    pathway = Path(config.get_opentrons_path("robot_calibration_dir"))
+
     data = {
         "attitude": [[1, 0, 1], [0, 1, -0.5], [0, 0, 1]],
         "pipette_calibrated_with": "fake",
         "last_modified": utc_now(),
         "tiprack": "hash",
     }
-    io.save_to_file(pathway, data)
+    calibration_storage.file_operators.save_to_file(pathway, "deck_calibration", data)
     obj = robot_calibration.load_attitude_matrix()
     transform = [[1, 0, 1], [0, 1, -0.5], [0, 0, 1]]
     assert np.allclose(obj.attitude, transform)
 
 
 def test_load_malformed_calibration(ot_config_tempdir):
-    pathway = (
-        config.get_opentrons_path("robot_calibration_dir") / "deck_calibration.json"
-    )
+    pathway = Path(config.get_opentrons_path("robot_calibration_dir"))
     data = {
         "atsadasitude": [[1, 0, 1], [0, 1, -0.5], [0, 0, 1]],
         "last_modified": utc_now(),
         "tiprack": "hash",
         "statu": [1, 2, 3],
     }
-    io.save_to_file(pathway, data)
+    calibration_storage.file_operators.save_to_file(pathway, "deck_calibration", data)
     obj = robot_calibration.load_attitude_matrix()
     assert np.allclose(obj.attitude, [[1, 0, 0], [0, 1, 0], [0, 0, 1]])
 
@@ -85,18 +95,13 @@ def test_load_json(ot_config_tempdir):
 def test_load_pipette_offset(ot_config_tempdir):
     pip_id = "fakePip"
     mount = Mount.LEFT
-    pip_dir = config.get_opentrons_path("pipette_calibration_dir") / "left"
-    pip_dir.mkdir(parents=True, exist_ok=True)
-    pathway = pip_dir / "fakePip.json"
-    data = {
-        "offset": [1, 2, 3],
-        "tiprack": "hash",
-        "uri": "opentrons/opentrons_96_tiprack_10ul/1",
-        "last_modified": utc_now(),
-    }
-    io.save_to_file(pathway, data)
-    obj = robot_calibration.load_pipette_offset(pip_id, mount)
-    offset = [1, 2, 3]
+    offset = Point(1, 2, 3)
+
+    calibration_storage.save_pipette_calibration(
+        offset, pip_id, mount, "hash", "opentrons/opentrons_96_tiprack_10ul/1"
+    )
+    obj = instrument_calibration.load_pipette_offset(pip_id, mount)
+
     assert np.allclose(obj.offset, offset)
 
 
@@ -105,5 +110,5 @@ def test_load_bad_pipette_offset(ot_config_tempdir):
     path.mkdir(parents=True, exist_ok=True)
     calpath = path / "fakePip.json"
     calpath.write_text("{")
-    obj = robot_calibration.load_pipette_offset("fakePip", Mount.LEFT)
-    assert obj.offset == [0, 0, 0]
+    obj = instrument_calibration.load_pipette_offset("fakePip", Mount.LEFT)
+    assert obj.offset == Point(0, 0, 0)

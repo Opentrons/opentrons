@@ -1,32 +1,48 @@
 // jog controls component
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import styled, { css } from 'styled-components'
 
 import {
   Box,
-  SPACING,
   Flex,
-  SIZE_2,
   Icon,
   HandleKeypress,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
+  BORDERS,
+  COLORS,
+  SPACING,
+  TYPOGRAPHY,
+  DIRECTION_COLUMN,
+  JUSTIFY_SPACE_BETWEEN,
+  DIRECTION_ROW,
+  ALIGN_FLEX_START,
+  ALIGN_FLEX_END,
+  PrimaryButton,
+  TEXT_ALIGN_LEFT,
+  JUSTIFY_FLEX_START,
+  ALIGN_STRETCH,
+  RESPONSIVENESS,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
+import { StyledText } from '../../atoms/text'
 import { ControlContainer } from './ControlContainer'
+import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 
 import type { IconName } from '@opentrons/components'
-import type { Jog, Plane, Sign, Bearing, Axis } from './types'
-import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
+import type { CSSProperties } from 'styled-components'
+import type { Jog, Plane, Sign, Bearing, Axis, StepSize } from './types'
+import { TouchControlButton } from './TouchControlButton'
 
 interface Control {
   bearing: Bearing
   keyName: string
   shiftKey: boolean
-  gridRow: number
   gridColumn: number
   iconName: IconName
   axis: Axis
   sign: Sign
+  disabled: boolean
 }
 interface ControlsContents {
   controls: Control[]
@@ -38,28 +54,48 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
   [VERTICAL_PLANE]: {
     controls: [
       {
+        keyName: 'ArrowLeft',
+        shiftKey: false,
+        bearing: 'left',
+        iconName: 'ot-arrow-left',
+        axis: 'x',
+        sign: -1,
+        gridColumn: 0,
+        disabled: true,
+      },
+      {
+        keyName: 'ArrowRight',
+        shiftKey: false,
+        bearing: 'right',
+        iconName: 'ot-arrow-right',
+        axis: 'x',
+        sign: 1,
+        gridColumn: 2,
+        disabled: true,
+      },
+      {
         keyName: 'ArrowUp',
         shiftKey: true,
         bearing: 'up',
-        gridRow: 1,
-        gridColumn: 2,
         iconName: 'ot-arrow-up',
         axis: 'z',
         sign: 1,
+        gridColumn: 1,
+        disabled: false,
       },
       {
         keyName: 'ArrowDown',
         shiftKey: true,
         bearing: 'down',
-        gridRow: 2,
-        gridColumn: 2,
         iconName: 'ot-arrow-down',
         axis: 'z',
         sign: -1,
+        gridColumn: 1,
+        disabled: false,
       },
     ],
-    title: 'Up & Down',
-    subtitle: 'Arrow keys + SHIFT',
+    title: 'Z-axis',
+    subtitle: 'Shift + Arrow Keys',
   },
   [HORIZONTAL_PLANE]: {
     controls: [
@@ -67,103 +103,406 @@ const CONTROLS_CONTENTS_BY_PLANE: Record<Plane, ControlsContents> = {
         keyName: 'ArrowLeft',
         shiftKey: false,
         bearing: 'left',
-        gridRow: 2,
-        gridColumn: 1,
         iconName: 'ot-arrow-left',
         axis: 'x',
         sign: -1,
+        gridColumn: 0,
+        disabled: false,
       },
       {
         keyName: 'ArrowRight',
         shiftKey: false,
         bearing: 'right',
-        gridRow: 2,
-        gridColumn: 3,
         iconName: 'ot-arrow-right',
         axis: 'x',
         sign: 1,
+        gridColumn: 2,
+        disabled: false,
       },
       {
         keyName: 'ArrowUp',
         shiftKey: false,
         bearing: 'back',
-        gridRow: 1,
-        gridColumn: 2,
         iconName: 'ot-arrow-up',
         axis: 'y',
         sign: 1,
+        gridColumn: 1,
+        disabled: false,
       },
       {
         keyName: 'ArrowDown',
         shiftKey: false,
         bearing: 'forward',
-        gridRow: 2,
-        gridColumn: 2,
         iconName: 'ot-arrow-down',
         axis: 'y',
         sign: -1,
+        gridColumn: 1,
+        disabled: false,
       },
     ],
-    title: 'Across Deck',
-    subtitle: 'Arrow keys',
+    title: 'X- and Y-axis',
+    subtitle: 'Arrow Keys',
   },
 }
 
+const DIRECTION_CONTROL_LAYOUT = css`
+  flex: 1;
+  flex-direction: ${DIRECTION_ROW};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  grid-gap: ${SPACING.spacing16};
+  min-width: 313px;
+
+  @media (max-width: 750px) {
+    flex-direction: ${DIRECTION_COLUMN};
+  }
+`
+
+const PLANE_BUTTONS_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  grid-gap: ${SPACING.spacing8};
+  min-width: 11.8125rem;
+
+  @media (max-width: 750px) {
+    flex-direction: ${DIRECTION_ROW};
+    width: 100%;
+  }
+`
+
+const DEFAULT_BUTTON_STYLE = css`
+  display: flex;
+  border: 1px ${COLORS.white} solid;
+  justify-content: ${JUSTIFY_FLEX_START};
+  align-items: ${ALIGN_CENTER};
+  background-color: ${COLORS.white};
+  color: ${COLORS.black};
+  grid-gap: ${SPACING.spacing8};
+  padding: ${SPACING.spacing8};
+
+  &:focus {
+    background-color: ${COLORS.white};
+  }
+
+  &:hover {
+    background-color: ${COLORS.white};
+    color: ${COLORS.black};
+    box-shadow: 0 0 0;
+    border: 1px ${COLORS.lightGreyHover} solid;
+  }
+
+  &:active {
+    background-color: ${COLORS.white};
+    color: ${COLORS.blueEnabled};
+    border: 1px ${COLORS.blueEnabled} solid;
+  }
+
+  &:disabled {
+    background-color: ${COLORS.white};
+    color: ${COLORS.errorDisabled};
+  }
+`
+
+const ACTIVE_BUTTON_STYLE = css`
+  ${DEFAULT_BUTTON_STYLE}
+  color: ${COLORS.blueEnabled};
+  border: 1px ${COLORS.blueEnabled} solid;
+
+  &:hover {
+    color: ${COLORS.bluePressed};
+    border: 1px ${COLORS.bluePressed} solid;
+  }
+`
+
 interface DirectionControlProps {
-  plane: Plane
+  planes: Plane[]
   jog: Jog
-  stepSize: number
+  stepSize: StepSize
+  initialPlane?: Plane
   buttonColor?: string
 }
 
 export function DirectionControl(props: DirectionControlProps): JSX.Element {
-  const { title, subtitle, controls } = CONTROLS_CONTENTS_BY_PLANE[props.plane]
+  const { planes, jog, stepSize, initialPlane } = props
+  const [currentPlane, setCurrentPlane] = React.useState<Plane>(
+    initialPlane ?? planes[0]
+  )
+  const { t } = useTranslation(['robot_calibration'])
+
+  const handlePlane = (event: React.MouseEvent<HTMLButtonElement>): void => {
+    setCurrentPlane(event.currentTarget.value as Plane)
+    event.currentTarget.blur()
+  }
 
   return (
-    <ControlContainer {...{ title, subtitle }}>
-      <HandleKeypress
-        preventDefault
-        handlers={controls.map(({ keyName, shiftKey, axis, sign }) => ({
-          key: keyName,
-          shiftKey,
-          onPress: () => props.jog(axis, sign, props.stepSize),
-        }))}
-      >
-        <Box
-          display="grid"
-          gridGap={SPACING.spacing1}
-          gridTemplateRows="repeat(2, [row] 2rem)"
-          gridTemplateColumns="repeat(3, [col] 2rem)"
-        >
-          {controls.map(
-            ({ bearing, gridRow, gridColumn, iconName, axis, sign }) => (
+    <ControlContainer title={t('direction_controls')}>
+      <Flex css={DIRECTION_CONTROL_LAYOUT}>
+        <Flex css={PLANE_BUTTONS_STYLE}>
+          {planes.map((plane: Plane) => {
+            const { title, subtitle } = CONTROLS_CONTENTS_BY_PLANE[plane]
+            return (
               <PrimaryButton
-                key={bearing}
-                title={bearing}
-                width={SIZE_2}
-                height={SIZE_2}
-                alignSelf={ALIGN_CENTER}
-                margin={SPACING.spacing1}
-                padding={0}
-                onClick={() => props.jog(axis, sign, props.stepSize)}
-                {...{ gridRow, gridColumn }}
+                key={plane}
+                title={plane}
+                css={
+                  currentPlane === plane
+                    ? ACTIVE_BUTTON_STYLE
+                    : DEFAULT_BUTTON_STYLE
+                }
+                value={plane}
+                onClick={handlePlane}
               >
+                <Icon
+                  name={
+                    plane === 'vertical' ? 'vertical-plane' : 'horizontal-plane'
+                  }
+                  height="1.375rem"
+                  flex="1 0 auto"
+                />
                 <Flex
-                  alignItems={ALIGN_CENTER}
-                  justifyContent={JUSTIFY_CENTER}
-                  width="100%"
+                  flexDirection={DIRECTION_COLUMN}
+                  alignItems={ALIGN_FLEX_START}
+                  flex="1 1 auto"
                 >
-                  <Icon
-                    size="1.5rem"
-                    name={iconName}
-                    backgroundColor={props.buttonColor}
-                  />
+                  {title}
+                  <StyledText
+                    textAlign={TEXT_ALIGN_LEFT}
+                    alignSelf={ALIGN_STRETCH}
+                    color={COLORS.darkGreyEnabled}
+                    css={TYPOGRAPHY.labelRegular}
+                  >
+                    {subtitle}
+                  </StyledText>
                 </Flex>
               </PrimaryButton>
             )
-          )}
-        </Box>
-      </HandleKeypress>
+          })}
+        </Flex>
+        <Flex justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
+          <HandleKeypress
+            preventDefault
+            handlers={[
+              ...CONTROLS_CONTENTS_BY_PLANE.vertical.controls,
+              ...CONTROLS_CONTENTS_BY_PLANE.horizontal.controls,
+            ].map(({ keyName, shiftKey, axis, sign }) => ({
+              key: keyName,
+              shiftKey,
+              onPress: () => {
+                setCurrentPlane(shiftKey ? 'vertical' : 'horizontal')
+                jog(axis, sign, stepSize)
+              },
+            }))}
+          >
+            <ArrowKeys plane={currentPlane} jog={jog} stepSize={stepSize} />
+          </HandleKeypress>
+        </Flex>
+      </Flex>
     </ControlContainer>
   )
 }
+
+const ARROW_GRID_STYLES = css`
+  display: grid;
+  max-width: 8.75rem;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-areas:
+    '.         .         .         .         .          .         '
+    '.         .         ArrowUp   ArrowUp   .          .         '
+    'ArrowLeft ArrowLeft ArrowUp   ArrowUp   ArrowRight ArrowRight'
+    'ArrowLeft ArrowLeft ArrowDown ArrowDown ArrowRight ArrowRight'
+    '.         .         ArrowDown ArrowDown .          .         '
+    '.         .         .         .         .          .         ';
+
+  grid-gap: ${SPACING.spacing4};
+  align-items: ${ALIGN_CENTER};
+
+  @media (max-width: 750px) {
+    max-width: 12.5rem;
+  }
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    max-width: 415px;
+    grid-gap: ${SPACING.spacing20};
+    grid-template-areas:
+      '.         .         ArrowUp   ArrowUp   .          .         '
+      'ArrowLeft ArrowLeft ArrowUp   ArrowUp   ArrowRight ArrowRight'
+      'ArrowLeft ArrowLeft ArrowDown ArrowDown ArrowRight ArrowRight'
+      '.         .         ArrowDown ArrowDown .          .         ';
+  }
+`
+const ARROW_BUTTON_STYLES = css`
+  color: ${COLORS.darkGreyEnabled};
+  background-color: ${COLORS.white};
+
+  border: ${BORDERS.lineBorder};
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  padding: 0;
+  align-items: ${ALIGN_CENTER};
+  justify-content: ${JUSTIFY_CENTER};
+  &:hover {
+    background-color: ${COLORS.white};
+    color: ${COLORS.darkGreyHover};
+    box-shadow: 0 0 0;
+    border: 1px ${COLORS.lightGreyHover} solid;
+  }
+
+  &:active {
+    background-color: ${COLORS.white};
+    color: ${COLORS.darkGreyPressed};
+    border: 1px ${COLORS.lightGreyHover} solid;
+  }
+
+  &:focus {
+    background-color: ${COLORS.white};
+  }
+
+  &:disabled {
+    background-color: ${COLORS.white};
+    color: ${COLORS.darkGreyDisabled};
+  }
+
+  @media (max-width: 750px) {
+    width: 4rem;
+    height: 4rem;
+  }
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 125px;
+    height: 125px;
+    background-color: ${COLORS.light1};
+    color: ${COLORS.darkBlackEnabled};
+    border-radius: ${BORDERS.borderRadiusSize4};
+
+    &:hover {
+      background-color: ${COLORS.light1Pressed};
+      color: ${COLORS.darkBlackHover};
+      border: 1px ${COLORS.transparent} solid;
+    }
+
+    &:active {
+      background-color: ${COLORS.light1Pressed};
+      color: ${COLORS.darkGreyPressed};
+    }
+
+    &:focus {
+      background-color: ${COLORS.light1Pressed};
+    }
+
+    &:disabled {
+      background-color: ${COLORS.darkBlack20};
+      color: ${COLORS.darkBlack40};
+      border: 1px ${COLORS.transparent} solid;
+    }
+  }
+`
+const ARROW_ICON_STYLES = css`
+  height: 1.125rem;
+  width: 1.125rem;
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    width: 84px;
+    height: 84px;
+  }
+`
+
+const BUTTON_ALIGN_BY_KEY_NAME: {
+  [keyName: string]: CSSProperties['alignSelf']
+} = {
+  ArrowUp: ALIGN_FLEX_END,
+  ArrowDown: ALIGN_FLEX_START,
+  ArrowLeft: ALIGN_CENTER,
+  ArrowRight: ALIGN_CENTER,
+}
+interface ArrowKeysProps {
+  plane: Plane
+  jog: Jog
+  stepSize: StepSize
+}
+
+export const ArrowKeys = (props: ArrowKeysProps): JSX.Element => {
+  const { plane, jog, stepSize } = props
+  const controls = CONTROLS_CONTENTS_BY_PLANE[plane].controls
+
+  return (
+    <Box css={ARROW_GRID_STYLES}>
+      {controls.map(
+        ({ bearing, iconName, axis, sign, gridColumn, keyName, disabled }) => (
+          <PrimaryButton
+            key={bearing}
+            onClick={() => jog(axis, sign, stepSize)}
+            css={ARROW_BUTTON_STYLES}
+            title={bearing}
+            gridArea={keyName}
+            alignSelf={BUTTON_ALIGN_BY_KEY_NAME[keyName] ?? 'center'}
+            disabled={disabled}
+          >
+            <Icon css={ARROW_ICON_STYLES} name={iconName} />
+          </PrimaryButton>
+        )
+      )}
+    </Box>
+  )
+}
+
+export function TouchDirectionControl(
+  props: DirectionControlProps
+): JSX.Element {
+  const { planes, jog, stepSize, initialPlane } = props
+  const [currentPlane, setCurrentPlane] = React.useState<Plane>(
+    initialPlane ?? planes[0]
+  )
+  const { i18n, t } = useTranslation(['robot_calibration'])
+
+  return (
+    <Flex
+      flex="1"
+      flexDirection={DIRECTION_COLUMN}
+      border={`1px solid ${COLORS.darkBlack40}`}
+      borderRadius={BORDERS.borderRadiusSize4}
+      padding={SPACING.spacing16}
+      gridGap={SPACING.spacing16}
+    >
+      <Flex css={DIRECTION_CONTROL_LAYOUT}>
+        <Flex css={PLANE_BUTTONS_STYLE}>
+          <TouchControlLabel>
+            {i18n.format(t('jog_controls'), 'capitalize')}
+          </TouchControlLabel>
+          {planes.map((plane: Plane) => {
+            const selected = currentPlane === plane
+            return (
+              <TouchControlButton
+                key={plane}
+                selected={selected}
+                onClick={() => {
+                  setCurrentPlane(plane)
+                }}
+              >
+                <Flex
+                  flexDirection={DIRECTION_COLUMN}
+                  alignItems={ALIGN_FLEX_START}
+                  justifyContent={JUSTIFY_CENTER}
+                  height="74px"
+                >
+                  <StyledText
+                    as="p"
+                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+                    color={selected ? COLORS.white : COLORS.darkBlackEnabled}
+                  >
+                    {CONTROLS_CONTENTS_BY_PLANE[plane].title}
+                  </StyledText>
+                </Flex>
+              </TouchControlButton>
+            )
+          })}
+        </Flex>
+        <Flex justifyContent={JUSTIFY_CENTER} alignItems={ALIGN_CENTER}>
+          <ArrowKeys plane={currentPlane} jog={jog} stepSize={stepSize} />
+        </Flex>
+      </Flex>
+    </Flex>
+  )
+}
+
+const TouchControlLabel = styled.p`
+  font-size: ${TYPOGRAPHY.fontSize20};
+  font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+  line-height: ${TYPOGRAPHY.lineHeight24};
+`

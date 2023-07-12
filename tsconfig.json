@@ -8,6 +8,9 @@
       "path": "./app-shell"
     },
     {
+      "path": "./app-shell-odd"
+    },
+    {
       "path": "./components"
     },
     {
@@ -36,6 +39,9 @@
     },
     {
       "path": "./react-api-client"
+    },
+    {
+      "path": "./usb-bridge/node-client"
     }
   ]
 }

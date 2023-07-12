@@ -1,19 +1,90 @@
 """Definition of CAN messages."""
 from dataclasses import dataclass
-from typing import Type
-
+from typing import Type, Any
+import threading
 from typing_extensions import Literal
 
-from ..constants import MessageId
+from ..constants import MessageId, ErrorCode, ErrorSeverity
 from . import payloads
+from .. import utils
+from logging import Logger
+
+
+class SingletonMessageIndexGenerator(object):
+    """Singleton class that generates uinque index values."""
+
+    def __new__(cls) -> Any:
+        """Either generate or return the singleton instance."""
+        if not hasattr(cls, "instance"):
+            cls.instance = super(SingletonMessageIndexGenerator, cls).__new__(cls)
+        return cls.instance
+
+    def __init__(self) -> None:
+        """Initalize the lock."""
+        self._lock = threading.Lock()
+
+    def get_next_index(self) -> int:
+        """Return the next index."""
+        # increment before returning so we never return 0 as a value
+        self._lock.acquire(timeout=1)
+        self.__current_index += 1
+        self._lock.release()
+        return self.__current_index
+
+    __current_index = 0
 
 
 @dataclass
-class EmptyPayloadMessage:
+class BaseMessage(object):
+    """Base class of a message."""
+
+    def __post_init__(self) -> None:
+        """Update the message index from the singleton."""
+        try:
+            index_generator = SingletonMessageIndexGenerator()
+            if self.payload.message_index.value is None:  # type: ignore[attr-defined]
+                self.payload.message_index = utils.UInt32Field(  # type: ignore[attr-defined]
+                    index_generator.get_next_index()
+                )
+        except AttributeError:
+            # we are probably constructing this instance from binary and it doesn't
+            # have a payload yet
+            pass
+
+
+@dataclass
+class EmptyPayloadMessage(BaseMessage):
     """Base class of a message that has an empty payload."""
 
     payload: payloads.EmptyPayload = payloads.EmptyPayload()
     payload_type: Type[payloads.EmptyPayload] = payloads.EmptyPayload
+
+
+@dataclass
+class Acknowledgement(EmptyPayloadMessage):  # noqa: D101
+    message_id: MessageId = MessageId.acknowledgement
+
+
+@dataclass
+class ErrorMessage(BaseMessage):  # noqa: D101
+    payload: payloads.ErrorMessagePayload
+    payload_type: Type[payloads.ErrorMessagePayload] = payloads.ErrorMessagePayload
+    message_id: Literal[MessageId.error_message] = MessageId.error_message
+
+    def log_error(self, log: Logger) -> None:
+        """Log an error message with the correct log level."""
+        error_name = ""
+        if self.payload.error_code.value in [err.value for err in ErrorCode]:
+            error_name = str(ErrorCode(self.payload.error_code.value).name)
+        else:
+            error_name = "UNKNOWN ERROR"
+
+        if self.payload.severity == ErrorSeverity.warning:
+            log.warning(f"recived a firmware warning {error_name}")
+        elif self.payload.severity == ErrorSeverity.recoverable:
+            log.error(f"recived a firmware recoverable error {error_name}")
+        elif self.payload.severity == ErrorSeverity.unrecoverable:
+            log.critical(f"recived a firmware critical error {error_name}")
 
 
 @dataclass
@@ -32,7 +103,7 @@ class DeviceInfoRequest(EmptyPayloadMessage):  # noqa: D101
 
 
 @dataclass
-class DeviceInfoResponse:  # noqa: D101
+class DeviceInfoResponse(BaseMessage):  # noqa: D101
     payload: payloads.DeviceInfoResponsePayload
     payload_type: Type[
         payloads.DeviceInfoResponsePayload
@@ -46,7 +117,7 @@ class TaskInfoRequest(EmptyPayloadMessage):  # noqa: D101
 
 
 @dataclass
-class TaskInfoResponse:  # noqa: D101
+class TaskInfoResponse(BaseMessage):  # noqa: D101
     payload: payloads.TaskInfoResponsePayload
     payload_type: Type[
         payloads.TaskInfoResponsePayload
@@ -77,7 +148,7 @@ class DisableMotorRequest(EmptyPayloadMessage):  # noqa: D101
 
 
 @dataclass
-class GetStatusResponse:  # noqa: D101
+class GetStatusResponse(BaseMessage):  # noqa: D101
     payload: payloads.GetStatusResponsePayload
     payload_type: Type[
         payloads.GetStatusResponsePayload
@@ -86,35 +157,35 @@ class GetStatusResponse:  # noqa: D101
 
 
 @dataclass
-class MoveRequest:  # noqa: D101
+class MoveRequest(BaseMessage):  # noqa: D101
     payload: payloads.MoveRequestPayload
     payload_type: Type[payloads.MoveRequestPayload] = payloads.MoveRequestPayload
     message_id: Literal[MessageId.move_request] = MessageId.move_request
 
 
 @dataclass
-class WriteToEEPromRequest:  # noqa: D101
+class WriteToEEPromRequest(BaseMessage):  # noqa: D101
     payload: payloads.EEPromDataPayload
     payload_type: Type[payloads.EEPromDataPayload] = payloads.EEPromDataPayload
     message_id: Literal[MessageId.write_eeprom] = MessageId.write_eeprom
 
 
 @dataclass
-class ReadFromEEPromRequest:  # noqa: D101
+class ReadFromEEPromRequest(BaseMessage):  # noqa: D101
     payload: payloads.EEPromReadPayload
     payload_type: Type[payloads.EEPromReadPayload] = payloads.EEPromReadPayload
     message_id: Literal[MessageId.read_eeprom_request] = MessageId.read_eeprom_request
 
 
 @dataclass
-class ReadFromEEPromResponse:  # noqa: D101
+class ReadFromEEPromResponse(BaseMessage):  # noqa: D101
     payload: payloads.EEPromDataPayload
     payload_type: Type[payloads.EEPromDataPayload] = payloads.EEPromDataPayload
     message_id: Literal[MessageId.read_eeprom_response] = MessageId.read_eeprom_response
 
 
 @dataclass
-class AddLinearMoveRequest:  # noqa: D101
+class AddLinearMoveRequest(BaseMessage):  # noqa: D101
     payload: payloads.AddLinearMoveRequestPayload
     payload_type: Type[
         payloads.AddLinearMoveRequestPayload
@@ -123,7 +194,7 @@ class AddLinearMoveRequest:  # noqa: D101
 
 
 @dataclass
-class GetMoveGroupRequest:  # noqa: D101
+class GetMoveGroupRequest(BaseMessage):  # noqa: D101
     payload: payloads.MoveGroupRequestPayload
     payload_type: Type[
         payloads.MoveGroupRequestPayload
@@ -134,7 +205,7 @@ class GetMoveGroupRequest:  # noqa: D101
 
 
 @dataclass
-class GetMoveGroupResponse:  # noqa: D101
+class GetMoveGroupResponse(BaseMessage):  # noqa: D101
     payload: payloads.GetMoveGroupResponsePayload
     payload_type: Type[
         payloads.GetMoveGroupResponsePayload
@@ -145,7 +216,7 @@ class GetMoveGroupResponse:  # noqa: D101
 
 
 @dataclass
-class ExecuteMoveGroupRequest:  # noqa: D101
+class ExecuteMoveGroupRequest(BaseMessage):  # noqa: D101
     payload: payloads.ExecuteMoveGroupRequestPayload
     payload_type: Type[
         payloads.ExecuteMoveGroupRequestPayload
@@ -163,32 +234,46 @@ class ClearAllMoveGroupsRequest(EmptyPayloadMessage):  # noqa: D101
 
 
 @dataclass
-class MoveCompleted:  # noqa: D101
+class MoveCompleted(BaseMessage):  # noqa: D101
     payload: payloads.MoveCompletedPayload
     payload_type: Type[payloads.MoveCompletedPayload] = payloads.MoveCompletedPayload
     message_id: Literal[MessageId.move_completed] = MessageId.move_completed
 
 
 @dataclass
-class EncoderPositionRequest(EmptyPayloadMessage):  # noqa: D101
+class MotorPositionRequest(EmptyPayloadMessage):  # noqa: D101
     message_id: Literal[
-        MessageId.encoder_position_request
-    ] = MessageId.encoder_position_request
+        MessageId.motor_position_request
+    ] = MessageId.motor_position_request
 
 
 @dataclass
-class EncoderPositionResponse:  # noqa: D101
-    payload: payloads.EncoderPositionResponse
-    payload_type: Type[
-        payloads.EncoderPositionResponse
-    ] = payloads.EncoderPositionResponse
+class MotorPositionResponse(BaseMessage):  # noqa: D101
+    payload: payloads.MotorPositionResponse
+    payload_type: Type[payloads.MotorPositionResponse] = payloads.MotorPositionResponse
     message_id: Literal[
-        MessageId.encoder_position_response
-    ] = MessageId.encoder_position_response
+        MessageId.motor_position_response
+    ] = MessageId.motor_position_response
 
 
 @dataclass
-class SetMotionConstraints:  # noqa: D101
+class UpdateMotorPositionEstimationRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.update_motor_position_estimation_request
+    ] = MessageId.update_motor_position_estimation_request
+
+
+@dataclass
+class UpdateMotorPositionEstimationResponse(BaseMessage):  # noqa: D101
+    payload: payloads.MotorPositionResponse
+    payload_type: Type[payloads.MotorPositionResponse] = payloads.MotorPositionResponse
+    message_id: Literal[
+        MessageId.update_motor_position_estimation_response
+    ] = MessageId.update_motor_position_estimation_response
+
+
+@dataclass
+class SetMotionConstraints(BaseMessage):  # noqa: D101
     payload: payloads.MotionConstraintsPayload
     payload_type: Type[
         payloads.MotionConstraintsPayload
@@ -206,7 +291,7 @@ class GetMotionConstraintsRequest(EmptyPayloadMessage):  # noqa: D101
 
 
 @dataclass
-class GetMotionConstraintsResponse:  # noqa: D101
+class GetMotionConstraintsResponse(BaseMessage):  # noqa: D101
     payload: payloads.MotionConstraintsPayload
     payload_type: Type[
         payloads.MotionConstraintsPayload
@@ -217,7 +302,7 @@ class GetMotionConstraintsResponse:  # noqa: D101
 
 
 @dataclass
-class WriteMotorDriverRegister:  # noqa: D101
+class WriteMotorDriverRegister(BaseMessage):  # noqa: D101
     payload: payloads.MotorDriverRegisterDataPayload
     payload_type: Type[
         payloads.MotorDriverRegisterPayload
@@ -228,7 +313,7 @@ class WriteMotorDriverRegister:  # noqa: D101
 
 
 @dataclass
-class ReadMotorDriverRequest:  # noqa: D101
+class ReadMotorDriverRequest(BaseMessage):  # noqa: D101
     payload: payloads.MotorDriverRegisterPayload
     payload_type: Type[
         payloads.MotorDriverRegisterPayload
@@ -239,7 +324,7 @@ class ReadMotorDriverRequest:  # noqa: D101
 
 
 @dataclass
-class ReadMotorDriverResponse:  # noqa: D101
+class ReadMotorDriverResponse(BaseMessage):  # noqa: D101
     payload: payloads.ReadMotorDriverRegisterResponsePayload
     payload_type: Type[
         payloads.ReadMotorDriverRegisterResponsePayload
@@ -250,7 +335,7 @@ class ReadMotorDriverResponse:  # noqa: D101
 
 
 @dataclass
-class WriteMotorCurrentRequest:  # noqa: D101
+class WriteMotorCurrentRequest(BaseMessage):  # noqa: D101
     payload: payloads.MotorCurrentPayload
     payload_type: Type[payloads.MotorCurrentPayload] = payloads.MotorCurrentPayload
     message_id: Literal[
@@ -266,7 +351,7 @@ class ReadPresenceSensingVoltageRequest(EmptyPayloadMessage):  # noqa: D101
 
 
 @dataclass
-class ReadPresenceSensingVoltageResponse:  # noqa: D101
+class ReadPresenceSensingVoltageResponse(BaseMessage):  # noqa: D101
     payload: payloads.ReadPresenceSensingVoltageResponsePayload
     payload_type: Type[
         payloads.ReadPresenceSensingVoltageResponsePayload
@@ -277,7 +362,7 @@ class ReadPresenceSensingVoltageResponse:  # noqa: D101
 
 
 @dataclass
-class PushToolsDetectedNotification:  # noqa: D101
+class PushToolsDetectedNotification(BaseMessage):  # noqa: D101
     payload: payloads.ToolsDetectedNotificationPayload
     payload_type: Type[
         payloads.ToolsDetectedNotificationPayload
@@ -300,14 +385,14 @@ class FirmwareUpdateInitiate(EmptyPayloadMessage):  # noqa: D101
 
 
 @dataclass
-class FirmwareUpdateData:  # noqa: D101
+class FirmwareUpdateData(BaseMessage):  # noqa: D101
     payload: payloads.FirmwareUpdateData
     payload_type: Type[payloads.FirmwareUpdateData] = payloads.FirmwareUpdateData
     message_id: Literal[MessageId.fw_update_data] = MessageId.fw_update_data
 
 
 @dataclass
-class FirmwareUpdateDataAcknowledge:  # noqa: D101
+class FirmwareUpdateDataAcknowledge(BaseMessage):  # noqa: D101
     payload: payloads.FirmwareUpdateDataAcknowledge
     payload_type: Type[
         payloads.FirmwareUpdateDataAcknowledge
@@ -316,7 +401,7 @@ class FirmwareUpdateDataAcknowledge:  # noqa: D101
 
 
 @dataclass
-class FirmwareUpdateComplete:  # noqa: D101
+class FirmwareUpdateComplete(BaseMessage):  # noqa: D101
     payload: payloads.FirmwareUpdateComplete
     payload_type: Type[
         payloads.FirmwareUpdateComplete
@@ -325,7 +410,7 @@ class FirmwareUpdateComplete:  # noqa: D101
 
 
 @dataclass
-class FirmwareUpdateCompleteAcknowledge:  # noqa: D101
+class FirmwareUpdateCompleteAcknowledge(BaseMessage):  # noqa: D101
     payload: payloads.FirmwareUpdateAcknowledge
     payload_type: Type[
         payloads.FirmwareUpdateAcknowledge
@@ -343,7 +428,7 @@ class FirmwareUpdateStatusRequest(EmptyPayloadMessage):  # noqa: D101
 
 
 @dataclass
-class FirmwareUpdateStatusResponse:  # noqa: D101
+class FirmwareUpdateStatusResponse(BaseMessage):  # noqa: D101
     payload: payloads.FirmwareUpdateStatus
     payload_type: Type[payloads.FirmwareUpdateStatus] = payloads.FirmwareUpdateStatus
     message_id: Literal[
@@ -357,7 +442,7 @@ class FirmwareUpdateEraseAppRequest(EmptyPayloadMessage):  # noqa: D101
 
 
 @dataclass
-class FirmwareUpdateEraseAppResponse:  # noqa: D101
+class FirmwareUpdateEraseAppResponse(BaseMessage):  # noqa: D101
     payload: payloads.FirmwareUpdateAcknowledge
     payload_type: Type[
         payloads.FirmwareUpdateAcknowledge
@@ -368,7 +453,7 @@ class FirmwareUpdateEraseAppResponse:  # noqa: D101
 
 
 @dataclass
-class HomeRequest:  # noqa: D101
+class HomeRequest(BaseMessage):  # noqa: D101
     payload: payloads.HomeRequestPayload
     payload_type: Type[payloads.HomeRequestPayload] = payloads.HomeRequestPayload
     message_id: Literal[MessageId.home_request] = MessageId.home_request
@@ -385,7 +470,7 @@ class ReadLimitSwitchRequest(EmptyPayloadMessage):  # noqa: D101
 
 
 @dataclass
-class ReadLimitSwitchResponse:  # noqa: D101
+class ReadLimitSwitchResponse(BaseMessage):  # noqa: D101
     payload: payloads.GetLimitSwitchResponse
     payload_type: Type[
         payloads.GetLimitSwitchResponse
@@ -394,7 +479,7 @@ class ReadLimitSwitchResponse:  # noqa: D101
 
 
 @dataclass
-class ReadFromSensorRequest:  # noqa: D101
+class ReadFromSensorRequest(BaseMessage):  # noqa: D101
     payload: payloads.ReadFromSensorRequestPayload
     payload_type: Type[
         payloads.ReadFromSensorRequestPayload
@@ -403,7 +488,7 @@ class ReadFromSensorRequest:  # noqa: D101
 
 
 @dataclass
-class WriteToSensorRequest:  # noqa: D101
+class WriteToSensorRequest(BaseMessage):  # noqa: D101
     payload: payloads.WriteToSensorRequestPayload
     payload_type: Type[
         payloads.WriteToSensorRequestPayload
@@ -412,7 +497,7 @@ class WriteToSensorRequest:  # noqa: D101
 
 
 @dataclass
-class BaselineSensorRequest:  # noqa: D101
+class BaselineSensorRequest(BaseMessage):  # noqa: D101
     payload: payloads.BaselineSensorRequestPayload
     payload_type: Type[
         payloads.BaselineSensorRequestPayload
@@ -423,7 +508,18 @@ class BaselineSensorRequest:  # noqa: D101
 
 
 @dataclass
-class ReadFromSensorResponse:  # noqa: D101
+class BaselineSensorResponse(BaseMessage):  # noqa: D101
+    payload: payloads.BaselineSensorResponsePayload
+    payload_type: Type[
+        payloads.BaselineSensorResponsePayload
+    ] = payloads.BaselineSensorResponsePayload
+    message_id: Literal[
+        MessageId.baseline_sensor_response
+    ] = MessageId.baseline_sensor_response
+
+
+@dataclass
+class ReadFromSensorResponse(BaseMessage):  # noqa: D101
     payload: payloads.ReadFromSensorResponsePayload
     payload_type: Type[
         payloads.ReadFromSensorResponsePayload
@@ -432,7 +528,7 @@ class ReadFromSensorResponse:  # noqa: D101
 
 
 @dataclass
-class SetSensorThresholdRequest:  # noqa: D101
+class SetSensorThresholdRequest(BaseMessage):  # noqa: D101
     payload: payloads.SetSensorThresholdRequestPayload
     payload_type: Type[
         payloads.SetSensorThresholdRequestPayload
@@ -443,7 +539,7 @@ class SetSensorThresholdRequest:  # noqa: D101
 
 
 @dataclass
-class SensorThresholdResponse:  # noqa: D101
+class SensorThresholdResponse(BaseMessage):  # noqa: D101
     payload: payloads.SensorThresholdResponsePayload
     payload_type: Type[
         payloads.SensorThresholdResponsePayload
@@ -454,7 +550,7 @@ class SensorThresholdResponse:  # noqa: D101
 
 
 @dataclass
-class SensorDiagnosticRequest:  # noqa: D101
+class SensorDiagnosticRequest(BaseMessage):  # noqa: D101
     payload: payloads.SensorDiagnosticRequestPayload
     payload_type: Type[
         payloads.SensorDiagnosticRequestPayload
@@ -465,7 +561,7 @@ class SensorDiagnosticRequest:  # noqa: D101
 
 
 @dataclass
-class SensorDiagnosticResponse:  # noqa: D101
+class SensorDiagnosticResponse(BaseMessage):  # noqa: D101
     payload: payloads.SensorDiagnosticResponsePayload
     payload_type: Type[
         payloads.SensorDiagnosticResponsePayload
@@ -476,7 +572,7 @@ class SensorDiagnosticResponse:  # noqa: D101
 
 
 @dataclass
-class PipetteInfoResponse:  # noqa: D101
+class PipetteInfoResponse(BaseMessage):  # noqa: D101
     payload: payloads.PipetteInfoResponsePayload
     payload_type: Type[
         payloads.PipetteInfoResponsePayload
@@ -487,7 +583,7 @@ class PipetteInfoResponse:  # noqa: D101
 
 
 @dataclass
-class SetBrushedMotorVrefRequest:  # noqa: D101
+class SetBrushedMotorVrefRequest(BaseMessage):  # noqa: D101
     payload: payloads.BrushedMotorVrefPayload
     payload_type: Type[
         payloads.BrushedMotorVrefPayload
@@ -498,7 +594,7 @@ class SetBrushedMotorVrefRequest:  # noqa: D101
 
 
 @dataclass
-class SetBrushedMotorPwmRequest:  # noqa: D101
+class SetBrushedMotorPwmRequest(BaseMessage):  # noqa: D101
     payload: payloads.BrushedMotorPwmPayload
     payload_type: Type[
         payloads.BrushedMotorPwmPayload
@@ -509,7 +605,25 @@ class SetBrushedMotorPwmRequest:  # noqa: D101
 
 
 @dataclass
-class GripperGripRequest:  # noqa: D101
+class BrushedMotorConfRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.brushed_motor_conf_request
+    ] = MessageId.brushed_motor_conf_request
+
+
+@dataclass
+class BrushedMotorConfResponse(BaseMessage):  # noqa: D101
+    payload: payloads.BrushedMotorConfPayload
+    payload_type: Type[
+        payloads.BrushedMotorConfPayload
+    ] = payloads.BrushedMotorConfPayload
+    message_id: Literal[
+        MessageId.brushed_motor_conf_response
+    ] = MessageId.brushed_motor_conf_response
+
+
+@dataclass
+class GripperGripRequest(BaseMessage):  # noqa: D101
     payload: payloads.GripperMoveRequestPayload
     payload_type: Type[
         payloads.GripperMoveRequestPayload
@@ -518,7 +632,7 @@ class GripperGripRequest:  # noqa: D101
 
 
 @dataclass
-class GripperHomeRequest:  # noqa: D101
+class GripperHomeRequest(BaseMessage):  # noqa: D101
     payload: payloads.GripperMoveRequestPayload
     payload_type: Type[
         payloads.GripperMoveRequestPayload
@@ -527,7 +641,18 @@ class GripperHomeRequest:  # noqa: D101
 
 
 @dataclass
-class BindSensorOutputRequest:  # noqa: D101
+class AddBrushedLinearMoveRequest(BaseMessage):  # noqa: D101
+    payload: payloads.GripperMoveRequestPayload
+    payload_type: Type[
+        payloads.GripperMoveRequestPayload
+    ] = payloads.GripperMoveRequestPayload
+    message_id: Literal[
+        MessageId.add_brushed_linear_move_request
+    ] = MessageId.add_brushed_linear_move_request
+
+
+@dataclass
+class BindSensorOutputRequest(BaseMessage):  # noqa: D101
     payload: payloads.BindSensorOutputRequestPayload
     payload_type: Type[
         payloads.BindSensorOutputRequestPayload
@@ -538,7 +663,7 @@ class BindSensorOutputRequest:  # noqa: D101
 
 
 @dataclass
-class BindSensorOutputResponse:  # noqa: D101
+class BindSensorOutputResponse(BaseMessage):  # noqa: D101
     payload: payloads.BindSensorOutputResponsePayload
     payload_type: Type[
         payloads.BindSensorOutputResponsePayload
@@ -549,7 +674,7 @@ class BindSensorOutputResponse:  # noqa: D101
 
 
 @dataclass
-class GripperInfoResponse:  # noqa: D101
+class GripperInfoResponse(BaseMessage):  # noqa: D101
     payload: payloads.GripperInfoResponsePayload
     payload_type: Type[
         payloads.GripperInfoResponsePayload
@@ -560,7 +685,21 @@ class GripperInfoResponse:  # noqa: D101
 
 
 @dataclass
-class TipActionRequest:  # noqa: D101
+class GearEnableMotorRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.gear_enable_motor_request
+    ] = MessageId.gear_enable_motor_request
+
+
+@dataclass
+class GearDisableMotorRequest(EmptyPayloadMessage):  # noqa: D101
+    message_id: Literal[
+        MessageId.gear_disable_motor_request
+    ] = MessageId.gear_disable_motor_request
+
+
+@dataclass
+class TipActionRequest(BaseMessage):  # noqa: D101
     payload: payloads.TipActionRequestPayload
     payload_type: Type[
         payloads.TipActionRequestPayload
@@ -571,7 +710,7 @@ class TipActionRequest:  # noqa: D101
 
 
 @dataclass
-class TipActionResponse:  # noqa: D101
+class TipActionResponse(BaseMessage):  # noqa: D101
     payload: payloads.TipActionResponsePayload
     payload_type: Type[
         payloads.TipActionResponsePayload
@@ -582,7 +721,38 @@ class TipActionResponse:  # noqa: D101
 
 
 @dataclass
-class PeripheralStatusRequest:  # noqa: D101
+class GearWriteMotorDriverRegisterRequest(BaseMessage):  # noqa: D101
+    payload: payloads.MotorDriverRegisterDataPayload
+    payload_type: Type[
+        payloads.MotorDriverRegisterPayload
+    ] = payloads.MotorDriverRegisterDataPayload
+    message_id: Literal[
+        MessageId.gear_write_motor_driver_request
+    ] = MessageId.gear_write_motor_driver_request
+
+
+@dataclass
+class GearReadMotorDriverRegisterRequest(BaseMessage):  # noqa: D101
+    payload: payloads.MotorDriverRegisterPayload
+    payload_type: Type[
+        payloads.MotorDriverRegisterPayload
+    ] = payloads.MotorDriverRegisterPayload
+    message_id: Literal[
+        MessageId.gear_read_motor_driver_request
+    ] = MessageId.gear_read_motor_driver_request
+
+
+@dataclass
+class GearWriteMotorCurrentRequest(BaseMessage):  # noqa: D101
+    payload: payloads.MotorCurrentPayload
+    payload_type: Type[payloads.MotorCurrentPayload] = payloads.MotorCurrentPayload
+    message_id: Literal[
+        MessageId.gear_set_current_request
+    ] = MessageId.gear_set_current_request
+
+
+@dataclass
+class PeripheralStatusRequest(BaseMessage):  # noqa: D101
     payload: payloads.SensorPayload
     payload_type: Type[payloads.SensorPayload] = payloads.SensorPayload
     message_id: Literal[
@@ -591,7 +761,7 @@ class PeripheralStatusRequest:  # noqa: D101
 
 
 @dataclass
-class PeripheralStatusResponse:  # noqa: D101
+class PeripheralStatusResponse(BaseMessage):  # noqa: D101
     payload: payloads.PeripheralStatusResponsePayload
     payload_type: Type[
         payloads.PeripheralStatusResponsePayload
@@ -602,7 +772,7 @@ class PeripheralStatusResponse:  # noqa: D101
 
 
 @dataclass
-class SetSerialNumber:  # noqa: D101
+class SetSerialNumber(BaseMessage):  # noqa: D101
     payload: payloads.SerialNumberPayload
     payload_type: Type[payloads.SerialNumberPayload] = payloads.SerialNumberPayload
     message_id: Literal[MessageId.set_serial_number] = MessageId.set_serial_number
@@ -619,3 +789,65 @@ class InstrumentInfoRequest(EmptyPayloadMessage):
     message_id: Literal[
         MessageId.instrument_info_request
     ] = MessageId.instrument_info_request
+
+
+@dataclass
+class SetGripperErrorTolerance(BaseMessage):  # noqa: D101
+    payload: payloads.GripperErrorTolerancePayload
+    payload_type: Type[
+        payloads.GripperErrorTolerancePayload
+    ] = payloads.GripperErrorTolerancePayload
+    message_id: Literal[
+        MessageId.set_gripper_error_tolerance
+    ] = MessageId.set_gripper_error_tolerance
+
+
+@dataclass
+class TipStatusQueryRequest(EmptyPayloadMessage):
+    """Request to query the tip presence pin.
+
+    The response should be a PushTipPresenceNotification.
+    """
+
+    message_id: Literal[
+        MessageId.get_tip_status_request
+    ] = MessageId.get_tip_status_request
+
+
+@dataclass
+class PushTipPresenceNotification(BaseMessage):
+    """Hardware triggered notification of ejector flag status.
+
+    The response should be a boolean of the ejector flag
+    either being occluded or not.
+    """
+
+    payload: payloads.PushTipPresenceNotificationPayload
+    payload_type: Type[
+        payloads.PushTipPresenceNotificationPayload
+    ] = payloads.PushTipPresenceNotificationPayload
+    message_id: Literal[
+        MessageId.tip_presence_notification
+    ] = MessageId.tip_presence_notification
+
+
+@dataclass
+class GetMotorUsageRequest(EmptyPayloadMessage):
+    """Prompt a motor to send it's total lifetime usage."""
+
+    message_id: Literal[
+        MessageId.get_motor_usage_request
+    ] = MessageId.get_motor_usage_request
+
+
+@dataclass
+class GetMotorUsageResponse(BaseMessage):
+    """Motor response with total lifetime usage."""
+
+    payload: payloads.GetMotorUsageResponsePayload
+    payload_type: Type[
+        payloads.GetMotorUsageResponsePayload
+    ] = payloads.GetMotorUsageResponsePayload
+    message_id: Literal[
+        MessageId.get_motor_usage_response
+    ] = MessageId.get_motor_usage_response

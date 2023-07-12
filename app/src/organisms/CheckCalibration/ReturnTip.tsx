@@ -1,26 +1,23 @@
 import * as React from 'react'
 import {
   Flex,
-  PrimaryBtn,
-  Text,
-  ALIGN_CENTER,
+  PrimaryButton,
   DIRECTION_COLUMN,
-  JUSTIFY_CENTER,
-  SPACING_3,
+  JUSTIFY_SPACE_BETWEEN,
+  SPACING,
+  ALIGN_STRETCH,
 } from '@opentrons/components'
 import uniq from 'lodash/uniq'
 
 import * as Sessions from '../../redux/sessions'
+import { StyledText } from '../../atoms/text'
 import type { CalibrationPanelProps } from '../../organisms/CalibrationPanels/types'
 import type { SessionCommandString } from '../../redux/sessions/types'
-
-const CONFIRM_RETURN_BODY = 'Return tip and '
-const CONTINUE_TO_NEXT = 'continue to next pipette'
-const EXIT_PROGRAM = 'see calibration health check results'
-const CONTINUE = 'continue to the next tiprack'
-const EXIT = 'continue to the result summary'
+import { useTranslation } from 'react-i18next'
+import { NeedHelpLink } from '../CalibrationPanels'
 
 export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
+  const { t } = useTranslation('robot_calibration')
   const { sendCommands, checkBothPipettes, activePipette, instruments } = props
   const onFinalPipette =
     !checkBothPipettes ||
@@ -55,23 +52,28 @@ export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
   }
   return (
     <Flex
-      width="100%"
       flexDirection={DIRECTION_COLUMN}
-      alignItems={ALIGN_CENTER}
-      justifyContent={JUSTIFY_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      padding={SPACING.spacing32}
+      minHeight="32rem"
     >
-      <Text marginBottom={SPACING_3}>
-        {`${CONFIRM_RETURN_BODY}
-        ${onFinalPipette ? EXIT_PROGRAM : CONTINUE_TO_NEXT}`}
-      </Text>
-      <PrimaryBtn
-        title="confirmReturnTip"
-        marginTop={SPACING_3}
-        width="80%"
-        onClick={confirmReturnTip}
+      <Flex alignSelf={ALIGN_STRETCH}>
+        <StyledText as="h1">
+          {onFinalPipette
+            ? t('return_tip_and_exit')
+            : t('return_tip_and_continue')}
+        </StyledText>
+      </Flex>
+      <Flex
+        width="100%"
+        justifyContent={JUSTIFY_SPACE_BETWEEN}
+        marginTop={SPACING.spacing16}
       >
-        {onFinalPipette ? EXIT : CONTINUE}
-      </PrimaryBtn>
+        <NeedHelpLink />
+        <PrimaryButton aria-label="return tip" onClick={confirmReturnTip}>
+          {t('return_tip')}
+        </PrimaryButton>
+      </Flex>
     </Flex>
   )
 }

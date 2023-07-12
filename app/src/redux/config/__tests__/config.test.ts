@@ -78,12 +78,6 @@ describe('config', () => {
         meta: { shell: true },
       })
     })
-    it('can create a python:OPEN_PYTHON_DIRECTORY action to request the python directory file to open', () => {
-      expect(Cfg.openPythonInterpreterDirectory()).toEqual({
-        type: 'python:OPEN_PYTHON_DIRECTORY',
-        meta: { shell: true },
-      })
-    })
   })
 
   describe('reducer', () => {

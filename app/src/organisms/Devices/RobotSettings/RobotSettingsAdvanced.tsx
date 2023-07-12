@@ -1,29 +1,42 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { useTranslation } from 'react-i18next'
 
-import { Box, SPACING, IconProps } from '@opentrons/components'
+import {
+  Box,
+  SPACING,
+  Flex,
+  ALIGN_CENTER,
+  JUSTIFY_SPACE_BETWEEN,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 
 import { Divider } from '../../../atoms/structure'
-import { Toast } from '../../../atoms/Toast'
-import { useIsRobotBusy, useRobot } from '../hooks'
-import { DisplayRobotName } from './AdvancedTab/DisplayRobotName'
-import { RobotInformation } from './AdvancedTab/RobotInformation'
-import { RobotServerVersion } from './AdvancedTab/RobotServerVersion'
+import { StyledText } from '../../../atoms/text'
+import { ToggleButton } from '../../../atoms/buttons'
+import { useIsOT3, useIsRobotBusy, useRobot } from '../hooks'
 import { UsageSettings } from './AdvancedTab/UsageSettings'
-import { DisableHoming } from './AdvancedTab/DisableHoming'
-import { OpenJupyterControl } from './AdvancedTab/OpenJupyterControl'
-import { UpdateRobotSoftware } from './AdvancedTab/UpdateRobotSoftware'
-import { Troubleshooting } from './AdvancedTab/Troubleshooting'
-import { FactoryReset } from './AdvancedTab/FactoryReset'
-import { UseOlderProtocol } from './AdvancedTab/UseOlderProtocol'
-import { LegacySettings } from './AdvancedTab/LegacySettings'
-import { ShortTrashBin } from './AdvancedTab/ShortTrashBin'
-import { UseOlderAspirateBehavior } from './AdvancedTab/UseOlderAspirateBehavior'
-import { getRobotSettings, fetchSettings } from '../../../redux/robot-settings'
+import {
+  DisableHoming,
+  DisplayRobotName,
+  DeviceReset,
+  LegacySettings,
+  OpenJupyterControl,
+  RobotInformation,
+  RobotServerVersion,
+  ShortTrashBin,
+  Troubleshooting,
+  UpdateRobotSoftware,
+  UseOlderAspirateBehavior,
+  UseOlderProtocol,
+} from './AdvancedTab'
+import {
+  updateSetting,
+  getRobotSettings,
+  fetchSettings,
+} from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
-import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
-import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
+import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
+import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
 import { UpdateBuildroot } from './UpdateBuildroot'
 import { UNREACHABLE } from '../../../redux/discovery'
 import { Portal } from '../../../App/portal'
@@ -44,39 +57,35 @@ export function RobotSettingsAdvanced({
   robotName,
   updateRobotStatus,
 }: RobotSettingsAdvancedProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
   const [
     showRenameRobotSlideout,
     setShowRenameRobotSlideout,
   ] = React.useState<boolean>(false)
   const [
-    showFactoryResetSlideout,
-    setShowFactoryResetSlideout,
+    showDeviceResetSlideout,
+    setShowDeviceResetSlideout,
   ] = React.useState<boolean>(false)
   const [
-    showFactoryResetModal,
-    setShowFactoryResetModal,
+    showDeviceResetModal,
+    setShowDeviceResetModal,
   ] = React.useState<boolean>(false)
   const [
     showSoftwareUpdateModal,
     setShowSoftwareUpdateModal,
   ] = React.useState<boolean>(false)
-  const [showDownloadToast, setShowDownloadToast] = React.useState<boolean>(
-    false
-  )
 
   const isRobotBusy = useIsRobotBusy({ poll: true })
 
-  const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
   const robot = useRobot(robotName)
+  const isOT3 = useIsOT3(robotName)
   const ipAddress = robot?.ip != null ? robot.ip : ''
   const settings = useSelector<State, RobotSettings>((state: State) =>
     getRobotSettings(state, robotName)
   )
-  const connected = robot?.connected != null && robot.connected
+  const reachable = robot?.status !== UNREACHABLE
 
-  const [isRobotConnected, setIsRobotConnected] = React.useState<boolean>(
-    connected
+  const [isRobotReachable, setIsRobotReachable] = React.useState<boolean>(
+    reachable
   )
   const [resetOptions, setResetOptions] = React.useState<ResetConfigRequest>({})
   const findSettings = (id: string): RobotSettingsField | undefined =>
@@ -84,30 +93,22 @@ export function RobotSettingsAdvanced({
 
   const updateIsExpanded = (
     isExpanded: boolean,
-    type: 'factoryReset' | 'renameRobot'
+    type: 'deviceReset' | 'renameRobot'
   ): void => {
-    if (type === 'factoryReset') {
-      setShowFactoryResetSlideout(isExpanded)
+    if (type === 'deviceReset') {
+      setShowDeviceResetSlideout(isExpanded)
     } else {
       setShowRenameRobotSlideout(isExpanded)
     }
   }
 
   const updateResetStatus = (
-    isConnected: boolean,
+    isReachable: boolean,
     options?: ResetConfigRequest
   ): void => {
     if (options != null) setResetOptions(options)
-    setShowFactoryResetModal(true)
-    setIsRobotConnected(isConnected ?? false)
-  }
-
-  const updateDownloadLogsStatus = (isDownloading: boolean): void =>
-    setShowDownloadToast(isDownloading)
-
-  // TODO: kj 07/1 this function and all props will be removed by another PR
-  const updateIsRobotBusy = (isRobotBusy: boolean): void => {
-    updateRobotStatus(isRobotBusy)
+    setShowDeviceResetModal(true)
+    setIsRobotReachable(isReachable ?? false)
   }
 
   const dispatch = useDispatch<Dispatch>()
@@ -130,16 +131,6 @@ export function RobotSettingsAdvanced({
           close={() => setShowSoftwareUpdateModal(false)}
         />
       ) : null}
-      {showDownloadToast && (
-        <Toast
-          message={t('update_robot_software_download_logs_toast_message')}
-          type="info"
-          icon={toastIcon}
-          closeButton={false}
-          onClose={() => setShowDownloadToast(false)}
-          disableTimeout={true}
-        />
-      )}
       <Box>
         {showRenameRobotSlideout && (
           <RenameRobotSlideout
@@ -148,19 +139,19 @@ export function RobotSettingsAdvanced({
             robotName={robotName}
           />
         )}
-        {showFactoryResetSlideout && (
-          <FactoryResetSlideout
-            isExpanded={showFactoryResetSlideout}
-            onCloseClick={() => setShowFactoryResetSlideout(false)}
+        {showDeviceResetSlideout && (
+          <DeviceResetSlideout
+            isExpanded={showDeviceResetSlideout}
+            onCloseClick={() => setShowDeviceResetSlideout(false)}
             robotName={robotName}
             updateResetStatus={updateResetStatus}
           />
         )}
-        {showFactoryResetModal && (
+        {showDeviceResetModal && (
           <Portal level="top">
-            <FactoryResetModal
-              closeModal={() => setShowFactoryResetModal(false)}
-              isRobotConnected={isRobotConnected}
+            <DeviceResetModal
+              closeModal={() => setShowDeviceResetModal(false)}
+              isRobotReachable={isRobotReachable}
               robotName={robotName}
               resetOptions={resetOptions}
             />
@@ -169,67 +160,111 @@ export function RobotSettingsAdvanced({
         <DisplayRobotName
           robotName={robotName}
           updateIsExpanded={updateIsExpanded}
-          updateIsRobotBusy={updateIsRobotBusy}
+          isRobotBusy={isRobotBusy}
         />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <RobotServerVersion robotName={robotName} />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <RobotInformation robotName={robotName} />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <UsageSettings
           settings={findSettings('enableDoorSafetySwitch')}
           robotName={robotName}
-          updateIsRobotBusy={updateIsRobotBusy}
+          isRobotBusy={isRobotBusy}
         />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <DisableHoming
           settings={findSettings('disableHomeOnBoot')}
           robotName={robotName}
-          updateIsRobotBusy={updateIsRobotBusy}
+          isRobotBusy={isRobotBusy}
         />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <OpenJupyterControl robotIp={ipAddress} />
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing16} />
         <UpdateRobotSoftware
           robotName={robotName}
           isRobotBusy={isRobotBusy}
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
-        <Divider marginY={SPACING.spacing4} />
-        <Troubleshooting
-          robotName={robotName}
-          updateDownloadLogsStatus={updateDownloadLogsStatus}
-        />
-        <Divider marginY={SPACING.spacing4} />
-        <FactoryReset
+        <Troubleshooting robotName={robotName} />
+        <Divider marginY={SPACING.spacing16} />
+        <DeviceReset
           updateIsExpanded={updateIsExpanded}
-          updateIsRobotBusy={updateIsRobotBusy}
+          isRobotBusy={isRobotBusy}
         />
-        <Divider marginY={SPACING.spacing4} />
-        <UseOlderProtocol
-          settings={findSettings('disableFastProtocolUpload')}
-          robotName={robotName}
-          updateIsRobotBusy={updateIsRobotBusy}
-        />
-        <Divider marginY={SPACING.spacing4} />
-        <LegacySettings
-          settings={findSettings('deckCalibrationDots')}
-          robotName={robotName}
-          updateIsRobotBusy={updateIsRobotBusy}
-        />
-        <Divider marginY={SPACING.spacing4} />
-        <ShortTrashBin
-          settings={findSettings('shortFixedTrash')}
-          robotName={robotName}
-          updateIsRobotBusy={updateIsRobotBusy}
-        />
-        <Divider marginY={SPACING.spacing4} />
-        <UseOlderAspirateBehavior
-          settings={findSettings('useOldAspirationFunctions')}
-          robotName={robotName}
-          updateIsRobotBusy={updateIsRobotBusy}
-        />
+        {isOT3 ? null : (
+          <>
+            <Divider marginY={SPACING.spacing16} />
+            <UseOlderProtocol
+              settings={findSettings('disableFastProtocolUpload')}
+              robotName={robotName}
+              isRobotBusy={isRobotBusy}
+            />
+            <Divider marginY={SPACING.spacing16} />
+            <LegacySettings
+              settings={findSettings('deckCalibrationDots')}
+              robotName={robotName}
+              isRobotBusy={isRobotBusy}
+            />
+            <Divider marginY={SPACING.spacing16} />
+            <ShortTrashBin
+              settings={findSettings('shortFixedTrash')}
+              robotName={robotName}
+              isRobotBusy={isRobotBusy}
+            />
+            <Divider marginY={SPACING.spacing16} />
+            <UseOlderAspirateBehavior
+              settings={findSettings('useOldAspirationFunctions')}
+              robotName={robotName}
+              isRobotBusy={isRobotBusy}
+            />
+          </>
+        )}
       </Box>
     </>
+  )
+}
+
+interface FeatureFlagToggleProps {
+  settingField: RobotSettingsField
+  robotName: string
+  isRobotBusy: boolean
+}
+
+export function FeatureFlagToggle({
+  settingField,
+  robotName,
+  isRobotBusy,
+}: FeatureFlagToggleProps): JSX.Element | null {
+  const dispatch = useDispatch<Dispatch>()
+  const { value, id, title, description } = settingField
+
+  if (id == null) return null
+
+  const handleClick: React.MouseEventHandler<Element> = () => {
+    if (!isRobotBusy) {
+      dispatch(updateSetting(robotName, id, !value))
+    }
+  }
+
+  return (
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      marginBottom={SPACING.spacing16}
+    >
+      <Box width="70%">
+        <StyledText css={TYPOGRAPHY.pSemiBold} paddingBottom={SPACING.spacing4}>
+          {title}
+        </StyledText>
+        <StyledText as="p">{description}</StyledText>
+      </Box>
+      <ToggleButton
+        label={title}
+        toggledOn={value === true}
+        onClick={handleClick}
+        disabled={isRobotBusy}
+      />
+    </Flex>
   )
 }

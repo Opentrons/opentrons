@@ -57,14 +57,14 @@ test-g-code-omega:
 	$(pytest) -m 'slow' -k 'test_omega_biotek_magbind_totalpure_ngs' $(tests) $(test_opts)
 
 .PHONY: lint
-lint:
+lint: lint-other
 	$(python) -m mypy g_code_parsing $(tests_to_typecheck)
-	$(python) -m black --check g_code_parsing tests setup.py
-	$(python) -m flake8 g_code_parsing tests setup.py
+	$(python) -m black --check g_code_parsing tests setup.py cli.py
+	$(python) -m flake8 g_code_parsing tests setup.py cli.py
 
 .PHONY: format
-format:
-	$(python) -m black g_code_parsing tests setup.py
+format: format-other
+	$(python) -m black g_code_parsing tests setup.py cli.py
 
 
 .PHONY: get-g-code-configurations
@@ -90,3 +90,19 @@ diff-g-code-configuration-comparison:
 update-g-code-configuration-comparison:
 	$(if $(name),,$(error name variable required))
 	$(pipenv) run python cli.py update-comparison ${name}
+
+.PHONY: check-for-missing-comparison-files
+check-for-missing-comparison-files:
+	$(pipenv) run python cli.py check-for-missing-comparison-files --error_on_missing_configuration_files
+
+FORMAT_FILE_GLOB = "g-code-testing/**/*.@(json|md|yml|yaml)"
+
+.PHONY: format-other
+format-other:
+	cd ..
+	yarn prettier --ignore-path .eslintignore --write $(FORMAT_FILE_GLOB)
+
+.PHONY: lint-other
+lint-other:
+	cd ..
+	yarn prettier --check --ignore-path .eslintignore $(FORMAT_FILE_GLOB)

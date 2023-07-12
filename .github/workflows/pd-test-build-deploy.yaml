@@ -27,6 +27,10 @@ on:
       - 'protocol-designer*'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
+
 defaults:
   run:
     shell: bash
@@ -37,13 +41,19 @@ env:
 jobs:
   js-unit-test:
     name: 'protocol designer unit tests'
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     timeout-minutes: 30
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+      - uses: 'actions/setup-node@v3'
         with:
-          node-version: '14'
+          node-version: '16'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
@@ -64,7 +74,7 @@ jobs:
         run: |
           yarn jest --coverage=true --ci=true --collectCoverageFrom="protocol-designer/src/**/*.(js|ts|tsx)" protocol-designer/src
       - name: 'Upload coverage report'
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           files: ./coverage/lcov.info
           flags: protocol-designer
@@ -75,18 +85,26 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        os: ['ubuntu-18.04']
+        os: ['ubuntu-22.04']
     runs-on: '${{ matrix.os }}'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
         with:
-          node-version: '14'
+          fetch-depth: 0
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
       - name: 'install udev for usb-detection'
         if: startsWith(matrix.os, 'ubuntu')
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -104,17 +122,25 @@ jobs:
   build-pd:
     name: 'build protocol designer artifact'
     needs: ['js-unit-test']
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     if: github.event_name != 'pull_request'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
         with:
-          node-version: '14'
+          fetch-depth: 0
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'cache yarn cache'
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ${{ github.workspace }}/.yarn-cache
@@ -134,41 +160,52 @@ jobs:
         run: |
           make -C protocol-designer
       - name: 'upload github artifact'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: 'pd-artifact'
           path: protocol-designer/dist
   deploy-pd:
     name: 'deploy PD artifact to S3'
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     needs: ['js-unit-test', 'build-pd']
     if: github.event_name != 'pull_request'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
+      # https://github.com/actions/checkout/issues/290
+      - name: 'Fix actions/checkout odd handling of tags'
+        if: startsWith(github.ref, 'refs/tags')
+        run: |
+          git fetch -f origin ${{ github.ref }}:${{ github.ref }}
+          git checkout ${{ github.ref }}
+      - uses: 'actions/setup-node@v3'
         with:
-          node-version: '14'
+          node-version: '16'
       - name: 'install udev for usb-detection'
         run: sudo apt-get update && sudo apt-get install libudev-dev
       - name: 'set complex environment variables'
         id: 'set-vars'
-        uses: actions/github-script@v3.1
+        uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
       - name: 'download PD build'
-        uses: 'actions/download-artifact@v2'
+        uses: 'actions/download-artifact@v3'
         with:
           name: pd-artifact
           path: ./dist
-      - name: 'deploy builds to s3'
+      - name: 'configure ot3 s3 deploy creds and deploy'
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.S3_SANDBOX_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SANDBOX_SECRET }}
-          AWS_DEFAULT_REGION: us-east-2
-        uses: './.github/actions/webstack/deploy-to-sandbox'
-        with:
-          domain: 'designer.opentrons.com'
-          distPath: './dist'
-          destPrefix: ${{ env.OT_BRANCH }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.PD_S3_SANDBOX_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PD_S3_SANDBOX_SECRET }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.PD_S3_SANDBOX_KEY_ID }} --profile identity
+          aws configure set aws_secret_access_key ${{ secrets.PD_S3_SANDBOX_SECRET }} --profile identity
+          aws configure set region us-east-2 --profile identity
+          aws configure set output json --profile identity
+          aws configure set region us-east-2 --profile deploy
+          aws configure set role_arn ${{ secrets.OT_PD_DEPLOY_ROLE }} --profile deploy
+          aws configure set source_profile identity --profile deploy
+          aws s3 sync ./dist s3://sandbox.designer.opentrons.com/${{ env.OT_BRANCH }} --acl=public-read --profile=deploy
+        shell: bash

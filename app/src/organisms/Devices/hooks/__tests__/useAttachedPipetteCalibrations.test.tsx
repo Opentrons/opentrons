@@ -4,11 +4,12 @@ import { Provider } from 'react-redux'
 import { createStore, Store } from 'redux'
 import { renderHook } from '@testing-library/react-hooks'
 import { QueryClient, QueryClientProvider } from 'react-query'
-
 import {
-  fetchPipetteOffsetCalibrations,
-  fetchTipLengthCalibrations,
-} from '../../../../redux/calibration'
+  useAllPipetteOffsetCalibrationsQuery,
+  useAllTipLengthCalibrationsQuery,
+  usePipettesQuery,
+} from '@opentrons/react-api-client'
+
 import {
   mockPipetteOffsetCalibration1,
   mockPipetteOffsetCalibration2,
@@ -17,34 +18,22 @@ import {
   mockTipLengthCalibration1,
   mockTipLengthCalibration2,
 } from '../../../../redux/calibration/tip-length/__fixtures__'
-import {
-  fetchPipettes,
-  getAttachedPipetteCalibrations,
-} from '../../../../redux/pipettes'
-import { useDispatchApiRequest } from '../../../../redux/robot-api'
-
-import type { DispatchApiRequestType } from '../../../../redux/robot-api'
 
 import { useAttachedPipetteCalibrations } from '..'
 
+jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../redux/calibration')
 jest.mock('../../../../redux/pipettes')
 jest.mock('../../../../redux/robot-api')
 
-const mockFetchPipettes = fetchPipettes as jest.MockedFunction<
-  typeof fetchPipettes
+const mockUsePipettesQuery = usePipettesQuery as jest.MockedFunction<
+  typeof usePipettesQuery
 >
-const mockFetchPipetteOffsetCalibrations = fetchPipetteOffsetCalibrations as jest.MockedFunction<
-  typeof fetchPipetteOffsetCalibrations
+const mockUseAllPipetteOffsetCalibrationsQuery = useAllPipetteOffsetCalibrationsQuery as jest.MockedFunction<
+  typeof useAllPipetteOffsetCalibrationsQuery
 >
-const mockFetchTipLengthCalibrations = fetchTipLengthCalibrations as jest.MockedFunction<
-  typeof fetchTipLengthCalibrations
->
-const mockGetAttachedPipetteCalibrations = getAttachedPipetteCalibrations as jest.MockedFunction<
-  typeof getAttachedPipetteCalibrations
->
-const mockUseDispatchApiRequest = useDispatchApiRequest as jest.MockedFunction<
-  typeof useDispatchApiRequest
+const mockUseAllTipLengthCalibrationsQuery = useAllTipLengthCalibrationsQuery as jest.MockedFunction<
+  typeof useAllTipLengthCalibrationsQuery
 >
 
 const store: Store<any> = createStore(jest.fn(), {})
@@ -60,22 +49,9 @@ const PIPETTE_CALIBRATIONS = {
   },
 }
 
-const NULL_PIPETTE_CALIBRATIONS = {
-  left: {
-    offset: null,
-    tipLength: null,
-  },
-  right: {
-    offset: null,
-    tipLength: null,
-  },
-}
-
 describe('useAttachedPipetteCalibrations hook', () => {
-  let dispatchApiRequest: DispatchApiRequestType
   let wrapper: React.FunctionComponent<{}>
   beforeEach(() => {
-    dispatchApiRequest = jest.fn()
     const queryClient = new QueryClient()
     wrapper = ({ children }) => (
       <Provider store={store}>
@@ -84,45 +60,54 @@ describe('useAttachedPipetteCalibrations hook', () => {
         </QueryClientProvider>
       </Provider>
     )
-    mockUseDispatchApiRequest.mockReturnValue([dispatchApiRequest, []])
   })
   afterEach(() => {
     resetAllWhenMocks()
     jest.resetAllMocks()
   })
 
-  it('returns no pipette calibrations when given a null robot name', () => {
-    when(mockGetAttachedPipetteCalibrations)
-      .calledWith(undefined as any, null)
-      .mockReturnValue(NULL_PIPETTE_CALIBRATIONS)
+  it('returns attached pipette calibrations when given a robot name', () => {
+    when(mockUsePipettesQuery)
+      .calledWith({}, {})
+      .mockReturnValue({
+        data: {
+          left: {
+            id: mockPipetteOffsetCalibration1.pipette,
+            name: 'p300_single_gen2',
+            model: 'p300_single_v2.1',
+            tip_length: 50,
+            mount_axis: 'z',
+            plunger_axis: 'b',
+          },
+          right: {
+            id: mockPipetteOffsetCalibration2.pipette,
+            name: 'p20_single_gen2',
+            model: 'p20_single_v2.1',
+            tip_length: 50,
+            mount_axis: 'z',
+            plunger_axis: 'b',
+          },
+        },
+      } as any)
+    when(mockUseAllPipetteOffsetCalibrationsQuery)
+      .calledWith()
+      .mockReturnValue({
+        data: {
+          data: [mockPipetteOffsetCalibration1, mockPipetteOffsetCalibration2],
+        },
+      } as any)
+    when(mockUseAllTipLengthCalibrationsQuery)
+      .calledWith()
+      .mockReturnValue({
+        data: {
+          data: [mockTipLengthCalibration1, mockTipLengthCalibration2],
+        },
+      } as any)
 
-    const { result } = renderHook(() => useAttachedPipetteCalibrations(null), {
+    const { result } = renderHook(() => useAttachedPipetteCalibrations(), {
       wrapper,
     })
 
-    expect(result.current).toEqual(NULL_PIPETTE_CALIBRATIONS)
-    expect(dispatchApiRequest).not.toBeCalled()
-  })
-
-  it('returns attached pipette calibrations when given a robot name', () => {
-    when(mockGetAttachedPipetteCalibrations)
-      .calledWith(undefined as any, 'otie')
-      .mockReturnValue(PIPETTE_CALIBRATIONS)
-
-    const { result } = renderHook(
-      () => useAttachedPipetteCalibrations('otie'),
-      {
-        wrapper,
-      }
-    )
-
     expect(result.current).toEqual(PIPETTE_CALIBRATIONS)
-    expect(dispatchApiRequest).toBeCalledWith(mockFetchPipettes('otie'))
-    expect(dispatchApiRequest).toBeCalledWith(
-      mockFetchPipetteOffsetCalibrations('otie')
-    )
-    expect(dispatchApiRequest).toBeCalledWith(
-      mockFetchTipLengthCalibrations('otie')
-    )
   })
 })

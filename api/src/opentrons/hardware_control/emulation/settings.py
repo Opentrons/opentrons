@@ -1,3 +1,5 @@
+from typing import List
+from opentrons.hardware_control.emulation.types import ModuleType
 from opentrons.hardware_control.emulation.util import TEMPERATURE_ROOM
 from pydantic import BaseSettings, BaseModel
 
@@ -29,6 +31,11 @@ class TemperatureModelSettings(BaseModel):
     starting: float = float(TEMPERATURE_ROOM)
 
 
+class RPMModelSettings(BaseModel):
+    rpm_per_tick: float = 100.0
+    starting: float = 0.0
+
+
 class MagDeckSettings(BaseModuleSettings):
     pass
 
@@ -42,12 +49,19 @@ class ThermocyclerSettings(BaseModuleSettings):
     plate_temperature: TemperatureModelSettings
 
 
+class HeaterShakerSettings(BaseModuleSettings):
+    temperature: TemperatureModelSettings
+    rpm: RPMModelSettings
+    home_delay_time: int = 0
+
+
 class ProxySettings(BaseModel):
     """Settings for a proxy."""
 
     host: str = "0.0.0.0"
     emulator_port: int
     driver_port: int
+    use_local_host: bool = True
 
 
 class ModuleServerSettings(BaseModel):
@@ -58,6 +72,11 @@ class ModuleServerSettings(BaseModel):
 
 
 class Settings(BaseSettings):
+    modules: List[ModuleType] = [
+        ModuleType.Magnetic,
+        ModuleType.Temperature,
+        ModuleType.Thermocycler,
+    ]
     smoothie: SmoothieSettings = SmoothieSettings()
     magdeck: MagDeckSettings = MagDeckSettings(
         serial_number="magnetic_emulator", model="mag_deck_v20", version="2.0.0"
@@ -74,6 +93,14 @@ class Settings(BaseSettings):
         version="v1.1.0",
         lid_temperature=TemperatureModelSettings(),
         plate_temperature=TemperatureModelSettings(),
+    )
+    heatershaker: HeaterShakerSettings = HeaterShakerSettings(
+        serial_number="heater_shaker_emulator",
+        model="v01",
+        version="v0.0.1",
+        temperature=TemperatureModelSettings(),
+        rpm=RPMModelSettings(),
+        home_delay_time=0,
     )
 
     heatershaker_proxy: ProxySettings = ProxySettings(

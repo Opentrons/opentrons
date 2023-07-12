@@ -4,12 +4,13 @@ import logging
 import asyncio
 import platform
 from typing import Optional, Union, Dict, Any
+import concurrent.futures
 
+from opentrons_shared_data.errors.exceptions import CANBusBusError
 from can import Notifier, Bus, AsyncBufferedReader, Message
 
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.message import CanMessage
-from .errors import ErrorFrameCanError
 from .abstract_driver import AbstractCanDriver
 from .settings import calculate_fdcan_parameters, PCANParameters
 
@@ -49,6 +50,7 @@ class CanDriver(AbstractCanDriver):
         self._loop = loop
         self._reader = AsyncBufferedReader(loop=loop)
         self._notifier = Notifier(bus=self._bus, listeners=[self._reader], loop=loop)
+        self._executor = concurrent.futures.ThreadPoolExecutor(max_workers=5)
 
     @classmethod
     async def build(
@@ -113,7 +115,7 @@ class CanDriver(AbstractCanDriver):
             is_fd=True,
             data=message.data,
         )
-        await self._loop.run_in_executor(None, self._bus.send, m)
+        await self._loop.run_in_executor(self._executor, self._bus.send, m)
 
     async def read(self) -> CanMessage:
         """Read a message.
@@ -122,12 +124,14 @@ class CanDriver(AbstractCanDriver):
             A can message
 
         Raises:
-            ErrorFrameCanError
+            CANBusBusError
         """
         m: Message = await self._reader.get_message()
         if m.is_error_frame:
             log.error("Error frame encountered")
-            raise ErrorFrameCanError(message=repr(m))
+            raise CANBusBusError(
+                message="Error frame encountered", detail={"frame": repr(m)}
+            )
 
         return CanMessage(
             arbitration_id=ArbitrationId(id=m.arbitration_id), data=m.data

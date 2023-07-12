@@ -14,7 +14,7 @@ from . import list_v2_defs, list_v3_defs
 @pytest.mark.parametrize("def_name", list_v3_defs())
 def test_load_v3_defs(def_name: str) -> None:
     """Test that all v3 definitions load correctly."""
-    assert load_definition("3", def_name) == json.loads(  # type: ignore [call-overload]
+    assert load_definition("3", def_name) == json.loads(
         load_shared_data(f"module/definitions/3/{def_name}.json")
     )
 

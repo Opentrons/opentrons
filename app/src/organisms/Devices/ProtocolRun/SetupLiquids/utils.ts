@@ -1,6 +1,7 @@
-import { getLabwareDisplayName, RunTimeCommand } from '@opentrons/shared-data'
-import type { LabwareByLiquidId, Liquid } from '@opentrons/api-client'
 import { WellGroup } from '@opentrons/components'
+
+import type { LabwareByLiquidId } from '@opentrons/api-client'
+import type { Liquid } from '@opentrons/shared-data'
 
 export function getWellFillFromLabwareId(
   labwareId: string,
@@ -15,9 +16,7 @@ export function getWellFillFromLabwareId(
     labwareArray.forEach(labware => {
       if (labware.labwareId === labwareId) {
         const liquidId = liquidIds[index]
-        const liquid = liquidsInLoadOrder.find(
-          liquid => liquid.liquidId === liquidId
-        )
+        const liquid = liquidsInLoadOrder.find(liquid => liquid.id === liquidId)
         const wellFill: {
           [well: string]: string
         } = {}
@@ -40,7 +39,7 @@ export function getTotalVolumePerLiquidId(
     .flatMap(labware => Object.values(labware.volumeByWell))
     .reduce((prev, curr) => prev + curr, 0)
 
-  return totalVolume
+  return parseFloat(totalVolume.toFixed(1))
 }
 
 export function getTotalVolumePerLiquidLabwarePair(
@@ -56,48 +55,6 @@ export function getTotalVolumePerLiquidLabwarePair(
     .reduce((prev, curr) => prev + curr, 0)
 
   return totalVolume
-}
-
-export function getSlotLabwareName(
-  labwareId: string,
-  commands?: RunTimeCommand[]
-): { slotName: string; labwareName: string } {
-  const loadLabwareCommands = commands?.filter(
-    command => command.commandType === 'loadLabware'
-  )
-  const loadLabwareCommand = loadLabwareCommands?.find(
-    command => command.result.labwareId === labwareId
-  )
-  if (loadLabwareCommand == null) {
-    return { slotName: '', labwareName: labwareId }
-  }
-  const labwareName = getLabwareDisplayName(
-    loadLabwareCommand.result.definition
-  )
-  let slotName = ''
-  const labwareLocation =
-    'location' in loadLabwareCommand.params
-      ? loadLabwareCommand.params.location
-      : ''
-  if ('slotName' in labwareLocation) {
-    slotName = labwareLocation.slotName
-  } else {
-    const loadModuleCommands = commands?.filter(
-      command => command.commandType === 'loadModule'
-    )
-    const loadModuleCommand = loadModuleCommands?.find(
-      command => command.result.moduleId === labwareLocation.moduleId
-    )
-    slotName =
-      loadModuleCommand != null && 'location' in loadModuleCommand.params
-        ? loadModuleCommand?.params.location.slotName
-        : ''
-  }
-
-  return {
-    slotName,
-    labwareName,
-  }
 }
 
 export function getLiquidsByIdForLabware(
@@ -135,6 +92,28 @@ export function getWellGroupForLiquidId(
     )
     return { ...allWells, ...someWells }
   }, {})
+}
+
+export function getDisabledWellGroupForLiquidId(
+  labwareByLiquidId: LabwareByLiquidId,
+  liquidIds: string[]
+): WellGroup[] {
+  const wellGroups = liquidIds.map(liquidId => {
+    const labwareInfo = labwareByLiquidId[liquidId]
+    return labwareInfo.reduce((allWells, { volumeByWell }) => {
+      const someWells = Object.entries(volumeByWell).reduce(
+        (someWells, [wellName]) => {
+          return {
+            ...someWells,
+            [wellName]: null,
+          }
+        },
+        {}
+      )
+      return { ...allWells, ...someWells }
+    }, {})
+  })
+  return wellGroups
 }
 
 export function getWellRangeForLiquidLabwarePair(

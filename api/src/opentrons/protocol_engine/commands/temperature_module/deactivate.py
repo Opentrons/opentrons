@@ -73,7 +73,7 @@ class DeactivateTemperature(
 class DeactivateTemperatureCreate(BaseCommandCreate[DeactivateTemperatureParams]):
     """A request to deactivate a Temperature Module."""
 
-    commandType: DeactivateTemperatureCommandType
+    commandType: DeactivateTemperatureCommandType = "temperatureModule/deactivate"
     params: DeactivateTemperatureParams
 
     _CommandCls: Type[DeactivateTemperature] = DeactivateTemperature

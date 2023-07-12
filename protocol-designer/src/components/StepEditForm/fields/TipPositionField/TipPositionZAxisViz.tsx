@@ -6,7 +6,7 @@ import WELL_CROSS_SECTION_IMAGE from '../../../../images/well_cross_section.svg'
 
 import styles from './TipPositionInput.css'
 
-const WELL_HEIGHT_PIXELS = 48
+const WELL_HEIGHT_PIXELS = 145
 const PIXEL_DECIMALS = 2
 interface Props {
   mmFromBottom: number

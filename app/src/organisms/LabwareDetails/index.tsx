@@ -17,9 +17,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   ALIGN_CENTER,
   SIZE_1,
+  useHoverTooltip,
+  TOOLTIP_TOP_START,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { Slideout } from '../../atoms/Slideout'
+import { Tooltip } from '../../atoms/Tooltip'
 import { getWellLabel } from './helpers/labels'
 import { getUniqueWellProperties } from './helpers/labwareInference'
 import { WellCount } from './WellCount'
@@ -37,12 +40,24 @@ const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: #16212d26;
+    background: ${COLORS.lightGreyHover};
   }
   &:active {
-    background: #16212d40;
+    background: ${COLORS.lightGreyPressed};
   }
 `
+
+const COPY_ICON_STYLE = css`
+  transform: translateY(${SPACING.spacing4});
+  &:hover {
+    color: ${COLORS.blueEnabled};
+  }
+  &:active,
+  &:focus {
+    color: ${COLORS.darkBlackEnabled};
+  }
+`
+
 export interface LabwareDetailsProps {
   onClose: () => void
   labware: LabwareDefAndDate
@@ -62,13 +77,29 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
   const irregular = wellGroups.length > 1
   const isMultiRow = ordering.some(row => row.length > 1)
   const isCustomDefinition = definition.namespace !== 'opentrons'
+  const [showToolTip, setShowToolTip] = React.useState<boolean>(false)
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP_START,
+  })
+
+  const handleCopy = async (): Promise<void> => {
+    await navigator.clipboard.writeText(apiName)
+    setShowToolTip(true)
+  }
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setShowToolTip(false), 2000)
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [showToolTip])
 
   const slideoutHeader = (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing2}
-      paddingX={SPACING.spacing4}
-      marginBottom={SPACING.spacing4}
+      gridGap={SPACING.spacing4}
+      paddingX={SPACING.spacing16}
+      marginBottom={SPACING.spacing16}
     >
       <Flex
         flexDirection={DIRECTION_ROW}
@@ -77,17 +108,29 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         <StyledText css={TYPOGRAPHY.h2SemiBold}>
           {props.labware.definition.metadata.displayName}
         </StyledText>
-        <Link onClick={props.onClose} role="button">
-          <Icon name="close" height={SPACING.spacing5} css={CLOSE_ICON_STYLE} />
+        <Link
+          onClick={props.onClose}
+          role="button"
+          data-testid="labwareDetails_slideout_close_button"
+        >
+          <Icon
+            name="close"
+            height={SPACING.spacing24}
+            css={CLOSE_ICON_STYLE}
+          />
         </Link>
       </Flex>
       {!isCustomDefinition && (
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-          <Icon color={COLORS.blue} name="check-decagram" height=".7rem" />{' '}
+          <Icon
+            color={COLORS.blueEnabled}
+            name="check-decagram"
+            height=".7rem"
+          />{' '}
           <StyledText
             as="label"
             id="LabwareDetails_opentronsDef"
-            marginLeft={SPACING.spacing2}
+            marginLeft={SPACING.spacing4}
           >
             {t('opentrons_def')}
           </StyledText>
@@ -97,7 +140,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          paddingRight={SPACING.spacing1}
+          paddingRight={SPACING.spacing2}
           alignItems={ALIGN_CENTER}
         >
           <StyledText
@@ -120,24 +163,29 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
     <Slideout onCloseClick={props.onClose} title={slideoutHeader} isExpanded>
       <Gallery definition={definition} />
       <Box
-        backgroundColor={COLORS.lightGrey}
-        padding={SPACING.spacing4}
-        marginBottom={SPACING.spacing5}
-        overflowWrap="break-word"
+        backgroundColor={COLORS.fundamentalsBackground}
+        padding={SPACING.spacing16}
+        marginBottom={SPACING.spacing24}
       >
         <StyledText as="h6">{t('api_name')}</StyledText>
-        <Link
-          css={TYPOGRAPHY.pRegular}
-          onClick={() => navigator.clipboard.writeText(apiName)}
-          role="button"
-        >
-          <Flex alignItems={ALIGN_CENTER} overflowWrap="anywhere">
-            {apiName} <Icon height={SIZE_1} name="copy-text" />
+        <Link css={TYPOGRAPHY.pRegular} onClick={handleCopy} role="button">
+          <Flex overflowWrap="anywhere">
+            <Box fontSize={TYPOGRAPHY.fontSizeP} color={COLORS.black}>
+              {apiName}
+              <span {...targetProps}>
+                <Icon size={SIZE_1} name="copy-text" css={COPY_ICON_STYLE} />
+              </span>
+            </Box>
           </Flex>
+          {showToolTip && (
+            <Tooltip width="3.25rem" tooltipProps={tooltipProps}>
+              {t('copied')}
+            </Tooltip>
+          )}
         </Link>
       </Box>
       <Box border={BORDERS.lineBorder}>
-        <Box padding={SPACING.spacing4}>
+        <Box padding={SPACING.spacing16}>
           <WellCount
             wellLabel={getWellLabel(definition)}
             count={Object.keys(wells).length}
@@ -159,7 +207,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
             const wellLabel = getWellLabel(wellProps, definition)
             const groupDisplaySuffix =
               groupMetadata.displayName != null
-                ? ` - ${groupMetadata.displayName}`
+                ? ` - ${String(groupMetadata.displayName)}`
                 : ''
 
             return (

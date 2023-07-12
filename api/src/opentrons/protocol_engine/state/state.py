@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from functools import partial
-from typing import Any, Callable, List, Optional, Sequence, TypeVar
+from typing import Any, Callable, Dict, List, Optional, Sequence, TypeVar
+from opentrons.protocol_engine.types import ModuleOffsetVector
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 
@@ -15,6 +16,8 @@ from .commands import CommandState, CommandStore, CommandView
 from .labware import LabwareState, LabwareStore, LabwareView
 from .pipettes import PipetteState, PipetteStore, PipetteView
 from .modules import ModuleState, ModuleStore, ModuleView
+from .liquids import LiquidState, LiquidView, LiquidStore
+from .tips import TipState, TipView, TipStore
 from .geometry import GeometryView
 from .motion import MotionView
 from .config import Config
@@ -31,6 +34,8 @@ class State:
     labware: LabwareState
     pipettes: PipetteState
     modules: ModuleState
+    liquids: LiquidState
+    tips: TipState
 
 
 class StateView(HasState[State]):
@@ -41,6 +46,8 @@ class StateView(HasState[State]):
     _labware: LabwareView
     _pipettes: PipetteView
     _modules: ModuleView
+    _liquid: LiquidView
+    _tips: TipView
     _geometry: GeometryView
     _motion: MotionView
     _config: Config
@@ -64,6 +71,16 @@ class StateView(HasState[State]):
     def modules(self) -> ModuleView:
         """Get state view selectors for hardware module state."""
         return self._modules
+
+    @property
+    def liquid(self) -> LiquidView:
+        """Get state view selectors for liquid state."""
+        return self._liquid
+
+    @property
+    def tips(self) -> TipView:
+        """Get state view selectors for tip state."""
+        return self._tips
 
     @property
     def geometry(self) -> GeometryView:
@@ -91,6 +108,7 @@ class StateView(HasState[State]):
             modules=self.modules.get_all(),
             completedAt=self._state.commands.run_completed_at,
             startedAt=self._state.commands.run_started_at,
+            liquids=self._liquid.get_all(),
         )
 
 
@@ -110,6 +128,7 @@ class StateStore(StateView, ActionHandler):
         deck_fixed_labware: Sequence[DeckFixedLabware],
         is_door_open: bool,
         change_notifier: Optional[ChangeNotifier] = None,
+        module_calibration_offsets: Optional[Dict[str, ModuleOffsetVector]] = None,
     ) -> None:
         """Initialize a StateStore and its substores.
 
@@ -121,6 +140,7 @@ class StateStore(StateView, ActionHandler):
                 definition to preload into labware state.
             is_door_open: Whether the robot's door is currently open.
             change_notifier: Internal state change notifier.
+            module_calibration_offsets: Module offsets to preload.
         """
         self._command_store = CommandStore(config=config, is_door_open=is_door_open)
         self._pipette_store = PipetteStore()
@@ -128,13 +148,19 @@ class StateStore(StateView, ActionHandler):
             deck_fixed_labware=deck_fixed_labware,
             deck_definition=deck_definition,
         )
-        self._module_store = ModuleStore()
+        self._module_store = ModuleStore(
+            module_calibration_offsets=module_calibration_offsets
+        )
+        self._liquid_store = LiquidStore()
+        self._tip_store = TipStore()
 
         self._substores: List[HandlesActions] = [
             self._command_store,
             self._pipette_store,
             self._labware_store,
             self._module_store,
+            self._liquid_store,
+            self._tip_store,
         ]
         self._config = config
         self._change_notifier = change_notifier or ChangeNotifier()
@@ -218,6 +244,8 @@ class StateStore(StateView, ActionHandler):
             labware=self._labware_store.state,
             pipettes=self._pipette_store.state,
             modules=self._module_store.state,
+            liquids=self._liquid_store.state,
+            tips=self._tip_store.state,
         )
 
     def _initialize_state(self) -> None:
@@ -230,13 +258,18 @@ class StateStore(StateView, ActionHandler):
         self._labware = LabwareView(state.labware)
         self._pipettes = PipetteView(state.pipettes)
         self._modules = ModuleView(state.modules)
+        self._liquid = LiquidView(state.liquids)
+        self._tips = TipView(state.tips)
 
         # Derived states
         self._geometry = GeometryView(
+            config=self._config,
             labware_view=self._labware,
             module_view=self._modules,
+            pipette_view=self._pipettes,
         )
         self._motion = MotionView(
+            config=self._config,
             labware_view=self._labware,
             pipette_view=self._pipettes,
             geometry_view=self._geometry,
@@ -251,4 +284,6 @@ class StateStore(StateView, ActionHandler):
         self._labware._state = next_state.labware
         self._pipettes._state = next_state.pipettes
         self._modules._state = next_state.modules
+        self._liquid._state = next_state.liquids
+        self._tips._state = next_state.tips
         self._change_notifier.notify()

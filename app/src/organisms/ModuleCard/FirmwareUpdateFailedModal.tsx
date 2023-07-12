@@ -5,16 +5,15 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_FLEX_END,
-  Text,
   SPACING,
   DIRECTION_COLUMN,
   Icon,
   COLORS,
   TYPOGRAPHY,
+  PrimaryButton,
 } from '@opentrons/components'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../atoms/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { AttachedModule } from '../../redux/modules/types'
 
@@ -32,33 +31,33 @@ export const FirmwareUpdateFailedModal = (
   const title = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Icon
-        width={SPACING.spacingM}
-        color={COLORS.error}
+        width={SPACING.spacing20}
+        color={COLORS.errorEnabled}
         name="information"
         aria-label="information"
       />
-      <StyledText marginLeft={SPACING.spacing3}>
+      <StyledText marginLeft={SPACING.spacing8}>
         {t('firmware_update_failed')}
       </StyledText>
     </Flex>
   )
 
   return (
-    <Modal title={title} onClose={onCloseClick}>
+    <LegacyModal title={title} onClose={onCloseClick}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid={`FirmwareUpdateFailedModal_body_text_${module.serialNumber}`}
       >
-        <Text paddingBottom={SPACING.spacing2}>
+        <StyledText paddingBottom={SPACING.spacing4}>
           {t('an_error_occurred_while_updating_module', {
             moduleName: getModuleDisplayName(module.moduleModel),
           })}
-        </Text>
-        <Text>{errorMessage}</Text>
+        </StyledText>
+        <StyledText>{errorMessage}</StyledText>
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
-        paddingTop={SPACING.spacingXL}
+        paddingTop={SPACING.spacing32}
         justifyContent={JUSTIFY_FLEX_END}
         data-testid={`FirmwareUpdateFailedModal_cancel_btn_${module.serialNumber}`}
       >
@@ -69,6 +68,6 @@ export const FirmwareUpdateFailedModal = (
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

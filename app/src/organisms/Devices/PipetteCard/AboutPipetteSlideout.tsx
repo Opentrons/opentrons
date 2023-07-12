@@ -4,12 +4,12 @@ import {
   Flex,
   DIRECTION_COLUMN,
   SPACING,
+  PrimaryButton,
   TYPOGRAPHY,
   COLORS,
 } from '@opentrons/components'
 import { StyledText } from '../../../atoms/text'
 import { Slideout } from '../../../atoms/Slideout'
-import { PrimaryButton } from '../../../atoms/buttons'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
@@ -36,6 +36,7 @@ export const AboutPipetteSlideout = (
         <PrimaryButton
           onClick={onCloseClick}
           width="100%"
+          textTransform={TYPOGRAPHY.textTransformCapitalize}
           data-testid="AboutPipette_slideout_close"
         >
           {t('shared:close')}
@@ -54,7 +55,7 @@ export const AboutPipetteSlideout = (
         </StyledText>
         <StyledText
           as="p"
-          paddingTop={SPACING.spacing2}
+          paddingTop={SPACING.spacing4}
           data-testid={`AboutPipetteSlideout_serial_${pipetteId}`}
         >
           {pipetteId}

@@ -13,13 +13,17 @@ export interface RouteProps {
   name: string
   /**
    * the path for navigation linking, for example to push to a default tab
-   * some of these links are temp (and params hardcoded) until final nav and breadcrumbs implemented
    */
   navLinkTo?: string
   path: string
 }
 
-export type RobotSettingsTab = 'calibration' | 'networking' | 'advanced'
+export type RobotSettingsTab =
+  | 'calibration'
+  | 'networking'
+  | 'advanced'
+  | 'feature-flags'
+  | 'privacy'
 
 export type AppSettingsTab =
   | 'general'
@@ -27,12 +31,12 @@ export type AppSettingsTab =
   | 'advanced'
   | 'feature-flags'
 
-export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-log'
+export type ProtocolRunDetailsTab = 'setup' | 'module-controls' | 'run-preview'
 
 /**
- * route params type definition for the next gen app
+ * desktop app route params type definition
  */
-export interface NavRouteParams {
+export interface DesktopRouteParams {
   appSettingsTab: AppSettingsTab
   robotName: string
   protocolKey: string
@@ -40,4 +44,12 @@ export interface NavRouteParams {
   robotSettingsTab: RobotSettingsTab
   runId: string
   protocolRunDetailsTab: ProtocolRunDetailsTab
+}
+
+/**
+ * on device display app route params type definition
+ */
+export interface OnDeviceRouteParams {
+  protocolId: string
+  runId: string
 }

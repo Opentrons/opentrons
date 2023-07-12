@@ -47,9 +47,7 @@ const makeSecurityField = (
   showAllOptions,
 })
 
-const getEapIsSelected = (
-  formSecurityType: string | null | undefined
-): boolean => {
+const getEapIsSelected = (formSecurityType?: string | null): boolean => {
   return (
     formSecurityType != null &&
     formSecurityType !== Constants.SECURITY_NONE &&
@@ -211,7 +209,7 @@ export const connectFormToConfigureRequest = (
     securityType = Constants.SECURITY_WPA_EAP
     // @ts-expect-error TODO: formSecurityType could be undefined, but eapType expects string
     eapConfig = { eapType: formSecurityType }
-  } else if (network) {
+  } else if (network != null) {
     securityType = network.securityType
   } else if (
     values.securityType === Constants.SECURITY_NONE ||
@@ -228,7 +226,8 @@ export const connectFormToConfigureRequest = (
     }
 
     if (formPsk != null) options.psk = formPsk
-    if (eapConfig) options.eapConfig = { ...eapConfig, ...formEapConfig }
+    if (eapConfig != null)
+      options.eapConfig = { ...eapConfig, ...formEapConfig }
     return options
   }
 

@@ -5,8 +5,8 @@ import {
   Flex,
   SPACING,
   TYPOGRAPHY,
+  SecondaryButton,
 } from '@opentrons/components'
-import { SecondaryButton } from '../../atoms/buttons'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
 
@@ -23,19 +23,19 @@ export function ConfigFormResetButton(props: ButtonProps): JSX.Element {
     <Flex flexDirection={DIRECTION_COLUMN}>
       <Trans
         t={t}
-        i18nKey={'device_details:these_are_advanced_settings'}
+        i18nKey="device_details:these_are_advanced_settings"
         components={{
           block: (
             <StyledText
               fontSize={TYPOGRAPHY.fontSizeP}
-              paddingBottom={SPACING.spacingXS}
+              paddingBottom={SPACING.spacing4}
             />
           ),
         }}
       />
       <SecondaryButton
-        marginTop={SPACING.spacingSM}
-        marginBottom={SPACING.spacing4}
+        marginTop={SPACING.spacing12}
+        marginBottom={SPACING.spacing16}
         onClick={onClick}
         disabled={disabled}
       >

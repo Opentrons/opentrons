@@ -1,12 +1,12 @@
 """Load pipette command request, result, and implementation models."""
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional, Type, Union
 from typing_extensions import Literal
 
+from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import MountType
 
-from ..types import PipetteName
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
 if TYPE_CHECKING:
@@ -19,7 +19,9 @@ LoadPipetteCommandType = Literal["loadPipette"]
 class LoadPipetteParams(BaseModel):
     """Payload needed to load a pipette on to a mount."""
 
-    pipetteName: PipetteName = Field(
+    # TODO (tz, 11-23-22): remove Union when refactoring load_pipette for 96 channels.
+    # https://opentrons.atlassian.net/browse/RLIQ-255
+    pipetteName: Union[PipetteNameType, Literal["p1000_96"]] = Field(
         ...,
         description="The load name of the pipette to be required.",
     )

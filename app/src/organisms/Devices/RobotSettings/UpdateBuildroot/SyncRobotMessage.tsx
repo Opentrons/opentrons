@@ -23,7 +23,7 @@ export function SyncRobotMessage(
       {updateType === UPGRADE && (
         <>
           For an optimal experience, we recommend you upgrade your robot
-          software to {version} match your app.
+          software to {version} to match your app.
         </>
       )}
       {updateType === DOWNGRADE && (

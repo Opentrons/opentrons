@@ -4,23 +4,27 @@ import {
   TYPOGRAPHY,
   Tooltip as SharedTooltip,
 } from '@opentrons/components'
-import type { UseTooltipResultTooltipProps } from '@opentrons/components'
+import type {
+  UseTooltipResultTooltipProps,
+  StyleProps,
+} from '@opentrons/components'
 
-export interface TooltipProps {
+export interface TooltipProps extends StyleProps {
   children: React.ReactNode
   tooltipProps: UseTooltipResultTooltipProps & { visible: boolean }
   key?: string
 }
 
 export function Tooltip(props: TooltipProps): JSX.Element {
-  const { children, tooltipProps } = props
+  const { children, tooltipProps, width = '8.75rem', ...styleProps } = props
 
   return (
     <SharedTooltip
       {...tooltipProps}
-      backgroundColor={COLORS.darkBlack}
+      backgroundColor={COLORS.darkBlackEnabled}
       fontSize={TYPOGRAPHY.fontSizeCaption}
-      width={'8.75rem'}
+      width={width}
+      {...styleProps}
     >
       {children}
     </SharedTooltip>

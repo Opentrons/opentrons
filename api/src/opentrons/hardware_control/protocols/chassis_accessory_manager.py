@@ -1,6 +1,6 @@
 from typing import Dict, Optional
 from typing_extensions import Protocol
-from ..types import DoorState
+from ..types import DoorState, StatusBarState
 from .event_sourcer import EventSourcer
 
 
@@ -28,7 +28,7 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
         """
         ...
 
-    def get_lights(self) -> Dict[str, bool]:
+    async def get_lights(self) -> Dict[str, bool]:
         """Return the current status of the robot lights.
 
         :returns: A dict of the lights: `{'button': bool, 'rails': bool}`
@@ -40,4 +40,23 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
 
         duration_s: The duration to blink for, in seconds.
         """
+        ...
+
+    async def set_status_bar_state(self, state: StatusBarState) -> None:
+        """Control the status bar to indicate robot state.
+
+        state: The state to set the robot to. Some states are transient
+        and will implicitly revert back to the previous state after a short
+        action, while others"""
+        ...
+
+    async def set_status_bar_enabled(self, enabled: bool) -> None:
+        """Enable or disable the status bar entirely.
+
+        enabled: True to turn the status bar on, false to turn it off."""
+
+    def get_status_bar_state(self) -> StatusBarState:
+        """Get the current status bar state.
+
+        :returns: The current status bar state enumeration."""
         ...

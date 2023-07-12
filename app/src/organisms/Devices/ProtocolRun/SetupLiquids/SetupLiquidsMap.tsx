@@ -9,36 +9,43 @@ import {
   DIRECTION_COLUMN,
   Flex,
   RobotWorkSpace,
+  SlotLabels,
   LabwareRender,
   Module,
   ALIGN_CENTER,
   JUSTIFY_CENTER,
 } from '@opentrons/components'
 import {
+  getDeckDefFromRobotType,
   inferModuleOrientationFromXCoordinate,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
+
 import {
   useLabwareRenderInfoForRunById,
   useModuleRenderInfoForProtocolById,
+  useProtocolDetailsForRun,
 } from '../../hooks'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { LabwareInfoOverlay } from '../LabwareInfoOverlay'
+import { getStandardDeckViewLayerBlockList } from '../utils/getStandardDeckViewLayerBlockList'
 import { LiquidsLabwareDetailsModal } from './LiquidsLabwareDetailsModal'
 import { getWellFillFromLabwareId } from './utils'
-import type { DeckDefinition } from '@opentrons/shared-data'
+import type { RobotType } from '@opentrons/shared-data'
 
-const DECK_MAP_VIEWBOX = '-80 -40 550 500'
-const DECK_LAYER_BLOCKLIST = [
-  'calibrationMarkings',
-  'fixedBase',
-  'doorStops',
-  'metalFrame',
-  'removalHandle',
-  'removableDeckOutline',
-  'screwHoles',
-]
+const OT2_VIEWBOX = '-80 -40 550 500'
+const OT3_VIEWBOX = '-144.31 -76.59 750 681.74'
 
+const getViewBox = (robotType: RobotType): string | null => {
+  switch (robotType) {
+    case 'OT-2 Standard':
+      return OT2_VIEWBOX
+    case 'OT-3 Standard':
+      return OT3_VIEWBOX
+    default:
+      return null
+  }
+}
 interface SetupLiquidsMapProps {
   runId: string
   robotName: string
@@ -53,8 +60,16 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
     runId
   )
   const labwareRenderInfoById = useLabwareRenderInfoForRunById(runId)
-  const liquids = parseLiquidsInLoadOrder()
-  const labwareByLiquidId = parseLabwareInfoByLiquidId()
+  const { robotType } = useProtocolDetailsForRun(runId)
+  const protocolData = useMostRecentCompletedAnalysis(runId)
+  const liquids = parseLiquidsInLoadOrder(
+    protocolData?.liquids != null ? protocolData?.liquids : [],
+    protocolData?.commands ?? []
+  )
+  const deckDef = getDeckDefFromRobotType(robotType)
+  const labwareByLiquidId = parseLabwareInfoByLiquidId(
+    protocolData?.commands ?? []
+  )
   const [liquidDetailsLabwareId, setLiquidDetailsLabwareId] = React.useState<
     string | null
   >(null)
@@ -68,10 +83,10 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
     >
       <RobotWorkSpace
-        deckDef={(standardDeckDef as unknown) as DeckDefinition}
-        viewBox={DECK_MAP_VIEWBOX}
-        deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
-        id={'LabwareSetup_deckMap'}
+        deckDef={deckDef}
+        viewBox={getViewBox(robotType)}
+        deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
+        id="LabwareSetup_deckMap"
       >
         {() => (
           <>
@@ -86,7 +101,9 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 nestedLabwareDisplayName,
               }) => (
                 <Module
-                  key={`LabwareSetup_Module_${moduleDef.model}_${x}${y}`}
+                  key={`LabwareSetup_Module_${String(
+                    moduleDef.model
+                  )}_${x}${y}`}
                   x={x}
                   y={y}
                   orientation={inferModuleOrientationFromXCoordinate(x)}
@@ -99,7 +116,9 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 >
                   {nestedLabwareDef != null && nestedLabwareId != null ? (
                     <React.Fragment
-                      key={`LabwareSetup_Labware_${nestedLabwareDef.metadata.displayName}_${x}${y}`}
+                      key={`LabwareSetup_Labware_${String(
+                        nestedLabwareDef.metadata.displayName
+                      )}_${x}${y}`}
                     >
                       <LabwareRender definition={nestedLabwareDef} />
                       <LabwareInfoOverlay
@@ -124,7 +143,9 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 const labwareHasLiquid = !isEmpty(wellFill)
                 return (
                   <React.Fragment
-                    key={`LabwareSetup_Labware_${labwareDef.metadata.displayName}_${x}${y}`}
+                    key={`LabwareSetup_Labware_${String(
+                      labwareDef.metadata.displayName
+                    )}_${x}${y}`}
                   >
                     <g
                       transform={`translate(${x},${y})`}
@@ -155,6 +176,7 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
                 )
               }
             )}
+            <SlotLabels robotType={robotType} />
           </>
         )}
       </RobotWorkSpace>

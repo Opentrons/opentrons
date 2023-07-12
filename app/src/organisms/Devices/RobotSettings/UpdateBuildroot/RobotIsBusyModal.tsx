@@ -9,9 +9,9 @@ import {
   TYPOGRAPHY,
   ALIGN_CENTER,
   Btn,
+  PrimaryButton,
 } from '@opentrons/components'
-import { Modal } from '../../../../atoms/Modal'
-import { PrimaryButton } from '../../../../atoms/buttons'
+import { LegacyModal } from '../../../../molecules/LegacyModal'
 import { StyledText } from '../../../../atoms/text'
 
 interface RobotIsBusyModalProps {
@@ -26,24 +26,24 @@ export function RobotIsBusyModal({
   const { t } = useTranslation(['device_details', 'shared'])
 
   return (
-    <Modal type="warning" title={t('robot_is_busy')}>
+    <LegacyModal type="warning" title={t('shared:robot_is_busy')}>
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Trans
           t={t}
           i18nKey="this_robot_will_restart_with_update"
           components={{
-            block: <StyledText as="p" marginBottom={SPACING.spacing2} />,
+            block: <StyledText as="p" marginBottom={SPACING.spacing4} />,
           }}
         />
         <Flex
           justifyContent={JUSTIFY_FLEX_END}
           alignItems={ALIGN_CENTER}
-          marginTop={SPACING.spacing3}
+          marginTop={SPACING.spacing8}
         >
           <Btn
             onClick={closeModal}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
-            marginRight={SPACING.spacing5}
+            marginRight={SPACING.spacing24}
             css={TYPOGRAPHY.linkPSemiBold}
           >
             {t('shared:cancel')}
@@ -51,6 +51,6 @@ export function RobotIsBusyModal({
           <PrimaryButton onClick={proceed}>{t('yes_update_now')}</PrimaryButton>
         </Flex>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

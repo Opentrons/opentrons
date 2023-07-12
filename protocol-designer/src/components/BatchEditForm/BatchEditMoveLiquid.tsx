@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {
   Box,
-  PrimaryButton,
+  DeprecatedPrimaryButton,
   OutlineButton,
   Tooltip,
   useHoverTooltip,
@@ -206,9 +206,12 @@ export const BatchEditMoveLiquid = (
             className={buttonStyles.form_button}
             display="inline-block"
           >
-            <PrimaryButton disabled={disableSave} onClick={handleSave}>
+            <DeprecatedPrimaryButton
+              disabled={disableSave}
+              onClick={handleSave}
+            >
               {i18n.t('button.save')}
-            </PrimaryButton>
+            </DeprecatedPrimaryButton>
             <Tooltip {...saveButtonTooltipProps}>
               {i18n.t(
                 `tooltip.save_batch_edit.${

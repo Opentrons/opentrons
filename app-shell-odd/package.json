@@ -1,0 +1,64 @@
+{
+  "name": "@opentrons/app-shell-odd",
+  "private": true,
+  "productName": "Opentrons",
+  "version": "0.0.0-dev",
+  "description": "Opentrons desktop application",
+  "main": "lib/main.js",
+  "types": "lib/main.d.ts",
+  "scripts": {
+    "start": "make dev",
+    "rebuild": "electron-rebuild"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Opentrons/opentrons.git"
+  },
+  "author": {
+    "name": "Opentrons Labworks",
+    "email": "engineering@opentrons.com"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Opentrons/opentrons/issues"
+  },
+  "homepage": "https://github.com/Opentrons/opentrons",
+  "workspaces": {
+    "nohoist": [
+      "**"
+    ]
+  },
+  "devDependencies": {
+    "@opentrons/app": "link:../app",
+    "@opentrons/discovery-client": "link:../discovery-client",
+    "@opentrons/shared-data": "link:../shared-data"
+  },
+  "dependencies": {
+    "@thi.ng/paths": "1.6.5",
+    "@types/dateformat": "^3.0.1",
+    "@types/fs-extra": "9.0.13",
+    "@types/lodash": "^4.14.191",
+    "@types/pump": "^1.1.0",
+    "@types/uuid": "^3.4.7",
+    "ajv": "6.12.3",
+    "dateformat": "3.0.3",
+    "electron-debug": "3.0.1",
+    "electron-devtools-installer": "3.2.0",
+    "electron-dl": "1.14.0",
+    "electron-store": "5.1.1",
+    "electron-updater": "4.1.2",
+    "execa": "4.0.0",
+    "form-data": "2.5.0",
+    "fs-extra": "10.0.0",
+    "get-stream": "5.1.0",
+    "merge-options": "1.0.1",
+    "node-fetch": "2.6.7",
+    "node-stream-zip": "1.8.2",
+    "pump": "3.0.0",
+    "semver": "5.5.0",
+    "tempy": "1.0.1",
+    "uuid": "3.2.1",
+    "winston": "3.1.0",
+    "yargs-parser": "13.1.2"
+  }
+}

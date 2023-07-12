@@ -25,7 +25,6 @@ describe('analytics epics', () => {
       expect(actual).toEqual(expected)
     })
   })
-
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -34,6 +33,7 @@ describe('analytics epics', () => {
     it('initializes analytics on config:INITIALIZED', () => {
       const action = Cfg.configInitialized({
         analytics: { optedIn: true },
+        isOnDevice: false,
       } as any)
 
       testScheduler.run(({ hot, expectObservable, flush }) => {
@@ -43,9 +43,12 @@ describe('analytics epics', () => {
 
         expectObservable(output$).toBe('--')
         flush()
-        expect(initializeMixpanel).toHaveBeenCalledWith({
-          optedIn: true,
-        })
+        expect(initializeMixpanel).toHaveBeenCalledWith(
+          {
+            optedIn: true,
+          },
+          false
+        )
       })
     })
   })
@@ -105,8 +108,8 @@ describe('analytics epics', () => {
   })
 
   describe('optIntoAnalyticsEvent', () => {
-    const off = { config: { analytics: { optedIn: false } } }
-    const on = { config: { analytics: { optedIn: true } } }
+    const off = { config: { analytics: { optedIn: false }, isOnDevice: false } }
+    const on = { config: { analytics: { optedIn: true }, isOnDevice: false } }
 
     it('sets opt-in', () => {
       testScheduler.run(({ hot, expectObservable, flush }) => {
@@ -116,7 +119,10 @@ describe('analytics epics', () => {
 
         expectObservable(output$).toBe('----')
         flush()
-        expect(setMixpanelTracking).toHaveBeenCalledWith({ optedIn: true })
+        expect(setMixpanelTracking).toHaveBeenCalledWith(
+          { optedIn: true },
+          false
+        )
       })
     })
 
@@ -128,7 +134,10 @@ describe('analytics epics', () => {
 
         expectObservable(output$).toBe('----')
         flush()
-        expect(setMixpanelTracking).toHaveBeenCalledWith({ optedIn: false })
+        expect(setMixpanelTracking).toHaveBeenCalledWith(
+          { optedIn: false },
+          false
+        )
       })
     })
 

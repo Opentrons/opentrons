@@ -9,7 +9,7 @@ from opentrons_hardware.firmware_bindings import (
 )
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition, fields
 from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
-from opentrons_hardware.firmware_bindings.utils import UInt32Field
+from opentrons_hardware.firmware_bindings.utils import UInt32Field, UInt8Field
 
 from opentrons_hardware.firmware_update import initiator
 from opentrons_hardware.firmware_update.errors import BootloaderNotReady
@@ -38,6 +38,8 @@ async def test_messaging(
                     version=UInt32Field(0),
                     flags=fields.VersionFlagsField(0),
                     shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
+                    revision=fields.OptionalRevisionField.build(b""),
+                    subidentifier=UInt8Field(0),
                 )
             )
             can_message_notifier.notify(
@@ -52,13 +54,13 @@ async def test_messaging(
                 ),
             )
 
-    target = Target(system_node=NodeId.head)
+    target = Target.from_single_node(NodeId.head)
 
-    mock_messenger.send.side_effect = responder
+    mock_messenger.send_exclusive.side_effect = responder
 
     await subject.run(target, 1, 1)
 
-    assert mock_messenger.send.mock_calls == [
+    assert mock_messenger.send_exclusive.mock_calls == [
         call(
             node_id=target.system_node,
             message=message_definitions.FirmwareUpdateInitiate(),
@@ -86,6 +88,8 @@ async def test_retry(
                 version=UInt32Field(0),
                 flags=fields.VersionFlagsField(0),
                 shortsha=fields.FirmwareShortSHADataField(b"abcdef0"),
+                revision=fields.OptionalRevisionField.build(b""),
+                subidentifier=UInt8Field(0),
             )
         ),
         None,
@@ -110,14 +114,14 @@ async def test_retry(
                     ),
                 )
 
-    target = Target(system_node=NodeId.head)
+    target = Target.from_single_node(NodeId.head)
 
-    mock_messenger.send.side_effect = responder
+    mock_messenger.send_exclusive.side_effect = responder
 
     await subject.run(target, retry_count=retry_count + 1, ready_wait_time_sec=0.1)
 
     assert (
-        mock_messenger.send.mock_calls
+        mock_messenger.send_exclusive.mock_calls
         == [
             call(
                 node_id=target.system_node,
@@ -143,14 +147,14 @@ async def test_bootloader_not_ready(
     mock_messenger: AsyncMock,
 ) -> None:
     """It should raise an error when bootloader never responds."""
-    target = Target(system_node=NodeId.head)
+    target = Target.from_single_node(NodeId.head)
 
     retry_count = 3
     with pytest.raises(BootloaderNotReady):
         await subject.run(target, retry_count=retry_count, ready_wait_time_sec=0.1)
 
     assert (
-        mock_messenger.send.mock_calls
+        mock_messenger.send_exclusive.mock_calls
         == [
             call(
                 node_id=target.system_node,

@@ -2,7 +2,6 @@
 import { combineEpics, ofType } from 'redux-observable'
 import { of, from, zip } from 'rxjs'
 import {
-  map,
   mergeMap,
   filter,
   tap,
@@ -12,7 +11,7 @@ import {
 } from 'rxjs/operators'
 
 import * as Cfg from '../config'
-import { getAnalyticsConfig } from './selectors'
+import { getAnalyticsConfig, getAnalyticsOptedIn } from './selectors'
 import { initializeMixpanel, setMixpanelTracking, trackEvent } from './mixpanel'
 import { makeEvent } from './make-event'
 
@@ -26,7 +25,7 @@ const initializeAnalyticsEpic: Epic = (action$, state$) => {
     ofType<Action, ConfigInitializedAction>(Cfg.INITIALIZED),
     tap((initAction: ConfigInitializedAction) => {
       const { config } = initAction.payload
-      initializeMixpanel(config.analytics)
+      initializeMixpanel(config.analytics, config.isOnDevice)
     }),
     ignoreElements()
   )
@@ -57,17 +56,17 @@ const sendAnalyticsEventEpic: Epic = (action$, state$) => {
 
 const optIntoAnalyticsEpic: Epic = (_, state$) => {
   return state$.pipe(
-    map<State, AnalyticsConfig | null>(getAnalyticsConfig),
-    // this epic is for runtime changes in opt-in (not initialization)
-    // ensure config exists so it doesn't conflict with initializeAnalyticsEpic
-    filter<AnalyticsConfig | null, AnalyticsConfig>(
-      (maybeConfig): maybeConfig is AnalyticsConfig => maybeConfig !== null
-    ),
+    // now this pipe receive the entire state to pass isOnDevice to setMixpanelTracking
+    // isOnDevice is used to distinguish appMode Desktop or ODD
     pairwise(),
-    filter(([prev, next]) => prev.optedIn !== next.optedIn),
-    tap(([_, config]: [unknown, AnalyticsConfig]) =>
-      setMixpanelTracking(config)
+    filter(
+      ([prevState, nextState]) =>
+        getAnalyticsOptedIn(prevState) !== getAnalyticsOptedIn(nextState)
     ),
+    tap(([_, state]: [State, State]) => {
+      if (state.config?.analytics != null)
+        setMixpanelTracking(state.config?.analytics, state.config?.isOnDevice)
+    }),
     ignoreElements()
   )
 }

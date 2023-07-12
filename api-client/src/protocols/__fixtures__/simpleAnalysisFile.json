@@ -3924,5 +3924,19 @@
       },
       "serialNumber": "dummySerialTD"
     }
+  ],
+  "liquids": [
+    {
+      "id": "0",
+      "displayName": "Water",
+      "description": "",
+      "displayColor": "#50d5ff"
+    },
+    {
+      "id": "1",
+      "displayName": "Saline",
+      "description": "",
+      "displayColor": "#b925ff"
+    }
   ]
 }

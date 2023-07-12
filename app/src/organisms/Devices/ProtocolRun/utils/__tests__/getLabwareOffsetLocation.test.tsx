@@ -3,7 +3,7 @@ import _uncastedProtocolWithTC from '@opentrons/shared-data/protocol/fixtures/6/
 import { getLabwareOffsetLocation } from '../getLabwareOffsetLocation'
 import { getLabwareLocation } from '../getLabwareLocation'
 import { getModuleInitialLoadInfo } from '../getModuleInitialLoadInfo'
-import type { ProtocolAnalysisFile } from '@opentrons/shared-data'
+import type { LoadedModule, ProtocolAnalysisFile } from '@opentrons/shared-data'
 
 jest.mock('../getLabwareLocation')
 jest.mock('../getModuleInitialLoadInfo')
@@ -20,11 +20,16 @@ const mockGetModuleInitialLoadInfo = getModuleInitialLoadInfo as jest.MockedFunc
 describe('getLabwareOffsetLocation', () => {
   let MOCK_LABWARE_ID: string
   let MOCK_COMMANDS: ProtocolAnalysisFile['commands']
-  let MOCK_MODULES: ProtocolAnalysisFile['modules']
+  let MOCK_MODULES: LoadedModule[]
   beforeEach(() => {
     MOCK_LABWARE_ID = 'some_labware'
     MOCK_COMMANDS = protocolWithTC.commands
-    MOCK_MODULES = protocolWithTC.modules
+    MOCK_MODULES = [
+      {
+        id: '18f0c1b0-0122-11ec-88a3-f1745cf9b36c:thermocyclerModuleType',
+        model: 'thermocyclerModuleV1',
+      },
+    ] as LoadedModule[]
   })
   afterEach(() => {
     resetAllWhenMocks()
@@ -39,6 +44,15 @@ describe('getLabwareOffsetLocation', () => {
     expect(
       getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES)
     ).toEqual({ slotName: MOCK_SLOT })
+  })
+  it('should return null if the location is off deck', () => {
+    when(mockGetLabwareLocation)
+      .calledWith(MOCK_LABWARE_ID, MOCK_COMMANDS)
+      .mockReturnValue('offDeck')
+
+    expect(
+      getLabwareOffsetLocation(MOCK_LABWARE_ID, MOCK_COMMANDS, MOCK_MODULES)
+    ).toEqual(null)
   })
   it('should return the slot name and module model if the labware is on top of a module', () => {
     const TCIdInProtocol =

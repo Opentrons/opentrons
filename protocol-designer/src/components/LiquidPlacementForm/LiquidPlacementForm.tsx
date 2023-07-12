@@ -8,7 +8,7 @@ import {
   InputField,
   FormGroup,
   OutlineButton,
-  PrimaryButton,
+  DeprecatedPrimaryButton,
   Options,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
@@ -166,9 +166,9 @@ export class LiquidPlacementForm extends React.Component<Props> {
                 <OutlineButton onClick={this.handleCancelForm}>
                   {i18n.t('button.cancel')}
                 </OutlineButton>
-                <PrimaryButton type="submit">
+                <DeprecatedPrimaryButton type="submit">
                   {i18n.t('button.save')}
-                </PrimaryButton>
+                </DeprecatedPrimaryButton>
               </div>
             </form>
           )}

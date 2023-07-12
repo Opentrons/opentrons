@@ -1,17 +1,32 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Tuple, TypeVar
+from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence, cast
+from typing_extensions import Literal
+from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
     OT3Axis,
     OT3AxisKind,
     OT3AxisMap,
     CurrentConfig,
-    OT3SubSystem,
+    SubSystem,
     OT3Mount,
+    InstrumentProbeType,
+    PipetteSubType,
+    UpdateState,
+    UpdateStatus,
 )
 import numpy as np
 
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    FirmwareTarget,
+    PipetteType,
+    SensorId,
+    PipetteTipActionType,
+    USBTarget,
+)
+from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
+from opentrons_hardware.hardware_control import network
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
     SystemConstraints,
@@ -19,7 +34,10 @@ from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     CoordinateValue,
 )
-from opentrons_hardware.hardware_control.tool_sensors import ProbeTarget
+from opentrons_hardware.hardware_control.tool_sensors import (
+    InstrumentProbeTarget,
+    PipetteProbeTarget,
+)
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
     unit_vector_multiplication,
 )
@@ -27,15 +45,20 @@ from opentrons_hardware.hardware_control.motion import (
     create_step,
     NodeIdMotionValues,
     create_home_step,
+    create_backoff_step,
     MoveGroup,
     MoveType,
     MoveStopCondition,
     create_gripper_jaw_step,
+    create_tip_action_step,
 )
 
-GRIPPER_JAW_HOME_TIME: float = 120
-GRIPPER_JAW_GRIP_TIME: float = 1
-GRIPPER_JAW_HOME_DC: float = 100
+GRIPPER_JAW_HOME_TIME: float = 10
+GRIPPER_JAW_GRIP_TIME: float = 10
+
+LIMIT_SWITCH_OVERTRAVEL_DISTANCE: float = 1
+
+PipetteAction = Literal["clamp", "home"]
 
 # TODO: These methods exist to defer uses of NodeId to inside
 # method bodies, which won't be evaluated until called. This is needed
@@ -44,6 +67,21 @@ GRIPPER_JAW_HOME_DC: float = 100
 # to NodeId that are interpreted at import time because then the robot
 # server tests fail when importing hardware controller. This is obviously
 # terrible and needs to be fixed.
+
+SUBSYSTEM_NODEID: Dict[SubSystem, NodeId] = {
+    SubSystem.gantry_x: NodeId.gantry_x,
+    SubSystem.gantry_y: NodeId.gantry_y,
+    SubSystem.head: NodeId.head,
+    SubSystem.pipette_left: NodeId.pipette_left,
+    SubSystem.pipette_right: NodeId.pipette_right,
+    SubSystem.gripper: NodeId.gripper,
+}
+
+NODEID_SUBSYSTEM = {node: subsystem for subsystem, node in SUBSYSTEM_NODEID.items()}
+
+SUBSYSTEM_USB: Dict[SubSystem, USBTarget] = {SubSystem.rear_panel: USBTarget.rear_panel}
+
+USB_SUBSYSTEM = {target: subsystem for subsystem, target in SUBSYSTEM_USB.items()}
 
 
 def axis_nodes() -> List["NodeId"]:
@@ -95,6 +133,7 @@ def axis_to_node(axis: OT3Axis) -> "NodeId":
         OT3Axis.P_R: NodeId.pipette_right,
         OT3Axis.Z_G: NodeId.gripper_z,
         OT3Axis.G: NodeId.gripper_g,
+        OT3Axis.Q: NodeId.pipette_left,
     }
     return anm[axis]
 
@@ -129,17 +168,38 @@ def axis_is_node(axis: OT3Axis) -> bool:
         return False
 
 
-def sub_system_to_node_id(sub_sys: OT3SubSystem) -> "NodeId":
+def sub_system_to_nodeid(sub_sys: SubSystem) -> "NodeId":
     """Convert a sub system to a NodeId."""
-    nam = {
-        OT3SubSystem.gantry_x: NodeId.gantry_x,
-        OT3SubSystem.gantry_y: NodeId.gantry_y,
-        OT3SubSystem.head: NodeId.head,
-        OT3SubSystem.pipette_left: NodeId.pipette_left,
-        OT3SubSystem.pipette_right: NodeId.pipette_right,
-        OT3SubSystem.gripper: NodeId.gripper,
-    }
-    return nam[sub_sys]
+    return SUBSYSTEM_NODEID[sub_sys]
+
+
+def node_id_to_subsystem(node_id: NodeId) -> "SubSystem":
+    """Convert a NodeId to a Subsystem"""
+    return NODEID_SUBSYSTEM[node_id.application_for()]
+
+
+def usb_to_subsystem(target: USBTarget) -> SubSystem:
+    return USB_SUBSYSTEM[target]
+
+
+def subsystem_to_usb(subsystem: SubSystem) -> USBTarget:
+    return SUBSYSTEM_USB[subsystem]
+
+
+def target_to_subsystem(target: FirmwareTarget) -> SubSystem:
+    if isinstance(target, USBTarget):
+        return usb_to_subsystem(target)
+    elif isinstance(target, NodeId):
+        return node_id_to_subsystem(target)
+    else:
+        raise KeyError(target)
+
+
+def subsystem_to_target(subsystem: SubSystem) -> FirmwareTarget:
+    try:
+        return sub_system_to_nodeid(subsystem)
+    except KeyError:
+        return subsystem_to_usb(subsystem)
 
 
 def get_current_settings(
@@ -148,7 +208,7 @@ def get_current_settings(
 ) -> OT3AxisMap[CurrentConfig]:
     conf_by_pip = config.by_gantry_load(gantry_load)
     currents = {}
-    for axis_kind in [OT3AxisKind.P, OT3AxisKind.X, OT3AxisKind.Y, OT3AxisKind.Z]:
+    for axis_kind in conf_by_pip["hold_current"].keys():
         for axis in OT3Axis.of_kind(axis_kind):
             currents[axis] = CurrentConfig(
                 conf_by_pip["hold_current"][axis_kind],
@@ -163,12 +223,42 @@ def get_system_constraints(
 ) -> "SystemConstraints[OT3Axis]":
     conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
-    for axis_kind in [OT3AxisKind.P, OT3AxisKind.X, OT3AxisKind.Y, OT3AxisKind.Z]:
+    for axis_kind in [
+        OT3AxisKind.P,
+        OT3AxisKind.X,
+        OT3AxisKind.Y,
+        OT3AxisKind.Z,
+        OT3AxisKind.Z_G,
+    ]:
         for axis in OT3Axis.of_kind(axis_kind):
             constraints[axis] = AxisConstraints.build(
                 conf_by_pip["acceleration"][axis_kind],
                 conf_by_pip["max_speed_discontinuity"][axis_kind],
                 conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
+                conf_by_pip["default_max_speed"][axis_kind],
+            )
+    return constraints
+
+
+def get_system_constraints_for_calibration(
+    config: OT3MotionSettings,
+    gantry_load: GantryLoad,
+) -> "SystemConstraints[OT3Axis]":
+    conf_by_pip = config.by_gantry_load(gantry_load)
+    constraints = {}
+    for axis_kind in [
+        OT3AxisKind.P,
+        OT3AxisKind.X,
+        OT3AxisKind.Y,
+        OT3AxisKind.Z,
+        OT3AxisKind.Z_G,
+    ]:
+        for axis in OT3Axis.of_kind(axis_kind):
+            constraints[axis] = AxisConstraints.build(
+                conf_by_pip["acceleration"][axis_kind],
+                conf_by_pip["max_speed_discontinuity"][axis_kind],
+                conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
+                DEFAULT_CALIBRATION_AXIS_MAX_SPEED,
             )
     return constraints
 
@@ -181,6 +271,53 @@ def _convert_to_node_id_dict(
         if axis_is_node(axis):
             target[axis_to_node(axis)] = np.float64(pos)
     return target
+
+
+def replace_head_node(targets: Set[FirmwareTarget]) -> Set[FirmwareTarget]:
+    """Replace the head core node with its two sides.
+
+    The node ID for the head central controller is what shows up in a network probe,
+    but what we actually send commands to an overwhelming majority of the time is
+    the head_l and head_r synthetic node IDs, and those are what we want in the
+    network map.
+    """
+    if NodeId.head in targets:
+        targets.remove(NodeId.head)
+        targets.add(NodeId.head_r)
+        targets.add(NodeId.head_l)
+    return targets
+
+
+def replace_gripper_node(targets: Set[FirmwareTarget]) -> Set[FirmwareTarget]:
+    """Replace the gripper core node with its two axes.
+
+    The node ID for the gripper controller is what shows up in a network probe,
+    but what we actually send most commands to is the gripper_z and gripper_g
+    synthetic nodes, so we should have them in the network map instead.
+    """
+    if NodeId.gripper in targets:
+        targets.remove(NodeId.gripper)
+        targets.add(NodeId.gripper_z)
+        targets.add(NodeId.gripper_g)
+    return targets
+
+
+def motor_nodes(devices: Set[FirmwareTarget]) -> Set[NodeId]:
+    # do the replacement of head and gripper devices
+    motor_nodes = replace_gripper_node(devices)
+    motor_nodes = replace_head_node(motor_nodes)
+    bootloader_nodes = {
+        NodeId.pipette_left_bootloader,
+        NodeId.pipette_right_bootloader,
+        NodeId.gantry_x_bootloader,
+        NodeId.gantry_y_bootloader,
+        NodeId.head_bootloader,
+        NodeId.gripper_bootloader,
+    }
+    # remove any bootloader nodes
+    motor_nodes -= bootloader_nodes
+    # filter out usb nodes
+    return {NodeId(target) for target in motor_nodes if target in NodeId}
 
 
 def create_move_group(
@@ -217,33 +354,63 @@ def create_home_group(
 ) -> MoveGroup:
     node_id_distances = _convert_to_node_id_dict(distance)
     node_id_velocities = _convert_to_node_id_dict(velocity)
-    step = create_home_step(
+    home = create_home_step(
         distance=node_id_distances,
         velocity=node_id_velocities,
     )
-    move_group: MoveGroup = [step]
+    # halve the homing speed for backoff
+    backoff_velocities = {k: v / 2 for k, v in node_id_velocities.items()}
+    backoff = create_backoff_step(backoff_velocities)
+
+    move_group: MoveGroup = [home, backoff]
     return move_group
 
 
-def create_gripper_jaw_move_group(
+def create_tip_action_group(
+    axes: Sequence[OT3Axis], distance: float, velocity: float, action: PipetteAction
+) -> MoveGroup:
+    current_nodes = [axis_to_node(ax) for ax in axes]
+    step = create_tip_action_step(
+        velocity={node_id: np.float64(velocity) for node_id in current_nodes},
+        distance={node_id: np.float64(distance) for node_id in current_nodes},
+        present_nodes=current_nodes,
+        action=PipetteTipActionType[action],
+    )
+    return [step]
+
+
+def create_gripper_jaw_grip_group(
     duty_cycle: float,
     stop_condition: MoveStopCondition = MoveStopCondition.none,
 ) -> MoveGroup:
     step = create_gripper_jaw_step(
         duration=np.float64(GRIPPER_JAW_GRIP_TIME),
-        duty_cycle=np.float32(duty_cycle),
+        duty_cycle=np.float32(round(duty_cycle)),
         stop_condition=stop_condition,
+        move_type=MoveType.grip,
     )
     move_group: MoveGroup = [step]
     return move_group
 
 
-def create_gripper_jaw_home_group() -> MoveGroup:
+def create_gripper_jaw_home_group(dc: float) -> MoveGroup:
     step = create_gripper_jaw_step(
         duration=np.float64(GRIPPER_JAW_HOME_TIME),
-        duty_cycle=np.float32(GRIPPER_JAW_HOME_DC),
+        duty_cycle=np.float32(dc),
         stop_condition=MoveStopCondition.limit_switch,
         move_type=MoveType.home,
+    )
+    move_group: MoveGroup = [step]
+    return move_group
+
+
+def create_gripper_jaw_hold_group(encoder_position_um: int) -> MoveGroup:
+    step = create_gripper_jaw_step(
+        duration=np.float64(GRIPPER_JAW_GRIP_TIME),
+        duty_cycle=np.float32(0),
+        encoder_position_um=np.int32(encoder_position_um),
+        stop_condition=MoveStopCondition.encoder_position,
+        move_type=MoveType.linear,
     )
     move_group: MoveGroup = [step]
     return move_group
@@ -262,12 +429,112 @@ def axis_convert(
     return ret
 
 
-_sensor_node_lookup: Dict[OT3Mount, ProbeTarget] = {
+_sensor_node_lookup: Dict[OT3Mount, InstrumentProbeTarget] = {
     OT3Mount.LEFT: NodeId.pipette_left,
     OT3Mount.RIGHT: NodeId.pipette_right,
     OT3Mount.GRIPPER: NodeId.gripper,
 }
 
+_sensor_node_lookup_pipettes_only: Dict[OT3Mount, PipetteProbeTarget] = {
+    OT3Mount.LEFT: NodeId.pipette_left,
+    OT3Mount.RIGHT: NodeId.pipette_right,
+}
 
-def sensor_node_for_mount(mount: OT3Mount) -> ProbeTarget:
+
+def sensor_node_for_mount(mount: OT3Mount) -> InstrumentProbeTarget:
     return _sensor_node_lookup[mount]
+
+
+def sensor_node_for_pipette(mount: OT3Mount) -> PipetteProbeTarget:
+    return _sensor_node_lookup_pipettes_only[mount]
+
+
+_instr_sensor_id_lookup: Dict[InstrumentProbeType, SensorId] = {
+    InstrumentProbeType.PRIMARY: SensorId.S0,
+    InstrumentProbeType.SECONDARY: SensorId.S1,
+}
+
+
+def sensor_id_for_instrument(probe: InstrumentProbeType) -> SensorId:
+    return _instr_sensor_id_lookup[probe]
+
+
+_pipette_channels_to_sensor_map = {
+    PipetteType.pipette_single: [SensorId.S0],
+    PipetteType.pipette_multi: [SensorId.S0, SensorId.S1],
+    PipetteType.pipette_96: [SensorId.S0, SensorId.S1],
+}
+
+
+def map_pipette_type_to_sensor_id(
+    available_instruments: List[NodeId],
+    device_info: Dict[SubSystem, network.DeviceInfoCache],
+) -> Dict[PipetteProbeTarget, List[SensorId]]:
+    return_map = {}
+    for node in available_instruments:
+        node_info = device_info[node_id_to_subsystem(node)]
+        return_map[cast(PipetteProbeTarget, node)] = _pipette_channels_to_sensor_map[
+            PipetteType(node_info.subidentifier)
+        ]
+    return return_map
+
+
+_pipette_subtype_lookup = {
+    PipetteSubType.pipette_single: PipetteType.pipette_single,
+    PipetteSubType.pipette_multi: PipetteType.pipette_multi,
+    PipetteSubType.pipette_96: PipetteType.pipette_96,
+}
+
+
+def pipette_type_for_subtype(pipette_subtype: PipetteSubType) -> PipetteType:
+    return _pipette_subtype_lookup[pipette_subtype]
+
+
+_update_state_lookup = {
+    FirmwareUpdateStatus.queued: UpdateState.queued,
+    FirmwareUpdateStatus.updating: UpdateState.updating,
+    FirmwareUpdateStatus.done: UpdateState.done,
+}
+
+
+def fw_update_state_from_status(state: FirmwareUpdateStatus) -> UpdateState:
+    return _update_state_lookup[state]
+
+
+class UpdateProgress:
+    """Class to keep track of Update progress."""
+
+    def __init__(self, targets: Set[FirmwareTarget]):
+        self._tracker: Dict[FirmwareTarget, UpdateStatus] = {}
+        self._total_progress = 0
+        for target in targets:
+            subsystem = (
+                node_id_to_subsystem(NodeId(target))
+                if isinstance(target, NodeId)
+                else SubSystem.rear_panel
+            )
+            self._tracker[target] = UpdateStatus(subsystem, UpdateState.queued, 0)
+
+    @property
+    def targets(self) -> Set[FirmwareTarget]:
+        """Gets the set of update Targets queued or updating."""
+        return set(self._tracker)
+
+    def get_progress(self) -> Set[UpdateStatus]:
+        """Gets the update status and total progress"""
+        return set(self._tracker.values())
+
+    def update(
+        self, target: FirmwareTarget, status_element: StatusElement
+    ) -> Set[UpdateStatus]:
+        """Update internal states/progress of firmware updates."""
+        fw_update_status, progress = status_element
+        subsystem = (
+            node_id_to_subsystem(NodeId(target))
+            if isinstance(target, NodeId)
+            else SubSystem.rear_panel
+        )
+        state = fw_update_state_from_status(fw_update_status)
+        progress = int(progress * 100)
+        self._tracker[target] = UpdateStatus(subsystem, state, progress)
+        return set(self._tracker.values())

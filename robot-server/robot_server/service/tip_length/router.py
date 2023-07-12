@@ -2,12 +2,8 @@ from starlette import status
 from fastapi import APIRouter
 from typing import Optional
 
-from opentrons.calibration_storage import (
-    types as cal_types,
-    get as get_cal,
-    helpers,
-    delete,
-)
+from opentrons.calibration_storage import types as cal_types
+from opentrons.calibration_storage.ot2 import tip_length, models
 
 from robot_server.errors import ErrorBody
 from robot_server.service.tip_length import models as tl_models
@@ -19,15 +15,21 @@ router = APIRouter()
 
 
 def _format_calibration(
-    calibration: cal_types.TipLengthCalibration,
+    calibration: models.v1.TipLengthCalibration,
 ) -> tl_models.TipLengthCalibration:
-    status = cal_model.CalibrationStatus(**helpers.convert_to_dict(calibration.status))
+    # TODO (lc 09-20-2022) We should use the calibration
+    # status model in calibration storage.
+    status = cal_model.CalibrationStatus(
+        markedBad=calibration.status.markedBad,
+        source=calibration.status.source,
+        markedAt=calibration.status.markedAt,
+    )
     formatted_cal = tl_models.TipLengthCalibration(
         id=f"{calibration.tiprack}&{calibration.pipette}",
-        tipLength=calibration.tip_length,
+        tipLength=calibration.tipLength,
         tiprack=calibration.tiprack,
         pipette=calibration.pipette,
-        lastModified=calibration.last_modified,
+        lastModified=calibration.lastModified,
         source=calibration.source,
         status=status,
         uri=calibration.uri,
@@ -47,8 +49,7 @@ async def get_all_tip_length_calibrations(
     pipette_id: Optional[str] = None,
     tiprack_uri: Optional[str] = None,
 ) -> tl_models.MultipleCalibrationsResponse:
-    all_calibrations = get_cal.get_all_tip_length_calibrations()
-
+    all_calibrations = tip_length.get_all_tip_length_calibrations()
     if not all_calibrations:
         return tl_models.MultipleCalibrationsResponse(
             data=[_format_calibration(cal) for cal in all_calibrations],
@@ -80,8 +81,8 @@ async def get_all_tip_length_calibrations(
 )
 async def delete_specific_tip_length_calibration(tiprack_hash: str, pipette_id: str):
     try:
-        delete.delete_tip_length_calibration(tiprack_hash, pipette_id)
-    except FileNotFoundError:
+        tip_length.delete_tip_length_calibration(tiprack_hash, pipette_id)
+    except cal_types.TipLengthCalNotFound:
         raise RobotServerError(
             definition=CommonErrorDef.RESOURCE_NOT_FOUND,
             resource="TipLengthCalibration",

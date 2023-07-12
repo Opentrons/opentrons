@@ -34,6 +34,8 @@ import {
   MAX_HEATER_SHAKER_MODULE_RPM,
   MIN_HEATER_SHAKER_DURATION_SECONDS,
   MAX_HEATER_SHAKER_DURATION_SECONDS,
+  MIN_TC_PROFILE_VOLUME,
+  MAX_TC_PROFILE_VOLUME,
 } from '../../constants'
 import {
   LabwareEntity,
@@ -41,6 +43,7 @@ import {
   InvariantContext,
 } from '@opentrons/step-generation'
 import { StepFieldName } from '../../form-types'
+import { LabwareLocation } from '@opentrons/shared-data'
 export type { StepFieldName }
 
 const getLabwareEntity = (
@@ -48,6 +51,20 @@ const getLabwareEntity = (
   id: string
 ): LabwareEntity | null => {
   return state.labwareEntities[id] || null
+}
+
+const getLabwareLocation = (
+  state: InvariantContext,
+  newLocationString: string
+): LabwareLocation | null => {
+  if (newLocationString === 'offDeck') {
+    return 'offDeck'
+  } else if (newLocationString in state.moduleEntities) {
+    return { moduleId: newLocationString }
+  } else {
+    // assume it is a slot
+    return { slotName: newLocationString }
+  }
 }
 
 const getPipetteEntity = (
@@ -261,6 +278,12 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
       temperatureRangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
     ),
   },
+  profileVolume: {
+    getErrors: composeErrors(
+      minFieldValue(MIN_TC_PROFILE_VOLUME),
+      maxFieldValue(MAX_TC_PROFILE_VOLUME)
+    ),
+  },
   blockTargetTempHold: {
     getErrors: composeErrors(
       temperatureRangeFieldValue(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
@@ -277,6 +300,10 @@ const stepFieldHelperMap: Record<StepFieldName, StepFieldHelpers> = {
   },
   mix_mmFromBottom: {
     castValue: Number,
+  },
+  newLocation: {
+    getErrors: composeErrors(requiredField),
+    hydrate: getLabwareLocation,
   },
 }
 const profileFieldHelperMap: Record<string, StepFieldHelpers> = {

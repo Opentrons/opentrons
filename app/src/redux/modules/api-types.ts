@@ -55,6 +55,7 @@ export interface ThermocyclerData {
   // will be rare in normal operation due to limitations in current revision
   lidStatus: 'open' | 'closed' | 'in_between'
   lidTargetTemperature: number | null
+  lidTemperatureStatus: TemperatureStatus
   lidTemperature: number | null
   currentTemperature: number | null
   targetTemperature: number | null

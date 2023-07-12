@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { FormGroup as FormGroupComponent } from './FormGroup'
-import { CheckboxField } from './CheckboxField.stories'
+import { DeprecatedCheckboxField } from './DeprecatedCheckboxField.stories'
 
 import type { Story, Meta } from '@storybook/react'
 
@@ -17,7 +17,15 @@ export const FormGroup = Template.bind({})
 FormGroup.args = {
   label: 'This is a FormGroup',
   children: [
-    <CheckboxField onChange={e => {}} key="first" label="first field" />,
-    <CheckboxField onChange={e => {}} key="second" label="second field" />,
+    <DeprecatedCheckboxField
+      onChange={e => {}}
+      key="first"
+      label="first field"
+    />,
+    <DeprecatedCheckboxField
+      onChange={e => {}}
+      key="second"
+      label="second field"
+    />,
   ],
 }

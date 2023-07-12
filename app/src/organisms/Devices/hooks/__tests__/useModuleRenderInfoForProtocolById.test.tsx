@@ -2,7 +2,8 @@ import { renderHook } from '@testing-library/react-hooks'
 import { when, resetAllWhenMocks } from 'jest-when'
 
 import standardDeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.json'
-import _uncastedSimpleV6Protocol from '@opentrons/shared-data/protocol/fixtures/6/simpleV6.json'
+import _heaterShakerCommandsWithResultsKey from '@opentrons/shared-data/protocol/fixtures/6/heaterShakerCommandsWithResultsKey.json'
+import { useMostRecentCompletedAnalysis } from '../../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 
 import { getProtocolModulesInfo } from '../../ProtocolRun/utils/getProtocolModulesInfo'
 
@@ -21,14 +22,15 @@ import {
 import type {
   ModuleModel,
   ModuleType,
-  ProtocolAnalysisFile,
+  ProtocolAnalysisOutput,
 } from '@opentrons/shared-data'
-import type { ProtocolDetails, StoredProtocolAnalysis } from '..'
+import type { ProtocolDetails } from '..'
 
 jest.mock('../../ProtocolRun/utils/getProtocolModulesInfo')
 jest.mock('../useAttachedModules')
 jest.mock('../useProtocolDetailsForRun')
 jest.mock('../useStoredProtocolAnalysis')
+jest.mock('../../../LabwarePositionCheck/useMostRecentCompletedAnalysis')
 
 const mockGetProtocolModulesInfo = getProtocolModulesInfo as jest.MockedFunction<
   typeof getProtocolModulesInfo
@@ -42,13 +44,17 @@ const mockUseProtocolDetailsForRun = useProtocolDetailsForRun as jest.MockedFunc
 const mockUseStoredProtocolAnalysis = useStoredProtocolAnalysis as jest.MockedFunction<
   typeof useStoredProtocolAnalysis
 >
+const mockUseMostRecentCompletedAnalysis = useMostRecentCompletedAnalysis as jest.MockedFunction<
+  typeof useMostRecentCompletedAnalysis
+>
 
-const simpleV6Protocol = (_uncastedSimpleV6Protocol as unknown) as ProtocolAnalysisFile<{}>
+const heaterShakerCommandsWithResultsKey = (_heaterShakerCommandsWithResultsKey as unknown) as ProtocolAnalysisOutput
 
 const PROTOCOL_DETAILS = {
   displayName: 'fake protocol',
-  protocolData: simpleV6Protocol,
+  protocolData: heaterShakerCommandsWithResultsKey,
   protocolKey: 'fakeProtocolKey',
+  robotType: 'OT-2 Standard' as const,
 }
 
 const mockMagneticModuleDefinition = {
@@ -122,12 +128,15 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
       ])
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
-      .mockReturnValue(PROTOCOL_DETAILS)
+      .mockReturnValue(PROTOCOL_DETAILS as any)
     when(mockUseStoredProtocolAnalysis)
       .calledWith('1')
-      .mockReturnValue((PROTOCOL_DETAILS as unknown) as StoredProtocolAnalysis)
+      .mockReturnValue((PROTOCOL_DETAILS as unknown) as ProtocolAnalysisOutput)
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith('1')
+      .mockReturnValue(PROTOCOL_DETAILS.protocolData as any)
     when(mockGetProtocolModulesInfo)
-      .calledWith(simpleV6Protocol, standardDeckDef as any)
+      .calledWith(heaterShakerCommandsWithResultsKey, standardDeckDef as any)
       .mockReturnValue([TEMPERATURE_MODULE_INFO, MAGNETIC_MODULE_INFO])
   })
 
@@ -138,6 +147,9 @@ describe('useModuleRenderInfoForProtocolById hook', () => {
     when(mockUseProtocolDetailsForRun)
       .calledWith('1')
       .mockReturnValue({} as ProtocolDetails)
+    when(mockUseMostRecentCompletedAnalysis)
+      .calledWith('1')
+      .mockReturnValue(null)
     when(mockUseStoredProtocolAnalysis).calledWith('1').mockReturnValue(null)
     const { result } = renderHook(() =>
       useModuleRenderInfoForProtocolById('otie', '1')

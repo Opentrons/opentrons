@@ -10,6 +10,8 @@ import * as FormState from '../form-state'
 import { LABEL_ADD_NEW_KEY } from '../../i18n'
 
 import type { ShallowWrapper } from 'enzyme'
+import type { ActionMeta } from 'react-select'
+import type { SelectOption } from '@opentrons/components'
 
 jest.mock('../form-state')
 
@@ -127,7 +129,11 @@ describe('ConnectModal KeyFileField', () => {
     const wrapper = render()
     const select = wrapper.find(SelectField)
 
-    select.invoke('onValueChange')?.(fieldName, 'new-key-id')
+    select.invoke('onValueChange')?.(
+      fieldName,
+      'new-key-id',
+      ('input-change' as unknown) as ActionMeta<SelectOption>
+    )
     expect(setValue).toHaveBeenCalledWith('new-key-id')
   })
 
@@ -137,7 +143,11 @@ describe('ConnectModal KeyFileField', () => {
     const options = select.prop('options').flatMap((o: any) => o.options)
     const addNewOpt = options.find(o => o?.label === LABEL_ADD_NEW_KEY)
 
-    select.invoke('onValueChange')?.(fieldName, addNewOpt?.value)
+    select.invoke('onValueChange')?.(
+      fieldName,
+      addNewOpt?.value,
+      ('input-change' as unknown) as ActionMeta<SelectOption>
+    )
     expect(setValue).not.toHaveBeenCalledWith(addNewOpt?.value)
   })
 

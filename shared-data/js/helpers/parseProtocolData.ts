@@ -1,4 +1,5 @@
 import Ajv from 'ajv'
+import size from 'lodash/size'
 import labwareV2Schema from '../../labware/schemas/2.json'
 import protocolSchemaV1 from '../../protocol/schemas/1.json'
 import protocolSchemaV2 from '../../protocol/schemas/2.json'
@@ -10,6 +11,7 @@ import type { ErrorObject } from 'ajv'
 import type {
   JsonProtocolFile,
   ProtocolAnalysisFile,
+  ProtocolAnalysisOutput,
   ProtocolFileV1,
 } from '../../protocol'
 
@@ -133,9 +135,9 @@ export function protocolHasModules(
 }
 
 export function protocolHasLiquids(
-  protocol: ProtocolAnalysisFile<{}>
+  protocol: ProtocolAnalysisFile<{}> | ProtocolAnalysisOutput
 ): boolean {
-  return 'liquids' in protocol && Object.entries(protocol.liquids).length > 0
+  return 'liquids' in protocol && size(protocol.liquids) > 0
 }
 
 export function getProtocolDesignerApplicationName(

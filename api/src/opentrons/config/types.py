@@ -20,18 +20,12 @@ Vt = TypeVar("Vt")
 class GantryLoad(Enum):
     HIGH_THROUGHPUT = "high_throughput"
     LOW_THROUGHPUT = "low_throughput"
-    TWO_LOW_THROUGHPUT = "two_low_throughput"
-    NONE = "none"
-    GRIPPER = "gripper"
 
 
 @dataclass
 class ByGantryLoad(Generic[Vt]):
     high_throughput: Vt
     low_throughput: Vt
-    two_low_throughput: Vt
-    none: Vt
-    gripper: Vt
 
     def __getitem__(self, key: GantryLoad) -> Vt:
         return cast(Vt, asdict(self)[key.value])
@@ -89,16 +83,10 @@ class OT3MotionSettings:
     def by_gantry_load(
         self, gantry_load: GantryLoad
     ) -> Dict[str, Dict[OT3AxisKind, float]]:
-        # create a shallow copy
-        base = dict(
-            (field.name, getattr(self, field.name)[GantryLoad.NONE])
+        return dict(
+            (field.name, getattr(self, field.name)[gantry_load])
             for field in fields(self)
         )
-        if gantry_load is GantryLoad.NONE:
-            return base
-        for key in base.keys():
-            base[key].update(getattr(self, key)[gantry_load])
-        return base
 
 
 @dataclass(frozen=True)
@@ -109,16 +97,10 @@ class OT3CurrentSettings:
     def by_gantry_load(
         self, gantry_load: GantryLoad
     ) -> Dict[str, Dict[OT3AxisKind, float]]:
-        # create a shallow copy
-        base = dict(
-            (field.name, getattr(self, field.name)[GantryLoad.NONE])
+        return dict(
+            (field.name, getattr(self, field.name)[gantry_load])
             for field in fields(self)
         )
-        if gantry_load is GantryLoad.NONE:
-            return base
-        for key in base.keys():
-            base[key].update(getattr(self, key)[gantry_load])
-        return base
 
 
 @dataclass(frozen=True)
@@ -131,27 +113,57 @@ class CapacitivePassSettings:
 
 @dataclass(frozen=True)
 class ZSenseSettings:
-    point: Offset
     pass_settings: CapacitivePassSettings
+
+
+@dataclass
+class LiquidProbeSettings:
+    starting_mount_height: float
+    max_z_distance: float
+    min_z_distance: float
+    mount_speed: float
+    plunger_speed: float
+    sensor_threshold_pascals: float
+    expected_liquid_height: float
+    log_pressure: bool
+    aspirate_while_sensing: bool
+    auto_zero_sensor: bool
+    num_baseline_reads: int
+    data_file: str
 
 
 @dataclass(frozen=True)
 class EdgeSenseSettings:
-    plus_x_pos: Offset
-    minus_x_pos: Offset
-    plus_y_pos: Offset
-    minus_y_pos: Offset
     overrun_tolerance_mm: float
     early_sense_tolerance_mm: float
     pass_settings: CapacitivePassSettings
     search_initial_tolerance_mm: float
     search_iteration_limit: int
 
+    def __init__(
+        self,
+        overrun_tolerance_mm: float,
+        early_sense_tolerance_mm: float,
+        pass_settings: CapacitivePassSettings,
+        search_initial_tolerance_mm: float,
+        search_iteration_limit: int,
+    ) -> None:
+        if overrun_tolerance_mm > pass_settings.max_overrun_distance_mm:
+            raise ValueError("Overrun tolerance and pass setting distance do not match")
+        object.__setattr__(self, "overrun_tolerance_mm", overrun_tolerance_mm)
+        object.__setattr__(self, "early_sense_tolerance_mm", early_sense_tolerance_mm)
+        object.__setattr__(self, "pass_settings", pass_settings)
+        object.__setattr__(
+            self, "search_initial_tolerance_mm", search_initial_tolerance_mm
+        )
+        object.__setattr__(self, "search_iteration_limit", search_iteration_limit)
+
 
 @dataclass(frozen=True)
 class OT3CalibrationSettings:
     z_offset: ZSenseSettings
     edge_sense: EdgeSenseSettings
+    probe_length: float
 
 
 @dataclass
@@ -163,9 +175,11 @@ class OT3Config:
     motion_settings: OT3MotionSettings
     current_settings: OT3CurrentSettings
     z_retract_distance: float
+    safe_home_distance: float
     deck_transform: OT3Transform
     carriage_offset: Offset
     left_mount_offset: Offset
     right_mount_offset: Offset
     gripper_mount_offset: Offset
     calibration: OT3CalibrationSettings
+    liquid_sense: LiquidProbeSettings

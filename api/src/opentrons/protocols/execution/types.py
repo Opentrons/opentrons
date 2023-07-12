@@ -1,6 +1,5 @@
 from typing import Dict
-from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.contexts import InstrumentContext
+from opentrons.protocol_api import InstrumentContext, Labware
 
 
 Instruments = Dict[str, InstrumentContext]

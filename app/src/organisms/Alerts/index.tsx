@@ -19,7 +19,7 @@ export function Alerts(): JSX.Element {
   })
 
   const dismissAlert = (remember?: boolean): void => {
-    if (activeAlert) {
+    if (activeAlert != null) {
       dispatch(AppAlerts.alertDismissed(activeAlert, remember))
     }
   }

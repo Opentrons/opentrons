@@ -14,12 +14,12 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   TYPOGRAPHY,
   SPACING,
+  PrimaryButton,
   POSITION_ABSOLUTE,
-  TEXT_ALIGN_CENTER,
+  DISPLAY_FLEX,
 } from '@opentrons/components'
 
 import { startDiscovery } from '../../redux/discovery'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 export const TROUBLESHOOTING_CONNECTION_PROBLEMS_URL =
@@ -42,13 +42,13 @@ export function DevicesEmptyState(): JSX.Element {
         <StyledText
           as="h1"
           fontWeight={FONT_WEIGHT_REGULAR}
-          paddingBottom={SPACING.spacing4}
+          paddingBottom={SPACING.spacing16}
           id="DevicesEmptyState_noRobotsFound"
           marginTop="20vh"
         >
           {t('no_robots_found')}
         </StyledText>
-        <Box paddingBottom={SPACING.spacing4}>
+        <Box paddingBottom={SPACING.spacing16}>
           <PrimaryButton
             onClick={handleRefresh}
             id="DevicesEmptyState_refreshButton"
@@ -62,18 +62,18 @@ export function DevicesEmptyState(): JSX.Element {
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
         position={POSITION_ABSOLUTE}
-        bottom="2.5rem"
+        bottom={SPACING.spacing40}
         left="0"
         right="0"
-        marginLeft="auto"
-        marginRight="auto"
-        textAlign={TEXT_ALIGN_CENTER}
+        marginLeft={SPACING.spacingAuto}
+        marginRight={SPACING.spacingAuto}
+        textAlign={TYPOGRAPHY.textAlignCenter}
       >
         <Link
           css={TYPOGRAPHY.darkLinkLabelSemiBold}
           external
           href={TROUBLESHOOTING_CONNECTION_PROBLEMS_URL}
-          display="flex"
+          display={DISPLAY_FLEX}
           alignItems={ALIGN_CENTER}
           id="DevicesEmptyState_troubleshootingConnectionProblems"
         >
@@ -81,7 +81,7 @@ export function DevicesEmptyState(): JSX.Element {
           <Icon
             name="open-in-new"
             size="0.5rem"
-            marginLeft={SPACING.spacing2}
+            marginLeft={SPACING.spacing4}
           />
         </Link>
       </Flex>

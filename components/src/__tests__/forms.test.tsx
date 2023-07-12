@@ -3,17 +3,21 @@ import React from 'react'
 import Renderer from 'react-test-renderer'
 
 import {
-  CheckboxField,
+  DeprecatedCheckboxField,
   DropdownField,
   FormGroup,
   InputField,
   RadioGroup,
 } from '..'
 
-describe('CheckboxField', () => {
+describe('DeprecatedCheckboxField', () => {
   it('renders correctly when unchecked', () => {
     const tree = Renderer.create(
-      <CheckboxField onChange={jest.fn()} label="Check Box 1" className="foo" />
+      <DeprecatedCheckboxField
+        onChange={jest.fn()}
+        label="Check Box 1"
+        className="foo"
+      />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
@@ -21,7 +25,7 @@ describe('CheckboxField', () => {
 
   it('renders correctly when checked', () => {
     const tree = Renderer.create(
-      <CheckboxField
+      <DeprecatedCheckboxField
         onChange={jest.fn()}
         label="Check Box 1"
         className="foo"

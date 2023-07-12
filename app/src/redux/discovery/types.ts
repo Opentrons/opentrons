@@ -1,5 +1,6 @@
 import type {
   DiscoveryClientRobot,
+  DiscoveryClientRobotAddress,
   HealthResponse,
   HealthStatus,
 } from '@opentrons/discovery-client'
@@ -9,9 +10,11 @@ import {
   CONNECTABLE,
   REACHABLE,
   UNREACHABLE,
+  ROBOT_MODEL_OT2,
+  ROBOT_MODEL_OT3,
 } from './constants'
 
-export type { DiscoveryClientRobot, HealthStatus }
+export type { DiscoveryClientRobot, DiscoveryClientRobotAddress, HealthStatus }
 
 export type RobotsMap = Record<string, DiscoveryClientRobot>
 
@@ -20,6 +23,8 @@ export type ConnectivityStatus =
   | typeof REACHABLE
   | typeof UNREACHABLE
 
+export type RobotModel = typeof ROBOT_MODEL_OT2 | typeof ROBOT_MODEL_OT3
+
 export interface DiscoveryState {
   scanning: boolean
   robotsByName: RobotsMap
@@ -27,9 +32,9 @@ export interface DiscoveryState {
 
 export interface BaseRobot extends Omit<DiscoveryClientRobot, 'addresses'> {
   displayName: string
-  connected: boolean
   local: boolean | null
   seen: boolean
+  robotModel: RobotModel
 }
 
 // fully connectable robot

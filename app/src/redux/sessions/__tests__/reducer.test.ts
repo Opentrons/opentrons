@@ -342,27 +342,6 @@ const SPECS: ReducerSpec[] = [
       },
     },
   },
-  {
-    name: 'handles robot:DISCONNECT',
-    action: {
-      type: 'robot:DISCONNECT',
-    },
-    state: {
-      'blithering-idiot': {
-        robotSessions: {
-          existing_fake_session_id: {
-            ...Fixtures.mockTipLengthCalibrationSessionAttributes,
-            id: 'existing_fake_session_id',
-          },
-          [Fixtures.mockSessionId]: {
-            ...Fixtures.mockTipLengthCalibrationSessionAttributes,
-            id: Fixtures.mockSessionId,
-          },
-        },
-      },
-    },
-    expected: {},
-  },
 ]
 
 describe('robotSessionReducer', () => {

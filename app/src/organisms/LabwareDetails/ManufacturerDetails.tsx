@@ -28,7 +28,10 @@ export function ManufacturerDetails(
     brandName === 'all' || brandName === 'generic' ? t(brandName) : brandName
 
   return (
-    <Box backgroundColor={COLORS.lightGrey} padding={SPACING.spacing4}>
+    <Box
+      backgroundColor={COLORS.fundamentalsBackground}
+      padding={SPACING.spacing16}
+    >
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -41,7 +44,7 @@ export function ManufacturerDetails(
             links.map((href, index) => (
               <StyledText as="p" key={index}>
                 <Link href={href} external>
-                  website <Icon height={SPACING.spacingSM} name="open-in-new" />
+                  website <Icon height="10px" name="open-in-new" />
                 </Link>
               </StyledText>
             ))}

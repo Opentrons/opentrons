@@ -47,8 +47,8 @@ describe('shell selectors', () => {
     it('should return "latest" and "beta" options if config is unknown', () => {
       const state: State = { config: null } as any
       expect(Selectors.getUpdateChannelOptions(state)).toEqual([
-        { name: 'Stable', value: 'latest' },
-        { name: 'Beta', value: 'beta' },
+        { label: 'Stable', value: 'latest' },
+        { label: 'Beta', value: 'beta' },
       ])
     })
 
@@ -57,8 +57,8 @@ describe('shell selectors', () => {
         config: { devtools: false, update: { channel: 'latest' } },
       } as any
       expect(Selectors.getUpdateChannelOptions(state)).toEqual([
-        { name: 'Stable', value: 'latest' },
-        { name: 'Beta', value: 'beta' },
+        { label: 'Stable', value: 'latest' },
+        { label: 'Beta', value: 'beta' },
       ])
     })
 
@@ -67,9 +67,9 @@ describe('shell selectors', () => {
         config: { devtools: true, update: { channel: 'latest' } },
       } as any
       expect(Selectors.getUpdateChannelOptions(state)).toEqual([
-        { name: 'Stable', value: 'latest' },
-        { name: 'Beta', value: 'beta' },
-        { name: 'Alpha', value: 'alpha' },
+        { label: 'Stable', value: 'latest' },
+        { label: 'Beta', value: 'beta' },
+        { label: 'Alpha', value: 'alpha' },
       ])
     })
 
@@ -78,9 +78,9 @@ describe('shell selectors', () => {
         config: { devtools: false, update: { channel: 'alpha' } },
       } as any
       expect(Selectors.getUpdateChannelOptions(state)).toEqual([
-        { name: 'Stable', value: 'latest' },
-        { name: 'Beta', value: 'beta' },
-        { name: 'Alpha', value: 'alpha' },
+        { label: 'Stable', value: 'latest' },
+        { label: 'Beta', value: 'beta' },
+        { label: 'Alpha', value: 'alpha' },
       ])
     })
   })
@@ -137,6 +137,89 @@ describe('shell selectors', () => {
         config: { python: { pathToPythonOverride: null } },
       } as any
       expect(Selectors.getPathToPythonOverride(state)).toEqual(null)
+    })
+  })
+
+  describe('getProtocolsDesktopSortKey', () => {
+    it('should return ProtocolSort if sortKey is selected', () => {
+      const state: State = {
+        config: {
+          protocols: { protocolsStoredSortKey: 'alphabetical' },
+        },
+      } as any
+      expect(Selectors.getProtocolsDesktopSortKey(state)).toEqual(
+        'alphabetical'
+      )
+    })
+
+    it('should return null if saved value in config is null', () => {
+      const state: State = {
+        config: { protocols: { protocolsStoredSortKey: null } },
+      } as any
+      expect(Selectors.getProtocolsDesktopSortKey(state)).toEqual(null)
+    })
+  })
+
+  describe('getProtocolsOnDeviceSortKey', () => {
+    it('should return ProtocolSort if sortKey is selected', () => {
+      const state: State = {
+        config: {
+          protocols: { protocolsOnDeviceSortKey: 'alphabetical' },
+        },
+      } as any
+      expect(Selectors.getProtocolsOnDeviceSortKey(state)).toEqual(
+        'alphabetical'
+      )
+    })
+
+    it('should return null if saved value in config is null', () => {
+      const state: State = {
+        config: { protocols: { protocolsOnDeviceSortKey: null } },
+      } as any
+      expect(Selectors.getProtocolsOnDeviceSortKey(state)).toEqual(null)
+    })
+  })
+
+  describe('pinnedProtocolIds', () => {
+    it('should return id list if pinnedProtocolIds is selected', () => {
+      const state: State = {
+        config: {
+          protocols: {
+            pinnedProtocolIds: ['2b790468-5d72-45ba-b5da-2fd2e6d93a0e'],
+          },
+        },
+      } as any
+      expect(Selectors.getPinnedProtocolIds(state)).toEqual([
+        '2b790468-5d72-45ba-b5da-2fd2e6d93a0e',
+      ])
+    })
+
+    it('should return empty array if saved value in config is empty array', () => {
+      const state: State = {
+        config: { protocols: { pinnedProtocolIds: [] } },
+      } as any
+      expect(Selectors.getPinnedProtocolIds(state)).toEqual([])
+    })
+  })
+
+  describe('getOnDeviceDisplaySettings', () => {
+    it('should return the initial settings OnDeviceDisplaySettings, when starting the unbox flow', () => {
+      const state: State = {
+        config: {
+          onDeviceDisplaySettings: {
+            sleepMs: 25200000,
+            brightness: 4,
+            textSize: 1,
+            unfinishedUnboxingFlowRoute: '/welcome',
+          },
+        },
+      } as any
+      expect(Selectors.getOnDeviceDisplaySettings(state)).toEqual({
+        sleepMs: 25200000,
+        brightness: 4,
+        textSize: 1,
+        unfinishedUnboxingFlowRoute: '/welcome',
+      })
     })
   })
 })

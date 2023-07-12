@@ -19,7 +19,7 @@ import {
 import { Divider } from '../structure'
 import { StyledText } from '../text'
 
-interface Props {
+export interface SlideoutProps {
   title: string | React.ReactElement
   children: React.ReactNode
   onCloseClick: () => unknown
@@ -28,58 +28,86 @@ interface Props {
   footer?: React.ReactNode
 }
 
-const EXPANDED_STYLE = css`
-  animation-duration: 300ms;
-  animation-name: slidein;
-  overflow-x: hidden;
-  width: 19.5rem;
-  max-width: 19.5rem;
-  visibility: visible;
+const SHARED_STYLE = css`
   z-index: 2;
-
+  overflow: hidden;
   @keyframes slidein {
     from {
-      width: 0;
+      transform: translateX(100%);
     }
     to {
-      width: 19.5rem;
+      transform: translateX(0);
+    }
+  }
+  @keyframes slideout {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes overlayin {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 0.35;
+    }
+  }
+  @keyframes overlayout {
+    from {
+      opacity: 0.35;
+      visibility: visible;
+    }
+    to {
+      opacity: 0;
+      visibility: hidden;
     }
   }
 `
+const EXPANDED_STYLE = css`
+  ${SHARED_STYLE}
+  animation: slidein 300ms forwards;
+`
 const COLLAPSED_STYLE = css`
-  animation-duration: 300ms;
-  animation-name: slideout;
-  animation-direction: alternate;
-  overflow: hidden;
-  max-width: 0rem;
-  visibility: hidden;
-
-  @keyframes slideout {
-    from {
-      width: 19.5rem;
-    }
-    to {
-      width: 0;
-    }
-  }
+  ${SHARED_STYLE}
+  animation: slideout 300ms forwards;
+`
+const INITIALLY_COLLAPSED_STYLE = css`
+  ${SHARED_STYLE}
+  animation: slideout 0ms forwards;
+`
+const OVERLAY_IN_STYLE = css`
+  ${SHARED_STYLE}
+  animation: overlayin 300ms forwards;
+`
+const OVERLAY_OUT_STYLE = css`
+  ${SHARED_STYLE}
+  animation: overlayout 300ms forwards;
+`
+const INITIALLY_OVERLAY_OUT_STYLE = css`
+  ${SHARED_STYLE}
+  animation: overlayout 0ms forwards;
 `
 
 const CLOSE_ICON_STYLE = css`
   border-radius: 50%;
 
   &:hover {
-    background: #16212d26;
+    background: ${COLORS.lightGreyHover};
   }
   &:active {
-    background: #16212d40;
+    background: ${COLORS.lightGreyPressed};
   }
 `
 
-export const Slideout = (props: Props): JSX.Element | null => {
+export const Slideout = (props: SlideoutProps): JSX.Element => {
   const { isExpanded, title, onCloseClick, children, footer } = props
   const slideOutRef = React.useRef<HTMLDivElement>(null)
   const [isReachedBottom, setIsReachedBottom] = React.useState<boolean>(false)
 
+  const hasBeenExpanded = React.useRef<boolean>(isExpanded ?? false)
   const handleScroll = (): void => {
     if (slideOutRef.current == null) return
     const { scrollTop, scrollHeight, clientHeight } = slideOutRef.current
@@ -94,25 +122,38 @@ export const Slideout = (props: Props): JSX.Element | null => {
     handleScroll()
   }, [slideOutRef])
 
+  const handleClose = (): void => {
+    hasBeenExpanded.current = true
+    onCloseClick()
+  }
+
+  const collapsedStyle = hasBeenExpanded.current
+    ? COLLAPSED_STYLE
+    : INITIALLY_COLLAPSED_STYLE
+  const overlayOutStyle = hasBeenExpanded.current
+    ? OVERLAY_OUT_STYLE
+    : INITIALLY_OVERLAY_OUT_STYLE
   return (
     <>
-      {isExpanded ?? false ? (
-        <Overlay
-          onClick={onCloseClick}
-          backgroundColor={COLORS.backgroundOverlay}
-        />
-      ) : null}
+      <Overlay
+        onClick={handleClose}
+        css={`
+          ${isExpanded ?? false ? OVERLAY_IN_STYLE : overlayOutStyle}
+        `}
+        backgroundColor={COLORS.darkBlackEnabled}
+      />
       <Box
-        css={isExpanded ?? false ? EXPANDED_STYLE : COLLAPSED_STYLE}
+        css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
+        cursor="auto"
         position={POSITION_FIXED}
         right="0"
         top="0"
         backgroundColor={COLORS.white}
-        boxShadow={'0px 3px 6px rgba(0, 0, 0, 0.23)'}
+        boxShadow="0px 3px 6px rgba(0, 0, 0, 0.23)"
         height="100%"
       >
         <Flex
-          paddingY={SPACING.spacing4}
+          paddingY={SPACING.spacing16}
           width="19.5rem"
           height="100%"
           flex="0 1 auto"
@@ -124,8 +165,8 @@ export const Slideout = (props: Props): JSX.Element | null => {
               flexDirection={DIRECTION_ROW}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               alignItems={ALIGN_CENTER}
-              paddingX={SPACING.spacing4}
-              marginBottom={SPACING.spacing4}
+              paddingX={SPACING.spacing16}
+              marginBottom={SPACING.spacing16}
             >
               <StyledText
                 as="h2"
@@ -137,8 +178,8 @@ export const Slideout = (props: Props): JSX.Element | null => {
               </StyledText>
               <Flex alignItems={ALIGN_CENTER}>
                 <Btn
-                  size={'1.5rem'}
-                  onClick={onCloseClick}
+                  size="1.5rem"
+                  onClick={handleClose}
                   aria-label="exit"
                   data-testid={`Slideout_icon_close_${
                     typeof title === 'string' ? title : ''
@@ -149,13 +190,11 @@ export const Slideout = (props: Props): JSX.Element | null => {
               </Flex>
             </Flex>
           ) : (
-            <React.Fragment css={{ 'overflow-wrap': 'break-word' }}>
-              {title}
-            </React.Fragment>
+            <>{title}</>
           )}
-          <Divider marginY={0} color={COLORS.medGrey} />
+          <Divider marginY={0} color={COLORS.medGreyEnabled} />
           <Box
-            padding={SPACING.spacing4}
+            padding={SPACING.spacing16}
             flex="1 1 auto"
             overflowY="scroll"
             data-testid={`Slideout_body_${
@@ -168,8 +207,8 @@ export const Slideout = (props: Props): JSX.Element | null => {
           </Box>
           {footer != null ? (
             <Box
-              paddingTop={SPACING.spacing4}
-              paddingX={SPACING.spacing4}
+              paddingTop={SPACING.spacing16}
+              paddingX={SPACING.spacing16}
               flex="0 0 auto"
               boxShadow={isReachedBottom ? 'none' : '0px -4px 12px #0000001a'}
               zIndex="3"

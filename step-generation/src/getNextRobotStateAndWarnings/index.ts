@@ -33,6 +33,7 @@ import {
   forHeaterShakerSetTargetTemperature,
   forHeaterShakerStopShake,
 } from './heaterShakerUpdates'
+import { forMoveLabware } from './forMoveLabware'
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -47,14 +48,21 @@ function _getNextRobotStateAndWarningsSingleCommand(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
-
   switch (command.commandType) {
     case 'aspirate':
-      forAspirate(command.params, invariantContext, robotStateAndWarnings)
+      if (command.meta?.isAirGap === true) {
+        break
+      } else {
+        forAspirate(command.params, invariantContext, robotStateAndWarnings)
+      }
       break
 
     case 'dispense':
-      forDispense(command.params, invariantContext, robotStateAndWarnings)
+      if (command.meta?.isAirGap === true) {
+        break
+      } else {
+        forDispense(command.params, invariantContext, robotStateAndWarnings)
+      }
       break
 
     case 'blowout':
@@ -81,27 +89,26 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
 
+    case 'moveLabware':
+      forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
+      break
+
     // the following commands currently don't effect tracked robot state
-    // pipetting
-    case 'touchTip':
-    // setup
-    case 'loadPipette':
+    case 'touchTip': // pipetting
+    case 'loadPipette': // setup VVV
     case 'loadLabware':
     case 'loadModule':
-    // gantry
-    case 'home':
+    case 'home': // gantry VVV
     case 'moveRelative':
     case 'moveToSlot':
     case 'moveToCoordinates':
     case 'moveToWell':
     case 'savePosition':
-    // timing
-    case 'waitForResume':
+    case 'waitForResume': // timing VVV
     case 'waitForDuration':
     case 'pause': // deprecated, use waitForResume instead
     case 'delay': // deprecated, use waitForDuration instead
-    // fall-back
-    case 'custom':
+    case 'custom': // fall-back
       break
 
     case 'loadLiquid':

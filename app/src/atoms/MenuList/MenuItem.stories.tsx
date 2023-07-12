@@ -14,4 +14,11 @@ const Template: Story<React.ComponentProps<typeof MenuItem>> = args => (
 export const Primary = Template.bind({})
 Primary.args = {
   children: 'Example menu btn',
+  disabled: false,
+}
+
+Primary.parameters = {
+  viewport: {
+    defaultViewport: 'onDeviceDisplay',
+  },
 }

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
 import {
   Tooltip,
-  PrimaryButton,
+  DeprecatedPrimaryButton,
   useHoverTooltip,
   TOOLTIP_RIGHT,
   TOOLTIP_TOP,
@@ -27,7 +27,6 @@ import {
 } from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, StepType } from '../form-types'
-import { selectors as featureFlagSelectors } from '../feature-flags'
 import styles from './listButtons.css'
 
 interface StepButtonComponentProps {
@@ -58,13 +57,13 @@ export const StepCreationButtonComponent = (
           {i18n.t(`tooltip.disabled_step_creation`)}
         </Tooltip>
       )}
-      <PrimaryButton
+      <DeprecatedPrimaryButton
         id="StepCreationButton"
         onClick={() => setExpanded(!expanded)}
         disabled={disabled}
       >
         {i18n.t('button.add_step')}
-      </PrimaryButton>
+      </DeprecatedPrimaryButton>
 
       <div className={styles.buttons_popover}>{expanded && children}</div>
     </div>
@@ -88,7 +87,7 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
     : i18n.t(`tooltip.step_description.${stepType}`)
   return (
     <>
-      <PrimaryButton
+      <DeprecatedPrimaryButton
         hoverTooltipHandlers={targetProps}
         onClick={onClick}
         iconName={stepIconsByType[stepType]}
@@ -97,41 +96,26 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
         })}
       >
         {i18n.t(`application.stepType.${stepType}`, stepType)}
-      </PrimaryButton>
+      </DeprecatedPrimaryButton>
       <Tooltip {...tooltipProps}>{tooltipMessage}</Tooltip>
     </>
   )
 }
 
 export const StepCreationButton = (): JSX.Element => {
-  const enableHeaterShaker = useSelector(
-    featureFlagSelectors.getEnabledHeaterShaker
-  )
-
   const getSupportedSteps = (): Array<
     Exclude<StepType, 'manualIntervention'>
-  > => {
-    if (enableHeaterShaker) {
-      return [
-        'moveLiquid',
-        'mix',
-        'pause',
-        'heaterShaker',
-        'magnet',
-        'temperature',
-        'thermocycler',
-      ]
-    } else {
-      return [
-        'moveLiquid',
-        'mix',
-        'pause',
-        'magnet',
-        'temperature',
-        'thermocycler',
-      ]
-    }
-  }
+  > => [
+    'moveLabware',
+    'moveLiquid',
+    'mix',
+    'pause',
+    'heaterShaker',
+    'magnet',
+    'temperature',
+    'thermocycler',
+  ]
+
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
@@ -144,6 +128,7 @@ export const StepCreationButton = (): JSX.Element => {
     Exclude<StepType, 'manualIntervention'>,
     boolean
   > = {
+    moveLabware: true,
     moveLiquid: true,
     mix: true,
     pause: true,

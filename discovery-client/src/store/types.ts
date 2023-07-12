@@ -1,3 +1,5 @@
+import type { Agent } from 'http'
+
 import type {
   HealthResponse,
   ServerHealthResponse,
@@ -49,6 +51,8 @@ export interface Address {
   ip: string
   /** Port */
   port: number
+  /** custom http agent */
+  agent?: Agent
 }
 
 /**
@@ -67,6 +71,8 @@ export interface HostState extends Address {
   serverHealthError: HealthErrorResponse | null
   /** Robot that this IP points to */
   robotName: string
+  /** the robot model advertised in mdns, if known */
+  advertisedModel: string | null
 }
 
 export interface RobotsByNameMap {

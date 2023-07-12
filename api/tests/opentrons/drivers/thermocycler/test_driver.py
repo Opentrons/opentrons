@@ -62,6 +62,14 @@ async def test_close_lid(
     connection.send_command.assert_called_once_with(command=expected, retries=3)
 
 
+async def test_plate_lift(
+    subject: driver.ThermocyclerDriver, connection: AsyncMock
+) -> None:
+    """It should raise an exception."""
+    with pytest.raises(NotImplementedError):
+        await subject.lift_plate()
+
+
 async def test_get_lid_status(
     subject: driver.ThermocyclerDriver, connection: AsyncMock
 ) -> None:

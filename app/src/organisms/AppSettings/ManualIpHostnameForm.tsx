@@ -31,20 +31,19 @@ const FlexForm = styled.form`
 const StyledInput = styled.input`
   width: 100%;
   flex: 6;
-  margin: ${SPACING.spacing2} 0;
+  margin: ${SPACING.spacing4} 0;
   background-color: ${COLORS.white};
-  border-radius: ${SPACING.spacing2};
-  border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.medGrey};
+  border-radius: ${SPACING.spacing4};
+  border: 1px ${BORDERS.styleSolid} ${COLORS.medGreyEnabled};
   height: ${SIZE_2};
   font-size: ${TYPOGRAPHY.fontSizeP};
 
   &:active {
-    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid}
-      ${COLORS.darkGreyEnabled};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyEnabled};
   }
 
   &:hover {
-    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.blue};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.blueEnabled};
   }
 
   &:focus-visible {
@@ -52,7 +51,7 @@ const StyledInput = styled.input`
   }
 
   &:disabled {
-    border: ${SPACING.spacingXXS} ${BORDERS.styleSolid} ${COLORS.greyDisabled};
+    border: 1px ${BORDERS.styleSolid} ${COLORS.darkGreyDisabled};
   }
 `
 
@@ -80,7 +79,7 @@ export function ManualIpHostnameForm({
       const ip = values.ip.trim()
       const inputForm = document.getElementById('ip')
       if (inputForm != null)
-        inputForm.style.border = `1px solid ${COLORS.medGrey}`
+        inputForm.style.border = `1px solid ${String(COLORS.medGreyEnabled)}`
       addManualIpAndHostname(ip)
       resetForm()
       setMostRecentAddition(ip)
@@ -88,11 +87,12 @@ export function ManualIpHostnameForm({
     validate: values => {
       const errors: FormikErrors = {}
       const ip = values.ip.trim()
+      // ToDo: kj 12/19/2022 for this, the best way is to use the regex because invisible unicode characters
       if (!ip) {
         errors.ip = t('add_ip_error')
         const inputForm = document.getElementById('ip')
         if (inputForm != null)
-          inputForm.style.border = `1px solid ${COLORS.error}`
+          inputForm.style.border = `1px solid ${String(COLORS.errorEnabled)}`
       }
       return errors
     },
@@ -101,8 +101,8 @@ export function ManualIpHostnameForm({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      margin={`${SPACING.spacing2} 0`}
-      height={SPACING.spacing6}
+      margin={`${SPACING.spacing4} 0`}
+      height={SPACING.spacing32}
     >
       <FlexForm onSubmit={formik.handleSubmit}>
         <StyledInput
@@ -118,7 +118,7 @@ export function ManualIpHostnameForm({
           fontSize={TYPOGRAPHY.fontSizeH6}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           lineHeight={TYPOGRAPHY.lineHeight12}
-          marginLeft={SPACING.spacing3}
+          marginLeft={SPACING.spacing8}
           type="submit"
         >
           {t('add_ip_button')}
@@ -127,8 +127,8 @@ export function ManualIpHostnameForm({
       {formik.errors.ip != null && (
         <StyledText
           as="label"
-          marginTop={SPACING.spacing2}
-          color={COLORS.error}
+          marginTop={SPACING.spacing4}
+          color={COLORS.errorEnabled}
         >
           {formik.errors.ip}
         </StyledText>

@@ -65,7 +65,9 @@ class CheckSession(BaseSession):
         # if lights are on already it's because the user clicked the button,
         # so a) we don't need to turn them on now and b) we shouldn't turn them
         # off after
-        session_controls_lights = not configuration.hardware.get_lights()["rails"]
+        session_controls_lights = not (await configuration.hardware.get_lights())[
+            "rails"
+        ]
         await configuration.hardware.cache_instruments()
         await configuration.hardware.home()
         try:

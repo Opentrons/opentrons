@@ -1,763 +1,350 @@
-import json
-from pathlib import Path
-from typing import Dict, List
+"""Tests for the InstrumentContext public interface."""
+import inspect
+from typing import cast
 
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_api import labware, MAX_SUPPORTED_VERSION
-from opentrons.protocols.geometry import module_geometry
-from opentrons.protocols.geometry.well_geometry import WellGeometry
-from opentrons.protocols.context.protocol_api.labware import LabwareImplementation
-from opentrons.protocols.context.well import WellImplementation
-from opentrons.protocols.labware.definition import _get_parent_identifier
+from opentrons_shared_data.labware.dev_types import LabwareDefinition as LabwareDefDict
 
-from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.labware.dev_types import WellDefinition
-
-from opentrons.calibration_storage import helpers, get, delete, file_operators
-from opentrons.types import Point, Location
-from opentrons.hardware_control.modules.types import ModuleType, MagneticModuleModel
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocols.context.labware import AbstractLabware
-from opentrons.protocols.geometry.deck import Deck
-from opentrons.protocols.geometry.module_geometry import ModuleGeometry
-
-test_data: Dict[str, WellDefinition] = {
-    "circular_well_json": {
-        "shape": "circular",
-        "depth": 40,
-        "totalLiquidVolume": 100,
-        "diameter": 30,
-        "x": 40,
-        "y": 50,
-        "z": 3,
-    },
-    "rectangular_well_json": {
-        "shape": "rectangular",
-        "depth": 20,
-        "totalLiquidVolume": 200,
-        "xDimension": 120,
-        "yDimension": 50,
-        "x": 45,
-        "y": 10,
-        "z": 22,
-    },
-}
-
-
-@pytest.fixture
-def set_up_index_file(labware_offset_tempdir: Path) -> List[str]:
-    deck = Deck()
-    labware_list = [
-        "nest_96_wellplate_2ml_deep",
-        "corning_384_wellplate_112ul_flat",
-        "geb_96_tiprack_1000ul",
-        "nest_12_reservoir_15ml",
-    ]
-    for idx, name in enumerate(labware_list):
-        parent = deck.position_for(idx + 1)
-        definition = labware.get_labware_definition(name)
-        lw = labware.Labware(implementation=LabwareImplementation(definition, parent))
-        labware.save_calibration(lw, Point(0, 0, 0))
-
-    return labware_list
-
-
-def test_well_init() -> None:
-    slot = Location(Point(1, 2, 3), 1)  # type: ignore[arg-type]
-    well_name = "circular_well_json"
-    has_tip = False
-    well1 = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
-            well_geometry=WellGeometry(
-                well_props=test_data[well_name],
-                parent_point=slot.point,
-                parent_object=slot.labware,  # type: ignore[arg-type]
-            ),
-            display_name=well_name,
-            has_tip=has_tip,
-            name="A1",
-        ),
-    )
-    assert well1.geometry.diameter == test_data[well_name]["diameter"]  # type: ignore[typeddict-item]
-    assert well1.geometry._length is None
-    assert well1.geometry._width is None
-
-    well2_name = "rectangular_well_json"
-    well2 = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
-            well_geometry=WellGeometry(
-                well_props=test_data[well2_name],
-                parent_point=slot.point,
-                parent_object=slot.labware,  # type: ignore[arg-type]
-            ),
-            display_name=well2_name,
-            has_tip=has_tip,
-            name="A1",
-        ),
-    )
-    assert well2.geometry.diameter is None
-    assert well2.geometry._length == test_data[well2_name]["xDimension"]  # type: ignore[typeddict-item]
-    assert well2.geometry._width == test_data[well2_name]["yDimension"]  # type: ignore[typeddict-item]
-
-
-def test_top() -> None:
-    slot = Location(Point(4, 5, 6), 1)  # type: ignore[arg-type]
-    well_name = "circular_well_json"
-    has_tip = False
-    well = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
-            well_geometry=WellGeometry(
-                well_props=test_data[well_name],
-                parent_point=slot.point,
-                parent_object=slot.labware,  # type: ignore[arg-type]
-            ),
-            display_name=well_name,
-            has_tip=has_tip,
-            name="A1",
-        ),
-    )
-    well_data = test_data[well_name]
-    expected_x = well_data["x"] + slot.point.x
-    expected_y = well_data["y"] + slot.point.y
-    expected_z = well_data["z"] + well_data["depth"] + slot.point.z
-    assert well.top() == Location(Point(expected_x, expected_y, expected_z), well)
-
-
-def test_bottom() -> None:
-    slot = Location(Point(7, 8, 9), 1)  # type: ignore[arg-type]
-    well_name = "rectangular_well_json"
-    has_tip = False
-    well = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
-            well_geometry=WellGeometry(
-                well_props=test_data[well_name],
-                parent_point=slot.point,
-                parent_object=slot.labware,  # type: ignore[arg-type]
-            ),
-            display_name=well_name,
-            has_tip=has_tip,
-            name="A1",
-        ),
-    )
-    well_data = test_data[well_name]
-    expected_x = well_data["x"] + slot.point.x
-    expected_y = well_data["y"] + slot.point.y
-    expected_z = well_data["z"] + slot.point.z
-    assert well.bottom() == Location(Point(expected_x, expected_y, expected_z), well)
-
-
-def test_from_center_cartesian():
-    slot1 = Location(Point(10, 11, 12), 1)  # type: ignore[arg-type]
-    well_name = "circular_well_json"
-    has_tip = False
-    well1 = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
-            well_geometry=WellGeometry(
-                well_props=test_data[well_name],
-                parent_point=slot1.point,
-                parent_object=slot1.labware,  # type: ignore[arg-type]
-            ),
-            display_name=well_name,
-            has_tip=has_tip,
-            name="A1",
-        ),
-    )
-
-    percent1_x = 1
-    percent1_y = 1
-    percent1_z = -0.5
-    point1 = well1.from_center_cartesian(percent1_x, percent1_y, percent1_z)
-
-    # slot.x + well.x + 1 * well.diamter/2
-    expected_x: float = 10 + 40 + 15
-    # slot.y + well.y + 1 * well.diamter/2
-    expected_y: float = 11 + 50 + 15
-    # slot.z + well.z + (1 - 0.5) * well.depth/2
-    expected_z: float = 12 + 3 + 20 - 10
-
-    assert point1.x == expected_x
-    assert point1.y == expected_y
-    assert point1.z == expected_z
-
-    slot2 = Location(Point(13, 14, 15), 1)  # type: ignore[arg-type]
-    well2_name = "rectangular_well_json"
-    has_tip = False
-    well2 = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
-            well_geometry=WellGeometry(
-                well_props=test_data[well2_name],
-                parent_point=slot2.point,
-                parent_object=slot2.labware,  # type: ignore[arg-type]
-            ),
-            display_name=well2_name,
-            has_tip=has_tip,
-            name="A1",
-        ),
-    )
-    percent2_x = -0.25
-    percent2_y = 0.1
-    percent2_z = 0.9
-    point2 = well2.geometry.from_center_cartesian(percent2_x, percent2_y, percent2_z)
-
-    # slot.x + well.x - 0.25 * well.length/2
-    expected_x = 13 + 45 - 15
-    # slot.y + well.y + 0.1 * well.width/2
-    expected_y = 14 + 10 + 2.5
-    # slot.z + well.z + (1 + 0.9) * well.depth/2
-    expected_z = 15 + 22 + 19
-
-    assert point2.x == expected_x
-    assert point2.y == expected_y
-    assert point2.z == expected_z
-
-
-@pytest.fixture
-def corning_96_wellplate_360ul_flat_def():
-    labware_name = "corning_96_wellplate_360ul_flat"
-    return labware.get_labware_definition(labware_name)
-
-
-@pytest.fixture
-def corning_96_wellplate_360ul_flat(corning_96_wellplate_360ul_flat_def):
-    return labware.Labware(
-        implementation=LabwareImplementation(
-            definition=corning_96_wellplate_360ul_flat_def,
-            parent=Location(Point(0, 0, 0), "Test Slot"),
-        )
-    )
-
-
-@pytest.fixture
-def opentrons_96_tiprack_300ul_def():
-    labware_name = "opentrons_96_tiprack_300ul"
-    return labware.get_labware_definition(labware_name)
-
-
-@pytest.fixture
-def opentrons_96_tiprack_300ul(opentrons_96_tiprack_300ul_def):
-    return labware.Labware(
-        implementation=LabwareImplementation(
-            definition=opentrons_96_tiprack_300ul_def,
-            parent=Location(Point(0, 0, 0), "Test Slot"),
-        )
-    )
-
-
-def test_back_compat(corning_96_wellplate_360ul_flat) -> None:
-    lw = corning_96_wellplate_360ul_flat
-
-    # Note that this test uses the display name of wells to test for equality,
-    # because dimensional parameters could be subject to modification through
-    # calibration, whereas here we are testing for "identity" in a way that is
-    # related to the combination of well name, labware name, and slot name
-    well_a1_name = repr(lw.wells_by_name()["A1"])
-    well_b2_name = repr(lw.wells_by_name()["B2"])
-    well_c3_name = repr(lw.wells_by_name()["C3"])
-
-    w2 = lw.well(0)
-    assert repr(w2) == well_a1_name
-
-    w3 = lw.well("A1")
-    assert repr(w3) == well_a1_name
-
-    w4 = lw.wells("B2")
-    assert repr(w4[0]) == well_b2_name
-
-    w5 = lw.wells(9, 21, 25, 27)
-    assert len(w5) == 4
-    assert repr(w5[0]) == well_b2_name
-
-    w6 = lw.wells("A1", "B2", "C3")
-    assert all(
-        [
-            repr(well[0]) == well[1]
-            for well in zip(w6, [well_a1_name, well_b2_name, well_c3_name])
-        ]
-    )
-
-    w7 = lw.rows("A")
-    assert len(w7) == 1
-    assert repr(w7[0][0]) == well_a1_name
-
-    w8 = lw.rows("A", "C")
-    assert len(w8) == 2
-    assert repr(w8[0][0]) == well_a1_name
-    assert repr(w8[1][2]) == well_c3_name
-
-    w11 = lw.columns("2", "3", "6")
-    assert len(w11) == 3
-    assert repr(w11[1][2]) == well_c3_name
-
-
-def test_well_parent(corning_96_wellplate_360ul_flat) -> None:
-    lw = corning_96_wellplate_360ul_flat
-    parent = Location(Point(7, 8, 9), lw)
-    well_name = "circular_well_json"
-    has_tip = True
-    well = labware.Well(
-        api_level=MAX_SUPPORTED_VERSION,
-        well_implementation=WellImplementation(
-            well_geometry=WellGeometry(
-                well_props=test_data[well_name],
-                parent_point=parent.point,
-                parent_object=parent.labware.as_labware()._implementation,
-            ),
-            display_name=well_name,
-            has_tip=has_tip,
-            name="A1",
-        ),
-    )
-    assert well.parent == lw
-    assert well.top().labware.object == well
-    assert well.top().labware.parent.object == lw
-    assert well.bottom().labware.object == well
-    assert well.bottom().labware.parent.object == lw
-    assert well.center().labware.object == well
-    assert well.center().labware.parent.object == lw
-
-
-def test_tip_tracking_init(
-    corning_96_wellplate_360ul_flat, opentrons_96_tiprack_300ul
-) -> None:
-    tiprack = opentrons_96_tiprack_300ul
-    assert tiprack.is_tiprack
-    for well in tiprack.wells():
-        assert well.has_tip
-
-    lw = corning_96_wellplate_360ul_flat
-    assert not lw.is_tiprack
-    for well in lw.wells():
-        assert not well.has_tip
-
-
-def test_use_tips(opentrons_96_tiprack_300ul) -> None:
-    tiprack = opentrons_96_tiprack_300ul
-    well_list = tiprack.wells()
-
-    # Test only using one tip
-    tiprack.use_tips(well_list[0])
-    assert not well_list[0].has_tip
-    for well in well_list[1:]:
-        assert well.has_tip
-
-    # Test using a whole column
-    tiprack.use_tips(well_list[8], num_channels=8)
-    for well in well_list[8:16]:
-        assert not well.has_tip
-    assert well_list[7].has_tip
-    assert well_list[16].has_tip
-
-    # Test using a partial column from the top
-    tiprack.use_tips(well_list[16], num_channels=4)
-    for well in well_list[16:20]:
-        assert not well.has_tip
-    for well in well_list[20:24]:
-        assert well.has_tip
-
-    # Test using a partial column where the number of tips that get picked up
-    # is less than the number of channels (e.g.: an 8-channel pipette picking
-    # up 4 tips from the bottom half of a column)
-    tiprack.use_tips(well_list[28], num_channels=4)
-    for well in well_list[24:28]:
-        assert well.has_tip
-    for well in well_list[28:32]:
-        assert not well.has_tip
-    for well in well_list[32:]:
-        assert well.has_tip
-
-
-def test_select_next_tip(
-    opentrons_96_tiprack_300ul, opentrons_96_tiprack_300ul_def
-) -> None:
-    tiprack = opentrons_96_tiprack_300ul
-    well_list = tiprack.wells()
-
-    next_one = tiprack.next_tip()
-    assert next_one == well_list[0]
-    next_five = tiprack.next_tip(5)
-    assert next_five == well_list[0]
-    next_eight = tiprack.next_tip(8)
-    assert next_eight == well_list[0]
-    next_nine = tiprack.next_tip(9)
-    assert next_nine is None
-
-    # A1 tip only has been used
-    tiprack.use_tips(well_list[0])
-
-    next_one = tiprack.next_tip()
-    assert next_one == well_list[1]
-    next_five = tiprack.next_tip(5)
-    assert next_five == well_list[1]
-    next_eight = tiprack.next_tip(8)
-    assert next_eight == well_list[8]
-
-    # 2nd column has also been used
-    tiprack.use_tips(well_list[8], num_channels=8)
-
-    next_one = tiprack.next_tip()
-    assert next_one == well_list[1]
-    next_five = tiprack.next_tip(5)
-    assert next_five == well_list[1]
-    next_eight = tiprack.next_tip(8)
-    assert next_eight == well_list[16]
-
-    # Bottom 4 tips of 1rd column are also used
-    tiprack.use_tips(well_list[4], num_channels=4)
-
-    next_one = tiprack.next_tip()
-    assert next_one == well_list[1]
-    next_three = tiprack.next_tip(3)
-    assert next_three == well_list[1]
-    next_five = tiprack.next_tip(5)
-    assert next_five == well_list[16]
-    next_eight = tiprack.next_tip(8)
-    assert next_eight == well_list[16]
-
-    # you can reuse tips infinitely on api level 2.2
-    tiprack.use_tips(well_list[0])
-    tiprack.use_tips(well_list[0])
-
-    # you can't on api level 2.1 or previous
-    early_tr = labware.Labware(
-        implementation=LabwareImplementation(
-            definition=opentrons_96_tiprack_300ul_def,
-            parent=Location(Point(0, 0, 0), "Test Slot"),
-        ),
-        api_level=APIVersion(2, 1),
-    )
-    early_tr.use_tips(well_list[0])
-    with pytest.raises(AssertionError):
-        early_tr.use_tips(well_list[0])
-
-
-def test_previous_tip(opentrons_96_tiprack_300ul) -> None:
-    tiprack = opentrons_96_tiprack_300ul
-    # If all wells are used, we can't get a previous tip
-    assert tiprack.previous_tip() is None
-    # If one well is empty, wherever it is, we can get a slot
-    tiprack.wells()[5].has_tip = False
-    assert tiprack.previous_tip() == tiprack.wells()[5]
-    # But not if we ask for more slots than are available
-    assert tiprack.previous_tip(2) is None
-    tiprack.wells()[7].has_tip = False
-    # And those available wells have to be contiguous
-    assert tiprack.previous_tip(2) is None
-    # But if they are, we're good
-    tiprack.wells()[6].has_tip = False
-    assert tiprack.previous_tip(3) == tiprack.wells()[5]
-
-
-def test_return_tips(opentrons_96_tiprack_300ul) -> None:
-    tiprack = opentrons_96_tiprack_300ul
-
-    # If all wells are used, we get an error if we try to return
-    with pytest.raises(AssertionError):
-        tiprack.return_tips(tiprack.wells()[0])
-    # If we have space where we specify, everything is OK
-    tiprack.wells()[0].has_tip = False
-    tiprack.return_tips(tiprack.wells()[0])
-    assert tiprack.wells()[0].has_tip
-    # We have to have enough space
-    tiprack.wells()[0].has_tip = False
-    with pytest.raises(AssertionError):
-        tiprack.return_tips(tiprack.wells()[0], 2)
-    # But we can drop stuff off the end of a column
-    tiprack.wells()[7].has_tip = False
-    tiprack.wells()[8].has_tip = False
-    tiprack.return_tips(tiprack.wells()[7], 2)
-    assert tiprack.wells()[7].has_tip
-    # But we won't wrap around
-    assert not tiprack.wells()[8].has_tip
-
-
-@pytest.mark.parametrize("v1_module_name", ["tempdeck", "magdeck", "thermocycler"])
-def test_module_load_v1(v1_module_name) -> None:
-    module_defs = json.loads(load_shared_data("module/definitions/1.json"))
-    model = module_geometry.resolve_module_model(v1_module_name)
-    mod = module_geometry.load_module(model, Location(Point(0, 0, 0), "test"))
-    mod_def = module_defs[v1_module_name]
-    offset = Point(
-        mod_def["labwareOffset"]["x"],
-        mod_def["labwareOffset"]["y"],
-        mod_def["labwareOffset"]["z"],
-    )
-    high_z = mod_def["dimensions"]["bareOverallHeight"]
-    assert mod.highest_z == high_z
-    assert mod.location.point == offset
-    mod = module_geometry.load_module(model, Location(Point(1, 2, 3), "test"))
-    assert mod.highest_z == high_z + 3
-    assert mod.location.point == (offset + Point(1, 2, 3))
-    mod2 = module_geometry.load_module_from_definition(
-        module_defs[v1_module_name],
-        Location(Point(3, 2, 1), "test2"),
-        module_geometry.ThermocyclerConfiguration.FULL,  # type: ignore[attr-defined]
-    )
-    assert mod2.highest_z == high_z + 1
-    assert mod2.location.point == (offset + Point(3, 2, 1))
-
-
-@pytest.mark.parametrize(
-    "module_model",
-    list(module_geometry.MagneticModuleModel)  # type: ignore[attr-defined]
-    + list(module_geometry.TemperatureModuleModel)  # type: ignore[attr-defined]
-    + list(module_geometry.ThermocyclerModuleModel),  # type: ignore[attr-defined]
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, Well
+from opentrons.protocol_api.core import well_grid
+from opentrons.protocol_api.core.common import (
+    LabwareCore,
+    WellCore,
+    ProtocolCore,
+    ModuleCore,
 )
-def test_module_load_v2(module_model) -> None:
-    mod = module_geometry.load_module(module_model, Location(Point(0, 0, 0), "3"))
-    mod_def = module_geometry._load_module_definition(
-        MAX_SUPPORTED_VERSION, module_model
+
+from opentrons.protocol_api.core.labware import LabwareLoadParams
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
+from opentrons.protocol_api import TemperatureModuleContext
+
+from opentrons.types import Point
+
+
+@pytest.fixture(autouse=True)
+def _mock_well_grid_module(decoy: Decoy, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Mock out the well grid module."""
+    for name, func in inspect.getmembers(well_grid, inspect.isfunction):
+        monkeypatch.setattr(well_grid, name, decoy.mock(func=func))
+
+
+@pytest.fixture
+def mock_labware_core(decoy: Decoy) -> LabwareCore:
+    """Get a mock labware implementation core."""
+    return decoy.mock(cls=LabwareCore)
+
+
+@pytest.fixture
+def mock_protocol_core(decoy: Decoy) -> ProtocolCore:
+    """Get a mock protocol implementation core."""
+    return decoy.mock(cls=ProtocolCore)
+
+
+@pytest.fixture
+def mock_map_core(decoy: Decoy) -> LoadedCoreMap:
+    """Get a mock map core."""
+    return decoy.mock(cls=LoadedCoreMap)
+
+
+@pytest.fixture
+def api_version() -> APIVersion:
+    """Get the API version to test at."""
+    return MAX_SUPPORTED_VERSION
+
+
+@pytest.fixture
+def subject(
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+    api_version: APIVersion,
+) -> Labware:
+    """Get a Labware test subject with its dependencies mocked out."""
+    decoy.when(mock_labware_core.get_well_columns()).then_return([])
+    decoy.when(well_grid.create([])).then_return(
+        well_grid.WellGrid(columns_by_name={}, rows_by_name={})
     )
-    high_z = mod_def["dimensions"]["bareOverallHeight"]
-    assert mod.highest_z == high_z
-
-
-@pytest.mark.parametrize(
-    "module_name",
-    [
-        "tempdeck",
-        "magdeck",
-        "temperature module",
-        "temperature module gen2",
-        "thermocycler",
-        "thermocycler module",
-        "magnetic module",
-        "magnetic module gen2",
-        "magneticModuleV1",
-        "magneticModuleV2",
-        "temperatureModuleV1",
-        "temperatureModuleV2",
-        "thermocyclerModuleV1",
-        "thermocyclerModuleV2",
-    ],
-)
-def test_module_load_labware(module_name) -> None:
-    labware_name = "corning_96_wellplate_360ul_flat"
-    labware_def = labware.get_labware_definition(labware_name)
-    model = module_geometry.resolve_module_model(module_name)
-    mod = module_geometry.load_module(model, Location(Point(0, 0, 0), "test"))
-    old_z = mod.highest_z
-    lw = labware.load_from_definition(labware_def, mod.location)
-    mod.add_labware(lw)
-    assert mod.labware == lw
-    assert mod.highest_z == (
-        mod.location.point.z
-        + labware_def["dimensions"]["zDimension"]
-        + mod._over_labware
-    )
-    with pytest.raises(AssertionError):
-        mod.add_labware(lw)
-    mod.reset_labware()
-    assert mod.labware is None
-    assert mod.highest_z == old_z
-
-
-def test_tiprack_list():
-    labware_name = "opentrons_96_tiprack_300ul"
-    labware_def = labware.get_labware_definition(labware_name)
-    tiprack = labware.Labware(
-        implementation=LabwareImplementation(
-            labware_def, Location(Point(0, 0, 0), "Test Slot")
-        )
-    )
-    tiprack_2 = labware.Labware(
-        implementation=LabwareImplementation(
-            labware_def, Location(Point(0, 0, 0), "Test Slot")
-        )
-    )
-
-    assert labware.select_tiprack_from_list([tiprack], 1) == (tiprack, tiprack["A1"])
-
-    assert labware.select_tiprack_from_list([tiprack], 1, tiprack.wells()[1]) == (
-        tiprack,
-        tiprack["B1"],
-    )
-
-    tiprack["C1"].has_tip = False
-    assert labware.select_tiprack_from_list([tiprack], 1, tiprack.wells()[2]) == (
-        tiprack,
-        tiprack["D1"],
-    )
-
-    tiprack["H12"].has_tip = False
-    tiprack_2["A1"].has_tip = False
-    assert labware.select_tiprack_from_list(
-        [tiprack, tiprack_2], 1, tiprack.wells()[95]
-    ) == (tiprack_2, tiprack_2["B1"])
-
-    with pytest.raises(labware.OutOfTipsError):
-        labware.select_tiprack_from_list([tiprack], 1, tiprack.wells()[95])
-
-
-def test_uris():
-    details = ("opentrons", "opentrons_96_tiprack_300ul", "1")
-    uri = "opentrons/opentrons_96_tiprack_300ul/1"
-    assert helpers.uri_from_details(*details) == uri
-    defn = labware.get_labware_definition(
-        details[1], details[0], details[2]  # type: ignore[arg-type]
-    )
-    assert helpers.uri_from_definition(defn) == uri
-    lw = labware.Labware(
-        implementation=LabwareImplementation(
-            defn, Location(Point(0, 0, 0), "Test Slot")
-        )
-    )
-    assert lw.uri == uri
-
-
-@pytest.mark.parametrize(
-    "labware_name",
-    [
-        "nest_96_wellplate_2ml_deep",
-        "corning_384_wellplate_112ul_flat",
-        "geb_96_tiprack_1000ul",
-        "nest_12_reservoir_15ml",
-    ],
-)
-def test_add_index_file(labware_name, labware_offset_tempdir) -> None:
-    deck = Deck()
-    parent = deck.position_for(1)
-    definition = labware.get_labware_definition(labware_name)
-    lw = labware.Labware(implementation=LabwareImplementation(definition, parent))
-    labware_hash = helpers.hash_labware_def(definition)
-    labware.save_calibration(lw, Point(0, 0, 0))
-
-    lw_uri = helpers.uri_from_definition(definition)
-
-    str_parent = _get_parent_identifier(lw._implementation)
-    slot = "1"
-    if str_parent:
-        mod_dict = {str_parent: f"{slot}-{str_parent}"}
-    else:
-        mod_dict = {}
-    full_id = f"{labware_hash}{str_parent}"
-    blob = {"uri": f"{lw_uri}", "slot": full_id, "module": mod_dict}
-
-    lw_path = labware_offset_tempdir / "index.json"
-    info = file_operators.read_cal_file(lw_path)
-    assert info["data"][full_id] == blob
-
-
-def test_delete_one_calibration(set_up_index_file) -> None:
-    lw_to_delete = "nest_96_wellplate_2ml_deep"
-    all_cals = get.get_all_calibrations()
-    id_saved = ""
-
-    def get_load_names(all_cals):
-        nonlocal id_saved
-        load_names = []
-        for cal in all_cals:
-            uri = cal.uri
-            dets = helpers.details_from_uri(uri)
-            if dets.load_name == lw_to_delete:
-                id_saved = cal.labware_id
-            load_names.append(dets.load_name)
-        return load_names
-
-    load_names = get_load_names(all_cals)
-
-    assert lw_to_delete in load_names
-
-    delete.delete_offset_file(id_saved)  # type: ignore[arg-type]
-
-    all_cals = get.get_all_calibrations()
-    load_names = get_load_names(all_cals)
-
-    assert lw_to_delete not in load_names
-
-
-def test_get_parent_identifier():
-    labware_name = "corning_96_wellplate_360ul_flat"
-    labware_def = labware.get_labware_definition(labware_name)
-    lw = labware.Labware(
-        implementation=LabwareImplementation(
-            labware_def, Location(Point(0, 0, 0), "Test Slot")
-        )
-    )
-    # slots have no parent identifier
-    assert _get_parent_identifier(lw._implementation) == ""
-    # modules do
-    mmg = ModuleGeometry(
-        "my magdeck",
-        MagneticModuleModel.MAGNETIC_V1,
-        ModuleType.MAGNETIC,
-        Point(0, 0, 0),
-        10,
-        10,
-        Location(Point(1, 2, 3), "3"),
-        APIVersion(2, 4),
-    )
-    lw = labware.Labware(
-        implementation=LabwareImplementation(labware_def, mmg.location)
-    )
-    assert (
-        _get_parent_identifier(lw._implementation)
-        == MagneticModuleModel.MAGNETIC_V1.value
+    return Labware(
+        core=mock_labware_core,
+        api_version=api_version,
+        protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
     )
 
 
-def test_labware_hash_func_same_implementation(minimal_labware_def) -> None:
-    """Test that multiple Labware objects with same implementation and version
-    have the same __hash__"""
-    impl = LabwareImplementation(
-        minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
-    )
-    s = set(
-        labware.Labware(implementation=impl, api_level=APIVersion(2, 3))
-        for i in range(10)
-    )
-    assert len(s) == 1
+@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
+def test_api_version(api_version: APIVersion, subject: Labware) -> None:
+    """It should have an api_version property."""
+    assert subject.api_version == api_version
 
 
-def test_labware_hash_func_same_implementation_different_version(
-    minimal_labware_def,
+@pytest.mark.parametrize("api_version", [APIVersion(2, 12)])
+def test_api_version_clamped(subject: Labware) -> None:
+    """It should not allow the API version to go any lower than 2.13."""
+    assert subject.api_version == APIVersion(2, 13)
+
+
+def test_is_tiprack(
+    decoy: Decoy, mock_labware_core: LabwareCore, subject: Labware
 ) -> None:
-    """Test that multiple Labware objects with same implementation yet
-    different version have different __hash__"""
-    impl = LabwareImplementation(
-        minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
-    )
+    """It should report if it's a tip rack."""
+    decoy.when(mock_labware_core.is_tip_rack()).then_return(True)
+    assert subject.is_tiprack is True
 
-    l1 = labware.Labware(implementation=impl, api_level=APIVersion(2, 3))
-    l2 = labware.Labware(implementation=impl, api_level=APIVersion(2, 4))
-
-    assert len({l1, l2}) == 2
+    decoy.when(mock_labware_core.is_tip_rack()).then_return(False)
+    assert subject.is_tiprack is False
 
 
-def test_labware_hash_func_diff_implementation_same_version(
-    minimal_labware_def,
+def test_is_adapter(
+    decoy: Decoy, mock_labware_core: LabwareCore, subject: Labware
 ) -> None:
-    """Test that multiple Labware objects with different implementation yet
-    sane version have different __hash__"""
-    impl1 = LabwareImplementation(
-        minimal_labware_def, Location(Point(0, 0, 0), "Test Slot")
+    """It should report if it's an adapter."""
+    decoy.when(mock_labware_core.is_adapter()).then_return(True)
+    assert subject.is_adapter is True
+
+    decoy.when(mock_labware_core.is_adapter()).then_return(False)
+    assert subject.is_adapter is False
+
+
+def test_load_labware(
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: Labware,
+) -> None:
+    """It should load a labware by the load parameters."""
+    new_mock_core = decoy.mock(cls=LabwareCore)
+    decoy.when(
+        mock_protocol_core.load_labware(
+            load_name="labware-name",
+            label="a label",
+            namespace="a-namespace",
+            version=123,
+            location=mock_labware_core,
+        )
+    ).then_return(new_mock_core)
+    decoy.when(new_mock_core.get_well_columns()).then_return([])
+
+    result = subject.load_labware(
+        name="labware-name",
+        label="a label",
+        namespace="a-namespace",
+        version=123,
     )
-    impl2 = LabwareImplementation(
-        minimal_labware_def, Location(Point(0, 0, 0), "Test Slot2")
+
+    assert isinstance(result, Labware)
+    assert result.api_version == api_version
+    decoy.verify(mock_map_core.add(new_mock_core, result), times=1)
+
+
+def test_load_labware_from_definition(
+    decoy: Decoy,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+    api_version: APIVersion,
+    subject: Labware,
+) -> None:
+    """It should be able to load a labware from a definition dictionary."""
+    new_mock_core = decoy.mock(cls=LabwareCore)
+
+    labware_definition_dict = cast(LabwareDefDict, {"labwareDef": True})
+    labware_load_params = LabwareLoadParams("you", "are", 1337)
+
+    decoy.when(
+        mock_protocol_core.add_labware_definition(labware_definition_dict)
+    ).then_return(labware_load_params)
+
+    decoy.when(new_mock_core.get_well_columns()).then_return([])
+
+    decoy.when(
+        mock_protocol_core.load_labware(
+            namespace="you",
+            load_name="are",
+            version=1337,
+            label="a label",
+            location=mock_labware_core,
+        )
+    ).then_return(new_mock_core)
+
+    result = subject.load_labware_from_definition(
+        definition=labware_definition_dict,
+        label="a label",
     )
 
-    l1 = labware.Labware(implementation=impl1, api_level=APIVersion(2, 3))
-    l2 = labware.Labware(implementation=impl2, api_level=APIVersion(2, 3))
+    assert isinstance(result, Labware)
+    assert result.api_version == api_version
+    decoy.verify(mock_map_core.add(new_mock_core, result), times=1)
 
-    assert len({l1, l2}) == 2
+
+def test_wells(
+    decoy: Decoy,
+    api_version: APIVersion,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+    subject: Labware,
+) -> None:
+    """It should return a list of wells."""
+    mock_well_core_1 = decoy.mock(cls=WellCore)
+    mock_well_core_2 = decoy.mock(cls=WellCore)
+    grid = well_grid.WellGrid(
+        columns_by_name={"1": ["A1", "B1"]},
+        rows_by_name={"A": ["A1"], "B": ["B1"]},
+    )
+
+    decoy.when(mock_well_core_1.get_name()).then_return("A1")
+    decoy.when(mock_well_core_1.get_max_volume()).then_return(100)
+    decoy.when(mock_well_core_2.get_name()).then_return("B1")
+    decoy.when(mock_well_core_1.get_max_volume()).then_return(1000)
+
+    decoy.when(mock_labware_core.get_well_columns()).then_return([["A1", "B1"]])
+    decoy.when(mock_labware_core.get_well_core("A1")).then_return(mock_well_core_1)
+    decoy.when(mock_labware_core.get_well_core("B1")).then_return(mock_well_core_2)
+    decoy.when(well_grid.create([["A1", "B1"]])).then_return(grid)
+
+    subject = Labware(
+        core=mock_labware_core,
+        api_version=api_version,
+        protocol_core=mock_protocol_core,
+        core_map=mock_map_core,
+    )
+    result = subject.wells()
+    result_a1 = result[0]
+    result_b1 = result[1]
+
+    assert len(result) == 2
+    assert isinstance(result_a1, Well)
+    assert result_a1.well_name == "A1"
+    assert isinstance(result_b1, Well)
+    assert result_b1.well_name == "B1"
+
+    assert subject.wells_by_name() == {"A1": result_a1, "B1": result_b1}
+
+    assert subject.rows() == [[result_a1], [result_b1]]
+    assert subject.rows_by_name() == {"A": [result_a1], "B": [result_b1]}
+    assert subject.columns() == [[result_a1, result_b1]]
+    assert subject.columns_by_name() == {"1": [result_a1, result_b1]}
 
 
-def test_set_offset(decoy: Decoy) -> None:
-    """It should set the labware's offset using the implementation."""
-    labware_impl = decoy.mock(cls=AbstractLabware)
-    subject = labware.Labware(implementation=labware_impl)
+def test_reset_tips(
+    decoy: Decoy, mock_labware_core: LabwareCore, subject: Labware
+) -> None:
+    """It should reset and tip state."""
+    subject.reset()
+    decoy.verify(mock_labware_core.reset_tips(), times=1)
 
-    subject.set_offset(x=1.1, y=2.2, z=3.3)
-    decoy.verify(labware_impl.set_calibration(Point(1.1, 2.2, 3.3)))
 
-    subject = labware.Labware(implementation=labware_impl, api_level=APIVersion(2, 11))
+def test_parent_slot(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """Should get the labware's parent slot name or None."""
+    decoy.when(mock_protocol_core.get_labware_location(mock_labware_core)).then_return(
+        "bloop"
+    )
+
+    assert subject.parent == "bloop"
+
+
+def test_parent_module_context(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+) -> None:
+    """Should get labware parent module context."""
+    mock_module_core = decoy.mock(cls=ModuleCore)
+    mock_temp_module_context = decoy.mock(cls=TemperatureModuleContext)
+
+    decoy.when(mock_protocol_core.get_labware_location(mock_labware_core)).then_return(
+        mock_module_core
+    )
+
+    decoy.when(mock_map_core.get(mock_module_core)).then_return(
+        mock_temp_module_context
+    )
+
+    assert subject.parent == mock_temp_module_context
+
+
+def test_parent_labware(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+) -> None:
+    """Should get labware's parent labware."""
+    mock_parent_labware_core = decoy.mock(cls=LabwareCore)
+    mock_labware = decoy.mock(cls=Labware)
+
+    decoy.when(mock_protocol_core.get_labware_location(mock_labware_core)).then_return(
+        mock_parent_labware_core
+    )
+
+    decoy.when(mock_map_core.get(mock_parent_labware_core)).then_return(mock_labware)
+
+    assert subject.parent == mock_labware
+
+
+def test_child(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+    mock_protocol_core: ProtocolCore,
+    mock_map_core: LoadedCoreMap,
+) -> None:
+    """It should get the labware sitting on top of the labware."""
+    mock_child_labware_core = decoy.mock(cls=LabwareCore)
+    mock_labware = decoy.mock(cls=Labware)
+
+    decoy.when(
+        mock_protocol_core.get_labware_on_labware(mock_labware_core)
+    ).then_return(mock_child_labware_core)
+    decoy.when(mock_map_core.get(mock_child_labware_core)).then_return(mock_labware)
+
+    assert subject.child == mock_labware
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 13)])
+def test_set_offset_succeeds_on_low_api_version(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+) -> None:
+    """It should pass the offset to the core, on low API versions."""
+    subject.set_offset(1, 2, 3)
+    decoy.verify(mock_labware_core.set_calibration(Point(1, 2, 3)))
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_set_offset_raises_on_high_api_version(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+) -> None:
+    """It should raise an error, on high API versions."""
     with pytest.raises(APIVersionError):
-        subject.set_offset(x=4.4, y=5.5, z=6.6)
+        subject.set_offset(1, 2, 3)
+
+
+@pytest.mark.parametrize("api_version", [APIVersion(2, 14)])
+def test_separate_calibration_raises_on_high_api_version(
+    decoy: Decoy,
+    subject: Labware,
+    mock_labware_core: LabwareCore,
+) -> None:
+    """It should raise an error, on high API versions."""
+    with pytest.raises(APIVersionError):
+        subject.separate_calibration

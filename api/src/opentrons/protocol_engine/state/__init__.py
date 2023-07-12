@@ -5,7 +5,7 @@ from .state_summary import StateSummary
 from .config import Config
 from .commands import CommandState, CommandView, CommandSlice, CurrentCommand
 from .labware import LabwareState, LabwareView
-from .pipettes import PipetteState, PipetteView, HardwarePipette, CurrentWell
+from .pipettes import PipetteState, PipetteView, HardwarePipette
 from .modules import ModuleState, ModuleView, HardwareModule
 from .module_substates import (
     MagneticModuleId,
@@ -18,7 +18,7 @@ from .module_substates import (
     ThermocyclerModuleSubState,
     ModuleSubStateType,
 )
-from .geometry import GeometryView, TipGeometry
+from .geometry import GeometryView
 from .motion import MotionView, PipetteLocationData
 
 __all__ = [
@@ -41,7 +41,6 @@ __all__ = [
     "PipetteState",
     "PipetteView",
     "HardwarePipette",
-    "CurrentWell",
     # module state and values
     "ModuleState",
     "ModuleView",
@@ -57,7 +56,6 @@ __all__ = [
     "ModuleSubStateType",
     # computed geometry state
     "GeometryView",
-    "TipGeometry",
     # computed motion state
     "MotionView",
     "PipetteLocationData",

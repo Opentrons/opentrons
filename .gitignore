@@ -137,6 +137,7 @@ api/LICENSE
 update-server/LICENSE
 notify-server/LICENSE
 shared-data/python/LICENSE
+shared-data/LICENSE
 robot-server/LICENSE
 
 # typescript incremental files
@@ -148,3 +149,9 @@ storybook-static/
 # api client type caches
 api-client/lib
 react-api-client/lib
+
+#tarball of source files to send to ODD when pushing
+opentrons-robot-app.tar.gz
+
+# local VERSION.json file when pushing to Flex
+*new_version_file.json

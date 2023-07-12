@@ -14,18 +14,18 @@ export interface LabeledValueProps {
   value: number | string
 }
 
-export function LabeledValue(props: LabeledValueProps): JSX.Element {
+export function LabeledValue({ label, value }: LabeledValueProps): JSX.Element {
   return (
     <Flex
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
-      paddingY={SPACING.spacing3}
+      paddingY={SPACING.spacing8}
     >
       <StyledText as="h6" color={COLORS.darkGreyEnabled}>
-        {props.label}
+        {label}
       </StyledText>
-      <StyledText as="p">{props.value}</StyledText>
+      <StyledText as="p">{value}</StyledText>
     </Flex>
   )
 }

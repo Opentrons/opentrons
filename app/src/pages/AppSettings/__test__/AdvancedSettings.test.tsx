@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { MemoryRouter } from 'react-router-dom'
+import { when, resetAllWhenMocks } from 'jest-when'
 import { fireEvent } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import {
@@ -15,9 +16,14 @@ import {
   mockReachableRobot,
   mockUnreachableRobot,
 } from '../../../redux/discovery/__fixtures__'
-import { useTrackEvent } from '../../../redux/analytics'
+import {
+  useTrackEvent,
+  ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
+  ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
+} from '../../../redux/analytics'
 import * as CustomLabware from '../../../redux/custom-labware'
 import * as Config from '../../../redux/config'
+import * as ProtocolAnalysis from '../../../redux/protocol-analysis'
 import * as SystemInfo from '../../../redux/system-info'
 import * as Fixtures from '../../../redux/system-info/__fixtures__'
 
@@ -27,6 +33,7 @@ jest.mock('../../../redux/config')
 jest.mock('../../../redux/calibration')
 jest.mock('../../../redux/custom-labware')
 jest.mock('../../../redux/discovery')
+jest.mock('../../../redux/protocol-analysis')
 jest.mock('../../../redux/system-info')
 jest.mock('@opentrons/components/src/hooks')
 jest.mock('../../../redux/analytics')
@@ -78,12 +85,16 @@ const mockGetPathToPythonOverride = Config.getPathToPythonOverride as jest.Mocke
   typeof Config.getPathToPythonOverride
 >
 
-const mockOpenPythonInterpreterDirectory = Config.openPythonInterpreterDirectory as jest.MockedFunction<
-  typeof Config.openPythonInterpreterDirectory
+const mockOpenPythonInterpreterDirectory = ProtocolAnalysis.openPythonInterpreterDirectory as jest.MockedFunction<
+  typeof ProtocolAnalysis.openPythonInterpreterDirectory
 >
 
 const mockUseTrackEvent = useTrackEvent as jest.MockedFunction<
   typeof useTrackEvent
+>
+
+const mockUseFeatureFlag = Config.useFeatureFlag as jest.MockedFunction<
+  typeof Config.useFeatureFlag
 >
 
 let mockTrackEvent: jest.Mock
@@ -97,11 +108,11 @@ describe('AdvancedSettings', () => {
     getCustomLabwarePath.mockReturnValue('')
     getChannelOptions.mockReturnValue([
       {
-        name: 'Stable',
+        label: 'Stable',
         value: 'latest',
       },
-      { name: 'Beta', value: 'beta' },
-      { name: 'Alpha', value: 'alpha' },
+      { label: 'Beta', value: 'beta' },
+      { label: 'Alpha', value: 'alpha' },
     ])
     mockGetU2EAdapterDevice.mockReturnValue(Fixtures.mockWindowsRealtekDevice)
     mockGetUnreachableRobots.mockReturnValue([mockUnreachableRobot])
@@ -112,28 +123,32 @@ describe('AdvancedSettings', () => {
       showConfirmation: true,
       cancel: mockCancel,
     })
+    when(mockUseFeatureFlag)
+      .calledWith('enableExtendedHardware')
+      .mockReturnValue(false)
   })
   afterEach(() => {
     jest.resetAllMocks()
+    resetAllWhenMocks()
   })
 
   it('renders correct titles', () => {
     const [{ getByText }] = render()
     getByText('Update Channel')
     getByText('Additional Custom Labware Source Folder')
-    getByText('Tip Length Calibration Method')
-    getByText('Disable Robot Caching')
+    getByText('Prevent Robot Caching')
     getByText('Clear Unavailable Robots')
     getByText('Enable Developer Tools')
+    getByText('OT-2 Advanced Settings')
+    getByText('Tip Length Calibration Method')
+    getByText('USB-to-Ethernet Adapter Information')
   })
-  it('renders the update channel section', () => {
+  it('renders the update channel combobox and section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
-      'Stable receives the latest stable releases. Beta allows you to try out new features before they have completed testing and launch in the Stable channel.'
+      'Stable receives the latest stable releases. Beta allows you to try out new in-progress features before they launch in Stable channel, but they have not completed testing yet.'
     )
-    getByRole('option', { name: 'Stable' })
-    getByRole('option', { name: 'Beta' })
-    getByRole('option', { name: 'Alpha' })
+    getByRole('combobox', { name: '' })
   })
   it('renders the custom labware section with source folder selected', () => {
     getCustomLabwarePath.mockReturnValue('/mock/custom-labware-path')
@@ -150,7 +165,7 @@ describe('AdvancedSettings', () => {
     const btn = getByRole('button', { name: 'Add labware source folder' })
     fireEvent.click(btn)
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'changeCustomLabwareSourceFolder',
+      name: ANALYTICS_CHANGE_CUSTOM_LABWARE_SOURCE_FOLDER,
       properties: {},
     })
   })
@@ -162,11 +177,10 @@ describe('AdvancedSettings', () => {
       name: 'Always show the prompt to choose calibration block or trash bin',
     })
   })
-  it('renders the display unavailable robots section', () => {
-    const [{ getByText, getByRole }] = render()
-    getByText('NOTE: This will clear cached robots when switched ON.')
-    getByText(
-      'Disable caching of previously seen robots. Enabling this setting may improve overall networking performance in environments with many OT-2s, but may cause initial OT-2 discovery on app launch to be slower and more susceptible to failures.'
+  it('renders the robot caching section', () => {
+    const [{ queryByText, getByRole }] = render()
+    queryByText(
+      'The app will immediately clear unavailable robots and will not remember unavailable robots while this is enabled. On networks with many robots, preventing caching may improve network performance at the expense of slower and less reliable robot discovery on app launch.'
     )
     getByRole('switch', { name: 'display_unavailable_robots' })
   })
@@ -237,11 +251,38 @@ describe('AdvancedSettings', () => {
 
   it('renders the display show link to get labware offset data section', () => {
     const [{ getByText, getByRole }] = render()
-    getByText('Show Link to Get Labware Offset Data')
+    getByText('Show Labware Offset data code snippets')
     getByText(
-      'If you need to access Labware Offset data outside of the Opentrons App, enabling this setting will display a link to get Offset Data in the Recent Runs overflow menu and in the Labware Setup section of the Protocol page.'
+      'Only for users who need to apply Labware Offset data outside of the Opentrons App. When enabled, code snippets for Jupyter Notebook and SSH are available during protocol setup.'
     )
     getByRole('switch', { name: 'show_link_to_get_labware_offset_data' })
+  })
+
+  it('does not render the allow sending all protocols to ot-3 section when feature flag is off', () => {
+    const [{ queryByText, queryByRole }] = render()
+    expect(
+      queryByText('Allow Sending All Protocols to Opentrons Flex')
+    ).toBeNull()
+    expect(
+      queryByText(
+        'Enable the "Send to Opentrons Flex" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the OT-3.'
+      )
+    ).toBeNull()
+    expect(
+      queryByRole('switch', { name: 'allow_sending_all_protocols_to_ot3' })
+    ).toBeNull()
+  })
+
+  it('renders the allow sending all protocols to ot-3 section when feature flag is on', () => {
+    when(mockUseFeatureFlag)
+      .calledWith('enableExtendedHardware')
+      .mockReturnValue(true)
+    const [{ getByText, getByRole }] = render()
+    getByText('Allow Sending All Protocols to Opentrons Flex')
+    getByText(
+      'Enable the "Send to Opentrons Flex" menu item for each imported protocol, even if protocol analysis fails or does not recognize it as designed for the Opentrons Flex.'
+    )
+    getByRole('switch', { name: 'allow_sending_all_protocols_to_ot3' })
   })
 
   it('renders the toggle button on when show link to labware offset data setting is true', () => {
@@ -277,7 +318,7 @@ describe('AdvancedSettings', () => {
 
   it('renders the path to python override text and button with no default path', () => {
     mockGetPathToPythonOverride.mockReturnValue(null)
-    const [{ getByText, getByRole, getByTestId }] = render()
+    const [{ getByText, getByRole }] = render()
     getByText('Override Path to Python')
     getByText(
       'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
@@ -285,12 +326,9 @@ describe('AdvancedSettings', () => {
     getByText('override path')
     getByText('No path specified')
     const button = getByRole('button', { name: 'Add override path' })
-    const input = getByTestId('AdvancedSetting_pythonPathDirectoryInput')
-    input.click = jest.fn()
     fireEvent.click(button)
-    expect(input.click).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: 'changePathToPythonDirectory',
+      name: ANALYTICS_CHANGE_PATH_TO_PYTHON_DIRECTORY,
       properties: {},
     })
   })
@@ -338,7 +376,7 @@ describe('AdvancedSettings', () => {
   it('renders the developer tools section', () => {
     const [{ getByText, getByRole }] = render()
     getByText(
-      'Open Developer Tools on app launch, enable additional logging, and allow access to feature flags.'
+      'Enabling this setting opens Developer Tools on app launch, enables additional logging and gives access to feature flags.'
     )
     getByRole('switch', { name: 'enable_dev_tools' })
   })

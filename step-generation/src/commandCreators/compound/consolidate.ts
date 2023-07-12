@@ -107,6 +107,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                   well: sourceWell,
                   flowRate: aspirateFlowRateUlSec,
                   offsetFromBottomMm: airGapOffsetSourceWell,
+                  isAirGap: true,
                 }),
                 ...(aspirateDelay != null
                   ? [
@@ -272,6 +273,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 well: args.destWell,
                 flowRate: aspirateFlowRateUlSec,
                 offsetFromBottomMm: airGapOffsetDestWell,
+                isAirGap: true,
               }),
               ...(aspirateDelay != null
                 ? [

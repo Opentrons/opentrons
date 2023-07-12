@@ -66,13 +66,6 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/awaitProfileComplete',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-          },
-        },
-        {
           commandType: 'thermocycler/openLid',
           key: expect.any(String),
           params: {
@@ -130,13 +123,6 @@ describe('thermocyclerProfileStep', () => {
             moduleId: 'thermocyclerId',
             profile: [{ celsius: 61, holdSeconds: 99 }],
             blockMaxVolumeUl: 42,
-          },
-        },
-        {
-          commandType: 'thermocycler/awaitProfileComplete',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
           },
         },
         {
@@ -207,13 +193,6 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/awaitProfileComplete',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-          },
-        },
-        {
           commandType: 'thermocycler/openLid',
           key: expect.any(String),
           params: {
@@ -271,13 +250,6 @@ describe('thermocyclerProfileStep', () => {
             moduleId: 'thermocyclerId',
             profile: [{ celsius: 61, holdSeconds: 99 }],
             blockMaxVolumeUl: 42,
-          },
-        },
-        {
-          commandType: 'thermocycler/awaitProfileComplete',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
           },
         },
         {

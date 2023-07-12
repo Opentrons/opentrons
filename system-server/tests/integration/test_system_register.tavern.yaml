@@ -1,0 +1,41 @@
+---
+test_name: POST System Register
+marks:
+  - usefixtures:
+    - run_server
+stages:
+  - name: POST request returns a new JWT
+    request: &system_register_first
+      url: "{host:s}:{port:d}/system/register"
+      method: POST
+      params:
+        agent: 'agent-1'
+        agentId: 'agent_id-1'
+        subject: 'subject-1'
+    response: &good_response
+      status_code: 201
+      json:
+        token: !anystr
+      save:
+        json:
+          issued_token: "token"
+  - name: Second POST request returns same JWT
+    request: *system_register_first
+    response:
+      status_code: 200
+      json:
+        token: '{issued_token}'
+  - name: POST request with different info returns a new JWT
+    request: &system_register_second
+      url: "{host:s}:{port:d}/system/register"
+      method: POST
+      params:
+        agent: 'agent-2'
+        agentId: 'agent_id-1'
+        subject: 'subject-1'
+    response:
+      status_code: 201
+      verify_response_with:
+        function: tests.integration.testing_utils:token_does_not_match
+        extra_kwargs:
+          token: '{issued_token:s}'

@@ -23,7 +23,7 @@ const mockUseAllRunsQuery = useAllRunsQuery as jest.MockedFunction<
 const mockHistoricalProtocolRun = HistoricalProtocolRun as jest.MockedFunction<
   typeof HistoricalProtocolRun
 >
-const mockUseRunStatues = useRunStatuses as jest.MockedFunction<
+const mockUseRunStatuses = useRunStatuses as jest.MockedFunction<
   typeof useRunStatuses
 >
 const render = () => {
@@ -34,8 +34,8 @@ const render = () => {
 
 describe('RecentProtocolRuns', () => {
   beforeEach(() => {
-    mockUseRunStatues.mockReturnValue({
-      isLegacySessionInProgress: false,
+    mockUseRunStatuses.mockReturnValue({
+      isRunRunning: false,
       isRunStill: false,
       isRunTerminal: true,
       isRunIdle: false,
@@ -78,7 +78,7 @@ describe('RecentProtocolRuns', () => {
       },
     } as UseQueryResult<Runs, Error>)
     const [{ getByText }] = render()
-    getByText(`otie's Protocol Runs`)
+    getByText('Recent Protocol Runs')
     getByText('Run')
     getByText('Protocol')
     getByText('Status')

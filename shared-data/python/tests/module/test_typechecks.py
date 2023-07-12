@@ -18,7 +18,7 @@ pytestmark = pytest.mark.xfail(
 @pytest.mark.parametrize("defname", list_v3_defs())
 def test_v3_definitions_match_types(defname: str) -> None:
     """Test that V3 module definitions match ModuleDefinitionV3."""
-    def_dict = module.load_definition("3", defname)  # type: ignore [call-overload]
+    def_dict = module.load_definition("3", defname)
     typeguard.check_type("def_dict", def_dict, dev_types.ModuleDefinitionV3)
 
 

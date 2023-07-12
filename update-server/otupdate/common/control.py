@@ -42,7 +42,7 @@ def build_health_endpoint(
             {
                 **health_response,
                 **{
-                    "name": get_name_synchronizer(request).get_name(),
+                    "name": await get_name_synchronizer(request).get_name(),
                     "serialNumber": get_serial(),
                     "bootId": request.app[DEVICE_BOOT_ID_NAME],
                 },

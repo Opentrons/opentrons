@@ -3,11 +3,11 @@
 types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
-from typing import Dict, List, Union
+from typing import Dict, List, NewType, Union
 from typing_extensions import Literal, TypedDict
 
-# TODO(mc, 2022-06-16): move here, shouldn't be in pipettes
-from ..pipette.dev_types import LabwareUri as LabwareUri  # noqa: F401
+
+LabwareUri = NewType("LabwareUri", str)
 
 LabwareDisplayCategory = Union[
     Literal["tipRack"],
@@ -16,6 +16,7 @@ LabwareDisplayCategory = Union[
     Literal["trash"],
     Literal["wellPlate"],
     Literal["aluminumBlock"],
+    Literal["adapter"],
     Literal["other"],
 ]
 
@@ -25,6 +26,13 @@ LabwareFormat = Union[
     Literal["trough"],
     Literal["irregular"],
     Literal["trash"],
+]
+
+LabwareRoles = Union[
+    Literal["labware"],
+    Literal["fixture"],
+    Literal["adapter"],
+    Literal["maintenance"],
 ]
 
 Circular = Literal["circular"]
@@ -104,7 +112,7 @@ class WellGroup(TypedDict, total=False):
     brand: LabwareBrandData
 
 
-class LabwareDefinition(TypedDict):
+class _RequiredLabwareDefinition(TypedDict):
     schemaVersion: Literal[2]
     version: int
     namespace: str
@@ -116,3 +124,9 @@ class LabwareDefinition(TypedDict):
     dimensions: LabwareDimensions
     wells: Dict[str, WellDefinition]
     groups: List[WellGroup]
+
+
+class LabwareDefinition(_RequiredLabwareDefinition, total=False):
+    stackingOffsetWithLabware: Dict[str, NamedOffset]
+    stackingOffsetWithModule: Dict[str, NamedOffset]
+    allowedRoles: List[LabwareRoles]

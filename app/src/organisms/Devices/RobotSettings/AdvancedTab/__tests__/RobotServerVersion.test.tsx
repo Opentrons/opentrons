@@ -56,7 +56,7 @@ describe('RobotSettings RobotServerVersion', () => {
 
   it('should render title and description', () => {
     const [{ getByText }] = render()
-    getByText('Robot Server Versions')
+    getByText('Robot Server Version')
     getByText('View latest release notes on')
     getByText('v7.7.7')
   })

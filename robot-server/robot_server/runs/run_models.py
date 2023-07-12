@@ -15,7 +15,9 @@ from opentrons.protocol_engine import (
     LoadedModule,
     LabwareOffset,
     LabwareOffsetCreate,
+    Liquid,
 )
+from opentrons_shared_data.errors import GeneralError
 from robot_server.service.json_api import ResourceModel
 from .action_models import RunAction
 
@@ -89,6 +91,10 @@ class Run(ResourceModel):
         ...,
         description="Labware that has been loaded into the run.",
     )
+    liquids: List[Liquid] = Field(
+        ...,
+        description="Liquids loaded to the run.",
+    )
     labwareOffsets: List[LabwareOffset] = Field(
         ...,
         description="Labware offsets to apply as labware are loaded.",
@@ -142,3 +148,13 @@ class LabwareDefinitionSummary(BaseModel):
         ...,
         description="The definition's unique resource identifier in the run.",
     )
+
+
+class RunNotFoundError(GeneralError):
+    """Error raised when a given Run ID is not found in the store."""
+
+    def __init__(self, run_id: str) -> None:
+        """Initialize the error message from the missing ID."""
+        super().__init__(
+            message=f"Run {run_id} was not found.", detail={"runId": run_id}
+        )

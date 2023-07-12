@@ -63,16 +63,19 @@ export interface InitializedAction {
     usbDevices: UsbDevice[]
     networkInterfaces: NetworkInterface[]
   }
+  meta: { shell: true }
 }
 
 export interface UsbDeviceAddedAction {
   type: typeof USB_DEVICE_ADDED
   payload: { usbDevice: UsbDevice }
+  meta: { shell: true }
 }
 
 export interface UsbDeviceRemovedAction {
   type: typeof USB_DEVICE_REMOVED
   payload: { usbDevice: UsbDevice }
+  meta: { shell: true }
 }
 
 export interface NetworkInterfacesChangedAction {

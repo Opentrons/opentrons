@@ -1,4 +1,5 @@
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { LabwareWellGroupProperties } from '../../../pages/Labware/types'
 import * as Types from '../types'
 
 export const mockDefinition: LabwareDefinition2 = {
@@ -16,6 +17,7 @@ export const mockDefinition: LabwareDefinition2 = {
     loadName: 'mock_definition',
     format: 'mock',
     isTiprack: false,
+    tipLength: 1,
     isMagneticModuleCompatible: false,
   },
   brand: { brand: 'Opentrons' },
@@ -94,4 +96,71 @@ export const mockTipRackDefinition: LabwareDefinition2 = {
   ordering: [],
   wells: {},
   groups: [],
+}
+
+export const mockCircularLabwareWellGroupProperties: LabwareWellGroupProperties = {
+  shape: { shape: 'circular', diameter: 1 },
+  depth: 1,
+  metadata: { wellBottomShape: 'flat' },
+  xOffsetFromLeft: 1,
+  xSpacing: 1,
+  yOffsetFromTop: 1,
+  ySpacing: 1,
+  wellCount: 1,
+  totalLiquidVolume: 10,
+  brand: { brand: 'Opentrons' },
+}
+
+export const mockRectangularLabwareWellGroupProperties: LabwareWellGroupProperties = {
+  shape: { shape: 'rectangular', xDimension: 1, yDimension: 2 },
+  depth: 1,
+  metadata: {},
+  xOffsetFromLeft: 1,
+  xSpacing: 1,
+  yOffsetFromTop: 1,
+  ySpacing: 1,
+  wellCount: 1,
+  totalLiquidVolume: 10,
+  brand: { brand: 'Opentrons' },
+}
+
+export const mockOpentronsLabwareDetailsDefinition: LabwareDefinition2 = {
+  version: 1,
+  schemaVersion: 2,
+  namespace: 'opentrons',
+  metadata: {
+    displayName: 'Mock Definition',
+    displayCategory: 'reservoir',
+    displayVolumeUnits: 'mL',
+  },
+  dimensions: { xDimension: 10, yDimension: 20, zDimension: 30 },
+  cornerOffsetFromSlot: { x: 0, y: 0, z: 0 },
+  parameters: {
+    loadName: 'mock_definition',
+    format: 'mock',
+    isTiprack: false,
+    isMagneticModuleCompatible: false,
+  },
+  brand: { brand: 'Opentrons', brandId: ['mockOpentrons-123'] },
+  ordering: [],
+  wells: {
+    A1: {
+      depth: 10,
+      shape: 'rectangular',
+      totalLiquidVolume: 290000,
+      x: 11,
+      xDimension: 10,
+      y: 22,
+      yDimension: 72,
+      z: 33,
+    },
+  },
+  groups: [
+    {
+      metadata: {
+        wellBottomShape: 'v',
+      },
+      wells: ['A1'],
+    },
+  ],
 }

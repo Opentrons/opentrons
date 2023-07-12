@@ -1,10 +1,15 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { Box, Flex, JUSTIFY_FLEX_END, SPACING } from '@opentrons/components'
+import {
+  Box,
+  Flex,
+  JUSTIFY_FLEX_END,
+  SPACING,
+  PrimaryButton,
+} from '@opentrons/components'
 
-import { Modal } from '../../atoms/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
-import { PrimaryButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 
 export const UNINSTALL_APP_URL =
@@ -22,9 +27,9 @@ export function PreviousVersionModal(
   const { t } = useTranslation('app_settings')
 
   return (
-    <Modal onClose={props.closeModal} title={t('how_to_restore')}>
+    <LegacyModal onClose={props.closeModal} title={t('how_to_restore')}>
       <Box>
-        <StyledText as="p" paddingBottom={SPACING.spacing3}>
+        <StyledText as="p" paddingBottom={SPACING.spacing8}>
           {t('restore_description')}
         </StyledText>
         <ExternalLink
@@ -33,7 +38,7 @@ export function PreviousVersionModal(
         >
           {t('learn_uninstalling')}
         </ExternalLink>
-        <Box marginY={SPACING.spacing3} />
+        <Box marginY={SPACING.spacing8} />
         <ExternalLink
           href={PREVIOUS_RELEASES_URL}
           id="PreviousVersionModal_previousReleases"
@@ -43,13 +48,13 @@ export function PreviousVersionModal(
       </Box>
       <Flex justifyContent={JUSTIFY_FLEX_END}>
         <PrimaryButton
-          marginTop={SPACING.spacing5}
+          marginTop={SPACING.spacing24}
           onClick={props.closeModal}
           id="PreviousVersionModal_closeButton"
         >
           {t('close')}
         </PrimaryButton>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

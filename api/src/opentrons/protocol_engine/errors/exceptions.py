@@ -1,173 +1,791 @@
 """Protocol engine exceptions."""
 
+from logging import getLogger
+from typing import Any, Dict, Optional, Union, Iterator, Sequence
 
-class ProtocolEngineError(RuntimeError):
+from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException
+
+log = getLogger(__name__)
+
+
+class ProtocolEngineError(EnumeratedError):
     """Base Protocol Engine error class."""
+
+    def __init__(
+        self,
+        code: Optional[ErrorCodes] = None,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ProtocolEngineError."""
+        super().__init__(
+            code=code or ErrorCodes.GENERAL_ERROR,
+            message=message,
+            detail=detail,
+            wrapping=wrapping,
+        )
 
 
 class UnexpectedProtocolError(ProtocolEngineError):
-    """An error raised when an unexpected error occurs.
+    """Raised when an unexpected error occurs.
 
     This error is indicative of a software bug. If it happens, it means an
     exception was raised somewhere in the stack and it was not properly caught
     and wrapped.
     """
 
-    def __init__(self, original_error: Exception) -> None:
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        wrapping: Optional[Sequence[Union[EnumeratedError, BaseException]]] = None,
+    ) -> None:
         """Initialize an UnexpectedProtocolError with an original error."""
-        super().__init__(str(original_error))
-        self.original_error: Exception = original_error
+
+        def _convert_exc() -> Iterator[EnumeratedError]:
+            if not wrapping:
+                return
+            for exc in wrapping:
+                if isinstance(exc, EnumeratedError):
+                    yield exc
+                else:
+                    yield PythonException(exc)
+
+        super().__init__(
+            code=ErrorCodes.GENERAL_ERROR,
+            message=message,
+            wrapping=[e for e in _convert_exc()],
+        )
 
 
 # TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect.
 # By comparison, loadModule uses ModuleAlreadyPresentError and ModuleNotAttachedError.
 class FailedToLoadPipetteError(ProtocolEngineError):
-    """An error raised when executing a LoadPipette command fails.
+    """Raised when a LoadPipette command fails.
 
     This failure may be caused by:
     - An incorrect pipette already attached to the mount
     - A missing pipette on the requested mount
     """
 
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FailedToLoadPipetteError."""
+        super().__init__(ErrorCodes.PIPETTE_NOT_PRESENT, message, details, wrapping)
+
 
 # TODO(mc, 2020-10-18): differentiate between pipette missing vs incorrect
 class PipetteNotAttachedError(ProtocolEngineError):
-    """An error raised when an operation's required pipette is not attached."""
+    """Raised when an operation's required pipette is not attached."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PipetteNotAttachedError."""
+        super().__init__(ErrorCodes.PIPETTE_NOT_PRESENT, message, details, wrapping)
+
+
+class TipNotAttachedError(ProtocolEngineError):
+    """Raised when an operation's required pipette tip is not attached."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PIpetteNotAttachedError."""
+        super().__init__(ErrorCodes.UNEXPECTED_TIP_REMOVAL, message, details, wrapping)
+
+
+class TipAttachedError(ProtocolEngineError):
+    """Raised when a tip shouldn't be attached, but is."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PIpetteNotAttachedError."""
+        super().__init__(ErrorCodes.UNEXPECTED_TIP_ATTACH, message, details, wrapping)
 
 
 class CommandDoesNotExistError(ProtocolEngineError):
-    """An error raised when referencing a command that does not exist."""
+    """Raised when referencing a command that does not exist."""
 
-
-class PipetteTipInfoNotFoundError(ProtocolEngineError):
-    """An error raised when fetching information (like tiprack id) of attached tip."""
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CommandDoesNotExistError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class LabwareNotLoadedError(ProtocolEngineError):
-    """An error raised when referencing a labware that has not been loaded."""
+    """Raised when referencing a labware that has not been loaded."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareNotLoadedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareNotLoadedOnModuleError(ProtocolEngineError):
+    """Raised when there is no labware loaded on the requested module."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareNotLoadedOnModuleError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareNotLoadedOnLabwareError(ProtocolEngineError):
+    """Raised when there is no labware loaded on the requested labware."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareNotLoadedOnLabwareError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareNotOnDeckError(ProtocolEngineError):
+    """Raised when a labware can't be used because it's off-deck."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareNotOnDeckError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LiquidDoesNotExistError(ProtocolEngineError):
+    """Raised when referencing a liquid that has not been loaded."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LiquidDoesNotExistError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class LabwareDefinitionDoesNotExistError(ProtocolEngineError):
-    """An error raised when referencing a labware definition that does not exist."""
+    """Raised when referencing a labware definition that does not exist."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareDefinitionDoesNotExistError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareDefinitionIsNotLabwareError(ProtocolEngineError):
+    """Raised when trying to load a labware via loadLabware that is not a labware."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareDefinitionIsNotLabwareError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareDefinitionIsNotAdapterError(ProtocolEngineError):
+    """Raised when trying to load an adapter via loadAdapter that is not an adapter."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareDefinitionIsNotAdapterError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareCannotBeStackedError(ProtocolEngineError):
+    """Raised when trying to load labware onto another labware it is not defined to be loaded onto."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareCannotBeStackedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareIsInStackError(ProtocolEngineError):
+    """Raised when trying to move to or physically interact with a labware that has another labware on top."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsInStackError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class LabwareOffsetDoesNotExistError(ProtocolEngineError):
-    """An error raised when referencing a labware offset that does not exist."""
+    """Raised when referencing a labware offset that does not exist."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareOffsetDoesNotExistError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class LabwareIsNotTipRackError(ProtocolEngineError):
-    """An error raised when trying to use a regular labware as a tip rack."""
+    """Raised when trying to use a regular labware as a tip rack."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsNotTiprackError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class LabwareIsTipRackError(ProtocolEngineError):
-    """An error raised when trying to use a command not allowed on tip rack."""
+    """Raised when trying to use a command not allowed on tip rack."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsTiprackError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LabwareIsAdapterError(ProtocolEngineError):
+    """Raised when trying to use a command not allowed on adapter."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareIsAdapterError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class TouchTipDisabledError(ProtocolEngineError):
-    """An error raised when touch tip is used on well with touchTipDisabled quirk."""
+    """Raised when touch tip is used on well with touchTipDisabled quirk."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a TouchTipDisabledError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class WellDoesNotExistError(ProtocolEngineError):
-    """An error raised when referencing a well that does not exist."""
+    """Raised when referencing a well that does not exist."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a WellDoesNotExistError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class PipetteNotLoadedError(ProtocolEngineError):
-    """An error raised when referencing a pipette that has not been loaded."""
+    """Raised when referencing a pipette that has not been loaded."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PipetteNotLoadedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class ModuleNotLoadedError(ProtocolEngineError):
-    """And error raised when referencing a module that has not been loaded."""
+    """Raised when referencing a module that has not been loaded."""
+
+    def __init__(self, *, module_id: str) -> None:
+        super().__init__(ErrorCodes.GENERAL_ERROR, f"Module {module_id} not found.")
 
 
 class ModuleNotOnDeckError(ProtocolEngineError):
-    """And error raised when trying to use a module that is loaded off the deck."""
+    """Raised when trying to use a module that is loaded off the deck."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ModuleNotOnDeckError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class ModuleNotConnectedError(ProtocolEngineError):
+    """Raised when trying to use a module that is not connected to the robot electrically."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ModuleNotConnectedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class SlotDoesNotExistError(ProtocolEngineError):
-    """An error raised when referencing a deck slot that does not exist."""
+    """Raised when referencing a deck slot that does not exist."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a SlotDoesNotExistError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 # TODO(mc, 2020-11-06): flesh out with structured data to replicate
 # existing LabwareHeightError
 class FailedToPlanMoveError(ProtocolEngineError):
-    """An error raised when a requested movement could not be planned."""
+    """Raised when a requested movement could not be planned."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a FailedToPlanmoveError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class MustHomeError(ProtocolEngineError):
-    """An error raised when motors must be homed due to unknown current position."""
+    """Raised when motors must be homed due to unknown current position."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a MustHomeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class SetupCommandNotAllowedError(ProtocolEngineError):
-    """An error raised when adding a setup command to a non-idle/non-paused engine."""
+    """Raised when adding a setup command to a non-idle/non-paused engine."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a SetupCommandNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class PauseNotAllowedError(ProtocolEngineError):
-    """An error raised when attempting to pause a run that is not running."""
+    """Raised when attempting to pause a run that is not running."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PauseNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class RunStoppedError(ProtocolEngineError):
-    """An error raised when attempting to interact with a stopped engine."""
+    """Raised when attempting to interact with a stopped engine."""
 
-
-class WellOriginNotAllowedError(ProtocolEngineError):
-    """An error raised when using a disallowed origin in a relative well location."""
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a RunStoppedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class ModuleNotAttachedError(ProtocolEngineError):
-    """An error raised when a requested module is not attached."""
+    """Raised when a requested module is not attached."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ModuleNotAttached."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class ModuleAlreadyPresentError(ProtocolEngineError):
-    """An error raised when a module is already present in a requested location."""
+    """Raised when a module is already present in a requested location."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ModuleAlreadyPresentError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class WrongModuleTypeError(ProtocolEngineError):
-    """An error raised when performing a module action on the wrong kind of module."""
+    """Raised when performing a module action on the wrong kind of module."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a WrongModuleTypeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class ThermocyclerNotOpenError(ProtocolEngineError):
-    """An error raised when trying to move to labware that's covered inside a TC."""
+    """Raised when trying to move to a labware that's in a closed Thermocycler."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ThermocyclerNotOpenError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class RobotDoorOpenError(ProtocolEngineError):
-    """An error raised when executing a protocol command when a robot door is open."""
+    """Raised when executing a protocol command when a robot door is open."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a RobotDoorOpenError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class PipetteMovementRestrictedByHeaterShakerError(ProtocolEngineError):
-    """An error raised when trying to move to labware that's restricted by a module."""
+    """Raised when trying to move to labware that's restricted by a module."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PipetteMovementRestrictedByHeaterShakerError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class HeaterShakerLabwareLatchNotOpenError(ProtocolEngineError):
+    """Raised when Heater-Shaker latch is not open when it is expected to be so."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a HeaterShakerLabwareLatchNotOpenError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class HeaterShakerLabwareLatchStatusUnknown(ProtocolEngineError):
+    """Raised when Heater-Shaker latch has not been set before moving to it."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a HeaterShakerLabwareLatchStatusUnknown."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class EngageHeightOutOfRangeError(ProtocolEngineError):
-    """An error raised when a Magnetic Module engage height is out of bounds."""
+    """Raised when a Magnetic Module engage height is out of bounds."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a EngageHeightOutOfRangeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class NoMagnetEngageHeightError(ProtocolEngineError):
+    """Raised if a Magnetic Module engage height is missing."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a NoMagnetEngageHeightError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class NoTargetTemperatureSetError(ProtocolEngineError):
-    """An error raised when awaiting temperature when no target was set."""
+    """Raised when awaiting temperature when no target was set."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a NoTargetTemperatureSetError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class InvalidTargetTemperatureError(ProtocolEngineError):
-    """An error raised when attempting to set an invalid target temperature."""
+    """Raised when attempting to set an invalid target temperature."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidTargetTemperatureError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class InvalidBlockVolumeError(ProtocolEngineError):
-    """An error raised when attempting to set an invalid block max volume."""
+    """Raised when attempting to set an invalid block max volume."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidBlockVolumeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidHoldTimeError(ProtocolEngineError):
+    """An error raised when attempting to set an invalid temperature hold time."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidHoldTimeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class InvalidTargetSpeedError(ProtocolEngineError):
-    """An error raised when attempting to set an invalid target speed."""
+    """Raised when attempting to set an invalid target speed."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidTargetSpeedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class CannotPerformModuleAction(ProtocolEngineError):
-    """An error raised when trying to perform an illegal hardware module action."""
+    """Raised when trying to perform an illegal hardware module action."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CannotPerformModuleAction."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
 class ProtocolCommandFailedError(ProtocolEngineError):
-    """An error raised if a fatal command execution error has occurred.
+    """Raised if a fatal command execution error has occurred."""
 
-    Args:
-        command_id: The ID of the command that failed.
-    """
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ProtocolCommandFailedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
-    def __init__(self, command_id: str) -> None:
-        super().__init__(f"Command {command_id} failed to execute")
-        self.command_id = command_id
+
+class HardwareNotSupportedError(ProtocolEngineError):
+    """Raised when executing a command on the wrong hardware."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a HardwareNotSupportedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class GripperNotAttachedError(ProtocolEngineError):
+    """Raised when executing a gripper action without an attached gripper."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a GripperNotAttachedError."""
+        super().__init__(ErrorCodes.GRIPPER_NOT_PRESENT, message, details, wrapping)
+
+
+class LabwareMovementNotAllowedError(ProtocolEngineError):
+    """Raised when attempting an illegal labware movement."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LabwareMovementNotAllowedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class LocationIsOccupiedError(ProtocolEngineError):
+    """Raised when attempting to place labware in a non-empty location."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LocationIsOccupiedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class FirmwareUpdateRequired(ProtocolEngineError):
+    """Raised when the firmware needs to be updated."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a LocationIsOccupiedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class PipetteNotReadyToAspirateError(ProtocolEngineError):
+    """Raised when the pipette is not ready to aspirate."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PipetteNotReadyToAspirateError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidPipettingVolumeError(ProtocolEngineError):
+    """Raised when pipetting a volume larger than the pipette volume."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidPipettingVolumeError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class InvalidAxisForRobotType(ProtocolEngineError):
+    """Raised when attempting to use an axis that is not present on the given type of robot."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InvalidAxisForRobotType."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)

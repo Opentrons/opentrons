@@ -5,17 +5,23 @@ include ../scripts/python.mk
 
 SHX := npx shx
 
-# Find the version of the wheel from package.json using a helper script. We
+ot_project := $(OPENTRONS_PROJECT)
+project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
+project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+
+# Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,hardware,opentrons_hardware,$(BUILD_NUMBER))
+wheel_file = dist/$(call python_get_wheelname,hardware,$(project_rs_default),opentrons_hardware,$(BUILD_NUMBER))
 
 
-# Find the version of the sdist from package.json using a helper script. We
+# Find the version of the sdist from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the sdist.
-sdist_file = dist/$(call python_get_sdistname,hardware,opentrons_hardware)
+sdist_file = dist/$(call python_get_sdistname,hardware,$(project_ot3_default),opentrons_hardware)
 
+# Find the branch, sha, version that will be used to update the VERSION.json file
+version_file = $(call python_get_git_version,hardware,$(project_ot3_default),opentrons_hardware)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -57,12 +63,13 @@ setup:
 
 .PHONY: teardown
 teardown:
-	$(pipenv) --rm
+	-$(pipenv) --rm
 
 .PHONY: clean
 clean:
-	$(clean_cmd)
+	-$(clean_cmd)
 
+dist/opentrons_hardware-%-py2.py3-none-any.whl: export OPENTRONS_PROJECT=$(project_rs_default)
 dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
@@ -70,6 +77,7 @@ dist/opentrons_hardware-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 
 wheel: $(wheel_file)
 
+$(sdist_file): export OPENTRONS_PROJECT=$(project_ot3_default)
 $(sdist_file): setup.py $(ot_sources)
 	$(python) setup.py sdist
 	$(SHX) rm -rf build
@@ -121,7 +129,7 @@ push: push-no-restart
 
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: sdist Pipfile.lock
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"opentrons_hardware")
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"opentrons_hardware",,,$(version_file))
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3

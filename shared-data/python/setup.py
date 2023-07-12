@@ -21,7 +21,16 @@ if os.name == "posix":
     fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
 
 DATA_ROOT = ".."
-DATA_SUBDIRS = ["deck", "labware", "module", "pipette", "protocol", "gripper"]
+DATA_SUBDIRS = [
+    "deck",
+    "labware",
+    "module",
+    "pipette",
+    "protocol",
+    "gripper",
+    "robot",
+    "errors",
+]
 DATA_TYPES = ["definitions", "schemas"]
 DEST_BASE_PATH = "data"
 
@@ -63,11 +72,6 @@ class SDistWithData(sdist.sdist):
                 msg=f"copying and minimizing {data_file} -> {target_file}",
             )
 
-        # also grab our package.json
-        self.copy_file(
-            os.path.join(HERE, "..", "package.json"),
-            os.path.join(base_dir, "package.json"),
-        )
         super().make_release_tree(base_dir, files)
 
 
@@ -88,11 +92,10 @@ class BuildWithData(build_py.build_py):
         # We want a list of paths to only files relative to ../shared-data
         to_include = [str(f.relative_to(DATA_ROOT)) for f in get_shared_data_files()]
         destination = os.path.join(build_base, "opentrons_shared_data", DEST_BASE_PATH)
-        # And finally, tell the system about our files, including package.json
+        # And finally, tell the system about our files
         files.extend(
             [
                 ("opentrons_shared_data", DATA_ROOT, destination, to_include),
-                ("opentrons_shared_data", "..", build_base, ["package.json"]),
             ]
         )
         return files
@@ -100,11 +103,13 @@ class BuildWithData(build_py.build_py):
 
 def get_version():
     buildno = os.getenv("BUILD_NUMBER")
+    project = os.getenv("OPENTRONS_PROJECT", "robot-stack")
+    git_dir = os.getenv("OPENTRONS_GIT_DIR", None)
     if buildno:
         normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version("shared-data", **normalize_opts)
+    return normalize_version("shared-data", project, git_dir=git_dir, **normalize_opts)
 
 
 VERSION = get_version()

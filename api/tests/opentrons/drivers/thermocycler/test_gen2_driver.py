@@ -1,7 +1,9 @@
 from typing import Optional
 import pytest
 from mock import AsyncMock
-from opentrons.drivers.asyncio.communication.serial_connection import SerialConnection
+from opentrons.drivers.asyncio.communication.serial_connection import (
+    AsyncResponseSerialConnection,
+)
 from opentrons.drivers.thermocycler import driver
 from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
@@ -10,7 +12,7 @@ from opentrons.drivers.utils import TC_GCODE_ROUNDING_PRECISION
 
 @pytest.fixture
 def connection() -> AsyncMock:
-    return AsyncMock(spec=SerialConnection)
+    return AsyncMock(spec=AsyncResponseSerialConnection)
 
 
 @pytest.fixture
@@ -40,6 +42,19 @@ async def test_close_lid(
 
     expected = CommandBuilder(terminator=driver.TC_COMMAND_TERMINATOR).add_gcode(
         gcode="M127"
+    )
+
+    connection.send_command.assert_called_once_with(command=expected, retries=3)
+
+
+async def test_plate_lift(
+    subject: driver.ThermocyclerDriverV2, connection: AsyncMock
+) -> None:
+    """It should send a Plate Lift command."""
+    await subject.lift_plate()
+
+    expected = CommandBuilder(terminator=driver.TC_COMMAND_TERMINATOR).add_gcode(
+        gcode="M128"
     )
 
     connection.send_command.assert_called_once_with(command=expected, retries=3)
@@ -234,8 +249,6 @@ async def test_enter_bootloader(
         gcode="dfu"
     )
 
-    connection.send_command.assert_called_once_with(
-        command=expected, retries=3, timeout=1
-    )
+    connection.send_dfu_command.assert_called_once_with(command=expected)
 
     assert connection.close.called

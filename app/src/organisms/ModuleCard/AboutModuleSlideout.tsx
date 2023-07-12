@@ -10,11 +10,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   Btn,
   ALIGN_START,
+  PrimaryButton,
   COLORS,
 } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import { Slideout } from '../../atoms/Slideout'
-import { PrimaryButton } from '../../atoms/buttons'
 import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
 import { useCurrentRunStatus } from '../RunTimeControl/hooks'
@@ -30,7 +30,7 @@ interface AboutModuleSlideoutProps {
 
 const ALERT_ITEM_STYLE = css`
   font-size: ${TYPOGRAPHY.fontSizeP};
-  margin-bottom: ${SPACING.spacing4};
+  margin-bottom: ${SPACING.spacing16};
 `
 
 export const AboutModuleSlideout = (
@@ -70,9 +70,11 @@ export const AboutModuleSlideout = (
       }
     >
       {module.hasAvailableUpdate && !isDisabled && showBanner ? (
-        <Flex paddingBottom={SPACING.spacing4}>
+        <Flex paddingBottom={SPACING.spacing16}>
           <Banner
-            data-testid={`alert_item_firmware_update_${module.moduleModel}`}
+            data-testid={`alert_item_firmware_update_${String(
+              module.moduleModel
+            )}`}
             css={ALERT_ITEM_STYLE}
             type="warning"
             onCloseClick={() => setShowBanner(false)}
@@ -80,7 +82,7 @@ export const AboutModuleSlideout = (
             {t('firmware_update_available')}
             <Btn
               textAlign={ALIGN_START}
-              paddingLeft={SPACING.spacing2}
+              paddingLeft={SPACING.spacing4}
               fontSize={TYPOGRAPHY.fontSizeP}
               textDecoration={TYPOGRAPHY.textDecorationUnderline}
               onClick={handleFirmwareUpdateClick}
@@ -94,27 +96,29 @@ export const AboutModuleSlideout = (
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            data-testid={`alert_item_version_${module.moduleModel}`}
+            data-testid={`alert_item_version_${String(module.moduleModel)}`}
             color={COLORS.darkGreyEnabled}
           >
             <StyledText as="h6">{t('current_version')}</StyledText>
-            <StyledText as="p" paddingTop={SPACING.spacing2}>
+            <StyledText as="p" paddingTop={SPACING.spacing4}>
               {t('version', { version: module.firmwareVersion })}
             </StyledText>
           </Flex>
         </Flex>
         <StyledText
-          paddingTop={SPACING.spacing4}
+          paddingTop={SPACING.spacing16}
           as="h6"
-          data-testid={`alert_item_serial_number_text_${module.moduleModel}`}
-          color={COLORS.darkBlack}
+          data-testid={`alert_item_serial_number_text_${String(
+            module.moduleModel
+          )}`}
+          color={COLORS.darkBlackEnabled}
         >
           {t('serial_number')}
         </StyledText>
         <StyledText
           as="h6"
-          paddingTop={SPACING.spacing2}
-          data-testid={`alert_item_serial_${module.moduleModel}`}
+          paddingTop={SPACING.spacing4}
+          data-testid={`alert_item_serial_${String(module.moduleModel)}`}
         >
           {module.serialNumber}
         </StyledText>

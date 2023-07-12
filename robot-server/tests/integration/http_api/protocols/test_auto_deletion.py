@@ -1,40 +1,49 @@
 import secrets
 from pathlib import Path
-from typing import List
+from typing import List, Optional
+
+import pytest
 
 from tests.integration.dev_server import DevServer
 from tests.integration.robot_client import RobotClient
 from tests.integration.protocol_files import get_py_protocol
 
 
-_NUM_PROTOCOLS_TO_UPLOAD = 10
-_NUM_PROTOCOLS_TO_EXPECT = 5
-
-
-async def test_protocols_auto_delete() -> None:
+@pytest.mark.parametrize(
+    ("num_to_configure_as_maximum", "num_to_upload", "num_to_expect"),
+    [
+        (None, 10, 5),  # Test that the server enforces a limit of 5 by default.
+        (3, 6, 3),
+    ],
+)
+async def test_protocols_auto_delete(
+    num_to_configure_as_maximum: Optional[int],
+    num_to_upload: int,
+    num_to_expect: int,
+) -> None:
     port = "15555"
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()
         ), "Dev Robot is running and must not be."
-        with DevServer(port=port) as server:
+        with DevServer(
+            port=port, maximum_unused_protocols=num_to_configure_as_maximum
+        ) as server:
             server.start()
             assert (
                 await robot_client.wait_until_alive()
             ), "Dev Robot never became available."
 
             uploaded_protocol_ids = await _upload_protocols(
-                robot_client=robot_client, num_protocols=_NUM_PROTOCOLS_TO_UPLOAD
+                robot_client=robot_client, num_protocols=num_to_upload
             )
 
             fetched_protocol_ids = await _get_protocol_ids(robot_client=robot_client)
 
             # Last n elements of uploaded_protocol_ids.
-            protocol_ids_to_expect = uploaded_protocol_ids[
-                -1 * _NUM_PROTOCOLS_TO_EXPECT :
-            ]
+            protocol_ids_to_expect = uploaded_protocol_ids[-num_to_expect:]
 
             assert fetched_protocol_ids == protocol_ids_to_expect
 

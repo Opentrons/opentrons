@@ -1,7 +1,15 @@
 import { createSelector } from 'reselect'
-import type { DropdownOption } from '@opentrons/components'
+import { SLEEP_NEVER_MS } from '../../App/constants'
 import type { State } from '../types'
-import type { Config, FeatureFlags, UpdateChannel } from './types'
+import type {
+  Config,
+  FeatureFlags,
+  UpdateChannel,
+  ProtocolsOnDeviceSortKey,
+  OnDeviceDisplaySettings,
+} from './types'
+import type { SelectOption } from '../../atoms/SelectField/Select'
+import type { ProtocolSort } from '../../organisms/ProtocolsLanding/hooks'
 
 export const getConfig = (state: State): Config | null => state.config
 
@@ -42,17 +50,65 @@ export const getPathToPythonOverride: (
 )
 
 const UPDATE_CHANNEL_OPTS = [
-  { name: 'Stable', value: 'latest' as UpdateChannel },
-  { name: 'Beta', value: 'beta' as UpdateChannel },
+  { label: 'Stable', value: 'latest' as UpdateChannel },
+  { label: 'Beta', value: 'beta' as UpdateChannel },
 ]
 
 const UPDATE_CHANNEL_OPTS_WITH_ALPHA = [
   ...UPDATE_CHANNEL_OPTS,
-  { name: 'Alpha', value: 'alpha' as UpdateChannel },
+  { label: 'Alpha', value: 'alpha' as UpdateChannel },
 ]
 
-export const getUpdateChannelOptions = (state: State): DropdownOption[] => {
+export const getUpdateChannelOptions = (state: State): SelectOption[] => {
   return state.config?.devtools || state.config?.update.channel === 'alpha'
     ? UPDATE_CHANNEL_OPTS_WITH_ALPHA
     : UPDATE_CHANNEL_OPTS
 }
+
+export const getIsOnDevice: (state: State) => boolean = createSelector(
+  getConfig,
+  config => config?.isOnDevice ?? false
+)
+
+export const getSendAllProtocolsToOT3: (
+  state: State
+) => boolean = createSelector(
+  getConfig,
+  config => config?.protocols.sendAllProtocolsToOT3 ?? false
+)
+
+export const getProtocolsDesktopSortKey: (
+  state: State
+) => ProtocolSort | null = createSelector(
+  getConfig,
+  config => config?.protocols.protocolsStoredSortKey ?? null
+)
+
+export const getProtocolsOnDeviceSortKey: (
+  state: State
+) => ProtocolsOnDeviceSortKey | null = createSelector(
+  getConfig,
+  config => config?.protocols.protocolsOnDeviceSortKey ?? null
+)
+
+export const getPinnedProtocolIds: (
+  state: State
+) => string[] | undefined = createSelector(
+  getConfig,
+  config => config?.protocols.pinnedProtocolIds
+)
+
+export const getOnDeviceDisplaySettings: (
+  state: State
+) => OnDeviceDisplaySettings = createSelector(
+  getConfig,
+  config =>
+    config?.onDeviceDisplaySettings ?? {
+      sleepMs: config?.onDeviceDisplaySettings?.sleepMs ?? SLEEP_NEVER_MS,
+      brightness: config?.onDeviceDisplaySettings?.brightness ?? 4,
+      textSize: config?.onDeviceDisplaySettings?.textSize ?? 1,
+      unfinishedUnboxingFlowRoute:
+        config?.onDeviceDisplaySettings.unfinishedUnboxingFlowRoute ??
+        '/welcome',
+    }
+)

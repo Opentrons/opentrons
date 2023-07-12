@@ -6,6 +6,7 @@ include ./scripts/python.mk
 
 API_DIR := api
 APP_SHELL_DIR := app-shell
+APP_SHELL_ODD_DIR := app-shell-odd
 COMPONENTS_DIR := components
 DISCOVERY_CLIENT_DIR := discovery-client
 G_CODE_TESTING_DIR := g-code-testing
@@ -15,9 +16,13 @@ PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
+SERVER_UTILS_DIR := server-utils
+SYSTEM_SERVER_DIR := system-server
 HARDWARE_DIR := hardware
+USB_BRIDGE_DIR := usb-bridge
+NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 
-PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR)
+PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR)
 
 # This may be set as an environment variable (and is by CI tasks that upload
 # to test pypi) to add a .dev extension to the python package versions. If
@@ -51,6 +56,7 @@ setup-js:
 	yarn config set network-timeout 60000
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
+	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-js
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
@@ -90,6 +96,7 @@ clean: clean-js clean-py
 .PHONY: clean-js
 clean-js: clean-ts
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
+	$(MAKE) -C $(NODE_USB_BRIDGE_CLIENT_DIR) clean
 	$(MAKE) -C $(COMPONENTS_DIR) clean
 
 PYTHON_CLEAN_TARGETS := $(addsuffix -py-clean, $(PYTHON_DIRS))
@@ -124,29 +131,33 @@ push-update-server:
 push: export host=$(usb_host)
 push:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
-	# TODO (amit, 2021-09-28): re-enable when opentrons-hardware is worth deploying.
-	# $(MAKE) -C $(HARDWARE_DIR) push-no-restart
-	# sleep 1
-	$(MAKE) -C $(API_DIR) push-no-restart
-	sleep 1
 	$(MAKE) -C $(SHARED_DATA_DIR) push-no-restart
 	sleep 1
-	$(MAKE) -C $(UPDATE_SERVER_DIR) push
+	$(MAKE) -C $(API_DIR) push-no-restart
+	sleep 1
+	$(MAKE) -C $(SERVER_UTILS_DIR) push
 	sleep 1
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) push
 	sleep 1
+	$(MAKE) -C $(SYSTEM_SERVER_DIR) push
+	sleep 1
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push
+	sleep 1
+	$(MAKE) -C $(UPDATE_SERVER_DIR) push
 
 
 .PHONY: push-ot3
 push-ot3:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
-	$(MAKE) -C $(API_DIR) push-no-restart-ot3
-	$(MAKE) -C $(HARDWARE_DIR) push-no-restart-ot3
 	$(MAKE) -C $(SHARED_DATA_DIR) push-no-restart-ot3
-	$(MAKE) -C $(NOTIFY_SERVER_DIR) push-no-restart-ot3
+	$(MAKE) -C $(HARDWARE_DIR) push-no-restart-ot3
+	$(MAKE) -C $(API_DIR) push-no-restart-ot3
+	$(MAKE) -C $(SERVER_UTILS_DIR) push-ot3
+	$(MAKE) -C $(NOTIFY_SERVER_DIR) push-ot3
 	$(MAKE) -C $(ROBOT_SERVER_DIR) push-ot3
+	$(MAKE) -C $(SYSTEM_SERVER_DIR) push-ot3
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push-ot3
+	$(MAKE) -C $(USB_BRIDGE_DIR) push-ot3
 
 
 .PHONY: term
@@ -178,8 +189,10 @@ test-py-windows:
 test-py: test-py-windows
 	$(MAKE) -C $(UPDATE_SERVER_DIR) test
 	$(MAKE) -C $(ROBOT_SERVER_DIR) test
+	$(MAKE) -C $(SERVER_UTILS_DIR) test
 	$(MAKE) -C $(NOTIFY_SERVER_DIR) test
 	$(MAKE) -C $(G_CODE_TESTING_DIR) test
+	$(MAKE) -C $(USB_BRIDGE_DIR) test
 
 .PHONY: test-js
 test-js:
@@ -247,8 +260,4 @@ circular-dependencies-js:
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular step-generation/src/index.ts
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.tsx
 	yarn madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.tsx
-
-.PHONY: bump
-bump:
-	@echo "Bumping versions"
-	yarn lerna version $(or $(version),prerelease)
+	yarn madge $(and $(CI),--no-spinner --no-color) --circular components/src/index.ts

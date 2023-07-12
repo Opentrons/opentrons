@@ -1,18 +1,7 @@
 """Firmware update target."""
-from dataclasses import dataclass, field
-from typing_extensions import Final
+from dataclasses import dataclass
 
 from opentrons_hardware.firmware_bindings import NodeId
-
-
-BootloaderNodeIdMap: Final = {
-    NodeId.head: NodeId.head_bootloader,
-    NodeId.pipette_left: NodeId.pipette_left_bootloader,
-    NodeId.pipette_right: NodeId.pipette_right_bootloader,
-    NodeId.gantry_x: NodeId.gantry_x_bootloader,
-    NodeId.gantry_y: NodeId.gantry_y_bootloader,
-    NodeId.gripper: NodeId.gripper_bootloader,
-}
 
 
 @dataclass
@@ -20,10 +9,15 @@ class Target:
     """Pair of a sub-system's node id with its bootloader's node id."""
 
     system_node: NodeId
-    bootloader_node: NodeId = field(init=False)
+    bootloader_node: NodeId
 
-    def __post_init__(self) -> None:
-        """Assign computed values."""
-        bn = BootloaderNodeIdMap.get(self.system_node)
-        assert bn, f"'{self.system_node}' is not valid for firmware update."
-        self.bootloader_node = bn
+    @classmethod
+    def from_single_node(cls, node: NodeId) -> "Target":
+        """Build a Target from just one of its node ids."""
+        assert node not in (
+            NodeId.broadcast,
+            NodeId.host,
+        ), f"Invalid update target {node}"
+        return cls(
+            system_node=node.application_for(), bootloader_node=node.bootloader_for()
+        )

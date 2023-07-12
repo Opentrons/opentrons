@@ -1,0 +1,7 @@
+#!/bin/sh
+# Wrapper script to run the hardware control ot3gripper with correct
+# environment variables. Should be installed to path; run with
+# ot3gripper
+orig=$(pwd)
+cd /opt/opentrons-robot-server
+OT_API_FF_enableOT3HardwareController="true" RUNNING_ON_VERDIN=1 OT_SYSTEM_VERSION="0.0.0" python3 -m opentrons.hardware_control.scripts.gripper_control && cd ${orig} || cd ${orig}

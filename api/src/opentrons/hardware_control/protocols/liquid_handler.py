@@ -4,17 +4,17 @@ from typing_extensions import Protocol
 from opentrons.types import Mount
 
 from .instrument_configurer import InstrumentConfigurer
-from .motion_controller import MotionController
+from .motion_controller import MotionController, AxisType
 from .configurable import Configurable
-from .calibratable import Calibratable
+from .calibratable import Calibratable, CalibrationType
 
 
 class LiquidHandler(
     InstrumentConfigurer,
-    MotionController,
+    MotionController[AxisType],
     Configurable,
-    Calibratable,
-    Protocol,
+    Calibratable[CalibrationType],
+    Protocol[CalibrationType, AxisType],
 ):
     async def prepare_for_aspirate(self, mount: Mount, rate: float = 1.0) -> None:
         """
@@ -81,7 +81,7 @@ class LiquidHandler(
         """
         ...
 
-    async def blow_out(self, mount: Mount) -> None:
+    async def blow_out(self, mount: Mount, volume: Optional[float] = None) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
@@ -94,6 +94,7 @@ class LiquidHandler(
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
+        prep_after: bool = True,
     ) -> None:
         """
         Pick up tip from current location.

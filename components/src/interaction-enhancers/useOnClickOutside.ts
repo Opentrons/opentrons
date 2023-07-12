@@ -23,10 +23,10 @@ export const useOnClickOutside = <E extends Element>(
       )
 
       if (
-        onClickOutside &&
-        node &&
-        node.current &&
-        node.current.contains &&
+        onClickOutside != null &&
+        node != null &&
+        node.current != null &&
+        node.current.contains != null &&
         !node.current.contains(clickedElem as Node)
       ) {
         onClickOutside(event)

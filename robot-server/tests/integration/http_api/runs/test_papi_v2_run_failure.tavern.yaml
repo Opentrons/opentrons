@@ -2,11 +2,11 @@ test_name: Upload and run a PAPI v2 protocol that should fail.
 
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Upload a protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/runtime_error.py'
@@ -18,7 +18,7 @@ stages:
 
   - name: Create run from protocol
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{ot2_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -31,7 +31,7 @@ stages:
 
   - name: Play the run
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -45,7 +45,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}'
+      url: '{ot2_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -59,10 +59,11 @@ stages:
               errorType: ExceptionInProtocolError
               createdAt: !anystr
               detail: 'NoTipAttachedError [line 9]: Cannot perform DROPTIP without a tip attached'
+              errorCode: '4000'
 
   - name: Verify commands contain the expected results
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       method: GET
     response:
       status_code: 200
@@ -108,13 +109,17 @@ stages:
               errorType: LegacyContextCommandError
               createdAt: !anystr
               detail: 'Cannot perform DROPTIP without a tip attached'
+              errorCode: '4000'
+              errorInfo: !anydict
+              wrappedErrors: !anylist
             params:
               pipetteId: !anystr
               labwareId: !anystr
               wellName: A1
               wellLocation:
-                origin: top
+                origin: default
                 offset:
                   x: 0
                   y: 0
                   z: 0
+              alternateDropLocation: false

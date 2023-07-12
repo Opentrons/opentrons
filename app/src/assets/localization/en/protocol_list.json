@@ -1,19 +1,20 @@
 {
   "a_software_update_is_available_please_update": "A software update is available for this robot. Update to run protocols. <robotLink>Go to Robot</robotLink>",
-  "delete_protocol": "Delete protocol",
-  "should_delete_this_protocol": "Delete this protocol?",
-  "yes_delete_this_protocol": "Yes, delete protocol",
+  "delete_protocol_message": " and its run history will be permanently deleted.",
   "last_updated_at": "Updated {{date}}",
   "left_mount": "left mount",
   "loading_data": "Loading data...",
   "modules": "modules",
   "no_data": "No data",
-  "protocol_analysis_failure": "Protocol analysis failure",
+  "protocol_analysis_failure": "Protocol analysis failure.",
   "reanalyze_or_view_error": "<analysisLink>Reanalyze</analysisLink> protocol or view <errorLink>error details</errorLink>",
   "right_mount": "right mount",
   "robot": "robot",
-  "run": "Run",
+  "send_to_ot3": "Send to Opentrons Flex",
+  "should_delete_this_protocol": "Delete this protocol?",
   "show_in_folder": "Show in folder",
+  "start_setup": "Start setup",
   "this_protocol_will_be_trashed": "This protocol will be moved to this computer’s trash and may be unrecoverable.",
-  "updated": "Updated"
+  "updated": "Updated",
+  "yes_delete_this_protocol": "Yes, delete protocol"
 }

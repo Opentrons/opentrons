@@ -16,6 +16,7 @@ from typing import (
     Set,
     Any,
     TypeVar,
+    Mapping,
 )
 
 from opentrons_shared_data.pipette import name_config
@@ -23,9 +24,10 @@ from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
+from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 
 from .util import use_or_initialize_loop, check_motion_bounds
-from .instruments.pipette import (
+from .instruments.ot2.pipette import (
     generate_hardware_configs,
     load_from_config_and_check_skip,
 )
@@ -36,7 +38,6 @@ from .module_control import AttachedModulesControl
 from .types import (
     Axis,
     CriticalPoint,
-    MustHomeError,
     DoorState,
     DoorStateNotification,
     ErrorMessageNotification,
@@ -44,15 +45,20 @@ from .types import (
     HardwareAction,
     MotionChecks,
     PauseType,
+    StatusBarState,
+)
+from .errors import (
+    MustHomeError,
+    NotSupportedByHardware,
 )
 from . import modules
 from .robot_calibration import (
     RobotCalibrationProvider,
-    load_pipette_offset,
     RobotCalibration,
 )
-from .protocols import HardwareControlAPI
-from .instruments.pipette_handler import PipetteHandlerProvider
+from .protocols import HardwareControlInterface
+from .instruments.ot2.pipette_handler import PipetteHandlerProvider
+from .instruments.ot2.instrument_calibration import load_pipette_offset
 from .motion_utilities import (
     target_position_from_absolute,
     target_position_from_relative,
@@ -74,7 +80,7 @@ class API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlAPI,
+    HardwareControlInterface[RobotCalibration, Axis],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -323,7 +329,7 @@ class API(
         """Control the robot lights."""
         self._backend.set_lights(button, rails)
 
-    def get_lights(self) -> Dict[str, bool]:
+    async def get_lights(self) -> Dict[str, bool]:
         """Return the current status of the robot lights.
 
         :returns: A dict of the lights: `{'button': bool, 'rails': bool}`
@@ -341,6 +347,18 @@ class API(
             now = self._loop.time()
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
+
+    async def set_status_bar_state(self, state: StatusBarState) -> None:
+        """The status bar does not exist on OT-2!"""
+        return None
+
+    async def set_status_bar_enabled(self, enabled: bool) -> None:
+        """The status bar does not exist on OT-2!"""
+        return None
+
+    def get_status_bar_state(self) -> StatusBarState:
+        """There is no status bar on OT-2, return IDLE at all times."""
+        return StatusBarState.IDLE
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
@@ -492,13 +510,28 @@ class API(
         await PipetteHandlerProvider.reset(self)
 
     # Gantry/frame (i.e. not pipette) action API
-    async def home_z(self, mount: Optional[top_types.Mount] = None) -> None:
-        """Home the two z-axes"""
-        self._reset_last_mount()
-        if not mount:
-            axes = [Axis.Z, Axis.A]
-        else:
+    async def home_z(
+        self,
+        mount: Optional[top_types.Mount] = None,
+        allow_home_other: bool = True,
+    ) -> None:
+        """Home the Z-stage(s) of the instrument mounts.
+
+        If given a mount, will try to only home that mount.
+        However, if the other mount is currently extended,
+        both mounts will be homed, unless `allow_home_other`
+        is explicitly set to `False`.
+
+        Setting `allow_home_other` to `False` is a bad idea,
+        but the option exists for strict backwards compatibility.
+        """
+        if mount is not None and (
+            self._last_moved_mount in [mount, None] or allow_home_other is False
+        ):
             axes = [Axis.by_mount(mount)]
+        else:
+            axes = [Axis.Z, Axis.A]
+
         await self.home(axes)
 
     async def _do_plunger_home(
@@ -548,9 +581,17 @@ class API(
     @ExecutionManagerProvider.wait_for_running
     async def home(self, axes: Optional[List[Axis]] = None) -> None:
         """Home the entire robot and initialize current position."""
+        # Should we assert/ raise an error or just remove non-ot2 axes and log warning?
+        # No internal code passes OT3 axes as arguments on an OT2. But a user/ client
+        # can still explicitly specify an OT3 axis even when working on an OT2.
+        # Adding this check in order to prevent misuse of axes types.
+        if axes and any(axis not in Axis.ot2_axes() for axis in axes):
+            raise NotSupportedByHardware(
+                f"At least one axis in {axes} is not supported on the OT2."
+            )
         self._reset_last_mount()
         # Initialize/update current_position
-        checked_axes = axes or [ax for ax in Axis]
+        checked_axes = axes or [ax for ax in Axis.ot2_axes()]
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
         smoothie_gantry = [ax.name.upper() for ax in gantry]
         smoothie_pos = {}
@@ -660,6 +701,18 @@ class API(
 
         await self._cache_and_maybe_retract_mount(mount)
         await self._move(target_position, speed=speed, max_speeds=max_speeds)
+
+    async def move_axes(
+        self,
+        position: Mapping[Axis, float],
+        speed: Optional[float] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
+    ) -> None:
+        """Moves the effectors of the specified axis to the specified position.
+        The effector of the x,y axis is the center of the carriage.
+        The effector of the pipette mount axis are the mount critical points but only in z.
+        """
+        raise NotSupportedByHardware("move_axes is not supported on the OT-2.")
 
     async def move_rel(
         self,
@@ -791,7 +844,15 @@ class API(
 
         Works regardless of critical point or home status.
         """
-        smoothie_ax = (Axis.by_mount(mount).name.upper(),)
+        await self.retract_axis(Axis.by_mount(mount), margin)
+
+    @ExecutionManagerProvider.wait_for_running
+    async def retract_axis(self, axis: Axis, margin: float = 10) -> None:
+        """Pull the specified axis up to its home position.
+
+        Works regardless of critical point or home status.
+        """
+        smoothie_ax = (axis.name.upper(),)
 
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
@@ -939,7 +1000,9 @@ class API(
         else:
             dispense_spec.instr.remove_current_volume(dispense_spec.volume)
 
-    async def blow_out(self, mount: top_types.Mount) -> None:
+    async def blow_out(
+        self, mount: top_types.Mount, volume: Optional[float] = None
+    ) -> None:
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
@@ -971,6 +1034,7 @@ class API(
         tip_length: float,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
+        prep_after: bool = True,
     ) -> None:
         """
         Pick up tip from current location.
@@ -1007,6 +1071,8 @@ class API(
             await self.move_rel(mount, rel_point, speed=speed)
 
         await self.retract(mount, spec.retract_target)
+        if prep_after:
+            await self.prepare_for_aspirate(mount)
 
     async def drop_tip(self, mount: top_types.Mount, home_after: bool = True) -> None:
         """Drop tip at the current location."""
@@ -1040,15 +1106,21 @@ class API(
         self._backend.set_active_current(spec.ending_current)
         _remove()
 
-    async def find_modules(
+    async def create_simulating_module(
         self,
-        by_model: modules.types.ModuleModel,
-        resolved_type: modules.types.ModuleType,
-    ) -> Tuple[List[modules.AbstractModule], Optional[modules.AbstractModule]]:
-        modules_result = await self._backend.module_controls.parse_modules(
-            by_model, resolved_type
+        model: modules.types.ModuleModel,
+    ) -> modules.AbstractModule:
+        """Get a simulating module hardware API interface for the given model."""
+        assert (
+            self.is_simulator
+        ), "Cannot build simulating module from non-simulating hardware control API"
+
+        return await self._backend.module_controls.build_module(
+            port="",
+            usb_port=USBPort(name="", port_number=1, port_group=PortGroup.MAIN),
+            type=modules.ModuleType.from_model(model),
+            sim_model=model.value,
         )
-        return modules_result
 
     def get_instrument_max_height(
         self, mount: top_types.Mount, critical_point: Optional[CriticalPoint] = None

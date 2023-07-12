@@ -1,0 +1,8 @@
+{
+  "detach": "detach",
+  "firmware_version": "firmware version",
+  "last_calibrated": "last calibrated",
+  "no_cal_data": "no calibration data",
+  "recalibrate": "recalibrate",
+  "serial_number": "serial number"
+}

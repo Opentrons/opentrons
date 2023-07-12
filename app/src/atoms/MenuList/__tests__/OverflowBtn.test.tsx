@@ -27,7 +27,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'background-color',
-      `#16212d26`,
+      `${String(COLORS.lightGreyHover)}`,
       {
         modifier: ':hover',
       }
@@ -41,7 +41,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'background-color',
-      `#16212d40`,
+      `${String(COLORS.lightGreyPressed)}`,
       {
         modifier: ':active',
       }
@@ -55,7 +55,7 @@ describe('OverflowBtn', () => {
 
     expect(getByRole('button')).toHaveStyleRule(
       'box-shadow',
-      `0 0 0 3px ${COLORS.warning}`,
+      `0 0 0 3px ${String(COLORS.fundamentalsFocus)}`,
       {
         modifier: ':focus-visible',
       }
@@ -67,8 +67,12 @@ describe('OverflowBtn', () => {
       onClick: jest.fn(),
     })
 
-    expect(getByRole('button')).toHaveStyleRule('fill', `${COLORS.errorText}`, {
-      modifier: ':disabled circle',
-    })
+    expect(getByRole('button')).toHaveStyleRule(
+      'fill',
+      `${String(COLORS.successDisabled)}`,
+      {
+        modifier: ':disabled circle',
+      }
+    )
   })
 })

@@ -1,63 +1,83 @@
 import * as React from 'react'
+import capitalize from 'lodash/capitalize'
+
 import {
   Flex,
   Icon,
-  Text,
-  JUSTIFY_SPACE_BETWEEN,
-  SPACING_1,
   ALIGN_CENTER,
-  C_BLUE_PRESSED,
-  FONT_SIZE_CAPTION,
+  BORDERS,
+  COLORS,
+  SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+
+import { StyledText } from '../text'
 interface StatusLabelProps {
   status: string
   backgroundColor: string
-  iconColor: string
+  showIcon?: boolean
+  iconColor?: string
   textColor?: string
+  fontWeight?: number
+  iconSize?: string
   pulse?: boolean
+  id?: string
 }
 
 export const StatusLabel = (props: StatusLabelProps): JSX.Element | null => {
-  const { status, backgroundColor, iconColor, textColor, pulse } = props
+  const {
+    status,
+    backgroundColor,
+    iconColor,
+    textColor,
+    fontWeight,
+    iconSize,
+    pulse,
+    showIcon = true,
+    id,
+  } = props
 
   return (
-    <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
+    <Flex>
       <Flex
         backgroundColor={backgroundColor}
-        borderRadius={SPACING_1}
-        padding="0.2rem"
+        borderRadius={BORDERS.radiusSoftCorners}
+        gridGap={SPACING.spacing4}
+        paddingX={SPACING.spacing6}
+        paddingY={SPACING.spacing2}
         alignItems={ALIGN_CENTER}
-        marginTop={SPACING_1}
-        marginBottom={SPACING_1}
-        data-testid={`status_label+${status}`}
+        marginTop={SPACING.spacing4}
+        marginBottom={SPACING.spacing4}
+        data-testid={
+          id != null ? `status_label_${status}_${id}` : `status_label_${status}`
+        }
       >
-        <Icon
-          name="circle"
-          color={iconColor}
-          size={SPACING_1}
-          marginX={SPACING_1}
-          data-testid="status_circle"
+        {showIcon ? (
+          <Icon
+            name="circle"
+            color={iconColor}
+            size={iconSize ?? '0.25rem'}
+            data-testid="status_circle"
+          >
+            {pulse != null && pulse ? (
+              <animate
+                attributeName="fill"
+                values={`${iconColor}; transparent`}
+                dur="1s"
+                calcMode="discrete"
+                repeatCount="indefinite"
+                data-testid="pulsing_status_circle"
+              />
+            ) : null}
+          </Icon>
+        ) : null}
+        <StyledText
+          fontSize={TYPOGRAPHY.fontSizeLabel}
+          fontWeight={fontWeight ?? TYPOGRAPHY.fontWeightRegular}
+          color={textColor ?? COLORS.bluePressed}
         >
-          {pulse ? (
-            <animate
-              attributeName="fill"
-              values={`${iconColor}; transparent`}
-              dur="1s"
-              calcMode="discrete"
-              repeatCount="indefinite"
-              data-testid="pulsing_status_circle"
-            />
-          ) : null}
-        </Icon>
-        <Text
-          fontSize={FONT_SIZE_CAPTION}
-          color={textColor ?? C_BLUE_PRESSED}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          marginRight={SPACING_1}
-        >
-          {status}
-        </Text>
+          {capitalize(status)}
+        </StyledText>
       </Flex>
     </Flex>
   )

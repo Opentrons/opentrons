@@ -2,12 +2,13 @@
   "name": "@opentrons/app-shell",
   "private": true,
   "productName": "Opentrons",
-  "version": "6.0.0",
+  "version": "0.0.0-dev",
   "description": "Opentrons desktop application",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
   "scripts": {
-    "start": "make dev"
+    "start": "make dev",
+    "rebuild": "electron-rebuild"
   },
   "repository": {
     "type": "git",
@@ -28,22 +29,25 @@
     ]
   },
   "devDependencies": {
-    "@opentrons/app": "6.0.0",
-    "@opentrons/discovery-client": "6.0.0",
-    "@opentrons/shared-data": "6.0.0"
+    "@opentrons/app": "link:../app",
+    "@opentrons/discovery-client": "link:../discovery-client",
+    "@opentrons/shared-data": "link:../shared-data",
+    "@opentrons/usb-bridge/node-client": "link:../usb-bridge/node-client",
+    "electron-notarize": "^1.2.1",
+    "electron-publisher-s3": "^20.17.2"
   },
   "dependencies": {
     "@thi.ng/paths": "1.6.5",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
-    "@types/lodash": "^4.14.168",
+    "@types/lodash": "^4.14.191",
     "@types/pump": "^1.1.0",
     "@types/uuid": "^3.4.7",
-    "ajv": "6.10.2",
+    "ajv": "6.12.3",
     "dateformat": "3.0.3",
-    "electron-context-menu": "0.15.1",
+    "electron-context-menu": "^3.5.0",
     "electron-debug": "3.0.1",
-    "electron-devtools-installer": "3.1.1",
+    "electron-devtools-installer": "3.2.0",
     "electron-dl": "1.14.0",
     "electron-store": "5.1.1",
     "electron-updater": "4.1.2",
@@ -52,14 +56,17 @@
     "fs-extra": "10.0.0",
     "get-stream": "5.1.0",
     "merge-options": "1.0.1",
-    "node-fetch": "2.6.0",
+    "node-fetch": "2.6.7",
     "node-stream-zip": "1.8.2",
     "pump": "3.0.0",
     "semver": "5.5.0",
-    "tempy": "0.3.0",
-    "usb-detection": "4.10.0",
+    "serialport": "10.5.0",
+    "tempy": "1.0.1",
     "uuid": "3.2.1",
     "winston": "3.1.0",
-    "yargs-parser": "10.0.0"
+    "yargs-parser": "13.1.2"
+  },
+  "optionalDependencies": {
+    "usb-detection": "4.14.1"
   }
 }

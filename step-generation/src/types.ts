@@ -4,6 +4,8 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
+  LabwareLocation,
 } from '@opentrons/shared-data'
 import type {
   CreateCommand,
@@ -68,12 +70,16 @@ export interface HeaterShakerModuleState {
   targetSpeed: number | null
   latchOpen: boolean | null
 }
+export interface MagneticBlockState {
+  type: typeof MAGNETIC_BLOCK_TYPE
+}
 
 export type ModuleState =
   | MagneticModuleState
   | TemperatureModuleState
   | ThermocyclerModuleState
   | HeaterShakerModuleState
+  | MagneticBlockState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState: ModuleState
@@ -103,6 +109,13 @@ export interface NormalizedPipetteById {
     name: PipetteName
     id: string
     tiprackDefURI: string
+  }
+}
+
+export interface NormalizedAdditionalEquipmentById {
+  [additionalEquipmentId: string]: {
+    name: 'gripper'
+    id: string
   }
 }
 
@@ -334,7 +347,7 @@ export type SetShakeSpeedArgs = ShakeSpeedParams & {
 }
 
 export interface HeaterShakerArgs {
-  module: string
+  module: string | null
   rpm: number | null
   commandCreatorFnName: 'heaterShaker'
   targetTemperature: number | null
@@ -390,6 +403,13 @@ export interface ThermocyclerStateStepArgs {
   message?: string
 }
 
+export interface MoveLabwareArgs extends CommonArgs {
+  commandCreatorFnName: 'moveLabware'
+  labware: string
+  useGripper: boolean
+  newLocation: LabwareLocation
+}
+
 export type CommandCreatorArgs =
   | ConsolidateArgs
   | DistributeArgs
@@ -404,6 +424,7 @@ export type CommandCreatorArgs =
   | ThermocyclerProfileStepArgs
   | ThermocyclerStateStepArgs
   | HeaterShakerArgs
+  | MoveLabwareArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
@@ -492,6 +513,8 @@ export type ErrorType =
   | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
   | 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL'
   | 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL'
+  | 'HEATER_SHAKER_LATCH_CLOSED'
+  | 'LABWARE_OFF_DECK'
 
 export interface CommandCreatorError {
   message: string

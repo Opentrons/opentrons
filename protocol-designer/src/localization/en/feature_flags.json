@@ -12,16 +12,16 @@
     "title": "Enable mix batch edit",
     "description": "Allow users to batch edit mix forms"
   },
-  "OT_PD_ENABLE_HEATER_SHAKER": {
-    "title": "Enable heater shaker module",
-    "description": "Allow adding heater shaker module and steps to protocols"
-  },
   "OT_PD_ENABLE_SCHEMA_V6": {
     "title": "Enable schema v6 support",
     "description": "Allow users to migrate older protocols to schema v6"
   },
-  "OT_PD_ENABLE_LIQUID_COLOR_ENHANCEMENTS": {
-    "title": "Enable liquid color enhancements",
-    "description": "Allow users to enable liquid color picking"
+  "OT_PD_ENABLE_OT_3": {
+    "title": "Enable OT-3 support",
+    "description": "Allow users to enable OT-3 support in protocol designer"
+  },
+  "OT_PD_ALLOW_ALL_TIPRACKS": {
+    "title": "Allow all tip rack options",
+    "description": "Enable selection of all tip racks for each pipette."
   }
 }

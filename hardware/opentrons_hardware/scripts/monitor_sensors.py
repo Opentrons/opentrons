@@ -15,7 +15,7 @@ from opentrons_hardware.firmware_bindings.messages import (
     fields,
 )
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
-from opentrons_hardware.sensors.utils import (
+from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
 )
@@ -63,8 +63,11 @@ async def do_run(
             if isinstance(message, message_definitions.ReadFromSensorResponse):
                 ts = (datetime.datetime.now() - start).total_seconds()
                 s = constants.SensorType(message.payload.sensor.value).name
-                d = SensorDataType.build(message.payload.sensor_data)
-                print(f"{ts:.3f}: {s} {d.to_float():5.3f}")
+                d = SensorDataType.build(
+                    message.payload.sensor_data, message.payload.sensor
+                )
+                rd = message.payload.sensor_data
+                print(f"{ts:.3f}: {s} {d.to_float():5.3f}, \traw data: {str(rd)}")
     finally:
         print("cleaning up")
         await messenger.send(target_node, reset_message)
@@ -102,7 +105,7 @@ def main() -> None:
         "-s",
         "--sensor",
         type=str,
-        choices=["capacitive"],
+        choices=["capacitive", "pressure", "environment"],
         help="which sensor",
         default="capacitive",
     )

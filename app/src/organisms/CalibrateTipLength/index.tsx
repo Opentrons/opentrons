@@ -1,36 +1,31 @@
 // Tip Length Calibration Orchestration Component
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
+import { css } from 'styled-components'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import {
-  ModalPage,
-  SpinnerModalPage,
-  useConditionalConfirm,
-  DISPLAY_FLEX,
-  DIRECTION_COLUMN,
-  ALIGN_CENTER,
-  JUSTIFY_CENTER,
-  SPACING_3,
-  C_TRANSPARENT,
-  ALIGN_FLEX_START,
-  C_WHITE,
-} from '@opentrons/components'
+import { useConditionalConfirm } from '@opentrons/components'
 
 import * as Sessions from '../../redux/sessions'
-
 import {
   Introduction,
   DeckSetup,
   TipPickUp,
   TipConfirmation,
-  CompleteConfirmation,
-  ConfirmExitModal,
   MeasureNozzle,
   MeasureTip,
-  INTENT_TIP_LENGTH_IN_PROTOCOL,
+  ConfirmExit,
+  LoadingState,
+  CompleteConfirmation,
 } from '../../organisms/CalibrationPanels'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
+import { WizardHeader } from '../../molecules/WizardHeader'
+import { Portal } from '../../App/portal'
 
-import type { StyleProps, Mount } from '@opentrons/components'
+import slotOneRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_1_Remove_CalBlock_(330x260)REV1.webm'
+import slotThreeRemoveBlockAsset from '../../assets/videos/tip-length-cal/Slot_3_Remove_CalBlock_(330x260)REV1.webm'
+
+import type { Mount } from '@opentrons/components'
 import type {
   SessionCommandParams,
   CalibrationLabware,
@@ -42,33 +37,6 @@ import type { CalibrateTipLengthParentProps } from './types'
 export { AskForCalibrationBlockModal } from './AskForCalibrationBlockModal'
 export { ConfirmRecalibrationModal } from './ConfirmRecalibrationModal'
 
-const TIP_LENGTH_CALIBRATION_SUBTITLE = 'Tip length calibration'
-const EXIT = 'exit'
-
-const darkContentsStyleProps = {
-  display: DISPLAY_FLEX,
-  flexDirection: DIRECTION_COLUMN,
-  alignItems: ALIGN_CENTER,
-  padding: SPACING_3,
-  backgroundColor: C_TRANSPARENT,
-  height: '100%',
-}
-const contentsStyleProps = {
-  display: DISPLAY_FLEX,
-  backgroundColor: C_WHITE,
-  flexDirection: DIRECTION_COLUMN,
-  justifyContent: JUSTIFY_CENTER,
-  alignItems: ALIGN_FLEX_START,
-  padding: SPACING_3,
-  maxWidth: '48rem',
-  minHeight: '14rem',
-}
-
-const terminalContentsStyleProps = {
-  ...contentsStyleProps,
-  paddingX: '1.5rem',
-}
-
 const PANEL_BY_STEP: Partial<
   Record<CalibrationSessionStep, React.ComponentType<CalibrationPanelProps>>
 > = {
@@ -78,42 +46,49 @@ const PANEL_BY_STEP: Partial<
   preparingPipette: TipPickUp,
   inspectingTip: TipConfirmation,
   measuringTipOffset: MeasureTip,
-  calibrationComplete: CompleteConfirmation,
+  calibrationComplete: TipLengthCalibrationComplete,
 }
-const PANEL_STYLE_PROPS_BY_STEP: Partial<
-  Record<CalibrationSessionStep, StyleProps>
-> = {
-  [Sessions.TIP_LENGTH_STEP_SESSION_STARTED]: terminalContentsStyleProps,
-  [Sessions.TIP_LENGTH_STEP_LABWARE_LOADED]: darkContentsStyleProps,
-  [Sessions.TIP_LENGTH_STEP_PREPARING_PIPETTE]: contentsStyleProps,
-  [Sessions.TIP_LENGTH_STEP_INSPECTING_TIP]: contentsStyleProps,
-  [Sessions.TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET]: contentsStyleProps,
-  [Sessions.TIP_LENGTH_STEP_MEASURING_TIP_OFFSET]: contentsStyleProps,
-  [Sessions.TIP_LENGTH_STEP_CALIBRATION_COMPLETE]: terminalContentsStyleProps,
-}
+const STEPS_IN_ORDER: CalibrationSessionStep[] = [
+  Sessions.TIP_LENGTH_STEP_SESSION_STARTED,
+  Sessions.TIP_LENGTH_STEP_LABWARE_LOADED,
+  Sessions.TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET,
+  Sessions.TIP_LENGTH_STEP_PREPARING_PIPETTE,
+  Sessions.TIP_LENGTH_STEP_INSPECTING_TIP,
+  Sessions.TIP_LENGTH_STEP_MEASURING_TIP_OFFSET,
+  Sessions.TIP_LENGTH_STEP_CALIBRATION_COMPLETE,
+]
+
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): JSX.Element | null {
-  const { session, robotName, showSpinner, dispatchRequests, isJogging } = props
-  const { currentStep, instrument, labware } = session?.details || {}
+  const { t } = useTranslation('robot_calibration')
+  const {
+    session,
+    robotName,
+    showSpinner,
+    dispatchRequests,
+    isJogging,
+    offsetInvalidationHandler,
+  } = props
+  const { currentStep, instrument, labware } = session?.details ?? {}
 
   const isMulti = React.useMemo(() => {
-    const spec = instrument && getPipetteModelSpecs(instrument.model)
-    return spec ? spec.channels > 1 : false
+    const spec =
+      instrument != null ? getPipetteModelSpecs(instrument.model) : null
+    return spec != null ? spec.channels > 1 : false
   }, [instrument])
 
   const tipRack: CalibrationLabware | null =
-    (labware && labware.find(l => l.isTiprack)) ?? null
-  const calBlock: CalibrationLabware | null = labware
-    ? labware.find(l => !l.isTiprack) ?? null
-    : null
+    labware != null ? labware.find(l => l.isTiprack) ?? null : null
+  const calBlock: CalibrationLabware | null =
+    labware != null ? labware.find(l => !l.isTiprack) ?? null : null
 
   function sendCommands(...commands: SessionCommandParams[]): void {
-    if (session?.id && !isJogging) {
+    if (session?.id != null && !isJogging) {
       const sessionCommandActions = commands.map(c =>
         Sessions.createSessionCommand(robotName, session.id, {
           command: c.command,
-          data: c.data || {},
+          data: c.data ?? {},
         })
       )
       dispatchRequests(...sessionCommandActions)
@@ -121,7 +96,7 @@ export function CalibrateTipLength(
   }
 
   function cleanUpAndExit(): void {
-    if (session?.id) {
+    if (session?.id != null) {
       dispatchRequests(
         Sessions.createSessionCommand(robotName, session.id, {
           command: Sessions.sharedCalCommands.EXIT,
@@ -140,44 +115,97 @@ export function CalibrateTipLength(
     cleanUpAndExit()
   }, true)
 
-  if (!session || !tipRack) {
+  if (session == null || tipRack == null) {
     return null
   }
 
-  const titleBarProps = {
-    title: TIP_LENGTH_CALIBRATION_SUBTITLE,
-    back: { onClick: confirmExit, title: EXIT, children: EXIT },
-  }
-
-  if (showSpinner) {
-    return <SpinnerModalPage titleBar={titleBarProps} />
-  }
-  // @ts-expect-error(sa, 2021-05-26): cannot index undefined, leaving to avoid src code change
-  const Panel = PANEL_BY_STEP[currentStep]
-
-  return Panel ? (
-    <>
-      <ModalPage
-        titleBar={titleBarProps}
-        // @ts-expect-error(sa, 2021-05-26): cannot index undefined, leaving to avoid src code change
-        innerProps={PANEL_STYLE_PROPS_BY_STEP[currentStep]}
+  const Panel =
+    currentStep != null && currentStep in PANEL_BY_STEP
+      ? PANEL_BY_STEP[currentStep]
+      : null
+  return (
+    <Portal level="top">
+      <LegacyModalShell
+        width="47rem"
+        header={
+          <WizardHeader
+            title={t('tip_length_calibration')}
+            currentStep={
+              STEPS_IN_ORDER.findIndex(step => step === currentStep) ?? 0
+            }
+            totalSteps={STEPS_IN_ORDER.length - 1}
+            onExit={confirmExit}
+          />
+        }
       >
-        <Panel
-          sendCommands={sendCommands}
-          cleanUpAndExit={cleanUpAndExit}
-          isMulti={isMulti}
-          mount={instrument?.mount.toLowerCase() as Mount}
-          tipRack={tipRack}
-          calBlock={calBlock}
-          currentStep={currentStep}
-          sessionType={session.sessionType}
-          intent={INTENT_TIP_LENGTH_IN_PROTOCOL}
-        />
-      </ModalPage>
-      {showConfirmExit && (
-        // @ts-expect-error TODO: ConfirmExitModal expects sessionType
-        <ConfirmExitModal exit={confirmExit} back={cancelExit} />
-      )}
-    </>
-  ) : null
+        {showSpinner || currentStep == null || Panel == null ? (
+          <LoadingState />
+        ) : showConfirmExit ? (
+          <ConfirmExit
+            exit={confirmExit}
+            back={cancelExit}
+            heading={t('progress_will_be_lost', {
+              sessionType: t('tip_length_calibration'),
+            })}
+            body={t('confirm_exit_before_completion', {
+              sessionType: t('tip_length_calibration'),
+            })}
+          />
+        ) : (
+          <Panel
+            sendCommands={sendCommands}
+            cleanUpAndExit={cleanUpAndExit}
+            isMulti={isMulti}
+            mount={instrument?.mount.toLowerCase() as Mount}
+            tipRack={tipRack}
+            calBlock={calBlock}
+            currentStep={currentStep}
+            sessionType={session.sessionType}
+            calInvalidationHandler={offsetInvalidationHandler}
+          />
+        )}
+      </LegacyModalShell>
+    </Portal>
+  )
+}
+
+const blockRemovalAssetBySlot: {
+  [slot in CalibrationLabware['slot']]: string
+} = {
+  '1': slotOneRemoveBlockAsset,
+  '3': slotThreeRemoveBlockAsset,
+}
+
+function TipLengthCalibrationComplete(
+  props: CalibrationPanelProps
+): JSX.Element {
+  const { t } = useTranslation('robot_calibration')
+  const { calBlock, cleanUpAndExit } = props
+
+  const visualAid =
+    calBlock != null ? (
+      <video
+        key={blockRemovalAssetBySlot[calBlock.slot]}
+        css={css`
+          max-width: 100%;
+          max-height: 15rem;
+        `}
+        autoPlay={true}
+        loop={true}
+        controls={false}
+      >
+        <source src={blockRemovalAssetBySlot[calBlock.slot]} />
+      </video>
+    ) : null
+
+  return (
+    <CompleteConfirmation
+      {...{
+        proceed: cleanUpAndExit,
+        flowName: t('tip_length_calibration'),
+        body: t('you_can_remove_cal_block'),
+        visualAid,
+      }}
+    />
+  )
 }

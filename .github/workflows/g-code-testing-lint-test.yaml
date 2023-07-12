@@ -8,7 +8,10 @@ on:
   push:
     paths:
       - 'Makefile'
+      - 'api/**'
       - 'g-code-testing/**'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
       - '.github/workflows/g-code-testing-lint-test.yaml'
       - '.github/actions/python/**'
     branches:
@@ -19,7 +22,16 @@ on:
     paths:
       - 'Makefile'
       - 'g-code-testing/**'
+      - 'api/**'
+      - 'scripts/**/*.mk'
+      - 'scripts/**/*.py'
+      - '.github/workflows/g-code-testing-lint-test.yaml'
+      - '.github/actions/python/**'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-${{ github.ref_name != 'edge' || github.run_id}}-${{ github.ref_type != 'tag' || github.run_id }}
+  cancel-in-progress: true
 
 defaults:
   run:
@@ -28,25 +40,47 @@ defaults:
 jobs:
   lint-test:
     name: 'g-code-testing package linting and tests'
-    runs-on: 'ubuntu-18.04'
+    runs-on: 'ubuntu-22.04'
     steps:
-      - uses: 'actions/checkout@v2'
-      - uses: 'actions/setup-node@v1'
+      - uses: 'actions/checkout@v3'
         with:
-          node-version: '12'
-      - uses: 'actions/setup-python@v2'
+          fetch-depth: 0
+      - name: 'install udev'
+        run: sudo apt-get update && sudo apt-get install libudev-dev
+      - uses: 'actions/setup-node@v3'
+        with:
+          node-version: '16'
+      - name: 'set complex environment variables'
+        id: 'set-vars'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
+            buildComplexEnvVars(core, context)
+      - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.7'
-
       - uses: './.github/actions/python/setup'
         with:
           project: 'g-code-testing'
+      - name: 'cache yarn cache'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ${{ github.workspace }}/.npm-cache/_prebuild
+            ${{ github.workspace }}/.yarn-cache
+          key: js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+      - name: 'setup-js'
+        run: |
+          npm config set cache ${{ github.workspace }}/.npm-cache
+          yarn config set cache-folder ${{ github.workspace }}/.yarn-cache
+          make setup-js
       - name: Lint
         run: make -C g-code-testing lint
       - name: Test
         run: make -C g-code-testing test
       - name: 'Upload coverage report'
-        uses: 'codecov/codecov-action@v2'
+        uses: 'codecov/codecov-action@v3'
         with:
           files: ./g-code-testing/coverage.xml
           flags: g-code-testing
