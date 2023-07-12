@@ -683,6 +683,10 @@ async def _determine_transform_matrix(
         (point_b.x, point_b.y, point_b.z),
         (point_c.x, point_c.y, point_c.z),
     )
+    print('Belt calibration intermediates: \n'
+          f'\tpoint a (slot 1): nominal={nominal_point_a} measured={point_a}, \n'
+          f'\tpoint b (slot 10): nominal={nominal_point_b} measured={point_b}, \n'
+          f'\tpoint c (slot 3): nominal={nominal_point_c} measured={point_c}')
     return solve_attitude(expected, actual)
 
 
