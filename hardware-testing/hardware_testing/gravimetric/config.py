@@ -27,6 +27,7 @@ class GravimetricConfig:
     gantry_speed: int
     scale_delay: int
     isolate_channels: List[int]
+    air_sensor: bool
 
 
 @dataclass

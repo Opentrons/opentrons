@@ -41,6 +41,13 @@ from .measurement.record import (
 )
 from .tips import get_tips, MULTI_CHANNEL_TEST_ORDER
 
+import time
+from drivers import list_ports_and_select, AsairSensor
+import threading
+
+_STOP_AIR_SENSOR_THREAD = False
+_INTERVEL_TIME_READ_AIR_SENSOR = 3
+
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -491,6 +498,62 @@ def _get_channel_divider(cfg: config.GravimetricConfig) -> float:
     else:
         return float(cfg.pipette_channels)
 
+def _creat_airsensor_csv(ctx, test_volumes, cfg, run_id, pipette_tag, start_time):
+    """
+    creat csv for air sensor
+    """
+    if "P50" in pipette_tag:
+        csv_path = '/data/testing_data/gravimetric-ot3-p50/'
+    elif "P1000" in pipette_tag:
+        csv_path = '/data/testing_data/gravimetric-ot3-p1000/'
+    else:
+        csv_path = '/data/testing_data/'
+    csv_name = "AirSensor"
+    csv_name + "-" + time.strftime("%Y%m%d%H%M%S") + '.csv'
+    csv_name = csv_path + csv_name
+    csv_head = "Time, Temperature, Humidity"
+    _write_airsensor_csv_row("META_DATA_START")
+    _write_airsensor_csv_row(f"test_name, {cfg.name}")
+    _write_airsensor_csv_row(f"test_tag, {pipette_tag}")
+    _write_airsensor_csv_row(f"test_run_id, {run_id}")
+    _write_airsensor_csv_row(f"test_time_utc, {start_time}")
+    _write_airsensor_csv_row(f"test_operator, {_get_operator_name(ctx.is_simulating())}")
+    _write_airsensor_csv_row(f"test_version, {get_git_description()}")
+    _write_airsensor_csv_row(f"test_volume, {test_volumes}")
+    _write_airsensor_csv_row(f"META_DATA_END")
+    _write_airsensor_csv_row()
+    _write_airsensor_csv_row(csv_head)
+    return csv_name
+
+def _write_airsensor_csv_row(csv_path: str, row: str):
+    """
+    write row
+    """
+    import csv
+    with open(csv_path, 'a+', encoding='utf8', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(row)
+
+def _write_airsensor_task(csv_path, port):
+    """
+    airsensor task
+    """
+    while True:
+        current_time = time.strftime("%Y%m%d%H%M%S")
+        con = AsairSensor.connect(port)
+        ret = con.get_reading()
+        _write_airsensor_csv_row(csv_path, f"{current_time}, {ret.relative_humidity}, {ret.temperature}")
+        if _STOP_AIR_SENSOR_THREAD:
+            print("AIR SENSOR RECORD IS STOPED...")
+            break
+        time.sleep(_TNTERVEL_TIME_READ_AIR_SENSOR)
+
+def airsensor_thread_start(csv_path, port):
+    """
+    create airsensor thread start
+    """
+    t = threading.Thread(target=_write_airsensor_task, args=(csv_path, port))
+
 
 def _get_tag_from_pipette(
     pipette: InstrumentContext, cfg: config.GravimetricConfig
@@ -648,6 +711,15 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         environment="None",
         liquid="None",
     )
+
+    # creat airsensor csv
+    if cfg.air_sensor:
+        test_vol = parameters.test_volumes
+        ui.print_header("CREATE TEMPERATURE-HUMIDITY REPORT")
+        csv_name = _creat_airsensor_csv(ctx, test_vol, cfg, run_id, pipette_tag, start_time)
+        _port = list_ports_and_select("asair_sensor")
+        # start thread
+        airsensor_thread_start(csv_name, _port)
 
     # need to be as far away from the scale as possible
     # to avoid static from distorting the measurement
@@ -953,6 +1025,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         ui.print_title("CHANGE PIPETTES")
         _return_tip = False if calibration_tip_in_use else cfg.return_tip
         _change_pipettes(ctx, pipette, _return_tip)
+    _STOP_AIR_SENSOR_THREAD = True
     ui.print_title("RESULTS")
     _print_final_results(
         volumes=parameters.test_volumes,

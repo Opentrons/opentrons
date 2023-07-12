@@ -104,6 +104,7 @@ def run_gravimetric(
     gantry_speed: int,
     scale_delay: int,
     isolate_channels: List[int],
+    air_sensor: bool
 ) -> None:
     """Run."""
     if increment:
@@ -134,6 +135,7 @@ def run_gravimetric(
             gantry_speed=gantry_speed,
             scale_delay=scale_delay,
             isolate_channels=isolate_channels,
+            air_sensor=air_sensor
         ),
     )
 
@@ -198,6 +200,7 @@ if __name__ == "__main__":
     parser.add_argument("--touch-tip", action="store_true")
     parser.add_argument("--refill", action="store_true")
     parser.add_argument("--isolate-channels", nargs="+", type=int, default=None)
+    parser.add_argument("--air-sensor", action="store_true")
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context
@@ -265,4 +268,5 @@ if __name__ == "__main__":
             args.gantry_speed,
             args.scale_delay,
             args.isolate_channels if args.isolate_channels else [],
+            args.air_sensor
         )
