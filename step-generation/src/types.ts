@@ -455,8 +455,7 @@ export interface InvariantContext {
   config: Config
 }
 
-// TODO Ian 2018-02-09 Rename this so it's less ambigious with what we call "robot state": `TimelineFrame`?
-export interface RobotState {
+export interface TimelineFrame {
   pipettes: {
     [pipetteId: string]: PipetteTemporalProperties
   }
@@ -492,6 +491,7 @@ export interface RobotState {
     }
   }
 }
+export type RobotState = TimelineFrame // legacy name alias
 
 export type ErrorType =
   | 'INSUFFICIENT_TIPS'

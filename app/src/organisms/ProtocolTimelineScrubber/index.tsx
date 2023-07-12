@@ -26,6 +26,8 @@ import { getResultingTimelineFrameFromRunCommands } from '@opentrons/step-genera
 import {
   inferModuleOrientationFromXCoordinate,
   getModuleDef2,
+  getDeckDefFromRobotType,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
 import type { RunTimeCommand } from '@opentrons/shared-data'
@@ -36,6 +38,7 @@ import type {
   TimelineFrame,
 } from '@opentrons/step-generation'
 import { StyledText } from '../../atoms/text'
+import ViewportList, { ViewportListRef } from 'react-viewport-list'
 
 const COMMAND_WIDTH_PX = 160
 
@@ -60,10 +63,10 @@ export const VIEWBOX_HEIGHT = 460
 export function ProtocolTimelineScrubber(
   props: ProtocolTimelineScrubberProps
 ): JSX.Element {
-  const deckDef = React.useMemo(() => getDeckDefinitions().ot2_standard, [])
+  const deckDef = React.useMemo(() => getDeckDefFromRobotType(FLEX_ROBOT_TYPE), [])
   const { commands } = props
   const wrapperRef = React.useRef<HTMLDivElement>(null)
-  const commandListRef = React.useRef<HTMLDivElement>(null)
+  const commandListRef = React.useRef<ViewportListRef>(null)
   const [currentCommandIndex, setCurrentCommandIndex] = React.useState<number>(
     0
   )
@@ -101,7 +104,9 @@ export function ProtocolTimelineScrubber(
             {({ deckSlotsById }) => (
               <>
                 {map(robotState.modules, (module, moduleId) => {
+                  console.log(robotState.modules)
                   const slot = deckSlotsById[module.slot]
+                  console.log(slot)
                   const labwareInModuleId =
                     Object.entries(robotState.labware).find(
                       ([labwareId, labware]) => labware.slot === moduleId
@@ -156,13 +161,13 @@ export function ProtocolTimelineScrubber(
 
                   const missingTips = definition.parameters.isTiprack
                     ? reduce(
-                        robotState.tipState.tipracks[labwareId],
-                        (acc, hasTip, wellName) => {
-                          if (!hasTip) return { ...acc, [wellName]: null }
-                          return acc
-                        },
-                        {}
-                      )
+                      robotState.tipState.tipracks[labwareId],
+                      (acc, hasTip, wellName) => {
+                        if (!hasTip) return { ...acc, [wellName]: null }
+                        return acc
+                      },
+                      {}
+                    )
                     : {}
 
                   const wellFill = reduce(
@@ -210,25 +215,20 @@ export function ProtocolTimelineScrubber(
           invariantContext={invariantContext}
         />
       </Flex>
-      <FixedSizeList
+      <ViewportList
+        viewportRef={wrapperRef}
         ref={commandListRef}
-        height={160}
-        itemCount={commands.length}
-        itemSize={COMMAND_WIDTH_PX}
-        layout="horizontal"
-        width={1000}
+        items={commands}
       >
-        {({ index, style }) => (
-          <div style={style}>
-            <CommandItem
-              index={index}
-              command={commands[index]}
-              currentCommandIndex={currentCommandIndex}
-              setCurrentCommandIndex={setCurrentCommandIndex}
-            />
-          </div>
+        {(command, index) => (
+          <CommandItem
+            index={index}
+            command={command}
+            currentCommandIndex={currentCommandIndex}
+            setCurrentCommandIndex={setCurrentCommandIndex}
+          />
         )}
-      </FixedSizeList>
+      </ViewportList>
       <StyledText as="label" marginY={SPACING.spacing2}>
         Jump to command
       </StyledText>
@@ -240,8 +240,8 @@ export function ProtocolTimelineScrubber(
         onChange={e => {
           const nextIndex = Number(e.target.value) - 1
           setCurrentCommandIndex(nextIndex)
-          const progressOffset = window.innerWidth / 2
-          commandListRef.current?.scrollToItem(nextIndex, 'center')
+          // const progressOffset = window.innerWidth / 2
+          // commandListRef.current?.scrollToItem(nextIndex, 'center')
         }}
       />
       <Flex alignSelf={ALIGN_STRETCH} justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -253,7 +253,7 @@ export function ProtocolTimelineScrubber(
         </Text>
       </Flex>
       {currentCommandIndex !== 0 &&
-      currentCommandIndex !== commands.length - 1 ? (
+        currentCommandIndex !== commands.length - 1 ? (
         <Text
           as="p"
           fontSize="0.5rem"
@@ -288,9 +288,9 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
   const maxVolume = (Object.entries(
     invariantContext.pipetteEntities[pipetteId]?.tiprackLabwareDef?.wells ?? {}
   ).find(([_wellName, { totalLiquidVolume }]) => totalLiquidVolume != null) ?? [
-    null,
-    { totalLiquidVolume: 0 },
-  ])[1].totalLiquidVolume
+      null,
+      { totalLiquidVolume: 0 },
+    ])[1].totalLiquidVolume
 
 
   return (
@@ -368,9 +368,8 @@ function PipetteSideView({
               />
             ) : (
               <path
-                d={`M${x + 2},130 L${x + 4},140 H${x + 6} L${x + 8},130 H${
-                  x + 2
-                }z`}
+                d={`M${x + 2},130 L${x + 4},140 H${x + 6} L${x + 8},130 H${x + 2
+                  }z`}
                 stroke="#000"
                 fill="#000"
               />
@@ -423,16 +422,14 @@ function TipSideView({
         )
       })}
       <path
-        d={`M${x},130 V150 L${x + 2},170 L${x + 4},180 H${x + 6} L${
-          x + 8
-        },170 L${x + 10},150 V130 H${x}z`}
+        d={`M${x},130 V150 L${x + 2},170 L${x + 4},180 H${x + 6} L${x + 8
+          },170 L${x + 10},150 V130 H${x}z`}
         stroke="#000"
         fill="none"
       />
       <path
-        d={`M${x - 1},129 V150 L${x + 2},170 L${x + 4},180 H${x + 6} L${
-          x + 8
-        },170 L${x + 10},150 V130 H${x + 11} V181 H${x - 1} V129z`}
+        d={`M${x - 1},129 V150 L${x + 2},170 L${x + 4},180 H${x + 6} L${x + 8
+          },170 L${x + 10},150 V130 H${x + 11} V181 H${x - 1} V129z`}
         fill="#FFF"
         stroke="none"
       />
@@ -455,8 +452,8 @@ function CommandItem(props: CommandItemProps): JSX.Element {
         index === currentCommandIndex
           ? COLORS.blueFocus
           : index < currentCommandIndex
-          ? '#00002222'
-          : '#fff'
+            ? '#00002222'
+            : '#fff'
       }
       border={
         index === currentCommandIndex
