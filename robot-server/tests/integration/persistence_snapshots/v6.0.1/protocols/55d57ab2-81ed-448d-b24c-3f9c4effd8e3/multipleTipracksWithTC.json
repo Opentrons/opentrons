@@ -1822,7 +1822,7 @@
       "brand": {
         "brand": "NEST",
         "brandId": ["360102"],
-        "links": ["https://www.nest-biotech.com/reagent-reserviors/59178414.html"]
+        "links": ["http://www.cell-nest.com/page94?_l=en&product_id=102"]
       },
       "metadata": {
         "displayName": "NEST 12 Well Reservoir 15 mL",
@@ -2007,7 +2007,7 @@
         "brand": "NEST",
         "brandId": ["402501"],
         "links": [
-          "https://www.nest-biotech.com/pcr-plates/58773587.html"
+          "http://www.cell-nest.com/page94?_l=en&product_id=97&product_category=96"
         ]
       },
       "metadata": {
@@ -4159,7 +4159,7 @@
           "brand": {
             "brand": "NEST",
             "brandId": ["360102"],
-            "links": ["https://www.nest-biotech.com/reagent-reserviors/59178414.html"]
+            "links": ["http://www.cell-nest.com/page94?_l=en&product_id=102"]
           },
           "metadata": {
             "displayName": "NEST 12 Well Reservoir 15 mL",
@@ -5385,7 +5385,7 @@
             "brand": "NEST",
             "brandId": ["402501"],
             "links": [
-              "https://www.nest-biotech.com/pcr-plates/58773587.html"
+              "http://www.cell-nest.com/page94?_l=en&product_id=97&product_category=96"
             ]
           },
           "metadata": {
