@@ -302,3 +302,10 @@ class OT3UpdateActions(UpdateActionsInterface):
         )
         if not success:
             raise RuntimeError(msg)
+
+    def clean_up(self, download_dir: str) -> None:
+        """Deletes the update contents in the download dir."""
+        LOG.info(f"Cleaning up download dir {download_dir}.")
+        for file in os.listdir(download_dir):
+            LOG.debug(f"Deleting {file}")
+            os.remove(file)
