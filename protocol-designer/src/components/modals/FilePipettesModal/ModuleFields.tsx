@@ -1,10 +1,10 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   DeprecatedCheckboxField,
   DropdownField,
   FormGroup,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import {
   DEFAULT_MODEL_FOR_MODULE_TYPE,
   MODELS_FOR_MODULE_TYPE,
@@ -73,7 +73,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
     errors,
     touched,
   } = props
-
+  const { t } = useTranslation('modules')
   // TODO(BC, 2023-05-11): REMOVE THIS MAG BLOCK FILTER BEFORE LAUNCH TO INCLUDE IT AMONG MODULE OPTIONS
   // @ts-expect-error(sa, 2021-6-21): Object.keys not smart enough to take the keys of FormModulesByType
   const modules: ModuleType[] = Object.keys(values).filter(
@@ -97,7 +97,7 @@ export function ModuleFields(props: ModuleFieldsProps): JSX.Element {
     <div className={styles.modules_row}>
       {modules.map((moduleType, i) => {
         const moduleTypeAccessor = `modulesByType.${moduleType}`
-        const label = i18n.t(`modules.module_display_names.${moduleType}`)
+        const label = t(`module_display_names.${moduleType}`)
         const defaultModel = DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType]
         const selectedModel = values[moduleType].model
         return (

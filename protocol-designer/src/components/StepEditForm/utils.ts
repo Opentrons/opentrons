@@ -1,11 +1,11 @@
 import difference from 'lodash/difference'
 import isEqual from 'lodash/isEqual'
 import without from 'lodash/without'
+import { useTranslation } from 'react-i18next'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
 } from '@opentrons/step-generation'
-import { i18n } from '../../localization'
 import {
   PROFILE_CYCLE,
   FormData,
@@ -19,6 +19,7 @@ import { Options } from '@opentrons/components'
 import { ProfileFormError } from '../../steplist/formLevel/profileErrors'
 import { FormWarning } from '../../steplist/formLevel/warnings'
 import { StepFormErrors } from '../../steplist/types'
+
 export function getBlowoutLocationOptionsForForm(args: {
   stepType: StepType
   path?: PathOption | null | undefined
@@ -167,19 +168,26 @@ export const getVisibleProfileFormLevelErrors = (args: {
     })
   })
 }
-export const getFieldDefaultTooltip = (name: string): string =>
-  i18n.t([`tooltip.step_fields.defaults.${name}`, ''])
-export const getFieldIndeterminateTooltip = (name: string): string =>
-  i18n.t([`tooltip.step_fields.indeterminate.${name}`, ''])
+export const getFieldDefaultTooltip = (name: string): string => {
+  const { t } = useTranslation('tooltip')
+  return t([`step_fields.defaults.${name}`, ''])
+}
+export const getFieldIndeterminateTooltip = (name: string): string => {
+  const { t } = useTranslation('tooltip')
+  return t([`step_fields.indeterminate.${name}`, ''])
+}
 export const getSingleSelectDisabledTooltip = (
   name: string,
   stepType: string
-): string =>
-  i18n.t([
-    `tooltip.step_fields.${stepType}.disabled.${name}`,
-    `tooltip.step_fields.${stepType}.disabled.$generic`,
+): string => {
+  const { t } = useTranslation('tooltip')
+
+  return t([
+    `step_fields.${stepType}.disabled.${name}`,
+    `step_fields.${stepType}.disabled.$generic`,
     '',
   ])
+}
 // TODO(IL, 2021-03-03): keys for fieldMap are more strictly of TipOffsetFields type,
 // but since utils like addFieldNamePrefix return StepFieldName/string instead
 // of strict TipOffsetFields, we have to be more lenient with the types

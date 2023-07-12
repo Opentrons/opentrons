@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { i18n } from '../../../localization'
+import { useTranslation } from 'react-i18next'
 import { TextField } from './TextField'
 import { CheckboxRowField } from './CheckboxRowField'
 import { TipPositionField } from './TipPositionField'
@@ -23,17 +23,17 @@ export const DelayFields = (props: DelayFieldProps): JSX.Element => {
     propsForFields,
     labwareId,
   } = props
-
+  const { t } = useTranslation(['form', 'application'])
   return (
     <CheckboxRowField
       {...propsForFields[checkboxFieldName]}
-      label={i18n.t('form.step_edit_form.field.delay.label')}
+      label={t('step_edit_form.field.delay.label')}
       className={styles.small_field}
     >
       <TextField
         {...propsForFields[secondsFieldName]}
         className={styles.small_field}
-        units={i18n.t('application.units.seconds')}
+        units={t('application:units.seconds')}
       />
       {tipPositionFieldName && (
         <TipPositionField

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   FormGroup,
   DeprecatedCheckboxField,
@@ -8,7 +9,6 @@ import {
 import { connect } from 'react-redux'
 import cx from 'classnames'
 
-import { i18n } from '../../../localization'
 import { getMaxDisposalVolumeForMultidispense } from '../../../steplist/formLevel/handleFormChange/utils'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
@@ -55,11 +55,11 @@ type Props = SP & OP
 
 const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
   const { propsForFields } = props
-
+  const { t } = useTranslation(['form', 'application'])
   const { maxDisposalVolume } = props
   const volumeBoundsCaption =
     maxDisposalVolume != null
-      ? `max ${maxDisposalVolume} ${i18n.t('application.units.microliter')}`
+      ? `max ${maxDisposalVolume} ${t('application:units.microliter')}`
       : null
 
   const volumeField = (
@@ -68,7 +68,7 @@ const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
         {...propsForFields.disposalVolume_volume}
         caption={volumeBoundsCaption}
         className={cx(styles.small_field, styles.orphan_field)}
-        units={i18n.t('application.units.microliter')}
+        units={t('application:units.microliter')}
       />
     </div>
   )
@@ -76,7 +76,7 @@ const DisposalVolumeFieldComponent = (props: Props): JSX.Element => {
   const { value, updateValue } = propsForFields.disposalVolume_checkbox
 
   return (
-    <FormGroup label={i18n.t('form.step_edit_form.multiDispenseOptionsLabel')}>
+    <FormGroup label={t('step_edit_form.multiDispenseOptionsLabel')}>
       <>
         <div
           // @ts-expect-error(sa, 2021-6-22): I think volumeBoundsCaption needs to be casted to a boolean to be fed into a class name

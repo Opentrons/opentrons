@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import { FormGroup, InputField } from '@opentrons/components'
-import { i18n } from '../../../../localization'
 import { WellSelectionModal } from './WellSelectionModal'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import {
@@ -63,10 +63,11 @@ export class WellSelectionInputComponent extends React.Component<Props> {
   }
 
   render(): JSX.Element {
+    const { t } = useTranslation('form')
     const modalKey = this.getModalKey()
     const label = this.props.isMulti
-      ? i18n.t('form.step_edit_form.wellSelectionLabel.columns')
-      : i18n.t('form.step_edit_form.wellSelectionLabel.wells')
+      ? t('form:step_edit_form.wellSelectionLabel.columns')
+      : t('form:step_edit_form.wellSelectionLabel.wells')
     return (
       <FormGroup
         label={label}

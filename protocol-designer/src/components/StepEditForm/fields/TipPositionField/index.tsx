@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import {
   FormGroup,
@@ -12,15 +13,15 @@ import {
   getIsTouchTipField,
   getIsDelayPositionField,
 } from '../../../../form-types'
-import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import stepFormStyles from '../../StepEditForm.css'
 import styles from './TipPositionInput.css'
 import { TipPositionModal } from './TipPositionModal'
 
 import { getDefaultMmFromBottom } from './utils'
-import { BaseState } from '../../../../types'
-import { FieldProps } from '../../types'
+import type { BaseState } from '../../../../types'
+import type { FieldProps } from '../../types'
+import type { TFunction } from 'i18next'
 
 interface OP extends FieldProps {
   labwareId?: string | null
@@ -55,7 +56,7 @@ function TipPositionInput(props: Props): JSX.Element {
     updateValue,
     isIndeterminate,
   } = props
-
+  const { t } = useTranslation(['application', 'form'])
   const isTouchTipField = getIsTouchTipField(name)
   const isDelayPositionField = getIsDelayPositionField(name)
   let value: number | string = ''
@@ -87,6 +88,7 @@ function TipPositionInput(props: Props): JSX.Element {
         disabled={disabled}
         isTouchTipField={isTouchTipField}
         isDelayPositionField={isDelayPositionField}
+        t={t}
       >
         <InputField
           disabled={disabled}
@@ -95,7 +97,7 @@ function TipPositionInput(props: Props): JSX.Element {
           onClick={handleOpen}
           value={String(value)}
           isIndeterminate={isIndeterminate}
-          units={i18n.t('application.units.millimeter')}
+          units={t('units.millimeter')}
           id={`TipPositionField_${name}`}
         />
       </Wrapper>
@@ -109,6 +111,7 @@ interface WrapperProps {
   children: React.ReactNode
   disabled: boolean
   targetProps: UseHoverTooltipTargetProps
+  t: TFunction<[string, string], undefined>
 }
 
 const Wrapper = (props: WrapperProps): JSX.Element =>
@@ -117,7 +120,7 @@ const Wrapper = (props: WrapperProps): JSX.Element =>
   ) : (
     <span {...props.targetProps}>
       <FormGroup
-        label={i18n.t('form.step_edit_form.field.tip_position.label')}
+        label={props.t('form:step_edit_form.field.tip_position.label')}
         disabled={props.disabled}
         className={styles.well_order_input}
       >

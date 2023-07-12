@@ -1,7 +1,7 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import { FormGroup, DropdownField, Options } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { BaseState } from '../../../types'
 import styles from '../StepEditForm.css'
@@ -21,10 +21,11 @@ const PipetteFieldSTP = (state: BaseState, ownProps: OP): SP => ({
 
 export const PipetteField = connect(PipetteFieldSTP)((props: Props) => {
   const { onFieldBlur, onFieldFocus, updateValue, value } = props
+  const { t } = useTranslation('form')
 
   return (
     <FormGroup
-      label={i18n.t('form.step_edit_form.field.pipette.label')}
+      label={t('step_edit_form.field.pipette.label')}
       className={styles.large_field}
     >
       <DropdownField

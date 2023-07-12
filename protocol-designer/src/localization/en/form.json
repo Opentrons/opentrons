@@ -27,6 +27,7 @@
     "volume_exceeded": "Warning: exceeded max volume per well: {{volume}}µL"
   },
   "step_edit_form": {
+    "compatible_labware": "Please ensure a compatible module is present on the deck and selected to create a temperature step.",
     "section": {
       "sterility": "sterility",
       "sterility&motion": "sterility & motion"

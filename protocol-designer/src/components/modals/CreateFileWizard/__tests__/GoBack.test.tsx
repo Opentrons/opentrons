@@ -1,6 +1,6 @@
 import * as React from 'react'
-import i18n from 'i18next'
-import { renderWithProviders } from '@opentrons/components'
+import { i18n } from '../../../../localization'
+import { renderWithProviders } from '../../../../localization/renderWithProvider'
 import { GoBack } from '../GoBack'
 
 const render = (props: React.ComponentProps<typeof GoBack>) => {
@@ -11,16 +11,14 @@ const render = (props: React.ComponentProps<typeof GoBack>) => {
 
 describe('GoBack', () => {
   let props: React.ComponentProps<typeof GoBack>
-
   beforeEach(() => {
     props = {
       onClick: jest.fn(),
     }
   })
-
   it('the go back renders and clicking on it calls prop', () => {
-    const { getByLabelText } = render(props)
-
+    const { getByLabelText, getByText } = render(props)
+    getByText('Go back')
     getByLabelText('GoBack_button').click()
     expect(props.onClick).toHaveBeenCalled()
   })

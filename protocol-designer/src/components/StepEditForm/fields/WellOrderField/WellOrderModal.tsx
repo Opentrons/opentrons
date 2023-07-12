@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
-import { i18n } from '../../../../localization'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import {
   Modal,
@@ -15,6 +15,7 @@ import { WellOrderOption } from '../../../../form-types'
 import { WellOrderViz } from './WellOrderViz'
 import styles from './WellOrderInput.css'
 import stepEditStyles from '../../StepEditForm.css'
+import type { TFunction } from 'i18next'
 
 const DEFAULT_FIRST: WellOrderOption = 't2b'
 const DEFAULT_SECOND: WellOrderOption = 'l2r'
@@ -44,27 +45,36 @@ interface State {
   secondValue: WellOrderOption
 }
 
-export const ResetButton = (props: { onClick: () => void }): JSX.Element => (
+export const ResetButton = (props: {
+  onClick: () => void
+  t: TFunction<[string, string, string], undefined>
+}): JSX.Element => (
   <OutlineButton className={modalStyles.button_medium} onClick={props.onClick}>
-    {i18n.t('button.reset')}
+    {props.t('reset')}
   </OutlineButton>
 )
 
-export const CancelButton = (props: { onClick: () => void }): JSX.Element => (
+export const CancelButton = (props: {
+  onClick: () => void
+  t: TFunction<[string, string, string], undefined>
+}): JSX.Element => (
   <DeprecatedPrimaryButton
     className={cx(modalStyles.button_medium, modalStyles.button_right_of_break)}
     onClick={props.onClick}
   >
-    {i18n.t('button.cancel')}
+    {props.t('button:cancel')}
   </DeprecatedPrimaryButton>
 )
 
-export const DoneButton = (props: { onClick: () => void }): JSX.Element => (
+export const DoneButton = (props: {
+  onClick: () => void
+  t: TFunction<[string, string, string], undefined>
+}): JSX.Element => (
   <DeprecatedPrimaryButton
     className={modalStyles.button_medium}
     onClick={props.onClick}
   >
-    {i18n.t('button.done')}
+    {props.t('button:done')}
   </DeprecatedPrimaryButton>
 )
 
@@ -167,6 +177,8 @@ export class WellOrderModal extends React.Component<
   }
 
   render(): React.ReactNode | null {
+    const { t } = useTranslation(['button', 'modal', 'form'])
+
     if (!this.props.isOpen) return null
 
     const { firstValue, secondValue } = this.state
@@ -180,11 +192,11 @@ export class WellOrderModal extends React.Component<
           onCloseClick={this.handleCancel}
         >
           <div className={styles.modal_header}>
-            <h4>{i18n.t('modal.well_order.title')}</h4>
-            <p>{i18n.t('modal.well_order.body')}</p>
+            <h4>{t('modal:well_order.title')}</h4>
+            <p>{t('modal:well_order.body')}</p>
           </div>
           <div className={styles.main_row}>
-            <FormGroup label={i18n.t('modal.well_order.field_label')}>
+            <FormGroup label={t('modal:well_order.field_label')}>
               <div className={styles.field_row}>
                 <DropdownField
                   name={firstName}
@@ -196,13 +208,13 @@ export class WellOrderModal extends React.Component<
                   onChange={this.makeOnChange('first')}
                   options={WELL_ORDER_VALUES.map(value => ({
                     value,
-                    name: i18n.t(
-                      `form.step_edit_form.field.well_order.option.${value}`
+                    name: t(
+                      `form:step_edit_form.field.well_order.option.${value}`
                     ),
                   }))}
                 />
                 <span className={styles.field_spacer}>
-                  {i18n.t('modal.well_order.then')}
+                  {t('modal:well_order.then')}
                 </span>
                 <DropdownField
                   name={secondName}
@@ -214,23 +226,23 @@ export class WellOrderModal extends React.Component<
                   onChange={this.makeOnChange('second')}
                   options={WELL_ORDER_VALUES.map(value => ({
                     value,
-                    name: i18n.t(
-                      `form.step_edit_form.field.well_order.option.${value}`
+                    name: t(
+                      `form:step_edit_form.field.well_order.option.${value}`
                     ),
                     disabled: this.isSecondOptionDisabled(value),
                   }))}
                 />
               </div>
             </FormGroup>
-            <FormGroup label={i18n.t('modal.well_order.viz_label')}>
+            <FormGroup label={t('modal:well_order.viz_label')}>
               <WellOrderViz firstValue={firstValue} secondValue={secondValue} />
             </FormGroup>
           </div>
           <div className={modalStyles.button_row_divided}>
-            <ResetButton onClick={this.handleReset} />
+            <ResetButton onClick={this.handleReset} t={t} />
             <div>
-              <CancelButton onClick={this.handleCancel} />
-              <DoneButton onClick={this.handleDone} />
+              <CancelButton onClick={this.handleCancel} t={t} />
+              <DoneButton onClick={this.handleDone} t={t} />
             </div>
           </div>
         </Modal>

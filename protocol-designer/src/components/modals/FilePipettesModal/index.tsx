@@ -39,7 +39,6 @@ import {
   FLEX_ROBOT_TYPE,
   RobotType,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
 import { ModuleFields } from './ModuleFields'
@@ -50,6 +49,7 @@ import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
 import { DeckSlot } from '../../../types'
 import { NewProtocolFields } from '../../../load-file'
+import { useTranslation } from 'react-i18next'
 
 export type PipetteFieldsData = Omit<
   PipetteOnDeck,
@@ -289,6 +289,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
   }
 
   render(): React.ReactNode | null {
+    const { t } = useTranslation(['modal', 'form', 'button'])
     if (this.props.hideModal) return null
     const {
       showProtocolFields,
@@ -368,7 +369,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                         <div className={styles.protocol_file_group}>
                           <Flex gridGap={SPACING.spacing16}>
                             <h2 className={styles.new_file_modal_title}>
-                              {i18n.t('modal.new_protocol.title.PROTOCOL_FILE')}
+                              {t('new_protocol.title.PROTOCOL_FILE')}
                             </h2>
                             <Flex
                               flexDirection={DIRECTION_COLUMN}
@@ -390,8 +391,8 @@ export class FilePipettesModal extends React.Component<Props, State> {
                             <InputField
                               autoFocus
                               tabIndex={1}
-                              placeholder={i18n.t(
-                                'form.generic.default_protocol_name'
+                              placeholder={t(
+                                'form:generic.default_protocol_name'
                               )}
                               name="fields.name"
                               value={values.fields.name}
@@ -404,8 +405,8 @@ export class FilePipettesModal extends React.Component<Props, State> {
 
                       <h2 className={styles.new_file_modal_title}>
                         {showProtocolFields
-                          ? i18n.t('modal.new_protocol.title.PROTOCOL_PIPETTES')
-                          : i18n.t('modal.edit_pipettes.title')}
+                          ? t('new_protocol.title.PROTOCOL_PIPETTES')
+                          : t('edit_pipettes.title')}
                       </h2>
 
                       <PipetteFields
@@ -425,9 +426,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                       {this.props.showModulesFields && (
                         <div className={styles.protocol_modules_group}>
                           <h2 className={styles.new_file_modal_title}>
-                            {i18n.t(
-                              'modal.new_protocol.title.PROTOCOL_MODULES'
-                            )}
+                            {t('new_protocol.title.PROTOCOL_MODULES')}
                           </h2>
                           <ModuleFields
                             // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module model inside of modulesByType exists, because it could be undefined
@@ -464,7 +463,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                           tabIndex={7}
                           className={styles.button}
                         >
-                          {i18n.t('button.cancel')}
+                          {t('button:cancel')}
                         </OutlineButton>
                         <OutlineButton
                           disabled={!pipetteSelectionIsValid}
@@ -473,7 +472,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                           tabIndex={6}
                           className={styles.button}
                         >
-                          {i18n.t('button.save')}
+                          {t('button:save')}
                         </OutlineButton>
                       </div>
                     </form>

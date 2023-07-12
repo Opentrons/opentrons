@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import round from 'lodash/round'
 import {
@@ -10,7 +11,6 @@ import {
   OutlineButton,
   RadioGroup,
 } from '@opentrons/components'
-import { i18n } from '../../../../localization'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
 import { TipPositionZAxisViz } from './TipPositionZAxisViz'
@@ -47,11 +47,12 @@ const getErrorText = (args: {
   isPristine: boolean
 }): string | null => {
   const { errors, minMmFromBottom, maxMmFromBottom, isPristine } = args
+  const { t } = useTranslation('modal')
 
   if (errors.includes(TOO_MANY_DECIMALS)) {
-    return i18n.t('modal.tip_position.errors.TOO_MANY_DECIMALS')
+    return t('tip_position.errors.TOO_MANY_DECIMALS')
   } else if (!isPristine && errors.includes(OUT_OF_BOUNDS)) {
-    return i18n.t('modal.tip_position.errors.OUT_OF_BOUNDS', {
+    return t('tip_position.errors.OUT_OF_BOUNDS', {
       minMmFromBottom,
       maxMmFromBottom,
     })
@@ -89,7 +90,7 @@ const getErrors = (args: {
 
 export const TipPositionModal = (props: Props): JSX.Element => {
   const { isIndeterminate, name, wellDepthMm } = props
-
+  const { t } = useTranslation(['button', 'modal'])
   const defaultMmFromBottom = utils.getDefaultMmFromBottom({
     name,
     wellDepthMm,
@@ -234,10 +235,10 @@ export const TipPositionModal = (props: Props): JSX.Element => {
         <AlertModal
           alertOverlay
           buttons={[
-            { onClick: handleCancel, children: i18n.t('button.cancel') },
+            { onClick: handleCancel, children: t('cancel') },
             {
               onClick: handleDone,
-              children: i18n.t('button.done'),
+              children: t('done'),
               disabled: hasVisibleErrors,
             },
           ]}
@@ -246,8 +247,8 @@ export const TipPositionModal = (props: Props): JSX.Element => {
           onCloseClick={handleCancel}
         >
           <div className={styles.modal_header}>
-            <h4>{i18n.t('modal.tip_position.title')}</h4>
-            <p>{i18n.t(`modal.tip_position.body.${name}`)}</p>
+            <h4>{t('modal:tip_position.title')}</h4>
+            <p>{t(`modal:tip_position.body.${name}`)}</p>
           </div>
           <div className={styles.main_row}>
             <Flex alignItems="flex-start">

@@ -64,7 +64,7 @@ const STEP_TEXT_STYLE = css`
 
 export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
   const { totalSteps, currentStep, title, onExit, exitDisabled } = props
-  const { t } = useTranslation()
+  const { t } = useTranslation('shared')
 
   return (
     <Box backgroundColor={COLORS.white}>
@@ -76,13 +76,13 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
 
           {currentStep != null && totalSteps != null && currentStep > 0 ? (
             <Text css={STEP_TEXT_STYLE} color={COLORS.darkGreyEnabled}>
-              {t('shared.step', { current: currentStep, max: totalSteps })}
+              {t('step', { current: currentStep, max: totalSteps })}
             </Text>
           ) : null}
         </Flex>
         {onExit != null ? (
           <Btn onClick={onExit} aria-label="Exit" disabled={exitDisabled}>
-            <Text css={EXIT_BUTTON_STYLE}>{t('shared.exit')}</Text>
+            <Text css={EXIT_BUTTON_STYLE}>{t('exit')}</Text>
           </Btn>
         ) : null}
       </Flex>

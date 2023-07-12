@@ -1,6 +1,4 @@
 import * as React from 'react'
-import i18n from 'i18next'
-import { renderWithProviders } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   LabwareDefinition2,
@@ -8,6 +6,8 @@ import {
 } from '@opentrons/shared-data'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
+import { renderWithProviders } from '../../../../localization/renderWithProvider'
+import { i18n } from '../../../../localization'
 import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import { getAllowAllTipracks } from '../../../../feature-flags/selectors'
 import { getTiprackOptions } from '../../utils'

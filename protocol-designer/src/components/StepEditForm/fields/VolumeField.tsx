@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import {
   FormGroup,
   Tooltip,
@@ -6,7 +7,6 @@ import {
   TOOLTIP_TOP,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import { getFieldDefaultTooltip } from '../utils'
 import { TextField } from './TextField'
 import { StepType } from '../../../form-types'
@@ -20,6 +20,7 @@ type Props = FieldProps & {
 }
 export const VolumeField = (props: Props): JSX.Element => {
   const { stepType, label, className, ...propsForVolumeField } = props
+  const { t } = useTranslation('application')
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_TOP,
     strategy: TOOLTIP_FIXED,
@@ -34,7 +35,7 @@ export const VolumeField = (props: Props): JSX.Element => {
         <TextField
           {...propsForVolumeField}
           className={styles.small_field}
-          units={i18n.t('application.units.microliter')}
+          units={t('units.microliter')}
         />
       </FormGroup>
     </div>

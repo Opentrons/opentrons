@@ -11,7 +11,6 @@ import {
   OutlineButton,
   DeprecatedPrimaryButton,
 } from '@opentrons/components'
-import { i18n } from '../localization'
 import { resetScrollElements } from '../ui/steps/utils'
 import { Portal } from './portals/MainPageModalPortal'
 import { EditPipettesModal } from './modals/EditPipettesModal'
@@ -25,6 +24,7 @@ import formStyles from '../components/forms/forms.css'
 import type { ModuleType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
 import type { ModulesForEditModulesCard } from '../step-forms'
+import { useTranslation } from 'react-i18next'
 
 export interface Props {
   formValues: FileMetadataFields
@@ -47,13 +47,11 @@ interface State {
 const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
 const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 
-// TODO: Ian 2019-03-15 use i18n for labels
 export class FilePage extends React.Component<Props, State> {
   state: State = {
     isEditPipetteModalOpen: false,
     moduleToEdit: null,
   }
-
   openEditPipetteModal: () => void = () => {
     resetScrollElements()
     this.setState({ isEditPipetteModalOpen: true })
@@ -87,6 +85,7 @@ export class FilePage extends React.Component<Props, State> {
       swapPipettes,
       modules,
     } = this.props
+    const { t } = useTranslation('button')
 
     return (
       <div className={styles.file_page}>
@@ -186,7 +185,7 @@ export class FilePage extends React.Component<Props, State> {
                 className={styles.edit_button}
                 name={'editPipettes'}
               >
-                {i18n.t('button.edit')}
+                {t('edit')}
               </DeprecatedPrimaryButton>
               <OutlineButton
                 onClick={swapPipettes}
@@ -194,7 +193,7 @@ export class FilePage extends React.Component<Props, State> {
                 iconName="swap-horizontal"
                 name={'swapPipettes'}
               >
-                {i18n.t('button.swap')}
+                {t('swap')}
               </OutlineButton>
             </div>
           </div>
@@ -210,9 +209,9 @@ export class FilePage extends React.Component<Props, State> {
             onClick={goToNextPage}
             className={styles.continue_button}
             iconName="arrow-right"
-            name={'continueToLiquids'}
+            name="continueToLiquids"
           >
-            {i18n.t('button.continue_to_liquids')}
+            {t('continue_to_liquids')}
           </DeprecatedPrimaryButton>
         </div>
 

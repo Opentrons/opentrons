@@ -1,4 +1,5 @@
 {
+  "test": "Testing this",
   "browse_labware": {
     "instructions": "Hover on a well to see contents"
   },

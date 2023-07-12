@@ -14,7 +14,6 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { Modal, InputField, OutlineButton } from '@opentrons/components'
-import { i18n } from '../../../../localization'
 import { CrashInfoBox } from '../../../modules'
 import { StepChangesConfirmModal } from '../../EditPipettesModal/StepChangesConfirmModal'
 import { PipetteFields } from '../PipetteFields'
@@ -22,6 +21,7 @@ import { ModuleFields } from '../ModuleFields'
 import { FilePipettesModal, Props } from '../'
 import { FormPipettesByMount } from '../../../../step-forms'
 import { FormState } from '..'
+import { i18n } from '../../../../localization'
 
 describe('FilePipettesModal', () => {
   const tiprackDefURI = 'tiprack_300'

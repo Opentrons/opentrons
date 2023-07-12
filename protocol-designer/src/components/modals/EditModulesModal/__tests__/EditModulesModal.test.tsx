@@ -3,6 +3,7 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 import * as Formik from 'formik'
+import { I18nextProvider } from 'react-i18next'
 import { OutlineButton, SlotMap } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -31,6 +32,7 @@ import {
   getSlotIsEmpty,
 } from '../../../../step-forms/utils'
 import * as moduleData from '../../../../modules/moduleData'
+import { i18n } from '../../../../localization'
 import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
 import { selectors as featureSelectors } from '../../../../feature-flags'
 import { getRobotType } from '../../../../file-data/selectors'
@@ -109,9 +111,11 @@ describe('Edit Modules Modal', () => {
   })
   const render = (props: EditModulesModalProps) =>
     mount(
-      <Provider store={mockStore}>
-        <EditModulesModal {...props} />
-      </Provider>
+      <I18nextProvider i18n={i18n}>
+        <Provider store={mockStore}>
+          <EditModulesModal {...props} />
+        </Provider>
+      </I18nextProvider>
     )
 
   describe('PD alert', () => {

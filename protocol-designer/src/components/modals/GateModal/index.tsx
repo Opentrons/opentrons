@@ -1,8 +1,8 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import cx from 'classnames'
 import { AlertModal } from '@opentrons/components'
-import { i18n } from '../../../localization'
 import {
   actions as analyticsActions,
   selectors as analyticsSelectors,
@@ -25,36 +25,35 @@ interface DP {
   optOut: Props['optOut']
 }
 
-class GateModalComponent extends React.Component<Props> {
-  render(): JSX.Element | null {
-    const { optIn, optOut } = this.props
+const GateModalComponent: React.FC<Props> = ({ optIn, optOut, hasOptedIn }) => {
+  const { t } = useTranslation(['card', 'button'])
 
-    if (this.props.hasOptedIn == null) {
-      return (
-        <AlertModal
-          alertOverlay
-          className={cx(modalStyles.modal, modalStyles.blocking)}
-          buttons={[
-            { onClick: optOut, children: i18n.t('button.no') },
-            { onClick: optIn, children: i18n.t('button.yes') },
-          ]}
-        >
-          <h3>{i18n.t('card.toggle.share_session')}</h3>
-          <div className={settingsStyles.body_wrapper}>
-            <p className={settingsStyles.card_body}>
-              {i18n.t('card.body.reason_for_collecting_data')}
-            </p>
-            <ul className={settingsStyles.card_point_list}>
-              <li>{i18n.t('card.body.data_collected_is_internal')}</li>
-              {/* TODO: BC 2018-09-26 uncomment when only using fullstory <li>{i18n.t('card.body.data_only_from_pd')}</li> */}
-              <li>{i18n.t('card.body.opt_out_of_data_collection')}</li>
-            </ul>
-          </div>
-        </AlertModal>
-      )
-    }
-    return null
+  if (hasOptedIn == null) {
+    return (
+      <AlertModal
+        alertOverlay
+        className={cx(modalStyles.modal, modalStyles.blocking)}
+        buttons={[
+          { onClick: optOut, children: t('button:no') },
+          { onClick: optIn, children: t('button:yes') },
+        ]}
+      >
+        <h3>{t('toggle.share_session')}</h3>
+        <div className={settingsStyles.body_wrapper}>
+          <p className={settingsStyles.card_body}>
+            {t('body.reason_for_collecting_data')}
+          </p>
+          <ul className={settingsStyles.card_point_list}>
+            <li>{t('body.data_collected_is_internal')}</li>
+            {/* TODO: BC 2018-09-26 uncomment when only using fullstory <li>{i18n.t('card.body.data_only_from_pd')}</li> */}
+            <li>{t('body.opt_out_of_data_collection')}</li>
+          </ul>
+        </div>
+      </AlertModal>
+    )
   }
+
+  return null
 }
 
 function mapStateToProps(state: BaseState): SP {

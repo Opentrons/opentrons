@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import without from 'lodash/without'
+import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
   Flex,
@@ -32,7 +33,6 @@ import {
   getIsCrashablePipetteSelected,
 } from '../../../step-forms'
 import gripperImage from '../../../images/flex_gripper.svg'
-import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import {
   CrashInfoBox,
@@ -70,6 +70,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
     goBack,
     proceed,
   } = props
+  const { t } = useTranslation('modal')
   const moduleRestrictionsDisabled = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
@@ -122,9 +123,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
           minHeight="26rem"
           gridGap={SPACING.spacing32}
         >
-          <Text as="h2">
-            {i18n.t('modal.create_file_wizard.choose_additional_items')}
-          </Text>
+          <Text as="h2">{t('create_file_wizard.choose_additional_items')}</Text>
           {robotType === OT2_ROBOT_TYPE ? (
             <ModuleFields
               //  @ts-expect-error
@@ -166,7 +165,7 @@ export function ModulesAndOtherTile(props: WizardTileProps): JSX.Element {
             }}
           />
           <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('modal.create_file_wizard.review_file_details')}
+            {t('create_file_wizard.review_file_details')}
           </PrimaryButton>
         </Flex>
       </Flex>

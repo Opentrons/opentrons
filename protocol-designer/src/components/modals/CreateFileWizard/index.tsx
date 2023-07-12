@@ -71,7 +71,7 @@ const WIZARD_STEPS: WizardStep[] = [
 ]
 
 export function CreateFileWizard(): JSX.Element | null {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['alert', 'modal'])
   const showWizard = useSelector(getNewProtocolModal)
   const hasUnsavedChanges = useSelector(loadFileSelectors.getHasUnsavedChanges)
   const customLabware = useSelector(
@@ -138,10 +138,7 @@ export function CreateFileWizard(): JSX.Element | null {
     }
     const newProtocolFields = values.fields
 
-    if (
-      !hasUnsavedChanges ||
-      window.confirm(t('alert.window.confirm_create_new'))
-    ) {
+    if (!hasUnsavedChanges || window.confirm(t('window.confirm_create_new'))) {
       dispatch(fileActions.createNewProtocol(newProtocolFields))
       const pipettesById: Record<string, PipetteOnDeck> = pipettes.reduce(
         (acc, pipette) => ({ ...acc, [uuid()]: pipette }),
@@ -203,7 +200,7 @@ export function CreateFileWizard(): JSX.Element | null {
   }
   const wizardHeader = (
     <WizardHeader
-      title={t('modal.create_file_wizard.create_new_protocol')}
+      title={t('modal:create_file_wizard.create_new_protocol')}
       currentStep={currentStepIndex}
       totalSteps={WIZARD_STEPS.length - 1}
       onExit={handleCancel}

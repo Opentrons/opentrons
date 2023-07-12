@@ -1,11 +1,11 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 
 import { TitleBar, Icon, IconName, TitleBarProps } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import styles from './TitleBar.css'
-import { i18n } from '../localization'
 import { START_TERMINAL_TITLE, END_TERMINAL_TITLE } from '../constants'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as uiLabwareSelectors } from '../ui/labware'
@@ -23,6 +23,7 @@ import { stepIconsByType } from '../form-types'
 import { selectors, Page } from '../navigation'
 
 import { BaseState } from '../types'
+import { StepTitleInfo } from '../ui/steps/selectors'
 
 type Props = React.ComponentProps<typeof TitleBar>
 
@@ -36,31 +37,60 @@ type SP = Omit<Props, keyof DP> & {
   _wellSelectionMode?: boolean
 }
 
-interface TitleWithIconProps {
+interface TitleWithIconProps extends StepTitleInfo {
   iconName: IconName | null | undefined
-  text: string | null | undefined
 }
 
 function TitleWithIcon(props: TitleWithIconProps): JSX.Element {
-  const { iconName, text } = props
+  const { iconName, stepName, stepType } = props
+  const { t } = useTranslation('application')
   return (
     <div>
       {iconName && <Icon className={styles.icon} name={iconName} />}
-      <div className={styles.icon_inline_text}>{text}</div>
+      <div className={styles.icon_inline_text}>
+        {stepName || t(`stepType.${stepType}`)}
+      </div>
     </div>
   )
 }
 
-interface TitleWithBetaTagProps {
-  text: string | null | undefined
+const StepTitle = (props: StepTitleInfo): JSX.Element => {
+  const { stepName, stepType } = props
+  const { t } = useTranslation('application')
+  return <div>{stepName || t(`stepType.${stepType}`)}</div>
 }
 
-const TitleWithBetaTag = (props: TitleWithBetaTagProps): JSX.Element => (
-  <div className={styles.title_wrapper}>
-    <div className={styles.icon_inline_text}>{props.text}</div>
-    <div className={styles.beta_tag}>{i18n.t('application.beta')}</div>
-  </div>
-)
+interface PageTitleProps {
+  page:
+    | 'liquids'
+    | 'file-detail'
+    | 'file-splash'
+    | 'settings-features'
+    | 'settings-app'
+  betaTag: boolean
+  fileName?: string
+}
+
+const Title = (props: PageTitleProps): JSX.Element => {
+  const { t } = useTranslation('nav')
+  return (
+    <div className={styles.title_wrapper}>
+      <div className={styles.icon_inline_text}>
+        {t(`title.${props.page}`, { fileName: props.fileName ?? '' })}
+      </div>
+      {props.betaTag ? (
+        <div className={styles.beta_tag}>{t('beta')}</div>
+      ) : null}
+    </div>
+  )
+}
+interface PageSubtitleProps {
+  page: 'liquids' | 'file-detail'
+}
+const PageSubtitle = (props: PageSubtitleProps): JSX.Element => {
+  const { t } = useTranslation('nav')
+  return <div>{t(`subtitle.${props.page}`)}</div>
+}
 
 function mapStateToProps(state: BaseState): SP {
   const selectedLabwareId = labwareIngredSelectors.getSelectedLabwareId(state)
@@ -90,18 +120,16 @@ function mapStateToProps(state: BaseState): SP {
     case 'file-detail':
       return {
         _page,
-        title: i18n.t([`nav.title.${_page}`, fileName]),
-        subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
+        title: <Title page={_page} fileName={fileName} betaTag={false} />,
+        subtitle: <PageSubtitle page={_page} />,
       }
     case 'file-splash':
     case 'settings-features':
     case 'settings-app':
       return {
         _page,
-        title: (
-          <TitleWithBetaTag text={i18n.t([`nav.title.${_page}`, fileName])} />
-        ),
-        subtitle: i18n.t([`nav.subtitle.${_page}`, '']),
+        title: <Title page={_page} fileName={fileName} betaTag={true} />,
+        subtitle: '',
       }
     case 'steplist':
     default: {
@@ -143,9 +171,9 @@ function mapStateToProps(state: BaseState): SP {
             labwareDef && getLabwareDisplayName(labwareDef).replace('µL', 'uL')
         }
       } else if (selectedStepInfo) {
-        const stepTitle =
-          selectedStepInfo.stepName ||
-          i18n.t(`application.stepType.${selectedStepInfo.stepType}`)
+        const stepName = selectedStepInfo.stepName
+        const stepType = selectedStepInfo.stepType
+
         if (wellSelectionLabwareKey) {
           // well selection modal
           return {
@@ -154,14 +182,15 @@ function mapStateToProps(state: BaseState): SP {
             title: (
               <TitleWithIcon
                 iconName={stepIconsByType[selectedStepInfo.stepType]}
-                text={stepTitle}
+                stepName={stepName}
+                stepType={stepType}
               />
             ),
             subtitle: labwareNames[wellSelectionLabwareKey],
             backButtonLabel: 'Back',
           }
         } else {
-          subtitle = stepTitle
+          subtitle = <StepTitle stepName={stepName} stepType={stepType} />
         }
       }
       return {

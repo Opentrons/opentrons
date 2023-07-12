@@ -18,7 +18,7 @@ interface GripperRowProps {
 
 export function GripperRow(props: GripperRowProps): JSX.Element {
   const { handleGripper, isGripperAdded } = props
-  const { i18n, t } = useTranslation()
+  const { i18n, t } = useTranslation('shared')
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
@@ -32,8 +32,8 @@ export function GripperRow(props: GripperRowProps): JSX.Element {
       >
         <OutlineButton className={styles.module_button} onClick={handleGripper}>
           {isGripperAdded
-            ? i18n.format(t('shared.remove'), 'capitalize')
-            : i18n.format(t('shared.add'), 'capitalize')}
+            ? i18n.format(t('remove'), 'capitalize')
+            : i18n.format(t('add'), 'capitalize')}
         </OutlineButton>
       </div>
     </Flex>

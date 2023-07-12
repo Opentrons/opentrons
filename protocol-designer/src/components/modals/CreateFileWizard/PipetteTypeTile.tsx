@@ -24,27 +24,29 @@ import {
   getAllPipetteNames,
   getPipetteNameSpecs,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
 import { GoBack } from './GoBack'
 import { EquipmentOption } from './EquipmentOption'
 import { HandleEnter } from './HandleEnter'
 
 import type { FormState, WizardTileProps } from './types'
+import { useTranslation } from 'react-i18next'
 
 export function FirstPipetteTypeTile(props: WizardTileProps): JSX.Element {
+  const { t } = useTranslation('modal')
   const mount = LEFT
   return (
     <PipetteTypeTile
       {...props}
       mount={mount}
       allowNoPipette={false}
-      tileHeader={i18n.t('modal.create_file_wizard.choose_first_pipette')}
+      tileHeader={t('create_file_wizard.choose_first_pipette')}
     />
   )
 }
 export function SecondPipetteTypeTile(
   props: WizardTileProps
 ): JSX.Element | null {
+  const { t } = useTranslation('modal')
   if (props.values.pipettesByMount.left.pipetteName === 'p1000_96') {
     props.proceed(2)
     return null
@@ -54,7 +56,7 @@ export function SecondPipetteTypeTile(
         {...props}
         mount={RIGHT}
         allowNoPipette
-        tileHeader={i18n.t('modal.create_file_wizard.choose_second_pipette')}
+        tileHeader={t('create_file_wizard.choose_second_pipette')}
       />
     )
   }
@@ -65,6 +67,8 @@ interface PipetteTypeTileProps extends WizardTileProps {
   tileHeader: string
 }
 export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
+  const { t } = useTranslation('application')
+
   const { allowNoPipette, tileHeader, proceed, goBack } = props
   return (
     <HandleEnter onEnter={proceed}>
@@ -83,9 +87,7 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
           width="100%"
         >
           <GoBack onClick={() => goBack()} />
-          <PrimaryButton onClick={() => proceed()}>
-            {i18n.t('application.next')}
-          </PrimaryButton>
+          <PrimaryButton onClick={() => proceed()}>{t('next')}</PrimaryButton>
         </Flex>
       </Flex>
     </HandleEnter>

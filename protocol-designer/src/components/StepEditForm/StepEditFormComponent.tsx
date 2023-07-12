@@ -17,8 +17,8 @@ import { FormAlerts } from './FormAlerts'
 import { ButtonRow } from './ButtonRow'
 import formStyles from '../forms/forms.css'
 import styles from './StepEditForm.css'
-import { FormData, StepType } from '../../form-types'
-import { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
+import type { FormData, StepType } from '../../form-types'
+import type { FieldPropsByName, FocusHandlers, StepFormProps } from './types'
 
 type StepFormMap = {
   [K in StepType]?: React.ComponentType<StepFormProps> | null

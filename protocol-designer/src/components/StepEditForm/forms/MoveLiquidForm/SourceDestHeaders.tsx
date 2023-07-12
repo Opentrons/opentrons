@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { FormGroup } from '@opentrons/components'
-import { i18n } from '../../../../localization'
 import { LabwareField, WellSelectionField } from '../../fields'
 import { AspDispSection } from '../AspDispSection'
 import { StepFieldName } from '../../../../steplist/fieldLevel'
@@ -31,8 +31,9 @@ export const SourceDestHeaders = (props: Props): JSX.Element => {
     propsForFields,
     formData,
   } = props
+  const { t } = useTranslation('form')
   const addFieldNamePrefix = makeAddFieldNamePrefix(prefix)
-  const labwareLabel = i18n.t(`form.step_edit_form.labwareLabel.${prefix}`)
+  const labwareLabel = t(`step_edit_form.labwareLabel.${prefix}`)
 
   return (
     <AspDispSection {...{ className, collapsed, toggleCollapsed, prefix }}>

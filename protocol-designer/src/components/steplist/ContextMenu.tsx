@@ -1,11 +1,11 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
   ConfirmDeleteModal,
   DELETE_STEP_FORM,
 } from '../modals/ConfirmDeleteModal'
-import { i18n } from '../../localization'
 import { actions as stepsActions, getIsMultiSelectMode } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
 import { Portal } from '../portals/TopPortal'
@@ -37,6 +37,8 @@ export const ContextMenu = (props: Props): JSX.Element => {
     stepId: StepIdType
   ): ReturnType<typeof stepsActions.duplicateStep> =>
     dispatch(stepsActions.duplicateStep(stepId))
+
+  const { t } = useTranslation('context_menu')
 
   const [visible, setVisible] = React.useState<boolean>(false)
   const [stepId, setStepId] = React.useState<StepIdType | null>(null)
@@ -139,10 +141,10 @@ export const ContextMenu = (props: Props): JSX.Element => {
                 onClick={handleDuplicate}
                 className={styles.context_menu_item}
               >
-                {i18n.t('context_menu.step.duplicate')}
+                {t('step.duplicate')}
               </div>
               <div onClick={confirmDelete} className={styles.context_menu_item}>
-                {i18n.t('context_menu.step.delete')}
+                {t('step.delete')}
               </div>
             </div>
           </React.Fragment>

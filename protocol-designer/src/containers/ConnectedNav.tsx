@@ -1,12 +1,12 @@
 import * as React from 'react'
-import { ThunkDispatch, BaseState } from '../types'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 
 import { KNOWLEDGEBASE_ROOT_URL } from '../components/KnowledgeBaseLink'
 import { NavTab, TabbedNavBar, OutsideLinkTab } from '@opentrons/components'
-import { i18n } from '../localization'
 import { Page, actions, selectors } from '../navigation'
 import { selectors as fileSelectors } from '../file-data'
+import type { ThunkDispatch, BaseState } from '../types'
 
 interface SP {
   currentPage: Page
@@ -21,6 +21,7 @@ type Props = SP & DP
 
 function Nav(props: Props): JSX.Element {
   const noCurrentProtocol = !props.currentProtocolExists
+  const { t } = useTranslation('nav')
   return (
     <TabbedNavBar
       topChildren={
@@ -28,7 +29,7 @@ function Nav(props: Props): JSX.Element {
           <NavTab
             id="NavTab_file"
             iconName="ot-file"
-            title={i18n.t('nav.tab_name.file')}
+            title={t('tab_name.file')}
             selected={
               props.currentPage === 'file-splash' ||
               props.currentPage === 'file-detail'
@@ -40,7 +41,7 @@ function Nav(props: Props): JSX.Element {
           <NavTab
             id="NavTab_liquids"
             iconName="water"
-            title={i18n.t('nav.tab_name.liquids')}
+            title={t('tab_name.liquids')}
             disabled={noCurrentProtocol}
             selected={props.currentPage === 'liquids'}
             onClick={props.handleClick('liquids')}
@@ -48,7 +49,7 @@ function Nav(props: Props): JSX.Element {
           <NavTab
             id="NavTab_design"
             iconName="ot-design"
-            title={i18n.t('nav.tab_name.design')}
+            title={t('tab_name.design')}
             disabled={noCurrentProtocol}
             selected={props.currentPage === 'steplist'}
             onClick={props.handleClick('steplist')}
@@ -59,12 +60,12 @@ function Nav(props: Props): JSX.Element {
         <React.Fragment>
           <OutsideLinkTab
             iconName="help-circle"
-            title={i18n.t('nav.tab_name.help')}
+            title={t('tab_name.help')}
             to={KNOWLEDGEBASE_ROOT_URL}
           />
           <NavTab
             iconName="settings"
-            title={i18n.t('nav.tab_name.settings')}
+            title={t('tab_name.settings')}
             selected={props.currentPage === 'settings-app'}
             onClick={props.handleClick('settings-app')}
           />

@@ -16,9 +16,9 @@
     "__end__": "Final Deck State"
   },
   "title": {
-    "settings-features": "Protocol Designer",
-    "settings-app": "Protocol Designer",
-    "file-splash": "Protocol Designer"
+    "settings-features": "Protocol Designer {{fileName}}",
+    "settings-app": "Protocol Designer {{fileName}}",
+    "file-splash": "Protocol Designer {{fileName}}"
   },
   "subtitle": {
     "file-detail": "File Details",

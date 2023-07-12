@@ -1,5 +1,6 @@
 import { useConditionalConfirm } from '@opentrons/components'
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { connect } from 'react-redux'
 import { actions } from '../../steplist'
 import { actions as stepsActions } from '../../ui/steps'
@@ -19,7 +20,6 @@ import { StepEditFormComponent } from './StepEditFormComponent'
 import { getDirtyFields } from './utils'
 import { BaseState, ThunkDispatch } from '../../types'
 import { FormData, StepFieldName, StepIdType } from '../../form-types'
-
 interface SP {
   canSave: boolean
   formData?: FormData | null
@@ -55,6 +55,7 @@ const StepEditFormManager = (
     saveHeaterShakerFormWithAddedPauseUntilTemp,
     saveStepForm,
   } = props
+  const { t } = useTranslation('modal')
 
   const [
     showMoreOptionsModal,
@@ -170,6 +171,7 @@ const StepEditFormManager = (
           displayTemperature={formData?.targetTemperature ?? '?'}
           handleCancelClick={saveStepForm}
           handleContinueClick={confirmAddPauseUntilTempStep}
+          t={t}
         />
       )}
       {showAddPauseUntilHeaterShakerTempStepModal && (
@@ -177,6 +179,7 @@ const StepEditFormManager = (
           displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
           handleCancelClick={saveStepForm}
           handleContinueClick={confirmAddPauseUntilHeaterShakerTempStep}
+          t={t}
         />
       )}
       <StepEditFormComponent

@@ -182,7 +182,7 @@ export const getCollapsedSteps: Selector<CollapsedStepsState> = createSelector(
   rootSelector,
   (state: StepsState) => state.collapsedSteps
 )
-interface StepTitleInfo {
+export interface StepTitleInfo {
   stepName: string
   stepType: StepType
 }

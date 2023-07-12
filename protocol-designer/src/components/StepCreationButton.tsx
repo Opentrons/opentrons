@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
 import {
@@ -15,7 +16,6 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { i18n } from '../localization'
 import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
 import {
   selectors as stepFormSelectors,
@@ -26,8 +26,8 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
 } from './modals/ConfirmDeleteModal'
 import { Portal } from './portals/MainPageModalPortal'
-import { stepIconsByType, StepType } from '../form-types'
 import styles from './listButtons.css'
+import { stepIconsByType, StepType } from '../form-types'
 
 interface StepButtonComponentProps {
   children: React.ReactNode
@@ -46,6 +46,7 @@ export const StepCreationButtonComponent = (
     placement: TOOLTIP_TOP,
     strategy: TOOLTIP_FIXED,
   })
+  const { t } = useTranslation(['tooltip', 'button'])
   return (
     <div
       className={styles.list_item_button}
@@ -53,16 +54,14 @@ export const StepCreationButtonComponent = (
       {...targetProps}
     >
       {disabled && (
-        <Tooltip {...tooltipProps}>
-          {i18n.t(`tooltip.disabled_step_creation`)}
-        </Tooltip>
+        <Tooltip {...tooltipProps}>{t(`disabled_step_creation`)}</Tooltip>
       )}
       <DeprecatedPrimaryButton
         id="StepCreationButton"
         onClick={() => setExpanded(!expanded)}
         disabled={disabled}
       >
-        {i18n.t('button.add_step')}
+        {t('button:add_step')}
       </DeprecatedPrimaryButton>
 
       <div className={styles.buttons_popover}>{expanded && children}</div>
@@ -82,9 +81,10 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
     placement: TOOLTIP_RIGHT,
     strategy: TOOLTIP_FIXED,
   })
+  const { t } = useTranslation(['application', 'tooltip'])
   const tooltipMessage = disabled
-    ? i18n.t(`tooltip.disabled_module_step`)
-    : i18n.t(`tooltip.step_description.${stepType}`)
+    ? t(`tooltip:disabled_module_step`)
+    : t(`tooltip:step_description.${stepType}`)
   return (
     <>
       <DeprecatedPrimaryButton
@@ -95,7 +95,7 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
           [styles.step_button_disabled]: disabled,
         })}
       >
-        {i18n.t(`application.stepType.${stepType}`, stepType)}
+        {t(`stepType.${stepType}`, stepType)}
       </DeprecatedPrimaryButton>
       <Tooltip {...tooltipProps}>{tooltipMessage}</Tooltip>
     </>

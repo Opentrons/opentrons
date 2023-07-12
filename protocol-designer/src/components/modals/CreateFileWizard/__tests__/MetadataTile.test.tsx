@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import i18n from 'i18next'
-import { renderWithProviders } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
+import { renderWithProviders } from '../../../../localization/renderWithProvider'
+import { i18n } from '../../../../localization'
 import { MetadataTile } from '../MetadataTile'
 import type { FormState, WizardTileProps } from '../types'
 

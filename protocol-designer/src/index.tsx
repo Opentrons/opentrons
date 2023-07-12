@@ -8,7 +8,7 @@ import { configureStore } from './configureStore'
 import { App } from './components/App'
 import { initialize } from './initialize'
 import { initializeMixpanel } from './analytics/mixpanel'
-import { i18n } from './localization'
+import { i18n } from './localization/index'
 
 // initialize Redux
 const store = configureStore()
@@ -21,7 +21,7 @@ const render = (Component: any): void => {
   ReactDOM.render(
     <Provider store={store}>
       <AppContainer>
-        <I18nextProvider i18n={i18n as any}>
+        <I18nextProvider i18n={i18n}>
           <Component />
         </I18nextProvider>
       </AppContainer>

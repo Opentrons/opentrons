@@ -16,7 +16,6 @@ import {
   OT3_PIPETTES,
   RobotType,
 } from '@opentrons/shared-data'
-import { i18n } from '../../../localization'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { FormPipettesByMount } from '../../../step-forms'
@@ -28,6 +27,7 @@ import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 
 import type { PipetteName } from '@opentrons/shared-data'
+import { useTranslation } from 'react-i18next'
 
 export interface Props {
   initialTabIndex?: number
@@ -85,7 +85,7 @@ export function PipetteFields(props: Props): JSX.Element {
     touched,
     robotType,
   } = props
-
+  const { t } = useTranslation(['modal', 'button'])
   const allowAllTipracks = useSelector(getAllowAllTipracks)
   const dispatch = useDispatch()
   const allLabware = useSelector(getLabwareDefsByURI)
@@ -161,7 +161,7 @@ export function PipetteFields(props: Props): JSX.Element {
         <div className={styles.mount_column}>
           <FormGroup
             key="leftPipetteModel"
-            label={i18n.t('modal.pipette_fields.left_pipette')}
+            label={t('pipette_fields.left_pipette')}
             className={formStyles.stacked_row}
           >
             {renderPipetteSelect({
@@ -175,7 +175,7 @@ export function PipetteFields(props: Props): JSX.Element {
           <FormGroup
             disabled={isEmpty(values.left.pipetteName)}
             key={'leftTiprackModel'}
-            label={i18n.t('modal.pipette_fields.left_tiprack')}
+            label={t('pipette_fields.left_tiprack')}
             className={formStyles.stacked_row}
           >
             {renderTiprackSelect({ mount: 'left', robotType })}
@@ -188,7 +188,7 @@ export function PipetteFields(props: Props): JSX.Element {
         <div className={styles.mount_column}>
           <FormGroup
             key="rightPipetteModel"
-            label={i18n.t('modal.pipette_fields.right_pipette')}
+            label={t('pipette_fields.right_pipette')}
             className={formStyles.stacked_row}
           >
             {renderPipetteSelect({
@@ -202,7 +202,7 @@ export function PipetteFields(props: Props): JSX.Element {
           <FormGroup
             disabled={isEmpty(values.right.pipetteName)}
             key={'rightTiprackModel'}
-            label={i18n.t('modal.pipette_fields.right_tiprack')}
+            label={t('pipette_fields.right_tiprack')}
             className={formStyles.stacked_row}
           >
             {renderTiprackSelect({ mount: 'right', robotType })}
@@ -211,7 +211,7 @@ export function PipetteFields(props: Props): JSX.Element {
       </div>
       <div>
         <OutlineButton Component="label" className={styles.upload_button}>
-          {i18n.t('button.upload_custom_tip_rack')}
+          {t('button:upload_custom_tip_rack')}
           <input
             type="file"
             onChange={e => dispatch(createCustomTiprackDef(e))}

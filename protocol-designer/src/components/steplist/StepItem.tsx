@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
 import sum from 'lodash/sum'
 import { Icon } from '@opentrons/components'
@@ -18,7 +19,6 @@ import {
   ProfileCycleItem,
   ProfileStepItem,
 } from '../../form-types'
-import { i18n } from '../../localization'
 import {
   makeLidLabelText,
   makeSpeedText,
@@ -83,6 +83,7 @@ export const StepItem = (props: StepItemProps): JSX.Element => {
     highlightStep,
     isMultiSelectMode,
   } = props
+  const { t } = useTranslation('application')
 
   const iconName = stepIconsByType[stepType]
   let iconClassName = ''
@@ -102,9 +103,7 @@ export const StepItem = (props: StepItemProps): JSX.Element => {
       iconName={error || warning ? 'alert-circle' : iconName}
       iconProps={{ className: iconClassName }}
       data-test={`StepItem_${stepNumber}`}
-      title={`${stepNumber}. ${
-        props.title || i18n.t(`application.stepType.${stepType}`)
-      }`}
+      title={`${stepNumber}. ${props.title || t(`stepType.${stepType}`)}`}
       onClick={handleClick}
       onContextMenu={onStepContextMenu}
       onMouseEnter={highlightStep}
@@ -297,6 +296,7 @@ export const StepItemContents = (
     highlightSubstep,
     hoveredSubstep,
   } = props
+  const { t } = useTranslation('modules')
 
   if (!rawForm) {
     return null
@@ -312,10 +312,8 @@ export const StepItemContents = (
       <ModuleStepItems
         labwareNickname={substeps.labwareNickname}
         message={substeps.message}
-        action={i18n.t(`modules.actions.action`)}
-        actionText={i18n.t(
-          `modules.actions.${substeps.engage ? 'engage' : 'disengage'}`
-        )}
+        action={t(`actions.action`)}
+        actionText={t(`actions.${substeps.engage ? 'engage' : 'disengage'}`)}
         moduleType={MAGNETIC_MODULE_TYPE}
       />
     )
@@ -327,7 +325,7 @@ export const StepItemContents = (
     return (
       <ModuleStepItems
         message={substeps.message}
-        action={i18n.t(`modules.actions.go_to`)}
+        action={t(`actions.go_to`)}
         actionText={temperature}
         moduleType={TEMPERATURE_MODULE_TYPE}
         labwareNickname={substeps.labwareNickname}
@@ -347,23 +345,20 @@ export const StepItemContents = (
 
     return (
       <ModuleStepItems
-        action={i18n.t(`modules.actions.go_to`)}
+        action={t(`actions.go_to`)}
         actionText={temperature}
         moduleType={HEATERSHAKER_MODULE_TYPE}
         labwareNickname={substeps.labwareNickname}
       >
         <ModuleStepItemRow
-          label={i18n.t(`modules.labware_latch`)}
+          label={t(`labware_latch`)}
           value={
             substeps.latchOpen
-              ? i18n.t(`modules.actions.open`)
-              : i18n.t(`modules.actions.closed_and_locked`)
+              ? t(`actions.open`)
+              : t(`actions.closed_and_locked`)
           }
         />
-        <ModuleStepItemRow
-          label={i18n.t(`modules.shaker_label`)}
-          value={shakerValue}
-        />
+        <ModuleStepItemRow label={t(`shaker_label`)} value={shakerValue} />
         {substeps.heaterShakerTimerMinutes === 0 &&
         substeps.heaterShakerTimerSeconds === 0 ? null : (
           <PDListItem
@@ -373,7 +368,7 @@ export const StepItemContents = (
             )}
           >
             <span className={styles.labware_display_name}>
-              {i18n.t(`modules.actions.deactivate_after`)}
+              {t(`actions.deactivate_after`)}
             </span>
             <span className={styles.align_right}>{timer}</span>
           </PDListItem>
@@ -386,8 +381,8 @@ export const StepItemContents = (
     return (
       <ModuleStepItems
         message={substeps.message}
-        action={i18n.t(`modules.actions.profile`)}
-        actionText={i18n.t(`modules.actions.cycling`)}
+        action={t(`actions.profile`)}
+        actionText={t(`actions.cycling`)}
         moduleType={THERMOCYCLER_MODULE_TYPE}
         labwareNickname={substeps.labwareNickname}
       >
@@ -457,7 +452,7 @@ export const StepItemContents = (
     return (
       <ModuleStepItems
         message={substeps.message}
-        action={i18n.t(`modules.actions.hold`)}
+        action={t(`actions.hold`)}
         actionText={blockTemperature}
         moduleType={THERMOCYCLER_MODULE_TYPE}
         labwareNickname={substeps.labwareNickname}
@@ -473,7 +468,7 @@ export const StepItemContents = (
     return (
       <ModuleStepItems
         message={substeps.message}
-        action={i18n.t('modules.actions.await_temperature')}
+        action={t('actions.await_temperature')}
         actionText={temperature}
         moduleType={substeps.moduleType}
         labwareNickname={substeps.labwareNickname}

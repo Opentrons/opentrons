@@ -1,5 +1,5 @@
-import { i18n } from '../localization'
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import styles from './TitledListNotes.css'
 
 interface Props {
@@ -7,9 +7,10 @@ interface Props {
 }
 
 export function TitledListNotes(props: Props): JSX.Element | null {
+  const { t } = useTranslation('card')
   return props.notes ? (
     <div className={styles.notes}>
-      <header>{i18n.t('card.notes')}</header>
+      <header>{t('notes')}</header>
       {props.notes}
     </div>
   ) : null

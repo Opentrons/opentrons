@@ -1,6 +1,6 @@
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 import cx from 'classnames'
-import { i18n } from '../../../../localization'
 import {
   VolumeField,
   PipetteField,
@@ -18,6 +18,7 @@ import { SourceDestHeaders } from './SourceDestHeaders'
 
 export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, _setCollapsed] = React.useState<boolean>(true)
+  const { t } = useTranslation('form')
 
   const toggleCollapsed = (): void => _setCollapsed(!collapsed)
 
@@ -28,14 +29,14 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>
-          {i18n.t('application.stepType.moveLiquid')}
+          {t('application.stepType.moveLiquid')}
         </span>
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
         <VolumeField
           {...propsForFields.volume}
-          label={i18n.t('form.step_edit_form.field.volume.label')}
+          label={t('step_edit_form.field.volume.label')}
           stepType={stepType}
           className={styles.large_field}
         />
@@ -81,7 +82,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
 
       <div className={styles.section_header}>
         <span className={styles.section_header_text}>
-          {i18n.t('form.step_edit_form.section.sterility&motion')}
+          {t('step_edit_form.section.sterility&motion')}
         </span>
       </div>
       <div className={styles.section_wrapper}>
