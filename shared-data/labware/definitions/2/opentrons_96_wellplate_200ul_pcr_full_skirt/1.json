@@ -17,7 +17,9 @@
   "brand": {
     "brand": "Opentrons",
     "brandId": ["991-00076"],
-    "links": ["https://shop.opentrons.com/tough-0.2-ml-96-well-pcr-plate-full-skirt/"]
+    "links": [
+      "https://shop.opentrons.com/tough-0.2-ml-96-well-pcr-plate-full-skirt/"
+    ]
   },
   "dimensions": {
     "xDimension": 127.76,
