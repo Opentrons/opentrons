@@ -387,6 +387,7 @@ class ProtocolEngine:
         for a in actions:
             self._action_dispatcher.dispatch(a)
 
+    # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
     @staticmethod
     def _code_in_exception_stack(error: EnumeratedError, code: ErrorCodes) -> bool:
         if (
