@@ -344,16 +344,16 @@ class CommandStore(HasState[CommandState], HandlesActions):
                             error_id
                         ] = action.error_details.error.original_error
                     else:
-                        if not isinstance(
+                        if isinstance(
                             action.error_details.error,
                             EnumeratedError,
                         ):
-                            error: EnumeratedError = UnexpectedProtocolError(
+                            error = action.error_details.error
+                        else:
+                            error = UnexpectedProtocolError(
                                 message=str(action.error_details.error),
                                 wrapping=[action.error_details.error],
                             )
-                        else:
-                            error = action.error_details.error
 
                         self._state.errors_by_id[
                             error_id

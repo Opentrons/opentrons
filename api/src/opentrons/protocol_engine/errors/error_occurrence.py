@@ -71,6 +71,7 @@ class ErrorOccurrence(BaseModel):
             schema["required"].extend(["errorCode", "wrappedErrors", "errorInfo"])
 
 
+# TODO (tz, 7-12-23): move this to exceptions.py when we stop relaying on ErrorOccurrence.
 class ProtocolCommandFailedError(ProtocolEngineError):
     """Raised if a fatal command execution error has occurred."""
 
