@@ -2,6 +2,10 @@
 import re
 from typing import Dict, Tuple
 import struct
+from opentrons_shared_data.errors.exceptions import (
+    InvalidInstrumentData,
+    PythonException,
+)
 from opentrons_hardware.firmware_bindings.constants import PipetteName
 from opentrons_hardware.instruments.serial_utils import ensure_serial_length
 
@@ -47,14 +51,16 @@ def info_from_serial_string(serialval: str) -> Tuple[PipetteName, int, bytes]:
     """
     matches = SERIAL_RE.match(serialval.strip())
     if not matches:
-        raise ValueError(
-            f"The serial number {serialval.strip()} is not valid. {SERIAL_FORMAT_MSG}"
+        raise InvalidInstrumentData(
+            message=f"The serial number {serialval.strip()} is not valid. {SERIAL_FORMAT_MSG}",
+            detail={"serial": serialval},
         )
     try:
         name = NAME_LOOKUP[matches.group("name")]
     except KeyError:
-        raise ValueError(
-            f"The pipette name part of the serial number ({matches.group('name')}) is unknown. {SERIAL_FORMAT_MSG}"
+        raise InvalidInstrumentData(
+            message=f"The pipette name part of the serial number ({matches.group('name')}) is unknown. {SERIAL_FORMAT_MSG}",
+            detail={"name": matches.group("name")},
         )
     model = int(matches.group("model"))
 
@@ -77,9 +83,16 @@ def serial_val_from_parts(name: PipetteName, model: int, serialval: bytes) -> by
 
     you will not get what you put in.
     """
-    return struct.pack(
-        ">HH16s",
-        name.value,
-        model,
-        ensure_serial_length(serialval),
-    )
+    try:
+        return struct.pack(
+            ">HH16s",
+            name.value,
+            model,
+            ensure_serial_length(serialval),
+        )
+    except struct.error as e:
+        raise InvalidInstrumentData(
+            message="Invalid pipette serial",
+            detail={"name": name, "model": model, "serial": str(serialval)},
+            wrapping=[PythonException(e)],
+        )

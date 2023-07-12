@@ -42,6 +42,18 @@
       "detail": "Firmware Update Failed",
       "category": "hardwareCommunicationError"
     },
+    "1006": {
+      "detail": "Internal Message Format Error",
+      "category": "hardwareCommunicationError"
+    },
+    "1007": {
+      "detail": "CANBus Configuration Error",
+      "category": "hardwareCommunicationError"
+    },
+    "1008": {
+      "detail": "CANBus Bus Error",
+      "category": "hardwareCommunicationError"
+    },
     "2000": {
       "detail": "Robotics Control Error",
       "category": "roboticsControlError"
@@ -60,6 +72,14 @@
     },
     "2004": {
       "detail": "Motion Planning Failure",
+      "category": "roboticsControlError"
+    },
+    "2005": {
+      "detail": "Position Estimation Invalid",
+      "category": "roboticsControlError"
+    },
+    "2006": {
+      "detail": "Move Condition Not Met",
       "category": "roboticsControlError"
     },
     "3000": {
@@ -120,6 +140,10 @@
     },
     "3015": {
       "detail": "Module Not Present",
+      "category": "roboticsInteractionError"
+    },
+    "3016": {
+      "detail": "Invalid Instrument Data",
       "category": "roboticsInteractionError"
     },
     "4000": {

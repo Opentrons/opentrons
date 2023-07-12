@@ -2,9 +2,9 @@ import * as React from 'react'
 import { SPACING, COLORS, Box } from '@opentrons/components'
 import { LegacyModalHeader } from './LegacyModalHeader'
 import { LegacyModalShell } from './LegacyModalShell'
-import type { StyleProps } from '@opentrons/components'
+import type { IconProps, StyleProps } from '@opentrons/components'
 
-type ModalType = 'info' | 'warning' | 'error'
+type ModalType = 'info' | 'warning' | 'error' | 'outlinedError'
 export * from './LegacyModalShell'
 export * from './LegacyModalHeader'
 
@@ -29,20 +29,41 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
     ...styleProps
   } = props
 
+  const iconColor = (type: ModalType): string => {
+    let iconColor: string = ''
+    switch (type) {
+      case 'warning':
+        iconColor = COLORS.warningEnabled
+        break
+      case 'error':
+        iconColor = COLORS.errorEnabled
+        break
+      case 'outlinedError':
+        iconColor = COLORS.white
+        break
+    }
+    return iconColor
+  }
+
+  const modalIcon: IconProps = {
+    name: 'ot-alert',
+    color: iconColor(type),
+    size: '1.25rem',
+    marginRight: SPACING.spacing8,
+  }
+
   const modalHeader = (
     <LegacyModalHeader
       onClose={onClose}
       title={title}
       icon={
-        ['error', 'warning'].includes(type)
-          ? {
-              name: 'ot-alert',
-              color:
-                type === 'error' ? COLORS.errorEnabled : COLORS.warningEnabled,
-              size: SPACING.spacing20,
-              marginRight: SPACING.spacing8,
-            }
+        ['error', 'warning', 'outlinedError'].includes(type)
+          ? modalIcon
           : undefined
+      }
+      color={type === 'outlinedError' ? COLORS.white : COLORS.darkBlackEnabled}
+      backgroundColor={
+        type === 'outlinedError' ? COLORS.errorEnabled : COLORS.white
       }
     />
   )
@@ -54,6 +75,11 @@ export const LegacyModal = (props: LegacyModalProps): JSX.Element => {
       onOutsideClick={closeOnOutsideClick ?? false ? onClose : undefined}
       // center within viewport aside from nav
       marginLeft="7.125rem"
+      border={
+        type === 'outlinedError'
+          ? `0.375rem solid ${COLORS.errorEnabled}`
+          : 'none'
+      }
       {...props}
     >
       <Box padding={childrenPadding}>{children}</Box>

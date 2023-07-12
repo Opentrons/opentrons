@@ -1,7 +1,6 @@
 """Basic labware data state and store."""
 from __future__ import annotations
 
-import random
 from dataclasses import dataclass
 from typing import (
     Any,
@@ -18,6 +17,7 @@ from typing import (
 )
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3, SlotDefV3
+from opentrons_shared_data.labware.labware_definition import LabwareRole
 from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from opentrons.types import DeckSlotName, Point, MountType
@@ -45,9 +45,6 @@ from ..types import (
     LoadedLabware,
     ModuleLocation,
     ModuleModel,
-    DropTipWellLocation,
-    DropTipWellOrigin,
-    WellOffset,
     OverlapOffset,
 )
 from ..actions import (
@@ -257,6 +254,18 @@ class LabwareView(HasState[LabwareState]):
 
         raise errors.exceptions.LabwareNotLoadedOnModuleError(
             "There is no labware loaded on this Module"
+        )
+
+    def get_id_by_labware(self, labware_id: str) -> str:
+        """Return the ID of the labware loaded on the given labware."""
+        for labware in self.state.labware_by_id.values():
+            if (
+                isinstance(labware.location, OnLabwareLocation)
+                and labware.location.labwareId == labware_id
+            ):
+                return labware.id
+        raise errors.exceptions.LabwareNotLoadedOnLabwareError(
+            f"There is not labware loaded onto labware {labware_id}"
         )
 
     def raise_if_labware_has_labware_on_top(self, labware_id: str) -> None:
@@ -473,6 +482,10 @@ class LabwareView(HasState[LabwareState]):
         if labware_definition.parameters.isTiprack:
             raise errors.LabwareIsTipRackError(
                 f"Given labware: {labware_id} is a tiprack. Can not load liquid."
+            )
+        if LabwareRole.adapter in labware_definition.allowedRoles:
+            raise errors.LabwareIsAdapterError(
+                f"Given labware: {labware_id} is an adapter. Can not load liquid."
             )
         if not contains_wells:
             raise errors.WellDoesNotExistError(
@@ -701,22 +714,6 @@ class LabwareView(HasState[LabwareState]):
                     f"Labware {top_labware_definition.parameters.loadName} cannot be loaded"
                     f" onto labware on top of adapter"
                 )
-
-    def get_random_drop_tip_location(
-        self, labware_id: str, well_name: str
-    ) -> DropTipWellLocation:
-        """Get a random location along the x-axis within 3/4th length of the well top plane."""
-        well_dims = self.get_well_size(labware_id=labware_id, well_name=well_name)
-        random_offset_in_well = WellOffset(
-            x=random.randrange(
-                start=int(well_dims[0] * -3 / 8), stop=int(well_dims[0] * 3 / 8), step=1
-            ),
-            y=0,
-            z=0,
-        )
-        return DropTipWellLocation(
-            origin=DropTipWellOrigin.DEFAULT, offset=random_offset_in_well
-        )
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""

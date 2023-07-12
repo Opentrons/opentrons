@@ -10,10 +10,10 @@ import {
   WRAP,
   Icon,
   DIRECTION_ROW,
+  LocationIcon,
 } from '@opentrons/components'
 import { MICRO_LITERS } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
-import { LocationIcon } from '../../molecules/LocationIcon'
 import { LiquidsLabwareDetailsModal } from '../Devices/ProtocolRun/SetupLiquids/LiquidsLabwareDetailsModal'
 import { getSlotLabwareName } from '../Devices/ProtocolRun/utils/getSlotLabwareName'
 import { getTotalVolumePerLiquidId } from '../Devices/ProtocolRun/SetupLiquids/utils'

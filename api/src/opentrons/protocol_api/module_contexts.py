@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Optional, cast
+from typing import List, Optional, Union, cast
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 from opentrons_shared_data.module.dev_types import ModuleModel, ModuleType
@@ -15,6 +15,7 @@ from opentrons.protocols.api_support.util import APIVersionError, requires_versi
 
 from .core.common import (
     ProtocolCore,
+    LabwareCore,
     ModuleCore,
     TemperatureModuleCore,
     MagneticModuleCore,
@@ -103,9 +104,8 @@ class ModuleContext(CommandPublisher):
 
         _log.warning(deprecation_message)
 
-        # Type ignoring to preserve backwards compatibility
         assert (
-            labware.parent == self._core.geometry  # type: ignore[comparison-overlap]
+            labware.parent == self._core.geometry
         ), "Labware is not configured with this module as its parent"
 
         return self._core.geometry.add_labware(labware)
@@ -115,7 +115,8 @@ class ModuleContext(CommandPublisher):
         name: str,
         label: Optional[str] = None,
         namespace: Optional[str] = None,
-        version: int = 1,
+        version: Optional[int] = None,
+        adapter: Optional[str] = None,
     ) -> Labware:
         """Load a labware onto the module using its load parameters.
 
@@ -137,12 +138,26 @@ class ModuleContext(CommandPublisher):
                 "are trying to utilize new load_labware parameters in 2.1"
             )
 
+        load_location: Union[ModuleCore, LabwareCore]
+        if adapter is not None:
+            if self._api_version < APIVersion(2, 15):
+                raise APIVersionError(
+                    "Loading a labware on an adapter requires apiLevel 2.15 or higher."
+                )
+            loaded_adapter = self.load_adapter(
+                name=adapter,
+                namespace=namespace,
+            )
+            load_location = loaded_adapter._core
+        else:
+            load_location = self._core
+
         labware_core = self._protocol_core.load_labware(
             load_name=name,
             label=label,
             namespace=namespace,
             version=version,
-            location=self._core,
+            location=load_location,
         )
 
         if isinstance(self._core, LegacyModuleCore):
@@ -187,7 +202,7 @@ class ModuleContext(CommandPublisher):
         name: str,
         label: Optional[str] = None,
         namespace: Optional[str] = None,
-        version: int = 1,
+        version: Optional[int] = None,
     ) -> Labware:
         """
         .. deprecated:: 2.0
@@ -196,6 +211,58 @@ class ModuleContext(CommandPublisher):
         _log.warning("load_labware_by_name is deprecated. Use load_labware instead.")
         return self.load_labware(
             name=name, label=label, namespace=namespace, version=version
+        )
+
+    @requires_version(2, 15)
+    def load_adapter(
+        self,
+        name: str,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        """Load an adapter onto the module using its load parameters.
+
+        The parameters of this function behave like those of
+        :py:obj:`ProtocolContext.load_adapter` (which loads adapters directly
+        onto the deck). Note that the parameter ``name`` here corresponds to
+        ``load_name`` on the ``ProtocolContext`` function.
+
+        :returns: The initialized and loaded adapter object.
+        """
+        labware_core = self._protocol_core.load_adapter(
+            load_name=name,
+            namespace=namespace,
+            version=version,
+            location=self._core,
+        )
+
+        if isinstance(self._core, LegacyModuleCore):
+            adapter = self._core.add_labware_core(cast(LegacyLabwareCore, labware_core))
+        else:
+            adapter = Labware(
+                core=labware_core,
+                api_version=self._api_version,
+                protocol_core=self._protocol_core,
+                core_map=self._core_map,
+            )
+
+        self._core_map.add(labware_core, adapter)
+
+        return adapter
+
+    @requires_version(2, 15)
+    def load_adapter_from_definition(self, definition: LabwareDefinition) -> Labware:
+        """Load an adapter onto the module using an inline definition.
+
+        :param definition: The labware definition.
+        :returns: The initialized and loaded labware object.
+        """
+        load_params = self._protocol_core.add_labware_definition(definition)
+
+        return self.load_adapter(
+            name=load_params.load_name,
+            namespace=load_params.namespace,
+            version=load_params.version,
         )
 
     @property  # type: ignore[misc]

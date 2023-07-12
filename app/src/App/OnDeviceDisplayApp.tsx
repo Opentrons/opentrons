@@ -21,6 +21,7 @@ import { MaintenanceRunTakeover } from '../organisms/TakeoverModal'
 import { ConnectViaEthernet } from '../pages/OnDeviceDisplay/ConnectViaEthernet'
 import { ConnectViaUSB } from '../pages/OnDeviceDisplay/ConnectViaUSB'
 import { ConnectViaWifi } from '../pages/OnDeviceDisplay/ConnectViaWifi'
+import { EmergencyStop } from '../pages/EmergencyStop'
 import { NameRobot } from '../pages/OnDeviceDisplay/NameRobot'
 import { NetworkSetupMenu } from '../pages/OnDeviceDisplay/NetworkSetupMenu'
 import { ProtocolSetup } from '../pages/OnDeviceDisplay/ProtocolSetup'
@@ -171,6 +172,12 @@ export const onDeviceDisplayRoutes: RouteProps[] = [
     exact: true,
     name: 'Update Robot',
     path: '/robot-settings/update-robot',
+  },
+  {
+    Component: EmergencyStop,
+    exact: true,
+    name: 'Emergency Stop',
+    path: '/emergency-stop',
   },
   {
     Component: () => (

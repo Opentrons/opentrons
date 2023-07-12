@@ -144,7 +144,7 @@ const ProtocolNameText = styled(StyledText)`
   -webkit-line-clamp: ${(props: { cardSize: CardSizeType }) =>
     props.cardSize === 'full' ? 1 : 2};
   overflow: hidden;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   font-size: ${(props: { cardSize: CardSizeType }) =>
     cardStyleBySize[props.cardSize].fontSize};
   font-weight: ${(props: { cardSize: CardSizeType }) =>

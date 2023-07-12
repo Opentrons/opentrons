@@ -112,6 +112,12 @@ def tip_rack_def() -> LabwareDefinition:
 
 
 @pytest.fixture(scope="session")
+def adapter_def() -> LabwareDefinition:
+    """Get the definition of Opentrons 96 PCR adapter."""
+    return LabwareDefinition.parse_obj(load_definition("opentrons_96_pcr_adapter", 1))
+
+
+@pytest.fixture(scope="session")
 def falcon_tuberack_def() -> LabwareDefinition:
     """Get the definition of the 6-well Falcon tuberack."""
     return LabwareDefinition.parse_obj(

@@ -175,14 +175,15 @@ export function ProtocolCard(props: {
         <StyledText as="p" color={COLORS.darkBlack70}>
           {format(new Date(protocol.createdAt), 'M/d/yy HH:mm')}
         </StyledText>
-        {longpress.isLongPressed && (
+        {longpress.isLongPressed && !isFailedAnalysis && (
           <LongPressModal
             longpress={longpress}
             protocolId={protocol.id}
             setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
           />
         )}
-        {showFailedAnalysisModal && (
+        {(showFailedAnalysisModal ||
+          (isFailedAnalysis && longpress.isLongPressed)) && (
           <Modal
             header={failedAnalysisHeader}
             onOutsideClick={() => setShowFailedAnalysisModal(false)}

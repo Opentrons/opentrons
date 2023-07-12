@@ -63,6 +63,7 @@ export function Toast(props: ToastProps): JSX.Element {
     ...styleProps
   } = props
   const { t } = useTranslation('shared')
+  const [isClosed, setIsClosed] = React.useState<boolean>(false)
 
   // We want to be able to storybook both the ODD and the Desktop versions,
   // so let it (and unit tests, for that matter) be able to pass in a parameter
@@ -80,7 +81,7 @@ export function Toast(props: ToastProps): JSX.Element {
       : closeButton === true
       ? t('close')
       : ''
-  const DESKTOP_ANIMATION = css`
+  const DESKTOP_ANIMATION_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slidein;
     overflow: hidden;
@@ -94,7 +95,25 @@ export function Toast(props: ToastProps): JSX.Element {
       }
     }
   `
-  const ODD_ANIMATION = css`
+  const DESKTOP_ANIMATION_OUT = css`
+    animation-duration: ${TOAST_ANIMATION_DURATION}ms;
+    animation-name: slideout;
+    overflow: hidden;
+
+    @keyframes slideout {
+      from {
+        transform: translateX(0%);
+      }
+      to {
+        transform: translateX(100%);
+      }
+    }
+  `
+  const desktopAnimation = isClosed
+    ? DESKTOP_ANIMATION_OUT
+    : DESKTOP_ANIMATION_IN
+
+  const ODD_ANIMATION_IN = css`
     animation-duration: ${TOAST_ANIMATION_DURATION}ms;
     animation-name: slideup;
     overflow: hidden;
@@ -108,6 +127,22 @@ export function Toast(props: ToastProps): JSX.Element {
       }
     }
   `
+  const ODD_ANIMATION_OUT = css`
+    animation-duration: ${TOAST_ANIMATION_DURATION}ms;
+    animation-name: slidedown;
+    overflow: hidden;
+
+    @keyframes slidedown {
+      from {
+        transform: translateY(0%);
+      }
+      to {
+        transform: translateY(100%);
+      }
+    }
+  `
+
+  const oddAnimation = isClosed ? ODD_ANIMATION_OUT : ODD_ANIMATION_IN
 
   const toastStyleByType: {
     [k in ToastType]: {
@@ -173,13 +208,16 @@ export function Toast(props: ToastProps): JSX.Element {
 
   if (!disableTimeout) {
     setTimeout(() => {
-      onClose?.()
+      setIsClosed(true)
+      setTimeout(() => {
+        onClose?.()
+      }, TOAST_ANIMATION_DURATION - 50)
     }, calculatedDuration(message, headingText, duration))
   }
 
   return (
     <Flex
-      css={showODDStyle ? ODD_ANIMATION : DESKTOP_ANIMATION}
+      css={showODDStyle ? oddAnimation : desktopAnimation}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
       borderRadius={
@@ -210,7 +248,7 @@ export function Toast(props: ToastProps): JSX.Element {
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing8}
         overflow="hidden"
         width="100%"
       >
@@ -219,7 +257,7 @@ export function Toast(props: ToastProps): JSX.Element {
           color={toastStyleByType[type].color}
           maxWidth={showODDStyle ? SPACING.spacing32 : SPACING.spacing16}
           minWidth={showODDStyle ? SPACING.spacing32 : SPACING.spacing16}
-          marginRight={SPACING.spacing8}
+          marginRight={showODDStyle ? SPACING.spacing8 : '0'}
           spin={icon?.spin != null ? icon.spin : false}
           aria-label={`icon_${type}`}
         />
