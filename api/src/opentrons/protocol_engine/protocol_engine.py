@@ -6,7 +6,10 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
-from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.errors import (
+    ErrorCodes,
+    code_in_exception_stack,
+)
 
 from .errors import ProtocolCommandFailedError
 from . import commands, slot_standardization
@@ -252,9 +255,9 @@ class ProtocolEngine:
             if (
                 isinstance(error, ProtocolCommandFailedError)
                 and error.original_error is not None
-                and any(
-                    ErrorCodes.E_STOP_ACTIVATED.value.code == wrapped_error.errorCode
-                    for wrapped_error in error.original_error.wrappedErrors
+                and code_in_exception_stack(
+                    exc=error,
+                    code=ErrorCodes.E_STOP_ACTIVATED,
                 )
             ):
                 drop_tips_and_home = False

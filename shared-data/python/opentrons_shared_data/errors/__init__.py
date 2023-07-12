@@ -16,6 +16,7 @@ from .exceptions import (
     RoboticsControlError,
     RoboticsInteractionError,
 )
+from .validation import code_in_exception_stack
 
 __all__ = [
     "ErrorCategory",
@@ -27,4 +28,5 @@ __all__ = [
     "GeneralError",
     "RoboticsControlError",
     "RoboticsInteractionError",
+    "code_in_exception_stack",
 ]
