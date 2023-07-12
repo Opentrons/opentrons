@@ -682,8 +682,8 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
         else:
             ui.print_title("MEASURE EVAPORATION")
             print(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
-            hover_pos = labware_on_scale["A1"].top().move(Point(z=50))
-            pipette.move_to(hover_pos)
+            mnt = OT3Mount.RIGHT if pipette.mount == "right" else OT3Mount.LEFT
+            ctx._core.get_hardware().retract(mnt)
             for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
                 print(
                     f"wait for scale to stabilize "
@@ -694,7 +694,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             actual_disp_list_evap: List[float] = []
             for trial in range(config.NUM_BLANK_TRIALS):
                 ui.print_header(f"BLANK {trial + 1}/{config.NUM_BLANK_TRIALS}")
-                pipette.move_to(hover_pos)
                 evap_aspirate, _, evap_dispense, _ = _run_trial(
                     ctx=ctx,
                     pipette=pipette,
