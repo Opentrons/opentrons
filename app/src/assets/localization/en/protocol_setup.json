@@ -48,7 +48,6 @@
   "heater_shaker_extra_attention": "Use latch controls for easy placement of labware.",
   "heater_shaker_labware_list_view": "To add labware, use the toggle to control the latch",
   "how_offset_data_works": "How labware offsets work",
-  "hub_port_connected": "USB Port {{port}} via hub",
   "initial_liquids_num_plural": "{{count}} initial liquids",
   "initial_liquids_num": "{{count}} initial liquid",
   "initial_location": "Initial Location",

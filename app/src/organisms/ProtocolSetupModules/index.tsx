@@ -226,11 +226,8 @@ export function ProtocolSetupModules({
                       <ModuleInfo
                         moduleModel={module.moduleDef.model}
                         isAttached={module.attachedModuleMatch != null}
-                        usbPort={
-                          module.attachedModuleMatch?.usbPort.port ?? null
-                        }
-                        hubPort={
-                          module.attachedModuleMatch?.usbPort.hub ?? null
+                        physicalPort={
+                          module.attachedModuleMatch?.usbPort ?? null
                         }
                         runId={runId}
                       />
