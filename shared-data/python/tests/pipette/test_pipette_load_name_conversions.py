@@ -7,7 +7,10 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteGenerationType,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
-from opentrons_shared_data.pipette import pipette_definition as pc, pipette_load_name_conversions as ps
+from opentrons_shared_data.pipette import (
+    pipette_definition as pc,
+    pipette_load_name_conversions as ps,
+)
 
 
 @pytest.mark.parametrize(
@@ -163,7 +166,7 @@ def test_model_version_type_string_version(
             PipetteModelType.p50,
             PipetteChannelType.SINGLE_CHANNEL,
             PipetteVersionType(1, 0),
-            "p50_single_v1.0",
+            "p50_single_v1",
         ],
         [
             PipetteModelType.p1000,

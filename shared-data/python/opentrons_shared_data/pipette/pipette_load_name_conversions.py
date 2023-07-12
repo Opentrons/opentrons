@@ -11,7 +11,7 @@ from .pipette_definition import (
     PipetteModelMajorVersionType,
     PipetteModelMinorVersionType,
     PipetteNameType,
-    PipetteModelVersionType
+    PipetteModelVersionType,
 )
 
 DEFAULT_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
@@ -89,7 +89,10 @@ def version_from_string(version: str) -> PipetteVersionType:
     """
     version_list = [v for v in re.split("\\.|[v]", version) if v]
     major = cast(PipetteModelMajorVersionType, int(version_list[0]))
-    minor = cast(PipetteModelMinorVersionType, int(version_list[1]))
+    if len(version_list) > 1:
+        minor = cast(PipetteModelMinorVersionType, int(version_list[1]))
+    else:
+        minor = 0
     return PipetteVersionType(major, minor)
 
 
@@ -134,7 +137,9 @@ def generation_from_string(pipette_name_list: List[str]) -> PipetteGenerationTyp
         return PipetteGenerationType.GEN1
 
 
-def convert_to_pipette_name_type(name: PipetteName) -> PipetteNameType:
+def convert_to_pipette_name_type(
+    model_or_name: Union[PipetteName, PipetteModel, None]
+) -> PipetteNameType:
     """Convert the py:data:PipetteName to a py:obj:PipetteModelVersionType.
 
     `PipetteNames` are in the format of "p300_single" or "p300_single_gen1".
@@ -147,10 +152,10 @@ def convert_to_pipette_name_type(name: PipetteName) -> PipetteNameType:
         string.
 
     """
-    split_pipette_name = name.split("_")
-    channels = channels_from_string(split_pipette_name[1])
-    generation = generation_from_string(split_pipette_name)
-    pipette_type = PipetteModelType[split_pipette_name[0]]
+    split_pipette_model_or_name = model_or_name.split("_")
+    channels = channels_from_string(split_pipette_model_or_name[1])
+    generation = generation_from_string(split_pipette_model_or_name)
+    pipette_type = PipetteModelType[split_pipette_model_or_name[0]]
 
     return PipetteNameType(pipette_type, channels, generation)
 

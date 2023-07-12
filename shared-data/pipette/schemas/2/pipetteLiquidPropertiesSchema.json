@@ -24,14 +24,13 @@
     },
     "flowRate": {
       "type": "object",
-      "required": ["value", "min", "max"],
+      "required": ["default", "valuesByApiLevel"],
       "properties": {
-        "value": {
+        "default": {
           "$ref": "#/definitions/positiveNumber",
-          "$comment": "This key is deprecated in favor of valuesByApiLevel"
+          "$comment": "The default value of the flowrate"
         },
-        "min": { "$ref": "#/definitions/positiveNumber" },
-        "max": { "$ref": "#/definitions/positiveNumber" }
+        "valuesByApiLevel": { "type": "object", "required": [] }
       }
     }
   },

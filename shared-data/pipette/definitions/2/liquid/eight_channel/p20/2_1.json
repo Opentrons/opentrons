@@ -3,19 +3,20 @@
   "supportedTips": {
     "t20": {
       "defaultAspirateFlowRate": {
+        "default": 7.6,
         "valuesByApiLevel": {
-        "2.0": 7.6
-      }},
+          "2.0": 7.6
+        }},
       "defaultDispenseFlowRate": {
+        "default": 7.6,
         "valuesByApiLevel": {
           "2.0": 7.6
-        }
-      },
+        }},
       "defaultBlowOutFlowRate": {
+        "default": 7.6,
         "valuesByApiLevel": {
           "2.0": 7.6
-        }
-      },
+        }},
       "defaultTipLength": 31.1,
       "defaultTipOverlap": 8.25,
       "aspirate": {
@@ -210,19 +211,20 @@
     },
     "t10": {
       "defaultAspirateFlowRate": {
+        "default": 7.6,
         "valuesByApiLevel": {
-        "2.0": 7.6
-      }},
+          "2.0": 7.6
+        }},
       "defaultDispenseFlowRate": {
+        "default": 7.6,
         "valuesByApiLevel": {
           "2.0": 7.6
-        }
-      },
+        }},
       "defaultBlowOutFlowRate": {
+        "default": 7.6,
         "valuesByApiLevel": {
           "2.0": 7.6
-        }
-      },
+        }},
       "defaultTipLength": 31.1,
       "defaultTipOverlap": 8.25,
       "aspirate": {

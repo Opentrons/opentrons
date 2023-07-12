@@ -2,9 +2,22 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t50": {
-      "defaultAspirateFlowRate": 478,
-      "defaultDispenseFlowRate": 160,
-      "defaultBlowOutFlowRate": 160,
+      "defaultAspirateFlowRate": {
+        "default": 478,
+        "valuesByApiLevel": {
+        "2.14": 478
+      }},
+      "defaultDispenseFlowRate": {
+        "default": 160,
+        "valuesByApiLevel": {
+          "2.14": 160
+        }
+      },
+      "defaultBlowOutFlowRate": {
+        "default": 160,
+        "valuesByApiLevel": {
+        "2.14": 160
+      }},
       "defaultTipLength": 57.9,
       "defaultTipOverlap": 10.5,
       "defaultReturnTipHeight": 0.71,
@@ -103,9 +116,22 @@
       "defaultBlowoutVolume": 3.2
     },
     "t200": {
-      "defaultAspirateFlowRate": 716,
-      "defaultDispenseFlowRate": 160,
-      "defaultBlowOutFlowRate": 160,
+      "defaultAspirateFlowRate": {
+        "default": 716,
+        "valuesByApiLevel": {
+        "2.14": 716
+      }},
+      "defaultDispenseFlowRate": {
+        "default": 160,
+        "valuesByApiLevel": {
+          "2.14": 160
+        }
+      },
+      "defaultBlowOutFlowRate": {
+        "default": 160,
+        "valuesByApiLevel": {
+        "2.14": 160
+      }},
       "defaultTipLength": 58.35,
       "defaultTipOverlap": 10.5,
       "defaultReturnTipHeight": 0.71,
@@ -202,9 +228,22 @@
       "defaultBlowoutVolume": 16
     },
     "t1000": {
-      "defaultAspirateFlowRate": 716,
-      "defaultDispenseFlowRate": 160,
-      "defaultBlowOutFlowRate": 160,
+      "defaultAspirateFlowRate": {
+        "default": 716,
+        "valuesByApiLevel": {
+        "2.14": 716
+      }},
+      "defaultDispenseFlowRate": {
+        "default": 160,
+        "valuesByApiLevel": {
+          "2.14": 160
+        }
+      },
+      "defaultBlowOutFlowRate": {
+        "default": 160,
+        "valuesByApiLevel": {
+        "2.14": 160
+      }},
       "defaultTipLength": 95.6,
       "defaultTipOverlap": 10.5,
       "defaultReturnTipHeight": 0.82,

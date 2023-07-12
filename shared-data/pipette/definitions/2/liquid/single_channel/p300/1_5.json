@@ -2,9 +2,15 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t200": {
-      "defaultAspirateFlowRate": {"valuesByApiLevel": { "2.0": 150 }},
-      "defaultDispenseFlowRate": {"valuesByApiLevel": { "2.0": 300 }},
-      "defaultBlowOutFlowRate": {"valuesByApiLevel": { "2.0": 1000 }},
+      "defaultAspirateFlowRate": {
+        "default": 150,
+        "valuesByApiLevel": { "2.0": 150 }},
+      "defaultDispenseFlowRate": {
+        "default": 300,
+        "valuesByApiLevel": { "2.0": 300 }},
+      "defaultBlowOutFlowRate": {
+        "default": 1000,
+        "valuesByApiLevel": { "2.0": 1000 }},
       "defaultTipLength": 51.7,
       "defaultTipOverlap": 7.47,
       "aspirate": {
@@ -49,9 +55,15 @@
       "defaultBlowoutVolume": 58.905
     },
     "t300": {
-      "defaultAspirateFlowRate": {"valuesByApiLevel": { "2.0": 150 }},
-      "defaultDispenseFlowRate": {"valuesByApiLevel": { "2.0": 300 }},
-      "defaultBlowOutFlowRate": {"valuesByApiLevel": { "2.0": 1000 }},
+      "defaultAspirateFlowRate": {
+        "default": 150,
+        "valuesByApiLevel": { "2.0": 150 }},
+      "defaultDispenseFlowRate": {
+        "default": 300,
+        "valuesByApiLevel": { "2.0": 300 }},
+      "defaultBlowOutFlowRate": {
+        "default": 1000,
+        "valuesByApiLevel": { "2.0": 1000 }},
       "defaultTipLength": 51.7,
       "defaultTipOverlap": 7.47,
       "aspirate": {

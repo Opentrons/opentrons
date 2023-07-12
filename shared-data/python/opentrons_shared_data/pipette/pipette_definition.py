@@ -79,7 +79,12 @@ class PipetteVersionType:
         return cls(major=major, minor=minor)
 
     def __str__(self) -> str:
-        return f"{self.major}.{self.minor}"
+        if self.major == 1 and self.minor == 0:
+            # Maintain the format of V1 pipettes that
+            # do not contain a minor version at all.
+            return f"{self.major}"
+        else:
+            return f"{self.major}.{self.minor}"
 
     @property
     def as_tuple(
@@ -118,20 +123,27 @@ class PipetteModelVersionType:
         return f"{base_name}_v{self.pipette_version}"
 
 
+class FlowRateDefinition(BaseModel):
+    default: float = Field(..., description="Highest API level default fallback.")
+    values_by_api_level: Dict[str, float] = Field(
+        ..., description="flow rates keyed by API level.", alias="valuesByApiLevel"
+    )
+
+
 class SupportedTipsDefinition(BaseModel):
     """Tip parameters available for every tip size."""
 
-    default_aspirate_flowrate: Dict[str, Dict[str, float]] = Field(
+    default_aspirate_flowrate: FlowRateDefinition = Field(
         ...,
         description="The flowrate used in aspirations by default.",
         alias="defaultAspirateFlowRate",
     )
-    default_dispense_flowrate: Dict[str, Dict[str, float]]  = Field(
+    default_dispense_flowrate: FlowRateDefinition = Field(
         ...,
         description="The flowrate used in dispenses by default.",
         alias="defaultDispenseFlowRate",
     )
-    default_blowout_flowrate: Dict[str, Dict[str, float]] = Field(
+    default_blowout_flowrate: FlowRateDefinition = Field(
         ...,
         description="The flowrate used in blowouts by default.",
         alias="defaultBlowOutFlowRate",
@@ -309,9 +321,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         return PipetteGenerationType(v)
 
     @validator("quirks", pre=True)
-    def convert_quirks(cls, v: str) -> List[pip_types.Quirks]:
-        if not v:
-            return []
+    def convert_quirks(cls, v: List[str]) -> List[pip_types.Quirks]:
         return [pip_types.Quirks(q) for q in v]
 
     @validator("quirks", pre=True)
@@ -325,6 +335,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
             PipetteChannelType: lambda v: v.value,
             PipetteModelType: lambda v: v.value,
             PipetteGenerationType: lambda v: v.value,
+            pip_types.Quirks: lambda v: v.value,
         }
 
 
@@ -382,4 +393,3 @@ class PipetteConfigurations(
     mount_configurations: pip_types.RobotMountConfigs = Field(
         ...,
     )
-

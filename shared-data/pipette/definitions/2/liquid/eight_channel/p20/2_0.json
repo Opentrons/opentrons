@@ -3,14 +3,17 @@
   "supportedTips": {
     "t20": {
       "defaultAspirateFlowRate": {
+        "default": 7.6,
         "valuesByApiLevel": {
           "2.0": 7.6
         }},
       "defaultDispenseFlowRate": {
+        "default": 7.6,
         "valuesByApiLevel": {
           "2.0": 7.6
         }},
       "defaultBlowOutFlowRate": {
+        "default": 7.6,
         "valuesByApiLevel": {
           "2.0": 7.6
         }},
@@ -178,14 +181,17 @@
     },
     "t10": {
       "defaultAspirateFlowRate": {
+        "default": 7.6,
         "valuesByApiLevel": {
           "2.0": 7.6
         }},
       "defaultDispenseFlowRate": {
+        "default": 7.6,
         "valuesByApiLevel": {
           "2.0": 7.6
         }},
       "defaultBlowOutFlowRate": {
+        "default": 7.6,
         "valuesByApiLevel": {
           "2.0": 7.6
         }},
