@@ -369,6 +369,7 @@ def _run_trial(
     print("recorded weights:")
 
     # RUN INIT
+    pipette.move_to(well.top(50).move(channel_offset))
     mnt = OT3Mount.RIGHT if pipette.mount == "right" else OT3Mount.LEFT
     ctx._core.get_hardware().retract(mnt)
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
