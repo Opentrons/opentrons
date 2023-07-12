@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import {
   Flex,
   Link,
@@ -21,7 +22,6 @@ import multipleModuleHelpOdd from '../../../../assets/images/multiple_modules_mo
 import { StyledText } from '../../../../atoms/text'
 import { getIsOnDevice } from '../../../../redux/config'
 import { Modal } from '../../../../molecules/Modal'
-import { useSelector } from 'react-redux'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =
   'https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2'
