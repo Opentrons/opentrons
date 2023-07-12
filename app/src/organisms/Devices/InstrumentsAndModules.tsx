@@ -83,7 +83,7 @@ export function InstrumentsAndModules({
     ) ?? null
   const badGripper =
     (attachedInstruments?.data ?? []).find(
-      (i): i is BadGripper => i.subsystem === 'gripper' && i.ok
+      (i): i is BadGripper => i.subsystem === 'gripper' && !i.ok
     ) ?? null
   const attachedLeftPipette =
     attachedInstruments?.data?.find(
