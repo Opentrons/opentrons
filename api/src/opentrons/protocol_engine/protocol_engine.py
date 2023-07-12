@@ -8,7 +8,7 @@ from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
 from opentrons_shared_data.errors import (
     ErrorCodes,
-    code_in_exception_stack,
+    EnumeratedError,
 )
 
 from .errors import ProtocolCommandFailedError
@@ -252,12 +252,12 @@ class ProtocolEngine:
                 If `False`, will set status to `stopped`.
         """
         if error:
+            print(error)
             if (
                 isinstance(error, ProtocolCommandFailedError)
                 and error.original_error is not None
-                and code_in_exception_stack(
-                    exc=error,
-                    code=ErrorCodes.E_STOP_ACTIVATED,
+                and self._code_in_exception_stack(
+                    error=error, code=ErrorCodes.E_STOP_ACTIVATED
                 )
             ):
                 drop_tips_and_home = False
@@ -386,3 +386,16 @@ class ProtocolEngine:
 
         for a in actions:
             self._action_dispatcher.dispatch(a)
+
+    @staticmethod
+    def _code_in_exception_stack(error: EnumeratedError, code: ErrorCodes) -> bool:
+        if (
+            isinstance(error, ProtocolCommandFailedError)
+            and error.original_error is not None
+        ):
+            return any(
+                code.value.code == wrapped_error.errorCode
+                for wrapped_error in error.original_error.wrappedErrors
+            )
+        else:
+            return any(code == wrapped_error.code for wrapped_error in error.wrapping)
