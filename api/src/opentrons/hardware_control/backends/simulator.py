@@ -3,7 +3,7 @@ import asyncio
 import copy
 import logging
 from threading import Event
-from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Sequence, Iterator
+from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Sequence, Iterator, cast
 from contextlib import contextmanager
 
 from opentrons_shared_data.pipette import (
@@ -26,7 +26,7 @@ from ..module_control import AttachedModulesControl
 from ..util import ot2_axis_to_string
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteName
+    from opentrons_shared_data.pipette.dev_types import PipetteName, PipetteModel
     from ..dev_types import (
         AttachedPipette,
         AttachedInstruments,
@@ -123,16 +123,17 @@ class Simulator:
         self._gpio_chardev = gpio_chardev
 
         def _sanitize_attached_instrument(
-            passed_ai: Optional[Dict[str, Optional[str]]] = None
+            passed_ai: Optional[PipetteSpec] = None
         ) -> PipetteSpec:
             if not passed_ai or not passed_ai.get("model"):
                 return {"model": None, "id": None}
-            if pipette_load_name.supported_pipette(passed_ai["model"]):
-                if pipette_load_name.has_version(passed_ai["model"]):
-                    return passed_ai  # type: ignore
+            if pipette_load_name.supported_pipette(cast(PipetteName, passed_ai["model"])):
+                if pipette_load_name.is_model(passed_ai["model"]):
+                    return passed_ai
                 else:
+                    get_pip_model = pipette_load_name.convert_pipette_name(cast(PipetteName, passed_ai["model"]))
                     return {
-                        "model": pipette_load_name.convert_pipette_name(passed_ai["model"]),  # type: ignore
+                        "model": PipetteModel(str(get_pip_model)),
                         "id": passed_ai.get("id"),
                     }
             raise KeyError(
@@ -142,7 +143,7 @@ class Simulator:
             )
 
         self._attached_instruments = {
-            m: _sanitize_attached_instrument(attached_instruments.get(m))
+            m: _sanitize_attached_instrument(attached_instruments.get(m))  # type: ignore
             for m in types.Mount.ot2_mounts()
         }
         self._stubbed_attached_modules = attached_modules

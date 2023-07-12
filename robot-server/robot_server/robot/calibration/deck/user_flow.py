@@ -178,7 +178,7 @@ class DeckCalibrationUserFlow:
         return AttachedPipette(
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
-            tipLength=self._hw_pipette.config.tip_length,
+            tipLength=self._hw_pipette.active_tip_settings.default_tip_length,
             mount=str(self._mount),
             serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
             defaultTipracks=self._default_tipracks,
@@ -209,12 +209,12 @@ class DeckCalibrationUserFlow:
         right_pip = pips[Mount.RIGHT]
         left_pip = pips[Mount.LEFT]
         if right_pip.config.max_volume == left_pip.config.max_volume:
-            if right_pip.config.channels == left_pip.config.channels:
+            if right_pip.config.channels.value == left_pip.config.channels.value:
                 return right_pip, Mount.RIGHT
             else:
                 return sorted(
                     [(right_pip, Mount.RIGHT), (left_pip, Mount.LEFT)],
-                    key=lambda p_m: p_m[0].config.channels,
+                    key=lambda p_m: p_m[0].config.channels.value,
                 )[0]
         else:
             return sorted(
@@ -270,7 +270,7 @@ class DeckCalibrationUserFlow:
     def critical_point_override(self) -> Optional[CriticalPoint]:
         return (
             CriticalPoint.FRONT_NOZZLE
-            if self._hw_pipette.config.channels == 8
+            if self._hw_pipette.config.channels.value == 8
             else None
         )
 
@@ -356,7 +356,11 @@ class DeckCalibrationUserFlow:
                 self._tip_rack._core.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:
-            tip_overlap = self._hw_pipette.config.tip_overlap.get(self._tip_rack.uri, 0)
+            tip_overlap = (
+                self._hw_pipette.active_tip_settings.tip_overlap_dictionary.get(
+                    self._tip_rack.uri, 0
+                )
+            )
             tip_length = self._tip_rack.tip_length
             return tip_length - tip_overlap
 

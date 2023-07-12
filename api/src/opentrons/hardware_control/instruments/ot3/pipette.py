@@ -15,6 +15,8 @@ from opentrons_shared_data.pipette.pipette_definition import (
     TipHandlingConfigurations,
     PipetteModelType,
     PipetteChannelType,
+    PipetteNameType,
+    PipetteModelVersionType,
 )
 from ..instrument_abc import AbstractInstrument, piecewise_volume_conversion
 from .instrument_calibration import (
@@ -28,7 +30,6 @@ from opentrons_shared_data.pipette.dev_types import (
     PipetteModel,
 )
 from opentrons_shared_data.pipette import (
-    pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
 )
 from opentrons.hardware_control.types import CriticalPoint, OT3Mount
@@ -69,13 +70,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._backlash_distance = config.backlash_distance
 
         # TODO (lc 12-05-2022) figure out how we can safely deprecate "name" and "model"
-        self._pipette_name = pipette_load_name.PipetteNameType(
+        self._pipette_name = PipetteNameType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
             pipette_generation=config.display_category,
         )
         self._acting_as = self._pipette_name
-        self._pipette_model = pipette_load_name.PipetteModelVersionType(
+        self._pipette_model = PipetteModelVersionType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
             pipette_version=config.version,

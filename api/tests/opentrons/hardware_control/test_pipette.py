@@ -15,6 +15,7 @@ from opentrons.hardware_control.instruments.ot3 import (
 from opentrons.hardware_control import types
 from opentrons.config import pipette_config
 from opentrons_shared_data.pipette import (
+    pipette_definition,
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
 )
@@ -47,7 +48,7 @@ def hardware_pipette_ot2() -> Callable:
 @pytest.fixture
 def hardware_pipette_ot3() -> Callable:
     def _create_pipette(
-        model: pipette_load_name.PipetteModelVersionType,
+        model: pipette_definition.PipetteModelVersionType,
         calibration: ot3_calibration.PipetteOffsetByPipetteMount = OT3_PIP_CAL,
         id: str = "testID",
     ):
@@ -74,7 +75,7 @@ def hardware_pipette_ot3() -> Callable:
 )
 def test_tip_tracking(
     pipette_builder: Callable,
-    model: Union[str, pipette_load_name.PipetteModelVersionType],
+    model: Union[str, pipette_definition.PipetteModelVersionType],
 ) -> None:
     hw_pipette = pipette_builder(model)
     with pytest.raises(AssertionError):
@@ -104,7 +105,7 @@ def test_tip_tracking(
 )
 def test_tip_nozzle_position_tracking(
     pipette_builder: Callable,
-    model: Union[str, pipette_load_name.PipetteModelVersionType],
+    model: Union[str, pipette_definition.PipetteModelVersionType],
     nozzle_offset: Point,
 ) -> None:
     hw_pipette = pipette_builder(model)
@@ -150,7 +151,7 @@ def test_tip_nozzle_position_tracking(
 )
 def test_critical_points_pipette_offset(
     pipette_builder: Callable,
-    model: Union[str, pipette_load_name.PipetteModelVersionType],
+    model: Union[str, pipette_definition.PipetteModelVersionType],
     calibration: Union[
         instrument_calibration.PipetteOffsetByPipetteMount,
         ot3_calibration.PipetteOffsetByPipetteMount,
@@ -188,7 +189,7 @@ def test_critical_points_pipette_offset(
 )
 def test_volume_tracking(
     pipette_builder: Callable,
-    model: Union[str, pipette_load_name.PipetteModelVersionType],
+    model: Union[str, pipette_definition.PipetteModelVersionType],
     max_volume: float,
 ) -> None:
     hw_pipette = pipette_builder(model)
@@ -305,7 +306,7 @@ def test_flow_rate_setting(
 )
 def test_alternative_critical_points(
     pipette_builder: Callable,
-    model: Union[str, pipette_load_name.PipetteModelVersionType],
+    model: Union[str, pipette_definition.PipetteModelVersionType],
     expected_xy_critical_point: Point,
     expected_front_critical_point: Point,
 ) -> None:
@@ -345,7 +346,7 @@ def test_alternative_critical_points(
 )
 def test_reset_instrument_offset(
     pipette_builder: Callable,
-    model: Union[str, pipette_load_name.PipetteModelVersionType],
+    model: Union[str, pipette_definition.PipetteModelVersionType],
     calibration: Union[
         instrument_calibration.PipetteOffsetByPipetteMount,
         ot3_calibration.PipetteOffsetByPipetteMount,

@@ -130,7 +130,7 @@ class TipCalibrationUserFlow:
         return AttachedPipette(
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
-            tipLength=self._hw_pipette.config.tip_length,
+            tipLength=self._hw_pipette.active_tip_settings.default_tip_length,
             mount=str(self._mount),
             serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
             defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
@@ -192,7 +192,9 @@ class TipCalibrationUserFlow:
     def _get_default_tip_length(self) -> float:
         tiprack: labware.Labware = self._deck[TIP_RACK_SLOT]  # type: ignore
         full_length = tiprack.tip_length
-        overlap_dict: Dict[str, float] = self._hw_pipette.config.tip_overlap
+        overlap_dict: Dict[
+            str, float
+        ] = self._hw_pipette.active_tip_settings.tip_overlap_dictionary
         overlap = overlap_dict.get(tiprack.uri, 0)
         return full_length - overlap
 
@@ -200,7 +202,7 @@ class TipCalibrationUserFlow:
     def critical_point_override(self) -> Optional[CriticalPoint]:
         return (
             CriticalPoint.FRONT_NOZZLE
-            if self._hw_pipette.config.channels == 8
+            if self._hw_pipette.config.channels.value == 8
             else None
         )
 

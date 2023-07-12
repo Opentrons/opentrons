@@ -42,7 +42,7 @@ def get_virtual_pipette_static_config(
 
     tip_configuration = config.supported_tips[pipette_definition.PipetteTipType(config.max_volume)]
     return LoadedStaticPipetteData(
-        model=config.model,
+        model=str(config.pipette_model),
         display_name=config.display_name,
         min_volume=config.min_volume,
         max_volume=config.max_volume,
@@ -55,7 +55,7 @@ def get_virtual_pipette_static_config(
             default_dispense=tip_configuration.default_dispense_flowrate["valuesByApiLevel"],
         ),
         return_tip_scale=tip_configuration.default_return_tip_height,
-        nominal_tip_overlap=tip_configuration.default_tip_overlap,
+        nominal_tip_overlap=tip_configuration.tip_overlap_dictionary,
     )
 
 

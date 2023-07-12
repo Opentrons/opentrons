@@ -16,6 +16,8 @@ from opentrons_shared_data.pipette.pipette_definition import (
     SupportedTipsDefinition,
     TipHandlingConfigurations,
     PipetteModelType,
+    PipetteModelVersionType,
+    PipetteNameType
 )
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
@@ -89,13 +91,13 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._backlash_distance = config.backlash_distance
 
         # TODO (lc 12-05-2022) figure out how we can safely deprecate "name" and "model"
-        self._pipette_name = pipette_load_name.PipetteNameType(
+        self._pipette_name = PipetteNameType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
             pipette_generation=config.display_category,
         )
         self._acting_as = self._pipette_name
-        self._pipette_model = pipette_load_name.PipetteModelVersionType(
+        self._pipette_model = PipetteModelVersionType(
             pipette_type=config.pipette_type,
             pipette_channels=config.channels,
             pipette_version=config.version,
@@ -117,9 +119,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self.ready_to_aspirate = False
         #: True if ready to aspirate
-        self._active_tip_settings = self._config.supported_tips[
-            PipetteTipType(self._working_volume)
-        ]
+        # TODO Clean this lookup up!
+        self._active_tip_settings = self._config.supported_tips.get(
+            PipetteTipType(self._working_volume), self._config.supported_tips[list(self._config.supported_tips.keys())[0]])
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
         self._aspirate_flow_rates_lookup = self._active_tip_settings.default_aspirate_flowrate["valuesByApiLevel"]
         self._dispense_flow_rates_lookup = self._active_tip_settings.default_dispense_flowrate["valuesByApiLevel"]

@@ -119,7 +119,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             config = action.config
             self._state.static_config_by_id[action.pipette_id] = StaticPipetteConfig(
                 serial_number=action.serial_number,
-                model=config.model,
+                model=config.pipette_model,
                 display_name=config.display_name,
                 min_volume=config.min_volume,
                 max_volume=config.max_volume,

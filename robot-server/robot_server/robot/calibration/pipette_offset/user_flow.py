@@ -191,7 +191,7 @@ class PipetteOffsetCalibrationUserFlow:
         return AttachedPipette(
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
-            tipLength=self._hw_pipette.config.tip_length,
+            tipLength=self._hw_pipette.active_tip_settings.default_tip_length,
             mount=str(self._mount),
             serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
             defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
@@ -244,7 +244,7 @@ class PipetteOffsetCalibrationUserFlow:
     def critical_point_override(self) -> Optional[CriticalPoint]:
         return (
             CriticalPoint.FRONT_NOZZLE
-            if self._hw_pipette.config.channels == 8
+            if self._hw_pipette.config.channels.value == 8
             else None
         )
 
@@ -320,7 +320,11 @@ class PipetteOffsetCalibrationUserFlow:
     def _get_tip_length(self) -> float:
         stored_tip_length_cal = self._get_stored_tip_length_cal()
         if stored_tip_length_cal is None or self._should_perform_tip_length:
-            tip_overlap = self._hw_pipette.config.tip_overlap.get(self._tip_rack.uri, 0)
+            tip_overlap = (
+                self._hw_pipette.active_tip_settings.tip_overlap_dictionary.get(
+                    self._tip_rack.uri, 0
+                )
+            )
             tip_length = self._tip_rack.tip_length
             return tip_length - tip_overlap
         else:
@@ -436,7 +440,7 @@ class PipetteOffsetCalibrationUserFlow:
         if current_state == self._sm.state.joggingToDeck:
             self._z_height_reference = cur_pt.z
         elif current_state == self._sm.state.savingPointOne:
-            if self._hw_pipette.config.channels > 1:
+            if self._hw_pipette.config.channels.value > 1:
                 cur_pt = await self.get_current_point(
                     critical_point=CriticalPoint.FRONT_NOZZLE
                 )
