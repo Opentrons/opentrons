@@ -176,7 +176,7 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
     return stall_count, xy_count, y_count, z_l_count, z_r_count, final_encoder_pos, open_loop_pos
 
 async def _main(is_simulating: bool, cycles: int, mount: types.OT3Mount) -> None:
-    api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
+    api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating, stall_detection_enable=True)
     await api.cache_instruments()
     await api.home()
     load = api.gantry_load
