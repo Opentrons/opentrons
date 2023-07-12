@@ -25,6 +25,7 @@ import { Navbar } from './Navbar'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { RouteProps } from './types'
+import { ProtocolTimeline } from '../pages/Protocols/ProtocolDetails/ProtocolTimeline'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
@@ -42,6 +43,12 @@ export const DesktopApp = (): JSX.Element => {
       exact: true,
       name: 'Protocol Details',
       path: '/protocols/:protocolKey',
+    },
+    {
+      Component: ProtocolTimeline,
+      exact: true,
+      name: 'Protocol Timeline',
+      path: '/protocols/:protocolKey/timeline',
     },
     {
       Component: Labware,

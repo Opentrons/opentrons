@@ -33,6 +33,7 @@ import { getIsOT3Protocol } from './utils'
 import type { StyleProps } from '@opentrons/components'
 import type { StoredProtocolData } from '../../redux/protocol-storage'
 import type { Dispatch } from '../../redux/types'
+import { useHistory } from 'react-router-dom'
 
 interface ProtocolOverflowMenuProps extends StyleProps {
   handleRunProtocol: (storedProtocolData: StoredProtocolData) => void
@@ -57,6 +58,7 @@ export function ProtocolOverflowMenu(
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
   const dispatch = useDispatch<Dispatch>()
+  const history = useHistory()
   const trackEvent = useTrackEvent()
   const {
     confirm: confirmDeleteProtocol,
@@ -104,6 +106,11 @@ export function ProtocolOverflowMenu(
     dispatch(analyzeProtocol(protocolKey))
     setShowOverflowMenu(currentShowOverflowMenu => !currentShowOverflowMenu)
   }
+  const handleClickTimeline: React.MouseEventHandler<HTMLButtonElement> = e => {
+    e.preventDefault()
+    history.push(`/protocols/${protocolKey}/timeline`)
+    setShowOverflowMenu(!showOverflowMenu)
+  }
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -138,6 +145,9 @@ export function ProtocolOverflowMenu(
             data-testid="ProtocolOverflowMenu_reanalyze"
           >
             {t('shared:reanalyze')}
+          </MenuItem>
+          <MenuItem onClick={handleClickTimeline}>
+            {t('go_to_timeline')}
           </MenuItem>
 
           {sendAllProtocolsToOT3 || isOT3Protocol ? (
