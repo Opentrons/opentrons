@@ -21,6 +21,8 @@ PipetteName = Literal[
     "p20_multi_gen2",
     "p50_single",
     "p50_multi",
+    "p50_single_gen3",
+    "p50_multi_gen3",
     "p50_single_flex",
     "p50_multi_flex",
     "p300_single",
@@ -29,6 +31,8 @@ PipetteName = Literal[
     "p300_multi_gen2",
     "p1000_single",
     "p1000_single_gen2",
+    "p1000_single_gen3",
+    "p1000_multi_gen3",
     "p1000_single_flex",
     "p1000_multi_flex",
     # TODO (tz, 11-23-22): remove when refactoring load_pipette for 96 channels.

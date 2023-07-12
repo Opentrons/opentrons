@@ -1,0 +1,22 @@
+from opentrons.protocol_api import ProtocolContext
+
+metadata = {
+    "author": "engineer@opentrons.com",
+    "protocolName": "Flex basic transfer protocol",
+}
+
+requirements = {
+    "robotType": "Flex",
+    "apiLevel": "2.15",
+}
+
+
+def run(protocol: ProtocolContext) -> None:
+    plate = protocol.load_labware("corning_96_wellplate_360ul_flat", "D1")
+    tiprack_1 = protocol.load_labware("opentrons_flex_96_tiprack_50ul", "D2")
+    p50 = protocol.load_instrument("p50_single_flex", "right", tip_racks=[tiprack_1])
+
+    p50.pick_up_tip()
+    p50.aspirate(40, plate["A1"])
+    p50.dispense(40, plate["B1"])
+    p50.return_tip()
