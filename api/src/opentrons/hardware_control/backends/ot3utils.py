@@ -350,7 +350,7 @@ def create_move_group(
 
 def create_home_groups(
     distance: Dict[OT3Axis, float], velocity: Dict[OT3Axis, float]
-) -> Tuple[MoveGroup, MoveGroup]:
+) -> List[MoveGroup]:
     node_id_distances = _convert_to_node_id_dict(distance)
     node_id_velocities = _convert_to_node_id_dict(velocity)
     home_group = [
@@ -359,7 +359,7 @@ def create_home_groups(
     # halve the homing speed for backoff
     backoff_velocities = {k: v / 2 for k, v in node_id_velocities.items()}
     backoff_group = [create_backoff_step(backoff_velocities)]
-    return home_group, backoff_group
+    return [home_group, backoff_group]
 
 
 def create_tip_action_group(
