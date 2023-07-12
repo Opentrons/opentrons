@@ -263,7 +263,6 @@ class ProtocolEngine:
                 If `False`, will set status to `stopped`.
         """
         if error:
-            print(error)
             if (
                 isinstance(error, ProtocolCommandFailedError)
                 and error.original_error is not None
