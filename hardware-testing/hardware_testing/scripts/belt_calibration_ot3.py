@@ -70,6 +70,10 @@ test_data = {
     "XR Position":"None",
     "YF Position":"None",
     "YB Position":"None",
+    "Slot 1 Offset":"None",
+    "Slot 3 Offset":"None",
+    "Slot 10 Offset":"None",
+    "Slot 12 Offset":"None",
     "Belt Attitude":"None",
 }
 test_name = None
@@ -171,7 +175,8 @@ async def _calibrate_pipette(api: OT3API, mount: types.OT3Mount) -> None:
 
 
 async def _check_belt_accuracy_probe(api: OT3API, mount: types.OT3Mount) -> None:
-    ui.print_header("CHECK BELT ACCURACY")
+    global test_data
+    ui.print_header("CHECK BELT ACCURACY WITH PROBE")
     for slot in [1, 3, 10, 12]:
         await api.home()
         # if not api.is_simulator:
@@ -187,15 +192,17 @@ async def _check_belt_accuracy_probe(api: OT3API, mount: types.OT3Mount) -> None
                 raise e
             slot_offset = types.Point()
         await api.remove_tip(mount)
+        test_data[f"Slot {slot} Offset"] = str(_trunc_point(slot_offset)).replace(", ",";")
         print(f"Slot #{slot}: {slot_offset}")
         await api.home_z(mount)
 
 
 async def _check_belt_accuracy_dial(api: OT3API, mount: types.OT3Mount) -> None:
+    ui.print_header("CHECK BELT ACCURACY WITH DIAL")
     await api.home()
     await api.add_tip(mount, api.config.calibration.probe_length)
-    distance_x = await _measure_axis(api, mount, "X")
-    distance_y = await _measure_axis(api, mount, "Y")
+    await _measure_axis(api, mount, "X")
+    await _measure_axis(api, mount, "Y")
     await api.home()
     await api.remove_tip(mount)
 
@@ -226,7 +233,6 @@ async def _measure_axis(api: OT3API, mount: types.OT3Mount, axis: str) -> None:
         print(f"X-Right Gauge = {x_right_gauge} mm")
         print(f"X-Right Position = {x_right_pos}\n")
         await api.move_to(mount, right_center)
-        distance = 0
     elif "Y" in axis:
         above_front = front_center._replace(z=current_position.z)
         await api.move_to(mount, above_front)
@@ -245,8 +251,6 @@ async def _measure_axis(api: OT3API, mount: types.OT3Mount, axis: str) -> None:
         print(f"Y-Back Gauge = {y_back_gauge} mm")
         print(f"Y-Back Position = {y_back_pos}\n")
         await api.move_to(mount, back_center)
-        distance = 0
-    return distance
 
 
 async def _read_gauge(api: OT3API, mount: types.OT3Mount, axis: str) -> float:
@@ -352,21 +356,13 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
         for i in range(args.cycles):
             cycle = i + 1
             print(f"\n-> Starting Test Cycle {cycle}/{args.cycles}")
-            # SKIP calibrating the belts, then check accuracy
-            # await _calibrate_pipette(api, mount)
-            # await _check_belt_accuracy_dial(api, mount)
-
-            # DO calibrate the belts, then check accuracy
-            # await _calibrate_belts(api, mount)  # <-- !!!
-            # await _calibrate_pipette(api, mount)
-            # await _check_belt_accuracy_dial(api, mount)
-
             if args.belt:
                 test_data["Belt Status"] = "Calibrated"
                 await _calibrate_belts(api, mount)
             else:
                 test_data["Belt Status"] = "Uncalibrated"
             await _calibrate_pipette(api, mount)
+            await _check_belt_accuracy_probe(api, mount)
             await _check_belt_accuracy_dial(api, mount)
             _record_data(api, cycle)
 
