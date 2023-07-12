@@ -107,7 +107,7 @@ class TestCopyFileLike:
         destination_path: Path,
     ) -> None:
         """Test that it correctly copies from a text-mode `open()`."""
-        source_path.write_text(source_text, encoding="utf-8")
+        source_path.write_text(source_text)
 
         with open(
             source_path,
