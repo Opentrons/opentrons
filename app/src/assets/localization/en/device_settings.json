@@ -8,6 +8,7 @@
   "alternative_security_types_description": "The Opentrons App supports connecting Flex to various enterprise access points. Connect via USB and finish setup in the app.",
   "alternative_security_types": "Alternative security types",
   "app_change_in": "App Changes in {{version}}",
+  "apply_historic_offsets": "Apply labware offsets",
   "are_you_sure_you_want_to_disconnect": "Are you sure you want to disconnect from {{ssid}}?",
   "attach_a_pipette_before_calibrating": "Attach a pipette in order to perform calibration",
   "boot_scripts": "Boot scripts",
