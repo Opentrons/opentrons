@@ -18,16 +18,16 @@ import type {
 
 interface EstopMissingModalProps {
   isActiveRun: boolean
-  isEngaged: boolean
+  robotName: string
 }
 
 export function EstopMissingModal({
   isActiveRun,
-  isEngaged,
+  robotName,
 }: EstopMissingModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalHeader: ModalHeaderBaseProps = {
-    title: t('estop_pressed'),
+    title: t('estop_missing'),
     iconName: 'ot-alert',
     iconColor: isActiveRun ? COLORS.white : COLORS.red2,
   }
@@ -46,7 +46,9 @@ export function EstopMissingModal({
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('connect_estop_to_continue')}
         </StyledText>
-        <StyledText as="p">{t('estop_pressed_description')}</StyledText>
+        <StyledText as="p">
+          {t('estop_missing_description', { robotName: robotName })}
+        </StyledText>
       </Flex>
     </Modal>
   )

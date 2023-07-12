@@ -33,7 +33,7 @@ export function EstopPressedModal({
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalHeader: ModalHeaderBaseProps = {
-    title: t('estop_missing'),
+    title: t('estop_pressed'),
     iconName: 'ot-alert',
     iconColor: isActiveRun ? COLORS.white : COLORS.red2,
   }
@@ -50,7 +50,7 @@ export function EstopPressedModal({
         marginTop={isActiveRun ? SPACING.spacing32 : undefined}
       >
         <StyledText as="p" fontWeight>
-          {t('estop_missing_description')}
+          {t('estop_pressed_description')}
         </StyledText>
         <Flex
           backgroundColor={isEngaged ? COLORS.red3 : COLORS.green3}
@@ -71,6 +71,9 @@ export function EstopPressedModal({
           />
         </Flex>
         <SmallButton
+          data-testid={`Estop_pressed_${
+            isActiveRun ? 'activeRun' : 'inactiveRun'
+          }_button`}
           width="100%"
           buttonText={t('resume_robot_operations')}
           disabled={isEngaged}
