@@ -90,7 +90,7 @@ class TestCopyFileLike:
 
     @pytest.fixture
     def source_bytes(self, source_text: str) -> bytes:
-        return source_text.encode("utf-8")
+        return b"\x00\x01\x02\x03\x04"
 
     @pytest.fixture
     def source_path(self, tmp_path: Path) -> Path:
