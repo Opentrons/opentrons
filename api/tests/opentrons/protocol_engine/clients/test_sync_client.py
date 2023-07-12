@@ -143,7 +143,7 @@ def test_load_labware(
 
 def test_load_adapter(
     decoy: Decoy,
-    transport: AbstractSyncTransport,
+    transport: ChildThreadTransport,
     adapter_def: LabwareDefinition,
     subject: SyncClient,
 ) -> None:

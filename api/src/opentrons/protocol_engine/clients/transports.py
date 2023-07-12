@@ -1,4 +1,4 @@
-"""Base transport interfaces for communicating with a Protocol Engine."""
+"""A helper for controlling a `ProtocolEngine` without async/await."""
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
 from typing import Any, overload
 from typing_extensions import Literal
@@ -13,22 +13,22 @@ from ..commands import CommandCreate, CommandResult
 
 
 class ChildThreadTransport:
-    """Concrete transport implementation using asyncio.run_coroutine_threadsafe."""
+    """A helper for controlling a `ProtocolEngine` without async/await.
+
+    You shouldn't use this directly, except to construct it and then pass it to a `SyncClient`.
+
+    This class is responsible for doing the actual transformation from async `ProtocolEngine` calls
+    to non-async ones, and doing it in a thread-safe way.
+    """
 
     def __init__(self, engine: ProtocolEngine, loop: AbstractEventLoop) -> None:
-        """Initialize a ProtocolEngine transport for use in a child thread.
-
-        This adapter allows a client to make blocking command calls on its
-        thread to the asynchronous ProtocolEngine running with an event loop
-        in a different thread.
+        """Initialize the `ChildThreadTransport`.
 
         Args:
-            engine: An instance of a ProtocolEngine to interact with hardware
-                and other run procedures.
-            loop: An event loop running in the thread where the hardware
-                interaction should occur. The thread this loop is running
-                in should be different than the thread in which the Python
-                protocol is running.
+            engine: The `ProtocolEngine` instance that you want to interact with.
+                It must be running in a thread *other* than the one from which you
+                want to synchronously access it.
+            loop: The event loop that `engine` is running in (in the other thread).
         """
         self._engine = engine
         self._loop = loop
