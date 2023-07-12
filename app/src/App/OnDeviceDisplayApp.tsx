@@ -254,6 +254,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
     }
   }, [dispatch, isIdle, usersBrightness])
 
+  // TODO (sb:6/12/23) Create a notification manager to set up preference and order of takeover modals
   return (
     <ApiHostProvider hostname="localhost">
       <ErrorBoundary FallbackComponent={OnDeviceDisplayAppFallback}>

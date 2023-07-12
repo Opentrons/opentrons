@@ -1,5 +1,8 @@
 import * as React from 'react'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import {
+  useInstrumentsQuery,
+  useCurrentMaintenanceRun,
+} from '@opentrons/react-api-client'
 import { UpdateNeededModal } from './UpdateNeededModal'
 
 export function FirmwareUpdateTakeover(): JSX.Element {
@@ -10,12 +13,13 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   const instrumentsData = useInstrumentsQuery({
     refetchInterval: 5000,
   }).data?.data
+  const { data: maintenanceRunData } = useCurrentMaintenanceRun()
   const subsystemUpdateInstrument = instrumentsData?.find(
     instrument => instrument.ok === false
   )
 
   React.useEffect(() => {
-    if (subsystemUpdateInstrument != null) {
+    if (subsystemUpdateInstrument != null && maintenanceRunData == null) {
       setShowUpdateNeededModal(true)
     }
   }, [subsystemUpdateInstrument])

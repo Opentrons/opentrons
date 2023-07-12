@@ -31,6 +31,7 @@
   "error_details": "error details",
   "failed": "failed",
   "firmware_update_available": "Firmware update available.",
+  "firmware_update_available_now": "Firmware update available. <updateLink>Update now</updateLink>",
   "firmware_update_failed": "Failed to update module firmware",
   "firmware_update_installation_successful": "Installation successful",
   "got_it": "Got it",

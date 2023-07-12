@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { renderWithProviders } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import {
+  useInstrumentsQuery,
+  useCurrentMaintenanceRun,
+} from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { FirmwareUpdateTakeover } from '../FirmwareUpdateTakeover'
 import { UpdateNeededModal } from '../UpdateNeededModal'
@@ -12,7 +15,9 @@ jest.mock('../UpdateNeededModal')
 const mockUseInstrumentQuery = useInstrumentsQuery as jest.MockedFunction<
   typeof useInstrumentsQuery
 >
-
+const mockUseCurrentMaintenanceRun = useCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useCurrentMaintenanceRun
+>
 const mockUpdateNeededModal = UpdateNeededModal as jest.MockedFunction<
   typeof UpdateNeededModal
 >
@@ -36,6 +41,7 @@ describe('FirmwareUpdateTakeover', () => {
       },
     } as any)
     mockUpdateNeededModal.mockReturnValue(<>Mock Update Needed Modal</>)
+    mockUseCurrentMaintenanceRun.mockReturnValue({ data: undefined } as any)
   })
   it('renders update needed modal when an instrument is not ok', () => {
     const { getByText } = render()
@@ -50,6 +56,15 @@ describe('FirmwareUpdateTakeover', () => {
             ok: true,
           } as PipetteData,
         ],
+      },
+    } as any)
+    const { queryByText } = render()
+    expect(queryByText('Mock Update In Progress Modal')).not.toBeInTheDocument()
+  })
+  it('does not render modal when a maintenance run is active', () => {
+    mockUseCurrentMaintenanceRun.mockReturnValue({
+      data: {
+        runId: 'mock run id',
       },
     } as any)
     const { queryByText } = render()

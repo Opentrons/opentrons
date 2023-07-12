@@ -11,6 +11,7 @@ import {
 
 import {
   Flex,
+  ModalShell,
   ALIGN_CENTER,
   ALIGN_FLEX_START,
   COLORS,
@@ -48,6 +49,12 @@ interface InstrumentsAndModulesProps {
   robotName: string
 }
 
+const BANNER_LINK_CSS = css`
+  text-decoration: underline;
+  cursor: pointer;
+  margin-left: 0.5rem;
+`
+
 export function InstrumentsAndModules({
   robotName,
 }: InstrumentsAndModulesProps): JSX.Element | null {
@@ -76,7 +83,7 @@ export function InstrumentsAndModules({
     ) ?? null
   const badGripper =
     (attachedInstruments?.data ?? []).find(
-      (i): i is BadGripper => i.instrumentType === 'gripper' && !i.ok
+      (i): i is BadGripper => i.subsystem === 'gripper' && i.ok
     ) ?? null
   const attachedLeftPipette =
     attachedInstruments?.data?.find(
@@ -137,28 +144,6 @@ export function InstrumentsAndModules({
     RIGHT
   )
 
-  const instrumentUpdateBanner = (subsystem: Subsystem): React.ReactNode => (
-    <Banner type="warning" marginBottom={SPACING.spacing4}>
-      <Trans
-        t={t}
-        i18nKey="update_now"
-        components={{
-          calLink: (
-            <StyledText
-              as="p"
-              css={css`
-                text-decoration: underline;
-                cursor: pointer;
-                margin-left: 0.5rem;
-              `}
-              onClick={setSubsystemToUpdate(subsystem)}
-            />
-          ),
-        }}
-      />
-    </Banner>
-  )
-
   return (
     <Flex
       alignItems={ALIGN_FLEX_START}
@@ -166,11 +151,13 @@ export function InstrumentsAndModules({
       width="100%"
     >
       {subsystemToUpdate != null && (
-        <FirmwareUpdateModal
-          subsystem={subsystemToUpdate}
-          proceed={() => setSubsystemToUpdate(null)}
-          description={t('updating_firmware')}
-        />
+        <ModalShell>
+          <FirmwareUpdateModal
+            subsystem={subsystemToUpdate}
+            proceed={() => setSubsystemToUpdate(null)}
+            description={t('updating_firmware')}
+          />
+        </ModalShell>
       )}
       <StyledText
         as="h3"
@@ -227,7 +214,23 @@ export function InstrumentsAndModules({
                 <InstrumentCard
                   label={t('mount', { side: 'left' })}
                   description={t('instrument_attached')}
-                  banner={instrumentUpdateBanner('pipette_left')}
+                  banner={
+                    <Banner type="warning" marginBottom={SPACING.spacing4}>
+                      <Trans
+                        t={t}
+                        i18nKey="update_now"
+                        components={{
+                          calLink: (
+                            <StyledText
+                              as="p"
+                              css={BANNER_LINK_CSS}
+                              onClick={setSubsystemToUpdate('pipette_left')}
+                            />
+                          ),
+                        }}
+                      />
+                    </Banner>
+                  }
                 />
               )}
               {isOT3 && badGripper == null && (
@@ -240,7 +243,23 @@ export function InstrumentsAndModules({
                 <InstrumentCard
                   label={t('shared:extension_mount')}
                   description={t('instrument_attached')}
-                  banner={instrumentUpdateBanner('gripper')}
+                  banner={
+                    <Banner type="warning" marginBottom={SPACING.spacing4}>
+                      <Trans
+                        t={t}
+                        i18nKey="firmware_update_available_now"
+                        components={{
+                          updateLink: (
+                            <StyledText
+                              as="p"
+                              css={BANNER_LINK_CSS}
+                              onClick={() => setSubsystemToUpdate('gripper')}
+                            />
+                          ),
+                        }}
+                      />
+                    </Banner>
+                  }
                 />
               )}
               {leftColumnModules.map((module, index) => (
@@ -282,7 +301,23 @@ export function InstrumentsAndModules({
                 <InstrumentCard
                   label={t('mount', { side: 'right' })}
                   description={t('instrument_attached')}
-                  banner={instrumentUpdateBanner('pipette_right')}
+                  banner={
+                    <Banner type="warning" marginBottom={SPACING.spacing4}>
+                      <Trans
+                        t={t}
+                        i18nKey="update_now"
+                        components={{
+                          calLink: (
+                            <StyledText
+                              as="p"
+                              css={BANNER_LINK_CSS}
+                              onClick={setSubsystemToUpdate('pipette_right')}
+                            />
+                          ),
+                        }}
+                      />
+                    </Banner>
+                  }
                 />
               )}
               {rightColumnModules.map((module, index) => (
