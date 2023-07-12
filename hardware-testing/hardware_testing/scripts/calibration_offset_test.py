@@ -77,10 +77,9 @@ class Calibration_Offset_Test:
 
     async def test_setup(self):
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
-        self.nominal_center = Point(*get_calibration_square_position_in_slot(self.slot))
         self.file_setup()
-        self.instrument_setup()
-        self.test_data["Slot"] = str(self.slot)
+        await self.instrument_setup()
+        await self.deck_setup()
         print(f"\nStarting Calibration Offset Test on Slot {self.slot}!\n")
         self.start_time = time.time()
 
@@ -96,7 +95,8 @@ class Calibration_Offset_Test:
         print("FILE PATH = ", self.test_path)
         print("FILE NAME = ", self.test_file)
 
-    def instrument_setup(self):
+    async def instrument_setup(self):
+        await self.api.cache_instruments()
         if self.instrument == "left":
             self.mount = OT3Mount.LEFT
         elif self.instrument == "right":
@@ -111,6 +111,10 @@ class Calibration_Offset_Test:
             else:
                 self.instrument_id = self.api._pipette_handler.get_pipette(self.mount)._pipette_id
         self.test_data["Instrument"] = str(self.instrument_id)
+
+    async def deck_setup(self):
+        self.nominal_center = Point(*get_calibration_square_position_in_slot(self.slot))
+        self.test_data["Slot"] = str(self.slot)
 
     def dict_keys_to_line(self, dict):
         return str.join(",", list(dict.keys()))+"\n"
