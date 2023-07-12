@@ -95,7 +95,7 @@ def test_convert_pipette_model_provided_version(
             ),
         ],
         [
-            "p1000_multi_gen3",
+            "p1000_multi_flex",
             pc.PipetteModelVersionType(
                 PipetteModelType.p1000,
                 PipetteChannelType.EIGHT_CHANNEL,
@@ -137,7 +137,7 @@ def test_convert_pipette_name(
             # 96 channel has a unique "name" right now
             PipetteModelType.p1000,
             PipetteChannelType.NINETY_SIX_CHANNEL,
-            PipetteGenerationType.GEN3,
+            PipetteGenerationType.FLEX,
             "p1000_96",
         ],
     ],

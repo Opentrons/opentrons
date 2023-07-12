@@ -12,7 +12,6 @@ describe('LargeButton', () => {
   beforeEach(() => {
     props = {
       onClick: jest.fn(),
-      buttonType: 'primary',
       buttonText: 'large button',
       iconName: 'play-round-corners',
     }

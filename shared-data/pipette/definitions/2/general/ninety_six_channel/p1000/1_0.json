@@ -1,8 +1,8 @@
 {
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
-  "displayName": "P1000 96 Channel GEN3",
+  "displayName": "Flex 96-Channel 1000 μL",
   "model": "p1000",
-  "displayCategory": "GEN3",
+  "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
     "current": 1.5,
     "presses": 0.0,
@@ -32,5 +32,6 @@
   "channels": 96,
   "shaftDiameter": 9.0,
   "shaftULperMM": 63.617,
-  "backlashDistance": 0.3
+  "backlashDistance": 0.3,
+  "quirks": []
 }

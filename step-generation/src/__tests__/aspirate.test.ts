@@ -21,6 +21,7 @@ import {
   getErrorResult,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
+  getInitialRobotStateWithOffDeckLabwareStandard,
 } from '../fixtures'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { AspDispAirgapParams } from '@opentrons/shared-data/protocol/types/schemaV3'
@@ -195,6 +196,27 @@ describe('aspirate', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'LABWARE_DOES_NOT_EXIST',
+    })
+  })
+  it('should return an error when aspirating from labware off deck', () => {
+    initialRobotState = getInitialRobotStateWithOffDeckLabwareStandard(
+      invariantContext
+    )
+
+    const result = aspirate(
+      {
+        ...flowRateAndOffsets,
+        pipette: DEFAULT_PIPETTE,
+        volume: 50,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      } as AspDispAirgapParams,
+      invariantContext,
+      initialRobotState
+    )
+    expect(getErrorResult(result).errors).toHaveLength(2)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'LABWARE_OFF_DECK',
     })
   })
   it('should return an error when aspirating from thermocycler with pipette collision', () => {

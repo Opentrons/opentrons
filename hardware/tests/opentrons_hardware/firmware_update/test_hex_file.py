@@ -63,7 +63,7 @@ from opentrons_hardware.firmware_update import hex_file
 )
 def test_process_line(line: str, expected: hex_file.HexRecord) -> None:
     """It should process line successfully."""
-    assert hex_file.process_line(line) == expected
+    assert hex_file.process_line(line, 2, "dummy-name") == expected
 
 
 @pytest.mark.parametrize(
@@ -94,7 +94,7 @@ def test_process_line(line: str, expected: hex_file.HexRecord) -> None:
 def test_process_bad_line(line: str) -> None:
     """It should fail to process malformed line."""
     with pytest.raises(hex_file.MalformedLineException):
-        hex_file.process_line(line)
+        hex_file.process_line(line, 2, "dummy-name")
 
 
 @pytest.mark.parametrize(
@@ -114,7 +114,7 @@ def test_process_bad_line(line: str) -> None:
 def test_process_bad_checksum(line: str) -> None:
     """It should raise a checksum exception."""
     with pytest.raises(hex_file.ChecksumException):
-        hex_file.process_line(line)
+        hex_file.process_line(line, 3, "dummy-name")
 
 
 @pytest.fixture(scope="session")
@@ -246,7 +246,7 @@ def test_process(
     hex_records: Iterable[hex_file.HexRecord], size: int, expected: List[hex_file.Chunk]
 ) -> None:
     """It should read n sized chunks from a stream of HexRecord objects."""
-    subject = hex_file.HexRecordProcessor(records=hex_records)
+    subject = hex_file.HexRecordProcessor(records=hex_records, filename="dummy-name")
 
     assert list(subject.process(size)) == expected
     assert subject.start_address == 0x8090A0B0
@@ -254,6 +254,6 @@ def test_process(
 
 def test_process_failure_zero_size(hex_records: Iterable[hex_file.HexRecord]) -> None:
     """It should fail if 0 is the requested size."""
-    subject = hex_file.HexRecordProcessor(records=hex_records)
+    subject = hex_file.HexRecordProcessor(records=hex_records, filename="dummy-name")
     with pytest.raises(hex_file.BadChunkSizeException):
         list(subject.process(0))

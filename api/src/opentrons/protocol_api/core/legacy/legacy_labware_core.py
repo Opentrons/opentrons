@@ -134,6 +134,9 @@ class LegacyLabwareCore(AbstractLabware[LegacyWellCore]):
     def is_tip_rack(self) -> bool:
         return self._parameters["isTiprack"]
 
+    def is_adapter(self) -> bool:
+        return False  # Adapters were introduced in v2.15 and not supported in legacy protocols
+
     def is_fixed_trash(self) -> bool:
         """Whether the labware is fixed trash."""
         return "fixedTrash" in self.get_quirks()

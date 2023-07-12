@@ -1,5 +1,5 @@
-import { HandleKeypress } from '@opentrons/components'
 import * as React from 'react'
+import { HandleKeypress } from '@opentrons/components'
 
 interface HandleEnterProps {
   children: React.ReactNode

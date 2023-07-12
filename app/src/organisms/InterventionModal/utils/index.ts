@@ -1,5 +1,5 @@
-export * from './getCurrentRunLabwareRenderInfo'
-export * from './getCurrentRunModulesRenderInfo'
+export * from './getRunLabwareRenderInfo'
+export * from './getRunModuleRenderInfo'
 export * from './getLabwareDisplayLocationFromRunData'
 export * from './getLabwareNameFromRunData'
 export * from './getModuleDisplayLocationFromRunData'

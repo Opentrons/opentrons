@@ -57,7 +57,6 @@ export function RobotSetupHeader({
         </StyledText>
         {onClickButton != null && buttonText != null ? (
           <SmallButton
-            buttonType="primary"
             buttonCategory="rounded"
             buttonText={buttonText}
             onClick={onClickButton}

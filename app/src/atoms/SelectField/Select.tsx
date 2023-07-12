@@ -1,15 +1,15 @@
 import * as React from 'react'
 import ReactSelect, { components, DropdownIndicatorProps } from 'react-select'
 import {
-  Icon,
   BORDERS,
-  TYPOGRAPHY,
-  COLORS,
   Box,
-  SPACING,
+  COLORS,
   DIRECTION_ROW,
-  POSITION_RELATIVE,
+  Icon,
   POSITION_ABSOLUTE,
+  POSITION_RELATIVE,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 
 import type {
@@ -45,7 +45,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       height: SPACING.spacing16,
       borderColor: COLORS.medGreyEnabled,
       boxShadow: 'none',
-      padding: '0.375rem',
+      padding: SPACING.spacing6,
       flexDirection: DIRECTION_ROW,
       '&:hover': {
         borderColor: COLORS.medGreyHover,
@@ -73,7 +73,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       zIndex: 5,
       position: POSITION_ABSOLUTE,
       top: SPACING.spacing4,
-      paddingLeft: '0.375rem',
+      paddingLeft: SPACING.spacing6,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
     loadingIndicator: NO_STYLE_FN,
@@ -101,7 +101,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
     multiValueRemove: NO_STYLE_FN,
     noOptionsMessage: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      padding: '0.375rem',
+      padding: SPACING.spacing6,
       color: COLORS.darkBlackEnabled,
     }),
     option: (styles: CSSObjectWithLabel, state: OptionProps<SelectOption>) => ({

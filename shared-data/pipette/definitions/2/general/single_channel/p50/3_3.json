@@ -2,7 +2,7 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
   "displayName": "Flex 1-Channel 50 μL",
   "model": "p50",
-  "displayCategory": "GEN3",
+  "displayCategory": "FLEX",
   "pickUpTipConfigurations": {
     "current": 0.15,
     "presses": 1,
@@ -29,5 +29,6 @@
   "channels": 1,
   "shaftDiameter": 1.0,
   "shaftULperMM": 0.785,
-  "backlashDistance": 0.1
+  "backlashDistance": 0.1,
+  "quirks": []
 }

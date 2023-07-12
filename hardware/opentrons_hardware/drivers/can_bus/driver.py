@@ -6,11 +6,11 @@ import platform
 from typing import Optional, Union, Dict, Any
 import concurrent.futures
 
+from opentrons_shared_data.errors.exceptions import CANBusBusError
 from can import Notifier, Bus, AsyncBufferedReader, Message
 
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.message import CanMessage
-from .errors import ErrorFrameCanError
 from .abstract_driver import AbstractCanDriver
 from .settings import calculate_fdcan_parameters, PCANParameters
 
@@ -124,12 +124,14 @@ class CanDriver(AbstractCanDriver):
             A can message
 
         Raises:
-            ErrorFrameCanError
+            CANBusBusError
         """
         m: Message = await self._reader.get_message()
         if m.is_error_frame:
             log.error("Error frame encountered")
-            raise ErrorFrameCanError(message=repr(m))
+            raise CANBusBusError(
+                message="Error frame encountered", detail={"frame": repr(m)}
+            )
 
         return CanMessage(
             arbitration_id=ArbitrationId(id=m.arbitration_id), data=m.data

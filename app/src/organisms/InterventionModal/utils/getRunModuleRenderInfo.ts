@@ -17,7 +17,7 @@ export interface RunModuleInfo {
   nestedLabwareId: string | null
 }
 
-export function getCurrentRunModulesRenderInfo(
+export function getRunModuleRenderInfo(
   runData: RunData,
   deckDef: DeckDefinition,
   labwareDefs: LabwareDefinitionsByUri

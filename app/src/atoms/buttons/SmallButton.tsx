@@ -28,7 +28,7 @@ export type ButtonCategory = 'default' | 'rounded'
 type IconPlacement = 'startIcon' | 'endIcon'
 interface SmallButtonProps extends StyleProps {
   onClick: React.MouseEventHandler
-  buttonType: SmallButtonTypes
+  buttonType?: SmallButtonTypes
   buttonText: React.ReactNode
   iconPlacement?: IconPlacement
   iconName?: IconName
@@ -38,7 +38,7 @@ interface SmallButtonProps extends StyleProps {
 
 export function SmallButton(props: SmallButtonProps): JSX.Element {
   const {
-    buttonType,
+    buttonType = 'primary',
     buttonText,
     buttonCategory = 'default',
     disabled,

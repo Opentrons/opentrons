@@ -51,7 +51,6 @@ export function ChildNavigation({
       </Flex>
       {onClickButton != null && buttonText != null ? (
         <SmallButton
-          buttonType="primary"
           buttonCategory="rounded"
           buttonText={buttonText}
           onClick={onClickButton}

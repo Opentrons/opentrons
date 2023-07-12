@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Flex, SPACING } from '@opentrons/components'
 import { ICON_DATA_BY_NAME } from '@opentrons/components/src/icons/icon-data'
 
-import { GlobalStyle } from '../../atoms/GlobalStyle'
+import { GlobalStyle } from '../../../../app/src/atoms/GlobalStyle'
 import { LocationIcon } from '.'
 
 import type { Story, Meta } from '@storybook/react'

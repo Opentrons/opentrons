@@ -21,6 +21,7 @@ import { RunSummary } from '../../pages/OnDeviceDisplay/RunSummary'
 import { Welcome } from '../../pages/OnDeviceDisplay/Welcome'
 import { NameRobot } from '../../pages/OnDeviceDisplay/NameRobot'
 import { InitialLoadingScreen } from '../../pages/OnDeviceDisplay/InitialLoadingScreen'
+import { EmergencyStop } from '../../pages/EmergencyStop'
 import { getOnDeviceDisplaySettings } from '../../redux/config'
 import { getIsShellReady } from '../../redux/shell'
 import { useCurrentRunRoute, useProtocolReceiptToast } from '../hooks'
@@ -42,6 +43,7 @@ jest.mock('../../pages/OnDeviceDisplay/RunningProtocol')
 jest.mock('../../pages/OnDeviceDisplay/RunSummary')
 jest.mock('../../pages/OnDeviceDisplay/NameRobot')
 jest.mock('../../pages/OnDeviceDisplay/InitialLoadingScreen')
+jest.mock('../../pages/EmergencyStop')
 jest.mock('../../redux/config')
 jest.mock('../../redux/shell')
 jest.mock('../hooks')
@@ -92,6 +94,9 @@ const mockRunningProtocol = RunningProtocol as jest.MockedFunction<
 >
 const mockRunSummary = RunSummary as jest.MockedFunction<typeof RunSummary>
 const mockNameRobot = NameRobot as jest.MockedFunction<typeof NameRobot>
+const mockEmergencyStop = EmergencyStop as jest.MockedFunction<
+  typeof EmergencyStop
+>
 const mockGetOnDeviceDisplaySettings = getOnDeviceDisplaySettings as jest.MockedFunction<
   typeof getOnDeviceDisplaySettings
 >
@@ -137,6 +142,7 @@ describe('OnDeviceDisplayApp', () => {
     mockgetIsShellReady.mockReturnValue(false)
     mockNameRobot.mockReturnValue(<div>Mock NameRobot</div>)
     mockInitialLoadingScreen.mockReturnValue(<div>Mock Loading</div>)
+    mockEmergencyStop.mockReturnValue(<div>Mock EmergencyStop</div>)
     mockUseCurrentRunRoute.mockReturnValue(null)
   })
   afterEach(() => {
@@ -213,6 +219,11 @@ describe('OnDeviceDisplayApp', () => {
     const [{ getByText }] = render('/')
     mockgetIsShellReady.mockReturnValue(true)
     getByText('Mock Loading')
+  })
+  it('renders EmergencyStop component from /emergency-stop', () => {
+    mockUseCurrentRunRoute.mockReturnValue('/emergency-stop')
+    const [{ getByText }] = render('/emergency-stop')
+    getByText('Mock EmergencyStop')
   })
   it('renders protocol receipt toasts', () => {
     render('/')

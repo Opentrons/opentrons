@@ -147,7 +147,6 @@ export function ProtocolInstrumentMountItem(
                   t(attachedInstrument != null ? 'calibrate' : 'attach'),
                   'capitalize'
                 )}
-                buttonType="primary"
                 buttonCategory="rounded"
               />
             </Flex>

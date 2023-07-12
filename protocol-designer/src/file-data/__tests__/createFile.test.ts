@@ -22,6 +22,7 @@ import {
   labwareNicknamesById,
   labwareDefsByURI,
   pipetteEntities,
+  ot2Robot,
 } from '../__fixtures__/createFile/commonFields'
 import * as v6Fixture from '../__fixtures__/createFile/v6Fixture'
 import {
@@ -76,6 +77,7 @@ describe('createFile selector', () => {
       fileMetadata,
       v6Fixture.initialRobotState,
       v6Fixture.robotStateTimeline,
+      ot2Robot,
       dismissedWarnings,
       ingredients,
       ingredLocations,

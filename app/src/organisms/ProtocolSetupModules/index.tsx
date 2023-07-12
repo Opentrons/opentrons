@@ -11,8 +11,10 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
+  LocationIcon,
   Module,
   RobotWorkSpace,
+  SlotLabels,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -33,7 +35,6 @@ import { InlineNotification } from '../../atoms/InlineNotification'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
-import { LocationIcon } from '../../molecules/LocationIcon'
 import { useAttachedModules } from '../../organisms/Devices/hooks'
 import { ModuleInfo } from '../../organisms/Devices/ModuleInfo'
 import { MultipleModulesModal } from '../../organisms/Devices/ProtocolRun/SetupModules/MultipleModulesModal'
@@ -208,27 +209,34 @@ export function ProtocolSetupModules({
               deckLayerBlocklist={OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
               id="ModuleSetup_deckMap"
             >
-              {() =>
-                attachedProtocolModuleMatches.map(module => (
-                  <Module
-                    key={module.moduleId}
-                    x={module.x}
-                    y={module.y}
-                    orientation={inferModuleOrientationFromXCoordinate(
-                      module.x
-                    )}
-                    def={module.moduleDef}
-                  >
-                    <ModuleInfo
-                      moduleModel={module.moduleDef.model}
-                      isAttached={module.attachedModuleMatch != null}
-                      usbPort={module.attachedModuleMatch?.usbPort.port ?? null}
-                      hubPort={module.attachedModuleMatch?.usbPort.hub ?? null}
-                      runId={runId}
-                    />
-                  </Module>
-                ))
-              }
+              {() => (
+                <>
+                  {attachedProtocolModuleMatches.map(module => (
+                    <Module
+                      key={module.moduleId}
+                      x={module.x}
+                      y={module.y}
+                      orientation={inferModuleOrientationFromXCoordinate(
+                        module.x
+                      )}
+                      def={module.moduleDef}
+                    >
+                      <ModuleInfo
+                        moduleModel={module.moduleDef.model}
+                        isAttached={module.attachedModuleMatch != null}
+                        usbPort={
+                          module.attachedModuleMatch?.usbPort.port ?? null
+                        }
+                        hubPort={
+                          module.attachedModuleMatch?.usbPort.hub ?? null
+                        }
+                        runId={runId}
+                      />
+                    </Module>
+                  ))}
+                  <SlotLabels robotType={ROBOT_MODEL_OT3} />
+                </>
+              )}
             </RobotWorkSpace>
           </LegacyModal>
         ) : null}
