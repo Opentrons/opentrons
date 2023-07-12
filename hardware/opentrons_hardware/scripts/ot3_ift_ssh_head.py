@@ -274,6 +274,23 @@ async def read_epprom(messenger: CanMessenger, node):
         print("errval",errval)
         return "None"
 
+async def read_epprom_gripper(messenger: CanMessenger, node):
+    await messenger.send(node, InstrumentInfoRequest())
+    target = datetime.datetime.now()
+    try:
+        while True:
+            with WaitableCallback(messenger) as wc:
+                message, arb = await asyncio.wait_for(wc.read(), 1.0)
+                pipette_name = "GRP"
+                pipette_version = str(message.payload.model.value)
+                serial_number = pipette_name + \
+                            pipette_version + \
+                            str(message.payload.serial.value.decode('ascii').rstrip('\x00'))
+                return serial_number
+    except Exception as errval:
+        print("errval",errval)
+        return "None"
+
 async def read_version(messenger: CanMessenger, node):
     await messenger.send(node, DeviceInfoRequest())
     target = datetime.datetime.now()
@@ -354,6 +371,10 @@ async def  run(args: argparse.Namespace) -> None:
         if match:
             value = match.group(1)
         print(f'READVERSION={value}')
+    if args.read_epprom_gripper:
+        serial_number2 = await read_epprom_gripper(messenger, node)
+        print(f'READEPPROMGRP={serial_number2}')
+        
 
 
 log = logging.getLogger(__name__)
@@ -419,6 +440,7 @@ def main() -> None:
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--read_epprom", action="store_true")
     parser.add_argument("--read_version", action="store_true")
+    parser.add_argument("--read_epprom_gripper", action="store_true")
     parser.add_argument("--home", action="store_true")
     parser.add_argument("--downward", action="store_true")
     parser.add_argument("--up", action="store_true")
