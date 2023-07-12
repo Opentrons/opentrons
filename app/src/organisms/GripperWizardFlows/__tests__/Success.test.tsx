@@ -25,6 +25,7 @@ describe('Success', () => {
           proceed={mockProceed}
           section={SECTIONS.SUCCESS}
           successfulAction={SUCCESSFULLY_ATTACHED_AND_CALIBRATED}
+          isRobotMoving={false}
           {...props}
         />,
         { i18nInstance: i18n }

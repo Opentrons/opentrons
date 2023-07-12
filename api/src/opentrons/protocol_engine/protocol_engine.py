@@ -55,6 +55,17 @@ class ProtocolEngine:
     A ProtocolEngine instance holds the state of a protocol as it executes,
     and manages calls to a command executor that actually implements the logic
     of the commands themselves.
+
+    Lifetime:
+        Instances are single-use. Each instance is associated with a single protocol,
+        or a a single chain of robot control such as Labware Position Check.
+
+    Concurrency:
+        Instances live in `asyncio` event loops. Each instance must be constructed inside an
+        event loop, and then must be interacted with exclusively through that
+        event loop's thread--even for regular non-`async` methods, like `.pause()`.
+        (This is because there are background async tasks that monitor state changes using
+        primitives that aren't thread-safe. See ChangeNotifier.)
     """
 
     def __init__(

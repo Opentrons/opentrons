@@ -20,6 +20,7 @@ describe('ExitConfirmation', () => {
           handleExit={mockExit}
           handleGoBack={mockBack}
           flowType={GRIPPER_FLOW_TYPES.ATTACH}
+          isRobotMoving={false}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -33,7 +34,7 @@ describe('ExitConfirmation', () => {
 
   it('clicking confirm exit calls exit', () => {
     const { getByRole } = render()[0]
-    getByRole('button', { name: 'exit' }).click()
+    getByRole('button', { name: 'Exit' }).click()
     expect(mockExit).toHaveBeenCalled()
   })
 
