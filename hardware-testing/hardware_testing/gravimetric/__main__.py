@@ -26,7 +26,7 @@ from hardware_testing.protocols import (
 )
 
 from . import execute, helpers, workarounds, execute_photometric
-from .config import GravimetricConfig, GANTRY_MAX_SPEED, PhotometricConfig
+from .config import GravimetricConfig, GANTRY_MAX_SPEED, PhotometricConfig, ConfigType
 from .measurement import DELAY_FOR_MEASUREMENT
 from .trial import TestResources
 from .tips import get_tips
@@ -106,6 +106,7 @@ def build_gravimetric_cfg(
     gantry_speed: int,
     scale_delay: int,
     isolate_channels: List[int],
+    extra: bool,
 ) -> GravimetricConfig:
     """Run."""
     if increment:
@@ -134,6 +135,8 @@ def build_gravimetric_cfg(
         gantry_speed=gantry_speed,
         scale_delay=scale_delay,
         isolate_channels=isolate_channels,
+        kind=ConfigType.gravimetric,
+        extra=args.extra,
     )
 
 
@@ -148,6 +151,7 @@ def build_photometric_cfg(
     user_volumes: bool,
     touch_tip: bool,
     refill: bool,
+    extra: bool,
 ) -> PhotometricConfig:
     """Run."""
     protocol_cfg = PHOTOMETRIC_CFG[tip_volume]
@@ -171,6 +175,8 @@ def build_photometric_cfg(
         user_volumes=user_volumes,
         touch_tip=touch_tip,
         refill=refill,
+        kind=ConfigType.photometric,
+        extra=args.extra,
     )
 
 
@@ -194,6 +200,7 @@ if __name__ == "__main__":
     parser.add_argument("--touch-tip", action="store_true")
     parser.add_argument("--refill", action="store_true")
     parser.add_argument("--isolate-channels", nargs="+", type=int, default=None)
+    parser.add_argument("--extra", action="store_true")
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context
@@ -246,6 +253,7 @@ if __name__ == "__main__":
             args.user_volumes,
             args.touch_tip,
             args.refill,
+            args.extra,
         )
         union_cfg = cfg_pm
     else:
@@ -264,6 +272,7 @@ if __name__ == "__main__":
             args.gantry_speed,
             args.scale_delay,
             args.isolate_channels if args.isolate_channels else [],
+            args.extra,
         )
         union_cfg = cfg_gm
     run_id, start_time = create_run_id_and_start_time()

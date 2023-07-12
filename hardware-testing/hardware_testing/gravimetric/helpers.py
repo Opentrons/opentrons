@@ -4,7 +4,7 @@ from types import MethodType
 from typing import Any, List, Dict, Optional, Tuple
 from statistics import stdev
 from . import config
-from .liquid_class.defaults import get_liquid_class, get_test_volumes
+from .liquid_class.defaults import get_liquid_class
 from .increments import get_volume_increments
 from inspect import getsource
 
@@ -275,9 +275,7 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.VolumetricConfig) -> List[flo
             float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
         ]
     else:
-        test_volumes = get_test_volumes(
-            cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume
-        )
+        test_volumes = get_test_volumes(cfg)
     if not test_volumes:
         raise ValueError("no volumes to test, check the configuration")
     if not _check_if_software_supports_high_volumes():
@@ -358,3 +356,20 @@ def _load_tipracks(
     ]
     _apply_labware_offsets(cfg, tipracks)
     return tipracks
+
+
+def get_test_volumes(cfg: config.VolumetricConfig) -> List[float]:
+    """Get test volumes."""
+    if cfg.kind is config.ConfigType.photometric:
+        return config.QC_VOLUMES_P[cfg.pipette_channels][cfg.pipette_volume][
+            cfg.tip_volume
+        ]
+    else:
+        if cfg.extra:
+            return config.QC_VOLUMES_EXTRA_G[cfg.pipette_channels][cfg.pipette_volume][
+                cfg.tip_volume
+            ]
+        else:
+            return config.QC_VOLUMES_G[cfg.pipette_channels][cfg.pipette_volume][
+                cfg.tip_volume
+            ]
