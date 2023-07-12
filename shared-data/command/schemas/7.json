@@ -727,9 +727,9 @@
           "description": "Whether to home this pipette's plunger after dropping the tip. You should normally leave this unspecified to let the robot choose a safe default depending on its hardware.",
           "type": "boolean"
         },
-        "randomizeDropLocation": {
-          "title": "Randomizedroplocation",
-          "description": "Whether to randomize the location where tip is dropped within the labware. If True, this command will ignore the wellLocation provided and drop tip at a random location within a set area of the specified labware well. If False, the tip will be dropped at the top center of the well.",
+        "alternateDropLocation": {
+          "title": "Alternatedroplocation",
+          "description": "Whether to alternate location where tip is dropped within the labware. If True, this command will ignore the wellLocation provided and alternate between dropping tips at two predetermined locations inside the specified labware well. If False, the tip will be dropped at the top center of the well.",
           "default": false,
           "type": "boolean"
         }

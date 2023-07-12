@@ -325,7 +325,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
         location: Optional[Location],
         well_core: WellCore,
         home_after: Optional[bool],
-        randomize_drop_location: Optional[bool] = False,
+        alternate_drop_location: Optional[bool] = False,
     ) -> None:
         """Move to and drop a tip into a given well.
 
@@ -334,7 +334,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
                 Used to calculate the relative well offset for the drop command.
             well_core: The well we're dropping into
             home_after: Whether to home the pipette after the tip is dropped.
-            randomize_drop_location: Whether to randomize the exact location to drop tip
+            alternate_drop_location: Whether to randomize the exact location to drop tip
                 within the specified well.
         """
         well_name = well_core.get_name()
@@ -362,7 +362,7 @@ class InstrumentCore(AbstractInstrument[WellCore]):
             well_name=well_name,
             well_location=well_location,
             home_after=home_after,
-            randomize_drop_location=randomize_drop_location,
+            alternateDropLocation=alternate_drop_location,
         )
 
         self._protocol_core.set_last_location(location=location, mount=self.get_mount())

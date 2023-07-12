@@ -1,17 +1,21 @@
 """The usb binary protocol over serial transport."""
+import asyncio
+import logging
+import concurrent.futures
+from functools import partial
+from typing import Optional, Type, Tuple
 
 import serial  # type: ignore[import]
 from serial.tools.list_ports import comports  # type: ignore[import]
-from functools import partial
+
+from opentrons_shared_data.errors.exceptions import InternalUSBCommunicationError
+
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     BinaryMessageDefinition,
     get_binary_definition,
 )
-import asyncio
-import logging
-import concurrent.futures
 
-from typing import Optional, Type, Tuple
+
 from opentrons_hardware.firmware_bindings import utils
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 
@@ -37,7 +41,10 @@ class SerialUsbDriver:
         """Initialize a serial connection to a usb device that uses the binary messaging protocol."""
         _port_name = self._find_serial_port(vid, pid)
         if _port_name is None:
-            raise IOError("unable to find serial device")
+            raise InternalUSBCommunicationError(
+                message="unable to find serial device",
+                detail={"vid": str(vid), "pid": str(pid)},
+            )
         self._vid = vid
         self._pid = pid
         self._baudrate = baudrate

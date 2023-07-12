@@ -20,6 +20,7 @@ from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_engine import (
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     ModuleModel as EngineModuleModel,
     LabwareMovementStrategy,
     LabwareOffsetVector,
@@ -30,10 +31,12 @@ from opentrons.protocol_engine.types import (
     ModuleModel as ProtocolEngineModuleModel,
     OFF_DECK_LOCATION,
     LabwareLocation,
+    NonStackedLocation,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import (
     LabwareNotLoadedOnModuleError,
+    LabwareNotLoadedOnLabwareError,
 )
 
 from ... import validation
@@ -134,7 +137,9 @@ class ProtocolCore(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType],
+        location: Union[
+            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+        ],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
@@ -193,12 +198,59 @@ class ProtocolCore(
 
         return labware_core
 
+    def load_adapter(
+        self,
+        load_name: str,
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType],
+        namespace: Optional[str],
+        version: Optional[int],
+    ) -> LabwareCore:
+        """Load an adapter using its identifying parameters"""
+        load_location = self._get_non_stacked_location(location=location)
+
+        custom_labware_params = (
+            self._engine_client.state.labware.find_custom_labware_load_params()
+        )
+        namespace, version = load_labware_params.resolve(
+            load_name, namespace, version, custom_labware_params
+        )
+
+        load_result = self._engine_client.load_adapter(
+            load_name=load_name,
+            location=load_location,
+            namespace=namespace,
+            version=version,
+        )
+
+        # FIXME(jbl, 2023-06-23) read fixme above:
+        deck_conflict.check(
+            engine_state=self._engine_client.state,
+            new_labware_id=load_result.adapterId,
+            # It's important that we don't fetch these IDs from Protocol Engine, and
+            # use our own bookkeeping instead. If we fetched these IDs from Protocol
+            # Engine, it would have leaked state from Labware Position Check in the
+            # same HTTP run.
+            #
+            # Wrapping .keys() in list() is just to make Decoy verification easier.
+            existing_labware_ids=list(self._labware_cores_by_id.keys()),
+            existing_module_ids=list(self._module_cores_by_id.keys()),
+        )
+
+        labware_core = LabwareCore(
+            labware_id=load_result.adapterId,
+            engine_client=self._engine_client,
+        )
+
+        self._labware_cores_by_id[labware_core.labware_id] = labware_core
+
+        return labware_core
+
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LabwareCore,
         new_location: Union[
-            DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType
+            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
         ],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
@@ -455,6 +507,18 @@ class ProtocolCore(
         except LabwareNotLoadedOnModuleError:
             return None
 
+    def get_labware_on_labware(
+        self, labware_core: LabwareCore
+    ) -> Optional[LabwareCore]:
+        """Get the item on top of a given labware, if any."""
+        try:
+            labware_id = self._engine_client.state.labware.get_id_by_labware(
+                labware_core.labware_id
+            )
+            return self._labware_cores_by_id[labware_id]
+        except LabwareNotLoadedOnLabwareError:
+            return None
+
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""
         return self._engine_client.state.labware.get_slot_center_position(slot_name)
@@ -493,7 +557,7 @@ class ProtocolCore(
 
     def get_labware_location(
         self, labware_core: LabwareCore
-    ) -> Union[str, ModuleCore, NonConnectedModuleCore, OffDeckType]:
+    ) -> Union[str, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType]:
         """Get labware parent location."""
         labware_location = self._engine_client.state.labware.get_location(
             labware_core.labware_id
@@ -504,13 +568,26 @@ class ProtocolCore(
             )
         elif isinstance(labware_location, ModuleLocation):
             return self._module_cores_by_id[labware_location.moduleId]
+        elif isinstance(labware_location, OnLabwareLocation):
+            return self._labware_cores_by_id[labware_location.labwareId]
 
         return OffDeckType.OFF_DECK
 
-    @staticmethod
     def _convert_labware_location(
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
+        self,
+        location: Union[
+            DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
+        ],
     ) -> LabwareLocation:
+        if isinstance(location, LabwareCore):
+            return OnLabwareLocation(labwareId=location.labware_id)
+        else:
+            return self._get_non_stacked_location(location)
+
+    @staticmethod
+    def _get_non_stacked_location(
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
+    ) -> NonStackedLocation:
         if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
             return ModuleLocation(moduleId=location.module_id)
         elif location is OffDeckType.OFF_DECK:

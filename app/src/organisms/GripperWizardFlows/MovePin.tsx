@@ -1,8 +1,10 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { LEFT } from '@opentrons/shared-data'
+import { COLORS } from '@opentrons/components'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import {
@@ -29,16 +31,16 @@ interface MovePinProps extends GripperWizardStepProps, MovePinStep {
 export const MovePin = (props: MovePinProps): JSX.Element | null => {
   const {
     proceed,
-    attachedGripper,
     isRobotMoving,
     goBack,
     movement,
     setFrontJawOffset,
     frontJawOffset,
     createRunCommand,
+    errorMessage,
+    setShowErrorMessage,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
-  if (attachedGripper == null) return null
 
   const handleOnClick = (): void => {
     if (movement === REMOVE_PIN_FROM_REAR_JAW) {
@@ -75,7 +77,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                   // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
                   commandType: 'calibration/moveToMaintenancePosition' as const,
                   params: {
-                    mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+                    mount: LEFT,
                   },
                 },
                 waitUntilComplete: true,
@@ -83,11 +85,11 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                 .then(() => {
                   proceed()
                 })
-                .catch()
+                .catch(error => setShowErrorMessage(error.message))
             })
-            .catch()
+            .catch(error => setShowErrorMessage(error.message))
         })
-        .catch()
+        .catch(error => setShowErrorMessage(error.message))
     }
   }
   const infoByMovement: {
@@ -152,7 +154,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       ),
       header: t('insert_pin_into_rear_jaw'),
       body: t('move_pin_from_front_to_rear_jaw'),
-      buttonText: t('shared:continue'),
+      buttonText: t('continue'),
       prepImage: (
         <video
           css={css`
@@ -205,7 +207,14 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
         alternativeSpinner={inProgressImage}
       />
     )
-  return (
+  return errorMessage != null ? (
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('shared:error_encountered')}
+      subHeader={errorMessage}
+    />
+  ) : (
     <GenericWizardTile
       header={header}
       rightHandBody={prepImage}

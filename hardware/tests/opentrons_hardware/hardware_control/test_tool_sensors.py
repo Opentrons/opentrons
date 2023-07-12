@@ -140,7 +140,16 @@ async def test_liquid_probe(
             return [
                 (
                     NodeId.host,
-                    Acknowledgement(payload=ack_payload),
+                    MoveCompleted(
+                        payload=MoveCompletedPayload(
+                            group_id=UInt8Field(0),
+                            seq_id=UInt8Field(0),
+                            current_position_um=UInt32Field(14000),
+                            encoder_position_um=Int32Field(14000),
+                            position_flags=MotorPositionFlagsField(0),
+                            ack_id=UInt8Field(2),
+                        )
+                    ),
                     motor_node,
                 ),
                 (
@@ -155,7 +164,7 @@ async def test_liquid_probe(
                             ack_id=UInt8Field(2),
                         )
                     ),
-                    motor_node,
+                    target_node,
                 ),
             ]
         else:

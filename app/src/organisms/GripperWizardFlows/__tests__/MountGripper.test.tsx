@@ -23,6 +23,7 @@ describe('MountGripper', () => {
   let mockGoBack: jest.Mock
   let mockProceed: jest.Mock
   let mockChainRunCommands: jest.Mock
+  let mockSetShowErrorMessage: jest.Mock
 
   beforeEach(() => {
     mockGoBack = jest.fn()
@@ -39,6 +40,8 @@ describe('MountGripper', () => {
           chainRunCommands={mockChainRunCommands}
           isRobotMoving={false}
           goBack={mockGoBack}
+          errorMessage={null}
+          setShowErrorMessage={mockSetShowErrorMessage}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -69,14 +72,15 @@ describe('MountGripper', () => {
     await getByRole('button', { name: 'Continue' }).click()
     expect(mockProceed).not.toHaveBeenCalled()
     await getByText('Unable to detect Gripper')
-    const tryAgainButton = getByRole('button', { name: 'Try again' })
+    let tryAgainButton = getByRole('button', { name: 'Try again' })
     tryAgainButton.click()
     expect(mockProceed).not.toHaveBeenCalled()
-    await getByRole('button', { name: 'Continue' }).click()
-    expect(mockProceed).not.toHaveBeenCalled()
+    tryAgainButton = getByRole('button', { name: 'Try again' })
+    tryAgainButton.click()
     const goBackButton = await getByRole('button', { name: 'Go back' })
     goBackButton.click()
-    expect(mockGoBack).toHaveBeenCalled()
+    await getByRole('button', { name: 'Continue' }).click()
+    expect(mockProceed).not.toHaveBeenCalled()
   })
 
   it('clicking go back calls back', () => {

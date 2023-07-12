@@ -141,6 +141,43 @@ def test_load_labware(
     assert result == expected_result
 
 
+def test_load_adapter(
+    decoy: Decoy,
+    transport: ChildThreadTransport,
+    adapter_def: LabwareDefinition,
+    subject: SyncClient,
+) -> None:
+    """It should execute a load labware command."""
+    expected_request = commands.LoadAdapterCreate(
+        params=commands.LoadAdapterParams(
+            location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+            loadName="some_adapter",
+            namespace="opentrons",
+            version=1,
+            adapterId=None,
+        )
+    )
+
+    expected_result = commands.LoadAdapterResult(
+        adapterId="abc123",
+        definition=adapter_def,
+        offsetId=None,
+    )
+
+    decoy.when(transport.execute_command(request=expected_request)).then_return(
+        expected_result
+    )
+
+    result = subject.load_adapter(
+        location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
+        load_name="some_adapter",
+        namespace="opentrons",
+        version=1,
+    )
+
+    assert result == expected_result
+
+
 def test_load_module(
     decoy: Decoy,
     transport: ChildThreadTransport,
@@ -303,7 +340,7 @@ def test_drop_tip(
             wellName="A2",
             wellLocation=DropTipWellLocation(),
             homeAfter=True,
-            randomizeDropLocation=True,
+            alternateDropLocation=True,
         )
     )
     response = commands.DropTipResult(position=DeckPoint(x=4, y=5, z=6))
@@ -316,7 +353,7 @@ def test_drop_tip(
         well_name="A2",
         well_location=DropTipWellLocation(),
         home_after=True,
-        randomize_drop_location=True,
+        alternateDropLocation=True,
     )
 
     assert result == response

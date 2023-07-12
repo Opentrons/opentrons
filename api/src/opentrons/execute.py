@@ -188,8 +188,9 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         "Only directories specified directly by "
         "this argument are searched, not their children. JSON files that "
         "do not define labware will be ignored with a message. "
-        "By default, the current directory (the one in which you are "
-        "invoking this program) will be searched for labware.",
+        "The current directory (the one from which you are "
+        "invoking this program) will always be included implicitly, "
+        "in addition to any directories that you specify.",
     )
     parser.add_argument(
         "-D",
@@ -410,8 +411,10 @@ def main() -> int:
         log_level = "warning"
     # Try to migrate containers from database to v2 format
     execute(
-        args.protocol,
-        args.protocol.name,
+        protocol_file=args.protocol,
+        protocol_name=args.protocol.name,
+        custom_labware_paths=args.custom_labware_path,
+        custom_data_paths=(args.custom_data_path + args.custom_data_file),
         log_level=log_level,
         emit_runlog=printer,
     )

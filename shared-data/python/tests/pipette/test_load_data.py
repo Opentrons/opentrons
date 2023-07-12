@@ -1,3 +1,4 @@
+import pytest
 from opentrons_shared_data.pipette import load_data
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteChannelType,
@@ -36,3 +37,18 @@ def test_load_pipette_definition() -> None:
         pipette_config_two.supported_tips[PipetteTipType.t200].default_aspirate_flowrate
         == 25.0
     )
+
+
+@pytest.mark.parametrize(
+    argnames=["key_spot_check", "value_spot_check"],
+    argvalues=[
+        ["P1KSV10", "p1000_single_v1.0"],
+        ["P1KHV33", "p1000_96_v3.3"],
+        ["P20MV21", "p20_multi_v2.1"],
+        ["P300MV10", "p300_multi_v1.0"],
+        ["P3HMV14", "p300_multi_v1.4"],
+    ],
+)
+def test_build_serial_number_lookup(key_spot_check: str, value_spot_check: str) -> None:
+    lookup_table = load_data.load_serial_lookup_table()
+    assert lookup_table[key_spot_check] == value_spot_check

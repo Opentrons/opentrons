@@ -138,11 +138,8 @@ export const Results = (props: ResultsProps): JSX.Element => {
       flowType === FLOWS.ATTACH &&
       currentStepIndex !== totalStepCount
     ) {
-      let axes: MotorAxes = mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
-      // TODO: (sb)5/25/23 Stop homing leftZ for 96 once motor is disabled
-      if (attachedPipettes[mount]?.instrumentName === 'p1000_96') {
-        axes = ['leftPlunger', 'leftZ']
-      }
+      const axes: MotorAxes =
+        mount === LEFT ? ['leftPlunger'] : ['rightPlunger']
       chainRunCommands(
         [
           {
@@ -158,13 +155,6 @@ export const Results = (props: ResultsProps): JSX.Element => {
             commandType: 'home' as const,
             params: {
               axes: axes,
-            },
-          },
-          {
-            // @ts-expect-error calibration type not yet supported
-            commandType: 'calibration/moveToMaintenancePosition' as const,
-            params: {
-              mount: mount,
             },
           },
         ],
@@ -298,6 +288,7 @@ export const Results = (props: ResultsProps): JSX.Element => {
       isSuccess={isSuccess}
       subHeader={subHeader}
       isPending={isFetching}
+      width="100%"
     >
       {button}
     </SimpleWizardBody>
