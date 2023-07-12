@@ -15,11 +15,9 @@
     "tags": []
   },
   "brand": {
-    "brand": "Thermo Scientific",
-    "brandId": ["AB2396"],
-    "links": [
-      "https://www.fishersci.com/shop/products/armadillo-96-well-pcr-plate-1/AB2396"
-    ]
+    "brand": "Opentrons",
+    "brandId": ["991-00076"],
+    "links": ["https://shop.opentrons.com/tough-0.2-ml-96-well-pcr-plate-full-skirt/"]
   },
   "dimensions": {
     "xDimension": 127.76,
