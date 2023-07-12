@@ -57,7 +57,7 @@ async def _validate_labware_definition(info: IdentifiedLabwareDefinition) -> Non
 async def _validate_json_protocol(info: IdentifiedJsonMain) -> None:
     def validate_sync() -> None:
         try:
-            if info.schema_version == 6:
+            if info.schema_version in [6, 7]:
                 JsonProtocolV6.parse_obj(info.unvalidated_json)
             else:
                 JsonProtocolUpToV5.parse_obj(info.unvalidated_json)

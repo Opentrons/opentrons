@@ -149,13 +149,13 @@ class DesignerApplication(BaseModel):
 
 
 class ProtocolSchemaV6(BaseModel):
-    otSharedSchema: Literal["#/protocol/schemas/6"] = Field(
+    otSharedSchema: Literal["#/protocol/schemas/6", "#/protocol/schemas/7"] = Field(
         ...,
         alias="$otSharedSchema",
         description="The path to a valid Opentrons shared schema relative to "
         "the shared-data directory, without its extension.",
     )
-    schemaVersion: Literal[6]
+    schemaVersion: Literal[6, 7]
     metadata: Metadata
     robot: Robot
     pipettes: Dict[str, Pipette]
