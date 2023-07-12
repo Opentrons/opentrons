@@ -30,7 +30,7 @@ describe('DesktopEstopMissingModal', () => {
     getByText('E-stop missing')
     getByText('Connect the E-stop to continue')
     getByText(
-      'Your E-stop could be damaged or detached mockFlex lost its connection to the E-stop, so it canceled the protocol. Connect a functioning E-stop to continue.'
+      'Your E-stop could be damaged or detached. mockFlex lost its connection to the E-stop, so it canceled the protocol. Connect a functioning E-stop to continue.'
     )
   })
   it('should render text - inactive run', () => {
@@ -40,7 +40,7 @@ describe('DesktopEstopMissingModal', () => {
     getByText('E-stop missing')
     getByText('Connect the E-stop to continue')
     getByText(
-      'Your E-stop could be damaged or detached mockFlex lost its connection to the E-stop, so it canceled the protocol. Connect a functioning E-stop to continue.'
+      'Your E-stop could be damaged or detached. mockFlex lost its connection to the E-stop, so it canceled the protocol. Connect a functioning E-stop to continue.'
     )
   })
   it('should call a mock function when clicking close icon', () => {

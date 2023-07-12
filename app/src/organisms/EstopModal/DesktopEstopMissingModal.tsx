@@ -19,7 +19,7 @@ export function DesktopEstopMissingModal({
   robotName,
   closeModal,
 }: DesktopEstopMissingModalProps): JSX.Element {
-  const { t } = useTranslation('app_settings')
+  const { t } = useTranslation('device_settings')
   const modalProps: LegacyModalProps = {
     type: isActiveRun ? 'outlinedError' : 'error',
     title: t('estop_missing'),
