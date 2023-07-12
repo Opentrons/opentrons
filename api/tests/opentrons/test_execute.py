@@ -43,11 +43,9 @@ def mock_get_attached_instr(
 def test_execute_function_apiv2(
     protocol: Protocol,
     protocol_file: str,
-    monkeypatch: pytest.MonkeyPatch,
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
-
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
         "config": load(PipetteModel("p10_single_v1.5")),
         "id": "testid",
