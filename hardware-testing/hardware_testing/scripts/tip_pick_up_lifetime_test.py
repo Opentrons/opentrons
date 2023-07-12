@@ -458,7 +458,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--mount", type=str, choices=list(mount_options.keys()), default="left"
     )
-    parser.add_argument("--pick_up_num", type=int, default=20)
+    parser.add_argument("--pick_up_num", type=int, default=480)
     # parser.add_argument("--tip_rack_num", type=int, default=12)
     parser.add_argument("--load_cal", action="store_true")
     parser.add_argument("--test_tag", action="store_true")
