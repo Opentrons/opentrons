@@ -6,7 +6,7 @@
 Labware
 #######
 
-Labware are the consumable items that you work with, reuse, or discard while running a protocol on a Flex or OT-2. This section provides a brief overview of default labware, custom labware, and how to use basic labware API methods to create a protocol for your robot.
+Labware are the consumable items that you work with, reuse, or discard while running a protocol on a Flex or OT-2. Items such as pipette tips, well plates, tubes, and reservoirs are all examples of labware. This section provides a brief overview of default labware, custom labware, and how to use basic labware API methods to create a protocol for your robot.
 
 *************
 Labware Types
@@ -14,15 +14,14 @@ Labware Types
 
 Default Labware
 ^^^^^^^^^^^^^^^
+.. Description almost verbatim from Flex user manual.
 
-Default labware is labware listed in the `Opentrons Labware Library <https://labware.opentrons.com/>`_. This database includes plain-text labware names, API load names, images, manufacturer part numbers, physical dimensions, and more. 
-
-When writing a protocol, you must inform the API about the labware you will be placing on the robot's deck. Search the library when you’re looking for the API load names of the labware used in your protocol. You can copy the load names that should be passed to the ``load_labware`` method.
+Default labware is everything listed in the `Opentrons Labware Library <https://labware.opentrons.com/>`_. When used in a protocol, your Flex or OT-2 knows how to work with default labware. However, you must first inform the API about the labware you will place on the robot’s deck. Search the library when you’re looking for the API load names of the labware you want to use. You can copy the load names from the library and pass them to the ``load_labware`` method in your protocol.
 
 Custom Labware
 ^^^^^^^^^^^^^^
 
-Custom labware is labware that is not listed the Labware Library. If your protocol needs labware that's not in the library, you can create it with the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. However, before using the Labware Creator, you should take a moment to review the support article, `Creating Custom Labware Definitions <https://support.opentrons.com/s/article/Creating-Custom-Labware-Definitions>`_ .
+Custom labware is labware that is not listed the Labware Library. If your protocol needs something that's not in the library, you can create it with the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. However, before using the Labware Creator, you should take a moment to review the support article, `Creating Custom Labware Definitions <https://support.opentrons.com/s/article/Creating-Custom-Labware-Definitions>`_ .
 
 After you've created your labware, save it as a ``.json`` file and add it to the Opentrons App. See `Using Labware in Your Protocols <https://support.opentrons.com/s/article/Using-labware-in-your-protocols>`_ for instructions. 
 
@@ -287,7 +286,9 @@ Well Dimensions
 
 The functions in the :ref:`new-well-access` section above return a single :py:class:`.Well` object or a larger object representing many wells. :py:class:`.Well` objects have attributes that provide information about their physical shape, such as the depth or diameter, as specified in their corresponding labware definition. These properties can be used for different applications, such as calculating the volume of a well or a :ref:`position-relative-labware`.
 
-In the code samples below, the ``load_labware`` method uses a Flex deck slot location. OT-2 users should replace ``D1`` with ``1``. Although our Python API knows how to automatically translate Flex and OT-2 deck locations, it's a good practice to use the  deck location coordinates that match your robot model. See :ref:`deck-slots` for more information.
+.. note::
+
+    In the code samples below, the ``load_labware`` method shows a Flex deck slot location (``D1``). If you have an OT-2, replace ``D1`` with ``1``. Although our Python API knows how to translate Flex and OT-2 deck locations, it's a good practice to use the deck location coordinates that match your robot model. See :ref:`deck-slots` for more information.
 
 Depth
 ^^^^^
