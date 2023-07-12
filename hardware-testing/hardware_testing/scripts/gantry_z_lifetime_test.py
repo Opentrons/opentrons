@@ -81,7 +81,7 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
                     # low_tp_points.update({key: [Point(cur_pos[OT3Axis.X], cur_pos[OT3Axis.Y], cur_pos[OT3Axis.Z_L]), low_tp_points[key][1]]})
                     # low_tp_points.update({(key+1): [Point(cur_pos[OT3Axis.X], cur_pos[OT3Axis.Y], cur_pos[OT3Axis.Z_L] - 150)], low_tp_points[key+1][1]})
                 try:
-                    await api.move_to(low_tp_points[key][1], low_tp_points[key][0], _expect_stalls=True)
+                    await api.move_to(low_tp_points[key][1], low_tp_points[key][0]) #, _expect_stalls=True)
                     print(f"Current position: {await api.gantry_position(low_tp_points[key][1])} on Mount: {low_tp_points[key][1]}")
                     encoder_pos = await api.encoder_current_position_ot3(low_tp_points[key][1], refresh=True)
                     if low_tp_points[key][1] == OT3Mount.LEFT:
@@ -147,7 +147,7 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
             if type(key) == int:
                 print(f">> Move {count} <<\n")
                 try:
-                    await api.move_to(OT3Mount.LEFT, p, _expect_stalls=True)
+                    await api.move_to(OT3Mount.LEFT, p) #, _expect_stalls=True)
                 except RuntimeError as e:
                     if "collision_detected" in str(e):
                         print("--STALL DETECTED--\n")
