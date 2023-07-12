@@ -72,12 +72,6 @@ from opentrons_hardware.firmware_bindings.messages.fields import (
 )
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
-from opentrons_shared_data.errors.exceptions import (
-    CanbusCommunicationError,
-    EStopActivatedError,
-    EnumeratedError,
-)
-
 from .types import NodeDict
 
 log = logging.getLogger(__name__)
@@ -498,18 +492,6 @@ class MoveScheduler:
                 nodes.append(NodeId(node_id))
         return nodes
 
-    def _raise_exception_from_error(
-        self, group_id: int, error: ErrorMessage
-    ) -> EnumeratedError:
-        if error.payload.error_code.value == ErrorCode.estop_detected:
-            raise EStopActivatedError(
-                message=f"estop detected for move group {group_id}",
-            )
-        else:
-            raise CanbusCommunicationError(
-                message=f"Unrecoverable firmware error during move group {group_id}: {error}",
-            )
-
     async def _send_stop_if_necessary(
         self, can_messenger: CanMessenger, group_id: int
     ) -> None:
@@ -527,7 +509,7 @@ class MoveScheduler:
                         "Motion failed with multiple errors", wrapping=self._errors
                     )
                 else:
-                    self._raise_exception_from_error(group_id=group_id, error=self._errors[0])
+                    raise self._errors[0]
             else:
                 # This happens when the move completed without stop condition
                 raise MoveConditionNotMetError(detail={"group-id": str(group_id)})
