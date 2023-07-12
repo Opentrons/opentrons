@@ -213,7 +213,6 @@ class PipetteHandlerProvider:
                 "name",
                 "min_volume",
                 "max_volume",
-                "channels",
                 "aspirate_flow_rate",
                 "dispense_flow_rate",
                 "pipette_id",

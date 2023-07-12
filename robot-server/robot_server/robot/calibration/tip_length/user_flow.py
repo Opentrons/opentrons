@@ -202,7 +202,7 @@ class TipCalibrationUserFlow:
     def critical_point_override(self) -> Optional[CriticalPoint]:
         return (
             CriticalPoint.FRONT_NOZZLE
-            if self._hw_pipette.config.channels.value == 8
+            if self._hw_pipette.config.channels.as_int == 8
             else None
         )
 

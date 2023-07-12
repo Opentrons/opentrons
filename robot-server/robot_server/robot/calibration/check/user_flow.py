@@ -229,7 +229,7 @@ class CheckCalibrationUserFlow:
     def critical_point_override(self) -> Optional[CriticalPoint]:
         return (
             CriticalPoint.FRONT_NOZZLE
-            if self.hw_pipette.config.channels.value == 8
+            if self.hw_pipette.config.channels.as_int == 8
             else None
         )
 
@@ -286,7 +286,7 @@ class CheckCalibrationUserFlow:
             for mount, pip in pips.items():
                 pip_calibration = self._pipette_calibrations[mount]
                 info = PipetteInfo(
-                    channels=pip.config.channels.value,
+                    channels=pip.config.channels.as_int,
                     rank=PipetteRank.first,
                     max_volume=pip.config.max_volume,
                     mount=mount,
@@ -304,7 +304,7 @@ class CheckCalibrationUserFlow:
         r_calibration = self._get_stored_pipette_offset_cal(right_pip, Mount.RIGHT)
         l_calibration = self._get_stored_pipette_offset_cal(left_pip, Mount.LEFT)
         r_info = PipetteInfo(
-            channels=right_pip.config.channels.value,
+            channels=right_pip.config.channels.as_int,
             max_volume=right_pip.config.max_volume,
             rank=PipetteRank.first,
             mount=Mount.RIGHT,
@@ -314,7 +314,7 @@ class CheckCalibrationUserFlow:
             default_tipracks=uf.get_default_tipracks(right_pip.config.default_tipracks),
         )
         l_info = PipetteInfo(
-            channels=left_pip.config.channels.value,
+            channels=left_pip.config.channels.as_int,
             max_volume=left_pip.config.max_volume,
             rank=PipetteRank.first,
             mount=Mount.LEFT,
@@ -325,7 +325,7 @@ class CheckCalibrationUserFlow:
         )
         if (
             left_pip.config.max_volume > right_pip.config.max_volume
-            or right_pip.config.channels.value > left_pip.config.channels.value
+            or right_pip.config.channels.as_int > left_pip.config.channels.as_int
         ):
             r_info.rank = PipetteRank.second
             return l_info, [l_info, r_info]

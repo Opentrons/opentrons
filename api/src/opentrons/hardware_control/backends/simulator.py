@@ -9,7 +9,7 @@ from contextlib import contextmanager
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     mutable_configurations,
-    pipette_definition
+    pipette_definition,
 )
 
 from opentrons import types
@@ -123,15 +123,19 @@ class Simulator:
         self._gpio_chardev = gpio_chardev
 
         def _sanitize_attached_instrument(
-            passed_ai: Optional[PipetteSpec] = None
+            passed_ai: Optional[PipetteSpec] = None,
         ) -> PipetteSpec:
             if not passed_ai or not passed_ai.get("model"):
                 return {"model": None, "id": None}
-            if pipette_load_name.supported_pipette(cast(PipetteName, passed_ai["model"])):
+            if pipette_load_name.supported_pipette(
+                cast("PipetteName", passed_ai["model"])
+            ):
                 if pipette_load_name.is_model(passed_ai["model"]):
                     return passed_ai
                 else:
-                    get_pip_model = pipette_load_name.convert_pipette_name(cast(PipetteName, passed_ai["model"]))
+                    get_pip_model = pipette_load_name.convert_pipette_name(
+                        cast("PipetteName", passed_ai["model"])
+                    )
                     return {
                         "model": PipetteModel(str(get_pip_model)),
                         "id": passed_ai.get("id"),
@@ -219,7 +223,7 @@ class Simulator:
         return self._position
 
     def _attached_to_mount(
-        self, mount: types.Mount, expected_instr: Optional[PipetteName]
+        self, mount: types.Mount, expected_instr: Optional["PipetteName"]
     ) -> AttachedPipette:
         init_instr = self._attached_instruments.get(mount, {"model": None, "id": None})
         found_model = init_instr["model"]
@@ -227,16 +231,25 @@ class Simulator:
 
         path_to_overrides = get_opentrons_path("pipette_config_overrides_dir")
         found_model_configs: Optional[pipette_definition.PipetteConfigurations] = None
+
+        converted_found_name: Optional[pipette_definition.PipetteNameType] = None
         if found_model:
             converted_found_model = pipette_load_name.convert_pipette_model(found_model)
-            found_model_configs = mutable_configurations.load_with_mutable_configurations(converted_found_model, path_to_overrides, init_instr["id"])
+            converted_found_name = pipette_load_name.convert_to_pipette_name_type(
+                found_model
+            )
+            found_model_configs = (
+                mutable_configurations.load_with_mutable_configurations(
+                    converted_found_model, path_to_overrides, init_instr["id"]
+                )
+            )
             back_compat = found_model_configs.pipette_backcompat_names
         if (
             expected_instr
             and found_model
             and found_model_configs
             and (
-                found_model_configs.name != expected_instr
+                str(converted_found_name) != expected_instr
                 and expected_instr not in back_compat
             )
         ):
@@ -247,9 +260,13 @@ class Simulator:
                     )
                 )
             else:
-                converted_expected_model = pipette_load_name.convert_pipette_name(expected_instr)
+                converted_expected_model = pipette_load_name.convert_pipette_name(
+                    expected_instr
+                )
                 return {
-                    "config": mutable_configurations.load_with_mutable_configurations(converted_expected_model, path_to_overrides),
+                    "config": mutable_configurations.load_with_mutable_configurations(
+                        converted_expected_model, path_to_overrides
+                    ),
                     "id": None,
                 }
         elif found_model and found_model_configs:
@@ -263,15 +280,22 @@ class Simulator:
             }
         elif expected_instr:
             # Expected instrument specified and no instrument detected
-            converted_expected_model = pipette_load_name.convert_pipette_name(expected_instr)
-            return {"config": mutable_configurations.load_with_mutable_configurations(converted_expected_model, path_to_overrides), "id": None}
+            converted_expected_model = pipette_load_name.convert_pipette_name(
+                expected_instr
+            )
+            return {
+                "config": mutable_configurations.load_with_mutable_configurations(
+                    converted_expected_model, path_to_overrides
+                ),
+                "id": None,
+            }
         else:
             # No instrument detected or expected
             return {"config": None, "id": None}
 
     @ensure_yield
     async def get_attached_instruments(
-        self, expected: Dict[types.Mount, PipetteName]
+        self, expected: Dict[types.Mount, "PipetteName"]
     ) -> AttachedInstruments:
         """Update the internal cache of attached instruments.
 

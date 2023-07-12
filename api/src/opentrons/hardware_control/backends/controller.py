@@ -13,6 +13,7 @@ from typing import (
     TYPE_CHECKING,
     Union,
     Sequence,
+    cast,
 )
 from typing_extensions import Final
 
@@ -24,7 +25,6 @@ except (OSError, ModuleNotFoundError):
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     mutable_configurations,
-    pipette_definition
 )
 
 from opentrons.drivers.smoothie_drivers import SmoothieDriver
@@ -193,16 +193,25 @@ class Controller:
         found_id = await self._smoothie_driver.read_pipette_id(mount.name.lower())
 
         if found_model:
-            path_to_overrides = opentrons.config.get_opentrons_path("pipette_config_overrides_dir")
+            path_to_overrides = opentrons.config.get_opentrons_path(
+                "pipette_config_overrides_dir"
+            )
             converted_found_model = pipette_load_name.convert_pipette_model(found_model)
-            config = mutable_configurations.load_with_mutable_configurations(converted_found_model, path_to_overrides,found_id)
+            converted_found_name = pipette_load_name.convert_to_pipette_name_type(
+                found_model
+            )
+            config = mutable_configurations.load_with_mutable_configurations(
+                converted_found_model, path_to_overrides, found_id
+            )
             if expected:
-                acceptable = [config.name] + config.pipette_backcompat_names
+                acceptable = [
+                    cast(PipetteName, str(converted_found_name))
+                ] + config.pipette_backcompat_names
                 if expected not in acceptable:
                     raise RuntimeError(
                         f"mount {mount}: instrument"
                         f" {expected} was requested"
-                        f" but {config.model} is present"
+                        f" but {converted_found_model} is present"
                     )
             return {"config": config, "id": found_id}
         else:

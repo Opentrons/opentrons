@@ -244,7 +244,7 @@ class PipetteOffsetCalibrationUserFlow:
     def critical_point_override(self) -> Optional[CriticalPoint]:
         return (
             CriticalPoint.FRONT_NOZZLE
-            if self._hw_pipette.config.channels.value == 8
+            if self._hw_pipette.config.channels.as_int == 8
             else None
         )
 
@@ -440,7 +440,7 @@ class PipetteOffsetCalibrationUserFlow:
         if current_state == self._sm.state.joggingToDeck:
             self._z_height_reference = cur_pt.z
         elif current_state == self._sm.state.savingPointOne:
-            if self._hw_pipette.config.channels.value > 1:
+            if self._hw_pipette.config.channels.as_int > 1:
                 cur_pt = await self.get_current_point(
                     critical_point=CriticalPoint.FRONT_NOZZLE
                 )

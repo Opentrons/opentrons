@@ -14,7 +14,8 @@ from opentrons_shared_data import get_shared_data_root, load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
-    load_data as load_pipette_data)
+    load_data as load_pipette_data,
+)
 from opentrons import execute, types
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import Controller, api
@@ -86,21 +87,23 @@ def test_execute_function_apiv2(
         cast(PipetteModel, "p10_single_v1.5")
     )
     converted_model_v1 = pipette_load_name.convert_pipette_model(
-        cast(PipetteModel, "p10_single_v1")
+        cast(PipetteModel, "p1000_single_v1")
     )
 
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
         "config": load_pipette_data.load_definition(
-         converted_model_v15.pipette_type,
-         converted_model_v15.pipette_channels,
-         converted_model_v15.pipette_version),
+            converted_model_v15.pipette_type,
+            converted_model_v15.pipette_channels,
+            converted_model_v15.pipette_version,
+        ),
         "id": "testid",
     }
     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
         "config": load_pipette_data.load_definition(
-         converted_model_v1.pipette_type,
-         converted_model_v1.pipette_channels,
-         converted_model_v1.pipette_version),
+            converted_model_v1.pipette_type,
+            converted_model_v1.pipette_channels,
+            converted_model_v1.pipette_version,
+        ),
         "id": "testid2",
     }
     entries = []
@@ -137,9 +140,10 @@ def test_execute_function_json_v3(
     )
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
         "config": load_pipette_data.load_definition(
-         converted_model_v15.pipette_type,
-         converted_model_v15.pipette_channels,
-         converted_model_v15.pipette_version),
+            converted_model_v15.pipette_type,
+            converted_model_v15.pipette_channels,
+            converted_model_v15.pipette_version,
+        ),
         "id": "testid",
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
@@ -174,9 +178,10 @@ def test_execute_function_json_v4(
     )
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
         "config": load_pipette_data.load_definition(
-         converted_model_v15.pipette_type,
-         converted_model_v15.pipette_channels,
-         converted_model_v15.pipette_version),
+            converted_model_v15.pipette_type,
+            converted_model_v15.pipette_channels,
+            converted_model_v15.pipette_version,
+        ),
         "id": "testid",
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
@@ -211,9 +216,10 @@ def test_execute_function_json_v5(
     )
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
         "config": load_pipette_data.load_definition(
-         converted_model_v15.pipette_type,
-         converted_model_v15.pipette_channels,
-         converted_model_v15.pipette_version),
+            converted_model_v15.pipette_type,
+            converted_model_v15.pipette_channels,
+            converted_model_v15.pipette_version,
+        ),
         "id": "testid",
     }
     execute.execute(filelike, "simple.json", emit_runlog=emit_runlog)
@@ -249,9 +255,10 @@ def test_execute_function_bundle_apiv2(
     )
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
         "config": load_pipette_data.load_definition(
-         converted_model_v15.pipette_type,
-         converted_model_v15.pipette_channels,
-         converted_model_v15.pipette_version),
+            converted_model_v15.pipette_type,
+            converted_model_v15.pipette_channels,
+            converted_model_v15.pipette_version,
+        ),
         "id": "testid",
     }
     execute.execute(

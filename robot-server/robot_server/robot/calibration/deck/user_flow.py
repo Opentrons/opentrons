@@ -209,12 +209,12 @@ class DeckCalibrationUserFlow:
         right_pip = pips[Mount.RIGHT]
         left_pip = pips[Mount.LEFT]
         if right_pip.config.max_volume == left_pip.config.max_volume:
-            if right_pip.config.channels.value == left_pip.config.channels.value:
+            if right_pip.config.channels.as_int == left_pip.config.channels.as_int:
                 return right_pip, Mount.RIGHT
             else:
                 return sorted(
                     [(right_pip, Mount.RIGHT), (left_pip, Mount.LEFT)],
-                    key=lambda p_m: p_m[0].config.channels.value,
+                    key=lambda p_m: p_m[0].config.channels.as_int,
                 )[0]
         else:
             return sorted(
@@ -270,7 +270,7 @@ class DeckCalibrationUserFlow:
     def critical_point_override(self) -> Optional[CriticalPoint]:
         return (
             CriticalPoint.FRONT_NOZZLE
-            if self._hw_pipette.config.channels.value == 8
+            if self._hw_pipette.config.channels.as_int == 8
             else None
         )
 

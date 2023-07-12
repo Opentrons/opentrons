@@ -3,6 +3,7 @@ import argparse
 import asyncio
 from math import pi as PI
 from typing import Optional
+from pathlib import Path
 
 try:
     import matplotlib.pyplot as plt  # type: ignore[import]
@@ -18,8 +19,10 @@ from opentrons.calibration_storage.types import (
     CalibrationStatus,
 )
 from opentrons.config.robot_configs import default_pipette_offset
-from opentrons.config import pipette_config
-
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+    mutable_configurations,
+)
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
@@ -117,13 +120,14 @@ def _print_errors(table: List[List[float]]) -> None:
 async def _main(length: int) -> None:
     while True:
         model = _user_select_model()
-        config = pipette_config.load(pipette_model=model)  # type: ignore[arg-type]
+        pipette_model = pipette_load_name.convert_pipette_model(model)
+        configurations = mutable_configurations.load_with_mutable_configurations(pipette_model, Path("fake/path"), "testiId")
         pip_cal_obj = PipetteOffsetByPipetteMount(
             offset=Point(*default_pipette_offset()),
             source=SourceType.default,
             status=CalibrationStatus(),
         )
-        pipette = Pipette(config=config, pipette_offset_cal=pip_cal_obj)
+        pipette = Pipette(config=configurations, pipette_offset_cal=pip_cal_obj)
         table = _get_accuracy_adjustment_table(pipette, length)
         _print_errors(table)
         _plot_table(model, table)

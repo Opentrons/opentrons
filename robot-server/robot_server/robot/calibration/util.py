@@ -132,7 +132,7 @@ async def pick_up_tip(user_flow: CalibrationUserFlow, tip_length: float):
     )
 
     with contextlib.ExitStack() as stack:
-        if user_flow.hw_pipette.config.channels.value > 1:
+        if user_flow.hw_pipette.config.channels.as_int > 1:
             stack.enter_context(save_default_pick_up_current(user_flow.hw_pipette))
 
         await user_flow.hardware.pick_up_tip(user_flow.mount, tip_length)

@@ -37,6 +37,7 @@ class PipetteSpec(InstrumentSpec):
 class GripperSpec(InstrumentSpec):
     model: Union[GripperModel, None]
 
+
 class AttachedPipette(TypedDict):
     config: Optional[PipetteConfigurations]
     id: Optional[str]

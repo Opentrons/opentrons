@@ -202,7 +202,6 @@ class PipetteHandlerProvider(Generic[MountType]):
                 "name",
                 "min_volume",
                 "max_volume",
-                "channels",
                 "aspirate_flow_rate",
                 "dispense_flow_rate",
                 "pipette_id",
@@ -226,6 +225,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             #  this dict newly every time? Any why only a few items are being updated?
             for key in configs:
                 result[key] = instr_dict[key]
+            result["channels"] = instr.channels.as_int
             result["has_tip"] = instr.has_tip
             result["tip_length"] = instr.current_tip_length
             result["aspirate_speed"] = self.plunger_speed(
@@ -371,7 +371,9 @@ class PipetteHandlerProvider(Generic[MountType]):
         pip = self.get_pipette(mount)
         cp = self.critical_point_for(mount, critical_point)
 
-        max_height = pip.config.mount_configurations.homePosition - retract_distance + cp.z
+        max_height = (
+            pip.config.mount_configurations.homePosition - retract_distance + cp.z
+        )
 
         return max_height
 
@@ -664,6 +666,7 @@ class PipetteHandlerProvider(Generic[MountType]):
                 (top_types.Point(0, 0, DROP_TIP_RELEASE_DISTANCE), None),  # up
             ]
 
+        breakpoint()
         if Quirks.pickupTipShake in instrument.config.quirks:
             return build_one_shake() + build_one_shake()
         else:
@@ -721,7 +724,8 @@ class PipetteHandlerProvider(Generic[MountType]):
             for i in range(checked_presses):
                 # move nozzle down into the tip
                 press_dist = (
-                    -1.0 * instrument.pick_up_configurations.distance + -1.0 * check_incr * i
+                    -1.0 * instrument.pick_up_configurations.distance
+                    + -1.0 * check_incr * i
                 )
                 # move nozzle back up
                 backup_dist = -press_dist
@@ -741,7 +745,9 @@ class PipetteHandlerProvider(Generic[MountType]):
                     presses=[
                         PickUpTipPressSpec(
                             current={
-                                Axis.by_mount(mount): instrument.pick_up_configurations.current
+                                Axis.by_mount(
+                                    mount
+                                ): instrument.pick_up_configurations.current
                             },
                             speed=pick_up_speed,
                             relative_down=top_types.Point(0, 0, press_dist),

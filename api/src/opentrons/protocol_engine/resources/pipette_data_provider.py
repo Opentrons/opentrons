@@ -6,7 +6,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
-    pipette_definition
+    pipette_definition,
 )
 
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -38,21 +38,24 @@ def get_virtual_pipette_static_config(
     config = load_pipette_data.load_definition(
         pipette_model.pipette_type,
         pipette_model.pipette_channels,
-        pipette_model.pipette_version)
+        pipette_model.pipette_version,
+    )
 
-    tip_configuration = config.supported_tips[pipette_definition.PipetteTipType(config.max_volume)]
+    tip_configuration = config.supported_tips[
+        pipette_definition.PipetteTipType(config.max_volume)
+    ]
     return LoadedStaticPipetteData(
-        model=str(config.pipette_model),
+        model=str(pipette_model),
         display_name=config.display_name,
         min_volume=config.min_volume,
         max_volume=config.max_volume,
-        channels=config.channels.value,
+        channels=config.channels.as_int,
         home_position=config.mount_configurations.homePosition,
         nozzle_offset_z=config.nozzle_offset[2],
         flow_rates=FlowRates(
-            default_blow_out=tip_configuration.default_blowout_flowrate["valuesByApiLevel"],
-            default_aspirate=tip_configuration.default_aspirate_flowrate["valuesByApiLevel"],
-            default_dispense=tip_configuration.default_dispense_flowrate["valuesByApiLevel"],
+            default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
+            default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
+            default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
         ),
         return_tip_scale=tip_configuration.default_return_tip_height,
         nominal_tip_overlap=tip_configuration.tip_overlap_dictionary,

@@ -430,7 +430,9 @@ class API(
             )
             self._attached_instruments[mount] = p
             if req_instr and p:
-                converted_name = pipette_load_name.convert_pipette_name(req_instr)
+                converted_name = pipette_load_name.convert_to_pipette_name_type(
+                    req_instr
+                )
                 p.act_as(converted_name)
 
             if may_skip:
@@ -567,7 +569,9 @@ class API(
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
                 target_pos = target_position_from_plunger(
-                    checked_mount, instr.plunger_positions.bottom, self._current_position
+                    checked_mount,
+                    instr.plunger_positions.bottom,
+                    self._current_position,
                 )
                 await self._move(
                     target_pos,

@@ -102,14 +102,19 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             PipetteTipType(self._working_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
-    
-        self._aspirate_flow_rates_lookup = self._active_tip_settings.default_aspirate_flowrate["valuesByApiLevel"]
-        self._dispense_flow_rates_lookup = self._active_tip_settings.default_dispense_flowrate["valuesByApiLevel"]
-        self._blowout_flow_rates_lookup = self._active_tip_settings.default_blowout_flowrate["valuesByApiLevel"]
-        self._aspirate_flow_rate = self._aspirate_flow_rates_lookup["2.0"]
-        self._dispense_flow_rate = self._dispense_flow_rates_lookup["2.0"]
-        self._blow_out_flow_rate = self._blowout_flow_rates_lookup["2.0"]
 
+        self._aspirate_flow_rates_lookup = (
+            self._active_tip_settings.default_aspirate_flowrate.values_by_api_level
+        )
+        self._dispense_flow_rates_lookup = (
+            self._active_tip_settings.default_dispense_flowrate.values_by_api_level
+        )
+        self._blowout_flow_rates_lookup = (
+            self._active_tip_settings.default_blowout_flowrate.values_by_api_level
+        )
+        self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate.default
+        self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate.default
+        self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate.default
         # TODO (lc 12-6-2022) When we switch over to sending pipette state, we
         # we should also try to make sure the python api isn't reaching into
         # Pipette interals. For now, we want to make sure the shape of
@@ -203,10 +208,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             PipetteTipType(self._working_volume)
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
-    
-        self._aspirate_flow_rate = self.aspirate_flow_rates_lookup["2.0"]
-        self._dispense_flow_rate = self.dispense_flow_rates_lookup["2.0"]
-        self._blow_out_flow_rate = self.blow_out_flow_rates_lookup["2.0"]
+
+        self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate.default
+        self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate.default
+        self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate.default
 
         self._tip_overlap = {"default": self._active_tip_settings.default_tip_overlap}
 
@@ -382,7 +387,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def aspirate_flow_rates_lookup(self) -> Dict[str, float]:
         return self._aspirate_flow_rates_lookup
-    
+
     @property
     def dispense_flow_rates_lookup(self) -> Dict[str, float]:
         return self._dispense_flow_rates_lookup
@@ -495,9 +500,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "aspirate_flow_rate": self.aspirate_flow_rate,
                 "dispense_flow_rate": self.dispense_flow_rate,
                 "blow_out_flow_rate": self.blow_out_flow_rate,
-                "default_aspirate_flow_rates": self.active_tip_settings.default_aspirate_flowrate,
-                "default_blow_out_flow_rates": self.active_tip_settings.default_blowout_flowrate,
-                "default_dispense_flow_rates": self.active_tip_settings.default_dispense_flowrate,
+                "default_aspirate_flow_rates": self.active_tip_settings.default_aspirate_flowrate.values_by_api_level,
+                "default_blow_out_flow_rates": self.active_tip_settings.default_blowout_flowrate.values_by_api_level,
+                "default_dispense_flow_rates": self.active_tip_settings.default_dispense_flowrate.values_by_api_level,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
                 "tip_overlap": self.tip_overlap,
