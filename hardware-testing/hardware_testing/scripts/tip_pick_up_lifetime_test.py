@@ -367,15 +367,17 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
                         else:
                             tip_presence_pick_up_flag = 'Tip Presence Not Checked'
 
-                        ### move plunger from blowout to top, back to blow_out
-                        top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
-
-                        print("Move to bottom plunger position\n")
-                        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
-                        print("Move to top plunger position\n")
-                        await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos)
-                        print("Move to bottom plunger position\n")
-                        await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+                        ### REMOVED PLUNGER MOVES
+                        # ### move plunger from blowout to top, back to blow_out
+                        # top_pos, bottom_pos, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
+                        #
+                        # print("Move to bottom plunger position\n")
+                        # await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+                        # print("Move to top plunger position\n")
+                        # await helpers_ot3.move_plunger_absolute_ot3(api, mount, top_pos)
+                        # print("Move to bottom plunger position\n")
+                        # await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom_pos)
+                        ###
 
                         ### check tip presence after tip drop
                         print("Dropping tip...\n")
