@@ -1,7 +1,15 @@
 """Config."""
 from dataclasses import dataclass
-from typing import List
+from typing import List, Dict
 from typing_extensions import Final
+from enum import Enum
+
+
+class ConfigType(Enum):
+    """Substitute for Literal which isn't available until 3.8.0."""
+
+    gravimetric = 1
+    photometric = 2
 
 
 @dataclass
@@ -21,6 +29,8 @@ class VolumetricConfig:
     mix: bool
     inspect: bool
     user_volumes: bool
+    kind: ConfigType
+    extra: bool
 
 
 @dataclass
@@ -66,3 +76,75 @@ TIP_SPEED_WHILE_RETRACTING_DISPENSE = 50
 
 VIAL_SAFE_Z_OFFSET: Final = 25
 LABWARE_BOTTOM_CLEARANCE = 1.5
+
+
+QC_VOLUMES_G: Dict[int, Dict[int, Dict[int, List[float]]]] = {
+    1: {
+        50: {  # P50
+            50: [1.0, 50.0],  # T50
+        },
+        1000: {  # P1000
+            50: [5.0],  # T50
+            200: [],  # T200
+            1000: [1000.0],  # T1000
+        },
+    },
+    8: {
+        50: {  # P50
+            50: [1.0, 50.0],  # T50
+        },
+        1000: {  # P1000
+            50: [5.0],  # T50
+            200: [],  # T200
+            1000: [1000.0],  # T1000
+        },
+    },
+    96: {
+        1000: {  # P1000
+            50: [5.0],  # T50
+            200: [200.0],  # T200
+            1000: [1000.0],  # T1000
+        },
+    },
+}
+
+
+QC_VOLUMES_EXTRA_G: Dict[int, Dict[int, Dict[int, List[float]]]] = {
+    1: {
+        50: {  # P50
+            50: [1.0, 10.0, 50.0],  # T50
+        },
+        1000: {  # P1000
+            50: [5.0],  # T50
+            200: [50.0, 200.0],  # T200
+            1000: [1000.0],  # T1000
+        },
+    },
+    8: {
+        50: {  # P50
+            50: [1.0, 10.0, 50.0],  # T50
+        },
+        1000: {  # P1000
+            50: [5.0],  # T50
+            200: [50.0, 200.0],  # T200
+            1000: [1000.0],  # T1000
+        },
+    },
+    96: {
+        1000: {  # P1000
+            50: [5.0],  # T50
+            200: [200.0],  # T200
+            1000: [1000.0],  # T1000
+        },
+    },
+}
+
+QC_VOLUMES_P: Dict[int, Dict[int, Dict[int, List[float]]]] = {
+    96: {
+        1000: {  # P1000
+            50: [5.0],  # T50
+            200: [],  # T200
+            1000: [200.0],  # T1000
+        },
+    },
+}
