@@ -319,7 +319,7 @@ async def test_home_execute(
     mock_present_devices: None,
 ) -> None:
     config = {"run.side_effect": move_group_run_side_effect(controller, axes)}
-    with mock.patch(
+    with mock.patch(  # type: ignore [call-overload]
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
         spec=mock.Mock(MoveGroupRunner),
         **config
@@ -336,7 +336,9 @@ async def test_home_execute(
             for group in arg.kwargs["move_groups"]
         ]
 
-        actual_nodes_steps = {ax: [] for ax in axes}
+        actual_nodes_steps: Dict[OT3Axis, List[MoveGroupSingleAxisStep]] = {
+            ax: [] for ax in axes
+        }
         for group in all_groups:
             for step in group:
                 for k, v in step.items():
