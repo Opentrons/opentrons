@@ -167,7 +167,7 @@ Wells can be referenced by their name, as demonstrated above. However, they can 
 .. tip::
 
     You may find coordinate well names like ``"B3"`` easier to reason with, especially when working with irregular labware, e.g.
-    ``opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical``(see the `Opentrons 10 Tube Rack <https://labware.opentrons.com/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical>`_ in the Labware Library). Whichever well access method you use, your protocol will be most maintainable if you use only one access method consistently.
+    ``opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical`` (see the `Opentrons 10 Tube Rack <https://labware.opentrons.com/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical>`_ in the Labware Library). Whichever well access method you use, your protocol will be most maintainable if you use only one access method consistently.
 
 .. versionadded:: 2.0
 
@@ -287,7 +287,7 @@ Well Dimensions
 
 The functions in the :ref:`new-well-access` section above return a single :py:class:`.Well` object or a larger object representing many wells. :py:class:`.Well` objects have attributes that provide information about their physical shape, such as the depth or diameter, as specified in their corresponding labware definition. These properties can be used for different applications, such as calculating the volume of a well or a :ref:`position-relative-labware`.
 
-In the code samples below, the ``load_labware`` method uses a Flex deck slot location. OT-2 users should replace ``D1`` with ``1``. Although our Python API knows how to automatically translate Flex and OT-2 deck locations, it's a good practice to use the  deck location coordinates that match your robot model.
+In the code samples below, the ``load_labware`` method uses a Flex deck slot location. OT-2 users should replace ``D1`` with ``1``. Although our Python API knows how to automatically translate Flex and OT-2 deck locations, it's a good practice to use the  deck location coordinates that match your robot model. See :ref:`deck-slots` for more information.
 
 Depth
 ^^^^^
