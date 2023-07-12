@@ -6,7 +6,7 @@
 Labware
 #######
 
-Labware are those durable components and consumable items that you work with, reuse, or discard while running a protocol on a Flex or OT-2. This definition includes default labware, custom labware, and their related software files that capture the physical dimensions of the labware objects you need to write and run a protocol. This section covers how to use the Opentrons Python API to create a protocol for your Flex or OT-2.
+Labware are the consumable items that you work with, reuse, or discard while running a protocol on a Flex or OT-2. This section provides a brief overview of default labware, custom labware, and how to use basic labware API methods to create a protocol for your robot.
 
 *************
 Labware Types
@@ -15,14 +15,14 @@ Labware Types
 Default Labware
 ^^^^^^^^^^^^^^^
 
-Default labware encompasses the hardware and software definitions found in the `Opentrons Labware Library <https://labware.opentrons.com/>`_. This database includes plain-text labware names, API ``load_labware`` names, images, manufacturer part numbers, physical dimensions, and more. 
+Default labware is labware listed in the `Opentrons Labware Library <https://labware.opentrons.com/>`_. This database includes plain-text labware names, API load names, images, manufacturer part numbers, physical dimensions, and more. 
 
 When writing a protocol, you must inform the API about the labware you will be placing on the robot's deck. Search the library when you’re looking for the API load names of the labware used in your protocol. You can copy the load names that should be passed to the ``load_labware`` method.
 
 Custom Labware
 ^^^^^^^^^^^^^^
 
-If you have labware that is not in the Labware Library, try creating your own definition using the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. Before using the Labware Creator, see `Creating Custom Labware Definitions <https://support.opentrons.com/s/article/Creating-Custom-Labware-Definitions>`_ .
+Custom labware is labware that is not listed the Labware Library. If your protocol needs labware that's not in the library, you can create it with the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. However, before using the Labware Creator, you should take a moment to review the support article, `Creating Custom Labware Definitions <https://support.opentrons.com/s/article/Creating-Custom-Labware-Definitions>`_ .
 
 After you've created your labware, save it as a ``.json`` file and add it to the Opentrons App. See `Using Labware in Your Protocols <https://support.opentrons.com/s/article/Using-labware-in-your-protocols>`_ for instructions. 
 
@@ -67,19 +67,16 @@ From the example in the :ref:`overview-section-v2`, we used the :py:meth:`.Proto
 
 After the ``load_labware`` method loads labware into your protocol, it returns a :py:class:`opentrons.protocol_api.labware.Labware` object.
 
-Labeling Labware
-^^^^^^^^^^^^^^^^
+.. Recommend a call-out instead of a section (H2, H3) for "label." It's more a "pro tip" nice-to-have rather than
+.. an item that requires its own section.
 
-Along with the required labware API name and deck location, the ``load_labware`` method also accepts an optional ``label`` argument. You can use it to name the labware. If used, the label value is displayed in the Opentrons App. For example::
-
-    tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat',
-                                    location= '1',
-                                    label= 'any-name-you-want')
-
-Stacking or Moving Labware
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Some text here.
+.. tip::
+    
+    The ``load_labware`` method also accepts an optional ``label`` argument. You can use it to name the labware. If used, the label value is displayed in the Opentrons App. For example::
+        
+        tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat',
+                                        location= '1',
+                                        label= 'any-name-you-want')
 
 .. _new-well-access:
 
@@ -105,17 +102,16 @@ The ending well will be in the bottom right, see the diagram below for further e
 .. image:: ../img/well_iteration/Well_Iteration.png
 
 .. code-block:: python
-    :substitutions:
 
-    '''
-    Examples in this section expect the following
-    '''
-    metadata = {'apiLevel': '|apiLevel|'}
-
+    # Flex
     def run(protocol):
+        plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', location='D1')
 
+.. code-block:: python
+
+    # OT-2
+    def run(protocol):
         plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', location='1')
-
 
 .. versionadded:: 2.0
 
@@ -170,11 +166,8 @@ Wells can be referenced by their name, as demonstrated above. However, they can 
 
 .. tip::
 
-    You may find well names (e.g. ``"B3"``) to be easier to reason with,
-    especially with irregular labware (e.g.
-    ``opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical``
-    (`Labware Library <https://labware.opentrons.com/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical>`_).
-    Whichever well access method you use, your protocol will be most maintainable if you use only one access method consistently.
+    You may find coordinate well names like ``"B3"`` easier to reason with, especially when working with irregular labware, e.g.
+    ``opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical``(see the `Opentrons 10 Tube Rack <https://labware.opentrons.com/opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical>`_ in the Labware Library). Whichever well access method you use, your protocol will be most maintainable if you use only one access method consistently.
 
 .. versionadded:: 2.0
 
@@ -266,11 +259,11 @@ This example uses ``load_liquid`` to label the initial well location, contents, 
 .. code-block:: python
 
         well_plate["A1"].load_liquid(liquid=greenWater, volume=50)
-        well_plate["A2"].load_liquid(greenWater, volume=50)
-        well_plate["B1"].load_liquid(blueWater, volume=50)
-        well_plate["B2"].load_liquid(blueWater, volume=50)
-        reservoir["A1"].load_liquid(greenWater, volume=200)
-        reservoir["A2"].load_liquid(blueWater, volume=200)
+        well_plate["A2"].load_liquid(liquid=greenWater, volume=50)
+        well_plate["B1"].load_liquid(liquid=blueWater, volume=50)
+        well_plate["B2"].load_liquid(liquid=blueWater, volume=50)
+        reservoir["A1"].load_liquid(liquid=greenWater, volume=200)
+        reservoir["A2"].load_liquid(liquid=blueWater, volume=200)
         
 .. versionadded:: 2.14
 
@@ -294,6 +287,8 @@ Well Dimensions
 
 The functions in the :ref:`new-well-access` section above return a single :py:class:`.Well` object or a larger object representing many wells. :py:class:`.Well` objects have attributes that provide information about their physical shape, such as the depth or diameter, as specified in their corresponding labware definition. These properties can be used for different applications, such as calculating the volume of a well or a :ref:`position-relative-labware`.
 
+In the code samples below, the ``load_labware`` method uses a Flex deck slot location. OT-2 users should replace ``D1`` with ``1``. Although our Python API knows how to automatically translate Flex and OT-2 deck locations, it's a good practice to use the  deck location coordinates that match your robot model.
+
 Depth
 ^^^^^
 
@@ -302,10 +297,8 @@ Use :py:attr:`.Well.depth` to get the distance in mm between the very top of the
 .. code-block:: python
     :substitutions:
 
-    metadata = {'apiLevel': '|apiLevel|'}
-
     def run(protocol):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
+        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D1')
         depth = plate['A1'].depth # 10.67
 
 Diameter
@@ -315,12 +308,9 @@ Use :py:attr:`.Well.diameter` to get the diameter of a given well in mm. Since d
 .. code-block:: python
     :substitutions:
 
-    metadata = {'apiLevel': '|apiLevel|'}
-
     def run(protocol):
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '1')
+        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 'D1')
         diameter = plate['A1'].diameter	# 6.86
-
 
 Length
 ^^^^^^
@@ -329,10 +319,8 @@ Use :py:attr:`.Well.length` to get the length of a given well in mm. Length is d
 .. code-block:: python
     :substitutions:
 
-    metadata = {'apiLevel': '|apiLevel|'}
-
     def run(protocol):
-        plate = protocol.load_labware('nest_12_reservoir_15ml', '1')
+        plate = protocol.load_labware('nest_12_reservoir_15ml', 'D1')
         length = plate['A1'].length	# 8.2
 
 
@@ -344,13 +332,9 @@ Use :py:attr:`.Well.width` to get the width of a given well in mm. Width is defi
 .. code-block:: python
     :substitutions:
 
-    metadata = {'apiLevel': '|apiLevel|'}
-
     def run(protocol):
-        plate = protocol.load_labware('nest_12_reservoir_15ml', '1')
+        plate = protocol.load_labware('nest_12_reservoir_15ml', 'D1')
         width = plate['A1'].width	# 71.2
-
-
 
 
 .. versionadded:: 2.9
