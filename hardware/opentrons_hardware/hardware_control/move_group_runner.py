@@ -585,7 +585,62 @@ class MoveScheduler:
         for group_id in range(
             self._start_at_index, self._start_at_index + len(self._moves)
         ):
-            await self._run_one_group(group_id, can_messenger)
+            self._event.clear()
+
+            log.debug(f"Executing move group {group_id}.")
+            self._current_group = group_id - self._start_at_index
+            error = await can_messenger.ensure_send(
+                node_id=NodeId.broadcast,
+                message=ExecuteMoveGroupRequest(
+                    payload=ExecuteMoveGroupRequestPayload(
+                        group_id=UInt8Field(group_id),
+                        # TODO (al, 2021-11-8): The triggers should be populated
+                        #  with actual values.
+                        start_trigger=UInt8Field(0),
+                        cancel_trigger=UInt8Field(0),
+                    )
+                ),
+                expected_nodes=self._get_nodes_in_move_group(group_id),
+            )
+            if error != ErrorCode.ok:
+                log.error(f"recieved error trying to execute move group {str(error)}")
+
+            expected_time = max(
+                3.0, self._durations[group_id - self._start_at_index] * 1.1
+            )
+            full_timeout = max(
+                5.0, self._durations[group_id - self._start_at_index] * 2
+            )
+            start_time = time.time()
+
+            try:
+                # TODO: The max here can be removed once can_driver.send() no longer
+                # returns before the message actually hits the bus. Right now it
+                # returns when the message is enqueued in the kernel, meaning that
+                # for short move durations we can see the timeout expiring before
+                # the execute even gets sent.
+                await asyncio.wait_for(
+                    self._event.wait(),
+                    full_timeout,
+                )
+                duration = time.time() - start_time
+                await self._send_stop_if_necessary(can_messenger, group_id)
+
+                if duration >= expected_time:
+                    log.warning(
+                        f"Move set {str(group_id)} took longer ({duration} seconds) than expected ({expected_time} seconds)."
+                    )
+            except asyncio.TimeoutError:
+                log.warning(
+                    f"Move set {str(group_id)} timed out of max duration {full_timeout}. Expected time: {expected_time}"
+                )
+                log.warning(
+                    f"Expected nodes in group {str(group_id)}: {str(self._get_nodes_in_move_group(group_id))}"
+                )
+                raise
+            except (RuntimeError, MoveConditionNotMet) as e:
+                log.error("canceling move group scheduler")
+                raise e
 
         def _reify_queue_iter() -> Iterator[_CompletionPacket]:
             while not self._completion_queue.empty():
