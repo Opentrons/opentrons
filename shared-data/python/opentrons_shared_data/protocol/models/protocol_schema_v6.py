@@ -26,6 +26,11 @@ class ProfileStep(BaseModel):
     holdSeconds: float
 
 
+class DropTipWellLocation(BaseModel):
+    origin: DropTipWellOrigin = DropTipWellOrigin.DEFAULT
+    offset: OffsetVector = Field(default_factory=OffsetVector)
+
+
 class WellLocation(BaseModel):
     origin: Optional[str]
     offset: Optional[OffsetVector]
@@ -46,7 +51,7 @@ class Params(BaseModel):
     wellName: Optional[str]
     volume: Optional[float]
     flowRate: Optional[float]
-    wellLocation: Optional[WellLocation]
+    wellLocation: Optional[Union[WellLocation, DropTipWellLocation]]
     waitForResume: Optional[Literal[True]]
     seconds: Optional[float]
     minimumZHeight: Optional[float]
@@ -67,6 +72,9 @@ class Params(BaseModel):
     radius: Optional[float]
     newLocation: Optional[Union[Location, Literal["offDeck"]]]
     strategy: Optional[str]
+    # schema v7 add-ons
+    adapterId: Optional[str]
+    homeAfter: Optional[bool]
 
 
 class Command(BaseModel):
@@ -98,6 +106,13 @@ class Group(BaseModel):
 class Shape(Enum):
     circular = "circular"
     rectangular = "rectangular"
+
+
+class DropTipWellOrigin(Enum):
+    TOP = "top"
+    BOTTOM = "bottom"
+    CENTER = "center"
+    DEFAULT = "default"
 
 
 class WellDefinition(BaseModel):
