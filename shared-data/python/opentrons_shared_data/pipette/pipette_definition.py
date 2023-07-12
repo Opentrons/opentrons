@@ -59,6 +59,7 @@ class PipetteModelType(Enum):
 class PipetteGenerationType(Enum):
     GEN1 = "GEN1"
     GEN2 = "GEN2"
+    GEN3 = "GEN3"  # equivalent to FLEX
     FLEX = "FLEX"
 
 

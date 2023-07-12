@@ -137,7 +137,7 @@ def test_convert_pipette_name(
             # 96 channel has a unique "name" right now
             PipetteModelType.p1000,
             PipetteChannelType.NINETY_SIX_CHANNEL,
-            PipetteGenerationType.FLEX,
+            PipetteGenerationType.GEN3,
             "p1000_96",
         ],
     ],

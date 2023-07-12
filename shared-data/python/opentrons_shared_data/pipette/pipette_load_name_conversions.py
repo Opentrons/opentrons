@@ -33,6 +33,8 @@ class PipetteNameType:
             return base_name
         elif self.pipette_channels == PipetteChannelType.NINETY_SIX_CHANNEL:
             return base_name
+        elif self.pipette_generation == PipetteGenerationType.FLEX:
+            return f"{base_name}_{PipetteGenerationType.GEN3.name.lower()}"
         else:
             return f"{base_name}_{self.pipette_generation.name.lower()}"
 
@@ -144,7 +146,7 @@ def generation_from_string(pipette_name_list: List[str]) -> PipetteGenerationTyp
 
     """
     if "flex" in pipette_name_list or "3." in pipette_name_list[-1]:
-        return PipetteGenerationType.FLEX
+        return PipetteGenerationType.GEN3
     elif "gen2" in pipette_name_list or "2." in pipette_name_list[-1]:
         return PipetteGenerationType.GEN2
     else:
