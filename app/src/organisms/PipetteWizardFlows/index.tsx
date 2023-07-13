@@ -150,7 +150,7 @@ export const PipetteWizardFlows = (
           deleteMaintenanceRun(maintenanceRunId)
         })
         .catch(error => {
-          console.error(error)
+          console.error(error.message)
           handleClose()
         })
     }

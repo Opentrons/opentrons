@@ -7,7 +7,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { getRobotSettings } from '../../../../redux/robot-settings'
 import { getLocalRobot } from '../../../../redux/discovery'
-import { toggleDevtools } from '../../../../redux/config'
+import { toggleDevtools, toggleHistoricOffsets } from '../../../../redux/config'
 import { mockConnectedRobot } from '../../../../redux/discovery/__fixtures__'
 import { Navigation } from '../../../../organisms/Navigation'
 import {
@@ -48,6 +48,9 @@ const mockGetRobotSettings = getRobotSettings as jest.MockedFunction<
 >
 const mockToggleDevtools = toggleDevtools as jest.MockedFunction<
   typeof toggleDevtools
+>
+const mockToggleHistoricOffsets = toggleHistoricOffsets as jest.MockedFunction<
+  typeof toggleHistoricOffsets
 >
 const mockNavigation = Navigation as jest.MockedFunction<typeof Navigation>
 const mockTouchScreenSleep = TouchScreenSleep as jest.MockedFunction<
@@ -125,9 +128,11 @@ describe('RobotSettingsDashboard', () => {
     getByText('Touchscreen Brightness')
     getByText('Device Reset')
     getByText('Update Channel')
+    getByText('Apply labware offsets')
+    getByText('Use stored data when setting up a protocol.')
     getByText('Enable Developer Tools')
     getByText('Enable additional logging and allow access to feature flags.')
-    expect(getAllByText('Off').length).toBe(2) // LED & DEV tools
+    expect(getAllByText('Off').length).toBe(3) // LED & DEV tools & historic offsets
   })
 
   // Note(kj: 02/03/2023) This case will be changed in a following PR
@@ -194,6 +199,13 @@ describe('RobotSettingsDashboard', () => {
     const button = getByText('Update Channel')
     fireEvent.click(button)
     getByText('Mock Update Channel')
+  })
+
+  it('should call a mock function when tapping enable historic offset', () => {
+    const [{ getByText }] = render()
+    const button = getByText('Apply labware offsets')
+    fireEvent.click(button)
+    expect(mockToggleHistoricOffsets).toHaveBeenCalled()
   })
 
   it('should call a mock function when tapping enable dev tools', () => {

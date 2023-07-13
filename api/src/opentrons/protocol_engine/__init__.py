@@ -3,6 +3,8 @@
 The protocol_engine module contains the logic necessary to take a stream of
 protocol commands, issued by some arbitrary protocol runner, and turn it into
 protocol state and side-effects like robot movements.
+
+The main interface is the `ProtocolEngine` class.
 """
 
 from .create_protocol_engine import create_protocol_engine
