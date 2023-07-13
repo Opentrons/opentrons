@@ -7,7 +7,7 @@ import {
   GEN1,
   GEN2,
   OT3_PIPETTES,
-  GEN3,
+  FLEX,
 } from '@opentrons/shared-data'
 import { PipetteSelect } from '../PipetteSelect'
 import { Select } from '../../forms'
@@ -50,7 +50,7 @@ describe('PipetteSelect', () => {
       .map(getPipetteNameSpecs)
       .filter((specs): specs is PipetteNameSpecs => specs !== null)
 
-    const gen3Specs = pipetteSpecs.filter(s => s.displayCategory === GEN3)
+    const gen3Specs = pipetteSpecs.filter(s => s.displayCategory === FLEX)
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
     const gen1Specs = pipetteSpecs.filter(s => s.displayCategory === GEN1)
 

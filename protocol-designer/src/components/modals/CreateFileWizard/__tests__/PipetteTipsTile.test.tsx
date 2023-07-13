@@ -52,7 +52,7 @@ const mockWizardTileProps: Partial<WizardTileProps> = {
     },
     pipettesByMount: {
       left: {
-        pipetteName: 'p50_single_gen3',
+        pipetteName: 'p50_single_flex',
         tiprackDefURI: 'opentrons/opentrons_flex_96_tiprack_200ul/1',
       },
       right: { pipetteName: null, tiprackDefURI: null },

@@ -26,7 +26,7 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
 
   let imgSrc
   switch (displayCategory) {
-    case 'GEN3': {
+    case 'FLEX': {
       imgSrc = channels === 1 ? singleFlexSrc : eightChannelFlexSrc
       break
     }
@@ -39,7 +39,6 @@ export function InstrumentDiagram(props: InstrumentDiagramProps): JSX.Element {
       imgSrc = channels === 1 ? singleSrc : multiSrc
     }
   }
-
   return (
     <Box
       className={className}

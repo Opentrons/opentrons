@@ -5,7 +5,7 @@ import {
   getPipetteNameSpecs,
   GEN1,
   GEN2,
-  GEN3,
+  FLEX
 } from '@opentrons/shared-data'
 import { Flex } from '../primitives'
 import { Select, CONTEXT_VALUE } from '../forms'
@@ -67,7 +67,9 @@ export const PipetteSelect = (props: PipetteSelectProps): JSX.Element => {
   const allowlist = ({ value }: SelectOption): boolean => {
     return !nameBlocklist.some(n => n === value)
   }
-  const gen3Options = specsByCategory[GEN3].map(specToOption).filter(allowlist)
+  const gen3Options = specsByCategory[FLEX]
+    .map(specToOption)
+    .filter(allowlist)
   const gen2Options = specsByCategory[GEN2].map(specToOption).filter(allowlist)
   const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
   const groupedOptions = [
