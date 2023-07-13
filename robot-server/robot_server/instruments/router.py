@@ -90,7 +90,7 @@ def _gripper_dict_to_gripper_res(
     """Convert GripperDict to Gripper response model."""
     calibration_data = gripper_dict["calibration_offset"]
     return Gripper.construct(
-        firmwareVersion=str(fw_version),
+        firmwareVersion=str(fw_version) if fw_version else None,
         ok=True,
         mount=MountType.EXTENSION.value,
         instrumentModel=GripperModelStr(str(gripper_dict["model"])),
