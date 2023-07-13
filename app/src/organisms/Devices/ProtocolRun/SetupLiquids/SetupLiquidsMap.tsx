@@ -86,6 +86,8 @@ export function SetupLiquidsMap(props: SetupLiquidsMapProps): JSX.Element {
         deckDef={deckDef}
         viewBox={getViewBox(robotType)}
         deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
+        deckFill="#e6e6e6"
+        trashSlotName="A3"
         id="LabwareSetup_deckMap"
       >
         {() => (
