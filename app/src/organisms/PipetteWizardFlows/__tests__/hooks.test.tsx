@@ -257,7 +257,7 @@ describe('usePipetteFlowWizardHeaderText', () => {
           pipetteInfo: [
             {
               id: 'id',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
               mount: LEFT,
             },
           ],
@@ -282,7 +282,7 @@ describe('usePipetteFlowWizardHeaderText', () => {
           pipetteInfo: [
             {
               id: 'id',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
               mount: LEFT,
             },
           ],
@@ -415,7 +415,7 @@ describe('usePipetteFlowWizardHeaderText', () => {
           pipetteInfo: [
             {
               id: 'id',
-              pipetteName: 'p50_single_gen3',
+              pipetteName: 'p50_single_flex',
               mount: LEFT,
             },
           ],
@@ -440,7 +440,7 @@ describe('usePipetteFlowWizardHeaderText', () => {
           pipetteInfo: [
             {
               id: 'id',
-              pipetteName: 'p50_single_gen3',
+              pipetteName: 'p50_single_flex',
               mount: LEFT,
             },
           ],

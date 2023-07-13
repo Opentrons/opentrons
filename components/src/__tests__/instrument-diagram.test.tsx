@@ -50,7 +50,7 @@ describe('InstrumentDiagram', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('single-channel GEN3 renders correctly', () => {
+  it('single-channel FLEX renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentDiagram
         mount="right"
@@ -61,7 +61,7 @@ describe('InstrumentDiagram', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('eight-channel GEN3 renders correctly', () => {
+  it('eight-channel FLEX renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentDiagram
         mount="right"
