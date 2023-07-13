@@ -33,11 +33,19 @@ from hardware_testing.opentrons_api.types import (
     OT3Axis,
 )
 
+DEFAULT_SLOT_TIP_RACK_LIQUID = 7
+DEFAULT_SLOT_TIP_RACK_FIXTURE = 1
+DEFAULT_SLOT_RESERVOIR = 8
+DEFAULT_SLOT_FIXTURE = 2
+DEFAULT_SLOT_TRASH = 12
+
 TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
 
 SAFE_HEIGHT_TRAVEL = 10
 SAFE_HEIGHT_CALIBRATE = 10
+
+ENCODER_ALIGNMENT_THRESHOLD_MM = 0.1
 
 COLUMNS = "ABCDEFGH"
 PRESSURE_DATA_HEADER = ["PHASE", "CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7", "CH8"]
@@ -618,7 +626,7 @@ async def _test_diagnostics_encoder(
     print("moving plunger")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, drop_tip)
     pip_pos, pip_enc = await _get_plunger_pos_and_encoder()
-    if abs(pip_pos - pip_enc) > 0.1:
+    if abs(pip_pos - pip_enc) > ENCODER_ALIGNMENT_THRESHOLD_MM:
         print(f"FAIL: plunger ({pip_pos}) and encoder ({pip_enc}) are too different")
         encoder_move_pass = False
     write_cb(["encoder-move", pip_pos, pip_enc, _bool_to_pass_fail(encoder_move_pass)])
@@ -1012,7 +1020,7 @@ async def _main(test_config: TestConfig) -> None:
             for f in fields(config):
                 csv_cb.write([t.value, f.name, getattr(config, f.name)])
 
-        tips_used = _get_tips_used_for_droplet_test(
+        tips_used_for_droplet = _get_tips_used_for_droplet_test(
             pipette_channels, test_config.num_trials
         )
 
@@ -1035,8 +1043,11 @@ async def _main(test_config: TestConfig) -> None:
                 test_passed = await _test_plunger_positions(api, mount, csv_cb.write)
                 csv_cb.results("plunger", test_passed)
 
+        # TODO: add calibration here
+        # TODO: add liquid-probe here
+
         if not test_config.skip_liquid:
-            for i, tip in enumerate(tips_used):
+            for i, tip in enumerate(tips_used_for_droplet):
                 droplet_wait_seconds = test_config.droplet_wait_seconds * (i + 1)
                 test_passed = await _test_for_leak_by_eye(
                     api, mount, test_config, tip, droplet_wait_seconds
@@ -1090,7 +1101,7 @@ async def _main(test_config: TestConfig) -> None:
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser(description="OT-3 Pipette Assembly QC Test")
-    arg_parser.add_argument("--operator", type=str, required=True)
+    arg_parser.add_argument("--operator", type=str, default=None)
     arg_parser.add_argument("--skip-liquid", action="store_true")
     arg_parser.add_argument("--skip-fixture", action="store_true")
     arg_parser.add_argument("--skip-diagnostics", action="store_true")
@@ -1104,16 +1115,28 @@ if __name__ == "__main__":
         default=PRESSURE_CFG[PressureEvent.ASPIRATE_P50].sample_count,
     )
     arg_parser.add_argument("--wait", type=int, default=30)
-    arg_parser.add_argument("--slot-tip-rack-liquid", type=int, default=7)
-    arg_parser.add_argument("--slot-tip-rack-fixture", type=int, default=1)
-    arg_parser.add_argument("--slot-reservoir", type=int, default=8)
-    arg_parser.add_argument("--slot-fixture", type=int, default=2)
-    arg_parser.add_argument("--slot-trash", type=int, default=12)
+    arg_parser.add_argument(
+        "--slot-tip-rack-liquid", type=int, default=DEFAULT_SLOT_TIP_RACK_LIQUID
+    )
+    arg_parser.add_argument(
+        "--slot-tip-rack-fixture", type=int, default=DEFAULT_SLOT_TIP_RACK_FIXTURE
+    )
+    arg_parser.add_argument(
+        "--slot-reservoir", type=int, default=DEFAULT_SLOT_RESERVOIR
+    )
+    arg_parser.add_argument("--slot-fixture", type=int, default=DEFAULT_SLOT_FIXTURE)
+    arg_parser.add_argument("--slot-trash", type=int, default=DEFAULT_SLOT_TRASH)
     arg_parser.add_argument("--insert-depth", type=int, default=14)
     arg_parser.add_argument("--simulate", action="store_true")
     args = arg_parser.parse_args()
+    if args.operator:
+        operator = args.operator
+    elif not args.simulate:
+        operator = input("OPERATOR name:").strip()
+    else:
+        operator = "simulation"
     _cfg = TestConfig(
-        operator_name=args.operator,
+        operator_name=operator,
         skip_liquid=args.skip_liquid,
         skip_fixture=args.skip_fixture,
         skip_diagnostics=args.skip_diagnostics,
