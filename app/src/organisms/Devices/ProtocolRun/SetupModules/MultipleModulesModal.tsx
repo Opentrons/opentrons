@@ -16,12 +16,11 @@ import {
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
 import { LegacyModal } from '../../../../molecules/LegacyModal'
-import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'
-import multipleModuleHelpOdd from '../../../../assets/images/multiple_modules_modal_odd.png'
-
 import { StyledText } from '../../../../atoms/text'
 import { getIsOnDevice } from '../../../../redux/config'
 import { Modal } from '../../../../molecules/Modal'
+import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'
+import multipleModuleHelpOdd from '../../../../assets/images/on-device-display/multiple_modules_modal.png'
 
 const HOW_TO_MULTIPLE_MODULES_HREF =
   'https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2'
@@ -50,7 +49,7 @@ export const MultipleModulesModal = (
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
-            gridGap={SPACING.spacing20}
+            gridGap={SPACING.spacing40}
           >
             <StyledText as="p">{t('multiple_of_most_modules')}</StyledText>
             <img
@@ -58,6 +57,7 @@ export const MultipleModulesModal = (
               height="404px"
               src={multipleModuleHelpOdd}
               style={{ flex: '1 0 0', alignSelf: ALIGN_STRETCH }}
+              alt="2 temperature modules plugged into the usb ports"
             />
           </Flex>
         </Modal>
@@ -102,6 +102,7 @@ export const MultipleModulesModal = (
                 width="288px"
                 src={multipleModuleHelp}
                 style={{ marginBottom: SPACING.spacing16 }}
+                alt="2 temperature modules plugged into the usb ports"
               />
             </Flex>
             <PrimaryButton
