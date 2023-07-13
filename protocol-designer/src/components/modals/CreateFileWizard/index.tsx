@@ -187,7 +187,12 @@ export function CreateFileWizard(): JSX.Element | null {
         steplistActions.changeSavedStepForm({
           stepId: INITIAL_DECK_SETUP_STEP_ID,
           update: {
-            labwareLocationUpdate: {[FIXED_TRASH_ID]: {slotName: values.fields.robotType === FLEX_ROBOT_TYPE ? 'A3' : '12'}},
+            labwareLocationUpdate: {
+              [FIXED_TRASH_ID]: {
+                slotName:
+                  values.fields.robotType === FLEX_ROBOT_TYPE ? 'A3' : '12',
+              },
+            },
           },
         })
       )
