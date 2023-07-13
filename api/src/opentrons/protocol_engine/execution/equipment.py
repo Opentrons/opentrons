@@ -39,6 +39,7 @@ from ..types import (
     LabwareLocation,
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
     LabwareOffset,
     LabwareOffsetLocation,
     ModuleModel,
@@ -435,6 +436,46 @@ class EquipmentHandler:
                 location=LabwareOffsetLocation(
                     slotName=slot_name,
                     moduleModel=module_model,
+                ),
+            )
+            return self._get_id_from_offset(offset)
+
+        elif isinstance(labware_location, OnLabwareLocation):
+            parent_labware_id = labware_location.labwareId
+            parent_labware_uri = self._state_store.labware.get_definition_uri(
+                parent_labware_id
+            )
+
+            base_location = self._state_store.labware.get_parent_location(
+                parent_labware_id
+            )
+
+            if isinstance(base_location, ModuleLocation):
+                module_id = base_location.moduleId
+                module_model = self._state_store.modules.get_requested_model(
+                    module_id=module_id
+                )
+                assert module_model is not None, (
+                    "Can't find offsets for labware"
+                    " that are loaded on modules"
+                    " that were loaded with ProtocolEngine.use_attached_modules()."
+                )
+                module_location = self._state_store.modules.get_location(
+                    module_id=module_id
+                )
+                slot_name = module_location.slotName
+            elif isinstance(base_location, DeckSlotLocation):
+                slot_name = base_location.slotName
+                module_model = None
+            else:  # No offset for labware sitting on labware off-deck
+                return None
+
+            offset = self._state_store.labware.find_applicable_labware_offset(
+                definition_uri=labware_definition_uri,
+                location=LabwareOffsetLocation(
+                    slotName=slot_name,
+                    moduleModel=module_model,
+                    definitionUri=parent_labware_uri,
                 ),
             )
             return self._get_id_from_offset(offset)
