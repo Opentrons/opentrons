@@ -42,7 +42,7 @@ from .measurement.record import (
 from .tips import get_tips, MULTI_CHANNEL_TEST_ORDER
 
 import time
-from drivers import list_ports_and_select, AsairSensor
+from ..drivers import list_ports_and_select, AsairSensor
 import threading
 
 _STOP_AIR_SENSOR_THREAD = False
