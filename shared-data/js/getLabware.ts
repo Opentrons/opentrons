@@ -20,7 +20,6 @@ assert(
   'Expected v1 labware defs. Something went wrong with shared-data/build/labware.json'
 )
 
-// labware definitions only used for back-compat with legacy v1 defs.
 // do not list in any "available labware" UI.
 // TODO(mc, 2019-12-3): how should this correspond to RETIRED_LABWARE?
 // see shared-data/js/helpers/index.js
@@ -33,7 +32,6 @@ export const LABWAREV2_DO_NOT_LIST = [
   'tipone_96_tiprack_200ul',
   'eppendorf_96_tiprack_1000ul_eptips',
   'eppendorf_96_tiprack_10ul_eptips',
-
   // Replaced by opentrons_96_wellplate_200ul_pcr_full_skirt
   // (https://opentrons.atlassian.net/browse/RLAB-230):
   'armadillo_96_wellplate_200ul_pcr_full_skirt',
