@@ -6,18 +6,18 @@
 Hardware Modules
 ################
 
-Hardware modules are first-party peripherals that attach to the OT-2 to extend its capabilities. The Python API currently supports four modules that attach to the OT-2 deck and are controlled over a USB connection: the :ref:`Temperature <temperature-module>`, :ref:`Magnetic <magnetic-module>`, :ref:`Thermocycler <thermocycler-module>`, and :ref:`Heater-Shaker <heater-shaker-module>` Modules.
+Hardware modules include powered and unpowered Opentrons peripherals that attach to your Flex or OT-2. The Flex and OT-2 are aware of and control powered hardware modules via a USB connection. Unpowered modules are controlled by the protocols you write and upload to the Opentrons App. The Python API currently supports a :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>`, :ref:`Thermocycler Module <thermocycler-module>`, :ref:`Heater-Shaker Module <heater-shaker-module>`, and an unpowered Magnetic Block. Modules are useful because they extend the capabilities of your robot.
 
 ************
 Module Setup
 ************
 
-Loading a Module onto the Deck
-==============================
+Loading Modules onto the Deck
+=============================
 
-Like labware and pipettes, you must inform the Protocol API of the modules you will use in your protocol.
+Like labware and pipettes, you must inform the Protocol API about the modules you want to use in your protocol.
 
-Use :py:meth:`.ProtocolContext.load_module` to load a module.  It will return an object representing the module.
+Use :py:meth:`.ProtocolContext.load_module` to load a module. It returns an object representing the module (e.g. :py:class:`~opentrons.protocol_api.MagneticModuleContext` or :py:class:`~opentrons.protocol_api.TemperatureModuleContext`).
 
 .. code-block:: python
     :substitutions:
@@ -32,6 +32,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.  It will return an
          
          # Load a Temperature Module GEN1 in deck slot 3.
          temperature_module = protocol.load_module('temperature module', 3)
+
 
 When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the OT-2 won't let you start the protocol run until all loaded modules are connected to the OT-2 and powered on.
 
