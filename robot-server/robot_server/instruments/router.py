@@ -52,11 +52,13 @@ def _pipette_dict_to_pipette_res(
     pipette_dict: PipetteDict,
     pipette_offset: Optional[PipetteOffsetByPipetteMount],
     mount: Mount,
+    fw_version: Optional[int],
 ) -> Pipette:
     """Convert PipetteDict to Pipette response model."""
     if pipette_dict:
         calibration_data = pipette_offset
         return Pipette.construct(
+            firmwareVersion=str(fw_version) if fw_version else None,
             ok=True,
             mount=MountType.from_hw_mount(mount).value,
             instrumentName=pipette_dict["name"],
@@ -82,10 +84,13 @@ def _pipette_dict_to_pipette_res(
         )
 
 
-def _gripper_dict_to_gripper_res(gripper_dict: GripperDict) -> Gripper:
+def _gripper_dict_to_gripper_res(
+    gripper_dict: GripperDict, fw_version: Optional[int]
+) -> Gripper:
     """Convert GripperDict to Gripper response model."""
     calibration_data = gripper_dict["calibration_offset"]
     return Gripper.construct(
+        firmwareVersion=str(fw_version) if fw_version else None,
         ok=True,
         mount=MountType.EXTENSION.value,
         instrumentModel=GripperModelStr(str(gripper_dict["model"])),
@@ -135,7 +140,10 @@ def _get_gripper_instrument_data(
     if status and (status.fw_update_needed or not status.ok):
         return _bad_gripper_response()
     if attached_gripper:
-        return _gripper_dict_to_gripper_res(gripper_dict=attached_gripper)
+        return _gripper_dict_to_gripper_res(
+            gripper_dict=attached_gripper,
+            fw_version=status.current_fw_version if status else None,
+        )
     return None
 
 
@@ -155,7 +163,10 @@ def _get_pipette_instrument_data(
             hardware.get_instrument_offset(OT3Mount.from_mount(mount)),
         )
         return _pipette_dict_to_pipette_res(
-            pipette_dict=pipette_dict, mount=mount, pipette_offset=offset
+            pipette_dict=pipette_dict,
+            mount=mount,
+            pipette_offset=offset,
+            fw_version=status.current_fw_version if status else None,
         )
     return None
 
@@ -195,9 +206,7 @@ async def _get_attached_instruments_ot2(
     pipettes = hardware.attached_instruments
     response_data = [
         _pipette_dict_to_pipette_res(
-            pipette_dict=pipette_dict,
-            mount=mount,
-            pipette_offset=None,
+            pipette_dict=pipette_dict, mount=mount, pipette_offset=None, fw_version=None
         )
         for mount, pipette_dict in pipettes.items()
         if pipette_dict
