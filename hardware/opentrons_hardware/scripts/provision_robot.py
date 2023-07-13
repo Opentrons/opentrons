@@ -242,7 +242,7 @@ def _format_properties(properties: List[List[Any]]) -> Dict[PropId, Any]:
     return formated_properties
 
 
-def _write_serial_number(serial_number: str, filepath: Optional[str] = None) -> bool:
+def _write_serial_number(serial_number: str, filepath: Optional[str] = None) -> None:
     """Writes the serial number to the rootfs."""
     filepath = filepath or SERIAL_NUMBER_FILE
     print(f"Writting {serial_number} to {filepath}")
