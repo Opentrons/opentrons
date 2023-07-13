@@ -12,10 +12,10 @@ metadata = {
     }
     
 def run(protocol: protocol_api.ProtocolContext):
-	tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
+	tips = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
 	reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
 	plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
-	left_pipette = protocol.load_instrument('p300_multi_gen2', 'right', tip_racks=[tiprack])
+	left_pipette = protocol.load_instrument('p300_multi_gen2', 'right', tip_racks=[tips])
 
 	# distribute diluent
 	left_pipette.transfer(100, reservoir['A1'], plate.rows()[0])  
