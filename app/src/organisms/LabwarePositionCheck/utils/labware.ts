@@ -2,7 +2,6 @@ import reduce from 'lodash/reduce'
 import {
   getIsTiprack,
   getTiprackVolume,
-  ProtocolFile,
   LabwareDefinition2,
   getLabwareDefURI,
   CompletedProtocolAnalysis,
@@ -39,8 +38,15 @@ export const orderBySlot = (
   return 1
 }
 
+interface Labware {
+  [labwareId: string]: {
+    definitionId: string
+    displayName?: string
+  }
+}
+
 export const getTiprackIdsInOrder = (
-  labware: ProtocolFile<{}>['labware'],
+  labware: Labware,
   labwareDefinitions: Record<string, LabwareDefinition2>,
   commands: RunTimeCommand[]
 ): string[] => {

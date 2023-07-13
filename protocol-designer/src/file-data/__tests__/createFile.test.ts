@@ -1,5 +1,4 @@
 import Ajv from 'ajv'
-import isEmpty from 'lodash/isEmpty'
 import protocolV7Schema from '@opentrons/shared-data/protocol/schemas/7.json'
 import commandV7Schema from '@opentrons/shared-data/command/schemas/7.json'
 import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
@@ -88,10 +87,6 @@ describe('createFile selector', () => {
     )
     expectResultToMatchSchema(result)
 
-    // check for false positives: if the output is lacking these entities, we don't
-    // have the opportunity to validate their part of the schema
-    expect(!isEmpty(result.labware)).toBe(true)
-    expect(!isEmpty(result.pipettes)).toBe(true)
     expect(mockGetLoadLiquidCommands).toHaveBeenCalledWith(
       ingredients,
       ingredLocations

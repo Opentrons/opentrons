@@ -1796,32 +1796,6 @@
     }
   },
   "robot": { "model": "OT-2 Standard", "deckId": "ot2_standard" },
-  "pipettes": {
-    "01217420-180a-11e9-9608-8bed9be8868f": { "name": "p10_single" },
-    "01217421-180a-11e9-9608-8bed9be8868f": { "name": "p10_multi" }
-  },
-  "labware": {
-    "fixedTrash": {
-      "displayName": "Trash",
-      "definitionId": "opentrons/opentrons_1_trash_1100ml_fixed/1"
-    },
-    "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul": {
-      "displayName": "Tiprack 10 Ul (1)",
-      "definitionId": "opentrons/opentrons_96_tiprack_10ul/1"
-    },
-    "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row": {
-      "displayName": "Trough 12 Row (1)",
-      "definitionId": "opentrons/usascientific_12_reservoir_22ml/1"
-    },
-    "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat": {
-      "displayName": "96 Flat (1)",
-      "definitionId": "opentrons/corning_96_wellplate_360ul_flat/1"
-    },
-    "cea1c650-1811-11e9-9608-8bed9be8868f": {
-      "displayName": "Tiprack 10 Ul (2)",
-      "definitionId": "opentrons/opentrons_96_tiprack_10ul/1"
-    }
-  },
   "liquids": {
     "0": {
       "displayName": "Liquid",
@@ -4120,7 +4094,6 @@
   },
   "$otSharedSchema": "#/protocol/schemas/7",
   "schemaVersion": 7,
-  "modules": {},
   "commands": [
     {
       "key": "0bf66f37-bbd6-4d3e-9b5f-221d8d73174f",

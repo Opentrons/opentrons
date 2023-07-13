@@ -172,28 +172,6 @@
     }
   },
   "robot": { "model": "OT-2 Standard", "deckId": "ot2_standard" },
-  "pipettes": {
-    "c6f45030-92a5-11e9-ac62-1b173f839d9e": { "name": "p10_single" },
-    "c6f47740-92a5-11e9-ac62-1b173f839d9e": { "name": "p50_single" }
-  },
-  "labware": {
-    "fixedTrash": {
-      "displayName": "Trash",
-      "definitionId": "opentrons/opentrons_1_trash_1100ml_fixed/1"
-    },
-    "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul": {
-      "displayName": "tiprack 10ul (1)",
-      "definitionId": "opentrons/opentrons_96_tiprack_10ul/1"
-    },
-    "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul": {
-      "displayName": "tiprack 200ul (1)",
-      "definitionId": "opentrons/tipone_96_tiprack_200ul/1"
-    },
-    "dafd4000-92a5-11e9-ac62-1b173f839d9e:96-deep-well": {
-      "displayName": "96 deep well (1)",
-      "definitionId": "opentrons/usascientific_96_wellplate_2.4ml_deep/1"
-    }
-  },
   "liquids": {
     "0": {
       "displayName": "samples",
@@ -3387,7 +3365,6 @@
   },
   "$otSharedSchema": "#/protocol/schemas/7",
   "schemaVersion": 7,
-  "modules": {},
   "commands": [
     {
       "key": "1103f9a2-cc33-4d2a-93be-1f5001cefc9e",
