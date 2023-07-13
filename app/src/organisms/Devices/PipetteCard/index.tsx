@@ -166,6 +166,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
         <AboutPipetteSlideout
           pipetteId={pipetteId}
           pipetteName={pipetteInfo.displayName}
+          mount={mount}
           onCloseClick={() => setShowAboutSlideout(false)}
           isExpanded={true}
         />

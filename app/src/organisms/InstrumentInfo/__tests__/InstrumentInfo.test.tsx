@@ -41,6 +41,7 @@ const mockGripperData: GripperData = {
       source: 'mockSource',
     },
   },
+  firmwareVersion: '12',
   instrumentModel: 'gripperModel_v1',
   instrumentType: 'gripper',
   mount: 'extension',
@@ -58,6 +59,7 @@ const mockGripperDataWithCalData: GripperData = {
       last_modified: 'mockLastModified',
     },
   },
+  firmwareVersion: '12',
   instrumentModel: 'gripperModel_v1',
   instrumentType: 'gripper',
   mount: 'extension',
@@ -80,6 +82,7 @@ describe('InstrumentInfo', () => {
     getByText('last calibrated')
     getByText('No calibration data')
     getByText('firmware version')
+    getByText('12')
     getByText('serial number')
     getByText('123')
     getByRole('button', { name: 'MediumButton_secondary' }).click()
@@ -96,6 +99,7 @@ describe('InstrumentInfo', () => {
     getByText('last calibrated')
     getByText('mockLastModified')
     getByText('firmware version')
+    getByText('12')
     getByText('serial number')
     getByText('123')
     getByRole('button', { name: 'MediumButton_secondary' }).click()
@@ -104,14 +108,13 @@ describe('InstrumentInfo', () => {
     getByText('mock GripperWizardFlows')
   })
 
-  it('returns the correct information for a pipette with cal data', () => {
+  it('returns the correct information for a pipette with cal data and no firmware version', () => {
     props = {
       instrument: mockPipetteData1Channel,
     }
     const { getByText, getByRole } = render(props)
     getByText('last calibrated')
     getByText('08/25/2020 20:25:00')
-    getByText('firmware version')
     getByText('serial number')
     getByText('abc')
     getByRole('button', { name: 'MediumButton_secondary' }).click()

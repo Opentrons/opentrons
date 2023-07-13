@@ -8,15 +8,18 @@ import {
   TYPOGRAPHY,
   COLORS,
 } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { StyledText } from '../../../atoms/text'
 import { Slideout } from '../../../atoms/Slideout'
 
 import type { AttachedPipette } from '../../../redux/pipettes/types'
-import type { PipetteModelSpecs } from '@opentrons/shared-data'
+import type { PipetteData } from '@opentrons/api-client'
+import type { PipetteModelSpecs, PipetteMount } from '@opentrons/shared-data'
 
 interface AboutPipetteSlideoutProps {
   pipetteId: AttachedPipette['id']
   pipetteName: PipetteModelSpecs['displayName']
+  mount: PipetteMount
   onCloseClick: () => unknown
   isExpanded: boolean
 }
@@ -24,8 +27,14 @@ interface AboutPipetteSlideoutProps {
 export const AboutPipetteSlideout = (
   props: AboutPipetteSlideoutProps
 ): JSX.Element | null => {
-  const { pipetteId, pipetteName, isExpanded, onCloseClick } = props
+  const { pipetteId, pipetteName, isExpanded, mount, onCloseClick } = props
   const { t } = useTranslation(['device_details', 'shared'])
+  const { data: attachedInstruments } = useInstrumentsQuery()
+  const instrumentInfo =
+    attachedInstruments?.data?.find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === mount
+    ) ?? null
 
   return (
     <Slideout
@@ -44,6 +53,25 @@ export const AboutPipetteSlideout = (
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
+        {instrumentInfo?.firmwareVersion != null && (
+          <>
+            <StyledText
+              as="h6"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              color={COLORS.darkGreyEnabled}
+              textTransform={TYPOGRAPHY.textTransformUppercase}
+            >
+              {t('current_version')}
+            </StyledText>
+            <StyledText
+              as="p"
+              paddingTop={SPACING.spacing4}
+              paddingBottom={SPACING.spacing12}
+            >
+              {instrumentInfo.firmwareVersion}
+            </StyledText>
+          </>
+        )}
         <StyledText
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}

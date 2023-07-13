@@ -127,7 +127,12 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
                 : i18n.format(t('no_cal_data'), 'capitalize')
             }
           />
-          <InfoItem label={t('firmware_version')} value="TODO" />
+          {instrument.firmwareVersion != null && (
+            <InfoItem
+              label={t('firmware_version')}
+              value={instrument.firmwareVersion}
+            />
+          )}
           <InfoItem
             label={t('serial_number')}
             value={instrument.serialNumber}
