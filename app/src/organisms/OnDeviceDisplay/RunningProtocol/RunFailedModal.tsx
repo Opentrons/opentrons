@@ -4,13 +4,14 @@ import { useHistory } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
+  ALIGN_FLEX_START,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
+  OVERFLOW_AUTO,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  ALIGN_FLEX_START,
-  COLORS,
-  BORDERS,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
@@ -116,7 +117,7 @@ export function RunFailedModal({
 }
 
 const SCROLL_BAR_STYLE = css`
-  overflow-y: scroll;
+  overflow-y: ${OVERFLOW_AUTO};
 
   &::-webkit-scrollbar {
     width: 0.75rem;
