@@ -262,8 +262,8 @@ class MoveGroupRunner:
                 for node, step in sequence.items():
                     await can_messenger.send(
                         node_id=node,
-                        message=self._get_message_type(
-                            step, group_i + self._start_at_index, seq_i
+                        message=self.get_message_type(
+                            step, group_i + self._start_at_index, seq_i, self._ignore_stalls
                         ),
                     )
 
@@ -272,18 +272,26 @@ class MoveGroupRunner:
         cls, velocity: Union[float, np.float64], interrupts: int
     ) -> Int32Field:
         return Int32Field(int((velocity / interrupts) * (2**31)))
+    
+    @classmethod
+    def convert_acceleration(
+        cls, acceleration: Union[float, np.float64], interrupts: int
+    ) -> Int32Field:
+        return Int32Field(
+            int((acceleration * 1000.0 / (interrupts ** 2)) * (2**31))
+        )
 
     @classmethod
     def get_message_type(
-        cls, step: SingleMoveStep, group: int, seq: int
+        cls, step: SingleMoveStep, group: int, seq: int, ignore_stalls: bool = False,
     ) -> MessageDefinition:
         """Return the correct payload type."""
         if isinstance(step, MoveGroupSingleAxisStep):
-            return cls._get_stepper_motor_message(step, group, seq)
+            return cls.get_stepper_motor_message(step, group, seq, ignore_stalls)
         elif isinstance(step, MoveGroupTipActionStep):
-            return cls._get_tip_action_motor_message(step, group, seq)
+            return cls.get_tip_action_motor_message(step, group, seq)
         else:
-            return cls._get_brushed_motor_message(step, group, seq)
+            return cls.get_brushed_motor_message(step, group, seq)
 
     @classmethod
     def get_brushed_motor_message(
@@ -328,16 +336,8 @@ class MoveGroupRunner:
                 group_id=UInt8Field(group),
                 seq_id=UInt8Field(seq),
                 duration=UInt32Field(int(step.duration_sec * INTERRUPTS_PER_SEC)),
-                acceleration_um=Int32Field(
-                    int(
-                        (
-                            step.acceleration_mm_sec_sq
-                            * 1000.0
-                            / INTERRUPTS_PER_SEC
-                            / INTERRUPTS_PER_SEC
-                        )
-                        * (2**31)
-                    )
+                acceleration_um=cls.convert_acceleration(
+                    step.acceleration_mm_sec_sq, INTERRUPTS_PER_SEC
                 ),
                 velocity_mm=cls.convert_velocity(
                     step.velocity_mm_sec, INTERRUPTS_PER_SEC
