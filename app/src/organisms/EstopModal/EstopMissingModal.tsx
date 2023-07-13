@@ -44,7 +44,7 @@ export function EstopMissingModal({
         marginTop={isActiveRun ? SPACING.spacing32 : undefined}
       >
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
-          {t('connect_estop_to_continue')}
+          {t('connect_the_estop_to_continue')}
         </StyledText>
         <StyledText as="p">
           {t('estop_missing_description', { robotName: robotName })}

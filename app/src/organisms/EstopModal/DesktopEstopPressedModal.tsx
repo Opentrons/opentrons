@@ -54,7 +54,7 @@ export function DesktopEstopPressedModal({
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
         </Banner>
         <StyledText as="p" color={COLORS.darkBlack90}>
-          {t('estop_description')}
+          {t('estop_pressed_description')}
         </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
           <PrimaryButton onClick={handleClick} disabled={isEngaged}>
