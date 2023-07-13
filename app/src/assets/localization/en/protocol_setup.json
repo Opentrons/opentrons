@@ -117,6 +117,7 @@
   "multiple_modules_missing": "Multiple modules missing",
   "multiple_modules_modal": "Setting up modules of the same type",
   "multiple_modules": "Multiple modules of the same type",
+  "multiple_of_most_modules": "You can use multiples of most module types within a single Python protocol by connecting and loading the modules in a specific order. The robot will initialize the matching module attached to the lowest numbered port first, regardless of what deck slot it occupies.",
   "must_have_labware_and_pip": "Protocol must load labware and a pipette",
   "n_a": "N/A",
   "no_data": "no data",
