@@ -49,12 +49,10 @@ PipetteHandlingData = Tuple[Pipette, MountType]
 
 MOD_LOG = logging.getLogger(__name__)
 
-AxisType = TypeVar("AxisType", bound=Axis)
-
 
 @dataclass(frozen=True)
-class LiquidActionSpec(Generic[AxisType]):
-    axis: AxisType
+class LiquidActionSpec:
+    axis: Axis
     volume: float
     plunger_distance: float
     speed: float
@@ -63,37 +61,37 @@ class LiquidActionSpec(Generic[AxisType]):
 
 
 @dataclass(frozen=True)
-class PickUpTipPressSpec(Generic[AxisType]):
+class PickUpTipPressSpec:
     relative_down: top_types.Point
     relative_up: top_types.Point
-    current: Dict[AxisType, float]
+    current: Dict[Axis, float]
     speed: float
 
 
 @dataclass(frozen=True)
-class PickUpTipSpec(Generic[AxisType]):
+class PickUpTipSpec:
     plunger_prep_pos: float
-    plunger_currents: Dict[AxisType, float]
-    presses: List[PickUpTipPressSpec[AxisType]]
+    plunger_currents: Dict[Axis, float]
+    presses: List[PickUpTipPressSpec]
     shake_off_list: List[Tuple[top_types.Point, Optional[float]]]
     retract_target: float
 
 
 @dataclass(frozen=True)
-class DropTipMove(Generic[AxisType]):
+class DropTipMove:
     target_position: float
-    current: Dict[AxisType, float]
+    current: Dict[Axis, float]
     speed: Optional[float]
     home_after: bool = False
     home_after_safety_margin: float = 0
-    home_axes: Sequence[AxisType] = tuple()
+    home_axes: Sequence[Axis] = tuple()
 
 
 @dataclass(frozen=True)
-class DropTipSpec(Generic[AxisType]):
-    drop_moves: List[DropTipMove[AxisType]]
+class DropTipSpec:
+    drop_moves: List[DropTipMove]
     shake_moves: List[Tuple[top_types.Point, Optional[float]]]
-    ending_current: Dict[AxisType, float]
+    ending_current: Dict[Axis, float]
 
 
 class PipetteHandlerProvider(Generic[MountType]):
@@ -461,13 +459,13 @@ class PipetteHandlerProvider(Generic[MountType]):
     @overload
     def plan_check_aspirate(
         self, mount: top_types.Mount, volume: Optional[float], rate: float
-    ) -> Optional[LiquidActionSpec[Axis]]:
+    ) -> Optional[LiquidActionSpec]:
         ...
 
     @overload
     def plan_check_aspirate(
         self, mount: OT3Mount, volume: Optional[float], rate: float
-    ) -> Optional[LiquidActionSpec[Axis]]:
+    ) -> Optional[LiquidActionSpec]:
         ...
 
     # note on this type ignore: see motion_utilities
@@ -538,13 +536,13 @@ class PipetteHandlerProvider(Generic[MountType]):
     @overload
     def plan_check_dispense(
         self, mount: top_types.Mount, volume: Optional[float], rate: float
-    ) -> Optional[LiquidActionSpec[Axis]]:
+    ) -> Optional[LiquidActionSpec]:
         ...
 
     @overload
     def plan_check_dispense(
         self, mount: OT3Mount, volume: Optional[float], rate: float
-    ) -> Optional[LiquidActionSpec[Axis]]:
+    ) -> Optional[LiquidActionSpec]:
         ...
 
     def plan_check_dispense(  # type: ignore[no-untyped-def]
@@ -613,11 +611,11 @@ class PipetteHandlerProvider(Generic[MountType]):
             )
 
     @overload
-    def plan_check_blow_out(self, mount: top_types.Mount) -> LiquidActionSpec[Axis]:
+    def plan_check_blow_out(self, mount: top_types.Mount) -> LiquidActionSpec:
         ...
 
     @overload
-    def plan_check_blow_out(self, mount: OT3Mount) -> LiquidActionSpec[Axis]:
+    def plan_check_blow_out(self, mount: OT3Mount) -> LiquidActionSpec:
         ...
 
     def plan_check_blow_out(self, mount):  # type: ignore[no-untyped-def]
@@ -676,7 +674,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         tip_length: float,
         presses: Optional[int],
         increment: Optional[float],
-    ) -> Tuple[PickUpTipSpec[Axis], Callable[[], None]]:
+    ) -> Tuple[PickUpTipSpec, Callable[[], None]]:
         ...
 
     @overload
@@ -686,7 +684,7 @@ class PipetteHandlerProvider(Generic[MountType]):
         tip_length: float,
         presses: Optional[int],
         increment: Optional[float],
-    ) -> Tuple[PickUpTipSpec[Axis], Callable[[], None]]:
+    ) -> Tuple[PickUpTipSpec, Callable[[], None]]:
         ...
 
     def plan_check_pick_up_tip(  # type: ignore[no-untyped-def]
@@ -808,13 +806,13 @@ class PipetteHandlerProvider(Generic[MountType]):
         self,
         bottom_pos: float,
         droptip_pos: float,
-        plunger_currents: Dict[AxisType, float],
-        drop_tip_currents: Dict[AxisType, float],
+        plunger_currents: Dict[Axis, float],
+        drop_tip_currents: Dict[Axis, float],
         speed: float,
         home_after: bool,
-        home_axes: Sequence[AxisType],
-    ) -> Callable[[], List[DropTipMove[AxisType]]]:
-        def build() -> List[DropTipMove[AxisType]]:
+        home_axes: Sequence[Axis],
+    ) -> Callable[[], List[DropTipMove]]:
+        def build() -> List[DropTipMove]:
             base = [
                 DropTipMove(
                     target_position=bottom_pos, current=plunger_currents, speed=None
@@ -838,13 +836,13 @@ class PipetteHandlerProvider(Generic[MountType]):
     @overload
     def plan_check_drop_tip(
         self, mount: top_types.Mount, home_after: bool
-    ) -> Tuple[DropTipSpec[Axis], Callable[[], None]]:
+    ) -> Tuple[DropTipSpec, Callable[[], None]]:
         ...
 
     @overload
     def plan_check_drop_tip(
         self, mount: OT3Mount, home_after: bool
-    ) -> Tuple[DropTipSpec[Axis], Callable[[], None]]:
+    ) -> Tuple[DropTipSpec, Callable[[], None]]:
         ...
 
     def plan_check_drop_tip(  # type: ignore[no-untyped-def]
