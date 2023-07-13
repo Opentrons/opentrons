@@ -29,7 +29,7 @@ import type { InvariantContext, RobotState } from '../'
 
 const fixtureTiprack10ul = _fixtureTiprack10ul as LabwareDefinition2
 const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
-const FLEX_PIPETTE = 'p1000_single_gen3'
+const FLEX_PIPETTE = 'p1000_single_flex'
 const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
 
 jest.mock('../utils/thermocyclerPipetteCollision')

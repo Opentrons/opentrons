@@ -29,9 +29,9 @@ PipetteSelect.args = {
   nameBlocklist: [
     'p20_multi_gen2',
     'p300_multi_gen2',
-    'p20_single_gen3',
-    'p300_single_gen3',
-    'p1000_single_gen3',
+    'p20_single_flex',
+    'p300_single_flex',
+    'p1000_single_flex',
   ],
   enableNoneOption: true,
 }

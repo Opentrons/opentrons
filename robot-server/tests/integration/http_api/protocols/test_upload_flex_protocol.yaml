@@ -1,0 +1,69 @@
+test_name: Upload, analyze, delete flex_basic_transfer_standalone protocol.
+
+marks:
+  - ot3_only
+  - usefixtures:
+      - ot3_server_base_url
+stages:
+  - name: Upload flex_basic_transfer_standalone protocol
+    request:
+      url: '{ot3_server_base_url}/protocols'
+      method: POST
+      files:
+        files: 'tests/integration/protocols/flex_basic_transfer_standalone.py'
+    response:
+      save:
+        json:
+          protocol_id: data.id
+          analysis_id: data.analysisSummaries[0].id
+      status_code: 201
+      json:
+        data:
+          id: !anystr
+          protocolType: python
+          files:
+            - name: flex_basic_transfer_standalone.py
+              role: main
+          createdAt: !re_search "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d+\\+\\d{2}:\\d{2}$"
+          robotType: Flex
+          metadata:
+            apiLevel: '2.15'
+            protocolName: Flex basic transfer protocol
+            author: engineer@opentrons.com
+          analyses: []
+          analysisSummaries:
+            - id: !anystr
+              status: pending
+  - name: Retry until analyses status is completed and result is ok.
+    max_retries: 5
+    delay_after: 1
+    request:
+      url: '{ot3_server_base_url}/protocols/{protocol_id}/analyses'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 200
+      json:
+        data:
+          - id: '{analysis_id}'
+            status: completed
+            result: ok
+  - name: Delete the protocol
+    request:
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
+      method: DELETE
+    response:
+      status_code: 200
+  - name: Get protocol with id to verify it is deleted
+    request:
+      url: '{ot3_server_base_url}/protocols/{protocol_id}'
+      method: GET
+    response:
+      strict:
+        - json:off
+      status_code: 404
+      json:
+        errors:
+          - id: ProtocolNotFound
+            title: Protocol Not Found

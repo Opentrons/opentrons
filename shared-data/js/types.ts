@@ -16,7 +16,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   GEN1,
   GEN2,
-  GEN3,
+  FLEX,
   LEFT,
   RIGHT,
   GRIPPER_V1,
@@ -339,7 +339,7 @@ export type ModuleOrientation = 'left' | 'right'
 
 export type PipetteChannels = 1 | 8 | 96
 
-export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof GEN3
+export type PipetteDisplayCategory = typeof GEN1 | typeof GEN2 | typeof FLEX
 
 export type PipetteMount = typeof LEFT | typeof RIGHT
 export type GantryMount = typeof LEFT | typeof RIGHT | typeof EXTENSION

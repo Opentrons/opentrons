@@ -15,7 +15,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 jest.mock('../utils/heaterShakerCollision')
 
 const fixtureTiprack1000ul = _fixtureTiprack1000ul as LabwareDefinition2
-const FLEX_PIPETTE = 'p1000_single_gen3'
+const FLEX_PIPETTE = 'p1000_single_flex'
 const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
 
 const mockGetIsTallLabwareEastWestOfHeaterShaker = getIsTallLabwareEastWestOfHeaterShaker as jest.MockedFunction<
