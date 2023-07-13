@@ -13,13 +13,13 @@ Labware Types
 *************
 
 Default Labware
-^^^^^^^^^^^^^^^
+===============
 .. Description almost verbatim from Flex user manual.
 
 Default labware is everything listed in the `Opentrons Labware Library <https://labware.opentrons.com/>`_. When used in a protocol, your Flex or OT-2 knows how to work with default labware. However, you must first inform the API about the labware you will place on the robot’s deck. Search the library when you’re looking for the API load names of the labware you want to use. You can copy the load names from the library and pass them to the ``load_labware`` method in your protocol.
 
 Custom Labware
-^^^^^^^^^^^^^^
+==============
 
 Custom labware is labware that is not listed the Labware Library. If your protocol needs something that's not in the library, you can create it with the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. However, before using the Labware Creator, you should take a moment to review the support article, `Creating Custom Labware Definitions <https://support.opentrons.com/s/article/Creating-Custom-Labware-Definitions>`_ .
 
@@ -69,13 +69,20 @@ After the ``load_labware`` method loads labware into your protocol, it returns a
 .. Recommend a call-out instead of a section (H2, H3) for "label." It's more a "pro tip" nice-to-have rather than
 .. an item that requires its own section.
 
-.. tip::
+Labeling Labware
+================
     
-    The ``load_labware`` method also accepts an optional ``label`` argument. You can use it to name the labware. If used, the label value is displayed in the Opentrons App. For example::
+The ``load_labware`` method also accepts an optional ``label`` argument. You can use it to help identify labware with a descriptive label. If used, the label value is displayed in the Opentrons App. For example::
         
-        tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat',
-                                        location= '1',
-                                        label= 'any-name-you-want')
+    tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat',
+                                    location= '1',
+                                    label= 'any-name-you-want')
+
+Adapter Section
+===============
+
+TBD use examples from PR 13016 and RLAB-343. This is the ``adapter`` argument.
+
 
 .. _new-well-access:
 
@@ -84,7 +91,7 @@ Accessing Wells in Labware
 **************************
 
 Well Ordering
-^^^^^^^^^^^^^
+=============
 
 When writing a protocol, you will need to select which wells to
 transfer liquids to and from.
@@ -115,7 +122,7 @@ The ending well will be in the bottom right, see the diagram below for further e
 .. versionadded:: 2.0
 
 Accessor Methods
-^^^^^^^^^^^^^^^^
+================
 
 There are many different ways to access wells inside labware. Different methods are useful in different contexts. The table below lists out the methods available to access wells and their differences.
 
@@ -136,7 +143,7 @@ There are many different ways to access wells inside labware. Different methods 
 +-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
 
 Accessing Individual Wells
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+==========================
 
 Dictionary Access
 -----------------
@@ -171,7 +178,7 @@ Wells can be referenced by their name, as demonstrated above. However, they can 
 .. versionadded:: 2.0
 
 Accessing Groups of Wells
-^^^^^^^^^^^^^^^^^^^^^^^^^
+=========================
 
 When describing a liquid transfer, you can point to groups of wells for the
 liquid's source and/or destination. Or, you can get a group of wells and loop
@@ -229,7 +236,7 @@ To use these optional methods, first create a liquid object with :py:meth:`.Prot
 Let's examine how these two methods work. The following examples demonstrate how to define colored water samples for a well plate and reservoir.
 
 Defining Liquids
-^^^^^^^^^^^^^^^^
+================
 
 This example uses ``define_liquid`` to create two liquid objects and instantiates them with the variables ``greenWater`` and ``blueWater``, respectively. The arguments for ``define_liquid`` are all required, and let you name the liquid, describe it, and assign it a color:
 
@@ -251,7 +258,7 @@ This example uses ``define_liquid`` to create two liquid objects and instantiate
 The ``display_color`` parameter accepts a hex color code, which adds a color to that liquid's label when you import your protocol into the Opentrons App. The ``define_liquid`` method accepts standard 3-, 4-, 6-, and 8-character hex color codes.
 
 Labeling Wells and Reservoirs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+=============================
 
 This example uses ``load_liquid`` to label the initial well location, contents, and volume (in µL) for the liquid objects created by ``define_liquid``. Notice how values of the ``liquid`` argument use the variable names ``greenWater`` and ``blueWater`` (defined above) to associate each well with a particular liquid: 
 
@@ -272,7 +279,7 @@ This information shows up in the Opentrons App (v6.3.0 or higher) after you impo
     ``load_liquid`` does not validate volume for your labware nor does it prevent you from adding multiple liquids to each well. For example, you could label a 40 µL well plate with ``greenWater``, ``volume=50``, and then also add blue water to the well. The API won't stop you. It's your responsibility to ensure the labels you use accurately reflect the amounts and types of liquid you plan to place into wells and reservoirs.
 
 Labeling vs Handling Liquids
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+============================
 
 The ``load_liquid`` arguments include a volume amount (``volume=n`` in µL). This amount is just a label. It isn't a command or function that manipulates liquids. It only tells you how much liquid should be in a well at the start of the protocol. You need to use a method like :py:meth:`.transfer` to physically move liquids from a source to a destination.
 
@@ -291,7 +298,7 @@ The functions in the :ref:`new-well-access` section above return a single :py:cl
     In the code samples below, the ``load_labware`` method shows a Flex deck slot location (``D1``). If you have an OT-2, replace ``D1`` with ``1``. Although our Python API knows how to translate Flex and OT-2 deck locations, it's a good practice to use the deck location coordinates that match your robot model. See :ref:`deck-slots` for more information.
 
 Depth
-^^^^^
+=====
 
 Use :py:attr:`.Well.depth` to get the distance in mm between the very top of the well and the very bottom. For example, a conical well's depth is measured from the top center to the bottom center of the well.
 
@@ -303,7 +310,8 @@ Use :py:attr:`.Well.depth` to get the distance in mm between the very top of the
         depth = plate['A1'].depth # 10.67
 
 Diameter
-^^^^^^^^
+========
+
 Use :py:attr:`.Well.diameter` to get the diameter of a given well in mm. Since diameter is a circular measurement, this attribute is only present on labware with circular wells. If the well is not circular, the value will be ``None``. Use length and width (see below) for non-circular wells.
 
 .. code-block:: python
@@ -314,7 +322,8 @@ Use :py:attr:`.Well.diameter` to get the diameter of a given well in mm. Since d
         diameter = plate['A1'].diameter	# 6.86
 
 Length
-^^^^^^
+======
+
 Use :py:attr:`.Well.length` to get the length of a given well in mm. Length is defined as the distance along the robot's x-axis (left to right). This attribute is only present on rectangular wells. If the well is not rectangular, the value will be ``None``. Use diameter (see above) for circular wells.
 
 .. code-block:: python
@@ -326,7 +335,8 @@ Use :py:attr:`.Well.length` to get the length of a given well in mm. Length is d
 
 
 Width
-^^^^^
+=====
+
 Use :py:attr:`.Well.width` to get the width of a given well in mm. Width is defined as the distance along the y-axis (front to back). This attribute is only present on rectangular wells. If the well is not rectangular, the value will be ``None``. Use diameter (see above) for circular wells.
 
 
