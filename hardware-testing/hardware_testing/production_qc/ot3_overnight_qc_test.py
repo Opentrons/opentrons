@@ -224,6 +224,7 @@ async def _run_bowtie(api: OT3API, is_simulating: bool, mount: types.OT3Mount, w
 async def _run_hour_glass(api: OT3API, is_simulating: bool, mount: types.OT3Mount, write_cb: Callable, record_bool=True) -> bool:
     ui.print_header('Run hour glass')
     hour_glass_points = _create_hour_glass_points(await api.gantry_position(mount))
+    pass_count = 0
     for q in hour_glass_points:
         es,en,al = await _move_and_check(api,is_simulating,mount,q)
         if record_bool:
@@ -359,7 +360,7 @@ async def _run_z_motion(arguments: argparse.Namespace, api: OT3API, mount: types
     ui.print_header('Run z motion check...')
     Z_AXIS_SETTINGS = _creat_z_axis_settings(arguments)
     for setting in Z_AXIS_SETTINGS:
-        print(f'Run speed={setting[OT3Axis.Z_L].max_speed}, acceleration={setting[OT3Axis.Z_L].acceleration}, current={setting[OT3Axis.Z_L].irun}')
+        print(f'Z: Run speed={setting[OT3Axis.Z_L].max_speed}, acceleration={setting[OT3Axis.Z_L].acceleration}, current={setting[OT3Axis.Z_L].run_current}')
         await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, setting)
         fail_count = 0
         pass_count = 0
@@ -374,14 +375,15 @@ async def _run_z_motion(arguments: argparse.Namespace, api: OT3API, mount: types
             _record_motion_check_data('z_motion',write_cb,
                                       setting[OT3Axis.Z_L].max_speed,
                                       setting[OT3Axis.Z_L].acceleration,
-                                      setting[OT3Axis.Z_L].irun,
+                                      setting[OT3Axis.Z_L].run_current,
                                       i+1,pass_count,fail_count)
 
 async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: types.OT3Mount, write_cb: Callable) -> None:
     ui.print_header('Run xy motion check...')
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
     for setting in XY_AXIS_SETTINGS:
-        print(f'Run speed={setting[OT3Axis.X].max_speed}, acceleration={setting[OT3Axis.X].acceleration}')
+        print(f'X: Run speed={setting[OT3Axis.X].max_speed}, acceleration={setting[OT3Axis.X].acceleration}, current={setting[OT3Axis.X].run_current}')
+        print(f'Y: Run speed={setting[OT3Axis.Y].max_speed}, acceleration={setting[OT3Axis.Y].acceleration}, current={setting[OT3Axis.Y].run_current}')
         await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, setting)
         fail_count = 0
         pass_count = 0
@@ -396,12 +398,12 @@ async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: type
             _record_motion_check_data('x_motion',write_cb,
                                       setting[OT3Axis.X].max_speed,
                                       setting[OT3Axis.X].acceleration,
-                                      setting[OT3Axis.X].irun,
+                                      setting[OT3Axis.X].run_current,
                                       i+1,pass_count,fail_count)
             _record_motion_check_data('y_motion',write_cb,
                                       setting[OT3Axis.Y].max_speed,
                                       setting[OT3Axis.Y].acceleration,
-                                      setting[OT3Axis.Y].irun,
+                                      setting[OT3Axis.Y].run_current,
                                       i+1,pass_count,fail_count)
 
 
@@ -422,30 +424,37 @@ async def _main(arguments: argparse.Namespace) -> None:
     csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
     test_name = Path(__file__).name
     ui.print_title(test_name.replace("_", " ").upper())
-    api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=arguments.simulate)
-    await helpers_ot3.home_ot3(api)
-    ui.get_user_ready("Is the deck totally empty?")
-    mount = types.OT3Mount.LEFT
-    if arguments.xy_motion:
-        await _run_xy_motion(arguments,api,mount,csv_cb.write)
-    if arguments.z_motion:
-        await _run_z_motion(arguments,api,mount,csv_cb.write)
-    # set the default config
-    await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, DEFAULT_AXIS_SETTINGS)
-    for i in range(arguments.cycles):
-            csv_cb.write(["--------"])
-            csv_cb.write(["run-cycle", i+1])
-            print(f"Cycle {i + 1}/{arguments.cycles}")
-            if not arguments.skip_bowtie:
-                await _run_bowtie(api,arguments.simulate,mount,csv_cb.write)
-                if not arguments.skip_mount:
-                    for mount in MOUNT_AXES:
-                        await _run_mount_up_down(api,arguments.simulate,mount,csv_cb.write,True)
-            if not arguments.skip_hourglass:
-                await _run_hour_glass(api,arguments.simulate,mount,csv_cb.write)
-                if not arguments.skip_mount:
-                    for mount in MOUNT_AXES:
-                        await _run_mount_up_down(api,arguments.simulate,mount,csv_cb.write,True)
+    api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=arguments.simulate,
+                                                         stall_detection_enable=False)
+    try:
+        await api.home()
+        ui.get_user_ready("Is the deck totally empty?")
+        mount = types.OT3Mount.LEFT
+        if arguments.xy_motion:
+            await _run_xy_motion(arguments,api,mount,csv_cb.write)
+        if arguments.z_motion:
+            await _run_z_motion(arguments,api,mount,csv_cb.write)
+        # set the default config
+        await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, DEFAULT_AXIS_SETTINGS)
+        for i in range(arguments.cycles):
+                csv_cb.write(["--------"])
+                csv_cb.write(["run-cycle", i+1])
+                print(f"Cycle {i + 1}/{arguments.cycles}")
+                if not arguments.skip_bowtie:
+                    await _run_bowtie(api,arguments.simulate,mount,csv_cb.write)
+                    if not arguments.skip_mount:
+                        for mount in MOUNT_AXES:
+                            await _run_mount_up_down(api,arguments.simulate,mount,csv_cb.write,True)
+                if not arguments.skip_hourglass:
+                    await _run_hour_glass(api,arguments.simulate,mount,csv_cb.write)
+                    if not arguments.skip_mount:
+                        for mount in MOUNT_AXES:
+                            await _run_mount_up_down(api,arguments.simulate,mount,csv_cb.write,True)
+    except KeyboardInterrupt:
+        await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+    finally:
+        # await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+        await api.clean_up()
 
     await api.disengage_axes([types.OT3Axis.X, types.OT3Axis.Y])
     await api.clean_up()
