@@ -6,7 +6,9 @@
 Hardware Modules
 ################
 
-Hardware modules include powered and unpowered Opentrons peripherals that attach to your Flex or OT-2. The Flex and OT-2 are aware of and control powered hardware modules via a USB connection. Unpowered modules are controlled by the protocols you write and upload to the Opentrons App. The Python API currently supports a :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>`, :ref:`Thermocycler Module <thermocycler-module>`, :ref:`Heater-Shaker Module <heater-shaker-module>`, and an unpowered Magnetic Block. Modules are useful because they extend the capabilities of your robot.
+Hardware modules are powered and unpowered deck-mounted peripherals. The Flex and OT-2 know about and control powered modules when they're attached via a USB connection. By contrast, the robots do not know about unpowered modules until you create a protocol and upload it to the Opentrons App.
+
+Opentrons powered modules include our :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>`, :ref:`Thermocycler Module <thermocycler-module>`, and :ref:`Heater-Shaker Module <heater-shaker-module>`. Our 96-well :ref:`Magnetic Block <magnetic-block>` is unpowered and recommended for use with the Flex only. These modules are useful because they help extend the capabilities of your Flex or OT-2.
 
 ************
 Module Setup
@@ -15,30 +17,41 @@ Module Setup
 Loading Modules onto the Deck
 =============================
 
-Like labware and pipettes, you must inform the Protocol API about the modules you want to use in your protocol.
+Similar to labware and pipettes, you must inform the Protocol API about the modules you want to use in your protocol. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all loaded modules are connected and powered on.
 
-Use :py:meth:`.ProtocolContext.load_module` to load a module.
+Use :py:meth:`.ProtocolContext.load_module` to load a module. 
 
 .. tabs::
     
     .. tab:: Flex
 
         .. code-block:: python
+            :substitutions:
 
-    from opentrons import protocol_api
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"
 
-    metadata = {'apiLevel': '2.14'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-         # Load a Magnetic Module GEN2 in deck slot 1.
-         magnetic_module = protocol.load_module('magnetic module gen2', 1)
+            def run(protocol: protocol_api.ProtocolContext): 
+                # Load a Magnetic Module GEN2 in deck slot D1.
+                magnetic_module = protocol.load_module('magnetic module gen2', "D1")
          
-         # Load a Temperature Module GEN1 in deck slot 3.
-         temperature_module = protocol.load_module('temperature module', 3)
+                # Load a Temperature Module GEN1 in deck slot 3.
+                temperature_module = protocol.load_module('temperature module', "D1")
+        
+    .. tab:: OT-2
+        
+        .. code-block:: python
+            :substitutions:
+            
+            metadata = {'apiLevel': "|apiLevel|"}
+            
+            def run(protocol: protocol_api.ProtocolContext): 
+                # Load a Magnetic Module GEN2 in deck slot 1.
+                magnetic_module = protocol.load_module('magnetic module gen2', 1)
+         
+                # Load a Temperature Module GEN1 in deck slot 3.
+                temperature_module = protocol.load_module('temperature module', 3)
 
-After the ``load_labware`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
-
-When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the OT-2 won't let you start the protocol run until all loaded modules are connected to the OT-2 and powered on.
+In the examples above, after the ``load_labware`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
 
 .. versionadded:: 2.0
 
@@ -77,6 +90,9 @@ Some modules were added to the Protocol API later than others, and some modules 
    +--------------------+-------------------------------+---------------------------+
    | Heater-Shaker      | ``heaterShakerModuleV1``      | 2.13                      |
    | Module             |                               |                           |
+   +--------------------+-------------------------------+---------------------------+
+   | Magnetic Block     | ``magneticBlockV1``           | 2.15                      |
+   | GEN1               |                               |                           |
    +--------------------+-------------------------------+---------------------------+
 
 Loading Labware onto a Module
@@ -582,6 +598,13 @@ As with setting targets, deactivating the heater and shaker are done separately,
 
     The OT-2 will not automatically deactivate the Heater-Shaker at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Heater-Shaker module controls on the device detail page in the Opentrons App or run these methods in Jupyter notebook.
 
+.. _magnetic-block:
+
+*****************************
+Using a Magnetic Block Module
+*****************************
+
+In hac habitasse platea dictumst. Ut eu maximus nulla. Nam imperdiet tristique ante, eu condimentum velit accumsan eu. Suspendisse ac sollicitudin eros.
 
 ***************************************
 Using Multiple Modules of the Same Type
