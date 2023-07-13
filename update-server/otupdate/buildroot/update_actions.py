@@ -183,8 +183,12 @@ class OT2UpdateActions(UpdateActionsInterface):
         """Deletes the update contents in the download dir."""
         LOG.info(f"Cleaning up download dir {download_dir}.")
         for file in os.listdir(download_dir):
-            LOG.debug(f"Deleting {file}")
-            os.remove(file)
+            filepath = os.path.join(download_dir, file)
+            LOG.debug(f"Deleting {filepath}")
+            try:
+                os.remove(filepath)
+            except Exception:
+                LOG.exception(f"Could not delete update file {filepath}.")
 
 
 def _find_unused_partition() -> RootPartitions:
