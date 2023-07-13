@@ -51,6 +51,8 @@ export const SetupModulesMap = ({
           deckDef={deckDef}
           viewBox={getStandardDeckViewBox(robotType)}
           deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
+          deckFill="#e6e6e6"
+          trashSlotName="A3"
           id="ModuleSetup_deckMap"
         >
           {() => (

@@ -54,6 +54,8 @@ export function SetupLabwareMap({
           <RobotWorkSpace
             deckDef={deckDef}
             deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
+            deckFill="#e6e6e6"
+            trashSlotName="A3"
             id="LabwareSetup_deckMap"
           >
             {() => (

@@ -233,7 +233,7 @@ export interface Dimensions {
 }
 
 export interface DeckRobot {
-  model: string
+  model: RobotType
 }
 
 export interface DeckFixture {
