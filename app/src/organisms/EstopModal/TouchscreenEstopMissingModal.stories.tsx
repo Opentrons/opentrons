@@ -9,13 +9,13 @@ import type { Store } from 'redux'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/organisms/EstopMissingModal',
+  title: 'ODD/organisms/EstopMissingModal',
   component: EstopMissingModal,
 } as Meta
 
 const dummyConfig = {
   config: {
-    isOnDevice: false,
+    isOnDevice: true,
   },
 } as any
 
