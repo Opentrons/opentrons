@@ -1,7 +1,6 @@
 import mock
 import pytest
 from decoy import Decoy
-from itertools import chain
 
 from contextlib import nullcontext as does_not_raise
 from typing import (
@@ -63,7 +62,6 @@ from opentrons_hardware.firmware_bindings.messages.messages import MessageDefini
 from opentrons_hardware.hardware_control.motion import (
     MoveType,
     MoveStopCondition,
-    MoveGroupStep,
     MoveGroupSingleAxisStep,
 )
 from opentrons_hardware.hardware_control.types import PCBARevision
