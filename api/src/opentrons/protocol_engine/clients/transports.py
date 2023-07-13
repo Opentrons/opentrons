@@ -7,7 +7,7 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..protocol_engine import ProtocolEngine
-from ..errors import ProtocolEngineError
+from ..errors import ProtocolCommandFailedError
 from ..state import StateView
 from ..commands import CommandCreate, CommandResult
 
@@ -59,7 +59,10 @@ class ChildThreadTransport:
         # TODO: this needs to have an actual code
         if command.error is not None:
             error = command.error
-            raise ProtocolEngineError(message=f"{error.errorType}: {error.detail}")
+            raise ProtocolCommandFailedError(
+                original_error=error,
+                message=f"{error.errorType}: {error.detail}",
+            )
 
         # FIXME(mm, 2023-04-10): This assert can easily trigger from this sequence:
         #
