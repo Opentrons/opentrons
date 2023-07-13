@@ -6,9 +6,9 @@
 Hardware Modules
 ################
 
-Hardware modules are powered and unpowered deck-mounted peripherals. The Flex and OT-2 know about and control powered modules when they're attached via a USB connection. By contrast, the robots do not know about unpowered modules until you create a protocol and upload it to the Opentrons App.
+Hardware modules are powered and unpowered deck-mounted peripherals. The Flex and OT-2 know about and control powered modules when they're attached via a USB connection. The robots do not know about unpowered modules until you use one in a protocol and upload that protocol to the Opentrons App.
 
-Opentrons powered modules include our :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>`, :ref:`Thermocycler Module <thermocycler-module>`, and :ref:`Heater-Shaker Module <heater-shaker-module>`. Our 96-well :ref:`Magnetic Block <magnetic-block>` is unpowered and recommended for use with the Flex only. These modules are useful because they help extend the capabilities of your Flex or OT-2.
+Opentrons powered modules include the :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>`, :ref:`Thermocycler Module <thermocycler-module>`, and :ref:`Heater-Shaker Module <heater-shaker-module>`. Our 96-well :ref:`Magnetic Block <magnetic-block>` is unpowered and recommended for use with the Flex only. These modules are useful because they help extend the capabilities of your Flex or OT-2.
 
 ************
 Module Setup
@@ -34,8 +34,8 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
                 # Load a Magnetic Module GEN2 in deck slot D1.
                 magnetic_module = protocol.load_module('magnetic module gen2', "D1")
          
-                # Load a Temperature Module GEN1 in deck slot 3.
-                temperature_module = protocol.load_module('temperature module', "D1")
+                # Load a Temperature Module GEN1 in deck slot D3.
+                temperature_module = protocol.load_module('temperature module', "D3")
         
     .. tab:: OT-2
         
@@ -51,7 +51,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
                 # Load a Temperature Module GEN1 in deck slot 3.
                 temperature_module = protocol.load_module('temperature module', 3)
 
-In the examples above, after the ``load_labware`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
+In the examples above, after the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
 
 .. versionadded:: 2.0
 
