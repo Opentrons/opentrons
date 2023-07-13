@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 from typing import Any, List, Optional, Dict, Union
 from typing_extensions import Literal
 from enum import Enum
@@ -19,6 +19,7 @@ class OffsetVector(BaseModel):
 class Location(BaseModel):
     slotName: Optional[str]
     moduleId: Optional[str]
+    labwareId: Optional[str]
 
 
 class ProfileStep(BaseModel):
@@ -46,7 +47,7 @@ class Params(BaseModel):
     wellName: Optional[str]
     volume: Optional[float]
     flowRate: Optional[float]
-    wellLocation: Optional[Union[WellLocation]]
+    wellLocation: Optional[WellLocation]
     waitForResume: Optional[Literal[True]]
     seconds: Optional[float]
     minimumZHeight: Optional[float]
@@ -67,6 +68,17 @@ class Params(BaseModel):
     radius: Optional[float]
     newLocation: Optional[Union[Location, Literal["offDeck"]]]
     strategy: Optional[str]
+    # schema v7 add-ons
+    adapterId: Optional[str]
+    homeAfter: Optional[bool]
+    alternateDropLocation: Optional[bool]
+    holdTimeSeconds: Optional[float]
+    maintenancePosition: Optional[str]
+    pipetteName: Optional[str]
+    model: Optional[str]
+    loadName: Optional[str]
+    namespace: Optional[str]
+    version: Optional[int]
 
 
 class Command(BaseModel):
@@ -148,18 +160,18 @@ class DesignerApplication(BaseModel):
     data: Optional[Dict[str, Any]]
 
 
-class ProtocolSchemaV6(BaseModel):
-    otSharedSchema: Literal["#/protocol/schemas/6"] = Field(
+class ProtocolSchemaV7(BaseModel):
+    otSharedSchema: Literal["#/protocol/schemas/7"] = Field(
         ...,
         alias="$otSharedSchema",
         description="The path to a valid Opentrons shared schema relative to "
         "the shared-data directory, without its extension.",
     )
-    schemaVersion: Literal[6]
+    schemaVersion: Literal[7]
     metadata: Metadata
     robot: Robot
-    pipettes: Dict[str, Pipette]
-    labware: Dict[str, Labware]
+    pipettes: Optional[Dict[str, Pipette]]
+    labware: Optional[Dict[str, Labware]]
     modules: Optional[Dict[str, Module]]
     liquids: Optional[Dict[str, Liquid]]
     labwareDefinitions: Dict[str, LabwareDefinition]
@@ -171,62 +183,3 @@ class ProtocolSchemaV6(BaseModel):
     class Config:
         # added for constructing the class with field name instead of alias
         allow_population_by_field_name = True
-
-    @validator("commands")
-    def _validate_commands(
-        cls,
-        value: List[Command],
-        values: Dict[str, Any],
-    ) -> List[Command]:
-        pipette_ids = set(values["pipettes"].keys()) if "pipettes" in values else set()
-        labware_ids = set(values["labware"].keys()) if "labware" in values else set()
-        module_ids = (
-            set(values["modules"].keys())
-            if "modules" in values and values["modules"]
-            else set()
-        )
-        liquid_ids = (
-            set(values["liquids"].keys())
-            if "liquids" in values and values["liquids"]
-            else set()
-        )
-
-        for index, command in enumerate(value):
-            if (
-                command.params.pipetteId is not None
-                and command.params.pipetteId not in pipette_ids
-            ):
-                raise ValueError(
-                    f"{command.commandType} command at index {index}"
-                    f" references ID {command.params.pipetteId},"
-                    f" which doesn't exist."
-                )
-            if (
-                command.params.labwareId is not None
-                and command.params.labwareId not in labware_ids
-            ):
-                raise ValueError(
-                    f"{command.commandType} command at index {index}"
-                    f" references ID {command.params.labwareId},"
-                    f" which doesn't exist."
-                )
-            if (
-                command.params.moduleId is not None
-                and command.params.moduleId not in module_ids
-            ):
-                raise ValueError(
-                    f"{command.commandType} command at index {index}"
-                    f" references ID {command.params.moduleId},"
-                    f" which doesn't exist."
-                )
-            if (
-                command.params.liquidId is not None
-                and command.params.liquidId not in liquid_ids
-            ):
-                raise ValueError(
-                    f"{command.commandType} command at index {index}"
-                    f" references ID {command.params.liquidId},"
-                    f" which doesn't exist."
-                )
-
-        return value
