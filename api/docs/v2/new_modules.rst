@@ -17,14 +17,17 @@ Loading Modules onto the Deck
 
 Like labware and pipettes, you must inform the Protocol API about the modules you want to use in your protocol.
 
-Use :py:meth:`.ProtocolContext.load_module` to load a module. It returns an object representing the module (e.g. :py:class:`~opentrons.protocol_api.MagneticModuleContext` or :py:class:`~opentrons.protocol_api.TemperatureModuleContext`).
+Use :py:meth:`.ProtocolContext.load_module` to load a module.
 
-.. code-block:: python
-    :substitutions:
+.. tabs::
+    
+    .. tab:: Flex
+
+        .. code-block:: python
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
          # Load a Magnetic Module GEN2 in deck slot 1.
@@ -33,6 +36,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module. It returns an obje
          # Load a Temperature Module GEN1 in deck slot 3.
          temperature_module = protocol.load_module('temperature module', 3)
 
+After the ``load_labware`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
 
 When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the OT-2 won't let you start the protocol run until all loaded modules are connected to the OT-2 and powered on.
 
