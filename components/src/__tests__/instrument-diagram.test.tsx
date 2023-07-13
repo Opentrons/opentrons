@@ -54,7 +54,7 @@ describe('InstrumentDiagram', () => {
     const tree = Renderer.create(
       <InstrumentDiagram
         mount="right"
-        pipetteSpecs={{ channels: 1, displayCategory: 'GEN3' }}
+        pipetteSpecs={{ channels: 1, displayCategory: 'FLEX' }}
       />
     ).toJSON()
 
@@ -65,7 +65,7 @@ describe('InstrumentDiagram', () => {
     const tree = Renderer.create(
       <InstrumentDiagram
         mount="right"
-        pipetteSpecs={{ channels: 8, displayCategory: 'GEN3' }}
+        pipetteSpecs={{ channels: 8, displayCategory: 'FLEX' }}
       />
     ).toJSON()
 
