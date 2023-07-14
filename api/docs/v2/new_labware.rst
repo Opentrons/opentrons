@@ -43,10 +43,10 @@ Throughout this section, we'll use the labware listed in the following table.
     * - Well plate
       - `Corning 96 Well Plate 360 µL Flat <https://labware.opentrons.com/corning_96_wellplate_360ul_flat/>`_
       - ``corning_96_wellplate_360ul_flat``
-    * - Flex tiprack
+    * - Flex tip rack
       - `Opentrons Flex 96 Tips 200 µL <https://shop.opentrons.com/opentrons-flex-tips-200-l/>`_
       - ``opentrons_flex_96_tiprack_200ul``
-    * - OT-2 tiprack
+    * - OT-2 tip rack
       - `Opentrons 96 Tip Rack 300 µL <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_
       - ``opentrons_96_tiprack_300ul``
 
