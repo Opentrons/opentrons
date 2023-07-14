@@ -74,11 +74,6 @@ import type {
   ProfileStepItem,
 } from '../../form-types'
 import {
-  FileLabware,
-  FilePipette,
-  FileModule,
-} from '@opentrons/shared-data/protocol/types/schemaV4'
-import {
   CancelStepFormAction,
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
@@ -1152,12 +1147,6 @@ export const labwareInvariantProperties: Reducer<
         (command): command is LoadLabwareCreateCommand =>
           command.commandType === 'loadLabware'
       )
-      if ('labware' in file && Object.keys(file.labware).length > 1) {
-        //  @ts-expect-error
-        return mapValues(file.labware, (fileLabware: FileLabware) => ({
-          labwareDefURI: fileLabware.definitionId,
-        })) as NormalizedLabwareById
-      }
       const FIXED_TRASH_ID = 'fixedTrash'
       const labware = {
         ...loadLabwareCommands.reduce(
@@ -1238,17 +1227,6 @@ export const moduleInvariantProperties: Reducer<
         (command): command is LoadModuleCreateCommand =>
           command.commandType === 'loadModule'
       )
-      if ('modules' in file && Object.keys(file.modules).length > 1) {
-        // @ts-expect-error(sa, 2021-6-10): falling back to {} will not create a valid `ModuleEntity`, as per TODO below it is theoritically unnecessary anyways
-        return mapValues(
-          file.modules || {}, // TODO: Ian 2019-11-11 this fallback to empty object is for JSONv3 protocols. Once JSONv4 is released, this should be handled in migration in PD
-          (fileModule: FileModule, id: string) => ({
-            id,
-            type: getModuleType(fileModule.model),
-            model: fileModule.model,
-          })
-        )
-      }
       const modules = loadModuleCommands.reduce(
         (acc: ModuleEntities, command: LoadModuleCreateCommand) => {
           const { moduleId, model } = command.params
@@ -1286,28 +1264,6 @@ export const pipetteInvariantProperties: Reducer<
         (command): command is LoadPipetteCreateCommand =>
           command.commandType === 'loadPipette'
       )
-
-      if ('pipettes' in file && Object.keys(file.pipettes).length > 0) {
-        //  @ts-expect-error
-        return mapValues(
-          file.pipettes,
-          (
-            filePipette: FilePipette,
-            pipetteId: string
-          ): NormalizedPipetteById[keyof NormalizedPipetteById] => {
-            const tiprackDefURI = metadata.pipetteTiprackAssignments[pipetteId]
-            assert(
-              tiprackDefURI,
-              `expected tiprackDefURI in file metadata for pipette ${pipetteId}`
-            )
-            return {
-              id: pipetteId,
-              name: filePipette.name,
-              tiprackDefURI,
-            }
-          }
-        )
-      }
       const pipettes = loadPipetteCommands.reduce(
         (acc: NormalizedPipetteById, command) => {
           const { pipetteName, pipetteId } = command.params

@@ -165,69 +165,27 @@ export const containers: Reducer<ContainersState, any> = handleActions(
       action: LoadFileAction
     ): ContainersState => {
       const { file } = action.payload
-      const lowerSchemaVersions =
-        file.schemaVersion === 3 ||
-        file.schemaVersion === 4 ||
-        file.schemaVersion === 5
-      if (
-        'labware' in file &&
-        Object.keys(file.labware).length > 1 &&
-        lowerSchemaVersions
-      ) {
-        const allFileLabware = file.labware as Record<
-          string,
-          {
-            slot: string
-            definitionId: string
-            displayName?: string | undefined
+
+      const loadLabwareCommands = Object.values(file.commands).filter(
+        command => command.commandType === 'loadLabware'
+      ) as LoadLabwareCreateCommand[]
+
+      return loadLabwareCommands.reduce(
+        (acc: ContainersState, command, key): ContainersState => {
+          const { loadName, displayName } = command.params
+          return {
+            ...acc,
+            [loadName]: {
+              nickname: displayName,
+              disambiguationNumber: key,
+            },
           }
-        >
-        const sortedLabwareIds: string[] =
-          Object.keys(allFileLabware).sort(
-            (a, b) =>
-              Number(allFileLabware[a].slot) - Number(allFileLabware[b].slot)
-          ) ?? null
-
-        return sortedLabwareIds.reduce(
-          (acc: ContainersState, id): ContainersState => {
-            const fileLabware = allFileLabware[id]
-            const nickname = fileLabware.displayName
-            const disambiguationNumber =
-              Object.keys(acc).filter(
-                (filterId: string) =>
-                  allFileLabware[filterId].displayName === nickname
-              ).length + 1
-            return {
-              ...acc,
-              [id]: {
-                nickname,
-                disambiguationNumber,
-              },
-            }
-          },
-          {}
-        )
-      } else {
-        const loadLabwareCommands = Object.values(file.commands).filter(
-          command => command.commandType === 'loadLabware'
-        ) as LoadLabwareCreateCommand[]
-
-        return loadLabwareCommands.reduce(
-          (acc: ContainersState, command, key): ContainersState => {
-            const { loadName, displayName } = command.params
-            return {
-              ...acc,
-              [loadName]: {
-                nickname: displayName,
-                disambiguationNumber: key,
-              },
-            }
-          },
-          {}
-        )
-      }
+        },
+        {}
+      )
     },
   },
+
   initialLabwareState
 )
 type SavedLabwareState = Record<string, boolean>
@@ -258,10 +216,6 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
         (command): command is LoadLabwareCreateCommand =>
           command.commandType === 'loadLabware'
       )
-      if ('labware' in file) {
-        return mapValues(file.labware, () => true)
-      }
-
       const labware = loadLabwareCommands.reduce(
         (
           acc: Record<

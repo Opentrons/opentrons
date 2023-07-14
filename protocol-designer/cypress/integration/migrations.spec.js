@@ -52,7 +52,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture:
         '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
       unusedPipettes: false,
-      migrationModal: null,
+      migrationModal: 'noBehaviorChange',
     },
     {
       title:

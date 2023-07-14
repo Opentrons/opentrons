@@ -44,8 +44,8 @@ const expectResultToMatchSchema = (
 
 const getSchemaDefForProtocol = (protocol: any): any => {
   // For reference, possibilities are, from newest to oldest:
-  // "$otSharedSchema": "#/protocol/schemas/5"
-  // "schemaVersion": 3
+  // "$otSharedSchema": "#/protocol/schemas/7"
+  // "schemaVersion": 7
   // "protocol-schema": "1.0.0"
   let n
   if (typeof protocol.$otSharedSchema === 'string') {
