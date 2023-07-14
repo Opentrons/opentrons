@@ -616,7 +616,6 @@ class OT3API(
         """
 
         if axes:
-            # (spp): should this be a Set? 'axes' can technically be: [X, Y, Z, Z_L, A, Z_R]..
             checked_axes = [ax for ax in axes if ax in Axis]
         else:
             checked_axes = [ax for ax in Axis]
@@ -924,9 +923,7 @@ class OT3API(
             top_types.Point(*self._config.gripper_mount_offset),
         )
         if max_speeds:
-            checked_max: Optional[OT3AxisMap[float]] = {
-                k: v for k, v in max_speeds.items()  # (spp): is this even needed?
-            }
+            checked_max: Optional[OT3AxisMap[float]] = max_speeds
         else:
             checked_max = None
 
@@ -1036,9 +1033,7 @@ class OT3API(
             realmount, delta, self._current_position
         )
         if max_speeds:
-            checked_max: Optional[OT3AxisMap[float]] = {
-                k: v for k, v in max_speeds.items()  # (spp): is this even needed?
-            }
+            checked_max: Optional[OT3AxisMap[float]] = max_speeds
         else:
             checked_max = None
         await self._cache_and_maybe_retract_mount(realmount)
@@ -1249,9 +1244,7 @@ class OT3API(
         await self.refresh_positions()
 
         if axes:
-            checked_axes = [
-                ax for ax in axes if ax in Axis
-            ]  # (spp): is this even needed?
+            checked_axes = axes
         else:
             checked_axes = [ax for ax in Axis if ax != Axis.Q]
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:

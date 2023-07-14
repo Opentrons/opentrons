@@ -54,7 +54,6 @@ async def post_disengage_motors(
     axes: model.Axes, hardware: HardwareControlAPI = Depends(get_hardware)
 ) -> V1BasicResponse:
     input_axes = [Axis[ax.upper()] for ax in axes.axes]
-    # Do we want this endpoint to run on OT3?
     try:
         hardware = ensure_ot3_hardware(hardware)
     except HardwareNotSupportedError:

@@ -28,8 +28,10 @@ class EngagedMotor(BaseModel):
 class EngagedMotors(BaseModel):
     """Which motors are engaged."""
 
-    # TODO (spp, 2023-07-06): check if changing this model's fields causes any
-    #  backweards compatibility issues or needs any app side changes.
+    # Note: This model has changed with introduction of Flex and causes a breaking change
+    # for the expected response of /motors/engaged endpoint.
+    # But the neither the app uses the motors endpoint, nor is it commonly used externally
+    # so it should be hopefully fine.
     x: EngagedMotor
     y: EngagedMotor
     z_l: EngagedMotor
