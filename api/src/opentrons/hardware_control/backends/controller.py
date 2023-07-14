@@ -26,6 +26,7 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     mutable_configurations,
 )
+from opentrons_shared_data.pipette.dev_types import PipetteName
 
 from opentrons.drivers.smoothie_drivers import SmoothieDriver
 from opentrons.drivers.rpi_drivers import build_gpio_chardev
@@ -38,7 +39,7 @@ from ..types import AionotifyEvent, BoardRevision, Axis, DoorState
 from ..util import ot2_axis_to_string
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.pipette.dev_types import PipetteModel, PipetteName
+    from opentrons_shared_data.pipette.dev_types import PipetteModel
     from ..dev_types import (
         AttachedPipette,
         AttachedInstruments,

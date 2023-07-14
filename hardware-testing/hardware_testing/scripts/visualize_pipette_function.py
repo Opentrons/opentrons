@@ -11,7 +11,7 @@ except ModuleNotFoundError:
     raise RuntimeError(
         "Do NOT run this script on a robot. Please install matplotlib on this computer."
     )
-from typing import List
+from typing import List, cast
 
 from opentrons.types import Point
 from opentrons.calibration_storage.types import (
@@ -23,6 +23,7 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     mutable_configurations,
 )
+
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
@@ -30,6 +31,7 @@ from opentrons.hardware_control.instruments.ot2.instrument_calibration import (
     PipetteOffsetByPipetteMount,
 )
 from opentrons_shared_data.pipette import model_config
+from opentrons_shared_data.pipette.dev_types import PipetteModel
 
 
 def _user_select_model(model_includes: Optional[str] = None) -> str:
@@ -120,8 +122,12 @@ def _print_errors(table: List[List[float]]) -> None:
 async def _main(length: int) -> None:
     while True:
         model = _user_select_model()
-        pipette_model = pipette_load_name.convert_pipette_model(model)
-        configurations = mutable_configurations.load_with_mutable_configurations(pipette_model, Path("fake/path"), "testiId")
+        pipette_model = pipette_load_name.convert_pipette_model(
+            cast(PipetteModel, model)
+        )
+        configurations = mutable_configurations.load_with_mutable_configurations(
+            pipette_model, Path("fake/path"), "testiId"
+        )
         pip_cal_obj = PipetteOffsetByPipetteMount(
             offset=Point(*default_pipette_offset()),
             source=SourceType.default,

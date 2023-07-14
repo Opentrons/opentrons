@@ -363,7 +363,7 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
         description="The minimum supported volume of the pipette.",
         alias="minVolume",
     )
-    default_tipracks: List[str] = Field(
+    default_tipracks: List[dev_types.LabwareUri] = Field(
         ...,
         description="A list of default tiprack paths.",
         regex="opentrons/[a-z0-9._]+/[0-9]",
