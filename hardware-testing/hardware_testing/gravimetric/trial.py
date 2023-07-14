@@ -196,11 +196,12 @@ def build_gravimetric_trials(
             )
     else:
         for volume in test_volumes:
+            trial_list[volume] = {}
             for channel in channels_to_test:
                 if cfg.isolate_channels and (channel + 1) not in cfg.isolate_channels:
                     ui.print_info(f"skipping channel {channel + 1}")
                     continue
-                trial_list[volume] = {channel: []}
+                trial_list[volume][channel] =  []
                 channel_offset = helpers._get_channel_offset(cfg, channel)
                 for trial in range(cfg.trials):
                     trial_list[volume][channel].append(
