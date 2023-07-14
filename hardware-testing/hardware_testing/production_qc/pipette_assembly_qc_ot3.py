@@ -694,43 +694,6 @@ async def _test_diagnostics_capacitive(
         ]
     )
 
-    # FIXME: change to pipette probing deck, then checking capacitance
-    if not api.is_simulator:
-        _get_operator_answer_to_question(
-            'touch a SQUARE to the probe, enter "y" when touching'
-        )
-    capacitance_with_square = await _read_cap()
-    print(f"square capacitance: {capacitance_with_square}")
-    if (
-        capacitance_with_square < CAP_THRESH_SQUARE[pip.channels.value][0]
-        or capacitance_with_square > CAP_THRESH_SQUARE[pip.channels.value][1]
-    ):
-        capacitive_square_pass = False
-        print(f"FAIL: square capacitance ({capacitance_with_square}) is not correct")
-    write_cb(
-        [
-            "capacitive-square",
-            capacitance_with_square,
-            _bool_to_pass_fail(capacitive_square_pass),
-        ]
-    )
-
-    print("probing downwards by 50 mm")
-    if not api.is_simulator:
-        _get_operator_answer_to_question("ready to touch the probe when it moves down?")
-    current_pos = await api.gantry_position(mount)
-    probe_target = current_pos.z - CAP_PROBE_SETTINGS.prep_distance_mm
-    probe_axis = OT3Axis.by_mount(mount)
-    trigger_pos = await api.capacitive_probe(
-        mount, probe_axis, probe_target, CAP_PROBE_SETTINGS
-    )
-    if trigger_pos <= probe_target + 1:
-        capacitive_probing_pass = False
-        print("FAIL: probe was not triggered while moving downwards")
-    write_cb(
-        ["capacitive-probing", trigger_pos, _bool_to_pass_fail(capacitive_probing_pass)]
-    )
-
     offsets: List[Point] = []
     for trial in range(2):
         print("probing deck slot #5")
@@ -759,9 +722,40 @@ async def _test_diagnostics_capacitive(
         and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
         and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
     ):
-        write_cb([f"probe-slot-result", "PASS"])
+        probe_slot_result = _bool_to_pass_fail(True)
     else:
-        write_cb([f"probe-slot-result", "FAIL"])
+        probe_slot_result = _bool_to_pass_fail(False)
+    print(f"probe-slot-result: {probe_slot_result}")
+
+    probe_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+    probe_pos += Point(13, 13, 0)
+    await api.add_tip(mount, api.config.calibration.probe_length)
+    print(f"Moving to: {probe_pos}")
+    # start probe 5mm above deck
+    _probe_start_mm = probe_pos.z + 5
+    current_pos = await api.gantry_position(mount)
+    if current_pos.z < _probe_start_mm:
+        await api.move_to(mount, current_pos._replace(z=_probe_start_mm))
+        current_pos = await api.gantry_position(mount)
+    await api.move_to(mount, probe_pos._replace(z=current_pos.z))
+    await api.move_to(mount, probe_pos)
+    capacitance_with_square = await _read_cap()
+    print(f"square capacitance: {capacitance_with_square}")
+    if (
+        capacitance_with_square < CAP_THRESH_SQUARE[pip.channels.value][0]
+        or capacitance_with_square > CAP_THRESH_SQUARE[pip.channels.value][1]
+    ):
+        capacitive_square_pass = False
+        print(f"FAIL: square capacitance ({capacitance_with_square}) is not correct")
+    write_cb(
+        [
+            "capacitive-square",
+            capacitance_with_square,
+            _bool_to_pass_fail(capacitive_square_pass),
+        ]
+    )
+    await api.home_z(mount)
+    await api.remove_tip(mount)
 
     if not api.is_simulator:
         _get_operator_answer_to_question('REMOVE the probe, enter "y" when removed')
