@@ -25,6 +25,7 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
 
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Calibration Offset Test')
+    arg_parser.add_argument('-p', '--pause', action="store_true", required=False, help='Pause between each calibration cycle')
     arg_parser.add_argument('-m', '--mount', choices=['left','right','gripper'], required=False, help='Instrument mount to be tested', default='left')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=10)
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=5)
@@ -33,9 +34,10 @@ def build_arg_parser():
 
 class Calibration_Offset_Test:
     def __init__(
-        self, simulate: bool, mount: string, cycles: int, slot: int
+        self, simulate: bool, pause: bool, mount: string, cycles: int, slot: int
     ) -> None:
         self.simulate = simulate
+        self.pause = pause
         self.instrument = mount
         self.cycles = cycles
         self.slot = slot
@@ -139,16 +141,21 @@ class Calibration_Offset_Test:
         self._get_average()
 
     async def _calibrate_slot(
-        self, api: OT3API, mount: OT3Mount, slot: int
+        self, api: OT3API, mount: OT3Mount, slot: int, cycle: int
     ) -> None:
         # Calibrate instrument
+        above_center = self.nominal_center._replace(z=self.home.z)
+        await api.move_to(mount, above_center)
         if self.instrument == "gripper":
             for position, probe in self.gripper_probes.items():
                 await api.home_z()
-                input(f"Add calibration probe to gripper {position.upper()}, then press ENTER: ")
+                if (self.pause and cycle > 1) or position == "Rear":
+                    input(f"Add calibration probe to gripper {position.upper()}, then press ENTER: ")
                 self.gripper_offsets[position] = await calibrate_gripper_jaw(api, probe, slot)
             self.offset = await calibrate_gripper(api, self.gripper_offsets["Front"], self.gripper_offsets["Rear"])
         else:
+            if self.pause and cycle > 1:
+                input(f"Add calibration probe to pipette {self.instrument.upper()}, then press ENTER: ")
             self.offset = await calibrate_pipette(api, mount, slot)
         self.slot_center = self.nominal_center - self.offset
 
@@ -188,13 +195,13 @@ class Calibration_Offset_Test:
         try:
             await self.test_setup()
             if self.api and self.mount:
-                input(f"Add probe to {self.instrument.upper()} mount, then press ENTER: ")
+                input(f"Add calibration probe to {self.instrument.upper()}, then press ENTER: ")
                 for i in range(self.cycles):
                     cycle = i + 1
                     print(f"\n-> Running Test Cycle {cycle}/{self.cycles}")
                     self.slot_center = self.nominal_center
                     await self._home(self.api, self.mount)
-                    await self._calibrate_slot(self.api, self.mount, self.slot)
+                    await self._calibrate_slot(self.api, self.mount, self.slot, cycle)
                     await self._record_data(cycle)
                     await self._reset(self.api, self.mount)
         except Exception as e:
@@ -211,5 +218,5 @@ if __name__ == '__main__':
     print("\nOT-3 Calibration Offset Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Calibration_Offset_Test(args.simulate, args.mount, args.cycles, args.slot)
+    test = Calibration_Offset_Test(args.simulate, args.pause, args.mount, args.cycles, args.slot)
     asyncio.run(test.run())
