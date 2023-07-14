@@ -1,7 +1,7 @@
 from opentrons import protocol_api
 
 metadata = {
-    'protocolName': 'Serial Dilution Tutorial',
+    'protocolName': 'Serial Dilution Tutorial – Flex 1-channel',
     'description': '''This protocol is the outcome of following the
                    Python Protocol API Tutorial located at
                    https://docs.opentrons.com/v2/tutorial.html. It takes a

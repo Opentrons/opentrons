@@ -2,7 +2,7 @@ from opentrons import protocol_api
 
 metadata = {
     'apiLevel': '2.15',
-    'protocolName': 'Serial Dilution Tutorial',
+    'protocolName': 'Serial Dilution Tutorial – OT-2 single-channel',
     'description': '''This protocol is the outcome of following the
                    Python Protocol API Tutorial located at
                    https://docs.opentrons.com/v2/tutorial.html. It takes a
