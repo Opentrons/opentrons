@@ -11,6 +11,12 @@ from opentrons_hardware.firmware_bindings.constants import SensorType
 
 from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.ot3_calibration import (
+    calibrate_pipette,
+    EdgeNotFoundError,
+    EarlyCapacitiveSenseTrigger,
+    CalibrationStructureNotFoundError,
+)
 
 from hardware_testing import data
 from hardware_testing.drivers import list_ports_and_select
@@ -33,11 +39,13 @@ from hardware_testing.opentrons_api.types import (
     OT3Axis,
 )
 
-DEFAULT_SLOT_TIP_RACK_LIQUID = 7
 DEFAULT_SLOT_TIP_RACK_FIXTURE = 1
+DEFAULT_SLOT_FIXTURE = 3
+DEFAULT_SLOT_TIP_RACK_LIQUID = 7
 DEFAULT_SLOT_RESERVOIR = 8
-DEFAULT_SLOT_FIXTURE = 2
 DEFAULT_SLOT_TRASH = 12
+
+PROBING_DECK_PRECISION_MM = 0.1
 
 TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
@@ -686,6 +694,7 @@ async def _test_diagnostics_capacitive(
         ]
     )
 
+    # FIXME: change to pipette probing deck, then checking capacitance
     if not api.is_simulator:
         _get_operator_answer_to_question(
             'touch a SQUARE to the probe, enter "y" when touching'
@@ -721,6 +730,38 @@ async def _test_diagnostics_capacitive(
     write_cb(
         ["capacitive-probing", trigger_pos, _bool_to_pass_fail(capacitive_probing_pass)]
     )
+
+    offsets: List[Point] = []
+    for trial in range(2):
+        print("probing deck slot #5")
+        if trial > 0:
+            input("REINSTALL the probe, press ENTER when ready: ")
+        await api.home()
+        try:
+            await calibrate_pipette(api, mount, slot=5)
+        except (
+            EdgeNotFoundError,
+            EarlyCapacitiveSenseTrigger,
+            CalibrationStructureNotFoundError,
+        ) as e:
+            print(f"ERROR: {e}")
+            write_cb([f"probe-slot-{trial}", None, None, None])
+        else:
+            o = api.hardware_pipettes[mount.to_mount()].pipette_offset.offset
+            print(f"found offset: {o}")
+            write_cb(
+                [f"probe-slot-{trial}", round(o.x, 2), round(o.y, 2), round(o.z, 2)]
+            )
+            offsets.append(o)
+        await api.retract(mount)
+    if (
+        abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
+        and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
+        and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
+    ):
+        write_cb([f"probe-slot-result", "PASS"])
+    else:
+        write_cb([f"probe-slot-result", "FAIL"])
 
     if not api.is_simulator:
         _get_operator_answer_to_question('REMOVE the probe, enter "y" when removed')
@@ -951,6 +992,8 @@ async def _main(test_config: TestConfig) -> None:
             "qc this pipette?"
         ):
             continue
+        # reset calibration for this pipette
+        await api.reset_instrument_offset(mount)
 
         # setup our labware locations
         pipette_volume = int(pipette.working_volume)
@@ -1043,7 +1086,6 @@ async def _main(test_config: TestConfig) -> None:
                 test_passed = await _test_plunger_positions(api, mount, csv_cb.write)
                 csv_cb.results("plunger", test_passed)
 
-        # TODO: add calibration here
         # TODO: add liquid-probe here
 
         if not test_config.skip_liquid:
