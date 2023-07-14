@@ -21,7 +21,7 @@ Default labware is everything listed in the `Opentrons Labware Library <https://
 Custom Labware
 ==============
 
-Custom labware is labware that is not listed the Labware Library. If your protocol needs something that's not in the library, you can create it with the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. However, before using the Labware Creator, you should take a moment to review the support article, `Creating Custom Labware Definitions <https://support.opentrons.com/s/article/Creating-Custom-Labware-Definitions>`_ .
+Custom labware is labware that is not listed the Labware Library. If your protocol needs something that's not in the library, you can create it with the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. However, before using the Labware Creator, you should take a moment to review the support article, `Creating Custom Labware Definitions <https://support.opentrons.com/s/article/Creating-Custom-Labware-Definitions>`_.
 
 After you've created your labware, save it as a ``.json`` file and add it to the Opentrons App. See `Using Labware in Your Protocols <https://support.opentrons.com/s/article/Using-labware-in-your-protocols>`_ for instructions. 
 
