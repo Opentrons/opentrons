@@ -322,12 +322,6 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     def convert_quirks(cls, v: List[str]) -> List[pip_types.Quirks]:
         return [pip_types.Quirks(q) for q in v]
 
-    @validator("quirks", pre=True)
-    def convert_quirks(cls, v: str) -> List[pip_types.Quirks]:
-        if not v:
-            return []
-        return [pip_types.Quirks(q) for q in v]
-
     class Config:
         json_encoders = {
             PipetteChannelType: lambda v: v.value,
