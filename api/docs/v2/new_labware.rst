@@ -50,7 +50,7 @@ Throughout this section, we'll use the labware listed in the following table.
       - `Opentrons 96 Tip Rack 300 µL <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_
       - ``opentrons_96_tiprack_300ul``
 
-From the example in the :ref:`overview-section-v2`, we used the :py:meth:`.ProtocolContext.load_labware` method to load Flex and OT-2 labware as shown below. 
+Following the example in the :ref:`overview-section-v2`, here is how to the :py:meth:`.ProtocolContext.load_labware` method to load labware on either Flex or OT-2. 
 
 .. code-block:: python
 
