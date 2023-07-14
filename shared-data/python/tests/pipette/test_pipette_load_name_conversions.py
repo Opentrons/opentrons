@@ -1,5 +1,6 @@
 import pytest
 
+from typing import Union
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteChannelType,
     PipetteModelType,
@@ -192,3 +193,29 @@ def test_name_type_string_generation(
         pipette_type=model_type, pipette_channels=channels, pipette_version=version
     )
     assert output == str(data)
+
+
+
+@pytest.mark.parametrize(
+    argnames=["model_or_name", "valid"],
+    argvalues=[
+        [
+            "p50_single",
+            True,
+        ],
+        [
+            "p50_sing",
+            False,
+        ],
+        [
+            "p100_multi",
+            False,
+        ],
+        [
+            "p1000_multi_v3.3",
+            True,
+        ],
+    ])
+def test_supported_pipette(model_or_name: Union[PipetteName, PipetteModel, None],  valid: bool) -> None:
+    assert ps.supported_pipette(model_or_name) == valid
+

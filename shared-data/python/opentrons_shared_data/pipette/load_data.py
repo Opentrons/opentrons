@@ -15,8 +15,7 @@ from .pipette_definition import (
     PipetteGenerationType,
     PipetteModelMajorVersion,
     PipetteModelMinorVersion,
-    PipetteModelVersionType,
-    PipetteNameType,
+    PipetteLiquidPropertiesDefinition
 )
 from .model_constants import MOUNT_CONFIG_LOOKUP_TABLE
 
@@ -107,6 +106,15 @@ def load_serial_lookup_table() -> Dict[str, str]:
     return _lookup_table
 
 
+def load_liquid_model(
+    max_volume: PipetteModelType,
+    channels: PipetteChannelType,
+    version: PipetteVersionType,
+) -> PipetteLiquidPropertiesDefinition:
+    liquid_dict = _liquid(channels, max_volume, version)
+    return PipetteLiquidPropertiesDefinition.parse_obj(liquid_dict)
+
+
 def load_definition(
     max_volume: PipetteModelType,
     channels: PipetteChannelType,
@@ -123,7 +131,7 @@ def load_definition(
     liquid_dict = _liquid(channels, max_volume, version)
 
     generation = PipetteGenerationType(physical_dict["displayCategory"])
-    mount_configs = MOUNT_CONFIG_LOOKUP_TABLE[generation.value]
+    mount_configs = MOUNT_CONFIG_LOOKUP_TABLE[generation.value][str(channels)]
 
     return PipetteConfigurations.parse_obj(
         {

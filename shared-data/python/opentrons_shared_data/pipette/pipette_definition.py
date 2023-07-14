@@ -110,6 +110,14 @@ class PipetteNameType:
         else:
             return f"{base_name}_{self.pipette_generation.name.lower()}"
 
+    def get_version(self) -> PipetteVersionType:
+        if self.pipette_generation == PipetteGenerationType.FLEX:
+            return PipetteVersionType(3, 0)
+        elif self.pipette_generation == PipetteGenerationType.GEN2:
+            return PipetteVersionType(2, 0)
+        else:
+            return PipetteVersionType(1, 0)
+
 
 @dataclass
 class PipetteModelVersionType:
@@ -153,11 +161,6 @@ class SupportedTipsDefinition(BaseModel):
         description="The default tip length associated with this tip type.",
         alias="defaultTipLength",
     )
-    default_tip_overlap: float = Field(
-        ...,
-        description="The default tip overlap associated with this tip type.",
-        alias="defaultTipOverlap",
-    )
     default_return_tip_height: float = Field(
         default=0.5,
         description="The height to return a tip to its tiprack.",
@@ -168,11 +171,6 @@ class SupportedTipsDefinition(BaseModel):
     )
     dispense: Dict[str, List[Tuple[float, float, float]]] = Field(
         ..., description="The default pipetting functions list for dispensing."
-    )
-    tip_overlap_dictionary: Dict[str, float] = Field(
-        default={},
-        description="The default tip overlap associated with this tip type.",
-        alias="defaultTipOverlapDictionary",
     )
     default_blowout_volume: Optional[float] = Field(
         ...,
@@ -356,6 +354,11 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
     supported_tips: Dict[PipetteTipType, SupportedTipsDefinition] = Field(
         ..., alias="supportedTips"
     )
+    tip_overlap_dictionary: Dict[str, float] = Field(
+        ...,
+        description="The default tip overlap associated with this tip type.",
+        alias="defaultTipOverlapDictionary",
+    )
     max_volume: int = Field(
         ...,
         description="The maximum supported volume of the pipette.",
@@ -393,3 +396,8 @@ class PipetteConfigurations(
     mount_configurations: pip_types.RobotMountConfigs = Field(
         ...,
     )
+
+    def update(self, data: dict) -> "PipetteConfigurations":
+        for k,v in data.items():
+            setattr(self, k, v)
+        return self

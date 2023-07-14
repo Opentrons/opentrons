@@ -3,9 +3,19 @@ from typing import Dict, Union
 from .types import Quirks, RobotMountConfigs, AvailableUnits
 
 MOUNT_CONFIG_LOOKUP_TABLE = {
-    "GEN1": RobotMountConfigs(768, 220, 30),
-    "GEN2": RobotMountConfigs(3200, 155.75, 60),
-    "FLEX": RobotMountConfigs(2133.33, 230.15, 80),
+    "GEN1": {
+        "single": RobotMountConfigs(768, 220, 30),
+        "multi": RobotMountConfigs(768, 220, 30)
+    },
+    "GEN2": {
+        "single": RobotMountConfigs(3200, 172.15, 60),
+        "multi": RobotMountConfigs(3200, 155.75, 60)
+    },
+    "FLEX": {
+        "single": RobotMountConfigs(2133.33, 230.15, 80),
+        "multi": RobotMountConfigs(2133.33, 230.15, 80),
+        "96": RobotMountConfigs(2133.33, 230.15, 80)
+    }
 }
 
 

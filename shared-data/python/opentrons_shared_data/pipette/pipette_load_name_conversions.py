@@ -44,10 +44,13 @@ def supported_pipette(model_or_name: Union[PipetteName, PipetteModel, None]) -> 
     if not model_or_name:
         return False
     split_model_or_name = model_or_name.split("_")
-    channels_as_int = channels_from_string(split_model_or_name[1]).as_int
+    try:
+        channels_as_int = channels_from_string(split_model_or_name[1]).as_int
+    except ValueError:
+        channels_as_int = 0
     if (
         split_model_or_name[0] in PIPETTE_AVAILABLE_TYPES
-        or channels_as_int in PIPETTE_CHANNELS_INTS
+        and channels_as_int in PIPETTE_CHANNELS_INTS
     ):
         return True
     return False
@@ -71,8 +74,10 @@ def channels_from_string(channels: str) -> PipetteChannelType:
         return PipetteChannelType.NINETY_SIX_CHANNEL
     elif channels == "multi":
         return PipetteChannelType.EIGHT_CHANNEL
-    else:
+    elif channels == "single":
         return PipetteChannelType.SINGLE_CHANNEL
+    else:
+        raise ValueError("Invalid number of channels") 
 
 
 def version_from_string(version: str) -> PipetteVersionType:
