@@ -15,6 +15,7 @@ from opentrons_shared_data.labware.labware_definition import (
     WellDefinition,
 )
 from opentrons_shared_data.protocol.models import protocol_schema_v6
+from opentrons_shared_data.protocol.models import protocol_schema_v7
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_runner.json_translator import JsonTranslator
@@ -394,7 +395,7 @@ def _load_labware_definition_data() -> LabwareDefinition:
     )
 
 
-def _make_json_protocol(
+def _make_v6_json_protocol(
     *,
     pipettes: Dict[str, protocol_schema_v6.Pipette] = {
         "pipette-id-1": protocol_schema_v6.Pipette(name="p10_single"),
@@ -439,15 +440,54 @@ def _make_json_protocol(
     )
 
 
+def _make_v7_json_protocol(
+    *,
+    labware_definitions: Dict[str, LabwareDefinition] = {
+        "example/plate/1": _load_labware_definition_data(),
+        "example/trash/1": _load_labware_definition_data(),
+    },
+    commands: List[protocol_schema_v7.Command] = [],
+    modules: Dict[str, protocol_schema_v7.Module] = {
+        "module-id-1": protocol_schema_v7.Module(model="magneticModuleV2"),
+        "module-id-2": protocol_schema_v7.Module(model="thermocyclerModuleV2"),
+    },
+    liquids: Dict[str, protocol_schema_v7.Liquid] = {
+        "liquid-id-555": protocol_schema_v7.Liquid(
+            displayName="water", description="water description", displayColor="#F00"
+        )
+    },
+) -> protocol_schema_v7.ProtocolSchemaV7:
+    """Return a minimal JsonProtocol with the given elements, to use as test input."""
+    return protocol_schema_v7.ProtocolSchemaV7(
+        # schemaVersion is arbitrary. Currently (2021-06-28), JsonProtocol.parse_obj()
+        # isn't smart enough to validate differently depending on this field.
+        otSharedSchema="#/protocol/schemas/6",
+        schemaVersion=7,
+        metadata=protocol_schema_v7.Metadata(),
+        robot=protocol_schema_v7.Robot(model="OT-2 Standard", deckId="ot2_standard"),
+        labwareDefinitions=labware_definitions,
+        commands=commands,
+        liquids=liquids,
+        modules=modules,
+    )
+
+
 @pytest.mark.parametrize("test_input, expected_output", VALID_TEST_PARAMS)
 def test_load_command(
     subject: JsonTranslator,
-    test_input: protocol_schema_v6.Command,
+    test_v6_input: protocol_schema_v6.Command,
+    test_v7_input: protocol_schema_v7.Command,
     expected_output: pe_commands.CommandCreate,
 ) -> None:
     """Test translating v6 commands to protocol engine commands."""
-    output = subject.translate_commands(_make_json_protocol(commands=[test_input]))
-    assert output == [expected_output]
+    v6_output = subject.translate_commands(
+        _make_v6_json_protocol(commands=[test_v6_input])
+    )
+    v7_output = subject.translate_commands(
+        _make_v7_json_protocol(commands=[test_v7_input])
+    )
+    assert v6_output == [expected_output]
+    assert v7_output == [expected_output]
 
 
 def test_load_liquid(
