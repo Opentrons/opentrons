@@ -166,7 +166,7 @@ class OT3API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlInterface[OT3Transforms, Axis],
+    HardwareControlInterface[OT3Transforms],
 ):
     """This API is the primary interface to the hardware controller.
 

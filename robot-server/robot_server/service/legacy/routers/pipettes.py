@@ -2,7 +2,7 @@ import typing
 from fastapi import APIRouter, Query, Depends
 
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.util import ot2_axis_to_string
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.errors import HardwareNotSupportedError
@@ -66,9 +66,11 @@ async def get_pipettes(
             model=pipette_dict.get("model"),
             name=pipette_dict.get("name"),
             id=pipette_dict.get("pipette_id"),
-            mount_axis=mount_axis.lower() ,
+            mount_axis=mount_axis.lower(),
             plunger_axis=plunger_axis.lower(),
-            tip_length=pipette_dict.get("tip_length", 0) if pipette_dict.get("model") else None,
+            tip_length=pipette_dict.get("tip_length", 0)
+            if pipette_dict.get("model")
+            else None,
         )
 
     try:

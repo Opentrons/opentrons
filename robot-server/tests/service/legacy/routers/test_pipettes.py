@@ -1,12 +1,9 @@
-from __future__ import annotations
-
 import pytest
 from mock import MagicMock
 from starlette.testclient import TestClient
-from typing import TYPE_CHECKING, Dict, Any
+from typing import Dict, Any
 
 from opentrons import types
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.resources import ot3_validation
 from opentrons.types import Mount
 
@@ -82,11 +79,12 @@ def test_get_pipettes_refresh_false(api_client, hardware, attached_pipettes):
 
     assert resp.status_code == 200
 
+
 def test_get_ot3_pipettes(
-        api_client: TestClient,
-        hardware: MagicMock,
-        attached_pipettes: Dict[Mount, Any],
-        monkeypatch: pytest.MonkeyPatch,
+    api_client: TestClient,
+    hardware: MagicMock,
+    attached_pipettes: Dict[Mount, Any],
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """It should return the correct pipette data for OT3 pipettes"""
     mock = MagicMock(return_value=None)
