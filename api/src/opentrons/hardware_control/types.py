@@ -114,12 +114,14 @@ class Axis(enum.Enum):
     @classmethod
     def ot2_mount_axes(cls) -> Tuple["Axis", "Axis"]:
         """The OT2 axes which are used for moving instruments up and down."""
+        # TODO (spp, 2023-07-14): make this a separate function outside of Axis
         # Does this need to be Z_R, Z_L ?
         return cls.Z_L, cls.Z_R
 
     @classmethod
     def ot3_mount_axes(cls) -> Tuple["Axis", "Axis", "Axis"]:
         """The OT3 axes which are used for moving instruments up and down."""
+        # TODO (spp, 2023-07-14): make this a separate function outside of Axis
         return cls.Z_R, cls.Z_L, cls.Z_G
 
     @classmethod
@@ -169,6 +171,7 @@ class Axis(enum.Enum):
 
     @classmethod
     def to_ot2_mount(cls, inst: "Axis") -> top_types.Mount:
+        # TODO (spp, 2023-07-14): make this a separate function outside of Axis
         return {
             cls.Z: top_types.Mount.LEFT,
             cls.A: top_types.Mount.RIGHT,
@@ -178,6 +181,7 @@ class Axis(enum.Enum):
 
     @classmethod
     def to_ot3_mount(cls, inst: "Axis") -> OT3Mount:
+        # TODO (spp, 2023-07-14): make this a separate function outside of Axis
         return {
             cls.Z_R: OT3Mount.RIGHT,
             cls.Z_L: OT3Mount.LEFT,
@@ -213,6 +217,7 @@ class Axis(enum.Enum):
     @classmethod
     def ot2_axes(cls) -> List["Axis"]:
         """Returns only OT2 axes."""
+        # TODO (spp, 2023-07-14): make this a separate function outside of Axis
         return [axis for axis in Axis if axis not in [Axis.Z_G, Axis.Q, Axis.G]]
 
     @classmethod
