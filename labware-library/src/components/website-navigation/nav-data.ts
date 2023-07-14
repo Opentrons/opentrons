@@ -40,17 +40,17 @@ export const hardwareLinks: Link[] = [
   },
   {
     name: 'Thermocycler Module',
-    url: 'https://opentrons.com/modules#thermocycler_module',
+    url: 'https://opentrons.com/products/modules/thermocycler_module',
     gtm: { action: 'click', category: 'l-header', label: 'modules' },
   },
   {
     name: 'Magnetic Module',
-    url: 'https://opentrons.com/modules#magnetic_module',
+    url: 'https://opentrons.com/products/modules/magnetic',
     gtm: { action: 'click', category: 'l-header', label: 'modules' },
   },
   {
     name: 'Temperature Module',
-    url: 'https://opentrons.com/modules#temperature_module',
+    url: 'https://opentrons.com/products/modules/temperature',
     gtm: { action: 'click', category: 'l-header', label: 'modules' },
   },
 ]

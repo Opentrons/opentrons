@@ -41,7 +41,7 @@ const PROTOCOL_ANALYSIS = {
   id: 'fake analysis',
   status: 'completed',
   labware: [],
-  pipettes: [{ id: 'pipId', pipetteName: 'p1000_multi_gen3', mount: 'left' }],
+  pipettes: [{ id: 'pipId', pipetteName: 'p1000_multi_flex', mount: 'left' }],
   modules: [
     {
       id: 'modId',
@@ -152,7 +152,7 @@ describe('useMissingProtocolHardware', () => {
     expect(result.current).toEqual([
       {
         hardwareType: 'pipette',
-        pipetteName: 'p1000_multi_gen3',
+        pipetteName: 'p1000_multi_flex',
         mount: 'left',
         connected: false,
       },
@@ -167,7 +167,7 @@ describe('useMissingProtocolHardware', () => {
   it('should return empty array when the correct modules and pipettes are attached', () => {
     mockUseAttachedPipettes.mockReturnValue({
       left: {
-        name: 'p1000_multi_gen3',
+        name: 'p1000_multi_flex',
       },
       right: {},
     } as any)
