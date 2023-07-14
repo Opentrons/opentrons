@@ -8,6 +8,9 @@ export const mockAnonLoadCommand: CreateCommand = {
     location: {
       slotName: '1',
     },
+    version: 1,
+    loadName: 'mockLoadname',
+    namespace: 'mockNamespace',
   },
 }
 
@@ -20,6 +23,9 @@ export const mockLoadLabwareRunCommandSummary: RunCommandSummary = {
     location: {
       slotName: '1',
     },
+    version: 1,
+    loadName: 'mockLoadname',
+    namespace: 'mockNamespace',
   },
   status: 'running',
   createdAt: 'fake_created_at_timestamp',

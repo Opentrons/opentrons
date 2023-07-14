@@ -29,6 +29,7 @@ import {
   DrillDownOnLabwareAction,
   DrillUpFromLabwareAction,
 } from '../actions'
+import type { LoadLabwareCreateCommand } from '@opentrons/shared-data'
 // REDUCERS
 // modeLabwareSelection: boolean. If true, we're selecting labware to add to a slot
 // (this state just toggles a modal)
@@ -164,30 +165,67 @@ export const containers: Reducer<ContainersState, any> = handleActions(
       action: LoadFileAction
     ): ContainersState => {
       const { file } = action.payload
-      const allFileLabware = file.labware
-      const sortedLabwareIds: string[] = Object.keys(allFileLabware).sort(
-        (a, b) =>
-          Number(allFileLabware[a].slot) - Number(allFileLabware[b].slot)
-      )
-      return sortedLabwareIds.reduce(
-        (acc: ContainersState, id): ContainersState => {
-          const fileLabware = allFileLabware[id]
-          const nickname = fileLabware.displayName
-          const disambiguationNumber =
-            Object.keys(acc).filter(
-              (filterId: string) =>
-                allFileLabware[filterId].displayName === nickname
-            ).length + 1
-          return {
-            ...acc,
-            [id]: {
-              nickname,
-              disambiguationNumber,
-            },
+      const lowerSchemaVersions =
+        file.schemaVersion === 3 ||
+        file.schemaVersion === 4 ||
+        file.schemaVersion === 5
+      if (
+        'labware' in file &&
+        Object.keys(file.labware).length > 1 &&
+        lowerSchemaVersions
+      ) {
+        const allFileLabware = file.labware as Record<
+          string,
+          {
+            slot: string
+            definitionId: string
+            displayName?: string | undefined
           }
-        },
-        {}
-      )
+        >
+        const sortedLabwareIds: string[] =
+          Object.keys(allFileLabware).sort(
+            (a, b) =>
+              Number(allFileLabware[a].slot) - Number(allFileLabware[b].slot)
+          ) ?? null
+
+        return sortedLabwareIds.reduce(
+          (acc: ContainersState, id): ContainersState => {
+            const fileLabware = allFileLabware[id]
+            const nickname = fileLabware.displayName
+            const disambiguationNumber =
+              Object.keys(acc).filter(
+                (filterId: string) =>
+                  allFileLabware[filterId].displayName === nickname
+              ).length + 1
+            return {
+              ...acc,
+              [id]: {
+                nickname,
+                disambiguationNumber,
+              },
+            }
+          },
+          {}
+        )
+      } else {
+        const loadLabwareCommands = Object.values(file.commands).filter(
+          command => command.commandType === 'loadLabware'
+        ) as LoadLabwareCreateCommand[]
+
+        return loadLabwareCommands.reduce(
+          (acc: ContainersState, command, key): ContainersState => {
+            const { loadName, displayName } = command.params
+            return {
+              ...acc,
+              [loadName]: {
+                nickname: displayName,
+                disambiguationNumber: key,
+              },
+            }
+          },
+          {}
+        )
+      }
     },
   },
   initialLabwareState
@@ -214,7 +252,52 @@ export const savedLabware: Reducer<SavedLabwareState, any> = handleActions(
     LOAD_FILE: (
       state: SavedLabwareState,
       action: LoadFileAction
-    ): SavedLabwareState => mapValues(action.payload.file.labware, () => true),
+    ): SavedLabwareState => {
+      const file = action.payload.file
+      const loadLabwareCommands = Object.values(file.commands).filter(
+        (command): command is LoadLabwareCreateCommand =>
+          command.commandType === 'loadLabware'
+      )
+      if ('labware' in file) {
+        return mapValues(file.labware, () => true)
+      }
+
+      const labware = loadLabwareCommands.reduce(
+        (
+          acc: Record<
+            string,
+            {
+              slot: string
+              definitionId?: string
+              displayName?: string
+            }
+          >,
+          command
+        ) => {
+          const { labwareId, displayName, loadName } = command.params
+          const location = command.params.location
+          let slot
+          if (location === 'offDeck') {
+            slot = 'offDeck'
+          } else if ('moduleId' in location) {
+            slot = location.moduleId
+          } else {
+            slot = location.slotName
+          }
+
+          return {
+            ...acc,
+            [loadName]: {
+              slot,
+              definitionId: labwareId,
+              displayName: displayName,
+            },
+          }
+        },
+        {}
+      )
+      return mapValues(labware, () => true)
+    },
   },
   {}
 )

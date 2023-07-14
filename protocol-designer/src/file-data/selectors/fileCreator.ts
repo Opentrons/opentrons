@@ -222,6 +222,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           key: uuid(),
           commandType: 'loadLabware' as const,
           params: {
+            displayName: def.metadata.displayName,
             labwareId: labwareId,
             loadName: labwareDefURI,
             namespace: namespace,

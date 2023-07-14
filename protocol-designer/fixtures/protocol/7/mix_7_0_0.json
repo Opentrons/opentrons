@@ -4,7 +4,7 @@
     "author": "",
     "description": "A test for 5.0.0 -> 5.1.0 migration",
     "created": 1600714068238,
-    "lastModified": 1688592093150,
+    "lastModified": 1689346760755,
     "category": null,
     "subcategory": null,
     "tags": []
@@ -13,7 +13,7 @@
     "name": "opentrons/protocol-designer",
     "version": "7.0.0",
     "data": {
-      "_internalAppBuildDate": "Wed, 05 Jul 2023 20:42:07 GMT",
+      "_internalAppBuildDate": "Fri, 14 Jul 2023 14:56:13 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 0.5,
@@ -2163,7 +2163,7 @@
   "schemaVersion": 7,
   "commands": [
     {
-      "key": "930d9a4c-b4b8-4816-abdb-dcd4c1424e2c",
+      "key": "08c30adb-1683-4720-a4f6-d352eb42b6fd",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p20_single_gen2",
@@ -2172,9 +2172,10 @@
       }
     },
     {
-      "key": "a2f16817-d119-4c0e-b977-a19b3ed7e92f",
+      "key": "b699b2c8-ccb2-4e6c-8ad7-1525a2c2871a",
       "commandType": "loadLabware",
       "params": {
+        "displayName": "Opentrons 96 Tip Rack 10 µL",
         "labwareId": "f1c677c0-fc3a-11ea-8809-e959e7d61d96:opentrons/opentrons_96_tiprack_10ul/1",
         "loadName": "opentrons/opentrons_96_tiprack_10ul/1",
         "namespace": "opentrons",
@@ -2183,9 +2184,10 @@
       }
     },
     {
-      "key": "cfe41753-afa2-4a51-8f08-0785ccf9770a",
+      "key": "0dbffd6b-cfc5-44fa-a534-d86fe999755f",
       "commandType": "loadLabware",
       "params": {
+        "displayName": "Bio-Rad 96 Well Plate 200 µL PCR",
         "labwareId": "fe572c50-fc3a-11ea-8809-e959e7d61d96:opentrons/biorad_96_wellplate_200ul_pcr/1",
         "loadName": "opentrons/biorad_96_wellplate_200ul_pcr/1",
         "namespace": "opentrons",
@@ -2195,12 +2197,12 @@
     },
     {
       "commandType": "waitForDuration",
-      "key": "59641cfa-e255-4273-ad17-2ac2152031b3",
+      "key": "3a31b5f4-285f-4ec3-be78-8b37fe1f9f80",
       "params": { "seconds": 3723, "message": "" }
     },
     {
       "commandType": "pickUpTip",
-      "key": "3d231194-5b66-418e-ba2a-47f4e920c020",
+      "key": "dba8623d-595d-4de6-94dc-c2a9cbba6387",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "f1c677c0-fc3a-11ea-8809-e959e7d61d96:opentrons/opentrons_96_tiprack_10ul/1",
@@ -2209,7 +2211,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "49701375-180c-40b5-9ac6-179d3ad89a3d",
+      "key": "68a776f0-04eb-4665-a0d0-9c041089e38c",
       "params": {
         "pipetteId": "pipetteId",
         "volume": 5,
@@ -2221,7 +2223,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "042b0fa2-7fea-41cd-89af-0de3492a5617",
+      "key": "de809052-e378-40ef-9df6-db76a4758c8b",
       "params": {
         "pipetteId": "pipetteId",
         "volume": 5,
@@ -2233,7 +2235,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "1cbf11e0-909e-4c57-b4d0-53e8856ee1df",
+      "key": "b9bca177-0c1b-49b8-a8f4-d7b3bc352344",
       "params": {
         "pipetteId": "pipetteId",
         "volume": 5,
@@ -2245,7 +2247,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "a713f4c4-d9b9-48b6-93dc-59e5afdbbc7f",
+      "key": "a7dbc075-dab1-42a5-8fa1-dc02e7c28bd3",
       "params": {
         "pipetteId": "pipetteId",
         "volume": 5,
@@ -2257,7 +2259,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "b911dd13-7670-46a0-a04f-59659b79979c",
+      "key": "91ab2763-94db-40cc-841a-9d365845abe5",
       "params": {
         "pipetteId": "pipetteId",
         "labwareId": "fixedTrash",

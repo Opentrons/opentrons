@@ -71,6 +71,14 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       migrationModal: 'noBehaviorChange',
       unusedPipettes: false,
     },
+    {
+      title:
+        'doItAllV7 Flex robot (schema 7, PD version 7.0.0) -> import and re-export should preserve data',
+      importFixture: '../../fixtures/protocol/7/doItAllV7.json',
+      expectedExportFixture: '../../fixtures/protocol/7/doItAllV7.json',
+      migrationModal: false,
+      unusedPipettes: false,
+    },
   ]
 
   testCases.forEach(
