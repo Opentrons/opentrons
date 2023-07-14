@@ -128,6 +128,7 @@ def _retract(
     pipette: InstrumentContext,
     well: Well,
     channel_offset: Point,
+    mm_above_well_bottom: float,
     speed: float,
     z_discontinuity: float,
 ) -> None:
@@ -143,8 +144,8 @@ def _retract(
         ] = z_discontinuity
     # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
     hw_api.set_gantry_load(hw_api.gantry_load)
-    # retract out of the vial (and evaporation trap if used)
-    pipette.move_to(well.top(config.VIAL_SAFE_Z_OFFSET).move(channel_offset))
+    # retract out of the liquid (not out of the well
+    pipette.move_to(well.top(mm_above_well_bottom).move(channel_offset), speed=speed)
     # reset discontinuity back to default
     if pipette.channels == 96:
         hw_api.config.motion_settings.max_speed_discontinuity.high_throughput[
@@ -329,7 +330,7 @@ def _pipette_with_liquid_settings(
         _z_disc = liquid_class.aspirate.z_retract_discontinuity
     else:
         _z_disc = liquid_class.dispense.z_retract_discontinuity
-    _retract(ctx, pipette, well, channel_offset, retract_speed, _z_disc)
+    _retract(ctx, pipette, well, channel_offset, retract_mm, retract_speed, _z_disc)
     _aspirate_on_retract() if aspirate else _dispense_on_retract()
 
     # EXIT
