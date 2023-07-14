@@ -15,9 +15,9 @@ from .pipette_definition import (
     PipetteGenerationType,
     PipetteModelMajorVersion,
     PipetteModelMinorVersion,
-    PipetteLiquidPropertiesDefinition
+    PipetteLiquidPropertiesDefinition,
 )
-from .model_constants import MOUNT_CONFIG_LOOKUP_TABLE
+from .model_constants import MOUNT_CONFIG_LOOKUP_TABLE, _MAP_KEY_TO_V2
 
 
 LoadedConfiguration = Dict[str, Union[str, Dict[str, Any]]]
@@ -113,6 +113,53 @@ def load_liquid_model(
 ) -> PipetteLiquidPropertiesDefinition:
     liquid_dict = _liquid(channels, max_volume, version)
     return PipetteLiquidPropertiesDefinition.parse_obj(liquid_dict)
+
+
+def _change_to_camel_case(c: str) -> str:
+    config_name = c.split("_")
+    if len(config_name) == 1:
+        return config_name[0]
+    return f"{config_name[0]}".join(s.capitalize() for s in config_name[1::])
+
+
+def update_pipette_configuration(
+    base_configurations: PipetteConfigurations,
+    v1_configuration_changes: Dict[str, Any],
+) -> PipetteConfigurations:
+    """Helper function to migration V1 Configs to the V2 format.
+
+    Given an input of v1 mutable configs, look up the equivalent keyed
+    value of that configuration."""
+    quirks_list = []
+    dict_of_base_model = base_configurations.dict(by_alias=True)
+
+    for c, v in v1_configuration_changes.items():
+        lookup_key = _change_to_camel_case(c)
+        if c == "quirks" and isinstance(v, dict):
+            quirks_list.extend([b.name for b in v.values() if b.value])
+        else:
+            new_names = _MAP_KEY_TO_V2[lookup_key]
+            top_name = new_names["top_level_name"]
+            nested_name = new_names["nested_name"]
+            if c == "tipLength":
+                # This is only a concern for OT-2 configs and I think we can
+                # be less smart about handling multiple tip types by updating
+                # all tips.
+                for k in dict_of_base_model[new_names["top_level_name"]].keys():
+                    dict_of_base_model[top_name][k][nested_name] = v
+            else:
+                # isinstances are needed for type checking.
+                dict_of_base_model[top_name][nested_name] = v
+    dict_of_base_model["quirks"] = list(
+        set(dict_of_base_model["quirks"]) - set(quirks_list)
+    )
+
+    # re-serialization is not great for this nested enum so we need
+    # to perform this workaround.
+    dict_of_base_model["supportedTips"] = {
+        k.name: v for k, v in dict_of_base_model["supportedTips"].items()
+    }
+    return PipetteConfigurations.parse_obj(dict_of_base_model)
 
 
 def load_definition(

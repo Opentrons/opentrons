@@ -396,8 +396,3 @@ class PipetteConfigurations(
     mount_configurations: pip_types.RobotMountConfigs = Field(
         ...,
     )
-
-    def update(self, data: dict) -> "PipetteConfigurations":
-        for k,v in data.items():
-            setattr(self, k, v)
-        return self

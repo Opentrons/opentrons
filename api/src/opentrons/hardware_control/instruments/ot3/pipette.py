@@ -112,15 +112,17 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._blowout_flow_rates_lookup = (
             self._active_tip_settings.default_blowout_flowrate.values_by_api_level
         )
-        self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate.default
-        self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate.default
-        self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate.default
-        # TODO (lc 12-6-2022) When we switch over to sending pipette state, we
-        # we should also try to make sure the python api isn't reaching into
-        # Pipette interals. For now, we want to make sure the shape of
-        # tip overlap matches the shape of OT2 pipettes. We'll also need
-        # to revisit some liquid configurations for tiprack types.
-        self._tip_overlap = {"default": self._active_tip_settings.default_tip_overlap}
+        self._aspirate_flow_rate = (
+            self._active_tip_settings.default_aspirate_flowrate.default
+        )
+        self._dispense_flow_rate = (
+            self._active_tip_settings.default_dispense_flowrate.default
+        )
+        self._blow_out_flow_rate = (
+            self._active_tip_settings.default_blowout_flowrate.default
+        )
+
+        self._tip_overlap_lookup = self._config.tip_overlap_dictionary
 
     @property
     def config(self) -> PipetteConfigurations:
@@ -136,7 +138,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
 
     @property
     def tip_overlap(self) -> Dict[str, float]:
-        return self._tip_overlap
+        return self._tip_overlap_lookup
 
     @property
     def nozzle_offset(self) -> List[float]:
@@ -181,7 +183,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             "Backwards compatibility is not supported at this time."
         )
 
-    def update_config_item(self, elem_name: str, elem_val: Any) -> None:
+    def update_config_item(self, elem_name: Dict[str, Any]) -> None:
         raise NotImplementedError("Update config is not supported at this time.")
 
     @property
@@ -209,11 +211,17 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
 
-        self._aspirate_flow_rate = self._active_tip_settings.default_aspirate_flowrate.default
-        self._dispense_flow_rate = self._active_tip_settings.default_dispense_flowrate.default
-        self._blow_out_flow_rate = self._active_tip_settings.default_blowout_flowrate.default
+        self._aspirate_flow_rate = (
+            self._active_tip_settings.default_aspirate_flowrate.default
+        )
+        self._dispense_flow_rate = (
+            self._active_tip_settings.default_dispense_flowrate.default
+        )
+        self._blow_out_flow_rate = (
+            self._active_tip_settings.default_blowout_flowrate.default
+        )
 
-        self._tip_overlap = {"default": self._active_tip_settings.default_tip_overlap}
+        self._tip_overlap_lookup = self._config.tip_overlap_dictionary
 
     def reset_pipette_offset(self, mount: OT3Mount, to_default: bool) -> None:
         """Reset the pipette offset to system defaults."""
@@ -409,7 +417,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             PipetteTipType(int(self._working_volume))
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
-        self._tip_overlap = {"default": self._active_tip_settings.default_tip_overlap}
+        self._tip_overlap_lookup = self._config.tip_overlap_dictionary
 
     @property
     def available_volume(self) -> float:

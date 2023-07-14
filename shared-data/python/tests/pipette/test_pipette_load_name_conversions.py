@@ -195,7 +195,6 @@ def test_name_type_string_generation(
     assert output == str(data)
 
 
-
 @pytest.mark.parametrize(
     argnames=["model_or_name", "valid"],
     argvalues=[
@@ -215,7 +214,9 @@ def test_name_type_string_generation(
             "p1000_multi_v3.3",
             True,
         ],
-    ])
-def test_supported_pipette(model_or_name: Union[PipetteName, PipetteModel, None],  valid: bool) -> None:
+    ],
+)
+def test_supported_pipette(
+    model_or_name: Union[PipetteName, PipetteModel, None], valid: bool
+) -> None:
     assert ps.supported_pipette(model_or_name) == valid
-

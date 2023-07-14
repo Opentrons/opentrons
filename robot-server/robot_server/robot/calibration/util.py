@@ -116,12 +116,12 @@ async def invalidate_tip(user_flow: CalibrationUserFlow):
 def save_default_pick_up_current(instr: Pipette):
     # reduce pick up current for multichannel pipette picking up 1 tip
     saved_default = instr.pick_up_configurations.current
-    instr.update_config_item("pick_up_current", 0.1)
+    instr.update_config_item({"pick_up_current": 0.1})
 
     try:
         yield
     finally:
-        instr.update_config_item("pick_up_current", saved_default)
+        instr.update_config_item({"pick_up_current": saved_default})
 
 
 async def pick_up_tip(user_flow: CalibrationUserFlow, tip_length: float):

@@ -135,14 +135,14 @@ async def test_save_default_pick_up_current(mock_hw):
     mock_hw.hardware_instruments[Mount.LEFT] = pip
     uf = DeckCalibrationUserFlow(hardware=mock_hw)
 
-    def mock_update_config_item(*args, **kwargs):
+    def mock_update_config_item(*args):
         pass
 
     uf._hw_pipette.update_config_item = MagicMock(side_effect=mock_update_config_item)
     default_current = pip.pick_up_configurations.current
     update_config_calls = [
-        call("pick_up_current", 0.1),
-        call("pick_up_current", default_current),
+        call({"pick_up_current": 0.1}),
+        call({"pick_up_current": default_current}),
     ]
     await uf.pick_up_tip()
     uf._hw_pipette.update_config_item.assert_has_calls(update_config_calls)

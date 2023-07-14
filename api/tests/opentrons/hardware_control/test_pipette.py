@@ -42,7 +42,9 @@ def hardware_pipette_ot2() -> Callable:
         id: str = "testID",
     ):
         pipette_model = pipette_load_name.convert_pipette_model(model)
-        configurations = mutable_configurations.load_with_mutable_configurations(pipette_model, Path("fake/path"), "testiId")
+        configurations = mutable_configurations.load_with_mutable_configurations(
+            pipette_model, Path("fake/path"), "testiId"
+        )
         return ot2_pipette.Pipette(configurations, calibration, id)
 
     return _create_pipette
@@ -220,8 +222,8 @@ def test_volume_tracking(
 def test_config_update(hardware_pipette_ot2: Callable):
     hw_pipette = hardware_pipette_ot2("p10_single_v1")
     sample_plunger_pos = {"top": 19.5}
-    hw_pipette.update_config_item("top", sample_plunger_pos.get("top"))
-    assert hw_pipette.config.top == sample_plunger_pos.get("top")
+    hw_pipette.update_config_item(sample_plunger_pos)
+    assert hw_pipette.plunger_positions.top == sample_plunger_pos.get("top")
 
 
 @pytest.mark.ot2_only
@@ -230,37 +232,19 @@ def test_flow_rate_setting(
 ) -> None:
     hw_pipette = hardware_pipette_ot2("p10_single_v1")
     # pipettes should load settings from config at init time
-    assert (
-        hw_pipette.aspirate_flow_rate
-        == hw_pipette.aspirate_flow_rates_lookup["2.0"]
-    )
-    assert (
-        hw_pipette.dispense_flow_rate
-        == hw_pipette.dispense_flow_rates_lookup["2.0"]
-    )
-    assert (
-        hw_pipette.blow_out_flow_rate
-        == hw_pipette.blow_out_flow_rates_lookup["2.0"]
-    )
+    assert hw_pipette.aspirate_flow_rate == hw_pipette.aspirate_flow_rates_lookup["2.0"]
+    assert hw_pipette.dispense_flow_rate == hw_pipette.dispense_flow_rates_lookup["2.0"]
+    assert hw_pipette.blow_out_flow_rate == hw_pipette.blow_out_flow_rates_lookup["2.0"]
     # changing flow rates with normal property access shouldn't touch
     # config or other flow rates
     hw_pipette.aspirate_flow_rate = 2
     assert hw_pipette.aspirate_flow_rate == 2
-    assert (
-        hw_pipette.dispense_flow_rate
-        == hw_pipette.dispense_flow_rates_lookup["2.0"]
-    )
-    assert (
-        hw_pipette.blow_out_flow_rate
-        == hw_pipette.blow_out_flow_rates_lookup["2.0"]
-    )
+    assert hw_pipette.dispense_flow_rate == hw_pipette.dispense_flow_rates_lookup["2.0"]
+    assert hw_pipette.blow_out_flow_rate == hw_pipette.blow_out_flow_rates_lookup["2.0"]
     hw_pipette.dispense_flow_rate = 3
     assert hw_pipette.aspirate_flow_rate == 2
     assert hw_pipette.dispense_flow_rate == 3
-    assert (
-        hw_pipette.blow_out_flow_rate
-        == hw_pipette.blow_out_flow_rates_lookup["2.0"]
-    )
+    assert hw_pipette.blow_out_flow_rate == hw_pipette.blow_out_flow_rates_lookup["2.0"]
     hw_pipette.blow_out_flow_rate = 4
     assert hw_pipette.aspirate_flow_rate == 2
     assert hw_pipette.dispense_flow_rate == 3

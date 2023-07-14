@@ -185,7 +185,7 @@ class Controller:
         ] = await self._smoothie_driver.read_pipette_model(  # type: ignore
             mount.name.lower()
         )
-        if found_model and pipette_load_name.supported_pipette(found_model):
+        if found_model and not pipette_load_name.supported_pipette(found_model):
             # TODO: Consider how to handle this error - it bubbles up now
             # and will cause problems at higher levels
             MODULE_LOG.error(f"Bad model on {mount.name}: {found_model}")

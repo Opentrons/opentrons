@@ -415,7 +415,6 @@ class API(
                 raise RuntimeError(f"{name} is not a valid pipette name")
         async with self._motion_lock:
             found = await self._backend.get_attached_instruments(checked_require)
-
         for mount, instrument_data in found.items():
             config = instrument_data.get("config")
             req_instr = checked_require.get(mount, None)

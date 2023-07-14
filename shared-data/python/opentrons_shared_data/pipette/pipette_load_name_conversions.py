@@ -29,6 +29,8 @@ def is_model(model_or_name: Union[PipetteName, PipetteModel, None]) -> bool:
     Returns:
         bool: Whether or not the given string is a PipetteModel
     """
+    if not model_or_name:
+        return False
     return "v" in model_or_name
 
 
@@ -77,7 +79,7 @@ def channels_from_string(channels: str) -> PipetteChannelType:
     elif channels == "single":
         return PipetteChannelType.SINGLE_CHANNEL
     else:
-        raise ValueError("Invalid number of channels") 
+        raise ValueError("Invalid number of channels")
 
 
 def version_from_string(version: str) -> PipetteVersionType:
@@ -143,7 +145,7 @@ def generation_from_string(pipette_name_list: List[str]) -> PipetteGenerationTyp
 
 
 def convert_to_pipette_name_type(
-    model_or_name: Union[PipetteName, PipetteModel, None]
+    model_or_name: Union[PipetteName, PipetteModel]
 ) -> PipetteNameType:
     """Convert the py:data:PipetteName to a py:obj:PipetteModelVersionType.
 

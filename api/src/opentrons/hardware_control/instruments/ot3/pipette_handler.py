@@ -333,8 +333,7 @@ class PipetteHandlerProvider:
             pos_dict["blow_out"] = blow_out
         if drop_tip is not None:
             pos_dict["drop_tip"] = drop_tip
-        for key in pos_dict.keys():
-            instr.update_config_item(key, pos_dict[key])
+        instr.update_config_item(pos_dict)
 
     def set_flow_rate(
         self,

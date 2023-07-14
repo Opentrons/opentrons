@@ -58,7 +58,7 @@ def get_virtual_pipette_static_config(
             default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
         ),
         return_tip_scale=tip_configuration.default_return_tip_height,
-        nominal_tip_overlap=tip_configuration.tip_overlap_dictionary,
+        nominal_tip_overlap=config.tip_overlap_dictionary,
     )
 
 
