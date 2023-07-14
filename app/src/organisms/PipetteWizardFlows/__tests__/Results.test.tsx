@@ -92,7 +92,7 @@ describe('Results', () => {
         {
           commandType: 'loadPipette' as const,
           params: {
-            pipetteName: 'p1000_single_gen3',
+            pipetteName: 'p1000_single_flex',
             pipetteId: 'abc',
             mount: 'left',
           },
@@ -124,7 +124,7 @@ describe('Results', () => {
         {
           commandType: 'loadPipette' as const,
           params: {
-            pipetteName: 'p1000_single_gen3',
+            pipetteName: 'p1000_single_flex',
             pipetteId: 'abc',
             mount: 'left',
           },
@@ -323,7 +323,7 @@ describe('Results', () => {
       flowType: FLOWS.ATTACH,
       requiredPipette: {
         id: 'mockId',
-        pipetteName: 'p1000_single_gen3',
+        pipetteName: 'p1000_single_flex',
         mount: LEFT,
       },
     }
@@ -339,7 +339,7 @@ describe('Results', () => {
       flowType: FLOWS.ATTACH,
       requiredPipette: {
         id: 'mockId',
-        pipetteName: 'p50_multi_gen3',
+        pipetteName: 'p50_multi_flex',
         mount: LEFT,
       },
     }
