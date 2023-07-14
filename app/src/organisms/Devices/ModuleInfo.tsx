@@ -49,7 +49,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
   if (physicalPort === null && isAttached) {
     connectionStatus = t('usb_connected_no_port_info')
   } else if (physicalPort != null && isAttached) {
-    connectionStatus = t('usb_port_connected', { port: physicalPort?.port })
+    connectionStatus = t('usb_port_connected', { port: physicalPort.port })
   }
 
   return (

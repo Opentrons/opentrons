@@ -18,7 +18,7 @@ export interface ApiBaseModule {
   moduleType: ModuleType
   firmwareVersion: string
   hasAvailableUpdate: boolean
-  usbPort: PhysicalPort | null
+  usbPort: PhysicalPort
 }
 
 export interface TemperatureData {
