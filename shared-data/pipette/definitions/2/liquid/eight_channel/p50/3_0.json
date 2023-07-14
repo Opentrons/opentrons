@@ -12,7 +12,6 @@
         "default": 4,
         "valuesByApiLevel": { "2.14": 4 }},
       "defaultTipLength": 57.9,
-      "defaultTipOverlap": 10.5,
       "defaultReturnTipHeight": 0.71,
       "aspirate": {
         "default": [
@@ -80,6 +79,10 @@
       },
       "defaultBlowoutVolume": 1.5
     }
+  },
+  "defaultTipOverlapDictionary": {
+    "default": 10.5,
+    "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5
   },
   "maxVolume": 50,
   "minVolume": 0.5,

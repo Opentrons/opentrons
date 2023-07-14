@@ -19,7 +19,6 @@
         "2.0": 94
       }},
       "defaultTipLength": 51.0,
-      "defaultTipOverlap": 8.2,
       "defaultReturnTipHeight": 0.4,
       "aspirate": {
         "opentrons/opentrons_96_filtertiprack_200ul/1": [
@@ -148,9 +147,6 @@
           [296.7631, 0.0007, 9.0766],
           [301.4592, 0.0004, 9.1587]
         ]
-      },
-      "defaultTipOverlapDictionary": {
-        "opentrons/opentrons_96_filtertiprack_200ul/1": 8.2
       },
       "defaultBlowoutVolume": 43.295
     },
@@ -172,7 +168,6 @@
         "2.0": 94
       }},
       "defaultTipLength": 51.0,
-      "defaultTipOverlap": 8.2,
       "defaultReturnTipHeight": 0.4,
       "aspirate": {
         "opentrons/opentrons_96_tiprack_300ul/1": [
@@ -302,11 +297,13 @@
           [301.4592, 0.0004, 9.1587]
         ]
       },
-      "defaultTipOverlapDictionary": {
-        "opentrons/opentrons_96_tiprack_300ul/1": 8.2
-      },
       "defaultBlowoutVolume": 43.295
     }
+  },
+  "defaultTipOverlapDictionary": {
+    "default": 8.2,
+    "opentrons/opentrons_96_tiprack_300ul/1": 8.2,
+    "opentrons/opentrons_96_filtertiprack_200ul/1": 8.2
   },
   "maxVolume": 300,
   "minVolume": 20.0,

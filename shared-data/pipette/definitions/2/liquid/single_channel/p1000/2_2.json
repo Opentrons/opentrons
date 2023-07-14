@@ -21,7 +21,6 @@
         "2.6": 274.7
       }},
       "defaultTipLength": 78.3,
-      "defaultTipOverlap": 9.7,
       "defaultReturnTipHeight": 0.83,
       "aspirate": {
         "opentrons/opentrons_96_tiprack_1000ul/1": [
@@ -283,13 +282,14 @@
           [1013.9597, 0.0001, 27.2644]
         ]
       },
-      "defaultTipOverlapDictionary": {
-        "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
-        "opentrons/geb_96_tiprack_1000ul/1": 9.5
-      },
       "defaultBlowoutVolume": 127.235
     }
+  },
+  "defaultTipOverlapDictionary": {
+    "default": 9.7,
+    "opentrons/opentrons_96_tiprack_1000ul/1": 11.5,
+    "opentrons/opentrons_96_filtertiprack_1000ul/1": 11.5,
+    "opentrons/geb_96_tiprack_1000ul/1": 9.5
   },
   "maxVolume": 1000,
   "minVolume": 100.0,
