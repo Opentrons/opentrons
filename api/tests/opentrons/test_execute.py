@@ -1,3 +1,5 @@
+"""Tests for `opentrons.execute`."""
+
 from __future__ import annotations
 import io
 import json
@@ -40,7 +42,7 @@ def api_version(request: pytest.FixtureRequest) -> APIVersion:
 
 
 @pytest.fixture
-def mock_get_attached_instr(
+def mock_get_attached_instr(  # noqa: D103
     monkeypatch: pytest.MonkeyPatch,
     virtual_smoothie_env: None,
 ) -> mock.AsyncMock:
@@ -76,6 +78,7 @@ def test_execute_function_apiv2(
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
+    """Test `execute()` with a Python file."""
     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
         "config": load(PipetteModel("p10_single_v1.5")),
         "id": "testid",
@@ -99,11 +102,12 @@ def test_execute_function_apiv2(
     ]
 
 
-def test_execute_function_json_v3_apiv2(
+def test_execute_function_json_v3(
     get_json_protocol_fixture: Callable[[str, str, bool], str],
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
+    """Test `execute()` with a JSONv3 file."""
     jp = get_json_protocol_fixture("3", "simple", False)
     filelike = io.StringIO(jp)
     entries = []
@@ -129,11 +133,12 @@ def test_execute_function_json_v3_apiv2(
     ]
 
 
-def test_execute_function_json_v4_apiv2(
+def test_execute_function_json_v4(
     get_json_protocol_fixture: Callable[[str, str, bool], str],
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
+    """Test `execute()` with a JSONv4 file."""
     jp = get_json_protocol_fixture("4", "simpleV4", False)
     filelike = io.StringIO(jp)
     entries = []
@@ -159,11 +164,12 @@ def test_execute_function_json_v4_apiv2(
     ]
 
 
-def test_execute_function_json_v5_apiv2(
+def test_execute_function_json_v5(
     get_json_protocol_fixture: Callable[[str, str, bool], str],
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
+    """Test `execute()` with a JSONv5 file."""
     jp = get_json_protocol_fixture("5", "simpleV5", False)
     filelike = io.StringIO(jp)
     entries = []
@@ -196,6 +202,7 @@ def test_execute_function_bundle_apiv2(
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
+    """Test `execute()` with a .zip bundle."""
     bundle = get_bundle_fixture("simple_bundle")
     entries = []
 
@@ -240,10 +247,12 @@ class TestExecutePythonLabware:
 
     @pytest.fixture(autouse=True)
     def use_virtual_smoothie_env(self, virtual_smoothie_env: None) -> None:
+        """Automatically enable the virtual_smoothie_env fixture for every test."""
         pass
 
     @pytest.fixture
     def protocol_path(self, tmp_path: Path, api_version: APIVersion) -> Path:
+        """Return a path to a Python protocol file that loads a custom labware."""
         path = tmp_path / "protocol.py"
         protocol_source = textwrap.dedent(
             f"""\
@@ -261,10 +270,12 @@ class TestExecutePythonLabware:
 
     @pytest.fixture
     def protocol_name(self, protocol_path: Path) -> str:
+        """Return the file name of the Python protocol file."""
         return protocol_path.name
 
     @pytest.fixture
     def protocol_filelike(self, protocol_path: Path) -> Generator[TextIO, None, None]:
+        """Return the Python protocol file opened as a stream."""
         with open(protocol_path) as file:
             yield file
 
@@ -344,6 +355,7 @@ class TestGetProtocolAPILabware:
 
     @pytest.fixture(autouse=True)
     def use_virtual_smoothie_env(self, virtual_smoothie_env: None) -> None:
+        """Automatically enable the virtual_smoothie_env fixture for every test."""
         pass
 
     def test_default_no_extra_labware(

@@ -1,3 +1,5 @@
+"""Tests for `opentrons.simulate`."""
+
 from __future__ import annotations
 import io
 import json
@@ -53,6 +55,7 @@ def test_simulate_function_apiv2(
     protocol_file: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """Test `simulate()` with a Python file."""
     monkeypatch.setenv("OT_API_FF_allowBundleCreation", "1")
     runlog, bundle = simulate.simulate(protocol.filelike, protocol.filename)
     assert isinstance(bundle, protocols.types.BundleContents)
@@ -64,9 +67,10 @@ def test_simulate_function_apiv2(
     ]
 
 
-def test_simulate_function_json_apiv2(
+def test_simulate_function_json(
     get_json_protocol_fixture: Callable[[str, str, bool], str]
 ) -> None:
+    """Test `simulate()` with a JSON file."""
     jp = get_json_protocol_fixture("3", "simple", False)
     filelike = io.StringIO(jp)
     runlog, bundle = simulate.simulate(filelike, "simple.json")
@@ -86,6 +90,7 @@ def test_simulate_function_json_apiv2(
 def test_simulate_function_bundle_apiv2(
     get_bundle_fixture: Callable[[str], Bundle]
 ) -> None:
+    """Test `simulate()` with a .zip bundle."""
     bundle_fixture = get_bundle_fixture("simple_bundle")
     runlog, bundle = simulate.simulate(
         cast(TextIO, bundle_fixture["filelike"]),
@@ -113,6 +118,7 @@ def test_simulate_function_bundle_apiv2(
 
 @pytest.mark.parametrize("protocol_file", ["testosaur.py"])
 def test_simulate_function_v1(protocol: Protocol, protocol_file: str) -> None:
+    """Test `simulate()` with an obsolete Python file."""
     with pytest.raises(ApiDeprecationError):
         simulate.simulate(protocol.filelike, "testosaur.py")
 
@@ -123,6 +129,7 @@ def test_simulate_aspirate_tip(
     protocol_file: str,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """Integration test for https://github.com/opentrons/opentrons/issues/7552."""
     with pytest.raises(ExceptionInProtocolError):
         simulate.simulate(protocol.filelike, "bug_aspirate_tip.py")
 
