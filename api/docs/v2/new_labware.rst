@@ -50,7 +50,7 @@ Throughout this section, we'll use the labware listed in the following table.
       - `Opentrons 96 Tip Rack 300 µL <https://labware.opentrons.com/opentrons_96_tiprack_300ul>`_
       - ``opentrons_96_tiprack_300ul``
 
-Following the example in the :ref:`overview-section-v2`, here is how to the :py:meth:`.ProtocolContext.load_labware` method to load labware on either Flex or OT-2. 
+Similar to the code sample in :ref:`overview-section-v2`, here's how you use the :py:meth:`.ProtocolContext.load_labware` method to load labware on either Flex or OT-2. 
 
 .. code-block:: python
 
@@ -66,10 +66,11 @@ Following the example in the :ref:`overview-section-v2`, here is how to the :py:
 
 When the ``load_labware`` method loads labware into your protocol, it returns a :py:class:`opentrons.protocol_api.labware.Labware` object.
 
-.. _labware-label:   
+.. _labware-label:
+
 .. Tip::
     
-    The ``load_labware`` method also accepts an optional ``label`` argument. You can use it to help identify labware with a descriptive label. If used, the label value is displayed in the Opentrons App. For example::
+    The ``load_labware`` method includes an optional ``label`` argument. You can use it to identify labware with a descriptive name. If used, the label value is displayed in the Opentrons App. For example::
         
         tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat',
                                         location= 'D1',  # Flex deck slot
@@ -78,9 +79,19 @@ When the ``load_labware`` method loads labware into your protocol, it returns a 
 Loading Labware on Adapters
 ===========================
 
+The previous example demonstrates working with labware that's mounted in a deck slot. But what do you do when you need to load labware onto an adapter and use it with a module? Well, our Python API gives you two options. The first option uses preconfigured API load names and applies to labware and adapter combinations for the `Heater-Shaker GEN1 module <https://opentrons.com/products/modules/heater-shaker/>`_. The second option includes the ``adapter`` argument which is part of the ``load_labware`` method. Let's examine how each of these options work.
 
+Loading Labware on Heater-Shaker Adapters
+-----------------------------------------
 
-TBD use examples from PR 13016 and RLAB-343. This is the ``adapter`` argument.
+Lorem ipsum
+
+Loading Labware and Adapters with ``load_labware``
+--------------------------------------------------
+
+Lorem ipsum
+
+.. TBD use examples from PR 13016 and RLAB-343. This is the ``adapter`` argument.
 
 
 .. _new-well-access:
