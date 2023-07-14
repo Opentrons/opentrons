@@ -180,6 +180,7 @@ async def _move_and_check(api: OT3API, is_simulating: bool, mount: types.OT3Moun
         if abs(estimate[ax] - encoder[ax]) <= THRESHOLD_MM
     ]
     for ax in GANTRY_AXES:
+        print(str(ax) + str(estimate[ax] - encoder[ax]))
         if ax in all_aligned_axes:
             aligned = True
         else:
@@ -294,7 +295,7 @@ def _creat_z_axis_settings(arguments: argparse.Namespace) -> List:
                     max_start_stop_speed=5,
                     max_change_dir_speed=1,
                     hold_current=0.8,
-                    run_current=current,
+                    run_current=current
                 ),
                 types.OT3Axis.Z_R: helpers_ot3.GantryLoadSettings(
                     max_speed=speed,
@@ -302,16 +303,18 @@ def _creat_z_axis_settings(arguments: argparse.Namespace) -> List:
                     max_start_stop_speed=5,
                     max_change_dir_speed=1,
                     hold_current=0.8,
-                    run_current=current,
+                    run_current=current
                 )
                 }
                 Z_AXIS_SETTINGS.append(Z_AXIS_SETTING)
 
     return Z_AXIS_SETTINGS
 
+
 def _creat_xy_axis_settings(arguments: argparse.Namespace) -> List:
-    if (arguments.x_accelerations and arguments.x_speeds and arguments.x_currents
-    and arguments.y_accelerations and arguments.y_speeds and arguments.y_currents):
+    x_args = arguments.x_accelerations and arguments.x_speeds and arguments.x_currents
+    y_args = arguments.y_accelerations and arguments.y_speeds and arguments.y_currents
+    if x_args and y_args:
         accelerations_x = [float(acc) for acc in arguments.x_accelerations.strip().replace(' ','').split(',')]
         speeds_x = [float(spe) for spe in arguments.x_speeds.strip().replace(' ','').split(',')]
         currents_x = [float(cur) for cur in arguments.x_currents.strip().replace(' ','').split(',')]
@@ -329,27 +332,26 @@ def _creat_xy_axis_settings(arguments: argparse.Namespace) -> List:
     speeds = zip(speeds_x, speeds_y)
     accelerations = zip(accelerations_x, accelerations_y)
     currents = zip(currents_x, currents_y)
-    xi = 0
-    yi = 1
-    for speed in speeds:
-        for acceleration in accelerations:
-            for current in currents:
+
+    for speed_x, speed_y in zip(speeds_x, speeds_y):
+        for acceleration_x, acceleration_y in zip(accelerations_x, accelerations_y):
+            for current_x, current_y in zip(currents_x, currents_y):
                 XY_AXIS_SETTING = {
                 types.OT3Axis.X: helpers_ot3.GantryLoadSettings(
-                    max_speed=speed[xi],
-                    acceleration=acceleration[xi],
+                    max_speed=speed_x,
+                    acceleration=acceleration_x,
                     max_start_stop_speed=10,
                     max_change_dir_speed=5,
                     hold_current=0.5,
-                    run_current=current[xi],
+                    run_current=current_x
                 ),
                 types.OT3Axis.Y: helpers_ot3.GantryLoadSettings(
-                    max_speed=speed[yi],
-                    acceleration=acceleration[yi],
+                    max_speed=speed_y,
+                    acceleration=acceleration_y,
                     max_start_stop_speed=10,
                     max_change_dir_speed=5,
                     hold_current=0.5,
-                    run_current=current[yi],
+                    run_current=current_y
                 )
                 }
                 XY_AXIS_SETTINGS.append(XY_AXIS_SETTING)
@@ -381,6 +383,7 @@ async def _run_z_motion(arguments: argparse.Namespace, api: OT3API, mount: types
 async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: types.OT3Mount, write_cb: Callable) -> None:
     ui.print_header('Run xy motion check...')
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
+    print(XY_AXIS_SETTINGS)
     for setting in XY_AXIS_SETTINGS:
         print(f'X: Run speed={setting[OT3Axis.X].max_speed}, acceleration={setting[OT3Axis.X].acceleration}, current={setting[OT3Axis.X].run_current}')
         print(f'Y: Run speed={setting[OT3Axis.Y].max_speed}, acceleration={setting[OT3Axis.Y].acceleration}, current={setting[OT3Axis.Y].run_current}')
@@ -453,11 +456,9 @@ async def _main(arguments: argparse.Namespace) -> None:
     except KeyboardInterrupt:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
     finally:
-        # await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+        await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
         await api.clean_up()
 
-    await api.disengage_axes([types.OT3Axis.X, types.OT3Axis.Y])
-    await api.clean_up()
     ui.print_title('Test Done')
 
 
