@@ -346,11 +346,11 @@ def simulate(  # noqa: C901
 
     :param protocol_file: The protocol file to simulate.
     :param file_name: The name of the file
-    :param custom_labware_paths: A list of directories to search for custom
-                                 labware, or None. Ignored if the apiv2 feature
-                                 flag is not set. Loads valid labware from
-                                 these paths and makes them available to the
-                                 protocol context.
+    :param custom_labware_paths: A list of directories to search for custom labware.
+                                 Loads valid labware from these paths and makes them available
+                                 to the protocol context. If this is `None` (the default), and this
+                                 function is called on a robot, it will look in the 'labware'
+                                 subdirectory of the Jupyter data directory.
     :param custom_data_paths: A list of directories or files to load custom
                               data files from. Ignored if the apiv2 feature
                               flag if not set. Entries may be either files or
