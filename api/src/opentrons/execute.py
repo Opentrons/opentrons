@@ -60,6 +60,8 @@ from opentrons.protocol_api.protocol_context import ProtocolContext
 from opentrons.protocol_engine import (
     Config,
     DeckType,
+    EngineStatus,
+    ErrorOccurrence as ProtocolEngineErrorOccurrence,
     create_protocol_engine,
     create_protocol_engine_in_thread,
 )
@@ -474,17 +476,61 @@ def main() -> int:
         stack_logger.addHandler(logging.StreamHandler(sys.stdout))
         log_level = args.log_level
     else:
+        # TODO(mm, 2023-07-13): This default logging prints error information redundantly
+        # when executing via Protocol Engine, because Protocol Engine logs when commands fail.
         log_level = "warning"
-    # Try to migrate containers from database to v2 format
-    execute(
-        protocol_file=args.protocol,
-        protocol_name=args.protocol.name,
-        custom_labware_paths=args.custom_labware_path,
-        custom_data_paths=(args.custom_data_path + args.custom_data_file),
-        log_level=log_level,
-        emit_runlog=printer,
-    )
-    return 0
+
+    try:
+        execute(
+            protocol_file=args.protocol,
+            protocol_name=args.protocol.name,
+            custom_labware_paths=args.custom_labware_path,
+            custom_data_paths=(args.custom_data_path + args.custom_data_file),
+            log_level=log_level,
+            emit_runlog=printer,
+        )
+        return 0
+    except _ProtocolEngineExecuteError as error:
+        # _ProtocolEngineExecuteError is a wrapper that's meaningless to the CLI user.
+        # Take the actual protocol problem out of it and just print that.
+        print(error.to_stderr_string(), file=sys.stderr)
+        return 1
+    # execute() might raise other exceptions, but we don't have a nice way to print those.
+    # Just let Python show a traceback.
+
+
+class _ProtocolEngineExecuteError(Exception):
+    def __init__(self, errors: List[ProtocolEngineErrorOccurrence]) -> None:
+        """Raised when there was any fatal error running a protocol through Protocol Engine.
+
+        Protocol Engine reports errors as data, not as exceptions.
+        But the only way for `execute()` to signal problems to its caller is to raise something.
+        So we need this class to wrap them.
+
+        Params:
+            errors: The errors that Protocol Engine reported.
+        """
+        # Show the full error details if this is part of a traceback. Don't try to summarize.
+        super().__init__(errors)
+        self._error_occurrences = errors
+
+    def to_stderr_string(self) -> str:
+        """Return a string suitable as the stderr output of the `opentrons_execute` CLI.
+
+        This summarizes from the full error details.
+        """
+        # It's unclear what exactly we should extract here.
+        #
+        # First, do we print the first element, or the last, or all of them?
+        #
+        # Second, do we print the .detail? .errorCode? .errorInfo? .wrappedErrors?
+        # By contract, .detail seems like it would be insufficient, but experimentally,
+        # it includes a lot, like:
+        #
+        #     ProtocolEngineError [line 3]: Error 4000 GENERAL_ERROR (ProtocolEngineError):
+        #     UnexpectedProtocolError: Labware "fixture_12_trough" not found with version 1
+        #     in namespace "fixture".
+        return self._error_occurrences[0].detail
 
 
 def _create_live_context_non_pe(
@@ -611,7 +657,10 @@ def _run_file_pe(
 
         # TODO(mm, 2023-06-30): This will home and drop tips at the end, which is not how
         # things have historically behaved with PAPIv2.13 and older or JSONv5 and older.
-        await protocol_runner.run(protocol_source)
+        result = await protocol_runner.run(protocol_source)
+
+        if result.state_summary.status != EngineStatus.SUCCEEDED:
+            raise _ProtocolEngineExecuteError(result.state_summary.errors)
 
     with _adapt_protocol_source(
         protocol_file=protocol_file,
