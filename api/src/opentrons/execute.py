@@ -337,9 +337,6 @@ def execute(  # noqa: C901
                               are presented by the protocol context in
                               ``ProtocolContext.bundled_data``.
 
-    :raises Exception: If the device that you're running this on doesn't match the ``robotType``
-        that the protocol declares in its ``requirements`` dict.
-
     The format of the runlog entries is as follows:
 
     .. code-block:: python
