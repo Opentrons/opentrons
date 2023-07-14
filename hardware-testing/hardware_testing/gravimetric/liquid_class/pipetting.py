@@ -219,7 +219,6 @@ def _pipette_with_liquid_settings(
     touch_tip: bool = False,
 ) -> None:
     """Run a pipette given some Pipetting Liquid Settings."""
-
     # FIXME: stop using hwapi, and get those functions into core software
     hw_api = ctx._core.get_hardware()
     hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
@@ -316,7 +315,6 @@ def _pipette_with_liquid_settings(
     _change_plunger_acceleration(
         ctx, pipette, liquid_class.dispense.plunger_acceleration
     )
-    # TODO: should this be made higher, to avoid touch-tip bug?
     pipette.move_to(well.bottom(approach_mm).move(channel_offset))
     _aspirate_on_approach() if aspirate else _dispense_on_approach()
 
