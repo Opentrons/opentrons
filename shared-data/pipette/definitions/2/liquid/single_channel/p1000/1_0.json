@@ -4,13 +4,16 @@
     "t1000": {
       "defaultAspirateFlowRate": {
         "default": 500,
-        "valuesByApiLevel": { "2.0": 500 }},
+        "valuesByApiLevel": { "2.0": 500 }
+      },
       "defaultDispenseFlowRate": {
         "default": 1000,
-        "valuesByApiLevel": { "2.0": 1000 }},
+        "valuesByApiLevel": { "2.0": 1000 }
+      },
       "defaultBlowOutFlowRate": {
         "default": 1000,
-        "valuesByApiLevel": { "2.0": 1000 }},
+        "valuesByApiLevel": { "2.0": 1000 }
+      },
       "defaultTipLength": 76.7,
       "aspirate": {
         "opentrons/opentrons_96_tiprack_1000ul/1": [

@@ -40,7 +40,8 @@
     "maxVolume",
     "minVolume",
     "defaultTipracks",
-    "supportedTips"
+    "supportedTips",
+    "defaultTipOverlapDictionary"
   ],
   "additionalProperties": false,
   "properties": {
@@ -77,9 +78,6 @@
               "defaultTipLength": {
                 "$ref": "#/definitions/positiveNumber"
               },
-              "defaultTipOverlap": {
-                "$ref": "#/definitions/positiveNumber"
-              },
               "defaultReturnTipHeight": {
                 "$ref": "#/definitions/positiveNumber"
               },
@@ -95,6 +93,16 @@
           }
         }
       }
+    },
+    "defaultTipOverlapDictionary": {
+      "type": "object",
+      "description": "Map of tip overlap values with defaults",
+      "required": ["default"],
+      "$comment": "Other keys in here should be labware URIs",
+      "properties": {
+        "default": { "type": "number" }
+      },
+      "additionalProperties": { "type": "number" }
     },
     "maxVolume": { "$ref": "#/definitions/positiveNumber" },
     "minVolume": { "$ref": "#/definitions/positiveNumber" },

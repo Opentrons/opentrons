@@ -4,13 +4,16 @@
     "t50": {
       "defaultAspirateFlowRate": {
         "default": 8,
-        "valuesByApiLevel": { "2.14": 8 }},
+        "valuesByApiLevel": { "2.14": 8 }
+      },
       "defaultDispenseFlowRate": {
         "default": 8,
-        "valuesByApiLevel": { "2.14": 8 }},
+        "valuesByApiLevel": { "2.14": 8 }
+      },
       "defaultBlowOutFlowRate": {
         "default": 4,
-        "valuesByApiLevel": { "2.14": 4 }},
+        "valuesByApiLevel": { "2.14": 4 }
+      },
       "defaultTipLength": 57.9,
       "defaultReturnTipHeight": 0.71,
       "aspirate": {

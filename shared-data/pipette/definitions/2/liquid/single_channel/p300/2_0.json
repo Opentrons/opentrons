@@ -5,15 +5,17 @@
       "defaultAspirateFlowRate": {
         "default": 92.86,
         "valuesByApiLevel": {
-        "2.0": 46.43,
-        "2.6": 92.86
-      }},
+          "2.0": 46.43,
+          "2.6": 92.86
+        }
+      },
       "defaultDispenseFlowRate": {
         "default": 92.86,
         "valuesByApiLevel": {
-        "2.0": 46.43,
-        "2.6": 92.86
-      }},
+          "2.0": 46.43,
+          "2.6": 92.86
+        }
+      },
       "defaultBlowOutFlowRate": {
         "default": 92.86,
         "valuesByApiLevel": {
@@ -156,15 +158,17 @@
       "defaultAspirateFlowRate": {
         "default": 92.86,
         "valuesByApiLevel": {
-        "2.0": 46.43,
-        "2.6": 92.86
-      }},
+          "2.0": 46.43,
+          "2.6": 92.86
+        }
+      },
       "defaultDispenseFlowRate": {
         "default": 92.86,
         "valuesByApiLevel": {
-        "2.0": 46.43,
-        "2.6": 92.86
-      }},
+          "2.0": 46.43,
+          "2.6": 92.86
+        }
+      },
       "defaultBlowOutFlowRate": {
         "default": 92.86,
         "valuesByApiLevel": {

@@ -5,8 +5,9 @@
       "defaultAspirateFlowRate": {
         "default": 478,
         "valuesByApiLevel": {
-        "2.14": 478
-      }},
+          "2.14": 478
+        }
+      },
       "defaultDispenseFlowRate": {
         "default": 160,
         "valuesByApiLevel": {
@@ -16,8 +17,9 @@
       "defaultBlowOutFlowRate": {
         "default": 160,
         "valuesByApiLevel": {
-        "2.14": 160
-      }},
+          "2.14": 160
+        }
+      },
       "defaultTipLength": 57.9,
       "defaultReturnTipHeight": 0.71,
       "aspirate": {
@@ -118,8 +120,9 @@
       "defaultAspirateFlowRate": {
         "default": 716,
         "valuesByApiLevel": {
-        "2.14": 716
-      }},
+          "2.14": 716
+        }
+      },
       "defaultDispenseFlowRate": {
         "default": 160,
         "valuesByApiLevel": {
@@ -129,8 +132,9 @@
       "defaultBlowOutFlowRate": {
         "default": 160,
         "valuesByApiLevel": {
-        "2.14": 160
-      }},
+          "2.14": 160
+        }
+      },
       "defaultTipLength": 58.35,
       "defaultReturnTipHeight": 0.71,
       "aspirate": {
@@ -229,8 +233,9 @@
       "defaultAspirateFlowRate": {
         "default": 716,
         "valuesByApiLevel": {
-        "2.14": 716
-      }},
+          "2.14": 716
+        }
+      },
       "defaultDispenseFlowRate": {
         "default": 160,
         "valuesByApiLevel": {
@@ -240,8 +245,9 @@
       "defaultBlowOutFlowRate": {
         "default": 160,
         "valuesByApiLevel": {
-        "2.14": 160
-      }},
+          "2.14": 160
+        }
+      },
       "defaultTipLength": 95.6,
       "defaultReturnTipHeight": 0.82,
       "aspirate": {

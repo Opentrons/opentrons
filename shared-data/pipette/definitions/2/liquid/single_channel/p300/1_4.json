@@ -4,13 +4,16 @@
     "t200": {
       "defaultAspirateFlowRate": {
         "default": 150,
-        "valuesByApiLevel": { "2.0": 150 }},
+        "valuesByApiLevel": { "2.0": 150 }
+      },
       "defaultDispenseFlowRate": {
         "default": 300,
-        "valuesByApiLevel": { "2.0": 300 }},
+        "valuesByApiLevel": { "2.0": 300 }
+      },
       "defaultBlowOutFlowRate": {
         "default": 1000,
-        "valuesByApiLevel": { "2.0": 1000 }},
+        "valuesByApiLevel": { "2.0": 1000 }
+      },
       "defaultTipLength": 51.7,
       "aspirate": {
         "opentrons/tipone_96_tiprack_200ul/1": [
@@ -49,13 +52,16 @@
     "t300": {
       "defaultAspirateFlowRate": {
         "default": 150,
-        "valuesByApiLevel": { "2.0": 150 }},
+        "valuesByApiLevel": { "2.0": 150 }
+      },
       "defaultDispenseFlowRate": {
         "default": 300,
-        "valuesByApiLevel": { "2.0": 300 }},
+        "valuesByApiLevel": { "2.0": 300 }
+      },
       "defaultBlowOutFlowRate": {
         "default": 1000,
-        "valuesByApiLevel": { "2.0": 1000 }},
+        "valuesByApiLevel": { "2.0": 1000 }
+      },
       "defaultTipLength": 51.7,
       "aspirate": {
         "opentrons/opentrons_96_tiprack_300ul/1": [
