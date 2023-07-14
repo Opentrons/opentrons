@@ -14,9 +14,10 @@ from opentrons_shared_data import get_shared_data_root, load_shared_data
 from opentrons_shared_data.pipette.dev_types import PipetteModel
 
 from opentrons import execute, types
-from opentrons.hardware_control import Controller, api
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.config.pipette_config import load
+from opentrons.hardware_control import Controller, api
+from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
+from opentrons.protocols.api_support.types import APIVersion
 
 if TYPE_CHECKING:
     from tests.opentrons.conftest import Bundle, Protocol
@@ -25,13 +26,7 @@ if TYPE_CHECKING:
 HERE = Path(__file__).parent
 
 
-@pytest.fixture(
-    params=[
-        APIVersion(2, 0),
-        # TODO(mm, 2023-07-14): Enable this for https://opentrons.atlassian.net/browse/RSS-268.
-        # ENGINE_CORE_API_VERSION,
-    ]
-)
+@pytest.fixture(params=[APIVersion(2, 0), ENGINE_CORE_API_VERSION])
 def api_version(request: pytest.FixtureRequest) -> APIVersion:
     """Return an API version to test with.
 
@@ -61,12 +56,15 @@ def mock_get_attached_instr(  # noqa: D103
 
 
 @pytest.mark.parametrize(
-    "protocol_file",
+    ("protocol_file", "expect_run_log"),
     [
-        "testosaur_v2.py",
-        # TODO(mm, 2023-07-14): Resolve this xfail. https://opentrons.atlassian.net/browse/RSS-268
+        ("testosaur_v2.py", True),
+        ("testosaur_v2_14.py", False),
+        # FIXME(mm, 2023-07-20): Support printing the run log when executing new protocols.
+        # Then, remove this expect_run_log parametrization (it should always be True).
         pytest.param(
             "testosaur_v2_14.py",
+            True,
             marks=pytest.mark.xfail(strict=True, raises=NotImplementedError),
         ),
     ],
@@ -74,6 +72,7 @@ def mock_get_attached_instr(  # noqa: D103
 def test_execute_function_apiv2(
     protocol: Protocol,
     protocol_file: str,
+    expect_run_log: bool,
     virtual_smoothie_env: None,
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
@@ -92,13 +91,21 @@ def test_execute_function_apiv2(
         nonlocal entries
         entries.append(entry)
 
-    execute.execute(protocol.filelike, protocol.filename, emit_runlog=emit_runlog)
-    assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
-        "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on 1",
-        "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
-        "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
-        "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on 1",
-    ]
+    execute.execute(
+        protocol.filelike,
+        protocol.filename,
+        emit_runlog=(emit_runlog if expect_run_log else None),
+    )
+
+    if expect_run_log:
+        assert [
+            item["payload"]["text"] for item in entries if item["$"] == "before"
+        ] == [
+            "Picking up tip from A1 of Opentrons 96 Tip Rack 1000 µL on 1",
+            "Aspirating 100.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 500.0 uL/sec",
+            "Dispensing 100.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1000.0 uL/sec",
+            "Dropping tip into H12 of Opentrons 96 Tip Rack 1000 µL on 1",
+        ]
 
 
 def test_execute_function_json_v3(
