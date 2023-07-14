@@ -64,7 +64,7 @@ Following the example in the :ref:`overview-section-v2`, here is how to the :py:
     tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
     plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '2')
 
-After the ``load_labware`` method loads labware into your protocol, it returns a :py:class:`opentrons.protocol_api.labware.Labware` object.
+When the ``load_labware`` method loads labware into your protocol, it returns a :py:class:`opentrons.protocol_api.labware.Labware` object.
 
 .. Recommend a call-out instead of a section (H2, H3) for "label." It's more a "pro tip" nice-to-have rather than
 .. an item that requires its own section.
