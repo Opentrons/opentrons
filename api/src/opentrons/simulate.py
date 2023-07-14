@@ -179,10 +179,6 @@ def get_protocol_api(
         >>> instr = protocol.load_instrument('p300_single', 'right')
         >>> instr.home()
 
-    If ``extra_labware`` is not specified, any labware definitions saved in
-    the ``labware`` directory of the Jupyter notebook directory will be
-    available.
-
     :param version: The API version to use. This must be lower than
                     ``opentrons.protocol_api.MAX_SUPPORTED_VERSION``.
                     It may be specified either as a string (``'2.0'``) or
@@ -196,14 +192,11 @@ def get_protocol_api(
                             and is best not used.
     :param bundled_data: If specified, a mapping from filenames to contents
                          for data to be available in the protocol from
-                         ``protocol_api.ProtocolContext.bundled_data``.
-    :param extra_labware: If specified, a mapping from labware names to
-                          labware definitions for labware to consider in the
-                          protocol in addition to those stored on the robot.
-                          If this is an empty dict, and this function is called
-                          on a robot, it will look in the 'labware'
-                          subdirectory of the Jupyter data directory for
-                          custom labware.
+                         :py:obj:`opentrons.protocol_api.ProtocolContext.bundled_data`.
+    :param extra_labware: A mapping from labware load names to custom labware definitions.
+                          If this is `None` (the default), and this function is called on a robot,
+                          it will look for labware in the 'labware' subdirectory of the Jupyter data
+                          directory.
     :param hardware_simulator: If specified, a hardware simulator instance.
     :param machine: Either `"ot2"` or `"ot3"`. If `None`, machine will be
                     determined from persistent settings.
