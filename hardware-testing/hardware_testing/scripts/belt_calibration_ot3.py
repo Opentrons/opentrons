@@ -179,6 +179,13 @@ async def _check_belt_accuracy_probe(api: OT3API, mount: types.OT3Mount) -> None
     ui.print_header("CHECK BELT ACCURACY WITH PROBE")
     for slot in [1, 3, 10, 12]:
         await api.home()
+        if args.mode == "dial":
+            if slot == 1 or slot == 3:
+                if slot == 1:
+                    position = "left"
+                elif slot == 3:
+                    position = "right"
+                input(f"Keep pulling {position.upper()} Dial Indicator plunger, and press ENTER:")
         # if not api.is_simulator:
         #     ui.get_user_ready(f"about to find offset of slot #{slot}")
         await api.add_tip(mount, api.config.calibration.probe_length)
