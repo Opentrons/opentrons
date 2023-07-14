@@ -303,6 +303,7 @@ def _pipette_with_liquid_settings(
             # NOTE: calculated using blow-out distance (mm) and the nominal ul-per-mm
             max_blow_out_volume = 79.5 if pipette.max_volume >= 1000 else 3.9
             hw_api.blow_out(hw_mount, max_blow_out_volume)
+            hw_api.prepare_for_aspirate(hw_mount)
         if touch_tip:
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
         # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
