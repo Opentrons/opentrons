@@ -55,6 +55,31 @@ def _translate_labware_command(
     return labware_command
 
 
+def _translate_v7_labware_command(
+    command: protocol_schema_v7.Command,
+) -> pe_commands.LoadLabwareCreate:
+    labware_id = command.params.labwareId
+    # v6 data model supports all commands and therefor most props are optional.
+    # load labware command must contain labware_id and definition_id.
+    assert labware_id is not None
+    labware_command = pe_commands.LoadLabwareCreate(
+        params=pe_commands.LoadLabwareParams(
+            labwareId=command.params.labwareId,
+            displayName=command.params.displayName,
+            version=command.params.version,
+            namespace=command.params.namespace,
+            loadName=command.params.loadName,
+            location=parse_obj_as(
+                # https://github.com/samuelcolvin/pydantic/issues/1847
+                LabwareLocation,  # type: ignore[arg-type]
+                command.params.location,
+            ),
+        ),
+        key=command.key,
+    )
+    return labware_command
+
+
 def _translate_module_command(
     protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7],
     command: Union[protocol_schema_v6.Command, protocol_schema_v7.Command],
@@ -76,6 +101,24 @@ def _translate_module_command(
     return translated_obj
 
 
+def _translate_v7_module_command(
+    command: Union[protocol_schema_v6.Command, protocol_schema_v7.Command],
+) -> pe_commands.CommandCreate:
+    module_id = command.params.moduleId
+    # v6 data model supports all commands and therefor most props are optional.
+    # load module command must contain module_id. modules cannot be None.
+    assert module_id is not None
+    translated_obj = pe_commands.LoadModuleCreate(
+        params=pe_commands.LoadModuleParams(
+            model=ModuleModel(command.params.model),
+            location=DeckSlotLocation.parse_obj(command.params.location),
+            moduleId=command.params.moduleId,
+        ),
+        key=command.key,
+    )
+    return translated_obj
+
+
 def _translate_pipette_command(
     protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7],
     command: Union[protocol_schema_v6.Command, protocol_schema_v7.Command],
@@ -87,6 +130,24 @@ def _translate_pipette_command(
     translated_obj = pe_commands.LoadPipetteCreate(
         params=pe_commands.LoadPipetteParams(
             pipetteName=PipetteNameType(protocol.pipettes[pipette_id].name),
+            mount=MountType(command.params.mount),
+            pipetteId=command.params.pipetteId,
+        ),
+        key=command.key,
+    )
+    return translated_obj
+
+
+def _translate_v7_pipette_command(
+    command: protocol_schema_v7.Command,
+) -> pe_commands.CommandCreate:
+    pipette_id = command.params.pipetteId
+    # v6 data model supports all commands and therefor most props are optional.
+    # load pipette command must contain pipette_id.
+    assert pipette_id is not None
+    translated_obj = pe_commands.LoadPipetteCreate(
+        params=pe_commands.LoadPipetteParams(
+            pipetteName=PipetteNameType(command.params.pipetteName),
             mount=MountType(command.params.mount),
             pipetteId=command.params.pipetteId,
         ),
@@ -139,9 +200,9 @@ class JsonTranslator:
             for liquid_id, liquid in protocol_liquids.items()
         ]
 
-    def translate_commands(
+    def translate_v6_commands(
         self,
-        protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7],
+        protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:
         """Takes json protocol v6 and translates commands->protocol engine commands."""
         commands_list: List[pe_commands.CommandCreate] = []
@@ -152,6 +213,24 @@ class JsonTranslator:
                 translated_obj = _translate_module_command(protocol, command)
             elif command.commandType == "loadLabware":
                 translated_obj = _translate_labware_command(protocol, command)
+            else:
+                translated_obj = _translate_simple_command(command)
+            commands_list.append(translated_obj)
+        return commands_list
+
+    def translate_v7_commands(
+        self,
+        protocol: Union[ProtocolSchemaV6],
+    ) -> List[pe_commands.CommandCreate]:
+        """Takes json protocol v6 and translates commands->protocol engine commands."""
+        commands_list: List[pe_commands.CommandCreate] = []
+        for command in protocol.commands:
+            if command.commandType == "loadPipette":
+                translated_obj = _translate_v7_pipette_command(protocol, command)
+            elif command.commandType == "loadModule":
+                translated_obj = _translate_v7_module_command(protocol, command)
+            elif command.commandType == "loadLabware":
+                translated_obj = _translate_v7_labware_command(protocol, command)
             else:
                 translated_obj = _translate_simple_command(command)
             commands_list.append(translated_obj)

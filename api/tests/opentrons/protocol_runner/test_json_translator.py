@@ -53,6 +53,23 @@ VALID_TEST_PARAMS = [
                 ),
             ),
         ),
+        protocol_schema_v7.Command(
+            commandType="aspirate",
+            key=None,
+            params=protocol_schema_v7.Params(
+                pipetteId="pipette-id-1",
+                labwareId="labware-id-2",
+                volume=1.23,
+                # todo (Max and Tamar 3/17/22):needs to be added to the aspirate command
+                #  https://github.com/Opentrons/opentrons/issues/8204
+                flowRate=4.56,
+                wellName="A1",
+                wellLocation=protocol_schema_v7.WellLocation(
+                    origin="bottom",
+                    offset=protocol_schema_v7.OffsetVector(x=0, y=0, z=7.89),
+                ),
+            ),
+        ),
         pe_commands.AspirateCreate(
             key=None,
             params=pe_commands.AspirateParams(
@@ -85,6 +102,21 @@ VALID_TEST_PARAMS = [
                 ),
             ),
         ),
+        protocol_schema_v7.Command(
+            commandType="dispense",
+            key="dispense-key",
+            params=protocol_schema_v7.Params(
+                pipetteId="pipette-id-1",
+                labwareId="labware-id-2",
+                volume=1.23,
+                flowRate=4.56,
+                wellName="A1",
+                wellLocation=protocol_schema_v7.WellLocation(
+                    origin="bottom",
+                    offset=protocol_schema_v7.OffsetVector(x=0, y=0, z=7.89),
+                ),
+            ),
+        ),
         pe_commands.DispenseCreate(
             key="dispense-key",
             params=pe_commands.DispenseParams(
@@ -109,6 +141,14 @@ VALID_TEST_PARAMS = [
                 wellName="A1",
             ),
         ),
+        protocol_schema_v7.Command(
+            commandType="dropTip",
+            params=protocol_schema_v7.Params(
+                pipetteId="pipette-id-1",
+                labwareId="labware-id-2",
+                wellName="A1",
+            ),
+        ),
         pe_commands.DropTipCreate(
             params=pe_commands.DropTipParams(
                 pipetteId="pipette-id-1",
@@ -125,6 +165,14 @@ VALID_TEST_PARAMS = [
         protocol_schema_v6.Command(
             commandType="pickUpTip",
             params=protocol_schema_v6.Params(
+                pipetteId="pipette-id-1",
+                labwareId="labware-id-2",
+                wellName="A1",
+            ),
+        ),
+        protocol_schema_v7.Command(
+            commandType="pickUpTip",
+            params=protocol_schema_v7.Params(
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
@@ -152,6 +200,18 @@ VALID_TEST_PARAMS = [
                 ),
             ),
         ),
+        protocol_schema_v7.Command(
+            commandType="touchTip",
+            params=protocol_schema_v7.Params(
+                pipetteId="pipette-id-1",
+                labwareId="labware-id-2",
+                wellName="A1",
+                wellLocation=protocol_schema_v7.WellLocation(
+                    origin="bottom",
+                    offset=protocol_schema_v7.OffsetVector(x=0, y=0, z=-1.23),
+                ),
+            ),
+        ),
         pe_commands.TouchTipCreate(
             params=pe_commands.TouchTipParams(
                 pipetteId="pipette-id-1",
@@ -169,6 +229,10 @@ VALID_TEST_PARAMS = [
             commandType="loadPipette",
             params=protocol_schema_v6.Params(pipetteId="pipette-id-1", mount="left"),
         ),
+        protocol_schema_v7.Command(
+            commandType="loadPipette",
+            params=protocol_schema_v7.Params(pipetteId="pipette-id-1", mount="left"),
+        ),
         pe_commands.LoadPipetteCreate(
             params=pe_commands.LoadPipetteParams(
                 pipetteId="pipette-id-1",
@@ -185,6 +249,13 @@ VALID_TEST_PARAMS = [
                 location=protocol_schema_v6.Location(slotName="3"),
             ),
         ),
+        protocol_schema_v7.Command(
+            commandType="loadModule",
+            params=protocol_schema_v7.Params(
+                moduleId="module-id-1",
+                location=protocol_schema_v7.Location(slotName="3"),
+            ),
+        ),
         pe_commands.LoadModuleCreate(
             params=pe_commands.LoadModuleParams(
                 model=ModuleModel("magneticModuleV2"),
@@ -199,6 +270,13 @@ VALID_TEST_PARAMS = [
             params=protocol_schema_v6.Params(
                 labwareId="labware-id-2",
                 location=protocol_schema_v6.Location(moduleId="temperatureModuleId"),
+            ),
+        ),
+        protocol_schema_v7.Command(
+            commandType="loadLabware",
+            params=protocol_schema_v7.Params(
+                labwareId="labware-id-2",
+                location=protocol_schema_v7.Location(moduleId="temperatureModuleId"),
             ),
         ),
         pe_commands.LoadLabwareCreate(
@@ -226,6 +304,19 @@ VALID_TEST_PARAMS = [
                 flowRate=1.23,
             ),
         ),
+        protocol_schema_v7.Command(
+            commandType="blowout",
+            params=protocol_schema_v7.Params(
+                pipetteId="pipette-id-1",
+                labwareId="labware-id-2",
+                wellName="A1",
+                wellLocation=protocol_schema_v7.WellLocation(
+                    origin="bottom",
+                    offset=protocol_schema_v7.OffsetVector(x=0, y=0, z=7.89),
+                ),
+                flowRate=1.23,
+            ),
+        ),
         pe_commands.BlowOutCreate(
             params=pe_commands.BlowOutParams(
                 pipetteId="pipette-id-1",
@@ -244,6 +335,10 @@ VALID_TEST_PARAMS = [
             commandType="delay",
             params=protocol_schema_v6.Params(waitForResume=True, message="hello world"),
         ),
+        protocol_schema_v7.Command(
+            commandType="delay",
+            params=protocol_schema_v7.Params(waitForResume=True, message="hello world"),
+        ),
         pe_commands.WaitForResumeCreate(
             params=pe_commands.WaitForResumeParams(message="hello world")
         ),
@@ -252,6 +347,10 @@ VALID_TEST_PARAMS = [
         protocol_schema_v6.Command(
             commandType="delay",
             params=protocol_schema_v6.Params(seconds=12.34, message="hello world"),
+        ),
+        protocol_schema_v7.Command(
+            commandType="delay",
+            params=protocol_schema_v7.Params(seconds=12.34, message="hello world"),
         ),
         pe_commands.WaitForDurationCreate(
             params=pe_commands.WaitForDurationParams(
@@ -265,6 +364,10 @@ VALID_TEST_PARAMS = [
             commandType="waitForResume",
             params=protocol_schema_v6.Params(message="hello world"),
         ),
+        protocol_schema_v7.Command(
+            commandType="waitForResume",
+            params=protocol_schema_v7.Params(message="hello world"),
+        ),
         pe_commands.WaitForResumeCreate(
             params=pe_commands.WaitForResumeParams(message="hello world")
         ),
@@ -273,6 +376,10 @@ VALID_TEST_PARAMS = [
         protocol_schema_v6.Command(
             commandType="waitForDuration",
             params=protocol_schema_v6.Params(seconds=12.34, message="hello world"),
+        ),
+        protocol_schema_v7.Command(
+            commandType="waitForDuration",
+            params=protocol_schema_v7.Params(seconds=12.34, message="hello world"),
         ),
         pe_commands.WaitForDurationCreate(
             params=pe_commands.WaitForDurationParams(
@@ -287,6 +394,15 @@ VALID_TEST_PARAMS = [
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-1",
                 coordinates=protocol_schema_v6.OffsetVector(x=1.1, y=2.2, z=3.3),
+                minimumZHeight=123.4,
+                forceDirect=True,
+            ),
+        ),
+        protocol_schema_v7.Command(
+            commandType="moveToCoordinates",
+            params=protocol_schema_v7.Params(
+                pipetteId="pipette-id-1",
+                coordinates=protocol_schema_v7.OffsetVector(x=1.1, y=2.2, z=3.3),
                 minimumZHeight=123.4,
                 forceDirect=True,
             ),
@@ -318,6 +434,23 @@ VALID_TEST_PARAMS = [
                 ],
             ),
         ),
+        protocol_schema_v7.Command(
+            commandType="thermocycler/runProfile",
+            params=protocol_schema_v7.Params(
+                moduleId="module-id-2",
+                blockMaxVolumeUl=1.11,
+                profile=[
+                    protocol_schema_v7.ProfileStep(
+                        celsius=2.22,
+                        holdSeconds=3.33,
+                    ),
+                    protocol_schema_v7.ProfileStep(
+                        celsius=4.44,
+                        holdSeconds=5.55,
+                    ),
+                ],
+            ),
+        ),
         pe_commands.thermocycler.RunProfileCreate(
             params=pe_commands.thermocycler.RunProfileParams(
                 moduleId="module-id-2",
@@ -338,6 +471,15 @@ VALID_TEST_PARAMS = [
             commandType="loadLiquid",
             key=None,
             params=protocol_schema_v6.Params(
+                labwareId="labware-id-2",
+                liquidId="liquid-id-555",
+                volumeByWell={"A1": 32, "B2": 50},
+            ),
+        ),
+        protocol_schema_v7.Command(
+            commandType="loadLiquid",
+            key=None,
+            params=protocol_schema_v7.Params(
                 labwareId="labware-id-2",
                 liquidId="liquid-id-555",
                 volumeByWell={"A1": 32, "B2": 50},
@@ -461,7 +603,7 @@ def _make_v7_json_protocol(
     return protocol_schema_v7.ProtocolSchemaV7(
         # schemaVersion is arbitrary. Currently (2021-06-28), JsonProtocol.parse_obj()
         # isn't smart enough to validate differently depending on this field.
-        otSharedSchema="#/protocol/schemas/6",
+        otSharedSchema="#/protocol/schemas/7",
         schemaVersion=7,
         metadata=protocol_schema_v7.Metadata(),
         robot=protocol_schema_v7.Robot(model="OT-2 Standard", deckId="ot2_standard"),
@@ -472,7 +614,9 @@ def _make_v7_json_protocol(
     )
 
 
-@pytest.mark.parametrize("test_input, expected_output", VALID_TEST_PARAMS)
+@pytest.mark.parametrize(
+    "test_v6_input, test_v7_input,expected_output", VALID_TEST_PARAMS
+)
 def test_load_command(
     subject: JsonTranslator,
     test_v6_input: protocol_schema_v6.Command,
@@ -494,7 +638,7 @@ def test_load_liquid(
     subject: JsonTranslator,
 ) -> None:
     """Test translating v6 commands to protocol engine commands."""
-    protocol = _make_json_protocol()
+    protocol = _make_v6_json_protocol()
     result = subject.translate_liquids(protocol)
 
     assert result == [
