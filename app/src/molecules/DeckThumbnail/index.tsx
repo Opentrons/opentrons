@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import map from 'lodash/map'
 
 import {
@@ -6,6 +7,7 @@ import {
   Module,
   LabwareRender,
   SlotLabels,
+  COLORS,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -22,6 +24,7 @@ import {
   parseLabwareInfoByLiquidId,
 } from '@opentrons/api-client'
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
+import { getIsOnDevice } from '../../redux/config'
 import { getStandardDeckViewLayerBlockList } from './utils/getStandardDeckViewLayerBlockList'
 import { getStandardDeckViewBox } from './utils/getStandardViewBox'
 
@@ -61,6 +64,10 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   )
   const labwareByLiquidId = parseLabwareInfoByLiquidId(commands)
 
+  const isOnDevice = useSelector(getIsOnDevice)
+  // TODO(bh, 2023-7-12): replace with color constant when added to design system
+  const deckFill = isOnDevice ? COLORS.light1 : '#e6e6e6'
+
   return (
     // PR #10488 changed size
     // revert the height
@@ -68,6 +75,8 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
     <RobotWorkSpace
       deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
       deckDef={deckDef}
+      deckFill={deckFill}
+      trashSlotName="A3"
       viewBox={getStandardDeckViewBox(robotType)}
       {...styleProps}
     >

@@ -85,7 +85,7 @@ exports[`InstrumentDiagram Single-channel renders correctly 1`] = `
 </div>
 `;
 
-exports[`InstrumentDiagram eight-channel GEN3 renders correctly 1`] = `
+exports[`InstrumentDiagram eight-channel FLEX renders correctly 1`] = `
 .c0 {
   min-width: 0;
   -webkit-transform: scaleX(-1);
@@ -100,12 +100,12 @@ exports[`InstrumentDiagram eight-channel GEN3 renders correctly 1`] = `
 >
   <img
     className=""
-    src="eight-channel-gen3.png"
+    src="eight-channel-flex.png"
   />
 </div>
 `;
 
-exports[`InstrumentDiagram single-channel GEN3 renders correctly 1`] = `
+exports[`InstrumentDiagram single-channel FLEX renders correctly 1`] = `
 .c0 {
   min-width: 0;
   -webkit-transform: scaleX(-1);
@@ -120,7 +120,7 @@ exports[`InstrumentDiagram single-channel GEN3 renders correctly 1`] = `
 >
   <img
     className=""
-    src="single-channel-gen3.png"
+    src="single-channel-flex.png"
   />
 </div>
 `;

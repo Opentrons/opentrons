@@ -33,7 +33,7 @@ const RUN_ID = 'mockRunId'
 const mockMissingPipette = [
   {
     hardwareType: 'pipette',
-    pipetteName: 'p1000_single_gen3',
+    pipetteName: 'p1000_single_flex',
     mount: 'left',
     connected: false,
   },
@@ -51,7 +51,7 @@ const mockMissingModule = [
 const missingBoth = [
   {
     hardwareType: 'pipette',
-    pipetteName: 'p1000_single_gen3',
+    pipetteName: 'p1000_single_flex',
     mount: 'left',
     connected: false,
   },

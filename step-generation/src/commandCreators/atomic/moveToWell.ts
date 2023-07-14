@@ -29,7 +29,7 @@ export const moveToWell: CommandCreator<v5MoveToWellParams> = (
   // across aspirate/dispense/blowout, we can probably DRY it up
   const pipetteSpec = invariantContext.pipetteEntities[pipette]?.spec
   const isFlexPipette =
-    (pipetteSpec?.displayCategory === 'GEN3' || pipetteSpec?.channels === 96) ??
+    (pipetteSpec?.displayCategory === 'FLEX' || pipetteSpec?.channels === 96) ??
     false
 
   const slotName = getLabwareSlot(

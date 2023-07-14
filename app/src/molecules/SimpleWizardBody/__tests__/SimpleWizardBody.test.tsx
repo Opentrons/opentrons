@@ -45,10 +45,11 @@ describe('SimpleWizardBody', () => {
       ...props,
       isSuccess: true,
     }
-    const { getByText, getByLabelText } = render(props)
+    const { getByText, getByRole } = render(props)
     getByText('header')
     getByText('subheader')
-    getByLabelText('ot-check')
+    const image = getByRole('img', { name: 'Success Icon' })
+    expect(image.getAttribute('src')).toEqual('icon_success.png')
   })
   it('renders a few skeletons  when it is pending', () => {
     props = {

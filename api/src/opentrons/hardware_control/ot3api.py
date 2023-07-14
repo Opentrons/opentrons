@@ -663,11 +663,6 @@ class OT3API(
         self._log.info("Recovering from halt")
         await self.reset()
 
-        # TODO: (2022-11-21 AA) remove this logic when encoder is added to the gripper
-        # Always refresh gripper z position as a safeguard, since we don't have an
-        # encoder position for reference
-        await self.home_z(OT3Mount.GRIPPER)
-
         if home_after:
             await self.home()
 

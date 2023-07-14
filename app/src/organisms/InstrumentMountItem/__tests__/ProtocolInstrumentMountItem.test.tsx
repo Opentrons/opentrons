@@ -36,7 +36,7 @@ const mockGripperData = {
   ok: true,
 }
 const mockLeftPipetteData = {
-  instrumentModel: 'p1000_multi_gen3',
+  instrumentModel: 'p1000_multi_flex',
   instrumentType: 'p1000',
   mount: 'left',
   serialNumber: 'def456',
@@ -71,7 +71,7 @@ describe('ProtocolInstrumentMountItem', () => {
       mount: LEFT,
       attachedInstrument: null,
       attachedCalibrationData: null,
-      speccedName: 'p1000_multi_gen3',
+      speccedName: 'p1000_multi_flex',
     }
     mockPipetteWizardFlows.mockReturnValue(<div>pipette wizard flow</div>)
     mockUseMaintenanceRunTakeover.mockReturnValue({

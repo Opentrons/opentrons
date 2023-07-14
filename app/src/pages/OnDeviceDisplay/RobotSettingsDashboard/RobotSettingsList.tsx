@@ -7,7 +7,10 @@ import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
 import { getLocalRobot, getRobotApiVersion } from '../../../redux/discovery'
 import { getBuildrootUpdateAvailable } from '../../../redux/buildroot'
-import { getDevtoolsEnabled } from '../../../redux/config'
+import {
+  getApplyHistoricOffsets,
+  getDevtoolsEnabled,
+} from '../../../redux/config'
 import { UNREACHABLE } from '../../../redux/discovery/constants'
 import { Navigation } from '../../../organisms/Navigation'
 import { useLEDLights } from '../../../organisms/Devices/hooks'
@@ -39,6 +42,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'
   const devToolsOn = useSelector(getDevtoolsEnabled)
+  const historicOffsetsOn = useSelector(getApplyHistoricOffsets)
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
 
   return (
@@ -93,6 +97,13 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           currentOption="TouchscreenBrightness"
           setCurrentOption={setCurrentOption}
           iconName="brightness"
+        />
+        <RobotSettingButton
+          settingName={t('apply_historic_offsets')}
+          settingInfo={t('historic_offsets_description')}
+          iconName="reticle"
+          enabledHistoricOffests
+          historicOffsetsOn={historicOffsetsOn}
         />
         <RobotSettingButton
           settingName={t('device_reset')}

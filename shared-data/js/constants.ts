@@ -48,7 +48,7 @@ export const GRIPPER_V1_1: 'gripperV1.1' = 'gripperV1.1'
 export const GRIPPER_MODELS = [GRIPPER_V1, GRIPPER_V1_1]
 
 // pipette display categories
-export const GEN3: 'GEN3' = 'GEN3'
+export const FLEX: 'FLEX' = 'FLEX'
 export const GEN2: 'GEN2' = 'GEN2'
 export const GEN1: 'GEN1' = 'GEN1'
 
@@ -112,13 +112,14 @@ export const ROBOT_MODELS = ['OT-2 Standard', 'OT-3 Standard']
 export const OT2_ROBOT_TYPE = 'OT-2 Standard' as const
 export const FLEX_ROBOT_TYPE = 'OT-3 Standard' as const
 
+//  TODO(jr, 7/13/23): rename this constant to FLEX_PIPETTES
 export const OT3_PIPETTES = [
-  'p300_single_gen3',
-  'p1000_single_gen3',
-  'p20_single_gen3',
-  'p50_single_gen3',
-  'p50_multi_gen3',
-  'p1000_multi_gen3',
+  'p300_single_flex',
+  'p1000_single_flex',
+  'p20_single_flex',
+  'p50_single_flex',
+  'p50_multi_flex',
+  'p1000_multi_flex',
   'p1000_96',
 ]
 export const OT2_PIPETTES = [

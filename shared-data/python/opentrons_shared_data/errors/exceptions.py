@@ -196,7 +196,7 @@ class PythonException(GeneralError):
         base_details["class"] = type(exc).__name__
 
         super().__init__(
-            message="\n".join(format_exception_only(type(exc), exc)),
+            message="\n".join(format_exception_only(type(exc), exc)).strip(),
             detail=base_details,
             wrapping=_descend_exc_ctx(exc),
         )
