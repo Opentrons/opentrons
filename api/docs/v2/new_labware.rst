@@ -76,23 +76,27 @@ When the ``load_labware`` method loads labware into your protocol, it returns a 
                                         location= 'D1',  # Flex deck slot
                                         label= 'any-name-you-want')
 
-Loading Labware on Adapters
+Loading Labware onto Adapters
 ===========================
 
-The previous example demonstrates working with labware that's mounted in a deck slot. But what do you do when you need to load labware onto an adapter and use it with a module? Well, our Python API gives you two options. The first option uses preconfigured API load names and applies to labware and adapter combinations for the `Heater-Shaker GEN1 module <https://opentrons.com/products/modules/heater-shaker/>`_. The second option includes the ``adapter`` argument which is part of the ``load_labware`` method. Let's examine how each of these options work.
+The previous section demonstrates working with labware that's mounted in a deck slot. But what do you do when you need to load labware onto an adapter and use it with a module? Well, our Python API gives you two options. The first option includes a set of API load names for labware and adapter combinations you can use with the `Heater-Shaker GEN1 module <https://opentrons.com/products/modules/heater-shaker/>`_. The second option includes the ``adapter`` argument which is part of the ``load_labware`` method. Let's examine how each of these options work.
 
 Loading Labware on Heater-Shaker Adapters
 -----------------------------------------
 
-Lorem ipsum
-
 Loading Labware and Adapters with ``load_labware``
 --------------------------------------------------
 
-Lorem ipsum
+Placing labware on top of a compatible adapter adds additional functionality to your robot. For example, you might want to use an adapter as a simple holding device or for moving labware/adapter combinations onto a module later in your protocol. To tell your Flex or OT-2 you're stacking labware on top of an adapter, pass the adapter's load name to the ``load_labware`` method like this:: 
+    
+    plate = protocol.load_labware (load_name= 'corning_96_wellplate_360ul_flat',
+                                   location= "D1",
+                                   adapter= "opentrons_universal_flat_adapter")
+
+
+.. versionadded:: 2.15
 
 .. TBD use examples from PR 13016 and RLAB-343. This is the ``adapter`` argument.
-
 
 .. _new-well-access:
 
