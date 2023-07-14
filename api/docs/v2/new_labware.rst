@@ -66,20 +66,19 @@ Following the example in the :ref:`overview-section-v2`, here is how to the :py:
 
 When the ``load_labware`` method loads labware into your protocol, it returns a :py:class:`opentrons.protocol_api.labware.Labware` object.
 
-.. Recommend a call-out instead of a section (H2, H3) for "label." It's more a "pro tip" nice-to-have rather than
-.. an item that requires its own section.
-
-Labeling Labware
-================
+.. _labware-label:   
+.. Tip::
     
-The ``load_labware`` method also accepts an optional ``label`` argument. You can use it to help identify labware with a descriptive label. If used, the label value is displayed in the Opentrons App. For example::
+    The ``load_labware`` method also accepts an optional ``label`` argument. You can use it to help identify labware with a descriptive label. If used, the label value is displayed in the Opentrons App. For example::
         
-    tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat',
-                                    location= '1',
-                                    label= 'any-name-you-want')
+        tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat',
+                                        location= 'D1',  # Flex deck slot
+                                        label= 'any-name-you-want')
 
-Adapter Section
-===============
+Loading Labware on Adapters
+===========================
+
+
 
 TBD use examples from PR 13016 and RLAB-343. This is the ``adapter`` argument.
 
