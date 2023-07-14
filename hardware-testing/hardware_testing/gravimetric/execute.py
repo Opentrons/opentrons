@@ -369,9 +369,9 @@ def _run_trial(
     print("recorded weights:")
 
     # RUN INIT
-    pipette.move_to(well.top(50).move(channel_offset))
+    pipette.move_to(well.top(50).move(channel_offset))  # center channel over well
     mnt = OT3Mount.RIGHT if pipette.mount == "right" else OT3Mount.LEFT
-    ctx._core.get_hardware().retract(mnt)
+    ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     print(f"\tinitial grams: {m_data_init.grams_average} g")
     if _PREV_TRIAL_GRAMS is not None:
@@ -667,7 +667,7 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         print("moving to scale")
         well = labware_on_scale["A1"]
-        pipette.move_to(well.top())
+        pipette.move_to(well.top(config.VIAL_SAFE_Z_OFFSET))
         _liquid_height = _jog_to_find_liquid_height(ctx, pipette, well)
         height_below_top = well.depth - _liquid_height
         print(f"liquid is {height_below_top} mm below top of vial")
