@@ -534,9 +534,6 @@ class ProtocolContext(CommandPublisher):
     ) -> None:
         """Move a loaded labware to a new location.
 
-        *** This API method is currently being developed. ***
-        *** Expect changes without API level bump.        ***
-
         :param labware: Labware to move. Should be a labware already loaded
                         using :py:meth:`load_labware`
 
