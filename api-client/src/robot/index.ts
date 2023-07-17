@@ -1,12 +1,11 @@
-export { getEstopState } from './getEstopState'
+export { getEstopStatus } from './getEstopStatus'
 export { setEstopPhysicalStatus } from './setEstopPhysicalStatus'
 export { getLights } from './getLights'
 export { setLights } from './setLights'
 export type {
   EstopPhysicalStatus,
-  // EstopState,
+  EstopState,
   EstopStatus,
   Lights,
-  SetEstopState,
   SetLightsData,
 } from './types'

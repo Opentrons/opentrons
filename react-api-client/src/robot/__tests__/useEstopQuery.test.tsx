@@ -3,25 +3,26 @@ import { when } from 'jest-when'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { renderHook } from '@testing-library/react-hooks'
 
-import { getEstopState } from '@opentrons/api-client'
+import { getEstopStatus } from '@opentrons/api-client'
 import { useHost } from '../../api'
 import { useEstopQuery } from '..'
 
-import type { HostConfig, Response, EstopState } from '@opentrons/api-client'
+import type { HostConfig, Response, EstopStatus } from '@opentrons/api-client'
 
 jest.mock('@opentrons/api-client')
 jest.mock('../../api/useHost')
 
-const mockGetEstopState = getEstopState as jest.MockedFunction<
-  typeof getEstopState
+const mockGetEstopStatus = getEstopStatus as jest.MockedFunction<
+  typeof getEstopStatus
 >
 const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
-const ESTOP_STATE_RESPONSE: EstopState = {
+const ESTOP_STATE_RESPONSE: EstopStatus = {
   status: 'disengaged',
-  estopPhysicalStatus: { status: 'disengaged' },
-} as EstopState
+  leftEstopPhysicalStatus: 'disengaged',
+  rightEstopPhysicalStatus: 'disengaged',
+} as EstopStatus
 
 describe('useEstopQuery hook', () => {
   let wrapper: React.FunctionComponent<{}>
@@ -49,7 +50,7 @@ describe('useEstopQuery hook', () => {
 
   it('should return no data if estop request fails', () => {
     when(useHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetEstopState).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
+    when(mockGetEstopStatus).calledWith(HOST_CONFIG).mockRejectedValue('oh no')
 
     const { result } = renderHook(useEstopQuery, { wrapper })
 
@@ -58,9 +59,11 @@ describe('useEstopQuery hook', () => {
 
   it('should return estop state response data', async () => {
     when(useHost).calledWith().mockReturnValue(HOST_CONFIG)
-    when(mockGetEstopState)
+    when(mockGetEstopStatus)
       .calledWith(HOST_CONFIG)
-      .mockResolvedValue({ data: ESTOP_STATE_RESPONSE } as Response<EstopState>)
+      .mockResolvedValue({
+        data: ESTOP_STATE_RESPONSE,
+      } as Response<EstopStatus>)
 
     const { result, waitFor } = renderHook(useEstopQuery, { wrapper })
 

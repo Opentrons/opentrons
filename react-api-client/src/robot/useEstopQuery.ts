@@ -1,4 +1,4 @@
-import { HostConfig, EstopStatus, getEstopState } from '@opentrons/api-client'
+import { HostConfig, EstopStatus, getEstopStatus } from '@opentrons/api-client'
 import { useQuery } from 'react-query'
 import { useHost } from '../api'
 import type { UseQueryResult, UseQueryOptions } from 'react-query'
@@ -13,7 +13,7 @@ export function useEstopQuery<TError = Error>(
   }
   const query = useQuery<EstopStatus, TError>(
     [host as HostConfig, 'robot/control/estopStatus'],
-    () => getEstopState(host as HostConfig).then(response => response.data),
+    () => getEstopStatus(host as HostConfig).then(response => response.data),
     allOptions
   )
 

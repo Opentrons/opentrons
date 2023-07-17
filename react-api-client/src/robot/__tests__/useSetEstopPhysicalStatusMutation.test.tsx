@@ -5,7 +5,7 @@ import { act, renderHook } from '@testing-library/react-hooks'
 import { setEstopPhysicalStatus } from '@opentrons/api-client'
 import { useSetEstopPhysicalStatusMutation } from '..'
 
-import type { HostConfig, Response, EstopState } from '@opentrons/api-client'
+import type { HostConfig, Response, EstopStatus } from '@opentrons/api-client'
 import { useHost } from '../../api'
 
 jest.mock('@opentrons/api-client')
@@ -19,11 +19,10 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 
 describe('useSetEstopPhysicalStatusMutation hook', () => {
   let wrapper: React.FunctionComponent<{}>
-  const updatedEstopPhysicalStatus: EstopState = {
+  const updatedEstopPhysicalStatus: EstopStatus = {
     status: 'disengaged',
-    estopPhysicalStatus: {
-      status: 'disengaged',
-    },
+    leftEstopPhysicalStatus: 'disengaged',
+    rightEstopPhysicalStatus: 'disengaged',
   }
 
   beforeEach(() => {
@@ -41,14 +40,14 @@ describe('useSetEstopPhysicalStatusMutation hook', () => {
   it('should return no data when calling setEstopPhysicalStatus if the request fails', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockSetEstopPhysicalStatus)
-      .calledWith(HOST_CONFIG, updatedEstopPhysicalStatus)
+      .calledWith(HOST_CONFIG, null)
       .mockRejectedValue('oh no')
     const { result, waitFor } = renderHook(
       () => useSetEstopPhysicalStatusMutation(),
       { wrapper }
     )
     expect(result.current.data).toBeUndefined()
-    result.current.setEstopPhysicalStatus(updatedEstopPhysicalStatus)
+    result.current.setEstopPhysicalStatus(null)
     await waitFor(() => {
       return result.current.status !== 'loading'
     })
@@ -58,16 +57,16 @@ describe('useSetEstopPhysicalStatusMutation hook', () => {
   it('should update a estop status when calling the setEstopPhysicalStatus with empty payload', async () => {
     when(mockUseHost).calledWith().mockReturnValue(HOST_CONFIG)
     when(mockSetEstopPhysicalStatus)
-      .calledWith(HOST_CONFIG, updatedEstopPhysicalStatus)
+      .calledWith(HOST_CONFIG, null)
       .mockResolvedValue({
         data: updatedEstopPhysicalStatus,
-      } as Response<EstopState>)
+      } as Response<EstopStatus>)
 
     const { result, waitFor } = renderHook(
       () => useSetEstopPhysicalStatusMutation(),
       { wrapper }
     )
-    act(() => result.current.setEstopPhysicalStatus(updatedEstopPhysicalStatus))
+    act(() => result.current.setEstopPhysicalStatus(null))
     await waitFor(() => result.current.data != null)
     expect(result.current.data).toEqual(updatedEstopPhysicalStatus)
   })
