@@ -48,6 +48,7 @@ export const OverflowBtn = React.forwardRef(
         `}
         {...props}
         ref={ref}
+        aria-label="overflow"
       >
         <svg
           width="19"

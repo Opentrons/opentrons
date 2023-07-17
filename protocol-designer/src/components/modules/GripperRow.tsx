@@ -8,7 +8,7 @@ import {
   ALIGN_CENTER,
   DIRECTION_COLUMN,
 } from '@opentrons/components'
-import gripperImage from '../../images/flex_gripper.svg'
+import gripperImage from '../../images/flex_gripper.png'
 import styles from './styles.css'
 
 interface GripperRowProps {

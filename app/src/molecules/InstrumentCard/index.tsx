@@ -14,7 +14,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import flexGripper from '../../assets/images/flex_gripper.svg'
+import flexGripper from '../../assets/images/flex_gripper.png'
 
 import { useMenuHandleClickOutside } from '../../atoms/MenuList/hooks'
 import { OverflowBtn } from '../../atoms/MenuList/OverflowBtn'
@@ -75,7 +75,7 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
           width="3.75rem"
           height="3.75rem"
         >
-          <img src={flexGripper} />
+          <img src={flexGripper} alt="flex gripper" />
         </Flex>
       ) : null}
       {instrumentDiagramProps?.pipetteSpecs != null ? (
