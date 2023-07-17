@@ -368,7 +368,7 @@ async def _run_z_motion(arguments: argparse.Namespace, api: OT3API, mount: types
         pass_count = 0
         for i in range(arguments.cycles):
             for mount in MOUNT_AXES:
-                res = await _run_mount_up_down(api,arguments.simulate,mount,write_cb,False)
+                res = await _run_mount_up_down(api,arguments.simulate,mount,write_cb,True)
                 if res:
                     pass_count+=1
                 else:
@@ -391,8 +391,8 @@ async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: type
         fail_count = 0
         pass_count = 0
         for i in range(arguments.cycles):
-            res_b = await _run_bowtie(api,arguments.simulate,mount,write_cb,False)
-            res_hg = await _run_hour_glass(api,arguments.simulate,mount,write_cb,False)
+            res_b = await _run_bowtie(api,arguments.simulate,mount,write_cb,True)
+            res_hg = await _run_hour_glass(api,arguments.simulate,mount,write_cb,True)
             if res_b and res_hg:
                 pass_count+=1
             else:
