@@ -5,7 +5,7 @@ from decoy import Decoy
 from typing import Optional
 
 from opentrons import types
-from opentrons.hardware_control.types import OT3Axis
+from opentrons.hardware_control.types import Axis
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette
 from opentrons.hardware_control.instruments.ot2.pipette_handler import (
     PipetteHandlerProvider,
@@ -88,7 +88,7 @@ def test_plan_check_pick_up_tip_with_presses_argument(
                 tiprack_up=types.Point(0, 0, 2),
                 pick_up_distance=0,
                 speed=10,
-                currents={OT3Axis.Q: 1},
+                currents={Axis.Q: 1},
                 home_buffer=10,
             ),
         ),

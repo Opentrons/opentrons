@@ -4,17 +4,17 @@ from typing_extensions import Protocol
 from opentrons.types import Mount
 
 from .instrument_configurer import InstrumentConfigurer
-from .motion_controller import MotionController, AxisType
+from .motion_controller import MotionController
 from .configurable import Configurable
 from .calibratable import Calibratable, CalibrationType
 
 
 class LiquidHandler(
     InstrumentConfigurer,
-    MotionController[AxisType],
+    MotionController,
     Configurable,
     Calibratable[CalibrationType],
-    Protocol[CalibrationType, AxisType],
+    Protocol[CalibrationType],
 ):
     async def prepare_for_aspirate(self, mount: Mount, rate: float = 1.0) -> None:
         """

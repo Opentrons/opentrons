@@ -16,7 +16,7 @@ from hardware_testing.data.csv_report import (
 
 from hardware_testing.data import ui
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
+from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point
 
 
 SLOT_FORCE_GAUGE = 4
@@ -110,8 +110,8 @@ async def _grip_and_read_force(
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    z_ax = OT3Axis.Z_G
-    g_ax = OT3Axis.G
+    z_ax = Axis.Z_G
+    g_ax = Axis.G
     mount = OT3Mount.GRIPPER
 
     # OPERATOR SETS UP GAUGE
