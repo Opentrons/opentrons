@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import cx from 'classnames'
 import {
   Tooltip,
   DeprecatedPrimaryButton,
@@ -87,16 +86,15 @@ export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
     : i18n.t(`tooltip.step_description.${stepType}`)
   return (
     <>
-      <DeprecatedPrimaryButton
-        hoverTooltipHandlers={targetProps}
-        onClick={onClick}
-        iconName={stepIconsByType[stepType]}
-        className={cx({
-          [styles.step_button_disabled]: disabled,
-        })}
-      >
-        {i18n.t(`application.stepType.${stepType}`, stepType)}
-      </DeprecatedPrimaryButton>
+      <div {...targetProps}>
+        <DeprecatedPrimaryButton
+          disabled={disabled}
+          onClick={onClick}
+          iconName={stepIconsByType[stepType]}
+        >
+          {i18n.t(`application.stepType.${stepType}`, stepType)}
+        </DeprecatedPrimaryButton>
+      </div>
       <Tooltip {...tooltipProps}>{tooltipMessage}</Tooltip>
     </>
   )

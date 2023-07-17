@@ -118,11 +118,13 @@ describe('StepCreationButton', () => {
       })
       wrapper.update()
       const updatedAddStepButton = wrapper.find(StepCreationButtonComponent)
-      // all 6 step button items render as children
+      // all 8 step button items render as children
       const stepButtonItems = updatedAddStepButton.find(StepButtonItem)
       expect(stepButtonItems).toHaveLength(8)
       // modules are disabled since there are no modules on deck
-      const disabledModuleSteps = stepButtonItems.find({ disabled: true })
+      const disabledModuleSteps = stepButtonItems.filterWhere(element => {
+        return element.prop('disabled') === true
+      })
       expect(disabledModuleSteps).toHaveLength(4)
       // enabled button tooltip
       const mixTooltip = stepButtonItems.at(2).find(Tooltip)
@@ -160,7 +162,9 @@ describe('StepCreationButton', () => {
       const stepButtonItems = updatedAddStepButton.find(StepButtonItem)
 
       // temperature step enabled since it is on the deck
-      const disabledModuleSteps = stepButtonItems.find({ disabled: true })
+      const disabledModuleSteps = stepButtonItems.filterWhere(element => {
+        return element.prop('disabled') === true
+      })
       expect(disabledModuleSteps).toHaveLength(3)
       // enabled temperature module step tooltip
       const enabledButtonTooltip = stepButtonItems.at(6).find(Tooltip)
