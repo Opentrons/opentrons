@@ -174,6 +174,8 @@ class MoveGroupRunner:
             List[Tuple[Tuple[int, int], float, float, bool, bool]]
         ] = defaultdict(list)
         for arbid, completion in completions:
+            if isinstance(completion, TipActionResponse):
+                continue
             position[NodeId(arbid.parts.originating_node_id)].append(
                 (
                     (
@@ -373,7 +375,10 @@ class MoveScheduler:
                 duration += float(movesteps[0].duration_sec)
                 if any(isinstance(g, MoveGroupTipActionStep) for g in movesteps):
                     self._expected_tip_action_motors.append(
-                        [GearMotorId.left, GearMotorId.right]
+                        [
+                            GearMotorId.left,
+                            GearMotorId.right,
+                        ]
                     )
                 for step in move_group[seq_id]:
                     stop_cond.append(move_group[seq_id][step].stop_condition)
@@ -398,7 +403,6 @@ class MoveScheduler:
 
             in_group = (node_id, seq_id) in self._moves[group_id]
             self._moves[group_id].remove((node_id, seq_id))
-            print(f"removing {node_id}, {seq_id}")
             self._completion_queue.put_nowait((arbitration_id, message))
             log.debug(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
@@ -406,7 +410,6 @@ class MoveScheduler:
             )
 
             if not self._moves[group_id]:
-                print(f"\nsetting event: {node_id}\n")
                 log.debug(f"Move group {group_id+self._start_at_index} has completed.")
                 self._event.set()
 
@@ -493,7 +496,6 @@ class MoveScheduler:
             gear_id = GearMotorId(message.payload.gear_motor_id.value)
             seq_id = message.payload.seq_id.value
             self._expected_tip_action_motors[seq_id].remove(gear_id)
-            print(f"expected tip motors = {self._expected_tip_action_motors}")
             if len(self._expected_tip_action_motors[seq_id]) == 0:
                 self._remove_move_group(message, arbitration_id)
                 self._handle_move_completed(message, arbitration_id)

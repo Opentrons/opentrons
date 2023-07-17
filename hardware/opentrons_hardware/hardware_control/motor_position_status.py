@@ -19,7 +19,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     UpdateMotorPositionEstimationResponse,
     UpdateGearMotorPositionEstimationRequest,
     UpdateGearMotorPositionEstimationResponse,
-    TipActionResponse,
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -224,7 +223,7 @@ async def _parser_update_gear_motor_position_response(
             node = NodeId(arb_id.parts.originating_node_id)
             if node == expected:
                 return (
-                    float(response.payload.current_position.value / 1000.0),
+                    float(response.payload.current_position_um.value / 1000.0),
                     bool(MotorPositionFlags.stepper_position_ok.value),
                 )
     raise StopAsyncIteration

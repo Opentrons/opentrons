@@ -40,7 +40,6 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
     create_tip_action_group,
-    PipetteAction,
     create_gear_motor_home_group,
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
@@ -252,7 +251,7 @@ class OT3Controller:
             FirmwareUpdate(),
         )
         self._position = self._get_home_position()
-        self._gear_motor_position: float
+        self._gear_motor_position: Dict[NodeId, float] = {}
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._check_updates = check_updates
@@ -325,7 +324,7 @@ class OT3Controller:
         )
 
     @property
-    def gear_motor_position(self) -> float:
+    def gear_motor_position(self) -> Dict[NodeId, float]:
         return self._gear_motor_position
 
     def _motor_nodes(self) -> Set[NodeId]:
@@ -354,7 +353,14 @@ class OT3Controller:
         response = await get_motor_position(self._messenger, motor_nodes)
         self._handle_motor_status_response(response)
 
-    async def update_motor_estimation(self, axes: Sequence[Axis]) -> None:
+    async def update_gear_motor_position(self) -> None:
+        motor_response = await update_gear_motor_position_estimation(self._messenger)
+        updated_successfully = motor_response[1]
+        # update position only if updated successfully by the firmware
+        if updated_successfully:
+            self._gear_motor_position = {NodeId.pipette_left: motor_response[0]}
+
+    async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         nodes = set([axis_to_node(a) for a in axes])
         response = await update_motor_position_estimation(self._messenger, nodes)
@@ -631,34 +637,31 @@ class OT3Controller:
             )
         return new_group
 
-    async def home_gear_motors(
-        self,
-        distance: float,
-        velocity: float,
-    ) -> None:
-        move_group = create_gear_motor_home_group(distance, velocity)
-        runner = MoveGroupRunner(
-            move_groups=[move_group],
-            ignore_stalls=True if not ff.stall_detection_enabled() else False,
-        )
-        positions = await runner.run(can_messenger=self._messenger)
-        if NodeId.pipette_left in positions:
-            self._gear_motor_position = positions[NodeId.pipette_left][0]
-
     async def tip_action(
         self,
-        moves: List[Move[OT3Axis]],
+        moves: Optional[List[Move[OT3Axis]]] = None,
+        distance: Optional[float] = None,
+        velocity: Optional[float] = None,
         tip_action: str = "home",
     ) -> None:
-        move_group = create_tip_action_group(moves, [NodeId.pipette_left], tip_action)
+        move_group = []
+        if tip_action == "clamp":
+            assert moves is not None
+            move_group = create_tip_action_group(
+                moves, [NodeId.pipette_left], tip_action
+            )
+        elif tip_action == "home":
+            assert distance is not None and velocity is not None
+            move_group = create_gear_motor_home_group(float(distance), float(velocity))
         runner = MoveGroupRunner(
             move_groups=[move_group],
             ignore_stalls=True if not ff.stall_detection_enabled() else False,
         )
         positions = await runner.run(can_messenger=self._messenger)
         if NodeId.pipette_left in positions:
-            self._gear_motor_position = positions[NodeId.pipette_left][0]
-        print(f"gear position is now {self._gear_motor_position}")
+            self._gear_motor_position = {
+                NodeId.pipette_left: positions[NodeId.pipette_left][0]
+            }
 
     @requires_update
     async def gripper_grip_jaw(

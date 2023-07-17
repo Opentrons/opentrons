@@ -1,5 +1,5 @@
 """A collection of motions that define a single move."""
-from typing import List, Dict, Iterable, Union, Optional, Tuple
+from typing import List, Dict, Iterable, Union
 from dataclasses import dataclass
 import numpy as np
 from logging import getLogger
@@ -178,10 +178,11 @@ def create_tip_action_step(
     action: PipetteTipActionType,
 ) -> MoveGroupStep:
     """Creates a step for tip handling actions that require motor movement."""
-    if action == PipetteTipActionType.home:
-        stop_condition = MoveStopCondition.limit_switch
-    else:
-        stop_condition = MoveStopCondition.none
+    stop_condition = (
+        MoveStopCondition.limit_switch
+        if action == PipetteTipActionType.home
+        else MoveStopCondition.none
+    )
     step: MoveGroupStep = {}
     for axis_node in present_nodes:
         step[axis_node] = MoveGroupTipActionStep(

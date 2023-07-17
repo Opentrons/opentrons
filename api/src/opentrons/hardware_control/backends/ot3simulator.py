@@ -29,8 +29,6 @@ from .ot3utils import (
     create_gripper_jaw_hold_group,
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
-    create_tip_action_group,
-    PipetteAction,
     NODEID_SUBSYSTEM,
     motor_nodes,
     target_to_subsystem,
@@ -137,7 +135,7 @@ class OT3Simulator:
         self._update_required = False
         self._initialized = False
         self._lights = {"button": False, "rails": False}
-        self._gear_motor_position = 0
+        self._gear_motor_position: Dict[NodeId, float] = {}
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -250,7 +248,19 @@ class OT3Simulator:
             )
 
     @ensure_yield
-    async def update_motor_estimation(self, axes: Sequence[Axis]) -> None:
+    async def update_gear_motor_position(self) -> None:
+        return None
+
+    @ensure_yield
+    async def home_gear_motors(
+        self,
+        distance: float,
+        velocity: float,
+    ) -> None:
+        return None
+
+    @ensure_yield
+    async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         # Simulate conditions as if there are no stalls, aka do nothing
         return None
@@ -377,7 +387,9 @@ class OT3Simulator:
 
     async def tip_action(
         self,
-        moves: List[Move[OT3Axis]],
+        moves: Optional[List[Move[OT3Axis]]] = None,
+        distance: Optional[float] = None,
+        velocity: Optional[float] = None,
         tip_action: str = "home",
     ) -> None:
         pass
