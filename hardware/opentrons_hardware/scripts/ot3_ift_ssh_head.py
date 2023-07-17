@@ -62,7 +62,7 @@ def getch():
 
 async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> None:
     step_size = [0.1, 0.5, 1,5,10, 20, 50]
-    step_length_index = 3
+    step_length_index = 4
     step = step_size[step_length_index]
     pos = 0
     speed = 10
@@ -74,13 +74,13 @@ async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> Non
             pos = pos + step
             position['pipette'] = pos
             res = await move_to(messenger, node, step, speed)
-            time.sleep(0.05)
+            time.sleep(1)
             res2 = await move_to(messenger, node, step, speed)
         elif xy == "up":
             pos = pos - step
             position['pipette'] = pos
             res = await move_to(messenger, node, step, -speed)
-            time.sleep(0.005)
+            time.sleep(1)
             res2 = await move_to(messenger, node, step, -speed)
         mores1 = res[node][0]
         encoder1 =res[node][1]
