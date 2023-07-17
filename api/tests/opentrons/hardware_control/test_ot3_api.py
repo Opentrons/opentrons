@@ -1104,7 +1104,7 @@ async def test_move_to_plunger_bottom(
     await ot3_hardware.cache_pipette(mount, instr_data, None)
     pipette = ot3_hardware.hardware_pipettes[mount.to_mount()]
     assert pipette
-    pip_ax = OT3Axis.of_main_tool_actuator(mount)
+    pip_ax = Axis.of_main_tool_actuator(mount)
 
     max_speeds = ot3_hardware.config.motion_settings.default_max_speed
     target_pos = target_position_from_plunger(
