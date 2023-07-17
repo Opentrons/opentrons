@@ -19,27 +19,31 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
-SLOT_FORCE_GAUGE = 4
-GRIP_HEIGHT_MM = 120
+SLOT_FORCE_GAUGE = 6
+GAUGE_OFFSET = Point(x=90, y=37.5, z=75)
 
 FAILURE_THRESHOLD_PERCENTAGE = 10
 GRIP_FORCES_NEWTON: List[int] = [5, 10, 15, 20]
+NUM_NEWTONS_TRIALS = 1
 
-NUM_DUTY_CYCLE_TRIALS = 5
-GRIP_DUTY_CYCLES: List[int] = [6, 8, 10, 12, 15, 20, 30, 40, 50]
+NUM_DUTY_CYCLE_TRIALS = 20
+GRIP_DUTY_CYCLES: List[int] = [6, 10, 15, 20, 25, 30, 40, 50]
+
+FORCE_GAUGE_TRIAL_SAMPLE_INTERVAL = 0.25  # seconds
+FORCE_GAUGE_TRIAL_SAMPLE_COUNT = 20  # 20 samples = 5 seconds @ 4Hz
 
 
 def _get_test_tag(
-    newtons: Optional[int] = None, duty_cycle: Optional[int] = None
+    trial: int, newtons: Optional[int] = None, duty_cycle: Optional[int] = None,
 ) -> str:
     if newtons and duty_cycle:
         raise ValueError("must measure either force or duty-cycle, not both")
     if newtons is None and duty_cycle is None:
         raise ValueError("both newtons and duty-cycle are None")
     if newtons is not None:
-        return f"{newtons}-newtons"
+        return f"newtons-{newtons}-trial-{trial}"
     else:
-        return f"{duty_cycle}-duty-cycle"
+        return f"duty-cycle-{duty_cycle}-trial-{trial}"
 
 
 def _get_gauge(is_simulating: bool) -> Union[Mark10, SimMark10]:
@@ -56,7 +60,7 @@ def _get_gauge(is_simulating: bool) -> Union[Mark10, SimMark10]:
 
 def _get_force_gauge_hover_and_grip_positions(api: OT3API) -> Tuple[Point, Point]:
     grip_pos = helpers_ot3.get_slot_calibration_square_position_ot3(SLOT_FORCE_GAUGE)
-    grip_pos += Point(z=GRIP_HEIGHT_MM)
+    grip_pos += GAUGE_OFFSET
     hover_pos = grip_pos._replace(z=api.get_instrument_max_height(OT3Mount.GRIPPER))
     return hover_pos, grip_pos
 
@@ -65,31 +69,36 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     """Build CSV Lines."""
     lines: List[Union[CSVLine, CSVLineRepeating]] = list()
     for force in GRIP_FORCES_NEWTON:
-        tag = _get_test_tag(newtons=force)
-        lines.append(CSVLine(tag, [int, float, CSVResult]))
+        for trial in range(NUM_NEWTONS_TRIALS):
+            tag = _get_test_tag(trial, newtons=force)
+            force_data_types = [float] * NUM_NEWTONS_TRIALS
+            lines.append(CSVLine(tag, [int] + force_data_types + [CSVResult]))
     for duty_cycle in GRIP_DUTY_CYCLES:
-        tag = _get_test_tag(duty_cycle=duty_cycle)
-        lines.append(CSVLine(tag, [int, float, CSVResult]))
+        for trial in range(NUM_DUTY_CYCLE_TRIALS):
+            tag = _get_test_tag(trial, duty_cycle=duty_cycle)
+            force_data_types = [float] * NUM_DUTY_CYCLE_TRIALS
+            lines.append(CSVLine(tag, [int] + force_data_types))
     return lines
 
 
-async def _read_average_force_from_gauge(
-    gauge: Union[Mark10, SimMark10], length: int = 10, interval: float = 0.25
-) -> float:
+async def _read_forces(gauge: Union[Mark10, SimMark10]) -> List[float]:
     n = list()
-    for _ in range(length):
-        n.append(gauge.read_force())
+    for _ in range(FORCE_GAUGE_TRIAL_SAMPLE_COUNT):
+        force = gauge.read_force()
+        n.append(force)
         if not gauge.is_simulator():
-            await sleep(interval)
-    return sum(n) / float(length)
+            await sleep(FORCE_GAUGE_TRIAL_SAMPLE_INTERVAL)
+    return n
 
 
-async def _grip_and_read_force(
+async def _grip_and_read_forces(
     api: OT3API,
     gauge: Union[Mark10, SimMark10],
     force: Optional[int] = None,
     duty: Optional[int] = None,
-) -> float:
+) -> List[float]:
+    if not api.is_simulator:
+        await sleep(2)  # let sensor settle
     if duty is not None:
         await api._grip(duty_cycle=float(duty))
         api._gripper_handler.set_jaw_state(GripperJawState.GRIPPING)
@@ -101,15 +110,12 @@ async def _grip_and_read_force(
             gauge.set_simulation_force(float(duty) * 0.5)  # type: ignore[union-attr]
         elif force is not None:
             gauge.set_simulation_force(float(force))  # type: ignore[union-attr]
-    if not api.is_simulator:
-        await sleep(2)
-    ret = await _read_average_force_from_gauge(gauge)
+    ret_list = await _read_forces(gauge)
     await api.ungrip()
-    return ret
+    return ret_list
 
 
-async def run(api: OT3API, report: CSVReport, section: str) -> None:
-    """Run."""
+async def _setup(api: OT3API) -> Union[Mark10, SimMark10]:
     z_ax = OT3Axis.Z_G
     g_ax = OT3Axis.G
     mount = OT3Mount.GRIPPER
@@ -121,49 +127,65 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         ui.get_user_ready("plug gauge into USB port on OT3")
     gauge = _get_gauge(api.is_simulator)
     gauge.connect()
+    print("test readings")
+    ret_list = await _read_forces(gauge)
+    print(ret_list)
 
     # HOME
     print("homing Z and G...")
     await api.home([z_ax, g_ax])
     # MOVE TO GAUGE
     await api.ungrip()
-    hover_pos, _ = _get_force_gauge_hover_and_grip_positions(api)
-    target_pos = Point(x=64.0, y=123.3, z=67.6)
-    await helpers_ot3.move_to_arched_ot3(api, mount, target_pos._replace(z=87.6))
+    hover_pos, target_pos = _get_force_gauge_hover_and_grip_positions(api)
+    await helpers_ot3.move_to_arched_ot3(api, mount, target_pos + Point(z=30))
     if not api.is_simulator:
         ui.get_user_ready("please make sure the gauge in the middle of the gripper")
     await api.move_to(mount, target_pos)
     if not api.is_simulator:
-        ui.get_user_ready("prepare to grip")
+        ui.get_user_ready("about to grip")
 
-    # LOOP THROUGH FORCES
-    ui.print_header("MEASURE NEWTONS")
-    for expected_force in GRIP_FORCES_NEWTON:
-        # GRIP AND MEASURE FORCE
-        actual_force = await _grip_and_read_force(api, gauge, force=expected_force)
-        print(f"gripping at {expected_force} N = {actual_force} N")
-        error = (actual_force - expected_force) / expected_force
-        result = CSVResult.from_bool(abs(error) * 100 < FAILURE_THRESHOLD_PERCENTAGE)
-        tag = _get_test_tag(newtons=expected_force)
-        report(section, tag, [expected_force, actual_force, result])
+    return gauge
+
+
+async def run_increment(api: OT3API, report: CSVReport, section: str) -> None:
+    """Run Increment."""
+    gauge = await _setup(api)
+
     # LOOP THROUGH DUTY-CYCLES
     ui.print_header("MEASURE DUTY-CYCLES")
     for duty_cycle in GRIP_DUTY_CYCLES:
         # GRIP AND MEASURE FORCE
-        print(f"gripping at {duty_cycle}% duty cycle")
-        found_forces = list()
-        # take 2x extra samples, because we'll remove min/max later
-        for i in range(NUM_DUTY_CYCLE_TRIALS + 2):
-            actual_force = await _grip_and_read_force(api, gauge, duty=duty_cycle)
-            print(f" - trial {i + 1}/{NUM_DUTY_CYCLE_TRIALS} = {actual_force} N")
-            found_forces.append(actual_force)
-        # remove min/max forces
-        forces_without_outliers = sorted(found_forces)[1:-1]
-        # calculate average
-        actual_force = sum(forces_without_outliers) / float(NUM_DUTY_CYCLE_TRIALS)
-        print(f"average = {actual_force} N")
-        tag = _get_test_tag(duty_cycle=duty_cycle)
-        report(section, tag, [duty_cycle, actual_force, CSVResult.PASS])
-    # RETRACT
+        for trial in range(NUM_DUTY_CYCLE_TRIALS):
+            print(f"{duty_cycle}% duty cycle - trial {trial + 1}/{NUM_DUTY_CYCLE_TRIALS}")
+            actual_forces = await _grip_and_read_forces(api, gauge, duty=duty_cycle)
+            print(actual_forces)
+            tag = _get_test_tag(trial, duty_cycle=duty_cycle)
+            report_data = [duty_cycle] + actual_forces
+            report(section, tag, report_data)
+
     print("done")
-    await helpers_ot3.move_to_arched_ot3(api, mount, hover_pos)
+    await api.retract(OT3Mount.GRIPPER)
+
+
+async def run(api: OT3API, report: CSVReport, section: str) -> None:
+    """Run."""
+    gauge = await _setup(api)
+
+    # LOOP THROUGH FORCES
+    ui.print_header("MEASURE NEWTONS")
+    for expected_force in GRIP_FORCES_NEWTON:
+        for trial in range(NUM_DUTY_CYCLE_TRIALS):
+            print(f"{expected_force}N - trial {trial + 1}/{NUM_DUTY_CYCLE_TRIALS}")
+            actual_forces = await _grip_and_read_forces(api, gauge, force=expected_force)
+            print(actual_forces)
+            # base PASS/FAIL on average
+            avg_force = sum(actual_forces) / len(actual_forces)
+            error = (avg_force - expected_force) / expected_force
+            result = CSVResult.from_bool(abs(error) * 100 < FAILURE_THRESHOLD_PERCENTAGE)
+            # store all data in CSV
+            tag = _get_test_tag(trial, newtons=expected_force)
+            report_data = [expected_force] + actual_forces + [result]
+            report(section, tag, report_data)
+
+    print("done")
+    await api.retract(OT3Mount.GRIPPER)
