@@ -42,7 +42,10 @@ export const getLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getLabwareEntities,
   getLabwareNicknamesById,
   stepFormSelectors.getInitialDeckSetup,
-  (labwareEntities, nicknamesById, initialDeckSetup) => {
+  stepFormSelectors.getPresavedStepForm,
+  (labwareEntities, nicknamesById, initialDeckSetup, presavedStepForm) => {
+    const moveLabwarePresavedStep = presavedStepForm?.stepType === 'moveLabware'
+
     const options = reduce(
       labwareEntities,
       (
@@ -59,15 +62,30 @@ export const getLabwareOptions: Selector<Options> = createSelector(
         const nickName = prefix
           ? `${prefix} ${nicknamesById[labwareId]}`
           : nicknamesById[labwareId]
-        return getIsTiprack(labwareEntity.def)
-          ? acc
-          : [
-              ...acc,
-              {
-                name: nickName,
-                value: labwareId,
-              },
-            ]
+
+        if (!moveLabwarePresavedStep) {
+          return getIsTiprack(labwareEntity.def)
+            ? acc
+            : [
+                ...acc,
+                {
+                  name: nickName,
+                  value: labwareId,
+                },
+              ]
+        } else {
+          //  TODO(jr, 7/17/23): filter out moving trash for now in MoveLabware step type
+          //  remove this when we support other slots for trash
+          return nickName === 'Trash'
+            ? acc
+            : [
+                ...acc,
+                {
+                  name: nickName,
+                  value: labwareId,
+                },
+              ]
+        }
       },
       []
     )
