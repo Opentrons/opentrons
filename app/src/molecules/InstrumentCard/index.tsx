@@ -112,7 +112,10 @@ export function InstrumentCard(props: InstrumentCardProps): JSX.Element {
           top={SPACING.spacing4}
           right={SPACING.spacing4}
         >
-          <OverflowBtn onClick={handleOverflowClick} />
+          <OverflowBtn
+            onClick={handleOverflowClick}
+            aria-label="InstrumentCard_overflowMenu"
+          />
           {menuOverlay}
           {showOverflowMenu ? (
             <MenuOverlay

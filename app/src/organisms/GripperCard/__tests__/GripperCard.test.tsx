@@ -107,7 +107,7 @@ describe('GripperCard', () => {
   it('renders wizard flow when detach button is pressed', () => {
     const { getByText, getByRole } = render(props)
     const overflowButton = getByRole('button', {
-      name: /overflow/i,
+      name: /InstrumentCard_overflowMenu/i,
     })
     fireEvent.click(overflowButton)
     const detachGripperButton = getByText('Detach gripper')
