@@ -31,7 +31,7 @@ import {
   FormModulesByType,
   getIsCrashablePipetteSelected,
 } from '../../../step-forms'
-import gripperImage from '../../../images/flex_gripper.png'
+import gripperImage from '../../../images/flex_gripper.svg'
 import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import {

@@ -7,6 +7,7 @@ import {
   useSubsystemUpdateQuery,
   useUpdateSubsystemMutation,
 } from '@opentrons/react-api-client'
+import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { Portal } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
@@ -46,8 +47,8 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   const updateError = updateData?.data.updateError
   const instrumentType = subsystem === 'gripper' ? 'gripper' : 'pipette'
   let mount = ''
-  if (subsystem === 'pipette_left') mount = 'left'
-  else if (subsystem === 'pipette_right') mount = 'right'
+  if (subsystem === 'pipette_left') mount = LEFT
+  else if (subsystem === 'pipette_right') mount = RIGHT
 
   const updateNeededHeader: ModalHeaderBaseProps = {
     title: t('update_needed'),

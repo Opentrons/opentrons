@@ -28,7 +28,7 @@ export function UpdateResultsModal(
   props: UpdateResultsModalProps
 ): JSX.Element {
   const { isSuccess, closeModal, instrument } = props
-  const { t } = useTranslation(['firmware_update', 'shared'])
+  const { i18n, t } = useTranslation(['firmware_update', 'shared'])
 
   const updateFailedHeader: ModalHeaderBaseProps = {
     title: t('update_failed'),
@@ -46,7 +46,7 @@ export function UpdateResultsModal(
             </StyledText>
             <SmallButton
               onClick={() => closeModal()}
-              buttonText={capitalize(t('shared:close'))}
+              buttonText={i18n.format(t('shared:close'), 'capitalize')}
               width="100%"
             />
           </Flex>
@@ -100,7 +100,7 @@ export function UpdateResultsModal(
             </Flex>
             <SmallButton
               onClick={() => closeModal()}
-              buttonText={capitalize(t('shared:close'))}
+              buttonText={i18n.format(t('shared:close'), 'capitalize')}
               width="100%"
             />
           </Flex>

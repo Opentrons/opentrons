@@ -7,7 +7,7 @@ import {
 import { i18n } from '../../../i18n'
 import { FirmwareUpdateTakeover } from '../FirmwareUpdateTakeover'
 import { UpdateNeededModal } from '../UpdateNeededModal'
-import { BadPipette, PipetteData } from '@opentrons/api-client'
+import type { BadPipette, PipetteData } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../UpdateNeededModal')

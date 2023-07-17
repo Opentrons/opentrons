@@ -22,7 +22,7 @@ export const AboutGripperSlideout = (
   props: AboutGripperSlideoutProps
 ): JSX.Element | null => {
   const { serialNumber, firmwareVersion, isExpanded, onCloseClick } = props
-  const { t } = useTranslation(['device_details', 'shared'])
+  const { i18n, t } = useTranslation(['device_details', 'shared'])
 
   return (
     <Slideout
@@ -33,10 +33,9 @@ export const AboutGripperSlideout = (
         <PrimaryButton
           onClick={onCloseClick}
           width="100%"
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
           data-testid="AboutPipette_slideout_close"
         >
-          {t('shared:close')}
+          {i18n.format(t('shared:close'), 'capitalize')}
         </PrimaryButton>
       }
     >
@@ -47,7 +46,6 @@ export const AboutGripperSlideout = (
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkGreyEnabled}
-              textTransform={TYPOGRAPHY.textTransformUppercase}
             >
               {t('current_version')}
             </StyledText>

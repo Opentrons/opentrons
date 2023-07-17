@@ -28,7 +28,7 @@ export const AboutPipetteSlideout = (
   props: AboutPipetteSlideoutProps
 ): JSX.Element | null => {
   const { pipetteId, pipetteName, isExpanded, mount, onCloseClick } = props
-  const { t } = useTranslation(['device_details', 'shared'])
+  const { i18n, t } = useTranslation(['device_details', 'shared'])
   const { data: attachedInstruments } = useInstrumentsQuery()
   const instrumentInfo =
     attachedInstruments?.data?.find(
@@ -45,10 +45,9 @@ export const AboutPipetteSlideout = (
         <PrimaryButton
           onClick={onCloseClick}
           width="100%"
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
           data-testid="AboutPipette_slideout_close"
         >
-          {t('shared:close')}
+          {i18n.format(t('shared:close'), 'capitalize')}
         </PrimaryButton>
       }
     >
@@ -59,7 +58,6 @@ export const AboutPipetteSlideout = (
               as="h6"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.darkGreyEnabled}
-              textTransform={TYPOGRAPHY.textTransformUppercase}
             >
               {t('current_version')}
             </StyledText>

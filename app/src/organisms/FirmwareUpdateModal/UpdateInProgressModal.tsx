@@ -48,7 +48,7 @@ export function UpdateInProgressModal(
           marginBottom={SPACING.spacing4}
           fontWeight={TYPOGRAPHY.fontWeightBold}
         >
-          {i18n.format(t('updating_firmware'))}
+          {i18n.format(t('updating_firmware'), 'capitalize')}
         </StyledText>
         <ProgressBar
           percentComplete={percentComplete}

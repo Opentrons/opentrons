@@ -52,7 +52,7 @@ interface InstrumentsAndModulesProps {
 const BANNER_LINK_CSS = css`
   text-decoration: underline;
   cursor: pointer;
-  margin-left: 0.5rem;
+  margin-left: ${SPACING.spacing8};
 `
 
 export function InstrumentsAndModules({

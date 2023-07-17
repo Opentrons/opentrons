@@ -9,7 +9,10 @@ import { i18n } from '../../../i18n'
 import { UpdateNeededModal } from '../UpdateNeededModal'
 import { UpdateInProgressModal } from '../UpdateInProgressModal'
 import { UpdateResultsModal } from '../UpdateResultsModal'
-import { BadPipette, SubsystemUpdateProgressData } from '@opentrons/api-client'
+import type {
+  BadPipette,
+  SubsystemUpdateProgressData,
+} from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../UpdateInProgressModal')
