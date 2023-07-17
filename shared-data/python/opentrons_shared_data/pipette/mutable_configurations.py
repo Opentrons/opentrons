@@ -66,7 +66,7 @@ def _migrate_to_v2_configurations(
                 # isinstances are needed for type checking.
                 dict_of_base_model[top_name][nested_name] = v.value
     dict_of_base_model["quirks"] = list(
-        set(dict_of_base_model["quirks"]) - set(quirks_list)
+        set(dict_of_base_model["quirks"]).union(set(quirks_list))
     )
 
     # re-serialization is not great for this nested enum so we need

@@ -47,7 +47,7 @@ def supported_pipette(model_or_name: Union[PipetteName, PipetteModel, None]) -> 
         return False
     split_model_or_name = model_or_name.split("_")
     try:
-        channels_as_int = channels_from_string(split_model_or_name[1])
+        channels_as_int = int(channels_from_string(split_model_or_name[1]))
     except ValueError:
         channels_as_int = 0
     if (
