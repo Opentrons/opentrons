@@ -62,7 +62,7 @@ Available Modules
 
 The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  *API load name*. The load name tells your robot which module you're going to use in a protocol. The table below lists the API load names for the currently available modules.
 
-Some modules were added to our python API later than others, and others span multiple hardware generations. For example, second generation modules have a "GEN2" label on the device. When writing a protocol that requires a module, make sure your protocol's ``requiremets`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
+Some modules were added to our python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requiremets`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
 
 .. table::
    :widths: 4 5 2
@@ -98,7 +98,9 @@ Some modules were added to our python API later than others, and others span mul
 Loading Labware onto a Module
 =============================
 
-Like specifying labware that will be placed directly on the deck of the OT-2, you must specify labware that will be present on the module you have just loaded, using ``load_labware()``. For instance, to load an `aluminum block for 2 mL tubes <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_ on top of a Temperature Module:
+.. start here on Tuesday
+
+Like specifying labware that will be placed directly on the deck of a robot, you must specify labware that will be present on the module you have just loaded, using ``load_labware()``. For instance, to load an `aluminum block for 2 mL tubes <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_ on top of a Temperature Module:
 
 .. code-block:: python
 
