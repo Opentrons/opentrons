@@ -613,6 +613,7 @@ class MoveScheduler:
             self._start_at_index, self._start_at_index + len(self._moves)
         ):
             await self._run_one_group(group_id, can_messenger)
+
         def _reify_queue_iter() -> Iterator[_CompletionPacket]:
             while not self._completion_queue.empty():
                 yield self._completion_queue.get_nowait()

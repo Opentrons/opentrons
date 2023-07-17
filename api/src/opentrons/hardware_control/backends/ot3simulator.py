@@ -203,7 +203,7 @@ class OT3Simulator:
         return EEPROMData()
 
     @property
-    def gear_motor_position(self) -> Optional[float]:
+    def gear_motor_position(self) -> Dict[NodeId, float]:
         return self._gear_motor_position
 
     @property
@@ -262,7 +262,7 @@ class OT3Simulator:
         return None
 
     @ensure_yield
-    async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
+    async def update_motor_estimation(self, axes: Sequence[Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         # Simulate conditions as if there are no stalls, aka do nothing
         return None
@@ -389,7 +389,7 @@ class OT3Simulator:
 
     async def tip_action(
         self,
-        moves: Optional[List[Move[OT3Axis]]] = None,
+        moves: Optional[List[Move[Axis]]] = None,
         distance: Optional[float] = None,
         velocity: Optional[float] = None,
         tip_action: str = "home",
@@ -540,6 +540,7 @@ class OT3Simulator:
             Axis.Y: phony_bounds,
             Axis.X: phony_bounds,
             Axis.Z_G: phony_bounds,
+            Axis.Q: phony_bounds,
         }
 
     @property

@@ -368,7 +368,7 @@ class OT3Controller:
         if updated_successfully:
             self._gear_motor_position = {NodeId.pipette_left: motor_response[0]}
 
-    async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
+    async def update_motor_estimation(self, axes: Sequence[Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         nodes = set([axis_to_node(a) for a in axes])
         response = await update_motor_position_estimation(self._messenger, nodes)
@@ -605,14 +605,14 @@ class OT3Controller:
         ]
         async with self._monitor_overpressure(moving_pipettes):
             positions = await asyncio.gather(*coros)
-        if Axis.Q in checked_axes:
-            await self.tip_action(
-                [Axis.Q],
-                self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
-                self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
-                    Axis.to_kind(Axis.Q)
-                ],
-            )
+        # if Axis.Q in checked_axes:
+            # await self.tip_action(
+            #     [Axis.Q],
+            #     self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
+            #     self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
+            #         Axis.to_kind(Axis.Q)
+            #     ],
+            # )
         for position in positions:
             self._handle_motor_status_response(position)
         return axis_convert(self._position, 0.0)
@@ -631,7 +631,7 @@ class OT3Controller:
 
     async def tip_action(
         self,
-        moves: Optional[List[Move[OT3Axis]]] = None,
+        moves: Optional[List[Move[Axis]]] = None,
         distance: Optional[float] = None,
         velocity: Optional[float] = None,
         tip_action: str = "home",
