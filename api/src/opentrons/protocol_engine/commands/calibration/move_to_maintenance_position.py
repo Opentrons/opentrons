@@ -8,7 +8,7 @@ from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
 from opentrons.types import MountType, Point, Mount
-from opentrons.hardware_control.types import OT3Axis, CriticalPoint
+from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.protocol_engine.commands.command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -108,7 +108,7 @@ class MoveToMaintenancePositionImplementation(
 
         if params.mount != MountType.EXTENSION:
             if params.maintenancePosition == MaintenancePosition.ATTACH_INSTRUMENT:
-                mount_to_axis = OT3Axis.by_mount(params.mount.to_hw_mount())
+                mount_to_axis = Axis.by_mount(params.mount.to_hw_mount())
                 await ot3_api.move_axes(
                     {
                         mount_to_axis: _INSTRUMENT_ATTACH_Z_POINT,
@@ -119,8 +119,8 @@ class MoveToMaintenancePositionImplementation(
                 max_motion_range = max_height_z_tip - _MAX_Z_AXIS_MOTION_RANGE
                 await ot3_api.move_axes(
                     {
-                        OT3Axis.Z_L: max_motion_range + _LEFT_MOUNT_Z_MARGIN,
-                        OT3Axis.Z_R: max_motion_range + _RIGHT_MOUNT_Z_MARGIN,
+                        Axis.Z_L: max_motion_range + _LEFT_MOUNT_Z_MARGIN,
+                        Axis.Z_R: max_motion_range + _RIGHT_MOUNT_Z_MARGIN,
                     }
                 )
 

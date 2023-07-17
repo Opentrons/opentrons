@@ -50,7 +50,7 @@ from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules
 from opentrons.hardware_control.types import (
     BoardRevision,
-    OT3Axis,
+    Axis,
     OT3Mount,
     OT3AxisMap,
     CurrentConfig,
@@ -245,23 +245,21 @@ class OT3Simulator:
             )
 
     @ensure_yield
-    async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
+    async def update_motor_estimation(self, axes: Sequence[Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         # Simulate conditions as if there are no stalls, aka do nothing
         return None
 
-    def _get_motor_status(
-        self, ax: Sequence[OT3Axis]
-    ) -> Iterator[Optional[MotorStatus]]:
+    def _get_motor_status(self, ax: Sequence[Axis]) -> Iterator[Optional[MotorStatus]]:
         return (self._motor_status.get(axis_to_node(a)) for a in ax)
 
-    def check_motor_status(self, axes: Sequence[OT3Axis]) -> bool:
+    def check_motor_status(self, axes: Sequence[Axis]) -> bool:
         return all(
             isinstance(status, MotorStatus) and status.motor_ok
             for status in self._get_motor_status(axes)
         )
 
-    def check_encoder_status(self, axes: Sequence[OT3Axis]) -> bool:
+    def check_encoder_status(self, axes: Sequence[Axis]) -> bool:
         """If any of the encoder statuses is ok, parking can proceed."""
         return all(
             isinstance(status, MotorStatus) and status.encoder_ok
@@ -296,7 +294,7 @@ class OT3Simulator:
         sensor_id: SensorId = SensorId.S0,
     ) -> None:
 
-        head_node = axis_to_node(OT3Axis.by_mount(mount))
+        head_node = axis_to_node(Axis.by_mount(mount))
         pos = self._position
         pos[head_node] = max_z_distance - 2
         self._position.update(pos)
@@ -305,8 +303,8 @@ class OT3Simulator:
     @ensure_yield
     async def move(
         self,
-        origin: Coordinates[OT3Axis, float],
-        moves: List[Move[OT3Axis]],
+        origin: Coordinates[Axis, float],
+        moves: List[Move[Axis]],
         stop_condition: MoveStopCondition = MoveStopCondition.none,
     ) -> None:
         """Move to a position.
@@ -326,7 +324,7 @@ class OT3Simulator:
 
     @ensure_yield
     async def home(
-        self, axes: Sequence[OT3Axis], gantry_load: GantryLoad
+        self, axes: Sequence[Axis], gantry_load: GantryLoad
     ) -> OT3AxisMap[float]:
         """Home axes.
 
@@ -375,7 +373,7 @@ class OT3Simulator:
     @ensure_yield
     async def tip_action(
         self,
-        axes: Sequence[OT3Axis],
+        axes: Sequence[Axis],
         distance: float = 33,
         speed: float = -5.5,
         tip_action: str = "drop",
@@ -521,13 +519,13 @@ class OT3Simulator:
         # TODO (AL, 2021-11-18): The bounds need to be defined
         phony_bounds = (0, 10000)
         return {
-            OT3Axis.Z_R: phony_bounds,
-            OT3Axis.Z_L: phony_bounds,
-            OT3Axis.P_L: phony_bounds,
-            OT3Axis.P_R: phony_bounds,
-            OT3Axis.Y: phony_bounds,
-            OT3Axis.X: phony_bounds,
-            OT3Axis.Z_G: phony_bounds,
+            Axis.Z_R: phony_bounds,
+            Axis.Z_L: phony_bounds,
+            Axis.P_L: phony_bounds,
+            Axis.P_R: phony_bounds,
+            Axis.Y: phony_bounds,
+            Axis.X: phony_bounds,
+            Axis.Z_G: phony_bounds,
         }
 
     @property
@@ -537,7 +535,7 @@ class OT3Simulator:
             NODEID_SUBSYSTEM[node.application_for()]: 0 for node in self._present_nodes
         }
 
-    def axis_is_present(self, axis: OT3Axis) -> bool:
+    def axis_is_present(self, axis: Axis) -> bool:
         try:
             return axis_to_node(axis) in motor_nodes(
                 cast(Set[FirmwareTarget], self._present_nodes)
@@ -572,12 +570,12 @@ class OT3Simulator:
         return {}
 
     @ensure_yield
-    async def disengage_axes(self, axes: List[OT3Axis]) -> None:
+    async def disengage_axes(self, axes: List[Axis]) -> None:
         """Disengage axes."""
         return None
 
     @ensure_yield
-    async def engage_axes(self, axes: List[OT3Axis]) -> None:
+    async def engage_axes(self, axes: List[Axis]) -> None:
         """Engage axes."""
         return None
 
@@ -607,7 +605,7 @@ class OT3Simulator:
         return None
 
     @ensure_yield
-    async def probe(self, axis: OT3Axis, distance: float) -> OT3AxisMap[float]:
+    async def probe(self, axis: Axis, distance: float) -> OT3AxisMap[float]:
         """Probe."""
         return {}
 
@@ -646,7 +644,7 @@ class OT3Simulator:
     async def capacitive_probe(
         self,
         mount: OT3Mount,
-        moving: OT3Axis,
+        moving: Axis,
         distance_mm: float,
         speed_mm_per_s: float,
         sensor_threshold_pf: float,
@@ -658,7 +656,7 @@ class OT3Simulator:
     async def capacitive_pass(
         self,
         mount: OT3Mount,
-        moving: OT3Axis,
+        moving: Axis,
         distance_mm: float,
         speed_mm_per_s: float,
         probe: InstrumentProbeType,

@@ -15,14 +15,16 @@ stages:
           enabled: !anybool 
         y:
           enabled: !anybool 
-        z:
+        z_l:
           enabled: !anybool 
-        a:
+        z_r:
           enabled: !anybool 
-        b:
+        p_l:
           enabled: !anybool 
-        c:
-          enabled: !anybool 
+        p_r:
+          enabled: !anybool
+        g: !anything
+        q: !anything
 ---
 test_name: Disengage motors
 marks:
@@ -50,6 +52,6 @@ stages:
       json:
         x:
           enabled: false
-        a:
+        z_r:
           enabled: false
       strict: false
