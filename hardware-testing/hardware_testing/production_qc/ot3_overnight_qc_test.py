@@ -125,7 +125,7 @@ def _record_axis_data(type: str, write_cb: Callable,estimate: Dict[OT3Axis, floa
     # data_array = zip(estimate, estimate.keys())
     # estimate = 0
     # encoder = 1
-    write_cb([type] + [(encoder[ax] - estimate[ax]) for ax in GANTRY_AXES])
+    write_cb([type] + [round(encoder[ax] - estimate[ax], 5) for ax in GANTRY_AXES])
     write_cb([type,bool_to_string(aligned)])
 
 def _record_motion_check_data(type: str, write_cb: Callable,
@@ -158,7 +158,9 @@ def _create_hour_glass_points(homed_position: types.Point) -> List[types.Point]:
     return hour_glass_points
 
 def _create_mounts_up_down_points(homed_position: types.Point) -> List[types.Point]:
-    pos_max = homed_position - types.Point(x=1, y=1, z=1)
+    # print("Create Up Down Start - gantry estimate: " + str(homed_position))
+    # pos_max = homed_position - types.Point(x=1, y=1, z=1)
+    pos_max = homed_position
     pos_min = types.Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
     mounts_up_down_points = [
         pos_max._replace(z=pos_max.z - 200),  # down
@@ -168,7 +170,15 @@ def _create_mounts_up_down_points(homed_position: types.Point) -> List[types.Poi
 
 async def _move_and_check(api: OT3API, is_simulating: bool, mount: types.OT3Mount, position: types.Point) -> None:
     if not is_simulating:
+        # inital_pos = await api.encoder_current_position_ot3(mount=mount)
+        # print("Premove Encoder: " + str(inital_pos))
+        # inital_pos = await api.gantry_position(mount)
+        # print("Premove Estimate: " + str(inital_pos))
         await api.move_to(mount,position)
+        # inital_pos = await api.encoder_current_position_ot3(mount=mount)
+        # print("Postmove Encoder: " + str(inital_pos))
+        # inital_pos = await api.gantry_position(mount)
+        # print("Postmove Estimate: " + str(inital_pos))
         estimate = {ax: api._current_position[ax] for ax in GANTRY_AXES}
         encoder = {ax: api._encoder_position[ax] for ax in GANTRY_AXES}
     else:
@@ -180,7 +190,9 @@ async def _move_and_check(api: OT3API, is_simulating: bool, mount: types.OT3Moun
         if abs(estimate[ax] - encoder[ax]) <= THRESHOLD_MM
     ]
     for ax in GANTRY_AXES:
-        print(str(ax) + str(estimate[ax] - encoder[ax]))
+        print(str(ax) + str(" Error: ") + str(estimate[ax] - encoder[ax]))
+        # print(str(ax) + str(" Estimate: ") + str(estimate[ax]))
+        # print(str(ax) + str(" Encoder: ") + str(encoder[ax]))
         if ax in all_aligned_axes:
             aligned = True
         else:
@@ -189,9 +201,11 @@ async def _move_and_check(api: OT3API, is_simulating: bool, mount: types.OT3Moun
 
 async def _run_mount_up_down(api: OT3API, is_simulating: bool, mount: types.OT3Mount, write_cb: Callable, record_bool=True) -> bool:
     ui.print_header('Run mount up and down')
+    # print("Up-Down Start - gantry estimate: " + str(await api.gantry_position(mount)))
     mount_up_down_points = _create_mounts_up_down_points(await api.gantry_position(mount))
     pass_count = 0
     for pos in mount_up_down_points:
+        # print("Up-Down Position - create-up-down-output: " + str(pos))
         es,en,al = await _move_and_check(api,is_simulating,mount,pos)
         if record_bool:
             if mount is types.OT3Mount.LEFT:
@@ -200,6 +214,8 @@ async def _run_mount_up_down(api: OT3API, is_simulating: bool, mount: types.OT3M
                 mount_type = 'Mount_up_down-Right'
             _record_axis_data(mount_type,write_cb,es,en,al)
             print(f'{mount_type} results: {al}')
+        if al:
+            pass_count += 1
     if pass_count == len(mount_up_down_points):
         return True
     else:
@@ -210,6 +226,7 @@ async def _run_bowtie(api: OT3API, is_simulating: bool, mount: types.OT3Mount, w
     bowtie_points = _create_bowtie_points(await api.gantry_position(mount))
     pass_count = 0
     for p in bowtie_points:
+        print("Bowtie Position: " + str(p))
         es,en,al = await _move_and_check(api,is_simulating,mount,p)
         if record_bool:
             _record_axis_data('Bowtie',write_cb,es,en,al)
@@ -227,6 +244,7 @@ async def _run_hour_glass(api: OT3API, is_simulating: bool, mount: types.OT3Moun
     hour_glass_points = _create_hour_glass_points(await api.gantry_position(mount))
     pass_count = 0
     for q in hour_glass_points:
+        print("Hour Glass Position: " + str(q))
         es,en,al = await _move_and_check(api,is_simulating,mount,q)
         if record_bool:
             _record_axis_data('Hour_glass',write_cb,es,en,al)
@@ -383,7 +401,6 @@ async def _run_z_motion(arguments: argparse.Namespace, api: OT3API, mount: types
 async def _run_xy_motion(arguments: argparse.Namespace, api: OT3API, mount: types.OT3Mount, write_cb: Callable) -> None:
     ui.print_header('Run xy motion check...')
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
-    print(XY_AXIS_SETTINGS)
     for setting in XY_AXIS_SETTINGS:
         print(f'X: Run speed={setting[OT3Axis.X].max_speed}, acceleration={setting[OT3Axis.X].acceleration}, current={setting[OT3Axis.X].run_current}')
         print(f'Y: Run speed={setting[OT3Axis.Y].max_speed}, acceleration={setting[OT3Axis.Y].acceleration}, current={setting[OT3Axis.Y].run_current}')
@@ -431,7 +448,8 @@ async def _main(arguments: argparse.Namespace) -> None:
                                                          stall_detection_enable=False)
     try:
         await api.home()
-        ui.get_user_ready("Is the deck totally empty?")
+        if not arguments.no_input:
+            ui.get_user_ready("Is the deck totally empty?")
         mount = types.OT3Mount.LEFT
         if arguments.xy_motion:
             await _run_xy_motion(arguments,api,mount,csv_cb.write)
@@ -454,7 +472,7 @@ async def _main(arguments: argparse.Namespace) -> None:
                         for mount in MOUNT_AXES:
                             await _run_mount_up_down(api,arguments.simulate,mount,csv_cb.write,True)
     except KeyboardInterrupt:
-        await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+        Print("Cancelled")
     finally:
         await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
         await api.clean_up()
@@ -482,6 +500,8 @@ if __name__ == "__main__":
     parser.add_argument("--z_speeds", type=str)
     parser.add_argument("--z_accelerations", type=str)
     parser.add_argument("--z_currents", type=str)
+    parser.add_argument("--no_input", action="store_true")
+
 
     args = parser.parse_args()
     asyncio.run(_main(args))
