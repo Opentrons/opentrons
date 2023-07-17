@@ -31,6 +31,5 @@ const Template: Story<
 
 export const EstopMissing = Template.bind({})
 EstopMissing.args = {
-  isActiveRun: true,
   robotName: 'Flexy',
 }

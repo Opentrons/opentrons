@@ -25,13 +25,11 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.
 
 interface EstopMissingModalProps {
-  isActiveRun: boolean
   robotName: string
   closeModal: () => void
 }
 
 export function EstopMissingModal({
-  isActiveRun,
   robotName,
   closeModal,
 }: EstopMissingModalProps): JSX.Element {
@@ -40,40 +38,29 @@ export function EstopMissingModal({
   return (
     <>
       {isOnDevice ? (
-        <TouchscreenModal isActiveRun={isActiveRun} robotName={robotName} />
+        <TouchscreenModal robotName={robotName} />
       ) : (
-        <DesktopModal
-          isActiveRun={isActiveRun}
-          robotName={robotName}
-          closeModal={closeModal}
-        />
+        <DesktopModal robotName={robotName} closeModal={closeModal} />
       )}
     </>
   )
 }
 
 function TouchscreenModal({
-  isActiveRun,
   robotName,
 }: Omit<EstopMissingModalProps, 'closeModal'>): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_missing'),
     iconName: 'ot-alert',
-    iconColor: isActiveRun ? COLORS.white : COLORS.red2,
+    iconColor: COLORS.red2,
   }
   const modalProps = {
     header: { ...modalHeader },
-    modalSize: 'large' as ModalSize,
-    isError: isActiveRun,
   }
   return (
     <Modal {...modalProps}>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing16}
-        marginTop={isActiveRun ? SPACING.spacing32 : undefined}
-      >
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
           {t('connect_the_estop_to_continue')}
         </StyledText>
@@ -86,27 +73,21 @@ function TouchscreenModal({
 }
 
 function DesktopModal({
-  isActiveRun,
   robotName,
   closeModal,
 }: EstopMissingModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalProps: LegacyModalProps = {
-    type: isActiveRun ? 'outlinedError' : 'error',
+    type: 'error',
     title: t('estop_missing'),
     onClose: () => closeModal(),
     closeOnOutsideClick: false,
-    childrenPadding: isActiveRun ? SPACING.spacing32 : SPACING.spacing24,
+    childrenPadding: SPACING.spacing24,
     width: '47rem',
   }
 
   return (
-    <LegacyModal
-      {...modalProps}
-      data-testid={`DesktopEstopMissingModal_${
-        isActiveRun ? 'activeRun' : 'inactiveRun'
-      }`}
-    >
+    <LegacyModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
         <StyledText as="h1">{t('connect_the_estop_to_continue')}</StyledText>
         <StyledText>

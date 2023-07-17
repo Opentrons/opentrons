@@ -31,6 +31,5 @@ const Template: Story<
 
 export const EstopPressed = Template.bind({})
 EstopPressed.args = {
-  isActiveRun: true,
   isEngaged: true,
 }

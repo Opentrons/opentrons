@@ -32,13 +32,11 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.
 interface EstopPressedModalProps {
-  isActiveRun: boolean
   isEngaged: boolean
   closeModal: () => void
 }
 
 export function EstopPressedModal({
-  isActiveRun,
   isEngaged,
   closeModal,
 }: EstopPressedModalProps): JSX.Element {
@@ -47,40 +45,30 @@ export function EstopPressedModal({
   return (
     <>
       {isOnDevice ? (
-        <TouchscreenModal isActiveRun={isActiveRun} isEngaged={isEngaged} />
+        <TouchscreenModal isEngaged={isEngaged} />
       ) : (
-        <DesktopModal
-          isActiveRun={isActiveRun}
-          isEngaged={isEngaged}
-          closeModal={closeModal}
-        />
+        <DesktopModal isEngaged={isEngaged} closeModal={closeModal} />
       )}
     </>
   )
 }
 
 function TouchscreenModal({
-  isActiveRun,
   isEngaged,
 }: Omit<EstopPressedModalProps, 'closeModal'>): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_pressed'),
     iconName: 'ot-alert',
-    iconColor: isActiveRun ? COLORS.white : COLORS.red2,
+    iconColor: COLORS.red2,
   }
   const modalProps = {
     header: { ...modalHeader },
     modalSize: 'large' as ModalSize,
-    isError: isActiveRun,
   }
   return (
     <Modal {...modalProps}>
-      <Flex
-        flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing40}
-        marginTop={isActiveRun ? SPACING.spacing32 : undefined}
-      >
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
         <StyledText as="p" fontWeight>
           {t('estop_pressed_description')}
         </StyledText>
@@ -103,9 +91,7 @@ function TouchscreenModal({
           />
         </Flex>
         <SmallButton
-          data-testid={`Estop_pressed_${
-            isActiveRun ? 'activeRun' : 'inactiveRun'
-          }_button`}
+          data-testid={`Estop_pressed_button`}
           width="100%"
           buttonText={t('resume_robot_operations')}
           disabled={isEngaged}
@@ -118,17 +104,16 @@ function TouchscreenModal({
 }
 
 function DesktopModal({
-  isActiveRun,
   isEngaged,
   closeModal,
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalProps: LegacyModalProps = {
-    type: isActiveRun ? 'outlinedError' : 'error',
+    type: 'error',
     title: t('estop_pressed'),
     onClose: () => closeModal(),
     closeOnOutsideClick: false,
-    childrenPadding: isActiveRun ? SPACING.spacing32 : SPACING.spacing24,
+    childrenPadding: SPACING.spacing24,
     width: '47rem',
   }
 
@@ -138,12 +123,7 @@ function DesktopModal({
   }
 
   return (
-    <LegacyModal
-      {...modalProps}
-      data-testid={`DesktopEstopModal_${
-        isActiveRun ? 'activeRun' : 'inactiveRun'
-      }`}
-    >
+    <LegacyModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
         <Banner type={isEngaged ? 'error' : 'success'}>
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
