@@ -194,9 +194,9 @@ def get_protocol_api(
                          for data to be available in the protocol from
                          :py:obj:`opentrons.protocol_api.ProtocolContext.bundled_data`.
     :param extra_labware: A mapping from labware load names to custom labware definitions.
-                          If this is `None` (the default), and this function is called on a robot,
-                          it will look for labware in the 'labware' subdirectory of the Jupyter data
-                          directory.
+                          If this is ``None`` (the default), and this function is called on a robot,
+                          it will look for labware in the ``labware`` subdirectory of the Jupyter
+                          data directory.
     :param hardware_simulator: If specified, a hardware simulator instance.
     :param machine: Either `"ot2"` or `"ot3"`. If `None`, machine will be
                     determined from persistent settings.
@@ -348,8 +348,8 @@ def simulate(  # noqa: C901
     :param file_name: The name of the file
     :param custom_labware_paths: A list of directories to search for custom labware.
                                  Loads valid labware from these paths and makes them available
-                                 to the protocol context. If this is `None` (the default), and this
-                                 function is called on a robot, it will look in the 'labware'
+                                 to the protocol context. If this is ``None`` (the default), and
+                                 this function is called on a robot, it will look in the ``labware``
                                  subdirectory of the Jupyter data directory.
     :param custom_data_paths: A list of directories or files to load custom
                               data files from. Ignored if the apiv2 feature
