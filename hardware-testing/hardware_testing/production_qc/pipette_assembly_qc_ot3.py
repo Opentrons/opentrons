@@ -697,9 +697,11 @@ async def _test_diagnostics_capacitive(
     offsets: List[Point] = []
     for trial in range(2):
         print("probing deck slot #5")
-        if trial > 0:
-            input("REINSTALL the probe, press ENTER when ready: ")
+        if trial > 0 and not api.is_simulator:
+            input("`REINSTALL` the probe, press ENTER when ready: ")
         await api.home()
+        if api.is_simulator:
+            pass
         try:
             await calibrate_pipette(api, mount, slot=5)
         except (
@@ -717,7 +719,7 @@ async def _test_diagnostics_capacitive(
             )
             offsets.append(o)
         await api.retract(mount)
-    if (
+    if not api.is_simulator and len(offsets) > 1 and (
         abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
         and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
         and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
