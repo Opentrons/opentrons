@@ -17,7 +17,7 @@ Module Setup
 Loading Modules onto the Deck
 =============================
 
-Similar to labware and pipettes, you must inform the API about the modules you want to use in your protocol. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all loaded modules are connected via USB and powered on.
+Similar to labware and pipettes, you must inform the API about the modules you want to use in your protocol. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all loaded modules that use power are connected via USB and turned on.
 
 Use :py:meth:`.ProtocolContext.load_module` to load a module. 
 
@@ -51,7 +51,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
                 # Load a Temperature Module GEN1 in deck slot 3.
                 temperature_module = protocol.load_module('temperature module', 3)
 
-In the examples above, after the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
+After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
 
 .. versionadded:: 2.0
 
@@ -62,7 +62,7 @@ Available Modules
 
 The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  *API load name*. The load name tells your robot which module you're going to use in a protocol. The table below lists the API load names for the currently available modules.
 
-Some modules were added to our python API later than others, and others span multiple hardware generations. For example, second generation modules have a "GEN2" label on the device. When writing a protocol that requires a module, make sure your protocol's ``requiremets`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the modules you want to use.
+Some modules were added to our python API later than others, and others span multiple hardware generations. For example, second generation modules have a "GEN2" label on the device. When writing a protocol that requires a module, make sure your protocol's ``requiremets`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
 
 .. table::
    :widths: 4 5 2
