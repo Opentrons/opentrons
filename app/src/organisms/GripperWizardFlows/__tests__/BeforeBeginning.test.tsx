@@ -37,6 +37,8 @@ describe('BeforeBeginning', () => {
       createMaintenanceRun: jest.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
+      setShowErrorMessage: jest.fn(),
+      errorMessage: null,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
@@ -68,10 +70,10 @@ describe('BeforeBeginning', () => {
         },
         {
           commandType: 'calibration/moveToMaintenancePosition',
-          params: { mount: 'extension' },
+          params: { mount: 'left' },
         },
       ],
-      true
+      false
     )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
@@ -97,10 +99,10 @@ describe('BeforeBeginning', () => {
         { commandType: 'home', params: {} },
         {
           commandType: 'calibration/moveToMaintenancePosition',
-          params: { mount: 'extension' },
+          params: { mount: 'left' },
         },
       ],
-      true
+      false
     )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
@@ -130,10 +132,10 @@ describe('BeforeBeginning', () => {
         },
         {
           commandType: 'calibration/moveToMaintenancePosition',
-          params: { mount: 'extension' },
+          params: { mount: 'left' },
         },
       ],
-      true
+      false
     )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()

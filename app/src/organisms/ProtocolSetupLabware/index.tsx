@@ -15,9 +15,11 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_SPACE_EVENLY,
   LabwareRender,
+  LocationIcon,
   Module,
   MODULE_ICON_NAME_BY_TYPE,
   RobotWorkSpace,
+  SlotLabels,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -39,7 +41,6 @@ import { StyledText } from '../../atoms/text'
 import { ODDBackButton } from '../../molecules/ODDBackButton'
 import { Portal } from '../../App/portal'
 import { LegacyModal } from '../../molecules/LegacyModal'
-import { LocationIcon } from '../../molecules/LocationIcon'
 
 import { useMostRecentCompletedAnalysis } from '../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
@@ -182,6 +183,8 @@ export function ProtocolSetupLabware({
             <RobotWorkSpace
               deckDef={deckDef}
               deckLayerBlocklist={OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+              deckFill={COLORS.light1}
+              trashSlotName="A3"
               id="LabwareSetup_deckMap"
             >
               {() => (
@@ -247,6 +250,7 @@ export function ProtocolSetupLabware({
                       </React.Fragment>
                     )
                   })}
+                  <SlotLabels robotType={ROBOT_MODEL_OT3} />
                 </>
               )}
             </RobotWorkSpace>
@@ -509,7 +513,7 @@ function RowLabware({
     location = commandTextTranslator('off_deck')
   } else if ('slotName' in initialLocation) {
     location = <LocationIcon slotName={initialLocation.slotName} />
-  } else if (matchedModuleType != null) {
+  } else if (matchedModuleType != null && matchedModule?.slotName != null) {
     location = (
       <>
         <LocationIcon slotName={matchedModule?.slotName} />{' '}

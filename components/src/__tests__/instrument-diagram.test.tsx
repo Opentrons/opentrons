@@ -50,22 +50,22 @@ describe('InstrumentDiagram', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  it('single-channel GEN3 renders correctly', () => {
+  it('single-channel FLEX renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentDiagram
         mount="right"
-        pipetteSpecs={{ channels: 1, displayCategory: 'GEN3' }}
+        pipetteSpecs={{ channels: 1, displayCategory: 'FLEX' }}
       />
     ).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
-  it('eight-channel GEN3 renders correctly', () => {
+  it('eight-channel FLEX renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentDiagram
         mount="right"
-        pipetteSpecs={{ channels: 8, displayCategory: 'GEN3' }}
+        pipetteSpecs={{ channels: 8, displayCategory: 'FLEX' }}
       />
     ).toJSON()
 

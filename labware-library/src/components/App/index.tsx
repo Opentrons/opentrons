@@ -18,7 +18,7 @@ export function AppComponent(props: DefinitionRouteRenderProps): JSX.Element {
   const { definition, location } = props
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
   const filters = useFilters(location)
-  const detailPage = Boolean(definition)
+  const isDetailPage = Boolean(definition)
 
   React.useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = 0
@@ -28,14 +28,14 @@ export function AppComponent(props: DefinitionRouteRenderProps): JSX.Element {
   return (
     <div
       className={cx(styles.app, {
-        [styles.is_detail_page]: detailPage,
+        [styles.is_detail_page]: isDetailPage,
       })}
     >
       <Nav />
-      {detailPage && <Breadcrumbs />}
+      <Breadcrumbs show={isDetailPage} />
       <Page
         scrollRef={scrollRef}
-        detailPage={detailPage}
+        isDetailPage={isDetailPage}
         sidebar={<Sidebar filters={filters} />}
         content={
           definition ? (

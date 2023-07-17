@@ -21,16 +21,16 @@ PipetteName = Literal[
     "p20_multi_gen2",
     "p50_single",
     "p50_multi",
-    "p50_single_gen3",
-    "p50_multi_gen3",
+    "p50_single_flex",
+    "p50_multi_flex",
     "p300_single",
     "p300_multi",
     "p300_single_gen2",
     "p300_multi_gen2",
     "p1000_single",
     "p1000_single_gen2",
-    "p1000_single_gen3",
-    "p1000_multi_gen3",
+    "p1000_single_flex",
+    "p1000_multi_flex",
     # TODO (tz, 11-23-22): remove when refactoring load_pipette for 96 channels.
     # https://opentrons.atlassian.net/browse/RLIQ-255
     "p1000_96",
@@ -48,16 +48,16 @@ class PipetteNameType(str, Enum):
     P20_MULTI_GEN2 = "p20_multi_gen2"
     P50_SINGLE = "p50_single"
     P50_MULTI = "p50_multi"
-    P50_SINGLE_GEN3 = "p50_single_gen3"
-    P50_MULTI_GEN3 = "p50_multi_gen3"
+    P50_SINGLE_FLEX = "p50_single_flex"
+    P50_MULTI_FLEX = "p50_multi_flex"
     P300_SINGLE = "p300_single"
     P300_MULTI = "p300_multi"
     P300_SINGLE_GEN2 = "p300_single_gen2"
     P300_MULTI_GEN2 = "p300_multi_gen2"
     P1000_SINGLE = "p1000_single"
     P1000_SINGLE_GEN2 = "p1000_single_gen2"
-    P1000_SINGLE_GEN3 = "p1000_single_gen3"
-    P1000_MULTI_GEN3 = "p1000_multi_gen3"
+    P1000_SINGLE_FLEX = "p1000_single_flex"
+    P1000_MULTI_FLEX = "p1000_multi_flex"
     P1000_96 = "p1000_96"
 
 
@@ -65,7 +65,7 @@ class PipetteNameType(str, Enum):
 # a huge number of them
 PipetteModel = NewType("PipetteModel", str)
 
-DisplayCategory = Literal["GEN1", "GEN2", "GEN3"]
+DisplayCategory = Literal["GEN1", "GEN2", "FLEX"]
 
 # todo(mm, 2022-03-18):
 # The JSON schema defines this as any string, not as an enum of string literals.

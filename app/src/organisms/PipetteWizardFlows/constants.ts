@@ -38,7 +38,7 @@ export const HEX_SCREWDRIVER = {
     'Provided with the robot. Using another size can strip the instruments’s screws.',
 }
 export const PIPETTE = {
-  loadName: 'gen3_pipette',
+  loadName: 'flex_pipette',
   displayName: PIPETTE_DISPLAY_NAME,
 }
 export const NINETY_SIX_CHANNEL_PIPETTE = {

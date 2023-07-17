@@ -140,6 +140,37 @@ async def test_get_all_attached_instruments(
                 Mount.RIGHT: right_pipette_dict,
             }
         )
+        decoy.when(ot3_hardware_api.attached_subsystems).then_return(
+            {
+                HWSubSystem.pipette_left: SubSystemState(
+                    ok=True,
+                    current_fw_version=10,
+                    next_fw_version=11,
+                    fw_update_needed=False,
+                    current_fw_sha="some-sha",
+                    pcba_revision="A1",
+                    update_state=None,
+                ),
+                HWSubSystem.pipette_right: SubSystemState(
+                    ok=True,
+                    current_fw_version=11,
+                    next_fw_version=11,
+                    fw_update_needed=False,
+                    current_fw_sha="some-other-sha",
+                    pcba_revision="A1",
+                    update_state=None,
+                ),
+                HWSubSystem.gripper: SubSystemState(
+                    ok=True,
+                    current_fw_version=11,
+                    next_fw_version=11,
+                    fw_update_needed=False,
+                    current_fw_sha="some-other-sha",
+                    pcba_revision="A1",
+                    update_state=None,
+                ),
+            }
+        )
 
     # We use this convoluted way of testing to verify the important point that
     # cache_instruments is called before fetching attached pipette and gripper data.
@@ -175,6 +206,7 @@ async def test_get_all_attached_instruments(
             instrumentModel=PipetteModel("abc"),
             serialNumber="my-pipette-id",
             subsystem=SubSystem.pipette_left,
+            firmwareVersion="10",
             data=PipetteData(
                 channels=1,
                 min_volume=1,
@@ -189,6 +221,7 @@ async def test_get_all_attached_instruments(
         Pipette.construct(
             ok=True,
             mount="right",
+            firmwareVersion="11",
             instrumentType="pipette",
             instrumentName="p20_multi_gen2",
             instrumentModel=PipetteModel("xyz"),
@@ -208,6 +241,7 @@ async def test_get_all_attached_instruments(
         Gripper.construct(
             ok=True,
             mount="extension",
+            firmwareVersion="11",
             instrumentType="gripper",
             instrumentModel=GripperModelStr("gripperV1"),
             serialNumber="GripperID321",

@@ -26,6 +26,7 @@ class GravimetricConfig:
     user_volumes: bool
     gantry_speed: int
     scale_delay: int
+    isolate_channels: List[int]
 
 
 @dataclass
@@ -69,5 +70,5 @@ TIP_SPEED_WHILE_SUBMERGING_DISPENSE = 50
 TIP_SPEED_WHILE_RETRACTING_ASPIRATE = 50
 TIP_SPEED_WHILE_RETRACTING_DISPENSE = 50
 
-VIAL_SAFE_Z_OFFSET: Final = 10
+VIAL_SAFE_Z_OFFSET: Final = 25
 LABWARE_BOTTOM_CLEARANCE = 1.5

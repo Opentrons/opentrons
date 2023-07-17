@@ -225,6 +225,14 @@ from .set_status_bar import (
     SetStatusBarCommandType,
 )
 
+from .retract_axis import (
+    RetractAxis,
+    RetractAxisParams,
+    RetractAxisCreate,
+    RetractAxisResult,
+    RetractAxisCommandType,
+)
+
 Command = Union[
     Aspirate,
     AspirateInPlace,
@@ -237,6 +245,7 @@ Command = Union[
     DropTip,
     DropTipInPlace,
     Home,
+    RetractAxis,
     LoadLabware,
     LoadAdapter,
     LoadLiquid,
@@ -292,6 +301,7 @@ CommandParams = Union[
     DropTipParams,
     DropTipInPlaceParams,
     HomeParams,
+    RetractAxisParams,
     LoadLabwareParams,
     LoadAdapterParams,
     LoadLiquidParams,
@@ -348,6 +358,7 @@ CommandType = Union[
     DropTipCommandType,
     DropTipInPlaceCommandType,
     HomeCommandType,
+    RetractAxisCommandType,
     LoadLabwareCommandType,
     LoadAdapterCommandType,
     LoadLiquidCommandType,
@@ -403,6 +414,7 @@ CommandCreate = Union[
     DropTipCreate,
     DropTipInPlaceCreate,
     HomeCreate,
+    RetractAxisCreate,
     LoadLabwareCreate,
     LoadAdapterCreate,
     LoadLiquidCreate,
@@ -458,6 +470,7 @@ CommandResult = Union[
     DropTipResult,
     DropTipInPlaceResult,
     HomeResult,
+    RetractAxisResult,
     LoadLabwareResult,
     LoadAdapterResult,
     LoadLiquidResult,

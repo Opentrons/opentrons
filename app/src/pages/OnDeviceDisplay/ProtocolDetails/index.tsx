@@ -37,7 +37,11 @@ import { StyledText } from '../../../atoms/text'
 import { useMissingHardwareText } from '../../../organisms/OnDeviceDisplay/RobotDashboard/hooks'
 import { Modal, SmallModalChildren } from '../../../molecules/Modal'
 import { useToaster } from '../../../organisms/ToasterOven'
-import { getPinnedProtocolIds, updateConfigValue } from '../../../redux/config'
+import {
+  getApplyHistoricOffsets,
+  getPinnedProtocolIds,
+  updateConfigValue,
+} from '../../../redux/config'
 import { useMissingProtocolHardware } from '../../Protocols/hooks'
 import { Deck } from './Deck'
 import { Hardware } from './Hardware'
@@ -117,7 +121,6 @@ const ProtocolHeader = (props: {
         buttonCategory="rounded"
         onClick={handleRunProtocol}
         buttonText={t('protocol_details:start_setup')}
-        buttonType="primary"
       />
     </Flex>
   )
@@ -279,6 +282,10 @@ export function ProtocolDetails(): JSX.Element | null {
         (analysis): analysis is CompletedProtocolAnalysis =>
           analysis.status === 'completed'
       ) ?? null
+  const shouldApplyOffsets = useSelector(getApplyHistoricOffsets)
+  // I'd love to skip scraping altogether if we aren't applying
+  // conditional offsets, but React won't let us use hooks conditionally.
+  // So, we'll scrape regardless and just toss them if we don't need them.
   const scrapedLabwareOffsets = useOffsetCandidatesForAnalysis(
     mostRecentAnalysis
   ).map(({ vector, location, definitionUri }) => ({
@@ -286,6 +293,7 @@ export function ProtocolDetails(): JSX.Element | null {
     location,
     definitionUri,
   }))
+  const labwareOffsets = shouldApplyOffsets ? scrapedLabwareOffsets : []
 
   const { createRun } = useCreateRunMutation({
     onSuccess: data => {
@@ -315,7 +323,7 @@ export function ProtocolDetails(): JSX.Element | null {
   }
 
   const handleRunProtocol = (): void => {
-    createRun({ protocolId, labwareOffsets: scrapedLabwareOffsets })
+    createRun({ protocolId, labwareOffsets })
   }
   const [
     showConfirmDeleteProtocol,
@@ -377,7 +385,6 @@ export function ProtocolDetails(): JSX.Element | null {
                 <SmallButton
                   onClick={() => setShowConfirmationDeleteProtocol(false)}
                   buttonText={i18n.format(t('shared:cancel'), 'capitalize')}
-                  buttonType="primary"
                   width="50%"
                 />
                 <SmallButton

@@ -38,9 +38,11 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
 
   return (
     <>
-      <Tooltip lineHeight="1.5" {...tooltipProps}>
-        {tooltipContent}
-      </Tooltip>
+      {tooltipContent && (
+        <Tooltip lineHeight="1.5" {...tooltipProps}>
+          {tooltipContent}
+        </Tooltip>
+      )}
       <div className={styles.checkbox_row}>
         <DeprecatedCheckboxField
           className={cx(styles.checkbox_field, className)}

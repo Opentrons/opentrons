@@ -59,6 +59,12 @@ def test_ensure_mount_input_invalid() -> None:
     [
         ("p300_single", PipetteNameType.P300_SINGLE),
         ("P300_muLTI_gen2", PipetteNameType.P300_MULTI_GEN2),
+        (
+            "p50_single_gen3",
+            PipetteNameType.P50_SINGLE_FLEX,
+        ),  # Remove this line once we phase out '_gen3' names
+        ("flex_8channel_1000", PipetteNameType.P1000_MULTI_FLEX),
+        ("flex_96channel_1000", PipetteNameType.P1000_96),
     ],
 )
 def test_ensure_pipette_name(input_value: str, expected: PipetteNameType) -> None:

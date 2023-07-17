@@ -196,7 +196,7 @@ class PythonException(GeneralError):
         base_details["class"] = type(exc).__name__
 
         super().__init__(
-            message="\n".join(format_exception_only(type(exc), exc)),
+            message="\n".join(format_exception_only(type(exc), exc)).strip(),
             detail=base_details,
             wrapping=_descend_exc_ctx(exc),
         )
@@ -286,6 +286,49 @@ class FirmwareUpdateFailedError(CommunicationError):
         super().__init__(ErrorCodes.FIRMWARE_UPDATE_FAILED, message, detail, wrapping)
 
 
+class InternalMessageFormatError(CommunicationError):
+    """An error indicating that an internal message was formatted incorrectly."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an InternalMesasgeFormatError."""
+        super().__init__(
+            ErrorCodes.INTERNAL_MESSAGE_FORMAT_ERROR, message, detail, wrapping
+        )
+
+
+class CANBusConfigurationError(CommunicationError):
+    """An error indicating a misconfiguration of the CANbus."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CANBus Configuration Error."""
+        super().__init__(
+            ErrorCodes.CANBUS_CONFIGURATION_ERROR, message, detail, wrapping
+        )
+
+
+class CANBusBusError(CommunicationError):
+    """An error indicating a low-level bus error on the CANbus like an error frame."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CANBus Bus Error."""
+        super().__init__(ErrorCodes.CANBUS_BUS_ERROR, message, detail, wrapping)
+
+
 class MotionFailedError(RoboticsControlError):
     """An error indicating that a motion failed."""
 
@@ -338,6 +381,39 @@ class MotionPlanningFailureError(RoboticsControlError):
     ) -> None:
         """Build a MotionPlanningFailureError."""
         super().__init__(ErrorCodes.MOTION_PLANNING_FAILURE, message, detail, wrapping)
+
+
+class PositionEstimationInvalidError(RoboticsControlError):
+    """An error indicating that a command failed because position estimation was invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a PositionEstimationFailedError."""
+        super().__init__(
+            ErrorCodes.POSITION_ESTIMATION_INVALID, message, detail, wrapping
+        )
+
+
+class MoveConditionNotMetError(RoboticsControlError):
+    """An error indicating that a move completed without its condition being met."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a MoveConditionNotMetError."""
+        super().__init__(
+            ErrorCodes.MOVE_CONDITION_NOT_MET,
+            message or "Move completed without its complete condition being met",
+            detail,
+            wrapping,
+        )
 
 
 class LabwareDroppedError(RoboticsInteractionError):
@@ -513,6 +589,19 @@ class ModuleNotPresent(RoboticsInteractionError):
         super().__init__(
             ErrorCodes.MODULE_NOT_PRESENT, checked_message, checked_detail, wrapping
         )
+
+
+class InvalidInstrumentData(RoboticsInteractionError):
+    """An error indicating that instrument data is invalid."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an GripperNotPresentError."""
+        super().__init__(ErrorCodes.INVALID_INSTRUMENT_DATA, message, detail, wrapping)
 
 
 class APIRemoved(GeneralError):

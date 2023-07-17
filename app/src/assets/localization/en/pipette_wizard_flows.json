@@ -33,7 +33,6 @@
   "detach_pipettes_attach_96": "Detach Pipettes and Attach 96-Channel Pipette",
   "detach_z_axis_screw_again": "detach the z-axis screw before attaching the 96-Channel Pipette.",
   "detach": "Detaching Pipette",
-  "error_encountered": "Error encountered",
   "exit_cal": "Exit calibration",
   "firmware_updating": "A firmware update is required, instrument is updating...",
   "gantry_empty_for_96_channel_success": "Now that both mounts are empty, you can begin the 96-Channel Pipette attachment process.",

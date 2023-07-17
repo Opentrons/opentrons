@@ -18,6 +18,7 @@ describe('MovePin', () => {
     props?: Partial<React.ComponentProps<typeof MovePin>>
   ) => ReturnType<typeof renderWithProviders>
   let mockCreateRunCommand: jest.Mock
+  let mockSetShowErrorMessage: jest.Mock
 
   const mockGoBack = jest.fn()
   const mockProceed = jest.fn()
@@ -44,6 +45,8 @@ describe('MovePin', () => {
           setFrontJawOffset={mockSetFrontJawOffset}
           frontJawOffset={{ x: 0, y: 0, z: 0 }}
           createRunCommand={mockCreateRunCommand}
+          errorMessage={null}
+          setShowErrorMessage={mockSetShowErrorMessage}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -107,7 +110,7 @@ describe('MovePin', () => {
     getByText(
       'Remove the calibration pin from the front jaw and attach it to the similar location on the rear jaw'
     )
-    await getByRole('button', { name: 'continue' }).click()
+    await getByRole('button', { name: 'Continue' }).click()
 
     await expect(mockCreateRunCommand).toHaveBeenNthCalledWith(1, {
       command: { commandType: 'home', params: { axes: [] } },
