@@ -1,8 +1,7 @@
 from opentrons import protocol_api
 
 metadata = {
-    'apiLevel': '2.15',
-    'protocolName': 'Serial Dilution Tutorial – OT-2 8-channel',
+    'protocolName': 'Serial Dilution Tutorial – Flex 8-channel',
     'description': '''This protocol is the outcome of following the
                    Python Protocol API Tutorial located at
                    https://docs.opentrons.com/v2/tutorial.html. It takes a
@@ -10,12 +9,17 @@ metadata = {
                    stepwise across a plate.''',
     'author': 'New API User'
     }
+
+requirements = {
+    'robotType': 'Flex',
+    'apiLevel': '2.15'
+    }
     
 def run(protocol: protocol_api.ProtocolContext):
-	tips = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
-	reservoir = protocol.load_labware('nest_12_reservoir_15ml', 2)
-	plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 3)
-	left_pipette = protocol.load_instrument('p300_multi_gen2', 'right', tip_racks=[tips])
+	tips = protocol.load_labware('opentrons_96_tiprack_300ul', 'D1')
+	reservoir = protocol.load_labware('nest_12_reservoir_15ml', 'D2')
+	plate = protocol.load_labware('nest_96_wellplate_200ul_flat', 'D3')
+	left_pipette = protocol.load_instrument('flex_8channel_1000', 'right', tip_racks=[tips])
 
 	# distribute diluent
 	left_pipette.transfer(100, reservoir['A1'], plate.rows()[0])  

@@ -74,8 +74,7 @@ export const SetupModulesMap = ({
                         <ModuleInfo
                           moduleModel={model}
                           isAttached={attachedModuleMatch != null}
-                          usbPort={attachedModuleMatch?.usbPort.port ?? null}
-                          hubPort={attachedModuleMatch?.usbPort.hub ?? null}
+                          physicalPort={attachedModuleMatch?.usbPort ?? null}
                           runId={runId}
                         />
                       </Module>

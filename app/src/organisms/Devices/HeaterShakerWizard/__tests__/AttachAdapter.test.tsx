@@ -38,7 +38,12 @@ const mockHeaterShakeShaking: HeaterShakerModule = {
     errorDetails: null,
     status: 'idle',
   },
-  usbPort: { path: '/dev/ot_module_heatershaker0', port: 1, hub: null },
+  usbPort: {
+    path: '/dev/ot_module_heatershaker0',
+    port: 1,
+    hub: false,
+    portGroup: 'unknown',
+  },
 }
 
 describe('AttachAdapter', () => {
