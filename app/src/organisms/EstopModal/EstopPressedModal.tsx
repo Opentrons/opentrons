@@ -109,6 +109,7 @@ function TouchscreenModal({
           width="100%"
           buttonText={t('resume_robot_operations')}
           disabled={isEngaged}
+          // ToDo (kk:07/17/2023) the function will be implemented by a following pr
           onClick={() => console.log('pressed')}
         />
       </Flex>
