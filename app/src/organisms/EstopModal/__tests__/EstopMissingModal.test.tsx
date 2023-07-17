@@ -23,24 +23,13 @@ describe('EstopMissingModal - Touchscreen', () => {
 
   beforeEach(() => {
     props = {
-      isActiveRun: true,
       robotName: 'mockFlex',
       closeModal: jest.fn(),
     }
     mockGetIsOnDevice.mockReturnValue(true)
   })
 
-  it('should render text - active run', () => {
-    const [{ getByText }] = render(props)
-    getByText('E-stop missing')
-    getByText('Connect the E-stop to continue')
-    getByText(
-      'Your E-stop could be damaged or detached. mockFlex lost its connection to the E-stop, so it canceled the protocol. Connect a functioning E-stop to continue.'
-    )
-  })
-
-  it('should render text - inactive run', () => {
-    props.isActiveRun = false
+  it('should render text', () => {
     const [{ getByText }] = render(props)
     getByText('E-stop missing')
     getByText('Connect the E-stop to continue')
@@ -55,27 +44,14 @@ describe('EstopMissingModal - Desktop', () => {
 
   beforeEach(() => {
     props = {
-      isActiveRun: true,
       robotName: 'mockFlex',
       closeModal: jest.fn(),
     }
     mockGetIsOnDevice.mockReturnValue(false)
   })
 
-  it('should render text - active run', () => {
-    const [{ getByText, getByTestId }] = render(props)
-    getByTestId('DesktopEstopMissingModal_activeRun')
-    getByText('E-stop missing')
-    getByText('Connect the E-stop to continue')
-    getByText(
-      'Your E-stop could be damaged or detached. mockFlex lost its connection to the E-stop, so it canceled the protocol. Connect a functioning E-stop to continue.'
-    )
-  })
-
-  it('should render text - inactive run', () => {
-    props.isActiveRun = false
-    const [{ getByText, getByTestId }] = render(props)
-    getByTestId('DesktopEstopMissingModal_inactiveRun')
+  it('should render text', () => {
+    const [{ getByText }] = render(props)
     getByText('E-stop missing')
     getByText('Connect the E-stop to continue')
     getByText(

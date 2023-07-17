@@ -91,7 +91,7 @@ function TouchscreenModal({
           />
         </Flex>
         <SmallButton
-          data-testid={`Estop_pressed_button`}
+          data-testid="Estop_pressed_button"
           width="100%"
           buttonText={t('resume_robot_operations')}
           disabled={isEngaged}

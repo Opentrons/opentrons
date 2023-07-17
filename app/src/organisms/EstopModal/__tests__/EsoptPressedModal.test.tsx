@@ -23,14 +23,13 @@ describe('EstopPressedModal - Touchscreen', () => {
 
   beforeEach(() => {
     props = {
-      isActiveRun: true,
       isEngaged: true,
       closeModal: jest.fn(),
     }
     mockGetIsOnDevice.mockReturnValue(true)
   })
 
-  it('should render text and button - active run', () => {
+  it('should render text and button', () => {
     const [{ getByText, getByTestId }] = render(props)
     getByText('E-stop pressed')
     getByText('E-stop')
@@ -39,20 +38,7 @@ describe('EstopPressedModal - Touchscreen', () => {
       'First, safely clear the deck of any labware or spills. Then, twist the E-stop button counterclockwise. Finally, have Flex move the gantry to its home position.'
     )
     getByText('Resume robot operations')
-    expect(getByTestId('Estop_pressed_activeRun_button')).toBeDisabled()
-  })
-
-  it('should render text and button - inactive run', () => {
-    props.isActiveRun = false
-    const [{ getByText, getByTestId }] = render(props)
-    getByText('E-stop pressed')
-    getByText('E-stop')
-    getByText('Engaged')
-    getByText(
-      'First, safely clear the deck of any labware or spills. Then, twist the E-stop button counterclockwise. Finally, have Flex move the gantry to its home position.'
-    )
-    getByText('Resume robot operations')
-    expect(getByTestId('Estop_pressed_inactiveRun_button')).toBeDisabled()
+    expect(getByTestId('Estop_pressed_button')).toBeDisabled()
   })
 
   it('should resume robot operation button is not disabled', () => {
@@ -61,7 +47,7 @@ describe('EstopPressedModal - Touchscreen', () => {
     getByText('E-stop')
     getByText('Disengaged')
     getByText('Resume robot operations')
-    expect(getByTestId('Estop_pressed_activeRun_button')).not.toBeDisabled()
+    expect(getByTestId('Estop_pressed_button')).not.toBeDisabled()
   })
 
   it.todo('should call a mock function when clicking resume robot operations')
@@ -72,14 +58,13 @@ describe('EstopPressedModal - Desktop', () => {
 
   beforeEach(() => {
     props = {
-      isActiveRun: true,
       isEngaged: true,
       closeModal: jest.fn(),
     }
     mockGetIsOnDevice.mockReturnValue(false)
   })
-  it('should render text and button - active run', () => {
-    const [{ getByText, getByRole, getByTestId }] = render(props)
+  it('should render text and button', () => {
+    const [{ getByText, getByRole }] = render(props)
     getByText('E-stop pressed')
     getByText('E-stop Engaged')
     getByText(
@@ -88,21 +73,6 @@ describe('EstopPressedModal - Desktop', () => {
     expect(
       getByRole('button', { name: 'Resume robot operations' })
     ).toBeDisabled()
-    getByTestId('DesktopEstopModal_activeRun')
-  })
-
-  it('should render text and button - inactive run', () => {
-    props.isActiveRun = false
-    const [{ getByText, getByRole, getByTestId }] = render(props)
-    getByText('E-stop pressed')
-    getByText('E-stop Engaged')
-    getByText(
-      'First, safely clear the deck of any labware or spills. Then, twist the E-stop button counterclockwise. Finally, have Flex move the gantry to its home position.'
-    )
-    expect(
-      getByRole('button', { name: 'Resume robot operations' })
-    ).toBeDisabled()
-    getByTestId('DesktopEstopModal_inactiveRun')
   })
 
   it('should resume robot operation button is not disabled', () => {
