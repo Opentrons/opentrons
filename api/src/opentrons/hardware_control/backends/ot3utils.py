@@ -1,6 +1,7 @@
 """Shared utilities for ot3 hardware control."""
 from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence
 from typing_extensions import Literal
+from logging import getLogger
 from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
@@ -52,6 +53,7 @@ from opentrons_hardware.hardware_control.motion import (
     create_gripper_jaw_step,
     create_tip_action_step,
 )
+from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 
 GRIPPER_JAW_HOME_TIME: float = 10
 GRIPPER_JAW_GRIP_TIME: float = 10
@@ -82,6 +84,8 @@ NODEID_SUBSYSTEM = {node: subsystem for subsystem, node in SUBSYSTEM_NODEID.item
 SUBSYSTEM_USB: Dict[SubSystem, USBTarget] = {SubSystem.rear_panel: USBTarget.rear_panel}
 
 USB_SUBSYSTEM = {target: subsystem for subsystem, target in SUBSYSTEM_USB.items()}
+
+LOG = getLogger(__name__)
 
 
 def axis_nodes() -> List["NodeId"]:
@@ -331,6 +335,11 @@ def create_move_group(
     for move in moves:
         unit_vector = move.unit_vector
         for block in move.blocks:
+            if block.time < (3.0 / interrupts_per_sec):
+                LOG.info(
+                    f"Skipping move block with time {block.time} (<{3.0/interrupts_per_sec})"
+                )
+                continue
             distances = unit_vector_multiplication(unit_vector, block.distance)
             node_id_distances = _convert_to_node_id_dict(distances)
             velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
