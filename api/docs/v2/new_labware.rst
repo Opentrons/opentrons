@@ -72,31 +72,46 @@ When the ``load_labware`` method loads labware into your protocol, it returns a 
     
     The ``load_labware`` method includes an optional ``label`` argument. You can use it to identify labware with a descriptive name. If used, the label value is displayed in the Opentrons App. For example::
         
-        tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat',
-                                        location= 'D1',  # Flex deck slot
-                                        label= 'any-name-you-want')
+        tiprack = protocol.load_labware(
+            load_name= 'corning_96_wellplate_360ul_flat',
+            location= 'D1',  # Flex deck slot
+            label= 'any-name-you-want')
 
-Loading Labware onto Adapters
+Loading Labware on Adapters
 ===========================
 
-The previous section demonstrates working with labware that's mounted in a deck slot. But what do you do when you need to load labware onto an adapter and use it with a module? Well, our Python API gives you two options. The first option includes a set of API load names for labware and adapter combinations you can use with the `Heater-Shaker GEN1 module <https://opentrons.com/products/modules/heater-shaker/>`_. The second option includes the ``adapter`` argument which is part of the ``load_labware`` method. Let's examine how each of these options work.
+The the previous section demonstrates loading labware directly into a deck slot. But, using the ``load_labware`` method also includes the ``adapter`` argument, which lets you stack labware on top of a compatible adapter. Placing labware on an adapter adds functionality and flexibility to your robot and protocols. For example, you can use an adapter as a simple labware holding device or when you need to use a labware/adapter combination with a module. 
 
-Loading Labware on Heater-Shaker Adapters
------------------------------------------
-
-Loading Labware and Adapters with ``load_labware``
---------------------------------------------------
-
-Placing labware on top of a compatible adapter adds additional functionality to your robot. For example, you might want to use an adapter as a simple holding device or for moving labware/adapter combinations onto a module later in your protocol. To tell your Flex or OT-2 you're stacking labware on top of an adapter, pass the adapter's load name to the ``load_labware`` method like this:: 
+On the Deck
+-------
+This example stacks a 96-well plate on a flat adapter and loads this combination into a deck slot::
     
-    plate = protocol.load_labware (load_name= 'corning_96_wellplate_360ul_flat',
-                                   location= "D1",
-                                   adapter= "opentrons_universal_flat_adapter")
+    corning_plate = protocol.load_labware (
+        load_name= 'corning_96_wellplate_360ul_flat',
+        location= "D1", #Flex deck slot
+        adapter= "opentrons_universal_flat_adapter")
 
+On a Module
+-----------
+
+This example stacks a 96-well plate on a PCR adapter and loads this combination onto a Heater-Shaker::
+
+    # Load module, open latch
+    heater_shaker = context.load_module(
+        module_name= "heaterShakerModuleV1",
+        location= "D1")
+    heater_shaker.open_labware_latch()
+    
+    # Load adapter on the module
+    pcr_adapter = heater_shaker.load_adapter(name= "opentrons_96_pcr_adapter")
+
+    # Load labware on the adapter
+    nest_plate = pcr_adapter.load_labware(
+        load_name= "nest_96_wellplate_100ul_pcr_full_skirt")
+
+.. Some text and link to separate moving/stacking doc here TBD? PR 13016 and RLAB-343.
 
 .. versionadded:: 2.15
-
-.. TBD use examples from PR 13016 and RLAB-343. This is the ``adapter`` argument.
 
 .. _new-well-access:
 
