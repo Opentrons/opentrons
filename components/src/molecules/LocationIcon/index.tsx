@@ -34,9 +34,10 @@ const LOCATION_ICON_STYLE = css<{
   slotName?: string
   height?: string
   width?: string
+  color?: string
 }>`
   align-items: ${ALIGN_CENTER};
-  border: 2px solid ${COLORS.darkBlack100};
+  border: 2px solid ${props => props.color ?? COLORS.darkBlack100};
   border-radius: ${BORDERS.borderRadiusSize3};
   height: ${props => props.height ?? SPACING.spacing32};
   padding: ${SPACING.spacing2} 0.375rem;
@@ -73,7 +74,7 @@ export function LocationIcon({
         <Icon
           name={iconName}
           size="1.25rem"
-          color={COLORS.darkBlack100}
+          color={props.color ?? COLORS.darkBlack100}
           aria-label={iconName}
         />
       ) : (

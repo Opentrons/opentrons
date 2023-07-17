@@ -31,6 +31,8 @@ interface BaseDeckProps {
     nestedLabwareDef?: LabwareDefinition2
     innerProps?: React.ComponentProps<typeof Module>['innerProps']
   }>
+  lightFill: string
+  darkFill: string
   trashSlotName?: DeckSlot['id']
   children?: React.ReactNode
 }
@@ -41,6 +43,8 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
     trashSlotName,
     moduleLocations,
     labwareLocations,
+    lightFill,
+    darkFill,
     children,
   } = props
   const deckDef = getDeckDefFromRobotType(robotType)
@@ -57,11 +61,17 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             <DeckSlotLocation
               slotName={slotDef.id}
               deckDefinition={deckDef}
-              slotClipColor={slotDef.id === trashSlotName ? '#0000' : '#ff0000'}
-              slotBaseColor="yellow"
+              slotClipColor={
+                slotDef.id === trashSlotName ? 'transparent' : darkFill
+              }
+              slotBaseColor={lightFill}
             />
             {slotDef.id === trashSlotName ? (
-              <FlexTrash robotType={robotType} trashIconColor="pink" />
+              <FlexTrash
+                robotType={robotType}
+                trashIconColor={lightFill}
+                backgroundColor={darkFill}
+              />
             ) : null}
           </>
         ))
@@ -103,7 +113,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
           </g>
         ) : null
       })}
-      <SlotLabels robotType={robotType} />
+      <SlotLabels robotType={robotType} color={darkFill} />
       {children}
     </RobotCoordinateSpace>
   )

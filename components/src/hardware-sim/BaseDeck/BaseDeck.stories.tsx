@@ -58,5 +58,7 @@ export const BaseDeck: Story = {
         nestedLabwareDef: fixture_96_plate as LabwareDefinition2,
       },
     ],
+    darkFill: 'rebeccapurple',
+    lightFill: 'lavender',
   },
 }
