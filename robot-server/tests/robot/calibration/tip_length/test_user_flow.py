@@ -4,7 +4,10 @@ from mock import ANY, patch, call
 from typing import List, Tuple, Dict, Any
 from opentrons import config
 from pathlib import Path
-from opentrons_shared_data.pipette import mutable_configurations, pipette_load_name_conversions as pipette_load_name
+from opentrons_shared_data.pipette import (
+    mutable_configurations,
+    pipette_load_name_conversions as pipette_load_name,
+)
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.protocol_api.labware import get_labware_definition
@@ -46,7 +49,9 @@ pipette_map = {
 @pytest.fixture(params=pipette_map.keys())
 def mock_hw_pipette_all_combos(request):
     pipette_model = pipette_load_name.convert_pipette_model(request.param)
-    configurations = mutable_configurations.load_with_mutable_configurations(pipette_model, fake_path, "testId")
+    configurations = mutable_configurations.load_with_mutable_configurations(
+        pipette_model, fake_path, "testId"
+    )
     return pipette.Pipette(configurations, PIP_CAL, "testId")
 
 
@@ -72,7 +77,9 @@ def mock_hw_all_combos(hardware, mock_hw_pipette_all_combos, request):
 @pytest.fixture
 def mock_hw(hardware):
     pipette_model = pipette_load_name.convert_pipette_model("p300_single_v2.1")
-    configurations = mutable_configurations.load_with_mutable_configurations(pipette_model, fake_path, "testId")
+    configurations = mutable_configurations.load_with_mutable_configurations(
+        pipette_model, fake_path, "testId"
+    )
     pip = pipette.Pipette(configurations, PIP_CAL, "testId")
     hardware.hardware_instruments = {Mount.RIGHT: pip}
     hardware._current_pos = Point(0, 0, 0)
@@ -223,7 +230,10 @@ async def test_invalidate_tip(mock_user_flow):
     uf = mock_user_flow
     uf._tip_origin_pt = Point(1, 1, 1)
     uf._hw_pipette._has_tip = True
-    z_offset = uf._hw_pipette.active_tip_settings.default_return_tip_height * uf._get_default_tip_length()
+    z_offset = (
+        uf._hw_pipette.active_tip_settings.default_return_tip_height
+        * uf._get_default_tip_length()
+    )
     await uf.invalidate_tip()
     # should move to return tip
     move_calls = [
@@ -241,7 +251,10 @@ async def test_exit(mock_user_flow):
     uf = mock_user_flow
     uf._tip_origin_pt = Point(1, 1, 1)
     uf._hw_pipette._has_tip = True
-    z_offset = uf._hw_pipette.active_tip_settings.default_return_tip_height * uf._get_default_tip_length()
+    z_offset = (
+        uf._hw_pipette.active_tip_settings.default_return_tip_height
+        * uf._get_default_tip_length()
+    )
     await uf.invalidate_tip()
     # should move to return tip
     move_calls = [

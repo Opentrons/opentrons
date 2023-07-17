@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, validator
 from enum import Enum
 from dataclasses import dataclass
 
-from . import types as pip_types, dev_types
+from . import types as pip_types
 
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
@@ -21,7 +21,7 @@ PipetteModelMajorVersionType = Literal[1, 2, 3]
 PipetteModelMinorVersionType = Literal[0, 1, 2, 3, 4, 5]
 
 
-class PipetteTipType(Enum):
+class PipetteTipType(int, Enum):
     t10 = 10
     t20 = 20
     t50 = 50
@@ -30,14 +30,10 @@ class PipetteTipType(Enum):
     t1000 = 1000
 
 
-class PipetteChannelType(Enum):
+class PipetteChannelType(int, Enum):
     SINGLE_CHANNEL = 1
     EIGHT_CHANNEL = 8
     NINETY_SIX_CHANNEL = 96
-
-    @property
-    def as_int(self) -> int:
-        return self.value
 
     def __str__(self) -> str:
         if self.value == 96:
@@ -363,7 +359,7 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
         description="The minimum supported volume of the pipette.",
         alias="minVolume",
     )
-    default_tipracks: List[dev_types.LabwareUri] = Field(
+    default_tipracks: List[str] = Field(
         ...,
         description="A list of default tiprack paths.",
         regex="opentrons/[a-z0-9._]+/[0-9]",

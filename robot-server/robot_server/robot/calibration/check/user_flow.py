@@ -228,9 +228,7 @@ class CheckCalibrationUserFlow:
     @property
     def critical_point_override(self) -> Optional[CriticalPoint]:
         return (
-            CriticalPoint.FRONT_NOZZLE
-            if self.hw_pipette.config.channels.as_int == 8
-            else None
+            CriticalPoint.FRONT_NOZZLE if self.hw_pipette.config.channels == 8 else None
         )
 
     async def handle_command(self, name: Any, data: Dict[Any, Any]):
@@ -286,7 +284,7 @@ class CheckCalibrationUserFlow:
             for mount, pip in pips.items():
                 pip_calibration = self._pipette_calibrations[mount]
                 info = PipetteInfo(
-                    channels=pip.config.channels.as_int,
+                    channels=pip.config.channels,
                     rank=PipetteRank.first,
                     max_volume=pip.config.max_volume,
                     mount=mount,
@@ -304,7 +302,7 @@ class CheckCalibrationUserFlow:
         r_calibration = self._get_stored_pipette_offset_cal(right_pip, Mount.RIGHT)
         l_calibration = self._get_stored_pipette_offset_cal(left_pip, Mount.LEFT)
         r_info = PipetteInfo(
-            channels=right_pip.config.channels.as_int,
+            channels=right_pip.config.channels,
             max_volume=right_pip.config.max_volume,
             rank=PipetteRank.first,
             mount=Mount.RIGHT,
@@ -314,7 +312,7 @@ class CheckCalibrationUserFlow:
             default_tipracks=uf.get_default_tipracks(right_pip.config.default_tipracks),
         )
         l_info = PipetteInfo(
-            channels=left_pip.config.channels.as_int,
+            channels=left_pip.config.channels,
             max_volume=left_pip.config.max_volume,
             rank=PipetteRank.first,
             mount=Mount.LEFT,
@@ -325,7 +323,7 @@ class CheckCalibrationUserFlow:
         )
         if (
             left_pip.config.max_volume > right_pip.config.max_volume
-            or right_pip.config.channels.as_int > left_pip.config.channels.as_int
+            or right_pip.config.channels > left_pip.config.channels
         ):
             r_info.rank = PipetteRank.second
             return l_info, [l_info, r_info]
@@ -535,7 +533,7 @@ class CheckCalibrationUserFlow:
             CheckAttachedPipette(
                 model=hw_pip.model,
                 name=hw_pip.name,
-                tipLength=hw_pip.current_tip_length,
+                tipLength=hw_pip.active_tip_settings.default_tip_length,
                 tipRackLoadName=info_pip.tip_rack.load_name,
                 tipRackDisplay=info_pip.tip_rack._core.get_definition()["metadata"][
                     "displayName"
@@ -842,10 +840,8 @@ class CheckCalibrationUserFlow:
                 self.active_tiprack._core.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:
-            tip_overlap = (
-                self.hw_pipette.tip_overlap.get(
-                    self.active_tiprack.uri, self.hw_pipette.tip_overlap["default"]
-                )
+            tip_overlap = self.hw_pipette.tip_overlap.get(
+                self.active_tiprack.uri, self.hw_pipette.tip_overlap["default"]
             )
             tip_length = self.active_tiprack.tip_length
             return tip_length - tip_overlap

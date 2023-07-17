@@ -118,7 +118,7 @@ def test_plan_check_pick_up_tip_with_presses_argument_ot3(
     decoy.when(mock_pipette_ot3.pick_up_configurations.distance).then_return(0)
     decoy.when(mock_pipette_ot3.pick_up_configurations.current).then_return(1)
     decoy.when(mock_pipette_ot3.config.quirks).then_return([])
-    decoy.when(mock_pipette_ot3.channels.value).then_return(channels)
+    decoy.when(mock_pipette_ot3.channels).then_return(channels)
 
     if presses_input is None:
         decoy.when(mock_pipette_ot3.config.pick_up_presses).then_return(

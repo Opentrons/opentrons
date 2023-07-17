@@ -236,7 +236,7 @@ class PipetteHandlerProvider:
             #  this dict newly every time? Any why only a few items are being updated?
             for key in configs:
                 result[key] = instr_dict[key]
-            result["channels"] = instr._max_channels.as_int
+            result["channels"] = instr._max_channels
             result["has_tip"] = instr.has_tip
             result["tip_length"] = instr.current_tip_length
             result["aspirate_speed"] = self.plunger_speed(
@@ -663,7 +663,7 @@ class PipetteHandlerProvider:
                 backup_dist = -press_dist
                 yield (press_dist, backup_dist)
 
-        if instrument.channels.value == 96:
+        if instrument.channels == 96:
             return (
                 PickUpTipSpec(
                     plunger_prep_pos=instrument.plunger_positions.bottom,
@@ -779,7 +779,7 @@ class PipetteHandlerProvider:
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.DROPTIP)
 
-        is_96_chan = instrument.channels.value == 96
+        is_96_chan = instrument.channels == 96
 
         bottom = instrument.plunger_positions.bottom
         droptip = (

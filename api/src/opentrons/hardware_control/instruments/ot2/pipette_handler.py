@@ -225,7 +225,7 @@ class PipetteHandlerProvider(Generic[MountType]):
             #  this dict newly every time? Any why only a few items are being updated?
             for key in configs:
                 result[key] = instr_dict[key]
-            result["channels"] = instr.channels.as_int
+            result["channels"] = instr.channels
             result["has_tip"] = instr.has_tip
             result["tip_length"] = instr.current_tip_length
             result["aspirate_speed"] = self.plunger_speed(

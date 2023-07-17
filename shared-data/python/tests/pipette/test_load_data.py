@@ -15,7 +15,7 @@ def test_load_pipette_definition() -> None:
         PipetteVersionType(major=3, minor=3),
     )
 
-    assert pipette_config_one.channels.as_int == 1
+    assert pipette_config_one.channels == 1
     assert pipette_config_one.pipette_type.value == "p50"
     assert pipette_config_one.nozzle_offset == [-8.0, -22.0, -259.15]
 
@@ -33,7 +33,7 @@ def test_load_pipette_definition() -> None:
         PipetteVersionType(major=1, minor=0),
     )
 
-    assert pipette_config_two.channels.as_int == 1
+    assert pipette_config_two.channels == 1
     assert pipette_config_two.pipette_type.value == "p50"
     assert pipette_config_two.nozzle_offset == [0.0, 0.0, 25.0]
     assert (

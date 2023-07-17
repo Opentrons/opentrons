@@ -318,18 +318,14 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         if cp_override == CriticalPoint.XY_CENTER:
             mod_offset_xy = [
                 offsets[0],
-                offsets[1]
-                - (INTERNOZZLE_SPACING_MM * (self._config.channels.as_int - 1) / 2),
+                offsets[1] - (INTERNOZZLE_SPACING_MM * (self._config.channels - 1) / 2),
                 offsets[2],
             ]
             cp_type = CriticalPoint.XY_CENTER
         elif cp_override == CriticalPoint.FRONT_NOZZLE:
             mod_offset_xy = [
                 0,
-                (
-                    offsets[1]
-                    - INTERNOZZLE_SPACING_MM * (self._config.channels.as_int - 1)
-                ),
+                (offsets[1] - INTERNOZZLE_SPACING_MM * (self._config.channels - 1)),
                 offsets[2],
             ]
             cp_type = CriticalPoint.FRONT_NOZZLE

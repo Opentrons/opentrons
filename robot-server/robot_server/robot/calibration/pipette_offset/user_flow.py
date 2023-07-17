@@ -8,6 +8,7 @@ from typing import (
     Optional,
     Union,
     Tuple,
+    cast,
 )
 from opentrons.calibration_storage import (
     helpers,
@@ -24,6 +25,7 @@ from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipett
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
 )
+from opentrons_shared_data.pipette.dev_types import LabwareUri
 from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.types import Mount, Point, Location
@@ -144,7 +146,7 @@ class PipetteOffsetCalibrationUserFlow:
 
         self._hw_pipette.reset_pipette_offset(self._mount, to_default=True)
         self._default_tipracks = util.get_default_tipracks(
-            self.hw_pipette.config.default_tipracks
+            cast(List[LabwareUri], self.hw_pipette.config.default_tipracks)
         )
         self._supported_commands = SupportedCommands(namespace="calibration")
         self._supported_commands.loadLabware = True
@@ -244,7 +246,7 @@ class PipetteOffsetCalibrationUserFlow:
     def critical_point_override(self) -> Optional[CriticalPoint]:
         return (
             CriticalPoint.FRONT_NOZZLE
-            if self._hw_pipette.config.channels.as_int == 8
+            if self._hw_pipette.config.channels == 8
             else None
         )
 
@@ -320,11 +322,7 @@ class PipetteOffsetCalibrationUserFlow:
     def _get_tip_length(self) -> float:
         stored_tip_length_cal = self._get_stored_tip_length_cal()
         if stored_tip_length_cal is None or self._should_perform_tip_length:
-            tip_overlap = (
-                self._hw_pipette.tip_overlap.get(
-                    self._tip_rack.uri, 0
-                )
-            )
+            tip_overlap = self._hw_pipette.tip_overlap.get(self._tip_rack.uri, 0)
             tip_length = self._tip_rack.tip_length
             return tip_length - tip_overlap
         else:
@@ -440,7 +438,7 @@ class PipetteOffsetCalibrationUserFlow:
         if current_state == self._sm.state.joggingToDeck:
             self._z_height_reference = cur_pt.z
         elif current_state == self._sm.state.savingPointOne:
-            if self._hw_pipette.config.channels.as_int > 1:
+            if self._hw_pipette.config.channels > 1:
                 cur_pt = await self.get_current_point(
                     critical_point=CriticalPoint.FRONT_NOZZLE
                 )

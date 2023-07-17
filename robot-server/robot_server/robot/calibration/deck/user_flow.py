@@ -36,6 +36,7 @@ from opentrons.types import Mount, Point, Location
 from opentrons.util import linal
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from robot_server.robot.calibration.constants import TIP_RACK_LOOKUP_BY_MAX_VOL
 from robot_server.service.errors import RobotServerError
@@ -209,12 +210,12 @@ class DeckCalibrationUserFlow:
         right_pip = pips[Mount.RIGHT]
         left_pip = pips[Mount.LEFT]
         if right_pip.config.max_volume == left_pip.config.max_volume:
-            if right_pip.config.channels.as_int == left_pip.config.channels.as_int:
+            if right_pip.config.channels == left_pip.config.channels:
                 return right_pip, Mount.RIGHT
             else:
                 return sorted(
                     [(right_pip, Mount.RIGHT), (left_pip, Mount.LEFT)],
-                    key=lambda p_m: p_m[0].config.channels.as_int,
+                    key=lambda p_m: p_m[0].config.channels,
                 )[0]
         else:
             return sorted(
@@ -235,7 +236,9 @@ class DeckCalibrationUserFlow:
             return labware.load(lw_load_name, self._deck.position_for(TIP_RACK_SLOT))
 
     def _get_default_tipracks(self):
-        return uf.get_default_tipracks(self.hw_pipette.config.default_tipracks)
+        return uf.get_default_tipracks(
+            cast(List[LabwareUri], self.hw_pipette.config.default_tipracks)
+        )
 
     def _build_expected_points_dict(self) -> ExpectedPoints:
         pos_1 = self._deck.get_calibration_position(POINT_ONE_ID).position
@@ -270,7 +273,7 @@ class DeckCalibrationUserFlow:
     def critical_point_override(self) -> Optional[CriticalPoint]:
         return (
             CriticalPoint.FRONT_NOZZLE
-            if self._hw_pipette.config.channels.as_int == 8
+            if self._hw_pipette.config.channels == 8
             else None
         )
 
@@ -356,11 +359,7 @@ class DeckCalibrationUserFlow:
                 self._tip_rack._core.get_definition(),
             ).tipLength
         except cal_types.TipLengthCalNotFound:
-            tip_overlap = (
-                self._hw_pipette.tip_overlap.get(
-                    self._tip_rack.uri, 0
-                )
-            )
+            tip_overlap = self._hw_pipette.tip_overlap.get(self._tip_rack.uri, 0)
             tip_length = self._tip_rack.tip_length
             return tip_length - tip_overlap
 

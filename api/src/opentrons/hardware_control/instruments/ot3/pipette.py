@@ -272,11 +272,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         # the pipette configurations.
         X_DIRECTION_VALUE = 1
         Y_DIVISION = 2
-        if self.channels.value == 96:
+        if self.channels == 96:
             NUM_ROWS = 12
             NUM_COLS = 8
             X_DIRECTION_VALUE = -1
-        elif self.channels.value == 8:
+        elif self.channels == 8:
             NUM_ROWS = 1
             NUM_COLS = 8
         else:

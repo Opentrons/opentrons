@@ -501,7 +501,7 @@ class OT3API(
         left = self._pipette_handler.has_pipette(OT3Mount.LEFT)
         if left:
             pip = self._pipette_handler.get_pipette(OT3Mount.LEFT)
-            if pip.config.channels.as_int > 8:
+            if pip.config.channels > 8:
                 return GantryLoad.HIGH_THROUGHPUT
         return GantryLoad.LOW_THROUGHPUT
 

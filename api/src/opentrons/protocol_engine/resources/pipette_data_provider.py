@@ -49,7 +49,7 @@ def get_virtual_pipette_static_config(
         display_name=config.display_name,
         min_volume=config.min_volume,
         max_volume=config.max_volume,
-        channels=config.channels.as_int,
+        channels=config.channels,
         home_position=config.mount_configurations.homePosition,
         nozzle_offset_z=config.nozzle_offset[2],
         flow_rates=FlowRates(
