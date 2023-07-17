@@ -8,7 +8,7 @@ Hardware Modules
 
 Hardware modules are powered and unpowered deck-mounted peripherals. The Flex and OT-2 know about and control powered modules when they're attached via a USB connection. The robots do not know about unpowered modules until you use one in a protocol and upload that protocol to the Opentrons App.
 
-Opentrons powered modules include the :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>`, :ref:`Thermocycler Module <thermocycler-module>`, and :ref:`Heater-Shaker Module <heater-shaker-module>`. Our 96-well :ref:`Magnetic Block <magnetic-block>` is unpowered and recommended for use with the Flex only. These modules are useful because they help extend the capabilities of your Flex or OT-2.
+Powered modules include the :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>`, :ref:`Thermocycler Module <thermocycler-module>`, and :ref:`Heater-Shaker Module <heater-shaker-module>`. The 96-well :ref:`Magnetic Block <magnetic-block>` is unpowered and recommended for use with the Flex only.
 
 ************
 Module Setup
@@ -17,7 +17,7 @@ Module Setup
 Loading Modules onto the Deck
 =============================
 
-Similar to labware and pipettes, you must inform the Protocol API about the modules you want to use in your protocol. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all loaded modules are connected and powered on.
+Similar to labware and pipettes, you must inform the API about the modules you want to use in your protocol. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all loaded modules are connected via USB and powered on.
 
 Use :py:meth:`.ProtocolContext.load_module` to load a module. 
 
@@ -60,9 +60,9 @@ In the examples above, after the ``load_module`` method loads labware into your 
 Available Modules
 -----------------
 
-The first parameter of :py:meth:`.ProtocolContext.load_module`, the module's *load name*, specifies the kind of module to load. The table below lists the load names for each kind of module.
+The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  *API load name*. The load name tells your robot which module you're going to use in a protocol. The table below lists the API load names for the currently available modules.
 
-Some modules were added to the Protocol API later than others, and some modules have multiple hardware generations (GEN2 modules have a "GEN2" label on the device). Make sure your protocol's metadata specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the modules you want to use.
+Some modules were added to our python API later than others, and others span multiple hardware generations. For example, second generation modules have a "GEN2" label on the device. When writing a protocol that requires a module, make sure your protocol's ``requiremets`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the modules you want to use.
 
 .. table::
    :widths: 4 5 2
