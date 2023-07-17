@@ -10,7 +10,7 @@ from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Lab
 
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
-from hardware_testing.opentrons_api.types import Point
+from hardware_testing.opentrons_api.types import Point, OT3Mount
 from .measurement import (
     MeasurementType,
     create_measurement_tag,
@@ -71,7 +71,7 @@ def _reduce_volumes_to_not_exceed_software_limit(
 ) -> List[float]:
     for i, v in enumerate(test_volumes):
         liq_cls = get_liquid_class(cfg.pipette_volume, 96, cfg.tip_volume, int(v))
-        max_vol = cfg.tip_volume - liq_cls.aspirate.air_gap.trailing_air_gap
+        max_vol = cfg.tip_volume - liq_cls.aspirate.trailing_air_gap
         test_volumes[i] = min(v, max_vol - 0.1)
     return test_volumes
 
@@ -492,7 +492,8 @@ def run(ctx: ProtocolContext, cfg: config.PhotometricConfig) -> None:
         setup_tip = tips[0][0]
         volume_for_setup = max(test_volumes)
         _pick_up_tip(ctx, pipette, cfg, location=setup_tip.top())
-        pipette.home()
+        mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
+        ctx._core.get_hardware().retract(mnt)
         if not ctx.is_simulating():
             ui.get_user_ready("REPLACE first tip with NEW TIP")
         required_ul = max(

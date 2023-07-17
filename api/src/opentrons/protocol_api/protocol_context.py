@@ -755,7 +755,7 @@ class ProtocolContext(CommandPublisher):
                              replaced by `instrument_name`.
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
-        is_96_channel = instrument_name == "p1000_96"
+        is_96_channel = instrument_name in ("p1000_96", "flex_96channel_1000")
         if is_96_channel and isinstance(self._core, ProtocolEngineCore):
             checked_instrument_name = instrument_name
             checked_mount = Mount.LEFT

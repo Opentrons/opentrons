@@ -343,9 +343,11 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   slotName != null
                     ? t('deck_slot', { slot: slotName }) + ' - '
                     : null}
-                  {t(module.usbPort.port === null ? 'usb_hub' : 'usb_port', {
-                    port: module.usbPort.hub ?? module.usbPort.port,
-                  })}
+                  {module?.usbPort !== null
+                    ? t('usb_port', {
+                        port: module?.usbPort?.port,
+                      })
+                    : t('usb_port_not_connected')}
                 </StyledText>
                 <Flex
                   paddingBottom={SPACING.spacing4}

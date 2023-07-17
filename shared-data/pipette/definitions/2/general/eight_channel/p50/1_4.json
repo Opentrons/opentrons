@@ -33,5 +33,6 @@
   "shaftDiameter": 2.0,
   "shaftULperMM": 3.142,
   "backCompatNames": [],
-  "backlashDistance": 0.0
+  "backlashDistance": 0.0,
+  "quirks": ["dropTipShake"]
 }

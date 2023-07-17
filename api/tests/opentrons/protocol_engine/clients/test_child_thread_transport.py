@@ -12,7 +12,7 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from opentrons.protocol_engine import ProtocolEngine, commands, DeckPoint
-from opentrons.protocol_engine.errors import ErrorOccurrence, ProtocolEngineError
+from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence
 from opentrons.protocol_engine.clients.transports import ChildThreadTransport
 
 
@@ -94,7 +94,7 @@ async def test_execute_command_failure(
 
     task = partial(subject.execute_command, request=cmd_request)
 
-    with pytest.raises(ProtocolEngineError, match="Things are not looking good"):
+    with pytest.raises(ProtocolCommandFailedError):
         await get_running_loop().run_in_executor(None, task)
 
 

@@ -42,6 +42,9 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
     ok: Literal[True] = Field(
         ..., description="Whether this instrument is OK and ready to go"
     )
+    firmwareVersion: Optional[str] = Field(
+        None, description="The firmware version of this instrument (if applicable)"
+    )
     data: InstrumentDataT
 
 

@@ -1216,9 +1216,7 @@
       "brand": {
         "brand": "NEST",
         "brandId": ["402501"],
-        "links": [
-          "http://www.cell-nest.com/page94?_l=en&product_id=97&product_category=96"
-        ]
+        "links": ["https://www.nest-biotech.com/pcr-plates/58773587.html"]
       },
       "metadata": {
         "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
@@ -2473,9 +2471,7 @@
           "brand": {
             "brand": "NEST",
             "brandId": ["634001"],
-            "links": [
-              "http://www.cell-nest.com/page94?_l=en&product_id=227&product_category=84"
-            ]
+            "links": ["https://www.nest-biotech.com/sample-vials/59299027.html"]
           },
           "wells": [
             "A1",

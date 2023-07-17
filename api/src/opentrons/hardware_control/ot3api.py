@@ -671,11 +671,6 @@ class OT3API(
         self._log.info("Recovering from halt")
         await self.reset()
 
-        # TODO: (2022-11-21 AA) remove this logic when encoder is added to the gripper
-        # Always refresh gripper z position as a safeguard, since we don't have an
-        # encoder position for reference
-        await self.home_z(OT3Mount.GRIPPER)
-
         if home_after:
             await self.home()
 
@@ -1463,10 +1458,13 @@ class OT3API(
             # save time by using max speed
             max_speeds = self.config.motion_settings.default_max_speed
             speed = max_speeds[self.gantry_load][OT3AxisKind.P]
-        if current_pos > target_pos[pip_ax]:
+        # IMPORTANT: Here is our backlash compensation.
+        #            The plunger is pre-loaded in the "aspirate" direction
+        # NOTE: plunger position (mm) decreases up towards homing switch
+        if current_pos < target_pos[pip_ax]:
+            # move down below "bottom", before moving back up to "bottom"
             backlash_pos = target_pos.copy()
-            backlash_pos[pip_ax] -= instrument.backlash_distance
-
+            backlash_pos[pip_ax] += instrument.backlash_distance
             await self._move(
                 backlash_pos,
                 speed=(speed * rate),
@@ -1507,10 +1505,6 @@ class OT3API(
         if not aspirate_spec:
             return
 
-        checked_mount = OT3Mount.from_mount(mount)
-        instrument = self._pipette_handler.get_pipette(checked_mount)
-        pip_ax = Axis.of_main_tool_actuator(mount)
-
         target_pos = target_position_from_plunger(
             realmount,
             aspirate_spec.plunger_distance,
@@ -1520,13 +1514,6 @@ class OT3API(
         try:
             await self._backend.set_active_current(
                 {aspirate_spec.axis: aspirate_spec.current}
-            )
-            backlash_pos = target_pos.copy()
-            backlash_pos[pip_ax] -= instrument.backlash_distance
-            await self._move(
-                backlash_pos,
-                speed=aspirate_spec.speed,
-                home_flagged_axes=False,
             )
             await self._move(
                 target_pos,

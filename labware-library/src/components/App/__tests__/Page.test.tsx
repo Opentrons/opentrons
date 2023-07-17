@@ -13,7 +13,7 @@ describe('Page', () => {
         scrollRef={{ current: null }}
         sidebar="foo"
         content="bar"
-        detailPage={false}
+        isDetailPage={false}
       />
     )
 
@@ -26,7 +26,7 @@ describe('Page', () => {
         scrollRef={{ current: null }}
         sidebar="foo"
         content="bar"
-        detailPage={true}
+        isDetailPage={true}
       />
     )
 

@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -17,6 +16,7 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
   RESPONSIVENESS,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
@@ -118,7 +118,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"
-          gridGap={SPACING.spacing8}
+          gridGap={SPACING.spacing24}
         >
           {typeof header === 'string' ? <Title>{header}</Title> : header}
           <StyledText as="p">{bodyText}</StyledText>
@@ -127,7 +127,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           {rightHandBody}
         </Flex>
       </Flex>
-      <Flex justifyContent={buttonPositioning} alignItems={ALIGN_CENTER}>
+      <Flex justifyContent={buttonPositioning} alignItems={ALIGN_FLEX_END}>
         {back != null ? (
           <Btn onClick={back} disabled={backIsDisabled} aria-label="back">
             <StyledText

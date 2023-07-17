@@ -207,6 +207,8 @@ export function ProtocolSetupModules({
             <RobotWorkSpace
               deckDef={deckDef}
               deckLayerBlocklist={OT3_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+              deckFill={COLORS.light1}
+              trashSlotName="A3"
               id="ModuleSetup_deckMap"
             >
               {() => (
@@ -224,11 +226,8 @@ export function ProtocolSetupModules({
                       <ModuleInfo
                         moduleModel={module.moduleDef.model}
                         isAttached={module.attachedModuleMatch != null}
-                        usbPort={
-                          module.attachedModuleMatch?.usbPort.port ?? null
-                        }
-                        hubPort={
-                          module.attachedModuleMatch?.usbPort.hub ?? null
+                        physicalPort={
+                          module.attachedModuleMatch?.usbPort ?? null
                         }
                         runId={runId}
                       />

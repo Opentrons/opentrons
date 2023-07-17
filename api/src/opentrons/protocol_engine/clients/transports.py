@@ -1,5 +1,4 @@
-"""Base transport interfaces for communicating with a Protocol Engine."""
-from abc import ABC, abstractmethod
+"""A helper for controlling a `ProtocolEngine` without async/await."""
 from asyncio import AbstractEventLoop, run_coroutine_threadsafe
 from typing import Any, overload
 from typing_extensions import Literal
@@ -8,21 +7,37 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from ..protocol_engine import ProtocolEngine
-from ..errors import ProtocolEngineError
+from ..errors import ProtocolCommandFailedError
 from ..state import StateView
 from ..commands import CommandCreate, CommandResult
 
 
-class AbstractSyncTransport(ABC):
-    """Interface describing a sync. ProtocolEngine state/command transport."""
+class ChildThreadTransport:
+    """A helper for controlling a `ProtocolEngine` without async/await.
+
+    You shouldn't use this directly, except to construct it and then pass it to a `SyncClient`.
+
+    This class is responsible for doing the actual transformation from async `ProtocolEngine` calls
+    to non-async ones, and doing it in a thread-safe way.
+    """
+
+    def __init__(self, engine: ProtocolEngine, loop: AbstractEventLoop) -> None:
+        """Initialize the `ChildThreadTransport`.
+
+        Args:
+            engine: The `ProtocolEngine` instance that you want to interact with.
+                It must be running in a thread *other* than the one from which you
+                want to synchronously access it.
+            loop: The event loop that `engine` is running in (in the other thread).
+        """
+        self._engine = engine
+        self._loop = loop
 
     @property
-    @abstractmethod
     def state(self) -> StateView:
-        """Get a view of the ProtocolEngine's state."""
-        ...
+        """Get a view of the Protocol Engine's state."""
+        return self._engine.state_view
 
-    @abstractmethod
     def execute_command(self, request: CommandCreate) -> CommandResult:
         """Execute a ProtocolEngine command, blocking until the command completes.
 
@@ -36,7 +51,33 @@ class AbstractSyncTransport(ABC):
             ProtocolEngineError: if the command execution is not successful,
                 the specific error that cause the command to fail is raised.
         """
-        ...
+        command = run_coroutine_threadsafe(
+            self._engine.add_and_execute_command(request=request),
+            loop=self._loop,
+        ).result()
+
+        # TODO: this needs to have an actual code
+        if command.error is not None:
+            error = command.error
+            raise ProtocolCommandFailedError(
+                original_error=error,
+                message=f"{error.errorType}: {error.detail}",
+            )
+
+        # FIXME(mm, 2023-04-10): This assert can easily trigger from this sequence:
+        #
+        # 1. The engine is paused.
+        # 2. The user's Python script calls this method to start a new command,
+        #    which remains `queued` because of the pause.
+        # 3. The engine is stopped.
+        #
+        # The returned command will be `queued`, so it won't have a result.
+        #
+        # We need to figure out a proper way to report this condition to callers
+        # so they correctly interpret it as an intentional stop, not an internal error.
+        assert command.result is not None, f"Expected Command {command} to have result"
+
+        return command.result
 
     @overload
     def call_method(
@@ -63,65 +104,6 @@ class AbstractSyncTransport(ABC):
         **kwargs: Any,
     ) -> Any:
         ...
-
-    @abstractmethod
-    def call_method(self, method_name: str, **kwargs: Any) -> Any:
-        """Execute a ProtocolEngine method, returning the result."""
-        ...
-
-
-class ChildThreadTransport(AbstractSyncTransport):
-    """Concrete transport implementation using asyncio.run_coroutine_threadsafe."""
-
-    def __init__(self, engine: ProtocolEngine, loop: AbstractEventLoop) -> None:
-        """Initialize a ProtocolEngine transport for use in a child thread.
-
-        This adapter allows a client to make blocking command calls on its
-        thread to the asynchronous ProtocolEngine running with an event loop
-        in a different thread.
-
-        Args:
-            engine: An instance of a ProtocolEngine to interact with hardware
-                and other run procedures.
-            loop: An event loop running in the thread where the hardware
-                interaction should occur. The thread this loop is running
-                in should be different than the thread in which the Python
-                protocol is running.
-        """
-        self._engine = engine
-        self._loop = loop
-
-    @property
-    def state(self) -> StateView:
-        """Get a view of the Protocol Engine's state."""
-        return self._engine.state_view
-
-    def execute_command(self, request: CommandCreate) -> CommandResult:
-        """Execute a command synchronously on the main thread."""
-        command = run_coroutine_threadsafe(
-            self._engine.add_and_execute_command(request=request),
-            loop=self._loop,
-        ).result()
-
-        # TODO: this needs to have an actual code
-        if command.error is not None:
-            error = command.error
-            raise ProtocolEngineError(message=f"{error.errorType}: {error.detail}")
-
-        # FIXME(mm, 2023-04-10): This assert can easily trigger from this sequence:
-        #
-        # 1. The engine is paused.
-        # 2. The user's Python script calls this method to start a new command,
-        #    which remains `queued` because of the pause.
-        # 3. The engine is stopped.
-        #
-        # The returned command will be `queued`, so it won't have a result.
-        #
-        # We need to figure out a proper way to report this condition to callers
-        # so they correctly interpret it as an intentional stop, not an internal error.
-        assert command.result is not None, f"Expected Command {command} to have result"
-
-        return command.result
 
     def call_method(self, method_name: str, **kwargs: Any) -> Any:
         """Execute a ProtocolEngine method, returning the result."""
