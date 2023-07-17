@@ -80,11 +80,11 @@ When the ``load_labware`` method loads labware into your protocol, it returns a 
 Loading Labware on Adapters
 ===========================
 
-The the previous section demonstrates loading labware directly into a deck slot. But, using the ``load_labware`` method also includes the ``adapter`` argument, which lets you stack labware on top of a compatible adapter. Placing labware on an adapter adds functionality and flexibility to your robot and protocols. For example, you can use an adapter as a simple labware holding device or when you need to use a labware/adapter combination with a module. 
+The the previous section demonstrates loading labware directly into a deck slot. But, the ``load_labware`` method also includes the ``adapter`` argument. This parameter lets you stack labware on top of a compatible adapter and work with them as a single unit in a protocol. For example, you can use an adapter as a simple labware holding device or when you need to use a labware/adapter combination with a module. The ability to combine labware with adapters adds functionality and flexibility to your robot and protocols. 
 
 On the Deck
 -------
-This example stacks a 96-well plate on a flat adapter and loads this combination into a deck slot::
+This example uses ``adapter`` to combine a 96-well plate with a flat adapter and loads them into a deck slot::
     
     corning_plate = protocol.load_labware (
         load_name= 'corning_96_wellplate_360ul_flat',
@@ -93,11 +93,11 @@ This example stacks a 96-well plate on a flat adapter and loads this combination
 
 On a Module
 -----------
-
-This example stacks a 96-well plate on a PCR adapter and loads this combination onto a Heater-Shaker::
+.. need to verify
+This example combines a 96-well plate with a PCR adapter and loads them onto a Heater-Shaker::
 
     # Load module, open latch
-    heater_shaker = context.load_module(
+    heater_shaker = protocol.load_module(
         module_name= "heaterShakerModuleV1",
         location= "D1")
     heater_shaker.open_labware_latch()
