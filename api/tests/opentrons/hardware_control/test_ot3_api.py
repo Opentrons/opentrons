@@ -1,6 +1,6 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import Iterator, Union, Dict, Tuple, List, Any, OrderedDict
+from typing import Iterator, Union, Dict, Tuple, List, Any, OrderedDict, Optional
 from typing_extensions import Literal
 from math import copysign
 import pytest
@@ -60,6 +60,7 @@ from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons.types import Point, Mount
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
+from opentrons_hardware.hardware_control.motion_planning.types import Move
 
 from opentrons.config import gripper_config as gc
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
@@ -468,6 +469,8 @@ async def test_blow_out_position(
     blowout_volume: float,
 ) -> None:
     for mount, configs in load_configs.items():
+        if configs["channels"] == 96:
+            await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         instr_data, ot3_hardware = await prepare_for_mock_blowout(
             ot3_hardware, mount, configs
         )
@@ -480,7 +483,6 @@ async def test_blow_out_position(
             max_allowed_input_distance * instr_data["config"].shaft_ul_per_mm
         )
         assume(blowout_volume < max_input_vol)
-
         await ot3_hardware.blow_out(mount, blowout_volume)
         pipette_axis = Axis.of_main_tool_actuator(mount)
         position_result = await ot3_hardware.current_position_ot3(mount)
@@ -513,6 +515,8 @@ async def test_blow_out_error(
     blowout_volume: float,
 ) -> None:
     for mount, configs in load_configs.items():
+        if configs["channels"] == 96:
+            await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         instr_data, ot3_hardware = await prepare_for_mock_blowout(
             ot3_hardware, mount, configs
         )
@@ -1368,23 +1372,48 @@ async def test_pick_up_tip_full_tiprack(
                     # Move onto the posts
                     tiprack_down=Point(0, 0, 0),
                     tiprack_up=Point(0, 0, 0),
-                    pick_up_distance=0,
+                    pick_up_distance=10,
                     speed=0,
                     currents={Axis.Q: 0},
                 ),
             ),
             _fake_function,
         )
+
+        def _update_gear_motor_pos(
+            moves: Optional[List[Move[OT3Axis]]] = None,
+            distance: Optional[float] = None,
+            velocity: Optional[float] = None,
+            tip_action: str = "home",
+        ) -> None:
+            if NodeId.pipette_left not in backend._gear_motor_position:
+                backend._gear_motor_position = {NodeId.pipette_left: 0.0}
+            if moves:
+                for move in moves:
+                    for block in move.blocks:
+                        backend._gear_motor_position[
+                            NodeId.pipette_left
+                        ] += block.distance
+            elif distance:
+                backend._gear_motor_position[NodeId.pipette_left] += distance
+
+        tip_action.side_effect = _update_gear_motor_pos
+        await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.pick_up_tip(Mount.LEFT, 40.0)
+        # backend._gear_motor_position = 10
         pipette_handler.plan_check_pick_up_tip.assert_called_once_with(
             OT3Mount.LEFT, 40.0, None, None
         )
-        tip_action.assert_has_calls(
-            calls=[
-                call([Axis.P_L], 0, 0, "clamp"),
-                call([Axis.P_L], 0, 0, "home"),
-            ]
-        )
+        # breakpoint()
+        # first call should be "clamp", moving down
+        assert tip_action.call_args_list[0][-1]["tip_action"] == "clamp"
+        assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {AxisQ: 1}
+        # next call should be "clamp", moving back up
+        assert tip_action.call_args_list[1][-1]["tip_action"] == "clamp"
+        assert tip_action.call_args_list[1][-1]["moves"][0].unit_vector == {AxisQ: -1}
+        # last call should be "home"
+        assert tip_action.call_args_list[2][-1]["tip_action"] == "home"
+        assert len(tip_action.call_args_list) == 3
 
 
 async def test_drop_tip_full_tiprack(
@@ -1404,8 +1433,8 @@ async def test_drop_tip_full_tiprack(
             DropTipSpec(
                 drop_moves=[
                     DropTipMove(
-                        target_position=1,
-                        current={Axis.P_L: 1.0},
+                        target_position=10,
+                        current={AxisP_L: 1.0},
                         speed=1,
                         is_ht_tip_action=True,
                     )
@@ -1415,14 +1444,39 @@ async def test_drop_tip_full_tiprack(
             ),
             _fake_function,
         )
+
+        def _update_gear_motor_pos(
+            moves: Optional[List[Move[OT3Axis]]] = None,
+            distance: Optional[float] = None,
+            velocity: Optional[float] = None,
+            tip_action: str = "home",
+        ) -> None:
+            if NodeId.pipette_left not in backend._gear_motor_position:
+                backend._gear_motor_position = {NodeId.pipette_left: 0.0}
+            if moves:
+                for move in moves:
+                    for block in move.blocks:
+                        backend._gear_motor_position[
+                            NodeId.pipette_left
+                        ] += block.distance
+            elif distance:
+                backend._gear_motor_position[NodeId.pipette_left] += distance
+
+        tip_action.side_effect = _update_gear_motor_pos
+
+        await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
-        tip_action.assert_has_calls(
-            calls=[
-                call([Axis.P_L], 1, 1, "clamp"),
-                call([Axis.P_L], 1, 1, "home"),
-            ]
-        )
+
+        # first call should be "clamp", moving down
+        assert tip_action.call_args_list[0][-1]["tip_action"] == "clamp"
+        assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
+        # next call should be "clamp", moving back up
+        assert tip_action.call_args_list[1][-1]["tip_action"] == "clamp"
+        assert tip_action.call_args_list[1][-1]["moves"][0].unit_vector == {Axis.Q: -1}
+        # last call should be "home"
+        assert tip_action.call_args_list[2][-1]["tip_action"] == "home"
+        assert len(tip_action.call_args_list) == 3
 
 
 @pytest.mark.parametrize(
@@ -1662,6 +1716,8 @@ async def test_tip_presence_disabled_ninety_six_channel(
         instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
         await ot3_hardware.cache_pipette(OT3Mount.LEFT, instr_data, None)
         await ot3_hardware._configure_instruments()
+        await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
+        # await ot3_hardware.cache_instruments()
         await ot3_hardware.pick_up_tip(OT3Mount.LEFT, 60)
 
         tip_present.assert_not_called()

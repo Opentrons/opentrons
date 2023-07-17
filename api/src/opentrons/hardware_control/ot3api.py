@@ -702,22 +702,22 @@ class OT3API(
 
     async def home_gear_motors(self) -> None:
         position_estimation_dict = axis_convert(self._backend.gear_motor_position, 0.0)
-        position_estimation = position_estimation_dict[OT3Axis.P_L]
-        gear_motor_axis_bound = self._backend.axis_bounds[OT3Axis.Q][1]
+        position_estimation_float = position_estimation_dict[Axis.P_L]
+        gear_motor_axis_bound = self._backend.axis_bounds[Axis.Q][1]
         velocity = self._config.motion_settings.default_max_speed[
             GantryLoad.HIGH_THROUGHPUT
         ][OT3AxisKind.Q]
-        if position_estimation is not None and position_estimation > 5.0:
-            position_valid = abs(position_estimation) < gear_motor_axis_bound
+        if position_estimation_float is not None and position_estimation_float > 5.0:
+            position_valid = abs(position_estimation_float) < gear_motor_axis_bound
             if position_valid:
-                position_dict = {OT3Axis.Q: position_estimation}
-                safe_home_target = {OT3Axis.Q: self._config.safe_home_distance}
+                position_dict = {Axis.Q: position_estimation_float}
+                safe_home_target = {Axis.Q: self._config.safe_home_distance}
                 moves = self._build_moves(position_dict, safe_home_target)
 
                 await self._backend.tip_action(moves=moves[0], tip_action="clamp")
 
                 distance = axis_convert(self._backend.gear_motor_position, 0.0)[
-                    OT3Axis.P_L
+                    Axis.P_L
                 ]
                 await self._backend.tip_action(
                     distance=distance, velocity=velocity, tip_action="home"
@@ -1246,7 +1246,7 @@ class OT3API(
                 try:
                     if axis == Axis.G:
                         await self.home_gripper_jaw()
-                    elif axis == OT3Axis.Q:
+                    elif axis == Axis.Q:
                         await self.home_gear_motors()
                     else:
                         await self._home_axis(axis)
@@ -1275,7 +1275,7 @@ class OT3API(
         else:
             checked_axes = [ax for ax in Axis if ax != Axis.Q]
         if self.gantry_load == GantryLoad.HIGH_THROUGHPUT:
-            checked_axes.append(OT3Axis.Q)
+            checked_axes.append(Axis.Q)
         self._log.info(f"Homing {axes}")
 
         home_seq = [
@@ -1680,11 +1680,13 @@ class OT3API(
             # perform pick up tip
 
             await self._backend.update_gear_motor_position()
-            gear_origin_dict = axis_convert(self._backend.gear_motor_position, 0.0)
+            gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
+                Axis.P_L
+            ]
+            gear_origin_dict = {Axis.Q: gear_origin_float}
             clamp_move_target = pipette_spec.pick_up_distance
-            gear_target_dict = {OT3Axis.Q: clamp_move_target}
+            gear_target_dict = {AxisQ: clamp_move_target}
             clamp_moves = self._build_moves(gear_origin_dict, gear_target_dict)
-
             await self._backend.tip_action(moves=clamp_moves[0], tip_action="clamp")
 
             await self.home_gear_motors()
@@ -1764,17 +1766,19 @@ class OT3API(
                 gear_start_position = axis_convert(
                     self._backend.gear_motor_position, 0.0
                 )
-                drop_target_dict = {OT3Axis.Q: move.target_position}
+                drop_target_dict = {Axis.Q: move.target_position}
                 drop_moves = self._build_moves(gear_start_position, drop_target_dict)
 
                 await self._backend.tip_action(moves=drop_moves[0], tip_action="clamp")
 
-                await self._backend.update_gear_motor_position()
-                current_gear_pos = axis_convert(self._backend.gear_motor_position, 0.0)
-                home_target_dict = {OT3Axis.Q: 0.0}
-                home_moves = self._build_moves(current_gear_pos, home_target_dict)
+                await self.home_gear_motors()
+                # await self._backend.update_gear_motor_position()
+                # gear_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[AxisP_L]
+                # gear_pos_dict = {AxisQ: gear_pos_float}
+                # home_target_dict = {AxisQ: 0.0}
+                # home_moves = self._build_moves(gear_pos_dict, home_target_dict)
 
-                await self._backend.tip_action(moves=home_moves[0], tip_action="home")
+                # await self._backend.tip_action(moves=home_moves[0], tip_action="home")
 
             else:
                 target_pos = target_position_from_plunger(

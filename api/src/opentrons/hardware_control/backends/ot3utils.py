@@ -1,5 +1,5 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Set, Tuple, TypeVar
+from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast
 from typing_extensions import Literal
 from opentrons.config.defaults_ot3 import (
     DEFAULT_CALIBRATION_AXIS_MAX_SPEED,
@@ -211,7 +211,7 @@ def get_current_settings(
     conf_by_pip = config.by_gantry_load(gantry_load)
     currents = {}
     for axis_kind in conf_by_pip["hold_current"].keys():
-        for axis in OT3Axis.of_kind(axis_kind):
+        for axis in Axis.of_kind(axis_kind):
             currents[axis] = CurrentConfig(
                 conf_by_pip["hold_current"][axis_kind],
                 conf_by_pip["run_current"][axis_kind],
@@ -222,7 +222,7 @@ def get_current_settings(
 def get_system_constraints(
     config: OT3MotionSettings,
     gantry_load: GantryLoad,
-) -> "SystemConstraints[OT3Axis]":
+) -> "SystemConstraints[Axis]":
     conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
     axis_kind_list = [
@@ -235,7 +235,7 @@ def get_system_constraints(
     if gantry_load == GantryLoad.HIGH_THROUGHPUT:
         axis_kind_list.append(OT3AxisKind.Q)
     for axis_kind in axis_kind_list:
-        for axis in OT3Axis.of_kind(axis_kind):
+        for axis in Axis.of_kind(axis_kind):
             constraints[axis] = AxisConstraints.build(
                 conf_by_pip["acceleration"][axis_kind],
                 conf_by_pip["max_speed_discontinuity"][axis_kind],
@@ -373,7 +373,7 @@ def create_home_group(
 
 
 def create_tip_action_group(
-    moves: List[Move[OT3Axis]],
+    moves: List[Move[Axis]],
     present_nodes: Iterable[NodeId],
     action: str,
 ) -> MoveGroup:
