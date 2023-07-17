@@ -141,13 +141,6 @@ def mock_get_opentrons_dir(decoy: Decoy) -> Decoy:
     ) as m:
         yield m
 
-@pytest.fixture
-def mock_list_mutable_configs(decoy: Decoy) -> Decoy:
-    with patch(
-        "opentrons_shared_data.pipette.mutable_configurations.list_mutable_configs",
-        new=decoy.mock(),
-    ) as m:
-        yield m
 
 def test_receive_pipette_settings(
     decoy: Decoy,
