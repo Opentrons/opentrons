@@ -22,12 +22,14 @@ from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 SLOT_FORCE_GAUGE = 6
 GAUGE_OFFSET = Point(x=90, y=37.5, z=75)
 
+WARMUP_SECONDS = 10
+
 FAILURE_THRESHOLD_PERCENTAGE = 10
-GRIP_FORCES_NEWTON: List[int] = [5, 10, 15, 20]
+GRIP_FORCES_NEWTON: List[int] = [20, 15, 10, 5]
 NUM_NEWTONS_TRIALS = 1
 
 NUM_DUTY_CYCLE_TRIALS = 20
-GRIP_DUTY_CYCLES: List[int] = [6, 10, 15, 20, 25, 30, 40, 50]
+GRIP_DUTY_CYCLES: List[int] = [50, 40, 30, 25, 20, 15, 10, 6]
 
 FORCE_GAUGE_TRIAL_SAMPLE_INTERVAL = 0.25  # seconds
 FORCE_GAUGE_TRIAL_SAMPLE_COUNT = 20  # 20 samples = 5 seconds @ 4Hz
@@ -143,7 +145,12 @@ async def _setup(api: OT3API) -> Union[Mark10, SimMark10]:
     await api.move_to(mount, target_pos)
     if not api.is_simulator:
         ui.get_user_ready("about to grip")
-
+    await api.grip(20)
+    for sec in range(WARMUP_SECONDS):
+        print(f"warmup ({sec + 1}/{WARMUP_SECONDS})")
+        if not api.is_simulator:
+            await sleep(1)
+    await api.ungrip()
     return gauge
 
 
