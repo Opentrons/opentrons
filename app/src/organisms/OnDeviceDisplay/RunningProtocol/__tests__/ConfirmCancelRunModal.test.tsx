@@ -119,14 +119,6 @@ describe('ConfirmCancelRunModal', () => {
     getByText('mock CancelingRunModal')
   })
 
-  it('should render the modal with red frame', () => {
-    props.isActiveRun = true
-    const [{ getByLabelText }] = render(props)
-    expect(getByLabelText('modal_medium')).toHaveStyle(
-      `backgroundColor: ${COLORS.red2}`
-    )
-  })
-
   it('when tapping go back, the mock function is called', () => {
     const [{ getByText }] = render(props)
     const button = getByText('Go back')

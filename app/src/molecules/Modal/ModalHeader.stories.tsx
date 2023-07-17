@@ -34,5 +34,4 @@ Default.args = {
   hasExitIcon: true,
   iconName: 'information',
   iconColor: COLORS.black,
-  isError: false,
 }
