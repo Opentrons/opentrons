@@ -14,8 +14,12 @@ from opentrons_shared_data.labware.labware_definition import (
     Metadata1,
     WellDefinition,
 )
-from opentrons_shared_data.protocol.models import protocol_schema_v6
-from opentrons_shared_data.protocol.models import protocol_schema_v7
+from opentrons_shared_data.protocol.models import (
+    protocol_schema_v6,
+    protocol_schema_v7,
+    Liquid,
+    Labware,
+)
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import DeckSlotName, MountType
 from opentrons.protocol_runner.json_translator import JsonTranslator
@@ -30,7 +34,7 @@ from opentrons.protocol_engine import (
     WellOffset,
     ModuleModel,
     ModuleLocation,
-    Liquid,
+    Liquid as PE_Liquid,
 )
 from opentrons.protocol_engine.types import HexColor
 
@@ -231,7 +235,9 @@ VALID_TEST_PARAMS = [
         ),
         protocol_schema_v7.Command(
             commandType="loadPipette",
-            params=protocol_schema_v7.Params(pipetteId="pipette-id-1", mount="left"),
+            params=protocol_schema_v7.Params(
+                pipetteId="pipette-id-1", mount="left", pipetteName="p10_single"
+            ),
         ),
         pe_commands.LoadPipetteCreate(
             params=pe_commands.LoadPipetteParams(
@@ -253,6 +259,7 @@ VALID_TEST_PARAMS = [
             commandType="loadModule",
             params=protocol_schema_v7.Params(
                 moduleId="module-id-1",
+                model="magneticModuleV2",
                 location=protocol_schema_v7.Location(slotName="3"),
             ),
         ),
@@ -276,7 +283,11 @@ VALID_TEST_PARAMS = [
             commandType="loadLabware",
             params=protocol_schema_v7.Params(
                 labwareId="labware-id-2",
+                version=1,
+                namespace="example",
+                loadName="foo_8_plate_33ul",
                 location=protocol_schema_v7.Location(moduleId="temperatureModuleId"),
+                displayName="Trash",
             ),
         ),
         pe_commands.LoadLabwareCreate(
@@ -546,21 +557,19 @@ def _make_v6_json_protocol(
         "example/plate/1": _load_labware_definition_data(),
         "example/trash/1": _load_labware_definition_data(),
     },
-    labware: Dict[str, protocol_schema_v6.Labware] = {
-        "labware-id-1": protocol_schema_v6.Labware(
+    labware: Dict[str, Labware] = {
+        "labware-id-1": Labware(
             displayName="Source Plate", definitionId="example/plate/1"
         ),
-        "labware-id-2": protocol_schema_v6.Labware(
-            displayName="Trash", definitionId="example/trash/1"
-        ),
+        "labware-id-2": Labware(displayName="Trash", definitionId="example/trash/1"),
     },
     commands: List[protocol_schema_v6.Command] = [],
     modules: Dict[str, protocol_schema_v6.Module] = {
         "module-id-1": protocol_schema_v6.Module(model="magneticModuleV2"),
         "module-id-2": protocol_schema_v6.Module(model="thermocyclerModuleV2"),
     },
-    liquids: Dict[str, protocol_schema_v6.Liquid] = {
-        "liquid-id-555": protocol_schema_v6.Liquid(
+    liquids: Dict[str, Liquid] = {
+        "liquid-id-555": Liquid(
             displayName="water", description="water description", displayColor="#F00"
         )
     },
@@ -593,8 +602,8 @@ def _make_v7_json_protocol(
         "module-id-1": protocol_schema_v7.Module(model="magneticModuleV2"),
         "module-id-2": protocol_schema_v7.Module(model="thermocyclerModuleV2"),
     },
-    liquids: Dict[str, protocol_schema_v7.Liquid] = {
-        "liquid-id-555": protocol_schema_v7.Liquid(
+    liquids: Dict[str, Liquid] = {
+        "liquid-id-555": Liquid(
             displayName="water", description="water description", displayColor="#F00"
         )
     },
@@ -627,7 +636,7 @@ def test_load_command(
     v6_output = subject.translate_commands(
         _make_v6_json_protocol(commands=[test_v6_input])
     )
-    v7_output = subject.translate_commands(
+    v7_output = subject.translate_v7_commands(
         _make_v7_json_protocol(commands=[test_v7_input])
     )
     assert v6_output == [expected_output]
@@ -642,7 +651,7 @@ def test_load_liquid(
     result = subject.translate_liquids(protocol)
 
     assert result == [
-        Liquid(
+        PE_Liquid(
             id="liquid-id-555",
             displayName="water",
             description="water description",

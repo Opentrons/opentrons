@@ -28,8 +28,8 @@ class CommandTranslatorError(Exception):
 
 
 def _translate_labware_command(
-    protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7],
-    command: Union[protocol_schema_v6.Command, protocol_schema_v7.Command],
+    protocol: ProtocolSchemaV6,
+    command: protocol_schema_v6.Command,
 ) -> pe_commands.LoadLabwareCreate:
     labware_id = command.params.labwareId
     # v6 data model supports all commands and therefor most props are optional.
@@ -62,6 +62,10 @@ def _translate_v7_labware_command(
     # v6 data model supports all commands and therefor most props are optional.
     # load labware command must contain labware_id and definition_id.
     assert labware_id is not None
+    assert command.params.version is not None
+    assert command.params.namespace is not None
+    assert command.params.loadName is not None
+
     labware_command = pe_commands.LoadLabwareCreate(
         params=pe_commands.LoadLabwareParams(
             labwareId=command.params.labwareId,
@@ -102,12 +106,13 @@ def _translate_module_command(
 
 
 def _translate_v7_module_command(
-    command: Union[protocol_schema_v6.Command, protocol_schema_v7.Command],
+    command: protocol_schema_v7.Command,
 ) -> pe_commands.CommandCreate:
     module_id = command.params.moduleId
     # v6 data model supports all commands and therefor most props are optional.
     # load module command must contain module_id. modules cannot be None.
     assert module_id is not None
+    assert command.params.model is not None
     translated_obj = pe_commands.LoadModuleCreate(
         params=pe_commands.LoadModuleParams(
             model=ModuleModel(command.params.model),
@@ -120,8 +125,8 @@ def _translate_v7_module_command(
 
 
 def _translate_pipette_command(
-    protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7],
-    command: Union[protocol_schema_v6.Command, protocol_schema_v7.Command],
+    protocol: ProtocolSchemaV6,
+    command: protocol_schema_v6.Command,
 ) -> pe_commands.CommandCreate:
     pipette_id = command.params.pipetteId
     # v6 data model supports all commands and therefor most props are optional.
@@ -145,6 +150,7 @@ def _translate_v7_pipette_command(
     # v6 data model supports all commands and therefor most props are optional.
     # load pipette command must contain pipette_id.
     assert pipette_id is not None
+    assert command.params.pipetteName is not None
     translated_obj = pe_commands.LoadPipetteCreate(
         params=pe_commands.LoadPipetteParams(
             pipetteName=PipetteNameType(command.params.pipetteName),
@@ -200,7 +206,7 @@ class JsonTranslator:
             for liquid_id, liquid in protocol_liquids.items()
         ]
 
-    def translate_v6_commands(
+    def translate_commands(
         self,
         protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:
@@ -220,17 +226,17 @@ class JsonTranslator:
 
     def translate_v7_commands(
         self,
-        protocol: Union[ProtocolSchemaV6],
+        protocol: Union[ProtocolSchemaV7],
     ) -> List[pe_commands.CommandCreate]:
         """Takes json protocol v6 and translates commands->protocol engine commands."""
         commands_list: List[pe_commands.CommandCreate] = []
         for command in protocol.commands:
             if command.commandType == "loadPipette":
-                translated_obj = _translate_v7_pipette_command(protocol, command)
+                translated_obj = _translate_v7_pipette_command(command)
             elif command.commandType == "loadModule":
-                translated_obj = _translate_v7_module_command(protocol, command)
+                translated_obj = _translate_v7_module_command(command)
             elif command.commandType == "loadLabware":
-                translated_obj = _translate_v7_labware_command(protocol, command)
+                translated_obj = _translate_v7_labware_command(command)
             else:
                 translated_obj = _translate_simple_command(command)
             commands_list.append(translated_obj)

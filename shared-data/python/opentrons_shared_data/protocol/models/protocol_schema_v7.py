@@ -4,6 +4,8 @@ from typing_extensions import Literal
 from enum import Enum
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+from .shared_models import Labware, Liquid
+
 
 class CommandAnnotation(BaseModel):
     commandIds: List[str]
@@ -87,11 +89,6 @@ class Command(BaseModel):
     key: Optional[str]
 
 
-class Labware(BaseModel):
-    displayName: Optional[str]
-    definitionId: str
-
-
 class Dimensions(BaseModel):
     xDimension: float
     yDimension: float
@@ -122,12 +119,6 @@ class WellDefinition(BaseModel):
     diameter: Optional[float]
     yDimension: Optional[float]
     xDimension: Optional[float]
-
-
-class Liquid(BaseModel):
-    displayName: str
-    description: str
-    displayColor: Optional[str]
 
 
 class Metadata(BaseModel):
