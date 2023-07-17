@@ -1,15 +1,15 @@
-import { POST, request } from '../request'
+import { PUT, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
-import type { EstopState, SetEstopState } from './types'
+import type { EstopStatus, SetEstopState } from './types'
 
 export function setEstopPhysicalStatus(
   config: HostConfig,
   data: SetEstopState
-): ResponsePromise<EstopState> {
-  return request<EstopState, SetEstopState>(
-    POST,
+): ResponsePromise<EstopStatus> {
+  return request<EstopStatus, SetEstopState>(
+    PUT,
     '/robot/control/acknowledgeEstopDisengage',
     data,
     config

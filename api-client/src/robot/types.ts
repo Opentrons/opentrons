@@ -1,14 +1,17 @@
-export interface EstopPhysicalStatus {
-  status: 'engaged' | 'disengaged' | 'not-present'
+type EstopState =
+  | 'physically-engaged'
+  | 'logically-engaged'
+  | 'not-present'
+  | 'disengaged'
+
+export interface EstopStatus {
+  status: EstopState
+  leftEstopPhysicalStatus: EstopState
+  rightEstopPhysicalStatus: EstopState
 }
 
-export interface EstopState {
-  status:
-    | 'physically-engaged'
-    | 'logically-engaged'
-    | 'not-present'
-    | 'disengaged'
-  estopPhysicalStatus: EstopPhysicalStatus
+export interface EstopPhysicalStatus {
+  status: 'engaged' | 'disengaged' | 'not-present'
 }
 
 export interface SetEstopState {
