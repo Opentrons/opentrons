@@ -63,7 +63,7 @@ export const migration = (
   const migratedFile = flow(
     migrationVersionsToRun.map(version => allMigrationsByVersion[version])
   )(file)
-  console.log(migratedFile)
+  
   return {
     file: migratedFile,
     didMigrate: migrationVersionsToRun.length > 0,
