@@ -174,6 +174,8 @@ class MoveGroupRunner:
             List[Tuple[Tuple[int, int], float, float, bool, bool]]
         ] = defaultdict(list)
         for arbid, completion in completions:
+            if isinstance(completion, TipActionResponse):
+                continue
             position[NodeId(arbid.parts.originating_node_id)].append(
                 (
                     (
@@ -405,7 +407,6 @@ class MoveScheduler:
 
             in_group = (node_id, seq_id) in self._moves[group_id]
             self._moves[group_id].remove((node_id, seq_id))
-            print(f"removing {node_id}, {seq_id}")
             self._completion_queue.put_nowait((arbitration_id, message))
             log.debug(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
@@ -413,7 +414,6 @@ class MoveScheduler:
             )
 
             if not self._moves[group_id]:
-                print(f"\nsetting event: {node_id}\n")
                 log.debug(f"Move group {group_id+self._start_at_index} has completed.")
                 self._event.set()
 

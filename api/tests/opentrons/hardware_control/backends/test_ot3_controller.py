@@ -681,7 +681,7 @@ async def test_tip_action(
     controller: OT3Controller,
     mock_move_group_run: mock.AsyncMock,
 ) -> None:
-    await controller.tip_action([Axis.P_L], 33, -5.5, tip_action="clamp")
+    await controller.tip_action(distance=33, velocity=-5.5, tip_action="clamp")
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:
@@ -694,7 +694,7 @@ async def test_tip_action(
 
     mock_move_group_run.reset_mock()
 
-    await controller.tip_action([Axis.P_L], 33, -5.5, tip_action="home")
+    await controller.tip_action(distance=33, velocity=-5.5, tip_action="home")
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
         for move_group in move_group_runner._move_groups:

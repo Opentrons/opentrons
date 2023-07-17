@@ -1,5 +1,5 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Set, Tuple, TypeVar, Sequence, cast
+from typing import Dict, Iterable, List, Set, Tuple, TypeVar
 from typing_extensions import Literal
 from logging import getLogger
 from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
@@ -425,7 +425,7 @@ def create_gear_motor_home_group(
     velocity: float,
 ) -> MoveGroup:
     step = create_tip_action_step(
-        velocity={NodeId.pipette_left: np.float64(velocity)},
+        velocity={NodeId.pipette_left: np.float64(-1 * velocity)},
         acceleration={NodeId.pipette_left: np.float64(0)},
         duration=np.float64(distance / velocity),
         present_nodes=[NodeId.pipette_left],
