@@ -20,7 +20,7 @@ def test_model_enum(model: str, expected_enum: PipetteModelType) -> None:
 @pytest.mark.parametrize(argnames="channels", argvalues=[1, 8, 96])
 def test_channel_enum(channels: int) -> None:
     channel_type = PipetteChannelType(channels)
-    assert channels == channel_type.as_int
+    assert channels == channel_type
 
 
 def test_incorrect_values() -> None:

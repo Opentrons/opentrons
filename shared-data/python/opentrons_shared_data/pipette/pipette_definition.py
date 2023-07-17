@@ -4,7 +4,7 @@ from pydantic import BaseModel, Field, validator
 from enum import Enum
 from dataclasses import dataclass
 
-from . import types as pip_types
+from . import types as pip_types, dev_types
 
 PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
@@ -21,7 +21,7 @@ PipetteModelMajorVersionType = Literal[1, 2, 3]
 PipetteModelMinorVersionType = Literal[0, 1, 2, 3, 4, 5]
 
 
-class PipetteTipType(int, Enum):
+class PipetteTipType(Enum):
     t10 = 10
     t20 = 20
     t50 = 50
@@ -59,7 +59,7 @@ class PipetteGenerationType(Enum):
 
 
 PIPETTE_AVAILABLE_TYPES = [m.name for m in PipetteModelType]
-PIPETTE_CHANNELS_INTS = [c.as_int for c in PipetteChannelType]
+PIPETTE_CHANNELS_INTS = [c.value for c in PipetteChannelType]
 PIPETTE_GENERATIONS = [g.name.lower() for g in PipetteGenerationType]
 
 
@@ -98,7 +98,7 @@ class PipetteNameType:
     pipette_generation: PipetteGenerationType
 
     def __repr__(self) -> str:
-        base_name = f"{self.pipette_type.name}_{self.pipette_channels}"
+        base_name = f"{self.pipette_type.name}_{str(self.pipette_channels)}"
         if self.pipette_generation == PipetteGenerationType.GEN1:
             return base_name
         elif self.pipette_channels == PipetteChannelType.NINETY_SIX_CHANNEL:
@@ -122,7 +122,7 @@ class PipetteModelVersionType:
     pipette_version: PipetteVersionType
 
     def __repr__(self) -> str:
-        base_name = f"{self.pipette_type.name}_{self.pipette_channels}"
+        base_name = f"{self.pipette_type.name}_{str(self.pipette_channels)}"
 
         return f"{base_name}_v{self.pipette_version}"
 
