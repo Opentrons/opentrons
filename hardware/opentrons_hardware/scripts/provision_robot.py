@@ -9,10 +9,10 @@ write - Writes at least one property to the eeprom
 
 Examples:
     clear
-        python3 -m opentrons_hardware.scripts.eeprom_writer --action clear
+        python3 -m opentrons_hardware.scripts.provision_robot --action clear
 
     print
-        python3 -m opentrons_hardware.scripts.eeprom_writer --action print
+        python3 -m opentrons_hardware.scripts.provision_robot --action print
 
     write
         The write action requires the --property arg to be passed in
@@ -20,7 +20,7 @@ Examples:
         the PROPERTY_NAME and property_value
         Note that you can pass in more than one --property
 
-        python3 -m opentrons_hardware.scripts.eeprom_writer --action write \
+        python3 -m opentrons_hardware.scripts.provision_robot --action write \
         --property SERIAL_NUMBER FLXA1020230602001 --property EXAMPLE value
 
 Notes:
@@ -41,7 +41,7 @@ Notes:
         By default we perform actions on the 3-0050 i2c device but this can
         be changed by passing in the --bus and --address arguments like so
 
-        python3 -m opentrons_hardware.scripts.eeprom_writer --bus 3 --address 0050 \
+        python3 -m opentrons_hardware.scripts.provision_robot --bus 3 --address 0050 \
         --action print
 
     Overriding the FORMAT_VERSION:
@@ -50,7 +50,7 @@ Notes:
         in the FORMAT_VERSION property. This should not be manually set at the factory
         as this is only meant to be used for testing.
 
-        python3 -m opentrons_hardware.scripts.eeprom_writer --action write \
+        python3 -m opentrons_hardware.scripts.provision_robot --action write \
         --property FORMAT_VERSION 2
 """
 
@@ -82,6 +82,9 @@ PROPERTIES = [prop.name for prop in PropId if prop not in INVALID]
 
 # serial number regex
 SERIAL_REGEX = re.compile(r"FLX[\w]{1}[\d]{2}[\d]{8}[\d]{3}")
+
+# the path to the serial number on the filesystem
+SERIAL_NUMBER_FILE = "/var/serial"
 
 
 def stop_robot_server(start: bool = False) -> None:
@@ -115,6 +118,8 @@ def clear_eeprom(eeprom_api: EEPROMDriver) -> Tuple[bool, str]:
             eeprom_api._write(data, address)
             address += DEFAULT_READ_SIZE
         print("Cleared Successfully")
+        # clear the serial number on the filesystem
+        _write_serial_number("")
         return True, ""
     except (RuntimeError, TimeoutError) as e:
         return False, f"Make sure eeprom write bit is set low - {e}"
@@ -149,9 +154,12 @@ def write_eeprom(
     # verify what was writen
     failed_to_write = []
     writen_props = [prop.id for prop in eeprom_api.property_read()]
-    for prop in properties:
+    for prop, value in properties.items():
         if prop in writen_props:
             print(f"Write Sucess: {prop}")
+            # if this is the serial number write it to the filesystem as well
+            if prop == PropId.SERIAL_NUMBER:
+                _write_serial_number(value)
         else:
             print(f"Write Failed: {prop}")
             failed_to_write.append(prop.name)
@@ -232,6 +240,17 @@ def _format_properties(properties: List[List[Any]]) -> Dict[PropId, Any]:
     if formated_properties and not formated_properties.get(PropId.FORMAT_VERSION):
         formated_properties[PropId.FORMAT_VERSION] = FORMAT_VERSION
     return formated_properties
+
+
+def _write_serial_number(serial_number: str, filepath: Optional[str] = None) -> None:
+    """Writes the serial number to the rootfs."""
+    filepath = filepath or SERIAL_NUMBER_FILE
+    print(f"Writting {serial_number} to {filepath}")
+    try:
+        with open(filepath, "w") as fh:
+            fh.write(serial_number)
+    except Exception as e:
+        raise RuntimeError(f"Unable to write serial {serial_number} - {e}")
 
 
 def _main(args: argparse.Namespace, eeprom_api: EEPROMDriver) -> None:

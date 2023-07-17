@@ -110,7 +110,7 @@ describe('PipetteOverflowMenu', () => {
     ).toBeInTheDocument()
   })
 
-  it('renders only the about pipette button if OT-3/GEN3 pipette is attached', () => {
+  it('renders only the about pipette button if FLEX pipette is attached', () => {
     mockIsOT3Pipette.mockReturnValue(true)
 
     const { getByRole, queryByRole } = render(props)

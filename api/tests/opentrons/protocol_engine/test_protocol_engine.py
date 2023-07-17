@@ -34,6 +34,7 @@ from opentrons.protocol_engine.execution import (
 from opentrons.protocol_engine.resources import ModelUtils, ModuleDataProvider
 from opentrons.protocol_engine.state import Config, StateStore
 from opentrons.protocol_engine.plugins import AbstractPlugin, PluginStarter
+from opentrons.protocol_engine.errors import ProtocolCommandFailedError, ErrorOccurrence
 
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
@@ -482,6 +483,47 @@ async def test_finish_with_error(
         ),
         await queue_worker.join(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
+        action_dispatcher.dispatch(
+            HardwareStoppedAction(completed_at=datetime(year=2022, month=2, day=2))
+        ),
+    )
+
+
+async def test_finish_with_estop_error_will_not_drop_tip_and_home(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    queue_worker: QueueWorker,
+    model_utils: ModelUtils,
+    subject: ProtocolEngine,
+    hardware_stopper: HardwareStopper,
+) -> None:
+    """It should be able to tell the engine it's finished because of an error and will not drop tip and home."""
+    error = ProtocolCommandFailedError(
+        original_error=ErrorOccurrence.construct(  # type: ignore[call-arg]
+            wrappedErrors=[
+                ErrorOccurrence.construct(errorCode="3008")  # type: ignore[call-arg]
+            ]
+        )
+    )
+    expected_error_details = FinishErrorDetails(
+        error_id="error-id",
+        created_at=datetime(year=2021, month=1, day=1),
+        error=error,
+    )
+
+    decoy.when(model_utils.generate_id()).then_return("error-id")
+    decoy.when(model_utils.get_timestamp()).then_return(
+        datetime(year=2021, month=1, day=1), datetime(year=2022, month=2, day=2)
+    )
+
+    await subject.finish(error=error)
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            FinishAction(error_details=expected_error_details, set_run_status=True)
+        ),
+        await queue_worker.join(),
+        await hardware_stopper.do_stop_and_recover(drop_tips_and_home=False),
         action_dispatcher.dispatch(
             HardwareStoppedAction(completed_at=datetime(year=2022, month=2, day=2))
         ),
