@@ -1717,7 +1717,7 @@ class OT3API(
             ]
             gear_origin_dict = {Axis.Q: gear_origin_float}
             clamp_move_target = pipette_spec.pick_up_distance
-            gear_target_dict = {AxisQ: clamp_move_target}
+            gear_target_dict = {Axis.Q: clamp_move_target}
             clamp_moves = self._build_moves(gear_origin_dict, gear_target_dict)
             await self._backend.tip_action(moves=clamp_moves[0], tip_action="clamp")
 

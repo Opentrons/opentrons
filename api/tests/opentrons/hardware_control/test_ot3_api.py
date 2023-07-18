@@ -4,7 +4,7 @@ from typing import Iterator, Union, Dict, Tuple, List, Any, OrderedDict, Optiona
 from typing_extensions import Literal
 from math import copysign
 import pytest
-from mock import AsyncMock, patch, Mock, call, PropertyMock
+from mock import AsyncMock, patch, Mock, PropertyMock
 from hypothesis import given, strategies, settings, HealthCheck, assume, example
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
@@ -1382,7 +1382,7 @@ async def test_pick_up_tip_full_tiprack(
         )
 
         def _update_gear_motor_pos(
-            moves: Optional[List[Move[OT3Axis]]] = None,
+            moves: Optional[List[Move[Axis]]] = None,
             distance: Optional[float] = None,
             velocity: Optional[float] = None,
             tip_action: str = "home",
@@ -1408,10 +1408,10 @@ async def test_pick_up_tip_full_tiprack(
         # breakpoint()
         # first call should be "clamp", moving down
         assert tip_action.call_args_list[0][-1]["tip_action"] == "clamp"
-        assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {AxisQ: 1}
+        assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
         # next call should be "clamp", moving back up
         assert tip_action.call_args_list[1][-1]["tip_action"] == "clamp"
-        assert tip_action.call_args_list[1][-1]["moves"][0].unit_vector == {AxisQ: -1}
+        assert tip_action.call_args_list[1][-1]["moves"][0].unit_vector == {Axis.Q: -1}
         # last call should be "home"
         assert tip_action.call_args_list[2][-1]["tip_action"] == "home"
         assert len(tip_action.call_args_list) == 3
@@ -1435,7 +1435,7 @@ async def test_drop_tip_full_tiprack(
                 drop_moves=[
                     DropTipMove(
                         target_position=10,
-                        current={AxisP_L: 1.0},
+                        current={Axis.P_L: 1.0},
                         speed=1,
                         is_ht_tip_action=True,
                     )
@@ -1447,7 +1447,7 @@ async def test_drop_tip_full_tiprack(
         )
 
         def _update_gear_motor_pos(
-            moves: Optional[List[Move[OT3Axis]]] = None,
+            moves: Optional[List[Move[Axis]]] = None,
             distance: Optional[float] = None,
             velocity: Optional[float] = None,
             tip_action: str = "home",

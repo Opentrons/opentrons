@@ -606,13 +606,13 @@ class OT3Controller:
         async with self._monitor_overpressure(moving_pipettes):
             positions = await asyncio.gather(*coros)
         # if Axis.Q in checked_axes:
-            # await self.tip_action(
-            #     [Axis.Q],
-            #     self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
-            #     self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
-            #         Axis.to_kind(Axis.Q)
-            #     ],
-            # )
+        # await self.tip_action(
+        #     [Axis.Q],
+        #     self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
+        #     self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
+        #         Axis.to_kind(Axis.Q)
+        #     ],
+        # )
         for position in positions:
             self._handle_motor_status_response(position)
         return axis_convert(self._position, 0.0)
