@@ -1,20 +1,26 @@
 from typing import Dict, Union
 
-from .types import Quirks, RobotMountConfigs, AvailableUnits
+from .types import (
+    Quirks,
+    RobotMountConfigs,
+    AvailableUnits,
+    PipetteGenerationType,
+    PipetteChannelType,
+)
 
 MOUNT_CONFIG_LOOKUP_TABLE = {
-    "GEN1": {
-        "single": RobotMountConfigs(768, 220, 30),
-        "multi": RobotMountConfigs(768, 220, 30),
+    PipetteGenerationType.GEN1: {
+        PipetteChannelType.SINGLE_CHANNEL: RobotMountConfigs(768, 220, 30),
+        PipetteChannelType.EIGHT_CHANNEL: RobotMountConfigs(768, 220, 30),
     },
-    "GEN2": {
-        "single": RobotMountConfigs(3200, 172.15, 60),
-        "multi": RobotMountConfigs(3200, 155.75, 60),
+    PipetteGenerationType.GEN2: {
+        PipetteChannelType.SINGLE_CHANNEL: RobotMountConfigs(3200, 172.15, 60),
+        PipetteChannelType.EIGHT_CHANNEL: RobotMountConfigs(3200, 155.75, 60),
     },
-    "FLEX": {
-        "single": RobotMountConfigs(2133.33, 230.15, 80),
-        "multi": RobotMountConfigs(2133.33, 230.15, 80),
-        "96": RobotMountConfigs(2133.33, 230.15, 80),
+    PipetteGenerationType.FLEX: {
+        PipetteChannelType.SINGLE_CHANNEL: RobotMountConfigs(2133.33, 230.15, 80),
+        PipetteChannelType.EIGHT_CHANNEL: RobotMountConfigs(2133.33, 230.15, 80),
+        PipetteChannelType.NINETY_SIX_CHANNEL: RobotMountConfigs(2133.33, 230.15, 80),
     },
 }
 

@@ -187,7 +187,7 @@ def load_definition(
     liquid_dict = _liquid(channels, max_volume, version)
 
     generation = PipetteGenerationType(physical_dict["displayCategory"])
-    mount_configs = MOUNT_CONFIG_LOOKUP_TABLE[generation.value][str(channels)]
+    mount_configs = MOUNT_CONFIG_LOOKUP_TABLE[generation][channels]
 
     return PipetteConfigurations.parse_obj(
         {
