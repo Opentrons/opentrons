@@ -1,10 +1,10 @@
 export type EstopState =
-  | 'physically-engaged'
-  | 'logically-engaged'
-  | 'not-present'
+  | 'physicallyEngaged'
+  | 'logicallyEngaged'
+  | 'notPresent'
   | 'disengaged'
 
-export type EstopPhysicalStatus = 'engaged' | 'disengaged' | 'not-present'
+export type EstopPhysicalStatus = 'engaged' | 'disengaged' | 'notPresent'
 
 export interface EstopStatus {
   status: EstopState
