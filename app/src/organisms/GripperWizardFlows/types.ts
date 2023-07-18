@@ -70,6 +70,8 @@ export interface GripperWizardStepProps {
   flowType: GripperWizardFlowType
   proceed: () => void
   goBack: () => void
+  errorMessage: string | null
+  setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   chainRunCommands: (
     commands: CreateCommand[],
     continuePastCommandFailure: boolean

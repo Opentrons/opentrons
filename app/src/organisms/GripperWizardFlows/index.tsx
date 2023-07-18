@@ -67,7 +67,7 @@ export function GripperWizardFlows(
     },
   })
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
-  const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
+  const [errorMessage, setShowErrorMessage] = React.useState<string | null>(
     null
   )
 
@@ -94,6 +94,8 @@ export function GripperWizardFlows(
       attachedGripper={attachedGripper}
       createMaintenanceRun={createMaintenanceRun}
       isCreateLoading={isCreateLoading}
+      errorMessage={errorMessage}
+      setShowErrorMessage={setShowErrorMessage}
       isRobotMoving={
         isChainCommandMutationLoading || isCommandLoading || isExiting
       }
@@ -116,6 +118,8 @@ interface GripperWizardProps {
     CreateMaintenanceRunData,
     unknown
   >
+  errorMessage: string | null
+  setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   isCreateLoading: boolean
   isRobotMoving: boolean
   setShowErrorMessage: (message: string | null) => void
@@ -142,8 +146,8 @@ export const GripperWizard = (
     isCreateLoading,
     isRobotMoving,
     createRunCommand,
-    setShowErrorMessage,
     errorMessage,
+    setShowErrorMessage,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
@@ -184,8 +188,8 @@ export const GripperWizard = (
     proceed: handleProceed,
     goBack,
     chainRunCommands,
-    setShowErrorMessage,
     errorMessage,
+    setShowErrorMessage,
   }
   let onExit
   if (currentStep == null) return null
