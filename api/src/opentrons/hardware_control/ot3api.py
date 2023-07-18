@@ -1247,7 +1247,7 @@ class OT3API(
                     if axis == Axis.G:
                         await self.home_gripper_jaw()
                     elif axis == Axis.Q:
-                        await self.home_gear_motors()
+                        await self._backend.home([axis], self.gantry_load)
                     else:
                         await self._home_axis(axis)
                 except ZeroLengthMoveError:
@@ -1678,7 +1678,6 @@ class OT3API(
             )
             await self._move(target_down)
             # perform pick up tip
-
             await self._backend.update_gear_motor_position()
             gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
                 Axis.P_L
@@ -1761,7 +1760,6 @@ class OT3API(
             if move.is_ht_tip_action and move.speed:
                 # The speed check is needed because speed can sometimes be None.
                 # Not sure why
-
                 await self._backend.update_gear_motor_position()
                 gear_start_position = axis_convert(
                     self._backend.gear_motor_position, 0.0
@@ -1772,13 +1770,6 @@ class OT3API(
                 await self._backend.tip_action(moves=drop_moves[0], tip_action="clamp")
 
                 await self.home_gear_motors()
-                # await self._backend.update_gear_motor_position()
-                # gear_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[AxisP_L]
-                # gear_pos_dict = {AxisQ: gear_pos_float}
-                # home_target_dict = {AxisQ: 0.0}
-                # home_moves = self._build_moves(gear_pos_dict, home_target_dict)
-
-                # await self._backend.tip_action(moves=home_moves[0], tip_action="home")
 
             else:
                 target_pos = target_position_from_plunger(

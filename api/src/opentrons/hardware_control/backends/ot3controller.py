@@ -613,14 +613,15 @@ class OT3Controller:
         ]
         async with self._monitor_overpressure(moving_pipettes):
             positions = await asyncio.gather(*coros)
-        # if Axis.Q in checked_axes:
-        # await self.tip_action(
-        #     [Axis.Q],
-        #     self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
-        #     self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
-        #         Axis.to_kind(Axis.Q)
-        #     ],
-        # )
+        # TODO(CM): default gear motor homing routine to have some acceleration
+        if Axis.Q in checked_axes:
+            await self.tip_action(
+                distance=self.axis_bounds[Axis.Q][1] - self.axis_bounds[Axis.Q][0],
+                velocity=self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
+                    Axis.to_kind(Axis.Q)
+                ],
+                tip_action="home",
+            )
         for position in positions:
             self._handle_motor_status_response(position)
         return axis_convert(self._position, 0.0)

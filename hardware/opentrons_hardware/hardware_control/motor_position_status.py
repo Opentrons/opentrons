@@ -179,7 +179,6 @@ async def update_gear_motor_position_estimation(
             MessageId(arbitration_id.parts.message_id)
             in [
                 UpdateGearMotorPositionEstimationResponse.message_id,
-                # TipActionResponse.message_id,
             ]
         )
 
@@ -217,9 +216,7 @@ async def _parser_update_gear_motor_position_response(
     reader: WaitableCallback, expected: NodeId
 ) -> Tuple[float, bool]:
     async for response, arb_id in reader:
-        if isinstance(
-            response, UpdateGearMotorPositionEstimationResponse
-        ):  # or isinstance(response, TipActionResponse):
+        if isinstance(response, UpdateGearMotorPositionEstimationResponse):
             node = NodeId(arb_id.parts.originating_node_id)
             if node == expected:
                 return (
