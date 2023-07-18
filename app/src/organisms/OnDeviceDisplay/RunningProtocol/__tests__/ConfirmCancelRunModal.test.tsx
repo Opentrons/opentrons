@@ -3,7 +3,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
 import {
   useStopRunMutation,
   useDismissCurrentRunMutation,
