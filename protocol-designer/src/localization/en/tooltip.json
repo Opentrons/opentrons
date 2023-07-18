@@ -15,8 +15,6 @@
     "heaterShaker": "Set heat, shake, or labware latch commands for the Heater-Shaker module"
   },
 
-  "disabled_module_step": "Add a relevant module to use this step",
-
   "step_fields": {
     "defaults": {
       "aspirate_airGap_checkbox": "Aspirate air before moving to next well",

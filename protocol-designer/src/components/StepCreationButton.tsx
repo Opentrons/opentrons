@@ -71,24 +71,20 @@ export const StepCreationButtonComponent = (
 
 export interface StepButtonItemProps {
   onClick: () => unknown
-  disabled: boolean
   stepType: StepType
 }
 
 export function StepButtonItem(props: StepButtonItemProps): JSX.Element {
-  const { onClick, disabled, stepType } = props
+  const { onClick, stepType } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_RIGHT,
     strategy: TOOLTIP_FIXED,
   })
-  const tooltipMessage = disabled
-    ? i18n.t(`tooltip.disabled_module_step`)
-    : i18n.t(`tooltip.step_description.${stepType}`)
+  const tooltipMessage = i18n.t(`tooltip.step_description.${stepType}`)
   return (
     <>
       <div {...targetProps}>
         <DeprecatedPrimaryButton
-          disabled={disabled}
           onClick={onClick}
           iconName={stepIconsByType[stepType]}
         >
@@ -148,22 +144,23 @@ export const StepCreationButton = (): JSX.Element => {
   ): ReturnType<typeof stepsActions.addAndSelectStepWithHints> =>
     dispatch(stepsActions.addAndSelectStepWithHints({ stepType }))
 
-  const items = getSupportedSteps().map(stepType => (
-    <StepButtonItem
-      key={stepType}
-      stepType={stepType}
-      disabled={!isStepTypeEnabled[stepType]}
-      onClick={() => {
-        setExpanded(false)
+  const items = getSupportedSteps()
+    .filter(stepType => isStepTypeEnabled[stepType])
+    .map(stepType => (
+      <StepButtonItem
+        key={stepType}
+        stepType={stepType}
+        onClick={() => {
+          setExpanded(false)
 
-        if (currentFormIsPresaved || formHasChanges) {
-          setEnqueuedStepType(stepType)
-        } else {
-          addStep(stepType)
-        }
-      }}
-    />
-  ))
+          if (currentFormIsPresaved || formHasChanges) {
+            setEnqueuedStepType(stepType)
+          } else {
+            addStep(stepType)
+          }
+        }}
+      />
+    ))
 
   return (
     <>
