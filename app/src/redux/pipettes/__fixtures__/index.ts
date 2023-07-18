@@ -43,25 +43,25 @@ export const mockUnattachedPipette = {
   plunger_axis: 'b',
 }
 
-export const mockAttachedGen3Pipette: Omit<AttachedPipette, 'modelSpecs'> = {
+export const mockAttachedFlexPipette: Omit<AttachedPipette, 'modelSpecs'> = {
   id: 'abc',
-  name: 'p1000_single_gen3',
+  name: 'p1000_single_flex',
   model: 'p1000_single_v3.0',
   tip_length: 42,
   mount_axis: 'c',
   plunger_axis: 'd',
 }
 
-export const mockGen3P1000PipetteSpecs: any = {
+export const mockFlexP1000PipetteSpecs: any = {
   displayName: 'Flex 1-Channel 1000 μL',
-  name: 'p1000_single_gen3',
+  name: 'p1000_single_flex',
   backCompatNames: ['p1000_single'],
   channels: 1,
 }
 
-export const mockGen3P1000Pipette8ChannelSpecs: any = {
+export const mockFlexP1000Pipette8ChannelSpecs: any = {
   displayName: 'Flex 8-Channel 1000 μL',
-  name: 'p1000_multi_gen3',
+  name: 'p1000_multi_flex',
   channels: 8,
   backCompatNames: ['p1000_multi'],
 }
@@ -345,7 +345,7 @@ export const mockPipetteData1Channel: PipetteData = {
     },
   },
   instrumentModel: 'p1000_single_v3.0',
-  instrumentName: 'p1000_single_gen3',
+  instrumentName: 'p1000_single_flex',
   instrumentType: 'pipette',
   mount: 'left',
   serialNumber: 'abc',
@@ -369,7 +369,7 @@ export const mockPipetteData8Channel: PipetteData = {
     },
   },
   instrumentModel: 'p1000_multi_v3.0',
-  instrumentName: 'p1000_multi_gen3',
+  instrumentName: 'p1000_multi_flex',
   instrumentType: 'pipette',
   mount: 'right',
   serialNumber: 'cba',

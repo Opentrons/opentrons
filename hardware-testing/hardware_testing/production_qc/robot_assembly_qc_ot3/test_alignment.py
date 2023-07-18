@@ -26,7 +26,7 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.opentrons_api import helpers_ot3, types
-from hardware_testing.opentrons_api.types import OT3Axis, Point, OT3Mount
+from hardware_testing.opentrons_api.types import Axis, Point, OT3Mount
 from hardware_testing.data import ui
 
 
@@ -119,7 +119,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     _assert_deck_transform_is_default(api)
     print("homing")
-    await api.home([OT3Axis.Z_L, OT3Axis.Z_R])
+    await api.home([Axis.Z_L, Axis.Z_R])
     mount = OT3Mount.LEFT
     cp = types.CriticalPoint.MOUNT  # not pipette or tip, for consistency
     home_pos = await api.gantry_position(mount, critical_point=cp)

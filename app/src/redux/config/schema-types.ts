@@ -207,4 +207,11 @@ export interface ConfigV16 extends Omit<ConfigV15, 'version'> {
   }
 }
 
-export type Config = ConfigV16
+export interface ConfigV17 extends Omit<ConfigV16, 'version'> {
+  version: 17
+  protocols: ConfigV15['protocols'] & {
+    applyHistoricOffsets: boolean
+  }
+}
+
+export type Config = ConfigV17

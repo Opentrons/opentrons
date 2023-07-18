@@ -19,6 +19,7 @@ import { SmallButton } from '../../../atoms/buttons'
 import { Modal } from '../../../molecules/Modal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../../redux/analytics'
+import { CancelingRunModal } from './CancelingRunModal'
 
 import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 
@@ -72,11 +73,12 @@ export function ConfirmCancelRunModal({
     })
   }
 
-  return (
+  return isCanceling || isDismissing ? (
+    <CancelingRunModal />
+  ) : (
     <Modal
       modalSize="medium"
       header={modalHeader}
-      isError={isActiveRun}
       onOutsideClick={() => setShowConfirmCancelRunModal(false)}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
@@ -104,7 +106,6 @@ export function ConfirmCancelRunModal({
             buttonType="alert"
             buttonText={t('cancel_run')}
             onClick={handleCancelRun}
-            disabled={isCanceling || isDismissing}
           />
         </Flex>
       </Flex>

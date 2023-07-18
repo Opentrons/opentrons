@@ -545,8 +545,9 @@ def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
         "Only directories specified directly by "
         "this argument are searched, not their children. JSON files that "
         "do not define labware will be ignored with a message. "
-        "By default, the current directory (the one from which you are "
-        "invoking this program) will be searched for labware.",
+        "The current directory (the one from which you are "
+        "invoking this program) will always be included implicitly, "
+        "in addition to any directories that you specify.",
     )
     parser.add_argument(
         "-D",
@@ -665,10 +666,10 @@ def main() -> int:
     duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]
 
     runlog, maybe_bundle = simulate(
-        args.protocol,
-        args.protocol.name,
-        getattr(args, "custom_labware_path", []),
-        getattr(args, "custom_data_path", []) + getattr(args, "custom_data_file", []),
+        protocol_file=args.protocol,
+        file_name=args.protocol.name,
+        custom_labware_paths=args.custom_labware_path,
+        custom_data_paths=(args.custom_data_path + args.custom_data_file),
         duration_estimator=duration_estimator,
         hardware_simulator_file_path=getattr(args, "custom_hardware_simulator_file"),
         log_level=args.log_level,

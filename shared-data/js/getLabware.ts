@@ -20,23 +20,33 @@ assert(
   'Expected v1 labware defs. Something went wrong with shared-data/build/labware.json'
 )
 
-// labware definitions only used for back-compat with legacy v1 defs.
 // do not list in any "available labware" UI.
 // TODO(mc, 2019-12-3): how should this correspond to RETIRED_LABWARE?
 // see shared-data/js/helpers/index.js
 export const LABWAREV2_DO_NOT_LIST = [
+  // Labware definitions only used for back-compat with legacy v1 defs:
   'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip',
   'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic',
   'opentrons_24_tuberack_generic_0.75ml_snapcap_acrylic',
   'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',
   'tipone_96_tiprack_200ul',
+  'eppendorf_96_tiprack_1000ul_eptips',
+  'eppendorf_96_tiprack_10ul_eptips',
+  // Replaced by opentrons_96_wellplate_200ul_pcr_full_skirt
+  // (https://opentrons.atlassian.net/browse/RLAB-230):
+  'armadillo_96_wellplate_200ul_pcr_full_skirt',
+  // Special labware that users probably shouldn't know about or load:
+  // these all should eventually be given a new namespace like "opentrons-internal"
+  // so that they can be filtered out by namespace rather than a block list like this
   'opentrons_1_trash_850ml_fixed',
   'opentrons_1_trash_1100ml_fixed',
   'opentrons_1_trash_3200ml_fixed',
-  'eppendorf_96_tiprack_1000ul_eptips',
-  'eppendorf_96_tiprack_10ul_eptips',
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
+  'opentrons_calibration_adapter_heatershaker_module',
+  'opentrons_calibration_adapter_magnetic_module',
+  'opentrons_calibration_adapter_temperature_module',
+  'opentrons_calibration_adapter_thermocycler_module',
   // TODO(lc 8-24-2022) We are temporarily filtering
   // out ot-3 labware definitions right now. We should
   // have a way to filter these in the future to display
@@ -45,11 +55,6 @@ export const LABWAREV2_DO_NOT_LIST = [
   'opentrons_flex_96_tiprack_200ul',
   'opentrons_flex_96_tiprack_1000ul',
   'opentrons_flex_96_tiprack_50ul',
-  // TODO(ba, 2023-06-23): exclude module calibration adapters
-  'opentrons_calibration_adapter_heatershaker_module',
-  'opentrons_calibration_adapter_magnetic_module',
-  'opentrons_calibration_adapter_temperature_module',
-  'opentrons_calibration_adapter_thermocycler_module',
 ]
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
 // but we still might want the rest of the labware in LABWAREV2_DO_NOT_LIST
@@ -57,6 +62,9 @@ export const LABWAREV2_DO_NOT_LIST = [
 export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
+  'opentrons_flex_96_tiprack_200ul',
+  'opentrons_flex_96_tiprack_1000ul',
+  'opentrons_flex_96_tiprack_50ul',
 ]
 
 export function getLabwareV1Def(

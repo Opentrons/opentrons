@@ -51,6 +51,9 @@ const RETIRED_LABWARE = [
   'tipone_96_tiprack_200ul',
   'eppendorf_96_tiprack_1000ul_eptips',
   'eppendorf_96_tiprack_10ul_eptips',
+  // Replaced by opentrons_96_wellplate_200ul_pcr_full_skirt
+  // https://opentrons.atlassian.net/browse/RLAB-230
+  'armadillo_96_wellplate_200ul_pcr_full_skirt',
 ]
 
 export const getLabwareDisplayName = (

@@ -21,7 +21,7 @@ import {
   useRunQuery,
   useRunActionMutations,
 } from '@opentrons/react-api-client'
-
+import { RUN_STATUS_STOP_REQUESTED } from '@opentrons/api-client'
 import { TertiaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
@@ -39,11 +39,13 @@ import {
   useTrackProtocolRunEvent,
   useRobotAnalyticsData,
 } from '../../organisms/Devices/hooks'
+import { CancelingRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/CancelingRunModal'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
 
+const RUN_STATUS_REFETCH_INTERVAL = 5000
 interface BulletProps {
   isActive: boolean
 }
@@ -79,7 +81,9 @@ export function RunningProtocol(): JSX.Element {
   const currentRunCommandIndex = robotSideAnalysis?.commands.findIndex(
     c => c.key === currentRunCommandKey
   )
-  const runStatus = useRunStatus(runId)
+  const runStatus = useRunStatus(runId, {
+    refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
+  })
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data.protocolId ?? null
@@ -94,7 +98,6 @@ export function RunningProtocol(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
-
   React.useEffect(() => {
     if (
       currentOption === 'CurrentRunningProtocolCommand' &&
@@ -115,6 +118,8 @@ export function RunningProtocol(): JSX.Element {
 
   return (
     <>
+      {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
+
       <Flex
         flexDirection={DIRECTION_COLUMN}
         position={POSITION_RELATIVE}

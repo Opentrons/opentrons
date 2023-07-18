@@ -12,6 +12,7 @@ import {
   SPACING,
   RESPONSIVENESS,
   BORDERS,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import { StepMeter } from '../../atoms/StepMeter'
@@ -65,7 +66,6 @@ const STEP_TEXT_STYLE = css`
   ${TYPOGRAPHY.pSemiBold}
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: 1.375rem;
-    font-weight: 700;
     margin-left: ${SPACING.spacing16};
   }
 `
@@ -77,7 +77,7 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
   return (
     <Box css={BOX_STYLE}>
       <Flex css={HEADER_CONTAINER_STYLE}>
-        <Flex flexDirection={DIRECTION_ROW}>
+        <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           <StyledText css={HEADER_TEXT_STYLE} marginRight={SPACING.spacing8}>
             {title}
           </StyledText>

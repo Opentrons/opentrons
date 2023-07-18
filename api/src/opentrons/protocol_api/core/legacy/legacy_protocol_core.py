@@ -80,7 +80,7 @@ class LegacyProtocolCore(
         }
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
-        self._default_max_speeds = AxisMaxSpeeds()
+        self._default_max_speeds = AxisMaxSpeeds(robot_type=self.robot_type)
         self._last_location: Optional[Location] = None
         self._last_mount: Optional[Mount] = None
         self._loaded_modules: Set["AbstractModule"] = set()
@@ -147,7 +147,12 @@ class LegacyProtocolCore(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore, OffDeckType],
+        location: Union[
+            DeckSlotName,
+            LegacyLabwareCore,
+            legacy_module_core.LegacyModuleCore,
+            OffDeckType,
+        ],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
@@ -156,6 +161,10 @@ class LegacyProtocolCore(
         if isinstance(location, OffDeckType):
             raise APIVersionError(
                 "Loading a labware off deck is only supported with apiLevel 2.15 and newer."
+            )
+        elif isinstance(location, LegacyLabwareCore):
+            raise APIVersionError(
+                "Loading a labware onto another labware or adapter is only supported with api version 2.15 and above"
             )
 
         deck_slot = (
@@ -224,12 +233,25 @@ class LegacyProtocolCore(
 
         return labware_core
 
+    def load_adapter(
+        self,
+        load_name: str,
+        location: Union[DeckSlotName, legacy_module_core.LegacyModuleCore, OffDeckType],
+        namespace: Optional[str],
+        version: Optional[int],
+    ) -> LegacyLabwareCore:
+        """Load an adapter using its identifying parameters"""
+        raise APIVersionError("Loading adapter is not supported in this API version.")
+
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     def move_labware(
         self,
         labware_core: LegacyLabwareCore,
         new_location: Union[
-            DeckSlotName, legacy_module_core.LegacyModuleCore, OffDeckType
+            DeckSlotName,
+            LegacyLabwareCore,
+            legacy_module_core.LegacyModuleCore,
+            OffDeckType,
         ],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
@@ -424,6 +446,11 @@ class LegacyProtocolCore(
         labware = module_core.geometry.labware
         return cast(LegacyLabwareCore, labware._core) if labware is not None else None
 
+    def get_labware_on_labware(
+        self, labware_core: LegacyLabwareCore
+    ) -> Optional[LegacyLabwareCore]:
+        assert False, "get_labware_on_labware only supported on engine core"
+
     def get_deck_definition(self) -> DeckDefinitionV3:
         """Get the geometry definition of the robot's deck."""
         assert False, "get_deck_definition only supported on engine core"
@@ -450,6 +477,8 @@ class LegacyProtocolCore(
 
     def get_labware_location(
         self, labware_core: LegacyLabwareCore
-    ) -> Union[str, legacy_module_core.LegacyModuleCore, OffDeckType]:
+    ) -> Union[
+        str, LegacyLabwareCore, legacy_module_core.LegacyModuleCore, OffDeckType
+    ]:
         """Get labware parent location."""
         assert False, "get_labware_location only supported on engine core"

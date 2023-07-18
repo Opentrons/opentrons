@@ -464,10 +464,10 @@ def test_command_failure_clears_queues() -> None:
         key="command-key-1",
         error=errors.ErrorOccurrence(
             id="error-id",
-            errorType="ProtocolEngineError",
-            detail="oh no",
             createdAt=datetime(year=2023, month=3, day=3),
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+            errorType="ProtocolEngineError",
+            detail="oh no",
         ),
         createdAt=datetime(year=2021, month=1, day=1),
         startedAt=datetime(year=2022, month=2, day=2),
@@ -565,9 +565,9 @@ def test_setup_command_failure_only_clears_setup_command_queue() -> None:
         key="command-key-2",
         error=errors.ErrorOccurrence(
             id="error-id",
+            createdAt=datetime(year=2023, month=3, day=3),
             errorType="ProtocolEngineError",
             detail="oh no",
-            createdAt=datetime(year=2023, month=3, day=3),
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
         ),
         createdAt=datetime(year=2021, month=1, day=1),
@@ -833,7 +833,7 @@ def test_command_store_saves_unknown_finish_error() -> None:
                         id="error-id",
                         createdAt=datetime(year=2021, month=1, day=1),
                         errorType="PythonException",
-                        detail="RuntimeError: oh no\n",
+                        detail="RuntimeError: oh no",
                         errorCode="4000",
                         # and we get some fun extra info if this wraps a normal exception
                         errorInfo={

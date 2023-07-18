@@ -36,12 +36,14 @@ import { storedProtocolData as storedProtocolDataFixture } from '../../../redux/
 import { SendProtocolToOT3Slideout } from '..'
 
 import type { State } from '../../../redux/types'
+import { getValidCustomLabwareFiles } from '../../../redux/custom-labware'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../organisms/ToasterOven')
 jest.mock('../../../redux/buildroot')
 jest.mock('../../../redux/discovery')
 jest.mock('../../../redux/networking')
+jest.mock('../../../redux/custom-labware')
 jest.mock('../../../redux/protocol-storage/selectors')
 
 const mockGetBuildrootUpdateDisplayInfo = getBuildrootUpdateDisplayInfo as jest.MockedFunction<
@@ -72,6 +74,9 @@ const mockGetIsProtocolAnalysisInProgress = getIsProtocolAnalysisInProgress as j
 >
 const mockGetNetworkInterfaces = getNetworkInterfaces as jest.MockedFunction<
   typeof getNetworkInterfaces
+>
+const mockGetValidCustomLabwareFiles = getValidCustomLabwareFiles as jest.MockedFunction<
+  typeof getValidCustomLabwareFiles
 >
 
 const render = (
@@ -110,6 +115,7 @@ const mockMakeSnackbar = jest.fn()
 const mockMakeToast = jest.fn()
 const mockEatToast = jest.fn()
 const mockMutateAsync = jest.fn()
+const mockCustomLabwareFile: File = { path: 'fake_custom_labware_path' } as any
 
 describe('SendProtocolToOT3Slideout', () => {
   beforeEach(() => {
@@ -144,6 +150,9 @@ describe('SendProtocolToOT3Slideout', () => {
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, expect.any(String))
       .mockReturnValue({ wifi: null, ethernet: null })
+    when(mockGetValidCustomLabwareFiles)
+      .calledWith({} as State)
+      .mockReturnValue([mockCustomLabwareFile])
   })
   afterEach(() => {
     jest.resetAllMocks()
@@ -246,6 +255,9 @@ describe('SendProtocolToOT3Slideout', () => {
     mockRobot.click()
     expect(sendButton).not.toBeDisabled()
     sendButton.click()
-    expect(mockMutateAsync).toBeCalled()
+    expect(mockMutateAsync).toBeCalledWith({
+      files: [expect.any(Object), mockCustomLabwareFile],
+      protocolKey: 'protocolKeyStub',
+    })
   })
 })

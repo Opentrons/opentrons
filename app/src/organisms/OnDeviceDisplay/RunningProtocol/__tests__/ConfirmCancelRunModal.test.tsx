@@ -3,7 +3,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { MemoryRouter } from 'react-router-dom'
 import { fireEvent } from '@testing-library/react'
 
-import { renderWithProviders, COLORS } from '@opentrons/components'
+import { renderWithProviders } from '@opentrons/components'
 import {
   useStopRunMutation,
   useDismissCurrentRunMutation,
@@ -12,13 +12,14 @@ import {
 import { i18n } from '../../../../i18n'
 import { useTrackProtocolRunEvent } from '../../../../organisms/Devices/hooks'
 import { useTrackEvent } from '../../../../redux/analytics'
-
 import { ConfirmCancelRunModal } from '../ConfirmCancelRunModal'
+import { CancelingRunModal } from '../CancelingRunModal'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../../../../organisms/Devices/hooks')
 jest.mock('../../../../redux/analytics')
 jest.mock('../../../ProtocolUpload/hooks')
+jest.mock('../CancelingRunModal')
 
 const mockPush = jest.fn()
 let mockStopRun: jest.Mock
@@ -46,7 +47,9 @@ const mockUseStopRunMutation = useStopRunMutation as jest.MockedFunction<
 const mockUseDismissCurrentRunMutation = useDismissCurrentRunMutation as jest.MockedFunction<
   typeof useDismissCurrentRunMutation
 >
-
+const mockCancelingRunModal = CancelingRunModal as jest.MockedFunction<
+  typeof CancelingRunModal
+>
 const render = (props: React.ComponentProps<typeof ConfirmCancelRunModal>) => {
   return renderWithProviders(
     <MemoryRouter>
@@ -85,6 +88,7 @@ describe('ConfirmCancelRunModal', () => {
     when(mockUseTrackProtocolRunEvent).calledWith(RUN_ID).mockReturnValue({
       trackProtocolRunEvent: mockTrackProtocolRunEvent,
     })
+    mockCancelingRunModal.mockReturnValue(<div>mock CancelingRunModal</div>)
   })
 
   afterEach(() => {
@@ -106,12 +110,13 @@ describe('ConfirmCancelRunModal', () => {
     getByText('Cancel run')
   })
 
-  it('should render the modal with red frame', () => {
-    props.isActiveRun = true
-    const [{ getByLabelText }] = render(props)
-    expect(getByLabelText('modal_medium')).toHaveStyle(
-      `backgroundColor: ${COLORS.red2}`
-    )
+  it('shoudler render the canceling run modal when run is dismissing', () => {
+    mockUseDismissCurrentRunMutation.mockReturnValue({
+      dismissCurrentRun: mockDismissCurrentRun,
+      isLoading: true,
+    } as any)
+    const [{ getByText }] = render(props)
+    getByText('mock CancelingRunModal')
   })
 
   it('when tapping go back, the mock function is called', () => {

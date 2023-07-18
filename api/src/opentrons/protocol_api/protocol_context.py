@@ -30,7 +30,7 @@ from opentrons.protocols.api_support.util import (
 )
 
 from ._types import OffDeckType
-from .core.common import ModuleCore, ProtocolCore
+from .core.common import ModuleCore, LabwareCore, ProtocolCore
 from .core.core_map import LoadedCoreMap
 from .core.engine.module_core import NonConnectedModuleCore
 from .core.module import (
@@ -266,7 +266,7 @@ class ProtocolContext(CommandPublisher):
     def load_labware_from_definition(
         self,
         labware_def: "LabwareDefinition",
-        location: DeckLocation,
+        location: Union[DeckLocation, OffDeckType],
         label: Optional[str] = None,
     ) -> Labware:
         """Specify the presence of a piece of labware on the OT2 deck.
@@ -277,7 +277,7 @@ class ProtocolContext(CommandPublisher):
         :param labware_def: The labware definition to load
         :param location: The slot into which to load the labware,
                          such as ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
-        :type location: int or str
+        :type location: int or str or :py:obj:`OFF_DECK`
         :param str label: An optional special name to give the labware. If
                           specified, this is the name the labware will appear
                           as in the run log and the calibration view in the
@@ -301,6 +301,7 @@ class ProtocolContext(CommandPublisher):
         label: Optional[str] = None,
         namespace: Optional[str] = None,
         version: Optional[int] = None,
+        adapter: Optional[str] = None,
     ) -> Labware:
         """Load a labware onto a location.
 
@@ -340,14 +341,28 @@ class ProtocolContext(CommandPublisher):
 
         :param version: The version of the labware definition. You should normally
             leave this unspecified to let the implementation choose a good default.
+        :param adapter: Load name of an adapter to load the labware on top of. The adapter
+            will be loaded from the same given namespace, but version will be automatically chosen.
         """
         if isinstance(location, OffDeckType) and self._api_version < APIVersion(2, 15):
             raise APIVersionError(
                 "Loading a labware off-deck requires apiLevel 2.15 or higher."
             )
+
         load_name = validation.ensure_lowercase_name(load_name)
-        load_location: Union[OffDeckType, DeckSlotName]
-        if isinstance(location, OffDeckType):
+        load_location: Union[OffDeckType, DeckSlotName, LabwareCore]
+        if adapter is not None:
+            if self._api_version < APIVersion(2, 15):
+                raise APIVersionError(
+                    "Loading a labware on an adapter requires apiLevel 2.15 or higher."
+                )
+            loaded_adapter = self.load_adapter(
+                load_name=adapter,
+                location=location,
+                namespace=namespace,
+            )
+            load_location = loaded_adapter._core
+        elif isinstance(location, OffDeckType):
             load_location = location
         else:
             load_location = validation.ensure_deck_slot(location, self._api_version)
@@ -386,6 +401,95 @@ class ProtocolContext(CommandPublisher):
         logger.warning("load_labware_by_name is deprecated. Use load_labware instead.")
         return self.load_labware(load_name, location, label, namespace, version)
 
+    @requires_version(2, 15)
+    def load_adapter_from_definition(
+        self,
+        adapter_def: "LabwareDefinition",
+        location: Union[DeckLocation, OffDeckType],
+    ) -> Labware:
+        """Specify the presence of an adapter on the deck.
+
+        This function loads the adapter definition specified by ``adapter_def``
+        to the location specified by ``location``.
+
+        :param adapter_def: The adapter's labware definition.
+        :param location: The slot into which to load the labware,
+                         such as ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
+        :type location: int or str or :py:obj:`OFF_DECK`
+        """
+        load_params = self._core.add_labware_definition(adapter_def)
+
+        return self.load_adapter(
+            load_name=load_params.load_name,
+            namespace=load_params.namespace,
+            version=load_params.version,
+            location=location,
+        )
+
+    @requires_version(2, 15)
+    def load_adapter(
+        self,
+        load_name: str,
+        location: Union[DeckLocation, OffDeckType],
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        """Load an adapter onto a location.
+
+        For adapters already defined by Opentrons, this is a convenient way
+        to collapse the two stages of adapter initialization (creating
+        the adapter and adding it to the protocol) into one.
+
+        This function returns the created and initialized adapter for use
+        later in the protocol.
+
+        :param str load_name: A string to use for looking up a labware definition for the adapter.
+            You can find the ``load_name`` for any standard adapter on the Opentrons
+            `Labware Library <https://labware.opentrons.com>`_.
+
+        :param location: Either a :ref:`deck slot <deck-slots>`,
+            like ``1``, ``"1"``, or ``"D1"``, or the special value :py:obj:`OFF_DECK`.
+
+        :type location: int or str or :py:obj:`OFF_DECK`
+
+        :param str namespace: The namespace that the labware definition belongs to.
+            If unspecified, will search both:
+
+              * ``"opentrons"``, to load standard Opentrons labware definitions.
+              * ``"custom_beta"``, to load custom labware definitions created with the
+                `Custom Labware Creator <https://labware.opentrons.com/create>`_.
+
+            You might need to specify an explicit ``namespace`` if you have a custom
+            definition whose ``load_name`` is the same as an Opentrons standard
+            definition, and you want to explicitly choose one or the other.
+
+        :param version: The version of the labware definition. You should normally
+            leave this unspecified to let the implementation choose a good default.
+        """
+        load_name = validation.ensure_lowercase_name(load_name)
+        load_location: Union[OffDeckType, DeckSlotName]
+        if isinstance(location, OffDeckType):
+            load_location = location
+        else:
+            load_location = validation.ensure_deck_slot(location, self._api_version)
+
+        labware_core = self._core.load_adapter(
+            load_name=load_name,
+            location=load_location,
+            namespace=namespace,
+            version=version,
+        )
+
+        adapter = Labware(
+            core=labware_core,
+            api_version=self._api_version,
+            protocol_core=self._core,
+            core_map=self._core_map,
+        )
+        self._core_map.add(labware_core, adapter)
+
+        return adapter
+
     # TODO(mm, 2023-06-07): Figure out what to do with this, now that the Flex has non-integer
     # slot names and labware can be stacked. https://opentrons.atlassian.net/browse/RLAB-354
     @property  # type: ignore
@@ -423,7 +527,7 @@ class ProtocolContext(CommandPublisher):
     def move_labware(
         self,
         labware: Labware,
-        new_location: Union[DeckLocation, ModuleTypes, OffDeckType],
+        new_location: Union[DeckLocation, Labware, ModuleTypes, OffDeckType],
         use_gripper: bool = False,
         use_pick_up_location_lpc_offset: bool = False,
         use_drop_location_lpc_offset: bool = False,
@@ -443,6 +547,8 @@ class ProtocolContext(CommandPublisher):
                 * A deck slot like ``1``, ``"1"``, or ``"D1"``. See :ref:`deck-slots`.
                 * A hardware module that's already been loaded on the deck
                   with :py:meth:`load_module`.
+                * A labware or adapter that's already been loaded on the deck
+                  with :py:meth:`load_labware` or :py:meth:`load_adapter`.
                 * The special constant :py:obj:`OFF_DECK`.
 
         :param use_gripper: Whether to use gripper to perform this move.
@@ -472,8 +578,8 @@ class ProtocolContext(CommandPublisher):
                 f"Expected labware of type 'Labware' but got {type(labware)}."
             )
 
-        location: Union[ModuleCore, OffDeckType, DeckSlotName]
-        if isinstance(new_location, ModuleContext):
+        location: Union[ModuleCore, LabwareCore, OffDeckType, DeckSlotName]
+        if isinstance(new_location, (Labware, ModuleContext)):
             location = new_location._core
         elif isinstance(new_location, OffDeckType):
             location = new_location
@@ -649,7 +755,7 @@ class ProtocolContext(CommandPublisher):
                              replaced by `instrument_name`.
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
-        is_96_channel = instrument_name == "p1000_96"
+        is_96_channel = instrument_name in ("p1000_96", "flex_96channel_1000")
         if is_96_channel and isinstance(self._core, ProtocolEngineCore):
             checked_instrument_name = instrument_name
             checked_mount = Mount.LEFT

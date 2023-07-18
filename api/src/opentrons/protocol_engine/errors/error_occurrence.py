@@ -1,10 +1,14 @@
 """Models for concrete occurrences of specific errors."""
+from logging import getLogger
+
 from datetime import datetime
-from typing import Any, Dict, List, Type, Union
+from typing import Any, Dict, List, Type, Union, Optional, Sequence
 from pydantic import BaseModel, Field
 from opentrons_shared_data.errors.codes import ErrorCodes
 from .exceptions import ProtocolEngineError
 from opentrons_shared_data.errors.exceptions import EnumeratedError
+
+log = getLogger(__name__)
 
 
 # TODO(mc, 2021-11-12): flesh this model out with structured error data
@@ -65,6 +69,22 @@ class ErrorOccurrence(BaseModel):
             that it does not, in fact, have to account for a missing errorCode, wrappedError, or errorInfo.
             """
             schema["required"].extend(["errorCode", "wrappedErrors", "errorInfo"])
+
+
+# TODO (tz, 7-12-23): move this to exceptions.py when we stop relaying on ErrorOccurrence.
+class ProtocolCommandFailedError(ProtocolEngineError):
+    """Raised if a fatal command execution error has occurred."""
+
+    def __init__(
+        self,
+        original_error: Optional[ErrorOccurrence] = None,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a ProtocolCommandFailedError."""
+        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        self.original_error = original_error
 
 
 ErrorOccurrence.update_forward_refs()

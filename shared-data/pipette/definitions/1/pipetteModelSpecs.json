@@ -5544,7 +5544,7 @@
       "idleCurrent": 0.3
     },
     "p1000_single_v3.0": {
-      "name": "p1000_single_gen3",
+      "name": "p1000_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -5739,7 +5739,7 @@
       "idleCurrent": 0.3
     },
     "p1000_single_v3.1": {
-      "name": "p1000_single_gen3",
+      "name": "p1000_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -5934,7 +5934,7 @@
       "idleCurrent": 0.3
     },
     "p1000_single_v3.3": {
-      "name": "p1000_single_gen3",
+      "name": "p1000_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -6129,7 +6129,7 @@
       "idleCurrent": 0.3
     },
     "p1000_single_v3.4": {
-      "name": "p1000_single_gen3",
+      "name": "p1000_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -6324,7 +6324,7 @@
       "idleCurrent": 0.3
     },
     "p50_single_v3.0": {
-      "name": "p50_single_gen3",
+      "name": "p50_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -6490,7 +6490,7 @@
       "idleCurrent": 0.3
     },
     "p50_single_v3.1": {
-      "name": "p50_single_gen3",
+      "name": "p50_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -6657,7 +6657,7 @@
       "idleCurrent": 0.3
     },
     "p50_single_v3.3": {
-      "name": "p50_single_gen3",
+      "name": "p50_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -6826,7 +6826,7 @@
       "idleCurrent": 0.3
     },
     "p50_single_v3.4": {
-      "name": "p50_single_gen3",
+      "name": "p50_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -6995,7 +6995,7 @@
       "idleCurrent": 0.3
     },
     "p50_single_v4.3": {
-      "name": "p50_single_gen3",
+      "name": "p50_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -7164,7 +7164,7 @@
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.0": {
-      "name": "p1000_multi_gen3",
+      "name": "p1000_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -7359,7 +7359,7 @@
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.1": {
-      "name": "p1000_multi_gen3",
+      "name": "p1000_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -7554,7 +7554,7 @@
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.3": {
-      "name": "p1000_multi_gen3",
+      "name": "p1000_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -7749,7 +7749,7 @@
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.4": {
-      "name": "p1000_multi_gen3",
+      "name": "p1000_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -7944,7 +7944,7 @@
       "idleCurrent": 0.3
     },
     "p50_multi_v3.0": {
-      "name": "p50_multi_gen3",
+      "name": "p50_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -8111,7 +8111,7 @@
       "idleCurrent": 0.3
     },
     "p50_multi_v3.1": {
-      "name": "p50_multi_gen3",
+      "name": "p50_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -8278,7 +8278,7 @@
       "idleCurrent": 0.3
     },
     "p50_multi_v3.3": {
-      "name": "p50_multi_gen3",
+      "name": "p50_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -8447,7 +8447,7 @@
       "idleCurrent": 0.3
     },
     "p50_multi_v3.4": {
-      "name": "p50_multi_gen3",
+      "name": "p50_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,

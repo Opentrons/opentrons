@@ -36,7 +36,7 @@ from opentrons.hardware_control.instruments.ot3.pipette_handler import (
 )
 from opentrons.hardware_control.types import (
     OT3Mount,
-    OT3Axis,
+    Axis,
     OT3AxisKind,
     CriticalPoint,
     GripperProbe,
@@ -370,7 +370,7 @@ def mock_backend_capacitive_probe(
 
         def _update_position(
             mount: OT3Mount,
-            moving: OT3Axis,
+            moving: Axis,
             distance_mm: float,
             speed_mm_per_s: float,
             threshold_pf: float,
@@ -393,14 +393,14 @@ def mock_current_position_ot3(
         AsyncMock(spec=ot3_hardware.managed_obj.current_position_ot3),
     ) as mock_position:
         mock_position.return_value = {
-            OT3Axis.X: 477.2,
-            OT3Axis.Y: 493.8,
-            OT3Axis.Z_L: 253.475,
-            OT3Axis.Z_R: 253.475,
-            OT3Axis.Z_G: 253.475,
-            OT3Axis.P_L: 0,
-            OT3Axis.P_R: 0,
-            OT3Axis.G: 0,
+            Axis.X: 477.2,
+            Axis.Y: 493.8,
+            Axis.Z_L: 253.475,
+            Axis.Z_R: 253.475,
+            Axis.Z_G: 253.475,
+            Axis.P_L: 0,
+            Axis.P_R: 0,
+            Axis.G: 0,
         }
         yield mock_position
 
@@ -416,7 +416,7 @@ def mock_backend_capacitive_pass(
 
         async def _update_position(
             mount: OT3Mount,
-            moving: OT3Axis,
+            moving: Axis,
             distance_mm: float,
             speed_mm_per_s: float,
             probe: InstrumentProbeType,
@@ -482,7 +482,7 @@ async def test_blow_out_position(
         assume(blowout_volume < max_input_vol)
 
         await ot3_hardware.blow_out(mount, blowout_volume)
-        pipette_axis = OT3Axis.of_main_tool_actuator(mount)
+        pipette_axis = Axis.of_main_tool_actuator(mount)
         position_result = await ot3_hardware.current_position_ot3(mount)
         expected_position = (
             blowout_volume / instr_data["config"].shaft_ul_per_mm
@@ -534,17 +534,17 @@ async def test_blow_out_error(
 @pytest.mark.parametrize(
     "mount,homed_axis",
     [
-        (OT3Mount.RIGHT, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R]),
-        (OT3Mount.LEFT, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]),
-        (OT3Mount.GRIPPER, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G]),
-        (Mount.EXTENSION, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G]),
+        (OT3Mount.RIGHT, [Axis.X, Axis.Y, Axis.Z_R]),
+        (OT3Mount.LEFT, [Axis.X, Axis.Y, Axis.Z_L]),
+        (OT3Mount.GRIPPER, [Axis.X, Axis.Y, Axis.Z_G]),
+        (Mount.EXTENSION, [Axis.X, Axis.Y, Axis.Z_G]),
     ],
 )
 async def test_move_to_without_homing_first(
     ot3_hardware: ThreadManager[OT3API],
     mock_home: AsyncMock,
     mount: Union[Mount, OT3Mount],
-    homed_axis: List[OT3Axis],
+    homed_axis: List[Axis],
 ) -> None:
     """Before a mount can be moved, XY and the corresponding Z  must be homed first"""
     await ot3_hardware.cache_instruments()
@@ -575,7 +575,7 @@ async def test_liquid_probe(
     mock_move_to: AsyncMock,
     ot3_hardware: ThreadManager[OT3API],
     head_node: NodeId,
-    pipette_node: OT3Axis,
+    pipette_node: Axis,
     mount: OT3Mount,
     fake_liquid_settings: LiquidProbeSettings,
     mock_instrument_handlers: Tuple[Mock],
@@ -682,12 +682,12 @@ async def test_liquid_sensing_errors(
 @pytest.mark.parametrize(
     "mount,moving",
     [
-        (OT3Mount.RIGHT, OT3Axis.Z_R),
-        (OT3Mount.LEFT, OT3Axis.Z_L),
-        (OT3Mount.RIGHT, OT3Axis.X),
-        (OT3Mount.LEFT, OT3Axis.X),
-        (OT3Mount.RIGHT, OT3Axis.Y),
-        (OT3Mount.LEFT, OT3Axis.Y),
+        (OT3Mount.RIGHT, Axis.Z_R),
+        (OT3Mount.LEFT, Axis.Z_L),
+        (OT3Mount.RIGHT, Axis.X),
+        (OT3Mount.LEFT, Axis.X),
+        (OT3Mount.RIGHT, Axis.Y),
+        (OT3Mount.LEFT, Axis.Y),
     ],
 )
 async def test_capacitive_probe(
@@ -695,7 +695,7 @@ async def test_capacitive_probe(
     mock_move_to: AsyncMock,
     mock_backend_capacitive_probe: AsyncMock,
     mount: OT3Mount,
-    moving: OT3Axis,
+    moving: Axis,
     fake_settings: CapacitivePassSettings,
 ) -> None:
     await ot3_hardware.home()
@@ -765,9 +765,7 @@ async def test_probe_direction(
     probe_direction: Direction,
 ) -> None:
     mock_gantry_position.return_value = origin
-    await ot3_hardware.capacitive_probe(
-        OT3Mount.RIGHT, OT3Axis.X, target, fake_settings
-    )
+    await ot3_hardware.capacitive_probe(OT3Mount.RIGHT, Axis.X, target, fake_settings)
     prep_move = mock_move_to.call_args_list[0]
     if prep_direction == 0.0:
         assert prep_move[0][1].x == origin.x
@@ -782,12 +780,12 @@ async def test_probe_direction(
 @pytest.mark.parametrize(
     "mount,moving",
     (
-        [OT3Mount.RIGHT, OT3Axis.Z_L],
-        [OT3Mount.LEFT, OT3Axis.Z_R],
-        [OT3Mount.RIGHT, OT3Axis.P_L],
-        [OT3Mount.RIGHT, OT3Axis.P_R],
-        [OT3Mount.LEFT, OT3Axis.P_L],
-        [OT3Mount.RIGHT, OT3Axis.P_R],
+        [OT3Mount.RIGHT, Axis.Z_L],
+        [OT3Mount.LEFT, Axis.Z_R],
+        [OT3Mount.RIGHT, Axis.P_L],
+        [OT3Mount.RIGHT, Axis.P_R],
+        [OT3Mount.LEFT, Axis.P_L],
+        [OT3Mount.RIGHT, Axis.P_R],
     ),
 )
 async def test_capacitive_probe_invalid_axes(
@@ -795,7 +793,7 @@ async def test_capacitive_probe_invalid_axes(
     mock_move_to: AsyncMock,
     mock_backend_capacitive_probe: AsyncMock,
     mount: OT3Mount,
-    moving: OT3Axis,
+    moving: Axis,
     fake_settings: CapacitivePassSettings,
 ) -> None:
     with pytest.raises(RuntimeError, match=r"Probing must be done with.*"):
@@ -809,12 +807,12 @@ async def test_capacitive_probe_invalid_axes(
     [
         # Points must be passed through the attitude transform and therefore
         # flipped
-        (OT3Axis.X, Point(0, 0, 0), Point(1, 0, 0), -1),
-        (OT3Axis.Y, Point(0, 0, 0), Point(0, -1, 0), 1),
+        (Axis.X, Point(0, 0, 0), Point(1, 0, 0), -1),
+        (Axis.Y, Point(0, 0, 0), Point(0, -1, 0), 1),
     ],
 )
 async def test_pipette_capacitive_sweep(
-    axis: OT3Axis,
+    axis: Axis,
     begin: Point,
     end: Point,
     distance: float,
@@ -841,14 +839,14 @@ async def test_pipette_capacitive_sweep(
     [
         # Points must be passed through the attitude transform and therefore
         # flipped
-        (OT3Axis.X, Point(0, 0, 0), Point(1, 0, 0), -1),
-        (OT3Axis.Y, Point(0, 0, 0), Point(0, -1, 0), 1),
+        (Axis.X, Point(0, 0, 0), Point(1, 0, 0), -1),
+        (Axis.Y, Point(0, 0, 0), Point(0, -1, 0), 1),
     ],
 )
 async def test_gripper_capacitive_sweep(
     probe: GripperProbe,
     intr_probe: InstrumentProbeType,
-    axis: OT3Axis,
+    axis: Axis,
     begin: Point,
     end: Point,
     distance: float,
@@ -871,12 +869,12 @@ async def test_gripper_capacitive_sweep(
 @pytest.mark.parametrize(
     "mount,moving",
     (
-        [OT3Mount.RIGHT, OT3Axis.Z_L],
-        [OT3Mount.LEFT, OT3Axis.Z_R],
-        [OT3Mount.RIGHT, OT3Axis.P_L],
-        [OT3Mount.RIGHT, OT3Axis.P_R],
-        [OT3Mount.LEFT, OT3Axis.P_L],
-        [OT3Mount.RIGHT, OT3Axis.P_R],
+        [OT3Mount.RIGHT, Axis.Z_L],
+        [OT3Mount.LEFT, Axis.Z_R],
+        [OT3Mount.RIGHT, Axis.P_L],
+        [OT3Mount.RIGHT, Axis.P_R],
+        [OT3Mount.LEFT, Axis.P_L],
+        [OT3Mount.RIGHT, Axis.P_R],
     ),
 )
 async def test_capacitive_sweep_invalid_axes(
@@ -884,7 +882,7 @@ async def test_capacitive_sweep_invalid_axes(
     mock_move_to: AsyncMock,
     mock_backend_capacitive_probe: AsyncMock,
     mount: OT3Mount,
-    moving: OT3Axis,
+    moving: Axis,
     fake_settings: CapacitivePassSettings,
 ) -> None:
     with pytest.raises(RuntimeError, match=r"Probing must be done with.*"):
@@ -957,7 +955,7 @@ async def test_gripper_action_works_with_gripper(
     await ot3_hardware.home_gripper_jaw()
     mock_ungrip.assert_called_once()
     mock_ungrip.reset_mock()
-    await ot3_hardware.home([OT3Axis.G])
+    await ot3_hardware.home([Axis.G])
     mock_ungrip.assert_called_once()
     mock_ungrip.reset_mock()
     await ot3_hardware.grip(5.0)
@@ -1045,9 +1043,9 @@ async def test_gripper_move_to(
     _, moves, _ = mock_backend_move.call_args_list[0][0]
     for move in moves:
         assert list(sorted(move.unit_vector.keys(), key=lambda elem: elem.value)) == [
-            OT3Axis.X,
-            OT3Axis.Y,
-            OT3Axis.Z_G,
+            Axis.X,
+            Axis.Y,
+            Axis.Z_G,
         ]
 
 
@@ -1106,6 +1104,7 @@ async def test_move_to_plunger_bottom(
     await ot3_hardware.cache_pipette(mount, instr_data, None)
     pipette = ot3_hardware.hardware_pipettes[mount.to_mount()]
     assert pipette
+    pip_ax = Axis.of_main_tool_actuator(mount)
 
     max_speeds = ot3_hardware.config.motion_settings.default_max_speed
     target_pos = target_position_from_plunger(
@@ -1113,6 +1112,8 @@ async def test_move_to_plunger_bottom(
         pipette.plunger_positions.bottom,
         ot3_hardware._current_position,
     )
+    backlash_pos = target_pos.copy()
+    backlash_pos[pip_ax] += pipette.backlash_distance
 
     # plunger will move at different speeds, depending on if:
     #  - no tip attached (max speed)
@@ -1130,7 +1131,12 @@ async def test_move_to_plunger_bottom(
     await ot3_hardware.home()
     mock_move.reset_mock()
     await ot3_hardware.home_plunger(mount)
-    mock_move.assert_called_once_with(
+    # make sure we've done the backlash compensation
+    mock_move.assert_any_call(
+        backlash_pos, speed=expected_speed_no_tip, acquire_lock=False
+    )
+    # make sure the final move is to our target position
+    mock_move.assert_called_with(
         target_pos, speed=expected_speed_no_tip, acquire_lock=False
     )
 
@@ -1139,25 +1145,21 @@ async def test_move_to_plunger_bottom(
     await ot3_hardware.add_tip(mount, 100)
     mock_move.reset_mock()
     await ot3_hardware.prepare_for_aspirate(mount)
-    # make sure when plunger is going down that only one move is called,
-    # and there's no backlash move queued
-    mock_move.assert_called_once_with(
+    # make sure we've done the backlash compensation
+    mock_move.assert_any_call(
+        backlash_pos, speed=expected_speed_moving_down, acquire_lock=True
+    )
+    # make sure the final move is to our target position
+    mock_move.assert_called_with(
         target_pos, speed=expected_speed_moving_down, acquire_lock=True
     )
 
     # tip attached, moving UP towards "bottom" position
     # NOTE: _move() is mocked, so we need to update the OT3API's
     #       cached coordinates in the test
-    pip_ax = OT3Axis.of_main_tool_actuator(mount)
     ot3_hardware._current_position[pip_ax] = target_pos[pip_ax] + 1
     mock_move.reset_mock()
     await ot3_hardware.prepare_for_aspirate(mount)
-    # make sure we've done the backlash compensation
-    backlash_pos = target_pos.copy()
-    backlash_pos[pip_ax] -= pipette.backlash_distance
-    mock_move.assert_any_call(
-        backlash_pos, speed=expected_speed_moving_up, acquire_lock=True
-    )
     # make sure the final move is to our target position
     mock_move.assert_called_with(
         target_pos, speed=expected_speed_moving_up, acquire_lock=True
@@ -1167,18 +1169,18 @@ async def test_move_to_plunger_bottom(
 @pytest.mark.parametrize(
     "input_position, expected_move_pos",
     [
-        ({OT3Axis.X: 13}, {OT3Axis.X: 13, OT3Axis.Y: 493.8, OT3Axis.Z_L: 253.475}),
+        ({Axis.X: 13}, {Axis.X: 13, Axis.Y: 493.8, Axis.Z_L: 253.475}),
         (
-            {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: 15},
-            {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: -240.675},
+            {Axis.X: 13, Axis.Y: 14, Axis.Z_R: 15},
+            {Axis.X: 13, Axis.Y: 14, Axis.Z_R: -240.675},
         ),
         (
-            {OT3Axis.Z_R: 15, OT3Axis.Z_L: 16},
+            {Axis.Z_R: 15, Axis.Z_L: 16},
             {
-                OT3Axis.X: 477.2,
-                OT3Axis.Y: 493.8,
-                OT3Axis.Z_L: -239.675,
-                OT3Axis.Z_R: -240.675,
+                Axis.X: 477.2,
+                Axis.Y: 493.8,
+                Axis.Z_L: -239.675,
+                Axis.Z_R: -240.675,
             },
         ),
     ],
@@ -1187,8 +1189,8 @@ async def test_move_axes(
     ot3_hardware: ThreadManager[OT3API],
     mock_move: AsyncMock,
     mock_check_motor: Mock,
-    input_position: Dict[OT3Axis, float],
-    expected_move_pos: OrderedDict[OT3Axis, float],
+    input_position: Dict[Axis, float],
+    expected_move_pos: OrderedDict[Axis, float],
 ):
 
     await ot3_hardware.move_axes(position=input_position)
@@ -1357,7 +1359,7 @@ async def test_pick_up_tip_full_tiprack(
             PickUpTipSpec(
                 plunger_prep_pos=0,
                 plunger_currents={
-                    OT3Axis.of_main_tool_actuator(Mount.LEFT): 0,
+                    Axis.of_main_tool_actuator(Mount.LEFT): 0,
                 },
                 presses=[],
                 shake_off_list=[],
@@ -1368,7 +1370,7 @@ async def test_pick_up_tip_full_tiprack(
                     tiprack_up=Point(0, 0, 0),
                     pick_up_distance=0,
                     speed=0,
-                    currents={OT3Axis.Q: 0},
+                    currents={Axis.Q: 0},
                 ),
             ),
             _fake_function,
@@ -1379,8 +1381,8 @@ async def test_pick_up_tip_full_tiprack(
         )
         tip_action.assert_has_calls(
             calls=[
-                call([OT3Axis.P_L], 0, 0, "clamp"),
-                call([OT3Axis.P_L], 0, 0, "home"),
+                call([Axis.P_L], 0, 0, "clamp"),
+                call([Axis.P_L], 0, 0, "home"),
             ]
         )
 
@@ -1403,13 +1405,13 @@ async def test_drop_tip_full_tiprack(
                 drop_moves=[
                     DropTipMove(
                         target_position=1,
-                        current={OT3Axis.P_L: 1.0},
+                        current={Axis.P_L: 1.0},
                         speed=1,
                         is_ht_tip_action=True,
                     )
                 ],
                 shake_moves=[],
-                ending_current={OT3Axis.P_L: 1.0},
+                ending_current={Axis.P_L: 1.0},
             ),
             _fake_function,
         )
@@ -1417,18 +1419,18 @@ async def test_drop_tip_full_tiprack(
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
         tip_action.assert_has_calls(
             calls=[
-                call([OT3Axis.P_L], 1, 1, "clamp"),
-                call([OT3Axis.P_L], 1, 1, "home"),
+                call([Axis.P_L], 1, 1, "clamp"),
+                call([Axis.P_L], 1, 1, "home"),
             ]
         )
 
 
 @pytest.mark.parametrize(
     "axes",
-    [[OT3Axis.X], [OT3Axis.X, OT3Axis.Y], [OT3Axis.X, OT3Axis.Y, OT3Axis.P_L], None],
+    [[Axis.X], [Axis.X, Axis.Y], [Axis.X, Axis.Y, Axis.P_L], None],
 )
 async def test_update_position_estimation(
-    ot3_hardware: ThreadManager[OT3API], axes: List[OT3Axis]
+    ot3_hardware: ThreadManager[OT3API], axes: List[Axis]
 ) -> None:
 
     backend = ot3_hardware.managed_obj._backend
@@ -1439,7 +1441,7 @@ async def test_update_position_estimation(
     ) as mock_update:
         await ot3_hardware._update_position_estimation(axes)
         if axes is None:
-            axes = [ax for ax in OT3Axis]
+            axes = [ax for ax in Axis]
         mock_update.assert_called_once_with(axes)
 
 
@@ -1463,8 +1465,8 @@ async def test_refresh_positions(ot3_hardware: ThreadManager[OT3API]) -> None:
         AsyncMock(spec=backend.update_encoder_position),
     ) as mock_encoder:
 
-        mock_pos.return_value = {ax: 100 for ax in OT3Axis}
-        mock_encoder.return_value = {ax: 99 for ax in OT3Axis}
+        mock_pos.return_value = {ax: 100 for ax in Axis}
+        mock_encoder.return_value = {ax: 99 for ax in Axis}
 
         await ot3_hardware.refresh_positions()
 
@@ -1472,11 +1474,11 @@ async def test_refresh_positions(ot3_hardware: ThreadManager[OT3API]) -> None:
         mock_pos.assert_called_once()
         mock_encoder.assert_called_once()
 
-        assert (ax in ot3_hardware._current_position.keys() for ax in OT3Axis)
-        assert (ax in ot3_hardware._encoder_position.keys() for ax in OT3Axis)
+        assert (ax in ot3_hardware._current_position.keys() for ax in Axis)
+        assert (ax in ot3_hardware._encoder_position.keys() for ax in Axis)
 
 
-@pytest.mark.parametrize("axis", [OT3Axis.X, OT3Axis.Z_L, OT3Axis.P_L, OT3Axis.Y])
+@pytest.mark.parametrize("axis", [Axis.X, Axis.Z_L, Axis.P_L, Axis.Y])
 @pytest.mark.parametrize(
     "stepper_ok,encoder_ok",
     [
@@ -1489,14 +1491,14 @@ async def test_home_axis(
     ot3_hardware: ThreadManager[OT3API],
     mock_check_motor: Mock,
     mock_check_encoder: Mock,
-    axis: OT3Axis,
+    axis: Axis,
     stepper_ok: bool,
     encoder_ok: bool,
 ) -> None:
 
     backend = ot3_hardware.managed_obj._backend
-    origin_pos = {ax: 100 for ax in OT3Axis}
-    origin_encoder = {ax: 99 for ax in OT3Axis}
+    origin_pos = {ax: 100 for ax in Axis}
+    origin_encoder = {ax: 99 for ax in Axis}
     backend._position = {axis_to_node(ax): v for ax, v in origin_pos.items()}
     backend._encoder_position = {
         axis_to_node(ax): v for ax, v in origin_encoder.items()
@@ -1539,7 +1541,7 @@ async def test_home_axis(
         if stepper_ok and encoder_ok:
             """Copy encoder position to stepper pos"""
             # for accurate axis, we just move to home pos:
-            if axis in [OT3Axis.Z_L, OT3Axis.P_L]:
+            if axis in [Axis.Z_L, Axis.P_L]:
                 # move is called
                 mock_backend_move.assert_awaited_once()
                 move = mock_backend_move.call_args_list[0][0][1][0]

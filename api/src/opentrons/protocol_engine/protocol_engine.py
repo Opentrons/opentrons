@@ -6,6 +6,12 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
+from opentrons_shared_data.errors import (
+    ErrorCodes,
+    EnumeratedError,
+)
+
+from .errors import ProtocolCommandFailedError
 from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
 from .types import (
@@ -49,6 +55,17 @@ class ProtocolEngine:
     A ProtocolEngine instance holds the state of a protocol as it executes,
     and manages calls to a command executor that actually implements the logic
     of the commands themselves.
+
+    Lifetime:
+        Instances are single-use. Each instance is associated with a single protocol,
+        or a a single chain of robot control such as Labware Position Check.
+
+    Concurrency:
+        Instances live in `asyncio` event loops. Each instance must be constructed inside an
+        event loop, and then must be interacted with exclusively through that
+        event loop's thread--even for regular non-`async` methods, like `.pause()`.
+        (This is because there are background async tasks that monitor state changes using
+        primitives that aren't thread-safe. See ChangeNotifier.)
     """
 
     def __init__(
@@ -246,6 +263,15 @@ class ProtocolEngine:
                 If `False`, will set status to `stopped`.
         """
         if error:
+            if (
+                isinstance(error, ProtocolCommandFailedError)
+                and error.original_error is not None
+                and self._code_in_exception_stack(
+                    error=error, code=ErrorCodes.E_STOP_ACTIVATED
+                )
+            ):
+                drop_tips_and_home = False
+
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
                 created_at=self._model_utils.get_timestamp(),
@@ -370,3 +396,17 @@ class ProtocolEngine:
 
         for a in actions:
             self._action_dispatcher.dispatch(a)
+
+    # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
+    @staticmethod
+    def _code_in_exception_stack(error: EnumeratedError, code: ErrorCodes) -> bool:
+        if (
+            isinstance(error, ProtocolCommandFailedError)
+            and error.original_error is not None
+        ):
+            return any(
+                code.value.code == wrapped_error.errorCode
+                for wrapped_error in error.original_error.wrappedErrors
+            )
+        else:
+            return any(code == wrapped_error.code for wrapped_error in error.wrapping)

@@ -10,6 +10,7 @@ from .exceptions import (
     CommandDoesNotExistError,
     LabwareNotLoadedError,
     LabwareNotLoadedOnModuleError,
+    LabwareNotLoadedOnLabwareError,
     LabwareNotOnDeckError,
     LiquidDoesNotExistError,
     LabwareDefinitionDoesNotExistError,
@@ -20,6 +21,7 @@ from .exceptions import (
     LabwareOffsetDoesNotExistError,
     LabwareIsNotTipRackError,
     LabwareIsTipRackError,
+    LabwareIsAdapterError,
     TouchTipDisabledError,
     WellDoesNotExistError,
     PipetteNotLoadedError,
@@ -47,7 +49,6 @@ from .exceptions import (
     InvalidHoldTimeError,
     CannotPerformModuleAction,
     PauseNotAllowedError,
-    ProtocolCommandFailedError,
     GripperNotAttachedError,
     HardwareNotSupportedError,
     LabwareMovementNotAllowedError,
@@ -55,7 +56,7 @@ from .exceptions import (
     InvalidAxisForRobotType,
 )
 
-from .error_occurrence import ErrorOccurrence
+from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
 
 __all__ = [
     # exceptions
@@ -68,6 +69,7 @@ __all__ = [
     "CommandDoesNotExistError",
     "LabwareNotLoadedError",
     "LabwareNotLoadedOnModuleError",
+    "LabwareNotLoadedOnLabwareError",
     "LabwareNotOnDeckError",
     "LiquidDoesNotExistError",
     "LabwareDefinitionDoesNotExistError",
@@ -78,6 +80,7 @@ __all__ = [
     "LabwareOffsetDoesNotExistError",
     "LabwareIsNotTipRackError",
     "LabwareIsTipRackError",
+    "LabwareIsAdapterError",
     "TouchTipDisabledError",
     "WellDoesNotExistError",
     "PipetteNotLoadedError",

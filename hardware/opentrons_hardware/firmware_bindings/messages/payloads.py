@@ -3,9 +3,11 @@
 #  dataclass fields interpretation.
 #  from __future__ import annotations
 from dataclasses import dataclass, field, asdict
-from . import message_definitions
 from typing import Iterator, List
 
+from opentrons_shared_data.errors.exceptions import InternalMessageFormatError
+
+from . import message_definitions
 from .fields import (
     FirmwareShortSHADataField,
     VersionFlagsField,
@@ -314,14 +316,16 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
         data_length = len(self.data.value)
         address = self.address.value
         if address % 8 != 0:
-            raise ValueError(
-                f"Data address needs to be doubleword aligned."
-                f" {address} mod 8 equals {address % 8} and should be 0"
+            raise InternalMessageFormatError(
+                f"FirmwareUpdateData: Data address needs to be doubleword aligned."
+                f" {address} mod 8 equals {address % 8} and should be 0",
+                detail={"address": address},
             )
         if data_length > FirmwareUpdateDataField.NUM_BYTES:
-            raise ValueError(
-                f"Data cannot be more than"
-                f" {FirmwareUpdateDataField.NUM_BYTES} bytes got {data_length}."
+            raise InternalMessageFormatError(
+                f"FirmwareUpdateData: Data cannot be more than"
+                f" {FirmwareUpdateDataField.NUM_BYTES} bytes got {data_length}.",
+                detail={"size": data_length},
             )
 
     @classmethod
