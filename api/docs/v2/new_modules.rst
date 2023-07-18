@@ -98,12 +98,12 @@ Some modules were added to our python API later than others, and others span mul
 Loading Labware onto a Module
 =============================
 
-You'll use the :py:meth:`.ProtocolContext.load_labware` when loading labware on a module. For example, this code shows how to load the `Opentrons 24 Well Aluminum Block <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_ on top of a Temperature Module::
+You'll use the :py:meth:`.ProtocolContext.load_labware` method when loading labware on a module. For example, this code shows how to load the `Opentrons 24 Well Aluminum Block <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_ on top of a Temperature Module::
 
     def run(protocol: protocol_api.ProtocolContext):
         temp_mod = protocol.load_module(
             module_name= "temperature module gen2",
-            location= 1)
+            location= "D1") # Flex deck slot
         temp_labware = temp_mod.load_labware(
             load_name= "opentrons_24_aluminumblock_generic_2ml_screwcap",
             label= "Temperature-Controlled Tubes",
@@ -111,7 +111,7 @@ You'll use the :py:meth:`.ProtocolContext.load_labware` when loading labware on 
 
 .. versionadded:: 2.0
 
-In the sample code, notice how you don't need to specify a deck slot for the aluminum block in the ``load_labware`` method. Your robot already knows the block's location because the ``load_module`` method for the Temperature Module includes that information (``location= 1``).
+Notice that when you load labware on a module, you don’t need to specify the labware’s deck slot. In this example, the aluminum block is loaded on the module and the ``load_module`` method already includes a location (e.g. ``location= "D1"``).
 
 Any :ref:`v2-custom-labware` added to your Opentrons App is also accessible when loading labware onto a module. You can find and copy its load name by going to its card on the Labware page.
 
