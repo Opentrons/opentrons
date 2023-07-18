@@ -22,6 +22,7 @@ For more details about this release, please see the full [technical change log][
 - More little stall detection fixes
 - The ODD will now display a spinner until the robot server has started
 - Homing now goes to the limit switch then backs off until the limit switch is released
+- Support for PVT (v3.5) pipettes
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
