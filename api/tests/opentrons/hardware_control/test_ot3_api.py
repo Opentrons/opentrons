@@ -1401,11 +1401,9 @@ async def test_pick_up_tip_full_tiprack(
         tip_action.side_effect = _update_gear_motor_pos
         await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.pick_up_tip(Mount.LEFT, 40.0)
-        # backend._gear_motor_position = 10
         pipette_handler.plan_check_pick_up_tip.assert_called_once_with(
             OT3Mount.LEFT, 40.0, None, None
         )
-        # breakpoint()
         # first call should be "clamp", moving down
         assert tip_action.call_args_list[0][-1]["tip_action"] == "clamp"
         assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
@@ -1445,7 +1443,6 @@ async def test_drop_tip_full_tiprack(
             ),
             _fake_function,
         )
-
         def _update_gear_motor_pos(
             moves: Optional[List[Move[Axis]]] = None,
             distance: Optional[float] = None,

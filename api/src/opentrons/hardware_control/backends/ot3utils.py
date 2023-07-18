@@ -245,7 +245,6 @@ def get_system_constraints(
                 conf_by_pip["direction_change_speed_discontinuity"][axis_kind],
                 conf_by_pip["default_max_speed"][axis_kind],
             )
-
     return constraints
 
 

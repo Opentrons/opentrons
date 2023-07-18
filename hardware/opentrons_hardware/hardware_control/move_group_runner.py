@@ -404,7 +404,6 @@ class MoveScheduler:
         group_id = message.payload.group_id.value - self._start_at_index
         node_id = arbitration_id.parts.originating_node_id
         try:
-
             in_group = (node_id, seq_id) in self._moves[group_id]
             self._moves[group_id].remove((node_id, seq_id))
             self._completion_queue.put_nowait((arbitration_id, message))
@@ -412,11 +411,9 @@ class MoveScheduler:
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
                 f", which {'is' if in_group else 'isn''t'} in group"
             )
-
             if not self._moves[group_id]:
                 log.debug(f"Move group {group_id+self._start_at_index} has completed.")
                 self._event.set()
-
         except KeyError:
             log.warning(
                 f"Got a move ack for ({node_id}, {seq_id}) which is not in this "
