@@ -5,9 +5,15 @@ include ../scripts/python.mk
 
 SHX := npx shx
 
+ot_project := $(OPENTRONS_PROJECT)
+project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
+project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
+
 sdist_file = dist/hardware_testing-0.0.1.tar.gz
 wheel_file = dist/hardware_testing-0.0.1-py3-none-any.whl
-
+# Find the branch, sha, version that will be used to update the VERSION.json file
+version_file = $(call python_get_git_version,hardware-testing,$(project_ot3_default),hardware-testing)
+usb_file = dist/hardware_testing_usb-0.0.1.tar.gz
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -26,6 +32,9 @@ ssh_opts ?= $(default_ssh_opts)
 # For the python sources
 ot_py_sources := $(filter %.py,$(shell $(SHX) find hardware_testing/))
 ot_sources := $(ot_py_sources)
+
+# usb package options
+usb_dir ?=
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
@@ -175,7 +184,7 @@ restart-ot3:
 
 .PHONY: push-no-restart-ot3
 push-no-restart-ot3: sdist Pipfile.lock
-	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing")
+	$(call push-python-sdist,$(host),,$(ssh_opts),$(sdist_file),/opt/opentrons-robot-server,"hardware_testing",,,$(version_file))
 
 .PHONY: push-ot3
 push-ot3: push-no-restart-ot3 push-plot-webpage-ot3 push-description-ot3
@@ -268,3 +277,18 @@ push-photometric-ot2:
 .PHONY: get-latest-tag
 get-latest-tag:
 	git tag -l --sort=-v:refname "ot3@*" --merged | (head -n 1 || Select -First 1)
+
+
+# Creates a tarball of the hardware-testing module that can be deployed to a thumb-drive
+.PHONY: setup-usb-module-ot3
+setup-usb-module: sdist Pipfile.lock
+	@echo "Creating hardware-testing USB package."
+
+	# Create the usb-package tarball
+	tar -zcvf $(usb_file) \
+		-C ./dist ./hardware_testing-0.0.1.tar.gz \
+		-C ../hardware_testing/scripts/ ./setup.sh \
+
+	# Lets extract the usb package to the usb device if given
+	$(if $(usb_dir), tar -xvf $(usb_file) -C $(usb_dir))
+

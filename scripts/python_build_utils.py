@@ -29,6 +29,7 @@ package_entries = {
     'shared-data': PackageEntry('shared_data'),
     'notify-server': PackageEntry('notify_server'),
     'hardware': PackageEntry('opentrons_hardware'),
+    'hardware-testing': PackageEntry('hardware_testing'),
     'usb-bridge': PackageEntry('usb_bridge'),
     'system-server': PackageEntry('system_server'),
     'server-utils': PackageEntry('server_utils'),
