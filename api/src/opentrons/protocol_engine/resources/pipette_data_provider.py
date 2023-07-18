@@ -6,7 +6,7 @@ from opentrons_shared_data.pipette.dev_types import PipetteName
 from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
-    pipette_definition,
+    types as pip_types,
 )
 
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -42,7 +42,7 @@ def get_virtual_pipette_static_config(
     )
 
     tip_configuration = config.supported_tips[
-        pipette_definition.PipetteTipType(config.max_volume)
+        pip_types.PipetteTipType(config.max_volume)
     ]
     return LoadedStaticPipetteData(
         model=str(pipette_model),

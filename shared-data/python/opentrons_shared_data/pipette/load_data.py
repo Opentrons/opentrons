@@ -9,15 +9,17 @@ from .. import load_shared_data, get_shared_data_root
 
 from .pipette_definition import (
     PipetteConfigurations,
-    PipetteChannelType,
-    PipetteVersionType,
-    PipetteModelType,
-    PipetteGenerationType,
-    PipetteModelMajorVersion,
-    PipetteModelMinorVersion,
     PipetteLiquidPropertiesDefinition,
 )
 from .model_constants import MOUNT_CONFIG_LOOKUP_TABLE, _MAP_KEY_TO_V2
+from .types import (
+    PipetteChannelType,
+    PipetteModelType,
+    PipetteGenerationType,
+    PipetteVersionType,
+    PipetteModelMajorVersion,
+    PipetteModelMinorVersion,
+)
 
 
 LoadedConfiguration = Dict[str, Union[str, Dict[str, Any]]]

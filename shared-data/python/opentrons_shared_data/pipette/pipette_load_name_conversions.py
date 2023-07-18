@@ -1,15 +1,15 @@
 import re
 from typing import List, Optional, Union, cast
 from .dev_types import PipetteModel, PipetteName
-from .pipette_definition import (
+from .types import (
     PipetteChannelType,
     PipetteModelType,
     PipetteVersionType,
     PipetteGenerationType,
-    PIPETTE_AVAILABLE_TYPES,
-    PIPETTE_CHANNELS_INTS,
     PipetteModelMajorVersionType,
     PipetteModelMinorVersionType,
+)
+from .pipette_definition import (
     PipetteNameType,
     PipetteModelVersionType,
 )
@@ -18,6 +18,9 @@ DEFAULT_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_MODEL = PipetteModelType.p1000
 DEFAULT_CHANNELS = PipetteChannelType.SINGLE_CHANNEL
 DEFAULT_MODEL_VERSION = PipetteVersionType(major=1, minor=0)
+
+PIPETTE_AVAILABLE_TYPES = [m.name for m in PipetteModelType]
+PIPETTE_CHANNELS_INTS = [c.value for c in PipetteChannelType]
 
 
 def is_model(model_or_name: Union[PipetteName, PipetteModel, None]) -> bool:

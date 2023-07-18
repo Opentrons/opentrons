@@ -1,7 +1,5 @@
-from typing_extensions import Literal
-from typing import List, Dict, Tuple, cast, Optional
+from typing import List, Dict, Tuple, Optional
 from pydantic import BaseModel, Field, validator
-from enum import Enum
 from dataclasses import dataclass
 
 from . import types as pip_types, dev_types
@@ -10,116 +8,37 @@ PLUNGER_CURRENT_MINIMUM = 0.1
 PLUNGER_CURRENT_MAXIMUM = 1.5
 
 
-PipetteModelMajorVersion = [1, 2, 3]
-PipetteModelMinorVersion = [0, 1, 2, 3, 4, 5]
-
-# TODO Literals are only good for writing down
-# exact values. Is there a better typing mechanism
-# so we don't need to keep track of versions in two
-# different places?
-PipetteModelMajorVersionType = Literal[1, 2, 3]
-PipetteModelMinorVersionType = Literal[0, 1, 2, 3, 4, 5]
-
-
-class PipetteTipType(Enum):
-    t10 = 10
-    t20 = 20
-    t50 = 50
-    t200 = 200
-    t300 = 300
-    t1000 = 1000
-
-
-class PipetteChannelType(int, Enum):
-    SINGLE_CHANNEL = 1
-    EIGHT_CHANNEL = 8
-    NINETY_SIX_CHANNEL = 96
-
-    def __str__(self) -> str:
-        if self.value == 96:
-            return "96"
-        elif self.value == 8:
-            return "multi"
-        else:
-            return "single"
-
-
-class PipetteModelType(Enum):
-    p10 = "p10"
-    p20 = "p20"
-    p50 = "p50"
-    p300 = "p300"
-    p1000 = "p1000"
-
-
-class PipetteGenerationType(Enum):
-    GEN1 = "GEN1"
-    GEN2 = "GEN2"
-    FLEX = "FLEX"
-
-
-PIPETTE_AVAILABLE_TYPES = [m.name for m in PipetteModelType]
-PIPETTE_CHANNELS_INTS = [c.value for c in PipetteChannelType]
-PIPETTE_GENERATIONS = [g.name.lower() for g in PipetteGenerationType]
-
-
-@dataclass(frozen=True)
-class PipetteVersionType:
-    major: PipetteModelMajorVersionType
-    minor: PipetteModelMinorVersionType
-
-    @classmethod
-    def convert_from_float(cls, version: float) -> "PipetteVersionType":
-        major = cast(PipetteModelMajorVersionType, int(version // 1))
-        minor = cast(PipetteModelMinorVersionType, int(round((version % 1), 2) * 10))
-        return cls(major=major, minor=minor)
-
-    def __str__(self) -> str:
-        if self.major == 1 and self.minor == 0:
-            # Maintain the format of V1 pipettes that
-            # do not contain a minor version at all.
-            return f"{self.major}"
-        else:
-            return f"{self.major}.{self.minor}"
-
-    @property
-    def as_tuple(
-        self,
-    ) -> Tuple[PipetteModelMajorVersionType, PipetteModelMinorVersionType]:
-        return (self.major, self.minor)
-
-
 # TODO (lc 12-5-2022) Ideally we can deprecate this
 # at somepoint once we load pipettes by channels and type
 @dataclass
 class PipetteNameType:
-    pipette_type: PipetteModelType
-    pipette_channels: PipetteChannelType
-    pipette_generation: PipetteGenerationType
+    pipette_type: pip_types.PipetteModelType
+    pipette_channels: pip_types.PipetteChannelType
+    pipette_generation: pip_types.PipetteGenerationType
 
     def __repr__(self) -> str:
         base_name = f"{self.pipette_type.name}_{str(self.pipette_channels)}"
-        if self.pipette_generation == PipetteGenerationType.GEN1:
+        if self.pipette_generation == pip_types.PipetteGenerationType.GEN1:
             return base_name
-        elif self.pipette_channels == PipetteChannelType.NINETY_SIX_CHANNEL:
+        elif self.pipette_channels == pip_types.PipetteChannelType.NINETY_SIX_CHANNEL:
             return base_name
         else:
             return f"{base_name}_{self.pipette_generation.name.lower()}"
 
-    def get_version(self) -> PipetteVersionType:
-        if self.pipette_generation == PipetteGenerationType.FLEX:
-            return PipetteVersionType(3, 0)
-        elif self.pipette_generation == PipetteGenerationType.GEN2:
-            return PipetteVersionType(2, 0)
+    def get_version(self) -> pip_types.PipetteVersionType:
+        if self.pipette_generation == pip_types.PipetteGenerationType.FLEX:
+            return pip_types.PipetteVersionType(3, 0)
+        elif self.pipette_generation == pip_types.PipetteGenerationType.GEN2:
+            return pip_types.PipetteVersionType(2, 0)
         else:
-            return PipetteVersionType(1, 0)
+            return pip_types.PipetteVersionType(1, 0)
 
 
 @dataclass
 class PipetteModelVersionType:
-    pipette_type: PipetteModelType
-    pipette_channels: PipetteChannelType
-    pipette_version: PipetteVersionType
+    pipette_type: pip_types.PipetteModelType
+    pipette_channels: pip_types.PipetteChannelType
+    pipette_version: pip_types.PipetteVersionType
 
     def __repr__(self) -> str:
         base_name = f"{self.pipette_type.name}_{str(self.pipette_channels)}"
@@ -256,12 +175,12 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="A list of pipette names that are compatible with this pipette.",
         alias="backCompatNames",
     )
-    pipette_type: PipetteModelType = Field(
+    pipette_type: pip_types.PipetteModelType = Field(
         ...,
         description="The pipette model type (related to number of channels).",
         alias="model",
     )
-    display_category: PipetteGenerationType = Field(
+    display_category: pip_types.PipetteGenerationType = Field(
         ..., description="The product model of the pipette.", alias="displayCategory"
     )
     pick_up_tip_configurations: TipHandlingConfigurations = Field(
@@ -280,7 +199,7 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     partial_tip_configurations: PartialTipDefinition = Field(
         ..., alias="partialTipConfigurations"
     )
-    channels: PipetteChannelType = Field(
+    channels: pip_types.PipetteChannelType = Field(
         ..., description="The maximum number of channels on the pipette."
     )
     shaft_diameter: float = Field(
@@ -301,18 +220,18 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
     )
 
     @validator("pipette_type", pre=True)
-    def convert_pipette_model_string(cls, v: str) -> PipetteModelType:
-        return PipetteModelType(v)
+    def convert_pipette_model_string(cls, v: str) -> pip_types.PipetteModelType:
+        return pip_types.PipetteModelType(v)
 
     @validator("channels", pre=True)
-    def convert_channels(cls, v: int) -> PipetteChannelType:
-        return PipetteChannelType(v)
+    def convert_channels(cls, v: int) -> pip_types.PipetteChannelType:
+        return pip_types.PipetteChannelType(v)
 
     @validator("display_category", pre=True)
-    def convert_display_category(cls, v: str) -> PipetteGenerationType:
+    def convert_display_category(cls, v: str) -> pip_types.PipetteGenerationType:
         if not v:
-            return PipetteGenerationType.GEN1
-        return PipetteGenerationType(v)
+            return pip_types.PipetteGenerationType.GEN1
+        return pip_types.PipetteGenerationType(v)
 
     @validator("quirks", pre=True)
     def convert_quirks(cls, v: List[str]) -> List[pip_types.Quirks]:
@@ -320,9 +239,9 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
 
     class Config:
         json_encoders = {
-            PipetteChannelType: lambda v: v.value,
-            PipetteModelType: lambda v: v.value,
-            PipetteGenerationType: lambda v: v.value,
+            pip_types.PipetteChannelType: lambda v: v.value,
+            pip_types.PipetteModelType: lambda v: v.value,
+            pip_types.PipetteGenerationType: lambda v: v.value,
             pip_types.Quirks: lambda v: v.value,
         }
 
@@ -341,7 +260,7 @@ class PipetteGeometryDefinition(BaseModel):
 class PipetteLiquidPropertiesDefinition(BaseModel):
     """The liquid properties definition of a pipette."""
 
-    supported_tips: Dict[PipetteTipType, SupportedTipsDefinition] = Field(
+    supported_tips: Dict[pip_types.PipetteTipType, SupportedTipsDefinition] = Field(
         ..., alias="supportedTips"
     )
     tip_overlap_dictionary: Dict[str, float] = Field(
@@ -369,8 +288,8 @@ class PipetteLiquidPropertiesDefinition(BaseModel):
     @validator("supported_tips", pre=True)
     def convert_aspirate_key_to_channel_type(
         cls, v: Dict[str, SupportedTipsDefinition]
-    ) -> Dict[PipetteTipType, SupportedTipsDefinition]:
-        return {PipetteTipType[key]: value for key, value in v.items()}
+    ) -> Dict[pip_types.PipetteTipType, SupportedTipsDefinition]:
+        return {pip_types.PipetteTipType[key]: value for key, value in v.items()}
 
 
 class PipetteConfigurations(
@@ -380,7 +299,7 @@ class PipetteConfigurations(
 ):
     """The full pipette configurations of a given model and version."""
 
-    version: PipetteVersionType = Field(
+    version: pip_types.PipetteVersionType = Field(
         ..., description="The version of the configuration loaded."
     )
     mount_configurations: pip_types.RobotMountConfigs = Field(

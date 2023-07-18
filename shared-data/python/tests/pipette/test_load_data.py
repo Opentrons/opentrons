@@ -1,6 +1,6 @@
 import pytest
 from opentrons_shared_data.pipette import load_data, types
-from opentrons_shared_data.pipette.pipette_definition import (
+from opentrons_shared_data.pipette.types import (
     PipetteChannelType,
     PipetteModelType,
     PipetteVersionType,

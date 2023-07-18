@@ -9,15 +9,12 @@ from typing import Any, Dict, Optional, Set, Tuple, Union, cast, List
 
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
-    PipetteTipType,
     PlungerPositions,
     MotorConfigurations,
     SupportedTipsDefinition,
     TipHandlingConfigurations,
-    PipetteModelType,
     PipetteModelVersionType,
     PipetteNameType,
-    PipetteChannelType,
 )
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
@@ -116,7 +113,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         #: True if ready to aspirate
         # TODO Clean this lookup up!
         self._active_tip_settings = self._config.supported_tips.get(
-            PipetteTipType(self._working_volume),
+            pip_types.PipetteTipType(self._working_volume),
             self._config.supported_tips[list(self._config.supported_tips.keys())[0]],
         )
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
@@ -187,7 +184,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._tip_overlap_lookup
 
     @property
-    def channels(self) -> PipetteChannelType:
+    def channels(self) -> pip_types.PipetteChannelType:
         return self._max_channels
 
     @property
@@ -241,7 +238,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self.ready_to_aspirate = False
         #: True if ready to aspirate
         self._active_tip_settings = self._config.supported_tips[
-            PipetteTipType(self._working_volume)
+            pip_types.PipetteTipType(self._working_volume)
         ]
         self._fallback_tip_length = self.active_tip_settings.default_tip_length
 
@@ -279,7 +276,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return cast(PipetteModel, f"{self._pipette_model}")
 
     @property
-    def pipette_type(self) -> PipetteModelType:
+    def pipette_type(self) -> pip_types.PipetteModelType:
         return self._pipette_type
 
     @property
@@ -425,7 +422,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         """The working volume is the current tip max volume"""
         self._working_volume = min(self.config.max_volume, tip_volume)
         self._active_tip_settings = self._config.supported_tips[
-            PipetteTipType(int(self._working_volume))
+            pip_types.PipetteTipType(int(self._working_volume))
         ]
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
 

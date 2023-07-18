@@ -63,7 +63,7 @@ from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
 from opentrons.config import gripper_config as gc
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
-from opentrons_shared_data.pipette.pipette_definition import (
+from opentrons_shared_data.pipette.types import (
     PipetteModelType,
     PipetteChannelType,
     PipetteVersionType,

@@ -1,7 +1,7 @@
 import pytest
 
 from typing import Union
-from opentrons_shared_data.pipette.pipette_definition import (
+from opentrons_shared_data.pipette.types import (
     PipetteChannelType,
     PipetteModelType,
     PipetteVersionType,
