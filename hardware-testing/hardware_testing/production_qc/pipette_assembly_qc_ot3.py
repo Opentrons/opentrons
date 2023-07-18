@@ -719,10 +719,14 @@ async def _test_diagnostics_capacitive(
             )
             offsets.append(o)
         await api.retract(mount)
-    if not api.is_simulator and len(offsets) > 1 and (
-        abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
-        and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
-        and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
+    if (
+        not api.is_simulator
+        and len(offsets) > 1
+        and (
+            abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
+            and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
+            and abs(offsets[0].x - offsets[1].x) < PROBING_DECK_PRECISION_MM
+        )
     ):
         probe_slot_result = _bool_to_pass_fail(True)
     else:
