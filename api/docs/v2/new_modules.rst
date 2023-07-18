@@ -28,7 +28,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
         .. code-block:: python
             :substitutions:
 
-            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"
+            requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
             def run(protocol: protocol_api.ProtocolContext): 
                 # Load a Magnetic Module GEN2 in deck slot D1.
@@ -153,7 +153,6 @@ The examples in this section use a Temperature Module loaded in Flex deck slot D
 
 .. suggested replacement for existing "where to put it" text
 .. maybe remove and just link to an online quick-start guide?
-.. might be odd here
 
 The supported deck slot positions for the Temperature Module depend on the robot you’re using.
 
@@ -161,8 +160,8 @@ The supported deck slot positions for the Temperature Module depend on the robot
    :widths: 30 80
    :header-rows: 1
 
-   * - Robot module
-     - Deck Placement
+   * - Robot Model
+     - Temperature Module Deck Placement
    * - Flex
      - In any deck slot in column 1 or 3. You could put it in slot A3, but you'd need to move the trash bin first.
    * - OT-2
@@ -179,13 +178,13 @@ The primary function of the module is to control the temperature of its deck, us
 
 .. code-block:: python
 
-    temp_mod.set_temperature(celsius=4)
+    temp_mod.set_temperature(celsius= 4)
 
 When using ``set_temperature``, your protocol will wait until the target temperature is reached before proceeding to further commands. In other words, you can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call :py:meth:`~.TemperatureModuleContext.deactivate`, which will stop heating or cooling and will turn off the fan.
 
 .. note::
 
-    The OT-2 will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App or run ``deactivate()`` in Jupyter notebook.
+    Your Flex or OT-2 will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App or run ``deactivate()`` in Jupyter notebook.
 
 .. versionadded:: 2.0
 
@@ -196,7 +195,7 @@ If you need to confirm in software whether the Temperature Module is holding at 
 
 .. code-block:: python
 
-    temp_mod.set_temperature(celsius=90)
+    temp_mod.set_temperature(celsius= 90)
     temp_mod.status  # 'holding at target'
     temp_mod.deactivate()
     temp_mod.status  # 'idle'
@@ -217,11 +216,13 @@ All methods of :py:class:`.TemperatureModuleContext` work with both the GEN1 and
 Using a Magnetic Module
 ***********************
 
-The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module.
+*For use with the OT-2 only.*
+
+The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module.  
 
 The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` object, which has methods for engaging (raising) and disengaging (lowering) its magnets.
 
-The examples in this section will use a Magnetic Module loaded in slot 6:
+The examples in this section apply to an OT-2 with a Magnetic Module loaded in slot 6:
 
 .. code-block:: python
     :substitutions:
@@ -276,8 +277,8 @@ Here are some examples of where the magnets will move when using the different p
 
   .. code-block:: python
 
-      mag_mod.engage(height_from_base=13.5)  # 13.5 mm
-      mag_mod.engage(offset=-2)              # 15.5 mm
+      mag_mod.engage(height_from_base= 13.5)  # 13.5 mm
+      mag_mod.engage(offset= -2)              # 15.5 mm
 
 Note that ``offset`` takes into account the fact that the magnets' home position is measured as −2.5 mm for GEN2 modules.
 
@@ -302,6 +303,8 @@ If at any point you need to check whether the magnets are engaged or not, use th
 Changes with the GEN2 Magnetic Module
 =====================================
 
+*For use with the OT-2 only.*
+
 The GEN2 Magnetic Module uses smaller magnets than the GEN1 version to mitigate an issue with the magnets attracting beads even from their retracted position. This means it takes longer for the GEN2 module to attract beads. The recommended attraction time is 5 minutes for liquid volumes up to 50 µL and 7 minutes for volumes greater than 50 µL. If your application needs additional magnetic strength to attract beads within  these timeframes, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
 
 
@@ -311,7 +314,6 @@ The GEN2 Magnetic Module uses smaller magnets than the GEN1 version to mitigate 
 Using a Thermocycler Module
 ***************************
 
-
 The Thermocycler Module provides on-deck, fully automated thermocycling and can heat and cool very quickly during operation. The module's block can heat and cool between 4 and 99 °C, and the module's lid can heat up to 110 °C.
 
 The Thermocycler is represented in code by a :py:class:`.ThermocyclerContext` object, which has methods for controlling the lid, controlling the block, and setting *profiles* — timed heating and cooling routines that can be automatically repeated. 
@@ -319,18 +321,25 @@ The Thermocycler is represented in code by a :py:class:`.ThermocyclerContext` ob
 The examples in this section will use a Thermocycler loaded as follows:
 
 .. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api
-
-    metadata = {'apiLevel': '2.13'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tc_mod = protocol.load_module('thermocyclerModuleV2')
         plate = tc_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
         
-The ``location`` parameter of :py:meth:`.load_module` isn't required for the Thermocycler. It only has one valid deck location, which covers :ref:`slots <deck-slots>` 7, 8, 10, and 11 on an OT-2 or A1 and B1 on a Flex. Attempting to load any other modules or labware in these slots while a Thermocycler is there will raise an error.
+The ``location`` parameter of :py:meth:`.load_module` isn't required for the Thermocycler. This module has only one valid deck location, which depends on the robot you're using.
 
+.. list-table::
+   :widths: 30 80
+   :header-rows: 1
+
+   * - Robot Model
+     - Thermocycler Deck Placement
+   * - Flex
+     - Requires deck slots A1 and B1 and the A1 expansion slot.
+   * - OT-2
+     - Requires deck slots 7, 8, 10, and 11.
+
+Attempting to load any other modules or labware in these slots while a Thermocycler is there will raise an error.
 
 .. versionadded:: 2.0
 
@@ -346,7 +355,7 @@ You can also control the temperature of the lid. Acceptable target temperatures 
 
 .. code-block:: python
 
-    tc_mod.set_lid_temperature(temperature=50)
+    tc_mod.set_lid_temperature(temperature= 50)
 
 The protocol will only proceed once the lid temperature reaches 50 °C. This is the case whether the previous temperature was lower than 50 °C (in which case the lid will actively heat) or higher than 50 °C (in which case the lid will passively cool).
 
@@ -370,7 +379,7 @@ To set the block temperature inside the Thermocycler, use :py:meth:`~.Thermocycl
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(temperature=4)
+        tc_mod.set_block_temperature(temperature= 4)
         
 If you don't specify any other parameters, the Thermocycler will hold this temperature until a new temperature is set, :py:meth:`~.ThermocyclerContext.deactivate_block` is called, or the module is powered off.
 
@@ -379,12 +388,12 @@ If you don't specify any other parameters, the Thermocycler will hold this tempe
 Hold Time
 ---------
 
-You can optionally instruct the Thermocycler to hold its block temperature for a specific amount of time. You can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added together). For example, this will set the block to 4 °C for 4 minutes and 15 seconds:
-
-.. code-block:: python
-
-        tc_mod.set_block_temperature(temperature=4, hold_time_minutes=4,
-                                     hold_time_seconds=15)
+You can optionally instruct the Thermocycler to hold its block temperature for a specific amount of time. You can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added together). For example, this will set the block to 4 °C for 4 minutes and 15 seconds::
+    
+    tc_mod.set_block_temperature(
+        temperature= 4,
+        hold_time_minutes= 4,
+        hold_time_seconds=15)
 
 .. note ::
 
@@ -397,12 +406,12 @@ Block Max Volume
 
 The Thermocycler's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Accurately specifying the liquid volume allows the Thermocycler to more precisely control the temperature of the samples. You should set the ``block_max_volume`` parameter to the amount of liquid in the *fullest* well, measured in µL. If not specified, the Thermocycler will assume samples of 25 µL.
 
-It is especially important to specify ``block_max_volume`` when holding at a temperature. For example, say you want to hold larger samples at a temperature for a short time:
+It is especially important to specify ``block_max_volume`` when holding at a temperature. For example, say you want to hold larger samples at a temperature for a short time::
 
-.. code-block:: python
-
-        tc_mod.set_block_temperature(temperature=4, hold_time_seconds=20,
-                                     block_max_volume=80)
+        tc_mod.set_block_temperature(
+            temperature= 4,
+            hold_time_seconds= 20,
+            block_max_volume= 80)
 
 If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 °C before starting the 20-second timer. In fact, with such a short hold time they may not reach 4 °C at all!
 
@@ -443,9 +452,9 @@ In terms of the actions that the Thermocycler performs, this would be equivalent
 .. code-block:: python
 
         for i in range(20):
-            tc_mod.set_block_temperature(95, hold_time_seconds=30, block_max_volume=32)
-            tc_mod.set_block_temperature(57, hold_time_seconds=30, block_max_volume=32)
-            tc_mod.set_block_temperature(72, hold_time_seconds=60, block_max_volume=32)
+            tc_mod.set_block_temperature(95, hold_time_seconds= 30, block_max_volume= 32)
+            tc_mod.set_block_temperature(57, hold_time_seconds= 30, block_max_volume= 32)
+            tc_mod.set_block_temperature(72, hold_time_seconds= 60, block_max_volume= 32)
             
 However, this code would generate 60 lines in the protocol's run log, while executing a profile is summarized in a single line. Additionally, you can set a profile once and execute it multiple times (with different numbers of repetitions and maximum volumes, if needed).
 
@@ -470,16 +479,12 @@ Using a Heater-Shaker Module
 
 The Heater-Shaker Module provides on-deck heating and orbital shaking. The module can heat from 37 to 95 °C, and can shake samples from 200 to 3000 rpm.
 
-The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerContext` object. The examples in this section will use a Heater-Shaker loaded in slot 1:
+The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerContext` object. The examples in this section will use a Heater-Shaker loaded in Flex deck slot D1, which corresponds to deck slot 1 on the OT-2:
 
 .. code-block:: python
 
-    from opentrons import protocol_api
-
-    metadata = {'apiLevel': '2.13'}
-
     def run(protocol: protocol_api.ProtocolContext):
-         hs_mod = protocol.load_module('heaterShakerModuleV1', 1)
+         hs_mod = protocol.load_module('heaterShakerModuleV1', "D1")
 
 .. versionadded:: 2.13
 
@@ -487,15 +492,40 @@ The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerCon
 Placement Restrictions
 ======================
 
-To allow for proper anchoring and cable routing, the Heater-Shaker should only be loaded in slot 1, 3, 4, 6, 7, or 10. 
+Deck Slots
+----------
 
-In general, it's best to leave all slots adjacent to the Heater-Shaker empty, in both directions. If your protocol requires filling those slots, you’ll need to observe certain restrictions put in place to avoid physical crashes involving the Heater-Shaker.
+The supported deck slot positions for the Heater-Shaker depend on the robot you’re using. 
 
-First, you can’t place any other modules adjacent to the Heater-Shaker in any direction. This prevents collisions both while shaking and while opening the labware latch. Attempting to load a module next to the Heater-Shaker will raise a ``DeckConflictError``.
+.. list-table::
+   :widths: 30 80
+   :header-rows: 1
 
-Next, you can’t place tall labware (defined as >53 mm) to the left or right of the Heater-Shaker. This prevents the Heater-Shaker’s latch from colliding with the adjacent labware. Attempting to load tall labware to the right or left of the Heater-Shaker will also raise a ``DeckConflictError``. Common labware that exceed the height limit include Opentrons tube racks and Opentrons 1000 µL tip racks.
+   * - Robot Model
+     - Heater-Shaker Deck Placement
+   * - Flex
+     - In any deck slot in column 1 or 3. The module can go in slot A3, but you need to move the trash bin first.
+   * - OT-2
+     - In deck slot 1, 3, 4, 6, 7, or 10.
 
-Finally, if you are using an 8-channel pipette, you can't perform pipetting actions in `any` adjacent slots. Attempting to do so will raise a ``PipetteMovementRestrictedByHeaterShakerError``. This prevents the pipette ejector from crashing on the module housing or labware latch. There is one exception: to the front or back of the Heater-Shaker, an 8-channel pipette can access tip racks only. Attempting to pipette to non-tip-rack labware will also raise a ``PipetteMovementRestrictedByHeaterShakerError``.
+In general, it's best to leave all slots adjacent to the Heater-Shaker empty. If your protocol requires filling those slots, you’ll need to observe certain restrictions put in place to avoid physical crashes involving the Heater-Shaker.
+
+Adjacent Modules
+----------------
+
+Do not place other modules next to the Heater-Shaker. Keeping adjacent deck slots clear helps prevents collisions during shaking and while opening the labware latch. Loading a module next to the Heater-Shaker will raise a ``DeckConflictError``.
+
+Tall Labware
+------------
+
+Do not place labware taller than 53 mm to the left or right of the Heater-Shaker. This prevents the Heater-Shaker’s latch from colliding with the adjacent labware. Common labware that exceed the height limit include Opentrons tube racks and Opentrons 1000 µL tip racks. Loading tall labware to the right or left of the Heater-Shaker will raise a ``DeckConflictError``. 
+
+8-Channel Pipettes
+------------------
+
+You can't perform pipetting actions in `any` slots adjacent to the Heater-Shaker if you're using an 8-channel pipette. This prevents the pipette ejector from crashing on the module housing or labware latch. Using an 8-channel pipette will raise a ``PipetteMovementRestrictedByHeaterShakerError``.
+
+There is one exception: to the front or back of the Heater-Shaker, an 8-channel pipette can access tip racks only. Attempting to pipette to non-tip-rack labware will also raise a ``PipetteMovementRestrictedByHeaterShakerError``.
 
 Latch Control
 =============
