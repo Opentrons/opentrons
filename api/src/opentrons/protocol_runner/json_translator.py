@@ -1,5 +1,5 @@
 """Translation of JSON protocol commands into ProtocolEngine commands."""
-from typing import cast, List, Union
+from typing import cast, List, Union, overload
 from pydantic import parse_obj_as
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -206,7 +206,31 @@ class JsonTranslator:
             for liquid_id, liquid in protocol_liquids.items()
         ]
 
+    @overload
     def translate_commands(
+        self,
+        protocol: ProtocolSchemaV6,
+    ) -> List[pe_commands.CommandCreate]:
+        ...
+
+    @overload
+    def translate_commands(
+        self,
+        protocol: ProtocolSchemaV7,
+    ) -> List[pe_commands.CommandCreate]:
+        ...
+
+    def translate_commands(
+        self,
+        protocol: Union[ProtocolSchemaV7, ProtocolSchemaV6],
+    ) -> List[pe_commands.CommandCreate]:
+        """Takes json protocol and translates commands->protocol engine commands."""
+        if isinstance(protocol, ProtocolSchemaV6):
+            return self._traslate_v6_commands(protocol)
+        else:
+            return self._translate_v7_commands(protocol)
+
+    def _traslate_v6_commands(
         self,
         protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:
@@ -224,11 +248,11 @@ class JsonTranslator:
             commands_list.append(translated_obj)
         return commands_list
 
-    def translate_v7_commands(
+    def _translate_v7_commands(
         self,
         protocol: Union[ProtocolSchemaV7],
     ) -> List[pe_commands.CommandCreate]:
-        """Takes json protocol v6 and translates commands->protocol engine commands."""
+        """Takes json protocol v7 and translates commands->protocol engine commands."""
         commands_list: List[pe_commands.CommandCreate] = []
         for command in protocol.commands:
             if command.commandType == "loadPipette":

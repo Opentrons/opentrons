@@ -644,7 +644,7 @@ def test_load_command(
     v6_output = subject.translate_commands(
         _make_v6_json_protocol(commands=[test_v6_input])
     )
-    v7_output = subject.translate_v7_commands(
+    v7_output = subject.translate_commands(
         _make_v7_json_protocol(commands=[test_v7_input])
     )
     assert v6_output == [expected_output]
