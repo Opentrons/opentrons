@@ -79,7 +79,6 @@ export function ConfirmCancelRunModal({
     <Modal
       modalSize="medium"
       header={modalHeader}
-      isError={isActiveRun}
       onOutsideClick={() => setShowConfirmCancelRunModal(false)}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>

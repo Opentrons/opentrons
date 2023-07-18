@@ -1,32 +1,27 @@
 import * as React from 'react'
 import {
-  Flex,
-  TYPOGRAPHY,
-  SPACING,
+  ALIGN_CENTER,
+  BORDERS,
+  COLORS,
   DIRECTION_ROW,
+  Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  COLORS,
-  SIZE_2,
-  BORDERS,
+  SPACING,
+  TYPOGRAPHY,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
 import type { ModalHeaderBaseProps } from '../Modal/types'
 
-interface ModalHeaderProps extends ModalHeaderBaseProps {
-  isError?: boolean
-}
-export function ModalHeader(props: ModalHeaderProps): JSX.Element {
-  const { title, hasExitIcon, iconName, iconColor, onClick, isError } = props
+export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
+  const { title, hasExitIcon, iconName, iconColor, onClick } = props
   return (
     <Flex
-      backgroundColor={isError ? COLORS.red2 : COLORS.white}
-      color={isError ? COLORS.white : COLORS.black}
+      backgroundColor={COLORS.white}
+      color={COLORS.black}
       height="6.25rem"
       width="100%"
-      paddingX={SPACING.spacing32}
-      paddingY={isError ? SPACING.spacing24 : SPACING.spacing32}
+      padding={SPACING.spacing32}
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
@@ -37,8 +32,8 @@ export function ModalHeader(props: ModalHeaderProps): JSX.Element {
           <Icon
             aria-label={`icon_${iconName}`}
             name={iconName}
-            color={isError ? COLORS.white : iconColor}
-            size={SIZE_2}
+            color={iconColor}
+            size="2rem"
             alignSelf={ALIGN_CENTER}
             marginRight={SPACING.spacing16}
           />
