@@ -692,10 +692,13 @@ async def test_tip_action(
         for move_group in move_group_runner._move_groups:
             assert move_group  # don't pass in empty groups
             assert len(move_group) == 1
+        
+        move_groups = move_group_runner._move_groups    
         # we should be sending this command to the pipette axes to process.
-        assert list(move_group[0].keys()) == [NodeId.pipette_left]
-        step = move_group[0][NodeId.pipette_left]
-        assert step.stop_condition == MoveStopCondition.limit_switch
+        home_step = move_groups[0][0][NodeId.pipette_left]
+        assert home_step.stop_condition == MoveStopCondition.limit_switch
+        backoff_step = move_groups[1][0][NodeId.pipette_left]
+        assert backoff_step.stop_condition == MoveStopCondition.limit_switch_backoff
 
 
 async def test_update_motor_status(
