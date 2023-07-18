@@ -31,6 +31,7 @@ from hardware_testing.measure.pressure.config import (  # type: ignore[import]
     pressure_fixture_a1_location,
     PressureEvent,
     PressureEventConfig,
+    PRESSURE_FIXTURE_INSERT_DEPTH,
 )
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import (
@@ -1168,7 +1169,7 @@ if __name__ == "__main__":
     )
     arg_parser.add_argument("--slot-fixture", type=int, default=DEFAULT_SLOT_FIXTURE)
     arg_parser.add_argument("--slot-trash", type=int, default=DEFAULT_SLOT_TRASH)
-    arg_parser.add_argument("--insert-depth", type=int, default=14)
+    arg_parser.add_argument("--insert-depth", type=int, default=PRESSURE_FIXTURE_INSERT_DEPTH)
     arg_parser.add_argument("--simulate", action="store_true")
     args = arg_parser.parse_args()
     if args.operator:
