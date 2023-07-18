@@ -1443,6 +1443,7 @@ async def test_drop_tip_full_tiprack(
             ),
             _fake_function,
         )
+
         def _update_gear_motor_pos(
             moves: Optional[List[Move[Axis]]] = None,
             distance: Optional[float] = None,
