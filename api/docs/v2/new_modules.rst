@@ -142,30 +142,33 @@ The Temperature Module acts as both a cooling and heating device. It can control
 
 The Temperature Module is represented in code by a :py:class:`.TemperatureModuleContext` object, which has methods for setting target temperatures and reading the module's status.
 
-The examples in this section will use a Temperature Module loaded in slot 3:
-
-.. tabs::
-    
-    .. tab:: Flex
-
-    
-    .. tab:: OT-2
-
-        .. code-block:: python
-            :substitutions:
+The examples in this section use a Temperature Module loaded in Flex deck slot D3, which corresponds to deck slot 3 on the OT-2.
 
 .. code-block:: python
     :substitutions:
 
-    from opentrons import protocol_api
-
-    metadata = {'apiLevel': '2.3'}
-
     def run(protocol: protocol_api.ProtocolContext):
-        temp_mod = protocol.load_module('temperature module gen2', '3')
+        temp_mod = protocol.load_module('temperature module gen2', 'D3')
         plate = temp_mod.load_labware('corning_96_wellplate_360ul_flat')
 
-In order to prevent physical obstruction of other slots, it's best to load the Temperature Module in a slot on the horizontal edges of the deck (1, 4, 7, or 10 on the left or 3, 6, or 9 on the right), with the USB cable and power cord pointing away from the deck.
+.. suggested replacement for existing "where to put it" text
+.. maybe remove and just link to an online quick-start guide?
+.. might be odd here
+
+The supported deck slot positions for the Temperature Module depend on the robot you’re using.
+
+.. list-table::
+   :widths: 30 80
+   :header-rows: 1
+
+   * - Robot module
+     - Deck Placement
+   * - Flex
+     - In any deck slot in column 1 or 3. You could put it in slot A3, but you'd need to move the trash bin first.
+   * - OT-2
+     - In deck slots 1, 3, 4, 6, 7, 9, or 10.
+
+To properly align the module relative to the robot, make sure its exhaust, power, and USB ports face outward, away from the center of the deck. This keeps the exhaust port clear and helps make cable routing and access easier.
 
 .. versionadded:: 2.0
 
