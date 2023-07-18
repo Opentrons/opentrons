@@ -695,7 +695,7 @@ async def test_tip_action(
         # we should be sending this command to the pipette axes to process.
         assert list(move_group[0].keys()) == [NodeId.pipette_left]
         step = move_group[0][NodeId.pipette_left]
-        assert step.stop_condition == MoveStopCondition.limit_switch
+        assert step.stop_condition == MoveStopCondition.limit_switch_backoff
 
 
 async def test_update_motor_status(
