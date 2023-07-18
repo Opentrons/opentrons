@@ -93,7 +93,7 @@ This example uses ``adapter`` to combine a 96-well plate with a flat adapter and
 
 On a Module
 -----------
-.. need to verify
+
 This example combines a 96-well plate with a PCR adapter and loads them onto a Heater-Shaker::
 
     # Load module, open latch
@@ -108,8 +108,6 @@ This example combines a 96-well plate with a PCR adapter and loads them onto a H
     # Load labware on the adapter
     nest_plate = pcr_adapter.load_labware(
         load_name= "nest_96_wellplate_100ul_pcr_full_skirt")
-
-.. Some text and link to separate moving/stacking doc here TBD? PR 13016 and RLAB-343.
 
 .. versionadded:: 2.15
 
