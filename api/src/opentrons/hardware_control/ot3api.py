@@ -2148,7 +2148,7 @@ class OT3API(
         presses: Optional[int] = None,
         increment: Optional[float] = None,
         prep_after: bool = True,
-    ) -> Dict[OT3Axis, float]:
+    ) -> None:
         """Pick up tip from current location."""
         realmount = OT3Mount.from_mount(mount)
         instrument = self._pipette_handler.get_pipette(realmount)
@@ -2199,7 +2199,6 @@ class OT3API(
 
         if prep_after:
             await self.prepare_for_aspirate(realmount)
-        return enc_pos
 
     def set_current_tiprack_diameter(
         self, mount: Union[top_types.Mount, OT3Mount], tiprack_diameter: float
@@ -2551,13 +2550,16 @@ class OT3API(
         probe: Optional[InstrumentProbeType] = None,
     ) -> float:
         """Search for and return liquid level height.
+
         This function begins by moving the mount the distance specified by starting_mount_height in the
         LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
         reading from the pressure sensor.
+
         If the move is completed without the specified threshold being triggered, a
         LiquidNotFound error will be thrown.
         If the threshold is triggered before the minimum z distance has been traveled,
         a EarlyLiquidSenseTrigger error will be thrown.
+
         Otherwise, the function will stop moving once the threshold is triggered,
         and return the position of the
         z axis in deck coordinates, as well as the encoder position, where
@@ -2591,9 +2593,6 @@ class OT3API(
             speed = max_speeds[self.gantry_load][OT3AxisKind.P]
             await self._move(target_pos, speed=speed, acquire_lock=True)
 
-        # if not aspirate_while_sensing, plunger should be at bottom, since
-        #  this expects to be called after pick_up_tip
-
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
         await self._backend.liquid_probe(
             mount,
@@ -2620,16 +2619,21 @@ class OT3API(
         retract_after: bool = True,
     ) -> float:
         """Determine the position of something using the capacitive sensor.
+
         This function orchestrates detecting the position of a collision between the
         capacitive probe on the tool on the specified mount, and some fixed element
         of the robot.
+
         When calling this function, the mount's probe critical point should already
         be aligned in the probe axis with the item to be probed.
+
         It will move the mount's probe critical point to a small distance behind
         the expected position of the element (which is target_pos, in deck coordinates,
         in the axis to be probed) while running the tool's capacitive sensor. When the
         sensor senses contact, the mount stops.
+
         This function moves away and returns the sensed position.
+
         This sensed position can be used in several ways, including
         - To get an absolute position in deck coordinates of whatever was
         targeted, if something was guaranteed to be physically present.
@@ -2753,7 +2757,6 @@ class OT3API(
         if retract_after:
             await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos), contact
-
 
 
 
