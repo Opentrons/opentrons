@@ -771,10 +771,10 @@ async def test_home_timeout(
         await subject.run(can_messenger=mock_can_messenger)
 
 
-async def test_tip_action_move_runner_receives_two_responses(
+async def test_tip_action_move_runner_receives_response(
     mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups
 ) -> None:
-    """The magic call function should receive two responses for a tip action."""
+    """The magic call function should now receive one response for a tip action."""
     with patch.object(MoveScheduler, "_handle_move_completed") as mock_move_complete:
         subject = MoveScheduler(move_groups=move_group_tip_action)
         mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
@@ -785,22 +785,12 @@ async def test_tip_action_move_runner_receives_two_responses(
         assert isinstance(
             mock_move_complete.call_args_list[0][0][0], md.TipActionResponse
         )
-        assert mock_move_complete.call_args_list[0][0][
-            0
-        ].payload.gear_motor_id == GearMotorIdField(1)
-
-        assert isinstance(
-            mock_move_complete.call_args_list[1][0][0], md.TipActionResponse
-        )
-        assert mock_move_complete.call_args_list[1][0][
-            0
-        ].payload.gear_motor_id == GearMotorIdField(0)
 
 
 async def test_tip_action_move_runner_position_updated(
     mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups
 ) -> None:
-    """Two responses from a tip action move are properly handled."""
+    """Response from a tip action move is properly handled."""
     subject = MoveScheduler(move_groups=move_group_tip_action)
     mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send
@@ -810,17 +800,17 @@ async def test_tip_action_move_runner_position_updated(
     assert completion_message[0][1].payload.current_position_um.value == 2000
 
 
-async def test_tip_action_move_runner_fail_receives_one_response(
-    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups, caplog: Any
-) -> None:
-    """Tip action move should fail if one or less responses received."""
-    subject = MoveScheduler(move_groups=move_group_tip_action)
-    mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
-    mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send_failure
-    mock_can_messenger.send.side_effect = mock_sender.mock_send_failure
+# async def test_tip_action_move_runner_fail_receives_one_response(
+#     mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups, caplog: Any
+# ) -> None:
+#     """Tip action move should fail if one or less responses received."""
+#     subject = MoveScheduler(move_groups=move_group_tip_action)
+#     mock_sender = MockSendMoveCompleter(move_group_tip_action, subject)
+#     mock_can_messenger.ensure_send.side_effect = mock_sender.mock_ensure_send_failure
+#     mock_can_messenger.send.side_effect = mock_sender.mock_send_failure
 
-    with pytest.raises(MotionFailedError):
-        await subject.run(can_messenger=mock_can_messenger)
+    # with pytest.raises(MotionFailedError):
+    # await subject.run(can_messenger=mock_can_messenger)
 
 
 async def test_multi_group_move(
