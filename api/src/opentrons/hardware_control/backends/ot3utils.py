@@ -45,6 +45,7 @@ from opentrons_hardware.hardware_control.motion import (
     NodeIdMotionValues,
     create_home_step,
     create_backoff_step,
+    create_tip_action_backoff_step,
     MoveGroup,
     MoveType,
     MoveStopCondition,
@@ -359,6 +360,27 @@ def create_home_groups(
     # halve the homing speed for backoff
     backoff_velocities = {k: v / 2 for k, v in node_id_velocities.items()}
     backoff_group = [create_backoff_step(backoff_velocities)]
+    return [home_group, backoff_group]
+
+
+def create_tip_action_home_group(
+    axes: Sequence[OT3Axis], distance: float, velocity: float
+) -> List[MoveGroup]:
+    current_nodes = [axis_to_node(ax) for ax in axes]
+    home_group = [
+        create_tip_action_step(
+            velocity={node_id: np.float64(velocity) for node_id in current_nodes},
+            distance={node_id: np.float64(distance) for node_id in current_nodes},
+            present_nodes=current_nodes,
+            action=PipetteTipActionType.home,
+        )
+    ]
+
+    backoff_group = [
+        create_tip_action_backoff_step(
+            velocity={node_id: np.float64(velocity / 2) for node_id in current_nodes}
+        )
+    ]
     return [home_group, backoff_group]
 
 

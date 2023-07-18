@@ -40,6 +40,7 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
     create_tip_action_group,
+    create_tip_action_home_group,
     PipetteAction,
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
@@ -569,10 +570,17 @@ class OT3Controller:
     ) -> None:
         if tip_action == "home":
             speed = speed * -1
-        move_group = create_tip_action_group(
-            axes, distance, speed, cast(PipetteAction, tip_action)
-        )
-        runner = MoveGroupRunner(move_groups=[move_group])
+            runner = MoveGroupRunner(
+                move_groups=create_tip_action_home_group(axes, distance, speed)
+            )
+        else:
+            runner = MoveGroupRunner(
+                move_groups=[
+                    create_tip_action_group(
+                        axes, distance, speed, cast(PipetteAction, tip_action)
+                    )
+                ]
+            )
         positions = await runner.run(can_messenger=self._messenger)
         for axis, point in positions.items():
             self._position.update({axis: point[0]})
