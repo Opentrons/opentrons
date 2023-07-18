@@ -17,6 +17,7 @@ import {
 
 import { Banner } from '../../atoms/Banner'
 import { Chip } from '../../atoms/Chip'
+import { ListItem } from '../../atoms/ListItem'
 import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
@@ -72,10 +73,8 @@ function TouchscreenModal({
         <StyledText as="p" fontWeight>
           {t('estop_pressed_description')}
         </StyledText>
-        <Flex
-          backgroundColor={isEngaged ? COLORS.red3 : COLORS.green3}
-          padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
-          borderRadius={BORDERS.borderRadiusSize3}
+        <ListItem
+          type={isEngaged ? 'error' : 'success'}
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignItems={ALIGN_CENTER}
@@ -89,7 +88,7 @@ function TouchscreenModal({
             iconName="connection-status"
             background={false}
           />
-        </Flex>
+        </ListItem>
         <SmallButton
           data-testid="Estop_pressed_button"
           width="100%"
