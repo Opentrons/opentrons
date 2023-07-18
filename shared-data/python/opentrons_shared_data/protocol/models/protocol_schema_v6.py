@@ -51,68 +51,6 @@ class Command(BaseModel):
     key: Optional[str]
 
 
-class Dimensions(BaseModel):
-    xDimension: float
-    yDimension: float
-    zDimension: float
-
-
-class GroupMetadata(BaseModel):
-    pass
-
-
-class Group(BaseModel):
-    metadata: GroupMetadata
-    wells: List[str]
-
-
-class Shape(Enum):
-    circular = "circular"
-    rectangular = "rectangular"
-
-
-class WellDefinition(BaseModel):
-    depth: float
-    totalLiquidVolume: int
-    shape: Shape
-    x: float
-    y: float
-    z: float
-    diameter: Optional[float]
-    yDimension: Optional[float]
-    xDimension: Optional[float]
-
-
-class Metadata(BaseModel):
-    protocolName: Optional[str]
-    author: Optional[str]
-    description: Optional[str]
-    created: Optional[int]
-    lastModified: Optional[int]
-    category: Optional[str]
-    subcategory: Optional[str]
-    tags: Optional[List[str]]
-
-
-class Module(BaseModel):
-    model: str
-
-
-class Pipette(BaseModel):
-    name: str
-
-
-class Robot(BaseModel):
-    model: Literal["OT-2 Standard", "OT-3 Standard"]
-    deckId: str
-
-
-class DesignerApplication(BaseModel):
-    name: Optional[str]
-    version: Optional[str]
-    data: Optional[Dict[str, Any]]
-
-
 class ProtocolSchemaV6(BaseModel):
     otSharedSchema: Literal["#/protocol/schemas/6"] = Field(
         ...,
