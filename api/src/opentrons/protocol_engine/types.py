@@ -510,6 +510,9 @@ class LabwareOffsetLocation(BaseModel):
         description=(
             "The definition URI of a labware that a labware can be loaded onto,"
             " if applicable."
+            "\n\n"
+            "This can be combined with moduleModel if the labware is loaded on top of"
+            " an adapter that is loaded on a module."
         ),
     )
 
