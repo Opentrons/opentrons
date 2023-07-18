@@ -406,18 +406,23 @@ class DoorState(enum.Enum):
 
 class EstopState(enum.Enum):
     """Enumerated state machine for the estop status."""
+
     PHYSICALLY_ENGAGED = enum.auto()
     LOGICALLY_ENGAGED = enum.auto()
     DISENGAGED = enum.auto()
     NOT_PRESENT = enum.auto()
 
+
 class EstopAttachLocation(enum.Enum):
     """Enumerated estop attach locations."""
+
     LEFT = enum.auto()
     RIGHT = enum.auto()
 
+
 class EstopPhysicalStatus(enum.Enum):
     """Possible status of an estop."""
+
     ENGAGED = enum.auto()
     DISENGAGED = enum.auto()
     NOT_PRESENT = enum.auto()
@@ -429,12 +434,20 @@ class HardwareEventType(enum.Enum):
     ESTOP_CHANGE = enum.auto()
 
 
+@dataclass
+class EstopOverallStatus:
+    state: EstopState
+    left_physical_state: EstopPhysicalStatus
+    right_physical_state: EstopPhysicalStatus
+
+
 @dataclass(frozen=True)
 class DoorStateNotification:
     event: Literal[
         HardwareEventType.DOOR_SWITCH_CHANGE
     ] = HardwareEventType.DOOR_SWITCH_CHANGE
     new_state: DoorState = DoorState.CLOSED
+
 
 @dataclass(frozen=True)
 class EstopStateNotification:
@@ -444,6 +457,7 @@ class EstopStateNotification:
     old_state: EstopState = EstopState.NOT_PRESENT
     new_state: EstopState = EstopState.NOT_PRESENT
 
+
 @dataclass(frozen=True)
 class ErrorMessageNotification:
     message: str
@@ -452,7 +466,9 @@ class ErrorMessageNotification:
 
 # new event types get new dataclasses
 # when we add more event types we add them here
-HardwareEvent = Union[DoorStateNotification, ErrorMessageNotification, EstopStateNotification]
+HardwareEvent = Union[
+    DoorStateNotification, ErrorMessageNotification, EstopStateNotification
+]
 
 HardwareEventHandler = Callable[[HardwareEvent], None]
 
@@ -643,6 +659,7 @@ class GripperProbe(enum.Enum):
             return InstrumentProbeType.SECONDARY
         else:
             return InstrumentProbeType.PRIMARY
+
 
 class TipStateType(enum.Enum):
     ABSENT = 0
