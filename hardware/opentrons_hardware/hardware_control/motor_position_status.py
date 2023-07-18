@@ -198,8 +198,6 @@ async def update_gear_motor_position_estimation(
                     timeout,
                 )
                 data.append(response)
-            # make sure response from both gear motors is the same
-            assert data[0] == data[1]
             if not data[0][1] or not data[1][1]:
                 # If the stepper_ok flag isn't set, that means the node didn't update position.
                 raise RuntimeError(
