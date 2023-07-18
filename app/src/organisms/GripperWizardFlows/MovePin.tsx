@@ -58,7 +58,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       })
         .then(({ data }) => {
           if (data.status === 'failed') {
-            setShowErrorMessage(data.error?.detail)
+            setShowErrorMessage(data.error?.detail ?? null)
           }
           createRunCommand({
             command: {
@@ -73,7 +73,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           })
             .then(({ data }) => {
               if (data.status === 'failed') {
-                setShowErrorMessage(data.error?.detail)
+                setShowErrorMessage(data.error?.detail ?? null)
               }
               if (jaw === 'front' && data?.result?.jawOffset != null) {
                 setFrontJawOffset(data.result.jawOffset)
@@ -90,7 +90,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
               })
                 .then(({ data }) => {
                   if (data.status === 'failed') {
-                    setShowErrorMessage(data.error?.detail)
+                    setShowErrorMessage(data.error?.detail ?? null)
                   }
                   proceed()
                 })
