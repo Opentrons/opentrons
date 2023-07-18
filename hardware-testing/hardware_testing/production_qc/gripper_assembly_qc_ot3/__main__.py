@@ -78,11 +78,15 @@ if __name__ == "__main__":
         ), 'use "--only" for just one test, not multiple tests'
     elif args.increment:
         _t_sections = {
-            s: f for s, f in TESTS_INCREMENT if not getattr(args, f"skip_{s.value.lower()}")
+            s: f
+            for s, f in TESTS_INCREMENT
+            if not getattr(args, f"skip_{s.value.lower()}")
         }
     else:
         _t_sections = {
             s: f for s, f in TESTS if not getattr(args, f"skip_{s.value.lower()}")
         }
-    _config = TestConfig(simulate=args.simulate, tests=_t_sections, increment=args.increment)
+    _config = TestConfig(
+        simulate=args.simulate, tests=_t_sections, increment=args.increment
+    )
     asyncio.run(_main(_config))

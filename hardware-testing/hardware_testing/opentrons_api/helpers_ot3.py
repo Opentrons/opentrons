@@ -23,7 +23,6 @@ from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 # have that well defined.
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette as PipetteOT2
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
-from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
 
 from .types import (

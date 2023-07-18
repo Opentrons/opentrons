@@ -20,32 +20,37 @@ from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
 
 
 SLOT_FORCE_GAUGE = 6
-GAUGE_OFFSET = Point(x=90, y=37.5, z=75)
+
+GRIP_DUTY_CYCLES: List[int] = [40, 30, 25, 20, 15, 10, 6]
+NUM_DUTY_CYCLE_TRIALS = 20
+
+GRIP_FORCES_NEWTON: List[int] = [20, 15, 10, 5]
+NUM_NEWTONS_TRIALS = 5
+FAILURE_THRESHOLD_PERCENTAGE = (
+    10  # TODO: wait for PVT to decide on if this should be tightened or loosened
+)
 
 WARMUP_SECONDS = 10
-
-FAILURE_THRESHOLD_PERCENTAGE = 10
-GRIP_FORCES_NEWTON: List[int] = [20, 15, 10, 5]
-NUM_NEWTONS_TRIALS = 1
-
-NUM_DUTY_CYCLE_TRIALS = 20
-GRIP_DUTY_CYCLES: List[int] = [50, 40, 30, 25, 20, 15, 10, 6]
 
 FORCE_GAUGE_TRIAL_SAMPLE_INTERVAL = 0.25  # seconds
 FORCE_GAUGE_TRIAL_SAMPLE_COUNT = 20  # 20 samples = 5 seconds @ 4Hz
 
+GAUGE_OFFSET = Point(x=90, y=37.5, z=75)
+
 
 def _get_test_tag(
-    trial: int, newtons: Optional[int] = None, duty_cycle: Optional[int] = None,
+    trial: int,
+    newtons: Optional[int] = None,
+    duty_cycle: Optional[int] = None,
 ) -> str:
     if newtons and duty_cycle:
         raise ValueError("must measure either force or duty-cycle, not both")
     if newtons is None and duty_cycle is None:
         raise ValueError("both newtons and duty-cycle are None")
     if newtons is not None:
-        return f"newtons-{newtons}-trial-{trial}"
+        return f"newtons-{newtons}-trial-{trial + 1}"
     else:
-        return f"duty-cycle-{duty_cycle}-trial-{trial}"
+        return f"duty-cycle-{duty_cycle}-trial-{trial + 1}"
 
 
 def _get_gauge(is_simulating: bool) -> Union[Mark10, SimMark10]:
@@ -73,13 +78,15 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     for force in GRIP_FORCES_NEWTON:
         for trial in range(NUM_NEWTONS_TRIALS):
             tag = _get_test_tag(trial, newtons=force)
-            force_data_types = [float] * NUM_NEWTONS_TRIALS
-            lines.append(CSVLine(tag, [int] + force_data_types + [CSVResult]))
+            force_data_types = [float] * FORCE_GAUGE_TRIAL_SAMPLE_COUNT
+            data_row = [int] + force_data_types + [CSVResult]  # type: ignore[operator,list-item]
+            lines.append(CSVLine(tag, data_row))
     for duty_cycle in GRIP_DUTY_CYCLES:
         for trial in range(NUM_DUTY_CYCLE_TRIALS):
             tag = _get_test_tag(trial, duty_cycle=duty_cycle)
-            force_data_types = [float] * NUM_DUTY_CYCLE_TRIALS
-            lines.append(CSVLine(tag, [int] + force_data_types))
+            force_data_types = [float] * FORCE_GAUGE_TRIAL_SAMPLE_COUNT
+            data_row = [int] + force_data_types  # type: ignore[operator]
+            lines.append(CSVLine(tag, data_row))
     return lines
 
 
@@ -163,11 +170,13 @@ async def run_increment(api: OT3API, report: CSVReport, section: str) -> None:
     for duty_cycle in GRIP_DUTY_CYCLES:
         # GRIP AND MEASURE FORCE
         for trial in range(NUM_DUTY_CYCLE_TRIALS):
-            print(f"{duty_cycle}% duty cycle - trial {trial + 1}/{NUM_DUTY_CYCLE_TRIALS}")
+            print(
+                f"{duty_cycle}% duty cycle - trial {trial + 1}/{NUM_DUTY_CYCLE_TRIALS}"
+            )
             actual_forces = await _grip_and_read_forces(api, gauge, duty=duty_cycle)
             print(actual_forces)
             tag = _get_test_tag(trial, duty_cycle=duty_cycle)
-            report_data = [duty_cycle] + actual_forces
+            report_data = [duty_cycle] + actual_forces  # type: ignore[operator]
             report(section, tag, report_data)
 
     print("done")
@@ -181,17 +190,23 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # LOOP THROUGH FORCES
     ui.print_header("MEASURE NEWTONS")
     for expected_force in GRIP_FORCES_NEWTON:
-        for trial in range(NUM_DUTY_CYCLE_TRIALS):
-            print(f"{expected_force}N - trial {trial + 1}/{NUM_DUTY_CYCLE_TRIALS}")
-            actual_forces = await _grip_and_read_forces(api, gauge, force=expected_force)
+        for trial in range(NUM_NEWTONS_TRIALS):
+            print(f"{expected_force}N - trial {trial + 1}/{NUM_NEWTONS_TRIALS}")
+            actual_forces = await _grip_and_read_forces(
+                api, gauge, force=expected_force
+            )
             print(actual_forces)
             # base PASS/FAIL on average
             avg_force = sum(actual_forces) / len(actual_forces)
             error = (avg_force - expected_force) / expected_force
-            result = CSVResult.from_bool(abs(error) * 100 < FAILURE_THRESHOLD_PERCENTAGE)
+            result = CSVResult.from_bool(
+                abs(error) * 100 < FAILURE_THRESHOLD_PERCENTAGE
+            )
             # store all data in CSV
             tag = _get_test_tag(trial, newtons=expected_force)
-            report_data = [expected_force] + actual_forces + [result]
+            report_data = (
+                [expected_force] + actual_forces + [result]  # type: ignore[operator,list-item]
+            )
             report(section, tag, report_data)
 
     print("done")

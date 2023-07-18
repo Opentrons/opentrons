@@ -110,6 +110,6 @@ class Mark10(Mark10Base):
                     return float(force_val)
             except ValueError as e:
                 print(e)
-                print(f"bad data: \"{line}\"")
+                print(f'bad data: "{line}"')
                 continue
         raise TimeoutError(f"unable to read from gauge within {timeout} seconds")
