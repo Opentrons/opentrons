@@ -121,7 +121,7 @@ Any :ref:`v2-custom-labware` added to your Opentrons App is also accessible when
 Module and Labware Compatibility
 --------------------------------
 
-It's up to you to make sure that the labware and modules you load make sense together. The Protocol API won't raise a warning or error if you load a nonsensical combination, like a tube rack on a Thermocycler.
+It's your responsibility to ensure the labware and modules you load work together. The Protocol API won't raise a warning or error if you load a nonsensical combination, like a tube rack on a Thermocycler.
 
 For further information on what combinations are possible, see the support article `What labware can I use with my modules? <https://support.opentrons.com/s/article/What-labware-can-I-use-with-my-modules>`_
 
@@ -143,6 +143,16 @@ The Temperature Module acts as both a cooling and heating device. It can control
 The Temperature Module is represented in code by a :py:class:`.TemperatureModuleContext` object, which has methods for setting target temperatures and reading the module's status.
 
 The examples in this section will use a Temperature Module loaded in slot 3:
+
+.. tabs::
+    
+    .. tab:: Flex
+
+    
+    .. tab:: OT-2
+
+        .. code-block:: python
+            :substitutions:
 
 .. code-block:: python
     :substitutions:
