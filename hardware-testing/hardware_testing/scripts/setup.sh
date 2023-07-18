@@ -3,6 +3,8 @@
 # This script sets up the hardware-testing module to run from usb or some other dir on the Flex robot
 
 USB_DIR=.
+PACKAGE_NAME="hardware_testing"
+PACKAGE_TAR_FILE="./${PACKAGE_NAME}-*.tar.gz"
 SYSTEM_VERSION_FILE="/etc/VERSION.json"
 PKG_INFO_FILE="PKG-INFO"
 PACKAGE_VERSION=""
@@ -32,32 +34,39 @@ validate() {
 		echo "${SYSTEM_VERSION_FILE} not found, make sure you're running this from a robot!"
 		exit 1;
 	fi
-	is_flex=$(cat $SYSTEM_VERSION_FILE | grep OT-3)
-	echo "is_flex: $(is_flex)"
-
-	# validate the package files
-	if [ ! -z "$2" ]; then
-		USB_DIR=$2
-		if [ ! -d "$USB_DIR" ]; then
-			echo "error: usb dir does not exist - ${USB_DIR}"
-			exit 1;
-		fi
+	is_flex=$(cat $SYSTEM_VERSION_FILE | grep -o OT-3)
+	if [ -z $is_flex ]; then
+		echo "Make sure robot is a Flex before running setup."
+		exit 1
 	fi
-	echo "usb dir is - ${USB_DIR}"
+
+	# Extract the tarball
+	usb_module_filename=$(ls $PACKAGE_TAR_FILE)
+	if [ ! -f "$usb_module_filename" ]; then
+		echo "Could not find package tarball - ${PACKAGE_TAR_FILE}"
+		exit 1;
+	fi
+	echo "Extracting tarball ${usb_module_filename}"
+	tar -xvf $usb_module_filename -C ./
+
+	# Enter the extracted dir
+	cd $PACKAGE_NAME*/
 
 	# Get the version of the package
 	if [ ! -f $PKG_INFO_FILE ]; then
 		echo "error: ${PKG_INFO_FILE} was not found!"
 		exit 1;
 	fi
-	PACKAGE_VERSION="cat ${PKG_INFO_FILE} | grep version"
-	# Check that the hardware-testing dir exists
+	PACKAGE_VERSION=$(cat ${PKG_INFO_FILE} | grep Version)
 }
 
 # Sets up the hardware-testing module to be used from usb location
 setup() {
 	echo "Setting up hardware-testing module ${PACKAGE_VERSION}"
-	# 1. Lets get our environment variables setup
+	echo "1. Setting up environment variables"
+	here=$(pwd)
+	export PYTHONPATH=$PYTHONPATH:$here:
+	echo $PYTHONPATH
 	# set PYTHONBINDIR to the usb dir
 	# maybe set OT_SYSTEM_VERSION for now
 	# also set OT_OT3_HARDWARE_CONTROLLER or w.e its called
