@@ -34,7 +34,7 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.MOUNT_PIPETTE }
   const isSingleMountPipette = selectedPipette === SINGLE_MOUNT_PIPETTES
-  console.log(isSingleMountPipette)
+
   const bodyTextSkeleton = (
     <Skeleton
       width="18rem"
