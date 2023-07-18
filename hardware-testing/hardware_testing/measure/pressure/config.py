@@ -6,11 +6,11 @@ from typing import Dict
 from hardware_testing.opentrons_api.types import Point
 
 
-LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=71.2)
+LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=96)
 LOCATION_A1_RIGHT = LOCATION_A1_LEFT._replace(x=128 - LOCATION_A1_LEFT.x)
 
 PRESSURE_FIXTURE_TIP_VOLUME = 50  # always 50ul
-PRESSURE_FIXTURE_INSERT_DEPTH = 25  # millimeters below top
+PRESSURE_FIXTURE_INSERT_DEPTH = 20  # millimeters below top
 
 
 class PressureEvent(enum.Enum):

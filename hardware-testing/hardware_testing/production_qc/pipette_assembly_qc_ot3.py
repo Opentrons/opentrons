@@ -439,6 +439,7 @@ async def _fixture_check_pressure(
     )
     results.append(r)
     # insert into the fixture
+    # NOTE: unknown amount of pressure here (depends on where Z was calibrated)
     await api.move_rel(mount, Point(z=-test_config.fixture_depth))
     r = await _read_pressure_and_check_results(
         api,
