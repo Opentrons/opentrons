@@ -6,6 +6,12 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
 from opentrons.hardware_control.types import PauseType as HardwarePauseType
 
+from opentrons_shared_data.errors import (
+    ErrorCodes,
+    EnumeratedError,
+)
+
+from .errors import ProtocolCommandFailedError
 from . import commands, slot_standardization
 from .resources import ModelUtils, ModuleDataProvider
 from .types import (
@@ -257,6 +263,15 @@ class ProtocolEngine:
                 If `False`, will set status to `stopped`.
         """
         if error:
+            if (
+                isinstance(error, ProtocolCommandFailedError)
+                and error.original_error is not None
+                and self._code_in_exception_stack(
+                    error=error, code=ErrorCodes.E_STOP_ACTIVATED
+                )
+            ):
+                drop_tips_and_home = False
+
             error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
                 created_at=self._model_utils.get_timestamp(),
@@ -381,3 +396,17 @@ class ProtocolEngine:
 
         for a in actions:
             self._action_dispatcher.dispatch(a)
+
+    # TODO(tz, 7-12-23): move this to shared data when we dont relay on ErrorOccurrence
+    @staticmethod
+    def _code_in_exception_stack(error: EnumeratedError, code: ErrorCodes) -> bool:
+        if (
+            isinstance(error, ProtocolCommandFailedError)
+            and error.original_error is not None
+        ):
+            return any(
+                code.value.code == wrapped_error.errorCode
+                for wrapped_error in error.original_error.wrappedErrors
+            )
+        else:
+            return any(code == wrapped_error.code for wrapped_error in error.wrapping)

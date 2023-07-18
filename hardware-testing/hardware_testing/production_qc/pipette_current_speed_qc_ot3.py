@@ -69,7 +69,7 @@ def _build_csv_report(operator: str, pipette_sn: str) -> CSVReport:
 
 async def _home(api: OT3API, mount: types.OT3Mount) -> None:
     # restore default current/speed before homing
-    pipette_ax = types.OT3Axis.of_main_tool_actuator(mount)
+    pipette_ax = types.Axis.of_main_tool_actuator(mount)
     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
         api, pipette_ax, run_current=DEFAULT_CURRENT
     )
@@ -83,7 +83,7 @@ async def _move_plunger(
     api: OT3API, mount: types.OT3Mount, p: float, s: float, c: float
 ) -> None:
     # set max currents/speeds, to make sure we're not accidentally limiting ourselves
-    pipette_ax = types.OT3Axis.of_main_tool_actuator(mount)
+    pipette_ax = types.Axis.of_main_tool_actuator(mount)
     await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
         api, pipette_ax, run_current=MAX_CURRENT
     )
@@ -103,7 +103,7 @@ async def _record_plunger_alignment(
     direction: str,
     position: str,
 ) -> bool:
-    pipette_ax = types.OT3Axis.of_main_tool_actuator(mount)
+    pipette_ax = types.Axis.of_main_tool_actuator(mount)
     _current_pos = await api.current_position_ot3(mount)
     est = _current_pos[pipette_ax]
     if not api.is_simulator:
@@ -148,7 +148,7 @@ async def _test_direction(
     )
     if not aligned:
         # move to target position using max current
-        plunger_axis = types.OT3Axis.of_main_tool_actuator(mount)
+        plunger_axis = types.Axis.of_main_tool_actuator(mount)
         await api._update_position_estimation([plunger_axis])
         await _move_plunger(api, mount, _plunger_target, DEFAULT_SPEED, MAX_CURRENT)
         return False

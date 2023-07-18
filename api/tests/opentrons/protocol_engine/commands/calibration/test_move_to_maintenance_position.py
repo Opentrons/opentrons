@@ -14,7 +14,7 @@ from opentrons.protocol_engine.commands.calibration.move_to_maintenance_position
 
 from opentrons.protocol_engine.state import StateView
 from opentrons.types import MountType, Mount, Point
-from opentrons.hardware_control.types import OT3Axis, CriticalPoint
+from opentrons.hardware_control.types import Axis, CriticalPoint
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -37,11 +37,11 @@ def subject(
     [
         (
             MaintenancePosition.ATTACH_INSTRUMENT,
-            {OT3Axis.Z_L: 400},
+            {Axis.Z_L: 400},
         ),
         (
             MaintenancePosition.ATTACH_PLATE,
-            {OT3Axis.Z_L: 90, OT3Axis.Z_R: 105},
+            {Axis.Z_L: 90, Axis.Z_R: 105},
         ),
     ],
 )
@@ -51,7 +51,7 @@ async def test_calibration_move_to_location_implementation(
     state_view: StateView,
     ot3_hardware_api: OT3API,
     maintenance_position: MaintenancePosition,
-    verify_axes: Mapping[OT3Axis, float],
+    verify_axes: Mapping[Axis, float],
 ) -> None:
     """Command should get a move to target location and critical point and should verify move_to call."""
     params = MoveToMaintenancePositionParams(
@@ -158,14 +158,14 @@ async def test_calibration_move_to_location_implementation_for_gripper(
 
     decoy.verify(
         await ot3_hardware_api.move_axes(
-            position={OT3Axis.Z_G: 400},
+            position={Axis.Z_G: 400},
         ),
         times=0,
     )
 
     decoy.verify(
         await ot3_hardware_api.disengage_axes(
-            [OT3Axis.Z_G],
+            [Axis.Z_G],
         ),
         times=0,
     )

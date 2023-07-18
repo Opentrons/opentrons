@@ -49,7 +49,6 @@ from .exceptions import (
     InvalidHoldTimeError,
     CannotPerformModuleAction,
     PauseNotAllowedError,
-    ProtocolCommandFailedError,
     GripperNotAttachedError,
     HardwareNotSupportedError,
     LabwareMovementNotAllowedError,
@@ -57,7 +56,7 @@ from .exceptions import (
     InvalidAxisForRobotType,
 )
 
-from .error_occurrence import ErrorOccurrence
+from .error_occurrence import ErrorOccurrence, ProtocolCommandFailedError
 
 __all__ = [
     # exceptions

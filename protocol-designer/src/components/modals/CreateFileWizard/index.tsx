@@ -22,6 +22,8 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_TYPE,
   SPAN7_8_10_11_SLOT,
+  FIXED_TRASH_ID,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import {
   actions as stepFormActions,
@@ -177,6 +179,20 @@ export function CreateFileWizard(): JSX.Element | null {
               pipettesById,
               (p: typeof pipettesById[keyof typeof pipettesById]) => p.mount
             ),
+          },
+        })
+      )
+      // default trash labware locations in initial deck setup step
+      dispatch(
+        steplistActions.changeSavedStepForm({
+          stepId: INITIAL_DECK_SETUP_STEP_ID,
+          update: {
+            labwareLocationUpdate: {
+              [FIXED_TRASH_ID]: {
+                slotName:
+                  values.fields.robotType === FLEX_ROBOT_TYPE ? 'A3' : '12',
+              },
+            },
           },
         })
       )

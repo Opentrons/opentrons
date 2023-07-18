@@ -47,7 +47,7 @@ const mockGetIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = getIs
   typeof getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette
 >
 
-const FLEX_PIPETTE = 'p1000_single_gen3'
+const FLEX_PIPETTE = 'p1000_single_flex'
 const FlexPipetteNameSpecs = getPipetteNameSpecs(FLEX_PIPETTE)
 
 describe('moveToWell', () => {

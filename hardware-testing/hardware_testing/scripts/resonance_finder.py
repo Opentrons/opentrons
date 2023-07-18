@@ -9,7 +9,7 @@ from typing import Tuple, Dict
 
 from opentrons.hardware_control.ot3api import OT3API
 
-from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point
+from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, Axis, Point
 from hardware_testing.opentrons_api.helpers_ot3 import (
     build_async_ot3_hardware_api,
     GantryLoadSettings,
@@ -88,7 +88,7 @@ TEST_PARAMETERS: Dict[GantryLoad, Dict[str, Dict[str, Dict[str, float]]]] = {
 
 
 SETTINGS = {
-    OT3Axis.X: GantryLoadSettings(
+    Axis.X: GantryLoadSettings(
         max_speed=500,
         acceleration=ACCEL,
         max_start_stop_speed=10,
@@ -96,7 +96,7 @@ SETTINGS = {
         hold_current=0.3,
         run_current=1.5,
     ),
-    OT3Axis.Y: GantryLoadSettings(
+    Axis.Y: GantryLoadSettings(
         max_speed=500,
         acceleration=ACCEL,
         max_start_stop_speed=10,
@@ -104,7 +104,7 @@ SETTINGS = {
         hold_current=0.3,
         run_current=1.5,
     ),
-    OT3Axis.Z_L: GantryLoadSettings(
+    Axis.Z_L: GantryLoadSettings(
         max_speed=35,
         acceleration=100,
         max_start_stop_speed=10,
@@ -112,7 +112,7 @@ SETTINGS = {
         hold_current=1.5,
         run_current=1.5,
     ),
-    OT3Axis.Z_R: GantryLoadSettings(
+    Axis.Z_R: GantryLoadSettings(
         max_speed=35,
         acceleration=100,
         max_start_stop_speed=10,
@@ -125,12 +125,12 @@ SETTINGS = {
 MOUNT = OT3Mount.LEFT
 
 AXIS_MAP = {
-    "Y": OT3Axis.Y,
-    "X": OT3Axis.X,
-    "L": OT3Axis.Z_L,
-    "R": OT3Axis.Z_R,
-    "P": OT3Axis.P_L,
-    "O": OT3Axis.P_R,
+    "Y": Axis.Y,
+    "X": Axis.X,
+    "L": Axis.Z_L,
+    "R": Axis.Z_R,
+    "P": Axis.P_L,
+    "O": Axis.P_R,
 }
 
 LOAD = GantryLoad.LOW_THROUGHPUT
@@ -169,8 +169,8 @@ NEG_POINT_MAP = {
 
 
 def get_pos_delta(
-    final_pos: Dict[OT3Axis, float], inital_pos: Dict[OT3Axis, float]
-) -> Dict[OT3Axis, float]:
+    final_pos: Dict[Axis, float], inital_pos: Dict[Axis, float]
+) -> Dict[Axis, float]:
     """Get delta between positions. Dict must have the same keys."""
     for axis in final_pos:
         final_pos[axis] = final_pos[axis] - inital_pos[axis]
@@ -305,7 +305,7 @@ async def _single_axis_move(
                 await api.move_rel(mount=MOUNT, delta=move_error_correction, speed=35)
             if DELAY > 0:
                 time.sleep(DELAY)
-            await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+            await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
             return (move_error, c + 1)
 
         # record the current position
@@ -336,14 +336,14 @@ async def _single_axis_move(
             input()
             if DELAY > 0:
                 time.sleep(DELAY)
-            await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+            await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
             return (move_error, c + 1)
         else:
             avg_error.append(move_error)
 
         # home every 50 cycles in case we have drifted
         if (c + 1) % 50 == 0:
-            await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+            await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
             # move away from the limit switch before cycling
             await api.move_rel(mount=MOUNT, delta=HOME_POINT_MAP[axis], speed=80)
 
@@ -374,7 +374,7 @@ async def _main(is_simulating: bool) -> None:
     )
     # api = await build_async_ot3_hardware_api(is_simulating=is_simulating)
     print("HOMING")
-    await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+    await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
     try:
         # check if directory exists, make if doesn't
         if not os.path.exists(BASE_DIRECTORY):
@@ -412,7 +412,7 @@ async def _main(is_simulating: bool) -> None:
                     # attempt to cycle with the test settings
                     # await api.home([AXIS_MAP[test_axis]])
                     print("HOMING")
-                    await api.home([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+                    await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
                     move_output_tuple = await _single_axis_move(
                         test_axis, api, cycles=CYCLES
                     )
@@ -430,9 +430,9 @@ async def _main(is_simulating: bool) -> None:
                     print("Error: " + str(run_avg_error))
 
     except KeyboardInterrupt:
-        await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+        await api.disengage_axes([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
     finally:
-        # await api.disengage_axes([OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R])
+        # await api.disengage_axes([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
         await api.clean_up()
 
 

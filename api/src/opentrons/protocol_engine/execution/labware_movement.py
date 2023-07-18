@@ -9,7 +9,7 @@ from opentrons_shared_data.gripper.constants import (
 
 from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import OT3Mount, OT3Axis
+from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.protocol_engine.types import ModuleModel
@@ -119,7 +119,7 @@ class LabwareMovementHandler:
         gripper_mount = OT3Mount.GRIPPER
 
         # Retract all mounts
-        await ot3api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G])
+        await ot3api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G])
         gripper_homed_position = await ot3api.gantry_position(mount=gripper_mount)
 
         async with self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
@@ -168,7 +168,7 @@ class LabwareMovementHandler:
             )
 
             # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
-            await ot3api.home(axes=[OT3Axis.Z_G])
+            await ot3api.home(axes=[Axis.Z_G])
 
             waypoints_to_new_location = self._get_gripper_movement_waypoints(
                 labware_id=labware_id,
@@ -183,7 +183,7 @@ class LabwareMovementHandler:
 
             await ot3api.ungrip()
             # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
-            await ot3api.home(axes=[OT3Axis.Z_G])
+            await ot3api.home(axes=[Axis.Z_G])
 
             # Keep the gripper in gripped position so it avoids colliding with
             # things like the thermocycler latches

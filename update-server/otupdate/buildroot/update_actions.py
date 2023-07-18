@@ -179,6 +179,17 @@ class OT2UpdateActions(UpdateActionsInterface):
             new_mid.write(mid)
         LOG.info(f"Wrote machine_id {mid.strip()} to {new_root}/etc/machine-id")
 
+    def clean_up(self, download_dir: str) -> None:
+        """Deletes the update contents in the download dir."""
+        LOG.info(f"Cleaning up download dir {download_dir}.")
+        for file in os.listdir(download_dir):
+            filepath = os.path.join(download_dir, file)
+            LOG.debug(f"Deleting {filepath}")
+            try:
+                os.remove(filepath)
+            except Exception:
+                LOG.exception(f"Could not delete update file {filepath}.")
+
 
 def _find_unused_partition() -> RootPartitions:
     """Find the currently-unused root partition to write to"""
