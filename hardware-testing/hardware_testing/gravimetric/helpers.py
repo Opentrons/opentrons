@@ -254,13 +254,16 @@ def _pick_up_tip(
 
 
 def _drop_tip(
-    pipette: InstrumentContext,
-    return_tip: bool,
+    pipette: InstrumentContext, return_tip: bool, minimum_z_height: int = 0
 ) -> None:
     if return_tip:
         pipette.return_tip(home_after=False)
     else:
         pipette.drop_tip(home_after=False)
+    if minimum_z_height > 0:
+        cur_location = pipette._get_last_location_by_api_version()
+        if cur_location is not None:
+            pipette.move_to(cur_location.move(Point(0, 0, minimum_z_height)))
 
 
 def _get_volumes(ctx: ProtocolContext, cfg: config.VolumetricConfig) -> List[float]:

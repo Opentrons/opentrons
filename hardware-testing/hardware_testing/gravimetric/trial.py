@@ -112,6 +112,7 @@ class GravimetricTrial(VolumetricTrial):
     blank: bool
     measure_height: float
     stable: bool
+    cfg: config.GravimetricConfig
     scale_delay: int = DELAY_FOR_MEASUREMENT
 
 
@@ -192,6 +193,7 @@ def build_gravimetric_trials(
                     stable=False,
                     scale_delay=cfg.scale_delay,
                     acceptable_cv=None,
+                    cfg=cfg,
                 )
             )
     else:
@@ -201,7 +203,7 @@ def build_gravimetric_trials(
                 if cfg.isolate_channels and (channel + 1) not in cfg.isolate_channels:
                     ui.print_info(f"skipping channel {channel + 1}")
                     continue
-                trial_list[volume][channel] =  []
+                trial_list[volume][channel] = []
                 channel_offset = helpers._get_channel_offset(cfg, channel)
                 for trial in range(cfg.trials):
                     trial_list[volume][channel].append(
@@ -225,6 +227,7 @@ def build_gravimetric_trials(
                             stable=True,
                             scale_delay=cfg.scale_delay,
                             acceptable_cv=None,
+                            cfg=cfg,
                         )
                     )
     return trial_list
