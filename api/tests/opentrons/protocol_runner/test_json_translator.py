@@ -19,6 +19,14 @@ from opentrons_shared_data.protocol.models import (
     protocol_schema_v7,
     Liquid,
     Labware,
+    Location,
+    ProfileStep,
+    WellLocation as SD_WellLocation,
+    OffsetVector,
+    Metadata as SD_Metadata,
+    Module,
+    Pipette,
+    Robot,
 )
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
 from opentrons.types import DeckSlotName, MountType
@@ -51,9 +59,9 @@ VALID_TEST_PARAMS = [
                 #  https://github.com/Opentrons/opentrons/issues/8204
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=protocol_schema_v6.WellLocation(
+                wellLocation=SD_WellLocation(
                     origin="bottom",
-                    offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
+                    offset=OffsetVector(x=0, y=0, z=7.89),
                 ),
             ),
         ),
@@ -68,9 +76,9 @@ VALID_TEST_PARAMS = [
                 #  https://github.com/Opentrons/opentrons/issues/8204
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=protocol_schema_v7.WellLocation(
+                wellLocation=SD_WellLocation(
                     origin="bottom",
-                    offset=protocol_schema_v7.OffsetVector(x=0, y=0, z=7.89),
+                    offset=OffsetVector(x=0, y=0, z=7.89),
                 ),
             ),
         ),
@@ -100,9 +108,9 @@ VALID_TEST_PARAMS = [
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=protocol_schema_v6.WellLocation(
+                wellLocation=SD_WellLocation(
                     origin="bottom",
-                    offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
+                    offset=OffsetVector(x=0, y=0, z=7.89),
                 ),
             ),
         ),
@@ -115,9 +123,9 @@ VALID_TEST_PARAMS = [
                 volume=1.23,
                 flowRate=4.56,
                 wellName="A1",
-                wellLocation=protocol_schema_v7.WellLocation(
+                wellLocation=SD_WellLocation(
                     origin="bottom",
-                    offset=protocol_schema_v7.OffsetVector(x=0, y=0, z=7.89),
+                    offset=OffsetVector(x=0, y=0, z=7.89),
                 ),
             ),
         ),
@@ -198,9 +206,9 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                wellLocation=protocol_schema_v6.WellLocation(
+                wellLocation=SD_WellLocation(
                     origin="bottom",
-                    offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=-1.23),
+                    offset=OffsetVector(x=0, y=0, z=-1.23),
                 ),
             ),
         ),
@@ -210,9 +218,9 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                wellLocation=protocol_schema_v7.WellLocation(
+                wellLocation=SD_WellLocation(
                     origin="bottom",
-                    offset=protocol_schema_v7.OffsetVector(x=0, y=0, z=-1.23),
+                    offset=OffsetVector(x=0, y=0, z=-1.23),
                 ),
             ),
         ),
@@ -252,7 +260,7 @@ VALID_TEST_PARAMS = [
             commandType="loadModule",
             params=protocol_schema_v6.Params(
                 moduleId="module-id-1",
-                location=protocol_schema_v6.Location(slotName="3"),
+                location=Location(slotName="3"),
             ),
         ),
         protocol_schema_v7.Command(
@@ -260,7 +268,7 @@ VALID_TEST_PARAMS = [
             params=protocol_schema_v7.Params(
                 moduleId="module-id-1",
                 model="magneticModuleV2",
-                location=protocol_schema_v7.Location(slotName="3"),
+                location=Location(slotName="3"),
             ),
         ),
         pe_commands.LoadModuleCreate(
@@ -276,7 +284,7 @@ VALID_TEST_PARAMS = [
             commandType="loadLabware",
             params=protocol_schema_v6.Params(
                 labwareId="labware-id-2",
-                location=protocol_schema_v6.Location(moduleId="temperatureModuleId"),
+                location=Location(moduleId="temperatureModuleId"),
             ),
         ),
         protocol_schema_v7.Command(
@@ -286,7 +294,7 @@ VALID_TEST_PARAMS = [
                 version=1,
                 namespace="example",
                 loadName="foo_8_plate_33ul",
-                location=protocol_schema_v7.Location(moduleId="temperatureModuleId"),
+                location=Location(moduleId="temperatureModuleId"),
                 displayName="Trash",
             ),
         ),
@@ -308,9 +316,9 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                wellLocation=protocol_schema_v6.WellLocation(
+                wellLocation=SD_WellLocation(
                     origin="bottom",
-                    offset=protocol_schema_v6.OffsetVector(x=0, y=0, z=7.89),
+                    offset=OffsetVector(x=0, y=0, z=7.89),
                 ),
                 flowRate=1.23,
             ),
@@ -321,9 +329,9 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 wellName="A1",
-                wellLocation=protocol_schema_v7.WellLocation(
+                wellLocation=SD_WellLocation(
                     origin="bottom",
-                    offset=protocol_schema_v7.OffsetVector(x=0, y=0, z=7.89),
+                    offset=OffsetVector(x=0, y=0, z=7.89),
                 ),
                 flowRate=1.23,
             ),
@@ -404,7 +412,7 @@ VALID_TEST_PARAMS = [
             commandType="moveToCoordinates",
             params=protocol_schema_v6.Params(
                 pipetteId="pipette-id-1",
-                coordinates=protocol_schema_v6.OffsetVector(x=1.1, y=2.2, z=3.3),
+                coordinates=OffsetVector(x=1.1, y=2.2, z=3.3),
                 minimumZHeight=123.4,
                 forceDirect=True,
             ),
@@ -413,7 +421,7 @@ VALID_TEST_PARAMS = [
             commandType="moveToCoordinates",
             params=protocol_schema_v7.Params(
                 pipetteId="pipette-id-1",
-                coordinates=protocol_schema_v7.OffsetVector(x=1.1, y=2.2, z=3.3),
+                coordinates=OffsetVector(x=1.1, y=2.2, z=3.3),
                 minimumZHeight=123.4,
                 forceDirect=True,
             ),
@@ -434,11 +442,11 @@ VALID_TEST_PARAMS = [
                 moduleId="module-id-2",
                 blockMaxVolumeUl=1.11,
                 profile=[
-                    protocol_schema_v6.ProfileStep(
+                    ProfileStep(
                         celsius=2.22,
                         holdSeconds=3.33,
                     ),
-                    protocol_schema_v6.ProfileStep(
+                    ProfileStep(
                         celsius=4.44,
                         holdSeconds=5.55,
                     ),
@@ -451,11 +459,11 @@ VALID_TEST_PARAMS = [
                 moduleId="module-id-2",
                 blockMaxVolumeUl=1.11,
                 profile=[
-                    protocol_schema_v7.ProfileStep(
+                    ProfileStep(
                         celsius=2.22,
                         holdSeconds=3.33,
                     ),
-                    protocol_schema_v7.ProfileStep(
+                    ProfileStep(
                         celsius=4.44,
                         holdSeconds=5.55,
                     ),
@@ -550,8 +558,8 @@ def _load_labware_definition_data() -> LabwareDefinition:
 
 def _make_v6_json_protocol(
     *,
-    pipettes: Dict[str, protocol_schema_v6.Pipette] = {
-        "pipette-id-1": protocol_schema_v6.Pipette(name="p10_single"),
+    pipettes: Dict[str, Pipette] = {
+        "pipette-id-1": Pipette(name="p10_single"),
     },
     labware_definitions: Dict[str, LabwareDefinition] = {
         "example/plate/1": _load_labware_definition_data(),
@@ -564,9 +572,9 @@ def _make_v6_json_protocol(
         "labware-id-2": Labware(displayName="Trash", definitionId="example/trash/1"),
     },
     commands: List[protocol_schema_v6.Command] = [],
-    modules: Dict[str, protocol_schema_v6.Module] = {
-        "module-id-1": protocol_schema_v6.Module(model="magneticModuleV2"),
-        "module-id-2": protocol_schema_v6.Module(model="thermocyclerModuleV2"),
+    modules: Dict[str, Module] = {
+        "module-id-1": Module(model="magneticModuleV2"),
+        "module-id-2": Module(model="thermocyclerModuleV2"),
     },
     liquids: Dict[str, Liquid] = {
         "liquid-id-555": Liquid(
@@ -580,8 +588,8 @@ def _make_v6_json_protocol(
         # isn't smart enough to validate differently depending on this field.
         otSharedSchema="#/protocol/schemas/6",
         schemaVersion=6,
-        metadata=protocol_schema_v6.Metadata(),
-        robot=protocol_schema_v6.Robot(model="OT-2 Standard", deckId="ot2_standard"),
+        metadata=SD_Metadata(),
+        robot=Robot(model="OT-2 Standard", deckId="ot2_standard"),
         pipettes=pipettes,
         labwareDefinitions=labware_definitions,
         labware=labware,
@@ -598,9 +606,9 @@ def _make_v7_json_protocol(
         "example/trash/1": _load_labware_definition_data(),
     },
     commands: List[protocol_schema_v7.Command] = [],
-    modules: Dict[str, protocol_schema_v7.Module] = {
-        "module-id-1": protocol_schema_v7.Module(model="magneticModuleV2"),
-        "module-id-2": protocol_schema_v7.Module(model="thermocyclerModuleV2"),
+    modules: Dict[str, Module] = {
+        "module-id-1": Module(model="magneticModuleV2"),
+        "module-id-2": Module(model="thermocyclerModuleV2"),
     },
     liquids: Dict[str, Liquid] = {
         "liquid-id-555": Liquid(
@@ -614,8 +622,8 @@ def _make_v7_json_protocol(
         # isn't smart enough to validate differently depending on this field.
         otSharedSchema="#/protocol/schemas/7",
         schemaVersion=7,
-        metadata=protocol_schema_v7.Metadata(),
-        robot=protocol_schema_v7.Robot(model="OT-2 Standard", deckId="ot2_standard"),
+        metadata=SD_Metadata(),
+        robot=Robot(model="OT-2 Standard", deckId="ot2_standard"),
         labwareDefinitions=labware_definitions,
         commands=commands,
         liquids=liquids,

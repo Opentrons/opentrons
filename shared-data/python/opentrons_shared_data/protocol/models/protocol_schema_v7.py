@@ -1,37 +1,10 @@
 from pydantic import BaseModel, Field
 from typing import Any, List, Optional, Dict, Union
 from typing_extensions import Literal
-from enum import Enum
+
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from .shared_models import Labware, Liquid
-
-
-class CommandAnnotation(BaseModel):
-    commandIds: List[str]
-    annotationType: str
-
-
-class OffsetVector(BaseModel):
-    x: Optional[float]
-    y: Optional[float]
-    z: Optional[float]
-
-
-class Location(BaseModel):
-    slotName: Optional[str]
-    moduleId: Optional[str]
-    labwareId: Optional[str]
-
-
-class ProfileStep(BaseModel):
-    celsius: float
-    holdSeconds: float
-
-
-class WellLocation(BaseModel):
-    origin: Optional[str]
-    offset: Optional[OffsetVector]
+from .shared_models import Liquid, Labware, CommandAnnotation, Location, ProfileStep, WellLocation, OffsetVector, Dimensions, GroupMetadata, Shape, WellDefinition, Metadata, Module, Pipette, Robot, DesignerApplication
 
 
 # TODO (tamar 3/15/22): split apart all the command payloads when we tackle #9583
@@ -87,68 +60,6 @@ class Command(BaseModel):
     commandType: str
     params: Params
     key: Optional[str]
-
-
-class Dimensions(BaseModel):
-    xDimension: float
-    yDimension: float
-    zDimension: float
-
-
-class GroupMetadata(BaseModel):
-    pass
-
-
-class Group(BaseModel):
-    metadata: GroupMetadata
-    wells: List[str]
-
-
-class Shape(Enum):
-    circular = "circular"
-    rectangular = "rectangular"
-
-
-class WellDefinition(BaseModel):
-    depth: float
-    totalLiquidVolume: int
-    shape: Shape
-    x: float
-    y: float
-    z: float
-    diameter: Optional[float]
-    yDimension: Optional[float]
-    xDimension: Optional[float]
-
-
-class Metadata(BaseModel):
-    protocolName: Optional[str]
-    author: Optional[str]
-    description: Optional[str]
-    created: Optional[int]
-    lastModified: Optional[int]
-    category: Optional[str]
-    subcategory: Optional[str]
-    tags: Optional[List[str]]
-
-
-class Module(BaseModel):
-    model: str
-
-
-class Pipette(BaseModel):
-    name: str
-
-
-class Robot(BaseModel):
-    model: Literal["OT-2 Standard", "OT-3 Standard"]
-    deckId: str
-
-
-class DesignerApplication(BaseModel):
-    name: Optional[str]
-    version: Optional[str]
-    data: Optional[Dict[str, Any]]
 
 
 class ProtocolSchemaV7(BaseModel):

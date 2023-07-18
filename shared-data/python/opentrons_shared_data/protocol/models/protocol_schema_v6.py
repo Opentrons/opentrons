@@ -4,33 +4,7 @@ from typing_extensions import Literal
 from enum import Enum
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from .shared_models import Liquid, Labware
-
-
-class CommandAnnotation(BaseModel):
-    commandIds: List[str]
-    annotationType: str
-
-
-class OffsetVector(BaseModel):
-    x: Optional[float]
-    y: Optional[float]
-    z: Optional[float]
-
-
-class Location(BaseModel):
-    slotName: Optional[str]
-    moduleId: Optional[str]
-
-
-class ProfileStep(BaseModel):
-    celsius: float
-    holdSeconds: float
-
-
-class WellLocation(BaseModel):
-    origin: Optional[str]
-    offset: Optional[OffsetVector]
+from .shared_models import Liquid, Labware, CommandAnnotation, Location, ProfileStep, WellLocation, OffsetVector, Dimensions, GroupMetadata, Shape, WellDefinition, Metadata, Module, Pipette, Robot, DesignerApplication
 
 
 # TODO (tamar 3/15/22): split apart all the command payloads when we tackle #9583
