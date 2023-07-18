@@ -15,10 +15,7 @@ import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
 
-import type {
-  ModalHeaderBaseProps,
-  ModalSize,
-} from '../../molecules/Modal/types'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
 // Note (07/13/2023) After the launch, we will unify the modal components into one component.
