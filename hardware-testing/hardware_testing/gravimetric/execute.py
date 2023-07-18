@@ -217,9 +217,10 @@ def _run_trial(
 
     # RUN INIT
     trial.pipette.move_to(
-        trial.well.top(trial.measure_height).move(trial.channel_offset),
-        minimum_z_height=_minimum_z_height(trial.cfg),
-    )
+        trial.well.top(50).move(trial.channel_offset)
+    )  # center channel over well
+    mnt = OT3Mount.RIGHT if trial.pipette.mount == "right" else OT3Mount.LEFT
+    trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     m_data_init = _record_measurement_and_store(MeasurementType.INIT)
     ui.print_info(f"\tinitial grams: {m_data_init.grams_average} g")
     if _PREV_TRIAL_GRAMS is not None:
@@ -247,9 +248,7 @@ def _run_trial(
         inspect=trial.inspect,
         mix=trial.mix,
     )
-    trial.pipette.move_to(
-        trial.well.top(trial.measure_height).move(trial.channel_offset)
-    )
+    trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     m_data_aspirate = _record_measurement_and_store(MeasurementType.ASPIRATE)
     ui.print_info(f"\tgrams after aspirate: {m_data_aspirate.grams_average} g")
     ui.print_info(f"\tcelsius after aspirate: {m_data_aspirate.celsius_pipette} C")
@@ -269,9 +268,7 @@ def _run_trial(
         inspect=trial.inspect,
         mix=trial.mix,
     )
-    trial.pipette.move_to(
-        trial.well.top(trial.measure_height).move(trial.channel_offset)
-    )
+    trial.ctx._core.get_hardware().retract(mnt)  # retract to top of gantry
     m_data_dispense = _record_measurement_and_store(MeasurementType.DISPENSE)
     ui.print_info(f"\tgrams after dispense: {m_data_dispense.grams_average} g")
     # calculate volumes
@@ -358,7 +355,6 @@ def _calculate_evaporation(
     liquid_tracker: LiquidTracker,
     test_report: report.CSVReport,
     labware_on_scale: Labware,
-    measure_height: float,
 ) -> Tuple[float, float]:
     ui.print_title("MEASURE EVAPORATION")
     blank_trials = build_gravimetric_trials(
@@ -372,11 +368,10 @@ def _calculate_evaporation(
         test_report,
         liquid_tracker,
         True,
-        measure_height=measure_height,
     )
     ui.print_info(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
-    hover_pos = labware_on_scale["A1"].top().move(Point(z=50))
-    resources.pipette.move_to(hover_pos)
+    mnt = OT3Mount.RIGHT if resources.pipette.mount == "right" else OT3Mount.LEFT
+    resources.ctx._core.get_hardware().retract(mnt)
     for i in range(config.SCALE_SECONDS_TO_TRUE_STABILIZE):
         ui.print_info(
             f"wait for scale to stabilize "
@@ -387,7 +382,6 @@ def _calculate_evaporation(
     actual_disp_list_evap: List[float] = []
     for b_trial in blank_trials[resources.test_volumes[-1]][0]:
         ui.print_header(f"BLANK {b_trial.trial + 1}/{config.NUM_BLANK_TRIALS}")
-        resources.pipette.move_to(hover_pos)
         evap_aspirate, _, evap_dispense, _ = _run_trial(b_trial)
         ui.print_info(
             f"blank {b_trial.trial + 1}/{config.NUM_BLANK_TRIALS}:\n"
@@ -435,11 +429,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     recorder = _load_scale(cfg, resources)
     test_report = build_gm_report(cfg, resources, recorder)
 
-    # need to be as far away from the scale as possible
-    # to avoid static from distorting the measurement
-    measure_height = (
-        50 if cfg.labware_on_scale == "radwag_pipette_calibration_vial" else 120
-    )
     calibration_tip_in_use = True
 
     try:
@@ -458,7 +447,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
             ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
-        resources.pipette.move_to(well.top(), minimum_z_height=_minimum_z_height(cfg))
+        resources.pipette.move_to(well.top(0), minimum_z_height=_minimum_z_height(cfg))
         _liquid_height = _jog_to_find_liquid_height(
             resources.ctx, resources.pipette, well
         )
@@ -486,7 +475,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                 liquid_tracker,
                 test_report,
                 labware_on_scale,
-                measure_height,
             )
 
         ui.print_info("dropping tip")
@@ -506,7 +494,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
             test_report,
             liquid_tracker,
             False,
-            measure_height=measure_height,
         )
         for volume in trials.keys():
             actual_asp_list_all = []
