@@ -158,7 +158,11 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
           buttonType="primary"
           flex="1"
           onClick={handleRecalibrate}
-          buttonText={t('recalibrate')}
+          buttonText={
+            instrument?.data?.calibratedOffset?.last_modified == null
+              ? t('calibrate')
+              : t('recalibrate')
+          }
           textTransform={TYPOGRAPHY.textTransformCapitalize}
           justifyContent={JUSTIFY_CENTER}
         />

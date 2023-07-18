@@ -25,7 +25,7 @@ interface Props extends StyleProps {
   header: string
   isSuccess: boolean
   children?: React.ReactNode
-  subHeader?: string
+  subHeader?: string | JSX.Element
   isPending?: boolean
 }
 const BACKGROUND_SIZE = '47rem'

@@ -255,7 +255,7 @@ export const GripperWizard = (
   let handleExit = onExit
   if (isRobotMoving) {
     handleExit = undefined
-  } else if (showConfirmExit) {
+  } else if (showConfirmExit || errorMessage != null) {
     handleExit = handleCleanUpAndClose
   }
 
