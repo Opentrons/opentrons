@@ -120,7 +120,7 @@ describe('StepCreationButton', () => {
       const updatedAddStepButton = wrapper.find(StepCreationButtonComponent)
       // all 8 step button items render as children
       const stepButtonItems = updatedAddStepButton.find(StepButtonItem)
-      //length 4 since there are no modules on deck
+      //  length 4 since there are no modules on deck
       expect(stepButtonItems).toHaveLength(4)
       // enabled button tooltip
       const mixTooltip = stepButtonItems.at(2).find(Tooltip)
@@ -151,7 +151,7 @@ describe('StepCreationButton', () => {
       wrapper.update()
       const updatedAddStepButton = wrapper.find(StepCreationButtonComponent)
       const stepButtonItems = updatedAddStepButton.find(StepButtonItem)
-      //length 5 since there is a temperature module on deck
+      //  length 5 since there is a temperature module on deck
       expect(stepButtonItems).toHaveLength(5)
       // enabled temperature module step tooltip
       const enabledButtonTooltip = stepButtonItems.at(4).find(Tooltip)
