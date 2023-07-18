@@ -460,9 +460,7 @@ export type SavedStepFormState = Record<StepIdType, FormData>
 export const initialDeckSetupStepForm: FormData = {
   stepType: 'manualIntervention',
   id: INITIAL_DECK_SETUP_STEP_ID,
-  labwareLocationUpdate: {
-    [FIXED_TRASH_ID]: '12',
-  },
+  labwareLocationUpdate: {},
   pipetteLocationUpdate: {},
   moduleLocationUpdate: {},
 }

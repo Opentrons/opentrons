@@ -135,10 +135,6 @@ def get_protocol_api(
         >>> instr = protocol.load_instrument('p300_single', 'right')
         >>> instr.home()
 
-    If ``extra_labware`` is not specified, any labware definitions saved in
-    the ``labware`` directory of the Jupyter notebook directory will be
-    available.
-
     When this function is called, modules and instruments will be recached.
 
     :param version: The API version to use. This must be lower than
@@ -154,14 +150,11 @@ def get_protocol_api(
                             and is best not used.
     :param bundled_data: If specified, a mapping from filenames to contents
                          for data to be available in the protocol from
-                         ``protocol_api.ProtocolContext.bundled_data``.
-    :param extra_labware: If specified, a mapping from labware names to
-                          labware definitions for labware to consider in the
-                          protocol in addition to those stored on the robot.
-                          If this is an empty dict, and this function is called
-                          on a robot, it will look in the 'labware'
-                          subdirectory of the Jupyter data directory for
-                          custom labware.
+                         :py:obj:`opentrons.protocol_api.ProtocolContext.bundled_data`.
+    :param extra_labware: A mapping from labware load names to custom labware definitions.
+                          If this is ``None`` (the default), and this function is called on a robot,
+                          it will look for labware in the ``labware`` subdirectory of the Jupyter
+                          data directory.
     :return: The protocol context.
     """
     if isinstance(version, str):
@@ -331,11 +324,11 @@ def execute(  # noqa: C901
                         estimation. If specified, the callback should take a
                         single argument (the name doesn't matter) which will
                         be a dictionary (see below). Default: ``None``
-    :param custom_labware_paths: A list of directories to search for custom
-                                 labware, or None. Ignored if the apiv2 feature
-                                 flag is not set. Loads valid labware from
-                                 these paths and makes them available to the
-                                 protocol context.
+    :param custom_labware_paths: A list of directories to search for custom labware.
+                                 Loads valid labware from these paths and makes them available
+                                 to the protocol context. If this is ``None`` (the default), and
+                                 this function is called on a robot, it will look in the ``labware``
+                                 subdirectory of the Jupyter data directory.
     :param custom_data_paths: A list of directories or files to load custom
                               data files from. Ignored if the apiv2 feature
                               flag if not set. Entries may be either files or

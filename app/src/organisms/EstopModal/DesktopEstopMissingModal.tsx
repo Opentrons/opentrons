@@ -21,7 +21,7 @@ export function DesktopEstopMissingModal({
 }: DesktopEstopMissingModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalProps: LegacyModalProps = {
-    type: isActiveRun ? 'outlinedError' : 'error',
+    type: 'error',
     title: t('estop_missing'),
     onClose: () => closeModal(),
     closeOnOutsideClick: false,

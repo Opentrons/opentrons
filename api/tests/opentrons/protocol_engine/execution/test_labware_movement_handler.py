@@ -15,7 +15,7 @@ from opentrons_shared_data.gripper.constants import (
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.types import DeckSlotName, Point
 
-from opentrons.hardware_control.types import OT3Mount, OT3Axis
+from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
@@ -237,7 +237,7 @@ async def test_move_labware_with_gripper(
 
     gripper = OT3Mount.GRIPPER
     decoy.verify(
-        await ot3_hardware_api.home(axes=[OT3Axis.Z_L, OT3Axis.Z_R, OT3Axis.Z_G]),
+        await ot3_hardware_api.home(axes=[Axis.Z_L, Axis.Z_R, Axis.Z_G]),
         await mock_tc_context_manager.__aenter__(),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[0]
@@ -252,7 +252,7 @@ async def test_move_labware_with_gripper(
         # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
         await ot3_hardware_api.grip(force_newtons=LABWARE_GRIP_FORCE),
         # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
-        await ot3_hardware_api.home(axes=[OT3Axis.Z_G]),
+        await ot3_hardware_api.home(axes=[Axis.Z_G]),
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[3]
         ),
@@ -264,7 +264,7 @@ async def test_move_labware_with_gripper(
         ),
         await ot3_hardware_api.ungrip(),
         # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
-        await ot3_hardware_api.home(axes=[OT3Axis.Z_G]),
+        await ot3_hardware_api.home(axes=[Axis.Z_G]),
         # TODO: see https://opentrons.atlassian.net/browse/RLAB-214
         await ot3_hardware_api.grip(force_newtons=IDLE_STATE_GRIP_FORCE),
     )

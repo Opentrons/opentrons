@@ -2,10 +2,12 @@ import { ModuleType } from '@opentrons/shared-data'
 
 import type { ModuleModel } from '@opentrons/shared-data'
 
+type PortGroup = 'main' | 'left' | 'right' | 'front' | 'unknown'
 interface PhysicalPort {
   path: string | null
-  port: number | null
-  hub: number | null
+  port: number
+  hub: boolean
+  portGroup: PortGroup
 }
 
 export interface ApiBaseModule {

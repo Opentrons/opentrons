@@ -4,7 +4,7 @@ from typing_extensions import Literal
 from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
-    OT3Axis,
+    Axis,
     OT3AxisKind,
     OT3AxisMap,
     CurrentConfig,
@@ -97,57 +97,57 @@ def axis_nodes() -> List["NodeId"]:
     ]
 
 
-def node_axes() -> List[OT3Axis]:
+def node_axes() -> List[Axis]:
     return [
-        OT3Axis.X,
-        OT3Axis.Y,
-        OT3Axis.Z_L,
-        OT3Axis.Z_R,
-        OT3Axis.P_L,
-        OT3Axis.P_R,
-        OT3Axis.Z_G,
-        OT3Axis.G,
+        Axis.X,
+        Axis.Y,
+        Axis.Z_L,
+        Axis.Z_R,
+        Axis.P_L,
+        Axis.P_R,
+        Axis.Z_G,
+        Axis.G,
     ]
 
 
-def home_axes() -> List[OT3Axis]:
+def home_axes() -> List[Axis]:
     return [
-        OT3Axis.P_L,
-        OT3Axis.P_R,
-        OT3Axis.G,
-        OT3Axis.Z_L,
-        OT3Axis.Z_R,
-        OT3Axis.Z_G,
-        OT3Axis.X,
-        OT3Axis.Y,
+        Axis.P_L,
+        Axis.P_R,
+        Axis.G,
+        Axis.Z_L,
+        Axis.Z_R,
+        Axis.Z_G,
+        Axis.X,
+        Axis.Y,
     ]
 
 
-def axis_to_node(axis: OT3Axis) -> "NodeId":
+def axis_to_node(axis: Axis) -> "NodeId":
     anm = {
-        OT3Axis.X: NodeId.gantry_x,
-        OT3Axis.Y: NodeId.gantry_y,
-        OT3Axis.Z_L: NodeId.head_l,
-        OT3Axis.Z_R: NodeId.head_r,
-        OT3Axis.P_L: NodeId.pipette_left,
-        OT3Axis.P_R: NodeId.pipette_right,
-        OT3Axis.Z_G: NodeId.gripper_z,
-        OT3Axis.G: NodeId.gripper_g,
-        OT3Axis.Q: NodeId.pipette_left,
+        Axis.X: NodeId.gantry_x,
+        Axis.Y: NodeId.gantry_y,
+        Axis.Z_L: NodeId.head_l,
+        Axis.Z_R: NodeId.head_r,
+        Axis.P_L: NodeId.pipette_left,
+        Axis.P_R: NodeId.pipette_right,
+        Axis.Z_G: NodeId.gripper_z,
+        Axis.G: NodeId.gripper_g,
+        Axis.Q: NodeId.pipette_left,
     }
     return anm[axis]
 
 
-def node_to_axis(node: "NodeId") -> OT3Axis:
+def node_to_axis(node: "NodeId") -> Axis:
     nam = {
-        NodeId.gantry_x: OT3Axis.X,
-        NodeId.gantry_y: OT3Axis.Y,
-        NodeId.head_l: OT3Axis.Z_L,
-        NodeId.head_r: OT3Axis.Z_R,
-        NodeId.pipette_left: OT3Axis.P_L,
-        NodeId.pipette_right: OT3Axis.P_R,
-        NodeId.gripper_z: OT3Axis.Z_G,
-        NodeId.gripper_g: OT3Axis.G,
+        NodeId.gantry_x: Axis.X,
+        NodeId.gantry_y: Axis.Y,
+        NodeId.head_l: Axis.Z_L,
+        NodeId.head_r: Axis.Z_R,
+        NodeId.pipette_left: Axis.P_L,
+        NodeId.pipette_right: Axis.P_R,
+        NodeId.gripper_z: Axis.Z_G,
+        NodeId.gripper_g: Axis.G,
     }
     return nam[node]
 
@@ -160,7 +160,7 @@ def node_is_axis(node: "NodeId") -> bool:
         return False
 
 
-def axis_is_node(axis: OT3Axis) -> bool:
+def axis_is_node(axis: Axis) -> bool:
     try:
         axis_to_node(axis)
         return True
@@ -209,7 +209,7 @@ def get_current_settings(
     conf_by_pip = config.by_gantry_load(gantry_load)
     currents = {}
     for axis_kind in conf_by_pip["hold_current"].keys():
-        for axis in OT3Axis.of_kind(axis_kind):
+        for axis in Axis.of_kind(axis_kind):
             currents[axis] = CurrentConfig(
                 conf_by_pip["hold_current"][axis_kind],
                 conf_by_pip["run_current"][axis_kind],
@@ -220,7 +220,7 @@ def get_current_settings(
 def get_system_constraints(
     config: OT3MotionSettings,
     gantry_load: GantryLoad,
-) -> "SystemConstraints[OT3Axis]":
+) -> "SystemConstraints[Axis]":
     conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
     for axis_kind in [
@@ -230,7 +230,7 @@ def get_system_constraints(
         OT3AxisKind.Z,
         OT3AxisKind.Z_G,
     ]:
-        for axis in OT3Axis.of_kind(axis_kind):
+        for axis in Axis.of_kind(axis_kind):
             constraints[axis] = AxisConstraints.build(
                 conf_by_pip["acceleration"][axis_kind],
                 conf_by_pip["max_speed_discontinuity"][axis_kind],
@@ -243,7 +243,7 @@ def get_system_constraints(
 def get_system_constraints_for_calibration(
     config: OT3MotionSettings,
     gantry_load: GantryLoad,
-) -> "SystemConstraints[OT3Axis]":
+) -> "SystemConstraints[Axis]":
     conf_by_pip = config.by_gantry_load(gantry_load)
     constraints = {}
     for axis_kind in [
@@ -253,7 +253,7 @@ def get_system_constraints_for_calibration(
         OT3AxisKind.Z,
         OT3AxisKind.Z_G,
     ]:
-        for axis in OT3Axis.of_kind(axis_kind):
+        for axis in Axis.of_kind(axis_kind):
             constraints[axis] = AxisConstraints.build(
                 conf_by_pip["acceleration"][axis_kind],
                 conf_by_pip["max_speed_discontinuity"][axis_kind],
@@ -264,7 +264,7 @@ def get_system_constraints_for_calibration(
 
 
 def _convert_to_node_id_dict(
-    axis_pos: Coordinates[OT3Axis, CoordinateValue],
+    axis_pos: Coordinates[Axis, CoordinateValue],
 ) -> NodeIdMotionValues:
     target: NodeIdMotionValues = {}
     for axis, pos in axis_pos.items():
@@ -321,8 +321,8 @@ def motor_nodes(devices: Set[FirmwareTarget]) -> Set[NodeId]:
 
 
 def create_move_group(
-    origin: Coordinates[OT3Axis, CoordinateValue],
-    moves: List[Move[OT3Axis]],
+    origin: Coordinates[Axis, CoordinateValue],
+    moves: List[Move[Axis]],
     present_nodes: Iterable[NodeId],
     stop_condition: MoveStopCondition = MoveStopCondition.none,
 ) -> Tuple[MoveGroup, Dict[NodeId, float]]:
@@ -350,7 +350,7 @@ def create_move_group(
 
 
 def create_home_group(
-    distance: Dict[OT3Axis, float], velocity: Dict[OT3Axis, float]
+    distance: Dict[Axis, float], velocity: Dict[Axis, float]
 ) -> MoveGroup:
     node_id_distances = _convert_to_node_id_dict(distance)
     node_id_velocities = _convert_to_node_id_dict(velocity)
@@ -367,7 +367,7 @@ def create_home_group(
 
 
 def create_tip_action_group(
-    axes: Sequence[OT3Axis], distance: float, velocity: float, action: PipetteAction
+    axes: Sequence[Axis], distance: float, velocity: float, action: PipetteAction
 ) -> MoveGroup:
     current_nodes = [axis_to_node(ax) for ax in axes]
     step = create_tip_action_step(

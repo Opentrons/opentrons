@@ -33,8 +33,7 @@ describe('ModuleInfo', () => {
     props = {
       moduleModel: mockTCModule.model,
       isAttached: false,
-      usbPort: null,
-      hubPort: null,
+      physicalPort: null,
     }
     when(mockUseRunHasStarted).calledWith(MOCK_RUN_ID).mockReturnValue(false)
   })
@@ -48,22 +47,19 @@ describe('ModuleInfo', () => {
     getByText('Not connected')
   })
 
-  it('should show module connected and hub number', () => {
-    props = { ...props, usbPort: 1, hubPort: 1, isAttached: true }
-    const { getByText } = render(props)
-    getByText('Connected')
-    getByText('USB Port 1 via hub')
-  })
-
   it('should show module connected and no USB number', () => {
-    props = { ...props, usbPort: null, hubPort: null, isAttached: true }
+    props = { ...props, isAttached: true }
     const { getByText } = render(props)
     getByText('Connected')
     getByText('USB Port Connected')
   })
 
   it('should show module connected and USB number', () => {
-    props = { ...props, usbPort: 1, hubPort: null, isAttached: true }
+    props = {
+      ...props,
+      physicalPort: { port: 1, hub: false, portGroup: 'unknown', path: '' },
+      isAttached: true,
+    }
     const { getByText } = render(props)
     getByText('Connected')
     getByText('USB Port 1')
@@ -72,8 +68,7 @@ describe('ModuleInfo', () => {
   it('should not show module connected when run has started', () => {
     props = {
       ...props,
-      usbPort: 1,
-      hubPort: null,
+      physicalPort: { port: 1, hub: false, portGroup: 'unknown', path: '' },
       isAttached: true,
       runId: MOCK_RUN_ID,
     }

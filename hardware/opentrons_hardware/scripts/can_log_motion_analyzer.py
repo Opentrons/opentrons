@@ -168,7 +168,7 @@ class MoveCommand(Record):
         """Build from a log line."""
         data = _MOVE_RE.search(line)
         assert data, f"Could not parse move command from {line}"
-        if data["acceleration_unit"] == "_ul":
+        if data["acceleration_unit"] == "_um":
             acceleration_mul = 1000
         else:
             acceleration_mul = 1
@@ -185,6 +185,8 @@ class MoveCommand(Record):
             * interrupts_per_sec
             * interrupts_per_sec
             / acceleration_mul,
+            velocity_encoded=int(data["velocity"]),
+            acceleration_encoded=int(data["acceleration"]),
             index=int(data["index"]),
         )
 
@@ -193,6 +195,8 @@ class MoveCommand(Record):
     acceleration: float
     duration: float
     index: int
+    velocity_encoded: int
+    acceleration_encoded: int
 
     def __str__(self) -> str:
         """String."""
@@ -372,6 +376,41 @@ class PositionLogEntry:
         return f"{self.__class__.__name__}: time={(self.date - date).total_seconds()}, motor_pos={self.motor_pos}, encoder_pos={self.encoder_pos}, diff={self.diff}"
 
 
+@dataclass
+class CommandLogEntry:
+    """Quick class for a command log."""
+
+    date: datetime
+    time: float
+    projected_distance_mm: float
+    velocity_mm_s: float
+    acceleration_mm_s2: float
+    velocity_encoded: int
+    acceleration_encoded: int
+
+    @classmethod
+    def build_from_record(
+        cls: Type["CommandLogEntry"], record: MoveCommand
+    ) -> "CommandLogEntry":
+        """Build from a record."""
+        return CommandLogEntry(
+            date=record.date,
+            time=record.duration,
+            projected_distance_mm=(
+                record.duration * record.velocity
+                + 0.5 * record.acceleration * (record.duration**2)
+            ),
+            velocity_mm_s=record.velocity,
+            acceleration_mm_s2=record.acceleration,
+            velocity_encoded=record.velocity_encoded,
+            acceleration_encoded=record.acceleration_encoded,
+        )
+
+    def format_date_offset(self, date: datetime) -> str:
+        """Print with a time offset."""
+        return f"{self.__class__.__name__}: time={(self.date - date).total_seconds()}, duration={self.time}, distance={self.projected_distance_mm}, vel={self.velocity_mm_s}mm/s ({self.velocity_encoded} encoded), acc={self.acceleration_mm_s2}mm/s^2 ({self.acceleration_encoded} encoded)"
+
+
 def position_log(records: Iterator[MoveComplete]) -> Iterator[PositionLogEntry]:
     """Print a log of positions."""
     for record in records:
@@ -383,8 +422,13 @@ def position_log(records: Iterator[MoveComplete]) -> Iterator[PositionLogEntry]:
         )
 
 
-Operation = Literal["print-positions", "print-errors", "plot-positions"]
-OPERATIONS: List[Operation] = ["print-positions", "print-errors", "plot-positions"]
+Operation = Literal["print-positions", "print-errors", "plot-positions", "print-motion"]
+OPERATIONS: List[Operation] = [
+    "print-positions",
+    "print-motion",
+    "print-errors",
+    "plot-positions",
+]
 
 
 def _print_positions(
@@ -400,9 +444,30 @@ def _print_positions(
             if not annotate_errors:
                 continue
             print(record.format_date_offset(t0))
-        else:
+        elif isinstance(record, MoveComplete):
             print(
                 f"{record.sender.name}: {PositionLogEntry.build_from_record(record).format_date_offset(t0)}"
+            )
+
+
+def _print_motion(
+    records_to_check: Iterator[RecordTypeVar], nodes: Set[NodeId], annotate_errors: bool
+) -> None:
+    t0: Optional[datetime] = None
+    for record in records_to_check:
+        if not t0:
+            t0 = record.date
+        if isinstance(record, Error) and record.sender in nodes:
+            if not annotate_errors:
+                continue
+            print(record.format_date_offset(t0))
+        elif isinstance(record, MoveComplete) and record.sender in nodes:
+            print(
+                f"{record.sender.name}: {PositionLogEntry.build_from_record(record).format_date_offset(t0)}"
+            )
+        elif isinstance(record, MoveCommand) and record.dest in nodes:
+            print(
+                f"{record.dest.name}: {CommandLogEntry.build_from_record(record).format_date_offset(t0)}"
             )
 
 
@@ -431,6 +496,8 @@ def main(
     records_to_check = date_limited(records(logfile), since, until)
     if operation == "print-positions":
         _print_positions(records_to_check, nodes, annotate_errors)
+    elif operation == "print-motion":
+        _print_motion(records_to_check, nodes, annotate_errors)
     elif operation == "print-errors":
         _print_errors(records_to_check, nodes, annotate_errors)
     elif operation == "plot-positions":

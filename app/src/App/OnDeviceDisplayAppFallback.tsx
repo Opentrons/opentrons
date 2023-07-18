@@ -48,7 +48,7 @@ export function OnDeviceDisplayAppFallback({
   }, [])
 
   return (
-    <Modal header={modalHeader} isError>
+    <Modal header={modalHeader}>
       <Flex
         marginTop={SPACING.spacing32}
         flexDirection={DIRECTION_COLUMN}

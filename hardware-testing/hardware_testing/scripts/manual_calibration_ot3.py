@@ -6,7 +6,7 @@ from typing import Tuple
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import GripperProbe
 
-from hardware_testing.opentrons_api.types import OT3Mount, OT3Axis, Point
+from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
 from hardware_testing.opentrons_api import helpers_ot3
 from opentrons.calibration_storage.ot3.pipette_offset import save_pipette_calibration
 from opentrons.calibration_storage.ot3.gripper_offset import save_gripper_calibration
@@ -118,9 +118,7 @@ async def _test_current_calibration(api: OT3API, mount: OT3Mount, pos: Point) ->
         return Point()
 
 
-async def _jog_axis(
-    api: OT3API, mount: OT3Mount, axis: OT3Axis, direction: float
-) -> None:
+async def _jog_axis(api: OT3API, mount: OT3Mount, axis: Axis, direction: float) -> None:
     step = DEFAULT_STEP_SIZE
     ax = axis.name.lower()[0]
     while True:
@@ -158,7 +156,7 @@ async def _begin_find_sequence(
 async def _find_square_z_pos(api: OT3API, mount: OT3Mount) -> float:
     # Jog gantry to find deck height
     print("\n--> Jog to find Z position")
-    await _jog_axis(api, mount, OT3Axis.by_mount(mount), -1)
+    await _jog_axis(api, mount, Axis.by_mount(mount), -1)
     current_position = await api.gantry_position(mount)
     await api.move_rel(mount, Point(z=SAFE_Z))
     deck_height = float(current_position.z)
@@ -192,7 +190,7 @@ async def _find_square_center(
     ) - probe_radius
 
     # move to the FRONT until we hit the square edge
-    await _jog_axis(api, mount, OT3Axis.Y, -1)
+    await _jog_axis(api, mount, Axis.Y, -1)
     current_position = await api.gantry_position(mount)
     front_square = current_position.y - probe_radius
     y_front = front_square + (helpers_ot3.CALIBRATION_SQUARE_EVT.height / 2)
@@ -200,7 +198,7 @@ async def _find_square_center(
     await api.move_rel(mount, Point(y=rel_dist_from_edge_to_center))
 
     # move to the FRONT until we hit the square edge
-    await _jog_axis(api, mount, OT3Axis.Y, 1)
+    await _jog_axis(api, mount, Axis.Y, 1)
     current_position = await api.gantry_position(mount)
     rear_square = current_position.y + probe_radius
     y_rear = rear_square - (helpers_ot3.CALIBRATION_SQUARE_EVT.height / 2)
@@ -208,7 +206,7 @@ async def _find_square_center(
     await api.move_rel(mount, Point(y=-rel_dist_from_edge_to_center))
 
     # move to the RIGHT until we hit the square edge
-    await _jog_axis(api, mount, OT3Axis.X, 1)
+    await _jog_axis(api, mount, Axis.X, 1)
     current_position = await api.gantry_position(mount)
     right_square = current_position.x + probe_radius
     x_right = right_square - (helpers_ot3.CALIBRATION_SQUARE_EVT.width / 2)
@@ -216,7 +214,7 @@ async def _find_square_center(
     await api.move_rel(mount, Point(x=-rel_dist_from_edge_to_center))
 
     # move to the LEFT until we hit the square edge
-    await _jog_axis(api, mount, OT3Axis.X, -1)
+    await _jog_axis(api, mount, Axis.X, -1)
     current_position = await api.gantry_position(mount)
     left_square = current_position.x - probe_radius
     x_left = left_square + (helpers_ot3.CALIBRATION_SQUARE_EVT.width / 2)
@@ -239,7 +237,7 @@ async def _find_square_center(
 async def _find_square_center_of_gripper_jaw(api: OT3API, expected_pos: Point) -> Point:
     # first, we grip the jaw, so that the jaws are fully pressing inwards
     # this removes wiggle/backlash from jaws during probing
-    await api.disengage_axes([OT3Axis.G])
+    await api.disengage_axes([Axis.G])
     input("ENTER to GRIP:")
     await api.grip(GRIP_FORCE_CALIBRATION)
     input("add probe to Gripper FRONT, then press ENTER: ")
