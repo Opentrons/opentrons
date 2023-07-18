@@ -29,7 +29,7 @@ export function DesktopEstopPressedModal({
 }: DesktopEstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalProps: LegacyModalProps = {
-    type: isActiveRun ? 'outlinedError' : 'error',
+    type: 'error',
     title: t('estop_pressed'),
     onClose: () => closeModal(),
     closeOnOutsideClick: false,

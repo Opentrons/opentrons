@@ -80,7 +80,7 @@ class LegacyProtocolCore(
         }
         self._bundled_labware = bundled_labware
         self._extra_labware = extra_labware or {}
-        self._default_max_speeds = AxisMaxSpeeds()
+        self._default_max_speeds = AxisMaxSpeeds(robot_type=self.robot_type)
         self._last_location: Optional[Location] = None
         self._last_mount: Optional[Mount] = None
         self._loaded_modules: Set["AbstractModule"] = set()
