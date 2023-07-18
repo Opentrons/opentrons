@@ -32,7 +32,7 @@ describe('EquipmentOption', () => {
     expect(
       getByLabelText('EquipmentOption_checkbox-blank-outline')
     ).toHaveStyle(`color: ${COLORS.darkGreyEnabled}`)
-    expect(getByLabelText('EquipmentOption_flex')).toHaveStyle(
+    expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `border: ${BORDERS.lineBorder}`
     )
   })
@@ -47,7 +47,7 @@ describe('EquipmentOption', () => {
     expect(getByLabelText('EquipmentOption_checkbox-marked')).toHaveStyle(
       `color: ${COLORS.blueEnabled}`
     )
-    expect(getByLabelText('EquipmentOption_flex')).toHaveStyle(
+    expect(getByLabelText('EquipmentOption_flex_mockText')).toHaveStyle(
       `border: ${BORDERS.activeLineBorder}`
     )
   })

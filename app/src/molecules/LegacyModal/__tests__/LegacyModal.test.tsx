@@ -49,15 +49,4 @@ describe('LegacyModal', () => {
       `background-color: ${COLORS.white}`
     )
   })
-
-  it('should render outlined modal when type is outlinedError', () => {
-    props.type = 'outlinedError'
-    const [{ getByTestId }] = render(props)
-    const headerIcon = getByTestId('Modal_header_icon')
-    expect(headerIcon).toBeInTheDocument()
-    expect(headerIcon).toHaveStyle(`color: ${COLORS.white}`)
-    expect(getByTestId('Modal_header')).toHaveStyle(
-      `background-color: ${COLORS.errorEnabled}`
-    )
-  })
 })

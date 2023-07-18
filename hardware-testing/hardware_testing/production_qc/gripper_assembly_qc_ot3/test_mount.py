@@ -11,7 +11,7 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
+from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point
 
 SLOT_MOUNT_TEST = 5
 RETRACT_AFTER_HOME_MM = 0.5
@@ -58,7 +58,7 @@ async def _is_z_axis_still_aligned_with_encoder(
 ) -> Tuple[float, float, bool]:
     enc_pos = await api.encoder_current_position_ot3(OT3Mount.GRIPPER)
     gantry_pos = await api.gantry_position(OT3Mount.GRIPPER)
-    z_enc = enc_pos[OT3Axis.Z_G]
+    z_enc = enc_pos[Axis.Z_G]
     z_est = gantry_pos.z
     is_aligned = abs(z_est - z_enc) < Z_MAX_SKIP_MM
     return z_enc, z_est, is_aligned
@@ -66,13 +66,13 @@ async def _is_z_axis_still_aligned_with_encoder(
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    z_ax = OT3Axis.Z_G
+    z_ax = Axis.Z_G
     mount = OT3Mount.GRIPPER
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, z_ax)
     default_z_current = settings.run_current
     default_z_speed = settings.max_speed
 
-    await api.home([OT3Axis.Z_G])
+    await api.home([Axis.Z_G])
     home_pos = await api.gantry_position(OT3Mount.GRIPPER)
     target_pos = helpers_ot3.get_slot_calibration_square_position_ot3(SLOT_MOUNT_TEST)
     target_pos = target_pos._replace(z=home_pos.z)

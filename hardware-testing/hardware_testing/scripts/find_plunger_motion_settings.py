@@ -6,7 +6,7 @@ from math import inf as infinity
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount
+from hardware_testing.opentrons_api.types import Axis, OT3Mount
 
 
 TEST_PASS_FAIL_MM = 0.05
@@ -49,7 +49,7 @@ async def _motion_settings(
     acceleration: float,
     speed: float,
 ) -> None:
-    pip_ax = OT3Axis.of_main_tool_actuator(mount)
+    pip_ax = Axis.of_main_tool_actuator(mount)
     helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
         api, axis=pip_ax, hold_current=DEFAULT_HOLD_CURRENT, run_current=current
     )
@@ -65,7 +65,7 @@ async def _motion_settings(
 
 
 async def _home(api: OT3API, mount: OT3Mount) -> None:
-    pip_ax = OT3Axis.of_main_tool_actuator(mount)
+    pip_ax = Axis.of_main_tool_actuator(mount)
     await _motion_settings(
         api,
         mount,
@@ -97,7 +97,7 @@ async def _test_dispense(
         acceleration=acceleration,
         speed=speed,
     )
-    pip_ax = OT3Axis.of_main_tool_actuator(mount)
+    pip_ax = Axis.of_main_tool_actuator(mount)
     _, _, blow_out, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
     position_ot3 = await api.current_position_ot3(mount)
     encoders_ot3 = await api.encoder_current_position_ot3(mount)

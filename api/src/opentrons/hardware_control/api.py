@@ -17,16 +17,18 @@ from typing import (
     Any,
     TypeVar,
     Mapping,
+    cast,
 )
 
 from opentrons_shared_data.pipette import name_config
 from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.robot.dev_types import RobotType
 from opentrons import types as top_types
 from opentrons.config import robot_configs
 from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 
-from .util import use_or_initialize_loop, check_motion_bounds
+from .util import use_or_initialize_loop, check_motion_bounds, ot2_axis_to_string
 from .instruments.ot2.pipette import (
     generate_hardware_configs,
     load_from_config_and_check_skip,
@@ -80,7 +82,7 @@ class API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlInterface[RobotCalibration, Axis],
+    HardwareControlInterface[RobotCalibration],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -543,7 +545,7 @@ class API(
         assert (axis is not None) ^ (mount is not None), "specify either axis or mount"
         if axis:
             checked_axis = axis
-            checked_mount = Axis.to_mount(checked_axis)
+            checked_mount = Axis.to_ot2_mount(checked_axis)
         if mount:
             checked_mount = mount
             checked_axis = Axis.of_plunger(checked_mount)
@@ -557,7 +559,7 @@ class API(
                 self._backend.set_active_current(
                     {checked_axis: instr.config.plunger_current}
                 )
-                await self._backend.home([checked_axis.name.upper()])
+                await self._backend.home([ot2_axis_to_string(checked_axis)])
                 # either we were passed False for our acquire_lock and we
                 # should pass it on, or we acquired the lock above and
                 # shouldn't do it again
@@ -593,7 +595,7 @@ class API(
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis.ot2_axes()]
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
-        smoothie_gantry = [ax.name.upper() for ax in gantry]
+        smoothie_gantry = [ot2_axis_to_string(ax) for ax in gantry]
         smoothie_pos = {}
         plungers = [ax for ax in checked_axes if ax not in Axis.gantry_axes()]
 
@@ -601,9 +603,10 @@ class API(
             if smoothie_gantry:
                 smoothie_pos.update(await self._backend.home(smoothie_gantry))
                 self._current_position = deck_from_machine(
-                    self._axis_map_from_string_map(smoothie_pos),
-                    self._robot_calibration.deck_calibration.attitude,
-                    top_types.Point(0, 0, 0),
+                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
+                    attitude=self._robot_calibration.deck_calibration.attitude,
+                    offset=top_types.Point(0, 0, 0),
+                    robot_type=cast(RobotType, "OT-2 Standard"),
                 )
             for plunger in plungers:
                 await self._do_plunger_home(axis=plunger, acquire_lock=False)
@@ -625,7 +628,7 @@ class API(
         position_axes = [Axis.X, Axis.Y, z_ax, plunger_ax]
 
         if fail_on_not_homed and (
-            not self._backend.is_homed([str(a) for a in position_axes])
+            not self._backend.is_homed([ot2_axis_to_string(a) for a in position_axes])
             or not self._current_position
         ):
             raise MustHomeError(
@@ -638,9 +641,10 @@ class API(
             if refresh:
                 smoothie_pos = await self._backend.update_position()
                 self._current_position = deck_from_machine(
-                    self._axis_map_from_string_map(smoothie_pos),
-                    self._robot_calibration.deck_calibration.attitude,
-                    top_types.Point(0, 0, 0),
+                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
+                    attitude=self._robot_calibration.deck_calibration.attitude,
+                    offset=top_types.Point(0, 0, 0),
+                    robot_type=cast(RobotType, "OT-2 Standard"),
                 )
             if mount == top_types.Mount.RIGHT:
                 offset = top_types.Point(0, 0, 0)
@@ -744,7 +748,7 @@ class API(
         )
         axes_moving = [Axis.X, Axis.Y, Axis.by_mount(mount)]
         if fail_on_not_homed and not self._backend.is_homed(
-            [axis.name for axis in axes_moving if axis is not None]
+            [ot2_axis_to_string(axis) for axis in axes_moving if axis is not None]
         ):
             raise mhe
         await self._cache_and_maybe_retract_mount(mount)
@@ -790,22 +794,23 @@ class API(
         """
         machine_pos = self._string_map_from_axis_map(
             machine_from_deck(
-                target_position,
-                self._robot_calibration.deck_calibration.attitude,
-                top_types.Point(0, 0, 0),
+                deck_pos=target_position,
+                attitude=self._robot_calibration.deck_calibration.attitude,
+                offset=top_types.Point(0, 0, 0),
+                robot_type=cast(RobotType, "OT-2 Standard"),
             )
         )
 
         bounds = self._backend.axis_bounds
         to_check = {
-            ax: machine_pos[ax.name]
+            ax: machine_pos[ot2_axis_to_string(ax)]
             for idx, ax in enumerate(target_position.keys())
             if ax in Axis.gantry_axes()
         }
 
         check_motion_bounds(to_check, target_position, bounds, check_bounds)
         checked_maxes = max_speeds or {}
-        str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
+        str_maxes = {ot2_axis_to_string(ax): val for ax, val in checked_maxes.items()}
         async with contextlib.AsyncExitStack() as stack:
             if acquire_lock:
                 await stack.enter_async_context(self._motion_lock)
@@ -832,7 +837,7 @@ class API(
         return self.get_engaged_axes()
 
     async def disengage_axes(self, which: List[Axis]) -> None:
-        await self._backend.disengage_axes([ax.name for ax in which])
+        await self._backend.disengage_axes([ot2_axis_to_string(ax) for ax in which])
 
     async def _fast_home(self, axes: Sequence[str], margin: float) -> Dict[str, float]:
         converted_axes = "".join(axes)
@@ -852,14 +857,15 @@ class API(
 
         Works regardless of critical point or home status.
         """
-        smoothie_ax = (axis.name.upper(),)
+        smoothie_ax = (ot2_axis_to_string(axis),)
 
         async with self._motion_lock:
             smoothie_pos = await self._fast_home(smoothie_ax, margin)
             self._current_position = deck_from_machine(
-                self._axis_map_from_string_map(smoothie_pos),
-                self._robot_calibration.deck_calibration.attitude,
-                top_types.Point(0, 0, 0),
+                machine_pos=self._axis_map_from_string_map(smoothie_pos),
+                attitude=self._robot_calibration.deck_calibration.attitude,
+                offset=top_types.Point(0, 0, 0),
+                robot_type=cast(RobotType, "OT-2 Standard"),
             )
 
     # Gantry/frame (i.e. not pipette) config API
@@ -1091,13 +1097,14 @@ class API(
             )
             if move.home_after:
                 smoothie_pos = await self._backend.fast_home(
-                    [ax.name.upper() for ax in move.home_axes],
+                    [ot2_axis_to_string(ax) for ax in move.home_axes],
                     move.home_after_safety_margin,
                 )
                 self._current_position = deck_from_machine(
-                    self._axis_map_from_string_map(smoothie_pos),
-                    self._robot_calibration.deck_calibration.attitude,
-                    top_types.Point(0, 0, 0),
+                    machine_pos=self._axis_map_from_string_map(smoothie_pos),
+                    attitude=self._robot_calibration.deck_calibration.attitude,
+                    offset=top_types.Point(0, 0, 0),
+                    robot_type=cast(RobotType, "OT-2 Standard"),
                 )
 
         for shake in spec.shake_moves:
@@ -1141,8 +1148,7 @@ class API(
     ) -> Dict[Axis, "API.MapPayload"]:
         return {Axis[k]: v for k, v in input_map.items()}
 
-    @staticmethod
     def _string_map_from_axis_map(
-        input_map: Dict[Axis, "API.MapPayload"]
+        self, input_map: Dict[Axis, "API.MapPayload"]
     ) -> Dict[str, "API.MapPayload"]:
-        return {k.name: v for k, v in input_map.items()}
+        return {ot2_axis_to_string(k): v for k, v in input_map.items()}

@@ -30,7 +30,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import (
     OT3Mount,
     Point,
-    OT3Axis,
+    Axis,
 )
 
 TRASH_HEIGHT_MM: Final = 45
@@ -592,7 +592,7 @@ async def _test_diagnostics_encoder(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
     print("testing encoder")
-    pip_axis = OT3Axis.of_main_tool_actuator(mount)
+    pip_axis = Axis.of_main_tool_actuator(mount)
     encoder_home_pass = True
     encoder_move_pass = True
     encoder_stall_pass = True
@@ -701,7 +701,7 @@ async def _test_diagnostics_capacitive(
         _get_operator_answer_to_question("ready to touch the probe when it moves down?")
     current_pos = await api.gantry_position(mount)
     probe_target = current_pos.z - CAP_PROBE_SETTINGS.prep_distance_mm
-    probe_axis = OT3Axis.by_mount(mount)
+    probe_axis = Axis.by_mount(mount)
     trigger_pos = await api.capacitive_probe(
         mount, probe_axis, probe_target, CAP_PROBE_SETTINGS
     )
@@ -824,9 +824,9 @@ async def _test_plunger_positions(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
     print("homing Z axis")
-    await api.home([OT3Axis.by_mount(mount)])
+    await api.home([Axis.by_mount(mount)])
     print("homing the plunger")
-    await api.home([OT3Axis.of_main_tool_actuator(mount)])
+    await api.home([Axis.of_main_tool_actuator(mount)])
     _, bottom, blow_out, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
     print("moving plunger to BLOW-OUT")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, blow_out)
@@ -843,7 +843,7 @@ async def _test_plunger_positions(
         drop_tip_passed = _get_operator_answer_to_question("is DROP-TIP correct?")
     write_cb(["plunger-blow-out", _bool_to_pass_fail(blow_out_passed)])
     print("homing the plunger")
-    await api.home([OT3Axis.of_main_tool_actuator(mount)])
+    await api.home([Axis.of_main_tool_actuator(mount)])
     return blow_out_passed and drop_tip_passed
 
 
@@ -1082,7 +1082,7 @@ async def _main(test_config: TestConfig) -> None:
         print("homing")
         await api.home()
         # disengage x,y for replace the new pipette
-        await api.disengage_axes([OT3Axis.X, OT3Axis.Y])
+        await api.disengage_axes([Axis.X, Axis.Y])
     print("done")
 
 
