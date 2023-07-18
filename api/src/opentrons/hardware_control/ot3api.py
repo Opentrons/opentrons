@@ -1613,7 +1613,7 @@ class OT3API(
 
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: PickUpTipSpec
-    ) -> Dict[OT3Axis, float]:
+    ) -> None:
         for press in pipette_spec.presses:
             async with self._backend.restore_current():
                 await self._backend.set_active_current(
@@ -1629,11 +1629,7 @@ class OT3API(
             target_up = target_position_from_relative(
                 mount, press.relative_up, self._current_position
             )
-            await asyncio.sleep(1)
-            enc_pos = await self.encoder_current_position_ot3(mount, CriticalPoint.NOZZLE)
-            print(enc_pos)
             await self._move(target_up)
-        return enc_pos
 
     async def _motor_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
@@ -1671,7 +1667,7 @@ class OT3API(
         presses: Optional[int] = None,
         increment: Optional[float] = None,
         prep_after: bool = True,
-    ) -> Dict[OT3Axis, float]:
+    ) -> None:
         """Pick up tip from current location."""
         realmount = OT3Mount.from_mount(mount)
         spec, _add_tip_to_instrs = self._pipette_handler.plan_check_pick_up_tip(
@@ -1681,15 +1677,14 @@ class OT3API(
         await self._move_to_plunger_bottom(realmount, rate=1.0)
         if spec.pick_up_motor_actions:
             await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
-            enc_pos = None
         else:
-            enc_pos = await self._force_pick_up_tip(realmount, spec)
+            await self._force_pick_up_tip(realmount, spec)
 
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
-        # for rel_point, speed in spec.shake_off_list:
-        #     await self.move_rel(realmount, rel_point, speed=speed)
+        for rel_point, speed in spec.shake_off_list:
+            await self.move_rel(realmount, rel_point, speed=speed)
 
         # TODO: implement tip-detection sequence during pick-up-tip for 96ch,
         #       but not with DVT pipettes because those can only detect drops
@@ -1701,7 +1696,6 @@ class OT3API(
 
         if prep_after:
             await self.prepare_for_aspirate(realmount)
-        return enc_pos
 
     def set_current_tiprack_diameter(
         self, mount: Union[top_types.Mount, OT3Mount], tiprack_diameter: float
@@ -2007,13 +2001,16 @@ class OT3API(
         probe_settings: Optional[LiquidProbeSettings] = None,
     ) -> float:
         """Search for and return liquid level height.
+
         This function begins by moving the mount the distance specified by starting_mount_height in the
         LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
         reading from the pressure sensor.
+
         If the move is completed without the specified threshold being triggered, a
         LiquidNotFound error will be thrown.
         If the threshold is triggered before the minimum z distance has been traveled,
         a EarlyLiquidSenseTrigger error will be thrown.
+
         Otherwise, the function will stop moving once the threshold is triggered,
         and return the position of the
         z axis in deck coordinates, as well as the encoder position, where
@@ -2030,56 +2027,53 @@ class OT3API(
             probe_settings = self.config.liquid_sense
         mount_axis = Axis.by_mount(mount)
 
-        # homes plunger then moves it to bottom of axis
+        gantry_position = await self.gantry_position(mount, refresh=True)
+
+        await self.move_to(
+            mount,
+            top_types.Point(
+                x=gantry_position.x,
+                y=gantry_position.y,
+                z=probe_settings.starting_mount_height,
+            ),
+        )
+
         if probe_settings.aspirate_while_sensing:
             await self.home_plunger(mount)
 
-        # if not aspirate_while_sensing, plunger should be at bottom, since
-        #  this expects to be called after pick_up_tip
-
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
 
-        # get position before moving in deck coordinates
-        starting_position = await self.current_position_ot3(
-            mount=mount, critical_point=CriticalPoint.TIP, refresh=True
-        )
-        await self._backend.liquid_probe(
+        machine_pos_node_id = await self._backend.liquid_probe(
             mount,
             probe_settings.max_z_distance,
             probe_settings.mount_speed,
             (probe_settings.plunger_speed * plunger_direction),
             probe_settings.sensor_threshold_pascals,
             probe_settings.log_pressure,
+            probe_settings.auto_zero_sensor,
+            probe_settings.num_baseline_reads,
         )
-
-        # get final position in deck coordinates
-        final_position = await self.current_position_ot3(
-            mount=mount, critical_point=CriticalPoint.TIP, refresh=True
-        )
-
+        machine_pos = axis_convert(machine_pos_node_id, 0.0)
+        position = self._deck_from_machine(machine_pos)
         z_distance_traveled = (
-            starting_position[mount_axis] - final_position[mount_axis]
+            position[mount_axis] - probe_settings.starting_mount_height
         )
         if z_distance_traveled < probe_settings.min_z_distance:
-            min_z_travel_pos = final_position
+            min_z_travel_pos = position
             min_z_travel_pos[mount_axis] = probe_settings.min_z_distance
             raise EarlyLiquidSenseTrigger(
-                triggered_at=final_position,
+                triggered_at=position,
                 min_z_pos=min_z_travel_pos,
             )
-        elif z_distance_traveled >= probe_settings.max_z_distance:
-            max_z_travel_pos = final_position
+        elif z_distance_traveled > probe_settings.max_z_distance:
+            max_z_travel_pos = position
             max_z_travel_pos[mount_axis] = probe_settings.max_z_distance
             raise LiquidNotFound(
-                position=final_position,
+                position=position,
                 max_z_pos=max_z_travel_pos,
             )
 
-        encoder_pos = await self.encoder_current_position_ot3(
-            mount=mount, critical_point=CriticalPoint.TIP
-        )
-
-        return final_position, encoder_pos
+        return position[mount_axis]
 
     async def capacitive_probe(
         self,
@@ -2090,16 +2084,21 @@ class OT3API(
         retract_after: bool = True,
     ) -> float:
         """Determine the position of something using the capacitive sensor.
+
         This function orchestrates detecting the position of a collision between the
         capacitive probe on the tool on the specified mount, and some fixed element
         of the robot.
+
         When calling this function, the mount's probe critical point should already
         be aligned in the probe axis with the item to be probed.
+
         It will move the mount's probe critical point to a small distance behind
         the expected position of the element (which is target_pos, in deck coordinates,
         in the axis to be probed) while running the tool's capacitive sensor. When the
         sensor senses contact, the mount stops.
+
         This function moves away and returns the sensed position.
+
         This sensed position can be used in several ways, including
         - To get an absolute position in deck coordinates of whatever was
         targeted, if something was guaranteed to be physically present.
@@ -2161,101 +2160,10 @@ class OT3API(
             await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
 
-    async def capacitive_nozzle(
-        self,
-        mount: OT3Mount,
-        moving_axis: OT3Axis,
-        target_pos: float,
-        direction: float,
-        pass_settings: CapacitivePassSettings,
-        probe_type: Optional[InstrumentProbeType] = InstrumentProbeType.PRIMARY,
-    ) -> float:
-        """Determine the position of something using the capacitive sensor.
-
-        This function orchestrates detecting the position of a collision between the
-        capacitive probe on the tool on the specified mount, and some fixed element
-        of the robot.
-
-        When calling this function, the mount's probe critical point should already
-        be aligned in the probe axis with the item to be probed.
-
-        It will move the mount's probe critical point to a small distance behind
-        the expected position of the element (which is target_pos, in deck coordinates,
-        in the axis to be probed) while running the tool's capacitive sensor. When the
-        sensor senses contact, the mount stops.
-
-        This function moves away and returns the sensed position.
-
-        This sensed position can be used in several ways, including
-        - To get an absolute position in deck coordinates of whatever was
-        targeted, if something was guaranteed to be physically present.
-        - To detect whether a collision occured at all. If this function
-        returns a value far enough past the anticipated position, then it indicates
-        there was no material there.
-        """
-        if moving_axis not in [
-            OT3Axis.X,
-            OT3Axis.Y,
-        ] and moving_axis != OT3Axis.by_mount(mount):
-            raise RuntimeError(
-                "Probing must be done with a gantry axis or the mount of the sensing"
-                " tool"
-            )
-
-        here = await self.gantry_position(mount, refresh=True)
-        origin_pos = moving_axis.of_point(here)
-        # print(f"origin_pos: {origin_pos}")
-        # if origin_pos < target_pos:
-        #     pass_start = target_pos - pass_settings.prep_distance_mm
-        #     # print(f"pass_start: {pass_start}")
-        pass_distance = direction * (
-                pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
-            )
-        # else:
-        #     pass_start = target_pos + pass_settings.prep_distance_mm
-        #     # print(f"pass_start: {pass_start}")
-        #     pass_distance = 1.0 * (
-        #         pass_settings.prep_distance_mm + pass_settings.max_overrun_distance_mm
-        #     )
-        machine_pass_distance = moving_axis.of_point(
-            machine_vector_from_deck_vector(
-                moving_axis.set_in_point(top_types.Point(0, 0, 0), pass_distance),
-                self._transforms.deck_calibration.attitude,
-            )
-        )
-        # print(f"machine_pass_distance: {machine_pass_distance}")
-        # pass_start_pos = moving_axis.set_in_point(here, pass_start)
-        # print(f"pass_start_pos: {pass_start_pos}")
-        # await self.move_to(mount, pass_start_pos)
-        if mount == OT3Mount.GRIPPER:
-            probe = self._gripper_handler.get_attached_probe()
-            assert probe
-            await self._backend.capacitive_probe(
-                mount,
-                moving_axis,
-                machine_pass_distance,
-                pass_settings.speed_mm_per_s,
-                pass_settings.sensor_threshold_pf,
-                GripperProbe.to_type(probe),
-            )
-        else:
-            await self._backend.capacitive_probe(
-                mount,
-                moving_axis,
-                machine_pass_distance,
-                pass_settings.speed_mm_per_s,
-                pass_settings.sensor_threshold_pf,
-                probe=probe_type,
-            )
-        end_pos = await self.gantry_position(mount, refresh=True)
-        # await self.move_to(mount, pass_start_pos)
-        return moving_axis.of_point(end_pos)
-
     @contextlib.asynccontextmanager
     async def instrument_cache_lock(self) -> AsyncGenerator[None, None]:
         async with self._instrument_cache_lock:
             yield
-
 
     async def capacitive_sweep(
         self,
