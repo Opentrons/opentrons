@@ -373,3 +373,11 @@ def get_test_volumes(cfg: config.VolumetricConfig) -> List[float]:
             return config.QC_VOLUMES_G[cfg.pipette_channels][cfg.pipette_volume][
                 cfg.tip_volume
             ]
+
+
+def get_default_trials(cfg: config.VolumetricConfig) -> int:
+    """Return the default number of trials for QC tests."""
+    if cfg.increment:
+        return 3
+    else:
+        return config.QC_DEFAULT_TRIALS[cfg.kind][cfg.pipette_channels]
