@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field, validator
 from typing import Any, List, Optional, Dict, Union
 from typing_extensions import Literal
-from enum import Enum
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from .shared_models import (
@@ -12,10 +11,6 @@ from .shared_models import (
     ProfileStep,
     WellLocation,
     OffsetVector,
-    Dimensions,
-    GroupMetadata,
-    Shape,
-    WellDefinition,
     Metadata,
     Module,
     Pipette,

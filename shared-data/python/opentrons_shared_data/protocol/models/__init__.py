@@ -19,7 +19,6 @@ from .shared_models import (
     Pipette,
     Robot,
     DesignerApplication,
-    Dimensions,
 )
 
 __all__ = [
