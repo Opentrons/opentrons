@@ -419,6 +419,7 @@ async def move_plunger_absolute_ot3(
     position: float,
     motor_current: Optional[float] = None,
     speed: Optional[float] = None,
+    expect_stalls: bool = False,
 ) -> None:
     """Move OT3 plunger position to an absolute position."""
     if not api.hardware_pipettes[mount.to_mount()]:
@@ -427,6 +428,7 @@ async def move_plunger_absolute_ot3(
     _move_coro = api._move(
         target_position={plunger_axis: position},  # type: ignore[arg-type]
         speed=speed,
+        expect_stalls=expect_stalls,
     )
     if motor_current is None:
         await _move_coro
