@@ -8,6 +8,10 @@ Labware
 
 Labware are the durable or consumable items that you work with, reuse, or discard while running a protocol on a Flex or OT-2. Items such as pipette tips, well plates, tubes, and reservoirs are all examples of labware. This section provides a brief overview of default labware, custom labware, and how to use basic labware API methods when creating a protocol for your robot.
 
+.. note::
+
+    Code snippets use alphanumeric Flex deck slot locations (e.g. ``D1``, ``D2``, etc.). If you have an OT-2, replace the Flex deck slot coordinate with its OT-2 equivalent. For example, Flex slot D1 corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
+
 *************
 Labware Types
 *************
@@ -74,7 +78,7 @@ When the ``load_labware`` method loads labware into your protocol, it returns a 
         
         tiprack = protocol.load_labware(
             load_name= 'corning_96_wellplate_360ul_flat',
-            location= 'D1',  # Flex deck slot
+            location= 'D1',
             label= 'any-name-you-want')
 
 Loading Labware on Adapters
@@ -83,13 +87,15 @@ Loading Labware on Adapters
 The previous section demonstrates loading labware directly into a deck slot. But, the ``load_labware`` method also includes the ``adapter`` argument. This parameter lets you stack labware on top of a compatible adapter and work with them as a single unit in a protocol. For example, you can use an adapter as a simple labware holding device or when you need to use a labware/adapter combination with a module. The ability to combine labware with adapters adds functionality and flexibility to your robot and protocols. 
 
 On the Deck
--------
+-----------
 This example uses ``adapter`` to combine a 96-well plate with a flat adapter and loads them into a deck slot::
     
     corning_plate = protocol.load_labware (
         load_name= 'corning_96_wellplate_360ul_flat',
         location= "D1",
         adapter= "opentrons_universal_flat_adapter")
+
+.. versionadded:: 2.15
 
 On a Module
 -----------
@@ -120,8 +126,7 @@ Accessing Wells in Labware
 Well Ordering
 =============
 
-When writing a protocol, you will need to select which wells to
-transfer liquids to and from.
+When writing a protocol, you will need to select which wells to transfer liquids to and from.
 
 Rows of wells (see image below) on a labware are typically labeled with capital letters starting with ``'A'``;
 for instance, an 8x12 96 well plate will have rows ``'A'`` through ``'H'``.
@@ -134,40 +139,46 @@ The ending well will be in the bottom right, see the diagram below for further e
 
 .. image:: ../img/well_iteration/Well_Iteration.png
 
+The code in this section assumes that ``plate`` is a 24-well plate. For example:
+
 .. code-block:: python
 
     # Flex
     def run(protocol):
         plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', location='D1')
 
-.. code-block:: python
-
-    # OT-2
-    def run(protocol):
-        plate = protocol.load_labware('corning_24_wellplate_3.4ml_flat', location='1')
-
 .. versionadded:: 2.0
 
 Accessor Methods
 ================
 
-There are many different ways to access wells inside labware. Different methods are useful in different contexts. The table below lists out the methods available to access wells and their differences.
+The API provides many different ways to access wells inside labware. Different methods are useful in different contexts. The table below lists out the methods available to access wells and their differences.
 
-+-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-|   Method Name                       |         Returns                                                                                                   |
-+=====================================+===================================================================================================================+
-| :py:meth:`.Labware.wells`           | List of all wells, i.e. ``[labware:A1, labware:B1, labware:C1...]``                                               |
-+-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| :py:meth:`.Labware.rows`            | List of a list ordered by row, i.e ``[[labware:A1, labware:A2...], [labware:B1, labware:B2..]]``                  |
-+-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| :py:meth:`.Labware.columns`         | List of a list ordered by column, i.e. ``[[labware:A1, labware:B1..], [labware:A2, labware:B2..]]``               |
-+-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| :py:meth:`.Labware.wells_by_name`   | Dictionary with well names as keys, i.e. ``{'A1': labware:A1, 'B1': labware:B1}``                                 |
-+-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| :py:meth:`.Labware.rows_by_name`    | Dictionary with row names as keys, i.e. ``{'A': [labware:A1, labware:A2..], 'B': [labware:B1, labware:B2]}``      |
-+-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
-| :py:meth:`.Labware.columns_by_name` | Dictionary with column names as keys, i.e. ``{'1': [labware:A1, labware:B1..], '2': [labware:A2, labware:B2..]}`` |
-+-------------------------------------+-------------------------------------------------------------------------------------------------------------------+
+.. list-table::
+   :widths: 20 30 50
+   :header-rows: 1
+
+   * - Method
+     - Returns
+     - Example
+   * - :py:meth:`.Labware.wells`
+     - List of all wells.
+     - ``[labware:A1, labware:B1, labware:C1...]``
+   * - :py:meth:`.Labware.rows`
+     - List of a list ordered by row.
+     - ``[[labware:A1, labware:A2...], [labware:B1, labware:B2..]]``
+   * - :py:meth:`.Labware.columns`
+     - List of a list ordered by column.
+     - ``[[labware:A1, labware:B1..], [labware:A2, labware:B2..]]``
+   * - :py:meth:`.Labware.wells_by_name`
+     - Dictionary with well names as keys.
+     - ``{'A1': labware:A1, 'B1': labware:B1}``
+   * - :py:meth:`.Labware.rows_by_name`
+     - Dictionary with row names as keys.
+     - ``{'A': [labware:A1, labware:A2..], 'B': [labware:B1, labware:B2]}``
+   * - :py:meth:`.Labware.columns_by_name`
+     - Dictionary with column names as keys.
+     - ``{'1': [labware:A1, labware:B1..], '2': [labware:A2, labware:B2..]}``
 
 Accessing Individual Wells
 ==========================
@@ -319,10 +330,6 @@ Well Dimensions
 ***************
 
 The functions in the :ref:`new-well-access` section above return a single :py:class:`.Well` object or a larger object representing many wells. :py:class:`.Well` objects have attributes that provide information about their physical shape, such as the depth or diameter, as specified in their corresponding labware definition. These properties can be used for different applications, such as calculating the volume of a well or a :ref:`position-relative-labware`.
-
-.. note::
-
-    In the code samples below, the ``load_labware`` method shows a Flex deck slot location (``D1``). If you have an OT-2, replace ``D1`` with ``1``. Although our Python API knows how to translate Flex and OT-2 deck locations, it's a good practice to use the deck location coordinates that match your robot model. See :ref:`deck-slots` for more information.
 
 Depth
 =====
