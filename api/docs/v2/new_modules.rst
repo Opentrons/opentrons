@@ -66,7 +66,7 @@ Available Modules
 
 The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  *API load name*. The load name tells your robot which module you're going to use in a protocol. The table below lists the API load names for the currently available modules.
 
-Some modules were added to our python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requiremets`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
+Some modules were added to our python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
 
 .. table::
    :widths: 4 5 2
