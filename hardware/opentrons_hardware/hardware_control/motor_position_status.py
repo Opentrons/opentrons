@@ -184,25 +184,23 @@ async def update_gear_motor_position_estimation(
 
     data = []
 
-    with WaitableCallback(can_messenger, _listener_filter) as reader:
+    with MultipleMessagesWaitableCallback(
+            can_messenger,
+            _listener_filter,
+            2,
+    ) as reader:
         await can_messenger.send(
             node_id=NodeId.pipette_left,
             message=UpdateGearMotorPositionEstimationRequest(),
         )
         try:
-            for i in range(2):
-                response = await asyncio.wait_for(
-                    _parser_update_gear_motor_position_response(
-                        reader, NodeId.pipette_left
-                    ),
-                    timeout,
-                )
-                data.append(response)
-            if not data[0][1] or not data[1][1]:
-                # If the stepper_ok flag isn't set, that means the node didn't update position.
-                raise RuntimeError(
-                    f"Failed to update motor position for node: {NodeId.pipette_left}"
-                )
+            response = await asyncio.wait_for(
+                _parser_update_gear_motor_position_response(
+                    reader, NodeId.pipette_left
+                ),
+                timeout,
+            )
+            data.append(response)
         except asyncio.TimeoutError:
             log.warning("Update motor position estimation timed out")
             return 0, False

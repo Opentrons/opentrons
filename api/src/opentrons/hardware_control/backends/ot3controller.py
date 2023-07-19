@@ -638,13 +638,11 @@ class OT3Controller:
         tip_action: str = "home",
     ) -> None:
         move_group = []
-        if tip_action == "clamp":
-            assert moves is not None
+        if moves is not None:
             move_group = create_tip_action_group(
                 moves, [NodeId.pipette_left], tip_action
             )
-        elif tip_action == "home":
-            assert distance is not None and velocity is not None
+        elif distance is not None and velocity is not None:
             move_group = create_gear_motor_home_group(float(distance), float(velocity))
         runner = MoveGroupRunner(
             move_groups=[move_group],
