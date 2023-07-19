@@ -215,21 +215,24 @@ export function ProtocolTimelineScrubber(
           invariantContext={invariantContext}
         />
       </Flex>
-      <ViewportList
-        viewportRef={wrapperRef}
-        ref={commandListRef}
-        items={commands}
-      >
-        {(command, index) => (
-          <CommandItem
-            index={index}
-            command={command}
-            currentCommandIndex={currentCommandIndex}
-            setCurrentCommandIndex={setCurrentCommandIndex}
-          />
-        )}
-      </ViewportList>
-      <StyledText as="label" marginY={SPACING.spacing2}>
+      <Flex alignSelf={ALIGN_STRETCH}>
+        <ViewportList
+          viewportRef={wrapperRef}
+          ref={commandListRef}
+          items={commands}
+          axis="x"
+        >
+          {(command, index) => (
+            <CommandItem
+              index={index}
+              command={command}
+              currentCommandIndex={currentCommandIndex}
+              setCurrentCommandIndex={setCurrentCommandIndex}
+            />
+          )}
+        </ViewportList>
+      </Flex>
+      <StyledText as="label" marginY={SPACING.spacing8}>
         Jump to command
       </StyledText>
       <input
@@ -298,7 +301,7 @@ function PipetteMountViz(props: PipetteMountVizProps): JSX.Element | null {
       <StyledText as="h1" textTransform={TEXT_TRANSFORM_UPPERCASE}>
         {mount}
       </StyledText>
-      <StyledText as="p" fontSize="0.5rem" marginY={SPACING.spacing2}>
+      <StyledText as="p" fontSize="0.5rem" marginY={SPACING.spacing8}>
         {pipetteEntity?.spec?.displayName ?? 'none'}
       </StyledText>
       {pipetteEntity != null && pipetteId != null ? (
@@ -441,7 +444,7 @@ interface CommandItemProps {
   command: RunTimeCommand
   index: number
   currentCommandIndex: number
-  setCurrentCommandIndex: (number) => void
+  setCurrentCommandIndex: (index: number) => void
 }
 function CommandItem(props: CommandItemProps): JSX.Element {
   const { index, command, currentCommandIndex, setCurrentCommandIndex } = props
@@ -450,17 +453,17 @@ function CommandItem(props: CommandItemProps): JSX.Element {
       key={index}
       backgroundColor={
         index === currentCommandIndex
-          ? COLORS.blueFocus
+          ? COLORS.blueEnabled
           : index < currentCommandIndex
             ? '#00002222'
             : '#fff'
       }
       border={
         index === currentCommandIndex
-          ? `3px solid ${COLORS.blue}`
+          ? `3px solid ${COLORS.blueEnabled}`
           : '1px solid #000'
       }
-      padding={SPACING.spacing1}
+      padding={SPACING.spacing4}
       flexDirection={DIRECTION_COLUMN}
       minWidth={`${COMMAND_WIDTH_PX}px`}
       width={`${COMMAND_WIDTH_PX}px`}
@@ -476,7 +479,7 @@ function CommandItem(props: CommandItemProps): JSX.Element {
       <StyledText
         as="p"
         fontSize="0.6rem"
-        marginBottom={SPACING.spacing2}
+        marginBottom={SPACING.spacing4}
         fontWeight={FONT_WEIGHT_BOLD}
       >
         {command.commandType}
@@ -485,10 +488,10 @@ function CommandItem(props: CommandItemProps): JSX.Element {
         <Flex
           key={key}
           flexDirection={DIRECTION_COLUMN}
-          marginBottom={SPACING.spacing1}
-          paddingLeft={SPACING.spacing1}
+          marginBottom={SPACING.spacing2}
+          paddingLeft={SPACING.spacing2}
         >
-          <Text as="label" fontSize="0.6rem" marginRight={SPACING.spacing1}>
+          <Text as="label" fontSize="0.6rem" marginRight={SPACING.spacing2}>
             {key}:
           </Text>
           {value != null && typeof value === 'object' ? (
@@ -497,7 +500,7 @@ function CommandItem(props: CommandItemProps): JSX.Element {
                 <Text
                   as="label"
                   fontSize="0.6rem"
-                  marginRight={SPACING.spacing1}
+                  marginRight={SPACING.spacing2}
                 >
                   {key}:
                 </Text>

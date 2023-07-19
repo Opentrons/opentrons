@@ -24,7 +24,7 @@ export function ProtocolTimeline(): JSX.Element {
   }, [])
 
   return storedProtocol != null && storedProtocol.mostRecentAnalysis != null ? (
-    <Box padding={SPACING.spacing3}>
+    <Box padding={SPACING.spacing16}>
       <ProtocolTimelineScrubber
         commands={storedProtocol.mostRecentAnalysis.commands}
       />
