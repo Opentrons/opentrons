@@ -542,24 +542,24 @@ To prepare the deck before running a protocol, use the labware latch controls in
 
 Loading Labware
 ===============
-.. use text from labware library
 
-Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it. Currently, only the following combinations are supported in the Opentrons Labware Library:
+Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it. Currently, the `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes several pre-configured thermal adapter and labware combinations that help make the Heater-Shaker ready to use right out of the box.
 
-+-------------------------+-------------------------------------------+----------------------------------------------------------------------+
-| Adapter                 | Labware                                   | Definition                                                           |
-+=========================+===========================================+======================================================================+
-| Deep Well Adapter       | NEST 96 Deep Well Plate 2mL               | ``opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep``           |
-+-------------------------+-------------------------------------------+----------------------------------------------------------------------+
-| 96 Flat Bottom Adapter  | NEST 96 Well Plate 200 µL Flat            | ``opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat``       |
-+-------------------------+-------------------------------------------+----------------------------------------------------------------------+
-| PCR Adapter             | NEST 96 Well Plate 100 µL PCR Full Skirt  | ``opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt``     |
-+-------------------------+-------------------------------------------+----------------------------------------------------------------------+
-| PCR Adapter             | Thermo Scientific Armadillo PCR Plate     | ``opentrons_96_pcr_adapter_armadillo_wellplate_200ul``               |
-+-------------------------+-------------------------------------------+----------------------------------------------------------------------+
-| Universal Flat Adapter  | Corning 384 Well Plate 112 µL Flat        | ``opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat``|
-+-------------------------+-------------------------------------------+----------------------------------------------------------------------+
+.. list-table::
+   :header-rows: 1
 
+   * - Adapter/Labware Combination
+     - API Load Name
+   * - Opentrons 96 Deep Well Adapter with NEST Deep Well Plate 2 mL
+     - ``opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep``
+   * - Opentrons 96 Flat Bottom Adapter with NEST 96 Well Plate 200 µL Flat
+     - ``opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat``
+   * - Opentrons 96 PCR Adapter with Armadillo Well Plate 200 µL
+     - ``opentrons_96_pcr_adapter_armadillo_wellplate_200ul``
+   * - Opentrons 96 PCR Adapter with NEST Well Plate 100 µL
+     - ``opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt``
+   * - Opentrons Universal Flat Adapter with Corning 384 Well Plate 112 µL Flat
+     - ``opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat``
 
 Custom flat-bottom labware can be used with the Universal Flat Adapter. If you need assistance creating custom labware definitions for the Heater-Shaker, `submit a request <https://support.opentrons.com/s/article/Requesting-a-custom-labware-definition>`_.
 
@@ -610,7 +610,7 @@ To pipette while the Heater-Shaker is heating, use :py:meth:`~.HeaterShakerConte
 
 This example would likely take just as long as the blocking version above; it’s unlikely that one aspirate and one dispense action would take longer than the time for the module to heat. However, be careful when putting a lot of commands between a ``set_target_temperature()`` call and a ``delay()`` call. In this situation, you’re relying on ``wait_for_temperature()`` to resume execution of commands once heating is complete. But if the temperature has already been reached, the delay will begin later than expected and the Heater-Shaker will hold at its target temperature longer than intended.
 
-Additionally, if you want to pipette while the module holds at a target for a certain length of time, you need to track the holding time yourself. One of the simplest ways to do this is with Python’s ``time`` module. First, add ``import time`` at the start of your protocol. Then, use :py:func:`time.monotonic` to set a reference time when the target is reached. Finally, add a delay that calculates how much holding time is remaining after the pipetting actions:
+Additionally, if you want to pipette while the module holds a temperature for a certain length of time, you need to track the holding time yourself. One of the simplest ways to do this is with Python’s ``time`` module. First, add ``import time`` at the start of your protocol. Then, use :py:func:`time.monotonic` to set a reference time when the target is reached. Finally, add a delay that calculates how much holding time is remaining after the pipetting actions:
 
 .. code-block:: python
 
@@ -641,7 +641,9 @@ Deactivating the heater and shaker are done separately using the :py:meth:`~.Hea
 Using a Magnetic Block Module
 *****************************
 
-In hac habitasse platea dictumst. Ut eu maximus nulla. Nam imperdiet tristique ante, eu condimentum velit accumsan eu. Suspendisse ac sollicitudin eros.
+The `Magnetic Block <https://opentrons.com/products/modules/opentrons-flex-magnetic-block/>`_ is an unpowered, magnetic 96-well plate for pulling particles out of suspension and retaining them during wash, rinse or other elution procedures. It is suitable for many magnetic bead-based protocols, including extracting and purifying DNA, RNA and proteins. Unlike the Magnetic Module, the Magnetic Block does not contain electronic components and does not move magnetic beads up or down in solution.
+
+Because the Magnetic Block is unpowered, neither your robot or the Opentrons App aware of this module. You "control" it via protocols that use the Opentrons Flex Gripper to add and remove labware from this module.
 
 ***************************************
 Using Multiple Modules of the Same Type
