@@ -9,13 +9,13 @@ import type { Store } from 'redux'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/organisms/EstopPressedModal',
+  title: 'ODD/organisms/EstopPressedModal',
   component: EstopPressedModal,
 } as Meta
 
 const dummyConfig = {
   config: {
-    isOnDevice: false,
+    isOnDevice: true,
   },
 } as any
 
@@ -32,4 +32,5 @@ const Template: Story<
 export const EstopPressed = Template.bind({})
 EstopPressed.args = {
   isEngaged: true,
+  closeModal: () => {},
 }

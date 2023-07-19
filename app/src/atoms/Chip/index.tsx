@@ -15,7 +15,7 @@ import { StyledText } from '../text'
 
 import type { IconName, StyleProps } from '@opentrons/components'
 
-export type ChipType = 'basic' | 'success' | 'warning' | 'neutral'
+export type ChipType = 'basic' | 'error' | 'neutral' | 'success' | 'warning'
 
 interface ChipProps extends StyleProps {
   /** Display background color? */
@@ -43,22 +43,28 @@ const CHIP_PROPS_BY_TYPE: Record<
     borderRadius: BORDERS.borderRadiusSize1,
     textColor: COLORS.darkBlack90,
   },
+  error: {
+    backgroundColor: COLORS.red3,
+    borderRadius: BORDERS.borderRadiusSize5,
+    iconColor: COLORS.red1,
+    textColor: COLORS.red1,
+  },
   neutral: {
     backgroundColor: COLORS.darkBlack20,
-    borderRadius: BORDERS.borderRadiusSize6,
+    borderRadius: BORDERS.borderRadiusSize5,
     iconColor: COLORS.darkBlack90,
     textColor: COLORS.darkBlack70,
   },
   success: {
     backgroundColor: COLORS.green3,
-    borderRadius: BORDERS.borderRadiusSize6,
+    borderRadius: BORDERS.borderRadiusSize5,
     iconColor: COLORS.green1,
     iconName: 'ot-check',
     textColor: COLORS.green1,
   },
   warning: {
     backgroundColor: COLORS.yellow3,
-    borderRadius: BORDERS.borderRadiusSize6,
+    borderRadius: BORDERS.borderRadiusSize5,
     iconColor: COLORS.yellow1,
     textColor: COLORS.yellow1,
   },
