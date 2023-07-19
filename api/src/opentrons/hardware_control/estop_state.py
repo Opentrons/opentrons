@@ -21,7 +21,7 @@ class EstopStateMachine:
     def __init__(self, detector: EstopDetector) -> None:
         """Create a new EstopStateMachine."""
         self._detector = detector
-        self._state = EstopState.DISENGAGED
+        self._state: EstopState = EstopState.DISENGAGED
         self._summary = detector.status
         self._transition_from_disengaged()
         detector.add_listener(self._detector_listener)
@@ -41,6 +41,7 @@ class EstopStateMachine:
             self._listeners.remove(listener)
 
     def _detector_listener(self, summary: EstopSummary) -> None:
+        """Callback from the detector."""
         self._handle_state_transition(new_summary=summary)
 
     def _transition_from_physically_engaged(self) -> None:
@@ -69,6 +70,7 @@ class EstopStateMachine:
             self._state = EstopState.DISENGAGED
 
     def _emit_event(self, prev_state: EstopState) -> None:
+        """Broadcast a state change to all listeners."""
         event = EstopStateNotification(old_state=prev_state, new_state=self._state)
         for l in self._listeners:
             l(event)

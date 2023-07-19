@@ -404,6 +404,7 @@ BinaryMessageDefinition = Union[
     EngageSyncOut,
     ReleaseSyncOut,
     EstopStateChange,
+    EstopStateRequest,
     EstopButtonDetectionChange,
     EstopButtonPresentRequest,
     DoorSwitchStateRequest,

@@ -1,3 +1,4 @@
+"""Detector for estop status messages."""
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 
 from typing import List, Callable
@@ -10,6 +11,9 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     EstopStateChange,
     EstopButtonPresentRequest,
     EstopStateRequest,
+)
+from opentrons_shared_data.errors.exceptions import (
+    InternalUSBCommunicationError,
 )
 from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 
@@ -38,6 +42,7 @@ class EstopDetector:
     def __init__(
         self, usb_messenger: BinaryMessenger, initial_state: EstopSummary
     ) -> None:
+        """Create a new EstopDetector."""
         self._usb_messenger = usb_messenger
         self._state = initial_state
         self._listeners: List[EstopDetectorListener] = []
@@ -53,28 +58,34 @@ class EstopDetector:
             ),
         )
 
-    def __del__(self):
+    def __del__(self) -> None:
         self._usb_messenger.remove_listener(self._estop_connected_listener)
 
     @staticmethod
     async def build(usb_messenger: BinaryMessenger) -> "EstopDetector":
         """Builder function to create a new estop detector."""
-        estop_state: EstopStateChange = await usb_messenger.send_and_receive(
+        estop_state = await usb_messenger.send_and_receive(
             EstopStateRequest(), EstopStateChange
         )
-        detected: EstopButtonDetectionChange = await usb_messenger.send_and_receive(
+        detected = await usb_messenger.send_and_receive(
             EstopButtonPresentRequest(), EstopButtonDetectionChange
         )
+        if not isinstance(estop_state, EstopStateChange) or not isinstance(
+            detected, EstopButtonDetectionChange
+        ):
+            raise InternalUSBCommunicationError(
+                "Could not get estop status from rear panel"
+            )
         initial_state = EstopSummary(
-            left_detected=detected.aux1_detected.value() > 0,
-            right_detected=detected.aux2_detected.value() > 0,
-            engaged=estop_state.engaged.value() > 0,
+            left_detected=detected.aux1_detected.value > 0,
+            right_detected=detected.aux2_detected.value > 0,
+            engaged=estop_state.engaged.value > 0,
         )
         return EstopDetector(usb_messenger=usb_messenger, initial_state=initial_state)
 
     def add_listener(self, listener: EstopDetectorListener) -> None:
         """Add a new listener for estop detector changes."""
-        if not listener in self._listeners:
+        if listener not in self._listeners:
             self._listeners.append(listener)
 
     def remove_listener(self, listener: EstopDetectorListener) -> None:
@@ -88,11 +99,12 @@ class EstopDetector:
         return self._state
 
     def _estop_connected_listener(self, msg: BinaryMessageDefinition) -> None:
+        """The callback to parse messages with estop data."""
         if isinstance(msg, EstopButtonDetectionChange):
-            self._state.left_detected = msg.aux1_detected.value() > 0
-            self._state.right_detected = msg.aux2_detected.value() > 0
+            self._state.left_detected = msg.aux1_detected.value > 0
+            self._state.right_detected = msg.aux2_detected.value > 0
         elif isinstance(msg, EstopStateChange):
-            self._state.engaged = msg.engaged.value() > 0
+            self._state.engaged = msg.engaged.value > 0
         else:
             # Don't call listeners if this was an unrelated message
             return
