@@ -28,7 +28,7 @@ LoadedConfiguration = Dict[str, Union[str, Dict[str, Any]]]
 def _get_configuration_dictionary(
     config_type: Literal["general", "geometry", "liquid"],
     channels: PipetteChannelType,
-    max_volume: PipetteModelType,
+    model: PipetteModelType,
     version: PipetteVersionType,
 ) -> LoadedConfiguration:
     config_path = (
@@ -38,7 +38,7 @@ def _get_configuration_dictionary(
         / "2"
         / config_type
         / channels.name.lower()
-        / max_volume.value
+        / model.value
         / f"{version.major}_{version.minor}.json"
     )
     return json.loads(load_shared_data(config_path))
@@ -47,28 +47,28 @@ def _get_configuration_dictionary(
 @lru_cache(maxsize=None)
 def _geometry(
     channels: PipetteChannelType,
-    max_volume: PipetteModelType,
+    model: PipetteModelType,
     version: PipetteVersionType,
 ) -> LoadedConfiguration:
-    return _get_configuration_dictionary("geometry", channels, max_volume, version)
+    return _get_configuration_dictionary("geometry", channels, model, version)
 
 
 @lru_cache(maxsize=None)
 def _liquid(
     channels: PipetteChannelType,
-    max_volume: PipetteModelType,
+    model: PipetteModelType,
     version: PipetteVersionType,
 ) -> LoadedConfiguration:
-    return _get_configuration_dictionary("liquid", channels, max_volume, version)
+    return _get_configuration_dictionary("liquid", channels, model, version)
 
 
 @lru_cache(maxsize=None)
 def _physical(
     channels: PipetteChannelType,
-    max_volume: PipetteModelType,
+    model: PipetteModelType,
     version: PipetteVersionType,
 ) -> LoadedConfiguration:
-    return _get_configuration_dictionary("general", channels, max_volume, version)
+    return _get_configuration_dictionary("general", channels, model, version)
 
 
 @lru_cache(maxsize=None)
@@ -109,11 +109,11 @@ def load_serial_lookup_table() -> Dict[str, str]:
 
 
 def load_liquid_model(
-    max_volume: PipetteModelType,
+    model: PipetteModelType,
     channels: PipetteChannelType,
     version: PipetteVersionType,
 ) -> PipetteLiquidPropertiesDefinition:
-    liquid_dict = _liquid(channels, max_volume, version)
+    liquid_dict = _liquid(channels, model, version)
     return PipetteLiquidPropertiesDefinition.parse_obj(liquid_dict)
 
 
@@ -172,7 +172,7 @@ def update_pipette_configuration(
 
 
 def load_definition(
-    max_volume: PipetteModelType,
+    model: PipetteModelType,
     channels: PipetteChannelType,
     version: PipetteVersionType,
 ) -> PipetteConfigurations:
@@ -182,9 +182,9 @@ def load_definition(
     ):
         raise KeyError("Pipette version not found.")
 
-    geometry_dict = _geometry(channels, max_volume, version)
-    physical_dict = _physical(channels, max_volume, version)
-    liquid_dict = _liquid(channels, max_volume, version)
+    geometry_dict = _geometry(channels, model, version)
+    physical_dict = _physical(channels, model, version)
+    liquid_dict = _liquid(channels, model, version)
 
     generation = PipetteGenerationType(physical_dict["displayCategory"])
     mount_configs = MOUNT_CONFIG_LOOKUP_TABLE[generation][channels]
