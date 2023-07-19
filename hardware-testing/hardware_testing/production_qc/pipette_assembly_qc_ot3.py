@@ -58,7 +58,7 @@ ASPIRATE_SUBMERGE_MM: Final = 3
 LIQUID_PROBE_ERROR_THRESHOLD_MM = 0.2
 
 SAFE_HEIGHT_TRAVEL = 10
-SAFE_HEIGHT_CALIBRATE = 1
+SAFE_HEIGHT_CALIBRATE = 0
 
 ENCODER_ALIGNMENT_THRESHOLD_MM = 0.1
 
@@ -1136,10 +1136,9 @@ async def _test_liquid_probe(api: OT3API, mount: OT3Mount, tip_volume: int, tria
             num_baseline_reads=10,  # TODO: when would we want to adjust this?
             data_file="",  # FIXME: remove
         )
-        await api.liquid_probe(mount, probe_settings)
-        end_pos = await api.gantry_position(mount, refresh=True)
-        trial_results.append(end_pos.z - target_z)  # store the mm error from target
-        print(start_pos.z, target_z, end_pos.z)
+        end_z = await api.liquid_probe(mount, probe_settings)
+        trial_results.append(end_z - target_z)  # store the mm error from target
+        print(start_pos.z, target_z, end_z)
         await _drop_tip_in_trash(api, mount)
     return trial_results
 
