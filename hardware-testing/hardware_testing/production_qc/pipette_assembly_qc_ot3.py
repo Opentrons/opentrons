@@ -75,6 +75,8 @@ PRESSURE_DATA_CACHE = []
 # save final test results, to be saved and displayed at the end
 FINAL_TEST_RESULTS = []
 
+_available_tips = {}
+
 
 @dataclass
 class TestConfig:
@@ -88,7 +90,6 @@ class TestConfig:
     skip_tip_presence: bool
     skip_liquid_probe: bool
     fixture_port: str
-    fixture_depth: int
     fixture_side: str
     fixture_aspirate_sample_count: int
     slot_tip_rack_1000: int
@@ -486,7 +487,8 @@ async def _fixture_check_pressure(
     results.append(r)
     # insert into the fixture
     # NOTE: unknown amount of pressure here (depends on where Z was calibrated)
-    await api.move_rel(mount, Point(z=-test_config.fixture_depth))
+    fixture_depth = PRESSURE_FIXTURE_INSERT_DEPTH[pip_vol]
+    await api.move_rel(mount, Point(z=-fixture_depth))
     r = await _read_pressure_and_check_results(
         api,
         fixture,
@@ -518,7 +520,7 @@ async def _fixture_check_pressure(
     )
     results.append(r)
     # retract out of fixture
-    await api.move_rel(mount, Point(z=test_config.fixture_depth))
+    await api.move_rel(mount, Point(z=fixture_depth))
     r = await _read_pressure_and_check_results(
         api, fixture, PressureEvent.POST, write_cb, accumulate_raw_data_cb, pip_channels
     )
@@ -526,11 +528,13 @@ async def _fixture_check_pressure(
     return False not in results
 
 
-_available_tips = {
-    50: [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"],
-    200: [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"],
-    1000: [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"],
-}
+def _reset_available_tip() -> None:
+    global _available_tips
+    _available_tips = {
+        50: [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"],
+        200: [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"],
+        1000: [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"],
+    }
 
 
 async def _test_for_leak(
@@ -1237,6 +1241,7 @@ async def _main(test_config: TestConfig) -> None:
             "qc this pipette?"
         ):
             continue
+        _reset_available_tip()
         # reset calibration for this pipette
         await api.reset_instrument_offset(mount)
 
@@ -1443,9 +1448,6 @@ if __name__ == "__main__":
     )
     arg_parser.add_argument("--slot-fixture", type=int, default=DEFAULT_SLOT_FIXTURE)
     arg_parser.add_argument("--slot-trash", type=int, default=DEFAULT_SLOT_TRASH)
-    arg_parser.add_argument(
-        "--insert-depth", type=int, default=PRESSURE_FIXTURE_INSERT_DEPTH
-    )
     arg_parser.add_argument("--simulate", action="store_true")
     args = arg_parser.parse_args()
     if args.operator:
@@ -1463,7 +1465,6 @@ if __name__ == "__main__":
         skip_tip_presence=args.skip_tip_presence,
         skip_liquid_probe=args.skip_liquid_probe,
         fixture_port=args.port,
-        fixture_depth=args.insert_depth,
         fixture_side=args.fixture_side,
         fixture_aspirate_sample_count=args.aspirate_sample_count,
         slot_tip_rack_1000=args.slot_tip_rack_1000,
