@@ -292,13 +292,14 @@ class OT3Simulator:
         auto_zero_sensor: bool = True,
         num_baseline_reads: int = 10,
         sensor_id: SensorId = SensorId.S0,
-    ) -> None:
+    ) -> Dict[NodeId, float]:
 
         head_node = axis_to_node(Axis.by_mount(mount))
         pos = self._position
         pos[head_node] = max_z_distance - 2
         self._position.update(pos)
         self._encoder_position.update(pos)
+        return self._position
 
     @ensure_yield
     async def move(
