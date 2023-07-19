@@ -71,7 +71,7 @@
       "category": "roboticsControlError"
     },
     "2004": {
-      "detail": "Motion Planning Failure",
+      "detail": "Motion Planning Failed",
       "category": "roboticsControlError"
     },
     "2005": {
@@ -83,7 +83,7 @@
       "category": "roboticsControlError"
     },
     "3000": {
-      "detail": "A robotics interaction error occurred.",
+      "detail": "Robotics Interaction Error",
       "category": "roboticsInteractionError"
     },
     "3001": {
@@ -151,7 +151,7 @@
       "category": "generalError"
     },
     "4001": {
-      "detail": "Robot In Use",
+      "detail": "Robot in Use",
       "category": "generalError"
     },
     "4002": {
