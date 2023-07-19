@@ -48,22 +48,20 @@ export class StepList extends React.Component<StepListProps> {
 
   render(): React.ReactNode {
     return (
-      <React.Fragment>
-        <SidePanel title="Protocol Timeline">
-          <MultiSelectToolbar
-            isMultiSelectMode={Boolean(this.props.isMultiSelectMode)}
-          />
+      <SidePanel title="Protocol Timeline">
+        <MultiSelectToolbar
+          isMultiSelectMode={Boolean(this.props.isMultiSelectMode)}
+        />
 
-          <StartingDeckStateTerminalItem />
-          <DraggableStepItems
-            orderedStepIds={this.props.orderedStepIds.slice()}
-            reorderSteps={this.props.reorderSteps}
-          />
-          <PresavedStepItem />
-          <StepCreationButton />
-          <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
-        </SidePanel>
-      </React.Fragment>
+        <StartingDeckStateTerminalItem />
+        <DraggableStepItems
+          orderedStepIds={this.props.orderedStepIds.slice()}
+          reorderSteps={this.props.reorderSteps}
+        />
+        <PresavedStepItem />
+        <StepCreationButton />
+        <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
+      </SidePanel>
     )
   }
 }

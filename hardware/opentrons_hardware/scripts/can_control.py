@@ -13,7 +13,6 @@ from typing import TextIO, Optional
 
 from opentrons_hardware.drivers.can_bus import build, CanMessenger
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_hardware.drivers.gpio import OT3GPIO
 
 from opentrons_hardware.firmware_bindings.message import CanMessage
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
@@ -74,9 +73,6 @@ async def input_task(
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    # build a GPIO handler which will automatically release estop
-    gpio = OT3GPIO()
-    gpio.deactivate_estop()
     async with build.driver(build_settings(args)) as driver, CanMessenger(
         driver
     ) as messenger:
