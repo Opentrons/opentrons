@@ -10,6 +10,10 @@ Hardware modules are powered and unpowered deck-mounted peripherals. The Flex an
 
 Powered modules include the :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>`, :ref:`Thermocycler Module <thermocycler-module>`, and :ref:`Heater-Shaker Module <heater-shaker-module>`. The 96-well :ref:`Magnetic Block <magnetic-block>` is unpowered and recommended for use with the Flex only.
 
+.. Note::
+    
+    Code snippets use alphanumeric Flex deck slot locations (e.g. ``D1``, ``D2``, etc.). If you have an OT-2, replace the Flex deck slot coordinate with its OT-2 equivalent. For example, Flex slot D1 corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
+
 ************
 Module Setup
 ************
@@ -31,8 +35,8 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
             requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
             def run(protocol: protocol_api.ProtocolContext): 
-                # Load a Magnetic Module GEN2 in deck slot D1.
-                magnetic_module = protocol.load_module('magnetic module gen2', "D1")
+                # Load a Heater-Shaker in deck slot D1.
+                heater_shaker = protocol.load_module('heaterShakerModuleV1', "D1")
          
                 # Load a Temperature Module GEN1 in deck slot D3.
                 temperature_module = protocol.load_module('temperature module', "D3")
@@ -42,7 +46,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
         .. code-block:: python
             :substitutions:
             
-            metadata = {'apiLevel': "|apiLevel|"}
+            metadata = {'apiLevel': "2.13"}
             
             def run(protocol: protocol_api.ProtocolContext): 
                 # Load a Magnetic Module GEN2 in deck slot 1.
@@ -303,9 +307,7 @@ If at any point you need to check whether the magnets are engaged or not, use th
 Changes with the GEN2 Magnetic Module
 =====================================
 
-*For use with the OT-2 only.*
-
-The GEN2 Magnetic Module uses smaller magnets than the GEN1 version to mitigate an issue with the magnets attracting beads even from their retracted position. This means it takes longer for the GEN2 module to attract beads. The recommended attraction time is 5 minutes for liquid volumes up to 50 µL and 7 minutes for volumes greater than 50 µL. If your application needs additional magnetic strength to attract beads within  these timeframes, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
+The GEN2 Magnetic Module uses smaller magnets than the GEN1 version. This change helps mitigate an issue with the magnets attracting beads from their retracted position, but it also takes longer for the GEN2 module to attract beads. The recommended attraction time is 5 minutes for liquid volumes up to 50 µL and 7 minutes for volumes greater than 50 µL. If your application needs additional magnetic strength to attract beads, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
 
 
 .. _thermocycler-module:
@@ -314,7 +316,7 @@ The GEN2 Magnetic Module uses smaller magnets than the GEN1 version to mitigate 
 Using a Thermocycler Module
 ***************************
 
-The Thermocycler Module provides on-deck, fully automated thermocycling and can heat and cool very quickly during operation. The module's block can heat and cool between 4 and 99 °C, and the module's lid can heat up to 110 °C.
+The Thermocycler Module provides on-deck, fully automated temperature cycling, and can heat and cool very quickly during operation. The module's block can reach and maintain temperatures between 4 and 99 °C. The module's lid can heat up to 110 °C.
 
 The Thermocycler is represented in code by a :py:class:`.ThermocyclerContext` object, which has methods for controlling the lid, controlling the block, and setting *profiles* — timed heating and cooling routines that can be automatically repeated. 
 
@@ -339,7 +341,7 @@ The ``location`` parameter of :py:meth:`.load_module` isn't required for the The
    * - OT-2
      - Requires deck slots 7, 8, 10, and 11.
 
-Attempting to load any other modules or labware in these slots while a Thermocycler is there will raise an error.
+Attempting to load any other modules or labware in these slots with a Thermocycler installed will raise an error.
 
 .. versionadded:: 2.0
 
@@ -479,16 +481,12 @@ Using a Heater-Shaker Module
 
 The Heater-Shaker Module provides on-deck heating and orbital shaking. The module can heat from 37 to 95 °C, and can shake samples from 200 to 3000 rpm.
 
-The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerContext` object. The examples in this section will use a Heater-Shaker loaded in Flex deck slot D1, which corresponds to deck slot 1 on the OT-2:
-
-.. code-block:: python
+The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerContext` object. For example::
 
     def run(protocol: protocol_api.ProtocolContext):
          hs_mod = protocol.load_module('heaterShakerModuleV1', "D1")
 
 .. versionadded:: 2.13
-
-.. Start here Wednesday
 
 Placement Restrictions
 ======================
@@ -531,7 +529,7 @@ There is one exception: to the front or back of the Heater-Shaker, an 8-channel 
 Latch Control
 =============
 
-To easily add and remove labware from the Heater-Shaker, you can control its labware latch within your protocol using :py:meth:`.open_labware_latch` and :py:meth:`.close_labware_latch`. Shaking requires the labware latch to be closed, so you may want to issue a close command before the first shake command in your protocol:
+To add and remove labware from the Heater-Shaker, you can control the module's labware latch from your protocol using :py:meth:`.open_labware_latch` and :py:meth:`.close_labware_latch`. Shaking requires the labware latch to be closed, so you may want to issue a close command before the first shake command in your protocol:
 
 .. code-block:: python
 
@@ -572,14 +570,12 @@ Heating and shaking operations are controlled independently, and are treated dif
 
 .. note::
 
-	As of version 2.13 of the API, only the Heater-Shaker Module supports non-blocking command execution. All other modules' methods are blocking commands.
+	With API version 2.13, only the Heater-Shaker Module supports non-blocking command execution. All other modules' methods are blocking commands.
 
 Blocking commands
 -----------------
 
-Here is an example of how to shake a sample for one minute in a blocking manner — no other commands will execute until the minute has elapsed. This can be done with three commands, which start the shake, wait the minute, and stop the shake:
-
-.. code-block:: python
+Here is an example of how to use a blocking command and shake a sample for one minute. No other commands will execute until a minute has elapsed. For example, the three commands in this code sample start the shake, wait for one minute, and then stop the shake::
 
     hs_mod.set_and_wait_for_shake_speed(500)
     protocol.delay(minutes=1)
@@ -632,11 +628,11 @@ Provided that the parallel pipetting actions don’t take more than one minute, 
 Deactivating
 ============
 
-As with setting targets, deactivating the heater and shaker are done separately, with :py:meth:`~.HeaterShakerContext.deactivate_heater` and :py:meth:`~.HeaterShakerContext.deactivate_shaker` respectively. There is no method to deactivate both simultaneously, so call the two methods in sequence if you need to stop both heating and shaking.
+Deactivating the heater and shaker are done separately using the :py:meth:`~.HeaterShakerContext.deactivate_heater` and :py:meth:`~.HeaterShakerContext.deactivate_shaker` respectively. There is no method to deactivate both simultaneously, so call the two methods in sequence if you need to stop both heating and shaking.
 
 .. note:: 
 
-    The OT-2 will not automatically deactivate the Heater-Shaker at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Heater-Shaker module controls on the device detail page in the Opentrons App or run these methods in Jupyter notebook.
+    The robot will not automatically deactivate the Heater-Shaker at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Heater-Shaker module controls on the device detail page in the Opentrons App or run these methods in Jupyter notebook.
 
 .. _magnetic-block:
 
