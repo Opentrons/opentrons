@@ -24,6 +24,11 @@ from opentrons.config.types import (
 )
 from hardware_testing.drivers import mitutoyo_digimatic_indicator
 
+import logging
+
+logging.basicConfig(level=logging.WARNING)
+LOG = logging.getLogger(__name__)
+
 def build_arg_parser():
     arg_parser = argparse.ArgumentParser(description='OT-3 Pipette Calibration Test')
     arg_parser.add_argument('-m', '--mount', choices=['l','r'], required=False, help='The pipette mount to be tested', default='l')
@@ -31,6 +36,9 @@ def build_arg_parser():
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=5)
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
+
+GAUGE_BLOCK_SIZE = 12 #mm
+PROBE_RADIUS = 2.75 #mm
 
 class Pipette_Calibration_Test:
     def __init__(
@@ -48,9 +56,9 @@ class Pipette_Calibration_Test:
         self.slot = slot
         self.z_offset = 25
         self.jog_speed = 10 # mm/s
-        self.jog_distance = 25 # mm
         self.CUTOUT_SIZE = 20 # mm
         self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
+        self.jog_distance = self.CUTOUT_HALF + GAUGE_BLOCK_SIZE # mm
         self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
         self.Z_PREP_OFFSET = Point(x=13, y=13, z=0)
         self.test_data ={
@@ -124,8 +132,12 @@ class Pipette_Calibration_Test:
         gauge_position = self.slot_center + self.gauge_offsets[axis]
         if axis == "X":
             jog_position = gauge_position._replace(x=gauge_position.x - self.jog_distance)
+            LOG.info(f"{axis}: gauge_position: {gauge_position.x}")
+            LOG.info(f"{axis}: jog_position: {jog_position}")
         elif axis == "Y":
             jog_position = gauge_position._replace(y=gauge_position.y + self.jog_distance)
+            LOG.info(f"{axis}: gauge_position: {gauge_position.y}")
+            LOG.info(f"{axis}: jog_position: {jog_position}")
         elif axis == "Z":
             jog_position = self.slot_center
         # Move to gauge position
@@ -243,6 +255,7 @@ class Pipette_Calibration_Test:
         try:
             await self.test_setup()
             if self.api and self.mount:
+                await self.api.home()
                 if len(self.gauges) > 0:
                     self._zero_gauges()
                 for i in range(self.cycles):
@@ -253,6 +266,13 @@ class Pipette_Calibration_Test:
                     await self._calibrate_slot(self.api, self.mount, self.slot)
                     if len(self.gauges) > 0:
                         await self._measure_gauges(self.api, self.mount)
+                        for axis in self.gauges:
+                            gauge_zero_key = "{} Zero".format(axis)
+                            gauge_key = "{} Gauge".format(axis)
+                            gauge_zero = float(self.test_data[gauge_zero_key])
+                            gauge_result = float(self.test_data[gauge_key])
+                            print(f"{axis} Error: {gauge_result - gauge_zero - PROBE_RADIUS}")
+
                     await self._record_data(cycle)
         except Exception as e:
             await self.exit()
@@ -261,6 +281,7 @@ class Pipette_Calibration_Test:
             await self.exit()
             print("Test Cancelled!")
         finally:
+            print(f"{self.test_path}/{self.test_file}")
             await self.exit()
             print("Test Completed!")
 
