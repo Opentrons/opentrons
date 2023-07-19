@@ -26,6 +26,8 @@ import { TertiaryButton } from '../../atoms/buttons'
 import { StepMeter } from '../../atoms/StepMeter'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { useLastRunCommandKey } from '../../organisms/Devices/hooks/useLastRunCommandKey'
+import { InterventionModal } from '../../organisms/InterventionModal'
+import { isInterventionCommand } from '../../organisms/InterventionModal/utils'
 import {
   useRunStatus,
   useRunTimestamps,
@@ -43,6 +45,7 @@ import { CancelingRunModal } from '../../organisms/OnDeviceDisplay/RunningProtoc
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol/ConfirmCancelRunModal'
 import { getLocalRobot } from '../../redux/discovery'
 
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { OnDeviceRouteParams } from '../../App/types'
 
 const RUN_STATUS_REFETCH_INTERVAL = 5000
@@ -72,6 +75,10 @@ export function RunningProtocol(): JSX.Element {
   const [
     showConfirmCancelRunModal,
     setShowConfirmCancelRunModal,
+  ] = React.useState<boolean>(false)
+  const [
+    showInterventionModal,
+    setShowInterventionModal,
   ] = React.useState<boolean>(false)
   const lastAnimatedCommand = React.useRef<string | null>(null)
   const swipe = useSwipe()
@@ -116,6 +123,22 @@ export function RunningProtocol(): JSX.Element {
     }
   }, [currentOption, swipe, swipe.setSwipeType])
 
+  const currentCommand = robotSideAnalysis?.commands.find(
+    (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
+  )
+
+  if (
+    currentCommand != null &&
+    isInterventionCommand(currentCommand) &&
+    !showInterventionModal
+  ) {
+    // this setTimeout is a hacky way to make sure the modal closes when we tell it to
+    // we can run into issues when there are 2 back to back move labware commands
+    // the modal never really un-renders and so the animations break after the first modal
+    // not really a fan of this, but haven't been able to fix the problem any other way
+    setTimeout(() => setShowInterventionModal(true), 0)
+  }
+
   return (
     <>
       {runStatus === RUN_STATUS_STOP_REQUESTED ? <CancelingRunModal /> : null}
@@ -140,6 +163,20 @@ export function RunningProtocol(): JSX.Element {
             runId={runId}
             setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
             isActiveRun={true}
+          />
+        ) : null}
+        {showInterventionModal &&
+        runRecord?.data != null &&
+        currentCommand != null ? (
+          <InterventionModal
+            robotName={robotName}
+            command={currentCommand}
+            onResume={() => {
+              setShowInterventionModal(false)
+              playRun()
+            }}
+            run={runRecord.data}
+            analysis={robotSideAnalysis}
           />
         ) : null}
         <Flex
