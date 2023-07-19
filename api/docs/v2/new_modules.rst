@@ -542,6 +542,7 @@ To prepare the deck before running a protocol, use the labware latch controls in
 
 Loading Labware
 ===============
+.. use text from labware library
 
 Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it. Currently, only the following combinations are supported in the Opentrons Labware Library:
 
