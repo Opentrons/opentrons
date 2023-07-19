@@ -15,7 +15,7 @@ const defaultTabStyle = css`
   border-top: ${BORDERS.transparentLineBorder};
   border-left: ${BORDERS.transparentLineBorder};
   border-right: ${BORDERS.transparentLineBorder};
-  padding: ${SPACING.spacing3} ${SPACING.spacing4};
+  padding: ${SPACING.spacing8} ${SPACING.spacing16};
   position: ${POSITION_RELATIVE};
 `
 

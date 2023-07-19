@@ -24,7 +24,7 @@ import {
   HOME,
 } from '../../redux/robot-controls'
 
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { StyledText } from '../../atoms/text'
@@ -181,8 +181,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
       <InProgressModal>
         <StyledText
           css={TYPOGRAPHY.h1Default}
-          marginTop={SPACING.spacing5}
-          marginBottom={SPACING.spacing3}
+          marginTop={SPACING.spacing24}
+          marginBottom={SPACING.spacing8}
         >
           {t('moving_gantry')}
         </StyledText>
@@ -303,7 +303,7 @@ export function ChangePipette(props: Props): JSX.Element | null {
     )
   }
   return (
-    <ModalShell width="42.375rem">
+    <LegacyModalShell width="42.375rem">
       <WizardHeader
         totalSteps={eightChannel ? EIGHT_CHANNEL_STEPS : SINGLE_CHANNEL_STEPS}
         currentStep={currentStepCount}
@@ -311,6 +311,6 @@ export function ChangePipette(props: Props): JSX.Element | null {
         onExit={exitWizardHeader}
       />
       {contents}
-    </ModalShell>
+    </LegacyModalShell>
   )
 }

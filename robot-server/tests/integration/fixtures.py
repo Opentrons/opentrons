@@ -1,4 +1,6 @@
-import requests
+"""Fixtures to be used by Tavern tests."""
+
+
 from box import Box
 from requests import Response
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION
@@ -30,36 +32,6 @@ def check_health_response(response: Response) -> None:
     }
 
     assert response.json() == expected
-
-
-def delete_all_runs(response: Response, host: str, port: str) -> None:
-    """Intake the response of a GET /runs and delete all runs if any exist."""
-    headers = {"Opentrons-Version": "*"}
-    base_url = f"{host}:{port}"
-    runs = response.json()["data"]
-    run_ids = [run["id"] for run in runs]
-    for run_id in run_ids:
-        delete_response = requests.delete(f"{base_url}/runs/{run_id}", headers=headers)
-        print(
-            f"Deleted run {run_id},"
-            f" response status code = {delete_response.status_code}"
-        )
-
-
-def delete_all_protocols(response: Response, host: str, port: str) -> None:
-    """Intake the response of a GET /protocols and delete all protocols if any exist."""
-    headers = {"Opentrons-Version": "*"}
-    base_url = f"{host}:{port}"
-    protocols = response.json()["data"]
-    protocol_ids = [protocol["id"] for protocol in protocols]
-    for protocol_id in protocol_ids:
-        delete_response = requests.delete(
-            f"{base_url}/protocols/{protocol_id}", headers=headers
-        )
-        print(
-            f"Deleted protocol {protocol_id},"
-            f" response status code = {delete_response.status_code}"
-        )
 
 
 def get_module_id(response: Response, module_model: ModuleModel) -> Box:

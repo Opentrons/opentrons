@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   DIRECTION_COLUMN,
@@ -11,12 +11,12 @@ import {
   TYPOGRAPHY,
   COLORS,
   Btn,
-  ALIGN_FLEX_END,
   JUSTIFY_FLEX_END,
   JUSTIFY_START,
   JUSTIFY_CENTER,
   PrimaryButton,
   RESPONSIVENESS,
+  ALIGN_FLEX_END,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
@@ -49,12 +49,22 @@ const GO_BACK_BUTTON_DISABLED_STYLE = css`
   ${TYPOGRAPHY.pSemiBold};
   color: ${COLORS.darkBlack70};
 `
-const HEADER_STYLE = css`
+const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    font-size: ${TYPOGRAPHY.fontSize28};
-    font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
+    ${TYPOGRAPHY.level4HeaderSemiBold};
+    height: ${SPACING.spacing40};
+  }
+`
+
+const TILE_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  padding: ${SPACING.spacing32};
+  height: 24.625rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 29.5rem;
   }
 `
 export interface GenericWizardTileProps {
@@ -103,24 +113,15 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
   }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      height={isOnDevice ? '30rem' : '24.625rem'}
-      padding={SPACING.spacing6}
-    >
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacingXXL}>
+    <Flex css={TILE_CONTAINER_STYLE}>
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing24}
         >
-          {typeof header === 'string' ? (
-            <StyledText css={HEADER_STYLE}>{header}</StyledText>
-          ) : (
-            header
-          )}
-          {bodyText}
+          {typeof header === 'string' ? <Title>{header}</Title> : header}
+          <StyledText as="p">{bodyText}</StyledText>
         </Flex>
         <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
           {rightHandBody}
@@ -143,11 +144,7 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         {getHelp != null ? <NeedHelpLink href={getHelp} /> : null}
         {proceed != null && proceedButton == null ? (
           isOnDevice ? (
-            <SmallButton
-              buttonText={proceedButtonText}
-              buttonType="primary"
-              onClick={proceed}
-            />
+            <SmallButton buttonText={proceedButtonText} onClick={proceed} />
           ) : (
             <PrimaryButton
               disabled={proceedIsDisabled}

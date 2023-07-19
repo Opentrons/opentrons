@@ -106,10 +106,7 @@ export const HeaterShakerModuleData = (
   }
 
   return (
-    <Flex
-      flexWrap={WRAP}
-      gridGap={`${String(SPACING.spacing1)} ${String(SPACING.spacing6)}`}
-    >
+    <Flex flexWrap={WRAP} gridGap={`${SPACING.spacing2} ${SPACING.spacing32}`}>
       {showTemperatureData && (
         <Flex
           flexDirection={DIRECTION_COLUMN}
@@ -120,7 +117,7 @@ export const HeaterShakerModuleData = (
             color={COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
-            marginTop={SPACING.spacing3}
+            marginTop={SPACING.spacing8}
           >
             {t('heater')}
           </StyledText>
@@ -131,7 +128,7 @@ export const HeaterShakerModuleData = (
           <StyledText
             title="heater_target_temp"
             fontSize={TYPOGRAPHY.fontSizeH6}
-            marginBottom={SPACING.spacing1}
+            marginBottom={SPACING.spacing2}
           >
             {t(
               moduleData.targetTemperature != null ? 'target_temp' : 'na_temp',
@@ -154,7 +151,7 @@ export const HeaterShakerModuleData = (
           color={COLORS.darkGreyEnabled}
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           fontSize={TYPOGRAPHY.fontSizeH6}
-          marginTop={SPACING.spacing3}
+          marginTop={SPACING.spacing8}
         >
           {t('shaker')}
         </StyledText>
@@ -166,7 +163,7 @@ export const HeaterShakerModuleData = (
         <StyledText
           title="shaker_target_speed"
           fontSize={TYPOGRAPHY.fontSizeH6}
-          marginBottom={SPACING.spacing1}
+          marginBottom={SPACING.spacing2}
         >
           {t(moduleData.targetSpeed != null ? 'target_speed' : 'na_speed', {
             speed: moduleData.targetSpeed,
@@ -190,21 +187,21 @@ export const HeaterShakerModuleData = (
             color={COLORS.darkGreyEnabled}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
-            marginTop={SPACING.spacing3}
+            marginTop={SPACING.spacing8}
             title="latch_status"
           >
             {t('labware_latch', { ns: 'heater_shaker' })}
           </StyledText>
           <Flex
             flexDirection={DIRECTION_ROW}
-            marginTop={SPACING.spacing2}
+            marginTop={SPACING.spacing4}
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             fontSize={TYPOGRAPHY.fontSizeH6}
           >
             {isShaking && (
               <Icon
                 paddingBottom="3px"
-                paddingRight={SPACING.spacing2}
+                paddingRight={SPACING.spacing4}
                 name="closed-locked"
                 data-testid="HeaterShakerModuleData_latch_lock"
                 size={SIZE_1}

@@ -266,7 +266,10 @@ class OT3UpdateActions(UpdateActionsInterface):
 
     def write_machine_id(self, current_root: str, new_root: str) -> None:
         """Copy the machine id over to the new partition"""
-        pass
+        mid = open(os.path.join(current_root, "etc", "machine-id")).read()
+        with open(os.path.join(new_root, "etc", "machine-id"), "w") as new_mid:
+            new_mid.write(mid)
+        LOG.info(f"Wrote machine_id {mid.strip()} to {new_root}/etc/machine-id")
 
     def write_update(
         self,
@@ -299,3 +302,14 @@ class OT3UpdateActions(UpdateActionsInterface):
         )
         if not success:
             raise RuntimeError(msg)
+
+    def clean_up(self, download_dir: str) -> None:
+        """Deletes the update contents in the download dir."""
+        LOG.info(f"Cleaning up download dir {download_dir}.")
+        for file in os.listdir(download_dir):
+            filepath = os.path.join(download_dir, file)
+            LOG.debug(f"Deleting {filepath}")
+            try:
+                os.remove(filepath)
+            except Exception:
+                LOG.exception(f"Could not delete update file {filepath}.")

@@ -1,7 +1,6 @@
 """Request and response models for /instruments endpoints."""
 from __future__ import annotations
 
-import enum
 from typing_extensions import Literal
 from typing import Optional, TypeVar, Union, Generic
 from datetime import datetime
@@ -9,7 +8,6 @@ from pydantic import BaseModel, Field
 from pydantic.generics import GenericModel
 
 
-from opentrons.types import Mount
 from opentrons.calibration_storage.types import SourceType
 from opentrons.protocol_engine.types import Vec3f
 from opentrons_shared_data.pipette.dev_types import (
@@ -18,7 +16,7 @@ from opentrons_shared_data.pipette.dev_types import (
     ChannelCount,
 )
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
-
+from robot_server.subsystems.models import SubSystem
 
 InstrumentModelT = TypeVar(
     "InstrumentModelT", bound=Union[GripperModelStr, PipetteModel]
@@ -26,21 +24,6 @@ InstrumentModelT = TypeVar(
 InstrumentDataT = TypeVar("InstrumentDataT", bound=BaseModel)
 
 InstrumentType = Literal["pipette", "gripper"]
-
-
-# TODO (spp, 2023-01-03): use MountType from opentrons.types once it has extension type
-class MountType(enum.Enum):
-    """Available mount types."""
-
-    LEFT = "left"
-    RIGHT = "right"
-    EXTENSION = "extension"
-
-    @staticmethod
-    def from_hw_mount(mount: Mount) -> MountType:
-        """Convert from Mount to MountType."""
-        mount_map = {Mount.LEFT: MountType.LEFT, Mount.RIGHT: MountType.RIGHT}
-        return mount_map[mount]
 
 
 class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT]):
@@ -51,8 +34,17 @@ class _GenericInstrument(GenericModel, Generic[InstrumentModelT, InstrumentDataT
         ..., description="Type of instrument- either a pipette or a gripper."
     )
     instrumentModel: InstrumentModelT = Field(..., description="Instrument model.")
-    # TODO (spp, 2023-01-06): add firmware version field
     serialNumber: str = Field(..., description="Instrument hardware serial number.")
+    subsystem: Optional[SubSystem] = Field(
+        None,
+        description="The subsystem corresponding to this instrument.",
+    )
+    ok: Literal[True] = Field(
+        ..., description="Whether this instrument is OK and ready to go"
+    )
+    firmwareVersion: Optional[str] = Field(
+        None, description="The firmware version of this instrument (if applicable)"
+    )
     data: InstrumentDataT
 
 
@@ -106,4 +98,35 @@ class Gripper(_GenericInstrument[GripperModelStr, GripperData]):
     data: GripperData
 
 
-AttachedInstrument = Union[Pipette, Gripper]
+class _BadInstrument(BaseModel):
+    """Represents something that is physically connected but broken in some way. Must be updated."""
+
+    subsystem: SubSystem = Field(
+        ..., description="The hardware subsystem for this instrument"
+    )
+    status: str = Field(
+        ...,
+        description="A route on this server to more information about the status of the hardware",
+    )
+    update: str = Field(
+        ..., description="A route on this server to begin an update of the instrument"
+    )
+    ok: Literal[False] = Field(
+        ...,
+        description="If the instrument is not OK, a previous update was interrupted. It must be updated again.",
+    )
+
+
+class BadGripper(_BadInstrument):
+    """Represents a gripper that is physically connected but not ready to operate."""
+
+    instrumentType: Literal["gripper"] = "gripper"
+
+
+class BadPipette(_BadInstrument):
+    """Represents a pipette that is physically connected but not ready to operate."""
+
+    instrumentType: Literal["pipette"] = "pipette"
+
+
+AttachedItem = Union[Pipette, Gripper, BadPipette, BadGripper]

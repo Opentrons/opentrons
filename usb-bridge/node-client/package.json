@@ -1,0 +1,30 @@
+{
+  "name": "@opentrons/node-usb-bridge-client",
+  "version": "0.0.0-dev",
+  "description": "Node.js client for sending HTTP over a USB serial connection",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "source": "src/index.ts",
+  "bin": {
+    "usb-curl": "bin/index.js"
+  },
+  "scripts": {
+    "usb-curl": "bin/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Opentrons/opentrons.git"
+  },
+  "author": "Opentrons Labworks <engineering@opentrons.com> (https://opentrons.com)",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Opentrons/opentrons/issues"
+  },
+  "homepage": "https://github.com/Opentrons/opentrons#readme",
+  "dependencies": {
+    "serialport": "10.5.0",
+    "yargs": "15.4.0",
+    "node-fetch": "2.6.7",
+    "agent-base": "^6.0.0"
+  }
+}

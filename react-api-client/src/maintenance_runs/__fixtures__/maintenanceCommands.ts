@@ -21,11 +21,6 @@ export const mockLoadLabwareRunCommandSummary: RunCommandSummary = {
       slotName: '1',
     },
   },
-  result: {
-    labwareId: 'abc123',
-    definition: {} as any,
-    offset: { x: 1, y: 2, z: 3 },
-  },
   status: 'running',
   createdAt: 'fake_created_at_timestamp',
   startedAt: 'fake_created_at_timestamp',
@@ -39,9 +34,7 @@ export const mockLoadPipetteRunCommandSummary: RunCommandSummary = {
   params: {
     mount: 'left',
     pipetteId: 'fake_load_pipette_id',
-  },
-  result: {
-    pipetteId: 'abc123',
+    pipetteName: 'p10_single',
   },
   status: 'running',
   createdAt: 'fake_created_at_timestamp',

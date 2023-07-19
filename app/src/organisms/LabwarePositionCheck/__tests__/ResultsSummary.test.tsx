@@ -43,7 +43,7 @@ describe('ResultsSummary', () => {
   it('renders correct copy', () => {
     const { getByText, getByRole } = render(props)
     getByText('New labware offset data')
-    getByRole('button', { name: 'Apply Offsets' })
+    getByRole('button', { name: 'Apply offsets' })
     getByRole('link', { name: 'Need help?' })
     getByRole('columnheader', { name: 'location' })
     getByRole('columnheader', { name: 'labware' })
@@ -51,7 +51,7 @@ describe('ResultsSummary', () => {
   })
   it('calls handle apply offsets function when button is clicked', () => {
     const { getByRole } = render(props)
-    getByRole('button', { name: 'Apply Offsets' }).click()
+    getByRole('button', { name: 'Apply offsets' }).click()
     expect(props.handleApplyOffsets).toHaveBeenCalled()
   })
   it('renders a row per offset to apply', () => {

@@ -13,6 +13,7 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   JUSTIFY_CENTER,
   ALIGN_CENTER,
+  ALIGN_FLEX_START,
 } from '@opentrons/components'
 import { RUN_STATUS_RUNNING, RUN_STATUS_IDLE } from '@opentrons/api-client'
 
@@ -66,15 +67,31 @@ const RUN_TIMER_STYLE = css`
   color: ${COLORS.darkBlackEnabled};
 `
 
-const COMMAND_ROW_STYLE = css`
+const COMMAND_ROW_STYLE_ANIMATED = css`
   font-size: 1.375rem;
   line-height: 1.75rem;
   font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  text-align: center;
+  width: fit-content;
+  margin: auto;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
   animation: ${fadeIn} 1.5s ease-in-out;
+`
+
+const COMMAND_ROW_STYLE = css`
+  font-size: 1.375rem;
+  line-height: 1.75rem;
+  font-weight: ${TYPOGRAPHY.fontWeightRegular};
+  text-align: center;
+  width: fit-content;
+  margin: auto;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 `
 
 interface RunTimerInfo {
@@ -93,6 +110,8 @@ interface CurrentRunningProtocolCommandProps {
   setShowConfirmCancelRunModal: (showConfirmCancelRunModal: boolean) => void
   trackProtocolRunEvent: TrackProtocolRunEvent
   robotAnalyticsData: RobotAnalyticsData | null
+  lastAnimatedCommand: string | null
+  updateLastAnimatedCommand: (newCommandKey: string) => void
   protocolName?: string
   currentRunCommandIndex?: number
 }
@@ -108,11 +127,26 @@ export function CurrentRunningProtocolCommand({
   robotAnalyticsData,
   protocolName,
   currentRunCommandIndex,
+  lastAnimatedCommand,
+  updateLastAnimatedCommand,
 }: CurrentRunningProtocolCommandProps): JSX.Element | null {
   const { t } = useTranslation('run_details')
   const currentCommand = robotSideAnalysis?.commands.find(
     (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
   )
+
+  let shouldAnimate = true
+  if (currentCommand?.key != null) {
+    if (lastAnimatedCommand == null) {
+      updateLastAnimatedCommand(currentCommand.key)
+      shouldAnimate = true
+    } else if (lastAnimatedCommand === currentCommand.key) {
+      shouldAnimate = false
+    } else {
+      shouldAnimate = true
+      updateLastAnimatedCommand(currentCommand.key)
+    }
+  }
   const currentRunStatus = t(`status_${runStatus}`)
 
   const onStop = (): void => {
@@ -142,29 +176,34 @@ export function CurrentRunningProtocolCommand({
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacingXXL}
+      gridGap={SPACING.spacing40}
       height="29.5rem"
     >
       <Flex
         flexDirection={DIRECTION_ROW}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
+        alignItems={ALIGN_FLEX_START}
+        gridGap={SPACING.spacing40}
+        height="6.75rem"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText
             fontSize={TYPOGRAPHY.fontSize28}
             lineHeight={TYPOGRAPHY.lineHeight36}
-            fontWeight="700"
+            fontWeight={TYPOGRAPHY.fontWeightBold}
           >
             {currentRunStatus}
           </StyledText>
           <StyledText css={TITLE_TEXT_STYLE}>{protocolName}</StyledText>
         </Flex>
-        <RunTimer {...runTimerInfo} style={RUN_TIMER_STYLE} />
+        <Flex height="100%" alignItems={ALIGN_CENTER}>
+          <RunTimer {...runTimerInfo} style={RUN_TIMER_STYLE} />
+        </Flex>
       </Flex>
 
       <Flex
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing5}
+        gridGap={SPACING.spacing24}
         justifyContent={JUSTIFY_CENTER}
         alignItems={ALIGN_CENTER}
       >
@@ -175,16 +214,16 @@ export function CurrentRunningProtocolCommand({
         />
       </Flex>
       <Flex
-        padding={`0.75rem ${SPACING.spacing5}`}
+        padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
         backgroundColor={COLORS.mediumBlueEnabled}
-        borderRadius={BORDERS.size_two}
+        borderRadius={BORDERS.borderRadiusSize2}
         justifyContent={JUSTIFY_CENTER}
+        css={shouldAnimate ? COMMAND_ROW_STYLE_ANIMATED : COMMAND_ROW_STYLE}
       >
         {robotSideAnalysis != null && currentCommand != null ? (
           <CommandText
             command={currentCommand}
             robotSideAnalysis={robotSideAnalysis}
-            css={COMMAND_ROW_STYLE}
           />
         ) : null}
       </Flex>

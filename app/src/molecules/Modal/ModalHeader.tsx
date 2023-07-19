@@ -1,79 +1,60 @@
 import * as React from 'react'
-import { css } from 'styled-components'
 import {
-  Btn,
-  Icon,
-  TYPOGRAPHY,
-  Flex,
   ALIGN_CENTER,
+  BORDERS,
+  COLORS,
+  DIRECTION_ROW,
+  Flex,
+  Icon,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
-  JUSTIFY_CENTER,
-  COLORS,
+  TYPOGRAPHY,
 } from '@opentrons/components'
-
 import { StyledText } from '../../atoms/text'
-import { Divider } from '../../atoms/structure'
-import type { IconProps } from '@opentrons/components'
+import type { ModalHeaderBaseProps } from '../Modal/types'
 
-export interface ModalHeaderProps {
-  onClose?: React.MouseEventHandler
-  title: React.ReactNode
-  icon?: IconProps
-  closeButton?: JSX.Element
-}
-
-const closeIconStyles = css`
-  display: flex;
-  justify-content: ${JUSTIFY_CENTER};
-  align-items: ${ALIGN_CENTER};
-  border-radius: 0.875rem;
-  width: ${SPACING.spacingL};
-  height: ${SPACING.spacingL};
-  &:hover {
-    background-color: ${COLORS.lightGreyHover};
-  }
-
-  &:active {
-    background-color: ${COLORS.lightGreyPressed};
-  }
-`
-
-export const ModalHeader = (props: ModalHeaderProps): JSX.Element => {
-  const { icon, onClose, title, closeButton } = props
+export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
+  const { title, hasExitIcon, iconName, iconColor, onClick } = props
   return (
-    <>
-      <Flex
-        alignItems={ALIGN_CENTER}
-        justifyContent={JUSTIFY_SPACE_BETWEEN}
-        paddingX={SPACING.spacing5}
-        paddingY={SPACING.spacing4}
-      >
-        <Flex>
-          {icon != null && <Icon {...icon} />}
-          <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {title}
-          </StyledText>
-        </Flex>
-        {closeButton != null
-          ? { closeButton }
-          : onClose != null && (
-              <Btn
-                onClick={onClose}
-                css={closeIconStyles}
-                data-testid={`ModalHeader_icon_close${
-                  typeof title === 'string' ? `_${title}` : ''
-                }`}
-              >
-                <Icon
-                  name="close"
-                  width={SPACING.spacing5}
-                  height={SPACING.spacing5}
-                />
-              </Btn>
-            )}
+    <Flex
+      backgroundColor={COLORS.white}
+      color={COLORS.black}
+      height="6.25rem"
+      width="100%"
+      padding={SPACING.spacing32}
+      flexDirection={DIRECTION_ROW}
+      justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
+      borderRadius={`${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3} 0px 0px`}
+    >
+      <Flex flexDirection={DIRECTION_ROW}>
+        {iconName != null && iconColor != null ? (
+          <Icon
+            aria-label={`icon_${iconName}`}
+            name={iconName}
+            color={iconColor}
+            size="2rem"
+            alignSelf={ALIGN_CENTER}
+            marginRight={SPACING.spacing16}
+          />
+        ) : null}
+        <StyledText
+          fontWeight={TYPOGRAPHY.fontWeightBold}
+          fontSize={TYPOGRAPHY.fontSize28}
+          lineHeight={TYPOGRAPHY.lineHeight36}
+        >
+          {title}
+        </StyledText>
       </Flex>
-      <Divider width="100%" marginY="0" />
-    </>
+      {hasExitIcon && onClick != null ? (
+        <Flex
+          onClick={onClick}
+          aria-label="closeIcon"
+          alignItems={ALIGN_CENTER}
+        >
+          <Icon size="3.5rem" name="ot-close" />
+        </Flex>
+      ) : null}
+    </Flex>
   )
 }

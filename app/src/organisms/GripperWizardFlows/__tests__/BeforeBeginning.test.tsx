@@ -37,6 +37,8 @@ describe('BeforeBeginning', () => {
       createMaintenanceRun: jest.fn(),
       isCreateLoading: false,
       isRobotMoving: false,
+      setShowErrorMessage: jest.fn(),
+      errorMessage: null,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
@@ -53,7 +55,7 @@ describe('BeforeBeginning', () => {
     getByText('You will need:')
     // getByText('mock need help link')
     getByText('Calibration Pin')
-    getByText('T10 Torx Screwdriver')
+    getByText('2.5 mm Hex Screwdriver')
     getByText(
       'Provided with robot. Using another size can strip the instrument’s screws.'
     )
@@ -71,7 +73,7 @@ describe('BeforeBeginning', () => {
           params: { mount: 'left' },
         },
       ],
-      true
+      false
     )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
@@ -85,7 +87,7 @@ describe('BeforeBeginning', () => {
       'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
     )
     getByText('You will need:')
-    getByText('T10 Torx Screwdriver')
+    getByText('2.5 mm Hex Screwdriver')
     getByText(
       'Provided with robot. Using another size can strip the instrument’s screws.'
     )
@@ -94,12 +96,13 @@ describe('BeforeBeginning', () => {
     getByRole('button', { name: 'Move gantry to front' }).click()
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
+        { commandType: 'home', params: {} },
         {
           commandType: 'calibration/moveToMaintenancePosition',
           params: { mount: 'left' },
         },
       ],
-      true
+      false
     )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()
@@ -132,7 +135,7 @@ describe('BeforeBeginning', () => {
           params: { mount: 'left' },
         },
       ],
-      true
+      false
     )
     await waitFor(() => {
       expect(props.proceed).toHaveBeenCalled()

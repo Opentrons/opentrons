@@ -10,28 +10,26 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { StyledText } from '../../atoms/text'
+
 export function ODDBackButton(
   props: React.HTMLProps<HTMLButtonElement>
 ): JSX.Element {
   const { onClick, label } = props
 
   return (
-    <Flex
-      alignItems={ALIGN_CENTER}
-      fontSize={TYPOGRAPHY.fontSize38}
-      fontWeight={TYPOGRAPHY.fontWeightBold}
-      gridGap={SPACING.spacing4}
-      lineHeight={TYPOGRAPHY.lineHeight48}
-    >
+    <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing16}>
       <Btn onClick={onClick}>
         <Icon
           color={COLORS.darkBlack100}
           data-testid="back_icon"
           name="back"
-          width="2.5rem"
+          width="3rem"
         />
       </Btn>
-      {label}
+      <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        {label}
+      </StyledText>
     </Flex>
   )
 }

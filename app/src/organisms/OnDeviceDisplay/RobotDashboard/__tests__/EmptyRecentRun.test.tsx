@@ -4,7 +4,7 @@ import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../../i18n'
 import { EmptyRecentRun } from '../EmptyRecentRun'
 
-const PNG_FILE_NAME = 'empty_recent_protocol_run.png'
+const PNG_FILE_NAME = 'empty_protocol_dashboard.png'
 
 const render = () => {
   return renderWithProviders(<EmptyRecentRun />, {
@@ -15,7 +15,7 @@ const render = () => {
 describe('EmptyRecentRun', () => {
   it('should render image and text', () => {
     const [{ getByText, getByAltText, getByRole }] = render()
-    getByAltText('There is no recent run protocol')
+    getByAltText('No recent runs')
     getByText('No recent runs')
     getByText('After you run some protocols, they will appear here.')
     const image = getByRole('img')

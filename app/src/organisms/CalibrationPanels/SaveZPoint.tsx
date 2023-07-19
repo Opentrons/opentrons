@@ -89,23 +89,23 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
       <Flex
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        padding={SPACING.spacing6}
+        padding={SPACING.spacing32}
         minHeight="32rem"
       >
         <Flex
           justifyContent={JUSTIFY_SPACE_BETWEEN}
           alignSelf={ALIGN_STRETCH}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <StyledText as="h1" marginBottom={SPACING.spacing4}>
+            <StyledText as="h1" marginBottom={SPACING.spacing16}>
               {title}
             </StyledText>
             <Trans
               t={t}
               i18nKey={bodyTranslationKey}
               components={{
-                block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
+                block: <StyledText as="p" marginBottom={SPACING.spacing8} />,
               }}
             />
           </Flex>
@@ -132,12 +132,12 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
           stepSizes={[SMALL_STEP_SIZE_MM, MEDIUM_STEP_SIZE_MM]}
           initialPlane={VERTICAL_PLANE}
         />
-        <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing2}>
+        <Box alignSelf={ALIGN_FLEX_END} marginTop={SPACING.spacing4}>
           {confirmLink}
         </Box>
         <Flex
           width="100%"
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <NeedHelpLink />

@@ -1,6 +1,7 @@
 """ opentrons.util.entrypoint_util: functions common to entrypoints
 """
 
+from dataclasses import dataclass
 import logging
 from json import JSONDecodeError
 import pathlib
@@ -16,10 +17,23 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
+@dataclass
+class FoundLabware:
+    """An individual labware found by `labware_from_paths()`."""
+
+    path: pathlib.Path
+    definition: "LabwareDefinition"
+
+
 def labware_from_paths(
     paths: Sequence[Union[str, pathlib.Path]]
-) -> Dict[str, "LabwareDefinition"]:
-    labware_defs: Dict[str, "LabwareDefinition"] = {}
+) -> Dict[str, FoundLabware]:
+    """Search paths for labware definitions.
+
+    Returns:
+        A dict, keyed by labware URI, where each value has the file path and the parsed def.
+    """
+    labware_defs: Dict[str, FoundLabware] = {}
 
     for strpath in paths:
         log.info(f"local labware: checking path {strpath}")
@@ -34,12 +48,15 @@ def labware_from_paths(
             if child.is_file() and child.suffix.endswith("json"):
                 try:
                     defn = labware.verify_definition(child.read_bytes())
-                except (ValidationError, JSONDecodeError) as e:
+                except (ValidationError, JSONDecodeError):
                     log.info(f"{child}: invalid labware, ignoring")
-                    log.debug(f"{child}: labware invalid because: {str(e)}")
+                    log.debug(
+                        f"{child}: labware invalid because of this exception.",
+                        exc_info=True,
+                    )
                 else:
                     uri = helpers.uri_from_definition(defn)
-                    labware_defs[uri] = defn
+                    labware_defs[uri] = FoundLabware(path=child, definition=defn)
                     log.info(f"loaded labware {uri} from {child}")
             else:
                 log.info(f"ignoring {child} in labware path")

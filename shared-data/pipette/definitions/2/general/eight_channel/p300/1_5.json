@@ -32,5 +32,7 @@
   "channels": 8,
   "shaftDiameter": 5.0,
   "shaftULperMM": 19.635,
-  "backCompatNames": []
+  "backCompatNames": [],
+  "backlashDistance": 0.0,
+  "quirks": ["dropTipShake", "doubleDropTip"]
 }

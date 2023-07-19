@@ -50,7 +50,9 @@ from opentrons.hardware_control import (
 )
 from opentrons.protocol_api import ProtocolContext, Labware, create_protocol_context
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
+from opentrons.protocols.api_support import deck_type
 from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.types import Location, Point
 
 from .protocol_engine_in_thread import protocol_engine_in_thread
@@ -230,11 +232,19 @@ async def robot_model(
 
 
 @pytest.fixture
-def deck_definition(robot_model: RobotModel) -> DeckDefinitionV3:
+def deck_definition_name(robot_model: RobotModel) -> str:
     if robot_model == "OT-3 Standard":
-        return load_deck("ot3_standard", DEFAULT_DECK_DEFINITION_VERSION)
-    else:
-        return load_deck("ot2_standard", DEFAULT_DECK_DEFINITION_VERSION)
+        return deck_type.STANDARD_OT3_DECK
+    elif robot_model == "OT-2 Standard":
+        # There are two OT-2 deck definitions (standard and short-trash),
+        # but RobotModel does not draw such a distinction. We assume here that it's
+        # sufficient to run OT-2 tests with the standard deck definition only.
+        return deck_type.STANDARD_OT2_DECK
+
+
+@pytest.fixture
+def deck_definition(deck_definition_name: str) -> DeckDefinitionV3:
+    return load_deck(deck_definition_name, DEFAULT_DECK_DEFINITION_VERSION)
 
 
 @pytest.fixture()
@@ -257,22 +267,27 @@ async def hardware(
         yield hw
 
 
-def _make_ot2_non_pe_ctx(hardware: ThreadManagedHardware) -> ProtocolContext:
+def _make_ot2_non_pe_ctx(
+    hardware: ThreadManagedHardware, deck_type: str
+) -> ProtocolContext:
     """Return a ProtocolContext configured for an OT-2 and not backed by Protocol Engine."""
-    return create_protocol_context(api_version=APIVersion(2, 13), hardware_api=hardware)
+    return create_protocol_context(
+        api_version=APIVersion(2, 13), hardware_api=hardware, deck_type=deck_type
+    )
 
 
 @contextlib.contextmanager
 def _make_ot3_pe_ctx(
     hardware: ThreadManagedHardware,
+    deck_type: str,
 ) -> Generator[ProtocolContext, None, None]:
     """Return a ProtocolContext configured for an OT-3 and backed by Protocol Engine."""
     with protocol_engine_in_thread(hardware=hardware) as (engine, loop):
         yield create_protocol_context(
-            api_version=APIVersion(2, 14),
+            api_version=MAX_SUPPORTED_VERSION,
             hardware_api=hardware,
+            deck_type=deck_type,
             protocol_engine=engine,
-            # TODO will this deadlock?
             protocol_engine_loop=loop,
         )
 
@@ -282,14 +297,17 @@ def ctx(
     request: pytest.FixtureRequest,
     robot_model: RobotModel,
     hardware: ThreadManagedHardware,
+    deck_definition_name: str,
 ) -> Generator[ProtocolContext, None, None]:
     if robot_model == "OT-2 Standard":
-        yield _make_ot2_non_pe_ctx(hardware=hardware)
+        yield _make_ot2_non_pe_ctx(hardware=hardware, deck_type=deck_definition_name)
     elif robot_model == "OT-3 Standard":
         if request.node.get_closest_marker("apiv2_non_pe_only"):
             pytest.skip("Test requests only non-Protocol-Engine ProtocolContexts")
         else:
-            with _make_ot3_pe_ctx(hardware=hardware) as ctx:
+            with _make_ot3_pe_ctx(
+                hardware=hardware, deck_type=deck_definition_name
+            ) as ctx:
                 yield ctx
 
 

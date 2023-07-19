@@ -19,7 +19,7 @@ import RobotCalHelpImage from '../../assets/images/robot_calibration_help.png'
 import { ExternalLink } from '../../atoms/Link/ExternalLink'
 import { Divider } from '../../atoms/structure'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 
 const ROBOT_CAL_HELP_ARTICLE =
   'https://support.opentrons.com/s/article/How-positional-calibration-works-on-the-OT-2'
@@ -33,13 +33,13 @@ export function HowCalibrationWorksModal({
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return (
     <Portal level="top">
-      <Modal
+      <LegacyModal
         title={t('robot_cal_help_title')}
         onClose={onCloseClick}
         maxHeight="28.125rem"
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="p" marginBottom={SPACING.spacing4}>
+          <StyledText as="p" marginBottom={SPACING.spacing16}>
             {t('robot_cal_description')}
           </StyledText>
           <ExternalLink
@@ -49,14 +49,14 @@ export function HowCalibrationWorksModal({
           >
             {t('learn_more_about_robot_cal_link')}
           </ExternalLink>
-          <Box textAlign={ALIGN_CENTER} marginTop={SPACING.spacing4}>
+          <Box textAlign={ALIGN_CENTER} marginTop={SPACING.spacing16}>
             <img src={RobotCalHelpImage} width="100%" />
           </Box>
           {/* deck calibration */}
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            marginTop={SPACING.spacing4}
+            marginTop={SPACING.spacing16}
             role="heading"
           >
             {t('deck_calibration_title')}
@@ -71,7 +71,7 @@ export function HowCalibrationWorksModal({
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            marginTop={SPACING.spacing4}
+            marginTop={SPACING.spacing16}
             role="heading"
           >
             {t('tip_length_cal_title')}
@@ -84,7 +84,7 @@ export function HowCalibrationWorksModal({
           <StyledText
             as="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            marginTop={SPACING.spacing4}
+            marginTop={SPACING.spacing16}
             role="heading"
           >
             {t('pipette_offset_cal')}
@@ -98,8 +98,8 @@ export function HowCalibrationWorksModal({
             ]}
           />
           <Divider
-            marginTop={SPACING.spacingXXL}
-            marginBottom={SPACING.spacing4}
+            marginTop={SPACING.spacing40}
+            marginBottom={SPACING.spacing16}
           />
           <PrimaryButton
             onClick={onCloseClick}
@@ -109,7 +109,7 @@ export function HowCalibrationWorksModal({
             {t('shared:close')}
           </PrimaryButton>
         </Flex>
-      </Modal>
+      </LegacyModal>
     </Portal>
   )
 }
@@ -123,15 +123,15 @@ function CalibrationSteps({
   steps,
 }: CalibrationStepsProps): JSX.Element {
   return (
-    <Box marginTop={SPACING.spacing2}>
-      <StyledText as="p" marginBottom={SPACING.spacing3}>
+    <Box marginTop={SPACING.spacing4}>
+      <StyledText as="p" marginBottom={SPACING.spacing8}>
         {description}
       </StyledText>
       <ul>
         {steps.map(step => (
           <li
             css={css`
-              margin-left: ${SPACING.spacing5};
+              margin-left: ${SPACING.spacing24};
             `}
             key={step}
           >

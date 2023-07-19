@@ -19,8 +19,8 @@ import type { ModuleTypesThatRequireExtraAttention } from '../utils/getModuleTyp
 const HeaderRow = styled.div`
   display: grid;
   grid-template-columns: 6fr 5fr;
-  grip-gap: ${SPACING.spacing3};
-  padding: ${SPACING.spacing3};
+  grip-gap: ${SPACING.spacing8};
+  padding: ${SPACING.spacing8};
 `
 interface SetupLabwareListProps {
   attachedModuleInfo: { [moduleId: string]: ModuleRenderInfoForProtocol }
@@ -38,8 +38,8 @@ export function SetupLabwareList(
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing2}
-      marginBottom={SPACING.spacing4}
+      gridGap={SPACING.spacing4}
+      marginBottom={SPACING.spacing16}
     >
       <HeaderRow>
         <StyledText as="label" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

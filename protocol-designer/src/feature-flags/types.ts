@@ -25,9 +25,11 @@ export type FlagTypes =
   | 'PRERELEASE_MODE'
   | 'OT_PD_DISABLE_MODULE_RESTRICTIONS'
   | 'OT_PD_ENABLE_OT_3'
+  | 'OT_PD_ALLOW_ALL_TIPRACKS'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
   'OT_PD_DISABLE_MODULE_RESTRICTIONS',
+  'OT_PD_ALLOW_ALL_TIPRACKS',
 ]
 export const allFlags: FlagTypes[] = [...userFacingFlags, 'PRERELEASE_MODE']
 export type Flags = Partial<Record<FlagTypes, boolean | null | undefined>>

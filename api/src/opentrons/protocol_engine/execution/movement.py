@@ -64,6 +64,10 @@ class MovementHandler:
         speed: Optional[float] = None,
     ) -> Point:
         """Move to a specific well."""
+        self._state_store.labware.raise_if_labware_has_labware_on_top(
+            labware_id=labware_id
+        )
+
         await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_parent=self._state_store.labware.get_location(labware_id=labware_id)
         )
@@ -148,13 +152,6 @@ class MovementHandler:
 
         return point
 
-    async def home(self, axes: Optional[List[MotorAxis]]) -> None:
-        """Send the requested axes to their "home" positions.
-
-        If axes is `None`, will home all motors.
-        """
-        await self._gantry_mover.home(axes)
-
     async def move_to_coordinates(
         self,
         pipette_id: str,
@@ -190,3 +187,19 @@ class MovementHandler:
         )
 
         return final_point
+
+    async def home(self, axes: Optional[List[MotorAxis]]) -> None:
+        """Send the requested axes to their "home" positions.
+
+        If axes is `None`, will home all motors.
+        """
+        await self._gantry_mover.home(axes)
+
+    async def retract_axis(self, axis: MotorAxis) -> None:
+        """Retract the requested axis as close to its home positions as safely possible.
+
+        For the OT2, the axis will retract to a safe distance from its limit switch,
+        and then probe the limit switch to reach the home position.
+        For the OT3, the axis will retract to its known home position.
+        """
+        await self._gantry_mover.retract_axis(axis)

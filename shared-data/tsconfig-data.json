@@ -15,6 +15,7 @@
     "module/**/*.json",
     "pipette/**/*.json",
     "protocol/**/*.json",
+    "errors/**/*.json",
     "build/**/*.json"
   ],
   "exclude": ["**/*.ts"]

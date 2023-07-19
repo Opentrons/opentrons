@@ -1,7 +1,9 @@
 """Geometry state getters."""
-from typing import Optional, List, Set, Tuple, Union
+import enum
+from typing import Optional, List, Set, Tuple, Union, cast
 
-from opentrons.types import Point, DeckSlotName
+from opentrons.types import Point, DeckSlotName, MountType
+from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from .. import errors
 from ..types import (
@@ -15,15 +17,31 @@ from ..types import (
     WellOffset,
     DeckSlotLocation,
     ModuleLocation,
+    OnLabwareLocation,
+    ModuleOffsetVector,
     LabwareLocation,
     LabwareOffsetVector,
     DeckType,
     CurrentWell,
     TipGeometry,
 )
+from .config import Config
 from .labware import LabwareView
 from .modules import ModuleView
 from .pipettes import PipetteView
+
+from opentrons_shared_data.pipette import PIPETTE_X_SPAN
+from opentrons_shared_data.pipette.dev_types import ChannelCount
+
+
+SLOT_WIDTH = 128
+
+
+class _TipDropSection(enum.Enum):
+    """Well sections to drop tips in."""
+
+    LEFT = "left"
+    RIGHT = "right"
 
 
 # TODO(mc, 2021-06-03): continue evaluation of which selectors should go here
@@ -33,14 +51,17 @@ class GeometryView:
 
     def __init__(
         self,
+        config: Config,
         labware_view: LabwareView,
         module_view: ModuleView,
         pipette_view: PipetteView,
     ) -> None:
         """Initialize a GeometryView instance."""
+        self._config = config
         self._labware = labware_view
         self._modules = module_view
         self._pipettes = pipette_view
+        self._last_drop_tip_location_spot: Optional[_TipDropSection] = None
 
     def get_labware_highest_z(self, labware_id: str) -> float:
         """Get the highest Z-point of a labware."""
@@ -90,37 +111,89 @@ class GeometryView:
             min_travel_z = max(min_travel_z, minimum_z_height)
         return min_travel_z
 
-    def get_labware_parent_position(self, labware_id: str) -> Point:
-        """Get the position of the labware's parent slot (deck or module)."""
-        labware_data = self._labware.get(labware_id)
-        module_id: Optional[str] = None
-
-        if isinstance(labware_data.location, DeckSlotLocation):
-            slot_name = labware_data.location.slotName
-        elif isinstance(labware_data.location, ModuleLocation):
-            module_id = labware_data.location.moduleId
-            slot_name = self._modules.get_location(module_id).slotName
-        elif labware_data.location == OFF_DECK_LOCATION:
-            # Labware is off-deck
-            raise errors.LabwareNotOnDeckError(
-                f"Labware {labware_id} does not have a parent associated with it"
-                f" since it is no longer on the deck."
-            )
-
+    def get_labware_parent_nominal_position(self, labware_id: str) -> Point:
+        """Get the position of the labware's uncalibrated parent slot (deck, module, or another labware)."""
+        slot_name = self.get_ancestor_slot_name(labware_id)
         slot_pos = self._labware.get_slot_position(slot_name)
+        labware_data = self._labware.get(labware_id)
+        offset = self._get_labware_position_offset(labware_id, labware_data.location)
 
-        if module_id is None:
-            return slot_pos
-        else:
+        return Point(
+            slot_pos.x + offset.x,
+            slot_pos.y + offset.y,
+            slot_pos.z + offset.z,
+        )
+
+    def _get_labware_position_offset(
+        self, labware_id: str, labware_location: LabwareLocation
+    ) -> LabwareOffsetVector:
+        """Gets the offset vector of a labware on the given location."""
+        if isinstance(labware_location, DeckSlotLocation):
+            return LabwareOffsetVector(x=0, y=0, z=0)
+        elif isinstance(labware_location, ModuleLocation):
+            module_id = labware_location.moduleId
             deck_type = DeckType(self._labware.get_deck_definition()["otId"])
-            module_offset = self._modules.get_module_offset(
+            module_offset = self._modules.get_nominal_module_offset(
                 module_id=module_id, deck_type=deck_type
             )
-            return Point(
-                x=slot_pos.x + module_offset.x,
-                y=slot_pos.y + module_offset.y,
-                z=slot_pos.z + module_offset.z,
+            module_model = self._modules.get_connected_model(module_id)
+            stacking_overlap = self._labware.get_module_overlap_offsets(
+                labware_id, module_model
             )
+            return LabwareOffsetVector(
+                x=module_offset.x - stacking_overlap.x,
+                y=module_offset.y - stacking_overlap.y,
+                z=module_offset.z - stacking_overlap.z,
+            )
+        elif isinstance(labware_location, OnLabwareLocation):
+            on_labware = self._labware.get(labware_location.labwareId)
+            on_labware_dimensions = self._labware.get_dimensions(on_labware.id)
+            stacking_overlap = self._labware.get_labware_overlap_offsets(
+                labware_id=labware_id, below_labware_name=on_labware.loadName
+            )
+            labware_offset = LabwareOffsetVector(
+                x=stacking_overlap.x,
+                y=stacking_overlap.y,
+                z=on_labware_dimensions.z - stacking_overlap.z,
+            )
+            return labware_offset + self._get_labware_position_offset(
+                on_labware.id, on_labware.location
+            )
+        else:
+            raise errors.LabwareNotOnDeckError(
+                f"Cannot access labware {labware_id} since it is not on the deck. "
+                f"Either it has been loaded off-deck or its been moved off-deck."
+            )
+
+    def _get_calibrated_module_offset(
+        self, location: LabwareLocation
+    ) -> ModuleOffsetVector:
+        """Get a labware location's underlying calibrated module offset, if it is on a module."""
+        if isinstance(location, ModuleLocation):
+            module_id = location.moduleId
+            return self._modules.get_module_calibration_offset(module_id)
+        elif isinstance(location, DeckSlotLocation):
+            return ModuleOffsetVector(x=0, y=0, z=0)
+        elif isinstance(location, OnLabwareLocation):
+            labware_data = self._labware.get(location.labwareId)
+            return self._get_calibrated_module_offset(labware_data.location)
+        elif location == OFF_DECK_LOCATION:
+            raise errors.LabwareNotOnDeckError(
+                "Labware does not have a slot or module associated with it"
+                " since it is no longer on the deck."
+            )
+
+    def get_labware_parent_position(self, labware_id: str) -> Point:
+        """Get the calibrated position of the labware's parent slot (deck or module)."""
+        parent_pos = self.get_labware_parent_nominal_position(labware_id)
+        labware_data = self._labware.get(labware_id)
+        cal_offset = self._get_calibrated_module_offset(labware_data.location)
+
+        return Point(
+            x=parent_pos.x + cal_offset.x,
+            y=parent_pos.y + cal_offset.y,
+            z=parent_pos.z + cal_offset.z,
+        )
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
         """Get the position of the labware's origin, without calibration."""
@@ -155,21 +228,33 @@ class GeometryView:
         well_def = self._labware.get_well_definition(labware_id, well_name)
         well_depth = well_def.depth
 
+        offset = WellOffset(x=0, y=0, z=well_depth)
         if well_location is not None:
             offset = well_location.offset
-
             if well_location.origin == WellOrigin.TOP:
                 offset = offset.copy(update={"z": offset.z + well_depth})
             elif well_location.origin == WellOrigin.CENTER:
                 offset = offset.copy(update={"z": offset.z + well_depth / 2.0})
 
-        else:
-            offset = WellOffset(x=0, y=0, z=well_depth)
-
         return Point(
             x=labware_pos.x + offset.x + well_def.x,
             y=labware_pos.y + offset.y + well_def.y,
             z=labware_pos.z + offset.z + well_def.z,
+        )
+
+    def get_nominal_well_position(
+        self,
+        labware_id: str,
+        well_name: str,
+    ) -> Point:
+        """Get the well position without calibration offsets."""
+        parent_pos = self.get_labware_parent_nominal_position(labware_id)
+        origin_offset = self._labware.get_definition(labware_id).cornerOffsetFromSlot
+        well_def = self._labware.get_well_definition(labware_id, well_name)
+        return Point(
+            x=parent_pos.x + origin_offset.x + well_def.x,
+            y=parent_pos.y + origin_offset.y + well_def.y,
+            z=parent_pos.z + origin_offset.z + well_def.z + well_def.depth,
         )
 
     def get_relative_well_location(
@@ -256,13 +341,17 @@ class GeometryView:
             volume=int(well_def.totalLiquidVolume),
         )
 
-    def get_tip_drop_location(
+    def get_checked_tip_drop_location(
         self,
         pipette_id: str,
         labware_id: str,
         well_location: DropTipWellLocation,
     ) -> WellLocation:
-        """Get tip drop location given labware and hardware pipette."""
+        """Get tip drop location given labware and hardware pipette.
+
+        This makes sure that the well location has an appropriate origin & offset
+        if one is not already set previously.
+        """
         if well_location.origin != DropTipWellOrigin.DEFAULT:
             return WellLocation(
                 origin=WellOrigin(well_location.origin.value),
@@ -298,6 +387,9 @@ class GeometryView:
         elif isinstance(labware.location, ModuleLocation):
             module_id = labware.location.moduleId
             slot_name = self._modules.get_location(module_id).slotName
+        elif isinstance(labware.location, OnLabwareLocation):
+            below_labware_id = labware.location.labwareId
+            slot_name = self.get_ancestor_slot_name(below_labware_id)
         elif labware.location == OFF_DECK_LOCATION:
             raise errors.LabwareNotOnDeckError(
                 f"Labware {labware_id} does not have a slot associated with it"
@@ -316,7 +408,9 @@ class GeometryView:
         return location
 
     def get_labware_center(
-        self, labware_id: str, location: Union[DeckSlotLocation, ModuleLocation]
+        self,
+        labware_id: str,
+        location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     ) -> Point:
         """Get the center point of the labware as placed on the given location.
 
@@ -324,21 +418,32 @@ class GeometryView:
         specified location. Labware offset not included.
         """
         labware_dimensions = self._labware.get_dimensions(labware_id)
-        module_offset = LabwareOffsetVector(x=0, y=0, z=0)
+        offset = LabwareOffsetVector(x=0, y=0, z=0)
         location_slot: DeckSlotName
+
         if isinstance(location, ModuleLocation):
             deck_type = DeckType(self._labware.get_deck_definition()["otId"])
-            module_offset = self._modules.get_module_offset(
+            offset = self._modules.get_module_offset(
                 module_id=location.moduleId, deck_type=deck_type
             )
             location_slot = self._modules.get_location(location.moduleId).slotName
+        elif isinstance(location, OnLabwareLocation):
+            location_slot = self.get_ancestor_slot_name(location.labwareId)
+            labware_offset = self._get_labware_position_offset(labware_id, location)
+            # Get the calibrated offset if the on labware location is on top of a module, otherwise return empty one
+            cal_offset = self._get_calibrated_module_offset(location)
+            offset = LabwareOffsetVector(
+                x=labware_offset.x + cal_offset.x,
+                y=labware_offset.y + cal_offset.y,
+                z=labware_offset.z + cal_offset.z,
+            )
         else:
             location_slot = location.slotName
         slot_center = self._labware.get_slot_center_position(location_slot)
         return Point(
-            slot_center.x + module_offset.x,
-            slot_center.y + module_offset.y,
-            slot_center.z + module_offset.z + labware_dimensions.z / 2,
+            slot_center.x + offset.x,
+            slot_center.y + offset.y,
+            slot_center.z + offset.z + labware_dimensions.z / 2,
         )
 
     def get_extra_waypoints(
@@ -349,10 +454,13 @@ class GeometryView:
             from_slot=self.get_ancestor_slot_name(location.labware_id),
             to_slot=self.get_ancestor_slot_name(labware_id),
         ):
-            slot_5_center = self._labware.get_slot_center_position(
-                slot=DeckSlotName.SLOT_5
+            middle_slot = DeckSlotName.SLOT_5.to_equivalent_for_robot_type(
+                self._config.robot_type
             )
-            return [(slot_5_center.x, slot_5_center.y)]
+            middle_slot_center = self._labware.get_slot_center_position(
+                slot=middle_slot,
+            )
+            return [(middle_slot_center.x, middle_slot_center.y)]
         return []
 
     # TODO(mc, 2022-12-09): enforce data integrity (e.g. one module per slot)
@@ -375,3 +483,136 @@ class GeometryView:
         )
 
         return maybe_labware or maybe_module or None
+
+    @staticmethod
+    def get_slot_column(slot_name: DeckSlotName) -> int:
+        """Get the column number for the specified slot."""
+        row_col_name = slot_name.to_ot3_equivalent()
+        slot_name_match = WELL_NAME_PATTERN.match(row_col_name.value)
+        assert (
+            slot_name_match is not None
+        ), f"Slot name {row_col_name} did not match required pattern; please check labware location."
+
+        row_name, column_name = slot_name_match.group(1, 2)
+        return int(column_name)
+
+    def get_next_tip_drop_location(
+        self, labware_id: str, well_name: str, pipette_id: str
+    ) -> DropTipWellLocation:
+        """Get the next location within the specified well to drop the tip into.
+
+        In order to prevent tip stacking, we will alternate between two tip drop locations:
+        1. location in left section: a safe distance from left edge of the well
+        2. location in right section: a safe distance from right edge of the well
+
+        This safe distance for most cases would be a location where all tips drop
+        reliably inside the labware's well. This can be calculated based off of the
+        span of a pipette, including all its tips, in the x-direction.
+
+        But we also need to account for the not-so-uncommon case of a left pipette
+        trying to drop tips in a labware in the rightmost deck column and vice versa.
+        If this labware extends beyond a regular deck slot, like the Flex's default trash,
+        then even after keeping a margin for x-span of a pipette, we will get
+        a location that's unreachable for the pipette. In such cases, we try to drop tips
+        at the rightmost location that a left pipette is able to reach,
+        and leftmost location that a right pipette is able to reach respectively.
+
+        In these calculations we assume that the critical point of a pipette
+        is considered to be the midpoint of the pipette's tip for single channel,
+        and the midpoint of the entire tip assembly for multi-channel pipettes.
+        We also assume that the pipette_x_span includes any safety margins required.
+        """
+        if not self._labware.is_fixed_trash(labware_id=labware_id):
+            # In order to avoid the complexity of finding tip drop locations for
+            # variety of labware with different well configs, we will allow
+            # location cycling only for fixed trash labware right now.
+            return DropTipWellLocation(
+                origin=DropTipWellOrigin.DEFAULT,
+                offset=WellOffset(x=0, y=0, z=0),
+            )
+
+        well_x_dim = self._labware.get_well_size(
+            labware_id=labware_id, well_name=well_name
+        )[0]
+        pipette_channels = self._pipettes.get_config(pipette_id).channels
+        pipette_mount = self._pipettes.get_mount(pipette_id)
+
+        labware_slot_column = self.get_slot_column(
+            slot_name=self.get_ancestor_slot_name(labware_id)
+        )
+
+        if self._last_drop_tip_location_spot == _TipDropSection.RIGHT:
+            # Drop tip in LEFT section
+            x_offset = self._get_drop_tip_well_x_offset(
+                tip_drop_section=_TipDropSection.LEFT,
+                well_x_dim=well_x_dim,
+                pipette_channels=pipette_channels,
+                pipette_mount=pipette_mount,
+                labware_slot_column=labware_slot_column,
+            )
+            self._last_drop_tip_location_spot = _TipDropSection.LEFT
+        else:
+            # Drop tip in RIGHT section
+            x_offset = self._get_drop_tip_well_x_offset(
+                tip_drop_section=_TipDropSection.RIGHT,
+                well_x_dim=well_x_dim,
+                pipette_channels=pipette_channels,
+                pipette_mount=pipette_mount,
+                labware_slot_column=labware_slot_column,
+            )
+            self._last_drop_tip_location_spot = _TipDropSection.RIGHT
+
+        return DropTipWellLocation(
+            origin=DropTipWellOrigin.TOP,
+            offset=WellOffset(
+                x=x_offset,
+                y=0,
+                z=0,
+            ),
+        )
+
+    @staticmethod
+    def _get_drop_tip_well_x_offset(
+        tip_drop_section: _TipDropSection,
+        well_x_dim: float,
+        pipette_channels: int,
+        pipette_mount: MountType,
+        labware_slot_column: int,
+    ) -> float:
+        """Get the well x offset for DropTipWellLocation."""
+        drop_location_margin_from_labware_edge = (
+            PIPETTE_X_SPAN[cast(ChannelCount, pipette_channels)] / 2
+        )
+        if tip_drop_section == _TipDropSection.LEFT:
+            if (
+                well_x_dim > SLOT_WIDTH
+                and pipette_channels != 96
+                and pipette_mount == MountType.RIGHT
+                and labware_slot_column == 1
+            ):
+                # Pipette might not reach the default left spot so use a different left spot
+                x_well_offset = (
+                    well_x_dim / 2 - SLOT_WIDTH + drop_location_margin_from_labware_edge
+                )
+            else:
+                x_well_offset = -well_x_dim / 2 + drop_location_margin_from_labware_edge
+                if x_well_offset > 0:
+                    x_well_offset = 0
+        else:
+            if (
+                well_x_dim > SLOT_WIDTH
+                and pipette_channels != 96
+                and pipette_mount == MountType.LEFT
+                and labware_slot_column == 3
+            ):
+                # Pipette might not reach the default right spot so use a different right spot
+                x_well_offset = (
+                    -well_x_dim / 2
+                    + SLOT_WIDTH
+                    - drop_location_margin_from_labware_edge
+                )
+            else:
+                x_well_offset = well_x_dim / 2 - drop_location_margin_from_labware_edge
+                if x_well_offset < 0:
+                    x_well_offset = 0
+        return x_well_offset

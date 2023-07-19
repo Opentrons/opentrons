@@ -1,3 +1,4 @@
+from json import load as json_load
 from pathlib import Path
 import pytest
 from typing import Tuple
@@ -9,10 +10,9 @@ from hardware_testing.gravimetric.liquid_height.height import (
     initialize_liquid_from_deck,
 )
 from hardware_testing.gravimetric.helpers import get_api_context
-from hardware_testing.gravimetric.radwag_pipette_calibration_vial import VIAL_DEFINITION
 
 CUSTOM_LABWARE_DEFINITION_DIR = (
-    Path(__file__).parent.parent.parent.parent / "protocols" / "definitions"
+    Path(__file__).parent.parent.parent.parent / "hardware_testing" / "labware"
 )
 
 
@@ -24,8 +24,13 @@ def _load_labware(ctx: ProtocolContext) -> Tuple[Labware, Labware, Labware, Labw
     tiprack = ctx.load_labware(load_name="opentrons_96_tiprack_300uL", location="8")
     trough = ctx.load_labware(load_name="nest_12_reservoir_15ml", location="5")
     plate = ctx.load_labware(load_name="corning_96_wellplate_360ul_flat", location="2")
+    vial_path = (
+        CUSTOM_LABWARE_DEFINITION_DIR / "radwag_pipette_calibration_vial" / "1.json"
+    )
+    with open(vial_path, "r") as f:
+        vial_def = json_load(f)
     vial = ctx.load_labware_from_definition(
-        VIAL_DEFINITION,
+        vial_def,
         location="6",
     )
     return tiprack, trough, plate, vial
@@ -191,36 +196,48 @@ def test_before_and_after_heights() -> None:
 
     # single-channel pipetting
     before, after = tracker.get_before_and_after_heights(
-        pipette=single, well=plate["A1"], aspirate=1
+        well=plate["A1"],
+        aspirate=1,
+        channels=single.channels,
     )
     assert before == 5
     assert after == 4
     before, after = tracker.get_before_and_after_heights(
-        pipette=single, well=plate["A1"], dispense=1
+        well=plate["A1"],
+        dispense=1,
+        channels=single.channels,
     )
     assert before == 5
     assert after == 6
 
     # multi-channel pipetting
     before, after = tracker.get_before_and_after_heights(
-        pipette=multi, well=plate["A1"], aspirate=0.1
+        well=plate["A1"],
+        aspirate=0.1,
+        channels=multi.channels,
     )
     assert before == 5
     assert after == 4.9
     before, after = tracker.get_before_and_after_heights(
-        pipette=multi, well=plate["A1"], dispense=0.1
+        well=plate["A1"],
+        dispense=0.1,
+        channels=multi.channels,
     )
     assert before == 5
     assert after == 5.1
 
     # multi-channel pipetting in a trough
     before, after = tracker.get_before_and_after_heights(
-        pipette=multi, well=trough["A1"], aspirate=0.1
+        well=trough["A1"],
+        aspirate=0.1,
+        channels=multi.channels,
     )
     assert before == 5
     assert after == 4.2
     before, after = tracker.get_before_and_after_heights(
-        pipette=multi, well=trough["A1"], dispense=0.1
+        well=trough["A1"],
+        dispense=0.1,
+        channels=multi.channels,
     )
     assert before == 5
     assert after == 5.8
@@ -246,9 +263,11 @@ def test_update_affected_wells() -> None:
         assert tracker.get_volume(well) == 5
 
     # plate
-    tracker.update_affected_wells(pipette=single, well=plate["A1"], dispense=1)
+    tracker.update_affected_wells(
+        well=plate["A1"], dispense=1, channels=single.channels
+    )
     assert tracker.get_volume(plate["A1"]) == 6
-    tracker.update_affected_wells(pipette=multi, well=plate["A2"], dispense=1)
+    tracker.update_affected_wells(well=plate["A2"], dispense=1, channels=multi.channels)
     assert tracker.get_volume(plate["A2"]) == 6
     assert tracker.get_volume(plate["B2"]) == 6
     assert tracker.get_volume(plate["C2"]) == 6
@@ -259,7 +278,11 @@ def test_update_affected_wells() -> None:
     assert tracker.get_volume(plate["H2"]) == 6
 
     # trough
-    tracker.update_affected_wells(pipette=single, well=trough["A1"], dispense=1)
+    tracker.update_affected_wells(
+        well=trough["A1"], dispense=1, channels=single.channels
+    )
     assert tracker.get_volume(trough["A1"]) == 6
-    tracker.update_affected_wells(pipette=multi, well=trough["A2"], dispense=0.1)
+    tracker.update_affected_wells(
+        well=trough["A2"], dispense=0.1, channels=multi.channels
+    )
     assert tracker.get_volume(trough["A2"]) == 5.8

@@ -6,14 +6,12 @@ import type {
   SelectablePipettes,
 } from './types'
 import type { PipetteMount } from '@opentrons/shared-data'
-import type { AttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 
 export const getPipetteWizardSteps = (
   flowType: PipetteWizardFlow,
   mount: PipetteMount,
   selectedPipette: SelectablePipettes,
-  isGantryEmpty: boolean,
-  attachedPipettes: AttachedPipettesFromInstrumentsQuery
+  isGantryEmpty: boolean
 ): PipetteWizardStep[] => {
   switch (flowType) {
     case FLOWS.CALIBRATE: {
@@ -41,6 +39,11 @@ export const getPipetteWizardSteps = (
             flowType: flowType,
           },
           { section: SECTIONS.MOUNT_PIPETTE, mount: mount, flowType: flowType },
+          {
+            section: SECTIONS.FIRMWARE_UPDATE,
+            mount: mount,
+            flowType: flowType,
+          },
           { section: SECTIONS.RESULTS, mount: mount, flowType: flowType },
           { section: SECTIONS.ATTACH_PROBE, mount: mount, flowType: flowType },
           { section: SECTIONS.DETACH_PROBE, mount: mount, flowType: flowType },
@@ -51,14 +54,12 @@ export const getPipetteWizardSteps = (
           },
         ]
       } else {
-        let detachMount = mount
-        if (attachedPipettes[LEFT] == null) {
-          detachMount = RIGHT
-        } else if (attachedPipettes[RIGHT] == null) {
-          detachMount = LEFT
-        }
         //  pipette needs to be detached before attached 96 channel
         if (!isGantryEmpty) {
+          let detachMount: PipetteMount = LEFT
+          if (mount === LEFT) {
+            detachMount = RIGHT
+          }
           return [
             {
               section: SECTIONS.BEFORE_BEGINNING,
@@ -88,6 +89,11 @@ export const getPipetteWizardSteps = (
             {
               section: SECTIONS.MOUNT_PIPETTE,
               mount: LEFT,
+              flowType: flowType,
+            },
+            {
+              section: SECTIONS.FIRMWARE_UPDATE,
+              mount: mount,
               flowType: flowType,
             },
             { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
@@ -127,6 +133,11 @@ export const getPipetteWizardSteps = (
             },
             {
               section: SECTIONS.MOUNT_PIPETTE,
+              mount: mount,
+              flowType: flowType,
+            },
+            {
+              section: SECTIONS.FIRMWARE_UPDATE,
               mount: mount,
               flowType: flowType,
             },

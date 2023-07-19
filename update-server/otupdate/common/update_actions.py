@@ -96,3 +96,8 @@ class UpdateActionsInterface:
     def write_machine_id(self, current_root: str, new_root: str) -> None:
         """Copy the machine id over to the new partition"""
         ...
+
+    @abc.abstractmethod
+    def clean_up(self, download_dir: str) -> None:
+        """Deletes the update files from the download dir."""
+        ...

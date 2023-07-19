@@ -7,6 +7,7 @@ import {
   GEN1,
   GEN2,
   OT3_PIPETTES,
+  FLEX,
 } from '@opentrons/shared-data'
 import { PipetteSelect } from '../PipetteSelect'
 import { Select } from '../../forms'
@@ -49,10 +50,14 @@ describe('PipetteSelect', () => {
       .map(getPipetteNameSpecs)
       .filter((specs): specs is PipetteNameSpecs => specs !== null)
 
+    const flexSpecs = pipetteSpecs.filter(s => s.displayCategory === FLEX)
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
     const gen1Specs = pipetteSpecs.filter(s => s.displayCategory === GEN1)
 
     expect(wrapper.find(Select).prop('options')).toEqual([
+      {
+        options: flexSpecs.map(s => ({ value: s.name, label: s.displayName })),
+      },
       {
         options: gen2Specs.map(s => ({ value: s.name, label: s.displayName })),
       },
@@ -72,7 +77,7 @@ describe('PipetteSelect', () => {
 
     const gen2Specs = pipetteSpecs.filter(s => s.displayCategory === GEN2)
     const nameBlocklist = pipetteSpecs
-      .filter(s => s.displayCategory === GEN1)
+      .filter(s => s.displayCategory !== GEN2)
       .map(s => s.name)
 
     const wrapper = shallow(
@@ -89,7 +94,7 @@ describe('PipetteSelect', () => {
     ])
   })
 
-  it('excludes the gen3 pipette options', () => {
+  it('excludes the flex pipette options', () => {
     const pipetteSpecs: PipetteNameSpecs[] = getAllPipetteNames(
       'maxVolume',
       'channels'

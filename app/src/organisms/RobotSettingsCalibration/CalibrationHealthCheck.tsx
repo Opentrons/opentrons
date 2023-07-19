@@ -136,11 +136,11 @@ export function CalibrationHealthCheck({
 
   return (
     <Flex
-      paddingY={SPACING.spacing5}
+      paddingY={SPACING.spacing24}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
-      <Flex gridGap={SPACING.spacing3} flexDirection={DIRECTION_COLUMN}>
+      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('calibration_health_check_title')}
         </StyledText>

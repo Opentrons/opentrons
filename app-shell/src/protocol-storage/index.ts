@@ -1,6 +1,7 @@
 import fse from 'fs-extra'
 import path from 'path'
 import { shell } from 'electron'
+import first from 'lodash/first'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import * as ProtocolStorageActions from '@opentrons/app/src/redux/protocol-storage/actions'
@@ -27,6 +28,18 @@ export const getParsedAnalysisFromPath = (
       error?.message ?? 'protocol analysis file cannot be parsed'
     )
   }
+}
+
+export const getProtocolSrcFilePaths = (
+  protocolKey: string
+): Promise<string[]> => {
+  const protocolDir = `${FileSystem.PROTOCOLS_DIRECTORY_PATH}/${protocolKey}`
+  return ensureDir(protocolDir)
+    .then(() => FileSystem.parseProtocolDirs([protocolDir]))
+    .then(storedProtocols => {
+      const storedProtocol = first(storedProtocols)
+      return storedProtocol?.srcFilePaths ?? []
+    })
 }
 
 export const fetchProtocols = (

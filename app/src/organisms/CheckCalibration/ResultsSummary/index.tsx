@@ -125,7 +125,7 @@ export function ResultsSummary(
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="25rem"
     >
       <Box marginBottom="1.5rem">
@@ -133,11 +133,11 @@ export function ResultsSummary(
           isCalibrationCompleted={isCalibrationCompleted()}
         />
       </Box>
-      <Box marginBottom={SPACING.spacing4}>
+      <Box marginBottom={SPACING.spacing16}>
         <CalibrationResult calType="deck" isBadCal={isDeckResultBad} />
       </Box>
       <RenderMountInformation mount={LEFT} pipette={leftPipette} />
-      <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN} marginBottom={SPACING.spacing16}>
         {leftPipette != null && (
           <>
             <CalibrationResult

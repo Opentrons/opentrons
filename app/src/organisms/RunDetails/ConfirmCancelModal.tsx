@@ -20,7 +20,7 @@ import { useStopRunMutation } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 import { useTrackProtocolRunEvent } from '../Devices/hooks'
 import { useRunStatus } from '../RunTimeControl/hooks'
 import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../redux/analytics'
@@ -64,16 +64,16 @@ export function ConfirmCancelModal(
 
   return (
     <Portal>
-      <Modal
+      <LegacyModal
         type="warning"
         onClose={isCanceling ? undefined : onClose}
         title={t('cancel_run_modal_heading')}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="p" marginBottom={SPACING.spacing5}>
+          <StyledText as="p" marginBottom={SPACING.spacing24}>
             {t('cancel_run_alert_info')}
           </StyledText>
-          <StyledText as="p" marginBottom={SPACING.spacing5}>
+          <StyledText as="p" marginBottom={SPACING.spacing24}>
             {t('cancel_run_module_info')}
           </StyledText>
           <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
@@ -81,7 +81,7 @@ export function ConfirmCancelModal(
               <Link
                 role="button"
                 onClick={onClose}
-                marginRight={SPACING.spacing5}
+                marginRight={SPACING.spacing24}
                 css={TYPOGRAPHY.linkPSemiBold}
               >
                 {t('cancel_run_modal_back')}
@@ -101,7 +101,7 @@ export function ConfirmCancelModal(
             </AlertPrimaryButton>
           </Flex>
         </Flex>
-      </Modal>
+      </LegacyModal>
     </Portal>
   )
 }

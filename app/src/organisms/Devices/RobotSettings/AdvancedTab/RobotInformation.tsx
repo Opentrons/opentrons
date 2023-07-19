@@ -41,9 +41,9 @@ export function RobotInformation({
   return (
     <Box>
       <Flex
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
         justifyContent={JUSTIFY_FLEX_START}
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
           <StyledText css={TYPOGRAPHY.pSemiBold}>

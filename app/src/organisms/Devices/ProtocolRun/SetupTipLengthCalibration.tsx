@@ -27,7 +27,7 @@ export function SetupTipLengthCalibration({
   const runPipetteInfoByMount = useRunPipetteInfoByMount(runId)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
       <StyledText
         color={COLORS.black}
         css={TYPOGRAPHY.pSemiBold}

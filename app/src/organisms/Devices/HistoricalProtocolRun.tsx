@@ -65,7 +65,7 @@ export function HistoricalProtocolRun(
       <Flex
         justifyContent={JUSTIFY_SPACE_AROUND}
         alignItems={ALIGN_CENTER}
-        padding={SPACING.spacing3}
+        padding={SPACING.spacing8}
         borderTop={BORDERS.lineBorder}
         backgroundColor={
           run.status === 'running' ? COLORS.lightBlue : COLORS.white
@@ -79,7 +79,7 @@ export function HistoricalProtocolRun(
           <Icon
             name={offsetDrawerOpen ? 'chevron-up' : 'chevron-down'}
             width="15px"
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
             css={{ cursor: 'pointer' }}
           />
         </Box>
@@ -105,7 +105,7 @@ export function HistoricalProtocolRun(
             data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
             onClick={() => history.push(`/protocols/${protocolKey}`)}
             css={CLICK_STYLE}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           >
             {protocolName}
           </StyledText>
@@ -115,7 +115,7 @@ export function HistoricalProtocolRun(
             width="35%"
             data-testid={`RecentProtocolRuns_Protocol_${String(protocolKey)}`}
             overflowWrap="anywhere"
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           >
             {protocolName}
           </StyledText>
@@ -130,9 +130,9 @@ export function HistoricalProtocolRun(
             <Icon
               name="circle"
               color={COLORS.blueEnabled}
-              size={SPACING.spacing2}
-              marginX={SPACING.spacing2}
-              marginBottom={SPACING.spacing2}
+              size={SPACING.spacing4}
+              marginX={SPACING.spacing4}
+              marginBottom={SPACING.spacing4}
             />
           )}
           {runStatus != null ? t(`status_${String(runStatus)}`) : ''}

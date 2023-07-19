@@ -12,7 +12,6 @@ interface RadioGroupFieldProps extends FieldProps {
 export const RadioGroupField = (props: RadioGroupFieldProps): JSX.Element => {
   const {
     className,
-    disabled, // NOTE: not used
     errorToShow,
     isIndeterminate, // TODO(IL, 2021-02-05): if we need indeterminate RadioGroupField, we'll want to pass this down into RadioGroup
     name,

@@ -84,7 +84,7 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
     """
     port = "15555"
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()
@@ -133,7 +133,7 @@ async def test_reset_is_available_even_with_corrupt_persistence_directory() -> N
     port = "15555"
     persistence_dir = _get_corrupt_persistence_dir()
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()

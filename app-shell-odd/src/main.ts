@@ -6,6 +6,7 @@ import { registerDiscovery } from './discovery'
 import { registerRobotLogs } from './robot-logs'
 import { registerUpdate, updateLatestVersion } from './update'
 import { registerRobotSystemUpdate } from './system-update'
+import { registerAppRestart } from './restart'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 import systemd from './systemd'
 
@@ -31,6 +32,7 @@ let rendererLogger: Logger
 // prepended listener is important here to work around Electron issue
 // https://github.com/electron/electron/issues/19468#issuecomment-623529556
 app.prependOnceListener('ready', startUp)
+if (config.devtools) app.once('ready', installDevtools)
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
@@ -45,11 +47,6 @@ function startUp(): void {
     log.error('Uncaught Promise rejection: ', { reason })
   )
 
-  mainWindow = createUi()
-  rendererLogger = createRendererLogger()
-
-  mainWindow.once('closed', () => (mainWindow = null))
-
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -58,6 +55,11 @@ function startUp(): void {
       mainWindow.webContents.send('dispatch', action)
     }
   }
+
+  mainWindow = createUi(dispatch)
+  rendererLogger = createRendererLogger()
+
+  mainWindow.once('closed', () => (mainWindow = null))
 
   log.info('Fetching latest software version')
   updateLatestVersion().catch((error: Error) => {
@@ -70,6 +72,7 @@ function startUp(): void {
     registerRobotLogs(dispatch, mainWindow),
     registerUpdate(dispatch),
     registerRobotSystemUpdate(dispatch),
+    registerAppRestart(),
   ]
 
   ipcMain.on('dispatch', (_, action) => {
@@ -92,4 +95,23 @@ function createRendererLogger(): Logger {
   ipcMain.on('log', (_, info) => logger.log(info))
 
   return logger
+}
+
+function installDevtools(): void {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const devtools = require('electron-devtools-installer')
+  const extensions = [devtools.REACT_DEVELOPER_TOOLS, devtools.REDUX_DEVTOOLS]
+  const install = devtools.default
+  const forceReinstall = config.reinstallDevtools
+
+  log.debug('Installing devtools')
+
+  install(extensions, forceReinstall)
+    .then(() => log.debug('Devtools extensions installed'))
+    .catch((error: unknown) => {
+      log.warn('Failed to install devtools extensions', {
+        forceReinstall,
+        error,
+      })
+    })
 }

@@ -2,7 +2,6 @@ import os
 
 from pathlib import Path
 import logging
-import asyncio
 import re
 from typing import Any, List, Tuple
 
@@ -118,6 +117,7 @@ async def _create_thread_manager() -> ThreadManagedHardware:
             OT3API.build_hardware_controller,
             use_usb_bus=ff.rear_panel_integration(),
             threadmanager_nonblocking=True,
+            status_bar_enabled=ff.status_bar_enabled(),
         )
     else:
         thread_manager = ThreadManager(
@@ -146,39 +146,4 @@ async def initialize() -> ThreadManagedHardware:
     log.info(f"API server version: {version}")
     log.info(f"Robot Name: {name()}")
 
-    hardware = await _create_thread_manager()
-
-    async def _blink() -> None:
-        while True:
-            await hardware.set_lights(button=True)
-            await asyncio.sleep(0.5)
-            await hardware.set_lights(button=False)
-            await asyncio.sleep(0.5)
-
-    # While the hardware was initializing in _create_hardware_api(), it blinked the
-    # front button light. But that blinking stops when the completed hardware object
-    # is returned. Do our own blinking here to keep it going while we home the robot.
-    blink_task = asyncio.create_task(_blink())
-
-    try:
-
-        if not ff.disable_home_on_boot():
-            log.info("Homing Z axes")
-            try:
-                await hardware.home_z()
-            except Exception:
-                # If this is a flex, and the estop is asserted, we'll get an error
-                # here; make sure that it doesn't prevent things from actually
-                # starting.
-                log.error(
-                    "Exception homing z on startup, ignoring to allow server to start"
-                )
-
-        await hardware.set_lights(button=True)
-        return hardware
-    finally:
-        blink_task.cancel()
-        try:
-            await blink_task
-        except asyncio.CancelledError:
-            pass
+    return await _create_thread_manager()

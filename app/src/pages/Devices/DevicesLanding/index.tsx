@@ -24,7 +24,9 @@ import {
   getConnectableRobots,
   getReachableRobots,
   getUnreachableRobots,
+  OPENTRONS_USB,
 } from '../../../redux/discovery'
+import { appShellRequestor } from '../../../redux/shell/remote'
 import { RobotCard } from '../../../organisms/Devices/RobotCard'
 import { DevicesEmptyState } from '../../../organisms/Devices/DevicesEmptyState'
 import { CollapsibleSection } from '../../../molecules/CollapsibleSection'
@@ -66,14 +68,11 @@ export function DevicesLanding(): JSX.Element {
     ].length === 0
 
   return (
-    <Box
-      minWidth={SIZE_6}
-      padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
-    >
+    <Box minWidth={SIZE_6} padding={`${SPACING.spacing8} ${SPACING.spacing16}`}>
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        marginTop={SPACING.spacing3}
+        marginTop={SPACING.spacing8}
         height="2.25rem"
       >
         <StyledText as="h1" id="DevicesLanding_title">
@@ -86,28 +85,40 @@ export function DevicesLanding(): JSX.Element {
       {!noRobots ? (
         <>
           <CollapsibleSection
-            gridGap={SPACING.spacing2}
-            marginY={SPACING.spacing3}
+            gridGap={SPACING.spacing4}
+            marginY={SPACING.spacing8}
             title={t('available', {
               count: [...healthyReachableRobots, ...unhealthyReachableRobots]
                 .length,
             })}
           >
             {healthyReachableRobots.map(robot => (
-              <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
+              <ApiHostProvider
+                key={robot.name}
+                hostname={robot.ip ?? null}
+                requestor={
+                  robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+                }
+              >
                 <RobotCard robot={robot} />
               </ApiHostProvider>
             ))}
             {unhealthyReachableRobots.map(robot => (
-              <ApiHostProvider key={robot.name} hostname={robot.ip ?? null}>
+              <ApiHostProvider
+                key={robot.name}
+                hostname={robot.ip ?? null}
+                requestor={
+                  robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+                }
+              >
                 <RobotCard robot={robot} />
               </ApiHostProvider>
             ))}
           </CollapsibleSection>
           <Divider />
           <CollapsibleSection
-            gridGap={SPACING.spacing2}
-            marginY={SPACING.spacing4}
+            gridGap={SPACING.spacing4}
+            marginY={SPACING.spacing16}
             title={t('not_available', {
               count: [...recentlySeenRobots, ...unreachableRobots].length,
             })}
@@ -141,15 +152,15 @@ function DevicesLoadingState(): JSX.Element {
         aria-label="ot-spinner"
         spin
         size="3.25rem"
-        marginTop={SPACING.spacing4}
-        marginBottom={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
+        marginBottom={SPACING.spacing16}
         color={COLORS.darkGreyEnabled}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
         position={POSITION_ABSOLUTE}
-        bottom={SPACING.spacingXXL}
+        bottom={SPACING.spacing40}
         left="0"
         right="0"
         marginLeft={SPACING.spacingAuto}
@@ -168,7 +179,7 @@ function DevicesLoadingState(): JSX.Element {
           <Icon
             name="open-in-new"
             size="0.5rem"
-            marginLeft={SPACING.spacing2}
+            marginLeft={SPACING.spacing4}
           />
         </Link>
       </Flex>

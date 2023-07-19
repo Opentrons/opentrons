@@ -5,7 +5,12 @@ import contextlib
 import typing
 
 from opentrons.hardware_control import ThreadManagedHardware
-from opentrons.protocol_engine import create_protocol_engine, ProtocolEngine, Config
+from opentrons.protocol_engine import (
+    create_protocol_engine,
+    ProtocolEngine,
+    Config,
+    DeckType,
+)
 
 from .async_context_manager_in_thread import async_context_manager_in_thread
 
@@ -48,6 +53,7 @@ async def _protocol_engine(
         hardware_api=hardware.wrapped(),
         config=Config(
             robot_type="OT-3 Standard",
+            deck_type=DeckType.OT3_STANDARD,
             ignore_pause=True,
             use_virtual_pipettes=True,
             use_virtual_modules=True,

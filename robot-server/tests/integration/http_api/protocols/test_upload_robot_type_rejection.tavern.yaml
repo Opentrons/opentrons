@@ -2,8 +2,7 @@ test_name: Make sure an OT-2 server rejects OT-3 protocols.
 
 marks:
   - usefixtures:
-    - run_server
-    - clean_server_state
+    - ot2_server_base_url
   - parametrize:
       key: protocol_file_path
       vals:
@@ -13,7 +12,7 @@ marks:
 stages:
   - name: Upload the protocol.
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: "{protocol_file_path}"
@@ -24,5 +23,6 @@ stages:
           - id: ProtocolRobotTypeMismatch
             title: Protocol For Different Robot Type
             detail: "This protocol is for OT-3 Standard robots. It can't be analyzed or run on this robot, which is an OT-2 Standard."
+            errorCode: '4000'
 
 # TODO(mm, 2022-12-12): Also make sure an OT-3 server rejects OT-2 protocols.

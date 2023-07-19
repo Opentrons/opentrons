@@ -28,7 +28,9 @@ from ..commands import (
     MoveRelativeResult,
     PickUpTipResult,
     DropTipResult,
+    DropTipInPlaceResult,
     HomeResult,
+    RetractAxisResult,
     BlowOutResult,
     TouchTipResult,
     thermocycler,
@@ -68,6 +70,7 @@ class StaticPipetteConfig:
     display_name: str
     min_volume: float
     max_volume: float
+    channels: int
     return_tip_scale: float
     nominal_tip_overlap: Dict[str, float]
     home_position: float
@@ -120,6 +123,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 display_name=config.display_name,
                 min_volume=config.min_volume,
                 max_volume=config.max_volume,
+                channels=config.channels,
                 return_tip_scale=config.return_tip_scale,
                 nominal_tip_overlap=config.nominal_tip_overlap,
                 home_position=config.home_position,
@@ -167,7 +171,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.attached_tip_by_id[pipette_id] = attached_tip
             self._state.aspirated_volume_by_id[pipette_id] = 0
 
-        elif isinstance(command.result, DropTipResult):
+        elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
@@ -206,6 +210,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             command.result,
             (
                 HomeResult,
+                RetractAxisResult,
                 MoveToCoordinatesResult,
                 thermocycler.OpenLidResult,
                 thermocycler.CloseLidResult,
@@ -273,6 +278,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             command.result,
             (
                 HomeResult,
+                RetractAxisResult,
                 thermocycler.OpenLidResult,
                 thermocycler.CloseLidResult,
             ),

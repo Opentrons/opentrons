@@ -5,7 +5,7 @@ import type { HostConfig, RunData } from '@opentrons/api-client'
 export function useHistoricRunDetails(
   hostOverride?: HostConfig | null
 ): RunData[] {
-  const { data: allHistoricRuns } = useAllRunsQuery({}, hostOverride)
+  const { data: allHistoricRuns } = useAllRunsQuery({}, {}, hostOverride)
 
   return allHistoricRuns == null
     ? []

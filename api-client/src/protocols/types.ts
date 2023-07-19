@@ -38,3 +38,8 @@ export interface Protocols {
   links?: ResourceLinks
   data: ProtocolResource[]
 }
+
+export interface ProtocolsIds {
+  links?: ResourceLinks
+  data: string[]
+}

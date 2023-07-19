@@ -19,6 +19,7 @@ from .instrument import InstrumentCoreType
 from .labware import LabwareCoreType, LabwareLoadParams
 from .module import ModuleCoreType
 from .._liquid import Liquid
+from .._types import OffDeckType
 
 
 class AbstractProtocol(
@@ -59,7 +60,7 @@ class AbstractProtocol(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCoreType],
+        location: Union[DeckSlotName, LabwareCoreType, ModuleCoreType, OffDeckType],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
@@ -67,12 +68,23 @@ class AbstractProtocol(
         """Load a labware using its identifying parameters."""
         ...
 
+    @abstractmethod
+    def load_adapter(
+        self,
+        load_name: str,
+        location: Union[DeckSlotName, ModuleCoreType, OffDeckType],
+        namespace: Optional[str],
+        version: Optional[int],
+    ) -> LabwareCoreType:
+        """Load an adapter using its identifying parameters"""
+        ...
+
     # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
     @abstractmethod
     def move_labware(
         self,
         labware_core: LabwareCoreType,
-        new_location: Union[DeckSlotName, ModuleCoreType],
+        new_location: Union[DeckSlotName, LabwareCoreType, ModuleCoreType, OffDeckType],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
         use_drop_location_lpc_offset: bool,
@@ -156,6 +168,12 @@ class AbstractProtocol(
         """Get the labware on a given module, if any."""
 
     @abstractmethod
+    def get_labware_on_labware(
+        self, labware_core: LabwareCoreType
+    ) -> Optional[LabwareCoreType]:
+        """Get the labware on a given labware, if any."""
+
+    @abstractmethod
     def get_slot_center(self, slot_name: DeckSlotName) -> Point:
         """Get the absolute coordinate of a slot's center."""
 
@@ -180,5 +198,5 @@ class AbstractProtocol(
     @abstractmethod
     def get_labware_location(
         self, labware_core: LabwareCoreType
-    ) -> Union[str, ModuleCoreType, None]:
+    ) -> Union[str, LabwareCoreType, ModuleCoreType, OffDeckType]:
         """Get labware parent location."""

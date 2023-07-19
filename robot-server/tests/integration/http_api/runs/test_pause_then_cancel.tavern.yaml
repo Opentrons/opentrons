@@ -2,12 +2,11 @@ test_name: Test a JSONv6 run can be paused and then cancelled.
 
 marks:
   - usefixtures:
-      - run_server
-      - clean_server_state
+      - ot2_server_base_url
 stages:
   - name: Upload a JSONv6 protocol
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: 'tests/integration/protocols/wait_then_home_v6.json'
@@ -19,7 +18,7 @@ stages:
 
   - name: Create run from protocol
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{ot2_server_base_url}/runs'
       method: POST
       json:
         data:
@@ -32,7 +31,7 @@ stages:
 
   - name: Play the run
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -42,7 +41,7 @@ stages:
 
   - name: Pause the run
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -54,7 +53,7 @@ stages:
     max_retries: 10
     delay_after: 0.2
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       method: GET
     response:
       status_code: 200
@@ -68,7 +67,7 @@ stages:
 
   - name: Stop the run
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -80,7 +79,7 @@ stages:
     max_retries: 10
     delay_after: 0.2
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}'
+      url: '{ot2_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200

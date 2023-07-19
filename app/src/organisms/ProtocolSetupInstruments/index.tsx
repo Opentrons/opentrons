@@ -21,6 +21,7 @@ import { ProtocolInstrumentMountItem } from '../InstrumentMountItem'
 import type { GripperData, PipetteData } from '@opentrons/api-client'
 import type { GripperModel } from '@opentrons/shared-data'
 import type { SetupScreens } from '../../pages/OnDeviceDisplay/ProtocolSetup'
+import { isGripperInCommands } from '../../resources/protocols/utils'
 
 export interface ProtocolSetupInstrumentsProps {
   runId: string
@@ -32,17 +33,16 @@ export function ProtocolSetupInstruments({
   setSetupScreen,
 }: ProtocolSetupInstrumentsProps): JSX.Element {
   const { t, i18n } = useTranslation('protocol_setup')
-  const { data: attachedInstruments } = useInstrumentsQuery()
+  const { data: attachedInstruments, refetch } = useInstrumentsQuery()
   const {
     data: allPipettesCalibrationData,
   } = useAllPipetteOffsetCalibrationsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const usesGripper =
-    mostRecentAnalysis?.commands.some(
-      c =>
-        c.commandType === 'moveLabware' && c.params.strategy === 'usingGripper'
-    ) ?? false
+    mostRecentAnalysis != null
+      ? isGripperInCommands(mostRecentAnalysis?.commands ?? [])
+      : false
   const attachedGripperMatch = usesGripper
     ? (attachedInstruments?.data ?? []).find(
         (i): i is GripperData => i.instrumentType === 'gripper'
@@ -53,7 +53,7 @@ export function ProtocolSetupInstruments({
     <Flex
       flexDirection={DIRECTION_COLUMN}
       width="100%"
-      gridGap={SPACING.spacing3}
+      gridGap={SPACING.spacing8}
     >
       <ODDBackButton
         label={t('instruments')}
@@ -62,7 +62,7 @@ export function ProtocolSetupInstruments({
       <Flex
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
-        paddingX={SPACING.spacing5}
+        paddingX={SPACING.spacing24}
       >
         <ColumnLabel>{t('location')}</ColumnLabel>
         <ColumnLabel>
@@ -74,6 +74,7 @@ export function ProtocolSetupInstruments({
           (attachedInstruments?.data ?? []).find(
             (i): i is PipetteData =>
               i.instrumentType === 'pipette' &&
+              i.ok &&
               i.mount === loadedPipette.mount &&
               i.instrumentName === loadedPipette.pipetteName
           ) ?? null
@@ -93,6 +94,7 @@ export function ProtocolSetupInstruments({
                   ) ?? null
                 : null
             }
+            instrumentsRefetch={refetch}
           />
         )
       })}
@@ -114,7 +116,7 @@ export function ProtocolSetupInstruments({
 const ColumnLabel = styled.p`
   flex: 1;
   font-weight: ${TYPOGRAPHY.fontWeightSemiBold};
-  font-size: ${TYPOGRAPHY.fontWeightSemiBold};
+  font-size: ${TYPOGRAPHY.fontSize22};
   line-height: ${TYPOGRAPHY.lineHeight28};
   color: ${COLORS.darkBlack70};
 `

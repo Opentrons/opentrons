@@ -58,6 +58,7 @@ describe('BeforeBeginning', () => {
       isCreateLoading: false,
       isRobotMoving: false,
       isOnDevice: false,
+      requiredPipette: undefined,
     }
     // mockNeedHelpLink.mockReturnValue(<div>mock need help link</div>)
     mockInProgressModal.mockReturnValue(<div>mock in progress</div>)
@@ -88,7 +89,7 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },
@@ -170,6 +171,56 @@ describe('BeforeBeginning', () => {
         expect(props.proceed).toHaveBeenCalled()
       })
     })
+    it('renders the attach flow when swapping pipettes is needed', async () => {
+      props = {
+        ...props,
+        attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
+        flowType: FLOWS.DETACH,
+        requiredPipette: {
+          mount: LEFT,
+          id: 'abc',
+          pipetteName: 'p1000_single_flex',
+        },
+      }
+      const { getByText, getByAltText, getByRole } = render(props)
+      getByText('Before you begin')
+      getByText(
+        'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+      )
+      getByText(
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
+      )
+      getByAltText('Flex 1-Channel 1000 μL')
+      getByText('You will need:')
+      getByAltText('Calibration Probe')
+      getByAltText('2.5 mm Hex Screwdriver')
+      getByText(
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
+      )
+      const proceedBtn = getByRole('button', { name: 'Move gantry to front' })
+      fireEvent.click(proceedBtn)
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'loadPipette',
+            params: {
+              mount: LEFT,
+              pipetteId: 'abc',
+              pipetteName: 'p1000_single_flex',
+            },
+          },
+          { commandType: 'home' as const, params: {} },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+      await waitFor(() => {
+        expect(props.proceed).toHaveBeenCalled()
+      })
+    })
   })
   describe('detach flow single mount', () => {
     it('renders the modal with all correct text. clicking on proceed button sends commands for detach flow', async () => {
@@ -196,7 +247,7 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },
@@ -248,11 +299,7 @@ describe('BeforeBeginning', () => {
           { commandType: 'home' as const, params: {} },
           {
             commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: LEFT },
-          },
-          {
-            commandType: 'calibration/moveToMaintenancePosition',
-            params: { mount: RIGHT },
+            params: { maintenancePosition: 'attachPlate', mount: RIGHT },
           },
         ],
         false
@@ -299,7 +346,7 @@ describe('BeforeBeginning', () => {
             params: {
               mount: RIGHT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },
@@ -351,7 +398,64 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
+            },
+          },
+          { commandType: 'home' as const, params: {} },
+          {
+            commandType: 'calibration/moveToMaintenancePosition',
+            params: { mount: LEFT },
+          },
+        ],
+        false
+      )
+      await waitFor(() => {
+        expect(props.proceed).toHaveBeenCalled()
+      })
+    })
+    it('renders the detach and attach 96 channel flow when there is a required 96-channel', async () => {
+      mockGetIsGantryEmpty.mockReturnValue(false)
+      props = {
+        ...props,
+        attachedPipettes: { left: mockAttachedPipetteInformation, right: null },
+        flowType: FLOWS.ATTACH,
+        selectedPipette: NINETY_SIX_CHANNEL,
+        requiredPipette: {
+          id: '123',
+          pipetteName: 'p1000_96',
+          mount: 'left',
+        },
+      }
+      const { getByText, getByAltText, getByRole } = render(props)
+      getByText('Before you begin')
+      getByText(
+        'To get started, remove labware from the deck and clean up the working area to make attachment and calibration easier. Also gather the needed equipment shown to the right.'
+      )
+      getByText(
+        'The calibration probe is included with the robot and should be stored on the front pillar of the robot.'
+      )
+      getByText(
+        'The 96-Channel Pipette is heavy (~10kg). Ask a labmate for help, if needed.'
+      )
+      getByAltText('2.5 mm Hex Screwdriver')
+      getByAltText('Calibration Probe')
+      getByAltText('Flex 96-Channel 1000 μL')
+      getByAltText('96-Channel Mounting Plate')
+      getByText(
+        'Provided with the robot. Using another size can strip the instruments’s screws.'
+      )
+      const proceedBtn = getByRole('button', {
+        name: 'Move gantry to front',
+      })
+      fireEvent.click(proceedBtn)
+      expect(props.chainRunCommands).toHaveBeenCalledWith(
+        [
+          {
+            commandType: 'loadPipette',
+            params: {
+              mount: LEFT,
+              pipetteId: 'abc',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },
@@ -411,7 +515,7 @@ describe('BeforeBeginning', () => {
             params: {
               mount: LEFT,
               pipetteId: 'abc',
-              pipetteName: 'p1000_single_gen3',
+              pipetteName: 'p1000_single_flex',
             },
           },
           { commandType: 'home' as const, params: {} },

@@ -25,6 +25,11 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { PauseInterventionContent } from './PauseInterventionContent'
+import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
+
+import type { RunCommandSummary, RunData } from '@opentrons/api-client'
+import { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -43,8 +48,8 @@ const MODAL_STYLE = {
   position: POSITION_RELATIVE,
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
-  width: '100%',
-  margin: SPACING.spacing5,
+  width: '47rem',
+  margin: SPACING.spacing24,
   border: `6px ${String(BORDERS.styleSolid)} ${String(COLORS.blueEnabled)}`,
   borderRadius: BORDERS.radiusSoftCorners,
   boxShadow: BORDERS.smallDropShadow,
@@ -55,7 +60,7 @@ const HEADER_STYLE = {
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
   justifyContent: JUSTIFY_CENTER,
-  padding: `0px ${String(SPACING.spacing6)}`,
+  padding: `0px ${SPACING.spacing32}`,
   color: COLORS.white,
   backgroundColor: COLORS.blueEnabled,
   position: POSITION_STICKY,
@@ -67,8 +72,8 @@ const CONTENT_STYLE = {
   display: DISPLAY_FLEX,
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
-  gridGap: SPACING.spacing5,
-  padding: `${String(SPACING.spacing6)}`,
+  gridGap: SPACING.spacing24,
+  padding: `${SPACING.spacing32}`,
   borderRadius: `0px 0px ${String(BORDERS.radiusSoftCorners)} ${String(
     BORDERS.radiusSoftCorners
   )}`,
@@ -82,12 +87,43 @@ const FOOTER_STYLE = {
 
 export interface InterventionModalProps {
   robotName: string
+  onResume: () => void
+  command: RunCommandSummary
+  run: RunData
+  analysis: CompletedProtocolAnalysis | null
 }
 
 export function InterventionModal({
   robotName,
+  onResume,
+  command,
+  run,
+  analysis,
 }: InterventionModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
+
+  const childContent = React.useMemo(() => {
+    if (
+      command.commandType === 'waitForResume' ||
+      command.commandType === 'pause' // legacy pause command
+    ) {
+      return (
+        <PauseInterventionContent
+          startedAt={command.startedAt ?? null}
+          message={command.params.message ?? null}
+        />
+      )
+    } else if (command.commandType === 'moveLabware') {
+      return <MoveLabwareInterventionContent {...{ command, run, analysis }} />
+    } else {
+      return null
+    }
+  }, [
+    command.id,
+    analysis?.status,
+    run.labware.map(l => l.id).join(),
+    run.modules.map(m => m.id).join(),
+  ])
 
   return (
     <Flex
@@ -113,19 +149,21 @@ export function InterventionModal({
             </StyledText>
           </Box>
           <Box {...CONTENT_STYLE}>
-            Content Goes Here
+            {childContent}
             <Box {...FOOTER_STYLE}>
               <StyledText>
                 <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} href="" external>
-                  {t('protocol_info:intervention_modal_learn_more')}
+                  {t('protocol_info:manual_steps_learn_more')}
                   <Icon
                     name="open-in-new"
-                    marginLeft={SPACING.spacing2}
+                    marginLeft={SPACING.spacing4}
                     size="0.5rem"
                   />
                 </Link>
               </StyledText>
-              <PrimaryButton>{t('confirm_and_resume')}</PrimaryButton>
+              <PrimaryButton onClick={onResume}>
+                {t('confirm_and_resume')}
+              </PrimaryButton>
             </Box>
           </Box>
         </Box>

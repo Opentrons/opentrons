@@ -1,20 +1,21 @@
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import {
+  DIRECTION_COLUMN,
+  JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
   Module,
-  RobotWorkSpace,
-  Flex,
-  Box,
-  JUSTIFY_SPACE_BETWEEN,
-  ALIGN_CENTER,
-  DIRECTION_COLUMN,
-  SPACING,
-  PrimaryButton,
   RESPONSIVENESS,
+  RobotWorkSpace,
+  SPACING,
+  Flex,
+  DIRECTION_ROW,
+  JUSTIFY_CENTER,
+  TYPOGRAPHY,
   JUSTIFY_FLEX_END,
+  PrimaryButton,
 } from '@opentrons/components'
 import {
   inferModuleOrientationFromXCoordinate,
@@ -28,11 +29,11 @@ import ot2DeckDef from '@opentrons/shared-data/deck/definitions/3/ot2_standard.j
 import ot3DeckDef from '@opentrons/shared-data/deck/definitions/3/ot3_standard.json'
 
 import { getIsOnDevice } from '../../redux/config'
-import { SmallButton } from '../../atoms/buttons'
-import { StyledText } from '../../atoms/text'
-import { NeedHelpLink } from '../CalibrationPanels'
+import { useProtocolMetadata } from '../Devices/hooks'
 
 import type { CheckLabwareStep } from './types'
+import { SmallButton } from '../../atoms/buttons'
+import { NeedHelpLink } from '../CalibrationPanels'
 
 const LPC_HELP_LINK_URL =
   'https://support.opentrons.com/s/article/How-Labware-Offsets-work-on-the-OT-2'
@@ -47,6 +48,24 @@ const DECK_LAYER_BLOCKLIST = [
   'removableDeckOutline',
   'screwHoles',
 ]
+
+const TILE_CONTAINER_STYLE = css`
+  flex-direction: ${DIRECTION_COLUMN};
+  justify-content: ${JUSTIFY_SPACE_BETWEEN};
+  padding: ${SPACING.spacing32};
+  height: 24.625rem;
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    height: 29.5rem;
+  }
+`
+
+const Title = styled.h1`
+  ${TYPOGRAPHY.h1Default};
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.level4HeaderSemiBold};
+  }
+`
 interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
   section: 'CHECK_LABWARE' | 'CHECK_TIP_RACKS' | 'PICK_UP_TIP' | 'RETURN_TIP'
   labwareDef: LabwareDefinition2
@@ -56,39 +75,29 @@ interface PrepareSpaceProps extends Omit<CheckLabwareStep, 'section'> {
   body: React.ReactNode
 }
 export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
-  const { t } = useTranslation(['labware_position_check', 'shared'])
+  const { i18n, t } = useTranslation(['labware_position_check', 'shared'])
   const { location, moduleId, labwareDef, protocolData, header, body } = props
+
+  const { robotType } = useProtocolMetadata()
   const isOnDevice = useSelector(getIsOnDevice)
 
-  if (protocolData == null) return null
+  if (protocolData == null || robotType == null) return null
+  const deckDef = robotType === 'OT-3 Standard' ? ot3DeckDef : ot2DeckDef
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
-      minHeight="29.5rem"
-    >
-      <ResponsiveTwoUpPanel>
+    <Flex css={TILE_CONTAINER_STYLE}>
+      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing40}>
         <Flex
-          flex="1"
           flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing3}
+          flex="1"
+          gridGap={SPACING.spacing16}
         >
-          <StyledText as="h1">{header}</StyledText>
+          <Title>{header}</Title>
           {body}
         </Flex>
-        <Box flex="1">
+        <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
           <RobotWorkSpace
-            height="100%"
-            deckDef={
-              protocolData.labware.some(
-                l =>
-                  l.loadName === 'opentrons_1_trash_850ml_fixed' ||
-                  l.loadName === 'opentrons_1_trash_1100ml_fixed'
-              )
-                ? (ot3DeckDef as any)
-                : (ot2DeckDef as any)
-            }
+            height={isOnDevice ? '300px' : '100%'}
+            deckDef={deckDef as any}
             viewBox={DECK_MAP_VIEWBOX}
             deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             id="LabwarePositionCheck_deckMap"
@@ -154,43 +163,26 @@ export const PrepareSpace = (props: PrepareSpaceProps): JSX.Element | null => {
               )
             }}
           </RobotWorkSpace>
-        </Box>
-      </ResponsiveTwoUpPanel>
+        </Flex>
+      </Flex>
       {isOnDevice ? (
-        <Flex
-          width="100%"
-          justifyContent={JUSTIFY_FLEX_END}
-          alignItems={ALIGN_CENTER}
-        >
+        <Flex justifyContent={JUSTIFY_FLEX_END}>
           <SmallButton
+            buttonText={i18n.format(
+              t('shared:confirm_placement'),
+              'capitalize'
+            )}
             onClick={props.confirmPlacement}
-            buttonType="primary"
-            buttonText={t('shared:confirm_placement')}
           />
         </Flex>
       ) : (
-        <Flex
-          width="100%"
-          marginTop={SPACING.spacing6}
-          justifyContent={JUSTIFY_SPACE_BETWEEN}
-          alignItems={ALIGN_CENTER}
-        >
+        <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <NeedHelpLink href={LPC_HELP_LINK_URL} />
           <PrimaryButton onClick={props.confirmPlacement}>
-            {t('shared:confirm_placement')}
+            {i18n.format(t('shared:confirm_placement'), 'capitalize')}
           </PrimaryButton>
         </Flex>
       )}
     </Flex>
   )
 }
-
-const ResponsiveTwoUpPanel = styled.div`
-  display: flex;
-  grid-gap: ${SPACING.spacingL};
-
-  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
-    grid-gap: 0;
-    max-height: 20rem;
-  }
-`

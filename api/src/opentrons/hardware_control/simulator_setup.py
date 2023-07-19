@@ -1,13 +1,16 @@
 import asyncio
-from typing import Dict, Optional, Any, List, cast
-from dataclasses import dataclass, asdict, field
+from typing import Dict, Optional, Any, List, Union
+from typing_extensions import Literal
+from dataclasses import dataclass, asdict, field, replace
 import json
 from pathlib import Path
+from warnings import warn
 
 from opentrons.config import robot_configs
-from opentrons.config.types import RobotConfig
+from opentrons.config.types import RobotConfig, OT3Config
 from opentrons.types import Mount
 from opentrons.hardware_control import API, HardwareControlAPI, ThreadManager
+from opentrons.hardware_control.types import OT3Mount
 
 
 # Name and kwargs for a module function
@@ -19,7 +22,8 @@ class ModuleCall:
 
 
 @dataclass(frozen=True)
-class SimulatorSetup:
+class OT2SimulatorSetup:
+    machine: Literal["OT-2 Standard"] = "OT-2 Standard"
     attached_instruments: Dict[Mount, Dict[str, Optional[str]]] = field(
         default_factory=dict
     )
@@ -28,18 +32,48 @@ class SimulatorSetup:
     strict_attached_instruments: bool = True
 
 
+@dataclass(frozen=True)
+class OT3SimulatorSetup:
+    machine: Literal["OT-3 Standard"] = "OT-3 Standard"
+    attached_instruments: Dict[OT3Mount, Dict[str, Optional[str]]] = field(
+        default_factory=dict
+    )
+    attached_modules: Dict[str, List[ModuleCall]] = field(default_factory=dict)
+    config: Optional[OT3Config] = None
+    strict_attached_instruments: bool = True
+
+
+SimulatorSetup = Union[OT2SimulatorSetup, OT3SimulatorSetup]
+
+
+async def _simulator_for_setup(
+    setup: SimulatorSetup, loop: Optional[asyncio.AbstractEventLoop]
+) -> HardwareControlAPI:
+    if setup.machine == "OT-2 Standard":
+        return await API.build_hardware_simulator(
+            attached_instruments=setup.attached_instruments,
+            attached_modules=list(setup.attached_modules.keys()),
+            config=setup.config,
+            strict_attached_instruments=setup.strict_attached_instruments,
+            loop=loop,
+        )
+    else:
+        from opentrons.hardware_control.ot3api import OT3API
+
+        return await OT3API.build_hardware_simulator(
+            attached_instruments=setup.attached_instruments,
+            attached_modules=list(setup.attached_modules.keys()),
+            config=setup.config,
+            strict_attached_instruments=setup.strict_attached_instruments,
+            loop=loop,
+        )
+
+
 async def create_simulator(
     setup: SimulatorSetup, loop: Optional[asyncio.AbstractEventLoop] = None
 ) -> HardwareControlAPI:
     """Create a simulator"""
-    simulator = await API.build_hardware_simulator(
-        attached_instruments=setup.attached_instruments,
-        attached_modules=list(setup.attached_modules.keys()),
-        config=setup.config,
-        strict_attached_instruments=setup.strict_attached_instruments,
-        loop=loop,
-    )
-
+    simulator = await _simulator_for_setup(setup, loop)
     for attached_module in simulator.attached_modules:
         calls = setup.attached_modules[attached_module.name()]
         for call in calls:
@@ -56,18 +90,34 @@ async def load_simulator(
     return await create_simulator(setup=load_simulator_setup(path), loop=loop)
 
 
-async def load_simulator_thread_manager(
-    path: Path,
+def _thread_manager_for_setup(
+    setup: SimulatorSetup,
 ) -> ThreadManager[HardwareControlAPI]:
-    """Create a simulator wrapped in a ThreadManager from a JSON file."""
-    setup = load_simulator_setup(path)
-    thread_manager: ThreadManager[HardwareControlAPI] = ThreadManager(
-        API.build_hardware_simulator,
-        attached_instruments=setup.attached_instruments,
-        attached_modules=list(setup.attached_modules.keys()),
-        config=setup.config,
-        strict_attached_instruments=setup.strict_attached_instruments,
-    )
+    if setup.machine == "OT-2 Standard":
+        return ThreadManager(
+            API.build_hardware_simulator,
+            attached_instruments=setup.attached_instruments,
+            attached_modules=list(setup.attached_modules.keys()),
+            config=setup.config,
+            strict_attached_instruments=setup.strict_attached_instruments,
+        )
+    else:
+        from opentrons.hardware_control.ot3api import OT3API
+
+        return ThreadManager(
+            OT3API.build_hardware_simulator,
+            attached_instruments=setup.attached_instruments,
+            attached_modules=list(setup.attached_modules.keys()),
+            config=setup.config,
+            strict_attached_instruments=setup.strict_attached_instruments,
+        )
+
+
+async def create_simulator_thread_manager(
+    setup: SimulatorSetup,
+) -> ThreadManager[HardwareControlAPI]:
+    """Create a simulator thread manager from a loaded config."""
+    thread_manager = _thread_manager_for_setup(setup)
     await thread_manager.managed_thread_ready_async()
 
     for attached_module in thread_manager.wrapped().attached_modules:
@@ -79,10 +129,30 @@ async def load_simulator_thread_manager(
     return thread_manager
 
 
+async def load_simulator_thread_manager(
+    path: Path,
+) -> ThreadManager[HardwareControlAPI]:
+    """Create a simulator wrapped in a ThreadManager from a JSON file."""
+    return await create_simulator_thread_manager(load_simulator_setup(path))
+
+
 def save_simulator_setup(simulator_setup: SimulatorSetup, path: Path) -> None:
     """Write a simulator setup to a file."""
-    as_dict = asdict(simulator_setup)
-    as_dict = {k: _prepare_for_dict(k, v) for (k, v) in as_dict.items()}
+    no_config = replace(simulator_setup, config=None)
+    as_dict = asdict(no_config)
+
+    as_dict["config"] = (
+        robot_configs.config_to_save(simulator_setup.config)
+        if simulator_setup.config
+        else None
+    )
+
+    if as_dict.get("attached_instruments", None):
+        as_dict["attached_instruments"] = {
+            mount.name.lower(): data
+            for mount, data in as_dict["attached_instruments"].items()
+        }
+
     with path.open("w") as f:
         json.dump(as_dict, f)
 
@@ -91,19 +161,20 @@ def load_simulator_setup(path: Path) -> SimulatorSetup:
     """Load a simulator setup from a file."""
     with path.open() as f:
         obj = json.load(f)
-        return SimulatorSetup(
+
+    if "machine" not in obj:
+        warn(
+            "Simulator configuration does not name a machine, defaulting to OT-2 Standard"
+        )
+    machine_type = obj.get("machine", "OT-2 Standard")
+    if machine_type == "OT-2 Standard":
+        return OT2SimulatorSetup(
             **{k: _prepare_for_simulator_setup(k, v) for (k, v) in obj.items()}
         )
-
-
-def _prepare_for_dict(key: str, value: Dict[str, Any]) -> Dict[str, Any]:
-    """Convert an element in SimulatorSetup to be a serializable dict"""
-    if key == "attached_instruments" and value:
-        return {
-            mount.name.lower(): data
-            for (mount, data) in cast(Dict[Mount, Any], value).items()
-        }
-    return value
+    else:
+        return OT3SimulatorSetup(
+            **{k: _prepare_for_ot3_simulator_setup(k, v) for (k, v) in obj.items()}
+        )
 
 
 def _prepare_for_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
@@ -112,6 +183,16 @@ def _prepare_for_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
         return {Mount[mount.upper()]: data for (mount, data) in value.items()}
     if key == "config" and value:
         return robot_configs.build_config_ot2(value)
+    if key == "attached_modules" and value:
+        return {k: [ModuleCall(**data) for data in v] for (k, v) in value.items()}
+    return value
+
+
+def _prepare_for_ot3_simulator_setup(key: str, value: Dict[str, Any]) -> Any:
+    if key == "attached_instruments" and value:
+        return {OT3Mount[mount.upper()]: data for (mount, data) in value.items()}
+    if key == "config" and value:
+        return robot_configs.build_config_ot3(value)
     if key == "attached_modules" and value:
         return {k: [ModuleCall(**data) for data in v] for (k, v) in value.items()}
     return value

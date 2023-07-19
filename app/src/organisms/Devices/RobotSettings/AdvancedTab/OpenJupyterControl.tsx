@@ -38,12 +38,12 @@ export function OpenJupyterControl({
       <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
           id="AdvancedSettings_About"
         >
           {t('jupyter_notebook')}
         </StyledText>
-        <StyledText as="p" marginBottom={SPACING.spacing3}>
+        <StyledText as="p" marginBottom={SPACING.spacing8}>
           {t('jupyter_notebook_description')}
         </StyledText>
         <ExternalLink href={JUPYTER_NOTEBOOK_LINK}>
@@ -54,7 +54,7 @@ export function OpenJupyterControl({
         onClick={() => trackEvent(EVENT_JUPYTER_OPEN)}
         as={Link}
         href={href}
-        marginLeft={SPACING.spacing6}
+        marginLeft={SPACING.spacing32}
         external
       >
         {t('launch_jupyter_notebook')}

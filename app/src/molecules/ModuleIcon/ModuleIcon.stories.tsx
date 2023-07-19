@@ -50,9 +50,9 @@ const modules = [
 ]
 
 const Template: Story<React.ComponentProps<typeof ModuleIcon>> = args => (
-  <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+  <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
     <StyledText>Modules</StyledText>
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing3}>
+    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing8}>
       {modules.map((module, i) => (
         <ModuleIcon
           key={`module-${i}`}

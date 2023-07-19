@@ -39,7 +39,7 @@ export function FloatingActionButton(
   const contentColor = disabled ? COLORS.darkBlack60 : COLORS.white
   const FLOATING_ACTION_BUTTON_STYLE = css`
     background-color: ${COLORS.highlightPurple1};
-    border-radius: ${BORDERS.size_five};
+    border-radius: ${BORDERS.borderRadiusSize5};
     box-shadow: ${BORDERS.shadowBig};
     color: ${contentColor};
     cursor: default;
@@ -50,7 +50,7 @@ export function FloatingActionButton(
 
     &:focus-visible {
       border-color: ${COLORS.fundamentalsFocus};
-      border-width: ${SPACING.spacing2};
+      border-width: ${SPACING.spacing4};
       box-shadow: ${BORDERS.shadowBig};
     }
 
@@ -62,21 +62,21 @@ export function FloatingActionButton(
 
   return (
     <Btn
-      bottom={SPACING.spacing5}
+      bottom={SPACING.spacing24}
       css={FLOATING_ACTION_BUTTON_STYLE}
       disabled={disabled}
       fontSize={TYPOGRAPHY.fontSize28}
       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
       lineHeight={TYPOGRAPHY.lineHeight36}
-      padding={`0.75rem ${SPACING.spacing5}`}
+      padding={`${SPACING.spacing12} ${SPACING.spacing24}`}
       position={POSITION_FIXED}
-      right={SPACING.spacing5}
+      right={SPACING.spacing24}
       {...buttonProps}
     >
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_ROW}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         <Icon
           color={contentColor}

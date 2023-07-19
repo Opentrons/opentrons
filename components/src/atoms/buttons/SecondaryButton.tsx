@@ -19,7 +19,7 @@ export const SecondaryButton = styled.button.withConfig<SecondaryButtonProps>({
   border-color: ${props =>
     props.isDangerous ? COLORS.errorEnabled : 'initial'};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing3} ${SPACING.spacing4};
+  padding: ${SPACING.spacing8} ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   background-color: ${COLORS.transparent};
   ${TYPOGRAPHY.pSemiBold}

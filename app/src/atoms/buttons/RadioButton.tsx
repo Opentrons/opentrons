@@ -19,6 +19,7 @@ interface RadioButtonProps extends StyleProps {
   disabled?: boolean
   isSelected?: boolean
   radioButtonType?: 'large' | 'small'
+  subButtonLabel?: string
 }
 
 export function RadioButton(props: RadioButtonProps): JSX.Element {
@@ -29,6 +30,7 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
     isSelected = false,
     onChange,
     radioButtonType = 'large',
+    subButtonLabel,
   } = props
 
   const isLarge = radioButtonType === 'large'
@@ -63,9 +65,9 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
   // TODO: (ew, 2023-04-21): button is not tabbable, so focus state
   // is not possible on ODD. It's testable in storybook but not in real life.
   const SettingButtonLabel = styled.label`
-    border-radius: ${BORDERS.size_four};
+    border-radius: ${BORDERS.borderRadiusSize4};
     cursor: pointer;
-    padding: ${isLarge ? SPACING.spacing5 : SPACING.spacingM};
+    padding: ${isLarge ? SPACING.spacing24 : SPACING.spacing20};
     width: 100%;
 
     ${isSelected ? SELECTED_BUTTON_STYLE : AVAILABLE_BUTTON_STYLE}
@@ -96,6 +98,11 @@ export function RadioButton(props: RadioButtonProps): JSX.Element {
         >
           {buttonLabel}
         </StyledText>
+        {subButtonLabel != null ? (
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+            {subButtonLabel}
+          </StyledText>
+        ) : null}
       </SettingButtonLabel>
     </Flex>
   )

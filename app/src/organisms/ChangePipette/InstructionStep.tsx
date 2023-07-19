@@ -38,13 +38,13 @@ export function InstructionStep(props: Props): JSX.Element {
 
   return (
     <Flex justifyContent={JUSTIFY_SPACE_EVENLY}>
-      <Box marginRight={SPACING.spacingXXL} width="18.6875rem">
+      <Box marginRight={SPACING.spacing40} width="18.6875rem">
         {children}
       </Box>
       <Box
-        marginTop={diagram === 'tab' ? '4.1875rem' : '0.75rem'}
-        marginLeft={diagram === 'tab' ? '1.5625rem' : SPACING.spacingXXL}
-        marginRight={SPACING.spacing6}
+        marginTop={diagram === 'tab' ? '4.1875rem' : SPACING.spacing12}
+        marginLeft={diagram === 'tab' ? '1.5625rem' : SPACING.spacing40}
+        marginRight={SPACING.spacing32}
       >
         <img
           src={display}

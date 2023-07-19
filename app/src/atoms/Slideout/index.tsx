@@ -30,7 +30,7 @@ export interface SlideoutProps {
 
 const SHARED_STYLE = css`
   z-index: 2;
-  overflow-x: hidden;
+  overflow: hidden;
   @keyframes slidein {
     from {
       transform: translateX(100%);
@@ -153,7 +153,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         height="100%"
       >
         <Flex
-          paddingY={SPACING.spacing4}
+          paddingY={SPACING.spacing16}
           width="19.5rem"
           height="100%"
           flex="0 1 auto"
@@ -165,8 +165,8 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
               flexDirection={DIRECTION_ROW}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               alignItems={ALIGN_CENTER}
-              paddingX={SPACING.spacing4}
-              marginBottom={SPACING.spacing4}
+              paddingX={SPACING.spacing16}
+              marginBottom={SPACING.spacing16}
             >
               <StyledText
                 as="h2"
@@ -194,7 +194,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           )}
           <Divider marginY={0} color={COLORS.medGreyEnabled} />
           <Box
-            padding={SPACING.spacing4}
+            padding={SPACING.spacing16}
             flex="1 1 auto"
             overflowY="scroll"
             data-testid={`Slideout_body_${
@@ -207,8 +207,8 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           </Box>
           {footer != null ? (
             <Box
-              paddingTop={SPACING.spacing4}
-              paddingX={SPACING.spacing4}
+              paddingTop={SPACING.spacing16}
+              paddingX={SPACING.spacing16}
               flex="0 0 auto"
               boxShadow={isReachedBottom ? 'none' : '0px -4px 12px #0000001a'}
               zIndex="3"

@@ -2,8 +2,10 @@
 
 from opentrons.config import feature_flags
 from opentrons.hardware_control import API as OT2API, HardwareControlAPI
+from opentrons.protocols.api_support import deck_type
 from opentrons.protocol_engine import (
     Config as ProtocolEngineConfig,
+    DeckType,
     create_protocol_engine,
 )
 from opentrons.protocol_reader.protocol_source import ProtocolConfig
@@ -50,6 +52,7 @@ async def create_simulating_runner(
         hardware_api=simulating_hardware_api,
         config=ProtocolEngineConfig(
             robot_type=robot_type,
+            deck_type=DeckType(deck_type.for_simulation(robot_type)),
             ignore_pause=True,
             use_virtual_modules=True,
             use_virtual_gripper=True,

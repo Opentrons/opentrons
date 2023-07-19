@@ -45,7 +45,7 @@ export function UseOlderAspirateBehavior({
       <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
-          paddingBottom={SPACING.spacing2}
+          paddingBottom={SPACING.spacing4}
           id="AdvancedSettings_devTools"
         >
           {t('use_older_aspirate')}

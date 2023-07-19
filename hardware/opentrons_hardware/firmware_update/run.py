@@ -3,7 +3,14 @@ import logging
 import asyncio
 import os
 from typing import Optional, Dict, Tuple, AsyncIterator, Any
-from .types import FirmwareUpdateStatus, StatusElement
+
+
+from opentrons_shared_data.errors.exceptions import (
+    InternalUSBCommunicationError,
+    FirmwareUpdateFailedError,
+    EnumeratedError,
+    PythonException,
+)
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
@@ -26,6 +33,7 @@ from opentrons_hardware.firmware_update import (
 )
 from opentrons_hardware.firmware_update.errors import BootloaderNotReady
 from opentrons_hardware.firmware_update.target import Target
+from .types import FirmwareUpdateStatus, StatusElement
 
 logger = logging.getLogger(__name__)
 DFU_PID = "df11"
@@ -60,7 +68,15 @@ async def find_dfu_device(pid: str, expected_device_count: int) -> str:
         if stdout is None and stderr is None:
             continue
         if stderr:
-            raise RuntimeError(f"Error finding dfu device: {stderr.decode()}")
+            raise BootloaderNotReady(
+                USBTarget.rear_panel,
+                wrapping=[
+                    InternalUSBCommunicationError(
+                        message="Error finding dfu device",
+                        detail={"stderr": stderr.decode(), "target-pid": pid},
+                    )
+                ],
+            )
 
         result = stdout.decode()
         if pid not in result:
@@ -76,11 +92,24 @@ async def find_dfu_device(pid: str, expected_device_count: int) -> str:
             # rear panel has 3 endpoints
             return serial
         elif devices_found > expected_device_count:
-            raise OSError("Multiple new bootloader devices" "found on mode switch")
+            raise BootloaderNotReady(
+                USBTarget.rear_panel,
+                wrapping=[
+                    InternalUSBCommunicationError(
+                        message="Multiple new bootloader devices found on mode switch",
+                        detail={"devices": result, "target-pid": pid},
+                    )
+                ],
+            )
 
-    raise RuntimeError(
-        "Could not update firmware via dfu. Possible issues- dfu-util"
-        " not working or specified dfu device not found"
+    raise BootloaderNotReady(
+        USBTarget.rear_panel,
+        wrapping=[
+            InternalUSBCommunicationError(
+                message="Could not find dfu device to update firmware. dfu-util may be broken or the device may not be present.",
+                detail={"target-pid": pid},
+            )
+        ],
     )
 
 
@@ -139,6 +168,7 @@ class RunUpdate:
         retry_count: int,
         timeout_seconds: float,
         erase: Optional[bool] = True,
+        erase_timeout_seconds: float = 60,
     ) -> None:
         """Initialize RunUpdate class.
 
@@ -158,6 +188,7 @@ class RunUpdate:
         self._retry_count = retry_count
         self._timeout_seconds = timeout_seconds
         self._erase = erase
+        self._erase_timeout_seconds = erase_timeout_seconds
         self._status_dict = {
             target: (FirmwareUpdateStatus.queued, 0) for target in update_details.keys()
         }
@@ -237,36 +268,30 @@ class RunUpdate:
             else:
                 continue
 
-    async def _run_can_update(
+    async def _prep_can_update(
         self,
         messenger: CanMessenger,
         node_id: NodeId,
-        filepath: str,
         retry_count: int,
         timeout_seconds: float,
-        erase: Optional[bool] = True,
-    ) -> None:
-        """Perform a firmware update on a node target."""
-        if not os.path.exists(filepath):
-            logger.error(f"Subsystem update file not found {filepath}")
-            raise FileNotFoundError
-
-        initiator = FirmwareUpdateInitiator(messenger)
-        downloader = FirmwareUpdateDownloader(messenger)
+        erase: Optional[bool],
+        erase_timeout_seconds: float = 60,
+    ) -> float:
 
         target = Target.from_single_node(node_id)
 
         logger.info(f"Initiating FW Update on {target}.")
         await self._status_queue.put((node_id, (FirmwareUpdateStatus.updating, 0)))
 
-        await initiator.run(
+        await FirmwareUpdateInitiator(messenger).run(
             target=target,
             retry_count=retry_count,
             ready_wait_time_sec=timeout_seconds,
         )
-        download_start_progress = 0.1
+
+        prep_progress = 0.1
         await self._status_queue.put(
-            (node_id, (FirmwareUpdateStatus.updating, download_start_progress))
+            (node_id, (FirmwareUpdateStatus.updating, prep_progress))
         )
 
         if erase:
@@ -276,28 +301,71 @@ class RunUpdate:
             try:
                 await eraser.run(
                     node_id=target.bootloader_node,
-                    timeout_sec=timeout_seconds,
+                    timeout_sec=erase_timeout_seconds,
                 )
-                download_start_progress = 0.2
+                prep_progress = 0.2
                 await self._status_queue.put(
                     (
                         node_id,
-                        (FirmwareUpdateStatus.updating, download_start_progress),
+                        (FirmwareUpdateStatus.updating, prep_progress),
                     )
                 )
-            except BootloaderNotReady as e:
+            except BaseException as e:
                 logger.error(f"Firmware Update failed for {target} {e}.")
                 await self._status_queue.put(
                     (
                         node_id,
-                        (FirmwareUpdateStatus.updating, download_start_progress),
+                        (FirmwareUpdateStatus.updating, prep_progress),
                     )
                 )
-                return
+                if isinstance(e, FirmwareUpdateFailedError):
+                    raise
+                elif isinstance(e, EnumeratedError):
+                    raise FirmwareUpdateFailedError(
+                        message="Device did not enter bootloader",
+                        detail={"node": target.bootloader_node.application_for().name},
+                        wrapping=[e],
+                    )
+                else:
+                    raise FirmwareUpdateFailedError(
+                        "Unhandled exception during firmware update",
+                        detail={"node": target.bootloader_node.application_for().name},
+                        wrapping=[PythonException(e)],
+                    )
         else:
             logger.info("Skipping erase step.")
+        return prep_progress
 
+    async def _run_can_update(
+        self,
+        messenger: CanMessenger,
+        node_id: NodeId,
+        filepath: str,
+        retry_count: int,
+        timeout_seconds: float,
+        erase: Optional[bool] = True,
+        erase_timeout_seconds: float = 60,
+    ) -> None:
+        """Perform a firmware update on a node target."""
+        if not os.path.exists(filepath):
+            logger.error(f"Subsystem update file not found {filepath}")
+            raise FirmwareUpdateFailedError(
+                message="Subsystem update file not found",
+                detail={"filepath": filepath, "target": node_id.application_for().name},
+            )
+
+        download_start_progress = await self._prep_can_update(
+            messenger,
+            node_id,
+            retry_count,
+            timeout_seconds,
+            erase,
+            erase_timeout_seconds,
+        )
+
+        target = Target.from_single_node(node_id)
         logger.info(f"Downloading {filepath} to {target.bootloader_node}.")
+        downloader = FirmwareUpdateDownloader(messenger)
         with open(filepath) as f:
             hex_processor = HexRecordProcessor.from_file(f)
             async for download_progress in downloader.run(
@@ -335,6 +403,7 @@ class RunUpdate:
                 retry_count=self._retry_count,
                 timeout_seconds=self._timeout_seconds,
                 erase=self._erase,
+                erase_timeout_seconds=self._erase_timeout_seconds,
             )
             for target, filepath in self._update_details.items()
             if target in NodeId
@@ -359,4 +428,5 @@ class RunUpdate:
             except asyncio.TimeoutError:
                 pass
             if task.done():
+                _ = task.result()
                 break

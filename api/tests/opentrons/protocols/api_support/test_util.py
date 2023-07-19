@@ -5,6 +5,7 @@ from opentrons.types import Point, Location, Mount
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.labware import Labware, get_labware_definition
 from opentrons.protocol_api.core.legacy.deck import Deck
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
     AxisMaxSpeeds,
@@ -15,7 +16,7 @@ from opentrons.hardware_control.types import Axis
 
 
 def test_max_speeds_userdict():
-    defaults = AxisMaxSpeeds()
+    defaults = AxisMaxSpeeds(robot_type="OT-2 Standard")
     assert defaults.data == {}
     assert dict(defaults) == {}
 
@@ -64,7 +65,7 @@ def test_build_edges():
         core_map=None,  # type: ignore[arg-type]
     )
     off = Point(0, 0, 1.0)
-    deck = Deck()
+    deck = Deck(deck_type=STANDARD_OT2_DECK)
     old_correct_edges = [
         test_lw["A1"].from_center_cartesian(x=1.0, y=0, z=1) + off,
         test_lw["A1"].from_center_cartesian(x=-1.0, y=0, z=1) + off,

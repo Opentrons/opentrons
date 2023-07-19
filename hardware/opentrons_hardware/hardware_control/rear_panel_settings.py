@@ -15,8 +15,12 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     EstopButtonPresentRequest,
     EstopButtonDetectionChange,
     Ack,
+    WriteEEPromRequest,
+    ReadEEPromRequest,
+    ReadEEPromResponse,
 )
 from opentrons_hardware.firmware_bindings import utils
+from opentrons_hardware.firmware_bindings.messages.fields import EepromDataField
 from typing import cast, Optional
 
 log = logging.getLogger(__name__)
@@ -34,6 +38,47 @@ class RearPinState:
     aux2_id_active: bool = False
     etop_active: bool = False
     door_open: bool = False
+
+
+async def write_eeprom(
+    messenger: Optional[BinaryMessenger], data_addr: int, data_len: int, data: bytes
+) -> bool:
+    """Writes up to 8 bytes from the eeprom."""
+    if messenger is None:
+        # the EVT bots don't have switches so just return that the door is closed
+        return False
+    if data_addr < 0 or data_addr > 0x4000 or data_len < 0 or data_len > 8:
+        return False
+    response = await messenger.send_and_receive(
+        message=WriteEEPromRequest(
+            data_address=utils.UInt16Field(data_addr),
+            data_length=utils.UInt16Field(data_len),
+            data=EepromDataField(data),
+        ),
+        response_type=Ack,
+    )
+    return response is not None
+
+
+async def read_eeprom(
+    messenger: Optional[BinaryMessenger], data_addr: int, data_len: int
+) -> bytes:
+    """Reads up to 8 bytes from the eeprom."""
+    if messenger is None:
+        # the EVT bots don't have switches so just return that the door is closed
+        return b""
+    if data_addr < 0 or data_addr > 0x4000 or data_len < 0 or data_len > 8:
+        return b""
+    response = await messenger.send_and_receive(
+        message=ReadEEPromRequest(
+            data_address=utils.UInt16Field(data_addr),
+            data_length=utils.UInt16Field(data_len),
+        ),
+        response_type=ReadEEPromResponse,
+    )
+    if response is None:
+        return b""
+    return bytes(cast(ReadEEPromResponse, response).data.value)
 
 
 async def get_door_state(messenger: Optional[BinaryMessenger]) -> bool:

@@ -9,6 +9,8 @@ from functools import wraps
 import asyncio
 import logging
 from logging.config import dictConfig
+from opentrons.hardware_control.api import API
+from opentrons.hardware_control.ot3api import OT3API
 
 update_firmware = True
 has_robot_server = True
@@ -33,18 +35,19 @@ from subprocess import run  # noqa: E402
 from typing import Union, Type, Any  # noqa: E402
 
 from opentrons.types import Mount, Point  # noqa: E402
-from opentrons.hardware_control.types import Axis, CriticalPoint  # noqa: E402
 from opentrons.config import feature_flags as ff  # noqa: E402
 from opentrons.hardware_control.modules.types import ModuleType  # noqa: E402
 from opentrons.hardware_control.types import (  # noqa: E402
-    OT3Axis,
+    Axis,
     OT3Mount,
-    OT3SubSystem,
+    SubSystem,
     GripperProbe,
+    CriticalPoint,
 )
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     calibrate_pipette,
     calibrate_belts,
+    delete_belt_calibration_data,
     calibrate_gripper_jaw,
     calibrate_module,
     find_calibration_structure_height,
@@ -53,7 +56,6 @@ from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
     find_axis_center,
     gripper_pin_offsets_mean,
 )
-from opentrons.hardware_control.protocols import HardwareControlAPI  # noqa: E402
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
 
 
@@ -84,23 +86,35 @@ LOG_CONFIG = {
 }
 
 if ff.enable_ot3_hardware_controller():
-    from opentrons.hardware_control.ot3api import OT3API
 
-    HCApi: Union[Type[OT3API], Type["API"]] = OT3API
+    HCApi: Union[Type[OT3API], Type[API]] = OT3API
+
+    def build_thread_manager() -> ThreadManager[Union[API, OT3API]]:
+        return ThreadManager(
+            OT3API.build_hardware_controller,
+            use_usb_bus=ff.rear_panel_integration(),
+            update_firmware=update_firmware,
+        )
 
     def wrap_async_util_fn(fn: Any, *bind_args: Any, **bind_kwargs: Any) -> Any:
         @wraps(fn)
         def synchronizer(*args: Any, **kwargs: Any) -> Any:
-            return asyncio.get_event_loop().run_until_complete(
+            return asyncio.new_event_loop().run_until_complete(
                 fn(*bind_args, *args, **bind_kwargs, **kwargs)
             )
 
         return synchronizer
 
 else:
-    from opentrons.hardware_control.api import API
 
     HCApi = API
+
+    def build_thread_manager() -> ThreadManager[Union[API, OT3API]]:
+        return ThreadManager(
+            API.build_hardware_controller,
+            use_usb_bus=ff.rear_panel_integration(),
+            update_firmware=update_firmware,
+        )
 
 
 logging.basicConfig(level=logging.INFO)
@@ -110,23 +124,28 @@ def stop_server() -> None:
     run(["systemctl", "stop", "opentrons-robot-server"])
 
 
-def build_api() -> ThreadManager[HardwareControlAPI]:
+def build_api() -> ThreadManager[Union[API, OT3API]]:
     # NOTE: We are using StreamHandler so when the hw controller is
     # being built we can log firmware update progress to stdout.
     stream_handler = logging.StreamHandler()
     stream_handler.setLevel(logging.INFO)
     logging.getLogger().addHandler(stream_handler)
-    tm = ThreadManager(
-        HCApi.build_hardware_controller,
-        use_usb_bus=ff.rear_panel_integration(),
-        update_firmware=update_firmware,
-    )
+    tm = build_thread_manager()
     logging.getLogger().removeHandler(stream_handler)
     tm.managed_thread_ready_blocking()
+
+    if update_firmware:
+
+        async def _do_update() -> None:
+            async for update in tm.update_firmware():
+                print(f"Update: {update.subsystem.name}: {update.progress}%")
+
+        asyncio.run(_do_update())
+
     return tm
 
 
-def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
+def do_interact(api: ThreadManager[Union[API, OT3API]]) -> None:
     interact(
         banner=(
             "Hardware Control API REPL\nCall methods on api like "
@@ -137,9 +156,8 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             "Mount": Mount,
             "Point": Point,
             "Axis": Axis,
-            "OT3Axis": OT3Axis,
             "OT3Mount": OT3Mount,
-            "OT3SubSystem": OT3SubSystem,
+            "SubSystem": SubSystem,
             "GripperProbe": GripperProbe,
             "ModuleType": ModuleType,
             "find_edge": wrap_async_util_fn(find_edge_binary, api),
@@ -148,6 +166,7 @@ def do_interact(api: ThreadManager[HardwareControlAPI]) -> None:
             ),
             "calibrate_pipette": wrap_async_util_fn(calibrate_pipette, api),
             "calibrate_belts": wrap_async_util_fn(calibrate_belts, api),
+            "delete_belt_calibration_data": delete_belt_calibration_data,
             "calibrate_gripper": wrap_async_util_fn(calibrate_gripper_jaw, api),
             "calibrate_module": wrap_async_util_fn(calibrate_module, api),
             "gripper_pin_offsets_mean": gripper_pin_offsets_mean,

@@ -7,7 +7,6 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
-  TYPOGRAPHY,
   SPACING,
 } from '@opentrons/components'
 import {
@@ -17,11 +16,12 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { SmallButton } from '../../../atoms/buttons'
-import { Modal } from '../../../molecules/Modal/OnDeviceDisplay/Modal'
+import { Modal } from '../../../molecules/Modal'
 import { useTrackProtocolRunEvent } from '../../../organisms/Devices/hooks'
 import { ANALYTICS_PROTOCOL_RUN_CANCEL } from '../../../redux/analytics'
+import { CancelingRunModal } from './CancelingRunModal'
 
-import type { ModalHeaderBaseProps } from '../../../molecules/Modal/OnDeviceDisplay/types'
+import type { ModalHeaderBaseProps } from '../../../molecules/Modal/types'
 
 interface ConfirmCancelRunModalProps {
   runId: string
@@ -54,13 +54,12 @@ export function ConfirmCancelRunModal({
   }
 
   const handleCancelRun = (): void => {
+    setIsCanceling(true)
     stopRun(runId, {
       onSuccess: () => {
         trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_CANCEL })
         dismissCurrentRun(runId)
-        if (isActiveRun) {
-          history.push(`/protocols/${runId}/summary`)
-        } else {
+        if (!isActiveRun) {
           if (protocolId != null) {
             history.push(`/protocols/${protocolId}`)
           } else {
@@ -74,42 +73,31 @@ export function ConfirmCancelRunModal({
     })
   }
 
-  return (
+  return isCanceling || isDismissing ? (
+    <CancelingRunModal />
+  ) : (
     <Modal
       modalSize="medium"
       header={modalHeader}
-      isError={isActiveRun}
       onOutsideClick={() => setShowConfirmCancelRunModal(false)}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          padding={SPACING.spacing6}
-          gridGap="0.75rem"
+          gridGap={SPACING.spacing12}
+          paddingBottom={SPACING.spacing32}
+          paddingTop={`${isActiveRun ? SPACING.spacing32 : '0'}`}
         >
-          <StyledText
-            fontSize={TYPOGRAPHY.fontSize22}
-            lineHeight={TYPOGRAPHY.lineHeight28}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {t('cancel_run_alert_info')}
-          </StyledText>
-          <StyledText
-            fontSize={TYPOGRAPHY.fontSize22}
-            lineHeight={TYPOGRAPHY.lineHeight28}
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
-            {t('cancel_run_module_info')}
-          </StyledText>
+          <StyledText as="p">{t('cancel_run_alert_info')}</StyledText>
+          <StyledText as="p">{t('cancel_run_module_info')}</StyledText>
         </Flex>
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
           width="100%"
         >
           <SmallButton
             flex="1"
-            buttonType="primary"
             buttonText={t('shared:go_back')}
             onClick={() => setShowConfirmCancelRunModal(false)}
           />
@@ -118,7 +106,6 @@ export function ConfirmCancelRunModal({
             buttonType="alert"
             buttonText={t('cancel_run')}
             onClick={handleCancelRun}
-            disabled={isCanceling || isDismissing}
           />
         </Flex>
       </Flex>

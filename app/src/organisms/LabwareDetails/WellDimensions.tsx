@@ -63,7 +63,7 @@ export function WellDimensions(props: WellDimensionsProps): JSX.Element {
   })?.map((src, index) => <img width="250px" src={src} key={index} />)
 
   return (
-    <Box marginBottom={SPACING.spacing4}>
+    <Box marginBottom={SPACING.spacing16}>
       <ExpandingTitle
         label={`${t(wellLabel)} ${t('measurements')} ${
           labelSuffix != null ? labelSuffix : ''

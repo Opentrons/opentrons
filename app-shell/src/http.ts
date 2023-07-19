@@ -85,12 +85,13 @@ export function fetchToFile(
 export function postFile(
   input: RequestInput,
   name: string,
-  source: string
+  source: string,
+  init?: RequestInit
 ): Promise<Response> {
   return createReadStream(source).then(readStream => {
     const body = new FormData()
     body.append(name, readStream)
-    return fetch(input, { body, method: 'POST' })
+    return fetch(input, { ...init, body, method: 'POST' })
   })
 }
 

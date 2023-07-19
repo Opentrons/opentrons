@@ -13,7 +13,6 @@ describe('SmallButton', () => {
   beforeEach(() => {
     props = {
       onClick: jest.fn(),
-      buttonType: 'primary',
       buttonText: 'small button',
     }
   })
@@ -25,7 +24,7 @@ describe('SmallButton', () => {
       `background-color: ${COLORS.blueEnabled}`
     )
     expect(getByRole('button')).toHaveStyle(
-      `border-radius: ${BORDERS.size_four}`
+      `border-radius: ${BORDERS.borderRadiusSize4}`
     )
   })
   it('renders the alert button', () => {
@@ -79,7 +78,7 @@ describe('SmallButton', () => {
     }
     const { getByRole } = render(props)
     expect(getByRole('button')).toHaveStyle(
-      `border-radius: ${BORDERS.size_five}`
+      `border-radius: ${BORDERS.borderRadiusSize5}`
     )
   })
   it('renders an icon with start placement', () => {

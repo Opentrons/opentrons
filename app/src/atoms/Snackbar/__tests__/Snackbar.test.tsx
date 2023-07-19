@@ -48,7 +48,7 @@ describe('Snackbar', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(4000)
+      jest.advanceTimersByTime(5000)
     })
     expect(props.onClose).toHaveBeenCalled()
   })
@@ -67,7 +67,7 @@ describe('Snackbar', () => {
     })
     expect(props.onClose).not.toHaveBeenCalled()
     act(() => {
-      jest.advanceTimersByTime(4000)
+      jest.advanceTimersByTime(5000)
     })
     expect(props.onClose).toHaveBeenCalled()
   })

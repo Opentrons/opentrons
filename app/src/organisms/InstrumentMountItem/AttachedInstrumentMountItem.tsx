@@ -2,8 +2,12 @@ import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 
 import {
+  getGripperDisplayName,
+  getPipetteModelSpecs,
+  GripperModel,
   LEFT,
   NINETY_SIX_CHANNEL,
+  PipetteModel,
   SINGLE_MOUNT_PIPETTES,
 } from '@opentrons/shared-data'
 import { ChoosePipette } from '../PipetteWizardFlows/ChoosePipette'
@@ -11,6 +15,7 @@ import { FLOWS } from '../PipetteWizardFlows/constants'
 import { PipetteWizardFlows } from '../PipetteWizardFlows'
 import { GripperWizardFlows } from '../GripperWizardFlows'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
+import { useMaintenanceRunTakeover } from '../TakeoverModal'
 import { LabeledMount } from './LabeledMount'
 import type { InstrumentData } from '@opentrons/api-client'
 import type { Mount } from '../../redux/pipettes/types'
@@ -40,6 +45,7 @@ export function AttachedInstrumentMountItem(
     selectedPipette,
     setSelectedPipette,
   ] = React.useState<SelectablePipettes>(SINGLE_MOUNT_PIPETTES)
+  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
 
   const handleClick: React.MouseEventHandler = () => {
     if (attachedInstrument == null && mount !== 'extension') {
@@ -48,17 +54,32 @@ export function AttachedInstrumentMountItem(
       setWizardProps({
         flowType: GRIPPER_FLOW_TYPES.ATTACH,
         attachedGripper: attachedInstrument,
+        onComplete: () => {
+          history.push(`/instruments/${mount}`)
+        },
         closeFlow: () => setWizardProps(null),
       })
+      setODDMaintenanceFlowInProgress()
     } else {
       history.push(`/instruments/${mount}`)
     }
+  }
+  let displayName
+  if (attachedInstrument != null && attachedInstrument.ok) {
+    displayName =
+      attachedInstrument?.mount !== 'extension'
+        ? getPipetteModelSpecs(
+            attachedInstrument?.instrumentModel as PipetteModel
+          )?.displayName
+        : getGripperDisplayName(
+            attachedInstrument?.instrumentModel as GripperModel
+          )
   }
   return (
     <>
       <LabeledMount
         mount={mount}
-        instrumentName={attachedInstrument?.instrumentModel ?? null}
+        instrumentName={displayName ?? null}
         handleClick={handleClick}
       />
       {showChoosePipetteModal ? (
@@ -80,6 +101,7 @@ export function AttachedInstrumentMountItem(
                 history.push(`/instruments/${mount}`)
               },
             })
+            setODDMaintenanceFlowInProgress()
             setShowChoosePipetteModal(false)
           }}
           setSelectedPipette={setSelectedPipette}

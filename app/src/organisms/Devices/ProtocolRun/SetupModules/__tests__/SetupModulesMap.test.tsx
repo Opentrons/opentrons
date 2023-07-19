@@ -193,8 +193,7 @@ describe('SetupModulesMap', () => {
         partialComponentPropsMatcher({
           moduleModel: mockMagneticModule.model,
           isAttached: false,
-          usbPort: null,
-          hubPort: null,
+          physicalPort: null,
           runId: MOCK_RUN_ID,
         })
       )
@@ -247,8 +246,7 @@ describe('SetupModulesMap', () => {
         componentPropsMatcher({
           moduleModel: mockMagneticModule.model,
           isAttached: true,
-          usbPort: mockMagneticModuleFixture.usbPort.port,
-          hubPort: mockMagneticModuleFixture.usbPort.hub,
+          physicalPort: mockMagneticModuleFixture.usbPort,
           runId: MOCK_RUN_ID,
         })
       )
@@ -259,8 +257,7 @@ describe('SetupModulesMap', () => {
         componentPropsMatcher({
           moduleModel: mockTCModule.model,
           isAttached: true,
-          usbPort: mockThermocyclerFixture.usbPort.port,
-          hubPort: mockThermocyclerFixture.usbPort.hub,
+          physicalPort: mockThermocyclerFixture.usbPort,
           runId: MOCK_RUN_ID,
         })
       )
@@ -273,7 +270,6 @@ describe('SetupModulesMap', () => {
   it('renders Moam with the correct module in the correct slot', () => {
     const dupModId = `${mockMagneticModule.moduleId}duplicate`
     const dupModPort = 10
-    const dupModHub = 2
     when(mockUseModuleRenderInfoForProtocolById)
       .calledWith(MOCK_ROBOT_NAME, MOCK_RUN_ID)
       .mockReturnValue({
@@ -308,7 +304,9 @@ describe('SetupModulesMap', () => {
             model: mockMagneticModule.model,
             usbPort: {
               port: dupModPort,
-              hub: dupModHub,
+              hub: false,
+              portGroup: 'unknown',
+              path: '',
             },
           } as any,
           slotName: '3',
@@ -320,8 +318,7 @@ describe('SetupModulesMap', () => {
         componentPropsMatcher({
           moduleModel: mockMagneticModule.model,
           isAttached: true,
-          usbPort: mockMagneticModuleFixture.usbPort.port,
-          hubPort: mockMagneticModuleFixture.usbPort.hub,
+          physicalPort: mockMagneticModuleFixture.usbPort,
           runId: MOCK_RUN_ID,
         })
       )
@@ -332,8 +329,12 @@ describe('SetupModulesMap', () => {
         componentPropsMatcher({
           moduleModel: mockMagneticModule.model,
           isAttached: true,
-          usbPort: dupModPort,
-          hubPort: dupModHub,
+          physicalPort: {
+            port: dupModPort,
+            hub: false,
+            portGroup: 'unknown',
+            path: '',
+          },
           runId: MOCK_RUN_ID,
         })
       )

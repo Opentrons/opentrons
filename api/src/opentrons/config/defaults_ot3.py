@@ -61,10 +61,15 @@ DEFAULT_CALIBRATION_SETTINGS: Final[OT3CalibrationSettings] = OT3CalibrationSett
 
 ROBOT_CONFIG_VERSION: Final = 1
 DEFAULT_LOG_LEVEL: Final = "INFO"
-DEFAULT_DECK_TRANSFORM: Final[OT3Transform] = [
+DEFAULT_MACHINE_TRANSFORM: Final[OT3Transform] = [
     [-1.0, 0.0, 0.0],
     [0.0, -1.0, 0.0],
     [0.0, 0.0, -1.0],
+]
+DEFAULT_BELT_ATTITUDE: Final[OT3Transform] = [
+    [1.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0],
+    [0.0, 0.0, 1.0],
 ]
 DEFAULT_CARRIAGE_OFFSET: Final[Offset] = (477.20, 493.8, 253.475)
 DEFAULT_LEFT_MOUNT_OFFSET: Final[Offset] = (-13.5, -60.5, 255.675)
@@ -72,38 +77,39 @@ DEFAULT_RIGHT_MOUNT_OFFSET: Final[Offset] = (40.5, -60.5, 255.675)
 DEFAULT_GRIPPER_MOUNT_OFFSET: Final[Offset] = (84.55, -12.75, 93.85)
 DEFAULT_Z_RETRACT_DISTANCE: Final = 2
 DEFAULT_SAFE_HOME_DISTANCE: Final = 5
+DEFAULT_CALIBRATION_AXIS_MAX_SPEED: Final = 30
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 500,
-        OT3AxisKind.Y: 375,
+        OT3AxisKind.X: 400,
+        OT3AxisKind.Y: 325,
         OT3AxisKind.Z: 35,
-        OT3AxisKind.P: 5,
+        OT3AxisKind.P: 15,
         OT3AxisKind.Z_G: 50,
         OT3AxisKind.Q: 5.5,
     },
     low_throughput={
-        OT3AxisKind.X: 600,
-        OT3AxisKind.Y: 500,
+        OT3AxisKind.X: 400,
+        OT3AxisKind.Y: 325,
         OT3AxisKind.Z: 100,
-        OT3AxisKind.P: 45,
+        OT3AxisKind.P: 70,
         OT3AxisKind.Z_G: 50,
     },
 )
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 1000,
-        OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 120,
-        OT3AxisKind.P: 10,
+        OT3AxisKind.X: 800,
+        OT3AxisKind.Y: 500,
+        OT3AxisKind.Z: 150,
+        OT3AxisKind.P: 30,
         OT3AxisKind.Z_G: 150,
         OT3AxisKind.Q: 10,
     },
     low_throughput={
-        OT3AxisKind.X: 1600,
-        OT3AxisKind.Y: 1000,
-        OT3AxisKind.Z: 300,
+        OT3AxisKind.X: 800,
+        OT3AxisKind.Y: 600,
+        OT3AxisKind.Z: 150,
         OT3AxisKind.P: 100,
         OT3AxisKind.Z_G: 150,
     },
@@ -116,9 +122,9 @@ DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
         OT3AxisKind.X: 10,
         OT3AxisKind.Y: 10,
         OT3AxisKind.Z: 5,
-        OT3AxisKind.P: 10,
+        OT3AxisKind.P: 5,
         OT3AxisKind.Z_G: 10,
-        OT3AxisKind.Q: 10,
+        OT3AxisKind.Q: 5,
     },
     low_throughput={
         OT3AxisKind.X: 10,
@@ -169,18 +175,17 @@ DEFAULT_HOLD_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLo
 
 DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 1.4,
+        OT3AxisKind.X: 1.25,
         OT3AxisKind.Y: 1.4,
-        OT3AxisKind.Z: 1.4,
-        # TODO: verify this value
-        OT3AxisKind.P: 2.0,
+        OT3AxisKind.Z: 1.5,
+        OT3AxisKind.P: 0.8,
         OT3AxisKind.Z_G: 0.67,
         OT3AxisKind.Q: 1.5,
     },
     low_throughput={
-        OT3AxisKind.X: 1.4,
-        OT3AxisKind.Y: 1.4,
-        OT3AxisKind.Z: 1.4,
+        OT3AxisKind.X: 1.25,
+        OT3AxisKind.Y: 1.25,
+        OT3AxisKind.Z: 1.0,
         # TODO: verify this value
         OT3AxisKind.P: 1.0,
         OT3AxisKind.Z_G: 0.67,
@@ -383,7 +388,7 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
             "safe_home_distance", DEFAULT_SAFE_HOME_DISTANCE
         ),
         deck_transform=_build_default_transform(
-            robot_settings.get("deck_transform", []), DEFAULT_DECK_TRANSFORM
+            robot_settings.get("deck_transform", []), DEFAULT_MACHINE_TRANSFORM
         ),
         carriage_offset=_build_default_offset(
             robot_settings.get("carriage_offset", []), DEFAULT_CARRIAGE_OFFSET

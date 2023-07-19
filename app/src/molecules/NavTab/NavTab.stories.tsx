@@ -17,10 +17,10 @@ export default {
 
 const Template: Story<React.ComponentProps<typeof NavTab>> = args => (
   <Flex
-    marginTop={SPACING.spacing4}
+    marginTop={SPACING.spacing16}
     alignItems={ALIGN_START}
     flexDirection={DIRECTION_ROW}
-    gridGap={SPACING.spacingM}
+    gridGap={SPACING.spacing20}
   >
     <MemoryRouter initialEntries={['/general']}>
       <NavTab to="/general" tabName="General" />

@@ -17,7 +17,8 @@ export function useAllTipLengthCalibrationsQuery(
   hostOverride?: HostConfig | null
 ): UseQueryResult<AllTipLengthCalibrations> {
   const contextHost = useHost()
-  const host = hostOverride ?? contextHost
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery(
     [host as HostConfig, 'calibration', 'tip_length'],
     () =>

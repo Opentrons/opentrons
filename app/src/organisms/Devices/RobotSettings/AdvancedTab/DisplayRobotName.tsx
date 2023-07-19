@@ -18,7 +18,7 @@ interface DisplayRobotNameProps {
   robotName: string
   updateIsExpanded: (
     isExpanded: boolean,
-    type: 'factoryReset' | 'renameRobot'
+    type: 'deviceReset' | 'renameRobot'
   ) => void
   isRobotBusy: boolean
 }
@@ -42,7 +42,7 @@ export function DisplayRobotName({
         <StyledText
           as="h2"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginBottom={SPACING.spacing4}
+          marginBottom={SPACING.spacing16}
           id="AdvancedSettings_About"
         >
           {t('about_advanced')}
@@ -50,7 +50,7 @@ export function DisplayRobotName({
         <StyledText
           as="p"
           css={TYPOGRAPHY.pSemiBold}
-          marginBottom={SPACING.spacing2}
+          marginBottom={SPACING.spacing4}
         >
           {t('robot_name')}
         </StyledText>
@@ -64,7 +64,7 @@ export function DisplayRobotName({
         id="RobotSettings_RenameRobot"
         disabled={isRobotBusy}
       >
-        {t('robot_rename_button')}
+        {t('rename_robot')}
       </TertiaryButton>
     </Flex>
   )

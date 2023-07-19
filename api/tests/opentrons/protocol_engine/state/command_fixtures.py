@@ -12,6 +12,7 @@ from opentrons.protocol_engine.types import (
     MovementAxis,
     WellLocation,
     LabwareLocation,
+    NonStackedLocation,
     LabwareMovementStrategy,
 )
 
@@ -131,6 +132,37 @@ def create_load_labware_command(
     )
 
     return cmd.LoadLabware(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_load_adapter_command(
+    adapter_id: str,
+    location: NonStackedLocation,
+    definition: LabwareDefinition,
+    offset_id: Optional[str],
+) -> cmd.LoadAdapter:
+    """Create a completed LoadLabware command."""
+    params = cmd.LoadAdapterParams(
+        loadName=definition.parameters.loadName,
+        namespace=definition.namespace,
+        version=definition.version,
+        location=location,
+        adapterId=None,
+    )
+
+    result = cmd.LoadAdapterResult(
+        adapterId=adapter_id,
+        definition=definition,
+        offsetId=offset_id,
+    )
+
+    return cmd.LoadAdapter(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,
@@ -291,6 +323,24 @@ def create_drop_tip_command(
     result = cmd.DropTipResult(position=destination)
 
     return cmd.DropTip(
+        id="command-id",
+        key="command-key",
+        status=cmd.CommandStatus.SUCCEEDED,
+        createdAt=datetime.now(),
+        params=params,
+        result=result,
+    )
+
+
+def create_drop_tip_in_place_command(
+    pipette_id: str,
+) -> cmd.DropTipInPlace:
+    """Get a completed DropTip command."""
+    params = cmd.DropTipInPlaceParams(pipetteId=pipette_id)
+
+    result = cmd.DropTipInPlaceResult()
+
+    return cmd.DropTipInPlace(
         id="command-id",
         key="command-key",
         status=cmd.CommandStatus.SUCCEEDED,

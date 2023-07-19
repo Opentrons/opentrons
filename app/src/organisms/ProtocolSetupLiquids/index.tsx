@@ -47,7 +47,7 @@ export function ProtocolSetupLiquids({
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
         marginTop="2.375rem"
       >
         {liquidsInLoadOrder?.map(liquid => (
@@ -78,26 +78,25 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
   return (
     <Flex
       backgroundColor={COLORS.light1}
-      borderRadius={BORDERS.size_four}
+      borderRadius={BORDERS.borderRadiusSize4}
       fontSize={TYPOGRAPHY.fontSize22}
       flexDirection={DIRECTION_COLUMN}
-      padding={SPACING.spacing5}
+      padding={SPACING.spacing24}
       width="100%"
     >
       <Flex
         alignItems={ALIGN_CENTER}
         width="100%"
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
         onClick={() => setOpenItem(prevOpenItem => !prevOpenItem)}
         aria-label={`Liquids_${liquid.id}`}
       >
         <Flex
-          borderRadius={BORDERS.size_two}
-          padding={SPACING.spacing4}
+          borderRadius={BORDERS.borderRadiusSize2}
+          padding={SPACING.spacing16}
           backgroundColor={COLORS.white}
           height="3.75rem"
           width="3.75rem"
-          marginRight={SPACING.spacing4}
         >
           <Icon
             name="circle"
@@ -110,11 +109,7 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           alignItems={TYPOGRAPHY.textAlignCenter}
         >
-          <StyledText
-            lineHeight={TYPOGRAPHY.lineHeight28}
-            fontSize="1.375rem"
-            fontWeight={TYPOGRAPHY.fontWeightRegular}
-          >
+          <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {liquid.displayName}
           </StyledText>
         </Flex>
@@ -123,9 +118,9 @@ export function LiquidsList(props: LiquidsListProps): JSX.Element {
             backgroundColor={COLORS.darkBlack20}
             borderRadius={BORDERS.radiusSoftCorners}
             height="2.75rem"
-            padding={`${SPACING.spacing3} 0.75rem`}
+            padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
             alignItems={TYPOGRAPHY.textAlignCenter}
-            marginRight={SPACING.spacing3}
+            marginRight={SPACING.spacing8}
           >
             {getTotalVolumePerLiquidId(liquid.id, labwareByLiquidId)}{' '}
             {MICRO_LITERS}

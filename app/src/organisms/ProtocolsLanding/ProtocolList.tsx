@@ -122,7 +122,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   }
 
   return (
-    <Box padding={SPACING.spacing4}>
+    <Box padding={SPACING.spacing16}>
       {selectedProtocol != null ? (
         <>
           <ChooseRobotToRunProtocolSlideout
@@ -140,14 +140,14 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
-        marginBottom={SPACING.spacing5}
+        marginBottom={SPACING.spacing24}
       >
         <StyledText as="h1">{t('protocols')}</StyledText>
         <Flex flexDirection={DIRECTION_ROW}>
           <Flex
             flexDirection={DIRECTION_ROW}
             alignItems={ALIGN_CENTER}
-            marginRight={SPACING.spacing4}
+            marginRight={SPACING.spacing16}
           >
             <StyledText
               as="p"
@@ -160,7 +160,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               flexDirection={DIRECTION_ROW}
               alignItems={ALIGN_CENTER}
               borderRadius={BORDERS.radiusSoftCorners}
-              marginLeft={SPACING.spacing3}
+              marginLeft={SPACING.spacing8}
               css={SORT_BY_BUTTON_STYLE}
               onClick={toggleSetShowSortByMenu}
               data-testid="ProtocolList_SortByMenu"
@@ -168,15 +168,15 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               <StyledText
                 as="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                paddingLeft={SPACING.spacing3}
-                paddingRight={SPACING.spacing2}
-                paddingY={SPACING.spacing2}
+                paddingLeft={SPACING.spacing8}
+                paddingRight={SPACING.spacing4}
+                paddingY={SPACING.spacing4}
                 data-testid="sortBy-label"
               >
                 {sortByLabelType[sortBy].label}
               </StyledText>
               <Icon
-                paddingRight={SPACING.spacing3}
+                paddingRight={SPACING.spacing8}
                 height={TYPOGRAPHY.lineHeight16}
                 name={showSortByMenu ? 'chevron-up' : 'chevron-down'}
               />
@@ -220,8 +220,8 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
       </Flex>
       <Flex
         flexDirection="column"
-        gridGap={SPACING.spacing3}
-        marginBottom={SPACING.spacingXXL}
+        gridGap={SPACING.spacing8}
+        marginBottom={SPACING.spacing40}
       >
         {sortedStoredProtocols.map(storedProtocol => (
           <ProtocolCard
@@ -238,7 +238,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         isExpanded={showImportProtocolSlideout}
         onCloseClick={() => setShowImportProtocolSlideout(false)}
       >
-        <Box marginTop={SPACING.spacing4}>
+        <Box marginTop={SPACING.spacing16}>
           <UploadInput onUpload={() => setShowImportProtocolSlideout(false)} />
         </Box>
       </Slideout>

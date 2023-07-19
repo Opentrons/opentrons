@@ -37,7 +37,7 @@ export function SetupLabwarePositionCheck(
 
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const currentOffsets = runRecord?.data?.labwareOffsets ?? []
-  const lpcDisabledReason = useLPCDisabledReason(robotName, runId)
+  const lpcDisabledReason = useLPCDisabledReason({ robotName, runId })
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const protocolData = robotProtocolAnalysis ?? storedProtocolAnalysis
@@ -53,14 +53,14 @@ export function SetupLabwarePositionCheck(
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      marginTop={SPACING.spacing4}
-      gridGap={SPACING.spacing4}
+      marginTop={SPACING.spacing16}
+      gridGap={SPACING.spacing16}
     >
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         flex="1 0 auto"
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
       >
         <Link
           css={TYPOGRAPHY.linkPSemiBold}
@@ -94,7 +94,7 @@ export function SetupLabwarePositionCheck(
         />
       ) : (
         <Flex
-          paddingY={SPACING.spacing6}
+          paddingY={SPACING.spacing32}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_CENTER}
         >
@@ -106,7 +106,7 @@ export function SetupLabwarePositionCheck(
         <PrimaryButton
           onClick={expandLabwareStep}
           id="ModuleSetup_proceedToLabwareSetup"
-          padding={`${String(SPACING.spacing3)} ${String(SPACING.spacing4)}`}
+          padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...targetProps}
         >
           {t('proceed_to_labware_setup_step')}

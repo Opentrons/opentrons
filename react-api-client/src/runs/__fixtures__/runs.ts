@@ -31,6 +31,7 @@ export const mockPausedRun: RunData = {
   errors: [],
   pipettes: [],
   labware: [],
+  modules: [],
 }
 
 export const mockRunningRun: RunData = {
@@ -59,6 +60,7 @@ export const mockRunningRun: RunData = {
   errors: [],
   pipettes: [],
   labware: [],
+  modules: [],
 }
 
 export const mockRunResponse: Run = {

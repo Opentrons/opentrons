@@ -17,14 +17,14 @@ export const getPipetteWizardStepsForProtocol = (
   //  no pipette is required in the protocol
   if (
     (requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName &&
-      attachedPipettes[mount]?.data.calibratedOffset != null) ||
+      attachedPipettes[mount]?.data?.calibratedOffset?.last_modified != null) ||
     requiredPipette == null
   ) {
     return []
     //    return calibration flow only if correct pipette is attached and pipette cal null
   } else if (
     requiredPipette?.pipetteName === attachedPipettes[mount]?.instrumentName &&
-    attachedPipettes[mount]?.data.calibratedOffset == null
+    attachedPipettes[mount]?.data?.calibratedOffset?.last_modified == null
   ) {
     return [
       {
@@ -73,12 +73,12 @@ export const getPipetteWizardStepsForProtocol = (
         },
         { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
         {
-          section: SECTIONS.BEFORE_BEGINNING,
+          section: SECTIONS.MOUNT_PIPETTE,
           mount: mount,
           flowType: FLOWS.ATTACH,
         },
         {
-          section: SECTIONS.MOUNT_PIPETTE,
+          section: SECTIONS.FIRMWARE_UPDATE,
           mount: mount,
           flowType: FLOWS.ATTACH,
         },
@@ -114,12 +114,12 @@ export const getPipetteWizardStepsForProtocol = (
         },
         { section: SECTIONS.RESULTS, mount: mount, flowType: FLOWS.DETACH },
         {
-          section: SECTIONS.BEFORE_BEGINNING,
+          section: SECTIONS.MOUNT_PIPETTE,
           mount: mount,
           flowType: FLOWS.ATTACH,
         },
         {
-          section: SECTIONS.MOUNT_PIPETTE,
+          section: SECTIONS.FIRMWARE_UPDATE,
           mount: mount,
           flowType: FLOWS.ATTACH,
         },
@@ -160,21 +160,11 @@ export const getPipetteWizardStepsForProtocol = (
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: RIGHT,
-        flowType: FLOWS.DETACH,
-      },
-      {
         section: SECTIONS.DETACH_PIPETTE,
         mount: RIGHT,
         flowType: FLOWS.DETACH,
       },
       { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
-      {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
       {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
@@ -187,6 +177,11 @@ export const getPipetteWizardStepsForProtocol = (
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -226,11 +221,6 @@ export const getPipetteWizardStepsForProtocol = (
       },
       { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -242,6 +232,11 @@ export const getPipetteWizardStepsForProtocol = (
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -281,11 +276,6 @@ export const getPipetteWizardStepsForProtocol = (
       },
       { section: SECTIONS.RESULTS, mount: RIGHT, flowType: FLOWS.DETACH },
       {
-        section: SECTIONS.BEFORE_BEGINNING,
-        mount: LEFT,
-        flowType: FLOWS.ATTACH,
-      },
-      {
         section: SECTIONS.CARRIAGE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
@@ -297,6 +287,11 @@ export const getPipetteWizardStepsForProtocol = (
       },
       {
         section: SECTIONS.MOUNT_PIPETTE,
+        mount: LEFT,
+        flowType: FLOWS.ATTACH,
+      },
+      {
+        section: SECTIONS.FIRMWARE_UPDATE,
         mount: LEFT,
         flowType: FLOWS.ATTACH,
       },
@@ -342,6 +337,11 @@ export const getPipetteWizardStepsForProtocol = (
           mount: LEFT,
           flowType: FLOWS.ATTACH,
         },
+        {
+          section: SECTIONS.FIRMWARE_UPDATE,
+          mount: LEFT,
+          flowType: FLOWS.ATTACH,
+        },
         { section: SECTIONS.RESULTS, mount: LEFT, flowType: FLOWS.ATTACH },
         {
           section: SECTIONS.ATTACH_PROBE,
@@ -369,6 +369,11 @@ export const getPipetteWizardStepsForProtocol = (
         },
         {
           section: SECTIONS.MOUNT_PIPETTE,
+          mount: mount,
+          flowType: FLOWS.ATTACH,
+        },
+        {
+          section: SECTIONS.FIRMWARE_UPDATE,
           mount: mount,
           flowType: FLOWS.ATTACH,
         },

@@ -4,7 +4,9 @@ import random
 from serial import Serial  # type: ignore[import]
 from time import sleep
 from typing import List, Tuple
-from typing_extensions import Final
+from typing_extensions import Final, Literal
+
+from opentrons.types import Point
 
 FIXTURE_REBOOT_TIME = 2
 FIXTURE_NUM_CHANNELS: Final[int] = 8
@@ -13,6 +15,9 @@ FIXTURE_BAUD_RATE: Final[int] = 115200
 FIXTURE_CMD_TERMINATOR = "\r\n"
 FIXTURE_CMD_GET_VERSION = "VERSION"
 FIXTURE_CMD_GET_ALL_PRESSURE = "GETPRESSURE:15"
+
+LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=71.2)
+LOCATION_A1_RIGHT = LOCATION_A1_LEFT._replace(x=128 - 14.4)
 
 
 class PressureFixtureBase(ABC):
@@ -43,6 +48,28 @@ class PressureFixtureBase(ABC):
     def read_all_pressure_channel(self) -> List[float]:
         """Read all pressure channels on fixture in Pascals."""
         ...
+
+    def position_in_slot(self, side: Literal["left", "right"] = "left") -> Point:
+        """Position in slot."""
+        if side == "left":
+            return LOCATION_A1_LEFT
+        else:
+            return LOCATION_A1_RIGHT
+
+    @property
+    def depth(self) -> float:
+        """Depth."""
+        return 14.0
+
+    @property
+    def tip_volume(self) -> int:
+        """Tip Volume."""
+        return 50
+
+    @property
+    def aspirate_volume(self) -> float:
+        """Aspirate Volume."""
+        return 20.0
 
 
 class SimPressureFixture(PressureFixtureBase):

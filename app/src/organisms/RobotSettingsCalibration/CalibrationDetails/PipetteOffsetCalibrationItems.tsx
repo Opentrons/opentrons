@@ -32,14 +32,14 @@ const StyledTable = styled.table`
 `
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
 `
 const StyledTableRow = styled.tr`
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
   border-bottom: ${BORDERS.lineBorder};
 `
 const StyledTableCell = styled.td`
-  padding: ${SPACING.spacing3};
+  padding: ${SPACING.spacing8};
   text-overflow: wrap;
 `
 

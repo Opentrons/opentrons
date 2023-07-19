@@ -8,14 +8,16 @@ import {
   DIRECTION_COLUMN,
   POSITION_ABSOLUTE,
   COLORS,
+  BORDERS,
 } from '@opentrons/components'
 import {
   useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
+import { FirmwareUpdateModal } from '../../molecules/FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
@@ -40,6 +42,7 @@ interface MaintenanceRunManagerProps {
   flowType: GripperWizardFlowType
   attachedGripper: InstrumentData | null
   closeFlow: () => void
+  onComplete?: () => void
 }
 export function GripperWizardFlows(
   props: MaintenanceRunManagerProps
@@ -64,14 +67,24 @@ export function GripperWizardFlows(
     },
   })
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
+  const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
+    null
+  )
+
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
-    chainRunCommands([{ commandType: 'home' as const, params: {} }], true).then(
-      () => {
+    chainRunCommands([{ commandType: 'home' as const, params: {} }], true)
+      .then(() => {
         setIsExiting(false)
+        props.onComplete?.()
         closeFlow()
-      }
-    )
+      })
+      .catch(error => {
+        console.error(error.message)
+        setIsExiting(false)
+        props.onComplete?.()
+        closeFlow()
+      })
   }
 
   return (
@@ -87,6 +100,8 @@ export function GripperWizardFlows(
       handleCleanUpAndClose={handleCleanUpAndClose}
       chainRunCommands={chainRunCommands}
       createRunCommand={createMaintenanceCommand}
+      errorMessage={errorMessage}
+      setShowErrorMessage={setShowErrorMessage}
     />
   )
 }
@@ -103,6 +118,8 @@ interface GripperWizardProps {
   >
   isCreateLoading: boolean
   isRobotMoving: boolean
+  setShowErrorMessage: (message: string | null) => void
+  errorMessage: string | null
   handleCleanUpAndClose: () => void
   chainRunCommands: ReturnType<
     typeof useChainMaintenanceCommands
@@ -125,6 +142,8 @@ export const GripperWizard = (
     isCreateLoading,
     isRobotMoving,
     createRunCommand,
+    setShowErrorMessage,
+    errorMessage,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
@@ -165,6 +184,8 @@ export const GripperWizard = (
     proceed: handleProceed,
     goBack,
     chainRunCommands,
+    setShowErrorMessage,
+    errorMessage,
   }
   let onExit
   if (currentStep == null) return null
@@ -175,6 +196,7 @@ export const GripperWizard = (
         handleGoBack={cancelExit}
         handleExit={confirmExit}
         flowType={flowType}
+        isRobotMoving={isRobotMoving}
       />
     )
   } else if (currentStep.section === SECTIONS.BEFORE_BEGINNING) {
@@ -200,6 +222,15 @@ export const GripperWizard = (
     modalContent = modalContent = (
       <MountGripper {...currentStep} {...sharedProps} />
     )
+  } else if (currentStep.section === SECTIONS.FIRMWARE_UPDATE) {
+    onExit = confirmExit
+    modalContent = modalContent = (
+      <FirmwareUpdateModal
+        proceed={handleProceed}
+        subsystem="gripper"
+        description={t('firmware_updating')}
+      />
+    )
   } else if (currentStep.section === SECTIONS.UNMOUNT_GRIPPER) {
     onExit = confirmExit
     modalContent = modalContent = (
@@ -208,7 +239,11 @@ export const GripperWizard = (
   } else if (currentStep.section === SECTIONS.SUCCESS) {
     onExit = confirmExit
     modalContent = modalContent = (
-      <Success {...currentStep} proceed={handleProceed} />
+      <Success
+        isRobotMoving={isRobotMoving}
+        {...currentStep}
+        proceed={handleProceed}
+      />
     )
   }
 
@@ -227,8 +262,8 @@ export const GripperWizard = (
   const wizardHeader = (
     <WizardHeader
       title={titleByFlowType[flowType]}
-      currentStep={currentStepIndex}
-      totalSteps={totalStepCount}
+      currentStep={currentStepIndex + 1}
+      totalSteps={totalStepCount + 1}
       onExit={handleExit}
     />
   )
@@ -238,7 +273,13 @@ export const GripperWizard = (
       {isOnDevice ? (
         <Flex
           flexDirection={DIRECTION_COLUMN}
-          width="100%"
+          width="992px"
+          height="568px"
+          left="14.5px"
+          top="16px"
+          border={BORDERS.lineBorder}
+          boxShadow={BORDERS.shadowSmall}
+          borderRadius={BORDERS.borderRadiusSize4}
           position={POSITION_ABSOLUTE}
           backgroundColor={COLORS.white}
         >
@@ -246,9 +287,9 @@ export const GripperWizard = (
           {modalContent}
         </Flex>
       ) : (
-        <ModalShell width="48rem" header={wizardHeader}>
+        <LegacyModalShell width="48rem" header={wizardHeader}>
           {modalContent}
-        </ModalShell>
+        </LegacyModalShell>
       )}
     </Portal>
   )

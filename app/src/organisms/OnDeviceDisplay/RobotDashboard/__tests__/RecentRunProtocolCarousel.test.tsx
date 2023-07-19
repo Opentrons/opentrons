@@ -5,31 +5,10 @@ import { useAllRunsQuery } from '@opentrons/react-api-client'
 
 import { RecentRunProtocolCard, RecentRunProtocolCarousel } from '..'
 
-import type { ProtocolResource } from '@opentrons/shared-data'
+import type { RunData } from '@opentrons/api-client'
 
 jest.mock('@opentrons/react-api-client')
 jest.mock('../RecentRunProtocolCard')
-
-const mockSortedProtocol = [
-  {
-    analysisSummaries: [],
-    createdAt: '2023-04-11T00:44:20.669922+00:00',
-    files: [
-      {
-        name: 'Mock Protocol',
-        role: '',
-      },
-    ],
-    id: 'mockSortedProtocolID',
-    key: 'mockKey',
-    metadata: {
-      author: 'New API User',
-      description: 'mock protocol',
-      name: 'Mock Protocol',
-    },
-    protocolType: 'python',
-  },
-] as ProtocolResource[]
 
 const mockRun = {
   actions: [],
@@ -65,7 +44,7 @@ describe('RecentRunProtocolCarousel', () => {
 
   beforeEach(() => {
     props = {
-      sortedProtocols: mockSortedProtocol,
+      recentRunsOfUniqueProtocols: [mockRun as RunData],
     }
     mockRecentRunProtocolCard.mockReturnValue(
       <div>mock RecentRunProtocolCard</div>

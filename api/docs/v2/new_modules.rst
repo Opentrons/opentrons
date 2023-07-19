@@ -37,6 +37,8 @@ When you load a module in a protocol, you inform the OT-2 that you want the spec
 
 .. versionadded:: 2.0
 
+.. _available_modules
+
 Available Modules
 -----------------
 
@@ -297,11 +299,8 @@ The examples in this section will use a Thermocycler loaded as follows:
         tc_mod = protocol.load_module('thermocyclerModuleV2')
         plate = tc_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
         
-The ``location`` parameter of :py:meth:`.load_module` isn't required for the Thermocycler, since it only has one valid deck location, which covers slots 7, 8, 10, and 11. Attempting to load any other modules or labware in these four slots will raise a ``DeckConflictError``. 
+The ``location`` parameter of :py:meth:`.load_module` isn't required for the Thermocycler. It only has one valid deck location, which covers :ref:`slots <deck-slots>` 7, 8, 10, and 11 on an OT-2 or A1 and B1 on a Flex. Attempting to load any other modules or labware in these slots while a Thermocycler is there will raise an error.
 
-.. note::
-
-    If you want to specify a slot for the Thermocycler (for parallelism with other ``load_module()`` calls in your protocol), you can do so: the only accepted value is ``7``.
 
 .. versionadded:: 2.0
 

@@ -2,11 +2,11 @@
 test_name: GET Pipette Offset Calibration, No Calibrations
 marks:
   - usefixtures:
-    - run_server
+    - ot2_server_base_url
 stages:
   - name: GET request returns an empty list
     request: &get_offsets
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{ot2_server_base_url}/calibration/pipette_offset"
       method: GET
     response: &no_offset_response
       status_code: 200
@@ -18,7 +18,7 @@ stages:
 test_name: GET Pipette Offset Calibration, Wtih Calibrations
 marks: &cal_marks
   - usefixtures:
-    - run_server
+    - ot2_server_base_url
     - set_up_pipette_offset_temp_directory
 stages:
   - name: GET request returns all calibrations from fixture
@@ -30,7 +30,7 @@ stages:
 
   - name: GET request returns filter with pipette id
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{ot2_server_base_url}/calibration/pipette_offset"
       method: GET
       params:
         pipette_id: '123'
@@ -51,7 +51,7 @@ stages:
 
   - name: GET request returns filter with mount
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{ot2_server_base_url}/calibration/pipette_offset"
       method: GET
       params:
         mount: 'left'
@@ -72,7 +72,7 @@ stages:
 
   - name: GET request returns filter with pipette AND mount
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{ot2_server_base_url}/calibration/pipette_offset"
       method: GET
       params:
         pipette_id: '123'
@@ -94,7 +94,7 @@ stages:
 
   - name: GET request returns filter with wrong pipette AND mount
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{ot2_server_base_url}/calibration/pipette_offset"
       method: GET
       params:
         pipette_id: '321'
@@ -107,7 +107,7 @@ marks: *cal_marks
 stages:
   - name: DELETE request with correct pipette AND mount
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{ot2_server_base_url}/calibration/pipette_offset"
       method: DELETE
       params:
         pipette_id: '321'
@@ -117,7 +117,7 @@ stages:
 
   - name: DELETE request with incorrect pipette AND MOUNT
     request:
-      url: "{host:s}:{port:d}/calibration/pipette_offset"
+      url: "{ot2_server_base_url}/calibration/pipette_offset"
       method: DELETE
       params:
         pipette_id: '321'

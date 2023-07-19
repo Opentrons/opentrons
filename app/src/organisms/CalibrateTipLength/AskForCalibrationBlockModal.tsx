@@ -17,7 +17,7 @@ import { useDispatch } from 'react-redux'
 
 import styles from './styles.css'
 import { labwareImages } from '../../organisms/CalibrationPanels/labwareImages'
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
 import { setUseTrashSurfaceForTipCal } from '../../redux/calibration'
@@ -54,7 +54,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
 
   return (
     <Portal level="top">
-      <ModalShell
+      <LegacyModalShell
         width="47rem"
         header={
           <WizardHeader
@@ -66,12 +66,12 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          padding={SPACING.spacing6}
+          padding={SPACING.spacing32}
           minHeight="25rem"
         >
-          <Flex gridGap={SPACING.spacing3}>
+          <Flex gridGap={SPACING.spacing8}>
             <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
-              <StyledText as="h1" marginBottom={SPACING.spacing4}>
+              <StyledText as="h1" marginBottom={SPACING.spacing16}>
                 {t('do_you_have_a_cal_block')}
               </StyledText>
 
@@ -79,7 +79,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
                 t={t}
                 i18nKey="calibration_block_description"
                 components={{
-                  block: <StyledText as="p" marginBottom={SPACING.spacing3} />,
+                  block: <StyledText as="p" marginBottom={SPACING.spacing8} />,
                   supportLink: (
                     <Link
                       external
@@ -100,7 +100,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
 
           <Flex
             width="100%"
-            marginTop={SPACING.spacing6}
+            marginTop={SPACING.spacing32}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
             alignItems={ALIGN_CENTER}
           >
@@ -111,11 +111,11 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
                 }
                 value={rememberPreference}
               />
-              <StyledText as="p" marginLeft={SPACING.spacing3}>
+              <StyledText as="p" marginLeft={SPACING.spacing8}>
                 {t('shared:remember_my_selection_and_do_not_ask_again')}
               </StyledText>
             </Flex>
-            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+            <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
               <SecondaryButton onClick={makeSetHasBlock(false)}>
                 {t('use_trash_bin')}
               </SecondaryButton>
@@ -125,7 +125,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
             </Flex>
           </Flex>
         </Flex>
-      </ModalShell>
+      </LegacyModalShell>
     </Portal>
   )
 }

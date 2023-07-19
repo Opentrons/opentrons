@@ -75,6 +75,11 @@ def test_resolve_load_labware_params(
     [
         "opentrons_24_aluminumblock_generic_2ml_screwcap",
         "opentrons_96_aluminumblock_generic_pcr_strip_200ul",
+        "armadillo_96_wellplate_200ul_pcr_full_skirt",
+        "corning_384_wellplate_112ul_flat",
+        "nest_96_wellplate_100ul_pcr_full_skirt",
+        "nest_96_wellplate_200ul_flat",
+        "nest_96_wellplate_2ml_deep",
     ],
 )
 @pytest.mark.parametrize("namespace", [OPENTRONS_NAMESPACE, None])
@@ -88,7 +93,7 @@ def test_resolve_load_labware_params(
         (123456, 123456),
     ],
 )
-def test_aluminumblock_generic_screwcap_or_pcr_strip_versioning(
+def test_version_two_and_above_default_versioning(
     load_name: str,
     namespace: Optional[str],
     version: Optional[int],

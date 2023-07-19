@@ -20,7 +20,7 @@ from opentrons import types as top_types
 from opentrons.hardware_control.types import (
     CriticalPoint,
     HardwareAction,
-    OT3Axis,
+    Axis,
     OT3Mount,
 )
 from opentrons.hardware_control.errors import (
@@ -52,7 +52,7 @@ PipetteHandlingData = Tuple[Pipette, OT3Mount]
 
 @dataclass(frozen=True)
 class LiquidActionSpec:
-    axis: OT3Axis
+    axis: Axis
     volume: float
     plunger_distance: float
     speed: float
@@ -68,7 +68,7 @@ class LiquidActionSpec:
 class PickUpTipPressSpec:
     relative_down: top_types.Point
     relative_up: top_types.Point
-    current: Dict[OT3Axis, float]
+    current: Dict[Axis, float]
     speed: float
 
 
@@ -78,13 +78,16 @@ class TipMotorPickUpTipSpec:
     tiprack_up: top_types.Point
     pick_up_distance: float
     speed: float
-    currents: Dict[OT3Axis, float]
+    currents: Dict[Axis, float]
+    # FIXME we should throw this in a config
+    # file of some sort
+    home_buffer: float = 0
 
 
 @dataclass(frozen=True)
 class PickUpTipSpec:
     plunger_prep_pos: float
-    plunger_currents: Dict[OT3Axis, float]
+    plunger_currents: Dict[Axis, float]
     presses: List[PickUpTipPressSpec]
     shake_off_list: List[Tuple[top_types.Point, Optional[float]]]
     retract_target: float
@@ -94,19 +97,22 @@ class PickUpTipSpec:
 @dataclass(frozen=True)
 class DropTipMove:
     target_position: float
-    current: Dict[OT3Axis, float]
+    current: Dict[Axis, float]
     speed: Optional[float]
     home_after: bool = False
     home_after_safety_margin: float = 0
-    home_axes: Sequence[OT3Axis] = tuple()
+    home_axes: Sequence[Axis] = tuple()
     is_ht_tip_action: bool = False
+    # FIXME we should throw this in a config
+    # file of some sort
+    home_buffer: float = 0
 
 
 @dataclass(frozen=True)
 class DropTipSpec:
     drop_moves: List[DropTipMove]
     shake_moves: List[Tuple[top_types.Point, Optional[float]]]
-    ending_current: Dict[OT3Axis, float]
+    ending_current: Dict[Axis, float]
 
 
 class PipetteHandlerProvider:
@@ -215,9 +221,6 @@ class PipetteHandlerProvider:
                 "display_name",
                 "tip_length",
                 "model",
-                "fw_update_required",
-                "fw_current_version",
-                "fw_next_version",
                 "blow_out_flow_rate",
                 "working_volume",
                 "tip_overlap",
@@ -525,7 +528,7 @@ class PipetteHandlerProvider:
         )
 
         return LiquidActionSpec(
-            axis=OT3Axis.of_main_tool_actuator(mount),
+            axis=Axis.of_main_tool_actuator(mount),
             volume=asp_vol,
             plunger_distance=dist,
             speed=speed,
@@ -580,7 +583,7 @@ class PipetteHandlerProvider:
             instrument, instrument.dispense_flow_rate * rate, "dispense"
         )
         return LiquidActionSpec(
-            axis=OT3Axis.of_main_tool_actuator(mount),
+            axis=Axis.of_main_tool_actuator(mount),
             volume=disp_vol,
             plunger_distance=dist,
             speed=speed,
@@ -594,11 +597,7 @@ class PipetteHandlerProvider:
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
-        speed = self.plunger_speed(
-            instrument,
-            instrument.blow_out_flow_rate,
-            "blowout",
-        )
+        speed = self.plunger_speed(instrument, instrument.blow_out_flow_rate, "blowout")
         if volume is None:
             ul = self.get_attached_instrument(mount)["default_blow_out_volume"]
         else:
@@ -606,7 +605,7 @@ class PipetteHandlerProvider:
 
         distance_mm = ul / instrument.ul_per_mm(ul, "blowout")
         return LiquidActionSpec(
-            axis=OT3Axis.of_main_tool_actuator(mount),
+            axis=Axis.of_main_tool_actuator(mount),
             volume=0,
             plunger_distance=distance_mm,
             speed=speed,
@@ -681,7 +680,7 @@ class PipetteHandlerProvider:
                 PickUpTipSpec(
                     plunger_prep_pos=instrument.plunger_positions.bottom,
                     plunger_currents={
-                        OT3Axis.of_main_tool_actuator(
+                        Axis.of_main_tool_actuator(
                             mount
                         ): instrument.plunger_motor_current.run,
                     },
@@ -694,7 +693,8 @@ class PipetteHandlerProvider:
                         tiprack_up=top_types.Point(0, 0, 2),
                         pick_up_distance=instrument.pick_up_configurations.distance,
                         speed=instrument.pick_up_configurations.speed,
-                        currents={OT3Axis.Q: instrument.pick_up_configurations.current},
+                        currents={Axis.Q: instrument.pick_up_configurations.current},
+                        home_buffer=10,
                     ),
                 ),
                 add_tip_to_instr,
@@ -703,14 +703,14 @@ class PipetteHandlerProvider:
             PickUpTipSpec(
                 plunger_prep_pos=instrument.plunger_positions.bottom,
                 plunger_currents={
-                    OT3Axis.of_main_tool_actuator(
+                    Axis.of_main_tool_actuator(
                         mount
                     ): instrument.plunger_motor_current.run
                 },
                 presses=[
                     PickUpTipPressSpec(
                         current={
-                            OT3Axis.by_mount(
+                            Axis.by_mount(
                                 mount
                             ): instrument.pick_up_configurations.current
                         },
@@ -753,11 +753,11 @@ class PipetteHandlerProvider:
         self,
         bottom_pos: float,
         droptip_pos: float,
-        plunger_currents: Dict[OT3Axis, float],
-        drop_tip_currents: Dict[OT3Axis, float],
+        plunger_currents: Dict[Axis, float],
+        drop_tip_currents: Dict[Axis, float],
         speed: float,
         home_after: bool,
-        home_axes: Sequence[OT3Axis],
+        home_axes: Sequence[Axis],
         is_ht_pipette: bool = False,
     ) -> Callable[[], List[DropTipMove]]:
         def build() -> List[DropTipMove]:
@@ -773,6 +773,7 @@ class PipetteHandlerProvider:
                     home_after_safety_margin=abs(bottom_pos - droptip_pos),
                     home_axes=home_axes,
                     is_ht_tip_action=is_ht_pipette,
+                    home_buffer=10 if is_ht_pipette else 0,
                 ),
                 DropTipMove(  # always finish drop-tip at a known safe plunger position
                     target_position=bottom_pos, current=plunger_currents, speed=None
@@ -807,20 +808,16 @@ class PipetteHandlerProvider:
             instrument.remove_tip()
 
         drop_tip_current_axis = (
-            OT3Axis.Q if is_96_chan else OT3Axis.of_main_tool_actuator(mount)
+            Axis.Q if is_96_chan else Axis.of_main_tool_actuator(mount)
         )
         seq_builder_ot3 = self._droptip_sequence_builder(
             bottom,
             droptip,
-            {
-                OT3Axis.of_main_tool_actuator(
-                    mount
-                ): instrument.plunger_motor_current.run
-            },
+            {Axis.of_main_tool_actuator(mount): instrument.plunger_motor_current.run},
             {drop_tip_current_axis: instrument.drop_configurations.current},
             speed,
             home_after,
-            (OT3Axis.of_main_tool_actuator(mount),),
+            (Axis.of_main_tool_actuator(mount),),
             is_96_chan,
         )
 
@@ -830,7 +827,7 @@ class PipetteHandlerProvider:
                 drop_moves=seq_ot3,
                 shake_moves=shakes,
                 ending_current={
-                    OT3Axis.of_main_tool_actuator(
+                    Axis.of_main_tool_actuator(
                         mount
                     ): instrument.plunger_motor_current.run
                 },

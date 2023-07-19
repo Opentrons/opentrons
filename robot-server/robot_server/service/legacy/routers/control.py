@@ -3,6 +3,7 @@ import asyncio
 from fastapi import APIRouter, Query, Depends
 from starlette import status
 
+from opentrons_shared_data.errors import ErrorCodes
 from opentrons.hardware_control import (
     ThreadedAsyncLock,
     ThreadedAsyncForbidden,
@@ -79,7 +80,7 @@ async def post_move_robot(
             pos = await _do_move(hardware=hardware, robot_move_target=robot_move_target)
             return V1BasicResponse(message=f"Move complete. New position: {pos}")
     except ThreadedAsyncForbidden as e:
-        raise LegacyErrorResponse(message=str(e)).as_error(status.HTTP_403_FORBIDDEN)
+        raise LegacyErrorResponse.from_exc(e).as_error(status.HTTP_403_FORBIDDEN)
 
 
 @router.post(
@@ -113,13 +114,14 @@ async def post_home_robot(
                 await home()
                 message = "Homing robot."
             else:
-                raise LegacyErrorResponse(message=f"{target} is invalid").as_error(
-                    status.HTTP_400_BAD_REQUEST
-                )
+                raise LegacyErrorResponse(
+                    message=f"{target} is invalid",
+                    errorCode=ErrorCodes.INVALID_ACTUATOR.value.code,
+                ).as_error(status.HTTP_400_BAD_REQUEST)
 
             return V1BasicResponse(message=message)
     except ThreadedAsyncForbidden as e:
-        raise LegacyErrorResponse(message=str(e)).as_error(status.HTTP_403_FORBIDDEN)
+        raise LegacyErrorResponse.from_exc(e).as_error(status.HTTP_403_FORBIDDEN)
 
 
 @router.get(

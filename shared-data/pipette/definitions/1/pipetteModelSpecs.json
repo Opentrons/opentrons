@@ -5544,7 +5544,7 @@
       "idleCurrent": 0.3
     },
     "p1000_single_v3.0": {
-      "name": "p1000_single_gen3",
+      "name": "p1000_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -5724,8 +5724,8 @@
       },
       "tipOverlap": {
         "default": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5
+        "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -5735,11 +5735,11 @@
         "max": 100
       },
       "quirks": ["pickupTipShake"],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p1000_single_v3.1": {
-      "name": "p1000_single_gen3",
+      "name": "p1000_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -5919,8 +5919,8 @@
       },
       "tipOverlap": {
         "default": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5
+        "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -5930,11 +5930,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p1000_single_v3.3": {
-      "name": "p1000_single_gen3",
+      "name": "p1000_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -6114,8 +6114,8 @@
       },
       "tipOverlap": {
         "default": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5
+        "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -6125,11 +6125,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p1000_single_v3.4": {
-      "name": "p1000_single_gen3",
+      "name": "p1000_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -6309,8 +6309,8 @@
       },
       "tipOverlap": {
         "default": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5
+        "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -6320,11 +6320,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p50_single_v3.0": {
-      "name": "p50_single_gen3",
+      "name": "p50_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -6486,11 +6486,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_single_v3.1": {
-      "name": "p50_single_gen3",
+      "name": "p50_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -6653,11 +6653,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_single_v3.3": {
-      "name": "p50_single_gen3",
+      "name": "p50_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -6822,11 +6822,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_single_v3.4": {
-      "name": "p50_single_gen3",
+      "name": "p50_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -6991,11 +6991,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_single_v4.3": {
-      "name": "p50_single_gen3",
+      "name": "p50_single_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -7160,11 +7160,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.83,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.0": {
-      "name": "p1000_multi_gen3",
+      "name": "p1000_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -7344,8 +7344,8 @@
       },
       "tipOverlap": {
         "default": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5
+        "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -7355,11 +7355,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.1": {
-      "name": "p1000_multi_gen3",
+      "name": "p1000_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -7539,8 +7539,8 @@
       },
       "tipOverlap": {
         "default": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5
+        "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -7550,11 +7550,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.3": {
-      "name": "p1000_multi_gen3",
+      "name": "p1000_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -7734,8 +7734,8 @@
       },
       "tipOverlap": {
         "default": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5
+        "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -7745,11 +7745,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p1000_multi_v3.4": {
-      "name": "p1000_multi_gen3",
+      "name": "p1000_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -7929,8 +7929,8 @@
       },
       "tipOverlap": {
         "default": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_1000ul/1": 10.5,
-        "opentrons/opentrons_ot3_96_tiprack_200ul/1": 10.5
+        "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5,
+        "opentrons/opentrons_flex_96_tiprack_200ul/1": 10.5
       },
       "tipLength": {
         "value": 78.3,
@@ -7940,11 +7940,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.71,
       "idleCurrent": 0.3
     },
     "p50_multi_v3.0": {
-      "name": "p50_multi_gen3",
+      "name": "p50_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -8107,11 +8107,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_multi_v3.1": {
-      "name": "p50_multi_gen3",
+      "name": "p50_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -8274,11 +8274,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_multi_v3.3": {
-      "name": "p50_multi_gen3",
+      "name": "p50_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -8443,11 +8443,11 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p50_multi_v3.4": {
-      "name": "p50_multi_gen3",
+      "name": "p50_multi_flex",
       "backCompatNames": [],
       "top": {
         "value": 0.5,
@@ -8612,7 +8612,7 @@
         "max": 100
       },
       "quirks": [],
-      "returnTipHeight": 0.5,
+      "returnTipHeight": 0.78,
       "idleCurrent": 0.3
     },
     "p1000_96_v1": {

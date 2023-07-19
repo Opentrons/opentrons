@@ -32,7 +32,7 @@ export function CompleteConfirmation(
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="32rem"
     >
       <Flex
@@ -46,11 +46,11 @@ export function CompleteConfirmation(
         ) : (
           <Icon name="ot-check" size={SIZE_3} color={COLORS.successEnabled} />
         )}
-        <StyledText as="h1" marginTop={SPACING.spacing5}>
+        <StyledText as="h1" marginTop={SPACING.spacing24}>
           {t('flow_complete', { flowName })}
         </StyledText>
         {body != null ? (
-          <StyledText as="p" marginTop={SPACING.spacing3}>
+          <StyledText as="p" marginTop={SPACING.spacing8}>
             {body}
           </StyledText>
         ) : null}
@@ -58,7 +58,7 @@ export function CompleteConfirmation(
       <Flex
         flex="0"
         alignSelf={ALIGN_STRETCH}
-        marginTop={SPACING.spacing6}
+        marginTop={SPACING.spacing32}
         justifyContent={JUSTIFY_FLEX_END}
       >
         <PrimaryButton

@@ -8,8 +8,10 @@ from textwrap import dedent
 from typing import Optional, Union
 from typing_extensions import Literal
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Query
 from pydantic import BaseModel, Field
+
+from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors import ErrorDetails, ErrorBody
 from robot_server.service.dependencies import get_current_time, get_unique_id
@@ -48,6 +50,7 @@ class RunNotFound(ErrorDetails):
 
     id: Literal["RunNotFound"] = "RunNotFound"
     title: str = "Run Not Found"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
 class RunAlreadyActive(ErrorDetails):
@@ -55,6 +58,7 @@ class RunAlreadyActive(ErrorDetails):
 
     id: Literal["RunAlreadyActive"] = "RunAlreadyActive"
     title: str = "Run Already Active"
+    errorCode: str = ErrorCodes.ROBOT_IN_USE.value.code
 
 
 class RunNotIdle(ErrorDetails):
@@ -66,6 +70,7 @@ class RunNotIdle(ErrorDetails):
         "Run is currently active. Allow the run to finish or"
         " stop it with a `stop` action before attempting to modify it."
     )
+    errorCode: str = ErrorCodes.ROBOT_IN_USE.value.code
 
 
 class RunStopped(ErrorDetails):
@@ -73,6 +78,7 @@ class RunStopped(ErrorDetails):
 
     id: Literal["RunStopped"] = "RunStopped"
     title: str = "Run Stopped"
+    errorCode: str = ErrorCodes.GENERAL_ERROR.value.code
 
 
 class AllRunsLinks(BaseModel):
@@ -185,14 +191,24 @@ async def create_run(
     },
 )
 async def get_runs(
+    pageLength: Optional[int] = Query(
+        None,
+        description=(
+            "The maximum number of runs to return."
+            " If this is less than the total number of runs,"
+            " the most-recently created runs will be returned."
+            " If this is omitted or `null`, all runs will be returned."
+        ),
+    ),
     run_data_manager: RunDataManager = Depends(get_run_data_manager),
 ) -> PydanticResponse[MultiBody[Run, AllRunsLinks]]:
-    """Get all runs.
+    """Get all runs, in order from least-recently to most-recently created.
 
     Args:
+        pageLength: Maximum number of items to return.
         run_data_manager: Current and historical run data management.
     """
-    data = run_data_manager.get_all()
+    data = run_data_manager.get_all(length=pageLength)
     current_run_id = run_data_manager.current_run_id
     meta = MultiBodyMeta(cursor=0, totalLength=len(data))
     links = AllRunsLinks(

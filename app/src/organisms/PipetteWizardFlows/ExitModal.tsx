@@ -49,22 +49,18 @@ export function ExitModal(props: ExitModalProps): JSX.Element {
     >
       {isOnDevice ? (
         <>
-          <Flex marginRight={SPACING.spacing3}>
+          <Flex marginRight={SPACING.spacing8}>
             <SmallButton
               onClick={proceed}
               buttonText={capitalize(t('shared:exit'))}
               buttonType="alert"
             />
           </Flex>
-          <SmallButton
-            buttonText={t('shared:go_back')}
-            buttonType="primary"
-            onClick={goBack}
-          />
+          <SmallButton buttonText={t('shared:go_back')} onClick={goBack} />
         </>
       ) : (
         <>
-          <SecondaryButton onClick={goBack} marginRight={SPACING.spacing2}>
+          <SecondaryButton onClick={goBack} marginRight={SPACING.spacing4}>
             {t('shared:go_back')}
           </SecondaryButton>
           <AlertPrimaryButton

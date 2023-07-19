@@ -80,7 +80,7 @@ export function UpdateRobot(): JSX.Element {
             dispatch(
               updateConfigValue(
                 'onDeviceDisplaySettings.unfinishedUnboxingFlowRoute',
-                '/robot-settings/rename-robot'
+                '/emergency-stop'
               )
             )
           }
@@ -113,11 +113,7 @@ export function UpdateRobot(): JSX.Element {
   }, [robotUpdateType, dispatch, robotName, isDownloading])
 
   return (
-    <Flex
-      padding={`${String(SPACING.spacing5)} ${String(
-        SPACING.spacingXXL
-      )} ${String(SPACING.spacingXXL)}`}
-    >
+    <Flex padding={SPACING.spacing40}>
       {isShowCheckingUpdates ? (
         <CheckUpdates />
       ) : robotUpdateType !== 'upgrade' ? (

@@ -2,11 +2,21 @@
 from typing import List, Union
 from typing_extensions import Final
 
-from opentrons.config.defaults_ot3 import DEFAULT_DECK_TRANSFORM
+try:
+    from opentrons.config.defaults_ot3 import (
+        DEFAULT_MACHINE_TRANSFORM as DEFAULT_TRANSFORM,
+    )
+except ImportError as e:
+    print(e)
+    # FIXME: delete this once there is no risk of machines running <=0.7.0
+    from opentrons.config.defaults_ot3 import (  # type: ignore[attr-defined, no-redef]
+        DEFAULT_DECK_TRANSFORM as DEFAULT_TRANSFORM,
+    )
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     find_calibration_structure_height,
     find_slot_center_binary,
+    EdgeNotFoundError,
 )
 
 from hardware_testing.data.csv_report import (
@@ -16,7 +26,7 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.opentrons_api import helpers_ot3, types
-from hardware_testing.opentrons_api.types import Point, OT3Mount
+from hardware_testing.opentrons_api.types import Axis, Point, OT3Mount
 from hardware_testing.data import ui
 
 
@@ -64,7 +74,7 @@ async def _find_slot(api: OT3API, mount: OT3Mount, expected: Point) -> Point:
 
 def _assert_deck_transform_is_default(api: OT3API) -> None:
     att_matrix = api.config.deck_transform
-    for def_row, att_row in zip(DEFAULT_DECK_TRANSFORM, att_matrix):
+    for def_row, att_row in zip(DEFAULT_TRANSFORM, att_matrix):
         for default_val, current_val in zip(def_row, att_row):
             assert (
                 current_val == default_val
@@ -109,7 +119,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     _assert_deck_transform_is_default(api)
     print("homing")
-    await api.home()
+    await api.home([Axis.Z_L, Axis.Z_R])
     mount = OT3Mount.LEFT
     cp = types.CriticalPoint.MOUNT  # not pipette or tip, for consistency
     home_pos = await api.gantry_position(mount, critical_point=cp)
@@ -132,37 +142,49 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     ui.print_header(f"PROBE SLOTS {slots_msg}")
     if not api.is_simulator:
         ui.get_user_ready(f"check SLOTS {slots_msg} are ready to be probed")
-    actual_pos = {
-        k: await _find_slot(api, mount, p) for k, p in EXPECTED_POINTS.items()
-    }
-    pos = await api.gantry_position(mount, critical_point=cp)
-    await api.move_to(mount, pos._replace(z=home_pos.z))
-
-    # calculate alignment
-    alignment_x = actual_pos["front-left"].x - actual_pos["back-left"].x
-    alignment_y = actual_pos["front-left"].y - actual_pos["front-right"].y
-    flatness_x = actual_pos["front-left"].z - actual_pos["front-right"].z
-    flatness_y = actual_pos["front-left"].z - actual_pos["back-left"].z
-    print(f"alignment-x: {alignment_x}")
-    print(f"alignment-y: {alignment_y}")
-    print(f"flatness-x: {flatness_x}")
-    print(f"flatness-y: {flatness_y}")
-    # compare to thresholds
-    alignment_x_passed = abs(alignment_x) < ALIGNMENT_THRESHOLDS["alignment-x"]
-    alignment_y_passed = abs(alignment_y) < ALIGNMENT_THRESHOLDS["alignment-y"]
-    flatness_x_passed = abs(flatness_x) < ALIGNMENT_THRESHOLDS["flatness-x"]
-    flatness_y_passed = abs(flatness_y) < ALIGNMENT_THRESHOLDS["flatness-y"]
-    # store in report
-    report(
-        section, "alignment-x", [alignment_x, CSVResult.from_bool(alignment_x_passed)]
-    )
-    report(
-        section, "alignment-y", [alignment_y, CSVResult.from_bool(alignment_y_passed)]
-    )
-    report(section, "flatness-x", [flatness_x, CSVResult.from_bool(flatness_x_passed)])
-    report(section, "flatness-y", [flatness_y, CSVResult.from_bool(flatness_y_passed)])
+    try:
+        actual_pos = {
+            k: await _find_slot(api, mount, p) for k, p in EXPECTED_POINTS.items()
+        }
+    except EdgeNotFoundError as e:
+        print(e)
+        ui.print_error("unable to probe slot, maybe the gantry is skipping?")
+    else:
+        # calculate alignment
+        alignment_x = actual_pos["front-left"].x - actual_pos["back-left"].x
+        alignment_y = actual_pos["front-left"].y - actual_pos["front-right"].y
+        flatness_x = actual_pos["front-left"].z - actual_pos["front-right"].z
+        flatness_y = actual_pos["front-left"].z - actual_pos["back-left"].z
+        print(f"alignment-x: {alignment_x}")
+        print(f"alignment-y: {alignment_y}")
+        print(f"flatness-x: {flatness_x}")
+        print(f"flatness-y: {flatness_y}")
+        # compare to thresholds
+        alignment_x_passed = abs(alignment_x) < ALIGNMENT_THRESHOLDS["alignment-x"]
+        alignment_y_passed = abs(alignment_y) < ALIGNMENT_THRESHOLDS["alignment-y"]
+        flatness_x_passed = abs(flatness_x) < ALIGNMENT_THRESHOLDS["flatness-x"]
+        flatness_y_passed = abs(flatness_y) < ALIGNMENT_THRESHOLDS["flatness-y"]
+        # store in report
+        report(
+            section,
+            "alignment-x",
+            [alignment_x, CSVResult.from_bool(alignment_x_passed)],
+        )
+        report(
+            section,
+            "alignment-y",
+            [alignment_y, CSVResult.from_bool(alignment_y_passed)],
+        )
+        report(
+            section, "flatness-x", [flatness_x, CSVResult.from_bool(flatness_x_passed)]
+        )
+        report(
+            section, "flatness-y", [flatness_y, CSVResult.from_bool(flatness_y_passed)]
+        )
 
     ui.print_header("REMOVE PIPETTE")
+    pos = await api.gantry_position(mount, critical_point=cp)
+    await api.move_to(mount, pos._replace(z=home_pos.z))
     print("moving to accessible position")
     await _move_to_accessible_spot(api, mount, arch_z=home_pos.z)
     await api.remove_tip(mount)
