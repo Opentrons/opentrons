@@ -1,9 +1,9 @@
-import type { IconName } from '@opentrons/components'
+import type { IconName, StyleProps } from '@opentrons/components'
 
 export type ModalSize = 'small' | 'medium' | 'large'
 
-export interface ModalHeaderBaseProps {
-  title: string
+export interface ModalHeaderBaseProps extends StyleProps {
+  title: React.ReactNode
   onClick?: React.MouseEventHandler
   hasExitIcon?: boolean
   iconName?: IconName
