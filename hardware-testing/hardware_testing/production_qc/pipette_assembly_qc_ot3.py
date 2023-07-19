@@ -40,9 +40,11 @@ from hardware_testing.opentrons_api.types import (
     Axis,
 )
 
-DEFAULT_SLOT_TIP_RACK_FIXTURE = 1
+DEFAULT_SLOT_TIP_RACK_1000 = 7
+DEFAULT_SLOT_TIP_RACK_200 = 4
+DEFAULT_SLOT_TIP_RACK_50 = 1
+
 DEFAULT_SLOT_FIXTURE = 3
-DEFAULT_SLOT_TIP_RACK_LIQUID = 7
 DEFAULT_SLOT_RESERVOIR = 8
 DEFAULT_SLOT_TRASH = 12
 
@@ -52,7 +54,7 @@ TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
 
 SAFE_HEIGHT_TRAVEL = 10
-SAFE_HEIGHT_CALIBRATE = 10
+SAFE_HEIGHT_CALIBRATE = 1
 
 ENCODER_ALIGNMENT_THRESHOLD_MM = 0.1
 
@@ -85,8 +87,9 @@ class TestConfig:
     fixture_depth: int
     fixture_side: str
     fixture_aspirate_sample_count: int
-    slot_tip_rack_liquid: int
-    slot_tip_rack_fixture: int
+    slot_tip_rack_1000: int
+    slot_tip_rack_200: int
+    slot_tip_rack_50: int
     slot_reservoir: int
     slot_fixture: int
     slot_trash: int
@@ -100,8 +103,9 @@ class LabwareLocations:
     """Test Labware Locations."""
 
     trash: Optional[Point]
-    tip_rack_liquid: Optional[Point]
-    tip_rack_fixture: Optional[Point]
+    tip_rack_1000: Optional[Point]
+    tip_rack_200: Optional[Point]
+    tip_rack_50: Optional[Point]
     reservoir: Optional[Point]
     fixture: Optional[Point]
 
@@ -110,15 +114,17 @@ class LabwareLocations:
 # we start with actual values here to pass linting
 IDEAL_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     trash=None,
-    tip_rack_liquid=None,
-    tip_rack_fixture=None,
+    tip_rack_1000=None,
+    tip_rack_200=None,
+    tip_rack_50=None,
     reservoir=None,
     fixture=None,
 )
 CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     trash=None,
-    tip_rack_liquid=None,
-    tip_rack_fixture=None,
+    tip_rack_1000=None,
+    tip_rack_200=None,
+    tip_rack_50=None,
     reservoir=None,
     fixture=None,
 )
@@ -175,26 +181,31 @@ def _get_operator_answer_to_question(question: str) -> bool:
 
 
 def _get_tips_used_for_droplet_test(
-    pipette_channels: int, num_trials: int
-) -> List[str]:
+    pipette_channels: int, pipette_volume: int, num_trials: int
+) -> Tuple[int, List[str]]:
     if pipette_channels == 1:
         tip_columns = COLUMNS[:num_trials]
-        return [f"{c}1" for c in tip_columns]
+        return pipette_volume, [f"{c}1" for c in tip_columns]
     elif pipette_channels == 8:
-        return [f"A{r + 1}" for r in range(num_trials)]
+        return pipette_volume, [f"A{r + 1}" for r in range(num_trials)]
     raise RuntimeError(f"unexpected number of channels: {pipette_channels}")
 
 
 def _get_ideal_labware_locations(
-    test_config: TestConfig, pipette_volume: int, pipette_channels: int
+    test_config: TestConfig, pipette_channels: int
 ) -> LabwareLocations:
-    tip_rack_liquid_loc_ideal = helpers_ot3.get_theoretical_a1_position(
-        test_config.slot_tip_rack_liquid,
-        f"opentrons_flex_96_tiprack_{pipette_volume}ul",
+    tip_rack_1000_loc_ideal = helpers_ot3.get_theoretical_a1_position(
+        test_config.slot_tip_rack_1000,
+
+        f"opentrons_flex_96_tiprack_1000ul",
     )
-    tip_rack_fixture_loc_ideal = helpers_ot3.get_theoretical_a1_position(
-        test_config.slot_tip_rack_fixture,
-        f"opentrons_flex_96_tiprack_{PRESSURE_FIXTURE_TIP_VOLUME}ul",
+    tip_rack_200_loc_ideal = helpers_ot3.get_theoretical_a1_position(
+        test_config.slot_tip_rack_200,
+        f"opentrons_flex_96_tiprack_200ul",
+    )
+    tip_rack_50_loc_ideal = helpers_ot3.get_theoretical_a1_position(
+        test_config.slot_tip_rack_50,
+        f"opentrons_flex_96_tiprack_50ul",
     )
     reservoir_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_reservoir, "nest_1_reservoir_195ml"
@@ -215,8 +226,9 @@ def _get_ideal_labware_locations(
         reservoir_loc_ideal += MULTI_CHANNEL_1_OFFSET
         trash_loc_ideal += MULTI_CHANNEL_1_OFFSET
     return LabwareLocations(
-        tip_rack_liquid=tip_rack_liquid_loc_ideal,
-        tip_rack_fixture=tip_rack_fixture_loc_ideal,
+        tip_rack_1000=tip_rack_1000_loc_ideal,
+        tip_rack_200=tip_rack_200_loc_ideal,
+        tip_rack_50=tip_rack_50_loc_ideal,
         reservoir=reservoir_loc_ideal,
         trash=trash_loc_ideal,
         fixture=fixture_loc_ideal,
@@ -275,25 +287,39 @@ async def _pick_up_tip(
     return actual
 
 
-async def _pick_up_tip_for_liquid(api: OT3API, mount: OT3Mount, tip: str) -> None:
-    CALIBRATED_LABWARE_LOCATIONS.tip_rack_liquid = await _pick_up_tip(
-        api,
-        mount,
-        tip,
-        IDEAL_LABWARE_LOCATIONS.tip_rack_liquid,
-        CALIBRATED_LABWARE_LOCATIONS.tip_rack_liquid,
-    )
-
-
-async def _pick_up_tip_for_fixture(api: OT3API, mount: OT3Mount, tip: str) -> None:
-    CALIBRATED_LABWARE_LOCATIONS.tip_rack_fixture = await _pick_up_tip(
-        api,
-        mount,
-        tip,
-        IDEAL_LABWARE_LOCATIONS.tip_rack_fixture,
-        CALIBRATED_LABWARE_LOCATIONS.tip_rack_fixture,
-        tip_volume=PRESSURE_FIXTURE_TIP_VOLUME,
-    )
+async def _pick_up_tip_for_tip_volume(api: OT3API, mount: OT3Mount, tip_volume: int) -> None:
+    pip_channels = api.hardware_pipettes[mount.to_mount()].channels.as_int
+    tip = _available_tips[tip_volume][0]
+    _available_tips[tip_volume] = _available_tips[tip_volume][pip_channels:]
+    if tip_volume == 1000:
+        CALIBRATED_LABWARE_LOCATIONS.tip_rack_1000 = await _pick_up_tip(
+            api,
+            mount,
+            tip,
+            IDEAL_LABWARE_LOCATIONS.tip_rack_1000,
+            CALIBRATED_LABWARE_LOCATIONS.tip_rack_1000,
+            tip_volume=tip_volume,
+        )
+    elif tip_volume == 200:
+        CALIBRATED_LABWARE_LOCATIONS.tip_rack_200 = await _pick_up_tip(
+            api,
+            mount,
+            tip,
+            IDEAL_LABWARE_LOCATIONS.tip_rack_200,
+            CALIBRATED_LABWARE_LOCATIONS.tip_rack_200,
+            tip_volume=tip_volume,
+        )
+    elif tip_volume == 50:
+        CALIBRATED_LABWARE_LOCATIONS.tip_rack_50 = await _pick_up_tip(
+            api,
+            mount,
+            tip,
+            IDEAL_LABWARE_LOCATIONS.tip_rack_50,
+            CALIBRATED_LABWARE_LOCATIONS.tip_rack_50,
+            tip_volume=tip_volume,
+        )
+    else:
+        raise ValueError(f"unexpected tip volume: {tip_volume}")
 
 
 async def _move_to_liquid(api: OT3API, mount: OT3Mount) -> None:
@@ -480,18 +506,25 @@ async def _fixture_check_pressure(
     return False not in results
 
 
+_available_tips = {
+    50: [f"{row}{col + 1}" for col in range(12) for row in 'ABCDEFGH'],
+    200: [f"{row}{col + 1}" for col in range(12) for row in 'ABCDEFGH'],
+    1000: [f"{row}{col + 1}" for col in range(12) for row in 'ABCDEFGH'],
+}
+
+
 async def _test_for_leak(
     api: OT3API,
     mount: OT3Mount,
     test_config: TestConfig,
-    tip: str,
+    tip_volume: int,
     fixture: Optional[PressureFixture],
     write_cb: Optional[Callable],
     accumulate_raw_data_cb: Optional[Callable],
     droplet_wait_seconds: Optional[int] = None,
 ) -> bool:
     if fixture:
-        await _pick_up_tip_for_fixture(api, mount, tip)
+        await _pick_up_tip_for_tip_volume(api, mount, tip_volume=tip_volume)
         assert write_cb, "pressure fixture requires recording data to disk"
         assert (
             accumulate_raw_data_cb
@@ -501,15 +534,12 @@ async def _test_for_leak(
             api, mount, test_config, fixture, write_cb, accumulate_raw_data_cb
         )
     else:
-        assert droplet_wait_seconds is not None
-        await _pick_up_tip_for_liquid(api, mount, tip)
+        await _pick_up_tip_for_tip_volume(api, mount, tip_volume=tip_volume)
         await _move_to_liquid(api, mount)
         test_passed = await _aspirate_and_look_for_droplets(
             api, mount, droplet_wait_seconds
         )
     await _drop_tip_in_trash(api, mount)
-    pass_msg = _bool_to_pass_fail(test_passed)
-    print(f"tip {tip}: {pass_msg}")
     return test_passed
 
 
@@ -517,11 +547,11 @@ async def _test_for_leak_by_eye(
     api: OT3API,
     mount: OT3Mount,
     test_config: TestConfig,
-    tip: str,
+    tip_volume: int,
     droplet_wait_time: int,
 ) -> bool:
     return await _test_for_leak(
-        api, mount, test_config, tip, None, None, None, droplet_wait_time
+        api, mount, test_config, tip_volume, None, None, None, droplet_wait_time
     )
 
 
@@ -1001,12 +1031,13 @@ async def _main(test_config: TestConfig) -> None:
         pipette_volume = int(pipette.working_volume)
         pipette_channels = int(pipette.channels.as_int)
         IDEAL_LABWARE_LOCATIONS = _get_ideal_labware_locations(
-            test_config, pipette_volume, pipette_channels
+            test_config, pipette_channels
         )
         CALIBRATED_LABWARE_LOCATIONS = LabwareLocations(
             trash=None,
-            tip_rack_liquid=None,
-            tip_rack_fixture=None,
+            tip_rack_1000=None,
+            tip_rack_200=None,
+            tip_rack_50=None,
             reservoir=None,
             fixture=None,
         )
@@ -1065,10 +1096,6 @@ async def _main(test_config: TestConfig) -> None:
             for f in fields(config):
                 csv_cb.write([t.value, f.name, getattr(config, f.name)])
 
-        tips_used_for_droplet = _get_tips_used_for_droplet_test(
-            pipette_channels, test_config.num_trials
-        )
-
         # run the test
         csv_cb.write(["----"])
         csv_cb.write(["TEST"])
@@ -1091,10 +1118,14 @@ async def _main(test_config: TestConfig) -> None:
         # TODO: add liquid-probe here
 
         if not test_config.skip_liquid:
-            for i, tip in enumerate(tips_used_for_droplet):
+            for i in range(test_config.num_trials):
                 droplet_wait_seconds = test_config.droplet_wait_seconds * (i + 1)
                 test_passed = await _test_for_leak_by_eye(
-                    api, mount, test_config, tip, droplet_wait_seconds
+                    api,
+                    mount,
+                    test_config,
+                    tip_volume=pipette_volume,
+                    droplet_wait_time=droplet_wait_seconds,
                 )
                 csv_cb.results("droplets", test_passed)
 
@@ -1103,7 +1134,7 @@ async def _main(test_config: TestConfig) -> None:
                 api,
                 mount,
                 test_config,
-                "A1",
+                tip_volume=50,
                 fixture=fixture,
                 write_cb=csv_cb.write,
                 accumulate_raw_data_cb=csv_cb.pressure,
@@ -1160,10 +1191,13 @@ if __name__ == "__main__":
     )
     arg_parser.add_argument("--wait", type=int, default=30)
     arg_parser.add_argument(
-        "--slot-tip-rack-liquid", type=int, default=DEFAULT_SLOT_TIP_RACK_LIQUID
+        "--slot-tip-rack-1000", type=int, default=DEFAULT_SLOT_TIP_RACK_1000
     )
     arg_parser.add_argument(
-        "--slot-tip-rack-fixture", type=int, default=DEFAULT_SLOT_TIP_RACK_FIXTURE
+        "--slot-tip-rack-200", type=int, default=DEFAULT_SLOT_TIP_RACK_200
+    )
+    arg_parser.add_argument(
+        "--slot-tip-rack-50", type=int, default=DEFAULT_SLOT_TIP_RACK_50
     )
     arg_parser.add_argument(
         "--slot-reservoir", type=int, default=DEFAULT_SLOT_RESERVOIR
@@ -1189,8 +1223,9 @@ if __name__ == "__main__":
         fixture_depth=args.insert_depth,
         fixture_side=args.fixture_side,
         fixture_aspirate_sample_count=args.aspirate_sample_count,
-        slot_tip_rack_liquid=args.slot_tip_rack_liquid,
-        slot_tip_rack_fixture=args.slot_tip_rack_fixture,
+        slot_tip_rack_1000=args.slot_tip_rack_1000,
+        slot_tip_rack_200=args.slot_tip_rack_200,
+        slot_tip_rack_50=args.slot_tip_rack_50,
         slot_reservoir=args.slot_reservoir,
         slot_fixture=args.slot_fixture,
         slot_trash=args.slot_trash,
