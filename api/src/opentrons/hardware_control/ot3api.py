@@ -563,8 +563,6 @@ class OT3API(
         async with self.instrument_cache_lock():
             await self._cache_instruments(require)
             await self._configure_instruments()
-        if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
-            await self._backend.update_gear_motor_position()
 
     async def _cache_instruments(
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
@@ -700,35 +698,6 @@ class OT3API(
             axes = list(Axis.ot3_mount_axes())
         await self.home(axes)
 
-    async def home_gear_motors(self) -> None:
-        position_estimation_dict = axis_convert(self._backend.gear_motor_position, 0.0)
-        position_estimation_float = position_estimation_dict[Axis.P_L]
-        gear_motor_axis_bound = self._backend.axis_bounds[Axis.Q][1]
-        velocity = self._config.motion_settings.default_max_speed[
-            GantryLoad.HIGH_THROUGHPUT
-        ][OT3AxisKind.Q]
-        if position_estimation_float is not None and position_estimation_float > 5.0:
-            position_valid = abs(position_estimation_float) < gear_motor_axis_bound
-            if position_valid:
-                position_dict = {Axis.Q: position_estimation_float}
-                safe_home_target = {Axis.Q: self._config.safe_home_distance}
-                moves = self._build_moves(position_dict, safe_home_target)
-
-                await self._backend.tip_action(moves=moves[0], tip_action="clamp")
-
-                distance = axis_convert(self._backend.gear_motor_position, 0.0)[
-                    Axis.P_L
-                ]
-                await self._backend.tip_action(
-                    distance=distance, velocity=velocity, tip_action="home"
-                )
-                return
-        # if gear motor position is not known:
-        #   start at the axis boundary, and move without acceleration
-        #   to avoid crashing if the gear motors' positions are not available
-        await self._backend.tip_action(
-            distance=gear_motor_axis_bound, velocity=velocity, tip_action="home"
-        )
 
     async def home_gripper_jaw(self) -> None:
         """
@@ -811,6 +780,8 @@ class OT3API(
             await self._backend.update_motor_status()
             await self._cache_current_position()
             await self._cache_encoder_position()
+            if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
+                await self._backend.update_gear_motor_position()
 
     async def _cache_current_position(self) -> Dict[Axis, float]:
         """Cache current position from backend and return in absolute deck coords."""
@@ -1679,8 +1650,9 @@ class OT3API(
             await self._move(target_down)
             # perform pick up tip
             await self._backend.update_gear_motor_position()
+            pipette_axis = Axis.of_main_tool_actuator(mount)
             gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
-                Axis.P_L
+                pipette_axis
             ]
             gear_origin_dict = {Axis.Q: gear_origin_float}
             clamp_move_target = pipette_spec.pick_up_distance
@@ -1688,7 +1660,15 @@ class OT3API(
             clamp_moves = self._build_moves(gear_origin_dict, gear_target_dict)
             await self._backend.tip_action(moves=clamp_moves[0], tip_action="clamp")
 
-            await self.home_gear_motors()
+            homing_velocity = self._config.motion_settings.default_max_speed[
+                GantryLoad.HIGH_THROUGHPUT
+            ][OT3AxisKind.Q]
+            q_axis_distance = axis_convert(self._backend.gear_motor_position, 0.0)[Axis.P_L]
+            await self._backend.tip_action(
+                distance=(q_axis_distance + pipette_spec.home_buffer),
+                velocity=homing_velocity,
+                tip_action="home",
+            )
 
     async def pick_up_tip(
         self,
@@ -1764,12 +1744,21 @@ class OT3API(
                 gear_start_position = axis_convert(
                     self._backend.gear_motor_position, 0.0
                 )
-                drop_target_dict = {Axis.Q: move.target_position}
-                drop_moves = self._build_moves(gear_start_position, drop_target_dict)
+                pickup_target_dict = {Axis.Q: move.target_position}
+                drop_moves = self._build_moves(gear_start_position, pickup_target_dict)
 
                 await self._backend.tip_action(moves=drop_moves[0], tip_action="clamp")
 
-                await self.home_gear_motors()
+                homing_velocity = self._config.motion_settings.default_max_speed[
+                    GantryLoad.HIGH_THROUGHPUT
+                ][OT3AxisKind.Q]
+                pipette_axis = Axis.of_main_tool_actuator(mount)
+                q_axis_distance = axis_convert(self._backend.gear_motor_position, 0.0)[pipette_axis]
+                await self._backend.tip_action(
+                    distance=(q_axis_distance + move.home_buffer),
+                    velocity=homing_velocity,
+                    tip_action="home",
+                )
 
             else:
                 target_pos = target_position_from_plunger(

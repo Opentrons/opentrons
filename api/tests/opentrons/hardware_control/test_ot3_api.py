@@ -1714,8 +1714,6 @@ async def test_tip_presence_disabled_ninety_six_channel(
         instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
         await ot3_hardware.cache_pipette(OT3Mount.LEFT, instr_data, None)
         await ot3_hardware._configure_instruments()
-        await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
-        # await ot3_hardware.cache_instruments()
         await ot3_hardware.pick_up_tip(OT3Mount.LEFT, 60)
 
         tip_present.assert_not_called()
