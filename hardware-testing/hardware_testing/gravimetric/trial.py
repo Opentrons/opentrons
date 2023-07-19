@@ -187,7 +187,7 @@ def build_gravimetric_trials(
                     blank=blank,
                     inspect=cfg.inspect,
                     mix=cfg.mix,
-                    stable=False,
+                    stable=True,
                     scale_delay=cfg.scale_delay,
                     acceptable_cv=None,
                     cfg=cfg,
