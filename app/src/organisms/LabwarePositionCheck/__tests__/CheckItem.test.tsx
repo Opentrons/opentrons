@@ -218,18 +218,15 @@ describe('CheckItem', () => {
             },
           },
           {
-            commandType: 'moveToWell',
+            commandType: 'retractAxis' as const,
             params: {
-              pipetteId: 'pipetteId1',
-              labwareId: 'fixedTrash',
-              wellName: 'A1',
-              wellLocation: { origin: 'top', offset: undefined },
+              axis: 'x',
             },
           },
           {
             commandType: 'retractAxis' as const,
             params: {
-              axis: 'leftZ',
+              axis: 'y',
             },
           },
           {
