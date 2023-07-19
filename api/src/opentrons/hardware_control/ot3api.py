@@ -1208,6 +1208,7 @@ class OT3API(
             await self.refresh_positions()
 
         for axis in position.keys():
+            print(axis)
             if not self._backend.axis_is_present(axis):
                 raise InvalidActuator(
                     message=f"{axis} is not present", detail={"axis": str(axis)}
@@ -2140,6 +2141,25 @@ class OT3API(
                 origin={Axis.Q: gear_origin_float}, targets=move_targets
             )
             await self.home_gear_motors()
+
+    async def _motor_pickup_move(
+        self, mount: OT3Mount, motor_current: Mapping[Axis, float],
+            move_distance: float, speed: float) -> None:
+        async with self._backend.restore_current():
+            await self._backend.set_active_current(
+                {axis: current for axis, current in motor_current.items()}
+            )
+            # perform pick up tip
+            await self._backend.tip_action(
+                [Axis.of_main_tool_actuator(mount)],
+                move_distance,
+                speed,
+                "clamp",
+            )
+
+    async def get_tip_presence(self, mount: Union[top_types.Mount, OT3Mount]):
+        state = await self._backend.get_tip_present_state(mount)
+        return state
 
     async def pick_up_tip(
         self,
