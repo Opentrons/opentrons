@@ -1999,7 +1999,6 @@ class OT3API(
         self,
         mount: OT3Mount,
         probe_settings: Optional[LiquidProbeSettings] = None,
-        retract_after: bool = True,
     ) -> float:
         """Search for and return liquid level height.
 
@@ -2026,7 +2025,6 @@ class OT3API(
 
         if not probe_settings:
             probe_settings = self.config.liquid_sense
-        mount_axis = Axis.by_mount(mount)
 
         pos = await self.gantry_position(mount, refresh=True)
         probe_start_pos = pos._replace(z=probe_settings.starting_mount_height)
@@ -2034,6 +2032,17 @@ class OT3API(
 
         if probe_settings.aspirate_while_sensing:
             await self._move_to_plunger_bottom(mount, rate=1.0)
+        else:
+            # TODO: shorten this distance by only moving far enough
+            #       to account for the specified "max-z-distance"
+            target_pos = target_position_from_plunger(
+                checked_mount, instrument.plunger_positions.top, self._current_position
+            )
+            # FIXME: this should really be the slower "aspirate" speed
+            #        but this is still in r&d so we'll speed things up
+            max_speeds = self.config.motion_settings.default_max_speed
+            speed = max_speeds[self.gantry_load][OT3AxisKind.P]
+            await self._move(target_pos, speed=speed, acquire_lock=True)
 
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
         await self._backend.liquid_probe(
@@ -2047,8 +2056,7 @@ class OT3API(
             probe_settings.num_baseline_reads,
         )
         end_pos = await self.gantry_position(mount, refresh=True)
-        if retract_after:
-            await self.move_to(mount, probe_start_pos)
+        await self.move_to(mount, probe_start_pos)
         return end_pos.z
 
     async def capacitive_probe(
