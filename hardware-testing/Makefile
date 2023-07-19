@@ -12,7 +12,7 @@ project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
 sdist_file = dist/hardware_testing-0.0.1.tar.gz
 wheel_file = dist/hardware_testing-0.0.1-py3-none-any.whl
 # Find the branch, sha, version that will be used to update the VERSION.json file
-version_file = $(call python_get_git_version,hardware-testing,$(project_ot3_default),hardware-testing)
+usb_fileversion_file = $(call python_get_git_version,hardware-testing,$(project_ot3_default),hardware-testing)
 usb_file = dist/hardware_testing_usb-0.0.1.tar.gz
 
 # These variables can be overriden when make is invoked to customize the
@@ -284,11 +284,17 @@ get-latest-tag:
 setup-usb-module: sdist Pipfile.lock
 	@echo "Creating hardware-testing USB package."
 
-	# Create the usb-package tarball
-	tar -zcvf $(usb_file) \
-		-C ./dist ./hardware_testing-0.0.1.tar.gz \
-		-C ../hardware_testing/scripts/ ./setup.sh \
+	# Clean the old dir
+	rm -rf ./dist/hardware_testing_usb/
 
+	# Copy files to dir
+	mkdir -p ./dist/hardware_testing_usb/
+	cp -r $(sdist_file) ./dist/hardware_testing_usb/
+	cp -r ./hardware_testing/scripts/setup.sh ./dist/hardware_testing_usb/
+	cp -r ./hardware_testing/tools/plot ./dist/hardware_testing_usb/
+
+	# Create the usb-package tarbaltar
+	tar -zcvf $(usb_file) -C ./dist/ ./hardware_testing_usb/
 	# Lets extract the usb package to the usb device if given
 	$(if $(usb_dir), tar -xvf $(usb_file) -C $(usb_dir))
 
