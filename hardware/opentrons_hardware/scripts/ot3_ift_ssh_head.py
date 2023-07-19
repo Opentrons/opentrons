@@ -20,7 +20,7 @@ from opentrons_hardware.firmware_bindings.messages import (
     payloads,
     fields,
 )
-
+from opentrons_hardware.firmware_bindings.messages.fields import EepromDataField
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     EnableMotorRequest,
     MotorPositionRequest,
@@ -43,6 +43,16 @@ from opentrons_hardware.drivers.gpio import OT3GPIO
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]
 from typing import Dict, Tuple
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    ReadFromEEPromRequest,
+    ReadFromEEPromResponse,
+    WriteToEEPromRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    EEPromDataPayload,
+    EEPromReadPayload,
+)
+from opentrons_hardware.firmware_bindings.utils import UInt16Field
 
 def getch():
     """
@@ -290,7 +300,42 @@ async def read_epprom_gripper(messenger: CanMessenger, node):
     except Exception as errval:
         print("errval",errval)
         return "None"
+async def write_epprom(
+    eeprom_node_id: NodeId,
+    can_messenger: CanMessenger,
+    address: int,
+    data: bytes,
+) -> None:
+    """It should be able to read and write eeprom values."""
+    await can_messenger.send(
+        node_id=eeprom_node_id,
+        message=WriteToEEPromRequest(
+            payload=EEPromDataPayload(
+                address=UInt16Field(address),
+                data_length=UInt16Field(len(data)),
+                data=EepromDataField(data),
+            )
+        ),
+    )
+async def write_epprom(
+    eeprom_node_id: NodeId,
+    can_messenger: CanMessenger,
+    address: int,
+    data: bytes,
+) -> None:
+    read_message = ReadFromEEPromRequest(
+        payload=EEPromReadPayload(
+            address=UInt16Field(address), data_length=UInt16Field(len(data))
+        )
+    )
+    await can_messenger.send(node_id=eeprom_node_id, message=read_message)
 
+    response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
+
+    assert isinstance(response, ReadFromEEPromResponse)
+    assert response.payload.data.value[: len(data)] == data
+    assert response.payload.address.value == address
+    assert response.payload.data_length.value == len(data)
 async def read_version(messenger: CanMessenger, node):
     await messenger.send(node, DeviceInfoRequest())
     target = datetime.datetime.now()
@@ -374,7 +419,14 @@ async def  run(args: argparse.Namespace) -> None:
     if args.read_epprom_gripper:
         serial_number2 = await read_epprom_gripper(messenger, node)
         print(f'READEPPROMGRP={serial_number2}')
-        
+    
+    if args.write_epprom:
+        dataval = args.eppromdata
+        try:
+            serial_number2 = await write_epprom(node,messenger, 0,dataval)
+            print(f'WRITEEPPOM=Pass')
+        except:
+            print(f'WRITEEPPOM=Fail')
 
 
 log = logging.getLogger(__name__)
@@ -450,7 +502,10 @@ def main() -> None:
     parser.add_argument(
         "--current", type=str, help="set current.", default=0.8
     )
-    
+    parser.add_argument("--write_epprom", action="store_true")
+    parser.add_argument(
+        "--eppromdata", type=str, help="data", default="aa"
+    )
     args = parser.parse_args()
 
     asyncio.run(run(args))
