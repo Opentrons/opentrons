@@ -190,7 +190,7 @@ if __name__ == "__main__":
     parser.add_argument("--increment", action="store_true")
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
-    parser.add_argument("--blank", action="store_true")
+    parser.add_argument("--no-blank", action="store_true")
     parser.add_argument("--mix", action="store_true")
     parser.add_argument("--inspect", action="store_true")
     parser.add_argument("--user-volumes", action="store_true")
@@ -267,7 +267,7 @@ if __name__ == "__main__":
             args.trials,
             args.increment,
             args.return_tip,
-            args.blank,
+            False if args.no_blank else True,
             args.mix,
             args.inspect,
             args.user_volumes,
