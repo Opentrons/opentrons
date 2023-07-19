@@ -4,12 +4,12 @@ import asyncio
 from dataclasses import dataclass, fields
 import os
 from time import time
-from typing import Optional, Callable, List, Any, Tuple
+from typing import Optional, Callable, List, Any, Tuple, Dict
 from typing_extensions import Final
 
 from opentrons_hardware.firmware_bindings.constants import SensorType
 
-from opentrons.config.types import CapacitivePassSettings
+from opentrons.config.types import CapacitivePassSettings, LiquidProbeSettings
 from opentrons.hardware_control.types import TipStateType, FailedTipStateCheck
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
@@ -53,6 +53,9 @@ PROBING_DECK_PRECISION_MM = 0.1
 
 TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
+ASPIRATE_SUBMERGE_MM: Final = 3
+
+LIQUID_PROBE_ERROR_THRESHOLD_MM = 0.2
 
 SAFE_HEIGHT_TRAVEL = 10
 SAFE_HEIGHT_CALIBRATE = 1
@@ -83,6 +86,7 @@ class TestConfig:
     skip_diagnostics: bool
     skip_plunger: bool
     skip_tip_presence: bool
+    skip_liquid_probe: bool
     fixture_port: str
     fixture_depth: int
     fixture_side: str
@@ -334,6 +338,16 @@ async def _move_to_liquid(api: OT3API, mount: OT3Mount) -> None:
     )
 
 
+async def _move_to_above_liquid(api: OT3API, mount: OT3Mount, height_mm: float) -> None:
+    assert CALIBRATED_LABWARE_LOCATIONS.reservoir, f"you must calibrate the liquid before hovering"
+    await _move_to_or_calibrate(
+        api,
+        mount,
+        IDEAL_LABWARE_LOCATIONS.reservoir,
+        CALIBRATED_LABWARE_LOCATIONS.reservoir + Point(z=height_mm),
+    )
+
+
 async def _move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
 
     CALIBRATED_LABWARE_LOCATIONS.fixture = await _move_to_or_calibrate(
@@ -361,6 +375,7 @@ async def _aspirate_and_look_for_droplets(
     assert pip
     pipette_volume = pip.working_volume
     print(f"aspirating {pipette_volume} microliters")
+    await api.move_rel(mount, Point(z=-ASPIRATE_SUBMERGE_MM))
     await api.aspirate(mount, pipette_volume)
     await api.move_rel(mount, Point(z=LEAK_HOVER_ABOVE_LIQUID_MM))
     for t in range(wait_time):
@@ -375,6 +390,7 @@ async def _aspirate_and_look_for_droplets(
     await api.move_rel(mount, Point(z=-LEAK_HOVER_ABOVE_LIQUID_MM))
     await api.dispense(mount, pipette_volume)
     await api.blow_out(mount)
+    await api.move_rel(mount, Point(z=ASPIRATE_SUBMERGE_MM))
     return leak_test_passed
 
 
@@ -1041,9 +1057,9 @@ async def _test_tip_presence_flag(
     data = [
         "tip-presence-displacements",
         pick_up_disp,
-        pick_up_result,
+        _bool_to_pass_fail(pick_up_result),
         drop_disp,
-        drop_result,
+        _bool_to_pass_fail(drop_result),
         ejector_rel_pos,
         pick_up_pos_rel,
         drop_pos_rel,
@@ -1051,6 +1067,81 @@ async def _test_tip_presence_flag(
     print(data)
     write_cb(data)
     return pick_up_result and drop_result
+
+
+@dataclass
+class LiqProbeCfg:
+    mount_speed: float
+    plunger_speed: float
+    sensor_threshold_pascals: float
+
+
+PROBE_SETTINGS: Dict[int, Dict[int, LiqProbeCfg]] = {
+    50: {
+        50: LiqProbeCfg(
+            mount_speed=11,
+            plunger_speed=21,
+            sensor_threshold_pascals=150,
+        ),
+    },
+    1000: {
+        50: LiqProbeCfg(
+            mount_speed=5,
+            plunger_speed=10,
+            sensor_threshold_pascals=200,
+        ),
+        200: LiqProbeCfg(
+            mount_speed=5,
+            plunger_speed=10,
+            sensor_threshold_pascals=200,
+        ),
+        1000: LiqProbeCfg(
+            mount_speed=5,
+            plunger_speed=11,
+            sensor_threshold_pascals=150,
+        ),
+    },
+}
+
+
+async def _test_liquid_probe(api: OT3API, mount: OT3Mount, tip_volume: int, trials: int) -> List[float]:
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    pip_vol = int(pip.working_volume)
+    if not CALIBRATED_LABWARE_LOCATIONS.reservoir:
+        await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
+        await _move_to_liquid(api, mount)
+        await _drop_tip_in_trash(api, mount)
+    trial_results: List[float] = []
+    hover_mm = 3
+    max_submerge_mm = -3
+    max_z_distance_machine_coords = hover_mm - max_submerge_mm
+    target_z = CALIBRATED_LABWARE_LOCATIONS.reservoir.z
+    for trial in range(trials):
+        await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
+        await _move_to_above_liquid(api, mount, height_mm=hover_mm)
+        start_pos = await api.gantry_position(mount)
+        probe_cfg = PROBE_SETTINGS[pip_vol][tip_volume]
+        probe_settings = LiquidProbeSettings(
+            starting_mount_height=start_pos.z,
+            max_z_distance=max_z_distance_machine_coords,  # FIXME: deck coords
+            min_z_distance=0,  # FIXME: remove
+            mount_speed=probe_cfg.mount_speed,
+            plunger_speed=probe_cfg.plunger_speed,
+            sensor_threshold_pascals=probe_cfg.sensor_threshold_pascals,
+            expected_liquid_height=0,  # FIXME: remove
+            log_pressure=False,  # FIXME: remove
+            aspirate_while_sensing=False,  # FIXME: I heard this doesn't work
+            auto_zero_sensor=True,  # TODO: when would we want to adjust this?
+            num_baseline_reads=10,  # TODO: when would we want to adjust this?
+            data_file="",  # FIXME: remove
+        )
+        await api.liquid_probe(mount, probe_settings)
+        end_pos = await api.gantry_position(mount, refresh=True)
+        trial_results.append(end_pos.z - target_z)  # store the mm error from target
+        print(start_pos.z, target_z, end_pos.z)
+        await _drop_tip_in_trash(api, mount)
+    return trial_results
 
 
 @dataclass
@@ -1238,7 +1329,19 @@ async def _main(test_config: TestConfig) -> None:
                 test_passed = await _test_plunger_positions(api, mount, csv_cb.write)
                 csv_cb.results("plunger", test_passed)
 
-        # TODO: add liquid-probe here
+        if not test_config.skip_liquid_probe:
+            tip_vols = [50] if pipette_volume == 50 else [50, 200, 1000]
+            test_passed = True
+            for tip_vol in tip_vols:
+                probe_data = await _test_liquid_probe(api, mount, tip_volume=tip_vol, trials=3)
+                worst_trial = max(abs(min(probe_data)), max(probe_data))
+                tip_passed = bool(worst_trial < LIQUID_PROBE_ERROR_THRESHOLD_MM)
+                trial_data = [_bool_to_pass_fail(tip_passed)] + probe_data  # type: ignore
+                print([f"liquid-probe-{tip_vol}-tip-trials"] + trial_data)
+                csv_cb.write([f"liquid-probe-{tip_vol}-tip-trials"] + trial_data)  # type: ignore
+                if not tip_passed:
+                    test_passed = False
+            csv_cb.results("liquid-probe", test_passed)
 
         if not test_config.skip_liquid:
             for i in range(test_config.num_trials):
@@ -1250,7 +1353,7 @@ async def _main(test_config: TestConfig) -> None:
                     tip_volume=pipette_volume,
                     droplet_wait_time=droplet_wait_seconds,
                 )
-                csv_cb.results("droplets", test_passed)
+                csv_cb.results(f"droplets-{droplet_wait_seconds}", test_passed)
 
         if not test_config.skip_fixture:
             test_passed = await _test_for_leak(
@@ -1266,6 +1369,14 @@ async def _main(test_config: TestConfig) -> None:
 
         if not test_config.skip_tip_presence:
             test_passed = await _test_tip_presence_flag(api, mount, csv_cb.write)
+            # P1000 also needs to check that 200uL tips can be picked up
+            if pipette_volume == 1000:
+                # FIXME: this will raise an error and exit the script if it fails
+                try:
+                    await _pick_up_tip_for_tip_volume(api, mount, tip_volume=200)
+                except FailedTipStateCheck:
+                    print("ERROR: failed to pickup 200uL tip")
+                    test_passed = False
             csv_cb.results("tip-presence", test_passed)
 
         print("test complete")
@@ -1309,6 +1420,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--skip-diagnostics", action="store_true")
     arg_parser.add_argument("--skip-plunger", action="store_true")
     arg_parser.add_argument("--skip-tip-presence", action="store_true")
+    arg_parser.add_argument("--skip-liquid-probe", action="store_true")
     arg_parser.add_argument("--fixture-side", choices=["left", "right"], default="left")
     arg_parser.add_argument("--port", type=str, default="")
     arg_parser.add_argument("--num-trials", type=int, default=2)
@@ -1350,6 +1462,7 @@ if __name__ == "__main__":
         skip_diagnostics=args.skip_diagnostics,
         skip_plunger=args.skip_plunger,
         skip_tip_presence=args.skip_tip_presence,
+        skip_liquid_probe=args.skip_liquid_probe,
         fixture_port=args.port,
         fixture_depth=args.insert_depth,
         fixture_side=args.fixture_side,
