@@ -25,7 +25,7 @@ def test_v7_types(defpath):
 
 
 # TODO (Tamar and Max 3/16/22):
-# Some of our v6 fixtures accidentally contain command "result" data,
+# Some of our v7 fixtures accidentally contain command "result" data,
 # which is not part of the schema, and which we don't parse into our models.
 # Here, we delete the extra junk from the fixtures.
 # Remove this when the fixtures are corrected.
