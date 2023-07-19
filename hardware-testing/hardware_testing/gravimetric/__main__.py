@@ -186,7 +186,7 @@ if __name__ == "__main__":
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
     parser.add_argument("--tip", type=int, choices=[50, 200, 1000], required=True)
-    parser.add_argument("--trials", type=int, required=True)
+    parser.add_argument("--trials", type=int, default=0)
     parser.add_argument("--increment", action="store_true")
     parser.add_argument("--return-tip", action="store_true")
     parser.add_argument("--skip-labware-offsets", action="store_true")
@@ -255,6 +255,8 @@ if __name__ == "__main__":
             args.refill,
             args.extra,
         )
+        if args.trials == 0:
+            cfg_pm.trials = helpers.get_default_trials(cfg_pm)
         union_cfg = cfg_pm
     else:
         cfg_gm: GravimetricConfig = build_gravimetric_cfg(
@@ -274,6 +276,8 @@ if __name__ == "__main__":
             args.isolate_channels if args.isolate_channels else [],
             args.extra,
         )
+        if args.trials == 0:
+            cfg_pm.trials = helpers.get_default_trials(cfg_gm)
         union_cfg = cfg_gm
     run_id, start_time = create_run_id_and_start_time()
     ui.print_header("LOAD PIPETTE")
