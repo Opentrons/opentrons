@@ -4,7 +4,24 @@ from typing_extensions import Literal
 from enum import Enum
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from .shared_models import Liquid, Labware, CommandAnnotation, Location, ProfileStep, WellLocation, OffsetVector, Dimensions, GroupMetadata, Shape, WellDefinition, Metadata, Module, Pipette, Robot, DesignerApplication
+from .shared_models import (
+    Liquid,
+    Labware,
+    CommandAnnotation,
+    Location,
+    ProfileStep,
+    WellLocation,
+    OffsetVector,
+    Dimensions,
+    GroupMetadata,
+    Shape,
+    WellDefinition,
+    Metadata,
+    Module,
+    Pipette,
+    Robot,
+    DesignerApplication,
+)
 
 
 # TODO (tamar 3/15/22): split apart all the command payloads when we tackle #9583

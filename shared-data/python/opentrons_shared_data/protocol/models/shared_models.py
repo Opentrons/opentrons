@@ -66,7 +66,6 @@ class DesignerApplication(BaseModel):
     data: Optional[Dict[str, Any]]
 
 
-
 class CommandAnnotation(BaseModel):
     commandIds: List[str]
     annotationType: str
@@ -98,6 +97,7 @@ class Liquid(BaseModel):
     displayName: str
     description: str
     displayColor: Optional[str]
+
 
 class Labware(BaseModel):
     displayName: Optional[str]
