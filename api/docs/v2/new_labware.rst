@@ -21,7 +21,7 @@ Default labware is everything listed in the `Opentrons Labware Library <https://
 Custom Labware
 ==============
 
-Custom labware is labware that is not listed the Labware Library. If your protocol needs something that's not in the library, you can create it with the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. However, before using the Labware Creator, you should take a moment to review the support article, `Creating Custom Labware Definitions <https://support.opentrons.com/s/article/Creating-Custom-Labware-Definitions>`_.
+Custom labware is labware that is not listed the Labware Library. If your protocol needs something that's not in the library, you can create it with the `Opentrons Labware Creator <https://labware.opentrons.com/create/>`_. However, before using the Labware Creator, you should take a moment to review the support article `Creating Custom Labware Definitions <https://support.opentrons.com/s/article/Creating-Custom-Labware-Definitions>`_.
 
 After you've created your labware, save it as a ``.json`` file and add it to the Opentrons App. See `Using Labware in Your Protocols <https://support.opentrons.com/s/article/Using-labware-in-your-protocols>`_ for instructions. 
 
@@ -64,7 +64,7 @@ Similar to the code sample in :ref:`overview-section-v2`, here's how you use the
     tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
     plate = protocol.load_labware('corning_96_wellplate_360ul_flat', '2')
 
-When the ``load_labware`` method loads labware into your protocol, it returns a :py:class:`opentrons.protocol_api.labware.Labware` object.
+When the ``load_labware`` method loads labware into your protocol, it returns a :py:class:`~opentrons.protocol_api.labware.Labware` object.
 
 .. _labware-label:
 
@@ -80,7 +80,7 @@ When the ``load_labware`` method loads labware into your protocol, it returns a 
 Loading Labware on Adapters
 ===========================
 
-The the previous section demonstrates loading labware directly into a deck slot. But, the ``load_labware`` method also includes the ``adapter`` argument. This parameter lets you stack labware on top of a compatible adapter and work with them as a single unit in a protocol. For example, you can use an adapter as a simple labware holding device or when you need to use a labware/adapter combination with a module. The ability to combine labware with adapters adds functionality and flexibility to your robot and protocols. 
+The previous section demonstrates loading labware directly into a deck slot. But, the ``load_labware`` method also includes the ``adapter`` argument. This parameter lets you stack labware on top of a compatible adapter and work with them as a single unit in a protocol. For example, you can use an adapter as a simple labware holding device or when you need to use a labware/adapter combination with a module. The ability to combine labware with adapters adds functionality and flexibility to your robot and protocols. 
 
 On the Deck
 -------
@@ -88,7 +88,7 @@ This example uses ``adapter`` to combine a 96-well plate with a flat adapter and
     
     corning_plate = protocol.load_labware (
         load_name= 'corning_96_wellplate_360ul_flat',
-        location= "D1", #Flex deck slot
+        location= "D1",
         adapter= "opentrons_universal_flat_adapter")
 
 On a Module
