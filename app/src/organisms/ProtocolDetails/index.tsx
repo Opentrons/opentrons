@@ -36,10 +36,7 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
 } from '@opentrons/api-client'
-import {
-  getGripperDisplayName,
-  protocolHasLiquids,
-} from '@opentrons/shared-data'
+import { getGripperDisplayName } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
@@ -569,20 +566,19 @@ export function ProtocolDetails(
                   {t('labware')}
                 </StyledText>
               </RoundTab>
-              {mostRecentAnalysis != null &&
-                protocolHasLiquids(mostRecentAnalysis) && (
-                  <RoundTab
-                    data-testid="ProtocolDetails_liquids"
-                    isCurrent={currentTab === 'liquids'}
-                    onClick={() => setCurrentTab('liquids')}
+              {mostRecentAnalysis != null && (
+                <RoundTab
+                  data-testid="ProtocolDetails_liquids"
+                  isCurrent={currentTab === 'liquids'}
+                  onClick={() => setCurrentTab('liquids')}
+                >
+                  <StyledText
+                    textTransform={TYPOGRAPHY.textTransformCapitalize}
                   >
-                    <StyledText
-                      textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    >
-                      {t('liquids')}
-                    </StyledText>
-                  </RoundTab>
-                )}
+                    {t('liquids')}
+                  </StyledText>
+                </RoundTab>
+              )}
             </Flex>
             <Box
               backgroundColor={COLORS.white}
