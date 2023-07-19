@@ -25,6 +25,11 @@ export function EmergencyStop(): JSX.Element {
   const history = useHistory()
   // Note (kk:06/28/2023) this IF is for test and it will be removed when the e-stop status check function
   // I will add the function soon
+
+  // ToDo(kk:07/19/2023) For e-stop button connection check,
+  // The ODD app needs to check the status is not "notPresent"
+  // notPresent -> isEstopConnected false
+  // other state(disengaged, physicallyEngaged, logicallyEngaged) -> isEstopConnected true
   const isEstopConnected = true
 
   return (
