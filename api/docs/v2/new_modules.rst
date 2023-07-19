@@ -645,6 +645,11 @@ The `Magnetic Block <https://opentrons.com/products/modules/opentrons-flex-magne
 
 Because the Magnetic Block is unpowered, neither your robot or the Opentrons App aware of this module. You "control" it via protocols that use the Opentrons Flex Gripper to add and remove labware from this module.
 
+.. start here 
+.. It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+.. opentrons/api/src/opentrons/protocol_api/module_contexts.py
+
 ***************************************
 Using Multiple Modules of the Same Type
 ***************************************
