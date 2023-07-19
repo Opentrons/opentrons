@@ -147,7 +147,7 @@ def _translate_v7_pipette_command(
     command: protocol_schema_v7.Command,
 ) -> pe_commands.CommandCreate:
     pipette_id = command.params.pipetteId
-    # v6 data model supports all commands and therefor most props are optional.
+    # v7 data model supports all commands and therefor most props are optional.
     # load pipette command must contain pipette_id.
     assert pipette_id is not None
     assert command.params.pipetteName is not None
