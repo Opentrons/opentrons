@@ -109,7 +109,7 @@ def _translate_v7_module_command(
     command: protocol_schema_v7.Command,
 ) -> pe_commands.CommandCreate:
     module_id = command.params.moduleId
-    # v6 data model supports all commands and therefor most props are optional.
+    # v7 data model supports all commands and therefor most props are optional.
     # load module command must contain module_id. modules cannot be None.
     assert module_id is not None
     assert command.params.model is not None
