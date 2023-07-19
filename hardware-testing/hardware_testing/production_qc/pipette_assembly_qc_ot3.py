@@ -10,6 +10,7 @@ from typing_extensions import Final
 from opentrons_hardware.firmware_bindings.constants import SensorType
 
 from opentrons.config.types import CapacitivePassSettings
+from opentrons.hardware_control.types import TipStateType, FailedTipStateCheck
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_pipette,
@@ -65,8 +66,6 @@ SPEED_REDUCTION_PERCENTAGE = 0.3
 
 MULTI_CHANNEL_1_OFFSET = Point(y=9 * 7 * 0.5)
 
-ChangedPressureFixtureHover = 20
-
 # NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
 #       so here we cache these readings, and append them to the CSV in the end
 PRESSURE_DATA_CACHE = []
@@ -83,6 +82,7 @@ class TestConfig:
     skip_fixture: bool
     skip_diagnostics: bool
     skip_plunger: bool
+    skip_tip_presence: bool
     fixture_port: str
     fixture_depth: int
     fixture_side: str
@@ -196,16 +196,15 @@ def _get_ideal_labware_locations(
 ) -> LabwareLocations:
     tip_rack_1000_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_tip_rack_1000,
-
-        f"opentrons_flex_96_tiprack_1000ul",
+        "opentrons_flex_96_tiprack_1000ul",
     )
     tip_rack_200_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_tip_rack_200,
-        f"opentrons_flex_96_tiprack_200ul",
+        "opentrons_flex_96_tiprack_200ul",
     )
     tip_rack_50_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_tip_rack_50,
-        f"opentrons_flex_96_tiprack_50ul",
+        "opentrons_flex_96_tiprack_50ul",
     )
     reservoir_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_reservoir, "nest_1_reservoir_195ml"
@@ -287,8 +286,12 @@ async def _pick_up_tip(
     return actual
 
 
-async def _pick_up_tip_for_tip_volume(api: OT3API, mount: OT3Mount, tip_volume: int) -> None:
-    pip_channels = api.hardware_pipettes[mount.to_mount()].channels.as_int
+async def _pick_up_tip_for_tip_volume(
+    api: OT3API, mount: OT3Mount, tip_volume: int
+) -> None:
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    pip_channels = pip.channels.as_int
     tip = _available_tips[tip_volume][0]
     _available_tips[tip_volume] = _available_tips[tip_volume][pip_channels:]
     if tip_volume == 1000:
@@ -332,10 +335,11 @@ async def _move_to_liquid(api: OT3API, mount: OT3Mount) -> None:
 
 
 async def _move_to_fixture(api: OT3API, mount: OT3Mount) -> None:
+
     CALIBRATED_LABWARE_LOCATIONS.fixture = await _move_to_or_calibrate(
         api,
         mount,
-        IDEAL_LABWARE_LOCATIONS.fixture + Point(z=ChangedPressureFixtureHover),
+        IDEAL_LABWARE_LOCATIONS.fixture,
         CALIBRATED_LABWARE_LOCATIONS.fixture,
     )
 
@@ -507,9 +511,9 @@ async def _fixture_check_pressure(
 
 
 _available_tips = {
-    50: [f"{row}{col + 1}" for col in range(12) for row in 'ABCDEFGH'],
-    200: [f"{row}{col + 1}" for col in range(12) for row in 'ABCDEFGH'],
-    1000: [f"{row}{col + 1}" for col in range(12) for row in 'ABCDEFGH'],
+    50: [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"],
+    200: [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"],
+    1000: [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"],
 }
 
 
@@ -521,7 +525,7 @@ async def _test_for_leak(
     fixture: Optional[PressureFixture],
     write_cb: Optional[Callable],
     accumulate_raw_data_cb: Optional[Callable],
-    droplet_wait_seconds: Optional[int] = None,
+    droplet_wait_seconds: int = 30,
 ) -> bool:
     if fixture:
         await _pick_up_tip_for_tip_volume(api, mount, tip_volume=tip_volume)
@@ -735,7 +739,7 @@ async def _test_diagnostics_capacitive(
         if api.is_simulator:
             pass
         try:
-            await calibrate_pipette(api, mount, slot=5)
+            await calibrate_pipette(api, mount, slot=5)  # type: ignore[arg-type]
         except (
             EdgeNotFoundError,
             EarlyCapacitiveSenseTrigger,
@@ -744,7 +748,9 @@ async def _test_diagnostics_capacitive(
             print(f"ERROR: {e}")
             write_cb([f"probe-slot-{trial}", None, None, None])
         else:
-            o = api.hardware_pipettes[mount.to_mount()].pipette_offset.offset
+            pip = api.hardware_pipettes[mount.to_mount()]
+            assert pip
+            o = pip.pipette_offset.offset
             print(f"found offset: {o}")
             write_cb(
                 [f"probe-slot-{trial}", round(o.x, 2), round(o.y, 2), round(o.z, 2)]
@@ -928,6 +934,123 @@ async def _test_plunger_positions(
     print("homing the plunger")
     await api.home([Axis.of_main_tool_actuator(mount)])
     return blow_out_passed and drop_tip_passed
+
+
+async def _jog_for_tip_state(
+    api: OT3API,
+    mount: OT3Mount,
+    current_z: float,
+    max_z: float,
+    step_mm: float,
+    criteria: Tuple[float, float],
+    tip_state: TipStateType,
+) -> bool:
+    async def _jog(_step: float) -> None:
+        nonlocal current_z
+        await api.move_rel(mount, Point(z=_step))
+        current_z = round(current_z + _step, 2)
+
+    async def _matches_state(_state: TipStateType) -> bool:
+        try:
+            await asyncio.sleep(0.2)
+            await api._backend.get_tip_present(mount, _state)
+            return True
+        except FailedTipStateCheck:
+            return False
+
+    while (step_mm > 0 and current_z < max_z) or (step_mm < 0 and current_z > max_z):
+        await _jog(step_mm)
+        if await _matches_state(tip_state):
+            passed = min(criteria) <= current_z <= max(criteria)
+            print(f"found {tip_state.name} displacement: {current_z} ({passed})")
+            return passed
+    print(f"ERROR: did not find {tip_state.name} displacement: {current_z}")
+    return False
+
+
+async def _test_tip_presence_flag(
+    api: OT3API, mount: OT3Mount, write_cb: Callable
+) -> bool:
+    offset_from_a1 = Point(x=9 * 11, y=9 * -7, z=-5)
+    nominal_test_pos = (
+        IDEAL_LABWARE_LOCATIONS.tip_rack_50 + offset_from_a1  # type: ignore[operator]
+    )
+    await api.retract(mount)
+    await helpers_ot3.move_to_arched_ot3(api, mount, nominal_test_pos)
+    print("align NOZZLE with tip-rack HOLE:")
+    await helpers_ot3.jog_mount_ot3(api, mount)
+    nozzle_pos = await api.gantry_position(mount)
+    print(f"nozzle: {nozzle_pos.z}")
+    await api.move_rel(mount, Point(z=-6))
+    print("align EJECTOR with tip-rack HOLE:")
+    await helpers_ot3.jog_mount_ot3(api, mount)
+    ejector_pos = await api.gantry_position(mount)
+    ejector_rel_pos = round(ejector_pos.z - nozzle_pos.z, 2)
+
+    pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
+    pip_channels = pip.channels.value
+    pick_up_criteria = {
+        1: (
+            ejector_rel_pos + -1.3,
+            ejector_rel_pos + -2.5,
+        ),
+        8: (
+            ejector_rel_pos + -1.9,
+            ejector_rel_pos + -3.2,
+        ),
+    }[pip_channels]
+
+    pick_up_result = await _jog_for_tip_state(
+        api,
+        mount,
+        current_z=ejector_rel_pos,
+        max_z=-10.5,
+        criteria=pick_up_criteria,
+        step_mm=-0.1,
+        tip_state=TipStateType.PRESENT,
+    )
+    pick_up_pos = await api.gantry_position(mount)
+    pick_up_pos_rel = round(pick_up_pos.z - nozzle_pos.z, 2)
+
+    await api.move_to(mount, nozzle_pos + Point(z=-10.5))  # nominal tip depth
+    drop_criteria = {
+        1: (
+            -10.5 + 1.2,
+            -10.5 + 2.3,
+        ),
+        8: (
+            -10.5 + 1.9,
+            -10.5 + 3.5,
+        ),
+    }[pip_channels]
+    drop_result = await _jog_for_tip_state(
+        api,
+        mount,
+        current_z=-10.5,
+        max_z=0.0,
+        criteria=drop_criteria,
+        step_mm=0.1,
+        tip_state=TipStateType.ABSENT,
+    )
+    drop_pos = await api.gantry_position(mount)
+    drop_pos_rel = round(drop_pos.z - nozzle_pos.z, 2)
+
+    pick_up_disp = round(ejector_rel_pos - pick_up_pos_rel, 2)
+    drop_disp = round(10.5 + drop_pos_rel, 2)
+    data = [
+        "tip-presence-displacements",
+        pick_up_disp,
+        pick_up_result,
+        drop_disp,
+        drop_result,
+        ejector_rel_pos,
+        pick_up_pos_rel,
+        drop_pos_rel,
+    ]
+    print(data)
+    write_cb(data)
+    return pick_up_result and drop_result
 
 
 @dataclass
@@ -1134,12 +1257,16 @@ async def _main(test_config: TestConfig) -> None:
                 api,
                 mount,
                 test_config,
-                tip_volume=50,
+                tip_volume=PRESSURE_FIXTURE_TIP_VOLUME,
                 fixture=fixture,
                 write_cb=csv_cb.write,
                 accumulate_raw_data_cb=csv_cb.pressure,
             )
             csv_cb.results("pressure", test_passed)
+
+        if not test_config.skip_tip_presence:
+            test_passed = await _test_tip_presence_flag(api, mount, csv_cb.write)
+            csv_cb.results("tip-presence", test_passed)
 
         print("test complete")
         csv_cb.write(["-------------"])
@@ -1181,6 +1308,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--skip-fixture", action="store_true")
     arg_parser.add_argument("--skip-diagnostics", action="store_true")
     arg_parser.add_argument("--skip-plunger", action="store_true")
+    arg_parser.add_argument("--skip-tip-presence", action="store_true")
     arg_parser.add_argument("--fixture-side", choices=["left", "right"], default="left")
     arg_parser.add_argument("--port", type=str, default="")
     arg_parser.add_argument("--num-trials", type=int, default=2)
@@ -1204,7 +1332,9 @@ if __name__ == "__main__":
     )
     arg_parser.add_argument("--slot-fixture", type=int, default=DEFAULT_SLOT_FIXTURE)
     arg_parser.add_argument("--slot-trash", type=int, default=DEFAULT_SLOT_TRASH)
-    arg_parser.add_argument("--insert-depth", type=int, default=PRESSURE_FIXTURE_INSERT_DEPTH)
+    arg_parser.add_argument(
+        "--insert-depth", type=int, default=PRESSURE_FIXTURE_INSERT_DEPTH
+    )
     arg_parser.add_argument("--simulate", action="store_true")
     args = arg_parser.parse_args()
     if args.operator:
@@ -1219,6 +1349,7 @@ if __name__ == "__main__":
         skip_fixture=args.skip_fixture,
         skip_diagnostics=args.skip_diagnostics,
         skip_plunger=args.skip_plunger,
+        skip_tip_presence=args.skip_tip_presence,
         fixture_port=args.port,
         fixture_depth=args.insert_depth,
         fixture_side=args.fixture_side,
