@@ -143,6 +143,7 @@ def update_pipette_configuration(
             quirks_list.extend([b.name for b in v.values() if b.value])
         else:
             try:
+                dict_of_base_model.pop(lookup_key)
                 dict_of_base_model[lookup_key] = v
             except KeyError:
                 # The name is not the same format as previous so
@@ -150,7 +151,7 @@ def update_pipette_configuration(
                 new_names = _MAP_KEY_TO_V2[lookup_key]
                 top_name = new_names["top_level_name"]
                 nested_name = new_names["nested_name"]
-                if c == "tipLength":
+                if lookup_key == "tipLength":
                     # This is only a concern for OT-2 configs and I think we can
                     # be less smart about handling multiple tip types by updating
                     # all tips.

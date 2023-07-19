@@ -1,10 +1,12 @@
 import pytest
-from opentrons_shared_data.pipette import load_data, types
+from typing import Dict, Any
+from opentrons_shared_data.pipette import load_data, pipette_load_name_conversions
 from opentrons_shared_data.pipette.types import (
     PipetteChannelType,
     PipetteModelType,
     PipetteVersionType,
     PipetteTipType,
+    Quirks,
 )
 
 
@@ -42,7 +44,7 @@ def test_load_pipette_definition() -> None:
         ].default_aspirate_flowrate.default
         == 25.0
     )
-    assert pipette_config_two.quirks == [types.Quirks.dropTipShake]
+    assert pipette_config_two.quirks == [Quirks.dropTipShake]
 
 
 @pytest.mark.parametrize(
@@ -58,3 +60,31 @@ def test_load_pipette_definition() -> None:
 def test_build_serial_number_lookup(key_spot_check: str, value_spot_check: str) -> None:
     lookup_table = load_data.load_serial_lookup_table()
     assert lookup_table[key_spot_check] == value_spot_check
+
+
+@pytest.mark.parametrize(
+    argnames=["pipette_model", "v1_configuration_changes"],
+    argvalues=[
+        ["p300_multi_v1.4", {"max_volume": 200, "min_volume": 10}],
+        ["p1000_96_v3.3", {"tip_length": 40, "min_volume": 300}],
+    ],
+)
+def test_update_pipette_configuration(
+    pipette_model: str, v1_configuration_changes: Dict[str, Any]
+) -> None:
+
+    model_name = pipette_load_name_conversions.convert_pipette_model(pipette_model)
+    base_configurations = load_data.load_definition(
+        model_name.pipette_type, model_name.pipette_channels, model_name.pipette_version
+    )
+    updated_configurations = load_data.update_pipette_configuration(
+        base_configurations, v1_configuration_changes
+    )
+
+    updated_configurations_dict = updated_configurations.dict()
+    for k, v in v1_configuration_changes.items():
+        if k == "tip_length":
+            for i in updated_configurations_dict["supported_tips"].values():
+                assert i["default_tip_length"] == v
+        else:
+            assert updated_configurations_dict[k] == v
