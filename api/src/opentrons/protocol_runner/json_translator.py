@@ -59,7 +59,7 @@ def _translate_v7_labware_command(
     command: protocol_schema_v7.Command,
 ) -> pe_commands.LoadLabwareCreate:
     labware_id = command.params.labwareId
-    # v6 data model supports all commands and therefor most props are optional.
+    # v7 data model supports all commands and therefor most props are optional.
     # load labware command must contain labware_id and definition_id.
     assert labware_id is not None
     assert command.params.version is not None
