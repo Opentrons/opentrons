@@ -26,13 +26,13 @@ Item.args = {
   children: (
     <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <StyledText as="p">
-        {'Slot Component: Replace me using the component panel.'}
+        Slot Component: Replace me using the component panel.
       </StyledText>
       <StyledText as="p">
-        {'Slot Component: Replace me using the component panel.'}
+        Slot Component: Replace me using the component panel.
       </StyledText>
       <StyledText as="p">
-        {'Slot Component: Replace me using the component panel.'}
+        Slot Component: Replace me using the component panel.
       </StyledText>
     </Flex>
   ),
