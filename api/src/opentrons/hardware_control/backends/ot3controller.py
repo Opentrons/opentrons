@@ -785,6 +785,12 @@ class OT3Controller:
     def _tip_motor_nodes(axis_current_keys: KeysView[Axis]) -> List[NodeId]:
         return [axis_to_node(Axis.Q)] if Axis.Q in axis_current_keys else []
 
+    async def get_tip_present_state(self, mount: OT3Mount) -> TipStateType:
+        res = await get_tip_ejector_state(
+            self._messenger, sensor_node_for_mount(OT3Mount(mount.value))  # type: ignore
+        )
+        return res
+
     async def set_default_currents(self) -> None:
         """Set both run and hold currents from robot config to each node."""
         assert self._current_settings, "Invalid current settings"
