@@ -40,7 +40,6 @@ def test_analyses(
     # Upload labware if any
     if protocol.custom_labware:
         for labware in protocol.labware_paths:
-            print(labware)
             left_menu.navigate("labware")
             labware_landing.click_import_button()
             assert labware_landing.get_import_custom_labware_definition_header().is_displayed()
