@@ -59,8 +59,9 @@ TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
 ASPIRATE_SUBMERGE_MM: Final = 3
 
-LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM = 0.2
-LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM = 0.2
+# FIXME: reduce this spec after dial indicator is implemented
+LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM = 0.4
+LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM = 0.4
 
 SAFE_HEIGHT_TRAVEL = 10
 SAFE_HEIGHT_CALIBRATE = 0
@@ -1120,15 +1121,16 @@ async def _test_liquid_probe(
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pip_vol = int(pip.working_volume)
-    if not CALIBRATED_LABWARE_LOCATIONS.reservoir:
-        await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
-        await _move_to_liquid(api, mount)
-        await _drop_tip_in_trash(api, mount)
+    # force the operator to re-calibrate the liquid every time
+    CALIBRATED_LABWARE_LOCATIONS.reservoir = None
+    await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
+    await _move_to_liquid(api, mount)
+    await _drop_tip_in_trash(api, mount)
     trial_results: List[float] = []
     hover_mm = 3
     max_submerge_mm = -3
     max_z_distance_machine_coords = hover_mm - max_submerge_mm
-    assert CALIBRATED_LABWARE_LOCATIONS.reservoir
+    assert CALIBRATED_LABWARE_LOCATIONS.reservoir is not None
     target_z = CALIBRATED_LABWARE_LOCATIONS.reservoir.z
     for trial in range(trials):
         await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
@@ -1377,7 +1379,9 @@ async def _main(test_config: TestConfig) -> None:
                 print(prec_tag, precision, _bool_to_pass_fail(precision_passed))
                 print(acc_tag, accuracy, _bool_to_pass_fail(accuracy_passed))
                 print(tip_tag, _bool_to_pass_fail(tip_passed))
-                csv_cb.write([prec_tag, precision, _bool_to_pass_fail(precision_passed)])
+                csv_cb.write(
+                    [prec_tag, precision, _bool_to_pass_fail(precision_passed)]
+                )
                 csv_cb.write([acc_tag, accuracy, _bool_to_pass_fail(accuracy_passed)])
                 csv_cb.write([tip_tag, _bool_to_pass_fail(tip_passed)])
                 if not tip_passed:

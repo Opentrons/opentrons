@@ -190,9 +190,11 @@ async def build_async_ot3_hardware_api(
         api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
     if not is_simulating:
         await asyncio.sleep(0.5)
-        await api.cache_instruments()
+    if not is_simulating:
         await update_firmware(api)
     print(f"Firmware: v{api.fw_version}")
+    await api.cache_instruments()
+    await api.refresh_positions()
     return api
 
 
