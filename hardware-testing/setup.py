@@ -10,7 +10,7 @@ sys.path.append(os.path.join(HERE, "..", "scripts"))
 from python_build_utils import normalize_version  # noqa: E402
 
 
-def get_version():
+def _get_version():
     buildno = os.getenv("BUILD_NUMBER")
     project = os.getenv("OPENTRONS_PROJECT", "ot3")
     git_dir = os.getenv("OPENTRONS_GIT_DIR", None)
@@ -25,7 +25,7 @@ def get_version():
 
 setup(
     name="hardware_testing",
-    version=get_version(),
+    version=_get_version(),
     packages=find_packages(where=".", exclude=["tests.*", "tests"]),
     url="",
     license="",
