@@ -1150,6 +1150,8 @@ async def _test_liquid_probe(
             data_file="",  # FIXME: remove
         )
         end_z = await api.liquid_probe(mount, probe_settings)
+        error_mm = end_z - target_z
+        print(f"liquid-probe error: {error_mm}")
         trial_results.append(end_z - target_z)  # store the mm error from target
         await _drop_tip_in_trash(api, mount)
     return trial_results
@@ -1362,8 +1364,9 @@ async def _main(test_config: TestConfig) -> None:
                     csv_cb.write([csv_label, round(found_height, 2)])
                 precision = abs(max(probe_data) - min(probe_data)) * 0.5
                 accuracy = sum(probe_data) / len(probe_data)
-                csv_cb.write([f"liquid-probe-{tip_vol}-tip-precision", precision])
-                csv_cb.write([f"liquid-probe-{tip_vol}-tip-accuracy", accuracy])
+                prec_tag = f"liquid-probe-{tip_vol}-tip-precision"
+                acc_tag = f"liquid-probe-{tip_vol}-tip-accuracy"
+                tip_tag = f"liquid-probe-{tip_vol}-tip"
                 precision_passed = bool(
                     precision < LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM
                 )
@@ -1371,9 +1374,12 @@ async def _main(test_config: TestConfig) -> None:
                     abs(accuracy) < LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM
                 )
                 tip_passed = precision_passed and accuracy_passed
-                csv_cb.write(
-                    [f"liquid-probe-{tip_vol}-tip", _bool_to_pass_fail(tip_passed)]
-                )
+                print(prec_tag, precision, _bool_to_pass_fail(precision_passed))
+                print(acc_tag, accuracy, _bool_to_pass_fail(accuracy_passed))
+                print(tip_tag, _bool_to_pass_fail(tip_passed))
+                csv_cb.write([prec_tag, precision, _bool_to_pass_fail(precision_passed)])
+                csv_cb.write([acc_tag, accuracy, _bool_to_pass_fail(accuracy_passed)])
+                csv_cb.write([tip_tag, _bool_to_pass_fail(tip_passed)])
                 if not tip_passed:
                     test_passed = False
             csv_cb.results("liquid-probe", test_passed)
