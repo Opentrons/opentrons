@@ -2,11 +2,14 @@
 from dataclasses import dataclass
 from typing import Dict
 
-from opentrons_shared_data.pipette import dummy_model_for_name
 from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+    load_data as load_pipette_data,
+    types as pip_types,
+)
 
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.config.pipette_config import load as load_pipette_config
 
 from ..types import FlowRates
 
@@ -31,24 +34,31 @@ def get_virtual_pipette_static_config(
     pipette_name: PipetteName,
 ) -> LoadedStaticPipetteData:
     """Get the config for a virtual pipette, given only the pipette name."""
-    pipette_model = dummy_model_for_name(pipette_name)
-    config = load_pipette_config(pipette_model)
+    pipette_model = pipette_load_name.convert_pipette_name(pipette_name)
+    config = load_pipette_data.load_definition(
+        pipette_model.pipette_type,
+        pipette_model.pipette_channels,
+        pipette_model.pipette_version,
+    )
 
+    tip_configuration = config.supported_tips[
+        pip_types.PipetteTipType(config.max_volume)
+    ]
     return LoadedStaticPipetteData(
-        model=config.model,
+        model=str(pipette_model),
         display_name=config.display_name,
         min_volume=config.min_volume,
         max_volume=config.max_volume,
         channels=config.channels,
-        home_position=config.home_position,
+        home_position=config.mount_configurations.homePosition,
         nozzle_offset_z=config.nozzle_offset[2],
         flow_rates=FlowRates(
-            default_blow_out=config.default_blow_out_flow_rates,
-            default_aspirate=config.default_aspirate_flow_rates,
-            default_dispense=config.default_dispense_flow_rates,
+            default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
+            default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
+            default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
         ),
-        return_tip_scale=config.return_tip_height,
-        nominal_tip_overlap=config.tip_overlap,
+        return_tip_scale=tip_configuration.default_return_tip_height,
+        nominal_tip_overlap=config.tip_overlap_dictionary,
     )
 
 

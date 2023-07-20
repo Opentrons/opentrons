@@ -157,7 +157,7 @@ from .subsystem_manager import SubsystemManager
 
 if TYPE_CHECKING:
     from ..dev_types import (
-        OT3AttachedPipette,
+        AttachedPipette,
         AttachedGripper,
         OT3AttachedInstruments,
     )
@@ -691,7 +691,7 @@ class OT3Controller:
     @staticmethod
     def _build_attached_pip(
         attached: ohc_tool_types.PipetteInformation, mount: OT3Mount
-    ) -> OT3AttachedPipette:
+    ) -> AttachedPipette:
         if attached.name == FirmwarePipetteName.unknown:
             raise InvalidPipetteName(name=attached.name_int, mount=mount)
         try:

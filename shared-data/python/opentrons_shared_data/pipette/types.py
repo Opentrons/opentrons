@@ -1,13 +1,87 @@
 import enum
 from dataclasses import dataclass
-from typing import Union, Dict, Mapping
+from typing import Union, Dict, Mapping, Tuple, cast
+from typing_extensions import Literal
+
+"""Pipette Definition V2 Types"""
+
+# Needed for Int Comparison. Keeping it next to
+# the Literal type for ease of readability
+PipetteModelMajorVersion = [1, 2, 3]
+PipetteModelMinorVersion = [0, 1, 2, 3, 4, 5]
+
+# TODO Literals are only good for writing down
+# exact values. Is there a better typing mechanism
+# so we don't need to keep track of versions in two
+# different places?
+PipetteModelMajorVersionType = Literal[1, 2, 3]
+PipetteModelMinorVersionType = Literal[0, 1, 2, 3, 4, 5]
 
 
-@dataclass
-class RobotMountConfigs:
-    stepsPerMM: float
-    homePosition: float
-    travelDistance: float
+class PipetteTipType(enum.Enum):
+    t10 = 10
+    t20 = 20
+    t50 = 50
+    t200 = 200
+    t300 = 300
+    t1000 = 1000
+
+
+class PipetteChannelType(int, enum.Enum):
+    SINGLE_CHANNEL = 1
+    EIGHT_CHANNEL = 8
+    NINETY_SIX_CHANNEL = 96
+
+    def __str__(self) -> str:
+        if self.value == 96:
+            return "96"
+        elif self.value == 8:
+            return "multi"
+        else:
+            return "single"
+
+
+class PipetteModelType(enum.Enum):
+    p10 = "p10"
+    p20 = "p20"
+    p50 = "p50"
+    p300 = "p300"
+    p1000 = "p1000"
+
+
+class PipetteGenerationType(enum.Enum):
+    GEN1 = "GEN1"
+    GEN2 = "GEN2"
+    FLEX = "FLEX"
+
+
+@dataclass(frozen=True)
+class PipetteVersionType:
+    major: PipetteModelMajorVersionType
+    minor: PipetteModelMinorVersionType
+
+    @classmethod
+    def convert_from_float(cls, version: float) -> "PipetteVersionType":
+        major = cast(PipetteModelMajorVersionType, int(version // 1))
+        minor = cast(PipetteModelMinorVersionType, int(round((version % 1), 2) * 10))
+        return cls(major=major, minor=minor)
+
+    def __str__(self) -> str:
+        if self.major == 1 and self.minor == 0:
+            # Maintain the format of V1 pipettes that
+            # do not contain a minor version at all.
+            return f"{self.major}"
+        else:
+            return f"{self.major}.{self.minor}"
+
+    @property
+    def as_tuple(
+        self,
+    ) -> Tuple[PipetteModelMajorVersionType, PipetteModelMinorVersionType]:
+        return (self.major, self.minor)
+
+
+"""Mutable Configs Types"""
 
 
 class Quirks(enum.Enum):
@@ -22,6 +96,13 @@ class AvailableUnits(enum.Enum):
     amps = "amps"
     speed = "mm/s"
     presses = "presses"
+
+
+@dataclass
+class RobotMountConfigs:
+    stepsPerMM: float
+    homePosition: float
+    travelDistance: float
 
 
 @dataclass
