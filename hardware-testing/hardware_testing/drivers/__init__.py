@@ -9,6 +9,7 @@ def list_ports_and_select(device_name: str = "") -> str:
     """List serial ports and display list for user to select from."""
     ports = comports()
     assert ports, "no serial ports found"
+    ports.sort(key=lambda p: p.device)
     print("found ports:")
     for i, p in enumerate(ports):
         print(f"\t{i + 1}) {p.device}")
