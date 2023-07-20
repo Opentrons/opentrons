@@ -10,7 +10,7 @@ from ..types import (
     OnLabwareLocation,
     LabwareMovementStrategy,
     LabwareOffsetVector,
-    ExperimentalOffsetData,
+    LabwareMovementOffsetData,
 )
 from ..errors import LabwareMovementNotAllowedError
 from ..resources import labware_validation
@@ -34,16 +34,6 @@ class MoveLabwareParams(BaseModel):
         ...,
         description="Whether to use the gripper to perform the labware movement"
         " or to perform a manual movement with an option to pause.",
-    )
-    usePickUpLocationLpcOffset: bool = Field(
-        False,
-        description="Whether to use LPC offset of the labware associated with its "
-        "pick up location. Experimental param, subject to change.",
-    )
-    useDropLocationLpcOffset: bool = Field(
-        False,
-        description="Whether to use LPC offset of the labware associated with its "
-        "drop off location. Experimental param, subject to change.",
     )
     pickUpOffset: Optional[LabwareOffsetVector] = Field(
         None,
@@ -145,9 +135,7 @@ class MoveLabwareImplementation(
             validated_new_loc = self._labware_movement.ensure_valid_gripper_location(
                 available_new_location,
             )
-            experimental_offset_data = ExperimentalOffsetData(
-                usePickUpLocationLpcOffset=params.usePickUpLocationLpcOffset,
-                useDropLocationLpcOffset=params.useDropLocationLpcOffset,
+            user_offset_data = LabwareMovementOffsetData(
                 pickUpOffset=params.pickUpOffset,
                 dropOffset=params.dropOffset,
             )
@@ -156,8 +144,7 @@ class MoveLabwareImplementation(
                 labware_id=params.labwareId,
                 current_location=validated_current_loc,
                 new_location=validated_new_loc,
-                experimental_offset_data=experimental_offset_data,
-                new_offset_id=new_offset_id,
+                user_offset_data=user_offset_data,
             )
         elif params.strategy == LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE:
             # Pause to allow for manual labware movement
