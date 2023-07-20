@@ -641,14 +641,14 @@ Deactivating the heater and shaker are done separately using the :py:meth:`~.Hea
 Using a Magnetic Block Module
 *****************************
 
-The `Magnetic Block <https://opentrons.com/products/modules/opentrons-flex-magnetic-block/>`_ is an unpowered, magnetic 96-well plate for pulling particles out of suspension and retaining them during wash, rinse or other elution procedures. It is suitable for many magnetic bead-based protocols, including extracting and purifying DNA, RNA and proteins. Unlike the Magnetic Module, the Magnetic Block does not contain electronic components and does not move magnetic beads up or down in solution.
+The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but unlike the Magnetic Module, the Magnetic Block does not move beads up or down in solution.
 
-Because the Magnetic Block is unpowered, neither your robot or the Opentrons App aware of this module. You "control" it via protocols that use the Opentrons Flex Gripper to add and remove labware from this module.
+Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module and with the :py:meth:`.ProtocolContext.load_module` method. For example::
 
-.. start here 
-.. It should not be instantiated directly; instead, it should be
-    created through :py:meth:`.ProtocolContext.load_module`.
-.. opentrons/api/src/opentrons/protocol_api/module_contexts.py
+    def run(protocol_api.ProtocolContext):
+        mag_block = protocol.load_module('magneticBlockV1', 'D1')
+
+.. Placeholder for longer example using gripper here?
 
 ***************************************
 Using Multiple Modules of the Same Type
