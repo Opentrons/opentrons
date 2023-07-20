@@ -50,7 +50,6 @@ export function OnDeviceDisplayAppFallback({
   return (
     <Modal header={modalHeader}>
       <Flex
-        marginTop={SPACING.spacing32}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
         alignItems={ALIGN_CENTER}
