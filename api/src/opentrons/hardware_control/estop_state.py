@@ -24,15 +24,15 @@ class EstopStateMachine:
         self._state: EstopState = EstopState.DISENGAGED
         self._summary = detector.status
         self._transition_from_disengaged()
-        detector.add_listener(self._detector_listener)
+        detector.add_listener(self.detector_listener)
         self._listeners: List[HardwareEventHandler] = []
 
-    def __del__(self):
-        self._detector.remove_listener(self._detector_listener)
+    def __del__(self) -> None:
+        self._detector.remove_listener(self.detector_listener)
 
     def add_listener(self, listener: HardwareEventHandler) -> None:
         """Add a hardware event listener for estop event changes."""
-        if not listener in self._listeners:
+        if listener not in self._listeners:
             self._listeners.append(listener)
 
     def remove_listener(self, listener: HardwareEventHandler) -> None:
@@ -40,7 +40,7 @@ class EstopStateMachine:
         if listener in self._listeners:
             self._listeners.remove(listener)
 
-    def _detector_listener(self, summary: EstopSummary) -> None:
+    def detector_listener(self, summary: EstopSummary) -> None:
         """Callback from the detector."""
         self._handle_state_transition(new_summary=summary)
 
@@ -69,23 +69,29 @@ class EstopStateMachine:
             # Plugged in and NOT on, go to Disengaged
             self._state = EstopState.DISENGAGED
 
+    def _transition_from_logically_engaged(self) -> None:
+        if self._summary.engaged:
+            # Estop was turned on, go back to physically engaged
+            self._state = EstopState.PHYSICALLY_ENGAGED
+
     def _emit_event(self, prev_state: EstopState) -> None:
         """Broadcast a state change to all listeners."""
         event = EstopStateNotification(old_state=prev_state, new_state=self._state)
-        for l in self._listeners:
-            l(event)
+        for listener in self._listeners:
+            listener(event)
 
     def _handle_state_transition(self, new_summary: EstopSummary) -> None:
         """Caches the new state summary and changes the _state variable."""
         self._summary = new_summary
 
         prev_state = self._state
-        if self._state == EstopState.PHYSICALLY_ENGAGED:
-            self._transition_from_physically_engaged()
-        elif self._state == EstopState.DISENGAGED:
-            self._transition_from_disengaged()
-        elif self._state == EstopState.NOT_PRESENT:
-            self._transition_from_not_present()
+
+        {
+            EstopState.PHYSICALLY_ENGAGED: self._transition_from_physically_engaged,
+            EstopState.DISENGAGED: self._transition_from_disengaged,
+            EstopState.NOT_PRESENT: self._transition_from_not_present,
+            EstopState.LOGICALLY_ENGAGED: self._transition_from_logically_engaged,
+        }[self._state]()
 
         if self._state != prev_state:
             self._emit_event(prev_state=prev_state)
@@ -108,3 +114,22 @@ class EstopStateMachine:
             if self._summary.engaged
             else EstopPhysicalStatus.DISENGAGED
         )
+
+    @property
+    def state(self) -> EstopState:
+        return self._state
+
+    def acknowledge_and_clear(self) -> EstopState:
+        """Acknowledge a `logically_engaged` status if relevant.
+
+        If the current state is not LOGICALLY_ENGAGED, this does nothing.
+
+        If the current state *is* LOGICALLY_ENGAGED, this will move to the
+        correct return state (NOT_PRESENT or ENGAGED)"""
+        if self._state == EstopState.LOGICALLY_ENGAGED:
+            if self._summary.left_detected or self._summary.right_detected:
+                self._state = EstopState.DISENGAGED
+            else:
+                self._state = EstopState.NOT_PRESENT
+            self._emit_event(EstopState.LOGICALLY_ENGAGED)
+        return self._state

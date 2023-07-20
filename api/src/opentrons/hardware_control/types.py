@@ -451,9 +451,7 @@ class DoorStateNotification:
 
 @dataclass(frozen=True)
 class EstopStateNotification:
-    event: Literal[
-        HardwareEventType.DOOR_SWITCH_CHANGE
-    ] = HardwareEventType.ESTOP_CHANGE
+    event: Literal[HardwareEventType.ESTOP_CHANGE] = HardwareEventType.ESTOP_CHANGE
     old_state: EstopState = EstopState.NOT_PRESENT
     new_state: EstopState = EstopState.NOT_PRESENT
 
