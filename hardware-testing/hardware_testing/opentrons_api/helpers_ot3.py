@@ -144,7 +144,6 @@ async def update_firmware(api: OT3API, force: bool = False) -> None:
         if update.progress != progress_tracker[update.subsystem][1]:
             progress_tracker[update.subsystem][1] = update.progress
             _print_update_progress()
-    print(f"Firmware: v{api.fw_version}")
 
 
 async def build_async_ot3_hardware_api(
@@ -193,6 +192,7 @@ async def build_async_ot3_hardware_api(
         await asyncio.sleep(0.5)
         await api.cache_instruments()
         await update_firmware(api)
+    print(f"Firmware: v{api.fw_version}")
     return api
 
 
