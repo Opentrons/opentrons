@@ -287,10 +287,14 @@ setup-usb-module: sdist Pipfile.lock
 	# Clean the old dir
 	rm -rf ./dist/hardware_testing_usb/
 
+	# create git-description
+	$(shell $(python) -c "from hardware_testing.data import *; create_git_description_file()")
+
 	# Copy files to dir
 	mkdir -p ./dist/hardware_testing_usb/
+	mv .hardware-testing-description ./dist/hardware_testing_usb/
 	cp -r $(sdist_file) ./dist/hardware_testing_usb/
-	cp -r ./hardware_testing/scripts/setup.sh ./dist/hardware_testing_usb/
+	cp -r ./hardware_testing/tools/usb-package/* ./dist/hardware_testing_usb/
 	cp -r ./hardware_testing/tools/plot ./dist/hardware_testing_usb/
 
 	# Create the usb-package tarbaltar

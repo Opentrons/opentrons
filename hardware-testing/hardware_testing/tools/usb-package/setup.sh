@@ -1,8 +1,9 @@
 #! /bin/bash
 
-# This script sets up the hardware-testing module to run from usb or some other dir on the Flex robot
+# This script sets up the hardware-testing module to run from usb or some other dir on the Flex robot. Read the readme.txt file for setup and instructions.
 
 USB_DIR=$(pwd)
+MOUNT_DIR=$(dirname ${USB_DIR})
 PACKAGE_VERSION=""
 PACKAGE_NAME="hardware_testing"
 PACKAGE_DIR=$(echo ${USB_DIR}/${PACKAGE_NAME}-*/)
@@ -56,12 +57,11 @@ _extract_tarball() {
 	tar -xvf $usb_module_filename -C $USB_DIR
 
 	# Get the version of the package
-	echo "SOEMTHING: $PKG_INFO_FILE"
 	if [ ! -f $PKG_INFO_FILE ]; then
 		echo "error: ${PKG_INFO_FILE} was not found!"
 		exit 1;
 	fi
-	PACKAGE_VERSION=$(cat ${PKG_INFO_FILE} | grep Version)
+	PACKAGE_VERSION=$(cat ${PKG_INFO_FILE} | sed -n '/Version/{n;n;p}')
 }
 
 
@@ -73,10 +73,11 @@ _env_profile() {
 	if [[ $1 =~ "delete" ]]; then
 		echo "Deleting usb-package env file - ${ENV_PROFILE}"
 		rm -rf $ENV_PROFILE
+		mount -o remount,ro /
 		return;
 	fi
 
-	echo "Writting usb-package env profile - $ENV_PROFILE"
+	echo "Writing usb-package env profile - $ENV_PROFILE"
 
 cat <<EOF > $ENV_PROFILE
 #!/usr/bin/env sh
@@ -85,20 +86,24 @@ cat <<EOF > $ENV_PROFILE
 if [ ! -d $USB_DIR ]; then
 	echo "################## WARNING ##################"
 	echo "The Hardware-Testing package is enabled, but was not found."
-	echo "Please make sure that the usb is plugged in and mounted to - $USB_DIR."
-	echo "If you are done using the Hardware-Testing package, make sure its disabled."
-	echo "You can disable by runing './setup teardown' from the usb."
+	echo "Please make sure that the usb is plugged in and mounted to - $MOUNT_DIR"
+	echo "If plugged in and mounted but not found, re-run the ./setup.sh script."
+	echo "If you are done using the Hardware-Testing package, make sure its uninstalled."
+	echo "You can uninstall it by runing './setup teardown' from the usb."
 	echo "################## WARNING ##################"
 	return 1;
 fi
 
 echo "Hardware-Testing package enabled at $USB_DIR"
-export PYTHONPATH=\$PYTHONPATH:$USB_DIR
+export PYTHONPATH=\$PYTHONPATH:$PACKAGE_DIR
 
 # set OT_SYSTEM_VERSION if not set
 if [ -z \$OT_SYSTEM_VERSION ]; then
 	export OT_SYSTEM_VERSION="0.0.0"
 fi
+
+# set the TESTING_DATA_DIR
+export TESTING_DATA_DIR=$USB_DIR/testing_data
 EOF
 	# remount filesystem as ro
 	mount -o remount,ro /
@@ -120,26 +125,26 @@ setup() {
 	# Lets deal with plot-webpage since the sdist file only contains .py files
 	cp -r $USB_DIR/plot $PACKAGE_DIR/$PACKAGE_NAME/tools/
 
-	# 3. Lets deal with hardware-testing-description
-	# file needs to be part of the tarball so we can place it in its proper location here
+	# Lets deal with hardware-testing-description file, is /data correct?
+	cp -r $USB_DIR/.hardware-testing-description /data/
 
-	# 5. Lets apply the patch files
-	# patch files are part of this package so we need to apply them here 
-	# use the same mechanism we use when applying from makefile
-
-	# 6. Lets deal with hardware-testing data
-	# This gets applied in get_testing_data_directory, look into it
-
-	# 7. Lets deal with push-grav-ot3 and replicate that setup here
-	echo "Hardare-Testing module has been setup, re-login to apply changes."
+	echo "Hardware-Testing module has been setup, re-login to apply changes."
 }
 
 # Tearsdown the hardare-testing module
 teardown() {
-	echo "Teardown usb package"
+	echo "Tearing down hardare-testing module ${PACKAGE_VERSION}"
+
+	# delete the environment profile
+	_env_profile delete
+
+	# delete the description file
+	rm -rf /data/.hardware-testing-description
+
+	echo "Teardown Success"
 }
 
-set -e -o pipefail
-trap teardown EXIT
+set -eE -o pipefail
+trap teardown ERR
 
 main "$@"
