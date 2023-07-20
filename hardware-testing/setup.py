@@ -18,7 +18,9 @@ def get_version():
         normalize_opts = {"extra_tag": buildno}
     else:
         normalize_opts = {}
-    return normalize_version("hardware-testing", project, git_dir=git_dir, **normalize_opts)
+    return normalize_version(
+        "hardware-testing", project, git_dir=git_dir, **normalize_opts
+    )
 
 
 setup(
