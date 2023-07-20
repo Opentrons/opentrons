@@ -323,8 +323,8 @@ class Protocols:
         robot_error=False,
     )
 
-    OT3_P1000_96_HS_MM_TM__2_15_ABR5_6_Quick_Zymo_RNA_Bacteria_OT3_Zach_edit: Protocol = Protocol(
-        file_name="OT3_P1000_96_HS_MM_TM__2_15_ABR5_6_Quick_Zymo_RNA_Bacteria_OT3_Zach_edit",
+    OT3_P1000_96_HS_MM_TM_2_15_ABR5_6_Quick_Zymo_RNA_Bacteria_OT3_Zach_edit: Protocol = Protocol(
+        file_name="OT3_P1000_96_HS_MM_TM_2_15_ABR5_6_Quick_Zymo_RNA_Bacteria_OT3_Zach_edit",
         file_extension="py",
         protocol_name="Quick Zymo Magbead RNA Extraction with Lysis: Bacteria 96 Channel Deletion Test",
         robot="OT-3",
