@@ -6,9 +6,11 @@
 Hardware Modules
 ################
 
-Hardware modules are powered and unpowered deck-mounted peripherals. The Flex and OT-2 are aware of deck-mounted powered modules when they're attached via a USB connection and when used in an uploaded protocol. The robots do not know about unpowered modules until you use one in a protocol and upload it to the Opentrons App.
+Hardware modules are powered and unpowered deck-mounted peripherals. The Flex and OT-2 are aware of deck-mounted powered modules when they're attached via a USB connection and used in an uploaded protocol. The robots do not know about unpowered modules until you use one in a protocol and upload it to the Opentrons App.
 
-Powered modules include the :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>` (OT-2 only), :ref:`Thermocycler Module <thermocycler-module>`, and :ref:`Heater-Shaker Module <heater-shaker-module>`. The 96-well :ref:`Magnetic Block <magnetic-block>` (Flex only) is an unpowered module.
+Powered modules include the :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>`, :ref:`Thermocycler Module <thermocycler-module>`, and :ref:`Heater-Shaker Module <heater-shaker-module>`. The 96-well :ref:`Magnetic Block <magnetic-block>` is an unpowered module.
+
+.. The Magnetic Module is OT-2 only. Note call-out text uses "Most ... code examples" to reflect that.
 
 .. Note::
     
@@ -69,8 +71,6 @@ Available Modules
 
 The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  *API load name*. The load name tells your robot which module you're going to use in a protocol. The table below lists the API load names for the currently available modules.
 
-Some modules were added to our python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
-
 .. table::
    :widths: 4 5 2
    
@@ -102,6 +102,8 @@ Some modules were added to our python API later than others, and others span mul
    | GEN1               |                               |                           |
    +--------------------+-------------------------------+---------------------------+
 
+Some modules were added to our python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
+
 Loading Labware onto a Module
 =============================
 
@@ -116,25 +118,24 @@ You'll use the :py:meth:`.ProtocolContext.load_labware` method when loading labw
 
 .. versionadded:: 2.0
 
-When you load labware on a module, you don’t need to specify the deck slot. In the above example, the aluminum block is loaded on the module and the ``load_module`` method already includes a location (e.g. ``location= "D1"``).
+When you load labware on a module, you don’t need to specify the deck slot. In the above example, the ``load_module`` method already includes a location (e.g. ``location= "D1"``).
 
 Any :ref:`v2-custom-labware` added to your Opentrons App is also accessible when loading labware onto a module. You can find and copy its load name by going to its card on the Labware page.
 
 .. versionadded:: 2.1
 
-
-.. Consider turning this section below into a warning. 
+.. Should the section below be a warning? 
 
 Module and Labware Compatibility
 --------------------------------
 
-It's your responsibility to ensure the labware and module combinations you load together work together. The Protocol API won't raise a warning or error if you load an unusual combination, like a tube rack on a Thermocycler. See `What labware can I use with my modules? <https://support.opentrons.com/s/article/What-labware-can-I-use-with-my-modules>`_ for more information about labware/module combinations.
+It's your responsibility to ensure the labware and module combinations you load together work together. The Protocol API won't raise a warning or error if you load an unusual combination, like placing a tube rack on a Thermocycler. See `What labware can I use with my modules? <https://support.opentrons.com/s/article/What-labware-can-I-use-with-my-modules>`_ for more information about labware/module combinations.
 
 
 Additional Labware Parameters
 -----------------------------
 
-In addition to the mandatory ``load_name`` argument, you can also specify additional parameters. If you specify a ``label``, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify ``version`` and ``namespace`` (though most of the time you won't have to). See :py:meth:`.MagneticModuleContext.load_labware`, :py:meth:`.TemperatureModuleContext.load_labware`, :py:meth:`.ThermocyclerContext.load_labware`, or :py:meth:`.HeaterShakerContext.load_labware` for more details.
+In addition to the mandatory ``load_name`` argument, you can also specify additional parameters. If you specify a ``label``, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify ``version`` and ``namespace`` (though most of the time you won't have to). See :py:meth:`.MagneticModuleContext.load_labware`, :py:meth:`.TemperatureModuleContext.load_labware`, :py:meth:`.ThermocyclerContext.load_labware`, or :py:meth:`.HeaterShakerContext.load_labware` for details.
 
 
 .. _temperature-module:
@@ -186,7 +187,7 @@ When using ``set_temperature``, your protocol will wait until the target tempera
 
 .. note::
 
-    Your Flex or OT-2 will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App or run ``deactivate()`` in Jupyter notebook.
+    Your robot will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App or run ``deactivate()`` in Jupyter notebook.
 
 .. versionadded:: 2.0
 
@@ -197,7 +198,7 @@ If you need to confirm in software whether the Temperature Module is holding at 
 
 .. code-block:: python
 
-    temp_mod.set_temperature(celsius= 90)
+    temp_mod.set_temperature(celsius=90)
     temp_mod.status  # 'holding at target'
     temp_mod.deactivate()
     temp_mod.status  # 'idle'
@@ -240,14 +241,26 @@ The examples in this section apply to an OT-2 with a Magnetic Module loaded in s
 Loading Labware
 ===============
 
-Like with all modules, use the Magnetic Module’s :py:meth:`~.MagneticModuleContext.load_labware` method to specify what you will place on the module. The Magnetic Module supports 96-well PCR plates and deep well plates. For the best compatibility, use a labware definition that specifies how far the magnets should move when engaging with the labware. The following plates in the Opentrons Labware Library include this measurement:
+Like with all modules, use the Magnetic Module’s :py:meth:`~.MagneticModuleContext.load_labware` method to specify what you will place on the module. The Magnetic Module supports 96-well PCR plates and deep well plates. For the best compatibility, use a labware definition that specifies how far the magnets should move when engaging with the labware. The following plates in the `Opentrons Labware Library <https://labware.opentrons.com/>`_ include this measurement:
 
-- ``biorad_96_wellplate_200ul_pcr``
-- ``nest_96_wellplate_100ul_pcr_full_skirt``
-- ``nest_96_wellplate_2ml_deep``
-- ``thermoscientificnunc_96_wellplate_1300ul``
-- ``thermoscientificnunc_96_wellplate_2000ul``
-- ``usascientific_96_wellplate_2.4ml_deep``
+.. list-table::
+   :widths: 50 50
+   :header-rows: 1
+
+   * - Labware Name
+     - API Load Name
+   * - Bio-Rad 96 Well Plate 200 µL PCR
+     - ``biorad_96_wellplate_200ul_pcr``
+   * - NEST 96 Well Plate 100 µL PCR Full Skirt
+     - ``nest_96_wellplate_100ul_pcr_full_skirt``
+   * - NEST 96 Deep Well Plate 2mL
+     - ``nest_96_wellplate_2ml_deep``
+   * - Thermo Scientific Nunc 96 Well Plate 1300 µL
+     - ``thermoscientificnunc_96_wellplate_1300ul``
+   * - Thermo Scientific Nunc 96 Well Plate 2000 µL
+     - ``thermoscientificnunc_96_wellplate_2000ul``
+   * - USA Scientific 96 Deep Well Plate 2.4 mL
+     - ``usascientific_96_wellplate_2.4ml_deep``
 
 To check whether a custom labware definition specifies this measurement, load the labware and query its :py:attr:`~.Labware.magdeck_engage_height` property. If has a numerical value, the labware is ready for use with the Magnetic Module.
 
@@ -314,7 +327,7 @@ Using a Thermocycler Module
 
 The Thermocycler Module provides on-deck, fully automated temperature cycling, and can heat and cool very quickly during operation. The module's block can reach and maintain temperatures between 4 and 99 °C. The module's lid can heat up to 110 °C.
 
-The Thermocycler is represented in code by a :py:class:`.ThermocyclerContext` object, which has methods for controlling the lid, controlling the block, and setting *profiles* — timed heating and cooling routines that can be automatically repeated. 
+The Thermocycler is represented in code by a :py:class:`.ThermocyclerContext` object, which has methods for controlling the lid, controlling the block, and setting *profiles* — timed heating and cooling routines that can be repeated automatically. 
 
 The examples in this section will use a Thermocycler loaded as follows:
 
@@ -353,7 +366,7 @@ You can also control the temperature of the lid. Acceptable target temperatures 
 
 .. code-block:: python
 
-    tc_mod.set_lid_temperature(temperature= 50)
+    tc_mod.set_lid_temperature(temperature=50)
 
 The protocol will only proceed once the lid temperature reaches 50 °C. This is the case whether the previous temperature was lower than 50 °C (in which case the lid will actively heat) or higher than 50 °C (in which case the lid will passively cool).
 
@@ -377,7 +390,7 @@ To set the block temperature inside the Thermocycler, use :py:meth:`~.Thermocycl
 
 .. code-block:: python
 
-        tc_mod.set_block_temperature(temperature= 4)
+        tc_mod.set_block_temperature(temperature=4)
         
 If you don't specify any other parameters, the Thermocycler will hold this temperature until a new temperature is set, :py:meth:`~.ThermocyclerContext.deactivate_block` is called, or the module is powered off.
 
@@ -420,8 +433,10 @@ If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 
 
 Thermocycler Profiles
 =====================
+.. Word choice: using "dicts" without context or explanation. Opaque, obscurant, and assumes reader understanding.
+.. Ought to try and explain it a little. python dict() function creates dictionaries, unordered, changeable, indexed.
 
-In addition to executing individual temperature commands, the Thermocycler can automatically cycle through a sequence of block temperatures to perform heat-sensitive reactions. These sequences are called *profiles*, which are defined in the Protocol API as lists of dicts. Each dict should have a ``temperature`` key, which specifies the temperature of the step, and either or both of ``hold_time_seconds`` and ``hold_time_minutes``, which specify the duration of the step. 
+In addition to executing individual temperature commands, the Thermocycler can automatically cycle through a sequence of block temperatures to perform heat-sensitive reactions. These sequences are called *profiles*, which are defined in the Protocol API as lists of dicts (i.e. a dictionary list created by the ``dict()`` function). Each profile should have a ``temperature`` key, which specifies the temperature of the step, and either or both of ``hold_time_seconds`` and ``hold_time_minutes``, which specify the duration of the step. 
 
 For example, this profile commands the Thermocycler to reach 10 °C and hold for 30 seconds, and then to reach 60 °C and hold for 45 seconds:
 
@@ -539,7 +554,12 @@ To prepare the deck before running a protocol, use the labware latch controls in
 Loading Labware
 ===============
 
-Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it. Currently, the `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes several pre-configured thermal adapter and labware combinations that help make the Heater-Shaker ready to use right out of the box.
+Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it. Currently, the `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes standalone thermal adapter definitions and several pre-configured thermal adapter and labware combinations that help make the Heater-Shaker ready to use right out of the box.
+
+Pre-configured Combinations
+---------------------------
+
+The Heater-Shaker supports these thermal adapter and labware combinations by default.
 
 .. list-table::
    :header-rows: 1
@@ -558,7 +578,6 @@ Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext
      - ``opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat``
 
 Custom flat-bottom labware can be used with the Universal Flat Adapter. If you need assistance creating custom labware definitions for the Heater-Shaker, `submit a request <https://support.opentrons.com/s/article/Requesting-a-custom-labware-definition>`_.
-
 
 Heating and Shaking
 ===================
@@ -639,12 +658,12 @@ Using a Magnetic Block Module
 
 The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but unlike the Magnetic Module, the Magnetic Block does not move beads up or down in solution. This module is recommended for use with the Flex only.
 
-Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module and with the :py:meth:`.ProtocolContext.load_module` method. For example::
+Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module and with the ``load_module`` method. After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext` For example::
 
     def run(protocol_api.ProtocolContext):
         mag_block = protocol.load_module('magneticBlockV1', 'D1')
 
-.. Placeholder for longer example using gripper here?
+.. Placeholder for brief example using gripper here?
 
 See :ref:`Moving Labware` for more information.
 
@@ -677,6 +696,7 @@ For this code to work as expected, ``temperature_module_1`` should be plugged in
 
 Before running your protocol, it's a good idea to use the module controls in the Opentrons App to check that commands are being sent where you expect.
 
-.. Does this apply to Flex? Can we ask about changing the article title to include Flex or make more generic for both?
+.. Does the support article apply to Flex?
+.. Maybe request a title change to include Flex or make more generic for both (substitute "robot" for model name)?
 
 See the support article, `Using Modules of the Same Type <https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2>`_ for more information.
