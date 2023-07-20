@@ -688,3 +688,8 @@ class OT3Simulator:
             )
             for target in self._present_nodes
         }
+
+    @property
+    def estop_state_machine(self) -> None:
+        """Simulator will not return an estop state machine."""
+        return None

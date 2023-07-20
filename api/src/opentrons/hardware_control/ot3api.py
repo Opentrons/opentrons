@@ -98,6 +98,10 @@ from .types import (
     StatusBarState,
     SubSystemState,
     TipStateType,
+    EstopOverallStatus,
+    EstopAttachLocation,
+    EstopState,
+    EstopPhysicalStatus,
 )
 from .errors import (
     MustHomeError,
@@ -317,6 +321,7 @@ class OT3API(
             api_instance, board_revision=backend.board_revision
         )
         backend.module_controls = module_controls
+        await backend.build_estop_state_machine()
         door_state = await backend.door_state()
         api_instance._update_door_state(door_state)
         backend.add_door_state_listener(api_instance._update_door_state)
@@ -2248,3 +2253,29 @@ class OT3API(
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
         """Get a view of the state of the currently-attached subsystems."""
         return self._backend.subsystems
+
+    @property
+    def estop_status(self) -> EstopOverallStatus:
+        if self._backend.estop_state_machine is None:
+            return EstopOverallStatus(
+                state=EstopState.DISENGAGED,
+                left_physical_state=EstopPhysicalStatus.DISENGAGED,
+                right_physical_state=EstopPhysicalStatus.DISENGAGED,
+            )
+        return EstopOverallStatus(
+            state=self._backend.estop_state_machine.state,
+            left_physical_state=self._backend.estop_state_machine.get_physical_status(
+                EstopAttachLocation.LEFT
+            ),
+            right_physical_state=self._backend.estop_state_machine.get_physical_status(
+                EstopAttachLocation.RIGHT
+            ),
+        )
+
+    def estop_acknowledge_and_clear(self) -> EstopOverallStatus:
+        """Attempt to acknowledge an Estop event and clear the status.
+
+        Returns the estop status after clearing the status."""
+        if self._backend.estop_state_machine is not None:
+            self._backend.estop_state_machine.acknowledge_and_clear()
+        return self.estop_status
