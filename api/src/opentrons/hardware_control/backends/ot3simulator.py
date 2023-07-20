@@ -296,7 +296,7 @@ class OT3Simulator:
 
         head_node = axis_to_node(Axis.by_mount(mount))
         pos = self._position
-        pos[head_node] = max_z_distance - 2
+        pos[head_node] += max_z_distance
         self._position.update(pos)
         self._encoder_position.update(pos)
         return self._position
