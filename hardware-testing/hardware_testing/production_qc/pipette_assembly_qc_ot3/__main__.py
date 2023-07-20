@@ -56,7 +56,8 @@ TRASH_HEIGHT_MM: Final = 45
 LEAK_HOVER_ABOVE_LIQUID_MM: Final = 50
 ASPIRATE_SUBMERGE_MM: Final = 3
 
-LIQUID_PROBE_ERROR_THRESHOLD_MM = 0.2
+LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM = 0.2
+LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM = 0.2
 
 SAFE_HEIGHT_TRAVEL = 10
 SAFE_HEIGHT_CALIBRATE = 0
@@ -151,7 +152,7 @@ CAP_THRESH_PROBE = {
     96: [0.0, 20.0],
 }
 CAP_THRESH_SQUARE = {
-    1: [7.0, 15.0],
+    1: [8.0, 15.0],
     8: [0.0, 1000.0],
     96: [0.0, 1000.0],
 }
@@ -446,7 +447,7 @@ async def _read_pressure_and_check_results(
     else:
         test_pass_stability = True
     csv_data_stability = [
-        tag.value,
+        f"pressure-{tag.value}",
         "stability",
         _bool_to_pass_fail(test_pass_stability),
     ]
@@ -460,7 +461,7 @@ async def _read_pressure_and_check_results(
     else:
         test_pass_accuracy = True
     csv_data_accuracy = [
-        tag.value,
+        f"pressure-{tag.value}",
         "accuracy",
         _bool_to_pass_fail(test_pass_accuracy),
     ]
@@ -950,7 +951,7 @@ async def _test_plunger_positions(
         drop_tip_passed = True
     else:
         drop_tip_passed = _get_operator_answer_to_question("is DROP-TIP correct?")
-    write_cb(["plunger-blow-out", _bool_to_pass_fail(blow_out_passed)])
+    write_cb(["plunger-drop-tip", _bool_to_pass_fail(drop_tip_passed)])
     print("homing the plunger")
     await api.home([Axis.of_main_tool_actuator(mount)])
     return blow_out_passed and drop_tip_passed
@@ -1059,18 +1060,19 @@ async def _test_tip_presence_flag(
 
     pick_up_disp = round(ejector_rel_pos - pick_up_pos_rel, 2)
     drop_disp = round(10.5 + drop_pos_rel, 2)
-    data = [
-        "tip-presence-displacements",
-        pick_up_disp,
-        _bool_to_pass_fail(pick_up_result),
-        drop_disp,
-        _bool_to_pass_fail(drop_result),
-        ejector_rel_pos,
-        pick_up_pos_rel,
-        drop_pos_rel,
-    ]
-    print(data)
-    write_cb(data)
+    write_cb(["tip-presence-ejector-height-above-nozzle", ejector_rel_pos])
+    write_cb(
+        [
+            "tip-presence-pick-up-displacement",
+            pick_up_disp,
+            _bool_to_pass_fail(pick_up_result),
+        ]
+    )
+    write_cb(["tip-presence-pick-up-height-above-nozzle", pick_up_pos_rel])
+    write_cb(
+        ["tip-presence-drop-displacement", drop_disp, _bool_to_pass_fail(drop_result)]
+    )
+    write_cb(["tip-presence-drop-height-above-nozzle", drop_pos_rel])
 
     # P1000 also needs to check that 200uL tips can be picked up
     if pip_volume == 1000:
@@ -1156,7 +1158,6 @@ async def _test_liquid_probe(
         )
         end_z = await api.liquid_probe(mount, probe_settings)
         trial_results.append(end_z - target_z)  # store the mm error from target
-        print(start_pos.z, target_z, end_z)
         await _drop_tip_in_trash(api, mount)
     return trial_results
 
@@ -1321,6 +1322,13 @@ async def _main(test_config: TestConfig) -> None:
         csv_cb.write(
             ["pressure-compressed"] + [str(t) for t in PRESSURE_THRESH_COMPRESS]
         )
+        csv_cb.write(["probe-deck", PROBING_DECK_PRECISION_MM])
+        csv_cb.write(
+            ["liquid-probe-precision", LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM]
+        )
+        csv_cb.write(
+            ["liquid-probe-accuracy", LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM]
+        )
         # add pressure thresholds to CSV
         csv_cb.write(["-----------------------"])
         csv_cb.write(["PRESSURE-CONFIGURATIONS"])
@@ -1355,11 +1363,23 @@ async def _main(test_config: TestConfig) -> None:
                 probe_data = await _test_liquid_probe(
                     api, mount, tip_volume=tip_vol, trials=3
                 )
-                worst_trial = max(abs(min(probe_data)), max(probe_data))
-                tip_passed = bool(worst_trial < LIQUID_PROBE_ERROR_THRESHOLD_MM)
-                trial_data = [_bool_to_pass_fail(tip_passed)] + probe_data  # type: ignore
-                print([f"liquid-probe-{tip_vol}-tip-trials"] + trial_data)
-                csv_cb.write([f"liquid-probe-{tip_vol}-tip-trials"] + trial_data)  # type: ignore
+                for trial, found_height in enumerate(probe_data):
+                    csv_label = f"liquid-probe-{tip_vol}-tip-trial-{trial}"
+                    csv_cb.write([csv_label, round(found_height, 2)])
+                precision = abs(max(probe_data) - min(probe_data)) * 0.5
+                accuracy = sum(probe_data) / len(probe_data)
+                csv_cb.write([f"liquid-probe-{tip_vol}-tip-precision", precision])
+                csv_cb.write([f"liquid-probe-{tip_vol}-tip-accuracy", accuracy])
+                precision_passed = bool(
+                    precision < LIQUID_PROBE_ERROR_THRESHOLD_PRECISION_MM
+                )
+                accuracy_passed = bool(
+                    abs(accuracy) < LIQUID_PROBE_ERROR_THRESHOLD_ACCURACY_MM
+                )
+                tip_passed = precision_passed and accuracy_passed
+                csv_cb.write(
+                    [f"liquid-probe-{tip_vol}-tip", _bool_to_pass_fail(tip_passed)]
+                )
                 if not tip_passed:
                     test_passed = False
             csv_cb.results("liquid-probe", test_passed)
@@ -1390,6 +1410,7 @@ async def _main(test_config: TestConfig) -> None:
 
         if not test_config.skip_tip_presence:
             test_passed = await _test_tip_presence_flag(api, mount, csv_cb.write)
+            print("tip-presence: ", _bool_to_pass_fail(test_passed))
             csv_cb.results("tip-presence", test_passed)
 
         print("test complete")
