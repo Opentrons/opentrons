@@ -6,13 +6,13 @@
 Hardware Modules
 ################
 
-Hardware modules are powered and unpowered deck-mounted peripherals. The Flex and OT-2 know about and control powered modules when they're attached via a USB connection. The robots do not know about unpowered modules until you use one in a protocol and upload that protocol to the Opentrons App.
+Hardware modules are powered and unpowered deck-mounted peripherals. The Flex and OT-2 are aware of deck-mounted powered modules when they're attached via a USB connection and when used in an uploaded protocol. The robots do not know about unpowered modules until you use one in a protocol and upload it to the Opentrons App.
 
 Powered modules include the :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>` (OT-2 only), :ref:`Thermocycler Module <thermocycler-module>`, and :ref:`Heater-Shaker Module <heater-shaker-module>`. The 96-well :ref:`Magnetic Block <magnetic-block>` (Flex only) is an unpowered module.
 
 .. Note::
     
-    Code snippets use alphanumeric Flex deck slot locations (e.g. ``D1``, ``D2``, etc.). If you have an OT-2, replace the Flex deck slot coordinate with its OT-2 equivalent. For example, Flex slot D1 corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
+    Most of the following code examples use alphanumeric Flex deck slot locations (e.g. ``D1``, ``D2``, etc.). If you have an OT-2, replace the Flex deck slot coordinate with its OT-2 equivalent. For example, Flex slot D1 corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
 
 ************
 Module Setup
@@ -40,6 +40,8 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
          
                 # Load a Temperature Module GEN1 in deck slot D3.
                 temperature_module = protocol.load_module('temperature module', "D3")
+
+        After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.HeaterShakerContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
         
     .. tab:: OT-2
         
@@ -55,7 +57,8 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
                 # Load a Temperature Module GEN1 in deck slot 3.
                 temperature_module = protocol.load_module('temperature module', 3)
 
-After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
+        After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
+
 
 .. versionadded:: 2.0
 
@@ -215,9 +218,7 @@ All methods of :py:class:`.TemperatureModuleContext` work with both the GEN1 and
 Using a Magnetic Module
 ***********************
 
-*For use with the OT-2 only.*
-
-The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module.  
+The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module. This module works with the OT-2 only. You cannot use it on a Flex liquid handling robot. 
 
 The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` object, which has methods for engaging (raising) and disengaging (lowering) its magnets.
 
@@ -636,7 +637,7 @@ Deactivating the heater and shaker are done separately using the :py:meth:`~.Hea
 Using a Magnetic Block Module
 *****************************
 
-The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but unlike the Magnetic Module, the Magnetic Block does not move beads up or down in solution.
+The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but unlike the Magnetic Module, the Magnetic Block does not move beads up or down in solution. This module is recommended for use with the Flex only.
 
 Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module and with the :py:meth:`.ProtocolContext.load_module` method. For example::
 
@@ -644,6 +645,8 @@ Because the Magnetic Block is unpowered, neither your robot nor the Opentrons Ap
         mag_block = protocol.load_module('magneticBlockV1', 'D1')
 
 .. Placeholder for longer example using gripper here?
+
+See :ref:`Moving Labware` for more information.
 
 ***************************************
 Using Multiple Modules of the Same Type
