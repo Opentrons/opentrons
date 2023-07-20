@@ -973,8 +973,8 @@ def clear_pipette_ul_per_mm(api: OT3API, mount: OT3Mount) -> None:
             pip_nominal_ul_per_mm,
         ),
     ]
-    pip._active_tip_settings.aspirate["default"] = ul_per_mm  # type: ignore[assignment]
-    pip._active_tip_settings.dispense["default"] = ul_per_mm  # type: ignore[assignment]
+    pip._active_tip_settings.aspirate.default["1"] = ul_per_mm  # type: ignore[assignment]
+    pip._active_tip_settings.dispense.default["1"] = ul_per_mm  # type: ignore[assignment]
     pip.ul_per_mm.cache_clear()
     assert pip.ul_per_mm(1, "aspirate") == pip_nominal_ul_per_mm
     assert pip.ul_per_mm(pip.working_volume, "aspirate") == pip_nominal_ul_per_mm

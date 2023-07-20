@@ -19,7 +19,6 @@ from opentrons_shared_data.pipette import (
 from opentrons import execute, types
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.hardware_control import Controller, api
-from opentrons.protocols.execution.errors import ExceptionInProtocolError
 
 if TYPE_CHECKING:
     from tests.opentrons.conftest import Bundle, Protocol
@@ -82,7 +81,6 @@ def test_execute_function_apiv2(
     mock_get_attached_instr: mock.AsyncMock,
 ) -> None:
     """Test `execute()` with a Python file."""
-
     converted_model_v15 = pipette_load_name.convert_pipette_model(
         cast(PipetteModel, "p10_single_v1.5")
     )
