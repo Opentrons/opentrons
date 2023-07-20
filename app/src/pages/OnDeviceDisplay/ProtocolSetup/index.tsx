@@ -365,7 +365,7 @@ function PrepareToRun({
   if (
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
-    (protocolHasModules && attachedModules.length === 0) ||
+    (protocolHasModules && attachedModules == null) ||
     allPipettesCalibrationData == null
   ) {
     return <ProtocolSetupSkeleton cancelAndClose={onConfirmCancelClose} />
