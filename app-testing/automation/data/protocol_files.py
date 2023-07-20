@@ -34,6 +34,5 @@ names = Literal[
     "OT3_P1000_96_HS_TM_MM_2_15_ABR5_6_HDQ_Bacteria_ParkTips_96_channel",
     "OT3_P1000_96_None_2_15_ABR5_6_IDT_xGen_EZ_96x_Head_PART_I_III_ABR",
     "OT3_P1000_96_HS_TM_TC_MM_2_15_ABR5_6_Illumina_DNA_Prep_96x_Head_PART_III",
-    "OT3_P1000_96_HS_MM_TM_2_15_ABR5_6_Quick_Zymo_RNA_Bacteria_OT3_Zach_edit",
-    "OT3_P1000_96_HS_MM_TM_2_15_ABR5_6_Quick_Zymo_RNA_Bacteria_OT3_Zack_better_set_up_for_liquids",
+    "OT3_P100_96_HS_TM_2_15_Quick_Zymo_RNA_Bacteria",
 ]

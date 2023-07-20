@@ -37,7 +37,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # ========== FIRST ROW ===========
     heatershaker = protocol.load_module("heaterShakerModuleV1", "1")
     sample_plate_2 = heatershaker.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
-    tiprack_200_1 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul_temporary_adapter", "2")
+    tiprack_200_1 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul_rss", "2")
     temp_block = protocol.load_module("temperature module gen2", "3")
     sample_plate_3 = temp_block.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
     # ========== SECOND ROW ==========
@@ -47,7 +47,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # ========== THIRD ROW ===========
     thermocycler = protocol.load_module("thermocycler module gen2")
     sample_plate_1 = thermocycler.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
-    tiprack_200_2 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul_temporary_adapter", "8")
+    tiprack_200_2 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul_rss", "8")
     reservoir_3 = protocol.load_labware("nest_96_wellplate_2ml_deep", "5")
     # ========== FOURTH ROW ==========
     reservoir_4 = protocol.load_labware("nest_96_wellplate_2ml_deep", "5")
@@ -226,8 +226,8 @@ def run(protocol: protocol_api.ProtocolContext):
         del tiprack_200_1
         del tiprack_200_2
 
-        tiprack_200_3 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul_temporary_adapter", "2")
-        tiprack_20_1 = protocol.load_labware("opentrons_ot3_96_tiprack_50ul_temporary_adapter", "8")
+        tiprack_200_3 = protocol.load_labware("opentrons_ot3_96_tiprack_200ul_rss", "2")
+        tiprack_20_1 = protocol.load_labware("opentrons_ot3_96_tiprack_50ul_rss", "8")
 
         for X in range(2):
             protocol.comment("--> ETOH Wash")

@@ -321,22 +321,13 @@ class Protocols:
         robot="OT-3",
         app_error=False,
         robot_error=False,
+        custom_labware=["opentrons_ot3_96_tiprack_200ul_rss", "opentrons_ot3_96_tiprack_50ul_rss"],
     )
 
-    OT3_P1000_96_HS_MM_TM_2_15_ABR5_6_Quick_Zymo_RNA_Bacteria_OT3_Zach_edit: Protocol = Protocol(
-        file_name="OT3_P1000_96_HS_MM_TM_2_15_ABR5_6_Quick_Zymo_RNA_Bacteria_OT3_Zach_edit",
+    OT3_P100_96_HS_TM_2_15_Quick_Zymo_RNA_Bacteria: Protocol = Protocol(
+        file_name="OT3_P100_96_HS_TM_2_15_Quick_Zymo_RNA_Bacteria",
         file_extension="py",
         protocol_name="Quick Zymo Magbead RNA Extraction with Lysis: Bacteria 96 Channel Deletion Test",
-        robot="OT-3",
-        app_error=False,
-        robot_error=False,
-        custom_labware=["opentrons_ot3_96_tiprack_200ul_rss"],
-    )
-
-    OT3_P1000_96_HS_MM_TM_2_15_ABR5_6_Quick_Zymo_RNA_Bacteria_OT3_Zack_better_set_up_for_liquids: Protocol = Protocol(
-        file_name="OT3_P1000_96_HS_MM_TM_2_15_ABR5_6_Quick_Zymo_RNA_Bacteria_OT3_Zack_better_set_up_for_liquids",
-        file_extension="py",
-        protocol_name="Quick Zymo Magbead RNA Extraction with Lysis: Bacteria 96 ABR TESTING",
         robot="OT-3",
         app_error=False,
         robot_error=False,
