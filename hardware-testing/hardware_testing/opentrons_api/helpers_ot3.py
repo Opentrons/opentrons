@@ -18,6 +18,7 @@ from opentrons_shared_data.labware import load_definition as load_labware
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.advanced_settings import set_adv_setting
 from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
+from opentrons.hardware_control.types import SubSystem
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
@@ -123,6 +124,29 @@ def _create_attached_instruments_dict(
     }
 
 
+async def update_firmware(api: OT3API, force: bool = False) -> None:
+    """Update firmware of OT3."""
+    subsystems_on_boot = api.attached_subsystems
+    progress_tracker: Dict[SubSystem, List[int]] = {}
+
+    def _print_update_progress() -> None:
+        msg = ""
+        for _sub_sys, (_ver, _prog) in progress_tracker.items():
+            if msg:
+                msg += ", "
+            msg += f"{_sub_sys.name}: v{_ver} ({_prog}%)"
+        print(msg)
+
+    async for update in api.update_firmware(force=force):
+        fw_version = subsystems_on_boot[update.subsystem].next_fw_version
+        if update.subsystem not in progress_tracker:
+            progress_tracker[update.subsystem] = [fw_version, 0]
+        if update.progress != progress_tracker[update.subsystem][1]:
+            progress_tracker[update.subsystem][1] = update.progress
+            _print_update_progress()
+    print(f"Firmware: v{api.fw_version}")
+
+
 async def build_async_ot3_hardware_api(
     is_simulating: Optional[bool] = False,
     use_defaults: Optional[bool] = True,
@@ -168,8 +192,7 @@ async def build_async_ot3_hardware_api(
     if not is_simulating:
         await asyncio.sleep(0.5)
         await api.cache_instruments()
-        async for update in api.update_firmware():
-            print(f"Update: {update.subsystem.name}: {update.progress}%")
+        await update_firmware(api)
     return api
 
 
