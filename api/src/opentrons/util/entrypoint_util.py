@@ -6,7 +6,7 @@ import logging
 from json import JSONDecodeError
 import pathlib
 import shutil
-from typing import BinaryIO, Dict, Optional, Sequence, TextIO, Union, TYPE_CHECKING
+from typing import BinaryIO, Dict, Sequence, TextIO, Union, TYPE_CHECKING
 
 from jsonschema import ValidationError  # type: ignore
 
@@ -92,13 +92,10 @@ def copy_file_like(source: Union[BinaryIO, TextIO], destination: pathlib.Path) -
     """Copy a file-like object to a path.
 
     Limitations:
-        If `source` is a Python source code file with a non-UTF-8 encoding,
-        the new file's encoding will not correctly match the original's encoding declaration
+        If `source` is text, the new file's encoding may not correctly match its original encoding.
+        This can matter if it's a Python file and it has an encoding declaration
         (https://docs.python.org/3.7/reference/lexical_analysis.html#encoding-declarations).
-        This will make the Python parser raise an error when it tries to parse it.
-
-        If `source` is text-mode, its newlines may get translated, either when they're read
-        from `source` or when they're written to `destination`.
+        Also, its newlines may get translated.
     """
     # When we read from the source stream, will it give us bytes, or text?
     try:
@@ -110,22 +107,14 @@ def copy_file_like(source: Union[BinaryIO, TextIO], destination: pathlib.Path) -
     else:
         source_is_text = True
 
-    # How should we open the destination file?
     if source_is_text:
         destination_mode = "wt"
-        # If we have to choose an arbitrary encoding, UTF-8 is better than the system default:
-        #   * It's Python's most common source encoding, and the default one when the source has
-        #     no encoding declaration.
-        #   * It's one of the encodings that `json.loads()` looks for.
-        destination_encoding: Optional[str] = "utf-8"
     else:
         destination_mode = "wb"
-        destination_encoding = None
 
     with open(
         destination,
         mode=destination_mode,
-        encoding=destination_encoding,
     ) as destination_file:
         # Use copyfileobj() to limit memory usage.
         shutil.copyfileobj(fsrc=source, fdst=destination_file)

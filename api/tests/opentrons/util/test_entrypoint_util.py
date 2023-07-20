@@ -115,7 +115,7 @@ class TestCopyFileLike:
         ) as source_file:
             copy_file_like(source=source_file, destination=destination_path)
 
-        assert destination_path.read_text(encoding="utf-8") == source_text
+        assert destination_path.read_text() == source_text
 
     def test_from_binary_file(
         self,
@@ -137,7 +137,7 @@ class TestCopyFileLike:
 
         copy_file_like(source=stringio, destination=destination_path)
 
-        assert destination_path.read_text(encoding="utf-8") == source_text
+        assert destination_path.read_text() == source_text
 
     def test_from_bytesio(self, source_bytes: bytes, destination_path: Path) -> None:
         """Test that it correctly copies from an `io.BytesIO`."""
