@@ -115,13 +115,13 @@ async def invalidate_tip(user_flow: CalibrationUserFlow):
 @contextlib.contextmanager
 def save_default_pick_up_current(instr: Pipette):
     # reduce pick up current for multichannel pipette picking up 1 tip
-    saved_default = instr.config.pick_up_current
-    instr.update_config_item("pick_up_current", 0.1)
+    saved_default = instr.pick_up_configurations.current
+    instr.update_config_item({"pick_up_current": 0.1})
 
     try:
         yield
     finally:
-        instr.update_config_item("pick_up_current", saved_default)
+        instr.update_config_item({"pick_up_current": saved_default})
 
 
 async def pick_up_tip(user_flow: CalibrationUserFlow, tip_length: float):
@@ -147,7 +147,7 @@ async def return_tip(user_flow: CalibrationUserFlow, tip_length: float):
     attached tip's length to determine proper z offset
     """
     if user_flow.tip_origin and user_flow.hw_pipette.has_tip:
-        coeff = user_flow.hw_pipette.config.return_tip_height
+        coeff = user_flow.hw_pipette.active_tip_settings.default_return_tip_height
         to_pt = user_flow.tip_origin - Point(0, 0, tip_length * coeff)
         cp = user_flow.critical_point_override
         await user_flow.hardware.move_to(

@@ -2,73 +2,45 @@
   "$otSharedSchema": "#/pipette/schemas/2/pipetteLiquidPropertiesSchema.json",
   "supportedTips": {
     "t1000": {
-      "defaultAspirateFlowRate": 500.0,
-      "defaultDispenseFlowRate": 1000.0,
-      "defaultBlowOutFlowRate": 1000.0,
+      "defaultAspirateFlowRate": {
+        "default": 500,
+        "valuesByApiLevel": { "2.0": 500 }
+      },
+      "defaultDispenseFlowRate": {
+        "default": 1000,
+        "valuesByApiLevel": { "2.0": 1000 }
+      },
+      "defaultBlowOutFlowRate": {
+        "default": 1000,
+        "valuesByApiLevel": { "2.0": 1000 }
+      },
       "defaultTipLength": 76.7,
-      "defaultTipOverlap": 7.95,
-      "defaultReturnTipHeight": null,
       "aspirate": {
-        "opentrons/opentrons_96_tiprack_1000ul/1": [
-          [148.9157, 0.0213, 56.3986],
-          [210.8237, 0.0108, 57.9568],
-          [241.2405, 0.0025, 59.717],
-          [365.2719, 0.0046, 59.2043],
-          [614.4871, 0.0023, 60.0431],
-          [1000.0, 0.001, 60.8209]
-        ],
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": [
-          [148.9157, 0.0213, 56.3986],
-          [210.8237, 0.0108, 57.9568],
-          [241.2405, 0.0025, 59.717],
-          [365.2719, 0.0046, 59.2043],
-          [614.4871, 0.0023, 60.0431],
-          [1000.0, 0.001, 60.8209]
-        ],
-        "opentrons/geb_96_tiprack_1000ul/1": [
-          [148.9157, 0.0213, 56.3986],
-          [210.8237, 0.0108, 57.9568],
-          [241.2405, 0.0025, 59.717],
-          [365.2719, 0.0046, 59.2043],
-          [614.4871, 0.0023, 60.0431],
-          [1000.0, 0.001, 60.8209]
-        ],
-        "opentrons/eppendorf_96_tiprack_1000ul_eptips/1": [
-          [148.9157, 0.0213, 56.3986],
-          [210.8237, 0.0108, 57.9568],
-          [241.2405, 0.0025, 59.717],
-          [365.2719, 0.0046, 59.2043],
-          [614.4871, 0.0023, 60.0431],
-          [1000.0, 0.001, 60.8209]
-        ],
-        "default": [
-          [148.9157, 0.0213, 56.3986],
-          [210.8237, 0.0108, 57.9568],
-          [241.2405, 0.0025, 59.717],
-          [365.2719, 0.0046, 59.2043],
-          [614.4871, 0.0023, 60.0431],
-          [1000.0, 0.001, 60.8209]
-        ]
+        "default": {
+          "1": [
+            [148.9157, 0.0213, 56.3986],
+            [210.8237, 0.0108, 57.9568],
+            [241.2405, 0.0025, 59.717],
+            [365.2719, 0.0046, 59.2043],
+            [614.4871, 0.0023, 60.0431],
+            [1000.0, 0.001, 60.8209]
+          ]
+        }
       },
       "dispense": {
-        "opentrons/opentrons_96_tiprack_1000ul/1": [[1000.0, 0.0, 61.3275]],
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": [
-          [1000.0, 0.0, 61.3275]
-        ],
-        "opentrons/geb_96_tiprack_1000ul/1": [[1000.0, 0.0, 61.3275]],
-        "opentrons/eppendorf_96_tiprack_1000ul_eptips/1": [
-          [1000.0, 0.0, 61.3275]
-        ],
-        "default": [[1000.0, 0.0, 61.3275]]
-      },
-      "defaultTipOverlapDictionary": {
-        "opentrons/opentrons_96_tiprack_1000ul/1": 7.95,
-        "opentrons/opentrons_96_filtertiprack_1000ul/1": 7.95,
-        "opentrons/geb_96_tiprack_1000ul/1": 11.2,
-        "opentrons/eppendorf_96_tiprack_1000ul_eptips/1": 0.0
+        "default": {
+          "1": [[1000.0, 0.0, 61.3275]]
+        }
       },
       "defaultBlowoutVolume": 127.235
     }
+  },
+  "defaultTipOverlapDictionary": {
+    "default": 7.95,
+    "opentrons/opentrons_96_tiprack_1000ul/1": 7.95,
+    "opentrons/opentrons_96_filtertiprack_1000ul/1": 7.95,
+    "opentrons/geb_96_tiprack_1000ul/1": 11.2,
+    "opentrons/eppendorf_96_tiprack_1000ul_eptips/1": 0.0
   },
   "maxVolume": 1000,
   "minVolume": 100.0,

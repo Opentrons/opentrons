@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import cast, Tuple, Union, List, Callable, Dict, TypeVar, Type
 from typing_extensions import Literal
 from opentrons import types as top_types
-from opentrons_shared_data.pipette.pipette_definition import PipetteChannelType
+from opentrons_shared_data.pipette.types import PipetteChannelType
 
 MODULE_LOG = logging.getLogger(__name__)
 
