@@ -554,12 +554,14 @@ To prepare the deck before running a protocol, use the labware latch controls in
 Loading Labware
 ===============
 
-Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it. Currently, the `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes standalone thermal adapter definitions and several pre-configured thermal adapter and labware combinations that help make the Heater-Shaker ready to use right out of the box.
+Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it.
+
+Currently, the `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes several pre-configured thermal adapter and labware combinations and standalone thermal adapter definitions that help make the Heater-Shaker ready to use right out of the box. See the :ref:`new-labware` chapter for information and examples about loading labware on modules.
 
 Pre-configured Combinations
 ---------------------------
 
-The Heater-Shaker supports these thermal adapter and labware combinations by default.
+The Heater-Shaker supports these thermal adapter and labware combinations by default. These let you load the adapter and labware with a single definition. 
 
 .. list-table::
    :header-rows: 1
@@ -577,7 +579,29 @@ The Heater-Shaker supports these thermal adapter and labware combinations by def
    * - Opentrons Universal Flat Adapter with Corning 384 Well Plate 112 µL Flat
      - ``opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat``
 
-Custom flat-bottom labware can be used with the Universal Flat Adapter. If you need assistance creating custom labware definitions for the Heater-Shaker, `submit a request <https://support.opentrons.com/s/article/Requesting-a-custom-labware-definition>`_.
+Standalone Well-Plate Adapters
+------------------------------
+
+You can use these standalone adapter definitions to load Opentrons verified or custom labware on top of the Heater-Shaker.
+
+.. list-table::
+   :header-rows: 1
+
+   * - Adapter Type
+     - API Load Name
+   * - Opentrons Universal Flat Adapter
+     - ``opentrons_universal_flat_adapter``
+   * - Opentrons 96 PCR Adapter
+     - ``opentrons_96_pcr_adapter``
+   * - Opentrons 96 Deep Well Adapter
+     - ``opentrons_96_deep_well_adapter``
+   * - Opentrons 96 Flat Bottom Adapter
+     - ``opentrons_96_flat_bottom_adapter``
+
+Custom Flat-Bottom Labware
+--------------------------
+
+Custom flat-bottom labware can be used with the Universal Flat Adapter. See the support article, `Requesting a Custom Labware Definition <https://support.opentrons.com/s/article/Requesting-a-custom-labware-definition>`_ if you need assistance creating custom labware definitions for the Heater-Shaker.
 
 Heating and Shaking
 ===================
@@ -658,7 +682,7 @@ Using a Magnetic Block Module
 
 The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but unlike the Magnetic Module, the Magnetic Block does not move beads up or down in solution. This module is recommended for use with the Flex only.
 
-Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module and with the ``load_module`` method. After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext` For example::
+Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module and with the ``load_module`` method. After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext`. For example::
 
     def run(protocol_api.ProtocolContext):
         mag_block = protocol.load_module('magneticBlockV1', 'D1')
