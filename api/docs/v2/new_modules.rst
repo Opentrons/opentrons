@@ -10,8 +10,6 @@ Hardware modules are powered and unpowered deck-mounted peripherals. The Flex an
 
 Powered modules include the :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>`, :ref:`Thermocycler Module <thermocycler-module>`, and :ref:`Heater-Shaker Module <heater-shaker-module>`. The 96-well :ref:`Magnetic Block <magnetic-block>` is an unpowered module.
 
-.. The Magnetic Module is OT-2 only. Note call-out text uses "Most ... code examples" to reflect that.
-
 .. Note::
     
     Most of the following code examples use alphanumeric Flex deck slot locations (e.g. ``D1``, ``D2``, etc.). If you have an OT-2, replace the Flex deck slot coordinate with its OT-2 equivalent. For example, Flex slot D1 corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
@@ -40,7 +38,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
                 # Load a Heater-Shaker in deck slot D1.
                 heater_shaker = protocol.load_module('heaterShakerModuleV1', "D1")
          
-                # Load a Temperature Module GEN1 in deck slot D3.
+                # Load a Temperature Module GEN2 in deck slot D3.
                 temperature_module = protocol.load_module('temperature module', "D3")
 
         After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.HeaterShakerContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
@@ -181,7 +179,7 @@ The primary function of the module is to control the temperature of its deck, us
 
 .. code-block:: python
 
-    temp_mod.set_temperature(celsius= 4)
+    temp_mod.set_temperature(celsius=4)
 
 When using ``set_temperature``, your protocol will wait until the target temperature is reached before proceeding to further commands. In other words, you can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call :py:meth:`~.TemperatureModuleContext.deactivate`, which will stop heating or cooling and will turn off the fan.
 
@@ -219,7 +217,9 @@ All methods of :py:class:`.TemperatureModuleContext` work with both the GEN1 and
 Using a Magnetic Module
 ***********************
 
-The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module. This module works with the OT-2 only. You cannot use it on a Flex liquid handling robot. 
+The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module. 
+
+.. put in a note: This module works with the OT-2 only. You cannot use it on a Flex liquid handling robot. 
 
 The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` object, which has methods for engaging (raising) and disengaging (lowering) its magnets.
 
@@ -433,10 +433,8 @@ If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 
 
 Thermocycler Profiles
 =====================
-.. Word choice: using "dicts" without context or explanation. Opaque, obscurant, and assumes reader understanding.
-.. Ought to try and explain it a little. python dict() function creates dictionaries, unordered, changeable, indexed.
 
-In addition to executing individual temperature commands, the Thermocycler can automatically cycle through a sequence of block temperatures to perform heat-sensitive reactions. These sequences are called *profiles*, which are defined in the Protocol API as lists of dicts (i.e. a dictionary list created by the ``dict()`` function). Each profile should have a ``temperature`` key, which specifies the temperature of the step, and either or both of ``hold_time_seconds`` and ``hold_time_minutes``, which specify the duration of the step. 
+In addition to executing individual temperature commands, the Thermocycler can automatically cycle through a sequence of block temperatures to perform heat-sensitive reactions. These sequences are called *profiles*, which are defined in the Protocol API as lists of dictionaries. Each dictionary within the profile should have a ``temperature`` key, which specifies the temperature of the step, and either or both of ``hold_time_seconds`` and ``hold_time_minutes``, which specify the duration of the step. 
 
 For example, this profile commands the Thermocycler to reach 10 °C and hold for 30 seconds, and then to reach 60 °C and hold for 45 seconds:
 
@@ -610,7 +608,7 @@ Heating and shaking operations are controlled independently, and are treated dif
 
 .. note::
 
-	With API version 2.13, only the Heater-Shaker Module supports non-blocking command execution. All other modules' methods are blocking commands.
+	Since API version 2.13, only the Heater-Shaker Module supports non-blocking command execution. All other modules' methods are blocking commands.
 
 Blocking commands
 -----------------
@@ -682,12 +680,12 @@ Using a Magnetic Block Module
 
 The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but unlike the Magnetic Module, the Magnetic Block does not move beads up or down in solution. This module is recommended for use with the Flex only.
 
-Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module and with the ``load_module`` method. After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext`. For example::
+Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module. After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext`. For example::
 
     def run(protocol_api.ProtocolContext):
         mag_block = protocol.load_module('magneticBlockV1', 'D1')
 
-.. Placeholder for brief example using gripper here?
+.. load something on the magnetic block here example.
 
 See :ref:`Moving Labware` for more information.
 
