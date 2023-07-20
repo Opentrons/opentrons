@@ -3,7 +3,11 @@ import argparse
 import asyncio
 
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.config.defaults_ot3 import DEFAULT_RUN_CURRENT, DEFAULT_MAX_SPEEDS, DEFAULT_ACCELERATIONS
+from opentrons.config.defaults_ot3 import (
+    DEFAULT_RUN_CURRENT,
+    DEFAULT_MAX_SPEEDS,
+    DEFAULT_ACCELERATIONS,
+)
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
@@ -84,7 +88,12 @@ async def _home_plunger(api: OT3API, mount: types.OT3Mount) -> None:
 
 
 async def _move_plunger(
-    api: OT3API, mount: types.OT3Mount, p: float, s: float, c: float, a: float,
+    api: OT3API,
+    mount: types.OT3Mount,
+    p: float,
+    s: float,
+    c: float,
+    a: float,
 ) -> None:
     # set max currents/speeds, to make sure we're not accidentally limiting ourselves
     pipette_ax = types.Axis.of_main_tool_actuator(mount)
@@ -92,10 +101,15 @@ async def _move_plunger(
         api, pipette_ax, run_current=MAX_CURRENT
     )
     await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
-        api, pipette_ax, default_max_speed=MAX_SPEED, acceleration=a,
+        api,
+        pipette_ax,
+        default_max_speed=MAX_SPEED,
+        acceleration=a,
     )
     # move
-    await helpers_ot3.move_plunger_absolute_ot3(api, mount, p, speed=s, motor_current=c, expect_stalls=True)
+    await helpers_ot3.move_plunger_absolute_ot3(
+        api, mount, p, speed=s, motor_current=c, expect_stalls=True
+    )
 
 
 async def _record_plunger_alignment(
@@ -202,7 +216,9 @@ async def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
 
 async def _reset_gantry(api: OT3API) -> None:
     await api.home()
-    home_pos = await api.gantry_position(types.OT3Mount.RIGHT, types.CriticalPoint.MOUNT)
+    home_pos = await api.gantry_position(
+        types.OT3Mount.RIGHT, types.CriticalPoint.MOUNT
+    )
     test_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     test_pos = test_pos._replace(z=home_pos.z)
     await api.move_to(

@@ -25,7 +25,7 @@ from hardware_testing.drivers.pressure_fixture import (
     PressureFixture,
     SimPressureFixture,
 )
-from hardware_testing.measure.pressure.config import (  # type: ignore[import]
+from .pressure import (  # type: ignore[import]
     PRESSURE_FIXTURE_TIP_VOLUME,
     PRESSURE_FIXTURE_ASPIRATE_VOLUME,
     PRESSURE_FIXTURE_EVENT_CONFIGS as PRESSURE_CFG,
@@ -75,7 +75,7 @@ PRESSURE_DATA_CACHE = []
 # save final test results, to be saved and displayed at the end
 FINAL_TEST_RESULTS = []
 
-_available_tips = {}
+_available_tips: Dict[int, List[str]] = {}
 
 
 @dataclass
@@ -340,7 +340,9 @@ async def _move_to_liquid(api: OT3API, mount: OT3Mount) -> None:
 
 
 async def _move_to_above_liquid(api: OT3API, mount: OT3Mount, height_mm: float) -> None:
-    assert CALIBRATED_LABWARE_LOCATIONS.reservoir, f"you must calibrate the liquid before hovering"
+    assert (
+        CALIBRATED_LABWARE_LOCATIONS.reservoir
+    ), "you must calibrate the liquid before hovering"
     await _move_to_or_calibrate(
         api,
         mount,
@@ -529,12 +531,10 @@ async def _fixture_check_pressure(
 
 
 def _reset_available_tip() -> None:
-    global _available_tips
-    _available_tips = {
-        50: [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"],
-        200: [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"],
-        1000: [f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"],
-    }
+    for tip_size in [50, 200, 1000]:
+        _available_tips[tip_size] = [
+            f"{row}{col + 1}" for col in range(12) for row in "ABCDEFGH"
+        ]
 
 
 async def _test_for_leak(
@@ -1010,6 +1010,7 @@ async def _test_tip_presence_flag(
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pip_channels = pip.channels.value
+    pip_volume = pip.working_volume
     pick_up_criteria = {
         1: (
             ejector_rel_pos + -1.3,
@@ -1070,36 +1071,46 @@ async def _test_tip_presence_flag(
     ]
     print(data)
     write_cb(data)
+
+    # P1000 also needs to check that 200uL tips can be picked up
+    if pip_volume == 1000:
+        # FIXME: this will raise an error and exit the script if it fails
+        try:
+            await _pick_up_tip_for_tip_volume(api, mount, tip_volume=200)
+            await _drop_tip_in_trash(api, mount)
+        except FailedTipStateCheck:
+            print("ERROR: failed to pickup 200uL tip")
+            return False
     return pick_up_result and drop_result
 
 
 @dataclass
-class LiqProbeCfg:
+class _LiqProbeCfg:
     mount_speed: float
     plunger_speed: float
     sensor_threshold_pascals: float
 
 
-PROBE_SETTINGS: Dict[int, Dict[int, LiqProbeCfg]] = {
+PROBE_SETTINGS: Dict[int, Dict[int, _LiqProbeCfg]] = {
     50: {
-        50: LiqProbeCfg(
+        50: _LiqProbeCfg(
             mount_speed=11,
             plunger_speed=21,
             sensor_threshold_pascals=150,
         ),
     },
     1000: {
-        50: LiqProbeCfg(
+        50: _LiqProbeCfg(
             mount_speed=5,
             plunger_speed=10,
             sensor_threshold_pascals=200,
         ),
-        200: LiqProbeCfg(
+        200: _LiqProbeCfg(
             mount_speed=5,
             plunger_speed=10,
             sensor_threshold_pascals=200,
         ),
-        1000: LiqProbeCfg(
+        1000: _LiqProbeCfg(
             mount_speed=5,
             plunger_speed=11,
             sensor_threshold_pascals=150,
@@ -1108,7 +1119,9 @@ PROBE_SETTINGS: Dict[int, Dict[int, LiqProbeCfg]] = {
 }
 
 
-async def _test_liquid_probe(api: OT3API, mount: OT3Mount, tip_volume: int, trials: int) -> List[float]:
+async def _test_liquid_probe(
+    api: OT3API, mount: OT3Mount, tip_volume: int, trials: int
+) -> List[float]:
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pip_vol = int(pip.working_volume)
@@ -1120,6 +1133,7 @@ async def _test_liquid_probe(api: OT3API, mount: OT3Mount, tip_volume: int, tria
     hover_mm = 3
     max_submerge_mm = -3
     max_z_distance_machine_coords = hover_mm - max_submerge_mm
+    assert CALIBRATED_LABWARE_LOCATIONS.reservoir
     target_z = CALIBRATED_LABWARE_LOCATIONS.reservoir.z
     for trial in range(trials):
         await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
@@ -1337,7 +1351,9 @@ async def _main(test_config: TestConfig) -> None:
             tip_vols = [50] if pipette_volume == 50 else [50, 200, 1000]
             test_passed = True
             for tip_vol in tip_vols:
-                probe_data = await _test_liquid_probe(api, mount, tip_volume=tip_vol, trials=3)
+                probe_data = await _test_liquid_probe(
+                    api, mount, tip_volume=tip_vol, trials=3
+                )
                 worst_trial = max(abs(min(probe_data)), max(probe_data))
                 tip_passed = bool(worst_trial < LIQUID_PROBE_ERROR_THRESHOLD_MM)
                 trial_data = [_bool_to_pass_fail(tip_passed)] + probe_data  # type: ignore
@@ -1373,14 +1389,6 @@ async def _main(test_config: TestConfig) -> None:
 
         if not test_config.skip_tip_presence:
             test_passed = await _test_tip_presence_flag(api, mount, csv_cb.write)
-            # P1000 also needs to check that 200uL tips can be picked up
-            if pipette_volume == 1000:
-                # FIXME: this will raise an error and exit the script if it fails
-                try:
-                    await _pick_up_tip_for_tip_volume(api, mount, tip_volume=200)
-                except FailedTipStateCheck:
-                    print("ERROR: failed to pickup 200uL tip")
-                    test_passed = False
             csv_cb.results("tip-presence", test_passed)
 
         print("test complete")
