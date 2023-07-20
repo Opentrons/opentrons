@@ -67,7 +67,8 @@ export const ProtocolLiquidsDetails = (
         })
       ) : (
         <Flex
-          padding={` ${SPACING.spacing16} ${SPACING.spacing16} ${SPACING.spacing32} ${SPACING.spacing16}`}
+          paddingTop={SPACING.spacing16}
+          paddingBottom={SPACING.spacing32}
           textAlign={TYPOGRAPHY.textAlignCenter}
           gridGap={SPACING.spacing12}
           flexDirection={DIRECTION_COLUMN}
@@ -75,7 +76,7 @@ export const ProtocolLiquidsDetails = (
           <Icon
             color={COLORS.medGreyEnabled}
             alignSelf={ALIGN_CENTER}
-            size="20px"
+            size="1.25rem"
             name="ot-alert"
             aria-label="ProtocolLIquidsDetails_noLiquidsIcon"
           />
