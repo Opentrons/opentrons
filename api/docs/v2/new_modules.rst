@@ -8,7 +8,7 @@ Hardware Modules
 
 Hardware modules are powered and unpowered deck-mounted peripherals. The Flex and OT-2 know about and control powered modules when they're attached via a USB connection. The robots do not know about unpowered modules until you use one in a protocol and upload that protocol to the Opentrons App.
 
-Powered modules include the :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>`, :ref:`Thermocycler Module <thermocycler-module>`, and :ref:`Heater-Shaker Module <heater-shaker-module>`. The 96-well :ref:`Magnetic Block <magnetic-block>` is unpowered and recommended for use with the Flex only.
+Powered modules include the :ref:`Temperature Module <temperature-module>`, :ref:`Magnetic Module <magnetic-module>` (OT-2 only), :ref:`Thermocycler Module <thermocycler-module>`, and :ref:`Heater-Shaker Module <heater-shaker-module>`. The 96-well :ref:`Magnetic Block <magnetic-block>` (Flex only) is an unpowered module.
 
 .. Note::
     
@@ -105,29 +105,27 @@ Loading Labware onto a Module
 You'll use the :py:meth:`.ProtocolContext.load_labware` method when loading labware on a module. For example, this code shows how to load the `Opentrons 24 Well Aluminum Block <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_ on top of a Temperature Module::
 
     def run(protocol: protocol_api.ProtocolContext):
-        temp_mod = protocol.load_module(
-            module_name= "temperature module gen2",
-            location= "D1") # Flex deck slot
+        temp_mod = protocol.load_module("temperature module gen2", "D1")
         temp_labware = temp_mod.load_labware(
-            load_name= "opentrons_24_aluminumblock_generic_2ml_screwcap",
-            label= "Temperature-Controlled Tubes",
+            "opentrons_24_aluminumblock_generic_2ml_screwcap",
+            "Temperature-Controlled Tubes",
         )
 
 .. versionadded:: 2.0
 
-Notice that when you load labware on a module, you don’t need to specify the labware’s deck slot. In this example, the aluminum block is loaded on the module and the ``load_module`` method already includes a location (e.g. ``location= "D1"``).
+When you load labware on a module, you don’t need to specify the deck slot. In the above example, the aluminum block is loaded on the module and the ``load_module`` method already includes a location (e.g. ``location= "D1"``).
 
 Any :ref:`v2-custom-labware` added to your Opentrons App is also accessible when loading labware onto a module. You can find and copy its load name by going to its card on the Labware page.
 
 .. versionadded:: 2.1
 
 
+.. Consider turning this section below into a warning. 
+
 Module and Labware Compatibility
 --------------------------------
 
-It's your responsibility to ensure the labware and modules you load work together. The Protocol API won't raise a warning or error if you load a nonsensical combination, like a tube rack on a Thermocycler.
-
-For further information on what combinations are possible, see the support article `What labware can I use with my modules? <https://support.opentrons.com/s/article/What-labware-can-I-use-with-my-modules>`_
+It's your responsibility to ensure the labware and module combinations you load together work together. The Protocol API won't raise a warning or error if you load an unusual combination, like a tube rack on a Thermocycler. See `What labware can I use with my modules? <https://support.opentrons.com/s/article/What-labware-can-I-use-with-my-modules>`_ for more information about labware/module combinations.
 
 
 Additional Labware Parameters
@@ -154,9 +152,6 @@ The examples in this section use a Temperature Module loaded in Flex deck slot D
     def run(protocol: protocol_api.ProtocolContext):
         temp_mod = protocol.load_module('temperature module gen2', 'D3')
         plate = temp_mod.load_labware('corning_96_wellplate_360ul_flat')
-
-.. suggested replacement for existing "where to put it" text
-.. maybe remove and just link to an online quick-start guide?
 
 The supported deck slot positions for the Temperature Module depend on the robot you’re using.
 
@@ -393,8 +388,8 @@ Hold Time
 You can optionally instruct the Thermocycler to hold its block temperature for a specific amount of time. You can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added together). For example, this will set the block to 4 °C for 4 minutes and 15 seconds::
     
     tc_mod.set_block_temperature(
-        temperature= 4,
-        hold_time_minutes= 4,
+        temperature=4,
+        hold_time_minutes=4,
         hold_time_seconds=15)
 
 .. note ::
@@ -411,9 +406,9 @@ The Thermocycler's block temperature controller varies its behavior based on the
 It is especially important to specify ``block_max_volume`` when holding at a temperature. For example, say you want to hold larger samples at a temperature for a short time::
 
         tc_mod.set_block_temperature(
-            temperature= 4,
-            hold_time_seconds= 20,
-            block_max_volume= 80)
+            temperature=4,
+            hold_time_seconds=20,
+            block_max_volume=80)
 
 If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 °C before starting the 20-second timer. In fact, with such a short hold time they may not reach 4 °C at all!
 
@@ -654,9 +649,9 @@ Because the Magnetic Block is unpowered, neither your robot nor the Opentrons Ap
 Using Multiple Modules of the Same Type
 ***************************************
 
-It's possible to use multiples of most module types within a single protocol. The exception is the Thermocycler Module, which only has one supported deck location due to its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and OT-2 robot server. 
+It's possible to use multiples of most module types within a single protocol. The exception is the Thermocycler Module, which only has one supported deck location due to its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and robot server. 
 
-In order to send commands to the correct module on the deck, you need to load the modules in your protocol in a specific order. Whenever you call :py:meth:`.load_module` for a particular module type, the OT-2 will initialize the matching module attached to the lowest-numbered USB port. Deck slot numbers play no role in the ordering of modules; you could load a Temperature Module in slot 4 first, followed by another one in slot 3:
+In order to send commands to the correct module on the deck, you need to load the modules in your protocol in a specific order. Whenever you call :py:meth:`.load_module` for a particular module type, the robot will initialize the matching module attached to the lowest-numbered USB port. Deck slot numbers play no role in the ordering of modules; you could load a Temperature Module in slot C1 first, followed by another one in slot D3:
 
 .. code-block:: python
 
@@ -665,16 +660,20 @@ In order to send commands to the correct module on the deck, you need to load th
     metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        # Load Temperature Module 1 in deck slot 4 on USB port 1
-        temperature_module_1 = protocol.load_module('temperature module gen2', 4)
+        # Load Temperature Module 1 in deck slot C1 on USB port 1
+        temperature_module_1 = protocol.load_module('temperature module gen2', "C1")
 
-        # Load Temperature Module 2 in deck slot 3 on USB port 2
-        temperature_module_2 = protocol.load_module('temperature module gen2', 3)
+        # Load Temperature Module 2 in deck slot D3 on USB port 2
+        temperature_module_2 = protocol.load_module('temperature module gen2', "D3")
         
 For this code to work as expected, ``temperature_module_1`` should be plugged into a lower-numbered USB port than ``temperature_module_2``. Assuming there are no other modules used in this protocol, it's simplest to use ports 1 and 2, like this:
+
+.. Will need 2 images for OT-2 and Flex, or 1 generic image that covers both.
 
 .. image:: ../img/modules/multiples_of_a_module.svg
 
 Before running your protocol, it's a good idea to use the module controls in the Opentrons App to check that commands are being sent where you expect.
 
-For additional information, including using modules with USB hubs, see our `support article on Using Multiple Modules of the Same Type <https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2>`_.
+.. Does this apply to Flex? Can we ask about changing the article title to include Flex or make more generic for both?
+
+See the support article, `Using Modules of the Same Type <https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2>`_ for more information.
