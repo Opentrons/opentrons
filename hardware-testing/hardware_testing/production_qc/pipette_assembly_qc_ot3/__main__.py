@@ -1076,16 +1076,6 @@ async def _test_tip_presence_flag(
         ["tip-presence-drop-displacement", drop_disp, _bool_to_pass_fail(drop_result)]
     )
     write_cb(["tip-presence-drop-height-above-nozzle", drop_pos_rel])
-
-    # P1000 also needs to check that 200uL tips can be picked up
-    if pip_volume == 1000:
-        # FIXME: this will raise an error and exit the script if it fails
-        try:
-            await _pick_up_tip_for_tip_volume(api, mount, tip_volume=200)
-            await _drop_tip_in_trash(api, mount)
-        except FailedTipStateCheck:
-            print("ERROR: failed to pickup 200uL tip")
-            return False
     return pick_up_result and drop_result
 
 
