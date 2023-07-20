@@ -69,7 +69,6 @@ from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import (
     get_system_constraints,
     get_system_constraints_for_calibration,
-    axis_convert,
 )
 from .backends.errors import SubsystemUpdating
 from .execution_manager import ExecutionManagerProvider
@@ -92,8 +91,6 @@ from .types import (
     GripperJawState,
     InstrumentProbeType,
     GripperProbe,
-    EarlyLiquidSenseTrigger,
-    LiquidNotFound,
     UpdateStatus,
     StatusBarState,
     SubSystemState,
