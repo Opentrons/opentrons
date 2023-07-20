@@ -10,7 +10,7 @@ sys.path.append(os.path.join(HERE, "..", "scripts"))
 from python_build_utils import normalize_version  # noqa: E402
 
 
-def _get_version():
+def _get_version() -> None:
     buildno = os.getenv("BUILD_NUMBER")
     project = os.getenv("OPENTRONS_PROJECT", "ot3")
     git_dir = os.getenv("OPENTRONS_GIT_DIR", None)
