@@ -457,6 +457,10 @@ class EquipmentHandler:
             if base_labware_offset_location is None:
                 # No offset for labware sitting on labware off-deck
                 return None
+
+            # If labware is being stacked on itself, all labware in the stack will share a labware offset due to
+            # them sharing the same definitionUri in `LabwareOffsetLocation`. This will not be true for the
+            # bottom-most labware, which will have a `DeckSlotLocation` and have its definitionUri field empty.
             return LabwareOffsetLocation(
                 slotName=base_labware_offset_location.slotName,
                 moduleModel=base_labware_offset_location.moduleModel,
