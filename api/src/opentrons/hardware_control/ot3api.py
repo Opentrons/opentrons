@@ -891,12 +891,16 @@ class OT3API(
         z_ax = Axis.by_mount(mount)
         plunger_ax = Axis.of_main_tool_actuator(mount)
 
-        return {
+        effector_pos = {
             Axis.X: carriage_position[Axis.X] + offset[0] + cp.x,
             Axis.Y: carriage_position[Axis.Y] + offset[1] + cp.y,
             z_ax: carriage_position[z_ax] + offset[2] + cp.z,
             plunger_ax: carriage_position[plunger_ax],
         }
+        if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            effector_pos[Axis.Q] = self._backend.gear_motor_position
+
+        return effector_pos
 
     async def gantry_position(
         self,
@@ -1687,6 +1691,7 @@ class OT3API(
                 pipette_axis
             ]
             gear_origin_dict = {Axis.Q: gear_origin_float}
+            gear_origin_dict = {Axis.Q: gear_origin_float}
             clamp_move_target = pipette_spec.pick_up_distance
             gear_target_dict = {Axis.Q: clamp_move_target}
             clamp_moves = self._build_moves(gear_origin_dict, gear_target_dict)
@@ -1697,7 +1702,7 @@ class OT3API(
             ][OT3AxisKind.Q]
             q_axis_distance = axis_convert(self._backend.gear_motor_position, 0.0)[Axis.P_L]
             await self._backend.tip_action(
-                distance=(q_axis_distance + pipette_spec.home_buffer),
+                distance=(pipette_spec.pick_up_distance + pipette_spec.home_buffer),
                 velocity=homing_velocity,
                 tip_action="home",
             )
@@ -1787,7 +1792,7 @@ class OT3API(
                 pipette_axis = Axis.of_main_tool_actuator(mount)
                 q_axis_distance = axis_convert(self._backend.gear_motor_position, 0.0)[pipette_axis]
                 await self._backend.tip_action(
-                    distance=(q_axis_distance + move.home_buffer),
+                    distance=(move.target_position + move.home_buffer),
                     velocity=homing_velocity,
                     tip_action="home",
                 )
