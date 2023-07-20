@@ -11,6 +11,11 @@ from time import time
 from typing import Optional, Callable, List, Any, Tuple, Dict
 from typing_extensions import Final
 
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    PushTipPresenceNotification,
+)
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.constants import SensorType
 
 from opentrons.config.types import CapacitivePassSettings, LiquidProbeSettings
@@ -996,6 +1001,11 @@ async def _jog_for_tip_state(
 async def _test_tip_presence_flag(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
+    await api.retract(mount)
+    wiggle_passed = await _wait_for_tip_presence_state_change(api, seconds_to_wait=5)
+    if not api.is_simulator:
+        input("press ENTER to continue")
+
     offset_from_a1 = Point(x=9 * 11, y=9 * -7, z=-5)
     nominal_test_pos = (
         IDEAL_LABWARE_LOCATIONS.tip_rack_50 + offset_from_a1  # type: ignore[operator]
@@ -1015,7 +1025,6 @@ async def _test_tip_presence_flag(
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pip_channels = pip.channels.value
-    pip_volume = pip.working_volume
     pick_up_criteria = {
         1: (
             ejector_rel_pos + -1.3,
@@ -1077,7 +1086,8 @@ async def _test_tip_presence_flag(
         ["tip-presence-drop-displacement", drop_disp, _bool_to_pass_fail(drop_result)]
     )
     write_cb(["tip-presence-drop-height-above-nozzle", drop_pos_rel])
-    return pick_up_result and drop_result
+    write_cb(["tip-presence-wiggle", _bool_to_pass_fail(wiggle_passed)])
+    return pick_up_result and drop_result and wiggle_passed
 
 
 @dataclass
@@ -1229,6 +1239,45 @@ def _create_csv_and_get_callbacks(
     )
 
 
+async def _wait_for_tip_presence_state_change(
+    api: OT3API, seconds_to_wait: int
+) -> bool:
+    print("prepare to wiggle the tip, in 3 seconds...")
+    for i in range(3):
+        print(f"{i + 1}..")
+        if not api.is_simulator:
+            await asyncio.sleep(1)
+    print("WIGGLE!")
+
+    event = asyncio.Event()
+    test_pass = True
+    if not api.is_simulator:
+
+        def _listener(message: MessageDefinition, arb_id: ArbitrationId) -> None:
+            if isinstance(message, PushTipPresenceNotification):
+                event.set()
+
+        messenger = api._backend._messenger  # type: ignore[union-attr]
+        messenger.add_listener(_listener)
+        try:
+            for i in range(seconds_to_wait):
+                print(f"wiggle the ejector ({i + 1}/{seconds_to_wait} seconds)")
+                try:
+                    await asyncio.wait_for(event.wait(), 1.0)
+                    test_pass = False  # event was set, so we failed the test
+                    messenger.remove_listener(_listener)
+                    break
+                except asyncio.TimeoutError:
+                    continue  # timed out, so keep waiting
+        finally:
+            messenger.remove_listener(_listener)
+    if test_pass:
+        print("PASS: no unexpected tip-presence")
+    else:
+        print("FAIL: tip-presence state changed unexpectedly")
+    return test_pass
+
+
 async def _main(test_config: TestConfig) -> None:
     global IDEAL_LABWARE_LOCATIONS
     global CALIBRATED_LABWARE_LOCATIONS
@@ -1244,6 +1293,13 @@ async def _main(test_config: TestConfig) -> None:
         pipette_left="p1000_single_v3.4",
         pipette_right="p1000_multi_v3.4",
     )
+
+    # home and move to attach position
+    await api.home([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R])
+    attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+    current_pos = await api.gantry_position(OT3Mount.RIGHT)
+    await api.move_to(OT3Mount.RIGHT, attach_pos._replace(z=current_pos.z))
+
     pips = {OT3Mount.from_mount(m): p for m, p in api.hardware_pipettes.items() if p}
     assert pips, "no pipettes attached"
     for mount, pipette in pips.items():
@@ -1254,8 +1310,6 @@ async def _main(test_config: TestConfig) -> None:
         ):
             continue
         _reset_available_tip()
-        # reset calibration for this pipette
-        await api.reset_instrument_offset(mount)
 
         # setup our labware locations
         pipette_volume = int(pipette.working_volume)
@@ -1337,8 +1391,9 @@ async def _main(test_config: TestConfig) -> None:
         # run the test
         csv_cb.write(["----"])
         csv_cb.write(["TEST"])
+
         print("homing")
-        await api.home()
+        await api.home([Axis.of_main_tool_actuator(mount)])
 
         if not test_config.skip_plunger or not test_config.skip_diagnostics:
             print("moving over slot 3")
@@ -1443,10 +1498,11 @@ async def _main(test_config: TestConfig) -> None:
 
         # print the filepath again, to help debugging
         print(f"CSV: {csv_props.name}")
-        print("homing")
-        await api.home()
-        # disengage x,y for replace the new pipette
-        await api.disengage_axes([Axis.X, Axis.Y])
+
+        # move to attach position
+        await api.retract(mount)
+        current_pos = await api.gantry_position(OT3Mount.RIGHT)
+        await api.move_to(OT3Mount.RIGHT, attach_pos._replace(z=current_pos.z))
     print("done")
 
 

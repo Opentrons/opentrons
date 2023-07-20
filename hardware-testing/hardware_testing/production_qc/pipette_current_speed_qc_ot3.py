@@ -30,7 +30,7 @@ PLUNGER_CURRENTS_SPEED = {
     0.3: TEST_SPEEDS,
     0.4: TEST_SPEEDS,
     0.6: TEST_SPEEDS,
-    1.0: TEST_SPEEDS
+    1.0: TEST_SPEEDS,
 }
 TEST_ACCELERATION = 1500  # used during gravimetric tests
 
