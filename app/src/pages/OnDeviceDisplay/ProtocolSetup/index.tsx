@@ -365,7 +365,7 @@ function PrepareToRun({
   if (
     mostRecentAnalysis == null ||
     attachedInstruments == null ||
-    (protocolHasModules && attachedModules == null) ||
+    (protocolHasModules && attachedModules.length === 0) ||
     allPipettesCalibrationData == null
   ) {
     return <ProtocolSetupSkeleton cancelAndClose={onConfirmCancelClose} />
@@ -492,7 +492,7 @@ function PrepareToRun({
                 mostRecentAnalysis == null ||
                 attachedInstruments == null ||
                 (protocolHasModules && attachedModules.length === 0) ||
-                allPipettesCalibrationData == null
+                allPipettesCalibrationData.data.length === 0
               }
               onPlay={onPlay}
               ready={isReadyToRun}
