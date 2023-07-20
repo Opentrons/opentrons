@@ -10,7 +10,6 @@ PACKAGE_DIR=$(echo ${USB_DIR}/${PACKAGE_NAME}-*/)
 PACKAGE_TAR_FILE=$(echo ${USB_DIR}/${PACKAGE_NAME}-*.tar.gz)
 PKG_INFO_FILE=$PACKAGE_DIR/PKG-INFO
 SYSTEM_VERSION_FILE="/etc/VERSION.json"
-DEFAULT_ENV_PROFILE="/etc/profile.d/ot-environ.sh"
 ENV_PROFILE="/etc/profile.d/ot-usb-environ.sh"
 
 # Script entry-point
@@ -82,15 +81,11 @@ _env_profile() {
 cat <<EOF > $ENV_PROFILE
 #!/usr/bin/env sh
 
-# check that the hardware-tesing dir in the usb device exists
+# Do an auto-teardown if the usb device is not found
 if [ ! -d $USB_DIR ]; then
-	echo "################## WARNING ##################"
-	echo "The Hardware-Testing package is enabled, but was not found."
-	echo "Please make sure that the usb is plugged in and mounted to - $MOUNT_DIR"
-	echo "If plugged in and mounted but not found, re-run the ./setup.sh script."
-	echo "If you are done using the Hardware-Testing package, make sure its uninstalled."
-	echo "You can uninstall it by runing './setup teardown' from the usb."
-	echo "################## WARNING ##################"
+	mount -o remount,rw /
+	rm -rf $ENV_PROFILE
+	mount -o remount,ro /
 	return 1;
 fi
 
