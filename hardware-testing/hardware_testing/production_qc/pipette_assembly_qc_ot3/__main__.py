@@ -1,4 +1,7 @@
 """Pipette Assembly QC Test."""
+# FIXME: (andy s) Sorry but this script should be re-written completely.
+#        It works, but it was written in a hurry and is just terrible to edit.
+
 import argparse
 import asyncio
 from dataclasses import dataclass, fields

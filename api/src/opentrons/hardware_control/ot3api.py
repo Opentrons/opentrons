@@ -2033,13 +2033,13 @@ class OT3API(
         if probe_settings.aspirate_while_sensing:
             await self._move_to_plunger_bottom(mount, rate=1.0)
         else:
-            # TODO: shorten this distance by only moving far enough
+            # TODO: shorten this distance by only moving just far enough
             #       to account for the specified "max-z-distance"
             target_pos = target_position_from_plunger(
                 checked_mount, instrument.plunger_positions.top, self._current_position
             )
-            # FIXME: this should really be the slower "aspirate" speed
-            #        but this is still in r&d so we'll speed things up
+            # FIXME: this should really be the slower "aspirate" speed,
+            #        but this is still in testing phase so let's bias towards speed
             max_speeds = self.config.motion_settings.default_max_speed
             speed = max_speeds[self.gantry_load][OT3AxisKind.P]
             await self._move(target_pos, speed=speed, acquire_lock=True)
