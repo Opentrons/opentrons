@@ -18,7 +18,6 @@ Labware Types
 
 Default Labware
 ===============
-.. Description almost verbatim from Flex user manual.
 
 Default labware is everything listed in the `Opentrons Labware Library <https://labware.opentrons.com/>`_. When used in a protocol, your Flex or OT-2 knows how to work with default labware. However, you must first inform the API about the labware you will place on the robot’s deck. Search the library when you’re looking for the API load names of the labware you want to use. You can copy the load names from the library and pass them to the :py:meth:`~.ProtocolContext.load_labware` method in your protocol.
 
