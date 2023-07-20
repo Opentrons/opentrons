@@ -62,7 +62,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
 
 .. versionadded:: 2.0
 
-.. _available_modules
+.. _available_modules:
 
 Available Modules
 -----------------

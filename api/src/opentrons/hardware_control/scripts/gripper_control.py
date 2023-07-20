@@ -7,7 +7,7 @@ sys.path.append("/opt/opentrons-robot-server")
 
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
 from opentrons.hardware_control.ot3api import OT3API  # noqa: E402
-from opentrons.hardware_control.types import OT3Axis, OT3Mount  # noqa: E402
+from opentrons.hardware_control.types import Axis, OT3Mount  # noqa: E402
 from opentrons.hardware_control import HardwareControlAPI  # noqa: E402
 from opentrons.types import Point  # noqa: E402
 from opentrons_shared_data.deck import load as load_deck_def  # noqa: E402
@@ -102,10 +102,10 @@ def print_current_state(
     6. encoder positions (X, Y, G)
     """
     pos = api.sync.current_position_ot3(OT3Mount.GRIPPER)
-    gripper_loc = (pos[OT3Axis.X], pos[OT3Axis.Y], pos[OT3Axis.Z_G])
+    gripper_loc = (pos[Axis.X], pos[Axis.Y], pos[Axis.Z_G])
 
     enc_pos = api.sync._encoder_position
-    enc_loc = (enc_pos[OT3Axis.X], enc_pos[OT3Axis.Y], enc_pos[OT3Axis.G])
+    enc_loc = (enc_pos[Axis.X], enc_pos[Axis.Y], enc_pos[Axis.G])
     print(
         f"{datetime.datetime.now()}, {cycle_index}, {slot}, "
         f"{gripper_loc}, {jaw_state}, {enc_loc}\n"

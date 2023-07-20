@@ -35,5 +35,4 @@ Default.args = {
       children goes here
     </Flex>
   ),
-  isError: false,
 }

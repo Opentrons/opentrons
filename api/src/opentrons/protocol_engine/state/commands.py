@@ -33,8 +33,8 @@ from ..errors import (
     RobotDoorOpenError,
     SetupCommandNotAllowedError,
     PauseNotAllowedError,
-    ProtocolCommandFailedError,
     UnexpectedProtocolError,
+    ProtocolCommandFailedError,
 )
 from ..types import EngineStatus
 from .abstract_store import HasState, HandlesActions
@@ -254,9 +254,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
         elif isinstance(action, FailCommandAction):
             error_occurrence = ErrorOccurrence.from_failed(
-                id=action.error_id, createdAt=action.failed_at, error=action.error
+                id=action.error_id,
+                createdAt=action.failed_at,
+                error=action.error,
             )
-
             prev_entry = self._state.commands_by_id[action.command_id]
             self._state.commands_by_id[action.command_id] = CommandEntry(
                 index=prev_entry.index,
@@ -333,21 +334,32 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 if action.error_details:
                     error_id = action.error_details.error_id
                     created_at = action.error_details.created_at
-
-                    if not isinstance(
-                        action.error_details.error,
-                        EnumeratedError,
-                    ):
-                        error: EnumeratedError = UnexpectedProtocolError(
-                            message=str(action.error_details.error),
-                            wrapping=[action.error_details.error],
+                    if (
+                        isinstance(
+                            action.error_details.error, ProtocolCommandFailedError
                         )
+                        and action.error_details.error.original_error is not None
+                    ):
+                        self._state.errors_by_id[
+                            error_id
+                        ] = action.error_details.error.original_error
                     else:
-                        error = action.error_details.error
+                        if isinstance(
+                            action.error_details.error,
+                            EnumeratedError,
+                        ):
+                            error = action.error_details.error
+                        else:
+                            error = UnexpectedProtocolError(
+                                message=str(action.error_details.error),
+                                wrapping=[action.error_details.error],
+                            )
 
-                    self._state.errors_by_id[error_id] = ErrorOccurrence.from_failed(
-                        id=error_id, createdAt=created_at, error=error
-                    )
+                        self._state.errors_by_id[
+                            error_id
+                        ] = ErrorOccurrence.from_failed(
+                            id=error_id, createdAt=created_at, error=error
+                        )
 
         elif isinstance(action, HardwareStoppedAction):
             self._state.queue_status = QueueStatus.PAUSED
@@ -556,7 +568,10 @@ class CommandView(HasState[CommandState]):
             for command_id in self._state.all_command_ids:
                 command = self._state.commands_by_id[command_id].command
                 if command.error and command.intent != CommandIntent.SETUP:
-                    raise ProtocolCommandFailedError(command.error.detail)
+                    # TODO(tz, 7-11-23): avoid raising an error and return the status instead
+                    raise ProtocolCommandFailedError(
+                        original_error=command.error, message=command.error.detail
+                    )
             return True
         else:
             return False

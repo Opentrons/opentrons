@@ -648,14 +648,18 @@ class ProtocolContext(CommandPublisher):
 
         :type location: str or int or None
         :returns: The loaded and initialized module---a
-                  :py:class:`TemperatureModuleContext`,
-                  :py:class:`MagneticModuleContext`,
-                  :py:class:`ThermocyclerContext`, or
                   :py:class:`HeaterShakerContext`,
+                  :py:class:`MagneticBlockContext`,
+                  :py:class:`MagneticModuleContext`,
+                  :py:class:`TemperatureModuleContext`, or
+                  :py:class:`ThermocyclerContext`,
                   depending on what you requested with ``module_name``.
 
+                  .. versionchanged:: 2.13
+                    Added ``HeaterShakerContext`` return value.
+
                   .. versionchanged:: 2.15
-                    Added :py:class:`MagneticBlockContext` return value.
+                    Added ``MagneticBlockContext`` return value.
         """
         if configuration:
             if self._api_version < APIVersion(2, 4):
@@ -755,7 +759,7 @@ class ProtocolContext(CommandPublisher):
                              replaced by `instrument_name`.
         """
         instrument_name = validation.ensure_lowercase_name(instrument_name)
-        is_96_channel = instrument_name == "p1000_96"
+        is_96_channel = instrument_name in ("p1000_96", "flex_96channel_1000")
         if is_96_channel and isinstance(self._core, ProtocolEngineCore):
             checked_instrument_name = instrument_name
             checked_mount = Mount.LEFT

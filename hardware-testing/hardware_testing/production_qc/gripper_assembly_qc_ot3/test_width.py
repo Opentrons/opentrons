@@ -13,7 +13,7 @@ from hardware_testing.data.csv_report import (
 )
 
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Axis, OT3Mount, Point
+from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point
 
 
 FAILURE_THRESHOLD_MM = 3
@@ -47,8 +47,8 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
-    z_ax = OT3Axis.Z_G
-    g_ax = OT3Axis.G
+    z_ax = Axis.Z_G
+    g_ax = Axis.G
     mount = OT3Mount.GRIPPER
     gripper = api._gripper_handler.get_gripper()
     max_width = gripper.config.geometry.jaw_width["max"]

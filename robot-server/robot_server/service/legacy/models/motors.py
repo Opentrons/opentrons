@@ -12,10 +12,11 @@ class MotorName(str, Enum):
     # https://docs.python.org/3/library/enum.html#timeperiod to
     # dynamically create an enum with the same keys as Axis but whose values
     # are also the keys. (ie X=0 becomes  X='X')
-    _ignore_ = "MotorName _current_axis"
+    _ignore_ = "MotorName _axis_name _axis_value"
     MotorName = vars()
-    for _current_axis in types.Axis:
-        MotorName[_current_axis.name] = _current_axis.name.lower()
+    for _axis_name, _axis_value in types.Axis.__members__.items():
+        # We need to use Axis.__members__ in order to access names of aliased axes
+        MotorName[_axis_name] = _axis_name.lower()
 
 
 class EngagedMotor(BaseModel):
@@ -24,16 +25,21 @@ class EngagedMotor(BaseModel):
     enabled: bool = Field(..., description="Is engine enabled")
 
 
-# Dynamically create the Engaged motors. It has one EngagedMotor per MotorName
 class EngagedMotors(BaseModel):
     """Which motors are engaged."""
 
+    # Note: This model has changed with introduction of Flex and causes a breaking change
+    # for the expected response of /motors/engaged endpoint.
+    # But the neither the app uses the motors endpoint, nor is it commonly used externally
+    # so it should be hopefully fine.
     x: EngagedMotor
     y: EngagedMotor
-    z: EngagedMotor
-    a: EngagedMotor
-    b: EngagedMotor
-    c: EngagedMotor
+    z_l: EngagedMotor
+    z_r: EngagedMotor
+    p_l: EngagedMotor
+    p_r: EngagedMotor
+    q: typing.Optional[EngagedMotor]  # Optional since OT2 doesn't have these axes
+    g: typing.Optional[EngagedMotor]
 
 
 class Axes(BaseModel):

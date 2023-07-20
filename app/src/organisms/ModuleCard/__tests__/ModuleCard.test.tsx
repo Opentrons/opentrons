@@ -98,7 +98,12 @@ const mockMagneticModuleHub = {
     height: 42,
     status: 'disengaged',
   },
-  usbPort: { hub: 2, path: '/dev/ot_module_magdeck0', port: null },
+  usbPort: {
+    hub: true,
+    path: '/dev/ot_module_magdeck0',
+    port: 1,
+    portGroup: 'unknown',
+  },
 } as MagneticModule
 
 const mockHotHeaterShaker = {
@@ -120,7 +125,12 @@ const mockHotHeaterShaker = {
     errorDetails: null,
     status: 'idle',
   },
-  usbPort: { path: '/dev/ot_module_heatershaker0', hub: null, port: 1 },
+  usbPort: {
+    path: '/dev/ot_module_heatershaker0',
+    hub: false,
+    port: 1,
+    portGroup: 'unknown',
+  },
 } as HeaterShakerModule
 
 const mockHotThermoGen2 = {
@@ -146,7 +156,12 @@ const mockHotThermoGen2 = {
     lidTemperatureStatus: 'idle',
     status: 'heating',
   },
-  usbPort: { path: '/dev/ot_module_thermocycler', hub: null, port: 1 },
+  usbPort: {
+    path: '/dev/ot_module_thermocycler',
+    hub: false,
+    port: 1,
+    portGroup: 'unknown',
+  },
 } as ThermocyclerModule
 
 const mockHotThermo = {
@@ -172,7 +187,12 @@ const mockHotThermo = {
     lidTemperatureStatus: 'idle',
     status: 'heating',
   },
-  usbPort: { path: '/dev/ot_module_thermocycler', hub: null, port: 1 },
+  usbPort: {
+    path: '/dev/ot_module_thermocycler',
+    hub: false,
+    port: 1,
+    portGroup: 'unknown',
+  },
 } as ThermocyclerModule
 
 const mockMakeSnackbar = jest.fn()
@@ -227,17 +247,6 @@ describe('ModuleCard', () => {
     getByText('Magnetic Module GEN1')
     getByText('Mock Magnetic Module Data')
     getByText('usb-1')
-    getByAltText('magneticModuleV1')
-  })
-  it('renders information if module is connected via hub', () => {
-    const { getByText, getByAltText } = render({
-      module: mockMagneticModuleHub,
-      robotName: mockRobot.name,
-      isLoadedInRun: false,
-    })
-    getByText('Magnetic Module GEN1')
-    getByText('Mock Magnetic Module Data')
-    getByText('usb-2 via hub')
     getByAltText('magneticModuleV1')
   })
   it('renders information for a temperature module with mocked status', () => {

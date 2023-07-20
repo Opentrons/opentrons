@@ -13,10 +13,10 @@ const mockPipetteInfo = [
 ] as LoadedPipette[]
 
 const mockPipettesInProtocolNotEmpty = [
-  { id: '123', pipetteName: 'p1000_single_gen3', mount: 'left' },
+  { id: '123', pipetteName: 'p1000_single_flex', mount: 'left' },
 ]
 const mockPipettesInProtocolMulti = [
-  { id: '123', pipetteName: 'p1000_multi_gen3', mount: 'left' },
+  { id: '123', pipetteName: 'p1000_multi_flex', mount: 'left' },
 ]
 const mockSingleMountPipetteAttached = {
   left: mockAttachedPipetteInformation,
@@ -32,7 +32,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
         [
           {
             id: '123',
-            pipetteName: 'p1000_single_gen3',
+            pipetteName: 'p1000_single_flex',
             mount: 'left',
           },
         ],
@@ -74,7 +74,7 @@ describe('getPipetteWizardStepsForProtocol', () => {
             data: { calibratedOffset: undefined as any },
           } as any,
         },
-        [{ id: '123', pipetteName: 'p1000_single_gen3', mount: 'right' }],
+        [{ id: '123', pipetteName: 'p1000_single_flex', mount: 'right' }],
         RIGHT
       )
     ).toStrictEqual(mockFlowSteps)

@@ -1,15 +1,17 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory } from 'react-router-dom'
+import { css } from 'styled-components'
 
 import {
+  ALIGN_FLEX_START,
+  BORDERS,
+  COLORS,
+  DIRECTION_COLUMN,
   Flex,
+  OVERFLOW_AUTO,
   SPACING,
   TYPOGRAPHY,
-  DIRECTION_COLUMN,
-  ALIGN_FLEX_START,
-  COLORS,
-  BORDERS,
 } from '@opentrons/components'
 import { useStopRunMutation } from '@opentrons/react-api-client'
 
@@ -81,20 +83,22 @@ export function RunFailedModal({
           <Flex
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing8}
-            overflowY="scroll"
-            maxHeight="5.375rem"
+            maxHeight="11rem"
             backgroundColor={COLORS.light1}
             borderRadius={BORDERS.borderRadiusSize3}
+            padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
           >
-            {errors?.map(error => (
-              <StyledText
-                as="p"
-                key={error.id}
-                textAlign={TYPOGRAPHY.textAlignLeft}
-              >
-                {error.detail}
-              </StyledText>
-            ))}
+            <Flex css={SCROLL_BAR_STYLE}>
+              {errors?.map(error => (
+                <StyledText
+                  as="p"
+                  key={error.id}
+                  textAlign={TYPOGRAPHY.textAlignLeft}
+                >
+                  {error.detail}
+                </StyledText>
+              ))}
+            </Flex>
           </Flex>
           <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
             {t('contact_information')}
@@ -111,3 +115,22 @@ export function RunFailedModal({
     </Modal>
   )
 }
+
+const SCROLL_BAR_STYLE = css`
+  overflow-y: ${OVERFLOW_AUTO};
+
+  &::-webkit-scrollbar {
+    width: 0.75rem;
+    background-color: ${COLORS.light1};
+  }
+
+  &::-webkit-scrollbar-track {
+    margin-top: ${SPACING.spacing16};
+    margin-bottom: ${SPACING.spacing16};
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${COLORS.darkBlack40};
+    border-radius: 11px;
+  }
+`

@@ -62,7 +62,7 @@ stages:
             moduleId: '{temperatureModuleV1_id}'
             celsius: 100
           error:
-            errorType: 'InvalidTargetTemperatureError'
+            errorType: InvalidTargetTemperatureError
             detail: "Temperature module got an invalid temperature 100.0 \u00b0C. Valid range is TemperatureRange(min=-9, max=99)."
       save:
         json:

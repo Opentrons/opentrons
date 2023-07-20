@@ -11,7 +11,7 @@ from math import floor, copysign, isclose
 from logging import getLogger
 from opentrons.util.linal import solve_attitude
 
-from .types import OT3Mount, OT3Axis, GripperProbe
+from .types import OT3Mount, Axis, GripperProbe
 from opentrons.types import Point
 from opentrons.config.types import CapacitivePassSettings, EdgeSenseSettings, OT3Config
 import json
@@ -112,7 +112,7 @@ def _deck_hit(
 async def _verify_edge_pos(
     hcapi: OT3API,
     mount: OT3Mount,
-    search_axis: Union[Literal[OT3Axis.X, OT3Axis.Y]],
+    search_axis: Union[Literal[Axis.X, Axis.Y]],
     found_edge: Point,
     last_stride: float,
     search_direction: Literal[1, -1],
@@ -153,7 +153,7 @@ async def _verify_edge_pos(
 
 
 def critical_edge_offset(
-    search_axis: Union[Literal[OT3Axis.X, OT3Axis.Y]], direction_if_hit: Literal[1, -1]
+    search_axis: Union[Literal[Axis.X, Axis.Y]], direction_if_hit: Literal[1, -1]
 ) -> Point:
     """
     Offset to be applied when we are aligning the edge of the probe to the edge of the
@@ -168,7 +168,7 @@ async def find_edge_binary(
     hcapi: OT3API,
     mount: OT3Mount,
     slot_edge_nominal: Point,
-    search_axis: Union[Literal[OT3Axis.X, OT3Axis.Y]],
+    search_axis: Union[Literal[Axis.X, Axis.Y]],
     direction_if_hit: Literal[1, -1],
     raise_verify_error: bool = True,
 ) -> Point:
@@ -266,7 +266,7 @@ async def find_slot_center_binary(
         hcapi,
         mount,
         estimated_center + EDGES["right"],
-        OT3Axis.X,
+        Axis.X,
         -1,
         raise_verify_error,
     )
@@ -274,13 +274,13 @@ async def find_slot_center_binary(
     estimated_center = estimated_center._replace(x=plus_x_edge.x - EDGES["right"].x)
 
     plus_y_edge = await find_edge_binary(
-        hcapi, mount, estimated_center + EDGES["top"], OT3Axis.Y, -1, raise_verify_error
+        hcapi, mount, estimated_center + EDGES["top"], Axis.Y, -1, raise_verify_error
     )
     LOG.info(f"Found +y edge at {plus_y_edge.y}mm")
     estimated_center = estimated_center._replace(y=plus_y_edge.y - EDGES["top"].y)
 
     minus_x_edge = await find_edge_binary(
-        hcapi, mount, estimated_center + EDGES["left"], OT3Axis.X, 1, raise_verify_error
+        hcapi, mount, estimated_center + EDGES["left"], Axis.X, 1, raise_verify_error
     )
     LOG.info(f"Found -x edge at {minus_x_edge.x}mm")
     estimated_center = estimated_center._replace(x=(plus_x_edge.x + minus_x_edge.x) / 2)
@@ -289,7 +289,7 @@ async def find_slot_center_binary(
         hcapi,
         mount,
         estimated_center + EDGES["bottom"],
-        OT3Axis.Y,
+        Axis.Y,
         1,
         raise_verify_error,
     )
@@ -341,7 +341,7 @@ async def _probe_deck_at(
     await api.move_to(mount, target._replace(z=safe_height), speed=speed)
     await api.move_to(mount, target._replace(z=abs_transit_height))
     _found_pos = await api.capacitive_probe(
-        mount, OT3Axis.by_mount(mount), target.z, settings
+        mount, Axis.by_mount(mount), target.z, settings
     )
     # don't use found Z position to calculate an updated transit height
     # because the probe may have gone through the hole
@@ -354,7 +354,7 @@ async def find_axis_center(
     mount: OT3Mount,
     minus_edge_nominal: Point,
     plus_edge_nominal: Point,
-    axis: Literal[OT3Axis.X, OT3Axis.Y],
+    axis: Literal[Axis.X, Axis.Y],
 ) -> float:
     """Find the center of the calibration slot on the specified axis.
 
@@ -499,14 +499,14 @@ async def find_slot_center_noncontact(
         mount,
         travel_center + EDGES["left"],
         travel_center + EDGES["right"],
-        OT3Axis.X,
+        Axis.X,
     )
     y_center = await find_axis_center(
         hcapi,
         mount,
         travel_center + EDGES["bottom"],
         travel_center + EDGES["top"],
-        OT3Axis.Y,
+        Axis.Y,
     )
     return Point(x_center, y_center, estimated_center.z)
 
