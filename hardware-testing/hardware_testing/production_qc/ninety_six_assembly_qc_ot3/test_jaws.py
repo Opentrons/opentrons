@@ -81,6 +81,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # LOOP THROUGH CURRENTS + SPEEDS
     currents = list(CURRENTS_SPEEDS.keys())
     for current in sorted(currents, reverse=True):
+        await api.refresh_positions()
         speeds = CURRENTS_SPEEDS[current]
         for speed in sorted(speeds, reverse=False):
             ui.print_header(f"CURRENT: {current}, SPEED: {speed}")

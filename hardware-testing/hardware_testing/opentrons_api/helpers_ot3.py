@@ -447,7 +447,19 @@ async def move_tip_motor_relative_ot3(
     """Move 96ch tip-motor (Q) to an absolute position."""
     if not api.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
         raise RuntimeError("No pipette found on LEFT mount")
+
+    current_pos = await api.current_position_ot3()
+    target_pos = current_pos.copy()
+    target_pos[Axis.Q] += distance
+
     if distance < 0:
+        speed *= -1
+
+    tip_motor_move = api._build_moves(current_pos, target_pos)
+    await api._backend.tip_action(moves=tip_motor_move[0], tip_action="clamp")
+
+    if distance < 0:
+        # change this so that it calls _build_moves, and passes in a speed
         action = "home"
     else:
         action = "clamp"
