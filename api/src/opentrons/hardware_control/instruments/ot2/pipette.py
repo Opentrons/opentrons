@@ -156,7 +156,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         if name == self._acting_as:
             return
 
-        str_name = f"{name.pipette_type.name}_{name.pipette_channels}"
+        str_name = f"{name.pipette_type.name}_{str(name.pipette_channels)}"
         assert str_name in self._config.pipette_backcompat_names + [
             self.name
         ], f"{self.name} is not back-compatible with {name}"
