@@ -10,7 +10,7 @@ Labware are the durable or consumable items that you work with, reuse, or discar
 
 .. note::
 
-    Code snippets use alphanumeric Flex deck slot locations (e.g. ``D1``, ``D2``, etc.). If you have an OT-2, replace the Flex deck slot coordinate with its OT-2 equivalent. For example, Flex slot D1 corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
+    Code snippets use alphanumeric Flex deck slot locations (e.g. ``D1``, ``D2``, etc.). If you have an OT-2 and are using API version 2.14 or earlier, replace the Flex deck slot coordinate with its OT-2 equivalent. For example, Flex slot D1 corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
 
 *************
 Labware Types
@@ -165,19 +165,19 @@ The API provides many different ways to access wells inside labware. Different m
      - ``[labware:A1, labware:B1, labware:C1...]``
    * - :py:meth:`.Labware.rows`
      - List of a list ordered by row.
-     - ``[[labware:A1, labware:A2...], [labware:B1, labware:B2..]]``
+     - ``[[labware:A1, labware:A2...], [labware:B1, labware:B2...]]``
    * - :py:meth:`.Labware.columns`
      - List of a list ordered by column.
-     - ``[[labware:A1, labware:B1..], [labware:A2, labware:B2..]]``
+     - ``[[labware:A1, labware:B1...], [labware:A2, labware:B2...]]``
    * - :py:meth:`.Labware.wells_by_name`
      - Dictionary with well names as keys.
      - ``{'A1': labware:A1, 'B1': labware:B1}``
    * - :py:meth:`.Labware.rows_by_name`
      - Dictionary with row names as keys.
-     - ``{'A': [labware:A1, labware:A2..], 'B': [labware:B1, labware:B2]}``
+     - ``{'A': [labware:A1, labware:A2...], 'B': [labware:B1, labware:B2...]}``
    * - :py:meth:`.Labware.columns_by_name`
      - Dictionary with column names as keys.
-     - ``{'1': [labware:A1, labware:B1..], '2': [labware:A2, labware:B2..]}``
+     - ``{'1': [labware:A1, labware:B1...], '2': [labware:A2, labware:B2...]}``
 
 Accessing Individual Wells
 ==========================
