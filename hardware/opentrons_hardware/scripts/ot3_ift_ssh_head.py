@@ -26,6 +26,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MotorPositionRequest,
     InstrumentInfoRequest,
     DeviceInfoRequest,
+    GetMotorUsageRequest,
+    ReadLimitSwitchRequest
 )
 
 from opentrons_hardware.hardware_control.motion import (
@@ -317,7 +319,7 @@ async def write_epprom(
             )
         ),
     )
-async def write_epprom(
+async def read_epprom_head(
     eeprom_node_id: NodeId,
     can_messenger: CanMessenger,
     address: int,
@@ -330,12 +332,27 @@ async def write_epprom(
     )
     await can_messenger.send(node_id=eeprom_node_id, message=read_message)
 
-    response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
+    try:
+        while True:
+            with WaitableCallback(can_messenger) as wc:
+                message, arb = await asyncio.wait_for(wc.read(), 1.0)
+                # aaaaa = message.payload.data.value
+                # print(aaaaa)
+                #str(message.payload.serial.value.decode('ascii').rstrip('\x00'))
+                eppdata = str(message.payload.data.value.decode('ascii').rstrip('\x00'))
+                return eppdata
+    except Exception as errval:
+        print("errval",errval)
+        return "None"
 
-    assert isinstance(response, ReadFromEEPromResponse)
-    assert response.payload.data.value[: len(data)] == data
-    assert response.payload.address.value == address
-    assert response.payload.data_length.value == len(data)
+
+
+    # response, arbitration_id = await asyncio.wait_for(can_messenger_queue.read(), 1)
+
+    # assert isinstance(response, ReadFromEEPromResponse)
+    # assert response.payload.data.value[: len(data)] == data
+    # assert response.payload.address.value == address
+    # assert response.payload.data_length.value == len(data)
 async def read_version(messenger: CanMessenger, node):
     await messenger.send(node, DeviceInfoRequest())
     target = datetime.datetime.now()
@@ -348,7 +365,34 @@ async def read_version(messenger: CanMessenger, node):
         #print("errval",errval)
         return "None"
 
-async def  run(args: argparse.Namespace) -> None:
+async def read_Usag(messenger: CanMessenger, node):
+    await messenger.send(node, GetMotorUsageRequest())
+    target = datetime.datetime.now()
+    try:
+        while True:
+            with WaitableCallback(messenger) as wc:
+                message, arb = await asyncio.wait_for(wc.read(), 1.0)
+                eppdata = (message.payload.usage_elements)[0].usage_value
+                return eppdata
+    except Exception as errval:
+        #print("errval",errval)
+        return "None"
+
+async def read_limitswitch(messenger: CanMessenger, node):
+    await messenger.send(node, ReadLimitSwitchRequest())
+    target = datetime.datetime.now()
+    try:
+        while True:
+            with WaitableCallback(messenger) as wc:
+                message, arb = await asyncio.wait_for(wc.read(), 1.0)
+                eppdata = str(message.payload.switch_status.value)
+                return eppdata
+    except Exception as errval:
+        #print("errval",errval)
+        return "None"
+        
+
+async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     # build a GPIO handler, which will automatically release estop
     # gpio = OT3GPIO(__name__)
@@ -371,6 +415,8 @@ async def  run(args: argparse.Namespace) -> None:
         node = NodeId.gripper_z   
     elif args.node == "gripper_g":
         node = NodeId.gripper_g   
+    elif args.node == "head":
+        node = NodeId.head
 
     driver = await build_driver(build_settings(args))
     messenger = CanMessenger(driver=driver)
@@ -421,13 +467,24 @@ async def  run(args: argparse.Namespace) -> None:
         print(f'READEPPROMGRP={serial_number2}')
     
     if args.write_epprom:
-        dataval = args.eppromdata
+        dataval = args.eppromdata.encode()
         try:
-            serial_number2 = await write_epprom(node,messenger, 0,dataval)
+            await write_epprom(node,messenger, 0,dataval)
             print(f'WRITEEPPOM=Pass')
-        except:
+        except Exception as errv:
             print(f'WRITEEPPOM=Fail')
-
+    if args.read_epprom_head:
+        dataval = args.eppromdata
+        serial_number = await read_epprom_head(node,messenger ,0,dataval)
+        print(f'READHEADEPPROM={serial_number}')
+    
+    if args.read_usag:
+        serial_version = await read_Usag(messenger, node)
+        
+        print(f'READUSAG={serial_version}')
+    if args.read_limitswitch:
+        serial_version = await read_limitswitch(messenger, node)
+        print(f'LIMITSWITCH={serial_version}')
 
 log = logging.getLogger(__name__)
 
@@ -492,7 +549,9 @@ def main() -> None:
     parser.add_argument("--jog", action="store_true")
     parser.add_argument("--read_epprom", action="store_true")
     parser.add_argument("--read_version", action="store_true")
+    parser.add_argument("--read_usag", action="store_true")
     parser.add_argument("--read_epprom_gripper", action="store_true")
+    parser.add_argument("--read_epprom_head", action="store_true")
     parser.add_argument("--home", action="store_true")
     parser.add_argument("--downward", action="store_true")
     parser.add_argument("--up", action="store_true")
