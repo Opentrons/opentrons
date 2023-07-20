@@ -9,11 +9,13 @@ ot_project := $(OPENTRONS_PROJECT)
 project_rs_default = $(if $(ot_project),$(ot_project),robot-stack)
 project_ot3_default = $(if $(ot_project),$(ot_project),ot3)
 
-sdist_file = dist/hardware_testing-0.0.1.tar.gz
-wheel_file = dist/hardware_testing-0.0.1-py3-none-any.whl
+package_name = hardware_testing
+package_version = $(call python_package_version,hardware-testing,$(project_ot3_default))
+wheel_file = dist/$(call python_get_wheelname,hardware-testing,$(project_rs_default),$(package_name),$(BUILD_NUMBER))
+sdist_file = dist/$(call python_get_sdistname,hardware-testing,$(project_ot3_default),$(package_name))
+usb_file =   dist/$(package_name)-usb-$(package_version).tar.gz
 # Find the branch, sha, version that will be used to update the VERSION.json file
-usb_fileversion_file = $(call python_get_git_version,hardware-testing,$(project_ot3_default),hardware-testing)
-usb_file = dist/hardware_testing_usb-0.0.1.tar.gz
+version_file = $(call python_get_git_version,hardware-testing,$(project_ot3_default),hardware-testing)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -56,21 +58,21 @@ teardown:
 clean:
 	$(clean_cmd)
 
-$(sdist_file): setup.py $(ot_sources) clean
-	$(python) setup.py sdist
-	$(SHX) rm -rf build
-	$(SHX) ls dist
-
-$(wheel_file): setup.py $(ot_sources) clean
-	$(python) setup.py bdist_wheel
+.PHONY: wheel
+wheel: export OPENTRONS_PROJECT=$(project_rs_default)
+wheel:
+	rm -rf dist/*.whl
+	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
 .PHONY: sdist
-sdist: $(sdist_file)
-
-.PHONY: wheel
-wheel: $(wheel_file)
+sdist: export OPENTRONS_PROJECT=$(project_ot3_default)
+sdist:
+	$(clean_cmd)
+	$(python) setup.py sdist
+	$(SHX) rm -rf build
+	$(SHX) ls dist
 
 .PHONY: test
 test:
@@ -172,7 +174,7 @@ restart:
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"opentrons-robot-server")
 
 .PHONY: push-no-restart
-push-no-restart:
+push-no-restart: wheel
 	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
 
 .PHONY: push
@@ -284,9 +286,6 @@ get-latest-tag:
 setup-usb-module: sdist Pipfile.lock
 	@echo "Creating hardware-testing USB package."
 
-	# Clean the old dir
-	rm -rf ./dist/hardware_testing_usb/
-
 	# create git-description
 	$(shell $(python) -c "from hardware_testing.data import *; create_git_description_file()")
 
@@ -297,8 +296,10 @@ setup-usb-module: sdist Pipfile.lock
 	cp -r ./hardware_testing/tools/usb-package/* ./dist/hardware_testing_usb/
 	cp -r ./hardware_testing/tools/plot ./dist/hardware_testing_usb/
 
-	# Create the usb-package tarbaltar
+	# Create the usb-package tar file
 	tar -zcvf $(usb_file) -C ./dist/ ./hardware_testing_usb/
+	rm -rf ./dist/hardware_testing_usb
+
 	# Lets extract the usb package to the usb device if given
 	$(if $(usb_dir), tar -xvf $(usb_file) -C $(usb_dir))
 
