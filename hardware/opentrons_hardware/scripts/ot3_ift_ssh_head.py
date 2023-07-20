@@ -27,7 +27,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     InstrumentInfoRequest,
     DeviceInfoRequest,
     GetMotorUsageRequest,
-    ReadLimitSwitchRequest
+    ReadLimitSwitchRequest,
+    AttachedToolsRequest
 )
 
 from opentrons_hardware.hardware_control.motion import (
@@ -391,6 +392,20 @@ async def read_limitswitch(messenger: CanMessenger, node):
         #print("errval",errval)
         return "None"
         
+async def read_detect(messenger: CanMessenger, node):
+    await messenger.send(node, AttachedToolsRequest())
+    target = datetime.datetime.now()
+    try:
+        while True:
+            with WaitableCallback(messenger) as wc:
+                message, arb = await asyncio.wait_for(wc.read(), 1.0)
+                z_ = str(message.payload.z_motor.value)
+                a_ = str(message.payload.a_motor.value)
+                gri = str(message.payload.gripper.value)
+                return z_,a_,gri
+    except Exception as errval:
+        #print("errval",errval)
+        return "None"
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
@@ -485,7 +500,9 @@ async def run(args: argparse.Namespace) -> None:
     if args.read_limitswitch:
         serial_version = await read_limitswitch(messenger, node)
         print(f'LIMITSWITCH={serial_version}')
-
+    if args.read_detect:
+        serial_version = await read_detect(messenger, node)
+        print(f'DETECT={serial_version}')
 log = logging.getLogger(__name__)
 
 LOG_CONFIG = {
