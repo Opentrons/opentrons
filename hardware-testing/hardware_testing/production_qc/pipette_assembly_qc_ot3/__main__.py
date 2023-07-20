@@ -3,6 +3,7 @@ import argparse
 import asyncio
 from dataclasses import dataclass, fields
 import os
+from pathlib import Path
 from time import time
 from typing import Optional, Callable, List, Any, Tuple, Dict
 from typing_extensions import Final
@@ -140,17 +141,17 @@ HUMIDITY_THRESH = [10, 90]
 
 # THRESHOLDS: capacitive sensor
 CAP_THRESH_OPEN_AIR = {
-    1: [1.0, 8.0],
+    1: [3.0, 6.0],
     8: [5.0, 20.0],
     96: [0.0, 10.0],
 }
 CAP_THRESH_PROBE = {
-    1: [1.0, 10.0],
+    1: [4.0, 7.0],
     8: [5.0, 20.0],
     96: [0.0, 20.0],
 }
 CAP_THRESH_SQUARE = {
-    1: [0.0, 1000.0],
+    1: [7.0, 15.0],
     8: [0.0, 1000.0],
     96: [0.0, 1000.0],
 }
@@ -164,11 +165,10 @@ CAP_PROBE_SETTINGS = CapacitivePassSettings(
 )
 
 # THRESHOLDS: air-pressure sensor
-PRESSURE_ASPIRATE_VOL = {50: 10.0, 1000: 100.0}
-PRESSURE_MAX_VALUE_ABS = 7500
-PRESSURE_THRESH_OPEN_AIR = [-300, 300]
-PRESSURE_THRESH_SEALED = [-1000, 1000]
-PRESSURE_THRESH_COMPRESS = [-PRESSURE_MAX_VALUE_ABS, PRESSURE_MAX_VALUE_ABS]
+PRESSURE_ASPIRATE_VOL = {50: 10.0, 1000: 20.0}
+PRESSURE_THRESH_OPEN_AIR = [-10, 10]
+PRESSURE_THRESH_SEALED = [-10, 10]
+PRESSURE_THRESH_COMPRESS = [-2600, 1600]
 
 
 def _bool_to_pass_fail(result: bool) -> str:
@@ -1183,7 +1183,7 @@ def _create_csv_and_get_callbacks(
     pipette_sn: str,
 ) -> Tuple[CSVProperties, CSVCallbacks]:
     run_id = data.create_run_id()
-    test_name = data.create_test_name_from_file(__file__)
+    test_name = Path(__file__).parent.name.replace("_", "-")
     folder_path = data.create_folder_for_test_data(test_name)
     file_name = data.create_file_name(test_name, run_id, pipette_sn)
     csv_display_name = os.path.join(folder_path, file_name)
@@ -1336,10 +1336,11 @@ async def _main(test_config: TestConfig) -> None:
 
         if not test_config.skip_plunger or not test_config.skip_diagnostics:
             print("moving over slot 3")
-            pos_slot_2 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
+            pos_slot_3 = helpers_ot3.get_slot_calibration_square_position_ot3(3)
             current_pos = await api.gantry_position(mount)
-            hover_over_slot_2 = pos_slot_2._replace(z=current_pos.z)
-            await api.move_to(mount, hover_over_slot_2)
+            hover_over_slot_3 = pos_slot_3._replace(z=current_pos.z)
+            await api.move_to(mount, hover_over_slot_3)
+            await api.move_rel(mount, Point(z=-20))
             if not test_config.skip_diagnostics:
                 test_passed = await _test_diagnostics(api, mount, csv_cb.write)
                 csv_cb.results("diagnostics", test_passed)
