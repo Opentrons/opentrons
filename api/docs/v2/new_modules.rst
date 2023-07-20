@@ -12,7 +12,7 @@ Powered modules include the :ref:`Temperature Module <temperature-module>`, :ref
 
 .. Note::
     
-    Most of the following code examples use alphanumeric Flex deck slot locations (e.g. ``D1``, ``D2``, etc.). If you have an OT-2, replace the Flex deck slot coordinate with its OT-2 equivalent. For example, Flex slot D1 corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
+    Most of the following code examples use alphanumeric Flex deck slot locations (e.g. ``D1``, ``D2``, etc.). If you have an OT-2 and are using API version 2.14 or earlier, replace the Flex deck slot coordinate with its OT-2 equivalent. For example, Flex slot D1 corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
 
 ************
 Module Setup
@@ -133,8 +133,12 @@ It's your responsibility to ensure the labware and module combinations you load 
 Additional Labware Parameters
 -----------------------------
 
-In addition to the mandatory ``load_name`` argument, you can also specify additional parameters. If you specify a ``label``, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify ``version`` and ``namespace`` (though most of the time you won't have to). See :py:meth:`.MagneticModuleContext.load_labware`, :py:meth:`.TemperatureModuleContext.load_labware`, :py:meth:`.ThermocyclerContext.load_labware`, or :py:meth:`.HeaterShakerContext.load_labware` for details.
+In addition to the mandatory ``load_name`` argument, you can also specify additional parameters. If you specify a ``label``, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify ``version`` and ``namespace`` (though most of the time you won't have to). Modules with methods that accept additional parameters include:
 
+- :py:meth:`.MagneticModuleContext.load_labware`
+- :py:meth:`.TemperatureModuleContext.load_labware`
+- :py:meth:`.ThermocyclerContext.load_labware`
+- :py:meth:`.HeaterShakerContext.load_labware`
 
 .. _temperature-module:
 
