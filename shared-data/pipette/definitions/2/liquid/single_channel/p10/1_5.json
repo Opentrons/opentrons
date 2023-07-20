@@ -28,7 +28,8 @@
       },
       "dispense": {
         "default": {
-          "1": [[12.5135, 0.0, 0.7945]]}
+          "1": [[12.5135, 0.0, 0.7945]]
+        }
       },
       "defaultTipOverlapDictionary": {
         "default": 3.29,

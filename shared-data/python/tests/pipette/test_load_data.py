@@ -1,6 +1,10 @@
 import pytest
-from typing import Dict, Any
-from opentrons_shared_data.pipette import load_data, pipette_load_name_conversions
+from typing import Dict, Any, cast
+from opentrons_shared_data.pipette import (
+    load_data,
+    pipette_load_name_conversions,
+    dev_types,
+)
 from opentrons_shared_data.pipette.types import (
     PipetteChannelType,
     PipetteModelType,
@@ -73,7 +77,9 @@ def test_update_pipette_configuration(
     pipette_model: str, v1_configuration_changes: Dict[str, Any]
 ) -> None:
 
-    model_name = pipette_load_name_conversions.convert_pipette_model(pipette_model)
+    model_name = pipette_load_name_conversions.convert_pipette_model(
+        cast(dev_types.PipetteModel, pipette_model)
+    )
     base_configurations = load_data.load_definition(
         model_name.pipette_type, model_name.pipette_channels, model_name.pipette_version
     )

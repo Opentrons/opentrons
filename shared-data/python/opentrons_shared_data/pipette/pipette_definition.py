@@ -53,11 +53,14 @@ class FlowRateDefinition(BaseModel):
         ..., description="flow rates keyed by API level.", alias="valuesByApiLevel"
     )
 
+
 PipetteFunctionKeyType = Literal["1", "2", "3"]
 ulPerMMType = Dict[PipetteFunctionKeyType, List[Tuple[float, float, float]]]
 
+
 class ulPerMMDefinition(BaseModel):
     default: ulPerMMType
+
 
 class SupportedTipsDefinition(BaseModel):
     """Tip parameters available for every tip size."""

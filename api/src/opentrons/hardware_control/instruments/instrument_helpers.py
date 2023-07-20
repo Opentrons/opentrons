@@ -1,7 +1,9 @@
 from typing import List, Tuple
 
-PIPETTING_FUNCTION_FALLBACK_VERSION = "1"
-PIPETTING_FUNCTION_LATEST_VERSION = "2"
+from opentrons_shared_data.pipette.pipette_definition import PipetteFunctionKeyType
+
+PIPETTING_FUNCTION_FALLBACK_VERSION: PipetteFunctionKeyType = "1"
+PIPETTING_FUNCTION_LATEST_VERSION: PipetteFunctionKeyType = "2"
 
 
 def piecewise_volume_conversion(
