@@ -1,5 +1,6 @@
 from typing import List, Dict, Tuple, Optional
 from pydantic import BaseModel, Field, validator
+from typing_extensions import Literal
 from dataclasses import dataclass
 
 from . import types as pip_types, dev_types
@@ -52,6 +53,11 @@ class FlowRateDefinition(BaseModel):
         ..., description="flow rates keyed by API level.", alias="valuesByApiLevel"
     )
 
+PipetteFunctionKeyType = Literal["1", "2", "3"]
+ulPerMMType = Dict[PipetteFunctionKeyType, List[Tuple[float, float, float]]]
+
+class ulPerMMDefinition(BaseModel):
+    default: ulPerMMType
 
 class SupportedTipsDefinition(BaseModel):
     """Tip parameters available for every tip size."""
@@ -81,10 +87,10 @@ class SupportedTipsDefinition(BaseModel):
         description="The height to return a tip to its tiprack.",
         alias="defaultReturnTipHeight",
     )
-    aspirate: Dict[str, List[Tuple[float, float, float]]] = Field(
+    aspirate: ulPerMMDefinition = Field(
         ..., description="The default pipetting functions list for aspirate."
     )
-    dispense: Dict[str, List[Tuple[float, float, float]]] = Field(
+    dispense: ulPerMMDefinition = Field(
         ..., description="The default pipetting functions list for dispensing."
     )
     default_blowout_volume: Optional[float] = Field(

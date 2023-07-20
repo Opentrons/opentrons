@@ -6,6 +6,7 @@ from typing_extensions import Final
 
 from opentrons.types import Point
 
+from opentrons.config import feature_flags as ff
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
     PlungerPositions,
@@ -15,7 +16,12 @@ from opentrons_shared_data.pipette.pipette_definition import (
     PipetteNameType,
     PipetteModelVersionType,
 )
-from ..instrument_abc import AbstractInstrument, piecewise_volume_conversion
+from ..instrument_abc import AbstractInstrument
+from ..instrument_helpers import (
+    piecewise_volume_conversion,
+    PIPETTING_FUNCTION_FALLBACK_VERSION,
+    PIPETTING_FUNCTION_LATEST_VERSION,
+)
 from .instrument_calibration import (
     save_pipette_offset_calibration,
     load_pipette_offset,
@@ -121,6 +127,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
 
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
+
+        if ff.use_old_aspiration_functions():
+            self._pipetting_function_version = PIPETTING_FUNCTION_FALLBACK_VERSION
+        else:
+            self._pipetting_function_version = PIPETTING_FUNCTION_LATEST_VERSION
 
     @property
     def config(self) -> PipetteConfigurations:
@@ -468,15 +479,23 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     # Cache max is chosen somewhat arbitrarily. With a float is input we don't
     # want this to unbounded.
     @functools.lru_cache(maxsize=100)
-    def ul_per_mm(
-        self, ul: float, action: UlPerMmAction, specific_tip: str = "default"
-    ) -> float:
+    def ul_per_mm(self, ul: float, action: UlPerMmAction) -> float:
         if action == "aspirate":
-            sequence = self._active_tip_settings.aspirate[specific_tip]
+            fallback = self._active_tip_settings.aspirate.default[
+                PIPETTING_FUNCTION_FALLBACK_VERSION
+            ]
+            sequence = self._active_tip_settings.aspirate.default.get(
+                self._pipetting_function_version, fallback
+            )
         elif action == "blowout":
             return self._config.shaft_ul_per_mm
         else:
-            sequence = self._active_tip_settings.dispense[specific_tip]
+            fallback = self._active_tip_settings.dispense.default[
+                PIPETTING_FUNCTION_FALLBACK_VERSION
+            ]
+            sequence = self._active_tip_settings.dispense.default.get(
+                self._pipetting_function_version, fallback
+            )
         return piecewise_volume_conversion(ul, sequence)
 
     def __str__(self) -> str:
