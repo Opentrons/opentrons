@@ -26,11 +26,11 @@ const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
 export function EmergencyStop(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
-  const estopStatus = useEstopQuery({
+  const { data: estopStatus } = useEstopQuery({
     refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL_MS,
   })
-  console.log(estopStatus?.data?.status)
-  const isEstopConnected = estopStatus?.data?.status !== 'notPresent'
+  console.log(estopStatus?.status)
+  const isEstopConnected = estopStatus?.status !== 'notPresent'
 
   return (
     <>
