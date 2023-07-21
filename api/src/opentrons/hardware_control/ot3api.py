@@ -1669,17 +1669,15 @@ class OT3API(
                 GantryLoad.HIGH_THROUGHPUT
             ][OT3AxisKind.Q]
 
-            gear_pos_float = gear_start_position = axis_convert(
-                self._backend.gear_motor_position, 0.0
-            )[Axis.P_L]
+            gear_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
+                Axis.P_L
+            ]
             gear_pos_dict = {Axis.Q: gear_pos_float}
             fast_home_target = {Axis.Q: self._config.safe_home_distance}
 
             fast_home_moves = self._build_moves(gear_pos_dict, fast_home_target)
             # move toward home until a safe distance
-            await self._backend.tip_action(
-                moves=fast_home_moves[0], tip_action="clamp"
-            )
+            await self._backend.tip_action(moves=fast_home_moves[0], tip_action="clamp")
             # move the rest of the way home with no acceleration
             await self._backend.tip_action(
                 distance=(self._config.safe_home_distance + pipette_spec.home_buffer),
@@ -1770,9 +1768,9 @@ class OT3API(
                     GantryLoad.HIGH_THROUGHPUT
                 ][OT3AxisKind.Q]
 
-                gear_pos_float = gear_start_position = axis_convert(
-                    self._backend.gear_motor_position, 0.0
-                )[Axis.P_L]
+                gear_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
+                    Axis.P_L
+                ]
                 gear_pos_dict = {Axis.Q: gear_pos_float}
                 fast_home_target = {Axis.Q: self._config.safe_home_distance}
 

@@ -187,9 +187,7 @@ class MoveGroupRunner:
                         & MotorPositionFlags.encoder_position_ok.value
                     ),
                 )
-                return {
-                    arbid.parts.originating_node_id: gear_position_response
-                }
+                return {arbid.parts.originating_node_id: gear_position_response}
             else:
                 position[NodeId(arbid.parts.originating_node_id)].append(
                     (

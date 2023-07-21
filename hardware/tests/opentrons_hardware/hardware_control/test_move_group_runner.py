@@ -1137,8 +1137,6 @@ def test_accumulate_move_completions(
     position_map: NodeMap[Tuple[float, float, bool, bool]],
 ) -> None:
     """Build correct move results."""
-    # assert MoveGroupRunner._accumulate_move_completions(completions) == position_map
-    c = MoveGroupRunner._accumulate_move_completions(completions)
     assert MoveGroupRunner._accumulate_move_completions(completions) == position_map
 
 
