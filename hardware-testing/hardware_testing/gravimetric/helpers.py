@@ -361,7 +361,7 @@ def _load_tipracks(
     loaded_labwares = ctx.loaded_labwares
     pre_loaded_tips: List[Labware] = []
     for ls in tiprack_load_settings:
-        if (ls[0] in loaded_labwares.keys() and loaded_labwares[ls[0]].name == ls[1]):
+        if ls[0] in loaded_labwares.keys() and loaded_labwares[ls[0]].name == ls[1]:
             pre_loaded_tips.append(loaded_labwares[ls[0]])
     if len(pre_loaded_tips) == len(tiprack_load_settings):
         return pre_loaded_tips
