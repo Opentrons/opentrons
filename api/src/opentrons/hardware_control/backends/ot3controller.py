@@ -67,6 +67,11 @@ from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
 )
+from opentrons_hardware.hardware_control.estop.detector import (
+    EstopDetector,
+)
+
+from opentrons.hardware_control.estop_state import EstopStateMachine
 
 from opentrons_hardware.hardware_control.motor_enable_disable import (
     set_enable_motor,
@@ -157,7 +162,7 @@ from .subsystem_manager import SubsystemManager
 
 if TYPE_CHECKING:
     from ..dev_types import (
-        OT3AttachedPipette,
+        AttachedPipette,
         AttachedGripper,
         OT3AttachedInstruments,
     )
@@ -249,6 +254,8 @@ class OT3Controller:
             network.NetworkInfo(self._messenger, self._usb_messenger),
             FirmwareUpdate(),
         )
+        self._estop_detector: Optional[EstopDetector] = None
+        self._estop_state_machine = EstopStateMachine(detector=None)
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
@@ -691,7 +698,7 @@ class OT3Controller:
     @staticmethod
     def _build_attached_pip(
         attached: ohc_tool_types.PipetteInformation, mount: OT3Mount
-    ) -> OT3AttachedPipette:
+    ) -> AttachedPipette:
         if attached.name == FirmwarePipetteName.unknown:
             raise InvalidPipetteName(name=attached.name_int, mount=mount)
         try:
@@ -1158,3 +1165,18 @@ class OT3Controller:
 
     def status_bar_interface(self) -> status_bar.StatusBar:
         return self._status_bar
+
+    async def build_estop_detector(self) -> bool:
+        """Must be called to set up the estop detector & state machine."""
+        if self._drivers.usb_messenger is None:
+            return False
+        self._estop_detector = await EstopDetector.build(
+            usb_messenger=self._drivers.usb_messenger
+        )
+        self._estop_state_machine.subscribe_to_detector(self._estop_detector)
+        return True
+
+    @property
+    def estop_state_machine(self) -> EstopStateMachine:
+        """Accessor for the API to get the state machine, if it exists."""
+        return self._estop_state_machine

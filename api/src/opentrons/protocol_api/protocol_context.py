@@ -529,8 +529,6 @@ class ProtocolContext(CommandPublisher):
         labware: Labware,
         new_location: Union[DeckLocation, Labware, ModuleTypes, OffDeckType],
         use_gripper: bool = False,
-        use_pick_up_location_lpc_offset: bool = False,
-        use_drop_location_lpc_offset: bool = False,
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
@@ -600,8 +598,6 @@ class ProtocolContext(CommandPublisher):
             labware_core=labware._core,
             new_location=location,
             use_gripper=use_gripper,
-            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
-            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )
@@ -648,14 +644,18 @@ class ProtocolContext(CommandPublisher):
 
         :type location: str or int or None
         :returns: The loaded and initialized module---a
-                  :py:class:`TemperatureModuleContext`,
-                  :py:class:`MagneticModuleContext`,
-                  :py:class:`ThermocyclerContext`, or
                   :py:class:`HeaterShakerContext`,
+                  :py:class:`MagneticBlockContext`,
+                  :py:class:`MagneticModuleContext`,
+                  :py:class:`TemperatureModuleContext`, or
+                  :py:class:`ThermocyclerContext`,
                   depending on what you requested with ``module_name``.
 
+                  .. versionchanged:: 2.13
+                    Added ``HeaterShakerContext`` return value.
+
                   .. versionchanged:: 2.15
-                    Added :py:class:`MagneticBlockContext` return value.
+                    Added ``MagneticBlockContext`` return value.
         """
         if configuration:
             if self._api_version < APIVersion(2, 4):

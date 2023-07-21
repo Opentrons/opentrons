@@ -14,7 +14,7 @@ from opentrons.protocol_engine.types import (
     LoadedLabware,
     LabwareMovementStrategy,
     LabwareOffsetVector,
-    ExperimentalOffsetData,
+    LabwareMovementOffsetData,
 )
 from opentrons.protocol_engine.state import StateView
 from opentrons.protocol_engine.commands.move_labware import (
@@ -183,7 +183,6 @@ async def test_gripper_move_labware_implementation(
         labwareId="my-cool-labware-id",
         newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         strategy=LabwareMovementStrategy.USING_GRIPPER,
-        usePickUpLocationLpcOffset=True,
         pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
@@ -224,10 +223,7 @@ async def test_gripper_move_labware_implementation(
             labware_id="my-cool-labware-id",
             current_location=validated_from_location,
             new_location=validated_new_location,
-            new_offset_id="wowzers-a-new-offset-id",
-            experimental_offset_data=ExperimentalOffsetData(
-                usePickUpLocationLpcOffset=True,
-                useDropLocationLpcOffset=False,
+            user_offset_data=LabwareMovementOffsetData(
                 pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
                 dropOffset=None,
             ),

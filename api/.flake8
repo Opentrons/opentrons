@@ -41,9 +41,7 @@ per-file-ignores =
     src/opentrons/system/*:ANN,D
     src/opentrons/tools/*:ANN,D
     src/opentrons/util/*:ANN,D
-    tests/opentrons/test_execute.py:ANN,D
     tests/opentrons/test_init.py:ANN,D
-    tests/opentrons/test_simulate.py:ANN,D
     tests/opentrons/test_types.py:ANN,D
     tests/opentrons/conftest.py:ANN,D
     tests/opentrons/broker/*:ANN,D
