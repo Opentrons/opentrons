@@ -32,13 +32,12 @@ export function UpdateInProgressModal(
   return (
     <Modal>
       <Flex
-        height="12.5rem"
+        height="17.25rem"
         width="100%"
         backgroundColor={COLORS.darkBlack20}
         borderRadius={BORDERS.borderRadiusSize3}
         flexDirection={DIRECTION_COLUMN}
-        color={COLORS.darkBlack90}
-        padding={SPACING.spacing24}
+        padding={SPACING.spacing32}
         justifyContent={ALIGN_CENTER}
         alignItems={ALIGN_CENTER}
         gridGap={SPACING.spacing40}

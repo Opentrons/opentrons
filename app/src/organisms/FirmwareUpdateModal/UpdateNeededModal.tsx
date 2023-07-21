@@ -58,8 +58,8 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
 
   let modalContent = (
     <Modal header={updateNeededHeader}>
-      <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing80}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
+        <StyledText as="p" marginBottom={SPACING.spacing60}>
           <Trans
             t={t}
             i18nKey="firmware_out_of_date"

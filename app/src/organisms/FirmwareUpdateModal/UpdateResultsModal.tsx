@@ -15,8 +15,8 @@ import { SmallButton } from '../../atoms/buttons'
 import { StyledText } from '../../atoms/text'
 import { Modal } from '../../molecules/Modal'
 
-import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 import type { InstrumentData } from '@opentrons/api-client'
+import type { ModalHeaderBaseProps } from '../../molecules/Modal/types'
 
 interface UpdateResultsModalProps {
   isSuccess: boolean
@@ -55,13 +55,13 @@ export function UpdateResultsModal(
         <Modal>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacing40}
+            gridGap={SPACING.spacing32}
             alignItems={ALIGN_CENTER}
             width="100%"
             justifyContent={ALIGN_CENTER}
           >
             <Flex
-              height="12.5rem"
+              height="11.5rem"
               width="100%"
               backgroundColor={COLORS.green3}
               borderRadius={BORDERS.borderRadiusSize3}

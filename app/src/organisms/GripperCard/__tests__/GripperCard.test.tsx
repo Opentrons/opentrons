@@ -1,13 +1,13 @@
 import * as React from 'react'
+import { resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { fireEvent } from '@testing-library/react'
-import { resetAllWhenMocks } from 'jest-when'
 import { i18n } from '../../../i18n'
 import { Banner } from '../../../atoms/Banner'
 import { GripperWizardFlows } from '../../GripperWizardFlows'
 import { AboutGripperSlideout } from '../AboutGripperSlideout'
 import { GripperCard } from '../'
-import { GripperData } from '@opentrons/api-client'
+import type { GripperData } from '@opentrons/api-client'
 
 jest.mock('../../../atoms/Banner')
 jest.mock('../../GripperWizardFlows')
@@ -89,9 +89,9 @@ describe('GripperCard', () => {
     const overflowButton = getByRole('button', {
       name: /overflow/i,
     })
-    fireEvent.click(overflowButton)
+    overflowButton.click()
     const aboutGripperButton = getByText('About gripper')
-    fireEvent.click(aboutGripperButton)
+    aboutGripperButton.click()
     getByText('about gripper')
   })
   it('renders wizard flow when recalibrate button is pressed', () => {
@@ -99,9 +99,9 @@ describe('GripperCard', () => {
     const overflowButton = getByRole('button', {
       name: /overflow/i,
     })
-    fireEvent.click(overflowButton)
+    overflowButton.click()
     const recalibrateGripperButton = getByText('Recalibrate gripper')
-    fireEvent.click(recalibrateGripperButton)
+    recalibrateGripperButton.click()
     getByText('wizard flow launched')
   })
   it('renders wizard flow when detach button is pressed', () => {
@@ -109,9 +109,9 @@ describe('GripperCard', () => {
     const overflowButton = getByRole('button', {
       name: /InstrumentCard_overflowMenu/i,
     })
-    fireEvent.click(overflowButton)
+    overflowButton.click()
     const detachGripperButton = getByText('Detach gripper')
-    fireEvent.click(detachGripperButton)
+    detachGripperButton.click()
     getByText('wizard flow launched')
   })
   it('renders wizard flow when attach button is pressed', () => {
@@ -123,9 +123,9 @@ describe('GripperCard', () => {
     const overflowButton = getByRole('button', {
       name: /overflow/i,
     })
-    fireEvent.click(overflowButton)
+    overflowButton.click()
     const attachGripperButton = getByText('Attach gripper')
-    fireEvent.click(attachGripperButton)
+    attachGripperButton.click()
     getByText('wizard flow launched')
   })
 })

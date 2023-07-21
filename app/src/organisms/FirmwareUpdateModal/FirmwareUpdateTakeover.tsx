@@ -5,13 +5,15 @@ import {
 } from '@opentrons/react-api-client'
 import { UpdateNeededModal } from './UpdateNeededModal'
 
+const INSTRUMENT_POLL_INTERVAL = 5000
+
 export function FirmwareUpdateTakeover(): JSX.Element {
   const [
     showUpdateNeededModal,
     setShowUpdateNeededModal,
   ] = React.useState<boolean>(false)
   const instrumentsData = useInstrumentsQuery({
-    refetchInterval: 5000,
+    refetchInterval: INSTRUMENT_POLL_INTERVAL,
   }).data?.data
   const { data: maintenanceRunData } = useCurrentMaintenanceRun()
   const subsystemUpdateInstrument = instrumentsData?.find(
@@ -26,12 +28,12 @@ export function FirmwareUpdateTakeover(): JSX.Element {
 
   return (
     <>
-      {subsystemUpdateInstrument != null && showUpdateNeededModal && (
+      {subsystemUpdateInstrument != null && showUpdateNeededModal ? (
         <UpdateNeededModal
           subsystem={subsystemUpdateInstrument.subsystem}
           setShowUpdateModal={setShowUpdateNeededModal}
         />
-      )}
+      ) : null}
     </>
   )
 }

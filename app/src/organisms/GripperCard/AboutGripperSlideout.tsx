@@ -64,7 +64,7 @@ export const AboutGripperSlideout = (
           color={COLORS.darkGreyEnabled}
           textTransform={TYPOGRAPHY.textTransformUppercase}
         >
-          {t('serial_number')}
+          {i18n.format(t('serial_number'), 'upperCase')}
         </StyledText>
         <StyledText as="p" paddingTop={SPACING.spacing4}>
           {serialNumber}
