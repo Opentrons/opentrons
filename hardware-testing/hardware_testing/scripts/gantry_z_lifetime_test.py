@@ -11,6 +11,7 @@ from hardware_testing import data
 from hardware_testing.opentrons_api.types import GantryLoad, OT3Mount, OT3Axis, Point
 
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
 def convert(seconds):
     weeks, seconds = divmod(seconds, 7*24*60*60)
@@ -94,32 +95,32 @@ async def _bowtie_move(api, homed_position_left: types.Point, homed_position_rig
                     ###input("\t>>")
                     # multi_pos = await helpers_ot3.jog_mount_ot3(api, low_tp_points[key][1])
                     # print(f"Multi position: {multi_pos}\n")
-                except RuntimeError as e:
-                    if "collision_detected" in str(e):
-                        print("--STALL DETECTED--\n")
-                        print(f"Axis/Axes stalled: {low_tp_points[key][2]}\n")
-                        stall_count += 1
-                        if low_tp_points[key][1] == OT3Mount.LEFT:
-                            STALL_AXIS = OT3Axis.Z_L
-                            z_l_count += 1
-                        else:
-                            STALL_AXIS = OT3Axis.Z_R
-                            z_r_count += 1
-                        print("------HOMING------\n")
-                        if 'X' in low_tp_points[key][2]:
-                            await api.home()
-                            xy_count += 1
-                        elif low_tp_points[key][2] == 'Y':
-                            await api.home([OT3Axis.Y])
-                            y_count += 1
-                        elif 'Z' in low_tp_points[key][2]:
-                            await api.home([STALL_AXIS])
+                except StallOrCollisionDetectedError: # except RuntimeError as e:
+                    # if "collision_detected" in str(e):
+                    print("--STALL DETECTED--\n")
+                    print(f"Axis/Axes stalled: {low_tp_points[key][2]}\n")
+                    stall_count += 1
+                    if low_tp_points[key][1] == OT3Mount.LEFT:
+                        STALL_AXIS = OT3Axis.Z_L
+                        z_l_count += 1
+                    else:
+                        STALL_AXIS = OT3Axis.Z_R
+                        z_r_count += 1
+                    print("------HOMING------\n")
+                    if 'X' in low_tp_points[key][2]:
+                        await api.home()
+                        xy_count += 1
+                    elif low_tp_points[key][2] == 'Y':
+                        await api.home([OT3Axis.Y])
+                        y_count += 1
+                    elif 'Z' in low_tp_points[key][2]:
+                        await api.home([STALL_AXIS])
 
-                        print(f"Total stalls for this cycle: {stall_count} (XY: {xy_count}, Y: {y_count}, Z_L: {z_l_count}, Z_R: {z_r_count})\n")
-                        # await api.home()
-                        home_z_pos = await api.current_position_ot3(low_tp_points[key][1], refresh=True)
-                        await api.move_to(low_tp_points[key][1], Point(low_tp_points[key][0][0], low_tp_points[key][0][1], home_z_pos[STALL_AXIS]))
-                        await api.move_to(low_tp_points[key][1], low_tp_points[key][0])
+                    print(f"Total stalls for this cycle: {stall_count} (XY: {xy_count}, Y: {y_count}, Z_L: {z_l_count}, Z_R: {z_r_count})\n")
+                    # await api.home()
+                    home_z_pos = await api.current_position_ot3(low_tp_points[key][1], refresh=True)
+                    await api.move_to(low_tp_points[key][1], Point(low_tp_points[key][0][0], low_tp_points[key][0][1], home_z_pos[STALL_AXIS]))
+                    await api.move_to(low_tp_points[key][1], low_tp_points[key][0])
 
             else:
                 print(f">> {key} <<\n")
