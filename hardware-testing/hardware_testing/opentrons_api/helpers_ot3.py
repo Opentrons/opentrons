@@ -450,7 +450,7 @@ async def move_tip_motor_relative_ot3(
     current_gear_pos_dict = {Axis.Q: current_gear_pos_float}
     target_pos_dict = {Axis.Q: current_gear_pos_float + distance}
 
-    if distance < 0:
+    if speed is not None and distance < 0:
         speed *= -1
 
     tip_motor_move = api._build_moves(current_gear_pos_dict, target_pos_dict, speed)
