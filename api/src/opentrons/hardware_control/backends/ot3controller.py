@@ -197,7 +197,7 @@ def requires_estop(func: Wrapped) -> Wrapped:
     @wraps(func)
     async def wrapper(self: OT3Controller, *args: Any, **kwargs: Any) -> Any:
         state = self._estop_state_machine.state
-        if state == EstopState.NOT_PRESENT:
+        if state == EstopState.NOT_PRESENT and ff.require_estop():
             raise EStopNotPresentError(
                 message="An Estop must be plugged in to move the robot."
             )

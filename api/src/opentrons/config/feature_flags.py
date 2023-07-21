@@ -48,3 +48,8 @@ def overpressure_detection_enabled() -> bool:
 def status_bar_enabled() -> bool:
     """Whether the status bar is enabled."""
     return not advs.get_setting_with_env_overload("disableStatusBar")
+
+
+def require_estop() -> bool:
+    """Whether the OT3 should allow gantry movements with no Estop plugged in."""
+    return not advs.get_setting_with_env_overload("estopNotRequired")
