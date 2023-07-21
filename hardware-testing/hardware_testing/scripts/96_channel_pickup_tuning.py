@@ -242,7 +242,7 @@ async def calibrate_tiprack(api, home_position, mount):
                     slot_loc[args.tiprack_slot][0],
                     slot_loc[args.tiprack_slot][1],
                     home_position[Axis.by_mount(mount)])
-    print("Move to Tiprack")
+    print("Calibrate for Pick up tip")
     await move_to_point(api, mount, tiprack_loc, cp)
     current_position = await api.current_position_ot3(mount, cp)
     tiprack_loc = await jog(api, current_position, cp)
@@ -255,11 +255,16 @@ async def calibrate_tiprack(api, home_position, mount):
     await api.home_z(mount)
     cp = CriticalPoint.TIP
     home_with_tip = await api.current_position(mount, cp)
+    print("Calibrate Drop Tip Position")
     drop_tip_loc = await jog(api, home_with_tip, cp)
     drop_tip_loc = Point(drop_tip_loc[Axis.X],
                         drop_tip_loc[Axis.Y],
                         drop_tip_loc[Axis.by_mount(mount)])
-    #await api.drop_tip(mount)
+    await update_pick_up_current(hw_api, mount, 1.5)
+    await update_pick_up_speed(hw_api, mount, pick_up_speed)
+    input("Press Enter to drop tip")
+    await api.drop_tip(mount)
+    input(" Press enter ")
     return tiprack_loc, drop_tip_loc
 
 async def _main() -> None:
@@ -288,7 +293,6 @@ async def _main() -> None:
                                                 args.mount_speed,
                                                 today.strftime("%b-%d-%Y"))
     liquid_probe_settings = LiquidProbeSettings(
-                                                starting_mount_height = 10,
                                                 max_z_distance = args.max_z_distance,
                                                 min_z_distance = args.min_z_distance,
                                                 mount_speed = args.mount_speed,
@@ -313,7 +317,7 @@ async def _main() -> None:
     pick_up_speed = float(input("pick up tip speed in mm/s: "))
     await update_pick_up_current(hw_api, mount, m_current)
     await update_pick_up_speed(hw_api, mount, pick_up_speed)
-    await update_pick_up_distance(hw_api, mount, 16.5)
+    await update_pick_up_distance(hw_api, mount, 20.0)
     # Calibrate to tiprack
     if args.tiprack:
         pickup_loc, droptip_loc = await calibrate_tiprack(hw_api, home_position, mount)
