@@ -394,6 +394,7 @@ export function ProtocolDetails(
               css={TYPOGRAPHY.h2SemiBold}
               marginBottom={SPACING.spacing16}
               data-testid={`ProtocolDetails_${protocolDisplayName}`}
+              overflowWrap="anywhere"
             >
               {protocolDisplayName}
             </StyledText>
