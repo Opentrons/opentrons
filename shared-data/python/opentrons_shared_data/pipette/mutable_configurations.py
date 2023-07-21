@@ -4,7 +4,7 @@ import re
 from pathlib import Path
 from typing import Optional, List, Dict, Any, cast
 
-from .pipette_definition import PipetteConfigurations
+from .pipette_definition import PipetteConfigurations, PipetteModelVersionType
 from .model_constants import (
     MUTABLE_CONFIGS_V1,
     VALID_QUIRKS,
@@ -13,7 +13,6 @@ from .model_constants import (
     _TYPE_LOOKUP,
     _UNITS_LOOKUP,
 )
-from .pipette_load_name_conversions import PipetteModelVersionType
 from .load_data import load_definition, load_serial_lookup_table
 from .types import MutableConfig, Quirks, QuirkConfig, TypeOverrides, OverrideType
 from .pipette_load_name_conversions import (
@@ -66,7 +65,9 @@ def _migrate_to_v2_configurations(
             elif isinstance(v, MutableConfig):
                 # isinstances are needed for type checking.
                 dict_of_base_model[top_name][nested_name] = v.value
-    dict_of_base_model["quirks"] = quirks_list
+    dict_of_base_model["quirks"] = list(
+        set(dict_of_base_model["quirks"]).union(set(quirks_list))
+    )
 
     # re-serialization is not great for this nested enum so we need
     # to perform this workaround.
@@ -250,7 +251,6 @@ def load_with_mutable_configurations(
             base_configurations = _migrate_to_v2_configurations(
                 base_configurations, override
             )
-
     # the ulPerMm functions are structured in pipetteModelSpecs.json as
     # a list sorted from oldest to newest. That means the latest functions
     # are always the last element and, as of right now, the older ones are

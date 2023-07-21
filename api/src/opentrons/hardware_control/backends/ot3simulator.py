@@ -75,7 +75,7 @@ from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
     PipetteSpec,
     GripperSpec,
-    OT3AttachedPipette,
+    AttachedPipette,
     AttachedGripper,
     OT3AttachedInstruments,
 )
@@ -408,7 +408,7 @@ class OT3Simulator:
         mount: OT3Mount,
         init_instr: PipetteSpec,
         expected_instr: Optional[PipetteName],
-    ) -> OT3AttachedPipette:
+    ) -> AttachedPipette:
         found_model = init_instr["model"]
 
         # TODO (lc 12-05-2022) When the time comes, we should think about supporting

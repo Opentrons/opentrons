@@ -134,7 +134,7 @@ from .motion_utilities import (
 
 from .dev_types import (
     AttachedGripper,
-    OT3AttachedPipette,
+    AttachedPipette,
     PipetteDict,
     InstrumentDict,
     GripperDict,
@@ -498,14 +498,14 @@ class OT3API(
         left = self._pipette_handler.has_pipette(OT3Mount.LEFT)
         if left:
             pip = self._pipette_handler.get_pipette(OT3Mount.LEFT)
-            if pip.config.channels.as_int > 8:
+            if pip.config.channels > 8:
                 return GantryLoad.HIGH_THROUGHPUT
         return GantryLoad.LOW_THROUGHPUT
 
     async def cache_pipette(
         self,
         mount: OT3Mount,
-        instrument_data: OT3AttachedPipette,
+        instrument_data: AttachedPipette,
         req_instr: Optional[PipetteName],
     ) -> None:
         """Set up pipette based on scanned information."""
@@ -591,7 +591,7 @@ class OT3API(
                 req_instr_name = checked_require.get(pipette_mount, None)
                 await self.cache_pipette(
                     pipette_mount,
-                    cast(OT3AttachedPipette, found.get(pipette_mount)),
+                    cast(AttachedPipette, found.get(pipette_mount)),
                     req_instr_name,
                 )
             else:
