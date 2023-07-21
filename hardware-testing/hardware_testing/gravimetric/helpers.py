@@ -298,6 +298,12 @@ def _load_pipette(
     chnl_str = load_str_channels[pip_channels]
     pip_name = f"p{cfg.pipette_volume}_{chnl_str}"
     ui.print_info(f'pipette "{pip_name}" on mount "{cfg.pipette_mount}"')
+
+    # if we're doing multiple tests in one run, the pipette may already be loaded
+    loaded_pipettes = ctx.loaded_instruments
+    if cfg.pipette_mount in loaded_pipettes.keys():
+        return loaded_pipettes[cfg.pipette_mount]
+
     pipette = ctx.load_instrument(pip_name, cfg.pipette_mount)
     assert pipette.max_volume == cfg.pipette_volume, (
         f"expected {cfg.pipette_volume} uL pipette, "
@@ -350,6 +356,16 @@ def _load_tipracks(
         tiprack_namespace = "custom_beta"
     else:
         tiprack_namespace = "opentrons"
+
+    # If running multiple tests in one run, the labware may already be loaded
+    loaded_labwares = ctx.loaded_labwares
+    pre_loaded_tips: List[Labware] = []
+    for ls in tiprack_load_settings:
+        if (ls[0] in loaded_labwares.keys() and loaded_labwares[ls[0]].name == ls[1]):
+            pre_loaded_tips.append(loaded_labwares[ls[0]])
+    if len(pre_loaded_tips) == len(tiprack_load_settings):
+        return pre_loaded_tips
+
     tipracks = [
         ctx.load_labware(ls[1], location=ls[0], namespace=tiprack_namespace)
         for ls in tiprack_load_settings
