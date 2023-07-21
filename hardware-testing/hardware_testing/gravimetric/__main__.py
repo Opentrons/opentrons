@@ -26,7 +26,13 @@ from hardware_testing.protocols import (
 )
 
 from . import execute, helpers, workarounds, execute_photometric
-from .config import GravimetricConfig, GANTRY_MAX_SPEED, PhotometricConfig, ConfigType, get_tip_volumes_for_qc
+from .config import (
+    GravimetricConfig,
+    GANTRY_MAX_SPEED,
+    PhotometricConfig,
+    ConfigType,
+    get_tip_volumes_for_qc,
+)
 from .measurement import DELAY_FOR_MEASUREMENT
 from .trial import TestResources
 from .tips import get_tips
@@ -258,7 +264,7 @@ if __name__ == "__main__":
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
     parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
-    parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default = 0)
+    parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default=0)
     parser.add_argument("--trials", type=int, default=0)
     parser.add_argument("--increment", action="store_true")
     parser.add_argument("--return-tip", action="store_true")
@@ -310,7 +316,11 @@ if __name__ == "__main__":
         extra_labware=custom_defs,
     )
     if args.tip == 0:
-        for tip in get_tip_volumes_for_qc(args.pipette, args.channels, args.extra, args.photometric):
+        for tip in get_tip_volumes_for_qc(
+            args.pipette, args.channels, args.extra, args.photometric
+        ):
+            hw = _ctx._core.get_hardware()
+            ui.alert_user_ready(f"Ready to run with {tip}ul tip?", hw)
             args.tip = tip
             _main(args, _ctx)
     else:

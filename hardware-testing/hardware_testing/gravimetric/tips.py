@@ -67,7 +67,12 @@ def _get_racks(ctx: ProtocolContext) -> Dict[int, Labware]:
 def get_tips_for_single(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
     """Get tips for single channel."""
     racks = _get_racks(ctx)
-    return [tip for rack in racks.values() for tip in rack.wells() if tip.max_volume == tip_volume]
+    return [
+        tip
+        for rack in racks.values()
+        for tip in rack.wells()
+        if tip.max_volume == tip_volume
+    ]
 
 
 def get_tips_for_individual_channel_on_multi(

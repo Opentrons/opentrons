@@ -1,5 +1,6 @@
 """Production QC User Interface."""
-
+from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import StatusBarState
 
 PRINT_HEADER_NUM_SPACES = 4
 PRINT_HEADER_DASHES = "-" * PRINT_HEADER_NUM_SPACES
@@ -23,6 +24,12 @@ def get_user_answer(question: str) -> bool:
 def get_user_ready(message: str) -> None:
     """Get user ready."""
     input(f"WAIT: {message}, press ENTER when ready: ")
+
+
+def alert_user_ready(message: str, hw: OT3API) -> None:
+    hw.set_status_bar_state(StatusBarState.PAUSED)
+    get_user_ready(message)
+    hw.set_status_bar_state(StatusBarState.CONFIRMATION)
 
 
 def print_title(title: str) -> None:

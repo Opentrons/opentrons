@@ -118,7 +118,10 @@ def _load_labware(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> Labwar
         namespace = "opentrons"
     # If running multiple tests in one run, the labware may already be loaded
     loaded_labwares = ctx.loaded_labwares
-    if (cfg.slot_scale in loaded_labwares.keys() and loaded_labwares[cfg.slot_scale].name == cfg.labware_on_scale):
+    if (
+        cfg.slot_scale in loaded_labwares.keys()
+        and loaded_labwares[cfg.slot_scale].name == cfg.labware_on_scale
+    ):
         return loaded_labwares[cfg.slot_scale]
 
     labware_on_scale = ctx.load_labware(
@@ -414,6 +417,7 @@ def _calculate_evaporation(
 def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     """Run."""
     global _PREV_TRIAL_GRAMS
+    global _MEASUREMENTS
     ui.print_header("LOAD LABWARE")
     labware_on_scale = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)

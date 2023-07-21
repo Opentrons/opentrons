@@ -160,7 +160,10 @@ QC_DEFAULT_TRIALS: Dict[ConfigType, Dict[int, int]] = {
     },
 }
 
-def get_tip_volumes_for_qc(pipette_volume: int, pipette_channels: int, extra: bool, photometric: bool) -> List[int]:
+
+def get_tip_volumes_for_qc(
+    pipette_volume: int, pipette_channels: int, extra: bool, photometric: bool
+) -> List[int]:
     config: Dict[int, Dict[int, Dict[int, List[float]]]] = {}
     if photometric:
         config = QC_VOLUMES_P
@@ -169,6 +172,10 @@ def get_tip_volumes_for_qc(pipette_volume: int, pipette_channels: int, extra: bo
             config = QC_VOLUMES_EXTRA_G
         else:
             config = QC_VOLUMES_G
-    tip_volumes = [t for t in config[pipette_channels][pipette_volume].keys() if len(config[pipette_channels][pipette_volume][t]) > 0]
+    tip_volumes = [
+        t
+        for t in config[pipette_channels][pipette_volume].keys()
+        if len(config[pipette_channels][pipette_volume][t]) > 0
+    ]
     assert len(tip_volumes) > 0
     return tip_volumes
