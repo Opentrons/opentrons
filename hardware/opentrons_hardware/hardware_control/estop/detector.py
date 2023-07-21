@@ -1,7 +1,7 @@
 """Detector for estop status messages."""
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 
-from typing import List, Callable, Optional
+from typing import List, Callable
 
 from dataclasses import dataclass
 
@@ -40,7 +40,7 @@ class EstopDetector:
     """
 
     def __init__(
-        self, usb_messenger: Optional[BinaryMessenger], initial_state: EstopSummary
+        self, usb_messenger: BinaryMessenger, initial_state: EstopSummary
     ) -> None:
         """Create a new EstopDetector."""
         self._usb_messenger = usb_messenger
@@ -59,8 +59,7 @@ class EstopDetector:
         )
 
     def __del__(self) -> None:
-        if self._usb_messenger is not None:
-            self._usb_messenger.remove_listener(self._estop_connected_listener)
+        self._usb_messenger.remove_listener(self._estop_connected_listener)
 
     @staticmethod
     async def build(usb_messenger: BinaryMessenger) -> "EstopDetector":
