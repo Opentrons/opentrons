@@ -30,8 +30,51 @@ def mock_estop_detector(decoy: Decoy, initial_state: EstopSummary) -> EstopDetec
 
 
 @pytest.fixture
-def subject(mock_estop_detector: EstopDetector, decoy: Decoy) -> EstopStateMachine:
+def subject(mock_estop_detector: EstopDetector) -> EstopStateMachine:
     return EstopStateMachine(detector=mock_estop_detector)
+
+
+async def test_estop_state_no_detector(
+    mock_estop_detector: EstopDetector, decoy: Decoy
+) -> None:
+    """Test that the estop state machine works without a detector."""
+    subject = EstopStateMachine(detector=None)
+    assert subject.state == EstopState.DISENGAGED
+    assert (
+        subject.get_physical_status(EstopAttachLocation.LEFT)
+        == EstopPhysicalStatus.DISENGAGED
+    )
+    assert (
+        subject.get_physical_status(EstopAttachLocation.RIGHT)
+        == EstopPhysicalStatus.DISENGAGED
+    )
+
+    decoy.when(mock_estop_detector.status).then_return(
+        EstopSummary(left_detected=False, right_detected=True, engaged=True)
+    )
+
+    subject.subscribe_to_detector(detector=mock_estop_detector)
+
+    assert subject.state == EstopState.PHYSICALLY_ENGAGED
+    assert (
+        subject.get_physical_status(EstopAttachLocation.LEFT)
+        == EstopPhysicalStatus.NOT_PRESENT
+    )
+    assert (
+        subject.get_physical_status(EstopAttachLocation.RIGHT)
+        == EstopPhysicalStatus.ENGAGED
+    )
+
+    # Check that adding a second listener will wipe out the first one
+    subject.subscribe_to_detector(detector=mock_estop_detector)
+
+    decoy.verify(
+        [
+            mock_estop_detector.add_listener(subject.detector_listener),
+            mock_estop_detector.remove_listener(subject.detector_listener),
+            mock_estop_detector.add_listener(subject.detector_listener),
+        ]
+    )
 
 
 async def test_estop_state_listener(

@@ -1,6 +1,6 @@
 """opentrons.hardware_control.estop_state: module to manage estop state machine on OT-3."""
 
-from typing import List
+from typing import List, Optional
 from opentrons_hardware.hardware_control.estop.detector import (
     EstopSummary,
     EstopDetector,
@@ -18,17 +18,37 @@ from opentrons.hardware_control.types import (
 class EstopStateMachine:
     """Class to manage global Estop state."""
 
-    def __init__(self, detector: EstopDetector) -> None:
-        """Create a new EstopStateMachine."""
-        self._detector = detector
+    def __init__(self, detector: Optional[EstopDetector]) -> None:
+        """Create a new EstopStateMachine.
+
+        If detector is None, the state machine will be initialized in
+        a happy state (Disengaged, both estops detected) until it is
+        hooked up to a valid detector.
+        """
+        self._detector: Optional[EstopDetector] = None
         self._state: EstopState = EstopState.DISENGAGED
-        self._summary = detector.status
-        self._transition_from_disengaged()
-        detector.add_listener(self.detector_listener)
+        # Start off in a happy state until a detector is added
+        self._summary = EstopSummary(
+            left_detected=True, right_detected=True, engaged=False
+        )
+        if detector is not None:
+            self.subscribe_to_detector(detector=detector)
         self._listeners: List[HardwareEventHandler] = []
 
+    def subscribe_to_detector(self, detector: EstopDetector) -> None:
+        """Configure the estop state machine to listen to a detector.
+
+        This function will also transition the state based on the current
+        status of the detector."""
+        if self._detector is not None:
+            self._detector.remove_listener(self.detector_listener)
+        self._detector = detector
+        detector.add_listener(listener=self.detector_listener)
+        self._handle_state_transition(new_summary=detector.status)
+
     def __del__(self) -> None:
-        self._detector.remove_listener(self.detector_listener)
+        if self._detector is not None:
+            self._detector.remove_listener(self.detector_listener)
 
     def add_listener(self, listener: HardwareEventHandler) -> None:
         """Add a hardware event listener for estop event changes."""

@@ -255,7 +255,7 @@ class OT3Controller:
             FirmwareUpdate(),
         )
         self._estop_detector: Optional[EstopDetector] = None
-        self._estop_state_machine: Optional[EstopStateMachine] = None
+        self._estop_state_machine = EstopStateMachine(detector=None)
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
@@ -1170,17 +1170,17 @@ class OT3Controller:
     def status_bar_interface(self) -> status_bar.StatusBar:
         return self._status_bar
 
-    async def build_estop_state_machine(self) -> bool:
+    async def build_estop_detector(self) -> bool:
         """Must be called to set up the estop detector & state machine."""
         if self._drivers.usb_messenger is None:
             return False
         self._estop_detector = await EstopDetector.build(
             usb_messenger=self._drivers.usb_messenger
         )
-        self._estop_state_machine = EstopStateMachine(self._estop_detector)
+        self._estop_state_machine.subscribe_to_detector(self._estop_detector)
         return True
 
     @property
-    def estop_state_machine(self) -> Optional[EstopStateMachine]:
+    def estop_state_machine(self) -> EstopStateMachine:
         """Accessor for the API to get the state machine, if it exists."""
         return self._estop_state_machine
