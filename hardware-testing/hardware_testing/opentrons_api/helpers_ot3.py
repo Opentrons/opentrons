@@ -124,7 +124,7 @@ def _create_attached_instruments_dict(
     }
 
 
-async def update_firmware(api: OT3API, force: bool = False) -> None:
+async def update_firmware(api: OT3API, force: bool = False, subsystems: Optional[List[SubSystem]] = None) -> None:
     """Update firmware of OT3."""
     subsystems_on_boot = api.attached_subsystems
     progress_tracker: Dict[SubSystem, List[int]] = {}
@@ -137,7 +137,10 @@ async def update_firmware(api: OT3API, force: bool = False) -> None:
             msg += f"{_sub_sys.name}: v{_ver} ({_prog}%)"
         print(msg)
 
-    async for update in api.update_firmware(force=force):
+    if not subsystems:
+        subsystems = [s for s in SubSystem]
+        subsystems.remove(SubSystem.motor_controller_board)  # this is ot2
+    async for update in api.update_firmware(set(subsystems), force=force):
         fw_version = subsystems_on_boot[update.subsystem].next_fw_version
         if update.subsystem not in progress_tracker:
             progress_tracker[update.subsystem] = [fw_version, 0]
