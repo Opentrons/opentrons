@@ -392,17 +392,20 @@ async def read_limitswitch(messenger: CanMessenger, node):
         #print("errval",errval)
         return "None"
         
-async def read_detect(messenger: CanMessenger, node):
+async def read_detect(messenger: CanMessenger, node,motortype):
     await messenger.send(node, AttachedToolsRequest())
     target = datetime.datetime.now()
     try:
         while True:
             with WaitableCallback(messenger) as wc:
                 message, arb = await asyncio.wait_for(wc.read(), 1.0)
-                z_ = str(message.payload.z_motor.value)
-                a_ = str(message.payload.a_motor.value)
-                gri = str(message.payload.gripper.value)
-                return z_,a_,gri
+                if motortype == "a":
+                    getval = str(message.payload.a_motor.value)
+                elif motortype == "z":
+                    getval = str(message.payload.z_motor.value)
+                elif motortype == "g":
+                    getval = str(message.payload.gripper.value)
+                return getval
     except Exception as errval:
         #print("errval",errval)
         return "None"
@@ -499,10 +502,11 @@ async def run(args: argparse.Namespace) -> None:
         print(f'READUSAG={serial_version}')
     if args.read_limitswitch:
         serial_version = await read_limitswitch(messenger, node)
-        print(f'LIMITSWITCH={serial_version}')
+        print(f'READLIMITSWITCH={serial_version}')
     if args.read_detect:
-        serial_version = await read_detect(messenger, node)
-        print(f'DETECT={serial_version}')
+        motortype = args.motortype
+        serial_version = await read_detect(messenger, node,motortype)
+        print(f'READDETECT={serial_version}')
 log = logging.getLogger(__name__)
 
 LOG_CONFIG = {
@@ -569,6 +573,10 @@ def main() -> None:
     parser.add_argument("--read_usag", action="store_true")
     parser.add_argument("--read_epprom_gripper", action="store_true")
     parser.add_argument("--read_epprom_head", action="store_true")
+
+    parser.add_argument("--read_limitswitch", action="store_true")
+    parser.add_argument("--read_detect", action="store_true")
+
     parser.add_argument("--home", action="store_true")
     parser.add_argument("--downward", action="store_true")
     parser.add_argument("--up", action="store_true")
@@ -581,6 +589,9 @@ def main() -> None:
     parser.add_argument("--write_epprom", action="store_true")
     parser.add_argument(
         "--eppromdata", type=str, help="data", default="aa"
+    )
+    parser.add_argument(
+        "--motortype", type=str, help="z,a,g", default="z"
     )
     args = parser.parse_args()
 
