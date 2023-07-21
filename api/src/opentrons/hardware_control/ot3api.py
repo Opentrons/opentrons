@@ -1623,22 +1623,24 @@ class OT3API(
     async def _force_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: PickUpTipSpec
     ) -> None:
-        for press in pipette_spec.presses:
-            async with self._backend.restore_current():
-                await self._backend.set_active_current(
-                    {axis: current for axis, current in press.current.items()}
-                )
-                target_down = target_position_from_relative(
-                    mount, press.relative_down, self._current_position
-                )
-                await self._move(target_down, speed=press.speed, expect_stalls=True)
-            # we expect a stall has happened during pick up, so we want to
-            # update the motor estimation
-            await self._update_position_estimation([OT3Axis.by_mount(mount)])
-            target_up = target_position_from_relative(
-                mount, press.relative_up, self._current_position
+        # for press in pipette_spec.presses:
+        start_pos = await self.gantry_position(mount) # move 96ch back to init pos
+        async with self._backend.restore_current():
+            await self._backend.set_active_current(
+                {axis: current for axis, current in pipette_spec.pick_up_motor_actions.currents.items()} # press.current.items()}
             )
-            await self._move(target_up)
+            target_down = target_position_from_relative(
+                mount, pipette_spec.pick_up_motor_actions.tiprack_down, self._current_position
+            )
+            await self._move(target_down, speed=pipette_spec.pick_up_motor_actions.speed, expect_stalls=True)
+        # we expect a stall has happened during pick up, so we want to
+        # update the motor estimation
+        await self._update_position_estimation([OT3Axis.by_mount(mount)])
+        # target_up = target_position_from_relative(
+        #     mount, press.relative_up, self._current_position
+        # )
+        # await self._move(target_up)
+        await self.move_to(mount, start_pos) # move 96ch back to init pos
 
     async def _motor_pick_up_tip(
         self, mount: OT3Mount, pipette_spec: TipMotorPickUpTipSpec
@@ -1683,12 +1685,11 @@ class OT3API(
             realmount, tip_length, presses, increment
         )
 
-        await self._move_to_plunger_bottom(realmount, rate=1.0)
-        if spec.pick_up_motor_actions:
-            await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
-        else:
-            await self._force_pick_up_tip(realmount, spec)
-
+        # await self._move_to_plunger_bottom(realmount, rate=1.0)
+        # if spec.pick_up_motor_actions:
+        #     await self._motor_pick_up_tip(realmount, spec.pick_up_motor_actions)
+        # else:
+        await self._force_pick_up_tip(realmount, spec)
         # neighboring tips tend to get stuck in the space between
         # the volume chamber and the drop-tip sleeve on p1000.
         # This extra shake ensures those tips are removed
