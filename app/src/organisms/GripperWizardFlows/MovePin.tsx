@@ -6,7 +6,6 @@ import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import {
   MOVE_PIN_FROM_FRONT_JAW_TO_REAR_JAW,
@@ -39,7 +38,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     frontJawOffset,
     createRunCommand,
     errorMessage,
-    setShowErrorMessage,
+    setErrorMessage,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
@@ -59,7 +58,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       })
         .then(({ data }) => {
           if (data.status === 'failed') {
-            setShowErrorMessage(data.error?.detail ?? null)
+            setErrorMessage(data.error?.detail ?? null)
           }
           createRunCommand({
             command: {
@@ -74,7 +73,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           })
             .then(({ data }) => {
               if (data.status === 'failed') {
-                setShowErrorMessage(data.error?.detail ?? null)
+                setErrorMessage(data.error?.detail ?? null)
               }
               if (jaw === 'front' && data?.result?.jawOffset != null) {
                 setFrontJawOffset(data.result.jawOffset)
@@ -91,15 +90,15 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
               })
                 .then(({ data }) => {
                   if (data.status === 'failed') {
-                    setShowErrorMessage(data.error?.detail ?? null)
+                    setErrorMessage(data.error?.detail ?? null)
                   }
                   proceed()
                 })
-                .catch(error => setShowErrorMessage(error.message))
+                .catch(error => setErrorMessage(error.message))
             })
-            .catch(error => setShowErrorMessage(error.message))
+            .catch(error => setErrorMessage(error.message))
         })
-        .catch(error => setShowErrorMessage(error.message))
+        .catch(error => setErrorMessage(error.message))
     }
   }
   const infoByMovement: {

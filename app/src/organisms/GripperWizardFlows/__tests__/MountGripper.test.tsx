@@ -23,7 +23,7 @@ describe('MountGripper', () => {
   let mockGoBack: jest.Mock
   let mockProceed: jest.Mock
   let mockChainRunCommands: jest.Mock
-  let mockSetShowErrorMessage: jest.Mock
+  let mocksetErrorMessage: jest.Mock
 
   beforeEach(() => {
     mockGoBack = jest.fn()
@@ -41,7 +41,7 @@ describe('MountGripper', () => {
           isRobotMoving={false}
           goBack={mockGoBack}
           errorMessage={null}
-          setShowErrorMessage={mockSetShowErrorMessage}
+          setErrorMessage={mocksetErrorMessage}
           {...props}
         />,
         { i18nInstance: i18n }

@@ -67,9 +67,7 @@ export function GripperWizardFlows(
     },
   })
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
-  const [errorMessage, setShowErrorMessage] = React.useState<string | null>(
-    null
-  )
+  const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
@@ -94,8 +92,6 @@ export function GripperWizardFlows(
       attachedGripper={attachedGripper}
       createMaintenanceRun={createMaintenanceRun}
       isCreateLoading={isCreateLoading}
-      errorMessage={errorMessage}
-      setShowErrorMessage={setShowErrorMessage}
       isRobotMoving={
         isChainCommandMutationLoading || isCommandLoading || isExiting
       }
@@ -103,7 +99,7 @@ export function GripperWizardFlows(
       chainRunCommands={chainRunCommands}
       createRunCommand={createMaintenanceCommand}
       errorMessage={errorMessage}
-      setShowErrorMessage={setShowErrorMessage}
+      setErrorMessage={setErrorMessage}
     />
   )
 }
@@ -118,11 +114,9 @@ interface GripperWizardProps {
     CreateMaintenanceRunData,
     unknown
   >
-  errorMessage: string | null
-  setShowErrorMessage: React.Dispatch<React.SetStateAction<string | null>>
   isCreateLoading: boolean
   isRobotMoving: boolean
-  setShowErrorMessage: (message: string | null) => void
+  setErrorMessage: (message: string | null) => void
   errorMessage: string | null
   handleCleanUpAndClose: () => void
   chainRunCommands: ReturnType<
@@ -146,8 +140,8 @@ export const GripperWizard = (
     isCreateLoading,
     isRobotMoving,
     createRunCommand,
+    setErrorMessage,
     errorMessage,
-    setShowErrorMessage,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation('gripper_wizard_flows')
@@ -188,8 +182,8 @@ export const GripperWizard = (
     proceed: handleProceed,
     goBack,
     chainRunCommands,
+    setErrorMessage,
     errorMessage,
-    setShowErrorMessage,
   }
   let onExit
   if (currentStep == null) return null
