@@ -18,7 +18,7 @@ describe('MovePin', () => {
     props?: Partial<React.ComponentProps<typeof MovePin>>
   ) => ReturnType<typeof renderWithProviders>
   let mockCreateRunCommand: jest.Mock
-  let mocksetErrorMessage: jest.Mock
+  let mockSetErrorMessage: jest.Mock
 
   const mockGoBack = jest.fn()
   const mockProceed = jest.fn()
@@ -46,7 +46,7 @@ describe('MovePin', () => {
           frontJawOffset={{ x: 0, y: 0, z: 0 }}
           createRunCommand={mockCreateRunCommand}
           errorMessage={null}
-          setErrorMessage={mocksetErrorMessage}
+          setErrorMessage={mockSetErrorMessage}
           {...props}
         />,
         { i18nInstance: i18n }
