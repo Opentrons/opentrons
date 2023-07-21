@@ -204,6 +204,16 @@ class EstopButtonPresentRequest(utils.BinarySerializable):
 
 
 @dataclass
+class EstopStateRequest(utils.BinarySerializable):
+    """Sent from the host to request the estop state."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.estop_state_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass
 class AuxPresentDetectionChange(utils.BinarySerializable):
     """Sent from the rear panel when a aux device is connected or disconnected."""
 
@@ -394,6 +404,7 @@ BinaryMessageDefinition = Union[
     EngageSyncOut,
     ReleaseSyncOut,
     EstopStateChange,
+    EstopStateRequest,
     EstopButtonDetectionChange,
     EstopButtonPresentRequest,
     DoorSwitchStateRequest,
