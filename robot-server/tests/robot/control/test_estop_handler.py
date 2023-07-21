@@ -2,9 +2,10 @@
 
 from decoy import Decoy
 import pytest
-from typing import List, Tuple
+from typing import List, Tuple, TYPE_CHECKING
 
-from opentrons.hardware_control.ot3api import OT3API
+if TYPE_CHECKING:
+    from opentrons.hardware_control.ot3api import OT3API
 
 from robot_server.robot.control.estop_handler import EstopHandler
 from robot_server.robot.control.models import (
@@ -19,19 +20,19 @@ from opentrons.hardware_control.types import (
 
 
 @pytest.fixture
-def mock_hardware(decoy: Decoy) -> OT3API:
+def mock_hardware(decoy: Decoy) -> "OT3API":
     """Create a mocked hardware api."""
-    return decoy.mock(cls=OT3API)
+    return decoy.mock(cls="OT3API")
 
 
 @pytest.fixture
-def subject(mock_hardware: OT3API) -> EstopHandler:
+def subject(mock_hardware: "OT3API") -> EstopHandler:
     """Create an EstopHandler to test."""
     return EstopHandler(hw_handle=mock_hardware)
 
 
 def test_estop_state_transform(
-    subject: EstopHandler, mock_hardware: OT3API, decoy: Decoy
+    subject: EstopHandler, mock_hardware: "OT3API", decoy: Decoy
 ) -> None:
     """Check that the state is transformed correctly."""
     steps: List[Tuple[HwEstopState, EstopState]] = [
@@ -52,7 +53,7 @@ def test_estop_state_transform(
 
 
 def test_estop_physical_state_transform(
-    subject: EstopHandler, mock_hardware: OT3API, decoy: Decoy
+    subject: EstopHandler, mock_hardware: "OT3API", decoy: Decoy
 ) -> None:
     """Check that physical state gets transformed correctly."""
     steps: List[Tuple[EstopOverallStatus, EstopPhysicalStatus, EstopPhysicalStatus]] = [
@@ -101,7 +102,7 @@ def test_estop_physical_state_transform(
 
 
 def test_estop_acknowledge_and_clear(
-    subject: EstopHandler, mock_hardware: OT3API, decoy: Decoy
+    subject: EstopHandler, mock_hardware: "OT3API", decoy: Decoy
 ) -> None:
     """Test that the hardware controller is called correctly."""
     subject.acknowledge_and_clear()
