@@ -66,7 +66,6 @@ export function Modal(props: ModalProps): JSX.Element {
         onClick={e => {
           e.stopPropagation()
         }}
-        {...styleProps}
       >
         {header != null ? (
           <ModalHeader {...header} onClick={onOutsideClick} />
@@ -81,6 +80,7 @@ export function Modal(props: ModalProps): JSX.Element {
               ? `0px 0px ${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3}`
               : BORDERS.borderRadiusSize3
           }
+          {...styleProps}
         >
           {children}
         </Flex>

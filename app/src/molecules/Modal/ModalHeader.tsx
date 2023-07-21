@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {
   ALIGN_CENTER,
+  BORDERS,
   COLORS,
   DIRECTION_ROW,
   Flex,
@@ -31,6 +32,7 @@ export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
       flexDirection={DIRECTION_ROW}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       alignItems={ALIGN_CENTER}
+      borderRadius={`${BORDERS.borderRadiusSize3} ${BORDERS.borderRadiusSize3} 0px 0px`}
       {...styleProps}
     >
       <Flex flexDirection={DIRECTION_ROW}>
