@@ -198,11 +198,17 @@ def requires_estop(func: Wrapped) -> Wrapped:
     async def wrapper(self: OT3Controller, *args: Any, **kwargs: Any) -> Any:
         state = self._estop_state_machine.state
         if state == EstopState.NOT_PRESENT:
-            raise EStopNotPresentError()
+            raise EStopNotPresentError(
+                message="An Estop must be plugged in to move the robot."
+            )
         if state == EstopState.LOGICALLY_ENGAGED:
-            raise EStopActivatedError(message="Estop must be acknowledged and cleared")
+            raise EStopActivatedError(
+                message="Estop must be acknowledged and cleared to move the robot."
+            )
         if state == EstopState.PHYSICALLY_ENGAGED:
-            raise EStopActivatedError(message="Estop is enaged")
+            raise EStopActivatedError(
+                message="Estop is currently engaged, robot cannot move."
+            )
         return await func(self, *args, **kwargs)
 
     return cast(Wrapped, wrapper)
