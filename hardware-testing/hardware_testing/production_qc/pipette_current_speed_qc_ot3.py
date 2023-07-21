@@ -8,7 +8,6 @@ from opentrons.config.defaults_ot3 import (
     DEFAULT_MAX_SPEEDS,
     DEFAULT_ACCELERATIONS,
 )
-
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 
 from hardware_testing.data.csv_report import (
@@ -23,20 +22,22 @@ from hardware_testing.data import ui
 
 TEST_TAG = "CURRENTS-SPEEDS"
 
-STALL_THRESHOLD_MM = 0.1
-TEST_SPEEDS = [80]
-PLUNGER_CURRENTS_SPEED = {
-    0.2: TEST_SPEEDS,
-    0.3: TEST_SPEEDS,
-    0.4: TEST_SPEEDS,
-    0.6: TEST_SPEEDS,
-    1.0: TEST_SPEEDS,
-}
-TEST_ACCELERATION = 1500  # used during gravimetric tests
-
 DEFAULT_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[types.OT3AxisKind.P]
 DEFAULT_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[types.OT3AxisKind.P]
 DEFAULT_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]
+
+MUST_PASS_CURRENT = DEFAULT_CURRENT * 0.6  # the target spec (must pass here)
+STALL_THRESHOLD_MM = 0.1
+TEST_SPEEDS = [DEFAULT_MAX_SPEEDS.low_throughput[types.OT3AxisKind.P]]
+PLUNGER_CURRENTS_SPEED = {
+    round(MUST_PASS_CURRENT - 0.3, 1): TEST_SPEEDS,
+    round(MUST_PASS_CURRENT - 0.2, 1): TEST_SPEEDS,
+    round(MUST_PASS_CURRENT - 0.1, 1): TEST_SPEEDS,
+    round(MUST_PASS_CURRENT, 1): TEST_SPEEDS,
+    DEFAULT_CURRENT: TEST_SPEEDS,
+}
+TEST_ACCELERATION = 1500  # used during gravimetric tests
+
 MAX_CURRENT = max(max(list(PLUNGER_CURRENTS_SPEED.keys())), 1.0)
 MAX_SPEED = max(TEST_SPEEDS)
 
@@ -55,6 +56,9 @@ def _build_csv_report(operator: str, pipette_sn: str) -> CSVReport:
     _report = CSVReport(
         test_name="pipette-current-speed-qc-ot3",
         sections=[
+            CSVSection(
+                title="OVERALL", lines=[CSVLine("failing-current", [float, CSVResult])]
+            ),
             CSVSection(
                 title=TEST_TAG,
                 lines=[
@@ -181,7 +185,7 @@ async def _unstick_plunger(api: OT3API, mount: types.OT3Mount) -> None:
     await _home_plunger(api, mount)
 
 
-async def _test_plunger(api: OT3API, mount: types.OT3Mount, report: CSVReport) -> None:
+async def _test_plunger(api: OT3API, mount: types.OT3Mount, report: CSVReport) -> float:
     ui.print_header("UNSTICK PLUNGER")
     await _unstick_plunger(api, mount)
     # start at HIGHEST (easiest) current
@@ -200,7 +204,8 @@ async def _test_plunger(api: OT3API, mount: types.OT3Mount, report: CSVReport) -
                     ui.print_error(
                         f"failed moving {direction} at {current} amps and {speed} mm/sec"
                     )
-                    return
+                    return current
+    return 0.0
 
 
 async def _get_next_pipette_mount(api: OT3API) -> types.OT3Mount:
@@ -248,7 +253,12 @@ async def _main(is_simulating: bool) -> None:
         if not api.is_simulator and not ui.get_user_answer("QC this pipette"):
             continue
         report = _build_csv_report(_operator, pipette_sn)
-        await _test_plunger(api, mount, report)
+        failing_current = await _test_plunger(api, mount, report)
+        report(
+            "OVERALL",
+            "failing-current",
+            [failing_current, CSVResult.from_bool(failing_current < MUST_PASS_CURRENT)],
+        )
         if api.is_simulator:
             break
 
