@@ -27,7 +27,7 @@ jobs:
           owner: opentrons
           repo: buildroot
           workflow-id: build.yml
-          ref: main
+          ref: opentrons-develop
           inputs: |
             {
               "buildroot-ref": "-",
@@ -50,7 +50,7 @@ jobs:
           owner: opentrons
           repo: buildroot
           workflow-id: build.yml
-          ref: main
+          ref: opentrons-develop
           inputs: |
             {
               "buildroot-ref": "-",
