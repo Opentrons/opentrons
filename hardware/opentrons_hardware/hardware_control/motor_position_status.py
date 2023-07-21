@@ -185,9 +185,9 @@ async def update_gear_motor_position_estimation(
     data = []
 
     with MultipleMessagesWaitableCallback(
-            can_messenger,
-            _listener_filter,
-            2,
+        can_messenger,
+        _listener_filter,
+        2,
     ) as reader:
         await can_messenger.send(
             node_id=NodeId.pipette_left,

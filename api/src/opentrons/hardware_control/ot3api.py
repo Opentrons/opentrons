@@ -730,7 +730,6 @@ class OT3API(
             axes = list(Axis.ot3_mount_axes())
         await self.home(axes)
 
-
     async def home_gripper_jaw(self) -> None:
         """
         Home the jaw of the gripper.
@@ -898,7 +897,9 @@ class OT3API(
             plunger_ax: carriage_position[plunger_ax],
         }
         if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
-            effector_pos[Axis.Q] = self._backend.gear_motor_position
+            effector_pos[Axis.Q] = axis_convert(self._backend.gear_motor_position, 0.0)[
+                Axis.P_L
+            ]
 
         return effector_pos
 
@@ -1691,18 +1692,29 @@ class OT3API(
                 pipette_axis
             ]
             gear_origin_dict = {Axis.Q: gear_origin_float}
-            gear_origin_dict = {Axis.Q: gear_origin_float}
             clamp_move_target = pipette_spec.pick_up_distance
             gear_target_dict = {Axis.Q: clamp_move_target}
             clamp_moves = self._build_moves(gear_origin_dict, gear_target_dict)
             await self._backend.tip_action(moves=clamp_moves[0], tip_action="clamp")
 
-            homing_velocity = self._config.motion_settings.default_max_speed[
+            homing_velocity = self._config.motion_settings.max_speed_discontinuity[
                 GantryLoad.HIGH_THROUGHPUT
             ][OT3AxisKind.Q]
-            q_axis_distance = axis_convert(self._backend.gear_motor_position, 0.0)[Axis.P_L]
+
+            gear_pos_float = gear_start_position = axis_convert(
+                self._backend.gear_motor_position, 0.0
+            )[Axis.P_L]
+            gear_pos_dict = {Axis.Q: gear_pos_float}
+            fast_home_target = {Axis.Q: self._config.safe_home_distance}
+
+            fast_home_moves = self._build_moves(gear_pos_dict, fast_home_target)
+            # move toward home until a safe distance
             await self._backend.tip_action(
-                distance=(pipette_spec.pick_up_distance + pipette_spec.home_buffer),
+                moves=fast_home_moves[0], tip_action="clamp"
+            )
+            # move the rest of the way home with no acceleration
+            await self._backend.tip_action(
+                distance=(self._config.safe_home_distance + pipette_spec.home_buffer),
                 velocity=homing_velocity,
                 tip_action="home",
             )
@@ -1786,13 +1798,24 @@ class OT3API(
 
                 await self._backend.tip_action(moves=drop_moves[0], tip_action="clamp")
 
-                homing_velocity = self._config.motion_settings.default_max_speed[
+                homing_velocity = self._config.motion_settings.max_speed_discontinuity[
                     GantryLoad.HIGH_THROUGHPUT
                 ][OT3AxisKind.Q]
-                pipette_axis = Axis.of_main_tool_actuator(mount)
-                q_axis_distance = axis_convert(self._backend.gear_motor_position, 0.0)[pipette_axis]
+
+                gear_pos_float = gear_start_position = axis_convert(
+                    self._backend.gear_motor_position, 0.0
+                )[Axis.P_L]
+                gear_pos_dict = {Axis.Q: gear_pos_float}
+                fast_home_target = {Axis.Q: self._config.safe_home_distance}
+
+                fast_home_moves = self._build_moves(gear_pos_dict, fast_home_target)
+                # move toward home until a safe distance
                 await self._backend.tip_action(
-                    distance=(move.target_position + move.home_buffer),
+                    moves=fast_home_moves[0], tip_action="clamp"
+                )
+                # move the rest of the way home with no acceleration
+                await self._backend.tip_action(
+                    distance=(self._config.safe_home_distance + move.home_buffer),
                     velocity=homing_velocity,
                     tip_action="home",
                 )
