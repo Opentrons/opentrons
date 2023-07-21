@@ -1,20 +1,19 @@
 import pytest
 from decoy import Decoy
-from typing import List, Tuple, Optional, TYPE_CHECKING
+from typing import List, Tuple, Optional
 
-if TYPE_CHECKING:
-    from opentrons.hardware_control.estop_state import EstopStateMachine
-    from opentrons_hardware.hardware_control.estop.detector import (
-        EstopSummary,
-        EstopDetector,
-    )
-    from opentrons.hardware_control.types import (
-        EstopState,
-        EstopPhysicalStatus,
-        EstopAttachLocation,
-        EstopStateNotification,
-        HardwareEvent,
-    )
+from opentrons.hardware_control.estop_state import EstopStateMachine
+from opentrons_hardware.hardware_control.estop.detector import (
+    EstopSummary,
+    EstopDetector,
+)
+from opentrons.hardware_control.types import (
+    EstopState,
+    EstopPhysicalStatus,
+    EstopAttachLocation,
+    EstopStateNotification,
+    HardwareEvent,
+)
 
 
 @pytest.mark.ot3_only
