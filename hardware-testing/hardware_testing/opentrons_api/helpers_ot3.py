@@ -2,7 +2,7 @@
 import asyncio
 from dataclasses import dataclass
 from datetime import datetime
-from math import pi, copysign
+from math import pi
 from subprocess import run
 from time import time
 from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union, cast
@@ -452,7 +452,8 @@ async def move_tip_motor_relative_ot3(
     current_gear_pos_dict = {Axis.Q: current_gear_pos_float}
     target_pos_dict = {Axis.Q: current_gear_pos_float + distance}
 
-    speed = copysign(speed, distance)
+    if distance < 0:
+        speed *= -1
 
     tip_motor_move = api._build_moves(current_gear_pos_dict, target_pos_dict, speed)
 
