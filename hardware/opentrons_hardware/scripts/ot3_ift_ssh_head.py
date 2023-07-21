@@ -73,6 +73,61 @@ def getch():
         return ch
     return _getch()
 
+async def move_for_encode(messenger: CanMessenger, node, position,xy,args) -> None:
+    step_size = [0.1, 0.5, 1,5,10, 20, 50]
+    step_length_index = 4
+    step = step_size[step_length_index]
+    pos = 0
+    speed = 10
+    res = {node: (0,0,0)}
+    current = args.current
+    await set_pipette_current(messenger,current,node)
+    try:
+        if xy == "downward":
+            pos = pos + step
+            position['pipette'] = pos
+            res = await move_to(messenger, node, step, speed)
+            time.sleep(0.2)
+            aa = await read_Usag(messenger, node)
+            res2 = await move_to(messenger, node, step, speed)
+            time.sleep(0.2)
+            aa2 = await read_Usag(messenger, node)
+        elif xy == "up":
+            pos = pos - step
+            position['pipette'] = pos
+            res = await move_to(messenger, node, step, -speed)
+            time.sleep(0.5)
+            
+            res2 = await move_to(messenger, node, step, -speed)
+        mores1 = res[node][0]
+        encoder1 =res[node][1]
+        mores2 = res2[node][0]
+        encoder2 =res2[node][1]
+        diff = float(aa2) - float(aa)
+        print("diff",diff)
+        try:
+            if abs(diff) > 0:
+                if xy == "downward":
+                    print("READUSAG=Pass")
+                elif xy == "up":
+                    print("READUSAG=Pass")
+            else:
+                if xy == "downward":
+                    print("READUSAG=Failed")
+                elif xy == "up":
+                    print("READUSAG=Failed")
+                
+        except:
+            if xy == "downward":
+                print("READUSAG=Failed")
+            elif xy == "up":
+                print("READUSAG=Failed")
+    except Exception as err:
+        if xy == "downward":
+            print("READUSAG=Failed")
+        elif xy == "up":
+            print("READUSAG=Failed")
+
 async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> None:
     step_size = [0.1, 0.5, 1,5,10, 20, 50]
     step_length_index = 4
@@ -399,6 +454,7 @@ async def read_detect(messenger: CanMessenger, node,motortype):
         while True:
             with WaitableCallback(messenger) as wc:
                 message, arb = await asyncio.wait_for(wc.read(), 1.0)
+                print("message",message)
                 if motortype == "a":
                     getval = str(message.payload.a_motor.value)
                 elif motortype == "z":
@@ -497,16 +553,16 @@ async def run(args: argparse.Namespace) -> None:
         print(f'READHEADEPPROM={serial_number}')
     
     if args.read_usag:
-        serial_version = await read_Usag(messenger, node)
+        serial_version = await move_for_encode(messenger, node,position,"downward",args)
         
-        print(f'READUSAG={serial_version}')
+        #print(f'READUSAG={serial_version}')
     if args.read_limitswitch:
         serial_version = await read_limitswitch(messenger, node)
         print(f'READLIMITSWITCH={serial_version}')
     if args.read_detect:
         motortype = args.motortype
-        serial_version = await read_detect(messenger, node,motortype)
-        print(f'READDETECT={serial_version}')
+        READDETECT = await read_detect(messenger, node,motortype)
+        print(f'READDETECT={READDETECT}')
 log = logging.getLogger(__name__)
 
 LOG_CONFIG = {
