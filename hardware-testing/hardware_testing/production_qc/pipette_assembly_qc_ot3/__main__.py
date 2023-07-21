@@ -912,7 +912,7 @@ async def _test_diagnostics_pressure(
     )
 
     if not api.is_simulator:
-        _get_operator_answer_to_question('REMOVE tip to nozzle, enter "y" when ready')
+        _get_operator_answer_to_question('REMOVE tip from nozzle, enter "y" when ready')
     print("moving plunger back down to BOTTOM position")
     await api.dispense(mount)
     await api.remove_tip(mount)
@@ -1246,7 +1246,9 @@ def _create_csv_and_get_callbacks(
 async def _wait_for_tip_presence_state_change(
     api: OT3API, seconds_to_wait: int
 ) -> bool:
-    print("prepare to wiggle the tip, in 3 seconds...")
+    if not api.is_simulator:
+        input("wiggle test, press ENTER when ready: ")
+    print("prepare to wiggle the ejector, in 3 seconds...")
     for i in range(3):
         print(f"{i + 1}..")
         if not api.is_simulator:
