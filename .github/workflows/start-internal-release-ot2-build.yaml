@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - edge
-      - *internal-release*
+      - '*internal-release*'
     tags:
       - ot3@*
   pull_request:
