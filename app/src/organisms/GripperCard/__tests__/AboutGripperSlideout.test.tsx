@@ -25,7 +25,7 @@ describe('AboutGripperSlideout', () => {
 
     getByText('About Flex Gripper')
     getByText('123')
-    getByText('Serial Number')
+    getByText('SERIAL NUMBER')
     const button = getByRole('button', { name: /exit/i })
     fireEvent.click(button)
     expect(props.onCloseClick).toHaveBeenCalled()
