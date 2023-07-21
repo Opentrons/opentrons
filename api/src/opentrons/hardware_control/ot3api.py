@@ -1654,7 +1654,6 @@ class OT3API(
             )
             await self._move(target_down)
             # perform pick up tip
-            await self._backend.update_gear_motor_position()
             pipette_axis = Axis.of_main_tool_actuator(mount)
             gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
                 pipette_axis
@@ -1755,12 +1754,12 @@ class OT3API(
             if move.is_ht_tip_action and move.speed:
                 # The speed check is needed because speed can sometimes be None.
                 # Not sure why
-                await self._backend.update_gear_motor_position()
+                #await self._backend.update_gear_motor_position()
                 gear_start_position = axis_convert(
                     self._backend.gear_motor_position, 0.0
-                )
+                )[Axis.P_L]
                 pickup_target_dict = {Axis.Q: move.target_position}
-                drop_moves = self._build_moves(gear_start_position, pickup_target_dict)
+                drop_moves = self._build_moves({Axis.Q : gear_start_position}, pickup_target_dict)
 
                 await self._backend.tip_action(moves=drop_moves[0], tip_action="clamp")
 
@@ -1768,13 +1767,13 @@ class OT3API(
                     GantryLoad.HIGH_THROUGHPUT
                 ][OT3AxisKind.Q]
 
-                gear_pos_float = axis_convert(self._backend.gear_motor_position, 0.0)[
+                #await self._backend.update_gear_motor_position()
+                gear_start_position = axis_convert(self._backend.gear_motor_position, 0.0)[
                     Axis.P_L
                 ]
-                gear_pos_dict = {Axis.Q: gear_pos_float}
                 fast_home_target = {Axis.Q: self._config.safe_home_distance}
 
-                fast_home_moves = self._build_moves(gear_pos_dict, fast_home_target)
+                fast_home_moves = self._build_moves({Axis.Q : gear_start_position}, fast_home_target)
                 # move toward home until a safe distance
                 await self._backend.tip_action(
                     moves=fast_home_moves[0], tip_action="clamp"
