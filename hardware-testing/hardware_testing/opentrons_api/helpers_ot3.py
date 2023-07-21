@@ -2,7 +2,7 @@
 import asyncio
 from dataclasses import dataclass
 from datetime import datetime
-from math import pi
+from math import pi, copysign
 from subprocess import run
 from time import time
 from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union, cast
@@ -452,22 +452,13 @@ async def move_tip_motor_relative_ot3(
     target_pos = current_pos.copy()
     target_pos[Axis.Q] += distance
 
-    if distance < 0:
-        speed *= -1
+    speed = copysign(speed, distance)
 
-    tip_motor_move = api._build_moves(current_pos, target_pos)
-    await api._backend.tip_action(moves=tip_motor_move[0], tip_action="clamp")
+    tip_motor_move = api._build_moves(current_pos, target_pos, speed)
 
-    if distance < 0:
-        # change this so that it calls _build_moves, and passes in a speed
-        action = "home"
-    else:
-        action = "clamp"
     _move_coro = api._backend.tip_action(
-        axes=[Axis.Q],
-        distance=distance,
-        speed=speed if speed else 5,
-        tip_action=action,
+        moves=tip_motor_move[0],
+        tip_action="clamp",
     )
     if motor_current is None:
         await _move_coro

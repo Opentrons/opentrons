@@ -661,6 +661,7 @@ class OT3Controller:
             self._gear_motor_position = {
                 NodeId.pipette_left: positions[NodeId.pipette_left][0]
             }
+            print(f"setting gear motor position to {positions[NodeId.pipette_left][0]}")
 
     @requires_update
     async def gripper_grip_jaw(

@@ -113,8 +113,10 @@ def move_group_single() -> MoveGroups:
         ]
     ]
 
+
 @pytest.fixture
 def move_group_tip_action_single() -> MoveGroups:
+    """Move group with one move."""
     return [
         [
             {
@@ -123,7 +125,7 @@ def move_group_tip_action_single() -> MoveGroups:
                     duration_sec=float64(1),
                     action=PipetteTipActionType.home,
                     stop_condition=MoveStopCondition.none,
-                    acceleration_mm_sec_sq=0,
+                    acceleration_mm_sec_sq=float64(0),
                 )
             }
         ]
@@ -132,7 +134,7 @@ def move_group_tip_action_single() -> MoveGroups:
 
 @pytest.fixture
 def move_group_tip_action_multiple() -> MoveGroups:
-    """Move group with one move."""
+    """Move group with multiple moves."""
     return [
         [
             {
@@ -141,16 +143,7 @@ def move_group_tip_action_multiple() -> MoveGroups:
                     duration_sec=float64(1),
                     action=PipetteTipActionType.clamp,
                     stop_condition=MoveStopCondition.none,
-                    acceleration_mm_sec_sq=1,
-                )
-            },
-            {
-                NodeId.pipette_left: MoveGroupTipActionStep(
-                    velocity_mm_sec=float64(3),
-                    duration_sec=float64(1),
-                    action=PipetteTipActionType.clamp,
-                    stop_condition=MoveStopCondition.none,
-                    acceleration_mm_sec_sq=0,
+                    acceleration_mm_sec_sq=float64(1),
                 )
             },
             {
@@ -159,9 +152,18 @@ def move_group_tip_action_multiple() -> MoveGroups:
                     duration_sec=float64(1),
                     action=PipetteTipActionType.clamp,
                     stop_condition=MoveStopCondition.none,
-                    acceleration_mm_sec_sq=-1,
+                    acceleration_mm_sec_sq=float64(1),
                 )
-            }
+            },
+            {
+                NodeId.pipette_left: MoveGroupTipActionStep(
+                    velocity_mm_sec=float64(2),
+                    duration_sec=float64(1),
+                    action=PipetteTipActionType.clamp,
+                    stop_condition=MoveStopCondition.none,
+                    acceleration_mm_sec_sq=float64(1),
+                )
+            },
         ]
     ]
 
@@ -810,10 +812,10 @@ async def test_home_timeout(
     [
         "move_group_tip_action_single",
         "move_group_tip_action_multiple",
-    ]
+    ],
 )
 async def test_tip_action_move_runner_receives_two_responses(
-    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups, request
+    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups, request: Any
 ) -> None:
     """The magic call function should receive two responses for a tip action."""
     with patch.object(MoveScheduler, "_handle_move_completed") as mock_move_complete:
@@ -837,10 +839,10 @@ async def test_tip_action_move_runner_receives_two_responses(
     [
         "move_group_tip_action_single",
         "move_group_tip_action_multiple",
-    ]
+    ],
 )
 async def test_tip_action_move_runner_position_updated(
-    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups, request
+    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups, request: Any
 ) -> None:
     """Two responses from a tip action move are properly handled."""
     move_group_tip_action = request.getfixturevalue(move_group_tip_action)
@@ -850,7 +852,8 @@ async def test_tip_action_move_runner_position_updated(
     mock_can_messenger.send.side_effect = mock_sender.mock_send
     completion_message = await subject.run(can_messenger=mock_can_messenger)
     assert len(completion_message) == len(move_group_tip_action[0])
-    # assert completion_message[0][1].payload.current_position_um.value == 2000
+    for i in range(len(completion_message)):
+        assert completion_message[i][1].payload.current_position_um.value == 2000
 
 
 @pytest.mark.parametrize(
@@ -858,10 +861,13 @@ async def test_tip_action_move_runner_position_updated(
     [
         "move_group_tip_action_single",
         "move_group_tip_action_multiple",
-    ]
+    ],
 )
 async def test_tip_action_move_runner_fail_receives_one_response(
-    mock_can_messenger: AsyncMock, move_group_tip_action: MoveGroups, caplog: Any, request
+    mock_can_messenger: AsyncMock,
+    move_group_tip_action: MoveGroups,
+    caplog: Any,
+    request: Any,
 ) -> None:
     """Tip action move should fail if one or less responses received."""
     move_group_tip_action = request.getfixturevalue(move_group_tip_action)
@@ -1117,7 +1123,7 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
                     ),
                 ),
             ],
-            {},
+            {NodeId.pipette_left: (10, 0, False, False)},
         ),
         (
             # empty base case
@@ -1131,6 +1137,8 @@ def test_accumulate_move_completions(
     position_map: NodeMap[Tuple[float, float, bool, bool]],
 ) -> None:
     """Build correct move results."""
+    # assert MoveGroupRunner._accumulate_move_completions(completions) == position_map
+    c = MoveGroupRunner._accumulate_move_completions(completions)
     assert MoveGroupRunner._accumulate_move_completions(completions) == position_map
 
 

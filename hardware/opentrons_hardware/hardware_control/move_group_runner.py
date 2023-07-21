@@ -175,13 +175,7 @@ class MoveGroupRunner:
         ] = defaultdict(list)
         for arbid, completion in completions:
             if isinstance(completion, TipActionResponse):
-                continue
-            position[NodeId(arbid.parts.originating_node_id)].append(
-                (
-                    (
-                        completion.payload.group_id.value,
-                        completion.payload.seq_id.value,
-                    ),
+                gear_position_response = (
                     float(completion.payload.current_position_um.value) / 1000.0,
                     float(completion.payload.encoder_position_um.value) / 1000.0,
                     bool(
@@ -193,7 +187,28 @@ class MoveGroupRunner:
                         & MotorPositionFlags.encoder_position_ok.value
                     ),
                 )
-            )
+                return {
+                    arbid.parts.originating_node_id: gear_position_response
+                }
+            else:
+                position[NodeId(arbid.parts.originating_node_id)].append(
+                    (
+                        (
+                            completion.payload.group_id.value,
+                            completion.payload.seq_id.value,
+                        ),
+                        float(completion.payload.current_position_um.value) / 1000.0,
+                        float(completion.payload.encoder_position_um.value) / 1000.0,
+                        bool(
+                            completion.payload.position_flags.value
+                            & MotorPositionFlags.stepper_position_ok.value
+                        ),
+                        bool(
+                            completion.payload.position_flags.value
+                            & MotorPositionFlags.encoder_position_ok.value
+                        ),
+                    )
+                )
         # for each node, pull the position from the completion with the largest
         # combination of group id and sequence id
         return {

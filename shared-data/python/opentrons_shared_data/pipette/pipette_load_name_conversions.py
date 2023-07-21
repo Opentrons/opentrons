@@ -223,7 +223,6 @@ def convert_pipette_model(
     # to attached pipettes.
     # We need to figure out how to default the pipette model as well
     # rather than returning a p1000
-    breakpoint()
     if model and not provided_version:
         pipette_type, parsed_channels, parsed_version = model.split("_")
         channels = channels_from_string(parsed_channels)
