@@ -138,8 +138,7 @@ async def update_firmware(api: OT3API, force: bool = False, subsystems: Optional
         print(msg)
 
     if not subsystems:
-        subsystems = [s for s in SubSystem]
-        subsystems.remove(SubSystem.motor_controller_board)  # this is ot2
+        subsystems = []
     async for update in api.update_firmware(set(subsystems), force=force):
         fw_version = subsystems_on_boot[update.subsystem].next_fw_version
         if update.subsystem not in progress_tracker:

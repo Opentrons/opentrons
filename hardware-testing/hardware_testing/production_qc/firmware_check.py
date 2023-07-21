@@ -35,5 +35,5 @@ if __name__ == "__main__":
         if getattr(args, f"{s.name}"):
             _subsystems.append(s)
     if not _subsystems:
-        _subsystems = ot3_subsystems
+        _subsystems = []
     run(_main(args.simulate, _subsystems))
