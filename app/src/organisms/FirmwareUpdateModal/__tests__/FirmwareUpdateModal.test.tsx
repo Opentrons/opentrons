@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { waitFor } from '@testing-library/react'
+import { act, waitFor } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import {
   useInstrumentsQuery,
@@ -95,9 +95,13 @@ describe('FirmwareUpdateModal', () => {
     expect(updateSubsystem).toHaveBeenCalled()
   })
   it('calls refetch instruments and then proceed once update is complete', async () => {
+    jest.useFakeTimers()
     const { getByText } = render(props)
     getByText('A firmware update is required, instrument is updating')
     await waitFor(() => expect(refetch).toHaveBeenCalled())
+    act(() => {
+      jest.advanceTimersByTime(10000)
+    })
     await waitFor(() => expect(props.proceed).toHaveBeenCalled())
   })
 })
