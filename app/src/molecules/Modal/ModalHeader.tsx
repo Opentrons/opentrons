@@ -10,7 +10,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { StyledText } from '../../atoms/text'
+
 import type { ModalHeaderBaseProps } from '../Modal/types'
 
 export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
@@ -46,13 +46,13 @@ export function ModalHeader(props: ModalHeaderBaseProps): JSX.Element {
             marginRight={SPACING.spacing16}
           />
         ) : null}
-        <StyledText
+        <Flex
           fontWeight={TYPOGRAPHY.fontWeightBold}
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
         >
           {title}
-        </StyledText>
+        </Flex>
       </Flex>
       {hasExitIcon && onClick != null ? (
         <Flex
