@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Generic, TypeVar
+from typing import Any, Optional, Generic, TypeVar, Dict
 
 from opentrons.types import Point
 from opentrons.hardware_control.types import CriticalPoint
@@ -27,7 +27,7 @@ class AbstractInstrument(ABC, Generic[InstrumentConfig]):
         ...
 
     @abstractmethod
-    def update_config_item(self, elem_name: str, elem_val: Any) -> None:
+    def update_config_item(self, elements: Dict[str, Any]) -> None:
         """Update instrument config item."""
         ...
 
