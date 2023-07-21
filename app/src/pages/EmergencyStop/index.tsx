@@ -13,6 +13,7 @@ import {
   ALIGN_CENTER,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { StyledText } from '../../atoms/text'
 import { MediumButton } from '../../atoms/buttons'
@@ -20,17 +21,16 @@ import { StepMeter } from '../../atoms/StepMeter'
 
 import estopImg from '../../assets/images/on-device-display/install_e_stop.png'
 
+const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
+
 export function EmergencyStop(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
-  // Note (kk:06/28/2023) this IF is for test and it will be removed when the e-stop status check function
-  // I will add the function soon
-
-  // ToDo(kk:07/19/2023) For e-stop button connection check,
-  // The ODD app needs to check the status is not "notPresent"
-  // notPresent -> isEstopConnected false
-  // other state(disengaged, physicallyEngaged, logicallyEngaged) -> isEstopConnected true
-  const isEstopConnected = true
+  const estopStatus = useEstopQuery({
+    refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL_MS,
+  })
+  console.log(estopStatus?.data?.status)
+  const isEstopConnected = estopStatus?.data?.status !== 'notPresent'
 
   return (
     <>
