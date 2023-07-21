@@ -179,7 +179,7 @@ export function NameRobot(): JSX.Element {
                 <Btn
                   onClick={() => {
                     if (isInitialSetup) {
-                      history.push('/robot-settings/update-robot')
+                      history.push('/emergency-stop')
                     } else {
                       history.push('/robot-settings')
                     }
