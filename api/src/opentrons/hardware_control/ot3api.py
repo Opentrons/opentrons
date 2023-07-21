@@ -1655,24 +1655,50 @@ class OT3API(
             # perform pick up tip
             await self._backend.update_gear_motor_position()
             pipette_axis = Axis.of_main_tool_actuator(mount)
+            # q_axis_distance = axis_convert(self._backend.gear_motor_position, 0.0)[Axis.P_L]
             gear_origin_float = axis_convert(self._backend.gear_motor_position, 0.0)[
                 pipette_axis
             ]
-            gear_origin_dict = {Axis.Q: gear_origin_float}
-            gear_origin_dict = {Axis.Q: gear_origin_float}
-            clamp_move_target = pipette_spec.pick_up_distance
-            gear_target_dict = {Axis.Q: clamp_move_target}
-            clamp_moves = self._build_moves(gear_origin_dict, gear_target_dict)
-            await self._backend.tip_action(moves=clamp_moves[0], tip_action="clamp")
-
-            homing_velocity = self._config.motion_settings.default_max_speed[
+            homing_velocity = self._config.motion_settings.max_speed_discontinuity[
                 GantryLoad.HIGH_THROUGHPUT
             ][OT3AxisKind.Q]
-            q_axis_distance = axis_convert(self._backend.gear_motor_position, 0.0)[Axis.P_L]
+
+            default_speed = self._config.motion_settings.default_max_speed[
+            GantryLoad.HIGH_THROUGHPUT][OT3AxisKind.Q]
+
+            pick_up_speed = 2
+            gear_origin_dict = {Axis.Q: gear_origin_float}
+            prepare_clamp_move = pipette_spec.pick_up_distance - 5
+            prepare_gear_target_dict = {Axis.Q: prepare_clamp_move}
+            prepare_clamp_moves = self._build_moves(gear_origin_dict, prepare_gear_target_dict)
+            await self._backend.tip_action(moves=prepare_clamp_moves[0],
+                                            velocity = default_speed,
+                                            tip_action="clamp")
+
+            clamp_gear_target_dict = {Axis.Q: pipette_spec.pick_up_distance}
+            clamp_moves = self._build_moves(prepare_gear_target_dict,
+                                            clamp_gear_target_dict,
+                                            speed = pick_up_speed)
+            await self._backend.tip_action(moves=clamp_moves[0],
+                                            tip_action="clamp")
+
+            retract_clamp_moves = self._build_moves(clamp_gear_target_dict,
+                                                    prepare_gear_target_dict,
+                                                    speed = pick_up_speed)
+            await self._backend.tip_action(moves=retract_clamp_moves[0],
+                                            tip_action="clamp")
+
+            gear_origin_dict = {Axis.Q: pipette_spec.pick_up_distance - pipette_spec.home_buffer}
+            retract_clamp_moves = self._build_moves(prepare_gear_target_dict,
+                                                    gear_origin_dict,
+                                                    speed = default_speed)
+            await self._backend.tip_action(moves=retract_clamp_moves[0],
+                                            tip_action="clamp")
+
             await self._backend.tip_action(
                 distance=(pipette_spec.pick_up_distance + pipette_spec.home_buffer),
                 velocity=homing_velocity,
-                tip_action="home",
+                tip_action="home"
             )
 
     async def pick_up_tip(
@@ -1749,14 +1775,27 @@ class OT3API(
                 gear_start_position = axis_convert(
                     self._backend.gear_motor_position, 0.0
                 )
-                pickup_target_dict = {Axis.Q: move.target_position}
-                drop_moves = self._build_moves(gear_start_position, pickup_target_dict)
-
-                await self._backend.tip_action(moves=drop_moves[0], tip_action="clamp")
-
-                homing_velocity = self._config.motion_settings.default_max_speed[
+                default_speed = self._config.motion_settings.default_max_speed[
                     GantryLoad.HIGH_THROUGHPUT
                 ][OT3AxisKind.Q]
+                pickup_target_dict = {Axis.Q: move.target_position - 20}
+                drop_moves = self._build_moves(gear_start_position,
+                                                pickup_target_dict,
+                                                speed = default_speed)
+
+                await self._backend.tip_action(moves=drop_moves[0],
+                                                tip_action="clamp")
+
+                homing_velocity = self._config.motion_settings.max_speed_discontinuity[
+                    GantryLoad.HIGH_THROUGHPUT
+                ][OT3AxisKind.Q]
+                drop_tip_target_dict = {Axis.Q: move.target_position}
+                drop_moves = self._build_moves(pickup_target_dict,
+                                                drop_tip_target_dict,
+                                                speed = homing_velocity)
+                await self._backend.tip_action(moves=drop_moves[0],
+                                                tip_action="clamp")
+
                 pipette_axis = Axis.of_main_tool_actuator(mount)
                 q_axis_distance = axis_convert(self._backend.gear_motor_position, 0.0)[pipette_axis]
                 await self._backend.tip_action(
@@ -2024,16 +2063,13 @@ class OT3API(
         probe_settings: Optional[LiquidProbeSettings] = None,
     ) -> float:
         """Search for and return liquid level height.
-
         This function begins by moving the mount the distance specified by starting_mount_height in the
         LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
         reading from the pressure sensor.
-
         If the move is completed without the specified threshold being triggered, a
         LiquidNotFound error will be thrown.
         If the threshold is triggered before the minimum z distance has been traveled,
         a EarlyLiquidSenseTrigger error will be thrown.
-
         Otherwise, the function will stop moving once the threshold is triggered,
         and return the position of the
         z axis in deck coordinates, as well as the encoder position, where
@@ -2048,25 +2084,22 @@ class OT3API(
 
         if not probe_settings:
             probe_settings = self.config.liquid_sense
-        mount_axis = Axis.by_mount(mount)
+        mount_axis = OT3Axis.by_mount(mount)
 
-        gantry_position = await self.gantry_position(mount, refresh=True)
-
-        await self.move_to(
-            mount,
-            top_types.Point(
-                x=gantry_position.x,
-                y=gantry_position.y,
-                z=probe_settings.starting_mount_height,
-            ),
-        )
-
+        # homes plunger then moves it to bottom of axis
         if probe_settings.aspirate_while_sensing:
             await self.home_plunger(mount)
 
+        # if not aspirate_while_sensing, plunger should be at bottom, since
+        #  this expects to be called after pick_up_tip
+
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
 
-        machine_pos_node_id = await self._backend.liquid_probe(
+        # get position before moving in deck coordinates
+        starting_position = await self.current_position_ot3(
+            mount=mount, critical_point=CriticalPoint.TIP, refresh=True
+        )
+        await self._backend.liquid_probe(
             mount,
             probe_settings.max_z_distance,
             probe_settings.mount_speed,
@@ -2076,27 +2109,35 @@ class OT3API(
             probe_settings.auto_zero_sensor,
             probe_settings.num_baseline_reads,
         )
-        machine_pos = axis_convert(machine_pos_node_id, 0.0)
-        position = self._deck_from_machine(machine_pos)
+
+        # get final position in deck coordinates
+        final_position = await self.current_position_ot3(
+            mount=mount, critical_point=CriticalPoint.TIP, refresh=True
+        )
+
         z_distance_traveled = (
-            position[mount_axis] - probe_settings.starting_mount_height
+            starting_position[mount_axis] - final_position[mount_axis]
         )
         if z_distance_traveled < probe_settings.min_z_distance:
-            min_z_travel_pos = position
+            min_z_travel_pos = final_position
             min_z_travel_pos[mount_axis] = probe_settings.min_z_distance
-            raise EarlyLiquidSenseTrigger(
-                triggered_at=position,
-                min_z_pos=min_z_travel_pos,
-            )
-        elif z_distance_traveled > probe_settings.max_z_distance:
-            max_z_travel_pos = position
+            # raise EarlyLiquidSenseTrigger(
+            #     triggered_at=final_position,
+            #     min_z_pos=min_z_travel_pos,
+            # )
+        elif z_distance_traveled >= probe_settings.max_z_distance:
+            max_z_travel_pos = final_position
             max_z_travel_pos[mount_axis] = probe_settings.max_z_distance
             raise LiquidNotFound(
-                position=position,
+                position=final_position,
                 max_z_pos=max_z_travel_pos,
             )
 
-        return position[mount_axis]
+        encoder_pos = await self.encoder_current_position_ot3(
+            mount=mount, critical_point=CriticalPoint.TIP, refresh=True
+        )
+
+        return final_position, encoder_pos
 
     async def capacitive_probe(
         self,
