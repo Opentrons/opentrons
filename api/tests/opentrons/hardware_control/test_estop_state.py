@@ -1,41 +1,46 @@
 import pytest
 from decoy import Decoy
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, TYPE_CHECKING
 
-from opentrons.hardware_control.estop_state import EstopStateMachine
-from opentrons_hardware.hardware_control.estop.detector import (
-    EstopSummary,
-    EstopDetector,
-)
-from opentrons.hardware_control.types import (
-    EstopState,
-    EstopPhysicalStatus,
-    EstopAttachLocation,
-    EstopStateNotification,
-    HardwareEvent,
-)
+if TYPE_CHECKING:
+    from opentrons.hardware_control.estop_state import EstopStateMachine
+    from opentrons_hardware.hardware_control.estop.detector import (
+        EstopSummary,
+        EstopDetector,
+    )
+    from opentrons.hardware_control.types import (
+        EstopState,
+        EstopPhysicalStatus,
+        EstopAttachLocation,
+        EstopStateNotification,
+        HardwareEvent,
+    )
 
 
+@pytest.mark.ot3_only
 @pytest.fixture
-def initial_state() -> EstopSummary:
+def initial_state() -> "EstopSummary":
     return EstopSummary(left_detected=True, right_detected=True, engaged=False)
 
 
+@pytest.mark.ot3_only
 @pytest.fixture
-def mock_estop_detector(decoy: Decoy, initial_state: EstopSummary) -> EstopDetector:
+def mock_estop_detector(decoy: Decoy, initial_state: "EstopSummary") -> "EstopDetector":
     """Create a mocked estop detector."""
     mock = decoy.mock(cls=EstopDetector)
     decoy.when(mock.status).then_return(initial_state)
     return mock
 
 
+@pytest.mark.ot3_only
 @pytest.fixture
-def subject(mock_estop_detector: EstopDetector) -> EstopStateMachine:
+def subject(mock_estop_detector: "EstopDetector") -> "EstopStateMachine":
     return EstopStateMachine(detector=mock_estop_detector)
 
 
+@pytest.mark.ot3_only
 async def test_estop_state_no_detector(
-    mock_estop_detector: EstopDetector, decoy: Decoy
+    mock_estop_detector: "EstopDetector", decoy: Decoy
 ) -> None:
     """Test that the estop state machine works without a detector."""
     subject = EstopStateMachine(detector=None)
@@ -77,8 +82,9 @@ async def test_estop_state_no_detector(
     )
 
 
+@pytest.mark.ot3_only
 async def test_estop_state_listener(
-    subject: EstopStateMachine, mock_estop_detector: EstopDetector, decoy: Decoy
+    subject: "EstopStateMachine", mock_estop_detector: "EstopDetector", decoy: Decoy
 ) -> None:
     """Test that the state machine broadcasts to listeners."""
     decoy.verify(mock_estop_detector.add_listener(subject.detector_listener))
@@ -136,6 +142,7 @@ async def test_estop_state_listener(
     assert events.pop().new_state == EstopState.DISENGAGED
 
 
+@pytest.mark.ot3_only
 @pytest.mark.parametrize(
     argnames=["left_connected", "right_connected"],
     argvalues=[
@@ -146,7 +153,7 @@ async def test_estop_state_listener(
     ],
 )
 async def test_estop_physical_status(
-    subject: EstopStateMachine, left_connected: bool, right_connected: bool
+    subject: "EstopStateMachine", left_connected: bool, right_connected: bool
 ) -> None:
     """Test that physical status maps to expected"""
     summary = EstopSummary(
@@ -182,9 +189,10 @@ async def test_estop_physical_status(
     )
 
 
+@pytest.mark.ot3_only
 @pytest.mark.parametrize("clear_to_disengaged", [True, False])
 async def test_estop_state_machine(
-    subject: EstopStateMachine, clear_to_disengaged: bool
+    subject: "EstopStateMachine", clear_to_disengaged: bool
 ) -> None:
     """Test traversal through the state machine."""
 

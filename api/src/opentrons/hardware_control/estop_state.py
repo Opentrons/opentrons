@@ -1,10 +1,12 @@
 """opentrons.hardware_control.estop_state: module to manage estop state machine on OT-3."""
 
-from typing import List, Optional
-from opentrons_hardware.hardware_control.estop.detector import (
-    EstopSummary,
-    EstopDetector,
-)
+from typing import List, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from opentrons_hardware.hardware_control.estop.detector import (
+        EstopSummary,
+        EstopDetector,
+    )
 
 from opentrons.hardware_control.types import (
     EstopState,
