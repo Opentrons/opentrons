@@ -58,23 +58,23 @@ PRESSURE_NONE = PressureEventConfig(
 )
 PRESSURE_INSERTED = PressureEventConfig(
     min=4000.0,
-    max=6000.0,
+    max=7000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=5.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_ASPIRATED_P50 = PressureEventConfig(
-    min=3000.0,
-    max=5000.0,
+    min=2000.0,
+    max=6000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=100.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_ASPIRATED_P1000 = PressureEventConfig(
-    min=3000.0,
-    max=5000.0,
+    min=2000.0,
+    max=6000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=100.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,

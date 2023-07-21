@@ -306,7 +306,7 @@ async def _pick_up_tip_for_tip_volume(
 ) -> None:
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
-    pip_channels = pip.channels.as_int
+    pip_channels = pip.channels.value
     tip = _available_tips[tip_volume][0]
     _available_tips[tip_volume] = _available_tips[tip_volume][pip_channels:]
     if tip_volume == 1000:
@@ -1002,6 +1002,10 @@ async def _test_tip_presence_flag(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
     await api.retract(mount)
+    slot_5_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+    current_pos = await api.gantry_position(mount)
+    await api.move_to(mount, slot_5_pos._replace(z=current_pos.z))
+    await api.move_rel(mount, Point(z=-20))
     wiggle_passed = await _wait_for_tip_presence_state_change(api, seconds_to_wait=5)
     if not api.is_simulator:
         input("press ENTER to continue")
