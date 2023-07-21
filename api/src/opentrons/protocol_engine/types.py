@@ -92,9 +92,8 @@ class LabwareMovementStrategy(str, Enum):
     MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
 
 
-# TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
-@dataclass(frozen=True)
-class LabwareMovementOffsetData(BaseModel):
+@dataclass
+class LabwareMovementOffsetData:
     """Offsets to be used during labware movement."""
 
     pickUpOffset: Optional[LabwareOffsetVector]
