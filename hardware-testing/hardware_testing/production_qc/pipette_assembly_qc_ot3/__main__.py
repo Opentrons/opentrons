@@ -76,8 +76,6 @@ ENCODER_ALIGNMENT_THRESHOLD_MM = 0.1
 COLUMNS = "ABCDEFGH"
 PRESSURE_DATA_HEADER = ["PHASE", "CH1", "CH2", "CH3", "CH4", "CH5", "CH6", "CH7", "CH8"]
 
-SPEED_REDUCTION_PERCENTAGE = 0.3
-
 MULTI_CHANNEL_1_OFFSET = Point(y=9 * 7 * 0.5)
 
 # NOTE: there is a ton of pressure data, so we want it on the bottom of the CSV
@@ -151,28 +149,17 @@ HUMIDITY_THRESH = [10, 90]
 
 # THRESHOLDS: capacitive sensor
 CAP_THRESH_OPEN_AIR = {
-    1: [3.0, 6.0],
-    8: [5.0, 20.0],
-    96: [0.0, 10.0],
+    1: [3.0, 7.0],
+    8: [3.0, 7.0],  # TODO: update for PVT multi build
 }
 CAP_THRESH_PROBE = {
-    1: [4.0, 7.0],
-    8: [5.0, 20.0],
-    96: [0.0, 20.0],
+    1: [4.0, 8.0],
+    8: [5.0, 20.0],  # TODO: update for PVT multi build
 }
 CAP_THRESH_SQUARE = {
     1: [8.0, 15.0],
-    8: [0.0, 1000.0],
-    96: [0.0, 1000.0],
+    8: [0.0, 1000.0],  # TODO: update for PVT multi build
 }
-CAP_PROBE_DISTANCE = 50.0
-CAP_PROBE_SECONDS = 5.0
-CAP_PROBE_SETTINGS = CapacitivePassSettings(
-    prep_distance_mm=CAP_PROBE_DISTANCE,
-    max_overrun_distance_mm=0.0,
-    speed_mm_per_s=CAP_PROBE_DISTANCE / CAP_PROBE_SECONDS,
-    sensor_threshold_pf=1.0,
-)
 
 # THRESHOLDS: air-pressure sensor
 PRESSURE_ASPIRATE_VOL = {50: 10.0, 1000: 20.0}
