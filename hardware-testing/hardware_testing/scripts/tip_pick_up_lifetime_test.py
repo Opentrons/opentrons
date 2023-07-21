@@ -302,6 +302,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     else:
         print("Failed to load complete information.\n")
 
+    start_slot = start_slot%12  # fix bug for cycles
     for i in range(start_slot-1):
         del calibrated_slot_loc[list(calibrated_slot_loc)[0]]
 
