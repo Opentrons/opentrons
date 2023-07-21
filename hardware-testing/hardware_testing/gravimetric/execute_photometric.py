@@ -66,9 +66,20 @@ def _load_labware(
     ctx: ProtocolContext, cfg: config.PhotometricConfig
 ) -> Tuple[Labware, Labware]:
     ui.print_info(f'Loading photoplate labware: "{cfg.photoplate}"')
-    photoplate = ctx.load_labware(cfg.photoplate, location=cfg.photoplate_slot)
-    reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
-    _apply_labware_offsets(cfg, [photoplate, reservoir])
+    # If running multiple tests in one run, the labware may already be loaded
+    loaded_labwares = ctx.loaded_labwares
+
+    if (cfg.photoplate_slot in loaded_labwares.keys() and loaded_labwares[cfg.photoplate_slot].name == cfg.photoplate):
+        photoplate = loaded_labwares[cfg.photoplate_slot]
+    else:
+        photoplate = ctx.load_labware(cfg.photoplate, location=cfg.photoplate_slot)
+        _apply_labware_offsets(cfg, [photoplate])
+
+    if (cfg.reservoir_slot in loaded_labwares.keys() and loaded_labwares[cfg.reservoir_slot].name == cfg.reservoir):
+        reservoir = loaded_labwares[cfg.reservoir_slot]
+    else:
+        reservoir = ctx.load_labware(cfg.reservoir, location=cfg.reservoir_slot)
+        _apply_labware_offsets(cfg, [reservoir])
     return photoplate, reservoir
 
 
@@ -264,7 +275,7 @@ def execute_trials(
         if not len(tips[0]):
             if not resources.ctx.is_simulating():
                 ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
-            tips = get_tips(resources.ctx, resources.pipette, True)
+            tips = get_tips(resources.ctx, cfg.tip_volume, resources.pipette, True)
         return tips[0].pop(0)
 
     trial_total = len(resources.test_volumes) * cfg.trials

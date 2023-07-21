@@ -26,7 +26,7 @@ from hardware_testing.protocols import (
 )
 
 from . import execute, helpers, workarounds, execute_photometric
-from .config import GravimetricConfig, GANTRY_MAX_SPEED, PhotometricConfig, ConfigType
+from .config import GravimetricConfig, GANTRY_MAX_SPEED, PhotometricConfig, ConfigType, get_tip_volumes_for_qc
 from .measurement import DELAY_FOR_MEASUREMENT
 from .trial import TestResources
 from .tips import get_tips
@@ -180,66 +180,7 @@ def build_photometric_cfg(
     )
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser("Pipette Testing")
-    parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
-    parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
-    parser.add_argument("--tip", type=int, choices=[50, 200, 1000], required=True)
-    parser.add_argument("--trials", type=int, default=0)
-    parser.add_argument("--increment", action="store_true")
-    parser.add_argument("--return-tip", action="store_true")
-    parser.add_argument("--skip-labware-offsets", action="store_true")
-    parser.add_argument("--no-blank", action="store_true")
-    parser.add_argument("--mix", action="store_true")
-    parser.add_argument("--inspect", action="store_true")
-    parser.add_argument("--user-volumes", action="store_true")
-    parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
-    parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
-    parser.add_argument("--photometric", action="store_true")
-    parser.add_argument("--touch-tip", action="store_true")
-    parser.add_argument("--refill", action="store_true")
-    parser.add_argument("--isolate-channels", nargs="+", type=int, default=None)
-    parser.add_argument("--extra", action="store_true")
-    args = parser.parse_args()
-    if not args.simulate and not args.skip_labware_offsets:
-        # getting labware offsets must be done before creating the protocol context
-        # because it requires the robot-server to be running
-        ui.print_title("SETUP")
-        ui.print_info(
-            "Starting opentrons-robot-server, so we can http GET labware offsets"
-        )
-        offsets = workarounds.http_get_all_labware_offsets()
-        ui.print_info(f"found {len(offsets)} offsets:")
-        for offset in offsets:
-            ui.print_info(f"\t{offset['createdAt']}:")
-            ui.print_info(f"\t\t{offset['definitionUri']}")
-            ui.print_info(f"\t\t{offset['vector']}")
-            LABWARE_OFFSETS.append(offset)
-    if args.increment:
-        _protocol = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][args.tip]
-    else:
-        _protocol = GRAVIMETRIC_CFG[args.pipette][args.channels][args.tip]
-    # gather the custom labware (for simulation)
-    custom_defs = {}
-    if args.simulate:
-        labware_dir = Path(__file__).parent.parent / "labware"
-        custom_def_uris = [
-            "radwag_pipette_calibration_vial",
-            "opentrons_flex_96_tiprack_50ul_adp",
-            "opentrons_flex_96_tiprack_200ul_adp",
-            "opentrons_flex_96_tiprack_1000ul_adp",
-        ]
-        for def_uri in custom_def_uris:
-            with open(labware_dir / def_uri / "1.json", "r") as f:
-                custom_def = json_load(f)
-            custom_defs[def_uri] = custom_def
-    _ctx = helpers.get_api_context(
-        API_LEVEL,  # type: ignore[attr-defined]
-        is_simulating=args.simulate,
-        deck_version="2",
-        extra_labware=custom_defs,
-    )
+def _main(args: argparse.Namespace, _ctx: ProtocolContext) -> None:
     union_cfg: Union[PhotometricConfig, GravimetricConfig]
     if args.photometric:
         cfg_pm: PhotometricConfig = build_photometric_cfg(
@@ -303,10 +244,74 @@ if __name__ == "__main__":
         robot_serial=helpers._get_robot_serial(_ctx.is_simulating()),
         tip_batch=helpers._get_tip_batch(_ctx.is_simulating()),
         git_description=get_git_description(),
-        tips=get_tips(_ctx, pipette, all_channels=all_channels_same_time),
+        tips=get_tips(_ctx, pipette, args.tip, all_channels=all_channels_same_time),
     )
 
     if args.photometric:
         execute_photometric.run(cfg_pm, run_args)
     else:
         execute.run(cfg_gm, run_args)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser("Pipette Testing")
+    parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--pipette", type=int, choices=[50, 1000], required=True)
+    parser.add_argument("--channels", type=int, choices=[1, 8, 96], default=1)
+    parser.add_argument("--tip", type=int, choices=[0, 50, 200, 1000], default = 0)
+    parser.add_argument("--trials", type=int, default=0)
+    parser.add_argument("--increment", action="store_true")
+    parser.add_argument("--return-tip", action="store_true")
+    parser.add_argument("--skip-labware-offsets", action="store_true")
+    parser.add_argument("--no-blank", action="store_true")
+    parser.add_argument("--mix", action="store_true")
+    parser.add_argument("--inspect", action="store_true")
+    parser.add_argument("--user-volumes", action="store_true")
+    parser.add_argument("--gantry-speed", type=int, default=GANTRY_MAX_SPEED)
+    parser.add_argument("--scale-delay", type=int, default=DELAY_FOR_MEASUREMENT)
+    parser.add_argument("--photometric", action="store_true")
+    parser.add_argument("--touch-tip", action="store_true")
+    parser.add_argument("--refill", action="store_true")
+    parser.add_argument("--isolate-channels", nargs="+", type=int, default=None)
+    parser.add_argument("--extra", action="store_true")
+    args = parser.parse_args()
+    if not args.simulate and not args.skip_labware_offsets:
+        # getting labware offsets must be done before creating the protocol context
+        # because it requires the robot-server to be running
+        ui.print_title("SETUP")
+        ui.print_info(
+            "Starting opentrons-robot-server, so we can http GET labware offsets"
+        )
+        offsets = workarounds.http_get_all_labware_offsets()
+        ui.print_info(f"found {len(offsets)} offsets:")
+        for offset in offsets:
+            ui.print_info(f"\t{offset['createdAt']}:")
+            ui.print_info(f"\t\t{offset['definitionUri']}")
+            ui.print_info(f"\t\t{offset['vector']}")
+            LABWARE_OFFSETS.append(offset)
+    # gather the custom labware (for simulation)
+    custom_defs = {}
+    if args.simulate:
+        labware_dir = Path(__file__).parent.parent / "labware"
+        custom_def_uris = [
+            "radwag_pipette_calibration_vial",
+            "opentrons_flex_96_tiprack_50ul_adp",
+            "opentrons_flex_96_tiprack_200ul_adp",
+            "opentrons_flex_96_tiprack_1000ul_adp",
+        ]
+        for def_uri in custom_def_uris:
+            with open(labware_dir / def_uri / "1.json", "r") as f:
+                custom_def = json_load(f)
+            custom_defs[def_uri] = custom_def
+    _ctx = helpers.get_api_context(
+        API_LEVEL,  # type: ignore[attr-defined]
+        is_simulating=args.simulate,
+        deck_version="2",
+        extra_labware=custom_defs,
+    )
+    if args.tip == 0:
+        for tip in get_tip_volumes_for_qc(args.pipette, args.channels, args.extra, args.photometric):
+            args.tip = tip
+            _main(args, _ctx)
+    else:
+        _main(args, _ctx)
