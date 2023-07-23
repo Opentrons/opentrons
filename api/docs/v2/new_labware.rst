@@ -83,38 +83,40 @@ When the ``load_labware`` method loads labware into your protocol, it returns a 
 Loading Labware on Adapters
 ===========================
 
-The previous section demonstrates loading labware directly into a deck slot. But, the ``load_labware`` method also includes the ``adapter`` argument. This parameter lets you stack labware on top of a compatible adapter and work with them as a single unit in a protocol. For example, you can use an adapter as a simple labware holding device or when you need to use a labware/adapter combination with a module. The ability to combine labware with adapters adds functionality and flexibility to your robot and protocols. 
+The previous section demonstrates loading labware directly into a deck slot. But you can also load labware on top of an adapter that either fits on a module or directly in a deck slot. Compatible labware then sits atop the adapter. The ability to combine labware with adapters adds functionality and flexibility to your robot and protocols.
 
-On the Deck
------------
-This example uses ``adapter`` to combine a 96-well plate with a flat adapter and loads them into a deck slot::
+You can either load the adapter first and the labware second, or load both the adapter and labware all at once.
+
+Loading Separately
+------------------
+
+The ``load_adapter()`` method is available on ``ProtocolContext`` and module contexts. It behaves similarly to ``load_labware()``, requiring the load name and location for the desired adapter. Load a module, adapter, and labware with separate calls to specify each layer of the physical stack of components individually::
+
+    hs_mod = protocol.load_module('heaterShakerModuleV1', 'D1')
+    hs_adapter = hs_mod.load_adapter('opentrons_96_flat_bottom_adapter')
+    hs_plate = hs_mod.load_labware('nest_96_wellplate_200ul_flat')
     
-    corning_plate = protocol.load_labware (
-        load_name= 'corning_96_wellplate_360ul_flat',
-        location= "D1",
-        adapter= "opentrons_universal_flat_adapter")
+.. versionadded:: 2.15
+
+Loading Together
+----------------
+
+Use the ``adapter`` argument of ``load_labware()`` to load an adapter at the same time as labware. For example, to load the same 96-well plate and adapter from the previous section at once::
+    
+    hs_plate = hs_mod.load_labware(
+        load_name='nest_96_wellplate_200ul_flat',
+        location="D1",
+        adapter="opentrons_96_flat_bottom_adapter")
 
 .. versionadded:: 2.15
 
-On a Module
------------
+The API also has some "combination" labware definitions, which treat the adapter and labware as a unit::
 
-This example combines a 96-well plate with a PCR adapter and loads them onto a Heater-Shaker::
+    hs_combo = hs_mod.load_labware(
+        "opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat"
+    )
 
-    # Load module, open latch
-    heater_shaker = protocol.load_module(
-        module_name= "heaterShakerModuleV1",
-        location= "D1")
-    heater_shaker.open_labware_latch()
-    
-    # Load adapter on the module
-    pcr_adapter = heater_shaker.load_adapter(name= "opentrons_96_pcr_adapter")
-
-    # Load labware on the adapter
-    nest_plate = pcr_adapter.load_labware(
-        load_name= "nest_96_wellplate_100ul_pcr_full_skirt")
-
-.. versionadded:: 2.15
+Loading labware this way prevents you from :ref:`moving the labware <moving-labware>` onto or off of the adapter, so it's less flexible than loading the two separately. Avoid using combination definitions unless your protocol specifies an ``apiLevel`` of 2.14 or lower.
 
 .. _new-well-access:
 
