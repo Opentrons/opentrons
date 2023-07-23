@@ -10,7 +10,7 @@ Labware are the durable or consumable items that you work with, reuse, or discar
 
 .. note::
 
-    Code snippets use alphanumeric Flex deck slot locations (e.g. ``D1``, ``D2``, etc.). If you have an OT-2 and are using API version 2.14 or earlier, replace the Flex deck slot coordinate with its OT-2 equivalent. For example, Flex slot D1 corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
+    Code snippets use coordinate deck slot locations (e.g. ``'D1'``, ``'D2'``), like those found on Flex. If you have an OT-2 and are using API version 2.14 or earlier, replace the  coordinate with its numeric OT-2 equivalent. For example, Flex slot D1 corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
 
 *************
 Labware Types
@@ -164,10 +164,10 @@ The API provides many different ways to access wells inside labware. Different m
      - List of all wells.
      - ``[labware:A1, labware:B1, labware:C1...]``
    * - :py:meth:`.Labware.rows`
-     - List of a list ordered by row.
+     - List of lists grouped by row.
      - ``[[labware:A1, labware:A2...], [labware:B1, labware:B2...]]``
    * - :py:meth:`.Labware.columns`
-     - List of a list ordered by column.
+     - List of lists grouped by column.
      - ``[[labware:A1, labware:B1...], [labware:A2, labware:B2...]]``
    * - :py:meth:`.Labware.wells_by_name`
      - Dictionary with well names as keys.
@@ -266,7 +266,10 @@ and it will return the individual well objects in row A.
 Labeling Liquids in Wells
 *************************
 
-Optionally, you can specify the liquids that should be in various wells at the beginning of your protocol. Doing so helps you identify well contents by name and volume, and adds corresponding labels to a single well, or group of wells, in well plates and reservoirs. Viewing the initial liquid setup in a Python protocol is available in the Opentrons App v6.3.0 or higher.
+Optionally, you can specify the liquids that should be in various wells at the beginning of your protocol. Doing so helps you identify well contents by name and volume, and adds corresponding labels to a single well, or group of wells, in well plates and reservoirs. You can view the initial liquid setup of a Python protocol:
+
+- For Flex protocols, on the touchscreen.
+- For Flex or OT-2 protocols, in the Opentrons App (v6.3.0 or higher).
 
 To use these optional methods, first create a liquid object with :py:meth:`.ProtocolContext.define_liquid` and then label individual wells by calling :py:meth:`.Well.load_liquid`, both within the ``run()`` function of your Python protocol.
 
@@ -313,7 +316,7 @@ This example uses ``load_liquid`` to label the initial well location, contents, 
 This information shows up in the Opentrons App (v6.3.0 or higher) after you import your protocol. A summary of liquids is available on the protocol detail page, and well-by-well detail is available in the Initial Liquid Setup section of the run setup page.
 
 .. note::
-    ``load_liquid`` does not validate volume for your labware nor does it prevent you from adding multiple liquids to each well. For example, you could label a 40 µL well plate with ``greenWater``, ``volume=50``, and then also add blue water to the well. The API won't stop you. It's your responsibility to ensure the labels you use accurately reflect the amounts and types of liquid you plan to place into wells and reservoirs.
+    ``load_liquid`` does not validate volume for your labware nor does it prevent you from adding multiple liquids to each well. For example, you could label a 40 µL well with ``greenWater``, ``volume=50``, and then also add blue water to the well. The API won't stop you. It's your responsibility to ensure the labels you use accurately reflect the amounts and types of liquid you plan to place into wells and reservoirs.
 
 Labeling vs Handling Liquids
 ============================
