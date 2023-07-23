@@ -20,6 +20,12 @@
           "2.14": 80
         }
       },
+      "defaultFlowAcceleration": {
+        "default": 24000,
+        "valuesByApiLevel": {
+          "2.13": 24000
+        }
+      },
       "defaultTipLength": 57.9,
       "defaultReturnTipHeight": 0.83,
       "aspirate": {
