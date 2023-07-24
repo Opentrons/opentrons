@@ -248,6 +248,7 @@ def _pipette_with_liquid_settings(
 
     # make sure the trailing-air-gap isn't too big, like during an increment test
     _vol = aspirate if aspirate else dispense
+    assert _vol
     _checked_trailing_air_gap = min(
         pipette.max_volume - _vol, liquid_class.aspirate.trailing_air_gap
     )

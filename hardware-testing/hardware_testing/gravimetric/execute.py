@@ -99,26 +99,6 @@ def _update_environment_first_last_min_max(test_report: report.CSVReport) -> Non
     report.store_environment(test_report, report.EnvironmentReportState.MAX, max_data)
 
 
-def _check_if_software_supports_high_volumes() -> bool:
-    src_a = getsource(Pipette.set_current_volume)
-    src_b = getsource(Pipette.ok_to_add_volume)
-    modified_a = "# assert new_volume <= self.working_volume" in src_a
-    modified_b = "return True" in src_b
-    return modified_a and modified_b
-
-
-def _reduce_volumes_to_not_exceed_software_limit(
-    test_volumes: List[float], cfg: config.GravimetricConfig
-) -> List[float]:
-    for i, v in enumerate(test_volumes):
-        liq_cls = get_liquid_class(
-            cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume, int(v)
-        )
-        max_vol = cfg.tip_volume - liq_cls.aspirate.trailing_air_gap
-        test_volumes[i] = min(v, max_vol - 0.1)
-    return test_volumes
-
-
 def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[float]:
     if cfg.increment:
         test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
@@ -133,13 +113,6 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[fl
         )
     if not test_volumes:
         raise ValueError("no volumes to test, check the configuration")
-    if not _check_if_software_supports_high_volumes():
-        if ctx.is_simulating():
-            test_volumes = _reduce_volumes_to_not_exceed_software_limit(
-                test_volumes, cfg
-            )
-        else:
-            raise RuntimeError("you are not the correct branch")
     return sorted(test_volumes, reverse=False)  # lowest volumes first
 
 
