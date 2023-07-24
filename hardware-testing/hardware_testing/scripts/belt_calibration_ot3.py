@@ -70,38 +70,49 @@ async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> None:
     print(attitude)
 
 
-async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
+async def _main(is_simulating: bool, mount: types.OT3Mount, test: bool) -> None:
     ui.print_title("BELT CALIBRATION")
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating,
         pipette_left="p1000_single_v3.4",
         pipette_right="p1000_single_v3.4",
     )
-    print("homing")
-    await api.home()
-    print("resetting robot calibration")
-    await api.reset_instrument_offset(mount)
-    api.reset_robot_calibration()
-
-    # SKIP calibrating the belts, then check accuracy
-    await _calibrate_pipette(api, mount)
-    await _check_belt_accuracy(api, mount)
-
-    # DO calibrate the belts, then check accuracy
-    await _calibrate_belts(api, mount)  # <-- !!!
-    await _calibrate_pipette(api, mount)
-    await _check_belt_accuracy(api, mount)
-
-    print("done")
+    try:
+        print("homing")
+        await api.home()
+        attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(2)
+        current_pos = await api.gantry_position(mount)
+        await api.move_to(mount, attach_pos._replace(z=current_pos.z))
+        if not api.is_simulator:
+            ui.get_user_ready("ATTACH a probe")
+        print("resetting robot calibration")
+        await api.reset_instrument_offset(mount)
+        api.reset_robot_calibration()
+        if test:
+            # check accuracy of gantry-to-deck
+            await _calibrate_pipette(api, mount)
+            await _check_belt_accuracy(api, mount)
+        # calibrate the belts
+        await _calibrate_belts(api, mount)  # <-- !!!
+        if test:
+            # check accuracy of gantry-to-deck
+            await _calibrate_pipette(api, mount)
+            await _check_belt_accuracy(api, mount)
+        print("done")
+    finally:
+        if not api.is_simulator:
+            print("restarting opentrons-robot-server")
+            helpers_ot3.start_server_ot3()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--mount", type=str, choices=["left", "right"], required=True)
+    parser.add_argument("--test", action="store_true")
+    parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     args = parser.parse_args()
     if args.mount == "left":
         mnt = types.OT3Mount.LEFT
     else:
         mnt = types.OT3Mount.RIGHT
-    asyncio.run(_main(args.simulate, mnt))
+    asyncio.run(_main(args.simulate, mnt, args.test))
