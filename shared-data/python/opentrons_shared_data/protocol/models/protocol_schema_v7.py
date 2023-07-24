@@ -6,15 +6,12 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 from .shared_models import (
     Liquid,
-    Labware,
     CommandAnnotation,
     Location,
     ProfileStep,
     WellLocation,
     OffsetVector,
     Metadata,
-    Module,
-    Pipette,
     Robot,
     DesignerApplication,
 )
@@ -85,12 +82,8 @@ class ProtocolSchemaV7(BaseModel):
     schemaVersion: Literal[7]
     metadata: Metadata
     robot: Robot
-    pipettes: Optional[Dict[str, Pipette]]
-    labware: Optional[Dict[str, Labware]]
-    modules: Optional[Dict[str, Module]]
     liquids: Optional[Dict[str, Liquid]]
     labwareDefinitions: Dict[str, LabwareDefinition]
-    # commands must be after pipettes, labware, etc. for its @validator to work.
     commands: List[Command]
     commandAnnotations: Optional[List[CommandAnnotation]]
     designerApplication: Optional[DesignerApplication]

@@ -10,9 +10,7 @@ from . import list_fixtures
 
 @pytest.mark.parametrize("defpath", list_fixtures(7))
 def test_v7_types(defpath):
-    def_data = load_shared_data(
-        "python/tests/protocol/../../../protocol/fixtures/7/simpleV7.json"
-    )
+    def_data = load_shared_data(defpath)
     def_model = protocol_schema_v7.ProtocolSchemaV7.parse_raw(def_data)
     def_dict_from_model = def_model.dict(
         exclude_unset=True,

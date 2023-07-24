@@ -1,5 +1,5 @@
 """Translation of JSON protocol commands into ProtocolEngine commands."""
-from typing import cast, List, Union, overload
+from typing import cast, List, Union
 from pydantic import parse_obj_as
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
@@ -85,8 +85,8 @@ def _translate_v7_labware_command(
 
 
 def _translate_module_command(
-    protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7],
-    command: Union[protocol_schema_v6.Command, protocol_schema_v7.Command],
+    protocol: ProtocolSchemaV6,
+    command: protocol_schema_v6.Command,
 ) -> pe_commands.CommandCreate:
     module_id = command.params.moduleId
     modules = protocol.modules
@@ -205,20 +205,6 @@ class JsonTranslator:
             )
             for liquid_id, liquid in protocol_liquids.items()
         ]
-
-    @overload
-    def translate_commands(
-        self,
-        protocol: ProtocolSchemaV6,
-    ) -> List[pe_commands.CommandCreate]:
-        ...
-
-    @overload
-    def translate_commands(
-        self,
-        protocol: ProtocolSchemaV7,
-    ) -> List[pe_commands.CommandCreate]:
-        ...
 
     def translate_commands(
         self,

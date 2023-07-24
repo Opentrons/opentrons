@@ -584,8 +584,6 @@ def _make_v6_json_protocol(
 ) -> protocol_schema_v6.ProtocolSchemaV6:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
     return protocol_schema_v6.ProtocolSchemaV6(
-        # schemaVersion is arbitrary. Currently (2021-06-28), JsonProtocol.parse_obj()
-        # isn't smart enough to validate differently depending on this field.
         otSharedSchema="#/protocol/schemas/6",
         schemaVersion=6,
         metadata=SD_Metadata(),
@@ -606,10 +604,6 @@ def _make_v7_json_protocol(
         "example/trash/1": _load_labware_definition_data(),
     },
     commands: List[protocol_schema_v7.Command] = [],
-    modules: Dict[str, Module] = {
-        "module-id-1": Module(model="magneticModuleV2"),
-        "module-id-2": Module(model="thermocyclerModuleV2"),
-    },
     liquids: Dict[str, Liquid] = {
         "liquid-id-555": Liquid(
             displayName="water", description="water description", displayColor="#F00"
@@ -618,8 +612,6 @@ def _make_v7_json_protocol(
 ) -> protocol_schema_v7.ProtocolSchemaV7:
     """Return a minimal JsonProtocol with the given elements, to use as test input."""
     return protocol_schema_v7.ProtocolSchemaV7(
-        # schemaVersion is arbitrary. Currently (2021-06-28), JsonProtocol.parse_obj()
-        # isn't smart enough to validate differently depending on this field.
         otSharedSchema="#/protocol/schemas/7",
         schemaVersion=7,
         metadata=SD_Metadata(),
@@ -627,7 +619,6 @@ def _make_v7_json_protocol(
         labwareDefinitions=labware_definitions,
         commands=commands,
         liquids=liquids,
-        modules=modules,
     )
 
 
