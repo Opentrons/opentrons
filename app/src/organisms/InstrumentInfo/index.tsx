@@ -155,7 +155,6 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
               justifyContent={JUSTIFY_CENTER}
             />
             <MediumButton
-              buttonType="primary"
               flex="1"
               onClick={handleRecalibrate}
               buttonText={
