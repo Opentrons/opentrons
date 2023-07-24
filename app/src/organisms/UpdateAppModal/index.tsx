@@ -74,8 +74,8 @@ const FINISH_UPDATE_INSTRUCTIONS = (
     <Box as="ol" paddingLeft={SPACING.spacing16}>
       <li>
         <Text marginBottom={SPACING.spacing8}>
-          After updating the Opentrons App, <strong>update your robot</strong> to
-          ensure the app and robot software is in sync.
+          After updating the Opentrons App, <strong>update your robot</strong>{' '}
+          to ensure the app and robot software is in sync.
         </Text>
       </li>
       <li>
