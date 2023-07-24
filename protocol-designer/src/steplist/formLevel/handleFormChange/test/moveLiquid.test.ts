@@ -30,15 +30,15 @@ beforeEach(() => {
       name: 'p10_single',
       spec: fixtureP10Single,
       // @ts-expect-error(sa, 2021-6-15): tiprackModel does not exist on PipetteEntity
-      tiprackModel: 'tiprack-10ul',
-      tiprackLabwareDef: fixtureTiprack10ul,
+      tiprackModel: ['tiprack-10ul'],
+      tiprackLabwareDef: [fixtureTiprack10ul],
     },
     otherPipetteId: {
       name: 'p300_single_gen2',
       spec: fixtureP300Single,
       // @ts-expect-error(sa, 2021-6-15): tiprackModel does not exist on PipetteEntity
-      tiprackModel: 'tiprack-300ul',
-      tiprackLabwareDef: fixtureTiprack300ul,
+      tiprackModel: ['tiprack-300ul'],
+      tiprackLabwareDef: [fixtureTiprack300ul],
     },
   }
   labwareEntities = {}

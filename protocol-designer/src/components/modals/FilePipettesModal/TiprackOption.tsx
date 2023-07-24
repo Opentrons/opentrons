@@ -5,7 +5,8 @@ import {
   Icon,
   DIRECTION_ROW,
   COLORS,
-  TYPOGRAPHY,
+  SPACING,
+  ALIGN_CENTER,
 } from '@opentrons/components'
 
 interface TiprackOptionProps {
@@ -21,18 +22,20 @@ export function TiprackOption(props: TiprackOptionProps): JSX.Element {
       cursor="pointer"
       onClick={onClick}
       flexDirection={DIRECTION_ROW}
+      padding={SPACING.spacing6}
+      width="15rem"
+      alignItems={ALIGN_CENTER}
+      gridGap={SPACING.spacing4}
     >
       <Icon
-        aria-label={`EquipmentOption_${
+        aria-label={`TiprackOption_${
           isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'
         }`}
         color={isSelected ? COLORS.blueEnabled : COLORS.darkGreyEnabled}
-        size="1.5rem"
+        size="1.25rem"
         name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
       />
-      <Text as="p" fontSize={TYPOGRAPHY.fontSizeP}>
-        {text}
-      </Text>
+      <Text fontSize="12px">{text}</Text>
     </Flex>
   )
 }

@@ -339,6 +339,8 @@ const validationSchema = Yup.object().shape({
     [MAGNETIC_MODULE_TYPE]: moduleValidationShape,
     [TEMPERATURE_MODULE_TYPE]: moduleValidationShape,
     [THERMOCYCLER_MODULE_TYPE]: moduleValidationShape,
+    [HEATERSHAKER_MODULE_TYPE]: moduleValidationShape,
+    [MAGNETIC_BLOCK_TYPE]: moduleValidationShape,
   }),
 })
 

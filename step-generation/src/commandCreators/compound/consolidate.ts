@@ -181,6 +181,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette: args.pipette,
+            tipRack: args.tipRack,
           }),
         ]
       }

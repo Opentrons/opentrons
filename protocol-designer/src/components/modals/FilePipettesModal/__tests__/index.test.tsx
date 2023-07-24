@@ -24,7 +24,7 @@ import { FormPipettesByMount } from '../../../../step-forms'
 import { FormState } from '..'
 
 describe('FilePipettesModal', () => {
-  const tiprackDefURI = 'tiprack_300'
+  const tiprackDefURI = ['tiprack_300']
   let props: Props,
     initialPipetteValues: FormPipettesByMount,
     initialModuleValues: FormState['modulesByType']

@@ -28,6 +28,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300SingleId,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         initialRobotState
@@ -39,6 +40,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300SingleId,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         merge({}, initialRobotState, {
@@ -71,6 +73,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300SingleId,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         initialTestRobotState
@@ -94,6 +97,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300SingleId,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         initialTestRobotState
@@ -115,6 +119,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300SingleId,
+          tipRack: tiprack2Id,
         },
         invariantContext,
         initialTestRobotState
@@ -132,6 +137,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300MultiId,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         initialRobotState
@@ -157,6 +163,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300MultiId,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         robotStateWithTipA1Missing
@@ -181,6 +188,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300MultiId,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         robotStateWithTipsOnMulti
