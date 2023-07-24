@@ -8,5 +8,5 @@ export const equipmentImages = {
   flex_pipette: require('../../assets/images/change-pip/single_mount_pipettes.png'),
   pipette_96: require('../../assets/images/change-pip/ninety-six-channel.png'),
   mounting_plate_96_channel: require('../../assets/images/change-pip/mounting-plate-96-channel.png'),
-  flex_gripper: require('../../assets/images/flex_gripper.svg'),
+  flex_gripper: require('../../assets/images/flex_gripper.png'),
 }

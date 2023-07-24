@@ -8,6 +8,7 @@ import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
 import { InstrumentCard } from '../../molecules/InstrumentCard'
 import { GripperWizardFlows } from '../GripperWizardFlows'
+import { AboutGripperSlideout } from './AboutGripperSlideout'
 import { GRIPPER_FLOW_TYPES } from '../GripperWizardFlows/constants'
 import type { GripperWizardFlowType } from '../GripperWizardFlows/types'
 
@@ -25,6 +26,10 @@ export function GripperCard({
     openWizardFlowType,
     setOpenWizardFlowType,
   ] = React.useState<GripperWizardFlowType | null>(null)
+  const [
+    showAboutGripperSlideout,
+    setShowAboutGripperSlideout,
+  ] = React.useState<boolean>(false)
 
   const handleAttach: React.MouseEventHandler<HTMLButtonElement> = () => {
     setOpenWizardFlowType(GRIPPER_FLOW_TYPES.ATTACH)
@@ -42,21 +47,29 @@ export function GripperCard({
     attachedGripper == null
       ? [
           {
-            label: 'Attach gripper',
+            label: t('attach_gripper'),
             disabled: attachedGripper != null,
             onClick: handleAttach,
           },
         ]
       : [
           {
-            label: 'Recalibrate gripper',
+            label:
+              attachedGripper.data.calibratedOffset?.last_modified != null
+                ? t('recalibrate_gripper')
+                : t('calibrate_gripper'),
             disabled: attachedGripper == null,
             onClick: handleCalibrate,
           },
           {
-            label: 'Detach gripper',
+            label: t('detach_gripper'),
             disabled: attachedGripper == null,
             onClick: handleDetach,
+          },
+          {
+            label: t('about_gripper'),
+            disabled: attachedGripper == null,
+            onClick: () => setShowAboutGripperSlideout(true),
           },
         ]
   return (
@@ -103,6 +116,14 @@ export function GripperCard({
           closeFlow={() => setOpenWizardFlowType(null)}
         />
       ) : null}
+      {attachedGripper != null && showAboutGripperSlideout && (
+        <AboutGripperSlideout
+          serialNumber={attachedGripper.serialNumber}
+          firmwareVersion={attachedGripper.firmwareVersion}
+          isExpanded={showAboutGripperSlideout}
+          onCloseClick={() => setShowAboutGripperSlideout(false)}
+        />
+      )}
     </>
   )
 }
