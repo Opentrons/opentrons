@@ -85,7 +85,7 @@ When the ``load_labware`` method loads labware into your protocol, it returns a 
 Loading Labware on Adapters
 ===========================
 
-The previous section demonstrates loading labware directly into a deck slot. But you can also load labware on top of an adapter that either fits on a module or goes directly on the deck. Compatible labware then sits atop the adapter. The ability to combine labware with adapters adds functionality and flexibility to your robot and protocols.
+The previous section demonstrates loading labware directly into a deck slot. But you can also load labware on top of an adapter that either fits on a module or goes directly on the deck. The ability to combine labware with adapters adds functionality and flexibility to your robot and protocols.
 
 You can either load the adapter first and the labware second, or load both the adapter and labware all at once.
 
