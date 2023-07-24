@@ -230,7 +230,7 @@ class JsonTranslator:
         else:
             return self._translate_v7_commands(protocol)
 
-    def _traslate_v6_commands(
+    def _translate_v6_commands(
         self,
         protocol: ProtocolSchemaV6,
     ) -> List[pe_commands.CommandCreate]:
