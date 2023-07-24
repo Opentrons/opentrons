@@ -67,7 +67,6 @@ ssh $(call id-file-arg,$(2)) $(3) root@$(1) \
  cleanup \
  "
 
-$(if $(9),$(call sync-version-file,$(1),$(2),$(3),$(9)),)
 endef
 
 # restart-service: ssh to a robot and restart one of its systemd units
