@@ -267,6 +267,15 @@ describe('ProtocolSetup', () => {
   })
 
   it('should play protocol when click play button', () => {
+    const mockCalibrationData = {
+      offset: [-1.3828125, 0.0703125, 0.31774999999997533],
+      lastModified: '2023-07-20T18:16:44.505833+00:00',
+      source: 'user',
+      status: { markedBad: false, source: null, markedAt: null },
+    }
+    when(mockUseAllPipetteOffsetCalibrationsQuery)
+      .calledWith()
+      .mockReturnValue({ data: { data: [mockCalibrationData] } } as any)
     const [{ getByRole }] = render(`/runs/${RUN_ID}/setup/`)
     expect(mockPlay).toBeCalledTimes(0)
     getByRole('button', { name: 'play' }).click()
@@ -328,6 +337,15 @@ describe('ProtocolSetup', () => {
   })
 
   it('should render a confirmation modal when heater-shaker is in a protocol and it is not shaking', () => {
+    const mockCalibrationData = {
+      offset: [-1.3828125, 0.0703125, 0.31774999999997533],
+      lastModified: '2023-07-20T18:16:44.505833+00:00',
+      source: 'user',
+      status: { markedBad: false, source: null, markedAt: null },
+    }
+    when(mockUseAllPipetteOffsetCalibrationsQuery)
+      .calledWith()
+      .mockReturnValue({ data: { data: [mockCalibrationData] } } as any)
     mockUseIsHeaterShakerInProtocol.mockReturnValue(true)
     const [{ getByRole, getByText }] = render(`/runs/${RUN_ID}/setup/`)
     getByRole('button', { name: 'play' }).click()
