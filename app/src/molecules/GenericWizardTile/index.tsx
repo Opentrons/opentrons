@@ -55,7 +55,7 @@ const Title = styled.h1`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderSemiBold};
     height: ${SPACING.spacing40};
-    display: inline-block;
+    display: ${DISPLAY_INLINE_BLOCK};
   }
 `
 
