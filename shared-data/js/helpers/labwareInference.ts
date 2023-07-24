@@ -6,14 +6,27 @@ import uniq from 'lodash/uniq'
 import type {
   LabwareWell,
   LabwareWellShapeProperties,
-  LabwareWellGroupProperties,
-  LabwareDefinition,
-} from '../../../pages/Labware/types'
+  LabwareDefinition2,
+  LabwareWellGroupMetadata,
+  LabwareBrand,
+} from '../types'
 
+export interface LabwareWellGroupProperties {
+  xOffsetFromLeft: number
+  yOffsetFromTop: number
+  xSpacing: number | null
+  ySpacing: number | null
+  wellCount: number
+  shape: LabwareWellShapeProperties | null
+  depth: number | null
+  totalLiquidVolume: number | null
+  metadata: LabwareWellGroupMetadata
+  brand: LabwareBrand | null
+}
 const ROUNDING_PRECISION = 2
 
 export function getUniqueWellProperties(
-  definition: LabwareDefinition
+  definition: LabwareDefinition2
 ): LabwareWellGroupProperties[] {
   const { groups, wells, dimensions } = definition
 
@@ -33,8 +46,8 @@ export function getUniqueWellProperties(
             }
     )
 
-    const xStart = wellProps[0].x
-    const yStart = wellProps[0].y
+    const xStart = wellProps[0]?.x ?? 0
+    const yStart = wellProps[0]?.y ?? 0
 
     return {
       metadata: group.metadata,

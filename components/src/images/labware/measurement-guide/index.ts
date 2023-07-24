@@ -32,6 +32,10 @@ const FOOTPRINT_DIAGRAMS: Diagrams = {
     require('./images/dimensions/footprint@3x.png'),
     require('./images/dimensions/height-tube-rack-irregular@3x.png'),
   ],
+  adapter: [
+    require('./images/dimensions/footprint@3x.png'),
+    require('./images/dimensions/height-plate-and-reservoir@3x.png'),
+  ],
 }
 
 const ALUM_BLOCK_FOOTPRINTS: Diagrams = {
