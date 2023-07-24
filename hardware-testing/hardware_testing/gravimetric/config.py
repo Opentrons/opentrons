@@ -164,6 +164,7 @@ QC_DEFAULT_TRIALS: Dict[ConfigType, Dict[int, int]] = {
 def get_tip_volumes_for_qc(
     pipette_volume: int, pipette_channels: int, extra: bool, photometric: bool
 ) -> List[int]:
+    """Build the default testing volumes for qc."""
     config: Dict[int, Dict[int, Dict[int, List[float]]]] = {}
     if photometric:
         config = QC_VOLUMES_P
