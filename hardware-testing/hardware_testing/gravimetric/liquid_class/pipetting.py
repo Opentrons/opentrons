@@ -246,6 +246,12 @@ def _pipette_with_liquid_settings(
         channel_count,
     )
 
+    # make sure the trailing-air-gap isn't too big, like during an increment test
+    _vol = aspirate if aspirate else dispense
+    _checked_trailing_air_gap = min(
+        pipette.max_volume - _vol, liquid_class.aspirate.trailing_air_gap
+    )
+
     # SET Z SPEEDS DURING SUBMERGE/RETRACT
     if aspirate:
         submerge_speed = config.TIP_SPEED_WHILE_SUBMERGING_ASPIRATE
@@ -275,11 +281,11 @@ def _pipette_with_liquid_settings(
 
     def _aspirate_on_retract() -> None:
         # add trailing-air-gap
-        pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
+        pipette.aspirate(_checked_trailing_air_gap)
 
     def _dispense_on_approach() -> None:
         # remove trailing-air-gap
-        pipette.dispense(liquid_class.aspirate.trailing_air_gap)
+        pipette.dispense(_checked_trailing_air_gap)
 
     def _dispense_on_submerge() -> None:
         callbacks.on_dispensing()
@@ -308,7 +314,7 @@ def _pipette_with_liquid_settings(
             pipette.touch_tip(speed=config.TOUCH_TIP_SPEED)
         # NOTE: always do a trailing-air-gap, regardless of if tip is empty or not
         #       to avoid droplets from forming and falling off the tip
-        pipette.aspirate(liquid_class.aspirate.trailing_air_gap)
+        pipette.aspirate(_checked_trailing_air_gap)
 
     # PHASE 1: APPROACH
     pipette.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
