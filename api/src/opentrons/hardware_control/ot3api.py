@@ -1676,7 +1676,7 @@ class OT3API(
             gear_pos_dict = {Axis.Q: gear_pos_float}
             fast_home_target = {Axis.Q: self._config.safe_home_distance}
 
-            fast_home_moves = self._build_moves(gear_pos_dict, fast_home_target)
+            fast_home_moves = self._build_moves(gear_pos_dict, fast_home_target, speed=pipette_spec.speed)
             # move toward home until a safe distance
             await self._backend.tip_action(moves=fast_home_moves[0], tip_action="clamp")
             # move the rest of the way home with no acceleration
@@ -1778,7 +1778,7 @@ class OT3API(
                 fast_home_target = {Axis.Q: self._config.safe_home_distance}
 
                 fast_home_moves = self._build_moves(
-                    {Axis.Q: gear_start_position}, fast_home_target
+                    {Axis.Q: gear_start_position}, fast_home_target, speed=move.speed
                 )
                 # move toward home until a safe distance
                 await self._backend.tip_action(
