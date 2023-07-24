@@ -2,7 +2,6 @@
 from serial.tools.list_ports import comports  # type: ignore[import]
 
 from .radwag import RadwagScaleBase, RadwagScale, SimRadwagScale
-from .asair_sensor import AsairSensor, AsairSensorError
 
 
 def list_ports_and_select(device_name: str = "") -> str:
