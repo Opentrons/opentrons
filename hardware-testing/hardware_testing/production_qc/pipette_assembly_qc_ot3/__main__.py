@@ -18,7 +18,7 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.constants import SensorType
 
-from opentrons.config.types import CapacitivePassSettings, LiquidProbeSettings
+from opentrons.config.types import LiquidProbeSettings
 from opentrons.hardware_control.types import TipStateType, FailedTipStateCheck
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
