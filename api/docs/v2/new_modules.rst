@@ -685,14 +685,19 @@ Using a Magnetic Block Module
 
 The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but unlike the Magnetic Module, the Magnetic Block does not move beads up or down in solution. This module is recommended for use with the Flex only.
 
-Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module. After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext`. For example::
+Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module. After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext`. For example, this code loads a Magnetic Block on deck slot D1::
 
     def run(protocol_api.ProtocolContext):
         mag_block = protocol.load_module('magneticBlockV1', 'D1')
 
-.. load something on the magnetic block here example.
+After loading the Magnetic Block, you can add other labware to it and start using it in your protocol. For example, this code tells the robot there's a Bio-Rad well plate on top of the block::
 
-See :ref:`Moving Labware` for more information.
+  def run(protocol_api.ProtocolContext):
+        mag_block = protocol.load_module('magneticBlockV1', 'D1')
+        well_plate = mag_block.load_labware ("biorad_96_wellplate_200ul_pcr")
+
+
+For more information about using and moving labware with the Magnetic Block, see :ref:`Labware` and :ref:`Moving Labware`, respectively.
 
 ***************************************
 Using Multiple Modules of the Same Type
