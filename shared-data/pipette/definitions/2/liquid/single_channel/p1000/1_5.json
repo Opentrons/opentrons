@@ -14,6 +14,9 @@
         "default": 1000,
         "valuesByApiLevel": { "2.0": 1000 }
       },
+      "defaultFlowAcceleration": {
+        "default": 100
+      },
       "defaultTipLength": 76.7,
       "aspirate": {
         "default": {

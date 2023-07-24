@@ -37,7 +37,7 @@
     "flowAcceleration": {
       "description": "Object with a default value and optional dict keyed by api level. If API level is unavailable, default is used.",
       "type": "object",
-      "required": ["default", "valuesByApiLevel"],
+      "required": ["default"],
       "properties": {
         "default": {
           "$ref": "#/definitions/positiveNumber",
@@ -75,6 +75,7 @@
               "defaultAspirateFlowRate",
               "defaultDispenseFlowRate",
               "defaultBlowOutFlowRate",
+              "defaultFlowAcceleration",
               "aspirate",
               "dispense"
             ],

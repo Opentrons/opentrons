@@ -54,6 +54,13 @@ class FlowRateDefinition(BaseModel):
     )
 
 
+class FlowAccelerationDefinition(BaseModel):
+    default: float = Field(..., description="Highest API level default fallback.")
+    values_by_api_level: Dict[str, float] = Field(
+        ..., description="flow accelerations keyed by API level.", alias="valuesByApiLevel"
+    )
+
+
 PipetteFunctionKeyType = Literal["1", "2", "3"]
 ulPerMMType = Dict[PipetteFunctionKeyType, List[Tuple[float, float, float]]]
 
@@ -79,6 +86,11 @@ class SupportedTipsDefinition(BaseModel):
         ...,
         description="The flowrate used in blowouts by default.",
         alias="defaultBlowOutFlowRate",
+    )
+    default_flow_acceleration: FlowAccelerationDefinition = Field(
+        ...,
+        description="The acceleration used during aspirate/dispense/blowout.",
+        alias="defaultFlowAcceleration",
     )
     default_tip_length: float = Field(
         ...,
