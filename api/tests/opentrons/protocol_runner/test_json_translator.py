@@ -55,8 +55,6 @@ VALID_TEST_PARAMS = [
                 pipetteId="pipette-id-1",
                 labwareId="labware-id-2",
                 volume=1.23,
-                # todo (Max and Tamar 3/17/22):needs to be added to the aspirate command
-                #  https://github.com/Opentrons/opentrons/issues/8204
                 flowRate=4.56,
                 wellName="A1",
                 wellLocation=SD_WellLocation(
