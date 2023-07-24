@@ -342,6 +342,7 @@ The examples in this section will use a Thermocycler loaded as follows:
         tc_mod = protocol.load_module('thermocyclerModuleV2')
         plate = tc_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
         
+.. _thermocycler-location:
 The ``location`` parameter of :py:meth:`.load_module` isn't required for the Thermocycler. This module has only one valid deck location, which depends on the robot you're using.
 
 .. list-table::
@@ -703,32 +704,55 @@ For more information about using and moving labware with the Magnetic Block, see
 Using Multiple Modules of the Same Type
 ***************************************
 
-It's possible to use multiples of most module types within a single protocol. The exception is the Thermocycler Module, which only has one supported deck location due to its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and robot server. 
+You can use multiple modules of the same type within a single protocol. The exception is the Thermocycler Module, which has only one :ref:`supported deck location <thermocycler-location>` due to its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and robot server. 
 
-In order to send commands to the correct module on the deck, you need to load the modules in your protocol in a specific order. Whenever you call :py:meth:`.load_module` for a particular module type, the robot will initialize the matching module attached to the lowest-numbered USB port. Deck slot numbers play no role in the ordering of modules; you could load a Temperature Module in slot C1 first, followed by another one in slot D3:
+To send commands to the correct module on the deck, you need to load them in a protocol according to their USB port number. Whenever you call :py:meth:`.load_module` for a particular module type, the robot initializes the matching module attached to the lowest-numbered USB port first, before the same module type in a higher numbered port. Also, deck slot coordinates do not determine which module gets used first, second, third, etc. For example, a Temperature Module in slot C1 that's connected to USB port 1 will get called before a temperature module in slot D3 that's connected to USB port 6. This functionality applies to the Flex and OT-2.
 
-.. code-block:: python
+.. I thought tabs might work here given the robot-specific images.
+.. Using the full, formal protocol works well here.
 
-    from opentrons import protocol_api
+.. tabs::
+  
+  .. tab:: Flex
 
-    metadata = {'apiLevel': '2.3'}
+    .. code-block:: python
+      :substitutions:
+      
+      from opentrons import protocol_api
+      
+      requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
-    def run(protocol: protocol_api.ProtocolContext):
+      def run(protocol: protocol_api.ProtocolContext):
         # Load Temperature Module 1 in deck slot C1 on USB port 1
-        temperature_module_1 = protocol.load_module('temperature module gen2', "C1")
+        temperature_module_1 = protocol.load_module('temperature module gen2',"C1")
 
         # Load Temperature Module 2 in deck slot D3 on USB port 2
-        temperature_module_2 = protocol.load_module('temperature module gen2', "D3")
+        temperature_module_2 = protocol.load_module('temperature module gen2',"D3")
         
-For this code to work as expected, ``temperature_module_1`` should be plugged into a lower-numbered USB port than ``temperature_module_2``. Assuming there are no other modules used in this protocol, it's simplest to use ports 1 and 2, like this:
+    For this code to work as expected, ``temperature_module_1`` should be plugged into a lower-numbered USB port than ``temperature_module_2``. Assuming there are no other modules used in this protocol, you could connect the USB cables as shown here:
 
-.. Will need 2 images for OT-2 and Flex, or 1 generic image that covers both.
+    .. image:: ../img/modules/flex-usb-order.png
+       :width: 400
 
-.. image:: ../img/modules/multiples_of_a_module.svg
+  .. tab:: OT-2
+
+    .. code-block:: python
+
+      from opentrons import protocol_api
+
+      metadata = { 'apiLevel': '2.14'}
+
+      def run(protocol: protocol_api.ProtocolContext):
+        # Load Temperature Module 1 in deck slot C1 on USB port 1
+        temperature_module_1 = protocol.load_module('temperature module gen2', "1")
+
+        # Load Temperature Module 2 in deck slot D3 on USB port 2
+        temperature_module_2 = protocol.load_module('temperature module gen2', "3")
+        
+    For this code to work as expected, ``temperature_module_1`` should be plugged into a lower-numbered USB port than ``temperature_module_2``. Assuming there are no other modules used in this protocol, you could connect the USB cables as shown here:
+    
+    .. image:: ../img/modules/multiples_of_a_module.svg
 
 Before running your protocol, it's a good idea to use the module controls in the Opentrons App to check that commands are being sent where you expect.
-
-.. Does the support article apply to Flex?
-.. Maybe request a title change to include Flex or make more generic for both (substitute "robot" for model name)?
 
 See the support article, `Using Modules of the Same Type <https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2>`_ for more information.
