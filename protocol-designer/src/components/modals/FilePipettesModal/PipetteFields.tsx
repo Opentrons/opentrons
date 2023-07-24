@@ -23,10 +23,10 @@ import { FormPipettesByMount } from '../../../step-forms'
 import { getAllowAllTipracks } from '../../../feature-flags/selectors'
 import { getTiprackOptions } from '../utils'
 import { PipetteDiagram } from './PipetteDiagram'
-import { TiprackOption } from './TiprackOption'
+import { TiprackSelect } from './TiprackSelect'
 
-import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
+import styles from './FilePipettesModal.css'
 
 import type { PipetteName } from '@opentrons/shared-data'
 
@@ -37,8 +37,6 @@ export interface Props {
   onSetFieldTouched: (field: string, touched: boolean) => void
   robotType: RobotType
 }
-
-// TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
 interface PipetteSelectProps {
   mount: Mount
   tabIndex: number
@@ -61,7 +59,7 @@ export function PipetteFields(props: Props): JSX.Element {
 
   const renderTiprackSelect = (
     props: TiprackSelectProps
-  ): JSX.Element[] | null => {
+  ): JSX.Element | null => {
     const { mount } = props
     const selectedPipetteName = values[mount].pipetteName
     const tiprackOptions = getTiprackOptions({
@@ -69,31 +67,15 @@ export function PipetteFields(props: Props): JSX.Element {
       allowAllTipracks: allowAllTipracks,
       selectedPipetteName: selectedPipetteName,
     })
-    const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
-    let selectedValues = values[mount].tiprackDefURI ?? []
 
-    React.useEffect(() => {
-      if (selectedValues?.length === 0 && tiprackOptions.length > 0) {
-        selectedValues = [tiprackOptions[0].value]
-        onSetFieldValue(nameAccessor, selectedValues)
-      }
-    }, [selectedValues, onSetFieldValue, nameAccessor, tiprackOptions])
-
-    return selectedPipetteName != null
-      ? tiprackOptions.map(option => (
-          <TiprackOption
-            isSelected={selectedValues.includes(option.value)}
-            key={option.name}
-            text={option.name}
-            onClick={() => {
-              const updatedValues = selectedValues?.includes(option.value)
-                ? selectedValues.filter(value => value !== option.value)
-                : [...(selectedValues ?? []), option.value]
-              onSetFieldValue(nameAccessor, updatedValues)
-            }}
-          />
-        ))
-      : null
+    return (
+      <TiprackSelect
+        mount={mount}
+        tiprackOptions={tiprackOptions}
+        values={values}
+        onSetFieldValue={onSetFieldValue}
+      />
+    )
   }
 
   const renderPipetteSelect = (props: PipetteSelectProps): JSX.Element => {
@@ -150,7 +132,7 @@ export function PipetteFields(props: Props): JSX.Element {
             label={i18n.t('modal.pipette_fields.left_tiprack')}
             className={formStyles.stacked_row}
           >
-            {renderTiprackSelect({ mount: 'left', robotType })}
+            {renderTiprackSelect({ mount: 'left', robotType })}{' '}
           </FormGroup>
         </div>
         <PipetteDiagram

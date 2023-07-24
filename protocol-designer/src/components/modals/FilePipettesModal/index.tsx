@@ -1,4 +1,3 @@
-import assert from 'assert'
 import reduce from 'lodash/reduce'
 import * as React from 'react'
 import cx from 'classnames'
@@ -129,13 +128,10 @@ const initialFormState: FormState = {
 
 const pipetteValidationShape = Yup.object().shape({
   pipetteName: Yup.string().nullable(),
-  tiprackDefURI: Yup.string()
-    .nullable()
-    .when('pipetteName', {
-      is: (val: string | null): boolean => Boolean(val),
-      then: Yup.string().required('Required'),
-      otherwise: null,
-    }),
+  tiprackDefURI: Yup.array()
+    .of(Yup.string().required('Required'))
+    .min(1, 'At least one tiprack is required')
+    .nullable(),
 })
 // any typing this because TS says there are too many possibilities of what this could be
 const moduleValidationShape: any = Yup.object().shape({
@@ -167,6 +163,8 @@ const validationSchema = Yup.object().shape({
     [MAGNETIC_MODULE_TYPE]: moduleValidationShape,
     [TEMPERATURE_MODULE_TYPE]: moduleValidationShape,
     [THERMOCYCLER_MODULE_TYPE]: moduleValidationShape,
+    [HEATERSHAKER_MODULE_TYPE]: moduleValidationShape,
+    [MAGNETIC_BLOCK_TYPE]: moduleValidationShape,
   }),
 })
 
@@ -215,17 +213,14 @@ export class FilePipettesModal extends React.Component<Props, State> {
     const pipettes = reduce<FormPipettesByMount, PipetteFieldsData[]>(
       values.pipettesByMount,
       (acc, formPipette: FormPipette, mount): PipetteFieldsData[] => {
-        assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
-        // @ts-expect-error(sa, 2021-6-21): TODO validate that pipette names coming from the modal are actually valid pipette names on PipetteName type
-        return formPipette &&
-          formPipette.pipetteName &&
-          formPipette.tiprackDefURI &&
+        return formPipette?.pipetteName != null &&
+          formPipette.tiprackDefURI != null &&
           (mount === 'left' || mount === 'right')
           ? [
               ...acc,
               {
                 mount,
-                name: formPipette.pipetteName,
+                name: formPipette.pipetteName as PipetteName,
                 tiprackDefURI: formPipette.tiprackDefURI,
               },
             ]

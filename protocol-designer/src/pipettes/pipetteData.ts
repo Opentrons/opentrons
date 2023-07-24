@@ -60,7 +60,7 @@ export function getPipetteCapacity(
     false,
     `Expected spec and tiprack def for pipette ${
       pipetteEntity ? pipetteEntity.id : '???'
-    } and ${tipRack ? tipRack : '???'}`
+    } and ${tipRack ?? '???'}`
   )
   return NaN
 }

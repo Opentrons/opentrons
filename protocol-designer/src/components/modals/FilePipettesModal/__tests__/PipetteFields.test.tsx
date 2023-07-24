@@ -47,7 +47,7 @@ describe('PipetteFields', () => {
   const rightTiprackKey = `${rightPipetteKey}.tiprackDefURI`
   const unselectedPipette = {
     pipetteName: '',
-    tiprackDefURI: '',
+    tiprackDefURI: [''],
   }
 
   let props: Props
@@ -63,24 +63,20 @@ describe('PipetteFields', () => {
 
     leftPipette = {
       pipetteName: 'p300',
-      tiprackDefURI: 'tiprack_300',
+      tiprackDefURI: ['tiprack_300'],
     }
     rightPipette = {
       pipetteName: 'p1000',
-      tiprackDefURI: 'tiprack_1000',
+      tiprackDefURI: ['tiprack_1000'],
     }
     props = {
-      onFieldChange: jest.fn(),
       onSetFieldValue: jest.fn(),
       onSetFieldTouched: jest.fn(),
-      onBlur: jest.fn(),
       initialTabIndex: 1,
       values: {
         left: leftPipette,
         right: rightPipette,
       },
-      errors: null,
-      touched: null,
       robotType: OT2_ROBOT_TYPE,
     }
 
@@ -139,7 +135,7 @@ describe('PipetteFields', () => {
   })
 
   it('undisables tiprack selection when a pipette is selected', () => {
-    props.values.left.tiprackDefURI = ''
+    props.values.left.tiprackDefURI = ['']
 
     const wrapper = render(props)
 
@@ -152,7 +148,7 @@ describe('PipetteFields', () => {
   })
 
   it('selects a tiprack for the pipette', () => {
-    props.values.left.tiprackDefURI = ''
+    props.values.left.tiprackDefURI = ['']
     const event = {
       target: {
         name: leftTiprackKey,
