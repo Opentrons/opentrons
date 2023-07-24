@@ -93,5 +93,6 @@ export const mixFormToArgs = (
     blowoutOffsetFromTopMm,
     aspirateDelaySeconds,
     dispenseDelaySeconds,
+    tipRack: hydratedFormData.tipRack,
   }
 }

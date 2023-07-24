@@ -74,6 +74,7 @@ export type StepFieldName = string
 // | 'dispense_touchTip'
 // | 'aspirate_disposalVol_checkbox'
 // | 'aspirate_disposalVol_volume'
+// | 'tiprack'
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
 export type StepType =
   | 'moveLabware'
@@ -173,6 +174,7 @@ export interface HydratedMoveLiquidFormData {
   description: string | null | undefined
   fields: {
     pipette: PipetteEntity
+    tipRack: string
     volume: number
     path: PathOption
     changeTip: ChangeTipOptions
@@ -235,6 +237,7 @@ export interface HydratedMixFormDataLegacy {
   stepName: string
   stepDetails: string | null | undefined
   pipette: PipetteEntity
+  tipRack: string
   volume: number
   changeTip: ChangeTipOptions
   labware: LabwareEntity

@@ -26,6 +26,7 @@ export function mixUtil(args: {
   dispenseFlowRateUlSec: number
   aspirateDelaySeconds?: number | null | undefined
   dispenseDelaySeconds?: number | null | undefined
+  tipRack: string
 }): CurriedCommandCreator[] {
   const {
     pipette,
@@ -39,6 +40,7 @@ export function mixUtil(args: {
     dispenseFlowRateUlSec,
     aspirateDelaySeconds,
     dispenseDelaySeconds,
+    tipRack,
   } = args
 
   const getDelayCommand = (seconds?: number | null): CurriedCommandCreator[] =>
@@ -63,6 +65,7 @@ export function mixUtil(args: {
         well,
         offsetFromBottomMm: aspirateOffsetFromBottomMm,
         flowRate: aspirateFlowRateUlSec,
+        tipRack,
       }),
       ...getDelayCommand(aspirateDelaySeconds),
       curryCommandCreator(dispense, {
@@ -108,6 +111,7 @@ export const mix: CommandCreator<MixArgs> = (
     dispenseFlowRateUlSec,
     blowoutFlowRateUlSec,
     blowoutOffsetFromTopMm,
+    tipRack,
   } = data
 
   // Errors
@@ -147,6 +151,7 @@ export const mix: CommandCreator<MixArgs> = (
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette,
+            tipRack,
           }),
         ]
       }
@@ -184,6 +189,7 @@ export const mix: CommandCreator<MixArgs> = (
         dispenseFlowRateUlSec,
         aspirateDelaySeconds,
         dispenseDelaySeconds,
+        tipRack,
       })
       return [
         ...tipCommands,

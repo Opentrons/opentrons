@@ -175,13 +175,14 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
   )
 
   const nameAccessor = `pipettesByMount.${mount}.tiprackDefURI`
-  const currentValue = values.pipettesByMount[mount].tiprackDefURI
+  let selectedValues = values.pipettesByMount[mount].tiprackDefURI ?? []
 
   React.useEffect(() => {
-    if (currentValue === undefined) {
-      setFieldValue(nameAccessor, tiprackOptions[0]?.value ?? '')
+    if (selectedValues?.length === 0 && tiprackOptions.length > 0) {
+      selectedValues = [tiprackOptions[0].value]
+      setFieldValue(nameAccessor, selectedValues)
     }
-  }, [currentValue, setFieldValue, nameAccessor, tiprackOptions])
+  }, [selectedValues, setFieldValue, nameAccessor, tiprackOptions])
 
   return (
     <Flex
@@ -193,10 +194,13 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
         {defaultTiprackOptions.map(o => (
           <EquipmentOption
             key={o.name}
-            isSelected={currentValue === o.value}
+            isSelected={selectedValues.includes(o.value)}
             text={o.name}
             onClick={() => {
-              setFieldValue(nameAccessor, o.value)
+              const updatedValues = selectedValues?.includes(o.value)
+                ? selectedValues.filter(value => value !== o.value)
+                : [...(selectedValues ?? []), o.value]
+              setFieldValue(nameAccessor, updatedValues)
             }}
             width="21.75rem"
             minHeight="4rem"
@@ -252,10 +256,13 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               {customTiprackOptions.map(o => (
                 <EquipmentOption
                   key={o.name}
-                  isSelected={currentValue === o.value}
+                  isSelected={selectedValues.includes(o.value)}
                   text={o.name}
                   onClick={() => {
-                    setFieldValue(nameAccessor, o.value)
+                    const updatedValues = selectedValues?.includes(o.value)
+                      ? selectedValues.filter(value => value !== o.value)
+                      : [...(selectedValues ?? []), o.value]
+                    setFieldValue(nameAccessor, updatedValues)
                   }}
                   width="21.75rem"
                   minHeight="4rem"

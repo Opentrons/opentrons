@@ -1,6 +1,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector } from 'react-redux'
+import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { getLabwareDefsByURI } from '../../../../labware-defs/selectors'
 import {
@@ -9,6 +10,7 @@ import {
   ChangeTipField,
   DisposalVolumeField,
   PathField,
+  TiprackField,
 } from '../../fields'
 import styles from '../../StepEditForm.css'
 import { StepFormProps } from '../../types'
@@ -26,7 +28,6 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
 
   const { propsForFields, formData } = props
   const { stepType, path } = formData
-
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -36,6 +37,12 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
+        <FormGroup
+          label={i18n.t('form.step_edit_form.tipRack')}
+          className={styles.large_field}
+        >
+          <TiprackField {...propsForFields.tipRack} />
+        </FormGroup>
         <VolumeField
           {...propsForFields.volume}
           label={i18n.t('form.step_edit_form.field.volume.label')}
@@ -107,6 +114,7 @@ export const MoveLiquidForm = (props: StepFormProps): JSX.Element => {
             dispense_wells={formData.dispense_wells}
             pipette={formData.pipette}
             volume={formData.volume}
+            tipRack={formData.tipRack}
           />
         </div>
         <div className={cx(styles.section_column, styles.disposal_vol_wrapper)}>

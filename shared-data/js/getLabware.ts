@@ -62,8 +62,11 @@ export const LABWAREV2_DO_NOT_LIST = [
 export const PD_DO_NOT_LIST = [
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
+<<<<<<< HEAD
   'opentrons_96_aluminumblock_biorad_wellplate_200ul',
   'opentrons_96_aluminumblock_nest_wellplate_100ul',
+=======
+>>>>>>> 13363a869d (begin multi tiprack support)
 ]
 
 export function getLabwareV1Def(

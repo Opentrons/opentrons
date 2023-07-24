@@ -14,6 +14,7 @@ import {
   HEATERSHAKER_MODULE_TYPE,
   PipetteName,
   MAGNETIC_BLOCK_TYPE,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import {
   NormalizedAdditionalEquipmentById,
@@ -147,7 +148,9 @@ export const getModuleEntities: Selector<
 export const _getPipetteEntitiesRootState: (
   arg: RootState
 ) => PipetteEntities = createSelector(
-  rs => rs.pipetteInvariantProperties,
+  rs => {
+    return rs.pipetteInvariantProperties
+  },
   labwareDefSelectors._getLabwareDefsByIdRootState,
   denormalizePipetteEntities
 )
@@ -311,7 +314,7 @@ export const getPermittedTipracks: Selector<
   reduce(
     initialDeckSetup.pipettes,
     (acc: string[], pipette: PipetteOnDeck) => {
-      return pipette.tiprackDefURI ? [...acc, pipette.tiprackDefURI] : acc
+      return pipette.tiprackDefURI ? [...acc, ...pipette.tiprackDefURI] : acc
     },
     []
   )
@@ -342,7 +345,6 @@ export const getEquippedPipetteOptions: Selector<
   const pipettes = initialDeckSetup.pipettes
 
   const pipettesSame = _getPipettesSame(pipettes)
-
   return reduce(
     pipettes,
     (acc: DropdownOption[], pipette: PipetteOnDeck, id: string) => {
@@ -372,13 +374,15 @@ export const getPipettesForInstrumentGroup: Selector<
       pipetteId
     ) => {
       const pipetteSpec = pipetteOnDeck.spec
-      const tiprackDef = pipetteOnDeck.tiprackLabwareDef
+      const tiprackDefs = pipetteOnDeck.tiprackLabwareDef
       const pipetteForInstrumentGroup: InstrumentInfoProps = {
         mount: pipetteOnDeck.mount,
         pipetteSpecs: pipetteSpec,
         description: _getPipetteDisplayName(pipetteOnDeck.name),
         isDisabled: false,
-        tiprackModel: getLabwareDisplayName(tiprackDef),
+        tiprackModels: tiprackDefs?.map((def: LabwareDefinition2) =>
+          getLabwareDisplayName(def)
+        ),
       }
       acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
       return acc
@@ -394,11 +398,14 @@ export const getPipettesForEditPipetteForm: Selector<
     initialDeckSetup.pipettes,
     (acc, pipetteOnDeck: PipetteOnDeck, id) => {
       const pipetteSpec = pipetteOnDeck.spec
-      const tiprackDef = pipetteOnDeck.tiprackLabwareDef
-      if (!pipetteSpec || !tiprackDef) return acc
+      const tiprackDefs = pipetteOnDeck.tiprackLabwareDef
+      if (!pipetteSpec || !tiprackDefs) return acc
+
       const pipetteForInstrumentGroup = {
         pipetteName: pipetteOnDeck.name,
-        tiprackDefURI: getLabwareDefURI(tiprackDef),
+        tiprackDefURI: tiprackDefs.map((def: LabwareDefinition2) =>
+          getLabwareDefURI(def)
+        ),
       }
       acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
       return acc
@@ -603,15 +610,17 @@ export const getInvariantContext: Selector<
     pipetteEntities,
     disableModuleRestrictions,
     allowAllTipracks
-  ) => ({
-    labwareEntities,
-    moduleEntities,
-    pipetteEntities,
-    config: {
-      OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
-      OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
-    },
-  })
+  ) => {
+    return {
+      labwareEntities,
+      moduleEntities,
+      pipetteEntities,
+      config: {
+        OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
+        OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
+      },
+    }
+  }
 )
 // TODO(IL, 2020-03-24) type this as Selector<HydratedFormData>. See #3161
 export const getHydratedUnsavedForm: Selector<

@@ -106,7 +106,7 @@ export interface NormalizedPipetteById {
   [pipetteId: string]: {
     name: PipetteName
     id: string
-    tiprackDefURI: string
+    tiprackDefURI: string[]
   }
 }
 
@@ -123,7 +123,7 @@ export type NormalizedPipette = NormalizedPipetteById[keyof NormalizedPipetteByI
 // when they are de-normalized, the definitions they reference are baked in
 // =========== PIPETTES ========
 export type PipetteEntity = NormalizedPipette & {
-  tiprackLabwareDef: LabwareDefinition2
+  tiprackLabwareDef: LabwareDefinition2[]
   spec: PipetteNameSpecs
 }
 
@@ -159,7 +159,7 @@ interface CommonArgs {
 
 export type SharedTransferLikeArgs = CommonArgs & {
   pipette: string // PipetteId
-
+  tipRack: string //  tipRackDefUri
   sourceLabware: string
   destLabware: string
   /** volume is interpreted differently by different Step types */
@@ -252,6 +252,7 @@ export type DistributeArgs = SharedTransferLikeArgs & {
 
 export type MixArgs = CommonArgs & {
   commandCreatorFnName: 'mix'
+  tipRack: string //  tiprackdefUri
   labware: string
   pipette: string
   wells: string[]

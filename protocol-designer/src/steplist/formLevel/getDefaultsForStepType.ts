@@ -35,11 +35,13 @@ export function getDefaultsForStepType(
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         mix_touchTip_checkbox: false,
         mix_touchTip_mmFromBottom: null,
+        tipRack: null,
       }
 
     case 'moveLiquid':
       return {
         pipette: null,
+        tipRack: null,
         volume: null,
         changeTip: DEFAULT_CHANGE_TIP_OPTION,
         path: 'single',

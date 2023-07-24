@@ -25,6 +25,7 @@ import { AspDispSection } from './AspDispSection'
 import { StepFormProps } from '../types'
 
 import styles from '../StepEditForm.css'
+import { TiprackField } from '../fields/TiprackField'
 
 export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)
@@ -33,7 +34,6 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
 
   const toggleCollapsed = (): void =>
     setCollapsed(prevCollapsed => !prevCollapsed)
-
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -43,6 +43,12 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
+        <FormGroup
+          label={i18n.t('form.step_edit_form.tipRack')}
+          className={styles.large_field}
+        >
+          <TiprackField {...propsForFields.tipRack} />
+        </FormGroup>
         <VolumeField
           {...propsForFields.volume}
           label={i18n.t('form.step_edit_form.mixVolumeLabel')}

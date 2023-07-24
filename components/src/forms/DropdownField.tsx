@@ -20,7 +20,7 @@ export interface DropdownFieldProps {
   /** blur handler */
   onBlur?: React.FocusEventHandler<HTMLSelectElement>
   /** value that is selected */
-  value?: string | null | undefined
+  value?: string | null | undefined | string[]
   /** optional id for the <select> element */
   id?: string
   /** name of field in form */
@@ -41,6 +41,8 @@ export interface DropdownFieldProps {
   autoFocus?: boolean
   /** if true, render indeterminate unselectable option */
   isIndeterminate?: boolean
+  /** allow for multiple selection */
+  allowMultiple?: boolean
 }
 
 const BLANK_OPTION: DropdownOption = { name: '', value: '' }
@@ -82,6 +84,7 @@ export function DropdownField(props: DropdownFieldProps): JSX.Element {
           className={styles.dropdown}
           tabIndex={props.tabIndex}
           autoFocus={props.autoFocus}
+          multiple={props.allowMultiple ?? false}
         >
           {options.map(opt => (
             <option
