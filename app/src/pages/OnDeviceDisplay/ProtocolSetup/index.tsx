@@ -491,8 +491,8 @@ function PrepareToRun({
               disabled={
                 mostRecentAnalysis == null ||
                 attachedInstruments == null ||
-                (protocolHasModules && attachedModules == null) ||
-                allPipettesCalibrationData == null
+                (protocolHasModules && attachedModules.length === 0) ||
+                allPipettesCalibrationData.data.length === 0
               }
               onPlay={onPlay}
               ready={isReadyToRun}
