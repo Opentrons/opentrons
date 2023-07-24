@@ -16,6 +16,7 @@ export interface ValuesForPath {
   dispense_wells?: string[] | null
   pipette?: string | null
   volume?: string | null
+  tipRack?: string | null
 }
 export function getDisabledPathMap(
   values: ValuesForPath,
@@ -27,6 +28,7 @@ export function getDisabledPathMap(
     changeTip,
     dispense_wells,
     pipette,
+    tipRack,
   } = values
   if (!pipette) return null
   const wellRatio = getWellRatio(aspirate_wells, dispense_wells)
@@ -51,7 +53,8 @@ export function getDisabledPathMap(
 
   // transfer volume overwrites change tip disable reasoning
   const pipetteEntity = pipetteEntities[pipette]
-  const pipetteCapacity = pipetteEntity && getPipetteCapacity(pipetteEntity)
+  const pipetteCapacity =
+    pipetteEntity && getPipetteCapacity(pipetteEntity, tipRack)
   const volume = Number(values.volume)
   const airGapChecked = aspirate_airGap_checkbox
   let airGapVolume = airGapChecked ? Number(values.aspirate_airGap_volume) : 0

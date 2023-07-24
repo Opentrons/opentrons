@@ -72,11 +72,11 @@ describe('EditModulesCard', () => {
 
     crashablePipette = {
       pipetteName: 'p300_multi',
-      tiprackDefURI: 'tiprack300',
+      tiprackDefURI: ['tiprack300'],
     }
     noncrashablePipette = {
       pipetteName: 'p300_multi_test',
-      tiprackDefURI: 'tiprack300',
+      tiprackDefURI: ['tiprack300'],
     }
     mockGetAdditionalEquipment.mockReturnValue({})
     mockGetRobotType.mockReturnValue(OT2_ROBOT_TYPE)

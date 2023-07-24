@@ -295,7 +295,6 @@ export class FilePipettesModal extends React.Component<Props, State> {
       moduleRestrictionsDisabled,
       robotType,
     } = this.props
-
     return (
       <Modal
         contentsClassName={cx(
@@ -325,7 +324,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                 setFieldTouched,
               }: FormikProps<FormState>) => {
                 const { left, right } = values.pipettesByMount
-
+                console.log(values)
                 const pipetteSelectionIsValid =
                   // at least one must not be none (empty string)
                   left.pipetteName || right.pipetteName
@@ -411,13 +410,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                       <PipetteFields
                         initialTabIndex={1}
                         values={values.pipettesByMount}
-                        onFieldChange={handleChange}
                         onSetFieldValue={setFieldValue}
-                        onBlur={handleBlur}
-                        // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
-                        errors={errors.pipettesByMount ?? null}
-                        // @ts-expect-error(sa, 2021-7-2): we need to explicitly check that the module tiprackDefURI inside of pipettesByMount exists, because it could be undefined
-                        touched={touched.pipettesByMount ?? null}
                         onSetFieldTouched={setFieldTouched}
                         robotType={robotType}
                       />

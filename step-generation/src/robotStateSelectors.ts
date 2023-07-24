@@ -4,6 +4,7 @@ import { orderWells } from './utils/orderWells'
 import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
 import {
+  getLabwareDefURI,
   getTiprackVolume,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -59,6 +60,7 @@ type NextTiprack = {
 } | null
 export function getNextTiprack(
   pipetteId: string,
+  tipRack: string,
   invariantContext: InvariantContext,
   robotState: RobotState
 ): NextTiprack {
@@ -74,7 +76,6 @@ export function getNextTiprack(
       `cannot getNextTiprack, no pipette entity for pipette "${pipetteId}"`
     )
   }
-
   // filter out unmounted or non-compatible tiprack models
   const sortedTipracksIds = sortLabwareBySlot(robotState.labware).filter(
     labwareId => {
@@ -83,11 +84,8 @@ export function getNextTiprack(
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
       const isOnDeck = robotState.labware[labwareId].slot != null
-      return (
-        isOnDeck &&
-        pipetteEntity.tiprackDefURI ===
-          invariantContext.labwareEntities[labwareId]?.labwareDefURI
-      )
+
+      return isOnDeck && labwareId === tipRack
     }
   )
   const firstAvailableTiprack = sortedTipracksIds.find(tiprackId =>
@@ -121,14 +119,23 @@ export function getNextTiprack(
 }
 export function getPipetteWithTipMaxVol(
   pipetteId: string,
-  invariantContext: InvariantContext
+  invariantContext: InvariantContext,
+  tipRack: string
 ): number {
   // NOTE: this fn assumes each pipette is assigned to exactly one tiprack type,
   // across the entire timeline
   const pipetteEntity = invariantContext.pipetteEntities[pipetteId]
   const pipetteMaxVol = pipetteEntity.spec.maxVolume
   const tiprackDef = pipetteEntity.tiprackLabwareDef
-  const tiprackTipVol = getTiprackVolume(tiprackDef)
+  const tipRackDefUri = tipRack?.split(':')[1]
+  let chosenTipRack = null
+  for (const def of tiprackDef) {
+    if (getLabwareDefURI(def) === tipRackDefUri) {
+      chosenTipRack = def
+      break
+    }
+  }
+  const tiprackTipVol = getTiprackVolume(chosenTipRack ?? tiprackDef[0])
 
   if (!pipetteMaxVol || !tiprackTipVol) {
     assert(

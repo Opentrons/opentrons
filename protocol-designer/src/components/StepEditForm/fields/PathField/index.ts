@@ -19,6 +19,7 @@ function mapSTP(state: BaseState, ownProps: OP): SP {
     dispense_wells,
     pipette,
     volume,
+    tipRack,
   } = ownProps
   const pipetteEntities = stepFormSelectors.getPipetteEntities(state)
   const disabledPathMap = getDisabledPathMap(
@@ -30,6 +31,7 @@ function mapSTP(state: BaseState, ownProps: OP): SP {
       dispense_wells,
       pipette,
       volume,
+      tipRack,
     },
     pipetteEntities
   )

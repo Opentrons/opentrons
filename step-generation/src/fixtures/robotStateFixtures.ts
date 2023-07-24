@@ -125,32 +125,32 @@ export function makeContext(): InvariantContext {
       name: 'p10_single',
       id: 'p10SingleId',
 
-      tiprackDefURI: getLabwareDefURI(fixtureTiprack10ul),
-      tiprackLabwareDef: fixtureTiprack10ul,
+      tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
+      tiprackLabwareDef: [fixtureTiprack10ul],
       spec: fixtureP10Single,
     },
     p10MultiId: {
       name: 'p10_multi',
       id: 'p10MultiId',
 
-      tiprackDefURI: getLabwareDefURI(fixtureTiprack10ul),
-      tiprackLabwareDef: fixtureTiprack10ul,
+      tiprackDefURI: [getLabwareDefURI(fixtureTiprack10ul)],
+      tiprackLabwareDef: [fixtureTiprack10ul],
       spec: fixtureP10Multi,
     },
     [DEFAULT_PIPETTE]: {
       name: 'p300_single',
       id: DEFAULT_PIPETTE,
 
-      tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
-      tiprackLabwareDef: fixtureTiprack300ul,
+      tiprackDefURI: [getLabwareDefURI(fixtureTiprack300ul)],
+      tiprackLabwareDef: [fixtureTiprack300ul],
       spec: fixtureP300Single,
     },
     [MULTI_PIPETTE]: {
       name: 'p300_multi',
       id: MULTI_PIPETTE,
 
-      tiprackDefURI: getLabwareDefURI(fixtureTiprack300ul),
-      tiprackLabwareDef: fixtureTiprack300ul,
+      tiprackDefURI: [getLabwareDefURI(fixtureTiprack300ul)],
+      tiprackLabwareDef: [fixtureTiprack300ul],
       spec: fixtureP300Multi,
     },
   }

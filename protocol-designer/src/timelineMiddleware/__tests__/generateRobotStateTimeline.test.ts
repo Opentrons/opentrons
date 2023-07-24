@@ -43,6 +43,7 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12', 'A12'],
           mixBeforeAspirate: null,
           description: null,
+          tipRack: 'tipRack',
         },
       },
       b: {
@@ -76,6 +77,7 @@ describe('generateRobotStateTimeline', () => {
           destWells: ['A12'],
           mixBeforeAspirate: null,
           description: null,
+          tipRack: 'tipRack',
         },
       },
       c: {
@@ -101,6 +103,7 @@ describe('generateRobotStateTimeline', () => {
           blowoutOffsetFromTopMm: 0,
           aspirateDelaySeconds: null,
           dispenseDelaySeconds: null,
+          tipRack: 'tipRack',
         },
       },
     }

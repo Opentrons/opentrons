@@ -113,7 +113,6 @@ export function CreateFileWizard(): JSX.Element | null {
       },
       []
     )
-
     const modules: ModuleCreationArgs[] = Object.entries(
       values.modulesByType
     ).reduce<ModuleCreationArgs[]>((acc, [moduleType, formModule]) => {
@@ -205,8 +204,8 @@ export function CreateFileWizard(): JSX.Element | null {
         dispatch(toggleIsGripperRequired())
       }
       // auto-generate tipracks for pipettes
-      const newTiprackModels: string[] = uniq(
-        pipettes.map(pipette => pipette.tiprackDefURI)
+      const newTiprackModels = uniq(
+        pipettes.flatMap(pipette => pipette.tiprackDefURI)
       )
       newTiprackModels.forEach(tiprackDefURI => {
         dispatch(
@@ -303,13 +302,10 @@ const initialFormState: FormState = {
 
 const pipetteValidationShape = Yup.object().shape({
   pipetteName: Yup.string().nullable(),
-  tiprackDefURI: Yup.string()
-    .nullable()
-    .when('pipetteName', {
-      is: (val: string | null): boolean => Boolean(val),
-      then: Yup.string().required('Required'),
-      otherwise: null,
-    }),
+  tiprackDefURI: Yup.array()
+    .of(Yup.string().required('Required'))
+    .min(1, 'At least one tiprack is required')
+    .nullable(),
 })
 // any typing this because TS says there are too many possibilities of what this could be
 const moduleValidationShape: any = Yup.object().shape({

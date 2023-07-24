@@ -6,7 +6,7 @@ import { ProtocolFile as ProtocolFileV4 } from '@opentrons/shared-data/protocol/
 import { ProtocolFile as ProtocolFileV5 } from '@opentrons/shared-data/protocol/types/schemaV5'
 export interface PDMetadata {
   // pipetteId to tiprackModel
-  pipetteTiprackAssignments: Record<string, string>
+  pipetteTiprackAssignments: Record<string, string[]>
   dismissedWarnings: DismissRoot['dismissedWarnings']
   ingredients: IngredRoot['ingredients']
   ingredLocations: IngredRoot['ingredLocations']

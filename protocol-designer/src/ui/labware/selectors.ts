@@ -75,6 +75,33 @@ export const getLabwareOptions: Selector<Options> = createSelector(
   }
 )
 
+export const getTiprackOptions: Selector<Options> = createSelector(
+  stepFormSelectors.getLabwareEntities,
+  getLabwareNicknamesById,
+  (labwareEntities, nicknamesById) => {
+    const options = reduce(
+      labwareEntities,
+      (
+        acc: Options,
+        labwareEntity: LabwareEntity,
+        labwareId: string
+      ): Options => {
+        return getIsTiprack(labwareEntity.def)
+          ? [
+              ...acc,
+              {
+                name: nicknamesById[labwareId],
+                value: labwareId,
+              },
+            ]
+          : acc
+      },
+      []
+    )
+    return _sortLabwareDropdownOptions(options)
+  }
+)
+
 /** Returns options for disposal (e.g. fixed trash and trash box) */
 export const getDisposalLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getLabwareEntities,

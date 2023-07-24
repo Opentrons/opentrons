@@ -73,6 +73,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
 
     case 'pickUpTip':
+      console.log('tiprack id for pick up tip', command.params.labwareId)
       forPickUpTip(command.params, invariantContext, robotStateAndWarnings)
       break
 

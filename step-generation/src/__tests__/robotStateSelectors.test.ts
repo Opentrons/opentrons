@@ -149,7 +149,12 @@ describe('getNextTiprack - single-channel', () => {
 
     robotState.tipState.tipracks.tiprack1Id.A1 = false
 
-    const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
+    const result = getNextTiprack(
+      DEFAULT_PIPETTE,
+      'tiprack1Id',
+      invariantContext,
+      robotState
+    )
 
     expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('B1')
@@ -163,7 +168,12 @@ describe('getNextTiprack - single-channel', () => {
       tiprackSetting: { tiprack1Id: false },
     })
 
-    const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
+    const result = getNextTiprack(
+      DEFAULT_PIPETTE,
+      'tiprack1Id',
+      invariantContext,
+      robotState
+    )
     expect(result).toEqual(null)
   })
 
@@ -177,7 +187,12 @@ describe('getNextTiprack - single-channel', () => {
       },
       tiprackSetting: { tiprack1Id: true, tiprack2Id: true },
     })
-    const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
+    const result = getNextTiprack(
+      DEFAULT_PIPETTE,
+      'tiprack1Id',
+      invariantContext,
+      robotState
+    )
 
     expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('A1')
@@ -196,7 +211,12 @@ describe('getNextTiprack - single-channel', () => {
     // remove A1 tip from both racks
     robotState.tipState.tipracks.tiprack1Id.A1 = false
     robotState.tipState.tipracks.tiprack2Id.A1 = false
-    const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
+    const result = getNextTiprack(
+      DEFAULT_PIPETTE,
+      'tiprack1Id',
+      invariantContext,
+      robotState
+    )
 
     expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('B1')
@@ -212,7 +232,12 @@ describe('getNextTiprack - single-channel', () => {
       },
       tiprackSetting: { tiprack1Id: false, tiprack2Id: false },
     })
-    const result = getNextTiprack(DEFAULT_PIPETTE, invariantContext, robotState)
+    const result = getNextTiprack(
+      DEFAULT_PIPETTE,
+      'tiprack1Id',
+      invariantContext,
+      robotState
+    )
 
     expect(result).toBe(null)
   })
@@ -229,7 +254,12 @@ describe('getNextTiprack - 8-channel', () => {
       tiprackSetting: { tiprack1Id: true },
     })
 
-    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+    const result = getNextTiprack(
+      'p300MultiId',
+      'tiprack1Id',
+      invariantContext,
+      robotState
+    )
 
     expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('A1')
@@ -250,7 +280,12 @@ describe('getNextTiprack - 8-channel', () => {
       A2: false,
       A5: false,
     }
-    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+    const result = getNextTiprack(
+      'p300MultiId',
+      'tiprack1Id',
+      invariantContext,
+      robotState
+    )
 
     expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('A3')
@@ -265,7 +300,12 @@ describe('getNextTiprack - 8-channel', () => {
       },
       tiprackSetting: { tiprack1Id: false },
     })
-    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+    const result = getNextTiprack(
+      'p300MultiId',
+      'tiprack1Id',
+      invariantContext,
+      robotState
+    )
 
     expect(result).toEqual(null)
   })
@@ -295,7 +335,12 @@ describe('getNextTiprack - 8-channel', () => {
       F12: false,
     }
 
-    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+    const result = getNextTiprack(
+      'p300MultiId',
+      'tiprack1Id',
+      invariantContext,
+      robotState
+    )
 
     expect(result).toEqual(null)
   })
@@ -311,7 +356,12 @@ describe('getNextTiprack - 8-channel', () => {
       },
       tiprackSetting: { tiprack1Id: true, tiprack2Id: true, tiprack3Id: true },
     })
-    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+    const result = getNextTiprack(
+      'p300MultiId',
+      'tiprack1Id',
+      invariantContext,
+      robotState
+    )
 
     expect(result && result.tiprackId).toEqual('tiprack1Id')
     expect(result && result.well).toEqual('A1')
@@ -366,7 +416,12 @@ describe('getNextTiprack - 8-channel', () => {
       A1: false,
     }
 
-    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+    const result = getNextTiprack(
+      'p300MultiId',
+      'tiprack1Id',
+      invariantContext,
+      robotState
+    )
 
     expect(result && result.tiprackId).toEqual('tiprack3Id')
     expect(result && result.well).toEqual('A2')
@@ -387,7 +442,12 @@ describe('getNextTiprack - 8-channel', () => {
         tiprack3Id: false,
       },
     })
-    const result = getNextTiprack('p300MultiId', invariantContext, robotState)
+    const result = getNextTiprack(
+      'p300MultiId',
+      'tiprack1Id',
+      invariantContext,
+      robotState
+    )
     expect(result).toEqual(null)
   })
 })

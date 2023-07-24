@@ -19,7 +19,7 @@ export interface InstrumentInfoProps {
   /** human-readable description, eg 'p300 Single-channel' */
   description: string
   /** paired tiprack model */
-  tiprackModel?: string
+  tiprackModels?: string[]
   /** if disabled, pipette & its info are grayed out */
   isDisabled: boolean
   /** specs of mounted pipette */
@@ -47,9 +47,14 @@ export function InstrumentInfo(props: InstrumentInfoProps): JSX.Element {
           title={props.showMountLabel ? `${props.mount} pipette` : 'pipette'}
           value={props.description}
         />
-        {props.tiprackModel && (
-          <InfoItem title="tip rack" value={props.tiprackModel} />
-        )}
+        {props.tiprackModels &&
+          props.tiprackModels.map((model, index) => (
+            <InfoItem
+              key={index}
+              title={index === 0 ? 'tip racks' : null}
+              value={model}
+            />
+          ))}
       </Flex>
       {props.children}
       {props.mount === LEFT && props.pipetteSpecs && (

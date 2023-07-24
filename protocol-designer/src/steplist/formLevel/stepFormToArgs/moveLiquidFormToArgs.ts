@@ -176,6 +176,7 @@ export const moveLiquidFormToArgs = (
     touchTipAfterDispenseOffsetMmFromBottom,
     description: hydratedFormData.description,
     name: hydratedFormData.stepName,
+    tipRack: hydratedFormData.fields.tipRack,
   }
   assert(
     sourceWellsUnordered.length > 0,
