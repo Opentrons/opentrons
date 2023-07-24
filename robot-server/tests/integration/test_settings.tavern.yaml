@@ -72,6 +72,12 @@ stages:
             description: !re_search 'This setting disables the LED status bar on the Flex.'
             restart_required: false
             value: !anything
+          - id: estopNotRequired
+            old_id: Null
+            title: 'If enabled, the Flex gantry can move with no estop attached.'
+            description: !re_search 'This setting allows the gantry on the Flex to move with no estop attached.'
+            restart_required: false
+            value: !anything
         links: !anydict
 
 ---
