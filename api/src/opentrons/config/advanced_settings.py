@@ -193,7 +193,10 @@ settings = [
     ),
 ]
 
-if ARCHITECTURE == SystemArchitecture.BUILDROOT or ARCHITECTURE == SystemArchitecture.YOCTO:
+if (
+    ARCHITECTURE == SystemArchitecture.BUILDROOT
+    or ARCHITECTURE == SystemArchitecture.YOCTO
+):
     settings.append(DisableLogIntegrationSettingDefinition())
 
 
