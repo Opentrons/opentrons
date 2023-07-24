@@ -70,7 +70,7 @@ async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> None:
     print(attitude)
 
 
-async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
+async def _main(is_simulating: bool, mount: types.OT3Mount, test: bool) -> None:
     ui.print_title("BELT CALIBRATION")
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating,
@@ -79,18 +79,20 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     )
     print("homing")
     await api.home()
-    print("resetting robot calibration")
-    await api.reset_instrument_offset(mount)
-    api.reset_robot_calibration()
+    if test:
+        print("resetting robot calibration")
+        await api.reset_instrument_offset(mount)
+        api.reset_robot_calibration()
+        # check accuracy of gantry-to-deck
+        await _calibrate_pipette(api, mount)
+        await _check_belt_accuracy(api, mount)
 
-    # SKIP calibrating the belts, then check accuracy
-    await _calibrate_pipette(api, mount)
-    await _check_belt_accuracy(api, mount)
-
-    # DO calibrate the belts, then check accuracy
+    # calibrate the belts
     await _calibrate_belts(api, mount)  # <-- !!!
-    await _calibrate_pipette(api, mount)
-    await _check_belt_accuracy(api, mount)
+    if test:
+        # check accuracy of gantry-to-deck
+        await _calibrate_pipette(api, mount)
+        await _check_belt_accuracy(api, mount)
 
     print("done")
 
@@ -98,10 +100,11 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--mount", type=str, choices=["left", "right"], required=True)
+    parser.add_argument("--test", action="store_true")
+    parser.add_argument("--mount", type=str, choices=["left", "right"], default="left")
     args = parser.parse_args()
     if args.mount == "left":
         mnt = types.OT3Mount.LEFT
     else:
         mnt = types.OT3Mount.RIGHT
-    asyncio.run(_main(args.simulate, mnt))
+    asyncio.run(_main(args.simulate, mnt, args.test))
