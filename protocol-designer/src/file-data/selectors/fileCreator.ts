@@ -11,6 +11,7 @@ import {
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
   OT3_STANDARD_DECKID,
+  PipetteName,
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
 import { getFileMetadata, getRobotType } from './fileFields'
@@ -33,7 +34,6 @@ import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
 import type {
-  ModuleEntity,
   PipetteEntity,
   LabwareEntities,
   PipetteEntities,
@@ -155,7 +155,11 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       },
     }
 
-    const pipettes: ProtocolFile['pipettes'] = mapValues(
+    interface Pipettes {
+      [pipetteId: string]: { name: PipetteName }
+    }
+
+    const pipettes: Pipettes = mapValues(
       initialRobotState.pipettes,
       (
         pipette: typeof initialRobotState.pipettes[keyof typeof initialRobotState.pipettes],
@@ -199,17 +203,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       {}
     )
 
-    const labware: ProtocolFile['labware'] = mapValues(
-      initialRobotState.labware,
-      (
-        l: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
-        labwareId: string
-      ) => ({
-        displayName: labwareNicknamesById[labwareId],
-        definitionId: labwareEntities[labwareId].labwareDefURI,
-      })
-    )
-
     const loadLabwareCommands = reduce<
       RobotState['labware'],
       LoadLabwareCreateCommand[]
@@ -229,6 +222,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           key: uuid(),
           commandType: 'loadLabware' as const,
           params: {
+            displayName: def.metadata.displayName,
             labwareId: labwareId,
             loadName: labwareDefURI,
             namespace: namespace,
@@ -247,13 +241,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ingredients,
       ingredLocations
     )
-    const modules: ProtocolFile['modules'] = mapValues(
-      moduleEntities,
-      (moduleEntity: ModuleEntity, moduleId: string) => ({
-        model: moduleEntity.model,
-      })
-    )
-
     const loadModuleCommands = map(
       initialRobotState.modules,
       (
@@ -312,8 +299,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         robotType === FLEX_ROBOT_TYPE
           ? { model: FLEX_ROBOT_TYPE, deckId: OT3_STANDARD_DECKID }
           : { model: OT2_STANDARD_MODEL, deckId: OT2_STANDARD_DECKID },
-      pipettes,
-      labware,
       liquids,
       labwareDefinitions,
     }
@@ -321,7 +306,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ...protocolFile,
       $otSharedSchema: '#/protocol/schemas/7',
       schemaVersion: 7,
-      modules,
       commands,
     }
   }

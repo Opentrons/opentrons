@@ -17,6 +17,9 @@ const mockLoadLabwareCommands: RunTimeCommand[] = [
       labwareId: 'firstLabwareId',
       location: { slotName: '1' },
       displayName: 'first labware nickname',
+      version: 1,
+      loadName: 'mockLoadname',
+      namespace: 'mockNamespace',
     },
     result: {
       labwareId: 'firstLabwareId',
@@ -37,6 +40,9 @@ const mockLoadLabwareCommands: RunTimeCommand[] = [
       labwareId: 'secondLabwareId',
       location: { slotName: '2' },
       displayName: 'second labware nickname',
+      version: 1,
+      loadName: 'mockLoadname',
+      namespace: 'mockNamespace',
     },
     result: {
       labwareId: 'secondLabwareId',
@@ -57,6 +63,9 @@ const mockLoadLabwareCommands: RunTimeCommand[] = [
       labwareId: 'duplicateLabwareId',
       location: { slotName: '2' },
       displayName: 'duplicate labware nickname',
+      version: 1,
+      loadName: 'mockLoadname',
+      namespace: 'mockNamespace',
     },
     result: {
       labwareId: 'duplicateLabwareId',
@@ -77,6 +86,9 @@ const mockLoadLabwareCommands: RunTimeCommand[] = [
       labwareId: 'onModuleLabwareId',
       location: { moduleId: 'firstModuleId', slotName: '3' },
       displayName: 'duplicate labware nickname',
+      version: 1,
+      loadName: 'mockLoadname',
+      namespace: 'mockNamespace',
     },
     result: {
       labwareId: 'onModuleLabwareId',

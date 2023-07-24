@@ -52,7 +52,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture:
         '../../fixtures/protocol/7/doItAllV4MigratedToV7.json',
       unusedPipettes: false,
-      migrationModal: null,
+      migrationModal: 'noBehaviorChange',
     },
     {
       title:
@@ -69,6 +69,14 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       importFixture: '../../fixtures/protocol/5/mix_5_0_x.json',
       expectedExportFixture: '../../fixtures/protocol/7/mix_7_0_0.json',
       migrationModal: 'noBehaviorChange',
+      unusedPipettes: false,
+    },
+    {
+      title:
+        'doItAllV7 Flex robot (schema 7, PD version 7.0.0) -> import and re-export should preserve data',
+      importFixture: '../../fixtures/protocol/7/doItAllV7.json',
+      expectedExportFixture: '../../fixtures/protocol/7/doItAllV7.json',
+      migrationModal: false,
       unusedPipettes: false,
     },
   ]

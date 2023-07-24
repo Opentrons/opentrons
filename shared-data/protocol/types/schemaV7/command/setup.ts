@@ -89,9 +89,12 @@ interface LoadPipetteResult {
   pipetteId: string
 }
 interface LoadLabwareParams {
-  labwareId: string
   location: LabwareLocation
+  version: number
+  namespace: string
+  loadName: string
   displayName?: string
+  labwareId?: string
 }
 interface LoadLabwareResult {
   labwareId: string
@@ -115,6 +118,7 @@ interface MoveLabwareResult {
 interface LoadModuleParams {
   moduleId: string
   location: ModuleLocation
+  model: ModuleModel
 }
 interface LoadModuleResult {
   moduleId: string

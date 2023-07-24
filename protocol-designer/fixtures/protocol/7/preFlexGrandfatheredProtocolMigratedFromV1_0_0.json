@@ -4,7 +4,7 @@
     "author": "",
     "description": "",
     "created": 1547476685921,
-    "lastModified": 1688591795361,
+    "lastModified": 1689346796528,
     "category": null,
     "subcategory": null,
     "tags": []
@@ -13,7 +13,7 @@
     "name": "opentrons/protocol-designer",
     "version": "7.0.0",
     "data": {
-      "_internalAppBuildDate": "Wed, 05 Jul 2023 20:42:07 GMT",
+      "_internalAppBuildDate": "Fri, 14 Jul 2023 14:56:13 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 0.5,
@@ -1796,32 +1796,6 @@
     }
   },
   "robot": { "model": "OT-2 Standard", "deckId": "ot2_standard" },
-  "pipettes": {
-    "01217420-180a-11e9-9608-8bed9be8868f": { "name": "p10_single" },
-    "01217421-180a-11e9-9608-8bed9be8868f": { "name": "p10_multi" }
-  },
-  "labware": {
-    "fixedTrash": {
-      "displayName": "Trash",
-      "definitionId": "opentrons/opentrons_1_trash_1100ml_fixed/1"
-    },
-    "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul": {
-      "displayName": "Tiprack 10 Ul (1)",
-      "definitionId": "opentrons/opentrons_96_tiprack_10ul/1"
-    },
-    "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row": {
-      "displayName": "Trough 12 Row (1)",
-      "definitionId": "opentrons/usascientific_12_reservoir_22ml/1"
-    },
-    "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat": {
-      "displayName": "96 Flat (1)",
-      "definitionId": "opentrons/corning_96_wellplate_360ul_flat/1"
-    },
-    "cea1c650-1811-11e9-9608-8bed9be8868f": {
-      "displayName": "Tiprack 10 Ul (2)",
-      "definitionId": "opentrons/opentrons_96_tiprack_10ul/1"
-    }
-  },
   "liquids": {
     "0": {
       "displayName": "Liquid",
@@ -4120,10 +4094,9 @@
   },
   "$otSharedSchema": "#/protocol/schemas/7",
   "schemaVersion": 7,
-  "modules": {},
   "commands": [
     {
-      "key": "0bf66f37-bbd6-4d3e-9b5f-221d8d73174f",
+      "key": "54824eab-d5d3-4604-aa6e-e499175fc618",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p10_single",
@@ -4132,7 +4105,7 @@
       }
     },
     {
-      "key": "54bc6fae-e135-4b72-8f01-9a6bd3a1e314",
+      "key": "eb88ebb1-4f0b-458d-94a7-0f7277917e55",
       "commandType": "loadPipette",
       "params": {
         "pipetteName": "p10_multi",
@@ -4141,9 +4114,10 @@
       }
     },
     {
-      "key": "2b762513-14b5-4d93-9774-cfefba4163b9",
+      "key": "089a13c0-b74c-41e1-a575-7451204f5335",
       "commandType": "loadLabware",
       "params": {
+        "displayName": "Opentrons 96 Tip Rack 10 µL",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
         "loadName": "opentrons/opentrons_96_tiprack_10ul/1",
         "namespace": "opentrons",
@@ -4152,9 +4126,10 @@
       }
     },
     {
-      "key": "fb2beee9-c090-4837-9838-d0e282c1b835",
+      "key": "7122f472-2b49-4258-9d6e-e08df6dea085",
       "commandType": "loadLabware",
       "params": {
+        "displayName": "USA Scientific 12 Well Reservoir 22 mL",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
         "loadName": "opentrons/usascientific_12_reservoir_22ml/1",
         "namespace": "opentrons",
@@ -4163,9 +4138,10 @@
       }
     },
     {
-      "key": "0f8123d8-52b7-4931-8004-c8b9696a44c4",
+      "key": "f1a115da-1a4e-485a-9522-37a57de5ac70",
       "commandType": "loadLabware",
       "params": {
+        "displayName": "Corning 96 Well Plate 360 µL Flat",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
         "loadName": "opentrons/corning_96_wellplate_360ul_flat/1",
         "namespace": "opentrons",
@@ -4174,9 +4150,10 @@
       }
     },
     {
-      "key": "38f1e075-0d00-4a4a-bd54-9671d3a36eca",
+      "key": "8e3f073d-615e-4df6-9fae-d2871829d4ff",
       "commandType": "loadLabware",
       "params": {
+        "displayName": "Opentrons 96 Tip Rack 10 µL",
         "labwareId": "cea1c650-1811-11e9-9608-8bed9be8868f",
         "loadName": "opentrons/opentrons_96_tiprack_10ul/1",
         "namespace": "opentrons",
@@ -4186,7 +4163,7 @@
     },
     {
       "commandType": "loadLiquid",
-      "key": "471a156a-8f23-4a27-b20a-b6cae4f09ffe",
+      "key": "ce9dcf85-5447-4b6e-8e7f-71f717e8bce1",
       "params": {
         "liquidId": "0",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -4195,7 +4172,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "a3129da5-1859-4a6b-aa9b-88f76a127ecf",
+      "key": "eea03bb1-67a8-4b5a-84d4-8f3ced80f7ff",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -4204,7 +4181,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "60e53575-17e2-45e8-a4a7-e12663c52294",
+      "key": "34a9065f-44fa-4d4d-829d-857379dd1629",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4216,7 +4193,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "a217a68f-dddf-446b-b23d-2c4dc3504058",
+      "key": "b59001fb-6d6f-4166-99a4-b4a4a50019a9",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4228,7 +4205,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "72f3ac47-b423-4ba8-a5cb-f560c86abb9a",
+      "key": "d883ab90-a0ef-4dcc-9730-b110d462cc57",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -4237,7 +4214,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "0472308d-be9a-40b3-81b8-01107db681f9",
+      "key": "f22eaa90-f601-4852-ac4e-f6c16926f8d9",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4249,7 +4226,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "902221d9-6665-4eb7-9523-107e581f1428",
+      "key": "9a8794d5-b5a8-455f-bf5e-7cd1fe9fe84c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4261,7 +4238,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "fa147d69-30e7-40c6-8067-f1507394e8aa",
+      "key": "b1c18bf9-279e-493d-8091-c9a4a11598be",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4273,7 +4250,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "0da3d886-ed22-4718-8035-0edd165205f1",
+      "key": "bd208132-69d8-4e21-aa1e-b77078202044",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4285,7 +4262,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "bd29c6a9-c91a-43d8-b393-a5171da75c60",
+      "key": "534823f0-4fed-4421-baaf-375d29cc7d8c",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -4297,7 +4274,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "1b60a312-ff05-406a-8ee9-847a9bbe6a97",
+      "key": "76436f3f-1952-4bdc-98bd-79ebab8e15e6",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -4309,7 +4286,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "f3be7728-422d-40b7-b0c8-67c8a542ee2b",
+      "key": "ccad61e0-6bc5-4ec5-b03b-328f941f5ea8",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -4321,7 +4298,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "5de788cd-efaf-4ff4-871a-c5ceaeca9e15",
+      "key": "6e056497-bb8f-440e-abce-218b3a5e7457",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -4333,7 +4310,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "e799792a-2a91-4d84-b139-5de7dc697326",
+      "key": "d843e625-b9ed-462c-b8ce-17c04bb6910c",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -4345,7 +4322,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "10787130-f08f-404c-884e-1834ef1d44cd",
+      "key": "8700a237-0e9b-450a-9973-afa3cb83fd18",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -4357,7 +4334,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "5f09681f-e8ac-4959-8489-9b0346385231",
+      "key": "334e60f9-667b-4e3c-8169-acdd70504941",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4369,7 +4346,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "9fe68d2d-19ae-4787-8546-0e4389f28f18",
+      "key": "ea9c98a1-a354-4a58-9d77-555ad4478a14",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -4379,7 +4356,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "22521712-e2e1-4292-8391-ecd9a2b01364",
+      "key": "fd1c59ff-654d-4023-ba6e-739c22f982c7",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4391,7 +4368,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "bf7ad75d-1ba2-40e8-b309-13786d2766f9",
+      "key": "630aff71-f414-412b-a057-90eca7673a8f",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -4403,7 +4380,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "138af4c9-5f88-4a3a-8b97-621728e53f39",
+      "key": "ffacb50b-33f0-4333-8345-bd351ceeb24f",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -4415,7 +4392,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "96b04ca0-3f37-437e-b19f-c803b4a71301",
+      "key": "eaa6144b-6dc4-4c64-91dc-27f3c861b9e8",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -4427,7 +4404,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "5563ec79-4e29-4b7d-9c59-376b0f3bd110",
+      "key": "6df07b56-170f-4a0e-a6ff-26fabf47f2e4",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -4439,7 +4416,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "b8e1efa2-65f2-41f5-afe9-08e5cf1b1585",
+      "key": "841ad03c-560d-4f52-820f-50e57108b79f",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -4451,7 +4428,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "17188b96-7ec2-4418-8451-7466ffc72f0f",
+      "key": "24b2938f-ae22-435c-8651-fe7963a71fd5",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -4463,7 +4440,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "fef933eb-1d2b-49cf-a4ac-d412048637b0",
+      "key": "ba628d15-9221-4a9f-bb0e-c725c3f9d3df",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -4473,7 +4450,7 @@
     },
     {
       "commandType": "blowout",
-      "key": "9a8eb0c0-6b1e-4790-819b-8945df6e38b5",
+      "key": "06e4ffb7-fd6f-43a6-8f94-c3b46e826b72",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -4484,7 +4461,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "0a2d026a-ef31-4e83-bcc0-0023ecf69661",
+      "key": "941e428a-b724-48d8-93bb-c5504b51da90",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4496,7 +4473,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "42112f8d-fc0a-4151-9050-4fcd4e250f31",
+      "key": "62157fc6-540a-4b1d-9af6-8bb19c6a588b",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4508,7 +4485,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "bd6f6dc5-db9c-4f1c-b9cd-28c674d90e41",
+      "key": "8b599312-3607-4912-ba59-1063297c950b",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -4520,7 +4497,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "3c6bd591-53cf-4624-bd93-f7af9ba00806",
+      "key": "9717d450-02f8-4dd0-bbcd-33c0eafbcd33",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -4532,7 +4509,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "ba58b675-02c8-4b0d-bb40-8942811f33b2",
+      "key": "181bc12d-f426-47a7-9101-57ed502d7471",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -4544,7 +4521,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "73a9559b-d9eb-4468-9305-a5a98ebf230e",
+      "key": "9f2e0746-72a4-43b0-aaec-07aec4c30154",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -4556,7 +4533,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "8c99f4b5-2e5b-4535-a580-6482621713a2",
+      "key": "26d76bd7-4574-4fe1-9566-1034e275132f",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -4568,7 +4545,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "3dff93ad-b349-4f38-9060-77a6c2d70d11",
+      "key": "a8312d0c-b20c-4c05-9a25-31fe4cf9517a",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -4580,7 +4557,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "fce861ed-a17b-479c-ba42-3ec1359b9870",
+      "key": "8a0161d3-26d5-4978-8b17-2a75d5ba61bd",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4592,7 +4569,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "b821e221-c28d-4a3c-94b6-b0bd9772475e",
+      "key": "01541062-761a-4bb6-9783-5602c759a101",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -4602,7 +4579,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "5e7e7703-a68a-4950-8f94-d4dadaaf84b5",
+      "key": "86657d83-8912-482f-abe6-80a6a43610fd",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4614,7 +4591,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "09abbfd6-1751-444f-a602-fac12b5c58ba",
+      "key": "264acd00-4030-4d3e-8e9a-8b5b10607dd3",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -4624,7 +4601,7 @@
     },
     {
       "commandType": "blowout",
-      "key": "5c1e4a44-a3a8-41b0-b105-7950445055db",
+      "key": "82608e10-e4b6-4d70-b5c1-09d0f154d82e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -4635,7 +4612,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "24762634-194f-4f52-b41a-90f3638bee77",
+      "key": "10fff451-ba4f-459c-8544-121b074cdd96",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4647,7 +4624,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "1dc2cc45-1ce9-4057-a7dc-efbe99208228",
+      "key": "9e080ef0-95df-45ad-b284-f280485e5c6e",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -4657,7 +4634,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "9e30a081-7dcf-4d39-88b1-a3ee90ba8945",
+      "key": "80461ff1-8b07-47ca-9672-3fe797af93f4",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4669,7 +4646,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "35a6de64-1313-4fbd-bdb3-b17eb5418352",
+      "key": "c4eafa46-16c3-4b56-b6b1-04f17358c90f",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -4678,7 +4655,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "2ee03496-28da-4d87-a0d3-276ccde703c4",
+      "key": "0fa253ea-dedc-4935-bee3-3d7364ea171c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4690,7 +4667,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "4c809d51-25a5-469b-a336-937b05f5f636",
+      "key": "11c49455-af5b-4fa4-8634-b0dea995434e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4702,7 +4679,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "77620cef-8f0a-42a3-9d75-e5fad4281a0a",
+      "key": "9d08afd0-1abb-4805-9c5b-57c454894e70",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -4711,7 +4688,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "e888de52-052b-4b3a-b9cb-da41450a8728",
+      "key": "de7f32eb-22e7-40b6-a8e6-ac1fb0e98066",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -4720,7 +4697,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "45afe5bb-535a-4bd9-9ac0-b24c41bdb96d",
+      "key": "b180e31a-1560-4745-9796-0baea5027af6",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4732,7 +4709,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "4ae18dba-292f-4e20-b830-4387998debbc",
+      "key": "c8e6cfac-e768-4c84-9221-60a3e538a767",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4744,7 +4721,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "90a9e6c9-a62b-443f-9d19-02142c11ddf1",
+      "key": "cf6619e9-84cf-4339-9804-bc0fbaefcfc2",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -4753,7 +4730,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "47626d9c-03b9-4171-b474-3a41cb1d6452",
+      "key": "295952ef-f408-41e5-be09-7615c0807425",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -4762,7 +4739,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "fe402c52-e9ff-41f3-9f12-9ca5f3b7cbd7",
+      "key": "5fe6b09e-dda6-4c1b-88c0-326fcc3c79d0",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4774,7 +4751,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "eb381ad3-fd2a-4a82-91a0-00782faacdbf",
+      "key": "cedfe716-103f-42ca-a5f4-a567a8a75ed9",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4786,7 +4763,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "a6a4d88b-4c67-4566-bf7e-7434f1cbfc42",
+      "key": "cc97a0d7-be8d-41ef-a65a-786b5dc2343b",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -4795,7 +4772,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "19e86d49-7b08-429e-8c9d-6c71e4e41e11",
+      "key": "8576c372-78f7-44e9-bee2-899a34bf6a26",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -4804,7 +4781,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "55271bba-50c4-45aa-9c42-bc3b2dcbaf76",
+      "key": "00f9d45d-be49-4945-a317-175052f084da",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4816,7 +4793,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "ce928618-caeb-482d-979c-bde0e2ec7365",
+      "key": "4d3cc892-feb2-42ba-be94-41c609d55a98",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4828,7 +4805,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "403b9560-dd04-4422-beff-8b2e9cc1e8d7",
+      "key": "997fcf53-822d-4a65-9553-700730c4774e",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -4837,7 +4814,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "c234fd4d-da5e-4eb3-b57e-35089fe2eb99",
+      "key": "f400f87c-56f1-4570-981f-9cbcd8cd909f",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -4846,7 +4823,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "0e98a82b-d6a1-4db9-a727-2b3bc7a077e5",
+      "key": "03a973aa-966a-42b8-8d85-6c81e3ff205b",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4858,7 +4835,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "22d76a02-f22a-4003-8b01-0fd794ae2159",
+      "key": "d69cf286-7e35-4b71-b5bf-d78b6eaf2d14",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4870,7 +4847,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "5e3906e4-f186-4ea9-bc09-d376b40cec6f",
+      "key": "28d2c435-0c9d-4852-9f04-f60c9162427e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -4879,7 +4856,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "a2f5a34c-205f-458a-a990-4a1e11b68500",
+      "key": "9847b884-9672-4790-9923-d2447b559d41",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -4888,7 +4865,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "ad492cb3-0d62-4430-a334-aba00623468c",
+      "key": "403b1a4c-aa52-4639-b123-774e8bd394d4",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4900,7 +4877,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "5cb1aad5-1819-402b-8a0b-fb7d95d5d223",
+      "key": "222801a7-e7e7-44a4-92aa-692dfb13bb6e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4912,7 +4889,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "a4fc8f27-b148-4bfd-b603-198de69b7c05",
+      "key": "baa3eed6-b4b3-426c-992f-6269675b69e5",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -4921,7 +4898,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "843e5567-e072-4830-9b20-3c75a898a3a2",
+      "key": "706e86b9-3341-4f8b-a336-97a16b467c8b",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -4930,7 +4907,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "e96d63e4-1673-4f08-adce-e30e3a5804ce",
+      "key": "530c6751-7fa2-41b0-8e64-1d6681754002",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4942,7 +4919,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "9e1802f8-6b89-4f65-9891-5015ab6cabe4",
+      "key": "a552908f-3268-42a4-bae0-19865c002c12",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4954,7 +4931,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "4a6ea8b9-5c80-42c1-8996-d7841d2841ef",
+      "key": "9a5c161a-3616-44a9-b3d9-df3476c1614a",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -4963,7 +4940,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "80b24557-f9d4-4a0b-88b6-a7075d53150f",
+      "key": "8f9f4497-e079-44a5-9d57-8ada05c3c47e",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -4972,7 +4949,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "1ddd772e-1f9a-4453-a53c-2c78fbfd509e",
+      "key": "06e3b6a4-9e2d-4a66-bf75-d822c3b29a9b",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4984,7 +4961,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "b67893eb-4374-46ab-bce8-7dd3eea23987",
+      "key": "bf2d49cb-82f8-4384-915f-213ac26764af",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -4996,7 +4973,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "112d728c-5799-435f-ae85-97b5a6e8ec41",
+      "key": "9fb9b781-6aad-46ca-a1f5-d95eab1756f0",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5008,7 +4985,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "a3a9812f-1da0-4267-ac80-4e908ccf5700",
+      "key": "2f3fbada-5b78-4d64-81a3-13efd798df65",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5020,7 +4997,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "8eed75c8-5ce5-401a-bb50-a6a3b5c9aaf3",
+      "key": "dc0c71ec-7ca6-42fd-ba96-da6ef65fa3d9",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5032,7 +5009,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "b0cead36-0093-4bf8-b29b-81976c5f11ca",
+      "key": "3d663915-edf4-4b48-ac40-4868b1be5d08",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5044,7 +5021,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "88125d83-682f-4d7d-bca0-b9160891c530",
+      "key": "273643d5-be76-41b3-a06e-7a2741cfaaf1",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -5053,7 +5030,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "4492ce7a-2786-4c06-96ae-8a9255d35b21",
+      "key": "2ceb6586-0a1a-49b7-9cc2-b8521da6a0dc",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5065,7 +5042,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "9105a9b7-bda8-4f88-9c2f-8a2ad4707431",
+      "key": "da27ff13-3914-4f0a-aa34-7695bcd43b04",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5077,7 +5054,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "42a52767-81f4-40a3-a8ea-7567316e0cf5",
+      "key": "faaccafe-d47e-4352-860e-f282932e3318",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5089,7 +5066,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "0633322f-fb9c-4d65-8a92-7a219fae9d60",
+      "key": "4db3bed5-7318-4586-a82f-17ab4cf6603a",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5101,7 +5078,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "9faa8574-6eb2-4b73-82e9-73080a2b0a13",
+      "key": "3b72ee27-96e9-4fe6-a2ad-33abcf63ccdc",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5113,7 +5090,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "b300b059-57d6-4598-bea7-5039fa7ee959",
+      "key": "88a181f4-77f6-45fb-90d7-2ee805eaccd3",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5125,7 +5102,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "2f15b334-dc8c-48ea-8366-79a802798a54",
+      "key": "8c7abf89-7f61-4be5-9a9a-019fb2613dab",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -5137,7 +5114,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "aea3e85e-4df0-474d-81f6-87e736426b58",
+      "key": "35563b92-34f5-4d90-a0b4-cccbbaa44589",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -5149,7 +5126,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "c09e1bfe-bd27-4bf0-a5aa-d359216b6509",
+      "key": "2453705a-2e73-45aa-be6d-0fdd599ceff1",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -5161,7 +5138,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "59440130-4082-416a-9850-ec06b094add7",
+      "key": "2123ce51-cbda-4bcd-82fd-3b34f76a674d",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -5173,7 +5150,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "b4c4fc34-5240-4af3-923c-0fe2689f40ca",
+      "key": "81784e7f-36e5-4121-aac8-820ae7ab7961",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -5185,7 +5162,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "32a3d36f-0372-48d7-be06-8fd170881055",
+      "key": "fc97fbf3-5c8c-4337-98c5-c0a19c446790",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -5197,7 +5174,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "5f0103ac-59bd-4a3c-b925-a2a9b6368d85",
+      "key": "7a10944d-f1f6-4a40-aab4-6959a400574c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -5209,7 +5186,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "df79678c-5bce-4e7d-a9fe-de02f5769afa",
+      "key": "07314ee0-4832-4c28-b69a-08d54c53f6ed",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -5221,7 +5198,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "08081bad-dd53-4d6a-aedf-8af2040c5252",
+      "key": "f558a74a-d6af-4808-83a3-626b33067b17",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5233,7 +5210,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "76c56048-3551-40e4-97a9-fed38a6c044c",
+      "key": "c0ae772b-d6e8-45c4-869d-6a2f8f02a2df",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5245,7 +5222,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "7e6989eb-bbe9-410a-a444-a6beb36ed9ac",
+      "key": "0f7c90a7-5a9d-4087-be54-f95e1fa0a772",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5257,7 +5234,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "68d7dd5a-2834-4da5-8c5d-a9bc2b2dab22",
+      "key": "d90fcd9f-86d3-4d6e-8d2e-2075d214ca61",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5269,7 +5246,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "00f80592-859f-4769-8ea5-eeebcaf8bf92",
+      "key": "5feeb309-4baa-43b3-b2c8-62073a556fd5",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5281,7 +5258,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "bd2752cb-2f01-4d29-8878-dad5c15ad598",
+      "key": "aa0c1602-fb17-4446-abe8-c82318dc5245",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5293,7 +5270,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "15d69b50-e341-4dda-8616-8f50ba4508bc",
+      "key": "e1b39f9b-3db9-482f-8dea-78b5c5ea2e3b",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5305,7 +5282,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "248ea69c-4131-4d30-b10b-0212e1c6fd58",
+      "key": "b0871465-7dc8-4a54-b549-df7567d490b0",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5317,7 +5294,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "73ee5274-d87b-4d99-b832-2096fb6ad8c5",
+      "key": "844c727a-a3ab-49bc-bcbb-251958b9deb1",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5329,7 +5306,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "186a0b88-7cd8-4d27-9666-43daed94e0c2",
+      "key": "775eefda-d48d-47ec-abf2-e223c953d00e",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -5339,7 +5316,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "fed90f85-813a-4a71-8d72-4f8d9fe6ebcb",
+      "key": "a1d2b333-1b10-4d12-862c-d2d1f670507d",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5351,7 +5328,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "c6c6ff98-601b-4e95-a864-992d818c84e2",
+      "key": "e48d96ae-3666-4db7-9dad-9c2c72ac750c",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -5361,7 +5338,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "42f4e041-50e6-47f8-8b1c-3656ca7b838e",
+      "key": "da802426-206a-4a50-8fda-7183909c58bb",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5373,7 +5350,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "b1460411-89ba-4aff-896f-e590629c3094",
+      "key": "5188b9c7-3dee-4d05-a16a-0092eb686ba0",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5385,7 +5362,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "48a24410-50e2-43b7-95e5-318fa4539d1b",
+      "key": "45779db0-f358-4d22-b944-3cfb39459e56",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5397,7 +5374,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "6ae3b12c-02ff-469a-888e-1db564b214d6",
+      "key": "90f3969a-9ac9-42bd-a2d6-bd2372866f36",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5409,7 +5386,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "19902d26-c198-466c-8cd0-b469a2697514",
+      "key": "fb8130f1-dafb-424e-a28d-ec126901146f",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5421,7 +5398,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "e5e7f9ed-ff69-45c0-8d47-3b648fbf7d00",
+      "key": "db651152-bd49-4fd1-ab5f-21be595a8116",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5433,7 +5410,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "ef3052a9-46ea-4c93-8391-c7292e12d910",
+      "key": "12effa65-0abe-4043-8a75-f1d6dfd05886",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5445,7 +5422,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "67f094f9-8dcd-4fb5-bcf8-7dd35430056b",
+      "key": "3c22b4ed-33be-4655-9b3f-6d4006d46025",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5457,7 +5434,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "648a0a0f-fd33-4fd2-ba34-032272530db5",
+      "key": "6c5d7f5d-16ed-46de-bf1d-75cc9f0af572",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5469,7 +5446,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "b7d89a64-bfd8-4004-ac96-a6eb8ac10720",
+      "key": "d9e3f4af-c851-4bef-b8f3-8cb0d6a32162",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -5479,7 +5456,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "d70058b8-a0ad-4018-b49e-05f0aff1045c",
+      "key": "d6b93e63-3516-4f27-9211-fd8b52e06714",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5491,7 +5468,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "374a4937-48f4-4e72-ba94-82b87614d83e",
+      "key": "d4650bbd-935a-44b9-9563-8047bebf6d84",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -5501,7 +5478,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "ed576810-d4fc-4029-88b7-42a62d3bfb6f",
+      "key": "f7e7afdf-49ae-45ac-a5c1-0363cfa41d2d",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5513,7 +5490,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "2d4082e2-4b9c-49ee-9adf-f1517411111b",
+      "key": "bd79fbb4-e4e0-4549-bd6c-61f92b3dfcbc",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5525,7 +5502,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "7eb99e69-7c3b-49c6-b591-82c7deb0baac",
+      "key": "bfb3488b-fd5d-4d67-a9c6-98ed6e00169d",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5537,7 +5514,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "a3df1dd5-1f3e-41cc-b73d-5eaef277b05e",
+      "key": "6974194b-f7b5-4a41-bfdf-ec597e6e3431",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5549,7 +5526,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "676844e9-04bc-4409-84ec-af52a396b12c",
+      "key": "5229fa26-b111-47c2-941a-44eedfd7fbb3",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5561,7 +5538,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "fc823faf-80f8-4ef2-89ce-603d1c48970f",
+      "key": "f342c08f-5496-4cd5-997c-10cc175a5355",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5573,7 +5550,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "842d6be4-a2e5-4d65-925c-3a360db52a8d",
+      "key": "043bca5e-ad04-486e-b335-b410e3931654",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5585,7 +5562,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "352356fb-5341-45ec-8de2-b89cbf0ca2a1",
+      "key": "1414881a-1138-496e-a95f-3a961955f426",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5597,7 +5574,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "96ca0c3c-6ea7-4054-97f6-011028e2f51a",
+      "key": "02ca723c-bdd0-4271-befd-611b1768afe0",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5609,7 +5586,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "59854782-8a8d-4c2d-a6e7-84698bd59a5e",
+      "key": "c32ec6d2-094f-4d4a-b25a-5e91e3368417",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -5619,7 +5596,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "5091efad-5907-4a55-adfd-b1323f0ec684",
+      "key": "dfc9dc7c-f6ca-40dc-9746-dac13058d684",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5631,7 +5608,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "9b01069b-7539-4c74-bd19-3cb3c4a899b9",
+      "key": "b40fff69-de1d-46bd-8172-b01d004d4744",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -5641,7 +5618,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "47431220-19f8-4976-be40-33fd1f7227b9",
+      "key": "3bb6c09f-14ee-46c2-b2a0-f33ca0401dc4",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5653,7 +5630,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "f4bd6b38-9e01-4b67-aa91-aa4f3ebdcfe1",
+      "key": "1368d075-aac2-4c71-8939-e5619aa3acce",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5665,7 +5642,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "61c1b2ff-3658-47dd-8ce4-d342ef9a16a2",
+      "key": "c77d2785-9052-46b3-9200-4bd372115629",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5677,7 +5654,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "ae4d62e1-cbd8-4714-82ab-2855f4f2d71f",
+      "key": "6656fc31-877e-4a7c-99f6-cfa561e1a788",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5689,7 +5666,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "1f0547d9-09ec-4c90-8b52-5a2026004d56",
+      "key": "254152f3-798f-4ebb-9798-2d82c7ab33f7",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5701,7 +5678,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "d793448e-620e-410b-a1fb-806a494b434f",
+      "key": "ca19384c-43b6-4610-b274-5ade92b14527",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5713,7 +5690,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "ead9b6ff-de90-4856-aa97-719adb4cee3e",
+      "key": "a414cad8-2b1e-43ff-92b3-33871a6ecc24",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5725,7 +5702,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "22384e83-44d5-4292-89a8-fe772ef16efd",
+      "key": "f2dd1de7-f5c8-4dcd-9952-e90179763741",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -5737,7 +5714,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "6d7f1b12-3659-4bcc-8f57-e8ed0efb1dd1",
+      "key": "ebf601da-0049-4da1-adfd-2b410890358b",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5749,7 +5726,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "a0296f02-5bd9-4488-98b2-8b4a7923e8c5",
+      "key": "a5a95336-d6b5-4510-8299-5b9335e0261b",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -5759,7 +5736,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "21e0a932-9161-4dd7-ab35-fac4ce30f997",
+      "key": "3f35708d-971d-4705-9496-0a34aeed4e70",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5771,7 +5748,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "5a5b07a0-601b-4450-b5b4-c63b7d45924e",
+      "key": "12cc9cd6-d4a7-4891-a990-c123c4177d96",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -5781,7 +5758,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "3e70feeb-fb8a-465f-b30c-02c620f70257",
+      "key": "f672db3d-9d52-4110-aff7-416310955c7a",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5793,7 +5770,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "a104b8ae-0dff-48eb-9118-2e5c0c4a249b",
+      "key": "e908ed11-bb00-4b22-897d-cd39bd50c040",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -5803,7 +5780,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "80b23172-5669-45bc-a46c-dc232f42c46c",
+      "key": "31a7ad65-0f6f-4357-b41c-2c0419c60174",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5815,7 +5792,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "b5b7abce-6eb7-4f48-a253-af302dd2cb38",
+      "key": "a52e95e2-4872-4403-abb7-b673fc278a9d",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5827,7 +5804,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "473cc133-579e-4187-93ff-3f8cfda72195",
+      "key": "a137e434-8e90-4a5b-995f-95f07fe9e3f5",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -5837,7 +5814,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "dd12e6de-b278-4d51-b913-b85e32b45af9",
+      "key": "68c43bb1-6cba-408c-a5ce-9ae526ff3388",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5849,7 +5826,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "afefe15e-b306-428a-a4ff-f0bbe0d582bd",
+      "key": "282b1d53-c94e-45d0-b617-40549da18071",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -5858,7 +5835,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "b5861938-d987-4364-99ee-f91a2ed271e4",
+      "key": "dee7f54f-4ffa-4be7-b726-ba3a9db84192",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5870,7 +5847,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "045d117d-904f-4031-90e8-25e5acc0c95a",
+      "key": "020e0ecd-d94d-446b-9f8a-fbcb7b955b58",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -5880,7 +5857,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "f8ca2901-7d0b-4003-8fb1-cbf2eed78ee4",
+      "key": "6b290b38-db8e-4451-80ef-80457d8ba48c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5892,7 +5869,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "16b1b01b-5e74-47c2-8b4e-0e67b3703904",
+      "key": "485860e3-adee-4e0c-85b0-ce189f8bd373",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5904,7 +5881,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "9995ef15-280e-4762-a2db-b56651a3e197",
+      "key": "064b0046-a9b4-41a1-a22f-5ce28096e98c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -5914,7 +5891,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "5875a494-a898-4090-a175-81053322b188",
+      "key": "839c1456-df07-456a-8355-aa79c1ab05a9",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5926,7 +5903,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "2f99449c-8272-4f04-b8bb-429228d2d704",
+      "key": "344c13bb-7db1-4719-8792-dfb328919056",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -5935,7 +5912,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "b21f2a2c-b035-47c2-ae63-c6bcd94cfe13",
+      "key": "d2a4949a-5e94-45f6-9953-135e1a0f9119",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -5944,7 +5921,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "a23dcaf0-00ab-4388-9e28-6f54e676230c",
+      "key": "09df36fa-5513-42e9-95fe-2b0cb9e76ffb",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5956,7 +5933,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "73fba05d-daa0-4f70-9aeb-65e10f47de70",
+      "key": "6bc278a8-6b23-4b59-8ebb-63a35cf32569",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5968,7 +5945,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "b8b29e2c-387d-4839-9ea8-4edd26f3d0bb",
+      "key": "d05cdd90-2a09-4f97-a2cf-9cbb7d1591b0",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -5977,7 +5954,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "becfb98b-8ad3-4b63-9ffc-c8fdfe5c0f7d",
+      "key": "178cece1-3e60-4f80-b1da-f7930ec2c20b",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -5986,7 +5963,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "8f2e0feb-b6e7-4d86-981f-ff9127214397",
+      "key": "5d8cc5e7-10bb-402a-8671-8033ee53b635",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -5998,7 +5975,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "2cc962f0-868b-4b72-b0ac-0ee05713e585",
+      "key": "a3d4465a-40ed-4fb7-8177-86ef0b9fa3d4",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6010,7 +5987,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "de77c286-631e-4c81-9bb9-e567d767ff2d",
+      "key": "7842c88c-9bb0-4557-99c2-f7c4d55dbae3",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -6019,7 +5996,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "942024b7-94be-444c-bd5b-fe7f8ce4748c",
+      "key": "fca283a0-c689-40ef-ad01-4dd3cd4320be",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -6028,7 +6005,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "2f9e762e-50f0-4186-b4a3-110f3c04a007",
+      "key": "89beca56-0f76-4d8a-a28a-d7d07d522e68",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6040,7 +6017,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "16762d6b-9006-49eb-bf08-553128cb2041",
+      "key": "87cfaeba-7740-4e6e-9385-241a5088185e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6052,7 +6029,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "f06a0c6e-e25a-4d36-a992-654b0703c621",
+      "key": "8852dba7-5be1-4ebc-827d-07696e883b61",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -6061,7 +6038,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "9c662fe5-1f64-4400-abb0-755181aa828c",
+      "key": "5a83ecf1-d9d0-49c9-a224-7b4b2aa93570",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -6070,7 +6047,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "2d70335f-d618-47af-b94f-c9839b89b0c4",
+      "key": "61b7f470-4001-4773-96e5-7d4e5f3904a2",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6082,7 +6059,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "297012c6-f506-4d29-baa9-bccbd1d0cbe9",
+      "key": "0a6da7c8-6924-4cb5-8588-69331926bb73",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6094,7 +6071,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "2834f4e1-ceb6-420b-84cd-b0412a442b38",
+      "key": "108d0a8b-5621-4db6-b877-e7252eba9df9",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -6103,7 +6080,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "368d6a15-266a-44eb-998e-233ded5d3812",
+      "key": "655bc090-9d4a-4637-ae67-a9c4faec7466",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -6112,7 +6089,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "5d4362b5-3007-41ba-85d7-b474407e2bad",
+      "key": "f5e589bb-2b36-4db2-829d-cff7da5a5f2f",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6124,7 +6101,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "2c1b224d-3e1d-49bc-ac98-06463fc8acb6",
+      "key": "98416b40-c472-4f52-b60c-5db7ee78b551",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6136,7 +6113,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "79862cc9-3a2a-43aa-8a86-7e1225203cc7",
+      "key": "2b4ddebc-9b42-4d51-b979-dbc3fca6e2e2",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6148,7 +6125,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "0af83763-7781-45ae-9678-76643d895b86",
+      "key": "180f7418-1c87-4abf-b44e-280aff387571",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6160,7 +6137,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "16cb9fa2-9282-4dae-8087-be40a5cbe2e1",
+      "key": "6044d5c5-9429-4ef6-9106-dbcca2eaa99c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -6169,7 +6146,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "f3d60d2a-ac94-4b8b-9f25-d5b3f8dc19fc",
+      "key": "0c34c74a-41c9-437d-b0ef-7d29cf250a99",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6181,7 +6158,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "4c76fd0f-4508-4ca3-9130-9133c8e4dea0",
+      "key": "a5dc155e-de09-49c7-87be-112b7d04df0d",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6193,7 +6170,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "4e48f19d-1bca-4ab4-acca-ff2b5b86c537",
+      "key": "310288c6-b963-4a4e-b097-c74f07a24a2a",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6205,7 +6182,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "95d9337c-18c9-4813-b279-82c39b40f007",
+      "key": "9ddb9d35-0f40-4efa-b3ed-9ca786c94f43",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6217,7 +6194,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "ff73b07c-0db4-4334-8115-af5d6bf4e518",
+      "key": "eee2deb9-128d-4d27-8034-9f89f0d68d9e",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6229,7 +6206,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "cd86ad58-213a-457c-adb0-180434361976",
+      "key": "0eafc317-8e77-4aa9-ae02-044c34e1a9e2",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6241,7 +6218,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "d04be15e-f0a8-40ba-a240-5f095251525b",
+      "key": "e4b17df6-9bab-4ff0-83bf-26d5d03c729f",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6253,7 +6230,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "0e34638f-7282-49f1-a60c-c74575145735",
+      "key": "5b0d8121-256c-475e-a1e9-8ab90ddee54c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6265,7 +6242,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "68f8b3bc-a21e-4eb2-8f09-81da64152f63",
+      "key": "96571e8c-27f5-417a-9469-6d864f8156ab",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6277,7 +6254,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "4e4611e5-8c61-47ff-8b03-d6a5eee9688a",
+      "key": "cc46eb54-d383-48fb-99dd-b8dcd71ce59b",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6289,7 +6266,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "c9d13568-1ba5-4788-be45-12b9bad1e262",
+      "key": "95ccbffd-65bc-4b1c-84fe-7c0aa1873017",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -6301,7 +6278,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "62abe623-eefb-4373-ac47-debd6feab6e4",
+      "key": "a4bad4d0-915f-48dd-ba9d-1f52bddf7d10",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -6313,7 +6290,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "4ac6fec8-0f45-42d3-be77-eea477affb94",
+      "key": "09e7e9e4-bae9-413e-a9e8-cb36958f7c58",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -6325,7 +6302,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "a570b04f-ef3f-4fa8-a54d-4f1d5c34f73b",
+      "key": "62b163ed-7ad6-4f35-bca4-5bb4965308c1",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -6337,7 +6314,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "ecb6e0db-2eea-4dd6-aca1-53498ddd7868",
+      "key": "23d6a426-3485-4d19-831c-9d6710374687",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -6349,7 +6326,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "e7e84ac5-dd9c-4bb2-9838-cf3bbbb16029",
+      "key": "dd3a8be1-5f89-4951-84f5-7c5bfdfafd87",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -6361,7 +6338,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "d089babc-fc83-4f40-a6ca-d99c7f6dd779",
+      "key": "09322e96-49aa-418f-ac14-4c787acd439c",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6373,7 +6350,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "75cde815-fdca-4655-92a0-d139bbe781b0",
+      "key": "8f6bc24f-e04b-4d3e-a3bd-f2f3979ad167",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6385,7 +6362,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "1798deff-bf50-4b4a-887c-a9b84cd1871e",
+      "key": "576c251b-a830-4dc4-b466-20fa5ad5348b",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6397,7 +6374,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "cd56bff2-2f0d-4fe1-a65f-0dc62a487591",
+      "key": "52e3b8d9-ff25-48bc-ac5d-a4aab6633c02",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -6407,7 +6384,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "9cc6e873-4b26-4d23-9b2b-c46c8d5b9579",
+      "key": "cda95d76-4699-47c6-a7a6-d10bdab774dc",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6419,7 +6396,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "147e8527-d043-43de-b687-8503ccd94507",
+      "key": "e08da794-eea6-4052-b4bb-0ba2b65b9eb9",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -6429,7 +6406,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "7fe710ff-59ae-4698-befc-91a96db6f7b4",
+      "key": "6a2d400e-be70-468f-ab50-954d3d22243b",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6441,7 +6418,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "b69439c4-a7ac-464f-9883-d26b8c8572c1",
+      "key": "9e4dc5a2-7e7d-4fd5-b9d1-e55777edfc8c",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -6453,7 +6430,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "0eccfc52-ed13-4043-9377-803e608a1192",
+      "key": "b39e6870-71bd-44dd-b424-f12e18851a72",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -6465,7 +6442,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "49fbaae9-3c1b-4ea8-a870-970acbcd074d",
+      "key": "a286d057-3bc9-43e2-847a-f310d4b5060f",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -6477,7 +6454,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "d4e57ed2-2557-4503-94e7-5bcafc390e38",
+      "key": "fecfe38f-7fc6-411b-8a45-784d462476ed",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -6489,7 +6466,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "0f4a25a8-a849-4ea3-a2af-f8b98c414279",
+      "key": "a6931604-5fdd-4e1f-82de-9f0ca7881836",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -6499,7 +6476,7 @@
     },
     {
       "commandType": "blowout",
-      "key": "12f84131-56dd-4864-975c-3aa6936ef894",
+      "key": "60f17855-b8c1-4016-bbd6-510e16aa89fd",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -6510,7 +6487,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "9ebdabce-370f-4178-a722-cb3ef38c1687",
+      "key": "2e5f90cf-da2d-44af-b6e7-ea7d31ea5ed2",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -6522,7 +6499,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "8385d02c-8634-4d6a-a35c-caaa8cb0d724",
+      "key": "8a3ecdf8-2fde-42d0-bb4d-ecfda568866d",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -6534,7 +6511,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "e7408300-ccd0-403c-b069-41ac0788a537",
+      "key": "b81e83c3-26c2-4fdd-98af-e702226c57e8",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -6546,7 +6523,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "be850e1c-4713-4ebf-b2f1-55f282934d0d",
+      "key": "26bff4db-8252-4047-a41b-34de273acd52",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -6558,7 +6535,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "559fdb1a-b47b-461c-afa6-a24e0d69960f",
+      "key": "a99ec555-e5c3-4ed6-8aa2-920490b8dda3",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -6570,7 +6547,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "02b137f0-5509-489b-b983-b20205c33776",
+      "key": "05ffe866-31cc-4473-9fba-07bfb285af33",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 3,
@@ -6582,7 +6559,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "40f8683a-81bc-4d1f-8d76-da1f039b2fc7",
+      "key": "a252a6ea-110f-44bb-8cba-b3696e18f0b1",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6594,7 +6571,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "d750a911-a192-4147-bda7-4315491c6881",
+      "key": "20249f42-2c7a-47b8-838a-f654e05f406e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6606,7 +6583,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "1f0930d1-ac6d-4e1f-8b5f-31bc7d5d13e4",
+      "key": "a67aa7cf-4942-4f88-83cc-5869bcbb2b0e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6618,7 +6595,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "d2273df6-4421-4643-a1d4-aed09eb43f4f",
+      "key": "950f47bc-12c8-4141-a446-7b45a2807ca6",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -6628,7 +6605,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "2baeafff-f613-4a08-bfa3-6f8de9f56b88",
+      "key": "dd772865-c6ca-41ce-a90e-4f046bdcbc11",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6640,7 +6617,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "9c183c49-994b-4947-99bf-96b670228c77",
+      "key": "af43fcbb-32e9-48c5-a394-9f1eeb9734b3",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -6650,7 +6627,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "1004f439-c8da-4457-a264-0f5fc4990ba7",
+      "key": "c6facb4a-8f97-4cc5-9315-d337c9e87d32",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6662,7 +6639,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "04db61bf-1acd-4e8e-bf93-ea8187d24ae7",
+      "key": "42ea6ccb-5a78-45c7-a6e7-32f1eb9fd5f9",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -6672,7 +6649,7 @@
     },
     {
       "commandType": "blowout",
-      "key": "266acea5-57fa-4ef4-b626-43e2046882ef",
+      "key": "2e5b9179-bad5-47ec-be46-1149f0784bcb",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -6683,7 +6660,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "971ebe9a-d96f-4e03-9c67-07df692d8974",
+      "key": "62dfb027-b50f-4276-9ca4-8528b01d56e8",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6695,7 +6672,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "e125185b-da81-40b2-915d-9a6ab9401b62",
+      "key": "b20256ef-e01e-41b1-a774-3e5d311029c4",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -6705,7 +6682,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "25e4c4b3-59f8-4996-be9d-20560ee8e8e5",
+      "key": "d1abe10c-a1fe-46a9-bb92-941de4a5f1ca",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6717,7 +6694,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "0899e9bf-e5f4-4de1-bb12-29254efed096",
+      "key": "0e2abda8-751f-4f8b-a058-4d7b3d974591",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -6727,7 +6704,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "f7509865-dfbb-46a6-907e-19538aa2ad55",
+      "key": "d864a8ed-e7a8-44de-9ac7-0c401f3034b3",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6739,7 +6716,7 @@
     },
     {
       "commandType": "blowout",
-      "key": "5cb17692-40e3-42c3-8e55-dd77c62fe808",
+      "key": "c1e35155-a2a0-4d8a-aa59-479536b588f6",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -6750,7 +6727,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "6d79f2b5-3057-4bf7-859f-d329890a298e",
+      "key": "b371aaca-edd1-4b00-9a14-26dc593ae70e",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -6759,7 +6736,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "3483260c-48a9-44bf-8326-7af5971023e6",
+      "key": "a68cd464-2ebf-45fe-bd07-0bc055928cd5",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6771,7 +6748,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "d2bed779-3bd3-4957-9ce8-1333b9e87753",
+      "key": "96e86a64-1958-47a2-bb9f-0cda806da690",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -6781,7 +6758,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "ed1e9f5d-c8f5-4e78-924a-86d492cd63d2",
+      "key": "0cf3d73a-17a5-46cf-a9e8-7b50bab0f907",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 5,
@@ -6793,7 +6770,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "025a6236-36f7-4d94-9aa9-233bfaf96d94",
+      "key": "c8eea9b8-cd27-4599-b7b6-3b71a2cbda1c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0bc091e0-180a-11e9-9608-8bed9be8868f:trough-12row",
@@ -6803,7 +6780,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "b48ca79e-2b24-4d07-bd72-3bd6b83f8868",
+      "key": "4ffd5ba9-556a-4f4b-a49d-ebc6d0992767",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6815,7 +6792,7 @@
     },
     {
       "commandType": "blowout",
-      "key": "525a43d6-99a0-4519-98e3-c4a02346b87c",
+      "key": "fcb32a40-b8e3-4924-9236-85420839b345",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -6826,7 +6803,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "00cd8704-0353-4689-8ae5-b6e7e7777c0c",
+      "key": "62badd9f-d95a-44e1-887a-1c4d09f4bc65",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -6835,7 +6812,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "ced63901-8a21-4ff8-9783-9fda7c4e1980",
+      "key": "bfe12e62-aa8b-4ef5-9f71-561d9eb17809",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -6844,7 +6821,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "15dec8c5-c4d6-40cb-9f9d-066ebacecedd",
+      "key": "2d22f9d2-213c-4089-a838-eb70342514dc",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6856,7 +6833,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "7c86eed5-1970-4ba8-824f-43ffea7cac21",
+      "key": "cacfe37a-93f4-4cdf-a272-10359969b4ce",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6868,7 +6845,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "fdf9a9e0-ab26-4701-b0f8-6a583f215e65",
+      "key": "82135a69-e603-4403-a70b-59f67c56b9d9",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -6877,7 +6854,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "c491481e-3769-45b6-87ff-a270af695da6",
+      "key": "8ab1ed01-8fd2-4552-8487-c7ff121a96c2",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -6886,7 +6863,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "f794147b-e55c-4883-a0ea-c37904c966cf",
+      "key": "7035cc00-99cc-474d-bde5-70db08e82a7f",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6898,7 +6875,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "3c56e017-d48e-4192-86c1-214758ff280b",
+      "key": "cccc684f-2b0a-4997-8b8f-c714da48e892",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6910,7 +6887,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "30ac4736-0122-4e6d-ad22-90cf1ac1129c",
+      "key": "fcde490c-7da9-4954-ac52-23926cedf3ee",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -6919,7 +6896,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "f769348b-0168-4dc2-804d-610d53aea703",
+      "key": "36258309-0825-4519-982d-eb35bca1f35e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -6928,7 +6905,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "58c40a4f-9991-4fcb-8445-28155d480bda",
+      "key": "a3101a7f-e7e5-4722-a5d5-1b47ffeaaaba",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6940,7 +6917,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "7411e179-0d7a-4046-a6e7-1b2be00c3b57",
+      "key": "c72cecbf-665a-4b8e-abc0-b4c458a27a82",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6952,7 +6929,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "074d9cc3-7d45-47a4-b642-db22dbf1833a",
+      "key": "7270dc36-68aa-4834-a037-0609e43159da",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -6961,7 +6938,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "398b39d2-0f09-4c5f-b9a5-7128350d6b01",
+      "key": "539793b2-968b-47b9-bf54-c3601fa9d346",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -6970,7 +6947,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "097751c4-3255-4b56-868d-8be544658960",
+      "key": "9d5aa18e-92ee-4c89-896b-9fc623830b8c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6982,7 +6959,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "97110945-23bf-4244-aa34-acd387c6e459",
+      "key": "32c9f988-59ee-4a89-a211-8e530737a520",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -6994,7 +6971,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "f44aa844-20ef-4faf-87f3-4126da75ae0f",
+      "key": "df141e35-a21d-4e16-96bf-a10172ef9288",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -7003,7 +6980,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "841508a9-7d88-4ede-b795-81187a35bdc1",
+      "key": "e76f1793-519c-41ec-84c5-0b70da627cc9",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -7012,7 +6989,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "9a8692aa-7910-4613-88bc-372e06d70873",
+      "key": "26d55769-aaad-4d62-af1b-90aa12e4d565",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -7024,7 +7001,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "e1cc4bcc-562e-4c55-bfeb-220b20337272",
+      "key": "f2dab032-46c3-4e66-8c41-f639d118c623",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -7036,7 +7013,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "5ede2cf8-90f8-4b45-9159-9750344c4677",
+      "key": "f31ccd34-34f3-424b-922c-a629b29aa385",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -7048,7 +7025,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "1c1a3727-cd61-4d06-bb6d-024f5edce2d1",
+      "key": "49643d23-24b0-4d8a-b2ea-4c2a850ce619",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -7060,7 +7037,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "491214d6-dfe0-45d6-9196-e37bf412d211",
+      "key": "ed17cdda-fbac-462e-a25b-6d213fe853c5",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "cea1c650-1811-11e9-9608-8bed9be8868f",
@@ -7069,7 +7046,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "c1206db1-4ba1-4be3-9f52-418186945f6e",
+      "key": "d7dfe82a-7cec-4ede-9ef9-68fd09bfe6da",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -7081,7 +7058,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "27a5ea53-ac26-4175-be4c-d4e46560e668",
+      "key": "bbabcf23-00cd-437a-b178-13874ebdc913",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -7093,7 +7070,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "19c955fd-b557-4006-a7a8-393f0688f273",
+      "key": "362d7eaa-56d9-4a63-b939-47d619756be9",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -7105,7 +7082,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "cc987301-804e-48db-a9d6-f312c1765ebe",
+      "key": "af8ea49d-7c2c-46e0-b5d4-8b13a5c3b634",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 10,
@@ -7117,7 +7094,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "129de55b-5db9-4183-a7e1-3b5350ba2249",
+      "key": "9188d4ad-e047-4ece-a1c0-844eaa57cf25",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7129,7 +7106,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "c60fa2a6-0125-4f45-a619-955fc4d4e794",
+      "key": "08862bde-8f27-430b-979a-31a002dff77d",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7141,7 +7118,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "46a9e9c5-9375-4a5a-90fe-af6597399e04",
+      "key": "621f5e5d-61cd-45d9-b18f-e8c0e7c10ad5",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7153,7 +7130,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "b767d94d-51fb-4bb3-aa3e-c02a1097c8a4",
+      "key": "7ba2c9f1-4edc-459f-a5c0-3e6d450a49ef",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7165,7 +7142,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "97a2331a-f876-4e7e-b538-2b732ba1b041",
+      "key": "6219ed32-757b-4dd2-9f38-867f0cb5952a",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7177,7 +7154,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "d0d72e67-235b-400d-8973-f37ed620f6fb",
+      "key": "5c3bed54-cee1-4857-ace0-abb107fbcb6d",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7189,7 +7166,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "53764e54-73f9-4e15-90b8-936ed7aa8bc6",
+      "key": "aa22fb98-a5ac-404c-a672-3e804654d302",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7201,7 +7178,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "6b3957bf-564f-45ad-8c70-74855f568170",
+      "key": "5bf4d859-a58b-43ac-bb7d-50ec099c292f",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7213,7 +7190,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "8de589b6-020b-4f73-99c7-7bb0679c1c94",
+      "key": "12b0c4bb-943c-45d1-a5eb-e45027325fa4",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7225,7 +7202,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "28746816-a2b5-41ef-978b-d4d479be8868",
+      "key": "4b3354d1-5bff-4407-8540-aa9e4c9caa6a",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7237,7 +7214,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "10ae8577-9219-4849-9dee-acdda269f30f",
+      "key": "d6b544e6-a2de-47ae-8cf1-7def0defe037",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7249,7 +7226,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "ca972d59-a18a-4f54-a3a8-5f68075289f5",
+      "key": "0d78cf5d-e8f9-402b-bc09-bf32e5ee095d",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7261,7 +7238,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "5b2fccc3-530b-4e40-aead-662d9b84b237",
+      "key": "954d47a7-77a3-44ff-a615-17c82fb3deec",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7273,7 +7250,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "46b94a47-5923-4512-ae7c-cecfa810447c",
+      "key": "c3819225-82b9-4146-a75b-8e826bc56d39",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7285,7 +7262,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "69a9094c-7b43-4030-adfe-66c980614c68",
+      "key": "70930c21-7e90-44da-a25a-75848129a30b",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7297,7 +7274,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "3709e581-9f23-436a-8b6d-661b557d7896",
+      "key": "d477f365-cbef-4881-b665-8f8ce8322599",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7309,7 +7286,7 @@
     },
     {
       "commandType": "blowout",
-      "key": "947267ce-5a56-4b81-8220-c72a0ebd67cb",
+      "key": "2e2e67a6-9261-451e-b421-647ac42410a1",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -7320,7 +7297,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "f015cb38-78be-420a-bb8d-41ab59df66ef",
+      "key": "8078075b-dd6a-4085-811e-3c4ce0325074",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -7330,7 +7307,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "d50cc9ec-07a7-4872-8705-9fad73fe971a",
+      "key": "eb47336b-200d-4d72-ac5d-dbfae84a508b",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7342,7 +7319,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "4a2eb4ee-87e9-41f1-a2ce-27cbbdaa0892",
+      "key": "17cb0117-d8fe-4954-b52f-52adf62cfbba",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7354,7 +7331,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "1159dfa4-eb45-4448-941e-63bd79c152aa",
+      "key": "a11f4233-40aa-453e-a72b-9d0302a75014",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7366,7 +7343,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "518d01c6-92a0-4108-99cb-b769b2509c4b",
+      "key": "e18467dd-3f02-483c-b127-55ca7cc2fcea",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7378,7 +7355,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "7575f35b-f54c-4a92-b6f9-aa446c9ec374",
+      "key": "b4ec9dc2-11f6-42a7-8367-7a6b3f252968",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7390,7 +7367,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "01d3e1de-d53c-4087-9a8b-74ea915c7d75",
+      "key": "702f9f1a-3106-4eec-a1f5-a73484abf6e6",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7402,7 +7379,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "f9e2178a-7b47-4efc-8a48-8290b6ec5187",
+      "key": "e6e96be2-113b-420e-8a51-cfcbd7ca9b85",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7414,7 +7391,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "68e015a3-6783-4809-92b6-af54967b1166",
+      "key": "4f63f8f7-7323-437a-a095-09f27acf279b",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7426,7 +7403,7 @@
     },
     {
       "commandType": "blowout",
-      "key": "c9cc8b84-b1af-4ed0-a69d-e28aed87fbe8",
+      "key": "081554aa-f075-4e65-ab15-dc80ec48be09",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -7437,7 +7414,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "5c140812-cef9-4aaa-917b-7b6f9468faa2",
+      "key": "c161d9e3-1d37-41aa-ac1a-1fe2587e0b26",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -7447,7 +7424,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "a56e7303-90cb-4e73-9dce-82001fad9165",
+      "key": "0227343f-7d1d-4691-a86e-245b1b989f63",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7459,7 +7436,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "181434a0-29c7-4faf-a590-7746590f44bf",
+      "key": "baca3818-ea38-48bb-96f2-8428a42a447a",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7471,7 +7448,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "b80f8c3a-db0d-41b3-8128-52a41d273d4c",
+      "key": "b628f9b6-1a33-496b-87ad-0b97983512bd",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7483,7 +7460,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "0aa2687b-e307-4fd6-aac2-199b41028076",
+      "key": "aa4fba6c-8b6d-4952-8ccc-69aa08974a77",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7495,7 +7472,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "f822c053-1cfb-4d53-b9b2-ff45a843d799",
+      "key": "450a0e60-4b47-4932-bd5f-d54a8676816c",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7507,7 +7484,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "553e6c55-02fb-4ffa-b296-02c5a621bc23",
+      "key": "e722b9e6-9b21-457f-accc-10a5201e1b7a",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7519,7 +7496,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "a41dcb0c-39e4-425c-b322-398944092447",
+      "key": "aff148d8-39a8-4aee-9f2f-1af7d63db605",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7531,7 +7508,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "df8b0657-2b5e-44de-9516-ff4528e5151c",
+      "key": "c8d4f4de-e98f-4c6a-90c0-b2ffca3c8ada",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7543,7 +7520,7 @@
     },
     {
       "commandType": "blowout",
-      "key": "9383c893-8dde-4daa-85f6-77cf0bde64d2",
+      "key": "677e67ba-4262-4542-9ebe-563403da2563",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -7554,7 +7531,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "11c88ddf-8db9-4e19-a840-64d66e925938",
+      "key": "47f1f26b-d604-48b1-ac02-60affd1b9a1a",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -7564,7 +7541,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "2bbebd10-141c-42fb-89f9-239d19c82d70",
+      "key": "aac73b40-1822-4416-92ae-605143f059ff",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -7573,7 +7550,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "ca772431-cec2-4c11-a617-442e2bc78018",
+      "key": "575a1f88-ea42-4166-bafc-bb19c19ac17e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7585,7 +7562,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "48133c88-ec51-4a59-90b8-568089959c53",
+      "key": "554bd2dd-6dab-4eb7-bf2e-d86853547eef",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7597,7 +7574,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "4563cee5-6a4f-4baa-9deb-9681015c97bd",
+      "key": "f7b685ef-2c54-4a85-b377-47b46183489c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7609,7 +7586,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "6bb1d9ba-df51-4bff-a101-6773f35e2d16",
+      "key": "4faeffb1-c7fd-422b-aef3-204c7a192b36",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7621,7 +7598,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "57e7180d-a3cb-4445-8d28-3ef51c271cba",
+      "key": "c3e2cf0a-3da4-4a55-b066-60f7394163bb",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7633,7 +7610,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "a81ae5ac-df4d-4c42-be9a-7a6cba245851",
+      "key": "7dfb9724-1d3d-49bb-9145-56b51974e295",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7645,7 +7622,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "bbdbed5c-cdf9-4a5c-b117-75960319b060",
+      "key": "ee4a33c9-797a-428a-9673-386ebc568939",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7657,7 +7634,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "b134fc47-7ffb-484b-a6d9-1582b5a78420",
+      "key": "a7967fe6-3f2a-4ef1-8ca0-dc5501a0d858",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 4,
@@ -7669,7 +7646,7 @@
     },
     {
       "commandType": "blowout",
-      "key": "5ed5fc1a-1446-4426-8193-942d66e41a82",
+      "key": "bb4d008a-3bbc-4f11-8de5-4df77ae525c4",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -7680,7 +7657,7 @@
     },
     {
       "commandType": "touchTip",
-      "key": "a797c98a-e754-43e8-bb58-e06923cc0c2b",
+      "key": "c170997a-baae-4d91-add9-e0d701f5b0da",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "3c1a31c0-180a-11e9-9608-8bed9be8868f:96-flat",
@@ -7690,7 +7667,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "89ad7c50-4b28-4863-8499-2d693f1e4b2b",
+      "key": "8cd2f94e-6565-4d94-af91-697c09c3b71a",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -7699,7 +7676,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "92a4ce04-4bde-4def-8b15-94dab569f6b3",
+      "key": "56a7fdd6-1cba-4498-971a-187066f7f026",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -7708,7 +7685,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "4b177f22-08e2-4321-92c8-b5799c1cc53b",
+      "key": "876173c9-7201-46d3-8ed6-7892c6dd9d8d",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7720,7 +7697,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "ef78df20-f47e-46bd-bb5a-890ca95d9667",
+      "key": "fb88eaca-5e24-41c2-bb60-9d07b328e5dd",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7732,7 +7709,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "f19a6800-e892-45e4-a1bc-a7e5a8c6e2aa",
+      "key": "c6afa54f-5dad-4ab4-9410-69f860be6559",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7744,7 +7721,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "2163eeb5-a374-4c06-9b4f-95718d34b90e",
+      "key": "b4bc3d0a-3488-4f9b-be15-2297d1f470d5",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7756,7 +7733,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "9f718677-d088-4555-819c-4d91346bcb8c",
+      "key": "b45c9b5a-c573-47e6-80ae-e225b95b7037",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -7765,7 +7742,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "d196821b-eab8-422a-b4a2-af7670c2f298",
+      "key": "c3d37eef-61e1-4233-b2ca-6be0bc575838",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -7774,7 +7751,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "3148d2dc-983f-4870-bbf9-dd4642dac82c",
+      "key": "a4a52eab-a87a-419d-90f8-c7e32f952562",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7786,7 +7763,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "60cec392-3a2b-44d7-bf3d-5a1472479a42",
+      "key": "0012cb6f-3661-473a-9523-6ff5db7bf0f4",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7798,7 +7775,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "936dad2f-4631-4770-85d1-9e04a6bc82ee",
+      "key": "825b6bf3-1976-4de5-838a-82c90aff9675",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7810,7 +7787,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "d70b1285-d6ce-4ef8-8f0e-fff65b7ac393",
+      "key": "e221b94b-4526-44f9-9e98-149d276f4edc",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7822,7 +7799,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "23c7ac13-bd0d-4cf8-8e68-eaf423a07003",
+      "key": "dda92f3b-f183-4336-917d-cf912b700a77",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -7831,7 +7808,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "8d41423c-a123-4a7a-9a60-9dec2ab26401",
+      "key": "83ac4936-8857-46dc-b9f2-c5b6056f940d",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -7840,7 +7817,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "fe56f834-86e2-4841-b9a1-1e0cb6f29196",
+      "key": "7dea8ed8-d0cb-42e0-a42d-215da0db2936",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7852,7 +7829,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "56186b1b-6afc-469a-a08e-47db84a2b624",
+      "key": "54206a12-b744-4a3c-bf8a-0e879d6cb16a",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7864,7 +7841,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "52853ea1-557b-499f-94f3-abd3bf14e0c0",
+      "key": "3b2c9a44-d5da-490c-8835-01ba5aa1b949",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7876,7 +7853,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "c2f16418-8d8a-48b1-8918-c9a0e34e4d01",
+      "key": "54fd6efe-3e1f-4d31-b5e4-5bffad8f84b6",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7888,7 +7865,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "e1930299-91e7-477e-bfc2-a8bfaced216a",
+      "key": "3c5084b4-db48-43f4-8ab3-4d77d52a1183",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -7897,7 +7874,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "13f71455-ee94-47cb-b9da-90577a052905",
+      "key": "2ae21980-6ba1-4560-80c0-800b8e51ae3e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "cea1c650-1811-11e9-9608-8bed9be8868f",
@@ -7906,7 +7883,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "ae10e49c-4082-48f0-ad24-5675b2a35a8f",
+      "key": "740e1abf-8aea-40d2-a28e-fd1368707c0c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7918,7 +7895,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "d5903aa4-094e-41ae-915e-fcc03f6f6cf1",
+      "key": "edb5fc04-293b-46ac-9e9b-8a90595b423e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7930,7 +7907,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "4f3c1974-0b5f-420a-94c6-f091aa9a8174",
+      "key": "a4afeb57-a7a5-42ae-b455-78960964f41c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7942,7 +7919,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "0446e8cd-5ff7-44a3-a537-3f331a1bb32d",
+      "key": "f2c6a74c-c442-444f-8042-8dc5f14ac78a",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7954,7 +7931,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "78dd4c9e-1efa-42f2-82af-c476f505c338",
+      "key": "6eb75559-b3a6-446a-8215-da6d51c10d56",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -7963,7 +7940,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "54b61102-b8fc-4877-8f1a-9b9069be2fb4",
+      "key": "aa52fac8-63d1-41a6-bdda-7bd7ad7d6ba5",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "cea1c650-1811-11e9-9608-8bed9be8868f",
@@ -7972,7 +7949,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "e570288d-211f-424f-bcff-7c995553fa97",
+      "key": "a204acc0-ac57-408e-936a-06c616b83cae",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7984,7 +7961,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "28ef465e-5e7c-4e92-98f1-cfb08c3f1d86",
+      "key": "dad08f8d-01f6-45ed-8228-6924ab2df8f3",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -7996,7 +7973,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "cc721227-c94f-4c93-9fba-13d7f66e5e3d",
+      "key": "c12f0cb2-6af9-41bf-9394-93b866bbc470",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8008,7 +7985,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "caf1c0cd-3fa0-48bb-90a9-1694014fc6f1",
+      "key": "c566b0d1-8834-42a5-b360-3a33dbd5c493",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8020,7 +7997,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "8854904e-616a-472b-856c-c081a10342bb",
+      "key": "48f2fcee-8c7e-4019-8e05-c5e8e4933bd0",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -8029,7 +8006,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "2acaea43-489a-46a8-96eb-2aff4faf0203",
+      "key": "e6843f21-9f54-42ae-bc85-553ed8987d33",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "cea1c650-1811-11e9-9608-8bed9be8868f",
@@ -8038,7 +8015,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "70907bac-af55-42e3-8f64-ad0ee8bc2cd8",
+      "key": "2daa82f6-072f-4fcf-9359-91eddf40700d",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8050,7 +8027,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "ecf4a691-a9bd-496c-8826-05f262643f22",
+      "key": "bf1c21c5-ebe1-42b1-bece-aa3beed4015a",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8062,7 +8039,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "cc96e65a-c199-4258-a5f0-45db63dc56e4",
+      "key": "4ea95da2-7efc-42c8-91b1-196909739868",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8074,7 +8051,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "90a12382-f612-4445-a3b2-8d9daa4d7d4a",
+      "key": "52299ae1-d9d1-4dad-86c6-89d787cf347e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8086,7 +8063,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "1f408174-3e0b-4d3d-b302-d45b40cd1714",
+      "key": "7f7e1da3-374a-47d2-a56c-a5c80c344c10",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -8095,7 +8072,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "2f60af84-010c-45ed-99d3-3a15ba7188b2",
+      "key": "41b46a04-2eda-4614-a6af-f21b42301840",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "0121e950-180a-11e9-9608-8bed9be8868f:tiprack-10ul",
@@ -8104,7 +8081,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "4f516e56-3886-4977-87d9-791713745671",
+      "key": "d61ab119-20a6-4b28-b750-bafd836d2e78",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8116,7 +8093,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "6d3d6bb1-9645-4458-b8b9-d536420c7fa0",
+      "key": "d83766c8-3b42-4064-ad39-97215519d304",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8128,7 +8105,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "742bbefb-a5a4-48dd-a371-9a8c86aaeeec",
+      "key": "52b28543-3114-4cd3-a641-30ea46ee5cf5",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8140,7 +8117,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "8e9d8d89-f3cf-4264-86d2-80570d823f43",
+      "key": "9c5c56ab-a2b9-4d04-9ac0-3d954600f526",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8152,7 +8129,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "c3c75d92-19f0-4338-b591-9ec9fd55d844",
+      "key": "d614dbb3-de31-4375-82d1-4abf995fc06e",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8164,7 +8141,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "64a37621-b7f8-46e9-8459-9054375ce6f5",
+      "key": "34403628-6d38-42e7-84f2-d23d18b091f9",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8176,7 +8153,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "3877eeb6-955b-4b97-8666-e4acc6c5c529",
+      "key": "e971f9ca-b97e-461c-bde2-3fb6be274f4e",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8188,7 +8165,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "31aa0cc6-b27c-4f59-b049-61f4f670fcb8",
+      "key": "a0e1f593-701d-4b21-8cc0-9fbb763c7d64",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8200,7 +8177,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "78042279-1d25-4855-baa5-2309f8ca011d",
+      "key": "3ff901b5-47d4-4def-840f-9e4e0ff2b854",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8212,7 +8189,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "38a45ccc-e294-4ad3-a3bd-f83e1be15469",
+      "key": "dd4daf7c-185f-4243-bad2-d0f16bf229cb",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8224,7 +8201,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "4a33b938-9a9f-4fee-b1a2-9f42a71d5246",
+      "key": "6f14f2c4-3077-47d1-9be7-918e485981bd",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8236,7 +8213,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "6c93938a-ac30-4cd5-972a-4d9a4f7544b5",
+      "key": "102ac1a4-6470-49b3-922b-fdcebe1a709e",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8248,7 +8225,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "4c3da12c-64e3-40f0-b56f-274da756f5b4",
+      "key": "46b82202-961d-4550-a65d-57850ab2b8c7",
       "params": {
         "pipetteId": "01217420-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -8257,7 +8234,7 @@
     },
     {
       "commandType": "pickUpTip",
-      "key": "ed322ca8-54df-409f-848d-2d0e058e503e",
+      "key": "b976e849-0614-43b0-b22e-948318ec9560",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "cea1c650-1811-11e9-9608-8bed9be8868f",
@@ -8266,7 +8243,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "e3254538-9d15-4ec7-8b18-4309efe024f7",
+      "key": "37723127-943d-4e61-8016-ee58bf02ac16",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8278,7 +8255,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "d1e9f87a-7335-43d6-98be-30ab8ed9eaa9",
+      "key": "fcd48aa8-be23-4653-be23-8999c97346c6",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8290,7 +8267,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "18e2b0ae-98f3-4c9e-bd06-eea98e4d83b4",
+      "key": "d4ef403a-2408-4374-85cc-1680ee98b85e",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8302,7 +8279,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "d451a4d2-afa8-49a0-9e99-60f005a65daa",
+      "key": "84f58b3a-8121-4f67-915f-88c247e0e0db",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8314,7 +8291,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "ee4cdab6-583e-4ff7-a0bd-29e770399bc7",
+      "key": "609e3c81-24f4-4074-9b44-626839cfea83",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8326,7 +8303,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "1fb98162-6367-4537-808b-2150f3bf961a",
+      "key": "28017be5-a85c-4800-8a19-2b3b0ebd4458",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8338,7 +8315,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "bf03c1db-9056-4b26-bee3-91330c7e54e0",
+      "key": "d91c0b03-5832-49ff-9bb7-10002d08154c",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8350,7 +8327,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "823d1e12-fc99-4dc6-9b86-de3a2fb180a2",
+      "key": "8285dba1-f96b-44cd-9d3f-c96e4364ca5b",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8362,7 +8339,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "c1103865-3cc9-461e-8548-5fd05a38fc55",
+      "key": "1b186d02-2554-4203-ac72-1b9585f28c63",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8374,7 +8351,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "43bc637d-3533-47a5-aa9e-82045fe8a7e6",
+      "key": "0ddb2420-e5d9-469b-a418-5c8d59f6aac1",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8386,7 +8363,7 @@
     },
     {
       "commandType": "aspirate",
-      "key": "facdcd6a-9b60-469f-a655-9dc19c296cac",
+      "key": "84f989ac-505d-4d6b-a539-92ea8c7a41dd",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8398,7 +8375,7 @@
     },
     {
       "commandType": "dispense",
-      "key": "eca9279a-14f2-494e-a4b5-cb2268eae8aa",
+      "key": "33300d7a-b9b0-4647-b892-0760f0e50245",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "volume": 2,
@@ -8410,7 +8387,7 @@
     },
     {
       "commandType": "dropTip",
-      "key": "dd28e2bc-179e-4488-9bc0-7ff19afc2d29",
+      "key": "eb4a1a9d-eb3d-4b5e-9ede-f74c1652150f",
       "params": {
         "pipetteId": "01217421-180a-11e9-9608-8bed9be8868f",
         "labwareId": "fixedTrash",
@@ -8419,12 +8396,12 @@
     },
     {
       "commandType": "waitForDuration",
-      "key": "7520f9b6-7a77-4c87-9287-7069ecf68a16",
+      "key": "b4bf60e9-8d45-42d2-9465-3e03e1c72216",
       "params": { "seconds": 3, "message": "" }
     },
     {
       "commandType": "waitForResume",
-      "key": "4209e497-b8b9-417e-9137-ec7e547102f0",
+      "key": "9db9ec4e-6949-4da0-a2a7-28b5eaca0c55",
       "params": { "message": "OK HOPEFULLY YOU ARE DONE" }
     }
   ]
