@@ -77,24 +77,32 @@ async def _main(is_simulating: bool, mount: types.OT3Mount, test: bool) -> None:
         pipette_left="p1000_single_v3.4",
         pipette_right="p1000_single_v3.4",
     )
-    print("homing")
-    await api.home()
-    if test:
+    try:
+        print("homing")
+        await api.home()
+        attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(2)
+        current_pos = await api.gantry_position(mount)
+        await api.move_to(mount, attach_pos._replace(z=current_pos.z))
+        if not api.is_simulator:
+            ui.get_user_ready("ATTACH a probe")
         print("resetting robot calibration")
         await api.reset_instrument_offset(mount)
         api.reset_robot_calibration()
-        # check accuracy of gantry-to-deck
-        await _calibrate_pipette(api, mount)
-        await _check_belt_accuracy(api, mount)
-
-    # calibrate the belts
-    await _calibrate_belts(api, mount)  # <-- !!!
-    if test:
-        # check accuracy of gantry-to-deck
-        await _calibrate_pipette(api, mount)
-        await _check_belt_accuracy(api, mount)
-
-    print("done")
+        if test:
+            # check accuracy of gantry-to-deck
+            await _calibrate_pipette(api, mount)
+            await _check_belt_accuracy(api, mount)
+        # calibrate the belts
+        await _calibrate_belts(api, mount)  # <-- !!!
+        if test:
+            # check accuracy of gantry-to-deck
+            await _calibrate_pipette(api, mount)
+            await _check_belt_accuracy(api, mount)
+        print("done")
+    finally:
+        if not api.is_simulator:
+            print("restarting opentrons-robot-server")
+            helpers_ot3.start_server_ot3()
 
 
 if __name__ == "__main__":
