@@ -1141,6 +1141,7 @@ export const labwareInvariantProperties: Reducer<
       action: LoadFileAction
     ): NormalizedLabwareById => {
       const { file } = action.payload
+      file.schemaVersion
       const loadLabwareCommands = Object.values(file.commands).filter(
         (command): command is LoadLabwareCreateCommand =>
           command.commandType === 'loadLabware'
@@ -1150,11 +1151,12 @@ export const labwareInvariantProperties: Reducer<
         ...loadLabwareCommands.reduce(
           (acc: NormalizedLabwareById, command: LoadLabwareCreateCommand) => {
             const { labwareId, loadName } = command.params
+            const defUri = labwareId?.split(':')[1]
             const id = labwareId ?? ''
             return {
               ...acc,
               [id]: {
-                labwareDefURI: loadName,
+                labwareDefURI: defUri ?? loadName,
               },
             }
           },

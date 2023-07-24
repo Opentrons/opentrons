@@ -2721,7 +2721,7 @@
       "key": "80e66b7b-f195-4ba9-be11-ae1d4788ba31",
       "commandType": "loadPipette",
       "params": {
-        "pipetteName": "p1000_single_gen3",
+        "pipetteName": "p1000_single_flex",
         "mount": "left",
         "pipetteId": "2e7c6344-58ab-465c-b542-489883cb63fe"
       }
@@ -2730,7 +2730,7 @@
       "key": "e41e7095-891f-4465-8aac-9623b3c99387",
       "commandType": "loadPipette",
       "params": {
-        "pipetteName": "p50_multi_gen3",
+        "pipetteName": "p50_multi_flex",
         "mount": "right",
         "pipetteId": "6d1e53c3-2db3-451b-ad60-3fe13781a193"
       }
@@ -2777,7 +2777,7 @@
       "params": {
         "displayName": "Opentrons Flex 96 Filter Tip Rack 50 µL",
         "labwareId": "23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1",
-        "loadName": "opentrons/opentrons_flex_96_filtertiprack_50ul/1",
+        "loadName": "opentrons_flex_96_filtertiprack_50ul",
         "namespace": "opentrons",
         "version": 1,
         "location": { "slotName": "C1" }
@@ -2789,7 +2789,7 @@
       "params": {
         "displayName": "NEST 96 Well Plate 100 µL PCR Full Skirt",
         "labwareId": "fcba73e7-b88e-438e-963e-f8b9a5de0983:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
-        "loadName": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
+        "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
         "namespace": "opentrons",
         "version": 2,
         "location": {
@@ -2803,7 +2803,7 @@
       "params": {
         "displayName": "Opentrons 24 Well Aluminum Block with NEST 1.5 mL Snapcap",
         "labwareId": "a793a135-06aa-4ed6-a1d3-c176c7810afa:opentrons/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1",
-        "loadName": "opentrons/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1",
+        "loadName": "opentrons_24_aluminumblock_nest_1.5ml_snapcap",
         "namespace": "opentrons",
         "version": 1,
         "location": {
@@ -2851,7 +2851,7 @@
       "key": "bddc2e6a-5b7c-4675-b7d5-baa0ffa26fe3",
       "params": {
         "moduleId": "c19dffa3-cb34-4702-bcf6-dcea786257d1:heaterShakerModuleType",
-        "celsius": 4
+        "celsius": 37
       }
     },
     {
@@ -3662,6 +3662,13 @@
       "commandType": "waitForDuration",
       "key": "a1b86ae6-233c-414b-816a-4378689dacf5",
       "params": { "seconds": 60, "message": "" }
+    },
+    {
+      "commandType": "heaterShaker/openLabwareLatch",
+      "key": "fdsacfbd-f655-4862-940a-b47580d6ca60",
+      "params": {
+        "moduleId": "c19dffa3-cb34-4702-bcf6-dcea786257d1:heaterShakerModuleType"
+      }
     },
     {
       "commandType": "moveLabware",

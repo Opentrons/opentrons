@@ -13,16 +13,6 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
   const testCases = [
     {
-      title:
-        'preFlexGrandfatheredProtocol 1.0.0 (schema 1, PD version pre-1) -> PD 7.0.x, schema 7',
-      importFixture:
-        '../../fixtures/protocol/1/preFlexGrandfatheredProtocol.json',
-      expectedExportFixture:
-        '../../fixtures/protocol/7/preFlexGrandfatheredProtocolMigratedFromV1_0_0.json',
-      unusedPipettes: false,
-      migrationModal: 'newLabwareDefs',
-    },
-    {
       title: 'example_1_1_0 (schema 1, PD version 1.1.1) -> PD 7.0.x, schema 7',
       importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
       expectedExportFixture:

@@ -217,6 +217,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         const isLabwareOnTopOfModule = labware.slot in initialRobotState.modules
         const { labwareDefURI, def } = labwareEntities[labwareId]
         const namespace = def.namespace
+        const loadName = labwareDefURI.split('/')[1].replace(/\/1$/, '')
         const version = def.version
         const loadLabwareCommand = {
           key: uuid(),
@@ -224,7 +225,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           params: {
             displayName: def.metadata.displayName,
             labwareId: labwareId,
-            loadName: labwareDefURI,
+            loadName,
             namespace: namespace,
             version: version,
             location: isLabwareOnTopOfModule
