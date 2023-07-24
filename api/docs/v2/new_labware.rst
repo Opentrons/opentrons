@@ -82,6 +82,8 @@ When the ``load_labware`` method loads labware into your protocol, it returns a 
             location='D1',
             label='any-name-you-want')
 
+.. _labware-on-adapters:
+
 Loading Labware on Adapters
 ===========================
 
