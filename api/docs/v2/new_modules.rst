@@ -704,9 +704,16 @@ For more information about using and moving labware with the Magnetic Block, see
 Using Multiple Modules of the Same Type
 ***************************************
 
-You can use multiple modules of the same type within a single protocol. The exception is the Thermocycler Module, which has only one :ref:`supported deck location <thermocycler-location>` due to its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and robot server. 
+You can use multiple modules of the same type within a single protocol. The exception is the Thermocycler Module, which has only one :ref:`supported deck location <thermocycler-location>` because of its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and robot server. 
 
-To send commands to the correct module on the deck, you need to load them in a protocol according to their USB port number. Whenever you call :py:meth:`.load_module` for a particular module type, the robot initializes the matching module attached to the lowest-numbered USB port first, before the same module type in a higher numbered port. Also, deck slot coordinates do not determine which module gets used first, second, third, etc. For example, a Temperature Module in slot C1 that's connected to USB port 1 will get called before a temperature module in slot D3 that's connected to USB port 6. This functionality applies to the Flex and OT-2.
+To send commands to the correct module on the deck, you need to load the modules in your protocol according to their USB port number. And, the lowest USB port number always loads a module before a higher port number. For example, say you're using two Temperature Modules and they're configured like this:
+
+- ``temp_module_1``: Deck slot C1, USB port 6
+- ``temp_module_2``: Deck slot D3, USB port 2
+
+.. add comparison with module 2
+
+Now, when your protocol calls :py:meth:`.load_module`, the robot initializes ``temp_module_2`` first because it's connected to USB port 2, a lower USB port number than ``temp_module_1`` on port 6. This functionality applies to the Flex and OT-2.
 
 .. I thought tabs might work here given the robot-specific images.
 .. Using the full, formal protocol works well here.
@@ -723,11 +730,11 @@ To send commands to the correct module on the deck, you need to load them in a p
       requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
       def run(protocol: protocol_api.ProtocolContext):
-        # Load Temperature Module 1 in deck slot C1 on USB port 1
-        temperature_module_1 = protocol.load_module('temperature module gen2',"C1")
+        # Load Temperature Module A in deck slot D3 on USB port 2
+        temperature_module_1 = protocol.load_module('temperature module gen2',"D3")
 
-        # Load Temperature Module 2 in deck slot D3 on USB port 2
-        temperature_module_2 = protocol.load_module('temperature module gen2',"D3")
+        # Load Temperature Module B in deck slot C1 on USB port 6
+        temperature_module_2 = protocol.load_module('temperature module gen2',"C1")
         
     For this code to work as expected, ``temperature_module_1`` should be plugged into a lower-numbered USB port than ``temperature_module_2``. Assuming there are no other modules used in this protocol, you could connect the USB cables as shown here:
 
