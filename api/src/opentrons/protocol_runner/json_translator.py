@@ -226,7 +226,7 @@ class JsonTranslator:
     ) -> List[pe_commands.CommandCreate]:
         """Takes json protocol and translates commands->protocol engine commands."""
         if isinstance(protocol, ProtocolSchemaV6):
-            return self._traslate_v6_commands(protocol)
+            return self._translate_v6_commands(protocol)
         else:
             return self._translate_v7_commands(protocol)
 
