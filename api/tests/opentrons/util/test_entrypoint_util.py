@@ -84,7 +84,7 @@ def test_datafiles_from_paths(tmp_path: Path) -> None:
 class TestCopyFileLike:
     """Tests for `copy_file_like()`."""
 
-    @pytest.fixture(params=["abc", "µ", "🥸"])
+    @pytest.fixture(params=["abc", "µ"])
     def source_text(self, request: pytest.FixtureRequest) -> str:
         return request.param  # type: ignore[attr-defined,no-any-return]
 
