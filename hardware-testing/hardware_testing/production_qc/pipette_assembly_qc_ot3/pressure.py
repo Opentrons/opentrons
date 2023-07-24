@@ -36,7 +36,7 @@ class PressureEventConfig:
 
 
 PRESSURE_FIXTURE_ASPIRATE_VOLUME = {50: 11.0, 1000: 12.0}
-PRESSURE_FIXTURE_INSERT_DEPTH = {50: 29.0, 1000: 33.0}
+PRESSURE_FIXTURE_INSERT_DEPTH = {50: 28.5, 1000: 33.0}
 
 DEFAULT_PRESSURE_SAMPLE_DELAY = 0.25
 DEFAULT_PRESSURE_SAMPLE_COUNT = 10
@@ -57,8 +57,8 @@ PRESSURE_NONE = PressureEventConfig(
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_INSERTED = PressureEventConfig(
-    min=4000.0,
-    max=7000.0,
+    min=3000.0,
+    max=8000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=50.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT,
@@ -66,7 +66,7 @@ PRESSURE_INSERTED = PressureEventConfig(
 )
 PRESSURE_ASPIRATED_P50 = PressureEventConfig(
     min=2000.0,
-    max=6000.0,
+    max=7000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=200.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
@@ -74,7 +74,7 @@ PRESSURE_ASPIRATED_P50 = PressureEventConfig(
 )
 PRESSURE_ASPIRATED_P1000 = PressureEventConfig(
     min=2000.0,
-    max=6000.0,
+    max=7000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
     stability_threshold=200.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
