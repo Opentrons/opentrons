@@ -19,10 +19,12 @@ const mockUseHost = useHost as jest.MockedFunction<typeof useHost>
 
 const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 const ESTOP_STATE_RESPONSE: EstopStatus = {
-  status: 'disengaged',
-  leftEstopPhysicalStatus: 'disengaged',
-  rightEstopPhysicalStatus: 'disengaged',
-} as EstopStatus
+  data: {
+    status: 'disengaged',
+    leftEstopPhysicalStatus: 'disengaged',
+    rightEstopPhysicalStatus: 'disengaged',
+  },
+}
 
 describe('useEstopQuery hook', () => {
   let wrapper: React.FunctionComponent<{}>

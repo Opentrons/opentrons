@@ -7,9 +7,11 @@ export type EstopState =
 export type EstopPhysicalStatus = 'engaged' | 'disengaged' | 'notPresent'
 
 export interface EstopStatus {
-  status: EstopState
-  leftEstopPhysicalStatus: EstopPhysicalStatus
-  rightEstopPhysicalStatus: EstopPhysicalStatus
+  data: {
+    status: EstopState
+    leftEstopPhysicalStatus: EstopPhysicalStatus
+    rightEstopPhysicalStatus: EstopPhysicalStatus
+  }
 }
 
 export interface Lights {

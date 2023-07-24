@@ -20,9 +20,11 @@ const HOST_CONFIG: HostConfig = { hostname: 'localhost' }
 describe('useSetEstopPhysicalStatusMutation hook', () => {
   let wrapper: React.FunctionComponent<{}>
   const updatedEstopPhysicalStatus: EstopStatus = {
-    status: 'disengaged',
-    leftEstopPhysicalStatus: 'disengaged',
-    rightEstopPhysicalStatus: 'disengaged',
+    data: {
+      status: 'disengaged',
+      leftEstopPhysicalStatus: 'disengaged',
+      rightEstopPhysicalStatus: 'disengaged',
+    },
   }
 
   beforeEach(() => {

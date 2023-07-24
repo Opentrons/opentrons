@@ -26,18 +26,14 @@ const ESTOP_STATUS_REFETCH_INTERVAL_MS = 10000
 export function EmergencyStop(): JSX.Element {
   const { i18n, t } = useTranslation(['device_settings', 'shared'])
   const history = useHistory()
-  // Note (kk:06/28/2023) this IF is for test and it will be removed when the e-stop status check function
-  // I will add the function soon
 
-  // ToDo(kk:07/19/2023) For e-stop button connection check,
-  // The ODD app needs to check the status is not "notPresent"
-  // notPresent -> isEstopConnected false
-  // other state(disengaged, physicallyEngaged, logicallyEngaged) -> isEstopConnected true
-  const { data: estopStatus } = useEstopQuery({
+  // Note here the touchscreen app is using status since status is linked to EstopPhysicalStatuses
+  // left notPresent + right disengaged => disengaged
+  // left notPresent + right notPresent => notPresent
+  const { data: estopStatusData } = useEstopQuery({
     refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL_MS,
   })
-  console.log(estopStatus?.status)
-  const isEstopConnected = estopStatus?.status !== 'notPresent'
+  const isEstopConnected = estopStatusData?.data?.status !== 'notPresent'
 
   return (
     <>
