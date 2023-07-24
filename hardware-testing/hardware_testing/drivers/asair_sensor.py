@@ -8,14 +8,14 @@ import abc
 import codecs
 import logging
 import time
-from typing import Tuple, Optional
+from typing import Tuple
 from abc import ABC
 from dataclasses import dataclass
-
-from serial.tools.list_ports import comports  # type: ignore[import]
+from . import list_ports_and_select
 import serial  # type: ignore[import]
 from serial.serialutil import SerialException  # type: ignore[import]
 from hardware_testing.data import ui
+
 log = logging.getLogger(__name__)
 
 USB_VID = 0x0403
@@ -66,25 +66,17 @@ class AsairSensorBase(ABC):
         ...
 
 
-def BuildAsairSensor() -> AsairSensorBase:
+def BuildAsairSensor(simulate: bool) -> AsairSensorBase:
     """Try to find and return an Asair sensor, if not found return a simulator."""
-    def _find_port() -> Optional[str]:
-        ports = comports()
-        for check_port in ports:
-            if (check_port.vid, check_port.pid) == (USB_VID, USB_PID):
-                return str(check_port.device)
-            continue
-        return None
     ui.print_title("Connecting to Environmental sensor")
-    port = _find_port()
-    if port is not None:
+    if not simulate:
+        port = list_ports_and_select(device_name="Asair environmental sensor")
         try:
             sensor = AsairSensor.connect(port)
             ui.print_info(f"Found sensor on port {port}")
             return sensor
         except SerialException:
             pass
-    ui.print_info(f"No sensor found with vid:pid {USB_VID}:{USB_PID}")
     return SimAsairSensor()
 
 

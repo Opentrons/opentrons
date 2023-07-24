@@ -252,7 +252,7 @@ def _main(args: argparse.Namespace, _ctx: ProtocolContext) -> None:
         tip_batch=helpers._get_tip_batch(_ctx.is_simulating()),
         git_description=get_git_description(),
         tips=get_tips(_ctx, pipette, args.tip, all_channels=all_channels_same_time),
-        env_sensor=asair_sensor.BuildAsairSensor(),
+        env_sensor=asair_sensor.BuildAsairSensor(_ctx.is_simulating()),
     )
 
     if args.photometric:
