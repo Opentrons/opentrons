@@ -461,10 +461,14 @@ async def read_detect(messenger: CanMessenger, node,motortype):
                     getval = str(message.payload.z_motor.value)
                 elif motortype == "g":
                     getval = str(message.payload.gripper.value)
-                return getval
+                if str(getval)=="2":
+                    pp = "Fail"
+                elif str(getval)=="0":
+                    pp = "Pass"
+                return pp
     except Exception as errval:
         #print("errval",errval)
-        return "None"
+        return "Fail"
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
