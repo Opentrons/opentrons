@@ -139,6 +139,7 @@ In addition to the mandatory ``load_name`` argument, you can also specify additi
 - :py:meth:`.TemperatureModuleContext.load_labware`
 - :py:meth:`.ThermocyclerContext.load_labware`
 - :py:meth:`.HeaterShakerContext.load_labware`
+- :py:meth:`.MagneticBlockContext.load_labware`
 
 .. _temperature-module:
 
