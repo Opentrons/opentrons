@@ -174,11 +174,32 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             self._state.attached_tip_by_id[pipette_id] = attached_tip
             self._state.aspirated_volume_by_id[pipette_id] = 0
 
+            static_config = self._state.static_config_by_id.get(pipette_id)
+            if static_config:
+                tip_configuration = static_config.tip_configuration_lookup_table[
+                    attached_tip.volume
+                ]
+                self._state.flow_rates_by_id[pipette_id] = FlowRates(
+                    default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
+                    default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
+                    default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
+                )
+
         elif isinstance(command.result, (DropTipResult, DropTipInPlaceResult)):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
             self._state.attached_tip_by_id[pipette_id] = None
 
+            static_config = self._state.static_config_by_id.get(pipette_id)
+            if static_config:
+                tip_configuration = static_config.tip_configuration_lookup_table[
+                    static_config.max_volume
+                ]
+                self._state.flow_rates_by_id[pipette_id] = FlowRates(
+                    default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
+                    default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
+                    default_dispense=tip_configuration.default_dispense_flowrate.values_by_api_level,
+                )
         elif isinstance(command.result, BlowOutResult):
             pipette_id = command.params.pipetteId
             self._state.aspirated_volume_by_id[pipette_id] = None
