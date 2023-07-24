@@ -8,37 +8,25 @@ import {
   TYPOGRAPHY,
   COLORS,
 } from '@opentrons/components'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
-import { StyledText } from '../../../atoms/text'
-import { Slideout } from '../../../atoms/Slideout'
+import { StyledText } from '../../atoms/text'
+import { Slideout } from '../../atoms/Slideout'
 
-import type { AttachedPipette } from '../../../redux/pipettes/types'
-import type { PipetteData } from '@opentrons/api-client'
-import type { PipetteModelSpecs, PipetteMount } from '@opentrons/shared-data'
-
-interface AboutPipetteSlideoutProps {
-  pipetteId: AttachedPipette['id']
-  pipetteName: PipetteModelSpecs['displayName']
-  mount: PipetteMount
+interface AboutGripperSlideoutProps {
+  serialNumber: string
+  firmwareVersion?: string
   onCloseClick: () => unknown
   isExpanded: boolean
 }
 
-export const AboutPipetteSlideout = (
-  props: AboutPipetteSlideoutProps
+export const AboutGripperSlideout = (
+  props: AboutGripperSlideoutProps
 ): JSX.Element | null => {
-  const { pipetteId, pipetteName, isExpanded, mount, onCloseClick } = props
+  const { serialNumber, firmwareVersion, isExpanded, onCloseClick } = props
   const { i18n, t } = useTranslation(['device_details', 'shared'])
-  const { data: attachedInstruments } = useInstrumentsQuery()
-  const instrumentInfo =
-    attachedInstruments?.data?.find(
-      (i): i is PipetteData =>
-        i.instrumentType === 'pipette' && i.ok && i.mount === mount
-    ) ?? null
 
   return (
     <Slideout
-      title={t('about_pipette_name', { name: pipetteName })}
+      title={t('about_flex_gripper')}
       onCloseClick={onCloseClick}
       isExpanded={isExpanded}
       footer={
@@ -52,7 +40,7 @@ export const AboutPipetteSlideout = (
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        {instrumentInfo?.firmwareVersion != null && (
+        {firmwareVersion != null && (
           <>
             <StyledText
               as="h6"
@@ -66,7 +54,7 @@ export const AboutPipetteSlideout = (
               paddingTop={SPACING.spacing4}
               paddingBottom={SPACING.spacing12}
             >
-              {instrumentInfo.firmwareVersion}
+              {firmwareVersion}
             </StyledText>
           </>
         )}
@@ -74,17 +62,12 @@ export const AboutPipetteSlideout = (
           as="h6"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           color={COLORS.darkGreyEnabled}
-          data-testid={`AboutPipetteSlideout_serial_number_text_${pipetteId}`}
           textTransform={TYPOGRAPHY.textTransformUppercase}
         >
-          {t('serial_number')}
+          {i18n.format(t('serial_number'), 'upperCase')}
         </StyledText>
-        <StyledText
-          as="p"
-          paddingTop={SPACING.spacing4}
-          data-testid={`AboutPipetteSlideout_serial_${pipetteId}`}
-        >
-          {pipetteId}
+        <StyledText as="p" paddingTop={SPACING.spacing4}>
+          {serialNumber}
         </StyledText>
       </Flex>
     </Slideout>

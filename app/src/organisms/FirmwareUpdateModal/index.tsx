@@ -66,7 +66,7 @@ export const FirmwareUpdateModal = (
   const {
     data: attachedInstruments,
     refetch: refetchInstruments,
-  } = useInstrumentsQuery()
+  } = useInstrumentsQuery({ refetchInterval: 5000 })
   const { updateSubsystem } = useUpdateSubsystemMutation({
     onSuccess: data => {
       setUpdateId(data.data.id)
@@ -88,16 +88,22 @@ export const FirmwareUpdateModal = (
   const percentComplete = updateData?.data.updateProgress ?? 0
 
   React.useEffect(() => {
-    if (status === 'done') {
+    if (status === 'done' && updateNeeded) {
       refetchInstruments()
         .then(() => {
-          proceed()
+          if (!updateNeeded) proceed()
+          else {
+            setTimeout(() => {
+              proceed()
+            }, 10000)
+          }
         })
-        .catch(() => {
-          proceed()
-        })
+        .catch(error => console.error(error.message))
+    } else if (status === 'done' && !updateNeeded) {
+      proceed()
     }
-  }, [status, proceed, refetchInstruments])
+  }, [status, proceed, refetchInstruments, updateNeeded])
+
   return (
     <Flex css={MODAL_STYLE}>
       <StyledText css={DESCRIPTION_STYLE}>{description}</StyledText>

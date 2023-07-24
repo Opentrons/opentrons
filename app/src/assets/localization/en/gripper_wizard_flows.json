@@ -1,7 +1,7 @@
 {
   "are_you_sure_exit": "Are you sure you want to exit before completing {{flow}}?",
   "attach_gripper": "Attach Gripper",
-  "attached_gripper_and_screw_in": "Attach the gripper to the robot by alinging the connector and ensuring a secure connection. Hold the gripper in place and use the hex screwdriver to tighten the gripper screws. Then test that the gripper is securely attached by gently pulling it side to side.",
+  "attached_gripper_and_screw_in": "Attach the gripper to the robot by aligning the connector and ensuring a secure connection. Hold the gripper in place and use the hex screwdriver to tighten the gripper screws. Then test that the gripper is securely attached by gently pulling it side to side.",
   "before_you_begin": "Before you begin",
   "begin_calibration": "Begin calibration",
   "calibrate_gripper": "Calibrate gripper",
