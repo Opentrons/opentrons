@@ -17,7 +17,10 @@ from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.advanced_settings import set_adv_setting
-from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount,  axis_convert
+from opentrons.hardware_control.backends.ot3utils import (
+    sensor_node_for_mount,
+    axis_convert,
+)
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
@@ -446,7 +449,9 @@ async def move_tip_motor_relative_ot3(
     if not api.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
         raise RuntimeError("No pipette found on LEFT mount")
 
-    current_gear_pos_float = axis_convert(api._backend.gear_motor_position)[Axis.P_L]
+    current_gear_pos_float = axis_convert(api._backend.gear_motor_position, 0.0)[
+        Axis.P_L
+    ]
     current_gear_pos_dict = {Axis.Q: current_gear_pos_float}
     target_pos_dict = {Axis.Q: current_gear_pos_float + distance}
 
