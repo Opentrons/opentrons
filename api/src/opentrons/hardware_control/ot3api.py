@@ -1569,11 +1569,15 @@ class OT3API(
             await self._backend.set_active_current(
                 {dispense_spec.axis: dispense_spec.current}
             )
-            await self._move(
-                target_pos,
-                speed=dispense_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, dispense_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=dispense_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Dispense failed")
             dispense_spec.instr.set_current_volume(0)
@@ -1617,11 +1621,15 @@ class OT3API(
         )
 
         try:
-            await self._move(
-                target_pos,
-                speed=blowout_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, blowout_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=blowout_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Blow out failed")
             raise
