@@ -3,11 +3,15 @@ from mock import call, MagicMock, patch
 
 import pytest
 import datetime
+from pathlib import Path
 from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.types import Mount, Point
 from opentrons import calibration_storage
 from opentrons.config import robot_configs
-from opentrons.config.pipette_config import load
+from opentrons_shared_data.pipette import (
+    mutable_configurations,
+    pipette_load_name_conversions as pipette_load_name,
+)
 
 from robot_server.robot.calibration.check import user_flow as check_flow
 from robot_server.robot.calibration.check.user_flow import CheckCalibrationUserFlow
@@ -34,10 +38,16 @@ PIP_OFFSET = calibration_storage.models.v1.InstrumentOffsetModel(
     last_modified=datetime.datetime.now(),
 )
 
+fake_path = Path("fake/path")
+
 
 @pytest.fixture
 def mock_hw(hardware):
-    pip = pipette.Pipette(load("p300_single_v2.1", "testiId"), PIP_OFFSET, "testId")
+    pipette_model = pipette_load_name.convert_pipette_model("p300_single_v2.1")
+    configurations = mutable_configurations.load_with_mutable_configurations(
+        pipette_model, fake_path, "testiId"
+    )
+    pip = pipette.Pipette(configurations, PIP_OFFSET, "testId")
     hardware.hardware_instruments = {Mount.RIGHT: pip, Mount.LEFT: pip}
     hardware._current_pos = Point(0, 0, 0)
 
@@ -73,9 +83,17 @@ pipette_combos: List[Tuple[List[str], Mount]] = [
 def test_user_flow_select_pipette(pipettes, target_mount, hardware):
     pip, pip2 = None, None
     if pipettes[0]:
-        pip = pipette.Pipette(load(pipettes[0], "testId"), PIP_OFFSET, "testId")
+        pip1_model = pipette_load_name.convert_pipette_model(pipettes[0])
+        pip1_configurations = mutable_configurations.load_with_mutable_configurations(
+            pip1_model, fake_path, "testId"
+        )
+        pip = pipette.Pipette(pip1_configurations, PIP_OFFSET, "testId")
     if pipettes[1]:
-        pip2 = pipette.Pipette(load(pipettes[1], "testId"), PIP_OFFSET, "testId2")
+        pip2_model = pipette_load_name.convert_pipette_model(pipettes[1])
+        pip2_configurations = mutable_configurations.load_with_mutable_configurations(
+            pip2_model, fake_path, "testId"
+        )
+        pip2 = pipette.Pipette(pip2_configurations, PIP_OFFSET, "testId2")
     hardware.hardware_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
     # load a labware with calibrations
     with patch.object(
@@ -99,9 +117,17 @@ def test_user_flow_select_pipette(pipettes, target_mount, hardware):
 async def test_switching_to_second_pipette(pipettes, target_mount, hardware):
     pip, pip2 = None, None
     if pipettes[0]:
-        pip = pipette.Pipette(load(pipettes[0], "testId"), PIP_OFFSET, "testId")
+        pip1_model = pipette_load_name.convert_pipette_model(pipettes[0])
+        pip1_configurations = mutable_configurations.load_with_mutable_configurations(
+            pip1_model, fake_path, "testId"
+        )
+        pip = pipette.Pipette(pip1_configurations, PIP_OFFSET, "testId")
     if pipettes[1]:
-        pip2 = pipette.Pipette(load(pipettes[1], "testId"), PIP_OFFSET, "testId2")
+        pip2_model = pipette_load_name.convert_pipette_model(pipettes[1])
+        pip2_configurations = mutable_configurations.load_with_mutable_configurations(
+            pip2_model, fake_path, "testId"
+        )
+        pip2 = pipette.Pipette(pip2_configurations, PIP_OFFSET, "testId2")
     hardware.hardware_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
     # load a labware with calibrations
     with patch.object(
@@ -336,7 +362,10 @@ async def test_return_tip(mock_user_flow):
     uf = mock_user_flow
     uf._tip_origin_pt = Point(1, 1, 1)
     uf.hw_pipette._has_tip = True
-    z_offset = uf.hw_pipette.config.return_tip_height * uf._get_tip_length()
+    z_offset = (
+        uf.hw_pipette.active_tip_settings.default_return_tip_height
+        * uf._get_tip_length()
+    )
     await uf.return_tip()
     # should move to return tip
     move_calls = [

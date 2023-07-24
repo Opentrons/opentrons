@@ -117,6 +117,8 @@ def tip_rack(minimal_labware_def: LabwareDefinition) -> LegacyLabwareCore:
     tip_rack_parameters["isTiprack"] = True
     tip_rack_parameters["tipLength"] = 123
     tip_rack_definition["parameters"] = tip_rack_parameters
+    tip_rack_definition["wells"]["A1"]["totalLiquidVolume"] = 200  # type: ignore
+    tip_rack_definition["wells"]["A2"]["totalLiquidVolume"] = 200  # type: ignore
 
     """Labware fixture."""
     return LegacyLabwareCore(

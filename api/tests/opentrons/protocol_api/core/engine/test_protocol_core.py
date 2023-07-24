@@ -517,17 +517,11 @@ def test_load_adapter(
     ],
 )
 @pytest.mark.parametrize(
-    argnames=[
-        "use_pick_up_location_lpc_offset",
-        "use_drop_location_lpc_offset",
-        "pick_up_offset",
-        "drop_offset",
-    ],
+    argnames=["pick_up_offset", "drop_offset"],
     argvalues=[
-        (False, False, None, None),
-        (True, False, None, None),
-        (False, True, None, (4, 5, 6)),
-        (True, True, (4, 5, 6), (4, 5, 6)),
+        (None, None),
+        (None, (4, 5, 6)),
+        ((4, 5, 6), (4, 5, 6)),
     ],
 )
 def test_move_labware(
@@ -536,8 +530,6 @@ def test_move_labware(
     mock_engine_client: EngineClient,
     expected_strategy: LabwareMovementStrategy,
     use_gripper: bool,
-    use_pick_up_location_lpc_offset: bool,
-    use_drop_location_lpc_offset: bool,
     pick_up_offset: Optional[Tuple[float, float, float]],
     drop_offset: Optional[Tuple[float, float, float]],
 ) -> None:
@@ -552,8 +544,6 @@ def test_move_labware(
         labware_core=labware,
         new_location=DeckSlotName.SLOT_5,
         use_gripper=use_gripper,
-        use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
-        use_drop_location_lpc_offset=use_drop_location_lpc_offset,
         pick_up_offset=pick_up_offset,
         drop_offset=drop_offset,
     )
@@ -562,8 +552,6 @@ def test_move_labware(
             labware_id="labware-id",
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_5),
             strategy=expected_strategy,
-            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
-            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
             pick_up_offset=LabwareOffsetVector(x=4, y=5, z=6)
             if pick_up_offset
             else None,
@@ -594,8 +582,6 @@ def test_move_labware_on_non_connected_module(
         labware_core=labware,
         new_location=non_connected_module_core,
         use_gripper=False,
-        use_pick_up_location_lpc_offset=False,
-        use_drop_location_lpc_offset=False,
         pick_up_offset=None,
         drop_offset=None,
     )
@@ -604,8 +590,6 @@ def test_move_labware_on_non_connected_module(
             labware_id="labware-id",
             new_location=ModuleLocation(moduleId="module-id"),
             strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
-            use_pick_up_location_lpc_offset=False,
-            use_drop_location_lpc_offset=False,
             pick_up_offset=None,
             drop_offset=None,
         )
@@ -630,8 +614,6 @@ def test_move_labware_off_deck(
         labware_core=labware,
         new_location=OFF_DECK,
         use_gripper=False,
-        use_pick_up_location_lpc_offset=False,
-        use_drop_location_lpc_offset=False,
         pick_up_offset=None,
         drop_offset=None,
     )
@@ -640,8 +622,6 @@ def test_move_labware_off_deck(
             labware_id="labware-id",
             new_location=OFF_DECK_LOCATION,
             strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
-            use_pick_up_location_lpc_offset=False,
-            use_drop_location_lpc_offset=False,
             pick_up_offset=None,
             drop_offset=None,
         )

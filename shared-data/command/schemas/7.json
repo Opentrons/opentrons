@@ -1435,18 +1435,6 @@
             }
           ]
         },
-        "usePickUpLocationLpcOffset": {
-          "title": "Usepickuplocationlpcoffset",
-          "description": "Whether to use LPC offset of the labware associated with its pick up location. Experimental param, subject to change.",
-          "default": false,
-          "type": "boolean"
-        },
-        "useDropLocationLpcOffset": {
-          "title": "Usedroplocationlpcoffset",
-          "description": "Whether to use LPC offset of the labware associated with its drop off location. Experimental param, subject to change.",
-          "default": false,
-          "type": "boolean"
-        },
         "pickUpOffset": {
           "title": "Pickupoffset",
           "description": "Offset to use when picking up labware. Experimental param, subject to change",
