@@ -133,6 +133,7 @@ test-examples:
 .PHONY: test-scripts
 test-scripts:
 	$(python) -m hardware_testing.scripts.bowtie_ot3 --simulate
+	$(python) -m hardware_testing.scripts.belt_calibration_ot3 --simulate
 
 .PHONY: test-integration
 test-integration: test-production-qc test-examples test-scripts test-gravimetric
