@@ -168,7 +168,6 @@ ul {
 ul ul {
     list-style-type: circle;
     margin-left: 30px;
-    color: #999;
     font-family: "Open Sans", "sans-serif";
 }
 
@@ -196,4 +195,23 @@ table.docutils.field-list {
     background-color: #EEE;
     margin-left: 0;
     padding-left: 30px;
+}
+
+/* Adjustments to Note and Warning admonitions */
+div.admonition {
+    padding-top: 20px;
+}
+
+div.admonition p.admonition-title {
+    font-size: 18px;
+}
+
+div.note {
+    background-color: #d9e9fe;
+    border: none;
+}
+
+div.warning {
+    background-color: #f7e0e0;
+    border: none;
 }

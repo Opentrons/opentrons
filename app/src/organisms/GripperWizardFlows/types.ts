@@ -77,4 +77,6 @@ export interface GripperWizardStepProps {
   isRobotMoving: boolean
   maintenanceRunId: string
   attachedGripper: {} | null
+  errorMessage: string | null
+  setErrorMessage: (message: string | null) => void
 }

@@ -1,14 +1,11 @@
-from typing import Dict, List, Optional, Mapping, TypeVar
+from typing import Dict, List, Optional, Mapping
 from typing_extensions import Protocol
 
 from opentrons.types import Mount, Point
-from ..types import Axis, CriticalPoint, MotionChecks, OT3Axis
+from ..types import Axis, CriticalPoint, MotionChecks
 
 
-AxisType = TypeVar("AxisType", Axis, OT3Axis)
-
-
-class MotionController(Protocol[AxisType]):
+class MotionController(Protocol):
     """Protocol specifying fundamental motion controls."""
 
     async def halt(self) -> None:
@@ -163,9 +160,9 @@ class MotionController(Protocol[AxisType]):
 
     async def move_axes(
         self,
-        position: Mapping[AxisType, float],
+        position: Mapping[Axis, float],
         speed: Optional[float] = None,
-        max_speeds: Optional[Dict[AxisType, float]] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
     ) -> None:
         """Moves the effectors of the specified axis to the specified position.
         The effector of the x,y axis is the center of the carriage.

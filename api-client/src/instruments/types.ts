@@ -8,6 +8,7 @@ export interface GripperData {
       last_modified?: string
     }
   }
+  firmwareVersion?: string
   instrumentModel: string
   instrumentType: 'gripper'
   mount: string
@@ -26,6 +27,7 @@ export interface PipetteData {
       last_modified?: string
     }
   }
+  firmwareVersion?: string
   instrumentName: string
   instrumentModel: string
   instrumentType: 'pipette'

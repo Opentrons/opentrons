@@ -34,5 +34,5 @@
   "shaftULperMM": 28.274,
   "backCompatNames": ["p1000_single"],
   "backlashDistance": 0.0,
-  "quirks": ["pickupTipShake", "dropTipShake"]
+  "quirks": ["pickupTipShake"]
 }

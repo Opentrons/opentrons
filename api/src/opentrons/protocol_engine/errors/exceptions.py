@@ -674,19 +674,6 @@ class CannotPerformModuleAction(ProtocolEngineError):
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
 
 
-class ProtocolCommandFailedError(ProtocolEngineError):
-    """Raised if a fatal command execution error has occurred."""
-
-    def __init__(
-        self,
-        message: Optional[str] = None,
-        details: Optional[Dict[str, Any]] = None,
-        wrapping: Optional[Sequence[EnumeratedError]] = None,
-    ) -> None:
-        """Build a ProtocolCommandFailedError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
-
-
 class HardwareNotSupportedError(ProtocolEngineError):
     """Raised when executing a command on the wrong hardware."""
 
@@ -789,3 +776,16 @@ class InvalidAxisForRobotType(ProtocolEngineError):
     ) -> None:
         """Build a InvalidAxisForRobotType."""
         super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+
+
+class EStopActivatedError(ProtocolEngineError):
+    """Raised when an operation's required pipette tip is not attached."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an EStopActivatedError."""
+        super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, details, wrapping)

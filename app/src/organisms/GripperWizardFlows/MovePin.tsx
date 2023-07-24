@@ -1,8 +1,10 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
-import { EXTENSION } from '@opentrons/shared-data'
+import { useTranslation, Trans } from 'react-i18next'
+import { LEFT } from '@opentrons/shared-data'
+import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
+import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import {
@@ -29,16 +31,16 @@ interface MovePinProps extends GripperWizardStepProps, MovePinStep {
 export const MovePin = (props: MovePinProps): JSX.Element | null => {
   const {
     proceed,
-    attachedGripper,
     isRobotMoving,
     goBack,
     movement,
     setFrontJawOffset,
     frontJawOffset,
     createRunCommand,
+    errorMessage,
+    setErrorMessage,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
-  if (attachedGripper == null) return null
 
   const handleOnClick = (): void => {
     if (movement === REMOVE_PIN_FROM_REAR_JAW) {
@@ -54,7 +56,10 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
         },
         waitUntilComplete: true,
       })
-        .then(() => {
+        .then(({ data }) => {
+          if (data.status === 'failed') {
+            setErrorMessage(data.error?.detail ?? null)
+          }
           createRunCommand({
             command: {
               commandType: 'calibration/calibrateGripper' as const,
@@ -66,6 +71,9 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
             waitUntilComplete: true,
           })
             .then(({ data }) => {
+              if (data.status === 'failed') {
+                setErrorMessage(data.error?.detail ?? null)
+              }
               if (jaw === 'front' && data?.result?.jawOffset != null) {
                 setFrontJawOffset(data.result.jawOffset)
               }
@@ -73,19 +81,22 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                 command: {
                   commandType: 'calibration/moveToMaintenancePosition' as const,
                   params: {
-                    mount: EXTENSION,
+                    mount: LEFT,
                   },
                 },
                 waitUntilComplete: true,
               })
-                .then(() => {
+                .then(({ data }) => {
+                  if (data.status === 'failed') {
+                    setErrorMessage(data.error?.detail ?? null)
+                  }
                   proceed()
                 })
-                .catch()
+                .catch(error => setErrorMessage(error.message))
             })
-            .catch()
+            .catch(error => setErrorMessage(error.message))
         })
-        .catch()
+        .catch(error => setErrorMessage(error.message))
     }
   }
   const infoByMovement: {
@@ -150,7 +161,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       ),
       header: t('insert_pin_into_rear_jaw'),
       body: t('move_pin_from_front_to_rear_jaw'),
-      buttonText: t('shared:continue'),
+      buttonText: t('continue'),
       prepImage: (
         <video
           css={css`
@@ -199,11 +210,34 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   if (isRobotMoving)
     return (
       <InProgressModal
-        description={inProgressText}
-        alternativeSpinner={inProgressImage}
+        description={
+          errorMessage == null
+            ? inProgressText
+            : t('shared:stand_back_robot_is_in_motion')
+        }
+        alternativeSpinner={errorMessage == null ? inProgressImage : undefined}
       />
     )
-  return (
+  return errorMessage != null ? (
+    <SimpleWizardBody
+      isSuccess={false}
+      iconColor={COLORS.errorEnabled}
+      header={t('shared:error_encountered')}
+      subHeader={
+        <Trans
+          t={t}
+          i18nKey={'return_pin_error'}
+          values={{ error: errorMessage }}
+          components={{
+            block: <StyledText as="p" />,
+            bold: (
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+            ),
+          }}
+        />
+      }
+    />
+  ) : (
     <GenericWizardTile
       header={header}
       rightHandBody={prepImage}

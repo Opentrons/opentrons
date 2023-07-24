@@ -504,7 +504,6 @@ def test_move_labware_to_slot(
     subject.move_labware(
         labware=movable_labware,
         new_location=42,
-        use_pick_up_location_lpc_offset=True,
         drop_offset=drop_offset,
     )
 
@@ -513,8 +512,6 @@ def test_move_labware_to_slot(
             labware_core=mock_labware_core,
             new_location=DeckSlotName.SLOT_1,
             use_gripper=False,
-            use_pick_up_location_lpc_offset=True,
-            use_drop_location_lpc_offset=False,
             pick_up_offset=None,
             drop_offset=(1, 2, 3),
         )
@@ -554,8 +551,6 @@ def test_move_labware_to_module(
             labware_core=mock_labware_core,
             new_location=mock_module_core,
             use_gripper=False,
-            use_pick_up_location_lpc_offset=False,
-            use_drop_location_lpc_offset=False,
             pick_up_offset=None,
             drop_offset=None,
         )
@@ -586,8 +581,6 @@ def test_move_labware_off_deck(
             labware_core=mock_labware_core,
             new_location=OFF_DECK,
             use_gripper=False,
-            use_pick_up_location_lpc_offset=False,
-            use_drop_location_lpc_offset=False,
             pick_up_offset=None,
             drop_offset=None,
         )

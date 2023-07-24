@@ -30,7 +30,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import (
     OT3Mount,
     Point,
-    OT3Axis,
+    Axis,
 )
 
 TRASH_HEIGHT_MM: Final = 45
@@ -413,7 +413,7 @@ async def _fixture_check_pressure(
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pip_vol = int(pip.working_volume)
-    pip_channels = int(pip.channels.value)
+    pip_channels = int(pip.channels)
     # above the fixture
     r = await _read_pressure_and_check_results(
         api, fixture, PressureEvent.PRE, write_cb, accumulate_raw_data_cb, pip_channels
@@ -592,7 +592,7 @@ async def _test_diagnostics_encoder(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
     print("testing encoder")
-    pip_axis = OT3Axis.of_main_tool_actuator(mount)
+    pip_axis = Axis.of_main_tool_actuator(mount)
     encoder_home_pass = True
     encoder_move_pass = True
     encoder_stall_pass = True
@@ -645,8 +645,8 @@ async def _test_diagnostics_capacitive(
     capacitance_open_air = await _read_cap()
     print(f"open-air capacitance: {capacitance_open_air}")
     if (
-        capacitance_open_air < CAP_THRESH_OPEN_AIR[pip.channels.value][0]
-        or capacitance_open_air > CAP_THRESH_OPEN_AIR[pip.channels.value][1]
+        capacitance_open_air < CAP_THRESH_OPEN_AIR[pip.channels][0]
+        or capacitance_open_air > CAP_THRESH_OPEN_AIR[pip.channels][1]
     ):
         capacitive_open_air_pass = False
         print(f"FAIL: open-air capacitance ({capacitance_open_air}) is not correct")
@@ -663,8 +663,8 @@ async def _test_diagnostics_capacitive(
     capacitance_with_probe = await _read_cap()
     print(f"probe capacitance: {capacitance_with_probe}")
     if (
-        capacitance_with_probe < CAP_THRESH_PROBE[pip.channels.value][0]
-        or capacitance_with_probe > CAP_THRESH_PROBE[pip.channels.value][1]
+        capacitance_with_probe < CAP_THRESH_PROBE[pip.channels][0]
+        or capacitance_with_probe > CAP_THRESH_PROBE[pip.channels][1]
     ):
         capacitive_probe_attached_pass = False
         print(f"FAIL: probe capacitance ({capacitance_with_probe}) is not correct")
@@ -683,8 +683,8 @@ async def _test_diagnostics_capacitive(
     capacitance_with_square = await _read_cap()
     print(f"square capacitance: {capacitance_with_square}")
     if (
-        capacitance_with_square < CAP_THRESH_SQUARE[pip.channels.value][0]
-        or capacitance_with_square > CAP_THRESH_SQUARE[pip.channels.value][1]
+        capacitance_with_square < CAP_THRESH_SQUARE[pip.channels][0]
+        or capacitance_with_square > CAP_THRESH_SQUARE[pip.channels][1]
     ):
         capacitive_square_pass = False
         print(f"FAIL: square capacitance ({capacitance_with_square}) is not correct")
@@ -701,7 +701,7 @@ async def _test_diagnostics_capacitive(
         _get_operator_answer_to_question("ready to touch the probe when it moves down?")
     current_pos = await api.gantry_position(mount)
     probe_target = current_pos.z - CAP_PROBE_SETTINGS.prep_distance_mm
-    probe_axis = OT3Axis.by_mount(mount)
+    probe_axis = Axis.by_mount(mount)
     trigger_pos = await api.capacitive_probe(
         mount, probe_axis, probe_target, CAP_PROBE_SETTINGS
     )
@@ -824,9 +824,9 @@ async def _test_plunger_positions(
     api: OT3API, mount: OT3Mount, write_cb: Callable
 ) -> bool:
     print("homing Z axis")
-    await api.home([OT3Axis.by_mount(mount)])
+    await api.home([Axis.by_mount(mount)])
     print("homing the plunger")
-    await api.home([OT3Axis.of_main_tool_actuator(mount)])
+    await api.home([Axis.of_main_tool_actuator(mount)])
     _, bottom, blow_out, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
     print("moving plunger to BLOW-OUT")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, blow_out)
@@ -843,7 +843,7 @@ async def _test_plunger_positions(
         drop_tip_passed = _get_operator_answer_to_question("is DROP-TIP correct?")
     write_cb(["plunger-blow-out", _bool_to_pass_fail(blow_out_passed)])
     print("homing the plunger")
-    await api.home([OT3Axis.of_main_tool_actuator(mount)])
+    await api.home([Axis.of_main_tool_actuator(mount)])
     return blow_out_passed and drop_tip_passed
 
 
@@ -944,7 +944,7 @@ async def _main(test_config: TestConfig) -> None:
 
         # setup our labware locations
         pipette_volume = int(pipette.working_volume)
-        pipette_channels = int(pipette.channels.as_int)
+        pipette_channels = int(pipette.channels)
         IDEAL_LABWARE_LOCATIONS = _get_ideal_labware_locations(
             test_config, pipette_volume, pipette_channels
         )
@@ -1082,7 +1082,7 @@ async def _main(test_config: TestConfig) -> None:
         print("homing")
         await api.home()
         # disengage x,y for replace the new pipette
-        await api.disengage_axes([OT3Axis.X, OT3Axis.Y])
+        await api.disengage_axes([Axis.X, Axis.Y])
     print("done")
 
 

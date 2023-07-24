@@ -1,7 +1,7 @@
 {
   "are_you_sure_exit": "Are you sure you want to exit before completing {{flow}}?",
   "attach_gripper": "Attach Gripper",
-  "attached_gripper_and_screw_in": "Attach the gripper to the robot by alinging the connector and ensuring a secure connection. Hold the gripper in place and use the hex screwdriver to tighten the gripper screws. Then test that the gripper is securely attached by gently pulling it side to side.",
+  "attached_gripper_and_screw_in": "Attach the gripper to the robot by aligning the connector and ensuring a secure connection. Hold the gripper in place and use the hex screwdriver to tighten the gripper screws. Then test that the gripper is securely attached by gently pulling it side to side.",
   "before_you_begin": "Before you begin",
   "begin_calibration": "Begin calibration",
   "calibrate_gripper": "Calibrate gripper",
@@ -37,6 +37,7 @@
   "remove_labware_to_get_started_detaching": "To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side",
   "remove_labware_to_get_started_recalibrating": "<block>To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side</block><block>The calibration pin is included with the gripper and should be stored on the exposed panel of the gripper.</block>",
   "remove_probe": "Unlatch the calibration probe, remove it from the pipette nozzle, and return it to its storage location.",
+  "return_pin_error": "<bold>Return the calibration pin to its storage location before exiting.</bold> <block>{{error}}</block>",
   "stand_back_gripper_is_calibrating": "Stand Back, Flex Gripper is Calibrating",
   "try_again": "Try again",
   "unable_to_detect_gripper": "Unable to detect Gripper"

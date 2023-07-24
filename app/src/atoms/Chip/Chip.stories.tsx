@@ -29,6 +29,12 @@ Basic.args = {
   text: 'Basic chip text',
 }
 
+export const Error = Template.bind({})
+Error.args = {
+  type: 'error',
+  text: 'Not connected',
+}
+
 export const Success = Template.bind({})
 Success.args = {
   type: 'success',

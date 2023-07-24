@@ -1,6 +1,7 @@
 import pytest
 from mock import patch
 from typing import Union, Callable
+from pathlib import Path
 from opentrons.calibration_storage import types as cal_types
 from opentrons.types import Point, Mount
 from pytest_lazyfixture import lazy_fixture  # type: ignore[import]
@@ -13,10 +14,11 @@ from opentrons.hardware_control.instruments.ot3 import (
     instrument_calibration as ot3_calibration,
 )
 from opentrons.hardware_control import types
-from opentrons.config import pipette_config
 from opentrons_shared_data.pipette import (
+    pipette_definition,
     pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
+    mutable_configurations,
 )
 
 OT2_PIP_CAL = instrument_calibration.PipetteOffsetByPipetteMount(
@@ -39,7 +41,11 @@ def hardware_pipette_ot2() -> Callable:
         calibration: instrument_calibration.PipetteOffsetByPipetteMount = OT2_PIP_CAL,
         id: str = "testID",
     ):
-        return ot2_pipette.Pipette(pipette_config.load(model), calibration, id)
+        pipette_model = pipette_load_name.convert_pipette_model(model)
+        configurations = mutable_configurations.load_with_mutable_configurations(
+            pipette_model, Path("fake/path"), "testiId"
+        )
+        return ot2_pipette.Pipette(configurations, calibration, id)
 
     return _create_pipette
 
@@ -47,7 +53,7 @@ def hardware_pipette_ot2() -> Callable:
 @pytest.fixture
 def hardware_pipette_ot3() -> Callable:
     def _create_pipette(
-        model: pipette_load_name.PipetteModelVersionType,
+        model: pipette_definition.PipetteModelVersionType,
         calibration: ot3_calibration.PipetteOffsetByPipetteMount = OT3_PIP_CAL,
         id: str = "testID",
     ):
@@ -74,7 +80,7 @@ def hardware_pipette_ot3() -> Callable:
 )
 def test_tip_tracking(
     pipette_builder: Callable,
-    model: Union[str, pipette_load_name.PipetteModelVersionType],
+    model: Union[str, pipette_definition.PipetteModelVersionType],
 ) -> None:
     hw_pipette = pipette_builder(model)
     with pytest.raises(AssertionError):
@@ -104,7 +110,7 @@ def test_tip_tracking(
 )
 def test_tip_nozzle_position_tracking(
     pipette_builder: Callable,
-    model: Union[str, pipette_load_name.PipetteModelVersionType],
+    model: Union[str, pipette_definition.PipetteModelVersionType],
     nozzle_offset: Point,
 ) -> None:
     hw_pipette = pipette_builder(model)
@@ -150,7 +156,7 @@ def test_tip_nozzle_position_tracking(
 )
 def test_critical_points_pipette_offset(
     pipette_builder: Callable,
-    model: Union[str, pipette_load_name.PipetteModelVersionType],
+    model: Union[str, pipette_definition.PipetteModelVersionType],
     calibration: Union[
         instrument_calibration.PipetteOffsetByPipetteMount,
         ot3_calibration.PipetteOffsetByPipetteMount,
@@ -188,7 +194,7 @@ def test_critical_points_pipette_offset(
 )
 def test_volume_tracking(
     pipette_builder: Callable,
-    model: Union[str, pipette_load_name.PipetteModelVersionType],
+    model: Union[str, pipette_definition.PipetteModelVersionType],
     max_volume: float,
 ) -> None:
     hw_pipette = pipette_builder(model)
@@ -216,8 +222,8 @@ def test_volume_tracking(
 def test_config_update(hardware_pipette_ot2: Callable):
     hw_pipette = hardware_pipette_ot2("p10_single_v1")
     sample_plunger_pos = {"top": 19.5}
-    hw_pipette.update_config_item("top", sample_plunger_pos.get("top"))
-    assert hw_pipette.config.top == sample_plunger_pos.get("top")
+    hw_pipette.update_config_item(sample_plunger_pos)
+    assert hw_pipette.plunger_positions.top == sample_plunger_pos.get("top")
 
 
 @pytest.mark.ot2_only
@@ -226,37 +232,19 @@ def test_flow_rate_setting(
 ) -> None:
     hw_pipette = hardware_pipette_ot2("p10_single_v1")
     # pipettes should load settings from config at init time
-    assert (
-        hw_pipette.aspirate_flow_rate
-        == hw_pipette.config.default_aspirate_flow_rates["2.0"]
-    )
-    assert (
-        hw_pipette.dispense_flow_rate
-        == hw_pipette.config.default_dispense_flow_rates["2.0"]
-    )
-    assert (
-        hw_pipette.blow_out_flow_rate
-        == hw_pipette.config.default_blow_out_flow_rates["2.0"]
-    )
+    assert hw_pipette.aspirate_flow_rate == hw_pipette.aspirate_flow_rates_lookup["2.0"]
+    assert hw_pipette.dispense_flow_rate == hw_pipette.dispense_flow_rates_lookup["2.0"]
+    assert hw_pipette.blow_out_flow_rate == hw_pipette.blow_out_flow_rates_lookup["2.0"]
     # changing flow rates with normal property access shouldn't touch
     # config or other flow rates
     hw_pipette.aspirate_flow_rate = 2
     assert hw_pipette.aspirate_flow_rate == 2
-    assert (
-        hw_pipette.dispense_flow_rate
-        == hw_pipette.config.default_dispense_flow_rates["2.0"]
-    )
-    assert (
-        hw_pipette.blow_out_flow_rate
-        == hw_pipette.config.default_blow_out_flow_rates["2.0"]
-    )
+    assert hw_pipette.dispense_flow_rate == hw_pipette.dispense_flow_rates_lookup["2.0"]
+    assert hw_pipette.blow_out_flow_rate == hw_pipette.blow_out_flow_rates_lookup["2.0"]
     hw_pipette.dispense_flow_rate = 3
     assert hw_pipette.aspirate_flow_rate == 2
     assert hw_pipette.dispense_flow_rate == 3
-    assert (
-        hw_pipette.blow_out_flow_rate
-        == hw_pipette.config.default_blow_out_flow_rates["2.0"]
-    )
+    assert hw_pipette.blow_out_flow_rate == hw_pipette.blow_out_flow_rates_lookup["2.0"]
     hw_pipette.blow_out_flow_rate = 4
     assert hw_pipette.aspirate_flow_rate == 2
     assert hw_pipette.dispense_flow_rate == 3
@@ -305,7 +293,7 @@ def test_flow_rate_setting(
 )
 def test_alternative_critical_points(
     pipette_builder: Callable,
-    model: Union[str, pipette_load_name.PipetteModelVersionType],
+    model: Union[str, pipette_definition.PipetteModelVersionType],
     expected_xy_critical_point: Point,
     expected_front_critical_point: Point,
 ) -> None:
@@ -345,7 +333,7 @@ def test_alternative_critical_points(
 )
 def test_reset_instrument_offset(
     pipette_builder: Callable,
-    model: Union[str, pipette_load_name.PipetteModelVersionType],
+    model: Union[str, pipette_definition.PipetteModelVersionType],
     calibration: Union[
         instrument_calibration.PipetteOffsetByPipetteMount,
         ot3_calibration.PipetteOffsetByPipetteMount,

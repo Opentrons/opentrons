@@ -22,7 +22,7 @@ import {
 
 import { StyledText } from '../../../atoms/text'
 import { InlineNotification } from '../../../atoms/InlineNotification'
-import { toggleDevtools } from '../../../redux/config'
+import { toggleDevtools, toggleHistoricOffsets } from '../../../redux/config'
 
 import type { IconName } from '@opentrons/components'
 import type { Dispatch } from '../../../redux/types'
@@ -45,7 +45,9 @@ interface RobotSettingButtonProps {
   robotName?: string
   isUpdateAvailable?: boolean
   enabledDevTools?: boolean
+  enabledHistoricOffests?: boolean
   devToolsOn?: boolean
+  historicOffsetsOn?: boolean
   ledLights?: boolean
   lightsOn?: boolean
   toggleLights?: () => void
@@ -59,7 +61,9 @@ export function RobotSettingButton({
   isUpdateAvailable,
   iconName,
   enabledDevTools,
+  enabledHistoricOffests,
   devToolsOn,
+  historicOffsetsOn,
   ledLights,
   lightsOn,
   toggleLights,
@@ -72,6 +76,8 @@ export function RobotSettingButton({
       setCurrentOption(currentOption)
     } else if (Boolean(enabledDevTools)) {
       dispatch(toggleDevtools())
+    } else if (Boolean(enabledHistoricOffests)) {
+      dispatch(toggleHistoricOffsets())
     } else if (Boolean(ledLights)) {
       if (toggleLights != null) toggleLights()
     }
@@ -98,6 +104,7 @@ export function RobotSettingButton({
           gridGap={SPACING.spacing2}
           alignItems={ALIGN_FLEX_START}
           justifyContent={JUSTIFY_CENTER}
+          width="46.25rem"
         >
           <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {settingName}
@@ -128,7 +135,20 @@ export function RobotSettingButton({
           </StyledText>
         </Flex>
       ) : null}
-
+      {enabledHistoricOffests != null ? (
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing12}
+          alignItems={ALIGN_CENTER}
+          backgroundColor={COLORS.transparent}
+          padding={`${SPACING.spacing12} ${SPACING.spacing4}`}
+          borderRadius={BORDERS.borderRadiusSize4}
+        >
+          <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+            {Boolean(historicOffsetsOn) ? t('shared:on') : t('shared:off')}
+          </StyledText>
+        </Flex>
+      ) : null}
       {ledLights != null ? (
         <Flex
           flexDirection={DIRECTION_ROW}
@@ -151,7 +171,9 @@ export function RobotSettingButton({
             hug={true}
           />
         ) : null}
-        {enabledDevTools == null && ledLights == null ? (
+        {enabledDevTools == null &&
+        enabledHistoricOffests == null &&
+        ledLights == null ? (
           <Icon name="more" size="3rem" color={COLORS.darkBlack100} />
         ) : null}
       </Flex>

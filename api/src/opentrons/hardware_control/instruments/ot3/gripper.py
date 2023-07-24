@@ -3,7 +3,7 @@ from __future__ import annotations
 """ Classes and functions for gripper state tracking
 """
 import logging
-from typing import Any, Optional, Set
+from typing import Any, Optional, Set, Dict, Tuple
 
 from opentrons.types import Point
 from opentrons.config import gripper_config
@@ -141,7 +141,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     def config(self) -> GripperDefinition:
         return self._config
 
-    def update_config_item(self, elem_name: str, elem_val: Any) -> None:
+    def update_config_item(self, elements: Dict[str, Any]) -> None:
         raise NotImplementedError("Update config is not supported at this time.")
 
     @property
@@ -237,7 +237,7 @@ def _reload_gripper(
     new_config: GripperDefinition,
     attached_instr: Gripper,
     cal_offset: GripperCalibrationOffset,
-) -> Gripper:
+) -> Tuple[Gripper, bool]:
     # Once we have determined that the new and attached grippers
     # are similar enough that we might skip, see if the configs
     # match closely enough.
@@ -247,7 +247,7 @@ def _reload_gripper(
         and cal_offset == attached_instr._calibration_offset
     ):
         # Same config, good enough
-        return attached_instr
+        return attached_instr, True
     else:
         newdict = new_config.dict()
         olddict = attached_instr.config.dict()
@@ -257,22 +257,25 @@ def _reload_gripper(
                 changed.add(k)
         if changed.intersection(RECONFIG_KEYS):
             # Something has changed that requires reconfig
-            return Gripper(
-                new_config,
-                cal_offset,
-                attached_instr._gripper_id,
+            return (
+                Gripper(
+                    new_config,
+                    cal_offset,
+                    attached_instr._gripper_id,
+                ),
+                False,
             )
         else:
             # update just the cal offset and update info
             attached_instr._calibration_offset = cal_offset
-            return attached_instr
+            return attached_instr, True
 
 
 def compare_gripper_config_and_check_skip(
     freshly_detected: AttachedGripper,
     attached: Optional[Gripper],
     cal_offset: GripperCalibrationOffset,
-) -> Optional[Gripper]:
+) -> Tuple[Optional[Gripper], bool]:
     """
     Given the gripper config for an attached gripper (if any) freshly read
     from disk, and any attached instruments,
@@ -288,7 +291,7 @@ def compare_gripper_config_and_check_skip(
     if not config and not attached:
         # nothing attached now, nothing used to be attached, nothing
         # to reconfigure
-        return attached
+        return attached, True
 
     if config and attached:
         # something was attached and something is attached. are they
@@ -298,6 +301,6 @@ def compare_gripper_config_and_check_skip(
             return _reload_gripper(config, attached, cal_offset)
 
     if config:
-        return Gripper(config, cal_offset, serial)
+        return Gripper(config, cal_offset, serial), False
     else:
-        return None
+        return None, False

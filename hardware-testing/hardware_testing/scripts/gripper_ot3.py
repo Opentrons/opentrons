@@ -285,7 +285,7 @@ async def _probe_labware_corners(
     api: OT3API, labware_key: str, slot: int, deck_item: str
 ) -> List[float]:
     nominal_corners = _calculate_probe_positions(slot, labware_key, deck_item)
-    await api.home([types.OT3Axis.by_mount(PROBE_MOUNT)])
+    await api.home([types.Axis.by_mount(PROBE_MOUNT)])
     await api.add_tip(PROBE_MOUNT, api.config.calibration.probe_length)
     found_heights: List[float] = list()
     for corner in nominal_corners:
@@ -293,12 +293,12 @@ async def _probe_labware_corners(
         await api.move_to(PROBE_MOUNT, corner._replace(z=current_pos.z))
         found_z = await api.capacitive_probe(
             PROBE_MOUNT,
-            types.OT3Axis.by_mount(PROBE_MOUNT),
+            types.Axis.by_mount(PROBE_MOUNT),
             corner.z,
             ALUMINUM_SEAL_SETTINGS,
         )
         found_heights.append(found_z)
-    await api.home([types.OT3Axis.by_mount(PROBE_MOUNT)])
+    await api.home([types.Axis.by_mount(PROBE_MOUNT)])
     await api.remove_tip(PROBE_MOUNT)
     print(f'\tLabware Corners ("{deck_item}" at slot {slot})')
     print(f"\t\tTop-Left = {found_heights[0]}")

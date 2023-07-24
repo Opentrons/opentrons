@@ -33,11 +33,11 @@ export function getTiprackOptions(props: TiprackOptionsProps): TiprackOption[] {
     ? Object.values(allLabware)
         .filter(def => def.metadata.displayCategory === 'tipRack')
         .filter(def => {
-          if (allowAllTipracks && selectedPipetteDisplayCategory !== 'GEN3') {
+          if (allowAllTipracks && selectedPipetteDisplayCategory !== 'FLEX') {
             return !def.metadata.displayName.includes('Flex')
           } else if (
             allowAllTipracks &&
-            selectedPipetteDisplayCategory === 'GEN3'
+            selectedPipetteDisplayCategory === 'FLEX'
           ) {
             return def.metadata.displayName.includes('Flex')
           } else {

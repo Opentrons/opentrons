@@ -8,7 +8,6 @@ from opentrons.hardware_control.instruments.ot3.pipette import Pipette
 from opentrons.types import Location
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, Well, Labware
 
-
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.opentrons_api.types import Point, OT3Mount

@@ -3,7 +3,6 @@ import {
   Flex,
   Btn,
   TYPOGRAPHY,
-  COLOR_ERROR,
   JUSTIFY_SPACE_BETWEEN,
   SPACING,
   COLORS,
@@ -51,7 +50,7 @@ export const MountGripper = (
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   const isOnDevice = useSelector(getIsOnDevice)
   const [showUnableToDetect, setShowUnableToDetect] = React.useState(false)
-
+  const [isPending, setIsPending] = React.useState(false)
   // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
   const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
     refetchInterval: 3000,
@@ -60,12 +59,15 @@ export const MountGripper = (
     (i): i is GripperData | BadGripper => i.instrumentType === 'gripper'
   )
   const handleOnClick = (): void => {
+    setIsPending(true)
     refetch()
       .then(() => {
         isGripperAttached ? proceed() : setShowUnableToDetect(true)
+        setIsPending(false)
       })
       .catch(() => {
         setShowUnableToDetect(true)
+        setIsPending(false)
       })
   }
 
@@ -78,7 +80,7 @@ export const MountGripper = (
   return showUnableToDetect ? (
     <SimpleWizardBody
       header={t('unable_to_detect_gripper')}
-      iconColor={COLOR_ERROR}
+      iconColor={COLORS.errorEnabled}
       isSuccess={false}
     >
       <Flex
@@ -87,15 +89,19 @@ export const MountGripper = (
         alignItems={ALIGN_FLEX_END}
         gridGap={SPACING.spacing8}
       >
-        <Btn onClick={goBack}>
+        <Btn onClick={() => setShowUnableToDetect(false)}>
           <StyledText css={GO_BACK_BUTTON_STYLE}>
             {t('shared:go_back')}
           </StyledText>
         </Btn>
         {isOnDevice ? (
-          <SmallButton buttonText={t('try_again')} onClick={proceed} />
+          <SmallButton
+            buttonText={t('try_again')}
+            disabled={isPending}
+            onClick={handleOnClick}
+          />
         ) : (
-          <PrimaryButton onClick={() => setShowUnableToDetect(false)}>
+          <PrimaryButton disabled={isPending} onClick={handleOnClick}>
             {t('try_again')}
           </PrimaryButton>
         )}
@@ -122,6 +128,7 @@ export const MountGripper = (
         <StyledText as="p">{t('attached_gripper_and_screw_in')}</StyledText>
       }
       proceedButtonText={t('continue')}
+      proceedIsDisabled={isPending}
       proceed={handleOnClick}
       back={goBack}
     />

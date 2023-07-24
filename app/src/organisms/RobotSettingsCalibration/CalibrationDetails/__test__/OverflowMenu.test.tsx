@@ -184,7 +184,7 @@ describe('OverflowMenu', () => {
     expect(saveAs).toHaveBeenCalled()
   })
 
-  it('recalibration button should open up the pipette wizard flow for gen3 pipettes', () => {
+  it('recalibration button should open up the pipette wizard flow for flex pipettes', () => {
     mockUseAttachedPipettesFromInstrumentsQuery.mockReturnValue({
       left: mockAttachedPipetteInformation,
       right: null,
@@ -207,7 +207,7 @@ describe('OverflowMenu', () => {
     getByText('mock pipette wizard flows')
   })
 
-  it('calibration button should open up the pipette wizard flow for gen3 pipettes', () => {
+  it('calibration button should open up the pipette wizard flow for flex pipettes', () => {
     mockPipetteWizardFlow.mockReturnValue(<div>mock pipette wizard flows</div>)
     mockUseAllPipetteOffsetCalibrationsQuery.mockReturnValue({
       data: {

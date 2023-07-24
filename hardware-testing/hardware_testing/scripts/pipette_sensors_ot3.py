@@ -64,7 +64,7 @@ async def _handle_gripper(api: OT3API) -> None:
 async def _handle_pipette(api: OT3API, mount: OT3Mount) -> None:
     pip: Optional[Pipette] = api.hardware_pipettes[mount.to_mount()]
     assert pip, f"no pipette found on {mount.name}"
-    num_channels = pip.channels.value
+    num_channels = pip.channels
     if num_channels == 1:
         capacitive_channels = [SensorId.S0]
         pressure_channels = [SensorId.S0]

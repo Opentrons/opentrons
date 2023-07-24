@@ -18,7 +18,7 @@ import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { FirmwareUpdateModal } from '../../molecules/FirmwareUpdateModal'
+import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getIsOnDevice } from '../../redux/config'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
@@ -150,7 +150,7 @@ export const PipetteWizardFlows = (
           deleteMaintenanceRun(maintenanceRunId)
         })
         .catch(error => {
-          console.error(error)
+          console.error(error.message)
           handleClose()
         })
     }

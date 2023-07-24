@@ -8,6 +8,7 @@ import pytest
 from opentrons_shared_data.pipette import (
     mutable_configurations,
     types,
+    pipette_definition,
     pipette_load_name_conversions as pip_conversions,
     load_data,
     dev_types,
@@ -223,7 +224,7 @@ def test_save_invalid_overrides(
 )
 def test_load_with_overrides(
     overrides_fixture: types.MutableConfig,
-    pipette_model: pip_conversions.PipetteModelVersionType,
+    pipette_model: pipette_definition.PipetteModelVersionType,
     serial_number: str,
     override_configuration_path: Path,
 ) -> None:

@@ -1,4 +1,5 @@
 {
+  "align_the_connector": "Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.",
   "all_pipette_detached": "All pipettes successfully detached",
   "are_you_sure_exit": "Are you sure you want to exit before completing {{flow}}?",
   "attach_96_channel_plus_detach": "Detach {{pipetteName}} and Attach 96-Channel Pipette",
@@ -33,7 +34,6 @@
   "detach_pipettes_attach_96": "Detach Pipettes and Attach 96-Channel Pipette",
   "detach_z_axis_screw_again": "detach the z-axis screw before attaching the 96-Channel Pipette.",
   "detach": "Detaching Pipette",
-  "error_encountered": "Error encountered",
   "exit_cal": "Exit calibration",
   "firmware_updating": "A firmware update is required, instrument is updating...",
   "gantry_empty_for_96_channel_success": "Now that both mounts are empty, you can begin the 96-Channel Pipette attachment process.",

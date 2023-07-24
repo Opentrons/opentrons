@@ -6,7 +6,7 @@ requirements = {"robotType": "Flex", "apiLevel": "2.15"}
 
 SLOT_SCALE = 4
 SLOTS_TIPRACK = {
-    200: [2, 3, 5, 6, 7, 8, 9, 10, 11],
+    200: [5, 6, 8, 9],
 }
 LABWARE_ON_SCALE = "radwag_pipette_calibration_vial"
 

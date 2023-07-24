@@ -62,8 +62,7 @@ export function PowerOn(props: PowerOnProps): JSX.Element {
               <ModuleInfo
                 moduleModel={moduleDef.model}
                 isAttached={props.attachedModule !== null}
-                usbPort={props.attachedModule?.usbPort.port ?? null}
-                hubPort={props.attachedModule?.usbPort.hub ?? null}
+                physicalPort={props.attachedModule?.usbPort ?? null}
               />
             </Module>
           </React.Fragment>

@@ -2,7 +2,7 @@ import pytest
 from unittest import mock
 from opentrons import types
 from opentrons.hardware_control import ot3api
-from opentrons.hardware_control.types import OT3Axis, OT3Mount
+from opentrons.hardware_control.types import Axis, OT3Mount
 from opentrons_shared_data.pipette import name_for_model
 
 
@@ -63,11 +63,9 @@ async def test_transform_values(pipette_model, enable_ot3_hardware_controller):
             (target.z - right_offset[2] - sim.config.right_mount_offset[2]) * -1
             + sim.config.carriage_offset[2],
         ]
-        assert mock_move.call_args[1]["target_list"][0].position[OT3Axis.X] == point[0]
-        assert mock_move.call_args[1]["target_list"][0].position[OT3Axis.Y] == point[1]
-        assert (
-            mock_move.call_args[1]["target_list"][0].position[OT3Axis.Z_R] == point[2]
-        )
+        assert mock_move.call_args[1]["target_list"][0].position[Axis.X] == point[0]
+        assert mock_move.call_args[1]["target_list"][0].position[Axis.Y] == point[1]
+        assert mock_move.call_args[1]["target_list"][0].position[Axis.Z_R] == point[2]
 
     with mock.patch.object(
         sim._move_manager,
@@ -85,8 +83,6 @@ async def test_transform_values(pipette_model, enable_ot3_hardware_controller):
             (target.z - left_offset[2] - sim.config.left_mount_offset[2]) * -1
             + sim.config.carriage_offset[2],
         ]
-        assert mock_move.call_args[1]["target_list"][0].position[OT3Axis.X] == point[0]
-        assert mock_move.call_args[1]["target_list"][0].position[OT3Axis.Y] == point[1]
-        assert (
-            mock_move.call_args[1]["target_list"][0].position[OT3Axis.Z_L] == point[2]
-        )
+        assert mock_move.call_args[1]["target_list"][0].position[Axis.X] == point[0]
+        assert mock_move.call_args[1]["target_list"][0].position[Axis.Y] == point[1]
+        assert mock_move.call_args[1]["target_list"][0].position[Axis.Z_L] == point[2]

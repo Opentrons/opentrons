@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
-  ALIGN_CENTER,
   DIRECTION_COLUMN,
   Flex,
   SPACING,
@@ -17,6 +16,8 @@ import {
   JUSTIFY_CENTER,
   PrimaryButton,
   RESPONSIVENESS,
+  ALIGN_FLEX_END,
+  DISPLAY_INLINE_BLOCK,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
@@ -51,10 +52,10 @@ const GO_BACK_BUTTON_DISABLED_STYLE = css`
 `
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};
-
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderSemiBold};
     height: ${SPACING.spacing40};
+    display: ${DISPLAY_INLINE_BLOCK};
   }
 `
 
@@ -118,16 +119,18 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           flex="1"
-          gridGap={SPACING.spacing8}
+          gridGap={SPACING.spacing24}
         >
-          {typeof header === 'string' ? <Title>{header}</Title> : header}
-          <StyledText as="p">{bodyText}</StyledText>
+          <Flex display={DISPLAY_INLINE_BLOCK}>
+            {typeof header === 'string' ? <Title>{header}</Title> : header}
+          </Flex>
+          {bodyText}
         </Flex>
         <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
           {rightHandBody}
         </Flex>
       </Flex>
-      <Flex justifyContent={buttonPositioning} alignItems={ALIGN_CENTER}>
+      <Flex justifyContent={buttonPositioning} alignItems={ALIGN_FLEX_END}>
         {back != null ? (
           <Btn onClick={back} disabled={backIsDisabled} aria-label="back">
             <StyledText

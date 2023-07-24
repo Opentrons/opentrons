@@ -100,16 +100,16 @@ class Mark10(Mark10Base):
         while time() < start_time + timeout:
             # return "12.3 N"
             line = self._force_guage.readline().decode("utf-8").strip()
-            force_val, units = line.split(" ")
-            if not force_val:
-                continue
-            if units != "N":
-                self._force_guage.write("N\r\n")  # Set force gauge units to Newtons
-                print(f'Setting gauge units from {units} to "N" (newtons)')
-                continue
             try:
-                return float(force_val)
+                force_val, units = line.split(" ")
+                if units != "N":
+                    self._force_guage.write("N\r\n")  # Set force gauge units to Newtons
+                    print(f'Setting gauge units from {units} to "N" (newtons)')
+                    continue
+                else:
+                    return float(force_val)
             except ValueError as e:
                 print(e)
+                print(f'bad data: "{line}"')
                 continue
         raise TimeoutError(f"unable to read from gauge within {timeout} seconds")
