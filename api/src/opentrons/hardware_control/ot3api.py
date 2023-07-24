@@ -1518,11 +1518,13 @@ class OT3API(
             await self._backend.set_active_current(
                 {aspirate_spec.axis: aspirate_spec.current}
             )
-            await self._move(
-                target_pos,
-                speed=aspirate_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_calibration()
+                await self._move(
+                    target_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Aspirate failed")
             aspirate_spec.instr.set_current_volume(0)

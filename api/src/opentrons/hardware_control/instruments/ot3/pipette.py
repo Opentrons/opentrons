@@ -116,6 +116,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._blowout_flow_rates_lookup = (
             self._active_tip_settings.default_blowout_flowrate.values_by_api_level
         )
+        self._flow_accelerations_lookup = (
+            self._active_tip_settings.default_flow_acceleration.values_by_api_level
+        )
+
         self._aspirate_flow_rate = (
             self._active_tip_settings.default_aspirate_flowrate.default
         )
@@ -124,6 +128,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._blow_out_flow_rate = (
             self._active_tip_settings.default_blowout_flowrate.default
+        )
+        self._flow_acceleration = (
+            self._active_tip_settings.default_flow_acceleration.default
         )
 
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
@@ -228,6 +235,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         )
         self._blow_out_flow_rate = (
             self._active_tip_settings.default_blowout_flowrate.default
+        )
+        self._flow_acceleration = (
+            self._active_tip_settings.default_flow_acceleration.default
         )
 
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
@@ -402,6 +412,16 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._blow_out_flow_rate = new_flow_rate
 
     @property
+    def flow_acceleration(self) -> float:
+        """Current active flow acceleration (not config value)"""
+        return self._flow_acceleration
+
+    @flow_acceleration.setter
+    def flow_acceleration(self, new_flow_acceleration: float) -> None:
+        assert new_flow_acceleration > 0
+        self._flow_acceleration = new_flow_acceleration
+
+    @property
     def aspirate_flow_rates_lookup(self) -> Dict[str, float]:
         return self._aspirate_flow_rates_lookup
 
@@ -412,6 +432,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     @property
     def blow_out_flow_rates_lookup(self) -> Dict[str, float]:
         return self._blowout_flow_rates_lookup
+
+    @property
+    def flow_accelerations_lookup(self) -> Dict[str, float]:
+        return self._flow_accelerations_lookup
 
     @property
     def working_volume(self) -> float:
@@ -525,9 +549,11 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "aspirate_flow_rate": self.aspirate_flow_rate,
                 "dispense_flow_rate": self.dispense_flow_rate,
                 "blow_out_flow_rate": self.blow_out_flow_rate,
+                "flow_acceleration": self.flow_acceleration,
                 "default_aspirate_flow_rates": self.active_tip_settings.default_aspirate_flowrate.values_by_api_level,
                 "default_blow_out_flow_rates": self.active_tip_settings.default_blowout_flowrate.values_by_api_level,
                 "default_dispense_flow_rates": self.active_tip_settings.default_dispense_flowrate.values_by_api_level,
+                "default_flow_acceleration": self.active_tip_settings.default_flow_acceleration.values_by_api_level,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
                 "tip_overlap": self.tip_overlap,
