@@ -53,7 +53,7 @@
       },
       "savedStepForms": {
         "__INITIAL_DECK_SETUP_STEP__": {
-          "labwareLocatiƒonUpdate": {
+          "labwareLocationUpdate": {
             "fixedTrash": "12",
             "c6f4ec70-92a5-11e9-ac62-1b173f839d9e:tiprack-10ul": "1",
             "c6f51380-92a5-11e9-ac62-1b173f839d9e:tiprack-200ul": "2",
