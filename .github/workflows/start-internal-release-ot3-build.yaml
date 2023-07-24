@@ -1,13 +1,10 @@
-name: 'Start OT-3 build'
+name: 'Start Internal-Release OT-3 build'
 on:
   push:
     branches:
       - edge
-      - chore_bump-*
-      - chore_release-*
-      - release*
+      - '*internal-release*'
     tags:
-      - v*
       - ot3@*
   pull_request:
     types:
