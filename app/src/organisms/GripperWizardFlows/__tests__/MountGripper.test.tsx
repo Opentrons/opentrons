@@ -23,7 +23,7 @@ describe('MountGripper', () => {
   let mockGoBack: jest.Mock
   let mockProceed: jest.Mock
   let mockChainRunCommands: jest.Mock
-  let mockSetShowErrorMessage: jest.Mock
+  let mockSetErrorMessage: jest.Mock
 
   beforeEach(() => {
     mockGoBack = jest.fn()
@@ -41,7 +41,7 @@ describe('MountGripper', () => {
           isRobotMoving={false}
           goBack={mockGoBack}
           errorMessage={null}
-          setShowErrorMessage={mockSetShowErrorMessage}
+          setErrorMessage={mockSetErrorMessage}
           {...props}
         />,
         { i18nInstance: i18n }
@@ -101,7 +101,7 @@ describe('MountGripper', () => {
     const { getByText } = render()[0]
     getByText('Connect and Screw In Gripper')
     getByText(
-      'Attach the gripper to the robot by alinging the connector and ensuring a secure connection. Hold the gripper in place and use the hex screwdriver to tighten the gripper screws. Then test that the gripper is securely attached by gently pulling it side to side.'
+      'Attach the gripper to the robot by aligning the connector and ensuring a secure connection. Hold the gripper in place and use the hex screwdriver to tighten the gripper screws. Then test that the gripper is securely attached by gently pulling it side to side.'
     )
   })
 })

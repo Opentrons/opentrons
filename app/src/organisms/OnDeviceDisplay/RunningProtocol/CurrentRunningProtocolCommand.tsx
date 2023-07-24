@@ -56,7 +56,7 @@ const TITLE_TEXT_STYLE = css`
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   overflow: hidden;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   height: max-content;
 `
 
