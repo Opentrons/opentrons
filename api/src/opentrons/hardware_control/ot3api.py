@@ -1661,7 +1661,9 @@ class OT3API(
             gear_origin_dict = {Axis.Q: gear_origin_float}
             clamp_move_target = pipette_spec.pick_up_distance
             gear_target_dict = {Axis.Q: clamp_move_target}
-            clamp_moves = self._build_moves(gear_origin_dict, gear_target_dict)
+            clamp_moves = self._build_moves(
+                gear_origin_dict, gear_target_dict, speed=pipette_spec.speed
+            )
             await self._backend.tip_action(moves=clamp_moves[0], tip_action="clamp")
 
             homing_velocity = self._config.motion_settings.max_speed_discontinuity[
@@ -1754,12 +1756,14 @@ class OT3API(
             if move.is_ht_tip_action and move.speed:
                 # The speed check is needed because speed can sometimes be None.
                 # Not sure why
-                #await self._backend.update_gear_motor_position()
+                # await self._backend.update_gear_motor_position()
                 gear_start_position = axis_convert(
                     self._backend.gear_motor_position, 0.0
                 )[Axis.P_L]
                 pickup_target_dict = {Axis.Q: move.target_position}
-                drop_moves = self._build_moves({Axis.Q : gear_start_position}, pickup_target_dict)
+                drop_moves = self._build_moves(
+                    {Axis.Q: gear_start_position}, pickup_target_dict, speed=move.speed
+                )
 
                 await self._backend.tip_action(moves=drop_moves[0], tip_action="clamp")
 
@@ -1767,13 +1771,15 @@ class OT3API(
                     GantryLoad.HIGH_THROUGHPUT
                 ][OT3AxisKind.Q]
 
-                #await self._backend.update_gear_motor_position()
-                gear_start_position = axis_convert(self._backend.gear_motor_position, 0.0)[
-                    Axis.P_L
-                ]
+                # await self._backend.update_gear_motor_position()
+                gear_start_position = axis_convert(
+                    self._backend.gear_motor_position, 0.0
+                )[Axis.P_L]
                 fast_home_target = {Axis.Q: self._config.safe_home_distance}
 
-                fast_home_moves = self._build_moves({Axis.Q : gear_start_position}, fast_home_target)
+                fast_home_moves = self._build_moves(
+                    {Axis.Q: gear_start_position}, fast_home_target
+                )
                 # move toward home until a safe distance
                 await self._backend.tip_action(
                     moves=fast_home_moves[0], tip_action="clamp"
