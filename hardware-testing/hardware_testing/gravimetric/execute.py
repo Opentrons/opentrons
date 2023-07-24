@@ -208,6 +208,7 @@ def _run_trial(
             trial.recorder,
             trial.pipette.mount,
             trial.stable,
+            trial.env_sensor,
             shorten=trial.inspect,
             delay_seconds=trial.scale_delay,
         )
@@ -376,6 +377,7 @@ def _calculate_evaporation(
         test_report,
         liquid_tracker,
         True,
+        resources.env_sensor,
     )
     ui.print_info(f"running {config.NUM_BLANK_TRIALS}x blank measurements")
     mnt = OT3Mount.RIGHT if resources.pipette.mount == "right" else OT3Mount.LEFT
@@ -507,6 +509,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
             test_report,
             liquid_tracker,
             False,
+            resources.env_sensor,
         )
         for volume in trials.keys():
             actual_asp_list_all = []

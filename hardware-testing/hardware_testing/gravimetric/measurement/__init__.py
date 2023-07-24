@@ -9,7 +9,7 @@ from opentrons.protocol_api import ProtocolContext
 
 from .record import GravimetricRecorder, GravimetricRecording
 from .environment import read_environment_data, EnvironmentData, get_average_reading
-
+from hardware_testing.drivers import asair_sensor
 
 RELATIVE_DENSITY_WATER: Final = 1.0
 
@@ -139,11 +139,12 @@ def record_measurement_data(
     recorder: GravimetricRecorder,
     mount: str,
     stable: bool,
+    env_sensor: asair_sensor.AsairSensorBase,
     shorten: bool = False,
     delay_seconds: int = DELAY_FOR_MEASUREMENT,
 ) -> MeasurementData:
     """Record measurement data."""
-    env_data = read_environment_data(mount, ctx.is_simulating())
+    env_data = read_environment_data(mount, ctx.is_simulating(), env_sensor)
     # NOTE: we need to delay some amount, to give the scale time to accumulate samples
     with recorder.samples_of_tag(tag):
         if ctx.is_simulating():
