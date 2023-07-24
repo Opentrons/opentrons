@@ -157,7 +157,19 @@ class _ValidJsonProtocolSpec:
     "spec",
     [
         # Basic JSON protocols of various versions:
-        # todo(mm, 2022-12-22): Add a v7 protocol when we support that in production.
+        _ValidJsonProtocolSpec(
+            file_name="foo.json",
+            contents=load_shared_data("protocol/fixtures/7/simpleV7.json"),
+            expected_schema_version=7,
+            expected_robot_type="OT-2 Standard",
+            expected_metadata={
+                "protocolName": "Simple test protocol",
+                "author": "engineering <engineering@opentrons.com>",
+                "description": "A short test protocol",
+                "created": 1223131231,
+                "tags": ["unitTest"],
+            },
+        ),
         _ValidJsonProtocolSpec(
             file_name="foo.json",
             contents=load_shared_data("protocol/fixtures/6/simpleV6.json"),

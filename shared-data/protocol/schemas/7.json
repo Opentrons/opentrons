@@ -221,51 +221,11 @@
       }
     },
 
-    "pipettes": {
-      "description": "The pipettes used in this protocol, keyed by a unique identifier (pipetteId)",
-      "additionalProperties": false,
-      "patternProperties": {
-        ".+": {
-          "description": "Fields describing an individual pipette",
-          "type": "object",
-          "required": ["name"],
-          "additionalProperties": false,
-          "properties": {
-            "name": {
-              "$ref": "#/definitions/pipetteName"
-            }
-          }
-        }
-      }
-    },
-
     "labwareDefinitions": {
       "description": "All labware definitions used by labware in this protocol, keyed by a unique identifier (definitionId)",
       "patternProperties": {
         ".+": {
           "$ref": "opentronsLabwareSchemaV2"
-        }
-      }
-    },
-
-    "labware": {
-      "description": "All instances of labware used in this protocol, and references to their definitions' labwareId, keyed by a unique identifier (labwareId)",
-      "patternProperties": {
-        ".+": {
-          "description": "Fields describing a single labware",
-          "type": "object",
-          "required": ["definitionId"],
-          "additionalProperties": false,
-          "properties": {
-            "definitionId": {
-              "description": "reference to this labware's ID in \"labwareDefinitions\"",
-              "type": "string"
-            },
-            "displayName": {
-              "description": "An optional human-readable nickname for this labware instance within this protocol. Eg \"Buffer Trough\"",
-              "type": "string"
-            }
-          }
         }
       }
     },
@@ -288,24 +248,6 @@
             },
             "displayColor": {
               "description": "Hex color code, with hash included, to represent the specified liquid. Standard three-value, four-value, six-value, and eight-value syntax are all acceptable.",
-              "type": "string"
-            }
-          }
-        }
-      }
-    },
-
-    "modules": {
-      "description": "All modules used in this protocol keyed by a unique identifier (moduleId)",
-      "patternProperties": {
-        ".+": {
-          "description": "Fields describing a single module on the deck",
-          "type": "object",
-          "required": ["model"],
-          "additionalProperties": false,
-          "properties": {
-            "model": {
-              "description": "model of module. Eg 'magneticModuleV1' or 'magneticModuleV2'. This should match a top-level key in shared-data/module/definitions/2.json",
               "type": "string"
             }
           }
