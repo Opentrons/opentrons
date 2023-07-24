@@ -468,5 +468,4 @@ def test_ensures_config() -> None:
         "rearPanelIntegration": None,
         "disableStallDetection": None,
         "disableStatusBar": None,
-        "estopNotRequired": None,
     }

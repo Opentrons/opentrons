@@ -191,11 +191,6 @@ settings = [
         title="Disable the LED status bar on the Flex.",
         description="This setting disables the LED status bar on the Flex.",
     ),
-    SettingDefinition(
-        _id="estopNotRequired",
-        title="If enabled, the Flex gantry can move with no estop attached.",
-        description="This setting allows the gantry on the Flex to move with no estop attached.",
-    ),
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
