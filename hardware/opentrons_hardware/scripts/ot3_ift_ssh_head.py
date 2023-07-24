@@ -87,10 +87,10 @@ async def move_for_encode(messenger: CanMessenger, node, position,xy,args) -> No
             pos = pos + step
             position['pipette'] = pos
             res = await move_to(messenger, node, step, speed)
-            time.sleep(0.2)
+            time.sleep(0.5)
             aa = await read_Usag(messenger, node)
             res2 = await move_to(messenger, node, step, speed)
-            time.sleep(0.2)
+            time.sleep(0.5)
             aa2 = await read_Usag(messenger, node)
         elif xy == "up":
             pos = pos - step
