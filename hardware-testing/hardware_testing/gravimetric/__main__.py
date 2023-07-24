@@ -113,6 +113,7 @@ def build_gravimetric_cfg(
     scale_delay: int,
     isolate_channels: List[int],
     extra: bool,
+    air_sensor: bool
 ) -> GravimetricConfig:
     """Run."""
     if increment:
@@ -143,6 +144,7 @@ def build_gravimetric_cfg(
         isolate_channels=isolate_channels,
         kind=ConfigType.gravimetric,
         extra=args.extra,
+        air_sensor=air_sensor
     )
 
 
@@ -222,6 +224,7 @@ def _main(args: argparse.Namespace, _ctx: ProtocolContext) -> None:
             args.scale_delay,
             args.isolate_channels if args.isolate_channels else [],
             args.extra,
+            args.air_sensor
         )
         if args.trials == 0:
             cfg_gm.trials = helpers.get_default_trials(cfg_gm)
@@ -280,6 +283,7 @@ if __name__ == "__main__":
     parser.add_argument("--refill", action="store_true")
     parser.add_argument("--isolate-channels", nargs="+", type=int, default=None)
     parser.add_argument("--extra", action="store_true")
+    parser.add_argument("--air-sensor", action="store_true")
     args = parser.parse_args()
     if not args.simulate and not args.skip_labware_offsets:
         # getting labware offsets must be done before creating the protocol context

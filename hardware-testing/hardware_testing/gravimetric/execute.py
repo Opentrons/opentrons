@@ -45,6 +45,11 @@ from .measurement.record import (
 )
 from .tips import MULTI_CHANNEL_TEST_ORDER
 
+from ..drivers import list_ports_and_select, AsairSensor
+import threading
+import time
+
+_INTERVEL_TIME_READ_AIR_SENSOR = 3
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -298,7 +303,67 @@ def _get_channel_divider(cfg: config.GravimetricConfig) -> float:
         return 1.0
     else:
         return float(cfg.pipette_channels)
+    
+"""
+read air sensor function
+"""
+def _creat_airsensor_csv(test_volumes, cfg, run_id, pipette_tag, start_time, operator_name, git_description):
+    """
+    creat csv for air sensor
+    """
+    if "P50" in pipette_tag:
+        csv_path = '/data/testing_data/gravimetric-ot3-p50-single/'
+    elif "P1000" in pipette_tag:
+        csv_path = '/data/testing_data/gravimetric-ot3-p1000-single/'
+    else:
+        csv_path = '/data/testing_data/'
+    csv_name = "AirSensor"
+    csv_name = csv_name + "-" + time.strftime("%Y%m%d-%H%M%S") + "-"+ pipette_tag+ '.csv'
+    csv_name = csv_path + csv_name
+    csv_head = ["Time", "Temperature", "Humidity"]
+    _write_airsensor_csv_row(csv_name, ["META_DATA_START"])
+    _write_airsensor_csv_row(csv_name, ["test_name", cfg.name])
+    _write_airsensor_csv_row(csv_name, ["test_tag", pipette_tag])
+    _write_airsensor_csv_row(csv_name, ["test_run_id", run_id])
+    _write_airsensor_csv_row(csv_name, ["test_time_utc", start_time])
+    _write_airsensor_csv_row(csv_name, ["test_operator", operator_name])
+    _write_airsensor_csv_row(csv_name, ["test_version", git_description])
+    _write_airsensor_csv_row(csv_name, ["test_volume", test_volumes])
+    _write_airsensor_csv_row(csv_name, ["META_DATA_END"])
+    _write_airsensor_csv_row(csv_name, [""])
+    _write_airsensor_csv_row(csv_name, csv_head)
+    return csv_name
 
+def _write_airsensor_csv_row(csv_path: str, row: list):
+    """
+    write row
+    """
+    import csv
+    with open(csv_path, 'a+', encoding='utf8', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(row)
+
+def _write_airsensor_task(csv_path, port):
+    """
+    airsensor task
+    """
+    global _STOP_AIR_SENSOR_THREAD
+    while not _STOP_AIR_SENSOR_THREAD.is_set():
+        current_time = time.strftime("%Y-%m-%d %H:%M:%S")
+        con = AsairSensor.connect(port)
+        ret = con.get_reading()
+        _write_airsensor_csv_row(csv_path, [current_time, ret.relative_humidity, ret.temperature])
+        time.sleep(_INTERVEL_TIME_READ_AIR_SENSOR)
+    print("break air-sensor")
+
+def airsensor_thread_start(csv_path, port):
+    """
+    create airsensor thread start
+    """
+    t = threading.Thread(target=_write_airsensor_task, args=(csv_path, port))
+    t.start()
+    print("\n"
+          "_air_sensor_reading_thread_started_\n")
 
 def build_gm_report(
     cfg: config.GravimetricConfig,
@@ -418,6 +483,10 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     """Run."""
     global _PREV_TRIAL_GRAMS
     global _MEASUREMENTS
+
+    global _STOP_AIR_SENSOR_THREAD
+    _STOP_AIR_SENSOR_THREAD = threading.Event()
+
     ui.print_header("LOAD LABWARE")
     labware_on_scale = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)
@@ -444,6 +513,17 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     if resources.ctx.is_simulating():
         _PREV_TRIAL_GRAMS = None
         _MEASUREMENTS = list()
+
+    # creat airsensor csv
+    if cfg.air_sensor:
+        test_vol = resources.test_volumes
+        ui.print_header("CREATE TEMPERATURE-HUMIDITY REPORT")
+        csv_name = _creat_airsensor_csv(test_vol, cfg, resources.run_id, resources.pipette_tag, resources.start_time, 
+                                        resources.operator_name, resources.git_description)
+        _port = list_ports_and_select("asair_sensor")
+        # start thread
+        airsensor_thread_start(csv_name, _port)
+
     try:
         ui.print_title("FIND LIQUID HEIGHT")
         ui.print_info("homing...")
@@ -699,6 +779,10 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         recorder.deactivate()
         _return_tip = False if calibration_tip_in_use else cfg.return_tip
         _finish_test(cfg, resources, _return_tip)
+
+    ui.print_title("SET _STOP_AIR_SENSOR_THREAD TRUE")
+    _STOP_AIR_SENSOR_THREAD.set()
+
     ui.print_title("RESULTS")
     _print_final_results(
         volumes=resources.test_volumes,
