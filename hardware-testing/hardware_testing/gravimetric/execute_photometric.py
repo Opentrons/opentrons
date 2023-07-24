@@ -109,7 +109,7 @@ def _run_trial(trial: PhotometricTrial) -> None:
     def _record_measurement_and_store(m_type: MeasurementType) -> EnvironmentData:
         m_tag = _tag(m_type)
         m_data = read_environment_data(
-            trial.cfg.pipette_mount, trial.ctx.is_simulating()
+            trial.cfg.pipette_mount, trial.ctx.is_simulating(), trial.env_sensor
         )
         report.store_measurements_pm(trial.test_report, m_tag, m_data)
         _MEASUREMENTS.append(
@@ -396,6 +396,7 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
         resources.test_volumes,
         liquid_tracker,
         cfg,
+        resources.env_sensor,
     )
 
     try:

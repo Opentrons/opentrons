@@ -36,6 +36,7 @@ from .config import (
 from .measurement import DELAY_FOR_MEASUREMENT
 from .trial import TestResources
 from .tips import get_tips
+from hardware_testing.drivers import asair_sensor
 
 # FIXME: bump to v2.15 to utilize protocol engine
 API_LEVEL = "2.13"
@@ -251,6 +252,7 @@ def _main(args: argparse.Namespace, _ctx: ProtocolContext) -> None:
         tip_batch=helpers._get_tip_batch(_ctx.is_simulating()),
         git_description=get_git_description(),
         tips=get_tips(_ctx, pipette, args.tip, all_channels=all_channels_same_time),
+        env_sensor=asair_sensor.BuildAsairSensor(),
     )
 
     if args.photometric:

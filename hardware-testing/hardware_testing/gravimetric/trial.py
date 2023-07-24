@@ -11,6 +11,7 @@ from hardware_testing.opentrons_api.types import Point
 from . import helpers
 from . import report
 from hardware_testing.data import ui
+from hardware_testing.drivers import asair_sensor
 
 
 @dataclass
@@ -27,6 +28,7 @@ class VolumetricTrial:
     volume: float
     mix: bool
     acceptable_cv: Optional[float]
+    env_sensor: asair_sensor.AsairSensorBase
 
 
 @dataclass
@@ -76,6 +78,7 @@ class TestResources:
     tip_batch: str
     git_description: str
     tips: Dict[int, List[Well]]
+    env_sensor: asair_sensor.AsairSensorBase
 
 
 def build_gravimetric_trials(
@@ -89,6 +92,7 @@ def build_gravimetric_trials(
     test_report: report.CSVReport,
     liquid_tracker: LiquidTracker,
     blank: bool,
+    env_sensor: asair_sensor.AsairSensorBase,
 ) -> Dict[float, Dict[int, List[GravimetricTrial]]]:
     """Build a list of all the trials that will be run."""
     trial_list: Dict[float, Dict[int, List[GravimetricTrial]]] = {}
@@ -120,6 +124,7 @@ def build_gravimetric_trials(
                     scale_delay=cfg.scale_delay,
                     acceptable_cv=None,
                     cfg=cfg,
+                    env_sensor=env_sensor,
                 )
             )
     else:
@@ -153,6 +158,7 @@ def build_gravimetric_trials(
                             scale_delay=cfg.scale_delay,
                             acceptable_cv=None,
                             cfg=cfg,
+                            env_sensor=env_sensor,
                         )
                     )
     return trial_list
@@ -167,6 +173,7 @@ def build_photometric_trials(
     test_volumes: List[float],
     liquid_tracker: LiquidTracker,
     cfg: config.PhotometricConfig,
+    env_sensor: asair_sensor.AsairSensorBase,
 ) -> Dict[float, List[PhotometricTrial]]:
     """Build a list of all the trials that will be run."""
     trial_list: Dict[float, List[PhotometricTrial]] = {}
@@ -188,6 +195,7 @@ def build_photometric_trials(
                     cfg=cfg,
                     mix=cfg.mix,
                     acceptable_cv=None,
+                    env_sensor=env_sensor,
                 )
             )
     return trial_list
