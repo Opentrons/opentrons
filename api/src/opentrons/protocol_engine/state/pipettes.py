@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Mapping, Optional, Tuple
 
+from opentrons_shared_data.pipette import pipette_definition
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.types import MountType, Mount as HwMount
@@ -71,7 +72,9 @@ class StaticPipetteConfig:
     min_volume: float
     max_volume: float
     channels: int
-    return_tip_scale: float
+    tip_configuration_lookup_table: Dict[
+        float, pipette_definition.SupportedTipsDefinition
+    ]
     nominal_tip_overlap: Dict[str, float]
     home_position: float
     nozzle_offset_z: float
@@ -124,7 +127,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 min_volume=config.min_volume,
                 max_volume=config.max_volume,
                 channels=config.channels,
-                return_tip_scale=config.return_tip_scale,
+                tip_configuration_lookup_table=config.tip_configuration_lookup_table,
                 nominal_tip_overlap=config.nominal_tip_overlap,
                 home_position=config.home_position,
                 nozzle_offset_z=config.nozzle_offset_z,
@@ -504,7 +507,12 @@ class PipetteView(HasState[PipetteState]):
 
     def get_return_tip_scale(self, pipette_id: str) -> float:
         """Return the given pipette's return tip height scale."""
-        return self.get_config(pipette_id).return_tip_scale
+        working_volume = self.get_working_volume(pipette_id)
+        return (
+            self.get_config(pipette_id)
+            .tip_configuration_lookup_table[working_volume]
+            .default_return_tip_height
+        )
 
     def get_flow_rates(self, pipette_id: str) -> FlowRates:
         """Get the default flow rates for the pipette."""
