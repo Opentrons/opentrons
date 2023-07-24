@@ -50,6 +50,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     MoveManager,
     MoveTarget,
     ZeroLengthMoveError,
+    AxisConstraints,
 )
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
@@ -69,6 +70,7 @@ from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import (
     get_system_constraints,
     get_system_constraints_for_calibration,
+    get_system_constraints_for_plunger_acceleration,
     axis_convert,
 )
 from .backends.errors import SubsystemUpdating
@@ -263,6 +265,15 @@ class OT3API(
         mod_log.debug(
             f"Set system constraints for calibration: {self._move_manager.get_constraints()}"
         )
+
+    async def set_system_constraints_for_plunger_acceleration(self, mount: OT3Mount, acceleration: float) -> None:
+        new_constraints = get_system_constraints_for_plunger_acceleration(
+            self._config.motion_settings,
+            self._gantry_load,
+            mount,
+            acceleration
+        )
+        self._move_manager.update_constraints(new_constraints)
 
     @contextlib.asynccontextmanager
     async def restore_system_constrants(self) -> AsyncIterator[None]:
@@ -1519,7 +1530,9 @@ class OT3API(
                 {aspirate_spec.axis: aspirate_spec.current}
             )
             async with self.restore_system_constrants():
-                await self.set_system_constraints_for_calibration()
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, aspirate_spec.acceleration
+                )
                 await self._move(
                     target_pos,
                     speed=aspirate_spec.speed,
