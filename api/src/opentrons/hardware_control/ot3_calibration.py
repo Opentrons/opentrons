@@ -726,19 +726,18 @@ async def calibrate_gripper_jaw(
     the average of the pin offsets, which can be obtained by passing the
     two offsets into the `gripper_pin_offsets_mean` func.
     """
-    async with hcapi.instrument_cache_lock():
-        try:
-            await hcapi.reset_instrument_offset(OT3Mount.GRIPPER)
-            hcapi.add_gripper_probe(probe)
-            await hcapi.grip(GRIPPER_GRIP_FORCE)
-            offset = await _calibrate_mount(
-                hcapi, OT3Mount.GRIPPER, slot, method, raise_verify_error
-            )
-            LOG.info(f"Gripper {probe.name} probe offset: {offset}")
-            return offset
-        finally:
-            hcapi.remove_gripper_probe()
-            await hcapi.ungrip()
+    try:
+        await hcapi.reset_instrument_offset(OT3Mount.GRIPPER)
+        hcapi.add_gripper_probe(probe)
+        await hcapi.grip(GRIPPER_GRIP_FORCE)
+        offset = await _calibrate_mount(
+            hcapi, OT3Mount.GRIPPER, slot, method, raise_verify_error
+        )
+        LOG.info(f"Gripper {probe.name} probe offset: {offset}")
+        return offset
+    finally:
+        hcapi.remove_gripper_probe()
+        await hcapi.ungrip()
 
 
 async def calibrate_gripper(
@@ -766,17 +765,14 @@ async def calibrate_pipette(
     tip has been attached, or the conductive probe has been attached,
     or the probe has been lowered).
     """
-    async with hcapi.instrument_cache_lock():
-        try:
-            await hcapi.reset_instrument_offset(mount)
-            await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-            offset = await _calibrate_mount(
-                hcapi, mount, slot, method, raise_verify_error
-            )
-            await hcapi.save_instrument_offset(mount, offset)
-            return offset
-        finally:
-            await hcapi.remove_tip(mount)
+    try:
+        await hcapi.reset_instrument_offset(mount)
+        await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
+        offset = await _calibrate_mount(hcapi, mount, slot, method, raise_verify_error)
+        await hcapi.save_instrument_offset(mount, offset)
+        return offset
+    finally:
+        await hcapi.remove_tip(mount)
 
 
 async def calibrate_module(
@@ -800,39 +796,38 @@ async def calibrate_module(
     The robot should be homed before calling this function.
     """
 
-    async with hcapi.instrument_cache_lock():
-        try:
-            # add the probe depending on the mount
-            if mount == OT3Mount.GRIPPER:
-                hcapi.add_gripper_probe(GripperProbe.FRONT)
-            else:
-                await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
+    try:
+        # add the probe depending on the mount
+        if mount == OT3Mount.GRIPPER:
+            hcapi.add_gripper_probe(GripperProbe.FRONT)
+        else:
+            await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
 
-            LOG.info(
-                f"Starting module calibration for {module_id} at {nominal_position} using {mount}"
-            )
-            # FIXME (ba, 2023-04-04): Well B1 of the module adapter definition includes the z prep offset
-            # of 13x13mm in the nominial position, but we are still using PREP_OFFSET_DEPTH in
-            # find_calibration_structure_height which effectively doubles the offset. We plan
-            # on removing PREP_OFFSET_DEPTH in the near future, but for now just subtract PREP_OFFSET_DEPTH
-            # from the nominal position so we dont have to alter any other part of the system.
-            nominal_position = nominal_position - PREP_OFFSET_DEPTH
-            offset = await find_calibration_structure_position(
-                hcapi,
-                mount,
-                nominal_position,
-                method=CalibrationMethod.BINARY_SEARCH,
-                target=CalibrationTarget.DECK_OBJECT,
-            )
-            await hcapi.save_module_offset(module_id, mount, slot, offset)
-            return offset
-        finally:
-            # remove probe
-            if mount == OT3Mount.GRIPPER:
-                hcapi.remove_gripper_probe()
-                await hcapi.ungrip()
-            else:
-                await hcapi.remove_tip(mount)
+        LOG.info(
+            f"Starting module calibration for {module_id} at {nominal_position} using {mount}"
+        )
+        # FIXME (ba, 2023-04-04): Well B1 of the module adapter definition includes the z prep offset
+        # of 13x13mm in the nominial position, but we are still using PREP_OFFSET_DEPTH in
+        # find_calibration_structure_height which effectively doubles the offset. We plan
+        # on removing PREP_OFFSET_DEPTH in the near future, but for now just subtract PREP_OFFSET_DEPTH
+        # from the nominal position so we dont have to alter any other part of the system.
+        nominal_position = nominal_position - PREP_OFFSET_DEPTH
+        offset = await find_calibration_structure_position(
+            hcapi,
+            mount,
+            nominal_position,
+            method=CalibrationMethod.BINARY_SEARCH,
+            target=CalibrationTarget.DECK_OBJECT,
+        )
+        await hcapi.save_module_offset(module_id, mount, slot, offset)
+        return offset
+    finally:
+        # remove probe
+        if mount == OT3Mount.GRIPPER:
+            hcapi.remove_gripper_probe()
+            await hcapi.ungrip()
+        else:
+            await hcapi.remove_tip(mount)
 
 
 async def calibrate_belts(
@@ -852,18 +847,17 @@ async def calibrate_belts(
     -------
     A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
     """
-    async with hcapi.instrument_cache_lock():
-        if mount == OT3Mount.GRIPPER:
-            raise RuntimeError("Must use pipette mount, not gripper")
-        try:
-            hcapi.reset_deck_calibration()
-            await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-            belt_attitude = await _determine_transform_matrix(hcapi, mount)
-            save_robot_belt_attitude(belt_attitude, pipette_id)
-            return belt_attitude
-        finally:
-            hcapi.load_deck_calibration()
-            await hcapi.remove_tip(mount)
+    if mount == OT3Mount.GRIPPER:
+        raise RuntimeError("Must use pipette mount, not gripper")
+    try:
+        hcapi.reset_deck_calibration()
+        await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
+        belt_attitude = await _determine_transform_matrix(hcapi, mount)
+        save_robot_belt_attitude(belt_attitude, pipette_id)
+        return belt_attitude
+    finally:
+        hcapi.load_deck_calibration()
+        await hcapi.remove_tip(mount)
 
 
 def apply_machine_transform(

@@ -447,6 +447,7 @@ async def prepare_for_mock_blowout(
     )
     instr_data = AttachedPipette(config=pipette_config, id="fakepip")
     await ot3_hardware.cache_pipette(mount, instr_data, None)
+    await ot3_hardware.refresh_positions()
     with patch.object(
         ot3_hardware, "pick_up_tip", AsyncMock(spec=ot3_hardware.liquid_probe)
     ) as mock_tip_pickup:
