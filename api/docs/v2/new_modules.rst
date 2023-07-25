@@ -116,7 +116,7 @@ You'll use the :py:meth:`.ProtocolContext.load_labware` method when loading labw
 
 .. versionadded:: 2.0
 
-When you load labware on a module, you don’t need to specify the deck slot. In the above example, the ``load_module`` method already includes a location (e.g. ``location= "D1"``).
+When you load labware on a module, you don’t need to specify the deck slot. In the above example, the ``load_module()`` method already specifies where the module is on the deck: ``location= "D1"``.
 
 Any :ref:`v2-custom-labware` added to your Opentrons App is also accessible when loading labware onto a module. You can find and copy its load name by going to its card on the Labware page.
 
