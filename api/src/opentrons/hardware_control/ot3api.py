@@ -1629,6 +1629,7 @@ class OT3API(
             await self._backend.set_active_current(
                 {axis: current for axis, current in pipette_spec.pick_up_motor_actions.currents.items()} # press.current.items()}
             )
+            # print(f"currents: {pipette_spec.pick_up_motor_actions.currents.items()}\n") ### pick up current for 96ch debugging
             target_down = target_position_from_relative(
                 mount, pipette_spec.pick_up_motor_actions.tiprack_down, self._current_position
             )

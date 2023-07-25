@@ -693,7 +693,7 @@ class PipetteHandlerProvider:
                         tiprack_up=top_types.Point(0, 0, 2),
                         pick_up_distance=instrument.pick_up_configurations.distance,
                         speed=instrument.pick_up_configurations.speed,
-                        currents={OT3Axis.Q: instrument.pick_up_configurations.current},
+                        currents={OT3Axis.Z_L: instrument.pick_up_configurations.current},
                         home_buffer=10,
                     ),
                 ),
