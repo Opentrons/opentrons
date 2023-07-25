@@ -222,9 +222,10 @@ All methods of :py:class:`.TemperatureModuleContext` work with both the GEN1 and
 Using a Magnetic Module
 ***********************
 
-The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module. 
+.. note::
+   Recommended for use with the OT-2 only.
 
-.. put in a note: This module works with the OT-2 only. You cannot use it on a Flex liquid handling robot. 
+The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module. 
 
 The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` object, which has methods for engaging (raising) and disengaging (lowering) its magnets.
 
@@ -684,7 +685,10 @@ Deactivating the heater and shaker are done separately using the :py:meth:`~.Hea
 Using a Magnetic Block Module
 *****************************
 
-The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but unlike the Magnetic Module, the Magnetic Block does not move beads up or down in solution. This module is recommended for use with the Flex only.
+.. note::
+   Recommended for use with the Flex only.
+
+The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but unlike the Magnetic Module, the Magnetic Block does not move beads up or down in solution.
 
 Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module. After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext`. For example, this code loads a Magnetic Block on deck slot D1::
 
