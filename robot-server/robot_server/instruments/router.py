@@ -25,7 +25,11 @@ from opentrons.hardware_control.types import (
     OT3Mount,
     SubSystem as HWSubSystem,
 )
-from opentrons.hardware_control.dev_types import PipetteDict, GripperDict
+from opentrons.hardware_control.dev_types import (
+    PipetteDict,
+    PipetteStateDict,
+    GripperDict,
+)
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
 
 from .instrument_models import (
@@ -37,6 +41,7 @@ from .instrument_models import (
     AttachedItem,
     BadGripper,
     BadPipette,
+    PipetteState,
 )
 
 from robot_server.subsystems.models import SubSystem
@@ -53,6 +58,7 @@ def _pipette_dict_to_pipette_res(
     pipette_offset: Optional[PipetteOffsetByPipetteMount],
     mount: Mount,
     fw_version: Optional[int],
+    pipette_state: Optional[PipetteStateDict],
 ) -> Pipette:
     """Convert PipetteDict to Pipette response model."""
     if pipette_dict:
@@ -81,6 +87,7 @@ def _pipette_dict_to_pipette_res(
                 if calibration_data
                 else None,
             ),
+            state=PipetteState.parse_obj(pipette_state) if pipette_state else None,
         )
 
 
@@ -147,7 +154,7 @@ def _get_gripper_instrument_data(
     return None
 
 
-def _get_pipette_instrument_data(
+async def _get_pipette_instrument_data(
     hardware: "OT3API",
     attached_pipettes: Dict[Mount, PipetteDict],
     mount: Mount,
@@ -162,16 +169,18 @@ def _get_pipette_instrument_data(
             Optional[PipetteOffsetByPipetteMount],
             hardware.get_instrument_offset(OT3Mount.from_mount(mount)),
         )
+        pipette_state = await hardware.get_instrument_state(mount)
         return _pipette_dict_to_pipette_res(
             pipette_dict=pipette_dict,
             mount=mount,
             pipette_offset=offset,
             fw_version=status.current_fw_version if status else None,
+            pipette_state=pipette_state,
         )
     return None
 
 
-def _get_instrument_data(
+async def _get_instrument_data(
     hardware: "OT3API",
 ) -> Iterator[AttachedItem]:
     attached_pipettes = hardware.attached_pipettes
@@ -190,7 +199,7 @@ async def _get_attached_instruments_ot3(
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
     # OT3
     await hardware.cache_instruments()
-    response_data = list(_get_instrument_data(hardware))
+    response_data = list(await _get_instrument_data(hardware))
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(
             data=response_data,
@@ -206,7 +215,11 @@ async def _get_attached_instruments_ot2(
     pipettes = hardware.attached_instruments
     response_data = [
         _pipette_dict_to_pipette_res(
-            pipette_dict=pipette_dict, mount=mount, pipette_offset=None, fw_version=None
+            pipette_dict=pipette_dict,
+            mount=mount,
+            pipette_offset=None,
+            fw_version=None,
+            pipette_state=None,
         )
         for mount, pipette_dict in pipettes.items()
         if pipette_dict

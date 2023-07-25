@@ -81,6 +81,15 @@ class PipetteData(BaseModel):
     #  add calibration data as decided by https://opentrons.atlassian.net/browse/RSS-167
 
 
+class PipetteState(BaseModel):
+    """State from an attached pipette."""
+
+    tip_detected: bool = Field(
+        None,
+        description="Physical state of the tip photointerrupter on the Flex. Null for OT-2",
+    )
+
+
 class Pipette(_GenericInstrument[PipetteModel, PipetteData]):
     """Attached pipette info & configuration."""
 
@@ -88,6 +97,7 @@ class Pipette(_GenericInstrument[PipetteModel, PipetteData]):
     instrumentName: PipetteName
     instrumentModel: PipetteModel
     data: PipetteData
+    state: Optional[PipetteState]
 
 
 class Gripper(_GenericInstrument[GripperModelStr, GripperData]):
