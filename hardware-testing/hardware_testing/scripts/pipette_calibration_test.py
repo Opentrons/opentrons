@@ -46,9 +46,8 @@ class Pipette_Calibration_Test:
         self.simulate = simulate
         self.cycles = cycles
         self.slot = slot
-        self.z_offset = 25
         self.jog_speed = 10 # mm/s
-        self.jog_distance = 25 # mm
+        self.jog_distance = 22 # mm
         self.CUTOUT_SIZE = 20 # mm
         self.CUTOUT_HALF = self.CUTOUT_SIZE / 2
         self.axes = [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L, OT3Axis.Z_R]
@@ -242,6 +241,16 @@ class Pipette_Calibration_Test:
         await api.home(self.axes)
         self.home = await api.gantry_position(mount)
 
+    async def _reset(
+        self, api: OT3API, mount: OT3Mount
+    ) -> None:
+        # Home Z-Axis
+        current_position = await api.gantry_position(mount)
+        home_z = current_position._replace(z=self.home.z)
+        await api.move_to(mount, home_z)
+        # Move next to XY home
+        await api.move_to(mount, self.home + Point(x=-5, y=-5, z=0))
+
     async def exit(self):
         if self.api:
             await self.api.disengage_axes(self.axes)
@@ -261,6 +270,7 @@ class Pipette_Calibration_Test:
                     if len(self.gauges) > 0:
                         await self._measure_gauges(self.api, self.mount)
                     await self._record_data(cycle)
+                    await self._reset(self.api, self.mount)
         except Exception as e:
             await self.exit()
             raise e
