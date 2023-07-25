@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useTranslation, Trans } from 'react-i18next'
-import { LEFT } from '@opentrons/shared-data'
+import { EXTENSION } from '@opentrons/shared-data'
 import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
@@ -49,10 +49,11 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       const jaw = movement === MOVE_PIN_TO_FRONT_JAW ? 'front' : 'rear'
       createRunCommand({
         command: {
-          commandType: 'home' as const,
-          params: {
-            axes: [], // TODO: use gripper motor axis const here
-          },
+          commandType: 'calibration/calibrateGripper' as const,
+          params:
+            jaw === 'rear' && frontJawOffset != null
+              ? { jaw, otherJawOffset: frontJawOffset }
+              : { jaw },
         },
         waitUntilComplete: true,
       })
@@ -60,13 +61,15 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           if (data.status === 'failed') {
             setErrorMessage(data.error?.detail ?? null)
           }
+          if (jaw === 'front' && data?.result?.jawOffset != null) {
+            setFrontJawOffset(data.result.jawOffset)
+          }
           createRunCommand({
             command: {
-              commandType: 'calibration/calibrateGripper' as const,
-              params:
-                jaw === 'rear' && frontJawOffset != null
-                  ? { jaw, otherJawOffset: frontJawOffset }
-                  : { jaw },
+              commandType: 'calibration/moveToMaintenancePosition' as const,
+              params: {
+                mount: EXTENSION,
+              },
             },
             waitUntilComplete: true,
           })
@@ -74,25 +77,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
               if (data.status === 'failed') {
                 setErrorMessage(data.error?.detail ?? null)
               }
-              if (jaw === 'front' && data?.result?.jawOffset != null) {
-                setFrontJawOffset(data.result.jawOffset)
-              }
-              createRunCommand({
-                command: {
-                  commandType: 'calibration/moveToMaintenancePosition' as const,
-                  params: {
-                    mount: LEFT,
-                  },
-                },
-                waitUntilComplete: true,
-              })
-                .then(({ data }) => {
-                  if (data.status === 'failed') {
-                    setErrorMessage(data.error?.detail ?? null)
-                  }
-                  proceed()
-                })
-                .catch(error => setErrorMessage(error.message))
+              proceed()
             })
             .catch(error => setErrorMessage(error.message))
         })
