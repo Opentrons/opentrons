@@ -17,7 +17,7 @@ import {
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
 import { WizardHeader } from '../../molecules/WizardHeader'
-import { FirmwareUpdateModal } from '../../molecules/FirmwareUpdateModal'
+import { FirmwareUpdateModal } from '../FirmwareUpdateModal'
 import { getIsOnDevice } from '../../redux/config'
 import { useChainMaintenanceCommands } from '../../resources/runs/hooks'
 import { getGripperWizardSteps } from './getGripperWizardSteps'
@@ -67,9 +67,7 @@ export function GripperWizardFlows(
     },
   })
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
-  const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
-    null
-  )
+  const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
 
   const handleCleanUpAndClose = (): void => {
     setIsExiting(true)
@@ -101,7 +99,7 @@ export function GripperWizardFlows(
       chainRunCommands={chainRunCommands}
       createRunCommand={createMaintenanceCommand}
       errorMessage={errorMessage}
-      setShowErrorMessage={setShowErrorMessage}
+      setErrorMessage={setErrorMessage}
     />
   )
 }
@@ -118,7 +116,7 @@ interface GripperWizardProps {
   >
   isCreateLoading: boolean
   isRobotMoving: boolean
-  setShowErrorMessage: (message: string | null) => void
+  setErrorMessage: (message: string | null) => void
   errorMessage: string | null
   handleCleanUpAndClose: () => void
   chainRunCommands: ReturnType<
@@ -142,7 +140,7 @@ export const GripperWizard = (
     isCreateLoading,
     isRobotMoving,
     createRunCommand,
-    setShowErrorMessage,
+    setErrorMessage,
     errorMessage,
   } = props
   const isOnDevice = useSelector(getIsOnDevice)
@@ -184,7 +182,7 @@ export const GripperWizard = (
     proceed: handleProceed,
     goBack,
     chainRunCommands,
-    setShowErrorMessage,
+    setErrorMessage,
     errorMessage,
   }
   let onExit
@@ -255,7 +253,7 @@ export const GripperWizard = (
   let handleExit = onExit
   if (isRobotMoving) {
     handleExit = undefined
-  } else if (showConfirmExit) {
+  } else if (showConfirmExit || errorMessage != null) {
     handleExit = handleCleanUpAndClose
   }
 

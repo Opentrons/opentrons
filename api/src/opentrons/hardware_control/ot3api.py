@@ -7,7 +7,6 @@ from copy import deepcopy
 from collections import OrderedDict
 from typing import (
     AsyncIterator,
-    AsyncGenerator,
     cast,
     Callable,
     Dict,
@@ -98,6 +97,8 @@ from .types import (
     StatusBarState,
     SubSystemState,
     TipStateType,
+    EstopOverallStatus,
+    EstopAttachLocation,
 )
 from .errors import (
     MustHomeError,
@@ -137,7 +138,7 @@ from .motion_utilities import (
 
 from .dev_types import (
     AttachedGripper,
-    OT3AttachedPipette,
+    AttachedPipette,
     PipetteDict,
     InstrumentDict,
     GripperDict,
@@ -201,7 +202,6 @@ class OT3API(
         self._config = config
         self._backend = backend
         self._loop = loop
-        self._instrument_cache_lock = asyncio.Lock()
 
         self._callbacks: Set[HardwareEventHandler] = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
@@ -325,11 +325,13 @@ class OT3API(
             api_instance, board_revision=backend.board_revision
         )
         backend.module_controls = module_controls
+        await backend.build_estop_detector()
         door_state = await backend.door_state()
         api_instance._update_door_state(door_state)
         backend.add_door_state_listener(api_instance._update_door_state)
         checked_loop.create_task(backend.watch(loop=checked_loop))
         backend.initialized = True
+        await api_instance.refresh_positions()
         return api_instance
 
     @classmethod
@@ -374,6 +376,7 @@ class OT3API(
         )
         backend.module_controls = module_controls
         await backend.watch(api_instance.loop)
+        await api_instance.refresh_positions()
         return api_instance
 
     def __repr__(self) -> str:
@@ -501,22 +504,22 @@ class OT3API(
         left = self._pipette_handler.has_pipette(OT3Mount.LEFT)
         if left:
             pip = self._pipette_handler.get_pipette(OT3Mount.LEFT)
-            if pip.config.channels.as_int > 8:
+            if pip.config.channels > 8:
                 return GantryLoad.HIGH_THROUGHPUT
         return GantryLoad.LOW_THROUGHPUT
 
     async def cache_pipette(
         self,
         mount: OT3Mount,
-        instrument_data: OT3AttachedPipette,
+        instrument_data: AttachedPipette,
         req_instr: Optional[PipetteName],
-    ) -> None:
+    ) -> bool:
         """Set up pipette based on scanned information."""
         config = instrument_data.get("config")
         pip_id = instrument_data.get("id")
         pip_offset_cal = load_pipette_offset(pip_id, mount)
 
-        p, _ = load_from_config_and_check_skip(
+        p, skipped = load_from_config_and_check_skip(
             config,
             self._pipette_handler.hardware_instruments[mount],
             req_instr,
@@ -526,16 +529,18 @@ class OT3API(
         self._pipette_handler.hardware_instruments[mount] = p
         # TODO (lc 12-5-2022) Properly support backwards compatibility
         # when applicable
+        return skipped
 
-    async def cache_gripper(self, instrument_data: AttachedGripper) -> None:
+    async def cache_gripper(self, instrument_data: AttachedGripper) -> bool:
         """Set up gripper based on scanned information."""
         grip_cal = load_gripper_calibration_offset(instrument_data.get("id"))
-        g = compare_gripper_config_and_check_skip(
+        g, skipped = compare_gripper_config_and_check_skip(
             instrument_data,
             self._gripper_handler._gripper,
             grip_cal,
         )
         self._gripper_handler.gripper = g
+        return skipped
 
     def get_all_attached_instr(self) -> Dict[OT3Mount, Optional[InstrumentDict]]:
         # NOTE (spp, 2023-03-07): The return type of this method indicates that
@@ -557,21 +562,25 @@ class OT3API(
         Scan the attached instruments, take necessary configuration actions,
         and set up hardware controller internal state if necessary.
         """
-        if self._instrument_cache_lock.locked():
-            self._log.info("Instrument cache is locked, not refreshing")
-            return
-        async with self.instrument_cache_lock():
-            await self._cache_instruments(require)
+        skip_configure = await self._cache_instruments(require)
+        self._log.info(
+            f"Instrument model cache updated, skip configure: {skip_configure}"
+        )
+        if not skip_configure:
             await self._configure_instruments()
 
-    async def _cache_instruments(
+    async def _cache_instruments(  # noqa: C901
         self, require: Optional[Dict[top_types.Mount, PipetteName]] = None
-    ) -> None:
-        """Actually cache instruments and scan network."""
-        self._log.info("Updating instrument model cache")
+    ) -> bool:
+        """Actually cache instruments and scan network.
+
+        Returns True if nothing changed since the last call and can skip any follow-up
+        configuration; False if we need to reconfigure.
+        """
         checked_require = {
             OT3Mount.from_mount(m): v for m, v in (require or {}).items()
         }
+        skip_configure = True
         for mount, name in checked_require.items():
             # TODO (lc 12-5-2022) cache instruments should be receiving
             # a pipette type / channels rather than the named config.
@@ -585,27 +594,50 @@ class OT3API(
             found = await self._backend.get_attached_instruments(checked_require)
 
         if OT3Mount.GRIPPER in found.keys():
-            await self.cache_gripper(cast(AttachedGripper, found.get(OT3Mount.GRIPPER)))
+            # Is now a gripper, ask if it's ok to skip
+            gripper_skip = await self.cache_gripper(
+                cast(AttachedGripper, found.get(OT3Mount.GRIPPER))
+            )
+            skip_configure &= gripper_skip
+            if not gripper_skip:
+                self._log.info(
+                    "cache_instruments: must configure because gripper now attached or changed config"
+                )
         elif self._gripper_handler.gripper:
+            # Is no gripper, have a cached gripper, definitely need to reconfig
             await self._gripper_handler.reset()
+            skip_configure = False
+            self._log.info("cache_instruments: must configure because gripper now gone")
 
         for pipette_mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
             if pipette_mount in found.keys():
+                # is now a pipette, ask if we need to reconfig
                 req_instr_name = checked_require.get(pipette_mount, None)
-                await self.cache_pipette(
+                pipette_skip = await self.cache_pipette(
                     pipette_mount,
-                    cast(OT3AttachedPipette, found.get(pipette_mount)),
+                    cast(AttachedPipette, found.get(pipette_mount)),
                     req_instr_name,
                 )
-            else:
-                self._pipette_handler.hardware_instruments[pipette_mount] = None
+                skip_configure &= pipette_skip
+                if not pipette_skip:
+                    self._log.info(
+                        f"cache_instruments: must configure because {pipette_mount.name} now attached or changed"
+                    )
 
-        await self.refresh_positions()
+            elif self._pipette_handler.hardware_instruments[pipette_mount]:
+                # Is no pipette, have a cached pipette, need to reconfig
+                skip_configure = False
+                self._pipette_handler.hardware_instruments[pipette_mount] = None
+                self._log.info(
+                    f"cache_instruments: must configure because {pipette_mount.name} now empty"
+                )
+
+        return skip_configure
 
     async def _configure_instruments(self) -> None:
         """Configure instruments"""
-        await self._backend.update_motor_status()
         await self.set_gantry_load(self._gantry_load_from_instruments())
+        await self.refresh_positions()
 
     @ExecutionManagerProvider.wait_for_running
     async def _update_position_estimation(
@@ -2160,11 +2192,6 @@ class OT3API(
             await self.move_to(mount, pass_start_pos)
         return moving_axis.of_point(end_pos)
 
-    @contextlib.asynccontextmanager
-    async def instrument_cache_lock(self) -> AsyncGenerator[None, None]:
-        async with self._instrument_cache_lock:
-            yield
-
     async def capacitive_sweep(
         self,
         mount: OT3Mount,
@@ -2216,3 +2243,22 @@ class OT3API(
     def attached_subsystems(self) -> Dict[SubSystem, SubSystemState]:
         """Get a view of the state of the currently-attached subsystems."""
         return self._backend.subsystems
+
+    @property
+    def estop_status(self) -> EstopOverallStatus:
+        return EstopOverallStatus(
+            state=self._backend.estop_state_machine.state,
+            left_physical_state=self._backend.estop_state_machine.get_physical_status(
+                EstopAttachLocation.LEFT
+            ),
+            right_physical_state=self._backend.estop_state_machine.get_physical_status(
+                EstopAttachLocation.RIGHT
+            ),
+        )
+
+    def estop_acknowledge_and_clear(self) -> EstopOverallStatus:
+        """Attempt to acknowledge an Estop event and clear the status.
+
+        Returns the estop status after clearing the status."""
+        self._backend.estop_state_machine.acknowledge_and_clear()
+        return self.estop_status

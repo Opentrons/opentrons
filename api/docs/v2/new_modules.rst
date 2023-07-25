@@ -37,7 +37,7 @@ When you load a module in a protocol, you inform the OT-2 that you want the spec
 
 .. versionadded:: 2.0
 
-.. _available_modules
+.. _available_modules:
 
 Available Modules
 -----------------

@@ -68,7 +68,7 @@ export const BeforeBeginning = (
     isRobotMoving,
     chainRunCommands,
     errorMessage,
-    setShowErrorMessage,
+    setErrorMessage,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
@@ -92,7 +92,7 @@ export const BeforeBeginning = (
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setErrorMessage(error.message)
       })
   }
 

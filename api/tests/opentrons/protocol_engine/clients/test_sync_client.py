@@ -29,6 +29,8 @@ from opentrons.protocol_engine.types import (
     DropTipWellLocation,
     MotorAxis,
     Liquid,
+    LabwareMovementStrategy,
+    LabwareOffsetVector,
 )
 
 
@@ -233,6 +235,35 @@ def test_load_pipette(
     )
 
     assert result == expected_result
+
+
+def test_move_labware(
+    decoy: Decoy,
+    transport: ChildThreadTransport,
+    subject: SyncClient,
+) -> None:
+    """It should execute a move labware command."""
+    request = commands.MoveLabwareCreate(
+        params=commands.MoveLabwareParams(
+            labwareId="movable-labware-id",
+            newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+            strategy=LabwareMovementStrategy.USING_GRIPPER,
+            pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
+            dropOffset=LabwareOffsetVector(x=10, y=20, z=30),
+        )
+    )
+
+    response = commands.MoveLabwareResult(offsetId="offset-id")
+    decoy.when(transport.execute_command(request=request)).then_return(response)
+
+    result = subject.move_labware(
+        labware_id="movable-labware-id",
+        new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
+        strategy=LabwareMovementStrategy.USING_GRIPPER,
+        pick_up_offset=LabwareOffsetVector(x=1, y=2, z=3),
+        drop_offset=LabwareOffsetVector(x=10, y=20, z=30),
+    )
+    assert result == response
 
 
 def test_move_to_well(

@@ -26,7 +26,7 @@ from opentrons.protocol_engine.types import (
     LabwareOffsetVector,
     LabwareLocation,
     NonStackedLocation,
-    ExperimentalOffsetData,
+    LabwareMovementOffsetData,
     ModuleModel,
 )
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
@@ -91,11 +91,9 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
     return decoy.mock(cls=HeaterShakerMovementFlagger)
 
 
-def default_experimental_movement_data() -> ExperimentalOffsetData:
+def default_experimental_movement_data() -> LabwareMovementOffsetData:
     """Experimental movement data with default values."""
-    return ExperimentalOffsetData(
-        usePickUpLocationLpcOffset=False,
-        useDropLocationLpcOffset=False,
+    return LabwareMovementOffsetData(
         pickUpOffset=None,
         dropOffset=None,
     )
@@ -188,10 +186,6 @@ async def test_move_labware_with_gripper(
         )
     ).then_return(Point(201, 202, 219.5))
 
-    decoy.when(
-        state_store.labware.get_labware_offset_vector("my-teleporting-labware")
-    ).then_return(LabwareOffsetVector(x=0.1, y=0.2, z=0.3))
-
     mock_tc_context_manager = decoy.mock()
     decoy.when(
         thermocycler_plate_lifter.lift_plate_for_labware_movement(
@@ -210,18 +204,16 @@ async def test_move_labware_with_gripper(
             vector=LabwareOffsetVector(x=0.5, y=0.6, z=0.7),
         )
     )
-    experimental_offset_data = ExperimentalOffsetData(
-        usePickUpLocationLpcOffset=True,
-        useDropLocationLpcOffset=False,
+    user_offset_data = LabwareMovementOffsetData(
         pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
         dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
     expected_waypoints = [
         Point(777, 888, 999),  # gripper retract at current location
-        Point(100.1, 100.2, 999),  # move to above slot 1
-        Point(100.1, 100.2, 116.8 + extra_pickup_offset),  # move to labware on slot 1
-        Point(100.1, 100.2, 999),  # gripper retract at current location
+        Point(100, 100, 999),  # move to above slot 1
+        Point(100, 100, 116.5 + extra_pickup_offset),  # move to labware on slot 1
+        Point(100, 100, 999),  # gripper retract at current location
         Point(202.0, 204.0, 999),  # move to above slot 3
         Point(202.0, 204.0, 222.5),  # move down to labware drop height on slot 3
         Point(201.5, 202.6, 999),  # retract in place
@@ -231,8 +223,7 @@ async def test_move_labware_with_gripper(
         labware_id="my-teleporting-labware",
         current_location=from_location,
         new_location=to_location,
-        new_offset_id="new-offset-id",
-        experimental_offset_data=experimental_offset_data,
+        user_offset_data=user_offset_data,
     )
 
     gripper = OT3Mount.GRIPPER
@@ -291,8 +282,7 @@ async def test_labware_movement_raises_on_ot2(
             labware_id="labware-id",
             current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            new_offset_id=None,
-            experimental_offset_data=default_experimental_movement_data(),
+            user_offset_data=default_experimental_movement_data(),
         )
 
 
@@ -309,8 +299,7 @@ async def test_labware_movement_skips_for_virtual_gripper(
         labware_id="labware-id",
         current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-        experimental_offset_data=default_experimental_movement_data(),
-        new_offset_id=None,
+        user_offset_data=default_experimental_movement_data(),
     )
     decoy.verify(
         await ot3_hardware_api.move_to(
@@ -336,8 +325,7 @@ async def test_labware_movement_raises_without_gripper(
             labware_id="labware-id",
             current_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            experimental_offset_data=default_experimental_movement_data(),
-            new_offset_id=None,
+            user_offset_data=default_experimental_movement_data(),
         )
 
 

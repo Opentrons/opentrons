@@ -5,7 +5,7 @@ from datetime import datetime
 from math import pi
 from subprocess import run
 from time import time
-from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union, cast
+from typing import Callable, Coroutine, Dict, List, Optional, Tuple, Union
 
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
@@ -23,9 +23,7 @@ from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 # have that well defined.
 from opentrons.hardware_control.instruments.ot2.pipette import Pipette as PipetteOT2
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette as PipetteOT3
-from opentrons.hardware_control.motion_utilities import deck_from_machine
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons_shared_data.robot import RobotType
 
 from .types import (
     GantryLoad,
@@ -493,18 +491,11 @@ async def move_gripper_jaw_relative_ot3(api: OT3API, delta: float) -> None:
 
 def get_endstop_position_ot3(api: OT3API, mount: OT3Mount) -> Dict[Axis, float]:
     """Get the endstop's position per mount."""
-    transforms = api._robot_calibration
-    machine_pos_per_axis = api._backend.home_position()
-    deck_pos_per_axis = deck_from_machine(
-        machine_pos=machine_pos_per_axis,
-        attitude=transforms.deck_calibration.attitude,
-        offset=transforms.carriage_offset,
-        robot_type=cast(RobotType, "OT-3 Standard"),
+    carriage_pos = api._deck_from_machine(api._backend.home_position())
+    pos_at_home = api._effector_pos_from_carriage_pos(
+        OT3Mount.from_mount(mount), carriage_pos, None
     )
-    mount_pos_per_axis = api._effector_pos_from_carriage_pos(
-        mount, deck_pos_per_axis, None
-    )
-    return {ax: val for ax, val in mount_pos_per_axis.items()}
+    return {ax: val for ax, val in pos_at_home.items()}
 
 
 def get_gantry_homed_position_ot3(api: OT3API, mount: OT3Mount) -> Point:
@@ -973,8 +964,8 @@ def clear_pipette_ul_per_mm(api: OT3API, mount: OT3Mount) -> None:
             pip_nominal_ul_per_mm,
         ),
     ]
-    pip._active_tip_settings.aspirate["default"] = ul_per_mm  # type: ignore[assignment]
-    pip._active_tip_settings.dispense["default"] = ul_per_mm  # type: ignore[assignment]
+    pip._active_tip_settings.aspirate.default["1"] = ul_per_mm  # type: ignore[assignment]
+    pip._active_tip_settings.dispense.default["1"] = ul_per_mm  # type: ignore[assignment]
     pip.ul_per_mm.cache_clear()
     assert pip.ul_per_mm(1, "aspirate") == pip_nominal_ul_per_mm
     assert pip.ul_per_mm(pip.working_volume, "aspirate") == pip_nominal_ul_per_mm

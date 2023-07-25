@@ -79,6 +79,7 @@ export function RunFailedModal({
             })}
           </StyledText>
           <Flex
+            width="100%"
             flexDirection={DIRECTION_COLUMN}
             gridGap={SPACING.spacing8}
             maxHeight="11rem"
