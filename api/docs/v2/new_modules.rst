@@ -108,11 +108,12 @@ Loading Labware onto a Module
 You'll use the :py:meth:`.ProtocolContext.load_labware` method when loading labware on a module. For example, this code shows how to load the `Opentrons 24 Well Aluminum Block <https://labware.opentrons.com/opentrons_24_aluminumblock_generic_2ml_screwcap?category=aluminumBlock>`_ on top of a Temperature Module::
 
     def run(protocol: protocol_api.ProtocolContext):
-        temp_mod = protocol.load_module("temperature module gen2", "D1")
+        temp_mod = protocol.load_module(
+          module_name:"temperature module gen2",
+          location:"D1")
         temp_labware = temp_mod.load_labware(
-            "opentrons_24_aluminumblock_generic_2ml_screwcap",
-            "Temperature-Controlled Tubes",
-        )
+            load_name:"opentrons_24_aluminumblock_generic_2ml_screwcap",
+            label:"Temperature-Controlled Tubes")
 
 .. versionadded:: 2.0
 
@@ -133,13 +134,7 @@ It's your responsibility to ensure the labware and module combinations you load 
 Additional Labware Parameters
 -----------------------------
 
-In addition to the mandatory ``load_name`` argument, you can also specify additional parameters. If you specify a ``label``, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify ``version`` and ``namespace`` (though most of the time you won't have to). Modules with methods that accept additional parameters include:
-
-- :py:meth:`.MagneticModuleContext.load_labware`
-- :py:meth:`.TemperatureModuleContext.load_labware`
-- :py:meth:`.ThermocyclerContext.load_labware`
-- :py:meth:`.HeaterShakerContext.load_labware`
-- :py:meth:`.MagneticBlockContext.load_labware`
+In addition to the mandatory ``load_name`` argument, you can also specify additional parameters. If you specify a ``label``, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify ``version`` and ``namespace`` (though most of the time you won't have to). The :py:meth:`~.ProtocolContext.load_labware` methods of all powered modules accept these additional parameters.
 
 .. _temperature-module:
 
@@ -296,8 +291,8 @@ Here are some examples of where the magnets will move when using the different p
 
   .. code-block:: python
 
-      mag_mod.engage(height_from_base= 13.5)  # 13.5 mm
-      mag_mod.engage(offset= -2)              # 15.5 mm
+      mag_mod.engage(height_from_base=13.5)  # 13.5 mm
+      mag_mod.engage(offset=-2)              # 15.5 mm
 
 Note that ``offset`` takes into account the fact that the magnets' home position is measured as −2.5 mm for GEN2 modules.
 
@@ -459,9 +454,9 @@ For instance, a PCR prep protocol might define and execute a profile like this:
 .. code-block:: python
 
         profile = [
-            {'temperature': 95, 'hold_time_seconds': 30},
-            {'temperature': 57, 'hold_time_seconds': 30},
-            {'temperature': 72, 'hold_time_seconds': 60}
+            {'temperature':95, 'hold_time_seconds':30},
+            {'temperature':57, 'hold_time_seconds':30},
+            {'temperature':72, 'hold_time_seconds':60}
         ]
         tc_mod.execute_profile(steps=profile, repetitions=20, block_max_volume=32)
 
@@ -470,9 +465,9 @@ In terms of the actions that the Thermocycler performs, this would be equivalent
 .. code-block:: python
 
         for i in range(20):
-            tc_mod.set_block_temperature(95, hold_time_seconds= 30, block_max_volume= 32)
-            tc_mod.set_block_temperature(57, hold_time_seconds= 30, block_max_volume= 32)
-            tc_mod.set_block_temperature(72, hold_time_seconds= 60, block_max_volume= 32)
+            tc_mod.set_block_temperature(95, hold_time_seconds=30, block_max_volume=32)
+            tc_mod.set_block_temperature(57, hold_time_seconds=30, block_max_volume=32)
+            tc_mod.set_block_temperature(72, hold_time_seconds=60, block_max_volume=32)
             
 However, this code would generate 60 lines in the protocol's run log, while executing a profile is summarized in a single line. Additionally, you can set a profile once and execute it multiple times (with different numbers of repetitions and maximum volumes, if needed).
 
@@ -690,7 +685,7 @@ Using a Magnetic Block Module
 
 The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but unlike the Magnetic Module, the Magnetic Block does not move beads up or down in solution.
 
-Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module. After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext`. For example, this code loads a Magnetic Block on deck slot D1::
+Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module. After the ``load_module ()`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext`. For example, this code loads a Magnetic Block on deck slot D1::
 
     def run(protocol_api.ProtocolContext):
         mag_block = protocol.load_module('magneticBlockV1', 'D1')
