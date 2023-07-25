@@ -84,7 +84,6 @@ export function getNextTiprack(
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
       const isOnDeck = robotState.labware[labwareId].slot != null
-
       return isOnDeck && labwareId === tipRack
     }
   )

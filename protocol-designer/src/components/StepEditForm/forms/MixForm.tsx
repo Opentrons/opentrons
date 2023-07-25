@@ -16,6 +16,7 @@ import {
   WellOrderField,
   WellSelectionField,
 } from '../fields'
+import { TiprackField } from '../fields/TiprackField'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
@@ -25,7 +26,6 @@ import { AspDispSection } from './AspDispSection'
 import { StepFormProps } from '../types'
 
 import styles from '../StepEditForm.css'
-import { TiprackField } from '../fields/TiprackField'
 
 export const MixForm = (props: StepFormProps): JSX.Element => {
   const [collapsed, setCollapsed] = React.useState(true)

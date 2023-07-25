@@ -63,6 +63,8 @@ describe('getDefaultsForStepType', () => {
         dispense_delay_checkbox: false,
         dispense_delay_seconds: `${DEFAULT_DELAY_SECONDS}`,
         dispense_delay_mmFromBottom: null,
+
+        tipRack: null,
       })
     })
   })
@@ -88,6 +90,7 @@ describe('getDefaultsForStepType', () => {
         wells: [],
         aspirate_flowRate: null,
         dispense_flowRate: null,
+        tipRack: null,
       })
     })
   })

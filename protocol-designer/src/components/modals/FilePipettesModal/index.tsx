@@ -319,7 +319,6 @@ export class FilePipettesModal extends React.Component<Props, State> {
                 setFieldTouched,
               }: FormikProps<FormState>) => {
                 const { left, right } = values.pipettesByMount
-                console.log(values)
                 const pipetteSelectionIsValid =
                   // at least one must not be none (empty string)
                   left.pipetteName || right.pipetteName

@@ -157,6 +157,7 @@ describe('generateSubstepItem', () => {
       touchTipAfterDispenseOffsetMmFromBottom: number
       dispenseFlowRateUlSec: number
       dispenseOffsetFromBottomMm: number
+      tipRack: string
     }
     beforeEach(() => {
       sharedArgs = {
@@ -175,6 +176,7 @@ describe('generateSubstepItem', () => {
         touchTipAfterDispenseOffsetMmFromBottom: 10,
         dispenseFlowRateUlSec: 5,
         dispenseOffsetFromBottomMm: 10,
+        tipRack: 'tiprack1Id',
       }
     })
     ;[
@@ -389,6 +391,7 @@ describe('generateSubstepItem', () => {
         dispenseOffsetFromBottomMm: 10,
         aspirateFlowRateUlSec: 5,
         dispenseFlowRateUlSec: 5,
+        tipRack: 'tiprack1Id',
       },
       // @ts-expect-error(sa, 2021-6-15): errors should be boolean typed
       errors: {},

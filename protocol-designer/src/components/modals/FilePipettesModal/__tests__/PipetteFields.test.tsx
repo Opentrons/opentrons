@@ -1,11 +1,7 @@
-import React, { ChangeEvent } from 'react'
+import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import {
-  PipetteSelect,
-  DropdownField,
-  OutlineButton,
-} from '@opentrons/components'
+import { PipetteSelect, OutlineButton } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
@@ -17,10 +13,10 @@ import { FormPipette } from '../../../../step-forms'
 
 import { PipetteFields, Props } from '../PipetteFields'
 import { PipetteDiagram } from '../PipetteDiagram'
+import { TiprackSelect } from '../TiprackSelect'
 
 import type { ActionMeta } from 'react-select'
 import type { SelectOption } from '@opentrons/components'
-import { TiprackSelect } from '../TiprackSelect'
 
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/selectors')
@@ -44,8 +40,6 @@ describe('PipetteFields', () => {
   const leftPipetteKey = 'pipettesByMount.left'
   const leftTiprackKey = `${leftPipetteKey}.tiprackDefURI`
   const leftPipetteName = `${leftPipetteKey}.pipetteName`
-  const rightPipetteKey = 'pipettesByMount.left'
-  const rightTiprackKey = `${rightPipetteKey}.tiprackDefURI`
   const unselectedPipette = {
     pipetteName: '',
     tiprackDefURI: [''],
