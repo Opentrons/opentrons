@@ -100,7 +100,7 @@ The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  
    | GEN1               |                               |                           |
    +--------------------+-------------------------------+---------------------------+
 
-Some modules were added to our python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
+Some modules were added to our Python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
 
 Loading Labware onto a Module
 =============================
