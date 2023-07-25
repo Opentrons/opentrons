@@ -32,6 +32,8 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
         .. code-block:: python
             :substitutions:
 
+            from opentrons import protocol_api
+
             requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
             def run(protocol: protocol_api.ProtocolContext): 
@@ -47,6 +49,8 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
         
         .. code-block:: python
             :substitutions:
+
+            from opentrons import protocol_api
             
             metadata = {'apiLevel': "2.13"}
             
