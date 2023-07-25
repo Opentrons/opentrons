@@ -736,6 +736,7 @@ async def calibrate_gripper_jaw(
         LOG.info(f"Gripper {probe.name} probe offset: {offset}")
         return offset
     finally:
+        await hcapi.retract(OT3Mount.GRIPPER)
         hcapi.remove_gripper_probe()
         await hcapi.ungrip()
 
