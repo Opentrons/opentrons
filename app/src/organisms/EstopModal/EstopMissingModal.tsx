@@ -23,7 +23,7 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
 interface EstopMissingModalProps {
   robotName: string
-  closeModal: () => void
+  closeModal?: () => void
 }
 
 export function EstopMissingModal({

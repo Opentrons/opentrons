@@ -33,7 +33,7 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.
 interface EstopPressedModalProps {
   isEngaged: boolean
-  closeModal: () => void
+  closeModal?: () => void
 }
 
 export function EstopPressedModal({

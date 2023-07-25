@@ -10,27 +10,27 @@ import {
   SPACING,
   COLORS,
 } from '@opentrons/components'
-import { ApiHostProvider, useEstopQuery } from '@opentrons/react-api-client'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { useRobot, useSyncRobotClock } from '../../../organisms/Devices/hooks'
 import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
-import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
+// import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
 import { getScanning, OPENTRONS_USB } from '../../../redux/discovery'
 import { appShellRequestor } from '../../../redux/shell/remote'
 
 import type { DesktopRouteParams } from '../../../App/types'
 
-const ESTOP_STATUS_REFETCH_INTERVAL = 10000
+// const ESTOP_STATUS_REFETCH_INTERVAL = 10000
 
 export function DeviceDetails(): JSX.Element | null {
   const { robotName } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
   const isScanning = useSelector(getScanning)
-  const { data: estopStatus } = useEstopQuery({
-    refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL,
-  })
+  // const { data: estopStatus } = useEstopQuery({
+  //   refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL,
+  // })
 
   useSyncRobotClock(robotName)
 
@@ -51,10 +51,12 @@ export function DeviceDetails(): JSX.Element | null {
         paddingBottom={SPACING.spacing48}
       >
         {/* EstopBanner here */}
-        <Flex marginBottom={SPACING.spacing16}>
-          <EstopBanner status={estopStatus?.data.status} />
-        </Flex>
-
+        {/* {estopStatus?.data.status != null &&
+        estopStatus?.data.status !== 'disengaged' ? (
+          <Flex marginBottom={SPACING.spacing16}>
+            <EstopBanner status={estopStatus?.data.status} />
+          </Flex>
+        ) : null} */}
         <Flex
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.white}
