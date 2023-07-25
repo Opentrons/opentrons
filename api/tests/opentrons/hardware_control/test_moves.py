@@ -202,7 +202,7 @@ async def test_gripper_critical_points_fail_on_pipettes(
         )
 
 
-async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
+async def test_critical_point_applied(hardware_api):
     await hardware_api.home()
     hardware_api._backend._attached_instruments = {
         types.Mount.LEFT: {"model": None, "id": None},

@@ -7,7 +7,6 @@ import {
   Flex,
   ALIGN_CENTER,
   DIRECTION_COLUMN,
-  OVERFLOW_SCROLL,
   SPACING,
   COLORS,
 } from '@opentrons/components'
@@ -41,8 +40,7 @@ export function DeviceDetails(): JSX.Element | null {
     >
       <Box
         minWidth="36rem"
-        height="100%"
-        overflow={OVERFLOW_SCROLL}
+        height="max-content"
         paddingX={SPACING.spacing16}
         paddingTop={SPACING.spacing16}
         paddingBottom={SPACING.spacing48}

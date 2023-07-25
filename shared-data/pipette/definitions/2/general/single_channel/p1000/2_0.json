@@ -17,7 +17,7 @@
     "increment": 0.0,
     "distance": 0.0
   },
-  "plungerMotorConfigurations": { "idle": 1.0, "run": 1.0 },
+  "plungerMotorConfigurations": { "idle": 0.05, "run": 1.0 },
   "plungerPositionsConfigurations": {
     "top": 19.5,
     "bottom": -18.5,
@@ -34,5 +34,5 @@
   "shaftULperMM": 28.274,
   "backCompatNames": ["p1000_single"],
   "backlashDistance": 0.0,
-  "quirks": ["pickupTipShake", "dropTipShake"]
+  "quirks": ["pickupTipShake"]
 }

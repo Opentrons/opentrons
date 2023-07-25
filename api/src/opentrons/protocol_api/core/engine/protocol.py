@@ -253,8 +253,6 @@ class ProtocolCore(
             DeckSlotName, LabwareCore, ModuleCore, NonConnectedModuleCore, OffDeckType
         ],
         use_gripper: bool,
-        use_pick_up_location_lpc_offset: bool,
-        use_drop_location_lpc_offset: bool,
         pick_up_offset: Optional[Tuple[float, float, float]],
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
@@ -286,8 +284,6 @@ class ProtocolCore(
             labware_id=labware_core.labware_id,
             new_location=to_location,
             strategy=strategy,
-            use_pick_up_location_lpc_offset=use_pick_up_location_lpc_offset,
-            use_drop_location_lpc_offset=use_drop_location_lpc_offset,
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )

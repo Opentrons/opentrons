@@ -3,7 +3,7 @@ from __future__ import annotations
 """ Classes and functions for gripper state tracking
 """
 import logging
-from typing import Any, Optional, Set
+from typing import Any, Optional, Set, Dict
 
 from opentrons.types import Point
 from opentrons.config import gripper_config
@@ -141,7 +141,7 @@ class Gripper(AbstractInstrument[GripperDefinition]):
     def config(self) -> GripperDefinition:
         return self._config
 
-    def update_config_item(self, elem_name: str, elem_val: Any) -> None:
+    def update_config_item(self, elements: Dict[str, Any]) -> None:
         raise NotImplementedError("Update config is not supported at this time.")
 
     @property

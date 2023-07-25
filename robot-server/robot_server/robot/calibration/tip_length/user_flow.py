@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Awaitable, Callable, Any, Set, List, Optional
+from typing import Dict, Awaitable, Callable, Any, Set, List, Optional, cast
 
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control import HardwareControlAPI, CriticalPoint, Pipette
@@ -10,6 +10,7 @@ from opentrons.protocol_api import labware
 from opentrons.protocol_api.core.legacy.deck import Deck
 
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
+from opentrons_shared_data.pipette.dev_types import LabwareUri
 
 from robot_server.robot.calibration import util
 from robot_server.service.errors import RobotServerError
@@ -78,7 +79,7 @@ class TipCalibrationUserFlow:
             CalibrationCommand.exit: self.exit_session,
         }
         self._default_tipracks = util.get_default_tipracks(
-            self.hw_pipette.config.default_tipracks
+            cast(List[LabwareUri], self.hw_pipette.config.default_tipracks)
         )
         self._supported_commands = SupportedCommands(namespace="calibration")
 
@@ -130,7 +131,7 @@ class TipCalibrationUserFlow:
         return AttachedPipette(
             model=self._hw_pipette.model,
             name=self._hw_pipette.name,
-            tipLength=self._hw_pipette.config.tip_length,
+            tipLength=self._hw_pipette.active_tip_settings.default_tip_length,
             mount=str(self._mount),
             serial=self._hw_pipette.pipette_id,  # type: ignore[arg-type]
             defaultTipracks=self._default_tipracks,  # type: ignore[arg-type]
@@ -192,7 +193,7 @@ class TipCalibrationUserFlow:
     def _get_default_tip_length(self) -> float:
         tiprack: labware.Labware = self._deck[TIP_RACK_SLOT]  # type: ignore
         full_length = tiprack.tip_length
-        overlap_dict: Dict[str, float] = self._hw_pipette.config.tip_overlap
+        overlap_dict: Dict[str, float] = self._hw_pipette.tip_overlap
         overlap = overlap_dict.get(tiprack.uri, 0)
         return full_length - overlap
 

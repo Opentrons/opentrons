@@ -8,17 +8,12 @@ from robot_server.service.json_api import (
     PydanticResponse,
     SimpleBody,
 )
-from robot_server.hardware import (
-    get_ot3_hardware,
-    get_thread_manager,
-)
-from opentrons.hardware_control import ThreadManagedHardware
 
 from .models import (
-    EstopState,
     EstopStatusModel,
-    EstopPhysicalStatus,
 )
+from .estop_handler import EstopHandler
+from robot_server.hardware import get_estop_handler
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API  # noqa: F401
@@ -26,17 +21,14 @@ if TYPE_CHECKING:
 control_router = APIRouter()
 
 
-async def _get_estop_status(
-    thread_manager: ThreadManagedHardware,
+async def _get_estop_status_response(
+    estop_handler: EstopHandler,
 ) -> PydanticResponse[SimpleBody[EstopStatusModel]]:
     """Helper to generate the current Estop Status as a response model."""
-    get_ot3_hardware(thread_manager)
-
-    # TODO - unstub the response here
     data = EstopStatusModel.construct(
-        status=EstopState.DISENGAGED,
-        leftEstopPhysicalStatus=EstopPhysicalStatus.DISENGAGED,
-        rightEstopPhysicalStatus=EstopPhysicalStatus.DISENGAGED,
+        status=estop_handler.get_state(),
+        leftEstopPhysicalStatus=estop_handler.get_left_physical_status(),
+        rightEstopPhysicalStatus=estop_handler.get_right_physical_status(),
     )
     return await PydanticResponse.create(content=SimpleBody.construct(data=data))
 
@@ -51,10 +43,10 @@ async def _get_estop_status(
     },
 )
 async def get_estop_status(
-    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+    estop_handler: EstopHandler = Depends(get_estop_handler),
 ) -> PydanticResponse[SimpleBody[EstopStatusModel]]:
     """Return the current status of the estop."""
-    return await _get_estop_status(thread_manager)
+    return await _get_estop_status_response(estop_handler)
 
 
 @control_router.put(
@@ -68,7 +60,8 @@ async def get_estop_status(
     },
 )
 async def put_acknowledge_estop_disengage(
-    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+    estop_handler: EstopHandler = Depends(get_estop_handler),
 ) -> PydanticResponse[SimpleBody[EstopStatusModel]]:
     """Transition from the `logically_engaged` status if applicable."""
-    return await _get_estop_status(thread_manager)
+    estop_handler.acknowledge_and_clear()
+    return await _get_estop_status_response(estop_handler)
