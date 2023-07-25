@@ -704,9 +704,11 @@ For more information about using and moving labware with the Magnetic Block, see
 Using Multiple Modules of the Same Type
 ***************************************
 
-You can use multiple modules of the same type within a single protocol. The exception is the Thermocycler Module, which has only one :ref:`supported deck location <thermocycler-location>` due to its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and robot server. 
+You can use multiple modules of the same type within a single protocol. The exception is the Thermocycler Module, which has only one :ref:`supported deck location <thermocycler-location>` because of its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and robot server. 
 
-To send commands to the correct module, load them in your protocol according to their USB port number. Your robot will use the module with the lowest USB port number before using a module of the same type with a higher USB port number. And, even though the :py:meth:`~.ProtocolContext.load_labware` method requires a deck coordinate via the ``location`` argument, deck location does not control which module gets used first. With multiple modules of the same type, the USB port number determines module load sequence, starting with the lowest port number first.
+When working with multiple modules of the same type, load them in your protocol according to their USB port number. Deck coordinates are required by the :py:meth:`~.ProtocolContext.load_labware` method, but location does not determine which module loads first. Your robot will use the module with the lowest USB port number *before* using a module of the same type that's connected to higher numbered USB port. The USB port number (not deck location) determines module load sequence, starting with the lowest port number first.
+
+.. Recommend being formal-ish with protocol code samples.
 
 .. tabs::
   
