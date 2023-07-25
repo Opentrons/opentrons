@@ -151,8 +151,11 @@ def _run_loop_in_thread() -> Generator[asyncio.AbstractEventLoop, None, None]:
 
     thread = Thread(
         target=_in_thread,
-        daemon=True,
         name=f"{__name__} event loop thread",
+        # This is a load-bearing daemon=True. It avoids @atexit-related deadlocks when this is used
+        # by opentrons.execute and cleaned up by opentrons.execute's @atexit handler.
+        # https://github.com/Opentrons/opentrons/pull/12970#issuecomment-1648243785
+        daemon=True,
     )
     thread.start()
     loop_in_thread = loop_mailbox.get()
