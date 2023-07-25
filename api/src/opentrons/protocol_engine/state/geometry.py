@@ -6,6 +6,7 @@ from opentrons.types import Point, DeckSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from .. import errors
+from ..errors import LabwareMovementNotAllowedError
 from ..types import (
     OFF_DECK_LOCATION,
     LoadedLabware,
@@ -24,6 +25,7 @@ from ..types import (
     DeckType,
     CurrentWell,
     TipGeometry,
+    LabwareMovementOffsetData, ModuleModel,
 )
 from .config import Config
 from .labware import LabwareView
@@ -35,6 +37,7 @@ from opentrons_shared_data.pipette.dev_types import ChannelCount
 
 
 SLOT_WIDTH = 128
+_ADDITIONAL_TC2_PICKUP_OFFSET = 3.5
 
 
 class _TipDropSection(enum.Enum):
@@ -616,3 +619,42 @@ class GeometryView:
                 if x_well_offset < 0:
                     x_well_offset = 0
         return x_well_offset
+
+    def get_final_labware_movement_offset_vectors(
+        self,
+        from_location: LabwareLocation,
+        to_location: LabwareLocation,
+        additional_offset_vector: LabwareMovementOffsetData = LabwareMovementOffsetData(),
+    ) -> LabwareMovementOffsetData:
+        """Calculate the final labware offset vector to use in labware movement."""
+        # TODO (fps, 2022-05-30): Update this once RLAB-295 is merged
+        #  Get location-based offsets from deck/module/adapter definitions,
+        #  then add additional offsets
+        pick_up_offset = additional_offset_vector.pick_up_offset
+        drop_offset = additional_offset_vector.drop_offset
+
+        if isinstance(from_location, ModuleLocation):
+            module_id = from_location.moduleId
+            if (
+                    self._modules.get_connected_model(module_id)
+                    == ModuleModel.THERMOCYCLER_MODULE_V2
+            ):
+                pick_up_offset.z += _ADDITIONAL_TC2_PICKUP_OFFSET
+
+        return LabwareMovementOffsetData(
+            pick_up_offset=pick_up_offset,
+            drop_offset=drop_offset
+        )
+
+    @staticmethod
+    def ensure_valid_gripper_location(
+        location: LabwareLocation,
+    ) -> Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation]:
+        """Ensure valid on-deck location for gripper, otherwise raise error."""
+        if not isinstance(
+            location, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
+        ):
+            raise LabwareMovementNotAllowedError(
+                "Off-deck labware movements are not supported using the gripper."
+            )
+        return location

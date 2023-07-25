@@ -224,8 +224,8 @@ async def test_gripper_move_labware_implementation(
             current_location=validated_from_location,
             new_location=validated_new_location,
             user_offset_data=LabwareMovementOffsetData(
-                pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
-                dropOffset=None,
+                pick_up_offset=LabwareOffsetVector(x=1, y=2, z=3),
+                drop_offset=None,
             ),
         ),
         times=1,

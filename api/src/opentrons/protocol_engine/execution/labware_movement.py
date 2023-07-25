@@ -37,8 +37,6 @@ from ..types import (
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 
-_ADDITIONAL_TC2_PICKUP_OFFSET = 3.5
-
 
 # TODO (spp, 2022-10-20): name this GripperMovementHandler if it doesn't handle
 #  any non-gripper implementations
@@ -91,7 +89,7 @@ class LabwareMovementHandler:
         new_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
         user_offset_data: LabwareMovementOffsetData,
     ) -> None:
-        """Move a loaded labware from one location to another."""
+        """Move a loaded labware from one location to another using gripper."""
         use_virtual_gripper = self._state_store.config.use_virtual_gripper
         if use_virtual_gripper:
             return
@@ -105,16 +103,6 @@ class LabwareMovementHandler:
                 "No gripper found for performing labware movements."
             )
 
-        is_tc2_pickup = False
-
-        if isinstance(current_location, ModuleLocation):
-            module_id = current_location.moduleId
-            if (
-                self._state_store.modules.get_connected_model(module_id)
-                == ModuleModel.THERMOCYCLER_MODULE_V2
-            ):
-                is_tc2_pickup = True
-
         gripper_mount = OT3Mount.GRIPPER
 
         # Retract all mounts
@@ -124,17 +112,18 @@ class LabwareMovementHandler:
         async with self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=current_location
         ):
-            labware_pickup_offset = self.get_final_labware_movement_offset_vector(
-                additional_offset_vector=user_offset_data.pickUpOffset,
-                is_pickup_from_tc2=is_tc2_pickup,
-            )
+            final_offsets = self._state_store.geometry.get_final_labware_movement_offset_vectors(
+                    from_location=current_location,
+                    to_location=new_location,
+                    additional_offset_vector=user_offset_data,
+                )
 
             waypoints_to_labware = self._get_gripper_movement_waypoints(
                 labware_id=labware_id,
                 location=current_location,
                 current_position=await ot3api.gantry_position(mount=gripper_mount),
                 gripper_home_z=gripper_homed_position.z,
-                labware_offset_vector=labware_pickup_offset,
+                labware_offset_vector=final_offsets.pick_up_offset,
             )
 
             for waypoint in waypoints_to_labware[:-1]:
@@ -149,9 +138,6 @@ class LabwareMovementHandler:
                 mount=gripper_mount, abs_position=waypoints_to_labware[-1]
             )
             await ot3api.grip(force_newtons=LABWARE_GRIP_FORCE)
-            labware_drop_offset = self.get_final_labware_movement_offset_vector(
-                additional_offset_vector=user_offset_data.dropOffset
-            )
 
             # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
             await ot3api.home(axes=[Axis.Z_G])
@@ -161,7 +147,7 @@ class LabwareMovementHandler:
                 location=new_location,
                 current_position=waypoints_to_labware[-1],
                 gripper_home_z=gripper_homed_position.z,
-                labware_offset_vector=labware_drop_offset,
+                labware_offset_vector=final_offsets.drop_offset,
             )
 
             for waypoint in waypoints_to_new_location:
@@ -175,6 +161,7 @@ class LabwareMovementHandler:
             # things like the thermocycler latches
             await ot3api.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
 
+    # ---->> Move to geometry view
     # TODO (spp, 2022-10-19): Move this to motion planning and
     #  test waypoints generation in isolation.
     def _get_gripper_movement_waypoints(
@@ -203,36 +190,6 @@ class LabwareMovementHandler:
             ),
         ]
         return waypoints
-
-    # TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
-    @staticmethod
-    def get_final_labware_movement_offset_vector(
-        additional_offset_vector: Optional[LabwareOffsetVector],
-        is_pickup_from_tc2: bool = False,
-    ) -> LabwareOffsetVector:
-        """Calculate the final labware offset vector to use in labware movement."""
-        user_offset_vector = additional_offset_vector or LabwareOffsetVector(
-            x=0, y=0, z=0
-        )
-        if is_pickup_from_tc2:
-            # TODO (fps, 2022-05-30): Remove this once RLAB-295 is merged
-            user_offset_vector.z += _ADDITIONAL_TC2_PICKUP_OFFSET
-
-        return user_offset_vector
-
-    # TODO (spp, 2022-10-20): move to labware view
-    @staticmethod
-    def ensure_valid_gripper_location(
-        location: LabwareLocation,
-    ) -> Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation]:
-        """Ensure valid on-deck location for gripper, otherwise raise error."""
-        if not isinstance(
-            location, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
-        ):
-            raise LabwareMovementNotAllowedError(
-                "Off-deck labware movements are not supported using the gripper."
-            )
-        return location
 
     async def ensure_movement_not_obstructed_by_module(
         self, labware_id: str, new_location: LabwareLocation

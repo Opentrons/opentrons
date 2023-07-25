@@ -94,8 +94,8 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
 def default_experimental_movement_data() -> LabwareMovementOffsetData:
     """Experimental movement data with default values."""
     return LabwareMovementOffsetData(
-        pickUpOffset=None,
-        dropOffset=None,
+        pick_up_offset=None,
+        drop_offset=None,
     )
 
 
@@ -205,8 +205,8 @@ async def test_move_labware_with_gripper(
         )
     )
     user_offset_data = LabwareMovementOffsetData(
-        pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
-        dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
+        pick_up_offset=LabwareOffsetVector(x=-1, y=-2, z=-3),
+        drop_offset=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
     expected_waypoints = [

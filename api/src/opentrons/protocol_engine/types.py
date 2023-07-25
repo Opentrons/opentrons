@@ -84,22 +84,6 @@ NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationTyp
 """Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
 
 
-class LabwareMovementStrategy(str, Enum):
-    """Strategy to use for labware movement."""
-
-    USING_GRIPPER = "usingGripper"
-    MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
-    MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
-
-
-@dataclass
-class LabwareMovementOffsetData:
-    """Offsets to be used during labware movement."""
-
-    pickUpOffset: Optional[LabwareOffsetVector]
-    dropOffset: Optional[LabwareOffsetVector]
-
-
 class WellOrigin(str, Enum):
     """Origin of WellLocation offset.
 
@@ -624,3 +608,19 @@ class HeaterShakerMovementRestrictors:
     plate_shaking: bool
     latch_status: HeaterShakerLatchStatus
     deck_slot: int
+
+
+class LabwareMovementStrategy(str, Enum):
+    """Strategy to use for labware movement."""
+
+    USING_GRIPPER = "usingGripper"
+    MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
+    MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
+
+
+@dataclass
+class LabwareMovementOffsetData:
+    """Offsets to be used during labware movement."""
+
+    pick_up_offset: LabwareOffsetVector = LabwareOffsetVector(x=0, y=0, z=0)
+    drop_offset: LabwareOffsetVector = LabwareOffsetVector(x=0, y=0, z=0)
