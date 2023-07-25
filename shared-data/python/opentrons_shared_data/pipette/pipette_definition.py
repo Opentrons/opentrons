@@ -57,7 +57,9 @@ class FlowRateDefinition(BaseModel):
 class FlowAccelerationDefinition(BaseModel):
     default: float = Field(..., description="Highest API level default fallback.")
     values_by_api_level: Dict[str, float] = Field(
-        ..., description="flow accelerations keyed by API level.", alias="valuesByApiLevel"
+        ...,
+        description="flow accelerations keyed by API level.",
+        alias="valuesByApiLevel",
     )
 
 

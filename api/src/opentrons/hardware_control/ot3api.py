@@ -50,7 +50,6 @@ from opentrons_hardware.hardware_control.motion_planning import (
     MoveManager,
     MoveTarget,
     ZeroLengthMoveError,
-    AxisConstraints,
 )
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
@@ -266,12 +265,11 @@ class OT3API(
             f"Set system constraints for calibration: {self._move_manager.get_constraints()}"
         )
 
-    async def set_system_constraints_for_plunger_acceleration(self, mount: OT3Mount, acceleration: float) -> None:
+    async def set_system_constraints_for_plunger_acceleration(
+        self, mount: OT3Mount, acceleration: float
+    ) -> None:
         new_constraints = get_system_constraints_for_plunger_acceleration(
-            self._config.motion_settings,
-            self._gantry_load,
-            mount,
-            acceleration
+            self._config.motion_settings, self._gantry_load, mount, acceleration
         )
         self._move_manager.update_constraints(new_constraints)
 

@@ -271,11 +271,7 @@ def get_system_constraints_for_plunger_acceleration(
 ) -> "SystemConstraints[Axis]":
     old_constraints = config.by_gantry_load(gantry_load)
     new_constraints = {}
-    axis_kinds = set([
-        k
-        for _, v in old_constraints.items()
-        for k in v.keys()
-    ])
+    axis_kinds = set([k for _, v in old_constraints.items() for k in v.keys()])
     for axis_kind in axis_kinds:
         for axis in Axis.of_kind(axis_kind):
             if axis == Axis.of_main_tool_actuator(mount):
