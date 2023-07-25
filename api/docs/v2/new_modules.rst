@@ -222,7 +222,7 @@ Using a Magnetic Module
 ***********************
 
 .. note::
-   Recommended for use with the OT-2 only.
+   Recommended for use with the OT-2 only. If you have a Flex, see :ref:`magnetic-block`.
 
 The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module. 
 
@@ -685,21 +685,29 @@ Using a Magnetic Block Module
 *****************************
 
 .. note::
-   Recommended for use with the Flex only.
+   Recommended for use with the Flex only. If you have an OT-2, see :ref:`magnetic-module`.
 
-The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but unlike the Magnetic Module, the Magnetic Block does not move beads up or down in solution.
+The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but does not move beads up or down in solution.
 
-Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module. After the ``load_module ()`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext`. For example, this code loads a Magnetic Block on deck slot D1::
+Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module. For example, this code loads a Magnetic Block in deck slot D1, stacks a well-plate on top of it, and then uses the Gripper to move the well plate to another deck slot::
 
-    def run(protocol_api.ProtocolContext):
-        mag_block = protocol.load_module('magneticBlockV1', 'D1')
-
-After loading the Magnetic Block, you can add other labware to it and start using it in your protocol. For example, this code tells the robot there's a Bio-Rad well plate on top of the block::
-
-  def run(protocol_api.ProtocolContext):
-        mag_block = protocol.load_module('magneticBlockV1', 'D1')
-        well_plate = mag_block.load_labware ("biorad_96_wellplate_200ul_pcr")
-
+    def run(protocol: protocol_api.ProtocolContext):
+        
+        # Load the Magnetic Block in deck slot D1
+        mag_block = protocol.load_module(
+          module_name='magneticBlockV1',
+          location='D1')
+        
+        # Load a 96-well plate on the magnetic block
+        well_plate = mag_block.load_labware(
+          name="biorad_96_wellplate_200ul_pcr")
+        
+        # Use the gripper to move the well plate off the block
+        protocol.move_labware(well_plate,
+          new_location="B2",
+          use_gripper=True)
+        
+After the ``load_module ()`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext`.
 
 For more information about using and moving labware with the Magnetic Block, see :ref:`Labware` and :ref:`Moving Labware`, respectively.
 
@@ -729,13 +737,13 @@ When working with multiple modules of the same type, load them in your protocol 
       def run(protocol: protocol_api.ProtocolContext):
         # Load Temperature Module 1 in deck slot D1 on USB port 2
         temperature_module_1 = protocol.load_module(
-          load_name:'temperature module gen2',
-          location:"D1")
+          module_name='temperature module gen2',
+          location="D1")
 
         # Load Temperature Module 2 in deck slot C1 on USB port 6
         temperature_module_2 = protocol.load_module(
-          load_name:'temperature module gen2',
-          location:"C1")
+          module_name='temperature module gen2',
+          location="C1")
         
     Assuming there are no other modules used in this protocol, the Temperature Modules are connected as shown here:
 
@@ -755,13 +763,13 @@ When working with multiple modules of the same type, load them in your protocol 
       def run(protocol: protocol_api.ProtocolContext):
         # Load Temperature Module 1 in deck slot C1 on USB port 1
         temperature_module_1 = protocol.load_module(
-          load_name:'temperature module gen2',
-          location:"1")
+          load_name='temperature module gen2',
+          location="1")
 
         # Load Temperature Module 2 in deck slot D3 on USB port 2
         temperature_module_2 = protocol.load_module(
-          load_name: 'temperature module gen2',
-          location:"3")
+          load_name='temperature module gen2',
+          location="3")
         
     Assuming there are no other modules used in this protocol, the Temperature Modules are connected as shown here:
     
