@@ -376,7 +376,11 @@ describe('getNextTiprack - 8-channel', () => {
         tiprack2Id: { slot: '2' },
         tiprack3Id: { slot: '3' },
       },
-      tiprackSetting: { tiprack1Id: true, tiprack2Id: true, tiprack3Id: true },
+      tiprackSetting: {
+        tiprack1Id: true,
+        tiprack2Id: true,
+        tiprack3Id: true,
+      },
     })
     // remove tips from state
     robotState.tipState.tipracks.tiprack1Id = {
@@ -418,7 +422,7 @@ describe('getNextTiprack - 8-channel', () => {
 
     const result = getNextTiprack(
       'p300MultiId',
-      'tiprack1Id',
+      'tiprack3Id',
       invariantContext,
       robotState
     )

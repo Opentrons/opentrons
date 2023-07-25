@@ -42,7 +42,7 @@ beforeEach(() => {
 
     pipette: DEFAULT_PIPETTE,
     labware: SOURCE_LABWARE,
-
+    tipRack: 'tiprack1Id',
     blowoutLocation: null,
     touchTip: false,
 

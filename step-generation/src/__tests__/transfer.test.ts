@@ -58,7 +58,7 @@ beforeEach(() => {
     name: 'Transfer Test',
     description: 'test blah blah',
     pipette: DEFAULT_PIPETTE,
-
+    tipRack: 'tiprack1Id',
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
 
