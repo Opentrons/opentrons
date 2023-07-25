@@ -19,7 +19,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point
 
 
-SLOT_FORCE_GAUGE = 6
+SLOT_FORCE_GAUGE = 4
 
 GRIP_DUTY_CYCLES: List[int] = [40, 30, 25, 20, 15, 10, 6]
 NUM_DUTY_CYCLE_TRIALS = 20
@@ -35,7 +35,7 @@ WARMUP_SECONDS = 10
 FORCE_GAUGE_TRIAL_SAMPLE_INTERVAL = 0.25  # seconds
 FORCE_GAUGE_TRIAL_SAMPLE_COUNT = 20  # 20 samples = 5 seconds @ 4Hz
 
-GAUGE_OFFSET = Point(x=90, y=37.5, z=75)
+GAUGE_OFFSET = Point(x=0, y=37.5, z=75)
 
 
 def _get_test_tag(
