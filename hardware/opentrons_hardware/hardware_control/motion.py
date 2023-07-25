@@ -179,6 +179,7 @@ def create_tip_action_backoff_step(velocity: Dict[NodeId, np.float64]) -> MoveGr
             duration_sec=abs(np.float64(BACKOFF_MAX_MM) / abs(v)),
             stop_condition=MoveStopCondition.limit_switch_backoff,
             action=PipetteTipActionType.home,
+            acceleration_mm_sec_sq=np.float64(0),
         )
     return backoff
 

@@ -694,18 +694,21 @@ async def test_tip_action(
 
     mock_move_group_run.reset_mock()
 
-    await controller.tip_action(distance=33, velocity=-5.5, tip_action="home")
+    await controller.tip_action(
+        distance=33, velocity=-5.5, tip_action="home", back_off=True
+    )
     for call in mock_move_group_run.call_args_list:
         move_group_runner = call[0][0]
-        for move_group in move_group_runner._move_groups:
-            assert move_group  # don't pass in empty groups
-            assert len(move_group) == 1
-
         move_groups = move_group_runner._move_groups
+
+        for move_group in move_groups:
+            assert move_group  # don't pass in empty groups
+            assert len(move_group) >= 1
+
         # we should be sending this command to the pipette axes to process.
         home_step = move_groups[0][0][NodeId.pipette_left]
         assert home_step.stop_condition == MoveStopCondition.limit_switch
-        backoff_step = move_groups[1][0][NodeId.pipette_left]
+        backoff_step = move_groups[0][1][NodeId.pipette_left]
         assert backoff_step.stop_condition == MoveStopCondition.limit_switch_backoff
 
 

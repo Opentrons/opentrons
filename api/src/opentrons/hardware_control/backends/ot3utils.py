@@ -1,5 +1,5 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast
+from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast, Sequence, Optional
 from typing_extensions import Literal
 from logging import getLogger
 from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
@@ -54,8 +54,6 @@ from opentrons_hardware.hardware_control.motion import (
     create_gripper_jaw_step,
     create_tip_action_step,
 )
-from opentrons_hardware.hardware_control.constants import interrupts_per_sec
-
 from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 
 GRIPPER_JAW_HOME_TIME: float = 10
@@ -378,29 +376,8 @@ def create_home_groups(
     return [home_group, backoff_group]
 
 
-def create_tip_action_home_group(
-    axes: Sequence[Axis], distance: float, velocity: float
-) -> List[MoveGroup]:
-    current_nodes = [axis_to_node(ax) for ax in axes]
-    home_group = [
-        create_tip_action_step(
-            velocity={node_id: np.float64(velocity) for node_id in current_nodes},
-            distance={node_id: np.float64(distance) for node_id in current_nodes},
-            present_nodes=current_nodes,
-            action=PipetteTipActionType.home,
-        )
-    ]
-
-    backoff_group = [
-        create_tip_action_backoff_step(
-            velocity={node_id: np.float64(velocity / 2) for node_id in current_nodes}
-        )
-    ]
-    return [home_group, backoff_group]
-
-
 def create_tip_action_group(
-    moves: List[Move[Axis]],
+    moves: Sequence[Move[Axis]],
     present_nodes: Iterable[NodeId],
     action: str,
 ) -> MoveGroup:
@@ -426,15 +403,26 @@ def create_tip_action_group(
 def create_gear_motor_home_group(
     distance: float,
     velocity: float,
+    backoff: Optional[bool] = False,
 ) -> MoveGroup:
-    step = create_tip_action_step(
+    move_group: MoveGroup = []
+    home_step = create_tip_action_step(
         velocity={NodeId.pipette_left: np.float64(-1 * velocity)},
         acceleration={NodeId.pipette_left: np.float64(0)},
         duration=np.float64(distance / velocity),
         present_nodes=[NodeId.pipette_left],
         action=PipetteTipActionType.home,
     )
-    return [step]
+    move_group.append(home_step)
+
+    if backoff:
+        backoff_group = create_tip_action_backoff_step(
+            velocity={
+                node_id: np.float64(velocity / 2) for node_id in [NodeId.pipette_left]
+            }
+        )
+        move_group.append(backoff_group)
+    return move_group
 
 
 def create_gripper_jaw_grip_group(

@@ -393,6 +393,7 @@ class OT3Simulator:
         distance: Optional[float] = None,
         velocity: Optional[float] = None,
         tip_action: str = "home",
+        back_off: Optional[bool] = False,
     ) -> None:
         pass
 

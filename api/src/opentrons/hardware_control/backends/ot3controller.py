@@ -628,6 +628,7 @@ class OT3Controller:
         distance: Optional[float] = None,
         velocity: Optional[float] = None,
         tip_action: str = "home",
+        back_off: Optional[bool] = False,
     ) -> None:
         move_group = []
         if moves is not None:
@@ -635,7 +636,9 @@ class OT3Controller:
                 moves, [NodeId.pipette_left], tip_action
             )
         elif distance is not None and velocity is not None:
-            move_group = create_gear_motor_home_group(float(distance), float(velocity))
+            move_group = create_gear_motor_home_group(
+                float(distance), float(velocity), back_off
+            )
         runner = MoveGroupRunner(
             move_groups=[move_group],
             ignore_stalls=True if not ff.stall_detection_enabled() else False,
