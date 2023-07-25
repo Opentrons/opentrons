@@ -33,7 +33,6 @@ export function _getNextTip(args: {
     invariantContext.pipetteEntities[pipetteId]?.spec?.channels
   const tiprackWellsState = robotState.tipState.tipracks[tiprackId]
   const tiprackDef = invariantContext.labwareEntities[tiprackId]?.def
-
   const hasTip = (wellName: string): boolean => tiprackWellsState[wellName]
 
   const orderedWells = orderWells(tiprackDef.ordering, 't2b', 'l2r')
@@ -95,7 +94,6 @@ export function getNextTiprack(
       robotState,
     })
   )
-
   // TODO Ian 2018-02-12: avoid calling _getNextTip twice
   const nextTip =
     firstAvailableTiprack &&

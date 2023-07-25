@@ -71,7 +71,7 @@ beforeEach(() => {
     pipette: DEFAULT_PIPETTE,
     sourceLabware: SOURCE_LABWARE,
     destLabware: DEST_LABWARE,
-
+    tipRack: 'tiprack1Id',
     preWetTip: false,
     touchTipAfterAspirate: false,
     disposalVolume: 60,
