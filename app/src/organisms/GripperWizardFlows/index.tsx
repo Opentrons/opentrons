@@ -14,6 +14,7 @@ import {
   useCreateMaintenanceCommandMutation,
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
+  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { Portal } from '../../App/portal'
@@ -67,6 +68,18 @@ export function GripperWizardFlows(
       setMaintenanceRunId(response.data.id)
     },
   })
+  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+    refetchInterval: 5000,
+  })
+  React.useEffect(() => {
+    if (
+      maintenanceRunId !== '' &&
+      maintenanceRunData?.data.id !== maintenanceRunId
+    ) {
+      closeFlow()
+    }
+  }, [maintenanceRunData, maintenanceRunId, closeFlow])
+
   const [isExiting, setIsExiting] = React.useState<boolean>(false)
   const [errorMessage, setErrorMessage] = React.useState<null | string>(null)
 

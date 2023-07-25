@@ -12,6 +12,7 @@ import {
   useHost,
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
+  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 
 import { LegacyModalShell } from '../../molecules/LegacyModal'
@@ -116,6 +117,17 @@ export const PipetteWizardFlows = (
     },
     host
   )
+  const { data: maintenanceRunData } = useCurrentMaintenanceRun({
+    refetchInterval: 5000,
+  })
+  React.useEffect(() => {
+    if (
+      maintenanceRunId !== '' &&
+      maintenanceRunData?.data.id !== maintenanceRunId
+    ) {
+      closeFlow()
+    }
+  }, [maintenanceRunData, maintenanceRunId, closeFlow])
 
   const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
     null
