@@ -322,7 +322,7 @@ If at any point you need to check whether the magnets are engaged or not, use th
 Changes with the GEN2 Magnetic Module
 =====================================
 
-The GEN2 Magnetic Module uses smaller magnets than the GEN1 version. This change helps mitigate an issue with the magnets attracting beads from their retracted position, but it also takes longer for the GEN2 module to attract beads. The recommended attraction time is 5 minutes for liquid volumes up to 50 µL and 7 minutes for volumes greater than 50 µL. If your application needs additional magnetic strength to attract beads, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
+The GEN2 Magnetic Module uses smaller magnets than the GEN1 version. This change helps mitigate an issue with the magnets attracting beads from their retracted position, but it also takes longer for the GEN2 module to attract beads. The recommended attraction time is 5 minutes for liquid volumes up to 50 µL and 7 minutes for volumes greater than 50 µL. If your application needs additional magnetic strength to attract beads within these timeframes, use the available `Adapter Magnets <https://support.opentrons.com/s/article/Adapter-magnets>`_.
 
 
 .. _thermocycler-module:
