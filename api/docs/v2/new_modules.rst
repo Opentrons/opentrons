@@ -151,7 +151,7 @@ The Temperature Module acts as both a cooling and heating device. It can control
 
 The Temperature Module is represented in code by a :py:class:`.TemperatureModuleContext` object, which has methods for setting target temperatures and reading the module's status.
 
-The examples in this section use a Temperature Module loaded in Flex deck slot D3, which corresponds to deck slot 3 on the OT-2.
+The examples in this section use a Temperature Module loaded in deck slot D3 on Flex, which corresponds to deck slot 3 on OT-2.
 
 .. code-block:: python
     :substitutions:
