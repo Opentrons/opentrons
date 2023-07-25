@@ -3111,7 +3111,7 @@ describe('consolidate multi-channel', () => {
       ...args,
       volume: 140,
       changeTip: 'once',
-      tipRack: 'tiprack1Id'
+      tipRack: 'tiprack1Id',
     } as ConsolidateArgs
     const result = consolidate(data, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
