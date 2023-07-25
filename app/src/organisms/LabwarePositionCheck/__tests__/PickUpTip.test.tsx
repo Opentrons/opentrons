@@ -389,15 +389,18 @@ describe('PickUpTip', () => {
           },
         },
         {
-          commandType: 'retractAxis' as const,
+          commandType: 'moveToWell',
           params: {
-            axis: 'x',
+            pipetteId: 'pipetteId1',
+            labwareId: 'fixedTrash',
+            wellName: 'A1',
+            wellLocation: { origin: 'top' },
           },
         },
         {
           commandType: 'retractAxis' as const,
           params: {
-            axis: 'y',
+            axis: 'leftZ',
           },
         },
         {

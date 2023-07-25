@@ -8,6 +8,7 @@ import { PrepareSpace } from './PrepareSpace'
 import { JogToWell } from './JogToWell'
 import {
   CreateCommand,
+  FIXED_TRASH_ID,
   getIsTiprack,
   getLabwareDefURI,
   getLabwareDisplayName,
@@ -216,12 +217,19 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         },
       },
       {
-        commandType: 'retractAxis' as const,
-        params: { axis: 'x' },
+        commandType: 'moveToWell' as const,
+        params: {
+          pipetteId: pipetteId,
+          labwareId: FIXED_TRASH_ID,
+          wellName: 'A1',
+          wellLocation: { origin: 'top' as const },
+        },
       },
       {
         commandType: 'retractAxis' as const,
-        params: { axis: 'y' },
+        params: {
+          axis: pipetteZMotorAxis,
+        },
       },
       {
         commandType: 'moveLabware' as const,

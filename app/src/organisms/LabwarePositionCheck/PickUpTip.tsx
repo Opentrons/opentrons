@@ -9,6 +9,7 @@ import { JogToWell } from './JogToWell'
 import {
   CompletedProtocolAnalysis,
   CreateCommand,
+  FIXED_TRASH_ID,
   getLabwareDefURI,
   getLabwareDisplayName,
   getModuleType,
@@ -214,12 +215,19 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
           },
         },
         {
-          commandType: 'retractAxis' as const,
-          params: { axis: 'x' },
+          commandType: 'moveToWell' as const,
+          params: {
+            pipetteId: pipetteId,
+            labwareId: FIXED_TRASH_ID,
+            wellName: 'A1',
+            wellLocation: { origin: 'top' as const },
+          },
         },
         {
           commandType: 'retractAxis' as const,
-          params: { axis: 'y' },
+          params: {
+            axis: pipetteZMotorAxis,
+          },
         },
         {
           commandType: 'moveLabware' as const,
