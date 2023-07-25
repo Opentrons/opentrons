@@ -77,9 +77,9 @@ export function RunningProtocol(): JSX.Element {
     setShowConfirmCancelRunModal,
   ] = React.useState<boolean>(false)
   const [
-    showInterventionModal,
-    setShowInterventionModal,
-  ] = React.useState<boolean>(false)
+    interventionModalCommandKey,
+    setInterventionModalCommandKey,
+  ] = React.useState<string | null>(null)
   const lastAnimatedCommand = React.useRef<string | null>(null)
   const swipe = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -127,17 +127,22 @@ export function RunningProtocol(): JSX.Element {
     (c: RunTimeCommand, index: number) => index === currentRunCommandIndex
   )
 
-  if (
-    currentCommand != null &&
-    isInterventionCommand(currentCommand) &&
-    !showInterventionModal
-  ) {
-    // this setTimeout is a hacky way to make sure the modal closes when we tell it to
-    // we can run into issues when there are 2 back to back move labware commands
-    // the modal never really un-renders and so the animations break after the first modal
-    // not really a fan of this, but haven't been able to fix the problem any other way
-    setTimeout(() => setShowInterventionModal(true), 0)
-  }
+  React.useEffect(() => {
+    if (
+      currentCommand != null &&
+      interventionModalCommandKey != null &&
+      currentCommand.key !== interventionModalCommandKey
+    ) {
+      // set intervention modal command key to null if different from current command key
+      setInterventionModalCommandKey(null)
+    } else if (
+      currentCommand?.key != null &&
+      isInterventionCommand(currentCommand) &&
+      interventionModalCommandKey === null
+    ) {
+      setInterventionModalCommandKey(currentCommand.key)
+    }
+  }, [currentCommand, interventionModalCommandKey])
 
   return (
     <>
@@ -165,16 +170,13 @@ export function RunningProtocol(): JSX.Element {
             isActiveRun={true}
           />
         ) : null}
-        {showInterventionModal &&
+        {interventionModalCommandKey != null &&
         runRecord?.data != null &&
         currentCommand != null ? (
           <InterventionModal
             robotName={robotName}
             command={currentCommand}
-            onResume={() => {
-              setShowInterventionModal(false)
-              playRun()
-            }}
+            onResume={playRun}
             run={runRecord.data}
             analysis={robotSideAnalysis}
           />
