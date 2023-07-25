@@ -1,7 +1,6 @@
 """Gravimetric."""
 from time import sleep
 from dataclasses import dataclass
-from inspect import getsource
 from statistics import stdev
 from typing import Optional, Tuple, List, Dict
 
@@ -19,7 +18,7 @@ from . import config
 from .helpers import get_pipette_unique_name
 from .workarounds import get_sync_hw_api, get_latest_offset_for_labware
 from .increments import get_volume_increments
-from .liquid_class.defaults import get_test_volumes, get_liquid_class
+from .liquid_class.defaults import get_test_volumes
 from .liquid_class.pipetting import (
     aspirate_with_liquid_class,
     dispense_with_liquid_class,

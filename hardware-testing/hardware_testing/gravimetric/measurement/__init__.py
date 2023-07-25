@@ -107,9 +107,7 @@ def _build_measurement_data(
     )
     if simulating and len(segment) == 1:
         segment.append(segment[0])
-    stable_only = GravimetricRecording(
-        [sample for sample in segment if sample.stable]
-    )
+    stable_only = GravimetricRecording([sample for sample in segment if sample.stable])
     if stable and not simulating and len(stable_only) >= 2:
         segment = stable_only
 
