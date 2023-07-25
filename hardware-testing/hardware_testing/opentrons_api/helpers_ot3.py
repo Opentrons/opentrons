@@ -392,16 +392,6 @@ def get_plunger_positions_ot3(
         pipette.plunger_positions.drop_tip,
     )
 
-
-async def update_pick_up_current(
-    api: OT3API, mount: OT3Mount, current: float = 0.125
-) -> None:
-    """Update pick-up-tip current."""
-    pipette = _get_pipette_from_mount(api, mount)
-    config_model = pipette.pick_up_configurations
-    config_model.current = current
-    pipette.pick_up_configurations = config_model
-
 async def update_drop_tip_current(
     api: OT3API, mount: OT3Mount, current: float = 1.0
 ) -> None:
@@ -411,24 +401,44 @@ async def update_drop_tip_current(
     config_model.current = current
     pipette._drop_configurations = config_model
 
+async def update_drop_tip_speed(
+    api: OT3API, mount: OT3Mount, current: float = 1.0
+) -> None:
+    """Update drop-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette._drop_configurations
+    config_model.current = current
+    pipette._drop_configurations = config_model
+
+
+
+async def update_pick_up_current(
+    api: OT3API, mount: OT3Mount, current: float = 0.125
+) -> None:
+    """Update pick-up-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette._pick_up_configurations
+    config_model.current = current
+    pipette._pick_up_configurations = config_model
+
 
 async def update_pick_up_distance(
     api: OT3API, mount: OT3Mount, distance: float = 17.0
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    config_model = pipette.pick_up_configurations
+    config_model = pipette._pick_up_configurations
     config_model.distance = distance
-    pipette.pick_up_configurations = config_model
+    pipette._pick_up_configurations = config_model
 
 async def update_pick_up_speed(
     api: OT3API, mount: OT3Mount, speed: float = 5.0
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    config_model = pipette.pick_up_configurations
+    config_model = pipette._pick_up_configurations
     config_model.speed = speed
-    pipette.pick_up_configurations = config_model
+    pipette._pick_up_configurations = config_model
 
 
 async def move_plunger_absolute_ot3(
@@ -465,19 +475,7 @@ async def move_tip_motor_relative_ot3(
     """Move 96ch tip-motor (Q) to an absolute position."""
     if not api.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
         raise RuntimeError("No pipette found on LEFT mount")
-
-    current_pos = await api.current_position_ot3()
-    target_pos = current_pos.copy()
-    target_pos[Axis.Q] += distance
-
     if distance < 0:
-        speed *= -1
-
-    tip_motor_move = api._build_moves(current_pos, target_pos)
-    await api._backend.tip_action(moves=tip_motor_move[0], tip_action="clamp")
-
-    if distance < 0:
-        # change this so that it calls _build_moves, and passes in a speed
         action = "home"
     else:
         action = "clamp"
