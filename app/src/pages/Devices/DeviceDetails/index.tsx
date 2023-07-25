@@ -17,6 +17,7 @@ import { useRobot, useSyncRobotClock } from '../../../organisms/Devices/hooks'
 import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
+import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
 import { getScanning, OPENTRONS_USB } from '../../../redux/discovery'
 import { appShellRequestor } from '../../../redux/shell/remote'
 
@@ -46,6 +47,11 @@ export function DeviceDetails(): JSX.Element | null {
         paddingTop={SPACING.spacing16}
         paddingBottom={SPACING.spacing48}
       >
+        {/* EstopBanner here */}
+        <Flex marginBottom={SPACING.spacing16}>
+          <EstopBanner />
+        </Flex>
+
         <Flex
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.white}
