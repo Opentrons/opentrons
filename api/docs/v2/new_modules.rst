@@ -12,7 +12,7 @@ Powered modules include the :ref:`Temperature Module <temperature-module>`, :ref
 
 .. Note::
     
-    Most of the following code examples use alphanumeric Flex deck slot locations (e.g. ``D1``, ``D2``, etc.). If you have an OT-2 and are using API version 2.14 or earlier, replace the Flex deck slot coordinate with its OT-2 equivalent. For example, Flex slot D1 corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
+    Most of the following code examples use coordinate deck slot locations (e.g. ``'D1'``, ``'D2'``), like those found on Flex. If you have an OT-2 and are using API version 2.14 or earlier, replace the coordinate with its numeric OT-2 equivalent. For example, slot D1 on Flex corresponds to slot 1 on an OT-2. See :ref:`deck-slots` for more information.
 
 ************
 Module Setup
@@ -35,7 +35,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
             requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
             def run(protocol: protocol_api.ProtocolContext): 
-                # Load a Heater-Shaker in deck slot D1.
+                # Load a Heater-Shaker Module GEN1 in deck slot D1.
                 heater_shaker = protocol.load_module('heaterShakerModuleV1', "D1")
          
                 # Load a Temperature Module GEN2 in deck slot D3.
@@ -100,7 +100,7 @@ The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  
    | GEN1               |                               |                           |
    +--------------------+-------------------------------+---------------------------+
 
-Some modules were added to our python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
+Some modules were added to our Python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
 
 Loading Labware onto a Module
 =============================
