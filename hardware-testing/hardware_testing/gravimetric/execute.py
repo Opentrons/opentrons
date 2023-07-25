@@ -313,13 +313,14 @@ def _creat_airsensor_csv(test_volumes, cfg, run_id, pipette_tag, start_time, ope
     """
     if "P50" in pipette_tag:
         csv_path = '/data/testing_data/gravimetric-ot3-p50-single/'
-    elif "P1000" in pipette_tag:
+    elif "P1K" in pipette_tag:
         csv_path = '/data/testing_data/gravimetric-ot3-p1000-single/'
     else:
         csv_path = '/data/testing_data/'
     csv_name = "AirSensor"
     csv_name = csv_name + "-" + time.strftime("%Y%m%d-%H%M%S") + "-"+ pipette_tag+ '.csv'
     csv_name = csv_path + csv_name
+    print(f"CSV_NAME: {csv_name}")
     csv_head = ["Time", "Temperature", "Humidity"]
     _write_airsensor_csv_row(csv_name, ["META_DATA_START"])
     _write_airsensor_csv_row(csv_name, ["test_name", cfg.name])
@@ -782,6 +783,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
 
     ui.print_title("SET _STOP_AIR_SENSOR_THREAD TRUE")
     _STOP_AIR_SENSOR_THREAD.set()
+    print("stop readding air sensor")
+    time.sleep(_INTERVEL_TIME_READ_AIR_SENSOR)
 
     ui.print_title("RESULTS")
     _print_final_results(

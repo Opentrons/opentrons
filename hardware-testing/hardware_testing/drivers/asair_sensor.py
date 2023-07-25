@@ -155,3 +155,11 @@ class SimAsairSensor(AsairSensorBase):
         temp = random.uniform(24.5, 25)
         relative_hum = random.uniform(45, 40)
         return Reading(temperature=temp, relative_humidity=relative_hum)
+    
+
+if __name__ == "__main__":
+    from . import list_ports_and_select
+    _port = list_ports_and_select("Air Sensor Port")
+    con = AsairSensor.connect(_port)
+    ret = con.get_reading()
+    print(f"Temp: {ret.relative_humidity}, Humi: {ret.temperature}") # fix me, the ret of readding is not correct
