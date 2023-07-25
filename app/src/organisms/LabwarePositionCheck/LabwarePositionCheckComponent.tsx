@@ -1,5 +1,6 @@
 import * as React from 'react'
 import isEqual from 'lodash/isEqual'
+import { useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next'
 import { useConditionalConfirm } from '@opentrons/components'
 import { LabwareOffsetCreateData } from '@opentrons/api-client'
@@ -7,7 +8,11 @@ import {
   useCreateLabwareOffsetMutation,
   useCreateMaintenanceCommandMutation,
 } from '@opentrons/react-api-client'
-import { useSelector } from 'react-redux'
+import {
+  CompletedProtocolAnalysis,
+  Coordinates,
+  FIXED_TRASH_ID,
+} from '@opentrons/shared-data'
 import { Portal } from '../../App/portal'
 // import { useTrackEvent } from '../../redux/analytics'
 import { IntroScreen } from './IntroScreen'
@@ -24,14 +29,9 @@ import { FatalErrorModal } from './FatalErrorModal'
 import { RobotMotionLoader } from './RobotMotionLoader'
 import { getLabwarePositionCheckSteps } from './getLabwarePositionCheckSteps'
 import type { LabwareOffset } from '@opentrons/api-client'
-import {
-  CompletedProtocolAnalysis,
-  Coordinates,
-  FIXED_TRASH_ID,
-} from '@opentrons/shared-data'
+import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type { Axis, Sign, StepSize } from '../../molecules/JogControls/types'
 import type { RegisterPositionAction, WorkingOffset } from './types'
-import type { DropTipCreateCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 
 const JOG_COMMAND_TIMEOUT = 10000 // 10 seconds
 interface LabwarePositionCheckModalProps {

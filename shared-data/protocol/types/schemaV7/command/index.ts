@@ -15,13 +15,13 @@ import type {
   CalibrationCreateCommand,
 } from './calibration'
 
-export * from './pipetting'
-export * from './gantry'
-export * from './module'
-export * from './setup'
-export * from './timing'
 export * from './annotation'
 export * from './calibration'
+export * from './gantry'
+export * from './module'
+export * from './pipetting'
+export * from './setup'
+export * from './timing'
 
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
