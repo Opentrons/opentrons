@@ -33,8 +33,12 @@ interface SP {
 }
 
 function SettingsAppComponent(props: Props): JSX.Element {
-  const { canClearHintDismissals, hasOptedIn, restoreHints, toggleOptedIn } =
-    props
+  const {
+    canClearHintDismissals,
+    hasOptedIn,
+    restoreHints,
+    toggleOptedIn,
+  } = props
   return (
     <>
       <div className={styles.page_row}>
