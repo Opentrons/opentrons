@@ -1,4 +1,9 @@
+.. contents:: Table of Contents
+   :depth: 1
+   :backlinks: none
+
 .. include:: index.rst
+    :start-line: 2
 .. include:: tutorial.rst
     :start-line: 3
 .. include:: versioning.rst
