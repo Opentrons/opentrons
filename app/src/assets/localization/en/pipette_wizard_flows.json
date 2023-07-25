@@ -1,4 +1,5 @@
 {
+  "align_the_connector": "Attach the pipette to the robot by aligning the connector and pressing to ensure a secure connection. Hold the pipette in place and use the hex screwdriver to tighten the pipette screws. Then test that the pipette is securely attached by gently pulling it side to side.",
   "all_pipette_detached": "All pipettes successfully detached",
   "are_you_sure_exit": "Are you sure you want to exit before completing {{flow}}?",
   "attach_96_channel_plus_detach": "Detach {{pipetteName}} and Attach 96-Channel Pipette",

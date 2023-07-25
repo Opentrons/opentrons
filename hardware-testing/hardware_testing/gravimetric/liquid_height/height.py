@@ -7,10 +7,7 @@ from typing import List, Optional, Tuple
 from opentrons.protocol_api.labware import Well
 from opentrons.protocol_api import ProtocolContext
 
-from hardware_testing.gravimetric.helpers import (
-    well_is_reservoir,
-    get_list_of_wells_affected,
-)
+from hardware_testing.gravimetric import helpers
 
 
 class CalcType(ABC):
@@ -200,7 +197,7 @@ def _get_actual_volume_change_in_well(
     """Get the actual volume change in well, depending on if the pipette is single or multi."""
     if volume is None:
         return None
-    if well_is_reservoir(well):
+    if helpers.well_is_reservoir(well):
         volume *= float(channels)
     return volume
 
@@ -208,9 +205,11 @@ def _get_actual_volume_change_in_well(
 class LiquidTracker:
     """Liquid Tracker."""
 
-    def __init__(self) -> None:
+    def __init__(self, ctx: Optional[ProtocolContext] = None) -> None:
         """Liquid Tracker."""
         self._items: dict = dict({})
+        if ctx is not None:
+            initialize_liquid_from_deck(ctx, self)
 
     def reset(self) -> None:
         """Reset."""
@@ -346,7 +345,7 @@ class LiquidTracker:
             volume=dispense,
             channels=channels,
         )
-        for w in get_list_of_wells_affected(well, channels):
+        for w in helpers.get_list_of_wells_affected(well, channels):
             self.update_well_volume(
                 w,
                 after_aspirate=actual_aspirate_amount,

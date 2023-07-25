@@ -31,7 +31,7 @@ from .ot3utils import (
     create_move_group,
     axis_to_node,
     get_current_settings,
-    create_home_group,
+    create_home_groups,
     node_to_axis,
     sensor_node_for_mount,
     sensor_node_for_pipette,
@@ -40,6 +40,7 @@ from .ot3utils import (
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
     create_tip_action_group,
+    create_tip_action_home_group,
     PipetteAction,
     motor_nodes,
     LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
@@ -115,6 +116,7 @@ from opentrons.hardware_control.types import (
     AionotifyEvent,
     OT3Mount,
     OT3AxisMap,
+    OT3AxisKind,
     CurrentConfig,
     MotorStatus,
     InstrumentProbeType,
@@ -495,85 +497,69 @@ class OT3Controller:
         else:
             return -1 * self.axis_bounds[axis][1] - self.axis_bounds[axis][0]
 
+    def _build_axes_home_groups(
+        self, axes: Sequence[Axis], speed_settings: Dict[OT3AxisKind, float]
+    ) -> List[MoveGroup]:
+        present_axes = [ax for ax in axes if self.axis_is_present(ax)]
+        if not present_axes:
+            return []
+        else:
+            distances = {ax: self._get_axis_home_distance(ax) for ax in present_axes}
+            velocities = {
+                ax: -1 * speed_settings[Axis.to_kind(ax)] for ax in present_axes
+            }
+            return create_home_groups(distances, velocities)
+
     def _build_home_pipettes_runner(
         self,
         axes: Sequence[Axis],
         gantry_load: GantryLoad,
     ) -> Optional[MoveGroupRunner]:
+        pipette_axes = [ax for ax in axes if ax in Axis.pipette_axes()]
+        if not pipette_axes:
+            return None
+
         speed_settings = self._configuration.motion_settings.max_speed_discontinuity[
             gantry_load
         ]
-
-        distances_pipette = {
-            ax: self._get_axis_home_distance(ax)
-            for ax in axes
-            if ax in Axis.pipette_axes()
-        }
-        velocities_pipette = {
-            ax: -1 * speed_settings[Axis.to_kind(ax)]
-            for ax in axes
-            if ax in Axis.pipette_axes()
-        }
-
-        move_group_pipette = []
-        if distances_pipette and velocities_pipette:
-            pipette_move = self._filter_move_group(
-                create_home_group(distances_pipette, velocities_pipette)
-            )
-            move_group_pipette.append(pipette_move)
-
-        if move_group_pipette:
-            return MoveGroupRunner(move_groups=move_group_pipette, start_at_index=2)
-        return None
+        move_groups: List[MoveGroup] = self._build_axes_home_groups(
+            pipette_axes, speed_settings
+        )
+        return MoveGroupRunner(move_groups=move_groups)
 
     def _build_home_gantry_z_runner(
         self,
         axes: Sequence[Axis],
         gantry_load: GantryLoad,
     ) -> Optional[MoveGroupRunner]:
+        gantry_axes = [ax for ax in axes if ax in Axis.gantry_axes()]
+        if not gantry_axes:
+            return None
+
         speed_settings = self._configuration.motion_settings.max_speed_discontinuity[
             gantry_load
         ]
 
-        distances_gantry = {
-            ax: self._get_axis_home_distance(ax)
-            for ax in axes
-            if ax in Axis.gantry_axes() and ax not in Axis.ot3_mount_axes()
-        }
-        velocities_gantry = {
-            ax: -1 * speed_settings[Axis.to_kind(ax)]
-            for ax in axes
-            if ax in Axis.gantry_axes() and ax not in Axis.ot3_mount_axes()
-        }
-        distances_z = {
-            ax: self._get_axis_home_distance(ax)
-            for ax in axes
-            if ax in Axis.ot3_mount_axes()
-        }
-        velocities_z = {
-            ax: -1 * speed_settings[Axis.to_kind(ax)]
-            for ax in axes
-            if ax in Axis.ot3_mount_axes()
-        }
-        move_group_gantry_z = []
-        if distances_z and velocities_z:
-            z_move = self._filter_move_group(
-                create_home_group(distances_z, velocities_z)
-            )
-            move_group_gantry_z.append(z_move)
-        if distances_gantry and velocities_gantry:
-            # home X axis before Y axis, to avoid collision with thermo-cycler lid
-            # that could be in the back-left corner
-            for ax in [Axis.X, Axis.Y]:
-                if ax in axes:
-                    gantry_move = self._filter_move_group(
-                        create_home_group(
-                            {ax: distances_gantry[ax]}, {ax: velocities_gantry[ax]}
-                        )
-                    )
-                    move_group_gantry_z.append(gantry_move)
-        if move_group_gantry_z:
-            return MoveGroupRunner(move_groups=move_group_gantry_z)
+        # first home all the present mount axes
+        z_axes = list(filter(lambda ax: ax in Axis.ot3_mount_axes(), gantry_axes))
+        z_groups = self._build_axes_home_groups(z_axes, speed_settings)
+
+        # home X axis before Y axis, to avoid collision with thermo-cycler lid
+        # that could be in the back-left corner
+        x_groups = (
+            self._build_axes_home_groups([Axis.X], speed_settings)
+            if Axis.X in gantry_axes
+            else []
+        )
+        y_groups = (
+            self._build_axes_home_groups([Axis.Y], speed_settings)
+            if Axis.Y in gantry_axes
+            else []
+        )
+
+        move_groups = [*z_groups, *x_groups, *y_groups]
+        if move_groups:
+            return MoveGroupRunner(move_groups=move_groups)
         return None
 
     @requires_update
@@ -619,18 +605,6 @@ class OT3Controller:
             self._handle_motor_status_response(position)
         return axis_convert(self._position, 0.0)
 
-    def _filter_move_group(self, move_group: MoveGroup) -> MoveGroup:
-        new_group: MoveGroup = []
-        for step in move_group:
-            new_group.append(
-                {
-                    node: axis_step
-                    for node, axis_step in step.items()
-                    if node in self._motor_nodes()
-                }
-            )
-        return new_group
-
     async def tip_action(
         self,
         axes: Sequence[Axis],
@@ -640,10 +614,17 @@ class OT3Controller:
     ) -> None:
         if tip_action == "home":
             speed = speed * -1
-        move_group = create_tip_action_group(
-            axes, distance, speed, cast(PipetteAction, tip_action)
-        )
-        runner = MoveGroupRunner(move_groups=[move_group])
+            runner = MoveGroupRunner(
+                move_groups=create_tip_action_home_group(axes, distance, speed)
+            )
+        else:
+            runner = MoveGroupRunner(
+                move_groups=[
+                    create_tip_action_group(
+                        axes, distance, speed, cast(PipetteAction, tip_action)
+                    )
+                ]
+            )
         positions = await runner.run(can_messenger=self._messenger)
         for axis, point in positions.items():
             self._position.update({axis: point[0]})

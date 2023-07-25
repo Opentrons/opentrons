@@ -34,6 +34,7 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.MOUNT_PIPETTE }
   const isSingleMountPipette = selectedPipette === SINGLE_MOUNT_PIPETTES
+
   const bodyTextSkeleton = (
     <Skeleton
       width="18rem"
@@ -63,7 +64,11 @@ export const MountPipette = (props: MountPipetteProps): JSX.Element => {
             {t('pipette_heavy', { weight: WEIGHT_OF_96_CHANNEL })}
           </Banner>
         ) : null}
-        <StyledText css={BODY_STYLE}> {t('hold_pipette_carefully')}</StyledText>
+        <StyledText css={BODY_STYLE}>
+          {isSingleMountPipette
+            ? t('align_the_connector')
+            : t('hold_pipette_carefully')}
+        </StyledText>
       </>
     )
   }

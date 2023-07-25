@@ -1,5 +1,5 @@
 """Defaults."""
-from typing import List
+from typing import Dict
 
 from .definition import (
     LiquidClassSettings,
@@ -20,7 +20,7 @@ _default_accel_p1000_ul_sec_sec = 24000
 _default_accel_96ch_ul_sec_sec = 16000
 
 # dispense settings are constant across volumes
-_dispense_defaults = {
+_dispense_defaults: Dict[int, Dict[int, Dict[int, Dict[int, DispenseSettings]]]] = {
     1: {
         50: {  # P50
             50: {  # T50
@@ -358,7 +358,7 @@ _dispense_defaults = {
     },
 }
 
-_aspirate_defaults = {
+_aspirate_defaults: Dict[int, Dict[int, Dict[int, Dict[int, AspirateSettings]]]] = {
     1: {
         50: {  # P50
             50: {  # T50
@@ -729,21 +729,3 @@ def get_liquid_class(
         return _get_interp_liq_class(defined_volumes[1], defined_volumes[2])
     else:
         return _build_liquid_class(defined_volumes[2])
-
-
-def get_test_volumes(pipette: int, channels: int, tip: int) -> List[float]:
-    """Get test volumes."""
-    if channels == 96:
-        if tip == 50:
-            return [5.0]
-        elif tip == 200:
-            return [200.0]
-        elif tip == 1000:
-            return [1000.0]
-        else:
-            raise ValueError(f"no volumes to test for tip size: {tip} uL")
-    else:
-        # FIXME: also reduce total number of volumes we test for 1ch & 8ch pipettes
-        aspirate_cls_per_volume = _aspirate_defaults[channels][pipette][tip]
-        defined_volumes = list(aspirate_cls_per_volume.keys())
-        return [float(v) for v in defined_volumes]

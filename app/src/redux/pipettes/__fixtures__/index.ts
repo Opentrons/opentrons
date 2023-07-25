@@ -368,6 +368,7 @@ export const mockPipetteData8Channel: PipetteData = {
       last_modified: '2020-08-25T20:25',
     },
   },
+  firmwareVersion: '12',
   instrumentModel: 'p1000_multi_v3.0',
   instrumentName: 'p1000_multi_flex',
   instrumentType: 'pipette',

@@ -118,46 +118,56 @@ export const InstrumentInfo = (props: InstrumentInfoProps): JSX.Element => {
       height="100%"
     >
       {instrument != null && instrument.ok ? (
-        <Flex
-          flexDirection={DIRECTION_COLUMN}
-          gridGap={SPACING.spacing8}
-          marginTop={SPACING.spacing24}
-        >
-          <InfoItem
-            label={t('last_calibrated')}
-            value={
-              instrument.data.calibratedOffset?.last_modified != null
-                ? formatTimestamp(
-                    instrument.data.calibratedOffset?.last_modified
-                  )
-                : i18n.format(t('no_cal_data'), 'capitalize')
-            }
-          />
-          <InfoItem label={t('firmware_version')} value="TODO" />
-          <InfoItem
-            label={t('serial_number')}
-            value={instrument.serialNumber}
-          />
-        </Flex>
+        <>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            marginTop={SPACING.spacing24}
+          >
+            <InfoItem
+              label={t('last_calibrated')}
+              value={
+                instrument.data.calibratedOffset?.last_modified != null
+                  ? formatTimestamp(
+                      instrument.data.calibratedOffset?.last_modified
+                    )
+                  : i18n.format(t('no_cal_data'), 'capitalize')
+              }
+            />
+            {instrument.firmwareVersion != null && (
+              <InfoItem
+                label={t('firmware_version')}
+                value={instrument.firmwareVersion}
+              />
+            )}
+            <InfoItem
+              label={t('serial_number')}
+              value={instrument.serialNumber}
+            />
+          </Flex>
+          <Flex gridGap={SPACING.spacing8}>
+            <MediumButton
+              buttonType="secondary"
+              flex="1"
+              onClick={handleDetach}
+              buttonText={t('detach')}
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              justifyContent={JUSTIFY_CENTER}
+            />
+            <MediumButton
+              flex="1"
+              onClick={handleRecalibrate}
+              buttonText={
+                instrument.data.calibratedOffset?.last_modified == null
+                  ? t('calibrate')
+                  : t('recalibrate')
+              }
+              textTransform={TYPOGRAPHY.textTransformCapitalize}
+              justifyContent={JUSTIFY_CENTER}
+            />
+          </Flex>
+        </>
       ) : null}
-      <Flex gridGap={SPACING.spacing8}>
-        <MediumButton
-          buttonType="secondary"
-          flex="1"
-          onClick={handleDetach}
-          buttonText={t('detach')}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          justifyContent={JUSTIFY_CENTER}
-        />
-        <MediumButton
-          buttonType="primary"
-          flex="1"
-          onClick={handleRecalibrate}
-          buttonText={t('recalibrate')}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          justifyContent={JUSTIFY_CENTER}
-        />
-      </Flex>
       {wizardProps != null && 'mount' in wizardProps ? (
         <PipetteWizardFlows {...wizardProps} />
       ) : null}
