@@ -12,6 +12,7 @@ from . import helpers
 from . import report
 from hardware_testing.data import ui
 from hardware_testing.drivers import asair_sensor
+from .measurement.scale import Scale
 
 
 @dataclass
@@ -79,6 +80,7 @@ class TestResources:
     git_description: str
     tips: Dict[int, List[Well]]
     env_sensor: asair_sensor.AsairSensorBase
+    scale: Optional[Scale]
 
 
 def build_gravimetric_trials(
