@@ -10,7 +10,7 @@ import {
   SPACING,
   COLORS,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
+import { ApiHostProvider, useEstopQuery } from '@opentrons/react-api-client'
 
 import { useRobot, useSyncRobotClock } from '../../../organisms/Devices/hooks'
 import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
@@ -22,10 +22,15 @@ import { appShellRequestor } from '../../../redux/shell/remote'
 
 import type { DesktopRouteParams } from '../../../App/types'
 
+const ESTOP_STATUS_REFETCH_INTERVAL = 10000
+
 export function DeviceDetails(): JSX.Element | null {
   const { robotName } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
   const isScanning = useSelector(getScanning)
+  const { data: estopStatus } = useEstopQuery({
+    refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL,
+  })
 
   useSyncRobotClock(robotName)
 
@@ -47,7 +52,7 @@ export function DeviceDetails(): JSX.Element | null {
       >
         {/* EstopBanner here */}
         <Flex marginBottom={SPACING.spacing16}>
-          <EstopBanner />
+          <EstopBanner status={estopStatus?.data.status} />
         </Flex>
 
         <Flex
