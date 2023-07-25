@@ -2,7 +2,7 @@
 from json import load as json_load
 from pathlib import Path
 import argparse
-from typing import List, Union
+from typing import List, Union, Dict, Optional
 
 from opentrons.protocol_api import ProtocolContext
 
@@ -34,6 +34,7 @@ from .config import (
     get_tip_volumes_for_qc,
 )
 from .measurement import DELAY_FOR_MEASUREMENT
+from .measurement.scale import Scale
 from .trial import TestResources
 from .tips import get_tips
 from hardware_testing.drivers import asair_sensor
@@ -187,7 +188,15 @@ def build_photometric_cfg(
     )
 
 
-def _main(args: argparse.Namespace, _ctx: ProtocolContext) -> None:
+def _main(
+    args: argparse.Namespace,
+    _ctx: ProtocolContext,
+    env_sensor: asair_sensor.AsairSensorBase,
+    robot_serial: str,
+    operator_name: str,
+    tip_batch: str,
+    scale: Optional[Scale],
+) -> None:
     union_cfg: Union[PhotometricConfig, GravimetricConfig]
     if args.photometric:
         cfg_pm: PhotometricConfig = build_photometric_cfg(
@@ -247,12 +256,13 @@ def _main(args: argparse.Namespace, _ctx: ProtocolContext) -> None:
         test_volumes=test_volumes,
         run_id=run_id,
         start_time=start_time,
-        operator_name=helpers._get_operator_name(_ctx.is_simulating()),
-        robot_serial=helpers._get_robot_serial(_ctx.is_simulating()),
-        tip_batch=helpers._get_tip_batch(_ctx.is_simulating()),
+        operator_name=operator_name,
+        robot_serial=robot_serial,
+        tip_batch=tip_batch,
         git_description=get_git_description(),
         tips=get_tips(_ctx, pipette, args.tip, all_channels=all_channels_same_time),
-        env_sensor=asair_sensor.BuildAsairSensor(_ctx.is_simulating()),
+        env_sensor=env_sensor,
+        scale=scale,
     )
 
     if args.photometric:
@@ -317,14 +327,33 @@ if __name__ == "__main__":
         deck_version="2",
         extra_labware=custom_defs,
     )
+    env_sensor = asair_sensor.BuildAsairSensor(_ctx.is_simulating())
+    robot_serial = helpers._get_robot_serial(_ctx.is_simulating())
+    operator_name = helpers._get_operator_name(_ctx.is_simulating())
+    scale: Optional[Scale] = None
+    if not args.photometric:
+        scale = Scale.build(simulate=_ctx.is_simulating())
     if args.tip == 0:
-        for tip in get_tip_volumes_for_qc(
+        volumes: List[int] = get_tip_volumes_for_qc(
             args.pipette, args.channels, args.extra, args.photometric
-        ):
+        )
+        tip_batches: Dict[int, str] = {}
+        for tip in volumes:
+            tip_batches[tip] = helpers._get_tip_batch(_ctx.is_simulating(), tip)
+        for tip in volumes:
             hw = _ctx._core.get_hardware()
             if not _ctx.is_simulating():
                 ui.alert_user_ready(f"Ready to run with {tip}ul tip?", hw)
             args.tip = tip
-            _main(args, _ctx)
+            _main(
+                args,
+                _ctx,
+                env_sensor,
+                robot_serial,
+                operator_name,
+                tip_batches[tip],
+                scale,
+            )
     else:
-        _main(args, _ctx)
+        tip_batch = helpers._get_tip_batch(_ctx.is_simulating(), args.tip)
+        _main(args, _ctx, env_sensor, robot_serial, operator_name, tip_batch, scale)

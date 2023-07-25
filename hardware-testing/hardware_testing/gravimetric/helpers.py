@@ -208,9 +208,9 @@ def _calculate_stats(
     return average, cv, d
 
 
-def _get_tip_batch(is_simulating: bool) -> str:
+def _get_tip_batch(is_simulating: bool, tip: int) -> str:
     if not is_simulating:
-        return input("TIP BATCH:").strip()
+        return input(f"TIP BATCH for {tip}ul tips:").strip()
     else:
         return "simulation-tip-batch"
 

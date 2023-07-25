@@ -336,6 +336,7 @@ def _load_scale(
         "  1) Set profile to USER\n"
         "  2) Set screensaver to NONE\n"
     )
+    assert resources.scale is not None
     recorder = GravimetricRecorder(
         GravimetricRecorderConfig(
             test_name=cfg.name,
@@ -346,6 +347,7 @@ def _load_scale(
             frequency=1000 if resources.ctx.is_simulating() else 5,
             stable=False,
         ),
+        resources.scale,
         simulate=resources.ctx.is_simulating(),
     )
     ui.print_info(f'found scale "{recorder.serial_number}"')
