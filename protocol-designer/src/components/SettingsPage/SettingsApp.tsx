@@ -33,12 +33,8 @@ interface SP {
 }
 
 function SettingsAppComponent(props: Props): JSX.Element {
-  const {
-    canClearHintDismissals,
-    hasOptedIn,
-    restoreHints,
-    toggleOptedIn,
-  } = props
+  const { canClearHintDismissals, hasOptedIn, restoreHints, toggleOptedIn } =
+    props
   return (
     <>
       <div className={styles.page_row}>
@@ -88,7 +84,8 @@ function SettingsAppComponent(props: Props): JSX.Element {
             </div>
 
             <p className={styles.card_body}>
-              {i18n.t('card.body.reason_for_collecting_data')} {i18n.t('card.body.data_collected_is_internal')}.
+              {i18n.t('card.body.reason_for_collecting_data')}{' '}
+              {i18n.t('card.body.data_collected_is_internal')}.
             </p>
           </div>
         </Card>
