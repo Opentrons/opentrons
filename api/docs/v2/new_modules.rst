@@ -35,7 +35,7 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
             requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
 
             def run(protocol: protocol_api.ProtocolContext): 
-                # Load a Heater-Shaker in deck slot D1.
+                # Load a Heater-Shaker Module GEN1 in deck slot D1.
                 heater_shaker = protocol.load_module('heaterShakerModuleV1', "D1")
          
                 # Load a Temperature Module GEN2 in deck slot D3.
