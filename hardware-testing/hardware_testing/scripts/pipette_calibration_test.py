@@ -85,14 +85,8 @@ class Pipette_Calibration_Test:
         self.gauge_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
         self.mount = OT3Mount.LEFT if args.mount == "l" else OT3Mount.RIGHT
-        self.nominal_center = Point(*get_calibration_square_position_in_slot(self.slot))
-        if self.simulate:
-            self.pipette_id = "SIMULATION"
-        else:
-            self.pipette_id = self.api._pipette_handler.get_pipette(self.mount)._pipette_id
-        self.deck_definition = load("ot3_standard", version=3)
-        self.test_data["Slot"] = str(self.slot)
-        self.test_data["Pipette"] = str(self.pipette_id)
+        await self.deck_setup()
+        await self.pipette_setup()
         self.start_time = time.time()
         print(f"\nStarting Pipette Calibration Test!\n")
 
@@ -112,6 +106,19 @@ class Pipette_Calibration_Test:
         for key, value in self.gauge_ports.items():
             self.gauges[key] = mitutoyo_digimatic_indicator.Mitutoyo_Digimatic_Indicator(port=value)
             self.gauges[key].connect()
+
+    async def pipette_setup(self):
+        await self.api.cache_instruments()
+        if self.simulate:
+            self.pipette_id = "SIMULATION"
+        else:
+            self.pipette_id = self.api._pipette_handler.get_pipette(self.mount)._pipette_id
+        self.test_data["Pipette"] = str(self.pipette_id)
+
+    async def deck_setup(self):
+        self.deck_definition = load("ot3_standard", version=3)
+        self.nominal_center = Point(*get_calibration_square_position_in_slot(self.slot))
+        self.test_data["Slot"] = str(self.slot)
 
     def dict_keys_to_line(self, dict):
         return str.join(",", list(dict.keys()))+"\n"
@@ -232,7 +239,7 @@ class Pipette_Calibration_Test:
         self, api: OT3API, mount: OT3Mount
     ) -> None:
         # Home grantry
-        await home_ot3(api, self.axes)
+        await api.home(self.axes)
         self.home = await api.gantry_position(mount)
 
     async def exit(self):
