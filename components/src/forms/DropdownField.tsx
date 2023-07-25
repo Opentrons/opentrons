@@ -20,7 +20,7 @@ export interface DropdownFieldProps {
   /** blur handler */
   onBlur?: React.FocusEventHandler<HTMLSelectElement>
   /** value that is selected */
-  value?: string | null | undefined | string
+  value?: string | null | undefined
   /** optional id for the <select> element */
   id?: string
   /** name of field in form */

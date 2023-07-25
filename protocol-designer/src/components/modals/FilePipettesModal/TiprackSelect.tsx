@@ -38,7 +38,7 @@ export const TiprackSelect = (
             const updatedValues = selectedValues?.includes(option.value)
               ? selectedValues.filter(value => value !== option.value)
               : [...(selectedValues ?? []), option.value]
-            onSetFieldValue(nameAccessor, updatedValues)
+            onSetFieldValue(nameAccessor, updatedValues.slice(0, 3))
           }}
         />
       ))}

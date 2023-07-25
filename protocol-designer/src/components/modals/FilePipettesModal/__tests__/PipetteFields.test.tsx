@@ -20,6 +20,7 @@ import { PipetteDiagram } from '../PipetteDiagram'
 
 import type { ActionMeta } from 'react-select'
 import type { SelectOption } from '@opentrons/components'
+import { TiprackSelect } from '../TiprackSelect'
 
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/selectors')
@@ -95,25 +96,15 @@ describe('PipetteFields', () => {
     )
   }
 
-  it('renders a selection for left and right pipette with disabled tiprack select', () => {
+  it('renders a selection for left and right pipette with no tiprack select', () => {
     props.values.left = unselectedPipette
     props.values.right = unselectedPipette
 
     const wrapper = render(props)
 
     expect(wrapper.find(PipetteSelect)).toHaveLength(2)
-    expect(
-      wrapper
-        .find(DropdownField)
-        .filter({ name: leftTiprackKey })
-        .prop('disabled')
-    ).toBe(true)
-    expect(
-      wrapper
-        .find(DropdownField)
-        .filter({ name: rightTiprackKey })
-        .prop('disabled')
-    ).toBe(true)
+    expect(wrapper.find(TiprackSelect)).toHaveLength(2)
+    expect(wrapper.find(TiprackSelect)).toEqual({})
   })
 
   it('selects a pipette and clears tiprack fields that has been touched', () => {
@@ -134,35 +125,27 @@ describe('PipetteFields', () => {
     ])
   })
 
-  it('undisables tiprack selection when a pipette is selected', () => {
+  it('shows tiprack selection when a pipette is selected and selects the first option', () => {
     props.values.left.tiprackDefURI = ['']
 
     const wrapper = render(props)
 
-    expect(
-      wrapper
-        .find(DropdownField)
-        .filter({ name: leftTiprackKey })
-        .prop('disabled')
-    ).toBe(false)
+    const tiprackSelectValues = wrapper.find(TiprackSelect).at(0).prop('values')
+    expect(tiprackSelectValues).toEqual({
+      left: { pipetteName: 'p300', tiprackDefURI: [''] },
+      right: { pipetteName: 'p1000', tiprackDefURI: ['tiprack_1000'] },
+    })
   })
 
   it('selects a tiprack for the pipette', () => {
     props.values.left.tiprackDefURI = ['']
-    const event = {
-      target: {
-        name: leftTiprackKey,
-        value: 'tiprack_300',
-      },
-    }
-
     const wrapper = render(props)
-    const leftTiprackSelect = wrapper
-      .find(DropdownField)
-      .filter({ name: leftTiprackKey })
-    leftTiprackSelect.prop('onChange')(event as ChangeEvent<HTMLSelectElement>)
+    const leftTiprackSelect = wrapper.find(TiprackSelect).at(1)
+    leftTiprackSelect.prop(
+      'onSetFieldValue'
+    )('pipettesByMount.left.tiprackDefURI', ['tiprack_1000'])
 
-    expect(props.onFieldChange).toHaveBeenCalledWith(event)
+    expect(props.onSetFieldValue).toHaveBeenCalled()
   })
   it('displays pipette diagrams for selected pipettes', () => {
     const wrapper = render(props)

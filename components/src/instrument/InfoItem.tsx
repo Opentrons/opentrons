@@ -4,6 +4,7 @@ import styles from './instrument.css'
 export interface InfoItemProps {
   title: string | null
   value: string
+  className?: string
 }
 
 /**
@@ -11,12 +12,14 @@ export interface InfoItemProps {
  * But if you're using this, you probably want `LabeledValue` instead.
  */
 export function InfoItem(props: InfoItemProps): JSX.Element {
-  const { title, value } = props
+  const { title, value, className } = props
 
   return (
-    <div>
+    <div className={className}>
       {title != null ? <h2 className={styles.title}>{title}</h2> : null}
-      <span className={styles.value}>{value}</span>
+      <span className={styles.value} style={{ paddingBottom: '4px' }}>
+        {value}
+      </span>
     </div>
   )
 }
