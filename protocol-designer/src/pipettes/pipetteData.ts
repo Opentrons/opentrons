@@ -43,6 +43,7 @@ export function getPipetteCapacity(
   const tiprackDefs = pipetteEntity.tiprackLabwareDef
   const tipRackDefUri = tipRack?.split(':')[1]
   let chosenTipRack = null
+
   for (const def of tiprackDefs) {
     if (getLabwareDefURI(def) === tipRackDefUri) {
       chosenTipRack = def

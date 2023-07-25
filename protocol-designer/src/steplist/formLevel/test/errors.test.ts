@@ -5,11 +5,12 @@ describe('volumeTooHigh', () => {
   let fieldsWithPipette: any // this is any typed because HydratedFormData in formLevel/errors is any typed :(
   beforeEach(() => {
     fieldsWithPipette = {
+      tipRack: 'mockTiprack:fixture_tiprack_10_ul/1',
       pipette: {
         spec: {
           maxVolume: 10,
         },
-        tiprackLabwareDef: { ...fixture_tiprack_10_ul }, // max tip volume is 10 ul
+        tiprackLabwareDef: [{ ...fixture_tiprack_10_ul }], // max tip volume is 10 ul
       },
     }
   })

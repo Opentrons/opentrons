@@ -22,7 +22,7 @@ describe('utils', () => {
       pipetteEntities = {
         p300_single: {
           spec: fixtureP300Single,
-          tiprackLabwareDef: fixtureTiprack300ul,
+          tiprackLabwareDef: [fixtureTiprack300ul],
         },
       } as any
     })

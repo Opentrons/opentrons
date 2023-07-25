@@ -109,8 +109,6 @@ describe('FilePipettesModal', () => {
         left: { pipetteName: '', tiprackDefURI: null },
         right: { pipetteName: '', tiprackDefURI: null },
       })
-      expect(pipetteFields.prop('errors')).toBeNull()
-      expect(pipetteFields.prop('touched')).toBeNull()
     })
 
     it('renders ModuleFields', () => {

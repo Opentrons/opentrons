@@ -1,18 +1,24 @@
 import * as React from 'react'
 import { mount, ReactWrapper } from 'enzyme'
 import { Provider } from 'react-redux'
-import { MixForm } from '../MixForm'
-import { AspDispSection } from '../AspDispSection'
 import * as stepFormSelectors from '../../../../step-forms/selectors'
+import { getTiprackOptions } from '../../../../ui/labware/selectors'
 import { FormData } from '../../../../form-types'
 import { WellOrderField } from '../../fields'
+import { MixForm } from '../MixForm'
+import { AspDispSection } from '../AspDispSection'
 
 const { DelayFields } = jest.requireActual('../../fields')
 
 jest.mock('../../../../step-forms/selectors')
+jest.mock('../../../../ui/labware/selectors')
 
 const getUnsavedFormMock = stepFormSelectors.getUnsavedForm as jest.MockedFunction<
   typeof stepFormSelectors.getUnsavedForm
+>
+
+const mockGetTiprackOptions = getTiprackOptions as jest.MockedFunction<
+  typeof getTiprackOptions
 >
 
 jest.mock('../../fields/', () => {
@@ -28,6 +34,7 @@ jest.mock('../../fields/', () => {
     TipPositionField: () => <div></div>,
     WellOrderField: () => <div></div>,
     WellSelectionField: () => <div></div>,
+    TiprackField: () => <div></div>,
   }
 })
 
@@ -56,7 +63,9 @@ describe('MixForm', () => {
     getUnsavedFormMock.mockReturnValue({
       stepType: 'mix',
     } as FormData)
-
+    mockGetTiprackOptions.mockReturnValue([
+      { name: 'mockName', value: 'mockValue' },
+    ])
     props = {
       formData: {
         stepType: 'mix',
@@ -94,6 +103,15 @@ describe('MixForm', () => {
           errorToShow: null,
           disabled: false,
           name: 'mix_wellOrder_second',
+          updateValue: jest.fn() as any,
+          value: null,
+        },
+        tipRack: {
+          onFieldFocus: jest.fn() as any,
+          onFieldBlur: jest.fn() as any,
+          errorToShow: null,
+          disabled: false,
+          name: 'tipRack',
           updateValue: jest.fn() as any,
           value: null,
         },
