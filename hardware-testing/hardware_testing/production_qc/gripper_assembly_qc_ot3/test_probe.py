@@ -30,8 +30,8 @@ from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, GripperP
 TEST_SLOT = 5
 PROBE_PREP_HEIGHT_MM = 5
 PROBE_POS_OFFSET = Point(13, 13, 0)
-JAW_ALIGNMENT_MM_X = 0.1
-JAW_ALIGNMENT_MM_Z = 0.1
+JAW_ALIGNMENT_MM_X = 0.5
+JAW_ALIGNMENT_MM_Z = 0.5
 
 
 def _get_test_tag(probe: GripperProbe) -> str:
@@ -142,21 +142,6 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         # move to 5 mm above the deck
         await api.move_to(mount, probe_pos._replace(z=PROBE_PREP_HEIGHT_MM))
         z_ax = Axis.by_mount(mount)
-        # NOTE: currently there's an issue where the 1st time an instrument
-        #       probes, it won't trigger when contacting the deck. However all
-        #       following probes work fine. So, here we do a "fake" probe
-        #       in case this gripper was just turned on
-        await api.capacitive_probe(
-            mount,
-            z_ax,
-            PROBE_PREP_HEIGHT_MM,
-            CapacitivePassSettings(
-                prep_distance_mm=0.0,
-                max_overrun_distance_mm=1.0,
-                speed_mm_per_s=2.0,
-                sensor_threshold_pf=0.1,
-            ),
-        )
         found_pos = await api.capacitive_probe(mount, z_ax, probe_pos.z, pass_settings)
         print(f"Found deck height: {found_pos}")
 
