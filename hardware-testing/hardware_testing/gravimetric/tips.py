@@ -44,15 +44,10 @@ CHANNEL_TO_TIP_ROW_LOOKUP = {  # zero indexed
     6: "B",
     7: "A",
 }
-CHANNEL_TO_SLOT_ROW_LOOKUP = {  # zero indexed
-    0: "B",
-    1: "B",
-    2: "B",
-    3: "B",
-    4: "C",
-    5: "C",
-    6: "C",
-    7: "C",
+VOLUME_TO_SLOT_LOOKUP = {
+    50: [2, 3],
+    200: [10, 8],
+    1000: [11, 9],
 }
 
 
@@ -76,14 +71,12 @@ def get_tips_for_single(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
 
 
 def get_tips_for_individual_channel_on_multi(
-    ctx: ProtocolContext, channel: int
+    ctx: ProtocolContext, channel: int, tip_volume: int
 ) -> List[Well]:
     """Get tips for a multi's channel."""
     racks = _get_racks(ctx)
-    slot_row = CHANNEL_TO_SLOT_ROW_LOOKUP[channel]
     tip_row = CHANNEL_TO_TIP_ROW_LOOKUP[channel]
-    # FIXME: need custom deck to support 3x racks horizontally
-    slots = [5, 6] if slot_row == "B" else [8, 9]
+    slots = VOLUME_TO_SLOT_LOOKUP[tip_volume]
     tips = [
         tip
         for slot in slots
@@ -119,7 +112,9 @@ def get_tips(
             return {0: get_tips_for_all_channels_on_multi(ctx)}
         else:
             return {
-                channel: get_tips_for_individual_channel_on_multi(ctx, channel)
+                channel: get_tips_for_individual_channel_on_multi(
+                    ctx, channel, tip_volume
+                )
                 for channel in range(pipette.channels)
             }
     elif pipette.channels == 96:

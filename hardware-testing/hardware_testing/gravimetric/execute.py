@@ -427,8 +427,8 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     labware_on_scale = _load_labware(resources.ctx, cfg)
     liquid_tracker = LiquidTracker(resources.ctx)
 
-    total_tips = len(
-        [tip for chnl_tips in resources.tips.values() for tip in chnl_tips]
+    total_tips = (
+        len([tip for chnl_tips in resources.tips.values() for tip in chnl_tips]) + 1
     )
     channels_to_test = _get_test_channels(cfg)
     for channel in channels_to_test:
@@ -454,7 +454,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         ui.print_info("homing...")
         resources.ctx.home()
         resources.pipette.home_plunger()
-        first_tip = resources.tips[0][0]
+        first_tip = resources.tips[0][-1]
         setup_channel_offset = _get_channel_offset(cfg, channel=0)
         first_tip_location = first_tip.top().move(setup_channel_offset)
         _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
