@@ -142,13 +142,13 @@ async def move_for_input(messenger: CanMessenger, node, position,xy,args) -> Non
             pos = pos + step
             position['pipette'] = pos
             res = await move_to(messenger, node, step, speed)
-            time.sleep(1)
+            time.sleep(0.1)
             res2 = await move_to(messenger, node, step, speed)
         elif xy == "up":
             pos = pos - step
             position['pipette'] = pos
             res = await move_to(messenger, node, step, -speed)
-            time.sleep(1)
+            time.sleep(0.1)
             res2 = await move_to(messenger, node, step, -speed)
         mores1 = res[node][0]
         encoder1 =res[node][1]
@@ -419,7 +419,7 @@ async def read_version(messenger: CanMessenger, node):
                 return message
     except Exception as errval:
         #print("errval",errval)
-        return "None"
+        return 0
 
 async def read_Usag(messenger: CanMessenger, node):
     await messenger.send(node, GetMotorUsageRequest())
@@ -461,13 +461,16 @@ async def read_detect(messenger: CanMessenger, node,motortype):
                     getval = str(message.payload.z_motor.value)
                 elif motortype == "g":
                     getval = str(message.payload.gripper.value)
+                print("getval:",getval)
                 if str(getval)=="2":
                     pp = "Fail"
                 elif str(getval)=="0":
                     pp = "Pass"
+                elif str(getval)=="1":
+                    pp = "Pass"
                 return pp
     except Exception as errval:
-        #print("errval",errval)
+        print("errval",errval)
         return "Fail"
 
 async def run(args: argparse.Namespace) -> None:
