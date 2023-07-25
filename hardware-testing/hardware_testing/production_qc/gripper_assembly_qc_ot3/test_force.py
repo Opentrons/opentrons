@@ -90,9 +90,7 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
             force_data_types = [float] * FORCE_GAUGE_TRIAL_SAMPLE_COUNT
             lines.append(CSVLine(f"{tag}-data", force_data_types))
             lines.append(CSVLine(f"{tag}-average", [float]))
-            lines.append(CSVLine(f"{tag}-target", [float]))
-            lines.append(CSVLine(f"{tag}-pass-%", [float]))
-            lines.append(CSVLine(f"{tag}-result", [CSVResult]))
+            lines.append(CSVLine(f"{tag}-duty-cycle", [float]))
     return lines
 
 
@@ -181,9 +179,12 @@ async def run_increment(api: OT3API, report: CSVReport, section: str) -> None:
             )
             actual_forces = await _grip_and_read_forces(api, gauge, duty=duty_cycle)
             print(actual_forces)
+            avg_force = sum(actual_forces) / len(actual_forces)
+            print(f"average = {round(avg_force, 2)} N")
             tag = _get_test_tag(trial, duty_cycle=duty_cycle)
-            report_data = [duty_cycle] + actual_forces  # type: ignore[operator]
-            report(section, tag, report_data)
+            report(section, f"{tag}-data", actual_forces)
+            report(section, f"{tag}-average", [avg_force])
+            report(section, f"{tag}-duty-cycle", [duty_cycle])
 
     print("done")
     await api.retract(OT3Mount.GRIPPER)
@@ -211,9 +212,6 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             )
             # store all data in CSV
             tag = _get_test_tag(trial, newtons=expected_force)
-            report_data = (
-                [expected_force] + actual_forces + [result]  # type: ignore[operator,list-item]
-            )
             report(section, f"{tag}-data", actual_forces)
             report(section, f"{tag}-average", [avg_force])
             report(section, f"{tag}-target", [expected_force])

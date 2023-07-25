@@ -76,9 +76,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         if _cache_error and not _error_when_gripping_itself:
             _error_when_gripping_itself = _width_error
         _width_error_adjusted = _width_error - _error_when_gripping_itself
-        result = CSVResult.from_bool(
-            abs(_width_error_adjusted) <= FAILURE_THRESHOLD_MM
-        )
+        result = CSVResult.from_bool(abs(_width_error_adjusted) <= FAILURE_THRESHOLD_MM)
         tag = _get_test_tag(_width, _force)
         print(f"{tag}-width-error: {_width_error}")
         print(f"{tag}-width-error-adjusted: {_width_error_adjusted}")

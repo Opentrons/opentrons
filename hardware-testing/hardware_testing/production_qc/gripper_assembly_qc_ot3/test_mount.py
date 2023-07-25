@@ -116,7 +116,12 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 target_z=home_pos.z,
                 include_pass_fail=include_pass_fail,
             )
-            await api.move_rel(mount, Point(z=-Z_AXIS_TRAVEL_DISTANCE), speed=speed, _expect_stalls=True)
+            await api.move_rel(
+                mount,
+                Point(z=-Z_AXIS_TRAVEL_DISTANCE),
+                speed=speed,
+                _expect_stalls=True,
+            )
             down_end_passed = await _save_result(
                 _get_test_tag(current, speed, "down", "end"),
                 target_z=home_pos.z - Z_AXIS_TRAVEL_DISTANCE,
@@ -130,7 +135,12 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                     target_z=home_pos.z - Z_AXIS_TRAVEL_DISTANCE,
                     include_pass_fail=include_pass_fail,
                 )
-                await api.move_rel(mount, Point(z=Z_AXIS_TRAVEL_DISTANCE), speed=speed, _expect_stalls=True)
+                await api.move_rel(
+                    mount,
+                    Point(z=Z_AXIS_TRAVEL_DISTANCE),
+                    speed=speed,
+                    _expect_stalls=True,
+                )
                 up_end_passed = await _save_result(
                     _get_test_tag(current, speed, "up", "end"),
                     target_z=home_pos.z,
