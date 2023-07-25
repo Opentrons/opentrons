@@ -56,6 +56,8 @@ from opentrons_hardware.hardware_control.motion import (
 )
 from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 
+from opentrons_hardware.hardware_control.constants import interrupts_per_sec
+
 GRIPPER_JAW_HOME_TIME: float = 10
 GRIPPER_JAW_GRIP_TIME: float = 10
 
@@ -406,6 +408,8 @@ def create_tip_action_group(
     for move in moves:
         unit_vector = move.unit_vector
         for block in move.blocks:
+            if block.time < (3.0 / interrupts_per_sec):
+                continue
             velocities = unit_vector_multiplication(unit_vector, block.initial_speed)
             accelerations = unit_vector_multiplication(unit_vector, block.acceleration)
             step = create_tip_action_step(

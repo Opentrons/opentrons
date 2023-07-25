@@ -17,8 +17,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MotorPositionResponse,
     UpdateMotorPositionEstimationRequest,
     UpdateMotorPositionEstimationResponse,
-    UpdateGearMotorPositionEstimationRequest,
-    UpdateGearMotorPositionEstimationResponse,
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
@@ -100,7 +98,7 @@ async def _parser_update_motor_position_response(
         node = NodeId(arb_id.parts.originating_node_id)
         if node == expected:
             return (
-                float(response.payload.current_position.value) / 1000.0,
+                float(response.payload.current_position.value / 1000.0),
                 float(response.payload.encoder_position.value) / 1000.0,
                 bool(
                     response.payload.position_flags.value
@@ -161,62 +159,3 @@ async def update_motor_position_estimation(
                 )
 
     return data
-
-
-async def update_gear_motor_position_estimation(
-    can_messenger: CanMessenger, timeout: float = 1.0
-) -> Tuple[float, bool]:
-    """Updates the estimation of motor position on selected nodes.
-
-    Request node to update motor position from its encoder and respond
-    with updated motor and encoder status.
-    """
-
-    def _listener_filter(arbitration_id: ArbitrationId) -> bool:
-        return (
-            NodeId(arbitration_id.parts.originating_node_id) in {NodeId.pipette_left}
-        ) and (
-            MessageId(arbitration_id.parts.message_id)
-            in [
-                UpdateGearMotorPositionEstimationResponse.message_id,
-            ]
-        )
-
-    data = []
-
-    with MultipleMessagesWaitableCallback(
-        can_messenger,
-        _listener_filter,
-        2,
-    ) as reader:
-        await can_messenger.send(
-            node_id=NodeId.pipette_left,
-            message=UpdateGearMotorPositionEstimationRequest(),
-        )
-        try:
-            response = await asyncio.wait_for(
-                _parser_update_gear_motor_position_response(
-                    reader, NodeId.pipette_left
-                ),
-                timeout,
-            )
-            data.append(response)
-        except asyncio.TimeoutError:
-            log.warning("Update motor position estimation timed out")
-            return 0, False
-
-    return data[0]
-
-
-async def _parser_update_gear_motor_position_response(
-    reader: WaitableCallback, expected: NodeId
-) -> Tuple[float, bool]:
-    async for response, arb_id in reader:
-        if isinstance(response, UpdateGearMotorPositionEstimationResponse):
-            node = NodeId(arb_id.parts.originating_node_id)
-            if node == expected:
-                return (
-                    float(response.payload.current_position_um.value / 1000.0),
-                    bool(MotorPositionFlags.stepper_position_ok.value),
-                )
-    raise StopAsyncIteration

@@ -1359,7 +1359,7 @@ async def test_pick_up_tip_full_tiprack(
     with patch.object(
         backend, "tip_action", AsyncMock(spec=backend.tip_action)
     ) as tip_action:
-
+        backend._gear_motor_position = {NodeId: 0}
         pipette_handler.plan_check_pick_up_tip.return_value = (
             PickUpTipSpec(
                 plunger_prep_pos=0,
@@ -1428,6 +1428,7 @@ async def test_drop_tip_full_tiprack(
     with patch.object(
         backend, "tip_action", AsyncMock(spec=backend.tip_action)
     ) as tip_action:
+        backend._gear_motor_position = {NodeId.pipette_left: 0}
         pipette_handler.plan_check_drop_tip.return_value = (
             DropTipSpec(
                 drop_moves=[
@@ -1466,7 +1467,6 @@ async def test_drop_tip_full_tiprack(
         await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
-
         # first call should be "clamp", moving down
         assert tip_action.call_args_list[0][-1]["tip_action"] == "clamp"
         assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}

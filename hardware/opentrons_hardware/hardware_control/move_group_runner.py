@@ -173,21 +173,31 @@ class MoveGroupRunner:
         position: NodeDict[
             List[Tuple[Tuple[int, int], float, float, bool, bool]]
         ] = defaultdict(list)
+        gear_motor_position: NodeDict[
+            List[Tuple[Tuple[int, int], float, float, bool, bool]]
+        ] = defaultdict(list)
         for arbid, completion in completions:
             if isinstance(completion, TipActionResponse):
-                gear_position_response = (
-                    float(completion.payload.current_position_um.value) / 1000.0,
-                    float(completion.payload.encoder_position_um.value) / 1000.0,
-                    bool(
-                        completion.payload.position_flags.value
-                        & MotorPositionFlags.stepper_position_ok.value
-                    ),
-                    bool(
-                        completion.payload.position_flags.value
-                        & MotorPositionFlags.encoder_position_ok.value
-                    ),
+                # if any completions are TipActionResponses, separate them from the 'positions'
+                # dict so the left pipette's position doesn't get overwritten
+                gear_motor_position[NodeId(arbid.parts.originating_node_id)].append(
+                    (
+                        (
+                            completion.payload.group_id.value,
+                            completion.payload.seq_id.value,
+                        ),
+                        float(completion.payload.current_position_um.value) / 1000.0,
+                        float(completion.payload.encoder_position_um.value) / 1000.0,
+                        bool(
+                            completion.payload.position_flags.value
+                            & MotorPositionFlags.stepper_position_ok.value
+                        ),
+                        bool(
+                            completion.payload.position_flags.value
+                            & MotorPositionFlags.encoder_position_ok.value
+                        ),
+                    )
                 )
-                return {arbid.parts.originating_node_id: gear_position_response}
             else:
                 position[NodeId(arbid.parts.originating_node_id)].append(
                     (
@@ -209,6 +219,17 @@ class MoveGroupRunner:
                 )
         # for each node, pull the position from the completion with the largest
         # combination of group id and sequence id
+        if any(gear_motor_position):
+            return {
+                node: next(
+                    reversed(
+                        sorted(
+                            poslist, key=lambda position_element: position_element[0]
+                        )
+                    )
+                )[1:]
+                for node, poslist in gear_motor_position.items()
+            }
         return {
             node: next(
                 reversed(

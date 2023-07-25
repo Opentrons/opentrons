@@ -80,7 +80,6 @@ from opentrons_hardware.hardware_control.motor_enable_disable import (
 from opentrons_hardware.hardware_control.motor_position_status import (
     get_motor_position,
     update_motor_position_estimation,
-    update_gear_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
 from opentrons_hardware.hardware_control.tip_presence import get_tip_ejector_state
@@ -360,13 +359,6 @@ class OT3Controller:
         assert len(motor_nodes)
         response = await get_motor_position(self._messenger, motor_nodes)
         self._handle_motor_status_response(response)
-
-    async def update_gear_motor_position(self) -> None:
-        motor_response = await update_gear_motor_position_estimation(self._messenger)
-        updated_successfully = motor_response[1]
-        # update position only if updated successfully by the firmware
-        if updated_successfully:
-            self._gear_motor_position = {NodeId.pipette_left: motor_response[0]}
 
     async def update_motor_estimation(self, axes: Sequence[Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
@@ -653,7 +645,6 @@ class OT3Controller:
             self._gear_motor_position = {
                 NodeId.pipette_left: positions[NodeId.pipette_left][0]
             }
-            print(f"setting gear motor position to {positions[NodeId.pipette_left][0]}")
 
     @requires_update
     async def gripper_grip_jaw(
