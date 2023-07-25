@@ -503,6 +503,7 @@ export type ErrorType =
   | 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL'
   | 'HEATER_SHAKER_LATCH_CLOSED'
   | 'LABWARE_OFF_DECK'
+  | 'NO_TIP_SELECTED'
 
 export interface CommandCreatorError {
   message: string

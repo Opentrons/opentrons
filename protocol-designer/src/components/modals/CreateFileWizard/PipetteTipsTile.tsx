@@ -200,7 +200,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
               const updatedValues = selectedValues?.includes(o.value)
                 ? selectedValues.filter(value => value !== o.value)
                 : [...(selectedValues ?? []), o.value]
-              setFieldValue(nameAccessor, updatedValues)
+              setFieldValue(nameAccessor, updatedValues.slice(0, 3))
             }}
             width="21.75rem"
             minHeight="4rem"
@@ -262,7 +262,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
                     const updatedValues = selectedValues?.includes(o.value)
                       ? selectedValues.filter(value => value !== o.value)
                       : [...(selectedValues ?? []), o.value]
-                    setFieldValue(nameAccessor, updatedValues)
+                    setFieldValue(nameAccessor, updatedValues.slice(0, 3))
                   }}
                   width="21.75rem"
                   minHeight="4rem"

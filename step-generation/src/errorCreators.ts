@@ -12,6 +12,13 @@ export function insufficientTips(): CommandCreatorError {
   }
 }
 
+export function noTipSelected(): CommandCreatorError {
+  return {
+    type: 'NO_TIP_SELECTED',
+    message: 'No tips were selected for this step',
+  }
+}
+
 export function noTipOnPipette(args: {
   actionName: string
   pipette: string

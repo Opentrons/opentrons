@@ -35,6 +35,8 @@ export function TiprackOption(props: TiprackOptionProps): JSX.Element {
         size="1.25rem"
         name={isSelected ? 'checkbox-marked' : 'checkbox-blank-outline'}
       />
+      {/* note: fontSize 12 isn't in the design system but it is to match
+    other font sizes in the modal this is in **/}
       <Text fontSize="12px">{text}</Text>
     </Flex>
   )
