@@ -620,7 +620,7 @@ Heating and shaking operations are controlled independently, and are treated dif
 Blocking commands
 -----------------
 
-Here is an example of how to use a blocking command and shake a sample for one minute. No other commands will execute until a minute has elapsed. For example, the three commands in this code sample start the shake, wait for one minute, and then stop the shake::
+Here is how to use a blocking command and shake a sample for one minute. No other commands will execute until a minute has elapsed. The three commands in this example start the shake, wait for one minute, and then stop the shake::
 
     hs_mod.set_and_wait_for_shake_speed(500)
     protocol.delay(minutes=1)
