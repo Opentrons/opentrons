@@ -8,14 +8,14 @@ from typing_extensions import Literal
 # Needed for Int Comparison. Keeping it next to
 # the Literal type for ease of readability
 PipetteModelMajorVersion = [1, 2, 3]
-PipetteModelMinorVersion = [0, 1, 2, 3, 4, 5]
+PipetteModelMinorVersion = [0, 1, 2, 3, 4, 5, 6]
 
 # TODO Literals are only good for writing down
 # exact values. Is there a better typing mechanism
 # so we don't need to keep track of versions in two
 # different places?
 PipetteModelMajorVersionType = Literal[1, 2, 3]
-PipetteModelMinorVersionType = Literal[0, 1, 2, 3, 4, 5]
+PipetteModelMinorVersionType = Literal[0, 1, 2, 3, 4, 5, 6]
 
 
 class PipetteTipType(enum.Enum):
