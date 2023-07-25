@@ -322,7 +322,8 @@ if __name__ == "__main__":
             args.pipette, args.channels, args.extra, args.photometric
         ):
             hw = _ctx._core.get_hardware()
-            ui.alert_user_ready(f"Ready to run with {tip}ul tip?", hw)
+            if not _ctx.is_simulating():
+                ui.alert_user_ready(f"Ready to run with {tip}ul tip?", hw)
             args.tip = tip
             _main(args, _ctx)
     else:
