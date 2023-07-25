@@ -706,13 +706,13 @@ Using Multiple Modules of the Same Type
 
 You can use multiple modules of the same type within a single protocol. The exception is the Thermocycler Module, which has only one :ref:`supported deck location <thermocycler-location>` due to its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and robot server. 
 
-To send commands to the correct module, load them in your protocol according to their USB port number. Your robot will use the module with the lowest USB port number before using a module with a higher USB port number. While you always need to specify a deck slot, deck location does not control which module gets used first. With multiple modules of the same type, the USB port number determines module load sequence, starting with the lowest number first.
+To send commands to the correct module, load them in your protocol according to their USB port number. Your robot will use the module with the lowest USB port number before using a module of the same type with a higher USB port number. And, even though the :py:meth:`~.ProtocolContext.load_labware` method requires a deck coordinate via the ``location`` argument, deck location does not control which module gets used first. With multiple modules of the same type, the USB port number determines module load sequence, starting with the lowest port number first.
 
 .. tabs::
   
   .. tab:: Flex
 
-    For example, when this protocol calls :py:meth:`.load_module`, the robot initializes ``temperature_module_1`` first because it's connected to USB port 2. ``temperature_module_2`` loads next because it's connected to USB port 6.
+    In this example, ``temperature_module_1`` loads first because it's connected to USB port 2. ``temperature_module_2`` loads next because it's connected to USB port 6.
 
     .. code-block:: python
       :substitutions:
@@ -723,19 +723,23 @@ To send commands to the correct module, load them in your protocol according to 
 
       def run(protocol: protocol_api.ProtocolContext):
         # Load Temperature Module 1 in deck slot D1 on USB port 2
-        temperature_module_1 = protocol.load_module('temperature module gen2',"D1")
+        temperature_module_1 = protocol.load_module(
+          load_name:'temperature module gen2',
+          location:"D1")
 
         # Load Temperature Module 2 in deck slot C1 on USB port 6
-        temperature_module_2 = protocol.load_module('temperature module gen2',"C1")
+        temperature_module_2 = protocol.load_module(
+          load_name:'temperature module gen2',
+          location:"C1")
         
-    Assuming there are no other modules used in this protocol, you could connect the USB cables as shown here:
+    Assuming there are no other modules used in this protocol, the Temperature Modules are connected as shown here:
 
     .. image:: ../img/modules/flex-usb-order.png
        :width: 400
 
   .. tab:: OT-2
 
-    For example, when this protocol calls :py:meth:`.load_module`, the robot initializes ``temperature_module_1`` first because it's connected to USB port 1. ``temperature_module_2`` loads next because it's connected to USB port 3.
+    In this example, ``temperature_module_1`` loads first because it's connected to USB port 1. ``temperature_module_2`` loads next because it's connected to USB port 3.
 
     .. code-block:: python
 
@@ -745,16 +749,19 @@ To send commands to the correct module, load them in your protocol according to 
 
       def run(protocol: protocol_api.ProtocolContext):
         # Load Temperature Module 1 in deck slot C1 on USB port 1
-        temperature_module_1 = protocol.load_module('temperature module gen2', "1")
+        temperature_module_1 = protocol.load_module(
+          load_name:'temperature module gen2',
+          location:"1")
 
         # Load Temperature Module 2 in deck slot D3 on USB port 2
-        temperature_module_2 = protocol.load_module('temperature module gen2', "3")
+        temperature_module_2 = protocol.load_module(
+          load_name: 'temperature module gen2',
+          location:"3")
         
-    Assuming there are no other modules used in this protocol, you could connect the USB cables as shown here:
+    Assuming there are no other modules used in this protocol, the Temperature Modules are connected as shown here:
     
     .. image:: ../img/modules/multiples_of_a_module.svg
 
-.. I don't understand this sentence. Can we remove it?
 
 Before running your protocol, it's a good idea to use the module controls in the Opentrons App to check that commands are being sent where you expect.
 
