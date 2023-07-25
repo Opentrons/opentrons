@@ -86,7 +86,6 @@ export function RunFailedModal({
             backgroundColor={COLORS.light1}
             borderRadius={BORDERS.borderRadiusSize3}
             padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
-            width={'100%'}
           >
             <Flex flexDirection={DIRECTION_COLUMN} css={SCROLL_BAR_STYLE}>
               <StyledText as="p" textAlign={TYPOGRAPHY.textAlignLeft}>
