@@ -2,8 +2,8 @@
 util.async_helpers - various utilities for asyncio functions and tasks.
 """
 
-from concurrent.futures import ThreadPoolExecutor
 from functools import wraps
+from threading import Thread
 from typing import (
     Any,
     AsyncContextManager,
@@ -149,12 +149,15 @@ def _run_loop_in_thread() -> Generator[asyncio.AbstractEventLoop, None, None]:
         # which can take care of these nuances for us.
         loop.close()
 
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        executor.submit(_in_thread)
-
-        loop_in_thread = loop_mailbox.get()
-
-        try:
-            yield loop_in_thread
-        finally:
-            loop_in_thread.call_soon_threadsafe(loop_in_thread.stop)
+    thread = Thread(
+        target=_in_thread,
+        daemon=True,
+        name=f"{__name__} event loop thread",
+    )
+    thread.start()
+    loop_in_thread = loop_mailbox.get()
+    try:
+        yield loop_in_thread
+    finally:
+        loop_in_thread.call_soon_threadsafe(loop_in_thread.stop)
+        thread.join()
