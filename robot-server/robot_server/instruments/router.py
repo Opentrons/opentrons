@@ -1,5 +1,5 @@
 """Instruments routes."""
-from typing import Optional, Dict, Iterator, TYPE_CHECKING, cast
+from typing import Optional, Dict, List, TYPE_CHECKING, cast
 
 from fastapi import APIRouter, status, Depends
 
@@ -138,7 +138,7 @@ def _bad_pipette_response(subsystem: SubSystem) -> BadPipette:
     )
 
 
-def _get_gripper_instrument_data(
+async def _get_gripper_instrument_data(
     hardware: "OT3API",
     attached_gripper: Optional[GripperDict],
 ) -> Optional[AttachedItem]:
@@ -182,16 +182,23 @@ async def _get_pipette_instrument_data(
 
 async def _get_instrument_data(
     hardware: "OT3API",
-) -> Iterator[AttachedItem]:
+) -> List[AttachedItem]:
     attached_pipettes = hardware.attached_pipettes
     attached_gripper = hardware.attached_gripper
-    for info in (
-        _get_pipette_instrument_data(hardware, attached_pipettes, Mount.LEFT),
-        _get_pipette_instrument_data(hardware, attached_pipettes, Mount.RIGHT),
-        _get_gripper_instrument_data(hardware, attached_gripper),
-    ):
+
+    pipette_left = await _get_pipette_instrument_data(
+        hardware, attached_pipettes, Mount.LEFT
+    )
+    pipette_right = await _get_pipette_instrument_data(
+        hardware, attached_pipettes, Mount.RIGHT
+    )
+    gripper = await _get_gripper_instrument_data(hardware, attached_gripper)
+
+    info_list = []
+    for info in (pipette_left, pipette_right, gripper):
         if info:
-            yield info
+            info_list.append(info)
+    return info_list
 
 
 async def _get_attached_instruments_ot3(
@@ -199,7 +206,7 @@ async def _get_attached_instruments_ot3(
 ) -> PydanticResponse[SimpleMultiBody[AttachedItem]]:
     # OT3
     await hardware.cache_instruments()
-    response_data = list(await _get_instrument_data(hardware))
+    response_data = await _get_instrument_data(hardware)
     return await PydanticResponse.create(
         content=SimpleMultiBody.construct(
             data=response_data,
