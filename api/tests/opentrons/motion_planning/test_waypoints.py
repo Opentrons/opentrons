@@ -2,8 +2,10 @@
 import pytest
 
 from opentrons.motion_planning.types import GripperMovementWaypointsWithJawStatus
-from opentrons.protocol_engine.types import LabwareMovementOffsetData, \
-    LabwareOffsetVector
+from opentrons.protocol_engine.types import (
+    LabwareMovementOffsetData,
+    LabwareOffsetVector,
+)
 from opentrons.types import Point
 from opentrons.hardware_control.types import CriticalPoint as CP
 
@@ -267,11 +269,13 @@ def test_get_gripper_labware_movement_waypoints() -> None:
     """It should get the correct waypoints for gripper movement."""
     result = get_gripper_labware_movement_waypoints(
         from_labware_center=Point(101, 102, 119.5),
-        to_labware_center=Point(201, 202, 219.5), gripper_home_z=999,
+        to_labware_center=Point(201, 202, 219.5),
+        gripper_home_z=999,
         offset_data=LabwareMovementOffsetData(
             pick_up_offset=LabwareOffsetVector(x=-1, y=-2, z=-3),
             drop_offset=LabwareOffsetVector(x=1, y=2, z=3),
-        ))
+        ),
+    )
     assert result == [
         # move to above "from" slot
         GripperMovementWaypointsWithJawStatus(Point(100, 100, 999), False),
@@ -284,5 +288,5 @@ def test_get_gripper_labware_movement_waypoints() -> None:
         # with labware gripped, move down to labware drop height on "to" slot
         GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 222.5), False),
         # ungrip labware and retract in place
-        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), True)
+        GripperMovementWaypointsWithJawStatus(Point(202.0, 204.0, 999), True),
     ]

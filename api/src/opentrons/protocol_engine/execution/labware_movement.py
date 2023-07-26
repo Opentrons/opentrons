@@ -1,13 +1,12 @@
 """Labware movement command handling."""
 from __future__ import annotations
 
-from typing import Optional, Union, List, TYPE_CHECKING
+from typing import Optional, Union, TYPE_CHECKING
 from opentrons_shared_data.gripper.constants import (
     LABWARE_GRIP_FORCE,
     IDLE_STATE_GRIP_FORCE,
 )
 
-from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.motion_planning import get_gripper_labware_movement_waypoints
@@ -31,7 +30,6 @@ from ..types import (
     ModuleLocation,
     OnLabwareLocation,
     LabwareLocation,
-    LabwareOffsetVector,
     LabwareMovementOffsetData,
 )
 
@@ -130,7 +128,7 @@ class LabwareMovementHandler:
                 from_labware_center=from_labware_center,
                 to_labware_center=to_labware_center,
                 gripper_home_z=gripper_homed_position.z,
-                offset_data=final_offsets
+                offset_data=final_offsets,
             )
 
             for waypoint_data in movement_waypoints:
@@ -138,9 +136,11 @@ class LabwareMovementHandler:
                     await ot3api.ungrip()
                 else:
                     await ot3api.grip(force_newtons=LABWARE_GRIP_FORCE)
-                await ot3api.move_to(mount=gripper_mount, abs_position=waypoint_data.position)
+                await ot3api.move_to(
+                    mount=gripper_mount, abs_position=waypoint_data.position
+                )
 
-            # Keep the gripper in gripped position so it avoids colliding with
+            # Keep the gripper in idly gripped position to avoid colliding with
             # things like the thermocycler latches
             await ot3api.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
 
