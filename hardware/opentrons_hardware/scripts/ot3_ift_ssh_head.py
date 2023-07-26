@@ -491,7 +491,9 @@ async def run(args: argparse.Namespace) -> None:
     elif args.node == "pipette_left":
         node = NodeId.pipette_left
     elif args.node == "pipette_right":
-        node = NodeId.pipette_right   
+        node = NodeId.pipette_right 
+    elif args.node == "gripper":
+        node = NodeId.gripper   
     elif args.node == "gripper_z":
         node = NodeId.gripper_z   
     elif args.node == "gripper_g":
