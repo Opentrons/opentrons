@@ -25,7 +25,8 @@ from ..types import (
     DeckType,
     CurrentWell,
     TipGeometry,
-    LabwareMovementOffsetData, ModuleModel,
+    LabwareMovementOffsetData,
+    ModuleModel,
 )
 from .config import Config
 from .labware import LabwareView
@@ -624,7 +625,7 @@ class GeometryView:
         self,
         from_location: LabwareLocation,
         to_location: LabwareLocation,
-        additional_offset_vector: LabwareMovementOffsetData = LabwareMovementOffsetData(),
+        additional_offset_vector: LabwareMovementOffsetData,
     ) -> LabwareMovementOffsetData:
         """Calculate the final labware offset vector to use in labware movement."""
         # TODO (fps, 2022-05-30): Update this once RLAB-295 is merged
@@ -636,14 +637,13 @@ class GeometryView:
         if isinstance(from_location, ModuleLocation):
             module_id = from_location.moduleId
             if (
-                    self._modules.get_connected_model(module_id)
-                    == ModuleModel.THERMOCYCLER_MODULE_V2
+                self._modules.get_connected_model(module_id)
+                == ModuleModel.THERMOCYCLER_MODULE_V2
             ):
                 pick_up_offset.z += _ADDITIONAL_TC2_PICKUP_OFFSET
 
         return LabwareMovementOffsetData(
-            pick_up_offset=pick_up_offset,
-            drop_offset=drop_offset
+            pick_up_offset=pick_up_offset, drop_offset=drop_offset
         )
 
     @staticmethod

@@ -20,14 +20,12 @@ from opentrons.protocol_engine.types import (
     DeckSlotLocation,
     ModuleLocation,
     OnLabwareLocation,
-    OFF_DECK_LOCATION,
     LabwareOffset,
     LabwareOffsetLocation,
     LabwareOffsetVector,
     LabwareLocation,
     NonStackedLocation,
     LabwareMovementOffsetData,
-    ModuleModel,
 )
 from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
     ThermocyclerPlateLifter,
@@ -94,8 +92,8 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
 def default_experimental_movement_data() -> LabwareMovementOffsetData:
     """Experimental movement data with default values."""
     return LabwareMovementOffsetData(
-        pick_up_offset=None,
-        drop_offset=None,
+        pick_up_offset=LabwareOffsetVector(x=0, y=0, z=0),
+        drop_offset=LabwareOffsetVector(x=0, y=0, z=0),
     )
 
 
@@ -126,28 +124,23 @@ def subject(
 #  1. Should write an acceptance test w/ real labware on ot3 deck.
 #  2. This test will be split once waypoints generation is moved to motion planning.
 @pytest.mark.parametrize(
-    argnames=["from_location", "to_location", "extra_pickup_offset"],
+    argnames=["from_location", "to_location"],
     argvalues=[
         (
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
-            0,
         ),
         (
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             ModuleLocation(moduleId="module-id"),
-            0,
         ),
         (
             OnLabwareLocation(labwareId="a-labware-id"),
             OnLabwareLocation(labwareId="another-labware-id"),
-            0,
         ),
         (
-            ModuleLocation(moduleId="tc2-id"),
+            ModuleLocation(moduleId="a-module-id"),
             DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
-            # This test picks up from a TC2, so it should pick up 3.5mm higher.
-            3.5,
         ),
     ],
 )
@@ -160,19 +153,31 @@ async def test_move_labware_with_gripper(
     subject: LabwareMovementHandler,
     from_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
     to_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
-    extra_pickup_offset: float,
 ) -> None:
     """It should perform a labware movement with gripper by delegating to OT3API."""
+    user_offset_data = LabwareMovementOffsetData(
+        pick_up_offset=LabwareOffsetVector(x=123, y=234, z=345),
+        drop_offset=LabwareOffsetVector(x=111, y=222, z=333),
+    )
+    final_offset_data = LabwareMovementOffsetData(
+        pick_up_offset=LabwareOffsetVector(x=-1, y=-2, z=-3),
+        drop_offset=LabwareOffsetVector(x=1, y=2, z=3),
+    )
+
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)
     decoy.when(ot3_hardware_api.has_gripper()).then_return(True)
-
-    decoy.when(state_store.modules.get_connected_model("tc2-id")).then_return(
-        ModuleModel.THERMOCYCLER_MODULE_V2
-    )
 
     decoy.when(
         await ot3_hardware_api.gantry_position(mount=OT3Mount.GRIPPER)
     ).then_return(Point(x=777, y=888, z=999))
+
+    decoy.when(
+        state_store.geometry.get_final_labware_movement_offset_vectors(
+            from_location=from_location,
+            to_location=to_location,
+            additional_offset_vector=user_offset_data,
+        )
+    ).then_return(final_offset_data)
 
     decoy.when(
         state_store.geometry.get_labware_center(
@@ -204,15 +209,11 @@ async def test_move_labware_with_gripper(
             vector=LabwareOffsetVector(x=0.5, y=0.6, z=0.7),
         )
     )
-    user_offset_data = LabwareMovementOffsetData(
-        pick_up_offset=LabwareOffsetVector(x=-1, y=-2, z=-3),
-        drop_offset=LabwareOffsetVector(x=1, y=2, z=3),
-    )
 
     expected_waypoints = [
         Point(777, 888, 999),  # gripper retract at current location
         Point(100, 100, 999),  # move to above slot 1
-        Point(100, 100, 116.5 + extra_pickup_offset),  # move to labware on slot 1
+        Point(100, 100, 116.5),  # move to labware on slot 1
         Point(100, 100, 999),  # gripper retract at current location
         Point(202.0, 204.0, 999),  # move to above slot 3
         Point(202.0, 204.0, 222.5),  # move down to labware drop height on slot 3
@@ -327,19 +328,6 @@ async def test_labware_movement_raises_without_gripper(
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
             user_offset_data=default_experimental_movement_data(),
         )
-
-
-def test_ensure_valid_gripper_location(subject: LabwareMovementHandler) -> None:
-    """It should validate on-deck gripper locations."""
-    slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
-    module_location = ModuleLocation(moduleId="dummy-module")
-    off_deck_location = OFF_DECK_LOCATION
-
-    assert subject.ensure_valid_gripper_location(slot_location) == slot_location
-    assert subject.ensure_valid_gripper_location(module_location) == module_location
-
-    with pytest.raises(LabwareMovementNotAllowedError):
-        subject.ensure_valid_gripper_location(off_deck_location)
 
 
 @pytest.mark.parametrize(

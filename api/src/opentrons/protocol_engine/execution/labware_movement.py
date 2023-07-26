@@ -12,7 +12,6 @@ from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, Axis
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-from opentrons.protocol_engine.types import ModuleModel
 
 from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
 from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
@@ -112,11 +111,13 @@ class LabwareMovementHandler:
         async with self._thermocycler_plate_lifter.lift_plate_for_labware_movement(
             labware_location=current_location
         ):
-            final_offsets = self._state_store.geometry.get_final_labware_movement_offset_vectors(
+            final_offsets = (
+                self._state_store.geometry.get_final_labware_movement_offset_vectors(
                     from_location=current_location,
                     to_location=new_location,
                     additional_offset_vector=user_offset_data,
                 )
+            )
 
             waypoints_to_labware = self._get_gripper_movement_waypoints(
                 labware_id=labware_id,

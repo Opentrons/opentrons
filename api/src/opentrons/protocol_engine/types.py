@@ -618,9 +618,8 @@ class LabwareMovementStrategy(str, Enum):
     MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
 
 
-@dataclass
-class LabwareMovementOffsetData:
+class LabwareMovementOffsetData(BaseModel):
     """Offsets to be used during labware movement."""
 
-    pick_up_offset: LabwareOffsetVector = LabwareOffsetVector(x=0, y=0, z=0)
-    drop_offset: LabwareOffsetVector = LabwareOffsetVector(x=0, y=0, z=0)
+    pick_up_offset: LabwareOffsetVector
+    drop_offset: LabwareOffsetVector
