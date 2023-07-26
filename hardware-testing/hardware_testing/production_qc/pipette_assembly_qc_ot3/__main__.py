@@ -121,6 +121,7 @@ class LabwareLocations:
     tip_rack_200: Optional[Point]
     tip_rack_50: Optional[Point]
     reservoir: Optional[Point]
+    plate: Optional[Point]
     fixture: Optional[Point]
 
 
@@ -132,6 +133,7 @@ IDEAL_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     tip_rack_200=None,
     tip_rack_50=None,
     reservoir=None,
+    plate=None,
     fixture=None,
 )
 CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
@@ -140,6 +142,7 @@ CALIBRATED_LABWARE_LOCATIONS: LabwareLocations = LabwareLocations(
     tip_rack_200=None,
     tip_rack_50=None,
     reservoir=None,
+    plate=None,
     fixture=None,
 )
 
@@ -211,6 +214,9 @@ def _get_ideal_labware_locations(
     reservoir_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_reservoir, "nest_1_reservoir_195ml"
     )
+    plate_loc_ideal = helpers_ot3.get_theoretical_a1_position(
+        test_config.slot_reservoir, "corning_96_wellplate_360ul_flat"
+    )
     # trash
     trash_loc_ideal = helpers_ot3.get_slot_calibration_square_position_ot3(
         test_config.slot_trash
@@ -231,6 +237,7 @@ def _get_ideal_labware_locations(
         tip_rack_200=tip_rack_200_loc_ideal,
         tip_rack_50=tip_rack_50_loc_ideal,
         reservoir=reservoir_loc_ideal,
+        plate=plate_loc_ideal + Point(z=5),  # give a few extra mm to help alignment
         trash=trash_loc_ideal,
         fixture=fixture_loc_ideal,
     )
@@ -327,7 +334,7 @@ async def _pick_up_tip_for_tip_volume(
         raise ValueError(f"unexpected tip volume: {tip_volume}")
 
 
-async def _move_to_liquid(api: OT3API, mount: OT3Mount) -> None:
+async def _move_to_reservoir_liquid(api: OT3API, mount: OT3Mount) -> None:
     CALIBRATED_LABWARE_LOCATIONS.reservoir = await _move_to_or_calibrate(
         api,
         mount,
@@ -336,15 +343,26 @@ async def _move_to_liquid(api: OT3API, mount: OT3Mount) -> None:
     )
 
 
-async def _move_to_above_liquid(api: OT3API, mount: OT3Mount, height_mm: float) -> None:
+async def _move_to_plate_liquid(api: OT3API, mount: OT3Mount) -> None:
+    CALIBRATED_LABWARE_LOCATIONS.plate = await _move_to_or_calibrate(
+        api,
+        mount,
+        IDEAL_LABWARE_LOCATIONS.plate,
+        CALIBRATED_LABWARE_LOCATIONS.plate,
+    )
+
+
+async def _move_to_above_plate_liquid(
+    api: OT3API, mount: OT3Mount, height_mm: float
+) -> None:
     assert (
-        CALIBRATED_LABWARE_LOCATIONS.reservoir
+        CALIBRATED_LABWARE_LOCATIONS.plate
     ), "you must calibrate the liquid before hovering"
     await _move_to_or_calibrate(
         api,
         mount,
-        IDEAL_LABWARE_LOCATIONS.reservoir,
-        CALIBRATED_LABWARE_LOCATIONS.reservoir + Point(z=height_mm),
+        IDEAL_LABWARE_LOCATIONS.plate,
+        CALIBRATED_LABWARE_LOCATIONS.plate + Point(z=height_mm),
     )
 
 
@@ -556,7 +574,7 @@ async def _test_for_leak(
         )
     else:
         await _pick_up_tip_for_tip_volume(api, mount, tip_volume=tip_volume)
-        await _move_to_liquid(api, mount)
+        await _move_to_reservoir_liquid(api, mount)
         test_passed = await _aspirate_and_look_for_droplets(
             api, mount, droplet_wait_seconds
         )
@@ -1124,19 +1142,19 @@ async def _test_liquid_probe(
     assert pip
     pip_vol = int(pip.working_volume)
     # force the operator to re-calibrate the liquid every time
-    CALIBRATED_LABWARE_LOCATIONS.reservoir = None
+    CALIBRATED_LABWARE_LOCATIONS.plate = None
     await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
-    await _move_to_liquid(api, mount)
+    await _move_to_plate_liquid(api, mount)
     await _drop_tip_in_trash(api, mount)
     trial_results: List[float] = []
     hover_mm = 3
     max_submerge_mm = -3
     max_z_distance_machine_coords = hover_mm - max_submerge_mm
-    assert CALIBRATED_LABWARE_LOCATIONS.reservoir is not None
-    target_z = CALIBRATED_LABWARE_LOCATIONS.reservoir.z
+    assert CALIBRATED_LABWARE_LOCATIONS.plate is not None
+    target_z = CALIBRATED_LABWARE_LOCATIONS.plate.z
     for trial in range(trials):
         await _pick_up_tip_for_tip_volume(api, mount, tip_volume)
-        await _move_to_above_liquid(api, mount, height_mm=hover_mm)
+        await _move_to_above_plate_liquid(api, mount, height_mm=hover_mm)
         start_pos = await api.gantry_position(mount)
         probe_cfg = PROBE_SETTINGS[pip_vol][tip_volume]
         probe_settings = LiquidProbeSettings(
@@ -1317,6 +1335,7 @@ async def _main(test_config: TestConfig) -> None:
             tip_rack_200=None,
             tip_rack_50=None,
             reservoir=None,
+            plate=None,
             fixture=None,
         )
 
