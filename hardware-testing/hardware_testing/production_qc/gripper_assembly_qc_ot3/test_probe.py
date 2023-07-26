@@ -5,7 +5,6 @@ from typing import List, Union, Tuple
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.sensors import sensor_driver, sensor_types
 
-from opentrons.config.types import CapacitivePassSettings
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.ot3_calibration import (
     calibrate_gripper,
