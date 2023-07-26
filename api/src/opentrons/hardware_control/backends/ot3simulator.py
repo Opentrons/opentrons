@@ -250,10 +250,6 @@ class OT3Simulator:
             )
 
     @ensure_yield
-    async def update_gear_motor_position(self) -> None:
-        return None
-
-    @ensure_yield
     async def home_gear_motors(
         self,
         distance: float,
