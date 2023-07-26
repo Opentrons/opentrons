@@ -1,5 +1,8 @@
 """Tests for motion planning module."""
 import pytest
+
+from opentrons.protocol_engine.types import LabwareMovementOffsetData, \
+    LabwareOffsetVector
 from opentrons.types import Point
 from opentrons.hardware_control.types import CriticalPoint as CP
 
@@ -9,6 +12,7 @@ from opentrons.motion_planning import (
     MoveType,
     DestinationOutOfBoundsError,
     ArcOutOfBoundsError,
+    get_gripper_labware_movement_waypoints,
 )
 
 
@@ -256,3 +260,24 @@ def test_get_waypoints_direct_moves_ignore_clearance_requirements() -> None:
     )
 
     assert result == [Waypoint(Point(1, 1, 5.5))]
+
+
+def test_get_gripper_labware_movement_waypoints() -> None:
+    """It should get the correct waypoints for gripper movement."""
+    result = get_gripper_labware_movement_waypoints(
+        from_labware_center=Point(101, 102, 119.5),
+        to_labware_center=Point(201, 202, 219.5),
+        gripper_home_z=999,
+        user_offset_data=LabwareMovementOffsetData(
+            pick_up_offset=LabwareOffsetVector(x=-1, y=-2, z=-3),
+            drop_offset=LabwareOffsetVector(x=1, y=2, z=3),
+        ),
+    )
+    assert result == [
+        Point(100, 100, 999),  # move to above slot 1
+        Point(100, 100, 116.5),  # move to labware on slot 1
+        # Point(100, 100, 999),  # gripper retract at current location
+        Point(202.0, 204.0, 999),  # move to above slot 3
+        Point(202.0, 204.0, 222.5),  # move down to labware drop height on slot 3
+        # Point(201.5, 202.6, 999),  # retract in place
+    ]

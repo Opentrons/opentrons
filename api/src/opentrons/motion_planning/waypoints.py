@@ -7,6 +7,7 @@ from opentrons.hardware_control.types import CriticalPoint
 
 from .types import Waypoint, MoveType
 from .errors import DestinationOutOfBoundsError, ArcOutOfBoundsError
+from ..protocol_engine.types import LabwareMovementOffsetData
 
 DEFAULT_GENERAL_ARC_Z_MARGIN: Final[float] = 10.0
 DEFAULT_IN_LABWARE_ARC_Z_MARGIN: Final[float] = 5.0
@@ -117,4 +118,34 @@ def get_waypoints(
 
     waypoints.append(dest_waypoint)
 
+    return waypoints
+
+
+def get_gripper_labware_movement_waypoints(
+    from_labware_center: Point,
+    to_labware_center: Point,
+    gripper_home_z: float,
+    user_offset_data: LabwareMovementOffsetData
+) -> List[Point]:
+    """Get waypoints for moving labware using a gripper."""
+    pick_up_offset = user_offset_data.pick_up_offset
+    drop_offset = user_offset_data.drop_offset
+
+    pick_up_location = from_labware_center + Point(
+        pick_up_offset.x, pick_up_offset.y,  pick_up_offset.z
+    )
+    drop_location = to_labware_center + Point(
+        drop_offset.x, drop_offset.y, drop_offset.z
+    )
+
+    waypoints: List[Point] = [
+        Point(pick_up_location.x, pick_up_location.y, gripper_home_z),
+        pick_up_location,
+        # Gripper grips the labware here and retracts the mount
+        # TODO (spp: 2023-07-26): to make the movement code a bit simpler, use
+        #  Point(pick_up_location.x, pick_up_location.y, gripper_home_z) here instead of
+        #  doing axis retraction/ homing
+        Point(drop_location.x, drop_location.y, gripper_home_z),
+        drop_location
+    ]
     return waypoints
