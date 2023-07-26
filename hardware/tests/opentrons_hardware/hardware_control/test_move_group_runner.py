@@ -1104,7 +1104,6 @@ def _build_arb(from_node: NodeId) -> ArbitrationId:
             },
         ),
         (
-            # tip action response, should not update position
             [
                 (
                     _build_arb(NodeId.pipette_left),

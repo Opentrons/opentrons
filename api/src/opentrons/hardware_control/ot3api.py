@@ -1682,11 +1682,11 @@ class OT3API(
                 pipette_spec.tiprack_down,
                 self._current_position,
             )
-            # check if position is known before pick up tip
             await self._move(target_down)
             homing_velocity = self._config.motion_settings.max_speed_discontinuity[
                 GantryLoad.HIGH_THROUGHPUT
             ][OT3AxisKind.Q]
+            # check if position is known before pick up tip
             if not any(self._backend.gear_motor_position):
                 # home gear motor if position not known
                 await self._backend.tip_action(
