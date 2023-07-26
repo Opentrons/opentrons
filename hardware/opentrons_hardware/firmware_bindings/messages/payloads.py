@@ -226,17 +226,6 @@ class MoveCompletedPayload(MoveGroupResponsePayload):
 
 
 @dataclass(eq=False)
-class GearMotorPositionResponse(MoveGroupResponsePayload):
-    """Read Gear Motor Position Estimation."""
-
-    seq_id: utils.UInt8Field
-    current_position_um: utils.UInt32Field
-    encoder_position_um: utils.Int32Field
-    position_flags: MotorPositionFlagsField
-    ack_id: utils.UInt8Field
-
-
-@dataclass(eq=False)
 class MotorPositionResponse(EmptyPayload):
     """Read Encoder Position."""
 

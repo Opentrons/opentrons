@@ -250,14 +250,6 @@ class OT3Simulator:
             )
 
     @ensure_yield
-    async def home_gear_motors(
-        self,
-        distance: float,
-        velocity: float,
-    ) -> None:
-        return None
-
-    @ensure_yield
     async def update_motor_estimation(self, axes: Sequence[Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         # Simulate conditions as if there are no stalls, aka do nothing
