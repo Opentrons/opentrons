@@ -26,9 +26,7 @@ NUM_DUTY_CYCLE_TRIALS = 20
 
 GRIP_FORCES_NEWTON: List[int] = [20, 15, 10, 5]
 NUM_NEWTONS_TRIALS = 1
-FAILURE_THRESHOLD_PERCENTAGE = (
-    10  # TODO: wait for PVT to decide on if this should be tightened or loosened
-)
+FAILURE_THRESHOLD_PERCENTAGES = [10, 10, 10, 20]
 
 WARMUP_SECONDS = 10
 
@@ -196,7 +194,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # LOOP THROUGH FORCES
     ui.print_header("MEASURE NEWTONS")
-    for expected_force in GRIP_FORCES_NEWTON:
+    for expected_force, allowed_percent_error in zip(
+        GRIP_FORCES_NEWTON, FAILURE_THRESHOLD_PERCENTAGES
+    ):
         for trial in range(NUM_NEWTONS_TRIALS):
             print(f"{expected_force}N - trial {trial + 1}/{NUM_NEWTONS_TRIALS}")
             actual_forces = await _grip_and_read_forces(
@@ -207,15 +207,13 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             avg_force = sum(actual_forces) / len(actual_forces)
             print(f"average = {round(avg_force, 2)} N")
             error = (avg_force - expected_force) / expected_force
-            result = CSVResult.from_bool(
-                abs(error) * 100 < FAILURE_THRESHOLD_PERCENTAGE
-            )
+            result = CSVResult.from_bool(abs(error) * 100 < allowed_percent_error)
             # store all data in CSV
             tag = _get_test_tag(trial, newtons=expected_force)
             report(section, f"{tag}-data", actual_forces)
             report(section, f"{tag}-average", [avg_force])
             report(section, f"{tag}-target", [expected_force])
-            report(section, f"{tag}-pass-%", [FAILURE_THRESHOLD_PERCENTAGE])
+            report(section, f"{tag}-pass-%", [allowed_percent_error])
             report(section, f"{tag}-result", [result])
 
     print("done")
