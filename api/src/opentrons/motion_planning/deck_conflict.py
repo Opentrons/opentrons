@@ -172,6 +172,7 @@ def check(
     existing_items: Mapping[int, DeckItem],
     new_item: DeckItem,
     new_location: int,
+    robot_type: str = "OT-2 Standard",
 ) -> None:
     """Check a deck layout for conflicts.
 
@@ -187,7 +188,9 @@ def check(
 
     # build restrictions driven by existing items
     for location, item in existing_items.items():
-        restrictions += _create_restrictions(item=item, location=location)
+        restrictions += _create_restrictions(
+            item=item, location=location, robot_type=robot_type
+        )
 
     # check new item against existing restrictions
     for r in restrictions:
@@ -198,7 +201,9 @@ def check(
 
     # check new restrictions required by new item
     # do not interfere with existing items
-    new_restrictions = _create_restrictions(item=new_item, location=new_location)
+    new_restrictions = _create_restrictions(
+        item=new_item, location=new_location, robot_type=robot_type
+    )
 
     for r in new_restrictions:
         existing_item = existing_items.get(r.location)
@@ -211,7 +216,9 @@ def check(
             )
 
 
-def _create_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction]:
+def _create_restrictions(
+    item: DeckItem, location: int, robot_type: str
+) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
 
     if location != _FIXED_TRASH_SLOT:
