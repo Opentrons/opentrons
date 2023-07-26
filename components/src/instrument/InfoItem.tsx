@@ -17,9 +17,7 @@ export function InfoItem(props: InfoItemProps): JSX.Element {
   return (
     <div className={className}>
       {title != null ? <h2 className={styles.title}>{title}</h2> : null}
-      <span className={styles.value} style={{ paddingBottom: '4px' }}>
-        {value}
-      </span>
+      <span className={styles.value}>{value}</span>
     </div>
   )
 }
