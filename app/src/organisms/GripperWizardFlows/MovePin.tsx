@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 import { LEFT } from '@opentrons/shared-data'
-import { COLORS } from '@opentrons/components'
+import { COLORS, TYPOGRAPHY } from '@opentrons/components'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
@@ -38,7 +38,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     frontJawOffset,
     createRunCommand,
     errorMessage,
-    setShowErrorMessage,
+    setErrorMessage,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
 
@@ -56,7 +56,10 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
         },
         waitUntilComplete: true,
       })
-        .then(() => {
+        .then(({ data }) => {
+          if (data.status === 'failed') {
+            setErrorMessage(data.error?.detail ?? null)
+          }
           createRunCommand({
             command: {
               // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
@@ -69,6 +72,9 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
             waitUntilComplete: true,
           })
             .then(({ data }) => {
+              if (data.status === 'failed') {
+                setErrorMessage(data.error?.detail ?? null)
+              }
               if (jaw === 'front' && data?.result?.jawOffset != null) {
                 setFrontJawOffset(data.result.jawOffset)
               }
@@ -82,14 +88,17 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                 },
                 waitUntilComplete: true,
               })
-                .then(() => {
+                .then(({ data }) => {
+                  if (data.status === 'failed') {
+                    setErrorMessage(data.error?.detail ?? null)
+                  }
                   proceed()
                 })
-                .catch(error => setShowErrorMessage(error.message))
+                .catch(error => setErrorMessage(error.message))
             })
-            .catch(error => setShowErrorMessage(error.message))
+            .catch(error => setErrorMessage(error.message))
         })
-        .catch(error => setShowErrorMessage(error.message))
+        .catch(error => setErrorMessage(error.message))
     }
   }
   const infoByMovement: {
@@ -203,8 +212,12 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
   if (isRobotMoving)
     return (
       <InProgressModal
-        description={inProgressText}
-        alternativeSpinner={inProgressImage}
+        description={
+          errorMessage == null
+            ? inProgressText
+            : t('shared:stand_back_robot_is_in_motion')
+        }
+        alternativeSpinner={errorMessage == null ? inProgressImage : undefined}
       />
     )
   return errorMessage != null ? (
@@ -212,7 +225,19 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
       isSuccess={false}
       iconColor={COLORS.errorEnabled}
       header={t('shared:error_encountered')}
-      subHeader={errorMessage}
+      subHeader={
+        <Trans
+          t={t}
+          i18nKey={'return_pin_error'}
+          values={{ error: errorMessage }}
+          components={{
+            block: <StyledText as="p" />,
+            bold: (
+              <StyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold} />
+            ),
+          }}
+        />
+      }
     />
   ) : (
     <GenericWizardTile

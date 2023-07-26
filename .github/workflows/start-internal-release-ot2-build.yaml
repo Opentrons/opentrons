@@ -1,0 +1,59 @@
+name: 'Start Internal-Release OT-2 build'
+on:
+  push:
+    branches:
+      - edge
+      - '*internal-release*'
+    tags:
+      - ot3@*
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - labeled
+
+jobs:
+  handle-push:
+    runs-on: 'ubuntu-latest'
+    if: github.event_name == 'push'
+    name: "Start an OT-2 build for a branch/tag push"
+    steps:
+      - name: 'start build'
+        uses: octokit/request-action@v2.x
+        env:
+          GITHUB_TOKEN: ${{ secrets.OT2_BUILD_CROSSREPO_ACCESS }}
+        with:
+          route: POST /repos/{owner}/{repo}/actions/workflows/{workflow-id}/dispatches
+          owner: opentrons
+          repo: buildroot
+          workflow-id: build.yml
+          ref: opentrons-develop
+          inputs: |
+            {
+              "buildroot-ref": "-",
+              "monorepo-ref": "${{ github.ref }}",
+              "infra-stage": "stage-prod"
+            }
+
+
+  handle-pr:
+    runs-on: 'ubuntu-latest'
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'Opentrons/opentrons' && contains(github.event.pull_request.labels.*.name, 'ot2-build')
+    name: "Start an OT-2 build for a requested PR"
+    steps:
+      - name: 'start build'
+        uses: octokit/request-action@v2.x
+        env:
+          GITHUB_TOKEN: ${{ secrets.OT2_BUILD_CROSSREPO_ACCESS }}
+        with:
+          route: POST /repos/{owner}/{repo}/actions/workflows/{workflow-id}/dispatches
+          owner: opentrons
+          repo: buildroot
+          workflow-id: build.yml
+          ref: opentrons-develop
+          inputs: |
+            {
+              "buildroot-ref": "-",
+              "monorepo-ref": "refs/heads/${{ github.head_ref }}",
+              "infra-stage": "stage-prod"
+            }

@@ -1,7 +1,6 @@
 import mock
 import pytest
 from decoy import Decoy
-from itertools import chain
 
 from contextlib import nullcontext as does_not_raise
 from typing import (
@@ -64,6 +63,7 @@ from opentrons_hardware.firmware_bindings.messages.messages import MessageDefini
 from opentrons_hardware.hardware_control.motion import (
     MoveType,
     MoveStopCondition,
+    MoveGroupSingleAxisStep,
 )
 from opentrons_hardware.hardware_control.types import PCBARevision
 from opentrons_hardware.hardware_control import current_settings
@@ -73,6 +73,7 @@ from opentrons_hardware.hardware_control.tools.types import (
     PipetteInformation,
     GripperInformation,
 )
+from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 
 
 @pytest.fixture
@@ -312,91 +313,107 @@ def move_group_run_side_effect(
 @pytest.mark.parametrize("axes", home_test_params)
 async def test_home_execute(
     controller: OT3Controller,
-    mock_move_group_run: mock.AsyncMock,
     axes: List[Axis],
     mock_present_devices: None,
 ) -> None:
-    mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
-    # nothing has been homed
-    assert not controller._motor_status
+    config = {"run.side_effect": move_group_run_side_effect(controller, axes)}
+    with mock.patch(  # type: ignore [call-overload]
+        "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
+        spec=mock.Mock(MoveGroupRunner),
+        **config
+    ) as mock_runner:
+        present_axes = set(ax for ax in axes if controller.axis_is_present(ax))
 
-    commanded_homes = set(axes)
-    await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
-    all_calls = list(chain([args[0][0] for args in mock_move_group_run.call_args_list]))
-    for command in all_calls:
-        for group in command._move_groups:
-            for node, step in group[0].items():
-                commanded_homes.remove(node_to_axis(node))
-                assert step.acceleration_mm_sec_sq == 0
-                assert step.move_type == MoveType.home
-                assert step.stop_condition == MoveStopCondition.limit_switch
-    assert not commanded_homes
+        # nothing has been homed
+        assert not controller._motor_status
+        await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
 
-    # all commanded axes have been homed
-    assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
-    assert controller.check_motor_status(axes)
+        all_groups = [
+            group
+            for arg in mock_runner.call_args_list
+            for group in arg.kwargs["move_groups"]
+        ]
+
+        actual_nodes_steps: Dict[Axis, List[MoveGroupSingleAxisStep]] = {
+            ax: [] for ax in axes
+        }
+        for group in all_groups:
+            for step in group:
+                for k, v in step.items():
+                    actual_nodes_steps[node_to_axis(k)].append(v)
+
+        # every single node will receive one home request and one backoff requests
+        for ax in present_axes:
+            assert len(actual_nodes_steps[ax]) == 2
+            home_request = filter(
+                lambda m: m.stop_condition == MoveStopCondition.limit_switch,
+                actual_nodes_steps[ax],
+            )
+            backoff_request = filter(
+                lambda m: m.stop_condition == MoveStopCondition.limit_switch_backoff,
+                actual_nodes_steps[ax],
+            )
+            assert len(list(home_request)) == 1
+            assert len(list(backoff_request)) == 1
+
+        # all commanded axes have been homed
+        assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
+        assert controller.check_motor_status(axes)
 
 
 @pytest.mark.parametrize("axes", home_test_params)
-async def test_home_prioritize_mount(
+async def test_home_gantry_order(
     controller: OT3Controller,
     mock_move_group_run: mock.AsyncMock,
     axes: List[Axis],
     mock_present_devices: None,
 ) -> None:
-    mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
-    # nothing has been homed
-    assert not controller._motor_status
+    with mock.patch(
+        "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
+        spec=mock.Mock(MoveGroupRunner),
+    ) as mock_runner:
+        controller._build_home_gantry_z_runner(axes, GantryLoad.LOW_THROUGHPUT)
+        has_mount = len(set(Axis.ot3_mount_axes()) & set(axes)) > 0
+        has_x = Axis.X in axes
+        has_y = Axis.Y in axes
+        if has_mount or has_x or has_y:
+            gantry_moves = mock_runner.call_args_list[0].kwargs["move_groups"]
 
-    await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
-    has_xy = len({Axis.X, Axis.Y} & set(axes)) > 0
-    has_mount = len(set(Axis.ot3_mount_axes()) & set(axes)) > 0
-    run = mock_move_group_run.call_args_list[0][0][0]._move_groups
-    if has_xy and has_mount:
-        assert len(run) > 1
-        for node in run[0][0]:
-            assert node_to_axis(node) in Axis.ot3_mount_axes()
-        for node in run[1][0]:
-            assert node in [NodeId.gantry_x, NodeId.gantry_y]
-    else:
-        assert len(run) == 1
+            # mount steps are commanded first
+            if has_mount:
+                # only one seq per group
+                assert len(gantry_moves[0]) == len(gantry_moves[1]) == 1
+                assert gantry_moves[0][0].keys() == gantry_moves[1][0].keys()
+                assert all(
+                    node_to_axis(node) in Axis.ot3_mount_axes()
+                    for node in gantry_moves[0][0].keys()
+                )
+                gantry_moves.pop(0)
+                gantry_moves.pop(0)
 
-    # all commanded axes have been homed
-    assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
-    assert controller.check_motor_status(axes)
+            # then X
+            if has_x:
+                # only one seq per group
+                assert len(gantry_moves[0]) == len(gantry_moves[1]) == 1
+                assert gantry_moves[0][0].keys() == gantry_moves[1][0].keys()
+                assert all(
+                    node_to_axis(node) == Axis.X for node in gantry_moves[0][0].keys()
+                )
+                gantry_moves.pop(0)
+                gantry_moves.pop(0)
 
+            # lastly Y
+            if has_y:
+                # only one seq per group
+                assert len(gantry_moves[0]) == len(gantry_moves[1]) == 1
+                assert gantry_moves[0][0].keys() == gantry_moves[1][0].keys()
+                assert all(
+                    node_to_axis(node) == Axis.Y for node in gantry_moves[0][0].keys()
+                )
+                gantry_moves.pop(0)
+                gantry_moves.pop(0)
 
-@pytest.mark.parametrize("axes", home_test_params)
-async def test_home_build_runners(
-    controller: OT3Controller,
-    mock_move_group_run: mock.AsyncMock,
-    axes: List[Axis],
-    mock_present_devices: None,
-) -> None:
-    mock_move_group_run.side_effect = move_group_run_side_effect(controller, axes)
-    assert not controller._motor_status
-
-    await controller.home(axes, GantryLoad.LOW_THROUGHPUT)
-    has_pipette = len(set(Axis.pipette_axes()) & set(axes)) > 0
-    has_gantry = len(set(Axis.gantry_axes()) & set(axes)) > 0
-
-    if has_pipette and has_gantry:
-        assert len(mock_move_group_run.call_args_list) == 2
-        run_gantry = mock_move_group_run.call_args_list[0][0][0]._move_groups
-        run_pipette = mock_move_group_run.call_args_list[1][0][0]._move_groups
-        for group in run_gantry:
-            for node in group[0]:
-                assert node_to_axis(node) in Axis.gantry_axes()
-        for node in run_pipette[0][0]:
-            assert node_to_axis(node) in Axis.pipette_axes()
-
-    if not has_pipette or not has_gantry:
-        assert len(mock_move_group_run.call_args_list) == 1
-        mock_move_group_run.assert_awaited_once()
-
-    # all commanded axes have been homed
-    assert all(controller._motor_status[axis_to_node(ax)].motor_ok for ax in axes)
-    assert controller.check_motor_status(axes)
+            assert not gantry_moves
 
 
 @pytest.mark.parametrize("axes", home_test_params)
@@ -683,10 +700,13 @@ async def test_tip_action(
         for move_group in move_group_runner._move_groups:
             assert move_group  # don't pass in empty groups
             assert len(move_group) == 1
+
+        move_groups = move_group_runner._move_groups
         # we should be sending this command to the pipette axes to process.
-        assert list(move_group[0].keys()) == [NodeId.pipette_left]
-        step = move_group[0][NodeId.pipette_left]
-        assert step.stop_condition == MoveStopCondition.limit_switch
+        home_step = move_groups[0][0][NodeId.pipette_left]
+        assert home_step.stop_condition == MoveStopCondition.limit_switch
+        backoff_step = move_groups[1][0][NodeId.pipette_left]
+        assert backoff_step.stop_condition == MoveStopCondition.limit_switch_backoff
 
 
 async def test_update_motor_status(

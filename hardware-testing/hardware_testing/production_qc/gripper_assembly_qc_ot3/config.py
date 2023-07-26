@@ -28,6 +28,7 @@ class TestConfig:
 
     simulate: bool
     tests: Dict[TestSection, Callable]
+    increment: bool
 
 
 TESTS = [
@@ -36,16 +37,23 @@ TESTS = [
         test_mount.run,
     ),
     (
-        TestSection.FORCE,
-        test_force.run,
+        TestSection.PROBE,
+        test_probe.run,
     ),
     (
         TestSection.WIDTH,
         test_width.run,
     ),
     (
-        TestSection.PROBE,
-        test_probe.run,
+        TestSection.FORCE,
+        test_force.run,
+    ),
+]
+
+TESTS_INCREMENT = [
+    (
+        TestSection.FORCE,
+        test_force.run_increment,  # NOTE: different run method
     ),
 ]
 
@@ -59,13 +67,13 @@ def build_report(test_name: str) -> CSVReport:
                 title=TestSection.MOUNT.value, lines=test_mount.build_csv_lines()
             ),
             CSVSection(
-                title=TestSection.FORCE.value, lines=test_force.build_csv_lines()
+                title=TestSection.PROBE.value, lines=test_probe.build_csv_lines()
             ),
             CSVSection(
                 title=TestSection.WIDTH.value, lines=test_width.build_csv_lines()
             ),
             CSVSection(
-                title=TestSection.PROBE.value, lines=test_probe.build_csv_lines()
+                title=TestSection.FORCE.value, lines=test_force.build_csv_lines()
             ),
         ],
     )

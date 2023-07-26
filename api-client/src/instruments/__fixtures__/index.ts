@@ -22,6 +22,8 @@ export const instrumentsResponseFixture = {
         cursor: 0,
         totalLength: 1,
       },
+      ok: true,
+      subsystem: 'gripper',
     },
   ],
 }

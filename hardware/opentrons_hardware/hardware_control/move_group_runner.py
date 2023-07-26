@@ -352,27 +352,33 @@ class MoveScheduler:
         self._durations: List[float] = []
         self._stop_condition: List[List[MoveStopCondition]] = []
         self._start_at_index = start_at_index
-        self._expected_tip_action_motors = []
+        self._expected_tip_action_motors: List[List[List[GearMotorId]]] = []
 
         for move_group in move_groups:
             move_set = set()
             duration = 0.0
             stop_cond = []
+            expected_motors = []
             for seq_id, move in enumerate(move_group):
                 movesteps = list(move.values())
                 move_set.update(set((k.value, seq_id) for k in move.keys()))
                 duration += float(movesteps[0].duration_sec)
                 if any(isinstance(g, MoveGroupTipActionStep) for g in movesteps):
-                    self._expected_tip_action_motors = [
-                        GearMotorId.left,
-                        GearMotorId.right,
-                    ]
+                    expected_motors.append(
+                        [
+                            GearMotorId.left,
+                            GearMotorId.right,
+                        ]
+                    )
+                else:
+                    expected_motors.append([])
                 for step in move_group[seq_id]:
                     stop_cond.append(move_group[seq_id][step].stop_condition)
 
             self._moves.append(move_set)
             self._stop_condition.append(stop_cond)
             self._durations.append(duration)
+            self._expected_tip_action_motors.append(expected_motors)
         log.debug(f"Move scheduler running for groups {move_groups}")
         self._completion_queue: asyncio.Queue[_CompletionPacket] = asyncio.Queue()
         self._event = asyncio.Event()
@@ -477,13 +483,20 @@ class MoveScheduler:
             self._remove_move_group(message, arbitration_id)
             self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, TipActionResponse):
-            gear_id = GearMotorId(message.payload.gear_motor_id.value)
-            self._expected_tip_action_motors.remove(gear_id)
-            if len(self._expected_tip_action_motors) == 0:
+            if self._handle_tip_action_motors(message):
                 self._remove_move_group(message, arbitration_id)
             self._handle_move_completed(message, arbitration_id)
         elif isinstance(message, ErrorMessage):
             self._handle_error(message, arbitration_id)
+
+    def _handle_tip_action_motors(self, message: TipActionResponse) -> bool:
+        gear_id = GearMotorId(message.payload.gear_motor_id.value)
+        group_id = message.payload.group_id.value - self._start_at_index
+        seq_id = message.payload.seq_id.value
+        self._expected_tip_action_motors[group_id][seq_id].remove(gear_id)
+        if len(self._expected_tip_action_motors[group_id][seq_id]) == 0:
+            return True
+        return False
 
     def _get_nodes_in_move_group(self, group_id: int) -> List[NodeId]:
         nodes = []
@@ -539,8 +552,8 @@ class MoveScheduler:
         if error != ErrorCode.ok:
             log.error(f"received error trying to execute move group: {str(error)}")
 
-        expected_time = max(1.0, self._durations[group_id - self._start_at_index] * 1.1)
-        full_timeout = max(1.0, self._durations[group_id - self._start_at_index] * 2)
+        expected_time = max(3.0, self._durations[group_id - self._start_at_index] * 1.1)
+        full_timeout = max(5.0, self._durations[group_id - self._start_at_index] * 2)
         start_time = time.time()
 
         try:

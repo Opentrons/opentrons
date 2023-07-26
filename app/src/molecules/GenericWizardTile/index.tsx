@@ -17,6 +17,7 @@ import {
   PrimaryButton,
   RESPONSIVENESS,
   ALIGN_FLEX_END,
+  DISPLAY_INLINE_BLOCK,
 } from '@opentrons/components'
 import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
@@ -51,10 +52,10 @@ const GO_BACK_BUTTON_DISABLED_STYLE = css`
 `
 const Title = styled.h1`
   ${TYPOGRAPHY.h1Default};
-
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     ${TYPOGRAPHY.level4HeaderSemiBold};
     height: ${SPACING.spacing40};
+    display: ${DISPLAY_INLINE_BLOCK};
   }
 `
 
@@ -120,8 +121,10 @@ export function GenericWizardTile(props: GenericWizardTileProps): JSX.Element {
           flex="1"
           gridGap={SPACING.spacing24}
         >
-          {typeof header === 'string' ? <Title>{header}</Title> : header}
-          <StyledText as="p">{bodyText}</StyledText>
+          <Flex display={DISPLAY_INLINE_BLOCK}>
+            {typeof header === 'string' ? <Title>{header}</Title> : header}
+          </Flex>
+          {bodyText}
         </Flex>
         <Flex flex="1" justifyContent={JUSTIFY_CENTER}>
           {rightHandBody}

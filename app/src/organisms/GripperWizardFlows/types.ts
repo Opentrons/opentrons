@@ -78,5 +78,5 @@ export interface GripperWizardStepProps {
   maintenanceRunId: string
   attachedGripper: {} | null
   errorMessage: string | null
-  setShowErrorMessage: (message: string | null) => void
+  setErrorMessage: (message: string | null) => void
 }
