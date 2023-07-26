@@ -215,7 +215,6 @@ async def test_move_labware_with_gripper(
     )
 
     expected_waypoints = [
-        # Point(777, 888, 999),  # gripper retract at current location
         Point(100, 100, 999),  # move to above slot 1
         Point(100, 100, 116.5),  # move to labware on slot 1
         Point(100, 100, 999),  # gripper retract at current location
