@@ -166,8 +166,9 @@ async def calibrate_tip_racks(api, mount, slot_loc, AXIS):
     return calibrated_slot_loc
 
 
-async def _main(is_simulating: bool, mount: types.Mount) -> None:
+async def _main(is_simulating: bool) -> None:
     path = '/data/testing_data/calibrated_slot_locations.json'
+    mount = Mount.LEFT
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
     await api.home_plunger(mount)
@@ -179,17 +180,12 @@ async def _main(is_simulating: bool, mount: types.Mount) -> None:
     if args.test_robot:
         test_robot = input("Enter robot ID:\n\t>> ")
 
-    if(mount == Mount.LEFT):
-        AXIS = Axis.Z_L
-    else:
-        AXIS = Axis.Z_R
-
-
+    AXIS = Axis.Z_L
 
     # TIP_RACKS = args.tip_rack_num # default: 12
     PICKUPS_PER_TIP = args.pick_up_num # default: 20
-    COLUMNS = 12
-    ROWS = 8
+    # COLUMNS = 12
+    # ROWS = 8
     CYCLES = 1
 
     test_pip = api.get_attached_instrument(mount)
@@ -211,8 +207,6 @@ async def _main(is_simulating: bool, mount: types.Mount) -> None:
         header_str = data.convert_list_to_csv_line(header)
         data.append_data_to_file(test_name=test_name, file_name=file_name, data=header_str)
 
-
-
     print("test_pip",test_pip)
     if(len(test_pip) == 0):
         print(f"No pipette recognized on {mount.name} mount\n")
@@ -222,20 +216,23 @@ async def _main(is_simulating: bool, mount: types.Mount) -> None:
 
     load = api.gantry_load
 
-    if load == GantryLoad.LOW_THROUGHPUT:
-        if "single" in test_pip['name']:
-            multi_pip = False
-            ### remove ### check_tip_presence = True
-        else:
-            multi_pip = True
-            ROWS = 1
-            CYCLES = 8
-            ### remove ### check_tip_presence = True
-    else:
+    if load == GantryLoad.HIGH_THROUGHPUT:
         ### add 96 ch conditions here ###
         multi_pip = True ###
         COLUMNS = 1
         ROWS = 1
+    else:
+        print("Test requires a high-throughput load (96ch pipette)\n")
+        Print("Exiting script...\n")
+        sys.exit()
+        # if "single" in test_pip['name']:
+        #     multi_pip = False
+        #     ### remove ### check_tip_presence = True
+        # else:
+        #     multi_pip = True
+        #     ROWS = 1
+        #     CYCLES = 8
+        #     ### remove ### check_tip_presence = True
 
     slot_loc = {
         "A1": (13.42, 394.92, 110),
@@ -275,8 +272,6 @@ async def _main(is_simulating: bool, mount: types.Mount) -> None:
     total_tip_num = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[3])
     total_fail_num = int(str(args.start_slot_row_col_totalTips_totalFailure).split(':')[4])
 
-
-
     start_time = time.perf_counter()
     elapsed_time = 0
     rack = start_slot - 1
@@ -303,7 +298,6 @@ async def _main(is_simulating: bool, mount: types.Mount) -> None:
 
     for i in range(start_slot-1):
         del calibrated_slot_loc[list(calibrated_slot_loc)[0]]
-
 
     for i in range(CYCLES):
         print(f"\n=========== Cycle {i + 1}/{CYCLES} ===========\n")
@@ -455,16 +449,16 @@ async def _main(is_simulating: bool, mount: types.Mount) -> None:
     await api.home()
 
 if __name__ == "__main__":
-    mount_options = {
-        "left": types.Mount.LEFT,
-        "right": types.Mount.RIGHT,
-        "gripper": types.Mount.GRIPPER,
-    }
+    # mount_options = {
+    #     "left": types.Mount.LEFT,
+    #     "right": types.Mount.RIGHT,
+    #     "gripper": types.Mount.GRIPPER,
+    # }
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument(
-        "--mount", type=str, choices=list(mount_options.keys()), default="left"
-    )
+    # parser.add_argument(
+    #     "--mount", type=str, choices=list(mount_options.keys()), default="left"
+    # )
     parser.add_argument("--pick_up_num", type=int, default=20)
     # parser.add_argument("--tip_rack_num", type=int, default=12)
     parser.add_argument("--load_cal", action="store_true")
@@ -474,6 +468,6 @@ if __name__ == "__main__":
     parser.add_argument("--start_slot_row_col_totalTips_totalFailure", type=str, default="1:1:1:1:0")
     # parser.add_argument("--check_tip", action="store_true")
     args = parser.parse_args()
-    mount = mount_options[args.mount]
+    # mount = mount_options[args.mount]
 
-    asyncio.run(_main(args.simulate, mount))
+    asyncio.run(_main(args.simulate))
