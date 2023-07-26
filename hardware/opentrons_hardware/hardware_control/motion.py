@@ -170,6 +170,19 @@ def create_home_step(
     return step
 
 
+def create_tip_action_backoff_step(velocity: Dict[NodeId, np.float64]) -> MoveGroupStep:
+    """Create a sequence to back away from the limit switch and re-home."""
+    backoff: MoveGroupStep = {}
+    for axis, v in velocity.items():
+        backoff[axis] = MoveGroupTipActionStep(
+            velocity_mm_sec=abs(v),
+            duration_sec=abs(np.float64(BACKOFF_MAX_MM) / abs(v)),
+            stop_condition=MoveStopCondition.limit_switch_backoff,
+            action=PipetteTipActionType.home,
+        )
+    return backoff
+
+
 def create_tip_action_step(
     velocity: Dict[NodeId, np.float64],
     distance: Dict[NodeId, np.float64],

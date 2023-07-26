@@ -1,0 +1,37 @@
+{
+  "$otSharedSchema": "#/pipette/schemas/2/pipettePropertiesSchema.json",
+  "displayName": "Flex 8-Channel 50 μL",
+  "model": "p50",
+  "displayCategory": "FLEX",
+  "pickUpTipConfigurations": {
+    "current": 0.55,
+    "presses": 1,
+    "speed": 10,
+    "increment": 0.0,
+    "distance": 13.0
+  },
+  "dropTipConfigurations": { "current": 1.0, "speed": 10 },
+  "plungerMotorConfigurations": { "idle": 0.3, "run": 1.0 },
+  "plungerPositionsConfigurations": {
+    "top": 0.0,
+    "bottom": 71.5,
+    "blowout": 76.5,
+    "drop": 91.5
+  },
+  "availableSensors": {
+    "sensors": ["pressure", "capacitive", "environment"],
+    "pressure": { "count": 2 },
+    "capacitive": { "count": 2 },
+    "environment": { "count": 1 }
+  },
+  "partialTipConfigurations": {
+    "partialTipSupported": true,
+    "availableConfigurations": [1, 2, 3, 4, 5, 6, 7, 8]
+  },
+  "backCompatNames": [],
+  "channels": 8,
+  "shaftDiameter": 1.0,
+  "shaftULperMM": 0.785,
+  "backlashDistance": 0.1,
+  "quirks": []
+}

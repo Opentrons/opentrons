@@ -20,11 +20,13 @@ For more details about this release, please see the full [technical change log][
 - The ODD should prompt you to update your pipettes when you attach one that needs it (!)
 - The 96 shouldn't fall down when you attach it now (!)
 - More little stall detection fixes
+- The ODD will now display a spinner until the robot server has started
+- Homing now goes to the limit switch then backs off until the limit switch is released
+- Support for PVT (v3.5) pipettes
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
 
 ### ODD
-- The ODD doesn't really tell you if the robot server hasn't started yet; if a robot looks on but has the name "opentrons", or says it's not network-connected when you know it is, probably the server isn't up yet, give it another little bit
 - It can take a while for the robot to start after installing an update (it's the firmware updates happening on boot). Allow 10 minutes after an update that has a firmware change.
 
 ### Robot Control
@@ -33,7 +35,7 @@ For more details about this release, please see the full [technical change log][
 
 ## Big Things That Do Work Please Do Report Bugs About Them
 ### Robot Control
-- Liquid handling protocols with 1 and 8 channel pipettes
+- Protocol behavior
 - Labware movement between slots/modules, both manual and with gripper, from python protocols
 - Labware drop/gripper crash errors, but they're very insensitive
 - Pipette and gripper automated offset calibration
@@ -41,6 +43,7 @@ For more details about this release, please see the full [technical change log][
 - Firmware update for all devices 
 - Cancelling a protocol run. We're even more sure we fixed this so definitely tell us if it's not.
 - USB connectivity
+- Stall detection firing basically ever unless you clearly ran into something
 
 ### ODD
 - Protocol execution including end-of-protocol screen
