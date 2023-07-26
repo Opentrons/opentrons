@@ -219,6 +219,8 @@ def _get_ideal_labware_locations(
     plate_loc_ideal = helpers_ot3.get_theoretical_a1_position(
         test_config.slot_plate, "corning_96_wellplate_360ul_flat"
     )
+    # NOTE: we are using well H6 (not A1)
+    plate_loc_ideal += Point(x=9 * 5, y=9 * -7)
     # trash
     trash_loc_ideal = helpers_ot3.get_slot_calibration_square_position_ot3(
         test_config.slot_trash
