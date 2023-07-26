@@ -136,6 +136,21 @@ def build_gravimetric_trials(
                 if cfg.isolate_channels and (channel + 1) not in cfg.isolate_channels:
                     ui.print_info(f"skipping channel {channel + 1}")
                     continue
+                if cfg.pipette_channels == 8 and channel > 0:
+                    if (
+                        volume
+                        in config.QC_VOLUMES_EXTRA_G[cfg.pipette_channels][
+                            cfg.pipette_volume
+                        ][cfg.tip_volume]
+                    ) and (
+                        volume
+                        not in config.QC_VOLUMES_G[cfg.pipette_channels][
+                            cfg.pipette_volume
+                        ][cfg.tip_volume]
+                    ):
+                        ui.print_info(f"skipping channel {channel + 1}")
+                        continue
+
                 trial_list[volume][channel] = []
                 channel_offset = helpers._get_channel_offset(cfg, channel)
                 for trial in range(cfg.trials):
