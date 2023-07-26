@@ -5,7 +5,7 @@ from typing_extensions import Final
 from opentrons.types import Point
 from opentrons.hardware_control.types import CriticalPoint
 
-from .types import Waypoint, MoveType
+from .types import Waypoint, MoveType, GripperMovementWaypointsWithJawStatus
 from .errors import DestinationOutOfBoundsError, ArcOutOfBoundsError
 from ..protocol_engine.types import LabwareMovementOffsetData
 
@@ -125,11 +125,11 @@ def get_gripper_labware_movement_waypoints(
     from_labware_center: Point,
     to_labware_center: Point,
     gripper_home_z: float,
-    user_offset_data: LabwareMovementOffsetData
-) -> List[Point]:
+    offset_data: LabwareMovementOffsetData
+) -> List[GripperMovementWaypointsWithJawStatus]:
     """Get waypoints for moving labware using a gripper."""
-    pick_up_offset = user_offset_data.pick_up_offset
-    drop_offset = user_offset_data.drop_offset
+    pick_up_offset = offset_data.pick_up_offset
+    drop_offset = offset_data.drop_offset
 
     pick_up_location = from_labware_center + Point(
         pick_up_offset.x, pick_up_offset.y,  pick_up_offset.z
@@ -138,14 +138,26 @@ def get_gripper_labware_movement_waypoints(
         drop_offset.x, drop_offset.y, drop_offset.z
     )
 
-    waypoints: List[Point] = [
-        Point(pick_up_location.x, pick_up_location.y, gripper_home_z),
-        pick_up_location,
+    waypoints_with_jaw_status = [
+        GripperMovementWaypointsWithJawStatus(
+            position=Point(pick_up_location.x, pick_up_location.y, gripper_home_z),
+            jawOpen=False,
+        ),
+        GripperMovementWaypointsWithJawStatus(position=pick_up_location, jawOpen=True),
         # Gripper grips the labware here
-        Point(pick_up_location.x, pick_up_location.y, gripper_home_z),
-        Point(drop_location.x, drop_location.y, gripper_home_z),
-        drop_location,
+        GripperMovementWaypointsWithJawStatus(
+            position=Point(pick_up_location.x, pick_up_location.y, gripper_home_z),
+            jawOpen=False,
+        ),
+        GripperMovementWaypointsWithJawStatus(
+            position=Point(drop_location.x, drop_location.y, gripper_home_z),
+            jawOpen=False,
+        ),
+        GripperMovementWaypointsWithJawStatus(position=drop_location, jawOpen=False),
         # Gripper ungrips here
-        Point(drop_location.x, drop_location.y, gripper_home_z),
+        GripperMovementWaypointsWithJawStatus(
+            position=Point(drop_location.x, drop_location.y, gripper_home_z),
+            jawOpen=True
+        )
     ]
-    return waypoints
+    return waypoints_with_jaw_status

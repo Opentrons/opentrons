@@ -10,6 +10,8 @@ from opentrons_shared_data.gripper.constants import (
 from opentrons.types import Point
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import OT3Mount, Axis
+from opentrons.motion_planning import get_gripper_labware_movement_waypoints
+
 from opentrons.protocol_engine.state import StateStore
 from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 
@@ -118,79 +120,29 @@ class LabwareMovementHandler:
                     additional_offset_vector=user_offset_data,
                 )
             )
-
-            waypoints_to_labware = self._get_gripper_movement_waypoints(
-                labware_id=labware_id,
-                location=current_location,
-                current_position=await ot3api.gantry_position(mount=gripper_mount),
+            from_labware_center = self._state_store.geometry.get_labware_center(
+                labware_id=labware_id, location=current_location
+            )
+            to_labware_center = self._state_store.geometry.get_labware_center(
+                labware_id=labware_id, location=new_location
+            )
+            movement_waypoints = get_gripper_labware_movement_waypoints(
+                from_labware_center=from_labware_center,
+                to_labware_center=to_labware_center,
                 gripper_home_z=gripper_homed_position.z,
-                labware_offset_vector=final_offsets.pick_up_offset,
+                offset_data=final_offsets
             )
 
-            for waypoint in waypoints_to_labware[:-1]:
-                await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
-
-            # TODO: We do this to have the gripper move to location with
-            #  closed grip and open right before picking up the labware to
-            #  avoid collisions as much as possible.
-            #  See https://opentrons.atlassian.net/browse/RLAB-214
-            await ot3api.home_gripper_jaw()
-            await ot3api.move_to(
-                mount=gripper_mount, abs_position=waypoints_to_labware[-1]
-            )
-            await ot3api.grip(force_newtons=LABWARE_GRIP_FORCE)
-
-            # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
-            await ot3api.home(axes=[Axis.Z_G])
-
-            waypoints_to_new_location = self._get_gripper_movement_waypoints(
-                labware_id=labware_id,
-                location=new_location,
-                current_position=waypoints_to_labware[-1],
-                gripper_home_z=gripper_homed_position.z,
-                labware_offset_vector=final_offsets.drop_offset,
-            )
-
-            for waypoint in waypoints_to_new_location:
-                await ot3api.move_to(mount=gripper_mount, abs_position=waypoint)
-
-            await ot3api.ungrip()
-            # TODO: see https://opentrons.atlassian.net/browse/RLAB-215
-            await ot3api.home(axes=[Axis.Z_G])
+            for waypoint_data in movement_waypoints:
+                if waypoint_data.jawOpen:
+                    await ot3api.ungrip()
+                else:
+                    await ot3api.grip(force_newtons=LABWARE_GRIP_FORCE)
+                await ot3api.move_to(mount=gripper_mount, abs_position=waypoint_data.position)
 
             # Keep the gripper in gripped position so it avoids colliding with
             # things like the thermocycler latches
             await ot3api.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
-
-    # ---->> Move to geometry view
-    # TODO (spp, 2022-10-19): Move this to motion planning and
-    #  test waypoints generation in isolation.
-    def _get_gripper_movement_waypoints(
-        self,
-        labware_id: str,
-        location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
-        current_position: Point,
-        gripper_home_z: float,
-        labware_offset_vector: LabwareOffsetVector,
-    ) -> List[Point]:
-        """Get waypoints for gripper to move to a specified location."""
-        labware_center = self._state_store.geometry.get_labware_center(
-            labware_id=labware_id, location=location
-        )
-        waypoints: List[Point] = [
-            Point(current_position.x, current_position.y, gripper_home_z),
-            Point(
-                labware_center.x + labware_offset_vector.x,
-                labware_center.y + labware_offset_vector.y,
-                gripper_home_z,
-            ),
-            Point(
-                labware_center.x + labware_offset_vector.x,
-                labware_center.y + labware_offset_vector.y,
-                labware_center.z + labware_offset_vector.z,
-            ),
-        ]
-        return waypoints
 
     async def ensure_movement_not_obstructed_by_module(
         self, labware_id: str, new_location: LabwareLocation
