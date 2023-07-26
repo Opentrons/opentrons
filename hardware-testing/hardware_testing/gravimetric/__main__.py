@@ -317,14 +317,19 @@ if __name__ == "__main__":
         deck_version="2",
         extra_labware=custom_defs,
     )
-    if args.tip == 0:
-        for tip in get_tip_volumes_for_qc(
-            args.pipette, args.channels, args.extra, args.photometric
-        ):
-            hw = _ctx._core.get_hardware()
-            if not _ctx.is_simulating():
-                ui.alert_user_ready(f"Ready to run with {tip}ul tip?", hw)
-            args.tip = tip
+    try:
+        if args.tip == 0:
+            for tip in get_tip_volumes_for_qc(
+                args.pipette, args.channels, args.extra, args.photometric
+            ):
+                hw = _ctx._core.get_hardware()
+                if not _ctx.is_simulating():
+                    ui.alert_user_ready(f"Ready to run with {tip}ul tip?", hw)
+                args.tip = tip
+                _main(args, _ctx)
+        else:
             _main(args, _ctx)
-    else:
-        _main(args, _ctx)
+    except Exception:
+        pass
+    finally:
+        _ctx._core.get_hardware()._backend.eeprom_driver._gpio.__del__()
