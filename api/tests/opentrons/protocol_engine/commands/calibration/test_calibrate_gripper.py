@@ -103,6 +103,35 @@ async def test_calibrate_gripper_saves_calibration(
     assert result.savedCalibration == expected_calibration_data
 
 
+@pytest.mark.ot3_only
+async def test_calibrate_gripper_does_not_save_during_error(
+    decoy: Decoy, ot3_hardware_api: OT3API
+) -> None:
+    """Data should not be saved when an error is raised."""
+    subject = CalibrateGripperImplementation(hardware_api=ot3_hardware_api)
+
+    params = CalibrateGripperParams(
+        jaw=CalibrateGripperParamsJaw.REAR,
+        otherJawOffset=Vec3f(x=4.4, y=5.5, z=6.6),
+    )
+
+    decoy.when(
+        await ot3_calibration.calibrate_gripper_jaw(
+            ot3_hardware_api, probe=GripperProbe.REAR
+        )
+    ).then_raise(ot3_calibration.EarlyCapacitiveSenseTrigger(5.0, 3.0))
+
+    with pytest.raises(ot3_calibration.EarlyCapacitiveSenseTrigger):
+        await subject.execute(params)
+
+    decoy.verify(
+        await ot3_hardware_api.save_instrument_offset(
+            mount=OT3Mount.LEFT, delta=Point(x=3, y=4, z=6)
+        ),
+        times=0,
+    )
+
+
 async def test_calibrate_gripper_raises_on_ot2(
     decoy: Decoy,
     ot2_hardware_api: OT2API,
