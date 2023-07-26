@@ -832,6 +832,7 @@ async def _test_diagnostics_pressure(
 ) -> bool:
     await api.add_tip(mount, 0.1)
     await api.prepare_for_aspirate(mount)
+    await api.remove_tip(mount)
 
     async def _read_pressure() -> float:
         return await _read_pipette_sensor_repeatedly_and_average(
@@ -859,8 +860,8 @@ async def _test_diagnostics_pressure(
     _, bottom, _, _ = helpers_ot3.get_plunger_positions_ot3(api, mount)
     print("moving plunger to bottom")
     await helpers_ot3.move_plunger_absolute_ot3(api, mount, bottom)
-    if not api.is_simulator:
-        _get_operator_answer_to_question('ATTACH tip to nozzle, enter "y" when ready')
+    await _pick_up_tip_for_tip_volume(api, mount, tip_volume=50)
+    await api.retract(mount)
     if not api.is_simulator:
         _get_operator_answer_to_question('COVER tip with finger, enter "y" when ready')
     pressure_sealed = await _read_pressure()
@@ -899,10 +900,10 @@ async def _test_diagnostics_pressure(
     )
 
     if not api.is_simulator:
-        _get_operator_answer_to_question('REMOVE tip from nozzle, enter "y" when ready')
+        _get_operator_answer_to_question('REMOVE your finger, enter "y" when ready')
     print("moving plunger back down to BOTTOM position")
     await api.dispense(mount)
-    await api.remove_tip(mount)
+    await _drop_tip_in_trash(api, mount)
     return pressure_open_air_pass and pressure_sealed_pass and pressure_compress_pass
 
 
@@ -911,10 +912,6 @@ async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) ->
     environment_pass = await _test_diagnostics_environment(api, mount, write_cb)
     print(f"environment: {_bool_to_pass_fail(environment_pass)}")
     write_cb(["diagnostics-environment", _bool_to_pass_fail(environment_pass)])
-    # PRESSURE
-    pressure_pass = await _test_diagnostics_pressure(api, mount, write_cb)
-    print(f"pressure: {_bool_to_pass_fail(pressure_pass)}")
-    write_cb(["diagnostics-pressure", _bool_to_pass_fail(pressure_pass)])
     # ENCODER
     encoder_pass = await _test_diagnostics_encoder(api, mount, write_cb)
     print(f"encoder: {_bool_to_pass_fail(encoder_pass)}")
@@ -923,6 +920,10 @@ async def _test_diagnostics(api: OT3API, mount: OT3Mount, write_cb: Callable) ->
     capacitance_pass = await _test_diagnostics_capacitive(api, mount, write_cb)
     print(f"capacitance: {_bool_to_pass_fail(capacitance_pass)}")
     write_cb(["diagnostics-capacitance", _bool_to_pass_fail(capacitance_pass)])
+    # PRESSURE
+    pressure_pass = await _test_diagnostics_pressure(api, mount, write_cb)
+    print(f"pressure: {_bool_to_pass_fail(pressure_pass)}")
+    write_cb(["diagnostics-pressure", _bool_to_pass_fail(pressure_pass)])
     return environment_pass and pressure_pass and encoder_pass and capacitance_pass
 
 
