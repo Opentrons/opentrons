@@ -1339,7 +1339,7 @@ async def _main(test_config: TestConfig) -> None:
         csv_cb.write(["pipette", pipette_sn])
         csv_cb.write(["simulating" if test_config.simulate else "live"])
         csv_cb.write(["version", data.get_git_description()])
-        # TODO: add firmware version here
+        csv_cb.write(["firmware", api.fw_version])
         # add test configurations to CSV
         csv_cb.write(["-------------------"])
         csv_cb.write(["TEST-CONFIGURATIONS"])
