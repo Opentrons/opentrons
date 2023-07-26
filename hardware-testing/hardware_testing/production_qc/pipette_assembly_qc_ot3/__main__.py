@@ -56,6 +56,7 @@ DEFAULT_SLOT_TIP_RACK_50 = 1
 
 DEFAULT_SLOT_FIXTURE = 3
 DEFAULT_SLOT_RESERVOIR = 8
+DEFAULT_SLOT_PLATE = 2
 DEFAULT_SLOT_TRASH = 12
 
 PROBING_DECK_PRECISION_MM = 0.1
@@ -105,6 +106,7 @@ class TestConfig:
     slot_tip_rack_200: int
     slot_tip_rack_50: int
     slot_reservoir: int
+    slot_plate: int
     slot_fixture: int
     slot_trash: int
     num_trials: int
@@ -215,7 +217,7 @@ def _get_ideal_labware_locations(
         test_config.slot_reservoir, "nest_1_reservoir_195ml"
     )
     plate_loc_ideal = helpers_ot3.get_theoretical_a1_position(
-        test_config.slot_reservoir, "corning_96_wellplate_360ul_flat"
+        test_config.slot_plate, "corning_96_wellplate_360ul_flat"
     )
     # trash
     trash_loc_ideal = helpers_ot3.get_slot_calibration_square_position_ot3(
@@ -1563,6 +1565,9 @@ if __name__ == "__main__":
     arg_parser.add_argument(
         "--slot-reservoir", type=int, default=DEFAULT_SLOT_RESERVOIR
     )
+    arg_parser.add_argument(
+        "--slot-plate", type=int, default=DEFAULT_SLOT_PLATE
+    )
     arg_parser.add_argument("--slot-fixture", type=int, default=DEFAULT_SLOT_FIXTURE)
     arg_parser.add_argument("--slot-trash", type=int, default=DEFAULT_SLOT_TRASH)
     arg_parser.add_argument("--simulate", action="store_true")
@@ -1588,6 +1593,7 @@ if __name__ == "__main__":
         slot_tip_rack_200=args.slot_tip_rack_200,
         slot_tip_rack_50=args.slot_tip_rack_50,
         slot_reservoir=args.slot_reservoir,
+        slot_plate=args.slot_plate,
         slot_fixture=args.slot_fixture,
         slot_trash=args.slot_trash,
         num_trials=args.num_trials,
