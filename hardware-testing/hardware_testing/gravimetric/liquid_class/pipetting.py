@@ -144,7 +144,7 @@ def _retract(
         ] = z_discontinuity
     # NOTE: re-setting the gantry-load will reset the move-manager's per-axis constraints
     hw_api.set_gantry_load(hw_api.gantry_load)
-    # retract out of the liquid (not out of the well
+    # retract out of the liquid (not out of the well)
     pipette.move_to(well.top(mm_above_well_bottom).move(channel_offset), speed=speed)
     # reset discontinuity back to default
     if pipette.channels == 96:
@@ -228,6 +228,8 @@ def _pipette_with_liquid_settings(
     def _dispense_with_added_blow_out() -> None:
         # dispense all liquid, plus some air by calling `pipette.blow_out(location, volume)`
         # FIXME: this is a hack, until there's an equivalent `pipette.blow_out(location, volume)`
+        hw_api = ctx._core.get_hardware()
+        hw_mount = OT3Mount.LEFT if pipette.mount == "left" else OT3Mount.RIGHT
         hw_api.blow_out(hw_mount, liquid_class.dispense.leading_air_gap)
 
     # ASPIRATE/DISPENSE SEQUENCE HAS THREE PHASES:

@@ -45,6 +45,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
 )
+from opentrons.hardware_control.estop_state import EstopStateMachine
 from opentrons_hardware.drivers.eeprom import EEPROMData
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules
@@ -137,6 +138,7 @@ class OT3Simulator:
         self._update_required = False
         self._initialized = False
         self._lights = {"button": False, "rails": False}
+        self._estop_state_machine = EstopStateMachine(detector=None)
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -687,3 +689,8 @@ class OT3Simulator:
             )
             for target in self._present_nodes
         }
+
+    @property
+    def estop_state_machine(self) -> EstopStateMachine:
+        """Return an estop state machine locked in the "disengaged" state."""
+        return self._estop_state_machine

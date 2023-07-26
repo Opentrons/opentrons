@@ -7,14 +7,14 @@ relative humidity that is recorded onto the pipette results.
 import abc
 import codecs
 import logging
-import random
 import time
 from typing import Tuple
 from abc import ABC
 from dataclasses import dataclass
-
+from . import list_ports_and_select
 import serial  # type: ignore[import]
 from serial.serialutil import SerialException  # type: ignore[import]
+from hardware_testing.data import ui
 
 log = logging.getLogger(__name__)
 
@@ -64,6 +64,20 @@ class AsairSensorBase(ABC):
     def get_reading(self) -> Reading:
         """Get a temp and humidity reading."""
         ...
+
+
+def BuildAsairSensor(simulate: bool) -> AsairSensorBase:
+    """Try to find and return an Asair sensor, if not found return a simulator."""
+    ui.print_title("Connecting to Environmental sensor")
+    if not simulate:
+        port = list_ports_and_select(device_name="Asair environmental sensor")
+        try:
+            sensor = AsairSensor.connect(port)
+            ui.print_info(f"Found sensor on port {port}")
+            return sensor
+        except SerialException:
+            pass
+    return SimAsairSensor()
 
 
 class AsairSensor(AsairSensorBase):
@@ -152,6 +166,6 @@ class SimAsairSensor(AsairSensorBase):
 
     def get_reading(self) -> Reading:
         """Get a reading."""
-        temp = random.uniform(24.5, 25)
-        relative_hum = random.uniform(45, 40)
+        temp = 25.0
+        relative_hum = 50.0
         return Reading(temperature=temp, relative_humidity=relative_hum)

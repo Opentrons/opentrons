@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { fireEvent } from '@testing-library/react'
-import { renderWithProviders } from '@opentrons/components'
-import { getFootprintDiagram } from '../../measurementGuide'
+import { renderWithProviders, getFootprintDiagram } from '@opentrons/components'
 import { ExpandingTitle } from '../ExpandingTitle'
 
 const render = (props: React.ComponentProps<typeof ExpandingTitle>) => {

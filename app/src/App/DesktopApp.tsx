@@ -5,7 +5,7 @@ import {
   Box,
   POSITION_RELATIVE,
   COLORS,
-  OVERFLOW_SCROLL,
+  OVERFLOW_AUTO,
 } from '@opentrons/components'
 
 import { Alerts } from '../organisms/Alerts'
@@ -102,7 +102,7 @@ export const DesktopApp = (): JSX.Element => {
                     width="100%"
                     height="100%"
                     backgroundColor={COLORS.fundamentalsBackground}
-                    overflow={OVERFLOW_SCROLL}
+                    overflow={OVERFLOW_AUTO}
                   >
                     <ModalPortalRoot />
                     <Component />
