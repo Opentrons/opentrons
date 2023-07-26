@@ -116,9 +116,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._blowout_flow_rates_lookup = (
             self._active_tip_settings.default_blowout_flowrate.values_by_api_level
         )
-        self._flow_accelerations_lookup = (
-            self._active_tip_settings.default_flow_acceleration.values_by_api_level
-        )
 
         self._aspirate_flow_rate = (
             self._active_tip_settings.default_aspirate_flowrate.default
@@ -130,7 +127,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._active_tip_settings.default_blowout_flowrate.default
         )
         self._flow_acceleration = (
-            self._active_tip_settings.default_flow_acceleration.default
+            self._active_tip_settings.default_flow_acceleration
         )
 
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
@@ -237,7 +234,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             self._active_tip_settings.default_blowout_flowrate.default
         )
         self._flow_acceleration = (
-            self._active_tip_settings.default_flow_acceleration.default
+            self._active_tip_settings.default_flow_acceleration
         )
 
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
@@ -434,10 +431,6 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         return self._blowout_flow_rates_lookup
 
     @property
-    def flow_accelerations_lookup(self) -> Dict[str, float]:
-        return self._flow_accelerations_lookup
-
-    @property
     def working_volume(self) -> float:
         """The working volume of the pipette"""
         return self._working_volume
@@ -553,7 +546,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "default_aspirate_flow_rates": self.active_tip_settings.default_aspirate_flowrate.values_by_api_level,
                 "default_blow_out_flow_rates": self.active_tip_settings.default_blowout_flowrate.values_by_api_level,
                 "default_dispense_flow_rates": self.active_tip_settings.default_dispense_flowrate.values_by_api_level,
-                "default_flow_acceleration": self.active_tip_settings.default_flow_acceleration.values_by_api_level,
+                "default_flow_acceleration": self.active_tip_settings.default_flow_acceleration,
                 "tip_length": self.current_tip_length,
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
                 "tip_overlap": self.tip_overlap,

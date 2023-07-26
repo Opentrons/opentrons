@@ -81,7 +81,7 @@ class SupportedTipsDefinition(BaseModel):
         alias="defaultBlowOutFlowRate",
     )
     default_flow_acceleration: float = Field(
-        200,
+        float("inf"),  # no default works for all pipettes
         description="The acceleration used during aspirate/dispense/blowout in ul/s^2.",
         alias="defaultFlowAcceleration",
     )
