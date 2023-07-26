@@ -126,9 +126,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._blow_out_flow_rate = (
             self._active_tip_settings.default_blowout_flowrate.default
         )
-        self._flow_acceleration = (
-            self._active_tip_settings.default_flow_acceleration
-        )
+        self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
 
@@ -233,9 +231,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._blow_out_flow_rate = (
             self._active_tip_settings.default_blowout_flowrate.default
         )
-        self._flow_acceleration = (
-            self._active_tip_settings.default_flow_acceleration
-        )
+        self._flow_acceleration = self._active_tip_settings.default_flow_acceleration
 
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
 
