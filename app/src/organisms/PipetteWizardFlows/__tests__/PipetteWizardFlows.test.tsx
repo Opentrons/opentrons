@@ -10,6 +10,7 @@ import {
 import {
   useCreateMaintenanceRunMutation,
   useDeleteMaintenanceRunMutation,
+  useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { useChainMaintenanceCommands } from '../../../resources/runs/hooks'
@@ -58,6 +59,9 @@ const mockUseCreateMaintenanceRunMutation = useCreateMaintenanceRunMutation as j
 >
 const mockUseDeleteMaintenanceRunMutation = useDeleteMaintenanceRunMutation as jest.MockedFunction<
   typeof useDeleteMaintenanceRunMutation
+>
+const mockUseCurrentMaintenanceRun = useCurrentMaintenanceRun as jest.MockedFunction<
+  typeof useCurrentMaintenanceRun
 >
 const mockUseRunStatus = useRunStatus as jest.MockedFunction<
   typeof useRunStatus
@@ -139,6 +143,11 @@ describe('PipetteWizardFlows', () => {
     mockUsePipetteFlowWizardHeaderText.mockReturnValue(
       'mock wizard header text'
     )
+    mockUseCurrentMaintenanceRun.mockReturnValue({
+      data: {
+        runId: 'mockRunId',
+      } as any,
+    } as any)
   })
   it('renders the correct information, calling the correct commands for the calibration flow', async () => {
     const { getByText, getByRole } = render(props)
