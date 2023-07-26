@@ -7,6 +7,7 @@ from typing import cast, List, Tuple, Union, Optional, NamedTuple
 
 from opentrons_shared_data.deck.dev_types import DeckDefinitionV3
 from opentrons_shared_data.labware.dev_types import LabwareUri
+from opentrons_shared_data.pipette import pipette_definition
 from opentrons.calibration_storage.helpers import uri_from_details
 from opentrons.protocols.models import LabwareDefinition
 from opentrons.types import Point, DeckSlotName, MountType
@@ -1354,6 +1355,7 @@ def test_get_next_drop_tip_location(
     pipette_channels: int,
     pipette_mount: MountType,
     expected_locations: List[DropTipWellLocation],
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
 ) -> None:
     """It should provide the next location to drop tips into within a labware."""
     decoy.when(labware_view.is_fixed_trash(labware_id="abc")).then_return(True)
@@ -1368,7 +1370,7 @@ def test_get_next_drop_tip_location(
             model="blah",
             display_name="bleh",
             serial_number="",
-            return_tip_scale=0,
+            tip_configuration_lookup_table={9001: supported_tip_fixture},
             nominal_tip_overlap={},
             home_position=0,
             nozzle_offset_z=0,

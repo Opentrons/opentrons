@@ -537,6 +537,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
                 "return_tip_height": self.active_tip_settings.default_return_tip_height,
                 "tip_overlap": self.tip_overlap,
                 "back_compat_names": self._config.pipette_backcompat_names,
+                "supported_tips": self._config.supported_tips,
             }
         )
         return self._config_as_dict
