@@ -276,8 +276,8 @@ def test_get_gripper_labware_movement_waypoints() -> None:
     assert result == [
         Point(100, 100, 999),  # move to above slot 1
         Point(100, 100, 116.5),  # move to labware on slot 1
-        # Point(100, 100, 999),  # gripper retract at current location
+        Point(100, 100, 999),  # retract in place
         Point(202.0, 204.0, 999),  # move to above slot 3
         Point(202.0, 204.0, 222.5),  # move down to labware drop height on slot 3
-        # Point(201.5, 202.6, 999),  # retract in place
+        Point(202.0, 204.0, 999),  # retract in place
     ]

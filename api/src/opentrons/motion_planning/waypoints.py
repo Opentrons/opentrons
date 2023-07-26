@@ -141,11 +141,11 @@ def get_gripper_labware_movement_waypoints(
     waypoints: List[Point] = [
         Point(pick_up_location.x, pick_up_location.y, gripper_home_z),
         pick_up_location,
-        # Gripper grips the labware here and retracts the mount
-        # TODO (spp: 2023-07-26): to make the movement code a bit simpler, use
-        #  Point(pick_up_location.x, pick_up_location.y, gripper_home_z) here instead of
-        #  doing axis retraction/ homing
+        # Gripper grips the labware here
+        Point(pick_up_location.x, pick_up_location.y, gripper_home_z),
         Point(drop_location.x, drop_location.y, gripper_home_z),
-        drop_location
+        drop_location,
+        # Gripper ungrips here
+        Point(drop_location.x, drop_location.y, gripper_home_z),
     ]
     return waypoints
