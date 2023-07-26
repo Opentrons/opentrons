@@ -50,6 +50,7 @@ from .types import (
     MotionChecks,
     PauseType,
     StatusBarState,
+    EstopState,
 )
 from .errors import (
     MustHomeError,
@@ -1158,3 +1159,6 @@ class API(
         self, input_map: Dict[Axis, "API.MapPayload"]
     ) -> Dict[str, "API.MapPayload"]:
         return {ot2_axis_to_string(k): v for k, v in input_map.items()}
+
+    def get_estop_state(self) -> EstopState:
+        return EstopState.DISENGAGED
