@@ -8,6 +8,7 @@ from typing import Tuple, Dict, Optional
 from threading import Thread
 import datetime
 import os
+
 import sys
 import termios
 import tty
@@ -354,12 +355,11 @@ async def _main() -> None:
                             trough_loc[Axis.by_mount(mount)])
 
     try:
-        tip_count = 0
-        x_offset = 0
-        y_offset = 0
         while True:
             measurements = []
             tip_count = 0
+            x_offset = 0
+            y_offset = 0
             cp = CriticalPoint.TIP
             for tip in range(1, tips_to_use + 1):
                 cp = CriticalPoint.TIP
@@ -389,10 +389,6 @@ async def _main() -> None:
                         measurements = []
                         print("\r\n")
                     await move_to_point(hw_api, mount, tip_position, cp)
-            if args.trough:
-                await move_to_point(hw_api, mount, trough_loc, cp)
-                await hw_api.liquid_probe(mount = mount, probe_settings = liquid_probe_settings)
-            # await move_to_point(hw_api, mount, droptip_loc, cp)
             m_current = float(input("motor_current in amps: "))
             pick_up_speed = float(input("pick up tip speed in mm/s: "))
             # Pick up distance i originally used was 16.5
@@ -405,11 +401,16 @@ async def _main() -> None:
             await hw_api.pick_up_tip(mount, tip_length=tip_length[args.tip_size])
             await hw_api.home_z(mount.LEFT)
             input("Press Enter to continue")
+            if args.trough:
+                await move_to_point(hw_api, mount, trough_loc, cp)
+                await hw_api.liquid_probe(mount = mount, probe_settings = liquid_probe_settings)
+            await move_to_point(hw_api, mount, droptip_loc, cp)
             update_drop_tip_speed(hw_api, mount, pick_up_speed)
             cp = CriticalPoint.TIP
             await move_to_point(hw_api, mount, droptip_loc, cp)
             await hw_api.drop_tip(mount)
             await hw_api.home_z(mount)
+
 
 
     except KeyboardInterrupt:
