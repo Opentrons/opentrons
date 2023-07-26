@@ -553,7 +553,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         await subject.finish()
 
     decoy.verify(
-        door_watcher.stop_soon(),
+        door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         action_dispatcher.dispatch(HardwareStoppedAction(completed_at=completed_at)),
         await plugin_starter.stop(),

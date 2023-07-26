@@ -291,10 +291,7 @@ class ProtocolEngine:
         # to robustly clean up all these resources
         # instead of try/finally, which can't scale without making indentation silly.
         finally:
-            # Note: After we stop listening, straggling events might be processed
-            # concurrently to the below lines in this .finish() call,
-            # or even after this .finish() call completes.
-            self._door_watcher.stop_soon()
+            self._door_watcher.stop()
 
             await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
 
