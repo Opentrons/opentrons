@@ -1659,10 +1659,17 @@ class OT3API(
                 pipette_axis
             ]
             gear_origin_dict = {Axis.Q: gear_origin_float}
-            clamp_move_target = pipette_spec.pick_up_distance
+            clamp_move_target = pipette_spec.pick_up_distance - 9
             gear_target_dict = {Axis.Q: clamp_move_target}
             clamp_moves = self._build_moves(
                 gear_origin_dict, gear_target_dict, speed=pipette_spec.speed
+            )
+            await self._backend.tip_action(moves=clamp_moves[0], tip_action="clamp")
+
+            gear_origin_dict = {Axis.Q: pipette_spec.pick_up_distance -9}
+            gear_target_dict = {Axis.Q: pipette_spec.pick_up_distance}
+            clamp_moves = self._build_moves(
+                gear_origin_dict, gear_target_dict, speed=5.5
             )
             await self._backend.tip_action(moves=clamp_moves[0], tip_action="clamp")
 
@@ -1760,9 +1767,17 @@ class OT3API(
                 gear_start_position = axis_convert(
                     self._backend.gear_motor_position, 0.0
                 )[Axis.P_L]
-                pickup_target_dict = {Axis.Q: move.target_position}
+                pickup_target_dict = {Axis.Q: move.target_position-9}
                 drop_moves = self._build_moves(
                     {Axis.Q: gear_start_position}, pickup_target_dict, speed=move.speed
+                )
+
+                await self._backend.tip_action(moves=drop_moves[0], tip_action="clamp")
+
+                gear_start_position = move.target_position - 9
+                pickup_target_dict = {Axis.Q: move.target_position}
+                drop_moves = self._build_moves(
+                    {Axis.Q: gear_start_position}, pickup_target_dict, speed=5.5
                 )
 
                 await self._backend.tip_action(moves=drop_moves[0], tip_action="clamp")

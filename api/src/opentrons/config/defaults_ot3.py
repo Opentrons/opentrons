@@ -86,7 +86,7 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
         OT3AxisKind.Z: 35,
         OT3AxisKind.P: 15,
         OT3AxisKind.Z_G: 50,
-        OT3AxisKind.Q: 10,
+        OT3AxisKind.Q: 50,
     },
     low_throughput={
         OT3AxisKind.X: 400,
@@ -104,7 +104,7 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
         OT3AxisKind.Z: 150,
         OT3AxisKind.P: 30,
         OT3AxisKind.Z_G: 150,
-        OT3AxisKind.Q: 10,
+        OT3AxisKind.Q: 80,
     },
     low_throughput={
         OT3AxisKind.X: 800,

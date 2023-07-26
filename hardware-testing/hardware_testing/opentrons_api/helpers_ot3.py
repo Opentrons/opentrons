@@ -17,7 +17,7 @@ from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.advanced_settings import set_adv_setting
-from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount,  axis_convert
+from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
@@ -392,15 +392,34 @@ def get_plunger_positions_ot3(
         pipette.plunger_positions.drop_tip,
     )
 
+async def update_drop_tip_current(
+    api: OT3API, mount: OT3Mount, current: float = 1.0
+) -> None:
+    """Update drop-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette._drop_configurations
+    config_model.current = current
+    pipette._drop_configurations = config_model
+
+async def update_drop_tip_speed(
+    api: OT3API, mount: OT3Mount, speed: float = 1.0
+) -> None:
+    """Update drop-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette.drop_configurations
+    config_model.speed = speed
+    pipette.drop_configurations = config_model
+
+
 
 async def update_pick_up_current(
     api: OT3API, mount: OT3Mount, current: float = 0.125
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    config_model = pipette.pick_up_configurations
+    config_model = pipette._pick_up_configurations
     config_model.current = current
-    pipette.pick_up_configurations = config_model
+    pipette._pick_up_configurations = config_model
 
 
 async def update_pick_up_distance(
@@ -408,9 +427,18 @@ async def update_pick_up_distance(
 ) -> None:
     """Update pick-up-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    config_model = pipette.pick_up_configurations
+    config_model = pipette._pick_up_configurations
     config_model.distance = distance
-    pipette.pick_up_configurations = config_model
+    pipette._pick_up_configurations = config_model
+
+async def update_pick_up_speed(
+    api: OT3API, mount: OT3Mount, speed: float = 5.0
+) -> None:
+    """Update pick-up-tip current."""
+    pipette = _get_pipette_from_mount(api, mount)
+    config_model = pipette._pick_up_configurations
+    config_model.speed = speed
+    pipette._pick_up_configurations = config_model
 
 
 async def move_plunger_absolute_ot3(
@@ -443,32 +471,31 @@ async def move_tip_motor_relative_ot3(
     distance: float,
     motor_current: Optional[float] = None,
     speed: Optional[float] = None,
+    axis_motion_setting: Dict[Axis, GantryLoadSettings] = None,
 ) -> None:
     """Move 96ch tip-motor (Q) to an absolute position."""
     if not api.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
         raise RuntimeError("No pipette found on LEFT mount")
-
-    current_gear_pos_float = axis_convert(api._backend.gear_motor_position)[Axis.P_L]
-    current_gear_pos_dict = {Axis.Q: current_gear_pos_float}
-    target_pos_dict = {Axis.Q: current_gear_pos_float + distance}
-
-    if speed is not None and distance < 0:
-        speed *= -1
-
-    tip_motor_move = api._build_moves(current_gear_pos_dict, target_pos_dict, speed)
-
-    _move_coro = api._backend.tip_action(
-        moves=tip_motor_move[0],
-        tip_action="clamp",
+    # if distance < 0:
+    #     action = "home"
+    # else:
+    action = "clamp"
+    if axis_motion_setting != None:
+        motion_settings = {Axis.Q: axis_motion_setting}
+        await set_gantry_load_per_axis_settings_ot3(api, motion_settings)
+    _move_coro = await api._backend.tip_action(
+        distance=distance,
+        velocity= speed,
+        tip_action=action,
     )
-    if motor_current is None:
-        await _move_coro
-    else:
-        async with api._backend.restore_current():
-            await api._backend.set_active_current(
-                {Axis.Q: motor_current}  # type: ignore[dict-item]
-            )
-            await _move_coro
+    # if motor_current is None:
+    #     await _move_coro
+    # else:
+    #     async with api._backend.restore_current():
+    #         await api._backend.set_active_current(
+    #             {Axis.Q: motor_current}  # type: ignore[dict-item]
+    #         )
+    #         await _move_coro
 
 
 async def move_plunger_relative_ot3(
