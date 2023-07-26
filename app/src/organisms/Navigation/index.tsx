@@ -130,6 +130,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
         <NavigationMenu
           onClick={() => handleMenu(false)}
           robotName={robotName}
+          setShowNavMenu={setShowNavMenu}
         />
       )}
     </>

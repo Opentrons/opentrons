@@ -22,10 +22,14 @@ import type { Dispatch } from '../../redux/types'
 interface NavigationMenuProps {
   onClick: React.MouseEventHandler
   robotName: string
+  setShowNavMenu: (showNavMenu: boolean) => void
 }
 
-export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
-  const { onClick, robotName } = props
+export function NavigationMenu({
+  onClick,
+  robotName,
+  setShowNavMenu,
+}: NavigationMenuProps): JSX.Element {
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
   const { lightsOn, toggleLights } = useLights()
   const dispatch = useDispatch<Dispatch>()
@@ -36,6 +40,11 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
 
   const handleRestart = (): void => {
     setShowRestartRobotConfirmationModal(true)
+  }
+
+  const handleHomeGantry = (): void => {
+    dispatch(home(robotName, ROBOT))
+    setShowNavMenu(false)
   }
 
   return (
@@ -49,10 +58,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
         />
       ) : null}
       <MenuList onClick={onClick} isOnDevice={true}>
-        <MenuItem
-          key="home-gantry"
-          onClick={() => dispatch(home(robotName, ROBOT))}
-        >
+        <MenuItem key="home-gantry" onClick={handleHomeGantry}>
           <Flex alignItems={ALIGN_CENTER}>
             <Icon
               name="home-gantry"
