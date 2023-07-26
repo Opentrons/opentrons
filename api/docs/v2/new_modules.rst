@@ -38,10 +38,12 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
 
             def run(protocol: protocol_api.ProtocolContext): 
                 # Load a Heater-Shaker Module GEN1 in deck slot D1.
-                heater_shaker = protocol.load_module('heaterShakerModuleV1', "D1")
+                heater_shaker = protocol.load_module(
+                  module_name='heaterShakerModuleV1', location="D1")
          
                 # Load a Temperature Module GEN2 in deck slot D3.
-                temperature_module = protocol.load_module('temperature module', "D3")
+                temperature_module = protocol.load_module(
+                  module_name='temperature module', location="D3")
 
         After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.HeaterShakerContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
         
@@ -56,10 +58,12 @@ Use :py:meth:`.ProtocolContext.load_module` to load a module.
             
             def run(protocol: protocol_api.ProtocolContext): 
                 # Load a Magnetic Module GEN2 in deck slot 1.
-                magnetic_module = protocol.load_module('magnetic module gen2', 1)
+                magnetic_module = protocol.load_module(
+                  module_name='magnetic module gen2', location=1)
          
                 # Load a Temperature Module GEN1 in deck slot 3.
-                temperature_module = protocol.load_module('temperature module', 3)
+                temperature_module = protocol.load_module(
+                  module_name='temperature module', location=3)
 
         After the ``load_module`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticModuleContext` and :py:class:`~opentrons.protocol_api.TemperatureModuleContext` objects.
 
@@ -77,7 +81,7 @@ The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  
    :widths: 4 5 2
    
    +--------------------+-------------------------------+---------------------------+
-   | Module             | Load Name                     | Introduced in API Version |
+   | Module             | API Load Name                 | Introduced in API Version |
    +====================+===============================+===========================+
    | Temperature Module | ``temperature module``        | 2.0                       |
    | GEN1               | or ``tempdeck``               |                           |
@@ -106,6 +110,8 @@ The first parameter of :py:meth:`.ProtocolContext.load_module` is the module's  
 
 Some modules were added to our Python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your ``requirements`` or ``metadata`` code block specifies a :ref:`Protocol API version <v2-versioning>` high enough to support all the module generations you want to use.
 
+.. _load-labware-module:
+
 Loading Labware onto a Module
 =============================
 
@@ -113,11 +119,11 @@ You'll use the :py:meth:`.ProtocolContext.load_labware` method when loading labw
 
     def run(protocol: protocol_api.ProtocolContext):
         temp_mod = protocol.load_module(
-          module_name:"temperature module gen2",
-          location:"D1")
+          module_name="temperature module gen2",
+          location="D1")
         temp_labware = temp_mod.load_labware(
-            load_name:"opentrons_24_aluminumblock_generic_2ml_screwcap",
-            label:"Temperature-Controlled Tubes")
+            name="opentrons_24_aluminumblock_generic_2ml_screwcap",
+            label="Temperature-Controlled Tubes")
 
 .. versionadded:: 2.0
 
@@ -126,8 +132,6 @@ When you load labware on a module, you don’t need to specify the deck slot. In
 Any :ref:`v2-custom-labware` added to your Opentrons App is also accessible when loading labware onto a module. You can find and copy its load name by going to its card on the Labware page.
 
 .. versionadded:: 2.1
-
-.. Should the section below be a warning? 
 
 Module and Labware Compatibility
 --------------------------------
@@ -138,7 +142,7 @@ It's your responsibility to ensure the labware and module combinations you load 
 Additional Labware Parameters
 -----------------------------
 
-In addition to the mandatory ``load_name`` argument, you can also specify additional parameters. If you specify a ``label``, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify ``version`` and ``namespace`` (though most of the time you won't have to). The :py:meth:`~.ProtocolContext.load_labware` methods of all powered modules accept these additional parameters.
+In addition to the mandatory ``load_name`` argument, you can also specify additional parameters. For example, if you specify a ``label``, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify ``version`` and ``namespace`` (though most of the time you won't have to). The :py:meth:`~.ProtocolContext.load_labware` methods of all powered modules accept these additional parameters.
 
 .. _temperature-module:
 
@@ -148,31 +152,17 @@ Using a Temperature Module
 
 The Temperature Module acts as both a cooling and heating device. It can control the temperature of its deck between 4 °C and 95 °C with a resolution of 1 °C.
 
-The Temperature Module is represented in code by a :py:class:`.TemperatureModuleContext` object, which has methods for setting target temperatures and reading the module's status.
-
-The examples in this section use a Temperature Module loaded in deck slot D3 on Flex, which corresponds to deck slot 3 on OT-2.
+The Temperature Module is represented in code by a :py:class:`.TemperatureModuleContext` object, which has methods for setting target temperatures and reading the module's status. This example demonstrates loading a Temperature Module and loading a well plate on top of it.
 
 .. code-block:: python
     :substitutions:
 
     def run(protocol: protocol_api.ProtocolContext):
-        temp_mod = protocol.load_module('temperature module gen2', 'D3')
-        plate = temp_mod.load_labware('corning_96_wellplate_360ul_flat')
-
-The supported deck slot positions for the Temperature Module depend on the robot you’re using.
-
-.. list-table::
-   :widths: 30 80
-   :header-rows: 1
-
-   * - Robot Model
-     - Temperature Module Deck Placement
-   * - Flex
-     - In any deck slot in column 1 or 3. You could put it in slot A3, but you'd need to move the trash bin first.
-   * - OT-2
-     - In deck slots 1, 3, 4, 6, 7, 9, or 10.
-
-To properly align the module relative to the robot, make sure its exhaust, power, and USB ports face outward, away from the center of the deck. This keeps the exhaust port clear and helps make cable routing and access easier.
+        temp_mod = protocol.load_module(
+          module_name='temperature module gen2',
+          location='D3')
+        plate = temp_mod.load_labware(
+          name='corning_96_wellplate_360ul_flat')
 
 .. versionadded:: 2.0
 
@@ -214,7 +204,6 @@ Changes with the GEN2 Temperature Module
 
 All methods of :py:class:`.TemperatureModuleContext` work with both the GEN1 and GEN2 Temperature Module. Physically, the GEN2 module has a plastic insulating rim around the plate, and plastic insulating shrouds designed to fit over Opentrons aluminum blocks. This mitigates an issue where the GEN1 module would have trouble cooling to very low temperatures, especially if it shared the deck with a running Thermocycler.
 
-
 .. _magnetic-module:
 
 ***********************
@@ -231,15 +220,13 @@ The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` objec
 The examples in this section apply to an OT-2 with a Magnetic Module loaded in slot 6:
 
 .. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api
-
-    metadata = {'apiLevel': '2.3'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        mag_mod = protocol.load_module('magnetic module gen2', '6')
-        plate = mag_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
+        mag_mod = protocol.load_module(
+          module_name='magnetic module gen2',
+          location='6')
+        plate = mag_mod.load_labware(
+          name='nest_96_wellplate_100ul_pcr_full_skirt')
 
 .. versionadded:: 2.0
 
@@ -339,27 +326,10 @@ The examples in this section will use a Thermocycler loaded as follows:
 .. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
-        tc_mod = protocol.load_module('thermocyclerModuleV2')
-        plate = tc_mod.load_labware('nest_96_wellplate_100ul_pcr_full_skirt')
-        
-.. _thermocycler-location:
-The ``location`` parameter of :py:meth:`.load_module` isn't required for the Thermocycler. This module has only one valid deck location, which depends on the robot you're using.
-
-.. list-table::
-   :widths: 30 80
-   :header-rows: 1
-
-   * - Robot Model
-     - Thermocycler Deck Placement
-   * - Flex
-     - Requires deck slots A1 and B1 and the A1 expansion slot.
-   * - OT-2
-     - Requires deck slots 7, 8, 10, and 11.
-
-Attempting to load any other modules or labware in these slots with a Thermocycler installed will raise an error.
+        tc_mod = protocol.load_module(module_name='thermocyclerModuleV2')
+        plate = tc_mod.load_labware(name='nest_96_wellplate_100ul_pcr_full_skirt')
 
 .. versionadded:: 2.0
-
 
 Lid Control
 ===========
@@ -447,8 +417,8 @@ For example, this profile commands the Thermocycler to reach 10 °C and hold for
 .. code-block:: python
 
         profile = [
-            {'temperature': 10, 'hold_time_seconds': 30},
-            {'temperature': 60, 'hold_time_seconds': 45}
+            {'temperature':10, 'hold_time_seconds':30},
+            {'temperature':60, 'hold_time_seconds':45}
         ]
 
 Once you have written the steps of your profile, execute it with :py:meth:`~.ThermocyclerContext.execute_profile`. This function executes your profile steps multiple times depending on the ``repetitions`` parameter. It also takes a ``block_max_volume`` parameter, which is the same as that of the :py:meth:`~.ThermocyclerContext.set_block_temperature` function.
@@ -499,7 +469,9 @@ The Heater-Shaker Module provides on-deck heating and orbital shaking. The modul
 The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerContext` object. For example::
 
     def run(protocol: protocol_api.ProtocolContext):
-         hs_mod = protocol.load_module('heaterShakerModuleV1', "D1")
+         hs_mod = protocol.load_module(
+          module_name='heaterShakerModuleV1',
+          location="D1")
 
 .. versionadded:: 2.13
 
@@ -558,14 +530,14 @@ To prepare the deck before running a protocol, use the labware latch controls in
 Loading Labware
 ===============
 
-Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it.
+Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it.  See the :ref:`load-labware-module` section for an example of how to place labware on a module.
 
 Currently, the `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes several pre-configured thermal adapter and labware combinations and standalone thermal adapter definitions that help make the Heater-Shaker ready to use right out of the box. See the :ref:`new-labware` chapter for information and examples about loading labware on modules.
 
 Pre-configured Combinations
 ---------------------------
 
-The Heater-Shaker supports these thermal adapter and labware combinations by default. These let you load the adapter and labware with a single definition. 
+The Heater-Shaker supports these thermal adapter and labware combinations by default. These let you load the adapter and labware with a single definition.
 
 .. list-table::
    :header-rows: 1
@@ -610,7 +582,11 @@ Custom flat-bottom labware can be used with the Universal Flat Adapter. See the 
 Heating and Shaking
 ===================
 
-Heating and shaking operations are controlled independently, and are treated differently due to the amount of time they take. Speeding up or slowing down the shaker takes at most a few seconds, so it is treated as a *blocking* command — all other command execution must wait until it is complete. In contrast, heating the module or letting it passively cool can take much longer, so the Python API gives you the flexibility to perform other pipetting actions while waiting to reach a target temperature. When holding at a target, you can design your protocol to run in a blocking or non-blocking manner.
+The API treats heating and shaking as separate, independent activities due to the amount of time they take.
+
+Increasing or reducing shaking speed takes a few seconds, so the API treats these actions as *blocking* commands. All other commands cannot run until the module reaches the required speed.
+
+Heating the module, or letting it passively cool, takes more time than changing the shaking speed. As a result, the API gives you the flexibility to perform other pipetting actions while waiting for the module to reach a target temperature. When holding at temperature, you can design your protocol to run in a blocking or non-blocking manner.
 
 .. note::
 
@@ -619,7 +595,7 @@ Heating and shaking operations are controlled independently, and are treated dif
 Blocking commands
 -----------------
 
-Here is how to use a blocking command and shake a sample for one minute. No other commands will execute until a minute has elapsed. The three commands in this example start the shake, wait for one minute, and then stop the shake::
+This example uses a blocking command and shakes a sample for one minute. No other commands will execute until a minute has elapsed. The three commands in this example start the shake, wait for one minute, and then stop the shake::
 
     hs_mod.set_and_wait_for_shake_speed(500)
     protocol.delay(minutes=1)
@@ -672,7 +648,7 @@ Provided that the parallel pipetting actions don’t take more than one minute, 
 Deactivating
 ============
 
-Deactivating the heater and shaker are done separately using the :py:meth:`~.HeaterShakerContext.deactivate_heater` and :py:meth:`~.HeaterShakerContext.deactivate_shaker` respectively. There is no method to deactivate both simultaneously, so call the two methods in sequence if you need to stop both heating and shaking.
+Deactivating the heater and shaker are done separately using the :py:meth:`~.HeaterShakerContext.deactivate_heater` and :py:meth:`~.HeaterShakerContext.deactivate_shaker` respectively. There is no method to deactivate both simultaneously. Call the two methods in sequence if you need to stop both heating and shaking.
 
 .. note:: 
 
@@ -687,35 +663,35 @@ Using a Magnetic Block Module
 .. note::
    Recommended for use with the Flex only. If you have an OT-2, see :ref:`magnetic-module`.
 
-The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. It is suitable for many magnetic bead-based protocols, but does not move beads up or down in solution.
+The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You "control" it via protocols to load labware onto the module and use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module. This module is suitable for many magnetic bead-based protocols, but does not move beads up or down in solution.
 
-Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You control it via protocols that use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module. For example, this code loads a Magnetic Block in deck slot D1, stacks a well-plate on top of it, and then uses the Gripper to move the well plate to another deck slot::
+The Magnetic Block is represented by a :py:class:`~opentrons.protocol_api.MagneticBlockContext` object which lets you load labware on top of the module.
+
+.. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
         
         # Load the Magnetic Block in deck slot D1
-        mag_block = protocol.load_module(
+        magnetic_block = protocol.load_module(
           module_name='magneticBlockV1',
           location='D1')
         
         # Load a 96-well plate on the magnetic block
-        well_plate = mag_block.load_labware(
+        well_plate = magnetic_block.load_labware(
           name="biorad_96_wellplate_200ul_pcr")
-        
-        # Use the gripper to move the well plate off the block
-        protocol.move_labware(well_plate,
-          new_location="B2",
-          use_gripper=True)
-        
-After the ``load_module ()`` method loads labware into your protocol, it returns the :py:class:`~opentrons.protocol_api.MagneticBlockContext`.
 
-For more information about using and moving labware with the Magnetic Block, see :ref:`Labware` and :ref:`Moving Labware`, respectively.
+        # Use the Gripper to move labware
+        protocol.move_labware(well_plate,
+                         new_location="B2",
+                         use_gripper=True)
+
+See :ref:`Moving Labware` for more information.
 
 ***************************************
 Using Multiple Modules of the Same Type
 ***************************************
 
-You can use multiple modules of the same type within a single protocol. The exception is the Thermocycler Module, which has only one :ref:`supported deck location <thermocycler-location>` because of its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and robot server. 
+You can use multiple modules of the same type within a single protocol. The exception is the Thermocycler Module, which has only one supported deck location because of its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and robot server. 
 
 When working with multiple modules of the same type, load them in your protocol according to their USB port number. Deck coordinates are required by the :py:meth:`~.ProtocolContext.load_labware` method, but location does not determine which module loads first. Your robot will use the module with the lowest USB port number *before* using a module of the same type that's connected to higher numbered USB port. The USB port number (not deck location) determines module load sequence, starting with the lowest port number first.
 
