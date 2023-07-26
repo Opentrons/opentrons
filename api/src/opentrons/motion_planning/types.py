@@ -37,4 +37,4 @@ class GripperMovementWaypointsWithJawStatus:
     """Gripper motion waypoint with expected jaw status while moving to the waypoint."""
 
     position: Point
-    jawOpen: bool
+    jaw_open: bool
