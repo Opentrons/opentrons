@@ -9,7 +9,7 @@ import { DeckSlot } from '../types'
 
 export function getNextAvailableDeckSlot(
   initialDeckSetup: InitialDeckSetup,
-  robotType: RobotType = OT2_ROBOT_TYPE
+  robotType: RobotType
 ): DeckSlot | null | undefined {
   const deckDef = getDeckDefFromRobotType(robotType)
   return deckDef.locations.orderedSlots.find(slot =>
