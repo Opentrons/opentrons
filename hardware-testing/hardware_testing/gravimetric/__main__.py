@@ -9,7 +9,7 @@ from opentrons.protocol_api import ProtocolContext
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
 from hardware_testing.protocols import (
     gravimetric_ot3_p50_single,
-    gravimetric_ot3_p50_multi_50ul_tip,
+    gravimetric_ot3_p50_multi,
     gravimetric_ot3_p1000_single,
     gravimetric_ot3_p1000_multi,
     gravimetric_ot3_p1000_96_50ul_tip,
@@ -46,7 +46,7 @@ LABWARE_OFFSETS: List[dict] = []
 GRAVIMETRIC_CFG = {
     50: {
         1: {50: gravimetric_ot3_p50_single},
-        8: {50: gravimetric_ot3_p50_multi_50ul_tip},
+        8: {50: gravimetric_ot3_p50_multi},
     },
     1000: {
         1: {
@@ -258,7 +258,9 @@ def _main(
         robot_serial=robot_serial,
         tip_batch=tip_batch,
         git_description=get_git_description(),
-        tips=get_tips(_ctx, pipette, args.tip, all_channels=all_channels_same_time),
+        tips=get_tips(
+            _ctx, pipette, args.tip, args.pipette, all_channels=all_channels_same_time
+        ),
         env_sensor=env_sensor,
         scale=scale,
     )

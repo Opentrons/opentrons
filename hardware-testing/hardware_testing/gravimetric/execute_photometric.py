@@ -281,7 +281,9 @@ def execute_trials(
         if not len(tips[0]):
             if not resources.ctx.is_simulating():
                 ui.get_user_ready(f"replace TIPRACKS in slots {cfg.slots_tiprack}")
-            tips = get_tips(resources.ctx, resources.pipette, cfg.tip_volume, True)
+            tips = get_tips(
+                resources.ctx, resources.pipette, cfg.tip_volume, 1000, True
+            )
         return tips[0].pop(0)
 
     trial_total = len(resources.test_volumes) * cfg.trials
