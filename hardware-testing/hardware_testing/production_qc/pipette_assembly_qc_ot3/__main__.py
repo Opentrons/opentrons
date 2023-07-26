@@ -1339,6 +1339,7 @@ async def _main(test_config: TestConfig) -> None:
         csv_cb.write(["pipette", pipette_sn])
         csv_cb.write(["simulating" if test_config.simulate else "live"])
         csv_cb.write(["version", data.get_git_description()])
+        # TODO: add firmware version here
         # add test configurations to CSV
         csv_cb.write(["-------------------"])
         csv_cb.write(["TEST-CONFIGURATIONS"])
@@ -1387,6 +1388,19 @@ async def _main(test_config: TestConfig) -> None:
 
         print("homing")
         await api.home([Axis.of_main_tool_actuator(mount)])
+        if not api.is_simulator:
+            barcode_sn = input("scan pipette barcode: ").strip()
+        else:
+            barcode_sn = str(pipette_sn)
+        barcode_passed = barcode_sn == pipette_sn
+        csv_cb.write(
+            [
+                "pipette-barcode",
+                pipette_sn,
+                barcode_sn,
+                _bool_to_pass_fail(barcode_passed),
+            ]
+        )
 
         if not test_config.skip_plunger or not test_config.skip_diagnostics:
             print("moving over slot 3")
