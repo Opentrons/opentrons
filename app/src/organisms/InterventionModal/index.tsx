@@ -134,8 +134,8 @@ export function InterventionModal({
   ])
 
   let iconName: IconName | null = null
-  let headerTitle = null
-  let headerTitleOnDevice = null
+  let headerTitle = ''
+  let headerTitleOnDevice = ''
   if (
     command.commandType === 'waitForResume' ||
     command.commandType === 'pause' // legacy pause command
@@ -156,18 +156,11 @@ export function InterventionModal({
       border={`8px ${BORDERS.styleSolid} ${COLORS.blueEnabled}`}
       modalSize="large"
       header={{
-        title: (
-          <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing16}>
-            {iconName != null ? (
-              <Icon name={iconName} size={SPACING.spacing32} />
-            ) : null}
-            <StyledText css={TYPOGRAPHY.level4HeaderBold}>
-              {headerTitleOnDevice}
-            </StyledText>
-          </Flex>
-        ),
         backgroundColor: COLORS.blueEnabled,
         color: COLORS.white,
+        iconColor: COLORS.white,
+        iconName: iconName ?? undefined,
+        title: headerTitleOnDevice,
       }}
     >
       <Flex
