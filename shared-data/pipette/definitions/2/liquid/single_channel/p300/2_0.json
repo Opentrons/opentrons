@@ -23,10 +23,6 @@
           "2.6": 92.86
         }
       },
-      "defaultFlowAcceleration": {
-        "default": 100,
-        "valuesByApiLevel": { "2.13": 100 }
-      },
       "defaultTipLength": 49.0,
       "aspirate": {
         "default": {
@@ -121,10 +117,6 @@
           "2.0": 46.43,
           "2.6": 92.86
         }
-      },
-      "defaultFlowAcceleration": {
-        "default": 100,
-        "valuesByApiLevel": { "2.13": 100 }
       },
       "defaultTipLength": 49.0,
       "aspirate": {

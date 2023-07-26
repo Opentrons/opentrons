@@ -14,10 +14,6 @@
         "default": 1000,
         "valuesByApiLevel": { "2.0": 1000 }
       },
-      "defaultFlowAcceleration": {
-        "default": 100,
-        "valuesByApiLevel": { "2.13": 100 }
-      },
       "defaultTipLength": 51.7,
       "aspirate": {
         "default": {
@@ -49,10 +45,6 @@
       "defaultBlowOutFlowRate": {
         "default": 1000,
         "valuesByApiLevel": { "2.0": 1000 }
-      },
-      "defaultFlowAcceleration": {
-        "default": 100,
-        "valuesByApiLevel": { "2.13": 100 }
       },
       "defaultTipLength": 51.7,
       "aspirate": {

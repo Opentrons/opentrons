@@ -23,10 +23,6 @@
           "2.6": 7.56
         }
       },
-      "defaultFlowAcceleration": {
-        "default": 100,
-        "valuesByApiLevel": { "2.13": 100 }
-      },
       "defaultTipLength": 31.15,
       "aspirate": {
         "opentrons/opentrons_96_tiprack_20ul/1": [
@@ -239,10 +235,6 @@
           "2.0": 3.78,
           "2.6": 7.56
         }
-      },
-      "defaultFlowAcceleration": {
-        "default": 100,
-        "valuesByApiLevel": { "2.13": 100 }
       },
       "defaultTipLength": 31.15,
       "aspirate": {

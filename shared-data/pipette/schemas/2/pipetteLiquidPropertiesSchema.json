@@ -33,18 +33,6 @@
         },
         "valuesByApiLevel": { "type": "object", "required": [] }
       }
-    },
-    "flowAcceleration": {
-      "description": "Object with a default value and optional dict keyed by api level. If API level is unavailable, default is used.",
-      "type": "object",
-      "required": ["default"],
-      "properties": {
-        "default": {
-          "$ref": "#/definitions/positiveNumber",
-          "$comment": "The default value of the plunger acceleration"
-        },
-        "valuesByApiLevel": { "type": "object", "required": [] }
-      }
     }
   },
   "type": "object",
@@ -75,7 +63,6 @@
               "defaultAspirateFlowRate",
               "defaultDispenseFlowRate",
               "defaultBlowOutFlowRate",
-              "defaultFlowAcceleration",
               "aspirate",
               "dispense"
             ],
@@ -90,7 +77,7 @@
                 "$ref": "#/definitions/flowRate"
               },
               "defaultFlowAcceleration": {
-                "$ref": "#/definitions/flowAcceleration"
+                "$ref": "#/definitions/positiveNumber"
               },
               "defaultTipLength": {
                 "$ref": "#/definitions/positiveNumber"
