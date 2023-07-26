@@ -20,6 +20,12 @@
           "2.14": 160
         }
       },
+      "defaultFlowAcceleration": {
+        "default": 24000,
+        "valuesByApiLevel": {
+          "2.13": 24000
+        }
+      },
       "defaultTipLength": 57.9,
       "defaultReturnTipHeight": 0.71,
       "aspirate": {
@@ -139,6 +145,12 @@
           "2.14": 160
         }
       },
+      "defaultFlowAcceleration": {
+        "default": 24000,
+        "valuesByApiLevel": {
+          "2.13": 24000
+        }
+      },
       "defaultTipLength": 58.35,
       "defaultReturnTipHeight": 0.71,
       "aspirate": {
@@ -256,6 +268,12 @@
           "2.14": 160
         }
       },
+      "defaultFlowAcceleration": {
+        "default": 24000,
+        "valuesByApiLevel": {
+          "2.13": 24000
+        }
+      },
       "defaultTipLength": 95.6,
       "defaultReturnTipHeight": 0.82,
       "aspirate": {
@@ -361,7 +379,6 @@
     "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5,
     "opentrons/opentrons_flex_96_tiprack_1000ul/1": 10.5
   },
-
   "maxVolume": 1000,
   "minVolume": 5,
   "defaultTipracks": [
