@@ -6,33 +6,49 @@
 Pipettes
 ########
 
-When writing a protocol, you must inform the Protocol API about the pipettes you will be using on your OT-2. The Protocol API then creates software objects called :py:class:`.InstrumentContext`, that represent the attached pipettes.
+A basic pipetting protocol tells the API about the pipette model you want to use and its location on the z-axis carriage. The :py:meth:`.ProtocolContext.load_instrument` function provides these capabilities. It includes parameters that accept a pipette’s API load name, its mount position, and other arguments. Calling this function returns an :py:class:`.InstrumentContext` object.
 
-Pipettes are loaded into a specific mount (``'left'`` or ``'right'``) on the OT-2 using the function :py:meth:`.ProtocolContext.load_instrument` from the :py:class:`.ProtocolContext` class. This will return an :py:class:`.InstrumentContext` object. See :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`
-for liquid handling commands from the :py:class:`.InstrumentContext` class.
+For information about liquid handling, see :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
 
 .. _new-create-pipette:
 
 Loading A Pipette
 ------------------
 
-Pipettes are specified in a protocol using the method :py:meth:`.ProtocolContext.load_instrument`. This method requires the model of the instrument to load, the mount to load it in, and (optionally) a list of associated tipracks:
+You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instrument` method. This method requires the pipette model, which is set by the API load name, it's location (e.g. ``'left'`` or ``'right'``), and a list of associated tipracks (if used). 
 
-.. code-block:: python
-    :substitutions:
+.. tabs::
 
-    from opentrons import protocol_api
+    .. tab:: Flex
 
-    metadata = {'apiLevel': '|apiLevel|'}
+        Some text and code here.
 
-    def run(protocol: protocol_api.ProtocolContext):
-        # Load a P50 multi on the left slot
-        left = protocol.load_instrument('p50_multi', 'left')
-        # Load a P1000 Single on the right slot, with two racks of tips
-        tiprack1 = protocol.load_labware('opentrons_96_tiprack_1000ul', 1)
-        tiprack2 = protocol.load_labware('opentrons_96_tiprack_1000ul', 2)
-        right = protocol.load_instrument('p1000_single', 'right',
-                                         tip_racks=[tiprack1, tiprack2])
+        .. code-block:: Python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|''}
+
+
+    .. tab:: OT-2
+        
+        Some text and code here.
+        
+        .. code-block:: python
+            :substitutions:
+
+            from opentrons import protocol_api
+
+            metadata = {'apiLevel': '|apiLevel|'}
+
+            def run(protocol: protocol_api.ProtocolContext):
+                # Load a P50 multi on the left slot
+                left = protocol.load_instrument('p50_multi', 'left')
+                # Load a P1000 Single on the right slot, with two racks of tips
+                tiprack1 = protocol.load_labware('opentrons_96_tiprack_1000ul', 1)
+                tiprack2 = protocol.load_labware('opentrons_96_tiprack_1000ul', 2)
+                right = protocol.load_instrument('p1000_single', 'right',tip_racks=[tiprack1, tiprack2])
 
 .. versionadded:: 2.0
 
