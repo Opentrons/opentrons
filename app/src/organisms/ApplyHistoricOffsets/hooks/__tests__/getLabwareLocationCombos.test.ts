@@ -120,6 +120,13 @@ const mockLabwareEntities: ProtocolAnalysisOutput['labware'] = [
     displayName: 'second labware nickname',
   },
   {
+    id: 'secondLabwareId',
+    loadName: mockLabwareDef.parameters.loadName,
+    definitionUri: getLabwareDefURI(mockLabwareDef),
+    location: { slotName: '2' },
+    displayName: 'second labware nickname',
+  },
+  {
     id: 'duplicateLabwareId',
     loadName: mockLabwareDef.parameters.loadName,
     definitionUri: getLabwareDefURI(mockLabwareDef),
@@ -157,6 +164,11 @@ describe('getLabwareLocationCombos', () => {
       {
         location: { slotName: '2' },
         labwareId: 'secondLabwareId',
+        definitionUri: getLabwareDefURI(mockLabwareDef),
+      },
+      {
+        location: { slotName: '2' },
+        labwareId: 'duplicateLabwareId',
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },
       {
@@ -264,6 +276,11 @@ describe('getLabwareLocationCombos', () => {
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },
       {
+        location: { slotName: '2' },
+        labwareId: 'duplicateLabwareId',
+        definitionUri: getLabwareDefURI(mockLabwareDef),
+      },
+      {
         location: { slotName: '3', moduleModel: 'heaterShakerModuleV1' },
         labwareId: 'onModuleLabwareId',
         moduleId: 'firstModuleId',
@@ -277,6 +294,11 @@ describe('getLabwareLocationCombos', () => {
       {
         location: { slotName: '5' },
         labwareId: 'secondLabwareId',
+        definitionUri: getLabwareDefURI(mockLabwareDef),
+      },
+      {
+        location: { slotName: '5' },
+        labwareId: 'duplicateLabwareId',
         definitionUri: getLabwareDefURI(mockLabwareDef),
       },
     ])
