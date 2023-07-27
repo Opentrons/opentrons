@@ -34,13 +34,15 @@
   font-weight: var(--fw-semibold);
 }
 
-.title,
-.subtitle {
+.title {
   @apply --truncate;
 
   padding: 0 1.5rem;
 }
 
+.subtitle {
+  padding: 0 1.5rem;
+}
 .title.right {
   margin-left: auto;
 }
