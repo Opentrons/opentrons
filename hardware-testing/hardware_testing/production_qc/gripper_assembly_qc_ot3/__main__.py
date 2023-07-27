@@ -19,6 +19,7 @@ async def _main(cfg: TestConfig) -> None:
         pipette_right="p1000_single_v3.3",
         gripper="GRPV1120230323A01",
     )
+    await api.home_z(OT3Mount.GRIPPER)
     await api.home()
     home_pos = await api.gantry_position(OT3Mount.GRIPPER)
     if not api.has_gripper():
