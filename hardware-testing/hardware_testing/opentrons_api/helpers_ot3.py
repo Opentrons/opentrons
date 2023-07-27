@@ -39,6 +39,8 @@ from .types import (
 TIP_LENGTH_OVERLAP = 10.5
 TIP_LENGTH_LOOKUP = {50: 57.9, 200: 58.35, 1000: 95.6}
 
+RESET_DELAY_SECONDS = 2
+
 
 @dataclass
 class CalibrationSquare:
@@ -126,6 +128,8 @@ async def update_firmware(
     api: OT3API, force: bool = False, subsystems: Optional[List[SubSystem]] = None
 ) -> None:
     """Update firmware of OT3."""
+    if not api.is_simulator:
+        await asyncio.sleep(RESET_DELAY_SECONDS)
     subsystems_on_boot = api.attached_subsystems
     progress_tracker: Dict[SubSystem, List[int]] = {}
 
@@ -146,6 +150,14 @@ async def update_firmware(
         if update.progress != progress_tracker[update.subsystem][1]:
             progress_tracker[update.subsystem][1] = update.progress
             _print_update_progress()
+
+
+async def reset_api(api: OT3API) -> None:
+    """Reset OT3API."""
+    if not api.is_simulator:
+        await asyncio.sleep(RESET_DELAY_SECONDS)
+    await api.cache_instruments()
+    await api.refresh_positions()
 
 
 async def build_async_ot3_hardware_api(
@@ -191,12 +203,9 @@ async def build_async_ot3_hardware_api(
         kwargs["use_usb_bus"] = False  # type: ignore[assignment]
         api = await builder(loop=loop, **kwargs)  # type: ignore[arg-type]
     if not is_simulating:
-        await asyncio.sleep(0.5)
-    if not is_simulating:
         await update_firmware(api)
     print(f"Firmware: v{api.fw_version}")
-    await api.cache_instruments()
-    await api.refresh_positions()
+    await reset_api(api)
     return api
 
 
