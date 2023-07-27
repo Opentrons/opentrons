@@ -3,7 +3,7 @@ import asyncio
 import logging
 from pathlib import Path
 from fastapi import Depends, status
-from typing import Callable, Union, TYPE_CHECKING, cast, Awaitable, Iterator
+from typing import Callable, Union, TYPE_CHECKING, cast, Awaitable, Iterator, Iterable
 from uuid import uuid4  # direct to avoid import cycles in service.dependencies
 from traceback import format_exception_only, TracebackException
 from contextlib import contextmanager
@@ -57,6 +57,8 @@ from .robot.control.estop_handler import EstopHandler
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
+# Function that can be called when hardware initialization completes
+PostInitCallback = Callable[[AppState, HardwareControlAPI], Awaitable[None]]
 
 log = logging.getLogger(__name__)
 
@@ -79,15 +81,22 @@ class _ExcPassthrough(BaseException):
         self.payload = payload
 
 
-def start_initializing_hardware(app_state: AppState) -> None:
+def start_initializing_hardware(
+    app_state: AppState, callbacks: Iterable[PostInitCallback]
+) -> None:
     """Initialize the hardware API singleton, attaching it to global state.
 
     Returns immediately while the hardware API initializes in the background.
+
+    Any defined callbacks will be called after the hardware API is initialized, but
+    before the post-init tasks are executed.
     """
     initialize_task = _init_task_accessor.get_from(app_state)
 
     if initialize_task is None:
-        initialize_task = asyncio.create_task(_initialize_hardware_api(app_state))
+        initialize_task = asyncio.create_task(
+            _initialize_hardware_api(app_state, callbacks)
+        )
         _init_task_accessor.set_on(app_state, initialize_task)
 
 
@@ -441,7 +450,9 @@ def _format_exc(log_prefix: str) -> Iterator[None]:
         log.error(f"{log_prefix}: {format_exception_only(type(be), be)}")
 
 
-async def _initialize_hardware_api(app_state: AppState) -> None:
+async def _initialize_hardware_api(
+    app_state: AppState, callbacks: Iterable[PostInitCallback]
+) -> None:
     """Initialize the HardwareAPI and attach it to global state."""
     app_settings = get_settings()
     systemd_available = IS_ROBOT and ARCHITECTURE != SystemArchitecture.HOST
@@ -457,6 +468,9 @@ async def _initialize_hardware_api(app_state: AppState) -> None:
 
         _initialize_event_watchers(app_state, hardware)
         _hw_api_accessor.set_on(app_state, hardware)
+
+        for callback in callbacks:
+            await callback(app_state, hardware.wrapped())
 
         _systemd_notify(systemd_available)
 
