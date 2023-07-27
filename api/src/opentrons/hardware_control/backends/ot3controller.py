@@ -630,9 +630,10 @@ class OT3Controller:
         tip_action: str = "home",
         back_off: Optional[bool] = False,
     ) -> None:
+        # TODO: split this into two functions for homing and 'clamp'
         move_group = []
         # make sure either moves or distance and velocity is not None
-        assert any([moves, distance and velocity])
+        assert bool(moves) ^ (bool(distance) and bool(velocity))
         if moves is not None:
             move_group = create_tip_action_group(
                 moves, [NodeId.pipette_left], tip_action
@@ -651,6 +652,8 @@ class OT3Controller:
             self._gear_motor_position = {
                 NodeId.pipette_left: positions[NodeId.pipette_left][0]
             }
+        else:
+            log.debug("no position returned from NodeId.pipette_left")
 
     @requires_update
     async def gripper_grip_jaw(
