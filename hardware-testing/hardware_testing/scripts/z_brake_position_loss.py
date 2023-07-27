@@ -1,6 +1,9 @@
 """Holding Current Test."""
 import argparse
 import asyncio
+import time
+import numpy as np
+from typing import Tuple, Dict
 
 
 from opentrons.hardware_control.ot3api import OT3API
@@ -25,7 +28,7 @@ SETTINGS = {
         max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=0.5,
-        run_current=1.25,
+        run_current=1.25
     ),
     Axis.Y: GantryLoadSettings(
         max_speed=300,
@@ -33,7 +36,7 @@ SETTINGS = {
         max_start_stop_speed=10,
         max_change_dir_speed=5,
         hold_current=0.5,
-        run_current=1.2,
+        run_current=1.2
     ),
     Axis.Z: GantryLoadSettings(
         max_speed=35,
@@ -41,38 +44,44 @@ SETTINGS = {
         max_start_stop_speed=10,
         max_change_dir_speed=1,
         hold_current=0.8,
-        run_current=1.5,
+        run_current=1.5
     )
 }
 
-async def cycle_brake(api: OT3API,
-                        mount: OT3Mount,
-                        load: GantryLoad,
-                        axis: Axis,
-                        test_current: float) -> bool:
-    # Record encoder position before test
+async def cycle_brake(api: OT3API, mount: OT3Mount) -> Tuple[bool, float]:
+    # Record encoder position before disabling axes
     inital_pos = await api.encoder_current_position_ot3(mount=mount,
                                                         refresh=True)
-    print(f"\tInital {str(axis)} position: {inital_pos[axis]}")
+    # print(f"\tInital position: {inital_pos[Axis.Z]}")
 
+    # disenage_axes enables the brake and then disables the z motor driver
+    await api.disengage_axes([Axis.Z_L])
+    time.sleep(0.5)
 
-    api.disengage_axes([Axis.by_mount(OT3Mount.LEFT])
-
-    # Record encoder position after test
-    final_pos = await api.encoder_current_position_ot3(mount=mount,
+    # Record encoder position after disengaging
+    disengaged_pos = await api.encoder_current_position_ot3(mount=mount,
                                                         refresh=True)
-    print(f"\tFinal {str(axis)} position: {final_pos[axis]}")
+    # print(f"\tDisengaged position: {disengaged_pos[Axis.Z]}")
+
+    # enage_axes enables the z motor driver and then disables the brake
+    await api.engage_axes([Axis.Z_L])
+    time.sleep(0.5)
+
+    # Record encoder position after re-engaging
+    engaged_pos = await api.encoder_current_position_ot3(mount=mount,
+                                                        refresh=True)
+    # print(f"\tEngaged position: {engaged_pos[Axis.Z]}")
 
     # Find difference and check if passing
-    difference = final_pos[axis] - inital_pos[axis]
-    print(f"\tDifference {str(axis)} position: {difference}")
+    difference = engaged_pos[Axis.Z] - inital_pos[Axis.Z]
+    print(f"\tDifference: {difference}")
 
-    if abs(difference) < 0.1:
-        print("PASS\n")
-        return True
+    if abs(difference) < 0.0029296875:
+        # print("PASS\n")
+        return (True, difference)
     else:
-        print("FAIL\n")
-        return False
+        # print("FAIL\n")
+        return (False, difference)
 
 
 async def _main(arguments: argparse.Namespace) -> None:
@@ -82,18 +91,35 @@ async def _main(arguments: argparse.Namespace) -> None:
 
     try:
         await api.home()
-        test_pos = get_slot_calibration_square_position_ot3(5)
-        test_pos = test_pos._replace(z=100)
-        axis = AXIS_MAP[_axis]
+        home_pos = await api.gantry_position(OT3Mount.LEFT)
+        # test_pos = get_slot_calibration_square_position_ot3(5)
+        test_pos = home_pos._replace(z=100)
         mount = OT3Mount.LEFT
 
-        await move_to_arched_ot3(api, mount, test_pos)
+        # await move_to_arched_ot3(api, mount, test_pos)
         await set_gantry_load_per_axis_settings_ot3(
             api, SETTINGS, load=GANTRY_LOAD_MAP[arguments.load]
         )
 
+        pass_count = 0
+        fail_count = 0
+        pass_avg = []
+        fail_avg = []
+        for d in range(10):
+            for i in range(10):
+                    print(f"Cycle: {i}")
+                    result = await cycle_brake(api, mount)
+                    if result[0]:
+                        pass_count += 1
+                        pass_avg.append(result[1])
+                    else:
+                        fail_count += 1
+                        fail_avg.append(result[1])
 
-
+                    print(f"\tPass: {pass_count} - Avg: {np.mean(pass_avg)}")
+                    print(f"\tFail: {fail_count} - Avg: {np.mean(fail_avg)}")
+            await api.move_to(mount, test_pos)
+            await api.home()
 
     except KeyboardInterrupt:
         print("Cancelled")
