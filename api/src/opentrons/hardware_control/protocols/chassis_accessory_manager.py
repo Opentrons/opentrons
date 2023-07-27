@@ -67,3 +67,4 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
         If the Estop is not supported on this robot, this will always return Disengaged.
 
         :returns: The current Estop state."""
+        ...
