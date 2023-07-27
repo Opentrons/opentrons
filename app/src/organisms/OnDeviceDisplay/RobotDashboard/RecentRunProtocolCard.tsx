@@ -66,7 +66,7 @@ export function ProtocolWithLastRun({
   isProtocolFetching,
 }: ProtocolWithLastRunProps): JSX.Element {
   const { t, i18n } = useTranslation('device_details')
-  const missingProtocolHardware = useMissingProtocolHardware(protocolData.id)
+  const { missingProtocolHardware, isLoading: isLookingForHardware }= useMissingProtocolHardware(protocolData.id)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
   const chipText = useMissingHardwareText(missingProtocolHardware)
@@ -123,7 +123,7 @@ export function ProtocolWithLastRun({
     }
   ).replace('about ', '')
 
-  return isProtocolFetching ? (
+  return isProtocolFetching || isLookingForHardware ? (
     <Skeleton
       height="24.5rem"
       width="25.8125rem"
