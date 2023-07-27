@@ -328,9 +328,10 @@ if __name__ == "__main__":
     env_sensor = asair_sensor.BuildAsairSensor(_ctx.is_simulating())
     robot_serial = helpers._get_robot_serial(_ctx.is_simulating())
     operator_name = helpers._get_operator_name(_ctx.is_simulating())
-    scale: Optional[Scale] = None
+    recorder: Optional[GravimetricRecorder] = None
     if not args.photometric:
         scale = Scale.build(simulate=_ctx.is_simulating())
+        recorder = execute._load_scale("name", scale, run_id, pipette_tag, start_time, _ctx.is_simulating())
     if args.tip == 0:
         volumes: List[int] = get_tip_volumes_for_qc(
             args.pipette, args.channels, args.extra, args.photometric

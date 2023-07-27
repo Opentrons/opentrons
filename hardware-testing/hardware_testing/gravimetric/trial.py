@@ -80,7 +80,7 @@ class TestResources:
     git_description: str
     tips: Dict[int, List[Well]]
     env_sensor: asair_sensor.AsairSensorBase
-    scale: Optional[Scale]
+    recorder: Optional[GravimetricRecorder]
 
 
 def build_gravimetric_trials(

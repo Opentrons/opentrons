@@ -327,7 +327,12 @@ def build_gm_report(
 
 
 def _load_scale(
-    cfg: config.GravimetricConfig, resources: TestResources
+    name: str,
+    scale: Scale,
+    run_id: str,
+    pipette_tag: str,
+    start_time: str,
+    simulating: bool
 ) -> GravimetricRecorder:
     ui.print_header("LOAD SCALE")
     ui.print_info(
@@ -336,7 +341,6 @@ def _load_scale(
         "  1) Set profile to USER\n"
         "  2) Set screensaver to NONE\n"
     )
-    assert resources.scale is not None
     recorder = GravimetricRecorder(
         GravimetricRecorderConfig(
             test_name=cfg.name,
@@ -352,8 +356,7 @@ def _load_scale(
     )
     ui.print_info(f'found scale "{recorder.serial_number}"')
     if resources.ctx.is_simulating():
-        start_sim_mass = {50: 15, 200: 200, 1000: 200}
-        recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
+        recorder.set_simulation_mass(0)
     recorder.record(in_thread=True)
     ui.print_info(f'scale is recording to "{recorder.file_name}"')
     return recorder
@@ -441,7 +444,11 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
             raise ValueError(f"more trials ({trial_total}) than tips ({total_tips})")
         elif not resources.ctx.is_simulating():
             ui.get_user_ready(f"prepare {trial_total - total_tips} extra tip-racks")
-    recorder = _load_scale(cfg, resources)
+    assert resources.recorder is not None
+    recorder = resources.recorder
+    if resources.ctx.is_simulating():
+        start_sim_mass = {50: 15, 200: 200, 1000: 200}
+        resources.recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
     test_report = build_gm_report(cfg, resources, recorder)
 
     calibration_tip_in_use = True
