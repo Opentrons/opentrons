@@ -6,7 +6,6 @@ from opentrons.types import Point, DeckSlotName, MountType
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 
 from .. import errors
-from ..errors import LabwareMovementNotAllowedError
 from ..types import (
     OFF_DECK_LOCATION,
     LoadedLabware,
@@ -26,7 +25,6 @@ from ..types import (
     CurrentWell,
     TipGeometry,
     LabwareMovementOffsetData,
-    ModuleModel,
 )
 from .config import Config
 from .labware import LabwareView
@@ -46,6 +44,13 @@ class _TipDropSection(enum.Enum):
 
     LEFT = "left"
     RIGHT = "right"
+
+
+class _GripperMoveType(enum.Enum):
+    """Types of gripper movement."""
+
+    PICK_UP_LABWARE = enum.auto()
+    DROP_LABWARE = enum.auto()
 
 
 # TODO(mc, 2021-06-03): continue evaluation of which selectors should go here
@@ -628,22 +633,21 @@ class GeometryView:
         additional_offset_vector: LabwareMovementOffsetData,
     ) -> LabwareMovementOffsetData:
         """Calculate the final labware offset vector to use in labware movement."""
-        # TODO (fps, 2022-05-30): Update this once RLAB-295 is merged
-        #  Get location-based offsets from deck/module/adapter definitions,
-        #  then add additional offsets
-        pick_up_offset = additional_offset_vector.pick_up_offset
-        drop_offset = additional_offset_vector.drop_offset
-
-        if isinstance(from_location, ModuleLocation):
-            module_id = from_location.moduleId
-            if (
-                self._modules.get_connected_model(module_id)
-                == ModuleModel.THERMOCYCLER_MODULE_V2
-            ):
-                pick_up_offset.z += _ADDITIONAL_TC2_PICKUP_OFFSET
+        pick_up_offset = (
+            self.get_total_nominal_gripper_offset(
+                location=from_location, move_type=_GripperMoveType.PICK_UP_LABWARE
+            )
+            + additional_offset_vector.pickUpOffset
+        )
+        drop_offset = (
+            self.get_total_nominal_gripper_offset(
+                location=to_location, move_type=_GripperMoveType.DROP_LABWARE
+            )
+            + additional_offset_vector.dropOffset
+        )
 
         return LabwareMovementOffsetData(
-            pick_up_offset=pick_up_offset, drop_offset=drop_offset
+            pickUpOffset=pick_up_offset, dropOffset=drop_offset
         )
 
     @staticmethod
@@ -654,7 +658,67 @@ class GeometryView:
         if not isinstance(
             location, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
         ):
-            raise LabwareMovementNotAllowedError(
+            raise errors.LabwareMovementNotAllowedError(
                 "Off-deck labware movements are not supported using the gripper."
             )
         return location
+
+    def get_total_nominal_gripper_offset(
+        self, location: LabwareLocation, move_type: _GripperMoveType
+    ) -> LabwareOffsetVector:
+        """Get the total of the offsets to be used to pick up labware in its current location."""
+        if move_type == _GripperMoveType.PICK_UP_LABWARE:
+            if isinstance(location, (ModuleLocation, DeckSlotLocation)):
+                return self.get_default_gripper_offsets(location).pickUpOffset
+            elif isinstance(location, OnLabwareLocation):
+                direct_parent_offset = self.get_default_gripper_offsets(location)
+                return (
+                    direct_parent_offset.pickUpOffset
+                    + self.get_total_nominal_gripper_offset(
+                        location=self._labware.get_location(location.labwareId),
+                        move_type=move_type,
+                    )
+                )
+            else:
+                raise errors.LabwareNotOnDeckError(
+                    "No gripper offsets for off-deck labware since Off-deck labware movements"
+                    " are not supported using the gripper."
+                )
+        else:
+            if isinstance(location, (ModuleLocation, DeckSlotLocation)):
+                return self.get_default_gripper_offsets(location).dropOffset
+            elif isinstance(location, OnLabwareLocation):
+                direct_parent_offset = self.get_default_gripper_offsets(location)
+                return (
+                    direct_parent_offset.dropOffset
+                    + self.get_total_nominal_gripper_offset(
+                        location, move_type=move_type
+                    )
+                )
+            else:
+                raise errors.LabwareNotOnDeckError(
+                    "No gripper offsets for off-deck labware since Off-deck labware movements"
+                    " are not supported using the gripper."
+                )
+
+    def get_default_gripper_offsets(
+        self, location: LabwareLocation
+    ) -> LabwareMovementOffsetData:
+        """Provide the default gripper offset data for the given location type."""
+        if isinstance(location, DeckSlotLocation):
+            offsets = self._labware.get_deck_default_gripper_offsets()
+        elif isinstance(location, ModuleLocation):
+            offsets = self._modules.get_default_gripper_offsets(location.moduleId)
+        elif isinstance(location, OnLabwareLocation):
+            offsets = self._labware.get_labware_default_gripper_offsets(
+                location.labwareId
+            )
+        else:
+            raise errors.LabwareNotOnDeckError(
+                "No gripper offsets for off-deck labware since Off-deck labware movements"
+                " are not supported using the gripper."
+            )
+        return offsets or LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
+            dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
+        )

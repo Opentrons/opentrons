@@ -18,6 +18,7 @@ from opentrons.protocol_engine.types import (
     DeckType,
     ModuleOffsetVector,
     HeaterShakerLatchStatus,
+    LabwareMovementOffsetData,
 )
 from opentrons.protocol_engine.state.modules import (
     ModuleView,
@@ -1743,3 +1744,36 @@ def test_is_edge_move_unsafe(
     result = subject.is_edge_move_unsafe(mount=mount, target_slot=target_slot)
 
     assert result is expected_result
+
+
+def test_get_default_gripper_offsets(
+    thermocycler_v2_def: ModuleDefinition,
+    tempdeck_v1_def: ModuleDefinition,
+) -> None:
+    """It should return the correct gripper offsets, if present."""
+    subject = make_module_view(
+        slot_by_module_id={
+            "module-1": DeckSlotName.SLOT_1,
+            "module-2": DeckSlotName.SLOT_2,
+        },
+        requested_model_by_module_id={
+            "module-1": ModuleModel.TEMPERATURE_MODULE_V1,
+            "module-2": ModuleModel.THERMOCYCLER_MODULE_V2,
+        },
+        hardware_by_module_id={
+            "module-1": HardwareModule(
+                serial_number="serial-1",
+                # Intentionally different from requested model.
+                definition=tempdeck_v1_def,
+            ),
+            "module-2": HardwareModule(
+                serial_number="serial-2",
+                definition=thermocycler_v2_def,
+            ),
+        },
+    )
+    assert subject.get_default_gripper_offsets("module-2") == LabwareMovementOffsetData(
+        pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
+        dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
+    )
+    assert subject.get_default_gripper_offsets("module-1") is None

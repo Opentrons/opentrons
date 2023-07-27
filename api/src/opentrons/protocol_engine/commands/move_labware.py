@@ -136,9 +136,8 @@ class MoveLabwareImplementation(
                 available_new_location,
             )
             user_offset_data = LabwareMovementOffsetData(
-                pick_up_offset=params.pickUpOffset
-                or LabwareOffsetVector(x=0, y=0, z=0),
-                drop_offset=params.dropOffset or LabwareOffsetVector(x=0, y=0, z=0),
+                pickUpOffset=params.pickUpOffset or LabwareOffsetVector(x=0, y=0, z=0),
+                dropOffset=params.dropOffset or LabwareOffsetVector(x=0, y=0, z=0),
             )
             # Skips gripper moves when using virtual gripper
             await self._labware_movement.move_labware_with_gripper(
