@@ -759,15 +759,17 @@ class OT3Controller:
         return {node_to_axis(node): bool(val) for node, val in res.items()}
 
     async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+        """Raise an error if the expected tip state does not match the current state."""
+        res = await self.get_tip_present_state(mount)
+        if res != tip_state.value:
+            raise FailedTipStateCheck(tip_state, res)
+
+    async def get_tip_present_state(self, mount: OT3Mount) -> int:
         """Get the state of the tip ejector flag for a given mount."""
-        # TODO (lc 06/09/2023) We should create a separate type for
-        # pipette specific sensors. This work is done in the overpressure
-        # PR.
         res = await get_tip_ejector_state(
             self._messenger, sensor_node_for_mount(OT3Mount(mount.value))  # type: ignore
         )
-        if res != tip_state.value:
-            raise FailedTipStateCheck(tip_state, res)
+        return res
 
     @staticmethod
     def _tip_motor_nodes(axis_current_keys: KeysView[Axis]) -> List[NodeId]:
