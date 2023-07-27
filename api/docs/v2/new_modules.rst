@@ -20,8 +20,10 @@ Hardware modules are powered and unpowered deck-mounted peripherals. The Flex an
 Powered modules include the Heater-Shaker Module, Magnetic Module, Temperature Module, and Thermocycler Module. The 96-well Magnetic Block is an unpowered module.
 
 Pages in this section of the documentation cover:
+
     - :ref:`Setting up modules and their labware <module-setup>`. 
     - Working with the module contexts for each type of module.
+    
         - :ref:`Heater-Shaker Module <heater-shaker-module>`
         - :ref:`Magnetic Block <magnetic-block>`
         - :ref:`Magnetic Module <magnetic-module>`
