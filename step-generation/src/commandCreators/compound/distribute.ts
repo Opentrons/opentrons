@@ -234,6 +234,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           curryCommandCreator(replaceTip, {
             pipette: args.pipette,
             tipRack: args.tipRack,
+            robotState: prevRobotState,
           }),
         ]
       }

@@ -204,6 +204,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
             }}
             width="21.75rem"
             minHeight="4rem"
+            showCheckbox
           />
         ))}
       </Flex>
@@ -266,6 +267,7 @@ function PipetteTipsField(props: PipetteTipsFieldProps): JSX.Element | null {
                   }}
                   width="21.75rem"
                   minHeight="4rem"
+                  showCheckbox
                 />
               ))}
             </Flex>

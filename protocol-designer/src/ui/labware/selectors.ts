@@ -42,7 +42,9 @@ export const getLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getLabwareEntities,
   getLabwareNicknamesById,
   stepFormSelectors.getInitialDeckSetup,
-  (labwareEntities, nicknamesById, initialDeckSetup) => {
+  stepFormSelectors.getPresavedStepForm,
+  (labwareEntities, nicknamesById, initialDeckSetup, presavedStepForm) => {
+    const isMoveLabware = presavedStepForm?.stepType === 'moveLabware'
     const options = reduce(
       labwareEntities,
       (
@@ -56,9 +58,12 @@ export const getLabwareOptions: Selector<Options> = createSelector(
               `form.step_edit_form.field.moduleLabwarePrefix.${moduleOnDeck.type}`
             )
           : null
-        const nickName = prefix
-          ? `${prefix} ${nicknamesById[labwareId]}`
-          : nicknamesById[labwareId]
+        const nickName =
+          //  todo(jr, 7/27/23): for now we are filtering out the module info for MoveLabware since it is getting labware from initial deck setup
+          //  and never updates if the labware is moved. Should find a way to get updated deck state though!
+          prefix && !isMoveLabware
+            ? `${prefix} ${nicknamesById[labwareId]}`
+            : nicknamesById[labwareId]
         return getIsTiprack(labwareEntity.def)
           ? acc
           : [
@@ -86,15 +91,22 @@ export const getTiprackOptions: Selector<Options> = createSelector(
         labwareEntity: LabwareEntity,
         labwareId: string
       ): Options => {
-        return getIsTiprack(labwareEntity.def)
-          ? [
-              ...acc,
-              {
-                name: nicknamesById[labwareId],
-                value: labwareId,
-              },
-            ]
-          : acc
+        const labwareDefURI = labwareEntity.labwareDefURI
+        const labwareDefURIs = acc.map(option => option.value.split(':')[1])
+        if (
+          labwareDefURIs.includes(labwareDefURI) ||
+          !getIsTiprack(labwareEntity.def)
+        ) {
+          return acc
+        } else {
+          return [
+            ...acc,
+            {
+              name: nicknamesById[labwareId],
+              value: labwareId,
+            },
+          ]
+        }
       },
       []
     )

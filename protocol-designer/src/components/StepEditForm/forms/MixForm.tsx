@@ -43,12 +43,7 @@ export const MixForm = (props: StepFormProps): JSX.Element => {
       </div>
       <div className={styles.form_row}>
         <PipetteField {...propsForFields.pipette} />
-        <FormGroup
-          label={i18n.t('form.step_edit_form.tipRack')}
-          className={styles.large_field}
-        >
-          <TiprackField {...propsForFields.tipRack} />
-        </FormGroup>
+        <TiprackField {...propsForFields.tipRack} />
         <VolumeField
           {...propsForFields.volume}
           label={i18n.t('form.step_edit_form.mixVolumeLabel')}

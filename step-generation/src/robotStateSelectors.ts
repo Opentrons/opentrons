@@ -83,7 +83,9 @@ export function getNextTiprack(
         `cannot getNextTiprack, no labware entity for "${labwareId}"`
       )
       const isOnDeck = robotState.labware[labwareId].slot != null
-      return isOnDeck && labwareId === tipRack
+      const labwareIdDefUri = labwareId.split(':')[1]
+      const tipRackDefUri = tipRack.split(':')[1]
+      return isOnDeck && labwareIdDefUri === tipRackDefUri
     }
   )
   const firstAvailableTiprack = sortedTipracksIds.find(tiprackId =>
@@ -94,6 +96,7 @@ export function getNextTiprack(
       robotState,
     })
   )
+
   // TODO Ian 2018-02-12: avoid calling _getNextTip twice
   const nextTip =
     firstAvailableTiprack &&
@@ -103,7 +106,7 @@ export function getNextTiprack(
       invariantContext,
       robotState,
     })
-
+  console.log('nextTip', nextTip)
   if (firstAvailableTiprack && nextTip) {
     return {
       tiprackId: firstAvailableTiprack,

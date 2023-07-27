@@ -10,16 +10,17 @@ import {
   TOOLTIP_FIXED,
   useHoverTooltip,
 } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { i18n } from '../../../../localization'
+import { getRobotType } from '../../../../file-data/selectors'
+import { getAdditionalEquipment } from '../../../../step-forms/selectors'
 import {
   LabwareField,
   LabwareLocationField,
   CheckboxRowField,
 } from '../../fields'
 import styles from '../../StepEditForm.css'
-import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
-import { getRobotType } from '../../../../file-data/selectors'
-import { getAdditionalEquipment } from '../../../../step-forms/selectors'
+
 import type { StepFormProps } from '../../types'
 
 export const MoveLabwareForm = (props: StepFormProps): JSX.Element => {
