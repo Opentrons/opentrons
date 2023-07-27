@@ -28,7 +28,7 @@ You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instr
 
             from opentrons import protocol_api
 
-            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|''}
+            requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
 
 
     .. tab:: OT-2
@@ -52,9 +52,9 @@ You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instr
 
 .. versionadded:: 2.0
 
-.. note::
+.. removed note for info below to match Modules text
 
-    When you load a pipette in a protocol, you inform the OT-2 that you want the specified pipette to be present. Even if you do not use the pipette anywhere else in your protocol, the Opentrons App and the OT-2 will not let your protocol proceed until all pipettes loaded with ``load_instrument`` are attached to the OT-2.
+When you load a pipette in a protocol, you inform the OT-2 that you want the specified pipette to be present. Even if you do not use the pipette anywhere else in your protocol, the Opentrons App and the OT-2 will not let your protocol proceed until all pipettes loaded with ``load_instrument`` are attached to the OT-2.
 
 .. _new-multichannel-pipettes:
 
