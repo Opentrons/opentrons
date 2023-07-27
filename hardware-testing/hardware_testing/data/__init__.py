@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from subprocess import check_output
 from time import time
-from typing import Tuple
+from typing import Tuple, List, Any
 
 from opentrons.config import infer_config_base_dir, IS_ROBOT
 
@@ -93,10 +93,10 @@ def create_run_id_and_start_time() -> Tuple[str, float]:
 
 
 def create_file_name(
-    test_name: str, run_id: str, tag: str, extension: str = "csv"
+    test_name: str, run_id: str, tag: str, pipid: str, extension: str = "csv"
 ) -> str:
     """Create a file name, given a test name."""
-    return f"{test_name}_{run_id}_{tag}.{extension}"
+    return f"{test_name}_{run_id}_{tag}_{pipid}.{extension}"
 
 
 def _save_data(test_name: str, file_name: str, data: str, perm: str = "w+") -> Path:
@@ -127,3 +127,8 @@ def insert_data_to_file(test_name: str, file_name: str, data: str, line: int) ->
     contents.insert(line, data)
     with open(data_path, "w") as f:
         f.write("".join(contents))
+
+
+def convert_list_to_csv_line(data: List[Any]) -> str:
+    """Convert list to csv line."""
+    return ",".join([str(n) for n in data]) + '\n'
