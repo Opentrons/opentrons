@@ -1,5 +1,5 @@
 """Firmware Check."""
-from asyncio import run, sleep
+from asyncio import run
 from typing import List
 
 from opentrons.hardware_control.ot3api import OT3API
@@ -13,10 +13,12 @@ from opentrons.hardware_control.types import SubSystem
 def _get_instrument_serial_number(api: OT3API, subsystem: SubSystem) -> str:
     if subsystem == SubSystem.pipette_right:
         _pip = api.hardware_pipettes[OT3Mount.RIGHT.to_mount()]
+        assert _pip
         _pip_id = helpers_ot3.get_pipette_serial_ot3(_pip)
         _id = f" ({_pip_id})"
     elif subsystem == SubSystem.pipette_left:
         _pip = api.hardware_pipettes[OT3Mount.LEFT.to_mount()]
+        assert _pip
         _pip_id = helpers_ot3.get_pipette_serial_ot3(_pip)
         _id = f" ({_pip_id})"
     elif subsystem == SubSystem.gripper:
@@ -32,7 +34,6 @@ def _get_instrument_serial_number(api: OT3API, subsystem: SubSystem) -> str:
 async def _main(simulate: bool, subsystems: List[SubSystem]) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=simulate)
     while True:
-        await api.cache_instruments()
         for subsys, state in api.attached_subsystems.items():
             _id = _get_instrument_serial_number(api, subsys)
             print(f" - v{state.current_fw_version}: {subsys.name}{_id}")
@@ -42,8 +43,7 @@ async def _main(simulate: bool, subsystems: List[SubSystem]) -> None:
         print("done")
         if api.is_simulator:
             break
-        else:
-            await sleep(1)
+        await helpers_ot3.reset_api(api)
 
 
 if __name__ == "__main__":

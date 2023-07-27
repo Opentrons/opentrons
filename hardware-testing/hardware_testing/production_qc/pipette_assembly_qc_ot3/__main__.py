@@ -1294,7 +1294,7 @@ async def _wait_for_tip_presence_state_change(
     return test_pass
 
 
-async def _main(test_config: TestConfig) -> None:
+async def _main(test_config: TestConfig) -> None:  # noqa: C901
     global IDEAL_LABWARE_LOCATIONS
     global CALIBRATED_LABWARE_LOCATIONS
     global FINAL_TEST_RESULTS
@@ -1567,9 +1567,7 @@ if __name__ == "__main__":
     arg_parser.add_argument(
         "--slot-reservoir", type=int, default=DEFAULT_SLOT_RESERVOIR
     )
-    arg_parser.add_argument(
-        "--slot-plate", type=int, default=DEFAULT_SLOT_PLATE
-    )
+    arg_parser.add_argument("--slot-plate", type=int, default=DEFAULT_SLOT_PLATE)
     arg_parser.add_argument("--slot-fixture", type=int, default=DEFAULT_SLOT_FIXTURE)
     arg_parser.add_argument("--slot-trash", type=int, default=DEFAULT_SLOT_TRASH)
     arg_parser.add_argument("--simulate", action="store_true")
