@@ -21,7 +21,8 @@
     "thermocyclerModuleV1": "GEN1",
     "thermocyclerModuleV2": "GEN2",
     "heaterShakerModuleV1": "GEN1",
-    "magneticBlockV1": "GEN1"
+    "magneticBlockV1": "GEN1",
+    "gripperV1": "GEN1"
   },
   "status": {
     "engaged": "engaged",
