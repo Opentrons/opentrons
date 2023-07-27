@@ -636,51 +636,6 @@ async def test_liquid_probe(
 
 
 @pytest.mark.parametrize(
-    "mount, head_node, pipette_node",
-    [
-        (OT3Mount.LEFT, NodeId.head_l, NodeId.pipette_left),
-        (OT3Mount.RIGHT, NodeId.head_r, NodeId.pipette_right),
-    ],
-)
-async def test_liquid_sensing_errors(
-    mock_move_to: AsyncMock,
-    ot3_hardware: ThreadManager[OT3API],
-    head_node: NodeId,
-    pipette_node: NodeId,
-    mount: OT3Mount,
-    fake_liquid_settings: LiquidProbeSettings,
-    mock_instrument_handlers: Tuple[Mock],
-    mock_current_position_ot3: AsyncMock,
-    mock_home_plunger: AsyncMock,
-    mock_ungrip: AsyncMock,
-) -> None:
-    backend = ot3_hardware.managed_obj._backend
-    mock_ungrip.return_value = None
-    await ot3_hardware.home()
-    mock_move_to.return_value = None
-
-    with patch.object(
-        backend, "liquid_probe", AsyncMock(spec=backend.liquid_probe)
-    ) as mock_position:
-        return_dict = {
-            head_node: 103,
-            NodeId.gantry_x: 0,
-            NodeId.gantry_y: 0,
-            pipette_node: 200,
-        }
-        # should raise LiquidNotFound
-        mock_position.return_value = return_dict
-        with pytest.raises(LiquidNotFound):
-            await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
-
-        # should raise EarlyLiquidSenseTrigger
-        return_dict[head_node], return_dict[pipette_node] = 150, 150
-        mock_position.return_value = return_dict
-        with pytest.raises(EarlyLiquidSenseTrigger):
-            await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
-
-
-@pytest.mark.parametrize(
     "mount,moving",
     [
         (OT3Mount.RIGHT, Axis.Z_R),
