@@ -99,6 +99,7 @@ from .types import (
     TipStateType,
     EstopOverallStatus,
     EstopAttachLocation,
+    EstopState,
 )
 from .errors import (
     MustHomeError,
@@ -2262,3 +2263,6 @@ class OT3API(
         Returns the estop status after clearing the status."""
         self._backend.estop_state_machine.acknowledge_and_clear()
         return self.estop_status
+
+    def get_estop_state(self) -> EstopState:
+        return self._backend.estop_state_machine.state

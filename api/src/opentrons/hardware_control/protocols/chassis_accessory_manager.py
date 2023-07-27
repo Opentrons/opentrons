@@ -1,6 +1,6 @@
 from typing import Dict, Optional
 from typing_extensions import Protocol
-from ..types import DoorState, StatusBarState
+from ..types import DoorState, StatusBarState, EstopState
 from .event_sourcer import EventSourcer
 
 
@@ -59,4 +59,12 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
         """Get the current status bar state.
 
         :returns: The current status bar state enumeration."""
+        ...
+
+    def get_estop_state(self) -> EstopState:
+        """Get the current Estop state.
+
+        If the Estop is not supported on this robot, this will always return Disengaged.
+
+        :returns: The current Estop state."""
         ...
