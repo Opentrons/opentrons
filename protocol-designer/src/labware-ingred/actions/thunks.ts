@@ -112,7 +112,7 @@ export const duplicateLabware: (
       payload: {
         duplicateLabwareNickname,
         templateLabwareId,
-        duplicateLabwareId: uuid(),
+        duplicateLabwareId: uuid() + ':' + templateLabwareDefURI,
         slot: duplicateSlot,
       },
     })
