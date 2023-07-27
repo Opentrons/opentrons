@@ -43,6 +43,7 @@ from .measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
+from .measurement.scale import Scale
 from .tips import MULTI_CHANNEL_TEST_ORDER
 
 
@@ -331,8 +332,8 @@ def _load_scale(
     scale: Scale,
     run_id: str,
     pipette_tag: str,
-    start_time: str,
-    simulating: bool
+    start_time: float,
+    simulating: bool,
 ) -> GravimetricRecorder:
     ui.print_header("LOAD SCALE")
     ui.print_info(
@@ -343,19 +344,19 @@ def _load_scale(
     )
     recorder = GravimetricRecorder(
         GravimetricRecorderConfig(
-            test_name=cfg.name,
-            run_id=resources.run_id,
-            tag=resources.pipette_tag,
-            start_time=resources.start_time,
+            test_name=name,
+            run_id=run_id,
+            tag=pipette_tag,
+            start_time=start_time,
             duration=0,
-            frequency=1000 if resources.ctx.is_simulating() else 5,
+            frequency=1000 if simulating else 5,
             stable=False,
         ),
-        resources.scale,
-        simulate=resources.ctx.is_simulating(),
+        scale,
+        simulate=simulating,
     )
     ui.print_info(f'found scale "{recorder.serial_number}"')
-    if resources.ctx.is_simulating():
+    if simulating:
         recorder.set_simulation_mass(0)
     recorder.record(in_thread=True)
     ui.print_info(f'scale is recording to "{recorder.file_name}"')

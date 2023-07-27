@@ -31,11 +31,13 @@ from .config import (
     ConfigType,
     get_tip_volumes_for_qc,
 )
+from .measurement.record import GravimetricRecorder
 from .measurement import DELAY_FOR_MEASUREMENT
 from .measurement.scale import Scale
 from .trial import TestResources
 from .tips import get_tips
 from hardware_testing.drivers import asair_sensor
+from opentrons.protocol_api import InstrumentContext
 
 # FIXME: bump to v2.15 to utilize protocol engine
 API_LEVEL = "2.13"
@@ -193,7 +195,11 @@ def _main(
     robot_serial: str,
     operator_name: str,
     tip_batch: str,
-    scale: Optional[Scale],
+    recorder: Optional[GravimetricRecorder],
+    run_id: str,
+    start_time: float,
+    pipette: InstrumentContext,
+    pipette_tag: str,
 ) -> None:
     union_cfg: Union[PhotometricConfig, GravimetricConfig]
     if args.photometric:
@@ -234,9 +240,6 @@ def _main(
         if args.trials == 0:
             cfg_gm.trials = helpers.get_default_trials(cfg_gm)
         union_cfg = cfg_gm
-    run_id, start_time = create_run_id_and_start_time()
-    ui.print_header("LOAD PIPETTE")
-    pipette = helpers._load_pipette(_ctx, union_cfg)
     ui.print_header("GET PARAMETERS")
     test_volumes = helpers._get_volumes(_ctx, union_cfg)
     for v in test_volumes:
@@ -247,7 +250,7 @@ def _main(
     run_args = TestResources(
         ctx=_ctx,
         pipette=pipette,
-        pipette_tag=helpers._get_tag_from_pipette(pipette, union_cfg),
+        pipette_tag=pipette_tag,
         tipracks=helpers._load_tipracks(
             _ctx, union_cfg, use_adapters=args.channels == 96
         ),
@@ -260,7 +263,7 @@ def _main(
         git_description=get_git_description(),
         tips=get_tips(_ctx, pipette, args.tip, all_channels=all_channels_same_time),
         env_sensor=env_sensor,
-        scale=scale,
+        recorder=recorder,
     )
 
     if args.photometric:
@@ -325,13 +328,30 @@ if __name__ == "__main__":
         deck_version="2",
         extra_labware=custom_defs,
     )
+
     env_sensor = asair_sensor.BuildAsairSensor(_ctx.is_simulating())
     robot_serial = helpers._get_robot_serial(_ctx.is_simulating())
     operator_name = helpers._get_operator_name(_ctx.is_simulating())
+    run_id, start_time = create_run_id_and_start_time()
+    ui.print_header("LOAD PIPETTE")
+    pipette = helpers._load_pipette(
+        _ctx,
+        args.channels,
+        args.pipette,
+        "left",
+        args.increment,
+        args.gantry_speed if not args.photometric else None,
+    )
+    pipette_tag = helpers._get_tag_from_pipette(
+        pipette, args.increment, args.user_volumes
+    )
     recorder: Optional[GravimetricRecorder] = None
     if not args.photometric:
         scale = Scale.build(simulate=_ctx.is_simulating())
-        recorder = execute._load_scale("name", scale, run_id, pipette_tag, start_time, _ctx.is_simulating())
+        recorder = execute._load_scale(
+            "name", scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
+        )
+
     if args.tip == 0:
         volumes: List[int] = get_tip_volumes_for_qc(
             args.pipette, args.channels, args.extra, args.photometric
@@ -351,8 +371,24 @@ if __name__ == "__main__":
                 robot_serial,
                 operator_name,
                 tip_batches[tip],
-                scale,
+                recorder,
+                run_id,
+                start_time,
+                pipette,
+                pipette_tag,
             )
     else:
         tip_batch = helpers._get_tip_batch(_ctx.is_simulating(), args.tip)
-        _main(args, _ctx, env_sensor, robot_serial, operator_name, tip_batch, scale)
+        _main(
+            args,
+            _ctx,
+            env_sensor,
+            robot_serial,
+            operator_name,
+            tip_batch,
+            recorder,
+            run_id,
+            start_time,
+            pipette,
+            pipette_tag,
+        )

@@ -12,7 +12,6 @@ from . import helpers
 from . import report
 from hardware_testing.data import ui
 from hardware_testing.drivers import asair_sensor
-from .measurement.scale import Scale
 
 
 @dataclass
