@@ -29,11 +29,6 @@ export function DeviceDetails(): JSX.Element | null {
   const { robotName } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
   const isScanning = useSelector(getScanning)
-  const { data: estopStatus } = useEstopQuery({
-    refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL,
-  })
-
-  const { isDismissedModal } = useEstopContext()
 
   useSyncRobotClock(robotName)
 
@@ -46,39 +41,53 @@ export function DeviceDetails(): JSX.Element | null {
       hostname={robot.ip ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
     >
-      <Box
-        minWidth="36rem"
-        height="max-content"
-        paddingX={SPACING.spacing16}
-        paddingTop={SPACING.spacing16}
-        paddingBottom={SPACING.spacing48}
-      >
-        {/* EstopBanner here */}
-        {estopStatus != null &&
-        estopStatus.data.status !== DISENGAGED &&
-        isDismissedModal ? (
-          <Flex marginBottom={SPACING.spacing16}>
-            <EstopBanner status={estopStatus.data.status} />
-          </Flex>
-        ) : null}
-        <Flex
-          alignItems={ALIGN_CENTER}
-          backgroundColor={COLORS.white}
-          border={`1px solid ${String(COLORS.medGreyEnabled)}`}
-          borderRadius="3px"
-          flexDirection={DIRECTION_COLUMN}
-          marginBottom={SPACING.spacing16}
-          paddingX={SPACING.spacing16}
-          paddingBottom={SPACING.spacing4}
-          width="100%"
-        >
-          <RobotOverview robotName={robotName} />
-          <InstrumentsAndModules robotName={robotName} />
-        </Flex>
-        <RecentProtocolRuns robotName={robotName} />
-      </Box>
+      <RenderDeviceDetails robotName={robotName} />
     </ApiHostProvider>
   ) : (
     <Redirect to="/devices" />
+  )
+}
+
+interface RenderDeviceDetailsProps {
+  robotName: string
+}
+
+function RenderDeviceDetails({
+  robotName,
+}: RenderDeviceDetailsProps): JSX.Element {
+  const { data: estopStatus } = useEstopQuery({
+    refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL,
+  })
+  const { isDismissedModal } = useEstopContext()
+
+  return (
+    <Box
+      minWidth="36rem"
+      height="max-content"
+      paddingX={SPACING.spacing16}
+      paddingTop={SPACING.spacing16}
+      paddingBottom={SPACING.spacing48}
+    >
+      {estopStatus?.data.status !== DISENGAGED && isDismissedModal ? (
+        <Flex marginBottom={SPACING.spacing16}>
+          <EstopBanner status={estopStatus?.data.status} />
+        </Flex>
+      ) : null}
+      <Flex
+        alignItems={ALIGN_CENTER}
+        backgroundColor={COLORS.white}
+        border={`1px solid ${String(COLORS.medGreyEnabled)}`}
+        borderRadius="3px"
+        flexDirection={DIRECTION_COLUMN}
+        marginBottom={SPACING.spacing16}
+        paddingX={SPACING.spacing16}
+        paddingBottom={SPACING.spacing4}
+        width="100%"
+      >
+        <RobotOverview robotName={robotName} />
+        <InstrumentsAndModules robotName={robotName} />
+      </Flex>
+      <RecentProtocolRuns robotName={robotName} />
+    </Box>
   )
 }

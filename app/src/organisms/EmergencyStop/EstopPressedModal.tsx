@@ -25,7 +25,6 @@ import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
-import { useEstopContext } from './hooks'
 
 import type {
   ModalHeaderBaseProps,
@@ -39,15 +38,16 @@ interface EstopPressedModalProps {
   isEngaged: boolean
   closeModal: () => void
   isDismissedModal?: boolean
+  setIsDismissedModal?: (isDismissedModal: boolean) => void
 }
 
 export function EstopPressedModal({
   isEngaged,
   closeModal,
+  isDismissedModal,
+  setIsDismissedModal,
 }: EstopPressedModalProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
-  const { isDismissedModal } = useEstopContext()
-  console.log('isDismissedModal EstopPressedModal', isDismissedModal)
   return (
     <Portal level="top">
       {isOnDevice ? (
@@ -59,6 +59,7 @@ export function EstopPressedModal({
               isEngaged={isEngaged}
               closeModal={closeModal}
               isDismissedModal={isDismissedModal}
+              setIsDismissedModal={setIsDismissedModal}
             />
           ) : null}
         </>
@@ -113,7 +114,6 @@ function TouchscreenModal({
           width="100%"
           buttonText={t('resume_robot_operations')}
           disabled={isEngaged}
-          // ToDo (kk:07/17/2023) the function will be implemented by a following pr
           onClick={handleClick}
         />
       </Flex>
@@ -124,17 +124,14 @@ function TouchscreenModal({
 function DesktopModal({
   isEngaged,
   closeModal,
+  isDismissedModal,
+  setIsDismissedModal,
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const { setEstopPhysicalStatus } = useSetEstopPhysicalStatusMutation()
-  const { isDismissedModal, setIsDismissedModal } = useEstopContext()
 
   const handleCloseModal = (): void => {
-    console.log('isDismissedModal - before', isDismissedModal)
-    console.log('called')
-    setIsDismissedModal(true)
-    console.log('updated')
-    console.log('isDismissedModal - after', isDismissedModal)
+    setIsDismissedModal && setIsDismissedModal(true)
     closeModal()
   }
 

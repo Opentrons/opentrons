@@ -1,9 +1,21 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
-import { DIRECTION_ROW, Flex, SPACING, TYPOGRAPHY } from '@opentrons/components'
+import {
+  Btn,
+  DIRECTION_ROW,
+  Flex,
+  SPACING,
+  TYPOGRAPHY,
+} from '@opentrons/components'
 
 import { Banner } from '../../atoms/Banner'
 import { StyledText } from '../../atoms/text'
+import {
+  NOT_PRESENT,
+  PHYSICALLY_ENGAGED,
+  LOGICALLY_ENGAGED,
+  useEstopContext,
+} from '../EmergencyStop'
 
 import type { EstopState } from '@opentrons/api-client'
 
@@ -13,18 +25,20 @@ interface EstopBannerProps {
 
 export function EstopBanner({ status }: EstopBannerProps): JSX.Element {
   const { t } = useTranslation('device_details')
+  const { setIsDismissedModal } = useEstopContext()
+
   let bannerText = ''
   let buttonText = ''
   switch (status) {
-    case 'physicallyEngaged':
+    case PHYSICALLY_ENGAGED:
       bannerText = t('estop_pressed')
       buttonText = t('reset_estop')
       break
-    case 'logicallyEngaged':
+    case LOGICALLY_ENGAGED:
       bannerText = t('estop_disengaged')
       buttonText = t('resume_operation')
       break
-    case 'notPresent':
+    case NOT_PRESENT:
       bannerText = t('estop_disconnected')
       buttonText = t('resume_operation')
       break
@@ -33,20 +47,18 @@ export function EstopBanner({ status }: EstopBannerProps): JSX.Element {
   }
 
   const handleClick = (): void => {
-    // reopen modal
-    console.log('reopen a modal')
+    setIsDismissedModal(false)
   }
 
   return (
     <Banner type="error" width="100%">
       <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing2}>
         <StyledText as="p">{bannerText}</StyledText>
-        <StyledText
-          textDecoration={TYPOGRAPHY.textDecorationUnderline}
-          onClick={handleClick}
-        >
-          {buttonText}
-        </StyledText>
+        <Btn onClick={handleClick}>
+          <StyledText textDecoration={TYPOGRAPHY.textDecorationUnderline}>
+            {buttonText}
+          </StyledText>
+        </Btn>
       </Flex>
     </Banner>
   )

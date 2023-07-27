@@ -34,6 +34,10 @@ import type { RouteProps, DesktopRouteParams } from './types'
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
 
+  const { isDismissedModal } = React.useContext(EmergencyStopContext)
+
+  console.log('DesktopApp', isDismissedModal)
+
   const desktopRoutes: RouteProps[] = [
     {
       Component: ProtocolsLanding,
@@ -95,37 +99,43 @@ export const DesktopApp = (): JSX.Element => {
   return (
     <>
       <Navbar routes={desktopRoutes} />
-      <ToasterOven>
-        <Box width="100%">
-          <Switch>
-            {desktopRoutes.map(({ Component, exact, path }: RouteProps) => {
-              return (
-                <Route key={path} exact={exact} path={path}>
-                  <Breadcrumbs />
-                  <Box
-                    position={POSITION_RELATIVE}
-                    width="100%"
-                    height="100%"
-                    backgroundColor={COLORS.fundamentalsBackground}
-                    overflow={OVERFLOW_AUTO}
-                  >
-                    <ModalPortalRoot />
-                    <Component />
-                  </Box>
-                </Route>
-              )
-            })}
-            <Redirect exact from="/" to="/protocols" />
-          </Switch>
-          <EmergencyStopTakeover />
-          <Alerts />
-        </Box>
-      </ToasterOven>
+      <EmergencyStopTakeover>
+        <ToasterOven>
+          <Box width="100%">
+            <Switch>
+              {desktopRoutes.map(({ Component, exact, path }: RouteProps) => {
+                return (
+                  <Route key={path} exact={exact} path={path}>
+                    <Breadcrumbs />
+                    <Box
+                      position={POSITION_RELATIVE}
+                      width="100%"
+                      height="100%"
+                      backgroundColor={COLORS.fundamentalsBackground}
+                      overflow={OVERFLOW_AUTO}
+                    >
+                      <ModalPortalRoot />
+                      <Component />
+                    </Box>
+                  </Route>
+                )
+              })}
+              <Redirect exact from="/" to="/protocols" />
+            </Switch>
+            <Alerts />
+          </Box>
+        </ToasterOven>
+      </EmergencyStopTakeover>
     </>
   )
 }
 
-function EmergencyStopTakeover(): JSX.Element | null {
+interface EmergencyStopTakeoverProps {
+  children: React.ReactNode
+}
+function EmergencyStopTakeover({
+  children,
+}: EmergencyStopTakeoverProps): JSX.Element | null {
   const deviceRouteMatch = useRouteMatch({ path: '/devices/:robotName' })
   const params = deviceRouteMatch?.params as DesktopRouteParams
   const robotName = params?.robotName
@@ -148,6 +158,7 @@ function EmergencyStopTakeover(): JSX.Element | null {
         }}
       >
         <EstopTakeover />
+        {children}
       </EmergencyStopContext.Provider>
     </ApiHostProvider>
   )
