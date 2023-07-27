@@ -163,18 +163,18 @@ class Move(Generic[AxisKey]):
             max_speed=np.float64(0),
             blocks=(
                 Block(
-                    distance=np.float64(0),
-                    initial_speed=np.float64(0),
+                    distance=np.float64(20),
+                    initial_speed=np.float64(3),
                     acceleration=np.float64(0),
                 ),
                 Block(
-                    distance=np.float64(0),
-                    initial_speed=np.float64(0),
+                    distance=np.float64(20),
+                    initial_speed=np.float64(3),
                     acceleration=np.float64(0),
                 ),
                 Block(
-                    distance=np.float64(0),
-                    initial_speed=np.float64(0),
+                    distance=np.float64(20),
+                    initial_speed=np.float64(3),
                     acceleration=np.float64(0),
                 ),
             ),
