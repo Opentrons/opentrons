@@ -74,6 +74,10 @@ test_data = {
     "XR Encoder":"None",
     "YF Encoder":"None",
     "YB Encoder":"None",
+    "XL Machine":"None",
+    "XR Machine":"None",
+    "YF Machine":"None",
+    "YB Machine":"None",
     "Slot 1 Offset":"None",
     "Slot 3 Offset":"None",
     "Slot 10 Offset":"None",
@@ -261,6 +265,7 @@ async def _measure_axis(api: OT3API, mount: types.OT3Mount, axis: str) -> None:
         test_data["YF Gauge"] = str(y_front_gauge)
         test_data["YF Position"] = y_front_pos
         test_data["YF Encoder"] = y_front_enc
+        test_data["YF Machine"] = y_front_mac
         print(f"Y-Front Gauge = {y_front_gauge} mm")
         print(f"Y-Front Position = {y_front_pos}")
         print(f"Y-Front Encoder = {y_front_enc}")
