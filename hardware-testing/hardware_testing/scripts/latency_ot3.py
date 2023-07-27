@@ -34,6 +34,7 @@ async def _main(is_simulating: bool, trials: int) -> None:
         await api.move_rel(types.OT3Mount.LEFT, vector * direction)
         direction *= -1.0  # change direction
     expected_ms = 0 if api.is_simulator else 1000
+    timestamps = timestamps[1:]
     processing_millis = [
         int((future - past) * 1000.0) - expected_ms
         for past, future in zip(timestamps[:-1], timestamps[1:])
