@@ -4,7 +4,7 @@ from typing import Iterator, Union, Dict, Tuple, List, Any, OrderedDict
 from typing_extensions import Literal
 from math import copysign
 import pytest
-from mock import AsyncMock, patch, Mock, call, PropertyMock
+from mock import AsyncMock, patch, Mock, call, PropertyMock, MagicMock
 from hypothesis import given, strategies, settings, HealthCheck, assume, example
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
@@ -263,13 +263,13 @@ async def mock_refresh(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMoc
 @pytest.fixture
 async def mock_instrument_handlers(
     ot3_hardware: ThreadManager[OT3API],
-) -> Iterator[Tuple[Mock]]:
+) -> Iterator[Tuple[MagicMock]]:
     with patch.object(
         ot3_hardware.managed_obj,
         "_gripper_handler",
-        Mock(spec=GripperHandler),
+        MagicMock(spec=GripperHandler),
     ) as mock_gripper_handler, patch.object(
-        ot3_hardware.managed_obj, "_pipette_handler", Mock(spec=OT3PipetteHandler)
+        ot3_hardware.managed_obj, "_pipette_handler", MagicMock(spec=OT3PipetteHandler)
     ) as mock_pipette_handler:
         yield mock_gripper_handler, mock_pipette_handler
 
@@ -579,10 +579,10 @@ async def test_liquid_probe(
     pipette_node: Axis,
     mount: OT3Mount,
     fake_liquid_settings: LiquidProbeSettings,
-    mock_instrument_handlers: Tuple[Mock],
+    mock_instrument_handlers: Tuple[MagicMock],
     mock_current_position_ot3: AsyncMock,
     mock_ungrip: AsyncMock,
-    mock_home_plunger: AsyncMock,
+    mock_move_to_plunger_bottom: AsyncMock,
 ) -> None:
     mock_ungrip.return_value = None
     backend = ot3_hardware.managed_obj._backend
@@ -616,7 +616,7 @@ async def test_liquid_probe(
             data_file="fake_file_name",
         )
         await ot3_hardware.liquid_probe(mount, fake_settings_aspirate)
-        mock_home_plunger.assert_called_once()
+        mock_move_to_plunger_bottom.assert_called_once()
         backend.liquid_probe.assert_called_once_with(
             mount,
             fake_settings_aspirate.max_z_distance,
