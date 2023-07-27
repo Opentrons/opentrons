@@ -792,14 +792,9 @@ async def calibrate_pipette(
     tip has been attached, or the conductive probe has been attached,
     or the probe has been lowered).
     """
-    try:
-        await hcapi.reset_instrument_offset(mount)
-        await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        offset = await _calibrate_mount(hcapi, mount, slot, method, raise_verify_error)
-        await hcapi.save_instrument_offset(mount, offset)
-        return offset
-    finally:
-        await hcapi.remove_tip(mount)
+    offset = await find_pipette_offset(hcapi, mount, slot, method, raise_verify_error)
+    await hcapi.save_instrument_offset(mount, offset)
+    return offset
 
 
 async def calibrate_module(
