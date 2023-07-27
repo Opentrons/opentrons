@@ -411,10 +411,8 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     elif args.mode == "dial":
         global start_time, test_data
         _test_setup(api, mount)
-        # _zero_gauges()
+        _zero_gauges()
         start_time = time.time()
-        # machine = await _get_machine(api, mount)
-        # print(machine)
         for i in range(args.cycles):
             cycle = i + 1
             print(f"\n-> Starting Test Cycle {cycle}/{args.cycles}")
