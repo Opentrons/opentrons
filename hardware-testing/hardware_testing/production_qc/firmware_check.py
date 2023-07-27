@@ -13,10 +13,12 @@ from opentrons.hardware_control.types import SubSystem
 def _get_instrument_serial_number(api: OT3API, subsystem: SubSystem) -> str:
     if subsystem == SubSystem.pipette_right:
         _pip = api.hardware_pipettes[OT3Mount.RIGHT.to_mount()]
+        assert _pip
         _pip_id = helpers_ot3.get_pipette_serial_ot3(_pip)
         _id = f" ({_pip_id})"
     elif subsystem == SubSystem.pipette_left:
         _pip = api.hardware_pipettes[OT3Mount.LEFT.to_mount()]
+        assert _pip
         _pip_id = helpers_ot3.get_pipette_serial_ot3(_pip)
         _id = f" ({_pip_id})"
     elif subsystem == SubSystem.gripper:

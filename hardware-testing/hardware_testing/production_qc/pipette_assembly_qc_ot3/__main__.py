@@ -1294,7 +1294,15 @@ async def _wait_for_tip_presence_state_change(
     return test_pass
 
 
-async def _main(test_config: TestConfig) -> None:
+def _test_barcode(api: OT3API, pipette_sn: str) -> Tuple[str, bool]:
+    if not api.is_simulator:
+        barcode_sn = input("scan pipette barcode: ").strip()
+    else:
+        barcode_sn = str(pipette_sn)
+    return barcode_sn, barcode_sn == pipette_sn
+
+
+async def _main(test_config: TestConfig) -> None:  # noqa: C901
     global IDEAL_LABWARE_LOCATIONS
     global CALIBRATED_LABWARE_LOCATIONS
     global FINAL_TEST_RESULTS
@@ -1412,11 +1420,7 @@ async def _main(test_config: TestConfig) -> None:
 
         print("homing")
         await api.home([Axis.of_main_tool_actuator(mount)])
-        if not api.is_simulator:
-            barcode_sn = input("scan pipette barcode: ").strip()
-        else:
-            barcode_sn = str(pipette_sn)
-        barcode_passed = barcode_sn == pipette_sn
+        barcode_sn, barcode_passed = _test_barcode(api, pipette_sn)
         csv_cb.write(
             [
                 "pipette-barcode",
@@ -1567,9 +1571,7 @@ if __name__ == "__main__":
     arg_parser.add_argument(
         "--slot-reservoir", type=int, default=DEFAULT_SLOT_RESERVOIR
     )
-    arg_parser.add_argument(
-        "--slot-plate", type=int, default=DEFAULT_SLOT_PLATE
-    )
+    arg_parser.add_argument("--slot-plate", type=int, default=DEFAULT_SLOT_PLATE)
     arg_parser.add_argument("--slot-fixture", type=int, default=DEFAULT_SLOT_FIXTURE)
     arg_parser.add_argument("--slot-trash", type=int, default=DEFAULT_SLOT_TRASH)
     arg_parser.add_argument("--simulate", action="store_true")

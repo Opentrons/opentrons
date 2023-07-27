@@ -41,8 +41,6 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     GripperProbe,
     InstrumentProbeType,
-    LiquidNotFound,
-    EarlyLiquidSenseTrigger,
     SubSystem,
     GripperJawState,
     StatusBarState,
