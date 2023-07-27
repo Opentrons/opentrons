@@ -190,6 +190,14 @@ def _map_module(
                 is_semi_configuration=False,
             ),
         )
+    elif module_type == ModuleType.TEMPERATURE:
+        return (
+            mapped_location,
+            wrapped_deck_conflict.TemperatureModule(
+                name_for_errors=name_for_errors,
+                highest_z_including_labware=highest_z_including_labware,
+            ),
+        )
     else:
         return (
             mapped_location,

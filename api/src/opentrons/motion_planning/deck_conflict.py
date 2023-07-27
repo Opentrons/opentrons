@@ -67,6 +67,11 @@ class HeaterShakerModule(_Module):
 
 
 @dataclass
+class TemperatureModule(_Module):
+    """A Temperature module."""
+
+
+@dataclass
 class ThermocyclerModule(_Module):
     """A Thermocycler module."""
 
@@ -79,13 +84,14 @@ class ThermocyclerModule(_Module):
 
 @dataclass
 class OtherModule(_Module):
-    """A module that's not a Heater-Shaker or Thermocycler."""
+    """A module that's not a Heater-Shaker or Thermocycler or Temperature."""
 
 
 DeckItem = Union[
     Labware,
     HeaterShakerModule,
     ThermocyclerModule,
+    TemperatureModule,
     OtherModule,
 ]
 
@@ -291,8 +297,8 @@ def _create_flex_restrictions(item: DeckItem, location: int) -> List[_DeckRestri
             )
 
     if (
-        isinstance(item, HeaterShakerModule)
-        and location in _flex_slots_for_heater_shaker()
+        isinstance(item, (HeaterShakerModule, TemperatureModule))
+        and location in _flex_right_hand_slots()
     ):
         restrictions.append(
             _NoModule(
@@ -367,8 +373,16 @@ def _flex_slots_covered_by_thermocycler() -> Set[int]:
     return {7, 10}
 
 
-def _flex_slots_for_heater_shaker() -> Set[int]:
-    return {1, 3, 4, 6, 7, 9, 10, 12}
+def _flex_right_left_hand_slots() -> List[int]:
+    return _flex_left_hand_slots() + _flex_left_hand_slots()
+
+
+def _flex_left_hand_slots() -> List[int]:
+    return [1, 4, 7, 10]
+
+
+def _flex_right_hand_slots() -> List[int]:
+    return [3, 6, 9, 12]
 
 
 def _is_fixed_trash(item: DeckItem) -> bool:

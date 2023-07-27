@@ -1,6 +1,6 @@
 """Unit tests for the deck_conflict module."""
 
-from decoy import Decoy, matchers
+from decoy import Decoy
 import pytest
 
 from opentrons_shared_data.labware.dev_types import LabwareUri
@@ -38,36 +38,11 @@ def mock_state_view(
 
 
 @pytest.mark.parametrize(
-    ("robot_type", "deck_type"), [("OT-3 Standard", DeckType.OT3_STANDARD)]
-)
-def test_noop_if_ot3(decoy: Decoy, mock_state_view: StateView) -> None:
-    """For now, it shouldn't do anything if it's an OT-3."""
-    deck_conflict.check(
-        engine_state=mock_state_view,
-        existing_labware_ids=["lw1", "lw2"],
-        existing_module_ids=["m1", "m2"],
-        new_labware_id="lw3",
-    )
-
-    deck_conflict.check(
-        engine_state=mock_state_view,
-        existing_labware_ids=["lw1", "lw2"],
-        existing_module_ids=["m1", "m2"],
-        new_module_id="m3",
-    )
-
-    decoy.verify(
-        wrapped_deck_conflict.check(
-            existing_items=matchers.Anything(),
-            new_item=matchers.Anything(),
-            new_location=matchers.Anything(),
-        ),
-        times=0,
-    )
-
-
-@pytest.mark.parametrize(
-    ("robot_type", "deck_type"), [("OT-2 Standard", DeckType.OT2_STANDARD)]
+    ("robot_type", "deck_type"),
+    [
+        ("OT-2 Standard", DeckType.OT2_STANDARD),
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
 )
 def test_maps_labware_on_deck(decoy: Decoy, mock_state_view: StateView) -> None:
     """It should correcly map a labware that's loaded directly into a deck slot."""
@@ -114,12 +89,17 @@ def test_maps_labware_on_deck(decoy: Decoy, mock_state_view: StateView) -> None:
                 is_fixed_trash=True,
             ),
             new_location=5,
+            robot_type=mock_state_view.config.robot_type,
         )
     )
 
 
 @pytest.mark.parametrize(
-    ("robot_type", "deck_type"), [("OT-2 Standard", DeckType.OT2_STANDARD)]
+    ("robot_type", "deck_type"),
+    [
+        ("OT-2 Standard", DeckType.OT2_STANDARD),
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
 )
 def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -> None:
     """It should correctly map a module with no labware loaded atop it."""
@@ -159,12 +139,17 @@ def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -
                 highest_z_including_labware=3.14159,
             ),
             new_location=5,
+            robot_type=mock_state_view.config.robot_type,
         )
     )
 
 
 @pytest.mark.parametrize(
-    ("robot_type", "deck_type"), [("OT-2 Standard", DeckType.OT2_STANDARD)]
+    ("robot_type", "deck_type"),
+    [
+        ("OT-2 Standard", DeckType.OT2_STANDARD),
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
 )
 def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> None:
     """It should correctly map a module with a labware loaded atop it.
@@ -207,12 +192,17 @@ def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> N
                 highest_z_including_labware=3.14159,
             ),
             new_location=5,
+            robot_type=mock_state_view.config.robot_type,
         )
     )
 
 
 @pytest.mark.parametrize(
-    ("robot_type", "deck_type"), [("OT-2 Standard", DeckType.OT2_STANDARD)]
+    ("robot_type", "deck_type"),
+    [
+        ("OT-2 Standard", DeckType.OT2_STANDARD),
+        ("OT-3 Standard", DeckType.OT3_STANDARD),
+    ],
 )
 @pytest.mark.parametrize("module_model", ModuleModel)
 def test_maps_different_module_models(
@@ -237,12 +227,14 @@ def test_maps_different_module_models(
                 is_semi_configuration=False,
             )
         elif (
-            module_model is ModuleModel.MAGNETIC_MODULE_V1
-            or module_model is ModuleModel.MAGNETIC_MODULE_V2
-            or module_model is ModuleModel.TEMPERATURE_MODULE_V1
+            module_model is ModuleModel.TEMPERATURE_MODULE_V1
             or module_model is ModuleModel.TEMPERATURE_MODULE_V2
-            or module_model is ModuleModel.MAGNETIC_BLOCK_V1
         ):
+            return wrapped_deck_conflict.TemperatureModule(
+                name_for_errors=expected_name_for_errors,
+                highest_z_including_labware=3.14159,
+            )
+        else:
             return wrapped_deck_conflict.OtherModule(
                 name_for_errors=expected_name_for_errors,
                 highest_z_including_labware=3.14159,
@@ -278,5 +270,6 @@ def test_maps_different_module_models(
             existing_items={},
             new_item=expected_mapping_result,
             new_location=5,
+            robot_type=mock_state_view.config.robot_type,
         )
     )
