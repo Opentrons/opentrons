@@ -18,6 +18,7 @@ For more details about this release, please see the full [technical change log][
 - Robot can now handle json protocol v7
 - Support for PVT (v1.1) grippers
 - Update progress should get displayed after restart for firmware updates
+- Removed `use_pick_up_location_lpc_offset` and `use_drop_location_lpc_offset` from `protocol_context.move_labware` arguments. So they should be removed from any protocols that used them. This change also requires resetting the protocol run database on the robot.
 
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
