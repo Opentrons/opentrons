@@ -1,4 +1,5 @@
 """ProtocolEngine class definition."""
+from contextlib import AsyncExitStack, ExitStack
 from typing import Dict, Optional
 
 from opentrons.protocols.models import LabwareDefinition
@@ -284,22 +285,32 @@ class ProtocolEngine:
             FinishAction(error_details=error_details, set_run_status=set_run_status)
         )
 
+        exit_stack = AsyncExitStack()
+        exit_stack.push_async_callback(self._queue_worker.join)
+        exit_stack.callback(self._door_watcher.stop)
+        exit_stack.push_async_callback(
+            self._hardware_stopper.do_stop_and_recover,
+            drop_tips_and_home=drop_tips_and_home,
+        )
+        exit_stack.push_async_callback(self._plugin_starter.stop)
+
         try:
-            await self._queue_worker.join()
-
-        # todo(mm, 2022-01-31): We should use something like contextlib.AsyncExitStack
-        # to robustly clean up all these resources
-        # instead of try/finally, which can't scale without making indentation silly.
-        finally:
-            self._door_watcher.stop()
-
-            await self._hardware_stopper.do_stop_and_recover(drop_tips_and_home)
-
-            completed_at = self._model_utils.get_timestamp()
-            self._action_dispatcher.dispatch(
-                HardwareStoppedAction(completed_at=completed_at)
+            await exit_stack.aclose()
+        except Exception as hardware_stopped_exception:
+            finish_error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
+                error_id=self._model_utils.generate_id(),
+                created_at=self._model_utils.get_timestamp(),
+                error=hardware_stopped_exception,
             )
-            await self._plugin_starter.stop()
+        else:
+            finish_error_details = None
+
+        self._action_dispatcher.dispatch(
+            HardwareStoppedAction(
+                completed_at=self._model_utils.get_timestamp(),
+                finish_error_details=finish_error_details,
+            )
+        )
 
     def add_labware_offset(self, request: LabwareOffsetCreate) -> LabwareOffset:
         """Add a new labware offset and return it.

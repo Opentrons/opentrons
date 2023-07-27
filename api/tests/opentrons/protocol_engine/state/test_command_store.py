@@ -80,7 +80,8 @@ def test_initial_state(
         queued_setup_command_ids=OrderedSet(),
         all_command_ids=[],
         commands_by_id=OrderedDict(),
-        errors_by_id={},
+        run_error=None,
+        finish_error=None,
         latest_command_hash=None,
     )
 
@@ -658,7 +659,8 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
-        errors_by_id={},
+        run_error=None,
+        finish_error=None,
         latest_command_hash=None,
     )
 
@@ -679,7 +681,8 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
-        errors_by_id={},
+        run_error=None,
+        finish_error=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
     )
@@ -702,7 +705,8 @@ def test_command_store_handles_finish_action() -> None:
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
-        errors_by_id={},
+        run_error=None,
+        finish_error=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
     )
@@ -735,7 +739,8 @@ def test_command_store_handles_stop_action() -> None:
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
-        errors_by_id={},
+        run_error=None,
+        finish_error=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
     )
@@ -757,7 +762,8 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
-        errors_by_id={},
+        run_error=None,
+        finish_error=None,
         run_started_at=None,
         latest_command_hash=None,
     )
@@ -770,7 +776,11 @@ def test_command_store_save_started_completed_run_timestamp() -> None:
     hardware_stopped_time = datetime(year=2022, month=2, day=2)
 
     subject.handle_action(PlayAction(requested_at=start_time))
-    subject.handle_action(HardwareStoppedAction(completed_at=hardware_stopped_time))
+    subject.handle_action(
+        HardwareStoppedAction(
+            completed_at=hardware_stopped_time, finish_error_details=None
+        )
+    )
 
     assert subject.state.run_started_at == start_time
     assert subject.state.run_completed_at == hardware_stopped_time
@@ -788,8 +798,12 @@ def test_timestamps_are_latched() -> None:
     subject.handle_action(PlayAction(requested_at=play_time_1))
     subject.handle_action(PauseAction(source=PauseSource.CLIENT))
     subject.handle_action(PlayAction(requested_at=play_time_2))
-    subject.handle_action(HardwareStoppedAction(completed_at=stop_time_1))
-    subject.handle_action(HardwareStoppedAction(completed_at=stop_time_2))
+    subject.handle_action(
+        HardwareStoppedAction(completed_at=stop_time_1, finish_error_details=None)
+    )
+    subject.handle_action(
+        HardwareStoppedAction(completed_at=stop_time_2, finish_error_details=None)
+    )
 
     assert subject.state.run_started_at == play_time_1
     assert subject.state.run_completed_at == stop_time_1
@@ -816,35 +830,34 @@ def test_command_store_saves_unknown_finish_error() -> None:
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
-        errors_by_id={
-            "error-id": errors.ErrorOccurrence(
-                id="error-id",
-                createdAt=datetime(year=2021, month=1, day=1),
-                # this is wrapped into an UnexpectedProtocolError because it's not
-                # enumerated
-                errorType="UnexpectedProtocolError",
-                # but it has the information about what created it
-                detail="oh no",
-                # Unknown errors use the default error code
-                errorCode=ErrorCodes.GENERAL_ERROR.value.code,
-                # and they wrap
-                wrappedErrors=[
-                    errors.ErrorOccurrence(
-                        id="error-id",
-                        createdAt=datetime(year=2021, month=1, day=1),
-                        errorType="PythonException",
-                        detail="RuntimeError: oh no",
-                        errorCode="4000",
-                        # and we get some fun extra info if this wraps a normal exception
-                        errorInfo={
-                            "class": "RuntimeError",
-                            "args": "('oh no',)",
-                        },
-                        wrappedErrors=[],
-                    )
-                ],
-            )
-        },
+        run_error=errors.ErrorOccurrence(
+            id="error-id",
+            createdAt=datetime(year=2021, month=1, day=1),
+            # this is wrapped into an UnexpectedProtocolError because it's not
+            # enumerated
+            errorType="UnexpectedProtocolError",
+            # but it has the information about what created it
+            detail="oh no",
+            # Unknown errors use the default error code
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+            # and they wrap
+            wrappedErrors=[
+                errors.ErrorOccurrence(
+                    id="error-id",
+                    createdAt=datetime(year=2021, month=1, day=1),
+                    errorType="PythonException",
+                    detail="RuntimeError: oh no",
+                    errorCode="4000",
+                    # and we get some fun extra info if this wraps a normal exception
+                    errorInfo={
+                        "class": "RuntimeError",
+                        "args": "('oh no',)",
+                    },
+                    wrappedErrors=[],
+                )
+            ],
+        ),
+        finish_error=None,
         run_started_at=None,
         latest_command_hash=None,
     )
@@ -876,18 +889,20 @@ def test_command_store_saves_correct_error_code() -> None:
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
-        errors_by_id={
-            "error-id": errors.ErrorOccurrence(
-                id="error-id",
-                createdAt=datetime(year=2021, month=1, day=1),
-                errorType="MyCustomError",
-                detail="oh no",
-                errorCode=ErrorCodes.PIPETTE_NOT_PRESENT.value.code,
-            )
-        },
+        run_error=errors.ErrorOccurrence(
+            id="error-id",
+            createdAt=datetime(year=2021, month=1, day=1),
+            errorType="MyCustomError",
+            detail="oh no",
+            errorCode=ErrorCodes.PIPETTE_NOT_PRESENT.value.code,
+        ),
+        finish_error=None,
         run_started_at=None,
         latest_command_hash=None,
     )
+
+
+# TODO: Add finish error tests.
 
 
 def test_command_store_ignores_stop_after_graceful_finish() -> None:
@@ -908,7 +923,8 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
-        errors_by_id={},
+        run_error=None,
+        finish_error=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
     )
@@ -932,7 +948,8 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
-        errors_by_id={},
+        run_error=None,
+        finish_error=None,
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_command_hash=None,
     )
@@ -979,7 +996,8 @@ def test_command_store_handles_command_failed() -> None:
         commands_by_id={
             "command-id": CommandEntry(index=0, command=expected_failed_command),
         },
-        errors_by_id={},
+        run_error=None,
+        finish_error=None,
         run_started_at=None,
         latest_command_hash=None,
     )
@@ -989,7 +1007,9 @@ def test_handles_hardware_stopped() -> None:
     """It should mark the hardware as stopped on HardwareStoppedAction."""
     subject = CommandStore(is_door_open=False, config=_make_config())
     completed_at = datetime(year=2021, day=1, month=1)
-    subject.handle_action(HardwareStoppedAction(completed_at=completed_at))
+    subject.handle_action(
+        HardwareStoppedAction(completed_at=completed_at, finish_error_details=None)
+    )
 
     assert subject.state == CommandState(
         queue_status=QueueStatus.PAUSED,
@@ -1001,7 +1021,8 @@ def test_handles_hardware_stopped() -> None:
         queued_command_ids=OrderedSet(),
         queued_setup_command_ids=OrderedSet(),
         commands_by_id=OrderedDict(),
-        errors_by_id={},
+        run_error=None,
+        finish_error=None,
         run_started_at=None,
         latest_command_hash=None,
     )

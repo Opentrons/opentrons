@@ -434,7 +434,9 @@ async def test_finish(
         await hardware_stopper.do_stop_and_recover(
             drop_tips_and_home=drop_tips_and_home
         ),
-        action_dispatcher.dispatch(HardwareStoppedAction(completed_at=completed_at)),
+        action_dispatcher.dispatch(
+            HardwareStoppedAction(completed_at=completed_at, finish_error_details=None)
+        ),
         await plugin_starter.stop(),
     )
 
@@ -484,7 +486,10 @@ async def test_finish_with_error(
         await queue_worker.join(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         action_dispatcher.dispatch(
-            HardwareStoppedAction(completed_at=datetime(year=2022, month=2, day=2))
+            HardwareStoppedAction(
+                completed_at=datetime(year=2022, month=2, day=2),
+                finish_error_details=None,
+            )
         ),
     )
 
@@ -525,7 +530,10 @@ async def test_finish_with_estop_error_will_not_drop_tip_and_home(
         await queue_worker.join(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=False),
         action_dispatcher.dispatch(
-            HardwareStoppedAction(completed_at=datetime(year=2022, month=2, day=2))
+            HardwareStoppedAction(
+                completed_at=datetime(year=2022, month=2, day=2),
+                finish_error_details=None,
+            )
         ),
     )
 
@@ -555,7 +563,9 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     decoy.verify(
         door_watcher.stop(),
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
-        action_dispatcher.dispatch(HardwareStoppedAction(completed_at=completed_at)),
+        action_dispatcher.dispatch(
+            HardwareStoppedAction(completed_at=completed_at, finish_error_details=None)
+        ),
         await plugin_starter.stop(),
     )
 
