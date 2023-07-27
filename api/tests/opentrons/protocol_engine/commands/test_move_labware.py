@@ -184,6 +184,7 @@ async def test_gripper_move_labware_implementation(
         newLocation=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
         strategy=LabwareMovementStrategy.USING_GRIPPER,
         pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
+        dropOffset=None,
     )
 
     decoy.when(state_view.labware.get(labware_id="my-cool-labware-id")).then_return(
@@ -210,10 +211,10 @@ async def test_gripper_move_labware_implementation(
     validated_from_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_6)
     validated_new_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_7)
     decoy.when(
-        labware_movement.ensure_valid_gripper_location(from_location)
+        state_view.geometry.ensure_valid_gripper_location(from_location)
     ).then_return(validated_from_location)
     decoy.when(
-        labware_movement.ensure_valid_gripper_location(new_location)
+        state_view.geometry.ensure_valid_gripper_location(new_location)
     ).then_return(validated_new_location)
 
     result = await subject.execute(data)
@@ -224,11 +225,10 @@ async def test_gripper_move_labware_implementation(
             current_location=validated_from_location,
             new_location=validated_new_location,
             user_offset_data=LabwareMovementOffsetData(
-                pickUpOffset=LabwareOffsetVector(x=1, y=2, z=3),
-                dropOffset=None,
+                pick_up_offset=LabwareOffsetVector(x=1, y=2, z=3),
+                drop_offset=LabwareOffsetVector(x=0, y=0, z=0),
             ),
         ),
-        times=1,
     )
     assert result == MoveLabwareResult(
         offsetId="wowzers-a-new-offset-id",

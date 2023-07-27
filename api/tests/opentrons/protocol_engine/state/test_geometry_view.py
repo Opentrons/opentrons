@@ -32,6 +32,8 @@ from opentrons.protocol_engine.types import (
     OverlapOffset,
     DeckType,
     CurrentWell,
+    LabwareLocation,
+    LabwareMovementOffsetData,
 )
 from opentrons.protocol_engine.state import move_types
 from opentrons.protocol_engine.state.config import Config
@@ -1411,3 +1413,65 @@ def test_get_next_drop_tip_location_in_non_trash_labware(
         origin=DropTipWellOrigin.DEFAULT,
         offset=WellOffset(x=0, y=0, z=0),
     )
+
+
+@pytest.mark.parametrize(
+    argnames=["from_location", "location_based_pick_up_offset"],
+    argvalues=[
+        (
+            DeckSlotLocation(slotName=DeckSlotName("D2")),
+            LabwareOffsetVector(x=0, y=0, z=0),
+        ),
+        (
+            ModuleLocation(moduleId="thermocycler-id"),
+            LabwareOffsetVector(x=0, y=0, z=3.5),
+        ),
+        (OnLabwareLocation(labwareId="adapter-id"), LabwareOffsetVector(x=0, y=0, z=0)),
+    ],
+)
+def test_get_final_labware_movement_offset_vectors(
+    decoy: Decoy,
+    module_view: ModuleView,
+    subject: GeometryView,
+    from_location: LabwareLocation,
+    location_based_pick_up_offset: LabwareOffsetVector,
+) -> None:
+    """It should provide the final labware movement offset data based on locations."""
+    # TODO: update once built-in offsets are being fetched from definitions
+    decoy.when(module_view.get_connected_model("thermocycler-id")).then_return(
+        ModuleModel.THERMOCYCLER_MODULE_V2
+    )
+
+    in_protocol_pickup_offset = LabwareOffsetVector(x=1, y=2, z=4.0)
+    in_protocol_drop_offset = LabwareOffsetVector(x=4, y=5, z=6)
+    final_offsets = subject.get_final_labware_movement_offset_vectors(
+        from_location=from_location,
+        to_location=DeckSlotLocation(slotName=DeckSlotName("D2")),
+        additional_offset_vector=LabwareMovementOffsetData(
+            pick_up_offset=in_protocol_pickup_offset,
+            drop_offset=in_protocol_drop_offset,
+        ),
+    )
+    assert (
+        final_offsets.pick_up_offset
+        == location_based_pick_up_offset + in_protocol_pickup_offset
+    )
+    assert final_offsets.drop_offset == in_protocol_drop_offset
+
+
+def test_ensure_valid_gripper_location(subject: GeometryView) -> None:
+    """It should raise error if it's not a valid labware movement location for gripper."""
+    slot_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_3)
+    module_location = ModuleLocation(moduleId="dummy-module")
+    on_labware_location = OnLabwareLocation(labwareId="adapter-id")
+    off_deck_location = OFF_DECK_LOCATION
+
+    assert subject.ensure_valid_gripper_location(slot_location) == slot_location
+    assert subject.ensure_valid_gripper_location(module_location) == module_location
+    assert (
+        subject.ensure_valid_gripper_location(on_labware_location)
+        == on_labware_location
+    )
+
+    with pytest.raises(errors.LabwareMovementNotAllowedError):
+        subject.ensure_valid_gripper_location(off_deck_location)
