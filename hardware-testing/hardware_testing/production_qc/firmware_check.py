@@ -1,5 +1,5 @@
 """Firmware Check."""
-from asyncio import run
+from asyncio import run, sleep
 from typing import List
 
 from opentrons.hardware_control.ot3api import OT3API
@@ -44,6 +44,8 @@ async def _main(simulate: bool, subsystems: List[SubSystem]) -> None:
         print("done")
         if api.is_simulator:
             break
+        else:
+            await sleep(1)
 
 
 if __name__ == "__main__":
