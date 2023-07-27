@@ -44,6 +44,7 @@ META_DATA_TEST_RUN_ID = "test_run_id"
 META_DATA_TEST_TIME_UTC = "test_time_utc"
 META_DATA_TEST_OPERATOR = "test_operator"
 META_DATA_TEST_VERSION = "test_version"
+META_DATA_TEST_FIRMWARE = "firmware"
 
 RESULTS_OVERVIEW_TITLE = "RESULTS_OVERVIEW"
 
@@ -262,6 +263,7 @@ def _generate_meta_data_section() -> CSVSection:
             CSVLine(tag=META_DATA_TEST_TIME_UTC, data=[str]),
             CSVLine(tag=META_DATA_TEST_OPERATOR, data=[str]),
             CSVLine(tag=META_DATA_TEST_VERSION, data=[str]),
+            CSVLine(tag=META_DATA_TEST_FIRMWARE, data=[str]),
         ],
     )
 
@@ -387,6 +389,10 @@ class CSVReport:
     def set_version(self, version: str) -> None:
         """Set version."""
         self(META_DATA_TITLE, META_DATA_TEST_VERSION, [version])
+
+    def set_firmware(self, firmware: str) -> None:
+        """Set firmware."""
+        self(META_DATA_TITLE, META_DATA_TEST_FIRMWARE, [firmware])
 
     def save_to_disk(self) -> Path:
         """CSV Report save to disk."""
