@@ -144,8 +144,8 @@ class AsairSensor(AsairSensorBase):
             log.debug(f"received {res}")
 
             res = codecs.encode(res, "hex")
-            temp = res[6:10]
-            relative_hum = res[10:14]
+            relative_hum = res[6:10]
+            temp = res[10:14]
             log.info(f"Temp: {temp}, RelativeHum: {relative_hum}")
 
             temp = float(int(temp, 16)) / 10
