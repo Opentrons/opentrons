@@ -19,8 +19,7 @@ import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
 import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
 import { getScanning, OPENTRONS_USB } from '../../../redux/discovery'
 import { appShellRequestor } from '../../../redux/shell/remote'
-import { DISENGAGED } from '../../../organisms/EmergencyStop/constants'
-import { useEstopContext } from '../../../organisms/EmergencyStop/hook'
+import { DISENGAGED, useEstopContext } from '../../../organisms/EmergencyStop'
 
 import type { DesktopRouteParams } from '../../../App/types'
 
