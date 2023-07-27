@@ -33,6 +33,7 @@ addrs = {
     "08": "C492",
     "09": "C543",
     "10": "C74A",
+    "0A": "48d9",
 }
 
 
@@ -151,6 +152,32 @@ class AsairSensor(AsairSensorBase):
             temp = float(int(temp, 16)) / 10
             relative_hum = float(int(relative_hum, 16)) / 10
             return Reading(temperature=temp, relative_humidity=relative_hum)
+
+        except (IndexError, ValueError) as e:
+            log.exception("Bad value read")
+            raise AsairSensorError(str(e))
+        except SerialException:
+            log.exception("Communication error")
+            error_msg = "Asair Sensor not connected. Check if port number is correct."
+            raise AsairSensorError(error_msg)
+
+    def get_serial(self) -> str:
+        """Read the device ID register."""
+        serial_addr = "0A"
+        data_packet = "{}0300000002{}".format(serial_addr, addrs[serial_addr])
+        log.debug(f"sending {data_packet}")
+        command_bytes = codecs.decode(data_packet.encode(), "hex")
+        try:
+            self._th_sensor.flushInput()
+            self._th_sensor.flushOutput()
+            self._th_sensor.write(command_bytes)
+            time.sleep(0.1)
+
+            length = self._th_sensor.inWaiting()
+            res = self._th_sensor.read(length)
+            log.debug(f"received {res}")
+            dev_id = res[6:14]
+            return dev_id.decode()
 
         except (IndexError, ValueError) as e:
             log.exception("Bad value read")
