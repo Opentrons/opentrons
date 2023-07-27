@@ -11,7 +11,7 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
 
-from hardware_testing.opentrons_api.types import Mount, Axis, Point
+from hardware_testing.opentrons_api.types import Mount, Axis, Point, GantryLoad, OT3Mount
 
 from opentrons.hardware_control.types import CriticalPoint
 
@@ -47,6 +47,7 @@ async def jog(api, position, cp):
     step = step_size[step_length_index]
     xy_speed = 60
     za_speed = 65
+    mount = Mount.LEFT
     information_str = """
         Click  >>   i   << to move up
         Click  >>   k   << to move down
@@ -168,7 +169,7 @@ async def calibrate_tip_racks(api, mount, slot_loc, AXIS):
 
 async def _main(is_simulating: bool) -> None:
     path = '/data/testing_data/calibrated_slot_locations.json'
-    mount = Mount.LEFT
+    mount = OT3Mount.LEFT
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.home()
     await api.home_plunger(mount)
