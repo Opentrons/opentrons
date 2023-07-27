@@ -68,7 +68,9 @@ async def get_serial(
     """Get a serial number that is correct and parseable."""
     loop = asyncio.get_running_loop()
     while True:
-        serial = await loop.run_in_executor(None, lambda: _read_input_and_confirm(prompt))
+        serial = await loop.run_in_executor(
+            None, lambda: _read_input_and_confirm(prompt)
+        )
         try:
             name, model, data = serials.info_from_serial_string(serial)
         except Exception as e:
@@ -128,10 +130,12 @@ async def update_serial_and_confirm(
                             base_log.info(f"serial confirmed on attempt {attempt}")
                             return
                         else:
-                            raise RuntimeError(f"serial does not match expected "
-                                               f"(name={message.payload.name}, "
-                                               f"model={message.payload.model}, "
-                                               f"serial={message.payload.serial})")
+                            raise RuntimeError(
+                                f"serial does not match expected "
+                                f"(name={message.payload.name}, "
+                                f"model={message.payload.model}, "
+                                f"serial={message.payload.serial})"
+                            )
                     base_log.debug(f"message {type(message)} is not relevant")
                     base_log.debug(
                         f"{(target-datetime.datetime.now()).total_seconds()} remaining in attempt {attempt}"
