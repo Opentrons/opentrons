@@ -370,6 +370,10 @@ class OT3Simulator:
         self._encoder_position[NodeId.gripper_g] = encoder_position_um / 1000.0
 
     async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+        """Raise an error if the given state doesn't match the physical state."""
+        pass
+
+    async def get_tip_present_state(self, mount: OT3Mount) -> int:
         """Get the state of the tip ejector flag for a given mount."""
         pass
 
