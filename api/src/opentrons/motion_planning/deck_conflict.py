@@ -281,7 +281,7 @@ def _create_flex_restrictions(item: DeckItem, location: int) -> List[_DeckRestri
     restrictions: List[_DeckRestriction] = []
 
     if isinstance(item, ThermocyclerModule):
-        for covered_location in _slots_covered_by_thermocycler(item):
+        for covered_location in _flex_slots_covered_by_thermocycler():
             restrictions.append(
                 _NothingAllowed(
                     location=covered_location,
@@ -290,15 +290,17 @@ def _create_flex_restrictions(item: DeckItem, location: int) -> List[_DeckRestri
                 )
             )
 
-    if isinstance(item, HeaterShakerModule):
-        for covered_location in get_adjacent_slots(location):
-            restrictions.append(
-                _NoModule(
-                    location=covered_location,
-                    source_item=item,
-                    source_location=location,
-                )
+    if (
+        isinstance(item, HeaterShakerModule)
+        and location in _flex_slots_for_heater_shaker()
+    ):
+        restrictions.append(
+            _NoModule(
+                location=location,
+                source_item=item,
+                source_location=location,
             )
+        )
 
         for covered_location in get_east_west_slots(location):
             restrictions.append(
@@ -359,6 +361,14 @@ def _slots_covered_by_thermocycler(thermocycler: ThermocyclerModule) -> Set[int]
         return {7, 10}
     else:
         return {7, 8, 10, 11}
+
+
+def _flex_slots_covered_by_thermocycler() -> Set[int]:
+    return {7, 10}
+
+
+def _flex_slots_for_heater_shaker() -> Set[int]:
+    return {1, 3, 4, 6, 7, 9, 10, 12}
 
 
 def _is_fixed_trash(item: DeckItem) -> bool:
