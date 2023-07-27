@@ -7,6 +7,7 @@ from opentrons.protocol_api import ProtocolContext, Well, Labware
 from hardware_testing.data import ui
 from hardware_testing.data.csv_report import CSVReport
 from hardware_testing.opentrons_api.types import Point, OT3Mount
+from hardware_testing.drivers import asair_sensor
 
 from . import report
 from . import config
@@ -42,6 +43,7 @@ from .measurement.environment import get_min_reading, get_max_reading
 from .measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
+    GravimetricRecording,
 )
 from .measurement.scale import Scale
 from .tips import MULTI_CHANNEL_TEST_ORDER
@@ -192,9 +194,10 @@ def _run_trial(
     )
 
     def _tag(m_type: MeasurementType) -> str:
-        return create_measurement_tag(
+        tag = create_measurement_tag(
             m_type, None if trial.blank else trial.volume, trial.channel, trial.trial
         )
+        return tag
 
     def _record_measurement_and_store(m_type: MeasurementType) -> MeasurementData:
         m_tag = _tag(m_type)
@@ -303,25 +306,35 @@ def _get_channel_divider(cfg: config.GravimetricConfig) -> float:
 
 
 def build_gm_report(
-    cfg: config.GravimetricConfig,
-    resources: TestResources,
+    test_volumes: List[float],
+    run_id: str,
+    pipette_tag: str,
+    operator_name: str,
+    git_description: str,
+    robot_serial: str,
+    tip_batchs: Dict[str, str],
     recorder: GravimetricRecorder,
+    pipette_channels: int,
+    increment: bool,
+    name: str,
+    environment_sensor: asair_sensor.AsairSensorBase,
+    trials: int,
 ) -> report.CSVReport:
     """Build a CSVReport formated for gravimetric tests."""
     ui.print_header("CREATE TEST-REPORT")
     test_report = report.create_csv_test_report(
-        resources.test_volumes, cfg, run_id=resources.run_id
+        test_volumes, pipette_channels, increment, trials, name, run_id=run_id
     )
-    test_report.set_tag(resources.pipette_tag)
-    test_report.set_operator(resources.operator_name)
-    test_report.set_version(resources.git_description)
+    test_report.set_tag(pipette_tag)
+    test_report.set_operator(operator_name)
+    test_report.set_version(git_description)
     report.store_serial_numbers(
         test_report,
-        robot=resources.robot_serial,
-        pipette=resources.pipette_tag,
-        tips=resources.tip_batch,
+        robot=robot_serial,
+        pipette=pipette_tag,
+        tips=tip_batchs,
         scale=recorder.serial_number,
-        environment="None",
+        environment=environment_sensor.get_serial(),
         liquid="None",
     )
     return test_report
@@ -450,8 +463,25 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     if resources.ctx.is_simulating():
         start_sim_mass = {50: 15, 200: 200, 1000: 200}
         resources.recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
-    test_report = build_gm_report(cfg, resources, recorder)
-
+    recorder._recording = GravimetricRecording()
+    tip_batches: Dict[str, str] = {}
+    tip_batches[f"tips_{cfg.tip_volume}ul"] = resources.tip_batch
+    test_report = build_gm_report(
+        test_volumes=resources.test_volumes,
+        run_id=resources.run_id,
+        pipette_tag=resources.pipette_tag,
+        operator_name=resources.operator_name,
+        git_description=resources.git_description,
+        robot_serial=resources.robot_serial,
+        tip_batchs=tip_batches,
+        recorder=resources.recorder,
+        pipette_channels=cfg.pipette_channels,
+        increment=cfg.increment,
+        name=cfg.name,
+        environment_sensor=resources.env_sensor,
+        trials=cfg.trials,
+    )
+    report.store_config_gm(test_report, cfg)
     calibration_tip_in_use = True
 
     if resources.ctx.is_simulating():
@@ -708,9 +738,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                 d=dispense_d,
             )
     finally:
-        ui.print_info("ending recording")
-        recorder.stop()
-        recorder.deactivate()
         _return_tip = False if calibration_tip_in_use else cfg.return_tip
         _finish_test(cfg, resources, _return_tip)
     ui.print_title("RESULTS")

@@ -348,8 +348,9 @@ if __name__ == "__main__":
     recorder: Optional[GravimetricRecorder] = None
     if not args.photometric:
         scale = Scale.build(simulate=_ctx.is_simulating())
+        protocol_cfg = GRAVIMETRIC_CFG[args.pipette][args.channels][1000]
         recorder = execute._load_scale(
-            "name", scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
+            protocol_cfg.metadata["protocolName"], scale, run_id, pipette_tag, start_time, _ctx.is_simulating()
         )
 
     if args.tip == 0:
@@ -392,3 +393,8 @@ if __name__ == "__main__":
             pipette,
             pipette_tag,
         )
+
+    if recorder is not None:
+        ui.print_info("ending recording")
+        recorder.stop()
+        recorder.deactivate()

@@ -66,6 +66,11 @@ class AsairSensorBase(ABC):
         """Get a temp and humidity reading."""
         ...
 
+    @abc.abstractmethod
+    def get_serial(self) -> str:
+        """Read the device ID register."""
+        ...
+
 
 def BuildAsairSensor(simulate: bool) -> AsairSensorBase:
     """Try to find and return an Asair sensor, if not found return a simulator."""
@@ -190,6 +195,10 @@ class AsairSensor(AsairSensorBase):
 
 class SimAsairSensor(AsairSensorBase):
     """Simulating Asair sensor driver."""
+
+    def get_serial(self) -> str:
+        """Read the device ID register."""
+        return "0102030405060708"
 
     def get_reading(self) -> Reading:
         """Get a reading."""
