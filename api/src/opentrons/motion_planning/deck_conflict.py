@@ -296,29 +296,28 @@ def _create_flex_restrictions(item: DeckItem, location: int) -> List[_DeckRestri
                 )
             )
 
-    if (
-        isinstance(item, (HeaterShakerModule, TemperatureModule))
-        and location in _flex_right_hand_slots()
-    ):
+    elif isinstance(item, (HeaterShakerModule, TemperatureModule)):
+        if location in _flex_right_hand_slots():
+            restrictions.append(
+                _NoModule(
+                    location=location,
+                    source_item=item,
+                    source_location=location,
+                )
+            )
+        else:
+            raise DeckConflictError(
+                f"{item.name_for_errors} is not allowed in slot {location}"
+            )
+
+    else:
         restrictions.append(
-            _NoModule(
+            _NothingAllowed(
                 location=location,
                 source_item=item,
                 source_location=location,
             )
         )
-
-        for covered_location in get_east_west_slots(location):
-            restrictions.append(
-                _MaxHeight(
-                    location=covered_location,
-                    source_item=item,
-                    source_location=location,
-                    max_height=HS_MAX_X_ADJACENT_ITEM_HEIGHT,
-                    allowed_labware=HS_ALLOWED_ADJACENT_TALL_LABWARE,
-                )
-            )
-
     return restrictions
 
 

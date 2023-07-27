@@ -9,7 +9,8 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons.motion_planning import deck_conflict
 
 
-def test_empty_no_conflict() -> None:
+@pytest.mark.parametrize("robot_type", [("OT-2 Standard"), ("OT-3 Standard")])
+def test_empty_no_conflict(robot_type: str) -> None:
     """It should not raise on empty input."""
     deck_conflict.check(
         existing_items={},
@@ -17,10 +18,12 @@ def test_empty_no_conflict() -> None:
             highest_z_including_labware=123, name_for_errors="foo"
         ),
         new_location=1,
+        robot_type=robot_type,
     )
 
 
-def test_no_multiple_locations() -> None:
+@pytest.mark.parametrize("robot_type", [("OT-2 Standard"), ("OT-3 Standard")])
+def test_no_multiple_locations(robot_type: str) -> None:
     """It should not allow two items in the same slot."""
     item_1 = deck_conflict.OtherModule(
         highest_z_including_labware=123, name_for_errors="some_item_1"
@@ -33,7 +36,12 @@ def test_no_multiple_locations() -> None:
         deck_conflict.DeckConflictError,
         match="some_item_1 in slot 1 prevents some_item_2 from using slot 1",
     ):
-        deck_conflict.check(existing_items={1: item_1}, new_item=item_2, new_location=1)
+        deck_conflict.check(
+            existing_items={1: item_1},
+            new_item=item_2,
+            new_location=1,
+            robot_type=robot_type,
+        )
 
 
 def test_only_trash_in_12() -> None:
@@ -189,6 +197,72 @@ def test_labware_when_thermocycler(
             existing_items={labware_location: labware},
             new_location=7,
             new_item=thermocycler,
+        )
+
+
+@pytest.mark.parametrize(
+    ("labware_location", "labware_should_be_allowed"),
+    [
+        (1, True),
+        (7, False),
+        (8, True),
+        (10, False),
+        (11, True),
+    ],
+)
+def test_flex_labware_when_thermocycler(
+    labware_location: int,
+    labware_should_be_allowed: bool,
+) -> None:
+    """It should reject labware if a Thermocycler covers the same slot."""
+    thermocycler = deck_conflict.ThermocyclerModule(
+        name_for_errors="some_thermocycler",
+        highest_z_including_labware=123,
+        is_semi_configuration=False,
+    )
+
+    labware = deck_conflict.Labware(
+        uri=LabwareUri("some_labware_uri"),
+        highest_z=123,
+        is_fixed_trash=False,
+        name_for_errors="some_labware",
+    )
+
+    maybe_raises: ContextManager[object]
+    if labware_should_be_allowed:
+        maybe_raises = nullcontext()  # Expecct no exception.
+    else:
+        maybe_raises = pytest.raises(  # Expect an exception..
+            deck_conflict.DeckConflictError,
+            match=(
+                "some_thermocycler in slot 7 prevents"
+                f" some_labware from using slot {labware_location}"
+            ),
+        )
+    with maybe_raises:
+        deck_conflict.check(
+            existing_items={7: thermocycler},
+            new_location=labware_location,
+            new_item=labware,
+            robot_type="OT-3 Standard",
+        )
+
+    if labware_should_be_allowed:
+        maybe_raises = nullcontext()  # Expecct no exception.
+    else:
+        maybe_raises = pytest.raises(  # Expect an exception..
+            deck_conflict.DeckConflictError,
+            match=(
+                f"some_labware in slot {labware_location}"
+                " prevents some_thermocycler from using slot 7"
+            ),
+        )
+    with maybe_raises:
+        deck_conflict.check(
+            existing_items={labware_location: labware},
+            new_location=7,
+            new_item=thermocycler,
+            robot_type="OT-3 Standard",
         )
 
 
@@ -467,4 +541,37 @@ def test_no_heater_shaker_south_of_trash() -> None:
             existing_items={12: trash},
             new_item=heater_shaker,
             new_location=9,
+        )
+
+
+@pytest.mark.parametrize(
+    "deck_item",
+    [
+        (
+            deck_conflict.HeaterShakerModule(
+                highest_z_including_labware=123,
+                name_for_errors="some_heater_shaker",
+            )
+        ),
+        (
+            deck_conflict.TemperatureModule(
+                highest_z_including_labware=123,
+                name_for_errors="some_temp_deck",
+            )
+        ),
+    ],
+)
+def test_flex_raises_module_in_wrong_location(
+    deck_item: deck_conflict.DeckItem,
+) -> None:
+    """It should raise when trying to load a module in a disallowed location."""
+    with pytest.raises(
+        deck_conflict.DeckConflictError,
+        match=(f"{deck_item.name_for_errors} is not allowed in slot {2}"),
+    ):
+        deck_conflict.check(
+            existing_items={},
+            new_location=2,
+            new_item=deck_item,
+            robot_type="OT-3 Standard",
         )
