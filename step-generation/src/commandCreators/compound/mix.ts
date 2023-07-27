@@ -152,6 +152,7 @@ export const mix: CommandCreator<MixArgs> = (
           curryCommandCreator(replaceTip, {
             pipette,
             tipRack,
+            robotState: prevRobotState,
           }),
         ]
       }

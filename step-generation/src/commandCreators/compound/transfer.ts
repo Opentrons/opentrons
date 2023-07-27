@@ -55,7 +55,6 @@ export const transfer: CommandCreator<TransferArgs> = (
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'
   const errors: CommandCreatorError[] = []
-
   if (
     !prevRobotState.pipettes[args.pipette] ||
     !invariantContext.pipetteEntities[args.pipette]
@@ -169,6 +168,7 @@ export const transfer: CommandCreator<TransferArgs> = (
                 curryCommandCreator(replaceTip, {
                   pipette: args.pipette,
                   tipRack: args.tipRack,
+                  robotState: prevRobotState,
                 }),
               ]
             : []

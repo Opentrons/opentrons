@@ -19,7 +19,7 @@ export const ModelDropdown = (props: ModelDropdownProps): JSX.Element => {
       tabIndex={tabIndex}
       options={options}
       name={fieldName}
-      value={field.value}
+      value={options.length === 1 ? String(options[0].value) : ''}
       onChange={field.onChange}
       onBlur={field.onBlur}
       error={meta.touched && meta.error ? meta.error : null}

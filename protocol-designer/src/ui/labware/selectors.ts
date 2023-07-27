@@ -120,15 +120,22 @@ export const getTiprackOptions: Selector<Options> = createSelector(
         labwareEntity: LabwareEntity,
         labwareId: string
       ): Options => {
-        return getIsTiprack(labwareEntity.def)
-          ? [
-              ...acc,
-              {
-                name: nicknamesById[labwareId],
-                value: labwareId,
-              },
-            ]
-          : acc
+        const labwareDefURI = labwareEntity.labwareDefURI
+        const labwareDefURIs = acc.map(option => option.value.split(':')[1])
+        if (
+          labwareDefURIs.includes(labwareDefURI) ||
+          !getIsTiprack(labwareEntity.def)
+        ) {
+          return acc
+        } else {
+          return [
+            ...acc,
+            {
+              name: nicknamesById[labwareId],
+              value: labwareId,
+            },
+          ]
+        }
       },
       []
     )

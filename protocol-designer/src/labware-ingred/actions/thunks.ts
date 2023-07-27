@@ -105,7 +105,6 @@ export const duplicateLabware: (
     Object.keys(allNicknamesById).map((id: string) => allNicknamesById[id]), // NOTE: flow won't do Object.values here >:(
     templateNickname
   )
-
   if (templateLabwareDefURI && duplicateSlot) {
     dispatch({
       type: 'DUPLICATE_LABWARE',

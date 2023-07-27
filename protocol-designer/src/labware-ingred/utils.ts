@@ -1,7 +1,7 @@
 import { RobotType, getDeckDefFromRobotType } from '@opentrons/shared-data'
 import { getSlotIsEmpty } from '../step-forms/utils'
-import { InitialDeckSetup } from '../step-forms/types'
-import { DeckSlot } from '../types'
+import type { InitialDeckSetup } from '../step-forms/types'
+import type { DeckSlot } from '../types'
 
 export function getNextAvailableDeckSlot(
   initialDeckSetup: InitialDeckSetup,
