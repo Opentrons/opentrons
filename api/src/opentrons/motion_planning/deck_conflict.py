@@ -216,9 +216,7 @@ def check(
             )
 
 
-def _create_restrictions(
-    item: DeckItem, location: int, robot_type: str
-) -> List[_DeckRestriction]:
+def _create_ot2_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
 
     if location != _FIXED_TRASH_SLOT:
@@ -277,6 +275,53 @@ def _create_restrictions(
             )
 
     return restrictions
+
+
+def _create_flex_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction]:
+    restrictions: List[_DeckRestriction] = []
+
+    if isinstance(item, ThermocyclerModule):
+        for covered_location in _slots_covered_by_thermocycler(item):
+            restrictions.append(
+                _NothingAllowed(
+                    location=covered_location,
+                    source_item=item,
+                    source_location=location,
+                )
+            )
+
+    if isinstance(item, HeaterShakerModule):
+        for covered_location in get_adjacent_slots(location):
+            restrictions.append(
+                _NoModule(
+                    location=covered_location,
+                    source_item=item,
+                    source_location=location,
+                )
+            )
+
+        for covered_location in get_east_west_slots(location):
+            restrictions.append(
+                _MaxHeight(
+                    location=covered_location,
+                    source_item=item,
+                    source_location=location,
+                    max_height=HS_MAX_X_ADJACENT_ITEM_HEIGHT,
+                    allowed_labware=HS_ALLOWED_ADJACENT_TALL_LABWARE,
+                )
+            )
+
+    return restrictions
+
+
+def _create_restrictions(
+    item: DeckItem, location: int, robot_type: str
+) -> List[_DeckRestriction]:
+
+    if robot_type == "OT-2 Standard":
+        return _create_ot2_restrictions(item, location)
+    else:
+        return _create_flex_restrictions(item, location)
 
 
 def _create_deck_conflict_error_message(
