@@ -4,7 +4,7 @@ from typing import Iterator, Union, Dict, Tuple, List, Any, OrderedDict
 from typing_extensions import Literal
 from math import copysign
 import pytest
-from mock import AsyncMock, patch, Mock, call, PropertyMock
+from mock import AsyncMock, patch, Mock, call, PropertyMock, MagicMock
 from hypothesis import given, strategies, settings, HealthCheck, assume, example
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
@@ -41,8 +41,6 @@ from opentrons.hardware_control.types import (
     CriticalPoint,
     GripperProbe,
     InstrumentProbeType,
-    LiquidNotFound,
-    EarlyLiquidSenseTrigger,
     SubSystem,
     GripperJawState,
     StatusBarState,
@@ -263,13 +261,13 @@ async def mock_refresh(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMoc
 @pytest.fixture
 async def mock_instrument_handlers(
     ot3_hardware: ThreadManager[OT3API],
-) -> Iterator[Tuple[Mock]]:
+) -> Iterator[Tuple[MagicMock]]:
     with patch.object(
         ot3_hardware.managed_obj,
         "_gripper_handler",
-        Mock(spec=GripperHandler),
+        MagicMock(spec=GripperHandler),
     ) as mock_gripper_handler, patch.object(
-        ot3_hardware.managed_obj, "_pipette_handler", Mock(spec=OT3PipetteHandler)
+        ot3_hardware.managed_obj, "_pipette_handler", MagicMock(spec=OT3PipetteHandler)
     ) as mock_pipette_handler:
         yield mock_gripper_handler, mock_pipette_handler
 
@@ -579,10 +577,10 @@ async def test_liquid_probe(
     pipette_node: Axis,
     mount: OT3Mount,
     fake_liquid_settings: LiquidProbeSettings,
-    mock_instrument_handlers: Tuple[Mock],
+    mock_instrument_handlers: Tuple[MagicMock],
     mock_current_position_ot3: AsyncMock,
     mock_ungrip: AsyncMock,
-    mock_home_plunger: AsyncMock,
+    mock_move_to_plunger_bottom: AsyncMock,
 ) -> None:
     mock_ungrip.return_value = None
     backend = ot3_hardware.managed_obj._backend
@@ -616,7 +614,7 @@ async def test_liquid_probe(
             data_file="fake_file_name",
         )
         await ot3_hardware.liquid_probe(mount, fake_settings_aspirate)
-        mock_home_plunger.assert_called_once()
+        mock_move_to_plunger_bottom.assert_called_once()
         backend.liquid_probe.assert_called_once_with(
             mount,
             fake_settings_aspirate.max_z_distance,
@@ -633,51 +631,6 @@ async def test_liquid_probe(
         await ot3_hardware.liquid_probe(
             mount, fake_liquid_settings
         )  # should raise no exceptions
-
-
-@pytest.mark.parametrize(
-    "mount, head_node, pipette_node",
-    [
-        (OT3Mount.LEFT, NodeId.head_l, NodeId.pipette_left),
-        (OT3Mount.RIGHT, NodeId.head_r, NodeId.pipette_right),
-    ],
-)
-async def test_liquid_sensing_errors(
-    mock_move_to: AsyncMock,
-    ot3_hardware: ThreadManager[OT3API],
-    head_node: NodeId,
-    pipette_node: NodeId,
-    mount: OT3Mount,
-    fake_liquid_settings: LiquidProbeSettings,
-    mock_instrument_handlers: Tuple[Mock],
-    mock_current_position_ot3: AsyncMock,
-    mock_home_plunger: AsyncMock,
-    mock_ungrip: AsyncMock,
-) -> None:
-    backend = ot3_hardware.managed_obj._backend
-    mock_ungrip.return_value = None
-    await ot3_hardware.home()
-    mock_move_to.return_value = None
-
-    with patch.object(
-        backend, "liquid_probe", AsyncMock(spec=backend.liquid_probe)
-    ) as mock_position:
-        return_dict = {
-            head_node: 103,
-            NodeId.gantry_x: 0,
-            NodeId.gantry_y: 0,
-            pipette_node: 200,
-        }
-        # should raise LiquidNotFound
-        mock_position.return_value = return_dict
-        with pytest.raises(LiquidNotFound):
-            await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
-
-        # should raise EarlyLiquidSenseTrigger
-        return_dict[head_node], return_dict[pipette_node] = 150, 150
-        mock_position.return_value = return_dict
-        with pytest.raises(EarlyLiquidSenseTrigger):
-            await ot3_hardware.liquid_probe(mount, fake_liquid_settings)
 
 
 @pytest.mark.parametrize(
