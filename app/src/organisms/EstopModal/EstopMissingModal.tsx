@@ -10,6 +10,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { Portal } from '../../App/portal'
 import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
@@ -23,7 +24,7 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 
 interface EstopMissingModalProps {
   robotName: string
-  closeModal?: () => void
+  closeModal: () => void
 }
 
 export function EstopMissingModal({
@@ -33,19 +34,17 @@ export function EstopMissingModal({
   const isOnDevice = useSelector(getIsOnDevice)
 
   return (
-    <>
+    <Portal level="top">
       {isOnDevice ? (
-        <TouchscreenModal robotName={robotName} />
+        <TouchscreenModal robotName={robotName} closeModal={closeModal} />
       ) : (
         <DesktopModal robotName={robotName} closeModal={closeModal} />
       )}
-    </>
+    </Portal>
   )
 }
 
-function TouchscreenModal({
-  robotName,
-}: Omit<EstopMissingModalProps, 'closeModal'>): JSX.Element {
+function TouchscreenModal({ robotName }: EstopMissingModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_missing'),
@@ -55,6 +54,7 @@ function TouchscreenModal({
   const modalProps = {
     header: { ...modalHeader },
   }
+
   return (
     <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>

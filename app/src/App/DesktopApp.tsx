@@ -1,5 +1,11 @@
 import * as React from 'react'
-import { Switch, Route, Redirect } from 'react-router-dom'
+import {
+  Redirect,
+  Route,
+  Switch,
+  useParams,
+  useRouteMatch,
+} from 'react-router-dom'
 
 import {
   Box,
@@ -7,6 +13,7 @@ import {
   COLORS,
   OVERFLOW_AUTO,
 } from '@opentrons/components'
+import { ApiHostProvider } from '@opentrons/react-api-client'
 
 import { Alerts } from '../organisms/Alerts'
 import { Breadcrumbs } from '../organisms/Breadcrumbs'
@@ -22,9 +29,13 @@ import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
 import { useSoftwareUpdatePoll } from './hooks'
 import { Navbar } from './Navbar'
+import { EstopTakeover } from '../organisms/EstopModal/EstopTakeover'
+import { OPENTRONS_USB } from '../redux/discovery'
+import { appShellRequestor } from '../redux/shell/remote'
+import { useRobot } from '../organisms/Devices/hooks'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
-import type { RouteProps } from './types'
+import type { RouteProps, DesktopRouteParams } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
@@ -112,9 +123,30 @@ export const DesktopApp = (): JSX.Element => {
             })}
             <Redirect exact from="/" to="/protocols" />
           </Switch>
+          <EmergencyStopTakeover />
           <Alerts />
         </Box>
       </ToasterOven>
     </>
+  )
+}
+
+function EmergencyStopTakeover(): JSX.Element | null {
+  const deviceRouteMatch = useRouteMatch({ path: '/devices/:robotName' })
+  const params = deviceRouteMatch?.params as DesktopRouteParams
+  const robotName = params?.robotName
+  const robot = useRobot(robotName)
+
+  if (deviceRouteMatch == null || robot == null || robotName == null)
+    return null
+
+  return (
+    <ApiHostProvider
+      key={robot.name}
+      hostname={robot.ip ?? null}
+      requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
+    >
+      <EstopTakeover />
+    </ApiHostProvider>
   )
 }

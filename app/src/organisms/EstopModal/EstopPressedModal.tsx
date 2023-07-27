@@ -14,6 +14,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { useSetEstopPhysicalStatusMutation } from '@opentrons/react-api-client'
+
+import { Portal } from '../../App/portal'
 import { Banner } from '../../atoms/Banner'
 import { Chip } from '../../atoms/Chip'
 import { ListItem } from '../../atoms/ListItem'
@@ -33,7 +36,7 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 // Then TouchScreenModal and DesktopModal will be TouchScreenContent and DesktopContent that only render each content.
 interface EstopPressedModalProps {
   isEngaged: boolean
-  closeModal?: () => void
+  closeModal: () => void
 }
 
 export function EstopPressedModal({
@@ -43,20 +46,22 @@ export function EstopPressedModal({
   const isOnDevice = useSelector(getIsOnDevice)
 
   return (
-    <>
+    <Portal level="top">
       {isOnDevice ? (
-        <TouchscreenModal isEngaged={isEngaged} />
+        <TouchscreenModal isEngaged={isEngaged} closeModal={closeModal} />
       ) : (
         <DesktopModal isEngaged={isEngaged} closeModal={closeModal} />
       )}
-    </>
+    </Portal>
   )
 }
 
 function TouchscreenModal({
   isEngaged,
-}: Omit<EstopPressedModalProps, 'closeModal'>): JSX.Element {
+  closeModal,
+}: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const { setEstopPhysicalStatus } = useSetEstopPhysicalStatusMutation()
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_pressed'),
     iconName: 'ot-alert',
@@ -65,6 +70,10 @@ function TouchscreenModal({
   const modalProps = {
     header: { ...modalHeader },
     modalSize: 'large' as ModalSize,
+  }
+  const handleClick = (): void => {
+    setEstopPhysicalStatus(null)
+    closeModal()
   }
   return (
     <Modal {...modalProps}>
@@ -94,7 +103,7 @@ function TouchscreenModal({
           buttonText={t('resume_robot_operations')}
           disabled={isEngaged}
           // ToDo (kk:07/17/2023) the function will be implemented by a following pr
-          onClick={() => console.log('pressed')}
+          onClick={handleClick}
         />
       </Flex>
     </Modal>
@@ -106,6 +115,7 @@ function DesktopModal({
   closeModal,
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const { setEstopPhysicalStatus } = useSetEstopPhysicalStatusMutation()
   const modalProps: LegacyModalProps = {
     type: 'error',
     title: t('estop_pressed'),
@@ -116,8 +126,8 @@ function DesktopModal({
   }
 
   const handleClick = (): void => {
-    // ToDo (kk:07/11/2023) this will be implemented by a following pr
-    console.log('resume robot operations')
+    setEstopPhysicalStatus(null)
+    closeModal()
   }
 
   return (

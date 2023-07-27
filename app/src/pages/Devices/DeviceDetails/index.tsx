@@ -31,6 +31,7 @@ export function DeviceDetails(): JSX.Element | null {
   // const { data: estopStatus } = useEstopQuery({
   //   refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL,
   // })
+  // need to use react context
 
   useSyncRobotClock(robotName)
 

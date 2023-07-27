@@ -7,19 +7,15 @@ import { getLocalRobot } from '../../redux/discovery'
 import { EstopPressedModal } from './EstopPressedModal'
 import { EstopMissingModal } from './EstopMissingModal'
 
-interface EstopTakeoverProps {
-  children: React.ReactNode
-}
-
 const ESTOP_REFETCH_INTERVAL_MS = 10000
 
-interface ShowModal {
+interface ShowModalType {
   showModal: boolean
   modalType: 'pressed' | 'missing'
 }
 
 export function EstopTakeover(): JSX.Element {
-  const [showEstopModal, setShowEstopModal] = React.useState<ShowModal>({
+  const [showEstopModal, setShowEstopModal] = React.useState<ShowModalType>({
     showModal: false,
     modalType: 'pressed',
   })
@@ -30,15 +26,20 @@ export function EstopTakeover(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
 
+  const closeModal = (): void => {
+    setShowEstopModal({ ...showEstopModal, showModal: false })
+  }
+
   const targetEstopModal = (): JSX.Element => {
     return (
       <>
         {showEstopModal.modalType === 'pressed' ? (
           <EstopPressedModal
             isEngaged={estopStatus?.data.status === 'physicallyEngaged'}
+            closeModal={closeModal}
           />
         ) : (
-          <EstopMissingModal robotName={robotName} />
+          <EstopMissingModal robotName={robotName} closeModal={closeModal} />
         )}
       </>
     )
@@ -54,6 +55,16 @@ export function EstopTakeover(): JSX.Element {
       setShowEstopModal({ showModal: true, modalType: 'missing' })
     }
   }, [estopStatus])
+
+  React.useEffect(() => {
+    if (
+      showEstopModal.showModal &&
+      showEstopModal.modalType === 'missing' &&
+      estopStatus?.data.status !== 'notPresent'
+    ) {
+      setShowEstopModal({ showModal: false, modalType: 'pressed' })
+    }
+  }, [estopStatus, showEstopModal])
 
   return <>{showEstopModal.showModal ? targetEstopModal() : null}</>
 }
