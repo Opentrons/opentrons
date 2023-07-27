@@ -553,16 +553,16 @@ async def _run_xy_motion(
                 fail_count,
             )
 
-async def enforce_pipette_attached(api: OT3API,
-                                   mount: OT3Mount,
-                                   attach_pos: Point) -> None:
-    await api.reset()
-    if not api.hardware_pipettes[mount.to_mount()]:
-        await helpers_ot3.move_to_arched_ot3(api, mount, attach_pos)
-        while not api.hardware_pipettes[mount.to_mount()]:
-            ui.get_user_ready("attach a multichannel pipette to left mount")
-            await api.reset()
-        await api.home_z(mount)
+# async def enforce_pipette_attached(api: OT3API,
+#                                    mount: OT3Mount,
+#                                    attach_pos: Point) -> None:
+#     await api.reset()
+#     if not api.hardware_pipettes[mount.to_mount()]:
+#         await helpers_ot3.move_to_arched_ot3(api, mount, attach_pos)
+#         while not api.hardware_pipettes[mount.to_mount()]:
+#             ui.get_user_ready("attach a multichannel pipette to left mount")
+#             await api.reset()
+#         await api.home_z(mount)
 
 
 async def _main(arguments: argparse.Namespace) -> None:
@@ -602,15 +602,15 @@ async def _main(arguments: argparse.Namespace) -> None:
 
     try:
         await api.home()
-        home_pos = await api.gantry_position(OT3Mount.LEFT)
-        attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
-        attach_pos = attach_pos._replace(z=home_pos.z)
-
-        await api.reset()
-        if (not arguments.simulate) and (not arguments.no_input):
-            await enforce_pipette_attached(api, OT3Mount.LEFT, attach_pos)
-            await enforce_pipette_attached(api, OT3Mount.RIGHT, attach_pos)
-            await api.home()
+        # home_pos = await api.gantry_position(OT3Mount.LEFT)
+        # attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+        # attach_pos = attach_pos._replace(z=home_pos.z)
+        #
+        # await api.reset()
+        # if (not arguments.simulate) and (not arguments.no_input):
+        #     await enforce_pipette_attached(api, OT3Mount.LEFT, attach_pos)
+        #     await enforce_pipette_attached(api, OT3Mount.RIGHT, attach_pos)
+        #     await api.home()
 
         mount = OT3Mount.LEFT
 
