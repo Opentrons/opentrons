@@ -1209,12 +1209,16 @@ class OT3API(
         # G, Q should be handled in the backend through `self._home()`
         assert axis not in [Axis.G, Axis.Q]
 
-        # ensure stepper position can be updated after boot
-        await self.engage_axes([axis])
-        await self._update_position_estimation([axis])
-        # refresh motor and encoder statuses after position estimation update
-        motor_ok = self._backend.check_motor_status([axis])
         encoder_ok = self._backend.check_encoder_status([axis])
+        motor_ok = self._backend.check_motor_status([axis])
+
+        if encoder_ok:
+            # ensure stepper position can be updated after boot
+            await self.engage_axes([axis])
+            await self._update_position_estimation([axis])
+            # refresh motor and encoder statuses after position estimation update
+            motor_ok = self._backend.check_motor_status([axis])
+            encoder_ok = self._backend.check_encoder_status([axis])
 
         # we can move to safe home distance!
         if encoder_ok and motor_ok:
