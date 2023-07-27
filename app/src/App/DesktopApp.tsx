@@ -1,11 +1,5 @@
 import * as React from 'react'
-import {
-  Redirect,
-  Route,
-  Switch,
-  useParams,
-  useRouteMatch,
-} from 'react-router-dom'
+import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
 
 import {
   Box,
@@ -29,10 +23,11 @@ import { AppSettings } from '../pages/AppSettings'
 import { Labware } from '../pages/Labware'
 import { useSoftwareUpdatePoll } from './hooks'
 import { Navbar } from './Navbar'
-import { EstopTakeover } from '../organisms/EstopModal/EstopTakeover'
+import { EstopTakeover } from '../organisms/EmergencyStop/EstopTakeover'
 import { OPENTRONS_USB } from '../redux/discovery'
 import { appShellRequestor } from '../redux/shell/remote'
 import { useRobot } from '../organisms/Devices/hooks'
+import { EmergencyStopContext } from '../organisms/EmergencyStop/EmergencyStopContext'
 import { PortalRoot as ModalPortalRoot } from './portal'
 
 import type { RouteProps, DesktopRouteParams } from './types'
@@ -136,6 +131,7 @@ function EmergencyStopTakeover(): JSX.Element | null {
   const params = deviceRouteMatch?.params as DesktopRouteParams
   const robotName = params?.robotName
   const robot = useRobot(robotName)
+  const [isDismissedModal, setIsDismissedModal] = React.useState<boolean>(false)
 
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null
@@ -146,7 +142,14 @@ function EmergencyStopTakeover(): JSX.Element | null {
       hostname={robot.ip ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
     >
-      <EstopTakeover />
+      <EmergencyStopContext.Provider
+        value={{
+          isDismissedModal,
+          setIsDismissedModal,
+        }}
+      >
+        <EstopTakeover />
+      </EmergencyStopContext.Provider>
     </ApiHostProvider>
   )
 }

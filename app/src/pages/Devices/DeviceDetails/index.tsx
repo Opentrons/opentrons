@@ -10,28 +10,31 @@ import {
   SPACING,
   COLORS,
 } from '@opentrons/components'
-import { ApiHostProvider } from '@opentrons/react-api-client'
+import { ApiHostProvider, useEstopQuery } from '@opentrons/react-api-client'
 
 import { useRobot, useSyncRobotClock } from '../../../organisms/Devices/hooks'
 import { InstrumentsAndModules } from '../../../organisms/Devices/InstrumentsAndModules'
 import { RecentProtocolRuns } from '../../../organisms/Devices/RecentProtocolRuns'
 import { RobotOverview } from '../../../organisms/Devices/RobotOverview'
-// import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
+import { EstopBanner } from '../../../organisms/Devices/EstopBanner'
 import { getScanning, OPENTRONS_USB } from '../../../redux/discovery'
 import { appShellRequestor } from '../../../redux/shell/remote'
+import { DISENGAGED } from '../../../organisms/EmergencyStop/constants'
+import { useEstopContext } from '../../../organisms/EmergencyStop/hook'
 
 import type { DesktopRouteParams } from '../../../App/types'
 
-// const ESTOP_STATUS_REFETCH_INTERVAL = 10000
+const ESTOP_STATUS_REFETCH_INTERVAL = 10000
 
 export function DeviceDetails(): JSX.Element | null {
   const { robotName } = useParams<DesktopRouteParams>()
   const robot = useRobot(robotName)
   const isScanning = useSelector(getScanning)
-  // const { data: estopStatus } = useEstopQuery({
-  //   refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL,
-  // })
-  // need to use react context
+  const { data: estopStatus } = useEstopQuery({
+    refetchInterval: ESTOP_STATUS_REFETCH_INTERVAL,
+  })
+
+  const { isDismissedModal } = useEstopContext()
 
   useSyncRobotClock(robotName)
 
@@ -52,12 +55,13 @@ export function DeviceDetails(): JSX.Element | null {
         paddingBottom={SPACING.spacing48}
       >
         {/* EstopBanner here */}
-        {/* {estopStatus?.data.status != null &&
-        estopStatus?.data.status !== 'disengaged' ? (
+        {estopStatus != null &&
+        estopStatus.data.status !== DISENGAGED &&
+        isDismissedModal ? (
           <Flex marginBottom={SPACING.spacing16}>
-            <EstopBanner status={estopStatus?.data.status} />
+            <EstopBanner status={estopStatus.data.status} />
           </Flex>
-        ) : null} */}
+        ) : null}
         <Flex
           alignItems={ALIGN_CENTER}
           backgroundColor={COLORS.white}

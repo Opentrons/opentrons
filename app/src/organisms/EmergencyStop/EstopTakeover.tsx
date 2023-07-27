@@ -6,6 +6,7 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 import { getLocalRobot } from '../../redux/discovery'
 import { EstopPressedModal } from './EstopPressedModal'
 import { EstopMissingModal } from './EstopMissingModal'
+import { PHYSICALLY_ENGAGED, LOGICALLY_ENGAGED, NOT_PRESENT } from './constants'
 
 const ESTOP_REFETCH_INTERVAL_MS = 10000
 
@@ -15,12 +16,12 @@ interface ShowModalType {
 }
 
 export function EstopTakeover(): JSX.Element {
+  const { data: estopStatus } = useEstopQuery({
+    refetchInterval: ESTOP_REFETCH_INTERVAL_MS,
+  })
   const [showEstopModal, setShowEstopModal] = React.useState<ShowModalType>({
     showModal: false,
     modalType: 'pressed',
-  })
-  const { data: estopStatus } = useEstopQuery({
-    refetchInterval: ESTOP_REFETCH_INTERVAL_MS,
   })
 
   const localRobot = useSelector(getLocalRobot)
@@ -35,7 +36,7 @@ export function EstopTakeover(): JSX.Element {
       <>
         {showEstopModal.modalType === 'pressed' ? (
           <EstopPressedModal
-            isEngaged={estopStatus?.data.status === 'physicallyEngaged'}
+            isEngaged={estopStatus?.data.status === PHYSICALLY_ENGAGED}
             closeModal={closeModal}
           />
         ) : (
@@ -47,11 +48,11 @@ export function EstopTakeover(): JSX.Element {
 
   React.useEffect(() => {
     if (
-      estopStatus?.data.status === 'physicallyEngaged' ||
-      estopStatus?.data.status === 'logicallyEngaged'
+      estopStatus?.data.status === PHYSICALLY_ENGAGED ||
+      estopStatus?.data.status === LOGICALLY_ENGAGED
     ) {
       setShowEstopModal({ showModal: true, modalType: 'pressed' })
-    } else if (estopStatus?.data.status === 'notPresent') {
+    } else if (estopStatus?.data.status === NOT_PRESENT) {
       setShowEstopModal({ showModal: true, modalType: 'missing' })
     }
   }, [estopStatus])
@@ -60,7 +61,7 @@ export function EstopTakeover(): JSX.Element {
     if (
       showEstopModal.showModal &&
       showEstopModal.modalType === 'missing' &&
-      estopStatus?.data.status !== 'notPresent'
+      estopStatus?.data.status !== NOT_PRESENT
     ) {
       setShowEstopModal({ showModal: false, modalType: 'pressed' })
     }

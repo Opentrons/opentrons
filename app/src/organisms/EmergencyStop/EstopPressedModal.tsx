@@ -25,6 +25,7 @@ import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
+import { useEstopContext } from './hook'
 
 import type {
   ModalHeaderBaseProps,
@@ -37,6 +38,7 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 interface EstopPressedModalProps {
   isEngaged: boolean
   closeModal: () => void
+  isDismissedModal?: boolean
 }
 
 export function EstopPressedModal({
@@ -44,13 +46,22 @@ export function EstopPressedModal({
   closeModal,
 }: EstopPressedModalProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
-
+  const { isDismissedModal } = useEstopContext()
+  console.log('isDismissedModal EstopPressedModal', isDismissedModal)
   return (
     <Portal level="top">
       {isOnDevice ? (
         <TouchscreenModal isEngaged={isEngaged} closeModal={closeModal} />
       ) : (
-        <DesktopModal isEngaged={isEngaged} closeModal={closeModal} />
+        <>
+          {isDismissedModal === false ? (
+            <DesktopModal
+              isEngaged={isEngaged}
+              closeModal={closeModal}
+              isDismissedModal={isDismissedModal}
+            />
+          ) : null}
+        </>
       )}
     </Portal>
   )
@@ -116,10 +127,21 @@ function DesktopModal({
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const { setEstopPhysicalStatus } = useSetEstopPhysicalStatusMutation()
+  const { isDismissedModal, setIsDismissedModal } = useEstopContext()
+
+  const handleCloseModal = (): void => {
+    console.log('isDismissedModal - before', isDismissedModal)
+    console.log('called')
+    setIsDismissedModal(true)
+    console.log('updated')
+    console.log('isDismissedModal - after', isDismissedModal)
+    closeModal()
+  }
+
   const modalProps: LegacyModalProps = {
     type: 'error',
     title: t('estop_pressed'),
-    onClose: () => closeModal(),
+    onClose: handleCloseModal,
     closeOnOutsideClick: false,
     childrenPadding: SPACING.spacing24,
     width: '47rem',
