@@ -70,6 +70,10 @@ test_data = {
     "XR Position":"None",
     "YF Position":"None",
     "YB Position":"None",
+    "XL Encoder":"None",
+    "XR Encoder":"None",
+    "YF Encoder":"None",
+    "YB Encoder":"None",
     "Slot 1 Offset":"None",
     "Slot 3 Offset":"None",
     "Slot 10 Offset":"None",
@@ -227,36 +231,51 @@ async def _measure_axis(api: OT3API, mount: types.OT3Mount, axis: str) -> None:
         await api.move_to(mount, above_left)
         await api.move_to(mount, left_center)
         # x_left_pos = await _get_position(api, mount)
-        x_left_pos, x_left_gauge = await _read_gauge(api, mount, "XL")
+        x_left_gauge, x_left_pos, x_left_enc, x_left_mac = await _read_gauge(api, mount, "XL")
         test_data["XL Gauge"] = str(x_left_gauge)
         test_data["XL Position"] = x_left_pos
+        test_data["XL Encoder"] = x_left_enc
+        test_data["XL Machine"] = x_left_mac
         print(f"X-Left Gauge = {x_left_gauge} mm")
-        print(f"X-Left Position = {x_left_pos}\n")
+        print(f"X-Left Position = {x_left_pos}")
+        print(f"X-Left Encoder = {x_left_enc}")
+        print(f"X-Left Machine = {x_left_mac}\n")
         await api.move_to(mount, right_center)
         # x_right_pos = await _get_position(api, mount)
-        x_right_pos, x_right_gauge = await _read_gauge(api, mount, "XR")
+        x_right_gauge, x_right_pos, x_right_enc, x_right_mac = await _read_gauge(api, mount, "XR")
         test_data["XR Gauge"] = str(x_right_gauge)
         test_data["XR Position"] = x_right_pos
+        test_data["XR Encoder"] = x_right_enc
+        test_data["XR Machine"] = x_right_mac
         print(f"X-Right Gauge = {x_right_gauge} mm")
-        print(f"X-Right Position = {x_right_pos}\n")
+        print(f"X-Right Position = {x_right_pos}")
+        print(f"X-Right Encoder = {x_right_enc}")
+        print(f"X-Right Machine = {x_right_mac}\n")
         await api.move_to(mount, right_center)
     elif "Y" in axis:
         above_front = front_center._replace(z=current_position.z)
         await api.move_to(mount, above_front)
         await api.move_to(mount, front_center)
         # y_front_pos = await _get_position(api, mount)
-        y_front_pos, y_front_gauge = await _read_gauge(api, mount, "YF")
+        y_front_gauge, y_front_pos, y_front_enc, y_front_mac = await _read_gauge(api, mount, "YF")
         test_data["YF Gauge"] = str(y_front_gauge)
         test_data["YF Position"] = y_front_pos
+        test_data["YF Encoder"] = y_front_enc
         print(f"Y-Front Gauge = {y_front_gauge} mm")
-        print(f"Y-Front Position = {y_front_pos}\n")
+        print(f"Y-Front Position = {y_front_pos}")
+        print(f"Y-Front Encoder = {y_front_enc}")
+        print(f"Y-Front Machine = {y_front_mac}\n")
         await api.move_to(mount, back_center)
         # y_back_pos = await _get_position(api, mount)
-        y_back_pos, y_back_gauge = await _read_gauge(api, mount, "YB")
+        y_back_gauge, y_back_pos, y_back_enc, y_back_mac = await _read_gauge(api, mount, "YB")
         test_data["YB Gauge"] = str(y_back_gauge)
         test_data["YB Position"] = y_back_pos
+        test_data["YB Encoder"] = y_back_enc
+        test_data["YB Machine"] = y_back_mac
         print(f"Y-Back Gauge = {y_back_gauge} mm")
-        print(f"Y-Back Position = {y_back_pos}\n")
+        print(f"Y-Back Position = {y_back_pos}")
+        print(f"Y-Back Encoder = {y_back_enc}")
+        print(f"Y-Back Machine = {y_back_mac}\n")
         await api.move_to(mount, back_center)
 
 
@@ -270,8 +289,10 @@ async def _read_gauge(api: OT3API, mount: types.OT3Mount, axis: str) -> float:
     elif "YB" in axis:
         await api.move_rel(mount, types.Point(y=DIAL_JOG_DISTANCE), DIAL_JOG_SPEED)
     position = await _get_position(api, mount)
+    encoder = await _get_encoder(api, mount)
+    machine = await _get_machine(api, mount)
     gauge = gauges[axis].read_stable(timeout=20)
-    return position, gauge
+    return gauge, position, encoder, machine
 
 
 def _get_attitude(api: OT3API) -> str:
@@ -285,6 +306,38 @@ async def _get_position(api: OT3API, mount: types.OT3Mount) -> str:
     trunc_position = _trunc_point(current_position)
     position = str(trunc_position).replace(", ",";")
     return position
+
+
+async def _get_encoder(api: OT3API, mount: types.OT3Mount):
+    encoder_position = await api.encoder_current_position_ot3(mount)
+    encoder_point = _encoder_to_point(encoder_position)
+    trunc_encoder = _trunc_point(encoder_point)
+    encoder = str(trunc_encoder).replace(", ",";")
+    return encoder
+
+
+async def _get_machine(api: OT3API, mount: types.OT3Mount):
+    machine_position = api._backend._position
+    machine_point = _machine_to_point(machine_position)
+    trunc_machine = _trunc_point(machine_point)
+    machine = str(trunc_machine).replace(", ",";")
+    return machine
+
+
+def _encoder_to_point(encoder_position):
+    list = []
+    for key, value in encoder_position.items():
+        list.append(value)
+    point = types.Point(list[0], list[1], list[2])
+    return point
+
+
+def _machine_to_point(machine_position):
+    dict = {}
+    for key, value in machine_position.items():
+        dict[key.name] = value
+    point = types.Point(dict["gantry_x"], dict["gantry_y"], dict["head_l"])
+    return point
 
 
 def _trunc_point(p: types.Point) -> types.Point:
@@ -358,8 +411,10 @@ async def _main(is_simulating: bool, mount: types.OT3Mount) -> None:
     elif args.mode == "dial":
         global start_time, test_data
         _test_setup(api, mount)
-        _zero_gauges()
+        # _zero_gauges()
         start_time = time.time()
+        # machine = await _get_machine(api, mount)
+        # print(machine)
         for i in range(args.cycles):
             cycle = i + 1
             print(f"\n-> Starting Test Cycle {cycle}/{args.cycles}")
