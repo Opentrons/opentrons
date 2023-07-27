@@ -1,8 +1,8 @@
 .. _moam:
 
-***************************************
-Using Multiple Modules of the Same Type
-***************************************
+*********************************
+Multiple Modules of the Same Type
+*********************************
 
 You can use multiple modules of the same type within a single protocol. The exception is the Thermocycler Module, which has only one supported deck location because of its size. Running protocols with multiple modules of the same type requires version 4.3 or newer of the Opentrons App and robot server. 
 

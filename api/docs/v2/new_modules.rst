@@ -2,9 +2,9 @@
 
 .. _new_modules:
 
-################
+****************
 Hardware Modules
-################
+****************
 
 .. toctree::
     modules/setup

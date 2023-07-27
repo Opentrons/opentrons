@@ -1,8 +1,8 @@
 .. _magnetic-module:
 
-***********************
-Using a Magnetic Module
-***********************
+***************
+Magnetic Module
+***************
 
 .. note::
    Recommended for use with the OT-2 only. If you have a Flex, see :ref:`magnetic-block`.

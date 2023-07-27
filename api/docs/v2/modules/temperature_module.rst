@@ -1,8 +1,8 @@
 .. _temperature-module:
 
-**************************
-Using a Temperature Module
-**************************
+******************
+Temperature Module
+******************
 
 The Temperature Module acts as both a cooling and heating device. It can control the temperature of its deck between 4 °C and 95 °C with a resolution of 1 °C.
 

@@ -1,8 +1,8 @@
 .. _thermocycler-module:
 
-***************************
-Using a Thermocycler Module
-***************************
+*******************
+Thermocycler Module
+*******************
 
 The Thermocycler Module provides on-deck, fully automated temperature cycling, and can heat and cool very quickly during operation. The module's block can reach and maintain temperatures between 4 and 99 °C. The module's lid can heat up to 110 °C.
 
