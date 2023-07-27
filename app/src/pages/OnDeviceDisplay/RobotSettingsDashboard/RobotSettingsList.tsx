@@ -46,7 +46,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
   const { lightsEnabled, toggleLights } = useLEDLights(robotName)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
+    <Flex paddingX={SPACING.spacing40} flexDirection={DIRECTION_COLUMN}>
       <Navigation routes={onDeviceDisplayRoutes} />
       <Flex flexDirection={DIRECTION_COLUMN} paddingX={SPACING.spacing40}>
         <RobotSettingButton
