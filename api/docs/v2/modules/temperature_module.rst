@@ -6,7 +6,7 @@ Temperature Module
 
 The Temperature Module acts as both a cooling and heating device. It can control the temperature of its deck between 4 °C and 95 °C with a resolution of 1 °C.
 
-The Temperature Module is represented in code by a :py:class:`.TemperatureModuleContext` object, which has methods for setting target temperatures and reading the module's status. This example demonstrates loading a Temperature Module and loading a well plate on top of it.
+The Temperature Module is represented in code by a :py:class:`.TemperatureModuleContext` object, which has methods for setting target temperatures and reading the module's status. This example demonstrates loading a Temperature Module GEN2 and loading a well plate on top of it.
 
 .. code-block:: python
     :substitutions:
@@ -18,7 +18,7 @@ The Temperature Module is represented in code by a :py:class:`.TemperatureModule
         plate = temp_mod.load_labware(
           name='corning_96_wellplate_360ul_flat')
 
-.. versionadded:: 2.0
+.. versionadded:: 2.3
 
 Temperature Control
 ===================
@@ -29,7 +29,7 @@ The primary function of the module is to control the temperature of its deck, us
 
     temp_mod.set_temperature(celsius=4)
 
-When using ``set_temperature``, your protocol will wait until the target temperature is reached before proceeding to further commands. In other words, you can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call :py:meth:`~.TemperatureModuleContext.deactivate`, which will stop heating or cooling and will turn off the fan.
+When using ``set_temperature()``, your protocol will wait until the target temperature is reached before proceeding to further commands. In other words, you can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call :py:meth:`~.TemperatureModuleContext.deactivate`, which will stop heating or cooling and will turn off the fan.
 
 .. note::
 

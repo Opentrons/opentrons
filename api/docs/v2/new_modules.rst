@@ -17,7 +17,7 @@ Hardware Modules
 
 Hardware modules are powered and unpowered deck-mounted peripherals. The Flex and OT-2 are aware of deck-mounted powered modules when they're attached via a USB connection and used in an uploaded protocol. The robots do not know about unpowered modules until you use one in a protocol and upload it to the Opentrons App.
 
-Powered modules include the Temperature Module, Magnetic Module, Thermocycler Module, and Heater-Shaker Module. The 96-well Magnetic Block is an unpowered module.
+Powered modules include the Heater-Shaker Module, Magnetic Module, Temperature Module, and Thermocycler Module. The 96-well Magnetic Block is an unpowered module.
 
 Pages in this section of the documentation cover:
     - :ref:`Setting up modules and their labware <module-setup>`. 

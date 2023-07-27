@@ -1,13 +1,15 @@
 .. _magnetic-block:
 
-*********************
-Magnetic Block Module
-*********************
+**************
+Magnetic Block
+**************
 
 .. note::
-   Recommended for use with the Flex only. If you have an OT-2, see :ref:`magnetic-module`.
+   The Magnetic Block is compatible with Opentrons Flex only. If you have an OT-2, use the :ref:`magnetic-module`.
 
-The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You "control" it via protocols to load labware onto the module and use the `Opentrons Flex Gripper <https://shop.opentrons.com/opentrons-flex-gripper-gen1/>`_ to move labware on and off the module. This module is suitable for many magnetic bead-based protocols, but does not move beads up or down in solution.
+The Magnetic Block is an unpowered, 96-well plate that holds labware close to its high-strength neodymium magnets. This module is suitable for many magnetic bead-based protocols, but does not move beads up or down in solution.
+
+Because the Magnetic Block is unpowered, neither your robot nor the Opentrons App aware of this module. You "control" it via protocols to load labware onto the module and use the Opentrons Flex Gripper to move labware on and off the module. See :ref:`moving-labware` for more information.
 
 The Magnetic Block is represented by a :py:class:`~opentrons.protocol_api.MagneticBlockContext` object which lets you load labware on top of the module.
 
@@ -29,5 +31,4 @@ The Magnetic Block is represented by a :py:class:`~opentrons.protocol_api.Magnet
                          new_location="B2",
                          use_gripper=True)
 
-See :ref:`Moving Labware` for more information.
-
+.. versionadded:: 2.15

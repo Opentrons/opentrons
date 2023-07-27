@@ -15,11 +15,8 @@ The Heater-Shaker Module is represented in code by a :py:class:`.HeaterShakerCon
 
 .. versionadded:: 2.13
 
-Placement Restrictions
-======================
-
 Deck Slots
-----------
+==========
 
 The supported deck slot positions for the Heater-Shaker depend on the robot you’re using. 
 
@@ -33,30 +30,35 @@ The supported deck slot positions for the Heater-Shaker depend on the robot you�
      - In any deck slot in column 1 or 3. The module can go in slot A3, but you need to move the trash bin first.
    * - OT-2
      - In deck slot 1, 3, 4, 6, 7, or 10.
+     
+OT-2 Placement Restrictions
+===========================
 
-In general, it's best to leave all slots adjacent to the Heater-Shaker empty. If your protocol requires filling those slots, you’ll need to observe certain restrictions put in place to avoid physical crashes involving the Heater-Shaker.
+On OT-2, you need to restrict placement of other modules and labware around the Heater-Shaker. On Flex, the module is installed below-deck in a caddy and there is more space between deck slots, so these restrictions don't apply.
+
+In general, it's best to leave all slots adjacent to the Heater-Shaker empty. If your protocol requires filling those slots, observe the following restrictions to avoid physical crashes involving the Heater-Shaker.
 
 Adjacent Modules
 ----------------
 
-Do not place other modules next to the Heater-Shaker. Keeping adjacent deck slots clear helps prevents collisions during shaking and while opening the labware latch. Loading a module next to the Heater-Shaker will raise a ``DeckConflictError``.
+Do not place other modules next to the Heater-Shaker. Keeping adjacent deck slots clear helps prevents collisions during shaking and while opening the labware latch. Loading a module next to the Heater-Shaker on OT-2 will raise a ``DeckConflictError``.
 
 Tall Labware
 ------------
 
-Do not place labware taller than 53 mm to the left or right of the Heater-Shaker. This prevents the Heater-Shaker’s latch from colliding with the adjacent labware. Common labware that exceed the height limit include Opentrons tube racks and Opentrons 1000 µL tip racks. Loading tall labware to the right or left of the Heater-Shaker will raise a ``DeckConflictError``. 
+Do not place labware taller than 53 mm to the left or right of the Heater-Shaker. This prevents the Heater-Shaker’s latch from colliding with the adjacent labware. Common labware that exceed the height limit include Opentrons tube racks and Opentrons 1000 µL tip racks. Loading tall labware to the right or left of the Heater-Shaker on OT-2 will raise a ``DeckConflictError``. 
 
 8-Channel Pipettes
 ------------------
 
-You can't perform pipetting actions in `any` slots adjacent to the Heater-Shaker if you're using an 8-channel pipette. This prevents the pipette ejector from crashing on the module housing or labware latch. Using an 8-channel pipette will raise a ``PipetteMovementRestrictedByHeaterShakerError``.
+You can't perform pipetting actions in `any` slots adjacent to the Heater-Shaker if you're using a GEN2 or GEN1 8-channel pipette. This prevents the pipette ejector from crashing on the module housing or labware latch. Using an 8-channel pipette will raise a ``PipetteMovementRestrictedByHeaterShakerError``.
 
 There is one exception: to the front or back of the Heater-Shaker, an 8-channel pipette can access tip racks only. Attempting to pipette to non-tip-rack labware will also raise a ``PipetteMovementRestrictedByHeaterShakerError``.
 
 Latch Control
 =============
 
-To add and remove labware from the Heater-Shaker, you can control the module's labware latch from your protocol using :py:meth:`.open_labware_latch` and :py:meth:`.close_labware_latch`. Shaking requires the labware latch to be closed, so you may want to issue a close command before the first shake command in your protocol:
+To add and remove labware from the Heater-Shaker, control the module's labware latch from your protocol using :py:meth:`.open_labware_latch` and :py:meth:`.close_labware_latch`. Shaking requires the labware latch to be closed, so you may want to issue a close command before the first shake command in your protocol:
 
 .. code-block:: python
 
@@ -72,7 +74,7 @@ Loading Labware
 
 Like with all modules, use the Heater-Shaker’s :py:meth:`~.HeaterShakerContext.load_labware` method to specify what you will place on the module. For the Heater-Shaker, you must use a definition that describes the combination of a thermal adapter and labware that fits it.  See the :ref:`load-labware-module` section for an example of how to place labware on a module.
 
-Currently, the `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes several pre-configured thermal adapter and labware combinations and standalone thermal adapter definitions that help make the Heater-Shaker ready to use right out of the box. See the :ref:`new-labware` chapter for information and examples about loading labware on modules.
+Currently, the `Opentrons Labware Library <https://labware.opentrons.com/>`_ includes several pre-configured adapter–labware combinations and standalone adapter definitions that help make the Heater-Shaker ready to use right out of the box. See :ref:`labware-on-adapters` for examples of loading labware on modules.
 
 Pre-configured Combinations
 ---------------------------
@@ -117,7 +119,7 @@ You can use these standalone adapter definitions to load Opentrons verified or c
 Custom Flat-Bottom Labware
 --------------------------
 
-Custom flat-bottom labware can be used with the Universal Flat Adapter. See the support article, `Requesting a Custom Labware Definition <https://support.opentrons.com/s/article/Requesting-a-custom-labware-definition>`_ if you need assistance creating custom labware definitions for the Heater-Shaker.
+Custom flat-bottom labware can be used with the Universal Flat Adapter. See the support article `Requesting a Custom Labware Definition <https://support.opentrons.com/s/article/Requesting-a-custom-labware-definition>`_ if you need assistance creating custom labware definitions for the Heater-Shaker.
 
 Heating and Shaking
 ===================
@@ -183,12 +185,12 @@ Additionally, if you want to pipette while the module holds a temperature for a 
     protocol.delay(max(0, start_time+60 - time.monotonic()))
     hs_mod.deactivate_heater()
 
-Provided that the parallel pipetting actions don’t take more than one minute, this code will deactivate the heater one minute after its target was reached. If more than one minute has elapsed, the value passed to ``protocol.delay`` will equal 0, and the protocol will continue immediately.
+Provided that the parallel pipetting actions don’t take more than one minute, this code will deactivate the heater one minute after its target was reached. If more than one minute has elapsed, the value passed to ``protocol.delay()`` will equal 0, and the protocol will continue immediately.
 
 Deactivating
 ============
 
-Deactivating the heater and shaker are done separately using the :py:meth:`~.HeaterShakerContext.deactivate_heater` and :py:meth:`~.HeaterShakerContext.deactivate_shaker` respectively. There is no method to deactivate both simultaneously. Call the two methods in sequence if you need to stop both heating and shaking.
+Deactivating the heater and shaker are done separately using the :py:meth:`~.HeaterShakerContext.deactivate_heater` and :py:meth:`~.HeaterShakerContext.deactivate_shaker` methods, respectively. There is no method to deactivate both simultaneously. Call the two methods in sequence if you need to stop both heating and shaking.
 
 .. note:: 
 

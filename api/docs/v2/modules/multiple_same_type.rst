@@ -34,7 +34,7 @@ When working with multiple modules of the same type, load them in your protocol 
           module_name='temperature module gen2',
           location="C1")
         
-    Assuming there are no other modules used in this protocol, the Temperature Modules are connected as shown here:
+    The Temperature Modules are connected as shown here:
 
     .. image:: ../../img/modules/flex-usb-order.png
        :width: 250
@@ -60,11 +60,11 @@ When working with multiple modules of the same type, load them in your protocol 
           load_name='temperature module gen2',
           location="3")
         
-    Assuming there are no other modules used in this protocol, the Temperature Modules are connected as shown here:
+    The Temperature Modules are connected as shown here:
     
     .. image:: ../../img/modules/multiples_of_a_module.svg
 
 
 Before running your protocol, it's a good idea to use the module controls in the Opentrons App to check that commands are being sent where you expect.
 
-See the support article, `Using Modules of the Same Type <https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2>`_ for more information.
+See the support article `Using Modules of the Same Type <https://support.opentrons.com/s/article/Using-modules-of-the-same-type-on-the-OT-2>`_ for more information.

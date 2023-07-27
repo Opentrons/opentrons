@@ -5,13 +5,13 @@ Magnetic Module
 ***************
 
 .. note::
-   Recommended for use with the OT-2 only. If you have a Flex, see :ref:`magnetic-block`.
+   The Magnetic Module is compatible with the OT-2 only. If you have a Flex, use the :ref:`magnetic-block`.
 
 The Magnetic Module controls a set of permanent magnets which can move vertically to induce a magnetic field in the labware loaded on the module. 
 
 The Magnetic Module is represented by a :py:class:`.MagneticModuleContext` object, which has methods for engaging (raising) and disengaging (lowering) its magnets.
 
-The examples in this section apply to an OT-2 with a Magnetic Module loaded in slot 6:
+The examples in this section apply to an OT-2 with a Magnetic Module GEN2 loaded in slot 6:
 
 .. code-block:: python
 
@@ -22,7 +22,7 @@ The examples in this section apply to an OT-2 with a Magnetic Module loaded in s
         plate = mag_mod.load_labware(
           name='nest_96_wellplate_100ul_pcr_full_skirt')
 
-.. versionadded:: 2.0
+.. versionadded:: 2.3
 
 Loading Labware
 ===============
@@ -55,7 +55,7 @@ To check whether a custom labware definition specifies this measurement, load th
 Engaging and Disengaging
 ========================
 
-Raising and lowering the module's magnets are done with the  :py:meth:`~.MagneticModuleContext.engage` and :py:meth:`~.MagneticModuleContext.disengage` functions, respectively.
+Raise and lower the module's magnets with the  :py:meth:`~.MagneticModuleContext.engage` and :py:meth:`~.MagneticModuleContext.disengage` functions, respectively.
 
 If your loaded labware is fully compatible with the Magnetic Module, you can call ``engage()`` with no argument:
 

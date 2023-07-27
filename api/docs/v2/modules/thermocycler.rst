@@ -4,11 +4,11 @@
 Thermocycler Module
 *******************
 
-The Thermocycler Module provides on-deck, fully automated temperature cycling, and can heat and cool very quickly during operation. The module's block can reach and maintain temperatures between 4 and 99 °C. The module's lid can heat up to 110 °C.
+The Thermocycler Module provides on-deck, fully automated thermocycling, and can heat and cool very quickly during operation. The module's block can reach and maintain temperatures between 4 and 99 °C. The module's lid can heat up to 110 °C.
 
 The Thermocycler is represented in code by a :py:class:`.ThermocyclerContext` object, which has methods for controlling the lid, controlling the block, and setting *profiles* — timed heating and cooling routines that can be repeated automatically. 
 
-The examples in this section will use a Thermocycler loaded as follows:
+The examples in this section will use a Thermocycler Module GEN2 loaded as follows:
 
 .. code-block:: python
 
@@ -16,7 +16,7 @@ The examples in this section will use a Thermocycler loaded as follows:
         tc_mod = protocol.load_module(module_name='thermocyclerModuleV2')
         plate = tc_mod.load_labware(name='nest_96_wellplate_100ul_pcr_full_skirt')
 
-.. versionadded:: 2.0
+.. versionadded:: 2.13
 
 Lid Control
 ===========
@@ -142,4 +142,4 @@ However, this code would generate 60 lines in the protocol's run log, while exec
 Changes with the GEN2 Thermocycler Module
 =========================================
 
-All methods of :py:class:`.ThermocyclerContext` work with both the GEN1 and GEN2 Thermocycler. One practical difference is that the GEN2 module has a plate lift feature to make it easier to remove the plate manually or with a robotic gripper. To activate the plate lift, press the button on the Thermocycler for three seconds while the lid is open. If you need to do this in the middle of a run, call :py:meth:`~.ProtocolContext.pause`, lift and move the plate, and then resume the run from the Opentrons App.
+All methods of :py:class:`.ThermocyclerContext` work with both the GEN1 and GEN2 Thermocycler. One practical difference is that the GEN2 module has a plate lift feature to make it easier to remove the plate manually or with the Opentrons Flex Gripper. To activate the plate lift, press the button on the Thermocycler for three seconds while the lid is open. If you need to do this in the middle of a run, call :py:meth:`~.ProtocolContext.pause`, lift and move the plate, and then resume the run.
