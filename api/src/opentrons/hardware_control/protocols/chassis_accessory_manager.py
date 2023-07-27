@@ -63,7 +63,7 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
 
     def get_estop_state(self) -> EstopState:
         """Get the current Estop state.
-        
+
         If the Estop is not supported on this robot, this will always return Disengaged.
 
         :returns: The current Estop state."""
