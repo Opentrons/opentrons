@@ -76,6 +76,9 @@
               "defaultBlowOutFlowRate": {
                 "$ref": "#/definitions/flowRate"
               },
+              "defaultFlowAcceleration": {
+                "$ref": "#/definitions/positiveNumber"
+              },
               "defaultTipLength": {
                 "$ref": "#/definitions/positiveNumber"
               },

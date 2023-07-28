@@ -23,6 +23,16 @@ jest.mock('../../../redux/discovery/selectors')
 jest.mock('../../../redux/config')
 jest.mock('../../../redux/analytics')
 
+const mockPush = jest.fn()
+
+jest.mock('react-router-dom', () => {
+  const reactRouterDom = jest.requireActual('react-router-dom')
+  return {
+    ...reactRouterDom,
+    useHistory: () => ({ push: mockPush } as any),
+  }
+})
+
 const mockSettings = {
   sleepMs: 0,
   brightness: 1,
@@ -78,16 +88,15 @@ describe('NameRobot', () => {
   it('should display a letter when typing a letter', () => {
     const [{ getByRole }] = render()
     const input = getByRole('textbox')
-    fireEvent.click(getByRole('button', { name: 'a' }))
-    fireEvent.click(getByRole('button', { name: 'b' }))
-    fireEvent.click(getByRole('button', { name: 'c' }))
+    getByRole('button', { name: 'a' }).click()
+    getByRole('button', { name: 'b' }).click()
+    getByRole('button', { name: 'c' }).click()
     expect(input).toHaveValue('abc')
   })
 
   it('should show an error message when tapping confirm without typing anything', async () => {
     const [{ findByText, getByLabelText }] = render()
-    const button = getByLabelText('SmallButton_primary')
-    fireEvent.click(button)
+    getByLabelText('SmallButton_primary').click()
     const error = await findByText(
       'Oops! Robot name must follow the character count and limitations'
     )
@@ -102,8 +111,7 @@ describe('NameRobot', () => {
     fireEvent.change(input, {
       target: { value: 'connectableOtie' },
     })
-    const nameButton = getByLabelText('SmallButton_primary')
-    fireEvent.click(nameButton)
+    getByLabelText('SmallButton_primary').click()
     const error = await findByText(
       'Oops! Name is already in use. Choose a different name.'
     )
@@ -118,8 +126,7 @@ describe('NameRobot', () => {
     fireEvent.change(input, {
       target: { value: 'reachableOtie' },
     })
-    const nameButton = getByLabelText('SmallButton_primary')
-    fireEvent.click(nameButton)
+    getByLabelText('SmallButton_primary').click()
     const error = await findByText(
       'Oops! Name is already in use. Choose a different name.'
     )
@@ -130,11 +137,10 @@ describe('NameRobot', () => {
 
   it('should call a mock function when tapping the confirm button', () => {
     const [{ getByRole, getByLabelText }] = render()
-    fireEvent.click(getByRole('button', { name: 'a' }))
-    fireEvent.click(getByRole('button', { name: 'b' }))
-    fireEvent.click(getByRole('button', { name: 'c' }))
-    const button = getByLabelText('SmallButton_primary')
-    fireEvent.click(button)
+    getByRole('button', { name: 'a' }).click()
+    getByRole('button', { name: 'b' }).click()
+    getByRole('button', { name: 'c' }).click()
+    getByLabelText('SmallButton_primary').click()
     expect(mockTrackEvent).toHaveBeenCalled()
   })
 
@@ -148,5 +154,12 @@ describe('NameRobot', () => {
     ).not.toBeInTheDocument()
     getByText('Enter up to 17 characters (letters and numbers only)')
     getByText('Confirm')
+  })
+
+  it('should call a mock function when tapping back button', () => {
+    mockSettings.unfinishedUnboxingFlowRoute = null
+    const [{ getByTestId }] = render()
+    getByTestId('name_back_button').click()
+    expect(mockPush).toHaveBeenCalledWith('/robot-settings')
   })
 })
