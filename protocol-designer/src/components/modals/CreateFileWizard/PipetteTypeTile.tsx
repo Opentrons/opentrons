@@ -23,6 +23,7 @@ import {
   OT3_PIPETTES,
   getAllPipetteNames,
   getPipetteNameSpecs,
+  FLEX_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { GoBack } from './GoBack'
@@ -32,13 +33,16 @@ import { HandleEnter } from './HandleEnter'
 import type { FormState, WizardTileProps } from './types'
 
 export function FirstPipetteTypeTile(props: WizardTileProps): JSX.Element {
+  const robotType = props.values.fields.robotType
+
   const mount = LEFT
   return (
     <PipetteTypeTile
       {...props}
       mount={mount}
-      allowNoPipette={false}
+      allowNoPipette={robotType === FLEX_ROBOT_TYPE ? true : false}
       tileHeader={i18n.t('modal.create_file_wizard.choose_first_pipette')}
+      tileNumber={1}
     />
   )
 }
@@ -55,6 +59,7 @@ export function SecondPipetteTypeTile(
         mount={RIGHT}
         allowNoPipette
         tileHeader={i18n.t('modal.create_file_wizard.choose_second_pipette')}
+        tileNumber={2}
       />
     )
   }
@@ -63,9 +68,10 @@ interface PipetteTypeTileProps extends WizardTileProps {
   mount: Mount
   allowNoPipette: boolean
   tileHeader: string
+  tileNumber: 1 | 2
 }
 export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
-  const { allowNoPipette, tileHeader, proceed, goBack } = props
+  const { allowNoPipette, tileHeader, proceed, goBack, tileNumber } = props
   return (
     <HandleEnter onEnter={proceed}>
       <Flex flexDirection={DIRECTION_COLUMN} padding={SPACING.spacing32}>
@@ -75,7 +81,11 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
           gridGap={SPACING.spacing32}
         >
           <Text as="h2">{tileHeader}</Text>
-          <PipetteField {...props} allowNoPipette={allowNoPipette} />
+          <PipetteField
+            {...props}
+            allowNoPipette={allowNoPipette}
+            tileNumber={tileNumber}
+          />
         </Flex>
         <Flex
           alignItems={ALIGN_CENTER}
@@ -92,13 +102,14 @@ export function PipetteTypeTile(props: PipetteTypeTileProps): JSX.Element {
   )
 }
 
-interface OT2FieldProps extends FormikProps<FormState> {
+interface PipetteFieldProps extends FormikProps<FormState> {
   mount: Mount
   allowNoPipette: boolean
+  tileNumber: 1 | 2
 }
 
-function PipetteField(props: OT2FieldProps): JSX.Element {
-  const { mount, values, setFieldValue, allowNoPipette } = props
+function PipetteField(props: PipetteFieldProps): JSX.Element {
+  const { mount, values, setFieldValue, allowNoPipette, tileNumber } = props
   const robotType = values.fields.robotType
   const pipetteOptions = React.useMemo(() => {
     const allPipetteOptions = getAllPipetteNames('maxVolume', 'channels')
@@ -127,7 +138,7 @@ function PipetteField(props: OT2FieldProps): JSX.Element {
     if (currentValue === undefined) {
       setFieldValue(
         nameAccessor,
-        allowNoPipette ? '' : pipetteOptions[0]?.value ?? ''
+        allowNoPipette && tileNumber === 2 ? '' : pipetteOptions[0]?.value ?? ''
       )
     }
   }, [

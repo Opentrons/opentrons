@@ -55,10 +55,13 @@ export const transfer: CommandCreator<TransferArgs> = (
   // TODO Ian 2018-04-02 following ~10 lines are identical to first lines of consolidate.js...
   const actionName = 'transfer'
   const errors: CommandCreatorError[] = []
+  console.log('pipetteEntites', invariantContext.pipetteEntities)
+  console.log('pipette', args.pipette)
 
   if (
     !prevRobotState.pipettes[args.pipette] ||
-    !invariantContext.pipetteEntities[args.pipette]
+    !invariantContext.pipetteEntities[args.pipette] ||
+    invariantContext.pipetteEntities[args.pipette].name == null
   ) {
     // bail out before doing anything else
     errors.push(

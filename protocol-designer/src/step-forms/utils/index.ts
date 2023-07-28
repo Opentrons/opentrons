@@ -160,3 +160,10 @@ export const getIsModuleOnDeck = (
   const moduleIds = Object.keys(modules)
   return moduleIds.some(moduleId => modules[moduleId]?.type === moduleType)
 }
+
+export const getIsPipetteAttached = (
+  pipettes: InitialDeckSetup['pipettes']
+): boolean => {
+  const pipetteIds = Object.keys(pipettes)
+  return pipetteIds.length > 0
+}

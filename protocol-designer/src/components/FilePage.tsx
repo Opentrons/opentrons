@@ -87,6 +87,7 @@ export class FilePage extends React.Component<Props, State> {
       swapPipettes,
       modules,
     } = this.props
+    const noPips = instruments.left == null && instruments.right == null
 
     return (
       <div className={styles.file_page}>
@@ -179,14 +180,16 @@ export class FilePage extends React.Component<Props, State> {
 
         <Card title="Pipettes">
           <div className={styles.card_content}>
-            <InstrumentGroup {...instruments} showMountLabel />
+            {noPips ? null : (
+              <InstrumentGroup {...instruments} showMountLabel />
+            )}
             <div className={styles.pipette_button_row}>
               <DeprecatedPrimaryButton
                 onClick={this.openEditPipetteModal}
                 className={styles.edit_button}
                 name={'editPipettes'}
               >
-                {i18n.t('button.edit')}
+                {i18n.t(noPips ? 'button.add' : 'button.edit')}
               </DeprecatedPrimaryButton>
               <OutlineButton
                 onClick={swapPipettes}

@@ -154,15 +154,10 @@ const validationSchema = Yup.object().shape({
   fields: Yup.object().shape({
     name: Yup.string(),
   }),
-  pipettesByMount: Yup.object()
-    .shape({
-      left: pipetteValidationShape,
-      right: pipetteValidationShape,
-    })
-    .test('pipette-is-required', 'a pipette is required', value =>
-      // @ts-expect-error(sa, 2021-6-21): TS not extracting type of value properly
-      Object.keys(value).some((val: string) => value[val].pipetteName)
-    ),
+  pipettesByMount: Yup.object().shape({
+    left: pipetteValidationShape,
+    right: pipetteValidationShape,
+  }),
   modulesByType: Yup.object().shape({
     [MAGNETIC_MODULE_TYPE]: moduleValidationShape,
     [TEMPERATURE_MODULE_TYPE]: moduleValidationShape,
@@ -326,10 +321,11 @@ export class FilePipettesModal extends React.Component<Props, State> {
               }: FormikProps<FormState>) => {
                 const { left, right } = values.pipettesByMount
 
-                const pipetteSelectionIsValid =
-                  // at least one must not be none (empty string)
-                  left.pipetteName || right.pipetteName
-
+                const pipetteSelectionInvalid =
+                  // at least one must not be none (empty string) for Ot-2
+                  robotType === OT2_ROBOT_TYPE &&
+                  left.pipetteName == null &&
+                  right.pipetteName == null
                 const hasCrashableMagnetModuleSelected = this.getCrashableModuleSelected(
                   values.modulesByType,
                   MAGNETIC_MODULE_TYPE
@@ -467,7 +463,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                           {i18n.t('button.cancel')}
                         </OutlineButton>
                         <OutlineButton
-                          disabled={!pipetteSelectionIsValid}
+                          disabled={pipetteSelectionInvalid}
                           // @ts-expect-error(sa, 2021-6-21): Formik handleSubmit type not cooporating with OutlineButton onClick type
                           onClick={handleSubmit}
                           tabIndex={6}

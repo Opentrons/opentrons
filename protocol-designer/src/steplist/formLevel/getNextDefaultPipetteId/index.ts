@@ -1,7 +1,7 @@
 import findKey from 'lodash/findKey'
 import last from 'lodash/last'
-import { PipetteOnDeck } from '../../../step-forms'
-import { StepIdType, FormData } from '../../../form-types'
+import type { PipetteOnDeck } from '../../../step-forms'
+import type { StepIdType, FormData } from '../../../form-types'
 // TODO: Ian 2018-09-18 once we support switching pipettes mid-protocol,
 // this should use pipette state in RobotState, instead of pipettes/ selectors
 // (which represent initial pipette state, expected to be static across the timeline)
@@ -23,10 +23,12 @@ export function getNextDefaultPipetteId(
     findKey(equippedPipettesById, p => p.mount === 'left') ||
     findKey(equippedPipettesById, p => p.mount === 'right')
 
+  //  TODO(jr, 7/28/23): add robotType in here so the warn only shows up if its an OT-2
   if (!nextDefaultPipette) {
-    console.error('Could not get next default pipette. Something went wrong.')
+    console.warn(
+      'Could not get next default pipette. If it is an OT-2 protocol, something went wrong.'
+    )
     return ''
   }
-
   return nextDefaultPipette
 }

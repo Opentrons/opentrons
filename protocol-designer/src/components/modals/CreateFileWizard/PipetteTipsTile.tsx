@@ -36,7 +36,18 @@ import { HandleEnter } from './HandleEnter'
 import type { PipetteName } from '@opentrons/shared-data'
 import type { FormState, WizardTileProps } from './types'
 
-export function FirstPipetteTipsTile(props: WizardTileProps): JSX.Element {
+export function FirstPipetteTipsTile(
+  props: WizardTileProps
+): JSX.Element | null {
+  const { values, proceed } = props
+  const leftPipetteName = values.pipettesByMount.left.pipetteName
+  const shouldProceed = leftPipetteName === ''
+
+  if (shouldProceed) {
+    proceed()
+    return null
+  }
+
   return <PipetteTipsTile {...props} mount="left" />
 }
 export function SecondPipetteTipsTile(

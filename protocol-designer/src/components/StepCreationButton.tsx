@@ -19,6 +19,7 @@ import { actions as stepsActions, getIsMultiSelectMode } from '../ui/steps'
 import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
+  getIsPipetteAttached,
 } from '../step-forms'
 import {
   ConfirmDeleteModal,
@@ -117,14 +118,16 @@ export const StepCreationButton = (): JSX.Element => {
     stepFormSelectors.getCurrentFormHasUnsavedChanges
   )
   const isStepCreationDisabled = useSelector(getIsMultiSelectMode)
-  const modules = useSelector(stepFormSelectors.getInitialDeckSetup).modules
+  const { modules, pipettes } = useSelector(
+    stepFormSelectors.getInitialDeckSetup
+  )
   const isStepTypeEnabled: Record<
     Exclude<StepType, 'manualIntervention'>,
     boolean
   > = {
     moveLabware: true,
-    moveLiquid: true,
-    mix: true,
+    moveLiquid: getIsPipetteAttached(pipettes),
+    mix: getIsPipetteAttached(pipettes),
     pause: true,
     magnet: getIsModuleOnDeck(modules, MAGNETIC_MODULE_TYPE),
     temperature: getIsModuleOnDeck(modules, TEMPERATURE_MODULE_TYPE),

@@ -57,6 +57,8 @@ export const migrateFile = (
     )
     .map(command => {
       const labwareId = command.params.labwareId
+      console.log(labware)
+      console.log(labwareId)
       const definitionId = labware[labwareId].definitionId
       const { namespace, version } = labwareDefinitions[definitionId]
       const labwareLocation = command.params.location
