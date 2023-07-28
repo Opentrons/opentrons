@@ -1560,7 +1560,7 @@ def test_get_stacked_labware_total_nominal_offset_default(
         )
     )
     decoy.when(module_view.get_location("module-id")).then_return(
-        DeckSlotLocation(slotName=DeckSlotName.SLOT_C1)
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_4)
     )
     decoy.when(
         labware_view.get_labware_gripper_offsets(
