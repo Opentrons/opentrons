@@ -190,6 +190,7 @@ def check(
     Raises:
         DeckConflictError: Adding this item should not be allowed.
     """
+    print(f"robot_type: {robot_type}")
     restrictions: List[_DeckRestriction] = [_FixedTrashOnly()]
 
     # build restrictions driven by existing items
@@ -297,7 +298,7 @@ def _create_flex_restrictions(item: DeckItem, location: int) -> List[_DeckRestri
             )
 
     elif isinstance(item, (HeaterShakerModule, TemperatureModule)):
-        if location in _flex_right_hand_slots():
+        if location in _flex_right_left_hand_slots():
             restrictions.append(
                 _NoModule(
                     location=location,

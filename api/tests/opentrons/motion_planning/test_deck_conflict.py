@@ -567,7 +567,7 @@ def test_flex_raises_module_in_wrong_location(
     """It should raise when trying to load a module in a disallowed location."""
     with pytest.raises(
         deck_conflict.DeckConflictError,
-        match=(f"{deck_item.name_for_errors} is not allowed in slot {2}"),
+        match=(f"{deck_item.name_for_errors} is not allowed in slot 2"),
     ):
         deck_conflict.check(
             existing_items={},
