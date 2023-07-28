@@ -672,12 +672,10 @@ class GeometryView:
                 return self.get_default_gripper_offsets(location).pickUpOffset
             elif isinstance(location, OnLabwareLocation):
                 direct_parent_offset = self.get_default_gripper_offsets(location)
+                ancestor = self._labware.get_parent_location(location.labwareId)
                 return (
                     direct_parent_offset.pickUpOffset
-                    + self.get_total_nominal_gripper_offset(
-                        location=self._labware.get_location(location.labwareId),
-                        move_type=move_type,
-                    )
+                    + self.get_default_gripper_offsets(location=ancestor).pickUpOffset
                 )
             else:
                 raise errors.LabwareNotOnDeckError(
@@ -689,11 +687,10 @@ class GeometryView:
                 return self.get_default_gripper_offsets(location).dropOffset
             elif isinstance(location, OnLabwareLocation):
                 direct_parent_offset = self.get_default_gripper_offsets(location)
+                ancestor = self._labware.get_parent_location(location.labwareId)
                 return (
                     direct_parent_offset.dropOffset
-                    + self.get_total_nominal_gripper_offset(
-                        location, move_type=move_type
-                    )
+                    + self.get_default_gripper_offsets(location=ancestor).dropOffset
                 )
             else:
                 raise errors.LabwareNotOnDeckError(
