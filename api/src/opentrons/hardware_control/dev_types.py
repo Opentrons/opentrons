@@ -91,6 +91,10 @@ class PipetteDict(InstrumentDict):
     default_blow_out_volume: float
 
 
+class PipetteStateDict(TypedDict):
+    tip_detected: bool
+
+
 class GripperDict(InstrumentDict):
     model: GripperModel
     gripper_id: str

@@ -6,8 +6,8 @@ from typing import Dict
 from hardware_testing.opentrons_api.types import Point
 
 
-LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=71.2)
-LOCATION_A1_RIGHT = LOCATION_A1_LEFT._replace(x=128 - 14.4)
+LOCATION_A1_LEFT = Point(x=14.4, y=74.5, z=96)
+LOCATION_A1_RIGHT = LOCATION_A1_LEFT._replace(x=128 - LOCATION_A1_LEFT.x)
 
 PRESSURE_FIXTURE_TIP_VOLUME = 50  # always 50ul
 
@@ -35,9 +35,9 @@ class PressureEventConfig:
     sample_delay: float
 
 
-PRESSURE_FIXTURE_ASPIRATE_VOLUME = {50: 20.0, 1000: 50.0}
+PRESSURE_FIXTURE_ASPIRATE_VOLUME = {50: 11.0, 1000: 12.0}
+PRESSURE_FIXTURE_INSERT_DEPTH = {50: 28.5, 1000: 33.0}
 
-FIXTURE_EVENT_STABILITY_THRESHOLD = 3000.0
 DEFAULT_PRESSURE_SAMPLE_DELAY = 0.25
 DEFAULT_PRESSURE_SAMPLE_COUNT = 10
 # FIXME: reduce once firmware latency is reduced
@@ -46,37 +46,37 @@ DEFAULT_STABILIZE_SECONDS = 1
 # but we want to keep the number of samples constant between test runs,
 # so that is why we don't specify a sample duration (b/c frequency is unpredictable)
 DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE = int(
-    (2 * 60) / DEFAULT_PRESSURE_SAMPLE_DELAY
+    (1 * 60) / DEFAULT_PRESSURE_SAMPLE_DELAY
 )
 PRESSURE_NONE = PressureEventConfig(
     min=-10.0,
     max=10.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
-    stability_threshold=FIXTURE_EVENT_STABILITY_THRESHOLD,
+    stability_threshold=2.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_INSERTED = PressureEventConfig(
-    min=0.0,
-    max=700.0,
+    min=3000.0,
+    max=8000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
-    stability_threshold=FIXTURE_EVENT_STABILITY_THRESHOLD,
+    stability_threshold=50.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_ASPIRATED_P50 = PressureEventConfig(
-    min=-5000.0,
-    max=0.0,
+    min=2000.0,
+    max=7000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
-    stability_threshold=FIXTURE_EVENT_STABILITY_THRESHOLD,
+    stability_threshold=200.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )
 PRESSURE_ASPIRATED_P1000 = PressureEventConfig(
-    min=-5000.0,
-    max=0.0,
+    min=2000.0,
+    max=7000.0,
     stability_delay=DEFAULT_STABILIZE_SECONDS,
-    stability_threshold=FIXTURE_EVENT_STABILITY_THRESHOLD,
+    stability_threshold=200.0,
     sample_count=DEFAULT_PRESSURE_SAMPLE_COUNT_DURING_ASPIRATE,
     sample_delay=DEFAULT_PRESSURE_SAMPLE_DELAY,
 )

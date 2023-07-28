@@ -69,7 +69,6 @@ from .backends.ot3utils import (
     get_system_constraints,
     get_system_constraints_for_calibration,
     get_system_constraints_for_plunger_acceleration,
-    axis_convert,
 )
 from .backends.errors import SubsystemUpdating
 from .execution_manager import ExecutionManagerProvider
@@ -92,14 +91,13 @@ from .types import (
     GripperJawState,
     InstrumentProbeType,
     GripperProbe,
-    EarlyLiquidSenseTrigger,
-    LiquidNotFound,
     UpdateStatus,
     StatusBarState,
     SubSystemState,
     TipStateType,
     EstopOverallStatus,
     EstopAttachLocation,
+    EstopState,
 )
 from .errors import (
     MustHomeError,
@@ -141,6 +139,7 @@ from .dev_types import (
     AttachedGripper,
     AttachedPipette,
     PipetteDict,
+    PipetteStateDict,
     InstrumentDict,
     GripperDict,
 )
@@ -1871,6 +1870,16 @@ class OT3API(
         # Warning: don't use this in new code, used `get_attached_pipettes` instead
         return self.get_attached_pipettes()
 
+    async def get_instrument_state(
+        self, mount: Union[top_types.Mount, OT3Mount]
+    ) -> PipetteStateDict:
+        # TODO we should have a PipetteState that can be returned from
+        # this function with additional state (such as critical points)
+        realmount = OT3Mount.from_mount(mount)
+        res = await self._backend.get_tip_present_state(realmount)
+        pipette_state_for_mount: PipetteStateDict = {"tip_detected": bool(res)}
+        return pipette_state_for_mount
+
     def reset_instrument(
         self, mount: Union[top_types.Mount, OT3Mount, None] = None
     ) -> None:
@@ -2078,25 +2087,27 @@ class OT3API(
 
         if not probe_settings:
             probe_settings = self.config.liquid_sense
-        mount_axis = Axis.by_mount(mount)
 
-        gantry_position = await self.gantry_position(mount, refresh=True)
-
-        await self.move_to(
-            mount,
-            top_types.Point(
-                x=gantry_position.x,
-                y=gantry_position.y,
-                z=probe_settings.starting_mount_height,
-            ),
-        )
+        pos = await self.gantry_position(mount, refresh=True)
+        probe_start_pos = pos._replace(z=probe_settings.starting_mount_height)
+        await self.move_to(mount, probe_start_pos)
 
         if probe_settings.aspirate_while_sensing:
-            await self.home_plunger(mount)
+            await self._move_to_plunger_bottom(mount, rate=1.0)
+        else:
+            # TODO: shorten this distance by only moving just far enough
+            #       to account for the specified "max-z-distance"
+            target_pos = target_position_from_plunger(
+                checked_mount, instrument.plunger_positions.top, self._current_position
+            )
+            # FIXME: this should really be the slower "aspirate" speed,
+            #        but this is still in testing phase so let's bias towards speed
+            max_speeds = self.config.motion_settings.default_max_speed
+            speed = max_speeds[self.gantry_load][OT3AxisKind.P]
+            await self._move(target_pos, speed=speed, acquire_lock=True)
 
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
-
-        machine_pos_node_id = await self._backend.liquid_probe(
+        await self._backend.liquid_probe(
             mount,
             probe_settings.max_z_distance,
             probe_settings.mount_speed,
@@ -2106,27 +2117,9 @@ class OT3API(
             probe_settings.auto_zero_sensor,
             probe_settings.num_baseline_reads,
         )
-        machine_pos = axis_convert(machine_pos_node_id, 0.0)
-        position = self._deck_from_machine(machine_pos)
-        z_distance_traveled = (
-            position[mount_axis] - probe_settings.starting_mount_height
-        )
-        if z_distance_traveled < probe_settings.min_z_distance:
-            min_z_travel_pos = position
-            min_z_travel_pos[mount_axis] = probe_settings.min_z_distance
-            raise EarlyLiquidSenseTrigger(
-                triggered_at=position,
-                min_z_pos=min_z_travel_pos,
-            )
-        elif z_distance_traveled > probe_settings.max_z_distance:
-            max_z_travel_pos = position
-            max_z_travel_pos[mount_axis] = probe_settings.max_z_distance
-            raise LiquidNotFound(
-                position=position,
-                max_z_pos=max_z_travel_pos,
-            )
-
-        return position[mount_axis]
+        end_pos = await self.gantry_position(mount, refresh=True)
+        await self.move_to(mount, probe_start_pos)
+        return end_pos.z
 
     async def capacitive_probe(
         self,
@@ -2283,3 +2276,6 @@ class OT3API(
         Returns the estop status after clearing the status."""
         self._backend.estop_state_machine.acknowledge_and_clear()
         return self.estop_status
+
+    def get_estop_state(self) -> EstopState:
+        return self._backend.estop_state_machine.state

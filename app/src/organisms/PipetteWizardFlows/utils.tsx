@@ -78,7 +78,7 @@ export function getPipetteAnimations(
         width: 100%;
         min-height: ${section === SECTIONS.ATTACH_PROBE ||
         section === SECTIONS.DETACH_PROBE
-          ? `20rem`
+          ? `18rem`
           : `12rem`};
       `}
       autoPlay={true}

@@ -19,23 +19,21 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point
 
 
-SLOT_FORCE_GAUGE = 6
+SLOT_FORCE_GAUGE = 4
 
 GRIP_DUTY_CYCLES: List[int] = [40, 30, 25, 20, 15, 10, 6]
 NUM_DUTY_CYCLE_TRIALS = 20
 
 GRIP_FORCES_NEWTON: List[int] = [20, 15, 10, 5]
-NUM_NEWTONS_TRIALS = 5
-FAILURE_THRESHOLD_PERCENTAGE = (
-    10  # TODO: wait for PVT to decide on if this should be tightened or loosened
-)
+NUM_NEWTONS_TRIALS = 1
+FAILURE_THRESHOLD_PERCENTAGES = [10, 10, 10, 20]
 
 WARMUP_SECONDS = 10
 
 FORCE_GAUGE_TRIAL_SAMPLE_INTERVAL = 0.25  # seconds
 FORCE_GAUGE_TRIAL_SAMPLE_COUNT = 20  # 20 samples = 5 seconds @ 4Hz
 
-GAUGE_OFFSET = Point(x=90, y=37.5, z=75)
+GAUGE_OFFSET = Point(x=2, y=42, z=75)
 
 
 def _get_test_tag(
@@ -79,14 +77,18 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
         for trial in range(NUM_NEWTONS_TRIALS):
             tag = _get_test_tag(trial, newtons=force)
             force_data_types = [float] * FORCE_GAUGE_TRIAL_SAMPLE_COUNT
-            data_row = [int] + force_data_types + [CSVResult]  # type: ignore[operator,list-item]
-            lines.append(CSVLine(tag, data_row))
+            lines.append(CSVLine(f"{tag}-data", force_data_types))
+            lines.append(CSVLine(f"{tag}-average", [float]))
+            lines.append(CSVLine(f"{tag}-target", [float]))
+            lines.append(CSVLine(f"{tag}-pass-%", [float]))
+            lines.append(CSVLine(f"{tag}-result", [CSVResult]))
     for duty_cycle in GRIP_DUTY_CYCLES:
         for trial in range(NUM_DUTY_CYCLE_TRIALS):
             tag = _get_test_tag(trial, duty_cycle=duty_cycle)
             force_data_types = [float] * FORCE_GAUGE_TRIAL_SAMPLE_COUNT
-            data_row = [int] + force_data_types  # type: ignore[operator]
-            lines.append(CSVLine(tag, data_row))
+            lines.append(CSVLine(f"{tag}-data", force_data_types))
+            lines.append(CSVLine(f"{tag}-average", [float]))
+            lines.append(CSVLine(f"{tag}-duty-cycle", [float]))
     return lines
 
 
@@ -145,8 +147,8 @@ async def _setup(api: OT3API) -> Union[Mark10, SimMark10]:
     await api.home([z_ax, g_ax])
     # MOVE TO GAUGE
     await api.ungrip()
-    hover_pos, target_pos = _get_force_gauge_hover_and_grip_positions(api)
-    await helpers_ot3.move_to_arched_ot3(api, mount, target_pos + Point(z=30))
+    _, target_pos = _get_force_gauge_hover_and_grip_positions(api)
+    await helpers_ot3.move_to_arched_ot3(api, mount, target_pos + Point(z=15))
     if not api.is_simulator:
         ui.get_user_ready("please make sure the gauge in the middle of the gripper")
     await api.move_to(mount, target_pos)
@@ -175,9 +177,12 @@ async def run_increment(api: OT3API, report: CSVReport, section: str) -> None:
             )
             actual_forces = await _grip_and_read_forces(api, gauge, duty=duty_cycle)
             print(actual_forces)
+            avg_force = sum(actual_forces) / len(actual_forces)
+            print(f"average = {round(avg_force, 2)} N")
             tag = _get_test_tag(trial, duty_cycle=duty_cycle)
-            report_data = [duty_cycle] + actual_forces  # type: ignore[operator]
-            report(section, tag, report_data)
+            report(section, f"{tag}-data", actual_forces)
+            report(section, f"{tag}-average", [avg_force])
+            report(section, f"{tag}-duty-cycle", [duty_cycle])
 
     print("done")
     await api.retract(OT3Mount.GRIPPER)
@@ -189,7 +194,9 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # LOOP THROUGH FORCES
     ui.print_header("MEASURE NEWTONS")
-    for expected_force in GRIP_FORCES_NEWTON:
+    for expected_force, allowed_percent_error in zip(
+        GRIP_FORCES_NEWTON, FAILURE_THRESHOLD_PERCENTAGES
+    ):
         for trial in range(NUM_NEWTONS_TRIALS):
             print(f"{expected_force}N - trial {trial + 1}/{NUM_NEWTONS_TRIALS}")
             actual_forces = await _grip_and_read_forces(
@@ -198,16 +205,16 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             print(actual_forces)
             # base PASS/FAIL on average
             avg_force = sum(actual_forces) / len(actual_forces)
+            print(f"average = {round(avg_force, 2)} N")
             error = (avg_force - expected_force) / expected_force
-            result = CSVResult.from_bool(
-                abs(error) * 100 < FAILURE_THRESHOLD_PERCENTAGE
-            )
+            result = CSVResult.from_bool(abs(error) * 100 < allowed_percent_error)
             # store all data in CSV
             tag = _get_test_tag(trial, newtons=expected_force)
-            report_data = (
-                [expected_force] + actual_forces + [result]  # type: ignore[operator,list-item]
-            )
-            report(section, tag, report_data)
+            report(section, f"{tag}-data", actual_forces)
+            report(section, f"{tag}-average", [avg_force])
+            report(section, f"{tag}-target", [expected_force])
+            report(section, f"{tag}-pass-%", [allowed_percent_error])
+            report(section, f"{tag}-result", [result])
 
     print("done")
     await api.retract(OT3Mount.GRIPPER)
