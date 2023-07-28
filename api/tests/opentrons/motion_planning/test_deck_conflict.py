@@ -9,21 +9,21 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons.motion_planning import deck_conflict
 
 
-@pytest.mark.parametrize("robot_type", [("OT-2 Standard"), ("OT-3 Standard")])
-def test_empty_no_conflict(robot_type: str) -> None:
+@pytest.mark.parametrize("robot_type, slot_name", [("OT-2 Standard", "1"), ("OT-3 Standard", "A1")])
+def test_empty_no_conflict(robot_type: str, slot_name: str) -> None:
     """It should not raise on empty input."""
     deck_conflict.check(
         existing_items={},
         new_item=deck_conflict.OtherModule(
             highest_z_including_labware=123, name_for_errors="foo"
         ),
-        new_location=1,
+        new_location=slot_name,
         robot_type=robot_type,
     )
 
 
-@pytest.mark.parametrize("robot_type", [("OT-2 Standard"), ("OT-3 Standard")])
-def test_no_multiple_locations(robot_type: str) -> None:
+@pytest.mark.parametrize("robot_type, slot_name", [("OT-2 Standard", "1"), ("OT-3 Standard", "A1")])
+def test_no_multiple_locations(robot_type: str, slot_name:str) -> None:
     """It should not allow two items in the same slot."""
     item_1 = deck_conflict.OtherModule(
         highest_z_including_labware=123, name_for_errors="some_item_1"
@@ -34,12 +34,12 @@ def test_no_multiple_locations(robot_type: str) -> None:
 
     with pytest.raises(
         deck_conflict.DeckConflictError,
-        match="some_item_1 in slot 1 prevents some_item_2 from using slot 1",
+        match=f"some_item_1 in slot {slot_name} prevents some_item_2 from using slot {slot_name}",
     ):
         deck_conflict.check(
-            existing_items={1: item_1},
+            existing_items={slot_name: item_1},
             new_item=item_2,
-            new_location=1,
+            new_location=slot_name,
             robot_type=robot_type,
         )
 
@@ -567,11 +567,11 @@ def test_flex_raises_module_in_wrong_location(
     """It should raise when trying to load a module in a disallowed location."""
     with pytest.raises(
         deck_conflict.DeckConflictError,
-        match=(f"{deck_item.name_for_errors} is not allowed in slot 2"),
+        match=(f"{deck_item.name_for_errors} is not allowed in slot A2"),
     ):
         deck_conflict.check(
             existing_items={},
-            new_location=2,
+            new_location="A2",
             new_item=deck_item,
             robot_type="OT-3 Standard",
         )

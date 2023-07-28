@@ -75,7 +75,7 @@ def test_maps_labware_on_deck(decoy: Decoy, mock_state_view: StateView) -> None:
     decoy.verify(
         wrapped_deck_conflict.check(
             existing_items={
-                5: wrapped_deck_conflict.Labware(
+                "5": wrapped_deck_conflict.Labware(
                     name_for_errors="labware_load_name",
                     highest_z=3.14159,
                     uri=LabwareUri("test/labware_load_name/123"),
@@ -88,7 +88,7 @@ def test_maps_labware_on_deck(decoy: Decoy, mock_state_view: StateView) -> None:
                 uri=LabwareUri("test/labware_load_name/123"),
                 is_fixed_trash=True,
             ),
-            new_location=5,
+            new_location="5",
             robot_type=mock_state_view.config.robot_type,
         )
     )
@@ -129,7 +129,7 @@ def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -
     decoy.verify(
         wrapped_deck_conflict.check(
             existing_items={
-                5: wrapped_deck_conflict.HeaterShakerModule(
+                "5": wrapped_deck_conflict.HeaterShakerModule(
                     name_for_errors="heaterShakerModuleV1",
                     highest_z_including_labware=3.14159,
                 )
@@ -138,7 +138,7 @@ def test_maps_module_without_labware(decoy: Decoy, mock_state_view: StateView) -
                 name_for_errors="heaterShakerModuleV1",
                 highest_z_including_labware=3.14159,
             ),
-            new_location=5,
+            new_location="5",
             robot_type=mock_state_view.config.robot_type,
         )
     )
@@ -182,7 +182,7 @@ def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> N
     decoy.verify(
         wrapped_deck_conflict.check(
             existing_items={
-                5: wrapped_deck_conflict.HeaterShakerModule(
+                "5": wrapped_deck_conflict.HeaterShakerModule(
                     name_for_errors="heaterShakerModuleV1",
                     highest_z_including_labware=3.14159,
                 )
@@ -191,7 +191,7 @@ def test_maps_module_with_labware(decoy: Decoy, mock_state_view: StateView) -> N
                 name_for_errors="heaterShakerModuleV1",
                 highest_z_including_labware=3.14159,
             ),
-            new_location=5,
+            new_location="5",
             robot_type=mock_state_view.config.robot_type,
         )
     )
@@ -269,7 +269,7 @@ def test_maps_different_module_models(
         wrapped_deck_conflict.check(
             existing_items={},
             new_item=expected_mapping_result,
-            new_location=5,
+            new_location="5",
             robot_type=mock_state_view.config.robot_type,
         )
     )
