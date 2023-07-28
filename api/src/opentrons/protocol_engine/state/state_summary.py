@@ -18,6 +18,7 @@ class StateSummary(BaseModel):
     """Data from a protocol run."""
 
     status: EngineStatus
+    # errors is a list for historical reasons. It will only have up to one element.
     errors: List[ErrorOccurrence]
     labware: List[LoadedLabware]
     pipettes: List[LoadedPipette]

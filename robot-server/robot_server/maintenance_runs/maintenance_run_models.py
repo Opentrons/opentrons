@@ -76,7 +76,11 @@ class MaintenanceRun(ResourceModel):
     )
     errors: List[ErrorOccurrence] = Field(
         ...,
-        description="Any errors that have occurred during the run.",
+        description=(
+            "The protocol's fatal error, if there was one."
+            " For historical reasons, this is an array,"
+            " but it will only have up to one element."
+        ),
     )
     pipettes: List[LoadedPipette] = Field(
         ...,

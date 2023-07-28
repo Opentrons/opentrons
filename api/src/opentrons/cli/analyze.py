@@ -152,4 +152,5 @@ class AnalyzeResults(BaseModel):
     pipettes: List[LoadedPipette]
     modules: List[LoadedModule]
     liquids: List[Liquid]
+    # errors is a list for historical reasons. It will only have up to one element.
     errors: List[ErrorOccurrence]
