@@ -74,6 +74,7 @@ function startUp(): void {
 
   // TESTING SERIALPORT LIBRARY:
   testSerialport()
+  // commit this to trigger a build
 
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {
