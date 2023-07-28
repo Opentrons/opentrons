@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { act, fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import {
   LEFT,
   NINETY_SIX_CHANNEL,
@@ -74,7 +74,7 @@ describe('Results', () => {
     expect(props.proceed).toHaveBeenCalled()
   })
 
-  it('renders the correct information when pipette wizard is a success for attach flow', () => {
+  it('renders the correct information when pipette wizard is a success for attach flow', async () => {
     props = {
       ...props,
       flowType: FLOWS.ATTACH,
@@ -90,20 +90,55 @@ describe('Results', () => {
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
         {
+          commandType: 'loadPipette' as const,
+          params: {
+            pipetteName: 'p1000_single_gen3',
+            pipetteId: 'abc',
+            mount: 'left',
+          },
+        },
+        {
           commandType: 'home' as const,
           params: {
             axes: ['leftPlunger'],
           },
         },
+      ],
+      false
+    )
+    await waitFor(() => expect(props.proceed).toHaveBeenCalled())
+  })
+  it('calls setShowErrorMessage when chainRunCommands fails', async () => {
+    props = {
+      ...props,
+      chainRunCommands: jest
+        .fn()
+        .mockImplementationOnce(() => Promise.reject(new Error('error'))),
+      flowType: FLOWS.ATTACH,
+    }
+    const { getByRole } = render(props)
+    const exit = getByRole('button', { name: 'Results_exit' })
+    fireEvent.click(exit)
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
         {
-          commandType: 'calibration/moveToMaintenancePosition' as const,
+          commandType: 'loadPipette' as const,
           params: {
+            pipetteName: 'p1000_single_gen3',
+            pipetteId: 'abc',
             mount: 'left',
           },
         },
+        {
+          commandType: 'home' as const,
+          params: {
+            axes: ['leftPlunger'],
+          },
+        },
       ],
-      true
+      false
     )
+    await waitFor(() => expect(props.setShowErrorMessage).toHaveBeenCalled())
   })
   it('renders the correct information when pipette wizard is a fail for attach flow', async () => {
     props = {
@@ -168,7 +203,7 @@ describe('Results', () => {
       screen.queryByRole('button', { name: 'Results_errorExit' })
     ).not.toBeInTheDocument()
   })
-  it('renders the correct information when pipette wizard is a fail for 96 channel attach flow and gantry not empty', async () => {
+  it('renders the correct information when pipette wizard is a failing to detach before 96 channel attach flow', async () => {
     props = {
       ...props,
       flowType: FLOWS.DETACH,
@@ -182,7 +217,7 @@ describe('Results', () => {
     getByRole('button', { name: 'Try again' }).click()
     await act(() => pipettePromise)
   })
-  it('renders the correct information when pipette wizard is a success for 96 channel attach flow and gantry not empty', () => {
+  it('renders the correct information when pipette wizard is a success for detaching before 96 channel attach flow', () => {
     props = {
       ...props,
       flowType: FLOWS.DETACH,
@@ -194,9 +229,20 @@ describe('Results', () => {
     expect(getByLabelText('ot-check')).toHaveStyle(
       `color: ${String(COLORS.successEnabled)}`
     )
+    getByText('attach pipette')
     const exit = getByRole('button', { name: 'Results_exit' })
     fireEvent.click(exit)
-    expect(props.proceed).toHaveBeenCalled()
+    expect(props.chainRunCommands).toHaveBeenCalledWith(
+      [
+        {
+          commandType: 'calibration/moveToMaintenancePosition' as const,
+          params: {
+            mount: 'left',
+          },
+        },
+      ],
+      false
+    )
   })
   it('renders the correct information when pipette wizard succeeds to calibrate in attach flow 96-channel', () => {
     props = {
@@ -265,6 +311,36 @@ describe('Results', () => {
       `color: ${String(COLORS.errorEnabled)}`
     )
     getByRole('button', { name: 'SmallButton_primary' }).click()
+    await act(() => pipettePromise)
+    expect(mockRefetchInstruments).toHaveBeenCalled()
+  })
+  it('renders the correct information when pipette succceeds to attach during run setup', () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      requiredPipette: {
+        id: 'mockId',
+        pipetteName: 'p1000_single_gen3',
+        mount: LEFT,
+      },
+    }
+    const { getByText } = render(props)
+    getByText('Flex 1-Channel 1000 μL successfully attached')
+  })
+  it('renders the correct information when attaching wrong pipette for run setup', async () => {
+    props = {
+      ...props,
+      flowType: FLOWS.ATTACH,
+      requiredPipette: {
+        id: 'mockId',
+        pipetteName: 'p50_multi_gen3',
+        mount: LEFT,
+      },
+    }
+    const { getByText, getByRole } = render(props)
+    getByText('Wrong instrument installed')
+    getByText('Install Flex 8-Channel 50 μL instead')
+    getByRole('button', { name: 'Detach and retry' }).click()
     await act(() => pipettePromise)
     expect(mockRefetchInstruments).toHaveBeenCalled()
   })

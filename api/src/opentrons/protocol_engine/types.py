@@ -37,7 +37,21 @@ class EngineStatus(str, Enum):
 class DeckSlotLocation(BaseModel):
     """The location of something placed in a single deck slot."""
 
-    slotName: DeckSlotName
+    slotName: DeckSlotName = Field(
+        ...,
+        description=(
+            # This description should be kept in sync with LabwareOffsetLocation.slotName.
+            "A slot on the robot's deck."
+            "\n\n"
+            'The plain numbers like `"5"` are for the OT-2,'
+            ' and the coordinates like `"C2"` are for the Flex.'
+            "\n\n"
+            "When you provide one of these values, you can use either style."
+            " It will automatically be converted to match the robot."
+            "\n\n"
+            "When one of these values is returned, it will always match the robot."
+        ),
+    )
 
 
 class ModuleLocation(BaseModel):
@@ -49,11 +63,25 @@ class ModuleLocation(BaseModel):
     )
 
 
+class OnLabwareLocation(BaseModel):
+    """The location of something placed atop another labware."""
+
+    labwareId: str = Field(
+        ...,
+        description="The ID of a loaded Labware from a prior `loadLabware` command.",
+    )
+
+
 _OffDeckLocationType = Literal["offDeck"]
 OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
 
-LabwareLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
+LabwareLocation = Union[
+    DeckSlotLocation, ModuleLocation, OnLabwareLocation, _OffDeckLocationType
+]
 """Union of all locations where it's legal to keep a labware."""
+
+NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
+"""Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
 
 
 class LabwareMovementStrategy(str, Enum):
@@ -151,6 +179,9 @@ class DeckPoint(BaseModel):
     z: float
 
 
+# TODO(mm, 2023-05-10): Deduplicate with constants in
+# opentrons.protocols.api_support.deck_type
+# and consider moving to shared-data.
 class DeckType(str, Enum):
     """Types of deck available."""
 
@@ -219,6 +250,8 @@ class MotorAxis(str, Enum):
     RIGHT_Z = "rightZ"
     LEFT_PLUNGER = "leftPlunger"
     RIGHT_PLUNGER = "rightPlunger"
+    EXTENSION_Z = "extensionZ"
+    EXTENSION_JAW = "extensionJaw"
 
 
 # TODO(mc, 2022-01-18): use opentrons_shared_data.module.dev_types.ModuleModel
@@ -329,6 +362,22 @@ class LabwareOffsetVector(BaseModel):
     y: float
     z: float
 
+    def __add__(self, other: Any) -> LabwareOffsetVector:
+        """Adds two vectors together."""
+        if not isinstance(other, LabwareOffsetVector):
+            return NotImplemented
+        return LabwareOffsetVector(
+            x=self.x + other.x, y=self.y + other.y, z=self.z + other.z
+        )
+
+    def __sub__(self, other: Any) -> LabwareOffsetVector:
+        """Subtracts two vectors."""
+        if not isinstance(other, LabwareOffsetVector):
+            return NotImplemented
+        return LabwareOffsetVector(
+            x=self.x - other.x, y=self.y - other.y, z=self.z - other.z
+        )
+
 
 # TODO(mm, 2022-11-07): Deduplicate with Vec3f.
 class InstrumentOffsetVector(BaseModel):
@@ -346,6 +395,10 @@ class ModuleOffsetVector(BaseModel):
     x: float
     y: float
     z: float
+
+
+class OverlapOffset(Vec3f):
+    """Offset representing overlap space of one labware on top of another labware or module."""
 
 
 # TODO(mm, 2023-04-13): Move to shared-data, so this binding can be maintained alongside the JSON
@@ -426,6 +479,15 @@ class LabwareOffsetLocation(BaseModel):
             "The deck slot where the protocol will load the labware."
             " Or, if the protocol will load the labware on a module,"
             " the deck slot where the protocol will load that module."
+            "\n\n"
+            # This description should be kept in sync with DeckSlotLocation.slotName.
+            'The plain numbers like `"5"` are for the OT-2,'
+            ' and the coordinates like `"C2"` are for the Flex.'
+            "\n\n"
+            "When you provide one of these values, you can use either style."
+            " It will automatically be converted to match the robot."
+            "\n\n"
+            "When one of these values is returned, it will always match the robot."
         ),
     )
     moduleModel: Optional[ModuleModel] = Field(
@@ -441,6 +503,13 @@ class LabwareOffsetLocation(BaseModel):
             " this field must be the *requested* model, not the connected one."
             " You can retrieve this from a `loadModule` command's `params.model`"
             " in the protocol's analysis."
+        ),
+    )
+    definitionUri: Optional[str] = Field(
+        None,
+        description=(
+            "The definition URI of a labware that a labware can be loaded onto,"
+            " if applicable."
         ),
     )
 

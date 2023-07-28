@@ -22,23 +22,29 @@ import {
 import {
   getGripperDisplayName,
   getModuleDisplayName,
+  getPipetteModelSpecs,
 } from '@opentrons/shared-data'
+import {
+  useInstrumentsQuery,
+  usePipettesQuery,
+  useModulesQuery,
+} from '@opentrons/react-api-client'
 
 import OT2_PNG from '../../assets/images/OT2-R_HERO.png'
-import OT3_PNG from '../../assets/images/OT3.png'
+import FLEX_PNG from '../../assets/images/FLEX.png'
 import { InstrumentContainer } from '../../atoms/InstrumentContainer'
 import { StyledText } from '../../atoms/text'
 import { CONNECTABLE, getRobotModelByName } from '../../redux/discovery'
 import { ModuleIcon } from '../../molecules/ModuleIcon'
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
-import { useAttachedModules, useAttachedPipettes, useIsOT3 } from './hooks'
+import { useIsOT3 } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverflowMenu } from './RobotOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
 
 import type { DiscoveredRobot } from '../../redux/discovery/types'
 import type { State } from '../../redux/types'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import { GripperData } from '@opentrons/api-client'
 
 interface RobotCardProps {
   robot: DiscoveredRobot
@@ -58,39 +64,40 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       backgroundColor={COLORS.white}
       cursor="pointer"
       flexDirection={DIRECTION_ROW}
-      gridGap={SPACING.spacing4}
+      gridGap={SPACING.spacing16}
       minWidth="36rem"
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
       position={POSITION_RELATIVE}
       onClick={() => history.push(`/devices/${robotName}`)}
       css={BORDERS.cardOutlineBorder}
     >
       <img
-        src={robotModel === 'OT-2' ? OT2_PNG : OT3_PNG}
+        src={robotModel === 'OT-2' ? OT2_PNG : FLEX_PNG}
         style={{ width: '6rem' }}
         id={`RobotCard_${String(robotName)}_robotImage`}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacingSM}
+        gridGap={SPACING.spacing12}
         justifyContent={JUSTIFY_FLEX_START}
         width="100%"
       >
-        <UpdateRobotBanner robot={robot} marginRight={SPACING.spacing5} />
+        <UpdateRobotBanner robot={robot} marginRight={SPACING.spacing24} />
         <ReachableBanner robot={robot} />
-        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
           <RobotStatusHeader
             local={local}
             name={robotName}
             robotModel={robotModel}
             alignItems={ALIGN_START}
-            paddingRight={SPACING.spacing5}
+            paddingRight={SPACING.spacing24}
           />
+
           {robot.status === CONNECTABLE ? (
             <Flex
               flexDirection={DIRECTION_ROW}
               flexWrap={WRAP}
-              gridGap={SPACING.spacing4}
+              gridGap={SPACING.spacing16}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <AttachedInstruments robotName={robotName} />
@@ -101,8 +108,8 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
       </Flex>
       <Box
         position={POSITION_ABSOLUTE}
-        top={SPACING.spacing2}
-        right={SPACING.spacing2}
+        top={SPACING.spacing4}
+        right={SPACING.spacing4}
       >
         <RobotOverflowMenu robot={robot} alignSelf={ALIGN_START} />
       </Box>
@@ -113,10 +120,14 @@ export function RobotCard(props: RobotCardProps): JSX.Element | null {
 function AttachedModules(props: { robotName: string }): JSX.Element | null {
   const { robotName } = props
   const { t } = useTranslation('devices_landing')
-  const attachedModules = useAttachedModules()
+  const {
+    data: modulesData,
+    isLoading: isModulesQueryLoading,
+  } = useModulesQuery()
+  const attachedModules = modulesData?.data ?? []
 
-  return attachedModules.length > 0 ? (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing2}>
+  return !isModulesQueryLoading && attachedModules.length > 0 ? (
+    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
       <StyledText
         as="h6"
         textTransform={TYPOGRAPHY.textTransformUppercase}
@@ -138,21 +149,28 @@ function AttachedModules(props: { robotName: string }): JSX.Element | null {
     </Flex>
   ) : null
 }
+
 function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const { t } = useTranslation('devices_landing')
-  const attachedPipettes = useAttachedPipettes()
   const isOT3 = useIsOT3(props.robotName)
-  const { data: attachedInstruments } = useInstrumentsQuery({ enabled: isOT3 })
-  const extensionInstrument =
-    (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
+  const {
+    data: pipettesData,
+    isLoading: isPipetteQueryLoading,
+  } = usePipettesQuery()
 
-  const leftPipetteDisplayName = attachedPipettes?.left?.modelSpecs.displayName
-  const rightPipetteDisplayName =
-    attachedPipettes?.right?.modelSpecs.displayName
-  const extensionMountDisplayName =
-    extensionInstrument != null &&
-    extensionInstrument.instrumentModel === 'gripperV1'
-      ? getGripperDisplayName(extensionInstrument.instrumentModel)
+  const {
+    data: attachedInstruments,
+    isLoading: isInstrumentsQueryLoading,
+  } = useInstrumentsQuery({ enabled: isOT3 })
+  const attachedGripper =
+    (attachedInstruments?.data ?? []).find(
+      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
+    ) ?? null
+  const leftPipetteModel = pipettesData?.left?.model ?? null
+  const rightPipetteModel = pipettesData?.right?.model ?? null
+  const gripperDisplayName =
+    attachedGripper != null && attachedGripper.instrumentModel === 'gripperV1'
+      ? getGripperDisplayName(attachedGripper.instrumentModel)
       : null
 
   // TODO(bh, 2022-11-1): insert actual 96-channel data
@@ -163,28 +181,39 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
     <Flex
       flex="1"
       flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing2}
+      gridGap={SPACING.spacing4}
       minWidth="24rem"
     >
       <StyledText as="h6" color={COLORS.darkGreyEnabled}>
         {t('shared:instruments')}
       </StyledText>
-      <Flex flexWrap={WRAP} gridGap={SPACING.spacing2}>
-        {leftAndRightMountsPipetteDisplayName != null ? (
-          <InstrumentContainer
-            displayName={leftAndRightMountsPipetteDisplayName}
-          />
-        ) : null}
-        {leftPipetteDisplayName != null ? (
-          <InstrumentContainer displayName={leftPipetteDisplayName} />
-        ) : null}
-        {rightPipetteDisplayName != null ? (
-          <InstrumentContainer displayName={rightPipetteDisplayName} />
-        ) : null}
-        {extensionMountDisplayName != null ? (
-          <InstrumentContainer displayName={extensionMountDisplayName} />
-        ) : null}
-      </Flex>
+
+      {isPipetteQueryLoading || isInstrumentsQueryLoading ? null : (
+        <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
+          {leftAndRightMountsPipetteDisplayName != null ? (
+            <InstrumentContainer
+              displayName={leftAndRightMountsPipetteDisplayName}
+            />
+          ) : null}
+          {leftPipetteModel != null ? (
+            <InstrumentContainer
+              displayName={
+                getPipetteModelSpecs(leftPipetteModel)?.displayName ?? ''
+              }
+            />
+          ) : null}
+          {rightPipetteModel != null ? (
+            <InstrumentContainer
+              displayName={
+                getPipetteModelSpecs(rightPipetteModel)?.displayName ?? ''
+              }
+            />
+          ) : null}
+          {gripperDisplayName != null ? (
+            <InstrumentContainer displayName={gripperDisplayName} />
+          ) : null}
+        </Flex>
+      )}
     </Flex>
   )
 }

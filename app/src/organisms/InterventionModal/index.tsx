@@ -25,6 +25,12 @@ import {
 } from '@opentrons/components'
 
 import { StyledText } from '../../atoms/text'
+import { PauseInterventionContent } from './PauseInterventionContent'
+import { MoveLabwareInterventionContent } from './MoveLabwareInterventionContent'
+
+import type { DeckDefinition, RobotType } from '@opentrons/shared-data'
+import type { RunCommandSummary } from '@opentrons/api-client'
+import type { RunLabwareInfo, RunModuleInfo } from './utils'
 
 const BASE_STYLE = {
   position: POSITION_ABSOLUTE,
@@ -43,8 +49,8 @@ const MODAL_STYLE = {
   position: POSITION_RELATIVE,
   overflowY: OVERFLOW_AUTO,
   maxHeight: '100%',
-  width: '100%',
-  margin: SPACING.spacing5,
+  width: '47rem',
+  margin: SPACING.spacing24,
   border: `6px ${String(BORDERS.styleSolid)} ${String(COLORS.blueEnabled)}`,
   borderRadius: BORDERS.radiusSoftCorners,
   boxShadow: BORDERS.smallDropShadow,
@@ -55,7 +61,7 @@ const HEADER_STYLE = {
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
   justifyContent: JUSTIFY_CENTER,
-  padding: `0px ${String(SPACING.spacing6)}`,
+  padding: `0px ${SPACING.spacing32}`,
   color: COLORS.white,
   backgroundColor: COLORS.blueEnabled,
   position: POSITION_STICKY,
@@ -67,8 +73,8 @@ const CONTENT_STYLE = {
   display: DISPLAY_FLEX,
   flexDirection: DIRECTION_COLUMN,
   alignItems: ALIGN_FLEX_START,
-  gridGap: SPACING.spacing5,
-  padding: `${String(SPACING.spacing6)}`,
+  gridGap: SPACING.spacing24,
+  padding: `${SPACING.spacing32}`,
   borderRadius: `0px 0px ${String(BORDERS.radiusSoftCorners)} ${String(
     BORDERS.radiusSoftCorners
   )}`,
@@ -82,12 +88,63 @@ const FOOTER_STYLE = {
 
 export interface InterventionModalProps {
   robotName: string
+  onResume: () => void
+  command: RunCommandSummary
+  robotType?: RobotType
+  moduleRenderInfo?: RunModuleInfo[] | null
+  labwareRenderInfo?: RunLabwareInfo[] | null
+  labwareName?: string
+  oldDisplayLocation?: string
+  newDisplayLocation?: string
+  deckDef?: DeckDefinition
 }
 
 export function InterventionModal({
   robotName,
+  onResume,
+  command,
+  robotType,
+  moduleRenderInfo,
+  labwareRenderInfo,
+  labwareName,
+  oldDisplayLocation,
+  newDisplayLocation,
+  deckDef,
 }: InterventionModalProps): JSX.Element {
   const { t } = useTranslation(['protocol_command_text', 'protocol_info'])
+
+  let modalContent: JSX.Element | null = null
+
+  if (
+    command.commandType === 'waitForResume' ||
+    command.commandType === 'pause' // legacy pause command
+  ) {
+    modalContent = (
+      <PauseInterventionContent
+        startedAt={command.startedAt ?? null}
+        message={command.params.message ?? null}
+      />
+    )
+  } else if (command.commandType === 'moveLabware') {
+    modalContent =
+      robotType != null &&
+      moduleRenderInfo != null &&
+      oldDisplayLocation != null &&
+      newDisplayLocation != null &&
+      labwareRenderInfo != null &&
+      deckDef != null ? (
+        <MoveLabwareInterventionContent
+          robotType={robotType}
+          moduleRenderInfo={moduleRenderInfo}
+          labwareRenderInfo={labwareRenderInfo}
+          labwareName={labwareName ?? ''}
+          movedLabwareId={command.params.labwareId}
+          oldDisplayLocation={oldDisplayLocation}
+          newDisplayLocation={newDisplayLocation}
+          deckDef={deckDef}
+        />
+      ) : null
+  }
 
   return (
     <Flex
@@ -113,19 +170,21 @@ export function InterventionModal({
             </StyledText>
           </Box>
           <Box {...CONTENT_STYLE}>
-            Content Goes Here
+            {modalContent}
             <Box {...FOOTER_STYLE}>
               <StyledText>
                 <Link css={TYPOGRAPHY.darkLinkLabelSemiBold} href="" external>
-                  {t('protocol_info:intervention_modal_learn_more')}
+                  {t('protocol_info:manual_steps_learn_more')}
                   <Icon
                     name="open-in-new"
-                    marginLeft={SPACING.spacing2}
+                    marginLeft={SPACING.spacing4}
                     size="0.5rem"
                   />
                 </Link>
               </StyledText>
-              <PrimaryButton>{t('confirm_and_resume')}</PrimaryButton>
+              <PrimaryButton onClick={onResume}>
+                {t('confirm_and_resume')}
+              </PrimaryButton>
             </Box>
           </Box>
         </Box>

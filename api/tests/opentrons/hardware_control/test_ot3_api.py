@@ -1,10 +1,11 @@
 """ Tests for behaviors specific to the OT3 hardware controller.
 """
-from typing import Iterator, Union, Dict, Tuple, List, Any
+from typing import Iterator, Union, Dict, Tuple, List, Any, OrderedDict
 from typing_extensions import Literal
 from math import copysign
 import pytest
 from mock import AsyncMock, patch, Mock, call, PropertyMock
+from hypothesis import given, strategies, settings, HealthCheck, assume, example
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
 from opentrons.config.types import (
@@ -17,6 +18,7 @@ from opentrons.hardware_control.dev_types import (
     OT3AttachedPipette,
     GripperDict,
 )
+from opentrons.hardware_control.motion_utilities import target_position_from_plunger
 from opentrons.hardware_control.instruments.ot3.gripper_handler import (
     GripError,
     GripperHandler,
@@ -35,13 +37,15 @@ from opentrons.hardware_control.instruments.ot3.pipette_handler import (
 from opentrons.hardware_control.types import (
     OT3Mount,
     OT3Axis,
+    OT3AxisKind,
     CriticalPoint,
     GripperProbe,
     InstrumentProbeType,
     LiquidNotFound,
     EarlyLiquidSenseTrigger,
-    OT3SubSystem,
+    SubSystem,
     GripperJawState,
+    StatusBarState,
 )
 from opentrons.hardware_control.errors import (
     GripperNotAttachedError,
@@ -57,14 +61,16 @@ from opentrons.types import Point, Mount
 
 from opentrons_hardware.hardware_control.motion import MoveStopCondition
 
-from opentrons.config import gripper_config as gc, ot3_pipette_config
+from opentrons.config import gripper_config as gc
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteModelType,
     PipetteChannelType,
     PipetteVersionType,
 )
-from hypothesis import given, strategies, settings, HealthCheck, assume, example
+from opentrons_shared_data.pipette import (
+    load_data as load_pipette_data,
+)
 
 
 @pytest.fixture
@@ -128,6 +134,32 @@ def mock_home_plunger(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock
         "home_plunger",
         AsyncMock(
             spec=ot3_hardware.managed_obj.home_plunger,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
+def mock_move_to_plunger_bottom(
+    ot3_hardware: ThreadManager[OT3API],
+) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_move_to_plunger_bottom",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj._move_to_plunger_bottom,
+        ),
+    ) as mock_move:
+        yield mock_move
+
+
+@pytest.fixture
+def mock_move(ot3_hardware: ThreadManager[OT3API]) -> Iterator[AsyncMock]:
+    with patch.object(
+        ot3_hardware.managed_obj,
+        "_move",
+        AsyncMock(
+            spec=ot3_hardware.managed_obj._move,
         ),
     ) as mock_move:
         yield mock_move
@@ -317,12 +349,10 @@ async def test_gantry_load_transform(
             instr_data = AttachedGripper(config=gripper_config, id="2345")
             await ot3_hardware.cache_gripper(instr_data)
         else:
-            pipette_config = ot3_pipette_config.load_ot3_pipette(
-                ot3_pipette_config.PipetteModelVersionType(
-                    PipetteModelType(configs["model"]),
-                    PipetteChannelType(configs["channels"]),
-                    PipetteVersionType(*configs["version"]),
-                )
+            pipette_config = load_pipette_data.load_definition(
+                PipetteModelType(configs["model"]),
+                PipetteChannelType(configs["channels"]),
+                PipetteVersionType(*configs["version"]),
             )
             instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
             await ot3_hardware.cache_pipette(mount, instr_data, None)
@@ -410,15 +440,14 @@ async def prepare_for_mock_blowout(
     mount: OT3Mount,
     configs: Any,
 ) -> Tuple[Any, ThreadManager[OT3API]]:
-    pipette_config = ot3_pipette_config.load_ot3_pipette(
-        ot3_pipette_config.PipetteModelVersionType(
-            PipetteModelType(configs["model"]),
-            PipetteChannelType(configs["channels"]),
-            PipetteVersionType(*configs["version"]),
-        )
+    pipette_config = load_pipette_data.load_definition(
+        PipetteModelType(configs["model"]),
+        PipetteChannelType(configs["channels"]),
+        PipetteVersionType(*configs["version"]),
     )
     instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
     await ot3_hardware.cache_pipette(mount, instr_data, None)
+    await ot3_hardware.refresh_positions()
     with patch.object(
         ot3_hardware, "pick_up_tip", AsyncMock(spec=ot3_hardware.liquid_probe)
     ) as mock_tip_pickup:
@@ -471,8 +500,14 @@ async def test_blow_out_position(
 
 
 @pytest.mark.parametrize("load_configs", load_blowout_configs)
-@given(blowout_volume=strategies.floats(min_value=0, max_value=200))
-@settings(suppress_health_check=[HealthCheck.function_scoped_fixture], max_examples=10)
+@given(blowout_volume=strategies.floats(min_value=0, max_value=300))
+@settings(
+    suppress_health_check=[
+        HealthCheck.function_scoped_fixture,
+        HealthCheck.filter_too_much,
+    ],
+    max_examples=20,
+)
 async def test_blow_out_error(
     ot3_hardware: ThreadManager[OT3API],
     load_configs: List[Dict[str, Any]],
@@ -503,17 +538,18 @@ async def test_blow_out_error(
         (OT3Mount.RIGHT, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_R]),
         (OT3Mount.LEFT, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_L]),
         (OT3Mount.GRIPPER, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G]),
+        (Mount.EXTENSION, [OT3Axis.X, OT3Axis.Y, OT3Axis.Z_G]),
     ],
 )
 async def test_move_to_without_homing_first(
     ot3_hardware: ThreadManager[OT3API],
     mock_home: AsyncMock,
-    mount: OT3Mount,
+    mount: Union[Mount, OT3Mount],
     homed_axis: List[OT3Axis],
 ) -> None:
     """Before a mount can be moved, XY and the corresponding Z  must be homed first"""
     await ot3_hardware.cache_instruments()
-    if mount == OT3Mount.GRIPPER:
+    if mount in (OT3Mount.GRIPPER, Mount.EXTENSION):
         # attach a gripper if we're testing the gripper mount
         gripper_config = gc.load(GripperModel.v1)
         instr_data = AttachedGripper(config=gripper_config, id="test")
@@ -1016,23 +1052,175 @@ async def test_gripper_move_to(
         ]
 
 
-@pytest.mark.parametrize("enable_stalls", [True, False])
-async def test_move_stall_flag(
+async def test_home_plunger(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move_to_plunger_bottom: AsyncMock,
+    mock_home: AsyncMock,
+):
+    mount = OT3Mount.LEFT
+    instr_data = OT3AttachedPipette(
+        config=load_pipette_data.load_definition(
+            PipetteModelType("p1000"), PipetteChannelType(1), PipetteVersionType(3, 4)
+        ),
+        id="fakepip",
+    )
+    await ot3_hardware.cache_pipette(mount, instr_data, None)
+    assert ot3_hardware.hardware_pipettes[mount.to_mount()]
+
+    await ot3_hardware.home_plunger(mount)
+    mock_home.assert_called_once()
+    mock_move_to_plunger_bottom.assert_called_once_with(mount, 1.0, False)
+
+
+async def test_prepare_for_aspirate(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move_to_plunger_bottom: AsyncMock,
+):
+    mount = OT3Mount.LEFT
+    instr_data = OT3AttachedPipette(
+        config=load_pipette_data.load_definition(
+            PipetteModelType("p1000"),
+            PipetteChannelType(1),
+            PipetteVersionType(3, 4),
+        ),
+        id="fakepip",
+    )
+    await ot3_hardware.cache_pipette(mount, instr_data, None)
+    assert ot3_hardware.hardware_pipettes[mount.to_mount()]
+
+    await ot3_hardware.add_tip(mount, 100)
+    await ot3_hardware.prepare_for_aspirate(OT3Mount.LEFT)
+    mock_move_to_plunger_bottom.assert_called_once_with(OT3Mount.LEFT, 1.0)
+
+
+async def test_move_to_plunger_bottom(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move: AsyncMock,
+):
+    mount = OT3Mount.LEFT
+    instr_data = OT3AttachedPipette(
+        config=load_pipette_data.load_definition(
+            PipetteModelType("p1000"), PipetteChannelType(1), PipetteVersionType(3, 4)
+        ),
+        id="fakepip",
+    )
+    await ot3_hardware.cache_pipette(mount, instr_data, None)
+    pipette = ot3_hardware.hardware_pipettes[mount.to_mount()]
+    assert pipette
+
+    max_speeds = ot3_hardware.config.motion_settings.default_max_speed
+    target_pos = target_position_from_plunger(
+        OT3Mount.from_mount(mount),
+        pipette.plunger_positions.bottom,
+        ot3_hardware._current_position,
+    )
+
+    # plunger will move at different speeds, depending on if:
+    #  - no tip attached (max speed)
+    #  - tip attached and moving down (blowout speed)
+    #  - tip attached and moving up (aspirate speed)
+    expected_speed_no_tip = max_speeds[ot3_hardware.gantry_load][OT3AxisKind.P]
+    expected_speed_moving_down = ot3_hardware._pipette_handler.plunger_speed(
+        pipette, pipette.blow_out_flow_rate, "dispense"
+    )
+    expected_speed_moving_up = ot3_hardware._pipette_handler.plunger_speed(
+        pipette, pipette.aspirate_flow_rate, "aspirate"
+    )
+
+    # no tip attached
+    await ot3_hardware.home()
+    mock_move.reset_mock()
+    await ot3_hardware.home_plunger(mount)
+    mock_move.assert_called_once_with(
+        target_pos, speed=expected_speed_no_tip, acquire_lock=False
+    )
+
+    # tip attached, moving DOWN towards "bottom" position
+    await ot3_hardware.home()
+    await ot3_hardware.add_tip(mount, 100)
+    mock_move.reset_mock()
+    await ot3_hardware.prepare_for_aspirate(mount)
+    # make sure when plunger is going down that only one move is called,
+    # and there's no backlash move queued
+    mock_move.assert_called_once_with(
+        target_pos, speed=expected_speed_moving_down, acquire_lock=True
+    )
+
+    # tip attached, moving UP towards "bottom" position
+    # NOTE: _move() is mocked, so we need to update the OT3API's
+    #       cached coordinates in the test
+    pip_ax = OT3Axis.of_main_tool_actuator(mount)
+    ot3_hardware._current_position[pip_ax] = target_pos[pip_ax] + 1
+    mock_move.reset_mock()
+    await ot3_hardware.prepare_for_aspirate(mount)
+    # make sure we've done the backlash compensation
+    backlash_pos = target_pos.copy()
+    backlash_pos[pip_ax] -= pipette.backlash_distance
+    mock_move.assert_any_call(
+        backlash_pos, speed=expected_speed_moving_up, acquire_lock=True
+    )
+    # make sure the final move is to our target position
+    mock_move.assert_called_with(
+        target_pos, speed=expected_speed_moving_up, acquire_lock=True
+    )
+
+
+@pytest.mark.parametrize(
+    "input_position, expected_move_pos",
+    [
+        ({OT3Axis.X: 13}, {OT3Axis.X: 13, OT3Axis.Y: 493.8, OT3Axis.Z_L: 253.475}),
+        (
+            {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: 15},
+            {OT3Axis.X: 13, OT3Axis.Y: 14, OT3Axis.Z_R: -240.675},
+        ),
+        (
+            {OT3Axis.Z_R: 15, OT3Axis.Z_L: 16},
+            {
+                OT3Axis.X: 477.2,
+                OT3Axis.Y: 493.8,
+                OT3Axis.Z_L: -239.675,
+                OT3Axis.Z_R: -240.675,
+            },
+        ),
+    ],
+)
+async def test_move_axes(
+    ot3_hardware: ThreadManager[OT3API],
+    mock_move: AsyncMock,
+    mock_check_motor: Mock,
+    input_position: Dict[OT3Axis, float],
+    expected_move_pos: OrderedDict[OT3Axis, float],
+):
+
+    await ot3_hardware.move_axes(position=input_position)
+    mock_check_motor.return_value = True
+
+    mock_move.assert_called_once_with(target_position=expected_move_pos, speed=None)
+
+
+async def test_move_gripper_mount_without_gripper_attached(
+    ot3_hardware: ThreadManager[OT3API], mock_backend_move: AsyncMock
+) -> None:
+    """It should move the empty gripper mount to specified position."""
+
+
+@pytest.mark.parametrize("expect_stalls", [True, False])
+async def test_move_expect_stall_flag(
     ot3_hardware: ThreadManager[OT3API],
     mock_backend_move: AsyncMock,
-    enable_stalls: bool,
+    expect_stalls: bool,
 ) -> None:
 
-    expected = MoveStopCondition.stall if enable_stalls else MoveStopCondition.none
+    expected = MoveStopCondition.stall if expect_stalls else MoveStopCondition.none
 
-    await ot3_hardware.move_to(Mount.LEFT, Point(0, 0, 0), _check_stalls=enable_stalls)
+    await ot3_hardware.move_to(Mount.LEFT, Point(0, 0, 0), _expect_stalls=expect_stalls)
     mock_backend_move.assert_called_once()
     _, _, condition = mock_backend_move.call_args_list[0][0]
     assert condition == expected
 
     mock_backend_move.reset_mock()
     await ot3_hardware.move_rel(
-        Mount.LEFT, Point(10, 0, 0), _check_stalls=enable_stalls
+        Mount.LEFT, Point(10, 0, 0), _expect_stalls=expect_stalls
     )
     mock_backend_move.assert_called_once()
     _, _, condition = mock_backend_move.call_args_list[0][0]
@@ -1342,19 +1530,14 @@ async def test_home_axis(
 
         await ot3_hardware._home_axis(axis)
 
-        # FIXME: uncomment the following when stall detection
-        # is fully re-enable
-        # if stepper_ok:
-        #     """Move to home position"""
-        #     # move is called
-        #     mock_backend_move.assert_awaited_once()
-        #     move = mock_backend_move.call_args_list[0][0][1][0]
-        #     assert move.distance == 100.0
-        #     # home is NOT called
-        #     mock_backend_home.assert_not_awaited()
-        if encoder_ok:
-            """Copy encoder position to stepper pos"""
+        if not stepper_ok and encoder_ok:
+            # position estimation updated!
             mock_estimate.assert_awaited_once()
+            mock_check_motor.return_value = encoder_ok
+            mock_check_encoder.return_value = encoder_ok
+
+        if stepper_ok and encoder_ok:
+            """Copy encoder position to stepper pos"""
             # for accurate axis, we just move to home pos:
             if axis in [OT3Axis.Z_L, OT3Axis.P_L]:
                 # move is called
@@ -1407,21 +1590,21 @@ async def test_light_settings(
     "versions,version_str",
     [
         ({}, "unknown"),
-        ({OT3SubSystem.pipette_right: 2}, "2"),
+        ({SubSystem.pipette_right: 2}, "2"),
         (
             {
-                OT3SubSystem.pipette_left: 2,
-                OT3SubSystem.gantry_x: 2,
-                OT3SubSystem.gantry_y: 2,
+                SubSystem.pipette_left: 2,
+                SubSystem.gantry_x: 2,
+                SubSystem.gantry_y: 2,
             },
             "2",
         ),
-        ({OT3SubSystem.gripper: 3, OT3SubSystem.head: 1}, "1, 3"),
+        ({SubSystem.gripper: 3, SubSystem.head: 1}, "1, 3"),
     ],
 )
 def test_fw_version(
     ot3_hardware: ThreadManager[OT3API],
-    versions: Dict[OT3SubSystem, int],
+    versions: Dict[SubSystem, int],
     version_str: str,
 ) -> None:
     with patch(
@@ -1430,3 +1613,53 @@ def test_fw_version(
     ) as mock_fw_version:
         mock_fw_version.return_value = versions
         assert ot3_hardware.get_fw_version() == version_str
+
+
+@pytest.mark.parametrize(argnames=["enabled"], argvalues=[[True], [False]])
+async def test_status_bar_interface(
+    ot3_hardware: ThreadManager[OT3API],
+    enabled: bool,
+) -> None:
+    """Test setting status bar statuses and make sure the cached status is correct."""
+    await ot3_hardware.set_status_bar_enabled(enabled)
+
+    settings = {
+        StatusBarState.IDLE: StatusBarState.IDLE,
+        StatusBarState.RUNNING: StatusBarState.RUNNING,
+        StatusBarState.PAUSED: StatusBarState.PAUSED,
+        StatusBarState.HARDWARE_ERROR: StatusBarState.HARDWARE_ERROR,
+        StatusBarState.SOFTWARE_ERROR: StatusBarState.SOFTWARE_ERROR,
+        StatusBarState.CONFIRMATION: StatusBarState.IDLE,
+        StatusBarState.RUN_COMPLETED: StatusBarState.RUN_COMPLETED,
+        StatusBarState.UPDATING: StatusBarState.UPDATING,
+        StatusBarState.ACTIVATION: StatusBarState.IDLE,
+        StatusBarState.DISCO: StatusBarState.IDLE,
+        StatusBarState.OFF: StatusBarState.OFF,
+    }
+
+    for setting, response in settings.items():
+        await ot3_hardware.set_status_bar_state(state=setting)
+        assert ot3_hardware.get_status_bar_state() == response
+
+
+async def test_tip_presence_disabled_ninety_six_channel(
+    ot3_hardware: ThreadManager[OT3API],
+) -> None:
+    """Test 96 channel tip presence is disabled."""
+    # TODO remove this check once we enable tip presence for 96 chan.
+    with patch.object(
+        ot3_hardware.managed_obj._backend,
+        "get_tip_present",
+        AsyncMock(spec=ot3_hardware.managed_obj._backend.get_tip_present),
+    ) as tip_present:
+        pipette_config = load_pipette_data.load_definition(
+            PipetteModelType("p1000"),
+            PipetteChannelType(96),
+            PipetteVersionType(3, 3),
+        )
+        instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
+        await ot3_hardware.cache_pipette(OT3Mount.LEFT, instr_data, None)
+        await ot3_hardware._configure_instruments()
+        await ot3_hardware.pick_up_tip(OT3Mount.LEFT, 60)
+
+        tip_present.assert_not_called()

@@ -448,8 +448,9 @@ def create_geometry(
     else:
         par = str(parent.labware.object)
 
-    # this needs to change to look up the current deck type if/when we add
-    # that notion
+    # This ModuleGeometry class is only used in Python Protocol API versions <=2.13,
+    # which only support the OT-2, so we can ignore OT-3s and hard-code "ot2_standard."
+    # We also assume that "ot2_short_trash" has the same transforms as "ot2_standard."
     xforms_ser = (
         definition["slotTransforms"]
         .get("ot2_standard", {})

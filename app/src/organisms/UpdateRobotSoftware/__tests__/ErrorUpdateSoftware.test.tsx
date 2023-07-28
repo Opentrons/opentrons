@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 import { startBuildrootUpdate } from '../../../redux/buildroot'
@@ -32,24 +31,22 @@ describe('ErrorUpdateSoftware', () => {
   })
 
   it('should render text and buttons', () => {
-    const [{ getByText, getByRole }] = render(props)
+    const [{ getByText }] = render(props)
     getByText('Software update error')
     getByText('mock error message')
-    getByRole('button', { name: 'Proceed without updating' })
-    getByRole('button', { name: 'Try again' })
+    getByText('Proceed without updating')
+    getByText('Try again')
   })
 
   it('call mockPush when tapping Proceed without updating', () => {
-    const [{ getByRole }] = render(props)
-    const button = getByRole('button', { name: 'Proceed without updating' })
-    fireEvent.click(button)
+    const [{ getByText }] = render(props)
+    getByText('Proceed without updating').click()
     expect(mockPush).toBeCalledWith('/robot-settings/rename-robot')
   })
 
   it('call mock function when tapping Try again', () => {
-    const [{ getByRole }, store] = render(props)
-    const button = getByRole('button', { name: 'Try again' })
-    fireEvent.click(button)
+    const [{ getByText }, store] = render(props)
+    getByText('Try again').click()
     expect(store.dispatch).toHaveBeenCalledWith(
       startBuildrootUpdate(props.robotName)
     )

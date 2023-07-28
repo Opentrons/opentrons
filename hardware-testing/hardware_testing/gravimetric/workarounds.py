@@ -1,4 +1,5 @@
 """Opentrons API Workarounds."""
+from atexit import register as atexit_register
 from datetime import datetime
 from urllib.request import Request, urlopen
 from typing import List
@@ -43,10 +44,29 @@ def http_get_all_labware_offsets() -> List[dict]:
     runs_response = urlopen(req)
     runs_response_data = runs_response.read()
     stop_server_ot3()
+    atexit_register(start_server_ot3)
 
     runs_json = json_loads(runs_response_data)
     protocols_list = runs_json["data"]
     return [offset for p in protocols_list for offset in p["labwareOffsets"]]
+
+
+def _old_slot_to_ot3_slot(old_api_slot: str) -> str:
+    conversion_dict = {
+        "1": "D1",
+        "2": "D2",
+        "3": "D3",
+        "4": "C1",
+        "5": "C2",
+        "6": "C3",
+        "7": "B1",
+        "8": "B2",
+        "9": "B3",
+        "10": "A1",
+        "11": "A2",
+        "12": "A3",
+    }
+    return conversion_dict[old_api_slot]
 
 
 def get_latest_offset_for_labware(
@@ -54,7 +74,7 @@ def get_latest_offset_for_labware(
 ) -> Point:
     """Get latest offset for labware."""
     lw_uri = str(labware.uri)
-    lw_slot = str(labware.parent)
+    lw_slot = _old_slot_to_ot3_slot(str(labware.parent))
 
     def _is_offset_present(_o: dict) -> bool:
         _v = _o["vector"]

@@ -253,6 +253,11 @@ class PipettePhysicalPropertiesDefinition(BaseModel):
         description="The conversion rate between uL dispensed and mm of motor movement.",
         alias="shaftULperMM",
     )
+    backlash_distance: float = Field(
+        ...,
+        description="The distance of backlash on the plunger motor.",
+        alias="backlashDistance",
+    )
 
     @validator("pipette_type", pre=True)
     def convert_pipette_model_string(cls, v: str) -> PipetteModelType:

@@ -19,6 +19,7 @@ from opentrons.protocol_engine.resources import (
     pipette_data_provider,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.errors import ErrorCodes, EnumeratedError, PythonException
 from opentrons.protocol_api.core.legacy.deck import FIXED_TRASH_ID
 
 from .legacy_wrappers import (
@@ -44,6 +45,22 @@ class LegacyCommandParams(pe_commands.CustomParams):
 
 class LegacyContextCommandError(ProtocolEngineError):
     """An error returned when a PAPIv2 ProtocolContext command fails."""
+
+    def __init__(self, wrapping_exc: BaseException) -> None:
+
+        if isinstance(wrapping_exc, EnumeratedError):
+            super().__init__(
+                wrapping_exc.code,
+                wrapping_exc.message,
+                wrapping_exc.detail,
+                wrapping_exc.wrapping,
+            )
+        else:
+            super().__init__(
+                code=ErrorCodes.GENERAL_ERROR,
+                message=str(wrapping_exc),
+                wrapping=[PythonException(wrapping_exc)],
+            )
 
 
 _LEGACY_TO_PE_MODULE: Dict[LegacyModuleModel, pe_types.ModuleModel] = {
@@ -224,7 +241,7 @@ class LegacyCommandMapper:
                         command_id=running_command.id,
                         error_id=ModelUtils.generate_id(),
                         failed_at=now,
-                        error=LegacyContextCommandError(str(command_error)),
+                        error=LegacyContextCommandError(command_error),
                     )
                 )
 

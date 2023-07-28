@@ -2,13 +2,12 @@ test_name: Make sure multiple commands can be queued and played on a basic run
 
 marks:
   - usefixtures:
-      - run_server
-      - clean_server_state
+      - ot2_server_base_url
 
 stages:
   - name: Create empty run
     request:
-      url: '{host:s}:{port:d}/runs'
+      url: '{ot2_server_base_url}/runs'
       json:
         data: {}
       method: POST
@@ -27,7 +26,7 @@ stages:
 
   - name: Create protocol commands
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       method: POST
       json:
         data:
@@ -40,7 +39,7 @@ stages:
 
   - name: Create protocol commands
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       method: POST
       json:
         data:
@@ -53,7 +52,7 @@ stages:
 
   - name: Create protocol commands
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       method: POST
       json:
         data:
@@ -66,7 +65,7 @@ stages:
 
   - name: Create protocol commands
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       method: POST
       json:
         data:
@@ -79,7 +78,7 @@ stages:
 
   - name: Get run
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}'
+      url: '{ot2_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -104,7 +103,7 @@ stages:
 
   - name: Play the run
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/actions'
+      url: '{ot2_server_base_url}/runs/{run_id}/actions'
       method: POST
       json:
         data:
@@ -127,7 +126,7 @@ stages:
     max_retries: 10
     delay_after: 0.1
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}'
+      url: '{ot2_server_base_url}/runs/{run_id}'
       method: GET
     response:
       status_code: 200
@@ -139,7 +138,7 @@ stages:
 
   - name: Verify commands succeeded with the expected results
     request:
-      url: '{host:s}:{port:d}/runs/{run_id}/commands'
+      url: '{ot2_server_base_url}/runs/{run_id}/commands'
       method: GET
     response:
       status_code: 200

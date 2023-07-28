@@ -68,12 +68,12 @@ export function UpdateRobotSoftware({
       <Box width="70%">
         <StyledText
           css={TYPOGRAPHY.pSemiBold}
-          marginBottom={SPACING.spacing3}
+          marginBottom={SPACING.spacing8}
           id="AdvancedSettings_updateRobotSoftware"
         >
           {t('update_robot_software')}
         </StyledText>
-        <StyledText as="p" marginBottom={SPACING.spacing3}>
+        <StyledText as="p" marginBottom={SPACING.spacing8}>
           {t('update_robot_software_description')}
         </StyledText>
         <ExternalLink href={OT_APP_UPDATE_PAGE_LINK}>

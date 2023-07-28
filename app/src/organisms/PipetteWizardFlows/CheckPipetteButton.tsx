@@ -7,8 +7,8 @@ interface CheckPipetteButtonProps {
   proceedButtonText: string
   setFetching: React.Dispatch<React.SetStateAction<boolean>>
   isFetching: boolean
-  proceed: () => void
   isOnDevice: boolean | null
+  proceed?: () => void
 }
 export const CheckPipetteButton = (
   props: CheckPipetteButtonProps
@@ -36,7 +36,7 @@ export const CheckPipetteButton = (
         setFetching(true)
         refetch()
           .then(() => {
-            proceed()
+            proceed?.()
           })
           .catch(() => {})
       }}
@@ -47,7 +47,7 @@ export const CheckPipetteButton = (
       onClick={() => {
         refetch()
           .then(() => {
-            proceed()
+            proceed?.()
           })
           .catch(() => {})
       }}

@@ -36,7 +36,7 @@ const body = (
 const rightHandBody = (
   <Flex flexDirection={DIRECTION_COLUMN}>
     <StyledText as="h1">{'You will need:'}</StyledText>
-    <StyledText as="p" marginTop={SPACING.spacing4}>
+    <StyledText as="p" marginTop={SPACING.spacing16}>
       {'this'}
     </StyledText>
     <StyledText as="p">{'and this'}</StyledText>
@@ -48,7 +48,7 @@ const skeleton = (
 )
 
 const skeletons = (
-  <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+  <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
     {skeleton}
     {skeleton}
     {skeleton}

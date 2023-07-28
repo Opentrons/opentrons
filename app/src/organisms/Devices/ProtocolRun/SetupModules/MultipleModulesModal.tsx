@@ -12,7 +12,7 @@ import {
   DIRECTION_ROW,
 } from '@opentrons/components'
 import { Portal } from '../../../../App/portal'
-import { Modal } from '../../../../molecules/Modal'
+import { LegacyModal } from '../../../../molecules/LegacyModal'
 import multipleModuleHelp from '../../../../assets/images/Moam_modal_image.png'
 import { StyledText } from '../../../../atoms/text'
 
@@ -29,7 +29,7 @@ export const MultipleModulesModal = (
   const { t } = useTranslation(['protocol_setup', 'shared'])
   return (
     <Portal level="top">
-      <Modal
+      <LegacyModal
         title={t('multiple_modules_modal')}
         onClose={props.onCloseClick}
         width="44.75rem"
@@ -37,7 +37,7 @@ export const MultipleModulesModal = (
         <Flex flexDirection={DIRECTION_COLUMN}>
           <Flex flexDirection={DIRECTION_ROW}>
             <Flex flexDirection={DIRECTION_COLUMN} marginRight="3.625rem">
-              <StyledText as="p" marginBottom={SPACING.spacing4}>
+              <StyledText as="p" marginBottom={SPACING.spacing16}>
                 {t('multiple_modules_explanation')}
               </StyledText>
               <Link
@@ -46,18 +46,18 @@ export const MultipleModulesModal = (
                 href={HOW_TO_MULTIPLE_MODULES_HREF}
                 target="_blank"
                 rel="noopener noreferrer"
-                marginBottom={SPACING.spacing4}
+                marginBottom={SPACING.spacing16}
               >
                 {t('multiple_modules_learn_more')}
                 <Icon
                   name="open-in-new"
-                  marginLeft={SPACING.spacing2}
+                  marginLeft={SPACING.spacing4}
                   size="0.625rem"
                 />
               </Link>
               <StyledText
                 css={TYPOGRAPHY.pSemiBold}
-                marginBottom={SPACING.spacing2}
+                marginBottom={SPACING.spacing4}
               >
                 {t('example')}
               </StyledText>
@@ -68,7 +68,7 @@ export const MultipleModulesModal = (
               height="100%"
               width="288px"
               src={multipleModuleHelp}
-              style={{ marginBottom: SPACING.spacing4 }}
+              style={{ marginBottom: SPACING.spacing16 }}
             />
           </Flex>
           <PrimaryButton
@@ -79,7 +79,7 @@ export const MultipleModulesModal = (
             {t('shared:close')}
           </PrimaryButton>
         </Flex>
-      </Modal>
+      </LegacyModal>
     </Portal>
   )
 }

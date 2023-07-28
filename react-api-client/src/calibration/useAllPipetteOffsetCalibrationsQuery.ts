@@ -17,7 +17,8 @@ export function useAllPipetteOffsetCalibrationsQuery(
   hostOverride?: HostConfig | null
 ): UseQueryResult<AllPipetteOffsetCalibrations> {
   const contextHost = useHost()
-  const host = hostOverride ?? contextHost
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const query = useQuery(
     [host as HostConfig, 'calibration', 'pipette_offset'],
     () =>

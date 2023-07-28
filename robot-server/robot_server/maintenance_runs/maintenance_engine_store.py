@@ -8,10 +8,11 @@ from opentrons.config import feature_flags
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_runner import LiveRunner, RunResult
 from opentrons.protocol_engine import (
-    ProtocolEngine,
     Config as ProtocolEngineConfig,
-    StateSummary,
+    DeckType,
     LabwareOffsetCreate,
+    ProtocolEngine,
+    StateSummary,
     create_protocol_engine,
 )
 
@@ -40,6 +41,7 @@ class MaintenanceEngineStore:
         self,
         hardware_api: HardwareControlAPI,
         robot_type: RobotType,
+        deck_type: DeckType,
     ) -> None:
         """Initialize an engine storage interface.
 
@@ -47,9 +49,11 @@ class MaintenanceEngineStore:
             hardware_api: Hardware control API instance used for ProtocolEngine
                 construction.
             robot_type: Passed along to `opentrons.protocol_engine.Config`.
+            deck_type: Passed along to `opentrons.protocol_engine.Config`.
         """
         self._hardware_api = hardware_api
         self._robot_type = robot_type
+        self._deck_type = deck_type
         self._runner_engine_pair: Optional[RunnerEnginePair] = None
 
     @property
@@ -104,6 +108,7 @@ class MaintenanceEngineStore:
             hardware_api=self._hardware_api,
             config=ProtocolEngineConfig(
                 robot_type=self._robot_type,
+                deck_type=self._deck_type,
                 block_on_door_open=feature_flags.enable_door_safety_switch(),
             ),
         )

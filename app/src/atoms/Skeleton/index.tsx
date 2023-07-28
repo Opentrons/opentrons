@@ -7,11 +7,12 @@ interface SkeletonProps {
   height: string
   //  backgroundSize is the total width to add to every Skeleton in the component which controls the animation speed
   backgroundSize: string
+  borderRadius?: string
 }
 export const Skeleton = (props: SkeletonProps): JSX.Element => {
-  const { width, height, backgroundSize } = props
+  const { width, height, backgroundSize, borderRadius } = props
   const SKELETON_STYLE = css`
-    border-radius: ${BORDERS.radiusSoftCorners};
+    border-radius: ${borderRadius ?? BORDERS.radiusSoftCorners};
     animation: shimmer 2s infinite linear;
     background: linear-gradient(
       to right,

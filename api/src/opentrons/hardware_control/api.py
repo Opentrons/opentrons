@@ -16,6 +16,7 @@ from typing import (
     Set,
     Any,
     TypeVar,
+    Mapping,
 )
 
 from opentrons_shared_data.pipette import name_config
@@ -48,13 +49,14 @@ from .types import (
 )
 from .errors import (
     MustHomeError,
+    NotSupportedByHardware,
 )
 from . import modules
 from .robot_calibration import (
     RobotCalibrationProvider,
     RobotCalibration,
 )
-from .protocols import HardwareControlAPI
+from .protocols import HardwareControlInterface
 from .instruments.ot2.pipette_handler import PipetteHandlerProvider
 from .instruments.ot2.instrument_calibration import load_pipette_offset
 from .motion_utilities import (
@@ -78,7 +80,7 @@ class API(
     # of methods that are present in the protocol will call the (empty,
     # do-nothing) methods in the protocol. This will happily make all the
     # tests fail.
-    HardwareControlAPI,
+    HardwareControlInterface[RobotCalibration, Axis],
 ):
     """This API is the primary interface to the hardware controller.
 
@@ -346,9 +348,17 @@ class API(
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         await self.set_lights(button=True)
 
-    async def set_status_bar_state(self, _: StatusBarState) -> None:
+    async def set_status_bar_state(self, state: StatusBarState) -> None:
         """The status bar does not exist on OT-2!"""
         return None
+
+    async def set_status_bar_enabled(self, enabled: bool) -> None:
+        """The status bar does not exist on OT-2!"""
+        return None
+
+    def get_status_bar_state(self) -> StatusBarState:
+        """There is no status bar on OT-2, return IDLE at all times."""
+        return StatusBarState.IDLE
 
     @ExecutionManagerProvider.wait_for_running
     async def delay(self, duration_s: float) -> None:
@@ -571,9 +581,17 @@ class API(
     @ExecutionManagerProvider.wait_for_running
     async def home(self, axes: Optional[List[Axis]] = None) -> None:
         """Home the entire robot and initialize current position."""
+        # Should we assert/ raise an error or just remove non-ot2 axes and log warning?
+        # No internal code passes OT3 axes as arguments on an OT2. But a user/ client
+        # can still explicitly specify an OT3 axis even when working on an OT2.
+        # Adding this check in order to prevent misuse of axes types.
+        if axes and any(axis not in Axis.ot2_axes() for axis in axes):
+            raise NotSupportedByHardware(
+                f"At least one axis in {axes} is not supported on the OT2."
+            )
         self._reset_last_mount()
         # Initialize/update current_position
-        checked_axes = axes or [ax for ax in Axis]
+        checked_axes = axes or [ax for ax in Axis.ot2_axes()]
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
         smoothie_gantry = [ax.name.upper() for ax in gantry]
         smoothie_pos = {}
@@ -683,6 +701,18 @@ class API(
 
         await self._cache_and_maybe_retract_mount(mount)
         await self._move(target_position, speed=speed, max_speeds=max_speeds)
+
+    async def move_axes(
+        self,
+        position: Mapping[Axis, float],
+        speed: Optional[float] = None,
+        max_speeds: Optional[Dict[Axis, float]] = None,
+    ) -> None:
+        """Moves the effectors of the specified axis to the specified position.
+        The effector of the x,y axis is the center of the carriage.
+        The effector of the pipette mount axis are the mount critical points but only in z.
+        """
+        raise NotSupportedByHardware("move_axes is not supported on the OT-2.")
 
     async def move_rel(
         self,
@@ -969,20 +999,11 @@ class API(
         Force any remaining liquid to dispense. The liquid will be dispensed at
         the current location of pipette
         """
-        blowout_spec = self.plan_check_blow_out(mount, volume)
-
-        instrument = self.get_pipette(mount)
-        max_blowout_pos = instrument.config.blow_out
-        # start at the bottom position and move additional distance det. by plan_check_blow_out
-        blowout_distance = instrument.config.bottom - blowout_spec.plunger_distance
-
-        if blowout_distance < max_blowout_pos:
-            raise ValueError("Blow out distance exceeds plunger position limit")
-
+        blowout_spec = self.plan_check_blow_out(mount)
         self._backend.set_active_current({blowout_spec.axis: blowout_spec.current})
         target_pos = target_position_from_plunger(
             mount,
-            blowout_distance,
+            blowout_spec.plunger_distance,
             self._current_position,
         )
 

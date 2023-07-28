@@ -2,6 +2,7 @@
 import threading
 import logging
 import asyncio
+import inspect
 import functools
 import weakref
 from typing import (
@@ -14,6 +15,9 @@ from typing import (
     cast,
     Sequence,
     Mapping,
+    AsyncGenerator,
+    Union,
+    Type,
 )
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
@@ -29,7 +33,11 @@ class ThreadManagerException(Exception):
 
 
 WrappedReturn = TypeVar("WrappedReturn", contravariant=True)
+WrappedYield = TypeVar("WrappedYield", contravariant=True)
 WrappedCoro = TypeVar("WrappedCoro", bound=Callable[..., Awaitable[WrappedReturn]])
+WrappedAGenFunc = TypeVar(
+    "WrappedAGenFunc", bound=Callable[..., AsyncGenerator[WrappedYield, None]]
+)
 
 
 async def call_coroutine_threadsafe(
@@ -44,6 +52,71 @@ async def call_coroutine_threadsafe(
     )
     wrapped = asyncio.wrap_future(fut)
     return await wrapped
+
+
+async def execute_asyncgen_threadsafe(
+    loop: asyncio.AbstractEventLoop,
+    agenfunc: WrappedAGenFunc,
+    *args: Sequence[Any],
+    **kwargs: Mapping[str, Any],
+) -> AsyncGenerator[WrappedYield, None]:
+
+    # This function should bridge an async generator function between two asyncio
+    # loops running in different threads. There are several stages to this because
+    # there are several stages to generator execution.
+
+    # These clues will help us later
+    class _DoneSingleton:
+        pass
+
+    async def _build_queue() -> "asyncio.Queue[Union[WrappedYield, _DoneSingleton]]":
+        return asyncio.Queue(maxsize=1)
+
+    yield_queue = await asyncio.wrap_future(
+        cast(
+            "asyncio.Future[asyncio.Queue[Union[WrappedYield, _DoneSingleton]]]",
+            asyncio.run_coroutine_threadsafe(_build_queue(), loop),
+        )
+    )
+
+    # the async generator function needs to run on the target loop. it is not a coroutine
+    # and cannot be run with run_coroutine_threadsafe in the same way. however, we can
+    # make a coroutine that _can_, and that exhausts the async generator and puts what
+    # the generator yields into a queue. since something later will have to combine
+    # awaiting yield results and the function finishing, we can now use the _DoneSingleton
+    # to short circuit the caller waiting for a yield result when the function is done.
+    # in addition, the queue being 1 element max should give us similar "backpressure"
+    # behavior as an async for.
+    async def _inner_agen_wrap() -> None:
+        item: WrappedYield
+        try:
+            async for item in agenfunc(*args, **kwargs):
+                await yield_queue.put(item)
+        finally:
+            await yield_queue.put(_DoneSingleton())
+
+    # as promised, we can run our coroutine pretty easily now. note that this coroutine
+    # returns None, because it is handling the generator yields internally.
+    fut = cast(
+        "asyncio.Future[None]",
+        asyncio.run_coroutine_threadsafe(_inner_agen_wrap(), loop),
+    )
+
+    # now we have to bridge the output of the generator to the calling loop. this is
+    # fun because this uses an asyncio queue which isn't thread safe. so we also need
+    # to pull stuff out of the asyncio queue via the other loop
+    while not fut.done():
+        getter = cast(
+            "asyncio.Future[Union[WrappedYield, _DoneSingleton]]",
+            asyncio.run_coroutine_threadsafe(yield_queue.get(), loop),
+        )
+        asyncio_getter = asyncio.wrap_future(getter)
+        item = await asyncio_getter
+        if isinstance(item, _DoneSingleton):
+            break
+        yield item
+    # if there was an exception then this should re-raise it in the calling loop
+    _ = fut.result()
 
 
 WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable, covariant=True)
@@ -84,6 +157,22 @@ class CallBridger(Generic[WrappedObj]):
             fut = asyncio.run_coroutine_threadsafe(attr, loop)
             wrapped = asyncio.wrap_future(fut)
             return wrapped
+
+        elif inspect.isasyncgenfunction(attr):
+            # Return a wrapper that will exectue the resulting async generator
+            # in managed thread loop
+
+            @functools.wraps(attr)
+            async def wrapper(
+                *args: Sequence[Any], **kwargs: Mapping[str, Any]
+            ) -> AsyncGenerator[WrappedYield, None]:
+                item: WrappedYield
+                async for item in execute_asyncgen_threadsafe(
+                    loop, attr, *args, **kwargs
+                ):
+                    yield item
+
+            return wrapper
 
         return attr
 
@@ -298,3 +387,7 @@ class ThreadManager(Generic[WrappedObj]):
         or less work out through the rest of the system. Not perfect, but ok.
         """
         return cast(WrappedObj, self)
+
+    def wraps_instance(self, of_type: Type[Any]) -> bool:
+        """Do isinstance() on the wrapped object."""
+        return isinstance(object.__getattribute__(self, "managed_obj"), of_type)

@@ -17,6 +17,7 @@ import {
   ALIGN_CENTER,
   useConditionalConfirm,
   PrimaryButton,
+  BORDERS,
 } from '@opentrons/components'
 import { getIsHeaterShakerAttached } from '../../redux/config'
 import {
@@ -162,20 +163,20 @@ export const TestShakeSlideout = (
         </Portal>
       )}
       <Flex
-        borderRadius={SPACING.spacingS}
-        marginBottom={SPACING.spacing3}
+        borderRadius={BORDERS.radiusSoftCorners}
+        marginBottom={SPACING.spacing8}
         backgroundColor={COLORS.fundamentalsBackground}
-        paddingY={SPACING.spacing4}
-        paddingLeft={SPACING.spacing2}
-        paddingRight={SPACING.spacing4}
+        paddingY={SPACING.spacing16}
+        paddingLeft={SPACING.spacing4}
+        paddingRight={SPACING.spacing16}
         flexDirection={DIRECTION_ROW}
         data-testid="test_shake_slideout_banner_info"
       >
         <Flex color={COLORS.darkGreyEnabled}>
           <Icon
             name="information"
-            size={SPACING.spacing6}
-            paddingBottom={SPACING.spacing4}
+            size={SPACING.spacing32}
+            paddingBottom={SPACING.spacing16}
             aria-label="information"
           />
         </Flex>
@@ -188,17 +189,15 @@ export const TestShakeSlideout = (
       <Flex
         flexDirection={DIRECTION_COLUMN}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
-        padding={`${String(SPACING.spacing4)} ${String(
-          SPACING.spacingM
-        )} ${String(SPACING.spacingM)} ${String(SPACING.spacing4)}`}
+        padding={`${SPACING.spacing16} ${SPACING.spacing20} ${SPACING.spacing20} ${SPACING.spacing16}`}
         width="100%"
       >
         <Flex
           flexDirection={DIRECTION_ROW}
-          marginY={SPACING.spacingSM}
+          marginY={SPACING.spacing12}
           alignItems={ALIGN_CENTER}
         >
-          <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing3}>
+          <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing8}>
             <StyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
@@ -209,14 +208,14 @@ export const TestShakeSlideout = (
             <StyledText
               textTransform={TYPOGRAPHY.textTransformCapitalize}
               fontSize={TYPOGRAPHY.fontSizeLabel}
-              marginTop={SPACING.spacing3}
+              marginTop={SPACING.spacing8}
               data-testid="TestShake_Slideout_latch_status"
             >
               {getLatchStatus(module.data.labwareLatchStatus)}
             </StyledText>
           </Flex>
           <TertiaryButton
-            marginTop={SPACING.spacing2}
+            marginTop={SPACING.spacing4}
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             fontSize={TYPOGRAPHY.fontSizeCaption}
             marginLeft={SIZE_AUTO}
@@ -237,15 +236,15 @@ export const TestShakeSlideout = (
         <StyledText
           fontSize={TYPOGRAPHY.fontSizeLabel}
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
         >
           {t('shake_speed')}
         </StyledText>
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_FLEX_START}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            marginTop={SPACING.spacing3}
-            paddingRight={SPACING.spacing4}
+            marginTop={SPACING.spacing8}
+            paddingRight={SPACING.spacing16}
           >
             <InputField
               data-testid="TestShakeSlideout_shake_input"
@@ -269,7 +268,7 @@ export const TestShakeSlideout = (
           <TertiaryButton
             textTransform={TYPOGRAPHY.textTransformCapitalize}
             marginLeft={SIZE_AUTO}
-            marginTop={SPACING.spacing3}
+            marginTop={SPACING.spacing8}
             onClick={isShaking ? sendCommands : confirmAttachment}
             disabled={
               !isLatchClosed ||
@@ -295,7 +294,7 @@ export const TestShakeSlideout = (
       )}
       <Link
         role="button"
-        marginTop={SPACING.spacing2}
+        marginTop={SPACING.spacing4}
         css={TYPOGRAPHY.linkPSemiBold}
         id="HeaterShaker_Attachment_Instructions"
         onClick={() => setShowWizard(true)}

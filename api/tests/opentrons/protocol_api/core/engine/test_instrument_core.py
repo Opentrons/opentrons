@@ -277,6 +277,7 @@ def test_drop_tip_no_location(
                 offset=WellOffset(x=0, y=0, z=0),
             ),
             home_after=True,
+            alternateDropLocation=False,
         ),
         times=1,
     )
@@ -312,6 +313,7 @@ def test_drop_tip_with_location(
                 origin=DropTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
             home_after=True,
+            alternateDropLocation=False,
         ),
         times=1,
     )

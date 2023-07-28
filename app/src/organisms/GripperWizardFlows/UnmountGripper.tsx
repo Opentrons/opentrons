@@ -8,6 +8,7 @@ import {
   TYPOGRAPHY,
   PrimaryButton,
 } from '@opentrons/components'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { css } from 'styled-components'
 import { StyledText } from '../../atoms/text'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
@@ -16,37 +17,45 @@ import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
 import unmountGripper from '../../assets/videos/gripper-wizards/UNMOUNT_GRIPPER.webm'
 
 import type { GripperWizardStepProps } from './types'
-import { useInstrumentsQuery } from '@opentrons/react-api-client'
+import type { GripperData } from '@opentrons/api-client'
 
 export const UnmountGripper = (
   props: GripperWizardStepProps
 ): JSX.Element | null => {
-  const {
-    proceed,
-    attachedGripper,
-    isRobotMoving,
-    goBack,
-    chainRunCommands,
-  } = props
+  const { proceed, isRobotMoving, goBack, chainRunCommands } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
+
+  // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
+  const { data: instrumentsQueryData, refetch } = useInstrumentsQuery({
+    refetchInterval: 3000,
+  })
+  const isGripperStillAttached = (instrumentsQueryData?.data ?? []).some(
+    (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
+  )
+
   const [
     showGripperStillDetected,
     setShowGripperStillDetected,
   ] = React.useState(false)
   const handleContinue = (): void => {
-    if (attachedGripper == null) {
-      chainRunCommands(
-        [{ commandType: 'home' as const, params: {} }],
-        true
-      ).then(() => {
-        proceed()
+    refetch()
+      .then(() => {
+        if (!isGripperStillAttached) {
+          chainRunCommands([{ commandType: 'home' as const, params: {} }], true)
+            .then(() => {
+              proceed()
+            })
+            .catch(() => {
+              // TODO(BC, 2023-05-18): set fatal error here if home fails
+            })
+        } else {
+          setShowGripperStillDetected(true)
+        }
       })
-    } else {
-      setShowGripperStillDetected(true)
-    }
+      .catch(() => {
+        setShowGripperStillDetected(true)
+      })
   }
-  // TODO(bc, 2023-03-23): remove this temporary local poll in favor of the single top level poll in InstrumentsAndModules
-  useInstrumentsQuery({ refetchInterval: 3000 })
 
   if (isRobotMoving)
     return (
@@ -69,14 +78,7 @@ export const UnmountGripper = (
         >
           {t('shared:go_back')}
         </Link>
-        <PrimaryButton
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
-          onClick={() => {
-            handleContinue()
-          }}
-        >
-          {t('shared:try_again')}
-        </PrimaryButton>
+        <PrimaryButton onClick={handleContinue}>{t('try_again')}</PrimaryButton>
       </Flex>
     </SimpleWizardBody>
   ) : (

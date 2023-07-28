@@ -94,6 +94,14 @@ from .drop_tip import (
     DropTipCommandType,
 )
 
+from .drop_tip_in_place import (
+    DropTipInPlace,
+    DropTipInPlaceParams,
+    DropTipInPlaceCreate,
+    DropTipInPlaceResult,
+    DropTipInPlaceCommandType,
+)
+
 from .home import (
     Home,
     HomeParams,
@@ -108,6 +116,14 @@ from .load_labware import (
     LoadLabwareCreate,
     LoadLabwareResult,
     LoadLabwareCommandType,
+)
+
+from .load_adapter import (
+    LoadAdapter,
+    LoadAdapterParams,
+    LoadAdapterCreate,
+    LoadAdapterResult,
+    LoadAdapterCommandType,
 )
 
 from .load_liquid import (
@@ -231,6 +247,15 @@ from .blow_out_in_place import (
     BlowOutInPlace,
 )
 
+from .set_status_bar import (
+    SetStatusBar,
+    SetStatusBarParams,
+    SetStatusBarCreate,
+    SetStatusBarResult,
+    SetStatusBarImplementation,
+    SetStatusBarCommandType,
+)
+
 __all__ = [
     # command type unions
     "Command",
@@ -290,6 +315,12 @@ __all__ = [
     "DropTipParams",
     "DropTipResult",
     "DropTipCommandType",
+    # drop tip in place command models
+    "DropTipInPlace",
+    "DropTipInPlaceCreate",
+    "DropTipInPlaceParams",
+    "DropTipInPlaceResult",
+    "DropTipInPlaceCommandType",
     # home command models
     "Home",
     "HomeParams",
@@ -302,6 +333,12 @@ __all__ = [
     "LoadLabwareParams",
     "LoadLabwareResult",
     "LoadLabwareCommandType",
+    # load adapter command models
+    "LoadAdapter",
+    "LoadAdapterCreate",
+    "LoadAdapterParams",
+    "LoadAdapterResult",
+    "LoadAdapterCommandType",
     # load module command models
     "LoadModule",
     "LoadModuleCreate",
@@ -386,6 +423,13 @@ __all__ = [
     "BlowOutInPlaceCreate",
     "BlowOutInPlaceImplementation",
     "BlowOutInPlace",
+    # set status bar command models
+    "SetStatusBar",
+    "SetStatusBarParams",
+    "SetStatusBarCreate",
+    "SetStatusBarResult",
+    "SetStatusBarImplementation",
+    "SetStatusBarCommandType",
     # load liquid command models
     "LoadLiquid",
     "LoadLiquidCreate",

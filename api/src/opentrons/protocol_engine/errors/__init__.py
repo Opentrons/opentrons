@@ -13,6 +13,10 @@ from .exceptions import (
     LabwareNotOnDeckError,
     LiquidDoesNotExistError,
     LabwareDefinitionDoesNotExistError,
+    LabwareDefinitionIsNotLabwareError,
+    LabwareDefinitionIsNotAdapterError,
+    LabwareCannotBeStackedError,
+    LabwareIsInStackError,
     LabwareOffsetDoesNotExistError,
     LabwareIsNotTipRackError,
     LabwareIsTipRackError,
@@ -40,6 +44,7 @@ from .exceptions import (
     InvalidTargetSpeedError,
     InvalidTargetTemperatureError,
     InvalidBlockVolumeError,
+    InvalidHoldTimeError,
     CannotPerformModuleAction,
     PauseNotAllowedError,
     ProtocolCommandFailedError,
@@ -47,6 +52,7 @@ from .exceptions import (
     HardwareNotSupportedError,
     LabwareMovementNotAllowedError,
     LocationIsOccupiedError,
+    InvalidAxisForRobotType,
 )
 
 from .error_occurrence import ErrorOccurrence
@@ -65,6 +71,10 @@ __all__ = [
     "LabwareNotOnDeckError",
     "LiquidDoesNotExistError",
     "LabwareDefinitionDoesNotExistError",
+    "LabwareDefinitionIsNotLabwareError",
+    "LabwareDefinitionIsNotAdapterError",
+    "LabwareCannotBeStackedError",
+    "LabwareIsInStackError",
     "LabwareOffsetDoesNotExistError",
     "LabwareIsNotTipRackError",
     "LabwareIsTipRackError",
@@ -92,6 +102,7 @@ __all__ = [
     "InvalidTargetTemperatureError",
     "InvalidTargetSpeedError",
     "InvalidBlockVolumeError",
+    "InvalidHoldTimeError",
     "CannotPerformModuleAction",
     "PauseNotAllowedError",
     "ProtocolCommandFailedError",
@@ -99,7 +110,7 @@ __all__ = [
     "HardwareNotSupportedError",
     "LabwareMovementNotAllowedError",
     "LocationIsOccupiedError",
-    "FirmwareUpdateRequired",
+    "InvalidAxisForRobotType",
     # error occurrence models
     "ErrorOccurrence",
 ]

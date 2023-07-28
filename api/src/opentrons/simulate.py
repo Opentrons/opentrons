@@ -42,6 +42,9 @@ from opentrons.commands import types as command_types
 
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import PythonProtocol, BundleContents
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -260,6 +263,10 @@ def _build_protocol_context(
         context = protocol_api.create_protocol_context(
             api_version=version,
             hardware_api=hardware_simulator,
+            # FIXME(2022-12-02): Instead of guessing,
+            # match this to the robot type declared by the protocol.
+            # https://opentrons.atlassian.net/browse/RSS-156
+            deck_type=guess_deck_type_from_global_config(),
             bundled_labware=bundled_labware,
             bundled_data=bundled_data,
             extra_labware=extra_labware,
@@ -646,6 +653,7 @@ def main() -> int:
     args = parser.parse_args()
     # Try to migrate api v1 containers if needed
 
+    # TODO(mm, 2022-12-01): Configure the DurationEstimator with the correct deck type.
     duration_estimator = DurationEstimator() if args.estimate_duration else None  # type: ignore[no-untyped-call]
 
     runlog, maybe_bundle = simulate(

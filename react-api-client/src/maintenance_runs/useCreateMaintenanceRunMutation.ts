@@ -7,7 +7,7 @@ import {
 import {
   UseMutationResult,
   useMutation,
-  UseMutateFunction,
+  UseMutateAsyncFunction,
   UseMutationOptions,
 } from 'react-query'
 import { useHost } from '../api'
@@ -18,7 +18,7 @@ export type UseCreateMaintenanceRunMutationResult = UseMutationResult<
   AxiosError,
   CreateMaintenanceRunData
 > & {
-  createMaintenanceRun: UseMutateFunction<
+  createMaintenanceRun: UseMutateAsyncFunction<
     MaintenanceRun,
     AxiosError,
     CreateMaintenanceRunData
@@ -36,7 +36,8 @@ export function useCreateMaintenanceRunMutation(
   hostOverride?: HostConfig | null
 ): UseCreateMaintenanceRunMutationResult {
   const contextHost = useHost()
-  const host = hostOverride ?? contextHost
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const mutation = useMutation<
     MaintenanceRun,
     AxiosError,
@@ -53,6 +54,6 @@ export function useCreateMaintenanceRunMutation(
   )
   return {
     ...mutation,
-    createMaintenanceRun: mutation.mutate,
+    createMaintenanceRun: mutation.mutateAsync,
   }
 }

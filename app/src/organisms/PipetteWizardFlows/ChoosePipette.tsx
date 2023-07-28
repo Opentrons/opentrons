@@ -34,9 +34,10 @@ import { getIsOnDevice } from '../../redux/config'
 import { StyledText } from '../../atoms/text'
 import { Portal } from '../../App/portal'
 import { SmallButton } from '../../atoms/buttons'
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import singleChannelAndEightChannel from '../../assets/images/change-pip/1_and_8_channel.png'
+import ninetySixChannel from '../../assets/images/change-pip/ninety-six-channel.png'
 import { useAttachedPipettesFromInstrumentsQuery } from '../Devices/hooks'
 import { ExitModal } from './ExitModal'
 import { FLOWS } from './constants'
@@ -56,7 +57,7 @@ const UNSELECTED_OPTIONS_STYLE = css`
   flex-direction: ${DIRECTION_COLUMN};
   justify-content: ${JUSTIFY_CENTER};
   align-items: ${ALIGN_CENTER};
-  grid-gap: ${SPACING.spacing3}
+  grid-gap: ${SPACING.spacing8}
 
   &:hover {
     border: 1px solid ${COLORS.medGreyHover};
@@ -67,8 +68,8 @@ const UNSELECTED_OPTIONS_STYLE = css`
     justify-content: ${JUSTIFY_FLEX_START};
     background-color: ${COLORS.mediumBlueEnabled};
     border-width: 0; 
-    border-radius: ${BORDERS.size_four};
-    padding: ${SPACING.spacing5};
+    border-radius: ${BORDERS.borderRadiusSize4};
+    padding: ${SPACING.spacing24};
     height: 5.25rem;
     width: 57.8125rem;
 
@@ -141,7 +142,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   return (
     <Portal level="top">
       {isOnDevice ? (
-        <ModalShell height="100%" header={wizardHeader}>
+        <LegacyModalShell height="100%" header={wizardHeader}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
             width="100%"
@@ -158,13 +159,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             ) : (
               <Flex
                 flexDirection={DIRECTION_COLUMN}
-                padding={SPACING.spacing6}
+                padding={SPACING.spacing32}
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 height="29.5rem"
               >
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing3}
+                  gridGap={SPACING.spacing8}
                 >
                   <StyledText
                     as="h4"
@@ -207,9 +208,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               </Flex>
             )}
           </Flex>
-        </ModalShell>
+        </LegacyModalShell>
       ) : (
-        <ModalShell width="47rem" height="30rem" header={wizardHeader}>
+        <LegacyModalShell width="47rem" height="30rem" header={wizardHeader}>
           {showExitConfirmation ? (
             <ExitModal
               goBack={() => setShowExitConfirmation(false)}
@@ -220,13 +221,13 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
           ) : (
             <Flex
               flexDirection={DIRECTION_COLUMN}
-              padding={SPACING.spacing6}
+              padding={SPACING.spacing40}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <StyledText as="h1">{t('choose_pipette')}</StyledText>
                 <Flex
-                  margin={SPACING.spacing6}
+                  margin={SPACING.spacing40}
                   justifyContent={JUSTIFY_SPACE_AROUND}
                 >
                   <PipetteMountOption
@@ -252,8 +253,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     onClick={() => setSelectedPipette(NINETY_SIX_CHANNEL)}
                   >
                     <img
-                      //  TODO(jr, 11/2/22): change this image to the correct 96 channel pipette image
-                      src={singleChannelAndEightChannel}
+                      src={ninetySixChannel}
                       width="138.78px"
                       height="160px"
                       alt={bothMounts}
@@ -273,7 +273,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
               </PrimaryButton>
             </Flex>
           )}
-        </ModalShell>
+        </LegacyModalShell>
       )}
     </Portal>
   )

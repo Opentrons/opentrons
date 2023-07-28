@@ -1,6 +1,6 @@
 from __future__ import annotations
 from anyio import to_thread
-from typing import Any, Dict, Generic, List, Optional, TypeVar
+from typing import Any, Dict, Generic, List, Optional, TypeVar, Sequence
 from pydantic import Field, BaseModel
 from pydantic.generics import GenericModel
 from fastapi.responses import JSONResponse
@@ -13,7 +13,7 @@ class ResourceModel(BaseModel):
     id: str = Field(..., description="Unique identifier of the resource.")
 
 
-ResponseDataT = TypeVar("ResponseDataT", bound=BaseModel)
+ResponseDataT = TypeVar("ResponseDataT")
 ResponseLinksT = TypeVar("ResponseLinksT")
 
 
@@ -80,7 +80,17 @@ class MultiBodyMeta(BaseModel):
 class SimpleMultiBody(BaseResponseBody, GenericModel, Generic[ResponseDataT]):
     """A response that returns multiple resources."""
 
-    data: List[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
+    data: Sequence[ResponseDataT] = Field(..., description=DESCRIPTION_DATA)
+    # note: the type of data is the protocol Sequence even though this is an actual
+    # object. this is normally something you shouldn't do - the type should be described -
+    # but it's done here because the type definition of the constructor and the construct()
+    # non-validating classmethod is taken from the type of this member, and there we really
+    # want the arguments to be Sequence so they can accept narrower subtypes. For instance,
+    # if you define a function as returning SimpleMultiBody[Union[A, B]], you should really
+    # be able to do return SimpleMultiBody.construct([A(), A(), A()]) or even
+    # SimpleMultiBody[Union[A, B]].construct([A(), A(), A()]). However, because construct's
+    # params are defined based on the dataclass fields, the only way to get the arguments
+    # to be covariant is to make data the covariant Sequence protocol.
     meta: MultiBodyMeta = Field(
         ...,
         description="Metadata about the colletion response.",
@@ -188,3 +198,9 @@ class DeprecatedMultiResponseModel(
         None,
         description=DESCRIPTION_LINKS,
     )
+
+
+class ResponseList(BaseModel, Generic[ResponseDataT]):
+    """A response that returns a list resource."""
+
+    __root__: List[ResponseDataT]

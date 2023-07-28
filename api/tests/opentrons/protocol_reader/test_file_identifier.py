@@ -88,6 +88,22 @@ class _ValidPythonProtocolSpec:
                     "apiLevel": "2.11",
                 }
                 requirements = {
+                    "robotType": "Flex",
+                }
+                """
+            ),
+            expected_api_level=APIVersion(2, 11),
+            expected_robot_type="OT-3 Standard",
+            expected_metadata={"apiLevel": "2.11"},
+        ),
+        _ValidPythonProtocolSpec(
+            file_name="foo.py",
+            contents=textwrap.dedent(
+                """
+                metadata = {
+                    "apiLevel": "2.11",
+                }
+                requirements = {
                     "robotType": "OT-3",
                 }
                 """
@@ -381,7 +397,18 @@ class _InvalidInputSpec:
                 requirements = {"robotType": "ot2"}
                 """
             ),
-            expected_message="robotType must be 'OT-2' or 'OT-3', not 'ot2'.",
+            expected_message="robotType must be 'OT-2' or 'Flex', not 'ot2'.",
+        ),
+        _InvalidInputSpec(
+            file_name="protocol.py",
+            contents=textwrap.dedent(
+                """
+                metadata = {"apiLevel": "2.11"}
+                # robotType provided, but not a valid string.
+                requirements = {"robotType": "flex"}
+                """
+            ),
+            expected_message="robotType must be 'OT-2' or 'Flex', not 'flex'.",
         ),
         # Unrecognized file extension:
         _InvalidInputSpec(

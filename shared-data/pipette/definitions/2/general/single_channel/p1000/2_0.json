@@ -32,5 +32,6 @@
   "channels": 1,
   "shaftDiameter": 6.0,
   "shaftULperMM": 28.274,
-  "backCompatNames": ["p1000_single"]
+  "backCompatNames": ["p1000_single"],
+  "backlashDistance": 0.0
 }

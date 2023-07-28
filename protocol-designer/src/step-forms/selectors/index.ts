@@ -13,8 +13,12 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   PipetteName,
+  MAGNETIC_BLOCK_TYPE,
 } from '@opentrons/shared-data'
-import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+import {
+  NormalizedAdditionalEquipmentById,
+  TEMPERATURE_DEACTIVATED,
+} from '@opentrons/step-generation'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import {
   getFormWarnings,
@@ -65,6 +69,7 @@ import {
   TemperatureModuleState,
   ThermocyclerModuleState,
   HeaterShakerModuleState,
+  MagneticBlockState,
 } from '../types'
 import {
   PresavedStepFormState,
@@ -145,10 +150,21 @@ export const _getPipetteEntitiesRootState: (
   labwareDefSelectors._getLabwareDefsByIdRootState,
   denormalizePipetteEntities
 )
+
 export const getPipetteEntities: Selector<
   BaseState,
   PipetteEntities
 > = createSelector(rootSelector, _getPipetteEntitiesRootState)
+
+export const _getAdditionalEquipmentRootState: (
+  arg: RootState
+) => NormalizedAdditionalEquipmentById = rs =>
+  rs.additionalEquipmentInvariantProperties
+
+export const getAdditionalEquipment: Selector<
+  BaseState,
+  NormalizedAdditionalEquipmentById
+> = createSelector(rootSelector, _getAdditionalEquipmentRootState)
 
 const _getInitialDeckSetupStepFormRootState: (
   arg: RootState
@@ -178,6 +194,9 @@ const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
   targetTemp: null,
   targetSpeed: null,
   latchOpen: null,
+}
+const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
+  type: MAGNETIC_BLOCK_TYPE,
 }
 
 const _getInitialDeckSetup = (
@@ -243,6 +262,14 @@ const _getInitialDeckSetup = (
               type: HEATERSHAKER_MODULE_TYPE,
               slot,
               moduleState: HEATERSHAKER_MODULE_INITIAL_STATE,
+            }
+          case MAGNETIC_BLOCK_TYPE:
+            return {
+              id: moduleEntity.id,
+              model: moduleEntity.model,
+              type: MAGNETIC_BLOCK_TYPE,
+              slot,
+              moduleState: MAGNETIC_BLOCK_INITIAL_STATE,
             }
         }
       }

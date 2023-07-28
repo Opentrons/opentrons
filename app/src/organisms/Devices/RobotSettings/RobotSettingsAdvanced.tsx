@@ -18,7 +18,7 @@ import { UsageSettings } from './AdvancedTab/UsageSettings'
 import {
   DisableHoming,
   DisplayRobotName,
-  FactoryReset,
+  DeviceReset,
   LegacySettings,
   OpenJupyterControl,
   RobotInformation,
@@ -35,8 +35,8 @@ import {
   fetchSettings,
 } from '../../../redux/robot-settings'
 import { RenameRobotSlideout } from './AdvancedTab/AdvancedTabSlideouts/RenameRobotSlideout'
-import { FactoryResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetSlideout'
-import { FactoryResetModal } from './AdvancedTab/AdvancedTabSlideouts/FactoryResetModal'
+import { DeviceResetSlideout } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetSlideout'
+import { DeviceResetModal } from './AdvancedTab/AdvancedTabSlideouts/DeviceResetModal'
 import { UpdateBuildroot } from './UpdateBuildroot'
 import { UNREACHABLE } from '../../../redux/discovery'
 import { Portal } from '../../../App/portal'
@@ -62,12 +62,12 @@ export function RobotSettingsAdvanced({
     setShowRenameRobotSlideout,
   ] = React.useState<boolean>(false)
   const [
-    showFactoryResetSlideout,
-    setShowFactoryResetSlideout,
+    showDeviceResetSlideout,
+    setShowDeviceResetSlideout,
   ] = React.useState<boolean>(false)
   const [
-    showFactoryResetModal,
-    setShowFactoryResetModal,
+    showDeviceResetModal,
+    setShowDeviceResetModal,
   ] = React.useState<boolean>(false)
   const [
     showSoftwareUpdateModal,
@@ -93,10 +93,10 @@ export function RobotSettingsAdvanced({
 
   const updateIsExpanded = (
     isExpanded: boolean,
-    type: 'factoryReset' | 'renameRobot'
+    type: 'deviceReset' | 'renameRobot'
   ): void => {
-    if (type === 'factoryReset') {
-      setShowFactoryResetSlideout(isExpanded)
+    if (type === 'deviceReset') {
+      setShowDeviceResetSlideout(isExpanded)
     } else {
       setShowRenameRobotSlideout(isExpanded)
     }
@@ -107,7 +107,7 @@ export function RobotSettingsAdvanced({
     options?: ResetConfigRequest
   ): void => {
     if (options != null) setResetOptions(options)
-    setShowFactoryResetModal(true)
+    setShowDeviceResetModal(true)
     setIsRobotReachable(isReachable ?? false)
   }
 
@@ -139,18 +139,18 @@ export function RobotSettingsAdvanced({
             robotName={robotName}
           />
         )}
-        {showFactoryResetSlideout && (
-          <FactoryResetSlideout
-            isExpanded={showFactoryResetSlideout}
-            onCloseClick={() => setShowFactoryResetSlideout(false)}
+        {showDeviceResetSlideout && (
+          <DeviceResetSlideout
+            isExpanded={showDeviceResetSlideout}
+            onCloseClick={() => setShowDeviceResetSlideout(false)}
             robotName={robotName}
             updateResetStatus={updateResetStatus}
           />
         )}
-        {showFactoryResetModal && (
+        {showDeviceResetModal && (
           <Portal level="top">
-            <FactoryResetModal
-              closeModal={() => setShowFactoryResetModal(false)}
+            <DeviceResetModal
+              closeModal={() => setShowDeviceResetModal(false)}
               isRobotReachable={isRobotReachable}
               robotName={robotName}
               resetOptions={resetOptions}
@@ -162,57 +162,57 @@ export function RobotSettingsAdvanced({
           updateIsExpanded={updateIsExpanded}
           isRobotBusy={isRobotBusy}
         />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <RobotServerVersion robotName={robotName} />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <RobotInformation robotName={robotName} />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <UsageSettings
           settings={findSettings('enableDoorSafetySwitch')}
           robotName={robotName}
           isRobotBusy={isRobotBusy}
         />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <DisableHoming
           settings={findSettings('disableHomeOnBoot')}
           robotName={robotName}
           isRobotBusy={isRobotBusy}
         />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <OpenJupyterControl robotIp={ipAddress} />
-        <Divider marginY={SPACING.spacing4} />
+        <Divider marginY={SPACING.spacing16} />
         <UpdateRobotSoftware
           robotName={robotName}
           isRobotBusy={isRobotBusy}
           onUpdateStart={() => setShowSoftwareUpdateModal(true)}
         />
         <Troubleshooting robotName={robotName} />
-        <Divider marginY={SPACING.spacing4} />
-        <FactoryReset
+        <Divider marginY={SPACING.spacing16} />
+        <DeviceReset
           updateIsExpanded={updateIsExpanded}
           isRobotBusy={isRobotBusy}
         />
         {isOT3 ? null : (
           <>
-            <Divider marginY={SPACING.spacing4} />
+            <Divider marginY={SPACING.spacing16} />
             <UseOlderProtocol
               settings={findSettings('disableFastProtocolUpload')}
               robotName={robotName}
               isRobotBusy={isRobotBusy}
             />
-            <Divider marginY={SPACING.spacing4} />
+            <Divider marginY={SPACING.spacing16} />
             <LegacySettings
               settings={findSettings('deckCalibrationDots')}
               robotName={robotName}
               isRobotBusy={isRobotBusy}
             />
-            <Divider marginY={SPACING.spacing4} />
+            <Divider marginY={SPACING.spacing16} />
             <ShortTrashBin
               settings={findSettings('shortFixedTrash')}
               robotName={robotName}
               isRobotBusy={isRobotBusy}
             />
-            <Divider marginY={SPACING.spacing4} />
+            <Divider marginY={SPACING.spacing16} />
             <UseOlderAspirateBehavior
               settings={findSettings('useOldAspirationFunctions')}
               robotName={robotName}
@@ -251,10 +251,10 @@ export function FeatureFlagToggle({
     <Flex
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      marginBottom={SPACING.spacing4}
+      marginBottom={SPACING.spacing16}
     >
       <Box width="70%">
-        <StyledText css={TYPOGRAPHY.pSemiBold} paddingBottom={SPACING.spacing2}>
+        <StyledText css={TYPOGRAPHY.pSemiBold} paddingBottom={SPACING.spacing4}>
           {title}
         </StyledText>
         <StyledText as="p">{description}</StyledText>

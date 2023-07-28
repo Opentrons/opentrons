@@ -221,7 +221,7 @@ class Controller:
         """
         return {
             mount: await self._query_mount(mount, expected.get(mount))
-            for mount in Mount
+            for mount in Mount.ot2_mounts()
         }
 
     def set_active_current(self, axis_currents: Dict[Axis, float]) -> None:

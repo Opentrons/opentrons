@@ -1,0 +1,36 @@
+test_name: GET Settings Reset Options for OT-3
+marks:
+  - ot3_only
+  - usefixtures:
+    - ot3_server_base_url
+stages:
+  - name: Reset Options GET request returns correct option
+    request:
+      url: '{ot3_server_base_url}/settings/reset/options'
+      method: GET
+    response:
+      status_code: 200
+      json:
+        options:
+          - id: bootScripts
+            name: Boot Scripts
+            description: Clear custom boot scripts
+          - id: pipetteOffsetCalibrations
+            name: Pipette Offset Calibrations
+            description: !re_search 'Clear pipette offset calibrations'
+          - id: gripperOffsetCalibrations
+            name: Gripper Offset Calibrations
+            description: !re_search 'Clear gripper offset calibrations'
+          - id: runsHistory
+            name: Clear Runs History
+            description: !re_search 'Erase this device''s stored history of protocols and runs.'
+  - name: POST Reset gripperOffsetCalibrations true on OT-3
+    request:
+      url: '{ot3_server_base_url}/settings/reset'
+      method: POST
+      json:
+        gripperOffsetCalibrations: true
+    response:
+      status_code: 200
+      json:
+        message: "Options 'gripper_offset' were reset"

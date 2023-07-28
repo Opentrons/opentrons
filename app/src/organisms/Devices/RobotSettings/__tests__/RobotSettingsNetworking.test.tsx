@@ -5,6 +5,11 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 
 import { i18n } from '../../../../i18n'
+import {
+  getRobotAddressesByName,
+  HEALTH_STATUS_OK,
+  OPENTRONS_USB,
+} from '../../../../redux/discovery'
 import * as Networking from '../../../../redux/networking'
 import {
   useCanDisconnect,
@@ -15,16 +20,21 @@ import { useIsOT3, useIsRobotBusy } from '../../hooks'
 import { DisconnectModal } from '../ConnectNetwork/DisconnectModal'
 import { RobotSettingsNetworking } from '../RobotSettingsNetworking'
 
+import type { DiscoveryClientRobotAddress } from '../../../../redux/discovery/types'
 import type { State } from '../../../../redux/types'
 
+jest.mock('../../../../redux/discovery/selectors')
 jest.mock('../../../../redux/networking')
-jest.mock('../../../../resources/networking/hooks')
 jest.mock('../../../../redux/robot-api/selectors')
+jest.mock('../../../../resources/networking/hooks')
 jest.mock('../../hooks')
 jest.mock('../ConnectNetwork/DisconnectModal')
 
 const mockUpdateRobotStatus = jest.fn()
 
+const mockGetRobotAddressesByName = getRobotAddressesByName as jest.MockedFunction<
+  typeof getRobotAddressesByName
+>
 const mockGetNetworkInterfaces = Networking.getNetworkInterfaces as jest.MockedFunction<
   typeof Networking.getNetworkInterfaces
 >
@@ -80,6 +90,9 @@ describe('RobotSettingsNetworking', () => {
   jest.useFakeTimers()
 
   beforeEach(() => {
+    when(mockGetRobotAddressesByName)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue([])
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, ROBOT_NAME)
       .mockReturnValue({
@@ -102,7 +115,7 @@ describe('RobotSettingsNetworking', () => {
     resetAllWhenMocks()
   })
 
-  it('should render title and description', () => {
+  it('should render title and description for OT-2', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
     const [{ getByText, getByTestId, queryByRole, queryByText }] = render()
     getByText('Wi-Fi - foo')
@@ -130,7 +143,23 @@ describe('RobotSettingsNetworking', () => {
     expect(queryByText('Go to Advanced App Settings')).toBeNull()
   })
 
-  it('should render Wi-Fi mock data and ethernet mock data', () => {
+  it('should render USB connection message for OT-3 when connected via USB', () => {
+    when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
+    when(mockUseIsOT3).calledWith(ROBOT_NAME).mockReturnValue(true)
+    when(mockGetRobotAddressesByName)
+      .calledWith({} as State, ROBOT_NAME)
+      .mockReturnValue([
+        {
+          ip: OPENTRONS_USB,
+          healthStatus: HEALTH_STATUS_OK,
+        } as DiscoveryClientRobotAddress,
+      ])
+
+    const [{ getByText }] = render()
+    getByText('Directly connected to this computer.')
+  })
+
+  it('should render Wi-Fi mock data and ethernet mock data for OT-2', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
     const [{ getByText, getByTestId, queryByText, queryAllByTestId }] = render()
     getByText('Wi-Fi - foo')
@@ -157,7 +186,7 @@ describe('RobotSettingsNetworking', () => {
     ).toHaveLength(2)
   })
 
-  it('should render Wi-Fi mock data and ethernet info not rendered', () => {
+  it('should render Wi-Fi mock data and ethernet info not rendered for OT-2', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue(mockWifiList)
     const mockWiFi = {
       ipAddress: '1.2.3.4',
@@ -189,7 +218,7 @@ describe('RobotSettingsNetworking', () => {
     ).toHaveLength(1)
   })
 
-  it('should render Wired USB mock data and wifi info not rendered', () => {
+  it('should render Wired USB mock data and wifi info not rendered for OT-2', () => {
     const mockWiredUSB = {
       ipAddress: '5.6.7.8',
       subnetMask: '255.255.255.124',
@@ -222,7 +251,7 @@ describe('RobotSettingsNetworking', () => {
     ).toHaveLength(1)
   })
 
-  it('should render Wi-Fi and Wired USB are not connected', () => {
+  it('should render Wi-Fi and Wired USB are not connected for OT-2', () => {
     when(mockGetNetworkInterfaces)
       .calledWith({} as State, ROBOT_NAME)
       .mockReturnValue({
@@ -246,7 +275,7 @@ describe('RobotSettingsNetworking', () => {
     getByText('Not connected via wired USB')
   })
 
-  it('should render the right links to external resource and internal resource', () => {
+  it('should render the right links to external resource and internal resource for OT-2', () => {
     when(mockUseWifiList).calledWith(ROBOT_NAME).mockReturnValue([])
     const usbExternalLink =
       'https://support.opentrons.com/s/article/Get-started-Connect-to-your-OT-2-over-USB'

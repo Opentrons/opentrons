@@ -29,7 +29,7 @@ describe('Unselected TabbedButton', () => {
       `background-color: ${String(COLORS.highlightPurple2)}`
     )
     expect(button).toHaveStyle(
-      `padding: ${String(SPACING.spacing4)} ${String(SPACING.spacing5)}`
+      `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
     expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSize22)}`)
     expect(button).toHaveStyle(
@@ -38,7 +38,9 @@ describe('Unselected TabbedButton', () => {
     expect(button).toHaveStyle(
       `line-height: ${String(TYPOGRAPHY.lineHeight28)}`
     )
-    expect(button).toHaveStyle(`border-radius: ${String(BORDERS.size_four)}`)
+    expect(button).toHaveStyle(
+      `border-radius: ${String(BORDERS.borderRadiusSize4)}`
+    )
     expect(button).toHaveStyle(
       `text-transform: ${String(TYPOGRAPHY.textTransformNone)}`
     )
@@ -105,7 +107,7 @@ describe('Selected TabbedButton', () => {
       `background-color: ${String(COLORS.highlightPurple1)}`
     )
     expect(button).toHaveStyle(
-      `padding: ${String(SPACING.spacing4)} ${String(SPACING.spacing5)}`
+      `padding: ${SPACING.spacing16} ${SPACING.spacing24}`
     )
     expect(button).toHaveStyle(`font-size: ${String(TYPOGRAPHY.fontSize22)}`)
     expect(button).toHaveStyle(
@@ -114,7 +116,9 @@ describe('Selected TabbedButton', () => {
     expect(button).toHaveStyle(
       `line-height: ${String(TYPOGRAPHY.lineHeight28)}`
     )
-    expect(button).toHaveStyle(`border-radius: ${String(BORDERS.size_four)}`)
+    expect(button).toHaveStyle(
+      `border-radius: ${String(BORDERS.borderRadiusSize4)}`
+    )
     expect(button).toHaveStyle(
       `text-transform: ${String(TYPOGRAPHY.textTransformNone)}`
     )

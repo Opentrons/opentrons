@@ -5,6 +5,7 @@ import { StepFieldName } from '../../steplist/fieldLevel'
 import { MoreOptionsModal } from '../modals/MoreOptionsModal'
 import {
   MixForm,
+  MoveLabwareForm,
   MoveLiquidForm,
   PauseForm,
   MagnetForm,
@@ -26,6 +27,7 @@ type StepFormMap = {
 const STEP_FORM_MAP: StepFormMap = {
   mix: MixForm,
   pause: PauseForm,
+  moveLabware: MoveLabwareForm,
   moveLiquid: MoveLiquidForm,
   magnet: MagnetForm,
   temperature: TemperatureForm,

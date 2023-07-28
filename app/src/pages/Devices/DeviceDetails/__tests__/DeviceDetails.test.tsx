@@ -48,6 +48,7 @@ const render = (path = '/') => {
       <Route path="/devices/:robotName">
         <DeviceDetails />
       </Route>
+      <Route path="/devices">devices page</Route>
     </MemoryRouter>,
     {
       i18nInstance: i18n,
@@ -75,19 +76,21 @@ describe('DeviceDetails', () => {
     resetAllWhenMocks()
   })
 
-  it('renders an error screen when a robot is not found and not scanning', () => {
+  it('redirects to devices page when a robot is not found and not scanning', () => {
     const [{ getByText }] = render('/devices/otie')
 
-    getByText(`Can't find robot!`)
+    getByText('devices page')
   })
 
-  it('does not render an error screen when a robot is not found and discovery client is scanning', () => {
+  it('renders null when a robot is not found and discovery client is scanning', () => {
     when(mockGetScanning)
       .calledWith({} as State)
       .mockReturnValue(true)
     const [{ queryByText }] = render('/devices/otie')
 
-    expect(queryByText(`Can't find robot!`)).toBeFalsy()
+    expect(queryByText('Mock RobotOverview')).toBeNull()
+    expect(queryByText('Mock InstrumentsAndModules')).toBeNull()
+    expect(queryByText('Mock RecentProtocolRuns')).toBeNull()
   })
 
   it('renders a RobotOverview when a robot is found and syncs clock', () => {

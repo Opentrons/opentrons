@@ -42,13 +42,13 @@ async def test_open_lid(
     decoy.when(equipment.get_module_hardware_api(expected_module_id)).then_return(
         tc_hardware
     )
-
+    decoy.when(state_view.motion.get_robot_mount_axes()).then_return(
+        [MotorAxis.EXTENSION_Z]
+    )
     result = await subject.execute(data)
 
     decoy.verify(
-        await movement.home(
-            [MotorAxis.X, MotorAxis.Y, MotorAxis.RIGHT_Z, MotorAxis.LEFT_Z]
-        ),
+        await movement.home([MotorAxis.X, MotorAxis.Y, MotorAxis.EXTENSION_Z]),
         await tc_hardware.open(),
         times=1,
     )

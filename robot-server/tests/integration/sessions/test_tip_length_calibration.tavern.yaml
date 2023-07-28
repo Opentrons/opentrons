@@ -4,11 +4,11 @@ strict:
   - json:on
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Create the session
     request:
-      url: "{host:s}:{port:d}/sessions"
+      url: "{ot2_server_base_url}/sessions"
       method: POST
       json:
         data:
@@ -24,7 +24,7 @@ stages:
           session_id: data.id
   - name: Get the session
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
+      url: "{ot2_server_base_url}/sessions/{session_id}"
       method: GET
     response:
       status_code: 200
@@ -48,7 +48,7 @@ stages:
 
   - name: Load labware
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      url: "{ot2_server_base_url}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
@@ -72,7 +72,7 @@ stages:
 
   - name: Attempt conflicting command
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      url: "{ot2_server_base_url}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
@@ -83,14 +83,14 @@ stages:
 
   - name: Delete the session
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
+      url: "{ot2_server_base_url}/sessions/{session_id}"
       method: DELETE
     response:
       status_code: 200
 
   - name: There are no sessions
     request:
-      url: "{host:s}:{port:d}/sessions"
+      url: "{ot2_server_base_url}/sessions"
       method: GET
     response:
       status_code: 200

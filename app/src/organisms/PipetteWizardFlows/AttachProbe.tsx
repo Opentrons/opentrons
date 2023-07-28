@@ -4,17 +4,17 @@ import { Trans, useTranslation } from 'react-i18next'
 import {
   Flex,
   TYPOGRAPHY,
-  COLORS,
   SPACING,
   RESPONSIVENESS,
 } from '@opentrons/components'
-import { NINETY_SIX_CHANNEL } from '@opentrons/shared-data'
+import { NINETY_SIX_CHANNEL, LEFT, MotorAxis } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
-import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
+import { CalibrationErrorModal } from './CalibrationErrorModal'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { InProgressModal } from '../../molecules/InProgressModal/InProgressModal'
 import pipetteProbe1 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_1.webm'
 import pipetteProbe8 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_8.webm'
+import probing96 from '../../assets/videos/pipette-wizard-flows/Pipette_Probing_96.webm'
 import { BODY_STYLE, SECTIONS, FLOWS } from './constants'
 import { getPipetteAnimations } from './utils'
 import type { PipetteWizardStepProps } from './types'
@@ -30,7 +30,7 @@ const IN_PROGRESS_STYLE = css`
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     font-size: ${TYPOGRAPHY.fontSize28};
     line-height: 1.625rem;
-    margin-top: ${SPACING.spacing2};
+    margin-top: ${SPACING.spacing4};
   }
 `
 export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
@@ -42,8 +42,8 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     isRobotMoving,
     goBack,
     isExiting,
-    errorMessage,
     setShowErrorMessage,
+    errorMessage,
     isOnDevice,
     selectedPipette,
     flowType,
@@ -53,12 +53,20 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
   const pipetteId = attachedPipettes[mount]?.serialNumber
   const displayName = attachedPipettes[mount]?.displayName
   const is8Channel = attachedPipettes[mount]?.data.channels === 8
+  const is96Channel = attachedPipettes[mount]?.data.channels === 96
   const calSlotNum = 'C2'
+  const axes: MotorAxis = mount === LEFT ? ['leftZ'] : ['rightZ']
 
   if (pipetteId == null) return null
   const handleOnClick = (): void => {
     chainRunCommands(
       [
+        {
+          commandType: 'home' as const,
+          params: {
+            axes: axes,
+          },
+        },
         {
           // @ts-expect-error calibration type not yet supported
           commandType: 'calibration/calibratePipette' as const,
@@ -84,8 +92,15 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       })
   }
 
+  let src = pipetteProbe1
+  if (is8Channel) {
+    src = pipetteProbe8
+  } else if (is96Channel) {
+    src = probing96
+  }
+
   const pipetteProbeVid = (
-    <Flex height="10.2rem" paddingTop={SPACING.spacing2}>
+    <Flex height="10.2rem" paddingTop={SPACING.spacing4}>
       <video
         css={css`
           max-width: 100%;
@@ -94,9 +109,9 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         autoPlay={true}
         loop={true}
         controls={false}
-        data-testid={is8Channel ? pipetteProbe8 : pipetteProbe1}
+        data-testid={src}
       >
-        <source src={is8Channel ? pipetteProbe8 : pipetteProbe1} />
+        <source src={src} />
       </video>
     </Flex>
   )
@@ -122,16 +137,20 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
         )}
       </InProgressModal>
     )
+
   return errorMessage != null ? (
-    <SimpleWizardBody
-      isSuccess={false}
-      iconColor={COLORS.errorEnabled}
-      header={t('error_encountered')}
-      subHeader={errorMessage}
+    <CalibrationErrorModal
+      proceed={proceed}
+      isOnDevice={isOnDevice}
+      errorMessage={errorMessage}
+      chainRunCommands={chainRunCommands}
+      mount={mount}
+      setShowErrorMessage={setShowErrorMessage}
     />
   ) : (
     <GenericWizardTile
       header={i18n.format(t('attach_probe'), 'capitalize')}
+      //  todo(jr, 5/30/23): update animations! these are not final for 1, 8 and 96
       rightHandBody={getPipetteAnimations({
         pipetteWizardStep,
         channel: is8Channel ? 8 : 1,

@@ -20,6 +20,7 @@ export function getLabwareLocationCombos(
   return commands.reduce<LabwareLocationCombo[]>((acc, command) => {
     if (command.commandType === 'loadLabware') {
       if (command.result?.definition == null) return acc
+      if (command.result.definition.parameters.format === 'trash') return acc
       const definitionUri = getLabwareDefURI(command.result.definition)
       if (command.params.location === 'offDeck') {
         return acc

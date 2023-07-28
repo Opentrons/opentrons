@@ -76,11 +76,11 @@ class HeaterShakerModuleSubState:
         """Raise an error if labware is not latched on the heater-shaker."""
         if self.labware_latch_status == HeaterShakerLatchStatus.UNKNOWN:
             raise CannotPerformModuleAction(
-                "Heater-Shaker cannot start shaking if the labware latch status has not been set to closed."
+                "Heater-Shaker cannot start or deactivate shaking if the labware latch has not been set to closed."
             )
         elif self.labware_latch_status == HeaterShakerLatchStatus.OPEN:
             raise CannotPerformModuleAction(
-                "Heater-Shaker cannot start shaking while the labware latch is open."
+                "Heater-Shaker cannot start or deactivate shaking while the labware latch is open."
             )
 
     def raise_if_shaking(self) -> None:

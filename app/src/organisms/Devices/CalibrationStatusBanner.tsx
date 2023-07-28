@@ -44,7 +44,7 @@ export function CalibrationStatusBanner({
           <StyledText
             as="p"
             color={COLORS.darkBlackEnabled}
-            paddingRight={SPACING.spacing4}
+            paddingRight={SPACING.spacing16}
             textAlign={TEXT_ALIGN_RIGHT}
             textDecoration={TYPOGRAPHY.textDecorationUnderline}
           >

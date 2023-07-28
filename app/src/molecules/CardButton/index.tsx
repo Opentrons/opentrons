@@ -22,8 +22,8 @@ const CARD_BUTTON_STYLE = css`
   display: flex;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_CENTER};
-  border-radius: ${BORDERS.size_four};
-  padding: ${SPACING.spacing6};
+  border-radius: ${BORDERS.borderRadiusSize5};
+  padding: ${SPACING.spacing32};
   box-shadow: none;
 
   &:focus {
@@ -92,11 +92,9 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         data-testid={`cardButton_icon_${String(iconName)}`}
         color={disabled ? COLORS.darkBlack60 : COLORS.blueEnabled}
       />
-      <Flex marginTop={SPACING.spacing4}>
+      <Flex marginTop={SPACING.spacing16}>
         <StyledText
           as="h4"
-          fontSize="1.75rem"
-          lineHeight="2.25rem"
           fontWeight={TYPOGRAPHY.fontWeightBold}
           color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
           textAlign={TYPOGRAPHY.textAlignCenter}
@@ -105,13 +103,12 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         </StyledText>
       </Flex>
       <Flex
-        marginTop={SPACING.spacing2}
+        marginTop={SPACING.spacing4}
         width="100%"
         justifyContent={JUSTIFY_CENTER}
       >
         <StyledText
-          fontSize="1.375rem"
-          lineHeight="1.75rem"
+          as="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={disabled ? COLORS.darkBlack60 : COLORS.darkBlackEnabled}
           css={CARD_BUTTON_TEXT_STYLE}

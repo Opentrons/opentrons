@@ -21,9 +21,7 @@ export function OffDeckLabwareList(
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         textTransform={TYPOGRAPHY.textTransformCapitalize}
-        margin={`${String(SPACING.spacing4)} ${String(
-          SPACING.spacing4
-        )} ${String(SPACING.spacing3)}`}
+        margin={`${SPACING.spacing16} ${SPACING.spacing16} ${SPACING.spacing8}`}
       >
         {t('additional_off_deck_labware')}
       </StyledText>

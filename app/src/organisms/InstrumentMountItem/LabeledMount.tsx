@@ -22,8 +22,8 @@ const MountButton = styled.button<{ isAttached: boolean }>`
   width: 100%;
   flex-direction: ${DIRECTION_COLUMN};
   align-items: ${ALIGN_FLEX_START};
-  padding: ${SPACING.spacing5};
-  border-radius: ${BORDERS.size_three};
+  padding: ${SPACING.spacing24};
+  border-radius: ${BORDERS.borderRadiusSize3};
   background-color: ${({ isAttached }) =>
     isAttached ? COLORS.green3 : COLORS.light1};
   &:hover,
@@ -42,6 +42,7 @@ interface LabeledMountProps {
 export function LabeledMount(props: LabeledMountProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const { mount, instrumentName, handleClick } = props
+  const ninetySixDislayName = 'Flex 96-Channel 1000 μL'
 
   return (
     <MountButton onClick={handleClick} isAttached={instrumentName != null}>
@@ -53,17 +54,19 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
         <Flex
           flex="1 0 auto"
           alignItems={ALIGN_CENTER}
-          gridGap={SPACING.spacing5}
+          gridGap={SPACING.spacing24}
         >
           <StyledText
-            flex="2"
             as="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textAlign={TYPOGRAPHY.textAlignLeft}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
             fontSize={TYPOGRAPHY.fontSize28}
+            width="15.625rem"
           >
-            {t('mount', { side: mount })}
+            {instrumentName === ninetySixDislayName
+              ? t('left_right')
+              : t('mount', { side: mount })}
           </StyledText>
           <StyledText
             flex="5"

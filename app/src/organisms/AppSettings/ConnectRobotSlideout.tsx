@@ -78,7 +78,7 @@ export function ConnectRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <StyledText as="p" marginBottom={SPACING.spacing3}>
+        <StyledText as="p" marginBottom={SPACING.spacing8}>
           {t('ip_description_first')}
         </StyledText>
         <StyledText as="p">{t('ip_description_second')}</StyledText>
@@ -86,19 +86,19 @@ export function ConnectRobotSlideout({
           href={SUPPORT_PAGE_LINK}
           css={TYPOGRAPHY.pSemiBold}
           id="ConnectIPAddressSupportPage"
-          marginTop={SPACING.spacing4}
+          marginTop={SPACING.spacing16}
         >
           {t('connect_ip_link')}
         </ExternalLink>
-        <Divider marginY={SPACING.spacing5} />
+        <Divider marginY={SPACING.spacing24} />
         <StyledText as="p" css={TYPOGRAPHY.pSemiBold}>
           {t('add_ip_hostname')}
         </StyledText>
         <ManualIpHostnameForm setMostRecentAddition={setMostRecentAddition} />
 
         <Flex
-          marginTop={SPACING.spacing5}
-          marginBottom={SPACING.spacing4}
+          marginTop={SPACING.spacing24}
+          marginBottom={SPACING.spacing16}
           justifyContent={ALIGN_FLEX_END}
         >
           {Boolean(isScanning) ? (
@@ -106,7 +106,7 @@ export function ConnectRobotSlideout({
               <StyledText
                 as="p"
                 color={COLORS.darkGreyEnabled}
-                marginRight={SPACING.spacing3}
+                marginRight={SPACING.spacing8}
               >
                 {t('searching')}
               </StyledText>{' '}
@@ -119,7 +119,7 @@ export function ConnectRobotSlideout({
                   <StyledText
                     as="p"
                     color={COLORS.darkGreyEnabled}
-                    margin={`0 ${String(SPACING.spacing2)}`}
+                    marginX={SPACING.spacing4}
                   >
                     {t('discovery_timeout')}
                   </StyledText>

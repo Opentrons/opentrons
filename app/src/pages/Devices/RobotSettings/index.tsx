@@ -16,7 +16,13 @@ import {
 import { ApiHostProvider } from '@opentrons/react-api-client'
 import { useSelector } from 'react-redux'
 
-import { CONNECTABLE, UNREACHABLE, REACHABLE } from '../../../redux/discovery'
+import {
+  CONNECTABLE,
+  UNREACHABLE,
+  REACHABLE,
+  OPENTRONS_USB,
+} from '../../../redux/discovery'
+import { appShellRequestor } from '../../../redux/shell/remote'
 import { getBuildrootSession } from '../../../redux/buildroot'
 import { getDevtoolsEnabled } from '../../../redux/config'
 import { StyledText } from '../../../atoms/text'
@@ -103,38 +109,38 @@ export function RobotSettings(): JSX.Element | null {
       minWidth={SIZE_6}
       height="100%"
       overflow={OVERFLOW_SCROLL}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
     >
       <Flex
         backgroundColor={COLORS.white}
         border={BORDERS.lineBorder}
         borderRadius={BORDERS.radiusSoftCorners}
         flexDirection={DIRECTION_COLUMN}
-        marginBottom={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
         minHeight="calc(100vh - 3.5rem)"
         width="100%"
       >
-        <Box padding={`0 ${String(SPACING.spacing4)}`}>
+        <Box paddingX={SPACING.spacing16}>
           <Box
             color={COLORS.black}
             css={TYPOGRAPHY.h1Default}
-            padding={`${String(SPACING.spacing5)} 0`}
+            padding={`${SPACING.spacing24} 0`}
           >
             {t('robot_settings')}
           </Box>
           {robot != null && (
-            <Box marginBottom={SPACING.spacing4}>
+            <Box marginBottom={SPACING.spacing16}>
               <ReachableBanner robot={robot} />
             </Box>
           )}
           {showRobotBusyBanner && (
-            <Banner type="warning" marginBottom={SPACING.spacing4}>
+            <Banner type="warning" marginBottom={SPACING.spacing16}>
               <StyledText as="p">
                 {t('some_robot_controls_are_not_available')}
               </StyledText>
             </Banner>
           )}
-          <Flex gridGap={SPACING.spacing4}>
+          <Flex gridGap={SPACING.spacing16}>
             <NavTab
               to={`/devices/${robotName}/robot-settings/calibration`}
               tabName={t('calibration')}
@@ -163,12 +169,13 @@ export function RobotSettings(): JSX.Element | null {
           </Flex>
         </Box>
         <Line />
-        <Box
-          padding={`${String(SPACING.spacing5)} ${String(SPACING.spacing4)}`}
-        >
+        <Box padding={`${SPACING.spacing24} ${SPACING.spacing16}`}>
           <ApiHostProvider
             hostname={robot?.ip ?? null}
             port={robot?.port ?? null}
+            requestor={
+              robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined
+            }
           >
             {robotSettingsContent}
           </ApiHostProvider>

@@ -28,7 +28,11 @@ import * as PipetteConstants from '../../../redux/pipettes/constants'
 import { useMostRecentCompletedAnalysis } from '../../LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { PipetteWizardFlows } from '../../PipetteWizardFlows'
 import { FLOWS } from '../../PipetteWizardFlows/constants'
-import { useDeckCalibrationData, useIsOT3 } from '../hooks'
+import {
+  useDeckCalibrationData,
+  useAttachedPipettesFromInstrumentsQuery,
+  useIsOT3,
+} from '../hooks'
 import { SetupCalibrationItem } from './SetupCalibrationItem'
 
 import type { Mount } from '../../../redux/pipettes/types'
@@ -36,12 +40,12 @@ import type { PipetteInfo } from '../hooks'
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/s/article/GEN2-pipette-compatibility'
-interface SetupPipetteCalibrationItemProps {
+interface SetupInstrumentCalibrationItemProps {
   pipetteInfo: PipetteInfo
-  index: number
   mount: Mount
   robotName: string
   runId: string
+  instrumentsRefetch?: () => void
 }
 
 export function SetupPipetteCalibrationItem({
@@ -49,13 +53,15 @@ export function SetupPipetteCalibrationItem({
   mount,
   robotName,
   runId,
-}: SetupPipetteCalibrationItemProps): JSX.Element | null {
+  instrumentsRefetch,
+}: SetupInstrumentCalibrationItemProps): JSX.Element | null {
   const { t } = useTranslation(['protocol_setup', 'devices_landing'])
   const deviceDetailsUrl = `/devices/${robotName}`
   const [showFlexPipetteFlow, setShowFlexPipetteFlow] = React.useState<boolean>(
     false
   )
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
+  const attachedPipettesForFlex = useAttachedPipettesFromInstrumentsQuery()
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
 
   const isOT3 = useIsOT3(robotName)
@@ -69,6 +75,9 @@ export function SetupPipetteCalibrationItem({
   let pipetteMismatchInfo
 
   if (pipetteInfo == null) return null
+  const pipetteCalDate = isOT3
+    ? attachedPipettesForFlex[mount]?.data?.calibratedOffset?.last_modified
+    : pipetteInfo.pipetteCalDate
 
   const attached =
     pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH ||
@@ -77,7 +86,7 @@ export function SetupPipetteCalibrationItem({
   if (pipetteInfo.requestedPipetteMatch === PipetteConstants.INEXACT_MATCH) {
     pipetteMismatchInfo = (
       <Flex alignItems={ALIGN_CENTER}>
-        <Banner type="warning" padding={SPACING.spacing2}>
+        <Banner type="warning" padding={SPACING.spacing4}>
           <Flex flexDirection={DIRECTION_COLUMN}>
             {t('pipette_mismatch')}
             <Link
@@ -98,7 +107,7 @@ export function SetupPipetteCalibrationItem({
   }
 
   let flowType = ''
-  if (pipetteInfo.pipetteCalDate != null && attached) {
+  if (pipetteCalDate != null && attached) {
     button = pipetteMismatchInfo
   } else if (!attached) {
     subText = t('attach_pipette_calibration')
@@ -133,20 +142,19 @@ export function SetupPipetteCalibrationItem({
       <>
         <Flex
           alignItems={ALIGN_CENTER}
-          marginLeft={SPACING.spacing4}
+          marginLeft={SPACING.spacing16}
           flexWrap={WRAP}
           justifyContent={JUSTIFY_FLEX_END}
-          gridGap={SPACING.spacing3}
+          gridGap={SPACING.spacing8}
         >
           <Flex>{pipetteMismatchInfo}</Flex>
           {isOT3 ? (
             <TertiaryButton
-              disabled={!isDeckCalibrated}
               id="PipetteCalibration_calibratePipetteButton"
               {...targetProps}
               onClick={() => setShowFlexPipetteFlow(true)}
             >
-              {t('calibrate_now_cta')}
+              {t('calibrate_now')}
             </TertiaryButton>
           ) : (
             <RRDLink
@@ -157,7 +165,7 @@ export function SetupPipetteCalibrationItem({
                 id="PipetteCalibration_calibratePipetteButton"
                 {...targetProps}
               >
-                {t('calibrate_now_cta')}
+                {t('calibrate_now')}
               </TertiaryButton>
             </RRDLink>
           )}
@@ -173,7 +181,7 @@ export function SetupPipetteCalibrationItem({
     )
   }
 
-  const attachedCalibratedDate = pipetteInfo.pipetteCalDate
+  const attachedCalibratedDate = pipetteCalDate ?? null
 
   return (
     <>
@@ -188,6 +196,7 @@ export function SetupPipetteCalibrationItem({
               : SINGLE_MOUNT_PIPETTES
           }
           pipetteInfo={mostRecentAnalysis?.pipettes}
+          onComplete={instrumentsRefetch}
         />
       )}
       <SetupCalibrationItem

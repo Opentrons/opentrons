@@ -96,10 +96,14 @@ async def test_register_modules_sort(
 ) -> None:
     """It should sort modules by port and hub, in ascending order."""
     module_1 = decoy.mock(cls=AbstractModule)
-    decoy.when(module_1.usb_port).then_return(USBPort(name="a", port_number=5, hub=1))
+    decoy.when(module_1.usb_port).then_return(
+        USBPort(name="a", port_number=4, hub=True, hub_port=2)
+    )
 
     module_2 = decoy.mock(cls=AbstractModule)
-    decoy.when(module_2.usb_port).then_return(USBPort(name="b", port_number=4, hub=1))
+    decoy.when(module_2.usb_port).then_return(
+        USBPort(name="b", port_number=4, hub=True, hub_port=1)
+    )
 
     module_3 = decoy.mock(cls=AbstractModule)
     decoy.when(module_3.usb_port).then_return(USBPort(name="c", port_number=3))
@@ -129,4 +133,4 @@ async def test_register_modules_sort(
     await subject.register_modules(new_mods_at_ports=new_mods_at_ports)
     result = subject.available_modules
 
-    assert result == [module_2, module_1, module_4, module_3]
+    assert result == [module_4, module_3, module_2, module_1]

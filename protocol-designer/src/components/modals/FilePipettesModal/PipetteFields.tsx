@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import isEmpty from 'lodash/isEmpty'
+import reduce from 'lodash/reduce'
 import {
   DropdownField,
   FormGroup,
@@ -11,20 +13,20 @@ import {
   getIncompatiblePipetteNames,
   getLabwareDefURI,
   getLabwareDisplayName,
+  OT2_PIPETTES,
+  OT2_ROBOT_TYPE,
   OT3_PIPETTES,
+  RobotType,
 } from '@opentrons/shared-data'
-import isEmpty from 'lodash/isEmpty'
-import reduce from 'lodash/reduce'
+import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
 import { i18n } from '../../../localization'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
+import { FormPipettesByMount } from '../../../step-forms'
 import { PipetteDiagram } from './PipetteDiagram'
 
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
-
-import { FormPipettesByMount } from '../../../step-forms'
-import { DropdownOption } from '../../../../../components/src/forms/DropdownField'
 
 import type { PipetteName } from '@opentrons/shared-data'
 
@@ -58,6 +60,7 @@ export interface Props {
   onSetFieldValue: (field: string, value: string | null) => void
   onSetFieldTouched: (field: string, touched: boolean) => void
   onBlur: (event: React.FocusEvent<HTMLSelectElement>) => unknown
+  robotType: RobotType
 }
 
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
@@ -76,6 +79,7 @@ export function PipetteFields(props: Props): JSX.Element {
     onBlur,
     errors,
     touched,
+    robotType,
   } = props
 
   const dispatch = useDispatch()
@@ -106,7 +110,9 @@ export function PipetteFields(props: Props): JSX.Element {
     const pipetteName = values[mount].pipetteName
     return (
       <PipetteSelect
-        nameBlocklist={OT3_PIPETTES}
+        nameBlocklist={
+          robotType === OT2_ROBOT_TYPE ? OT3_PIPETTES : OT2_PIPETTES
+        }
         enableNoneOption
         tabIndex={tabIndex}
         pipetteName={pipetteName != null ? pipetteName : null}

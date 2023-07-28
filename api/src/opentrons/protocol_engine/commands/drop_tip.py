@@ -1,5 +1,6 @@
 """Drop tip command request, result, and implementation models."""
 from __future__ import annotations
+
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
 from typing_extensions import Literal
@@ -33,6 +34,16 @@ class DropTipParams(PipetteIdMixin):
             " a safe default depending on its hardware."
         ),
     )
+    alternateDropLocation: Optional[bool] = Field(
+        False,
+        description=(
+            "Whether to alternate location where tip is dropped within the labware."
+            " If True, this command will ignore the wellLocation provided and alternate"
+            " between dropping tips at two predetermined locations inside the specified"
+            " labware well."
+            " If False, the tip will be dropped at the top center of the well."
+        ),
+    )
 
 
 class DropTipResult(DestinationPositionResult):
@@ -60,20 +71,26 @@ class DropTipImplementation(AbstractCommandImpl[DropTipParams, DropTipResult]):
         pipette_id = params.pipetteId
         labware_id = params.labwareId
         well_name = params.wellName
-        drop_tip_well_location = params.wellLocation
         home_after = params.homeAfter
 
-        well_location = self._state_view.geometry.get_tip_drop_location(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_location=drop_tip_well_location,
+        if params.alternateDropLocation:
+            well_location = self._state_view.geometry.get_next_tip_drop_location(
+                labware_id=labware_id,
+                well_name=well_name,
+                pipette_id=pipette_id,
+            )
+        else:
+            well_location = params.wellLocation
+
+        tip_drop_location = self._state_view.geometry.get_checked_tip_drop_location(
+            pipette_id=pipette_id, labware_id=labware_id, well_location=well_location
         )
 
         position = await self._movement_handler.move_to_well(
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_name=well_name,
-            well_location=well_location,
+            well_location=tip_drop_location,
         )
 
         await self._tip_handler.drop_tip(pipette_id=pipette_id, home_after=home_after)

@@ -19,6 +19,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
     mount,
     flowType,
     attachedPipettes,
+    errorMessage,
   } = props
   const { t, i18n } = useTranslation('pipette_wizard_flows')
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.DETACH_PROBE }
@@ -28,6 +29,7 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
   return (
     <GenericWizardTile
       header={i18n.format(t('remove_cal_probe'), 'capitalize')}
+      //  todo(jr, 5/30/23): update animations! these are not final for 1, 8 and 96
       rightHandBody={getPipetteAnimations({
         pipetteWizardStep,
         channel,
@@ -37,9 +39,11 @@ export const DetachProbe = (props: DetachProbeProps): JSX.Element => {
           {i18n.format(t('remove_probe'), 'capitalize')}
         </StyledText>
       }
-      proceedButtonText={t('complete_cal')}
+      proceedButtonText={
+        errorMessage != null ? t('exit_cal') : t('complete_cal')
+      }
       proceed={proceed}
-      back={goBack}
+      back={errorMessage != null ? undefined : goBack}
     />
   )
 }

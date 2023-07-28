@@ -8,26 +8,17 @@ import {
   PrimaryButton,
   SecondaryButton,
 } from '@opentrons/components'
-import { SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { StyledText } from '../../atoms/text'
 import { SmallButton } from '../../atoms/buttons'
 import { GenericWizardTile } from '../../molecules/GenericWizardTile'
 import { SimpleWizardBody } from '../../molecules/SimpleWizardBody'
-import unscrewCarriage from '../../assets/images/change-pip/unscrew-carriage.png'
-import { BODY_STYLE, FLOWS } from './constants'
+import { getPipetteAnimations96 } from './utils'
+import { BODY_STYLE, FLOWS, SECTIONS } from './constants'
 
-import type { MotorAxis } from '@opentrons/shared-data'
 import type { PipetteWizardStepProps } from './types'
 
 export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
-  const {
-    goBack,
-    proceed,
-    flowType,
-    selectedPipette,
-    chainRunCommands,
-    isOnDevice,
-  } = props
+  const { goBack, proceed, flowType, chainRunCommands, isOnDevice } = props
   const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const [errorMessage, setErrorMessage] = React.useState<boolean>(false)
   const [numberOfTryAgains, setNumberOfTryAgains] = React.useState<number>(0)
@@ -37,7 +28,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       [
         {
           commandType: 'home' as const,
-          params: { axes: ('rightZ' as unknown) as MotorAxis },
+          params: { axes: ['rightZ'] },
         },
       ],
       false
@@ -50,9 +41,6 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         setErrorMessage(true)
       })
   }
-  //  this should never happen but to be safe
-  if (selectedPipette === SINGLE_MOUNT_PIPETTES || flowType === FLOWS.CALIBRATE)
-    return null
 
   return errorMessage ? (
     <SimpleWizardBody
@@ -68,7 +56,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
       <SecondaryButton
         isDangerous
         onClick={goBack}
-        marginRight={SPACING.spacing2}
+        marginRight={SPACING.spacing4}
       >
         {i18n.format(t('cancel_attachment'), 'capitalize')}
       </SecondaryButton>
@@ -85,16 +73,10 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
         t(flowType === FLOWS.ATTACH ? 'unscrew_carriage' : 'reattach_carriage'),
         'capitalize'
       )}
-      rightHandBody={
-        <img
-          //  TODO(jr 12/2/22): update images
-          src={flowType === FLOWS.ATTACH ? unscrewCarriage : unscrewCarriage}
-          style={{ marginTop: '-3.5rem' }}
-          alt={
-            flowType === FLOWS.ATTACH ? 'Unscrew gantry' : 'Reattach carriage'
-          }
-        />
-      }
+      rightHandBody={getPipetteAnimations96({
+        section: SECTIONS.CARRIAGE,
+        flowType: flowType,
+      })}
       bodyText={
         <Trans
           t={t}
@@ -103,7 +85,7 @@ export const Carriage = (props: PipetteWizardStepProps): JSX.Element | null => {
           }
           components={{
             block: (
-              <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing4} />
+              <StyledText css={BODY_STYLE} marginBottom={SPACING.spacing16} />
             ),
           }}
         />

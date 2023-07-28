@@ -138,7 +138,7 @@ class Simulator:
 
         self._attached_instruments = {
             m: _sanitize_attached_instrument(attached_instruments.get(m))
-            for m in types.Mount
+            for m in types.Mount.ot2_mounts()
         }
         self._stubbed_attached_modules = attached_modules
         self._position = copy.copy(self._smoothie_driver.homed_position)
@@ -284,7 +284,7 @@ class Simulator:
         """
         return {
             mount: self._attached_to_mount(mount, expected.get(mount))
-            for mount in types.Mount
+            for mount in types.Mount.ot2_mounts()
         }
 
     def set_active_current(self, axis_currents: Dict[Axis, float]) -> None:

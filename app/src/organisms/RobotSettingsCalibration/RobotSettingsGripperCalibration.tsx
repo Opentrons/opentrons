@@ -16,13 +16,13 @@ export function RobotSettingsGripperCalibration(): JSX.Element {
   const { t } = useTranslation('device_settings')
 
   return (
-    <Box paddingTop={SPACING.spacing5} paddingBottom={SPACING.spacing2}>
+    <Box paddingTop={SPACING.spacing24} paddingBottom={SPACING.spacing4}>
       <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_SPACE_BETWEEN}>
-        <Box marginRight={SPACING.spacing6}>
-          <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing3}>
+        <Box marginRight={SPACING.spacing32}>
+          <Box css={TYPOGRAPHY.h3SemiBold} marginBottom={SPACING.spacing8}>
             {t('gripper_calibration_title')}
           </Box>
-          <StyledText as="p" marginBottom={SPACING.spacing3}>
+          <StyledText as="p" marginBottom={SPACING.spacing8}>
             {t('gripper_calibration_description')}
           </StyledText>
         </Box>

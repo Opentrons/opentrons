@@ -11,6 +11,10 @@ Protocols and Instruments
 -------------------------
 .. module:: opentrons.protocol_api
 
+..
+   TODO(mm, 2023-06-06): When we want to publish move_labware(), un-exclude it here and
+   and also uncomment the inclusion of OFF_DECK, below in this file.
+   https://opentrons.atlassian.net/browse/RTC-288
 .. autoclass:: opentrons.protocol_api.ProtocolContext
    :members:
    :exclude-members: location_cache, cleanup, clear_commands, commands, move_labware
@@ -71,6 +75,11 @@ Useful Types and Definitions
 .. automodule:: opentrons.types
    :members: PipetteNotAttachedError, Point, Location, Mount
 
+..
+   TODO(mm, 2023-06-06): This should be uncommented when move_labware() is published. See above.
+   https://opentrons.atlassian.net/browse/RTC-288
+   .. autodata:: opentrons.protocol_api.OFF_DECK
+      :no-value:
 
 Executing and Simulating Protocols
 ----------------------------------

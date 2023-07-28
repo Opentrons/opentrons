@@ -42,7 +42,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       borderRadius: BORDERS.radiusRoundEdge,
       border: BORDERS.lineBorder,
       width: props.width != null ? props.width : 'auto',
-      height: SPACING.spacing4,
+      height: SPACING.spacing16,
       borderColor: COLORS.medGreyEnabled,
       boxShadow: 'none',
       padding: '0.375rem',
@@ -72,7 +72,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       ...styles,
       zIndex: 5,
       position: POSITION_ABSOLUTE,
-      top: SPACING.spacingXS,
+      top: SPACING.spacing4,
       paddingLeft: '0.375rem',
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
@@ -84,7 +84,7 @@ export function Select(props: SelectComponentProps): JSX.Element {
       width: props.width != null ? props.width : 'auto',
       boxShadowcha: '0px 1px 3px rgba(0, 0, 0, 0.2)',
       borderRadius: '4px 4px 0px 0px',
-      marginTop: SPACING.spacing2,
+      marginTop: SPACING.spacing4,
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
     menuList: (styles: CSSObjectWithLabel) => ({
@@ -121,15 +121,15 @@ export function Select(props: SelectComponentProps): JSX.Element {
     }),
     placeholder: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      marginLeft: SPACING.spacingSS,
+      marginLeft: SPACING.spacing8,
       color: COLORS.darkBlackEnabled,
       fontSize: TYPOGRAPHY.fontSizeP,
       marginTop: '0.2rem',
     }),
     singleValue: (styles: CSSObjectWithLabel) => ({
       ...styles,
-      marginRight: '0.75rem',
-      marginLeft: SPACING.spacing2,
+      marginRight: SPACING.spacing12,
+      marginLeft: SPACING.spacing4,
       marginTop: '0.2rem',
       fontSize: TYPOGRAPHY.fontSizeP,
     }),
@@ -153,8 +153,8 @@ function DropdownIndicator(
       <Box
         position={POSITION_ABSOLUTE}
         top="0.55rem"
-        right={SPACING.spacing3}
-        width={SPACING.spacingM}
+        right={SPACING.spacing8}
+        width={SPACING.spacing20}
       >
         {Boolean(props.selectProps.menuIsOpen) ? (
           <Icon transform="rotate(180deg)" name="menu-down" height="1.25rem" />

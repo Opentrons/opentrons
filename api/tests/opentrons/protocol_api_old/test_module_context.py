@@ -1,4 +1,3 @@
-import json
 from typing import cast
 
 import mock
@@ -21,9 +20,10 @@ from opentrons.protocol_api.core.legacy.module_geometry import (
     PipetteMovementRestrictedByHeaterShakerError,
     models_compatible,
 )
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
 from opentrons.protocols.api_support.types import APIVersion
 
-from opentrons_shared_data import load_shared_data
+from opentrons_shared_data.labware import load_definition as load_labware_definition
 from opentrons_shared_data.module.dev_types import ModuleDefinitionV3
 
 
@@ -54,6 +54,7 @@ def ctx_with_tempdeck(
     return papi.create_protocol_context(
         api_version=APIVersion(2, 13),
         hardware_api=mock_hardware,
+        deck_type=STANDARD_OT2_DECK,
     )
 
 
@@ -69,6 +70,7 @@ def ctx_with_magdeck(
     return papi.create_protocol_context(
         api_version=APIVersion(2, 13),
         hardware_api=mock_hardware,
+        deck_type=STANDARD_OT2_DECK,
     )
 
 
@@ -84,6 +86,7 @@ async def ctx_with_thermocycler(
     return papi.create_protocol_context(
         api_version=APIVersion(2, 13),
         hardware_api=mock_hardware,
+        deck_type=STANDARD_OT2_DECK,
     )
 
 
@@ -101,6 +104,7 @@ def ctx_with_heater_shaker(
     ctx = papi.create_protocol_context(
         api_version=APIVersion(2, 13),
         hardware_api=mock_hardware,
+        deck_type=STANDARD_OT2_DECK,
     )
     ctx.location_cache = mock_pipette_location
     return ctx
@@ -369,9 +373,7 @@ def test_heater_shaker_loading(
 def test_module_load_labware(ctx_with_tempdeck):
     labware_name = "corning_96_wellplate_360ul_flat"
     # TODO Ian 2019-05-29 load fixtures, not real defs
-    labware_def = json.loads(
-        load_shared_data(f"labware/definitions/2/{labware_name}/1.json")
-    )
+    labware_def = load_labware_definition(labware_name, 1)
     mod = ctx_with_tempdeck.load_module("Temperature Module", 1)
     assert mod.labware is None
     lw = mod.load_labware(labware_name)
@@ -420,9 +422,7 @@ def test_deprecated_module_load_labware_by_name(ctx_with_tempdeck):
 async def test_magdeck_gen1_labware_props(ctx):
     # TODO Ian 2019-05-29 load fixtures, not real defs
     labware_name = "biorad_96_wellplate_200ul_pcr"
-    labware_def = json.loads(
-        load_shared_data(f"labware/definitions/2/{labware_name}/1.json")
-    )
+    labware_def = load_labware_definition(labware_name, 1)
     mod = ctx.load_module("magdeck", 1)
     assert mod.labware is None
     mod.engage(height=45)

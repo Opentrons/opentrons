@@ -1,21 +1,34 @@
 import * as React from 'react'
+import { useInstrumentsQuery } from '@opentrons/react-api-client'
 import { renderWithProviders } from '@opentrons/components'
+import { instrumentsResponseFixture } from '@opentrons/api-client'
 import { i18n } from '../../../i18n'
 
 import { UnmountGripper } from '../UnmountGripper'
 import { GRIPPER_FLOW_TYPES } from '../constants'
 
+jest.mock('@opentrons/react-api-client')
+
+const mockUseInstrumentsQuery = useInstrumentsQuery as jest.MockedFunction<
+  typeof useInstrumentsQuery
+>
+
+const mockRunId = 'fakeRunId'
 describe('UnmountGripper', () => {
   let render: (
     props?: Partial<React.ComponentProps<typeof UnmountGripper>>
   ) => ReturnType<typeof renderWithProviders>
 
-  const mockGoBack = jest.fn()
-  const mockProceed = jest.fn()
-  const mockChainRunCommands = jest.fn(() => Promise.resolve())
-  const mockRunId = 'fakeRunId'
+  let mockRefetch: jest.Mock
+  let mockGoBack: jest.Mock
+  let mockProceed: jest.Mock
+  let mockChainRunCommands: jest.Mock
 
   beforeEach(() => {
+    mockGoBack = jest.fn()
+    mockProceed = jest.fn()
+    mockChainRunCommands = jest.fn(() => Promise.resolve())
+    mockRefetch = jest.fn(() => Promise.resolve())
     render = props => {
       return renderWithProviders(
         <UnmountGripper
@@ -37,10 +50,14 @@ describe('UnmountGripper', () => {
     jest.resetAllMocks()
   })
 
-  it('clicking confirm proceed calls home and proceed if gripper attached', async () => {
+  it('clicking confirm proceed calls home and proceed if gripper detached', async () => {
+    mockUseInstrumentsQuery.mockReturnValue({
+      refetch: mockRefetch,
+      data: null,
+    } as any)
     const { getByRole } = render({ attachedGripper: null })[0]
     await getByRole('button', { name: 'continue' }).click()
-    expect(mockChainRunCommands).toHaveBeenCalledWith(
+    await expect(mockChainRunCommands).toHaveBeenCalledWith(
       [{ commandType: 'home', params: {} }],
       true
     )
@@ -48,12 +65,20 @@ describe('UnmountGripper', () => {
   })
 
   it('clicking go back calls back', () => {
+    mockUseInstrumentsQuery.mockReturnValue({
+      refetch: mockRefetch,
+      data: instrumentsResponseFixture,
+    } as any)
     const { getByLabelText } = render()[0]
     getByLabelText('back').click()
     expect(mockGoBack).toHaveBeenCalled()
   })
 
   it('renders correct text', () => {
+    mockUseInstrumentsQuery.mockReturnValue({
+      refetch: mockRefetch,
+      data: instrumentsResponseFixture,
+    } as any)
     const { getByText } = render()[0]
     getByText('Loosen Screws and Detach')
     getByText(

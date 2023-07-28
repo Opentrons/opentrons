@@ -29,7 +29,7 @@ export function useConfirmCrashRecovery(
     <Flex
       key="crash-recovery-link"
       justifyContent={JUSTIFY_CENTER}
-      gridGap={SPACING.spacing2}
+      gridGap={SPACING.spacing4}
     >
       <StyledText as="p">{t('jog_too_far_or_bend_tip')}</StyledText>
       <Link

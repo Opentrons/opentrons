@@ -64,6 +64,10 @@ class MovementHandler:
         speed: Optional[float] = None,
     ) -> Point:
         """Move to a specific well."""
+        self._state_store.labware.raise_if_labware_has_labware_on_top(
+            labware_id=labware_id
+        )
+
         await self._tc_movement_flagger.raise_if_labware_in_non_open_thermocycler(
             labware_parent=self._state_store.labware.get_location(labware_id=labware_id)
         )

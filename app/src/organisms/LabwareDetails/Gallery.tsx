@@ -52,13 +52,13 @@ export function Gallery(props: GalleryProps): JSX.Element {
       {images.length > 1 && (
         <Flex
           flexDirection={DIRECTION_ROW}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing16}
           justifyContent={JUSTIFY_SPACE_EVENLY}
         >
           {images.map((img, index) => {
             return (
               <Box
-                padding={SPACING.spacing3}
+                padding={SPACING.spacing8}
                 key={index}
                 onClick={() => setCurrentImage(index)}
                 data-testid="gallery_mini_image"

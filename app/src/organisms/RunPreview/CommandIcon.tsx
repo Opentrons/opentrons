@@ -33,7 +33,7 @@ export function CommandIcon(props: CommandIconProps): JSX.Element | null {
     <Icon
       {...styleProps}
       name={iconName}
-      size={SPACING.spacingM}
+      size={SPACING.spacing20}
       flex="0 0 auto"
     />
   ) : null

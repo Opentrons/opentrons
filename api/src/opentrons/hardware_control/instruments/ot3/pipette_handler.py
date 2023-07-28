@@ -79,6 +79,9 @@ class TipMotorPickUpTipSpec:
     pick_up_distance: float
     speed: float
     currents: Dict[OT3Axis, float]
+    # FIXME we should throw this in a config
+    # file of some sort
+    home_buffer: float = 0
 
 
 @dataclass(frozen=True)
@@ -100,6 +103,9 @@ class DropTipMove:
     home_after_safety_margin: float = 0
     home_axes: Sequence[OT3Axis] = tuple()
     is_ht_tip_action: bool = False
+    # FIXME we should throw this in a config
+    # file of some sort
+    home_buffer: float = 0
 
 
 @dataclass(frozen=True)
@@ -215,9 +221,6 @@ class PipetteHandlerProvider:
                 "display_name",
                 "tip_length",
                 "model",
-                "fw_update_required",
-                "fw_current_version",
-                "fw_next_version",
                 "blow_out_flow_rate",
                 "working_volume",
                 "tip_overlap",
@@ -594,11 +597,7 @@ class PipetteHandlerProvider:
         """Check preconditions and calculate values for blowout."""
         instrument = self.get_pipette(mount)
         self.ready_for_tip_action(instrument, HardwareAction.BLOWOUT)
-        speed = self.plunger_speed(
-            instrument,
-            instrument.blow_out_flow_rate,
-            "blowout",
-        )
+        speed = self.plunger_speed(instrument, instrument.blow_out_flow_rate, "blowout")
         if volume is None:
             ul = self.get_attached_instrument(mount)["default_blow_out_volume"]
         else:
@@ -695,6 +694,7 @@ class PipetteHandlerProvider:
                         pick_up_distance=instrument.pick_up_configurations.distance,
                         speed=instrument.pick_up_configurations.speed,
                         currents={OT3Axis.Q: instrument.pick_up_configurations.current},
+                        home_buffer=10,
                     ),
                 ),
                 add_tip_to_instr,
@@ -773,6 +773,7 @@ class PipetteHandlerProvider:
                     home_after_safety_margin=abs(bottom_pos - droptip_pos),
                     home_axes=home_axes,
                     is_ht_tip_action=is_ht_pipette,
+                    home_buffer=10 if is_ht_pipette else 0,
                 ),
                 DropTipMove(  # always finish drop-tip at a known safe plunger position
                     target_position=bottom_pos, current=plunger_currents, speed=None

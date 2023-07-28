@@ -20,6 +20,7 @@ SERVER_UTILS_DIR := server-utils
 SYSTEM_SERVER_DIR := system-server
 HARDWARE_DIR := hardware
 USB_BRIDGE_DIR := usb-bridge
+NODE_USB_BRIDGE_CLIENT_DIR := usb-bridge/node-client
 
 PYTHON_DIRS := $(API_DIR) $(UPDATE_SERVER_DIR) $(NOTIFY_SERVER_DIR) $(ROBOT_SERVER_DIR) $(SERVER_UTILS_DIR) $(SHARED_DATA_DIR)/python $(G_CODE_TESTING_DIR) $(HARDWARE_DIR) $(USB_BRIDGE_DIR)
 
@@ -95,6 +96,7 @@ clean: clean-js clean-py
 .PHONY: clean-js
 clean-js: clean-ts
 	$(MAKE) -C $(DISCOVERY_CLIENT_DIR) clean
+	$(MAKE) -C $(NODE_USB_BRIDGE_CLIENT_DIR) clean
 	$(MAKE) -C $(COMPONENTS_DIR) clean
 
 PYTHON_CLEAN_TARGETS := $(addsuffix -py-clean, $(PYTHON_DIRS))

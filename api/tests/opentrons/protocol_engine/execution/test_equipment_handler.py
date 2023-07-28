@@ -24,6 +24,7 @@ from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.actions import ActionDispatcher, AddPipetteConfigAction
 from opentrons.protocol_engine.types import (
     DeckSlotLocation,
+    DeckType,
     ModuleLocation,
     LoadedPipette,
     LabwareOffset,
@@ -57,7 +58,9 @@ from opentrons.protocol_engine.execution.equipment import (
 def _make_config(use_virtual_modules: bool) -> Config:
     return Config(
         use_virtual_modules=use_virtual_modules,
-        robot_type="OT-2 Standard",  # Arbitrary.
+        # Robot and deck type are arbitrary.
+        robot_type="OT-2 Standard",
+        deck_type=DeckType.OT2_STANDARD,
     )
 
 
@@ -74,12 +77,6 @@ def patch_mock_pipette_data_provider(
 def state_store(decoy: Decoy) -> StateStore:
     """Get a mocked out StateStore instance."""
     return decoy.mock(cls=StateStore)
-
-
-@pytest.fixture
-def hardware_api(decoy: Decoy) -> HardwareControlAPI:
-    """Get a mocked out HardwareControlAPI instance."""
-    return decoy.mock(cls=HardwareControlAPI)
 
 
 @pytest.fixture

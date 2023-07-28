@@ -25,28 +25,25 @@ from typing import (
     Union,
 )
 from opentrons.config.types import OT3Config, GantryLoad
-from opentrons.config import ot3_pipette_config, gripper_config
+from opentrons.config import gripper_config, feature_flags as ff
 from .ot3utils import (
-    UpdateProgress,
     axis_convert,
     create_move_group,
     axis_to_node,
     get_current_settings,
-    create_home_group,
+    create_home_groups,
     node_to_axis,
-    pipette_type_for_subtype,
     sensor_node_for_mount,
+    sensor_node_for_pipette,
     sensor_id_for_instrument,
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
     create_gripper_jaw_hold_group,
     create_tip_action_group,
+    create_tip_action_home_group,
     PipetteAction,
-    sub_system_to_node_id,
-    NODEID_SUBSYSTEM,
-    USBTARGET_SUBSYSTEM,
-    filter_probed_core_nodes,
     motor_nodes,
+    LIMIT_SWITCH_OVERTRAVEL_DISTANCE,
 )
 
 try:
@@ -77,7 +74,7 @@ from opentrons_hardware.hardware_control.motor_position_status import (
     update_motor_position_estimation,
 )
 from opentrons_hardware.hardware_control.limit_switches import get_limit_switches
-from opentrons_hardware.hardware_control.network import NetworkInfo
+from opentrons_hardware.hardware_control.tip_presence import get_tip_ejector_state
 from opentrons_hardware.hardware_control.current_settings import (
     set_run_current,
     set_hold_current,
@@ -87,9 +84,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     PipetteName as FirmwarePipetteName,
     SensorId,
-    PipetteType,
-    USBTarget,
-    FirmwareTarget,
     ErrorCode,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
@@ -103,43 +97,45 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
     BinaryMessageDefinition,
     DoorSwitchStateInfo,
 )
-from opentrons_hardware import firmware_update
-
+from opentrons_hardware.firmware_update import FirmwareUpdate
+from opentrons_hardware.hardware_control import network, tools
 
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control.types import (
     BoardRevision,
-    InstrumentFWInfo,
     OT3Axis,
     AionotifyEvent,
     OT3Mount,
     OT3AxisMap,
+    OT3AxisKind,
     CurrentConfig,
     MotorStatus,
     InstrumentProbeType,
-    PipetteSubType,
     UpdateStatus,
-    mount_to_subsystem,
     DoorState,
-    OT3SubSystem,
+    SubSystemState,
+    SubSystem,
+    TipStateType,
+    FailedTipStateCheck,
 )
 from opentrons.hardware_control.errors import (
-    MustHomeError,
     InvalidPipetteName,
     InvalidPipetteModel,
     FirmwareUpdateRequired,
+    OverPressureDetected,
 )
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     MoveGroup,
 )
 from opentrons_hardware.hardware_control.types import NodeMap
-from opentrons_hardware.hardware_control.tools import detector, types as ohc_tool_types
+from opentrons_hardware.hardware_control.tools import types as ohc_tool_types
 
 from opentrons_hardware.hardware_control.tool_sensors import (
     capacitive_probe,
     capacitive_pass,
     liquid_probe,
+    check_overpressure,
 )
 from opentrons_hardware.hardware_control.rear_panel_settings import (
     get_door_state,
@@ -149,7 +145,13 @@ from opentrons_hardware.hardware_control.rear_panel_settings import (
 
 from opentrons_hardware.drivers.gpio import OT3GPIO, RemoteOT3GPIO
 from opentrons_shared_data.pipette.dev_types import PipetteName
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+    load_data as load_pipette_data,
+)
 from opentrons_shared_data.gripper.gripper_definition import GripForceProfile
+
+from .subsystem_manager import SubsystemManager
 
 if TYPE_CHECKING:
     from ..dev_types import (
@@ -179,12 +181,13 @@ def requires_update(func: Wrapped) -> Wrapped:
 class OT3Controller:
     """OT3 Hardware Controller Backend."""
 
+    _initialized: bool
     _messenger: CanMessenger
     _usb_messenger: Optional[BinaryMessenger]
     _position: Dict[NodeId, float]
     _encoder_position: Dict[NodeId, float]
     _motor_status: Dict[NodeId, MotorStatus]
-    _tool_detector: detector.OneshotToolDetector
+    _subsystem_manager: SubsystemManager
 
     @classmethod
     async def build(
@@ -208,9 +211,11 @@ class OT3Controller:
                     "No rear panel device found, probably an EVT bot, disable rearPanelIntegration feature flag if it is"
                 )
                 raise e
-        return cls(
+        inst = cls(
             config, driver=driver, usb_driver=usb_driver, check_updates=check_updates
         )
+        await inst._subsystem_manager.start()
+        return inst
 
     def __init__(
         self,
@@ -230,15 +235,18 @@ class OT3Controller:
         self._messenger = CanMessenger(driver=driver)
         self._messenger.start()
         self._gpio_dev, self._usb_messenger = self._build_system_hardware(usb_driver)
-        self._tool_detector = detector.OneshotToolDetector(self._messenger)
-        self._network_info = NetworkInfo(self._messenger, self._usb_messenger)
+        self._subsystem_manager = SubsystemManager(
+            self._messenger,
+            self._usb_messenger,
+            tools.detector.ToolDetector(self._messenger),
+            network.NetworkInfo(self._messenger, self._usb_messenger),
+            FirmwareUpdate(),
+        )
         self._position = self._get_home_position()
         self._encoder_position = self._get_home_position()
         self._motor_status = {}
         self._check_updates = check_updates
-        self._update_required = False
         self._initialized = False
-        self._update_tracker: Optional[UpdateProgress] = None
         self._status_bar = status_bar.StatusBar(messenger=self._usb_messenger)
         try:
             self._event_watcher = self._build_event_watcher()
@@ -247,7 +255,6 @@ class OT3Controller:
                 "Failed to initiate aionotify, cannot watch modules "
                 "or door, likely because not running on linux"
             )
-        self._present_devices: Set[FirmwareTarget] = set()
         self._current_settings: Optional[OT3AxisMap[CurrentConfig]] = None
 
     @property
@@ -260,28 +267,20 @@ class OT3Controller:
         self._initialized = value
 
     @property
-    def fw_version(self) -> Dict[OT3SubSystem, int]:
+    def subsystems(self) -> Dict[SubSystem, SubSystemState]:
+        return self._subsystem_manager.subsystems
+
+    @property
+    def fw_version(self) -> Dict[SubSystem, int]:
         """Get the firmware version."""
-        subsystem_map: Dict[Union[NodeId, USBTarget], OT3SubSystem] = deepcopy(
-            cast(Dict[Union[NodeId, USBTarget], OT3SubSystem], USBTARGET_SUBSYSTEM)
-        )
-        subsystem_map.update(
-            cast(Dict[Union[NodeId, USBTarget], OT3SubSystem], NODEID_SUBSYSTEM)
-        )
         return {
-            subsystem_map[node.application_for()]: device.version
-            for node, device in self._network_info.device_info.items()
+            subsystem: info.current_fw_version
+            for subsystem, info in self.subsystems.items()
         }
 
     @property
     def update_required(self) -> bool:
-        return self._update_required and self._check_updates
-
-    @update_required.setter
-    def update_required(self, value: bool) -> None:
-        if self._update_required != value:
-            log.info(f"Firmware Update Flag set {self._update_required} -> {value}")
-            self._update_required = value
+        return self._subsystem_manager.update_required and self._check_updates
 
     @staticmethod
     def _build_system_hardware(
@@ -294,109 +293,18 @@ class OT3Controller:
             usb_messenger.start()
             return RemoteOT3GPIO(usb_messenger), usb_messenger
 
-    @staticmethod
-    def _attached_pipettes_to_nodes(
-        attached_pipettes: Dict[OT3Mount, PipetteSubType]
-    ) -> Dict[NodeId, PipetteType]:
-        pipette_nodes = {}
-        for mount, subtype in attached_pipettes.items():
-            subsystem = mount_to_subsystem(mount)
-            node_id = sub_system_to_node_id(subsystem)
-            pipette_type = pipette_type_for_subtype(subtype)
-            pipette_nodes[node_id] = pipette_type
-        return pipette_nodes
-
     def _motor_nodes(self) -> Set[NodeId]:
-        return motor_nodes(self._present_devices)
-
-    def get_instrument_update(
-        self, mount: OT3Mount, pipette_subtype: Optional[PipetteSubType] = None
-    ) -> InstrumentFWInfo:
-        """Check whether the given instrument requires an update."""
-        subsystem = mount_to_subsystem(mount)
-        node_id = sub_system_to_node_id(subsystem)
-        # get the pipette_type if this is a pipette
-        attached_pipettes: Dict[NodeId, PipetteType] = dict()
-        if mount in [OT3Mount.LEFT, OT3Mount.RIGHT] and pipette_subtype:
-            attached_pipettes[node_id] = pipette_type_for_subtype(pipette_subtype)
-
-        # check if this instrument requires an update
-        firmware_updates = firmware_update.check_firmware_updates(
-            self._network_info.device_info, attached_pipettes, targets={node_id}
-        )
-        device_info = self._network_info.device_info.get(node_id)
-        current_fw_version = device_info.version if device_info else 0
-        update_info = firmware_updates.get(node_id)
-        update_required = bool(update_info)
-        next_version = update_info[0] if update_info else None
-        # set our global firmware update state if any updates are available
-        self.update_required |= bool(firmware_updates)
-        return InstrumentFWInfo(
-            mount, update_required, current_fw_version, next_version
-        )
-
-    def get_update_progress(self) -> Set[UpdateStatus]:
-        """Returns a set of UpdateStatus of the updates."""
-        updates: Set[UpdateStatus] = set()
-        if self._update_tracker:
-            updates = self._update_tracker.get_progress()
-        return updates
+        """Get a list of the motor controller nodes of all attached and ok devices."""
+        return motor_nodes(self._subsystem_manager.targets)
 
     async def update_firmware(
         self,
-        attached_pipettes: Dict[OT3Mount, PipetteSubType],
-        targets: Optional[Set[FirmwareTarget]] = None,
+        subsystems: Set[SubSystem],
         force: bool = False,
-    ) -> AsyncIterator[Set[UpdateStatus]]:
+    ) -> AsyncIterator[UpdateStatus]:
         """Updates the firmware on the OT3."""
-        # Check that there arent updates already running for given nodes
-        targets = targets or set(self._network_info.device_info)
-        targets_updating = (
-            self._update_tracker.targets if self._update_tracker else set()
-        )
-        targets_to_update = targets - targets_updating
-        if not targets_to_update:
-            log.info("No viable subsystem to update.")
-            return
-
-        attached_pipette_nodes = self._attached_pipettes_to_nodes(attached_pipettes)
-        # Check if devices need an update, only checks nodes if given
-        firmware_updates = firmware_update.check_firmware_updates(
-            self._network_info.device_info,
-            attached_pipette_nodes,
-            targets=targets_to_update,
-            force=force,
-        )
-        if not firmware_updates:
-            log.info("No firmware updates required.")
-            self.update_required = False
-            return
-
-        log.info("Firmware updates are available.")
-        self._update_tracker = UpdateProgress(set(firmware_updates))
-        self.update_required = True
-
-        update_details = {
-            target: update_info[1] for target, update_info in firmware_updates.items()
-        }
-        updater = firmware_update.RunUpdate(
-            can_messenger=self._messenger,
-            usb_messenger=self._usb_messenger,
-            update_details=update_details,
-            retry_count=3,
-            timeout_seconds=20,
-            erase=True,
-        )
-
-        # start the updates and yield progress to caller
-        async for target, status_element in updater.run_updates():
-            progress = self._update_tracker.update(target, status_element)
-            yield progress
-
-        # refresh the device_info cache and reset internal states
-        await self._network_info.probe()
-        self._update_tracker = None
-        self.update_required = False
+        async for update in self._subsystem_manager.update_firmware(subsystems, force):
+            yield update
 
     async def update_to_default_current_settings(self, gantry_load: GantryLoad) -> None:
         self._current_settings = get_current_settings(
@@ -414,12 +322,6 @@ class OT3Controller:
     async def update_motor_estimation(self, axes: Sequence[OT3Axis]) -> None:
         """Update motor position estimation for commanded nodes, and update cache of data."""
         nodes = set([axis_to_node(a) for a in axes])
-        for node in nodes:
-            if not (
-                node in self._motor_status.keys()
-                and self._motor_status[node].encoder_ok
-            ):
-                raise MustHomeError(f"Axis {node} has invalid encoder position")
         response = await update_motor_position_estimation(self._messenger, nodes)
         self._handle_motor_status_response(response)
 
@@ -455,7 +357,7 @@ class OT3Controller:
     @property
     def board_revision(self) -> BoardRevision:
         """Get the board revision"""
-        return BoardRevision.UNKNOWN
+        return BoardRevision.FLEX_B2
 
     @property
     def module_controls(self) -> AttachedModulesControl:
@@ -501,16 +403,22 @@ class OT3Controller:
         for axis, pos in response.items():
             self._position.update({axis: pos[0]})
             self._encoder_position.update({axis: pos[1]})
-            # if an axis has already been homed, we're not clearing the motor ok status flag
-            # TODO: (2023-01-10) This is just a temp fix so we're not blocking hardware testing,
-            # we should port the encoder position over to use as motor position if encoder status is ok
-            already_homed = (
-                self._motor_status[axis].motor_ok
-                if axis in self._motor_status.keys()
-                else False
+            # TODO (FPS 6-01-2023): Remove this once the Feature Flag to ignore stall detection is removed.
+            # This check will latch the motor status for an axis at "true" if it was ever set to true.
+            # To account for the case where a motor axis has its power reset, we also depend on the
+            # "encoder_ok" flag staying set (it will only be False if the motor axis has not been
+            # homed since a power cycle)
+            motor_ok_latch = (
+                (not ff.stall_detection_enabled())
+                and ((axis in self._motor_status) and self._motor_status[axis].motor_ok)
+                and self._motor_status[axis].encoder_ok
             )
             self._motor_status.update(
-                {axis: MotorStatus(motor_ok=pos[2] or already_homed, encoder_ok=pos[3])}
+                {
+                    axis: MotorStatus(
+                        motor_ok=(pos[2] or motor_ok_latch), encoder_ok=pos[3]
+                    )
+                }
             )
 
     @requires_update
@@ -532,89 +440,90 @@ class OT3Controller:
         """
         group = create_move_group(origin, moves, self._motor_nodes(), stop_condition)
         move_group, _ = group
-        runner = MoveGroupRunner(move_groups=[move_group])
+        runner = MoveGroupRunner(
+            move_groups=[move_group],
+            ignore_stalls=True if not ff.stall_detection_enabled() else False,
+        )
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)
 
-    def _build_home_pipettes_runner(
-        self, axes: Sequence[OT3Axis]
-    ) -> Optional[MoveGroupRunner]:
-        speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
-        )
-
-        distances_pipette = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in axes
-            if ax in OT3Axis.pipette_axes()
-        }
-        velocities_pipette = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
-            for ax in axes
-            if ax in OT3Axis.pipette_axes()
-        }
-
-        move_group_pipette = []
-        if distances_pipette and velocities_pipette:
-            pipette_move = self._filter_move_group(
-                create_home_group(distances_pipette, velocities_pipette)
+    def _get_axis_home_distance(self, axis: OT3Axis) -> float:
+        if self.check_motor_status([axis]):
+            return -1 * (
+                self._position[axis_to_node(axis)] + LIMIT_SWITCH_OVERTRAVEL_DISTANCE
             )
-            move_group_pipette.append(pipette_move)
+        else:
+            return -1 * self.axis_bounds[axis][1] - self.axis_bounds[axis][0]
 
-        if move_group_pipette:
-            return MoveGroupRunner(move_groups=move_group_pipette, start_at_index=2)
-        return None
+    def _build_axes_home_groups(
+        self, axes: Sequence[OT3Axis], speed_settings: Dict[OT3AxisKind, float]
+    ) -> List[MoveGroup]:
+        present_axes = [ax for ax in axes if self.axis_is_present(ax)]
+        if not present_axes:
+            return []
+        else:
+            distances = {ax: self._get_axis_home_distance(ax) for ax in present_axes}
+            velocities = {
+                ax: -1 * speed_settings[OT3Axis.to_kind(ax)] for ax in present_axes
+            }
+            return create_home_groups(distances, velocities)
+
+    def _build_home_pipettes_runner(
+        self,
+        axes: Sequence[OT3Axis],
+        gantry_load: GantryLoad,
+    ) -> Optional[MoveGroupRunner]:
+        pipette_axes = [ax for ax in axes if ax in OT3Axis.pipette_axes()]
+        if not pipette_axes:
+            return None
+
+        speed_settings = self._configuration.motion_settings.max_speed_discontinuity[
+            gantry_load
+        ]
+        move_groups: List[MoveGroup] = self._build_axes_home_groups(
+            pipette_axes, speed_settings
+        )
+        return MoveGroupRunner(move_groups=move_groups)
 
     def _build_home_gantry_z_runner(
-        self, axes: Sequence[OT3Axis]
+        self,
+        axes: Sequence[OT3Axis],
+        gantry_load: GantryLoad,
     ) -> Optional[MoveGroupRunner]:
-        speed_settings = (
-            self._configuration.motion_settings.max_speed_discontinuity.low_throughput
+        gantry_axes = [ax for ax in axes if ax in OT3Axis.gantry_axes()]
+        if not gantry_axes:
+            return None
+
+        speed_settings = self._configuration.motion_settings.max_speed_discontinuity[
+            gantry_load
+        ]
+
+        # first home all the present mount axes
+        z_axes = list(filter(lambda ax: ax in OT3Axis.mount_axes(), gantry_axes))
+        z_groups = self._build_axes_home_groups(z_axes, speed_settings)
+
+        # home X axis before Y axis, to avoid collision with thermo-cycler lid
+        # that could be in the back-left corner
+        x_groups = (
+            self._build_axes_home_groups([OT3Axis.X], speed_settings)
+            if OT3Axis.X in gantry_axes
+            else []
+        )
+        y_groups = (
+            self._build_axes_home_groups([OT3Axis.Y], speed_settings)
+            if OT3Axis.Y in gantry_axes
+            else []
         )
 
-        distances_gantry = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in axes
-            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
-        }
-        velocities_gantry = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
-            for ax in axes
-            if ax in OT3Axis.gantry_axes() and ax not in OT3Axis.mount_axes()
-        }
-        distances_z = {
-            ax: -1 * self.axis_bounds[ax][1] - self.axis_bounds[ax][0]
-            for ax in axes
-            if ax in OT3Axis.mount_axes()
-        }
-        velocities_z = {
-            ax: -1 * speed_settings[OT3Axis.to_kind(ax)]
-            for ax in axes
-            if ax in OT3Axis.mount_axes()
-        }
-        move_group_gantry_z = []
-        if distances_z and velocities_z:
-            z_move = self._filter_move_group(
-                create_home_group(distances_z, velocities_z)
-            )
-            move_group_gantry_z.append(z_move)
-        if distances_gantry and velocities_gantry:
-            # home X axis before Y axis, to avoid collision with thermo-cycler lid
-            # that could be in the back-left corner
-            for ax in [OT3Axis.X, OT3Axis.Y]:
-                if ax in axes:
-                    gantry_move = self._filter_move_group(
-                        create_home_group(
-                            {ax: distances_gantry[ax]}, {ax: velocities_gantry[ax]}
-                        )
-                    )
-                    move_group_gantry_z.append(gantry_move)
-        if move_group_gantry_z:
-            return MoveGroupRunner(move_groups=move_group_gantry_z)
+        move_groups = [*z_groups, *x_groups, *y_groups]
+        if move_groups:
+            return MoveGroupRunner(move_groups=move_groups)
         return None
 
     @requires_update
-    async def home(self, axes: Sequence[OT3Axis]) -> OT3AxisMap[float]:
+    async def home(
+        self, axes: Sequence[OT3Axis], gantry_load: GantryLoad
+    ) -> OT3AxisMap[float]:
         """Home each axis passed in, and reset the positions to 0.
 
         Args:
@@ -631,8 +540,8 @@ class OT3Controller:
             return {}
 
         maybe_runners = (
-            self._build_home_gantry_z_runner(checked_axes),
-            self._build_home_pipettes_runner(checked_axes),
+            self._build_home_gantry_z_runner(checked_axes, gantry_load),
+            self._build_home_pipettes_runner(checked_axes, gantry_load),
         )
         coros = [
             runner.run(can_messenger=self._messenger)
@@ -644,25 +553,13 @@ class OT3Controller:
             await self.tip_action(
                 [OT3Axis.Q],
                 self.axis_bounds[OT3Axis.Q][1] - self.axis_bounds[OT3Axis.Q][0],
-                self._configuration.motion_settings.default_max_speed.high_throughput[
+                self._configuration.motion_settings.max_speed_discontinuity.high_throughput[
                     OT3Axis.to_kind(OT3Axis.Q)
                 ],
             )
         for position in positions:
             self._handle_motor_status_response(position)
         return axis_convert(self._position, 0.0)
-
-    def _filter_move_group(self, move_group: MoveGroup) -> MoveGroup:
-        new_group: MoveGroup = []
-        for step in move_group:
-            new_group.append(
-                {
-                    node: axis_step
-                    for node, axis_step in step.items()
-                    if node in self._motor_nodes()
-                }
-            )
-        return new_group
 
     async def tip_action(
         self,
@@ -673,10 +570,17 @@ class OT3Controller:
     ) -> None:
         if tip_action == "home":
             speed = speed * -1
-        move_group = create_tip_action_group(
-            axes, distance, speed, cast(PipetteAction, tip_action)
-        )
-        runner = MoveGroupRunner(move_groups=[move_group])
+            runner = MoveGroupRunner(
+                move_groups=create_tip_action_home_group(axes, distance, speed)
+            )
+        else:
+            runner = MoveGroupRunner(
+                move_groups=[
+                    create_tip_action_group(
+                        axes, distance, speed, cast(PipetteAction, tip_action)
+                    )
+                ]
+            )
         positions = await runner.run(can_messenger=self._messenger)
         for axis, point in positions.items():
             self._position.update({axis: point[0]})
@@ -725,7 +629,7 @@ class OT3Controller:
     @staticmethod
     def _combine_serial_number(pipette_info: ohc_tool_types.PipetteInformation) -> str:
         serialized_name = OT3Controller._lookup_serial_key(pipette_info.name)
-        version = ot3_pipette_config.version_from_string(pipette_info.model)
+        version = pipette_load_name.version_from_string(pipette_info.model)
         return f"{serialized_name}V{version.major}{version.minor}{pipette_info.serial}"
 
     @staticmethod
@@ -741,11 +645,14 @@ class OT3Controller:
             # for PipetteInformation.serial so we don't have to use
             # helper methods to convert the serial back to what was flashed
             # on the eeprom.
+            converted_name = pipette_load_name.convert_pipette_name(
+                cast(PipetteName, attached.name.name), attached.model
+            )
             return {
-                "config": ot3_pipette_config.load_ot3_pipette(
-                    ot3_pipette_config.convert_pipette_name(
-                        cast(PipetteName, attached.name.name), attached.model
-                    )
+                "config": load_pipette_data.load_definition(
+                    converted_name.pipette_type,
+                    converted_name.pipette_channels,
+                    converted_name.pipette_version,
                 ),
                 "id": OT3Controller._combine_serial_number(attached),
             }
@@ -796,20 +703,9 @@ class OT3Controller:
         Returns:
             A map of mount to instrument name.
         """
-        await self._probe_core()
-        attached = await self._tool_detector.detect()
-
-        current_tools = dict(OT3Controller._generate_attached_instrs(attached))
-        # remove pipette_left, pipette_right and gripper
-        self._present_devices -= set(
-            axis_to_node(OT3Axis.of_main_tool_actuator(mount)) for mount in OT3Mount
+        return dict(
+            OT3Controller._generate_attached_instrs(self._subsystem_manager.tools)
         )
-        # add pipette_left, pipette_right and gripper if present
-        for mount in current_tools.keys():
-            self._present_devices.add(
-                axis_to_node(OT3Axis.of_main_tool_actuator(mount))
-            )
-        return current_tools
 
     async def get_limit_switches(self) -> OT3AxisMap[bool]:
         """Get the state of the gantry's limit switches on each axis."""
@@ -817,6 +713,17 @@ class OT3Controller:
         assert motor_nodes, "No nodes available to read limit switch status from"
         res = await get_limit_switches(self._messenger, motor_nodes)
         return {node_to_axis(node): bool(val) for node, val in res.items()}
+
+    async def get_tip_present(self, mount: OT3Mount, tip_state: TipStateType) -> None:
+        """Get the state of the tip ejector flag for a given mount."""
+        # TODO (lc 06/09/2023) We should create a separate type for
+        # pipette specific sensors. This work is done in the overpressure
+        # PR.
+        res = await get_tip_ejector_state(
+            self._messenger, sensor_node_for_mount(OT3Mount(mount.value))  # type: ignore
+        )
+        if res != tip_state.value:
+            raise FailedTipStateCheck(tip_state, res)
 
     @staticmethod
     def _tip_motor_nodes(axis_current_keys: KeysView[OT3Axis]) -> List[NodeId]:
@@ -944,11 +851,13 @@ class OT3Controller:
         nodes = {axis_to_node(ax) for ax in axes}
         await set_enable_motor(self._messenger, nodes)
 
+    @requires_update
     async def set_lights(self, button: Optional[bool], rails: Optional[bool]) -> None:
         """Set the light states."""
         if rails is not None:
             await set_deck_light(1 if rails else 0, self._usb_messenger)
 
+    @requires_update
     async def get_lights(self) -> Dict[str, bool]:
         """Get the light state."""
         return {
@@ -1008,53 +917,13 @@ class OT3Controller:
             node_to_axis(k): v for k, v in OT3Controller._get_home_position().items()
         }
 
-    async def _probe_core(self, timeout: float = 5.0) -> None:
-        """Update the list of core nodes present on the network.
-
-        Unlike probe_network, this always waits for the nodes that must be present for
-        a working machine, and no more.
-        """
-        core_nodes: Set[FirmwareTarget] = {
-            NodeId.gantry_x,
-            NodeId.gantry_y,
-            NodeId.head,
-        }
-        if self._usb_messenger is not None:
-            core_nodes.add(USBTarget.rear_panel)
-        core_present = set(await self._network_info.probe(core_nodes, timeout))
-        self._present_devices = filter_probed_core_nodes(
-            self._present_devices, core_present
-        )
-
     async def probe_network(self, timeout: float = 5.0) -> None:
         """Update the list of nodes present on the network.
 
         The stored result is used to make sure that move commands include entries
         for all present axes, so none incorrectly move before the others are ready.
         """
-        # TODO: Only add pipette ids to expected if the head indicates
-        # they're present. In the meantime, we'll use get_attached_instruments to
-        # see if we should expect instruments to be present, which should be removed
-        # when that method actually does canbus stuff
-        instrs = await self.get_attached_instruments({})
-        expected: Set[FirmwareTarget] = {NodeId.gantry_x, NodeId.gantry_y, NodeId.head}
-        if self._usb_messenger:
-            expected.add(USBTarget.rear_panel)
-        if instrs.get(OT3Mount.LEFT, cast("OT3AttachedPipette", {})).get(
-            "config", None
-        ):
-            expected.add(NodeId.pipette_left)
-        if instrs.get(OT3Mount.RIGHT, cast("OT3AttachedPipette", {})).get(
-            "config", None
-        ):
-            expected.add(NodeId.pipette_right)
-        if instrs.get(OT3Mount.GRIPPER, cast("AttachedGripper", {})).get(
-            "config", None
-        ):
-            expected.add(NodeId.gripper)
-        core_present = set(await self._network_info.probe(expected, timeout))
-        self._present_devices = core_present
-        log.info(f"The present devices are now {self._present_devices}")
+        await self._subsystem_manager.refresh()
 
     def axis_is_present(self, axis: OT3Axis) -> bool:
         try:
@@ -1069,6 +938,38 @@ class OT3Controller:
         by_node = {axis_to_node(k): v for k, v in to_xform.items()}
         return {k: v for k, v in by_node.items() if k in self._motor_nodes()}
 
+    @asynccontextmanager
+    async def monitor_overpressure(
+        self, mount: OT3Mount, sensor_id: SensorId = SensorId.S0
+    ) -> AsyncIterator[None]:
+        if ff.overpressure_detection_enabled():
+            tool = sensor_node_for_pipette(OT3Mount(mount.value))
+            # FIXME we should switch the sensor type based on the channel
+            # used when partial tip pick up is implemented.
+            # FIXME we should also monitor pressure in all available channels
+            provided_context_manager = await check_overpressure(
+                self._messenger, tool, sensor_id
+            )
+            errors: asyncio.Queue[ErrorCode] = asyncio.Queue()
+
+            async with provided_context_manager() as errors:
+                try:
+                    yield
+                finally:
+
+                    def _pop_queue() -> Optional[ErrorCode]:
+                        try:
+                            return errors.get_nowait()
+                        except asyncio.QueueEmpty:
+                            return None
+
+                    if _pop_queue():
+                        raise OverPressureDetected(
+                            f"The pressure sensor on the {mount} mount has exceeded operational limits."
+                        )
+        else:
+            yield
+
     async def liquid_probe(
         self,
         mount: OT3Mount,
@@ -1082,7 +983,7 @@ class OT3Controller:
         sensor_id: SensorId = SensorId.S0,
     ) -> Dict[NodeId, float]:
         head_node = axis_to_node(OT3Axis.by_mount(mount))
-        tool = sensor_node_for_mount(OT3Mount(mount.value))
+        tool = sensor_node_for_pipette(OT3Mount(mount.value))
         positions = await liquid_probe(
             self._messenger,
             tool,

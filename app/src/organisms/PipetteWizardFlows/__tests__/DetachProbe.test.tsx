@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { fireEvent } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { renderWithProviders } from '@opentrons/components'
 import { LEFT, SINGLE_MOUNT_PIPETTES } from '@opentrons/shared-data'
 import { i18n } from '../../../i18n'
@@ -60,5 +60,21 @@ describe('DetachProbe', () => {
     }
     const { getByText } = render(props)
     getByText('mock in progress')
+  })
+  it('returns the correct information when there is an error message', () => {
+    props = {
+      ...props,
+      errorMessage: 'error shmerror',
+    }
+    const { getByText, getByTestId, getByRole } = render(props)
+    getByText('Remove calibration probe')
+    getByText(
+      'Unlatch the calibration probe, remove it from the nozzle, and return it to its storage location.'
+    )
+    getByTestId('Pipette_Detach_Probe_1.webm')
+    const proceedBtn = getByRole('button', { name: 'Exit calibration' })
+    fireEvent.click(proceedBtn)
+    expect(props.proceed).toHaveBeenCalled()
+    expect(screen.queryByLabelText('back')).not.toBeInTheDocument()
   })
 })

@@ -60,16 +60,16 @@ export function CalibrationStatusCard({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       border={BORDERS.lineBorder}
       borderRadius={BORDERS.radiusSoftCorners}
-      padding={SPACING.spacing4}
+      padding={SPACING.spacing16}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_FLEX_START}
         justifyContent={JUSTIFY_CENTER}
-        gridGap={SPACING.spacing3}
-        marginRight={SPACING.spacingXXL}
+        gridGap={SPACING.spacing8}
+        marginRight={SPACING.spacing40}
       >
-        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+        <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <StyledText css={TYPOGRAPHY.h2SemiBold}>
             {t('calibration_status')}
           </StyledText>

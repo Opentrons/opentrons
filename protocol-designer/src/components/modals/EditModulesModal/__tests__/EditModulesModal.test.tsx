@@ -24,12 +24,13 @@ import {
 } from '../../../../step-forms'
 import {
   getLabwareOnSlot,
-  getSlotsBlockedBySpanning,
+  getSlotIdsBlockedBySpanning,
   getSlotIsEmpty,
 } from '../../../../step-forms/utils'
 import * as moduleData from '../../../../modules/moduleData'
 import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
 import { selectors as featureSelectors } from '../../../../feature-flags'
+import { getRobotType } from '../../../../file-data/selectors'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
 import { isModuleWithCollisionIssue } from '../../../modules/utils'
 import { PDAlert } from '../../../alerts/PDAlert'
@@ -51,6 +52,7 @@ jest.mock('../../../../step-forms/selectors')
 jest.mock('../../../modules/utils')
 jest.mock('../../../../step-forms/utils')
 jest.mock('../form-state')
+jest.mock('../../../../file-data/selectors')
 
 const MODEL_FIELD = 'selectedModel'
 const SLOT_FIELD = 'selectedSlot'
@@ -65,7 +67,7 @@ const getDisableModuleRestrictionsMock: jest.MockedFunction<any> =
 
 const isModuleWithCollisionIssueMock: jest.MockedFunction<any> = isModuleWithCollisionIssue
 
-const getSlotsBlockedBySpanningMock: jest.MockedFunction<any> = getSlotsBlockedBySpanning
+const getSlotIdsBlockedBySpanningMock: jest.MockedFunction<any> = getSlotIdsBlockedBySpanning
 
 const getSlotIsEmptyMock: jest.MockedFunction<any> = getSlotIsEmpty
 
@@ -73,12 +75,15 @@ const getLabwareOnSlotMock: jest.MockedFunction<any> = getLabwareOnSlot
 
 const getIsLabwareAboveHeightMock: jest.MockedFunction<any> = getIsLabwareAboveHeight
 
+const getRobotTypeMock: jest.MockedFunction<any> = getRobotType
+
 describe('Edit Modules Modal', () => {
   let mockStore: any
   let props: EditModulesModalProps
   beforeEach(() => {
+    getRobotTypeMock.mockReturnValue('OT-2 Standard')
     getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
-    getSlotsBlockedBySpanningMock.mockReturnValue([])
+    getSlotIdsBlockedBySpanningMock.mockReturnValue([])
     getLabwareOnSlotMock.mockReturnValue({})
     getIsLabwareAboveHeightMock.mockReturnValue(false)
     props = {
@@ -160,7 +165,7 @@ describe('Edit Modules Modal', () => {
 
     it('should error when slot is empty but blocked', () => {
       getSlotIsEmptyMock.mockReturnValueOnce(true)
-      getSlotsBlockedBySpanningMock.mockReturnValue(['1']) // 1 is default slot
+      getSlotIdsBlockedBySpanningMock.mockReturnValue(['1']) // 1 is default slot
       const wrapper = render(props)
       expect(wrapper.find(SlotDropdown).childAt(0).prop('error')).toMatch(
         'labware incompatible'

@@ -59,26 +59,40 @@ def load_labware_command(labware_definition: LabwareDefinition) -> commands.Load
 
 @pytest.fixture
 def pick_up_tip_command() -> commands.PickUpTip:
-    """Get a load labware command value object."""
+    """Get a pick-up tip command value object."""
     return commands.PickUpTip.construct(  # type: ignore[call-arg]
         params=commands.PickUpTipParams.construct(
             pipetteId="pipette-id",
             labwareId="cool-labware",
             wellName="A1",
         ),
-        result=commands.PickUpTipResult.construct(position=DeckPoint(x=0, y=0, z=0)),
+        result=commands.PickUpTipResult.construct(
+            position=DeckPoint(x=0, y=0, z=0), tipLength=1.23
+        ),
     )
 
 
 @pytest.fixture
 def drop_tip_command() -> commands.DropTip:
-    """Get a load labware command value object."""
+    """Get a drop tip command value object."""
     return commands.DropTip.construct(  # type: ignore[call-arg]
-        params=commands.DropTipParams.construct(  # type: ignore[call-arg]
+        params=commands.DropTipParams.construct(
+            pipetteId="pipette-id",
             labwareId="cool-labware",
             wellName="A1",
         ),
         result=commands.DropTipResult.construct(position=DeckPoint(x=0, y=0, z=0)),
+    )
+
+
+@pytest.fixture
+def drop_tip_in_place_command() -> commands.DropTipInPlace:
+    """Get a drop tip in place command object."""
+    return commands.DropTipInPlace.construct(  # type: ignore[call-arg]
+        params=commands.DropTipInPlaceParams.construct(
+            pipetteId="pipette-id",
+        ),
+        result=commands.DropTipInPlaceResult.construct(),
     )
 
 
@@ -310,3 +324,53 @@ def test_has_tip_tip_rack(
     result = TipView(state=subject.state).has_clean_tip("cool-labware", "A1")
 
     assert result is True
+
+
+def test_drop_tip(
+    subject: TipStore,
+    load_labware_command: commands.LoadLabware,
+    pick_up_tip_command: commands.PickUpTip,
+    drop_tip_command: commands.DropTip,
+    drop_tip_in_place_command: commands.DropTipInPlace,
+) -> None:
+    """It should be clear tip length when a tip is dropped."""
+    subject.handle_action(actions.UpdateCommandAction(command=load_labware_command))
+    subject.handle_action(
+        actions.AddPipetteConfigAction(
+            pipette_id="pipette-id",
+            serial_number="pipette-serial",
+            config=LoadedStaticPipetteData(
+                channels=8,
+                max_volume=15,
+                min_volume=3,
+                model="gen a",
+                display_name="display name",
+                flow_rates=FlowRates(
+                    default_aspirate={},
+                    default_dispense={},
+                    default_blow_out={},
+                ),
+                return_tip_scale=0,
+                nominal_tip_overlap={},
+                nozzle_offset_z=1.23,
+                home_position=4.56,
+            ),
+        )
+    )
+    subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
+    result = TipView(subject.state).get_tip_length("pipette-id")
+    assert result == 1.23
+
+    subject.handle_action(actions.UpdateCommandAction(command=drop_tip_command))
+    result = TipView(subject.state).get_tip_length("pipette-id")
+    assert result == 0
+
+    subject.handle_action(actions.UpdateCommandAction(command=pick_up_tip_command))
+    result = TipView(subject.state).get_tip_length("pipette-id")
+    assert result == 1.23
+
+    subject.handle_action(
+        actions.UpdateCommandAction(command=drop_tip_in_place_command)
+    )
+    result = TipView(subject.state).get_tip_length("pipette-id")
+    assert result == 0

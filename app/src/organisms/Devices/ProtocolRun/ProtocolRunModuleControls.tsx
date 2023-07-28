@@ -41,22 +41,22 @@ export const ProtocolRunModuleControls = ({
       <StyledText
         as="p"
         color={COLORS.darkGreyEnabled}
-        marginY={SPACING.spacing4}
+        marginY={SPACING.spacing16}
       >
         {t('connect_modules_to_see_controls')}
       </StyledText>
     </Flex>
   ) : (
     <Flex
-      gridGap={SPACING.spacing3}
-      paddingTop={SPACING.spacing4}
-      paddingBottom={SPACING.spacing3}
-      paddingX={SPACING.spacing4}
+      gridGap={SPACING.spacing8}
+      paddingTop={SPACING.spacing16}
+      paddingBottom={SPACING.spacing8}
+      paddingX={SPACING.spacing16}
     >
       <Flex
         flexDirection={DIRECTION_COLUMN}
         flex="50%"
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         {leftColumnModules.map((module, index) =>
           module.attachedModuleMatch != null ? (
@@ -74,7 +74,7 @@ export const ProtocolRunModuleControls = ({
       <Flex
         flexDirection={DIRECTION_COLUMN}
         flex="50%"
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
       >
         {rightColumnModules.map((module, index) =>
           module.attachedModuleMatch != null ? (

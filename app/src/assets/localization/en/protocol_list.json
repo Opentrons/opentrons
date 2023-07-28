@@ -1,5 +1,6 @@
 {
   "a_software_update_is_available_please_update": "A software update is available for this robot. Update to run protocols. <robotLink>Go to Robot</robotLink>",
+  "delete_protocol_message": " and its run history will be permanently deleted.",
   "last_updated_at": "Updated {{date}}",
   "left_mount": "left mount",
   "loading_data": "Loading data...",

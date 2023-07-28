@@ -2,11 +2,11 @@
 test_name: GET Robot Settings
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Settings Robot GET request returns correct settings
     request:
-      url: "{host:s}:{port:d}/settings/robot"
+      url: "{ot2_server_base_url}/settings/robot"
       method: GET
     response:
       status_code: 200

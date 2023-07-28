@@ -5,6 +5,12 @@
   stroke: var(--c-black);
 }
 
+.labware_outline_highlight {
+  fill: var(--c-white);
+  stroke: var(--c-blue-enabled);
+  stroke-width: 3.57;
+}
+
 .tiprack_outline {
   fill: var(--c-plate-bg);
   stroke: var(--c-charcoal);

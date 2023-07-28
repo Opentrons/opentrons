@@ -30,7 +30,7 @@ describe('Line', () => {
       width: '80%',
       color: COLORS.blueEnabled,
       marginY: 0,
-      paddingX: SPACING.spacing2,
+      paddingX: SPACING.spacing4,
     }
     const { getByTestId } = render(props)
     const line = getByTestId('line')

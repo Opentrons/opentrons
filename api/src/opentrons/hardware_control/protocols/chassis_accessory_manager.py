@@ -49,3 +49,14 @@ class ChassisAccessoryManager(EventSourcer, Protocol):
         and will implicitly revert back to the previous state after a short
         action, while others"""
         ...
+
+    async def set_status_bar_enabled(self, enabled: bool) -> None:
+        """Enable or disable the status bar entirely.
+
+        enabled: True to turn the status bar on, false to turn it off."""
+
+    def get_status_bar_state(self) -> StatusBarState:
+        """Get the current status bar state.
+
+        :returns: The current status bar state enumeration."""
+        ...

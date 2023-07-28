@@ -83,7 +83,9 @@ class ModuleListener:
             ModuleAtPort(
                 port=c.url,
                 name=c.module_type,
-                usb_port=USBPort(name=c.identifier, port_number=0, hub=_next_index()),
+                usb_port=USBPort(
+                    name=c.identifier, port_number=0, hub=True, hub_port=_next_index()
+                ),
             )
             for c in message.connections
         ]

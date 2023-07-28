@@ -43,7 +43,7 @@ export function AddCustomLabwareSlideout(
       <Flex
         flexDirection={DIRECTION_COLUMN}
         alignItems={ALIGN_CENTER}
-        gridGap={SPACING.spacing4}
+        gridGap={SPACING.spacing16}
       >
         <UploadInput
           onUpload={(file: File) => {

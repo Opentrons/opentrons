@@ -17,7 +17,8 @@ import type {
 } from '@opentrons/api-client'
 import type { GripperWizardFlowType, GripperWizardStepProps } from './types'
 import type { AxiosError } from 'axios'
-import { CreateCommand, LEFT } from '@opentrons/shared-data'
+import { EXTENSION } from '@opentrons/shared-data'
+import type { CreateCommand } from '@opentrons/shared-data'
 
 interface BeforeBeginningInfo {
   bodyI18nKey: string
@@ -70,24 +71,16 @@ export const BeforeBeginning = (
     createMaintenanceRun({})
   }, [])
 
-  let commandsOnProceed: CreateCommand[] = [
+  const commandsOnProceed: CreateCommand[] = [
+    { commandType: 'home' as const, params: {} },
     {
       // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
-        mount: LEFT, // TODO: update to gripper mount when RLAB-231 is addressed
+        mount: EXTENSION,
       },
     },
   ]
-  if (
-    flowType === GRIPPER_FLOW_TYPES.ATTACH ||
-    flowType === GRIPPER_FLOW_TYPES.RECALIBRATE
-  ) {
-    commandsOnProceed = [
-      { commandType: 'home' as const, params: {} },
-      ...commandsOnProceed,
-    ]
-  }
 
   const handleOnClick = (): void => {
     chainRunCommands(commandsOnProceed, true)
@@ -101,8 +94,8 @@ export const BeforeBeginning = (
     [loadName: string]: { displayName: string; subtitle?: string }
   } = {
     calibration_pin: { displayName: t('calibration_pin') },
-    t10_torx_screwdriver: {
-      displayName: t('t10_torx_screwdriver'),
+    hex_screwdriver: {
+      displayName: t('hex_screwdriver'),
       subtitle: t('provided_with_robot_use_right_size'),
     },
     [GRIPPER_LOADNAME]: { displayName: t('gripper') },

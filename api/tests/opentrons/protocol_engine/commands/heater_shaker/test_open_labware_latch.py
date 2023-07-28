@@ -51,11 +51,15 @@ async def test_open_labware_latch(
     decoy.when(
         equipment.get_module_hardware_api(HeaterShakerModuleId("heater-shaker-id"))
     ).then_return(hs_hardware)
-
+    decoy.when(state_view.motion.get_robot_mount_axes()).then_return(
+        [MotorAxis.EXTENSION_Z]
+    )
     result = await subject.execute(data)
     decoy.verify(
         hs_module_substate.raise_if_shaking(),
-        await movement.home([MotorAxis.RIGHT_Z, MotorAxis.LEFT_Z]),
+        await movement.home(
+            [MotorAxis.EXTENSION_Z],
+        ),
         await hs_hardware.open_labware_latch(),
     )
     assert result == heater_shaker.OpenLabwareLatchResult(pipetteRetracted=True)

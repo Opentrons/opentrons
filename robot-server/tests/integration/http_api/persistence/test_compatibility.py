@@ -58,7 +58,7 @@ async def test_protocols_analyses_and_runs_available_from_older_persistence_dir(
 ) -> None:
     port = "15555"
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()

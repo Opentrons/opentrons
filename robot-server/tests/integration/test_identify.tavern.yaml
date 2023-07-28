@@ -2,12 +2,12 @@
 test_name: POST Identify
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Identify a robot by flashing the lights
     request:
       method: POST
-      url: "{host:s}:{port:d}/identify"
+      url: "{ot2_server_base_url}/identify"
       params:
         seconds: 5
     response:
@@ -18,12 +18,12 @@ stages:
 test_name: POST Identify without params
 marks:
   - usefixtures:
-      - run_server
+      - ot2_server_base_url
 stages:
   - name: Attempt to send identify request without parameters
     request:
       method: POST
-      url: "{host:s}:{port:d}/identify"
+      url: "{ot2_server_base_url}/identify"
     response:
       status_code: 422
       json:

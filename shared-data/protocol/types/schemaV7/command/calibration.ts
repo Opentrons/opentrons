@@ -1,6 +1,7 @@
 import type { CommonCommandRunTimeInfo, CommonCommandCreateInfo } from '.'
 import type {
   PipetteMount,
+  GantryMount,
   LabwareOffset,
   Coordinates,
 } from '../../../../js/types'
@@ -59,5 +60,6 @@ interface CalibrateGripperResult {
   jawOffset: Coordinates
 }
 interface MoveToMaintenancePositionParams {
-  mount: PipetteMount
+  mount: GantryMount
+  maintenancePosition?: 'attachPlate' | 'attachInstrument'
 }

@@ -12,10 +12,11 @@ from opentrons.config import (
     reset as reset_util,
     robot_configs,
     advanced_settings,
+    feature_flags as ff,
 )
 
 from robot_server.errors import LegacyErrorResponse
-from robot_server.hardware import get_hardware
+from robot_server.hardware import get_hardware, get_robot_type
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
     AdvancedSettingsResponse,
@@ -50,10 +51,13 @@ router = APIRouter()
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": LegacyErrorResponse},
     },
 )
-async def post_settings(update: AdvancedSettingRequest) -> AdvancedSettingsResponse:
+async def post_settings(
+    update: AdvancedSettingRequest, hardware: HardwareControlAPI = Depends(get_hardware)
+) -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
     try:
         await advanced_settings.set_adv_setting(update.id, update.value)
+        await hardware.set_status_bar_enabled(ff.status_bar_enabled())
     except ValueError as e:
         raise LegacyErrorResponse(message=str(e)).as_error(status.HTTP_400_BAD_REQUEST)
     except advanced_settings.SettingException as e:
@@ -180,8 +184,10 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
     description="Get the settings that can be reset as part of " "factory reset",
     response_model=FactoryResetOptions,
 )
-async def get_settings_reset_options() -> FactoryResetOptions:
-    reset_options = reset_util.reset_options().items()
+async def get_settings_reset_options(
+    robot_type: str = Depends(get_robot_type),
+) -> FactoryResetOptions:
+    reset_options = reset_util.reset_options(robot_type).items()
     return FactoryResetOptions(
         options=[
             FactoryResetOption(id=k, name=v.name, description=v.description)
@@ -191,12 +197,29 @@ async def get_settings_reset_options() -> FactoryResetOptions:
 
 
 @router.post(
-    "/settings/reset", description="Perform a factory reset of some robot data"
+    "/settings/reset",
+    description="Perform a factory reset of some robot data",
+    responses={
+        status.HTTP_403_FORBIDDEN: {"model": LegacyErrorResponse},
+    },
 )
 async def post_settings_reset_options(
     factory_reset_commands: Dict[reset_util.ResetOptionId, bool],
     persistence_resetter: PersistenceResetter = Depends(get_persistence_resetter),
+    robot_type: str = Depends(get_robot_type),
 ) -> V1BasicResponse:
+    reset_options = reset_util.reset_options(robot_type)
+    not_allowed_options = [
+        option.value
+        for option in list(factory_reset_commands.keys())
+        if option not in reset_options.keys()
+    ]
+    if not_allowed_options:
+        not_allowed_array_to_str = " ".join(not_allowed_options)
+        raise LegacyErrorResponse(
+            message=f"{not_allowed_array_to_str} is not a valid reset option."
+        ).as_error(status.HTTP_403_FORBIDDEN)
+
     options = set(k for k, v in factory_reset_commands.items() if v)
     reset_util.reset(options)
 

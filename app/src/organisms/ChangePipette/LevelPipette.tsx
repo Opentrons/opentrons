@@ -32,8 +32,8 @@ function LevelingVideo(props: {
       css={css`
         width: 275px;
         max-height: 270px;
-        margin-top: ${SPACING.spacing4};
-        margin-left: ${SPACING.spacing4};
+        margin-top: ${SPACING.spacing16};
+        margin-left: ${SPACING.spacing16};
       `}
       autoPlay={true}
       loop={true}
@@ -55,14 +55,14 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
     <>
       <Flex
         flexDirection={DIRECTION_COLUMN}
-        paddingX={SPACING.spacing6}
-        paddingTop={SPACING.spacing6}
+        paddingX={SPACING.spacing32}
+        paddingTop={SPACING.spacing32}
         height="100%"
       >
         <Flex
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          marginBottom={SPACING.spacingXXL}
+          marginBottom={SPACING.spacing40}
         >
           <Flex flexDirection={DIRECTION_COLUMN}>
             <Trans
@@ -82,7 +82,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
                 h1: (
                   <StyledText
                     css={TYPOGRAPHY.h1Default}
-                    marginBottom={SPACING.spacing4}
+                    marginBottom={SPACING.spacing16}
                   />
                 ),
                 block: (
@@ -90,7 +90,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
                     css={css`
                       display: list-item;
                     `}
-                    marginLeft={SPACING.spacing6}
+                    marginLeft={SPACING.spacing32}
                     as="p"
                   />
                 ),
@@ -100,7 +100,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
           <LevelingVideo pipetteName={pipetteModelName} mount={mount} />
         </Flex>
       </Flex>
-      <Flex justifyContent={JUSTIFY_FLEX_END} margin={SPACING.spacing6}>
+      <Flex justifyContent={JUSTIFY_FLEX_END} margin={SPACING.spacing32}>
         <PrimaryButton onClick={confirm}>{t('confirm_level')}</PrimaryButton>
       </Flex>
     </>

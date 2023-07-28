@@ -21,7 +21,7 @@ async def test_protocols_and_analyses_persist(
     """
     port = "15555"
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()
@@ -87,7 +87,7 @@ async def test_protocol_labware_files_persist() -> None:
     """
     port = "15556"
     async with RobotClient.make(
-        host="http://localhost", port=port, version="*"
+        base_url=f"http://localhost:{port}", version="*"
     ) as robot_client:
         assert (
             await robot_client.wait_until_dead()

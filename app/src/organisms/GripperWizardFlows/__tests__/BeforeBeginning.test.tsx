@@ -53,7 +53,7 @@ describe('BeforeBeginning', () => {
     getByText('You will need:')
     // getByText('mock need help link')
     getByText('Calibration Pin')
-    getByText('T10 Torx Screwdriver')
+    getByText('2.5 mm Hex Screwdriver')
     getByText(
       'Provided with robot. Using another size can strip the instrument’s screws.'
     )
@@ -68,7 +68,7 @@ describe('BeforeBeginning', () => {
         },
         {
           commandType: 'calibration/moveToMaintenancePosition',
-          params: { mount: 'left' },
+          params: { mount: 'extension' },
         },
       ],
       true
@@ -85,7 +85,7 @@ describe('BeforeBeginning', () => {
       'To get started, remove labware from the rest of the deck and clean up the work area to make attachment and calibration easier. Also gather the needed equipment shown on the right hand side'
     )
     getByText('You will need:')
-    getByText('T10 Torx Screwdriver')
+    getByText('2.5 mm Hex Screwdriver')
     getByText(
       'Provided with robot. Using another size can strip the instrument’s screws.'
     )
@@ -94,9 +94,10 @@ describe('BeforeBeginning', () => {
     getByRole('button', { name: 'Move gantry to front' }).click()
     expect(props.chainRunCommands).toHaveBeenCalledWith(
       [
+        { commandType: 'home', params: {} },
         {
           commandType: 'calibration/moveToMaintenancePosition',
-          params: { mount: 'left' },
+          params: { mount: 'extension' },
         },
       ],
       true
@@ -129,7 +130,7 @@ describe('BeforeBeginning', () => {
         },
         {
           commandType: 'calibration/moveToMaintenancePosition',
-          params: { mount: 'left' },
+          params: { mount: 'extension' },
         },
       ],
       true

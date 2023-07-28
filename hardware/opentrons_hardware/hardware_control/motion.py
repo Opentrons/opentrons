@@ -35,6 +35,7 @@ class MoveType(int, Enum):
             MoveStopCondition.encoder_position: cls.linear,
             MoveStopCondition.gripper_force: cls.grip,
             MoveStopCondition.stall: cls.linear,
+            MoveStopCondition.limit_switch_backoff: cls.linear,
         }
         return mapping[condition]
 
@@ -95,6 +96,8 @@ MAX_SPEEDS = {
     NodeId.pipette_right: 2,
 }
 
+BACKOFF_MAX_MM = 5
+
 
 def create_step(
     distance: Dict[NodeId, np.float64],
@@ -134,6 +137,22 @@ def create_step(
     return step
 
 
+def create_backoff_step(velocity: Dict[NodeId, np.float64]) -> MoveGroupStep:
+    """Create a sequence to back away from the limit switch and re-home."""
+    backoff: MoveGroupStep = {}
+
+    for axis, v in velocity.items():
+        backoff[axis] = MoveGroupSingleAxisStep(
+            distance_mm=np.float64(BACKOFF_MAX_MM),
+            acceleration_mm_sec_sq=np.float64(0),
+            velocity_mm_sec=abs(v),
+            duration_sec=np.float64(BACKOFF_MAX_MM) / abs(v),
+            stop_condition=MoveStopCondition.limit_switch_backoff,
+            move_type=MoveType.linear,
+        )
+    return backoff
+
+
 def create_home_step(
     distance: Dict[NodeId, np.float64], velocity: Dict[NodeId, np.float64]
 ) -> MoveGroupStep:
@@ -149,6 +168,19 @@ def create_home_step(
             move_type=MoveType.home,
         )
     return step
+
+
+def create_tip_action_backoff_step(velocity: Dict[NodeId, np.float64]) -> MoveGroupStep:
+    """Create a sequence to back away from the limit switch and re-home."""
+    backoff: MoveGroupStep = {}
+    for axis, v in velocity.items():
+        backoff[axis] = MoveGroupTipActionStep(
+            velocity_mm_sec=abs(v),
+            duration_sec=abs(np.float64(BACKOFF_MAX_MM) / abs(v)),
+            stop_condition=MoveStopCondition.limit_switch_backoff,
+            action=PipetteTipActionType.home,
+        )
+    return backoff
 
 
 def create_tip_action_step(

@@ -27,7 +27,7 @@ describe('SecondaryButton', () => {
     const button = getByText('secondary button')
     expect(button).toHaveStyle(`background-color: ${COLORS.transparent}`)
     expect(button).toHaveStyle(
-      `padding: ${SPACING.spacing3} ${SPACING.spacing4}`
+      `padding: ${SPACING.spacing8} ${SPACING.spacing16}`
     )
     expect(button).toHaveStyle(`font-size: ${TYPOGRAPHY.fontSizeP}`)
     expect(button).toHaveStyle(`font-weight: ${TYPOGRAPHY.fontWeightSemiBold}`)

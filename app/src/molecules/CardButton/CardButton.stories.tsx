@@ -21,7 +21,7 @@ export default {
 
 const Template: Story<React.ComponentProps<typeof CardButton>> = args => (
   <MemoryRouter>
-    <Flex marginTop={SPACING.spacing4} width="15.375rem" height="17rem">
+    <Flex marginTop={SPACING.spacing16} width="15.375rem" height="17rem">
       <CardButton {...args} />
     </Flex>
   </MemoryRouter>

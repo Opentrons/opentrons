@@ -2,10 +2,12 @@
 import asyncio
 from pathlib import Path
 from subprocess import run as run_subprocess, Popen, CalledProcessError
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Dict
 from urllib.request import urlopen
+from time import time
 
 from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import StatusBarState, DoorState
 from opentrons.system import nmcli
 
 from hardware_testing.data import create_datetime_string
@@ -26,6 +28,14 @@ CAM_CMD_OT3 = (
     "v4l2-ctl --device /dev/video0 --set-fmt-video=width=640,height=480,pixelformat=MJPG "
     "--stream-mmap --stream-to={0} --stream-count=1"
 )
+
+COLOR_TO_STATE: Dict[str, StatusBarState] = {
+    "off": StatusBarState.OFF,
+    "white": StatusBarState.IDLE,
+    "red": StatusBarState.SOFTWARE_ERROR,
+    "green": StatusBarState.RUN_COMPLETED,
+    "blue": StatusBarState.RUNNING,
+}
 
 
 async def _get_ip(api: OT3API) -> Optional[str]:
@@ -124,7 +134,11 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
         CSVLine("screen-touch", [CSVResult]),
         CSVLine("deck-lights-on", [CSVResult]),
         CSVLine("deck-lights-off", [CSVResult]),
-        CSVLine("status-light-on", [CSVResult]),
+        CSVLine("status-light-off", [CSVResult]),
+        CSVLine("status-light-white", [CSVResult]),
+        CSVLine("status-light-red", [CSVResult]),
+        CSVLine("status-light-green", [CSVResult]),
+        CSVLine("status-light-blue", [CSVResult]),
         CSVLine("door-switch", [CSVResult]),
         CSVLine("camera-active", [CSVResult]),
         CSVLine("camera-image", [CSVResult]),
@@ -133,6 +147,8 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
 
 async def run(api: OT3API, report: CSVReport, section: str) -> None:
     """Run."""
+    await api.set_lights(rails=True)
+    await api.set_status_bar_state(StatusBarState.IDLE)
 
     def _get_user_confirmation(question: str) -> bool:
         if api.is_simulator:
@@ -148,21 +164,44 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # DECK LIGHTS
     ui.print_header("DECK LIGHTS")
+    await api.set_lights(rails=True)
     result = _get_user_confirmation("are the DECK-LIGHTS on")
     report(section, "deck-lights-on", [CSVResult.from_bool(result)])
-    # TODO: enable once we are able to turn off the deck lights
-    report(section, "deck-lights-off", [CSVResult.PASS])
+    await api.set_lights(rails=False)
+    result = _get_user_confirmation("are the DECK-LIGHTS off")
+    report(section, "deck-lights-off", [CSVResult.from_bool(result)])
+    await api.set_lights(rails=True)
 
     # STATUS LIGHTS
     ui.print_header("STATUS LIGHT")
-    result = _get_user_confirmation("is the STATUS-LIGHT on")
-    report(section, "status-light-on", [CSVResult.from_bool(result)])
-    # TODO: do more testing (colors, on/off, etc.) once implemented
+    for color, state in COLOR_TO_STATE.items():
+        await api.set_status_bar_state(state)
+        result = _get_user_confirmation(f"is the STATUS-LIGHT {color}")
+        report(section, f"status-light-{color}", [CSVResult.from_bool(result)])
+    await api.set_status_bar_state(StatusBarState.IDLE)
 
     # DOOR SWITCH
+    # NOTE: we need to use asyncio while waiting, so that we don't
+    #       block the event loop from receiving the updated status
     ui.print_header("DOOR SWITCH")
-    # TODO: add test once implemented
-    report(section, "door-switch", [CSVResult.PASS])
+    door_timeout_seconds = 10
+    print("CLOSE the front door")
+    start_time_seconds = time()
+    while not api.is_simulator and api.door_state != DoorState.CLOSED:
+        await asyncio.sleep(0.1)
+        if time() - start_time_seconds > door_timeout_seconds:
+            ui.print_error("timed out waiting for door to close")
+    print(api.door_state)
+    is_closed = api.door_state == DoorState.CLOSED
+    print("OPEN the front door")
+    start_time_seconds = time()
+    while not api.is_simulator and api.door_state != DoorState.OPEN:
+        await asyncio.sleep(0.1)
+        if time() - start_time_seconds > door_timeout_seconds:
+            ui.print_error("timed out waiting for door to open")
+    print(api.door_state)
+    is_open = api.door_state == DoorState.OPEN
+    report(section, "door-switch", [CSVResult.from_bool(is_closed and is_open)])
 
     # CAMERA
     ui.print_header("CAMERA")

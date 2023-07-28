@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import { useTranslation } from 'react-i18next'
 import {
   Icon,
@@ -11,35 +11,20 @@ import {
   JUSTIFY_SPACE_BETWEEN,
   BORDERS,
   TYPOGRAPHY,
+  RESPONSIVENESS,
   TEXT_ALIGN_CENTER,
   ALIGN_CENTER,
   ALIGN_FLEX_END,
   TEXT_TRANSFORM_CAPITALIZE,
 } from '@opentrons/components'
 import { Portal } from '../../App/portal'
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { StyledText } from '../../atoms/text'
+import { i18n } from '../../i18n'
 
 const SUPPORT_EMAIL = 'support@opentrons.com'
 
-const ErrorTextArea = styled.textarea`
-  min-height: 6rem;
-  width: 30rem;
-  background-color: #f8f8f8;
-  border: ${BORDERS.lineBorder};
-  border-radius: ${BORDERS.radiusSoftCorners};
-  padding: ${SPACING.spacing3};
-  margin: ${SPACING.spacing4} 0;
-  font-size: ${TYPOGRAPHY.fontSizeCaption};
-  font-family: monospace;
-  resize: none;
-`
-const CAPITALIZE_FIRST_LETTER_STYLE = css`
-  &:first-letter {
-    text-transform: uppercase;
-  }
-`
 interface FatalErrorModalProps {
   errorMessage: string
   onClose: () => void
@@ -48,7 +33,7 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
   const { t } = useTranslation(['labware_position_check', 'shared'])
   return (
     <Portal level="top">
-      <ModalShell
+      <LegacyModalShell
         width="47rem"
         header={
           <WizardHeader
@@ -58,11 +43,11 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
         }
       >
         <Flex
-          padding={SPACING.spacing6}
+          padding={SPACING.spacing32}
           flexDirection={DIRECTION_COLUMN}
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
-          gridGap={SPACING.spacing4}
+          gridGap={SPACING.spacing16}
         >
           <Icon
             name="ot-alert"
@@ -70,13 +55,9 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
             color={COLORS.errorEnabled}
             aria-label="alert"
           />
-          <StyledText
-            as="h1"
-            textAlign={TEXT_ALIGN_CENTER}
-            css={CAPITALIZE_FIRST_LETTER_STYLE}
-          >
-            {t('shared:something_went_wrong')}
-          </StyledText>
+          <ErrorHeader>
+            {i18n.format(t('shared:something_went_wrong'), 'sentenceCase')}
+          </ErrorHeader>
           <StyledText as="p" textAlign={TEXT_ALIGN_CENTER}>
             {t('shared:help_us_improve_send_error_report', {
               support_email: SUPPORT_EMAIL,
@@ -95,7 +76,29 @@ export function FatalErrorModal(props: FatalErrorModalProps): JSX.Element {
             {t('shared:exit')}
           </PrimaryButton>
         </Flex>
-      </ModalShell>
+      </LegacyModalShell>
     </Portal>
   )
 }
+
+const ErrorHeader = styled.h1`
+  text-align: ${TEXT_ALIGN_CENTER};
+  ${TYPOGRAPHY.h1Default}
+
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    ${TYPOGRAPHY.level4HeaderSemiBold}
+  }
+`
+
+const ErrorTextArea = styled.textarea`
+  min-height: 6rem;
+  width: 30rem;
+  background-color: #f8f8f8;
+  border: ${BORDERS.lineBorder};
+  border-radius: ${BORDERS.radiusSoftCorners};
+  padding: ${SPACING.spacing8};
+  margin: ${SPACING.spacing16} 0;
+  font-size: ${TYPOGRAPHY.fontSizeCaption};
+  font-family: monospace;
+  resize: none;
+`

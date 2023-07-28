@@ -13,7 +13,7 @@ import {
   PrimaryButton,
 } from '@opentrons/components'
 import { StyledText } from '../../atoms/text'
-import { Modal } from '../../molecules/Modal'
+import { LegacyModal } from '../../molecules/LegacyModal'
 
 import type { AttachedModule } from '../../redux/modules/types'
 
@@ -31,24 +31,24 @@ export const FirmwareUpdateFailedModal = (
   const title = (
     <Flex flexDirection={DIRECTION_ROW}>
       <Icon
-        width={SPACING.spacingM}
+        width={SPACING.spacing20}
         color={COLORS.errorEnabled}
         name="information"
         aria-label="information"
       />
-      <StyledText marginLeft={SPACING.spacing3}>
+      <StyledText marginLeft={SPACING.spacing8}>
         {t('firmware_update_failed')}
       </StyledText>
     </Flex>
   )
 
   return (
-    <Modal title={title} onClose={onCloseClick}>
+    <LegacyModal title={title} onClose={onCloseClick}>
       <Flex
         flexDirection={DIRECTION_COLUMN}
         data-testid={`FirmwareUpdateFailedModal_body_text_${module.serialNumber}`}
       >
-        <StyledText paddingBottom={SPACING.spacing2}>
+        <StyledText paddingBottom={SPACING.spacing4}>
           {t('an_error_occurred_while_updating_module', {
             moduleName: getModuleDisplayName(module.moduleModel),
           })}
@@ -57,7 +57,7 @@ export const FirmwareUpdateFailedModal = (
       </Flex>
       <Flex
         flexDirection={DIRECTION_ROW}
-        paddingTop={SPACING.spacingXL}
+        paddingTop={SPACING.spacing32}
         justifyContent={JUSTIFY_FLEX_END}
         data-testid={`FirmwareUpdateFailedModal_cancel_btn_${module.serialNumber}`}
       >
@@ -68,6 +68,6 @@ export const FirmwareUpdateFailedModal = (
           {t('shared:close')}
         </PrimaryButton>
       </Flex>
-    </Modal>
+    </LegacyModal>
   )
 }

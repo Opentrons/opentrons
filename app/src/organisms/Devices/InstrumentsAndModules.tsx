@@ -31,6 +31,7 @@ import {
 } from './utils'
 import { PipetteCard } from './PipetteCard'
 import { GripperCard } from '../GripperCard'
+import type { GripperData, PipetteData } from '@opentrons/api-client'
 
 const EQUIPMENT_POLL_MS = 5000
 const FETCH_PIPETTE_CAL_POLL = 30000
@@ -56,9 +57,20 @@ export function InstrumentsAndModules({
   const { data: attachedInstruments } = useInstrumentsQuery()
   // TODO(bc, 2023-03-20): reintroduce this poll, once it is safe to call cache_instruments during sensor reads on CAN bus
   // { refetchInterval: EQUIPMENT_POLL_MS, },
-  const extensionInstrument =
-    (attachedInstruments?.data ?? []).find(i => i.mount === 'extension') ?? null
-
+  const attachedGripper =
+    (attachedInstruments?.data ?? []).find(
+      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
+    ) ?? null
+  const attachedLeftPipette =
+    attachedInstruments?.data?.find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'left'
+    ) ?? null
+  const attachedRightPipette =
+    attachedInstruments?.data?.find(
+      (i): i is PipetteData =>
+        i.instrumentType === 'pipette' && i.ok && i.mount === 'right'
+    ) ?? null
   const is96ChannelAttached = getIs96ChannelPipetteAttached(
     attachedPipettes?.left ?? null
   )
@@ -103,7 +115,7 @@ export function InstrumentsAndModules({
       <StyledText
         as="h3"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-        marginBottom={SPACING.spacing4}
+        marginBottom={SPACING.spacing16}
         id="InstrumentsAndModules_title"
       >
         {t('instruments_and_modules')}
@@ -112,26 +124,26 @@ export function InstrumentsAndModules({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
         minHeight={SIZE_3}
-        paddingBottom={SPACING.spacing3}
+        paddingBottom={SPACING.spacing8}
         width="100%"
         flexDirection={DIRECTION_COLUMN}
       >
         {currentRunId != null && !isRunTerminal && (
           <Flex
-            paddingBottom={SPACING.spacing4}
+            paddingBottom={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
-            paddingX={SPACING.spacing2}
+            paddingX={SPACING.spacing4}
             width="100%"
           >
             <Banner type="warning">{t('robot_control_not_available')}</Banner>
           </Flex>
         )}
         {isRobotViewable ? (
-          <Flex gridGap={SPACING.spacing3} width="100%">
+          <Flex gridGap={SPACING.spacing8} width="100%">
             <Flex
               flex="50%"
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
               <PipetteCard
                 pipetteId={attachedPipettes.left?.id}
@@ -142,8 +154,7 @@ export function InstrumentsAndModules({
                 }
                 isPipetteCalibrated={
                   isOT3
-                    ? attachedInstruments?.data?.find(i => i.mount === 'left')
-                        ?.data?.calibratedOffset != null
+                    ? attachedLeftPipette?.data?.calibratedOffset != null
                     : leftMountOffsetCalibration != null
                 }
                 mount={LEFT}
@@ -152,12 +163,8 @@ export function InstrumentsAndModules({
               />
               {isOT3 ? (
                 <GripperCard
-                  attachedGripper={extensionInstrument}
-                  isCalibrated={
-                    attachedInstruments?.data?.find(
-                      i => i.mount === 'extension'
-                    )?.data?.calibratedOffset != null
-                  }
+                  attachedGripper={attachedGripper}
+                  isCalibrated={attachedGripper?.data?.calibratedOffset != null}
                 />
               ) : null}
               {leftColumnModules.map((module, index) => (
@@ -174,7 +181,7 @@ export function InstrumentsAndModules({
             <Flex
               flex="50%"
               flexDirection={DIRECTION_COLUMN}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
               {!Boolean(is96ChannelAttached) ? (
                 <PipetteCard
@@ -187,9 +194,7 @@ export function InstrumentsAndModules({
                   }
                   isPipetteCalibrated={
                     isOT3
-                      ? attachedInstruments?.data?.find(
-                          i => i.mount === 'right'
-                        )?.data?.calibratedOffset != null
+                      ? attachedRightPipette?.data?.calibratedOffset != null
                       : rightMountOffsetCalibration != null
                   }
                   mount={RIGHT}
@@ -213,10 +218,10 @@ export function InstrumentsAndModules({
           <Flex
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_COLUMN}
-            gridGap={SPACING.spacingSM}
+            gridGap={SPACING.spacing12}
             justifyContent={JUSTIFY_CENTER}
             minHeight={SIZE_3}
-            padding={SPACING.spacingSM}
+            padding={SPACING.spacing12}
           >
             {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
             <StyledText

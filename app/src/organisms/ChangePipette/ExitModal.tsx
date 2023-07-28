@@ -32,7 +32,7 @@ export function ExitModal(props: Props): JSX.Element {
     >
       <SecondaryButton
         onClick={back}
-        marginRight={SPACING.spacing2}
+        marginRight={SPACING.spacing4}
         disabled={isDisabled}
       >
         {t('go_back')}

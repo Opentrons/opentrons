@@ -29,20 +29,18 @@ const render = () => {
 
 describe('NetworkSetupMenu', () => {
   it('should render text and button, and step meter', () => {
-    const [{ getByText, getAllByText }] = render()
+    const [{ getByText }] = render()
 
-    getByText('Let’s connect to a network')
-    getByText('Choose your connection type from the options below.')
-
-    // currently this screen uses the same text for each button
-    // in the future descriptions will be updated
-    const descriptions = getAllByText(
-      'Find a network in your lab or enter your own.'
+    getByText('Connect to a network')
+    getByText(
+      'You’ll use this connection to run software updates and load protocols onto your Opentrons Flex.'
     )
-    expect(descriptions.length).toBe(3)
     getByText('Wi-Fi')
+    getByText('Find a network in your lab or enter your own.')
     getByText('Ethernet')
+    getByText("Connect to your lab's wired network.")
     getByText('USB')
+    getByText('Connect directly to a computer (running the Opentrons App).')
   })
 
   it('should call mock function when tapping a button', () => {

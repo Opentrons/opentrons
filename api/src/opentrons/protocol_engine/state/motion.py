@@ -12,7 +12,8 @@ from opentrons import motion_planning
 
 from . import move_types
 from .. import errors
-from ..types import WellLocation, CurrentWell
+from ..types import WellLocation, CurrentWell, MotorAxis
+from .config import Config
 from .labware import LabwareView
 from .pipettes import PipetteView
 from .geometry import GeometryView
@@ -33,12 +34,14 @@ class MotionView:
 
     def __init__(
         self,
+        config: Config,
         labware_view: LabwareView,
         pipette_view: PipetteView,
         geometry_view: GeometryView,
         module_view: ModuleView,
     ) -> None:
         """Initialize a MotionState instance."""
+        self._config = config
         self._labware = labware_view
         self._pipettes = pipette_view
         self._geometry = geometry_view
@@ -229,3 +232,10 @@ class MotionView:
             motion_planning.Waypoint(position=p, critical_point=critical_point)
             for p in positions
         ]
+
+    def get_robot_mount_axes(self) -> List[MotorAxis]:
+        """Get a list of axes belonging to all mounts on the robot."""
+        mount_axes = [MotorAxis.LEFT_Z, MotorAxis.RIGHT_Z]
+        if self._config.robot_type == "OT-3 Standard":
+            mount_axes.append(MotorAxis.EXTENSION_Z)
+        return mount_axes

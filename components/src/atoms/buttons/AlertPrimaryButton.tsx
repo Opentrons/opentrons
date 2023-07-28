@@ -5,8 +5,8 @@ import { NewAlertPrimaryBtn, styleProps } from '../../primitives'
 export const AlertPrimaryButton = styled(NewAlertPrimaryBtn)`
   background-color: ${COLORS.errorEnabled};
   border-radius: ${BORDERS.radiusSoftCorners};
-  padding-left: ${SPACING.spacing4};
-  padding-right: ${SPACING.spacing4};
+  padding-left: ${SPACING.spacing16};
+  padding-right: ${SPACING.spacing16};
   text-transform: ${TYPOGRAPHY.textTransformNone};
   box-shadow: 0 0 0;
   ${TYPOGRAPHY.pSemiBold}

@@ -58,6 +58,7 @@ class PipetteNameType(str, Enum):
     P1000_SINGLE_GEN2 = "p1000_single_gen2"
     P1000_SINGLE_GEN3 = "p1000_single_gen3"
     P1000_MULTI_GEN3 = "p1000_multi_gen3"
+    P1000_96 = "p1000_96"
 
 
 # Generic NewType for models because we get new ones frequently and theres

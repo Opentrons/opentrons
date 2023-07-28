@@ -26,11 +26,18 @@ from opentrons.protocol_engine import (
     LoadedLabware,
     LoadedModule,
 )
-from opentrons.protocol_engine.types import ModuleModel as ProtocolEngineModuleModel
+from opentrons.protocol_engine.types import (
+    ModuleModel as ProtocolEngineModuleModel,
+    OFF_DECK_LOCATION,
+    LabwareLocation,
+)
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
+from opentrons.protocol_engine.errors import (
+    LabwareNotLoadedOnModuleError,
+)
 
 from ... import validation
+from ..._types import OffDeckType
 from ..._liquid import Liquid
 from ..protocol import AbstractProtocol
 from ..labware import LabwareLoadParams
@@ -127,28 +134,28 @@ class ProtocolCore(
     def load_labware(
         self,
         load_name: str,
-        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore],
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType],
         label: Optional[str],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
         """Load a labware using its identifying parameters."""
-        module_location: Union[ModuleLocation, DeckSlotLocation]
-        if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
-            module_location = ModuleLocation(moduleId=location.module_id)
-        else:
-            module_location = DeckSlotLocation(slotName=location)
+        load_location = self._convert_labware_location(location=location)
+
+        # TODO (lc 06-27-2023) Let's keep this around up to launch to
+        # make the user-facing name switching a bit easier for everyone.
+        mapped_load_name = load_labware_params.resolve_loadname(load_name)
 
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
         )
         namespace, version = load_labware_params.resolve(
-            load_name, namespace, version, custom_labware_params
+            mapped_load_name, namespace, version, custom_labware_params
         )
 
         load_result = self._engine_client.load_labware(
-            load_name=load_name,
-            location=module_location,
+            load_name=mapped_load_name,
+            location=load_location,
             namespace=namespace,
             version=version,
             display_name=label,
@@ -190,7 +197,9 @@ class ProtocolCore(
     def move_labware(
         self,
         labware_core: LabwareCore,
-        new_location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore],
+        new_location: Union[
+            DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType
+        ],
         use_gripper: bool,
         use_pick_up_location_lpc_offset: bool,
         use_drop_location_lpc_offset: bool,
@@ -198,11 +207,7 @@ class ProtocolCore(
         drop_offset: Optional[Tuple[float, float, float]],
     ) -> None:
         """Move the given labware to a new location."""
-        to_location: Union[ModuleLocation, DeckSlotLocation]
-        if isinstance(new_location, (ModuleCore, NonConnectedModuleCore)):
-            to_location = ModuleLocation(moduleId=new_location.module_id)
-        else:
-            to_location = DeckSlotLocation(slotName=new_location)
+        to_location = self._convert_labware_location(location=new_location)
 
         strategy = (
             LabwareMovementStrategy.USING_GRIPPER
@@ -234,6 +239,10 @@ class ProtocolCore(
             pick_up_offset=_pick_up_offset,
             drop_offset=_drop_offset,
         )
+        if strategy == LabwareMovementStrategy.USING_GRIPPER:
+            # Clear out last location since it is not relevant to pipetting
+            # and we only use last location for in-place pipetting commands
+            self.set_last_location(location=None, mount=Mount.EXTENSION)
 
     def _resolve_module_hardware(
         self, serial_number: str, model: ModuleModel
@@ -484,7 +493,7 @@ class ProtocolCore(
 
     def get_labware_location(
         self, labware_core: LabwareCore
-    ) -> Union[str, ModuleCore, NonConnectedModuleCore, None]:
+    ) -> Union[str, ModuleCore, NonConnectedModuleCore, OffDeckType]:
         """Get labware parent location."""
         labware_location = self._engine_client.state.labware.get_location(
             labware_core.labware_id
@@ -494,5 +503,17 @@ class ProtocolCore(
                 labware_location.slotName, self._engine_client.state.config.robot_type
             )
         elif isinstance(labware_location, ModuleLocation):
-            return self._module_cores_by_id.get(labware_location.moduleId)
-        return None
+            return self._module_cores_by_id[labware_location.moduleId]
+
+        return OffDeckType.OFF_DECK
+
+    @staticmethod
+    def _convert_labware_location(
+        location: Union[DeckSlotName, ModuleCore, NonConnectedModuleCore, OffDeckType]
+    ) -> LabwareLocation:
+        if isinstance(location, (ModuleCore, NonConnectedModuleCore)):
+            return ModuleLocation(moduleId=location.module_id)
+        elif location is OffDeckType.OFF_DECK:
+            return OFF_DECK_LOCATION
+        elif isinstance(location, DeckSlotName):
+            return DeckSlotLocation(slotName=location)

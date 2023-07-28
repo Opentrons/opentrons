@@ -9,7 +9,7 @@ import {
 } from '@opentrons/components'
 import { useToggleGroup } from '../../../../molecules/ToggleGroup/useToggleGroup'
 import { ANALYTICS_LIQUID_SETUP_VIEW_TOGGLE } from '../../../../redux/analytics'
-import { ProceedToRunButton } from '../ProceedToRunButton'
+import { BackToTopButton } from '../BackToTopButton'
 import { SetupLiquidsList } from './SetupLiquidsList'
 import { SetupLiquidsMap } from './SetupLiquidsMap'
 
@@ -30,8 +30,8 @@ export function SetupLiquids(props: SetupLiquidsProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_CENTER}
-      marginTop={SPACING.spacing6}
-      gridGap={SPACING.spacing4}
+      marginTop={SPACING.spacing32}
+      gridGap={SPACING.spacing16}
     >
       {toggleGroup}
       {selectedValue === t('list_view') ? (
@@ -40,7 +40,7 @@ export function SetupLiquids(props: SetupLiquidsProps): JSX.Element {
         <SetupLiquidsMap runId={props.runId} robotName={props.robotName} />
       )}
       <Flex alignSelf={ALIGN_CENTER}>
-        <ProceedToRunButton
+        <BackToTopButton
           protocolRunHeaderRef={props.protocolRunHeaderRef}
           robotName={props.robotName}
           runId={props.runId}

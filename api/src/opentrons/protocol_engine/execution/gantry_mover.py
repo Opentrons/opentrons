@@ -12,7 +12,7 @@ from opentrons.motion_planning import Waypoint
 
 from ..state import StateView
 from ..types import MotorAxis, CurrentWell
-from ..errors import MustHomeError
+from ..errors import MustHomeError, InvalidAxisForRobotType
 
 
 _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
@@ -22,6 +22,8 @@ _MOTOR_AXIS_TO_HARDWARE_AXIS: Dict[MotorAxis, HardwareAxis] = {
     MotorAxis.RIGHT_Z: HardwareAxis.A,
     MotorAxis.LEFT_PLUNGER: HardwareAxis.B,
     MotorAxis.RIGHT_PLUNGER: HardwareAxis.C,
+    MotorAxis.EXTENSION_Z: HardwareAxis.Z_G,
+    MotorAxis.EXTENSION_JAW: HardwareAxis.G,
 }
 
 # The height of the bottom of the pipette nozzle at home position without any tips.
@@ -185,6 +187,13 @@ class HardwareGantryMover(GantryMover):
             await self._hardware_api.home_plunger(Mount.RIGHT)
         else:
             hardware_axes = [_MOTOR_AXIS_TO_HARDWARE_AXIS[a] for a in axes]
+            if self._state_view.config.robot_type == "OT-2 Standard" and any(
+                axis not in HardwareAxis.ot2_axes() for axis in hardware_axes
+            ):
+                raise InvalidAxisForRobotType(
+                    f"{axes} includes axes that are not valid for OT-2 Standard robot type"
+                )
+            # Hardware API will raise error if invalid axes are passed for the type of robot
             await self._hardware_api.home(axes=hardware_axes)
 
 

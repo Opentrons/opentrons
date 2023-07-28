@@ -5,20 +5,10 @@ export interface GetCommandsParams {
   pageLength: number // the number of items to include
 }
 
-export interface RunCommandSummary {
-  id: string
-  key: string
-  commandType: RunTimeCommand['commandType']
-  status: 'queued' | 'running' | 'succeeded' | 'failed'
-  createdAt: string
-  intent?: 'protocol' | 'setup'
-  params?: any
-  // TODO(mc, 2022-02-02): `result` does not exist on RunCommandSummary
-  result?: RunTimeCommand['result']
-  startedAt?: string
-  completedAt?: string
-  error?: RunCommandError
-}
+// NOTE: this incantation allows us to omit a key from each item in a union distributively
+// this means we can, for example, maintain the associated commandType and params after the Omit is applied
+type DistributiveOmit<T, K extends keyof T> = T extends any ? Omit<T, K> : never
+export type RunCommandSummary = DistributiveOmit<RunTimeCommand, 'result'>
 
 export interface CommandDetail {
   data: RunTimeCommand

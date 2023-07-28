@@ -8,7 +8,7 @@ from opentrons_shared_data import get_shared_data_root
 from opentrons_shared_data.robot.dev_types import RobotType
 
 from opentrons.types import DeckSlotName
-from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control import HardwareControlAPI, API
 from opentrons.protocol_engine import ProtocolEngine, StateSummary, types as pe_types
 from opentrons.protocol_runner import (
     RunResult,
@@ -22,23 +22,14 @@ from robot_server.runs.engine_store import EngineStore, EngineConflictError
 
 
 @pytest.fixture
-def hardware_api(
-    decoy: Decoy,
-) -> HardwareControlAPI:
-    """Return a mock in the shape of a HardwareControlAPI."""
-    # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
-    # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    return decoy.mock(cls=HardwareControlAPI)
-
-
-@pytest.fixture
 def subject(decoy: Decoy, hardware_api: HardwareControlAPI) -> EngineStore:
     """Get a EngineStore test subject."""
     return EngineStore(
         hardware_api=hardware_api,
-        # Arbitrary choice of robot_type. Tests where robot_type matters should
+        # Arbitrary choice of robot and deck type. Tests where these matter should
         # construct their own EngineStore.
         robot_type="OT-2 Standard",
+        deck_type=pe_types.DeckType.OT2_SHORT_TRASH,
     )
 
 
@@ -90,14 +81,17 @@ async def test_create_engine_with_protocol(
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
+@pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_create_engine_uses_robot_type(
-    decoy: Decoy, robot_type: RobotType
+    decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
 ) -> None:
-    """It should create ProtocolEngines with the given robot type."""
+    """It should create ProtocolEngines with the given robot and deck type."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=HardwareControlAPI)
-    subject = EngineStore(hardware_api=hardware_api, robot_type=robot_type)
+    hardware_api = decoy.mock(cls=API)
+    subject = EngineStore(
+        hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
+    )
 
     await subject.create(run_id="run-id", labware_offsets=[], protocol=None)
 
@@ -191,14 +185,17 @@ async def test_get_default_engine_idempotent(subject: EngineStore) -> None:
 
 
 @pytest.mark.parametrize("robot_type", ["OT-2 Standard", "OT-3 Standard"])
+@pytest.mark.parametrize("deck_type", pe_types.DeckType)
 async def test_get_default_engine_robot_type(
-    decoy: Decoy, robot_type: RobotType
+    decoy: Decoy, robot_type: RobotType, deck_type: pe_types.DeckType
 ) -> None:
-    """It should create default ProtocolEngines with the given robot type."""
+    """It should create default ProtocolEngines with the given robot and deck type."""
     # TODO(mc, 2021-06-11): to make these test more effective and valuable, we
     # should pass in some sort of actual, valid HardwareAPI instead of a mock
-    hardware_api = decoy.mock(cls=HardwareControlAPI)
-    subject = EngineStore(hardware_api=hardware_api, robot_type=robot_type)
+    hardware_api = decoy.mock(cls=API)
+    subject = EngineStore(
+        hardware_api=hardware_api, robot_type=robot_type, deck_type=deck_type
+    )
 
     result = await subject.get_default_engine()
 

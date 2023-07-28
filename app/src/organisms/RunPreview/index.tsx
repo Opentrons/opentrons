@@ -55,10 +55,10 @@ export const RunPreviewComponent = (
       height="28rem"
       width="100%"
       overflowY="scroll"
-      gridGap={SPACING.spacing3}
-      padding={SPACING.spacing4}
+      gridGap={SPACING.spacing8}
+      padding={SPACING.spacing16}
     >
-      <Flex gridGap={SPACING.spacing3} alignItems={ALIGN_CENTER}>
+      <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
         <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('run_preview')}
         </StyledText>
@@ -66,10 +66,10 @@ export const RunPreviewComponent = (
           {t('steps_total', { count: robotSideAnalysis.commands.length })}
         </StyledText>
       </Flex>
-      <StyledText as="p" marginBottom={SPACING.spacing3}>
+      <StyledText as="p" marginBottom={SPACING.spacing8}>
         {t('preview_of_protocol_steps')}
       </StyledText>
-      <Divider marginX={`calc(-1 * ${SPACING.spacing4})`} />
+      <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
       <ViewportList
         viewportRef={viewPortRef}
         ref={ref}
@@ -102,17 +102,17 @@ export const RunPreviewComponent = (
             <Flex
               key={command.id}
               alignItems={ALIGN_CENTER}
-              gridGap={SPACING.spacing3}
+              gridGap={SPACING.spacing8}
             >
               <StyledText
-                minWidth={SPACING.spacing4}
+                minWidth={SPACING.spacing16}
                 fontSize={TYPOGRAPHY.fontSizeCaption}
               >
                 {index + 1}
               </StyledText>
               <Flex
                 flexDirection={DIRECTION_COLUMN}
-                gridGap={SPACING.spacing2}
+                gridGap={SPACING.spacing4}
                 width="100%"
                 border={`solid 1px ${
                   index === jumpedIndex ? COLORS.electricPurple : borderColor
@@ -122,13 +122,13 @@ export const RunPreviewComponent = (
                 }
                 color={COLORS.darkBlackEnabled}
                 borderRadius={BORDERS.radiusSoftCorners}
-                padding={SPACING.spacing3}
+                padding={SPACING.spacing8}
                 css={css`
                   transition: background-color ${COLOR_FADE_MS}ms ease-out,
                     border-color ${COLOR_FADE_MS}ms ease-out;
                 `}
               >
-                <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing3}>
+                <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
                   <CommandIcon command={command} color={contentColor} />
                   <CommandText
                     command={command}
@@ -144,10 +144,10 @@ export const RunPreviewComponent = (
       {currentRunCommandIndex >= 0 ? (
         <PrimaryButton
           position={POSITION_FIXED}
-          bottom={SPACING.spacingXXL}
+          bottom={SPACING.spacing40}
           left={`calc(calc(100% + ${NAV_BAR_WIDTH})/2)`} // add width of half of nav bar to center within run tab
           transform="translate(-50%)"
-          borderRadius={SPACING.spacing6}
+          borderRadius={SPACING.spacing32}
           display={isCurrentCommandVisible ? DISPLAY_NONE : DISPLAY_FLEX}
           onClick={makeHandleScrollToStep(currentRunCommandIndex)}
           id="RunLog_jumpToCurrentStep"

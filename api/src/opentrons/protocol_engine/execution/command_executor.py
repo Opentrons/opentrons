@@ -18,6 +18,7 @@ from .pipetting import PipettingHandler
 from .tip_handler import TipHandler
 from .run_control import RunControlHandler
 from .rail_lights import RailLightsHandler
+from .status_bar import StatusBarHandler
 
 
 log = getLogger(__name__)
@@ -43,6 +44,7 @@ class CommandExecutor:
         tip_handler: TipHandler,
         run_control: RunControlHandler,
         rail_lights: RailLightsHandler,
+        status_bar: StatusBarHandler,
         model_utils: Optional[ModelUtils] = None,
     ) -> None:
         """Initialize the CommandExecutor with access to its dependencies."""
@@ -58,6 +60,7 @@ class CommandExecutor:
         self._run_control = run_control
         self._rail_lights = rail_lights
         self._model_utils = model_utils or ModelUtils()
+        self._status_bar = status_bar
 
     async def execute(self, command_id: str) -> None:
         """Run a given command's execution procedure.
@@ -78,6 +81,7 @@ class CommandExecutor:
             tip_handler=self._tip_handler,
             run_control=self._run_control,
             rail_lights=self._rail_lights,
+            status_bar=self._status_bar,
         )
 
         started_at = self._model_utils.get_timestamp()
@@ -104,7 +108,7 @@ class CommandExecutor:
             if isinstance(error, asyncio.CancelledError):
                 error = RunStoppedError("Run was cancelled")
             elif not isinstance(error, ProtocolEngineError):
-                error = UnexpectedProtocolError(error)
+                error = UnexpectedProtocolError(message=str(error), wrapping=[error])
 
             self._action_dispatcher.dispatch(
                 FailCommandAction(

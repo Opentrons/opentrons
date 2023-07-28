@@ -16,7 +16,7 @@ export function ReachableBanner(
   const { robot } = props
   const { t } = useTranslation('shared')
   return robot.status === REACHABLE && robot.serverHealthStatus === 'ok' ? (
-    <Banner type="error" marginRight={SPACING.spacing5}>
+    <Banner type="error" marginRight={SPACING.spacing24}>
       {t('robot_is_reachable_but_not_responding', {
         hostname: robot.ip,
       })}

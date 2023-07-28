@@ -10,7 +10,17 @@ export const heaterShakerOpenLatch: CommandCreator<ModuleOnlyParams> = (
   prevRobotState
 ) => {
   const heaterShakerSlot = prevRobotState.modules[args.moduleId].slot
+  const firstPipetteId = Object.keys(invariantContext.pipetteEntities)[0]
+  const firstPipetteSpec =
+    invariantContext.pipetteEntities[firstPipetteId]?.spec
+
+  const isFlexPipette =
+    (firstPipetteSpec?.displayCategory === 'GEN3' ||
+      firstPipetteSpec?.channels === 96) ??
+    false
+
   if (
+    !isFlexPipette &&
     getIsTallLabwareEastWestOfHeaterShaker(
       prevRobotState.labware,
       invariantContext.labwareEntities,

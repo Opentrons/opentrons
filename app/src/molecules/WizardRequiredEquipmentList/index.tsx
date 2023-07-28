@@ -45,7 +45,7 @@ export function WizardRequiredEquipmentList(
             fontSize="1.25rem"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             lineHeight="1.5rem"
-            marginBottom={SPACING.spacing3}
+            marginBottom={SPACING.spacing8}
           >
             {t('you_will_need')}
           </StyledText>
@@ -53,21 +53,22 @@ export function WizardRequiredEquipmentList(
           <Flex
             backgroundColor="#16212D33"
             flexDirection={DIRECTION_COLUMN}
-            borderRadius={BORDERS.size_three}
+            borderRadius={BORDERS.borderRadiusSize3}
+            width="428px"
           >
             {equipmentList.map((requiredEquipmentProps, index) => (
               <Box
-                paddingX={SPACING.spacingM}
-                paddingY={SPACING.spacing2}
+                paddingX={SPACING.spacing20}
+                paddingY={SPACING.spacing4}
                 key={`${index}_${requiredEquipmentProps.loadName}`}
               >
-                <StyledText fontSize="1.25rem" paddingY="0.75rem">
+                <StyledText fontSize="1.25rem" paddingY={SPACING.spacing12}>
                   {requiredEquipmentProps.displayName}
                 </StyledText>
                 {/* do not show divider after the last equipment in the list */}
                 {index + 1 === Object.keys(equipmentList).length ? null : (
                   <Box
-                    borderBottom={`${SPACING.spacingXXS} solid ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
+                    borderBottom={`1px solid ${COLORS.darkBlackEnabled}${COLORS.opacity20HexCode}`}
                   />
                 )}
               </Box>
@@ -88,7 +89,7 @@ export function WizardRequiredEquipmentList(
           ))}
           {footer != null ? (
             <StyledText
-              marginTop={SPACING.spacing3}
+              marginTop={SPACING.spacing8}
               as="label"
               color={COLORS.darkGreyEnabled}
             >
@@ -129,7 +130,7 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
           flex="0 1 30%"
           justifyContent={JUSTIFY_CENTER}
           alignItems={ALIGN_CENTER}
-          marginRight={SPACING.spacing4}
+          marginRight={SPACING.spacing16}
         >
           <img
             css={css`

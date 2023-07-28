@@ -41,7 +41,7 @@ export const SetupModulesMap = ({
     <Flex
       flex="1"
       maxHeight="180vh"
-      marginTop={SPACING.spacing4}
+      marginTop={SPACING.spacing16}
       flexDirection={DIRECTION_COLUMN}
     >
       <Box margin="0 auto" maxWidth="46.25rem" width="100%">

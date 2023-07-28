@@ -20,16 +20,18 @@ def test_get_serial_log_with_defaults(api_client):
         body = response.text
         assert response.status_code == 200
         assert body == expected
-        m.assert_called_once_with("opentrons-api-serial", DEFAULT_RECORDS, "short")
+        m.assert_called_once_with(
+            "opentrons-api-serial", DEFAULT_RECORDS, "short-precise"
+        )
 
 
 @pytest.mark.parametrize(
     "format_param, records_param, mode_param",
     [
         ("json", MAX_RECORDS - 1, "json"),
-        ("text", MAX_RECORDS - 1, "short"),
+        ("text", MAX_RECORDS - 1, "short-precise"),
         ("json", 1, "json"),
-        ("text", 1, "short"),
+        ("text", 1, "short-precise"),
     ],
 )
 def test_get_serial_log_with_params(
@@ -94,16 +96,16 @@ def test_get_api_log_with_defaults(api_client):
         body = response.text
         assert response.status_code == 200
         assert body == expected
-        m.assert_called_once_with("opentrons-api", DEFAULT_RECORDS, "short")
+        m.assert_called_once_with("opentrons-api", DEFAULT_RECORDS, "short-precise")
 
 
 @pytest.mark.parametrize(
     "format_param, records_param, mode_param",
     [
         ("json", MAX_RECORDS - 1, "json"),
-        ("text", MAX_RECORDS - 1, "short"),
+        ("text", MAX_RECORDS - 1, "short-precise"),
         ("json", 1, "json"),
-        ("text", 1, "short"),
+        ("text", 1, "short-precise"),
     ],
 )
 def test_get_api_log_with_params(api_client, format_param, records_param, mode_param):

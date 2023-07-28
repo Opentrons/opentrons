@@ -34,12 +34,11 @@ ANALYSIS_POLL_TIMEOUT = 10
 
 @pytest.fixture
 async def robot_client(
-    session_server_host: str,
-    session_server_port: str,
+    ot2_server_base_url: str,
 ) -> AsyncGenerator[RobotClient, None]:
     """Return a client for a running dev server."""
     async with RobotClient.make(
-        host=session_server_host, port=session_server_port, version="*"
+        base_url=ot2_server_base_url, version="*"
     ) as robot_client:
         assert (
             await robot_client.wait_until_alive()

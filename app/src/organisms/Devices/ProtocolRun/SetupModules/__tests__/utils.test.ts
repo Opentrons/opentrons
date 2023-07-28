@@ -35,4 +35,9 @@ describe('getModuleImage', () => {
     const result = getModuleImage('thermocyclerModuleV2')
     expect(result).toEqual('thermocycler_gen_2_closed.png')
   })
+
+  it('should render the magnetic block v1 image when the module is magneticBlockV1', () => {
+    const result = getModuleImage('magneticBlockV1')
+    expect(result).toEqual('magnetic_block_gen_1.png')
+  })
 })

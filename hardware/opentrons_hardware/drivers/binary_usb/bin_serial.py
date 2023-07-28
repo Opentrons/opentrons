@@ -140,6 +140,9 @@ class SerialUsbDriver:
         Returns:
             Binary USB message
         """
+        if not self._port.is_open:
+            self.__exit__()
+            return None
         return await self.read()
 
     def get_connection_info(self) -> Tuple[int, int, int, int]:

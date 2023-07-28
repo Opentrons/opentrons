@@ -37,7 +37,7 @@ from .measurement.record import (
     GravimetricRecorder,
     GravimetricRecorderConfig,
 )
-from .radwag_pipette_calibration_vial import VIAL_DEFINITION
+from .labware.radwag_pipette_calibration_vial import VIAL_DEFINITION
 from .tips import get_tips, MULTI_CHANNEL_TEST_ORDER
 
 
@@ -106,7 +106,9 @@ def _reduce_volumes_to_not_exceed_software_limit(
     test_volumes: List[float], cfg: config.GravimetricConfig
 ) -> List[float]:
     for i, v in enumerate(test_volumes):
-        liq_cls = get_liquid_class(cfg.pipette_volume, cfg.tip_volume, int(v))
+        liq_cls = get_liquid_class(
+            cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume, int(v)
+        )
         max_vol = cfg.tip_volume - liq_cls.aspirate.air_gap.trailing_air_gap
         test_volumes[i] = min(v, max_vol - 0.1)
     return test_volumes
@@ -121,7 +123,9 @@ def _get_volumes(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> List[fl
             float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
         ]
     else:
-        test_volumes = get_test_volumes(cfg.pipette_volume, cfg.tip_volume)
+        test_volumes = get_test_volumes(
+            cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume
+        )
     if not test_volumes:
         raise ValueError("no volumes to test, check the configuration")
     if not _check_if_software_supports_high_volumes():
@@ -209,7 +213,7 @@ def _load_labware(
     tiprack_load_settings: List[Tuple[int, str]] = [
         (
             slot,
-            f"opentrons_ot3_96_tiprack_{cfg.tip_volume}ul",
+            f"opentrons_flex_96_tiprack_{cfg.tip_volume}ul",
         )
         for slot in cfg.slots_tiprack
     ]
@@ -410,6 +414,13 @@ def _get_robot_serial(is_simulating: bool) -> str:
         return "simulation-serial-number"
 
 
+def _get_tip_batch(is_simulating: bool) -> str:
+    if not is_simulating:
+        return input("TIP BATCH:").strip()
+    else:
+        return "simulation-tip-batch"
+
+
 def _pick_up_tip(
     ctx: ProtocolContext,
     pipette: InstrumentContext,
@@ -522,11 +533,13 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     test_report.set_tag(pipette_tag)
     test_report.set_operator(_get_operator_name(ctx.is_simulating()))
     serial_number = _get_robot_serial(ctx.is_simulating())
+    tip_batch = _get_tip_batch(ctx.is_simulating())
     test_report.set_version(get_git_description())
     report.store_serial_numbers(
         test_report,
         robot=serial_number,
         pipette=pipette_tag,
+        tips=tip_batch,
         scale=recorder.serial_number,
         environment="None",
         liquid="None",
@@ -818,6 +831,6 @@ def run(ctx: ProtocolContext, cfg: config.GravimetricConfig) -> None:
     ui.print_title("RESULTS")
     _print_final_results(
         volumes=test_volumes,
-        channel_count=cfg.pipette_channels,
+        channel_count=len(channels_to_test),
         test_report=test_report,
     )

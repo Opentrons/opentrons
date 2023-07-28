@@ -15,6 +15,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
+  MAGNETIC_BLOCK_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   LabwareDefinition2,
   ModuleType,
@@ -80,6 +81,10 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat',
     'opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt',
     'opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat',
+  ],
+  [MAGNETIC_BLOCK_TYPE]: [
+    'armadillo_96_wellplate_200ul_pcr_full_skirt',
+    'nest_96_wellplate_100ul_pcr_full_skirt',
   ],
 }
 

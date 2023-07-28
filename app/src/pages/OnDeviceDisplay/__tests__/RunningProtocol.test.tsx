@@ -90,7 +90,7 @@ const mockTrackProtocolRunEvent = jest.fn(
 const render = (path = '/') => {
   return renderWithProviders(
     <MemoryRouter initialEntries={[path]} initialIndex={0}>
-      <Route path="/protocols/:runId/run">
+      <Route path="/runs/:runId/run">
         <RunningProtocol />
       </Route>
     </MemoryRouter>
@@ -165,18 +165,18 @@ describe('RunningProtocol', () => {
     when(mockUseMostRecentCompletedAnalysis)
       .calledWith(RUN_ID)
       .mockReturnValue(null)
-    const [{ getByText }] = render(`/protocols/${RUN_ID}/run`)
+    const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
     getByText('mock RunningProtocolSkeleton')
   })
 
   it('should render CurrentRunningProtocolCommand when loaded the data', () => {
-    const [{ getByText }] = render(`/protocols/${RUN_ID}/run`)
+    const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
     getByText('mock CurrentRunningProtocolCommand')
   })
 
   // ToDo (kj:04/04/2023) need to figure out the way to simulate swipe
   it.todo('should render RunningProtocolCommandList when swiping left')
-  // const [{ getByText }] = render(`/protocols/${RUN_ID}/run`)
+  // const [{ getByText }] = render(`/runs/${RUN_ID}/run`)
   // const targetScreen = getByText('mock CurrentRunningProtocolCommand')
   // fireEvent.dragStart(targetScreen)
   // fireEvent.dragEnd(targetScreen)

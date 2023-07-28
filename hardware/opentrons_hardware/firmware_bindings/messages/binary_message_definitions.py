@@ -13,6 +13,7 @@ from .fields import (
     OptionalRevisionField,
     LightTransitionTypeField,
     LightAnimationTypeField,
+    EepromDataField,
 )
 
 log = logging.getLogger(__name__)
@@ -142,7 +143,7 @@ class EngageEstop(utils.BinarySerializable):
     """Send a request to enable the estop line."""
 
     message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.engage_estop)
-    lenght: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = utils.UInt16Field(0)
 
 
 @dataclass
@@ -150,7 +151,7 @@ class ReleaseEstop(utils.BinarySerializable):
     """Send a request to disable the estop line."""
 
     message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.release_estop)
-    lenght: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = utils.UInt16Field(0)
 
 
 @dataclass
@@ -158,7 +159,7 @@ class EngageSyncOut(utils.BinarySerializable):
     """Send a request to enable the sync line."""
 
     message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.engage_nsync_out)
-    lenght: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = utils.UInt16Field(0)
 
 
 @dataclass
@@ -166,7 +167,7 @@ class ReleaseSyncOut(utils.BinarySerializable):
     """Send a request to disable the sync line."""
 
     message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.release_nsync_out)
-    lenght: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = utils.UInt16Field(0)
 
 
 @dataclass
@@ -267,6 +268,44 @@ class DoorSwitchStateInfo(utils.BinarySerializable):
 
 
 @dataclass
+class WriteEEPromRequest(utils.BinarySerializable):
+    """Write to the EEPROM."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.write_eeprom_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(12)
+    data_address: utils.UInt16Field = utils.UInt16Field(0)
+    data_length: utils.UInt16Field = utils.UInt16Field(0)
+    data: EepromDataField = EepromDataField(bytes())
+
+
+@dataclass
+class ReadEEPromRequest(utils.BinarySerializable):
+    """Read from the EEPROM."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.read_eeprom_request
+    )
+    length: utils.UInt16Field = utils.UInt16Field(4)
+    data_address: utils.UInt16Field = utils.UInt16Field(0)
+    data_length: utils.UInt16Field = utils.UInt16Field(0)
+
+
+@dataclass
+class ReadEEPromResponse(utils.BinarySerializable):
+    """Read from the EEPROM response."""
+
+    message_id: utils.UInt16Field = utils.UInt16Field(
+        BinaryMessageId.read_eeprom_response
+    )
+    length: utils.UInt16Field = utils.UInt16Field(12)
+    data_address: utils.UInt16Field = utils.UInt16Field(0)
+    data_length: utils.UInt16Field = utils.UInt16Field(0)
+    data: EepromDataField = EepromDataField(bytes())
+
+
+@dataclass
 class AddLightActionRequest(utils.BinarySerializable):
     """Add an action to the staging light queue.
 
@@ -363,6 +402,9 @@ BinaryMessageDefinition = Union[
     AuxPresentRequest,
     AuxIDRequest,
     AuxIDResponse,
+    WriteEEPromRequest,
+    ReadEEPromRequest,
+    ReadEEPromResponse,
     AddLightActionRequest,
     ClearLightActionStagingQueue,
     StartLightAction,

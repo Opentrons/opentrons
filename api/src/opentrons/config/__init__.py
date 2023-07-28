@@ -79,7 +79,6 @@ if IS_ROBOT:
     if "OT_SYSTEM_VERSION" in os.environ:
         OT_SYSTEM_VERSION = os.environ["OT_SYSTEM_VERSION"]
         ARCHITECTURE = SystemArchitecture.YOCTO
-        ROBOT_FIRMWARE_DIR = Path("/lib/firmware/")
     else:
         try:
             with open("/etc/VERSION.json") as vj:
@@ -88,7 +87,7 @@ if IS_ROBOT:
             ARCHITECTURE = SystemArchitecture.BUILDROOT
         except Exception:
             log.exception("Could not find version file in /etc/VERSION.json")
-        ROBOT_FIRMWARE_DIR = Path("/usr/lib/firmware/")
+    ROBOT_FIRMWARE_DIR = Path("/usr/lib/firmware/")
     JUPYTER_NOTEBOOK_ROOT_DIR = Path("/var/lib/jupyter/notebooks/")
     JUPYTER_NOTEBOOK_LABWARE_DIR = JUPYTER_NOTEBOOK_ROOT_DIR / "labware"
 

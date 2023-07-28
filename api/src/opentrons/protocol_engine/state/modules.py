@@ -15,7 +15,7 @@ from typing import (
     Union,
     overload,
 )
-from numpy import array, dot, add
+from numpy import array, dot
 
 from opentrons.hardware_control.modules.magdeck import (
     OFFSET_TO_LABWARE_BOTTOM as MAGNETIC_MODULE_OFFSET_TO_LABWARE_BOTTOM,
@@ -64,6 +64,8 @@ from .module_substates import (
     HeaterShakerModuleId,
     TemperatureModuleId,
     ThermocyclerModuleId,
+    MagneticBlockSubState,
+    MagneticBlockId,
     ModuleSubStateType,
 )
 
@@ -78,7 +80,7 @@ class SlotTransit(NamedTuple):
     end: DeckSlotName
 
 
-_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
+_OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.FIXED_TRASH),
     SlotTransit(start=DeckSlotName.FIXED_TRASH, end=DeckSlotName.SLOT_1),
     SlotTransit(start=DeckSlotName.SLOT_4, end=DeckSlotName.FIXED_TRASH),
@@ -93,7 +95,16 @@ _THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = [
     SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_4),
     SlotTransit(start=DeckSlotName.SLOT_1, end=DeckSlotName.SLOT_11),
     SlotTransit(start=DeckSlotName.SLOT_11, end=DeckSlotName.SLOT_1),
-]
+}
+
+_OT3_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = {
+    SlotTransit(start=t.start.to_ot3_equivalent(), end=t.end.to_ot3_equivalent())
+    for t in _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE
+}
+
+_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE = (
+    _OT2_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE | _OT3_THERMOCYCLER_SLOT_TRANSITS_TO_DODGE
+)
 
 
 @dataclass(frozen=True)
@@ -270,6 +281,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 is_lid_open=live_data is not None and live_data["lid"] == "open",
                 target_block_temperature=live_data["targetTemp"] if live_data else None,  # type: ignore[arg-type]
                 target_lid_temperature=live_data["lidTarget"] if live_data else None,  # type: ignore[arg-type]
+            )
+        elif ModuleModel.is_magnetic_block(actual_model):
+            self._state.substate_by_module_id[module_id] = MagneticBlockSubState(
+                module_id=MagneticBlockId(module_id)
             )
 
     def _update_module_calibration(
@@ -594,8 +609,12 @@ class ModuleView(HasState[ModuleState]):
         except KeyError as e:
             raise errors.ModuleNotLoadedError(module_id=module_id) from e
 
+    # TODO(jbl 2023-06-20) rename this method to better reflect it's not just "connected" modules
     def get_connected_model(self, module_id: str) -> ModuleModel:
         """Return the model of the connected module.
+
+        NOTE: This method will return the name for any module loaded, not just electronically connected ones.
+            This includes the Magnetic Block.
 
         This can differ from `get_requested_model()` because of module compatibility.
         For example, a ``loadModule`` command might request a ``temperatureModuleV1``
@@ -630,7 +649,16 @@ class ModuleView(HasState[ModuleState]):
         """Get the specified module's dimensions."""
         return self.get_definition(module_id).dimensions
 
-    def get_module_offset(
+    def get_module_calibration_offset(self, module_id: str) -> ModuleOffsetVector:
+        """Get the stored module calibration offset."""
+        module_serial = self.get(module_id).serialNumber
+        if module_serial is not None:
+            offset = self._state.module_offset_by_serial.get(module_serial)
+            if offset:
+                return offset
+        return ModuleOffsetVector(x=0, y=0, z=0)
+
+    def get_nominal_module_offset(
         self, module_id: str, deck_type: DeckType
     ) -> LabwareOffsetVector:
         """Get the module's offset vector computed with slot transform."""
@@ -654,21 +682,24 @@ class ModuleView(HasState[ModuleState]):
         # Apply the slot transform, if any
         xform = array(xforms_ser_offset)
         xformed = dot(xform, pre_transform)  # type: ignore[no-untyped-call]
-
-        # add the calibrated module offset if there is one
-        module = self.get(module_id)
-        if module.serialNumber is None:
-            raise errors.ModuleNotConnectedError(
-                f"Cannot calibrate module of type {module.model.name}. Can only calibrate modules that are connected to the robot and can provide the robot with a serial number."
-            )
-        offset = self._state.module_offset_by_serial.get(module.serialNumber)
-        if offset is not None:
-            module_offset = array((offset.x, offset.y, offset.z, 1))
-            xformed = add(xformed, module_offset)
         return LabwareOffsetVector(
             x=xformed[0],
             y=xformed[1],
             z=xformed[2],
+        )
+
+    def get_module_offset(
+        self, module_id: str, deck_type: DeckType
+    ) -> LabwareOffsetVector:
+        """Get the module's offset vector computed with slot transform and calibrated module offsets."""
+        offset_vector = self.get_nominal_module_offset(module_id, deck_type)
+
+        # add the calibrated module offset if there is one
+        cal_offset = self.get_module_calibration_offset(module_id)
+        return LabwareOffsetVector(
+            x=offset_vector.x + cal_offset.x,
+            y=offset_vector.y + cal_offset.y,
+            z=offset_vector.z + cal_offset.z,
         )
 
     def get_overall_height(self, module_id: str) -> float:

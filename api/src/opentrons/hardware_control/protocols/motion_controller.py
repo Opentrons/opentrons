@@ -1,11 +1,14 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Mapping, TypeVar
 from typing_extensions import Protocol
 
 from opentrons.types import Mount, Point
-from ..types import Axis, CriticalPoint, MotionChecks
+from ..types import Axis, CriticalPoint, MotionChecks, OT3Axis
 
 
-class MotionController(Protocol):
+AxisType = TypeVar("AxisType", Axis, OT3Axis)
+
+
+class MotionController(Protocol[AxisType]):
     """Protocol specifying fundamental motion controls."""
 
     async def halt(self) -> None:
@@ -155,6 +158,18 @@ class MotionController(Protocol):
                            axis move precisely at the given speed; it only
                            it if it was going to go faster. Direct speed
                            is still set by ``speed``.
+        """
+        ...
+
+    async def move_axes(
+        self,
+        position: Mapping[AxisType, float],
+        speed: Optional[float] = None,
+        max_speeds: Optional[Dict[AxisType, float]] = None,
+    ) -> None:
+        """Moves the effectors of the specified axis to the specified position.
+        The effector of the x,y axis is the center of the carriage.
+        The effector of the pipette mount axis are the mount critical points but only in z.
         """
         ...
 

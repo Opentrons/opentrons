@@ -51,16 +51,4 @@ describe('StepMeter', () => {
     const bar = getByTestId('StepMeter_StepMeterBar')
     expect(bar).toHaveStyle('width: 100%')
   })
-
-  // desktop app container height 0.25rem odd app container height 0.75rem
-  it('renders StepMeterContainer is varied when OnDevice option is true', () => {
-    props = {
-      ...props,
-      currentStep: 2,
-      OnDevice: true,
-    }
-    const { getByTestId } = render(props)
-    const bar = getByTestId('StepMeter_StepMeterContainer')
-    expect(bar).toHaveStyle('height : 0.75rem')
-  })
 })

@@ -32,7 +32,8 @@ export function useCreateRunMutation(
   hostOverride?: HostConfig | null
 ): UseCreateRunMutationResult {
   const contextHost = useHost()
-  const host = hostOverride ?? contextHost
+  const host =
+    hostOverride != null ? { ...contextHost, ...hostOverride } : contextHost
   const mutation = useMutation<Run, AxiosError, CreateRunData>(
     [host, 'runs'],
     createRunData =>

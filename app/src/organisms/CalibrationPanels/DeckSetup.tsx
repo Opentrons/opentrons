@@ -48,12 +48,12 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
     <Flex
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
-      padding={SPACING.spacing6}
+      padding={SPACING.spacing32}
       minHeight="25rem"
     >
       <Flex>
         <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
-          <StyledText as="h1" marginBottom={SPACING.spacing4}>
+          <StyledText as="h1" marginBottom={SPACING.spacing16}>
             {t('prepare_the_space')}
           </StyledText>
           {isHealthCheck ? (
@@ -61,7 +61,7 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
               {t('to_check', { mount: activePipette?.mount })}
             </StyledText>
           ) : null}
-          <Flex marginLeft={SPACING.spacing6}>
+          <Flex marginLeft={SPACING.spacing32}>
             <ul>
               <li>
                 <StyledText as="p">
@@ -133,7 +133,7 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
       </Flex>
       <Flex
         width="100%"
-        marginTop={SPACING.spacing6}
+        marginTop={SPACING.spacing32}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         alignItems={ALIGN_CENTER}
       >

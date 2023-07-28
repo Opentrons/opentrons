@@ -2,8 +2,7 @@ test_name: Make sure an OT-2 server rejects OT-3 protocols.
 
 marks:
   - usefixtures:
-    - run_server
-    - clean_server_state
+    - ot2_server_base_url
   - parametrize:
       key: protocol_file_path
       vals:
@@ -13,7 +12,7 @@ marks:
 stages:
   - name: Upload the protocol.
     request:
-      url: '{host:s}:{port:d}/protocols'
+      url: '{ot2_server_base_url}/protocols'
       method: POST
       files:
         files: "{protocol_file_path}"

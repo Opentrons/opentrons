@@ -19,6 +19,8 @@ import {
 import { getWellFillFromLabwareId } from '../../organisms/Devices/ProtocolRun/SetupLiquids/utils'
 import { getStandardDeckViewLayerBlockList } from './utils/getStandardDeckViewLayerBlockList'
 import { getStandardDeckViewBox } from './utils/getStandardViewBox'
+
+import type { StyleProps } from '@opentrons/components'
 import type {
   DeckSlot,
   Liquid,
@@ -26,14 +28,14 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 
-interface DeckThumbnailProps {
+interface DeckThumbnailProps extends StyleProps {
   commands: RunTimeCommand[]
   labware: LoadedLabware[]
   liquids?: Liquid[]
 }
 
 export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
-  const { commands, liquids, labware = [] } = props
+  const { commands, liquids, labware = [], ...styleProps } = props
   const robotType = getRobotTypeFromLoadedLabware(labware)
   const deckDef = getDeckDefFromRobotType(robotType)
   const initialLoadedLabwareBySlot = parseInitialLoadedLabwareBySlot(commands)
@@ -55,6 +57,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
       deckLayerBlocklist={getStandardDeckViewLayerBlockList(robotType)}
       deckDef={deckDef}
       viewBox={getStandardDeckViewBox(robotType)}
+      {...styleProps}
     >
       {({ deckSlotsById }) =>
         map<DeckSlot>(deckSlotsById, (slot: DeckSlot, slotId: string) => {

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import { useHistory, useParams } from 'react-router-dom'
 import first from 'lodash/first'
+import { css } from 'styled-components'
 
 import {
   Btn,
@@ -19,6 +20,7 @@ import {
   TYPOGRAPHY,
   BORDERS,
   SPACING,
+  POSITION_STICKY,
 } from '@opentrons/components'
 import {
   useProtocolQuery,
@@ -33,14 +35,19 @@ import {
 
 import { StyledText } from '../../atoms/text'
 import { Skeleton } from '../../atoms/Skeleton'
-import { useAttachedModules } from '../../organisms/Devices/hooks'
+import { ODD_FOCUS_VISIBLE } from '../../atoms/buttons/constants'
+import { useMaintenanceRunTakeover } from '../../organisms/TakeoverModal'
+import {
+  useAttachedModules,
+  useLPCDisabledReason,
+} from '../../organisms/Devices/hooks'
 import { useMostRecentCompletedAnalysis } from '../../organisms/LabwarePositionCheck/useMostRecentCompletedAnalysis'
 import { getProtocolModulesInfo } from '../../organisms/Devices/ProtocolRun/utils/getProtocolModulesInfo'
 import { ProtocolSetupLabware } from '../../organisms/ProtocolSetupLabware'
 import { ProtocolSetupModules } from '../../organisms/ProtocolSetupModules'
 import { ProtocolSetupLiquids } from '../../organisms/ProtocolSetupLiquids'
 import { ProtocolSetupInstruments } from '../../organisms/ProtocolSetupInstruments'
-import { ProtocolSetupLabwarePositionCheck } from '../../organisms/ProtocolSetupLabwarePositionCheck'
+import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
 import { getUnmatchedModulesForProtocol } from '../../organisms/ProtocolSetupModules/utils'
 import { ConfirmCancelRunModal } from '../../organisms/OnDeviceDisplay/RunningProtocol'
 import {
@@ -48,11 +55,11 @@ import {
   getProtocolUsesGripper,
 } from '../../organisms/ProtocolSetupInstruments/utils'
 import { useRunControls } from '../../organisms/RunTimeControl/hooks'
+import { useToaster } from '../../organisms/ToasterOven'
 import { getLabwareSetupItemGroups } from '../../pages/Protocols/utils'
 import { ROBOT_MODEL_OT3 } from '../../redux/discovery'
 
 import type { OnDeviceRouteParams } from '../../App/types'
-import { useLaunchLPC } from '../../organisms/LabwarePositionCheck/useLaunchLPC'
 
 interface ProtocolSetupStepProps {
   onClickSetupStep: () => void
@@ -62,6 +69,10 @@ interface ProtocolSetupStepProps {
   detail?: string | null
   // second line of detail text
   subDetail?: string | null
+  // disallow click handler, disabled styling
+  disabled?: boolean
+  // display the reason the setup step is disabled
+  disabledReason?: string | null
 }
 
 function ProtocolSetupStep({
@@ -70,44 +81,98 @@ function ProtocolSetupStep({
   title,
   detail,
   subDetail,
+  disabled = false,
+  disabledReason,
 }: ProtocolSetupStepProps): JSX.Element {
   const backgroundColorByStepStatus = {
     ready: COLORS.green3,
     'not ready': COLORS.yellow3,
     general: COLORS.light1,
   }
+  const { makeSnackbar } = useToaster()
+
+  const makeDisabledReasonSnackbar = (): void => {
+    if (disabledReason != null) {
+      makeSnackbar(disabledReason)
+    }
+  }
+
   return (
-    <Btn onClick={onClickSetupStep} width="100%">
+    <Btn
+      onClick={() =>
+        !disabled ? onClickSetupStep() : makeDisabledReasonSnackbar()
+      }
+      width="100%"
+    >
       <Flex
         alignItems={ALIGN_CENTER}
-        backgroundColor={backgroundColorByStepStatus[status]}
-        borderRadius={BORDERS.size_four}
-        gridGap={SPACING.spacing4}
-        padding={`${SPACING.spacingM} ${SPACING.spacing5}`}
+        backgroundColor={
+          disabled ? COLORS.light1 : backgroundColorByStepStatus[status]
+        }
+        borderRadius={BORDERS.borderRadiusSize4}
+        gridGap={SPACING.spacing16}
+        padding={`${SPACING.spacing20} ${SPACING.spacing24}`}
       >
-        {status !== 'general' ? (
+        {status !== 'general' && !disabled ? (
           <Icon
             color={status === 'ready' ? COLORS.green2 : COLORS.yellow2}
             size="2rem"
             name={status === 'ready' ? 'ot-check' : 'ot-alert'}
           />
         ) : null}
-        <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <StyledText
+          as="h4"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          color={disabled ? COLORS.darkBlack60 : COLORS.darkBlack100}
+        >
           {title}
         </StyledText>
         <Flex flex="1" justifyContent={JUSTIFY_END}>
-          <StyledText as="p" textAlign={TEXT_ALIGN_RIGHT}>
+          <StyledText
+            as="p"
+            textAlign={TEXT_ALIGN_RIGHT}
+            color={disabled ? COLORS.darkBlack60 : COLORS.darkBlack100}
+          >
             {detail}
             {subDetail != null && detail != null ? <br /> : null}
             {subDetail}
           </StyledText>
         </Flex>
-        <Icon marginLeft={SPACING.spacing3} name="more" size="3rem" />
+        {disabled ? null : (
+          <Icon marginLeft={SPACING.spacing8} name="more" size="3rem" />
+        )}
       </Flex>
     </Btn>
   )
 }
 
+const CLOSE_BUTTON_STYLE = css`
+  -webkit-tap-highlight-color: transparent;
+  &:focus {
+    background-color: ${COLORS.red2Pressed};
+    color: ${COLORS.white};
+  }
+
+  &:hover {
+    background-color: ${COLORS.red2};
+    color: ${COLORS.white};
+  }
+
+  &:focus-visible {
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.red2};
+  }
+
+  &:active {
+    background-color: ${COLORS.red2Pressed};
+    color: ${COLORS.white};
+  }
+
+  &:disabled {
+    background-color: ${COLORS.darkBlack20};
+    color: ${COLORS.darkBlack60};
+  }
+`
 // TODO(ew, 05/03/2023): refactor the run buttons into a shared component
 interface CloseButtonProps {
   onClose: () => void
@@ -125,22 +190,57 @@ function CloseButton({ onClose }: CloseButtonProps): JSX.Element {
       width="6.25rem"
       onClick={onClose}
       aria-label="close"
+      css={CLOSE_BUTTON_STYLE}
     >
       <Icon color={COLORS.white} name="close-icon" size="2.5rem" />
     </Btn>
   )
 }
 
+const PLAY_BUTTON_STYLE = css`
+  -webkit-tap-highlight-color: transparent;
+  &:focus {
+    background-color: ${COLORS.bluePressed};
+    color: ${COLORS.white};
+  }
+
+  &:hover {
+    background-color: ${COLORS.blueEnabled};
+    color: ${COLORS.white};
+  }
+
+  &:focus-visible {
+    box-shadow: ${ODD_FOCUS_VISIBLE};
+    background-color: ${COLORS.blueEnabled};
+  }
+
+  &:active {
+    background-color: ${COLORS.bluePressed};
+    color: ${COLORS.white};
+  }
+
+  &:disabled {
+    background-color: ${COLORS.darkBlack20};
+    color: ${COLORS.darkBlack60};
+  }
+`
 interface PlayButtonProps {
-  disabled: boolean
+  ready: boolean
   onPlay: () => void
+  disabled?: boolean
 }
 
-function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
+function PlayButton({
+  disabled = false,
+  onPlay,
+  ready,
+}: PlayButtonProps): JSX.Element {
   return (
     <Btn
       alignItems={ALIGN_CENTER}
-      backgroundColor={disabled ? COLORS.darkBlack20 : COLORS.blueEnabled}
+      backgroundColor={
+        disabled || !ready ? COLORS.darkBlack20 : COLORS.blueEnabled
+      }
       borderRadius="6.25rem"
       display={DISPLAY_FLEX}
       height="6.25rem"
@@ -149,9 +249,10 @@ function PlayButton({ disabled, onPlay }: PlayButtonProps): JSX.Element {
       disabled={disabled}
       onClick={onPlay}
       aria-label="play"
+      css={PLAY_BUTTON_STYLE}
     >
       <Icon
-        color={disabled ? COLORS.darkBlack60 : COLORS.white}
+        color={disabled || !ready ? COLORS.darkBlack60 : COLORS.white}
         name="play-icon"
         size="2.5rem"
       />
@@ -168,8 +269,19 @@ function PrepareToRun({
   runId,
   setSetupScreen,
 }: PrepareToRunProps): JSX.Element {
-  const { t } = useTranslation('protocol_setup')
+  const { t, i18n } = useTranslation('protocol_setup')
   const history = useHistory()
+  const { makeSnackbar } = useToaster()
+
+  // Watch for scrolling to toggle dropshadow
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const [isScrolled, setIsScrolled] = React.useState<boolean>(false)
+  const observer = new IntersectionObserver(([entry]) => {
+    setIsScrolled(!entry.isIntersecting)
+  })
+  if (scrollRef.current) {
+    observer.observe(scrollRef.current)
+  }
 
   const { data: runRecord } = useRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
@@ -186,29 +298,43 @@ function PrepareToRun({
     protocolRecord?.data.files[0].name
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const { launchLPC, LPCWizard } = useLaunchLPC(runId)
+  const { setODDMaintenanceFlowInProgress } = useMaintenanceRunTakeover()
 
   const { play } = useRunControls(runId)
 
-  const onPlay = (): void => {
-    play()
-    history.push(`/protocols/${runId}/run`)
-  }
-
-  // TODO(bh, 2023-02-24): cancel run functionality - replace modal with OOD-specific pop-up
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
     history.goBack()
   }
 
-  const [
-    showConfirmCancelModal,
-    setShowConfirmCancelModal,
-  ] = React.useState<boolean>(false)
-
   const protocolHasModules =
     mostRecentAnalysis?.modules != null &&
     mostRecentAnalysis?.modules.length > 0
   const attachedModules = useAttachedModules()
+
+  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
+
+  const protocolModulesInfo =
+    mostRecentAnalysis != null
+      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
+      : []
+
+  const { missingModuleIds } = getUnmatchedModulesForProtocol(
+    attachedModules,
+    protocolModulesInfo
+  )
+
+  const isMissingModules = missingModuleIds.length > 0
+  const lpcDisabledReason = useLPCDisabledReason({
+    runId,
+    hasMissingModulesForOdd: isMissingModules,
+    hasMissingPipCalForOdd: allPipettesCalibrationData == null,
+  })
+
+  const [
+    showConfirmCancelModal,
+    setShowConfirmCancelModal,
+  ] = React.useState<boolean>(false)
 
   if (
     mostRecentAnalysis == null ||
@@ -232,24 +358,19 @@ function PrepareToRun({
   })
   const instrumentsStatus = areInstrumentsReady ? 'ready' : 'not ready'
 
-  const deckDef = getDeckDefFromRobotType(ROBOT_MODEL_OT3)
-
-  const protocolModulesInfo =
-    mostRecentAnalysis != null
-      ? getProtocolModulesInfo(mostRecentAnalysis, deckDef)
-      : []
-
-  const {
-    missingModuleIds,
-    remainingAttachedModules,
-  } = getUnmatchedModulesForProtocol(attachedModules, protocolModulesInfo)
-
-  const isMissingModules = missingModuleIds.length > 0
-  const isUnmatchedModules =
-    remainingAttachedModules.length > 0 && missingModuleIds.length > 0
   const modulesStatus = isMissingModules ? 'not ready' : 'ready'
 
   const isReadyToRun = areInstrumentsReady && !isMissingModules
+
+  const onPlay = (): void => {
+    if (isReadyToRun) {
+      play()
+    } else {
+      makeSnackbar(
+        i18n.format(t('complete_setup_before_proceeding'), 'capitalize')
+      )
+    }
+  }
 
   // get display name of first missing module
   const firstMissingModuleId = first(missingModuleIds)
@@ -262,9 +383,12 @@ function PrepareToRun({
       : ''
 
   // determine modules detail messages
-  const connectedModulesText = t('modules_connected', {
-    count: attachedModules.length,
-  })
+  const connectedModulesText =
+    protocolModulesInfo.length === 0
+      ? t('no_modules_used_in_this_protocol')
+      : t('modules_connected', {
+          count: attachedModules.length,
+        })
   const missingModulesText =
     missingModuleIds.length === 1
       ? `${t('missing')} ${firstMissingModuleDisplayName}`
@@ -273,8 +397,6 @@ function PrepareToRun({
   const modulesDetail = isMissingModules
     ? missingModulesText
     : connectedModulesText
-  const modulesSubDetail =
-    isMissingModules && isUnmatchedModules ? t('module_mismatch_error') : null
 
   // Labware information
   const { offDeckItems, onDeckItems } = getLabwareSetupItemGroups(
@@ -297,16 +419,24 @@ function PrepareToRun({
 
   return (
     <>
+      {/* Empty box to detect scrolling */}
+      <Flex ref={scrollRef} />
       {/* Protocol Setup Header */}
       <Flex
+        boxShadow={isScrolled ? BORDERS.shadowBig : undefined}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing5}
-        marginBottom={SPACING.spacingXXL}
+        gridGap={SPACING.spacing24}
+        padding={`${SPACING.spacing32} ${SPACING.spacing40} ${SPACING.spacing40}`}
+        position={POSITION_STICKY}
+        top={0}
+        backgroundColor={COLORS.white}
+        overflowY="hidden"
+        marginX={`-${SPACING.spacing32}`}
       >
         <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
           <Flex
             flexDirection={DIRECTION_COLUMN}
-            gridGap="0.25rem"
+            gridGap={SPACING.spacing2}
             maxWidth="43rem"
           >
             <StyledText as="h4" fontWeight={TYPOGRAPHY.fontWeightBold}>
@@ -321,55 +451,74 @@ function PrepareToRun({
               {truncateString(protocolName as string, 100)}
             </StyledText>
           </Flex>
-          <Flex gridGap={SPACING.spacing4}>
+          <Flex gridGap={SPACING.spacing16}>
             <CloseButton onClose={() => setShowConfirmCancelModal(true)} />
-            <PlayButton disabled={!isReadyToRun} onPlay={onPlay} />
+            <PlayButton
+              disabled={
+                mostRecentAnalysis == null ||
+                attachedInstruments == null ||
+                (protocolHasModules && attachedModules == null) ||
+                allPipettesCalibrationData == null
+              }
+              onPlay={onPlay}
+              ready={isReadyToRun}
+            />
           </Flex>
         </Flex>
       </Flex>
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
-        gridGap={SPACING.spacing3}
+        gridGap={SPACING.spacing8}
+        paddingX={SPACING.spacing8}
       >
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('instruments')}
           title={t('instruments')}
           detail={instrumentsDetail}
           status={instrumentsStatus}
+          disabled={speccedInstrumentCount === 0}
         />
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('modules')}
           title={t('modules')}
           detail={modulesDetail}
-          subDetail={modulesSubDetail}
           status={modulesStatus}
+          disabled={protocolModulesInfo.length === 0}
         />
-
+        <ProtocolSetupStep
+          onClickSetupStep={() => {
+            setODDMaintenanceFlowInProgress()
+            launchLPC()
+          }}
+          title={t('labware_position_check')}
+          detail={t(
+            lpcDisabledReason != null ? 'currently_unavailable' : 'recommended'
+          )}
+          status="general"
+          disabled={lpcDisabledReason != null}
+          disabledReason={lpcDisabledReason}
+        />
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('labware')}
           title={t('labware')}
           detail={labwareDetail}
           subDetail={labwareSubDetail}
           status="general"
-        />
-        <ProtocolSetupStep
-          onClickSetupStep={launchLPC}
-          title={t('labware_position_check')}
-          detail={t('recommended')}
-          status="general"
+          disabled={labwareDetail === null}
         />
         <ProtocolSetupStep
           onClickSetupStep={() => setSetupScreen('liquids')}
           title={t('liquids')}
           status="general"
           detail={
-            liquidsInProtocol.length < 0
+            liquidsInProtocol.length > 0
               ? t('initial_liquids_num', {
-                  num: liquidsInProtocol.length,
+                  count: liquidsInProtocol.length,
                 })
               : t('liquids_not_in_setup')
           }
+          disabled={liquidsInProtocol.length === 0}
         />
       </Flex>
       {LPCWizard}
@@ -412,19 +561,20 @@ export function ProtocolSetup(): JSX.Element {
     labware: (
       <ProtocolSetupLabware runId={runId} setSetupScreen={setSetupScreen} />
     ),
-    lpc: (
-      <ProtocolSetupLabwarePositionCheck
-        runId={runId}
-        setSetupScreen={setSetupScreen}
-      />
-    ),
     liquids: (
       <ProtocolSetupLiquids runId={runId} setSetupScreen={setSetupScreen} />
     ),
   }
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} padding="2rem 2.5rem">
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      padding={
+        setupScreen === 'prepare to run'
+          ? `0 ${SPACING.spacing32} ${SPACING.spacing40}`
+          : `${SPACING.spacing32} ${SPACING.spacing40}`
+      }
+    >
       {setupComponentByScreen[setupScreen]}
     </Flex>
   )
@@ -435,18 +585,22 @@ interface ProtocolSetupSkeletonProps {
 }
 function ProtocolSetupSkeleton(props: ProtocolSetupSkeletonProps): JSX.Element {
   return (
-    <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacingXXL}>
+    <Flex
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing40}
+      marginTop={SPACING.spacing40}
+    >
       <Flex justifyContent={JUSTIFY_SPACE_BETWEEN}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap="0.25rem">
           <Skeleton height="2rem" width="7rem" backgroundSize="64rem" />
           <Skeleton height="2rem" width="28rem" backgroundSize="64rem" />
         </Flex>
-        <Flex gridGap={SPACING.spacing5}>
+        <Flex gridGap={SPACING.spacing24}>
           <CloseButton onClose={() => props.cancelAndClose()} />
-          <PlayButton disabled onPlay={() => {}} />
+          <PlayButton onPlay={() => {}} ready={false} />
         </Flex>
       </Flex>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing3}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />
         <Skeleton height="6rem" width="100%" backgroundSize="64rem" />

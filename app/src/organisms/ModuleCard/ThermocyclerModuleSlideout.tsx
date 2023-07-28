@@ -113,7 +113,7 @@ export const ThermocyclerModuleSlideout = (
       <StyledText
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         fontSize={TYPOGRAPHY.fontSizeP}
-        paddingTop={SPACING.spacing2}
+        paddingTop={SPACING.spacing4}
         data-testid={`ThermocyclerSlideout_text_${module.serialNumber}`}
       >
         {t('tc_set_temperature_body', {
@@ -123,7 +123,7 @@ export const ThermocyclerModuleSlideout = (
         })}
       </StyledText>
       <Flex
-        marginTop={SPACING.spacing4}
+        marginTop={SPACING.spacing16}
         flexDirection={DIRECTION_COLUMN}
         data-testid={`ThermocyclerSlideout_input_field_${module.serialNumber}`}
       >
@@ -131,7 +131,7 @@ export const ThermocyclerModuleSlideout = (
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           fontSize={TYPOGRAPHY.fontSizeH6}
           color={COLORS.darkGreyEnabled}
-          paddingBottom={SPACING.spacing3}
+          paddingBottom={SPACING.spacing8}
         >
           {t(isSecondaryTemp ? 'set_lid_temperature' : 'set_block_temperature')}
         </StyledText>

@@ -73,6 +73,14 @@ from .drop_tip import (
     DropTipCommandType,
 )
 
+from .drop_tip_in_place import (
+    DropTipInPlace,
+    DropTipInPlaceParams,
+    DropTipInPlaceCreate,
+    DropTipInPlaceResult,
+    DropTipInPlaceCommandType,
+)
+
 from .home import (
     Home,
     HomeParams,
@@ -87,6 +95,14 @@ from .load_labware import (
     LoadLabwareCreate,
     LoadLabwareResult,
     LoadLabwareCommandType,
+)
+
+from .load_adapter import (
+    LoadAdapter,
+    LoadAdapterParams,
+    LoadAdapterCreate,
+    LoadAdapterResult,
+    LoadAdapterCommandType,
 )
 
 from .load_liquid import (
@@ -201,6 +217,14 @@ from .blow_out_in_place import (
     BlowOutInPlaceResult,
 )
 
+from .set_status_bar import (
+    SetStatusBar,
+    SetStatusBarParams,
+    SetStatusBarCreate,
+    SetStatusBarResult,
+    SetStatusBarCommandType,
+)
+
 Command = Union[
     Aspirate,
     AspirateInPlace,
@@ -211,8 +235,10 @@ Command = Union[
     BlowOut,
     BlowOutInPlace,
     DropTip,
+    DropTipInPlace,
     Home,
     LoadLabware,
+    LoadAdapter,
     LoadLiquid,
     LoadModule,
     LoadPipette,
@@ -226,6 +252,7 @@ Command = Union[
     SavePosition,
     SetRailLights,
     TouchTip,
+    SetStatusBar,
     heater_shaker.WaitForTemperature,
     heater_shaker.SetTargetTemperature,
     heater_shaker.DeactivateHeater,
@@ -263,8 +290,10 @@ CommandParams = Union[
     BlowOutParams,
     BlowOutInPlaceParams,
     DropTipParams,
+    DropTipInPlaceParams,
     HomeParams,
     LoadLabwareParams,
+    LoadAdapterParams,
     LoadLiquidParams,
     LoadModuleParams,
     LoadPipetteParams,
@@ -278,6 +307,7 @@ CommandParams = Union[
     SavePositionParams,
     SetRailLightsParams,
     TouchTipParams,
+    SetStatusBarParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -316,8 +346,10 @@ CommandType = Union[
     BlowOutCommandType,
     BlowOutInPlaceCommandType,
     DropTipCommandType,
+    DropTipInPlaceCommandType,
     HomeCommandType,
     LoadLabwareCommandType,
+    LoadAdapterCommandType,
     LoadLiquidCommandType,
     LoadModuleCommandType,
     LoadPipetteCommandType,
@@ -331,6 +363,7 @@ CommandType = Union[
     SavePositionCommandType,
     SetRailLightsCommandType,
     TouchTipCommandType,
+    SetStatusBarCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -368,8 +401,10 @@ CommandCreate = Union[
     BlowOutCreate,
     BlowOutInPlaceCreate,
     DropTipCreate,
+    DropTipInPlaceCreate,
     HomeCreate,
     LoadLabwareCreate,
+    LoadAdapterCreate,
     LoadLiquidCreate,
     LoadModuleCreate,
     LoadPipetteCreate,
@@ -383,6 +418,7 @@ CommandCreate = Union[
     SavePositionCreate,
     SetRailLightsCreate,
     TouchTipCreate,
+    SetStatusBarCreate,
     heater_shaker.WaitForTemperatureCreate,
     heater_shaker.SetTargetTemperatureCreate,
     heater_shaker.DeactivateHeaterCreate,
@@ -420,8 +456,10 @@ CommandResult = Union[
     BlowOutResult,
     BlowOutInPlaceResult,
     DropTipResult,
+    DropTipInPlaceResult,
     HomeResult,
     LoadLabwareResult,
+    LoadAdapterResult,
     LoadLiquidResult,
     LoadModuleResult,
     LoadPipetteResult,
@@ -435,6 +473,7 @@ CommandResult = Union[
     SavePositionResult,
     SetRailLightsResult,
     TouchTipResult,
+    SetStatusBarResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,

@@ -212,7 +212,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
   return (
     <Flex
       backgroundColor={COLORS.fundamentalsBackground}
-      borderRadius={SPACING.spacing2}
+      borderRadius={SPACING.spacing4}
       width="100%"
       data-testid={`ModuleCard_${module.serialNumber}`}
     >
@@ -245,11 +245,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           onCloseClick={() => setShowTestShake(false)}
         />
       )}
-      <Box
-        padding={`${String(SPACING.spacing4)} ${String(SPACING.spacing3)}`}
-        width="100%"
-      >
-        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing3}>
+      <Box padding={`${SPACING.spacing16} ${SPACING.spacing8}`} width="100%">
+        <Flex flexDirection={DIRECTION_ROW} paddingRight={SPACING.spacing8}>
           <Flex alignItems={ALIGN_START} opacity={isPending ? '50%' : '100%'}>
             <img
               width="60px"
@@ -261,7 +258,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
           <Flex
             flexDirection={DIRECTION_COLUMN}
             flex="100%"
-            paddingLeft={SPACING.spacing3}
+            paddingLeft={SPACING.spacing8}
           >
             <ErrorInfo attachedModule={module} />
             {latestRequest != null && latestRequest.status === FAILURE && (
@@ -273,7 +270,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
             )}
             {module.hasAvailableUpdate && showBanner && !isPending ? (
               <Flex
-                paddingBottom={SPACING.spacing2}
+                paddingBottom={SPACING.spacing4}
                 width="100%"
                 flexDirection={DIRECTION_COLUMN}
                 data-testid={`ModuleCard_firmware_update_banner_${module.serialNumber}`}
@@ -300,8 +297,8 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
               <Flex
                 width="100%"
                 flexDirection={DIRECTION_COLUMN}
-                paddingRight={SPACING.spacingM}
-                paddingBottom={SPACING.spacing3}
+                paddingRight={SPACING.spacing20}
+                paddingBottom={SPACING.spacing8}
                 data-testid={`ModuleCard_too_hot_banner_${module.serialNumber}`}
               >
                 <Banner type="warning" icon={hotToTouch}>
@@ -323,12 +320,12 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                 data-testid={`ModuleCard_update_pending_${module.serialNumber}`}
               >
                 <Icon
-                  width={SPACING.spacingSM}
+                  width="10px"
                   name="ot-spinner"
                   spin
                   aria-label="ot-spinner"
                 />
-                <StyledText marginLeft={SPACING.spacing3}>
+                <StyledText marginLeft={SPACING.spacing8}>
                   {t('updating_firmware')}
                 </StyledText>
               </Flex>
@@ -339,7 +336,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   color={COLORS.darkGreyEnabled}
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   fontSize={TYPOGRAPHY.fontSizeH6}
-                  paddingBottom={SPACING.spacing2}
+                  paddingBottom={SPACING.spacing4}
                   data-testid={`module_card_usb_port_${module.serialNumber}`}
                 >
                   {module.moduleType !== THERMOCYCLER_MODULE_TYPE &&
@@ -351,14 +348,14 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
                   })}
                 </StyledText>
                 <Flex
-                  paddingBottom={SPACING.spacing2}
+                  paddingBottom={SPACING.spacing4}
                   data-testid={`ModuleCard_display_name_${module.serialNumber}`}
                   fontSize={TYPOGRAPHY.fontSizeP}
                 >
                   <ModuleIcon
                     moduleType={module.moduleType}
                     size="1rem"
-                    marginRight={SPACING.spacing1}
+                    marginRight={SPACING.spacing2}
                     color={COLORS.darkGreyEnabled}
                   />
                   <StyledText>
@@ -379,7 +376,7 @@ export const ModuleCard = (props: ModuleCardProps): JSX.Element | null => {
 
       <Box
         alignSelf={ALIGN_START}
-        padding={SPACING.spacing2}
+        padding={SPACING.spacing4}
         data-testid={`ModuleCard_overflow_btn_${module.serialNumber}`}
         opacity={isPending ? '50%' : '100%'}
       >

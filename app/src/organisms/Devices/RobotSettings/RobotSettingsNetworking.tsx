@@ -24,6 +24,11 @@ import { ExternalLink } from '../../../atoms/Link/ExternalLink'
 import { StyledText } from '../../../atoms/text'
 import { Divider } from '../../../atoms/structure'
 
+import {
+  getRobotAddressesByName,
+  HEALTH_STATUS_OK,
+  OPENTRONS_USB,
+} from '../../../redux/discovery'
 import { fetchStatus, getNetworkInterfaces } from '../../../redux/networking'
 
 import { useIsOT3, useIsRobotBusy } from '../hooks'
@@ -58,8 +63,12 @@ export function RobotSettingsNetworking({
 
   const canDisconnect = useCanDisconnect(robotName)
 
-  // TODO(bh, 2023-1-18): get the real OT-3 USB connection info
-  const isOT3ConnectedViaUSB = false
+  const addresses = useSelector((state: State) =>
+    getRobotAddressesByName(state, robotName)
+  )
+  const usbAddress = addresses.find(addr => addr.ip === OPENTRONS_USB)
+  const isOT3ConnectedViaUSB =
+    usbAddress != null && usbAddress.healthStatus === HEALTH_STATUS_OK
 
   const { wifi, ethernet } = useSelector((state: State) =>
     getNetworkInterfaces(state, robotName)
@@ -84,23 +93,25 @@ export function RobotSettingsNetworking({
           />
         ) : null}
       </Portal>
-      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
         <Flex alignItems={ALIGN_CENTER}>
           {wifi?.ipAddress != null ? (
             <Icon
               size="1.25rem"
               name="ot-check"
               color={COLORS.successEnabled}
-              marginRight={SPACING.spacing3}
+              marginRight={SPACING.spacing8}
               data-testid="RobotSettings_Networking_check_circle"
             />
           ) : (
-            <Box height={SPACING.spacing4} width="1.75rem"></Box>
+            <Box height={SPACING.spacing16} width="1.75rem"></Box>
           )}
           <Icon
             size="1.25rem"
             name="wifi"
-            marginRight={wifi?.ipAddress != null ? '0.5rem' : '0.75rem'}
+            marginRight={
+              wifi?.ipAddress != null ? SPACING.spacing8 : SPACING.spacing12
+            }
             data-testid="RobotSettings_Networking_wifi_icon"
           />
           <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -111,8 +122,8 @@ export function RobotSettingsNetworking({
         <Box paddingLeft="3.75rem">
           {wifi?.ipAddress != null ? (
             <>
-              <Flex marginBottom={SPACING.spacing5}>
-                <Flex marginRight={SPACING.spacing3}>
+              <Flex marginBottom={SPACING.spacing24}>
+                <Flex marginRight={SPACING.spacing8}>
                   <SelectNetwork
                     robotName={robotName}
                     isRobotBusy={isRobotBusy}
@@ -124,10 +135,10 @@ export function RobotSettingsNetworking({
                   </SecondaryButton>
                 ) : null}
               </Flex>
-              <Flex gridGap={SPACING.spacing4}>
+              <Flex gridGap={SPACING.spacing16}>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing2}
+                  gridGap={SPACING.spacing4}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wireless_ip')}
@@ -138,7 +149,7 @@ export function RobotSettingsNetworking({
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing2}
+                  gridGap={SPACING.spacing4}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wireless_subnet_mask')}
@@ -150,7 +161,7 @@ export function RobotSettingsNetworking({
 
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing2}
+                  gridGap={SPACING.spacing4}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wireless_mac_address')}
@@ -174,16 +185,16 @@ export function RobotSettingsNetworking({
               size="1.25rem"
               name="ot-check"
               color={COLORS.successEnabled}
-              marginRight={SPACING.spacing3}
+              marginRight={SPACING.spacing8}
               data-testid="RobotSettings_Networking_check_circle"
             />
           ) : (
-            <Box height={SPACING.spacing4} width="1.75rem"></Box>
+            <Box height={SPACING.spacing16} width="1.75rem"></Box>
           )}
           <Icon
             size="1.25rem"
             name={isOT3 ? 'ethernet' : 'usb'}
-            marginRight="0.75rem"
+            marginRight={SPACING.spacing12}
             data-testid="RobotSettings_Networking_usb_icon"
           />
           <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
@@ -191,12 +202,12 @@ export function RobotSettingsNetworking({
           </StyledText>
         </Flex>
         <Box paddingLeft="3.75rem">
-          <Flex gridGap={SPACING.spacing4}>
+          <Flex gridGap={SPACING.spacing16}>
             {ethernet?.ipAddress != null ? (
               <>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing2}
+                  gridGap={SPACING.spacing4}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wired_ip')}
@@ -207,7 +218,7 @@ export function RobotSettingsNetworking({
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing2}
+                  gridGap={SPACING.spacing4}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wired_subnet_mask')}
@@ -218,7 +229,7 @@ export function RobotSettingsNetworking({
                 </Flex>
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
-                  gridGap={SPACING.spacing2}
+                  gridGap={SPACING.spacing4}
                 >
                   <StyledText css={TYPOGRAPHY.pSemiBold}>
                     {t('wired_mac_address')}
@@ -237,14 +248,17 @@ export function RobotSettingsNetworking({
             )}
           </Flex>
           {isOT3 ? null : (
-            <Flex flexDirection={DIRECTION_COLUMN} marginTop={SPACING.spacing4}>
+            <Flex
+              flexDirection={DIRECTION_COLUMN}
+              marginTop={SPACING.spacing16}
+            >
               <ExternalLink href={HELP_CENTER_URL} id="WiredUSB_description">
                 {t('wired_usb_description')}
               </ExternalLink>
               <StyledText
                 as="p"
-                marginTop={SPACING.spacing4}
-                marginBottom={SPACING.spacing3}
+                marginTop={SPACING.spacing16}
+                marginBottom={SPACING.spacing8}
               >
                 {t('usb_to_ethernet_description')}
               </StyledText>
@@ -263,16 +277,16 @@ export function RobotSettingsNetworking({
                   size="1.25rem"
                   name="ot-check"
                   color={COLORS.successEnabled}
-                  marginRight={SPACING.spacing3}
+                  marginRight={SPACING.spacing8}
                   data-testid="RobotSettings_Networking_check_circle"
                 />
               ) : (
-                <Box height={SPACING.spacing4} width="1.75rem"></Box>
+                <Box height={SPACING.spacing16} width="1.75rem"></Box>
               )}
               <Icon
                 size="1.25rem"
                 name="usb"
-                marginRight="0.75rem"
+                marginRight={SPACING.spacing12}
                 data-testid="RobotSettings_Networking_wifi_icon"
               />
               <StyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>

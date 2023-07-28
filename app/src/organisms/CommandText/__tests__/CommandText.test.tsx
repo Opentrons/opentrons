@@ -316,7 +316,9 @@ describe('CommandText', () => {
         i18nInstance: i18n,
       }
     )[0]
-    getByText('Setting Thermocycler block temperature to 20°C')
+    getByText(
+      'Setting Thermocycler block temperature to 20°C with hold time of 0 seconds after target reached'
+    )
   })
   it('renders correct text for thermocycler/setTargetLidTemperature', () => {
     const mockTemp = 20
@@ -488,14 +490,14 @@ describe('CommandText', () => {
     const expectedCopyByCommandType: {
       [commandType in RunTimeCommand['commandType']]?: string
     } = {
-      home: 'Homing all gantry, pipette, and plunger axes',
+      home: 'Homing all robot arm, pipette, and plunger axes',
       savePosition: 'Saving position',
       touchTip: 'Touching tip',
       'magneticModule/engage': 'Engaging Magnetic Module',
       'magneticModule/disengage': 'Disengaging Magnetic Module',
       'temperatureModule/deactivate': 'Deactivating Temperature Module',
       'thermocycler/waitForBlockTemperature':
-        'Waiting for Thermocycler block to reach target temperature',
+        'Waiting for Thermocycler block to reach target temperature and holding for specified time',
       'thermocycler/waitForLidTemperature':
         'Waiting for Thermocycler lid to reach target temperature',
       'thermocycler/openLid': 'Opening Thermocycler lid',

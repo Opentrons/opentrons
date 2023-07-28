@@ -18,7 +18,7 @@ import {
   LoadingState,
   CompleteConfirmation,
 } from '../../organisms/CalibrationPanels'
-import { ModalShell } from '../../molecules/Modal'
+import { LegacyModalShell } from '../../molecules/LegacyModal'
 import { WizardHeader } from '../../molecules/WizardHeader'
 import { Portal } from '../../App/portal'
 
@@ -125,7 +125,7 @@ export function CalibrateTipLength(
       : null
   return (
     <Portal level="top">
-      <ModalShell
+      <LegacyModalShell
         width="47rem"
         header={
           <WizardHeader
@@ -164,7 +164,7 @@ export function CalibrateTipLength(
             calInvalidationHandler={offsetInvalidationHandler}
           />
         )}
-      </ModalShell>
+      </LegacyModalShell>
     </Portal>
   )
 }

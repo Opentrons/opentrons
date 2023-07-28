@@ -22,10 +22,11 @@ export interface CommonCommandRunTimeInfo {
   key?: string
   id: string
   status: CommandStatus
-  error?: string | null
+  error?: RunCommandError | null
   createdAt: string
   startedAt: string | null
   completedAt: string | null
+  intent?: 'protocol' | 'setup'
 }
 export interface CommonCommandCreateInfo {
   key?: string
@@ -55,3 +56,10 @@ export type RunTimeCommand =
       params: { [key: string]: any }
       result?: any
     } & CommonCommandRunTimeInfo) // allows for experimentation between schema versions with no expectation of system support
+
+interface RunCommandError {
+  id: string
+  errorType: string
+  createdAt: string
+  detail: string
+}

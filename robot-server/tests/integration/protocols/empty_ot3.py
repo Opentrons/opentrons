@@ -1,5 +1,5 @@
 requirements = {
-    "robotType": "OT-3",
+    "robotType": "Flex",
     "apiLevel": "2.13",
 }
 

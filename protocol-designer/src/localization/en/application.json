@@ -1,6 +1,7 @@
 {
   "stepType": {
     "mix": "mix",
+    "moveLabware": "move labware",
     "moveLiquid": "transfer",
     "pause": "pause",
     "magnet": "magnet",

@@ -29,6 +29,7 @@
     "protocol-library-kludge/src",
     "protocol-library-kludge/typings",
     "api-client/src",
-    "react-api-client/src"
+    "react-api-client/src",
+    "usb-bridge/node-client/src"
   ]
 }
