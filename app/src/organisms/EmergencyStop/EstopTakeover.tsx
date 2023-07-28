@@ -1,9 +1,7 @@
 import * as React from 'react'
-import { useSelector } from 'react-redux'
 
 import { useEstopQuery } from '@opentrons/react-api-client'
 
-import { getLocalRobot } from '../../redux/discovery'
 import { EstopPressedModal } from './EstopPressedModal'
 import { EstopMissingModal } from './EstopMissingModal'
 import { useEstopContext } from './hooks'
@@ -16,7 +14,11 @@ interface ShowModalType {
   modalType: 'pressed' | 'missing'
 }
 
-export function EstopTakeover(): JSX.Element {
+interface EstopTakeoverProps {
+  robotName: string
+}
+
+export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
   const { data: estopStatus } = useEstopQuery({
     refetchInterval: ESTOP_REFETCH_INTERVAL_MS,
   })
@@ -25,9 +27,6 @@ export function EstopTakeover(): JSX.Element {
     modalType: 'pressed',
   })
   const { isDismissedModal, setIsDismissedModal } = useEstopContext()
-
-  const localRobot = useSelector(getLocalRobot)
-  const robotName = localRobot?.name ?? 'no name'
 
   const closeModal = (): void => {
     setShowEstopModal({ ...showEstopModal, showModal: false })

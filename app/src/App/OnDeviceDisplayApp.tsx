@@ -43,6 +43,8 @@ import { PortalRoot as ModalPortalRoot } from './portal'
 import { getOnDeviceDisplaySettings, updateConfigValue } from '../redux/config'
 import { SLEEP_NEVER_MS } from './constants'
 import { useCurrentRunRoute, useProtocolReceiptToast } from './hooks'
+import { getLocalRobot } from '../redux/discovery'
+
 import { OnDeviceDisplayAppFallback } from './OnDeviceDisplayAppFallback'
 
 import type { Dispatch } from '../redux/types'
@@ -215,6 +217,8 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
   const isIdle = useIdle(sleepTime, options)
   const scrollRef = React.useRef(null)
   const isScrolling = useScrolling(scrollRef)
+  const localRobot = useSelector(getLocalRobot)
+  const robotName = localRobot?.name ?? 'no name'
 
   const TOUCH_SCREEN_STYLE = css`
     position: ${POSITION_RELATIVE};
@@ -264,7 +268,7 @@ export const OnDeviceDisplayApp = (): JSX.Element => {
             <SleepScreen />
           ) : (
             <>
-              <EstopTakeover />
+              <EstopTakeover robotName={robotName} />
               <MaintenanceRunTakeover>
                 <FirmwareUpdateTakeover />
                 <ToasterOven>

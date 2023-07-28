@@ -157,7 +157,7 @@ function EmergencyStopTakeover({
           setIsDismissedModal,
         }}
       >
-        <EstopTakeover />
+        <EstopTakeover robotName={robotName} />
         {children}
       </EmergencyStopContext.Provider>
     </ApiHostProvider>
