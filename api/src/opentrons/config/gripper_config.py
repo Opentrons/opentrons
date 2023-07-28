@@ -21,9 +21,10 @@ def info_num_to_model(num: str) -> GripperModel:
     minor_model = num[2]
     # we provisioned the some EVT grippers as 01 and some as 10
     # DVT will now be 1.1
+    # PVT will now be 1.2
     model_map = {
         "0": {"0": GripperModel.v1, "1": GripperModel.v1},
-        "1": {"0": GripperModel.v1, "1": GripperModel.v1_1},
+        "1": {"0": GripperModel.v1, "1": GripperModel.v1_1, "2": GripperModel.v1_2},
     }
     return model_map[major_model][minor_model]
 

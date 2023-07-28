@@ -44,6 +44,7 @@ async def _main(cfg: TestConfig) -> None:
     else:
         report.set_operator("simulation")
     report.set_version(get_git_description())
+    report.set_firmware(api.fw_version)
 
     # RUN TESTS
     for section, test_run in cfg.tests.items():
