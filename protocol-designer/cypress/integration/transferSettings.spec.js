@@ -237,7 +237,7 @@ describe('Advanced Settings for Transfer Form', () => {
     cy.get('[data-test="StepItem_2"]').click()
     cy.get('button[id="AspDispSection_settings_button_aspirate"]').click()
 
-    // Verify that volume is set to 10 and repitions to 2
+    // Verify that volume is set to 10 and repetitions to 2
     cy.get('input[name="aspirate_mix_volume"]').should('have.value', 10)
     cy.get('input[name="aspirate_mix_times"]').should('have.value', 2)
   })
