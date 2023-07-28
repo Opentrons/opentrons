@@ -48,7 +48,9 @@ async def _validate_labware_definition(info: IdentifiedLabwareDefinition) -> Non
             LabwareDefinition.parse_obj(info.unvalidated_json)
         except PydanticValidationError as e:
             raise FileFormatValidationError(
-                f"{info.original_file.name} could not be read as a labware definition."
+                message=f"{info.original_file.name} could not be read as a labware definition.",
+                detail={"name": info.original_file.name},
+                wrapping=[e],
             ) from e
 
     await anyio.to_thread.run_sync(validate_sync)
@@ -63,7 +65,9 @@ async def _validate_json_protocol(info: IdentifiedJsonMain) -> None:
                 JsonProtocolUpToV5.parse_obj(info.unvalidated_json)
         except PydanticValidationError as e:
             raise FileFormatValidationError(
-                f"{info.original_file.name} could not be read as a JSON protocol."
+                message=f"{info.original_file.name} could not be read as a JSON protocol.",
+                detail={"name": info.original_file.name},
+                wrapping=[e],
             ) from e
 
     await anyio.to_thread.run_sync(validate_sync)

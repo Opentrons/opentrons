@@ -55,7 +55,9 @@ def run_python(proto: PythonProtocol, context: ProtocolContext):
     try:
         _runfunc_ok(new_globs.get("run"))
     except SyntaxError as se:
-        raise MalformedProtocolError(str(se))
+        raise MalformedProtocolError(
+            message=str(se), detail={"kind": "syntax error"}, wrapping=[se]
+        )
     new_globs["__context"] = context
     try:
         exec("run(__context)", new_globs)

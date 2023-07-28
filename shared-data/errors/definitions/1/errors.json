@@ -157,6 +157,14 @@
     "4002": {
       "detail": "API Removed",
       "category": "generalError"
+    },
+    "4003": {
+      "detail": "Corrupt Stored Data",
+      "category": "generalError"
+    },
+    "4004": {
+      "detail": "Invalid Protocol Data",
+      "category": "generalError"
     }
   }
 }

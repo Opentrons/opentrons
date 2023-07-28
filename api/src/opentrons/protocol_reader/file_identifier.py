@@ -127,7 +127,8 @@ async def _identify(file: BufferedFile) -> IdentifiedFile:
         return IdentifiedData(original_file=file)
     else:
         raise FileIdentificationError(
-            f"{file.name} has an unrecognized file extension."
+            message=f"{file.name} has an unrecognized file extension.",
+            detail={"file": file.name, "extension": file.name.split(".")[-1]},
         )
 
 
@@ -138,7 +139,9 @@ async def _analyze_json(
         json_contents = await anyio.to_thread.run_sync(json.loads, json_file.contents)
     except json.JSONDecodeError as e:
         raise FileIdentificationError(
-            f"{json_file.name} is not valid JSON. {str(e)}"
+            message=f"{json_file.name} is not valid JSON. {str(e)}",
+            detail={"file": json_file.name},
+            wrapping=[e],
         ) from e
 
     if _json_seems_like_labware(json_contents):
@@ -153,7 +156,8 @@ async def _analyze_json(
         )
     else:
         raise FileIdentificationError(
-            f"{json_file.name} is not a known Opentrons format."
+            message=f"{json_file.name} is not a known Opentrons format.",
+            detail={"file": json_file.name},
         )
 
 
@@ -181,19 +185,48 @@ def _analyze_json_protocol(
         schema_version = json_contents["schemaVersion"]
         robot_type = json_contents["robot"]["model"]
     except KeyError as e:
-        raise FileIdentificationError(error_message) from e
+        raise FileIdentificationError(
+            message=error_message,
+            detail={
+                "file": original_file.name,
+                "kind": "missing required key",
+                "key": str(e),
+            },
+            wrapping=[e],
+        ) from e
 
     # todo(mm, 2022-12-22): A JSON protocol file's metadata is not quite just an
     # arbitrary dict: its fields are supposed to follow a schema. Should we validate
     # this metadata against that schema instead of doing this simple isinstance() check?
     if not isinstance(metadata, dict):
-        raise FileIdentificationError(error_message)
+        raise FileIdentificationError(
+            message=error_message,
+            detail={
+                "file": original_file.name,
+                "kind": "metadata is not a dict",
+                "original": str(metadata),
+            },
+        )
 
     if not isinstance(schema_version, int):
-        raise FileIdentificationError(error_message)
+        raise FileIdentificationError(
+            message=error_message,
+            detail={
+                "file": original_file.name,
+                "kind": "schema_version is not an int",
+                "original": str(schema_version),
+            },
+        )
 
     if robot_type not in ("OT-2 Standard", "OT-3 Standard"):
-        raise FileIdentificationError(error_message)
+        raise FileIdentificationError(
+            message=error_message,
+            detail={
+                "file": original_file.name,
+                "kind": "bad robot type",
+                "original": str(robot_type),
+            },
+        )
 
     return IdentifiedJsonMain(
         original_file=original_file,
@@ -220,14 +253,13 @@ def _analyze_python_protocol(
     except (SyntaxError, ValueError) as e:
         # ast.parse() raises SyntaxError for most errors,
         # but ValueError if the source contains null bytes.
-        raise FileIdentificationError(f"Unable to parse {py_file.name}.") from e
-
-    try:
-        static_info = extract_static_python_info(module_ast)
-    except ValueError as e:
         raise FileIdentificationError(
-            f"Unable to extract metadata from {py_file.name}."
+            message=f"Unable to parse {py_file.name}.",
+            detail={"kind": "python parsing failed"},
+            wrapping=[e],
         ) from e
+
+    static_info = extract_static_python_info(module_ast)
 
     api_version = _get_api_version(static_info, py_file.name)
 
@@ -244,17 +276,19 @@ def _analyze_python_protocol(
 def _get_api_version(
     static_python_info: StaticPythonInfo, file_name_for_error: str
 ) -> APIVersion:
-    try:
-        api_version = version_from_static_python_info(static_python_info)
-    except ValueError as e:
-        raise FileIdentificationError(str(e)) from e
+    api_version = version_from_static_python_info(static_python_info)
+
     if api_version is None:
-        raise FileIdentificationError(f"apiLevel not declared in {file_name_for_error}")
+        raise FileIdentificationError(
+            message=f"apiLevel not declared in {file_name_for_error}",
+            detail={"kind": "api version is None", "file": file_name_for_error},
+        )
     if api_version > MAX_SUPPORTED_VERSION:
         raise FileIdentificationError(
-            f"API version {api_version} is not supported by this "
+            message=f"API version {api_version} is not supported by this "
             f"robot software. Please either reduce your requested API "
-            f"version or update your robot."
+            f"version or update your robot.",
+            detail={"kind": "api version not supported", "file": file_name_for_error},
         )
 
     return api_version
@@ -264,4 +298,6 @@ def _get_robot_type(static_python_info: StaticPythonInfo) -> RobotType:
     try:
         return robot_type_from_static_python_info(static_python_info)
     except ValueError as e:
-        raise FileIdentificationError(str(e)) from e
+        raise FileIdentificationError(
+            message=str(e), detail={"kind": "bad robot type"}, wrapping=[e]
+        ) from e

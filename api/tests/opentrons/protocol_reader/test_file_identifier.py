@@ -8,12 +8,12 @@ import pytest
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.robot.dev_types import RobotType
+from opentrons_shared_data.errors.exceptions import InvalidProtocolData
 
 from opentrons.protocols.api_support.types import APIVersion
 
 from opentrons.protocol_reader.file_identifier import (
     FileIdentifier,
-    FileIdentificationError,
     IdentifiedJsonMain,
     IdentifiedPythonMain,
     IdentifiedLabwareDefinition,
@@ -455,5 +455,5 @@ async def test_invalid_input(spec: _InvalidInputSpec) -> None:
         name=spec.file_name, contents=spec.contents.encode("utf-8"), path=None
     )
     subject = FileIdentifier()
-    with pytest.raises(FileIdentificationError, match=spec.expected_message):
+    with pytest.raises(InvalidProtocolData, match=r".*" + spec.expected_message):
         await subject.identify([input_file])

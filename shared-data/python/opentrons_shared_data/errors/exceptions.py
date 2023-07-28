@@ -626,3 +626,29 @@ class APIRemoved(GeneralError):
         super().__init__(
             ErrorCodes.API_REMOVED, checked_message, checked_detail, wrapping
         )
+
+
+class CorruptStoredData(GeneralError):
+    """Error raised when stored data is corrupt or unreadable."""
+
+    def __init__(
+        self,
+        message: str,
+        detail: Dict[str, Any],
+        wrapping: Optional[Sequence[Union[EnumeratedError, BaseException]]] = None,
+    ) -> None:
+        """Build a CorruptStoredData error."""
+        super().__init__(ErrorCodes.CORRUPT_STORED_DATA, message, detail, wrapping)
+
+
+class InvalidProtocolData(GeneralError):
+    """Error raised when protocol data is invalid."""
+
+    def __init__(
+        self,
+        message: str,
+        detail: Dict[str, Any],
+        wrapping: Optional[Sequence[Union[EnumeratedError, BaseException]]] = None,
+    ) -> None:
+        """Build an InvalidProtocolData error."""
+        super().__init__(ErrorCodes.INVALID_PROTOCOL_DATA, message, detail, wrapping)

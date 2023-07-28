@@ -1,6 +1,7 @@
 from typing import Any, Dict, NamedTuple, Optional, Union, TYPE_CHECKING
 from dataclasses import dataclass
 
+from opentrons_shared_data.errors.exceptions import InvalidProtocolData
 from opentrons_shared_data.robot.dev_types import RobotType
 from .api_support.definitions import MIN_SUPPORTED_VERSION
 from .api_support.types import APIVersion
@@ -98,25 +99,21 @@ through the downgrade process.
 """
 
 
-class MalformedProtocolError(Exception):
-    def __init__(self, message: str) -> None:
-        self.message = message
-        super().__init__(message)
-
-    def __str__(self) -> str:
-        return self.message + PROTOCOL_MALFORMED
-
-    def __repr__(self) -> str:
-        return "<{}: {}>".format(self.__class__.__name__, self.message)
+class MalformedProtocolError(InvalidProtocolData):
+    """Error for a generally malformed protocol."""
 
 
-class ApiDeprecationError(Exception):
+class ApiDeprecationError(InvalidProtocolData):
+    """Error for a protocol that tries to use an old API version."""
+
     def __init__(self, version: APIVersion) -> None:
         self.version = version
-        super().__init__(version)
-
-    def __str__(self) -> str:
-        return PYTHON_API_VERSION_DEPRECATED.format(self.version, MIN_SUPPORTED_VERSION)
-
-    def __repr__(self) -> str:
-        return "<{}: {}>".format(self.__class__.__name__, self.version)
+        super().__init__(
+            message=PYTHON_API_VERSION_DEPRECATED.format(
+                self.version, MIN_SUPPORTED_VERSION
+            ),
+            detail={
+                "requested-version": self.version,
+                "minimum-version": MIN_SUPPORTED_VERSION,
+            },
+        )

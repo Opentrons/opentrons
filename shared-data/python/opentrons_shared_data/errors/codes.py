@@ -69,9 +69,11 @@ class ErrorCodes(Enum):
     GENERAL_ERROR = _code_from_dict_entry("4000")
     ROBOT_IN_USE = _code_from_dict_entry("4001")
     API_REMOVED = _code_from_dict_entry("4002")
+    CORRUPT_STORED_DATA = _code_from_dict_entry("4003")
+    INVALID_PROTOCOL_DATA = _code_from_dict_entry("4004")
 
     @classmethod
-    @lru_cache(25)
+    @lru_cache(30)
     def by_error_code(cls, error_code: str) -> "ErrorCodes":
         """Get an error by its code.
 

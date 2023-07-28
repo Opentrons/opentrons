@@ -67,14 +67,18 @@ def _validate_v2_ast(protocol_ast: ast.Module) -> None:
         lines = [str(d.lineno) for d in rundefs]
         linestr = ", ".join(lines)
         raise MalformedProtocolError(
-            f"More than one run function is defined (lines {linestr})"
+            message=f"More than one run function is defined (lines {linestr})",
+            detail={"kind": "multiple run functions", "lines": linestr},
         )
     if not rundefs:
-        raise MalformedProtocolError("No function 'run(ctx)' defined")
+        raise MalformedProtocolError(
+            message="No function 'run(ctx)' defined", detail={"kind": "no run function"}
+        )
     if _has_api_v1_imports(protocol_ast):
         raise MalformedProtocolError(
-            "Protocol API v1 modules such as robot, instruments, and labware "
-            "may not be imported in Protocol API V2 protocols"
+            message="Protocol API v1 modules such as robot, instruments, and labware "
+            "may not be imported in Protocol API V2 protocols",
+            detail={"kind": "has v1 imports"},
         )
 
 
@@ -87,9 +91,10 @@ def version_from_string(vstr: str) -> APIVersion:
     """
     matches = API_VERSION_RE.match(vstr)
     if not matches:
-        raise ValueError(
-            f"apiLevel {vstr} is incorrectly formatted. It should "
-            "major.minor, where both major and minor are numbers."
+        raise MalformedProtocolError(
+            message=f"apiLevel {vstr} is incorrectly formatted. It should "
+            "major.minor, where both major and minor are numbers.",
+            detail={"kind": "bad api level", "original": vstr},
         )
     return APIVersion(major=int(matches.group(1)), minor=int(matches.group(2)))
 

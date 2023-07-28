@@ -55,7 +55,9 @@ async def _read_file(
         filename = input_file.name
         contents = await anyio.Path(input_file).read_bytes()
     elif not input_file.filename:
-        raise FileReadError("File was missing a name")
+        raise FileReadError(
+            message="File was missing a name", detail={"input": str(input_file)}
+        )
     else:
         path = None
         filename = input_file.filename
