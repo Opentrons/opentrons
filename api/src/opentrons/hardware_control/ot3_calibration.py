@@ -583,6 +583,7 @@ async def _calibrate_mount(
             InaccurateNonContactSweepError,
             EarlyCapacitiveSenseTrigger,
             CalibrationStructureNotFoundError,
+            EdgeNotFoundError,
         ):
             LOG.info(
                 "Error occurred during calibration. Resetting to current saved calibration value."
@@ -749,6 +750,32 @@ async def calibrate_gripper(
     return offset
 
 
+async def find_pipette_offset(
+    hcapi: OT3API,
+    mount: Literal[OT3Mount.LEFT, OT3Mount.RIGHT],
+    slot: int = 5,
+    method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
+    raise_verify_error: bool = True,
+) -> Point:
+    """
+    Run automatic calibration for pipette and only return the calibration point.
+
+    Before running this function, make sure that the appropriate probe
+    has been attached or prepped on the tool (for instance, a capacitive
+    tip has been attached, or the conductive probe has been attached,
+    or the probe has been lowered).
+
+    This function should be used in the robot server only.
+    """
+    try:
+        await hcapi.reset_instrument_offset(mount)
+        await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
+        offset = await _calibrate_mount(hcapi, mount, slot, method, raise_verify_error)
+        return offset
+    finally:
+        await hcapi.remove_tip(mount)
+
+
 async def calibrate_pipette(
     hcapi: OT3API,
     mount: Literal[OT3Mount.LEFT, OT3Mount.RIGHT],
@@ -757,21 +784,16 @@ async def calibrate_pipette(
     raise_verify_error: bool = True,
 ) -> Point:
     """
-    Run automatic calibration for pipette.
+    Run automatic calibration for pipette and save the offset.
 
     Before running this function, make sure that the appropriate probe
     has been attached or prepped on the tool (for instance, a capacitive
     tip has been attached, or the conductive probe has been attached,
     or the probe has been lowered).
     """
-    try:
-        await hcapi.reset_instrument_offset(mount)
-        await hcapi.add_tip(mount, hcapi.config.calibration.probe_length)
-        offset = await _calibrate_mount(hcapi, mount, slot, method, raise_verify_error)
-        await hcapi.save_instrument_offset(mount, offset)
-        return offset
-    finally:
-        await hcapi.remove_tip(mount)
+    offset = await find_pipette_offset(hcapi, mount, slot, method, raise_verify_error)
+    await hcapi.save_instrument_offset(mount, offset)
+    return offset
 
 
 async def calibrate_module(
