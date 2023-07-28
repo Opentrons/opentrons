@@ -18,6 +18,10 @@ from hardware_testing.opentrons_api.helpers_ot3 import (
     get_slot_calibration_square_position_ot3
 )
 
+import logging
+LOG = logging.getLogger(__name__)
+LOG.setLevel(logging.INFO)
+
 AXIS_MAP = {
     "Y": Axis.Y,
     "X": Axis.X,
@@ -48,7 +52,7 @@ SETTINGS = {
         acceleration=100,
         max_start_stop_speed=10,
         max_change_dir_speed=1,
-        hold_current=0.8,
+        hold_current=0.5,
         run_current=1.5,
     )
 }
@@ -56,25 +60,22 @@ SETTINGS = {
 async def _main(is_simulating: bool) -> None:
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=is_simulating,
-        pipette_left="p1000_single_v3.3"
+        pipette_left="p1000_96_v3.4"
     )
-    pip_mounts = [OT3Mount.from_mount(m) for m, p in api.hardware_pipettes.items() if p]
+    # api.reset()
+    await api.home()
+    await set_gantry_load_per_axis_settings_ot3(
+        api, SETTINGS, load=GANTRY_LOAD_MAP["HIGH"]
+    )
+
+    await api._backend.set_hold_current(Axis.Z_R, 0.1)
+
+    mount = OT3Mount.LEFT
     while True:
-        for mount in pip_mounts:
-            pascals = await helpers_ot3.get_pressure_ot3(api, mount)
-            pico_farads = await helpers_ot3.get_capacitance_ot3(api, mount)
-            celsius, humidity = await helpers_ot3.get_temperature_humidity_ot3(
-                api, mount
-            )
-            print(
-                f"-----\n"
-                f"{mount.name}:\n"
-                f"\tpascals={pascals}\n"
-                f"\tpico_farads={pico_farads}\n"
-                f"\tcelsius={celsius}\n"
-                f"\thumidity={humidity}"
-            )
-        sleep(0.2)
+        celsius, humidity = await helpers_ot3.get_temperature_humidity_ot3(
+            api, mount)
+        LOG.info(celsius)
+        sleep(5)
 
 
 if __name__ == "__main__":
