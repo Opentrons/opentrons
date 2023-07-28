@@ -44,7 +44,12 @@ export function EstopTakeover(): JSX.Element {
             setIsDismissedModal={setIsDismissedModal}
           />
         ) : (
-          <EstopMissingModal robotName={robotName} closeModal={closeModal} />
+          <EstopMissingModal
+            robotName={robotName}
+            closeModal={closeModal}
+            isDismissedModal={isDismissedModal}
+            setIsDismissedModal={setIsDismissedModal}
+          />
         )}
       </>
     )

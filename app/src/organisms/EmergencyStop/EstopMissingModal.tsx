@@ -25,11 +25,15 @@ import type { LegacyModalProps } from '../../molecules/LegacyModal'
 interface EstopMissingModalProps {
   robotName: string
   closeModal: () => void
+  isDismissedModal?: boolean
+  setIsDismissedModal?: (isDismissedModal: boolean) => void
 }
 
 export function EstopMissingModal({
   robotName,
   closeModal,
+  isDismissedModal,
+  setIsDismissedModal,
 }: EstopMissingModalProps): JSX.Element {
   const isOnDevice = useSelector(getIsOnDevice)
 
@@ -38,7 +42,15 @@ export function EstopMissingModal({
       {isOnDevice ? (
         <TouchscreenModal robotName={robotName} closeModal={closeModal} />
       ) : (
-        <DesktopModal robotName={robotName} closeModal={closeModal} />
+        <>
+          {isDismissedModal === false ? (
+            <DesktopModal
+              robotName={robotName}
+              closeModal={closeModal}
+              setIsDismissedModal={setIsDismissedModal}
+            />
+          ) : null}
+        </>
       )}
     </Portal>
   )
@@ -72,12 +84,21 @@ function TouchscreenModal({ robotName }: EstopMissingModalProps): JSX.Element {
 function DesktopModal({
   robotName,
   closeModal,
+  setIsDismissedModal,
 }: EstopMissingModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+
+  const handleCloseModal = (): void => {
+    if (setIsDismissedModal != null) {
+      setIsDismissedModal(true)
+    }
+    closeModal()
+  }
+
   const modalProps: LegacyModalProps = {
     type: 'error',
     title: t('estop_missing'),
-    onClose: () => closeModal(),
+    onClose: handleCloseModal,
     closeOnOutsideClick: false,
     childrenPadding: SPACING.spacing24,
     width: '47rem',
