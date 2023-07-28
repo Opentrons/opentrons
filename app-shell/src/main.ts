@@ -2,6 +2,8 @@
 import { app, ipcMain } from 'electron'
 import contextMenu from 'electron-context-menu'
 
+import { fetchSerialPortList } from '@opentrons/usb-bridge/node-client'
+
 import { createUi } from './ui'
 import { initializeMenu } from './menu'
 import { createLogger } from './log'
@@ -70,6 +72,9 @@ function startUp(): void {
 
   initializeMenu()
 
+  // TESTING SERIALPORT LIBRARY:
+  testSerialport()
+
   // wire modules to UI dispatches
   const dispatch: Dispatch = action => {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
@@ -98,6 +103,12 @@ function startUp(): void {
   })
 
   log.silly('Global references', { mainWindow, rendererLogger })
+}
+
+function testSerialport(): void {
+  fetchSerialPortList().then((list: any) =>
+    console.log('serialport list', list)
+  )
 }
 
 function createRendererLogger(): Logger {
