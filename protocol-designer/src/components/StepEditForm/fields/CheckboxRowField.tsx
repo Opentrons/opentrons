@@ -35,7 +35,6 @@ export const CheckboxRowField = (props: CheckboxRowProps): JSX.Element => {
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: tooltipPlacement,
   })
-  console.log(value)
   return (
     <>
       {tooltipContent && (
