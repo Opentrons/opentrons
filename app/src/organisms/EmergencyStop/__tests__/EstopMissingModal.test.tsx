@@ -46,6 +46,8 @@ describe('EstopMissingModal - Desktop', () => {
     props = {
       robotName: 'mockFlex',
       closeModal: jest.fn(),
+      isDismissedModal: false,
+      setIsDismissedModal: jest.fn(),
     }
     mockGetIsOnDevice.mockReturnValue(false)
   })
@@ -62,6 +64,7 @@ describe('EstopMissingModal - Desktop', () => {
   it('should call a mock function when clicking close icon', () => {
     const [{ getByTestId }] = render(props)
     getByTestId('ModalHeader_icon_close_E-stop missing').click()
-    expect(props.closeModal).toBeCalled()
+    expect(props.setIsDismissedModal).toHaveBeenCalled()
+    expect(props.closeModal).toHaveBeenCalled()
   })
 })
