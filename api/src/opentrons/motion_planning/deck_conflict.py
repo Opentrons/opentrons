@@ -99,9 +99,9 @@ DeckItem = Union[
 class _NothingAllowed(NamedTuple):
     """Nothing is allowed in this slot."""
 
-    location: int
+    location: Union[int, str]
     source_item: DeckItem
-    source_location: int
+    source_location: Union[int, str]
 
     def is_allowed(self, item: DeckItem) -> bool:
         return False
@@ -129,9 +129,9 @@ class _MaxHeight(NamedTuple):
 class _NoModule(NamedTuple):
     """No module of any kind is allowed in this slot."""
 
-    location: int
+    location: Union[int, str]
     source_item: DeckItem
-    source_location: int
+    source_location: Union[int, str]
 
     def is_allowed(self, item: DeckItem) -> bool:
         return not isinstance(item, _Module)
@@ -175,9 +175,9 @@ class DeckConflictError(ValueError):
 # things that don't fit into a single deck slot, like the Thermocycler.
 # Refactor this interface to take a more symbolic location.
 def check(
-    existing_items: Mapping[int, DeckItem],
+    existing_items: Mapping[Union[int, str], DeckItem],
     new_item: DeckItem,
-    new_location: int,
+    new_location: Union[int, str],
     robot_type: str = "OT-2 Standard",
 ) -> None:
     """Check a deck layout for conflicts.
@@ -190,7 +190,6 @@ def check(
     Raises:
         DeckConflictError: Adding this item should not be allowed.
     """
-    print(f"robot_type: {robot_type}")
     restrictions: List[_DeckRestriction] = [_FixedTrashOnly()]
 
     # build restrictions driven by existing items
@@ -284,7 +283,7 @@ def _create_ot2_restrictions(item: DeckItem, location: int) -> List[_DeckRestric
     return restrictions
 
 
-def _create_flex_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction]:
+def _create_flex_restrictions(item: DeckItem, location: str) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
 
     if isinstance(item, ThermocyclerModule):
@@ -323,12 +322,13 @@ def _create_flex_restrictions(item: DeckItem, location: int) -> List[_DeckRestri
 
 
 def _create_restrictions(
-    item: DeckItem, location: int, robot_type: str
+    item: DeckItem, location: Union[int, str], robot_type: str
 ) -> List[_DeckRestriction]:
 
     if robot_type == "OT-2 Standard":
-        return _create_ot2_restrictions(item, location)
+        return _create_ot2_restrictions(item, int(location))
     else:
+        assert isinstance(location, str)
         return _create_flex_restrictions(item, location)
 
 
@@ -373,16 +373,16 @@ def _flex_slots_covered_by_thermocycler() -> Set[int]:
     return {7, 10}
 
 
-def _flex_right_left_hand_slots() -> List[int]:
+def _flex_right_left_hand_slots() -> List[str]:
     return _flex_left_hand_slots() + _flex_left_hand_slots()
 
 
-def _flex_left_hand_slots() -> List[int]:
-    return [1, 4, 7, 10]
+def _flex_left_hand_slots() -> List[str]:
+    return ["A1", "B1", "C1", "D1"]
 
 
-def _flex_right_hand_slots() -> List[int]:
-    return [3, 6, 9, 12]
+def _flex_right_hand_slots() -> List[str]:
+    return ["A3", "B3", "C3", "D3"]
 
 
 def _is_fixed_trash(item: DeckItem) -> bool:

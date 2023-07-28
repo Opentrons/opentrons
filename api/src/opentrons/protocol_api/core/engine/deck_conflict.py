@@ -96,7 +96,7 @@ def check(
     )
     mapped_existing_modules = (m for m in all_existing_modules if m is not None)
 
-    existing_items: Dict[int, wrapped_deck_conflict.DeckItem] = {}
+    existing_items: Dict[str, wrapped_deck_conflict.DeckItem] = {}
     for existing_location, existing_item in itertools.chain(
         mapped_existing_labware, mapped_existing_modules
     ):
@@ -104,7 +104,7 @@ def check(
         existing_items[existing_location] = existing_item
 
     wrapped_deck_conflict.check(
-        existing_items=existing_items,
+        existing_items=existing_items,  # type: ignore[arg-type]
         new_item=new_item,
         new_location=new_location,
         robot_type=engine_state.config.robot_type,
@@ -114,14 +114,14 @@ def check(
 def _map_labware(
     engine_state: StateView,
     labware_id: str,
-) -> Optional[Tuple[int, wrapped_deck_conflict.DeckItem]]:
+) -> Optional[Tuple[str, wrapped_deck_conflict.DeckItem]]:
     location_from_engine = engine_state.labware.get_location(labware_id=labware_id)
 
     if isinstance(location_from_engine, DeckSlotLocation):
         # This labware is loaded directly into a deck slot.
         # Map it to a wrapped_deck_conflict.Labware.
         return (
-            _deck_slot_to_int(location_from_engine),
+            location_from_engine.slotName.id,
             wrapped_deck_conflict.Labware(
                 name_for_errors=engine_state.labware.get_load_name(
                     labware_id=labware_id
@@ -154,12 +154,10 @@ def _map_labware(
 def _map_module(
     engine_state: StateView,
     module_id: str,
-) -> Optional[Tuple[int, wrapped_deck_conflict.DeckItem]]:
+) -> Optional[Tuple[str, wrapped_deck_conflict.DeckItem]]:
     module_model = engine_state.modules.get_connected_model(module_id=module_id)
     module_type = module_model.as_type()
-    mapped_location = _deck_slot_to_int(
-        engine_state.modules.get_location(module_id=module_id)
-    )
+    mapped_location = engine_state.modules.get_location(module_id=module_id).slotName.id
 
     # Use the module model (e.g. "temperatureModuleV1") as the name for error messages
     # because it's convenient for us. Unfortunately, this won't necessarily match

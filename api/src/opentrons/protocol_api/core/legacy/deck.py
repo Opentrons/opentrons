@@ -174,7 +174,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
 
         # will raise DeckConflictError if items conflict
         deck_conflict.check(
-            existing_items=existing_items,
+            existing_items=existing_items,  # type: ignore[arg-type]
             new_location=slot_key_int,
             new_item=self._map_to_conflict_checker_item(val),
         )
