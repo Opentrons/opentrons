@@ -84,25 +84,6 @@ NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationTyp
 """Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
 
 
-class LabwareMovementStrategy(str, Enum):
-    """Strategy to use for labware movement."""
-
-    USING_GRIPPER = "usingGripper"
-    MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
-    MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
-
-
-# TODO (spp, 2022-12-14): https://opentrons.atlassian.net/browse/RLAB-237
-@dataclass(frozen=True)
-class ExperimentalOffsetData(BaseModel):
-    """The result of a load module procedure."""
-
-    usePickUpLocationLpcOffset: bool
-    useDropLocationLpcOffset: bool
-    pickUpOffset: Optional[LabwareOffsetVector]
-    dropOffset: Optional[LabwareOffsetVector]
-
-
 class WellOrigin(str, Enum):
     """Origin of WellLocation offset.
 
@@ -510,6 +491,9 @@ class LabwareOffsetLocation(BaseModel):
         description=(
             "The definition URI of a labware that a labware can be loaded onto,"
             " if applicable."
+            "\n\n"
+            "This can be combined with moduleModel if the labware is loaded on top of"
+            " an adapter that is loaded on a module."
         ),
     )
 
@@ -624,3 +608,18 @@ class HeaterShakerMovementRestrictors:
     plate_shaking: bool
     latch_status: HeaterShakerLatchStatus
     deck_slot: int
+
+
+class LabwareMovementStrategy(str, Enum):
+    """Strategy to use for labware movement."""
+
+    USING_GRIPPER = "usingGripper"
+    MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
+    MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
+
+
+class LabwareMovementOffsetData(BaseModel):
+    """Offsets to be used during labware movement."""
+
+    pick_up_offset: LabwareOffsetVector
+    drop_offset: LabwareOffsetVector

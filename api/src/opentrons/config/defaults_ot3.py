@@ -81,16 +81,16 @@ DEFAULT_CALIBRATION_AXIS_MAX_SPEED: Final = 30
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 400,
-        OT3AxisKind.Y: 325,
+        OT3AxisKind.X: 350,
+        OT3AxisKind.Y: 300,
         OT3AxisKind.Z: 35,
         OT3AxisKind.P: 15,
         OT3AxisKind.Z_G: 50,
         OT3AxisKind.Q: 50,
     },
     low_throughput={
-        OT3AxisKind.X: 400,
-        OT3AxisKind.Y: 325,
+        OT3AxisKind.X: 350,
+        OT3AxisKind.Y: 300,
         OT3AxisKind.Z: 100,
         OT3AxisKind.P: 70,
         OT3AxisKind.Z_G: 50,
@@ -99,8 +99,8 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 800,
-        OT3AxisKind.Y: 500,
+        OT3AxisKind.X: 700,
+        OT3AxisKind.Y: 600,
         OT3AxisKind.Z: 150,
         OT3AxisKind.P: 30,
         OT3AxisKind.Z_G: 150,
@@ -184,7 +184,7 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
     },
     low_throughput={
         OT3AxisKind.X: 1.25,
-        OT3AxisKind.Y: 1.25,
+        OT3AxisKind.Y: 1.2,
         OT3AxisKind.Z: 1.0,
         # TODO: verify this value
         OT3AxisKind.P: 1.0,

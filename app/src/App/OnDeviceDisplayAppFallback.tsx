@@ -39,7 +39,7 @@ export function OnDeviceDisplayAppFallback({
   const modalHeader: ModalHeaderBaseProps = {
     title: t('error_boundary_title'),
     iconName: 'information',
-    iconColor: COLORS.white,
+    iconColor: COLORS.red2,
   }
 
   // immediately report to robot logs that something fatal happened
@@ -48,9 +48,8 @@ export function OnDeviceDisplayAppFallback({
   }, [])
 
   return (
-    <Modal header={modalHeader} isError>
+    <Modal header={modalHeader}>
       <Flex
-        marginTop={SPACING.spacing32}
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing32}
         alignItems={ALIGN_CENTER}

@@ -476,10 +476,10 @@ async def move_tip_motor_relative_ot3(
     """Move 96ch tip-motor (Q) to an absolute position."""
     if not api.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
         raise RuntimeError("No pipette found on LEFT mount")
-    # if distance < 0:
-    #     action = "home"
-    # else:
-    action = "clamp"
+    if distance < 0:
+        action = "home"
+    else:
+        action = "clamp"
     if axis_motion_setting != None:
         motion_settings = {Axis.Q: axis_motion_setting}
         await set_gantry_load_per_axis_settings_ot3(api, motion_settings)
@@ -488,14 +488,14 @@ async def move_tip_motor_relative_ot3(
         velocity= speed,
         tip_action=action,
     )
-    # if motor_current is None:
-    #     await _move_coro
-    # else:
-    #     async with api._backend.restore_current():
-    #         await api._backend.set_active_current(
-    #             {Axis.Q: motor_current}  # type: ignore[dict-item]
-    #         )
-    #         await _move_coro
+    if motor_current is None:
+        await _move_coro
+    else:
+        async with api._backend.restore_current():
+            await api._backend.set_active_current(
+                {Axis.Q: motor_current}  # type: ignore[dict-item]
+            )
+            await _move_coro
 
 
 async def move_plunger_relative_ot3(

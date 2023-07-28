@@ -8,7 +8,7 @@ from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Axis
 
-from .config import TestSection, TestConfig, build_report, TESTS
+from .config import TestSection, TestConfig, build_report, TESTS, TESTS_INCREMENT
 
 
 async def _main(cfg: TestConfig) -> None:
@@ -65,6 +65,7 @@ async def _main(cfg: TestConfig) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--increment", action="store_true")
     # add each test-section as a skippable argument (eg: --skip-gantry)
     for s in TestSection:
         parser.add_argument(f"--skip-{s.value.lower()}", action="store_true")
@@ -75,9 +76,17 @@ if __name__ == "__main__":
         assert (
             len(list(_t_sections.keys())) < 2
         ), 'use "--only" for just one test, not multiple tests'
+    elif args.increment:
+        _t_sections = {
+            s: f
+            for s, f in TESTS_INCREMENT
+            if not getattr(args, f"skip_{s.value.lower()}")
+        }
     else:
         _t_sections = {
             s: f for s, f in TESTS if not getattr(args, f"skip_{s.value.lower()}")
         }
-    _config = TestConfig(simulate=args.simulate, tests=_t_sections)
+    _config = TestConfig(
+        simulate=args.simulate, tests=_t_sections, increment=args.increment
+    )
     asyncio.run(_main(_config))

@@ -1,18 +1,35 @@
 import * as React from 'react'
-import { DesktopEstopMissingModal } from './DesktopEstopMissingModal'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+
+import { configReducer } from '../../redux/config/reducer'
+import { EstopMissingModal } from '.'
+
+import type { Store } from 'redux'
 import type { Story, Meta } from '@storybook/react'
 
 export default {
-  title: 'App/organisms/DesktopEstopMissingModal',
-  component: DesktopEstopMissingModal,
+  title: 'App/organisms/EstopMissingModal',
+  component: EstopMissingModal,
 } as Meta
 
-const Template: Story<
-  React.ComponentProps<typeof DesktopEstopMissingModal>
-> = args => <DesktopEstopMissingModal {...args} />
+const dummyConfig = {
+  config: {
+    isOnDevice: false,
+  },
+} as any
 
-export const Primary = Template.bind({})
-Primary.args = {
-  isActiveRun: true,
+const store: Store<any> = createStore(configReducer, dummyConfig)
+
+const Template: Story<
+  React.ComponentProps<typeof EstopMissingModal>
+> = args => (
+  <Provider store={store}>
+    <EstopMissingModal {...args} />
+  </Provider>
+)
+
+export const EstopMissing = Template.bind({})
+EstopMissing.args = {
   robotName: 'Flexy',
 }

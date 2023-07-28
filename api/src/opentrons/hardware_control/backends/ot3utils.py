@@ -1,9 +1,8 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast
+from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast, Sequence, Optional
 from typing_extensions import Literal
-from opentrons.config.defaults_ot3 import (
-    DEFAULT_CALIBRATION_AXIS_MAX_SPEED,
-)
+from logging import getLogger
+from opentrons.config.defaults_ot3 import DEFAULT_CALIBRATION_AXIS_MAX_SPEED
 from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
 from opentrons.hardware_control.types import (
     Axis,
@@ -48,12 +47,14 @@ from opentrons_hardware.hardware_control.motion import (
     NodeIdMotionValues,
     create_home_step,
     create_backoff_step,
+    create_tip_action_backoff_step,
     MoveGroup,
     MoveType,
     MoveStopCondition,
     create_gripper_jaw_step,
     create_tip_action_step,
 )
+from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 
 from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 
@@ -86,6 +87,8 @@ NODEID_SUBSYSTEM = {node: subsystem for subsystem, node in SUBSYSTEM_NODEID.item
 SUBSYSTEM_USB: Dict[SubSystem, USBTarget] = {SubSystem.rear_panel: USBTarget.rear_panel}
 
 USB_SUBSYSTEM = {target: subsystem for subsystem, target in SUBSYSTEM_USB.items()}
+
+LOG = getLogger(__name__)
 
 
 def axis_nodes() -> List["NodeId"]:
@@ -339,6 +342,9 @@ def create_move_group(
         unit_vector = move.unit_vector
         for block in move.blocks:
             if block.time < (3.0 / interrupts_per_sec):
+                LOG.info(
+                    f"Skipping move block with time {block.time} (<{3.0/interrupts_per_sec})"
+                )
                 continue
             distances = unit_vector_multiplication(unit_vector, block.distance)
             node_id_distances = _convert_to_node_id_dict(distances)
@@ -358,25 +364,22 @@ def create_move_group(
     return move_group, {k: float(v) for k, v in pos.items()}
 
 
-def create_home_group(
+def create_home_groups(
     distance: Dict[Axis, float], velocity: Dict[Axis, float]
-) -> MoveGroup:
+) -> List[MoveGroup]:
     node_id_distances = _convert_to_node_id_dict(distance)
     node_id_velocities = _convert_to_node_id_dict(velocity)
-    home = create_home_step(
-        distance=node_id_distances,
-        velocity=node_id_velocities,
-    )
+    home_group = [
+        create_home_step(distance=node_id_distances, velocity=node_id_velocities)
+    ]
     # halve the homing speed for backoff
     backoff_velocities = {k: v / 2 for k, v in node_id_velocities.items()}
-    backoff = create_backoff_step(backoff_velocities)
-
-    move_group: MoveGroup = [home, backoff]
-    return move_group
+    backoff_group = [create_backoff_step(backoff_velocities)]
+    return [home_group, backoff_group]
 
 
 def create_tip_action_group(
-    moves: List[Move[Axis]],
+    moves: Sequence[Move[Axis]],
     present_nodes: Iterable[NodeId],
     action: str,
 ) -> MoveGroup:
@@ -402,15 +405,26 @@ def create_tip_action_group(
 def create_gear_motor_home_group(
     distance: float,
     velocity: float,
+    backoff: Optional[bool] = False,
 ) -> MoveGroup:
-    step = create_tip_action_step(
+    move_group: MoveGroup = []
+    home_step = create_tip_action_step(
         velocity={NodeId.pipette_left: np.float64(-1 * velocity)},
         acceleration={NodeId.pipette_left: np.float64(0)},
         duration=np.float64(distance / velocity),
         present_nodes=[NodeId.pipette_left],
         action=PipetteTipActionType.home,
     )
-    return [step]
+    move_group.append(home_step)
+
+    if backoff:
+        backoff_group = create_tip_action_backoff_step(
+            velocity={
+                node_id: np.float64(velocity / 2) for node_id in [NodeId.pipette_left]
+            }
+        )
+        move_group.append(backoff_group)
+    return move_group
 
 
 def create_gripper_jaw_grip_group(

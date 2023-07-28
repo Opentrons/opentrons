@@ -15,7 +15,7 @@ from opentrons.config.types import (
 )
 from opentrons.hardware_control.dev_types import (
     AttachedGripper,
-    OT3AttachedPipette,
+    AttachedPipette,
     GripperDict,
 )
 from opentrons.hardware_control.motion_utilities import target_position_from_plunger
@@ -64,7 +64,7 @@ from opentrons_hardware.hardware_control.motion_planning.types import Move
 
 from opentrons.config import gripper_config as gc
 from opentrons_shared_data.gripper.gripper_definition import GripperModel
-from opentrons_shared_data.pipette.pipette_definition import (
+from opentrons_shared_data.pipette.types import (
     PipetteModelType,
     PipetteChannelType,
     PipetteVersionType,
@@ -355,7 +355,7 @@ async def test_gantry_load_transform(
                 PipetteChannelType(configs["channels"]),
                 PipetteVersionType(*configs["version"]),
             )
-            instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
+            instr_data = AttachedPipette(config=pipette_config, id="fakepip")
             await ot3_hardware.cache_pipette(mount, instr_data, None)
     assert ot3_hardware._gantry_load_from_instruments() == load
 
@@ -446,8 +446,9 @@ async def prepare_for_mock_blowout(
         PipetteChannelType(configs["channels"]),
         PipetteVersionType(*configs["version"]),
     )
-    instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
+    instr_data = AttachedPipette(config=pipette_config, id="fakepip")
     await ot3_hardware.cache_pipette(mount, instr_data, None)
+    await ot3_hardware.refresh_positions()
     with patch.object(
         ot3_hardware, "pick_up_tip", AsyncMock(spec=ot3_hardware.liquid_probe)
     ) as mock_tip_pickup:
@@ -1059,7 +1060,7 @@ async def test_home_plunger(
     mock_home: AsyncMock,
 ):
     mount = OT3Mount.LEFT
-    instr_data = OT3AttachedPipette(
+    instr_data = AttachedPipette(
         config=load_pipette_data.load_definition(
             PipetteModelType("p1000"), PipetteChannelType(1), PipetteVersionType(3, 4)
         ),
@@ -1078,7 +1079,7 @@ async def test_prepare_for_aspirate(
     mock_move_to_plunger_bottom: AsyncMock,
 ):
     mount = OT3Mount.LEFT
-    instr_data = OT3AttachedPipette(
+    instr_data = AttachedPipette(
         config=load_pipette_data.load_definition(
             PipetteModelType("p1000"),
             PipetteChannelType(1),
@@ -1099,7 +1100,7 @@ async def test_move_to_plunger_bottom(
     mock_move: AsyncMock,
 ):
     mount = OT3Mount.LEFT
-    instr_data = OT3AttachedPipette(
+    instr_data = AttachedPipette(
         config=load_pipette_data.load_definition(
             PipetteModelType("p1000"), PipetteChannelType(1), PipetteVersionType(3, 4)
         ),
@@ -1358,7 +1359,7 @@ async def test_pick_up_tip_full_tiprack(
     with patch.object(
         backend, "tip_action", AsyncMock(spec=backend.tip_action)
     ) as tip_action:
-
+        backend._gear_motor_position = {NodeId: 0}
         pipette_handler.plan_check_pick_up_tip.return_value = (
             PickUpTipSpec(
                 plunger_prep_pos=0,
@@ -1427,6 +1428,7 @@ async def test_drop_tip_full_tiprack(
     with patch.object(
         backend, "tip_action", AsyncMock(spec=backend.tip_action)
     ) as tip_action:
+        backend._gear_motor_position = {NodeId.pipette_left: 0}
         pipette_handler.plan_check_drop_tip.return_value = (
             DropTipSpec(
                 drop_moves=[
@@ -1465,7 +1467,6 @@ async def test_drop_tip_full_tiprack(
         await ot3_hardware.set_gantry_load(GantryLoad.HIGH_THROUGHPUT)
         await ot3_hardware.drop_tip(Mount.LEFT, home_after=True)
         pipette_handler.plan_check_drop_tip.assert_called_once_with(OT3Mount.LEFT, True)
-
         # first call should be "clamp", moving down
         assert tip_action.call_args_list[0][-1]["tip_action"] == "clamp"
         assert tip_action.call_args_list[0][-1]["moves"][0].unit_vector == {Axis.Q: 1}
@@ -1711,7 +1712,7 @@ async def test_tip_presence_disabled_ninety_six_channel(
             PipetteChannelType(96),
             PipetteVersionType(3, 3),
         )
-        instr_data = OT3AttachedPipette(config=pipette_config, id="fakepip")
+        instr_data = AttachedPipette(config=pipette_config, id="fakepip")
         await ot3_hardware.cache_pipette(OT3Mount.LEFT, instr_data, None)
         await ot3_hardware._configure_instruments()
         await ot3_hardware.pick_up_tip(OT3Mount.LEFT, 60)

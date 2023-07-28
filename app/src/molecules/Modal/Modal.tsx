@@ -22,17 +22,9 @@ interface ModalProps {
   modalSize?: ModalSize
   /** see ModalHeader component for more details */
   header?: ModalHeaderBaseProps
-  /** an option for adding additional styles for an error modal */
-  isError?: boolean
 }
 export function Modal(props: ModalProps): JSX.Element {
-  const {
-    modalSize = 'medium',
-    onOutsideClick,
-    children,
-    header,
-    isError,
-  } = props
+  const { modalSize = 'medium', onOutsideClick, children, header } = props
 
   let modalWidth: string = '45.625rem'
   switch (modalSize) {
@@ -55,8 +47,7 @@ export function Modal(props: ModalProps): JSX.Element {
       justifyContent={JUSTIFY_CENTER}
     >
       <Flex
-        backgroundColor={isError ? COLORS.red2 : COLORS.white}
-        border={isError ? `0.375rem solid ${COLORS.red2}` : 'none'}
+        backgroundColor={COLORS.white}
         width={modalWidth}
         height="max-content"
         maxHeight="33.5rem"
@@ -76,7 +67,6 @@ export function Modal(props: ModalProps): JSX.Element {
             iconColor={header.iconColor}
             hasExitIcon={header.hasExitIcon}
             onClick={onOutsideClick}
-            isError={isError}
           />
         ) : null}
         <Flex

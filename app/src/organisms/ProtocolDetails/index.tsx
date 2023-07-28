@@ -36,10 +36,7 @@ import {
   parseInitialLoadedLabwareBySlot,
   parseInitialLoadedLabwareByModuleId,
 } from '@opentrons/api-client'
-import {
-  getGripperDisplayName,
-  protocolHasLiquids,
-} from '@opentrons/shared-data'
+import { getGripperDisplayName } from '@opentrons/shared-data'
 
 import { Portal } from '../../App/portal'
 import { Divider } from '../../atoms/structure'
@@ -144,7 +141,7 @@ interface ReadMoreContentProps {
 
 const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
   const { metadata, protocolType } = props
-  const { t } = useTranslation('protocol_details')
+  const { t, i18n } = useTranslation('protocol_details')
   const [isReadMore, setIsReadMore] = React.useState(true)
 
   const description = isEmpty(metadata.description)
@@ -167,10 +164,11 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
           role="button"
           css={TYPOGRAPHY.linkPSemiBold}
           marginTop={SPACING.spacing8}
-          textTransform={TYPOGRAPHY.textTransformCapitalize}
           onClick={() => setIsReadMore(!isReadMore)}
         >
-          {isReadMore ? t('read_more') : t('read_less')}
+          {isReadMore
+            ? i18n.format(t('read_more'), 'capitalize')
+            : i18n.format(t('read_less'), 'capitalize')}
         </Link>
       )}
     </Flex>
@@ -185,7 +183,7 @@ export function ProtocolDetails(
   const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
   const { protocolKey, srcFileNames, mostRecentAnalysis, modified } = props
-  const { t } = useTranslation(['protocol_details', 'shared'])
+  const { t, i18n } = useTranslation(['protocol_details', 'shared'])
   const [currentTab, setCurrentTab] = React.useState<
     'robot_config' | 'labware' | 'liquids'
   >('robot_config')
@@ -394,6 +392,7 @@ export function ProtocolDetails(
               css={TYPOGRAPHY.h2SemiBold}
               marginBottom={SPACING.spacing16}
               data-testid={`ProtocolDetails_${protocolDisplayName}`}
+              overflowWrap="anywhere"
             >
               {protocolDisplayName}
             </StyledText>
@@ -556,8 +555,8 @@ export function ProtocolDetails(
                 isCurrent={currentTab === 'robot_config'}
                 onClick={() => setCurrentTab('robot_config')}
               >
-                <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-                  {t('robot_configuration')}
+                <StyledText>
+                  {i18n.format(t('robot_configuration'), 'capitalize')}
                 </StyledText>
               </RoundTab>
               <RoundTab
@@ -565,24 +564,21 @@ export function ProtocolDetails(
                 isCurrent={currentTab === 'labware'}
                 onClick={() => setCurrentTab('labware')}
               >
-                <StyledText textTransform={TYPOGRAPHY.textTransformCapitalize}>
-                  {t('labware')}
+                <StyledText>
+                  {i18n.format(t('labware'), 'capitalize')}
                 </StyledText>
               </RoundTab>
-              {mostRecentAnalysis != null &&
-                protocolHasLiquids(mostRecentAnalysis) && (
-                  <RoundTab
-                    data-testid="ProtocolDetails_liquids"
-                    isCurrent={currentTab === 'liquids'}
-                    onClick={() => setCurrentTab('liquids')}
-                  >
-                    <StyledText
-                      textTransform={TYPOGRAPHY.textTransformCapitalize}
-                    >
-                      {t('liquids')}
-                    </StyledText>
-                  </RoundTab>
-                )}
+              {mostRecentAnalysis != null && (
+                <RoundTab
+                  data-testid="ProtocolDetails_liquids"
+                  isCurrent={currentTab === 'liquids'}
+                  onClick={() => setCurrentTab('liquids')}
+                >
+                  <StyledText>
+                    {i18n.format(t('liquids'), 'capitalize')}
+                  </StyledText>
+                </RoundTab>
+              )}
             </Flex>
             <Box
               backgroundColor={COLORS.white}

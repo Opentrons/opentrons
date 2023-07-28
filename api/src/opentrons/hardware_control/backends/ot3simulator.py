@@ -43,6 +43,7 @@ from opentrons_hardware.hardware_control.motion_planning import (
     Move,
     Coordinates,
 )
+from opentrons.hardware_control.estop_state import EstopStateMachine
 from opentrons_hardware.drivers.eeprom import EEPROMData
 from opentrons.hardware_control.module_control import AttachedModulesControl
 from opentrons.hardware_control import modules
@@ -73,7 +74,7 @@ from opentrons.hardware_control.dev_types import (
     InstrumentHardwareConfigs,
     PipetteSpec,
     GripperSpec,
-    OT3AttachedPipette,
+    AttachedPipette,
     AttachedGripper,
     OT3AttachedInstruments,
 )
@@ -135,6 +136,7 @@ class OT3Simulator:
         self._update_required = False
         self._initialized = False
         self._lights = {"button": False, "rails": False}
+        self._estop_state_machine = EstopStateMachine(detector=None)
         self._gear_motor_position: Dict[NodeId, float] = {}
 
         def _sanitize_attached_instrument(
@@ -391,6 +393,7 @@ class OT3Simulator:
         distance: Optional[float] = None,
         velocity: Optional[float] = None,
         tip_action: str = "home",
+        back_off: Optional[bool] = False,
     ) -> None:
         pass
 
@@ -419,7 +422,7 @@ class OT3Simulator:
         mount: OT3Mount,
         init_instr: PipetteSpec,
         expected_instr: Optional[PipetteName],
-    ) -> OT3AttachedPipette:
+    ) -> AttachedPipette:
         found_model = init_instr["model"]
 
         # TODO (lc 12-05-2022) When the time comes, we should think about supporting
@@ -699,3 +702,8 @@ class OT3Simulator:
             )
             for target in self._present_nodes
         }
+
+    @property
+    def estop_state_machine(self) -> EstopStateMachine:
+        """Return an estop state machine locked in the "disengaged" state."""
+        return self._estop_state_machine
