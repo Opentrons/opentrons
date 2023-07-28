@@ -3,9 +3,9 @@ import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom'
 
 import {
   Box,
-  POSITION_RELATIVE,
   COLORS,
   OVERFLOW_AUTO,
+  POSITION_RELATIVE,
 } from '@opentrons/components'
 import { ApiHostProvider } from '@opentrons/react-api-client'
 
@@ -33,10 +33,6 @@ import type { RouteProps, DesktopRouteParams } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
-
-  const { isDismissedModal } = React.useContext(EmergencyStopContext)
-
-  console.log('DesktopApp', isDismissedModal)
 
   const desktopRoutes: RouteProps[] = [
     {
