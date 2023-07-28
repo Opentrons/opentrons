@@ -3,6 +3,7 @@ import argparse
 import asyncio
 import os
 import time
+from math import ceil
 
 from dataclasses import dataclass
 from typing import Optional, Callable, List, Any, Tuple, Dict
@@ -11,7 +12,7 @@ from pathlib import Path
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import types
-from hardware_testing.opentrons_api.types import (Axis, OT3Mount)
+from hardware_testing.opentrons_api.types import (Axis, OT3Mount, Point)
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
 from hardware_testing.data import ui
@@ -27,7 +28,7 @@ LOG.setLevel(logging.CRITICAL)
 GANTRY_AXES = [Axis.X, Axis.Y,
                Axis.by_mount(OT3Mount.LEFT), Axis.by_mount(OT3Mount.RIGHT)]
 MOUNT_AXES = [OT3Mount.LEFT, OT3Mount.RIGHT]
-THRESHOLD_MM = 0.2
+THRESHOLD_MM = 0.125
 
 DEFAULT_X_SPEEDS: List[float] = [250, 350, 450]
 DEFAULT_X_ACCELERATIONS: List[float] = [700, 800, 900]
@@ -136,7 +137,18 @@ def _record_axis_data(
     for ax in GANTRY_AXES:
         data_str = data_str + [str(ax)] + [str(round(encoder[ax] - estimate[ax], 5))]
     write_cb([type] + [bool_to_string(aligned)] + data_str)
-    # write_cb([type] + [bool_to_string(aligned)] + [str(round(encoder[ax] - estimate[ax], 5)) for ax in GANTRY_AXES])
+
+
+def _record_run_data(
+    type: str,
+    write_cb: Callable,
+    error: Dict[Axis, float],
+    aligned: bool,
+) -> None:
+    data_str = []
+    for ax in GANTRY_AXES:
+        data_str = data_str + [str(ax)] + [str(round(error[ax], 5))]
+    write_cb([type] + [bool_to_string(aligned)] + data_str)
 
 
 def _record_motion_check_data(
@@ -238,8 +250,11 @@ async def _run_mount_up_down(
 ) -> bool:
     ui.print_header("Run mount up and down")
     pass_count = 0
+    error_sum = {ax: 0 for ax in GANTRY_AXES}
     for pos in mount_up_down_points:
         es, en, al = await _move_and_check(api, is_simulating, mount, pos)
+        for ax in GANTRY_AXES:
+            error_sum[ax] += en[ax] - es[ax]
         if record_bool:
             if mount is OT3Mount.LEFT:
                 mount_type = "Mount_up_down-Left"
@@ -249,9 +264,16 @@ async def _run_mount_up_down(
             print(f"{mount_type} results: {al}")
         if al:
             pass_count += 1
-    if pass_count == len(mount_up_down_points):
+        else:
+            api.home()
+
+    num_points = len(mount_up_down_points)
+    error_results = {ax: error_sum[ax]/num_points for ax in GANTRY_AXES}
+    if pass_count == num_points:
+        _record_run_data("Bowtie", write_cb, error_results, True)
         return True
     else:
+        _record_run_data("Bowtie", write_cb, error_results, False)
         return False
 
 
@@ -265,16 +287,26 @@ async def _run_bowtie(
 ) -> bool:
     ui.print_header("Run bowtie")
     pass_count = 0
+    error_sum = {ax: 0 for ax in GANTRY_AXES}
     for p in bowtie_points:
         es, en, al = await _move_and_check(api, is_simulating, mount, p)
+        for ax in GANTRY_AXES:
+            error_sum[ax] += en[ax] - es[ax]
         if record_bool:
             _record_axis_data("Bowtie", write_cb, es, en, al)
             print(f"bowtie results: {al}")
         if al:
             pass_count += 1
-    if pass_count == len(bowtie_points):
+        else:
+            api.home()
+
+    num_points = len(bowtie_points)
+    error_results = {ax: error_sum[ax]/num_points for ax in GANTRY_AXES}
+    if pass_count == num_points:
+        _record_run_data("Bowtie", write_cb, error_results, True)
         return True
     else:
+        _record_run_data("Bowtie", write_cb, error_results, False)
         return False
 
 
@@ -288,16 +320,26 @@ async def _run_hour_glass(
 ) -> bool:
     ui.print_header("Run hour glass")
     pass_count = 0
+    error_sum = {ax: 0 for ax in GANTRY_AXES}
     for q in hour_glass_points:
         es, en, al = await _move_and_check(api, is_simulating, mount, q)
+        for ax in GANTRY_AXES:
+            error_sum[ax] += en[ax] - es[ax]
         if record_bool:
             _record_axis_data("Hour_glass", write_cb, es, en, al)
             print(f"hour glass results: {al}")
         if al:
             pass_count += 1
-    if pass_count == len(hour_glass_points):
+        else:
+            api.home()
+
+    num_points = len(hour_glass_points)
+    error_results = {ax: error_sum[ax]/num_points for ax in GANTRY_AXES}
+    if pass_count == num_points:
+        _record_run_data("Bowtie", write_cb, error_results, True)
         return True
     else:
+        _record_run_data("Bowtie", write_cb, error_results, False)
         return False
 
 
@@ -477,14 +519,14 @@ async def _run_z_motion(
                     mount,
                     mount_up_down_points[mount],
                     write_cb,
-                    True,
+                    arguments.record_error,
                 )
                 if res:
                     pass_count += 1
                 else:
                     fail_count += 1
                 print(
-                    f"Run mount up and down cycle: {i}, results: {res}, pass count: {pass_count}, fail count: {fail_count}"
+                    f"Run Z motion cycle: {i+1}, results: {res}, pass count: {pass_count}, fail count: {fail_count}"
                 )
             _record_motion_check_data(
                 "z_motion",
@@ -518,19 +560,19 @@ async def _run_xy_motion(
         await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, setting)
         fail_count = 0
         pass_count = 0
-        for i in range(arguments.cycles):
+        for i in range(max(int(arguments.cycles/2), 1)):
             res_b = await _run_bowtie(
-                api, arguments.simulate, mount, bowtie_points, write_cb, True
-            )
+                api, arguments.simulate, mount, bowtie_points,
+                write_cb, arguments.record_error)
             res_hg = await _run_hour_glass(
-                api, arguments.simulate, mount, hour_glass_points, write_cb, True
-            )
+                api, arguments.simulate, mount, hour_glass_points,
+                write_cb, arguments.record_error)
             if res_b and res_hg:
                 pass_count += 1
             else:
                 fail_count += 1
             print(
-                f"Run bowtie cycle: {i}, results: {res_b and res_hg}, pass count: {pass_count}, fail count: {fail_count}"
+                f"Run XY cycle: {i+1}, results: {res_b and res_hg}, pass count: {pass_count}, fail count: {fail_count}"
             )
             _record_motion_check_data(
                 "x_motion",
@@ -553,16 +595,16 @@ async def _run_xy_motion(
                 fail_count,
             )
 
-# async def enforce_pipette_attached(api: OT3API,
-#                                    mount: OT3Mount,
-#                                    attach_pos: Point) -> None:
-#     await api.reset()
-#     if not api.hardware_pipettes[mount.to_mount()]:
-#         await helpers_ot3.move_to_arched_ot3(api, mount, attach_pos)
-#         while not api.hardware_pipettes[mount.to_mount()]:
-#             ui.get_user_ready("attach a multichannel pipette to left mount")
-#             await api.reset()
-#         await api.home_z(mount)
+async def enforce_pipette_attached(api: OT3API,
+                                   mount: OT3Mount,
+                                   attach_pos: Point) -> None:
+    await api.reset()
+    if not api.hardware_pipettes[mount.to_mount()]:
+        await helpers_ot3.move_to_arched_ot3(api, mount, attach_pos)
+        while not api.hardware_pipettes[mount.to_mount()]:
+            ui.get_user_ready("attach a multichannel pipette to left mount")
+            await api.reset()
+        await api.home_z(mount)
 
 
 async def _main(arguments: argparse.Namespace) -> None:
@@ -577,7 +619,7 @@ async def _main(arguments: argparse.Namespace) -> None:
             _robot_id = input("enter ROBOT SERIAL number: ")
             _operator = input("enter OPERATOR name: ")
 
-    ui.print_title(test_name.replace("_", " ").upper())
+
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=arguments.simulate, stall_detection_enable=False
     )
@@ -598,19 +640,20 @@ async def _main(arguments: argparse.Namespace) -> None:
     csv_cb.write(["operator-name", _operator])
     csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
     test_name = Path(__file__).name
+    ui.print_title(test_name.replace("_", " ").upper())
 
 
     try:
         await api.home()
-        # home_pos = await api.gantry_position(OT3Mount.LEFT)
-        # attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
-        # attach_pos = attach_pos._replace(z=home_pos.z)
-        #
-        # await api.reset()
-        # if (not arguments.simulate) and (not arguments.no_input):
-        #     await enforce_pipette_attached(api, OT3Mount.LEFT, attach_pos)
-        #     await enforce_pipette_attached(api, OT3Mount.RIGHT, attach_pos)
-        #     await api.home()
+        home_pos = await api.gantry_position(OT3Mount.LEFT)
+        attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
+        attach_pos = attach_pos._replace(z=home_pos.z)
+
+        await api.reset()
+        if (not arguments.simulate) and (not arguments.no_input):
+            await enforce_pipette_attached(api, OT3Mount.LEFT, attach_pos)
+            await enforce_pipette_attached(api, OT3Mount.RIGHT, attach_pos)
+            await api.home()
 
         mount = OT3Mount.LEFT
 
@@ -655,7 +698,7 @@ async def _main(arguments: argparse.Namespace) -> None:
                             mount,
                             mount_up_down_points[mount],
                             csv_cb.write,
-                            True,
+                            arguments.record_error,
                         )
             if not arguments.skip_hourglass:
                 await _run_hour_glass(
@@ -669,7 +712,7 @@ async def _main(arguments: argparse.Namespace) -> None:
                             mount,
                             mount_up_down_points[mount],
                             csv_cb.write,
-                            True,
+                            arguments.record_error,
                         )
     except KeyboardInterrupt:
         print("Cancelled")
@@ -700,6 +743,7 @@ if __name__ == "__main__":
     parser.add_argument("--z_accelerations", type=str)
     parser.add_argument("--z_currents", type=str)
     parser.add_argument("--no_input", action="store_true")
+    parser.add_argument("--record_error", action="store_true")
 
     args = parser.parse_args()
     asyncio.run(_main(args))
