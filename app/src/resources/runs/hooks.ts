@@ -2,6 +2,8 @@ import * as React from 'react'
 import {
   useCreateCommandMutation,
   useCreateMaintenanceCommandMutation,
+  useCreateMaintenanceRunMutation,
+  useDeleteMaintenanceRunMutation,
 } from '@opentrons/react-api-client'
 import { chainRunCommandsRecursive } from './utils'
 import type { CreateCommand } from '@opentrons/shared-data'
@@ -87,3 +89,43 @@ export function useChainMaintenanceCommands(
     isCommandMutationLoading: isLoading,
   }
 }
+
+export function useChainCommandsOnce(): {
+  chainCommandsOnce: (
+    commands: CreateCommand[],
+    continuePastCommandFailure: boolean
+  ) => Promise<boolean>,
+  isLoading: boolean
+} {
+  const [isLoading, setIsLoading] = React.useState(false)
+  const { createMaintenanceRun } = useCreateMaintenanceRunMutation({})
+  const { deleteMaintenanceRun } = useDeleteMaintenanceRunMutation({})
+  const { createMaintenanceCommand } = useCreateMaintenanceCommandMutation()
+  return {
+    chainCommandsOnce: (
+      commands: CreateCommand[],
+      continuePastCommandFailure: boolean
+    ) =>
+      createMaintenanceRun({})
+        .then(createRunResponse => (
+          chainRunCommandsRecursive(
+            commands,
+            (
+              variables: Parameters<typeof createMaintenanceCommand>[0],
+              options: Parameters<typeof createMaintenanceCommand>[1]
+            ) => createMaintenanceCommand({ ...variables, maintenanceRunIdOverride: createRunResponse.data.id }, options),
+            continuePastCommandFailure,
+            setIsLoading
+          ).then(() => {
+            deleteMaintenanceRun(createRunResponse.data.id)
+            return Promise.resolve(true)
+          }).catch(error => {
+            return Promise.reject(error)
+          })
+        )).catch(error => {
+          return Promise.reject(error)
+        }),
+    isLoading,
+  }
+}
+

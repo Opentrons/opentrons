@@ -17,6 +17,7 @@ interface CreateMaintenanceCommandMutateParams extends CreateCommandParams {
   command: CreateCommand
   waitUntilComplete?: boolean
   timeout?: number
+  maintenanceRunIdOverride?: string
 }
 
 export type UseCreateMaintenanceCommandMutationResult = UseMutationResult<
@@ -38,7 +39,7 @@ export type UseCreateMaintenanceCommandMutationOptions = UseMutationOptions<
 >
 
 export function useCreateMaintenanceCommandMutation(
-  maintenanceRunId: string
+  maintenanceRunId: string = ''
 ): UseCreateMaintenanceCommandMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
@@ -47,8 +48,8 @@ export function useCreateMaintenanceCommandMutation(
     CommandData,
     unknown,
     CreateMaintenanceCommandMutateParams
-  >(({ command, waitUntilComplete, timeout }) =>
-    createMaintenanceCommand(host as HostConfig, maintenanceRunId, command, {
+  >(({ command, waitUntilComplete, timeout, maintenanceRunIdOverride }) =>
+    createMaintenanceCommand(host as HostConfig, maintenanceRunIdOverride ?? maintenanceRunId, command, {
       waitUntilComplete,
       timeout,
     }).then(response => {

@@ -18,6 +18,7 @@ import { useLights } from '../Devices/hooks'
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 
 import type { Dispatch } from '../../redux/types'
+import { GantryControlModal } from './GantryControlModal'
 
 interface NavigationMenuProps {
   onClick: React.MouseEventHandler
@@ -32,6 +33,10 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   const [
     showRestartRobotConfirmationModal,
     setShowRestartRobotConfirmationModal,
+  ] = React.useState<boolean>(false)
+  const [
+    showGantryControlModal,
+    setShowGantryControlModal,
   ] = React.useState<boolean>(false)
 
   const handleRestart = (): void => {
@@ -48,15 +53,18 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
           }
         />
       ) : null}
+      {showGantryControlModal ? (
+        <GantryControlModal
+          robotName={robotName}
+          close={() => setShowGantryControlModal(false)}
+        />
+      ) : null}
       <MenuList onClick={onClick} isOnDevice={true}>
-        <MenuItem
-          key="home-gantry"
-          onClick={() => dispatch(home(robotName, ROBOT))}
-        >
+        <MenuItem onClick={() => setShowGantryControlModal(true)} >
           <Flex alignItems={ALIGN_CENTER}>
             <Icon
               name="home-gantry"
-              aria-label="home-gantry_icon"
+              aria-label="control-gantry_icon"
               size="2.5rem"
             />
             <StyledText
@@ -64,7 +72,7 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               marginLeft={SPACING.spacing12}
             >
-              {t('home_gantry')}
+              {t('control_gantry')}
             </StyledText>
           </Flex>
         </MenuItem>
