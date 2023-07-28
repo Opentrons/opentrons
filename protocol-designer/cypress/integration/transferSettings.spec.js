@@ -335,7 +335,7 @@ describe('Advanced Settings for Transfer Form', () => {
     // Verify that volume is set
     cy.get('[id=TipPositionField_aspirate_touchTip_mmFromBottom]').should(
       'have.value',
-      24
+      13.78
     )
     // Click on step 3 to verify that touchTip has volume set
     cy.get('[data-test="StepItem_3"]').click()
@@ -344,7 +344,7 @@ describe('Advanced Settings for Transfer Form', () => {
     // Verify that volume is set
     cy.get('[id=TipPositionField_aspirate_touchTip_mmFromBottom]').should(
       'have.value',
-      24
+      13.78
     )
   })
 
