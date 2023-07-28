@@ -6,6 +6,7 @@ import {
   useAllPipetteOffsetCalibrationsQuery,
   useAllTipLengthCalibrationsQuery,
   useCalibrationStatusQuery,
+  useInstrumentsQuery,
 } from '@opentrons/react-api-client'
 
 import { Portal } from '../../App/portal'
@@ -40,6 +41,7 @@ import type {
   DeckCalibrationSession,
 } from '../../redux/sessions/types'
 import type { State, Dispatch } from '../../redux/types'
+import { GripperData } from '@opentrons/api-client'
 
 const CALS_FETCH_MS = 5000
 
@@ -120,6 +122,11 @@ export function RobotSettingsCalibration({
 
   const pipetteOffsetCalibrations = useAllPipetteOffsetCalibrationsQuery().data
     ?.data
+  const { data: attachedInstruments } = useInstrumentsQuery()
+  const attachedGripper =
+    (attachedInstruments?.data ?? []).find(
+      (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
+    ) ?? null
   const attachedPipettesFromInstrumentQuery = useAttachedPipettesFromInstrumentsQuery()
   const attachedPipettes = useAttachedPipettes()
   const { isRunRunning: isRunning } = useRunStatuses()
@@ -317,7 +324,9 @@ export function RobotSettingsCalibration({
             updateRobotStatus={updateRobotStatus}
           />
           <Line />
-          <RobotSettingsGripperCalibration />
+          {attachedGripper != null && (
+            <RobotSettingsGripperCalibration gripper={attachedGripper} />
+          )}
         </>
       ) : (
         <>
