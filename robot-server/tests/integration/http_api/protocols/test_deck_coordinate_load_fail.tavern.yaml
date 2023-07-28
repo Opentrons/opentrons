@@ -49,4 +49,3 @@ stages:
             result: not-ok
             errors:
               - detail: 'DeckConflictError [line 17]: thermocyclerModuleV2 in slot 7 prevents temperatureModuleV2 from using slot 10.'
-  # TODO(jbl 2023-04-25) When returning deck coordinates is implemented, check output here
