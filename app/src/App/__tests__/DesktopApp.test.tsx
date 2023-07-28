@@ -15,10 +15,13 @@ import { RobotSettings } from '../../pages/Devices/RobotSettings'
 import { GeneralSettings } from '../../pages/AppSettings/GeneralSettings'
 import { Alerts } from '../../organisms/Alerts'
 import { useSoftwareUpdatePoll } from '../hooks'
+// import { useRobot } from '../../organisms/Devices/hooks'
+// import { mockConnectedRobot } from '../../redux/discovery/__fixtures__'
 import { DesktopApp } from '../DesktopApp'
 
 jest.mock('../../organisms/Alerts')
 jest.mock('../../organisms/Breadcrumbs')
+jest.mock('../../organisms/Devices/hooks')
 jest.mock('../../pages/AppSettings/GeneralSettings')
 jest.mock('../../pages/Devices/CalibrationDashboard')
 jest.mock('../../pages/Devices/DeviceDetails')
@@ -54,6 +57,7 @@ const mockBreadcrumbs = Breadcrumbs as jest.MockedFunction<typeof Breadcrumbs>
 const mockUseSoftwareUpdatePoll = useSoftwareUpdatePoll as jest.MockedFunction<
   typeof useSoftwareUpdatePoll
 >
+// const mockUseRobot = useRobot as jest.MockedFunction<typeof useRobot>
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -77,6 +81,7 @@ describe('DesktopApp', () => {
     mockAlerts.mockReturnValue(<div>Mock Alerts</div>)
     mockAppSettings.mockReturnValue(<div>Mock AppSettings</div>)
     mockBreadcrumbs.mockReturnValue(<div>Mock Breadcrumbs</div>)
+    // mockUseRobot.mockReturnValue(mockConnectedRobot)
   })
   afterEach(() => {
     jest.resetAllMocks()
