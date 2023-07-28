@@ -1305,9 +1305,12 @@ def test_get_labware_gripper_offsets(
         },
     )
 
-    assert subject.get_labware_default_gripper_offsets("plate-id") is None
-    assert subject.get_labware_default_gripper_offsets(
-        "adapter-plate-id"
+    assert (
+        subject.get_labware_gripper_offsets(labware_id="plate-id", slot_name=None)
+        is None
+    )
+    assert subject.get_labware_gripper_offsets(
+        labware_id="adapter-plate-id", slot_name=DeckSlotName.SLOT_D1
     ) == LabwareMovementOffsetData(
         pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
         dropOffset=LabwareOffsetVector(x=2, y=0, z=0),

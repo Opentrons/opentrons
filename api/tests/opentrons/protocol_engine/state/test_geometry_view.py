@@ -1488,36 +1488,41 @@ def test_get_total_nominal_gripper_offset(
     )
 
     # Case 1: labware on deck
-    result1 = subject.get_total_nominal_gripper_offset(
+    result1 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=DeckSlotLocation(slotName=DeckSlotName.SLOT_3),
         move_type=_GripperMoveType.PICK_UP_LABWARE,
     )
     assert result1 == LabwareOffsetVector(x=1, y=2, z=3)
 
     # Case 2: labware on module
-    result2 = subject.get_total_nominal_gripper_offset(
+    result2 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=ModuleLocation(moduleId="module-id"),
         move_type=_GripperMoveType.DROP_LABWARE,
     )
     assert result2 == LabwareOffsetVector(x=33, y=22, z=11)
 
 
-def test_get_stacked_labware_total_nominal_offset(
+def test_get_stacked_labware_total_nominal_offset_slot_specific(
     decoy: Decoy,
     labware_view: LabwareView,
     module_view: ModuleView,
     subject: GeometryView,
 ) -> None:
     """Get nominal offset for stacked labware."""
-    # Case: labware on adapter on module
+    # Case: labware on adapter on module, adapter has slot-specific offsets
     decoy.when(module_view.get_default_gripper_offsets("module-id")).then_return(
         LabwareMovementOffsetData(
             pickUpOffset=LabwareOffsetVector(x=11, y=22, z=33),
             dropOffset=LabwareOffsetVector(x=33, y=22, z=11),
         )
     )
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_C1)
+    )
     decoy.when(
-        labware_view.get_labware_default_gripper_offsets("adapter-id")
+        labware_view.get_labware_gripper_offsets(
+            labware_id="adapter-id", slot_name=DeckSlotName.SLOT_C1
+        )
     ).then_return(
         LabwareMovementOffsetData(
             pickUpOffset=LabwareOffsetVector(x=100, y=200, z=300),
@@ -1527,8 +1532,62 @@ def test_get_stacked_labware_total_nominal_offset(
     decoy.when(labware_view.get_parent_location("adapter-id")).then_return(
         ModuleLocation(moduleId="module-id")
     )
-    result3 = subject.get_total_nominal_gripper_offset(
+    result1 = subject.get_total_nominal_gripper_offset_for_move_type(
         location=OnLabwareLocation(labwareId="adapter-id"),
         move_type=_GripperMoveType.PICK_UP_LABWARE,
     )
-    assert result3 == LabwareOffsetVector(x=111, y=222, z=333)
+    assert result1 == LabwareOffsetVector(x=111, y=222, z=333)
+
+    result2 = subject.get_total_nominal_gripper_offset_for_move_type(
+        location=OnLabwareLocation(labwareId="adapter-id"),
+        move_type=_GripperMoveType.DROP_LABWARE,
+    )
+    assert result2 == LabwareOffsetVector(x=333, y=222, z=111)
+
+
+def test_get_stacked_labware_total_nominal_offset_default(
+    decoy: Decoy,
+    labware_view: LabwareView,
+    module_view: ModuleView,
+    subject: GeometryView,
+) -> None:
+    """Get nominal offset for stacked labware."""
+    # Case: labware on adapter on module, adapter has only default offsets
+    decoy.when(module_view.get_default_gripper_offsets("module-id")).then_return(
+        LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=11, y=22, z=33),
+            dropOffset=LabwareOffsetVector(x=33, y=22, z=11),
+        )
+    )
+    decoy.when(module_view.get_location("module-id")).then_return(
+        DeckSlotLocation(slotName=DeckSlotName.SLOT_C1)
+    )
+    decoy.when(
+        labware_view.get_labware_gripper_offsets(
+            labware_id="adapter-id", slot_name=DeckSlotName.SLOT_C1
+        )
+    ).then_return(None)
+    decoy.when(
+        labware_view.get_labware_gripper_offsets(
+            labware_id="adapter-id", slot_name=None
+        )
+    ).then_return(
+        LabwareMovementOffsetData(
+            pickUpOffset=LabwareOffsetVector(x=100, y=200, z=300),
+            dropOffset=LabwareOffsetVector(x=300, y=200, z=100),
+        )
+    )
+    decoy.when(labware_view.get_parent_location("adapter-id")).then_return(
+        ModuleLocation(moduleId="module-id")
+    )
+    result1 = subject.get_total_nominal_gripper_offset_for_move_type(
+        location=OnLabwareLocation(labwareId="adapter-id"),
+        move_type=_GripperMoveType.PICK_UP_LABWARE,
+    )
+    assert result1 == LabwareOffsetVector(x=111, y=222, z=333)
+
+    result2 = subject.get_total_nominal_gripper_offset_for_move_type(
+        location=OnLabwareLocation(labwareId="adapter-id"),
+        move_type=_GripperMoveType.DROP_LABWARE,
+    )
+    assert result2 == LabwareOffsetVector(x=333, y=222, z=111)

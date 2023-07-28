@@ -743,18 +743,21 @@ class LabwareView(HasState[LabwareState]):
             else None
         )
 
-    def get_labware_default_gripper_offsets(
-        self, labware_id: str
+    def get_labware_gripper_offsets(
+        self,
+        labware_id: str,
+        slot_name: Optional[DeckSlotName],
     ) -> Optional[LabwareMovementOffsetData]:
-        """Get the labware's default gripper offsets."""
+        """Get the labware's gripper offsets of the specified type."""
         parsed_offsets = self.get_definition(labware_id).gripperOffsets
+        offset_key = slot_name.name if slot_name else "default"
         return (
             LabwareMovementOffsetData(
                 pickUpOffset=cast(
-                    LabwareOffsetVector, parsed_offsets["default"].pickUpOffset
+                    LabwareOffsetVector, parsed_offsets[offset_key].pickUpOffset
                 ),
                 dropOffset=cast(
-                    LabwareOffsetVector, parsed_offsets["default"].dropOffset
+                    LabwareOffsetVector, parsed_offsets[offset_key].dropOffset
                 ),
             )
             if parsed_offsets

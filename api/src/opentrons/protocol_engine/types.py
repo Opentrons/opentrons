@@ -80,6 +80,8 @@ LabwareLocation = Union[
 ]
 """Union of all locations where it's legal to keep a labware."""
 
+OnDeckLabwareLocation = Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation]
+
 NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
 """Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
 
