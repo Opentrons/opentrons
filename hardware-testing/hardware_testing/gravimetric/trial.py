@@ -68,18 +68,12 @@ class TestResources:
 
     ctx: ProtocolContext
     pipette: InstrumentContext
-    pipette_tag: str
     tipracks: List[Labware]
     test_volumes: List[float]
-    run_id: str
-    start_time: float
-    operator_name: str
-    robot_serial: str
-    tip_batch: str
-    git_description: str
     tips: Dict[int, List[Well]]
     env_sensor: asair_sensor.AsairSensorBase
     recorder: Optional[GravimetricRecorder]
+    test_report: CSVReport
 
 
 def build_gravimetric_trials(

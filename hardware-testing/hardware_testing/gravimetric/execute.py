@@ -464,24 +464,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         start_sim_mass = {50: 15, 200: 200, 1000: 200}
         resources.recorder.set_simulation_mass(start_sim_mass[cfg.tip_volume])
     recorder._recording = GravimetricRecording()
-    tip_batches: Dict[str, str] = {}
-    tip_batches[f"tips_{cfg.tip_volume}ul"] = resources.tip_batch
-    test_report = build_gm_report(
-        test_volumes=resources.test_volumes,
-        run_id=resources.run_id,
-        pipette_tag=resources.pipette_tag,
-        operator_name=resources.operator_name,
-        git_description=resources.git_description,
-        robot_serial=resources.robot_serial,
-        tip_batchs=tip_batches,
-        recorder=resources.recorder,
-        pipette_channels=cfg.pipette_channels,
-        increment=cfg.increment,
-        name=cfg.name,
-        environment_sensor=resources.env_sensor,
-        trials=cfg.trials,
-    )
-    report.store_config_gm(test_report, cfg)
+    report.store_config_gm(resources.test_report, cfg)
     calibration_tip_in_use = True
 
     if resources.ctx.is_simulating():
@@ -529,7 +512,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                 resources,
                 recorder,
                 liquid_tracker,
-                test_report,
+                resources.test_report,
                 labware_on_scale,
             )
 
@@ -547,7 +530,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
             resources.test_volumes,
             channels_to_test,
             recorder,
-            test_report,
+            resources.test_report,
             liquid_tracker,
             False,
             resources.env_sensor,
@@ -619,7 +602,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                     dispense_data_list.append(dispense_data)
 
                     report.store_trial(
-                        test_report,
+                        resources.test_report,
                         run_trial.trial,
                         run_trial.volume,
                         run_trial.channel,
@@ -656,7 +639,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                 _print_stats("dispense", dispense_average, dispense_cv, dispense_d)
 
                 report.store_volume_per_channel(
-                    report=test_report,
+                    report=resources.test_report,
                     mode="aspirate",
                     volume=volume,
                     channel=channel,
@@ -667,7 +650,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                     humidity=aspirate_humidity_avg,
                 )
                 report.store_volume_per_channel(
-                    report=test_report,
+                    report=resources.test_report,
                     mode="dispense",
                     volume=volume,
                     channel=channel,
@@ -692,7 +675,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                 )
 
                 report.store_volume_per_trial(
-                    report=test_report,
+                    report=resources.test_report,
                     mode="aspirate",
                     volume=volume,
                     trial=trial,
@@ -701,7 +684,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                     d=aspirate_d,
                 )
                 report.store_volume_per_trial(
-                    report=test_report,
+                    report=resources.test_report,
                     mode="dispense",
                     volume=volume,
                     trial=trial,
@@ -722,7 +705,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
             _print_stats("dispense", dispense_average, dispense_cv, dispense_d)
 
             report.store_volume_all(
-                report=test_report,
+                report=resources.test_report,
                 mode="aspirate",
                 volume=volume,
                 average=aspirate_average,
@@ -730,7 +713,7 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
                 d=aspirate_d,
             )
             report.store_volume_all(
-                report=test_report,
+                report=resources.test_report,
                 mode="dispense",
                 volume=volume,
                 average=dispense_average,
@@ -744,5 +727,5 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
     _print_final_results(
         volumes=resources.test_volumes,
         channel_count=len(channels_to_test),
-        test_report=test_report,
+        test_report=resources.test_report,
     )

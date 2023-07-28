@@ -79,7 +79,7 @@ class EnvironmentReportState(str, Enum):
 
 
 def create_csv_test_report_photometric(
-    volumes: List[float], cfg: config.PhotometricConfig, run_id: str
+    volumes: List[float], trials: int, name: str, run_id: str
 ) -> CSVReport:
     """Create CSV test report."""
     env_info = [field.name.replace("_", "-") for field in fields(EnvironmentData)]
@@ -92,11 +92,11 @@ def create_csv_test_report_photometric(
                 0,
                 trial,
             )
-            for trial in range(cfg.trials)
+            for trial in range(trials)
         ]
 
     report = CSVReport(
-        test_name=cfg.name,
+        test_name=name,
         run_id=run_id,
         sections=[
             CSVSection(
@@ -104,7 +104,9 @@ def create_csv_test_report_photometric(
                 lines=[
                     CSVLine("robot", [str]),
                     CSVLine("pipette", [str]),
-                    CSVLine("tips", [str]),
+                    CSVLine("tips_50ul", [str]),
+                    CSVLine("tips_200ul", [str]),
+                    CSVLine("tips_1000ul", [str]),
                     CSVLine("environment", [str]),
                     CSVLine("liquid", [str]),
                 ],
@@ -133,12 +135,15 @@ def create_csv_test_report_photometric(
             ),
         ],
     )
-    # might as well set the configuration values now
+    return report
+
+
+def store_config_pm(report: CSVReport, cfg: config.PhotometricConfig) -> None:
+    """Store the config file list."""
     for field in fields(config.PhotometricConfig):
         if field.name in config.PHOTO_CONFIG_EXCLUDE_FROM_REPORT:
             continue
         report("CONFIG", field.name, [getattr(cfg, field.name)])
-    return report
 
 
 def create_csv_test_report(
@@ -277,7 +282,6 @@ def create_csv_test_report(
 
 def store_config_gm(report: CSVReport, cfg: config.GravimetricConfig) -> None:
     """Store the config file list."""
-    # might as well set the configuration values now
     for field in fields(config.GravimetricConfig):
         if field.name in config.GRAV_CONFIG_EXCLUDE_FROM_REPORT:
             continue
@@ -288,14 +292,15 @@ def store_serial_numbers_pm(
     report: CSVReport,
     robot: str,
     pipette: str,
-    tips: str,
+    tips: Dict[str, str],
     environment: str,
     liquid: str,
 ) -> None:
     """Report serial numbers."""
     report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "pipette", [pipette])
-    report("SERIAL-NUMBERS", "tips", [tips])
+    for tip in tips.keys():
+        report("SERIAL-NUMBERS", tip, [tips[tip]])
     report("SERIAL-NUMBERS", "environment", [environment])
     report("SERIAL-NUMBERS", "liquid", [liquid])
 

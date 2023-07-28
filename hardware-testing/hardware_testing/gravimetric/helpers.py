@@ -147,13 +147,13 @@ def _calculate_average(volume_list: List[float]) -> float:
 
 def _reduce_volumes_to_not_exceed_software_limit(
     test_volumes: List[float],
-    cfg: config.VolumetricConfig,
+    pipette_volume: int,
+    pipette_channels: int,
+    tip_volume: int,
 ) -> List[float]:
     for i, v in enumerate(test_volumes):
-        liq_cls = get_liquid_class(
-            cfg.pipette_volume, cfg.pipette_channels, cfg.tip_volume, int(v)
-        )
-        max_vol = cfg.tip_volume - liq_cls.aspirate.trailing_air_gap
+        liq_cls = get_liquid_class(pipette_volume, pipette_channels, tip_volume, int(v))
+        max_vol = tip_volume - liq_cls.aspirate.trailing_air_gap
         test_volumes[i] = min(v, max_vol - 0.1)
     return test_volumes
 
@@ -266,26 +266,39 @@ def _drop_tip(
             pipette.move_to(cur_location.move(Point(0, 0, minimum_z_height)))
 
 
-def _get_volumes(ctx: ProtocolContext, cfg: config.VolumetricConfig) -> List[float]:
-    if cfg.increment:
-        test_volumes = get_volume_increments(cfg.pipette_volume, cfg.tip_volume)
-    elif cfg.user_volumes and not ctx.is_simulating():
-        _inp = input('Enter desired volumes, comma separated (eg: "10,100,1000") :')
+def _get_volumes(
+    ctx: ProtocolContext,
+    increment: bool,
+    pipette_volume: int,
+    tip_volume: int,
+    user_volumes: bool,
+    kind: config.ConfigType,
+    extra: bool,
+    channels: int,
+) -> List[float]:
+    if increment:
+        test_volumes = get_volume_increments(pipette_volume, tip_volume)
+    elif user_volumes and not ctx.is_simulating():
+        _inp = input(
+            f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
+        )
         test_volumes = [
             float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
         ]
     else:
-        test_volumes = get_test_volumes(cfg)
+        test_volumes = get_test_volumes(
+            kind, channels, pipette_volume, tip_volume, extra
+        )
     if not test_volumes:
         raise ValueError("no volumes to test, check the configuration")
     if not _check_if_software_supports_high_volumes():
         if ctx.is_simulating():
             test_volumes = _reduce_volumes_to_not_exceed_software_limit(
-                test_volumes, cfg
+                test_volumes, pipette_volume, channels, tip_volume
             )
         else:
             raise RuntimeError("you are not the correct branch")
-    return sorted(test_volumes, reverse=False)  # lowest volumes first
+    return test_volumes
 
 
 def _load_pipette(
@@ -378,26 +391,22 @@ def _load_tipracks(
     return tipracks
 
 
-def get_test_volumes(cfg: config.VolumetricConfig) -> List[float]:
+def get_test_volumes(
+    kind: config.ConfigType, pipette: int, volume: int, tip: int, extra: bool
+) -> List[float]:
     """Get test volumes."""
-    if cfg.kind is config.ConfigType.photometric:
-        return config.QC_VOLUMES_P[cfg.pipette_channels][cfg.pipette_volume][
-            cfg.tip_volume
-        ]
+    if kind is config.ConfigType.photometric:
+        return config.QC_VOLUMES_P[pipette][volume][tip]
     else:
-        if cfg.extra:
-            return config.QC_VOLUMES_EXTRA_G[cfg.pipette_channels][cfg.pipette_volume][
-                cfg.tip_volume
-            ]
+        if extra:
+            return config.QC_VOLUMES_EXTRA_G[pipette][volume][tip]
         else:
-            return config.QC_VOLUMES_G[cfg.pipette_channels][cfg.pipette_volume][
-                cfg.tip_volume
-            ]
+            return config.QC_VOLUMES_G[pipette][volume][tip]
 
 
-def get_default_trials(cfg: config.VolumetricConfig) -> int:
+def get_default_trials(increment: bool, kind: config.ConfigType, channels: int) -> int:
     """Return the default number of trials for QC tests."""
-    if cfg.increment:
+    if increment:
         return 3
     else:
-        return config.QC_DEFAULT_TRIALS[cfg.kind][cfg.pipette_channels]
+        return config.QC_DEFAULT_TRIALS[kind][channels]

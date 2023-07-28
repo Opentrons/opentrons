@@ -11,6 +11,7 @@ from .measurement import (
     create_measurement_tag,
     EnvironmentData,
 )
+from hardware_testing.drivers import asair_sensor
 from .measurement.environment import read_environment_data
 from . import report
 from . import config
@@ -241,22 +242,31 @@ def _display_dye_information(
 
 
 def build_pm_report(
-    cfg: config.PhotometricConfig, resources: TestResources
+    test_volumes: List[float],
+    run_id: str,
+    pipette_tag: str,
+    operator_name: str,
+    git_description: str,
+    tip_batches: Dict[str, str],
+    environment_sensor: asair_sensor.AsairSensorBase,
+    trials: int,
+    name: str,
+    robot_serial: str,
 ) -> report.CSVReport:
     """Build a CSVReport formated for photometric tests."""
     ui.print_header("CREATE TEST-REPORT")
     test_report = report.create_csv_test_report_photometric(
-        resources.test_volumes, cfg, run_id=resources.run_id
+        test_volumes, trials, name, run_id
     )
-    test_report.set_tag(resources.pipette_tag)
-    test_report.set_operator(resources.operator_name)
-    test_report.set_version(resources.git_description)
+    test_report.set_tag(pipette_tag)
+    test_report.set_operator(operator_name)
+    test_report.set_version(git_description)
     report.store_serial_numbers_pm(
         test_report,
-        robot=resources.robot_serial,
-        pipette=resources.pipette_tag,
-        tips=resources.tip_batch,
-        environment="None",
+        robot=robot_serial,
+        pipette=pipette_tag,
+        tips=tip_batches,
+        environment=environment_sensor.get_serial(),
         liquid="None",
     )
     return test_report
@@ -382,14 +392,12 @@ def run(cfg: config.PhotometricConfig, resources: TestResources) -> None:
         trial_total <= total_tips
     ), f"more trials ({trial_total}) than tips ({total_tips})"
 
-    test_report = build_pm_report(cfg, resources)
-
     _display_dye_information(cfg, resources)
     _find_liquid_height(cfg, resources, liquid_tracker, reservoir["A1"])
 
     trials = build_photometric_trials(
         resources.ctx,
-        test_report,
+        resources.test_report,
         resources.pipette,
         reservoir["A1"],
         photoplate,

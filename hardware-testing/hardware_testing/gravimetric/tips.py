@@ -45,9 +45,14 @@ CHANNEL_TO_TIP_ROW_LOOKUP = {  # zero indexed
     7: "A",
 }
 VOLUME_TO_SLOT_LOOKUP = {
-    50: [2, 3],
-    200: [10, 8],
-    1000: [11, 9],
+    50: {
+        50: [5, 6, 8, 9],
+    },
+    1000: {
+        50: [2, 3],
+        200: [10, 8],
+        1000: [11, 9],
+    },
 }
 
 
@@ -71,12 +76,12 @@ def get_tips_for_single(ctx: ProtocolContext, tip_volume: int) -> List[Well]:
 
 
 def get_tips_for_individual_channel_on_multi(
-    ctx: ProtocolContext, channel: int, tip_volume: int
+    ctx: ProtocolContext, channel: int, tip_volume: int, pipette_volume: int
 ) -> List[Well]:
     """Get tips for a multi's channel."""
     racks = _get_racks(ctx)
     tip_row = CHANNEL_TO_TIP_ROW_LOOKUP[channel]
-    slots = VOLUME_TO_SLOT_LOOKUP[tip_volume]
+    slots = VOLUME_TO_SLOT_LOOKUP[pipette_volume][tip_volume]
     tips = [
         tip
         for slot in slots
@@ -113,7 +118,7 @@ def get_tips(
         else:
             return {
                 channel: get_tips_for_individual_channel_on_multi(
-                    ctx, channel, tip_volume
+                    ctx, channel, tip_volume, pipette.max_volume
                 )
                 for channel in range(pipette.channels)
             }
