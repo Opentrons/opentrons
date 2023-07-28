@@ -15,7 +15,7 @@ For information about liquid handling, see :ref:`v2-atomic-commands` and :ref:`v
 Loading A Pipette
 ------------------
 
-You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instrument` method. This method requires the pipette model, which is set by the API load name, it's location (e.g. ``'left'`` or ``'right'``), and a list of associated tipracks (if used). 
+You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instrument` method. This method requires the pipette model, which is set by the API load name, it's location (e.g. ``left`` or ``right``), and a list of associated tipracks (if used). 
 
 .. tabs::
 
@@ -30,6 +30,18 @@ You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instr
 
             requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
 
+            def run(protocol: protocol_api.ProtocolContext):
+                # Load a 1-channel 0.5–50 µL pipette in the left slot
+                left = protocol.load_instrument(
+                    instrument_name='flex_1channel_50',
+                    mount='left'
+                )
+                # Load an 8-channel 5–1000 µL pipette in the right slot
+                right = protocol.load_instrument(
+                    instrument_name='flex_8channel_1000',
+                    mount='right'
+                )
+
 
     .. tab:: OT-2
         
@@ -40,7 +52,7 @@ You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instr
 
             from opentrons import protocol_api
 
-            metadata = {'apiLevel': '|apiLevel|'}
+            metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
                 # Load a P50 multi on the left slot
@@ -81,7 +93,7 @@ For instance, to aspirate from the first column of a 96-well plate you would wri
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '|apiLevel|'}
+    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 300uL tips
@@ -156,7 +168,19 @@ The first parameter of the :py:meth:`~.ProtocolContext.load_instrument` method i
 
     .. tab:: Flex Pipettes
         
-        Some text here
+        +-------------------------+-----------+-------------------------+
+        | Pipette Name            | Capacity  | API Load Name           |
+        +=========================+===========+=========================+
+        | Flex 1-Channel Pipette  | 0.5–50 µL | ``flex_1channel_50``    |
+        +                         +-----------+-------------------------+
+        |                         | 5–1000 µL | ``flex_1channel_1000``  |
+        +-------------------------+-----------+-------------------------+
+        | Flex 8-Channel Pipette  + 0.5–50 µL + ``flex_8channel_50``    |
+        +                         +-----------+-------------------------+
+        |                         | 5–1000 µL | ``flex_8channel_1000``  |
+        +-------------------------+-----------+-------------------------+
+        | Flex 96-Channel Pipette | 5–1000 µL | ``flex_96channel_1000`` |
+        +-------------------------+-----------+-------------------------+
 
     .. tab:: OT-2 Pipettes
 
@@ -171,38 +195,10 @@ The first parameter of the :py:meth:`~.ProtocolContext.load_instrument` method i
         +-----------------------------+                    +-----------------------+
         | P300 GEN2 (8-channel)       |                    | ``p300_multi_gen2``   |
         +-----------------------------+--------------------+-----------------------+
-        | P1000 GEN2 (single channel) | 100 - 1000 µL      | ``p1000_single_gen2`` |
+        | P1000 GEN2 (single channel) | 100-1000 µL        | ``p1000_single_gen2`` |
         +-----------------------------+--------------------+-----------------------+
 
-
-
-+---------------------------------------+-------------------------+
-|          Pipette Type                 |     Model Name          |
-+=======================================+=========================+
-| ``P20 Single GEN2`` (1 - 20 µL)       | ``'p20_single_gen2'``   |
-+---------------------------------------+-------------------------+
-| ``P300 Single GEN2`` (20 - 300 µL)    | ``'p300_single_gen2'``  |
-+---------------------------------------+-------------------------+
-| ``P1000 Single GEN2`` (100 - 1000 µL) | ``'p1000_single_gen2'`` |
-+---------------------------------------+-------------------------+
-| ``P300 Multi GEN2`` (20-300 µL)       | ``'p300_multi_gen2'``   |
-+---------------------------------------+-------------------------+
-| ``P20 Multi GEN2`` (1-20 µL)          | ``'p20_multi_gen2'``    |
-+---------------------------------------+-------------------------+
-| ``P10 Single``   (1 - 10 µL)          | ``'p10_single'``        |
-+---------------------------------------+-------------------------+
-| ``P10 Multi``    (1 - 10 µL)          | ``'p10_multi'``         |
-+---------------------------------------+-------------------------+
-| ``P50 Single``   (5 - 50 µL)          | ``'p50_single'``        |
-+---------------------------------------+-------------------------+
-| ``P50 Multi``    (5 - 50 µL)          | ``'p50_multi'``         |
-+---------------------------------------+-------------------------+
-| ``P300 Single``  (30 - 300 µL)        | ``'p300_single'``       |
-+---------------------------------------+-------------------------+
-| ``P300 Multi``   (30 - 300 µL)        | ``'p300_multi'``        |
-+---------------------------------------+-------------------------+
-| ``P1000 Single`` (100 - 1000 µL)      | ``'p1000_single'``      |
-+---------------------------------------+-------------------------+
+        See the pipette compatibility section below if you're using a older GEN1 model pipette. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single chanel model.
 
 
 GEN2 Pipette Backward Compatibility
