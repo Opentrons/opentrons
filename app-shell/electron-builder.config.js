@@ -52,11 +52,11 @@ module.exports = async () => ({
           '!node_modules/usb-detection/build',
           'node_modules/usb-detection/build/Release',
         ]),
-    {
-      from: '../app/dist',
-      to: './ui',
-      filter: ['**/*'],
-    },
+    //{
+    //  from: '../app/dist',
+    //  to: './ui',
+    //  filter: ['**/*'],
+    //},
   ],
   extraMetadata: {
     version: await versionForProject(project),
@@ -67,12 +67,13 @@ module.exports = async () => ({
   artifactName: '${productName}-v${version}-${os}-${env.BUILD_ID}.${ext}',
   /* eslint-enable no-template-curly-in-string */
   asar: true,
+  asarUnpack: ['node_modules/usb-detection/build/Release/detection.node'],
   mac: {
     target: process.platform === 'darwin' ? ['dmg', 'zip'] : ['zip'],
     category: 'public.app-category.productivity',
     type: DEV_MODE ? 'development' : 'distribution',
     icon: project === 'robot-stack' ? 'build/icon.icns' : 'build/three.icns',
-    forceCodeSigning: !DEV_MODE,
+    //forceCodeSigning: !DEV_MODE,
     gatekeeperAssess: true,
   },
   dmg: {

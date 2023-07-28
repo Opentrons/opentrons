@@ -78,7 +78,7 @@ setup:
 
 .PHONY: clean
 clean:
-	shx rm -rf lib dist python
+	shx rm -rf lib dist python ui
 
 # artifacts
 #####################################################################
@@ -91,6 +91,8 @@ lib:
 .PHONY: deps
 deps:
 	$(MAKE) -C $(ui_dir)
+	mkdir -p ./ui
+	cp -r $(ui_dir)/dist/* ./ui/
 
 .PHONY: package-deps
 package-deps: clean lib deps
