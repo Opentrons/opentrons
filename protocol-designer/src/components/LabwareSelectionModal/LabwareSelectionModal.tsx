@@ -366,7 +366,6 @@ export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
                   inert={!isPopulated}
                 >
                   {labwareByCategory[category]?.map((labwareDef, index) => {
-                    console.log(labwareDef.parameters.loadName)
                     const isFiltered = getIsLabwareFiltered(labwareDef)
                     if (!isFiltered) {
                       return (
