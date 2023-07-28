@@ -111,7 +111,7 @@ class CompletedAnalysis(BaseModel):
         description=(
             "The protocol's fatal error, if there was one."
             " For historical reasons, this is an array,"
-            " but it will only have up to one element."
+            " but it won't have more than one element."
         ),
     )
     liquids: List[Liquid] = Field(

@@ -140,7 +140,10 @@ class PythonConfig(BaseModel):
 
 
 class AnalyzeResults(BaseModel):
-    """Results of a protocol analysis."""
+    """Results of a protocol analysis.
+
+    See robot-server's analysis models for field documentation.
+    """
 
     createdAt: datetime
     files: List[ProtocolFile]
@@ -152,5 +155,4 @@ class AnalyzeResults(BaseModel):
     pipettes: List[LoadedPipette]
     modules: List[LoadedModule]
     liquids: List[Liquid]
-    # errors is a list for historical reasons. It will only have up to one element.
     errors: List[ErrorOccurrence]
