@@ -1746,34 +1746,46 @@ def test_is_edge_move_unsafe(
     assert result is expected_result
 
 
+@pytest.mark.parametrize(
+    argnames=["module_def", "expected_offset_data"],
+    argvalues=[
+        (
+            lazy_fixture("thermocycler_v2_def"),
+            LabwareMovementOffsetData(
+                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=3.5),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
+            ),
+        ),
+        (
+            lazy_fixture("heater_shaker_v1_def"),
+            LabwareMovementOffsetData(
+                pickUpOffset=LabwareOffsetVector(x=0, y=0, z=1.0),
+                dropOffset=LabwareOffsetVector(x=0, y=0, z=2.5),
+            ),
+        ),
+        (
+            lazy_fixture("tempdeck_v1_def"),
+            None,
+        ),
+    ],
+)
 def test_get_default_gripper_offsets(
-    thermocycler_v2_def: ModuleDefinition,
-    tempdeck_v1_def: ModuleDefinition,
+    module_def: ModuleDefinition,
+    expected_offset_data: Optional[LabwareMovementOffsetData],
 ) -> None:
     """It should return the correct gripper offsets, if present."""
     subject = make_module_view(
         slot_by_module_id={
             "module-1": DeckSlotName.SLOT_1,
-            "module-2": DeckSlotName.SLOT_2,
         },
         requested_model_by_module_id={
-            "module-1": ModuleModel.TEMPERATURE_MODULE_V1,
-            "module-2": ModuleModel.THERMOCYCLER_MODULE_V2,
+            "module-1": ModuleModel.TEMPERATURE_MODULE_V1,  # Does not matter
         },
         hardware_by_module_id={
             "module-1": HardwareModule(
                 serial_number="serial-1",
-                # Intentionally different from requested model.
-                definition=tempdeck_v1_def,
-            ),
-            "module-2": HardwareModule(
-                serial_number="serial-2",
-                definition=thermocycler_v2_def,
+                definition=module_def,
             ),
         },
     )
-    assert subject.get_default_gripper_offsets("module-2") == LabwareMovementOffsetData(
-        pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
-        dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
-    )
-    assert subject.get_default_gripper_offsets("module-1") is None
+    assert subject.get_default_gripper_offsets("module-1") == expected_offset_data

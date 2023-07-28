@@ -671,6 +671,9 @@ class GeometryView:
             if isinstance(location, (ModuleLocation, DeckSlotLocation)):
                 return self.get_default_gripper_offsets(location).pickUpOffset
             elif isinstance(location, OnLabwareLocation):
+                # If it's a labware on a labware, we calculate the offset as sum of
+                # offsets for the direct parent labware and the underlying
+                # non-labware parent location.
                 direct_parent_offset = self.get_default_gripper_offsets(location)
                 ancestor = self._labware.get_parent_location(location.labwareId)
                 return (
@@ -686,6 +689,9 @@ class GeometryView:
             if isinstance(location, (ModuleLocation, DeckSlotLocation)):
                 return self.get_default_gripper_offsets(location).dropOffset
             elif isinstance(location, OnLabwareLocation):
+                # If it's a labware on a labware, we calculate the offset as sum of
+                # offsets for the direct parent labware and the underlying
+                # non-labware parent location.
                 direct_parent_offset = self.get_default_gripper_offsets(location)
                 ancestor = self._labware.get_parent_location(location.labwareId)
                 return (
