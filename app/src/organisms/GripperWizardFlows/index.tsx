@@ -40,6 +40,9 @@ import type {
 } from '@opentrons/api-client'
 import type { Coordinates } from '@opentrons/shared-data'
 
+const RUN_DELETION_TIMEOUT = 10000
+const RUN_REFETCH_INTERVAL = 5000
+
 interface MaintenanceRunManagerProps {
   flowType: GripperWizardFlowType
   attachedGripper: InstrumentData | null
@@ -69,15 +72,19 @@ export function GripperWizardFlows(
     },
   })
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
-    refetchInterval: 5000,
+    refetchInterval: RUN_REFETCH_INTERVAL,
   })
+  // this will close the modal in case the run was deleted by the terminate
+  // activity modal on the ODD
   React.useEffect(() => {
-    if (
-      maintenanceRunId !== '' &&
-      maintenanceRunData?.data.id !== maintenanceRunId
-    ) {
-      closeFlow()
-    }
+    setTimeout(() => {
+      if (
+        maintenanceRunId !== '' &&
+        maintenanceRunData?.data.id !== maintenanceRunId
+      ) {
+        closeFlow()
+      }
+    }, RUN_DELETION_TIMEOUT)
   }, [maintenanceRunData, maintenanceRunId, closeFlow])
 
   const [isExiting, setIsExiting] = React.useState<boolean>(false)

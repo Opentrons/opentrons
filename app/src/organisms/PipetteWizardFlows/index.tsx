@@ -41,6 +41,9 @@ import { UnskippableModal } from './UnskippableModal'
 import type { PipetteMount } from '@opentrons/shared-data'
 import type { PipetteWizardFlow, SelectablePipettes } from './types'
 
+const RUN_DELETION_TIMEOUT = 10000
+const RUN_REFETCH_INTERVAL = 5000
+
 interface PipetteWizardFlowsProps {
   flowType: PipetteWizardFlow
   mount: PipetteMount
@@ -118,15 +121,19 @@ export const PipetteWizardFlows = (
     host
   )
   const { data: maintenanceRunData } = useCurrentMaintenanceRun({
-    refetchInterval: 5000,
+    refetchInterval: RUN_REFETCH_INTERVAL,
   })
+  // this will close the modal in case the run was deleted by the terminate
+  // activity modal on the ODD
   React.useEffect(() => {
-    if (
-      maintenanceRunId !== '' &&
-      maintenanceRunData?.data.id !== maintenanceRunId
-    ) {
-      closeFlow()
-    }
+    setTimeout(() => {
+      if (
+        maintenanceRunId !== '' &&
+        maintenanceRunData?.data.id !== maintenanceRunId
+      ) {
+        closeFlow()
+      }
+    }, RUN_DELETION_TIMEOUT)
   }, [maintenanceRunData, maintenanceRunId, closeFlow])
 
   const [errorMessage, setShowErrorMessage] = React.useState<null | string>(
