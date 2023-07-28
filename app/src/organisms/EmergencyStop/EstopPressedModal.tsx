@@ -58,7 +58,6 @@ export function EstopPressedModal({
             <DesktopModal
               isEngaged={isEngaged}
               closeModal={closeModal}
-              isDismissedModal={isDismissedModal}
               setIsDismissedModal={setIsDismissedModal}
             />
           ) : null}
@@ -124,14 +123,15 @@ function TouchscreenModal({
 function DesktopModal({
   isEngaged,
   closeModal,
-  isDismissedModal,
   setIsDismissedModal,
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const { setEstopPhysicalStatus } = useSetEstopPhysicalStatusMutation()
 
   const handleCloseModal = (): void => {
-    setIsDismissedModal && setIsDismissedModal(true)
+    if (setIsDismissedModal != null) {
+      setIsDismissedModal(true)
+    }
     closeModal()
   }
 
