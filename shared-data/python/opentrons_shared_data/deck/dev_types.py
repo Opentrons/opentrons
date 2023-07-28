@@ -119,6 +119,7 @@ class _RequiredDeckDefinitionV3(TypedDict):
     locations: LocationsV3
     layers: List[INode]
 
+
 class DeckDefinitionV3(_RequiredDeckDefinitionV3, total=False):
     gripperOffsets: Dict[str, GripperOffsets]
 

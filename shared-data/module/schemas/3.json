@@ -153,15 +153,10 @@
               "description": "Offset added to calculate drop coordinates of a labware placed on this module."
             }
           },
-          "required": [
-            "pickUpOffset",
-            "dropOffset"
-          ]
+          "required": ["pickUpOffset", "dropOffset"]
         }
       },
-      "required": [
-        "default"
-      ]
+      "required": ["default"]
     },
     "displayName": { "type": "string" },
     "quirks": {

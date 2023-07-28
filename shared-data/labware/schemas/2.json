@@ -356,15 +356,10 @@
               "description": "Offset added to calculate drop coordinates of a labware placed on this labware."
             }
           },
-          "required": [
-            "pickUpOffset",
-            "dropOffset"
-          ]
+          "required": ["pickUpOffset", "dropOffset"]
         }
       },
-      "required": [
-        "default"
-      ]
+      "required": ["default"]
     }
   }
 }

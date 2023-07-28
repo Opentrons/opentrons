@@ -78,6 +78,7 @@ class GripperOffsets(BaseModel):
     """
     Offsets used when calculating coordinates for gripping labware during labware movement.
     """
+
     pickUpOffset: OffsetVector
     dropOffset: OffsetVector
 
@@ -315,5 +316,5 @@ class LabwareDefinition(BaseModel):
     gripperOffsets: Dict[str, GripperOffsets] = Field(
         default_factory=dict,
         description="Offsets use when calculating coordinates for gripping labware "
-                    "during labware movement.",
+        "during labware movement.",
     )

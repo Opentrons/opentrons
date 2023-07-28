@@ -81,9 +81,7 @@
     },
     "schemaVersion": {
       "description": "Schema version of a deck is a single integer",
-      "enum": [
-        3
-      ]
+      "enum": [3]
     },
     "cornerOffsetFromOrigin": {
       "$ref": "#/definitions/xyzArray",
@@ -112,26 +110,18 @@
     },
     "robot": {
       "type": "object",
-      "required": [
-        "model"
-      ],
+      "required": ["model"],
       "properties": {
         "model": {
           "description": "Model of the robot",
           "type": "string",
-          "enum": [
-            "OT-2 Standard",
-            "OT-3 Standard"
-          ]
+          "enum": ["OT-2 Standard", "OT-3 Standard"]
         }
       }
     },
     "locations": {
       "type": "object",
-      "required": [
-        "orderedSlots",
-        "calibrationPoints"
-      ],
+      "required": ["orderedSlots", "calibrationPoints"],
       "properties": {
         "orderedSlots": {
           "type": "array",
@@ -185,11 +175,7 @@
           "description": "Key points for deck calibration",
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "position",
-              "displayName"
-            ],
+            "required": ["id", "position", "displayName"],
             "properties": {
               "id": {
                 "description": "Unique identifier for calibration point",
@@ -210,10 +196,7 @@
           "description": "Fixed position objects on the deck.",
           "items": {
             "type": "object",
-            "required": [
-              "id",
-              "displayName"
-            ],
+            "required": ["id", "displayName"],
             "properties": {
               "id": {
                 "description": "Unique identifier for fixed object",
@@ -242,32 +225,20 @@
               {
                 "anyOf": [
                   {
-                    "required": [
-                      "labware",
-                      "slot"
-                    ]
+                    "required": ["labware", "slot"]
                   },
                   {
-                    "required": [
-                      "labware",
-                      "position"
-                    ]
+                    "required": ["labware", "position"]
                   }
                 ]
               },
               {
                 "anyOf": [
                   {
-                    "required": [
-                      "boundingBox",
-                      "slot"
-                    ]
+                    "required": ["boundingBox", "slot"]
                   },
                   {
-                    "required": [
-                      "boundingBox",
-                      "position"
-                    ]
+                    "required": ["boundingBox", "position"]
                   }
                 ]
               }
@@ -299,10 +270,7 @@
               "description": "Offset added to calculate drop coordinates of a labware placed on this deck."
             }
           },
-          "required": [
-            "pickUpOffset",
-            "dropOffset"
-          ]
+          "required": ["pickUpOffset", "dropOffset"]
         }
       }
     }

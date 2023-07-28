@@ -77,6 +77,7 @@ CornerOffsetFromSlot = TypedDict(
     "CornerOffsetFromSlot", {"x": float, "y": float, "z": float}
 )
 
+
 class NamedOffset(TypedDict):
     x: float
     y: float
@@ -105,7 +106,7 @@ ModuleDefinitionV3 = TypedDict(
         "slotTransforms": Dict[str, Dict[str, Dict[str, List[List[float]]]]],
         "compatibleWith": List[ModuleModel],
         "twoDimensionalRendering": Dict[str, Any],
-        "gripperOffsets": Dict[str, GripperOffsets]
+        "gripperOffsets": Dict[str, GripperOffsets],
     },
     total=False,
 )
