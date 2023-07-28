@@ -5,7 +5,7 @@ describe('The Home Page', () => {
   })
 
   it('successfully loads', () => {
-    cy.title().should('equal', 'Opentrons Protocol Designer BETA')
+    cy.title().should('equal', 'Opentrons Protocol Designer')
   })
 
   it('has the right charset', () => {
@@ -23,7 +23,6 @@ describe('The Home Page', () => {
     cy.contains('HELP')
     cy.contains('Settings')
     cy.contains('Protocol Designer')
-    cy.contains('beta')
   })
 
   it('displays all the expected images', () => {})
