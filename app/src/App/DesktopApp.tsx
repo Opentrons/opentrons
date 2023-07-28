@@ -33,6 +33,7 @@ import type { RouteProps, DesktopRouteParams } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
+  const [isDismissedModal, setIsDismissedModal] = React.useState<boolean>(false)
 
   const desktopRoutes: RouteProps[] = [
     {
@@ -96,30 +97,37 @@ export const DesktopApp = (): JSX.Element => {
     <>
       <Navbar routes={desktopRoutes} />
       <ToasterOven>
-        <Box width="100%">
-          <Switch>
-            {desktopRoutes.map(({ Component, exact, path }: RouteProps) => {
-              return (
-                <Route key={path} exact={exact} path={path}>
-                  <Breadcrumbs />
-                  <Box
-                    position={POSITION_RELATIVE}
-                    width="100%"
-                    height="100%"
-                    backgroundColor={COLORS.fundamentalsBackground}
-                    overflow={OVERFLOW_AUTO}
-                  >
-                    <ModalPortalRoot />
-                    <Component />
-                  </Box>
-                </Route>
-              )
-            })}
-            <Redirect exact from="/" to="/protocols" />
-          </Switch>
-          <RobotControlTakeover />
-          <Alerts />
-        </Box>
+        <EmergencyStopContext.Provider
+          value={{
+            isDismissedModal,
+            setIsDismissedModal,
+          }}
+        >
+          <Box width="100%">
+            <Switch>
+              {desktopRoutes.map(({ Component, exact, path }: RouteProps) => {
+                return (
+                  <Route key={path} exact={exact} path={path}>
+                    <Breadcrumbs />
+                    <Box
+                      position={POSITION_RELATIVE}
+                      width="100%"
+                      height="100%"
+                      backgroundColor={COLORS.fundamentalsBackground}
+                      overflow={OVERFLOW_AUTO}
+                    >
+                      <ModalPortalRoot />
+                      <Component />
+                    </Box>
+                  </Route>
+                )
+              })}
+              <Redirect exact from="/" to="/protocols" />
+            </Switch>
+            <RobotControlTakeover />
+            <Alerts />
+          </Box>
+        </EmergencyStopContext.Provider>
       </ToasterOven>
     </>
   )
@@ -130,11 +138,11 @@ export const DesktopApp = (): JSX.Element => {
 // }
 function RobotControlTakeover(): JSX.Element | null {
   const deviceRouteMatch = useRouteMatch({ path: '/devices/:robotName' })
-  console.log('deviceRouteMatch', deviceRouteMatch)
+  // console.log('deviceRouteMatch', deviceRouteMatch)
   const params = deviceRouteMatch?.params as DesktopRouteParams
   const robotName = params?.robotName
   const robot = useRobot(robotName)
-  const [isDismissedModal, setIsDismissedModal] = React.useState<boolean>(false)
+  // const [isDismissedModal, setIsDismissedModal] = React.useState<boolean>(false)
 
   if (deviceRouteMatch == null || robot == null || robotName == null)
     return null
@@ -145,14 +153,14 @@ function RobotControlTakeover(): JSX.Element | null {
       hostname={robot.ip ?? null}
       requestor={robot?.ip === OPENTRONS_USB ? appShellRequestor : undefined}
     >
-      <EmergencyStopContext.Provider
+      {/* <EmergencyStopContext.Provider
         value={{
           isDismissedModal,
           setIsDismissedModal,
         }}
-      >
-        <EstopTakeover robotName={robotName} />
-      </EmergencyStopContext.Provider>
+      > */}
+      <EstopTakeover robotName={robotName} />
+      {/* </EmergencyStopContext.Provider> */}
     </ApiHostProvider>
   )
 }
