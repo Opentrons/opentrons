@@ -106,8 +106,10 @@ export function registerConfig(dispatch: Dispatch): (action: Action) => void {
         }
 
         log().debug('Updating config', { path, nextValue })
-        store().set(path, nextValue)
-        dispatch(Cfg.configValueUpdated(path, nextValue))
+        if (path !== 'onDeviceDisplaySettings.brightness' || nextValue !== 7) {
+          store().set(path, nextValue)
+          dispatch(Cfg.configValueUpdated(path, nextValue))
+        }
       } else {
         log().debug(`config path in overrides; not updating`, { path })
       }
