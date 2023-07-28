@@ -147,12 +147,20 @@ commands.
 
 .. _new-pipette-models:
 
-.. start here Friday.
-.. Flex pipette load names
 Pipette Models
 ==============
 
-This table lists the model names, which are passed to :py:meth:`.ProtocolContext.load_instrument`, for each model of pipette sold by Opentrons.
+The first parameter of the :py:meth:`~.ProtocolContext.load_instrument` method is the pipette's *API load name*. The load name tells your robot which attached pipette you're going to use in a protocol. The table below lists the API load names for the currently available Flex and OT-2 pipette models.
+
+.. tabs::
+
+    .. tab:: Flex Pipettes
+        
+        Some text here
+
+    .. tab:: OT-2 Pipettes
+        
+        More text here
 
 
 +---------------------------------------+-------------------------+
