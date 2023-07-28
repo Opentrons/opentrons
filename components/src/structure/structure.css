@@ -42,13 +42,11 @@
 
 .subtitle {
   padding: 0 1.5rem;
-}
-.title.right {
-  margin-left: auto;
+  font-weight: normal;
 }
 
-.subtitle {
-  font-weight: normal;
+.title.right {
+  margin-left: auto;
 }
 
 .title_button {
