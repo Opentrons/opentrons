@@ -15,6 +15,8 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, GripperProbe
 from hardware_testing.data import ui
 
+from .utils import wait_for_instrument_presence
+
 PLUNGER_TOLERANCE_MM = 0.2
 
 GRIPPER_Z_ENDSTOP_RETRACT_MM = 0.5
@@ -34,8 +36,6 @@ PROBE_SETTINGS = CapacitivePassSettings(
 )
 
 RELATIVE_MOVE_FROM_HOME_DELTA = Point(x=-500, y=-300)
-
-SECONDS_TO_WAIT_FOR_INSTRUMENT = 15
 
 
 PIPETTE_TESTS = {
@@ -64,36 +64,6 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     for t, d in GRIPPER_TESTS.items():
         tests.append(CSVLine(f"gripper-{t}", d))  # type: ignore[arg-type]
     return tests
-
-
-async def _wait_for_instrument_presence(
-    api: OT3API, mount: OT3Mount, presence: bool
-) -> bool:
-    is_gripper = mount == OT3Mount.GRIPPER
-    instr_str = "gripper" if is_gripper else "pipette"
-    verb = "attach" if presence else "remove"
-    direction = "to" if presence else "from"
-    for countdown in range(SECONDS_TO_WAIT_FOR_INSTRUMENT):
-        print(
-            f"{verb} a {instr_str} {direction} the {mount.name} mount "
-            f"({countdown + 1}/{SECONDS_TO_WAIT_FOR_INSTRUMENT} seconds)"
-        )
-        if not api.is_simulator:
-            await sleep(1)
-        await api.cache_instruments()
-        if is_gripper:
-            found = api.has_gripper()
-        else:
-            found = api.hardware_pipettes[mount.to_mount()] is not None
-        if found == presence:
-            print(f"found instrument on {mount.name}\n")
-            return True
-    ui.print_error(
-        f"unable to detect {instr_str} was {verb}d"
-        f"{direction} {mount.name} mount "
-        f"after {SECONDS_TO_WAIT_FOR_INSTRUMENT} seconds"
-    )
-    return False
 
 
 async def _get_plunger_positions(api: OT3API, mount: OT3Mount) -> Tuple[float, float]:
@@ -306,17 +276,17 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     # PIPETTES
     for mount in [OT3Mount.LEFT, OT3Mount.RIGHT]:
         ui.print_header(f"PIPETTE - {mount.name}")
-        if await _wait_for_instrument_presence(api, mount, presence=True):
+        if await wait_for_instrument_presence(api, mount, presence=True):
             await _test_pipette(api, mount, report, section)
-            await _wait_for_instrument_presence(api, mount, presence=False)
+            await wait_for_instrument_presence(api, mount, presence=False)
 
     # GRIPPER
     ui.print_header("GRIPPER")
     if not api.is_simulator:
         ui.get_user_ready("attach a gripper")
-    if await _wait_for_instrument_presence(api, OT3Mount.GRIPPER, presence=True):
+    if await wait_for_instrument_presence(api, OT3Mount.GRIPPER, presence=True):
         await _test_gripper(api, report, section)
-        await _wait_for_instrument_presence(api, OT3Mount.GRIPPER, presence=False)
+        await wait_for_instrument_presence(api, OT3Mount.GRIPPER, presence=False)
 
     print("moving back near home position")
     await api.home([Axis.Z_L, Axis.Z_R])
