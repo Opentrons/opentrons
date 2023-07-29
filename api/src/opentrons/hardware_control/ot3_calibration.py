@@ -48,6 +48,12 @@ LINEAR_TRANSIT_HEIGHT: Final[float] = 1
 SEARCH_TRANSIT_HEIGHT: Final[float] = 5
 GRIPPER_GRIP_FORCE: Final[float] = 20
 BELT_CAL_TRANSIT_HEIGHT: Final[float] = 50
+BELT_CALIBRATION_SLOTS = {
+    "front-left": 1,
+    "front-right": 3,
+    "rear-left": 10,
+}
+BELT_CALIBRATION_MAX_MISALIGNMENT = 0.5
 
 PREP_OFFSET_DEPTH = Point(*Z_PREP_OFFSET)
 EDGES = {
@@ -92,6 +98,15 @@ class InaccurateNonContactSweepError(RuntimeError):
         super().__init__(
             f"Calibration detected a slot width of {detected_width:.3f}mm "
             f"which is too far from the design width of {nominal_width:.3f}mm"
+        )
+
+
+class RobotMisalignmentError(RuntimeError):
+    def __init__(self, x_alignment: float, y_alignment: float) -> None:
+        super().__init__(
+            f"Calibration detected a the X alignment is {x_alignment:.3f}mm "
+            f"and the Y alignment is {y_alignment:.3f}mm "
+            f"(max allowed is {BELT_CALIBRATION_MAX_MISALIGNMENT}mm)"
         )
 
 
@@ -663,29 +678,57 @@ async def _determine_transform_matrix(
     -------
     A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
     """
-    slot_a, slot_b, slot_c = 1, 10, 3
-    point_a, nominal_point_a = await find_slot_center_binary_from_nominal_center(
-        hcapi, mount, slot_a
+
+    async def _find_slot(_s: int) -> Tuple[Point, Point]:
+        _actual_nominal_points = await find_slot_center_binary_from_nominal_center(
+            hcapi, mount, _s
+        )
+        await hcapi.move_rel(mount, Point(0, 0, BELT_CAL_TRANSIT_HEIGHT))
+        return _actual_nominal_points
+
+    slots = BELT_CALIBRATION_SLOTS
+    points = {name: await _find_slot(slot) for name, slot in slots.items()}
+    await hcapi.retract(mount)
+    actual_points = (
+        (
+            points["front-left"][0].x,
+            points["front-left"][0].y,
+            points["front-left"][0].z,
+        ),
+        (
+            points["rear-left"][0].x,
+            points["rear-left"][0].y,
+            points["rear-left"][0].z,
+        ),
+        (
+            points["front-right"][0].x,
+            points["front-right"][0].y,
+            points["front-right"][0].z,
+        ),
     )
-    await hcapi.move_rel(mount, Point(0, 0, BELT_CAL_TRANSIT_HEIGHT))
-    point_b, nominal_point_b = await find_slot_center_binary_from_nominal_center(
-        hcapi, mount, slot_b
+    nominal_points = (
+        (
+            points["front-left"][1].x,
+            points["front-left"][1].y,
+            points["front-left"][1].z,
+        ),
+        (
+            points["rear-left"][1].x,
+            points["rear-left"][1].y,
+            points["rear-left"][1].z,
+        ),
+        (
+            points["front-right"][1].x,
+            points["front-right"][1].y,
+            points["front-right"][1].z,
+        ),
     )
-    await hcapi.move_rel(mount, Point(0, 0, BELT_CAL_TRANSIT_HEIGHT))
-    point_c, nominal_point_c = await find_slot_center_binary_from_nominal_center(
-        hcapi, mount, slot_c
-    )
-    expected = (
-        (nominal_point_a.x, nominal_point_a.y, nominal_point_a.z),
-        (nominal_point_b.x, nominal_point_b.y, nominal_point_b.z),
-        (nominal_point_c.x, nominal_point_c.y, nominal_point_c.z),
-    )
-    actual = (
-        (point_a.x, point_a.y, point_a.z),
-        (point_b.x, point_b.y, point_b.z),
-        (point_c.x, point_c.y, point_c.z),
-    )
-    return solve_attitude(expected, actual)
+    alignment_along_y = abs(points["front-left"][0].x - points["rear-left"][0].x)
+    alignment_along_x = abs(points["front-left"][0].y - points["front-right"][0].y)
+    max_alignment = BELT_CALIBRATION_MAX_MISALIGNMENT
+    if alignment_along_y > max_alignment or alignment_along_x > max_alignment:
+        raise RobotMisalignmentError(alignment_along_x, alignment_along_y)
+    return solve_attitude(nominal_points, actual_points)
 
 
 def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:

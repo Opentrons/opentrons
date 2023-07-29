@@ -65,7 +65,6 @@ async def _calibrate_belts(api: OT3API, mount: types.OT3Mount) -> None:
         if not api.is_simulator:
             raise e
         attitude = DEFAULT_MACHINE_TRANSFORM
-    await api.home_z(mount)
     print("attitude:")
     print(attitude)
 
@@ -100,6 +99,7 @@ async def _main(is_simulating: bool, mount: types.OT3Mount, test: bool) -> None:
             await _check_belt_accuracy(api, mount)
         print("done")
     finally:
+        await api.retract(mount)
         if not api.is_simulator:
             print("restarting opentrons-robot-server")
             helpers_ot3.start_server_ot3()
