@@ -37,12 +37,12 @@ async def _main(cfg: TestConfig) -> None:
     if not cfg.simulate:
         eeprom_data = api._backend.eeprom_data
         robot_id = eeprom_data.serial_number
-        assert eeprom_data.machine_type == "FLX", \
-            f"unexpected machine type: {robot_id}"
-        assert eeprom_data.machine_version == "A10", \
-            f"unexpected machine version: {robot_id}"
-        assert len(robot_id) == 17, \
-            f"unexpected serial number length: {robot_id}"
+        assert robot_id, "no robot serial found"
+        assert eeprom_data.machine_type == "FLX", f"unexpected machine type: {robot_id}"
+        assert (
+            eeprom_data.machine_version == "A10"
+        ), f"unexpected machine version: {robot_id}"
+        assert len(robot_id) == 17, f"unexpected serial number length: {robot_id}"
     else:
         robot_id = "simulation"
     report.set_tag(robot_id)

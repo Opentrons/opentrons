@@ -1,5 +1,4 @@
 """Test Instruments."""
-from asyncio import sleep
 from typing import List, Tuple, Optional, Union
 
 from opentrons.config.types import CapacitivePassSettings
@@ -21,7 +20,7 @@ PLUNGER_TOLERANCE_MM = 0.2
 
 GRIPPER_Z_ENDSTOP_RETRACT_MM = 0.5
 GRIPPER_GRIP_FORCE = 20
-GRIPPER_JAW_WIDTH_TOLERANCE_MM = 3.0  # FIXME: this is way too big
+GRIPPER_JAW_WIDTH_TOLERANCE_MM = 3.0
 
 GRIPPER_MAX_Z_TRAVEL_MM = 170.025
 GRIPPER_Z_NO_SKIP_TRAVEL_MM = GRIPPER_MAX_Z_TRAVEL_MM - 30  # avoid hitting clips
@@ -141,6 +140,7 @@ async def _test_pipette(
 ) -> None:
     mnt_tag = mount.name.lower()
     pip = api.hardware_pipettes[mount.to_mount()]
+    assert pip
     pip_id = helpers_ot3.get_pipette_serial_ot3(pip)
     pip_ax = Axis.of_main_tool_actuator(mount)
     top, _, _, drop_tip = helpers_ot3.get_plunger_positions_ot3(api, mount)
@@ -185,6 +185,7 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     z_ax = Axis.by_mount(mount)
     jaw_ax = Axis.of_main_tool_actuator(mount)
     gripper = api._gripper_handler.gripper
+    assert gripper
     gripper_id = gripper.gripper_id
     jaw_widths = gripper.config.geometry.jaw_width
 
@@ -197,43 +198,18 @@ async def _test_gripper(api: OT3API, report: CSVReport, section: str) -> None:
     print(f"gripper: {gripper_id}, barcode: {user_id}")
     report(section, "gripper-id", [gripper_id, user_id, result])
 
-    # NO-SKIP
-    # FIXME: DVT units had encoders added, so change this test to use them
-    async def _z_is_hitting_endstop() -> bool:
-        if api.is_simulator:
-            return True
-        _switches = await api.get_limit_switches()
-        return _switches[z_ax]
-
-    async def _z_is_not_hitting_endstop() -> bool:
-        if api.is_simulator:
-            return True
-        return not await _z_is_hitting_endstop()
-
+    # CHECK FOR MISALIGNED ENCODER
+    result = CSVResult.FAIL
+    target_z = 100
     await api.home([z_ax])
-    await api.move_rel(mount, Point(z=-5))
+    start_pos = await api.gantry_position(OT3Mount.GRIPPER)
+    await api.move_to(mount, start_pos._replace(z=target_z), _expect_stalls=True)
+    enc_pos = await api.encoder_current_position_ot3(OT3Mount.GRIPPER)
+    if abs(enc_pos[Axis.Z_G] - target_z) < 0.25:
+        await api.move_to(mount, start_pos, _expect_stalls=True)
+        if abs(enc_pos[Axis.Z_G] - target_z) < 0.25:
+            result = CSVResult.PASS
     await api.home([z_ax])
-    try:
-        assert (
-            await _z_is_hitting_endstop()
-        ), "error: not hitting gripper Z endstop after homing"
-        await api.move_rel(mount, Point(z=-GRIPPER_Z_ENDSTOP_RETRACT_MM))
-        assert (
-            await _z_is_not_hitting_endstop()
-        ), "error: hitting gripper Z endstop after retracting"
-        await api.move_rel(mount, Point(z=-GRIPPER_Z_NO_SKIP_TRAVEL_MM))
-        await api.move_rel(mount, Point(z=GRIPPER_Z_NO_SKIP_TRAVEL_MM))
-        assert (
-            await _z_is_not_hitting_endstop()
-        ), "error: hitting gripper Z endstop after moving"
-        await api.move_rel(mount, Point(z=GRIPPER_Z_ENDSTOP_RETRACT_MM))
-        assert (
-            await _z_is_hitting_endstop()
-        ), "error: not hitting gripper Z endstop after moving"
-        result = CSVResult.PASS
-    except AssertionError as e:
-        print(str(e))
-        result = CSVResult.FAIL
     report(section, "gripper-no-skip", [result])
     await api.home([z_ax])
 
