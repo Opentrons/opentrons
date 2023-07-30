@@ -14,27 +14,38 @@ async def _main(cfg: TestConfig) -> None:
     # BUILD REPORT
     test_name = Path(__file__).parent.name
     report = build_report(test_name)
-    ui.print_title(test_name.replace("_", " ").upper())
-
-    # GET INFO
-    if not cfg.simulate:
-        robot_id = input("enter robot serial number: ")
-        operator = input("enter operator name: ")
-    else:
-        robot_id = "ot3-simulated-A01"
-        operator = "simulation"
-    report.set_tag(robot_id)
-    report.set_operator(operator)
     report.set_version(get_git_description())
+    ui.print_title(test_name.replace("_", " ").upper())
 
     # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
         use_defaults=True,  # includes default XY calibration matrix
         is_simulating=cfg.simulate,
-        pipette_left="p1000_single_v3.3",
-        pipette_right="p1000_single_v3.3",
-        gripper="GRPV102",
+        pipette_left="p1000_single_v3.5",
+        pipette_right="p1000_single_v3.5",
+        gripper="GRPV122",
     )
+
+    # GET INFO
+    if not cfg.simulate:
+        operator = input("enter operator name: ")
+    else:
+        operator = "simulation"
+    report.set_operator(operator)
+
+    # GET ROBOT SERIAL NUMBER
+    if not cfg.simulate:
+        eeprom_data = api._backend.eeprom_data
+        robot_id = eeprom_data.serial_number
+        assert eeprom_data.machine_type == "FLX", \
+            f"unexpected machine type: {robot_id}"
+        assert eeprom_data.machine_version == "A10", \
+            f"unexpected machine version: {robot_id}"
+        assert len(robot_id) == 17, \
+            f"unexpected serial number length: {robot_id}"
+    else:
+        robot_id = "simulation"
+    report.set_tag(robot_id)
 
     # RUN TESTS
     for section, test_run in cfg.tests.items():
