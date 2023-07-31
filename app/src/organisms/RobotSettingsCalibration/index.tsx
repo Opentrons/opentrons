@@ -34,6 +34,7 @@ import { RobotSettingsGripperCalibration } from './RobotSettingsGripperCalibrati
 import { RobotSettingsPipetteOffsetCalibration } from './RobotSettingsPipetteOffsetCalibration'
 import { RobotSettingsTipLengthCalibration } from './RobotSettingsTipLengthCalibration'
 
+import type { GripperData } from '@opentrons/api-client'
 import type { Mount } from '@opentrons/components'
 import type { RequestState } from '../../redux/robot-api/types'
 import type {
@@ -41,7 +42,6 @@ import type {
   DeckCalibrationSession,
 } from '../../redux/sessions/types'
 import type { State, Dispatch } from '../../redux/types'
-import { GripperData } from '@opentrons/api-client'
 
 const CALS_FETCH_MS = 5000
 
