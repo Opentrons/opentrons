@@ -206,9 +206,9 @@ export function getTouchTipNotSupportedLabware(
   labwareId?: string
 ): boolean {
   const labwareDefURI = labwareId?.split(':')[1] ?? ''
-  const test =
+  const isTouchTipNotSupported =
     allLabware[labwareDefURI]?.parameters?.quirks?.includes(
       'touchTipDisabled'
     ) ?? false
-  return test
+  return isTouchTipNotSupported
 }

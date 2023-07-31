@@ -30,7 +30,7 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
   return (
     <>
       <li className={styles.substep_header}>
-        <span>Method: {useGripper ? 'With gripper' : 'Manually'} </span>
+        <span>{useGripper ? 'With gripper' : 'Manually'} </span>
       </li>
       <li className={styles.substep_header}>
         <span>LABWARE</span>
