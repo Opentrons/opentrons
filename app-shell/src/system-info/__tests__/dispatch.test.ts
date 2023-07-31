@@ -52,9 +52,7 @@ describe('app-shell::system-info module action tests', () => {
   beforeEach(() => {
     handler = registerSystemInfo(dispatch)
     isWindows.mockReturnValue(false)
-    createUsbDeviceMonitor.mockReturnValue(
-      new Promise(resolve => resolve(usbMonitor))
-    )
+    createUsbDeviceMonitor.mockReturnValue(usbMonitor)
     createNetworkInterfaceMonitor.mockReturnValue(ifaceMonitor)
     getAllDevices.mockResolvedValue([realtek0])
     getActiveInterfaces.mockReturnValue([
@@ -143,7 +141,7 @@ describe('app-shell::system-info module action tests', () => {
     })
   })
 
-  it('stops monitoring on app quit', async () => {
+  it('stops monitoring on app quit', () => {
     handler(uiInitialized())
 
     const appQuitHandler = appOnce.mock.calls.find(
@@ -152,7 +150,7 @@ describe('app-shell::system-info module action tests', () => {
     )?.[1]
 
     expect(typeof appQuitHandler).toBe('function')
-    await (appQuitHandler as Function)()
+    appQuitHandler?.()
     expect(usbMonitor.stop).toHaveBeenCalled()
     expect(ifaceMonitor.stop).toHaveBeenCalled()
   })
