@@ -29,12 +29,13 @@ def build_arg_parser():
     arg_parser.add_argument('-m', '--mount', choices=['l','r'], required=False, help='The pipette mount to be tested', default='l')
     arg_parser.add_argument('-c', '--cycles', type=int, required=False, help='Number of testing cycles', default=1)
     arg_parser.add_argument('-o', '--slot', type=int, required=False, help='Deck slot number', default=5)
+    arg_parser.add_argument('-a', '--manual', action="store_true", required=False, help='Jog gauge plunger manually')
     arg_parser.add_argument('-s', '--simulate', action="store_true", required=False, help='Simulate this test script')
     return arg_parser
 
 class Pipette_Calibration_Test:
     def __init__(
-        self, simulate: bool, cycles: int, slot: int
+        self, simulate: bool, manual: bool, cycles: int, slot: int
     ) -> None:
         self.api = None
         self.mount = None
@@ -44,6 +45,7 @@ class Pipette_Calibration_Test:
         self.slot_center = None
         self.nominal_center = None
         self.simulate = simulate
+        self.manual = manual
         self.cycles = cycles
         self.slot = slot
         self.jog_speed = 10 # mm/s
@@ -142,6 +144,8 @@ class Pipette_Calibration_Test:
         # Move to jog position
         await self.api.move_to(self.mount, jog_position, speed=self.jog_speed)
         # Read gauge
+        if self.manual:
+            input(f"Move {axis}-Axis Gauge plunger next to Probe, and press ENTER:")
         gauge = self.gauges[axis].read_stable(timeout=20)
         # Return to gauge position
         await self.api.move_to(self.mount, gauge_position, speed=100)
@@ -288,5 +292,5 @@ if __name__ == '__main__':
     print("\nOT-3 Pipette Calibration Test\n")
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
-    test = Pipette_Calibration_Test(args.simulate, args.cycles, args.slot)
+    test = Pipette_Calibration_Test(args.simulate, args.manual, args.cycles, args.slot)
     asyncio.run(test.run())
