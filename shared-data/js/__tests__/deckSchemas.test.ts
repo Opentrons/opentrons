@@ -41,7 +41,7 @@ describe('validate deck defs and fixtures', () => {
   defs.forEach(defPath => {
     const deckDef = require(defPath)
 
-    it('deck validates against v1 schema', () => {
+    it('deck validates against v3 schema', () => {
       const valid = validateSchema(deckDef)
       const validationErrors = validateSchema.errors
 

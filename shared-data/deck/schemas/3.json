@@ -12,6 +12,22 @@
       "minItems": 3,
       "maxItems": 3
     },
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      }
+    },
     "unitVector": {
       "type": "array",
       "description": "Array of 3 unit directions, [x, y, z]",
@@ -262,17 +278,18 @@
           "type": "object",
           "properties": {
             "pickUpOffset": {
-              "$ref": "#/definitions/xyzArray",
+              "$ref": "#/definitions/coordinates",
               "description": "Offset added to calculate pick-up coordinates of a labware placed on this deck."
             },
             "dropOffset": {
-              "$ref": "#/definitions/xyzArray",
+              "$ref": "#/definitions/coordinates",
               "description": "Offset added to calculate drop coordinates of a labware placed on this deck."
             }
           },
           "required": ["pickUpOffset", "dropOffset"]
         }
-      }
+      },
+      "required": ["default"]
     }
   }
 }
