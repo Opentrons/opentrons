@@ -12,16 +12,14 @@ For information about liquid handling, see :ref:`v2-atomic-commands` and :ref:`v
 
 .. _new-create-pipette:
 
-Loading A Pipette
-------------------
+Loading Pipettes
+----------------
 
 You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instrument` method. This method requires the pipette model, which is set by the API load name, it's location (e.g. ``left`` or ``right``), and a list of associated tipracks (if used). 
 
 .. tabs::
 
     .. tab:: Flex
-
-        Some text and code here.
 
         .. code-block:: Python
             :substitutions:
@@ -31,36 +29,52 @@ You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instr
             requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
 
             def run(protocol: protocol_api.ProtocolContext):
-                # Load a 1-channel 0.5–50 µL pipette in the left slot
+                # Load an 8-channel 1000 µL pipette in the left slot
                 left = protocol.load_instrument(
-                    instrument_name='flex_1channel_50',
-                    mount='left'
-                )
-                # Load an 8-channel 5–1000 µL pipette in the right slot
-                right = protocol.load_instrument(
                     instrument_name='flex_8channel_1000',
-                    mount='right'
-                )
+                    mount='left')
+                # Load a 1-channel 1000 µL pipette in the right slot, with two tip-racks    
+                tiprack1 = protocol.load_labware(
+                    load_name='opentrons_flex_96_tiprack_1000ul',
+                    location='D1')
+                tiprack2 = protocol.load_labware(
+                    load_name='opentrons_flex_96_tiprack_1000ul',
+                    location='C1')
+                right = protocol.load_instrument(
+                    instrument_name='flex_1channel_1000',
+                    mount='right',
+                    tip_racks=[tiprack1, tiprack2])
 
+        The 96-channel pipette requires the left and right mounts. You cannot load this pipette with a 1- or 8-channel pipette already attached. To load the 96-channel pipette in an API protocol, specify its load name and assign it to the ``left`` mount like this::
+
+            96-channel = protocol.load_instrument(
+                instrument_name='flex_96channel_1000',
+                mount='left') 
 
     .. tab:: OT-2
         
-        Some text and code here.
-        
         .. code-block:: python
-            :substitutions:
 
             from opentrons import protocol_api
 
             metadata = {'apiLevel': '2.14'}
 
             def run(protocol: protocol_api.ProtocolContext):
-                # Load a P50 multi on the left slot
-                left = protocol.load_instrument('p50_multi', 'left')
-                # Load a P1000 Single on the right slot, with two racks of tips
-                tiprack1 = protocol.load_labware('opentrons_96_tiprack_1000ul', 1)
-                tiprack2 = protocol.load_labware('opentrons_96_tiprack_1000ul', 2)
-                right = protocol.load_instrument('p1000_single', 'right',tip_racks=[tiprack1, tiprack2])
+                # Load a P50 multi-channel pipette on the left slot
+                left = protocol.load_instrument(
+                    instrument_name='p50_multi',
+                    mount='left')
+                # Load a P1000 Single on the right slot with two tip-racks
+                tiprack1 = protocol.load_labware(
+                    load_name='opentrons_96_tiprack_1000ul',
+                    location=1)
+                tiprack2 = protocol.load_labware(
+                    load_name='opentrons_96_tiprack_1000ul',
+                    location=2)
+                right = protocol.load_instrument(
+                    instrument_name='p1000_single',
+                    mount='right',
+                    tip_racks=[tiprack1, tiprack2])
 
 .. versionadded:: 2.0
 
@@ -71,12 +85,11 @@ Similar to working with labware and modules, you must inform the robot about the
 Multi-Channel Pipettes
 ======================
 
-All building block and advanced commands work with both single-channel (like
-``'p20_single_gen2'``) and multi-channel (like ``'p20_multi_gen2'``) pipettes.
+All building block and advanced commands work with single- and multi-channel pipettes.
+
 To keep the interface to the Opentrons API consistent between single and
 multi-channel pipettes, commands treat the *backmost channel* (furthest from the
-door) of a
-multi-channel pipette as the location of the pipette. Location arguments to
+door) of a multi-channel pipette as the location of the pipette. Location arguments to
 building block and advanced commands are specified for the backmost channel.
 This also means that offset changes (such as :py:meth:`.Well.top` or
 :py:meth:`.Well.bottom`) can be applied to the single specified well, and each
@@ -89,21 +102,21 @@ pipettes will always aspirate and dispense on all channels simultaneously.
 For instance, to aspirate from the first column of a 96-well plate you would write:
 
 .. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api
-
-    metadata = {'apiLevel': '2.14'}
 
     def run(protocol: protocol_api.ProtocolContext):
-        # Load a tiprack for 300uL tips
-        tiprack1 = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
+        # Load a tiprack for 1000uL tips
+        tiprack1 = protocol.load_labware(
+        name='opentrons_flex_96_tiprack_1000ul',
+        location='D1')
         # Load a wellplate
-        plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 4)
-
-        # Load a P300 Multi GEN2 on the right mount
+        plate = protocol.load_labware(
+            load_name='corning_96_wellplate_360ul_flat',
+            location='C1')
+            # Load an 8-channel pipette on the right mount
         right = protocol.load_instrument(
-            'p300_multi_gen2', 'right',  tip_racks=[tiprack1])
+            instrument_name='flex_8channel_1000',
+            mount='right',
+            tip_racks=[tiprack1])
 
         # Specify well A1 for pick_up_tip. The backmost channel of the
         # pipette moves to A1, which means the rest of the wells are above the
@@ -113,31 +126,27 @@ For instance, to aspirate from the first column of a 96-well plate you would wri
         # Similarly, specifying well A2 for aspirate means the pipette will
         # position its backmost channel over well A2, and the rest of the
         # pipette channels are over the rest of the wells of column 1
-        right.aspirate(300, plate['A2'])
+        right.aspirate(volume=300, location=plate['A2'])
 
         # Dispense into column 3 of the plate with all 8 channels of the
         # pipette at the top of their respective wells
-        right.dispense(300, plate['A3'].top())
+        right.dispense(volume=300, location=plate['A3'].top())
 
 In general, you should specify wells in the first row of a labware when you are
 using multi-channel pipettes. One common exception to this rule is when using
 384-well plates. The spacing between the wells in a 384-well plate and the space
 between the nozzles of a multi-channel pipette means that a multi-channel
-pipette accesses every other well in a column. Specifying well A1 acesses every
+pipette accesses every other well in a column. Specifying well A1 accesses every
 other well starting with the first (rows A, C, E, G, I, K, M, and O); specifying well
 B1 similarly accesses every other well, but starting with the second (rows B, D,
 F, H, J, L, N, and P).
 
 .. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api
-
-    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a tiprack for 300uL tips
-        tiprack1 = protocol.load_labware('opentrons_96_tiprack_300ul', 1)
+        tiprack1 = protocol.load_labware(
+            'opentrons_96_tiprack_300ul', 1)
         # Load a wellplate
         plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 4)
 
