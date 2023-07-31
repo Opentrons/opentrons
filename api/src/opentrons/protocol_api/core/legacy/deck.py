@@ -16,7 +16,7 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict
 from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.types import DeckLocation, Location, Mount, Point
+from opentrons.types import DeckLocation, Location, Mount, Point, DeckSlotName
 
 from opentrons.protocol_api.core.labware import AbstractLabware
 from opentrons.protocol_api.deck import CalibrationPosition
@@ -175,7 +175,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
         # will raise DeckConflictError if items conflict
         deck_conflict.check(
             existing_items=existing_items,  # type: ignore[arg-type]
-            new_location=slot_key_int,
+            new_location=DeckSlotName(slot_key_int),
             new_item=self._map_to_conflict_checker_item(val),
         )
 

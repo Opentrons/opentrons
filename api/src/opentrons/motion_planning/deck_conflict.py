@@ -13,8 +13,9 @@ from opentrons.motion_planning.adjacent_slots_getters import (
     get_adjacent_slots,
 )
 
+from opentrons.types import DeckSlotName
 
-_FIXED_TRASH_SLOT: Final = 12
+_FIXED_TRASH_SLOT: Final = DeckSlotName.FIXED_TRASH
 
 
 # The maximum height allowed for items adjacent to a Heater-Shaker in the x-direction.
@@ -99,9 +100,9 @@ DeckItem = Union[
 class _NothingAllowed(NamedTuple):
     """Nothing is allowed in this slot."""
 
-    location: Union[int, str]
+    location: DeckSlotName
     source_item: DeckItem
-    source_location: Union[int, str]
+    source_location: DeckSlotName
 
     def is_allowed(self, item: DeckItem) -> bool:
         return False
@@ -110,9 +111,9 @@ class _NothingAllowed(NamedTuple):
 class _MaxHeight(NamedTuple):
     """Nothing over a certain height is allowed in this slot."""
 
-    location: int
+    location: DeckSlotName
     source_item: DeckItem
-    source_location: int
+    source_location: DeckSlotName
     max_height: float
     allowed_labware: List[LabwareUri]
 
@@ -129,9 +130,9 @@ class _MaxHeight(NamedTuple):
 class _NoModule(NamedTuple):
     """No module of any kind is allowed in this slot."""
 
-    location: Union[int, str]
+    location: DeckSlotName
     source_item: DeckItem
-    source_location: Union[int, str]
+    source_location: DeckSlotName
 
     def is_allowed(self, item: DeckItem) -> bool:
         return not isinstance(item, _Module)
@@ -140,9 +141,9 @@ class _NoModule(NamedTuple):
 class _NoHeaterShakerModule(NamedTuple):
     """No Heater-Shaker module is allowed in this slot."""
 
-    location: int
+    location: DeckSlotName
     source_item: DeckItem
-    source_location: int
+    source_location: DeckSlotName
 
     def is_allowed(self, item: DeckItem) -> bool:
         return not isinstance(item, HeaterShakerModule)
@@ -151,7 +152,7 @@ class _NoHeaterShakerModule(NamedTuple):
 class _FixedTrashOnly(NamedTuple):
     """Only fixed-trash labware is allowed in this slot."""
 
-    location: int = _FIXED_TRASH_SLOT
+    location: DeckSlotName = _FIXED_TRASH_SLOT
 
     def is_allowed(self, item: DeckItem) -> bool:
         return _is_fixed_trash(item)
@@ -175,9 +176,9 @@ class DeckConflictError(ValueError):
 # things that don't fit into a single deck slot, like the Thermocycler.
 # Refactor this interface to take a more symbolic location.
 def check(
-    existing_items: Mapping[Union[int, str], DeckItem],
+    existing_items: Mapping[DeckSlotName, DeckItem],
     new_item: DeckItem,
-    new_location: Union[int, str],
+    new_location: DeckSlotName,
     robot_type: str = "OT-2 Standard",
 ) -> None:
     """Check a deck layout for conflicts.
@@ -191,8 +192,6 @@ def check(
         DeckConflictError: Adding this item should not be allowed.
     """
     restrictions: List[_DeckRestriction] = [_FixedTrashOnly()]
-    if robot_type == "OT-2 Standard":
-        new_location = int(new_location)
     # build restrictions driven by existing items
     for location, item in existing_items.items():
         restrictions += _create_restrictions(
@@ -223,7 +222,9 @@ def check(
             )
 
 
-def _create_ot2_restrictions(item: DeckItem, location: int) -> List[_DeckRestriction]:
+def _create_ot2_restrictions(
+    item: DeckItem, location: DeckSlotName
+) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
 
     if location != _FIXED_TRASH_SLOT:
@@ -284,7 +285,9 @@ def _create_ot2_restrictions(item: DeckItem, location: int) -> List[_DeckRestric
     return restrictions
 
 
-def _create_flex_restrictions(item: DeckItem, location: str) -> List[_DeckRestriction]:
+def _create_flex_restrictions(
+    item: DeckItem, location: DeckSlotName
+) -> List[_DeckRestriction]:
     restrictions: List[_DeckRestriction] = []
 
     if isinstance(item, ThermocyclerModule):
@@ -323,17 +326,12 @@ def _create_flex_restrictions(item: DeckItem, location: str) -> List[_DeckRestri
 
 
 def _create_restrictions(
-    item: DeckItem, location: Union[int, str], robot_type: str
+    item: DeckItem, location: DeckSlotName, robot_type: str
 ) -> List[_DeckRestriction]:
 
     if robot_type == "OT-2 Standard":
-        try:
-            new_location = int(location)
-        except ValueError:
-            raise DeckConflictError("OT-2 deck location is expected to be a number")
-        return _create_ot2_restrictions(item, new_location)
+        return _create_ot2_restrictions(item, location)
     else:
-        assert isinstance(location, str)
         return _create_flex_restrictions(item, location)
 
 
@@ -367,27 +365,44 @@ def _create_deck_conflict_error_message(
     return message
 
 
-def _slots_covered_by_thermocycler(thermocycler: ThermocyclerModule) -> Set[int]:
+def _slots_covered_by_thermocycler(
+    thermocycler: ThermocyclerModule,
+) -> Set[DeckSlotName]:
     if thermocycler.is_semi_configuration:
-        return {7, 10}
+        return {DeckSlotName.SLOT_7, DeckSlotName.SLOT_10}
     else:
-        return {7, 8, 10, 11}
+        return {
+            DeckSlotName.SLOT_7,
+            DeckSlotName.SLOT_10,
+            DeckSlotName.SLOT_8,
+            DeckSlotName.SLOT_11,
+        }
 
 
-def _flex_slots_covered_by_thermocycler() -> Set[str]:
-    return {"B1", "A1"}
+def _flex_slots_covered_by_thermocycler() -> Set[DeckSlotName]:
+    return {DeckSlotName.SLOT_B1, DeckSlotName.SLOT_A1}
 
 
-def _flex_right_left_hand_slots() -> List[str]:
+def _flex_right_left_hand_slots() -> List[DeckSlotName]:
     return _flex_left_hand_slots() + _flex_left_hand_slots()
 
 
-def _flex_left_hand_slots() -> List[str]:
-    return ["A1", "B1", "C1", "D1"]
+def _flex_left_hand_slots() -> List[DeckSlotName]:
+    return [
+        DeckSlotName.SLOT_A1,
+        DeckSlotName.SLOT_B1,
+        DeckSlotName.SLOT_C1,
+        DeckSlotName.SLOT_D1,
+    ]
 
 
-def _flex_right_hand_slots() -> List[str]:
-    return ["A3", "B3", "C3", "D3"]
+def _flex_right_hand_slots() -> List[DeckSlotName]:
+    return [
+        DeckSlotName.SLOT_A3,
+        DeckSlotName.SLOT_B3,
+        DeckSlotName.SLOT_C3,
+        DeckSlotName.SLOT_D3,
+    ]
 
 
 def _is_fixed_trash(item: DeckItem) -> bool:
