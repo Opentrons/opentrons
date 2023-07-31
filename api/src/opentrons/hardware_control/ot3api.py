@@ -779,8 +779,8 @@ class OT3API(
             await self._backend.update_motor_status()
             await self._cache_current_position()
             await self._cache_encoder_position()
-            if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
-                await self._backend.update_gear_motor_position()
+            # if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            #     await self._backend.update_gear_motor_position()
 
     async def _cache_current_position(self) -> Dict[Axis, float]:
         """Cache current position from backend and return in absolute deck coords."""

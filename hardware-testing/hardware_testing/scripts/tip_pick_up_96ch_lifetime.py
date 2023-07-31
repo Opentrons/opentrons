@@ -171,6 +171,7 @@ async def _main(is_simulating: bool) -> None:
     path = '/data/testing_data/calibrated_slot_locations.json'
     mount = Mount.LEFT
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
+    await api.cache_instruments()
     await api.home()
     await api.home_plunger(mount)
 
