@@ -27,7 +27,7 @@ import type { GripperData } from '@opentrons/api-client'
 const StyledTable = styled.table`
   width: 100%;
   border-collapse: collapse;
-  text-align: left;
+  text-align: ${TYPOGRAPHY.textAlignLeft};
 `
 const StyledTableHeader = styled.th`
   ${TYPOGRAPHY.labelSemiBold}
