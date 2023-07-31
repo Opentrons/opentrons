@@ -69,7 +69,7 @@ If you attempt to use the gripper to move labware in an OT-2 protocol, the API w
 Supported Labware
 =================
 
-Moving the following types of labware is fully supported by Opentrons:
+You can manually move any standard or custom labware. Using the gripper to move the following types of labware is fully supported by Opentrons:
 
 .. list-table::
     :header-rows: 1
