@@ -202,7 +202,7 @@ def test_working_volume(subject: InstrumentCore, tip_rack: LabwareCore) -> None:
         increment=None,
         prep_after=False,
     )
-    assert subject.get_hardware_state()["working_volume"] == 100
+    assert subject.get_hardware_state()["working_volume"] == 200
 
 
 @pytest.mark.parametrize(

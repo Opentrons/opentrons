@@ -52,6 +52,8 @@ from .subsystems.firmware_update_manager import (
 from .subsystems.models import SubSystem
 from .service.task_runner import TaskRunner, get_task_runner
 
+from .robot.control.estop_handler import EstopHandler
+
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
@@ -69,6 +71,7 @@ _event_unsubscribe_accessor = AppStateAccessor[Callable[[], None]](
 _firmware_update_manager_accessor = AppStateAccessor[FirmwareUpdateManager](
     "firmware_update_manager"
 )
+_estop_handler_accessor = AppStateAccessor[EstopHandler]("estop_handler")
 
 
 class _ExcPassthrough(BaseException):
@@ -214,6 +217,20 @@ async def get_firmware_update_manager(
         )
         _firmware_update_manager_accessor.set_on(app_state, update_manager)
     return update_manager
+
+
+async def get_estop_handler(
+    app_state: AppState = Depends(get_app_state),
+    thread_manager: ThreadManagedHardware = Depends(get_thread_manager),
+) -> EstopHandler:
+    """Get an Estop Handler for working with the estop."""
+    hardware = get_ot3_hardware(thread_manager)
+    estop_handler = _estop_handler_accessor.get_from(app_state)
+
+    if estop_handler is None:
+        estop_handler = EstopHandler(hw_handle=hardware)
+        _estop_handler_accessor.set_on(app_state, estop_handler)
+    return estop_handler
 
 
 async def get_robot_type() -> RobotType:

@@ -413,7 +413,7 @@ async def _fixture_check_pressure(
     pip = api.hardware_pipettes[mount.to_mount()]
     assert pip
     pip_vol = int(pip.working_volume)
-    pip_channels = int(pip.channels.value)
+    pip_channels = int(pip.channels)
     # above the fixture
     r = await _read_pressure_and_check_results(
         api, fixture, PressureEvent.PRE, write_cb, accumulate_raw_data_cb, pip_channels
@@ -645,8 +645,8 @@ async def _test_diagnostics_capacitive(
     capacitance_open_air = await _read_cap()
     print(f"open-air capacitance: {capacitance_open_air}")
     if (
-        capacitance_open_air < CAP_THRESH_OPEN_AIR[pip.channels.value][0]
-        or capacitance_open_air > CAP_THRESH_OPEN_AIR[pip.channels.value][1]
+        capacitance_open_air < CAP_THRESH_OPEN_AIR[pip.channels][0]
+        or capacitance_open_air > CAP_THRESH_OPEN_AIR[pip.channels][1]
     ):
         capacitive_open_air_pass = False
         print(f"FAIL: open-air capacitance ({capacitance_open_air}) is not correct")
@@ -663,8 +663,8 @@ async def _test_diagnostics_capacitive(
     capacitance_with_probe = await _read_cap()
     print(f"probe capacitance: {capacitance_with_probe}")
     if (
-        capacitance_with_probe < CAP_THRESH_PROBE[pip.channels.value][0]
-        or capacitance_with_probe > CAP_THRESH_PROBE[pip.channels.value][1]
+        capacitance_with_probe < CAP_THRESH_PROBE[pip.channels][0]
+        or capacitance_with_probe > CAP_THRESH_PROBE[pip.channels][1]
     ):
         capacitive_probe_attached_pass = False
         print(f"FAIL: probe capacitance ({capacitance_with_probe}) is not correct")
@@ -683,8 +683,8 @@ async def _test_diagnostics_capacitive(
     capacitance_with_square = await _read_cap()
     print(f"square capacitance: {capacitance_with_square}")
     if (
-        capacitance_with_square < CAP_THRESH_SQUARE[pip.channels.value][0]
-        or capacitance_with_square > CAP_THRESH_SQUARE[pip.channels.value][1]
+        capacitance_with_square < CAP_THRESH_SQUARE[pip.channels][0]
+        or capacitance_with_square > CAP_THRESH_SQUARE[pip.channels][1]
     ):
         capacitive_square_pass = False
         print(f"FAIL: square capacitance ({capacitance_with_square}) is not correct")
@@ -944,7 +944,7 @@ async def _main(test_config: TestConfig) -> None:
 
         # setup our labware locations
         pipette_volume = int(pipette.working_volume)
-        pipette_channels = int(pipette.channels.as_int)
+        pipette_channels = int(pipette.channels)
         IDEAL_LABWARE_LOCATIONS = _get_ideal_labware_locations(
             test_config, pipette_volume, pipette_channels
         )

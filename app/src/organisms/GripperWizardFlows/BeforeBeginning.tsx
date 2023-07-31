@@ -68,7 +68,7 @@ export const BeforeBeginning = (
     isRobotMoving,
     chainRunCommands,
     errorMessage,
-    setShowErrorMessage,
+    setErrorMessage,
   } = props
   const { t } = useTranslation(['gripper_wizard_flows', 'shared'])
   React.useEffect(() => {
@@ -78,7 +78,6 @@ export const BeforeBeginning = (
   const commandsOnProceed: CreateCommand[] = [
     { commandType: 'home' as const, params: {} },
     {
-      // @ts-expect-error(BC, 2022-03-10): this will pass type checks when we update command types from V6 to V7 in shared-data
       commandType: 'calibration/moveToMaintenancePosition' as const,
       params: {
         mount: LEFT,
@@ -92,7 +91,7 @@ export const BeforeBeginning = (
         proceed()
       })
       .catch(error => {
-        setShowErrorMessage(error.message)
+        setErrorMessage(error.message)
       })
   }
 

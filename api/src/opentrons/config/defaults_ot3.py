@@ -21,7 +21,7 @@ DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
 
 DEFAULT_LIQUID_PROBE_SETTINGS: Final[LiquidProbeSettings] = LiquidProbeSettings(
-    starting_mount_height=100,
+    # starting_mount_height=100,
     max_z_distance=40,
     min_z_distance=5,
     mount_speed=10,
@@ -81,16 +81,16 @@ DEFAULT_CALIBRATION_AXIS_MAX_SPEED: Final = 30
 
 DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 400,
-        OT3AxisKind.Y: 325,
+        OT3AxisKind.X: 350,
+        OT3AxisKind.Y: 300,
         OT3AxisKind.Z: 35,
         OT3AxisKind.P: 15,
         OT3AxisKind.Z_G: 50,
         OT3AxisKind.Q: 50,
     },
     low_throughput={
-        OT3AxisKind.X: 400,
-        OT3AxisKind.Y: 325,
+        OT3AxisKind.X: 350,
+        OT3AxisKind.Y: 300,
         OT3AxisKind.Z: 100,
         OT3AxisKind.P: 70,
         OT3AxisKind.Z_G: 50,
@@ -99,8 +99,8 @@ DEFAULT_MAX_SPEEDS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad
 
 DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoad(
     high_throughput={
-        OT3AxisKind.X: 800,
-        OT3AxisKind.Y: 500,
+        OT3AxisKind.X: 700,
+        OT3AxisKind.Y: 600,
         OT3AxisKind.Z: 150,
         OT3AxisKind.P: 30,
         OT3AxisKind.Z_G: 150,
@@ -184,7 +184,7 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
     },
     low_throughput={
         OT3AxisKind.X: 1.25,
-        OT3AxisKind.Y: 1.25,
+        OT3AxisKind.Y: 1.2,
         OT3AxisKind.Z: 1.0,
         # TODO: verify this value
         OT3AxisKind.P: 1.0,
@@ -278,9 +278,9 @@ def _build_default_liquid_probe(
     from_conf: Any, default: LiquidProbeSettings
 ) -> LiquidProbeSettings:
     return LiquidProbeSettings(
-        starting_mount_height=from_conf.get(
-            "starting_mount_height", default.starting_mount_height
-        ),
+        # starting_mount_height=from_conf.get(
+        #     "starting_mount_height", default.starting_mount_height
+        # ),
         max_z_distance=from_conf.get("max_z_distance", default.max_z_distance),
         min_z_distance=from_conf.get("min_z_distance", default.min_z_distance),
         mount_speed=from_conf.get("mount_speed", default.mount_speed),

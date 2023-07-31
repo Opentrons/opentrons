@@ -2,6 +2,7 @@ from opentrons_hardware.hardware_control.motion_planning import Move
 from opentrons.hardware_control.backends import ot3utils
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons.hardware_control.types import Axis
+from numpy import float64 as f64
 
 
 def test_create_step() -> None:
@@ -14,6 +15,39 @@ def test_create_step() -> None:
         Axis.P_R: 0,
     }
     moves = [Move.build_dummy([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R, Axis.P_L])]
+    for block in moves[0].blocks:
+        block.distance = f64(25.0)
+        block.time = f64(1.0)
+        block.initial_speed = f64(25.0)
+        block.acceleration = f64(0.0)
+        block.final_speed = f64(25.0)
+    present_nodes = [NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l]
+    move_group, final_pos = ot3utils.create_move_group(
+        origin=origin,
+        moves=moves,
+        present_nodes=present_nodes,
+    )
+    assert len(move_group) == 3
+    for step in move_group:
+        assert set(present_nodes) == set(step.keys())
+
+
+def test_filter_zero_duration_step() -> None:
+    origin = {
+        Axis.X: 0,
+        Axis.Y: 0,
+        Axis.Z_L: 0,
+        Axis.Z_R: 0,
+        Axis.P_L: 0,
+        Axis.P_R: 0,
+    }
+    moves = [Move.build_dummy([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R, Axis.P_L])]
+    for block in (moves[0].blocks[0], moves[0].blocks[1]):
+        block.distance = f64(25.0)
+        block.time = f64(1.0)
+        block.initial_speed = f64(25.0)
+        block.acceleration = f64(0.0)
+        block.final_speed = f64(25.0)
     present_nodes = [NodeId.gantry_x, NodeId.gantry_y, NodeId.head_l]
     move_group, final_pos = ot3utils.create_move_group(
         origin=origin,

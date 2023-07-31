@@ -295,7 +295,7 @@ async def _main() -> None:
                                                 args.mount_speed,
                                                 today.strftime("%b-%d-%Y"))
     liquid_probe_settings = LiquidProbeSettings(
-                                                starting_mount_height = 100,
+                                                # starting_mount_height = 100,
                                                 max_z_distance = args.max_z_distance,
                                                 min_z_distance = args.min_z_distance,
                                                 mount_speed = args.mount_speed,
@@ -318,6 +318,7 @@ async def _main() -> None:
     start_time = time.perf_counter()
     m_current = float(input("motor_current in amps: "))
     pick_up_speed = float(input("pick up tip speed in mm/s: "))
+    hw_api.clamp_tip_speed = float(input("clamp pick up Speed: "))
     await update_pick_up_current(hw_api, mount, m_current)
     await update_pick_up_speed(hw_api, mount, pick_up_speed)
     # await update_pick_up_distance(hw_api, mount, 20.0)
@@ -364,19 +365,15 @@ async def _main() -> None:
             for tip in range(1, tips_to_use + 1):
                 cp = CriticalPoint.TIP
                 tip_count += 1
-                x_offset -= 9
-                if tip_count % 12 == 0:
-                    y_offset += 9
-                if tip_count % 12 == 0:
-                    x_offset = 0
-                await asyncio.sleep(1)
                 if args.dial_indicator:
-                    tip_measurement = gauge.read()
-                    print("tip-",tip_count, "(mm): " ,tip_measurement, end="")
-                    print("\r", end="")
                     tip_position = Point(dial_loc[0] + x_offset,
                                             dial_loc[1] + y_offset,
                                             dial_loc[2])
+                    await move_to_point(hw_api, mount, tip_position, cp)
+                    await asyncio.sleep(1)
+                    tip_measurement = gauge.read()
+                    print("tip-",tip_count, "(mm): " ,tip_measurement, end="")
+                    print("\r", end="")
                     measurements.append(tip_measurement)
                     if tip_count % 12 == 0:
                         d_str = ''
@@ -388,30 +385,43 @@ async def _main() -> None:
                         # Reset Measurements list
                         measurements = []
                         print("\r\n")
-                    await move_to_point(hw_api, mount, tip_position, cp)
-            m_current = float(input("motor_current in amps: "))
-            pick_up_speed = float(input("pick up tip speed in mm/s: "))
-            # Pick up distance i originally used was 16.5
-            pick_up_distance = float(input("pick up distance in mm: "))
-            await update_pick_up_current(hw_api, mount, m_current)
-            await update_pick_up_speed(hw_api, mount, pick_up_speed)
-            await update_pick_up_distance(hw_api, mount, pick_up_distance)
-            cp = CriticalPoint.NOZZLE
-            await move_to_point(hw_api, mount, pickup_loc, cp)
-            await hw_api.pick_up_tip(mount, tip_length=tip_length[args.tip_size])
-            await hw_api.home_z(mount.LEFT)
-            input("Press Enter to continue")
+                    x_offset -= 9
+                    if tip_count % 12 == 0:
+                        y_offset += 9
+                    if tip_count % 12 == 0:
+                        x_offset = 0
+
             if args.trough:
                 await move_to_point(hw_api, mount, trough_loc, cp)
-                await hw_api.liquid_probe(mount = mount, probe_settings = liquid_probe_settings)
-            await move_to_point(hw_api, mount, droptip_loc, cp)
-            update_drop_tip_speed(hw_api, mount, pick_up_speed)
+                await hw_api.prepare_for_aspirate(Mount.LEFT)
+                await hw_api.aspirate(Mount.LEFT, test_volume)
+                await hw_api.home_z(Mount.LEFT)
+                await countdown(leak_test_time)
+                await move_to_point(hw_api, mount, trough_loc, cp)
+                await hw_api.dispense(Mount.LEFT)
+                await hw_api.home_z(Mount.LEFT)
+                #await hw_api.liquid_probe(mount = mount, probe_settings = liquid_probe_settings)
+            hw_api.clamp_drop_tip_speed = float(input("Drop tip speed: "))
+            await update_drop_tip_speed(hw_api, mount, pick_up_speed)
             cp = CriticalPoint.TIP
             await move_to_point(hw_api, mount, droptip_loc, cp)
             await hw_api.drop_tip(mount)
             await hw_api.home_z(mount)
 
-
+            m_current = float(input("motor_current in amps: "))
+            pick_up_speed = float(input("prep pick up tip speed in mm/s: "))
+            # Pick up distance i originally used was 16.5
+            pick_up_distance = float(input("pick up distance in mm: "))
+            hw_api.clamp_tip_speed = float(input("clamp pick up Speed: "))
+            await update_pick_up_current(hw_api, mount, m_current)
+            await update_pick_up_speed(hw_api, mount, pick_up_speed)
+            await update_pick_up_distance(hw_api, mount, pick_up_distance)
+            print("Clamp pick-up speed: ", api.clamp_tip_speed)
+            cp = CriticalPoint.NOZZLE
+            await move_to_point(hw_api, mount, pickup_loc, cp)
+            await hw_api.pick_up_tip(mount, tip_length=tip_length[args.tip_size])
+            await hw_api.home_z(mount.LEFT)
+            input("Press Enter to continue")
 
     except KeyboardInterrupt:
         await hw_api.disengage_axes([Axis.X, Axis.Y])

@@ -1,16 +1,17 @@
 import re
 from typing import List, Optional, Union, cast
-from dataclasses import dataclass
 from .dev_types import PipetteModel, PipetteName
-from .pipette_definition import (
+from .types import (
     PipetteChannelType,
     PipetteModelType,
     PipetteVersionType,
     PipetteGenerationType,
-    PIPETTE_AVAILABLE_TYPES,
-    PIPETTE_CHANNELS_INTS,
     PipetteModelMajorVersionType,
     PipetteModelMinorVersionType,
+)
+from .pipette_definition import (
+    PipetteNameType,
+    PipetteModelVersionType,
 )
 
 DEFAULT_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
@@ -18,35 +19,22 @@ DEFAULT_MODEL = PipetteModelType.p1000
 DEFAULT_CHANNELS = PipetteChannelType.SINGLE_CHANNEL
 DEFAULT_MODEL_VERSION = PipetteVersionType(major=1, minor=0)
 
-
-# TODO (lc 12-5-2022) Ideally we can deprecate this
-# at somepoint once we load pipettes by channels and type
-@dataclass
-class PipetteNameType:
-    pipette_type: PipetteModelType
-    pipette_channels: PipetteChannelType
-    pipette_generation: PipetteGenerationType
-
-    def __repr__(self) -> str:
-        base_name = f"{self.pipette_type.name}_{self.pipette_channels}"
-        if self.pipette_generation == PipetteGenerationType.GEN1:
-            return base_name
-        elif self.pipette_channels == PipetteChannelType.NINETY_SIX_CHANNEL:
-            return base_name
-        else:
-            return f"{base_name}_{self.pipette_generation.name.lower()}"
+PIPETTE_AVAILABLE_TYPES = [m.name for m in PipetteModelType]
+PIPETTE_CHANNELS_INTS = [c.value for c in PipetteChannelType]
 
 
-@dataclass
-class PipetteModelVersionType:
-    pipette_type: PipetteModelType
-    pipette_channels: PipetteChannelType
-    pipette_version: PipetteVersionType
+def is_model(model_or_name: Union[PipetteName, PipetteModel, None]) -> bool:
+    """Determine if we have a real model or just a PipetteName.
 
-    def __repr__(self) -> str:
-        base_name = f"{self.pipette_type.name}_{self.pipette_channels}"
+    Args:
+        model_or_name (Union[PipetteName, PipetteModel, None]): The pipette we want to check.
 
-        return f"{base_name}_v{self.pipette_version}"
+    Returns:
+        bool: Whether or not the given string is a PipetteModel
+    """
+    if not model_or_name:
+        return False
+    return "v" in model_or_name
 
 
 def supported_pipette(model_or_name: Union[PipetteName, PipetteModel, None]) -> bool:
@@ -61,10 +49,13 @@ def supported_pipette(model_or_name: Union[PipetteName, PipetteModel, None]) -> 
     if not model_or_name:
         return False
     split_model_or_name = model_or_name.split("_")
-    channels_as_int = channels_from_string(split_model_or_name[1]).as_int
+    try:
+        channels_as_int = int(channels_from_string(split_model_or_name[1]))
+    except ValueError:
+        channels_as_int = 0
     if (
         split_model_or_name[0] in PIPETTE_AVAILABLE_TYPES
-        or channels_as_int in PIPETTE_CHANNELS_INTS
+        and channels_as_int in PIPETTE_CHANNELS_INTS
     ):
         return True
     return False
@@ -88,8 +79,10 @@ def channels_from_string(channels: str) -> PipetteChannelType:
         return PipetteChannelType.NINETY_SIX_CHANNEL
     elif channels == "multi":
         return PipetteChannelType.EIGHT_CHANNEL
-    else:
+    elif channels == "single":
         return PipetteChannelType.SINGLE_CHANNEL
+    else:
+        raise ValueError("Invalid number of channels")
 
 
 def version_from_string(version: str) -> PipetteVersionType:
@@ -106,7 +99,10 @@ def version_from_string(version: str) -> PipetteVersionType:
     """
     version_list = [v for v in re.split("\\.|[v]", version) if v]
     major = cast(PipetteModelMajorVersionType, int(version_list[0]))
-    minor = cast(PipetteModelMinorVersionType, int(version_list[1]))
+    if len(version_list) > 1:
+        minor = cast(PipetteModelMinorVersionType, int(version_list[1]))
+    else:
+        minor = 0
     return PipetteVersionType(major, minor)
 
 
@@ -151,7 +147,9 @@ def generation_from_string(pipette_name_list: List[str]) -> PipetteGenerationTyp
         return PipetteGenerationType.GEN1
 
 
-def convert_to_pipette_name_type(name: PipetteName) -> PipetteNameType:
+def convert_to_pipette_name_type(
+    model_or_name: Union[PipetteName, PipetteModel]
+) -> PipetteNameType:
     """Convert the py:data:PipetteName to a py:obj:PipetteModelVersionType.
 
     `PipetteNames` are in the format of "p300_single" or "p300_single_gen1".
@@ -164,10 +162,10 @@ def convert_to_pipette_name_type(name: PipetteName) -> PipetteNameType:
         string.
 
     """
-    split_pipette_name = name.split("_")
-    channels = channels_from_string(split_pipette_name[1])
-    generation = generation_from_string(split_pipette_name)
-    pipette_type = PipetteModelType[split_pipette_name[0]]
+    split_pipette_model_or_name = model_or_name.split("_")
+    channels = channels_from_string(split_pipette_model_or_name[1])
+    generation = generation_from_string(split_pipette_model_or_name)
+    pipette_type = PipetteModelType[split_pipette_model_or_name[0]]
 
     return PipetteNameType(pipette_type, channels, generation)
 

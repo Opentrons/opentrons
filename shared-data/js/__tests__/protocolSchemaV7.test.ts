@@ -5,7 +5,7 @@ import path from 'path'
 import glob from 'glob'
 import omit from 'lodash/omit'
 
-import protocolSchema from '../../protocol/schemas/7-draft.json'
+import protocolSchema from '../../protocol/schemas/7.json'
 import labwareV2Schema from '../../labware/schemas/2.json'
 import commandV7Schema from '../../command/schemas/7.json'
 import simpleV7Fixture from '../../protocol/fixtures/7/simpleV7.json'
@@ -43,7 +43,7 @@ describe('validate v7 protocol fixtures under JSON schema', () => {
 })
 
 describe('ensure bad protocol data fails validation', () => {
-  it('$otSharedSchema is required to be "#/protocol/schemas/7-draft"', () => {
+  it('$otSharedSchema is required to be "#/protocol/schemas/7"', () => {
     expect(validateProtocol(omit(simpleV7Fixture, '$otSharedSchema'))).toBe(
       false
     )

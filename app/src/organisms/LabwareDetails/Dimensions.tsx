@@ -1,10 +1,9 @@
 import * as React from 'react'
 import { useTranslation } from 'react-i18next'
 import round from 'lodash/round'
-import { Box, SPACING } from '@opentrons/components'
+import { Box, SPACING, getFootprintDiagram } from '@opentrons/components'
 import { LabeledValue } from './StyledComponents/LabeledValue'
 import { ExpandingTitle } from './StyledComponents/ExpandingTitle'
-import { getFootprintDiagram } from './measurementGuide'
 import type { LabwareDefinition } from '../../pages/Labware/types'
 
 const toFixed = (n: number): string => round(n, 2).toFixed(2)
