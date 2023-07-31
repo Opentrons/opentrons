@@ -76,14 +76,35 @@ class Plot:
         x_right_gantry = df["XR Position"].str.strip(")(").str.split(";").str[0].astype(float)
         y_front_gantry = df["YF Position"].str.strip(")(").str.split(";").str[1].astype(float)
         y_back_gantry = df["YB Position"].str.strip(")(").str.split(";").str[1].astype(float)
+
+        x_left_encoder = df["XL Encoder"].str.strip(")(").str.split(";").str[0].astype(float)
+        x_right_encoder = df["XR Encoder"].str.strip(")(").str.split(";").str[0].astype(float)
+        y_front_encoder = df["YF Encoder"].str.strip(")(").str.split(";").str[1].astype(float)
+        y_back_encoder = df["YB Encoder"].str.strip(")(").str.split(";").str[1].astype(float)
+
+        x_left_machine = df["XL Machine"].str.strip(")(").str.split(";").str[0].astype(float)
+        x_right_machine = df["XR Machine"].str.strip(")(").str.split(";").str[0].astype(float)
+        y_front_machine = df["YF Machine"].str.strip(")(").str.split(";").str[1].astype(float)
+        y_back_machine = df["YB Machine"].str.strip(")(").str.split(";").str[1].astype(float)
+
         x_error = error["XL Error"] + error["XR Error"]
         y_error = error["YF Error"] + error["YB Error"]
+
         df_distance["X Gantry"] = (x_right_gantry - x_left_gantry) - self.GAUGE_BLOCK*2
         df_distance["Y Gantry"] = (y_back_gantry - y_front_gantry) - self.GAUGE_BLOCK*2
+        df_distance["X Encoder"] = (x_right_encoder - x_left_encoder) - self.GAUGE_BLOCK*2
+        df_distance["Y Encoder"] = (y_back_encoder - y_front_encoder) - self.GAUGE_BLOCK*2
+        df_distance["X Machine"] = (x_left_machine - x_right_machine) - self.GAUGE_BLOCK*2
+        df_distance["Y Machine"] = (y_front_machine - y_back_machine) - self.GAUGE_BLOCK*2
         df_distance["X Measured"] = self.CALIPER_X + x_error
         df_distance["Y Measured"] = self.CALIPER_Y + y_error
+
         df_distance["X Gantry Error"] = df_distance["X Gantry"] - self.CALIPER_X
         df_distance["Y Gantry Error"] = df_distance["Y Gantry"] - self.CALIPER_Y
+        df_distance["X Encoder Error"] = df_distance["X Encoder"] - self.CALIPER_X
+        df_distance["Y Encoder Error"] = df_distance["Y Encoder"] - self.CALIPER_Y
+        df_distance["X Machine Error"] = df_distance["X Machine"] - self.CALIPER_X
+        df_distance["Y Machine Error"] = df_distance["Y Machine"] - self.CALIPER_Y
         df_distance["X Measured Error"] = df_distance["X Measured"] - self.CALIPER_X
         df_distance["Y Measured Error"] = df_distance["Y Measured"] - self.CALIPER_Y
         return df_distance
@@ -91,9 +112,13 @@ class Plot:
     def avg_distance_df(self, df):
         avg_list = []
         for axis in self.axes:
-            avg_list.append([axis, "Gantry Position", df[f"{axis} Gantry"].mean(), abs(df[f"{axis} Gantry Error"].mean()), df[f"{axis} Gantry Error"].std()])
+            avg_list.append([f"{axis}-Axis", "Gantry", abs(df[f"{axis} Gantry"].mean()), abs(df[f"{axis} Gantry Error"].mean()), df[f"{axis} Gantry Error"].std()])
         for axis in self.axes:
-            avg_list.append([axis, "Measured", df[f"{axis} Measured"].mean(), abs(df[f"{axis} Measured Error"].mean()), df[f"{axis} Measured Error"].std()])
+            avg_list.append([f"{axis}-Axis", "Encoder", abs(df[f"{axis} Encoder"].mean()), abs(df[f"{axis} Encoder Error"].mean()), df[f"{axis} Encoder Error"].std()])
+        for axis in self.axes:
+            avg_list.append([f"{axis}-Axis", "Machine", abs(df[f"{axis} Machine"].mean()), abs(df[f"{axis} Machine Error"].mean()), df[f"{axis} Machine Error"].std()])
+        for axis in self.axes:
+            avg_list.append([f"{axis}-Axis", "Measured", abs(df[f"{axis} Measured"].mean()), abs(df[f"{axis} Measured Error"].mean()), df[f"{axis} Measured Error"].std()])
         df_avg_distance = pd.DataFrame(avg_list, columns=["Axis","Type","Distance","Average Error","StdDev"])
         print(df_avg_distance)
         return df_avg_distance
@@ -230,6 +255,7 @@ class Plot:
 
     def plot_avg_distance(self):
         df = self.df_avg_distance
+        cycles = len(self.df_data)
         x_axis = "Axis"
         y_axis = "Average Error"
         x_start = df[x_axis].iloc[0]
@@ -239,11 +265,11 @@ class Plot:
         fig = px.bar(df, x=x_axis, y=[y_axis], color="Type", error_y="StdDev", barmode="group")
         self.plot_param["figure"] = fig
         self.plot_param["filename"] = "plot_avg_distance"
-        self.plot_param["title"] = f"Average Absolute Error"
-        self.plot_param["x_title"] = "Axis"
+        self.plot_param["title"] = f"Average Absolute Error ({cycles} cycles)"
+        self.plot_param["x_title"] = "Gantry Axis"
         self.plot_param["y_title"] = "Average Absolute Error (mm)"
         self.plot_param["x_range"] = [x_start, x_end]
-        self.plot_param["y_range"] = [0, 1]
+        self.plot_param["y_range"] = [0, 1.2]
         self.plot_param["legend"] = "Data"
         self.plot_param["annotation"] = None
         self.write_plot(self.plot_param)
