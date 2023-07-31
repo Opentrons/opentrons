@@ -4,7 +4,7 @@ import asyncio
 from pathlib import Path
 
 from hardware_testing.data import ui, get_git_description
-from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE
+from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE, CSVResult
 from hardware_testing.opentrons_api import helpers_ot3
 
 from .config import TestSection, TestConfig, build_report, TESTS
@@ -12,10 +12,16 @@ from .config import TestSection, TestConfig, build_report, TESTS
 
 async def _main(cfg: TestConfig) -> None:
     # BUILD REPORT
-    test_name = Path(__file__).parent.name
+    test_name = Path(__file__).parent.name.replace("_", " ")
+    ui.print_title(test_name.upper())
     report = build_report(test_name)
     report.set_version(get_git_description())
-    ui.print_title(test_name.replace("_", " ").upper())
+
+    # GET OPERATOR
+    if not cfg.simulate:
+        report.set_operator(input("enter operator name: "))
+    else:
+        report.set_operator("simulation")
 
     # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
@@ -26,26 +32,15 @@ async def _main(cfg: TestConfig) -> None:
         gripper="GRPV122",
     )
 
-    # GET INFO
-    if not cfg.simulate:
-        operator = input("enter operator name: ")
-    else:
-        operator = "simulation"
-    report.set_operator(operator)
-
     # GET ROBOT SERIAL NUMBER
-    if not cfg.simulate:
-        eeprom_data = api._backend.eeprom_data
-        robot_id = eeprom_data.serial_number
-        assert robot_id, "no robot serial found"
-        assert eeprom_data.machine_type == "FLX", f"unexpected machine type: {robot_id}"
-        assert (
-            eeprom_data.machine_version == "A10"
-        ), f"unexpected machine version: {robot_id}"
-        assert len(robot_id) == 17, f"unexpected serial number length: {robot_id}"
-    else:
-        robot_id = "simulation"
+    robot_id = helpers_ot3.get_robot_serial_ot3(api)
     report.set_tag(robot_id)
+    report.set_robot_id(robot_id)
+    if not api.is_simulator:
+        barcode = input("scan robot barcode: ").strip()
+        report.set_device_id(robot_id, CSVResult.from_bool(barcode == robot_id))
+    else:
+        report.set_device_id(robot_id, CSVResult.PASS)
 
     # RUN TESTS
     for section, test_run in cfg.tests.items():
