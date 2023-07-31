@@ -67,13 +67,6 @@ def check(
         opentrons.motion_planning.deck_conflict.DeckConflictError:
             If the newly-added item conflicts with one of the existing items.
     """
-    # if engine_state.config.robot_type == "OT-3 Standard":
-    #     # No-op if this is an OT-3 deck, for now.
-    #     #
-    #     # todo(mm, 2023-02-24): Support deck conflict checking for the OT-3.
-    #     # This will likely require adding support for it in the underlying
-    #     # wrapped_deck_conflict.check() function.
-    #     return
 
     if new_labware_id is not None:
         new_location_and_item = _map_labware(engine_state, new_labware_id)
@@ -103,11 +96,12 @@ def check(
         assert existing_location not in existing_items
         existing_items[existing_location] = existing_item
 
+    robot_type = engine_state.config.robot_type
     wrapped_deck_conflict.check(
         existing_items=existing_items,  # type: ignore[arg-type]
         new_item=new_item,
         new_location=new_location,
-        robot_type=engine_state.config.robot_type,
+        robot_type=robot_type,
     )
 
 

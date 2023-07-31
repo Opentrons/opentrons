@@ -191,7 +191,8 @@ def check(
         DeckConflictError: Adding this item should not be allowed.
     """
     restrictions: List[_DeckRestriction] = [_FixedTrashOnly()]
-
+    if robot_type == "OT-2 Standard":
+        new_location = int(new_location)
     # build restrictions driven by existing items
     for location, item in existing_items.items():
         restrictions += _create_restrictions(
@@ -326,7 +327,11 @@ def _create_restrictions(
 ) -> List[_DeckRestriction]:
 
     if robot_type == "OT-2 Standard":
-        return _create_ot2_restrictions(item, int(location))
+        try:
+            new_location = int(location)
+        except ValueError:
+            raise DeckConflictError("OT-2 deck location is expected to be a number")
+        return _create_ot2_restrictions(item, new_location)
     else:
         assert isinstance(location, str)
         return _create_flex_restrictions(item, location)
@@ -369,8 +374,8 @@ def _slots_covered_by_thermocycler(thermocycler: ThermocyclerModule) -> Set[int]
         return {7, 8, 10, 11}
 
 
-def _flex_slots_covered_by_thermocycler() -> Set[int]:
-    return {7, 10}
+def _flex_slots_covered_by_thermocycler() -> Set[str]:
+    return {"B1", "A1"}
 
 
 def _flex_right_left_hand_slots() -> List[str]:

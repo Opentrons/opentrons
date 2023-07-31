@@ -9,7 +9,9 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 from opentrons.motion_planning import deck_conflict
 
 
-@pytest.mark.parametrize("robot_type, slot_name", [("OT-2 Standard", "1"), ("OT-3 Standard", "A1")])
+@pytest.mark.parametrize(
+    "robot_type, slot_name", [("OT-2 Standard", "1"), ("OT-3 Standard", "A1")]
+)
 def test_empty_no_conflict(robot_type: str, slot_name: str) -> None:
     """It should not raise on empty input."""
     deck_conflict.check(
@@ -22,8 +24,10 @@ def test_empty_no_conflict(robot_type: str, slot_name: str) -> None:
     )
 
 
-@pytest.mark.parametrize("robot_type, slot_name", [("OT-2 Standard", "1"), ("OT-3 Standard", "A1")])
-def test_no_multiple_locations(robot_type: str, slot_name:str) -> None:
+@pytest.mark.parametrize(
+    "robot_type, slot_name", [("OT-2 Standard", "1"), ("OT-3 Standard", "A1")]
+)
+def test_no_multiple_locations(robot_type: str, slot_name: str) -> None:
     """It should not allow two items in the same slot."""
     item_1 = deck_conflict.OtherModule(
         highest_z_including_labware=123, name_for_errors="some_item_1"
@@ -203,15 +207,15 @@ def test_labware_when_thermocycler(
 @pytest.mark.parametrize(
     ("labware_location", "labware_should_be_allowed"),
     [
-        (1, True),
-        (7, False),
-        (8, True),
-        (10, False),
-        (11, True),
+        ("D1", True),
+        ("B1", False),
+        ("B2", True),
+        ("A1", False),
+        ("A2", True),
     ],
 )
 def test_flex_labware_when_thermocycler(
-    labware_location: int,
+    labware_location: str,
     labware_should_be_allowed: bool,
 ) -> None:
     """It should reject labware if a Thermocycler covers the same slot."""
@@ -235,13 +239,13 @@ def test_flex_labware_when_thermocycler(
         maybe_raises = pytest.raises(  # Expect an exception..
             deck_conflict.DeckConflictError,
             match=(
-                "some_thermocycler in slot 7 prevents"
+                "some_thermocycler in slot B1 prevents"
                 f" some_labware from using slot {labware_location}"
             ),
         )
     with maybe_raises:
         deck_conflict.check(
-            existing_items={7: thermocycler},
+            existing_items={"B1": thermocycler},
             new_location=labware_location,
             new_item=labware,
             robot_type="OT-3 Standard",
@@ -254,13 +258,13 @@ def test_flex_labware_when_thermocycler(
             deck_conflict.DeckConflictError,
             match=(
                 f"some_labware in slot {labware_location}"
-                " prevents some_thermocycler from using slot 7"
+                " prevents some_thermocycler from using slot B1"
             ),
         )
     with maybe_raises:
         deck_conflict.check(
             existing_items={labware_location: labware},
-            new_location=7,
+            new_location="B1",
             new_item=thermocycler,
             robot_type="OT-3 Standard",
         )
