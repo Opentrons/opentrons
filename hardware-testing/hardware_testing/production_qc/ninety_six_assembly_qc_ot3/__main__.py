@@ -4,7 +4,7 @@ import asyncio
 from pathlib import Path
 
 from hardware_testing.data import ui, get_git_description
-from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE
+from hardware_testing.data.csv_report import RESULTS_OVERVIEW_TITLE, CSVResult
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Axis
 
@@ -12,14 +12,39 @@ from .config import TestSection, TestConfig, build_report, TESTS
 
 
 async def _main(cfg: TestConfig) -> None:
+    # BUILD REPORT
+    test_name = Path(__file__).parent.name
+    ui.print_title(test_name.replace("_", " ").upper())
+    report = build_report(test_name.replace("_", "-"))
+    report.set_version(get_git_description())
+    if not cfg.simulate:
+        report.set_operator(input("enter operator name: "))
+    else:
+        report.set_operator("simulation")
+
     # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=cfg.simulate,
         pipette_left="p1000_96_v3.4",
     )
-    await api.home()
-    home_pos = await api.gantry_position(OT3Mount.LEFT)
+    report.set_robot_id(helpers_ot3.get_robot_serial_ot3(api))
+
+    # PIPETTE SERIAL NUMBER
     mount = OT3Mount.LEFT
+    pipette = api.hardware_pipettes[mount.to_mount()]
+    assert pipette
+    pipette_id = str(pipette.pipette_id)
+    report.set_tag(pipette_id)
+    if not api.is_simulator:
+        barcode = input("scan pipette barcode: ").strip()
+        barcode_result = CSVResult(barcode == pipette_id)
+        report.set_device_id(pipette_id, barcode_result)
+    else:
+        report.set_device_id(pipette_id, CSVResult.PASS)
+
+    # HOME and ATTACH
+    await api.home()
+    home_pos = await api.gantry_position(mount)
     attach_pos = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     attach_pos = attach_pos._replace(z=home_pos.z)
     if not api.hardware_pipettes[mount.to_mount()]:
@@ -30,26 +55,11 @@ async def _main(cfg: TestConfig) -> None:
         while not api.hardware_pipettes[mount.to_mount()]:
             ui.get_user_ready("attach a 96ch pipette")
             await api.reset()
-        await api.home_z(OT3Mount.LEFT)
-
-    pipette = api.hardware_pipettes[mount.to_mount()]
-    assert pipette
-    pipette_id = str(pipette.pipette_id)
+        await api.home_z(mount)
 
     # FIXME: remove this once the "'L' format requires 0 <= number <= 4294967295" bug is gone
     await api._backend.home([Axis.P_L], api.gantry_load)
     await api.refresh_positions()
-
-    # BUILD REPORT
-    test_name = Path(__file__).parent.name
-    ui.print_title(test_name.replace("_", " ").upper())
-    report = build_report(test_name.replace("_", "-"))
-    report.set_tag(pipette_id)
-    if not cfg.simulate:
-        report.set_operator(input("enter operator name: "))
-    else:
-        report.set_operator("simulation")
-    report.set_version(get_git_description())
 
     # RUN TESTS
     for section, test_run in cfg.tests.items():
