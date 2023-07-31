@@ -406,9 +406,9 @@ async def update_drop_tip_speed(
 ) -> None:
     """Update drop-tip current."""
     pipette = _get_pipette_from_mount(api, mount)
-    config_model = pipette.drop_configurations
+    config_model = pipette._drop_configurations
     config_model.speed = speed
-    pipette.drop_configurations = config_model
+    pipette._drop_configurations = config_model
 
 
 

@@ -1062,6 +1062,7 @@ class OT3Controller:
     ) -> Dict[NodeId, float]:
         head_node = axis_to_node(Axis.by_mount(mount))
         tool = sensor_node_for_pipette(OT3Mount(mount.value))
+        print(f"tool: {tool}")
         positions = await liquid_probe(
             self._messenger,
             tool,

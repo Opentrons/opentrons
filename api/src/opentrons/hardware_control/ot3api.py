@@ -226,7 +226,8 @@ class OT3API(
         self._status_bar_controller = StatusBarStateController(
             self._backend.status_bar_interface()
         )
-
+        self.clamp_speed = 5.5
+        self.clamp_drop_tip_speed = 5.5
         self._pipette_handler = OT3PipetteHandler({m: None for m in OT3Mount})
         self._gripper_handler = GripperHandler(gripper=None)
         OT3RobotCalibrationProvider.__init__(self, self._config)
@@ -811,8 +812,8 @@ class OT3API(
             await self._backend.update_motor_status()
             await self._cache_current_position()
             await self._cache_encoder_position()
-            if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
-                await self._backend.update_gear_motor_position()
+            # if self._gantry_load == GantryLoad.HIGH_THROUGHPUT:
+            #     await self._backend.update_gear_motor_position()
 
     async def _cache_current_position(self) -> Dict[Axis, float]:
         """Cache current position from backend and return in absolute deck coords."""
@@ -1700,7 +1701,7 @@ class OT3API(
             gear_origin_dict = {Axis.Q: pipette_spec.pick_up_distance -9}
             gear_target_dict = {Axis.Q: pipette_spec.pick_up_distance}
             clamp_moves = self._build_moves(
-                gear_origin_dict, gear_target_dict, speed=5.5
+                gear_origin_dict, gear_target_dict, speed = self.clamp_speed
             )
             await self._backend.tip_action(moves=clamp_moves[0], tip_action="clamp")
 
@@ -1811,7 +1812,7 @@ class OT3API(
                 gear_start_position = move.target_position - 9
                 pickup_target_dict = {Axis.Q: move.target_position}
                 drop_moves = self._build_moves(
-                    {Axis.Q: gear_start_position}, pickup_target_dict, speed=5.5
+                    {Axis.Q: gear_start_position}, pickup_target_dict, speed=self.clamp_drop_tip_speed
                 )
 
                 await self._backend.tip_action(moves=drop_moves[0], tip_action="clamp")
@@ -2099,16 +2100,13 @@ class OT3API(
         probe_settings: Optional[LiquidProbeSettings] = None,
     ) -> float:
         """Search for and return liquid level height.
-
         This function begins by moving the mount the distance specified by starting_mount_height in the
         LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
         reading from the pressure sensor.
-
         If the move is completed without the specified threshold being triggered, a
         LiquidNotFound error will be thrown.
         If the threshold is triggered before the minimum z distance has been traveled,
         a EarlyLiquidSenseTrigger error will be thrown.
-
         Otherwise, the function will stop moving once the threshold is triggered,
         and return the position of the
         z axis in deck coordinates, as well as the encoder position, where
@@ -2125,23 +2123,20 @@ class OT3API(
             probe_settings = self.config.liquid_sense
         mount_axis = Axis.by_mount(mount)
 
-        gantry_position = await self.gantry_position(mount, refresh=True)
-
-        await self.move_to(
-            mount,
-            top_types.Point(
-                x=gantry_position.x,
-                y=gantry_position.y,
-                z=probe_settings.starting_mount_height,
-            ),
-        )
-
+        # homes plunger then moves it to bottom of axis
         if probe_settings.aspirate_while_sensing:
             await self.home_plunger(mount)
 
+        # if not aspirate_while_sensing, plunger should be at bottom, since
+        #  this expects to be called after pick_up_tip
+
         plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
 
-        machine_pos_node_id = await self._backend.liquid_probe(
+        # get position before moving in deck coordinates
+        starting_position = await self.current_position_ot3(
+            mount=mount, critical_point=CriticalPoint.TIP, refresh=True
+        )
+        await self._backend.liquid_probe(
             mount,
             probe_settings.max_z_distance,
             probe_settings.mount_speed,
@@ -2151,27 +2146,115 @@ class OT3API(
             probe_settings.auto_zero_sensor,
             probe_settings.num_baseline_reads,
         )
-        machine_pos = axis_convert(machine_pos_node_id, 0.0)
-        position = self._deck_from_machine(machine_pos)
+
+        # get final position in deck coordinates
+        final_position = await self.current_position_ot3(
+            mount=mount, critical_point=CriticalPoint.TIP, refresh=True
+        )
+
         z_distance_traveled = (
-            position[mount_axis] - probe_settings.starting_mount_height
+            starting_position[mount_axis] - final_position[mount_axis]
         )
         if z_distance_traveled < probe_settings.min_z_distance:
-            min_z_travel_pos = position
+            min_z_travel_pos = final_position
             min_z_travel_pos[mount_axis] = probe_settings.min_z_distance
-            raise EarlyLiquidSenseTrigger(
-                triggered_at=position,
-                min_z_pos=min_z_travel_pos,
-            )
-        elif z_distance_traveled > probe_settings.max_z_distance:
-            max_z_travel_pos = position
+            # raise EarlyLiquidSenseTrigger(
+            #     triggered_at=final_position,
+            #     min_z_pos=min_z_travel_pos,
+            # )
+        elif z_distance_traveled >= probe_settings.max_z_distance:
+            max_z_travel_pos = final_position
             max_z_travel_pos[mount_axis] = probe_settings.max_z_distance
             raise LiquidNotFound(
-                position=position,
+                position=final_position,
                 max_z_pos=max_z_travel_pos,
             )
 
-        return position[mount_axis]
+        encoder_pos = await self.encoder_current_position_ot3(
+            mount=mount, critical_point=CriticalPoint.TIP, refresh=True
+        )
+
+        return final_position, encoder_pos
+
+    # async def liquid_probe(
+    #     self,
+    #     mount: OT3Mount,
+    #     probe_settings: Optional[LiquidProbeSettings] = None,
+    # ) -> float:
+    #     """Search for and return liquid level height.
+    #
+    #     This function begins by moving the mount the distance specified by starting_mount_height in the
+    #     LiquidProbeSettings. After this, the mount and plunger motors will move simultaneously while
+    #     reading from the pressure sensor.
+    #
+    #     If the move is completed without the specified threshold being triggered, a
+    #     LiquidNotFound error will be thrown.
+    #     If the threshold is triggered before the minimum z distance has been traveled,
+    #     a EarlyLiquidSenseTrigger error will be thrown.
+    #
+    #     Otherwise, the function will stop moving once the threshold is triggered,
+    #     and return the position of the
+    #     z axis in deck coordinates, as well as the encoder position, where
+    #     the liquid was found.
+    #     """
+    #
+    #     checked_mount = OT3Mount.from_mount(mount)
+    #     instrument = self._pipette_handler.get_pipette(checked_mount)
+    #     self._pipette_handler.ready_for_tip_action(
+    #         instrument, HardwareAction.LIQUID_PROBE
+    #     )
+    #
+    #     if not probe_settings:
+    #         probe_settings = self.config.liquid_sense
+    #     mount_axis = Axis.by_mount(mount)
+    #
+    #     gantry_position = await self.gantry_position(mount, refresh=True)
+    #
+    #     await self.move_to(
+    #         mount,
+    #         top_types.Point(
+    #             x=gantry_position.x,
+    #             y=gantry_position.y,
+    #             z=probe_settings.starting_mount_height,
+    #         ),
+    #     )
+    #
+    #     if probe_settings.aspirate_while_sensing:
+    #         await self.home_plunger(mount)
+    #
+    #     plunger_direction = -1 if probe_settings.aspirate_while_sensing else 1
+    #
+    #     machine_pos_node_id = await self._backend.liquid_probe(
+    #         mount,
+    #         probe_settings.max_z_distance,
+    #         probe_settings.mount_speed,
+    #         (probe_settings.plunger_speed * plunger_direction),
+    #         probe_settings.sensor_threshold_pascals,
+    #         probe_settings.log_pressure,
+    #         probe_settings.auto_zero_sensor,
+    #         probe_settings.num_baseline_reads,
+    #     )
+    #     machine_pos = axis_convert(machine_pos_node_id, 0.0)
+    #     position = self._deck_from_machine(machine_pos)
+    #     z_distance_traveled = (
+    #         position[mount_axis] - probe_settings.starting_mount_height
+    #     )
+    #     if z_distance_traveled < probe_settings.min_z_distance:
+    #         min_z_travel_pos = position
+    #         min_z_travel_pos[mount_axis] = probe_settings.min_z_distance
+    #         raise EarlyLiquidSenseTrigger(
+    #             triggered_at=position,
+    #             min_z_pos=min_z_travel_pos,
+    #         )
+    #     elif z_distance_traveled > probe_settings.max_z_distance:
+    #         max_z_travel_pos = position
+    #         max_z_travel_pos[mount_axis] = probe_settings.max_z_distance
+    #         raise LiquidNotFound(
+    #             position=position,
+    #             max_z_pos=max_z_travel_pos,
+    #         )
+    #
+    #     return position[mount_axis]
 
     async def capacitive_probe(
         self,
