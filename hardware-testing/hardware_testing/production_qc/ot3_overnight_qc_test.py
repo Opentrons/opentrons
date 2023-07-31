@@ -259,7 +259,7 @@ async def _run_mount_up_down(
     else:
         mount_type = "Mount_up_down-Right"
     for pos in mount_up_down_points:
-        LOG.info(f"mount_up_down: {pos}")
+        LOG.debug(f"mount_up_down: {pos}")
         es, en, al = await _move_and_check(api, is_simulating, mount, pos)
         for ax in GANTRY_AXES:
             error_sum[ax] += en[ax] - es[ax]
@@ -274,15 +274,14 @@ async def _run_mount_up_down(
             pass_count += 1
         else:
             await api.home()
+            break
 
     num_points = len(mount_up_down_points)
     error_results = {ax: error_sum[ax] / num_points for ax in GANTRY_AXES}
     if pass_count == num_points:
-        LOG.info(f"mount_up_down: True")
         _record_run_data(mount_type, write_cb, error_results, True)
         return True
     else:
-        LOG.info(f"mount_up_down: True")
         _record_run_data(mount_type, write_cb, error_results, False)
         return False
 
@@ -309,6 +308,7 @@ async def _run_bowtie(
             pass_count += 1
         else:
             await api.home()
+            break
 
     num_points = len(bowtie_points)
     error_results = {ax: error_sum[ax] / num_points for ax in GANTRY_AXES}
@@ -342,6 +342,7 @@ async def _run_hour_glass(
             pass_count += 1
         else:
             await api.home()
+            break
 
     num_points = len(hour_glass_points)
     error_results = {ax: error_sum[ax] / num_points for ax in GANTRY_AXES}
@@ -522,11 +523,11 @@ async def _run_z_motion(
         fail_count = 0
         pass_count = 0
         for i in range(arguments.cycles):
-            for mount in MOUNT_AXES:
+            for z_mount in MOUNT_AXES:
                 res = await _run_mount_up_down(
                     api,
                     arguments.simulate,
-                    mount,
+                    z_mount,
                     mount_up_down_points[mount],
                     write_cb,
                     arguments.record_error,
@@ -714,12 +715,12 @@ async def _main(arguments: argparse.Namespace) -> None:
                     arguments.record_error,
                 )
                 if not arguments.skip_mount:
-                    for mount in MOUNT_AXES:
+                    for z_mount in MOUNT_AXES:
                         await _run_mount_up_down(
                             api,
                             arguments.simulate,
-                            mount,
-                            mount_up_down_points[mount],
+                            z_mount,
+                            mount_up_down_points[z_mount],
                             csv_cb.write,
                             arguments.record_error,
                         )
@@ -733,12 +734,12 @@ async def _main(arguments: argparse.Namespace) -> None:
                     arguments.record_error,
                 )
                 if not arguments.skip_mount:
-                    for mount in MOUNT_AXES:
+                    for z_mount in MOUNT_AXES:
                         await _run_mount_up_down(
                             api,
                             arguments.simulate,
-                            mount,
-                            mount_up_down_points[mount],
+                            z_mount,
+                            mount_up_down_points[z_mount],
                             csv_cb.write,
                             arguments.record_error,
                         )
