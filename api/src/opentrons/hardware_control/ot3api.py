@@ -68,6 +68,7 @@ from .backends.ot3simulator import OT3Simulator
 from .backends.ot3utils import (
     get_system_constraints,
     get_system_constraints_for_calibration,
+    get_system_constraints_for_plunger_acceleration,
 )
 from .backends.errors import SubsystemUpdating
 from .execution_manager import ExecutionManagerProvider
@@ -260,6 +261,14 @@ class OT3API(
         mod_log.debug(
             f"Set system constraints for calibration: {self._move_manager.get_constraints()}"
         )
+
+    async def set_system_constraints_for_plunger_acceleration(
+        self, mount: OT3Mount, acceleration: float
+    ) -> None:
+        new_constraints = get_system_constraints_for_plunger_acceleration(
+            self._config.motion_settings, self._gantry_load, mount, acceleration
+        )
+        self._move_manager.update_constraints(new_constraints)
 
     @contextlib.asynccontextmanager
     async def restore_system_constrants(self) -> AsyncIterator[None]:
@@ -1546,11 +1555,15 @@ class OT3API(
             await self._backend.set_active_current(
                 {aspirate_spec.axis: aspirate_spec.current}
             )
-            await self._move(
-                target_pos,
-                speed=aspirate_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, aspirate_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=aspirate_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Aspirate failed")
             aspirate_spec.instr.set_current_volume(0)
@@ -1582,11 +1595,15 @@ class OT3API(
             await self._backend.set_active_current(
                 {dispense_spec.axis: dispense_spec.current}
             )
-            await self._move(
-                target_pos,
-                speed=dispense_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, dispense_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=dispense_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Dispense failed")
             dispense_spec.instr.set_current_volume(0)
@@ -1630,11 +1647,15 @@ class OT3API(
         )
 
         try:
-            await self._move(
-                target_pos,
-                speed=blowout_spec.speed,
-                home_flagged_axes=False,
-            )
+            async with self.restore_system_constrants():
+                await self.set_system_constraints_for_plunger_acceleration(
+                    realmount, blowout_spec.acceleration
+                )
+                await self._move(
+                    target_pos,
+                    speed=blowout_spec.speed,
+                    home_flagged_axes=False,
+                )
         except Exception:
             self._log.exception("Blow out failed")
             raise

@@ -10,7 +10,7 @@ from hardware_testing.drivers.pressure_fixture import (
     SimPressureFixture,
 )
 
-from hardware_testing.data.csv_report import CSVReport, CSVSection, CSVLine
+from hardware_testing.data.csv_report import CSVReport, CSVSection, CSVLine, CSVResult
 from hardware_testing.data import ui, get_git_description
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Point, OT3Mount
@@ -94,12 +94,6 @@ def _get_tip_offset_in_rack(tip_name: str) -> Point:
 async def _main(is_simulating: bool, volume: float) -> None:
     ui.print_title("TIP IQC")
 
-    # CONNECT
-    api = await helpers_ot3.build_async_ot3_hardware_api(
-        is_simulating=is_simulating, pipette_left="p50_single_v3.4"
-    )
-    mount = OT3Mount.LEFT
-
     # CREATE CSV REPORT
     report = CSVReport(
         test_name="tip-iqc-ot3",
@@ -115,13 +109,31 @@ async def _main(is_simulating: bool, volume: float) -> None:
             for tip in WELL_NAMES
         ],
     )
-    if api.is_simulator:
+    version = get_git_description()
+    report.set_version(version)
+    print(f"version: {version}")
+    if is_simulating:
         report.set_operator("simulation")
         report.set_tag("simulation")
+        report.set_device_id("simulation", CSVResult.PASS)
     else:
-        report.set_operator(input("enter OPERATOR: "))
-        report.set_tag(input("enter TAG: "))
-    report.set_version(get_git_description())
+        report.set_operator(input("enter OPERATOR: ").strip())
+        tag = input("enter TAG: ").strip()
+        report.set_tag(tag)
+        report.set_device_id(tag, CSVResult.from_bool(bool(tag)))
+
+    # BUILD API
+    api = await helpers_ot3.build_async_ot3_hardware_api(
+        is_simulating=is_simulating,
+        pipette_left="p1000_single_v3.3",
+        pipette_right="p1000_single_v3.3",
+        gripper="GRPV1120230323A01",
+    )
+    report.set_firmware(api.fw_version)
+    robot_id = helpers_ot3.get_robot_serial_ot3(api)
+    print(f"robot serial: {robot_id}")
+    report.set_robot_id(robot_id)
+    mount = OT3Mount.LEFT
 
     # SETUP DECK
     if not api.is_simulator:
