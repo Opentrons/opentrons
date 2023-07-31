@@ -19,6 +19,7 @@ For more details about this release, please see the full [technical change log][
 - Support for PVT (v1.1) grippers
 - Update progress should get displayed after restart for firmware updates
 - Removed `use_pick_up_location_lpc_offset` and `use_drop_location_lpc_offset` from `protocol_context.move_labware` arguments. So they should be removed from any protocols that used them. This change also requires resetting the protocol run database on the robot.
+- Added 'contextual' gripper offsets to deck, labware and module definitions. So, any labware movement offsets that were previously being specified in the protocol should now be removed or adjusted or they will get added twice.
 
 
 ## Big Things That Don't Work Yet So Don't Report Bugs About Them
