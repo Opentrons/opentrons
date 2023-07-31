@@ -4,6 +4,7 @@ from enum import Enum
 from typing import List, Tuple, Any
 
 from hardware_testing.data.csv_report import (
+    CSVResult,
     CSVReport,
     CSVSection,
     CSVLine,
@@ -310,6 +311,8 @@ def store_serial_numbers(
     liquid: str,
 ) -> None:
     """Report serial numbers."""
+    report.set_robot_id(robot)
+    report.set_device_id(pipette, CSVResult.PASS)
     report("SERIAL-NUMBERS", "robot", [robot])
     report("SERIAL-NUMBERS", "pipette", [pipette])
     report("SERIAL-NUMBERS", "tips", [tips])

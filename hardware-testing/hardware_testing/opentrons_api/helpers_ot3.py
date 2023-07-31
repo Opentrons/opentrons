@@ -976,6 +976,16 @@ def get_pipette_serial_ot3(pipette: Union[PipetteOT2, PipetteOT3]) -> str:
     return f"P{volume}{channels}V{version}{id}"
 
 
+def get_robot_serial_ot3(api: OT3API) -> str:
+    """Get robot serial number."""
+    if api.is_simulator:
+        return "FLXA1000000000000"
+    robot_id = api._backend.eeprom_data.serial_number
+    if not robot_id:
+        robot_id = "None"
+    return robot_id
+
+
 def clear_pipette_ul_per_mm(api: OT3API, mount: OT3Mount) -> None:
     """Clear pipette ul-per-mm."""
 
