@@ -687,9 +687,8 @@ async def _main(arguments: argparse.Namespace) -> None:
                 arguments, api, mount, mount_up_down_points, csv_cb.write
             )
         # set the default config
-        await helpers_ot3.set_gantry_load_per_axis_settings_ot3(
-            api, DEFAULT_AXIS_SETTINGS
-        )
+        await api.set_gantry_load(api.gantry_load)
+        
         for i in range(arguments.cycles):
             csv_cb.write(["--------"])
             csv_cb.write(["run-cycle", i + 1])
@@ -735,7 +734,7 @@ async def _main(arguments: argparse.Namespace) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--cycles", type=int, default=2)
+    parser.add_argument("--cycles", type=int, default=50)
     parser.add_argument("--sn", type=str, default="SN")
     parser.add_argument("--skip_bowtie", action="store_true")
     parser.add_argument("--skip_hourglass", action="store_true")
