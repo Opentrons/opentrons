@@ -251,7 +251,12 @@ async def _run_mount_up_down(
     ui.print_header("Run mount up and down")
     pass_count = 0
     error_sum = {ax: 0 for ax in GANTRY_AXES}
+    if mount is OT3Mount.LEFT:
+        mount_type = "Mount_up_down-Left"
+    else:
+        mount_type = "Mount_up_down-Right"
     for pos in mount_up_down_points:
+        LOG.info(f"mount_up_down: {pos}")
         es, en, al = await _move_and_check(api, is_simulating, mount, pos)
         for ax in GANTRY_AXES:
             error_sum[ax] += en[ax] - es[ax]
@@ -260,20 +265,22 @@ async def _run_mount_up_down(
                 mount_type = "Mount_up_down-Left"
             else:
                 mount_type = "Mount_up_down-Right"
-            _record_axis_data(mount_type, write_cb, es, en, al)
+            _record_axis_data(f"_{mount_type}", write_cb, es, en, al)
             print(f"{mount_type} results: {al}")
         if al:
             pass_count += 1
         else:
-            api.home()
+            await api.home()
 
     num_points = len(mount_up_down_points)
     error_results = {ax: error_sum[ax]/num_points for ax in GANTRY_AXES}
     if pass_count == num_points:
-        _record_run_data("Bowtie", write_cb, error_results, True)
+        LOG.info(f"mount_up_down: True")
+        _record_run_data(mount_type, write_cb, error_results, True)
         return True
     else:
-        _record_run_data("Bowtie", write_cb, error_results, False)
+        LOG.info(f"mount_up_down: True")
+        _record_run_data(mount_type, write_cb, error_results, False)
         return False
 
 
@@ -293,12 +300,12 @@ async def _run_bowtie(
         for ax in GANTRY_AXES:
             error_sum[ax] += en[ax] - es[ax]
         if record_bool:
-            _record_axis_data("Bowtie", write_cb, es, en, al)
+            _record_axis_data("_Bowtie", write_cb, es, en, al)
             print(f"bowtie results: {al}")
         if al:
             pass_count += 1
         else:
-            api.home()
+            await api.home()
 
     num_points = len(bowtie_points)
     error_results = {ax: error_sum[ax]/num_points for ax in GANTRY_AXES}
@@ -326,20 +333,20 @@ async def _run_hour_glass(
         for ax in GANTRY_AXES:
             error_sum[ax] += en[ax] - es[ax]
         if record_bool:
-            _record_axis_data("Hour_glass", write_cb, es, en, al)
+            _record_axis_data("_Hour_glass", write_cb, es, en, al)
             print(f"hour glass results: {al}")
         if al:
             pass_count += 1
         else:
-            api.home()
+            await api.home()
 
     num_points = len(hour_glass_points)
     error_results = {ax: error_sum[ax]/num_points for ax in GANTRY_AXES}
     if pass_count == num_points:
-        _record_run_data("Bowtie", write_cb, error_results, True)
+        _record_run_data("Hour_glass", write_cb, error_results, True)
         return True
     else:
-        _record_run_data("Bowtie", write_cb, error_results, False)
+        _record_run_data("Hour_glass", write_cb, error_results, False)
         return False
 
 
@@ -602,7 +609,8 @@ async def enforce_pipette_attached(api: OT3API,
     if not api.hardware_pipettes[mount.to_mount()]:
         await helpers_ot3.move_to_arched_ot3(api, mount, attach_pos)
         while not api.hardware_pipettes[mount.to_mount()]:
-            ui.get_user_ready("attach a multichannel pipette to left mount")
+            ui.get_user_ready(f"attach a multichannel pipette to {mount.name} mount")
+            time.sleep(0.5)
             await api.reset()
         await api.home_z(mount)
 
@@ -688,7 +696,8 @@ async def _main(arguments: argparse.Namespace) -> None:
             print(f"Cycle {i + 1}/{arguments.cycles}")
             if not arguments.skip_bowtie:
                 await _run_bowtie(
-                    api, arguments.simulate, mount, bowtie_points, csv_cb.write
+                    api, arguments.simulate, mount, bowtie_points,
+                    csv_cb.write, arguments.record_error
                 )
                 if not arguments.skip_mount:
                     for mount in MOUNT_AXES:
@@ -698,11 +707,12 @@ async def _main(arguments: argparse.Namespace) -> None:
                             mount,
                             mount_up_down_points[mount],
                             csv_cb.write,
-                            arguments.record_error,
+                            arguments.record_error
                         )
             if not arguments.skip_hourglass:
                 await _run_hour_glass(
-                    api, arguments.simulate, mount, hour_glass_points, csv_cb.write
+                    api, arguments.simulate, mount, hour_glass_points,
+                    csv_cb.write, arguments.record_error
                 )
                 if not arguments.skip_mount:
                     for mount in MOUNT_AXES:
@@ -712,12 +722,11 @@ async def _main(arguments: argparse.Namespace) -> None:
                             mount,
                             mount_up_down_points[mount],
                             csv_cb.write,
-                            arguments.record_error,
+                            arguments.record_error
                         )
     except KeyboardInterrupt:
         print("Cancelled")
     finally:
-        await api.disengage_axes(GANTRY_AXES)
         await api.clean_up()
 
     ui.print_title("Test Done")
