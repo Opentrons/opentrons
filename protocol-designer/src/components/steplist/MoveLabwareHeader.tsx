@@ -1,11 +1,6 @@
 import * as React from 'react'
 import cx from 'classnames'
-import {
-  Icon,
-  Tooltip,
-  useHoverTooltip,
-  TOOLTIP_FIXED,
-} from '@opentrons/components'
+import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 
@@ -61,8 +56,7 @@ export function MoveLabwareHeader(props: MoveLabwareHeaderProps): JSX.Element {
           {sourceLabwareNickname}
         </span>
 
-        <Icon className={styles.step_subitem_spacer} name="ot-transfer" />
-
+        <div className={styles.spacer} />
         <span {...destTargetProps} className={styles.labware_display_name}>
           {destSlot}
         </span>
