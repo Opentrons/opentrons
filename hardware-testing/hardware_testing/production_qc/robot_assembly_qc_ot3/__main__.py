@@ -12,7 +12,7 @@ from .config import TestSection, TestConfig, build_report, TESTS
 
 async def _main(cfg: TestConfig) -> None:
     # BUILD REPORT
-    test_name = Path(__file__).parent.name.replace("_", " ")
+    test_name = Path(__file__).parent.name.replace("_", "-")
     ui.print_title(test_name.upper())
     report = build_report(test_name)
     report.set_version(get_git_description())
