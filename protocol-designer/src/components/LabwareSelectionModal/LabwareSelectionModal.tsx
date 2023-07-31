@@ -97,13 +97,13 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
 export const getLabwareIsRecommended = (
   def: LabwareDefinition2,
   moduleType?: ModuleType | null
-): boolean => {
-  return moduleType
+): boolean =>
+  moduleType
     ? RECOMMENDED_LABWARE_BY_MODULE[moduleType].includes(
         def.parameters.loadName
       )
     : false
-}
+
 export const LabwareSelectionModal = (props: Props): JSX.Element | null => {
   const {
     customLabwareDefs,
