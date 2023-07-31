@@ -9,11 +9,6 @@ import { PHYSICALLY_ENGAGED, LOGICALLY_ENGAGED, NOT_PRESENT } from './constants'
 
 const ESTOP_REFETCH_INTERVAL_MS = 10000
 
-interface ShowModalType {
-  showModal: boolean
-  modalType: 'pressed' | 'missing'
-}
-
 interface EstopTakeoverProps {
   robotName: string
 }
@@ -22,62 +17,46 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
   const { data: estopStatus } = useEstopQuery({
     refetchInterval: ESTOP_REFETCH_INTERVAL_MS,
   })
-  const [showEstopModal, setShowEstopModal] = React.useState<ShowModalType>({
-    showModal: false,
-    modalType: 'pressed',
-  })
+  const [showEstopModal, setShowEstopModal] = React.useState<boolean>(false)
   const { isDismissedModal, setIsDismissedModal } = useEstopContext()
 
   const closeModal = (): void => {
-    setShowEstopModal({ ...showEstopModal, showModal: false })
+    setShowEstopModal(false)
   }
 
-  const targetEstopModal = (): JSX.Element => {
-    return (
-      <>
-        {showEstopModal.modalType === 'pressed' ? (
+  const targetEstopModal = (): JSX.Element | null => {
+    switch (estopStatus?.data.status) {
+      case PHYSICALLY_ENGAGED:
+      case LOGICALLY_ENGAGED:
+        return (
           <EstopPressedModal
             isEngaged={estopStatus?.data.status === PHYSICALLY_ENGAGED}
             closeModal={closeModal}
             isDismissedModal={isDismissedModal}
             setIsDismissedModal={setIsDismissedModal}
           />
-        ) : (
+        )
+      case NOT_PRESENT:
+        return (
           <EstopMissingModal
             robotName={robotName}
             closeModal={closeModal}
             isDismissedModal={isDismissedModal}
             setIsDismissedModal={setIsDismissedModal}
           />
-        )}
-      </>
-    )
+        )
+      default:
+        return null
+    }
   }
 
   React.useEffect(() => {
-    if (
-      estopStatus?.data.status === PHYSICALLY_ENGAGED ||
-      estopStatus?.data.status === LOGICALLY_ENGAGED
-    ) {
-      setShowEstopModal({ showModal: true, modalType: 'pressed' })
-    } else if (estopStatus?.data.status === NOT_PRESENT) {
-      setShowEstopModal({ showModal: true, modalType: 'missing' })
-    }
-  }, [estopStatus])
-
-  React.useEffect(() => {
-    if (
-      showEstopModal.showModal &&
-      showEstopModal.modalType === 'missing' &&
-      estopStatus?.data.status !== NOT_PRESENT
-    ) {
-      setShowEstopModal({ showModal: false, modalType: 'pressed' })
-    }
-  }, [estopStatus, showEstopModal])
-
-  React.useEffect(() => {
+    console.log('useEffect', isDismissedModal)
     setIsDismissedModal(isDismissedModal)
-  }, [isDismissedModal, setIsDismissedModal])
+    if (!isDismissedModal) {
+      setShowEstopModal(true)
+    }
+  }, [isDismissedModal, setIsDismissedModal, showEstopModal])
 
-  return <>{showEstopModal.showModal ? targetEstopModal() : null}</>
+  return <>{showEstopModal ? targetEstopModal() : null}</>
 }
