@@ -77,7 +77,7 @@ class MaintenanceRun(ResourceModel):
     errors: List[ErrorOccurrence] = Field(
         ...,
         description=(
-            "The protocol's fatal error, if there was one."
+            "The run's fatal error, if there was one."
             " For historical reasons, this is an array,"
             " but it won't have more than one element."
         ),
