@@ -1,6 +1,5 @@
 import * as React from 'react'
 import cx from 'classnames'
-import { FormGroup } from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import {
   VolumeField,
