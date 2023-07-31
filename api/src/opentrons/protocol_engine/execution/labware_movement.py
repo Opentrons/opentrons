@@ -97,7 +97,7 @@ class LabwareMovementHandler:
             return
         ot3api = ensure_ot3_hardware(
             hardware_api=self._hardware_api,
-            error_msg="Gripper is only available on the OT-3",
+            error_msg="Gripper is only available on Opentrons Flex",
         )
 
         if not ot3api.has_gripper():
@@ -230,7 +230,7 @@ class LabwareMovementHandler:
             location, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
         ):
             raise LabwareMovementNotAllowedError(
-                "Off-deck labware movements are not supported using the gripper."
+                "Cannot move labware off-deck using the gripper."
             )
         return location
 
@@ -260,10 +260,10 @@ class LabwareMovementHandler:
                 )
             except ThermocyclerNotOpenError:
                 raise LabwareMovementNotAllowedError(
-                    "Cannot move labware from/to a thermocycler with closed lid."
+                    "Cannot move labware to or from a Thermocycler with its lid closed."
                 )
             except HeaterShakerLabwareLatchNotOpenError:
                 raise LabwareMovementNotAllowedError(
-                    "Cannot move labware from/to a heater-shaker"
+                    "Cannot move labware to or from a Heater-Shaker"
                     " with its labware latch closed."
                 )
