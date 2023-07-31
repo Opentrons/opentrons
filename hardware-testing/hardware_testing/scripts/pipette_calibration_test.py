@@ -83,6 +83,10 @@ class Pipette_Calibration_Test:
         self.file_setup()
         self.gauge_setup()
         self.api = await build_async_ot3_hardware_api(is_simulating=self.simulate, use_defaults=True)
+        # await self.api._backend._subsystem_manager.refresh()
+        # print(self.api._backend.subsystems)
+        # print(self.api.get_attached_instruments())
+        # print(self.api._backend._subsystem_manager.tools)
         self.mount = OT3Mount.LEFT if args.mount == "l" else OT3Mount.RIGHT
         await self.deck_setup()
         await self.pipette_setup()
@@ -107,7 +111,6 @@ class Pipette_Calibration_Test:
             self.gauges[key].connect()
 
     async def pipette_setup(self):
-        await self.api.cache_instruments()
         if self.simulate:
             self.pipette_id = "SIMULATION"
         else:
