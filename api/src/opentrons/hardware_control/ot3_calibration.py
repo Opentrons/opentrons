@@ -9,7 +9,7 @@ import numpy as np
 from enum import Enum
 from math import floor, copysign, isclose
 from logging import getLogger
-from opentrons.util.linal import solve_attitude
+from opentrons.util.linal import solve_attitude, SolvePoints
 
 from .types import OT3Mount, Axis, GripperProbe
 from opentrons.types import Point
@@ -53,7 +53,8 @@ BELT_CALIBRATION_SLOTS = {
     "front-right": 3,
     "rear-left": 10,
 }
-BELT_CALIBRATION_MAX_MISALIGNMENT = 0.5
+BELT_CALIBRATION_MAX_GANTRY_MISALIGNED = 0.5
+BELT_CALIBRATION_MAX_DECK_TILT = 0.5
 
 PREP_OFFSET_DEPTH = Point(*Z_PREP_OFFSET)
 EDGES = {
@@ -101,12 +102,21 @@ class InaccurateNonContactSweepError(RuntimeError):
         )
 
 
-class RobotMisalignmentError(RuntimeError):
-    def __init__(self, x_alignment: float, y_alignment: float) -> None:
+class GantryRotationalError(RuntimeError):
+    def __init__(self, x: float, y: float) -> None:
         super().__init__(
-            f"Calibration detected a the X alignment is {x_alignment:.3f}mm "
-            f"and the Y alignment is {y_alignment:.3f}mm "
-            f"(max allowed is {BELT_CALIBRATION_MAX_MISALIGNMENT}mm)"
+            f"Calibration detected the X alignment is {x:.3f}mm "
+            f"and the Y alignment is {y:.3f}mm across the whole deck"
+            f"(max allowed is {BELT_CALIBRATION_MAX_GANTRY_MISALIGNED}mm)"
+        )
+
+
+class DeckTiltError(RuntimeError):
+    def __init__(self, x: float, y: float) -> None:
+        super().__init__(
+            f"Calibration detected the Z shifts {x:.3f}mm along X axis,"
+            f"and {x:.3f}mm along Y axis across the whole deck"
+            f"(max allowed is {BELT_CALIBRATION_MAX_DECK_TILT}mm)"
         )
 
 
@@ -352,15 +362,17 @@ async def _probe_deck_at(
         target.z + LINEAR_TRANSIT_HEIGHT, target.z + settings.prep_distance_mm
     )
     safe_height = max(here.z, target.z, abs_transit_height)
-    await api.move_to(mount, here._replace(z=safe_height))
-    await api.move_to(mount, target._replace(z=safe_height), speed=speed)
-    await api.move_to(mount, target._replace(z=abs_transit_height))
-    _found_pos = await api.capacitive_probe(
-        mount, Axis.by_mount(mount), target.z, settings
-    )
-    # don't use found Z position to calculate an updated transit height
-    # because the probe may have gone through the hole
-    await api.move_to(mount, target._replace(z=abs_transit_height))
+    async with api.restore_system_constrants():
+        await api.set_system_constraints_for_calibration()
+        await api.move_to(mount, here._replace(z=safe_height))
+        await api.move_to(mount, target._replace(z=safe_height), speed=speed)
+        await api.move_to(mount, target._replace(z=abs_transit_height))
+        _found_pos = await api.capacitive_probe(
+            mount, Axis.by_mount(mount), target.z, settings
+        )
+        # don't use found Z position to calculate an updated transit height
+        # because the probe may have gone through the hole
+        await api.move_to(mount, target._replace(z=abs_transit_height))
     return _found_pos
 
 
@@ -380,7 +392,9 @@ async def find_axis_center(
     """
     WIDTH_TOLERANCE_MM: float = 0.5
     here = await hcapi.gantry_position(mount)
-    await hcapi.move_to(mount, here._replace(z=SEARCH_TRANSIT_HEIGHT))
+    async with hcapi.restore_system_constrants():
+        await hcapi.set_system_constraints_for_calibration()
+        await hcapi.move_to(mount, here._replace(z=SEARCH_TRANSIT_HEIGHT))
     edge_settings = hcapi.config.calibration.edge_sense
 
     start = axis.set_in_point(
@@ -392,7 +406,9 @@ async def find_axis_center(
         axis.of_point(plus_edge_nominal) + edge_settings.search_initial_tolerance_mm,
     )
 
-    await hcapi.move_to(mount, start._replace(z=SEARCH_TRANSIT_HEIGHT))
+    async with hcapi.restore_system_constrants():
+        await hcapi.set_system_constraints_for_calibration()
+        await hcapi.move_to(mount, start._replace(z=SEARCH_TRANSIT_HEIGHT))
 
     data = await hcapi.capacitive_sweep(
         mount, axis, start, end, edge_settings.pass_settings.speed_mm_per_s
@@ -579,32 +595,30 @@ async def _calibrate_mount(
     from the current instrument offset to set a new instrument offset.
     """
     nominal_center = Point(*get_calibration_square_position_in_slot(slot))
-    async with hcapi.restore_system_constrants():
-        await hcapi.set_system_constraints_for_calibration()
-        try:
-            # find the center of the calibration sqaure
-            offset = await find_calibration_structure_position(
-                hcapi,
-                mount,
-                nominal_center,
-                method=method,
-                raise_verify_error=raise_verify_error,
-            )
-            # update center with values obtained during calibration
-            LOG.info(f"Found calibration value {offset} for mount {mount.name}")
-            return offset
+    try:
+        # find the center of the calibration sqaure
+        offset = await find_calibration_structure_position(
+            hcapi,
+            mount,
+            nominal_center,
+            method=method,
+            raise_verify_error=raise_verify_error,
+        )
+        # update center with values obtained during calibration
+        LOG.info(f"Found calibration value {offset} for mount {mount.name}")
+        return offset
 
-        except (
-            InaccurateNonContactSweepError,
-            EarlyCapacitiveSenseTrigger,
-            CalibrationStructureNotFoundError,
-        ):
-            LOG.info(
-                "Error occurred during calibration. Resetting to current saved calibration value."
-            )
-            await hcapi.reset_instrument_offset(mount, to_default=False)
-            # re-raise exception after resetting instrument offset
-            raise
+    except (
+        InaccurateNonContactSweepError,
+        EarlyCapacitiveSenseTrigger,
+        CalibrationStructureNotFoundError,
+    ):
+        LOG.info(
+            "Error occurred during calibration. Resetting to current saved calibration value."
+        )
+        await hcapi.reset_instrument_offset(mount, to_default=False)
+        # re-raise exception after resetting instrument offset
+        raise
 
 
 async def find_calibration_structure_position(
@@ -661,34 +675,27 @@ async def find_slot_center_binary_from_nominal_center(
     return nominal_center - offset, nominal_center
 
 
-async def _determine_transform_matrix(
-    hcapi: OT3API,
-    mount: OT3Mount,
-) -> types.AttitudeMatrix:
-    """
-    Run automatic calibration for the gantry x and y belts attached to the specified mount. Returned linear transform matrix is determined via the
-    actual and nominal center points of the back right (A), front right (B), and back left (C) slots.
+def _confirm_robot_alignment(points: Dict[str, Tuple[Point, Point]]) -> None:
+    # check rotational alignment between gantry and deck
+    # NOTE: we cannot exceed a certain amount of rotation b/c of 96ch alignment
+    # FIXME: would be easier to define in degrees/radians, but this currently
+    #        defined in MM because it's easier
+    rotation_along_x = abs(points["front-left"][0].y - points["front-right"][0].y)
+    rotation_along_y = abs(points["front-left"][0].x - points["rear-left"][0].x)
+    max_alignment = BELT_CALIBRATION_MAX_GANTRY_MISALIGNED
+    if rotation_along_x > max_alignment or rotation_along_y > max_alignment:
+        raise GantryRotationalError(rotation_along_x, rotation_along_y)
+    # check how much the deck is tilted, relative to the gantry
+    max_tilt = BELT_CALIBRATION_MAX_DECK_TILT
+    tilt_along_x = abs(points["front-left"][0].z - points["front-right"][0].z)
+    tilt_along_y = abs(points["front-left"][0].z - points["rear-left"][0].z)
+    if tilt_along_x > max_tilt or tilt_along_y > max_tilt:
+        raise DeckTiltError(tilt_along_x, tilt_along_y)
 
-    Params
-    ------
-    hcapi: a hardware control api to run commands against
-    mount: the mount to calibration
 
-    Returns
-    -------
-    A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
-    """
-
-    async def _find_slot(_s: int) -> Tuple[Point, Point]:
-        _actual_nominal_points = await find_slot_center_binary_from_nominal_center(
-            hcapi, mount, _s
-        )
-        await hcapi.move_rel(mount, Point(0, 0, BELT_CAL_TRANSIT_HEIGHT))
-        return _actual_nominal_points
-
-    slots = BELT_CALIBRATION_SLOTS
-    points = {name: await _find_slot(slot) for name, slot in slots.items()}
-    await hcapi.retract(mount)
+def _points_dict_to_solve_points(
+    points: Dict[str, Tuple[Point, Point]]
+) -> Tuple[SolvePoints, SolvePoints]:
     actual_points = (
         (
             points["front-left"][0].x,
@@ -723,12 +730,39 @@ async def _determine_transform_matrix(
             points["front-right"][1].z,
         ),
     )
-    alignment_along_y = abs(points["front-left"][0].x - points["rear-left"][0].x)
-    alignment_along_x = abs(points["front-left"][0].y - points["front-right"][0].y)
-    max_alignment = BELT_CALIBRATION_MAX_MISALIGNMENT
-    if alignment_along_y > max_alignment or alignment_along_x > max_alignment:
-        raise RobotMisalignmentError(alignment_along_x, alignment_along_y)
-    return solve_attitude(nominal_points, actual_points)
+    return nominal_points, actual_points
+
+
+async def _determine_transform_matrix(
+    hcapi: OT3API,
+    mount: OT3Mount,
+) -> types.AttitudeMatrix:
+    """
+    Run automatic calibration for the gantry x and y belts attached to the specified mount. Returned linear transform matrix is determined via the
+    actual and nominal center points of the back right (A), front right (B), and back left (C) slots.
+
+    Params
+    ------
+    hcapi: a hardware control api to run commands against
+    mount: the mount to calibration
+
+    Returns
+    -------
+    A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
+    """
+
+    async def _find_slot(_s: int) -> Tuple[Point, Point]:
+        _actual_nominal_points = await find_slot_center_binary_from_nominal_center(
+            hcapi, mount, _s
+        )
+        await hcapi.retract(mount)
+        return _actual_nominal_points
+
+    slots = BELT_CALIBRATION_SLOTS
+    points = {name: await _find_slot(slot) for name, slot in slots.items()}
+    _confirm_robot_alignment(points)
+    nominal, actual = _points_dict_to_solve_points(points)
+    return solve_attitude(nominal, actual)
 
 
 def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
