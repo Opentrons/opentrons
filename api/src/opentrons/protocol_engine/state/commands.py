@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Mapping, Optional, Union
 
-from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
+from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
 
 from opentrons.ordered_set import OrderedSet
 
@@ -338,7 +338,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.run_result = RunResult.STOPPED
 
                 if action.error_details:
-                    self._state.run_error = self._map_exception_to_error_occurrence(
+                    self._state.run_error = self._map_run_exception_to_error_occurrence(
                         action.error_details.error_id,
                         action.error_details.created_at,
                         action.error_details.error,
@@ -352,10 +352,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
             )
 
             if action.finish_error_details:
-                self._state.finish_error = self._map_exception_to_error_occurrence(
-                    action.finish_error_details.error_id,
-                    action.finish_error_details.created_at,
-                    action.finish_error_details.error,
+                self._state.finish_error = (
+                    self._map_finish_exception_to_error_occurrence(
+                        action.finish_error_details.error_id,
+                        action.finish_error_details.created_at,
+                        action.finish_error_details.error,
+                    )
                 )
 
         elif isinstance(action, DoorChangeAction):
@@ -368,9 +370,10 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     self._state.is_door_blocking = False
 
     @staticmethod
-    def _map_exception_to_error_occurrence(
+    def _map_run_exception_to_error_occurrence(
         error_id: str, created_at: datetime, exception: Exception
     ) -> ErrorOccurrence:
+        """Map a fatal exception from the main part of the run to an ErrorOccurrence."""
         if (
             isinstance(exception, ProtocolCommandFailedError)
             and exception.original_error is not None
@@ -385,6 +388,21 @@ class CommandStore(HasState[CommandState], HandlesActions):
                 message=str(exception),
                 wrapping=[exception],
             )
+            return ErrorOccurrence.from_failed(
+                id=error_id, createdAt=created_at, error=enumerated_wrapper
+            )
+
+    @staticmethod
+    def _map_finish_exception_to_error_occurrence(
+        error_id: str, created_at: datetime, exception: Exception
+    ) -> ErrorOccurrence:
+        """Map a fatal exception from the finish phase (drop tip & home) to an ErrorOccurrence."""
+        if isinstance(exception, EnumeratedError):
+            return ErrorOccurrence.from_failed(
+                id=error_id, createdAt=created_at, error=exception
+            )
+        else:
+            enumerated_wrapper = PythonException(exc=exception)
             return ErrorOccurrence.from_failed(
                 id=error_id, createdAt=created_at, error=enumerated_wrapper
             )
