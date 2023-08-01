@@ -658,46 +658,6 @@ async def find_slot_center_binary_from_nominal_center(
     return nominal_center - offset, nominal_center
 
 
-def _points_dict_to_solve_points(
-    points: Dict[str, Tuple[Point, Point]]
-) -> Tuple[SolvePoints, SolvePoints]:
-    actual_points = (
-        (
-            points["front-left"][0].x,
-            points["front-left"][0].y,
-            points["front-left"][0].z,
-        ),
-        (
-            points["rear-left"][0].x,
-            points["rear-left"][0].y,
-            points["rear-left"][0].z,
-        ),
-        (
-            points["front-right"][0].x,
-            points["front-right"][0].y,
-            points["front-right"][0].z,
-        ),
-    )
-    nominal_points = (
-        (
-            points["front-left"][1].x,
-            points["front-left"][1].y,
-            points["front-left"][1].z,
-        ),
-        (
-            points["rear-left"][1].x,
-            points["rear-left"][1].y,
-            points["rear-left"][1].z,
-        ),
-        (
-            points["front-right"][1].x,
-            points["front-right"][1].y,
-            points["front-right"][1].z,
-        ),
-    )
-    return nominal_points, actual_points
-
-
 async def _determine_transform_matrix(
     hcapi: OT3API,
     mount: OT3Mount,
@@ -1057,8 +1017,8 @@ class OT3Transforms(RobotCalibration):
 class AlignmentError(RuntimeError):
     def __init__(self, x: float, y: float, zx: float, zy: float) -> None:
         super().__init__(
-            f"this machine is misaligned and requires maintenance "
-            f"(x-along-y: {x}, y-along-x: {y}, z-along-x: {zx}, z-along-y: {zy}"
+            f"this machine is misaligned and requires maintenance: "
+            f"x-along-y: {x}, y-along-x: {y}, z-along-x: {zx}, z-along-y: {zy}"
         )
 
 

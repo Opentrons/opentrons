@@ -6,8 +6,7 @@ from opentrons.hardware_control.ot3_calibration import (
     EarlyCapacitiveSenseTrigger,
     EdgeNotFoundError,
     CalibrationStructureNotFoundError,
-    GantryRotationalError,
-    DeckTiltError,
+    AlignmentError,
 )
 
 from hardware_testing.data.csv_report import (
@@ -72,8 +71,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             EarlyCapacitiveSenseTrigger,
             EdgeNotFoundError,
             CalibrationStructureNotFoundError,
-            GantryRotationalError,
-            DeckTiltError,
+            AlignmentError,
     ) as e:
         ui.print_error(e)
         return
