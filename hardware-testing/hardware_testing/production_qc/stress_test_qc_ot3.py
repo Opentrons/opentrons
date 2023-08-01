@@ -118,6 +118,7 @@ class CSVProperties:
 
 
 def _create_csv_and_get_callbacks(sn: str) -> Tuple[CSVProperties, CSVCallbacks]:
+    """Create CSV and get callback functions."""
     run_id = data.create_run_id()
     test_name = data.create_test_name_from_file(__file__)
     folder_path = data.create_folder_for_test_data(test_name)
@@ -153,6 +154,7 @@ def _create_csv_and_get_callbacks(sn: str) -> Tuple[CSVProperties, CSVCallbacks]
 
 
 def bool_to_string(result: bool) -> str:
+    """Turn bool into String."""
     return "PASS" if result else "FAIL"
 
 
@@ -163,6 +165,7 @@ def _record_axis_data(
     encoder: Dict[Axis, float],
     aligned: bool,
 ) -> None:
+    """Record raw axis movement to csv."""
     data_str: List[str] = []
     for ax in GANTRY_AXES:
         data_str = data_str + [str(ax)] + [str(round(encoder[ax] - estimate[ax], 5))]
@@ -175,6 +178,7 @@ def _record_run_data(
     error: Dict[Axis, float],
     aligned: bool,
 ) -> None:
+    """Record series of axis movements to csv."""
     data_str: List[str] = []
     for ax in GANTRY_AXES:
         data_str = data_str + [str(ax)] + [str(round(error[ax], 5))]
@@ -191,6 +195,7 @@ def _record_motion_check_data(
     pass_count: int,
     fail_count: int,
 ) -> None:
+    """Record motion log to csv."""
     write_cb(
         [type]
         + ["Speed"]
@@ -209,6 +214,7 @@ def _record_motion_check_data(
 
 
 def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
+    """Create points for the bowtie movement."""
     pos_max = homed_position - types.Point(x=1, y=1, z=1)
     pos_min = types.Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
     bowtie_points = [
@@ -222,6 +228,7 @@ def _create_bowtie_points(homed_position: types.Point) -> List[types.Point]:
 
 
 def _create_hour_glass_points(homed_position: types.Point) -> List[types.Point]:
+    """Create points for the hourglass movement."""
     pos_max = homed_position - types.Point(x=1, y=1, z=1)
     pos_min = types.Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
     hour_glass_points = [
@@ -235,10 +242,8 @@ def _create_hour_glass_points(homed_position: types.Point) -> List[types.Point]:
 
 
 def _create_mounts_up_down_points(homed_position: types.Point) -> List[types.Point]:
-    # print("Create Up Down Start - gantry estimate: " + str(homed_position))
-    # pos_max = homed_position - types.Point(x=1, y=1, z=1)
+    """Create points for the up and down movement."""
     pos_max = homed_position
-    pos_min = types.Point(x=0, y=25, z=pos_max.z)  # stay above deck to be safe
     mounts_up_down_points = [
         pos_max._replace(z=pos_max.z - 200),  # down
         pos_max,  # up
@@ -249,6 +254,7 @@ def _create_mounts_up_down_points(homed_position: types.Point) -> List[types.Poi
 async def _move_and_check(
     api: OT3API, is_simulating: bool, mount: OT3Mount, position: types.Point
 ) -> Tuple[Dict[Axis, float], Dict[Axis, float], bool]:
+    """Move and check accuracy with encoder."""
     if not is_simulating:
         await api.move_to(mount, position)
         estimate = {ax: api._current_position[ax] for ax in GANTRY_AXES}
@@ -275,8 +281,9 @@ async def _run_mount_up_down(
     mount: OT3Mount,
     mount_up_down_points: List[types.Point],
     write_cb: Callable,
-    record_bool=True,
+    record_bool: bool = True,
 ) -> bool:
+    """Run Z axis up and down."""
     ui.print_header("Run mount up and down")
     pass_count = 0
     error_sum = {ax: 0.0 for ax in GANTRY_AXES}
@@ -317,8 +324,9 @@ async def _run_bowtie(
     mount: OT3Mount,
     bowtie_points: List[types.Point],
     write_cb: Callable,
-    record_bool=True,
+    record_bool: bool = True,
 ) -> bool:
+    """Run XY in bowtie pattern."""
     ui.print_header("Run bowtie")
     pass_count = 0
     error_sum = {ax: 0.0 for ax in GANTRY_AXES}
@@ -350,8 +358,9 @@ async def _run_hour_glass(
     mount: OT3Mount,
     hour_glass_points: List[types.Point],
     write_cb: Callable,
-    record_bool=True,
+    record_bool: bool = True,
 ) -> bool:
+    """Run XY in hour glass pattern."""
     ui.print_header("Run hour glass")
     pass_count = 0
     error_sum = {ax: 0.0 for ax in GANTRY_AXES}
@@ -378,6 +387,7 @@ async def _run_hour_glass(
 
 
 def _get_accelerations_from_user() -> List:
+    """Get acceleration list from user."""
     condition = True
     accelerations = []
     while condition:
@@ -396,6 +406,7 @@ def _get_accelerations_from_user() -> List:
 
 
 def _get_speeds_from_user() -> List:
+    """Get speed list from user."""
     condition = True
     speeds = []
     while condition:
@@ -413,6 +424,7 @@ def _get_speeds_from_user() -> List:
 
 
 def _get_currents_from_user() -> List:
+    """Get current list from user."""
     condition = True
     currents = []
     while condition:
@@ -430,6 +442,7 @@ def _get_currents_from_user() -> List:
 
 
 def _creat_z_axis_settings(arguments: argparse.Namespace) -> List:
+    """Generate list of Z gantry settings to test."""
     if arguments.z_speeds and arguments.z_accelerations and arguments.z_currents:
         accelerations = [
             float(acc)
@@ -466,6 +479,7 @@ def _creat_z_axis_settings(arguments: argparse.Namespace) -> List:
 
 
 def _creat_xy_axis_settings(arguments: argparse.Namespace) -> List:
+    """Generate list of XY gantry settings to test."""
     x_args = arguments.x_accelerations and arguments.x_speeds and arguments.x_currents
     y_args = arguments.y_accelerations and arguments.y_speeds and arguments.y_currents
     if x_args and y_args:
@@ -533,6 +547,7 @@ async def _run_z_motion(
     mount_up_down_points: Dict[OT3Mount, List[types.Point]],
     write_cb: Callable,
 ) -> bool:
+    """Test Z at different settings."""
     ui.print_header("Run z motion check...")
     Z_AXIS_SETTINGS = _creat_z_axis_settings(arguments)
     LOG.info(Z_AXIS_SETTINGS)
@@ -599,6 +614,7 @@ async def _run_xy_motion(
     hour_glass_points: List[types.Point],
     write_cb: Callable,
 ) -> bool:
+    """Test XY at different settings."""
     ui.print_header("Run xy motion check...")
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
     LOG.info(XY_AXIS_SETTINGS)
@@ -680,6 +696,7 @@ async def _run_xy_motion(
 async def enforce_pipette_attached(
     api: OT3API, mount: OT3Mount, attach_pos: Point
 ) -> None:
+    """Check if pipette is attached, prompt user to attach if not."""
     await api.reset()
     if not api.hardware_pipettes[mount.to_mount()]:
         await helpers_ot3.move_to_arched_ot3(api, mount, attach_pos)
@@ -691,7 +708,7 @@ async def enforce_pipette_attached(
 
 
 async def _main(arguments: argparse.Namespace) -> None:
-
+    """Stress Test."""
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=arguments.simulate
     )
