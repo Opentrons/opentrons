@@ -25,7 +25,7 @@ from hardware_testing.data import ui
 import logging
 
 LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.INFO)
+LOG.setLevel(logging.CRITICAL)
 # logging.getLogger('opentrons.hardware_control.ot3api.OT3API').setLevel(logging.INFO) #tells all movement settings
 # logging.getLogger('opentrons_hardware.hardware_control').setLevel(logging.INFO) #confirms speeds
 
@@ -255,7 +255,7 @@ async def _move_and_check(
         encoder = {ax: api._encoder_position[ax] for ax in GANTRY_AXES}
     else:
         pass
-
+    aligned = True
     all_aligned_axes = [
         ax for ax in GANTRY_AXES if abs(estimate[ax] - encoder[ax]) <= THRESHOLD_MM
     ]
@@ -263,10 +263,9 @@ async def _move_and_check(
         LOG.info(str(ax) + str(" Error: ") + str(estimate[ax] - encoder[ax]))
         LOG.info(str(ax) + str(" Estimate: ") + str(estimate[ax]))
         LOG.info(str(ax) + str(" Encoder: ") + str(encoder[ax]))
-        if ax in all_aligned_axes:
-            aligned = True
-        else:
+        if ax not in all_aligned_axes:
             aligned = False
+
     return estimate, encoder, aligned
 
 
@@ -300,7 +299,6 @@ async def _run_mount_up_down(
         if al:
             pass_count += 1
         else:
-            await api.home()
             break
 
     num_points = len(mount_up_down_points)
@@ -334,7 +332,6 @@ async def _run_bowtie(
         if al:
             pass_count += 1
         else:
-            await api.home()
             break
 
     num_points = len(bowtie_points)
@@ -368,7 +365,6 @@ async def _run_hour_glass(
         if al:
             pass_count += 1
         else:
-            await api.home()
             break
 
     num_points = len(hour_glass_points)
@@ -536,9 +532,10 @@ async def _run_z_motion(
     mount: OT3Mount,
     mount_up_down_points: Dict[OT3Mount, List[types.Point]],
     write_cb: Callable,
-) -> None:
+) -> bool:
     ui.print_header("Run z motion check...")
     Z_AXIS_SETTINGS = _creat_z_axis_settings(arguments)
+    LOG.info(Z_AXIS_SETTINGS)
     for setting in Z_AXIS_SETTINGS:
         print(
             f"Z: Run speed={setting[Axis.Z].max_speed}, acceleration={setting[Axis.Z].acceleration}, current={setting[Axis.Z].run_current}"
@@ -587,6 +584,10 @@ async def _run_z_motion(
                 pass_count,
                 fail_count,
             )
+            if fail_count > 0:
+                return False
+
+    return True
 
 
 async def _run_xy_motion(
@@ -596,9 +597,10 @@ async def _run_xy_motion(
     bowtie_points: List[types.Point],
     hour_glass_points: List[types.Point],
     write_cb: Callable,
-) -> None:
+) -> bool:
     ui.print_header("Run xy motion check...")
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
+    LOG.info(XY_AXIS_SETTINGS)
     for setting in XY_AXIS_SETTINGS:
         print(
             f"X: Run speed={setting[Axis.X].max_speed}, acceleration={setting[Axis.X].acceleration}, current={setting[Axis.X].run_current}"
@@ -667,6 +669,11 @@ async def _run_xy_motion(
                 fail_count,
             )
 
+            if fail_count > 0:
+                return False
+
+    return True
+
 
 async def enforce_pipette_attached(
     api: OT3API, mount: OT3Mount, attach_pos: Point
@@ -684,12 +691,14 @@ async def enforce_pipette_attached(
 async def _main(arguments: argparse.Namespace) -> None:
 
     api = await helpers_ot3.build_async_ot3_hardware_api(
-        is_simulating=arguments.simulate, stall_detection_enable=False
-    )
+        is_simulating=arguments.simulate)
 
     if arguments.no_input:
-        _robot_id = arguments.sn
         _operator = "None"
+        _robot_id = api._backend.eeprom_data.serial_number
+        if not _robot_id:
+            ui.print_error("no serial number saved on this robot")
+            _robot_id = "None"
     else:
         if arguments.simulate:
             _robot_id = "ot3-simulated-A01"
@@ -717,7 +726,7 @@ async def _main(arguments: argparse.Namespace) -> None:
     csv_cb.write(["date", csv_props.id])  # run-id includes a date/time string
     test_name = Path(__file__).name
     ui.print_title(test_name.replace("_", " ").upper())
-
+    qc_pass = False
     try:
         await api.home()
         home_pos = await api.gantry_position(OT3Mount.LEFT)
@@ -746,13 +755,17 @@ async def _main(arguments: argparse.Namespace) -> None:
         }
 
         if not arguments.skip_xy_motion:
-            await _run_xy_motion(
+            qc_pass = await _run_xy_motion(
                 arguments, api, mount, bowtie_points, hour_glass_points, csv_cb.write
             )
+            if not qc_pass:
+                return
         if not arguments.skip_z_motion:
-            await _run_z_motion(
+            qc_pass =  await _run_z_motion(
                 arguments, api, mount, mount_up_down_points, csv_cb.write
             )
+            if not qc_pass:
+                return
         # set the default config
         await api.set_gantry_load(api.gantry_load)
 
@@ -761,7 +774,7 @@ async def _main(arguments: argparse.Namespace) -> None:
             csv_cb.write(["run-cycle", i + 1])
             print(f"Cycle {i + 1}/{arguments.cycles}")
             if not arguments.skip_bowtie:
-                await _run_bowtie(
+                qc_pass =  await _run_bowtie(
                     api,
                     arguments.simulate,
                     mount,
@@ -769,9 +782,11 @@ async def _main(arguments: argparse.Namespace) -> None:
                     csv_cb.write,
                     arguments.record_error,
                 )
+                if not qc_pass:
+                    return
                 if not arguments.skip_mount:
                     for z_mount in MOUNT_AXES:
-                        await _run_mount_up_down(
+                        qc_pass =  await _run_mount_up_down(
                             api,
                             arguments.simulate,
                             z_mount,
@@ -779,8 +794,10 @@ async def _main(arguments: argparse.Namespace) -> None:
                             csv_cb.write,
                             arguments.record_error,
                         )
+                        if not qc_pass:
+                            return
             if not arguments.skip_hourglass:
-                await _run_hour_glass(
+                qc_pass =  await _run_hour_glass(
                     api,
                     arguments.simulate,
                     mount,
@@ -788,9 +805,11 @@ async def _main(arguments: argparse.Namespace) -> None:
                     csv_cb.write,
                     arguments.record_error,
                 )
+                if not qc_pass:
+                    return
                 if not arguments.skip_mount:
                     for z_mount in MOUNT_AXES:
-                        await _run_mount_up_down(
+                        qc_pass =  await _run_mount_up_down(
                             api,
                             arguments.simulate,
                             z_mount,
@@ -798,19 +817,23 @@ async def _main(arguments: argparse.Namespace) -> None:
                             csv_cb.write,
                             arguments.record_error,
                         )
+                        if not qc_pass:
+                            return
     except KeyboardInterrupt:
         print("Cancelled")
     finally:
         await api.clean_up()
+        if qc_pass:
+            ui.print_title("Test Done - PASSED")
+        else:
+            ui.print_title("Test Done - FAILED")
 
-    ui.print_title("Test Done")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
     parser.add_argument("--cycles", type=int, default=50)
-    parser.add_argument("--sn", type=str, default="SN")
     parser.add_argument("--skip_bowtie", action="store_true")
     parser.add_argument("--skip_hourglass", action="store_true")
     parser.add_argument("--skip_mount", action="store_true")
