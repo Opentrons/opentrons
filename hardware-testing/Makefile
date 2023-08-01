@@ -126,7 +126,8 @@ test-production-qc:
 	$(python) -m hardware_testing.production_qc.robot_assembly_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.gripper_assembly_qc_ot3 --simulate
 	$(python) -m hardware_testing.production_qc.ninety_six_assembly_qc_ot3 --simulate
-	$(python) -m hardware_testing.production_qc.ot3_overnight_qc_test --simulate
+	$(python) -m hardware_testing.production_qc.stress_test_qc_ot3 --simulate
+	$(python) -m hardware_testing.production_qc.firmware_check --simulate
 
 .PHONY: test-examples
 test-examples:

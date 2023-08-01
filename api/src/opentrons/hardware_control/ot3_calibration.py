@@ -737,7 +737,6 @@ async def calibrate_gripper_jaw(
         return offset
     finally:
         hcapi.remove_gripper_probe()
-        await hcapi.ungrip()
 
 
 async def calibrate_gripper(
