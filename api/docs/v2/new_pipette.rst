@@ -46,7 +46,7 @@ This code sample loads an 8-Channel Pipette in the left slot and a 1-Channel Pip
 Flex 96-Channel Pipette
 -----------------------
 
-This code sample loads the Flex 96-Channel Pipette. The Flex 96-Channel Pipette (1000 µL only) requires the left and right pipette mounts. You cannot use this pipette with a 1- or 8-Channel Pipette attached to the robot. To load the 96-Channel Pipette, specify the left mounting slot in your protocol.
+This code sample loads the Flex 96-Channel Pipette. The Flex 96-Channel Pipette (1000 µL only) requires the left and right pipette mounts. You cannot use this pipette with a 1- or 8-Channel Pipette attached to the robot. To load the 96-Channel Pipette, specify ``mount='left'`` in your protocol.
 
 .. code-block:: python
     :substitutions:
@@ -61,7 +61,7 @@ This code sample loads the Flex 96-Channel Pipette. The Flex 96-Channel Pipette 
 
 OT-2 Single- and Multi-Channel Pipettes
 ---------------------------------------
-.. start here fix code sample to match text
+
 This code sample loads a 8-channel, P300 GEN2 pipette in the left slot and a P1000 GEN2 pipette with two tip racks in the right slot. 
 
 .. code-block:: python
@@ -72,7 +72,7 @@ This code sample loads a 8-channel, P300 GEN2 pipette in the left slot and a P10
 
     def run(protocol: protocol_api.ProtocolContext):
         left = protocol.load_instrument(
-            instrument_name='p50_multi',
+            instrument_name='p300_multi_gen2',
             mount='left')
         tiprack1 = protocol.load_labware(
             load_name='opentrons_96_tiprack_1000ul',
@@ -81,7 +81,7 @@ This code sample loads a 8-channel, P300 GEN2 pipette in the left slot and a P10
             load_name='opentrons_96_tiprack_1000ul',
             location=2)
         right = protocol.load_instrument(
-            instrument_name='p1000_single',
+            instrument_name='p1000_single_gen2',
             mount='right',
             tip_racks=[tiprack1, tiprack2])
 
@@ -98,6 +98,7 @@ To keep the interface to the Opentrons API consistent between single and
 multi-channel pipettes, commands treat the *backmost channel* (furthest from the
 door) of a multi-channel pipette as the location of the pipette. Location arguments to
 building block and advanced commands are specified for the backmost channel.
+
 This also means that offset changes (such as :py:meth:`.Well.top` or
 :py:meth:`.Well.bottom`) can be applied to the single specified well, and each
 channels of the pipette will be at the same position relative to the well
@@ -139,14 +140,10 @@ For instance, to aspirate from the first column of a 96-well plate you would wri
         # pipette at the top of their respective wells
         right.dispense(volume=300, location=plate['A3'].top())
 
-In general, you should specify wells in the first row of a labware when you are
-using multi-channel pipettes. One common exception to this rule is when using
-384-well plates. The spacing between the wells in a 384-well plate and the space
-between the nozzles of a multi-channel pipette means that a multi-channel
-pipette accesses every other well in a column. Specifying well A1 accesses every
-other well starting with the first (rows A, C, E, G, I, K, M, and O); specifying well
-B1 similarly accesses every other well, but starting with the second (rows B, D,
-F, H, J, L, N, and P).
+In general, you should specify wells in the first row of a well plate when
+using multi-channel pipettes. One exception to this rule is when using
+384-well plates. The limited space between the wells in a 384-well plate and
+between the nozzles of a multi-channel pipette means the pipette accesses every other well in a column. Specifying well A1 accesses every other well starting with the first(rows A, C, E, G, I, K, M, and O); specifying well B1 similarly accesses every other well, but starting with the second (rows B, D, F, H, J, L, N, and P).
 
 .. code-block:: python
 
@@ -180,7 +177,7 @@ commands.
 Pipette Models
 ==============
 
-The first parameter of the :py:meth:`~.ProtocolContext.load_instrument` method is the pipette's *API load name*. The load name tells your robot which attached pipette you're going to use in a protocol. The table below lists the API load names for the currently available Flex and OT-2 pipette models.
+The pipette's load name is the first parameter of the ``load_instrument()`` method. It tells your robot which attached pipette you're going to use in a protocol. The table below lists the API load names for the currently available Flex and OT-2 pipettes.
 
 .. tabs::
 
@@ -219,10 +216,10 @@ The first parameter of the :py:meth:`~.ProtocolContext.load_instrument` method i
         See the pipette compatibility section below if you're using a older GEN1 model pipette. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single chanel model.
 
 
-GEN2 Pipette Backward Compatibility
+OT-2 GEN2 Pipette Backward Compatibility
 ===================================
 
-GEN2 pipettes have different volume ranges than GEN1 pipettes. However, each GEN2 pipette covers one or two GEN1 pipette volume ranges. For instance, with  a range of 1 - 20 µL, the P20 Single GEN2 covers the P10 Single GEN1 (1 - 10 µL). If your protocol specifies a GEN1 pipette but you have a GEN2 pipette attached to your OT-2  with a compatible volume range, you can still run your protocol. The OT-2 will consider the GEN2 pipette to have the same minimum volume as the GEN1 pipette, so any advanced commands have the same behavior as before.
+If you have an OT-2, the GEN2 pipettes have different volume ranges than GEN1 pipettes. However, each GEN2 pipette covers one or two GEN1 pipette volume ranges. For instance, with  a range of 1 - 20 µL, the P20 Single GEN2 covers the P10 Single GEN1 (1 - 10 µL). If your protocol specifies a GEN1 pipette but you have a GEN2 pipette with a compatible volume range attached to your OT-2, you can still run your protocol. The OT-2 will consider the GEN2 pipette to have the same minimum volume as the GEN1 pipette, so any advanced commands have the same behavior as before.
 
 Specifically, the P20 GEN2s (single and multi) cover the entire P10 GEN1 range; the P300 Single GEN2 covers the entire P300 Single GEN1 range; and the P1000 Single GEN2 covers the entire P1000 Single GEN1 range.
 
