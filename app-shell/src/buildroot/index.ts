@@ -5,7 +5,6 @@ import { app } from 'electron'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/redux/shell/actions'
 import { createLogger } from '../log'
-import { getConfig } from '../config'
 import { CURRENT_VERSION } from '../update'
 import { downloadManifest, getReleaseSet } from './release-manifest'
 import {
@@ -18,6 +17,7 @@ import { startPremigration, uploadSystemFile } from './update'
 import type { DownloadProgress } from '../http'
 import type { Action, Dispatch } from '../types'
 import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
+import { UPDATE_MANIFEST_URLS } from './constants'
 import type {
   BuildrootUpdateInfo,
   BuildrootAction,
@@ -127,9 +127,7 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
 }
 
 export function getBuildrootUpdateUrls(): Promise<ReleaseSetUrls | null> {
-  const manifestUrl: string = getConfig('robotSystemUpdate').manifestUrls[
-    _DEFAULT_ROBOT_UPDATE_SOURCE_CONFIG_SELECTION_
-  ]
+  const manifestUrl = UPDATE_MANIFEST_URLS()
 
   return downloadManifest(manifestUrl, MANIFEST_CACHE)
     .then(manifest => {

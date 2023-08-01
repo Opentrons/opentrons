@@ -1,3 +1,5 @@
+export type UpdatableMachine = 'ot2' | 'flex'
+
 export interface ReleaseSetUrls {
   fullImage: string
   system: string

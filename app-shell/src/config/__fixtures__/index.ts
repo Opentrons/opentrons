@@ -21,6 +21,7 @@ import type {
   ConfigV15,
   ConfigV16,
   ConfigV17,
+  ConfigV18,
 } from '@opentrons/app/src/redux/config/types'
 
 export const MOCK_CONFIG_V0: ConfigV0 = {
@@ -234,4 +235,12 @@ export const MOCK_CONFIG_V17: ConfigV17 = {
     ...MOCK_CONFIG_V16.protocols,
     applyHistoricOffsets: true,
   },
+}
+
+export const MOCK_CONFIG_V18: ConfigV18 = {
+  ...(() => {
+    const { robotSystemUpdate, version, ...rest } = MOCK_CONFIG_V17
+    return rest
+  })(),
+  version: 18,
 }
