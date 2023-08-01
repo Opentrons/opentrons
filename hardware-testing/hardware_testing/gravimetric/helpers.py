@@ -277,8 +277,10 @@ def _get_volumes(
     channels: int,
 ) -> List[float]:
     if increment:
+        print("if")
         test_volumes = get_volume_increments(pipette_volume, tip_volume)
     elif user_volumes and not ctx.is_simulating():
+        print("elif")
         _inp = input(
             f'Enter desired volumes for tip{tip_volume}, comma separated (eg: "10,100,1000") :'
         )
@@ -286,11 +288,10 @@ def _get_volumes(
             float(vol_str) for vol_str in _inp.strip().split(",") if vol_str
         ]
     else:
+        print("else")
         test_volumes = get_test_volumes(
             kind, channels, pipette_volume, tip_volume, extra
         )
-    if not test_volumes:
-        raise ValueError("no volumes to test, check the configuration")
     if not _check_if_software_supports_high_volumes():
         if ctx.is_simulating():
             test_volumes = _reduce_volumes_to_not_exceed_software_limit(
@@ -395,13 +396,25 @@ def get_test_volumes(
     kind: config.ConfigType, pipette: int, volume: int, tip: int, extra: bool
 ) -> List[float]:
     """Get test volumes."""
+    volumes: List[float] = []
+    print(f"Finding volumes for p {pipette} {volume} with tip {tip}, extra: {extra}")
     if kind is config.ConfigType.photometric:
-        return config.QC_VOLUMES_P[pipette][volume][tip]
+        for t, vls in config.QC_VOLUMES_P[pipette][volume]:
+            if t == tip:
+                volumes = vls
     else:
         if extra:
-            return config.QC_VOLUMES_EXTRA_G[pipette][volume][tip]
+            cfg = config.QC_VOLUMES_EXTRA_G
         else:
-            return config.QC_VOLUMES_G[pipette][volume][tip]
+            cfg = config.QC_VOLUMES_G
+
+        for t, vls in cfg[pipette][volume]:
+            print(f"tip {t} volumes {vls}")
+            if t == tip:
+                volumes = vls
+                break
+    print(f"final volumes{volumes}")
+    return volumes
 
 
 def get_default_trials(increment: bool, kind: config.ConfigType, channels: int) -> int:

@@ -201,7 +201,6 @@ def _finish_test(
     resources: TestResources,
     return_tip: bool,
 ) -> None:
-    ui.print_title("CHANGE PIPETTES")
     if resources.pipette.has_tip:
         if resources.pipette.current_volume > 0:
             ui.print_info("dispensing liquid to trash")
@@ -213,7 +212,12 @@ def _finish_test(
             resources.pipette.aspirate(10)  # to pull any droplets back up
         ui.print_info("dropping tip")
         helpers._drop_tip(resources.pipette, return_tip)
+
+
+def _change_pipettes(
+    ctx: ProtocolContext,
+    pipette: InstrumentContext,
+) -> None:
+    ui.print_title("CHANGE PIPETTES")
     ui.print_info("moving to attach position")
-    resources.pipette.move_to(
-        resources.ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150))
-    )
+    pipette.move_to(ctx.deck.position_for(5).move(Point(x=0, y=9 * 7, z=150)))

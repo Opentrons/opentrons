@@ -2,7 +2,7 @@
 from json import load as json_load
 from pathlib import Path
 import argparse
-from typing import List, Union, Dict, Optional, Any
+from typing import List, Union, Dict, Optional, Any, Tuple
 from dataclasses import dataclass
 from opentrons.protocol_api import ProtocolContext
 from . import report
@@ -35,7 +35,7 @@ from .config import (
 from .measurement.record import GravimetricRecorder
 from .measurement import DELAY_FOR_MEASUREMENT
 from .measurement.scale import Scale
-from .trial import TestResources
+from .trial import TestResources, _change_pipettes
 from .tips import get_tips
 from hardware_testing.drivers import asair_sensor
 from opentrons.protocol_api import InstrumentContext
@@ -93,7 +93,7 @@ class RunArgs:
     """Common resources across multiple runs."""
 
     tip_volumes: List[int]
-    volumes: Dict[int, List[float]]
+    volumes: List[Tuple[int, List[float]]]
     run_id: str
     pipette: InstrumentContext
     pipette_tag: str
@@ -183,21 +183,46 @@ class RunArgs:
                 _ctx.is_simulating(), args.tip
             )
 
-        volumes: Dict[int, List[float]] = {}
+        volumes: List[Tuple[int, List[float]]] = []
         for tip in tip_volumes:
-            volumes[tip] = helpers._get_volumes(
-                _ctx,
-                args.increment,
-                args.pipette,
-                tip,
-                args.user_volumes,
-                kind,
-                args.extra,
-                args.channels,
+            volumes.append(
+                (
+                    tip,
+                    helpers._get_volumes(
+                        _ctx,
+                        args.increment,
+                        args.pipette,
+                        tip,
+                        args.user_volumes,
+                        kind,
+                        False,  # set extra to false so we always do the normal tests first
+                        args.channels,
+                    ),
+                )
             )
+        if args.extra:
+            # if we use extra, add those tests after
+            for tip in tip_volumes:
+                volumes.append(
+                    (
+                        tip,
+                        helpers._get_volumes(
+                            _ctx,
+                            args.increment,
+                            args.pipette,
+                            tip,
+                            args.user_volumes,
+                            kind,
+                            True,
+                            args.channels,
+                        ),
+                    )
+                )
+        if not volumes:
+            raise ValueError("no volumes to test, check the configuration")
         volumes_list: List[float] = []
-        for tip in volumes.keys():
-            volumes_list.extend(volumes[tip])
+        for _, vls in volumes:
+            volumes_list.extend(vls)
 
         if args.trials == 0:
             trials = helpers.get_default_trials(args.increment, kind, args.channels)
@@ -353,12 +378,14 @@ def build_photometric_cfg(
 def _main(
     args: argparse.Namespace,
     run_args: RunArgs,
+    tip: int,
+    volumes: List[float],
 ) -> None:
     union_cfg: Union[PhotometricConfig, GravimetricConfig]
     if args.photometric:
         cfg_pm: PhotometricConfig = build_photometric_cfg(
             run_args.ctx,
-            args.tip,
+            tip,
             args.return_tip,
             args.mix,
             args.inspect,
@@ -372,7 +399,7 @@ def _main(
     else:
         cfg_gm: GravimetricConfig = build_gravimetric_cfg(
             run_args.ctx,
-            args.tip,
+            tip,
             args.increment,
             args.return_tip,
             False if args.no_blank else True,
@@ -389,7 +416,7 @@ def _main(
         union_cfg = cfg_gm
     ui.print_header("GET PARAMETERS")
 
-    for v in run_args.volumes:
+    for v in volumes:
         ui.print_info(f"\t{v} uL")
     all_channels_same_time = (
         getattr(union_cfg, "increment", False) or union_cfg.pipette_channels == 96
@@ -400,11 +427,11 @@ def _main(
         tipracks=helpers._load_tipracks(
             run_args.ctx, union_cfg, use_adapters=args.channels == 96
         ),
-        test_volumes=run_args.volumes[args.tip],
+        test_volumes=volumes,
         tips=get_tips(
             run_args.ctx,
             run_args.pipette,
-            args.tip,
+            tip,
             all_channels=all_channels_same_time,
         ),
         env_sensor=run_args.environment_sensor,
@@ -441,13 +468,17 @@ if __name__ == "__main__":
     parser.add_argument("--extra", action="store_true")
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
-    for tip in run_args.volumes:
-        hw = run_args.ctx._core.get_hardware()
-        if not run_args.ctx.is_simulating():
-            ui.alert_user_ready(f"Ready to run with {tip}ul tip?", hw)
-        args.tip = tip
-        _main(args, run_args)
-    if run_args.recorder is not None:
-        ui.print_info("ending recording")
-        run_args.recorder.stop()
-        run_args.recorder.deactivate()
+    try:
+        for tip, volumes in run_args.volumes:
+            hw = run_args.ctx._core.get_hardware()
+            if not run_args.ctx.is_simulating():
+                ui.alert_user_ready(f"Ready to run with {tip}ul tip?", hw)
+            _main(args, run_args, tip, volumes)
+        if run_args.recorder is not None:
+            ui.print_info("ending recording")
+            run_args.recorder.stop()
+            run_args.recorder.deactivate()
+    except Exception:
+        pass
+    finally:
+        _change_pipettes(run_args.ctx, run_args.pipette)

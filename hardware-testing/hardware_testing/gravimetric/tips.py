@@ -118,7 +118,7 @@ def get_tips(
         else:
             return {
                 channel: get_tips_for_individual_channel_on_multi(
-                    ctx, channel, tip_volume, pipette.max_volume
+                    ctx, channel, tip_volume, int(pipette.max_volume)
                 )
                 for channel in range(pipette.channels)
             }
