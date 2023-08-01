@@ -20,7 +20,7 @@ from hardware_testing.data import ui
 import logging
 
 LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.INFO)
+LOG.setLevel(logging.CRITICAL)
 # logging.getLogger('opentrons.hardware_control.ot3api.OT3API').setLevel(logging.INFO) #tells all movement settings
 # logging.getLogger('opentrons_hardware.hardware_control').setLevel(logging.INFO) #confirms speeds
 
@@ -512,9 +512,10 @@ async def _run_z_motion(
     mount: OT3Mount,
     mount_up_down_points: Dict[OT3Mount, List[types.Point]],
     write_cb: Callable,
-) -> None:
+) -> bool:
     ui.print_header("Run z motion check...")
     Z_AXIS_SETTINGS = _creat_z_axis_settings(arguments)
+    total_fail_count = 0
     for setting in Z_AXIS_SETTINGS:
         print(
             f"Z: Run speed={setting[Axis.Z].max_speed}, acceleration={setting[Axis.Z].acceleration}, current={setting[Axis.Z].run_current}"
@@ -536,6 +537,7 @@ async def _run_z_motion(
                     pass_count += 1
                 else:
                     fail_count += 1
+                    total_fail_count += 1
                 print(
                     f"Run Z motion cycle: {i+1}, results: {res}, pass count: {pass_count}, fail count: {fail_count}"
                 )
@@ -550,6 +552,11 @@ async def _run_z_motion(
                 fail_count,
             )
 
+    if total_fail_count > 0:
+        return False
+    else:
+        return True
+
 
 async def _run_xy_motion(
     arguments: argparse.Namespace,
@@ -558,9 +565,10 @@ async def _run_xy_motion(
     bowtie_points: List[types.Point],
     hour_glass_points: List[types.Point],
     write_cb: Callable,
-) -> None:
+) -> bool:
     ui.print_header("Run xy motion check...")
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
+    total_fail_count = 0
     for setting in XY_AXIS_SETTINGS:
         print(
             f"X: Run speed={setting[Axis.X].max_speed}, acceleration={setting[Axis.X].acceleration}, current={setting[Axis.X].run_current}"
@@ -592,6 +600,7 @@ async def _run_xy_motion(
                 pass_count += 1
             else:
                 fail_count += 1
+                total_fail_count += 1
             print(
                 f"Run XY cycle: {i+1}, results: {res_b and res_hg}, pass count: {pass_count}, fail count: {fail_count}"
             )
@@ -615,6 +624,11 @@ async def _run_xy_motion(
                 pass_count,
                 fail_count,
             )
+
+    if total_fail_count > 0:
+        return False
+    else:
+        return True
 
 
 async def enforce_pipette_attached(
@@ -690,14 +704,22 @@ async def _main(arguments: argparse.Namespace) -> None:
             OT3Mount.RIGHT: mount_up_down_points_right,
         }
 
+        qc_pass = True
+
         if not arguments.skip_xy_motion:
-            await _run_xy_motion(
+            res = await _run_xy_motion(
                 arguments, api, mount, bowtie_points, hour_glass_points, csv_cb.write
             )
+            if not res:
+                qc_pass = False
+
         if not arguments.skip_z_motion:
-            await _run_z_motion(
+            res = await _run_z_motion(
                 arguments, api, mount, mount_up_down_points, csv_cb.write
             )
+            if not res:
+                qc_pass = False
+
         # set the default config
         await api.set_gantry_load(api.gantry_load)
 
@@ -706,7 +728,7 @@ async def _main(arguments: argparse.Namespace) -> None:
             csv_cb.write(["run-cycle", i + 1])
             print(f"Cycle {i + 1}/{arguments.cycles}")
             if not arguments.skip_bowtie:
-                await _run_bowtie(
+                res = await _run_bowtie(
                     api,
                     arguments.simulate,
                     mount,
@@ -714,9 +736,11 @@ async def _main(arguments: argparse.Namespace) -> None:
                     csv_cb.write,
                     arguments.record_error,
                 )
+                if not res:
+                    qc_pass = False
                 if not arguments.skip_mount:
                     for z_mount in MOUNT_AXES:
-                        await _run_mount_up_down(
+                        res = await _run_mount_up_down(
                             api,
                             arguments.simulate,
                             z_mount,
@@ -724,8 +748,10 @@ async def _main(arguments: argparse.Namespace) -> None:
                             csv_cb.write,
                             arguments.record_error,
                         )
+                        if not res:
+                            qc_pass = False
             if not arguments.skip_hourglass:
-                await _run_hour_glass(
+                res = await _run_hour_glass(
                     api,
                     arguments.simulate,
                     mount,
@@ -733,9 +759,11 @@ async def _main(arguments: argparse.Namespace) -> None:
                     csv_cb.write,
                     arguments.record_error,
                 )
+                if not res:
+                    qc_pass = False
                 if not arguments.skip_mount:
                     for z_mount in MOUNT_AXES:
-                        await _run_mount_up_down(
+                        res = await _run_mount_up_down(
                             api,
                             arguments.simulate,
                             z_mount,
@@ -743,6 +771,13 @@ async def _main(arguments: argparse.Namespace) -> None:
                             csv_cb.write,
                             arguments.record_error,
                         )
+                        if not res:
+                            qc_pass = False
+
+        if qc_pass:
+            ui.print_title("TEST PASSED")
+        else:
+            ui.print_title("TEST FAILED")
     except KeyboardInterrupt:
         print("Cancelled")
     finally:
