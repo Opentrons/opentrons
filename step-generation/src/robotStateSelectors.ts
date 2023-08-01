@@ -106,7 +106,6 @@ export function getNextTiprack(
       invariantContext,
       robotState,
     })
-  console.log('nextTip', nextTip)
   if (firstAvailableTiprack && nextTip) {
     return {
       tiprackId: firstAvailableTiprack,
