@@ -141,7 +141,7 @@ class LabwareMovementHandler:
 
             # Keep the gripper in idly gripped position to avoid colliding with
             # things like the thermocycler latches
-            await ot3api.grip(force_newtons=IDLE_STATE_GRIP_FORCE)
+            await ot3api.grip(force_newtons=IDLE_STATE_GRIP_FORCE, stay_engaged=False)
 
     async def ensure_movement_not_obstructed_by_module(
         self, labware_id: str, new_location: LabwareLocation

@@ -660,8 +660,11 @@ class OT3Controller:
         self,
         duty_cycle: float,
         stop_condition: MoveStopCondition = MoveStopCondition.none,
+        stay_engaged: bool = True,
     ) -> None:
-        move_group = create_gripper_jaw_grip_group(duty_cycle, stop_condition)
+        move_group = create_gripper_jaw_grip_group(
+            duty_cycle, stop_condition, stay_engaged
+        )
         runner = MoveGroupRunner(move_groups=[move_group])
         positions = await runner.run(can_messenger=self._messenger)
         self._handle_motor_status_response(positions)

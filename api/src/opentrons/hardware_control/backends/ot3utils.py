@@ -428,13 +428,14 @@ def create_gear_motor_home_group(
 def create_gripper_jaw_grip_group(
     duty_cycle: float,
     stop_condition: MoveStopCondition = MoveStopCondition.none,
+    stay_engaged: bool = True,
 ) -> MoveGroup:
     step = create_gripper_jaw_step(
         duration=np.float64(GRIPPER_JAW_GRIP_TIME),
         duty_cycle=np.float32(round(duty_cycle)),
         stop_condition=stop_condition,
         move_type=MoveType.grip,
-        stay_engaged=True,
+        stay_engaged=stay_engaged,
     )
     move_group: MoveGroup = [step]
     return move_group

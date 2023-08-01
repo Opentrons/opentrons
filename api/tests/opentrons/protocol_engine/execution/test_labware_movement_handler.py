@@ -258,7 +258,9 @@ async def test_move_labware_with_gripper(
         await ot3_hardware_api.move_to(
             mount=gripper, abs_position=expected_waypoints[5]
         ),
-        await ot3_hardware_api.grip(force_newtons=IDLE_STATE_GRIP_FORCE),
+        await ot3_hardware_api.grip(
+            force_newtons=IDLE_STATE_GRIP_FORCE, stay_engaged=False
+        ),
     )
 
 
