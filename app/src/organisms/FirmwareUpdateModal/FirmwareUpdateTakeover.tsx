@@ -1,8 +1,11 @@
 import * as React from 'react'
+
 import {
   useInstrumentsQuery,
   useCurrentMaintenanceRun,
 } from '@opentrons/react-api-client'
+
+import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 import { UpdateNeededModal } from './UpdateNeededModal'
 
 const INSTRUMENT_POLL_INTERVAL = 5000
@@ -19,6 +22,7 @@ export function FirmwareUpdateTakeover(): JSX.Element {
   const subsystemUpdateInstrument = instrumentsData?.find(
     instrument => instrument.ok === false
   )
+  const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
 
   React.useEffect(() => {
     if (subsystemUpdateInstrument != null && maintenanceRunData == null) {
@@ -28,7 +32,9 @@ export function FirmwareUpdateTakeover(): JSX.Element {
 
   return (
     <>
-      {subsystemUpdateInstrument != null && showUpdateNeededModal ? (
+      {subsystemUpdateInstrument != null &&
+      showUpdateNeededModal &&
+      !isUnboxingFlowOngoing ? (
         <UpdateNeededModal
           subsystem={subsystemUpdateInstrument.subsystem}
           setShowUpdateModal={setShowUpdateNeededModal}
