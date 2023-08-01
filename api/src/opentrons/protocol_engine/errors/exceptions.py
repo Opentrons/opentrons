@@ -789,3 +789,16 @@ class EStopActivatedError(ProtocolEngineError):
     ) -> None:
         """Build an EStopActivatedError."""
         super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, details, wrapping)
+
+
+class NotSupportedOnRobotType(ProtocolEngineError):
+    """Raised when attempting to perform an action that is not supported for the given RobotType."""
+
+    def __init__(
+        self,
+        message: Optional[str] = None,
+        details: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build an EStopActivatedError."""
+        super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, details, wrapping)
