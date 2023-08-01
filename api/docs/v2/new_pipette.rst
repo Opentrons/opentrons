@@ -216,8 +216,8 @@ The pipette's load name is the first parameter of the ``load_instrument()`` meth
         See the pipette compatibility section below if you're using a older GEN1 model pipette. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single chanel model.
 
 
-GEN1-GEN2 Pipette Compatibility
-===============================
+OT-2 Pipette Generations
+========================
 
 If you have an OT-2, the GEN2 pipettes have different volume ranges than the older GEN1 pipettes. However, with some exceptions, the volume ranges for GEN2 pipettes include those used by the GEN1 models. If your protocol specifies a GEN1 pipette, but you have a GEN2 pipette with a compatible volume range, you can still run your protocol. The OT-2 will consider the GEN2 pipette to have the same minimum volume as the GEN1 pipette. The following table shows you the compatibility between the GEN2 and GEN1 pipettes.
 
@@ -301,16 +301,21 @@ You can change each attribute without affecting the others.
 .. code-block:: python
 
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
+        tiprack = protocol.load_labware(
+            load_name='opentrons_96_tiprack_300ul',
+            location='D1')
         pipette = protocol.load_instrument(
-            'p300_single', 'right', tip_racks=[tiprack])
-        plate = protocol.load_labware('corning_384_wellplate_112ul_flat', 3)
+            instrument_name='flex_1channel_1000',
+            mount='right', tip_racks=[tiprack])
+        plate = protocol.load_labware(
+            load_name='corning_384_wellplate_112ul_flat',
+            location= 'D3')
         pipette.pick_up_tip()
 
-        # Aspirate at the default flowrate of 150 ul/s
-        pipette.aspirate(50, plate['A1'])
+        # Aspirate at the default flow rate of 150 ul/s
+        pipette.aspirate(volume=50, plate['A1'])
         # Dispense at the default flowrate of 300 ul/s
-        pipette.dispense(50, plate['A1'])
+        pipette.dispense(volume=50, plate['A1'])
 
         # Change default aspirate speed to 50ul/s, 1/3 of the default
         pipette.flow_rate.aspirate = 50
@@ -326,7 +331,7 @@ You can change each attribute without affecting the others.
         # This is now at 50 ul/s as well
         pipette.dispense(50, plate['A1'])
 
-        # Also slow down the blow out flowrate from its default
+        # Also slow down the blow out flow rate from its default
         pipette.flow_rate.blow_out = 100
         pipette.aspirate(50, plate['A1'])
         # This will be much slower
@@ -334,7 +339,7 @@ You can change each attribute without affecting the others.
 
         pipette.drop_tip()
 
-
+.. Docs note this property removed in 2.14
 :py:obj:`.InstrumentContext.speed` offers the same functionality, but controlled in
 units of mm/s of plunger speed. This does not have a linear transfer to flow rate and
 should only be used if you have a specific need.
