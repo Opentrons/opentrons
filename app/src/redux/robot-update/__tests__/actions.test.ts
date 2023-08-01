@@ -1,87 +1,87 @@
 import { mockRobot } from '../../robot-api/__fixtures__'
 import * as actions from '../actions'
 
-import type { BuildrootAction } from '../types'
+import type { RobotUpdateAction } from '../types'
 
 interface ActionSpec {
   name: string
-  creator: (...args: any[]) => BuildrootAction
+  creator: (...args: any[]) => RobotUpdateAction
   args: unknown[]
-  expected: BuildrootAction
+  expected: RobotUpdateAction
 }
 
-describe('buildroot action creators', () => {
+describe('robot update action creators', () => {
   const SPECS: ActionSpec[] = [
     {
-      name: 'buildroot:SET_UPDATE_SEEN',
-      creator: actions.setBuildrootUpdateSeen,
+      name: 'robotUpdate:SET_UPDATE_SEEN',
+      creator: actions.setRobotUpdateSeen,
       args: ['robot-name'],
       expected: {
-        type: 'buildroot:SET_UPDATE_SEEN',
+        type: 'robotUpdate:SET_UPDATE_SEEN',
         meta: { robotName: 'robot-name' },
       },
     },
     {
-      name: 'buildroot:UPDATE_IGNORED',
-      creator: actions.buildrootUpdateIgnored,
+      name: 'robotUpdate:UPDATE_IGNORED',
+      creator: actions.robotUpdateIgnored,
       args: ['robot-name'],
       expected: {
-        type: 'buildroot:UPDATE_IGNORED',
+        type: 'robotUpdate:UPDATE_IGNORED',
         meta: { robotName: 'robot-name' },
       },
     },
     {
-      name: 'buildroot:CHANGELOG_SEEN',
-      creator: actions.buildrootChangelogSeen,
+      name: 'robotUpdate:CHANGELOG_SEEN',
+      creator: actions.robotUpdateChangelogSeen,
       args: ['robot-name'],
       expected: {
-        type: 'buildroot:CHANGELOG_SEEN',
+        type: 'robotUpdate:CHANGELOG_SEEN',
         meta: { robotName: 'robot-name' },
       },
     },
     {
-      name: 'buildroot:START_PREMIGRATION',
+      name: 'robotUpdate:START_PREMIGRATION',
       creator: actions.startBuildrootPremigration,
       args: [mockRobot],
       expected: {
-        type: 'buildroot:START_PREMIGRATION',
+        type: 'robotUpdate:START_PREMIGRATION',
         payload: mockRobot,
         meta: { shell: true },
       },
     },
     {
-      name: 'buildroot:START_UPDATE',
-      creator: actions.startBuildrootUpdate,
+      name: 'robotUpdate:START_UPDATE',
+      creator: actions.startRobotUpdate,
       args: ['robot'],
       expected: {
-        type: 'buildroot:START_UPDATE',
+        type: 'robotUpdate:START_UPDATE',
         payload: { robotName: 'robot', systemFile: null },
       },
     },
     {
-      name: 'buildroot:START_UPDATE with user file',
-      creator: actions.startBuildrootUpdate,
+      name: 'robotUpdate:START_UPDATE with user file',
+      creator: actions.startRobotUpdate,
       args: ['robot', '/path/to/system.zip'],
       expected: {
-        type: 'buildroot:START_UPDATE',
+        type: 'robotUpdate:START_UPDATE',
         payload: { robotName: 'robot', systemFile: '/path/to/system.zip' },
       },
     },
     {
-      name: 'buildroot:CREATE_SESSION',
+      name: 'robotUpdate:CREATE_SESSION',
       creator: actions.createSession,
       args: [mockRobot, '/update/begin'],
       expected: {
-        type: 'buildroot:CREATE_SESSION',
+        type: 'robotUpdate:CREATE_SESSION',
         payload: { host: mockRobot, sessionPath: '/update/begin' },
       },
     },
     {
-      name: 'buildroot:CREATE_SESSION_SUCCESS',
+      name: 'robotUpdate:CREATE_SESSION_SUCCESS',
       creator: actions.createSessionSuccess,
       args: [mockRobot, 'some-token', '/update'],
       expected: {
-        type: 'buildroot:CREATE_SESSION_SUCCESS',
+        type: 'robotUpdate:CREATE_SESSION_SUCCESS',
         payload: {
           host: mockRobot,
           token: 'some-token',
@@ -90,11 +90,11 @@ describe('buildroot action creators', () => {
       },
     },
     {
-      name: 'buildroot:STATUS',
-      creator: actions.buildrootStatus,
+      name: 'robotUpdate:STATUS',
+      creator: actions.robotUpdateStatus,
       args: ['awaiting-file', 'Awaiting File', null],
       expected: {
-        type: 'buildroot:STATUS',
+        type: 'robotUpdate:STATUS',
         payload: {
           stage: 'awaiting-file',
           message: 'Awaiting File',
@@ -103,39 +103,39 @@ describe('buildroot action creators', () => {
       },
     },
     {
-      name: 'buildroot:SET_SESSION_STEP',
-      creator: actions.setBuildrootSessionStep,
+      name: 'robotUpdate:SET_SESSION_STEP',
+      creator: actions.setRobotUpdateSessionStep,
       args: ['restarting'],
       expected: {
-        type: 'buildroot:SET_SESSION_STEP',
+        type: 'robotUpdate:SET_SESSION_STEP',
         payload: 'restarting',
       },
     },
     {
-      name: 'buildroot:UNEXPECTED_ERROR',
-      creator: actions.unexpectedBuildrootError,
+      name: 'robotUpdate:UNEXPECTED_ERROR',
+      creator: actions.unexpectedRobotUpdateError,
       args: ['AH!'],
       expected: {
-        type: 'buildroot:UNEXPECTED_ERROR',
+        type: 'robotUpdate:UNEXPECTED_ERROR',
         payload: { message: 'AH!' },
       },
     },
     {
-      name: 'buildroot:READ_USER_FILE',
-      creator: actions.readUserBuildrootFile,
+      name: 'robotUpdate:READ_USER_FILE',
+      creator: actions.readUserRobotUpdateFile,
       args: ['/server/update/token/file'],
       expected: {
-        type: 'buildroot:READ_USER_FILE',
+        type: 'robotUpdate:READ_USER_FILE',
         payload: { systemFile: '/server/update/token/file' },
         meta: { shell: true },
       },
     },
     {
-      name: 'buildroot:UPLOAD_FILE',
-      creator: actions.uploadBuildrootFile,
+      name: 'robotUpdate:UPLOAD_FILE',
+      creator: actions.uploadRobotUpdateFile,
       args: [mockRobot, '/server/update/token/file', null],
       expected: {
-        type: 'buildroot:UPLOAD_FILE',
+        type: 'robotUpdate:UPLOAD_FILE',
         payload: {
           host: mockRobot,
           path: '/server/update/token/file',
@@ -145,11 +145,11 @@ describe('buildroot action creators', () => {
       },
     },
     {
-      name: 'buildroot:UPLOAD_FILE with file specified',
-      creator: actions.uploadBuildrootFile,
+      name: 'robotUpdate:UPLOAD_FILE with file specified',
+      creator: actions.uploadRobotUpdateFile,
       args: [mockRobot, '/server/update/token/file', '/path/to/system.zip'],
       expected: {
-        type: 'buildroot:UPLOAD_FILE',
+        type: 'robotUpdate:UPLOAD_FILE',
         payload: {
           host: mockRobot,
           path: '/server/update/token/file',
@@ -159,10 +159,10 @@ describe('buildroot action creators', () => {
       },
     },
     {
-      name: 'buildroot:CLEAR_SESSION',
-      creator: actions.clearBuildrootSession,
+      name: 'robotUpdate:CLEAR_SESSION',
+      creator: actions.clearRobotUpdateSession,
       args: [],
-      expected: { type: 'buildroot:CLEAR_SESSION' },
+      expected: { type: 'robotUpdate:CLEAR_SESSION' },
     },
   ]
 

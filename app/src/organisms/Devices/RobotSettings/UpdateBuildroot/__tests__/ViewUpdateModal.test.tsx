@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { mountWithStore } from '@opentrons/components'
-import * as Buildroot from '../../../../../redux/buildroot'
+import * as Buildroot from '../../../../../redux/robot-update'
 
 import { DownloadUpdateModal } from '../DownloadUpdateModal'
 import { ReleaseNotesModal } from '../ReleaseNotesModal'
@@ -10,16 +10,16 @@ import { ViewUpdateModal } from '../ViewUpdateModal'
 
 import type { State } from '../../../../../redux/types'
 
-jest.mock('../../../../../redux/buildroot')
+jest.mock('../../../../../redux/robot-update')
 
-const getBuildrootUpdateInfo = Buildroot.getBuildrootUpdateInfo as jest.MockedFunction<
-  typeof Buildroot.getBuildrootUpdateInfo
+const getRobotUpdateInfo = Buildroot.getRobotUpdateInfo as jest.MockedFunction<
+  typeof Buildroot.getRobotUpdateInfo
 >
-const getBuildrootDownloadProgress = Buildroot.getBuildrootDownloadProgress as jest.MockedFunction<
-  typeof Buildroot.getBuildrootDownloadProgress
+const getRobotUpdateDownloadProgress = Buildroot.getRobotUpdateDownloadProgress as jest.MockedFunction<
+  typeof Buildroot.getRobotUpdateDownloadProgress
 >
-const getBuildrootDownloadError = Buildroot.getBuildrootDownloadError as jest.MockedFunction<
-  typeof Buildroot.getBuildrootDownloadError
+const getRobotUpdateDownloadError = Buildroot.getRobotUpdateDownloadError as jest.MockedFunction<
+  typeof Buildroot.getRobotUpdateDownloadError
 >
 
 const MOCK_STATE: State = { mockState: true } as any
@@ -52,9 +52,9 @@ describe('ViewUpdateModal', () => {
     )
   }
   beforeEach(() => {
-    getBuildrootUpdateInfo.mockReturnValue(null)
-    getBuildrootDownloadProgress.mockReturnValue(50)
-    getBuildrootDownloadError.mockReturnValue(null)
+    getRobotUpdateInfo.mockReturnValue(null)
+    getRobotUpdateDownloadProgress.mockReturnValue(50)
+    getRobotUpdateDownloadError.mockReturnValue(null)
   })
 
   afterEach(() => {
@@ -67,7 +67,7 @@ describe('ViewUpdateModal', () => {
 
     expect(downloadUpdateModal.prop('error')).toEqual(null)
     expect(downloadUpdateModal.prop('progress')).toEqual(50)
-    expect(getBuildrootDownloadProgress).toHaveBeenCalledWith(MOCK_STATE)
+    expect(getRobotUpdateDownloadProgress).toHaveBeenCalledWith(MOCK_STATE)
 
     const closeButtonProps = downloadUpdateModal.prop('notNowButton')
 
@@ -78,13 +78,13 @@ describe('ViewUpdateModal', () => {
   })
 
   it('should show a DownloadUpdateModal if the update download errored out', () => {
-    getBuildrootDownloadError.mockReturnValue('oh no!')
+    getRobotUpdateDownloadError.mockReturnValue('oh no!')
 
     const { wrapper } = render()
     const downloadUpdateModal = wrapper.find(DownloadUpdateModal)
 
     expect(downloadUpdateModal.prop('error')).toEqual('oh no!')
-    expect(getBuildrootDownloadError).toHaveBeenCalledWith(MOCK_STATE)
+    expect(getRobotUpdateDownloadError).toHaveBeenCalledWith(MOCK_STATE)
 
     const closeButtonProps = downloadUpdateModal.prop('notNowButton')
 
@@ -95,7 +95,7 @@ describe('ViewUpdateModal', () => {
   })
 
   it('should show a ReleaseNotesModal if the update is an upgrade', () => {
-    getBuildrootUpdateInfo.mockReturnValue({
+    getRobotUpdateInfo.mockReturnValue({
       releaseNotes: 'hey look a release',
     })
 
@@ -105,7 +105,7 @@ describe('ViewUpdateModal', () => {
     expect(releaseNotesModal.prop('robotName')).toBe(MOCK_ROBOT_NAME)
     expect(releaseNotesModal.prop('releaseNotes')).toBe('hey look a release')
     expect(releaseNotesModal.prop('systemType')).toBe(Buildroot.BUILDROOT)
-    expect(getBuildrootUpdateInfo).toHaveBeenCalledWith(MOCK_STATE)
+    expect(getRobotUpdateInfo).toHaveBeenCalledWith(MOCK_STATE)
 
     const closeButtonProps = releaseNotesModal.prop('notNowButton')
 
@@ -134,7 +134,7 @@ describe('ViewUpdateModal', () => {
   })
 
   it('should proceed from MigrationWarningModal to release notes if upgrade', () => {
-    getBuildrootUpdateInfo.mockReturnValue({
+    getRobotUpdateInfo.mockReturnValue({
       releaseNotes: 'hey look a release',
     })
 

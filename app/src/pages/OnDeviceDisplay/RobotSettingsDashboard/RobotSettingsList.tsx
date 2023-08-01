@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { Flex, DIRECTION_COLUMN, SPACING } from '@opentrons/components'
 
 import { getLocalRobot, getRobotApiVersion } from '../../../redux/discovery'
-import { getBuildrootUpdateAvailable } from '../../../redux/buildroot'
+import { getRobotUpdateAvailable } from '../../../redux/robot-update'
 import {
   getApplyHistoricOffsets,
   getDevtoolsEnabled,
@@ -37,7 +37,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
 
   const robotUpdateType = useSelector((state: State) => {
     return localRobot != null && localRobot.status !== UNREACHABLE
-      ? getBuildrootUpdateAvailable(state, localRobot)
+      ? getRobotUpdateAvailable(state, localRobot)
       : null
   })
   const isUpdateAvailable = robotUpdateType === 'upgrade'

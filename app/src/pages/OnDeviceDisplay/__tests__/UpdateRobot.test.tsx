@@ -5,7 +5,7 @@ import { when, resetAllWhenMocks } from 'jest-when'
 import { renderWithProviders } from '@opentrons/components'
 import { i18n } from '../../../i18n'
 
-import * as Buildroot from '../../../redux/buildroot'
+import * as Buildroot from '../../../redux/robot-update'
 import { getLocalRobot } from '../../../redux/discovery'
 import { CheckUpdates } from '../../../organisms/UpdateRobotSoftware/CheckUpdates'
 import { CompleteUpdateSoftware } from '../../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware'
@@ -18,7 +18,7 @@ import { UpdateRobot } from '../UpdateRobot'
 import type { State } from '../../../redux/types'
 
 jest.mock('../../../redux/discovery')
-jest.mock('../../../redux/buildroot')
+jest.mock('../../../redux/robot-update')
 jest.mock('../../../organisms/UpdateRobotSoftware/CheckUpdates')
 jest.mock('../../../organisms/UpdateRobotSoftware/CompleteUpdateSoftware')
 jest.mock('../../../organisms/UpdateRobotSoftware/ErrorUpdateSoftware')
@@ -40,11 +40,11 @@ const mockNoUpdateFound = NoUpdateFound as jest.MockedFunction<
 const mockUpdateSoftware = UpdateSoftware as jest.MockedFunction<
   typeof UpdateSoftware
 >
-const mockGetBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<
-  typeof Buildroot.getBuildrootUpdateAvailable
+const mockGetBuildrootUpdateAvailable = Buildroot.getRobotUpdateAvailable as jest.MockedFunction<
+  typeof Buildroot.getRobotUpdateAvailable
 >
-const mockGetBuildrootSession = Buildroot.getBuildrootSession as jest.MockedFunction<
-  typeof Buildroot.getBuildrootSession
+const mockGetBuildrootSession = Buildroot.getRobotUpdateSession as jest.MockedFunction<
+  typeof Buildroot.getRobotUpdateSession
 >
 const mockGetLocalRobot = getLocalRobot as jest.MockedFunction<
   typeof getLocalRobot

@@ -9,9 +9,9 @@ import { onDeviceDisplayRoutes } from '../../../App/OnDeviceDisplayApp'
 import { Dispatch } from '../../../redux/types'
 import { checkShellUpdate } from '../../../redux/shell'
 import {
-  getBuildrootUpdateVersion,
-  startBuildrootUpdate,
-} from '../../../redux/buildroot'
+  getRobotUpdateVersion,
+  startRobotUpdate,
+} from '../../../redux/robot-update'
 import { getLocalRobot } from '../../../redux/discovery'
 
 import type { RouteProps } from '../../../App/types'
@@ -24,7 +24,7 @@ export function TempODDMenu(): JSX.Element {
   })
 
   const localRobot = useSelector(getLocalRobot)
-  const latestRobotSystemVersion = useSelector(getBuildrootUpdateVersion)
+  const latestRobotSystemVersion = useSelector(getRobotUpdateVersion)
 
   return (
     <>
@@ -32,7 +32,7 @@ export function TempODDMenu(): JSX.Element {
       {latestRobotSystemVersion && (
         <PrimaryButton
           onClick={() =>
-            dispatch(startBuildrootUpdate(localRobot?.displayName ?? ''))
+            dispatch(startRobotUpdate(localRobot?.displayName ?? ''))
           }
         >
           {`Download latest OT-3 system version ${latestRobotSystemVersion}`}

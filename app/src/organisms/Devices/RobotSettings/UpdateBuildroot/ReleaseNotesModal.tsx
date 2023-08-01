@@ -1,7 +1,10 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 
-import { buildrootChangelogSeen, OT2_BALENA } from '../../../../redux/buildroot'
+import {
+  robotUpdateChangelogSeen,
+  OT2_BALENA,
+} from '../../../../redux/robot-update'
 import { ScrollableAlertModal } from '../../../../molecules/modals'
 import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 import { useIsRobotBusy } from '../../hooks'
@@ -10,7 +13,7 @@ import { RobotIsBusyModal } from './RobotIsBusyModal'
 
 import { ButtonProps, useConditionalConfirm } from '@opentrons/components'
 import type { Dispatch } from '../../../../redux/types'
-import type { RobotSystemType } from '../../../../redux/buildroot/types'
+import type { RobotSystemType } from '../../../../redux/robot-update/types'
 
 export interface ReleaseNotesModalProps {
   robotName: string
@@ -26,7 +29,7 @@ export function ReleaseNotesModal(props: ReleaseNotesModalProps): JSX.Element {
   const isRobotBusy = useIsRobotBusy()
 
   React.useEffect(() => {
-    dispatch(buildrootChangelogSeen(robotName))
+    dispatch(robotUpdateChangelogSeen(robotName))
   }, [dispatch, robotName])
 
   const {

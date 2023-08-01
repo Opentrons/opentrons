@@ -4,23 +4,23 @@ import { useSelector } from 'react-redux'
 import {
   OT2_BALENA,
   UPGRADE,
-  getBuildrootUpdateInfo,
-  getBuildrootDownloadProgress,
-  getBuildrootDownloadError,
-} from '../../../../redux/buildroot'
+  getRobotUpdateInfo,
+  getRobotUpdateDownloadProgress,
+  getRobotUpdateDownloadError,
+} from '../../../../redux/robot-update'
 
 import { MigrationWarningModal } from './MigrationWarningModal'
 import { DownloadUpdateModal } from './DownloadUpdateModal'
 import { ReleaseNotesModal } from './ReleaseNotesModal'
 
 import type {
-  BuildrootUpdateType,
+  RobotUpdateType,
   RobotSystemType,
-} from '../../../../redux/buildroot/types'
+} from '../../../../redux/robot-update/types'
 
 export interface ViewUpdateModalProps {
   robotName: string
-  robotUpdateType: BuildrootUpdateType | null
+  robotUpdateType: RobotUpdateType | null
   robotSystemType: RobotSystemType | null
   close: () => unknown
   proceed: () => unknown
@@ -30,9 +30,9 @@ export function ViewUpdateModal(
   props: ViewUpdateModalProps
 ): JSX.Element | null {
   const { robotName, robotUpdateType, robotSystemType, close, proceed } = props
-  const updateInfo = useSelector(getBuildrootUpdateInfo)
-  const downloadProgress = useSelector(getBuildrootDownloadProgress)
-  const downloadError = useSelector(getBuildrootDownloadError)
+  const updateInfo = useSelector(getRobotUpdateInfo)
+  const downloadProgress = useSelector(getRobotUpdateDownloadProgress)
+  const downloadError = useSelector(getRobotUpdateDownloadError)
 
   const [
     showMigrationWarning,

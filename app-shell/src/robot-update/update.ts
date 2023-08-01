@@ -1,4 +1,4 @@
-// start a buildroot migration by POSTing the necessary wheel files to a robot
+// start a robot migration by POSTing the necessary wheel files to a robot
 // and restarting
 
 import path from 'path'

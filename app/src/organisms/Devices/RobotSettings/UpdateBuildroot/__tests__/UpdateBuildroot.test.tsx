@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import { mountWithStore, WrapperWithStore } from '@opentrons/components'
 import { mockConnectableRobot as mockRobot } from '../../../../../redux/discovery/__fixtures__'
-import * as Buildroot from '../../../../../redux/buildroot'
+import * as Buildroot from '../../../../../redux/robot-update'
 import { VersionInfoModal } from '../VersionInfoModal'
 import { ViewUpdateModal } from '../ViewUpdateModal'
 import { InstallModal } from '../InstallModal'
@@ -19,13 +19,13 @@ jest.mock('../ViewUpdateModal', () => ({
   ViewUpdateModal: () => <></>,
 }))
 
-jest.mock('../../../../../redux/buildroot/selectors')
+jest.mock('../../../../../redux/robot-update/selectors')
 
-const getBuildrootUpdateAvailable = Buildroot.getBuildrootUpdateAvailable as jest.MockedFunction<
-  typeof Buildroot.getBuildrootUpdateAvailable
+const getRobotUpdateAvailable = Buildroot.getRobotUpdateAvailable as jest.MockedFunction<
+  typeof Buildroot.getRobotUpdateAvailable
 >
-const getBuildrootSession = Buildroot.getBuildrootSession as jest.MockedFunction<
-  typeof Buildroot.getBuildrootSession
+const getRobotUpdateSession = Buildroot.getRobotUpdateSession as jest.MockedFunction<
+  typeof Buildroot.getRobotUpdateSession
 >
 const getRobotSystemType = Buildroot.getRobotSystemType as jest.MockedFunction<
   typeof Buildroot.getRobotSystemType
@@ -45,7 +45,7 @@ describe('UpdateBuildroot wizard', () => {
   }
 
   beforeEach(() => {
-    getBuildrootUpdateAvailable.mockReturnValue(Buildroot.UPGRADE)
+    getRobotUpdateAvailable.mockReturnValue(Buildroot.UPGRADE)
     getRobotSystemType.mockReturnValue(Buildroot.BUILDROOT)
   })
 
@@ -57,7 +57,7 @@ describe('UpdateBuildroot wizard', () => {
     const { store } = render()
 
     expect(store.dispatch).toHaveBeenCalledWith(
-      Buildroot.setBuildrootUpdateSeen(mockRobot.name)
+      Buildroot.setRobotUpdateSeen(mockRobot.name)
     )
   })
 
@@ -68,10 +68,7 @@ describe('UpdateBuildroot wizard', () => {
     expect(versionInfo.prop('robot')).toBe(mockRobot)
     expect(versionInfo.prop('robotUpdateType')).toBe(Buildroot.UPGRADE)
 
-    expect(getBuildrootUpdateAvailable).toHaveBeenCalledWith(
-      MOCK_STATE,
-      mockRobot
-    )
+    expect(getRobotUpdateAvailable).toHaveBeenCalledWith(MOCK_STATE, mockRobot)
     expect(closeModal).not.toHaveBeenCalled()
 
     versionInfo.invoke('close')?.()
@@ -100,7 +97,7 @@ describe('UpdateBuildroot wizard', () => {
     wrapper.find(VersionInfoModal).invoke('installUpdate')?.()
 
     expect(store.dispatch).toHaveBeenCalledWith(
-      Buildroot.startBuildrootUpdate(mockRobot.name)
+      Buildroot.startRobotUpdate(mockRobot.name)
     )
   })
 
@@ -116,7 +113,7 @@ describe('UpdateBuildroot wizard', () => {
       error: null,
     }
 
-    getBuildrootSession.mockReturnValue(mockSession)
+    getRobotUpdateSession.mockReturnValue(mockSession)
 
     const { wrapper } = render()
     const installModal = wrapper.find(InstallModal)
@@ -142,13 +139,13 @@ describe('UpdateBuildroot wizard', () => {
       error: null,
     }
 
-    getBuildrootSession.mockReturnValue(mockSession)
+    getRobotUpdateSession.mockReturnValue(mockSession)
 
     const { wrapper, store } = render()
 
     wrapper.unmount()
     expect(store.dispatch).toHaveBeenCalledWith(
-      Buildroot.clearBuildrootSession()
+      Buildroot.clearRobotUpdateSession()
     )
   })
 
@@ -164,13 +161,13 @@ describe('UpdateBuildroot wizard', () => {
       error: null,
     }
 
-    getBuildrootSession.mockReturnValue(mockSession)
+    getRobotUpdateSession.mockReturnValue(mockSession)
 
     const { wrapper, store } = render()
 
     wrapper.unmount()
     expect(store.dispatch).not.toHaveBeenCalledWith(
-      Buildroot.clearBuildrootSession()
+      Buildroot.clearRobotUpdateSession()
     )
   })
 })

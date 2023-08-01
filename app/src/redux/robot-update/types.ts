@@ -1,15 +1,15 @@
 import type { ViewableRobot } from '../discovery/types'
 import type { RobotHost } from '../robot-api/types'
 
-export type BuildrootUpdateType = 'upgrade' | 'downgrade' | 'reinstall'
+export type RobotUpdateType = 'upgrade' | 'downgrade' | 'reinstall'
 
 export type RobotSystemType = 'ot2-balena' | 'ot2-buildroot' | 'flex'
 
-export interface BuildrootUpdateInfo {
+export interface RobotUpdateInfo {
   releaseNotes: string
 }
 
-export interface BuildrootUserFileInfo {
+export interface RobotUpdateUserFileInfo {
   systemFile: string
   version: string
 }
@@ -36,9 +36,9 @@ export type UpdateSessionStep =
   | 'restarting'
   | 'finished'
 
-export interface BuildrootUpdateSession {
+export interface RobotUpdateSession {
   robotName: string
-  userFileInfo: BuildrootUserFileInfo | null
+  userFileInfo: RobotUpdateUserFileInfo | null
   token: string | null
   pathPrefix: string | null
   step: UpdateSessionStep | null
@@ -47,32 +47,32 @@ export interface BuildrootUpdateSession {
   error: string | null
 }
 
-export interface BuildrootState {
+export interface RobotUpdateState {
   seen: boolean
   downloadProgress: number | null
   downloadError: string | null
   version: string | null
-  info: BuildrootUpdateInfo | null
-  session: BuildrootUpdateSession | null
+  info: RobotUpdateInfo | null
+  session: RobotUpdateSession | null
 }
 
-export interface StartBuildrootUpdateAction {
-  type: 'buildroot:START_UPDATE'
+export interface StartRobotUpdateAction {
+  type: 'robotUpdate:START_UPDATE'
   payload: { robotName: string; systemFile: string | null }
 }
 
 export interface CreateSessionAction {
-  type: 'buildroot:CREATE_SESSION'
+  type: 'robotUpdate:CREATE_SESSION'
   payload: { host: RobotHost; sessionPath: string }
 }
 
 export interface CreateSessionSuccessAction {
-  type: 'buildroot:CREATE_SESSION_SUCCESS'
+  type: 'robotUpdate:CREATE_SESSION_SUCCESS'
   payload: { host: RobotHost; token: string; pathPrefix: string }
 }
 
-export interface BuildrootStatusAction {
-  type: 'buildroot:STATUS'
+export interface RobotUpdateStatusAction {
+  type: 'robotUpdate:STATUS'
   payload: {
     stage: UpdateSessionStage
     message: string
@@ -80,42 +80,42 @@ export interface BuildrootStatusAction {
   }
 }
 
-export interface UnexpectedBuildrootError {
-  type: 'buildroot:UNEXPECTED_ERROR'
+export interface UnexpectedRobotUpdateError {
+  type: 'robotUpdate:UNEXPECTED_ERROR'
   payload: { message: string }
 }
 
-export type BuildrootAction =
-  | StartBuildrootUpdateAction
+export type RobotUpdateAction =
+  | StartRobotUpdateAction
   | CreateSessionAction
   | CreateSessionSuccessAction
-  | BuildrootStatusAction
-  | UnexpectedBuildrootError
-  | { type: 'buildroot:DOWNLOAD_PROGRESS'; payload: number }
-  | { type: 'buildroot:DOWNLOAD_ERROR'; payload: string }
-  | { type: 'buildroot:UPDATE_VERSION'; payload: string }
-  | { type: 'buildroot:UPDATE_INFO'; payload: BuildrootUpdateInfo }
-  | { type: 'buildroot:USER_FILE_INFO'; payload: BuildrootUserFileInfo }
-  | { type: 'buildroot:SET_UPDATE_SEEN'; meta: { robotName: string } }
-  | { type: 'buildroot:CHANGELOG_SEEN'; meta: { robotName: string } }
-  | { type: 'buildroot:UPDATE_IGNORED'; meta: { robotName: string } }
+  | RobotUpdateStatusAction
+  | UnexpectedRobotUpdateError
+  | { type: 'robotUpdate:DOWNLOAD_PROGRESS'; payload: number }
+  | { type: 'robotUpdate:DOWNLOAD_ERROR'; payload: string }
+  | { type: 'robotUpdate:UPDATE_VERSION'; payload: string }
+  | { type: 'robotUpdate:UPDATE_INFO'; payload: RobotUpdateInfo }
+  | { type: 'robotUpdate:USER_FILE_INFO'; payload: RobotUpdateUserFileInfo }
+  | { type: 'robotUpdate:SET_UPDATE_SEEN'; meta: { robotName: string } }
+  | { type: 'robotUpdate:CHANGELOG_SEEN'; meta: { robotName: string } }
+  | { type: 'robotUpdate:UPDATE_IGNORED'; meta: { robotName: string } }
   | {
-      type: 'buildroot:START_PREMIGRATION'
+      type: 'robotUpdate:START_PREMIGRATION'
       payload: RobotHost
       meta: { shell: true }
     }
-  | { type: 'buildroot:PREMIGRATION_DONE'; payload: string }
-  | { type: 'buildroot:PREMIGRATION_ERROR'; payload: { message: string } }
+  | { type: 'robotUpdate:PREMIGRATION_DONE'; payload: string }
+  | { type: 'robotUpdate:PREMIGRATION_ERROR'; payload: { message: string } }
   | {
-      type: 'buildroot:READ_USER_FILE'
+      type: 'robotUpdate:READ_USER_FILE'
       payload: { systemFile: string }
       meta: { shell: true }
     }
   | {
-      type: 'buildroot:UPLOAD_FILE'
+      type: 'robotUpdate:UPLOAD_FILE'
       payload: { host: ViewableRobot; path: string; systemFile: string | null }
       meta: { shell: true }
     }
-  | { type: 'buildroot:FILE_UPLOAD_DONE'; payload: string }
-  | { type: 'buildroot:SET_SESSION_STEP'; payload: UpdateSessionStep }
-  | { type: 'buildroot:CLEAR_SESSION' }
+  | { type: 'robotUpdate:FILE_UPLOAD_DONE'; payload: string }
+  | { type: 'robotUpdate:SET_SESSION_STEP'; payload: UpdateSessionStep }
+  | { type: 'robotUpdate:CLEAR_SESSION' }

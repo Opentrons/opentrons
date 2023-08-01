@@ -1,4 +1,4 @@
-// buildroot update files
+// robot update files
 import path from 'path'
 import { readFile, ensureDir } from 'fs-extra'
 import { app } from 'electron'
@@ -19,12 +19,12 @@ import type { Action, Dispatch } from '../types'
 import type { ReleaseSetUrls, ReleaseSetFilepaths } from './types'
 import { UPDATE_MANIFEST_URLS } from './constants'
 import type {
-  BuildrootUpdateInfo,
-  BuildrootAction,
-} from '@opentrons/app/src/redux/buildroot/types'
+  RobotUpdateInfo,
+  RobotUpdateAction,
+} from '@opentrons/app/src/redux/robot-update/types'
 import type { RobotHost } from '@opentrons/app/src/redux/robot-api/types'
 
-const log = createLogger('buildroot/index')
+const log = createLogger('robot-update/index')
 
 const DIRECTORY = path.join(app.getPath('userData'), '__ot_buildroot__')
 const MANIFEST_CACHE = path.join(DIRECTORY, 'releases.json')
@@ -32,7 +32,7 @@ const MANIFEST_CACHE = path.join(DIRECTORY, 'releases.json')
 let checkingForUpdates = false
 let updateSet: ReleaseSetFilepaths | null = null
 
-export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
+export function registerRobotUpdate(dispatch: Dispatch): Dispatch {
   return function handleAction(action: Action) {
     switch (action.type) {
       case UI_INITIALIZED:
@@ -40,13 +40,11 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
         if (!checkingForUpdates) {
           checkingForUpdates = true
           // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          checkForBuildrootUpdate(dispatch).then(
-            () => (checkingForUpdates = false)
-          )
+          checkForRobotUpdate(dispatch).then(() => (checkingForUpdates = false))
         }
         break
 
-      case 'buildroot:START_PREMIGRATION': {
+      case 'robotUpdate:START_PREMIGRATION': {
         const robot = action.payload as RobotHost
 
         log.info('Starting robot premigration', { robot })
@@ -54,14 +52,14 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         startPremigration(robot)
           .then(
-            (): BuildrootAction => ({
-              type: 'buildroot:PREMIGRATION_DONE',
+            (): RobotUpdateAction => ({
+              type: 'robotUpdate:PREMIGRATION_DONE',
               payload: robot.name,
             })
           )
           .catch(
-            (error: Error): BuildrootAction => ({
-              type: 'buildroot:PREMIGRATION_ERROR',
+            (error: Error): RobotUpdateAction => ({
+              type: 'robotUpdate:PREMIGRATION_ERROR',
               payload: { message: error.message },
             })
           )
@@ -70,28 +68,28 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
         break
       }
 
-      case 'buildroot:UPLOAD_FILE': {
+      case 'robotUpdate:UPLOAD_FILE': {
         const { host, path, systemFile } = action.payload
         const file = systemFile !== null ? systemFile : updateSet?.system
 
         if (file == null) {
           return dispatch({
-            type: 'buildroot:UNEXPECTED_ERROR',
-            payload: { message: 'Buildroot update file not downloaded' },
+            type: 'robotUpdate:UNEXPECTED_ERROR',
+            payload: { message: 'Robot update file not downloaded' },
           })
         }
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         uploadSystemFile(host, path, file)
           .then(() => ({
-            type: 'buildroot:FILE_UPLOAD_DONE' as const,
+            type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
             payload: host.name,
           }))
           .catch((error: Error) => {
             log.warn('Error uploading update to robot', { path, file, error })
 
             return {
-              type: 'buildroot:UNEXPECTED_ERROR' as const,
+              type: 'robotUpdate:UNEXPECTED_ERROR' as const,
               payload: {
                 message: `Error uploading update to robot: ${error.message}`,
               },
@@ -102,20 +100,20 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
         break
       }
 
-      case 'buildroot:READ_USER_FILE': {
+      case 'robotUpdate:READ_USER_FILE': {
         const { systemFile } = action.payload as { systemFile: string }
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         readUserFileInfo(systemFile)
           .then(userFile => ({
-            type: 'buildroot:USER_FILE_INFO' as const,
+            type: 'robotUpdate:USER_FILE_INFO' as const,
             payload: {
               systemFile: userFile.systemFile,
               version: userFile.versionInfo.opentrons_api_version,
             },
           }))
           .catch((error: Error) => ({
-            type: 'buildroot:UNEXPECTED_ERROR' as const,
+            type: 'robotUpdate:UNEXPECTED_ERROR' as const,
             payload: { message: error.message },
           }))
           .then(dispatch)
@@ -126,7 +124,7 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
   }
 }
 
-export function getBuildrootUpdateUrls(): Promise<ReleaseSetUrls | null> {
+export function getRobotUpdateUrls(): Promise<ReleaseSetUrls | null> {
   const manifestUrl = UPDATE_MANIFEST_URLS()
 
   return downloadManifest(manifestUrl, MANIFEST_CACHE)
@@ -152,22 +150,22 @@ export function getBuildrootUpdateUrls(): Promise<ReleaseSetUrls | null> {
     })
 }
 
-// check for a buildroot update matching the current app version
-//   1. Ensure the buildroot directory exists
+// check for a robot update matching the current app version
+//   1. Ensure the robot update directory exists
 //   2. Download the manifest file from S3
 //   3. Get the release files according to the manifest
 //      a. If the files need downloading, dispatch progress updates to UI
 //   4. Cache the filepaths of the update files in memory
 //   5. Dispatch info or error to UI
-export function checkForBuildrootUpdate(dispatch: Dispatch): Promise<unknown> {
+export function checkForRobotUpdate(dispatch: Dispatch): Promise<unknown> {
   const fileDownloadDir = path.join(DIRECTORY, CURRENT_VERSION)
 
   return ensureDir(fileDownloadDir)
-    .then(getBuildrootUpdateUrls)
+    .then(getRobotUpdateUrls)
     .then(urls => {
       if (urls === null) return Promise.resolve()
 
-      dispatch({ type: 'buildroot:UPDATE_VERSION', payload: CURRENT_VERSION })
+      dispatch({ type: 'robotUpdate:UPDATE_VERSION', payload: CURRENT_VERSION })
 
       let prevPercentDone = 0
 
@@ -178,7 +176,7 @@ export function checkForBuildrootUpdate(dispatch: Dispatch): Promise<unknown> {
 
           if (Math.abs(percentDone - prevPercentDone) > 0) {
             dispatch({
-              type: 'buildroot:DOWNLOAD_PROGRESS',
+              type: 'robotUpdate:DOWNLOAD_PROGRESS',
               payload: percentDone,
             })
             prevPercentDone = percentDone
@@ -189,10 +187,13 @@ export function checkForBuildrootUpdate(dispatch: Dispatch): Promise<unknown> {
       return getReleaseFiles(urls, fileDownloadDir, handleProgress)
         .then(filepaths => cacheUpdateSet(filepaths))
         .then(updateInfo =>
-          dispatch({ type: 'buildroot:UPDATE_INFO', payload: updateInfo })
+          dispatch({ type: 'robotUpdate:UPDATE_INFO', payload: updateInfo })
         )
         .catch((error: Error) =>
-          dispatch({ type: 'buildroot:DOWNLOAD_ERROR', payload: error.message })
+          dispatch({
+            type: 'robotUpdate:DOWNLOAD_ERROR',
+            payload: error.message,
+          })
         )
         .then(() => cleanupReleaseFiles(DIRECTORY, CURRENT_VERSION))
         .catch((error: Error) => {
@@ -203,7 +204,7 @@ export function checkForBuildrootUpdate(dispatch: Dispatch): Promise<unknown> {
 
 function cacheUpdateSet(
   filepaths: ReleaseSetFilepaths
-): Promise<BuildrootUpdateInfo> {
+): Promise<RobotUpdateInfo> {
   updateSet = filepaths
 
   return readFile(updateSet.releaseNotes, 'utf8').then(releaseNotes => ({

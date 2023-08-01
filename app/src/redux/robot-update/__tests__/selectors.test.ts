@@ -18,7 +18,7 @@ const getRobotByName = discoSelectors.getRobotByName as jest.MockedFunction<
   typeof discoSelectors.getRobotByName
 >
 
-describe('buildroot selectors', () => {
+describe('robot update selectors', () => {
   beforeEach(() => {
     getViewableRobots.mockReturnValue([])
     getRobotApiVersion.mockReturnValue(null)
@@ -29,59 +29,59 @@ describe('buildroot selectors', () => {
     jest.resetAllMocks()
   })
 
-  it('should get buildroot update info', () => {
+  it('should get robot update info', () => {
     const state: State = {
-      buildroot: { info: { releaseNotes: 'some release notes' } },
+      robotUpdate: { info: { releaseNotes: 'some release notes' } },
     } as any
-    const result = selectors.getBuildrootUpdateInfo(state)
+    const result = selectors.getRobotUpdateInfo(state)
 
     expect(result).toEqual({ releaseNotes: 'some release notes' })
   })
 
   it('should get the update version from the auto-downloaded file', () => {
-    const state: State = { buildroot: { version: '1.0.0' } } as any
-    const result = selectors.getBuildrootTargetVersion(state)
+    const state: State = { robotUpdate: { version: '1.0.0' } } as any
+    const result = selectors.getRobotUpdateTargetVersion(state)
 
     expect(result).toBe('1.0.0')
   })
 
   it('should get the update version from the user-provided file', () => {
     const state: State = {
-      buildroot: {
+      robotUpdate: {
         version: '1.0.0',
         session: { userFileInfo: { version: '1.0.1' } },
       },
     } as any
-    const result = selectors.getBuildrootTargetVersion(state)
+    const result = selectors.getRobotUpdateTargetVersion(state)
 
     expect(result).toBe('1.0.1')
   })
 
   it('should get the update download error', () => {
     const state: State = {
-      buildroot: { downloadError: 'error with download' },
+      robotUpdate: { downloadError: 'error with download' },
     } as any
-    const result = selectors.getBuildrootDownloadError(state)
+    const result = selectors.getRobotUpdateDownloadError(state)
 
     expect(result).toBe('error with download')
   })
 
   it('should get the update download progress', () => {
-    const state: State = { buildroot: { downloadProgress: 10 } } as any
-    const result = selectors.getBuildrootDownloadProgress(state)
+    const state: State = { robotUpdate: { downloadProgress: 10 } } as any
+    const result = selectors.getRobotUpdateDownloadProgress(state)
 
     expect(result).toBe(10)
   })
 
   it('should get the update seen flag', () => {
-    const state: State = { buildroot: { seen: false } } as any
-    const result = selectors.getBuildrootUpdateSeen(state)
+    const state: State = { robotUpdate: { seen: false } } as any
+    const result = selectors.getRobotUpdateSeen(state)
 
     expect(result).toBe(false)
   })
 
   it('should return "upgrade" update type when robot is behind the update', () => {
-    const state: State = { buildroot: { version: '1.0.0' } } as any
+    const state: State = { robotUpdate: { version: '1.0.0' } } as any
     const robot = { name: 'robot-name' } as any
 
     getRobotApiVersion.mockImplementation(inputRobot => {
@@ -89,62 +89,62 @@ describe('buildroot selectors', () => {
       return '0.9.9'
     })
 
-    const result = selectors.getBuildrootUpdateAvailable(state, robot)
+    const result = selectors.getRobotUpdateAvailable(state, robot)
 
     expect(result).toBe('upgrade')
   })
 
   it('should return "downgrade" update type when robot is ahead of the update', () => {
-    const state: State = { buildroot: { version: '1.0.0' } } as any
+    const state: State = { robotUpdate: { version: '1.0.0' } } as any
     const robot = { name: 'robot-name' } as any
 
     getRobotApiVersion.mockReturnValue('1.0.1')
 
-    const result = selectors.getBuildrootUpdateAvailable(state, robot)
+    const result = selectors.getRobotUpdateAvailable(state, robot)
 
     expect(result).toBe('downgrade')
   })
 
   it('should get "reinstall" update type when robot matches the update', () => {
-    const state: State = { buildroot: { version: '1.0.0' } } as any
+    const state: State = { robotUpdate: { version: '1.0.0' } } as any
     const robot = { name: 'robot-name' } as any
 
     getRobotApiVersion.mockReturnValue('1.0.0')
 
-    const result = selectors.getBuildrootUpdateAvailable(state, robot)
+    const result = selectors.getRobotUpdateAvailable(state, robot)
 
     expect(result).toBe('reinstall')
   })
 
   it('should return null update type when no update available', () => {
-    const state: State = { buildroot: { version: null } } as any
+    const state: State = { robotUpdate: { version: null } } as any
     const robot = { name: 'robot-name' } as any
 
     getRobotApiVersion.mockReturnValue('1.0.0')
 
-    const result = selectors.getBuildrootUpdateAvailable(state, robot)
+    const result = selectors.getRobotUpdateAvailable(state, robot)
 
     expect(result).toBe(null)
   })
 
   it('should return null update type when no robot version available', () => {
-    const state: State = { buildroot: { version: '1.0.0' } } as any
+    const state: State = { robotUpdate: { version: '1.0.0' } } as any
     const robot = { name: 'robot-name' } as any
 
     getRobotApiVersion.mockReturnValue(null)
 
-    const result = selectors.getBuildrootUpdateAvailable(state, robot)
+    const result = selectors.getRobotUpdateAvailable(state, robot)
 
     expect(result).toBe(null)
   })
 
-  it('should get the buildroot update session', () => {
+  it('should get the robot update session', () => {
     const state: State = {
-      buildroot: {
+      robotUpdate: {
         session: { robotName: 'robot-name', token: null, pathPrefix: null },
       },
     } as any
-    const result = selectors.getBuildrootSession(state)
+    const result = selectors.getRobotUpdateSession(state)
 
     expect(result).toEqual({
       robotName: 'robot-name',
@@ -155,18 +155,18 @@ describe('buildroot selectors', () => {
 
   it('should get the robot name from the update session', () => {
     const state: State = {
-      buildroot: {
+      robotUpdate: {
         session: { robotName: 'robot-name', token: null, pathPrefix: null },
       },
     } as any
-    const result = selectors.getBuildrootRobotName(state)
+    const result = selectors.getRobotUpdateSessionRobotName(state)
 
     expect(result).toBe('robot-name')
   })
 
   it('should get the full robot from the update session', () => {
     const state: State = {
-      buildroot: {
+      robotUpdate: {
         session: { robotName: 'robot-name' },
       },
     } as any
@@ -180,7 +180,7 @@ describe('buildroot selectors', () => {
       ] as any
     })
 
-    const result = selectors.getBuildrootRobot(state)
+    const result = selectors.getRobotUpdateRobot(state)
     expect(result).toEqual({
       name: 'robot-name',
       host: '10.10.0.0',
@@ -190,7 +190,7 @@ describe('buildroot selectors', () => {
 
   it('should get the robot from session after migration with opentrons- name prefix', () => {
     const state: State = {
-      buildroot: {
+      robotUpdate: {
         session: { robotName: 'opentrons-robot-name' },
       },
     } as any
@@ -206,7 +206,7 @@ describe('buildroot selectors', () => {
       { name: 'another-robot-name', host: '10.10.0.2', port: 31950 },
     ] as any[])
 
-    const result = selectors.getBuildrootRobot(state)
+    const result = selectors.getRobotUpdateRobot(state)
     expect(result).toEqual({
       name: 'robot-name',
       host: '10.10.0.0',
@@ -230,9 +230,9 @@ describe('buildroot selectors', () => {
     ] as any[])
 
     expect(
-      selectors.getBuildrootUpdateInProgress(
+      selectors.getRobotUpdateInProgress(
         {
-          buildroot: {
+          robotUpdate: {
             session: {
               robotName: 'opentrons-robot-name',
               step: Constants.RESTART,
@@ -245,9 +245,9 @@ describe('buildroot selectors', () => {
     ).toBe(true)
 
     expect(
-      selectors.getBuildrootUpdateInProgress(
+      selectors.getRobotUpdateInProgress(
         {
-          buildroot: {
+          robotUpdate: {
             session: {
               robotName: 'opentrons-robot-name',
               step: Constants.RESTART,
@@ -260,9 +260,9 @@ describe('buildroot selectors', () => {
     ).toBe(false)
 
     expect(
-      selectors.getBuildrootUpdateInProgress(
+      selectors.getRobotUpdateInProgress(
         {
-          buildroot: {
+          robotUpdate: {
             session: {
               robotName: 'opentrons-robot-name',
               step: Constants.FINISHED,
@@ -275,15 +275,15 @@ describe('buildroot selectors', () => {
     ).toBe(false)
 
     expect(
-      selectors.getBuildrootUpdateInProgress(
-        { buildroot: { session: null } } as any,
+      selectors.getRobotUpdateInProgress(
+        { robotUpdate: { session: null } } as any,
         robot
       )
     ).toBe(false)
   })
 
   it('should return update disabled because not responding if no robot', () => {
-    const state: State = { buildroot: {} } as any
+    const state: State = { robotUpdate: {} } as any
     const robotName = 'robot-name'
 
     getRobotByName.mockImplementation((inputState, inputName) => {
@@ -292,7 +292,7 @@ describe('buildroot selectors', () => {
       return null
     })
 
-    const result = selectors.getBuildrootUpdateDisplayInfo(state, robotName)
+    const result = selectors.getRobotUpdateDisplayInfo(state, robotName)
 
     expect(result).toMatchObject({
       autoUpdateDisabledReason: expect.stringMatching(
@@ -305,7 +305,7 @@ describe('buildroot selectors', () => {
   })
 
   it('should return update disabled if robot has unhealthy update sever', () => {
-    const state: State = { buildroot: {} } as any
+    const state: State = { robotUpdate: {} } as any
     const robotName = 'robot-name'
 
     getRobotByName.mockReturnValue({
@@ -313,7 +313,7 @@ describe('buildroot selectors', () => {
       serverHealthStatus: HEALTH_STATUS_NOT_OK,
     })
 
-    const result = selectors.getBuildrootUpdateDisplayInfo(state, robotName)
+    const result = selectors.getRobotUpdateDisplayInfo(state, robotName)
 
     expect(result).toMatchObject({
       autoUpdateDisabledReason: expect.stringMatching(
@@ -327,7 +327,7 @@ describe('buildroot selectors', () => {
 
   it('should return update disabled because other robot updating', () => {
     const state: State = {
-      buildroot: { session: { robotName: 'other-name' } },
+      robotUpdate: { session: { robotName: 'other-name' } },
     } as any
     const robotName = 'robot-name'
     const robot = { ...mockReachableRobot, name: robotName }
@@ -340,7 +340,7 @@ describe('buildroot selectors', () => {
       return '1.0.0'
     })
 
-    const result = selectors.getBuildrootUpdateDisplayInfo(state, robotName)
+    const result = selectors.getRobotUpdateDisplayInfo(state, robotName)
 
     expect(result).toMatchObject({
       autoUpdateDisabledReason: expect.stringMatching(
@@ -353,14 +353,14 @@ describe('buildroot selectors', () => {
   })
 
   it('should return auto-update disabled but from-file enabled if no downloaded files', () => {
-    const state: State = { buildroot: {} } as any
+    const state: State = { robotUpdate: {} } as any
     const robotName = 'robot-name'
     const robot = { ...mockReachableRobot, name: robotName }
 
     getRobotByName.mockReturnValue(robot)
     getRobotApiVersion.mockReturnValue('1.0.0')
 
-    const result = selectors.getBuildrootUpdateDisplayInfo(state, robotName)
+    const result = selectors.getRobotUpdateDisplayInfo(state, robotName)
 
     expect(result).toEqual({
       autoUpdateAction: expect.stringMatching(/unavailable/i),
@@ -372,14 +372,14 @@ describe('buildroot selectors', () => {
   })
 
   it('should return all updates allowed if update files exist and robot is healthy', () => {
-    const state: State = { buildroot: { version: '1.0.0' } } as any
+    const state: State = { robotUpdate: { version: '1.0.0' } } as any
     const robotName = 'robot-name'
     const robot = { ...mockReachableRobot, name: robotName }
 
     getRobotByName.mockReturnValue(robot)
     getRobotApiVersion.mockReturnValue('0.9.9')
 
-    const result = selectors.getBuildrootUpdateDisplayInfo(state, robotName)
+    const result = selectors.getRobotUpdateDisplayInfo(state, robotName)
 
     expect(result).toEqual({
       autoUpdateAction: expect.stringMatching(/upgrade/i),

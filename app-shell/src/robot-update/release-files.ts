@@ -14,11 +14,11 @@ import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'
 
 const VERSION_FILENAME = 'VERSION.json'
 
-const log = createLogger('buildroot/release-files')
+const log = createLogger('robotUpdate/release-files')
 const outPath = (dir: string, url: string): string =>
   path.join(dir, path.basename(url))
 
-// checks `directory` for buildroot files matching the given `urls`, and
+// checks `directory` for robot update files matching the given `urls`, and
 // download them if they can't be found
 export function getReleaseFiles(
   urls: ReleaseSetUrls,
@@ -31,7 +31,7 @@ export function getReleaseFiles(
       return []
     })
     .then((files: string[]) => {
-      log.debug('Files in buildroot download directory', { files })
+      log.debug('Files in robot update download directory', { files })
       const system = outPath(directory, urls.system)
       const releaseNotes = outPath(directory, urls.releaseNotes)
 

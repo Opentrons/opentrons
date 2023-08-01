@@ -5,15 +5,15 @@ import { InstallModalContents } from './InstallModalContents'
 
 import type { ViewableRobot } from '../../../../redux/discovery/types'
 import type {
-  BuildrootUpdateSession,
+  RobotUpdateSession,
   RobotSystemType,
-} from '../../../../redux/buildroot/types'
-import { OT2_BALENA } from '../../../../redux/buildroot'
+} from '../../../../redux/robot-update/types'
+import { OT2_BALENA } from '../../../../redux/robot-update'
 
 export interface InstallModalProps {
   robot: ViewableRobot
   robotSystemType: RobotSystemType | null
-  session: BuildrootUpdateSession
+  session: RobotUpdateSession
   close: () => unknown
 }
 
@@ -36,7 +36,7 @@ export function InstallModal(props: InstallModalProps): JSX.Element {
     } else {
       heading = 'Robot Update: Step 2 of 2'
     }
-  } else if (robotSystemType === 'buildroot') {
+  } else {
     heading = 'Robot Update'
   }
 

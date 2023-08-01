@@ -50,12 +50,12 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
 
         break
 
-      case 'buildroot:UPLOAD_FILE': {
+      case 'robotUpdate:UPLOAD_FILE': {
         const { host, path, systemFile } = action.payload
         const file = systemFile !== null ? systemFile : updateSet?.system
         if (file == null) {
           return dispatch({
-            type: 'buildroot:UNEXPECTED_ERROR',
+            type: 'robotUpdate:UNEXPECTED_ERROR',
             payload: { message: 'Buildroot update file not downloaded' },
           })
         }
@@ -63,14 +63,14 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         uploadSystemFile(host, path, file)
           .then(() => ({
-            type: 'buildroot:FILE_UPLOAD_DONE' as const,
+            type: 'robotUpdate:FILE_UPLOAD_DONE' as const,
             payload: host.name,
           }))
           .catch((error: Error) => {
             log.warn('Error uploading update to robot', { path, file, error })
 
             return {
-              type: 'buildroot:UNEXPECTED_ERROR' as const,
+              type: 'robotUpdate:UNEXPECTED_ERROR' as const,
               payload: {
                 message: `Error uploading update to robot: ${error.message}`,
               },
@@ -81,20 +81,20 @@ export function registerRobotSystemUpdate(dispatch: Dispatch): Dispatch {
         break
       }
 
-      case 'buildroot:READ_USER_FILE': {
+      case 'robotUpdate:READ_USER_FILE': {
         const { systemFile } = action.payload as { systemFile: string }
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         readUserFileInfo(systemFile)
           .then(userFile => ({
-            type: 'buildroot:USER_FILE_INFO' as const,
+            type: 'robotUpdate:USER_FILE_INFO' as const,
             payload: {
               systemFile: userFile.systemFile,
               version: userFile.versionInfo.opentrons_api_version,
             },
           }))
           .catch((error: Error) => ({
-            type: 'buildroot:UNEXPECTED_ERROR' as const,
+            type: 'robotUpdate:UNEXPECTED_ERROR' as const,
             payload: { message: error.message },
           }))
           .then(dispatch)
@@ -139,7 +139,7 @@ export function getLatestSystemUpdateFiles(
           if (Math.abs(percentDone - prevPercentDone) > 0) {
             dispatch({
               // TODO: change this action type to 'systemUpdate:DOWNLOAD_PROGRESS'
-              type: 'buildroot:DOWNLOAD_PROGRESS',
+              type: 'robotUpdate:DOWNLOAD_PROGRESS',
               payload: percentDone,
             })
             prevPercentDone = percentDone
@@ -152,12 +152,15 @@ export function getLatestSystemUpdateFiles(
           return cacheUpdateSet(filepaths)
         })
         .then(({ version, releaseNotes }) => {
-          dispatch({ type: 'buildroot:UPDATE_INFO', payload: { releaseNotes } })
-          dispatch({ type: 'buildroot:UPDATE_VERSION', payload: version })
+          dispatch({
+            type: 'robotUpdate:UPDATE_INFO',
+            payload: { releaseNotes },
+          })
+          dispatch({ type: 'robotUpdate:UPDATE_VERSION', payload: version })
         })
         .catch((error: Error) => {
           return dispatch({
-            type: 'buildroot:DOWNLOAD_ERROR',
+            type: 'robotUpdate:DOWNLOAD_ERROR',
             payload: error.message,
           })
         })
