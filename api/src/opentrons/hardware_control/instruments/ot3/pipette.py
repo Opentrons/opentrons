@@ -101,10 +101,12 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             )
         )
         self.ready_to_aspirate = False
-        #: True if ready to aspirate
-        self._active_tip_settings = self._config.supported_tips[
+
+        self._default_active_tip_settings = self._config.supported_tips[
             pip_types.PipetteTipType(self._working_volume)
         ]
+        #: True if ready to aspirate
+        self._active_tip_settings = self._default_active_tip_settings
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
 
         self._aspirate_flow_rates_lookup = (
@@ -215,9 +217,7 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         self._has_tip = False
         self.ready_to_aspirate = False
         #: True if ready to aspirate
-        self._active_tip_settings = self._config.supported_tips[
-            pip_types.PipetteTipType(self._working_volume)
-        ]
+        self._active_tip_settings = self._default_active_tip_settings
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
 
         self._aspirate_flow_rate = (
@@ -422,9 +422,10 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
     def working_volume(self, tip_volume: float) -> None:
         """The working volume is the current tip max volume"""
         self._working_volume = min(self.config.max_volume, tip_volume)
-        self._active_tip_settings = self._config.supported_tips[
-            pip_types.PipetteTipType(int(self._working_volume))
-        ]
+        self._active_tip_settings = self._config.supported_tips.get(
+            pip_types.PipetteTipType(int(self._working_volume)),
+            self._default_active_tip_settings,
+        )
         self._fallback_tip_length = self._active_tip_settings.default_tip_length
         self._tip_overlap_lookup = self._config.tip_overlap_dictionary
 

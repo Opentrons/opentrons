@@ -176,9 +176,14 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
 
             static_config = self._state.static_config_by_id.get(pipette_id)
             if static_config:
-                tip_configuration = static_config.tip_configuration_lookup_table[
-                    attached_tip.volume
-                ]
+                try:
+                    tip_configuration = static_config.tip_configuration_lookup_table[
+                        attached_tip.volume
+                    ]
+                except KeyError:
+                    tip_configuration = static_config.tip_configuration_lookup_table[
+                        static_config.max_volume
+                    ]
                 self._state.flow_rates_by_id[pipette_id] = FlowRates(
                     default_blow_out=tip_configuration.default_blowout_flowrate.values_by_api_level,
                     default_aspirate=tip_configuration.default_aspirate_flowrate.values_by_api_level,
@@ -539,7 +544,7 @@ class PipetteView(HasState[PipetteState]):
             ]
         else:
             tip_lookup = self.get_config(pipette_id).tip_configuration_lookup_table[
-                working_volume
+                max_volume
             ]
         return tip_lookup.default_return_tip_height
 
