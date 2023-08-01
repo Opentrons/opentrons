@@ -46,6 +46,11 @@ class NamedOffset(TypedDict):
     z: float
 
 
+class GripperOffsets(TypedDict):
+    pickUpOffset: NamedOffset
+    dropOffset: NamedOffset
+
+
 class LabwareParameters(TypedDict, total=False):
     format: LabwareFormat
     isTiprack: bool
@@ -130,3 +135,4 @@ class LabwareDefinition(_RequiredLabwareDefinition, total=False):
     stackingOffsetWithLabware: Dict[str, NamedOffset]
     stackingOffsetWithModule: Dict[str, NamedOffset]
     allowedRoles: List[LabwareRoles]
+    gripperOffsets: Dict[str, GripperOffsets]

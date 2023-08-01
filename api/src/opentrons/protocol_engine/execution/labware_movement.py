@@ -1,7 +1,7 @@
 """Labware movement command handling."""
 from __future__ import annotations
 
-from typing import Optional, Union, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 from opentrons_shared_data.gripper.constants import (
     LABWARE_GRIP_FORCE,
     IDLE_STATE_GRIP_FORCE,
@@ -26,11 +26,10 @@ from ..errors import (
 )
 
 from ..types import (
-    DeckSlotLocation,
-    ModuleLocation,
     OnLabwareLocation,
     LabwareLocation,
     LabwareMovementOffsetData,
+    OnDeckLabwareLocation,
 )
 
 if TYPE_CHECKING:
@@ -84,8 +83,8 @@ class LabwareMovementHandler:
     async def move_labware_with_gripper(
         self,
         labware_id: str,
-        current_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
-        new_location: Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation],
+        current_location: OnDeckLabwareLocation,
+        new_location: OnDeckLabwareLocation,
         user_offset_data: LabwareMovementOffsetData,
     ) -> None:
         """Move a loaded labware from one location to another using gripper."""

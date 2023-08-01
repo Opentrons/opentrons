@@ -64,6 +64,25 @@ class OverlapOffset(BaseModel):
     z: _Number
 
 
+class OffsetVector(BaseModel):
+    """
+    A generic 3-D offset vector.
+    """
+
+    x: _Number
+    y: _Number
+    z: _Number
+
+
+class GripperOffsets(BaseModel):
+    """
+    Offsets used when calculating coordinates for gripping labware during labware movement.
+    """
+
+    pickUpOffset: OffsetVector
+    dropOffset: OffsetVector
+
+
 class BrandData(BaseModel):
     brand: str = Field(..., description="Brand/manufacturer name")
     brandId: Optional[List[str]] = Field(
@@ -293,4 +312,9 @@ class LabwareDefinition(BaseModel):
         default_factory=dict,
         description="Supported module that can be stacked upon,"
         " with overlap vector offset between labware and module.",
+    )
+    gripperOffsets: Dict[str, GripperOffsets] = Field(
+        default_factory=dict,
+        description="Offsets use when calculating coordinates for gripping labware "
+        "during labware movement.",
     )

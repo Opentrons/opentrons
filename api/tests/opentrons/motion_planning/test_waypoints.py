@@ -272,8 +272,8 @@ def test_get_gripper_labware_movement_waypoints() -> None:
         to_labware_center=Point(201, 202, 219.5),
         gripper_home_z=999,
         offset_data=LabwareMovementOffsetData(
-            pick_up_offset=LabwareOffsetVector(x=-1, y=-2, z=-3),
-            drop_offset=LabwareOffsetVector(x=1, y=2, z=3),
+            pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
+            dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
         ),
     )
     assert result == [

@@ -92,8 +92,8 @@ def heater_shaker_movement_flagger(decoy: Decoy) -> HeaterShakerMovementFlagger:
 def default_experimental_movement_data() -> LabwareMovementOffsetData:
     """Experimental movement data with default values."""
     return LabwareMovementOffsetData(
-        pick_up_offset=LabwareOffsetVector(x=0, y=0, z=0),
-        drop_offset=LabwareOffsetVector(x=0, y=0, z=0),
+        pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
+        dropOffset=LabwareOffsetVector(x=0, y=0, z=0),
     )
 
 
@@ -160,12 +160,12 @@ async def test_move_labware_with_gripper(
     #  smoke test for gripper labware movement with actual labware and make this a unit test.
 
     user_offset_data = LabwareMovementOffsetData(
-        pick_up_offset=LabwareOffsetVector(x=123, y=234, z=345),
-        drop_offset=LabwareOffsetVector(x=111, y=222, z=333),
+        pickUpOffset=LabwareOffsetVector(x=123, y=234, z=345),
+        dropOffset=LabwareOffsetVector(x=111, y=222, z=333),
     )
     final_offset_data = LabwareMovementOffsetData(
-        pick_up_offset=LabwareOffsetVector(x=-1, y=-2, z=-3),
-        drop_offset=LabwareOffsetVector(x=1, y=2, z=3),
+        pickUpOffset=LabwareOffsetVector(x=-1, y=-2, z=-3),
+        dropOffset=LabwareOffsetVector(x=1, y=2, z=3),
     )
 
     decoy.when(state_store.config.use_virtual_gripper).then_return(False)

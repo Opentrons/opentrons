@@ -101,6 +101,14 @@ def well_plate_def() -> LabwareDefinition:
 
 
 @pytest.fixture(scope="session")
+def adapter_plate_def() -> LabwareDefinition:
+    """Get the definition of a h/s adapter plate."""
+    return LabwareDefinition.parse_obj(
+        load_definition("opentrons_universal_flat_adapter", 1)
+    )
+
+
+@pytest.fixture(scope="session")
 def reservoir_def() -> LabwareDefinition:
     """Get the definition of single-row reservoir."""
     return LabwareDefinition.parse_obj(load_definition("nest_12_reservoir_15ml", 1))
