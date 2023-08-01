@@ -154,6 +154,8 @@ class RunArgs:
         run_id, start_time = create_run_id_and_start_time()
         environment_sensor = asair_sensor.BuildAsairSensor(_ctx.is_simulating())
         git_description = get_git_description()
+        if not args.photometric:
+            scale = Scale.build(simulate=_ctx.is_simulating())
         ui.print_header("LOAD PIPETTE")
         pipette = helpers._load_pipette(
             _ctx,
@@ -245,7 +247,6 @@ class RunArgs:
                 robot_serial=robot_serial,
             )
         else:
-            scale = Scale.build(simulate=_ctx.is_simulating())
             if args.increment:
                 protocol_cfg = GRAVIMETRIC_CFG_INCREMENT[args.pipette][args.channels][
                     args.tip
@@ -469,6 +470,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     run_args = RunArgs.build_run_args(args)
     try:
+        if not resources.ctx.is_simulating():
+            ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         for tip, volumes in run_args.volumes:
             hw = run_args.ctx._core.get_hardware()
             if not run_args.ctx.is_simulating():

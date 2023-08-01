@@ -481,9 +481,6 @@ def run(cfg: config.GravimetricConfig, resources: TestResources) -> None:
         _pick_up_tip(resources.ctx, resources.pipette, cfg, location=first_tip_location)
         mnt = OT3Mount.LEFT if cfg.pipette_mount == "left" else OT3Mount.RIGHT
         resources.ctx._core.get_hardware().retract(mnt)
-        if not resources.ctx.is_simulating():
-            ui.get_user_ready("REPLACE first tip with NEW TIP")
-            ui.get_user_ready("CLOSE the door, and MOVE AWAY from machine")
         ui.print_info("moving to scale")
         well = labware_on_scale["A1"]
         resources.pipette.move_to(well.top(0), minimum_z_height=_minimum_z_height(cfg))
