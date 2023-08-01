@@ -20,6 +20,7 @@ import {
   WRAP,
 } from '@opentrons/components'
 import {
+  GripperModel,
   getGripperDisplayName,
   getModuleDisplayName,
   getPipetteModelSpecs,
@@ -169,8 +170,8 @@ function AttachedInstruments(props: { robotName: string }): JSX.Element {
   const leftPipetteModel = pipettesData?.left?.model ?? null
   const rightPipetteModel = pipettesData?.right?.model ?? null
   const gripperDisplayName =
-    attachedGripper != null && attachedGripper.instrumentModel === 'gripperV1'
-      ? getGripperDisplayName(attachedGripper.instrumentModel)
+    attachedGripper != null
+      ? getGripperDisplayName(attachedGripper.instrumentModel as GripperModel)
       : null
 
   // TODO(bh, 2022-11-1): insert actual 96-channel data

@@ -29,8 +29,6 @@ from .ot3utils import (
     create_gripper_jaw_hold_group,
     create_gripper_jaw_grip_group,
     create_gripper_jaw_home_group,
-    create_tip_action_group,
-    PipetteAction,
     NODEID_SUBSYSTEM,
     motor_nodes,
     target_to_subsystem,
@@ -139,6 +137,7 @@ class OT3Simulator:
         self._initialized = False
         self._lights = {"button": False, "rails": False}
         self._estop_state_machine = EstopStateMachine(detector=None)
+        self._gear_motor_position: Dict[NodeId, float] = {}
 
         def _sanitize_attached_instrument(
             mount: OT3Mount, passed_ai: Optional[Dict[str, Optional[str]]] = None
@@ -202,6 +201,10 @@ class OT3Simulator:
     @property
     def eeprom_data(self) -> EEPROMData:
         return EEPROMData()
+
+    @property
+    def gear_motor_position(self) -> Dict[NodeId, float]:
+        return self._gear_motor_position
 
     @property
     def board_revision(self) -> BoardRevision:
@@ -377,17 +380,15 @@ class OT3Simulator:
         """Get the state of the tip ejector flag for a given mount."""
         pass
 
-    @ensure_yield
     async def tip_action(
         self,
-        axes: Sequence[Axis],
-        distance: float = 33,
-        speed: float = -5.5,
-        tip_action: str = "drop",
+        moves: Optional[List[Move[Axis]]] = None,
+        distance: Optional[float] = None,
+        velocity: Optional[float] = None,
+        tip_action: str = "home",
+        back_off: Optional[bool] = False,
     ) -> None:
-        _ = create_tip_action_group(
-            axes, distance, speed, cast(PipetteAction, tip_action)
-        )
+        pass
 
     def _attached_to_mount(
         self, mount: OT3Mount, expected_instr: Optional[PipetteName]
@@ -533,6 +534,7 @@ class OT3Simulator:
             Axis.Y: phony_bounds,
             Axis.X: phony_bounds,
             Axis.Z_G: phony_bounds,
+            Axis.Q: phony_bounds,
         }
 
     @property

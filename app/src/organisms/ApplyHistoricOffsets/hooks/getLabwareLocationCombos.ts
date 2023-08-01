@@ -6,7 +6,7 @@ import type {
 } from '@opentrons/shared-data'
 import { LabwareOffsetLocation } from '@opentrons/api-client'
 
-interface LabwareLocationCombo {
+export interface LabwareLocationCombo {
   location: LabwareOffsetLocation
   definitionUri: string
   labwareId: string
@@ -84,6 +84,7 @@ function appendLocationComboIfUniq(
 ): LabwareLocationCombo[] {
   const locationComboAlreadyExists = acc.some(
     combo =>
+      combo.labwareId === locationCombo.labwareId &&
       isEqual(combo.location, locationCombo.location) &&
       combo.definitionUri === locationCombo.definitionUri
   )

@@ -12,7 +12,7 @@ from ..types import (
     LabwareOffsetVector,
     LabwareMovementOffsetData,
 )
-from ..errors import LabwareMovementNotAllowedError
+from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
 from ..resources import labware_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
@@ -120,6 +120,11 @@ class MoveLabwareImplementation(
         )
 
         if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
+            if self._state_view.config.robot_type == "OT-2 Standard":
+                raise NotSupportedOnRobotType(
+                    message="Labware movement using a gripper is not supported on the OT-2",
+                    details={"strategy": params.strategy},
+                )
             if labware_validation.validate_definition_is_adapter(
                 current_labware_definition
             ):
@@ -128,16 +133,16 @@ class MoveLabwareImplementation(
                 )
 
             validated_current_loc = (
-                self._labware_movement.ensure_valid_gripper_location(
+                self._state_view.geometry.ensure_valid_gripper_location(
                     current_labware.location
                 )
             )
-            validated_new_loc = self._labware_movement.ensure_valid_gripper_location(
+            validated_new_loc = self._state_view.geometry.ensure_valid_gripper_location(
                 available_new_location,
             )
             user_offset_data = LabwareMovementOffsetData(
-                pickUpOffset=params.pickUpOffset,
-                dropOffset=params.dropOffset,
+                pickUpOffset=params.pickUpOffset or LabwareOffsetVector(x=0, y=0, z=0),
+                dropOffset=params.dropOffset or LabwareOffsetVector(x=0, y=0, z=0),
             )
             # Skips gripper moves when using virtual gripper
             await self._labware_movement.move_labware_with_gripper(

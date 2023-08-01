@@ -12,6 +12,22 @@
       "minItems": 3,
       "maxItems": 3
     },
+    "coordinates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "z": {
+          "type": "number"
+        }
+      }
+    },
     "unitVector": {
       "type": "array",
       "description": "Array of 3 unit directions, [x, y, z]",
@@ -79,32 +95,26 @@
       "description": "Unique internal ID generated using UUID",
       "type": "string"
     },
-
     "schemaVersion": {
       "description": "Schema version of a deck is a single integer",
       "enum": [3]
     },
-
     "cornerOffsetFromOrigin": {
       "$ref": "#/definitions/xyzArray",
       "description": "Position of left-front-bottom corner of entire deck to robot coordinate system origin"
     },
-
     "dimensions": {
       "$ref": "#/definitions/xyzArray",
       "description": "Outer dimensions of a deck bounding box"
     },
-
     "metadata": {
       "description": "Optional metadata about the Deck",
       "type": "object",
-
       "properties": {
         "displayName": {
           "description": "A short, human-readable name for the deck",
           "type": "string"
         },
-
         "tags": {
           "description": "Tags to be used in searching for this deck",
           "type": "array",
@@ -114,7 +124,6 @@
         }
       }
     },
-
     "robot": {
       "type": "object",
       "required": ["model"],
@@ -126,7 +135,6 @@
         }
       }
     },
-
     "locations": {
       "type": "object",
       "required": ["orderedSlots", "calibrationPoints"],
@@ -148,12 +156,16 @@
                 "description": "Unique identifier for slot",
                 "type": "string"
               },
-              "position": { "$ref": "#/definitions/xyzArray" },
+              "position": {
+                "$ref": "#/definitions/xyzArray"
+              },
               "matingSurfaceUnitVector": {
                 "$ref": "#/definitions/unitVector",
                 "description": "An optional diagonal direction of force, defined by spring location, which governs the mating surface of objects placed in slot."
               },
-              "boundingBox": { "$ref": "#/definitions/boundingBox" },
+              "boundingBox": {
+                "$ref": "#/definitions/boundingBox"
+              },
               "displayName": {
                 "description": "A human-readable nickname for this slot Eg \"Slot 1\" or \"Fixed Trash\"",
                 "type": "string"
@@ -174,7 +186,6 @@
             }
           }
         },
-
         "calibrationPoints": {
           "type": "array",
           "description": "Key points for deck calibration",
@@ -186,7 +197,9 @@
                 "description": "Unique identifier for calibration point",
                 "type": "string"
               },
-              "position": { "$ref": "#/definitions/xyzArray" },
+              "position": {
+                "$ref": "#/definitions/xyzArray"
+              },
               "displayName": {
                 "description": "An optional human-readable nickname for this point Eg \"Slot 3 Cross\" or \"Slot 1 Dot\"",
                 "type": "string"
@@ -194,7 +207,6 @@
             }
           }
         },
-
         "fixtures": {
           "type": "array",
           "description": "Fixed position objects on the deck.",
@@ -210,12 +222,16 @@
                 "description": "Valid labware loadName for fixed object",
                 "type": "string"
               },
-              "boundingBox": { "$ref": "#/definitions/boundingBox" },
+              "boundingBox": {
+                "$ref": "#/definitions/boundingBox"
+              },
               "slot": {
                 "description": "Slot location of the fixed object",
                 "type": "string"
               },
-              "position": { "$ref": "#/definitions/xyzArray" },
+              "position": {
+                "$ref": "#/definitions/xyzArray"
+              },
               "displayName": {
                 "description": "An optional human-readable nickname for this fixture Eg \"Tall Fixed Trash\" or \"Short Fixed Trash\"",
                 "type": "string"
@@ -250,7 +266,30 @@
     "layers": {
       "type": "array",
       "description": "Layered feature groups of the deck.",
-      "items": { "$ref": "#/definitions/svgsonNode" }
+      "items": {
+        "$ref": "#/definitions/svgsonNode"
+      }
+    },
+    "gripperOffsets": {
+      "type": "object",
+      "description": "Offsets to be added when calculating the coordinates a gripper should go to when picking up or dropping a labware on this deck.",
+      "properties": {
+        "default": {
+          "type": "object",
+          "properties": {
+            "pickUpOffset": {
+              "$ref": "#/definitions/coordinates",
+              "description": "Offset added to calculate pick-up coordinates of a labware placed on this deck."
+            },
+            "dropOffset": {
+              "$ref": "#/definitions/coordinates",
+              "description": "Offset added to calculate drop coordinates of a labware placed on this deck."
+            }
+          },
+          "required": ["pickUpOffset", "dropOffset"]
+        }
+      },
+      "required": ["default"]
     }
   }
 }

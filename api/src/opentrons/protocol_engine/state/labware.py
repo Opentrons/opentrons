@@ -46,6 +46,7 @@ from ..types import (
     ModuleLocation,
     ModuleModel,
     OverlapOffset,
+    LabwareMovementOffsetData,
 )
 from ..actions import (
     Action,
@@ -719,3 +720,46 @@ class LabwareView(HasState[LabwareState]):
         """Check whether the labware uri needs to be calculated in half a millimeter."""
         uri = self.get_uri_from_definition(self.get_definition(labware_id))
         return uri in _MAGDECK_HALF_MM_LABWARE
+
+    def get_deck_default_gripper_offsets(self) -> Optional[LabwareMovementOffsetData]:
+        """Get the deck's default gripper offsets."""
+        parsed_offsets = (
+            self.get_deck_definition().get("gripperOffsets", {}).get("default")
+        )
+        return (
+            LabwareMovementOffsetData(
+                pickUpOffset=LabwareOffsetVector(
+                    x=parsed_offsets["pickUpOffset"]["x"],
+                    y=parsed_offsets["pickUpOffset"]["y"],
+                    z=parsed_offsets["pickUpOffset"]["z"],
+                ),
+                dropOffset=LabwareOffsetVector(
+                    x=parsed_offsets["dropOffset"]["x"],
+                    y=parsed_offsets["dropOffset"]["y"],
+                    z=parsed_offsets["dropOffset"]["z"],
+                ),
+            )
+            if parsed_offsets
+            else None
+        )
+
+    def get_labware_gripper_offsets(
+        self,
+        labware_id: str,
+        slot_name: Optional[DeckSlotName],
+    ) -> Optional[LabwareMovementOffsetData]:
+        """Get the labware's gripper offsets of the specified type."""
+        parsed_offsets = self.get_definition(labware_id).gripperOffsets
+        offset_key = slot_name.name if slot_name else "default"
+        return (
+            LabwareMovementOffsetData(
+                pickUpOffset=cast(
+                    LabwareOffsetVector, parsed_offsets[offset_key].pickUpOffset
+                ),
+                dropOffset=cast(
+                    LabwareOffsetVector, parsed_offsets[offset_key].dropOffset
+                ),
+            )
+            if parsed_offsets
+            else None
+        )

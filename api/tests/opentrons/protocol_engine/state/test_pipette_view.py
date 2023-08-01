@@ -3,6 +3,7 @@ import pytest
 from typing import cast, Dict, List, Optional
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette import pipette_definition
 
 from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
 from opentrons.types import MountType, Mount as HwMount
@@ -227,7 +228,9 @@ def test_get_aspirated_volume() -> None:
         subject.get_aspirated_volume("pipette-id-no-tip")
 
 
-def test_get_pipette_working_volume() -> None:
+def test_get_pipette_working_volume(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> None:
     """It should get the minimum value of tip volume and max volume."""
     subject = get_pipette_view(
         attached_tip_by_id={
@@ -241,7 +244,7 @@ def test_get_pipette_working_volume() -> None:
                 model="blah",
                 display_name="bleh",
                 serial_number="",
-                return_tip_scale=0,
+                tip_configuration_lookup_table={9001: supported_tip_fixture},
                 nominal_tip_overlap={},
                 home_position=0,
                 nozzle_offset_z=0,
@@ -252,7 +255,9 @@ def test_get_pipette_working_volume() -> None:
     assert subject.get_working_volume("pipette-id") == 1337
 
 
-def test_get_pipette_working_volume_raises_if_tip_volume_is_none() -> None:
+def test_get_pipette_working_volume_raises_if_tip_volume_is_none(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> None:
     """Should raise an exception that no tip is attached."""
     subject = get_pipette_view(
         attached_tip_by_id={
@@ -266,7 +271,7 @@ def test_get_pipette_working_volume_raises_if_tip_volume_is_none() -> None:
                 model="blah",
                 display_name="bleh",
                 serial_number="",
-                return_tip_scale=0,
+                tip_configuration_lookup_table={9001: supported_tip_fixture},
                 nominal_tip_overlap={},
                 home_position=0,
                 nozzle_offset_z=0,
@@ -281,7 +286,9 @@ def test_get_pipette_working_volume_raises_if_tip_volume_is_none() -> None:
         subject.get_working_volume("wrong-id")
 
 
-def test_get_pipette_available_volume() -> None:
+def test_get_pipette_available_volume(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> None:
     """It should get the available volume for a pipette."""
     subject = get_pipette_view(
         attached_tip_by_id={
@@ -300,7 +307,7 @@ def test_get_pipette_available_volume() -> None:
                 model="blah",
                 display_name="bleh",
                 serial_number="",
-                return_tip_scale=0,
+                tip_configuration_lookup_table={123: supported_tip_fixture},
                 nominal_tip_overlap={},
                 home_position=0,
                 nozzle_offset_z=0,
@@ -312,7 +319,7 @@ def test_get_pipette_available_volume() -> None:
                 model="blah",
                 display_name="bleh",
                 serial_number="",
-                return_tip_scale=0,
+                tip_configuration_lookup_table={123: supported_tip_fixture},
                 nominal_tip_overlap={},
                 home_position=0,
                 nozzle_offset_z=0,
@@ -409,7 +416,9 @@ def test_get_deck_point(
     assert subject.get_deck_point(pipette_id="pipette-id") == DeckPoint(x=1, y=2, z=3)
 
 
-def test_get_static_config() -> None:
+def test_get_static_config(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> None:
     """It should return the static pipette configuration that was set for the given pipette."""
     config = StaticPipetteConfig(
         model="pipette-model",
@@ -418,13 +427,25 @@ def test_get_static_config() -> None:
         min_volume=1.23,
         max_volume=4.56,
         channels=9,
-        return_tip_scale=7.89,
+        tip_configuration_lookup_table={4.56: supported_tip_fixture},
         nominal_tip_overlap={},
         home_position=10.12,
         nozzle_offset_z=12.13,
     )
 
-    subject = get_pipette_view(static_config_by_id={"pipette-id": config})
+    subject = get_pipette_view(
+        pipettes_by_id={
+            "pipette-id": LoadedPipette(
+                id="pipette-id",
+                mount=MountType.LEFT,
+                pipetteName=PipetteNameType.P300_SINGLE,
+            )
+        },
+        attached_tip_by_id={
+            "pipette-id": TipGeometry(length=1, volume=4.56, diameter=3),
+        },
+        static_config_by_id={"pipette-id": config},
+    )
 
     assert subject.get_config("pipette-id") == config
     assert subject.get_model_name("pipette-id") == "pipette-model"
@@ -432,14 +453,16 @@ def test_get_static_config() -> None:
     assert subject.get_serial_number("pipette-id") == "serial-number"
     assert subject.get_minimum_volume("pipette-id") == 1.23
     assert subject.get_maximum_volume("pipette-id") == 4.56
-    assert subject.get_return_tip_scale("pipette-id") == 7.89
+    assert subject.get_return_tip_scale("pipette-id") == 0.5
     assert (
         subject.get_instrument_max_height_ot2("pipette-id")
         == 22.25 - Z_RETRACT_DISTANCE
     )
 
 
-def test_get_nominal_tip_overlap() -> None:
+def test_get_nominal_tip_overlap(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> None:
     """It should return the static pipette configuration that was set for the given pipette."""
     config = StaticPipetteConfig(
         model="",
@@ -448,7 +471,7 @@ def test_get_nominal_tip_overlap() -> None:
         min_volume=0,
         max_volume=0,
         channels=10,
-        return_tip_scale=0,
+        tip_configuration_lookup_table={0: supported_tip_fixture},
         nominal_tip_overlap={
             "some-uri": 100,
             "default": 10,

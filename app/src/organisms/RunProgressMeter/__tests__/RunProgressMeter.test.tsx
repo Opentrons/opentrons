@@ -18,7 +18,6 @@ import { useDownloadRunLog } from '../../Devices/hooks'
 import {
   mockUseAllCommandsResponseNonDeterministic,
   mockUseCommandResultNonDeterministic,
-  NON_DETERMINISTIC_COMMAND_ID,
   NON_DETERMINISTIC_COMMAND_KEY,
 } from '../__fixtures__'
 import {
@@ -82,7 +81,7 @@ describe('RunProgressMeter', () => {
       .calledWith(NON_DETERMINISTIC_RUN_ID, { cursor: null, pageLength: 1 })
       .mockReturnValue(mockUseAllCommandsResponseNonDeterministic)
     when(mockUseCommandQuery)
-      .calledWith(NON_DETERMINISTIC_RUN_ID, NON_DETERMINISTIC_COMMAND_ID)
+      .calledWith(NON_DETERMINISTIC_RUN_ID, NON_DETERMINISTIC_COMMAND_KEY)
       .mockReturnValue(mockUseCommandResultNonDeterministic)
     mockUseDownloadRunLog.mockReturnValue({
       downloadRunLog: jest.fn(),

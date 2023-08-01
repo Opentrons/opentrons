@@ -60,9 +60,7 @@ class HardwareTipHandler(TipHandler):
         hw_mount = self._state_view.pipettes.get_mount(pipette_id).to_hw_mount()
 
         nominal_tip_geometry = self._state_view.geometry.get_nominal_tip_geometry(
-            pipette_id=pipette_id,
-            labware_id=labware_id,
-            well_name=well_name,
+            pipette_id=pipette_id, labware_id=labware_id, well_name=well_name
         )
 
         actual_tip_length = await self._labware_data_provider.get_calibrated_tip_length(

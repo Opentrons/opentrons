@@ -1,16 +1,6 @@
-import {
-  LoadedPipette,
-  LoadedLabware,
-  LoadedModule,
-  Liquid,
-  PipetteName,
-} from '../../../js'
+import { LoadedPipette, LoadedLabware, LoadedModule, Liquid } from '../../../js'
 import type { CreateCommand, RunTimeCommand } from './command'
-import type {
-  LabwareDefinition2,
-  ModuleModel,
-  RobotType,
-} from '../../../js/types'
+import type { LabwareDefinition2, RobotType } from '../../../js/types'
 
 export * from './command'
 
@@ -37,22 +27,8 @@ export interface ProtocolFile<DesignerApplicationData = {}> {
     model: 'OT-2 Standard' | 'OT-3 Standard'
     deckId: 'ot2_standard' | 'ot2_short_trash' | 'ot3_standard'
   }
-  pipettes: {
-    [pipetteId: string]: { name: PipetteName }
-  }
   labwareDefinitions: {
     [definitionId: string]: LabwareDefinition2
-  }
-  labware: {
-    [labwareId: string]: {
-      definitionId: string
-      displayName?: string
-    }
-  }
-  modules: {
-    [moduleId: string]: {
-      model: ModuleModel
-    }
   }
   liquids: {
     [liquidId: string]: {
