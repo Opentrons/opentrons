@@ -1,5 +1,5 @@
 """ProtocolEngine class definition."""
-from contextlib import AsyncExitStack, ExitStack
+from contextlib import AsyncExitStack
 from typing import Dict, Optional
 
 from opentrons.protocols.models import LabwareDefinition

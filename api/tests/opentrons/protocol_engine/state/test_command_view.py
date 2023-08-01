@@ -2,7 +2,7 @@
 import pytest
 from contextlib import nullcontext as does_not_raise
 from datetime import datetime
-from typing import Dict, List, NamedTuple, Optional, Sequence, Type, Union
+from typing import List, NamedTuple, Optional, Sequence, Type, Union
 
 from opentrons.ordered_set import OrderedSet
 
