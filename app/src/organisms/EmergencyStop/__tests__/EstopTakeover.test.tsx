@@ -6,6 +6,7 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 import { i18n } from '../../../i18n'
 import { EstopMissingModal } from '../EstopMissingModal'
 import { EstopPressedModal } from '../EstopPressedModal'
+import { useIsUnboxingFlowOngoing } from '../../RobotSettingsDashboard/NetworkSettings/hooks'
 import {
   ENGAGED,
   LOGICALLY_ENGAGED,
@@ -17,6 +18,7 @@ import { EstopTakeover } from '../EstopTakeover'
 jest.mock('@opentrons/react-api-client')
 jest.mock('../EstopMissingModal')
 jest.mock('../EstopPressedModal')
+jest.mock('../../RobotSettingsDashboard/NetworkSettings/hooks')
 
 const mockPressed = {
   data: {
@@ -35,6 +37,9 @@ const mockEstopMissingModal = EstopMissingModal as jest.MockedFunction<
 const mockEstopPressedModal = EstopPressedModal as jest.MockedFunction<
   typeof EstopPressedModal
 >
+const mockUseIsUnboxingFlowOngoing = useIsUnboxingFlowOngoing as jest.MockedFunction<
+  typeof useIsUnboxingFlowOngoing
+>
 
 const render = (props: React.ComponentProps<typeof EstopTakeover>) => {
   return renderWithProviders(<EstopTakeover {...props} />, {
@@ -52,6 +57,7 @@ describe('EstopTakeover', () => {
     mockUseEstopQuery.mockReturnValue({ data: mockPressed } as any)
     mockEstopMissingModal.mockReturnValue(<div>mock EstopMissingModal</div>)
     mockEstopPressedModal.mockReturnValue(<div>mock EstopPressedModal</div>)
+    mockUseIsUnboxingFlowOngoing.mockReturnValue(false)
   })
 
   it('should render EstopPressedModal - PHYSICALLY_ENGAGED', () => {
@@ -72,5 +78,18 @@ describe('EstopTakeover', () => {
     mockUseEstopQuery.mockReturnValue({ data: mockPressed } as any)
     const [{ getByText }] = render(props)
     getByText('mock EstopMissingModal')
+  })
+
+  it('should not render EstopPressedModal if a user does not finish unboxing', () => {
+    mockUseIsUnboxingFlowOngoing.mockReturnValue(true)
+    const [{ queryByText }] = render(props)
+    expect(queryByText('mock EstopPressedModal')).not.toBeInTheDocument()
+  })
+
+  it('should not render EstopMissingModal if a user does not finish unboxing', () => {
+    mockUseIsUnboxingFlowOngoing.mockReturnValue(true)
+    mockPressed.data.status = NOT_PRESENT
+    const [{ queryByText }] = render(props)
+    expect(queryByText('mock EstopMissingModal')).not.toBeInTheDocument()
   })
 })

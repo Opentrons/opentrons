@@ -5,6 +5,7 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 import { EstopPressedModal } from './EstopPressedModal'
 import { EstopMissingModal } from './EstopMissingModal'
 import { useEstopContext } from './hooks'
+import { useIsUnboxingFlowOngoing } from '../RobotSettingsDashboard/NetworkSettings/hooks'
 import {
   PHYSICALLY_ENGAGED,
   LOGICALLY_ENGAGED,
@@ -24,7 +25,7 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
   })
   const [showEstopModal, setShowEstopModal] = React.useState<boolean>(false)
   const { isDismissedModal, setIsDismissedModal } = useEstopContext()
-
+  const isUnboxingFlowOngoing = useIsUnboxingFlowOngoing()
   const closeModal = (): void => {
     if (estopStatus?.data.status === DISENGAGED) {
       setShowEstopModal(false)
@@ -65,5 +66,11 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
     }
   }, [isDismissedModal, setIsDismissedModal, showEstopModal])
 
-  return <>{showEstopModal ? targetEstopModal() : null}</>
+  return (
+    <>
+      {showEstopModal && isUnboxingFlowOngoing === false
+        ? targetEstopModal()
+        : null}
+    </>
+  )
 }
