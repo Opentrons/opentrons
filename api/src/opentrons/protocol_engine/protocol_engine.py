@@ -253,9 +253,9 @@ class ProtocolEngine:
         and then shut down. After an engine has been `finished`'ed, it cannot
         be restarted.
 
-        This method should not raise, but if any exceptions happen during
-        execution that are not properly caught by the CommandExecutor, they
-        will be raised here.
+        This method should not raise. If any exceptions happened during execution that were not
+        properly caught by the CommandExecutor, or if any exceptions happen during this
+        `finish()` call, they should be saved as `.state_view.get_summary().errors`.
 
         Arguments:
             error: An error that caused the stop, if applicable.

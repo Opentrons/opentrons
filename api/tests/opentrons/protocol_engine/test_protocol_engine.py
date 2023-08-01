@@ -559,16 +559,18 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     model_utils: ModelUtils,
 ) -> None:
     """It should be able to stop the engine."""
+    exception = RuntimeError("oh no")
     decoy.when(
         await queue_worker.join(),
-    ).then_raise(RuntimeError("oh no"))
+    ).then_raise(exception)
 
+    error_id = "error-id"
     completed_at = datetime(2021, 1, 1, 0, 0)
 
+    decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(model_utils.get_timestamp()).then_return(completed_at)
 
-    with pytest.raises(RuntimeError, match="oh no"):
-        await subject.finish()
+    await subject.finish()
 
     decoy.verify(
         action_dispatcher.dispatch(FinishAction()),
@@ -578,7 +580,12 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
         await hardware_stopper.do_stop_and_recover(drop_tips_and_home=True),
         await plugin_starter.stop(),
         action_dispatcher.dispatch(
-            HardwareStoppedAction(completed_at=completed_at, finish_error_details=None)
+            HardwareStoppedAction(
+                completed_at=completed_at,
+                finish_error_details=FinishErrorDetails(
+                    error=exception, error_id="error-id", created_at=completed_at
+                ),
+            )
         ),
     )
 
