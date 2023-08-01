@@ -69,6 +69,7 @@ class ErrorCodes(Enum):
     GENERAL_ERROR = _code_from_dict_entry("4000")
     ROBOT_IN_USE = _code_from_dict_entry("4001")
     API_REMOVED = _code_from_dict_entry("4002")
+    NOT_SUPPORTED_ON_ROBOT_TYPE = _code_from_dict_entry("4003")
 
     @classmethod
     @lru_cache(25)

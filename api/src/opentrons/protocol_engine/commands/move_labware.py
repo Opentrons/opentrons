@@ -122,7 +122,8 @@ class MoveLabwareImplementation(
         if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
             if self._state_view.config.robot_type == "OT-2 Standard":
                 raise NotSupportedOnRobotType(
-                    "Labware movement using a gripper is not supported on the OT2"
+                    message="Labware movement using a gripper is not supported on the OT2",
+                    details={"strategy": params.strategy},
                 )
             if labware_validation.validate_definition_is_adapter(
                 current_labware_definition

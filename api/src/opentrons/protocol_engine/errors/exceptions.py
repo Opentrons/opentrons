@@ -684,7 +684,9 @@ class HardwareNotSupportedError(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a HardwareNotSupportedError."""
-        super().__init__(ErrorCodes.GENERAL_ERROR, message, details, wrapping)
+        super().__init__(
+            ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, details, wrapping
+        )
 
 
 class GripperNotAttachedError(ProtocolEngineError):
@@ -792,7 +794,7 @@ class EStopActivatedError(ProtocolEngineError):
 
 
 class NotSupportedOnRobotType(ProtocolEngineError):
-    """Raised when attempting to perform an action that is not supported for the given RobotType."""
+    """Raised when attempting to perform an action that is not supported for the given robot type."""
 
     def __init__(
         self,
@@ -801,4 +803,6 @@ class NotSupportedOnRobotType(ProtocolEngineError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a NotSupportedOnRobotType exception."""
-        super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, details, wrapping)
+        super().__init__(
+            ErrorCodes.NOT_SUPPORTED_ON_ROBOT_TYPE, message, details, wrapping
+        )
