@@ -134,7 +134,7 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
             )
             self._state.flow_rates_by_id[action.pipette_id] = config.flow_rates
 
-    def _handle_command(self, command: Command) -> None:
+    def _handle_command(self, command: Command) -> None:  # noqa: ANN101, C901
         self._update_current_well(command)
         self._update_deck_point(command)
 
