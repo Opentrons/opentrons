@@ -243,7 +243,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
 
     const loadLabwareCommands = reduce<
       RobotState['labware'],
-      LoadLabwareCreateCommand[]
+      LoadLabwareCreateCommand[] | any
     >(
       initialRobotState.labware,
       (

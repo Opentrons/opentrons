@@ -1,4 +1,5 @@
 import { uuid } from '../../utils'
+<<<<<<< HEAD
 import { getOnlyLatestDefs } from '../../labware-defs'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { getAdapterAndLabwareSplitInfo } from './utils/getAdapterAndLabwareSplitInfo'
@@ -6,6 +7,10 @@ import type {
   LabwareDefinitionsByUri,
   ProtocolFileV6,
 } from '@opentrons/shared-data'
+=======
+import { getAdapterAndLabwareSplitInfo } from './utils/getAdapterAndLabwareSplitInfo'
+import { ProtocolFileV6 } from '@opentrons/shared-data'
+>>>>>>> 56db1b035f (adapter split in migration)
 import type {
   LoadPipetteCreateCommand,
   LoadModuleCreateCommand,
@@ -74,12 +79,22 @@ export const migrateFile = (
       },
     }))
 
+<<<<<<< HEAD
   const loadAdapterAndLabwareCommands: LoadLabwareCreateCommand[] = commands
+=======
+  //  need better way to filter this since the strip tubes in 96 well alum block are allowed!
+  const getIsAdapter = (labwareId: string): boolean =>
+    labwareId.includes('96_aluminumblock') || labwareId.includes('adapter')
+
+  //  todo: update this type to LoadAdapterCreateCommand[]
+  const loadAdapterAndLabwareCommands: any = commands
+>>>>>>> 56db1b035f (adapter split in migration)
     .filter(
       (command): command is LoadLabwareCommandV6 =>
         command.commandType === 'loadLabware' &&
         getIsAdapter(command.params.labwareId)
     )
+<<<<<<< HEAD
     .flatMap(command => {
       const {
         adapterUri,
@@ -88,6 +103,15 @@ export const migrateFile = (
         labwareDisplayName,
       } = getAdapterAndLabwareSplitInfo(command.params.labwareId)
       const previousLabwareIdUuid = command.params.labwareId.split(':')[0]
+=======
+    .map(command => {
+      const {
+        adapterLoadname,
+        labwareLoadname,
+        adapterDisplayName,
+        labwareDisplayName,
+      } = getAdapterAndLabwareSplitInfo(command.params.labwareId)
+>>>>>>> 56db1b035f (adapter split in migration)
       const labwareLocation = command.params.location
       let adapterLocation: LabwareLocation = 'offDeck'
       if (labwareLocation === 'offDeck') {
@@ -97,6 +121,7 @@ export const migrateFile = (
       } else if ('slotName' in labwareLocation) {
         adapterLocation = { slotName: labwareLocation.slotName }
       }
+<<<<<<< HEAD
       const defUris = Object.keys(allLatestDefs)
       const adapterDefUri = defUris.find(defUri => defUri === adapterUri) ?? ''
       const labwareDefUri = defUris.find(defUri => defUri === labwareUri) ?? ''
@@ -109,6 +134,15 @@ export const migrateFile = (
         commandType: 'loadLabware',
         params: {
           labwareId: adapterId,
+=======
+      const adapterId = `${uuid()}:opentrons/${adapterLoadname}/1`
+
+      const loadAdapterCommand = {
+        key: uuid(),
+        commandType: 'loadAdapter',
+        params: {
+          adapterId,
+>>>>>>> 56db1b035f (adapter split in migration)
           loadName: adapterLoadname,
           namespace: 'opentrons',
           version: 1,
@@ -121,12 +155,20 @@ export const migrateFile = (
         key: uuid(),
         commandType: 'loadLabware',
         params: {
+<<<<<<< HEAD
           //  keeping same Uuid as previous id for ingredLocation and savedStepForms mapping
           labwareId: `${previousLabwareIdUuid}:${labwareUri}`,
           loadName: labwareLoadname,
           namespace: 'opentrons',
           version: 1,
           location: { labwareId: adapterId },
+=======
+          labwareId: `${uuid()}:opentrons/${labwareLoadname}/1`,
+          loadName: labwareLoadname,
+          namespace: 'opentrons',
+          version: 1,
+          location: { adapterId: adapterId },
+>>>>>>> 56db1b035f (adapter split in migration)
           displayName: labwareDisplayName,
         },
       }
@@ -134,6 +176,7 @@ export const migrateFile = (
       return [loadAdapterCommand, loadLabwareCommand]
     })
 
+<<<<<<< HEAD
   const newLabwareDefinitions: LabwareDefinitionsByUri = Object.keys(
     labwareDefinitions
   ).reduce((acc: LabwareDefinitionsByUri, defId: string) => {
@@ -154,6 +197,8 @@ export const migrateFile = (
     return acc
   }, {})
 
+=======
+>>>>>>> 56db1b035f (adapter split in migration)
   const loadLabwareCommands: LoadLabwareCreateCommand[] = commands
     .filter(
       (command): command is LoadLabwareCommandV6 =>
