@@ -3,16 +3,21 @@ import argparse
 import asyncio
 import os
 import time
-from math import ceil
 
 from dataclasses import dataclass
 from typing import Optional, Callable, List, Any, Tuple, Dict
 from pathlib import Path
 
+from opentrons.config.defaults_ot3 import (
+    DEFAULT_MAX_SPEEDS,
+    DEFAULT_ACCELERATIONS,
+    DEFAULT_RUN_CURRENT,
+    DEFAULT_HOLD_CURRENT,
+)
 from opentrons.hardware_control.ot3api import OT3API
 
 from hardware_testing.opentrons_api import types
-from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point
+from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point, OT3AxisKind
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
 from hardware_testing.data import ui
@@ -20,7 +25,7 @@ from hardware_testing.data import ui
 import logging
 
 LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.CRITICAL)
+LOG.setLevel(logging.INFO)
 # logging.getLogger('opentrons.hardware_control.ot3api.OT3API').setLevel(logging.INFO) #tells all movement settings
 # logging.getLogger('opentrons_hardware.hardware_control').setLevel(logging.INFO) #confirms speeds
 
@@ -34,44 +39,66 @@ GANTRY_AXES = [
 MOUNT_AXES = [OT3Mount.LEFT, OT3Mount.RIGHT]
 THRESHOLD_MM = 0.125
 
-DEFAULT_X_SPEEDS: List[float] = [250, 350, 450]
-DEFAULT_X_ACCELERATIONS: List[float] = [700, 800, 900]
-DEFAULT_X_CURRENTS: List[float] = [1, 1.25, 1.5]
+DEFAULT_X_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.X]
+DEFAULT_Y_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.Y]
+DEFAULT_Z_SPEED = DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.Z]
+DEFAULT_X_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[OT3AxisKind.X]
+DEFAULT_Y_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[OT3AxisKind.Y]
+DEFAULT_Z_ACCELERATION = DEFAULT_ACCELERATIONS.low_throughput[OT3AxisKind.Z]
+DEFAULT_X_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[OT3AxisKind.X]
+DEFAULT_Y_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[OT3AxisKind.Y]
+DEFAULT_Z_CURRENT = DEFAULT_RUN_CURRENT.low_throughput[OT3AxisKind.Z]
 
-DEFAULT_Y_SPEEDS: List[float] = [225, 300, 375]
-DEFAULT_Y_ACCELERATIONS: List[float] = [500, 600, 700]
-DEFAULT_Y_CURRENTS: List[float] = [1, 1.2, 1.4]
+# NOTE: using high-throughput hold current, to purposefully heat it up
+DEFAULT_Z_HOLD_CURRENT = DEFAULT_HOLD_CURRENT.high_throughput[OT3AxisKind.Z]
 
-DEFAULT_Z_SPEEDS: List[float] = [80, 100, 120]
-DEFAULT_Z_ACCELERATIONS: List[float] = [100, 150, 200]
-DEFAULT_Z_CURRENTS: List[float] = [0.75, 1, 1.25]
+DEFAULT_X_SPEEDS: List[float] = [
+    DEFAULT_X_SPEED - 100,
+    DEFAULT_X_SPEED,
+    DEFAULT_X_SPEED + 100,
+]
+DEFAULT_X_ACCELERATIONS: List[float] = [
+    DEFAULT_X_ACCELERATION - 100,
+    DEFAULT_X_ACCELERATION,
+    DEFAULT_X_ACCELERATION + 100,
+]
+DEFAULT_X_CURRENTS: List[float] = [
+    DEFAULT_X_CURRENT - 0.25,
+    DEFAULT_X_CURRENT,
+    DEFAULT_X_CURRENT + 0.25,
+]
 
-DEFAULT_AXIS_SETTINGS = {
-    Axis.X: helpers_ot3.GantryLoadSettings(
-        max_speed=500,
-        acceleration=1000,
-        max_start_stop_speed=10,
-        max_change_dir_speed=5,
-        hold_current=0.5,
-        run_current=1.4,
-    ),
-    Axis.Y: helpers_ot3.GantryLoadSettings(
-        max_speed=500,
-        acceleration=1000,
-        max_start_stop_speed=10,
-        max_change_dir_speed=5,
-        hold_current=0.5,
-        run_current=1.4,
-    ),
-    Axis.Z: helpers_ot3.GantryLoadSettings(
-        max_speed=65,
-        acceleration=100,
-        max_start_stop_speed=10,
-        max_change_dir_speed=5,
-        hold_current=0.1,
-        run_current=1.4,
-    ),
-}
+DEFAULT_Y_SPEEDS: List[float] = [
+    DEFAULT_Y_SPEED - 75,
+    DEFAULT_Y_SPEED,
+    DEFAULT_Y_SPEED + 75,
+]
+DEFAULT_Y_ACCELERATIONS: List[float] = [
+    DEFAULT_Y_ACCELERATION - 100,
+    DEFAULT_Y_ACCELERATION,
+    DEFAULT_Y_ACCELERATION + 100,
+]
+DEFAULT_Y_CURRENTS: List[float] = [
+    DEFAULT_Y_CURRENT - 0.2,
+    DEFAULT_Y_CURRENT,
+    DEFAULT_Y_CURRENT + 0.2,
+]
+
+DEFAULT_Z_SPEEDS: List[float] = [
+    DEFAULT_Z_SPEED - 20,
+    DEFAULT_Z_SPEED,
+    DEFAULT_Z_SPEED + 20,
+]
+DEFAULT_Z_ACCELERATIONS: List[float] = [
+    DEFAULT_Z_ACCELERATION - 50,
+    DEFAULT_Z_ACCELERATION,
+    DEFAULT_Z_ACCELERATION + 50,
+]
+DEFAULT_Z_CURRENTS: List[float] = [
+    DEFAULT_Z_CURRENT - 0.25,
+    DEFAULT_Z_CURRENT,
+    DEFAULT_Z_CURRENT + 0.25,
+]
 
 
 @dataclass
@@ -431,9 +458,9 @@ def _creat_z_axis_settings(arguments: argparse.Namespace) -> List:
                     Axis.Z: helpers_ot3.GantryLoadSettings(
                         max_speed=speed,
                         acceleration=acceleration,
-                        max_start_stop_speed=5,
-                        max_change_dir_speed=1,
-                        hold_current=0.8,
+                        max_start_stop_speed=10000,  # not used, so value doesn't matter
+                        max_change_dir_speed=10000,  # not used, so value doesn't matter
+                        hold_current=DEFAULT_Z_HOLD_CURRENT,  # NOTE: only set this for Z axes
                         run_current=current,
                     )
                 }
@@ -476,9 +503,6 @@ def _creat_xy_axis_settings(arguments: argparse.Namespace) -> List:
         speeds_y = DEFAULT_Y_SPEEDS
         currents_y = DEFAULT_Y_CURRENTS
     XY_AXIS_SETTINGS = []
-    speeds = zip(speeds_x, speeds_y)
-    accelerations = zip(accelerations_x, accelerations_y)
-    currents = zip(currents_x, currents_y)
 
     for speed_x, speed_y in zip(speeds_x, speeds_y):
         for acceleration_x, acceleration_y in zip(accelerations_x, accelerations_y):
@@ -487,17 +511,17 @@ def _creat_xy_axis_settings(arguments: argparse.Namespace) -> List:
                     Axis.X: helpers_ot3.GantryLoadSettings(
                         max_speed=speed_x,
                         acceleration=acceleration_x,
-                        max_start_stop_speed=10,
-                        max_change_dir_speed=5,
-                        hold_current=0.5,
+                        max_start_stop_speed=10000,  # not used, so value doesn't matter
+                        max_change_dir_speed=10000,  # not used, so value doesn't matter
+                        hold_current=0,  # not used, so value doesn't matter
                         run_current=current_x,
                     ),
                     Axis.Y: helpers_ot3.GantryLoadSettings(
                         max_speed=speed_y,
                         acceleration=acceleration_y,
-                        max_start_stop_speed=10,
-                        max_change_dir_speed=5,
-                        hold_current=0.5,
+                        max_start_stop_speed=10000,  # not used, so value doesn't matter
+                        max_change_dir_speed=10000,  # not used, so value doesn't matter
+                        hold_current=0,  # not used, so value doesn't matter
                         run_current=current_y,
                     ),
                 }
@@ -512,15 +536,28 @@ async def _run_z_motion(
     mount: OT3Mount,
     mount_up_down_points: Dict[OT3Mount, List[types.Point]],
     write_cb: Callable,
-) -> bool:
+) -> None:
     ui.print_header("Run z motion check...")
     Z_AXIS_SETTINGS = _creat_z_axis_settings(arguments)
-    total_fail_count = 0
     for setting in Z_AXIS_SETTINGS:
         print(
             f"Z: Run speed={setting[Axis.Z].max_speed}, acceleration={setting[Axis.Z].acceleration}, current={setting[Axis.Z].run_current}"
         )
-        await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, setting)
+        z_ax = Axis.Z_L if mount == OT3Mount.LEFT else Axis.Z_R
+        await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+            api,
+            z_ax,
+            api.gantry_load,
+            default_max_speed=setting[z_ax].max_speed,
+            acceleration=setting[z_ax].acceleration,
+        )
+        await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+            api,
+            z_ax,
+            api.gantry_load,
+            run_current=setting[z_ax].run_current,
+            hold_current=setting[z_ax].hold_current,  # NOTE: only set this for Z axes
+        )
         fail_count = 0
         pass_count = 0
         for i in range(arguments.cycles):
@@ -537,7 +574,6 @@ async def _run_z_motion(
                     pass_count += 1
                 else:
                     fail_count += 1
-                    total_fail_count += 1
                 print(
                     f"Run Z motion cycle: {i+1}, results: {res}, pass count: {pass_count}, fail count: {fail_count}"
                 )
@@ -552,11 +588,6 @@ async def _run_z_motion(
                 fail_count,
             )
 
-    if total_fail_count > 0:
-        return False
-    else:
-        return True
-
 
 async def _run_xy_motion(
     arguments: argparse.Namespace,
@@ -565,10 +596,9 @@ async def _run_xy_motion(
     bowtie_points: List[types.Point],
     hour_glass_points: List[types.Point],
     write_cb: Callable,
-) -> bool:
+) -> None:
     ui.print_header("Run xy motion check...")
     XY_AXIS_SETTINGS = _creat_xy_axis_settings(arguments)
-    total_fail_count = 0
     for setting in XY_AXIS_SETTINGS:
         print(
             f"X: Run speed={setting[Axis.X].max_speed}, acceleration={setting[Axis.X].acceleration}, current={setting[Axis.X].run_current}"
@@ -576,7 +606,20 @@ async def _run_xy_motion(
         print(
             f"Y: Run speed={setting[Axis.Y].max_speed}, acceleration={setting[Axis.Y].acceleration}, current={setting[Axis.Y].run_current}"
         )
-        await helpers_ot3.set_gantry_load_per_axis_settings_ot3(api, setting)
+        for ax in [Axis.X, Axis.Y]:
+            await helpers_ot3.set_gantry_load_per_axis_motion_settings_ot3(
+                api,
+                ax,
+                api.gantry_load,
+                default_max_speed=setting[ax].max_speed,
+                acceleration=setting[ax].acceleration,
+            )
+            await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+                api,
+                ax,
+                api.gantry_load,
+                run_current=setting[ax].run_current,
+            )
         fail_count = 0
         pass_count = 0
         for i in range(max(int(arguments.cycles / 2), 1)):
@@ -600,7 +643,6 @@ async def _run_xy_motion(
                 pass_count += 1
             else:
                 fail_count += 1
-                total_fail_count += 1
             print(
                 f"Run XY cycle: {i+1}, results: {res_b and res_hg}, pass count: {pass_count}, fail count: {fail_count}"
             )
@@ -624,11 +666,6 @@ async def _run_xy_motion(
                 pass_count,
                 fail_count,
             )
-
-    if total_fail_count > 0:
-        return False
-    else:
-        return True
 
 
 async def enforce_pipette_attached(
@@ -704,22 +741,14 @@ async def _main(arguments: argparse.Namespace) -> None:
             OT3Mount.RIGHT: mount_up_down_points_right,
         }
 
-        qc_pass = True
-
         if not arguments.skip_xy_motion:
-            res = await _run_xy_motion(
+            await _run_xy_motion(
                 arguments, api, mount, bowtie_points, hour_glass_points, csv_cb.write
             )
-            if not res:
-                qc_pass = False
-
         if not arguments.skip_z_motion:
-            res = await _run_z_motion(
+            await _run_z_motion(
                 arguments, api, mount, mount_up_down_points, csv_cb.write
             )
-            if not res:
-                qc_pass = False
-
         # set the default config
         await api.set_gantry_load(api.gantry_load)
 
@@ -728,7 +757,7 @@ async def _main(arguments: argparse.Namespace) -> None:
             csv_cb.write(["run-cycle", i + 1])
             print(f"Cycle {i + 1}/{arguments.cycles}")
             if not arguments.skip_bowtie:
-                res = await _run_bowtie(
+                await _run_bowtie(
                     api,
                     arguments.simulate,
                     mount,
@@ -736,11 +765,9 @@ async def _main(arguments: argparse.Namespace) -> None:
                     csv_cb.write,
                     arguments.record_error,
                 )
-                if not res:
-                    qc_pass = False
                 if not arguments.skip_mount:
                     for z_mount in MOUNT_AXES:
-                        res = await _run_mount_up_down(
+                        await _run_mount_up_down(
                             api,
                             arguments.simulate,
                             z_mount,
@@ -748,10 +775,8 @@ async def _main(arguments: argparse.Namespace) -> None:
                             csv_cb.write,
                             arguments.record_error,
                         )
-                        if not res:
-                            qc_pass = False
             if not arguments.skip_hourglass:
-                res = await _run_hour_glass(
+                await _run_hour_glass(
                     api,
                     arguments.simulate,
                     mount,
@@ -759,11 +784,9 @@ async def _main(arguments: argparse.Namespace) -> None:
                     csv_cb.write,
                     arguments.record_error,
                 )
-                if not res:
-                    qc_pass = False
                 if not arguments.skip_mount:
                     for z_mount in MOUNT_AXES:
-                        res = await _run_mount_up_down(
+                        await _run_mount_up_down(
                             api,
                             arguments.simulate,
                             z_mount,
@@ -771,13 +794,6 @@ async def _main(arguments: argparse.Namespace) -> None:
                             csv_cb.write,
                             arguments.record_error,
                         )
-                        if not res:
-                            qc_pass = False
-
-        if qc_pass:
-            ui.print_title("TEST PASSED")
-        else:
-            ui.print_title("TEST FAILED")
     except KeyboardInterrupt:
         print("Cancelled")
     finally:
