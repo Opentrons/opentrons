@@ -365,7 +365,7 @@
     "opentrons/opentrons_flex_96_tiprack_50ul/1": 10.5
   },
   "maxVolume": 1000,
-  "minVolume": 1,
+  "minVolume": 5,
   "defaultTipracks": [
     "opentrons/opentrons_flex_96_tiprack_1000ul/1",
     "opentrons/opentrons_flex_96_tiprack_200ul/1",
