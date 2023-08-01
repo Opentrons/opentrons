@@ -833,7 +833,7 @@ async def _main(arguments: argparse.Namespace) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
-    parser.add_argument("--cycles", type=int, default=50)
+    parser.add_argument("--cycles", type=int, default=20)
     parser.add_argument("--skip_bowtie", action="store_true")
     parser.add_argument("--skip_hourglass", action="store_true")
     parser.add_argument("--skip_mount", action="store_true")
