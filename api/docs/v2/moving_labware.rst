@@ -165,13 +165,10 @@ You can also load labware off-deck, in preparation for a ``move_labware()`` comm
         for i in range(96):
             pipette.pick_up_tip()
             pipette.drop_tip()
-        # move the spent tip rack off-deck
+        # pause to move the spent tip rack off-deck
         protocol.move_labware(labware=tips1, new_location=protocol_api.OFF_DECK)
-        # move the fresh tip rack on-deck
+        # pause to move the fresh tip rack on-deck
         protocol.move_labware(labware=tips2, new_location=1)
         pipette.pick_up_tip()
 
 Using the off-deck location to remove or replace labware lets you continue your workflow in a single protocol, rather than needing to end a protocol, reset the deck, and start a new protocol run.
-
-
-
