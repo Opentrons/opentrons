@@ -217,15 +217,15 @@ def test_labware_when_thermocycler(
 @pytest.mark.parametrize(
     ("labware_location", "labware_should_be_allowed"),
     [
-        ("D1", True),
-        ("B1", False),
-        ("B2", True),
-        ("A1", False),
-        ("A2", True),
+        (DeckSlotName.SLOT_D1, True),
+        (DeckSlotName.SLOT_B1, False),
+        (DeckSlotName.SLOT_B2, True),
+        (DeckSlotName.SLOT_A1, False),
+        (DeckSlotName.SLOT_A2, True),
     ],
 )
 def test_flex_labware_when_thermocycler(
-    labware_location: str,
+    labware_location: DeckSlotName,
     labware_should_be_allowed: bool,
 ) -> None:
     """It should reject labware if a Thermocycler covers the same slot."""
@@ -274,7 +274,7 @@ def test_flex_labware_when_thermocycler(
     with maybe_raises:
         deck_conflict.check(
             existing_items={labware_location: labware},
-            new_location="B1",
+            new_location=DeckSlotName.SLOT_B1,
             new_item=thermocycler,
             robot_type="OT-3 Standard",
         )
@@ -300,8 +300,8 @@ def test_flex_labware_when_thermocycler(
     ],
 )
 def test_labware_when_heater_shaker(
-    heater_shaker_location: int,
-    labware_location: int,
+    heater_shaker_location: DeckSlotName,
+    labware_location: DeckSlotName,
 ) -> None:
     """It should allow short labware east and west if a heater-shaker is placed."""
     heater_shaker = deck_conflict.HeaterShakerModule(
@@ -361,41 +361,41 @@ def test_labware_when_heater_shaker(
 @pytest.mark.parametrize(
     ("heater_shaker_location", "other_module_location"),
     [
-        (1, 2),
-        (1, 4),
-        (2, 1),
-        (2, 3),
-        (2, 5),
-        (3, 2),
-        (3, 6),
-        (4, 1),
-        (4, 5),
-        (4, 7),
-        (5, 2),
-        (5, 4),
-        (5, 6),
-        (5, 8),
-        (6, 3),
-        (6, 5),
-        (6, 9),
-        (7, 4),
-        (7, 8),
-        (7, 10),
-        (8, 5),
-        (8, 7),
-        (8, 9),
-        (8, 11),
-        (9, 6),
-        (9, 8),
-        (10, 7),
-        (10, 11),
-        (11, 8),
-        (11, 10),
+        (DeckSlotName.SLOT_1, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_1, DeckSlotName.SLOT_4),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_1),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_3),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_3, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_3, DeckSlotName.SLOT_6),
+        (DeckSlotName.SLOT_4, DeckSlotName.SLOT_1),
+        (DeckSlotName.SLOT_4, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_4, DeckSlotName.SLOT_7),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_4),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_6),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_6, DeckSlotName.SLOT_3),
+        (DeckSlotName.SLOT_6, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_6, DeckSlotName.SLOT_9),
+        (DeckSlotName.SLOT_7, DeckSlotName.SLOT_4),
+        (DeckSlotName.SLOT_7, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_7, DeckSlotName.SLOT_10),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_7),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_9),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_11),
+        (DeckSlotName.SLOT_9, DeckSlotName.SLOT_6),
+        (DeckSlotName.SLOT_9, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_10, DeckSlotName.SLOT_7),
+        (DeckSlotName.SLOT_10, DeckSlotName.SLOT_11),
+        (DeckSlotName.SLOT_11, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_11, DeckSlotName.SLOT_10),
     ],
 )
 def test_no_modules_when_heater_shaker(
-    heater_shaker_location: int,
-    other_module_location: int,
+    heater_shaker_location: DeckSlotName,
+    other_module_location: DeckSlotName,
 ) -> None:
     """It should not allow other modules north and south of the H/S.
 
@@ -443,14 +443,14 @@ def test_no_modules_when_heater_shaker(
 @pytest.mark.parametrize(
     ("heater_shaker_location", "tip_rack_location"),
     [
-        (1, 2),
-        (2, 1),
-        (2, 3),
-        (3, 2),
-        (4, 5),
-        (5, 4),
-        (5, 6),
-        (6, 5),
+        (DeckSlotName.SLOT_1, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_1),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_3),
+        (DeckSlotName.SLOT_3, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_4, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_4),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_6),
+        (DeckSlotName.SLOT_6, DeckSlotName.SLOT_5),
         (7, 8),
         (8, 7),
         (8, 9),
@@ -461,8 +461,8 @@ def test_no_modules_when_heater_shaker(
 )
 def test_tip_rack_when_heater_shaker(
     allowed_tip_rack_uri: LabwareUri,
-    heater_shaker_location: int,
-    tip_rack_location: int,
+    heater_shaker_location: DeckSlotName,
+    tip_rack_location: DeckSlotName,
 ) -> None:
     """It should allow short tip racks east and west if a heater-shaker is placed."""
     heater_shaker = deck_conflict.HeaterShakerModule(
