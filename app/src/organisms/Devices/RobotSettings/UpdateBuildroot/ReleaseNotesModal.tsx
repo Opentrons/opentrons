@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useDispatch } from 'react-redux'
 
-import { buildrootChangelogSeen } from '../../../../redux/buildroot'
+import { buildrootChangelogSeen, OT2_BALENA } from '../../../../redux/buildroot'
 import { ScrollableAlertModal } from '../../../../molecules/modals'
 import { ReleaseNotes } from '../../../../molecules/ReleaseNotes'
 import { useIsRobotBusy } from '../../hooks'
@@ -36,9 +36,7 @@ export function ReleaseNotesModal(props: ReleaseNotesModalProps): JSX.Element {
   } = useConditionalConfirm(proceed, isRobotBusy)
 
   const heading =
-    systemType === 'buildroot'
-      ? 'Robot Update'
-      : 'Robot Operating System Update'
+    systemType !== OT2_BALENA ? 'Robot Update' : 'Robot Operating System Update'
 
   const buttons = [
     notNowButton,

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 
 import {
-  BALENA,
+  OT2_BALENA,
   UPGRADE,
   getBuildrootUpdateInfo,
   getBuildrootDownloadProgress,
@@ -37,7 +37,7 @@ export function ViewUpdateModal(
   const [
     showMigrationWarning,
     setShowMigrationWarning,
-  ] = React.useState<boolean>(robotSystemType === BALENA)
+  ] = React.useState<boolean>(robotSystemType === OT2_BALENA)
 
   const notNowButton = {
     onClick: close,

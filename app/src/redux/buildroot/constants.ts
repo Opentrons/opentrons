@@ -20,8 +20,9 @@ export const ERROR: 'error' = 'error'
 
 // system types
 
-export const BALENA: 'balena' = 'balena'
-export const BUILDROOT: 'buildroot' = 'buildroot'
+export const OT2_BALENA: 'ot2-balena' = 'ot2-balena'
+export const OT2_BUILDROOT: 'ot2-buildroot' = 'ot2-buildroot'
+export const FLEX: 'flex' = 'flex'
 
 // update types
 

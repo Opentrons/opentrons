@@ -3,7 +3,7 @@ import type { RobotHost } from '../robot-api/types'
 
 export type BuildrootUpdateType = 'upgrade' | 'downgrade' | 'reinstall'
 
-export type RobotSystemType = 'balena' | 'buildroot'
+export type RobotSystemType = 'ot2-balena' | 'ot2-buildroot' | 'flex'
 
 export interface BuildrootUpdateInfo {
   releaseNotes: string
@@ -13,8 +13,6 @@ export interface BuildrootUserFileInfo {
   systemFile: string
   version: string
 }
-
-export type BuildrootStatus = 'balena' | 'migrating' | 'buildroot'
 
 // stage response from API
 // update-server/otupdate/buildroot/update_session.py

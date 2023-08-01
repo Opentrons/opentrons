@@ -120,7 +120,7 @@ describe('ViewUpdateModal', () => {
   })
 
   it('should show a MigrationWarningModal if the robot is on Balena', () => {
-    const { wrapper } = render(Buildroot.UPGRADE, Buildroot.BALENA)
+    const { wrapper } = render(Buildroot.UPGRADE, Buildroot.OT2_BALENA)
     const migrationWarning = wrapper.find(MigrationWarningModal)
 
     expect(migrationWarning.prop('updateType')).toBe(Buildroot.UPGRADE)
@@ -138,18 +138,18 @@ describe('ViewUpdateModal', () => {
       releaseNotes: 'hey look a release',
     })
 
-    const { wrapper } = render(Buildroot.UPGRADE, Buildroot.BALENA)
+    const { wrapper } = render(Buildroot.UPGRADE, Buildroot.OT2_BALENA)
     const migrationWarning = wrapper.find(MigrationWarningModal)
 
     migrationWarning.invoke('proceed')?.()
 
     expect(wrapper.find(ReleaseNotesModal).prop('systemType')).toBe(
-      Buildroot.BALENA
+      Buildroot.OT2_BALENA
     )
   })
 
   it('should proceed from MigrationWarningModal to DownloadUpdateModal if still downloading', () => {
-    const { wrapper } = render(Buildroot.UPGRADE, Buildroot.BALENA)
+    const { wrapper } = render(Buildroot.UPGRADE, Buildroot.OT2_BALENA)
     const migrationWarning = wrapper.find(MigrationWarningModal)
 
     migrationWarning.invoke('proceed')?.()

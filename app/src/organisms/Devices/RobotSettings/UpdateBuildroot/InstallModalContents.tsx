@@ -8,6 +8,7 @@ import type {
   BuildrootUpdateSession,
   RobotSystemType,
 } from '../../../../redux/buildroot/types'
+import { OT2_BALENA } from '../../../../redux/buildroot'
 
 export interface InstallModalContentsProps {
   robotSystemType: RobotSystemType | null
@@ -50,7 +51,7 @@ export function InstallModalContents(
     restartMessage = 'Waiting for robot to restart to complete update'
   } else {
     title = `Robot ${
-      robotSystemType === 'balena' ? 'system ' : ''
+      robotSystemType === OT2_BALENA ? 'system ' : ''
     } update in progress…`
     restartMessage = 'Your OT-2 will restart once the update is complete.'
   }

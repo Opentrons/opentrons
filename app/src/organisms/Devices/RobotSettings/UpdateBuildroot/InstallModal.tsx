@@ -8,6 +8,7 @@ import type {
   BuildrootUpdateSession,
   RobotSystemType,
 } from '../../../../redux/buildroot/types'
+import { OT2_BALENA } from '../../../../redux/buildroot'
 
 export interface InstallModalProps {
   robot: ViewableRobot
@@ -26,7 +27,7 @@ export function InstallModal(props: InstallModalProps): JSX.Element {
 
   let heading: string
   // let heading: string = ''
-  if (robotSystemType === 'balena') {
+  if (robotSystemType === OT2_BALENA) {
     if (
       session.step === 'premigration' ||
       session.step === 'premigrationRestart'

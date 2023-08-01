@@ -182,7 +182,7 @@ export function getRobotSystemType(
     const { capabilities } = serverHealth
 
     if (!capabilities || capabilities.balenaUpdate) {
-      return Constants.BALENA
+      return Constants.OT2_BALENA
     }
 
     return Constants.BUILDROOT
