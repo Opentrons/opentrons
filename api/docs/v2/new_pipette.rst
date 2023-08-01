@@ -174,7 +174,7 @@ commands.
 
 .. _new-pipette-models:
 
-Pipette Models
+API Load Names
 ==============
 
 The pipette's load name is the first parameter of the ``load_instrument()`` method. It tells your robot which attached pipette you're going to use in a protocol. The table below lists the API load names for the currently available Flex and OT-2 pipettes.
@@ -237,86 +237,68 @@ If you have an OT-2, the GEN2 pipettes have different volume ranges than the old
     * - P1000 Single GEN2 (100-1000 µL)
       - P1000 Single GEN1 (100-1000 µL)
 
-The single- and multi-channel P50 GEN1 pipette is the exception. If you have a P50 Single specified in your protocol, there is no backward compatibility with a corresponding GEN2 pipette. If you want to use a GEN2 Pipette, you must change your protocol to load a P20 Single GEN2 (for volumes below 20 µL) or a P300 Single GEN2 (for volumes between 20 and 50 µL).
+The single- and multi-channel P50 GEN1 pipette is the exception. If your protocol uses a P50 GEN1 pipette, there is no backward compatibility with the GEN2 pipettes. If you want to replace a P50 GEN1 with a corresponding GEN2 pipette, change your protocol to load a P20 Single GEN2 (for volumes below 20 µL) or a P300 Single GEN2 (for volumes between 20 and 50 µL).
 
 Adding Tip Racks
 ================
 
-When you load a pipette, you can optionally specify a list of tip racks you will use to supply the pipette. This is done with the optional parameter ``tip_racks`` to :py:meth:`.ProtocolContext.load_instrument`.
-This parameter accepts a *list* of tiprack labware objects, allowing you to specify as many
-tipracks as you want. Associating tipracks with your pipette allows for automatic tip tracking
-throughout your protocol. This removes the need to specify tip locations in
-:py:meth:`.InstrumentContext.pick_up_tip`.
-
-For instance, in this protocol you can see the effects of specifying tipracks:
-
-.. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api
-
-    metadata = {'apiLevel': '|apiLevel|'}
-
+The ``load_instrument()`` method includes the optional argument, ``tip_racks``. This parameter accepts a list of tip rack labware objects, which lets you to specify as many tip racks as you want. The advantage of using ``tip_racks`` is twofold. First, associating tip racks with your pipette allows for automatic tip tracking throughout your protocol. Second, it removes the need to specify tip locations in the :py:meth:`.InstrumentContext.pick_up_tip` method. For example::
+        
     def run(protocol: protocol_api.ProtocolContext):
-        tiprack_left = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
-        tiprack_right = protocol.load_labware('opentrons_96_tiprack_300ul', '2')
-        left_pipette = protocol.load_instrument('p300_single', 'left')
-        right_pipette = protocol.load_instrument(
-            'p300_multi', 'right', tip_racks=[tiprack_right])
+    tiprack_left = protocol.load_labware(
+        load_name='opentrons_96_tiprack_300ul', location='1')
+    tiprack_right = protocol.load_labware(
+        load_name='opentrons_96_tiprack_300ul', location='2')
+    left_pipette = protocol.load_instrument(
+        instrument_name='p300_single', mount='left')
+    right_pipette = protocol.load_instrument(
+            instrument_name='p300_multi',
+            mount='right',
+            tip_racks=[tiprack_right])
 
-        # You must specify the tip location for the left pipette, which was
-        # loaded without specifying tip_racks
-        left_pipette.pick_up_tip(tiprack_left['A1'])
-        left_pipette.drop_tip()
+    # You must specify the tip location for the left pipette, which was
+    # loaded without specifying tip_racks
+    left_pipette.pick_up_tip(tiprack_left['A1'])
+    left_pipette.drop_tip()
 
-        # And you have to do it every time you call pick_up_tip, doing all
-        # your own tip tracking
-        left_pipette.pick_up_tip(tiprack_left['A2'])
-        left_pipette.drop_tip()
-        left_pipette.pick_up_tip(tiprack_left['A3'])
-        left_pipette.drop_tip()
+    # And you have to do it every time you call pick_up_tip, doing all
+    # your own tip tracking
+    left_pipette.pick_up_tip(tiprack_left['A2'])
+    left_pipette.drop_tip()
+    left_pipette.pick_up_tip(tiprack_left['A3'])
+    left_pipette.drop_tip()
 
-        # Since you specified tip_racks when loading the right pipette, it will
-        # automatically pick up from A1 of its associated tiprack
-        right_pipette.pick_up_tip()
-        right_pipette.drop_tip()
+    # Since you specified tip_racks when loading the right pipette, it will
+    # automatically pick up from A1 of its associated tiprack
+    right_pipette.pick_up_tip()
+    right_pipette.drop_tip()
 
-        # And further calls to pick_up_tip will automatically progress through
-        # the tips in the rack
-        right_pipette.pick_up_tip()
-        right_pipette.drop_tip()
-        right_pipette.pick_up_tip()
-        right_pipette.drop_tip()
+    # And further calls to pick_up_tip will automatically progress through
+    # the tips in the rack
+    right_pipette.pick_up_tip()
+    right_pipette.drop_tip()
+    right_pipette.pick_up_tip()
+    right_pipette.drop_tip()
        
-
-This is further discussed in :ref:`v2-atomic-commands`
-and :ref:`v2-complex-commands`.
+See also, :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
 
 .. versionadded:: 2.0
-
-
 
 .. _new-plunger-flow-rates:
 
 Plunger Flow Rates
 ==================
 
-Opentrons pipettes aspirate or dispense at different rates. These flow rates can be changed on a loaded
-:py:class:`.InstrumentContext` at any time, in units of µL/sec by altering
-:py:obj:`.InstrumentContext.flow_rate`. This has the following attributes:
+Pipettes aspirate or dispense at different rates measured in units of µL/second. You can change the flow rate on a loaded :py:class:`.InstrumentContext` by altering the
+:py:obj:`~.InstrumentContext.flow_rate` properties listed below:
 
-* ``InstrumentContext.flow_rate.aspirate``: The aspirate flow rate, in µL/s
-* ``InstrumentContext.flow_rate.dispense``: The dispense flow rate, in µL/s
-* ``InstrumentContext.flow_rate.blow_out``: The blow out flow rate, in µL/s
+* ``InstrumentContext.flow_rate.aspirate``
+* ``InstrumentContext.flow_rate.dispense``
+* ``InstrumentContext.flow_rate.blow_out``
 
-Each of these attributes can be altered without affecting the others.
+You can change each attribute without affecting the others.
 
 .. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api
-
-    metadata = {'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
