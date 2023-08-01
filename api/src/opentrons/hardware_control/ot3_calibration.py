@@ -45,7 +45,7 @@ LOG = getLogger(__name__)
 
 LINEAR_TRANSIT_HEIGHT: Final[float] = 1
 SEARCH_TRANSIT_HEIGHT: Final[float] = 5
-GRIPPER_GRIP_FORCE: Final[float] = 20  # FIXME: (andy s) this adds error, reduce
+GRIPPER_GRIP_FORCE: Final[float] = 20  # FIXME: (andy s) this adds error, reduce to 5N
 
 SLOT_CENTER = 5
 SLOT_FRONT_LEFT = 1
@@ -53,12 +53,12 @@ SLOT_FRONT_RIGHT = 3
 SLOT_REAR_LEFT = 10
 
 # 96ch is 99mm from left->right, and 63mm front->rear
-# deck calibration squares are ~330mm both left->right and front->rear
+# deck calibration squares are 328mm left->right and 321mm front->rear
 # we need to support <=0.1mm shift from 96ch left->right
 # which means we can only tolerate left/right shift <=0.33mm
-# and front/rear shift <=0.52
+# and front/rear shift <=0.51
 MAX_SHIFT_ACROSS_DECK_LEFT_RIGHT = 0.33
-MAX_SHIFT_ACROSS_DECK_FRONT_REAR = 0.52
+MAX_SHIFT_ACROSS_DECK_FRONT_REAR = 0.51
 
 PREP_OFFSET_DEPTH = Point(*Z_PREP_OFFSET)
 EDGES = {
@@ -348,17 +348,15 @@ async def _probe_deck_at(
         target.z + LINEAR_TRANSIT_HEIGHT, target.z + settings.prep_distance_mm
     )
     safe_height = max(here.z, target.z, abs_transit_height)
-    async with api.restore_system_constrants():
-        await api.set_system_constraints_for_calibration()
-        await api.move_to(mount, here._replace(z=safe_height))
-        await api.move_to(mount, target._replace(z=safe_height), speed=speed)
-        await api.move_to(mount, target._replace(z=abs_transit_height))
-        _found_pos = await api.capacitive_probe(
-            mount, Axis.by_mount(mount), target.z, settings
-        )
-        # don't use found Z position to calculate an updated transit height
-        # because the probe may have gone through the hole
-        await api.move_to(mount, target._replace(z=abs_transit_height))
+    await api.move_to(mount, here._replace(z=safe_height))
+    await api.move_to(mount, target._replace(z=safe_height), speed=speed)
+    await api.move_to(mount, target._replace(z=abs_transit_height))
+    _found_pos = await api.capacitive_probe(
+        mount, Axis.by_mount(mount), target.z, settings
+    )
+    # don't use found Z position to calculate an updated transit height
+    # because the probe may have gone through the hole
+    await api.move_to(mount, target._replace(z=abs_transit_height))
     return _found_pos
 
 
@@ -378,24 +376,23 @@ async def find_axis_center(
     """
     WIDTH_TOLERANCE_MM: float = 0.5
     here = await hcapi.gantry_position(mount)
-    async with hcapi.restore_system_constrants():
-        await hcapi.set_system_constraints_for_calibration()
-        await hcapi.move_to(mount, here._replace(z=SEARCH_TRANSIT_HEIGHT))
-        edge_settings = hcapi.config.calibration.edge_sense
-        start = axis.set_in_point(
-            minus_edge_nominal,
-            axis.of_point(minus_edge_nominal)
-            - edge_settings.search_initial_tolerance_mm,
-        )
-        end = axis.set_in_point(
-            plus_edge_nominal,
-            axis.of_point(plus_edge_nominal)
-            + edge_settings.search_initial_tolerance_mm,
-        )
-        await hcapi.move_to(mount, start._replace(z=SEARCH_TRANSIT_HEIGHT))
-        data = await hcapi.capacitive_sweep(
-            mount, axis, start, end, edge_settings.pass_settings.speed_mm_per_s
-        )
+    await hcapi.move_to(mount, here._replace(z=SEARCH_TRANSIT_HEIGHT))
+    edge_settings = hcapi.config.calibration.edge_sense
+
+    start = axis.set_in_point(
+        minus_edge_nominal,
+        axis.of_point(minus_edge_nominal) - edge_settings.search_initial_tolerance_mm,
+    )
+    end = axis.set_in_point(
+        plus_edge_nominal,
+        axis.of_point(plus_edge_nominal) + edge_settings.search_initial_tolerance_mm,
+    )
+
+    await hcapi.move_to(mount, start._replace(z=SEARCH_TRANSIT_HEIGHT))
+
+    data = await hcapi.capacitive_sweep(
+        mount, axis, start, end, edge_settings.pass_settings.speed_mm_per_s
+    )
 
     left_edge, right_edge = _edges_from_data(
         data,
@@ -578,30 +575,32 @@ async def _calibrate_mount(
     from the current instrument offset to set a new instrument offset.
     """
     nominal_center = Point(*get_calibration_square_position_in_slot(slot))
-    try:
-        # find the center of the calibration sqaure
-        offset = await find_calibration_structure_position(
-            hcapi,
-            mount,
-            nominal_center,
-            method=method,
-            raise_verify_error=raise_verify_error,
-        )
-        # update center with values obtained during calibration
-        LOG.info(f"Found calibration value {offset} for mount {mount.name}")
-        return offset
+    async with hcapi.restore_system_constrants():
+        await hcapi.set_system_constraints_for_calibration()
+        try:
+            # find the center of the calibration sqaure
+            offset = await find_calibration_structure_position(
+                hcapi,
+                mount,
+                nominal_center,
+                method=method,
+                raise_verify_error=raise_verify_error,
+            )
+            # update center with values obtained during calibration
+            LOG.info(f"Found calibration value {offset} for mount {mount.name}")
+            return offset
 
-    except (
-        InaccurateNonContactSweepError,
-        EarlyCapacitiveSenseTrigger,
-        CalibrationStructureNotFoundError,
-    ):
-        LOG.info(
-            "Error occurred during calibration. Resetting to current saved calibration value."
-        )
-        await hcapi.reset_instrument_offset(mount, to_default=False)
-        # re-raise exception after resetting instrument offset
-        raise
+        except (
+            InaccurateNonContactSweepError,
+            EarlyCapacitiveSenseTrigger,
+            CalibrationStructureNotFoundError,
+        ):
+            LOG.info(
+                "Error occurred during calibration. Resetting to current saved calibration value."
+            )
+            await hcapi.reset_instrument_offset(mount, to_default=False)
+            # re-raise exception after resetting instrument offset
+            raise
 
 
 async def find_calibration_structure_position(
