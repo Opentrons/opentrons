@@ -43,18 +43,22 @@ if TYPE_CHECKING:
 
 LOG = getLogger(__name__)
 
-CAL_TRANSIT_HEIGHT: Final[float] = 5
 LINEAR_TRANSIT_HEIGHT: Final[float] = 1
 SEARCH_TRANSIT_HEIGHT: Final[float] = 5
-GRIPPER_GRIP_FORCE: Final[float] = 20
-BELT_CAL_TRANSIT_HEIGHT: Final[float] = 50
-BELT_CALIBRATION_SLOTS = {
-    "front-left": 1,
-    "front-right": 3,
-    "rear-left": 10,
-}
-BELT_CALIBRATION_MAX_GANTRY_MISALIGNED = 0.5
-BELT_CALIBRATION_MAX_DECK_TILT = 0.5
+GRIPPER_GRIP_FORCE: Final[float] = 20  # FIXME: (andy s) this adds error, reduce
+
+SLOT_CENTER = 5
+SLOT_FRONT_LEFT = 1
+SLOT_FRONT_RIGHT = 3
+SLOT_REAR_LEFT = 10
+
+# 96ch is 99mm from left->right, and 63mm front->rear
+# deck calibration squares are ~330mm both left->right and front->rear
+# we need to support <=0.1mm shift from 96ch left->right
+# which means we can only tolerate left/right shift <=0.33mm
+# and front/rear shift <=0.52
+MAX_SHIFT_ACROSS_DECK_LEFT_RIGHT = 0.33
+MAX_SHIFT_ACROSS_DECK_FRONT_REAR = 0.52
 
 PREP_OFFSET_DEPTH = Point(*Z_PREP_OFFSET)
 EDGES = {
@@ -99,24 +103,6 @@ class InaccurateNonContactSweepError(RuntimeError):
         super().__init__(
             f"Calibration detected a slot width of {detected_width:.3f}mm "
             f"which is too far from the design width of {nominal_width:.3f}mm"
-        )
-
-
-class GantryRotationalError(RuntimeError):
-    def __init__(self, x: float, y: float) -> None:
-        super().__init__(
-            f"Calibration detected the X alignment is {x:.3f}mm "
-            f"and the Y alignment is {y:.3f}mm across the whole deck"
-            f"(max allowed is {BELT_CALIBRATION_MAX_GANTRY_MISALIGNED}mm)"
-        )
-
-
-class DeckTiltError(RuntimeError):
-    def __init__(self, x: float, y: float) -> None:
-        super().__init__(
-            f"Calibration detected the Z shifts {x:.3f}mm along X axis,"
-            f"and {x:.3f}mm along Y axis across the whole deck"
-            f"(max allowed is {BELT_CALIBRATION_MAX_DECK_TILT}mm)"
         )
 
 
@@ -395,24 +381,21 @@ async def find_axis_center(
     async with hcapi.restore_system_constrants():
         await hcapi.set_system_constraints_for_calibration()
         await hcapi.move_to(mount, here._replace(z=SEARCH_TRANSIT_HEIGHT))
-    edge_settings = hcapi.config.calibration.edge_sense
-
-    start = axis.set_in_point(
-        minus_edge_nominal,
-        axis.of_point(minus_edge_nominal) - edge_settings.search_initial_tolerance_mm,
-    )
-    end = axis.set_in_point(
-        plus_edge_nominal,
-        axis.of_point(plus_edge_nominal) + edge_settings.search_initial_tolerance_mm,
-    )
-
-    async with hcapi.restore_system_constrants():
-        await hcapi.set_system_constraints_for_calibration()
+        edge_settings = hcapi.config.calibration.edge_sense
+        start = axis.set_in_point(
+            minus_edge_nominal,
+            axis.of_point(minus_edge_nominal)
+            - edge_settings.search_initial_tolerance_mm,
+        )
+        end = axis.set_in_point(
+            plus_edge_nominal,
+            axis.of_point(plus_edge_nominal)
+            + edge_settings.search_initial_tolerance_mm,
+        )
         await hcapi.move_to(mount, start._replace(z=SEARCH_TRANSIT_HEIGHT))
-
-    data = await hcapi.capacitive_sweep(
-        mount, axis, start, end, edge_settings.pass_settings.speed_mm_per_s
-    )
+        data = await hcapi.capacitive_sweep(
+            mount, axis, start, end, edge_settings.pass_settings.speed_mm_per_s
+        )
 
     left_edge, right_edge = _edges_from_data(
         data,
@@ -566,7 +549,7 @@ async def find_calibration_structure_center(
 async def _calibrate_mount(
     hcapi: OT3API,
     mount: OT3Mount,
-    slot: int = 5,
+    slot: int = SLOT_CENTER,
     method: CalibrationMethod = CalibrationMethod.BINARY_SEARCH,
     raise_verify_error: bool = True,
 ) -> Point:
@@ -675,24 +658,6 @@ async def find_slot_center_binary_from_nominal_center(
     return nominal_center - offset, nominal_center
 
 
-def _confirm_robot_alignment(points: Dict[str, Tuple[Point, Point]]) -> None:
-    # check rotational alignment between gantry and deck
-    # NOTE: we cannot exceed a certain amount of rotation b/c of 96ch alignment
-    # FIXME: would be easier to define in degrees/radians, but this currently
-    #        defined in MM because it's easier
-    rotation_along_x = abs(points["front-left"][0].y - points["front-right"][0].y)
-    rotation_along_y = abs(points["front-left"][0].x - points["rear-left"][0].x)
-    max_alignment = BELT_CALIBRATION_MAX_GANTRY_MISALIGNED
-    if rotation_along_x > max_alignment or rotation_along_y > max_alignment:
-        raise GantryRotationalError(rotation_along_x, rotation_along_y)
-    # check how much the deck is tilted, relative to the gantry
-    max_tilt = BELT_CALIBRATION_MAX_DECK_TILT
-    tilt_along_x = abs(points["front-left"][0].z - points["front-right"][0].z)
-    tilt_along_y = abs(points["front-left"][0].z - points["rear-left"][0].z)
-    if tilt_along_x > max_tilt or tilt_along_y > max_tilt:
-        raise DeckTiltError(tilt_along_x, tilt_along_y)
-
-
 def _points_dict_to_solve_points(
     points: Dict[str, Tuple[Point, Point]]
 ) -> Tuple[SolvePoints, SolvePoints]:
@@ -751,18 +716,18 @@ async def _determine_transform_matrix(
     A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
     """
 
-    async def _find_slot(_s: int) -> Tuple[Point, Point]:
-        _actual_nominal_points = await find_slot_center_binary_from_nominal_center(
-            hcapi, mount, _s
+    async def _find_slot(s: CalibrationSlot) -> None:
+        s.actual, s.nominal = await find_slot_center_binary_from_nominal_center(
+            hcapi, mount, s.slot
         )
         await hcapi.retract(mount)
-        return _actual_nominal_points
 
-    slots = BELT_CALIBRATION_SLOTS
-    points = {name: await _find_slot(slot) for name, slot in slots.items()}
-    _confirm_robot_alignment(points)
-    nominal, actual = _points_dict_to_solve_points(points)
-    return solve_attitude(nominal, actual)
+    belt_cal = BeltCalibrationData(SLOT_FRONT_LEFT, SLOT_FRONT_RIGHT, SLOT_REAR_LEFT)
+    await _find_slot(belt_cal.front_left)
+    await _find_slot(belt_cal.front_right)
+    await _find_slot(belt_cal.rear_left)
+    belt_cal.check_alignment()  # raises error if misaligned
+    return solve_attitude(*belt_cal.get_solve_points())
 
 
 def gripper_pin_offsets_mean(front: Point, rear: Point) -> Point:
@@ -1087,3 +1052,100 @@ class OT3Transforms(RobotCalibration):
     left_mount_offset: Point
     right_mount_offset: Point
     gripper_mount_offset: Point
+
+
+class AlignmentError(RuntimeError):
+    def __init__(self, x: float, y: float, zx: float, zy: float) -> None:
+        super().__init__(
+            f"this machine is misaligned and requires maintenance "
+            f"(x-along-y: {x}, y-along-x: {y}, z-along-x: {zx}, z-along-y: {zy}"
+        )
+
+
+@dataclass
+class CalibrationSlot:
+    slot: int
+    nominal: Optional[Point]
+    actual: Optional[Point]
+
+
+class BeltCalibrationData:
+    def __init__(
+        self, slot_front_left: int, slot_front_right: int, slot_rear_left: int
+    ) -> None:
+        self.front_left = CalibrationSlot(
+            slot=slot_front_left, nominal=None, actual=None
+        )
+        self.front_right = CalibrationSlot(
+            slot=slot_front_right, nominal=None, actual=None
+        )
+        self.rear_left = CalibrationSlot(slot=slot_rear_left, nominal=None, actual=None)
+
+    def check_alignment(self) -> None:
+        if self._y_shift_left_to_right() > MAX_SHIFT_ACROSS_DECK_LEFT_RIGHT:
+            self._raise_alignment_error()
+        if self._z_shift_left_to_right() > MAX_SHIFT_ACROSS_DECK_LEFT_RIGHT:
+            self._raise_alignment_error()
+        if self._x_shift_front_to_rear() > MAX_SHIFT_ACROSS_DECK_FRONT_REAR:
+            self._raise_alignment_error()
+        if self._z_shift_front_to_rear() > MAX_SHIFT_ACROSS_DECK_FRONT_REAR:
+            self._raise_alignment_error()
+
+    def get_solve_points(self) -> Tuple[SolvePoints, SolvePoints]:
+        def _point_to_tuple(_p: Point) -> Tuple[float, float, float]:
+            return _p.x, _p.y, _p.z
+
+        self._has_cal_data()
+        actual = (
+            _point_to_tuple(self.front_left.actual),  # type: ignore[arg-type]
+            _point_to_tuple(self.rear_left.actual),  # type: ignore[arg-type]
+            _point_to_tuple(self.front_right.actual),  # type: ignore[arg-type]
+        )
+        nominal = (
+            _point_to_tuple(self.front_left.nominal),  # type: ignore[arg-type]
+            _point_to_tuple(self.rear_left.nominal),  # type: ignore[arg-type]
+            _point_to_tuple(self.front_right.nominal),  # type: ignore[arg-type]
+        )
+        return nominal, actual
+
+    def _y_shift_left_to_right(self) -> float:
+        # deck coordinates (positive is towards front of machine)
+        self._has_cal_data()
+        return self.front_right.actual.y - self.front_left.actual.y  # type: ignore[union-attr]
+
+    def _z_shift_left_to_right(self) -> float:
+        # deck coordinates (positive is towards top of machine)
+        self._has_cal_data()
+        return self.front_right.actual.z - self.front_left.actual.z  # type: ignore[union-attr]
+
+    def _x_shift_front_to_rear(self) -> float:
+        # deck coordinates (positive is towards right side of machine)
+        self._has_cal_data()
+        return self.rear_left.actual.x - self.front_left.actual.x  # type: ignore[union-attr]
+
+    def _z_shift_front_to_rear(self) -> float:
+        # deck coordinates (positive is towards top of machine)
+        self._has_cal_data()
+        return self.rear_left.actual.z - self.front_left.actual.z  # type: ignore[union-attr]
+
+    def _has_cal_data(self) -> None:
+        if (
+            not self.front_left.actual
+            or not self.front_right.actual
+            or not self.rear_left.actual
+            or not self.front_left.nominal
+            or not self.front_right.nominal
+            or not self.rear_left.nominal
+        ):
+            raise ValueError(
+                "not all nominal and actual slot positions not stored, "
+                "need to run belt-calibration sequence first"
+            )
+
+    def _raise_alignment_error(self) -> None:
+        raise AlignmentError(
+            x=self._x_shift_front_to_rear(),
+            y=self._y_shift_left_to_right(),
+            zx=self._z_shift_left_to_right(),
+            zy=self._z_shift_front_to_rear(),
+        )
