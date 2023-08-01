@@ -3,7 +3,7 @@ from json import load as json_load
 from pathlib import Path
 import argparse
 from typing import List, Union
-
+import subprocess
 from opentrons.protocol_api import ProtocolContext
 
 from hardware_testing.data import create_run_id_and_start_time, ui, get_git_description
@@ -317,6 +317,7 @@ if __name__ == "__main__":
         deck_version="2",
         extra_labware=custom_defs,
     )
+    serial_logger = subprocess.Popen(['python3 -m opentrons_hardware.scripts.can_mon > /data/testing_data/serial.log'], shell=True)
     try:
         if args.tip == 0:
             for tip in get_tip_volumes_for_qc(
@@ -324,7 +325,7 @@ if __name__ == "__main__":
             ):
                 hw = _ctx._core.get_hardware()
                 if not _ctx.is_simulating():
-                    ui.alert_user_ready(f"Ready to run with {tip}ul tip?", hw)
+                    ui.alert_user_ready(f"\nReady to run with {tip}ul tip?", hw)
                 args.tip = tip
                 _main(args, _ctx)
         else:
@@ -332,4 +333,5 @@ if __name__ == "__main__":
     except Exception:
         pass
     finally:
+        serial_logger.terminate()
         _ctx._core.get_hardware()._backend.eeprom_driver._gpio.__del__()
