@@ -15,7 +15,7 @@ from hardware_testing.data.csv_report import (
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import Axis, OT3Mount, Point
 
-FAILURE_THRESHOLD_MM = 3
+FAILURE_THRESHOLD_MM = -3
 GAUGE_HEIGHT_MM = 40
 GRIP_HEIGHT_MM = 30
 TEST_WIDTHS_MM: List[float] = [60, 85.75, 62]
@@ -73,7 +73,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             _error_when_gripping_itself = _width_error
         _width_error_adjusted = _width_error - _error_when_gripping_itself
         # should always fail in the negative direction
-        result = CSVResult.from_bool(0 <= _width_error_adjusted <= FAILURE_THRESHOLD_MM)
+        result = CSVResult.from_bool(0 >= _width_error_adjusted >= FAILURE_THRESHOLD_MM)
         tag = _get_test_tag(_width, _force)
         print(f"{tag}-width-error: {_width_error}")
         print(f"{tag}-width-error-adjusted: {_width_error_adjusted}")

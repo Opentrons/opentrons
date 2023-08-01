@@ -33,7 +33,7 @@ WARMUP_SECONDS = 10
 FORCE_GAUGE_TRIAL_SAMPLE_INTERVAL = 0.25  # seconds
 FORCE_GAUGE_TRIAL_SAMPLE_COUNT = 20  # 20 samples = 5 seconds @ 4Hz
 
-GAUGE_OFFSET = Point(x=2, y=42, z=75)
+GAUGE_OFFSET = Point(x=2, y=-42, z=75)
 
 
 def _get_test_tag(
@@ -151,7 +151,7 @@ async def _setup(api: OT3API) -> Union[Mark10, SimMark10]:
     await helpers_ot3.move_to_arched_ot3(api, mount, target_pos + Point(z=15))
     if not api.is_simulator:
         ui.get_user_ready("please make sure the gauge in the middle of the gripper")
-    await api.move_to(mount, target_pos)
+    await helpers_ot3.jog_mount_ot3(api, OT3Mount.GRIPPER)
     if not api.is_simulator:
         ui.get_user_ready("about to grip")
     await api.grip(20)

@@ -31,6 +31,9 @@ PROBE_PREP_HEIGHT_MM = 5
 PROBE_POS_OFFSET = Point(13, 13, 0)
 JAW_ALIGNMENT_MM_X = 0.5
 JAW_ALIGNMENT_MM_Z = 0.5
+PROBE_PF_MAX = 6.0
+DECK_PF_MIN = 9.0
+DECK_PF_MAX = 15.0
 
 
 def _get_test_tag(probe: GripperProbe) -> str:
@@ -44,7 +47,9 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
         tag = _get_test_tag(p)
         lines.append(CSVLine(f"{tag}-open-air-pf", [float]))
         lines.append(CSVLine(f"{tag}-probe-pf", [float]))
+        lines.append(CSVLine(f"{tag}-probe-pf-max-allowed", [float]))
         lines.append(CSVLine(f"{tag}-deck-pf", [float]))
+        lines.append(CSVLine(f"{tag}-deck-pf-min-max-allowed", [float, float]))
         lines.append(CSVLine(f"{tag}-result", [CSVResult]))
     for p in GripperProbe:
         lines.append(CSVLine(f"jaw-probe-{p.name.lower()}-xyz", [float, float, float]))
@@ -155,12 +160,15 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
                 deck_pf = await _read_from_sensor(api, s_driver, cap_sensor, 10)
         print(f"Reading on deck: {deck_pf}")
 
-        result = deck_pf > probe_pf
-
+        result = (
+            open_air_pf < probe_pf < PROBE_PF_MAX < DECK_PF_MIN < deck_pf < DECK_PF_MAX
+        )
         _tag = _get_test_tag(probe)
         report(section, f"{_tag}-open-air-pf", [open_air_pf])
         report(section, f"{_tag}-probe-pf", [probe_pf])
+        report(section, f"{_tag}-probe-pf-max-allowed", [PROBE_PF_MAX])
         report(section, f"{_tag}-deck-pf", [deck_pf])
+        report(section, f"{_tag}-deck-pf-min-max-allowed", [DECK_PF_MIN, DECK_PF_MAX])
         report(section, f"{_tag}-result", [CSVResult.from_bool(result)])
         await api.home_z()
         await api.ungrip()

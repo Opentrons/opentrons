@@ -237,3 +237,99 @@ class Protocols:
         robot_error=True,
         robot_analysis_error="?",
     )
+
+    OT3_P1000_96_HS_TM_MM_2_15_MagMaxRNACells96Ch: Protocol = Protocol(
+        file_name="OT3_P1000_96_HS_TM_MM_2_15_MagMaxRNACells96Ch",
+        file_extension="py",
+        protocol_name="MagMax RNA Extraction: Cells 96 ABR TESTING",
+        robot="OT-3",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["opentrons_ot3_96_tiprack_200ul_rss"],
+    )
+
+    OT3_P1000SRight_None_2_15_ABR_Simple_Normalize_Long_Right: Protocol = Protocol(
+        file_name="OT3_P1000SRight_None_2_15_ABR_Simple_Normalize_Long_Right",
+        file_extension="py",
+        protocol_name="OT3 ABR Simple Normalize Long",
+        robot="OT-3",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["opentrons_ot3_96_tiprack_200ul_rss"],
+    )
+
+    OT3_P50MLeft_P1000MRight_None_2_15_ABRKAPALibraryQuantLongv2: Protocol = Protocol(
+        file_name="OT3_P50MLeft_P1000MRight_None_2_15_ABRKAPALibraryQuantLongv2",
+        file_extension="py",
+        protocol_name="OT3 ABR KAPA Library Quant v2",
+        robot="OT-3",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT3_P1000MLeft_P50MRight_HS_MM_TC_TM_2_15_ABR3_Illumina_DNA_Enrichment_v4: Protocol = Protocol(
+        file_name="OT3_P1000MLeft_P50MRight_HS_MM_TC_TM_2_15_ABR3_Illumina_DNA_Enrichment_v4",
+        file_extension="py",
+        protocol_name="Illumina DNA Enrichment v4",
+        robot="OT-3",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT3_P1000MLeft_P50MRight_HS_MM_TC_TM_2_15_ABR3_Illumina_DNA_Enrichment: Protocol = Protocol(
+        file_name="OT3_P1000MLeft_P50MRight_HS_MM_TC_TM_2_15_ABR3_Illumina_DNA_Enrichment",
+        file_extension="py",
+        protocol_name="Illumina DNA Enrichment",
+        robot="OT-3",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT3_P1000MLeft_P50MRight_HS_TM_MM_TC_2_15_ABR4_Illumina_DNA_Prep_24x: Protocol = Protocol(
+        file_name="OT3_P1000MLeft_P50MRight_HS_TM_MM_TC_2_15_ABR4_Illumina_DNA_Prep_24x",
+        file_extension="py",
+        protocol_name="Illumina DNA Prep 24x",
+        robot="OT-3",
+        app_error=False,
+        robot_error=False,
+    )
+
+    OT3_P1000_96_HS_TM_MM_2_15_ABR5_6_HDQ_Bacteria_ParkTips_96_channel: Protocol = Protocol(
+        file_name="OT3_P1000_96_HS_TM_MM_2_15_ABR5_6_HDQ_Bacteria_ParkTips_96_channel",
+        file_extension="py",
+        protocol_name="Omega HDQ DNA Extraction: Bacteria 96 FOR ABR TESTING",
+        robot="OT-3",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["opentrons_ot3_96_tiprack_1000ul_rss"],
+    )
+
+    OT3_P1000_96_None_2_15_ABR5_6_IDT_xGen_EZ_96x_Head_PART_I_III_ABR: Protocol = Protocol(
+        file_name="OT3_P1000_96_None_2_15_ABR5_6_IDT_xGen_EZ_96x_Head_PART_I_III_ABR",
+        file_extension="py",
+        protocol_name="IDT xGen EZ 96x Head PART I-III ABR",
+        robot="OT-3",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["opentrons_ot3_96_tiprack_50ul_rss", "opentrons_ot3_96_tiprack_200ul_rss"],
+    )
+
+    OT3_P1000_96_HS_TM_TC_MM_2_15_ABR5_6_Illumina_DNA_Prep_96x_Head_PART_III: Protocol = Protocol(
+        file_name="OT3_P1000_96_HS_TM_TC_MM_2_15_ABR5_6_Illumina_DNA_Prep_96x_Head_PART_III",
+        file_extension="py",
+        protocol_name="Illumina DNA Prep 96x Head PART III",
+        robot="OT-3",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["opentrons_ot3_96_tiprack_200ul_rss", "opentrons_ot3_96_tiprack_50ul_rss"],
+    )
+
+    OT3_P100_96_HS_TM_2_15_Quick_Zymo_RNA_Bacteria: Protocol = Protocol(
+        file_name="OT3_P100_96_HS_TM_2_15_Quick_Zymo_RNA_Bacteria",
+        file_extension="py",
+        protocol_name="Quick Zymo Magbead RNA Extraction with Lysis: Bacteria 96 Channel Deletion Test",
+        robot="OT-3",
+        app_error=False,
+        robot_error=False,
+        custom_labware=["opentrons_ot3_96_tiprack_1000ul_rss"],
+    )
