@@ -416,6 +416,114 @@ class MoveConditionNotMetError(RoboticsControlError):
         )
 
 
+class CalibrationStructureNotFoundError(RoboticsControlError):
+    """An error indicating that a calibration square was not able to be found."""
+
+    def __init__(
+        self,
+        structure_height: float,
+        lower_limit: float,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a CalibrationStructureNotFoundError."""
+        super().__init__(
+            ErrorCodes.CALIBRATION_STRUCTURE_NOT_FOUND,
+            f"Structure height at z={structure_height}mm beyond lower limit: {lower_limit}.",
+            detail,
+            wrapping,
+        )
+
+
+class EdgeNotFoundError(RoboticsControlError):
+    """An error indicating that a calibration square edge was not able to be found."""
+
+    def __init__(
+        self,
+        edge_name: str,
+        stride: float,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a EdgeNotFoundError."""
+        super().__init__(
+            ErrorCodes.EDGE_NOT_FOUND,
+            f"Edge {edge_name} could not be verified at {stride} mm resolution.",
+            detail,
+            wrapping,
+        )
+
+
+class EarlyCapacitiveSenseTrigger(RoboticsControlError):
+    """An error indicating that a capacitive probe triggered too early."""
+
+    def __init__(
+        self,
+        found: float,
+        nominal: float,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a EarlyCapacitiveSenseTrigger."""
+        super().__init__(
+            ErrorCodes.EARLY_CAPACITIVE_SENSE_TRIGGER,
+            f"Calibration triggered early at z={found}mm, expected {nominal}",
+            detail,
+            wrapping,
+        )
+
+
+class InaccurateNonContactSweepError(RoboticsControlError):
+    """An error indicating that a capacitive sweep was inaccurate."""
+
+    def __init__(
+        self,
+        found: float,
+        nominal: float,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a InaccurateNonContactSweepError."""
+        msg = f"Calibration detected a slot width of {found:.3f}mm, " \
+              f"which is too far from the design width of {nominal:.3f}mm"
+        super().__init__(
+            ErrorCodes.INACCURATE_NON_CONTACT_SWEEP,
+            msg,
+            detail,
+            wrapping,
+        )
+
+
+class MisalignedGantryError(RoboticsControlError):
+    """An error indicating that the robot's gantry and deck are misaligned."""
+
+    def __init__(
+        self,
+        detail: Optional[Dict[str, Any]] = None,
+        wrapping: Optional[Sequence[EnumeratedError]] = None,
+    ) -> None:
+        """Build a MisalignedGantryError."""
+        msg = "this machine is misaligned and requires maintenance"
+        try:
+            # TODO: add PASS/FAIL to message so it's easy to identify
+            append_msg = "\n"
+            append_msg += f' - left-to-right-spec: {detail["spec"]["left-to-right"]}\n'
+            append_msg += f' - front-to-rear-spec: {detail["spec"]["front-to-rear"]}\n'
+            append_msg += f' - front-to-rear-x: {detail["shift"]["x"]}\n'
+            append_msg += f' - left-to-right-y: {detail["shift"]["y"]}\n'
+            append_msg += f' - left-to-right-z: {detail["shift"]["zx"]}\n'
+            append_msg += f' - front-to-rear-z: {detail["shift"]["zy"]}\n'
+            msg += append_msg
+        except KeyError:
+            pass
+        super().__init__(
+            ErrorCodes.MISALIGNED_GANTRY,
+            msg,
+            detail,
+            wrapping,
+        )
+
+
 class LabwareDroppedError(RoboticsInteractionError):
     """An error indicating that the gripper dropped labware it was holding."""
 
