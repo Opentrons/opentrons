@@ -13,11 +13,9 @@ import {
 import { StyledText } from '../../atoms/text'
 import { MenuList } from '../../atoms/MenuList'
 import { MenuItem } from '../../atoms/MenuList/MenuItem'
-import { home, ROBOT } from '../../redux/robot-controls'
 import { useLights } from '../Devices/hooks'
 import { RestartRobotConfirmationModal } from './RestartRobotConfirmationModal'
 
-import type { Dispatch } from '../../redux/types'
 import { GantryControlModal } from './GantryControlModal'
 
 interface NavigationMenuProps {
@@ -29,7 +27,6 @@ export function NavigationMenu(props: NavigationMenuProps): JSX.Element {
   const { onClick, robotName } = props
   const { t, i18n } = useTranslation(['devices_landing', 'robot_controls'])
   const { lightsOn, toggleLights } = useLights()
-  const dispatch = useDispatch<Dispatch>()
   const [
     showRestartRobotConfirmationModal,
     setShowRestartRobotConfirmationModal,

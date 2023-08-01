@@ -56,7 +56,6 @@ export function JogControls(props: JogControlsProps): JSX.Element {
   const [currentStepSize, setCurrentStepSize] = React.useState<StepSize>(
     stepSizes[0]
   )
-
   const controls = isOnDevice ? (
     <>
       <TouchStepSizeControl
