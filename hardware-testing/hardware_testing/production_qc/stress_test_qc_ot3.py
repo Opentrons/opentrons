@@ -682,6 +682,11 @@ async def enforce_pipette_attached(
 
 
 async def _main(arguments: argparse.Namespace) -> None:
+
+    api = await helpers_ot3.build_async_ot3_hardware_api(
+        is_simulating=arguments.simulate, stall_detection_enable=False
+    )
+
     if arguments.no_input:
         _robot_id = arguments.sn
         _operator = "None"
@@ -690,12 +695,11 @@ async def _main(arguments: argparse.Namespace) -> None:
             _robot_id = "ot3-simulated-A01"
             _operator = "simulation"
         else:
-            _robot_id = input("enter ROBOT SERIAL number: ")
+            _robot_id = api._backend.eeprom_data.serial_number
+            if not _robot_id:
+                ui.print_error("no serial number saved on this robot")
+                _robot_id = input("enter ROBOT SERIAL number: ").strip()
             _operator = input("enter OPERATOR name: ")
-
-    api = await helpers_ot3.build_async_ot3_hardware_api(
-        is_simulating=arguments.simulate, stall_detection_enable=False
-    )
 
     # callback function for writing new data to CSV file
     csv_props, csv_cb = _create_csv_and_get_callbacks(_robot_id)
