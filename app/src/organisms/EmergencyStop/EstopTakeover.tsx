@@ -5,7 +5,12 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 import { EstopPressedModal } from './EstopPressedModal'
 import { EstopMissingModal } from './EstopMissingModal'
 import { useEstopContext } from './hooks'
-import { PHYSICALLY_ENGAGED, LOGICALLY_ENGAGED, NOT_PRESENT } from './constants'
+import {
+  PHYSICALLY_ENGAGED,
+  LOGICALLY_ENGAGED,
+  NOT_PRESENT,
+  DISENGAGED,
+} from './constants'
 
 const ESTOP_REFETCH_INTERVAL_MS = 10000
 
@@ -21,7 +26,9 @@ export function EstopTakeover({ robotName }: EstopTakeoverProps): JSX.Element {
   const { isDismissedModal, setIsDismissedModal } = useEstopContext()
 
   const closeModal = (): void => {
-    setShowEstopModal(false)
+    if (estopStatus?.data.status === DISENGAGED) {
+      setShowEstopModal(false)
+    }
   }
 
   const targetEstopModal = (): JSX.Element | null => {

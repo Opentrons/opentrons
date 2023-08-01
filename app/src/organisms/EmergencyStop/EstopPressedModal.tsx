@@ -7,6 +7,7 @@ import {
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  Icon,
   JUSTIFY_FLEX_END,
   JUSTIFY_SPACE_BETWEEN,
   PrimaryButton,
@@ -25,6 +26,7 @@ import { StyledText } from '../../atoms/text'
 import { LegacyModal } from '../../molecules/LegacyModal'
 import { Modal } from '../../molecules/Modal'
 import { getIsOnDevice } from '../../redux/config'
+import { DISENGAGED } from './constants'
 
 import type {
   ModalHeaderBaseProps,
@@ -72,6 +74,7 @@ function TouchscreenModal({
   closeModal,
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const [isResuming, setIsResuming] = React.useState<boolean>(false)
   const { setEstopPhysicalStatus } = useSetEstopPhysicalStatusMutation()
   const modalHeader: ModalHeaderBaseProps = {
     title: t('estop_pressed'),
@@ -83,6 +86,7 @@ function TouchscreenModal({
     modalSize: 'large' as ModalSize,
   }
   const handleClick = (): void => {
+    setIsResuming(true)
     setEstopPhysicalStatus(null)
     closeModal()
   }
@@ -111,8 +115,10 @@ function TouchscreenModal({
         <SmallButton
           data-testid="Estop_pressed_button"
           width="100%"
+          iconName={isResuming ? 'ot-spinner' : undefined}
+          iconPlacement={isResuming ? 'startIcon' : undefined}
           buttonText={t('resume_robot_operations')}
-          disabled={isEngaged}
+          disabled={isEngaged || isResuming}
           onClick={handleClick}
         />
       </Flex>
@@ -126,7 +132,8 @@ function DesktopModal({
   setIsDismissedModal,
 }: EstopPressedModalProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { setEstopPhysicalStatus } = useSetEstopPhysicalStatusMutation()
+  const [isResuming, setIsResuming] = React.useState<boolean>(false)
+  const { setEstopPhysicalStatus, data } = useSetEstopPhysicalStatusMutation()
 
   const handleCloseModal = (): void => {
     if (setIsDismissedModal != null) {
@@ -144,10 +151,23 @@ function DesktopModal({
     width: '47rem',
   }
 
-  const handleClick = (): void => {
-    setEstopPhysicalStatus(null)
-    closeModal()
+  const handleClick: React.MouseEventHandler<HTMLButtonElement> = (e): void => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsResuming(true)
+    setEstopPhysicalStatus(null, {
+      onSuccess: () => {},
+      onError: () => {
+        setIsResuming(false)
+      },
+    })
   }
+
+  React.useEffect(() => {
+    if (data?.data.status === DISENGAGED) {
+      closeModal()
+    }
+  }, [data?.data.status, closeModal])
 
   return (
     <LegacyModal {...modalProps}>
@@ -159,8 +179,18 @@ function DesktopModal({
           {t('estop_pressed_description')}
         </StyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>
-          <PrimaryButton onClick={handleClick} disabled={isEngaged}>
-            {t('resume_robot_operations')}
+          <PrimaryButton
+            onClick={handleClick}
+            disabled={isEngaged || isResuming}
+          >
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              gridGap={SPACING.spacing8}
+              alignItems={ALIGN_CENTER}
+            >
+              {isResuming ? <Icon size="1rem" spin name="ot-spinner" /> : null}
+              {t('resume_robot_operations')}
+            </Flex>
           </PrimaryButton>
         </Flex>
       </Flex>
