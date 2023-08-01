@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux'
 import { getOnDeviceDisplaySettings } from '../../../redux/config'
 
-export const useIsFinishedUnboxing = (): boolean => {
+export const useIsUnboxingFlowOngoing = (): boolean => {
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
   )

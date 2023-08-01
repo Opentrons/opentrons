@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { createStore } from 'redux'
 
 import { getOnDeviceDisplaySettings } from '../../../../redux/config'
-import { useIsFinishedUnboxing } from '../hooks'
+import { useIsUnboxingFlowOngoing } from '../hooks'
 
 import type { Store } from 'redux'
 import type { State } from '../../../../redux/types'
@@ -24,7 +24,7 @@ const mockDisplaySettings = {
   unfinishedUnboxingFlowRoute: null,
 }
 
-describe('useIsFinishedUnboxing', () => {
+describe('useIsUnboxingFlowOngoing', () => {
   let wrapper: React.FunctionComponent<{}>
   beforeEach(() => {
     wrapper = ({ children }) => <Provider store={store}>{children}</Provider>
@@ -40,21 +40,27 @@ describe('useIsFinishedUnboxing', () => {
       ...mockDisplaySettings,
       unfinishedUnboxingFlowRoute: '/welcome',
     })
-    const { result } = renderHook(() => useIsFinishedUnboxing(), { wrapper })
+    const { result } = renderHook(() => useIsUnboxingFlowOngoing(), {
+      wrapper,
+    })
     expect(result.current).toBe(true)
   })
 
-  it('should return true if unfinishedUnboxingFlowRoute is /robot-settings/rename-robot', () => {
+  it('should return true if unfinishedUnboxingFlowRoute is /emergency-stop', () => {
     mockGetOnDeviceDisplaySettings.mockReturnValue({
       ...mockDisplaySettings,
-      unfinishedUnboxingFlowRoute: '/robot-settings/rename-robot',
+      unfinishedUnboxingFlowRoute: '/emergency-stop',
     })
-    const { result } = renderHook(() => useIsFinishedUnboxing(), { wrapper })
+    const { result } = renderHook(() => useIsUnboxingFlowOngoing(), {
+      wrapper,
+    })
     expect(result.current).toBe(true)
   })
 
   it('should return false if unfinishedUnboxingFlowRoute is null', () => {
-    const { result } = renderHook(() => useIsFinishedUnboxing(), { wrapper })
+    const { result } = renderHook(() => useIsUnboxingFlowOngoing(), {
+      wrapper,
+    })
     expect(result.current).toBe(false)
   })
 })
