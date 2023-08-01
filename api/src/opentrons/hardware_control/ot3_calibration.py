@@ -675,16 +675,17 @@ async def _determine_transform_matrix(
     A listed matrix of the linear transform in the x and y dimensions that accounts for the stretch of the gantry x and y belts.
     """
 
-    async def _find_slot(s: CalibrationSlot) -> None:
-        s.actual, s.nominal = await find_slot_center_binary_from_nominal_center(
-            hcapi, mount, s.slot
+    async def _find_slot(s: int) -> CalibrationSlot:
+        actual, nominal = await find_slot_center_binary_from_nominal_center(
+            hcapi, mount, s
         )
         await hcapi.retract(mount)
+        return CalibrationSlot(slot=s, nominal=nominal, actual=actual)
 
-    belt_cal = BeltCalibrationData(SLOT_FRONT_LEFT, SLOT_FRONT_RIGHT, SLOT_REAR_LEFT)
-    await _find_slot(belt_cal.front_left)
-    await _find_slot(belt_cal.front_right)
-    await _find_slot(belt_cal.rear_left)
+    front_left = await _find_slot(SLOT_FRONT_LEFT)
+    front_right = await _find_slot(SLOT_FRONT_RIGHT)
+    rear_left = await _find_slot(SLOT_REAR_LEFT)
+    belt_cal = BeltCalibrationData(front_left, front_right, rear_left)
     belt_cal.check_alignment()  # raises error if misaligned
     return solve_attitude(*belt_cal.get_solve_points())
 
@@ -1024,21 +1025,20 @@ class AlignmentError(RuntimeError):
 @dataclass
 class CalibrationSlot:
     slot: int
-    nominal: Optional[Point]
-    actual: Optional[Point]
+    nominal: Point
+    actual: Point
 
 
 class BeltCalibrationData:
     def __init__(
-        self, slot_front_left: int, slot_front_right: int, slot_rear_left: int
+        self,
+        slot_front_left: CalibrationSlot,
+        slot_front_right: CalibrationSlot,
+        slot_rear_left: CalibrationSlot,
     ) -> None:
-        self.front_left = CalibrationSlot(
-            slot=slot_front_left, nominal=None, actual=None
-        )
-        self.front_right = CalibrationSlot(
-            slot=slot_front_right, nominal=None, actual=None
-        )
-        self.rear_left = CalibrationSlot(slot=slot_rear_left, nominal=None, actual=None)
+        self.front_left = slot_front_left
+        self.front_right = slot_front_right
+        self.rear_left = slot_rear_left
 
     def check_alignment(self) -> None:
         if self._y_shift_left_to_right() > MAX_SHIFT_ACROSS_DECK_LEFT_RIGHT:
@@ -1054,52 +1054,33 @@ class BeltCalibrationData:
         def _point_to_tuple(_p: Point) -> Tuple[float, float, float]:
             return _p.x, _p.y, _p.z
 
-        self._has_cal_data()
         actual = (
-            _point_to_tuple(self.front_left.actual),  # type: ignore[arg-type]
-            _point_to_tuple(self.rear_left.actual),  # type: ignore[arg-type]
-            _point_to_tuple(self.front_right.actual),  # type: ignore[arg-type]
+            _point_to_tuple(self.front_left.actual),
+            _point_to_tuple(self.rear_left.actual),
+            _point_to_tuple(self.front_right.actual),
         )
         nominal = (
-            _point_to_tuple(self.front_left.nominal),  # type: ignore[arg-type]
-            _point_to_tuple(self.rear_left.nominal),  # type: ignore[arg-type]
-            _point_to_tuple(self.front_right.nominal),  # type: ignore[arg-type]
+            _point_to_tuple(self.front_left.nominal),
+            _point_to_tuple(self.rear_left.nominal),
+            _point_to_tuple(self.front_right.nominal),
         )
         return nominal, actual
 
     def _y_shift_left_to_right(self) -> float:
         # deck coordinates (positive is towards front of machine)
-        self._has_cal_data()
-        return self.front_right.actual.y - self.front_left.actual.y  # type: ignore[union-attr]
+        return self.front_right.actual.y - self.front_left.actual.y
 
     def _z_shift_left_to_right(self) -> float:
         # deck coordinates (positive is towards top of machine)
-        self._has_cal_data()
-        return self.front_right.actual.z - self.front_left.actual.z  # type: ignore[union-attr]
+        return self.front_right.actual.z - self.front_left.actual.z
 
     def _x_shift_front_to_rear(self) -> float:
         # deck coordinates (positive is towards right side of machine)
-        self._has_cal_data()
-        return self.rear_left.actual.x - self.front_left.actual.x  # type: ignore[union-attr]
+        return self.rear_left.actual.x - self.front_left.actual.x
 
     def _z_shift_front_to_rear(self) -> float:
         # deck coordinates (positive is towards top of machine)
-        self._has_cal_data()
-        return self.rear_left.actual.z - self.front_left.actual.z  # type: ignore[union-attr]
-
-    def _has_cal_data(self) -> None:
-        if (
-            not self.front_left.actual
-            or not self.front_right.actual
-            or not self.rear_left.actual
-            or not self.front_left.nominal
-            or not self.front_right.nominal
-            or not self.rear_left.nominal
-        ):
-            raise ValueError(
-                "not all nominal and actual slot positions not stored, "
-                "need to run belt-calibration sequence first"
-            )
+        return self.rear_left.actual.z - self.front_left.actual.z
 
     def _raise_alignment_error(self) -> None:
         raise AlignmentError(
