@@ -12,7 +12,7 @@ from ..types import (
     LabwareOffsetVector,
     LabwareMovementOffsetData,
 )
-from ..errors import LabwareMovementNotAllowedError
+from ..errors import LabwareMovementNotAllowedError, NotSupportedOnRobotType
 from ..resources import labware_validation
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate
 
@@ -120,6 +120,11 @@ class MoveLabwareImplementation(
         )
 
         if params.strategy == LabwareMovementStrategy.USING_GRIPPER:
+            if self._state_view.config.robot_type == "OT-2 Standard":
+                raise NotSupportedOnRobotType(
+                    message="Labware movement using a gripper is not supported on the OT-2",
+                    details={"strategy": params.strategy},
+                )
             if labware_validation.validate_definition_is_adapter(
                 current_labware_definition
             ):
