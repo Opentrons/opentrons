@@ -92,6 +92,11 @@ class CSVLine:
         """Line stored."""
         return self._stored
 
+    @property
+    def num_data_points(self) -> int:
+        """Get the number of data points saved in this line."""
+        return len(self._data_types)
+
     def cache_start_time(self, start_time: float) -> None:
         """Line cache start time."""
         self._start_time = start_time
@@ -349,7 +354,17 @@ class CSVReport:
 
     def __str__(self) -> str:
         """CSV Report string."""
-        return "\n".join([str(s) for s in self._sections])
+        max_cols = max(
+            [
+                line.num_data_points
+                for section in self._sections
+                for line in section.lines
+            ]
+        )
+        max_cols += 2  # all lines are prepended with the timestamp and tag
+        # the first line in the CSV should be populated with "copy"
+        first_line = ",".join(["copy"] * max_cols)
+        return f"{first_line}\n" + "\n".join([str(s) for s in self._sections])
 
     @property
     def completed(self) -> bool:
