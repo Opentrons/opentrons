@@ -21,6 +21,7 @@ import {
   RIGHT,
   GRIPPER_V1,
   GRIPPER_V1_1,
+  GRIPPER_V1_2,
   EXTENSION,
   MAGNETIC_BLOCK_V1,
 } from './constants'
