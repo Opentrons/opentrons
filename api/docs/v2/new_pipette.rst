@@ -6,7 +6,7 @@
 Pipettes
 ########
 
-A basic pipetting protocol tells the API about the pipette model you want to use and its location (left or right) on the z-axis mounting slot. The :py:meth:`.ProtocolContext.load_instrument` function provides these capabilities. It includes parameters that accept a pipette’s API load name, its mount position, and other arguments. Calling this function returns an :py:class:`.InstrumentContext` object.
+When writing a protocol, you must inform the Protocol API about the pipettes you will be using on your robot. The :py:meth:`.ProtocolContext.load_instrument` function provides this information. Calling this function returns an :py:class:`.InstrumentContext` object.
 
 For information about liquid handling, see :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
 
@@ -15,7 +15,7 @@ For information about liquid handling, see :ref:`v2-atomic-commands` and :ref:`v
 Loading Pipettes
 ================
 
-You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instrument` method. This method requires the pipette model, which is set by the API load name, it's location (e.g. ``left`` or ``right``), and a list of associated tip racks (if used).
+You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instrument` method. This method requires the :ref:`pipette's API load name <new-pipette-models>`, its left or right mount location, and (optionally) a list of associated tip racks.
 
 Similar to working with labware and modules, you must inform the robot about the pipettes you want to use in your protocol. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all pipettes loaded with ``load_instrument()`` are attached to the robot.
 
@@ -46,18 +46,15 @@ This code sample loads an 8-Channel Pipette in the left slot and a 1-Channel Pip
 Flex 96-Channel Pipette
 -----------------------
 
-This code sample loads the Flex 96-Channel Pipette. The Flex 96-Channel Pipette (1000 µL only) requires the left and right pipette mounts. You cannot use this pipette with a 1- or 8-Channel Pipette attached to the robot. To load the 96-Channel Pipette, specify ``mount='left'`` in your protocol.
+This code sample loads the Flex 96-Channel Pipette. The Flex 96-Channel Pipette (1000 µL only) requires the left and right pipette mounts. You cannot use this pipette with a 1- or 8-Channel Pipette in the same protocol or physically attached to the robot. To load the 96-Channel Pipette, specify ``mount='left'`` in your code.
 
 .. code-block:: python
-    :substitutions:
-
-    from opentrons import protocol_api
-
-    requirements = {'robotType': 'Flex', 'apiLevel': '|apiLevel|'}
 
     def run(protocol: protocol_api.ProtocolContext):
         left = protocol.load_instrument(
             instrument_name='flex_96channel_1000', mount='left')
+
+.. version added, 2.15??
 
 OT-2 Single- and Multi-Channel Pipettes
 ---------------------------------------
