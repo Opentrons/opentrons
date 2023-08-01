@@ -11,7 +11,7 @@ from hardware_testing.opentrons_api import types
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing import data
 
-from hardware_testing.opentrons_api.types import Mount, Axis, Point, GantryLoad
+from hardware_testing.opentrons_api.types import OT3Mount, Mount, Axis, Point, GantryLoad
 
 from opentrons.hardware_control.types import CriticalPoint
 
@@ -169,7 +169,7 @@ async def calibrate_tip_racks(api, mount, slot_loc, AXIS):
 
 async def _main(is_simulating: bool) -> None:
     path = '/data/testing_data/calibrated_slot_locations.json'
-    mount = Mount.LEFT
+    mount = OT3Mount.LEFT
     api = await helpers_ot3.build_async_ot3_hardware_api(is_simulating=is_simulating)
     await api.cache_instruments()
     await api.home()
@@ -193,6 +193,15 @@ async def _main(is_simulating: bool) -> None:
     test_pip = api.get_attached_instrument(mount)
 
     print("mount.id:{}".format(test_pip["pipette_id"]))
+
+    # set pick up speed to 10
+    await helpers_ot3.update_pick_up_speed(api, mount, 10.0)
+    # set clamp speed to 5.5
+    api.clamp_tip_speed = 5.5
+    # set drop tip speed to 10
+    await helpers_ot3.update_drop_tip_speed(api, mount, 10.0)
+    # set clamp speed to 5.5
+    api.clamp_drop_tip_speed = 5.5
 
     test_name = "tip-pick-up-lifetime-test"
     if args.restart_flag:
@@ -237,18 +246,18 @@ async def _main(is_simulating: bool) -> None:
         #     ### remove ### check_tip_presence = True
 
     slot_loc = {
-        "A1": (13.42, 394.92, 110),
-        "A2": (177.32, 394.92, 110),
-        "A3": (341.03, 394.92, 110),
-        "B1": (13.42, 288.42, 110),
-        "B2": (177.32, 288.92, 110),
-        "B3": (341.03, 288.92, 110),
-        "C1": (13.42, 181.92, 110),
-        "C2": (177.32, 181.92, 110),
-        "C3": (341.03, 181.92, 110),
-        "D1": (13.42, 75.5, 110),
-        "D2": (177.32, 75.5, 110),
-        "D3": (341.03, 75.5, 110),
+        "A1": (13.42, 394.92, 160),
+        "A2": (177.32, 394.92, 160),
+        "A3": (341.03, 394.92, 160),
+        "B1": (13.42, 288.42, 160),
+        "B2": (177.32, 288.92, 160),
+        "B3": (341.03, 288.92, 160),
+        "C1": (13.42, 181.92, 160),
+        "C2": (177.32, 181.92, 160),
+        "C3": (341.03, 181.92, 160),
+        "D1": (13.42, 75.5, 160),
+        "D2": (177.32, 75.5, 160),
+        "D3": (341.03, 75.5, 160),
     }
 
     ### optional arg for tip rack calibration
@@ -355,6 +364,8 @@ async def _main(is_simulating: bool) -> None:
                         print("Picking up tip...\n")
                         await api.pick_up_tip(mount, tip_len)
                         total_pick_ups += 1
+
+                        await api.move_rel(mount, delta=Point(z=50))
 
                         ### Tip presence implemented in sw, removed for 96ch testing ###
                         ### check tip presence after tip pick up
