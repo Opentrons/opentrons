@@ -216,27 +216,28 @@ The pipette's load name is the first parameter of the ``load_instrument()`` meth
         See the pipette compatibility section below if you're using a older GEN1 model pipette. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single chanel model.
 
 
-OT-2 GEN2 Pipette Backward Compatibility
-===================================
+GEN1-GEN2 Pipette Compatibility
+===============================
 
-If you have an OT-2, the GEN2 pipettes have different volume ranges than GEN1 pipettes. However, each GEN2 pipette covers one or two GEN1 pipette volume ranges. For instance, with  a range of 1 - 20 µL, the P20 Single GEN2 covers the P10 Single GEN1 (1 - 10 µL). If your protocol specifies a GEN1 pipette but you have a GEN2 pipette with a compatible volume range attached to your OT-2, you can still run your protocol. The OT-2 will consider the GEN2 pipette to have the same minimum volume as the GEN1 pipette, so any advanced commands have the same behavior as before.
+If you have an OT-2, the GEN2 pipettes have different volume ranges than the older GEN1 pipettes. However, with some exceptions, the volume ranges for GEN2 pipettes include those used by the GEN1 models. If your protocol specifies a GEN1 pipette, but you have a GEN2 pipette with a compatible volume range, you can still run your protocol. The OT-2 will consider the GEN2 pipette to have the same minimum volume as the GEN1 pipette. The following table shows you the compatibility between the GEN2 and GEN1 pipettes.
 
-Specifically, the P20 GEN2s (single and multi) cover the entire P10 GEN1 range; the P300 Single GEN2 covers the entire P300 Single GEN1 range; and the P1000 Single GEN2 covers the entire P1000 Single GEN1 range.
+.. list-table::
+    :header-rows: 1
+    
+    * - GEN2 Pipette
+      - Covers/Replaces GEN1 Pipette
+    * - P20 Single GEN2 (1-20 µL)
+      - P10 Single GEN1 (1-10 µL)
+    * - P20 Multi-Channel GEN2 (1-20 µL)
+      - P10 Multi GEN1 (1-10 µL)
+    * - P300 Single GEN2 (20-300 µL)
+      - P300 Single GEN1 (30-300 µL)
+    * - P300 Multi-Channel GEN2 (20-300 µL)
+      - P300 Multi GEN1 (20-200 µL)
+    * - P1000 Single GEN2 (100-1000 µL)
+      - P1000 Single GEN1 (100-1000 µL)
 
-If you have a P50 Single specified in your protocol, there is no automatic backward compatibility.
-If you want to use a GEN2 Pipette, you must change your protocol to load either a P300 Single GEN2
-(if you are using volumes between 20 and 50 µL) or a P20 Single GEN2 (if you are using volumes
-below 20 µL).
-
-If your protocol specifies a pipette and you attach a compatible
-pipette, the protocol will run, and the pipette will act the same as the pipette
-specified in your protocol - altering parameters like its minimum volume if
-necessary.
-
-For instance, if your protocol specifies a P300
-Multi, and you connect a P300 Multi GEN2, the pipette will act like a P300
-Multi - it will set its minimum volume to 30 µL.
-
+The single- and multi-channel P50 GEN1 pipette is the exception. If you have a P50 Single specified in your protocol, there is no backward compatibility with a corresponding GEN2 pipette. If you want to use a GEN2 Pipette, you must change your protocol to load a P20 Single GEN2 (for volumes below 20 µL) or a P300 Single GEN2 (for volumes between 20 and 50 µL).
 
 Adding Tip Racks
 ================
