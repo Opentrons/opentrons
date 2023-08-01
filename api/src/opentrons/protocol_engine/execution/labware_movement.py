@@ -230,7 +230,7 @@ class LabwareMovementHandler:
             location, (DeckSlotLocation, ModuleLocation, OnLabwareLocation)
         ):
             raise LabwareMovementNotAllowedError(
-                "Cannot move labware off-deck using the gripper."
+                "Cannot perform off-deck labware movements with the gripper."
             )
         return location
 
