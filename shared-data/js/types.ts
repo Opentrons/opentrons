@@ -212,7 +212,10 @@ export type ModuleModel =
   | HeaterShakerModuleModel
   | MagneticBlockModel
 
-export type GripperModel = typeof GRIPPER_V1 | typeof GRIPPER_V1_1
+export type GripperModel =
+  | typeof GRIPPER_V1
+  | typeof GRIPPER_V1_1
+  | typeof GRIPPER_V1_2
 
 export type ModuleModelWithLegacy =
   | ModuleModel
