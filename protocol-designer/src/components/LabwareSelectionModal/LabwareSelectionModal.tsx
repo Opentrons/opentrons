@@ -58,7 +58,7 @@ const orderedCategories: string[] = [
   'tubeRack',
   'wellPlate',
   'reservoir',
-  'aluminumBlock',
+  'adapter',
   // 'trash', // NOTE: trash intentionally hidden
 ]
 

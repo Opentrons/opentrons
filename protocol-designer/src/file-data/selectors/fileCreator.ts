@@ -202,10 +202,48 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       },
       {}
     )
+    const loadAdapterCommands = reduce<
+      RobotState['labware'],
+      // change this type to LoadAdapterCreateCommand when it exists!
+      any
+    >(
+      initialRobotState.labware,
+      (
+        acc,
+        labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
+        labwareId: string
+        // change this type to LoadAdapterCreateCommand when it exists!
+      ): any => {
+        const { labwareDefURI, def } = labwareEntities[labwareId]
+        const isAdapter = def.metadata.displayCategory === 'adapter'
+        if (!isAdapter) return [...acc]
+        const isOnTopOfModule = labware.slot in initialRobotState.modules
+        const namespace = def.namespace
+        const loadName = labwareDefURI.split('/')[1].replace(/\/1$/, '')
+        const version = def.version
+        const loadAdapterCommands = {
+          key: uuid(),
+          commandType: 'loadAdapter' as const,
+          params: {
+            displayName: def.metadata.displayName,
+            adapterId: labwareId,
+            loadName,
+            namespace: namespace,
+            version: version,
+            location: isOnTopOfModule
+              ? { moduleId: labware.slot }
+              : { slotName: labware.slot },
+          },
+        }
+
+        return [...acc, loadAdapterCommands]
+      },
+      []
+    )
 
     const loadLabwareCommands = reduce<
       RobotState['labware'],
-      LoadLabwareCreateCommand[]
+      LoadLabwareCreateCommand[] | any
     >(
       initialRobotState.labware,
       (
@@ -213,13 +251,15 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
         labwareId: string
       ): LoadLabwareCreateCommand[] => {
-        if (labwareId === FIXED_TRASH_ID) return [...acc]
-        const isLabwareOnTopOfModule = labware.slot in initialRobotState.modules
         const { labwareDefURI, def } = labwareEntities[labwareId]
+        const isAdapter = def.metadata.displayCategory === 'adapter'
+        if (labwareId === FIXED_TRASH_ID || isAdapter) return [...acc]
+        const isOnTopOfModule = labware.slot in initialRobotState.modules
+        const isOnAdapter = labware.slot in loadAdapterCommands
         const namespace = def.namespace
         const loadName = labwareDefURI.split('/')[1].replace(/\/1$/, '')
         const version = def.version
-        const loadLabwareCommand = {
+        const loadLabwareCommands = {
           key: uuid(),
           commandType: 'loadLabware' as const,
           params: {
@@ -228,12 +268,15 @@ export const createFile: Selector<ProtocolFile> = createSelector(
             loadName,
             namespace: namespace,
             version: version,
-            location: isLabwareOnTopOfModule
+            location: isOnTopOfModule
               ? { moduleId: labware.slot }
+              : isOnAdapter
+              ? { adapterId: labware.slot }
               : { slotName: labware.slot },
           },
         }
-        return [...acc, loadLabwareCommand]
+
+        return [...acc, loadLabwareCommands]
       },
       []
     )
@@ -272,6 +315,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
     const loadCommands: CreateCommand[] = [
       ...loadPipetteCommands,
       ...loadModuleCommands,
+      ...loadAdapterCommands,
       ...loadLabwareCommands,
       ...loadLiquidCommands,
     ]

@@ -1,4 +1,6 @@
-import type { ProtocolFileV6 } from '@opentrons/shared-data'
+import { uuid } from '../../utils'
+import { getAdapterAndLabwareSplitInfo } from './utils/getAdapterAndLabwareSplitInfo'
+import { ProtocolFileV6 } from '@opentrons/shared-data'
 import type {
   LoadPipetteCreateCommand,
   LoadModuleCreateCommand,
@@ -50,10 +52,69 @@ export const migrateFile = (
       },
     }))
 
+  //  need better way to filter this since the strip tubes in 96 well alum block are allowed!
+  const getIsAdapter = (labwareId: string): boolean =>
+    labwareId.includes('96_aluminumblock') || labwareId.includes('adapter')
+
+  //  todo: update this type to LoadAdapterCreateCommand[]
+  const loadAdapterAndLabwareCommands: any = commands
+    .filter(
+      (command): command is LoadLabwareCommandV6 =>
+        command.commandType === 'loadLabware' &&
+        getIsAdapter(command.params.labwareId)
+    )
+    .map(command => {
+      const {
+        adapterLoadname,
+        labwareLoadname,
+        adapterDisplayName,
+        labwareDisplayName,
+      } = getAdapterAndLabwareSplitInfo(command.params.labwareId)
+      const labwareLocation = command.params.location
+      let adapterLocation: LabwareLocation = 'offDeck'
+      if (labwareLocation === 'offDeck') {
+        adapterLocation = 'offDeck'
+      } else if ('moduleId' in labwareLocation) {
+        adapterLocation = { moduleId: labwareLocation.moduleId }
+      } else if ('slotName' in labwareLocation) {
+        adapterLocation = { slotName: labwareLocation.slotName }
+      }
+      const adapterId = `${uuid()}:opentrons/${adapterLoadname}/1`
+
+      const loadAdapterCommand = {
+        key: uuid(),
+        commandType: 'loadAdapter',
+        params: {
+          adapterId,
+          loadName: adapterLoadname,
+          namespace: 'opentrons',
+          version: 1,
+          location: adapterLocation,
+          displayName: adapterDisplayName,
+        },
+      }
+
+      const loadLabwareCommand: LoadLabwareCreateCommand = {
+        key: uuid(),
+        commandType: 'loadLabware',
+        params: {
+          labwareId: `${uuid()}:opentrons/${labwareLoadname}/1`,
+          loadName: labwareLoadname,
+          namespace: 'opentrons',
+          version: 1,
+          location: { adapterId: adapterId },
+          displayName: labwareDisplayName,
+        },
+      }
+
+      return [loadAdapterCommand, loadLabwareCommand]
+    })
+
   const loadLabwareCommands: LoadLabwareCreateCommand[] = commands
     .filter(
       (command): command is LoadLabwareCommandV6 =>
-        command.commandType === 'loadLabware'
+        command.commandType === 'loadLabware' &&
+        getIsAdapter(command.params.labwareId) === false
     )
     .map(command => {
       const labwareId = command.params.labwareId
@@ -68,6 +129,7 @@ export const migrateFile = (
       } else if ('slotName' in labwareLocation) {
         location = { slotName: labwareLocation.slotName }
       }
+
       return {
         ...command,
         params: {
@@ -92,6 +154,7 @@ export const migrateFile = (
     commands: [
       ...loadPipetteCommands,
       ...loadModuleCommands,
+      ...loadAdapterAndLabwareCommands,
       ...loadLabwareCommands,
     ],
   }

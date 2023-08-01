@@ -32,6 +32,8 @@ import {
   DeckDefinition,
   RobotType,
   FLEX_ROBOT_TYPE,
+  HEATERSHAKER_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'
@@ -281,6 +283,10 @@ export const DeckSetupContents = (props: ContentsProps): JSX.Element => {
         const moduleOrientation = inferModuleOrientationFromSlot(
           moduleOnDeck.slot
         )
+
+        const adapterSupportModule =
+          moduleOnDeck.moduleState.type === HEATERSHAKER_MODULE_TYPE ||
+          moduleOnDeck.moduleState.type === TEMPERATURE_MODULE_TYPE
 
         return (
           <Module

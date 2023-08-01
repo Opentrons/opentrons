@@ -1,8 +1,9 @@
 import reduce from 'lodash/reduce'
 import { AIR } from '@opentrons/step-generation'
-import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import { WellFill } from '@opentrons/components'
+import { swatchColors, MIXED_WELL_COLOR } from '../swatchColors'
 import { ContentsByWell, WellContents } from '../../labware-ingred/types'
+import { LabwareOnDeck } from '../../step-forms'
 
 const ingredIdsToColor = (
   groupIds: string[],
@@ -33,3 +34,6 @@ export const wellFillFromWellContents = (
     },
     {}
   )
+
+export const getIsAdapter = (labwareOnDeck: LabwareOnDeck): boolean =>
+  labwareOnDeck.def.metadata.displayCategory === 'adapter'

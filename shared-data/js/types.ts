@@ -82,6 +82,7 @@ export type LabwareDisplayCategory =
   | 'aluminumBlock'
   | 'trash'
   | 'other'
+  | 'adapter'
 
 export type LabwareVolumeUnits = 'µL' | 'mL' | 'L'
 
