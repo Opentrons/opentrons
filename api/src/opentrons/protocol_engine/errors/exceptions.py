@@ -800,5 +800,5 @@ class NotSupportedOnRobotType(ProtocolEngineError):
         details: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
-        """Build an EStopActivatedError."""
+        """Build a NotSupportedOnRobotType exception."""
         super().__init__(ErrorCodes.E_STOP_ACTIVATED, message, details, wrapping)
