@@ -555,6 +555,7 @@ async def _run_z_motion(
             run_current=setting[z_ax].run_current,
             hold_current=setting[z_ax].hold_current,  # NOTE: only set this for Z axes
         )
+        LOG.info(f"Motor Current Settings: {api._backend._current_settings}")
         fail_count = 0
         pass_count = 0
         for i in range(arguments.cycles):
@@ -622,6 +623,7 @@ async def _run_xy_motion(
                 api.gantry_load,
                 run_current=setting[ax].run_current,
             )
+            LOG.info(f"Motor Current Settings: {api._backend._current_settings}")
         fail_count = 0
         pass_count = 0
         for i in range(max(int(arguments.cycles / 2), 1)):
@@ -691,7 +693,8 @@ async def enforce_pipette_attached(
 async def _main(arguments: argparse.Namespace) -> None:
 
     api = await helpers_ot3.build_async_ot3_hardware_api(
-        is_simulating=arguments.simulate)
+        is_simulating=arguments.simulate
+    )
 
     if arguments.no_input:
         _operator = "None"
@@ -754,27 +757,22 @@ async def _main(arguments: argparse.Namespace) -> None:
             OT3Mount.RIGHT: mount_up_down_points_right,
         }
 
-        if not arguments.skip_xy_motion:
-            qc_pass = await _run_xy_motion(
-                arguments, api, mount, bowtie_points, hour_glass_points, csv_cb.write
-            )
-            if not qc_pass:
-                return
-        if not arguments.skip_z_motion:
-            qc_pass =  await _run_z_motion(
-                arguments, api, mount, mount_up_down_points, csv_cb.write
-            )
-            if not qc_pass:
-                return
-        # set the default config
-        await api.set_gantry_load(api.gantry_load)
+        # set high throughput hold current
+        await helpers_ot3.set_gantry_load_per_axis_current_settings_ot3(
+            api,
+            Axis.Z,
+            api.gantry_load,
+            hold_current=DEFAULT_Z_CURRENT,  # NOTE: only set this for Z axes
+        )
+        LOG.info(DEFAULT_Z_CURRENT)
+        LOG.info(f"Motor Current Settings: {api._backend._current_settings}")
 
         for i in range(arguments.cycles):
             csv_cb.write(["--------"])
             csv_cb.write(["run-cycle", i + 1])
             print(f"Cycle {i + 1}/{arguments.cycles}")
             if not arguments.skip_bowtie:
-                qc_pass =  await _run_bowtie(
+                qc_pass = await _run_bowtie(
                     api,
                     arguments.simulate,
                     mount,
@@ -786,7 +784,7 @@ async def _main(arguments: argparse.Namespace) -> None:
                     return
                 if not arguments.skip_mount:
                     for z_mount in MOUNT_AXES:
-                        qc_pass =  await _run_mount_up_down(
+                        qc_pass = await _run_mount_up_down(
                             api,
                             arguments.simulate,
                             z_mount,
@@ -797,7 +795,7 @@ async def _main(arguments: argparse.Namespace) -> None:
                         if not qc_pass:
                             return
             if not arguments.skip_hourglass:
-                qc_pass =  await _run_hour_glass(
+                qc_pass = await _run_hour_glass(
                     api,
                     arguments.simulate,
                     mount,
@@ -809,7 +807,7 @@ async def _main(arguments: argparse.Namespace) -> None:
                     return
                 if not arguments.skip_mount:
                     for z_mount in MOUNT_AXES:
-                        qc_pass =  await _run_mount_up_down(
+                        qc_pass = await _run_mount_up_down(
                             api,
                             arguments.simulate,
                             z_mount,
@@ -819,6 +817,24 @@ async def _main(arguments: argparse.Namespace) -> None:
                         )
                         if not qc_pass:
                             return
+
+        if not arguments.skip_xy_motion:
+            csv_cb.write(["--------"])
+            csv_cb.write(["xy_motion"])
+            qc_pass = await _run_xy_motion(
+                arguments, api, mount, bowtie_points, hour_glass_points, csv_cb.write
+            )
+            if not qc_pass:
+                return
+        if not arguments.skip_z_motion:
+            csv_cb.write(["--------"])
+            csv_cb.write(["z_motion"])
+            qc_pass = await _run_z_motion(
+                arguments, api, mount, mount_up_down_points, csv_cb.write
+            )
+            if not qc_pass:
+                return
+
     except KeyboardInterrupt:
         print("Cancelled")
     finally:
@@ -827,7 +843,6 @@ async def _main(arguments: argparse.Namespace) -> None:
             ui.print_title("Test Done - PASSED")
         else:
             ui.print_title("Test Done - FAILED")
-
 
 
 if __name__ == "__main__":
