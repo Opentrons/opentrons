@@ -1,5 +1,6 @@
 """ProtocolEngine class definition."""
 from contextlib import AsyncExitStack
+from logging import getLogger
 from typing import Dict, Optional
 
 from opentrons.protocols.models import LabwareDefinition
@@ -48,6 +49,9 @@ from .actions import (
     ResetTipsAction,
     SetPipetteMovementSpeedAction,
 )
+
+
+_log = getLogger(__name__)
 
 
 class ProtocolEngine:
@@ -302,6 +306,7 @@ class ProtocolEngine:
             # If any teardown steps failed, this will raise something.
             await exit_stack.aclose()
         except Exception as hardware_stopped_exception:
+            _log.exception("Exception during post-run finish steps.")
             finish_error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
                 error_id=self._model_utils.generate_id(),
                 created_at=self._model_utils.get_timestamp(),
