@@ -285,16 +285,21 @@ class ProtocolEngine:
             FinishAction(error_details=error_details, set_run_status=set_run_status)
         )
 
+        # We have a lot of independent things to tear down. If any teardown fails, we want
+        # to continue with the rest, to avoid leaking resources or leaving the engine with a broken
+        # state. We use an AsyncExitStack to avoid a gigantic try/finally tree. Note that execution
+        # order will be backwards because the stack is first-in-last-out.
         exit_stack = AsyncExitStack()
-        exit_stack.push_async_callback(self._queue_worker.join)
-        exit_stack.callback(self._door_watcher.stop)
+        exit_stack.push_async_callback(self._plugin_starter.stop)  # Last step.
         exit_stack.push_async_callback(
             self._hardware_stopper.do_stop_and_recover,
             drop_tips_and_home=drop_tips_and_home,
         )
-        exit_stack.push_async_callback(self._plugin_starter.stop)
+        exit_stack.callback(self._door_watcher.stop)
+        exit_stack.push_async_callback(self._queue_worker.join)  # First step.
 
         try:
+            # If any teardown steps failed, this will raise something.
             await exit_stack.aclose()
         except Exception as hardware_stopped_exception:
             finish_error_details: Optional[FinishErrorDetails] = FinishErrorDetails(
