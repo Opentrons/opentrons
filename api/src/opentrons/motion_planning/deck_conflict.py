@@ -241,11 +241,11 @@ def _create_ot2_restrictions(
         # A Heater-Shaker can't safely be placed just south of the fixed trash,
         # because the fixed trash blocks access to the screw that locks the
         # Heater-Shaker onto the deck.
-        location_south_of_fixed_trash = get_south_slot(location)
+        location_south_of_fixed_trash = get_south_slot(location.as_int())
         if location_south_of_fixed_trash is not None:
             restrictions.append(
                 _NoHeaterShakerModule(
-                    location=location_south_of_fixed_trash,
+                    location=DeckSlotName(location_south_of_fixed_trash),
                     source_item=item,
                     source_location=location,
                 )
@@ -262,19 +262,19 @@ def _create_ot2_restrictions(
             )
 
     if isinstance(item, HeaterShakerModule):
-        for covered_location in get_adjacent_slots(location):
+        for hs_covered_location in get_adjacent_slots(location.as_int()):
             restrictions.append(
                 _NoModule(
-                    location=covered_location,
+                    location=DeckSlotName(hs_covered_location),
                     source_item=item,
                     source_location=location,
                 )
             )
 
-        for covered_location in get_east_west_slots(location):
+        for hs_covered_location in get_east_west_slots(location.as_int()):
             restrictions.append(
                 _MaxHeight(
-                    location=covered_location,
+                    location=DeckSlotName(hs_covered_location),
                     source_item=item,
                     source_location=location,
                     max_height=HS_MAX_X_ADJACENT_ITEM_HEIGHT,

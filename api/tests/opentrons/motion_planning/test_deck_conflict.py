@@ -8,11 +8,14 @@ from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.motion_planning import deck_conflict
 
+from opentrons.types import DeckSlotName
+
 
 @pytest.mark.parametrize(
-    "robot_type, slot_name", [("OT-2 Standard", "1"), ("OT-3 Standard", "A1")]
+    "robot_type, slot_name",
+    [("OT-2 Standard", DeckSlotName.SLOT_1), ("OT-3 Standard", DeckSlotName.SLOT_A1)],
 )
-def test_empty_no_conflict(robot_type: str, slot_name: str) -> None:
+def test_empty_no_conflict(robot_type: str, slot_name: DeckSlotName) -> None:
     """It should not raise on empty input."""
     deck_conflict.check(
         existing_items={},
@@ -25,9 +28,10 @@ def test_empty_no_conflict(robot_type: str, slot_name: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "robot_type, slot_name", [("OT-2 Standard", "1"), ("OT-3 Standard", "A1")]
+    "robot_type, slot_name",
+    [("OT-2 Standard", DeckSlotName.SLOT_1), ("OT-3 Standard", DeckSlotName.SLOT_A1)],
 )
-def test_no_multiple_locations(robot_type: str, slot_name: str) -> None:
+def test_no_multiple_locations(robot_type: str, slot_name: DeckSlotName) -> None:
     """It should not allow two items in the same slot."""
     item_1 = deck_conflict.OtherModule(
         highest_z_including_labware=123, name_for_errors="some_item_1"
@@ -66,20 +70,26 @@ def test_only_trash_in_12() -> None:
         highest_z_including_labware=123, name_for_errors="not_trash_module"
     )
 
-    deck_conflict.check(existing_items={}, new_item=trash_labware, new_location=12)
+    deck_conflict.check(
+        existing_items={}, new_item=trash_labware, new_location=DeckSlotName.FIXED_TRASH
+    )
 
     with pytest.raises(
         deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
     ):
         deck_conflict.check(
-            existing_items={}, new_item=not_trash_labware, new_location=12
+            existing_items={},
+            new_item=not_trash_labware,
+            new_location=DeckSlotName.FIXED_TRASH,
         )
 
     with pytest.raises(
         deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
     ):
         deck_conflict.check(
-            existing_items={}, new_item=not_trash_module, new_location=12
+            existing_items={},
+            new_item=not_trash_module,
+            new_location=DeckSlotName.FIXED_TRASH,
         )
 
 
@@ -108,27 +118,27 @@ def test_trash_override() -> None:
     )
 
     deck_conflict.check(
-        existing_items={12: trash_labware_1},
+        existing_items={DeckSlotName.FIXED_TRASH: trash_labware_1},
         new_item=trash_labware_2,
-        new_location=12,
+        new_location=DeckSlotName.FIXED_TRASH,
     )
 
     with pytest.raises(
         deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
     ):
         deck_conflict.check(
-            existing_items={12: trash_labware_1},
+            existing_items={DeckSlotName.FIXED_TRASH: trash_labware_1},
             new_item=not_trash_labware,
-            new_location=12,
+            new_location=DeckSlotName.FIXED_TRASH,
         )
 
     with pytest.raises(
         deck_conflict.DeckConflictError, match="Only fixed-trash is allowed in slot 12"
     ):
         deck_conflict.check(
-            existing_items={12: trash_labware_1},
+            existing_items={DeckSlotName.FIXED_TRASH: trash_labware_1},
             new_item=not_trash_module,
-            new_location=12,
+            new_location=DeckSlotName.FIXED_TRASH,
         )
 
 
@@ -136,22 +146,22 @@ def test_trash_override() -> None:
     ("thermocycler_is_semi", "labware_location", "labware_should_be_allowed"),
     [
         # Non-semi config:
-        (False, 1, True),
-        (False, 7, False),
-        (False, 8, False),
-        (False, 10, False),
-        (False, 11, False),
+        (False, DeckSlotName.SLOT_1, True),
+        (False, DeckSlotName.SLOT_7, False),
+        (False, DeckSlotName.SLOT_8, False),
+        (False, DeckSlotName.SLOT_10, False),
+        (False, DeckSlotName.SLOT_11, False),
         # Semi config:
-        (True, 1, True),
-        (True, 7, False),
-        (True, 8, True),
-        (True, 10, False),
-        (True, 11, True),
+        (True, DeckSlotName.SLOT_1, True),
+        (True, DeckSlotName.SLOT_7, False),
+        (True, DeckSlotName.SLOT_8, True),
+        (True, DeckSlotName.SLOT_10, False),
+        (True, DeckSlotName.SLOT_11, True),
     ],
 )
 def test_labware_when_thermocycler(
     thermocycler_is_semi: bool,
-    labware_location: int,
+    labware_location: DeckSlotName,
     labware_should_be_allowed: bool,
 ) -> None:
     """It should reject labware if a Thermocycler covers the same slot."""
@@ -181,7 +191,7 @@ def test_labware_when_thermocycler(
         )
     with maybe_raises:
         deck_conflict.check(
-            existing_items={7: thermocycler},
+            existing_items={DeckSlotName.SLOT_7: thermocycler},
             new_location=labware_location,
             new_item=labware,
         )
@@ -199,7 +209,7 @@ def test_labware_when_thermocycler(
     with maybe_raises:
         deck_conflict.check(
             existing_items={labware_location: labware},
-            new_location=7,
+            new_location=DeckSlotName.SLOT_7,
             new_item=thermocycler,
         )
 
@@ -245,7 +255,7 @@ def test_flex_labware_when_thermocycler(
         )
     with maybe_raises:
         deck_conflict.check(
-            existing_items={"B1": thermocycler},
+            existing_items={DeckSlotName.SLOT_B1: thermocycler},
             new_location=labware_location,
             new_item=labware,
             robot_type="OT-3 Standard",
@@ -273,20 +283,20 @@ def test_flex_labware_when_thermocycler(
 @pytest.mark.parametrize(
     ("heater_shaker_location", "labware_location"),
     [
-        (1, 2),
-        (2, 1),
-        (2, 3),
-        (3, 2),
-        (4, 5),
-        (5, 4),
-        (5, 6),
-        (6, 5),
-        (7, 8),
-        (8, 7),
-        (8, 9),
-        (9, 8),
-        (10, 11),
-        (11, 10),
+        (DeckSlotName.SLOT_1, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_1),
+        (DeckSlotName.SLOT_2, DeckSlotName.SLOT_3),
+        (DeckSlotName.SLOT_3, DeckSlotName.SLOT_2),
+        (DeckSlotName.SLOT_4, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_4),
+        (DeckSlotName.SLOT_5, DeckSlotName.SLOT_6),
+        (DeckSlotName.SLOT_6, DeckSlotName.SLOT_5),
+        (DeckSlotName.SLOT_7, DeckSlotName.SLOT_7),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_7),
+        (DeckSlotName.SLOT_8, DeckSlotName.SLOT_9),
+        (DeckSlotName.SLOT_9, DeckSlotName.SLOT_8),
+        (DeckSlotName.SLOT_10, DeckSlotName.SLOT_11),
+        (DeckSlotName.SLOT_11, DeckSlotName.SLOT_10),
     ],
 )
 def test_labware_when_heater_shaker(
