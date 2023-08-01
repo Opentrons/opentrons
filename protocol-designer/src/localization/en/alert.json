@@ -193,12 +193,12 @@
     "unused_pipette_and_module": {
       "heading": "Unused pipette and module",
       "body1": "The {{pipettesDetails}} and {{modulesDetails}} in your protocol are not currently used in any step. In order to run this protocol you will need to attach this pipette as well as power up and connect the module to your robot.",
-      "body2": "If you don't intend to use them, please consider removing them from your protocol."
+      "body2": "If you don't intend to use them, please consider removing them from your protocol.  Keep in mind that all JSON protocols must specify at least one pipette."
     },
     "unused_pipette": {
       "heading": "Unused pipette",
       "body1": "The {{pipettesDetails}} specified in your protocol is currently not used in any step. In order to run this protocol you will need to attach this pipette to your robot.",
-      "body2": "If you don't intend to use the pipette, please consider removing it from your protocol."
+      "body2": "If you don’t intend to use the pipette, remove it on the File tab. Keep in mind that all JSON protocols must specify at least one pipette."
     },
     "unused_module": {
       "heading": "Unused module",
