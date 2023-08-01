@@ -251,6 +251,7 @@ describe('tip handling for multiple distribute chunks', () => {
       destWells: ['A2', 'A3', 'A4', 'A5'],
       changeTip: 'always',
       volume: 150,
+      tipRack: '123:tiprack1Id',
     } as DistributeArgs
 
     const result = distribute(

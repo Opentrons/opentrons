@@ -110,6 +110,7 @@ describe('replaceTip', () => {
         tipState: {
           tipracks: {
             [tiprack1Id]: getTiprackTipstate(false),
+            [tiprack1Id]: getTiprackTipstate(true),
           },
           pipettes: {
             p300SingleId: false,
@@ -119,7 +120,7 @@ describe('replaceTip', () => {
       const result = replaceTip(
         {
           pipette: p300SingleId,
-          tipRack: tiprack2Id,
+          tipRack: tiprack1Id,
         },
         invariantContext,
         initialTestRobotState
@@ -127,7 +128,7 @@ describe('replaceTip', () => {
       const res = getSuccessResult(result)
       expect(res.commands).toEqual([
         pickUpTipHelper('A1', {
-          labwareId: tiprack2Id,
+          labwareId: tiprack1Id,
         }),
       ])
     })
