@@ -20,7 +20,7 @@ from hardware_testing.data import ui
 import logging
 
 LOG = logging.getLogger(__name__)
-LOG.setLevel(logging.CRITICAL)
+LOG.setLevel(logging.INFO)
 # logging.getLogger('opentrons.hardware_control.ot3api.OT3API').setLevel(logging.INFO) #tells all movement settings
 # logging.getLogger('opentrons_hardware.hardware_control').setLevel(logging.INFO) #confirms speeds
 
@@ -528,7 +528,7 @@ async def _run_z_motion(
                     api,
                     arguments.simulate,
                     z_mount,
-                    mount_up_down_points[mount],
+                    mount_up_down_points[z_mount],
                     write_cb,
                     arguments.record_error,
                 )
