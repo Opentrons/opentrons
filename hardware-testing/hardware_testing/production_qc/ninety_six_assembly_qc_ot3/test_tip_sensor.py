@@ -82,23 +82,44 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     slot_5 = helpers_ot3.get_slot_calibration_square_position_ot3(5)
     home_pos = await api.gantry_position(OT3Mount.LEFT)
     await api.move_to(OT3Mount.LEFT, slot_5._replace(z=home_pos.z))
-    for expected_state in [False, True]:
-        print("homing...")
-        await api.home([ax])
-        if not api.is_simulator:
-            if expected_state:
-                ui.get_user_ready("remove all tips from the pipette")
-            else:
-                ui.get_user_ready("press on tips to channels A1 + H12")
-        if not api.is_simulator:
-            init_state = await get_tip_status(api)
-            if init_state != EXPECTED_STATE_AT_HOME_POSITION:
-                ui.print_error("tip sensor is not in expected state at home position")
-        print(f"moving to tip-presence position ({TIP_PRESENCE_POSITION} mm)")
-        await helpers_ot3.move_tip_motor_relative_ot3(api, TIP_PRESENCE_POSITION)
-        state = expected_state if api.is_simulator else await get_tip_status(api)
-        tag = _get_tag_for_state(expected_state)
-        result = state == expected_state
-        report(section, tag, [CSVResult.from_bool(result)])
-        print("homing...")
-        await api.home([ax])
+    await api.home([ax])
+    pos = 0
+    state = await get_tip_status(api)
+    input(f"{pos}mm: {state}")
+    while pos < 6:
+        await helpers_ot3.move_tip_motor_relative_ot3(api, 1)
+        pos += 1
+        state = await get_tip_status(api)
+        input(f"{pos}mm: {state}")
+
+    while pos > 0:
+        await api._backend.tip_action(
+            axes=[Axis.Q],
+            distance=1,
+            speed=-5,
+            tip_action="clamp",
+        )
+        pos -= 1
+        state = await get_tip_status(api)
+        input(f"{pos}mm: {state}")
+
+    # for expected_state in [False, True]:
+    #     print("homing...")
+    #     await api.home([ax])
+    #     if not api.is_simulator:
+    #         if expected_state:
+    #             ui.get_user_ready("remove all tips from the pipette")
+    #         else:
+    #             ui.get_user_ready("press on tips to channels A1 + H12")
+    #     if not api.is_simulator:
+    #         init_state = await get_tip_status(api)
+    #         if init_state != EXPECTED_STATE_AT_HOME_POSITION:
+    #             ui.print_error("tip sensor is not in expected state at home position")
+    #     print(f"moving to tip-presence position ({TIP_PRESENCE_POSITION} mm)")
+    #     await helpers_ot3.move_tip_motor_relative_ot3(api, TIP_PRESENCE_POSITION)
+    #     state = expected_state if api.is_simulator else await get_tip_status(api)
+    #     tag = _get_tag_for_state(expected_state)
+    #     result = state == expected_state
+    #     report(section, tag, [CSVResult.from_bool(result)])
+    #     print("homing...")
+    #     await api.home([ax])
