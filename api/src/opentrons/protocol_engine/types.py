@@ -80,24 +80,10 @@ LabwareLocation = Union[
 ]
 """Union of all locations where it's legal to keep a labware."""
 
+OnDeckLabwareLocation = Union[DeckSlotLocation, ModuleLocation, OnLabwareLocation]
+
 NonStackedLocation = Union[DeckSlotLocation, ModuleLocation, _OffDeckLocationType]
 """Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
-
-
-class LabwareMovementStrategy(str, Enum):
-    """Strategy to use for labware movement."""
-
-    USING_GRIPPER = "usingGripper"
-    MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
-    MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"
-
-
-@dataclass
-class LabwareMovementOffsetData:
-    """Offsets to be used during labware movement."""
-
-    pickUpOffset: Optional[LabwareOffsetVector]
-    dropOffset: Optional[LabwareOffsetVector]
 
 
 class WellOrigin(str, Enum):
@@ -398,6 +384,13 @@ class OverlapOffset(Vec3f):
     """Offset representing overlap space of one labware on top of another labware or module."""
 
 
+class LabwareMovementOffsetData(BaseModel):
+    """Offsets to be used during labware movement."""
+
+    pickUpOffset: LabwareOffsetVector
+    dropOffset: LabwareOffsetVector
+
+
 # TODO(mm, 2023-04-13): Move to shared-data, so this binding can be maintained alongside the JSON
 # schema that it's sourced from. We already do that for labware definitions and JSON protocols.
 class ModuleDefinition(BaseModel):
@@ -455,6 +448,10 @@ class ModuleDefinition(BaseModel):
     compatibleWith: List[ModuleModel] = Field(
         ...,
         description="List of module models this model is compatible with.",
+    )
+    gripperOffsets: Optional[Dict[str, LabwareMovementOffsetData]] = Field(
+        default_factory=dict,
+        description="Offsets to use for labware movement using gripper",
     )
 
 
@@ -624,3 +621,11 @@ class HeaterShakerMovementRestrictors:
     plate_shaking: bool
     latch_status: HeaterShakerLatchStatus
     deck_slot: int
+
+
+class LabwareMovementStrategy(str, Enum):
+    """Strategy to use for labware movement."""
+
+    USING_GRIPPER = "usingGripper"
+    MANUAL_MOVE_WITH_PAUSE = "manualMoveWithPause"
+    MANUAL_MOVE_WITHOUT_PAUSE = "manualMoveWithoutPause"

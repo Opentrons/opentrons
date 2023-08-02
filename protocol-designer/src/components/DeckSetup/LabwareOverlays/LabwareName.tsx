@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { LabwareNameOverlay } from '@opentrons/components'
+import { LabwareNameOverlay, truncateString } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { BaseState } from '../../../types'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
@@ -17,7 +17,9 @@ type Props = OP & SP
 
 const NameOverlay = (props: Props): JSX.Element => {
   const { labwareOnDeck, nickname } = props
-  const title = nickname || getLabwareDisplayName(labwareOnDeck.def)
+  const truncatedNickName =
+    nickname != null ? truncateString(nickname, 75, 25) : null
+  const title = truncatedNickName ?? getLabwareDisplayName(labwareOnDeck.def)
   return <LabwareNameOverlay title={title} />
 }
 

@@ -1,5 +1,5 @@
 {
-  "$otSharedSchema": "#/protocol/schemas/7-draft",
+  "$otSharedSchema": "#/protocol/schemas/7",
   "schemaVersion": 7,
   "metadata": {
     "protocolName": "Simple test protocol",

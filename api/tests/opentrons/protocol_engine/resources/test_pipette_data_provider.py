@@ -1,5 +1,6 @@
 """Test pipette data provider."""
 from opentrons_shared_data.pipette.dev_types import PipetteNameType, PipetteModel
+from opentrons_shared_data.pipette import pipette_definition, types as pip_types
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.protocol_engine.types import FlowRates
@@ -29,7 +30,7 @@ def test_get_virtual_pipette_static_config() -> None:
             default_dispense={"2.0": 3.78, "2.6": 7.56},
             default_blow_out={"2.0": 3.78, "2.6": 7.56},
         ),
-        return_tip_scale=0.5,
+        tip_configuration_lookup_table=result.tip_configuration_lookup_table,
         nominal_tip_overlap={
             "default": 8.25,
             "opentrons/eppendorf_96_tiprack_10ul_eptips/1": 8.4,
@@ -42,7 +43,9 @@ def test_get_virtual_pipette_static_config() -> None:
     )
 
 
-def test_get_pipette_static_config() -> None:
+def test_get_pipette_static_config(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> None:
     """It should return config data given a PipetteDict."""
     pipette_dict: PipetteDict = {
         "name": "p300_single_gen2",
@@ -78,6 +81,7 @@ def test_get_pipette_static_config() -> None:
         "default_dispense_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_aspirate_speeds": {"2.0": 5.021202, "2.6": 10.042404},
         "default_blow_out_volume": 10,
+        "supported_tips": {pip_types.PipetteTipType.t300: supported_tip_fixture},
     }
 
     result = subject.get_pipette_static_config(pipette_dict)
@@ -93,7 +97,7 @@ def test_get_pipette_static_config() -> None:
             default_dispense={"2.0": 46.43, "2.3": 92.86},
             default_blow_out={"2.0": 46.43, "2.2": 92.86},
         ),
-        return_tip_scale=0.5,
+        tip_configuration_lookup_table={300: supported_tip_fixture},
         nominal_tip_overlap={
             "default": 8.2,
             "opentrons/opentrons_96_tiprack_300ul/1": 8.2,

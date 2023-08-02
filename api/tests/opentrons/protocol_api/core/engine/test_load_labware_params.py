@@ -80,6 +80,8 @@ def test_resolve_load_labware_params(
         "nest_96_wellplate_100ul_pcr_full_skirt",
         "nest_96_wellplate_200ul_flat",
         "nest_96_wellplate_2ml_deep",
+        "opentrons_96_wellplate_200ul_pcr_full_skirt",
+        "biorad_96_wellplate_200ul_pcr",
     ],
 )
 @pytest.mark.parametrize("namespace", [OPENTRONS_NAMESPACE, None])

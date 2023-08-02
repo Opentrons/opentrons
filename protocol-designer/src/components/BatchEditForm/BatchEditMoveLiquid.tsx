@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import {
   Box,
   DeprecatedPrimaryButton,
@@ -9,6 +10,7 @@ import {
   TOOLTIP_FIXED,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
+import { getLabwareDefsByURI } from '../../labware-defs/selectors'
 import {
   BlowoutLocationField,
   CheckboxRowField,
@@ -21,6 +23,7 @@ import { MixFields } from '../StepEditForm/fields/MixFields'
 import {
   getBlowoutLocationOptionsForForm,
   getLabwareFieldForPositioningField,
+  getTouchTipNotSupportedLabware,
 } from '../StepEditForm/utils'
 import { FormColumn } from './FormColumn'
 import { FieldPropsByName } from '../StepEditForm/types'
@@ -36,6 +39,7 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
 }): JSX.Element => {
   const { prefix, propsForFields } = props
   const addFieldNamePrefix = (name: string): string => `${prefix}_${name}`
+  const allLabware = useSelector(getLabwareDefsByURI)
 
   const getLabwareIdForPositioningField = (name: string): string | null => {
     const labwareField = getLabwareFieldForPositioningField(name)
@@ -57,6 +61,20 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
     } else {
       return null
     }
+  }
+
+  const isTouchTipNotSupportedLabware = getTouchTipNotSupportedLabware(
+    allLabware,
+    getLabwareIdForPositioningField(
+      addFieldNamePrefix('touchTip_mmFromBottom')
+    ) ?? undefined
+  )
+
+  let disabledTouchTip: boolean = false
+  if (isTouchTipNotSupportedLabware) {
+    disabledTouchTip = true
+  } else if (propsForFields[addFieldNamePrefix('touchTip_checkbox')].disabled) {
+    disabledTouchTip = true
   }
 
   return (
@@ -121,6 +139,13 @@ const SourceDestBatchEditMoveLiquidFields = (props: {
         {...propsForFields[addFieldNamePrefix('touchTip_checkbox')]}
         label={i18n.t('form.step_edit_form.field.touchTip.label')}
         className={styles.small_field}
+        tooltipContent={
+          isTouchTipNotSupportedLabware
+            ? i18n.t('tooltip.step_fields.touchTip.disabled')
+            : propsForFields[addFieldNamePrefix('touchTip_checkbox')]
+                .tooltipContent
+        }
+        disabled={disabledTouchTip}
       >
         <TipPositionField
           {...propsForFields[addFieldNamePrefix('touchTip_mmFromBottom')]}

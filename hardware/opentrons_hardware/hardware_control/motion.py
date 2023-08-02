@@ -56,10 +56,11 @@ class MoveGroupSingleAxisStep:
 class MoveGroupTipActionStep:
     """A single tip handling action that requires movement in a move group."""
 
-    velocity_mm_sec: np.float64
     duration_sec: np.float64
+    velocity_mm_sec: np.float64
     action: PipetteTipActionType
     stop_condition: MoveStopCondition
+    acceleration_mm_sec_sq: np.float64
 
 
 @dataclass(frozen=True)
@@ -118,12 +119,11 @@ def create_step(
         A Move
     """
     ordered_nodes = sorted(present_nodes, key=lambda node: node.value)
-    # Gripper G cannont process this type of move and this will
+    # Gripper G cannot process this type of move and this will
     # result in numerous move set timeouts if the gripper is attached
     # possible TODO if requested is to also add a move group step that
-    # adds a MoveGroupeSingleGripperStep
+    # adds a MoveGroupSingleGripperStep
     ordered_nodes = list([n for n in present_nodes if n != NodeId.gripper_g])
-
     step: MoveGroupStep = {}
     for axis_node in ordered_nodes:
         step[axis_node] = MoveGroupSingleAxisStep(
@@ -179,29 +179,32 @@ def create_tip_action_backoff_step(velocity: Dict[NodeId, np.float64]) -> MoveGr
             duration_sec=abs(np.float64(BACKOFF_MAX_MM) / abs(v)),
             stop_condition=MoveStopCondition.limit_switch_backoff,
             action=PipetteTipActionType.home,
+            acceleration_mm_sec_sq=np.float64(0),
         )
     return backoff
 
 
 def create_tip_action_step(
     velocity: Dict[NodeId, np.float64],
-    distance: Dict[NodeId, np.float64],
+    acceleration: Dict[NodeId, np.float64],
+    duration: np.float64,
     present_nodes: Iterable[NodeId],
     action: PipetteTipActionType,
 ) -> MoveGroupStep:
     """Creates a step for tip handling actions that require motor movement."""
-    step: MoveGroupStep = {}
     stop_condition = (
         MoveStopCondition.limit_switch
         if action == PipetteTipActionType.home
         else MoveStopCondition.none
     )
+    step: MoveGroupStep = {}
     for axis_node in present_nodes:
         step[axis_node] = MoveGroupTipActionStep(
-            velocity_mm_sec=velocity[axis_node],
-            duration_sec=abs(distance[axis_node] / velocity[axis_node]),
-            stop_condition=stop_condition,
+            duration_sec=duration,
+            velocity_mm_sec=velocity.get(axis_node, np.float64(0)),
             action=action,
+            stop_condition=stop_condition,
+            acceleration_mm_sec_sq=acceleration.get(axis_node, np.float64(0)),
         )
     return step
 

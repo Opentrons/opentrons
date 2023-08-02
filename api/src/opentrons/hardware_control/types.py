@@ -57,7 +57,7 @@ class OT3AxisKind(enum.Enum):
     #: Plunger axis (of the left and right pipettes)
     Z_G = 4
     #: Gripper Z axis
-    Q = 5
+    Q = 6
     #: High-throughput tip grabbing axis
     OTHER = 6
     #: The internal axes of high throughput pipettes, for instance

@@ -51,6 +51,14 @@ class Record:
     sender: NodeId
     dest: NodeId
 
+    def dest_includes(self: RecordSlfType, nodes: Set[NodeId]) -> bool:
+        """Check if the destination is in the provided set."""
+        return self.dest in nodes
+
+    def sender_includes(self: RecordSlfType, nodes: Set[NodeId]) -> bool:
+        """Check if the sender is in the provided set."""
+        return self.sender in nodes
+
     def format_date_offset(self: RecordSlfType, date: datetime) -> str:
         """Print with a time offset from some other time rather than a timestamp."""
         return (
@@ -207,7 +215,38 @@ class MoveCommand(Record):
         return f"velocity={self.velocity}, acceleration={self.acceleration}, duration={self.duration}, seq_id={self.seq_id}, index={self.index}"
 
 
-RecordType = Union[MoveCommand, Error, MoveComplete]
+_EXECUTE_RE = re.compile(
+    r"ExecuteMoveGroupRequestPayload\("
+    r".*message_index=UInt32Field\(value=(?P<index>\d+)\)"
+)
+
+
+@dataclass
+class ExecuteCommand(Record):
+    """Represents an ExecuteMoveGroup."""
+
+    @classmethod
+    def from_payload_log(
+        cls: Type["ExecuteCommand"], record: Record, line: str
+    ) -> "ExecuteCommand":
+        """Build from a log line."""
+        data = _EXECUTE_RE.search(line)
+        assert data, f"Could not parse execute command from {line}"
+        return ExecuteCommand(
+            date=record.date,
+            sender=record.sender,
+            dest=record.dest,
+            index=int(data["index"]),
+        )
+
+    index: int
+
+    def dest_includes(self: "ExecuteCommand", nodes: Set[NodeId]) -> bool:
+        """True for broadcast moves as well."""
+        return self.dest in nodes or self.dest == NodeId.broadcast
+
+
+RecordType = Union[MoveCommand, Error, MoveComplete, ExecuteCommand]
 RecordTypeVar = TypeVar("RecordTypeVar", bound=Union[Record], covariant=True)
 
 
@@ -234,9 +273,13 @@ def _arb_from_line(line: str, date: datetime) -> Record:
     )
 
 
-def _send_record(payload_line: str, record: Record) -> MoveCommand:
+def _send_record(
+    payload_line: str, record: Record
+) -> Union[MoveCommand, ExecuteCommand]:
     if "AddLinearMoveRequest" in payload_line:
         return MoveCommand.from_payload_log(record, payload_line)
+    if "ExecuteMoveGroupRequest" in payload_line:
+        return ExecuteCommand.from_payload_log(record, payload_line)
     raise IgnoredMessage()
 
 
@@ -255,7 +298,9 @@ def _gobble_to_next_record(lines: Iterator[str]) -> str:
     return nextline
 
 
-def _record(lines: Iterator[str]) -> Union[MoveCommand, MoveComplete, Error]:
+def _record(
+    lines: Iterator[str],
+) -> Union[MoveCommand, MoveComplete, Error, ExecuteCommand]:
     dirline = next(lines)
     if "." in dirline:
         ms_offset = timedelta(seconds=float("0." + dirline.split(".")[1].split(" ")[0]))
@@ -335,7 +380,7 @@ def sender_limited(
 ) -> Iterator[RecordTypeVar]:
     """Filter only records of messages from nodes."""
     for record in records:
-        if record.sender not in nodes:
+        if not record.sender_includes(nodes):
             continue
         yield record
 
@@ -345,7 +390,7 @@ def dest_limited(
 ) -> Iterator[RecordTypeVar]:
     """Filter only records of messages to nodes."""
     for record in records:
-        if record.dest not in nodes:
+        if not record.dest_includes(nodes):
             continue
         yield record
 
@@ -506,7 +551,9 @@ def main(
         plots = [
             PlotParams(
                 records=date_limited(
-                    sender_limited(receive_records(ind_records[index]), {node}),
+                    sender_limited(
+                        PlotParams.record_filter(ind_records[index]), {node}
+                    ),
                     since,
                     until,
                 ),
@@ -522,9 +569,18 @@ def main(
 class PlotParams:
     """Gather plotting params for later iteration."""
 
-    records: Iterator[Union[MoveComplete, Error]]
+    records: Iterator[Union[MoveComplete, Error, ExecuteCommand]]
     title: str
     annotate_errors: bool
+
+    @classmethod
+    def record_filter(
+        cls, records: Iterator[Record]
+    ) -> Iterator[Union[MoveComplete, Error, ExecuteCommand]]:
+        """Filter records appropriate for plotting."""
+        for record in records:
+            if isinstance(record, (MoveComplete, Error, ExecuteCommand)):
+                yield record
 
 
 def plot_one(plot: PlotParams) -> "pp.Figure":  # noqa: C901
@@ -549,6 +605,11 @@ def plot_one(plot: PlotParams) -> "pp.Figure":  # noqa: C901
             diff.append(record.motor_pos - record.encoder_pos)
         elif isinstance(record, Error):
             errors.append(record)
+        elif isinstance(record, ExecuteCommand):
+            time_offsets.append((record.date - t0).total_seconds())
+            absolute_encoder.append(absolute_encoder[-1])
+            absolute_motor.append(absolute_motor[-1])
+            diff.append(diff[-1])
     if not t0:
         raise NoRecords()
 

@@ -9,6 +9,7 @@ import {
   ProtocolFileV5,
 } from '@opentrons/shared-data'
 import { uuid } from '../../utils'
+import { FIXED_TRASH_ID, INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 // NOTE: this migration bump adds load commands (loadLiquid, loadModule, loadPipette, loadLabware), modifies both pipette
 //  and labware access parameters, renames AirGap to aspirate, and removes all temporal properties from labware, pipettes,
 //  and module keys such as slot, mount
@@ -24,7 +25,6 @@ import type {
   ProtocolFile,
 } from '@opentrons/shared-data/protocol/types/schemaV6'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
-import { FIXED_TRASH_ID, INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 
 const PD_VERSION = '6.0.0'
 const SCHEMA_VERSION = 6

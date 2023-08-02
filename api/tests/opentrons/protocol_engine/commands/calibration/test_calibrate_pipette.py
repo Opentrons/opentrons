@@ -43,15 +43,50 @@ async def test_calibrate_pipette_implementation(
     )
 
     decoy.when(
-        await calibration.calibrate_pipette(
+        await calibration.find_pipette_offset(
             hcapi=ot3_hardware_api, mount=OT3Mount.LEFT, slot=5
         )
     ).then_return(Point(x=3, y=4, z=6))
 
     result = await subject.execute(params)
 
+    decoy.verify(
+        await ot3_hardware_api.save_instrument_offset(
+            mount=OT3Mount.LEFT, delta=Point(x=3, y=4, z=6)
+        ),
+        times=1,
+    )
+
     assert result == CalibratePipetteResult(
         pipetteOffset=InstrumentOffsetVector(x=3, y=4, z=6)
+    )
+
+
+@pytest.mark.ot3_only
+async def test_calibrate_pipette_does_not_save_during_error(
+    decoy: Decoy, ot3_hardware_api: OT3API
+) -> None:
+    """Data should not be saved when an error is raised."""
+    subject = CalibratePipetteImplementation(hardware_api=ot3_hardware_api)
+
+    params = CalibratePipetteParams(
+        mount=MountType.LEFT,
+    )
+
+    decoy.when(
+        await calibration.find_pipette_offset(
+            hcapi=ot3_hardware_api, mount=OT3Mount.LEFT, slot=5
+        )
+    ).then_raise(calibration.EarlyCapacitiveSenseTrigger(5.0, 3.0))
+
+    with pytest.raises(calibration.EarlyCapacitiveSenseTrigger):
+        await subject.execute(params)
+
+    decoy.verify(
+        await ot3_hardware_api.save_instrument_offset(
+            mount=OT3Mount.LEFT, delta=Point(x=3, y=4, z=6)
+        ),
+        times=0,
     )
 
 

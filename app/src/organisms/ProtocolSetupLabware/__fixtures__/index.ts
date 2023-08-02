@@ -3655,7 +3655,7 @@ export const mockRecentAnalysis = {
         labwareId: 'fixedTrash',
         wellName: 'A1',
         wellLocation: {
-          origin: 'default',
+          origin: 'bottom',
           offset: {
             x: 0,
             y: 0,
@@ -3674,7 +3674,7 @@ export const mockRecentAnalysis = {
       completedAt: '2023-03-13T18:20:41.944336+00:00',
     },
   ],
-  errors: [],
+  errors: [{}],
   liquids: [
     {
       id: '0',
