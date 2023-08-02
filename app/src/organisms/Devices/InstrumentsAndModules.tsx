@@ -224,7 +224,9 @@ export function InstrumentsAndModules({
                             <StyledText
                               as="p"
                               css={BANNER_LINK_CSS}
-                              onClick={setSubsystemToUpdate('pipette_left')}
+                              onClick={() =>
+                                setSubsystemToUpdate('pipette_left')
+                              }
                             />
                           ),
                         }}
@@ -311,7 +313,9 @@ export function InstrumentsAndModules({
                             <StyledText
                               as="p"
                               css={BANNER_LINK_CSS}
-                              onClick={setSubsystemToUpdate('pipette_right')}
+                              onClick={() =>
+                                setSubsystemToUpdate('pipette_right')
+                              }
                             />
                           ),
                         }}
