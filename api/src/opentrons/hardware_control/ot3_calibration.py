@@ -86,10 +86,10 @@ class CalibrationSlot:
 
 
 class AlignmentShift(Enum):
-    FRONT_TO_REAR_X = "front_to_rear_x"
     LEFT_TO_RIGHT_Y = "left_to_right_y"
-    FRONT_TO_REAR_Z = "front_to_rear_z"
     LEFT_TO_RIGHT_Z = "left_to_right_z"
+    FRONT_TO_REAR_X = "front_to_rear_x"
+    FRONT_TO_REAR_Z = "front_to_rear_z"
 
 
 # 96ch is 99mm from left->right, and 63mm front->rear
@@ -1049,7 +1049,7 @@ class BeltCalibrationData:
         shift_details = {
             shift.value: {
                 "spec": MAX_SHIFT[shift],
-                "pass": self._get_shift_mm(shift) > MAX_SHIFT[shift],
+                "pass": abs(self._get_shift_mm(shift)) > MAX_SHIFT[shift],
                 "shift": round(self._get_shift_mm(shift), 3),
                 "slots": {
                     "front_left": str(self._front_left.actual),
