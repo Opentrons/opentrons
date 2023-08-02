@@ -320,9 +320,9 @@ class LabwareDefinition(BaseModel):
     )
     gripHeightFromLabwareBottom: float = Field(
         default_factory=None,
-        description="The Z-height, from labware bottom, where the gripper should grip the labware."
+        description="The Z-height, from labware bottom, where the gripper should grip the labware.",
     )
     gripForce: float = Field(
         default_factory=None,
-        description="Force, in Newtons, with which the gripper should grip the labware."
+        description="Force, in Newtons, with which the gripper should grip the labware.",
     )
