@@ -552,9 +552,9 @@ def test_no_heater_shaker_south_of_trash() -> None:
         ),
     ):
         deck_conflict.check(
-            existing_items={12: trash},
+            existing_items={DeckSlotName.FIXED_TRASH: trash},
             new_item=heater_shaker,
-            new_location=9,
+            new_location=DeckSlotName.SLOT_9,
         )
 
 
@@ -585,7 +585,7 @@ def test_flex_raises_module_in_wrong_location(
     ):
         deck_conflict.check(
             existing_items={},
-            new_location="A2",
+            new_location=DeckSlotName.SLOT_A2,
             new_item=deck_item,
             robot_type="OT-3 Standard",
         )
