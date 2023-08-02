@@ -22,15 +22,15 @@ import { SelectLocation } from './SelectLocation'
 
 import type { AttachedModule } from '@opentrons/api-client'
 
-interface PipetteWizardFlowsProps {
+interface ModuleCalWizardFlowsProps {
   attachedModule: AttachedModule
   slotName: string
   closeFlow: () => void
   onComplete?: () => void
 }
 
-export const PipetteWizardFlows = (
-  props: PipetteWizardFlowsProps
+export const ModuleCalWizardFlows = (
+  props: ModuleCalWizardFlowsProps
 ): JSX.Element | null => {
   const { attachedModule, slotName, closeFlow, onComplete } = props
   const isOnDevice = useSelector(getIsOnDevice)
