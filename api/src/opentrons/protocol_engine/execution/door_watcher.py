@@ -53,10 +53,7 @@ class DoorWatcher:
                 self._handle_hardware_door_event
             )
 
-    # todo(mm, 2022-02-01):
-    # Find a way to prevent straggling events.
-    # AnyIO blocking portals can help with this.
-    def stop_soon(self) -> None:
+    def stop(self) -> None:
         """Unsubscribe from hardware events.
 
         Safe to call more than once.
@@ -84,15 +81,16 @@ class DoorWatcher:
         owns the event loop that this DoorWatcher was constructed in.
         """
         if isinstance(event, DoorStateNotification):
-            action = DoorChangeAction(door_state=event.new_state)
-            coroutine = self._dispatch_action(action)
+            coroutine = self._handle_hardware_door_event_async(event)
             future = run_coroutine_threadsafe(coroutine, self._loop)
             # Wait for the dispatch to complete before returning,
             # which is important for ordering guarantees.
             future.result()
 
-    async def _dispatch_action(self, action: DoorChangeAction) -> None:
-        """Dispatch an action into self._action_dispatcher.
+    async def _handle_hardware_door_event_async(
+        self, event: DoorStateNotification
+    ) -> None:
+        """Handle a door state hardware event.
 
         This must run in the event loop that owns self._action_dispatcher, for safety.
 
@@ -100,6 +98,15 @@ class DoorWatcher:
         run_coroutine_threadsafe(), which lets us block until
         the dispatch completes.
         """
+        # Throw away this event if this instance has already been stop()'d.
+        # This can happen if the stop() happens after the HardwareAPI has sent the event,
+        # but before this handler has had its turn to run in the asyncio event loop.
+        already_stopped = self._unsubscribe_callback is None
+        if already_stopped:
+            return
+
+        action = DoorChangeAction(door_state=event.new_state)
+
         if (
             self._state_store.commands.get_is_running()
             and action.door_state == DoorState.OPEN
