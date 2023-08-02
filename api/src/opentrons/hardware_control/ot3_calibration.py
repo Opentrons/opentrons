@@ -95,14 +95,15 @@ class AlignmentShift(Enum):
 # 96ch is 99mm from left->right, and 63mm front->rear
 # deck calibration squares are 328mm left->right and 321mm front->rear
 # we need to support <=0.1mm shift from 96ch left->right
-# which means we can only tolerate left/right shift <=0.33mm
-# and front/rear shift <=0.51
-# TODO: these will need to update (increase) after testing on DVT2 units
+# which means we would ideally spec left/right shift <=0.33mm
+# and front/rear shift <=0.5 (but in reality will be bigger)
+# TODO: these will need to update (increase) after testing
+#       on DVT2 lifetime units, as well as PVT units
 MAX_SHIFT = {
-    AlignmentShift.LEFT_TO_RIGHT_Y: 0.33,
-    AlignmentShift.LEFT_TO_RIGHT_Z: 0.33,
-    AlignmentShift.FRONT_TO_REAR_X: 0.51,
-    AlignmentShift.FRONT_TO_REAR_Z: 0.51,
+    AlignmentShift.LEFT_TO_RIGHT_Y: 0.5,  # increased from 0.3, based on test results
+    AlignmentShift.LEFT_TO_RIGHT_Z: 0.5,  # increased from 0.3, based on test results
+    AlignmentShift.FRONT_TO_REAR_X: 0.5,
+    AlignmentShift.FRONT_TO_REAR_Z: 0.5,
 }
 
 
