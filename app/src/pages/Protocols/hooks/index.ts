@@ -4,10 +4,6 @@ import {
   useModulesQuery,
   useProtocolAnalysesQuery,
 } from '@opentrons/react-api-client'
-import {
-  useAttachedModules,
-  useAttachedPipettes,
-} from '../../../organisms/Devices/hooks'
 import { getLabwareSetupItemGroups } from '../utils'
 
 import type {
@@ -53,36 +49,42 @@ export type ProtocolHardware =
  */
 export const useRequiredProtocolHardware = (
   protocolId: string
-): {requiredProtocolHardware: ProtocolHardware[], isLoading: boolean} => {
+): { requiredProtocolHardware: ProtocolHardware[]; isLoading: boolean } => {
   const { data: protocolAnalyses } = useProtocolAnalysesQuery(protocolId, {
     staleTime: Infinity,
   })
   const mostRecentAnalysis = last(protocolAnalyses?.data ?? []) ?? null
 
-  const {data: attachedModulesData, isLoading: isLoadingModules} = useModulesQuery()
+  const {
+    data: attachedModulesData,
+    isLoading: isLoadingModules,
+  } = useModulesQuery()
   const attachedModules = attachedModulesData?.data ?? []
 
-  const {data: attachedInstrumentsData, isLoading: isLoadingInstruments} = useInstrumentsQuery()
+  const {
+    data: attachedInstrumentsData,
+    isLoading: isLoadingInstruments,
+  } = useInstrumentsQuery()
   const attachedInstruments = attachedInstrumentsData?.data ?? []
 
   if (
     mostRecentAnalysis == null ||
     mostRecentAnalysis?.status !== 'completed'
   ) {
-    return {requiredProtocolHardware: [], isLoading: true}
+    return { requiredProtocolHardware: [], isLoading: true }
   }
 
   const requiredGripper: ProtocolGripper[] = getProtocolUsesGripper(
     mostRecentAnalysis
   )
     ? [
-      {
-        hardwareType: 'gripper',
-        connected:
-          attachedInstruments.some(i => i.instrumentType === 'gripper') ??
-          false,
-      },
-    ]
+        {
+          hardwareType: 'gripper',
+          connected:
+            attachedInstruments.some(i => i.instrumentType === 'gripper') ??
+            false,
+        },
+      ]
     : []
 
   const requiredModules: ProtocolModule[] = mostRecentAnalysis.modules.map(
@@ -102,18 +104,24 @@ export const useRequiredProtocolHardware = (
       hardwareType: 'pipette',
       pipetteName: pipetteName,
       mount: mount,
-      connected: attachedInstruments.some(i => (
-        i.instrumentType === 'pipette'
-        && i.ok 
-        && i.mount === mount
-        && i.instrumentName === pipetteName
-      ))?? false
+      connected:
+        attachedInstruments.some(
+          i =>
+            i.instrumentType === 'pipette' &&
+            i.ok &&
+            i.mount === mount &&
+            i.instrumentName === pipetteName
+        ) ?? false,
     })
   )
 
   return {
-    requiredProtocolHardware: [...requiredPipettes, ...requiredModules, ...requiredGripper],
-    isLoading: isLoadingInstruments || isLoadingModules
+    requiredProtocolHardware: [
+      ...requiredPipettes,
+      ...requiredModules,
+      ...requiredGripper,
+    ],
+    isLoading: isLoadingInstruments || isLoadingModules,
   }
 }
 
@@ -147,12 +155,16 @@ export const useRequiredProtocolLabware = (
 export const useMissingProtocolHardware = (
   protocolId: string
 ): {
-  missingProtocolHardware: ProtocolHardware[],
+  missingProtocolHardware: ProtocolHardware[]
   isLoading: boolean
 } => {
-  const {requiredProtocolHardware, isLoading} = useRequiredProtocolHardware(protocolId)
+  const { requiredProtocolHardware, isLoading } = useRequiredProtocolHardware(
+    protocolId
+  )
   return {
-    missingProtocolHardware: requiredProtocolHardware.filter(hardware => !hardware.connected),
-    isLoading
+    missingProtocolHardware: requiredProtocolHardware.filter(
+      hardware => !hardware.connected
+    ),
+    isLoading,
   }
 }

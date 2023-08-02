@@ -66,7 +66,10 @@ export function ProtocolWithLastRun({
   isProtocolFetching,
 }: ProtocolWithLastRunProps): JSX.Element {
   const { t, i18n } = useTranslation('device_details')
-  const { missingProtocolHardware, isLoading: isLookingForHardware }= useMissingProtocolHardware(protocolData.id)
+  const {
+    missingProtocolHardware,
+    isLoading: isLookingForHardware,
+  } = useMissingProtocolHardware(protocolData.id)
   const history = useHistory()
   const isReadyToBeReRun = missingProtocolHardware.length === 0
   const chipText = useMissingHardwareText(missingProtocolHardware)
