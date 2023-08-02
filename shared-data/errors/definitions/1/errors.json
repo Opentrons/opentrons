@@ -82,6 +82,26 @@
       "detail": "Move Condition Not Met",
       "category": "roboticsControlError"
     },
+    "2007": {
+      "detail": "Calibration Structure Not Found",
+      "category": "roboticsControlError"
+    },
+    "2008": {
+      "detail": "Calibration Edge Not Found",
+      "category": "roboticsControlError"
+    },
+    "2009": {
+      "detail": "Early Capacitance Sense Trigger",
+      "category": "roboticsControlError"
+    },
+    "2010": {
+      "detail": "Inaccurate Non-Contact Sweep",
+      "category": "roboticsControlError"
+    },
+    "2011": {
+      "detail": "Misaligned Gantry",
+      "category": "roboticsControlError"
+    },
     "3000": {
       "detail": "A robotics interaction error occurred.",
       "category": "roboticsInteractionError"

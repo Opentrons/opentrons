@@ -22,6 +22,13 @@ from opentrons_shared_data.deck import (
     CALIBRATION_PROBE_RADIUS,
     CALIBRATION_SQUARE_EDGES as SQUARE_EDGES,
 )
+from opentrons_shared_data.errors.exceptions import (
+    CalibrationStructureNotFoundError,
+    EdgeNotFoundError,
+    EarlyCapacitiveSenseTrigger,
+    InaccurateNonContactSweepError,
+    MisalignedGantryError,
+)
 from .robot_calibration import (
     RobotCalibration,
     DeckCalibration,
@@ -52,14 +59,6 @@ SLOT_FRONT_LEFT = 1
 SLOT_FRONT_RIGHT = 3
 SLOT_REAR_LEFT = 10
 
-# 96ch is 99mm from left->right, and 63mm front->rear
-# deck calibration squares are 328mm left->right and 321mm front->rear
-# we need to support <=0.1mm shift from 96ch left->right
-# which means we can only tolerate left/right shift <=0.33mm
-# and front/rear shift <=0.51
-MAX_SHIFT_ACROSS_DECK_LEFT_RIGHT = 0.33
-MAX_SHIFT_ACROSS_DECK_FRONT_REAR = 0.51
-
 PREP_OFFSET_DEPTH = Point(*Z_PREP_OFFSET)
 EDGES = {
     "left": Point(*SQUARE_EDGES["left"]),
@@ -79,31 +78,32 @@ class CalibrationTarget(Enum):
     GANTRY_INSTRUMENT = "gantry_instrument"
 
 
-class CalibrationStructureNotFoundError(RuntimeError):
-    def __init__(self, structure_height: float, lower_limit: float) -> None:
-        super().__init__(
-            f"Structure height at z={structure_height}mm beyond lower limit: {lower_limit}."
-        )
+@dataclass
+class CalibrationSlot:
+    slot: int
+    nominal: Point
+    actual: Point
 
 
-class EdgeNotFoundError(RuntimeError):
-    pass
+class AlignmentShift(Enum):
+    FRONT_TO_REAR_X = "front_to_rear_x"
+    LEFT_TO_RIGHT_Y = "left_to_right_y"
+    FRONT_TO_REAR_Z = "front_to_rear_z"
+    LEFT_TO_RIGHT_Z = "left_to_right_z"
 
 
-class EarlyCapacitiveSenseTrigger(RuntimeError):
-    def __init__(self, triggered_at: float, nominal_point: float) -> None:
-        super().__init__(
-            f"Calibration triggered early at z={triggered_at}mm, "
-            f"expected {nominal_point}"
-        )
-
-
-class InaccurateNonContactSweepError(RuntimeError):
-    def __init__(self, nominal_width: float, detected_width: float) -> None:
-        super().__init__(
-            f"Calibration detected a slot width of {detected_width:.3f}mm "
-            f"which is too far from the design width of {nominal_width:.3f}mm"
-        )
+# 96ch is 99mm from left->right, and 63mm front->rear
+# deck calibration squares are 328mm left->right and 321mm front->rear
+# we need to support <=0.1mm shift from 96ch left->right
+# which means we can only tolerate left/right shift <=0.33mm
+# and front/rear shift <=0.51
+# TODO: these will need to update (increase) after testing on DVT2 units
+MAX_SHIFT = {
+    AlignmentShift.LEFT_TO_RIGHT_Y: 0.33,
+    AlignmentShift.LEFT_TO_RIGHT_Z: 0.33,
+    AlignmentShift.FRONT_TO_REAR_X: 0.51,
+    AlignmentShift.FRONT_TO_REAR_Z: 0.51,
+}
 
 
 def _deck_hit(
@@ -158,9 +158,7 @@ async def _verify_edge_pos(
             return
         else:
             last_result = hit_deck
-    raise EdgeNotFoundError(
-        f"Edge {edge_name_str} could not be verified at {check_stride} mm resolution."
-    )
+    raise EdgeNotFoundError(edge_name_str, check_stride)
 
 
 def critical_edge_offset(
@@ -1014,21 +1012,6 @@ class OT3Transforms(RobotCalibration):
     gripper_mount_offset: Point
 
 
-class AlignmentError(RuntimeError):
-    def __init__(self, x: float, y: float, zx: float, zy: float) -> None:
-        super().__init__(
-            f"this machine is misaligned and requires maintenance: "
-            f"x-along-y: {x}, y-along-x: {y}, z-along-x: {zx}, z-along-y: {zy}"
-        )
-
-
-@dataclass
-class CalibrationSlot:
-    slot: int
-    nominal: Point
-    actual: Point
-
-
 class BeltCalibrationData:
     def __init__(
         self,
@@ -1041,14 +1024,20 @@ class BeltCalibrationData:
         self.rear_left = slot_rear_left
 
     def check_alignment(self) -> None:
-        if self._y_shift_left_to_right() > MAX_SHIFT_ACROSS_DECK_LEFT_RIGHT:
-            self._raise_alignment_error()
-        if self._z_shift_left_to_right() > MAX_SHIFT_ACROSS_DECK_LEFT_RIGHT:
-            self._raise_alignment_error()
-        if self._x_shift_front_to_rear() > MAX_SHIFT_ACROSS_DECK_FRONT_REAR:
-            self._raise_alignment_error()
-        if self._z_shift_front_to_rear() > MAX_SHIFT_ACROSS_DECK_FRONT_REAR:
-            self._raise_alignment_error()
+        shift_details = {
+            shift.value: {
+                "spec": MAX_SHIFT[shift],
+                "pass": self._get_shift_mm(shift) > MAX_SHIFT[shift],
+                "shift": round(self._get_shift_mm(shift), 3),
+            }
+            for shift in AlignmentShift
+        }
+        LOG.info(shift_details)
+        failures = [
+            shift for shift in AlignmentShift if not shift_details[shift.value]["pass"]
+        ]
+        if failures:
+            raise MisalignedGantryError(shift_details)
 
     def get_solve_points(self) -> Tuple[SolvePoints, SolvePoints]:
         def _point_to_tuple(_p: Point) -> Tuple[float, float, float]:
@@ -1066,26 +1055,16 @@ class BeltCalibrationData:
         )
         return nominal, actual
 
-    def _y_shift_left_to_right(self) -> float:
-        # deck coordinates (positive is towards front of machine)
-        return self.front_right.actual.y - self.front_left.actual.y
-
-    def _z_shift_left_to_right(self) -> float:
-        # deck coordinates (positive is towards top of machine)
-        return self.front_right.actual.z - self.front_left.actual.z
-
-    def _x_shift_front_to_rear(self) -> float:
-        # deck coordinates (positive is towards right side of machine)
-        return self.rear_left.actual.x - self.front_left.actual.x
-
-    def _z_shift_front_to_rear(self) -> float:
-        # deck coordinates (positive is towards top of machine)
-        return self.rear_left.actual.z - self.front_left.actual.z
-
-    def _raise_alignment_error(self) -> None:
-        raise AlignmentError(
-            x=self._x_shift_front_to_rear(),
-            y=self._y_shift_left_to_right(),
-            zx=self._z_shift_left_to_right(),
-            zy=self._z_shift_front_to_rear(),
-        )
+    def _get_shift_mm(self, shift: AlignmentShift) -> float:
+        # polarity is same as deck coordinates,
+        # so positive values describe shifting towards right/rear/up,
+        # while negative values describe shifting towards left/front/down.
+        if shift == AlignmentShift.FRONT_TO_REAR_X:
+            return self.rear_left.actual.x - self.front_left.actual.x
+        elif shift == AlignmentShift.FRONT_TO_REAR_Z:
+            return self.rear_left.actual.z - self.front_left.actual.z
+        elif shift == AlignmentShift.LEFT_TO_RIGHT_Y:
+            return self.front_right.actual.y - self.front_left.actual.y
+        elif shift == AlignmentShift.LEFT_TO_RIGHT_Z:
+            return self.front_right.actual.z - self.front_left.actual.z
+        raise ValueError(f"unexpected shift: {shift}")

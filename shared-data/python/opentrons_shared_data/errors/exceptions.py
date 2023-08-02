@@ -484,8 +484,10 @@ class InaccurateNonContactSweepError(RoboticsControlError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a InaccurateNonContactSweepError."""
-        msg = f"Calibration detected a slot width of {found:.3f}mm, " \
-              f"which is too far from the design width of {nominal:.3f}mm"
+        msg = (
+            f"Calibration detected a slot width of {found:.3f}mm, "
+            f"which is too far from the design width of {nominal:.3f}mm"
+        )
         super().__init__(
             ErrorCodes.INACCURATE_NON_CONTACT_SWEEP,
             msg,
@@ -503,19 +505,9 @@ class MisalignedGantryError(RoboticsControlError):
         wrapping: Optional[Sequence[EnumeratedError]] = None,
     ) -> None:
         """Build a MisalignedGantryError."""
-        msg = "this machine is misaligned and requires maintenance"
-        try:
-            # TODO: add PASS/FAIL to message so it's easy to identify
-            append_msg = "\n"
-            append_msg += f' - left-to-right-spec: {detail["spec"]["left-to-right"]}\n'
-            append_msg += f' - front-to-rear-spec: {detail["spec"]["front-to-rear"]}\n'
-            append_msg += f' - front-to-rear-x: {detail["shift"]["x"]}\n'
-            append_msg += f' - left-to-right-y: {detail["shift"]["y"]}\n'
-            append_msg += f' - left-to-right-z: {detail["shift"]["zx"]}\n'
-            append_msg += f' - front-to-rear-z: {detail["shift"]["zy"]}\n'
-            msg += append_msg
-        except KeyError:
-            pass
+        msg = "This machine is misaligned and requires maintenance."
+        if detail:
+            msg += str(detail)
         super().__init__(
             ErrorCodes.MISALIGNED_GANTRY,
             msg,
