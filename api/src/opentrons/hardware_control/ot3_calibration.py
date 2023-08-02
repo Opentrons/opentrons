@@ -1019,9 +1019,9 @@ class BeltCalibrationData:
         slot_front_right: CalibrationSlot,
         slot_rear_left: CalibrationSlot,
     ) -> None:
-        self.front_left = slot_front_left
-        self.front_right = slot_front_right
-        self.rear_left = slot_rear_left
+        self._front_left = slot_front_left
+        self._front_right = slot_front_right
+        self._rear_left = slot_rear_left
 
     def check_alignment(self) -> None:
         shift_details = {
@@ -1029,6 +1029,11 @@ class BeltCalibrationData:
                 "spec": MAX_SHIFT[shift],
                 "pass": self._get_shift_mm(shift) > MAX_SHIFT[shift],
                 "shift": round(self._get_shift_mm(shift), 3),
+                "slots": {
+                    "front_left": str(self._front_left.actual),
+                    "front_right": str(self._front_right.actual),
+                    "rear_left": str(self._rear_left.actual),
+                },
             }
             for shift in AlignmentShift
         }
@@ -1044,14 +1049,14 @@ class BeltCalibrationData:
             return _p.x, _p.y, _p.z
 
         actual = (
-            _point_to_tuple(self.front_left.actual),
-            _point_to_tuple(self.rear_left.actual),
-            _point_to_tuple(self.front_right.actual),
+            _point_to_tuple(self._front_left.actual),
+            _point_to_tuple(self._rear_left.actual),
+            _point_to_tuple(self._front_right.actual),
         )
         nominal = (
-            _point_to_tuple(self.front_left.nominal),
-            _point_to_tuple(self.rear_left.nominal),
-            _point_to_tuple(self.front_right.nominal),
+            _point_to_tuple(self._front_left.nominal),
+            _point_to_tuple(self._rear_left.nominal),
+            _point_to_tuple(self._front_right.nominal),
         )
         return nominal, actual
 
@@ -1060,11 +1065,11 @@ class BeltCalibrationData:
         # so positive values describe shifting towards right/rear/up,
         # while negative values describe shifting towards left/front/down.
         if shift == AlignmentShift.FRONT_TO_REAR_X:
-            return self.rear_left.actual.x - self.front_left.actual.x
+            return self._rear_left.actual.x - self._front_left.actual.x
         elif shift == AlignmentShift.FRONT_TO_REAR_Z:
-            return self.rear_left.actual.z - self.front_left.actual.z
+            return self._rear_left.actual.z - self._front_left.actual.z
         elif shift == AlignmentShift.LEFT_TO_RIGHT_Y:
-            return self.front_right.actual.y - self.front_left.actual.y
+            return self._front_right.actual.y - self._front_left.actual.y
         elif shift == AlignmentShift.LEFT_TO_RIGHT_Z:
-            return self.front_right.actual.z - self.front_left.actual.z
+            return self._front_right.actual.z - self._front_left.actual.z
         raise ValueError(f"unexpected shift: {shift}")
