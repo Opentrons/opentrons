@@ -150,7 +150,6 @@ async def run_belt_calibration(
     await api.move_to(mount, attach_pos._replace(z=current_pos.z))
     if not api.is_simulator:
         ui.get_user_ready("REMOVE probe from pipette")
-
     return before_data, attitude, after_data
 
 

@@ -2,11 +2,11 @@
 from typing import List, Dict, Union
 
 from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.ot3_calibration import (
+from opentrons_shared_data.errors.exceptions import (
     EarlyCapacitiveSenseTrigger,
     EdgeNotFoundError,
     CalibrationStructureNotFoundError,
-    AlignmentError,
+    MisalignedGantryError,
 )
 
 from hardware_testing.data.csv_report import (
@@ -68,10 +68,10 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
     try:
         before, attitude, after = await run_belt_calibration(api, mount, test=True)
     except (
-            EarlyCapacitiveSenseTrigger,
-            EdgeNotFoundError,
-            CalibrationStructureNotFoundError,
-            AlignmentError,
+        EarlyCapacitiveSenseTrigger,
+        EdgeNotFoundError,
+        CalibrationStructureNotFoundError,
+        MisalignedGantryError,
     ) as e:
         ui.print_error(e)
         return
@@ -103,8 +103,7 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
         for slot, o in after.deck_offsets.items()
     }
     distance_improvement: Dict[int, float] = {
-        slot: distance_before[slot] - distance_after[slot]
-        for slot in TEST_SLOTS
+        slot: distance_before[slot] - distance_after[slot] for slot in TEST_SLOTS
     }
     for slot in TEST_SLOTS:
         o = before.deck_offsets[slot]
@@ -120,7 +119,17 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
             [o.x, o.y, o.z],
         )
         report(section, f"slot-distance-before-{slot}", [distance_before[slot]])
-        dist_after_result = CSVResult.from_bool(distance_after[slot] <= MAX_ERROR_DISTANCE_MM)
-        report(section, f"slot-distance-after-{slot}", [distance_after[slot], dist_after_result])
+        dist_after_result = CSVResult.from_bool(
+            distance_after[slot] <= MAX_ERROR_DISTANCE_MM
+        )
+        report(
+            section,
+            f"slot-distance-after-{slot}",
+            [distance_after[slot], dist_after_result],
+        )
         dist_improve_result = CSVResult.from_bool(distance_improvement[slot] >= 0)
-        report(section, f"slot-distance-improvement-{slot}", [distance_improvement[slot], dist_improve_result])
+        report(
+            section,
+            f"slot-distance-improvement-{slot}",
+            [distance_improvement[slot], dist_improve_result],
+        )
