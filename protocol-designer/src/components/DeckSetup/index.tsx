@@ -32,8 +32,6 @@ import {
   DeckDefinition,
   RobotType,
   FLEX_ROBOT_TYPE,
-  HEATERSHAKER_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/hardware-sim/Deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS } from '../../constants'

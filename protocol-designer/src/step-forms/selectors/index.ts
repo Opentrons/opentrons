@@ -77,6 +77,7 @@ import {
   RootState,
   SavedStepFormState,
   BatchEditFormChangesState,
+  labwareInvariantProperties,
 } from '../reducers'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
@@ -220,10 +221,22 @@ const _getInitialDeckSetup = (
     labware: mapValues<{}, LabwareOnDeck>(
       labwareLocations,
       (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
+        // const {
+        //   labwareLoadname,
+        //   adapterLoadname,
+        // } = getAdapterAndLabwareSplitInfo(labwareId)
+        // const adapterId =
+        // if (labwareLoadname !== '' && adapterLoadname !== '') {
+        //   return [
+        //     { slot, ...labwareEntities[adapterId] },
+        //     { slot, ...labwareEntities[labwareId] },
+        //   ]
+        // } else {
         return {
           slot,
           ...labwareEntities[labwareId],
         }
+        // }
       }
     ),
     modules: mapValues<{}, ModuleOnDeck>(
