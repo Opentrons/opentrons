@@ -355,6 +355,8 @@ The following section provides data on the default aspirate, dispense, and blow-
 .. what is head speed, applies to gantry movement or pipette?
 Additionally, all OT-2 GEN2 pipettes have a default head speed of 400 mm/second and a well bottom clearance of 1mm for aspirate and dispense actions.
 
+.. tables are aligned center of page. can we left justify? they're slightly different sizes.
+
 **P20 Single GEN2 Pipette (1-20 µL)**
 
 +----------+---------------------------------+
