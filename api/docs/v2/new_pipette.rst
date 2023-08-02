@@ -6,7 +6,7 @@
 Pipettes
 ########
 
-When writing a protocol, you must inform the Protocol API about the pipettes you will be using on your robot. The :py:meth:`.ProtocolContext.load_instrument` function provides this information. Calling this function returns an :py:class:`.InstrumentContext` object.
+When writing a protocol, you must inform the Protocol API about the pipettes you will be using on your robot. The :py:meth:`.ProtocolContext.load_instrument` function provides this information and returns an :py:class:`.InstrumentContext` object.
 
 For information about liquid handling, see :ref:`v2-atomic-commands` and :ref:`v2-complex-commands`.
 
@@ -15,14 +15,14 @@ For information about liquid handling, see :ref:`v2-atomic-commands` and :ref:`v
 Loading Pipettes
 ================
 
-You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instrument` method. This method requires the :ref:`pipette's API load name <new-pipette-models>`, its left or right mount location, and (optionally) a list of associated tip racks.
+You load pipettes in a protocol using the :py:meth:`~.ProtocolContext.load_instrument` method. This method requires the :ref:`pipette's API load name <new-pipette-models>`, its left or right mount position, and (optionally) a list of associated tip racks.
 
-Similar to working with labware and modules, you must inform the robot about the pipettes you want to use in your protocol. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all pipettes loaded with ``load_instrument()`` are attached to the robot.
+Similar to working with labware and modules, you must inform the robot about the pipettes you want to use in your protocol. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all pipettes loaded by ``load_instrument()`` are attached properly.
 
-Flex 1- and 8-Channel Pipettes
-------------------------------
+Loading Flex 1- and 8-Channel Pipettes
+--------------------------------------
 
-This code sample loads an 8-Channel Pipette in the left slot and a 1-Channel Pipette with two tip racks in the right slot. Both pipettes are 1000 µL. 
+This code sample loads a Flex 8-Channel Pipette in the left slot along with a Flex 1-Channel Pipette and two tip racks in the right slot. Both pipettes are 1000 µL. 
 
 .. code-block:: Python
     :substitutions:
@@ -43,10 +43,10 @@ This code sample loads an 8-Channel Pipette in the left slot and a 1-Channel Pip
             mount='right',
             tip_racks=[tiprack1, tiprack2]) 
 
-Flex 96-Channel Pipette
------------------------
+Loading a Flex 96-Channel Pipette
+---------------------------------
 
-This code sample loads the Flex 96-Channel Pipette. The Flex 96-Channel Pipette (1000 µL only) requires the left and right pipette mounts. You cannot use this pipette with a 1- or 8-Channel Pipette in the same protocol or physically attached to the robot. To load the 96-Channel Pipette, specify ``mount='left'`` in your code.
+This code sample loads the Flex 96-Channel Pipette. Because of its size, the Flex 96-Channel Pipette requires the left *and* right pipette mounts. You cannot use this pipette with a 1- or 8-Channel Pipette in the same protocol or when these other instruments are attached to the robot. To load the 96-Channel Pipette, specify its position as ``mount='left'`` as shown here:
 
 .. code-block:: python
 
@@ -56,10 +56,10 @@ This code sample loads the Flex 96-Channel Pipette. The Flex 96-Channel Pipette 
 
 .. version added, 2.15??
 
-OT-2 Single- and Multi-Channel Pipettes
----------------------------------------
+Loading OT-2 Pipettes
+---------------------
 
-This code sample loads a 8-channel, P300 GEN2 pipette in the left slot and a P1000 GEN2 pipette with two tip racks in the right slot. 
+This code sample loads a 8-channel, P300 GEN2 pipette in the left slot and a single-channel, P1000 GEN2 pipette with two tip racks in the right slot. 
 
 .. code-block:: python
 
@@ -91,20 +91,17 @@ Multi-Channel Pipettes
 
 All building block and advanced commands work with single- and multi-channel pipettes.
 
-To keep the interface to the Opentrons API consistent between single and
+To keep the interface to the Opentrons API consistent between single- and
 multi-channel pipettes, commands treat the *backmost channel* (furthest from the
 door) of a multi-channel pipette as the location of the pipette. Location arguments to
 building block and advanced commands are specified for the backmost channel.
 
 This also means that offset changes (such as :py:meth:`.Well.top` or
 :py:meth:`.Well.bottom`) can be applied to the single specified well, and each
-channels of the pipette will be at the same position relative to the well
+pipette channel will be at the same position relative to the well
 that it is over.
 
-Because there is only one motor in a multi-channel pipette, multi-channel
-pipettes will always aspirate and dispense on all channels simultaneously.
-
-For instance, to aspirate from the first column of a 96-well plate you would write:
+Because there is only one motor in a multi-channel pipette, these pipettes always aspirate and dispense on all channels simultaneously. For instance, to aspirate from the first column of a 96-well plate you would write:
 
 .. code-block:: python
 
@@ -137,10 +134,7 @@ For instance, to aspirate from the first column of a 96-well plate you would wri
         # pipette at the top of their respective wells
         right.dispense(volume=300, location=plate['A3'].top())
 
-In general, you should specify wells in the first row of a well plate when
-using multi-channel pipettes. One exception to this rule is when using
-384-well plates. The limited space between the wells in a 384-well plate and
-between the nozzles of a multi-channel pipette means the pipette accesses every other well in a column. Specifying well A1 accesses every other well starting with the first(rows A, C, E, G, I, K, M, and O); specifying well B1 similarly accesses every other well, but starting with the second (rows B, D, F, H, J, L, N, and P).
+In general, you should specify wells in the first row of a well plate when using multi-channel pipettes. One exception to this rule is when using 384-well plates. The limited space between the wells in a 384-well plate and between the nozzles of a multi-channel pipette means the pipette accesses every other well in a column. Specifying well A1 accesses every other well starting with the first (rows A, C, E, G, I, K, M, and O). Similarly, specifying well B1 also accesses every other well, but starts with the second (rows B, D, F, H, J, L, N, and P).
 
 .. code-block:: python
 
@@ -174,7 +168,7 @@ commands.
 API Load Names
 ==============
 
-The pipette's load name is the first parameter of the ``load_instrument()`` method. It tells your robot which attached pipette you're going to use in a protocol. The table below lists the API load names for the currently available Flex and OT-2 pipettes.
+The pipette's API load name (``instrument_name``) is the first parameter of the ``load_instrument()`` method. It tells your robot which attached pipette you're going to use in a protocol. The tables below list the API load names for the currently available Flex and OT-2 pipettes.
 
 .. tabs::
 
@@ -210,13 +204,13 @@ The pipette's load name is the first parameter of the ``load_instrument()`` meth
         | P1000 GEN2 (single channel) | 100-1000 µL        | ``p1000_single_gen2`` |
         +-----------------------------+--------------------+-----------------------+
 
-        See the pipette compatibility section below if you're using a older GEN1 model pipette. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single chanel model.
+        See the pipette compatibility section below if you're using GEN1 pipettes on an OT-2. The GEN1 family includes the P10, P50, and P300 single- and multi-channel pipettes, along with the P1000 single chanel model.
 
 
 OT-2 Pipette Generations
 ========================
 
-If you have an OT-2, the GEN2 pipettes have different volume ranges than the older GEN1 pipettes. However, with some exceptions, the volume ranges for GEN2 pipettes include those used by the GEN1 models. If your protocol specifies a GEN1 pipette, but you have a GEN2 pipette with a compatible volume range, you can still run your protocol. The OT-2 will consider the GEN2 pipette to have the same minimum volume as the GEN1 pipette. The following table shows you the compatibility between the GEN2 and GEN1 pipettes.
+The OT-2 works with two different sets of pipettes. These are the GEN1 and GEN2 models. The newer GEN2 pipettes have different volume ranges than the older GEN1 pipettes. However, with some exceptions, the volume ranges for GEN2 pipettes overlap those used by the GEN1 models. If your protocol specifies a GEN1 pipette, but you have a GEN2 pipette with a compatible volume range, you can still run your protocol. The OT-2 will consider the GEN2 pipette to have the same minimum volume as the GEN1 pipette. The following table lists the volume compatibility between the GEN2 and GEN1 pipettes.
 
 .. list-table::
     :header-rows: 1
@@ -234,7 +228,7 @@ If you have an OT-2, the GEN2 pipettes have different volume ranges than the old
     * - P1000 Single GEN2 (100-1000 µL)
       - P1000 Single GEN1 (100-1000 µL)
 
-The single- and multi-channel P50 GEN1 pipette is the exception. If your protocol uses a P50 GEN1 pipette, there is no backward compatibility with the GEN2 pipettes. If you want to replace a P50 GEN1 with a corresponding GEN2 pipette, change your protocol to load a P20 Single GEN2 (for volumes below 20 µL) or a P300 Single GEN2 (for volumes between 20 and 50 µL).
+The single- and multi-channel P50 GEN1 pipettes are the exceptions here. If your protocol uses a P50 GEN1 pipette, there is no backward compatibility with a related GEN2 pipette. To replace a P50 GEN1 with a corresponding GEN2 pipette, edit your protocol to load a P20 Single GEN2 (for volumes below 20 µL) or a P300 Single GEN2 (for volumes between 20 and 50 µL).
 
 Adding Tip Racks
 ================
