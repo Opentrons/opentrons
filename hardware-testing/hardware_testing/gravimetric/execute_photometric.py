@@ -185,13 +185,11 @@ def _run_trial(trial: PhotometricTrial) -> None:
             touch_tip=trial.cfg.touch_tip,
         )
         _record_measurement_and_store(MeasurementType.DISPENSE)
-        trial.pipette.move_to(location=trial.dest["A1"].top().move(Point(0, 0, 133)))
+        trial.ctx._core.get_hardware().retract(
+            OT3Mount.LEFT
+        )  # retract to top of gantry
         if (i + 1) == num_dispenses:
             _drop_tip(trial.pipette, trial.cfg.return_tip)
-        else:
-            trial.pipette.move_to(
-                location=trial.dest["A1"].top().move(Point(0, 107, 133))
-            )
         if not trial.ctx.is_simulating():
             ui.get_user_ready("add SEAL to plate and remove from DECK")
     return
@@ -361,6 +359,9 @@ def _find_liquid_height(
         raise RuntimeError(
             f"bad volume in reservoir: {round(reservoir_ul / 1000, 1)} ml"
         )
+    trial.ctx._core.get_hardware().retract(
+            OT3Mount.LEFT
+    )  # retract to top of gantry
     resources.pipette.drop_tip(home_after=False)  # always trash setup tips
     # NOTE: the first tip-rack should have already been replaced
     #       with new tips by the operator

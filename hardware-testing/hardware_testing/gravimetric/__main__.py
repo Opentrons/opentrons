@@ -317,7 +317,12 @@ if __name__ == "__main__":
         deck_version="2",
         extra_labware=custom_defs,
     )
-    serial_logger = subprocess.Popen(['python3 -m opentrons_hardware.scripts.can_mon > /data/testing_data/serial.log'], shell=True)
+    serial_logger = subprocess.Popen(
+        [
+            "python3 -m opentrons_hardware.scripts.can_mon > /data/testing_data/serial.log"
+        ],
+        shell=True,
+    )
     try:
         if args.tip == 0:
             for tip in get_tip_volumes_for_qc(
