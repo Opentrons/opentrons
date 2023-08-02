@@ -264,7 +264,7 @@ describe('robot update reducer', () => {
     const { name, action, initialState, expected } = spec
     it(name, () =>
       expect(
-        robotUpdateReducer(initialState as RobotUpdateState, action as Action)
+        robotUpdateReducer(initialState as RobotUpdatesState, action as Action)
       ).toEqual(expected)
     )
   })

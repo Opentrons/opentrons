@@ -7,6 +7,7 @@ import type {
   UpdateSessionStep,
   UpdateSessionStage,
   RobotUpdateStatusAction,
+  RobotUpdateTarget,
 } from './types'
 
 export function setRobotUpdateSeen(robotName: string): RobotUpdateAction {
@@ -35,32 +36,35 @@ export function startBuildrootPremigration(
 
 export function startRobotUpdate(
   robotName: string,
+  robotType: RobotUpdateTarget,
   systemFile: string | null = null
 ): RobotUpdateAction {
   return {
     type: Constants.ROBOTUPDATE_START_UPDATE,
-    payload: { robotName, systemFile },
+    payload: { robotName, systemFile, robotType },
   }
 }
 
 export function createSession(
   host: RobotHost,
-  sessionPath: string
+  sessionPath: string,
+  robotType: RobotUpdateTarget
 ): RobotUpdateAction {
   return {
     type: Constants.ROBOTUPDATE_CREATE_SESSION,
-    payload: { host, sessionPath },
+    payload: { host, sessionPath, robotType },
   }
 }
 
 export function createSessionSuccess(
   host: RobotHost,
   token: string,
-  pathPrefix: string
+  pathPrefix: string,
+  robotType: RobotUpdateTarget
 ): RobotUpdateAction {
   return {
     type: Constants.ROBOTUPDATE_CREATE_SESSION_SUCCESS,
-    payload: { host, token, pathPrefix },
+    payload: { host, token, pathPrefix, robotType },
   }
 }
 

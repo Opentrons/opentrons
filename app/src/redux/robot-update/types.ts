@@ -5,8 +5,12 @@ export type RobotUpdateType = 'upgrade' | 'downgrade' | 'reinstall'
 
 export type RobotSystemType = 'ot2-balena' | 'ot2-buildroot' | 'flex'
 
+export type RobotUpdateTarget = 'ot2' | 'flex'
+
 export interface RobotUpdateInfo {
+  version: string
   releaseNotes: string
+  target: RobotUpdateTarget
 }
 
 export interface RobotUpdateUserFileInfo {
@@ -47,28 +51,41 @@ export interface RobotUpdateSession {
   error: string | null
 }
 
-export interface RobotUpdateState {
-  seen: boolean
+export interface PerTargetRobotUpdateState {
   downloadProgress: number | null
   downloadError: string | null
   version: string | null
-  info: RobotUpdateInfo | null
-  session: RobotUpdateSession | null
+  releaseNotes: string | null
 }
+
+export type RobotUpdateState = Record<
+  RobotUpdateTarget,
+  PerTargetRobotUpdateState
+> & { session: RobotUpdateSession | null }
 
 export interface StartRobotUpdateAction {
   type: 'robotUpdate:START_UPDATE'
-  payload: { robotName: string; systemFile: string | null }
+  payload: {
+    robotName: string
+    systemFile: string | null
+  }
 }
 
 export interface CreateSessionAction {
   type: 'robotUpdate:CREATE_SESSION'
-  payload: { host: RobotHost; sessionPath: string }
+  payload: {
+    host: RobotHost
+    sessionPath: string
+  }
 }
 
 export interface CreateSessionSuccessAction {
   type: 'robotUpdate:CREATE_SESSION_SUCCESS'
-  payload: { host: RobotHost; token: string; pathPrefix: string }
+  payload: {
+    host: RobotHost
+    token: string
+    pathPrefix: string
+  }
 }
 
 export interface RobotUpdateStatusAction {
@@ -85,15 +102,39 @@ export interface UnexpectedRobotUpdateError {
   payload: { message: string }
 }
 
+export interface RobotUpdateDownloadProgressAction {
+  type: 'robotUpdate:DOWNLOAD_PROGRESS'
+  payload: {
+    progress: number
+    target: RobotUpdateTarget
+  }
+}
+
+export interface RobotUpdateDownloadErrorAction {
+  type: 'robotUpdate:DOWNLOAD_ERROR'
+  payload: {
+    error: string
+    target: RobotUpdateTarget
+  }
+}
+
+export interface RobotUpdateAvailableAction {
+  type: 'robotUpdate:UPDATE_VERSION'
+  payload: {
+    version: string
+    target: RobotUpdateTarget
+  }
+}
+
 export type RobotUpdateAction =
   | StartRobotUpdateAction
   | CreateSessionAction
   | CreateSessionSuccessAction
   | RobotUpdateStatusAction
   | UnexpectedRobotUpdateError
-  | { type: 'robotUpdate:DOWNLOAD_PROGRESS'; payload: number }
-  | { type: 'robotUpdate:DOWNLOAD_ERROR'; payload: string }
-  | { type: 'robotUpdate:UPDATE_VERSION'; payload: string }
+  | RobotUpdateDownloadProgressAction
+  | RobotUpdateDownloadErrorAction
+  | RobotUpdateAvailableAction
   | { type: 'robotUpdate:UPDATE_INFO'; payload: RobotUpdateInfo }
   | { type: 'robotUpdate:USER_FILE_INFO'; payload: RobotUpdateUserFileInfo }
   | { type: 'robotUpdate:SET_UPDATE_SEEN'; meta: { robotName: string } }
@@ -113,7 +154,7 @@ export type RobotUpdateAction =
     }
   | {
       type: 'robotUpdate:UPLOAD_FILE'
-      payload: { host: ViewableRobot; path: string; systemFile: string | null }
+      payload: { host: ViewableRobot; path: string; systemFile: string | null; robotType: RobotUpdateTarget }
       meta: { shell: true }
     }
   | { type: 'robotUpdate:FILE_UPLOAD_DONE'; payload: string }

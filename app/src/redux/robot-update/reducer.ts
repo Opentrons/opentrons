@@ -2,14 +2,26 @@ import * as Constants from './constants'
 
 import type { Reducer } from 'redux'
 import type { Action } from '../types'
-import type { RobotUpdateState, RobotUpdateSession } from './types'
+import type {
+  RobotUpdateTarget,
+  RobotUpdateState,
+  RobotUpdateSession,
+} from './types'
+
 
 export const INITIAL_STATE: RobotUpdateState = {
-  seen: false,
-  version: null,
-  info: null,
-  downloadProgress: null,
-  downloadError: null,
+  flex: {
+    version: null,
+    info: null,
+    downloadProgress: null,
+    downloadError: null,
+  },
+  ot2: {
+    version: null,
+    info: null,
+    downloadProgress: null,
+    downloadError: null,
+  },
   session: null,
 }
 
@@ -33,35 +45,55 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
 ) => {
   switch (action.type) {
     case Constants.ROBOTUPDATE_UPDATE_VERSION: {
-      return { ...state, version: action.payload }
+      return {
+        ...state,
+        ...{ [action.payload.target]: { version: action.payload.version } },
+      }
     }
 
     case Constants.ROBOTUPDATE_UPDATE_INFO: {
-      return { ...state, info: action.payload }
-    }
-
-    case Constants.ROBOTUPDATE_SET_UPDATE_SEEN: {
-      return { ...state, seen: true }
+      return {
+        ...state,
+        ...{
+          [action.payload.target]: {
+            info: { releaseNotes: action.payload.releaseNotes },
+          },
+        },
+      }
     }
 
     case Constants.ROBOTUPDATE_DOWNLOAD_PROGRESS: {
-      return { ...state, downloadProgress: action.payload }
+      return {
+        ...state,
+        ...{
+          [action.payload.target]: {
+            downloadProgress: action.payload.progress,
+          },
+        },
+      }
     }
 
     case Constants.ROBOTUPDATE_DOWNLOAD_ERROR: {
-      return { ...state, downloadError: action.payload }
+      return {
+        ...state,
+        ...{ [action.payload.target]: { downloadError: action.payload.error } },
+      }
     }
 
     case Constants.ROBOTUPDATE_START_UPDATE: {
       return {
         ...state,
-        session: initialSession(action.payload.robotName, state.session),
+        session: initialSession(
+          action.payload.robotName,
+          state.session
+        ),
       }
     }
 
     case Constants.ROBOTUPDATE_CREATE_SESSION: {
-      const { host } = action.payload
-      const session = state.session || initialSession(host.name, null)
+      const { host, } = action.payload
+      const session =
+        state.session || initialSession(host.name, null)
 
       return {
         ...state,
@@ -70,8 +102,9 @@ export const robotUpdateReducer: Reducer<RobotUpdateState, Action> = (
     }
 
     case Constants.ROBOTUPDATE_CREATE_SESSION_SUCCESS: {
-      const { host, pathPrefix, token } = action.payload
-      const session = state.session || initialSession(host.name, null)
+      const { host, pathPrefix, token, } = action.payload
+      const session =
+        state.session || initialSession(host.name, null)
 
       return {
         ...state,

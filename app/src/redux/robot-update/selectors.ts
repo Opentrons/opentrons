@@ -43,10 +43,6 @@ export function getRobotUpdateTargetVersion(state: State): string | null {
   )
 }
 
-export function getRobotUpdateSeen(state: State): boolean {
-  return state.robotUpdate.seen || false
-}
-
 export function getRobotUpdateInProgress(
   state: State,
   robot: ViewableRobot
