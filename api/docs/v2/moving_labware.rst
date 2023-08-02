@@ -63,7 +63,7 @@ The ``use_gripper`` parameter of :py:meth:`~.ProtocolContext.move_labware` deter
 
 The above example is a complete and valid ``run()`` function. You don't have to load the gripper as an instrument, and there is no ``InstrumentContext`` for the gripper. All you have to do to specify that a protocol requires the gripper is to include at least one ``move_labware()`` command with ``use_labware=True``.
 
-If you attempt to use the gripper to move labware in an OT-2 protocol, the API will raise a ``ErrorType TK`` error.
+If you attempt to use the gripper to move labware in an OT-2 protocol, the API will raise a ``NotSupportedOnRobotType`` error.
 
 
 Supported Labware
