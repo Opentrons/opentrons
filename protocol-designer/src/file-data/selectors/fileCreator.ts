@@ -11,6 +11,7 @@ import {
   OT2_STANDARD_DECKID,
   OT2_STANDARD_MODEL,
   OT3_STANDARD_DECKID,
+  PipetteName,
   SPAN7_8_10_11_SLOT,
 } from '@opentrons/shared-data'
 import { getFileMetadata, getRobotType } from './fileFields'
@@ -33,7 +34,6 @@ import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
 import type {
-  ModuleEntity,
   PipetteEntity,
   LabwareEntities,
   PipetteEntities,
@@ -42,14 +42,13 @@ import type {
 import type {
   CreateCommand,
   ProtocolFile,
-} from '@opentrons/shared-data/protocol/types/schemaV6'
+} from '@opentrons/shared-data/protocol/types/schemaV7'
 import type { Selector } from '../../types'
 import type {
   LoadLabwareCreateCommand,
   LoadModuleCreateCommand,
   LoadPipetteCreateCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
-
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
 if (isEmpty(process.env.OT_PD_VERSION))
@@ -102,6 +101,7 @@ export const createFile: Selector<ProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
+
   (
     fileMetadata,
     initialRobotState,
@@ -155,7 +155,11 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       },
     }
 
-    const pipettes: ProtocolFile['pipettes'] = mapValues(
+    interface Pipettes {
+      [pipetteId: string]: { name: PipetteName }
+    }
+
+    const pipettes: Pipettes = mapValues(
       initialRobotState.pipettes,
       (
         pipette: typeof initialRobotState.pipettes[keyof typeof initialRobotState.pipettes],
@@ -175,8 +179,9 @@ export const createFile: Selector<ProtocolFile> = createSelector(
           key: uuid(),
           commandType: 'loadPipette' as const,
           params: {
-            pipetteId: pipetteId,
+            pipetteName: pipettes[pipetteId].name,
             mount: pipette.mount,
+            pipetteId: pipetteId,
           },
         }
         return loadPipetteCommand
@@ -198,17 +203,6 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       {}
     )
 
-    const labware: ProtocolFile['labware'] = mapValues(
-      initialRobotState.labware,
-      (
-        l: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
-        labwareId: string
-      ) => ({
-        displayName: labwareNicknamesById[labwareId],
-        definitionId: labwareEntities[labwareId].labwareDefURI,
-      })
-    )
-
     const loadLabwareCommands = reduce<
       RobotState['labware'],
       LoadLabwareCreateCommand[]
@@ -221,11 +215,19 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ): LoadLabwareCreateCommand[] => {
         if (labwareId === FIXED_TRASH_ID) return [...acc]
         const isLabwareOnTopOfModule = labware.slot in initialRobotState.modules
+        const { labwareDefURI, def } = labwareEntities[labwareId]
+        const namespace = def.namespace
+        const loadName = labwareDefURI.split('/')[1].replace(/\/1$/, '')
+        const version = def.version
         const loadLabwareCommand = {
           key: uuid(),
           commandType: 'loadLabware' as const,
           params: {
+            displayName: def.metadata.displayName,
             labwareId: labwareId,
+            loadName,
+            namespace: namespace,
+            version: version,
             location: isLabwareOnTopOfModule
               ? { moduleId: labware.slot }
               : { slotName: labware.slot },
@@ -240,27 +242,22 @@ export const createFile: Selector<ProtocolFile> = createSelector(
       ingredients,
       ingredLocations
     )
-    const modules: ProtocolFile['modules'] = mapValues(
-      moduleEntities,
-      (moduleEntity: ModuleEntity, moduleId: string) => ({
-        model: moduleEntity.model,
-      })
-    )
-
     const loadModuleCommands = map(
       initialRobotState.modules,
       (
         module: typeof initialRobotState.modules[keyof typeof initialRobotState.modules],
         moduleId: string
       ): LoadModuleCreateCommand => {
+        const model = moduleEntities[moduleId].model
         const loadModuleCommand = {
           key: uuid(),
           commandType: 'loadModule' as const,
           params: {
-            moduleId: moduleId,
+            model: model,
             location: {
               slotName: module.slot === SPAN7_8_10_11_SLOT ? '7' : module.slot,
             },
+            moduleId: moduleId,
           },
         }
         return loadModuleCommand
@@ -303,16 +300,13 @@ export const createFile: Selector<ProtocolFile> = createSelector(
         robotType === FLEX_ROBOT_TYPE
           ? { model: FLEX_ROBOT_TYPE, deckId: OT3_STANDARD_DECKID }
           : { model: OT2_STANDARD_MODEL, deckId: OT2_STANDARD_DECKID },
-      pipettes,
-      labware,
       liquids,
       labwareDefinitions,
     }
     return {
       ...protocolFile,
-      $otSharedSchema: '#/protocol/schemas/6',
-      schemaVersion: 6,
-      modules,
+      $otSharedSchema: '#/protocol/schemas/7',
+      schemaVersion: 7,
       commands,
     }
   }

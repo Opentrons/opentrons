@@ -31,10 +31,9 @@ describe('delay', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       {
-        commandType: 'delay',
+        commandType: 'waitForResume',
         key: expect.any(String),
         params: {
-          waitForResume: true,
           message,
         },
       },
@@ -52,7 +51,7 @@ describe('delay', () => {
     const res = getSuccessResult(result)
     expect(res.commands).toEqual([
       {
-        commandType: 'delay',
+        commandType: 'waitForDuration',
         key: expect.any(String),
         params: {
           seconds: 95.5,

@@ -17,8 +17,11 @@ from opentrons_shared_data.labware import load_definition as load_labware
 
 from opentrons.config.robot_configs import build_config_ot3, load_ot3 as load_ot3_config
 from opentrons.config.advanced_settings import set_adv_setting
-from opentrons.hardware_control.backends.ot3utils import sensor_node_for_mount
 from opentrons.hardware_control.types import SubSystem
+from opentrons.hardware_control.backends.ot3utils import (
+    sensor_node_for_mount,
+    axis_convert,
+)
 
 # TODO (lc 10-27-2022) This should be changed to an ot3 pipette object once we
 # have that well defined.
@@ -485,15 +488,21 @@ async def move_tip_motor_relative_ot3(
     """Move 96ch tip-motor (Q) to an absolute position."""
     if not api.hardware_pipettes[OT3Mount.LEFT.to_mount()]:
         raise RuntimeError("No pipette found on LEFT mount")
-    if distance < 0:
-        action = "home"
-    else:
-        action = "clamp"
+
+    current_gear_pos_float = axis_convert(api._backend.gear_motor_position, 0.0)[
+        Axis.P_L
+    ]
+    current_gear_pos_dict = {Axis.Q: current_gear_pos_float}
+    target_pos_dict = {Axis.Q: current_gear_pos_float + distance}
+
+    if speed is not None and distance < 0:
+        speed *= -1
+
+    tip_motor_move = api._build_moves(current_gear_pos_dict, target_pos_dict)
+
     _move_coro = api._backend.tip_action(
-        axes=[Axis.Q],
-        distance=distance,
-        speed=speed if speed else 5,
-        tip_action=action,
+        moves=tip_motor_move[0],
+        tip_action="clamp",
     )
     if motor_current is None:
         await _move_coro

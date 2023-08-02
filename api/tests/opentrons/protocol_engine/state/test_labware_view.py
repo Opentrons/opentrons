@@ -28,6 +28,7 @@ from opentrons.protocol_engine.types import (
     LabwareLocation,
     OFF_DECK_LOCATION,
     OverlapOffset,
+    LabwareMovementOffsetData,
 )
 from opentrons.protocol_engine.state.move_types import EdgePathType
 from opentrons.protocol_engine.state.labware import (
@@ -75,6 +76,14 @@ tip_rack = LoadedLabware(
     loadName="tip-rack-load-name",
     location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
     definitionUri="some-tip-rack-uri",
+    offsetId=None,
+)
+
+adapter_plate = LoadedLabware(
+    id="adapter-plate-id",
+    loadName="adapter-load-name",
+    location=DeckSlotLocation(slotName=DeckSlotName.SLOT_1),
+    definitionUri="some-adapter-uri",
     offsetId=None,
 )
 
@@ -1271,3 +1280,38 @@ def test_raise_if_labware_cannot_be_stacked_on_labware_on_adapter() -> None:
             ),
             bottom_labware_id="labware-id",
         )
+
+
+def test_get_deck_gripper_offsets(ot3_standard_deck_def: DeckDefinitionV3) -> None:
+    """It should get the deck's gripper offsets."""
+    subject = get_labware_view(deck_definition=ot3_standard_deck_def)
+
+    assert subject.get_deck_default_gripper_offsets() == LabwareMovementOffsetData(
+        pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
+        dropOffset=LabwareOffsetVector(x=0, y=0, z=-0.25),
+    )
+
+
+def test_get_labware_gripper_offsets(
+    well_plate_def: LabwareDefinition,
+    adapter_plate_def: LabwareDefinition,
+) -> None:
+    """It should get the labware's gripper offsets."""
+    subject = get_labware_view(
+        labware_by_id={"plate-id": plate, "adapter-plate-id": adapter_plate},
+        definitions_by_uri={
+            "some-plate-uri": well_plate_def,
+            "some-adapter-uri": adapter_plate_def,
+        },
+    )
+
+    assert (
+        subject.get_labware_gripper_offsets(labware_id="plate-id", slot_name=None)
+        is None
+    )
+    assert subject.get_labware_gripper_offsets(
+        labware_id="adapter-plate-id", slot_name=DeckSlotName.SLOT_D1
+    ) == LabwareMovementOffsetData(
+        pickUpOffset=LabwareOffsetVector(x=0, y=0, z=0),
+        dropOffset=LabwareOffsetVector(x=2, y=0, z=0),
+    )

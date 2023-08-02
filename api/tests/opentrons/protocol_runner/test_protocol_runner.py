@@ -12,7 +12,7 @@ from opentrons.broker import Broker
 from opentrons.equipment_broker import EquipmentBroker
 from opentrons.hardware_control import API as HardwareAPI
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSchemaV6
+from opentrons_shared_data.protocol.models import ProtocolSchemaV6, ProtocolSchemaV7
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons.protocol_engine import ProtocolEngine, Liquid, commands as pe_commands
 from opentrons import protocol_reader
@@ -159,6 +159,7 @@ def live_runner_subject(
     "config, runner_type",
     [
         (JsonProtocolConfig(schema_version=6), JsonRunner),
+        (JsonProtocolConfig(schema_version=7), JsonRunner),
         (PythonProtocolConfig(api_version=APIVersion(2, 14)), PythonAndLegacyRunner),
         (JsonProtocolConfig(schema_version=5), PythonAndLegacyRunner),
         (PythonProtocolConfig(api_version=APIVersion(2, 13)), PythonAndLegacyRunner),
@@ -302,6 +303,13 @@ async def test_run_json_runner(
     )
 
 
+@pytest.mark.parametrize(
+    "schema_version, json_protocol",
+    [
+        (6, ProtocolSchemaV6.construct()),  # type: ignore[call-arg]
+        (7, ProtocolSchemaV7.construct()),  # type: ignore[call-arg]
+    ],
+)
 async def test_load_json_runner(
     decoy: Decoy,
     json_file_reader: JsonFileReader,
@@ -309,6 +317,8 @@ async def test_load_json_runner(
     protocol_engine: ProtocolEngine,
     task_queue: TaskQueue,
     json_runner_subject: JsonRunner,
+    schema_version: int,
+    json_protocol: Union[ProtocolSchemaV6, ProtocolSchemaV7],
 ) -> None:
     """It should load a JSON protocol file."""
     labware_definition = LabwareDefinition.construct()  # type: ignore[call-arg]
@@ -319,11 +329,9 @@ async def test_load_json_runner(
         files=[],
         metadata={},
         robot_type="OT-2 Standard",
-        config=JsonProtocolConfig(schema_version=6),
+        config=JsonProtocolConfig(schema_version=schema_version),
         content_hash="abc123",
     )
-
-    json_protocol = ProtocolSchemaV6.construct()  # type: ignore[call-arg]
 
     commands: List[pe_commands.CommandCreate] = [
         pe_commands.WaitForResumeCreate(

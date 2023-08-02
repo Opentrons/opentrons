@@ -20,6 +20,7 @@ export const thermocyclerSetTargetBlockTemperature: CommandCreator<ThermocyclerS
         params: {
           moduleId: args.module,
           celsius: args.temperature,
+          //  TODO( jr 7/17/23): add optional blockMaxVolumeUI and holdTimeSeconds params
         },
       },
     ],

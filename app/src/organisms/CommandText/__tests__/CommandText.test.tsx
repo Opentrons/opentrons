@@ -4,12 +4,12 @@ import { i18n } from '../../../i18n'
 import { CommandText } from '../'
 import { mockRobotSideAnalysis } from '../__fixtures__'
 
-import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/gantry'
-import type { BlowoutRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
+import type { MoveToWellRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/gantry'
+import type { BlowoutRunTimeCommand } from '@opentrons/shared-data/protocol/types/schemaV7/command/pipetting'
 import type {
   LoadLabwareRunTimeCommand,
   LoadLiquidRunTimeCommand,
-} from '@opentrons/shared-data/protocol/types/schemaV6/command/setup'
+} from '@opentrons/shared-data/protocol/types/schemaV7/command/setup'
 import { RunTimeCommand } from '@opentrons/shared-data'
 
 describe('CommandText', () => {

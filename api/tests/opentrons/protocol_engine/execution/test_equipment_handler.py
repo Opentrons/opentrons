@@ -6,6 +6,7 @@ from decoy import Decoy, matchers
 from typing import Any, Optional, cast
 
 from opentrons_shared_data.pipette.dev_types import PipetteNameType
+from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.labware.dev_types import LabwareUri
 
 from opentrons.calibration_storage.helpers import uri_from_details
@@ -126,7 +127,9 @@ async def temp_module_v2(decoy: Decoy) -> TempDeck:
 
 
 @pytest.fixture
-def loaded_static_pipette_data() -> LoadedStaticPipetteData:
+def loaded_static_pipette_data(
+    supported_tip_fixture: pipette_definition.SupportedTipsDefinition,
+) -> LoadedStaticPipetteData:
     """Get a pipette config data value object."""
     return LoadedStaticPipetteData(
         model="pipette_model",
@@ -139,7 +142,7 @@ def loaded_static_pipette_data() -> LoadedStaticPipetteData:
             default_aspirate={"b": 4.56},
             default_dispense={"c": 7.89},
         ),
-        return_tip_scale=0.5,
+        tip_configuration_lookup_table={4.56: supported_tip_fixture},
         nominal_tip_overlap={"default": 9.87},
         home_position=10.11,
         nozzle_offset_z=12.13,
