@@ -343,8 +343,8 @@ class HeaterShaker(mod_abc.AbstractModule):
 
     async def deactivate(self, must_be_running: bool = True) -> None:
         """Stop heating/cooling; stop shaking and home the plate"""
-        await self.deactivate_heater()
-        await self.deactivate_shaker()
+        await self.deactivate_heater(must_be_running=must_be_running)
+        await self.deactivate_shaker(must_be_running=must_be_running)
 
     async def deactivate_heater(self, must_be_running: bool = True) -> None:
         """Stop heating/cooling"""
